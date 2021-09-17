@@ -9,14 +9,20 @@ Tables are essentially pandas DataFrames but with metadata. All operations on th
 #### Make a new table
 
 ```python
-t = Table({'gdp': [1, 2, 3], 'country': ['AU', 'SE', 'CH']}).set_index('country')
+# same API as DataFrames
+t = Table({
+    'gdp': [1, 2, 3],
+    'country': ['AU', 'SE', 'CH']
+}).set_index('country')
 ```
 
 #### Add metadata about the whole table
 
 ```python
 t.title = 'Very important data'
-t.sources.append(Source(title='World Bank', 'url': 'https://www.worldbank.org/en/home'))
+t.sources.append(
+    Source(title='World Bank', url='https://www.worldbank.org/en/home')
+)
 ```
 
 #### Add metadata about a field
