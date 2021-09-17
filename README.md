@@ -20,25 +20,37 @@ t = Table({
 
 ```python
 t.title = 'Very important data'
-t.sources.append(
-    Source(title='World Bank', url='https://www.worldbank.org/en/home')
-)
 ```
 
 #### Add metadata about a field
 
 ```python
 t.gdp.description = 'GDP measured in 2011 international $'
+t.sources = [
+    Source(title='World Bank', url='https://www.worldbank.org/en/home')
+]
+```
+
+#### Add metadata about all fields at once
+
+```python
+# sources and licenses are actually stored a the field level
+t.sources = [
+    Source(title='World Bank', url='https://www.worldbank.org/en/home')
+]
+t.licenses = [
+    License('CC-BY-SA-4.0', url='https://creativecommons.org/licenses/by-nc/4.0/')
+]
 ```
 
 #### Save a table to disk
 
 ```python
 # save to /tmp/my_table.feather + /tmp/my_table.meta.json
-t.save_feather('/tmp/my_table.feather')
+t.to_feather('/tmp/my_table.feather')
 
 # save to /tmp/my_table.csv + /tmp/my_table.meta.json
-t.save_csv('/tmp/my_table.csv')
+t.to_csv('/tmp/my_table.csv')
 ```
 
 #### Load a table from disk
