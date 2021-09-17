@@ -53,7 +53,11 @@ t = Table.read_csv('/tmp/my_table.csv')
 
 ## Datasets
 
-A dataset is a folder of tables containing metadata about the overall collection. All operations on them are serialized to disk the moment they happen. Metadata about the dataset lives in `index.json`.
+A dataset is a folder of tables containing metadata about the overall collection.
+
+- All operations on them are serialized to disk the moment they happen
+- Metadata about the dataset lives in `index.json`
+- All tables in the folder must share a common format (CSV or Feather)
 
 #### Create a new dataset
 
