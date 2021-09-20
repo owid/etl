@@ -11,6 +11,7 @@ jsonschema = "^3.2.0"
 pandas-stubs = "^1.2.0"
 dataclasses-json = "^0.5.6"
 pyarrow = "^5.0.0"
+ipdb = "^0.13.9"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"

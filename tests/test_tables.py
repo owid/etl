@@ -9,7 +9,7 @@ import jsonschema
 import pytest
 
 from etl.tables import Table, SCHEMA
-from etl.variables import Variable
+from etl.variables import VariableMeta
 
 
 def test_create():
@@ -46,11 +46,17 @@ def test_add_field_metadata():
     t = Table({"gdp": [100, 102, 104], "country": ["AU", "SE", "CH"]})
     title = "GDP per capita in 2011 international $"
 
-    assert isinstance(t.gdp, Variable)
+    assert t.gdp.metadata == VariableMeta()
 
     t.gdp.title = title
 
-    # field-level metadata persists across slices
+    # check single field access
+    assert t.gdp.title == title
+
+    # check entire metadata access
+    assert t.gdp.metadata == VariableMeta(title=title)
+
+    # check field-level metadata persists across slices
     assert t.iloc[:1].gdp.title == title
 
 
@@ -88,8 +94,21 @@ def test_round_trip_with_index():
         assert_tables_eq(t1, t2)
 
 
-# def test_round_trip_with_metadata():
-#     raise Exception("TODO")
+def test_round_trip_with_metadata():
+    t1 = Table({"gdp": [100, 102, 104], "country": ["AU", "SE", "CH"]})
+    t1.set_index("country", inplace=True)
+    t1.title = "A very special table"
+    t1.description = "Something something"
+
+    with tempfile.TemporaryDirectory() as path:
+        filename = join(path, "table.feather")
+        t1.to_feather(filename)
+
+        assert exists(filename)
+        assert exists(splitext(filename)[0] + ".meta.json")
+
+        t2 = Table.read_feather(filename)
+        assert_tables_eq(t1, t2)
 
 
 def assert_tables_eq(lhs: Table, rhs: Table) -> None:

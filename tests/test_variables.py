@@ -4,7 +4,7 @@
 
 import pytest
 
-from etl.variables import Variable
+from etl.variables import Variable, VariableMeta
 
 
 def test_create_empty_variable() -> None:
@@ -36,3 +36,8 @@ def test_metadata_survives_slicing() -> None:
 
     assert isinstance(v.iloc[:2], Variable)
     # assert v.iloc[:2].description == v.description
+
+
+def test_metadata_accessed_in_bulk() -> None:
+    v = Variable([1, 2, 3], name="dog")
+    assert v.metadata == VariableMeta()

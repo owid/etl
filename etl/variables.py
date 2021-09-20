@@ -27,13 +27,18 @@ class Variable(pd.Series):
 
     def __init__(
         self,
-        *args: Any,
+        data: Any = None,
+        index: Any = None,
         _fields: Optional[Dict[str, VariableMeta]] = None,
         **kwargs: Any,
     ) -> None:
         self._fields = _fields or {}
 
-        super().__init__(*args, **kwargs)
+        # silence warning
+        if not data and not kwargs.get("dtype"):
+            kwargs["dtype"] = "object"
+
+        super().__init__(data=data, index=index, **kwargs)
 
     @property
     def name(self) -> Optional[str]:
@@ -58,6 +63,7 @@ class Variable(pd.Series):
 
         return self.name
 
+    # which fields should pandas propagate on slicing, etc?
     _metadata = ["_fields"]
 
     @property
@@ -68,18 +74,24 @@ class Variable(pd.Series):
     def _constructor_expanddim(self) -> type:
         return tables.Table
 
+    @property
+    def metadata(self) -> VariableMeta:
+        return self._fields[self.checked_name]
+
+
+def _proxied_property(k: str) -> property:
+    def getter(self) -> Any:  # type: ignore
+        return getattr(self.metadata, k)
+
+    def setter(self, v: Any) -> None:  # type: ignore
+        return setattr(self.metadata, k, v)
+
+    return property(getter, setter)
+
 
 # dynamically add all metadata properties to the class
 for k in VariableMeta.__dataclass_fields__:  # type: ignore
-    setattr(
-        Variable,
-        k,
-        property(
-            lambda self: getattr(self._fields[self.checked_name], k),
-            lambda self, v: setattr(
-                self._fields[self.checked_name],
-                k,
-                v,
-            ),
-        ),
-    )
+    if hasattr(Variable, k):
+        raise Exception(f'metadata field "{k}" would overwrite a Pandas built-in')
+
+    setattr(Variable, k, _proxied_property(k))

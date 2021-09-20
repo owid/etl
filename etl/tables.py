@@ -18,13 +18,14 @@ METADATA_FIELDS = list(SCHEMA["properties"])
 
 @dataclass_json
 @dataclass
-class TableMetadata:
-    name: Optional[str]
-    title: Optional[str]
-    description: Optional[str]
+class TableMeta:
+    name: Optional[str] = None
+    title: Optional[str] = None
+    description: Optional[str] = None
 
 
 class Table(pd.DataFrame):
+    metadata: TableMeta
     _fields: Dict[str, variables.VariableMeta]
 
     # propagate all these fields on every slice or copy
@@ -39,22 +40,17 @@ class Table(pd.DataFrame):
     def _constructor_sliced(self) -> Any:
         return variables.Variable
 
-    def __init__(self, *args: Any, **kwargs: Any) -> None:
+    def __init__(
+        self, *args: Any, metadata: Optional[TableMeta] = None, **kwargs: Any
+    ) -> None:
         super().__init__(*args, **kwargs)
-        for f in METADATA_FIELDS:
-            assert not hasattr(self, f)
-            setattr(self, f, None)
 
+        # empty table metadata by default
+        self.metadata = metadata or TableMeta()
+
+        # all columns have empty metadata by default
         assert not hasattr(self, "_fields")
         self._fields = {col: variables.VariableMeta() for col in self.columns}
-
-    @property
-    def metadata(self) -> TableMetadata:
-        return TableMetadata(
-            **{
-                f: getattr(self, f) for f in TableMetadata.__dataclass_fields__  # type: ignore
-            }
-        )
 
     @property
     def primary_key(self) -> List[str]:
@@ -110,3 +106,21 @@ class Table(pd.DataFrame):
             df.set_index(primary_key, inplace=True)
 
         return df
+
+
+def _proxied_property(k: str) -> property:
+    def getter(self) -> Any:  # type: ignore
+        return getattr(self.metadata, k)
+
+    def setter(self, v: Any) -> None:  # type: ignore
+        return setattr(self.metadata, k, v)
+
+    return property(getter, setter)
+
+
+# dynamically add all metadata properties to the class
+for k in TableMeta.__dataclass_fields__:  # type: ignore
+    if hasattr(Table, k):
+        raise Exception(f'metadata field "{k}" would overwrite a Pandas built-in')
+
+    setattr(Table, k, _proxied_property(k))
