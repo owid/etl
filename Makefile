@@ -13,3 +13,7 @@ SRC = etl tests
 check-typing:
 	@echo '==> Checking types'
 	PYTHONPATH=. poetry run mypy --strict .
+
+coverage:
+	@echo '==> Unit testing with coverage'
+	poetry run pytest --cov=etl --cov-report=term-missing tests

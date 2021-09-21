@@ -12,6 +12,7 @@ pandas-stubs = "^1.2.0"
 dataclasses-json = "^0.5.6"
 pyarrow = "^5.0.0"
 ipdb = "^0.13.9"
+pytest-cov = "^2.12.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
