@@ -8,8 +8,8 @@ from os.path import join, exists, splitext
 import jsonschema
 import pytest
 
-from etl.tables import Table, SCHEMA, TableMeta
-from etl.variables import VariableMeta
+from etl.tables import Table, SCHEMA
+from etl.meta import VariableMeta, TableMeta
 from .mocking import mock
 
 
@@ -122,9 +122,22 @@ def test_field_metadata_copied_between_tables():
     assert t2.gdp.metadata == t1.gdp.metadata
 
 
+def test_field_metadata_serialised():
+    t1 = Table({"gdp": [100, 102, 104], "country": ["AU", "SE", "CH"]})
+    t1.gdp.description = "Something grand"
+
+    with tempfile.TemporaryDirectory() as dirname:
+        filename = join(dirname, "test.feather")
+        t1.to_feather(filename)
+
+        t2 = Table.read_feather(filename)
+        assert_tables_eq(t1, t2)
+
+
 def assert_tables_eq(lhs: Table, rhs: Table) -> None:
     assert lhs.to_dict() == rhs.to_dict()
     assert lhs.metadata == rhs.metadata
+    assert lhs._fields == rhs._fields
 
 
 def mock_table() -> Table:

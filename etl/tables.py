@@ -2,36 +2,32 @@
 #  tables.py
 #
 
-from dataclasses import dataclass
 from os.path import join, dirname, splitext
 import json
-from typing import Any, Dict, Optional, List
+from typing import Any, Optional, List, Dict
 from collections import defaultdict
 
 import pandas as pd
-from dataclasses_json import dataclass_json
 
 from . import variables
 from .properties import metadata_property
+from .meta import VariableMeta, TableMeta
 
 SCHEMA = json.load(open(join(dirname(__file__), "schemas", "table.json")))
 METADATA_FIELDS = list(SCHEMA["properties"])
 
 
-@dataclass_json
-@dataclass
-class TableMeta:
-    name: Optional[str] = None
-    title: Optional[str] = None
-    description: Optional[str] = None
-
-
 class Table(pd.DataFrame):
+    # metdata about the entire table
     metadata: TableMeta
-    _fields: Dict[str, variables.VariableMeta]
+
+    # metadata about individual columns
+    # NOTE: the name _fields is also on the Variable class, pandas will propagate this to
+    #       any slices, which is how they get access to their metadata
+    _fields: Dict[str, VariableMeta]
 
     # propagate all these fields on every slice or copy
-    _metadata = METADATA_FIELDS + ["_fields"]
+    _metadata = ["metadata", "_fields"]
 
     # slicing and copying creates tables
     @property
@@ -52,7 +48,7 @@ class Table(pd.DataFrame):
 
         # all columns have empty metadata by default
         assert not hasattr(self, "_fields")
-        self._fields = defaultdict(variables.VariableMeta)
+        self._fields = defaultdict(VariableMeta)
 
     @property
     def primary_key(self) -> List[str]:
@@ -81,6 +77,7 @@ class Table(pd.DataFrame):
         with open(metadata_filename, "w") as ostream:
             metadata = self.metadata.to_dict()  # type: ignore
             metadata["primary_key"] = primary_key
+            metadata["fields"] = {k: v.to_dict() for k, v in self._fields.items()}
             json.dump(metadata, ostream, indent=2)
 
     @classmethod
@@ -98,11 +95,14 @@ class Table(pd.DataFrame):
         metadata_filename = splitext(path)[0] + ".meta.json"
         with open(metadata_filename, "r") as istream:
             metadata = json.load(istream)
-            primary_key = (
-                metadata.pop("primary_key") if "primary_key" in metadata else []
-            )
-            for k, v in metadata.items():
-                setattr(df, k, v)
+
+        primary_key = metadata.pop("primary_key") if "primary_key" in metadata else []
+        fields = metadata.pop("fields") if "fields" in metadata else {}
+
+        df.metadata = TableMeta(**metadata)
+        df._fields = defaultdict(
+            VariableMeta, {k: VariableMeta.from_dict(v) for k, v in fields.items()}
+        )
 
         if primary_key:
             df.set_index(primary_key, inplace=True)
@@ -117,7 +117,7 @@ class Table(pd.DataFrame):
             if isinstance(value, variables.Variable):
                 self._fields[key] = value.metadata
             else:
-                self._fields[key] = variables.VariableMeta()
+                self._fields[key] = VariableMeta()
 
     def equals_table(self, rhs: "Table") -> bool:
         return (

@@ -4,7 +4,8 @@
 
 import pytest
 
-from etl.variables import Variable, VariableMeta
+from etl.variables import Variable
+from etl.meta import VariableMeta
 
 
 def test_create_empty_variable() -> None:

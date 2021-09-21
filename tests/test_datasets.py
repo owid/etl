@@ -7,21 +7,25 @@ from os.path import join, exists
 from os import rmdir
 import json
 import shutil
+from contextlib import contextmanager
+from typing import Iterator
 
 import pytest
 
-from etl.datasets import Dataset, DatasetMeta
+from etl.datasets import Dataset
+from etl.meta import DatasetMeta
 from .test_tables import mock_table
+from .mocking import mock
 
 
 def test_dataset_fails_to_load_empty_folder():
-    with tempfile.TemporaryDirectory() as dirname:
+    with temp_dataset_dir(create=True) as dirname:
         with pytest.raises(Exception):
             Dataset(dirname)
 
 
 def test_create_empty():
-    with tempfile.TemporaryDirectory() as dirname:
+    with temp_dataset_dir(create=True) as dirname:
         shutil.rmtree(dirname)
 
         Dataset.create_empty(dirname)
@@ -33,13 +37,13 @@ def test_create_empty():
 
 
 def test_create_fails_if_non_dataset_dir_exists():
-    with tempfile.TemporaryDirectory() as dirname:
+    with temp_dataset_dir(create=True) as dirname:
         with pytest.raises(Exception):
             Dataset.create_empty(dirname)
 
 
 def test_create_overwrites_entire_folder():
-    with tempfile.TemporaryDirectory() as dirname:
+    with temp_dataset_dir(create=True) as dirname:
         with open(join(dirname, "index.json"), "w") as ostream:
             ostream.write('{"clam": "chowder"}')
 
@@ -54,26 +58,10 @@ def test_create_overwrites_entire_folder():
     assert open(d._index_file).read().strip() == "{}"
 
 
-def test_loading_metadata_does_not_trigger_autosaving():
-    with tempfile.NamedTemporaryFile() as temp:
-        with open(temp.name, "w") as ostream:
-            json.dump({"title": "Hello", "description": "Thar"}, ostream)
-
-        metadata = DatasetMeta.load(temp.name)
-        assert metadata._save_count == 0
-        assert metadata.title == "Hello"
-        assert metadata.description == "Thar"
-
-        metadata.title = "I changed my mind"
-        assert metadata._save_count == 1
-
-
 def test_add_table():
     t = mock_table()
 
-    with tempfile.TemporaryDirectory() as dirname:
-        rmdir(dirname)
-
+    with temp_dataset_dir() as dirname:
         # make a dataset
         ds = Dataset.create_empty(dirname)
 
@@ -94,3 +82,21 @@ def test_add_table():
 
         # the fresh copy from disk should be identical to the copy we added
         assert t2.equals_table(t)
+
+
+def test_metadata_roundtrip():
+    with temp_dataset_dir() as dirname:
+        d = Dataset.create_empty(dirname)
+        d.metadata = mock(DatasetMeta)
+        d.save()
+
+        d2 = Dataset(dirname)
+        assert d2.metadata == d.metadata
+
+
+@contextmanager
+def temp_dataset_dir(create: bool = False) -> Iterator[str]:
+    with tempfile.TemporaryDirectory() as dirname:
+        if not create:
+            rmdir(dirname)
+        yield dirname

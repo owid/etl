@@ -120,9 +120,10 @@ for table in ds:
 #### Add metadata
 
 ```python
-# changes saved to index.json with each assignment
+# you need to manually save your changes
 ds.title = "Very Important Dataset"
 ds.description = "This dataset is a composite of blah blah blah..."
+ds.save()
 ```
 
 #### Copy a dataset

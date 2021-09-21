@@ -5,21 +5,14 @@
 from os import path
 import json
 from typing import Any, Dict, Optional
-from dataclasses import dataclass
 
 import pandas as pd
 
-from . import tables
 from .properties import metadata_property
+from .meta import VariableMeta
 
 SCHEMA = json.load(open(path.join(path.dirname(__file__), "schemas", "table.json")))
 METADATA_FIELDS = list(SCHEMA["properties"])
-
-
-@dataclass
-class VariableMeta:
-    title: Optional[str] = None
-    description: Optional[str] = None
 
 
 class Variable(pd.Series):
@@ -73,6 +66,9 @@ class Variable(pd.Series):
 
     @property
     def _constructor_expanddim(self) -> type:
+        # XXX lazy circular import
+        from . import tables
+
         return tables.Table
 
     @property

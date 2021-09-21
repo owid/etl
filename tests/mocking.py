@@ -33,6 +33,9 @@ def mock(_type: type) -> Any:
     if _type == int:
         return random.randint(0, 1000)
 
+    elif _type == bool:
+        return random.choice([True, False])
+
     elif _type == float:
         return 10 * random.random() / random.random()
 
