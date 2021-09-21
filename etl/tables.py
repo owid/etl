@@ -6,11 +6,13 @@ from dataclasses import dataclass
 from os.path import join, dirname, splitext
 import json
 from typing import Any, Dict, Optional, List
+from collections import defaultdict
 
 import pandas as pd
 from dataclasses_json import dataclass_json
 
 from . import variables
+from .properties import metadata_property
 
 SCHEMA = json.load(open(join(dirname(__file__), "schemas", "table.json")))
 METADATA_FIELDS = list(SCHEMA["properties"])
@@ -50,7 +52,7 @@ class Table(pd.DataFrame):
 
         # all columns have empty metadata by default
         assert not hasattr(self, "_fields")
-        self._fields = {col: variables.VariableMeta() for col in self.columns}
+        self._fields = defaultdict(variables.VariableMeta)
 
     @property
     def primary_key(self) -> List[str]:
@@ -107,15 +109,22 @@ class Table(pd.DataFrame):
 
         return df
 
+    def __setitem__(self, key: Any, value: Any) -> Any:
+        super().__setitem__(key, value)
 
-def _proxied_property(k: str) -> property:
-    def getter(self) -> Any:  # type: ignore
-        return getattr(self.metadata, k)
+        # propagate metadata when we add a series to a table
+        if isinstance(key, str):
+            if isinstance(value, variables.Variable):
+                self._fields[key] = value.metadata
+            else:
+                self._fields[key] = variables.VariableMeta()
 
-    def setter(self, v: Any) -> None:  # type: ignore
-        return setattr(self.metadata, k, v)
-
-    return property(getter, setter)
+    def equals_table(self, rhs: "Table") -> bool:
+        return (
+            isinstance(rhs, Table)
+            and self.metadata == rhs.metadata
+            and self.to_dict() == rhs.to_dict()
+        )
 
 
 # dynamically add all metadata properties to the class
@@ -123,4 +132,4 @@ for k in TableMeta.__dataclass_fields__:  # type: ignore
     if hasattr(Table, k):
         raise Exception(f'metadata field "{k}" would overwrite a Pandas built-in')
 
-    setattr(Table, k, _proxied_property(k))
+    setattr(Table, k, metadata_property(k))

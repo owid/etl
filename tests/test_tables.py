@@ -8,8 +8,9 @@ from os.path import join, exists, splitext
 import jsonschema
 import pytest
 
-from etl.tables import Table, SCHEMA
+from etl.tables import Table, SCHEMA, TableMeta
 from etl.variables import VariableMeta
+from .mocking import mock
 
 
 def test_create():
@@ -111,6 +112,24 @@ def test_round_trip_with_metadata():
         assert_tables_eq(t1, t2)
 
 
+def test_field_metadata_copied_between_tables():
+    t1 = Table({"gdp": [100, 102, 104], "country": ["AU", "SE", "CH"]})
+    t2 = Table({"hdi": [73, 92, 45], "country": ["AU", "SE", "CH"]})
+
+    t1.gdp.description = "A very important measurement"
+
+    t2["gdp"] = t1.gdp
+    assert t2.gdp.metadata == t1.gdp.metadata
+
+
 def assert_tables_eq(lhs: Table, rhs: Table) -> None:
     assert lhs.to_dict() == rhs.to_dict()
     assert lhs.metadata == rhs.metadata
+
+
+def mock_table() -> Table:
+    t: Table = Table({"gdp": [100, 102, 104], "country": ["AU", "SE", "CH"]}).set_index(
+        "country"
+    )  # type: ignore
+    t.metadata = mock(TableMeta)
+    return t

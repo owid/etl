@@ -10,6 +10,7 @@ from dataclasses import dataclass
 import pandas as pd
 
 from . import tables
+from .properties import metadata_property
 
 SCHEMA = json.load(open(path.join(path.dirname(__file__), "schemas", "table.json")))
 METADATA_FIELDS = list(SCHEMA["properties"])
@@ -79,19 +80,9 @@ class Variable(pd.Series):
         return self._fields[self.checked_name]
 
 
-def _proxied_property(k: str) -> property:
-    def getter(self) -> Any:  # type: ignore
-        return getattr(self.metadata, k)
-
-    def setter(self, v: Any) -> None:  # type: ignore
-        return setattr(self.metadata, k, v)
-
-    return property(getter, setter)
-
-
 # dynamically add all metadata properties to the class
 for k in VariableMeta.__dataclass_fields__:  # type: ignore
     if hasattr(Variable, k):
         raise Exception(f'metadata field "{k}" would overwrite a Pandas built-in')
 
-    setattr(Variable, k, _proxied_property(k))
+    setattr(Variable, k, metadata_property(k))
