@@ -2,6 +2,8 @@
 #  Makefile
 #
 
+.PHONY: etl
+
 
 include default.mk
 
@@ -17,3 +19,7 @@ check-typing:
 coverage:
 	@echo '==> Unit testing with coverage'
 	poetry run pytest --cov=etl --cov-report=term-missing tests
+
+etl:
+	@echo '==> Running full etl'
+	poetry run python -m etl.command

@@ -1,0 +1,3 @@
+steps:
+  data://example:
+    - walden://who/latest/ghe

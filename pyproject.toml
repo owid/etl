@@ -8,6 +8,8 @@ authors = ["Lars Yencken <lars@yencken.org>"]
 python = "^3.9"
 owid-catalog = {path = "vendor/owid-catalog-py"}
 walden = {path = "vendor/walden"}
+click = "^8.0.1"
+PyYAML = "^5.4.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
