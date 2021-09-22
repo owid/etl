@@ -1,5 +1,8 @@
 .coverage
 /data
+**/__pycache__
+.virtual_documents
+**/.ipynb_checkpoints
 .submodule-init
 .mypy-cache
 .pytest-cache
