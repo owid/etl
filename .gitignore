@@ -3,6 +3,7 @@
 **/__pycache__
 .virtual_documents
 **/.ipynb_checkpoints
+data
 .submodule-init
 .mypy-cache
 .pytest-cache
