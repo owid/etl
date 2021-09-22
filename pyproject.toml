@@ -17,6 +17,8 @@ flake8 = "^3.9.2"
 watchdog = "^2.1.5"
 PyYAML = "^5.4.1"
 argh = "^0.26.2"
+jupyter = "^1.0.0"
+ipython = "^7.27.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
