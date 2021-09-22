@@ -1,3 +1,6 @@
 [submodule "vendor/owid-catalog-py"]
 	path = vendor/owid-catalog-py
 	url = git@github.com:owid/owid-catalog-py
+[submodule "vendor/walden"]
+	path = vendor/walden
+	url = git@github.com:owid/walden

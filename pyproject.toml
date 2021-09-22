@@ -7,6 +7,7 @@ authors = ["Lars Yencken <lars@yencken.org>"]
 [tool.poetry.dependencies]
 python = "^3.9"
 owid-catalog = {path = "vendor/owid-catalog-py"}
+walden = {path = "vendor/walden"}
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
