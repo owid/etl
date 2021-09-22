@@ -23,3 +23,9 @@ coverage:
 etl:
 	@echo '==> Running full etl'
 	poetry run python -m etl.command
+
+clean:
+	rm -rf data/*
+
+clobber: clean
+	rm -rf .venv
