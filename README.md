@@ -2,6 +2,24 @@
 
 _A compute graph for loading and transforming data for OWID._
 
+## Developing
+
+You need Python 3.9+ and `poetry` installed.
+
+Then there's some once-off intialisation to do:
+
+```
+# check out submodules
+git submodule update --init
+
+# create virtualenv
+poetry install
+```
+
+Then you can run all checks with:
+
+`make test`
+
 ## Tables
 
 Tables are essentially pandas DataFrames but with metadata. All operations on them occur in-memory, except for loading from and saving to disk. On disk, they are represented by tabular file (feather or CSV) and a JSON metadata file.

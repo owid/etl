@@ -24,11 +24,11 @@ check-formatting-default:
 
 check-typing-default:
 	@echo '==> Checking types'
-	PYTHONPATH=. poetry run mypy .
+	poetry run mypy $(SRC)
 
 unittest-default:
 	@echo '==> Running unit tests'
-	@PYTHONPATH=. poetry run pytest
+	poetry run pytest $(SRC)
 
 format-default:
 	@echo '==> Reformatting files'

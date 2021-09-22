@@ -301,6 +301,28 @@ optional = false
 python-versions = ">=3.7"
 
 [[package]]
+name = "owid-catalog"
+version = "0.1.0"
+description = "Core data types used by OWID for managing data."
+category = "main"
+optional = false
+python-versions = "^3.9"
+develop = false
+
+[package.dependencies]
+dataclasses-json = "^0.5.6"
+ipdb = "^0.13.9"
+jsonschema = "^3.2.0"
+pandas = "^1.3.3"
+pandas-stubs = "^1.2.0"
+pyarrow = "^5.0.0"
+pytest-cov = "^2.12.1"
+
+[package.source]
+type = "directory"
+url = "vendor/owid-catalog-py"
+
+[[package]]
 name = "packaging"
 version = "21.0"
 description = "Core utilities for Python packages"
@@ -625,7 +647,7 @@ python-versions = "*"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "8ae95f876245197fb49bf8c25635bb54a38b8198bc20c98ddf8064208a8f1368"
+content-hash = "5d1cddbd86612c144cef7d7bc4719c4cfc30e8945ba89a270d297f54819441ae"
 
 [metadata.files]
 appnope = [
@@ -820,6 +842,7 @@ numpy = [
     {file = "numpy-1.21.1-pp37-pypy37_pp73-manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:2d4d1de6e6fb3d28781c73fbde702ac97f03d79e4ffd6598b880b2d95d62ead4"},
     {file = "numpy-1.21.1.zip", hash = "sha256:dff4af63638afcc57a3dfb9e4b26d434a7a602d225b42d746ea7fe2edf1342fd"},
 ]
+owid-catalog = []
 packaging = [
     {file = "packaging-21.0-py3-none-any.whl", hash = "sha256:c86254f9220d55e31cc94d69bade760f0847da8000def4dfe1c6b872fd14ff14"},
     {file = "packaging-21.0.tar.gz", hash = "sha256:7dc96269f53a4ccec5c0670940a4281106dd0bb343f47b7471f779df49c2fbe7"},

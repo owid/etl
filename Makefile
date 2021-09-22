@@ -12,7 +12,7 @@ SRC = etl tests
 
 check-typing:
 	@echo '==> Checking types'
-	PYTHONPATH=. poetry run mypy --strict .
+	poetry run mypy --strict $(SRC)
 
 coverage:
 	@echo '==> Unit testing with coverage'
