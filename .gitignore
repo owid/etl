@@ -1,2 +1,8 @@
 .coverage
 data
+.submodule-init
+.mypy-cache
+.pytest-cache
+.github
+.venv
+__pycache__
