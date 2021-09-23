@@ -90,8 +90,6 @@ def topological_sort(graph: Graph) -> List[str]:
 
 
 def run_step(step_name: str) -> None:
-    step_base = f"{BASE_DIR}/steps/{step_name}"
-
     step_type, _path = parse_step(step_name)
     if step_type == "data":
         run_data_step(_path)
