@@ -30,6 +30,7 @@ jobs:
 
     - name: Install packages
       run: |
+        git submodule update --init
         poetry install
 
     - name: Check formatting
