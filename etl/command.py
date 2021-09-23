@@ -5,10 +5,11 @@
 
 from os import path
 from importlib import import_module
-from typing import List, Dict, Set, Iterable, Tuple, Any
+from typing import Callable, List, Dict, Set, Iterable, Tuple, Any
 from collections import defaultdict
 import graphlib
 from urllib.parse import urlparse
+import time
 
 import click
 import yaml
@@ -38,12 +39,14 @@ def main(steps: List[str], dry_run: bool = False) -> None:
         subgraph = graph
 
     step_names = topological_sort(subgraph)
+    print(f"Running {len(step_names)} steps:")
     for i, step_name in enumerate(step_names, 1):
-        print(f"{i}. {step_name}...")
+        print(f"  {i}. {step_name}... ", end="", flush=True)
         if not dry_run:
-            run_step(step_name)
-
-    print("Done")
+            time_taken = timed_run(lambda: run_step(step_name))
+            print(f"({time_taken:.0f}s)")
+        else:
+            print()
 
 
 def load_yaml(filename: str) -> Dict[str, Any]:
@@ -143,6 +146,12 @@ def _find_walden_dataset(walden_path: str) -> walden.Dataset:
 def parse_step(step_name: str) -> Tuple[str, str]:
     parts = urlparse(step_name)
     return parts.scheme, parts.netloc + parts.path
+
+
+def timed_run(f: Callable[[], Any]) -> float:
+    start_time = time.time()
+    f()
+    return time.time() - start_time
 
 
 if __name__ == "__main__":
