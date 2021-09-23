@@ -13,6 +13,8 @@ from urllib.parse import urlparse
 import click
 import yaml
 
+from owid import walden
+
 BASE_DIR = path.join(path.dirname(__file__), "..")
 DAG_FILE = path.join(BASE_DIR, "dag.yml")
 DATA_DIR = path.join(BASE_DIR, "data")
@@ -90,12 +92,13 @@ def topological_sort(graph: Graph) -> List[str]:
 
 
 def run_step(step_name: str) -> None:
-    step_type, _path = parse_step(step_name)
+    step_type, name = parse_step(step_name)
+
     if step_type == "data":
-        run_data_step(_path)
+        run_data_step(name)
 
     elif step_type == "walden":
-        run_walden_step(_path)
+        run_walden_step(name)
 
     else:
         raise Exception(f"no recipe for executing step: {step_name}")
@@ -114,7 +117,27 @@ def run_data_step(dataset_path: str) -> None:
 
 
 def run_walden_step(walden_path: str) -> None:
-    pass
+    "Ensure the dataset we're looking for is there."
+    walden_dataset = _find_walden_dataset(walden_path)
+    walden_dataset.ensure_downloaded()
+
+
+def _find_walden_dataset(walden_path: str) -> walden.Dataset:
+    if walden_path.count("/") != 2:
+        raise ValueError(f"malformed walden path: {walden_path}")
+
+    namespace, version, short_name = walden_path.split("/")
+    catalog = walden.Catalog()
+
+    # normally version is a year or date, but we also accept "latest"
+    if version == "latest":
+        dataset = catalog.find_latest(namespace=namespace, short_name=short_name)
+    else:
+        dataset = catalog.find_one(
+            namespace=namespace, version=version, short_name=short_name
+        )
+
+    return dataset
 
 
 def parse_step(step_name: str) -> Tuple[str, str]:
