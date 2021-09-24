@@ -142,14 +142,15 @@ def run_data_step_notebook(notebook_path: str, dest_dir: str) -> None:
     "Run a parameterised Jupyter notebook."
     with tempfile.TemporaryDirectory() as tmp_dir:
         notebook_out = path.join(tmp_dir, "notebook.ipynb")
-        pm.execute_notebook(
-            notebook_path,
-            notebook_out,
-            parameters={"dest_dir": path.abspath(dest_dir)},
-            progress_bar=False,
-            stdout_file=path.join(tmp_dir, "log.out"),
-            stderr_file=path.join(tmp_dir, "log.err"),
-        )
+        with open(path.join(tmp_dir, "output.log"), "w") as ostream:
+            pm.execute_notebook(
+                notebook_path,
+                notebook_out,
+                parameters={"dest_dir": path.abspath(dest_dir)},
+                progress_bar=False,
+                stdout_file=ostream,
+                stderr_file=ostream,
+            )
 
 
 def run_walden_step(walden_path: str) -> None:
