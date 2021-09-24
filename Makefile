@@ -39,3 +39,7 @@ clean:
 
 clobber: clean
 	rm -rf .venv
+
+lab: .venv
+	@echo '==> Starting Jupyter server'
+	poetry run jupyter lab

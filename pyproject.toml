@@ -10,10 +10,12 @@ owid-catalog = {path = "vendor/owid-catalog-py", develop = true}
 walden = {path = "vendor/walden", develop = true}
 click = "^8.0.1"
 PyYAML = "^5.4.1"
+papermill = "^2.3.3"
+jupyterlab = "^3.1.13"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
-black = "^21.9b0"
+black = {extras = ["jupyter"], version = "^21.9b0"}
 mypy = "^0.910"
 flake8 = "^3.9.2"
 watchdog = "^2.1.5"

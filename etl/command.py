@@ -9,10 +9,17 @@ from typing import Callable, List, Dict, Set, Iterable, Tuple, Any
 from collections import defaultdict
 import graphlib
 from urllib.parse import urlparse
+import tempfile
 import time
+import warnings
 
 import click
 import yaml
+
+# smother deprecation warnings by papermill
+with warnings.catch_warnings():
+    warnings.simplefilter("ignore")
+    import papermill as pm
 
 from owid import walden
 
@@ -107,16 +114,42 @@ def run_step(step_name: str) -> None:
         raise Exception(f"no recipe for executing step: {step_name}")
 
 
-def run_data_step(dataset_path: str) -> None:
+def run_data_step(step_name: str) -> None:
     # data steps are expected to create new datasets in data/
-    dest_dir = path.join(DATA_DIR, dataset_path.lstrip("/"))
+    dest_dir = path.join(DATA_DIR, step_name.lstrip("/"))
 
-    step_module = import_module(f"etl.steps.data.{dataset_path}")
+    module_name = path.join(path.dirname(__file__), "steps", "data", step_name)
+    if path.exists(module_name + ".py"):
+        run_data_step_py(step_name, dest_dir)
+
+    elif path.exists(module_name + ".ipynb"):
+        run_data_step_notebook(module_name + ".ipynb", dest_dir)
+
+    else:
+        raise Exception(f"have no idea how to run step: {step_name}")
+
+
+def run_data_step_py(step_name: str, dest_dir: str) -> None:
+    step_module = import_module(f"etl.steps.data.{step_name}")
     if not hasattr(step_module, "run"):
-        raise Exception(f'no run() method defined for step "{dataset_path}"')
+        raise Exception(f'no run() method defined for step "{step_name}"')
 
     # data steps
     step_module.run(dest_dir)  # type: ignore
+
+
+def run_data_step_notebook(notebook_path: str, dest_dir: str) -> None:
+    "Run a parameterised Jupyter notebook."
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        notebook_out = path.join(tmp_dir, "notebook.ipynb")
+        pm.execute_notebook(
+            notebook_path,
+            notebook_out,
+            parameters={"dest_dir": path.abspath(dest_dir)},
+            progress_bar=False,
+            stdout_file=path.join(tmp_dir, "log.out"),
+            stderr_file=path.join(tmp_dir, "log.err"),
+        )
 
 
 def run_walden_step(walden_path: str) -> None:
