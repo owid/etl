@@ -1,3 +1,5 @@
 steps:
   data://ghe_latest:
     - walden://who/latest/ghe
+  data://gho_latest:
+    - walden://who/latest/gho
