@@ -1,7 +1,8 @@
 .coverage
-data
+/data
 .submodule-init
 .mypy-cache
 .pytest-cache
 .venv
 __pycache__
+.ipynb_checkpoints
