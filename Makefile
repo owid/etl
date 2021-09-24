@@ -9,8 +9,8 @@ include default.mk
 
 SRC = etl tests
 
-# watch:
-# 	poetry run watchmedo shell-command -c 'clear; make unittest' --recursive --drop .
+watch-all:
+	poetry run watchmedo shell-command -c 'clear; make unittest; (cd vendor/owid-catalog-py && make unittest); (cd vendor/walden && make unittest)' --recursive --drop .
 
 .submodule-init:
 	@echo '==> Initialising submodules'
