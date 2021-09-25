@@ -20,6 +20,10 @@ Then you can run all checks with:
 
 `make test`
 
+You can build all known data tables into the `data/` folder with:
+
+`make etl`
+
 ## Tables
 
 Tables are essentially pandas DataFrames but with metadata. All operations on them occur in-memory, except for loading from and saving to disk. On disk, they are represented by tabular file (feather or CSV) and a JSON metadata file.
