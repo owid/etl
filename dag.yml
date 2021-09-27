@@ -1,5 +1,5 @@
 steps:
-  data://ghe_latest:
-    - walden://who/latest/ghe
-  data://gho_latest:
-    - walden://who/latest/gho
+  data://meadow/who/2021-07-01/ghe:
+    - walden://who/2021-07-01/ghe
+  data://meadow/who/2021-07-01/gho:
+    - walden://who/2021-07-01/gho

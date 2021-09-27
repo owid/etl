@@ -4,6 +4,7 @@
 #
 
 from os import path
+import os
 from importlib import import_module
 from typing import Callable, List, Dict, Set, Iterable, Tuple, Any
 from collections import defaultdict
@@ -117,6 +118,7 @@ def run_step(step_name: str) -> None:
 def run_data_step(step_name: str) -> None:
     # data steps are expected to create new datasets in data/
     dest_dir = path.join(DATA_DIR, step_name.lstrip("/"))
+    os.makedirs(path.dirname(dest_dir), exist_ok=True)
 
     module_name = path.join(path.dirname(__file__), "steps", "data", step_name)
     if path.exists(module_name + ".py"):
