@@ -1,9 +1,7 @@
 {
-  "name": "countries-regions",
+  "short_name": "countries-regions",
   "title": "Countries and regions",
-  "description": [
-    "Our World In Data countries and geo-regions harmonisation dataset. Contains various identifiers for all current sovereign nations, overseas territories, some historic countries as well as common groupings like continents like world"
-  ],
+  "description": "Our World In Data countries and geo-regions harmonisation dataset. Contains various identifiers for all current sovereign nations, overseas territories, some historic countries as well as common groupings like continents like world",
   "primary_key": [
     "code"
   ],
@@ -44,6 +42,7 @@
       "title": "MARC code",
       "description": "Library of Congress MARC project country code"
     },
+    "ncd_code": {},
     "kansas_code": {
       "title": "kansas_code",
       "description": ""
@@ -60,13 +59,13 @@
       "title": "Wikidata label",
       "description": "The Wikidata label (english language)"
     },
-    "legacy_country_id": {
-      "title": "Legacy OWID country table id",
-      "description": "Used for matching legacy data that contained ids from the Our World In Data mysql country_name_tool_countrydata table"
-    },
     "legacy_entity_id": {
       "title": "Legacy OWID entity table id",
       "description": "Used for matching legacy data that contained ids from the Our World In Data mysql entity table"
+    },
+    "legacy_country_id": {
+      "title": "Legacy OWID country table id",
+      "description": "Used for matching legacy data that contained ids from the Our World In Data mysql country_name_tool_countrydata table"
     },
     "members": {
       "title": "List of members of each region/country",
