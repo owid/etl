@@ -12,6 +12,9 @@ SRC = etl tests
 watch-all:
 	poetry run watchmedo shell-command -c 'clear; make unittest; (cd vendor/owid-catalog-py && make unittest); (cd vendor/walden && make unittest)' --recursive --drop .
 
+watch: .venv
+	poetry run watchmedo shell-command -c 'clear; make check-formatting lint check-typing coverage' --recursive --drop .
+
 .submodule-init:
 	@echo '==> Initialising submodules'
 	git submodule update --init

@@ -24,9 +24,10 @@ with warnings.catch_warnings():
 
 from owid import walden
 
-BASE_DIR = path.join(path.dirname(__file__), "..")
+BASE_DIR = path.normpath(path.join(path.dirname(__file__), ".."))
 DAG_FILE = path.join(BASE_DIR, "dag.yml")
 DATA_DIR = path.join(BASE_DIR, "data")
+STEP_DIR = path.join(BASE_DIR, "etl", "steps")
 
 Graph = Dict[str, Set[str]]
 
@@ -39,14 +40,12 @@ def main(steps: List[str], dry_run: bool = False) -> None:
     Execute all ETL steps listed in dag.yaml
     """
     dag = load_yaml(DAG_FILE)
-    graph = reverse_graph(dag["steps"])
+    run_dag(dag, steps, dry_run)
 
-    if len(steps) > 0:
-        subgraph = filter_to_subgraph(graph, steps)
-    else:
-        subgraph = graph
 
-    step_names = topological_sort(subgraph)
+def run_dag(dag: Dict[str, Any], selection: List[str], dry_run: bool = False) -> None:
+    step_names = select_steps(dag, selection)
+
     print(f"Running {len(step_names)} steps:")
     for i, step_name in enumerate(step_names, 1):
         print(f"  {i}. {step_name}... ", end="", flush=True)
@@ -55,6 +54,17 @@ def main(steps: List[str], dry_run: bool = False) -> None:
             print(f"({time_taken:.0f}s)")
         else:
             print()
+
+
+def select_steps(dag: Dict[str, Any], selection: List[str]) -> List[str]:
+    graph = reverse_graph(dag["steps"])
+
+    if selection:
+        subgraph = filter_to_subgraph(graph, selection)
+    else:
+        subgraph = graph
+
+    return topological_sort(subgraph)
 
 
 def load_yaml(filename: str) -> Dict[str, Any]:
@@ -120,7 +130,7 @@ def run_data_step(step_name: str) -> None:
     dest_dir = path.join(DATA_DIR, step_name.lstrip("/"))
     os.makedirs(path.dirname(dest_dir), exist_ok=True)
 
-    module_name = path.join(path.dirname(__file__), "steps", "data", step_name)
+    module_name = path.join(STEP_DIR, "data", step_name)
     if path.exists(module_name + ".py"):
         run_data_step_py(step_name, dest_dir)
 
