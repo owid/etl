@@ -12,6 +12,8 @@ click = "^8.0.1"
 PyYAML = "^5.4.1"
 papermill = "^2.3.3"
 jupyterlab = "^3.1.13"
+mysqlclient = "^2.0.3"
+SPARQLWrapper = "^1.8.5"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"

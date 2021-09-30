@@ -1,8 +1,14 @@
 .coverage
-/data
+**/__pycache__
+.virtual_documents
+**/.ipynb_checkpoints
 .submodule-init
 .mypy-cache
 .pytest-cache
 .venv
 __pycache__
 .ipynb_checkpoints
+etl/scripts/countries-regions/intermediate
+!data/
+data/*
+!data/reference/

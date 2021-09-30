@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [ master ]
+    branches: [master]
   pull_request:
-    branches: [ master ]
+    branches: [master]
 
 jobs:
   build:
@@ -16,35 +16,46 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+      - uses: actions/checkout@v2
 
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        id: setup-python
+        with:
+          python-version: ${{ matrix.python-version }}
 
-    - name: Install Poetry
-      run: |
-        pip install poetry
-        poetry --version
+      - name: Install Poetry
+        run: |
+          pip install poetry
+          poetry --version
 
-    - name: Install packages
-      run: |
-        git submodule update --init
-        poetry install
+      - name: Update submodules
+        run: |
+          git submodule update --init
 
-    - name: Check formatting
-      run: |
-        make check-formatting
+      - name: Restore venv from cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.venv
+          key: ${{ runner.os }}-python-${{ steps.setup-python.outputs.python-version }}-poetry-${{ hashFiles('poetry.lock') }}
 
-    - name: Lint
-      run: |
-        make lint
+      - name: install missing dependencies
+        run: |
+          poetry install
 
-    - name: Check typing
-      run: |
-        make check-typing
+      - name: Check formatting
+        run: |
+          make check-formatting
 
-    - name: Unit test
-      run: |
-        make unittest
+      - name: Lint
+        run: |
+          make lint
+
+      - name: Check typing
+        run: |
+          make check-typing
+
+      - name: Unit test
+        run: |
+          make unittest

@@ -8,11 +8,10 @@ from dataclasses import dataclass
 from importlib import import_module
 from os import path
 from pathlib import Path
-from typing import Callable, List, Dict, Protocol, Set, Iterable, Tuple, Any
+from typing import Callable, List, Dict, Protocol, Set, Iterable, Any, cast
 from urllib.parse import urlparse
 import graphlib
 import hashlib
-import os
 import tempfile
 import time
 import warnings
@@ -25,7 +24,7 @@ with warnings.catch_warnings():
     warnings.simplefilter("ignore")
     import papermill as pm
 
-from owid import catalog, walden  # type: ignore
+from owid import catalog, walden
 
 BASE_DIR = Path(__file__).parent.parent
 DAG_FILE = BASE_DIR / "dag.yml"
@@ -53,7 +52,10 @@ def main(steps: List[str], dry_run: bool = False, force: bool = False) -> None:
 
 
 def run_dag(
-    dag: Dict[str, Any], selection: List[str], dry_run: bool = False, force=False
+    dag: Dict[str, Any],
+    selection: List[str],
+    dry_run: bool = False,
+    force: bool = False,
 ) -> None:
     """
     Run the selected steps, and anything that needs updating based on them. An empty
@@ -75,7 +77,7 @@ def run_dag(
                 time_taken = timed_run(lambda: step.run())
                 print(f"({time_taken:.0f}s)")
             else:
-                print(f"(cached)")
+                print("(cached)")
         else:
             print()
 
@@ -145,6 +147,7 @@ def topological_sort(graph: Graph) -> List[str]:
 def _parse_step(step_name: str, dag: Dict[str, Any]) -> "Step":
     parts = urlparse(step_name)
     step_type = parts.scheme
+    step: Step
     path = parts.netloc + parts.path
 
     if step_type == "data":
@@ -227,7 +230,8 @@ class DataStep(Step):
         return catalog.Dataset(self._dest_dir.as_posix())
 
     def checksum_output(self) -> str:
-        return self._output_dataset.checksum()
+        # This cast from str to str is IMHO unnecessary but MyPy complains about this without it...
+        return cast(str, self._output_dataset.checksum())
 
     def _step_files(self) -> List[str]:
         known_suffixes = [".py", ".ipynb"]
@@ -290,7 +294,7 @@ class WaldenStep(Step):
         return not Path(self._walden_dataset.local_path).exists()
 
     def checksum_output(self) -> str:
-        checksum = self._walden_dataset.md5
+        checksum: str = self._walden_dataset.md5
         if not checksum:
             raise Exception(
                 f"no md5 checksum available for walden dataset: {self.path}"
