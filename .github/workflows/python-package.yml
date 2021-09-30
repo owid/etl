@@ -37,7 +37,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: |
-            ~/.venv
+            .venv
           key: ${{ runner.os }}-python-${{ steps.setup-python.outputs.python-version }}-poetry-${{ hashFiles('poetry.lock') }}
 
       - name: install missing dependencies
