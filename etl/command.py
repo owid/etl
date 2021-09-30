@@ -8,11 +8,10 @@ from dataclasses import dataclass
 from importlib import import_module
 from os import path
 from pathlib import Path
-from typing import Callable, List, Dict, Protocol, Set, Iterable, Tuple, Any
+from typing import Callable, List, Dict, Protocol, Set, Iterable, Any
 from urllib.parse import urlparse
 import graphlib
 import hashlib
-import os
 import tempfile
 import time
 import warnings
@@ -75,7 +74,7 @@ def run_dag(
                 time_taken = timed_run(lambda: step.run())
                 print(f"({time_taken:.0f}s)")
             else:
-                print(f"(cached)")
+                print("(cached)")
         else:
             print()
 
