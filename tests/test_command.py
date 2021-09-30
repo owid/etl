@@ -38,7 +38,7 @@ def run(dest_dir):
                 file=ostream,
             )
 
-        cmd.run_data_step(step_name)
+        cmd.DataStep(step_name, []).run()
 
         Dataset((Path(cmd.DATA_DIR) / step_name).as_posix())
 
