@@ -5,6 +5,7 @@
 
 from collections import defaultdict
 from dataclasses import dataclass
+from glob import glob
 from importlib import import_module
 from os import path
 from pathlib import Path
@@ -234,14 +235,8 @@ class DataStep(Step):
         return cast(str, self._output_dataset.checksum())
 
     def _step_files(self) -> List[str]:
-        known_suffixes = [".py", ".ipynb"]
-        files = []
-        for suffix in known_suffixes:
-            p = self._search_path.with_suffix(suffix)
-            if p.exists():
-                files.append(p.as_posix())
-
-        return files
+        "Return a list of code files defining this step."
+        return glob(self._search_path.as_posix() + ".*")
 
     @property
     def _search_path(self) -> Path:
