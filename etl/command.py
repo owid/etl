@@ -216,6 +216,12 @@ class DataStep(Step):
             != self.checksum_input()
         )
 
+    def can_execute(self) -> bool:
+        return (
+            self._search_path.with_suffix(".py").exists()
+            or self._search_path.with_suffix(".ipynb").exists()
+        )
+
     def checksum_input(self) -> str:
         "Return the MD5 of all ingredients for making this step."
         inputs = [d.checksum_output() for d in self.dependencies]
