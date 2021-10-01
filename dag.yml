@@ -1,4 +1,6 @@
 steps:
+  data://garden/who/2021-07-01/ghe:
+    - data://meadow/who/2021-07-01/ghe
   data://meadow/who/2021-07-01/ghe:
     - walden://who/2021-07-01/ghe
   data://meadow/who/2021-07-01/gho:
