@@ -2,12 +2,24 @@
 #  Makefile
 #
 
-.PHONY: etl
+.PHONY: etl help
 
 
 include default.mk
 
 SRC = etl tests
+
+help:
+	@echo 'Available commands:'
+	@echo
+	@echo '  make etl       Fetch data and run all transformations'
+	@echo '  make lab       Start a Jupyter Lab server'
+	@echo '  make test      Run all linting and unit tests'
+	@echo '  make watch     Run all tests, watching for changes'
+	@echo '  make clean     Delete all non-reference data in the data/ folder'
+	@echo '  make clobber   Delete non-reference data and .venv'
+	@echo
+
 
 watch-all:
 	poetry run watchmedo shell-command -c 'clear; make unittest; (cd vendor/owid-catalog-py && make unittest); (cd vendor/walden && make unittest)' --recursive --drop .
@@ -38,7 +50,8 @@ etl: .venv
 	poetry run python -m etl.command
 
 clean:
-	rm -rf data/*
+	@echo '==> Cleaning data/ folder'
+	rm -rf $$(ls -d data/* | grep -v reference)
 
 clobber: clean
 	rm -rf .venv

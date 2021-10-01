@@ -4,7 +4,9 @@
 
 SRC = src test
 
-default:
+default: help
+
+help-default:
 	@echo 'Available commands:'
 	@echo
 	@echo '  make test      Run all linting and unit tests'
