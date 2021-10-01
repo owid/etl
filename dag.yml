@@ -7,3 +7,5 @@ steps:
     - walden://who/2021-07-01/gho
   data://meadow/gapminder/2019-12-10/population:
     - walden://gapminder/2019-12-10/population
+  data://meadow/hyde/2017/general_files:
+    - walden://hyde/2017/general_files
