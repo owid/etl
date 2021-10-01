@@ -9,3 +9,6 @@ steps:
     - walden://gapminder/2019-12-10/population
   data://meadow/hyde/2017/general_files:
     - walden://hyde/2017/general_files
+  data://meadow/hyde/2017/baseline:
+    - walden://hyde/2017/baseline
+    - data://meadow/hyde/2017/general_files
