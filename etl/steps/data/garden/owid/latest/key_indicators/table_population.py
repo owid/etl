@@ -3,6 +3,12 @@
 #  key_indicators
 #
 
+"""
+Adapted from Ed's importers script:
+
+https://github.com/owid/importers/blob/master/population/etl.py
+"""
+
 from pathlib import Path
 import json
 from numpy import tracemalloc_domain
