@@ -15,6 +15,9 @@ jupyterlab = "^3.1.13"
 mysqlclient = "^2.0.3"
 SPARQLWrapper = "^1.8.5"
 openpyxl = "^3.0.9"
+sh = "^1.14.2"
+boto3 = "^1.18.54"
+awscli = "^1.20.54"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
