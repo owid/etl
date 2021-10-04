@@ -11,7 +11,7 @@ from etl.command import DATA_DIR
 
 
 @click.command()
-def reindex():
+def reindex() -> None:
     LocalCatalog(DATA_DIR).reindex()
 
 
