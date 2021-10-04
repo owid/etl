@@ -4,7 +4,7 @@
 
 # from os import environ
 
-S3_BUCKET = "catalog.ourworldindata.org"
+S3_BUCKET = "owid-catalog"
 # S3_REGION_NAME = "nyc3"
 S3_ENDPOINT_URL = "https://nyc3.digitaloceanspaces.com"
 # S3_ACCESS_KEY = environ.get("OWID_ACCESS_KEY")

@@ -4,10 +4,12 @@
 #
 
 import click
-from sh import aws  # type: ignore
+from sh import aws
 
-from . import config
-from .command import DATA_DIR
+from owid.catalog import LocalCatalog
+
+from etl import config
+from etl.command import DATA_DIR
 
 
 class CannotPublish(Exception):
@@ -19,6 +21,7 @@ def publish() -> None:
     """
     Publish the generated data catalog to S3.
     """
+    LocalCatalog(DATA_DIR).reindex()
     sync_to_s3()
 
 
@@ -28,6 +31,7 @@ def sync_to_s3() -> None:
         "--endpoint-url",
         config.S3_ENDPOINT_URL,
         "sync",
+        "--acl=public-read",
         DATA_DIR.as_posix(),
         f"s3://{config.S3_BUCKET}/",
         _fg=True,

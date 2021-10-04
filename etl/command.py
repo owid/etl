@@ -214,7 +214,10 @@ class DataStep(Step):
         dataset.save()
 
     def is_dirty(self) -> bool:
-        if not self._dest_dir.is_dir():
+        if not self._dest_dir.is_dir() or any(
+            isinstance(d, DataStep) and not d.has_existing_data()
+            for d in self.dependencies
+        ):
             return True
 
         found_source_checksum = catalog.Dataset(
@@ -226,6 +229,9 @@ class DataStep(Step):
             return True
 
         return False
+
+    def has_existing_data(self) -> bool:
+        return self._dest_dir.is_dir()
 
     def can_execute(self) -> bool:
         sp = self._search_path
@@ -321,6 +327,9 @@ class WaldenStep(Step):
 
     def is_dirty(self) -> bool:
         return not Path(self._walden_dataset.local_path).exists()
+
+    def has_existing_data(self) -> bool:
+        return True
 
     def checksum_output(self) -> str:
         checksum: str = self._walden_dataset.md5
