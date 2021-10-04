@@ -68,19 +68,19 @@ def run_dag(
     step_names = select_steps(dag, selection)
     steps = [_parse_step(name, dag) for name in step_names]
 
-    print(f"Running {len(step_names)} steps:")
-    for i, step_name in enumerate(step_names, 0):
-        step = steps[i]
+    if not force:
+        steps = [s for s in steps if s.is_dirty()]
 
-        print(f"  {i}. {step_name}... ", end="", flush=True)
+    if not steps:
+        print("All datasets up to date!")
+        return
+
+    print(f"Running {len(steps)} steps:")
+    for i, step in enumerate(steps, 1):
+        print(f"{i}. {step}...")
         if not dry_run:
-            if force or step.is_dirty():
-                time_taken = timed_run(lambda: step.run())
-                print(f"({time_taken:.0f}s)")
-            else:
-                print("(cached)")
-        else:
-            print()
+            time_taken = timed_run(lambda: step.run())
+            print(f"  OK ({time_taken:.0f}s)")
 
 
 def select_steps(dag: Dict[str, Any], selection: List[str]) -> List[str]:
@@ -165,6 +165,8 @@ def _parse_step(step_name: str, dag: Dict[str, Any]) -> "Step":
 
 
 class Step(Protocol):
+    path: str
+
     def run(self) -> None:
         ...
 
@@ -189,14 +191,18 @@ class DataStep(Step):
         self.path = path
         self.dependencies = dependencies
 
+    def __str__(self):
+        return f"data://{self.path}"
+
     def run(self) -> None:
         # make sure the encosing folder is there
         self._dest_dir.parent.mkdir(parents=True, exist_ok=True)
 
-        if self._search_path.with_suffix(".py").exists():
+        sp = self._search_path
+        if sp.with_suffix(".py").exists() or (sp / "__init__.py").exists():
             self._run_py()
 
-        elif self._search_path.with_suffix(".ipynb").exists():
+        elif sp.with_suffix(".ipynb").exists():
             self._run_notebook()
 
         else:
@@ -208,25 +214,41 @@ class DataStep(Step):
         dataset.save()
 
     def is_dirty(self) -> bool:
-        return (
-            # dirty if we haven't built this dataset yet
-            not self._dest_dir.is_dir()
-            # or it was built off of different inputs
-            or catalog.Dataset(self._dest_dir.as_posix()).metadata.source_checksum
-            != self.checksum_input()
-        )
+        if not self._dest_dir.is_dir():
+            return True
+
+        found_source_checksum = catalog.Dataset(
+            self._dest_dir.as_posix()
+        ).metadata.source_checksum
+        exp_source_checksum = self.checksum_input()
+
+        if found_source_checksum != exp_source_checksum:
+            return True
+
+        return False
 
     def can_execute(self) -> bool:
+        sp = self._search_path
         return (
-            self._search_path.with_suffix(".py").exists()
-            or self._search_path.with_suffix(".ipynb").exists()
+            # python script
+            sp.with_suffix(".py").exists()
+            # folder of scripts with __init__.py
+            or (sp / "__init__.py").exists()
+            # jupyter notebook
+            or sp.with_suffix(".ipynb").exists()
         )
 
     def checksum_input(self) -> str:
         "Return the MD5 of all ingredients for making this step."
-        inputs = [d.checksum_output() for d in self.dependencies]
-        inputs.extend(_checksum_file(f) for f in sorted(self._step_files()))
-        return hashlib.md5(",".join(inputs).encode("utf8")).hexdigest()
+        checksums = {}
+        for d in self.dependencies:
+            checksums[d.path] = d.checksum_output()
+
+        for f in self._step_files():
+            checksums[f] = _checksum_file(f)
+
+        in_order = [v for _, v in sorted(checksums.items())]
+        return hashlib.md5(",".join(in_order).encode("utf8")).hexdigest()
 
     @property
     def _output_dataset(self) -> catalog.Dataset:
@@ -242,6 +264,9 @@ class DataStep(Step):
 
     def _step_files(self) -> List[str]:
         "Return a list of code files defining this step."
+        if self._search_path.is_dir():
+            return [p.as_posix() for p in walk(self._search_path)]
+
         return glob(self._search_path.as_posix() + ".*")
 
     @property
@@ -286,6 +311,9 @@ class WaldenStep(Step):
 
     def __init__(self, path: str) -> None:
         self.path = path
+
+    def __str__(self):
+        return f"walden://{self.path}"
 
     def run(self) -> None:
         "Ensure the dataset we're looking for is there."
@@ -338,6 +366,21 @@ def _checksum_file(filename: str) -> str:
             chunk = istream.read(chunk_size)
 
     return _hash.hexdigest()
+
+
+def walk(
+    folder: Path, ignore_set: Set[str] = {"__pycache__", ".ipynb_checkpoints"}
+) -> List[Path]:
+    paths = []
+    for p in folder.iterdir():
+        if p.is_dir():
+            paths.extend(walk(p))
+            continue
+
+        if p.name not in ignore_set:
+            paths.append(p)
+
+    return paths
 
 
 if __name__ == "__main__":
