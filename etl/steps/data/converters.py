@@ -23,7 +23,9 @@ def convert_walden_metadata(wd: WaldenDataset) -> DatasetMeta:
                 source_data_url=wd.source_data_url,
                 owid_data_url=wd.owid_data_url,
                 date_accessed=wd.date_accessed,
-                publication_date=str(wd.publication_date),
+                publication_date=str(wd.publication_date)
+                if wd.publication_date
+                else None,
                 publication_year=wd.publication_year,
             )
         ],

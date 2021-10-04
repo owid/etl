@@ -78,7 +78,7 @@ def calculate_aggregates(df: pd.DataFrame) -> pd.DataFrame:
         )
     ]
 
-    countries = Dataset(REFERENCE)["countries-regions"]
+    countries = Dataset(REFERENCE)["countries_regions"]
     continent_rows = []
     for code, row in countries.iterrows():
         if pd.isnull(row.members):

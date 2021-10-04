@@ -15,6 +15,7 @@ help:
 	@echo '  make etl       Fetch data and run all transformations'
 	@echo '  make lab       Start a Jupyter Lab server'
 	@echo '  make test      Run all linting and unit tests'
+	@echo '  make publish   Publish the generated catalog to S3'
 	@echo '  make watch     Run all tests, watching for changes'
 	@echo '  make clean     Delete all non-reference data in the data/ folder'
 	@echo '  make clobber   Delete non-reference data and .venv'
@@ -47,7 +48,7 @@ coverage: .venv
 
 etl: .venv
 	@echo '==> Running full etl'
-	poetry run python -m etl.command
+	poetry run python etl/command.py
 
 clean:
 	@echo '==> Cleaning data/ folder'
@@ -59,3 +60,11 @@ clobber: clean
 lab: .venv
 	@echo '==> Starting Jupyter server'
 	poetry run jupyter lab
+
+publish: etl reindex
+	@echo '==> Publishing the catalog'
+	poetry run python etl/publish.py
+
+reindex: .venv
+	@echo '==> Creating a catalog index'
+	poetry run python etl/reindex.py
