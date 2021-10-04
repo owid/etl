@@ -11,7 +11,6 @@ https://github.com/owid/importers/blob/master/population/etl.py
 
 from pathlib import Path
 import json
-from numpy import tracemalloc_domain
 
 import pandas as pd
 
@@ -76,7 +75,7 @@ def calculate_aggregates(df: pd.DataFrame) -> pd.DataFrame:
                 "Oceania",
                 "World",
             ]
-        )  # type: ignore
+        )
     ]
 
     countries = Dataset(REFERENCE)["countries-regions"]

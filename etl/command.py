@@ -191,7 +191,7 @@ class DataStep(Step):
         self.path = path
         self.dependencies = dependencies
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"data://{self.path}"
 
     def run(self) -> None:
@@ -312,7 +312,7 @@ class WaldenStep(Step):
     def __init__(self, path: str) -> None:
         self.path = path
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"walden://{self.path}"
 
     def run(self) -> None:
