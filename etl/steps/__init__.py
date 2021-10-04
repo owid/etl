@@ -321,6 +321,119 @@ class WaldenStep(Step):
         return dataset
 
 
+class GrapherStep(Step):
+    """
+    A step which ingests data into a local mysql database. You specify it by
+    by making a Python module with a to_grapher_table function that takes a
+    table and returns a sequence of tables with the fixed grapher structure of
+    (year, entitiyId, value)
+    """
+
+    path: str
+    dependencies: List[Step]
+
+    def __init__(self, path: str, dependencies: List[Step]) -> None:
+        self.path = path
+        self.dependencies = dependencies
+
+    def __str__(self) -> str:
+        return f"data://{self.path}"
+
+    def run(self) -> None:
+        # make sure the encosing folder is there
+        self._dest_dir.parent.mkdir(parents=True, exist_ok=True)
+
+        sp = self._search_path
+        if sp.with_suffix(".py").exists() or (sp / "__init__.py").exists():
+            self._run_py()
+
+        else:
+            raise Exception(f"have no idea how to run step: {self.path}")
+
+        # modify the dataset to remember what inputs were used to build it
+        dataset = self._output_dataset
+        dataset.metadata.source_checksum = self.checksum_input()
+        dataset.save()
+
+    def is_dirty(self) -> bool:
+        found_source_checksum = catalog.Dataset(
+            self._dest_dir.as_posix()
+        ).metadata.source_checksum
+        exp_source_checksum = self.checksum_input()
+
+        if found_source_checksum != exp_source_checksum:
+            return True
+
+        return False
+
+    def can_execute(self) -> bool:
+        sp = self._search_path
+        return (
+            # python script
+            sp.with_suffix(".py").exists()
+            # folder of scripts with __init__.py
+            or (sp / "__init__.py").exists()
+        )
+
+    def checksum_input(self) -> str:
+        "Return the MD5 of all ingredients for making this step."
+        checksums = {}
+        for d in self.dependencies:
+            checksums[d.path] = d.checksum_output()
+
+        for f in self._step_files():
+            checksums[f] = _checksum_file(f)
+
+        in_order = [v for _, v in sorted(checksums.items())]
+        return hashlib.md5(",".join(in_order).encode("utf8")).hexdigest()
+
+    @property
+    def _output_dataset(self) -> catalog.Dataset:
+        "If this step is completed, return the MD5 of the output."
+        if not self._dest_dir.is_dir():
+            raise Exception("dataset has not been created yet")
+
+        return catalog.Dataset(self._dest_dir.as_posix())
+
+    def checksum_output(self) -> str:
+        # This cast from str to str is IMHO unnecessary but MyPy complains about this without it...
+        return cast(str, self._output_dataset.checksum())
+
+    def _step_files(self) -> List[str]:
+        "Return a list of code files defining this step."
+        if self._search_path.is_dir():
+            return [p.as_posix() for p in walk(self._search_path)]
+
+        return glob(self._search_path.as_posix() + ".*")
+
+    @property
+    def _search_path(self) -> Path:
+        return Path(STEP_DIR) / "data" / self.path
+
+    @property
+    def _dest_dir(self) -> Path:
+        return DATA_DIR / self.path.lstrip("/")
+
+    def _run_py(self) -> None:
+        """
+        Import the Python module for this step and call run() on it.
+        """
+        module_path = self.path.lstrip("/").replace("/", ".")
+        step_module = import_module(f"etl.steps.data.{module_path}")
+        if not hasattr(step_module, "to_grapher_table"):
+            raise Exception(
+                f'no to_grapher_table() method defined for module "{step_module}"'
+            )
+
+        # data steps
+
+        # TODO: call grapher_import.upsert_dataset here
+
+        for table in step_module.run(self._dest_dir.as_posix()):  # type: ignore
+            print(f"Would import to grapher now table {table.short_name}")
+            # TODO: call grapher_import.upsert_table here
+
+
 class GithubStep(Step):
     """
     An empty step that represents a dependency on the latest version of a Github repo.
