@@ -1,5 +1,5 @@
 {
-  "short_name": "countries-regions",
+  "short_name": "countries_regions",
   "title": "Countries and regions",
   "description": "Our World In Data countries and geo-regions harmonisation dataset. Contains various identifiers for all current sovereign nations, overseas territories, some historic countries as well as common groupings like continents like world",
   "primary_key": [
