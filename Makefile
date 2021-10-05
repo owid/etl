@@ -25,6 +25,10 @@ help:
 watch-all:
 	poetry run watchmedo shell-command -c 'clear; make unittest; (cd vendor/owid-catalog-py && make unittest); (cd vendor/walden && make unittest)' --recursive --drop .
 
+test-all: test
+	cd vendor/owid-catalog-py && make test
+	cd vendor/walden && make test
+
 watch: .venv
 	poetry run watchmedo shell-command -c 'clear; make check-formatting lint check-typing coverage' --recursive --drop .
 
