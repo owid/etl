@@ -18,7 +18,9 @@ def test_all_walden_deps_exist():
 
 def test_all_data_steps_have_code():
     # find all data steps
-    steps = [s for s in get_steps() if isinstance(s, cmd.DataStep)]
+    steps = [
+        s for s in get_steps() if isinstance(s, cmd.DataStep) and not s.is_reference()
+    ]
 
     for s in steps:
         assert s.can_execute(), f'no code found for step "data://{s.path}"'

@@ -66,7 +66,9 @@ def run_dag(
     looking at their checksum.
     """
     step_names = select_steps(dag, selection)
-    steps = [_parse_step(name, dag) for name in step_names]
+    steps = [
+        _parse_step(name, dag) for name in step_names if name != "data://reference"
+    ]
 
     if not force:
         steps = [s for s in steps if s.is_dirty()]
@@ -134,7 +136,7 @@ def filter_to_subgraph(graph: Graph, steps: Iterable[str]) -> Graph:
     to_visit = list(steps)
     while to_visit:
         node = to_visit.pop()
-        children = graph[node]
+        children = graph.get(node, set())
         subgraph[node].update(children)
         to_visit.extend(children)
 
@@ -152,7 +154,7 @@ def _parse_step(step_name: str, dag: Dict[str, Any]) -> "Step":
     path = parts.netloc + parts.path
 
     if step_type == "data":
-        dependencies = dag["steps"][step_name]
+        dependencies = dag["steps"].get(step_name, [])
         step = DataStep(path, [_parse_step(s, dag) for s in dependencies])
 
     elif step_type == "walden":
@@ -213,7 +215,14 @@ class DataStep(Step):
         dataset.metadata.source_checksum = self.checksum_input()
         dataset.save()
 
+    def is_reference(self) -> bool:
+        return self.path == "reference"
+
     def is_dirty(self) -> bool:
+        # the reference dataset never needs rebuilding
+        if self.is_reference():
+            return False
+
         if not self._dest_dir.is_dir() or any(
             isinstance(d, DataStep) and not d.has_existing_data()
             for d in self.dependencies
