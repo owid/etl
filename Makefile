@@ -59,7 +59,8 @@ clean:
 	rm -rf $$(ls -d data/* | grep -v reference)
 
 clobber: clean
-	rm -rf .venv
+	find . -name .venv | xargs rm -rf
+	find . -name .mypy_cache | xargs rm -rf
 
 lab: .venv
 	@echo '==> Starting Jupyter server'
