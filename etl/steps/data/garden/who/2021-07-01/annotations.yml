@@ -16,41 +16,41 @@ variables:
     description:
     unit:
     short_unit:
-    display
+    display:
       name:
       unit:
   - short_name: deaths_rate
     description:
     unit:
     short_unit:
-    display
+    display:
       name:
       unit:
   - short_name: deaths_100k
     description:
     unit:
     short_unit:
-    display
+    display:
       name:
       unit:
   - short_name: daly
     description:
     unit:
     short_unit:
-    display
+    display:
       name:
       unit:
   - short_name: daly_rate
     description:
     unit:
     short_unit:
-    display
+    display:
       name:
       unit:
   - short_name: daly_100k
     description:
     unit:
     short_unit:
-    display
+    display:
       name:
       unit:
