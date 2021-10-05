@@ -356,6 +356,12 @@ class GrapherStep(Step):
         dataset.save()
 
     def is_dirty(self) -> bool:
+        if not self._dest_dir.is_dir() or any(
+            isinstance(d, DataStep) and not d.has_existing_data()
+            for d in self.dependencies
+        ):
+            return True
+
         found_source_checksum = catalog.Dataset(
             self._dest_dir.as_posix()
         ).metadata.source_checksum
@@ -416,21 +422,21 @@ class GrapherStep(Step):
 
     def _run_py(self) -> None:
         """
-        Import the Python module for this step and call run() on it.
+        Import the Python module for this step and call get_grapher_tables() on it.
         """
         module_path = self.path.lstrip("/").replace("/", ".")
         step_module = import_module(f"etl.steps.data.{module_path}")
-        if not hasattr(step_module, "to_grapher_table"):
+        if not hasattr(step_module, "get_grapher_tables"):
             raise Exception(
-                f'no to_grapher_table() method defined for module "{step_module}"'
+                f'no to_grapher_tables() method defined for module "{step_module}"'
             )
 
         # data steps
 
         # TODO: call grapher_import.upsert_dataset here
 
-        for table in step_module.run(self._dest_dir.as_posix()):  # type: ignore
-            print(f"Would import to grapher now table {table.short_name}")
+        for table in step_module.get_grapher_tables():  # type: ignore
+            print(f"Would import to grapher now table {table.metadata.short_name}")
             # TODO: call grapher_import.upsert_table here
 
 

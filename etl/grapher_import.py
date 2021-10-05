@@ -73,6 +73,8 @@ def upsert_table(table: catalog.Table, dataset_id):
         logger.info("---\nUpserting variable...")
 
         variable = table["value"]
+
+        # TODO: this is actually an insert always as id is not used, correct below accordingly
         db_variable_id = db.upsert_variable(
             name=variable.short_name,
             source_id=variable.metadata.source_id,
@@ -105,8 +107,11 @@ def upsert_table(table: catalog.Table, dataset_id):
                 entityId = VALUES(entityId),
                 variableId = VALUES(variableId)
         """
-        db.upsert_many(query, table)  # TODO: check if I can pass a table here!
-        logger.info(f"Upserted {len(table)} datapoint files.")
+        db.upsert_many(
+            query,
+            ((row.value, row.year, row.entity_id, row.db_variable_id) for row in table),
+        )
+        logger.info(f"Upserted {len(table)} datapoints.")
 
         connection.commit()
 
