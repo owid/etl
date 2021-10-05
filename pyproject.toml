@@ -4,6 +4,11 @@ version = "0.1.0"
 description = ""
 authors = ["Lars Yencken <lars@yencken.org>"]
 
+[tool.poetry.scripts]
+etl = 'etl.command:main'
+reindex = 'etl.reindex:reindex'
+publish = 'etl.publish:publish'
+
 [tool.poetry.dependencies]
 python = "^3.9"
 owid-catalog = {path = "vendor/owid-catalog-py", develop = true}
