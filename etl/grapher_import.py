@@ -74,16 +74,19 @@ def upsert_table(table: catalog.Table, dataset_id):
 
         variable = table["value"]
 
+        years = table.index.unique(level="year").values
+        min_year = min(years)
+        max_year = max(years)
         # TODO: this is actually an insert always as id is not used, correct below accordingly
         db_variable_id = db.upsert_variable(
             name=variable.short_name,
-            source_id=variable.metadata.source_id,
+            source_id="?",
             dataset_id=dataset_id,
             description=variable.metadata.description,
             code="?",
             unit=variable.metadata.unit,
             short_unit=variable.metadata.short_unit,
-            timespan=variable.metadata.timespan,
+            timespan=f"{min_year}-{max_year}",
             coverage="?",
             display=variable.metadata.display,
             original_metadata="?",
