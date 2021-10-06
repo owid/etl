@@ -28,6 +28,7 @@ from owid import walden
 from etl import files
 from etl import paths
 from etl.helpers import get_etag, get_latest_github_sha
+from etl.grapher_import import upsert_table
 
 Graph = Dict[str, Set[str]]
 
@@ -436,7 +437,7 @@ class GrapherStep(Step):
         # TODO: call grapher_import.upsert_dataset here
 
         for table in step_module.get_grapher_tables():  # type: ignore
-            print(f"Would import to grapher now table {table.metadata.short_name}")
+            upsert_table(table, 1)
             # TODO: call grapher_import.upsert_table here
 
 
