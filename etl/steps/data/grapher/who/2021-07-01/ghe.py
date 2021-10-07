@@ -2,13 +2,20 @@ from owid import catalog
 from collections.abc import Iterable
 import pandas as pd
 import slugify
+import yaml
+from pathlib import Path
 
 from etl.command import DATA_DIR
 
 
-def get_grapher_tables() -> Iterable[catalog.Table]:
+def get_grapher_dataset() -> catalog.Dataset:
     dataset = catalog.Dataset(DATA_DIR / "garden" / "who" / "2021-07-01" / "ghe")
+    dataset.metadata.short_name = "ghe-2021-07-01"
+    dataset.metadata.namespace = "who"
+    return dataset
 
+
+def get_grapher_tables(dataset: catalog.Dataset) -> Iterable[catalog.Table]:
     table = dataset["estimates"]
 
     expected_primary_keys = [
@@ -39,6 +46,16 @@ def get_grapher_tables() -> Iterable[catalog.Table]:
             f"GHE table to transform to grapher did not contain the expected columns but instead had: {list(table.columns)}"
         )
 
+    script_dir = Path(__file__).parent
+    with open(script_dir / "annotations.yml") as istream:
+        annotations = yaml.safe_load(istream)
+
+    for column in columns_to_export:
+        annotation = annotations["variables"][column]
+        table[column].metadata.description = annotation["description"]
+        table[column].metadata.unit = annotation["unit"]
+        table[column].metadata.short_unit = annotation["short_unit"]
+
     # Get the legacy_entity_id from the country_code via the countries_regions dimension table
     reference_dataset = catalog.Dataset(DATA_DIR / "reference")
     countries_regions = reference_dataset["countries_regions"]
@@ -50,7 +67,6 @@ def get_grapher_tables() -> Iterable[catalog.Table]:
         validate="m:1",
     )
     table.reset_index(inplace=True)
-    print(table.columns)
     df = pd.DataFrame(table)
     table["year"] = df["year"].astype(int)
     table["entity_id"] = df["legacy_entity_id"].astype(int)
@@ -60,7 +76,6 @@ def get_grapher_tables() -> Iterable[catalog.Table]:
         inplace=True,
     )
 
-    # I tried to do this generically but itertools.product only does 2D cross product and here we need 3D
     for ghe_cause_title in table.index.unique(level="ghe_cause_title").values:
         for sex_code in table.index.unique(level="sex_code").values:
             for agegroup_code in table.index.unique(level="agegroup_code").values:
@@ -72,6 +87,7 @@ def get_grapher_tables() -> Iterable[catalog.Table]:
                 cutout_table = table.loc[
                     idx[:, :, ghe_cause_title, sex_code, agegroup_code], :
                 ]
+
                 # drop the indices
                 cutout_table.reset_index(level=4, drop=True, inplace=True)
                 cutout_table.reset_index(level=3, drop=True, inplace=True)
@@ -81,5 +97,8 @@ def get_grapher_tables() -> Iterable[catalog.Table]:
                         f"{column}-{ghe_cause_title}-{sex_code}-{agegroup_code}"
                     )
                     cutout_table.metadata.short_name = short_name
+                    assert (
+                        cutout_table[column].metadata.unit is not None
+                    ), "Unit should not be None here!"
 
                     yield cutout_table[[column]]

@@ -9,7 +9,10 @@ Usage:
     >>> import_dataset.main(dataset_dir, dataset_namespace)
 """
 
+from dataclasses import dataclass
+import json
 import os
+from typing import Dict, List, Optional, cast
 from dotenv import load_dotenv
 
 from db import get_connection
@@ -25,23 +28,83 @@ logger.setLevel(logging.INFO)
 
 load_dotenv()
 DEBUG = os.getenv("DEBUG") == "True"
-# USER_ID = int(os.getenv("USER_ID"))  # type: ignore
+USER_ID = int(os.getenv("USER_ID"))  # type: ignore
 
 CURRENT_DIR = os.path.dirname(__file__)
 # CURRENT_DIR = os.path.join(os.getcwd(), 'standard_importer')
 
 
-def upsert_dataset(dataset: catalog.Dataset, dataset_namespace: str):
+@dataclass
+class DatasetUpsertResult:
+    dataset_id: int
+    source_ids: Dict[str, int]
+
+
+def upsert_dataset(
+    dataset: catalog.Dataset, namespace: str, sources: List[catalog.meta.Source]
+) -> DatasetUpsertResult:
     # This function would have to create the dataset table row, a namespace row
     # and the sources table row. There is a bit of an open question if we should
     # map one dataset with N tables to one namespace and N datasets in
     # mysql or if we should just flatten it into one dataset?
     # The metadata of the dataset should be used to feed the other instances where
     # possible
-    pass
+    connection = None
+    cursor = None
+    try:
+        connection = get_connection()
+        connection.autocommit(False)
+        cursor = connection.cursor()
+        db = DBUtils(cursor)
+
+        print("Verifying namespace is present")
+        ns = db.fetch_one_or_none("SELECT * from namespaces where name=%s", [namespace])
+        if ns is None:
+            db.upsert_namespace(namespace, "")
+
+        print("Upserting dataset")
+        dataset_id = db.upsert_dataset(
+            dataset.metadata.short_name,
+            namespace,
+            USER_ID,
+            description=dataset.metadata.description,
+        )
+
+        source_ids: Dict[str, int] = dict()
+        for source in sources:
+            if source.name is not None:
+                json_description = json.dumps(
+                    {
+                        "link": source.url,
+                        "retrievedDate": source.date_accessed,
+                        "dataPublishedBy": source.name,
+                    }
+                )
+                source_id = db.upsert_source(source.name, json_description, dataset_id)
+                source_ids[source.name] = source_id
+            else:
+                print(
+                    "Source name was None - please fix this in the metadata. Continuing"
+                )
+        connection.commit()
+
+        return DatasetUpsertResult(dataset_id, source_ids)
+    except Exception as e:
+        logger.error(f"Error encountered during import: {e}")
+        logger.error("Rolling back changes...")
+        if connection:
+            connection.rollback()
+        if DEBUG:
+            traceback.print_exc()
+        raise e
+    finally:
+        if cursor:
+            cursor.close()
+        if connection:
+            connection.close()
 
 
-def upsert_table(table: catalog.Table, dataset_id):
+def upsert_table(table: catalog.Table, dataset_upsert_result: DatasetUpsertResult):
     # This function is used to put one ready to go formatted Table (i.e.
     # in the format (year, entityId, value)) into mysql. The metadata
     # of the variable should be used to fill the required fields if possible.
@@ -70,63 +133,60 @@ def upsert_table(table: catalog.Table, dataset_id):
         connection.autocommit(False)
         cursor = connection.cursor()
         db = DBUtils(cursor)
-        variable = db.fetch_one_or_none(
-            "select * from variables v where v.datasetId = %(datasetid)s",
-            {"datasetid": str(dataset_id)},
-        )
-
-        if variable is not None:
-            print("Variable already exists in Mysql")
-        else:
-            print("Variable does not yet exist")
 
         # Upsert variables
         logger.info("---\nUpserting variable...")
 
-        # variable = table["value"]
+        variable = cast(catalog.Variable, table.iloc[:, 0])
 
         years = table.index.unique(level="year").values
         min_year = min(years)
         max_year = max(years)
         timespan = f"{min_year}-{max_year}"
-        print(timespan)
-        # TODO: this is actually an insert always as id is not used, correct below accordingly
-        # db_variable_id = db.upsert_variable(
-        #     name=variable.short_name,
-        #     source_id="?",
-        #     dataset_id=dataset_id,
-        #     description=variable.metadata.description,
-        #     code="?",
-        #     unit=variable.metadata.unit,
-        #     short_unit=variable.metadata.short_unit,
-        #     timespan=timespan,
-        #     coverage="?",
-        #     display=variable.metadata.display,
-        #     original_metadata="?",
-        # )
-        # table["db_variable_id"] = db_variable_id
 
-        # db.cursor.execute(
-        #     """
-        #     DELETE FROM data_values WHERE variableId=%s
-        # """,
-        #     [int(db_variable_id)],
-        # )
+        source_id = None
+        if len(variable.metadata.sources) > 0:
+            source_name = variable.metadata.sources[0].name
+            if source_name is not None:
+                source_id = dataset_upsert_result.source_ids.get(source_name)
+        if source_id is None:
+            source_id = list(dataset_upsert_result.source_ids.values())[0]
 
-        # query = """
-        #     INSERT INTO data_values
-        #         (value, year, entityId, variableId)
-        #     VALUES (%s, %s, %s, %s)
-        #     ON DUPLICATE KEY UPDATE
-        #         value = VALUES(value),
-        #         year = VALUES(year),
-        #         entityId = VALUES(entityId),
-        #         variableId = VALUES(variableId)
-        # """
-        # db.upsert_many(
-        #     query,
-        #     ((row.value, row.year, row.entity_id, row.db_variable_id) for row in table),
-        # )
+        db_variable_id = db.upsert_variable(
+            name=table.metadata.short_name,
+            source_id=source_id,
+            dataset_id=dataset_upsert_result.dataset_id,
+            description=variable.metadata.description,
+            code=None,
+            unit=variable.metadata.unit,
+            short_unit=variable.metadata.short_unit,
+            timespan=timespan,
+            coverage="",
+            display=variable.metadata.display,
+            original_metadata=None,
+        )
+
+        db.cursor.execute(
+            """
+            DELETE FROM data_values WHERE variableId=%s
+        """,
+            [int(db_variable_id)],
+        )
+
+        query = """
+            INSERT INTO data_values
+                (value, year, entityId, variableId)
+            VALUES (%s, %s, %s, %s)
+            ON DUPLICATE KEY UPDATE
+                value = VALUES(value),
+                year = VALUES(year),
+                entityId = VALUES(entityId),
+                variableId = VALUES(variableId)
+        """
+        db.upsert_many(
+            query,
+            ((row.value, row.year, row.entity_id, db_variable_id) for row in table),
+        )
         logger.info(f"Upserted {len(table)} datapoints.")
 
         connection.commit()

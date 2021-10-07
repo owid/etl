@@ -28,7 +28,7 @@ from owid import walden
 from etl import files
 from etl import paths
 from etl.helpers import get_etag, get_latest_github_sha
-from etl.grapher_import import upsert_table
+from etl.grapher_import import upsert_table, upsert_dataset
 
 Graph = Dict[str, Set[str]]
 
@@ -427,17 +427,22 @@ class GrapherStep(Step):
         """
         module_path = self.path.lstrip("/").replace("/", ".")
         step_module = import_module(f"etl.steps.data.{module_path}")
+        if not hasattr(step_module, "get_grapher_dataset"):
+            raise Exception(
+                f'no get_grapher_dataset() method defined for module "{step_module}"'
+            )
         if not hasattr(step_module, "get_grapher_tables"):
             raise Exception(
-                f'no to_grapher_tables() method defined for module "{step_module}"'
+                f'no get_grapher_tables() method defined for module "{step_module}"'
             )
 
         # data steps
-
-        # TODO: call grapher_import.upsert_dataset here
-
-        for table in step_module.get_grapher_tables():  # type: ignore
-            upsert_table(table, 1)
+        dataset = step_module.get_grapher_dataset()
+        dataset_upsert_results = upsert_dataset(
+            dataset, dataset.metadata.namespace, dataset.metadata.sources
+        )
+        for table in step_module.get_grapher_tables(dataset):  # type: ignore
+            upsert_table(table, dataset_upsert_results)
             # TODO: call grapher_import.upsert_table here
 
 

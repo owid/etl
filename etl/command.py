@@ -58,7 +58,6 @@ def run_dag(
         if not dry_run:
             time_taken = timed_run(lambda: step.run())
             click.echo(f"{click.style('OK', fg='blue')} ({time_taken:.0f}s)")
-            print()
 
 
 def timed_run(f: Callable[[], Any]) -> float:
