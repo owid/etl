@@ -16,3 +16,5 @@ steps:
     - data://meadow/hyde/2017/baseline
     - data://meadow/gapminder/2019-12-10/population
     - data://reference
+  data://meadow/wpp/2019/standard_projections:
+    - walden://wpp/2019/standard_projections

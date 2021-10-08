@@ -34,6 +34,7 @@ PyYAML = "^5.4.1"
 argh = "^0.26.2"
 jupyter = "^1.0.0"
 ipython = "^7.27.0"
+matplotlib = "^3.4.3"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
