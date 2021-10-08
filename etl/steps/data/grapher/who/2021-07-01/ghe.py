@@ -46,16 +46,6 @@ def get_grapher_tables(dataset: catalog.Dataset) -> Iterable[catalog.Table]:
             f"GHE table to transform to grapher did not contain the expected columns but instead had: {list(table.columns)}"
         )
 
-    script_dir = Path(__file__).parent
-    with open(script_dir / "annotations.yml") as istream:
-        annotations = yaml.safe_load(istream)
-
-    for column in columns_to_export:
-        annotation = annotations["variables"][column]
-        table[column].metadata.description = annotation["description"]
-        table[column].metadata.unit = annotation["unit"]
-        table[column].metadata.short_unit = annotation["short_unit"]
-
     # Get the legacy_entity_id from the country_code via the countries_regions dimension table
     reference_dataset = catalog.Dataset(DATA_DIR / "reference")
     countries_regions = reference_dataset["countries_regions"]
@@ -66,6 +56,7 @@ def get_grapher_tables(dataset: catalog.Dataset) -> Iterable[catalog.Table]:
         right_index=True,
         validate="m:1",
     )
+
     table.reset_index(inplace=True)
     df = pd.DataFrame(table)
     table["year"] = df["year"].astype(int)
@@ -75,6 +66,19 @@ def get_grapher_tables(dataset: catalog.Dataset) -> Iterable[catalog.Table]:
         ["entity_id", "year", "ghe_cause_title", "sex_code", "agegroup_code"],
         inplace=True,
     )
+
+    script_dir = Path(__file__).parent
+    with open(script_dir / "annotations.yml") as istream:
+        annotations = yaml.safe_load(istream)
+
+    for column in columns_to_export:
+        annotation = annotations["variables"][column]
+        table[column].metadata.description = annotation["description"]
+        table[column].metadata.unit = annotation["unit"]
+        table[column].metadata.short_unit = annotation["short_unit"]
+
+    for column in columns_to_export:
+        assert table[column].metadata.unit is not None, "Unit should not be None here!"
 
     for ghe_cause_title in table.index.unique(level="ghe_cause_title").values:
         for sex_code in table.index.unique(level="sex_code").values:
@@ -88,7 +92,8 @@ def get_grapher_tables(dataset: catalog.Dataset) -> Iterable[catalog.Table]:
                     idx[:, :, ghe_cause_title, sex_code, agegroup_code], :
                 ]
 
-                # drop the indices
+                # drop the indices of the dimensions we fixed. The table to be yielded
+                # should only have the year and entity_id index and one value column
                 cutout_table.reset_index(level=4, drop=True, inplace=True)
                 cutout_table.reset_index(level=3, drop=True, inplace=True)
                 cutout_table.reset_index(level=2, drop=True, inplace=True)
@@ -96,9 +101,13 @@ def get_grapher_tables(dataset: catalog.Dataset) -> Iterable[catalog.Table]:
                     short_name = slugify.slugify(
                         f"{column}-{ghe_cause_title}-{sex_code}-{agegroup_code}"
                     )
-                    cutout_table.metadata.short_name = short_name
+
+                    table_to_yield = cutout_table[[column]]
+                    table_to_yield.metadata.short_name = short_name
+
+                    # Safety check to see if the metadata is still intact
                     assert (
-                        cutout_table[column].metadata.unit is not None
+                        table_to_yield[column].metadata.unit is not None
                     ), "Unit should not be None here!"
 
-                    yield cutout_table[[column]]
+                    yield table_to_yield

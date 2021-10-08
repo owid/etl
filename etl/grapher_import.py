@@ -43,12 +43,10 @@ class DatasetUpsertResult:
 def upsert_dataset(
     dataset: catalog.Dataset, namespace: str, sources: List[catalog.meta.Source]
 ) -> DatasetUpsertResult:
-    # This function would have to create the dataset table row, a namespace row
-    # and the sources table row. There is a bit of an open question if we should
+    # This function creates the dataset table row, a namespace row
+    # and the sources table row(s). There is a bit of an open question if we should
     # map one dataset with N tables to one namespace and N datasets in
     # mysql or if we should just flatten it into one dataset?
-    # The metadata of the dataset should be used to feed the other instances where
-    # possible
     connection = None
     cursor = None
     try:
@@ -107,9 +105,7 @@ def upsert_dataset(
 def upsert_table(table: catalog.Table, dataset_upsert_result: DatasetUpsertResult):
     # This function is used to put one ready to go formatted Table (i.e.
     # in the format (year, entityId, value)) into mysql. The metadata
-    # of the variable should be used to fill the required fields if possible.
-    test = pd.DataFrame()
-    test.index
+    # of the variable is used to fill the required fields
 
     assert set(table.index.names) == {
         "year",
@@ -134,19 +130,21 @@ def upsert_table(table: catalog.Table, dataset_upsert_result: DatasetUpsertResul
         cursor = connection.cursor()
         db = DBUtils(cursor)
 
-        # Upsert variables
-        logger.info("---\nUpserting variable...")
+        logger.info("---Upserting variable...")
 
-        variable = cast(catalog.Variable, table.iloc[:, 0])
+        # For easy retrieveal of the value series we store the name
+        column_name = table.columns[0]
 
         years = table.index.unique(level="year").values
         min_year = min(years)
         max_year = max(years)
         timespan = f"{min_year}-{max_year}"
 
+        table.reset_index(inplace=True)
+
         source_id = None
-        if len(variable.metadata.sources) > 0:
-            source_name = variable.metadata.sources[0].name
+        if len(table[column_name].metadata.sources) > 0:
+            source_name = table[column_name].metadata.sources[0].name
             if source_name is not None:
                 source_id = dataset_upsert_result.source_ids.get(source_name)
         if source_id is None:
@@ -156,13 +154,13 @@ def upsert_table(table: catalog.Table, dataset_upsert_result: DatasetUpsertResul
             name=table.metadata.short_name,
             source_id=source_id,
             dataset_id=dataset_upsert_result.dataset_id,
-            description=variable.metadata.description,
+            description=table[column_name].metadata.description,
             code=None,
-            unit=variable.metadata.unit,
-            short_unit=variable.metadata.short_unit,
+            unit=table[column_name].metadata.unit,
+            short_unit=table[column_name].metadata.short_unit,
             timespan=timespan,
             coverage="",
-            display=variable.metadata.display,
+            display=table[column_name].metadata.display,
             original_metadata=None,
         )
 
@@ -185,7 +183,10 @@ def upsert_table(table: catalog.Table, dataset_upsert_result: DatasetUpsertResul
         """
         db.upsert_many(
             query,
-            ((row.value, row.year, row.entity_id, db_variable_id) for row in table),
+            (
+                (row[column_name], row["year"], row["entity_id"], db_variable_id)
+                for index, row in table.iterrows()
+            ),
         )
         logger.info(f"Upserted {len(table)} datapoints.")
 
