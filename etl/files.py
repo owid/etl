@@ -1,0 +1,38 @@
+#
+#  files.py
+#
+
+from pathlib import Path
+import hashlib
+from typing import Set, List, Union
+
+
+def checksum_file(filename: Union[str, Path]) -> str:
+    "Return the md5 hex digest of the file contents."
+    if isinstance(filename, Path):
+        filename = filename.as_posix()
+
+    chunk_size = 2 ** 20
+    _hash = hashlib.md5()
+    with open(filename, "rb") as istream:
+        chunk = istream.read(chunk_size)
+        while chunk:
+            _hash.update(chunk)
+            chunk = istream.read(chunk_size)
+
+    return _hash.hexdigest()
+
+
+def walk(
+    folder: Path, ignore_set: Set[str] = {"__pycache__", ".ipynb_checkpoints"}
+) -> List[Path]:
+    paths = []
+    for p in folder.iterdir():
+        if p.is_dir():
+            paths.extend(walk(p))
+            continue
+
+        if p.name not in ignore_set:
+            paths.append(p)
+
+    return paths
