@@ -4,8 +4,8 @@
 #
 
 import sys
-from typing import Any, Dict, List, Optional
-from urllib.request import HTTPError
+from typing import Any, Dict, Iterator, Optional, cast
+from urllib.error import HTTPError
 from pathlib import Path
 
 import click
@@ -58,7 +58,7 @@ def is_catalog_up_to_date(s3: Any) -> bool:
     return remote == local
 
 
-def sync_datasets(s3, dry_run: bool = False):
+def sync_datasets(s3: Any, dry_run: bool = False) -> None:
     "Go dataset by dataset and check if each one needs updating."
     existing = get_published_checksums()
 
@@ -85,7 +85,9 @@ def sync_datasets(s3, dry_run: bool = False):
             delete_dataset(s3, path)
 
 
-def sync_folder(s3: Any, local_folder, dest_path: str, delete: bool = True) -> None:
+def sync_folder(
+    s3: Any, local_folder: Path, dest_path: str, delete: bool = True
+) -> None:
     """
     Perform a content-based sync of a local folder with a "folder" on an S3 bucket,
     by comparing checksums and only uploading files that have changed.
@@ -113,11 +115,11 @@ def sync_folder(s3: Any, local_folder, dest_path: str, delete: bool = True) -> N
             print("  DEL", rel_filename)
 
 
-def object_md5(obj: dict) -> str:
-    return obj["ETag"].strip("'\"")
+def object_md5(obj: Dict[str, Any]) -> str:
+    return cast(str, obj["ETag"]).strip("'\"")
 
 
-def walk_s3(s3: Any, bucket: str, path: str) -> List[dict]:
+def walk_s3(s3: Any, bucket: str, path: str) -> Iterator[Dict[str, Any]]:
     objs = s3.list_objects(Bucket=bucket, Prefix=path)
     yield from objs["Contents"]
 
@@ -126,8 +128,7 @@ def walk_s3(s3: Any, bucket: str, path: str) -> List[dict]:
         yield from objs["Contents"]
 
 
-def delete_dataset(s3: Any, path: Path) -> None:
-    relative_path = path.relative_to(DATA_DIR).as_posix()
+def delete_dataset(s3: Any, relative_path: str) -> None:
     to_delete = [o["Key"] for o in walk_s3(s3, config.S3_BUCKET, relative_path)]
     while to_delete:
         chunk = to_delete[:1000]
@@ -163,7 +164,7 @@ def get_published_checksums() -> Dict[str, str]:
     except HTTPError:
         existing = {}
 
-    return existing
+    return cast(Dict[str, str], existing)
 
 
 def get_remote_checksum(s3: Any, path: str) -> Optional[str]:
