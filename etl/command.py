@@ -20,6 +20,8 @@ import warnings
 import click
 import yaml
 
+from etl import files
+
 # smother deprecation warnings by papermill
 with warnings.catch_warnings():
     warnings.simplefilter("ignore")
@@ -260,7 +262,7 @@ class DataStep(Step):
             checksums[d.path] = d.checksum_output()
 
         for f in self._step_files():
-            checksums[f] = _checksum_file(f)
+            checksums[f] = files.checksum_file(f)
 
         in_order = [v for _, v in sorted(checksums.items())]
         return hashlib.md5(",".join(in_order).encode("utf8")).hexdigest()
@@ -280,7 +282,7 @@ class DataStep(Step):
     def _step_files(self) -> List[str]:
         "Return a list of code files defining this step."
         if self._search_path.is_dir():
-            return [p.as_posix() for p in walk(self._search_path)]
+            return [p.as_posix() for p in files.walk(self._search_path)]
 
         return glob(self._search_path.as_posix() + ".*")
 
@@ -371,34 +373,6 @@ def timed_run(f: Callable[[], Any]) -> float:
     start_time = time.time()
     f()
     return time.time() - start_time
-
-
-def _checksum_file(filename: str) -> str:
-    "Return the md5 hex digest of the file contents."
-    chunk_size = 2 ** 20
-    _hash = hashlib.md5()
-    with open(filename, "rb") as istream:
-        chunk = istream.read(chunk_size)
-        while chunk:
-            _hash.update(chunk)
-            chunk = istream.read(chunk_size)
-
-    return _hash.hexdigest()
-
-
-def walk(
-    folder: Path, ignore_set: Set[str] = {"__pycache__", ".ipynb_checkpoints"}
-) -> List[Path]:
-    paths = []
-    for p in folder.iterdir():
-        if p.is_dir():
-            paths.extend(walk(p))
-            continue
-
-        if p.name not in ignore_set:
-            paths.append(p)
-
-    return paths
 
 
 if __name__ == "__main__":
