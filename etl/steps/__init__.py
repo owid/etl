@@ -351,11 +351,6 @@ class GrapherStep(Step):
         else:
             raise Exception(f"have no idea how to run step: {self.path}")
 
-        # modify the dataset to remember what inputs were used to build it
-        dataset = self._output_dataset
-        dataset.metadata.source_checksum = self.checksum_input()
-        dataset.save()
-
     def is_dirty(self) -> bool:
         return True
 
@@ -380,17 +375,9 @@ class GrapherStep(Step):
         in_order = [v for _, v in sorted(checksums.items())]
         return hashlib.md5(",".join(in_order).encode("utf8")).hexdigest()
 
-    @property
-    def _output_dataset(self) -> catalog.Dataset:
-        "If this step is completed, return the MD5 of the output."
-        if not self._dest_dir.is_dir():
-            raise Exception("dataset has not been created yet")
-
-        return catalog.Dataset(self._dest_dir.as_posix())
-
     def checksum_output(self) -> str:
         # This cast from str to str is IMHO unnecessary but MyPy complains about this without it...
-        raise Exception('grapher steps do not output a dataset')
+        raise Exception("grapher steps do not output a dataset")
 
     def _step_files(self) -> List[str]:
         "Return a list of code files defining this step."
@@ -412,7 +399,7 @@ class GrapherStep(Step):
         Import the Python module for this step and call get_grapher_tables() on it.
         """
         module_path = self.path.lstrip("/").replace("/", ".")
-        step_module = import_module(f"etl.steps.data.{module_path}")
+        step_module = import_module(f"etl.steps.grapher.{module_path}")
         if not hasattr(step_module, "get_grapher_dataset"):
             raise Exception(
                 f'no get_grapher_dataset() method defined for module "{step_module}"'
