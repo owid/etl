@@ -389,7 +389,7 @@ class GrapherStep(Step):
             checksums[d.path] = d.checksum_output()
 
         for f in self._step_files():
-            checksums[f] = _checksum_file(f)
+            checksums[f] = files.checksum_file(f)
 
         in_order = [v for _, v in sorted(checksums.items())]
         return hashlib.md5(",".join(in_order).encode("utf8")).hexdigest()
@@ -409,7 +409,7 @@ class GrapherStep(Step):
     def _step_files(self) -> List[str]:
         "Return a list of code files defining this step."
         if self._search_path.is_dir():
-            return [p.as_posix() for p in walk(self._search_path)]
+            return [p.as_posix() for p in files.walk(self._search_path)]
 
         return glob(self._search_path.as_posix() + ".*")
 
