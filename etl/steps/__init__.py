@@ -338,7 +338,7 @@ class GrapherStep(Step):
         self.dependencies = dependencies
 
     def __str__(self) -> str:
-        return f"data://{self.path}"
+        return f"grapher://{self.path}"
 
     def run(self) -> None:
         # make sure the encosing folder is there
@@ -357,21 +357,7 @@ class GrapherStep(Step):
         dataset.save()
 
     def is_dirty(self) -> bool:
-        if not self._dest_dir.is_dir() or any(
-            isinstance(d, DataStep) and not d.has_existing_data()
-            for d in self.dependencies
-        ):
-            return True
-
-        found_source_checksum = catalog.Dataset(
-            self._dest_dir.as_posix()
-        ).metadata.source_checksum
-        exp_source_checksum = self.checksum_input()
-
-        if found_source_checksum != exp_source_checksum:
-            return True
-
-        return False
+        return True
 
     def can_execute(self) -> bool:
         sp = self._search_path
@@ -404,7 +390,7 @@ class GrapherStep(Step):
 
     def checksum_output(self) -> str:
         # This cast from str to str is IMHO unnecessary but MyPy complains about this without it...
-        return cast(str, self._output_dataset.checksum())
+        raise Exception('grapher steps do not output a dataset')
 
     def _step_files(self) -> List[str]:
         "Return a list of code files defining this step."
@@ -415,7 +401,7 @@ class GrapherStep(Step):
 
     @property
     def _search_path(self) -> Path:
-        return Path(STEP_DIR) / "data" / self.path
+        return Path(STEP_DIR) / "grapher" / self.path
 
     @property
     def _dest_dir(self) -> Path:
@@ -443,7 +429,6 @@ class GrapherStep(Step):
         )
         for table in step_module.get_grapher_tables(dataset):  # type: ignore
             upsert_table(table, dataset_upsert_results)
-            # TODO: call grapher_import.upsert_table here
 
 
 class GithubStep(Step):
