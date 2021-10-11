@@ -12,23 +12,20 @@ Usage:
 from dataclasses import dataclass
 import json
 import os
-from typing import Dict, List, Optional, cast
-from dotenv import load_dotenv
+from typing import Dict, List
 
-from db import get_connection
-from db_utils import DBUtils
+from etl.db import get_connection
+from etl.db_utils import DBUtils
+from etl import config
 from owid import catalog
-import pandas as pd
 
 import logging
+import traceback
 
 logging.basicConfig()
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
-load_dotenv()
-DEBUG = os.getenv("DEBUG") == "True"
-USER_ID = int(os.getenv("USER_ID"))  # type: ignore
 
 CURRENT_DIR = os.path.dirname(__file__)
 # CURRENT_DIR = os.path.join(os.getcwd(), 'standard_importer')
@@ -64,7 +61,7 @@ def upsert_dataset(
         dataset_id = db.upsert_dataset(
             dataset.metadata.short_name,
             namespace,
-            USER_ID,
+            config.GRAPHER_USER_ID,
             description=dataset.metadata.description,
         )
 
@@ -92,7 +89,7 @@ def upsert_dataset(
         logger.error("Rolling back changes...")
         if connection:
             connection.rollback()
-        if DEBUG:
+        if config.DEBUG:
             traceback.print_exc()
         raise e
     finally:
@@ -102,7 +99,9 @@ def upsert_dataset(
             connection.close()
 
 
-def upsert_table(table: catalog.Table, dataset_upsert_result: DatasetUpsertResult):
+def upsert_table(
+    table: catalog.Table, dataset_upsert_result: DatasetUpsertResult
+) -> None:
     # This function is used to put one ready to go formatted Table (i.e.
     # in the format (year, entityId, value)) into mysql. The metadata
     # of the variable is used to fill the required fields
@@ -197,7 +196,7 @@ def upsert_table(table: catalog.Table, dataset_upsert_result: DatasetUpsertResul
         logger.error("Rolling back changes...")
         if connection:
             connection.rollback()
-        if DEBUG:
+        if config.DEBUG:
             traceback.print_exc()
     finally:
         if cursor:

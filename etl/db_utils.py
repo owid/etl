@@ -1,5 +1,7 @@
 import json
+from typing import Any, Dict, Iterator, List, Optional, Tuple, cast
 from unidecode import unidecode
+from MySQLdb.cursors import Cursor
 
 import pandas as pd
 
@@ -8,7 +10,7 @@ INSERT = 1
 UPDATE = 2
 
 
-def normalize_entity_name(entity_name):
+def normalize_entity_name(entity_name: str) -> str:
     return unidecode(entity_name.lower().strip())
 
 
@@ -20,7 +22,7 @@ class DBUtils:
 
     # TODO create bulk inserts for every create? what type should they return?
 
-    def __init__(self, cursor):
+    def __init__(self, cursor: Cursor):
         self.cursor = cursor
         self.counts = {
             "tags_inserted": 0,
@@ -35,15 +37,15 @@ class DBUtils:
             "sources_inserted": 0,
             "sources_updated": 0,
         }
-        self.entity_id_by_normalised_name = {}
+        self.entity_id_by_normalised_name: Dict[str, int] = {}
 
-    def get_counts(self):
+    def get_counts(self) -> Dict[str, int]:
         return self.counts
 
-    def get_entity_cache(self):
+    def get_entity_cache(self) -> Dict[str, int]:
         return self.entity_id_by_normalised_name
 
-    def fetch_one_or_none(self, *args, **kwargs):
+    def fetch_one_or_none(self, *args: Any, **kwargs: Any) -> Any:
         self.cursor.execute(*args, **kwargs)
         rows = self.cursor.fetchall()
         if len(rows) > 1:
@@ -53,22 +55,22 @@ class DBUtils:
         else:
             return None
 
-    def fetch_one(self, *args, **kwargs):
+    def fetch_one(self, *args: Any, **kwargs: Any) -> Any:
         result = self.fetch_one_or_none(*args, **kwargs)
         if result is None:
             raise NotOne("Expected 1 row but received 0")
         else:
             return result
 
-    def fetch_many(self, *args, **kwargs):
+    def fetch_many(self, *args: Any, **kwargs: Any) -> List[Any]:
         self.cursor.execute(*args, **kwargs)
-        return self.cursor.fetchall()
+        return cast(List[Any], self.cursor.fetchall())
 
-    def insert_one(self, *args, **kwargs):
+    def insert_one(self, *args: Any, **kwargs: Any) -> int:
         self.cursor.execute(*args, **kwargs)
-        return self.cursor.lastrowid
+        return int(self.cursor.lastrowid)
 
-    def upsert_one(self, *args, **kwargs):
+    def upsert_one(self, *args: Any, **kwargs: Any) -> Optional[int]:
         self.cursor.execute(*args, **kwargs)
         if self.cursor.rowcount == 0:
             return UNMODIFIED
@@ -78,16 +80,16 @@ class DBUtils:
             return UPDATE
         return None
 
-    def upsert_many(self, query, tuples):
+    def upsert_many(self, query: str, tuples: Iterator[Tuple[Any, ...]]) -> None:
         self.cursor.executemany(query, tuples)
 
-    def execute_until_empty(self, *args, **kwargs):
+    def execute_until_empty(self, *args: Any, **kwargs: Any) -> None:
         first = True
         while first or self.cursor.rowcount > 0:
             first = False
             self.cursor.execute(*args, **kwargs)
 
-    def __fetch_parent_tag(self, name):
+    def __fetch_parent_tag(self, name: str) -> int:
         (tag_id,) = self.fetch_one(
             """
             SELECT id FROM tags
@@ -98,9 +100,9 @@ class DBUtils:
         """,
             [name],
         )
-        return tag_id
+        return cast(int, tag_id)
 
-    def upsert_parent_tag(self, name):
+    def upsert_parent_tag(self, name: str) -> int:
         try:
             return self.__fetch_parent_tag(name)
         except NotOne:
@@ -114,7 +116,7 @@ class DBUtils:
             self.counts["tags_inserted"] += 1
             return self.__fetch_parent_tag(name)
 
-    def upsert_tag(self, name, parent_id):
+    def upsert_tag(self, name: str, parent_id: int) -> int:
         operation = self.upsert_one(
             """
             INSERT INTO
@@ -142,9 +144,9 @@ class DBUtils:
             [name, parent_id],
         )
 
-        return tag_id
+        return cast(int, tag_id)
 
-    def associate_dataset_tag(self, dataset_id, tag_id):
+    def associate_dataset_tag(self, dataset_id: int, tag_id: int) -> None:
         self.upsert_one(
             """
             INSERT INTO dataset_tags
@@ -160,12 +162,12 @@ class DBUtils:
 
     def upsert_dataset(
         self,
-        name,
-        namespace,
-        user_id,
-        tag_id=None,
-        description="This is a dataset imported by the automated fetcher",
-    ):
+        name: str,
+        namespace: str,
+        user_id: int,
+        tag_id: Optional[int] = None,
+        description: str = "This is a dataset imported by the automated fetcher",
+    ) -> int:
         operation = self.upsert_one(
             """
             INSERT INTO datasets
@@ -184,7 +186,7 @@ class DBUtils:
         """,
             [name, description, namespace, user_id, user_id, user_id],
         )
-        (dataset_id,) = self.fetch_one(
+        (v,) = self.fetch_one(
             """
             SELECT id FROM datasets
             WHERE name = %s
@@ -192,6 +194,7 @@ class DBUtils:
         """,
             [name, namespace],
         )
+        dataset_id = cast(int, v)
 
         if operation == INSERT:
             self.counts["datasets_inserted"] += 1
@@ -203,7 +206,7 @@ class DBUtils:
 
         return dataset_id
 
-    def upsert_namespace(self, name, description):
+    def upsert_namespace(self, name: str, description: str) -> int:
         operation = self.upsert_one(
             """
             INSERT INTO namespaces
@@ -229,9 +232,9 @@ class DBUtils:
         if operation == UPDATE:
             self.counts["namespaces_updated"] += 1
 
-        return namespace_id
+        return cast(int, namespace_id)
 
-    def upsert_source(self, name, description, dataset_id):
+    def upsert_source(self, name: str, description: str, dataset_id: int) -> int:
         # There is no UNIQUE key constraint we can rely on to prevent duplicates
         # so we have to do a SELECT before INSERT...
         desc_json = json.loads(description)
@@ -294,30 +297,28 @@ class DBUtils:
                 {"description": description, "id": row[0]},
             )
             self.counts["sources_updated"] += 1
-        return row[0]
+
+        return cast(int, row[0])
 
     def upsert_variable(
         self,
-        name,
-        code,
-        unit,
-        short_unit,
-        source_id,
-        dataset_id,
-        description=None,
-        timespan="",
-        coverage="",
-        display=None,
-        original_metadata=None,
-    ):
-        if display is None or display == "":
+        name: str,
+        code: Optional[str],
+        unit: Optional[str],
+        short_unit: Optional[str],
+        source_id: int,
+        dataset_id: int,
+        description: Optional[str] = None,
+        timespan: str = "",
+        coverage: str = "",
+        display: Optional[Dict[str, Any]] = None,
+        original_metadata: Optional[Dict[str, Any]] = None,
+    ) -> int:
+        if display is None:
             display = {}
-        if original_metadata is None or original_metadata == "":
+        if original_metadata is None:
             original_metadata = {}
-        if not isinstance(display, str):
-            display = json.dumps(display)
-        if not isinstance(original_metadata, str):
-            original_metadata = json.dumps(original_metadata)
+
         operation = self.upsert_one(
             """
             INSERT INTO variables (
@@ -350,8 +351,8 @@ class DBUtils:
                 short_unit,
                 timespan,
                 coverage,
-                display,
-                original_metadata,
+                json.dumps(display),
+                json.dumps(original_metadata),
                 source_id,
                 dataset_id,
             ],
@@ -372,9 +373,9 @@ class DBUtils:
             [name, code, dataset_id, source_id],
         )
 
-        return var_id
+        return cast(int, var_id)
 
-    def touch_variable(self, var_id):
+    def touch_variable(self, var_id: int) -> None:
         self.cursor.execute(
             """
             UPDATE variables
@@ -385,7 +386,9 @@ class DBUtils:
         )
         self.counts["variables_updated"] += self.cursor.rowcount
 
-    def note_import(self, import_type, import_notes, import_state):
+    def note_import(
+        self, import_type: str, import_notes: str, import_state: str
+    ) -> None:
         self.upsert_one(
             """
             INSERT INTO importer_importhistory (import_type, import_time, import_notes, import_state)
@@ -394,14 +397,14 @@ class DBUtils:
             [import_type, import_notes, import_state],
         )
 
-    def __get_cached_entity_id(self, name):
+    def __get_cached_entity_id(self, name: str) -> Optional[int]:
         normalised_name = normalize_entity_name(name)
         if normalised_name in self.entity_id_by_normalised_name:
             return self.entity_id_by_normalised_name[normalised_name]
         else:
             return None
 
-    def get_or_create_entity(self, name):
+    def get_or_create_entity(self, name: str) -> int:
         # Serve from cache if available
         entity_id = self.__get_cached_entity_id(name)
         if entity_id is not None:
@@ -432,9 +435,9 @@ class DBUtils:
             )
             # Cache the newly created entity
             self.entity_id_by_normalised_name[normalize_entity_name(name)] = entity_id
-            return entity_id
+            return cast(int, entity_id)
 
-    def prefill_entity_cache(self, names):
+    def prefill_entity_cache(self, names: List[str]) -> None:
         rows = self.fetch_many(
             """
             SELECT
