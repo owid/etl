@@ -19,4 +19,4 @@ steps:
   data://meadow/wpp/2019/standard_projections:
     - walden://wpp/2019/standard_projections
   data://garden/owid/latest/covid:
-    - github://owid/covid-19-data
+    - etag://raw.githubusercontent.com/owid/covid-19-data/master/public/data/owid-covid-data.csv

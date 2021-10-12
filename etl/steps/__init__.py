@@ -27,7 +27,7 @@ from owid import walden
 
 from etl import files
 from etl import paths
-from etl.helpers import get_latest_github_sha
+from etl.helpers import get_etag, get_latest_github_sha
 
 Graph = Dict[str, Set[str]]
 
@@ -109,6 +109,9 @@ def parse_step(step_name: str, dag: Dict[str, Any]) -> "Step":
 
     elif step_type == "github":
         step = GithubStep(path)
+
+    elif step_type == "etag":
+        step = ETagStep(path)
 
     else:
         raise Exception(f"no recipe for executing step: {step_name}")
@@ -354,3 +357,24 @@ class GithubStep(Step):
 
     def checksum_output(self) -> str:
         return get_latest_github_sha(self.org, self.repo, self.branch)
+
+
+class ETagStep(Step):
+    """
+    An empty step that represents a dependency on the ETag of a URL.
+    """
+
+    path: str
+
+    def __init__(self, path: str) -> None:
+        self.path = path
+
+    def is_dirty(self) -> bool:
+        return False
+
+    def run(self) -> None:
+        # nothing is done for this step
+        pass
+
+    def checksum_output(self) -> str:
+        return get_etag(f"https://{self.path}")

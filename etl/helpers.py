@@ -25,6 +25,12 @@ def downloaded(url: str) -> Iterator[str]:
         yield tmp.name
 
 
+def get_etag(url: str) -> str:
+    resp = requests.head(url)
+    resp.raise_for_status()
+    return cast(str, resp.headers["ETag"])
+
+
 def get_latest_github_sha(org: str, repo: str, branch: str) -> str:
     # Use Github's list-branches API to get the sha1 of the most recent commit
     # https://docs.github.com/en/rest/reference/repos#list-branches
@@ -33,23 +39,14 @@ def get_latest_github_sha(org: str, repo: str, branch: str) -> str:
     return cast(str, match["commit"]["sha"])
 
 
-def _get_github_branches(org: str, repo: str) -> Iterator[Any]:
-    page = 1
-
-    branches = _get_github_branches_page(org, repo, page)
-    yield from branches
-
-    while len(branches) == 100:
-        page += 1
-
-        branches = _get_github_branches_page(org, repo, page)
-        yield from branches
-
-
-def _get_github_branches_page(org: str, repo: str, page: int = 1) -> List[Any]:
-    url = f"https://api.github.com/repos/{org}/{repo}/branches?per_page=100&page={page}"
+def _get_github_branches(org: str, repo: str) -> List[Any]:
+    url = f"https://api.github.com/repos/{org}/{repo}/branches?per_page=100"
     resp = requests.get(url, headers={"Accept": "application/vnd.github.v3+json"})
     if resp.status_code != 200:
         raise Exception(f"got {resp.status_code} from {url}")
 
-    return cast(List[Any], resp.json())
+    branches = cast(List[Any], resp.json())
+    if len(branches) == 100:
+        raise Exception("reached single page limit, should paginate request")
+
+    return branches
