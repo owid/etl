@@ -2,19 +2,32 @@
 #  config.py
 #
 
-from os import environ
+"""
+The environment variables and settings here are for publishing options, they're
+only important for OWID staff.
+"""
+
+from os import environ as env
 from typing import cast
 
 from dotenv import load_dotenv
 
 load_dotenv()
 
+DEBUG = env.get("DEBUG") == "True"
+
+# publishing to OWID's public data catalog
 S3_BUCKET = "owid-catalog"
 S3_REGION_NAME = "nyc3"
 S3_ENDPOINT_URL = "https://nyc3.digitaloceanspaces.com"
 S3_HOST = "nyc3.digitaloceanspaces.com"
-S3_ACCESS_KEY = environ.get("OWID_ACCESS_KEY")
-S3_SECRET_KEY = environ.get("OWID_SECRET_KEY")
+S3_ACCESS_KEY = env.get("OWID_ACCESS_KEY")
+S3_SECRET_KEY = env.get("OWID_SECRET_KEY")
 
-DEBUG = environ.get("DEBUG") == "True"
-GRAPHER_USER_ID = cast(int, environ.get("GRAPHER_USER_ID", -1))
+# publishing to grapher's MySQL db
+GRAPHER_USER_ID = cast(int, env.get("GRAPHER_USER_ID", -1))
+DB_NAME = env.get("DB_NAME")
+DB_HOST = env.get("DB_HOST", "localhost")
+DB_PORT = int(env.get("DB_PORT", "3306"))
+DB_USER = env.get("DB_USER", "root")
+DB_PASS = env.get("DB_PASS", "")
