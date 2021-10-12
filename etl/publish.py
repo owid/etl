@@ -108,7 +108,8 @@ def sync_folder(
                 ExtraArgs={"ACL": "public-read"},
             )
 
-        del existing[rel_filename]
+        if rel_filename in existing:
+            del existing[rel_filename]
 
     if delete:
         for rel_filename in existing:
@@ -121,11 +122,11 @@ def object_md5(obj: Dict[str, Any]) -> str:
 
 def walk_s3(s3: Any, bucket: str, path: str) -> Iterator[Dict[str, Any]]:
     objs = s3.list_objects(Bucket=bucket, Prefix=path)
-    yield from objs["Contents"]
+    yield from objs.get("Contents", [])
 
     while objs["IsTruncated"]:
         objs = s3.list_objects(Bucket=bucket, Prefix=path, Marker=objs["NextMarker"])
-        yield from objs["Contents"]
+        yield from objs.get("Contents", [])
 
 
 def delete_dataset(s3: Any, relative_path: str) -> None:
