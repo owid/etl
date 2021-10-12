@@ -3,14 +3,19 @@
 #  steps
 #
 
-from typing import Protocol, List, cast
+from typing import Any, Dict, Protocol, List, Set, cast, Iterable
 from pathlib import Path
 import hashlib
 import tempfile
+from collections import defaultdict
+from urllib.parse import urlparse
 from dataclasses import dataclass
 from glob import glob
 from importlib import import_module
 import warnings
+import graphlib
+
+import yaml
 
 # smother deprecation warnings by papermill
 with warnings.catch_warnings():
@@ -22,6 +27,89 @@ from owid import walden
 
 from etl import files
 from etl import paths
+
+Graph = Dict[str, Set[str]]
+
+
+def select_steps(dag: Dict[str, Any], selection: List[str]) -> List[str]:
+    """
+    Return the list of steps which, if executed in order, mean that every
+    step has its dependencies ready for it.
+    """
+    graph = reverse_graph(dag["steps"])
+
+    if selection:
+        # cut the graph to just the listed steps and the things that
+        # then depend on them (transitive closure)
+        subgraph = filter_to_subgraph(graph, selection)
+    else:
+        subgraph = graph
+
+    return topological_sort(subgraph)
+
+
+def load_dag(filename: str) -> Dict[str, Any]:
+    with open(filename) as istream:
+        dag: Dict[str, Any] = yaml.safe_load(istream)
+
+    dag["steps"] = {
+        node: set(deps) if deps else set() for node, deps in dag["steps"].items()
+    }
+    return dag
+
+
+def reverse_graph(graph: Graph) -> Graph:
+    """
+    Invert the edge direction of a graph.
+    """
+    g = defaultdict(set)
+    for dest, sources in graph.items():
+        for source in sources:
+            g[source].add(dest)
+
+        # trigger creation of dest if it's not there
+        g[dest]
+
+    return dict(g)
+
+
+def filter_to_subgraph(graph: Graph, steps: Iterable[str]) -> Graph:
+    """
+    Filter to only the graph including steps and their descendents.
+    """
+    subgraph: Graph = defaultdict(set)
+
+    to_visit = list(steps)
+    while to_visit:
+        node = to_visit.pop()
+        children = graph.get(node, set())
+        subgraph[node].update(children)
+        to_visit.extend(children)
+
+    return dict(subgraph)
+
+
+def topological_sort(graph: Graph) -> List[str]:
+    return list(reversed(list(graphlib.TopologicalSorter(graph).static_order())))
+
+
+def parse_step(step_name: str, dag: Dict[str, Any]) -> "Step":
+    parts = urlparse(step_name)
+    step_type = parts.scheme
+    step: Step
+    path = parts.netloc + parts.path
+
+    if step_type == "data":
+        dependencies = dag["steps"].get(step_name, [])
+        step = DataStep(path, [parse_step(s, dag) for s in dependencies])
+
+    elif step_type == "walden":
+        step = WaldenStep(path)
+
+    else:
+        raise Exception(f"no recipe for executing step: {step_name}")
+
+    return step
 
 
 class Step(Protocol):
