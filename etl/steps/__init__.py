@@ -106,6 +106,9 @@ def parse_step(step_name: str, dag: Dict[str, Any]) -> "Step":
     elif step_type == "walden":
         step = WaldenStep(path)
 
+    elif step_type == "github":
+        step = GithubStep(path)
+
     else:
         raise Exception(f"no recipe for executing step: {step_name}")
 
@@ -315,4 +318,13 @@ class WaldenStep(Step):
 
 
 class GithubStep(Step):
-    pass
+    path: str
+
+    def __init__(self, path: str) -> None:
+        self.path = path
+
+    def can_execute(self) -> bool:
+        return True
+
+    def is_dirty(self) -> bool:
+        return False

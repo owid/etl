@@ -18,3 +18,5 @@ steps:
     - data://reference
   data://meadow/wpp/2019/standard_projections:
     - walden://wpp/2019/standard_projections
+  data://garden/owid/latest/covid19:
+    - github://owid/covid-19-data
