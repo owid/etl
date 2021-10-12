@@ -74,7 +74,7 @@ def run(dest_dir: str) -> None:
 
 You can use `make etl` to rebuild everything, including your new table. Or you can run:
 
-`poetry run python -m etl.command data://<path>`
+`.venv/bin/etl data://<path>`
 
 just to run your step alone.
 

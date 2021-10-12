@@ -16,7 +16,7 @@ import pandas as pd
 from owid.catalog import LocalCatalog
 
 from etl import config, files
-from etl.command import DATA_DIR
+from etl.paths import DATA_DIR
 
 
 class CannotPublish(Exception):

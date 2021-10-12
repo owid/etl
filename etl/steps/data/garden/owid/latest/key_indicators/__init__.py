@@ -8,7 +8,7 @@ from importlib import import_module
 
 from owid.catalog import Dataset, DatasetMeta, Table
 
-from etl.command import BASE_DIR
+from etl.paths import BASE_DIR
 
 
 def run(dest_dir: str) -> None:

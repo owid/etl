@@ -7,7 +7,7 @@ import click
 
 from owid.catalog import LocalCatalog
 
-from etl.command import DATA_DIR
+from etl.paths import DATA_DIR
 
 
 @click.command()

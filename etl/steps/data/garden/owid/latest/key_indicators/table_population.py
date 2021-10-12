@@ -11,11 +11,12 @@ https://github.com/owid/importers/blob/master/population/etl.py
 
 from pathlib import Path
 import json
+from typing import cast
 
 import pandas as pd
 
 from owid.catalog import Dataset, Table
-from etl.command import DATA_DIR
+from etl.paths import DATA_DIR
 
 GAPMINDER = DATA_DIR / "meadow/gapminder/2019-12-10/population"
 HYDE = DATA_DIR / "meadow/hyde/2017/baseline"
@@ -64,19 +65,22 @@ def calculate_aggregates(df: pd.DataFrame) -> pd.DataFrame:
     """
     Aggregate our own totals according to OWID continent definitions.
     """
-    df = df[
-        -df.country.isin(
-            [
-                "North America",
-                "South America",
-                "Europe",
-                "Africa",
-                "Asia",
-                "Oceania",
-                "World",
-            ]
-        )
-    ]
+    df = cast(
+        pd.DataFrame,
+        df[
+            -df.country.isin(
+                [
+                    "North America",
+                    "South America",
+                    "Europe",
+                    "Africa",
+                    "Asia",
+                    "Oceania",
+                    "World",
+                ]
+            )
+        ],
+    )
 
     countries = Dataset(REFERENCE)["countries_regions"]
     continent_rows = []
@@ -111,7 +115,7 @@ def calculate_aggregates(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def prepare_dataset(df: pd.DataFrame) -> Table:
-    df = df[df.population > 0].copy()
+    df = cast(pd.DataFrame, df[df.population > 0].copy())
     df["population"] = df.population.astype("int64")
 
     # Add a metric "% of world population"
