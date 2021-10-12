@@ -5,7 +5,7 @@ import slugify
 import yaml
 from pathlib import Path
 
-from etl.command import DATA_DIR
+from etl.paths import DATA_DIR
 
 
 def get_grapher_dataset() -> catalog.Dataset:

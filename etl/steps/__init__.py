@@ -98,12 +98,12 @@ def topological_sort(graph: Graph) -> List[str]:
 def parse_step(step_name: str, dag: Dict[str, Any]) -> "Step":
     parts = urlparse(step_name)
     step_type = parts.scheme
-    step: Step
     path = parts.netloc + parts.path
+    dependencies = [parse_step(s, dag) for s in dag["steps"].get(step_name, [])]
 
+    step: Step
     if step_type == "data":
-        dependencies = dag["steps"].get(step_name, [])
-        step = DataStep(path, [parse_step(s, dag) for s in dependencies])
+        step = DataStep(path, dependencies)
 
     elif step_type == "walden":
         step = WaldenStep(path)
@@ -113,6 +113,9 @@ def parse_step(step_name: str, dag: Dict[str, Any]) -> "Step":
 
     elif step_type == "etag":
         step = ETagStep(path)
+
+    elif step_type == "grapher":
+        step = GrapherStep(path, dependencies)
 
     else:
         raise Exception(f"no recipe for executing step: {step_name}")
@@ -388,11 +391,11 @@ class GrapherStep(Step):
 
     @property
     def _search_path(self) -> Path:
-        return Path(STEP_DIR) / "grapher" / self.path
+        return paths.STEP_DIR / "grapher" / self.path
 
     @property
     def _dest_dir(self) -> Path:
-        return DATA_DIR / self.path.lstrip("/")
+        return paths.DATA_DIR / self.path.lstrip("/")
 
     def _run_py(self) -> None:
         """
