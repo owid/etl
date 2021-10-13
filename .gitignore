@@ -13,3 +13,5 @@ etl/scripts/countries-regions/intermediate
 data/*
 !data/reference/
 .env
+*.dot
+*.pdf
