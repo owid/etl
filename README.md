@@ -76,11 +76,19 @@ Data steps can have any dependencies you like. The ETL system will make sure all
 
 ### Github (`github://...`)
 
-A Github step is designed for small datasets that are too frequenty changed to be snapshotted into Walden, e.g. OWID's [covid-19-data](https://github.com/owid/covid-19-data).
+An empty step used only to mark a dependency on a Github repo, and trigger a rebuild of later steps whenever that repo changes. This is useful since Github is a good store for data that updates too frequently to be snapshotted into Walden, e.g. OWID's [covid-19-data](https://github.com/owid/covid-19-data).
 
-A step refers to a specific Github repository, e.g. `github://owid/covid-19-data/master`
+Example: `github://owid/covid-19-data/master`
 
-Github steps do nothing when executed, but instead serve as dependency markers. The most recent commit hash of the given branch will be used to determine whether the data has been updated. This way, the ETL will be triggered to rebuild any downstream steps each time the data is changed.
+The most recent commit hash of the given branch will be used to determine whether the data has been updated. This way, the ETL will be triggered to rebuild any downstream steps each time the data is changed.
+
+NOTE: Github rate-limits unauthorized API requests to 60 per hour, so we should be sparing with the use of this step as it is implemented today.
+
+### ETag (`etag://...`)
+
+A step used to mark dependencies on HTTPS resources. The path is interpreted as an HTTPS url, and a HEAD request is made against the URL and checked for its `ETag`. This can be used to trigger a rebuild each time the resource changes.
+
+Example: `etag://raw.githubusercontent.com/owid/covid-19-data/master/public/data/owid-covid-data.csv`
 
 ## Writing a new ETL step
 
