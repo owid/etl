@@ -8,7 +8,6 @@ only important for OWID staff.
 """
 
 from os import environ as env
-from typing import cast
 
 from dotenv import load_dotenv
 

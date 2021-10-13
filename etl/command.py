@@ -38,7 +38,7 @@ def main(
     run_dag(dag, steps, dry_run=dry_run, force=force, include_grapher=grapher)
 
 
-def sanity_check_db_settings():
+def sanity_check_db_settings() -> None:
     """
     Give a nice error if the DB has not been configured.
     """

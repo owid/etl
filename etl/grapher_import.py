@@ -12,7 +12,7 @@ Usage:
 from dataclasses import dataclass
 import json
 import os
-from typing import Dict, List
+from typing import Dict, List, cast
 
 from etl.db import get_connection
 from etl.db_utils import DBUtils
@@ -61,7 +61,7 @@ def upsert_dataset(
         dataset_id = db.upsert_dataset(
             dataset.metadata.short_name,
             namespace,
-            config.GRAPHER_USER_ID,
+            int(cast(str, config.GRAPHER_USER_ID)),
             description=dataset.metadata.description,
         )
 
