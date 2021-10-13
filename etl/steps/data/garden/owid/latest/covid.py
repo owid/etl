@@ -1,6 +1,6 @@
 #
 #  covid19.py
-#  owid/latest/key_indicators
+#  owid/latest/covid
 #
 
 from owid.catalog.meta import Source
