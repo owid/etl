@@ -2,8 +2,7 @@
 #  Makefile
 #
 
-.PHONY: etl help
-
+.PHONY: etl
 
 include default.mk
 
@@ -16,6 +15,8 @@ help:
 	@echo '  make lab       Start a Jupyter Lab server'
 	@echo '  make test      Run all linting and unit tests'
 	@echo '  make publish   Publish the generated catalog to S3'
+	@echo '  make grapher   Publish supported datasets to Grapher'
+	@echo '  make dot   	Build a visual graph of the dependencies'
 	@echo '  make watch     Run all tests, watching for changes'
 	@echo '  make clean     Delete all non-reference data in the data/ folder'
 	@echo '  make clobber   Delete non-reference data and .venv'
@@ -73,3 +74,14 @@ publish: etl reindex
 reindex: .venv
 	@echo '==> Creating a catalog index'
 	.venv/bin/reindex
+
+grapher: .venv
+	@echo '==> Running full etl with grapher upsert'
+	.venv/bin/etl --grapher
+
+dot: dependencies.pdf
+
+dependencies.pdf: .venv dag.yml etl/to_graphviz.py
+	.venv/bin/python etl/to_graphviz.py dependencies.dot
+	dot -Tpdf dependencies.dot >$@.tmp
+	mv -f $@.tmp $@

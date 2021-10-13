@@ -3,7 +3,7 @@
 #  steps
 #
 
-from typing import Any, Dict, Protocol, List, Set, cast, Iterable
+from typing import Any, Dict, Protocol, List, Set, Union, cast, Iterable
 from pathlib import Path
 import hashlib
 import tempfile
@@ -28,16 +28,25 @@ from owid import walden
 from etl import files
 from etl import paths
 from etl.helpers import get_etag, get_latest_github_sha
+from etl.grapher_import import upsert_table, upsert_dataset
 
 Graph = Dict[str, Set[str]]
 
 
-def select_steps(dag: Dict[str, Any], selection: List[str]) -> List[str]:
+def compile_steps(
+    dag: Dict[str, Any], selection: List[str], include_grapher: bool = False
+) -> List[str]:
     """
     Return the list of steps which, if executed in order, mean that every
     step has its dependencies ready for it.
     """
-    graph = reverse_graph(dag["steps"])
+    # exclude grapher steps by default
+    raw_dag = dag["steps"]
+    if not include_grapher:
+        raw_dag = {k: v for k, v in raw_dag.items() if not k.startswith("grapher://")}
+
+    # reverse the graph so that dependencies point to their dependents
+    graph = reverse_graph(raw_dag)
 
     if selection:
         # cut the graph to just the listed steps and the things that
@@ -49,8 +58,8 @@ def select_steps(dag: Dict[str, Any], selection: List[str]) -> List[str]:
     return topological_sort(subgraph)
 
 
-def load_dag(filename: str) -> Dict[str, Any]:
-    with open(filename) as istream:
+def load_dag(filename: Union[str, Path] = paths.DAG_FILE) -> Dict[str, Any]:
+    with open(str(filename)) as istream:
         dag: Dict[str, Any] = yaml.safe_load(istream)
 
     dag["steps"] = {
@@ -76,7 +85,8 @@ def reverse_graph(graph: Graph) -> Graph:
 
 def filter_to_subgraph(graph: Graph, steps: Iterable[str]) -> Graph:
     """
-    Filter to only the graph including steps and their descendents.
+    Filter to only the graph including steps and their descendents, i.e. anything that
+    would become out of date if this step was re-run.
     """
     subgraph: Graph = defaultdict(set)
 
@@ -97,12 +107,12 @@ def topological_sort(graph: Graph) -> List[str]:
 def parse_step(step_name: str, dag: Dict[str, Any]) -> "Step":
     parts = urlparse(step_name)
     step_type = parts.scheme
-    step: Step
     path = parts.netloc + parts.path
+    dependencies = [parse_step(s, dag) for s in dag["steps"].get(step_name, [])]
 
+    step: Step
     if step_type == "data":
-        dependencies = dag["steps"].get(step_name, [])
-        step = DataStep(path, [parse_step(s, dag) for s in dependencies])
+        step = DataStep(path, dependencies)
 
     elif step_type == "walden":
         step = WaldenStep(path)
@@ -112,6 +122,9 @@ def parse_step(step_name: str, dag: Dict[str, Any]) -> "Step":
 
     elif step_type == "etag":
         step = ETagStep(path)
+
+    elif step_type == "grapher":
+        step = GrapherStep(path, dependencies)
 
     else:
         raise Exception(f"no recipe for executing step: {step_name}")
@@ -319,6 +332,102 @@ class WaldenStep(Step):
             )
 
         return dataset
+
+
+class GrapherStep(Step):
+    """
+    A step which ingests data into a local mysql database. You specify it by
+    by making a Python module with a to_grapher_table function that takes a
+    table and returns a sequence of tables with the fixed grapher structure of
+    (year, entitiyId, value)
+    """
+
+    path: str
+    dependencies: List[Step]
+
+    def __init__(self, path: str, dependencies: List[Step]) -> None:
+        self.path = path
+        self.dependencies = dependencies
+
+    def __str__(self) -> str:
+        return f"grapher://{self.path}"
+
+    def run(self) -> None:
+        # make sure the encosing folder is there
+        self._dest_dir.parent.mkdir(parents=True, exist_ok=True)
+
+        sp = self._search_path
+        if sp.with_suffix(".py").exists() or (sp / "__init__.py").exists():
+            self._run_py()
+
+        else:
+            raise Exception(f"have no idea how to run step: {self.path}")
+
+    def is_dirty(self) -> bool:
+        return True
+
+    def can_execute(self) -> bool:
+        sp = self._search_path
+        return (
+            # python script
+            sp.with_suffix(".py").exists()
+            # folder of scripts with __init__.py
+            or (sp / "__init__.py").exists()
+        )
+
+    def checksum_input(self) -> str:
+        "Return the MD5 of all ingredients for making this step."
+        checksums = {}
+        for d in self.dependencies:
+            checksums[d.path] = d.checksum_output()
+
+        for f in self._step_files():
+            checksums[f] = files.checksum_file(f)
+
+        in_order = [v for _, v in sorted(checksums.items())]
+        return hashlib.md5(",".join(in_order).encode("utf8")).hexdigest()
+
+    def checksum_output(self) -> str:
+        # This cast from str to str is IMHO unnecessary but MyPy complains about this without it...
+        raise Exception("grapher steps do not output a dataset")
+
+    def _step_files(self) -> List[str]:
+        "Return a list of code files defining this step."
+        if self._search_path.is_dir():
+            return [p.as_posix() for p in files.walk(self._search_path)]
+
+        return glob(self._search_path.as_posix() + ".*")
+
+    @property
+    def _search_path(self) -> Path:
+        return paths.STEP_DIR / "grapher" / self.path
+
+    @property
+    def _dest_dir(self) -> Path:
+        return paths.DATA_DIR / self.path.lstrip("/")
+
+    def _run_py(self) -> None:
+        """
+        Import the Python module for this step and call get_grapher_tables() on it.
+        """
+        module_path = self.path.lstrip("/").replace("/", ".")
+        step_module = import_module(f"etl.steps.grapher.{module_path}")
+        if not hasattr(step_module, "get_grapher_dataset"):
+            raise Exception(
+                f'no get_grapher_dataset() method defined for module "{step_module}"'
+            )
+        if not hasattr(step_module, "get_grapher_tables"):
+            raise Exception(
+                f'no get_grapher_tables() method defined for module "{step_module}"'
+            )
+
+        # data steps
+        dataset = step_module.get_grapher_dataset()  # type: ignore
+        dataset_upsert_results = upsert_dataset(
+            dataset, dataset.metadata.namespace, dataset.metadata.sources
+        )
+        for table in step_module.get_grapher_tables(dataset):  # type: ignore
+            upsert_table(table, dataset_upsert_results)
 
 
 class GithubStep(Step):

@@ -8,8 +8,7 @@ Check the integrity of the DAG.
 
 from typing import List
 
-from etl import paths
-from etl.steps import load_dag, parse_step, select_steps, WaldenStep, DataStep, Step
+from etl.steps import load_dag, parse_step, compile_steps, WaldenStep, DataStep, Step
 
 
 def test_all_walden_deps_exist():
@@ -32,7 +31,7 @@ def test_all_data_steps_have_code():
 
 
 def get_all_steps() -> List[Step]:
-    dag = load_dag(paths.DAG_FILE.as_posix())
-    step_names = select_steps(dag, [])
+    dag = load_dag()
+    step_names = compile_steps(dag, [])
     steps = [parse_step(name, dag) for name in step_names]
     return steps

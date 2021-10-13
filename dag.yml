@@ -1,6 +1,7 @@
 steps:
   data://garden/who/2021-07-01/ghe:
     - data://meadow/who/2021-07-01/ghe
+    - data://reference
   data://meadow/who/2021-07-01/ghe:
     - walden://who/2021-07-01/ghe
   data://meadow/who/2021-07-01/gho:
@@ -20,3 +21,5 @@ steps:
     - walden://wpp/2019/standard_projections
   data://garden/owid/latest/covid:
     - etag://raw.githubusercontent.com/owid/covid-19-data/master/public/data/owid-covid-data.csv
+  grapher://who/2021-07-01/ghe:
+    - data://garden/who/2021-07-01/ghe
