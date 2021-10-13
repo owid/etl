@@ -15,7 +15,7 @@ import shutil
 from owid.catalog import Dataset
 
 from etl import paths
-from etl.steps import DataStep, select_steps
+from etl.steps import DataStep, compile_steps
 
 
 def test_data_step():
@@ -61,4 +61,4 @@ def temporary_step() -> Iterator[str]:
 
 def test_topological_sort():
     dag = {"steps": {"a": ["b", "c"], "b": ["c"]}}
-    assert select_steps(dag, []) == ["c", "b", "a"]
+    assert compile_steps(dag, []) == ["c", "b", "a"]

@@ -8,8 +8,7 @@ import time
 
 import click
 
-from etl.steps import load_dag, select_steps, parse_step
-from etl import paths
+from etl.steps import load_dag, compile_steps, parse_step
 
 
 @click.command()
@@ -17,16 +16,21 @@ from etl import paths
 @click.option(
     "--force", is_flag=True, help="Redo a step even if it appears done and up-to-date"
 )
+@click.option(
+    "--grapher", is_flag=True, help="Publish changes to grapher (OWID staff only)"
+)
 @click.argument("steps", nargs=-1)
-def main(steps: List[str], dry_run: bool = False, force: bool = False) -> None:
+def main(
+    steps: List[str], dry_run: bool = False, force: bool = False, grapher: bool = False
+) -> None:
     """
     Execute all ETL steps listed in dag.yaml
     """
     # Load our graph of steps and the things they depend on
-    dag = load_dag(paths.DAG_FILE.as_posix())
+    dag = load_dag()
 
     # Run the steps we have selected, and everything downstream of them
-    run_dag(dag, steps, dry_run=dry_run, force=force)
+    run_dag(dag, steps, dry_run=dry_run, force=force, include_grapher=grapher)
 
 
 def run_dag(
@@ -34,6 +38,7 @@ def run_dag(
     selection: List[str],
     dry_run: bool = False,
     force: bool = False,
+    include_grapher: bool = False,
 ) -> None:
     """
     Run the selected steps, and anything that needs updating based on them. An empty
@@ -42,7 +47,7 @@ def run_dag(
     By default, data steps do not re-run if they appear to be up-to-date already by
     looking at their checksum.
     """
-    step_names = select_steps(dag, selection)
+    step_names = compile_steps(dag, selection, include_grapher=include_grapher)
     steps = [parse_step(name, dag) for name in step_names if name != "data://reference"]
 
     if not force:
@@ -58,6 +63,7 @@ def run_dag(
         if not dry_run:
             time_taken = timed_run(lambda: step.run())
             click.echo(f"{click.style('OK', fg='blue')} ({time_taken:.0f}s)")
+            print()
 
 
 def timed_run(f: Callable[[], Any]) -> float:

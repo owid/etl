@@ -3,7 +3,7 @@
 #  steps
 #
 
-from typing import Any, Dict, Protocol, List, Set, cast, Iterable
+from typing import Any, Dict, Protocol, List, Set, Union, cast, Iterable
 from pathlib import Path
 import hashlib
 import tempfile
@@ -33,12 +33,20 @@ from etl.grapher_import import upsert_table, upsert_dataset
 Graph = Dict[str, Set[str]]
 
 
-def select_steps(dag: Dict[str, Any], selection: List[str]) -> List[str]:
+def compile_steps(
+    dag: Dict[str, Any], selection: List[str], include_grapher: bool = False
+) -> List[str]:
     """
     Return the list of steps which, if executed in order, mean that every
     step has its dependencies ready for it.
     """
-    graph = reverse_graph(dag["steps"])
+    # exclude grapher steps by default
+    raw_dag = dag["steps"]
+    if not include_grapher:
+        raw_dag = {k: v for k, v in raw_dag.items() if not k.startswith("grapher://")}
+
+    # reverse the graph so that dependencies point to their dependents
+    graph = reverse_graph(raw_dag)
 
     if selection:
         # cut the graph to just the listed steps and the things that
@@ -50,8 +58,8 @@ def select_steps(dag: Dict[str, Any], selection: List[str]) -> List[str]:
     return topological_sort(subgraph)
 
 
-def load_dag(filename: str) -> Dict[str, Any]:
-    with open(filename) as istream:
+def load_dag(filename: Union[str, Path] = paths.DAG_FILE) -> Dict[str, Any]:
+    with open(str(filename)) as istream:
         dag: Dict[str, Any] = yaml.safe_load(istream)
 
     dag["steps"] = {
@@ -77,7 +85,8 @@ def reverse_graph(graph: Graph) -> Graph:
 
 def filter_to_subgraph(graph: Graph, steps: Iterable[str]) -> Graph:
     """
-    Filter to only the graph including steps and their descendents.
+    Filter to only the graph including steps and their descendents, i.e. anything that
+    would become out of date if this step was re-run.
     """
     subgraph: Graph = defaultdict(set)
 
