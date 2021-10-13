@@ -25,8 +25,8 @@ S3_ACCESS_KEY = env.get("OWID_ACCESS_KEY")
 S3_SECRET_KEY = env.get("OWID_SECRET_KEY")
 
 # publishing to grapher's MySQL db
-GRAPHER_USER_ID = cast(int, env.get("GRAPHER_USER_ID", -1))
-DB_NAME = env.get("DB_NAME")
+GRAPHER_USER_ID = env.get("GRAPHER_USER_ID")
+DB_NAME = env.get("DB_NAME", "grapher")
 DB_HOST = env.get("DB_HOST", "localhost")
 DB_PORT = int(env.get("DB_PORT", "3306"))
 DB_USER = env.get("DB_USER", "root")

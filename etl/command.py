@@ -5,10 +5,12 @@
 
 from typing import Callable, List, Dict, Any
 import time
+import sys
 
 import click
 
 from etl.steps import load_dag, compile_steps, parse_step
+from etl import config
 
 
 @click.command()
@@ -26,11 +28,24 @@ def main(
     """
     Execute all ETL steps listed in dag.yaml
     """
+    if grapher:
+        sanity_check_db_settings()
+
     # Load our graph of steps and the things they depend on
     dag = load_dag()
 
     # Run the steps we have selected, and everything downstream of them
     run_dag(dag, steps, dry_run=dry_run, force=force, include_grapher=grapher)
+
+
+def sanity_check_db_settings():
+    """
+    Give a nice error if the DB has not been configured.
+    """
+    if config.GRAPHER_USER_ID is None:
+        click.echo("ERROR: No grapher user id has been set in the environment.")
+        click.echo("       Did you configure the MySQL connection in .env?")
+        sys.exit(1)
 
 
 def run_dag(
