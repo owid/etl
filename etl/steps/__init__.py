@@ -27,6 +27,7 @@ from owid import walden
 
 from etl import files
 from etl import paths
+from etl.helpers import get_etag, get_latest_github_sha
 
 Graph = Dict[str, Set[str]]
 
@@ -105,6 +106,12 @@ def parse_step(step_name: str, dag: Dict[str, Any]) -> "Step":
 
     elif step_type == "walden":
         step = WaldenStep(path)
+
+    elif step_type == "github":
+        step = GithubStep(path)
+
+    elif step_type == "etag":
+        step = ETagStep(path)
 
     else:
         raise Exception(f"no recipe for executing step: {step_name}")
@@ -315,4 +322,59 @@ class WaldenStep(Step):
 
 
 class GithubStep(Step):
-    pass
+    """
+    An empty step that represents a dependency on the latest version of a Github repo.
+    This has the effect of triggering a rebuild each time the repo gets new commits.
+    We achieve this by using the sha1 of the most recent Github branch as the checksum.
+    """
+
+    path: str
+
+    org: str
+    repo: str
+    branch: str = "master"
+
+    def __init__(self, path: str) -> None:
+        path = path.strip("/")
+
+        self.path = path
+
+        if path.count("/") == 1:
+            self.org, self.repo = path.split("/")
+
+        elif path.count("/") == 2:
+            self.org, self.repo, self.branch = path.split("/")
+
+        else:
+            raise ValueError("github step not in form github://org/repo/[branch]")
+
+    def is_dirty(self) -> bool:
+        return False
+
+    def run(self) -> None:
+        # nothing is done for this step
+        pass
+
+    def checksum_output(self) -> str:
+        return get_latest_github_sha(self.org, self.repo, self.branch)
+
+
+class ETagStep(Step):
+    """
+    An empty step that represents a dependency on the ETag of a URL.
+    """
+
+    path: str
+
+    def __init__(self, path: str) -> None:
+        self.path = path
+
+    def is_dirty(self) -> bool:
+        return False
+
+    def run(self) -> None:
+        # nothing is done for this step
+        pass
+
+    def checksum_output(self) -> str:
+        return get_etag(f"https://{self.path}")
