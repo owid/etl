@@ -8,6 +8,7 @@ Helpers for working with Git in an ETL flow.
 """
 
 from dataclasses import dataclass
+from os import truncate
 from pathlib import Path
 import re
 from typing import cast
@@ -33,7 +34,9 @@ class GithubRepo:
 
     @property
     def cache_dir(self) -> Path:
-        return Path(f"~/.owid/git/{self.org}/{self.repo}")
+        return Path(
+            f"~/.owid/git/{self.org}/{self.repo}"
+        ).expanduser()
 
     def ensure_cloned(self, shallow: bool = True) -> None:
         """
@@ -43,9 +46,11 @@ class GithubRepo:
         if not dest_dir.is_dir():
             dest_dir.parent.mkdir(parents=True, exist_ok=True)
             if shallow:
-                sh.git("clone", "--depth=1", self.github_url, dest_dir.as_posix())
+                sh.git(
+                    "clone", "--depth=1", self.github_url, dest_dir.as_posix(), _fg=True
+                )
             else:
-                sh.git("clone", self.github_url, dest_dir.as_posix())
+                sh.git("clone", self.github_url, dest_dir.as_posix(), _fg=True)
         else:
             self.update_and_reset()
 
@@ -85,12 +90,16 @@ class GithubRepo:
     def is_up_to_date(self) -> bool:
         "Returns true if remote has no new changes, false otherwise."
         # XXX over-sensitive, triggers if other remote branches have changes
+        if not self.cache_dir.is_dir():
+            return False
+
         available_updates = sh.git(
             "fetch",
             "--dry-run",
             # special TTY settings required otherwise git-fetch will operate silently
             _tty_in=True,
             _unify_ttys=True,
+            _cwd=self.cache_dir.as_posix(),
         ).stdout.decode("utf8")
 
         return not available_updates

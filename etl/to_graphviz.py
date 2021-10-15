@@ -39,7 +39,10 @@ def to_graphviz(output_file: str) -> None:
         for n in nodes:
             node(n)
 
+        p("subgraph { rank=same")
         node("Walden")
+        node("Github")
+        p("}")
 
         p("subgraph { rank=same")
         node("Garden")
@@ -75,6 +78,9 @@ def to_graphviz(output_file: str) -> None:
         for n in nodes:
             if n.startswith("walden://"):
                 link("Walden", n)
+
+            if n.startswith("github://"):
+                link("Github", n)
 
         for prefix in ["walden://", "data://garden/", "data://meadow"]:
             p("subgraph {")

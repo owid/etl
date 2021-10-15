@@ -66,6 +66,7 @@ def run_dag(
     steps = [parse_step(name, dag) for name in step_names if name != "data://reference"]
 
     if not force:
+        print("Detecting which steps need rebuilding...")
         steps = [s for s in steps if s.is_dirty()]
 
     if not steps:
