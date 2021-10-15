@@ -29,8 +29,6 @@ steps:
   - github://open-numbers/ddf--ecdc--covid_19_geographic_distribution
   data://meadow/open_numbers/latest/energy_flows_usa:
   - github://open-numbers/ddf--energy_flows_usa
-  data://meadow/open_numbers/latest/gadm__geo_boundaries:
-  - github://open-numbers/ddf--gadm--geo_boundaries
   data://meadow/open_numbers/latest/gapminder__atlas_of_economic_complexity:
   - github://open-numbers/ddf--gapminder--atlas_of_economic_complexity
   data://meadow/open_numbers/latest/gapminder__bp_energy:
@@ -47,8 +45,6 @@ steps:
   - github://open-numbers/ddf--gapminder--fasttrack
   data://meadow/open_numbers/latest/gapminder__fertility_rate:
   - github://open-numbers/ddf--gapminder--fertility_rate
-  data://meadow/open_numbers/latest/gapminder__fertility_rate_historic:
-  - github://open-numbers/ddf--gapminder--fertility_rate_historic
   data://meadow/open_numbers/latest/gapminder__gapminder_world:
   - github://open-numbers/ddf--gapminder--gapminder_world
   data://meadow/open_numbers/latest/gapminder__gbd_indicators:
@@ -111,8 +107,6 @@ steps:
   - github://open-numbers/ddf--gdl--area_db
   data://meadow/open_numbers/latest/global_carbon_project__global_carbon_budget:
   - github://open-numbers/ddf--global_carbon_project--global_carbon_budget
-  data://meadow/open_numbers/latest/global_data_lab__area_db:
-  - github://open-numbers/ddf--global_data_lab--area_db
   data://meadow/open_numbers/latest/harvard__country_complexity_rankings:
   - github://open-numbers/ddf--harvard--country_complexity_rankings
   data://meadow/open_numbers/latest/iarc__ci5:
