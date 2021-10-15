@@ -153,8 +153,6 @@ steps:
   - github://open-numbers/ddf--imf--weo
   data://meadow/open_numbers/latest/imperial__metabolic:
   - github://open-numbers/ddf--imperial--metabolic
-  data://meadow/open_numbers/latest/iucn__red_list:
-  - github://open-numbers/ddf--iucn--red_list
   data://meadow/open_numbers/latest/mit__economic_complexity_rankings:
   - github://open-numbers/ddf--mit--economic_complexity_rankings
   data://meadow/open_numbers/latest/oecd__dac:
