@@ -12,8 +12,6 @@ from pathlib import Path
 from typing import Dict, List, Tuple
 import hashlib
 
-import pandas as pd
-import numpy as np
 import frictionless
 
 from owid.catalog import Dataset, Table

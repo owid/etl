@@ -121,13 +121,14 @@ def sync_folder(
             print("  DEL", rel_filename)
 
 
-def object_md5(s3: Any, key: str, obj: Dict[str, Any]) -> str:
+def object_md5(s3: Any, key: str, obj: Dict[str, Any]) -> Optional[str]:
     maybe_md5 = obj["ETag"].strip('"')
     if re.match("^[0-9a-f]{40}$", maybe_md5):
-        return maybe_md5
+        return cast(str, maybe_md5)
 
-    return (
-        s3.head_object(Bucket=config.S3_BUCKET, Key=key).get("Metadata", {}).get("md5")
+    return cast(
+        Optional[str],
+        s3.head_object(Bucket=config.S3_BUCKET, Key=key).get("Metadata", {}).get("md5"),
     )
 
 

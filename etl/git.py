@@ -8,7 +8,6 @@ Helpers for working with Git in an ETL flow.
 """
 
 from dataclasses import dataclass
-from os import truncate
 from pathlib import Path
 import re
 from typing import cast
@@ -34,9 +33,7 @@ class GithubRepo:
 
     @property
     def cache_dir(self) -> Path:
-        return Path(
-            f"~/.owid/git/{self.org}/{self.repo}"
-        ).expanduser()
+        return Path(f"~/.owid/git/{self.org}/{self.repo}").expanduser()
 
     def ensure_cloned(self, shallow: bool = True) -> None:
         """
