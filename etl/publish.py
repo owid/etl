@@ -3,6 +3,7 @@
 #  etl
 #
 
+import re
 import sys
 from typing import Any, Dict, Iterator, Optional, cast
 from urllib.error import HTTPError
@@ -93,19 +94,23 @@ def sync_folder(
     by comparing checksums and only uploading files that have changed.
     """
     existing = {
-        o["Key"]: object_md5(o) for o in walk_s3(s3, config.S3_BUCKET, dest_path)
+        o["Key"]: object_md5(s3, o["Key"], o)
+        for o in walk_s3(s3, config.S3_BUCKET, dest_path)
     }
 
     for filename in files.walk(local_folder):
         checksum = files.checksum_file(filename)
         rel_filename = filename.relative_to(DATA_DIR).as_posix()
-        if checksum != existing.get(rel_filename):
+
+        existing_checksum = existing.get(rel_filename)
+
+        if checksum != existing_checksum:
             print("  PUT", rel_filename)
             s3.upload_file(
                 filename.as_posix(),
                 config.S3_BUCKET,
                 rel_filename,
-                ExtraArgs={"ACL": "public-read"},
+                ExtraArgs={"ACL": "public-read", "Metadata": {"md5": checksum}},
             )
 
         if rel_filename in existing:
@@ -116,8 +121,14 @@ def sync_folder(
             print("  DEL", rel_filename)
 
 
-def object_md5(obj: Dict[str, Any]) -> str:
-    return cast(str, obj["ETag"]).strip("'\"")
+def object_md5(s3: Any, key: str, obj: Dict[str, Any]) -> str:
+    maybe_md5 = obj["ETag"].strip('"')
+    if re.match("^[0-9a-f]{40}$", maybe_md5):
+        return maybe_md5
+
+    return (
+        s3.head_object(Bucket=config.S3_BUCKET, Key=key).get("Metadata", {}).get("md5")
+    )
 
 
 def walk_s3(s3: Any, bucket: str, path: str) -> Iterator[Dict[str, Any]]:
@@ -141,11 +152,13 @@ def delete_dataset(s3: Any, relative_path: str) -> None:
 
 
 def update_catalog(s3: Any) -> None:
+    catalog_filename = (DATA_DIR / "catalog.feather").as_posix()
+    md5 = files.checksum_file(catalog_filename)
     s3.upload_file(
-        (DATA_DIR / "catalog.feather").as_posix(),
+        catalog_filename,
         config.S3_BUCKET,
         "catalog.feather",
-        ExtraArgs={"ACL": "public-read"},
+        ExtraArgs={"ACL": "public-read", "Metadata": {"md5": md5}},
     )
 
 
@@ -177,7 +190,7 @@ def get_remote_checksum(s3: Any, path: str) -> Optional[str]:
 
         raise
 
-    return object_md5(obj)
+    return object_md5(s3, path, obj)
 
 
 def connect_s3() -> Any:
