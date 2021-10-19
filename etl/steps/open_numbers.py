@@ -8,7 +8,6 @@ Convert repositories with data in DDF format to OWID's Dataset and Table
 format.
 """
 
-from pathlib import Path
 from typing import Dict, List, Tuple
 import hashlib
 

@@ -7,10 +7,14 @@ from typing import Any, Dict, List, Union, cast
 
 import numpy as np
 import pandas as pd
-from pandas.core import series
 
 
-def repack_frame(df: pd.DataFrame, remap: Dict[str, str]):
+def repack_frame(df: pd.DataFrame, remap: Dict[str, str]) -> None:
+    """
+    Convert the DataFrame's columns to the most compact types possible.
+    Rename columns if necessary during the repacking. The column renames
+    work even if the column is part of the index.
+    """
     if len(df.index.names) == 1 and not df.index.names[0]:
         primary_key = []
     else:

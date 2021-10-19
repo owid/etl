@@ -18,7 +18,7 @@ def test_repack_non_object_columns():
     df["mycat"] = df["mycat"].astype("category")
 
     df2 = df.copy()
-    frames.repack_frame(df2)
+    frames.repack_frame(df2, {})
 
     for col in df.columns:
         assert df2[col].dtype == df[col].dtype, col
@@ -38,7 +38,7 @@ def test_repack_object_columns():
 
     df_repack = df.copy()
 
-    frames.repack_frame(df_repack)
+    frames.repack_frame(df_repack, {})
 
     for col in df_repack.columns:
         assert (df_repack[col].isnull() == df[col].isnull()).all()
