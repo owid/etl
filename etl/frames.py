@@ -3,14 +3,14 @@
 #  etl
 #
 
-from typing import List, cast
+from typing import Any, Dict, List, Union, cast
 
 import numpy as np
 import pandas as pd
 from pandas.core import series
 
 
-def repack_frame(df: pd.DataFrame) -> pd.DataFrame:
+def repack_frame(df: pd.DataFrame, remap: Dict[str, str]):
     if len(df.index.names) == 1 and not df.index.names[0]:
         primary_key = []
     else:
@@ -20,10 +20,15 @@ def repack_frame(df: pd.DataFrame) -> pd.DataFrame:
     for col in df.columns:
         df[col] = repack_series(df[col])
 
+    for from_, to_ in remap.items():
+        if from_ in df.columns:
+            df.rename(columns={from_: to_}, inplace=True)
+    primary_key = [remap.get(k, k) for k in primary_key]
+
+    assert all(df[col].dtype != "object" for col in df.columns)
+
     if primary_key:
         df.set_index(primary_key, inplace=True)
-
-    return df
 
 
 def repack_series(s: pd.Series) -> pd.Series:
@@ -31,20 +36,47 @@ def repack_series(s: pd.Series) -> pd.Series:
     if s.dtype not in (np.object_, np.float64):
         return s
 
-    for type_ in ["Int64", "float64", "category"]:
+    for strategy in [to_int, to_float, to_category]:
         try:
-            v = cast(pd.Series, s.astype(type_))
+            return strategy(s)
         except (ValueError, TypeError):
             continue
-
-        if series_eq(v, s):
-            # successful repack
-            return v
 
     return s
 
 
-def series_eq(lhs: pd.Series, rhs: pd.Series):
+def to_int(s: pd.Series) -> pd.Series:
+    # values could be integers or strings
+    def intify(v: Any) -> Union[int, None]:
+        return int(v) if not pd.isnull(v) else None
+
+    v = cast(pd.Series, s.apply(intify).astype("Int64"))
+
+    if not series_eq(v, s, cast=float):
+        raise ValueError()
+
+    return v
+
+
+def to_float(s: pd.Series) -> pd.Series:
+    v = cast(pd.Series, s.astype("float64"))
+
+    if not series_eq(v, s, cast=float):
+        raise ValueError()
+
+    return v
+
+
+def to_category(s: pd.Series) -> pd.Series:
+    types = set(s.apply(type).unique())
+
+    if types.difference({str, type(None)}):
+        raise ValueError()
+
+    return cast(pd.Series, s.astype("category"))
+
+
+def series_eq(lhs: pd.Series, rhs: pd.Series, cast: Any) -> bool:
     """
     Check that series are equal, but unlike normal floating point checks where
     NaN != NaN, we want missing or null values to be reported as equal to each
@@ -53,5 +85,5 @@ def series_eq(lhs: pd.Series, rhs: pd.Series):
     return (
         len(lhs) == len(rhs)
         and (lhs.isnull() == rhs.isnull()).all()
-        and (lhs.dropna() == rhs.dropna()).all()
+        and (lhs.dropna().apply(cast) == rhs.dropna().apply(cast)).all()
     )

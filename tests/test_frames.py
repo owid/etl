@@ -13,37 +13,46 @@ from etl import frames
 
 def test_repack_non_object_columns():
     df = pd.DataFrame(
-        {"myint": [1, 2, 3], "myfloat": [1.0, 2.0, 3.0], "mycat": ["a", "b", "c"]}
+        {"myint": [1, 2, 3], "myfloat": [1.0, 2.2, 3.0], "mycat": ["a", "b", "c"]}
     )
     df["mycat"] = df["mycat"].astype("category")
 
-    df2 = frames.repack_frame(df)
+    df2 = df.copy()
+    frames.repack_frame(df2)
+
+    for col in df.columns:
+        assert df2[col].dtype == df[col].dtype, col
 
     assert (df2.dtypes == df.dtypes).all()
 
 
-# def test_repack_object_columns():
-#     df = pd.DataFrame(
-#         {
-#             "myint": [1, 2, None, 3],
-#             "myfloat": [1.2, 2.0, 3.0, None],
-#             "mycat": ["a", None, "b", "c"],
-#         }
-#     )
-#     df["mycat"] = df["mycat"].astype("category")
+def test_repack_object_columns():
+    df = pd.DataFrame(
+        {
+            "myint": [1, 2, None, 3],
+            "myfloat": [1.2, 2.0, 3.0, None],
+            "mycat": ["a", None, "b", "c"],
+        },
+        dtype="object",
+    )
 
-#     df_bad = df.copy()
-#     for col in df_bad:
-#         df[col] = df[col].astype("object")
+    df_repack = df.copy()
 
-#     repack_frame(df_bad)
+    frames.repack_frame(df_repack)
 
-#     for col in df_bad.columns:
-#         assert df_bad[col].dtype == df[col].dtype, col
+    for col in df_repack.columns:
+        assert (df_repack[col].isnull() == df[col].isnull()).all()
+        assert (df_repack[col].dropna() == df[col].dropna()).all()
 
 
 def test_repack_int():
     s = cast(pd.Series, pd.Series([1, 2, None, 3]).astype("object"))
+    v = frames.repack_series(s)
+    assert v.dtype == "Int64"
+
+
+def test_repack_int_no_null():
+    s = cast(pd.Series, pd.Series([1, 2, 3]).astype("object"))
     v = frames.repack_series(s)
     assert v.dtype == "Int64"
 

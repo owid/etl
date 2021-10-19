@@ -45,15 +45,18 @@ def run(dest_dir: str) -> None:
     # copy tables one by one
     for short_name, resources in resource_map.items():
         print(f"- {short_name}")
-
         all_frames = []
         for resource in resources:
             df = resource.to_pandas()
+
             # use more accurate column types that minimise space
-            frames.repack_frame(df)
+            frames.repack_frame(df, {"global": "geo"})
+
             all_frames.append(df)
 
         df = pd.concat(all_frames)
+        frames.repack_frame(df, {})
+
         t = Table(df)
         t.metadata.short_name = short_name
         ds.add(t)
@@ -74,7 +77,7 @@ def remap_names(
             {
                 "name": name,
                 "hashed_name": hashed_name,
-                "primary_key": tuple(resource.schema.primary_key),
+                "primary_key": tuple(norm_primary_key(resource.schema.primary_key)),
                 "resource": resource,
             }
         )
@@ -83,8 +86,14 @@ def remap_names(
 
     names = {}
     for name, group in df.groupby("name"):
-        assert len(group.primary_key.unique()) == 1
-        names[name] = list(group.resource)
+        if len(group.primary_key.unique()) == 1:
+            names[name] = list(group.resource)
+            continue
+
+        # multiple primary keys found for the same name, give each a unique suffix
+        for primary_key, subgroup in group.groupby("primary_key"):
+            suffix = hashlib.md5(",".join(primary_key).encode("utf8")).hexdigest()[:4]
+            names[f"{name}_{suffix}"] = list(subgroup.resource)
 
     return names
 
@@ -100,3 +109,7 @@ def parse_name(name: str) -> Tuple[str, str]:
     hashed_name = f"{preferred_name}_{hash_suffix}"
 
     return preferred_name, hashed_name
+
+
+def norm_primary_key(primary_key: List[str]) -> List[str]:
+    return [k if k != "global" else "geo" for k in primary_key]
