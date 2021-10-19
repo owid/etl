@@ -13,6 +13,7 @@ from typing import Dict, List, Tuple
 import hashlib
 
 import pandas as pd
+from etl.git import GithubRepo
 import frictionless
 
 from owid.catalog import Dataset, Table
@@ -22,12 +23,12 @@ from etl import frames
 def run(dest_dir: str) -> None:
     # identify the short name and the repo
     short_name = dest_dir.split("/")[-1]
-    repo_short_name = short_name.replace("__", "--")
-    repo_path = Path(f"~/.owid/git/open-numbers/ddf--{repo_short_name}").expanduser()
-    assert repo_path.is_dir()
+    repo_short_name = "ddf--" + short_name.replace("__", "--")
+    repo = GithubRepo("open-numbers", repo_short_name)
+    assert repo.cache_dir.is_dir()
 
     # load it as a frictionless package
-    package = frictionless.Package((repo_path / "datapackage.json"))
+    package = frictionless.Package((repo.cache_dir / "datapackage.json"))
 
     # make an empty dataset
     ds = Dataset.create_empty(dest_dir)
@@ -81,6 +82,9 @@ def remap_names(
                 "resource": resource,
             }
         )
+
+    if not rows:
+        return {}
 
     df = pd.DataFrame.from_records(rows)
 
