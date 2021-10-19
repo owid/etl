@@ -12,9 +12,11 @@ from pathlib import Path
 from typing import Dict, List, Tuple
 import hashlib
 
+import pandas as pd
 import frictionless
 
 from owid.catalog import Dataset, Table
+from etl import frames
 
 
 def run(dest_dir: str) -> None:
@@ -38,12 +40,20 @@ def run(dest_dir: str) -> None:
     ds.save()
 
     # name remapping
-    named_resources = remap_names(package.resources)
+    resource_map = remap_names(package.resources)
 
     # copy tables one by one
-    for short_name, resource in named_resources.items():
+    for short_name, resources in resource_map.items():
         print(f"- {short_name}")
-        df = resource.to_pandas()
+
+        all_frames = []
+        for resource in resources:
+            df = resource.to_pandas()
+            # use more accurate column types that minimise space
+            frames.repack_frame(df)
+            all_frames.append(df)
+
+        df = pd.concat(all_frames)
         t = Table(df)
         t.metadata.short_name = short_name
         ds.add(t)
@@ -53,27 +63,28 @@ def remap_names(
     resources: List[frictionless.Resource],
 ) -> Dict[str, frictionless.Resource]:
     "Short names must be unique, so fix name collisions."
-    blacklist = set()
-    names = {}
+    rows = []
     for resource in resources:
         # ignore categories for now
         if not resource.name.startswith("ddf--datapoints"):
             continue
 
-        preferred_name, hashed_name = parse_name(resource.name)
-        if preferred_name not in names and preferred_name not in blacklist:
-            names[preferred_name] = resource
+        name, hashed_name = parse_name(resource.name)
+        rows.append(
+            {
+                "name": name,
+                "hashed_name": hashed_name,
+                "primary_key": tuple(resource.schema.primary_key),
+                "resource": resource,
+            }
+        )
 
-        else:
-            # collision!
-            if preferred_name not in blacklist:
-                # move the original entry
-                blacklist.add(preferred_name)
-                r = names.pop(preferred_name)
-                r_hash = parse_name(r.name)[1]
-                names[r_hash] = r
+    df = pd.DataFrame.from_records(rows)
 
-            names[hashed_name] = resource
+    names = {}
+    for name, group in df.groupby("name"):
+        assert len(group.primary_key.unique()) == 1
+        names[name] = list(group.resource)
 
     return names
 
