@@ -33,6 +33,7 @@ def run(dest_dir: str) -> None:
     ds = Dataset.create_empty(dest_dir)
 
     # copy metadata from frictionless
+    ds.metadata.namespace = "open_numbers"
     ds.metadata.short_name = short_name
     ds.metadata.title = package.title
     if package.description and package.title != package.description:
