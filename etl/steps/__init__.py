@@ -25,9 +25,8 @@ with warnings.catch_warnings():
 from owid import catalog
 from owid import walden
 
-from etl import files
-from etl import paths
-from etl.helpers import get_etag, get_latest_github_sha
+from etl import files, paths, git
+from etl.helpers import get_etag
 from etl.grapher_import import upsert_table, upsert_dataset
 
 Graph = Dict[str, Set[str]]
@@ -432,40 +431,38 @@ class GrapherStep(Step):
 
 class GithubStep(Step):
     """
-    An empty step that represents a dependency on the latest version of a Github repo.
+    Shallow-clone a git repo and ensure that the most recent version of the repo is available.
     This has the effect of triggering a rebuild each time the repo gets new commits.
-    We achieve this by using the sha1 of the most recent Github branch as the checksum.
     """
 
     path: str
 
-    org: str
-    repo: str
-    branch: str = "master"
+    gh_repo: git.GithubRepo
 
     def __init__(self, path: str) -> None:
-        path = path.strip("/")
-
         self.path = path
+        try:
+            org, repo = path.split("/")
+        except ValueError:
+            raise Exception("github step is not in the form github://<org>/<repo>")
 
-        if path.count("/") == 1:
-            self.org, self.repo = path.split("/")
+        self.gh_repo = git.GithubRepo(org, repo)
 
-        elif path.count("/") == 2:
-            self.org, self.repo, self.branch = path.split("/")
-
-        else:
-            raise ValueError("github step not in form github://org/repo/[branch]")
+    def __str__(self) -> str:
+        return f"github://{self.path}"
 
     def is_dirty(self) -> bool:
-        return False
+        # always poll the git repo
+        # XXX is there a way of asking Git if there are more changes without downloading them?
+        return True
+        # return not self.gh_repo.is_up_to_date()
 
     def run(self) -> None:
-        # nothing is done for this step
-        pass
+        # either clone the repo, or update it
+        self.gh_repo.ensure_cloned()
 
     def checksum_output(self) -> str:
-        return get_latest_github_sha(self.org, self.repo, self.branch)
+        return self.gh_repo.latest_sha
 
 
 class ETagStep(Step):
