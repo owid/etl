@@ -3,7 +3,7 @@
 #  etl.py
 #
 
-from typing import Callable, List, Any
+from typing import Callable, List, Any, Optional
 import time
 import sys
 
@@ -21,14 +21,14 @@ from etl import config
 @click.option(
     "--grapher", is_flag=True, help="Publish changes to grapher (OWID staff only)"
 )
-@click.option("--no-github", is_flag=True, help="Skip Github repository checks")
+@click.option("--exclude", help="Comma-separated patterns to exclude")
 @click.argument("steps", nargs=-1)
 def main(
     steps: List[str],
     dry_run: bool = False,
     force: bool = False,
     grapher: bool = False,
-    no_github: bool = False,
+    exclude: Optional[str] = None,
 ) -> None:
     """
     Execute all ETL steps listed in dag.yaml
@@ -39,6 +39,8 @@ def main(
     # Load our graph of steps and the things they depend on
     dag = load_dag()
 
+    excludes = exclude.split(",") if exclude else []
+
     # Run the steps we have selected, and everything downstream of them
     run_dag(
         dag,
@@ -46,7 +48,7 @@ def main(
         dry_run=dry_run,
         force=force,
         include_grapher=grapher,
-        include_github=not no_github,
+        excludes=excludes,
     )
 
 
@@ -62,11 +64,11 @@ def sanity_check_db_settings() -> None:
 
 def run_dag(
     dag: DAG,
-    selection: List[str],
+    includes: Optional[List[str]] = None,
     dry_run: bool = False,
     force: bool = False,
     include_grapher: bool = False,
-    include_github: bool = True,
+    excludes: Optional[List[str]] = None,
 ) -> None:
     """
     Run the selected steps, and anything that needs updating based on them. An empty
@@ -75,12 +77,11 @@ def run_dag(
     By default, data steps do not re-run if they appear to be up-to-date already by
     looking at their checksum.
     """
-    excludes = []
+    excludes = excludes or []
     if not include_grapher:
         excludes.append("grapher://")
-    if not include_github:
-        excludes.append("github://")
-    steps = compile_steps(dag, selection, excludes)
+
+    steps = compile_steps(dag, includes, excludes)
 
     if not force:
         print("Detecting which steps need rebuilding...")

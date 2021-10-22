@@ -69,7 +69,7 @@ def to_dependency_order(
 
     # filter out explicit excludes
     filtered = [
-        s for s in in_order if not any(s.startswith(prefix) for prefix in excludes)
+        s for s in in_order if not any(re.findall(pattern, s) for pattern in excludes)
     ]
 
     return filtered
