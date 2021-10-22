@@ -3,13 +3,13 @@
 #  etl.py
 #
 
-from typing import Callable, List, Dict, Any
+from typing import Callable, List, Any
 import time
 import sys
 
 import click
 
-from etl.steps import load_dag, compile_steps, parse_step
+from etl.steps import load_dag, compile_steps, DAG
 from etl import config
 
 
@@ -21,9 +21,14 @@ from etl import config
 @click.option(
     "--grapher", is_flag=True, help="Publish changes to grapher (OWID staff only)"
 )
+@click.option("--no-github", is_flag=True, help="Skip Github repository checks")
 @click.argument("steps", nargs=-1)
 def main(
-    steps: List[str], dry_run: bool = False, force: bool = False, grapher: bool = False
+    steps: List[str],
+    dry_run: bool = False,
+    force: bool = False,
+    grapher: bool = False,
+    no_github: bool = False,
 ) -> None:
     """
     Execute all ETL steps listed in dag.yaml
@@ -35,7 +40,14 @@ def main(
     dag = load_dag()
 
     # Run the steps we have selected, and everything downstream of them
-    run_dag(dag, steps, dry_run=dry_run, force=force, include_grapher=grapher)
+    run_dag(
+        dag,
+        steps,
+        dry_run=dry_run,
+        force=force,
+        include_grapher=grapher,
+        include_github=not no_github,
+    )
 
 
 def sanity_check_db_settings() -> None:
@@ -49,11 +61,12 @@ def sanity_check_db_settings() -> None:
 
 
 def run_dag(
-    dag: Dict[str, Any],
+    dag: DAG,
     selection: List[str],
     dry_run: bool = False,
     force: bool = False,
     include_grapher: bool = False,
+    include_github: bool = True,
 ) -> None:
     """
     Run the selected steps, and anything that needs updating based on them. An empty
@@ -62,8 +75,12 @@ def run_dag(
     By default, data steps do not re-run if they appear to be up-to-date already by
     looking at their checksum.
     """
-    step_names = compile_steps(dag, selection, include_grapher=include_grapher)
-    steps = [parse_step(name, dag) for name in step_names if name != "data://reference"]
+    excludes = []
+    if not include_grapher:
+        excludes.append("grapher://")
+    if not include_github:
+        excludes.append("github://")
+    steps = compile_steps(dag, selection, excludes)
 
     if not force:
         print("Detecting which steps need rebuilding...")

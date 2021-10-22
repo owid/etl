@@ -15,7 +15,7 @@ import shutil
 from owid.catalog import Dataset
 
 from etl import paths
-from etl.steps import DataStep, compile_steps
+from etl.steps import DataStep, to_dependency_order
 
 
 def test_data_step():
@@ -60,5 +60,6 @@ def temporary_step() -> Iterator[str]:
 
 
 def test_topological_sort():
-    dag = {"steps": {"a": ["b", "c"], "b": ["c"]}}
-    assert compile_steps(dag, []) == ["c", "b", "a"]
+    "Check that a dependency will be scheduled to run before things that need it."
+    dag = {"a": ["b", "c"], "b": ["c"]}
+    assert to_dependency_order(dag, [], []) == ["c", "b", "a"]

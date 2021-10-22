@@ -3,13 +3,14 @@
 #  steps
 #
 
-from typing import Any, Dict, Protocol, List, Set, Union, cast, Iterable
+from typing import Any, Dict, Optional, Protocol, List, Set, Union, cast, Iterable
 from pathlib import Path
+import re
 import hashlib
 import tempfile
 from collections import defaultdict
 from urllib.parse import urlparse
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from glob import glob
 from importlib import import_module
 import warnings
@@ -30,40 +31,55 @@ from etl.helpers import get_etag
 from etl.grapher_import import upsert_table, upsert_dataset
 
 Graph = Dict[str, Set[str]]
+DAG = Dict[str, Any]
 
 
 def compile_steps(
-    dag: Dict[str, Any], selection: List[str], include_grapher: bool = False
-) -> List[str]:
+    dag: DAG, includes: Optional[List[str]] = None, excludes: Optional[List[str]] = None
+) -> List["Step"]:
     """
     Return the list of steps which, if executed in order, mean that every
     step has its dependencies ready for it.
     """
-    # exclude grapher steps by default
-    raw_dag = dag["steps"]
-    if not include_grapher:
-        raw_dag = {k: v for k, v in raw_dag.items() if not k.startswith("grapher://")}
+    includes = includes or []
+    excludes = excludes or []
 
+    # make sure each step runs after its dependencies
+    steps = to_dependency_order(dag, includes, excludes)
+
+    # parse the steps into Python objects
+    return [parse_step(name, dag) for name in steps]
+
+
+def to_dependency_order(
+    dag: DAG, includes: List[str], excludes: List[str]
+) -> List[str]:
     # reverse the graph so that dependencies point to their dependents
-    graph = reverse_graph(raw_dag)
+    graph = reverse_graph(dag)
 
-    if selection:
+    if includes:
         # cut the graph to just the listed steps and the things that
         # then depend on them (transitive closure)
-        subgraph = filter_to_subgraph(graph, selection)
+        subgraph = filter_to_subgraph(graph, includes)
     else:
         subgraph = graph
 
-    return topological_sort(subgraph)
+    # make sure dependencies are built before running the things that depend on them
+    in_order = topological_sort(subgraph)
+
+    # filter out explicit excludes
+    filtered = [
+        s for s in in_order if not any(s.startswith(prefix) for prefix in excludes)
+    ]
+
+    return filtered
 
 
 def load_dag(filename: Union[str, Path] = paths.DAG_FILE) -> Dict[str, Any]:
     with open(str(filename)) as istream:
         dag: Dict[str, Any] = yaml.safe_load(istream)
 
-    dag["steps"] = {
-        node: set(deps) if deps else set() for node, deps in dag["steps"].items()
-    }
+    dag = {node: set(deps) if deps else set() for node, deps in dag["steps"].items()}
     return dag
 
 
@@ -82,14 +98,20 @@ def reverse_graph(graph: Graph) -> Graph:
     return dict(g)
 
 
-def filter_to_subgraph(graph: Graph, steps: Iterable[str]) -> Graph:
+def filter_to_subgraph(graph: Graph, includes: Iterable[str]) -> Graph:
     """
     Filter to only the graph including steps and their descendents, i.e. anything that
     would become out of date if this step was re-run.
     """
+    all_steps = set(graph)
+    for children in graph.values():
+        all_steps.update(children)
+
     subgraph: Graph = defaultdict(set)
 
-    to_visit = list(steps)
+    to_visit = [
+        s for s in all_steps if any(re.findall(pattern, s) for pattern in includes)
+    ]
     while to_visit:
         node = to_visit.pop()
         children = graph.get(node, set())
@@ -107,11 +129,14 @@ def parse_step(step_name: str, dag: Dict[str, Any]) -> "Step":
     parts = urlparse(step_name)
     step_type = parts.scheme
     path = parts.netloc + parts.path
-    dependencies = [parse_step(s, dag) for s in dag["steps"].get(step_name, [])]
+    dependencies = [parse_step(s, dag) for s in dag.get(step_name, [])]
 
     step: Step
     if step_type == "data":
-        step = DataStep(path, dependencies)
+        if path == "reference":
+            step = ReferenceStep(path)
+        else:
+            step = DataStep(path, dependencies)
 
     elif step_type == "walden":
         step = WaldenStep(path)
@@ -144,6 +169,7 @@ class Step(Protocol):
         ...
 
 
+@dataclass
 class DataStep(Step):
     """
     A step which creates a local Dataset on disk in the data/ folder. You specify it
@@ -180,14 +206,8 @@ class DataStep(Step):
         dataset.metadata.source_checksum = self.checksum_input()
         dataset.save()
 
-    def is_reference(self) -> bool:
-        return self.path == "reference"
-
     def is_dirty(self) -> bool:
         # the reference dataset never needs rebuilding
-        if self.is_reference():
-            return False
-
         if not self._dest_dir.is_dir() or any(
             isinstance(d, DataStep) and not d.has_existing_data()
             for d in self.dependencies
@@ -284,6 +304,27 @@ class DataStep(Step):
                     stdout_file=ostream,
                     stderr_file=ostream,
                 )
+
+
+@dataclass
+class ReferenceStep(DataStep):
+    """
+    A step that marks a dependency on a local dataset. It never runs, but it will checksum
+    the local dataset and trigger rebuilds if the local dataset changes.
+    """
+
+    def __init__(self, path: str) -> None:
+        self.path = path
+        self.dependencies = []
+
+    def is_dirty(self) -> bool:
+        return False
+
+    def can_execute(self) -> bool:
+        return True
+
+    def run(self) -> None:
+        return
 
 
 @dataclass
@@ -429,6 +470,7 @@ class GrapherStep(Step):
             upsert_table(table, dataset_upsert_results)
 
 
+@dataclass
 class GithubStep(Step):
     """
     Shallow-clone a git repo and ensure that the most recent version of the repo is available.
@@ -437,7 +479,7 @@ class GithubStep(Step):
 
     path: str
 
-    gh_repo: git.GithubRepo
+    gh_repo: git.GithubRepo = field(repr=False)
 
     def __init__(self, path: str) -> None:
         self.path = path
