@@ -2,7 +2,7 @@
 name = "etl"
 version = "0.1.0"
 description = ""
-authors = ["Lars Yencken <lars@yencken.org>"]
+authors = ["Our World In Data <tech@worldindata.org>"]
 
 [tool.poetry.scripts]
 etl = 'etl.command:main'
