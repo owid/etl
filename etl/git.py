@@ -10,7 +10,7 @@ Helpers for working with Git in an ETL flow.
 from dataclasses import dataclass
 from pathlib import Path
 import re
-from typing import cast
+from typing import Any, cast
 
 import sh
 
@@ -60,29 +60,28 @@ class GithubRepo:
         if not self.cache_dir.is_dir():
             raise Exception("cannot update repo until repo is cloned")
 
-        cwd = self.cache_dir.as_posix()
-        sh.git("fetch", _cwd=cwd)
-        sh.git("reset", "--hard", f"origin/{self.branch_name}", _cwd=cwd)
+        self._git("fetch")
+        self._git("reset", "--hard", f"origin/{self.branch_name}")
 
     @property
     def branch_name(self) -> str:
         "Return the current branch name of the checked out repo."
-        return cast(
-            str,
-            (
-                sh.git("branch", "--show-current", _cwd=self.cache_dir.as_posix())
-                .stdout.decode("utf8")
-                .strip()
-            ),
-        )
+        return self._git("branch", "--show-current")
 
     @property
     def latest_sha(self) -> str:
-        output = cast(
-            str, sh.git("log", "-n", 1, '--format="%H"').stdout.decode("utf8").strip()
-        )
+        output = self._git("log", "-n", "1", '--format="%H"')
         (sha,) = re.findall("[0-9a-f]{40}", output)
         return cast(str, sha)
+
+    def _git(self, *args: str, **kwargs: Any) -> str:
+        "Execute a git command in the context of this repo."
+        return cast(
+            str,
+            sh.git(*args, _cwd=self.cache_dir.as_posix(), **kwargs)
+            .stdout.decode("utf8")
+            .strip(),
+        )
 
     def is_up_to_date(self) -> bool:
         "Returns true if remote has no new changes, false otherwise."
@@ -90,13 +89,12 @@ class GithubRepo:
         if not self.cache_dir.is_dir():
             return False
 
-        available_updates = sh.git(
+        available_updates = self._git(
             "fetch",
             "--dry-run",
             # special TTY settings required otherwise git-fetch will operate silently
             _tty_in=True,
             _unify_ttys=True,
-            _cwd=self.cache_dir.as_posix(),
-        ).stdout.decode("utf8")
+        )
 
         return not available_updates
