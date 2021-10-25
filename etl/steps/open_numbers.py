@@ -10,6 +10,8 @@ format.
 
 from typing import Dict, List, Tuple
 import hashlib
+from owid.catalog.meta import Source
+import datetime as dt
 
 import pandas as pd
 from etl.git import GithubRepo
@@ -35,7 +37,11 @@ def run(dest_dir: str) -> None:
     # copy metadata from frictionless
     ds.metadata.namespace = "open_numbers"
     ds.metadata.short_name = short_name
-    ds.metadata.title = package.title
+    ds.metadata.title = package.title or None
+    ds.metadata.sources = [
+        Source(url=repo.github_url, date_accessed=str(dt.date.today()))
+    ]
+
     if package.description and package.title != package.description:
         ds.metadata.description = package.description
     ds.save()
