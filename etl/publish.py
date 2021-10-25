@@ -153,13 +153,19 @@ def delete_dataset(s3: Any, relative_path: str) -> None:
 
 
 def update_catalog(s3: Any) -> None:
-    catalog_filename = (DATA_DIR / "catalog.feather").as_posix()
-    md5 = files.checksum_file(catalog_filename)
+    catalog_filename = DATA_DIR / "catalog.feather"
     s3.upload_file(
-        catalog_filename,
+        catalog_filename.as_posix(),
         config.S3_BUCKET,
         "catalog.feather",
-        ExtraArgs={"ACL": "public-read", "Metadata": {"md5": md5}},
+        ExtraArgs={"ACL": "public-read"},
+    )
+
+    s3.upload_file(
+        catalog_filename.with_suffix(".meta.json").as_posix(),
+        config.S3_BUCKET,
+        "catalog.feather",
+        ExtraArgs={"ACL": "public-read"},
     )
 
 
