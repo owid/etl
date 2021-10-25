@@ -18,7 +18,7 @@ def to_graphviz(output_file: str) -> None:
     font_name = "Lato"
 
     nodes = set()
-    for child, parents in dag["steps"].items():
+    for child, parents in dag.items():
         nodes.update(parents)
         if not child.startswith("grapher://"):
             nodes.add(child)
@@ -55,7 +55,7 @@ def to_graphviz(output_file: str) -> None:
         node("Data catalog")
         p("}")
 
-        for child, parents in dag["steps"].items():
+        for child, parents in dag.items():
             if child.startswith("grapher://"):
                 for parent in parents:
                     link(parent, "Grapher DB")
