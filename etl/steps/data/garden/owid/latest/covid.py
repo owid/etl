@@ -3,7 +3,7 @@
 #  owid/latest/covid
 #
 
-from owid.catalog.meta import Source
+from owid.catalog.meta import License, Source
 import datetime as dt
 
 import pandas as pd
@@ -44,6 +44,12 @@ def create_dataset(dest_dir: str) -> Dataset:
             date_accessed=str(dt.date.today()),
             publication_date=str(dt.date.today()),
             publication_year=dt.date.today().year,
+        )
+    ]
+    d.metadata.licenses = [
+        License(
+            name="Other (Attribution)",
+            url="https://github.com/owid/covid-19-data/tree/master/public/data#license",
         )
     ]
     d.save()
