@@ -491,9 +491,7 @@ class GithubStep(Step):
 
     def is_dirty(self) -> bool:
         # always poll the git repo
-        # XXX is there a way of asking Git if there are more changes without downloading them?
-        return True
-        # return not self.gh_repo.is_up_to_date()
+        return not self.gh_repo.is_up_to_date()
 
     def run(self) -> None:
         # either clone the repo, or update it
