@@ -71,14 +71,18 @@ class GithubRepo:
     @property
     def latest_sha(self) -> str:
         output = self._git("log", "-n", "1", '--format="%H"')
-        (sha,) = re.findall("[0-9a-f]{40}", output)
+        try:
+            (sha,) = re.findall("[0-9a-f]{40}", output)
+        except ValueError:
+            raise GitError(f"could not get latest sha from repo: {self.cache_dir}")
+
         return cast(str, sha)
 
     def _git(self, *args: str, **kwargs: Any) -> str:
         "Execute a git command in the context of this repo."
         return cast(
             str,
-            sh.git(*args, _cwd=self.cache_dir.as_posix(), **kwargs)
+            sh.git("--no-pager", *args, _cwd=self.cache_dir.as_posix(), **kwargs)
             .stdout.decode("utf8")
             .strip(),
         )
@@ -98,3 +102,7 @@ class GithubRepo:
         )
 
         return not available_updates
+
+
+class GitError(Exception):
+    pass
