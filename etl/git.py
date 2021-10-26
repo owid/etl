@@ -66,7 +66,9 @@ class GithubRepo:
     @property
     def branch_name(self) -> str:
         "Return the current branch name of the checked out repo."
-        return self._git("branch", "--show-current")
+        # in newer versions of git we can do "git branch --show-current"
+        # but these aren't available on Ubuntu 18.04 on live
+        return self._git("symbolic-ref", "--short", "HEAD")
 
     @property
     def latest_sha(self) -> str:
