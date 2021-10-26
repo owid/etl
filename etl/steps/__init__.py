@@ -207,11 +207,7 @@ class DataStep(Step):
         dataset.save()
 
     def is_dirty(self) -> bool:
-        # the reference dataset never needs rebuilding
-        if not self._dest_dir.is_dir() or any(
-            isinstance(d, DataStep) and not d.has_existing_data()
-            for d in self.dependencies
-        ):
+        if not self.has_existing_data() or any(d.is_dirty() for d in self.dependencies):
             return True
 
         found_source_checksum = catalog.Dataset(
