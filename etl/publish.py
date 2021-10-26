@@ -164,7 +164,7 @@ def update_catalog(s3: Any) -> None:
     s3.upload_file(
         catalog_filename.with_suffix(".meta.json").as_posix(),
         config.S3_BUCKET,
-        "catalog.feather",
+        "catalog.meta.json",
         ExtraArgs={"ACL": "public-read"},
     )
 
