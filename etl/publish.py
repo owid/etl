@@ -67,6 +67,10 @@ def sync_datasets(s3: Any, dry_run: bool = False) -> None:
     local = LocalCatalog(DATA_DIR)
     print("Datasets to sync:")
     for ds in local.iter_datasets():
+        # ignore datasets with no tables
+        if len(ds._data_files) == 0:
+            continue
+
         path = Path(ds.path).relative_to(DATA_DIR).as_posix()
         if path in to_delete:
             to_delete.remove(path)
