@@ -20,6 +20,8 @@ def run(dest_dir: str) -> None:
     with downloaded(MEGAFILE_URL) as filename:
         df = pd.read_csv(filename)
 
+    df["date"] = pd.to_datetime(df.date)
+
     for col in ["iso_code", "continent", "location"]:
         df[col] = df[col].astype("category")
 
