@@ -16,6 +16,7 @@ import datetime as dt
 import pandas as pd
 from etl.git import GithubRepo
 import frictionless
+from frictionless.exception import FrictionlessException
 
 from owid.catalog import Dataset, Table
 from etl import frames
@@ -52,14 +53,20 @@ def run(dest_dir: str) -> None:
     # copy tables one by one
     for short_name, resources in resource_map.items():
         print(f"- {short_name}")
-        all_frames = []
-        for resource in resources:
-            df = resource.to_pandas()
+        try:
+            all_frames = []
+            for resource in resources:
+                df = resource.to_pandas()
 
-            # use more accurate column types that minimise space
-            frames.repack_frame(df, {"global": "geo"})
+                # use more accurate column types that minimise space
+                frames.repack_frame(df, {"global": "geo"})
 
-            all_frames.append(df)
+                all_frames.append(df)
+
+        except FrictionlessException:
+            # see: https://github.com/owid/etl/issues/36
+            print("  ERROR: skipping")
+            continue
 
         df = pd.concat(all_frames)
         frames.repack_frame(df, {})
