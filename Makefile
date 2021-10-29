@@ -2,7 +2,7 @@
 #  Makefile
 #
 
-.PHONY: etl
+.PHONY: etl test
 
 include default.mk
 
@@ -24,7 +24,9 @@ help:
 
 
 watch-all:
-	poetry run watchmedo shell-command -c 'clear; make unittest; (cd vendor/owid-catalog-py && make unittest); (cd vendor/walden && make unittest)' --recursive --drop .
+	poetry run watchmedo shell-command -c 'clear; make coverage; (cd vendor/owid-catalog-py && make coverage); (cd vendor/walden && make coverage)' --recursive --drop .
+
+test: check-formatting lint check-typing coverage
 
 test-all: test
 	cd vendor/owid-catalog-py && make test
@@ -38,9 +40,12 @@ watch: .venv
 	git submodule update --init
 	touch $@
 
-.venv: pyproject.toml poetry.toml poetry.lock .submodule-init vendor/*/*
+.venv: environment.yml extra-requirements.txt .submodule-init vendor/*/*
 	@echo '==> Installing packages'
-	poetry install
+	rm -rf .venv
+	conda env create -p .venv -f environment.yml
+	.venv/bin/pip install -r extra-requirements.txt
+	for folder in vendor/*; do (cd $$folder; rm -rf dist; poetry build); .venv/bin/pip install $$folder/dist/*.whl; done
 	touch $@
 
 check-typing: .venv
@@ -49,7 +54,7 @@ check-typing: .venv
 
 coverage: .venv
 	@echo '==> Unit testing with coverage'
-	poetry run pytest --cov=etl --cov-report=term-missing tests
+	PYTHONPATH=. poetry run pytest --cov=etl --cov-report=term-missing tests
 
 etl: .venv
 	@echo '==> Running full etl'

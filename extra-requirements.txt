@@ -1,0 +1,8 @@
+mysqlclient>=2.0.3
+sh>=1.14.2
+awscli>=1.20.54
+frictionless>=4.19.5
+mypy
+flake8
+pytest
+black[jupyter]
