@@ -3,7 +3,18 @@
 #  steps
 #
 
-from typing import Any, Dict, Optional, Protocol, List, Set, Union, cast, Iterable
+from typing import (
+    Any,
+    Dict,
+    Optional,
+    Protocol,
+    List,
+    Set,
+    Tuple,
+    Union,
+    cast,
+    Iterable,
+)
 from pathlib import Path
 import re
 import hashlib
@@ -100,8 +111,8 @@ def reverse_graph(graph: Graph) -> Graph:
 
 def filter_to_subgraph(graph: Graph, includes: Iterable[str]) -> Graph:
     """
-    Filter to only the graph including steps and their descendents, i.e. anything that
-    would become out of date if this step was re-run.
+    For each step to be included, find all its ancestors and all its descendents
+    recursively and include them too.
     """
     all_steps = set(graph)
     for children in graph.values():
@@ -109,23 +120,59 @@ def filter_to_subgraph(graph: Graph, includes: Iterable[str]) -> Graph:
 
     subgraph: Graph = defaultdict(set)
 
-    to_visit = [
+    included = [
         s for s in all_steps if any(re.findall(pattern, s) for pattern in includes)
     ]
-    while to_visit:
-        node = to_visit.pop()
+
+    child_frontier: List[str] = []
+    parent_frontier: List[Tuple[str, str]] = []
+    for node in included:
         children = graph.get(node, set())
-        subgraph[node].update(children)
-        to_visit.extend(children)
+        child_frontier.extend(children)
+
+        parents = set((n, node) for n in graph if node in graph.get(n, set()))
+        parent_frontier.extend(parents)
+
+        subgraph[node] = children
+
+    # follow all children and their children, recursively
+    while child_frontier:
+        node = child_frontier.pop()
+        children = graph.get(node, set())
+        child_frontier.extend(children)
+
+        subgraph[node] = children
+
+    # follow all parents and their parents, recursively
+    while parent_frontier:
+        parent, child = parent_frontier.pop()
+        parents = set((n, parent) for n in graph if parent in graph.get(n, set()))
+        parent_frontier.extend(parents)
+
+        # ignore other children of this parent
+        subgraph[parent] = {child}
 
     return dict(subgraph)
 
 
 def topological_sort(graph: Graph) -> List[str]:
+    """
+    Take a directed graph mapping dependencies to parents, and return a list of
+    steps that, if run in this order, make sure that every dependency is run before
+    anything that needs it.
+
+    E.g. you have steps, "a" and "b", where you need "a" to build "b". Then you
+    will have a graph like {"a": "b"}. This method will return ["a", "b"] as the
+    correct build order.
+
+    In general, there can be many build orders which can work for a graph, we don't
+    care which one we get, just that it build dependencies first.
+    """
     return list(reversed(list(graphlib.TopologicalSorter(graph).static_order())))
 
 
 def parse_step(step_name: str, dag: Dict[str, Any]) -> "Step":
+    "Convert each step's name into a step object that we can run."
     parts = urlparse(step_name)
     step_type = parts.scheme
     path = parts.netloc + parts.path
