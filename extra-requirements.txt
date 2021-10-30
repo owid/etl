@@ -6,3 +6,5 @@ mypy
 flake8
 pytest
 black[jupyter]
+watchdog
+argh
