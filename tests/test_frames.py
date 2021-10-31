@@ -7,6 +7,7 @@ from typing import cast
 
 import numpy as np
 import pandas as pd
+from pandas.testing import assert_frame_equal
 
 from etl import frames
 
@@ -20,10 +21,9 @@ def test_repack_non_object_columns():
     df2 = df.copy()
     frames.repack_frame(df2, {})
 
-    for col in df.columns:
-        assert df2[col].dtype == df[col].dtype, col
-
-    assert (df2.dtypes == df.dtypes).all()
+    assert df2.myint.dtype.name == "uint8"
+    assert df2.myfloat.dtype.name == "float64"
+    assert_frame_equal(df, df2, check_dtype=False)
 
 
 def test_repack_object_columns():
@@ -48,26 +48,24 @@ def test_repack_object_columns():
 def test_repack_int():
     s = cast(pd.Series, pd.Series([1, 2, None, 3]).astype("object"))
     v = frames.repack_series(s)
-    assert v.dtype == "Int64"
+    assert v.dtype == "UInt8"
 
 
 def test_repack_int_no_null():
     s = cast(pd.Series, pd.Series([1, 2, 3]).astype("object"))
     v = frames.repack_series(s)
-    assert v.dtype == "Int64"
+    assert v.dtype == "uint8"
 
 
 def test_repack_float_to_int():
     s = pd.Series([1, 2, None, 3])
     assert s.dtype == "float64"
     v = frames.repack_series(s)
-    assert v.dtype == "Int64"
+    assert v.dtype == "UInt8"
 
 
-def test_repack_float():
-    s = pd.Series([1, 2, None, 3.3])
-    assert s.dtype == "float64"
-    s = cast(pd.Series, s.astype("object"))
+def test_repack_float_object_to_float64():
+    s = pd.Series([1, 2, None, 3.3], dtype="object")
 
     v = frames.repack_series(s)
     assert v.dtype == "float64"
@@ -79,3 +77,15 @@ def test_repack_category():
 
     v = frames.repack_series(s)
     assert v.dtype == "category"
+
+
+def test_shrink_integers_uint8():
+    s = pd.Series([1, 2, 3], dtype="Int64")
+    v = frames.shrink_integer(s)
+    assert v.dtype.name == "uint8"
+
+
+def test_shrink_integers_int8():
+    s = pd.Series([1, 2, 3, -3], dtype="Int64")
+    v = frames.shrink_integer(s)
+    assert v.dtype.name == "int8"
