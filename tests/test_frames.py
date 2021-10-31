@@ -45,6 +45,97 @@ def test_repack_object_columns():
         assert (df_repack[col].dropna() == df[col].dropna()).all()
 
 
+def test_repack_integer_strings():
+    s = pd.Series(["1", "2", "3", None])
+    v = frames.repack_series(s)
+    assert v.dtype.name == "UInt8"
+
+
+def test_repack_float_strings():
+    s = pd.Series(["10", "22.2", "30"])
+    v = frames.repack_series(s)
+    assert v.dtype.name == "float64"
+
+
+def test_repack_int8_boundaries():
+    s = pd.Series([0, -1])
+    info = np.iinfo(np.int8)
+
+    # check the lower boundary
+    s[0] = info.min
+    assert frames.repack_series(s).dtype.name == "int8"
+    s[0] -= 1
+    assert frames.repack_series(s).dtype.name == "int16"
+
+    # check the upper boundary
+    s[0] = info.max
+    assert frames.repack_series(s).dtype.name == "int8"
+    s[0] += 1
+    assert frames.repack_series(s).dtype.name == "int16"
+
+
+def test_repack_int16_boundaries():
+    s = pd.Series([0, -1])
+    info = np.iinfo(np.int16)
+
+    # check the lower boundary
+    s[0] = info.min
+    assert frames.repack_series(s).dtype.name == "int16"
+    s[0] -= 1
+    assert frames.repack_series(s).dtype.name == "int32"
+
+    # check the upper boundary
+    s[0] = info.max
+    assert frames.repack_series(s).dtype.name == "int16"
+    s[0] += 1
+    assert frames.repack_series(s).dtype.name == "int32"
+
+
+def test_repack_int32_boundaries():
+    s = pd.Series([0, -1])
+    info = np.iinfo(np.int32)
+
+    # check the lower boundary
+    s[0] = info.min
+    assert frames.repack_series(s).dtype.name == "int32"
+    s[0] -= 1
+    assert frames.repack_series(s).dtype.name == "int64"
+
+    # check the upper boundary
+    s[0] = info.max
+    assert frames.repack_series(s).dtype.name == "int32"
+    s[0] += 1
+    assert frames.repack_series(s).dtype.name == "int64"
+
+
+def test_repack_uint_boundaries():
+    s = pd.Series([0])
+    # uint8
+    info = np.iinfo(np.uint8)
+    s[0] = info.max
+    assert frames.repack_series(s).dtypes.name == "uint8"
+
+    s[0] += 1
+    assert frames.repack_series(s).dtypes.name == "uint16"
+
+    # uint16
+    info = np.iinfo(np.uint16)
+    s[0] = info.max
+    assert frames.repack_series(s).dtypes.name == "uint16"
+
+    s[0] += 1
+    assert frames.repack_series(s).dtypes.name == "uint32"
+
+    # uint32
+    info = np.iinfo(np.uint32)
+    s[0] = info.max
+    assert frames.repack_series(s).dtypes.name == "uint32"
+
+    # we don't bother using uint64, we just use int64
+    s[0] += 1
+    assert frames.repack_series(s).dtypes.name == "int64"
+
+
 def test_repack_int():
     s = cast(pd.Series, pd.Series([1, 2, None, 3]).astype("object"))
     v = frames.repack_series(s)
