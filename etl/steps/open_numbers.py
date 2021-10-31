@@ -58,7 +58,7 @@ def run(dest_dir: str) -> None:
             for resource in resources:
                 df = resource.to_pandas()
 
-                # use more accurate column types that minimise space
+                # use smaller, more accurate column types that minimise space
                 frames.repack_frame(df, {"global": "geo"})
 
                 all_frames.append(df)
