@@ -91,7 +91,7 @@ def shrink_integer(s: pd.Series) -> pd.Series:
         if not (v == s).all():
             break
 
-        s = v
+        s = cast(pd.Series, v)
 
     return s
 
@@ -99,7 +99,7 @@ def shrink_integer(s: pd.Series) -> pd.Series:
 def to_float(s: pd.Series) -> pd.Series:
     options = ["float32", "float64"]
     for dtype in options:
-        v = s.astype(dtype)
+        v = cast(pd.Series, s.astype(dtype))
 
         if series_eq(s, v, float):
             return v
@@ -124,7 +124,7 @@ def series_eq(
     NaN != NaN, we want missing or null values to be reported as equal to each
     other.
     """
-    if len(lhs) != len(rhs) or (lhs.isnull() != rhs.isnull()).all():
+    if len(lhs) != len(rhs) or (lhs.isnull() != rhs.isnull()).any():  # type: ignore
         return False
 
     lhs_values = lhs.dropna().apply(cast)
