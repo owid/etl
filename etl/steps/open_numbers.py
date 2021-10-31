@@ -19,7 +19,6 @@ import frictionless
 from frictionless.exception import FrictionlessException
 
 from owid.catalog import Dataset, Table
-from etl import frames
 
 
 def run(dest_dir: str) -> None:
@@ -59,7 +58,8 @@ def run(dest_dir: str) -> None:
                 df = resource.to_pandas()
 
                 # use smaller, more accurate column types that minimise space
-                frames.repack_frame(df, {"global": "geo"})
+                if "global" in df.columns:
+                    df["geo"] = df.pop("global")
 
                 all_frames.append(df)
 
@@ -69,7 +69,6 @@ def run(dest_dir: str) -> None:
             continue
 
         df = pd.concat(all_frames)
-        frames.repack_frame(df, {})
 
         t = Table(df)
         t.metadata.short_name = short_name
