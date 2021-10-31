@@ -97,12 +97,14 @@ def shrink_integer(s: pd.Series) -> pd.Series:
 
 
 def to_float(s: pd.Series) -> pd.Series:
-    v = cast(pd.Series, s.astype("float64"))
+    options = ["float32", "float64"]
+    for dtype in options:
+        v = s.astype(dtype)
 
-    if not series_eq(s, v, float):
-        raise ValueError()
+        if series_eq(s, v, float):
+            return v
 
-    return v
+    raise ValueError()
 
 
 def to_category(s: pd.Series) -> pd.Series:
@@ -114,14 +116,17 @@ def to_category(s: pd.Series) -> pd.Series:
     return cast(pd.Series, s.astype("category"))
 
 
-def series_eq(lhs: pd.Series, rhs: pd.Series, cast: Any) -> bool:
+def series_eq(
+    lhs: pd.Series, rhs: pd.Series, cast: Any, rtol: float = 1e-5, atol: float = 1e-8
+) -> bool:
     """
     Check that series are equal, but unlike normal floating point checks where
     NaN != NaN, we want missing or null values to be reported as equal to each
     other.
     """
-    return (
-        len(lhs) == len(rhs)
-        and (lhs.isnull() == rhs.isnull()).all()
-        and (lhs.dropna().apply(cast) == rhs.dropna().apply(cast)).all()
-    )
+    if len(lhs) != len(rhs) or (lhs.isnull() != rhs.isnull()).all():
+        return False
+
+    lhs_values = lhs.dropna().apply(cast)
+    rhs_values = rhs.dropna().apply(cast)
+    return np.allclose(lhs_values, rhs_values, rtol=rtol, atol=atol)

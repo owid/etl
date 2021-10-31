@@ -22,7 +22,7 @@ def test_repack_non_object_columns():
     frames.repack_frame(df2, {})
 
     assert df2.myint.dtype.name == "uint8"
-    assert df2.myfloat.dtype.name == "float64"
+    assert df2.myfloat.dtype.name == "float32"
     assert_frame_equal(df, df2, check_dtype=False)
 
 
@@ -39,10 +39,9 @@ def test_repack_object_columns():
     df_repack = df.copy()
 
     frames.repack_frame(df_repack, {})
-
-    for col in df_repack.columns:
-        assert (df_repack[col].isnull() == df[col].isnull()).all()
-        assert (df_repack[col].dropna() == df[col].dropna()).all()
+    assert df_repack.myint.dtype.name == "UInt8"
+    assert df_repack.myfloat.dtype.name == "float32"
+    assert df_repack.mycat.dtype.name == "category"
 
 
 def test_repack_integer_strings():
@@ -54,7 +53,7 @@ def test_repack_integer_strings():
 def test_repack_float_strings():
     s = pd.Series(["10", "22.2", "30"])
     v = frames.repack_series(s)
-    assert v.dtype.name == "float64"
+    assert v.dtype.name == "float32"
 
 
 def test_repack_int8_boundaries():
@@ -155,11 +154,11 @@ def test_repack_float_to_int():
     assert v.dtype == "UInt8"
 
 
-def test_repack_float_object_to_float64():
+def test_repack_float_object_to_float32():
     s = pd.Series([1, 2, None, 3.3], dtype="object")
 
     v = frames.repack_series(s)
-    assert v.dtype == "float64"
+    assert v.dtype == "float32"
 
 
 def test_repack_category():
