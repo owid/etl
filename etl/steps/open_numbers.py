@@ -8,10 +8,12 @@ Convert repositories with data in DDF format to OWID's Dataset and Table
 format.
 """
 
-from typing import Dict, List, Tuple
+from pathlib import Path
+from typing import Dict, List, Tuple, cast
 import hashlib
 from owid.catalog.meta import Source
 import datetime as dt
+import tempfile
 
 import pandas as pd
 from etl.git import GithubRepo
@@ -19,7 +21,6 @@ import frictionless
 from frictionless.exception import FrictionlessException
 
 from owid.catalog import Dataset, Table
-from etl import frames
 
 
 def run(dest_dir: str) -> None:
@@ -53,27 +54,61 @@ def run(dest_dir: str) -> None:
     # copy tables one by one
     for short_name, resources in resource_map.items():
         print(f"- {short_name}")
-        try:
-            all_frames = []
-            for resource in resources:
+        if len(resources) > 1:
+            df = load_all_resources(repo.cache_dir, resources)
+        else:
+            (resource,) = resources
+            try:
                 df = resource.to_pandas()
 
-                # use more accurate column types that minimise space
-                frames.repack_frame(df, {"global": "geo"})
+            except FrictionlessException:
+                # see: https://github.com/owid/etl/issues/36
+                print("  ERROR: skipping")
+                continue
 
-                all_frames.append(df)
-
-        except FrictionlessException:
-            # see: https://github.com/owid/etl/issues/36
-            print("  ERROR: skipping")
-            continue
-
-        df = pd.concat(all_frames)
-        frames.repack_frame(df, {})
+            # use smaller, more accurate column types that minimise space
+            if "global" in df.columns:
+                df["geo"] = df.pop("global")
 
         t = Table(df)
         t.metadata.short_name = short_name
         ds.add(t)
+
+
+def load_all_resources(
+    path: Path, resources: List[frictionless.Resource]
+) -> pd.DataFrame:
+    first = True
+    primary_key: List[str]
+    columns: List[str]
+
+    with tempfile.NamedTemporaryFile(suffix=".csv") as f:
+        for resource in resources:
+            if first:
+                # print csv header
+                primary_key = resource.schema.primary_key
+                columns = [k.name for k in resource.schema.fields]
+
+                if "global" in columns:
+                    remap = {"global": "geo"}
+                    columns = [remap.get(c, c) for c in columns]
+                    primary_key = [remap.get(c, c) for c in primary_key]
+
+                f.write(",".join(columns).encode("utf8") + b"\n")
+                first = False
+
+            with open((path / resource.path).as_posix(), "rb") as istream:
+                lines = iter(istream)
+                next(lines)  # skip the header
+                for line in lines:
+                    f.write(line)
+
+        f.flush()
+        df = pd.read_csv(f.name)
+
+    df.set_index(primary_key, inplace=True)
+
+    return cast(pd.DataFrame, df)
 
 
 def remap_names(
