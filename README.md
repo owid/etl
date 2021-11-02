@@ -1,5 +1,7 @@
 # etl
 
+![build status](https://github.com/owid/etl/actions/workflows/python-package.yml/badge.svg)
+
 _A compute graph for loading and transforming data for OWID._
 
 **Status: work in progress**
