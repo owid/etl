@@ -24,14 +24,14 @@ help:
 
 
 watch-all:
-	poetry run watchmedo shell-command -c 'clear; make unittest; (cd vendor/owid-catalog-py && make unittest); (cd vendor/walden && make unittest)' --recursive --drop .
+	.venv/bin/watchmedo shell-command -c 'clear; make unittest; (cd vendor/owid-catalog-py && make unittest); (cd vendor/walden && make unittest)' --recursive --drop .
 
 test-all: test
 	cd vendor/owid-catalog-py && make test
 	cd vendor/walden && make test
 
 watch: .venv
-	poetry run watchmedo shell-command -c 'clear; make check-formatting lint check-typing coverage' --recursive --drop .
+	.venv/bin/watchmedo shell-command -c 'clear; make check-formatting lint check-typing coverage' --recursive --drop .
 
 .submodule-init:
 	@echo '==> Initialising submodules'
@@ -45,11 +45,11 @@ watch: .venv
 
 check-typing: .venv
 	@echo '==> Checking types'
-	poetry run mypy --strict $(SRC)
+	.venv/bin/mypy --strict $(SRC)
 
 coverage: .venv
 	@echo '==> Unit testing with coverage'
-	poetry run pytest --cov=etl --cov-report=term-missing tests
+	.venv/bin/pytest --cov=etl --cov-report=term-missing tests
 
 etl: .venv
 	@echo '==> Running full etl'
