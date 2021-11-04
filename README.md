@@ -1,6 +1,4 @@
-# etl
-
-![build status](https://github.com/owid/etl/actions/workflows/python-package.yml/badge.svg)
+# etl ![build status](https://github.com/owid/etl/actions/workflows/python-package.yml/badge.svg) ![](https://img.shields.io/badge/python-3.9-blue.svg)
 
 _A compute graph for loading and transforming data for OWID._
 
