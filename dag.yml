@@ -17,8 +17,6 @@ steps:
     - walden://hyde/2017/general_files
   data://meadow/faostat/2021-03-18/faostat_qcl:
   - walden://faostat/2021-03-18/faostat_QCL
-  data://garden/faostat/2021-03-18/faostat_qcl:
-  - data://meadow/faostat/2021-03-18/faostat_qcl
   data://meadow/faostat/2021-04-09/faostat_fbs:
     - walden://faostat/2021-04-09/faostat_FBS
   data://meadow/faostat/2017-12-11/faostat_fbsh:
