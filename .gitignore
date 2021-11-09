@@ -16,3 +16,4 @@ data/*
 *.dot
 *.pdf
 pyrightconfig.json
+.DS_Store
