@@ -9,9 +9,9 @@ Helpers for working with Git in an ETL flow.
 
 from dataclasses import dataclass
 from pathlib import Path
-import re
 from typing import Any, cast
 
+import requests
 import sh
 
 
@@ -72,13 +72,11 @@ class GithubRepo:
 
     @property
     def latest_sha(self) -> str:
-        output = self._git("log", "-n", "1", '--format="%H"')
-        try:
-            (sha,) = re.findall("[0-9a-f]{40}", output)
-        except ValueError:
-            raise GitError(f"could not get latest sha from repo: {self.cache_dir}")
+        master_file = self.cache_dir / ".git/refs/heads/master"
+        with open(master_file, "r") as f:
+            sha = f.read().strip()
 
-        return cast(str, sha)
+        return sha
 
     def _git(self, *args: str, **kwargs: Any) -> str:
         "Execute a git command in the context of this repo."
@@ -91,19 +89,43 @@ class GithubRepo:
 
     def is_up_to_date(self) -> bool:
         "Returns true if remote has no new changes, false otherwise."
-        # XXX over-sensitive, triggers if other remote branches have changes
         if not self.cache_dir.is_dir():
             return False
 
-        available_updates = self._git(
-            "fetch",
-            "--dry-run",
-            # special TTY settings required otherwise git-fetch will operate silently
-            _tty_in=True,
-            _unify_ttys=True,
-        )
+        return self.latest_remote_sha() == self.latest_sha
 
-        return not available_updates
+    def latest_remote_sha(self) -> str:
+        "Return the latest commit SHA of the remote branch."
+        # we rely on the smart HTTPS protocol for Git served by Github
+        # https://www.git-scm.com/docs/http-protocol
+        #
+        # Responses look like this:
+        #
+        # S: 200 OK
+        # S: Content-Type: application/x-git-upload-pack-advertisement
+        # S: Cache-Control: no-cache
+        # S:
+        # S: 001e# service=git-upload-pack\n
+        # S: 0000
+        # S: 004895dcfa3633004da0049d3d0fa03f80589cbcaf31 refs/heads/maint\0multi_ack\n
+        # S: 003fd049f6c27a2244e12041955e262a404c7faba355 refs/heads/master\n
+        # S: 003c2cb58b79488a98d2721cea644875a8dd0026b115 refs/tags/v1.0\n
+        # S: 003fa3c2e2402b99163d1d59756e5f207ae21cccba4c refs/tags/v1.0^{}\n
+        # S: 0000
+
+        uri = self.github_url + "/info/refs?service=git-upload-pack"
+        resp = requests.get(uri)
+        resp.raise_for_status()
+        lines = resp.content.decode("latin-1").splitlines()
+
+        for line in lines:
+            # XXX some repos now use "main" instead of "master"
+            if line.count(" ") == 1 and line.endswith("refs/heads/master"):
+                # the first four bytes are the line length, ignore them
+                sha = line.split(" ")[0][4:]
+                return cast(str, sha)
+
+        raise Exception("Could not find latest remote SHA in response")
 
 
 class GitError(Exception):
