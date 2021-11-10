@@ -2,6 +2,15 @@
   "short_name": "countries_regions",
   "title": "Countries and regions",
   "description": "Our World In Data countries and geo-regions harmonisation dataset. Contains various identifiers for all current sovereign nations, overseas territories, some historic countries as well as common groupings like continents like world",
+  "dataset": {
+    "namespace": "owid",
+    "short_name": "reference",
+    "title": null,
+    "description": "Our World In Data reference datasets. These datasets define the vocabulary for important dimensions that we harmonized across different datasets. \nEvery table represents the vocabulary for one dimensions and can include additional columns like third party identifiers, hierarchical grouping etc.",
+    "sources": [],
+    "licenses": [],
+    "source_checksum": null
+  },
   "primary_key": [
     "code"
   ],
@@ -70,6 +79,10 @@
     "members": {
       "title": "List of members of each region/country",
       "description": "An optional json encoded array of strings referencing other rows in this table by 'code'. Rows that have entries here are understood to 'contain' other entries, e.g. continents list the contained countries or a country could list the contained subnational regions. "
+    },
+    "aliases": {
+      "title": "List of aliases for this country/region",
+      "description": "An optional json encoded array of alternative names for the country/region."
     }
   }
 }
