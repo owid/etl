@@ -18,6 +18,7 @@ def get_grapher_dataset() -> catalog.Dataset:
 def get_grapher_tables(dataset: catalog.Dataset) -> Iterable[catalog.Table]:
     table = dataset["estimates"]
 
+    # Since this script expects a certain structure make sure it is actually met
     expected_primary_keys = [
         "country_code",
         "year",
@@ -57,6 +58,7 @@ def get_grapher_tables(dataset: catalog.Dataset) -> Iterable[catalog.Table]:
         validate="m:1",
     )
 
+    # Add entity_id, drop country_code
     table.reset_index(inplace=True)
     df = pd.DataFrame(table)
     table["year"] = df["year"].astype(int)
@@ -67,6 +69,8 @@ def get_grapher_tables(dataset: catalog.Dataset) -> Iterable[catalog.Table]:
         inplace=True,
     )
 
+    # Load variable descriptions and units from the annotations.yml file and
+    # store them as column metadata
     script_dir = Path(__file__).parent
     with open(script_dir / "annotations.yml") as istream:
         annotations = yaml.safe_load(istream)
@@ -77,9 +81,13 @@ def get_grapher_tables(dataset: catalog.Dataset) -> Iterable[catalog.Table]:
         table[column].metadata.unit = annotation["unit"]
         table[column].metadata.short_unit = annotation["short_unit"]
 
+    # Sanity check
     for column in columns_to_export:
         assert table[column].metadata.unit is not None, "Unit should not be None here!"
 
+    # We have 5 dimensions but graphers data model can only handle 2 (year and entityId). This means
+    # we have to iterate all combinations of the remaining 3 dimensions and create a new variable for
+    # every combination that cuts out only the data points for a specific combination of these 3 dimensions
     for ghe_cause_title in table.index.unique(level="ghe_cause_title").values:
         for sex_code in table.index.unique(level="sex_code").values:
             for agegroup_code in table.index.unique(level="agegroup_code").values:
@@ -97,6 +105,9 @@ def get_grapher_tables(dataset: catalog.Dataset) -> Iterable[catalog.Table]:
                 cutout_table.reset_index(level=4, drop=True, inplace=True)
                 cutout_table.reset_index(level=3, drop=True, inplace=True)
                 cutout_table.reset_index(level=2, drop=True, inplace=True)
+
+                # Now iterate over every column in the original dataset and export the
+                # subset of data that we prepared above
                 for column in columns_to_export:
                     short_name = slugify.slugify(
                         f"{column}-{ghe_cause_title}-{sex_code}-{agegroup_code}"
