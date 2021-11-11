@@ -4,7 +4,7 @@
 #
 
 from pathlib import Path
-from typing import DefaultDict, Dict, List, Optional, Set
+from typing import DefaultDict, Dict, List, Optional, Set, cast
 from collections import defaultdict
 import json
 import cmd
@@ -13,7 +13,7 @@ import click
 import pandas as pd
 from thefuzz import process
 
-from owid.catalog import Table, Dataset
+from owid.catalog import Dataset
 
 from etl.paths import REFERENCE_DATASET
 
@@ -38,8 +38,8 @@ def harmonize(data_file: str, column: str, output_file: str) -> None:
 
     If a mapping file already exists, it will resume where the mapping file left off.
     """
-    t = read_table(data_file)
-    geo_column = t.reset_index()[column].dropna().astype("str")
+    df = read_table(data_file)
+    geo_column = cast(pd.Series, df[column].dropna().astype("str"))
 
     if Path(output_file).exists():
         print("Resuming from existing mapping...")
@@ -53,14 +53,19 @@ def harmonize(data_file: str, column: str, output_file: str) -> None:
         json.dump(mapping, ostream, indent=2)
 
 
-def read_table(input_file: str) -> Table:
+def read_table(input_file: str) -> pd.DataFrame:
     if input_file.endswith(".feather"):
-        return Table.read_feather(input_file)
+        df = pd.read_feather(input_file)
 
-    if input_file.endswith(".csv"):
-        return Table.read_csv(input_file)
+    elif input_file.endswith(".csv"):
+        df = pd.read_csv(
+            input_file, index_col=False, na_values=[""], keep_default_na=False
+        )
 
-    raise ValueError(f"Unsupported file type: {input_file}")
+    else:
+        raise ValueError(f"Unsupported file type: {input_file}")
+
+    return cast(pd.DataFrame, df)
 
 
 def interactive_harmonize(geo: pd.Series, mapping: Dict[str, str]) -> Dict[str, str]:
