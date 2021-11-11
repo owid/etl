@@ -36,7 +36,7 @@ The ETL is the place where several key steps can be done:
 
 - **Syntactic harmonization**: get data from institutional formats into a common OWID format with as few changes as possible
 - **Semantic harmonization**: harmonize dimension fields like country, region, gender, and others to create OWID's reference data set
-- **Remixing**: generating combined datasets and indicators, e.g. taking population from one dataset and using it to  transforming another indicator into a per-capita version
+- **Remixing**: generating combined datasets and indicators, e.g. taking population from one dataset and using it to transforming another indicator into a per-capita version
 - **Republishing** (OWID only): export OWID's reference data set for a variety of consumers
 
 ## Design principles
@@ -44,8 +44,8 @@ The ETL is the place where several key steps can be done:
 - **Dependencies listed**: all transformation steps and their dependencies are collected in a single file `dag.yml`
 - **URI style steps**: all steps have a URI style format, e.g. `data://garden/who/2021-07-01/gho`
 - **Filenames by convention**: We use convention to reduce the amount of config required
-    - `walden://<path>` steps match data snapshots in the [walden](https://github.com/owid/walden) index at `<path>`, and download the snapshots locally when executed
-    - `data://<path>` steps are defined by a Python or Jupyter notebook script in `etl/steps/data/<path>.{py,ipynb}`, and generate a new dataset in the `data/<path>` folder when executed
+  - `walden://<path>` steps match data snapshots in the [walden](https://github.com/owid/walden) index at `<path>`, and download the snapshots locally when executed
+  - `data://<path>` steps are defined by a Python or Jupyter notebook script in `etl/steps/data/<path>.{py,ipynb}`, and generate a new dataset in the `data/<path>` folder when executed
 - **Data stored outside Git**: unlike the importers repo, only tiny reference datasets and metadata is kept in git; all actual datasets are not stored and are instead regenerated on demand from the raw data in Walden
 
 ## Data formats
@@ -140,3 +140,11 @@ ds.save()
 ```
 
 Then run `make etl` to check that it's working correctly before fleshing out your ETL step.
+
+## Harmonizing countries
+
+An interactive country harmonizing tool is available, which can generate a country mapping file.
+
+```
+.venv/bin/harmonize <path/to/input.feather> <country-field> <path/to/output.mapping.json>
+```
