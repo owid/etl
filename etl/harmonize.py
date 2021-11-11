@@ -68,25 +68,32 @@ def interactive_harmonize(geo: pd.Series, mapping: Dict[str, str]) -> Dict[str, 
 
     for region in sorted(set(geo)):
         if region in mapping:
+            # we did this one in a previous run
             print_mapping(region, mapping[region])
             continue
 
         if region in mapper:
+            # it's an exact match for a country/region or its known aliases
             name = mapper[region]
             mapping[region] = name
             print_mapping(region, name)
             continue
 
+        # no exact match, get nearby matches
         suggestions = mapper.suggestions(region)
+
+        # ask interactively how to proceed
         picker = GeoPickerCmd(region, suggestions, mapper.valid_names)
         picker.cmdloop()
 
         if picker.match:
+            # we found a match or manually gave a valid one
             name = picker.match
             mapping[region] = name
             print_mapping(region, name)
 
             if picker.save_alias:
+                # update the reference dataset to include this alias
                 save_alias(name, region)
 
         if picker.quit_flag:
@@ -96,6 +103,7 @@ def interactive_harmonize(geo: pd.Series, mapping: Dict[str, str]) -> Dict[str, 
 
 
 class CountryRegionMapper:
+    # known aliases of our canonical geo-regions
     aliases: Dict[str, str]
     valid_names: Set[str]
 
@@ -121,10 +129,13 @@ class CountryRegionMapper:
         return self.aliases[key.lower()]
 
     def suggestions(self, region: str) -> List[str]:
+        # get the aliases which score highest on fuzzy matching
         results = process.extract(region.lower(), self.aliases.keys(), limit=5)
         if not results:
             return []
 
+        # some of these aliases will actually be for the same country/region,
+        # just take the best score for each match
         best: DefaultDict[str, int] = defaultdict(int)
         for match, score in results:
             key = self.aliases[match]
@@ -136,6 +147,13 @@ class CountryRegionMapper:
 
 
 class GeoPickerCmd(cmd.Cmd):
+    """
+    An interactive command meant to resolve a single ambiguous geo-region name.
+    If there are multipe ambiguous names, you make a new command for each one.
+
+    During this step, you can type "help" to see a list of commands.
+    """
+
     geo: str
     suggestions: List[str]
     valid_names: Set[str]
@@ -155,6 +173,9 @@ class GeoPickerCmd(cmd.Cmd):
     def do_n(self, arg: str) -> bool:
         # go to the next item
         return True
+
+    def help_n(self) -> None:
+        print("Go to the next item")
 
     def do_s(self, arg: str) -> Optional[bool]:
         for i, s in enumerate(self.suggestions):
@@ -177,8 +198,8 @@ class GeoPickerCmd(cmd.Cmd):
         self.save_alias = input_bool("Save this alias")
         return True
 
-    def help_n(self) -> None:
-        print("Go to the next item")
+    def help_s(self) -> None:
+        print("Suggest possible matches, or manually enter one yourself")
 
     def do_q(self, arg: str) -> bool:
         self.quit_flag = True
