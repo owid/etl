@@ -39,7 +39,7 @@ def harmonize(data_file: str, column: str, output_file: str) -> None:
     If a mapping file already exists, it will resume where the mapping file left off.
     """
     t = read_table(data_file)
-    geo_column = t.reset_index()[column]
+    geo_column = t.reset_index()[column].dropna().astype("str")
 
     if Path(output_file).exists():
         print("Resuming from existing mapping...")
