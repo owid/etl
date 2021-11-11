@@ -122,7 +122,7 @@ def interactive_harmonize(
         if picker.quit_flag:
             break
 
-    print(f"\nDone! ({n_skipped} skipped)")
+    print(f"\nDone! ({len(mapping)} mapped, {n_skipped} skipped)")
 
     return mapping
 
