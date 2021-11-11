@@ -209,8 +209,15 @@ class GeoPickerCmd(cmd.Cmd):
         print("Quit and save progress so far")
 
 
-def input_bool(query: str) -> bool:
-    print(f"{query}? (y/N)")
+def input_bool(query: str, default: str = "y") -> bool:
+    if default == "y":
+        options = "(Y/n)"
+    elif default == "n":
+        options = "(y/N)"
+    else:
+        raise ValueError(f"Invalid default: {default}")
+
+    print(f"{query}? {options}")
     while True:
         c = input("> ")
         print()
@@ -219,7 +226,7 @@ def input_bool(query: str) -> bool:
 
         print("ERROR: please press y, n, or return")
 
-    return c.lower() == "y"
+    return (c.lower() or default) == "y"
 
 
 def save_alias(name: str, alias: str) -> None:
