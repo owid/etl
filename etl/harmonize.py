@@ -42,7 +42,7 @@ def harmonize(data_file: str, column: str, output_file: str) -> None:
     geo_column = cast(pd.Series, df[column].dropna().astype("str"))
 
     if Path(output_file).exists():
-        print("Resuming from existing mapping...")
+        print("Resuming from existing mapping...\n")
         with open(output_file, "r") as istream:
             mapping = json.load(istream)
     else:
@@ -68,22 +68,38 @@ def read_table(input_file: str) -> pd.DataFrame:
     return cast(pd.DataFrame, df)
 
 
-def interactive_harmonize(geo: pd.Series, mapping: Dict[str, str]) -> Dict[str, str]:
+def interactive_harmonize(
+    geo: pd.Series, mapping: Optional[Dict[str, str]] = None
+) -> Dict[str, str]:
+    mapping = mapping or {}
+
+    to_map = sorted(set(geo))
+    print(f"{len(to_map)} countries/regions to harmonize")
     mapper = CountryRegionMapper()
 
-    for region in sorted(set(geo)):
+    # do the easy cases first
+    ambiguous = []
+    for region in to_map:
         if region in mapping:
             # we did this one in a previous run
-            print_mapping(region, mapping[region])
             continue
 
         if region in mapper:
             # it's an exact match for a country/region or its known aliases
             name = mapper[region]
             mapping[region] = name
-            print_mapping(region, name)
             continue
 
+        ambiguous.append(region)
+
+    print(f"  └ {len(to_map) - len(ambiguous)} automatically matched")
+    print(f"  └ {len(ambiguous)} ambiguous countries/regions")
+    print()
+
+    print("Beginning interactive harmonization...")
+    n_skipped = 0
+    for i, region in enumerate(ambiguous, 1):
+        print(f"\n[{i}/{len(ambiguous)}] {region}")
         # no exact match, get nearby matches
         suggestions = mapper.suggestions(region)
 
@@ -95,14 +111,18 @@ def interactive_harmonize(geo: pd.Series, mapping: Dict[str, str]) -> Dict[str, 
             # we found a match or manually gave a valid one
             name = picker.match
             mapping[region] = name
-            print_mapping(region, name)
 
             if picker.save_alias:
                 # update the reference dataset to include this alias
                 save_alias(name, region)
+                print(f'Saved alias: "{region}" -> "{name}"')
+        else:
+            n_skipped += 1
 
         if picker.quit_flag:
             break
+
+    print(f"\nDone! ({n_skipped} skipped)")
 
     return mapping
 
@@ -173,7 +193,7 @@ class GeoPickerCmd(cmd.Cmd):
         self.geo = geo
         self.suggestions = suggestions
         self.valid_names = valid_names
-        print('No match found for "{}"'.format(geo))
+        print("(n) skip, (s) suggest, (q) quit")
 
     def do_n(self, arg: str) -> bool:
         # go to the next item
@@ -185,20 +205,27 @@ class GeoPickerCmd(cmd.Cmd):
     def do_s(self, arg: str) -> Optional[bool]:
         for i, s in enumerate(self.suggestions):
             print(f"{i}: {s}")
+        print("(or type a name manually)")
         choice = input("> ")
         if not choice:
             return None
 
         if choice.isdigit():
+            # it's one of the suggested options
             i = int(choice)
             self.match = self.suggestions[i]
 
-        elif choice in self.valid_names:
-            self.match = choice
-
         else:
-            print(f"{choice} is not a valid country name")
-            return None
+            # it's a manual entry, make sure it's valid
+            choice = choice.strip()
+            if choice in self.valid_names:
+                self.match = choice.strip()
+
+            else:
+                print(
+                    f"{choice} does not match a country/region from the reference set"
+                )
+                return None
 
         self.save_alias = input_bool("Save this alias")
         return True
