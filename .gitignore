@@ -16,3 +16,5 @@ data/*
 *.dot
 *.pdf
 pyrightconfig.json
+
+ign.*
