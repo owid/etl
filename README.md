@@ -36,7 +36,7 @@ The ETL is the place where several key steps can be done:
 
 - **Syntactic harmonization**: get data from institutional formats into a common OWID format with as few changes as possible
 - **Semantic harmonization**: harmonize dimension fields like country, region, gender, and others to create OWID's reference data set
-- **Remixing**: generating combined datasets and indicators, e.g. taking population from one dataset and using it to  transforming another indicator into a per-capita version
+- **Remixing**: generating combined datasets and indicators, e.g. taking population from one dataset and using it to transforming another indicator into a per-capita version
 - **Republishing** (OWID only): export OWID's reference data set for a variety of consumers
 
 ## Design principles
@@ -44,8 +44,8 @@ The ETL is the place where several key steps can be done:
 - **Dependencies listed**: all transformation steps and their dependencies are collected in a single file `dag.yml`
 - **URI style steps**: all steps have a URI style format, e.g. `data://garden/who/2021-07-01/gho`
 - **Filenames by convention**: We use convention to reduce the amount of config required
-    - `walden://<path>` steps match data snapshots in the [walden](https://github.com/owid/walden) index at `<path>`, and download the snapshots locally when executed
-    - `data://<path>` steps are defined by a Python or Jupyter notebook script in `etl/steps/data/<path>.{py,ipynb}`, and generate a new dataset in the `data/<path>` folder when executed
+  - `walden://<path>` steps match data snapshots in the [walden](https://github.com/owid/walden) index at `<path>`, and download the snapshots locally when executed
+  - `data://<path>` steps are defined by a Python or Jupyter notebook script in `etl/steps/data/<path>.{py,ipynb}`, and generate a new dataset in the `data/<path>` folder when executed
 - **Data stored outside Git**: unlike the importers repo, only tiny reference datasets and metadata is kept in git; all actual datasets are not stored and are instead regenerated on demand from the raw data in Walden
 
 ## Data formats
@@ -91,6 +91,18 @@ NOTE: Github rate-limits unauthorized API requests to 60 per hour, so we should 
 A step used to mark dependencies on HTTPS resources. The path is interpreted as an HTTPS url, and a HEAD request is made against the URL and checked for its `ETag`. This can be used to trigger a rebuild each time the resource changes.
 
 Example: `etag://raw.githubusercontent.com/owid/covid-19-data/master/public/data/owid-covid-data.csv`
+
+### Grapher (`grapher://...`)
+
+A step to load a dataset into the grapher mysql database. Similar to `data` steps the path is interpreted as the path to a python script. The job of this script is to make the input dataset fit the constrained grapher data model where we only have the exact dimensions of year and entity id. The latter is the numeric id of the entity (usually the country) and the former can also be the number of days since a reference date.
+
+The pyton script that does this re-fitting of the data for the grapher datamodel only has to reformat the data and ensure the metadata exists. Actually interfacing with the database is taken care of by the ETL library.
+
+The script you supply has to have two functions, the first of which is `get_grapher_dataset` which should return a `owid.catalog.Dataset` instance. The `.metadata.namespace` field will be used to decide what namespace to upsert this data to (or whether to create this namespace if it does not exist) and the `.metadata.short_name` field will be used to decide what dataset to upsert to (again, this will be created if no dataset with this name in this namespace exists, otherwise the existing dataset will be upserted to). `.metadata.sources` will be used to upsert the entries for the sources table.
+
+The other required function is `get_grapher_tables`. It is passed the Dataset instance created by the `get_grapher_dataset` function and should return an iterable of `owid.catalog.Table` instances that should be upserted as an entry in the variables table and then the data points in the data_values table. Every table that is yielded by this function has to adhere to the limited grapher data schema. This means that if you have e.g. a variable with dimensions `year`, `country` and `sex` with the latter having values [male, female, both] then to fit this into grapher we have to created 3 separate variables, one for every sex value. I.e. that this function would have to yield 3 Table instances with year, entityId and value.
+
+See [the GHE example](./etl/steps/grapher/who/2021-07-01/ghe.py) as an example. If you need to look at the code implementing the actual database upserts (e.g. to look up metadata fields required) they can be found [here](./etl/grapher_import.py)
 
 ## Writing a new ETL step
 
@@ -140,3 +152,11 @@ ds.save()
 ```
 
 Then run `make etl` to check that it's working correctly before fleshing out your ETL step.
+
+## Harmonizing countries
+
+An interactive country harmonizing tool is available, which can generate a country mapping file.
+
+```
+.venv/bin/harmonize <path/to/input.feather> <country-field> <path/to/output.mapping.json>
+```

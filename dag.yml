@@ -25,6 +25,8 @@ steps:
     - walden://faostat/2021-06-17/faostat_rl
   data://garden/faostat/2021-03-18/faostat_qcl:
   - data://meadow/faostat/2021-03-18/faostat_qcl
+  data://garden/faostat/2021-06-17/faostat_rl:
+    - data://meadow/faostat/2021-06-17/faostat_rl
   data://garden/explorers/2021/food_explorer:
   - data://garden/faostat/2021-03-18/faostat_qcl
   data://meadow/open_numbers/latest/bp__energy:
