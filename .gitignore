@@ -17,3 +17,4 @@ data/*
 *.pdf
 pyrightconfig.json
 .DS_Store
+ign.*

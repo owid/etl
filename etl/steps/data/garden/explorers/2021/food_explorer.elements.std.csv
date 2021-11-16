@@ -1,0 +1,16 @@
+code,name,unit,unit_description,number_occurrences,name_standardised,unit_name_standardised_with_conversion,unit_factor
+5114,Stocks,No,number,6085,,,
+5422,Yield,hg,hectogram,8857,,,
+5513,Production,1000 No,thousand number,13174,,,
+5313,Laying,1000 Head,thousand head,23081,,,
+5410,Yield,100mg/An,100 milligrams per animal,23088,Yield,kg/animal,1.00E-04
+5424,Yield/Carcass Weight,0.1g/An,0.1 grams per animal,34674,Yield,kg/animal,1.00E-04
+5321,Producing Animals/Slaughtered,1000 Head,thousand head,35354,,,
+5112,Stocks,1000 Head,thousand head,36311,,,
+5420,Yield,hg/An,hectograms per animal,63705,Yield,kg/animal,1.00E-01
+5417,Yield/Carcass Weight,hg/An,hectograms per animal,69432,Yield,kg/animal,1.00E-01
+5111,Stocks,Head,head,86112,,,
+5320,Producing Animals/Slaughtered,Head,head,149439,,,
+5419,Yield,hg/ha,hectograms per hectare,534847,Yield,tonnes/ha,1.00E-04
+5312,Area harvested,ha,hectares,539828,Area harvested,ha,1
+5510,Production,tonnes,tonnes,996973,Production,tonnes,1

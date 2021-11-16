@@ -1,0 +1,304 @@
+code,name,type,number_occurences,name_standardised
+800,Agave fibres nes,,484,
+221,"Almonds, with shell",,2450,Almonds
+711,"Anise, badian, fennel, coriander",,2250,Herbs (e.g. fennel)
+515,Apples,,4779,Apples
+526,Apricots,,3550,Apricots
+226,Areca nuts,,745,Areca nuts
+366,Artichokes,,1816,Artichokes
+367,Asparagus,,2427,Asparagus
+1107,Asses,,6657,Asses
+572,Avocados,,3967,Avocados
+203,Bambara beans,,361,
+486,Bananas,,7472,Bananas
+44,Barley,,5273,Barley
+782,"Bastfibres, other",,1266,
+176,"Beans, dry",,6639,"Beans, dry"
+414,"Beans, green",,5815,"Beans, green"
+1806,Beef and Buffalo Meat,Group,10735,Beef and Buffalo Meat
+1181,Beehives,,6290,Beehives
+51,Beer of barley,,8619,
+1183,Beeswax,,3089,Beeswax
+558,Berries nes,,3012,
+552,Blueberries,,1464,Blueberries
+216,"Brazil nuts, with shell",,306,"Brazil nuts, with shell"
+181,"Broad beans, horse beans, dry",,3285,Broad beans
+89,Buckwheat,,1397,Buckwheat
+946,Buffaloes,,2367,Buffaloes
+1811,Butter and Ghee,Group,6163,Butter and Ghee
+983,"Butter and ghee, sheep milk",,638,
+952,"Butter, buffalo milk",,351,
+886,"Butter, cow milk",,5757,
+1022,"Butter, goat milk",,29,
+358,Cabbages and other brassicas,,7873,Cabbages
+1157,"Camelids, other",,118,
+1126,Camels,,2391,Camels
+101,Canary seed,,689,Canary seed
+461,Carobs,,845,
+426,Carrots and turnips,,6686,Carrots and turnips
+217,"Cashew nuts, with shell",,1945,Cashew nuts
+591,Cashewapple,,236,
+125,Cassava,,5916,Cassava
+265,Castor oil seed,,2472,Castor oil seed
+866,Cattle,,10706,Cattle
+1746,Cattle and Buffaloes,Group,10676,Cattle and Buffaloes
+393,Cauliflowers and broccoli,,5012,Cauliflowers and broccoli
+108,Cereals nes,,3110,Other cereals
+1717,"Cereals, Total",Group,9869,Cereals
+1745,Cheese (All Kinds),Group,5380,Cheese
+955,"Cheese, buffalo milk",,225,
+1021,"Cheese, goat milk",,1835,
+984,"Cheese, sheep milk",,1990,
+904,"Cheese, skimmed cow milk",,2255,
+901,"Cheese, whole cow milk",,4626,
+531,Cherries,,3196,Cherries
+530,"Cherries, sour",,1542,
+220,Chestnut,,1550,Chestnut
+191,Chick peas,,3022,Chickpeas
+1057,Chickens,,10893,Chickens
+459,Chicory roots,,901,
+689,"Chillies and peppers, dry",,3835,"Chillies and peppers, dry"
+401,"Chillies and peppers, green",,6435,"Chillies and peppers, green"
+693,Cinnamon (cannella),,661,
+1804,"Citrus Fruit, Total",Group,7917,Citrus Fruit
+698,Cloves,,641,
+661,"Cocoa, beans",,3678,Cocoa beans
+249,Coconuts,,5341,Coconuts
+656,"Coffee, green",,4939,"Coffee, green"
+813,Coir,,478,
+767,Cotton lint,,5363,Cotton
+329,Cottonseed,,5387,Cottonseed
+195,"Cow peas, dry",,2188,Cow peas
+554,Cranberries,,652,Cranberries
+885,Cream fresh,,3221,Cream
+397,Cucumbers and gherkins,,6926,Cucumbers and gherkins
+550,Currants,,1767,Currants
+577,Dates,,2210,Dates
+1068,Ducks,,5261,Ducks
+399,Eggplants (aubergines),,4803,Eggplants
+1783,Eggs Primary,Group,10869,Eggs
+1062,"Eggs, hen, in shell",,10875,Hen eggs
+1067,"Eggs, hen, in shell (number)",,10880,Number of hen eggs
+1091,"Eggs, other bird, in shell",,2504,Eggs from other birds
+1092,"Eggs, other bird, in shell (number)",,2458,Number of eggs from other birds
+1816,Evaporat&Condensed Milk,Group,3741,
+949,"Fat, buffaloes",,898,"Fat, buffaloes"
+1129,"Fat, camels",,1071,"Fat, camels"
+869,"Fat, cattle",,5581,"Fat, cattle"
+1019,"Fat, goats",,5041,"Fat, goats"
+1037,"Fat, pigs",,5132,"Fat, pigs"
+979,"Fat, sheep",,5146,"Fat, sheep"
+821,Fibre crops nes,,1603,
+1753,Fibre Crops Primary,Group,7215,Fibre crops
+569,Figs,,2735,
+773,Flax fibre and tow,,1729,Flax fibre
+94,Fonio,,590,
+1738,Fruit Primary,Group,10909,Fruit
+512,"Fruit, citrus nes",,4042,
+619,"Fruit, fresh nes",,9130,
+542,"Fruit, pome nes",,114,
+541,"Fruit, stone nes",,1948,
+603,"Fruit, tropical fresh nes",,4448,
+406,Garlic,,4984,Garlic
+1072,Geese and guinea fowls,,2818,Geese and guinea fowls
+953,"Ghee, buffalo milk",,268,"Ghee, buffalo milk"
+887,"Ghee, butteroil of cow milk",,1026,"Ghee, butteroil of cow milk"
+720,Ginger,,2248,
+1016,Goats,,10331,Goats
+549,Gooseberries,,940,
+103,"Grain, mixed",,1391,Mixed grains
+507,Grapefruit (inc. pomelos),,4613,Grapefruit
+560,Grapes,,4684,Grapes
+242,"Groundnuts, with shell",,6651,Groundnuts
+839,"Gums, natural",,106,
+225,"Hazelnuts, with shell",,1512,Hazelnuts
+777,Hemp tow waste,,1350,
+336,Hempseed,,858,Hempseed
+957,"Hides, buffalo, fresh",,1738,Buffalo hides
+919,"Hides, cattle, fresh",,10681,Cattle hides
+1182,"Honey, natural",,6957,Honey
+677,Hops,,1627,
+1096,Horses,,8974,Horses
+277,Jojoba seed,,59,
+780,Jute,,1131,Jute
+778,Kapok fibre,,106,
+310,Kapok fruit,,118,
+311,Kapokseed in shell,,106,
+263,Karite nuts (sheanuts),,439,Karite nuts
+592,Kiwi fruit,,975,Kiwi
+224,Kola nuts,,385,Kola nuts
+1043,Lard,,4237,
+407,"Leeks, other alliaceous vegetables",,2668,Leeks
+497,Lemons and limes,,6223,Lemons and limes
+201,Lentils,,2874,Lentils
+372,Lettuce and chicory,,5627,Lettuce
+333,Linseed,,2949,Linseed
+210,Lupins,,1357,
+56,Maize,,8961,Maize
+446,"Maize, green",,2697,Green maize
+571,"Mangoes, mangosteens, guavas",,5851,Mangoes
+809,Manila fibre (abaca),,381,
+1242,"Margarine, short",,4731,Margarine
+671,Maté,,222,
+1166,Meat nes,,2858,Other meats
+1108,"Meat, ass",,507,"Meat, ass"
+1089,"Meat, bird nes",,639,"Meat, other birds"
+947,"Meat, buffalo",,1714,"Meat, buffalo"
+1127,"Meat, camel",,1949,"Meat, camel"
+867,"Meat, cattle",,10735,"Meat, cattle"
+1058,"Meat, chicken",,10883,"Meat, chicken"
+1069,"Meat, duck",,4604,"Meat, duck"
+1163,"Meat, game",,3390,"Meat, game"
+1017,"Meat, goat",,9717,"Meat, goat"
+1073,"Meat, goose and guinea fowl",,2300,"Meat, goose and guinea fowl"
+1097,"Meat, horse",,4230,"Meat, horse"
+1111,"Meat, mule",,120,"Meat, mule"
+1158,"Meat, other camelids",,118,"Meat, other camelids"
+1151,"Meat, other rodents",,118,"Meat, other rodents"
+1035,"Meat, pig",,9926,"Meat, pig"
+1808,"Meat, Poultry",Group,10883,"Meat, Poultry"
+1141,"Meat, rabbit",,3034,"Meat, rabbit"
+977,"Meat, sheep",,9910,"Meat, sheep"
+1765,"Meat, Total",Group,11055,"Meat, Total"
+1080,"Meat, turkey",,3753,"Meat, turkey"
+568,"Melons, other (inc.cantaloupes)",,5343,Melon
+299,Melonseed,,1088,Melonseed
+899,"Milk, dry buttermilk",,595,
+896,"Milk, skimmed condensed",,597,
+888,"Milk, skimmed cow",,6382,
+898,"Milk, skimmed dried",,2704,
+895,"Milk, skimmed evaporated",,288,
+1780,"Milk, Total",Group,10323,"Milk, excluding butter"
+889,"Milk, whole condensed",,2639,
+897,"Milk, whole dried",,2926,
+894,"Milk, whole evaporated",,3158,
+951,"Milk, whole fresh buffalo",,1339,
+1130,"Milk, whole fresh camel",,1357,
+882,"Milk, whole fresh cow",,10234,
+1020,"Milk, whole fresh goat",,5500,
+982,"Milk, whole fresh sheep",,4016,
+79,Millet,,4610,Millet
+165,Molasses,,7259,Molasses
+1110,Mules,,4512,
+449,Mushrooms and truffles,,3347,Mushrooms
+292,Mustard seed,,1383,Mustard seed
+702,"Nutmeg, mace and cardamoms",,1320,
+234,Nuts nes,,3961,
+75,Oats,,3824,Oats
+948,"Offals, edible, buffaloes",,898,"Offals, buffaloes"
+1128,"Offals, edible, camels",,1127,"Offals, camels"
+868,"Offals, edible, cattle",,5581,"Offals, cattle"
+1018,"Offals, edible, goats",,5041,"Offals, goats"
+1098,"Offals, horses",,2312,"Offals, horses"
+1036,"Offals, pigs, edible",,5132,"Offals, pigs"
+978,"Offals, sheep,edible",,5146,"Offals, sheep"
+254,Oil palm fruit,,2568,Palm fruit oil
+252,"Oil, coconut (copra)",,5212,Coconut oil
+331,"Oil, cottonseed",,5391,Cottonseed oil
+244,"Oil, groundnut",,5492,Grounut oil
+334,"Oil, linseed",,3233,Linseed oil
+60,"Oil, maize",,2732,Maize oil
+261,"Oil, olive, virgin",,1762,Olive oil
+257,"Oil, palm",,2602,Palm oil
+258,"Oil, palm kernel",,3074,Palm kernel oil
+271,"Oil, rapeseed",,3020,Rapeseed oil
+281,"Oil, safflower",,963,Safflower oil
+290,"Oil, sesame",,3181,Sesame oil
+237,"Oil, soybean",,4977,Soybean oil
+268,"Oil, sunflower",,3796,Sunflower oil
+1731,Oilcrops,Group,10411,Oilcrops
+1841,"Oilcrops, Cake Equivalent",Group,10294,"Oilcrops, Cake Equivalent"
+1732,"Oilcrops, Oil Equivalent",Group,10411,"Oilcrops, Oil Equivalent"
+339,Oilseeds nes,,3348,Other oilseeds
+430,Okra,,2524,Okra
+260,Olives,,2209,Olives
+403,"Onions, dry",,7426,Onions
+402,"Onions, shallots, green",,3500,Onions
+490,Oranges,,6866,Oranges
+256,Palm kernels,,2529,Palm kernels
+600,Papayas,,3870,Papayas
+534,Peaches and nectarines,,4204,Peaches and nectarines
+521,Pears,,4476,Pears
+187,"Peas, dry",,4835,"Peas, dry"
+417,"Peas, green",,4386,"Peas, green"
+687,Pepper (piper spp.),,2506,Pepper
+748,Peppermint,,520,
+587,Persimmons,,806,
+197,Pigeon peas,,1386,Pigeon peas
+1034,Pigs,,9856,Pigs
+574,Pineapples,,5131,Pineapples
+223,Pistachios,,1082,Pistachios
+489,Plantains and others,,3125,Plantains
+536,Plums and sloes,,4356,Plums
+296,Poppy seed,,886,Poppy seeds
+116,Potatoes,,8444,Potatoes
+2029,Poultry Birds,Group,10863,Poultry
+211,Pulses nes,,6236,
+1726,"Pulses, Total",Group,9320,Pulses
+394,"Pumpkins, squash and gourds",,6342,
+754,"Pyrethrum, dried",,687,
+523,Quinces,,2533,
+92,Quinoa,,194,Quinoa
+1140,Rabbits and hares,,3329,Rabbits
+788,Ramie,,437,
+270,Rapeseed,,3046,Rapeseed
+547,Raspberries,,2064,Raspberries
+27,"Rice, paddy",,6952,Rice
+30,"Rice, paddy (rice milled equivalent)",,6952,Rice (milled equivalent)
+1150,"Rodents, other",,118,
+149,Roots and tubers nes,,4684,
+1720,"Roots and Tubers, Total",Group,10872,Roots and tubers
+836,"Rubber, natural",,2025,Rubber
+71,Rye,,2992,Rye
+280,Safflower seed,,1181,Safflower seed
+328,Seed cotton,,5516,Seed cotton
+289,Sesame seed,,4153,Sesame seed
+976,Sheep,,9879,Sheep meat
+1807,Sheep and Goat Meat,Group,10470,Sheep and goat meat
+1749,Sheep and Goats,Group,10478,Sheep and goats
+1185,"Silk-worm cocoons, reelable",,1680,
+1186,"Silk, raw",,1521,Silk
+789,Sisal,,1456,
+1809,"Skim Milk&Buttermilk,Dry",Group,2878,
+1025,"Skins, goat, fresh",,9661,"Skins, goat"
+995,"Skins, sheep, fresh",,9826,"Skins, sheep"
+1176,"Snails, not sea",,147,
+83,Sorghum,,6268,Sorghum
+236,Soybeans,,4993,Soybeans
+723,Spices nes,,4080,
+373,Spinach,,3413,Spinach
+544,Strawberries,,3748,Strawberries
+423,String beans,,1199,String beans
+157,Sugar beet,,3194,Sugar beet
+156,Sugar cane,,6249,Sugar cane
+161,Sugar crops nes,,206,
+1723,Sugar Crops Primary,Group,8222,Sugar crops
+162,Sugar Raw Centrifugal,,7289,Sugar (raw)
+267,Sunflower seed,,3610,Sunflower seed
+122,Sweet potatoes,,6839,Sweet potatoes
+1225,Tallow,,3448,
+305,Tallowtree seed,,59,
+495,"Tangerines, mandarins, clementines, satsumas",,4067,Tangerines
+136,Taro (cocoyam),,2996,
+667,Tea,,2698,Tea
+826,"Tobacco, unmanufactured",,7422,Tobacco
+388,Tomatoes,,9139,Tomatoes
+1729,"Treenuts, Total",Group,5977,Treenuts
+97,Triticale,,1639,
+275,Tung nuts,,397,
+1079,Turkeys,,4310,Turkeys
+692,Vanilla,,1080,
+1735,Vegetables Primary,Group,10850,Vegetables
+463,"Vegetables, fresh nes",,10731,
+420,"Vegetables, leguminous nes",,3181,
+205,Vetches,,1944,
+222,"Walnuts, with shell",,2770,Walnuts
+567,Watermelons,,6336,Watermelons
+15,Wheat,,6442,Wheat
+890,"Whey, condensed",,758,
+900,"Whey, dry",,1872,Whey
+564,Wine,,3305,Wine
+987,"Wool, greasy",,4883,Wool
+137,Yams,,3408,Yams
+135,Yautia (cocoyam),,814,
+891,Yoghurt,,804,Yoghurt
