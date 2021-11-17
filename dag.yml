@@ -235,3 +235,5 @@ steps:
     - walden://wpp/2019/standard_projections
   grapher://who/2021-07-01/ghe:
     - data://garden/who/2021-07-01/ghe
+  data://meadow/un_sdg/2021-09-30/un_sdg:
+    - walden://un_sdg/2021-09-30/un_sdg
