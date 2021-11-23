@@ -240,5 +240,7 @@ steps:
     - walden://wpp/2019/standard_projections
   grapher://who/2021-07-01/ghe:
     - data://garden/who/2021-07-01/ghe
-  data://meadow/living_planet/2021-09-10/lpd:
+  data://meadow/living_planet/2020-09-10/lpd:
     - walden://living_planet/2020-09-10/lpd
+  data://garden/living_planet/2020-09-10/lpd:
+    - data://meadow/living_planet/2020-09-10/lpd
