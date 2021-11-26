@@ -1,16 +1,16 @@
 code,name,unit,unit_description,number_occurrences,Dataset,name_standardised,unit_name_standardised_with_conversion,unit_factor
 5312,Area harvested,ha,hectares,539828,QCL,Area harvested,ha,1
-5301,Domestic supply quantity,1000 tonnes,thousand tonnes,1043347,FBSC,Domestic supply,1000_tonnes,1
-5911,Export Quantity,1000 tonnes,thousand tonnes,842139,FBSC,Exports,1000_tonnes,1
+5301,Domestic supply quantity,1000 tonnes,thousand tonnes,1043347,FBSC,Domestic supply,tonnes,1.00E+03
+5911,Export Quantity,1000 tonnes,thousand tonnes,842139,FBSC,Exports,tonnes,1.00E+03
 684,Fat supply quantity (g/capita/day),g/capita/day,grams per capita per day,866317,FBSC,Food available for consumption,fat_g_per_day_per_capita,1
-5521,Feed,1000 tonnes,thousand tonnes,219816,FBSC,Feed,1000_tonnes,1
-5142,Food,1000 tonnes,thousand tonnes,966295,FBSC,Food,1000_tonnes,1
+5521,Feed,1000 tonnes,thousand tonnes,219816,FBSC,Feed,tonnes,1.00E+03
+5142,Food,1000 tonnes,thousand tonnes,966295,FBSC,Food,tonnes,1.00E+03
 664,Food supply (kcal/capita/day),kcal/capita/day,kilocalorie per capita per day,1005702,FBSC,Food available for consumption,kcal_per_day_per_capita,1
 645,Food supply quantity (kg/capita/yr),kg,kilograms,966185,FBSC,Food available for consumption,kg,1
-5611,Import Quantity,1000 tonnes,thousand tonnes,1008063,FBSC,Imports,1000_tonnes,1
+5611,Import Quantity,1000 tonnes,thousand tonnes,1008063,FBSC,Imports,tonnes,1.00E+03
 5313,Laying,1000 Head,thousand head,23081,QCL,,,
-5123,Losses,1000 tonnes,thousand tonnes,339465,FBSC,Waste,1000_tonnes,1
-5154,Other uses (non-food),1000 tonnes,thousand tonnes,418035,FBSC,Other uses,1000_tonnes,1
+5123,Losses,1000 tonnes,thousand tonnes,339465,FBSC,Waste,tonnes,1.00E+03
+5154,Other uses (non-food),1000 tonnes,thousand tonnes,418035,FBSC,Other uses,tonnes,1.00E+03
 5131,Processing,1000 tonnes,thousand tonnes,199001,FBSC,,,
 5321,Producing Animals/Slaughtered,1000 Head,thousand head,35354,QCL,,,
 5320,Producing Animals/Slaughtered,Head,head,149439,QCL,,,
