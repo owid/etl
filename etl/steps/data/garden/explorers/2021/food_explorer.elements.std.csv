@@ -6,7 +6,7 @@ code,name,unit,unit_description,number_occurrences,Dataset,name_standardised,uni
 5521,Feed,1000 tonnes,thousand tonnes,219816,FBSC,Feed,tonnes,1.00E+03
 5142,Food,1000 tonnes,thousand tonnes,966295,FBSC,Food,tonnes,1.00E+03
 664,Food supply (kcal/capita/day),kcal/capita/day,kilocalorie per capita per day,1005702,FBSC,Food available for consumption,kcal_per_day_per_capita,1
-645,Food supply quantity (kg/capita/yr),kg,kilograms,966185,FBSC,Food available for consumption,kg,1
+645,Food supply quantity (kg/capita/yr),kg,kilograms,966185,FBSC,Food available for consumption,kg_per_capita_per_year,1
 5611,Import Quantity,1000 tonnes,thousand tonnes,1008063,FBSC,Imports,tonnes,1.00E+03
 5313,Laying,1000 Head,thousand head,23081,QCL,,,
 5123,Losses,1000 tonnes,thousand tonnes,339465,FBSC,Waste,tonnes,1.00E+03
