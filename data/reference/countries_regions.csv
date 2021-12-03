@@ -233,7 +233,7 @@ ESP,Spain,ES,ESP,184.0,SPN,230.0,,SP,SPAN,ESP,ESP,http://www.wikidata.org/entity
 LKA,Sri Lanka,LK,LKA,524.0,SRI,780.0,SRL,CE,SRLK,LKA,LKA,http://www.wikidata.org/entity/Q854,Sri Lanka,141.0,681.0,,
 SDN,Sudan,SD,SDN,732.0,SUD,625.0,SUD,SJ,,SDN,SDN,http://www.wikidata.org/entity/Q1049,Sudan,79.0,739.0,,
 SUR,Suriname,SR,SUR,366.0,SUR,115.0,SUR,SR,SRNM,SUR,SUR,http://www.wikidata.org/entity/Q730,Suriname,234.0,752.0,,
-SJM,Svalbard and Jan Mayen,SJ,SJM,,,,,,,,,http://www.wikidata.org/entity/Q842829,Svalbard and Jan Mayen,298.0,808.0,,
+SJM,Svalbard and Jan Mayen,SJ,SJM,,,,,,,,,http://www.wikidata.org/entity/Q842829,Svalbard and Jan Mayen,298.0,808.0,,"[""Svalbard and Jan Mayen Islands""]"
 SWE,Sweden,SE,SWE,144.0,SWD,380.0,,SW,SWDN,SWE,SWE,http://www.wikidata.org/entity/Q34,Sweden,10.0,755.0,,
 CHE,Switzerland,CH,CHE,146.0,SWZ,225.0,,SZ,SWTZ,CHE,CHE,http://www.wikidata.org/entity/Q39,Switzerland,7.0,597.0,,
 SYR,Syria,SY,SYR,463.0,SYR,652.0,SYR,SY,SYRA,SYR,SYR,http://www.wikidata.org/entity/Q858,Syria,77.0,758.0,,"[""Syrian Arab Republic""]"
