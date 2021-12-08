@@ -148,7 +148,7 @@ code,name,type,number_occurences,dataset,name_standardised,Description
 1016,Goats,,10331,QCL,Goats,"Capra spp.. See 866. Includes Hircus, Ibex, Nubiana, Pyrenaica, Tibetana, Kashmir and Angora."
 549,Gooseberries,,940,QCL,,"Ribes grossularia. Trade data may sometimes include black, white or red currants."
 103,"Grain, mixed",,1391,QCL,Mixed grains,"A mixture of cereal species that are sown and harvested together. The mixture wheat/rye is known as meslin, but in trade is usually classified with wheat."
-2901,Grand Total,Group,9513,FBSC,,
+2901,Grand Total,Group,9513,FBSC,Total,
 507,Grapefruit (inc. pomelos),,4613,QCL,Grapefruit,Citrus maxima; C. grandis; C. paradisi.
 2613,Grapefruit and products,,8854,FBSC,Grapefruit,"Default composition: 507 Grapefruit (inc. pomelos), 509 Juice, grapefruit, 510 Juice, grapefruit, concentrated"
 560,Grapes,,4684,QCL,Grapes,Vitis vinifera. Includes both table and wine grapes.
