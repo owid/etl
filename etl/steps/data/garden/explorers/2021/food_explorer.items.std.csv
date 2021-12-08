@@ -148,7 +148,7 @@ code,name,type,number_occurences,dataset,name_standardised,Description
 1016,Goats,,10331,QCL,Goats,"Capra spp.. See 866. Includes Hircus, Ibex, Nubiana, Pyrenaica, Tibetana, Kashmir and Angora."
 549,Gooseberries,,940,QCL,,"Ribes grossularia. Trade data may sometimes include black, white or red currants."
 103,"Grain, mixed",,1391,QCL,Mixed grains,"A mixture of cereal species that are sown and harvested together. The mixture wheat/rye is known as meslin, but in trade is usually classified with wheat."
-2901,Grand Total,Group,9513,FBSC,,
+2901,Grand Total,Group,9513,FBSC,Total,
 507,Grapefruit (inc. pomelos),,4613,QCL,Grapefruit,Citrus maxima; C. grandis; C. paradisi.
 2613,Grapefruit and products,,8854,FBSC,Grapefruit,"Default composition: 507 Grapefruit (inc. pomelos), 509 Juice, grapefruit, 510 Juice, grapefruit, concentrated"
 560,Grapes,,4684,QCL,Grapes,Vitis vinifera. Includes both table and wine grapes.
@@ -315,7 +315,7 @@ code,name,type,number_occurences,dataset,name_standardised,Description
 489,Plantains and others,,3125,QCL,Plantains,Musa paradisiaca. Generally known as a cooking banana. Data should be reported excluding the weight of the central stalk.
 536,Plums and sloes,,4356,QCL,Plums,"Greengage, mirabelle, damson (Prunus domestica); sloe (P. spinosa)."
 296,Poppy seed,,886,QCL,Poppy seeds,"Papaver somniferum. The source of opium, poppy seeds are also used in baking and confectionery."
-116,Potatoes,,8444,QCL,,"Solanum tuberosum Irish potato. A seasonal crop grown in temperate zones all over the world, but primarily in the northern hemisphere."
+116,Potatoes,,8444,QCL,Potatoes,"Solanum tuberosum Irish potato. A seasonal crop grown in temperate zones all over the world, but primarily in the northern hemisphere."
 2531,Potatoes and products,,9518,FBSC,Potatoes,"Default composition: 116 Potatoes, 117 Flour, potatoes, 118 Potatoes, frozen, 119 Starch, potatoes, 121 Tapioca, potatoes"
 2029,Poultry Birds,Group,10863,QCL,Poultry,
 2734,Poultry Meat,,9518,FBSC,"Meat, poultry","Default composition: 1058 Meat, chicken, 1060 Fat, liver prepared (foie gras), 1061 Meat, chicken, canned, 1069 Meat, duck, 1073 Meat, goose and guinea fowl, 1080 Meat, turkey"
