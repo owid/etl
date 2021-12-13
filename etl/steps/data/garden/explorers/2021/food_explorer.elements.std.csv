@@ -9,11 +9,11 @@ code,name,unit,unit_description,number_occurrences,Dataset,name_standardised,uni
 645,Food supply quantity (kg/capita/yr),kg,kilograms,966185,FBSC,Food available for consumption,kg_per_capita_per_year,1
 5611,Import Quantity,1000 tonnes,thousand tonnes,1008063,FBSC,Imports,tonnes,1.00E+03
 5313,Laying,1000 Head,thousand head,23081,QCL,,,
-5123,Losses,1000 tonnes,thousand tonnes,339465,FBSC,Waste,tonnes,1.00E+03
+5123,Losses,1000 tonnes,thousand tonnes,339465,FBSC,Waste in Supply Chain,tonnes,1.00E+03
 5154,Other uses (non-food),1000 tonnes,thousand tonnes,418035,FBSC,Other uses,tonnes,1.00E+03
 5131,Processing,1000 tonnes,thousand tonnes,199001,FBSC,,,
-5321,Producing Animals/Slaughtered,1000 Head,thousand head,35354,QCL,,,
-5320,Producing Animals/Slaughtered,Head,head,149439,QCL,,,
+5321,Producing Animals/Slaughtered,1000 Head,thousand head,35354,QCL,Producing or slaughtered animals,animals,1000
+5320,Producing Animals/Slaughtered,Head,head,149439,QCL,Producing or slaughtered animals,animals,1
 5513,Production,1000 No,thousand number,13174,QCL,,,
 5510,Production,tonnes,tonnes,996973,QCL,Production,tonnes,1
 5511,Production,1000 tonnes,thousand tonnes,683798,FBSC,,,
