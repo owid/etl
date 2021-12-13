@@ -77,8 +77,8 @@ code,name,type,number_occurences,dataset,name_standardised,Description
 191,Chick peas,,3022,QCL,Chickpeas,"Chickpea, Bengal gram, garbanzos (Cicer arietinum)."
 1057,Chickens,,10893,QCL,Chickens,Fowl (Gallus domesticus); Guinea fowl (Numida meleagris. Domesticated birds only. Data are expressed in thousands.
 459,Chicory roots,,901,QCL,,Horium intybus; C. sativum. Unroasted chicory roots.
-689,"Chillies and peppers, dry",,3835,QCL,"Chillies and peppers, dry","Red and cayenne pepper, paprika, chillies (Capsicum frutescens; C. annuum); allspice, Jamaica pepper (Pimenta officinalis). Uncrushed or unground fresh pimentos are considered to be vegetables."
-401,"Chillies and peppers, green",,6435,QCL,"Chillies and peppers, green","Capsicum annuum; C. fructescens; Pimenta officinalis. Production data exclude crops cultivated explicitly as spices. In contrast, trade data include these crops, provided they are fresh, uncrushed and unground."
+689,"Chillies and peppers, dry",,3835,QCL,"Chillies and peppers","Red and cayenne pepper, paprika, chillies (Capsicum frutescens; C. annuum); allspice, Jamaica pepper (Pimenta officinalis). Uncrushed or unground fresh pimentos are considered to be vegetables."
+401,"Chillies and peppers, green",,6435,QCL,,"Capsicum annuum; C. fructescens; Pimenta officinalis. Production data exclude crops cultivated explicitly as spices. In contrast, trade data include these crops, provided they are fresh, uncrushed and unground."
 693,Cinnamon (cannella),,661,QCL,,"Ceylon cinnamon (Cinnamomum zeylanicum); Chinese, common cinnamon, cassia (C. cassia). The inner bark of young branches of certain trees of the Laurus family. Includes cinnamon- tree flowers, cinnamon fruit and cinnamon waste (chips), whether whole, crushed or ground."
 1804,"Citrus Fruit, Total",Group,7917,QCL,Citrus Fruit,
 2614,"Citrus, Other",,8725,FBSC,,"Default composition: 512 Fruit, citrus nes, 513 Juice, citrus, single strength, 514 Juice, citrus, concentrated"
@@ -209,8 +209,8 @@ code,name,type,number_occurences,dataset,name_standardised,Description
 1097,"Meat, horse",,4230,QCL,"Meat, horse","Fresh, chilled or frozen."
 1111,"Meat, mule",,120,QCL,"Meat, mule","Fresh, chilled or frozen."
 2735,"Meat, Other",,9518,FBSC,,"Default composition: 1089 Meat, bird nes, 1097 Meat, horse, 1108 Meat, ass, 1111 Meat, mule, 1127 Meat, camel, 1141 Meat, rabbit, 1151 Meat, other rodents, 1158 Meat, other camelids, 1163 Meat, game, 1164 Meat, dried nes, 1166 Meat, nes, 1172 Meat, nes, preparations, 1176 Snails, not sea"
-1158,"Meat, other camelids",,118,QCL,"Meat, other camelids","Fresh, chilled or frozen."
-1151,"Meat, other rodents",,118,QCL,"Meat, other rodents","Fresh, chilled or frozen."
+1158,"Meat, other camelids",,118,QCL,,"Fresh, chilled or frozen."
+1151,"Meat, other rodents",,118,QCL,,"Fresh, chilled or frozen."
 1035,"Meat, pig",,9926,QCL,"Meat, pig","Meat, with the bone in, of domestic or wild pigs (e.g. wild boars),whether fresh, chilled or frozen."
 1808,"Meat, Poultry",Group,10883,QCL,"Meat, poultry",
 1141,"Meat, rabbit",,3034,QCL,"Meat, rabbit","Fresh, chilled or frozen. May include hare meat."
@@ -307,7 +307,7 @@ code,name,type,number_occurences,dataset,name_standardised,Description
 197,Pigeon peas,,1386,QCL,Pigeon peas,"Pigeon pea, cajan pea, Congo bean (Cajanus cajan)."
 2733,Pigmeat,,9402,FBSC,Pork,"Default composition: 1035 Meat, pig, 1038 Meat, pork, 1039 Bacon and ham, 1041 Meat, pig sausages, 1042 Meat, pig, preparations"
 1034,Pigs,,9856,QCL,Pigs,Domestic pig (Sus domestica); wild boar (Sus scrofa). See 866. Excludes non-domesticated wild boars.
-2641,Pimento,,8809,FBSC,"Chillies and peppers, dry","Default composition: 689 Chillies and peppers, dry"
+2641,Pimento,,8809,FBSC,"Chillies and peppers","Default composition: 689 Chillies and peppers, dry"
 574,Pineapples,,5131,QCL,,Ananas comosus; A. sativ. Trade figures may include dried pineapples.
 2618,Pineapples and products,,9212,FBSC,Pineapples,"Default composition: 574 Pineapples, 575 Pineapples canned, 576 Juice, pineapple, 580 Juice, pineapple, concentrated"
 223,Pistachios,,1082,QCL,Pistachios,Pistacia vera. Produced mainly in the Near East and the United States.
