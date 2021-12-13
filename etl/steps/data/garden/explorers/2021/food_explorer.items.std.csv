@@ -35,7 +35,7 @@ code,name,type,number_occurences,dataset,name_standardised,Description
 2658,"Beverages, Alcoholic",,9518,FBSC,,"Default composition: 634 Beverages, distilled alcoholic"
 2657,"Beverages, Fermented",,9040,FBSC,,"Default composition: 26 Beverages, fermented wheat, 39 Beverages, fermented rice, 66 Beer of maize, 82 Beer of millet, 86 Beer of sorghum, 517 Cider etc"
 552,Blueberries,,1464,QCL,Blueberries,"European blueberry, wild bilberry, whortleberry (Vaccinium myrtillus); American blueberry (V. corymbosum). Trade data may include cranberries, myrtle berries and other fruits of the genus Vaccinium."
-2731,Bovine Meat,,9518,FBSC,,"Default composition: 867 Meat, cattle, 870 Meat, cattle, boneless (beef & veal), 872 Meat, beef, dried, salted, smoked, 873 Meat, extracts, 874 Meat, beef and veal sausages, 875 Meat, beef, preparations, 876 Meat, beef, canned, 877 Meat, homogenized preparations, 947 Meat, buffalo"
+2731,Bovine Meat,,9518,FBSC,"Meat, beef","Default composition: 867 Meat, cattle, 870 Meat, cattle, boneless (beef & veal), 872 Meat, beef, dried, salted, smoked, 873 Meat, extracts, 874 Meat, beef and veal sausages, 875 Meat, beef, preparations, 876 Meat, beef, canned, 877 Meat, homogenized preparations, 947 Meat, buffalo"
 216,"Brazil nuts, with shell",,306,QCL,"Brazil nuts, with shell","Brazil, Para or cream nut (Bertholletia excelsa)."
 181,"Broad beans, horse beans, dry",,3285,QCL,Broad beans,Vicia faba: horse-bean (var. equina); broad bean (var. major); field bean (var. minor).
 89,Buckwheat,,1397,QCL,Buckwheat,"Fagopyrum esculentum (Polygonaceae). A minor cereal cultivated primarily in northern regions. Buckwheat is considered a cereal, although it does not belong to the gramineous family."
@@ -128,7 +128,7 @@ code,name,type,number_occurences,dataset,name_standardised,Description
 569,Figs,,2735,QCL,,Ficus carica.
 2781,"Fish, Body Oil",,8754,FBSC,,"Default composition: 1509 Frwt Bdy Oil, 1522 Dmrs Bdy Oil, 1535 Pelg Bdy Oil, 1548 Marn Bdy Oil, 1582 Aq M Oils"
 2782,"Fish, Liver Oil",,8065,FBSC,,"Default composition: 1510 Frwt Lvr Oil, 1523 Demersal Liver Oils, 1536 Pelg Lvr Oil, 1549 Marine nes Liver Oils"
-2960,"Fish, Seafood",Group,9513,FBSC,,
+2960,"Fish, Seafood",Group,9513,FBSC,Fish and seafood,
 773,Flax fibre and tow,,1729,QCL,Flax fibre,"Broken, scutched, hackled etc. but not spun. Traditionally, FAO has used this commodity to identify production in its raw state; in reality, the primary agricultural product is the commodity 771, which can either be used for the production of fibre or for other purposes."
 94,Fonio,,590,QCL,,Digitaria spp.: fonio or findi (D. exilis); black fonio or hungry rice (D. iburua). A minor cereal of importance only in West Africa where it is eaten in place of rice during famines. The seeds are cooked by steaming the whole grain.
 2761,Freshwater Fish,,9528,FBSC,,"Default composition: 1501 Frwtr Diad F, 1502 Frwtr Fz Whl, 1503 Frwtr Fillet, 1504 Frwtr Fz Flt, 1505 Frwtr Cured, 1506 Frwtr Canned, 1507 Frwtr Pr nes, 1508 Frwtr Meals"
@@ -197,10 +197,10 @@ code,name,type,number_occurences,dataset,name_standardised,Description
 1166,Meat nes,,2858,QCL,,"Including frog legs, marine mammals, etc. Some countries includeunder this heading meats that are listed above, but which are notreported separately. Fresh, chilled or frozen."
 2768,"Meat, Aquatic Mammals",,174,FBSC,,"Default composition: 1580 Aq M Meat, 1583 Aq M Prep Ns"
 1108,"Meat, ass",,507,QCL,"Meat, ass","Fresh, chilled or frozen."
-1089,"Meat, bird nes",,639,QCL,"Meat, other birds","Fresh, chilled or frozen."
+1089,"Meat, bird nes",,639,QCL,,"Fresh, chilled or frozen."
 947,"Meat, buffalo",,1714,QCL,"Meat, buffalo","Fresh, chilled or frozen, with bone in or boneless."
 1127,"Meat, camel",,1949,QCL,"Meat, camel","Fresh, chilled or frozen."
-867,"Meat, cattle",,10735,QCL,"Meat, cattle","Meat of bovine animals, fresh, chilled or frozen, with bone in. Commontrade names are beef and veal."
+867,"Meat, cattle",,10735,QCL,,"Meat of bovine animals, fresh, chilled or frozen, with bone in. Commontrade names are beef and veal."
 1058,"Meat, chicken",,10883,QCL,"Meat, chicken","Fresh, chilled or frozen. May include all types of poultry meat ifnational statistics do not report separate data."
 1069,"Meat, duck",,4604,QCL,"Meat, duck","Fresh, chilled or frozen."
 1163,"Meat, game",,3390,QCL,"Meat, game","Meat and offals of wild animals, whether fresh, chilled or frozen."
