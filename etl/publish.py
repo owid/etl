@@ -123,10 +123,7 @@ def sync_folder(
     if delete:
         for rel_filename in existing:
             print("  DEL", rel_filename)
-            s3.delete_object(
-                Bucket=config.S3_BUCKET,
-                Key=rel_filename
-            )
+            s3.delete_object(Bucket=config.S3_BUCKET, Key=rel_filename)
 
 
 def object_md5(s3: Any, key: str, obj: Dict[str, Any]) -> Optional[str]:
