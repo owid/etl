@@ -9,7 +9,7 @@ format.
 """
 
 from pathlib import Path
-from typing import Dict, List, Tuple, cast
+from typing import Dict, List, Tuple
 import hashlib
 from owid.catalog.meta import Source
 import datetime as dt
@@ -108,7 +108,7 @@ def load_all_resources(
 
     df.set_index(primary_key, inplace=True)
 
-    return cast(pd.DataFrame, df)
+    return df
 
 
 def remap_names(

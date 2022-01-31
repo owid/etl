@@ -1,0 +1,18 @@
+steps:
+  data://examples/un_sdg/2021-09-30/un_sdg:
+    - walden://un_sdg/2021-09-30/un_sdg
+  grapher://examples/un_sdg/2021-09-30/un_sdg:
+    - data://examples/un_sdg/2021-09-30/un_sdg
+
+  grapher://examples/who/2021-07-01/ghe:
+    - data://garden/who/2021-07-01/ghe
+  data://garden/who/2021-07-01/ghe:
+    - data://meadow/who/2021-07-01/ghe
+    - data://reference
+
+  grapher://examples/faostat/2021-06-17/faostat_rl:
+    - data://garden/faostat/2021-06-17/faostat_rl
+  data://garden/faostat/2021-06-17/faostat_rl:
+    - data://meadow/faostat/2021-06-17/faostat_rl
+  data://meadow/faostat/2021-06-17/faostat_rl:
+    - walden://faostat/2021-06-17/faostat_rl
