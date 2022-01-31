@@ -6,10 +6,11 @@
 from typing import Callable, List, Any, Optional
 import time
 import sys
+from pathlib import Path
 
 import click
 
-from etl.steps import load_dag, compile_steps, DAG
+from etl.steps import load_dag, compile_steps, DAG, paths
 from etl import config
 
 
@@ -22,6 +23,7 @@ from etl import config
     "--grapher", is_flag=True, help="Publish changes to grapher (OWID staff only)"
 )
 @click.option("--exclude", help="Comma-separated patterns to exclude")
+@click.option("--dag-path", type=click.Path(exists=True), help="Path to DAG yaml file", default=paths.DAG_FILE)
 @click.argument("steps", nargs=-1)
 def main(
     steps: List[str],
@@ -29,6 +31,7 @@ def main(
     force: bool = False,
     grapher: bool = False,
     exclude: Optional[str] = None,
+    dag_path: Path = paths.DAG_FILE,
 ) -> None:
     """
     Execute all ETL steps listed in dag.yaml
@@ -37,7 +40,7 @@ def main(
         sanity_check_db_settings()
 
     # Load our graph of steps and the things they depend on
-    dag = load_dag()
+    dag = load_dag(dag_path)
 
     excludes = exclude.split(",") if exclude else []
 

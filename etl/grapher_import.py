@@ -113,6 +113,7 @@ def upsert_table(
     assert (
         len(table.columns) == 1
     ), f"Tables to be upserted must have only 1 column. Instead they have: {table.columns.names}"
+    table = table.reorder_levels(["year", "entity_id"])
     assert (
         table.index.dtypes[0] == "int"
     ), f"year must be of an integer type but was: {table.index.dtypes[0]}"

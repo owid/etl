@@ -1,0 +1,9 @@
+variables:
+  se_tot_prfl:
+    description: Proportion of children and young people achieving a minimum proficiency level in reading and mathematics (%)
+    unit: percentage
+    short_unit:
+  se_tot_gpi:
+    description: Adjusted gender parity index for achieving a minimum proficiency level in reading and mathematics (ratio)
+    unit: ratio
+    short_unit:
