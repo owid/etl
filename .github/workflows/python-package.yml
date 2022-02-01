@@ -44,6 +44,13 @@ jobs:
         run: |
           poetry install
 
+      # fix for failing MySQL in Github CI https://github.com/actions/virtual-environments/issues/4799
+      # remove after it gets fixed
+      - name: MySQL fix
+        run: |
+          sudo apt-get update
+          sudo apt-get remove mysql* && sudo apt-get install -y mysql-server libmysqlclient-dev
+
       - name: Check formatting
         run: |
           make check-formatting
