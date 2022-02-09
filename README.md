@@ -160,3 +160,4 @@ An interactive country harmonizing tool is available, which can generate a count
 ```
 .venv/bin/harmonize <path/to/input.feather> <country-field> <path/to/output.mapping.json>
 ```
+
