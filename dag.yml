@@ -15,6 +15,8 @@ steps:
     - data://meadow/hyde/2017/general_files
   data://meadow/hyde/2017/general_files:
     - walden://hyde/2017/general_files
+  data://meadow/faostat/2022-02-10/faostat_metadata:
+    - walden://faostat/2022-02-10/faostat_metadata
   data://meadow/faostat/2017-12-11/faostat_fbsh:
     - walden://faostat/2017-12-11/faostat_FBSH
   data://meadow/faostat/2021-03-18/faostat_qcl:
@@ -25,9 +27,11 @@ steps:
     - walden://faostat/2021-06-17/faostat_rl
   data://garden/faostat/2021-03-18/faostat_qcl:
     - data://meadow/faostat/2021-03-18/faostat_qcl
+    - data://meadow/faostat/2022-02-10/faostat_metadata
   data://garden/faostat/2021-04-09/faostat_fbsc:
     - data://meadow/faostat/2017-12-11/faostat_fbsh
     - data://meadow/faostat/2021-04-09/faostat_fbs
+    - data://meadow/faostat/2022-02-10/faostat_metadata
   data://garden/faostat/2021-06-17/faostat_rl:
     - data://meadow/faostat/2021-06-17/faostat_rl
   data://garden/explorers/2021/food_explorer:
