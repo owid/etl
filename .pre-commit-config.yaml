@@ -5,6 +5,15 @@ repos:
       name: format
       entry: make format
       language: system
+    - id: lint
+      name: lint
+      entry: make lint
+      language: system
+    - id: check-typing
+      name: check-typing
+      entry: make check-typing
+      language: system
+
 - repo: https://github.com/roy-ht/pre-commit-jupyter
   rev: v1.2.1
   hooks:

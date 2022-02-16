@@ -45,7 +45,7 @@ watch: .venv
 
 check-typing: .venv
 	@echo '==> Checking types'
-	.venv/bin/mypy --strict $(SRC)
+	.venv/bin/mypy $(SRC)
 
 coverage: .venv
 	@echo '==> Unit testing with coverage'
