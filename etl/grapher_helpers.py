@@ -18,7 +18,7 @@ class DatasetModel(BaseModel):
     namespace: str
 
 
-# TODO: remove if it turns out to be useless for real examples
+# TODO: remove if this turns out to be useless for real examples
 class DimensionModel(BaseModel):
     pass
 
@@ -161,5 +161,7 @@ def country_to_entity_id(country: pd.Series) -> pd.Series:
     countries_regions = reference_dataset["countries_regions"]
     country_map = countries_regions.set_index("name")["legacy_entity_id"]
     entity_id = country.map(country_map)
-    assert not (entity_id.isnull()).any(), 'Some countries are not in the reference dataset'
+    assert not (
+        entity_id.isnull()
+    ).any(), "Some countries are not in the reference dataset"
     return cast(pd.Series, entity_id.astype(int))

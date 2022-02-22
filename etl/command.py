@@ -23,7 +23,12 @@ from etl import config
     "--grapher", is_flag=True, help="Publish changes to grapher (OWID staff only)"
 )
 @click.option("--exclude", help="Comma-separated patterns to exclude")
-@click.option("--dag-path", type=click.Path(exists=True), help="Path to DAG yaml file", default=paths.DAG_FILE)
+@click.option(
+    "--dag-path",
+    type=click.Path(exists=True),
+    help="Path to DAG yaml file",
+    default=paths.DAG_FILE,
+)
 @click.argument("steps", nargs=-1)
 def main(
     steps: List[str],
