@@ -1,5 +1,0 @@
-variables:
-  Agricultural land:
-    description: "The total area of the country."
-    unit: "Area/1000 ha"
-    short_unit: "area/1000ha"
