@@ -391,7 +391,13 @@ class WaldenStep(Step):
         return True
 
     def checksum_output(self) -> str:
-        checksum: str = cast(str, self._walden_dataset.md5)
+        inputs: List[str] = [
+            self._walden_dataset.md5,
+            files.checksum_file(self._walden_dataset.index_path),
+        ]
+
+        checksum = hashlib.md5(",".join(inputs).encode("utf8")).hexdigest()
+
         if not checksum:
             raise Exception(
                 f"no md5 checksum available for walden dataset: {self.path}"
