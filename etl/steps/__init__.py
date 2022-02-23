@@ -391,8 +391,13 @@ class WaldenStep(Step):
         return True
 
     def checksum_output(self) -> str:
-        inputs: List[str] = [
+        if not self._walden_dataset.md5:
+            raise Exception(f"walden dataset is missing checksum: {self}")
+
+        inputs = [
+            # the contents of the dataset
             self._walden_dataset.md5,
+            # the metadata describing the dataset
             files.checksum_file(self._walden_dataset.index_path),
         ]
 
