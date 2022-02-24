@@ -403,10 +403,6 @@ class WaldenStep(Step):
 
         checksum = hashlib.md5(",".join(inputs).encode("utf8")).hexdigest()
 
-        if not checksum:
-            raise Exception(
-                f"no md5 checksum available for walden dataset: {self.path}"
-            )
         return checksum
 
     @property
