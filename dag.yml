@@ -15,6 +15,8 @@ steps:
     - data://meadow/hyde/2017/general_files
   data://meadow/hyde/2017/general_files:
     - walden://hyde/2017/general_files
+  data://garden/hyde/2017/baseline:
+    - data://meadow/hyde/2017/baseline
   data://meadow/faostat/2022-02-10/faostat_metadata:
     - walden://faostat/2022-02-10/faostat_metadata
   data://meadow/faostat/2017-12-11/faostat_fbsh:
