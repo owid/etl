@@ -2,8 +2,8 @@ steps:
   data://garden/owid/latest/covid:
     - etag://raw.githubusercontent.com/owid/covid-19-data/master/public/data/owid-covid-data.csv
   data://garden/owid/latest/key_indicators:
-    - data://meadow/hyde/2017/baseline
-    - data://meadow/gapminder/2019-12-10/population
+    - data://garden/hyde/2017/baseline
+    - data://garden/gapminder/2019-12-10/population
     - data://reference
   data://garden/who/2021-07-01/ghe:
     - data://meadow/who/2021-07-01/ghe
