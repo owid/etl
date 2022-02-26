@@ -1,0 +1,26 @@
+{
+  "namespace": "private",
+  "short_name": "private_test",
+  "title": "private_test",
+  "description": "testing private walden data",
+  "sources": [
+    {
+      "name": "test",
+      "description": null,
+      "url": "test",
+      "source_data_url": null,
+      "owid_data_url": "https://walden.nyc3.digitaloceanspaces.com/private/2021/private_test.csv",
+      "date_accessed": "2022-02-07",
+      "publication_date": null,
+      "publication_year": 2021
+    }
+  ],
+  "licenses": [
+    {
+      "name": null,
+      "url": "test"
+    }
+  ],
+  "is_public": false,
+  "source_checksum": "c4b820f74eb5de805c22a184c48dd232"
+}
