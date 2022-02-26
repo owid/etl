@@ -197,6 +197,15 @@ def parse_step(step_name: str, dag: Dict[str, Any]) -> "Step":
     elif step_type == "grapher":
         step = GrapherStep(path, dependencies)
 
+    elif step_type == "data-private":
+        step = DataStepPrivate(path, dependencies)
+
+    elif step_type == "walden-private":
+        step = WaldenStepPrivate(path)
+
+    elif step_type == "grapher-private":
+        step = GrapherStepPrivate(path, dependencies)
+
     else:
         raise Exception(f"no recipe for executing step: {step_name}")
 
@@ -205,6 +214,7 @@ def parse_step(step_name: str, dag: Dict[str, Any]) -> "Step":
 
 class Step(Protocol):
     path: str
+    is_public: bool = True
 
     def run(self) -> None:
         ...
@@ -574,3 +584,29 @@ class ETagStep(Step):
 
     def checksum_output(self) -> str:
         return get_etag(f"https://{self.path}")
+
+
+class DataStepPrivate(DataStep):
+    is_public = True
+
+    @staticmethod
+    def _make_dataset_private(dest_dir: str) -> None:
+        ds = catalog.Dataset(dest_dir)
+        ds.metadata.is_public = False
+        ds.save()
+
+    def _run_py(self) -> None:
+        super()._run_py()
+        self._make_dataset_private(self._dest_dir.as_posix())
+
+    def _run_notebook(self) -> None:
+        super()._run_notebook()
+        self._make_dataset_private(self._dest_dir.as_posix())
+
+
+class WaldenStepPrivate(WaldenStep):
+    is_public = True
+
+
+class GrapherStepPrivate(GrapherStep):
+    is_public = True

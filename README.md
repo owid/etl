@@ -160,3 +160,57 @@ An interactive country harmonizing tool is available, which can generate a count
 ```
 .venv/bin/harmonize <path/to/input.feather> <country-field> <path/to/output.mapping.json>
 ```
+
+## Private steps
+
+### Uploading private data to walden
+
+It is possible to upload private data to walden so that only those with S3 credentials would be able to download it.
+
+```python
+from owid.walden import Dataset
+
+local_file = 'private_test.csv'
+metadata = {
+  'name': 'private_test',
+  'short_name': 'private_test',
+  'description': 'testing private walden data',
+  'source_name': 'test',
+  'url': 'test',
+  'license_url': 'test',
+  'date_accessed': '2022-02-07',
+  'file_extension': 'csv',
+  'namespace': '_private_test',
+  'publication_year': 2021,
+}
+
+# upload the local file to Walden's cache
+dataset = Dataset.copy_and_create(local_file, metadata)
+# upload it as private file to S3
+url = dataset.upload(public=False)
+# update PUBLIC walden index with metadata
+dataset.save()
+```
+
+## Running private ETL
+
+`--private` flag rebuilds everything including private datasets
+
+```
+etl --private
+reindex
+publish --private
+```
+
+
+## Downloading from private catalog
+
+```python
+from owid import catalog
+
+# download catalog from `https://owid-catalog-private.nyc3.digitaloceanspaces.com/`
+catalog_frame = catalog.find('covid', 'owid')
+
+# download from our private catalog
+catalog_frame = catalog.find('energy', 'owid-private')
+```

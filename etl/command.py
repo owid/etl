@@ -6,6 +6,7 @@
 from typing import Callable, List, Any, Optional
 import time
 import sys
+import re
 from pathlib import Path
 
 import click
@@ -19,6 +20,7 @@ from etl import config
 @click.option(
     "--force", is_flag=True, help="Redo a step even if it appears done and up-to-date"
 )
+@click.option("--private", is_flag=True, help="Execute private steps")
 @click.option(
     "--grapher", is_flag=True, help="Publish changes to grapher (OWID staff only)"
 )
@@ -34,6 +36,7 @@ def main(
     steps: List[str],
     dry_run: bool = False,
     force: bool = False,
+    private: bool = False,
     grapher: bool = False,
     exclude: Optional[str] = None,
     dag_path: Path = paths.DAG_FILE,
@@ -55,6 +58,7 @@ def main(
         steps,
         dry_run=dry_run,
         force=force,
+        private=private,
         include_grapher=grapher,
         excludes=excludes,
     )
@@ -75,6 +79,7 @@ def run_dag(
     includes: Optional[List[str]] = None,
     dry_run: bool = False,
     force: bool = False,
+    private: bool = False,
     include_grapher: bool = False,
     excludes: Optional[List[str]] = None,
 ) -> None:
@@ -88,6 +93,10 @@ def run_dag(
     excludes = excludes or []
     if not include_grapher:
         excludes.append("grapher://")
+
+    if not private:
+        dag = _filter_private_steps(dag)
+        print("Excluding private steps...")
 
     steps = compile_steps(dag, includes, excludes)
 
@@ -112,6 +121,14 @@ def timed_run(f: Callable[[], Any]) -> float:
     start_time = time.time()
     f()
     return time.time() - start_time
+
+
+def _filter_private_steps(dag: DAG) -> DAG:
+    return {k: v for k, v in dag.items() if not _is_private_step(k)}
+
+
+def _is_private_step(step_name: str) -> bool:
+    return bool(re.findall(r".*?-private://", step_name))
 
 
 if __name__ == "__main__":
