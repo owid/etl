@@ -9,7 +9,6 @@ Adapted from Ed's importers script:
 https://github.com/owid/importers/blob/master/population/etl.py
 """
 
-from pathlib import Path
 import json
 from typing import cast
 
@@ -18,36 +17,20 @@ import pandas as pd
 from owid.catalog import Dataset, Table
 from etl.paths import DATA_DIR
 
-GAPMINDER = DATA_DIR / "meadow/gapminder/2019-12-10/population"
-HYDE = DATA_DIR / "meadow/hyde/2017/baseline"
+GAPMINDER = DATA_DIR / "garden/gapminder/2019-12-10/population"
+HYDE = DATA_DIR / "garden/hyde/2017/baseline"
 REFERENCE = DATA_DIR / "reference"
-
-COUNTRY_MAPPING = Path(__file__).with_suffix(".mapping.csv")
 
 
 def make_table() -> Table:
     t = (
         make_combined()
-        .pipe(rename_entities)
         .pipe(select_source)
         .pipe(calculate_aggregates)
         .pipe(prepare_dataset)
     )
     t.metadata.short_name = "population"
     return t
-
-
-def rename_entities(df: pd.DataFrame) -> pd.DataFrame:
-    mapping = pd.read_csv(COUNTRY_MAPPING).drop_duplicates()
-    df = df.merge(mapping, left_on="country", right_on="country", how="left")
-
-    missing = df[pd.isnull(df["owid_country"])]
-    if len(missing) > 0:
-        raise Exception(f"Missing entities in mapping: {missing.country.unique()}")
-
-    df = df.drop(columns=["country"]).rename(columns={"owid_country": "country"})
-
-    return df
 
 
 def select_source(df: pd.DataFrame) -> pd.DataFrame:
