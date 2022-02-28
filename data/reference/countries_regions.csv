@@ -55,7 +55,7 @@ CXR,Christmas Island,CX,CXR,,,,,XA,,,CXR,http://www.wikidata.org/entity/Q31063,C
 CCK,Cocos Islands,CC,CCK,,,,,XB,,,CCK,http://www.wikidata.org/entity/Q36004,Cocos (Keeling) Islands,263.0,596.0,,"[""Cocos (Keeling) Isl."", ""Cocos (Keeling) Islands""]"
 COL,Colombia,CO,COL,233.0,COL,100.0,COL,CK,CLMB,COL,COL,http://www.wikidata.org/entity/Q739,Colombia,170.0,605.0,,
 COM,Comoros,KM,COM,632.0,COM,581.0,COI,CQ,CMRS,COM,COM,http://www.wikidata.org/entity/Q970,Comoros,169.0,606.0,,
-COG,Congo,CG,COG,634.0,CON,484.0,PRC,CF,CNGO,,COG,http://www.wikidata.org/entity/Q971,Republic of the Congo,168.0,603.0,,
+COG,Congo,CG,COG,634.0,CON,484.0,PRC,CF,CNGO,,COG,http://www.wikidata.org/entity/Q971,Republic of the Congo,168.0,603.0,,"[""Congo, Rep.""]"
 COK,Cook Islands,CK,COK,815.0,,,CKI,CW,,COK,COK,http://www.wikidata.org/entity/Q26988,Cook Islands,199.0,604.0,,
 CRI,Costa Rica,CR,CRI,238.0,COS,94.0,COS,CR,CRCA,CRI,CRI,http://www.wikidata.org/entity/Q800,Costa Rica,166.0,608.0,,
 CIV,Cote d'Ivoire,CI,CIV,662.0,CDI,437.0,IVC,IV,IVCT,CIV,CIV,http://www.wikidata.org/entity/Q1008,Ivory Coast,143.0,600.0,,"[""C\u00c3\u00b4te D'Ivoire"", ""C\u00f4te d'Ivoire""]"
@@ -63,9 +63,9 @@ HRV,Croatia,HR,HRV,960.0,CRO,344.0,CRO,CI,,HRV,HRV,http://www.wikidata.org/entit
 CUB,Cuba,CU,CUB,928.0,CUB,40.0,CUB,CU,CUBA,CUB,CUB,http://www.wikidata.org/entity/Q241,Cuba,164.0,609.0,,
 CUW,Curacao,CW,CUW,,,,,,,,,http://www.wikidata.org/entity/Q25279,Curaçao,279.0,797.0,,"[""Cura\u00c3\u00a7ao"", ""Cura\u00e7ao""]"
 CYP,Cyprus,CY,CYP,423.0,CYP,352.0,CYP,CY,CYPR,CYP,CYP,http://www.wikidata.org/entity/Q229,Cyprus,163.0,612.0,,
-CZE,Czechia,CZ,CZE,935.0,CZR,316.0,CZE,XR,,CZE,CZE,http://www.wikidata.org/entity/Q213,Czech Republic,162.0,613.0,,"[""Czech Rep.""]"
+CZE,Czechia,CZ,CZE,935.0,CZR,316.0,CZE,XR,,CZE,CZE,http://www.wikidata.org/entity/Q213,Czech Republic,162.0,613.0,,"[""Czech Rep."", ""Czech Republic""]"
 OWID_CZS,Czechoslovakia,,,,CZE,315.0,,,,,,,,267.0,823.0,,
-COD,Democratic Republic of Congo,CD,COD,636.0,DRC,490.0,ZAI,CG,ZAIR,,ZAR,http://www.wikidata.org/entity/Q974,Democratic Republic of the Congo,167.0,602.0,,"[""Congo, The Democratic Republic Of The"", ""Democratic Republic of the Congo"", ""Zaire/ Congo , Dem. Rep.""]"
+COD,Democratic Republic of Congo,CD,COD,636.0,DRC,490.0,ZAI,CG,ZAIR,,ZAR,http://www.wikidata.org/entity/Q974,Democratic Republic of the Congo,167.0,602.0,,"[""Congo, Dem. Rep."", ""Congo, The Democratic Republic Of The"", ""Democratic Republic of the Congo"", ""Zaire/ Congo , Dem. Rep.""]"
 DNK,Denmark,DK,DNK,128.0,DEN,390.0,,DK,DNMK,DNK,DNK,http://www.wikidata.org/entity/Q35,Denmark,161.0,617.0,,
 DJI,Djibouti,DJ,DJI,611.0,DJI,522.0,DJI,FT,,DJI,DJI,http://www.wikidata.org/entity/Q977,Djibouti,154.0,615.0,,
 DMA,Dominica,DM,DMA,321.0,DMA,54.0,DMI,DQ,,DMA,DMA,http://www.wikidata.org/entity/Q784,Dominica,200.0,616.0,,
@@ -109,7 +109,7 @@ HMD,Heard Island and McDonald Islands,HM,HMD,,,,,,,,,http://www.wikidata.org/ent
 OWID_HSE,Hesse Electoral,,,,HSE,273.0,,,,,,,,370.0,819.0,,
 OWID_HSG,Hesse Grand Ducal,,,,HSG,275.0,,,,,,,,371.0,820.0,,
 HND,Honduras,HN,HND,268.0,HON,91.0,HON,HO,HNDS,HND,HND,http://www.wikidata.org/entity/Q783,Honduras,139.0,652.0,,
-HKG,Hong Kong,HK,HKG,532.0,,,,HK,HGKG,HKG,HKG,http://www.wikidata.org/entity/Q8646,Hong Kong,144.0,651.0,,"[""China, Hong Kong SAR""]"
+HKG,Hong Kong,HK,HKG,532.0,,,,HK,HGKG,HKG,HKG,http://www.wikidata.org/entity/Q8646,Hong Kong,144.0,651.0,,"[""China, Hong Kong SAR"", ""Hong Kong, China""]"
 HUN,Hungary,HU,HUN,944.0,HUN,310.0,HUN,HU,HNGR,HUN,HUN,http://www.wikidata.org/entity/Q28,Hungary,138.0,655.0,,
 ISL,Iceland,IS,ISL,176.0,ICE,395.0,,IC,ICLD,ISL,ISL,http://www.wikidata.org/entity/Q189,Iceland,207.0,661.0,,
 IND,India,IN,IND,534.0,IND,750.0,IND,II,INDA,IND,IND,http://www.wikidata.org/entity/Q668,India,137.0,657.0,,
@@ -129,7 +129,7 @@ KEN,Kenya,KE,KEN,664.0,KEN,501.0,KEN,KE,KNYA,KEN,KEN,http://www.wikidata.org/ent
 KIR,Kiribati,KI,KIR,826.0,KIR,946.0,KIR,GB,,KIR,KIR,http://www.wikidata.org/entity/Q710,Kiribati,204.0,671.0,,
 OWID_KOS,Kosovo,,,,KOS,347.0,,,,,,,,379.0,828.0,,
 KWT,Kuwait,KW,KWT,443.0,KUW,690.0,KUW,KU,KWAT,KWT,KWT,http://www.wikidata.org/entity/Q817,Kuwait,208.0,674.0,,
-KGZ,Kyrgyzstan,KG,KGZ,917.0,KYR,703.0,KYR,KG,,KGZ,KGZ,http://www.wikidata.org/entity/Q813,Kyrgyzstan,126.0,669.0,,
+KGZ,Kyrgyzstan,KG,KGZ,917.0,KYR,703.0,KYR,KG,,KGZ,KGZ,http://www.wikidata.org/entity/Q813,Kyrgyzstan,126.0,669.0,,"[""Kyrgyz Republic""]"
 LAO,Laos,LA,LAO,544.0,LAO,812.0,LAO,LS,LAOS,LAO,LAO,http://www.wikidata.org/entity/Q819,Laos,125.0,675.0,,"[""Lao"", ""Lao People's Democratic Republic""]"
 LVA,Latvia,LV,LVA,941.0,LAT,367.0,LAT,LV,,LVA,LVA,http://www.wikidata.org/entity/Q211,Latvia,122.0,685.0,,
 LBN,Lebanon,LB,LBN,446.0,LEB,660.0,LEB,LE,LBNN,LBN,LBN,http://www.wikidata.org/entity/Q822,Lebanon,124.0,676.0,,
@@ -154,7 +154,7 @@ MYT,Mayotte,YT,MYT,,,,,OT,,MYT,MYT,http://www.wikidata.org/entity/Q17063,Mayotte
 OWID_MEC,Mecklenburg Schwerin,,,,MEC,280.0,,,,,,,,372.0,821.0,,
 OWID_MNS,Melanesia,,,,,,,,,,,,,478.0,835.0,,
 MEX,Mexico,MX,MEX,273.0,MEX,70.0,MEX,MX,MXCO,MEX,MEX,http://www.wikidata.org/entity/Q96,Mexico,113.0,692.0,,
-FSM,Micronesia (country),FM,FSM,868.0,FSM,987.0,,FM,,FSM,FSM,http://www.wikidata.org/entity/Q702,Federated States of Micronesia,222.0,633.0,,"[""Micronesia (Fed. States of)"", ""Micronesia (Federated States of)""]"
+FSM,Micronesia (country),FM,FSM,868.0,FSM,987.0,,FM,,FSM,FSM,http://www.wikidata.org/entity/Q702,Federated States of Micronesia,222.0,633.0,,"[""Micronesia (Fed. States of)"", ""Micronesia (Federated States of)"", ""Micronesia, Fed. Sts.""]"
 OWID_MOD,Modena,,,,MOD,332.0,,,,,,,,376.0,825.0,,
 MDA,Moldova,MD,MDA,921.0,MLD,359.0,MOL,MV,,MDA,MDA,http://www.wikidata.org/entity/Q217,Moldova,111.0,689.0,,"[""Rep. of Moldova"", ""Republic of Moldova""]"
 MCO,Monaco,MC,MCO,,MNC,221.0,,MC,,MCO,MCO,http://www.wikidata.org/entity/Q235,Monaco,214.0,688.0,,
@@ -177,7 +177,7 @@ NGA,Nigeria,NG,NGA,694.0,NIG,475.0,NIR,NR,NGRA,NGA,NGA,http://www.wikidata.org/e
 NIU,Niue,NU,NIU,,,,NIU,XH,,NIU,NIU,http://www.wikidata.org/entity/Q34020,Niue,261.0,713.0,,
 NFK,Norfolk Island,NF,NFK,,,,,,,,,http://www.wikidata.org/entity/Q31057,Norfolk Island,285.0,805.0,,"[""Norfolk Isl.""]"
 PRK,North Korea,KP,PRK,,PRK,731.0,DRK,KN,KORN,,PRK,http://www.wikidata.org/entity/Q423,North Korea,128.0,728.0,,"[""Dem.Rep.,Korea"", ""Democratic People's Republic of Korea""]"
-MKD,North Macedonia,MK,MKD,962.0,MAC,343.0,MCD,XN,,MKD,MKD,http://www.wikidata.org/entity/Q221,North Macedonia,66.0,694.0,,"[""Macedonia, The Former Yugoslav Republic Of"", ""TFYR Macedonia""]"
+MKD,North Macedonia,MK,MKD,962.0,MAC,343.0,MCD,XN,,MKD,MKD,http://www.wikidata.org/entity/Q221,North Macedonia,66.0,694.0,,"[""Macedonia, FYR"", ""Macedonia, The Former Yugoslav Republic Of"", ""TFYR Macedonia""]"
 OWID_CYN,Northern Cyprus,,,,,,,,,,,,,390.0,838.0,,
 MNP,Northern Mariana Islands,MP,MNP,,,,,,,,,http://www.wikidata.org/entity/Q16644,Northern Mariana Islands,266.0,804.0,,"[""Northern Mariana""]"
 NOR,Norway,NO,NOR,142.0,NOR,385.0,,NO,NRWY,NOR,NOR,http://www.wikidata.org/entity/Q20,Norway,102.0,715.0,,
@@ -204,11 +204,11 @@ RUS,Russia,RU,RUS,922.0,RUS,365.0,RUS,RU,USSR,RUS,RUS,http://www.wikidata.org/en
 RWA,Rwanda,RW,RWA,714.0,RWA,517.0,RWA,RW,RWND,RWA,RWA,http://www.wikidata.org/entity/Q1037,Rwanda,91.0,737.0,,
 BLM,Saint Barthlemy,BL,BLM,,,,,,,,,http://www.wikidata.org/entity/Q25362,Saint Barthélemy,297.0,795.0,,"[""Saint Barth\u00e9lemy""]"
 SHN,Saint Helena,SH,SHN,855.0,,,STH,XJ,,SHN,SHN,http://www.wikidata.org/entity/Q192184,"Saint Helena, Ascension and Tristan da Cunha",260.0,742.0,,"[""Saint Helena, Ascension and Tristan da Cunha"", ""St. Helena""]"
-KNA,Saint Kitts and Nevis,KN,KNA,361.0,SKN,60.0,STK,XD,,KNA,KNA,http://www.wikidata.org/entity/Q763,Saint Kitts and Nevis,227.0,672.0,,"[""St.Kitts & Nevis""]"
-LCA,Saint Lucia,LC,LCA,362.0,SLU,56.0,STL,XK,,LCA,LCA,http://www.wikidata.org/entity/Q760,Saint Lucia,229.0,679.0,,
+KNA,Saint Kitts and Nevis,KN,KNA,361.0,SKN,60.0,STK,XD,,KNA,KNA,http://www.wikidata.org/entity/Q763,Saint Kitts and Nevis,227.0,672.0,,"[""St. Kitts and Nevis"", ""St.Kitts & Nevis""]"
+LCA,Saint Lucia,LC,LCA,362.0,SLU,56.0,STL,XK,,LCA,LCA,http://www.wikidata.org/entity/Q760,Saint Lucia,229.0,679.0,,"[""St. Lucia""]"
 MAF,Saint Martin (French part),MF,MAF,,,,,,,,,http://www.wikidata.org/entity/Q126125,Saint Martin (French part),280.0,803.0,,"[""Saint-Martin (French part)""]"
 SPM,Saint Pierre and Miquelon,PM,SPM,363.0,,,,XL,,SPM,SPM,http://www.wikidata.org/entity/Q34617,Saint Pierre and Miquelon,353.0,748.0,,"[""St.Pierre & Miq.""]"
-VCT,Saint Vincent and the Grenadines,VC,VCT,364.0,SVG,57.0,STV,XM,,VCT,VCT,http://www.wikidata.org/entity/Q757,Saint Vincent and the Grenadines,230.0,779.0,,"[""St.Vin. & Gren.""]"
+VCT,Saint Vincent and the Grenadines,VC,VCT,364.0,SVG,57.0,STV,XM,,VCT,VCT,http://www.wikidata.org/entity/Q757,Saint Vincent and the Grenadines,230.0,779.0,,"[""St. Vincent and the Grenadines"", ""St.Vin. & Gren.""]"
 WSM,Samoa,WS,WSM,862.0,WSM,990.0,SAM,WS,WSMA,WSM,WSM,http://www.wikidata.org/entity/Q683,Samoa,239.0,786.0,,
 SMR,San Marino,SM,SMR,135.0,SNM,331.0,,SM,,SMR,SMR,http://www.wikidata.org/entity/Q238,San Marino,231.0,746.0,,
 STP,Sao Tome and Principe,ST,STP,716.0,STP,403.0,STP,SF,STPR,STP,STP,http://www.wikidata.org/entity/Q1039,São Tomé and Príncipe,232.0,751.0,,"[""Sao Tome & Pr.""]"
@@ -220,7 +220,7 @@ SYC,Seychelles,SC,SYC,718.0,SEY,591.0,SEY,SE,SYCH,SYC,SYC,http://www.wikidata.or
 SLE,Sierra Leone,SL,SLE,724.0,SIE,451.0,SIL,SL,SRLE,SLE,SLE,http://www.wikidata.org/entity/Q1044,Sierra Leone,87.0,744.0,,
 SGP,Singapore,SG,SGP,576.0,SIN,830.0,SIN,SI,SNGP,SGP,SGP,http://www.wikidata.org/entity/Q334,Singapore,86.0,741.0,,
 SXM,Sint Maarten (Dutch part),SX,SXM,,,,,,,,,http://www.wikidata.org/entity/Q26273,Sint Maarten,281.0,809.0,,
-SVK,Slovakia,SK,SVK,936.0,SLO,317.0,SLO,XO,,SVK,SVK,http://www.wikidata.org/entity/Q214,Slovakia,85.0,753.0,,
+SVK,Slovakia,SK,SVK,936.0,SLO,317.0,SLO,XO,,SVK,SVK,http://www.wikidata.org/entity/Q214,Slovakia,85.0,753.0,,"[""Slovak Republic""]"
 SVN,Slovenia,SI,SVN,961.0,SLV,349.0,SVN,XV,,SVN,SVN,http://www.wikidata.org/entity/Q215,Slovenia,83.0,754.0,,
 SLB,Solomon Islands,SB,SLB,813.0,SOL,940.0,SOI,BP,,SLB,SLB,http://www.wikidata.org/entity/Q685,Solomon Islands,195.0,743.0,,
 SOM,Somalia,SO,SOM,726.0,SOM,520.0,SOM,SO,SMLA,SOM,SOM,http://www.wikidata.org/entity/Q1045,Somalia,82.0,747.0,,

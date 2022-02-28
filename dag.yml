@@ -8,6 +8,8 @@ steps:
   data://garden/who/2021-07-01/ghe:
     - data://meadow/who/2021-07-01/ghe
     - data://reference
+  data://garden/gapminder/2019-12-10/population:
+    - data://meadow/gapminder/2019-12-10/population
   data://meadow/gapminder/2019-12-10/population:
     - walden://gapminder/2019-12-10/population
   data://meadow/hyde/2017/baseline:
