@@ -1,10 +1,6 @@
-#
-#  Gapminder population
-#
-
-import json
 from pathlib import Path
 from typing import Dict, cast
+import json
 
 from owid.catalog import Dataset
 from etl.paths import DATA_DIR
@@ -13,7 +9,7 @@ MAPPING_FILE = Path(__file__).with_suffix(".mapping.json")
 
 
 def run(dest_dir: str) -> None:
-    harmonize_countries("meadow/gapminder/2019-12-10/population", dest_dir)
+    harmonize_countries("meadow/wpp/2019/standard_projections", dest_dir)
 
 
 def harmonize_countries(source_ds_path: str, dest_dir: str) -> None:
@@ -31,10 +27,29 @@ def harmonize_countries(source_ds_path: str, dest_dir: str) -> None:
         names = table.index.names
         table = table.reset_index()
 
-        # harmonize countries; fail by design if a match is not found
-        table["country"] = table.country.apply(lambda c: mapping[c])
+        # these tables don't need harmonization
+        if table.metadata.short_name in ("location_codes", "variant_codes"):
+            ds.add(table)
+            continue
 
-        table.set_index(names, inplace=True)
+        # drop locations with suffix `(and dependencies)`
+        table = table[~table.location.str.endswith("(and dependencies)")]
+
+        # continents are duplicated for unknown reason
+        table = table.drop_duplicates()
+
+        dimensions = [n for n in names if n != "location"]
+
+        # harmonize countries; drop locations without a match (typically WB defined regions)
+        table = (
+            table.assign(country=table.location.map(mapping))
+            .dropna(subset=["country"])
+            .drop(["location"], axis=1)
+            .set_index(["country"] + dimensions)
+        )
+
+        # make sure we don't have duplicate countries
+        assert table[table.index.duplicated()].empty
 
         ds.add(table)
 

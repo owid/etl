@@ -40,6 +40,8 @@ def harmonize_countries(source_ds_path: str, dest_dir: str) -> None:
 
         ds.add(table)
 
+    ds.save()
+
 
 def load_mapping() -> Dict[str, str]:
     country_mapping_file = MAPPING_FILE
