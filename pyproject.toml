@@ -47,6 +47,8 @@ argh = "^0.26.2"
 jupyter = "^1.0.0"
 ipython = "^7.27.0"
 matplotlib = "^3.4.3"
+jupytext = "^1.13.7"
+jupyter_nbextensions_configurator = "^0.4.1"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
