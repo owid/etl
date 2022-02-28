@@ -1,12 +1,10 @@
 #
-#  Hyde baseline 2017
-#
-#  Harmonize countries in the Hyde baseline.
+#  Gapminder population
 #
 
+import json
 from pathlib import Path
 from typing import Dict, cast
-import json
 
 from owid.catalog import Dataset
 from etl.paths import DATA_DIR
@@ -15,7 +13,7 @@ MAPPING_FILE = Path(__file__).with_suffix(".mapping.json")
 
 
 def run(dest_dir: str) -> None:
-    harmonize_countries("meadow/hyde/2017/baseline", dest_dir)
+    harmonize_countries("meadow/gapminder/2019-12-10/population", dest_dir)
 
 
 def harmonize_countries(source_ds_path: str, dest_dir: str) -> None:
