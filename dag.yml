@@ -1,4 +1,7 @@
 steps:
+  #
+  #  OWID curated datasets
+  #
   data://garden/owid/latest/covid:
     - etag://raw.githubusercontent.com/owid/covid-19-data/master/public/data/owid-covid-data.csv
   data://garden/owid/latest/key_indicators:
@@ -43,6 +46,22 @@ steps:
     - data://garden/faostat/2021-04-09/faostat_fbsc
     - data://garden/owid/latest/key_indicators
     - data://meadow/open_numbers/latest/gapminder__systema_globalis
+  data://meadow/who/2021-07-01/ghe:
+    - walden://who/2021-07-01/ghe
+  data://meadow/who/2021-07-01/gho:
+    - walden://who/2021-07-01/gho
+  data://meadow/wpp/2019/standard_projections:
+    - walden://wpp/2019/standard_projections
+  grapher://who/2021-07-01/ghe:
+    - data://garden/who/2021-07-01/ghe
+  data://meadow/living_planet/2020-09-10/lpd:
+    - walden://living_planet/2020-09-10/lpd
+  data://garden/living_planet/2020-09-10/lpd:
+    - data://meadow/living_planet/2020-09-10/lpd
+
+  #
+  #  Gapminder/Open Numbers curated datasets
+  #
   data://meadow/open_numbers/latest/bp__energy:
     - github://open-numbers/ddf--bp--energy
   data://meadow/open_numbers/latest/cait__historical_emissions:
@@ -241,15 +260,3 @@ steps:
     - github://open-numbers/ddf--world_bank--world_development_indicators
   data://meadow/open_numbers/latest/worldbank__povcalnet:
     - github://open-numbers/ddf--worldbank--povcalnet
-  data://meadow/who/2021-07-01/ghe:
-    - walden://who/2021-07-01/ghe
-  data://meadow/who/2021-07-01/gho:
-    - walden://who/2021-07-01/gho
-  data://meadow/wpp/2019/standard_projections:
-    - walden://wpp/2019/standard_projections
-  grapher://who/2021-07-01/ghe:
-    - data://garden/who/2021-07-01/ghe
-  data://meadow/living_planet/2020-09-10/lpd:
-    - walden://living_planet/2020-09-10/lpd
-  data://garden/living_planet/2020-09-10/lpd:
-    - data://meadow/living_planet/2020-09-10/lpd
