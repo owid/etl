@@ -11,7 +11,7 @@ https://github.com/owid/notebooks/blob/main/EdouardMathieu/omm_population_densit
 
 import pandas as pd
 
-from owid.catalog import Dataset, DatasetMeta, Table
+from owid.catalog import Dataset, DatasetMeta, Table, Variable, Source, VariableMeta
 
 from etl.paths import DATA_DIR
 
@@ -53,21 +53,50 @@ def make_table() -> Table:
         .sort_values(["country", "year"])
     )
 
-    df.metadata.short_name = "population-density"
-    df.metadata.description = "Population density (World Bank, Gapminder, HYDE & UN)"
     assert (df.population_density >= 0).all()
     assert (df.population_density < 40000).all()
     return df.set_index(["country", "year"])
 
 
+def load_sources() -> list[Source]:
+    return load_population().metadata.sources + load_land_area().metadata.sources
+
+
 def run(dest_dir: str) -> None:
     ds = Dataset.create_empty(dest_dir)
+    t = make_table()
+
+    # add metadata, use values from variable 123 in grapher
     ds.metadata = DatasetMeta(
         namespace="owid",
-        short_name="population_density",
-        description="Population density (World Bank, Gapminder, HYDE & UN)",
+        title="Population density (World Bank, Gapminder, HYDE & UN)",
+        # TODO: might make more sense to split source into three?
+        sources=load_sources(),
+    )
+    t.metadata.short_name = "population_density"
+    t.metadata.description = """
+    Our World in Data builds and maintains a long-run dataset on population by country, region, and for the world, based on three key sources: HYDE, Gapminder, and the UN World Population Prospects. This combines historical population estimates with median scenario projections to 2100. You can find more information on these sources and how our time series is constructed on this page: <a href="https://ourworldindata.org/population-sources">What sources do we rely on for population estimates?</a>\n\nWe combine this population dataset with the <a href="https://ourworldindata.org/grapher/land-area-km">land area estimates published by the World Bank</a>, to produce a long-run dataset of population density.\n\nIn all sources that we rely on, population estimates and land area estimates are based on today’s geographical borders.'
+    """.strip()
+
+    # variable metadata (id 123 in grapher)
+    set_variable_metadata(
+        t.population_density,
+        VariableMeta(
+            title="population_density",
+            display={
+                "name": "Population density",
+                "unit": "people per km²",
+                "includeInTable": True,
+            },
+        ),
     )
 
-    t = make_table()
     ds.add(t)
     ds.save()
+
+
+def set_variable_metadata(v: Variable, meta: VariableMeta) -> None:
+    """Set Metadata on a variable.
+    TODO: make this a method of the Variable class
+    """
+    v._fields[v.checked_name] = meta
