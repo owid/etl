@@ -6,7 +6,7 @@ from etl.steps.data.converters import convert_walden_metadata
 
 
 def run(dest_dir: str) -> None:
-    walden_ds = Catalog().find_one("_private_test", "2021", "private_test")
+    walden_ds = Catalog().find_one("private", "2021", "private_test")
 
     ds = Dataset.create_empty(dest_dir)
     ds.metadata = convert_walden_metadata(walden_ds)

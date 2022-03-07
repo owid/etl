@@ -180,7 +180,7 @@ metadata = {
   'license_url': 'test',
   'date_accessed': '2022-02-07',
   'file_extension': 'csv',
-  'namespace': '_private_test',
+  'namespace': 'private',
   'publication_year': 2021,
 }
 
@@ -200,17 +200,4 @@ dataset.save()
 etl --private
 reindex
 publish --private
-```
-
-
-## Downloading from private catalog
-
-```python
-from owid import catalog
-
-# download catalog from `https://owid-catalog-private.nyc3.digitaloceanspaces.com/`
-catalog_frame = catalog.find('covid', 'owid')
-
-# download from our private catalog
-catalog_frame = catalog.find('energy', 'owid-private')
 ```

@@ -223,6 +223,7 @@ def get_remote_checksum(s3: Any, bucket: str, path: str) -> Optional[str]:
 
 def connect_s3() -> Any:
     # TODO: consider using AWS_PROFILE just like we do here https://github.com/owid/walden/blob/master/owid/walden/owid_cache.py#L52
+    # to be consistent
     session = boto3.Session()
     return session.client(
         "s3",
