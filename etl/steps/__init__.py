@@ -587,7 +587,7 @@ class ETagStep(Step):
 
 
 class DataStepPrivate(DataStep):
-    is_public = True
+    is_public = False
 
     @staticmethod
     def _make_dataset_private(dest_dir: str) -> None:
@@ -605,8 +605,8 @@ class DataStepPrivate(DataStep):
 
 
 class WaldenStepPrivate(WaldenStep):
-    is_public = True
+    is_public = False
 
 
 class GrapherStepPrivate(GrapherStep):
-    is_public = True
+    is_public = False
