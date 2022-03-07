@@ -97,6 +97,7 @@ def run_dag(
     _validate_private_steps(dag)
 
     if not private:
+        # NOTE: could this possibly go to `excludes`?
         dag = _filter_private_steps(dag)
         print("Excluding private steps...")
 
