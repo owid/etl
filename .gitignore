@@ -19,3 +19,4 @@ pyrightconfig.json
 .DS_Store
 ign.*
 .idea
+examples/data/*
