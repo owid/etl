@@ -16,25 +16,33 @@ from unittest.mock import patch
 from owid.catalog import Dataset
 
 from etl import paths
-from etl.steps import DataStep, compile_steps, to_dependency_order, Step
+from etl.steps import (
+    DataStep,
+    DataStepPrivate,
+    compile_steps,
+    to_dependency_order,
+    Step,
+)
+
+
+def _create_mock_py_file(step_name: str) -> None:
+    py_file = paths.STEP_DIR / "data" / f"{step_name}.py"
+    assert not py_file.exists()
+    with open(str(py_file), "w") as ostream:
+        print(
+            """
+from owid.catalog import Dataset
+def run(dest_dir):
+    Dataset.create_empty(dest_dir)
+            """,
+            file=ostream,
+        )
 
 
 def test_data_step():
     with temporary_step() as step_name:
-        py_file = paths.STEP_DIR / "data" / f"{step_name}.py"
-        assert not py_file.exists()
-        with open(str(py_file), "w") as ostream:
-            print(
-                """
-from owid.catalog import Dataset
-def run(dest_dir):
-    Dataset.create_empty(dest_dir)
-                """,
-                file=ostream,
-            )
-
+        _create_mock_py_file(step_name)
         DataStep(step_name, []).run()
-
         Dataset((paths.DATA_DIR / step_name).as_posix())
 
 
@@ -100,3 +108,11 @@ class DummyStep(Step):
 
     def __repr__(self):
         return self.path
+
+
+def test_date_step_private():
+    with temporary_step() as step_name:
+        _create_mock_py_file(step_name)
+        DataStepPrivate(step_name, []).run()
+        ds = Dataset((paths.DATA_DIR / step_name).as_posix())
+        assert not ds.metadata.is_public

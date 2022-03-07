@@ -94,6 +94,8 @@ def run_dag(
     if not include_grapher:
         excludes.append("grapher://")
 
+    _validate_private_steps(dag)
+
     if not private:
         dag = _filter_private_steps(dag)
         print("Excluding private steps...")
@@ -125,6 +127,18 @@ def timed_run(f: Callable[[], Any]) -> float:
 
 def _filter_private_steps(dag: DAG) -> DAG:
     return {k: v for k, v in dag.items() if not _is_private_step(k)}
+
+
+def _validate_private_steps(dag: DAG) -> None:
+    """Make sure there are no public steps that have private steps as dependency."""
+    for step_name, step_dependencies in dag.items():
+        if _is_private_step(step_name):
+            continue
+        for dependency in step_dependencies:
+            if _is_private_step(dependency):
+                raise ValueError(
+                    f"Public step {step_name} has a dependency on private {dependency}"
+                )
 
 
 def _is_private_step(step_name: str) -> bool:
