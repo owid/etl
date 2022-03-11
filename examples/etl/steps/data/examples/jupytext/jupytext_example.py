@@ -24,7 +24,7 @@ def run(dest_dir: str) -> None:
     ds.metadata.short_name = 'jupytext_example'
 
     # use module-level variables
-    t = Table(df)
+    t = Table(df.reset_index(drop=True))
     t.metadata.short_name = 'jupytext_example'
 
     ds.add(t)

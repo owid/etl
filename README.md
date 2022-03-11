@@ -163,6 +163,11 @@ An interactive country harmonizing tool is available, which can generate a count
 
 ## Private steps
 
+Most of the steps have private versions with `-private` suffix (e.g. `data-private://...`, `walden-private://...`) that remember and enforce a dataset level `is_public` flag.
+
+When publishing, the index is public, but tables in the index that are private are only available over s3 with appropriate credentials. `owid-catalog-py` is also updated to support these private datasets and supports fetching them over s3 transparently.
+
+
 ### Uploading private data to walden
 
 It is possible to upload private data to walden so that only those with S3 credentials would be able to download it.

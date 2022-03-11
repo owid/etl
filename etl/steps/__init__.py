@@ -258,10 +258,16 @@ class DataStep(Step):
         else:
             raise Exception(f"have no idea how to run step: {self.path}")
 
+        self.after_run()
+
         # modify the dataset to remember what inputs were used to build it
         dataset = self._output_dataset
         dataset.metadata.source_checksum = self.checksum_input()
         dataset.save()
+
+    def after_run(self) -> None:
+        """Optional post-hook"""
+        ...
 
     def is_dirty(self) -> bool:
         if not self.has_existing_data() or any(d.is_dirty() for d in self.dependencies):
@@ -335,7 +341,7 @@ class DataStep(Step):
         Import the Python module for this step and call run() on it.
         """
         module_path = self.path.lstrip("/").replace("/", ".")
-        step_module = import_module(f"etl.steps.data.{module_path}")
+        step_module = import_module(f"{paths.BASE_PACKAGE}.steps.data.{module_path}")
         if not hasattr(step_module, "run"):
             raise Exception(f'no run() method defined for module "{step_module}"')
 
@@ -589,19 +595,11 @@ class ETagStep(Step):
 class DataStepPrivate(DataStep):
     is_public = False
 
-    @staticmethod
-    def _make_dataset_private(dest_dir: str) -> None:
-        ds = catalog.Dataset(dest_dir)
+    def after_run(self) -> None:
+        """Make dataset private"""
+        ds = catalog.Dataset(self._dest_dir.as_posix())
         ds.metadata.is_public = False
         ds.save()
-
-    def _run_py(self) -> None:
-        super()._run_py()
-        self._make_dataset_private(self._dest_dir.as_posix())
-
-    def _run_notebook(self) -> None:
-        super()._run_notebook()
-        self._make_dataset_private(self._dest_dir.as_posix())
 
 
 class WaldenStepPrivate(WaldenStep):
