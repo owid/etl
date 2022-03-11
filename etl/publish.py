@@ -33,10 +33,10 @@ def publish(dry_run: bool, private: bool, bucket: str) -> None:
     Publish the generated data catalog to S3.
     """
     catalog = Path(DATA_DIR)
-    if not dry_run:
-        assert (
-            private
-        ), "You cannot publish public catalog yet, only private catalogs with flag --private are supported"
+    if not dry_run and not private:
+        raise Exception(
+            "You cannot publish public catalog yet, only private catalogs with flag --private are supported"
+        )
     sanity_checks(catalog)
     sync_catalog_to_s3(bucket, catalog, dry_run=dry_run)
 
@@ -61,6 +61,8 @@ def sync_catalog_to_s3(bucket: str, catalog: Path, dry_run: bool = False) -> Non
 
 
 def is_catalog_up_to_date(s3: Any, bucket: str, catalog: Path) -> bool:
+    """The catalog file is synced last -- if it is the same as our local one, then all the remote
+    files will be the same as our local ones too."""
     remote = get_remote_checksum(s3, bucket, "catalog.feather")
     local = files.checksum_file(catalog / "catalog.feather")
     return remote == local

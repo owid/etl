@@ -97,9 +97,7 @@ def run_dag(
     _validate_private_steps(dag)
 
     if not private:
-        # NOTE: could this possibly go to `excludes`?
-        dag = _filter_private_steps(dag)
-        print("Excluding private steps...")
+        excludes.append("-private://")
 
     steps = compile_steps(dag, includes, excludes)
 
@@ -124,10 +122,6 @@ def timed_run(f: Callable[[], Any]) -> float:
     start_time = time.time()
     f()
     return time.time() - start_time
-
-
-def _filter_private_steps(dag: DAG) -> DAG:
-    return {k: v for k, v in dag.items() if not _is_private_step(k)}
 
 
 def _validate_private_steps(dag: DAG) -> None:

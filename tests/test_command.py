@@ -22,10 +22,6 @@ def dag():
     return {"data-private://a": {"data://b"}, "data://e": {"data://f"}}
 
 
-def test_filter_private_steps(dag):
-    assert cmd._filter_private_steps(dag) == {"data://e": {"data://f"}}
-
-
 def test_validate_private_steps(dag):
     cmd._validate_private_steps(dag)
 

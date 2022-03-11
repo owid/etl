@@ -3,7 +3,7 @@
 Collection of examples to give you a head start for the `etl`. To build example DAG run from the root of the project:
 
 ```
-BASE_DIR=examples etl
+BASE_DIR=examples BASE_PACKAGE=examples.etl etl
 ```
 
 ## Private datasets
@@ -11,5 +11,5 @@ BASE_DIR=examples etl
 Add `--private` flag to generate private datasets in the DAG
 
 ```
-BASE_DIR=examples etl --private
+BASE_DIR=examples BASE_PACKAGE=examples.etl etl --private
 ```
