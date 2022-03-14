@@ -72,6 +72,12 @@ steps:
     - data://meadow/wb/2021-07-01/wb_income
   data://garden/ggdc/2020-10-01/ggdc_maddison:
     - walden://ggdc/2020-10-01/ggdc_maddison
+  # TODO: maybe `data://meadow/backport/latest/wdi_world_bank`?
+  # can it be shorter, e.g. `data://backport/latest/wdi_world_bank`?
+  data://meadow/grapher/latest/wdi_world_bank:
+    # TODO: only refresh if updatedAt timestamps of a dataset or variables
+    # is newer than the exported file timestamp
+    # - grapher-dataset://World Development Indicators - World Bank (2021.07.30)
 
   #
   #  Gapminder/Open Numbers curated datasets

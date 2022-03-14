@@ -35,6 +35,8 @@ wikipedia = "^1.4.0"
 pandas = "^1.4.0"
 numpy = "^1.22.1"
 pydantic = "^1.9.0"
+xlrd = "^2.0.1"
+structlog = "^21.5.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
