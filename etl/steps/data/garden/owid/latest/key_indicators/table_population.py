@@ -21,6 +21,7 @@ from etl import data_helpers
 UNWPP = DATA_DIR / "garden/wpp/2019/standard_projections"
 GAPMINDER = DATA_DIR / "garden/gapminder/2019-12-10/population"
 HYDE = DATA_DIR / "garden/hyde/2017/baseline"
+WB_INCOME = DATA_DIR / "garden/wb/2021-07-01/wb_income"
 REFERENCE = DATA_DIR / "reference"
 
 COUNTRY_MAPPING = Path(__file__).with_suffix(".mapping.csv")
@@ -33,6 +34,7 @@ def make_table() -> Table:
         make_combined()
         .pipe(select_source)
         .pipe(data_helpers.calculate_region_sums)
+        .pipe(add_income_groups)
         .pipe(prepare_dataset)
     )
 
@@ -67,6 +69,22 @@ def select_source(df: pd.DataFrame) -> pd.DataFrame:
     _assert_unique(df, subset=["country", "year"])
 
     return df.drop(columns=["source"])
+
+
+def add_income_groups(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Add population of income groups to the dataframe.
+    """
+    income_groups = Dataset(WB_INCOME)["wb_income_group"]
+
+    population_income_groups = (
+        df.merge(income_groups, left_on="country", right_index=True)
+        .groupby(["income_group", "year"], as_index=False)
+        .sum()
+        .rename(columns={"income_group": "country"})
+    )
+
+    return pd.concat([df, population_income_groups], ignore_index=True)
 
 
 def rename_entities(df: pd.DataFrame) -> pd.DataFrame:

@@ -11,6 +11,7 @@ steps:
     - data://garden/hyde/2017/baseline
     - data://garden/gapminder/2019-12-10/population
     - data://garden/wpp/2019/standard_projections
+    - data://garden/wb/2021-07-01/wb_income
     - data://meadow/open_numbers/latest/open_numbers__world_development_indicators
     - data://reference
   data://garden/wpp/2019/standard_projections:
