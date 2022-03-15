@@ -18,6 +18,7 @@ def test_calculate_region_sums():
         {"year": 2000, "country": "China", "population": 5},
         {"year": 2000, "country": "Europen Union", "population": 3},
         {"year": 2000, "country": "Asia", "population": 5},
+        {"year": 2000, "country": "EU-27", "population": 3},
         {"year": 2000, "country": "Europe", "population": 3},
         {"year": 2000, "country": "World", "population": 8},
     ]
