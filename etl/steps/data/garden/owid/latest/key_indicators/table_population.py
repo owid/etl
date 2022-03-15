@@ -151,3 +151,7 @@ def make_combined() -> pd.DataFrame:
     hyde.reset_index(inplace=True)
 
     return pd.DataFrame(pd.concat([gapminder, hyde, unwpp], ignore_index=True))
+
+
+if __name__ == "__main__":
+    t = make_table()
