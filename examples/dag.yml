@@ -1,5 +1,6 @@
 steps:
   data://examples/jupytext/jupytext_example:
+  data://examples/vs_code_cells/vs_code_cells_example:
 
   # private steps that require S3 access keys for private walden
   data-private://examples/private/2022-03-08/private_example:

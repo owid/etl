@@ -1,23 +1,28 @@
-# %%[markdown]
-
 # # Jupytext example
+#
+# Install jupytext to your Jupyter Lab environment https://github.com/mwouts/jupytext, then right click the
+# file and open with `Jupytext Notebook`.
 
-# Install jupytext (or its extension for PyCharm) or see this directly in
-# [Visual Studio Code](https://code.visualstudio.com/docs/python/jupyter-support-py)
+# There's also a [VS Code extension](https://marketplace.visualstudio.com/items?itemName=donjayamanne.vscode-jupytext),
+# but it's unfortunately not usable [due to this bug](https://github.com/notebookPowerTools/vscode-jupytext/issues/9).
 
-# %% Get data
+# ## Get data
+
+# +
 import pandas as pd
 from owid.catalog import Dataset, Table
 
 df = pd.DataFrame({
     'a': [1, 2, 3]
 })
+# -
 
-# %% Clean it up
+# ## Clean data
 
 df = df[df.a > 1]
 
-# %% Create dataset in the `run` function using module-level variables
+
+# ## Create dataset in the `run` function using module-level variables
 
 def run(dest_dir: str) -> None:
     ds = Dataset.create_empty(dest_dir)
@@ -29,3 +34,5 @@ def run(dest_dir: str) -> None:
 
     ds.add(t)
     ds.save()
+
+
