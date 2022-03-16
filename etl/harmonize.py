@@ -24,7 +24,7 @@ from etl.paths import REFERENCE_DATASET
 @click.argument("output_file")
 def harmonize(data_file: str, column: str, output_file: str) -> None:
     """
-    Given a data file in feather or CSV format, and the name of the columnn representing
+    Given a data file in feather or CSV format, and the name of the column representing
     country or region names, interactively generate a JSON mapping from the given names
     to OWID's canonical names.
 
@@ -174,7 +174,7 @@ class CountryRegionMapper:
 class GeoPickerCmd(cmd.Cmd):
     """
     An interactive command meant to resolve a single ambiguous geo-region name.
-    If there are multipe ambiguous names, you make a new command for each one.
+    If there are multiple ambiguous names, you make a new command for each one.
 
     During this step, you can type "help" to see a list of commands.
     """
@@ -193,14 +193,14 @@ class GeoPickerCmd(cmd.Cmd):
         self.geo = geo
         self.suggestions = suggestions
         self.valid_names = valid_names
-        print("(n) skip, (s) suggest, (q) quit")
+        print("(n) next, (s) suggest, (q) quit")
 
     def do_n(self, arg: str) -> bool:
         # go to the next item
         return True
 
     def help_n(self) -> None:
-        print("Go to the next item")
+        print("Ignore and skip to the next item")
 
     def do_s(self, arg: str) -> Optional[bool]:
         for i, s in enumerate(self.suggestions):
