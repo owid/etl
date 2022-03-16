@@ -64,7 +64,7 @@ CUW,Curacao,CW,CUW,,,,,,,,,http://www.wikidata.org/entity/Q25279,Curaçao,279.0,
 CYP,Cyprus,CY,CYP,423.0,CYP,352.0,CYP,CY,CYPR,CYP,CYP,http://www.wikidata.org/entity/Q229,Cyprus,163.0,612.0,,
 CZE,Czechia,CZ,CZE,935.0,CZR,316.0,CZE,XR,,CZE,CZE,http://www.wikidata.org/entity/Q213,Czech Republic,162.0,613.0,,"[""Czech Rep."", ""Czech Republic""]"
 OWID_CZS,Czechoslovakia,,,,CZE,315.0,,,,,,,,267.0,823.0,,"[""Former Czechoslovakia""]"
-COD,Democratic Republic of Congo,CD,COD,636.0,DRC,490.0,ZAI,CG,ZAIR,,ZAR,http://www.wikidata.org/entity/Q974,Democratic Republic of the Congo,167.0,602.0,,"[""Congo, Dem. Rep."", ""Congo, The Democratic Republic Of The"", ""Congo-Kinshasa"", ""Democratic Republic of the Congo"", ""Zaire/ Congo , Dem. Rep.""]"
+COD,Democratic Republic of Congo,CD,COD,636.0,DRC,490.0,ZAI,CG,ZAIR,,ZAR,http://www.wikidata.org/entity/Q974,Democratic Republic of the Congo,167.0,602.0,,"[""Congo, Dem. Rep."", ""Congo, The Democratic Republic Of The"", ""Congo-Kinshasa"", ""D.R. of the Congo"", ""Democratic Republic of the Congo"", ""Zaire/ Congo , Dem. Rep.""]"
 DNK,Denmark,DK,DNK,128.0,DEN,390.0,,DK,DNMK,DNK,DNK,http://www.wikidata.org/entity/Q35,Denmark,161.0,617.0,,
 DJI,Djibouti,DJ,DJI,611.0,DJI,522.0,DJI,FT,,DJI,DJI,http://www.wikidata.org/entity/Q977,Djibouti,154.0,615.0,,
 DMA,Dominica,DM,DMA,321.0,DMA,54.0,DMI,DQ,,DMA,DMA,http://www.wikidata.org/entity/Q784,Dominica,200.0,616.0,,
@@ -129,7 +129,7 @@ KIR,Kiribati,KI,KIR,826.0,KIR,946.0,KIR,GB,,KIR,KIR,http://www.wikidata.org/enti
 OWID_KOS,Kosovo,,,,KOS,347.0,,,,,,,,379.0,828.0,,
 KWT,Kuwait,KW,KWT,443.0,KUW,690.0,KUW,KU,KWAT,KWT,KWT,http://www.wikidata.org/entity/Q817,Kuwait,208.0,674.0,,
 KGZ,Kyrgyzstan,KG,KGZ,917.0,KYR,703.0,KYR,KG,,KGZ,KGZ,http://www.wikidata.org/entity/Q813,Kyrgyzstan,126.0,669.0,,"[""Kyrgyz Republic""]"
-LAO,Laos,LA,LAO,544.0,LAO,812.0,LAO,LS,LAOS,LAO,LAO,http://www.wikidata.org/entity/Q819,Laos,125.0,675.0,,"[""Lao"", ""Lao People's Democratic Republic""]"
+LAO,Laos,LA,LAO,544.0,LAO,812.0,LAO,LS,LAOS,LAO,LAO,http://www.wikidata.org/entity/Q819,Laos,125.0,675.0,,"[""Lao"", ""Lao People's DR"", ""Lao People's Democratic Republic""]"
 LVA,Latvia,LV,LVA,941.0,LAT,367.0,LAT,LV,,LVA,LVA,http://www.wikidata.org/entity/Q211,Latvia,122.0,685.0,,
 LBN,Lebanon,LB,LBN,446.0,LEB,660.0,LEB,LE,LBNN,LBN,LBN,http://www.wikidata.org/entity/Q822,Lebanon,124.0,676.0,,
 LSO,Lesotho,LS,LSO,666.0,LES,570.0,LES,LO,LSTO,LSO,LSO,http://www.wikidata.org/entity/Q1013,Lesotho,123.0,682.0,,
@@ -175,15 +175,15 @@ NER,Niger,NE,NER,692.0,NIR,436.0,NER,NG,NGER,NER,NER,http://www.wikidata.org/ent
 NGA,Nigeria,NG,NGA,694.0,NIG,475.0,NIR,NR,NGRA,NGA,NGA,http://www.wikidata.org/entity/Q1033,Nigeria,103.0,711.0,,
 NIU,Niue,NU,NIU,,,,NIU,XH,,NIU,NIU,http://www.wikidata.org/entity/Q34020,Niue,261.0,713.0,,
 NFK,Norfolk Island,NF,NFK,,,,,,,,,http://www.wikidata.org/entity/Q31057,Norfolk Island,285.0,805.0,,"[""Norfolk Isl.""]"
-PRK,North Korea,KP,PRK,,PRK,731.0,DRK,KN,KORN,,PRK,http://www.wikidata.org/entity/Q423,North Korea,128.0,728.0,,"[""Dem.Rep.,Korea"", ""Democratic People's Republic of Korea""]"
-MKD,North Macedonia,MK,MKD,962.0,MAC,343.0,MCD,XN,,MKD,MKD,http://www.wikidata.org/entity/Q221,North Macedonia,66.0,694.0,,"[""Macedonia, FYR"", ""Macedonia, The Former Yugoslav Republic Of"", ""TFYR Macedonia""]"
+PRK,North Korea,KP,PRK,,PRK,731.0,DRK,KN,KORN,,PRK,http://www.wikidata.org/entity/Q423,North Korea,128.0,728.0,,"[""D.P.R. of Korea"", ""Dem.Rep.,Korea"", ""Democratic People's Republic of Korea""]"
+MKD,North Macedonia,MK,MKD,962.0,MAC,343.0,MCD,XN,,MKD,MKD,http://www.wikidata.org/entity/Q221,North Macedonia,66.0,694.0,,"[""Macedonia, FYR"", ""Macedonia, The Former Yugoslav Republic Of"", ""TFYR Macedonia"", ""TFYR of Macedonia""]"
 OWID_CYN,Northern Cyprus,,,,,,,,,,,,,390.0,838.0,,
 MNP,Northern Mariana Islands,MP,MNP,,,,,,,,,http://www.wikidata.org/entity/Q16644,Northern Mariana Islands,266.0,804.0,,"[""Northern Mariana""]"
 NOR,Norway,NO,NOR,142.0,NOR,385.0,,NO,NRWY,NOR,NOR,http://www.wikidata.org/entity/Q20,Norway,102.0,715.0,,
 OMN,Oman,OM,OMN,449.0,OMA,698.0,OMA,MK,OMAN,OMN,OMN,http://www.wikidata.org/entity/Q842,Oman,217.0,719.0,,
 PAK,Pakistan,PK,PAK,564.0,PAK,770.0,PAK,PK,PKST,PAK,PAK,http://www.wikidata.org/entity/Q843,Pakistan,101.0,720.0,,
 PLW,Palau,PW,PLW,565.0,PAL,986.0,,PW,,PLW,PLW,http://www.wikidata.org/entity/Q695,Palau,224.0,724.0,,
-PSE,Palestine,PS,PSE,,,,PAL,,,PSE,PSE,http://www.wikidata.org/entity/Q219060,State of Palestine,140.0,731.0,,"[""Occupied Palestinian Terr."", ""Palestinian Territories""]"
+PSE,Palestine,PS,PSE,,,,PAL,,,PSE,PSE,http://www.wikidata.org/entity/Q219060,State of Palestine,140.0,731.0,,"[""Occupied Palestinian Terr."", ""Palestinian Territories"", ""State of Palestine""]"
 PAN,Panama,PA,PAN,283.0,PAN,95.0,PAN,PN,PNMA,PAN,PAN,http://www.wikidata.org/entity/Q804,Panama,100.0,721.0,,
 PNG,Papua New Guinea,PG,PNG,853.0,PNG,910.0,PNG,PP,PPNG,PNG,PNG,http://www.wikidata.org/entity/Q691,Papua New Guinea,99.0,725.0,,
 PRY,Paraguay,PY,PRY,288.0,PAR,150.0,PAR,PY,PRGY,PRY,PRY,http://www.wikidata.org/entity/Q733,Paraguay,98.0,730.0,,
@@ -284,7 +284,7 @@ OWID_SEK,Serbia excluding Kosovo,,,,,,,,,,,,,392.0,,,
 OWID_SML,Somaliland,,,,,,,,,,,,,393.0,,,
 OWID_SOS,South Ossetia,,,,,,,,,,,,,394.0,,,
 OWID_TRS,Transnistria,,,,,,,,,,,,,395.0,,,
-OWID_USS,USSR,,,,,,,,,,,,,270.0,,,"[""Former U.S.S.R.""]"
+OWID_USS,USSR,,,,,,,,,,,,,270.0,,,"[""Former U.S.S.R."", ""Former USSR""]"
 OWID_KRU,United Korea,,,,,,,,,,,,,383.0,,,
 OWID_YGS,Yugoslavia,,,,,,,,,,,,,271.0,,,"[""Former Yugoslavia"", ""Yugoslav SFR""]"
 OWID_AFR,Africa,,,,,,,,,,,,,273.0,,"[""DZA"", ""AGO"", ""BEN"", ""BWA"", ""BFA"", ""BDI"", ""CMR"", ""CPV"", ""CAF"", ""TCD"", ""COM"", ""COG"", ""CIV"", ""COD"", ""DJI"", ""EGY"", ""GNQ"", ""ERI"", ""SWZ"", ""ETH"", ""GAB"", ""GMB"", ""GHA"", ""GIN"", ""GNB"", ""KEN"", ""LSO"", ""LBR"", ""LBY"", ""MDG"", ""MWI"", ""MLI"", ""MRT"", ""MUS"", ""MYT"", ""MAR"", ""MOZ"", ""NAM"", ""NER"", ""NGA"", ""REU"", ""RWA"", ""SHN"", ""STP"", ""SEN"", ""SYC"", ""SLE"", ""SOM"", ""ZAF"", ""SSD"", ""SDN"", ""TZA"", ""TGO"", ""TUN"", ""UGA"", ""ESH"", ""ZMB"", ""OWID_ZAN"", ""ZWE"", ""OWID_ERE"", ""OWID_SML""]",
