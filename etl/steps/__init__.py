@@ -197,6 +197,15 @@ def parse_step(step_name: str, dag: Dict[str, Any]) -> "Step":
     elif step_type == "grapher":
         step = GrapherStep(path, dependencies)
 
+    elif step_type == "data-private":
+        step = DataStepPrivate(path, dependencies)
+
+    elif step_type == "walden-private":
+        step = WaldenStepPrivate(path)
+
+    elif step_type == "grapher-private":
+        step = GrapherStepPrivate(path, dependencies)
+
     else:
         raise Exception(f"no recipe for executing step: {step_name}")
 
@@ -205,6 +214,7 @@ def parse_step(step_name: str, dag: Dict[str, Any]) -> "Step":
 
 class Step(Protocol):
     path: str
+    is_public: bool = True
 
     def run(self) -> None:
         ...
@@ -248,10 +258,16 @@ class DataStep(Step):
         else:
             raise Exception(f"have no idea how to run step: {self.path}")
 
+        self.after_run()
+
         # modify the dataset to remember what inputs were used to build it
         dataset = self._output_dataset
         dataset.metadata.source_checksum = self.checksum_input()
         dataset.save()
+
+    def after_run(self) -> None:
+        """Optional post-hook"""
+        ...
 
     def is_dirty(self) -> bool:
         if not self.has_existing_data() or any(d.is_dirty() for d in self.dependencies):
@@ -325,7 +341,7 @@ class DataStep(Step):
         Import the Python module for this step and call run() on it.
         """
         module_path = self.path.lstrip("/").replace("/", ".")
-        step_module = import_module(f"etl.steps.data.{module_path}")
+        step_module = import_module(f"{paths.BASE_PACKAGE}.steps.data.{module_path}")
         if not hasattr(step_module, "run"):
             raise Exception(f'no run() method defined for module "{step_module}"')
 
@@ -574,3 +590,21 @@ class ETagStep(Step):
 
     def checksum_output(self) -> str:
         return get_etag(f"https://{self.path}")
+
+
+class DataStepPrivate(DataStep):
+    is_public = False
+
+    def after_run(self) -> None:
+        """Make dataset private"""
+        ds = catalog.Dataset(self._dest_dir.as_posix())
+        ds.metadata.is_public = False
+        ds.save()
+
+
+class WaldenStepPrivate(WaldenStep):
+    is_public = False
+
+
+class GrapherStepPrivate(GrapherStep):
+    is_public = False

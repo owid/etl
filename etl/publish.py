@@ -25,53 +25,62 @@ class CannotPublish(Exception):
 
 
 @click.command()
-@click.option("--dry-run", is_flag=True)
-def publish(dry_run: bool = False) -> None:
+@click.option("--dry-run", is_flag=True, default=False)
+@click.option("--private", is_flag=True, default=False)
+@click.option("--bucket", type=str, help="Bucket name", default=config.S3_BUCKET)
+def publish(dry_run: bool, private: bool, bucket: str) -> None:
     """
     Publish the generated data catalog to S3.
     """
-    sanity_checks()
-    sync_catalog_to_s3(dry_run=dry_run)
+    catalog = Path(DATA_DIR)
+    if not dry_run and not private:
+        raise Exception(
+            "You cannot publish public catalog yet, only private catalogs with flag --private are supported"
+        )
+    sanity_checks(catalog)
+    sync_catalog_to_s3(bucket, catalog, dry_run=dry_run)
 
 
-def sanity_checks() -> None:
-    if not (DATA_DIR / "catalog.feather").exists():
+def sanity_checks(catalog: Path) -> None:
+    if not (catalog / "catalog.feather").exists():
         print(
             "ERROR: catalog has not been indexed, refusing to publish", file=sys.stderr
         )
         sys.exit(1)
 
 
-def sync_catalog_to_s3(dry_run: bool = False) -> None:
+def sync_catalog_to_s3(bucket: str, catalog: Path, dry_run: bool = False) -> None:
     s3 = connect_s3()
-    if is_catalog_up_to_date(s3):
+    if is_catalog_up_to_date(s3, bucket, catalog):
         print("Catalog is up to date!")
         return
 
-    sync_datasets(s3, dry_run=dry_run)
+    sync_datasets(s3, bucket, catalog, dry_run=dry_run)
     if not dry_run:
-        update_catalog(s3)
+        update_catalog(s3, bucket, catalog)
 
 
-def is_catalog_up_to_date(s3: Any) -> bool:
-    remote = get_remote_checksum(s3, "catalog.feather")
-    local = files.checksum_file(DATA_DIR / "catalog.feather")
+def is_catalog_up_to_date(s3: Any, bucket: str, catalog: Path) -> bool:
+    """The catalog file is synced last -- if it is the same as our local one, then all the remote
+    files will be the same as our local ones too."""
+    remote = get_remote_checksum(s3, bucket, "catalog.feather")
+    local = files.checksum_file(catalog / "catalog.feather")
     return remote == local
 
 
-def sync_datasets(s3: Any, dry_run: bool = False) -> None:
+def sync_datasets(s3: Any, bucket: str, catalog: Path, dry_run: bool = False) -> None:
     "Go dataset by dataset and check if each one needs updating."
-    existing = get_published_checksums()
+    existing = get_published_checksums(bucket)
 
     to_delete = set(existing)
-    local = LocalCatalog(DATA_DIR)
+    local = LocalCatalog(catalog)
     print("Datasets to sync:")
     for ds in local.iter_datasets():
         # ignore datasets with no tables
         if len(ds._data_files) == 0:
             continue
 
-        path = Path(ds.path).relative_to(DATA_DIR).as_posix()
+        path = Path(ds.path).relative_to(catalog).as_posix()
         if path in to_delete:
             to_delete.remove(path)
 
@@ -81,40 +90,51 @@ def sync_datasets(s3: Any, dry_run: bool = False) -> None:
 
         print("-", path)
         if not dry_run:
-            sync_folder(s3, DATA_DIR / path, path)
+            sync_folder(
+                s3, bucket, catalog, catalog / path, path, public=ds.metadata.is_public
+            )
 
     print("Datasets to delete:")
     for path in to_delete:
         print("-", path)
         if not dry_run:
-            delete_dataset(s3, path)
+            delete_dataset(s3, bucket, path)
 
 
 def sync_folder(
-    s3: Any, local_folder: Path, dest_path: str, delete: bool = True
+    s3: Any,
+    bucket: str,
+    catalog: Path,
+    local_folder: Path,
+    dest_path: str,
+    delete: bool = True,
+    public: bool = True,
 ) -> None:
     """
     Perform a content-based sync of a local folder with a "folder" on an S3 bucket,
     by comparing checksums and only uploading files that have changed.
     """
     existing = {
-        o["Key"]: object_md5(s3, o["Key"], o)
-        for o in walk_s3(s3, config.S3_BUCKET, dest_path)
+        o["Key"]: object_md5(s3, bucket, o["Key"], o)
+        for o in walk_s3(s3, bucket, dest_path)
     }
 
     for filename in files.walk(local_folder):
         checksum = files.checksum_file(filename)
-        rel_filename = filename.relative_to(DATA_DIR).as_posix()
+        rel_filename = filename.relative_to(catalog).as_posix()
 
         existing_checksum = existing.get(rel_filename)
 
         if checksum != existing_checksum:
             print("  PUT", rel_filename)
+            ExtraArgs: Dict[str, Any] = {"Metadata": {"md5": checksum}}
+            if public:
+                ExtraArgs["ACL"] = "public-read"
             s3.upload_file(
                 filename.as_posix(),
-                config.S3_BUCKET,
+                bucket,
                 rel_filename,
-                ExtraArgs={"ACL": "public-read", "Metadata": {"md5": checksum}},
+                ExtraArgs=ExtraArgs,
             )
 
         if rel_filename in existing:
@@ -123,17 +143,17 @@ def sync_folder(
     if delete:
         for rel_filename in existing:
             print("  DEL", rel_filename)
-            s3.delete_object(Bucket=config.S3_BUCKET, Key=rel_filename)
+            s3.delete_object(Bucket=bucket, Key=rel_filename)
 
 
-def object_md5(s3: Any, key: str, obj: Dict[str, Any]) -> Optional[str]:
+def object_md5(s3: Any, bucket: str, key: str, obj: Dict[str, Any]) -> Optional[str]:
     maybe_md5 = obj["ETag"].strip('"')
     if re.match("^[0-9a-f]{40}$", maybe_md5):
         return cast(str, maybe_md5)
 
     return cast(
         Optional[str],
-        s3.head_object(Bucket=config.S3_BUCKET, Key=key).get("Metadata", {}).get("md5"),
+        s3.head_object(Bucket=bucket, Key=key).get("Metadata", {}).get("md5"),
     )
 
 
@@ -146,40 +166,38 @@ def walk_s3(s3: Any, bucket: str, path: str) -> Iterator[Dict[str, Any]]:
         yield from objs.get("Contents", [])
 
 
-def delete_dataset(s3: Any, relative_path: str) -> None:
-    to_delete = [o["Key"] for o in walk_s3(s3, config.S3_BUCKET, relative_path)]
+def delete_dataset(s3: Any, bucket: str, relative_path: str) -> None:
+    to_delete = [o["Key"] for o in walk_s3(s3, bucket, relative_path)]
     while to_delete:
         chunk = to_delete[:1000]
         s3.delete_objects(
-            Bucket=config.S3_BUCKET,
+            Bucket=bucket,
             Delete={"Objects": [{"Key": key} for key in chunk], "Quiet": True},
         )
         to_delete = to_delete[1000:]
 
 
-def update_catalog(s3: Any) -> None:
-    catalog_filename = DATA_DIR / "catalog.feather"
+def update_catalog(s3: Any, bucket: str, catalog: Path) -> None:
+    catalog_filename = catalog / "catalog.feather"
     s3.upload_file(
         catalog_filename.as_posix(),
-        config.S3_BUCKET,
+        bucket,
         "catalog.feather",
         ExtraArgs={"ACL": "public-read"},
     )
 
     s3.upload_file(
         catalog_filename.with_suffix(".meta.json").as_posix(),
-        config.S3_BUCKET,
+        bucket,
         "catalog.meta.json",
         ExtraArgs={"ACL": "public-read"},
     )
 
 
-def get_published_checksums() -> Dict[str, str]:
+def get_published_checksums(bucket: str) -> Dict[str, str]:
     "Get the checksum of every dataset that's been published."
     try:
-        existing = pd.read_feather(
-            f"https://{config.S3_BUCKET}.{config.S3_HOST}/catalog.feather"
-        )
+        existing = pd.read_feather(f"https://{bucket}.{config.S3_HOST}/catalog.feather")
         existing["path"] = existing["path"].apply(lambda p: p.rsplit("/", 1)[0])
         existing = (
             existing[["path", "checksum"]]
@@ -193,19 +211,21 @@ def get_published_checksums() -> Dict[str, str]:
     return cast(Dict[str, str], existing)
 
 
-def get_remote_checksum(s3: Any, path: str) -> Optional[str]:
+def get_remote_checksum(s3: Any, bucket: str, path: str) -> Optional[str]:
     try:
-        obj = s3.head_object(Bucket=config.S3_BUCKET, Key=path)
+        obj = s3.head_object(Bucket=bucket, Key=path)
     except ClientError:
         if "Not Found" in ClientError.args[0]:
             return None
 
         raise
 
-    return object_md5(s3, path, obj)
+    return object_md5(s3, bucket, path, obj)
 
 
 def connect_s3() -> Any:
+    # TODO: consider using AWS_PROFILE just like we do here https://github.com/owid/walden/blob/master/owid/walden/owid_cache.py#L52
+    # to be consistent
     session = boto3.Session()
     return session.client(
         "s3",
