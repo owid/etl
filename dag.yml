@@ -70,7 +70,8 @@ steps:
     - walden://wb/2021-07-01/wb_income
   data://garden/wb/2021-07-01/wb_income:
     - data://meadow/wb/2021-07-01/wb_income
-
+  data://garden/ggdc/2020-10-01/ggdc_maddison_project_database:
+    - walden://ggdc/2020-10-01/ggdc_maddison_project_database
   #
   #  Gapminder/Open Numbers curated datasets
   #
