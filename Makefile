@@ -70,7 +70,7 @@ lab: .venv
 
 publish: etl reindex
 	@echo '==> Publishing the catalog'
-	.venv/bin/publish
+	.venv/bin/publish --private
 
 reindex: .venv
 	@echo '==> Creating a catalog index'
