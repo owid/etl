@@ -1,4 +1,8 @@
 steps:
+  data://examples/script/script_example:
+    - walden://wb/2021-07-01/wb_income
+    - data://reference
+
   data://examples/jupytext/jupytext_example:
   data://examples/vs_code_cells/vs_code_cells_example:
 
