@@ -28,9 +28,9 @@ DATASET_NAME = "ggdc_maddison"
 # Original dataset publication date.
 VERSION = "2020-10-01"
 # Column name for GDP in output dataset.
-GDP_COLUMN = "GDP"
+GDP_COLUMN = "gdp"
 # Column name for GDP per capita in output dataset.
-GDP_PER_CAPITA_COLUMN = "GDP per capita"
+GDP_PER_CAPITA_COLUMN = "gdp_per_capita"
 
 
 def load_countries() -> Dict[str, str]:
@@ -73,17 +73,17 @@ def load_main_data(data_file: str) -> pd.DataFrame:
     # Load main sheet from original excel file.
     data = pd.read_excel(data_file, sheet_name="Full data").rename(
         columns={
-            "country": "Country",
-            "year": "Year",
-            "pop": "Population",
+            "country": "country",
+            "year": "year",
+            "pop": "population",
             "gdppc": GDP_PER_CAPITA_COLUMN,
         },
         errors="raise",
-    )[["Country", "Year", "Population", GDP_PER_CAPITA_COLUMN]]
+    )[["country", "year", "population", GDP_PER_CAPITA_COLUMN]]
     # Convert units.
-    data["Population"] = data["Population"] * 1000
+    data["population"] = data["population"] * 1000
     # Create column for GDP.
-    data[GDP_COLUMN] = data[GDP_PER_CAPITA_COLUMN] * data["Population"]
+    data[GDP_COLUMN] = data[GDP_PER_CAPITA_COLUMN] * data["population"]
 
     return cast(pd.DataFrame, data)
 
@@ -127,8 +127,8 @@ def load_additional_data(data_file: str) -> pd.DataFrame:
         region.replace(".1", "") for region in additional_population_data.columns
     ]
     additional_population_data = additional_population_data.melt(
-        id_vars="Region", var_name="Country", value_name="Population"
-    ).rename(columns={"Region": "Year"})
+        id_vars="Region", var_name="country", value_name="population"
+    ).rename(columns={"Region": "year"})
 
     # Prepare additional GDP data.
     gdp_columns = [
@@ -147,25 +147,25 @@ def load_additional_data(data_file: str) -> pd.DataFrame:
         columns={"World GDP pc": "World"}
     )
     additional_gdp_data = additional_gdp_data.melt(
-        id_vars="Region", var_name="Country", value_name=GDP_PER_CAPITA_COLUMN
-    ).rename(columns={"Region": "Year"})
+        id_vars="Region", var_name="country", value_name=GDP_PER_CAPITA_COLUMN
+    ).rename(columns={"Region": "year"})
 
     # Merge additional population and GDP data.
     additional_combined_data = pd.merge(
         additional_population_data,
         additional_gdp_data,
-        on=["Year", "Country"],
+        on=["year", "country"],
         how="inner",
     )
     # Convert units.
-    additional_combined_data["Population"] = (
-        additional_combined_data["Population"] * 1000
+    additional_combined_data["population"] = (
+        additional_combined_data["population"] * 1000
     )
 
     # Create column for GDP.
     additional_combined_data[GDP_COLUMN] = (
         additional_combined_data[GDP_PER_CAPITA_COLUMN]
-        * additional_combined_data["Population"]
+        * additional_combined_data["population"]
     )
 
     assert len(additional_combined_data) == len(additional_population_data)
@@ -194,16 +194,16 @@ def generate_ggdc_data(data_file: str) -> pd.DataFrame:
 
     # Combine both dataframes.
     combined = pd.concat([gdp_data, additional_data], ignore_index=True).dropna(
-        how="all", subset=[GDP_PER_CAPITA_COLUMN, "Population", GDP_COLUMN]
+        how="all", subset=[GDP_PER_CAPITA_COLUMN, "population", GDP_COLUMN]
     )
 
     # Standardize country names.
     countries = load_countries()
-    combined["Country"] = combined["Country"].replace(countries)
+    combined["country"] = combined["country"].replace(countries)
 
     # Sort rows and columns conveniently.
-    combined = combined.sort_values(["Country", "Year"]).reset_index(drop=True)[
-        ["Country", "Year", GDP_PER_CAPITA_COLUMN, "Population", GDP_COLUMN]
+    combined = combined.sort_values(["country", "year"]).reset_index(drop=True)[
+        ["country", "year", GDP_PER_CAPITA_COLUMN, "population", GDP_COLUMN]
     ]
 
     # Some rows have spurious zero GDP. Convert them into nan.
