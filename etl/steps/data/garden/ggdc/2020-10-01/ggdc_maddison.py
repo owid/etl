@@ -32,7 +32,7 @@ GDP_COLUMN = "gdp"
 # Column name for GDP per capita in output dataset.
 GDP_PER_CAPITA_COLUMN = "gdp_per_capita"
 # Name for table of GDP to be included in the dataset in garden.
-TABLE_SHORT_NAME = "gdp"
+TABLE_SHORT_NAME = "maddison_gdp"
 # Additional description to be prepended to the description given in walden.
 ADDITIONAL_DESCRIPTION = """
 Notes:
@@ -41,6 +41,14 @@ independent until the 2011 referendum which took place).
 + Tanzania refers only to Mainland Tanzania.
 
 """
+# Define variable titles.
+VARIABLE_TITLES = {
+    "country": "Country",
+    "year": "Year",
+    "population": "Population",
+    GDP_COLUMN: "GDP",
+    GDP_PER_CAPITA_COLUMN: "GDP per capita",
+}
 
 
 def load_countries() -> Dict[str, str]:
@@ -242,11 +250,15 @@ def run(dest_dir: str) -> None:
     # Create a new table with the processed data.
     t = Table(df)
 
-    # Assign the same metadata of the walden dataset to this table.
+    # Assign metadata.
     t.metadata.short_name = TABLE_SHORT_NAME
     t.metadata.title = ds.metadata.title
     t.metadata.description = ADDITIONAL_DESCRIPTION + ds.metadata.description
-    t.set_index(["country", "year"])
+    for variable in VARIABLE_TITLES:
+        t[variable].metadata.title = VARIABLE_TITLES[variable]
+
+    # Set meaningful indexes.
+    t = t.set_index(["country", "year"])
 
     # Add table to current dataset.
     ds.add(t)
