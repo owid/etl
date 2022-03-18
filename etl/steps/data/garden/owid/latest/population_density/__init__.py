@@ -10,6 +10,7 @@ https://github.com/owid/notebooks/blob/main/EdouardMathieu/omm_population_densit
 """
 
 import pandas as pd
+from typing import cast
 
 from owid.catalog import Dataset, DatasetMeta, Table, Variable, Source, VariableMeta
 
@@ -59,7 +60,11 @@ def make_table() -> Table:
 
 
 def load_sources() -> list[Source]:
-    return load_population().metadata.sources + load_land_area().metadata.sources
+    return cast(
+        list[Source],
+        load_population().population.metadata.sources
+        + load_land_area().land_area.metadata.sources,
+    )
 
 
 def run(dest_dir: str) -> None:
@@ -70,7 +75,6 @@ def run(dest_dir: str) -> None:
     ds.metadata = DatasetMeta(
         namespace="owid",
         title="Population density (World Bank, Gapminder, HYDE & UN)",
-        # TODO: might make more sense to split source into three?
         sources=load_sources(),
     )
     t.metadata.short_name = "population_density"
@@ -79,16 +83,13 @@ def run(dest_dir: str) -> None:
     """.strip()
 
     # variable metadata (id 123 in grapher)
-    set_variable_metadata(
-        t.population_density,
-        VariableMeta(
-            title="population_density",
-            display={
-                "name": "Population density",
-                "unit": "people per km²",
-                "includeInTable": True,
-            },
-        ),
+    t.population_density.metadata = VariableMeta(
+        title="population_density",
+        display={
+            "name": "Population density",
+            "unit": "people per km²",
+            "includeInTable": True,
+        },
     )
 
     ds.add(t)

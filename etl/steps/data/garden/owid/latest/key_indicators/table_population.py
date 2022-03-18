@@ -58,10 +58,10 @@ def make_table() -> Table:
     t.metadata.short_name = "population"
     t.metadata.title = "Population (Gapminder, HYDE & UN)"
     t.metadata.description = 'Our World in Data builds and maintains a long-run dataset on population by country, region, and for the world, based on three key sources: HYDE, Gapminder, and the UN World Population Prospects. You can find more information on these sources and how our time series is constructed on this page: <a href="https://ourworldindata.org/population-sources">What sources do we rely on for population estimates?</a>'
-    t.metadata.sources = sources
 
     # variables metadata (variable 72 in grapher)
     t.population.metadata.title = "Population"
+    t.population.metadata.sources = sources
     t.population.metadata.description = "Population by country, available from 1800 to 2021 based on Gapminder data, HYDE, and UN Population Division (2019) estimates."
     t.population.metadata.display = {"name": "Population", "includeInTable": True}
 
@@ -111,30 +111,6 @@ def add_income_groups(df: pd.DataFrame) -> pd.DataFrame:
     )
 
     return pd.concat([df, population_income_groups], ignore_index=True)
-
-
-def rename_entities(df: pd.DataFrame) -> pd.DataFrame:
-    mapping = (
-        pd.read_csv(COUNTRY_MAPPING)
-        .drop_duplicates()
-        .rename(
-            columns={
-                "Country": "country",
-                "Our World In Data Name": "owid_country",
-            }
-        )
-    )
-    df = df.merge(mapping, left_on="country", right_on="country", how="left")
-
-    missing = df[pd.isnull(df["owid_country"])]
-    if len(missing) > 0:
-        missing = "\n".join(missing.country.unique())
-        raise Exception(f"Missing entities in mapping:\n{missing}")
-
-    df = df.drop(columns=["country"]).rename(columns={"owid_country": "country"})
-
-    df = df.loc[-(df.country == "DROPENTITY")]
-    return df
 
 
 def _assert_unique(df: pd.DataFrame, subset: List[str]) -> None:
