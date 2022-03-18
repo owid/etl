@@ -31,6 +31,16 @@ VERSION = "2020-10-01"
 GDP_COLUMN = "gdp"
 # Column name for GDP per capita in output dataset.
 GDP_PER_CAPITA_COLUMN = "gdp_per_capita"
+# Name for table of GDP to be included in the dataset in garden.
+TABLE_SHORT_NAME = "gdp"
+# Additional description to be prepended to the description given in walden.
+ADDITIONAL_DESCRIPTION = """
+Notes:
++ Sudan in Maddison's classification includes the Republic of the Sudan and South Sudan (which had not yet become
+independent until the 2011 referendum which took place).
++ Tanzania refers only to Mainland Tanzania.
+
+"""
 
 
 def load_countries() -> Dict[str, str]:
@@ -209,7 +219,6 @@ def generate_ggdc_data(data_file: str) -> pd.DataFrame:
     # Some rows have spurious zero GDP. Convert them into nan.
     zero_gdp_rows = combined[GDP_COLUMN] == 0
     if zero_gdp_rows.any():
-        print(f"WARNING: Converting {zero_gdp_rows.sum()} rows with zero GDP into nan.")
         combined.loc[zero_gdp_rows, [GDP_COLUMN, GDP_PER_CAPITA_COLUMN]] = np.nan
 
     return combined
@@ -234,9 +243,10 @@ def run(dest_dir: str) -> None:
     t = Table(df)
 
     # Assign the same metadata of the walden dataset to this table.
-    t.metadata.short_name = DATASET_NAME
+    t.metadata.short_name = TABLE_SHORT_NAME
     t.metadata.title = ds.metadata.title
-    t.metadata.description = ds.metadata.description
+    t.metadata.description = ADDITIONAL_DESCRIPTION + ds.metadata.description
+    t.set_index(["country", "year"])
 
     # Add table to current dataset.
     ds.add(t)
