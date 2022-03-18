@@ -13,6 +13,7 @@ Definitions according to the Notes in the data file:
 import json
 from typing import cast, Dict
 
+import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
 from owid.walden import Catalog
@@ -43,10 +44,9 @@ def load_countries() -> Dict[str, str]:
     """
     # Define path to countries file.
     garden_dir = STEP_DIR / "data" / "garden" / NAMESPACE / VERSION
-    files = list(garden_dir.glob("*countries.json"))
-    # Ensure there is only one countries file.
-    assert len(files) == 1
-    countries_file = files[0]
+    # Identify countries file.
+    # If none, or more than one files are found, this step will raise an error.
+    (countries_file,) = list(garden_dir.glob("*countries.json"))
     # Load countries from file.
     with open(countries_file, "r") as _file:
         countries = json.loads(_file.read())
@@ -56,6 +56,8 @@ def load_countries() -> Dict[str, str]:
 
 def load_main_data(data_file: str) -> pd.DataFrame:
     """Load data from the main sheet of the original dataset.
+
+    Note: This function does not standardize countries (since this is done later).
 
     Parameters
     ----------
@@ -83,15 +85,13 @@ def load_main_data(data_file: str) -> pd.DataFrame:
     # Create column for GDP.
     data[GDP_COLUMN] = data[GDP_PER_CAPITA_COLUMN] * data["Population"]
 
-    # Standardize country names.
-    countries = load_countries()
-    data["Country"] = data["Country"].replace(countries)
-
     return cast(pd.DataFrame, data)
 
 
 def load_additional_data(data_file: str) -> pd.DataFrame:
     """Load regional data from the original dataset.
+
+    Note: This function does not standardize countries (since this is done later).
 
     Parameters
     ----------
@@ -168,12 +168,6 @@ def load_additional_data(data_file: str) -> pd.DataFrame:
         * additional_combined_data["Population"]
     )
 
-    # Standardize country names.
-    countries = load_countries()
-    additional_combined_data["Country"] = additional_combined_data["Country"].replace(
-        countries
-    )
-
     assert len(additional_combined_data) == len(additional_population_data)
     assert len(additional_combined_data) == len(additional_gdp_data)
 
@@ -181,7 +175,7 @@ def load_additional_data(data_file: str) -> pd.DataFrame:
 
 
 def generate_ggdc_data(data_file: str) -> pd.DataFrame:
-    """Load and process GGDC data.
+    """Load and process GGDC data (including standardizing country names).
 
     Parameters
     ----------
@@ -199,18 +193,24 @@ def generate_ggdc_data(data_file: str) -> pd.DataFrame:
     additional_data = load_additional_data(data_file=data_file)
 
     # Combine both dataframes.
-    combined = (
-        pd.concat([gdp_data, additional_data], ignore_index=True)
-        .dropna(how="all", subset=[GDP_COLUMN, GDP_PER_CAPITA_COLUMN])
-        .sort_values(["Country", "Year"])
-        .reset_index(drop=True)
+    combined = pd.concat([gdp_data, additional_data], ignore_index=True).dropna(
+        how="all", subset=[GDP_PER_CAPITA_COLUMN, "Population", GDP_COLUMN]
     )
 
-    # Some rows have spurious zero GDP. Remove them.
+    # Standardize country names.
+    countries = load_countries()
+    combined["Country"] = combined["Country"].replace(countries)
+
+    # Sort rows and columns conveniently.
+    combined = combined.sort_values(["Country", "Year"]).reset_index(drop=True)[
+        ["Country", "Year", GDP_PER_CAPITA_COLUMN, "Population", GDP_COLUMN]
+    ]
+
+    # Some rows have spurious zero GDP. Convert them into nan.
     zero_gdp_rows = combined[GDP_COLUMN] == 0
     if zero_gdp_rows.any():
-        print(f"WARNING: Removing {zero_gdp_rows.sum()} rows with zero GDP.")
-        combined = combined[~zero_gdp_rows].reset_index(drop=True)
+        print(f"WARNING: Converting {zero_gdp_rows.sum()} rows with zero GDP into nan.")
+        combined.loc[zero_gdp_rows, [GDP_COLUMN, GDP_PER_CAPITA_COLUMN]] = np.nan
 
     return combined
 
