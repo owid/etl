@@ -24,7 +24,7 @@ from etl.steps.data.converters import convert_walden_metadata
 # Institution name.
 NAMESPACE = "ggdc"
 # Dataset name.
-DATASET_NAME = "ggdc_maddison_project_database"
+DATASET_NAME = "ggdc_maddison"
 # Original dataset publication date.
 VERSION = "2020-10-01"
 # Column name for GDP in output dataset.
