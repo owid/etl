@@ -54,6 +54,8 @@ def make_table() -> Table:
         .sort_values(["country", "year"])
     )
 
+    df.metadata.short_name = "population_density"
+    df.metadata.description = "Population density (World Bank, Gapminder, HYDE & UN)"
     assert (df.population_density >= 0).all()
     assert (df.population_density < 40000).all()
     return df.set_index(["country", "year"])
