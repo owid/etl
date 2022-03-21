@@ -18,6 +18,7 @@ from etl.db import get_connection
 from etl.db_utils import DBUtils
 from etl import config
 from owid import catalog
+from owid.catalog import utils
 
 import logging
 import traceback
@@ -46,6 +47,8 @@ class DatasetUpsertResult:
 def upsert_dataset(
     dataset: catalog.Dataset, namespace: str, sources: List[catalog.meta.Source]
 ) -> DatasetUpsertResult:
+    utils.validate_snake_case(dataset.metadata.short_name, "Dataset's short_name")
+
     # This function creates the dataset table row, a namespace row
     # and the sources table row(s). There is a bit of an open question if we should
     # map one dataset with N tables to one namespace and N datasets in
@@ -129,6 +132,10 @@ def upsert_table(
     assert (
         table.index.dtypes[1] in INT_TYPES
     ), f"entity_id must be of an integer type but was: {table.index.dtypes[1]}"
+    utils.validate_snake_case(table.metadata.short_name, "Table's short_name")
+    utils.validate_snake_case(
+        table.iloc[:, 0].metadata.short_name, "Variable's short_name"
+    )
 
     connection = None
     cursor = None
