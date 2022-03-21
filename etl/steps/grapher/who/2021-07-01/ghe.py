@@ -10,7 +10,7 @@ from etl.paths import DATA_DIR
 
 def get_grapher_dataset() -> catalog.Dataset:
     dataset = catalog.Dataset(DATA_DIR / "garden" / "who" / "2021-07-01" / "ghe")
-    dataset.metadata.short_name = "ghe-2021-07-01"
+    dataset.metadata.short_name = "ghe__2021_07_01"
     dataset.metadata.namespace = "who"
     return dataset
 
@@ -110,7 +110,7 @@ def get_grapher_tables(dataset: catalog.Dataset) -> Iterable[catalog.Table]:
                 # subset of data that we prepared above
                 for column in columns_to_export:
                     short_name = slugify.slugify(
-                        f"{column}-{ghe_cause_title}-{sex_code}-{agegroup_code}"
+                        f"{column}__{ghe_cause_title}__{sex_code}__{agegroup_code}"
                     )
 
                     table_to_yield = cutout_table[[column]]
