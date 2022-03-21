@@ -14,7 +14,7 @@ from typing import cast, List
 
 import pandas as pd
 
-from owid.catalog import Dataset, Table, Source
+from owid.catalog import Dataset, Table
 from etl.paths import DATA_DIR
 from etl import data_helpers
 
@@ -36,34 +36,7 @@ def make_table() -> Table:
         .pipe(prepare_dataset)
     )
 
-    sources = [
-        Source(
-            name="Gapminder (v6)",
-            url="https://www.gapminder.org/data/documentation/gd003/",
-            date_accessed="October 8, 2021",
-        ),
-        Source(
-            name="UN (2019)",
-            url="https://population.un.org/wpp/Download/Standard/Population/",
-            date_accessed="October 8, 2021",
-        ),
-        Source(
-            name="HYDE (v3.2)",
-            url="https://dataportaal.pbl.nl/downloads/HYDE/",
-            date_accessed="October 8, 2021",
-        ),
-    ]
-
-    # table metadata
-    t.metadata.short_name = "population"
-    t.metadata.title = "Population (Gapminder, HYDE & UN)"
-    t.metadata.description = 'Our World in Data builds and maintains a long-run dataset on population by country, region, and for the world, based on three key sources: HYDE, Gapminder, and the UN World Population Prospects. You can find more information on these sources and how our time series is constructed on this page: <a href="https://ourworldindata.org/population-sources">What sources do we rely on for population estimates?</a>'
-
-    # variables metadata (variable 72 in grapher)
-    t.population.metadata.title = "Population"
-    t.population.metadata.sources = sources
-    t.population.metadata.description = "Population by country, available from 1800 to 2021 based on Gapminder data, HYDE, and UN Population Division (2019) estimates."
-    t.population.metadata.display = {"name": "Population", "includeInTable": True}
+    t.update_metadata_from_yaml(DIR_PATH / "table_population.meta.yml", "population")
 
     return t
 

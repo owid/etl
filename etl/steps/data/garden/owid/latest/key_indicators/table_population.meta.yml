@@ -1,0 +1,27 @@
+tables:
+  population:
+    title: Population (Gapminder, HYDE & UN)
+    description: |
+      Our World in Data builds and maintains a long-run dataset on population by country, region, and for the world, based on three key sources: HYDE, Gapminder, and the UN World Population Prospects.
+      You can find more information on these sources and how our time series is constructed on this page: <a href="https://ourworldindata.org/population-sources">What sources do we rely on for population estimates?</a>'
+
+    variables:
+      population:
+        title: Population
+        description: Population by country, available from 1800 to 2021 based on Gapminder data, HYDE, and UN Population Division (2019) estimates.
+        sources:
+          -
+            name: Gapminder (v6)
+            published_by: Gapminder (v6)
+            url: https://www.gapminder.org/data/documentation/gd003/
+            date_accessed: October 8, 2021
+          -
+            name: UN (2019)
+            published_by: United Nations Population Division (2019)
+            url: https://population.un.org/wpp/Download/Standard/Population/
+            date_accessed: October 8, 2021
+          -
+            name: HYDE (v3.2)
+            published_by: HYDE (v3.2)
+            url: https://dataportaal.pbl.nl/downloads/HYDE/
+            date_accessed: October 8, 2021

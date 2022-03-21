@@ -73,21 +73,10 @@ steps:
   data://garden/ggdc/2020-10-01/ggdc_maddison:
     - walden://ggdc/2020-10-01/ggdc_maddison
 
+  grapher://owid/latest/population_density:
+    - data://garden/owid/latest/population_density
   grapher://ggdc/2020-10-01/ggdc_maddison:
     - data://garden/ggdc/2020-10-01/ggdc_maddison
-
-  #
-  #  Backported data
-  #
-  # data://backport/owid/latest/political_regimes:
-  #   # TODO: rename `political_regimes_values` to `political_regimes` and check only for that one
-  #   # alternatively support multiple files in walden, but that's not necessary yet
-  #   # TODO: would it be better to create `BackportDataStep` instead of having step file for every dataset?
-  #   - walden://_staging_backport/latest/5426_political_regimes_values
-  #   - walden://_staging_backport/latest/5426_political_regimes_config
-  # data://backport/owid/latest/wdi_world_bank:
-  #   - walden://_staging_backport/latest/5357_wdi_world_bank_values
-  #   - walden://_staging_backport/latest/5357_wdi_world_bank_config
 
   #
   #  Gapminder/Open Numbers curated datasets

@@ -11,8 +11,9 @@ https://github.com/owid/notebooks/blob/main/EdouardMathieu/omm_population_densit
 
 import pandas as pd
 from typing import cast
+from pathlib import Path
 
-from owid.catalog import Dataset, DatasetMeta, Table, Variable, Source, VariableMeta
+from owid.catalog import Dataset, Table, Source
 
 from etl.paths import DATA_DIR
 
@@ -69,35 +70,12 @@ def load_sources() -> list[Source]:
 
 def run(dest_dir: str) -> None:
     ds = Dataset.create_empty(dest_dir)
+    meta_path = Path(__file__).parent / "population_density.meta.yml"
+    ds.metadata.update_from_yaml(meta_path)
+    ds.metadata.sources = load_sources()
+
     t = make_table()
-
-    # add metadata, use values from variable 123 in grapher
-    ds.metadata = DatasetMeta(
-        namespace="owid",
-        title="Population density (World Bank, Gapminder, HYDE & UN)",
-        sources=load_sources(),
-    )
-    t.metadata.short_name = "population_density"
-    t.metadata.description = """
-    Our World in Data builds and maintains a long-run dataset on population by country, region, and for the world, based on three key sources: HYDE, Gapminder, and the UN World Population Prospects. This combines historical population estimates with median scenario projections to 2100. You can find more information on these sources and how our time series is constructed on this page: <a href="https://ourworldindata.org/population-sources">What sources do we rely on for population estimates?</a>\n\nWe combine this population dataset with the <a href="https://ourworldindata.org/grapher/land-area-km">land area estimates published by the World Bank</a>, to produce a long-run dataset of population density.\n\nIn all sources that we rely on, population estimates and land area estimates are based on today’s geographical borders.'
-    """.strip()
-
-    # variable metadata (id 123 in grapher)
-    t.population_density.metadata = VariableMeta(
-        title="population_density",
-        display={
-            "name": "Population density",
-            "unit": "people per km²",
-            "includeInTable": True,
-        },
-    )
+    t.update_metadata_from_yaml(meta_path, "population_density")
 
     ds.add(t)
     ds.save()
-
-
-def set_variable_metadata(v: Variable, meta: VariableMeta) -> None:
-    """Set Metadata on a variable.
-    TODO: make this a method of the Variable class
-    """
-    v._fields[v.checked_name] = meta
