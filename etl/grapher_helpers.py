@@ -3,6 +3,7 @@ from owid import catalog
 from collections.abc import Iterable
 import yaml
 import slugify
+import warnings
 from pathlib import Path
 
 from typing import Optional, Dict, Literal, cast, List, Any
@@ -105,14 +106,20 @@ def yield_wide_table(table: catalog.Table) -> Iterable[catalog.Table]:
 
     dim_names = [k for k in table.primary_key if k not in ("year", "entity_id")]
 
-    for dims, table_to_yield in table.groupby(dim_names, as_index=False):
+    if dim_names:
+        grouped = table.groupby(dim_names, as_index=False)
+    else:
+        # a situation when there's only year and entity_id in index with no additional dimensions
+        grouped = [([], table)]
+
+    for dims, table_to_yield in grouped:
         # Now iterate over every column in the original dataset and export the
         # subset of data that we prepared above
         for column in table_to_yield.columns:
 
             # Add column and dimensions as short_name
             table_to_yield.metadata.short_name = slugify.slugify(
-                "-".join([column] + list(dims))
+                "__".join([column] + list(dims))
             )
 
             # Safety check to see if the metadata is still intact
@@ -149,19 +156,25 @@ def yield_long_table(
         yield from yield_wide_table(cast(catalog.Table, t))
 
 
-def dataset_table_names(ds: catalog.Dataset) -> List[str]:
-    """Return table names of a dataset.
-    TODO: move it to Dataset as a method"""
-    return [t.metadata.short_name for t in ds if t.metadata.short_name is not None]
-
-
-def country_to_entity_id(country: pd.Series) -> pd.Series:
+def country_to_entity_id(
+    country: pd.Series, errors: Literal["raise", "ignore", "warn"] = "raise"
+) -> pd.Series:
     """Convert country name to grapher entity_id."""
     reference_dataset = catalog.Dataset(DATA_DIR / "reference")
     countries_regions = reference_dataset["countries_regions"]
     country_map = countries_regions.set_index("name")["legacy_entity_id"]
     entity_id = country.map(country_map)
-    assert not (
-        entity_id.isnull()
-    ).any(), "Some countries are not in the reference dataset"
-    return cast(pd.Series, entity_id.astype(int))
+
+    if entity_id.isnull().any():
+        msg = f"Some countries are not in the reference dataset: {set(country[entity_id.isnull()])}"
+        if errors == "raise":
+            raise ValueError(msg)
+        elif errors == "warn":
+            warnings.warn(msg)
+        elif errors == "ignore":
+            pass
+
+        # Int64 allows NaN values
+        return cast(pd.Series, entity_id.astype("Int64"))
+    else:
+        return cast(pd.Series, entity_id.astype(int))
