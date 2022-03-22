@@ -1,8 +1,7 @@
 """Load dataset for the Maddison Project Database from walden, process it, and transfer it to garden.
 
-Current dataset assumes the following approximate mappings:
+Current dataset assumes the following approximate mapping:
 * "U.R. of Tanzania: Mainland" -> "Tanzania" (ignoring Zanzibar).
-* "Sudan (Former)" -> "Sudan" (including South Sudan).
 
 Definitions according to the Notes in the data file:
 * "gdppc": Real GDP per capita in 2011$.
