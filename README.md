@@ -161,7 +161,7 @@ Frequently used patterns are provided in the `etl/steps/data/examples` folder. Y
 etl examples --force
 ```
 
-and use them as templates for your own steps.
+or use them as starting templates for your own steps.
 
 ## Harmonizing countries
 
