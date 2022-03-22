@@ -34,10 +34,8 @@ GDP_PER_CAPITA_COLUMN = "gdp_per_capita"
 TABLE_SHORT_NAME = "maddison_gdp"
 # Additional description to be prepended to the description given in walden.
 ADDITIONAL_DESCRIPTION = """
-Notes:
-+ Sudan in Maddison's classification includes the Republic of the Sudan and South Sudan (which had not yet become
-independent until the 2011 referendum which took place).
-+ Tanzania refers only to Mainland Tanzania.
+Note:
+Tanzania refers only to Mainland Tanzania.
 
 """
 # Define variable titles.
