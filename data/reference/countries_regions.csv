@@ -29,7 +29,7 @@ BMU,Bermuda,BM,BMU,319.0,,,BER,BM,,BMU,BMU,http://www.wikidata.org/entity/Q23635
 BTN,Bhutan,BT,BTN,514.0,BHU,760.0,BHU,BT,BHTN,BTN,BTN,http://www.wikidata.org/entity/Q917,Bhutan,33.0,592.0,,
 BOL,Bolivia,BO,BOL,218.0,BOL,145.0,BOL,BO,BOLV,BOL,BOL,http://www.wikidata.org/entity/Q750,Bolivia,34.0,588.0,,"[""Bolivia (Plurinational State of)"", ""Bolivia, Plurinational State Of""]"
 BES,Bonaire Sint Eustatius and Saba,BQ,BES,,,,,,,,,http://www.wikidata.org/entity/Q27561,Caribbean Netherlands,348.0,794.0,,"[""Bonaire, Saint Eustatius And Saba"", ""Bonaire, Sint Eustatius and Saba""]"
-BIH,Bosnia and Herzegovina,BA,BIH,963.0,BOS,346.0,BIH,BN,,BIH,BIH,http://www.wikidata.org/entity/Q225,Bosnia and Herzegovina,35.0,584.0,,"[""Bsnia.&Hrzgvna.""]"
+BIH,Bosnia and Herzegovina,BA,BIH,963.0,BOS,346.0,BIH,BN,,BIH,BIH,http://www.wikidata.org/entity/Q225,Bosnia and Herzegovina,35.0,584.0,,"[""Bosnia Herzegovina"", ""Bsnia.&Hrzgvna.""]"
 BWA,Botswana,BW,BWA,616.0,BOT,571.0,BOT,BS,BTSN,BWA,BWA,http://www.wikidata.org/entity/Q963,Botswana,36.0,593.0,,
 BVT,Bouvet Island,BV,BVT,,,,,,,,,http://www.wikidata.org/entity/Q23408,Bouvet Island,349.0,796.0,,
 BRA,Brazil,BR,BRA,223.0,BRA,140.0,BRA,BL,BRZL,BRA,BRA,http://www.wikidata.org/entity/Q155,Brazil,37.0,589.0,,
@@ -294,4 +294,4 @@ OWID_SAM,South America,,,,,,,,,,,,,5403.0,,"[""ARG"", ""BOL"", ""BRA"", ""CHL"",
 OWID_NAM,North America,,,,,,,,,,,,,294.0,,"[""AIA"", ""ATG"", ""ABW"", ""BHS"", ""BRB"", ""BLZ"", ""BMU"", ""BES"", ""VGB"", ""CAN"", ""CYM"", ""CRI"", ""CUB"", ""CUW"", ""DMA"", ""DOM"", ""SLV"", ""GRL"", ""GRD"", ""GLP"", ""GTM"", ""HTI"", ""HND"", ""JAM"", ""MTQ"", ""MEX"", ""MSR"", ""ANT"", ""NIC"", ""PAN"", ""PRI"", ""BLM"", ""KNA"", ""LCA"", ""MAF"", ""SPM"", ""VCT"", ""SXM"", ""TTO"", ""TCA"", ""USA"", ""VIR""]",
 OWID_OCE,Oceania,,,,,,,,,,,,,277.0,,"[""ASM"", ""AUS"", ""COK"", ""FJI"", ""PYF"", ""GUM"", ""KIR"", ""MHL"", ""FSM"", ""NRU"", ""NCL"", ""NZL"", ""NIU"", ""NFK"", ""MNP"", ""PLW"", ""PNG"", ""PCN"", ""WSM"", ""SLB"", ""TKL"", ""TON"", ""TUV"", ""UMI"", ""VUT"", ""WLF""]",
 ATA,Antarctica,AQ,ATA,,,,,,,,,http://www.wikidata.org/entity/Q21590062,Antarctic Treaty area,346.0,792.0,"[""BVT"", ""ATF"", ""HMD"", ""ATA""]",
-OWID_EU27,EU-27,,,,,,,,,,,,,135114.0,,"[""AUT"", ""BEL"", ""BGR"", ""HRV"", ""CYP"", ""CZE"", ""DNK"", ""EST"", ""FIN"", ""FRA"", ""DEU"", ""GRC"", ""HUN"", ""IRL"", ""ITA"", ""LVA"", ""LTU"", ""LUX"", ""MLT"", ""NLD"", ""POL"", ""PRT"", ""ROU"", ""SVK"", ""SVN"", ""ESP"", ""SWE""]",
+OWID_EU27,European Union (27),,,,,,,,,,,,,135114.0,,"[""AUT"", ""BEL"", ""BGR"", ""HRV"", ""CYP"", ""CZE"", ""DNK"", ""EST"", ""FIN"", ""FRA"", ""DEU"", ""GRC"", ""HUN"", ""IRL"", ""ITA"", ""LVA"", ""LTU"", ""LUX"", ""MLT"", ""NLD"", ""POL"", ""PRT"", ""ROU"", ""SVK"", ""SVN"", ""ESP"", ""SWE""]","[""EU-27""]"

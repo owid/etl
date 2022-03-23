@@ -14,7 +14,7 @@ from typing import cast, List
 
 import pandas as pd
 
-from owid.catalog import Dataset, Table
+from owid.catalog import Dataset, Table, Source
 from etl.paths import DATA_DIR
 from etl import data_helpers
 
@@ -23,8 +23,6 @@ GAPMINDER = DATA_DIR / "garden/gapminder/2019-12-10/population"
 HYDE = DATA_DIR / "garden/hyde/2017/baseline"
 WB_INCOME = DATA_DIR / "garden/wb/2021-07-01/wb_income"
 REFERENCE = DATA_DIR / "reference"
-
-COUNTRY_MAPPING = Path(__file__).with_suffix(".mapping.csv")
 
 DIR_PATH = Path(__file__).parent
 
@@ -38,7 +36,35 @@ def make_table() -> Table:
         .pipe(prepare_dataset)
     )
 
+    sources = [
+        Source(
+            name="Gapminder (v6)",
+            url="https://www.gapminder.org/data/documentation/gd003/",
+            date_accessed="October 8, 2021",
+        ),
+        Source(
+            name="UN (2019)",
+            url="https://population.un.org/wpp/Download/Standard/Population/",
+            date_accessed="October 8, 2021",
+        ),
+        Source(
+            name="HYDE (v3.2)",
+            url="https://dataportaal.pbl.nl/downloads/HYDE/",
+            date_accessed="October 8, 2021",
+        ),
+    ]
+
+    # table metadata
     t.metadata.short_name = "population"
+    t.metadata.title = "Population (Gapminder, HYDE & UN)"
+    t.metadata.description = 'Our World in Data builds and maintains a long-run dataset on population by country, region, and for the world, based on three key sources: HYDE, Gapminder, and the UN World Population Prospects. You can find more information on these sources and how our time series is constructed on this page: <a href="https://ourworldindata.org/population-sources">What sources do we rely on for population estimates?</a>'
+
+    # variables metadata (variable 72 in grapher)
+    t.population.metadata.title = "Population"
+    t.population.metadata.sources = sources
+    t.population.metadata.description = "Population by country, available from 1800 to 2021 based on Gapminder data, HYDE, and UN Population Division (2019) estimates."
+    t.population.metadata.display = {"name": "Population", "includeInTable": True}
+
     return t
 
 
@@ -85,30 +111,6 @@ def add_income_groups(df: pd.DataFrame) -> pd.DataFrame:
     )
 
     return pd.concat([df, population_income_groups], ignore_index=True)
-
-
-def rename_entities(df: pd.DataFrame) -> pd.DataFrame:
-    mapping = (
-        pd.read_csv(COUNTRY_MAPPING)
-        .drop_duplicates()
-        .rename(
-            columns={
-                "Country": "country",
-                "Our World In Data Name": "owid_country",
-            }
-        )
-    )
-    df = df.merge(mapping, left_on="country", right_on="country", how="left")
-
-    missing = df[pd.isnull(df["owid_country"])]
-    if len(missing) > 0:
-        missing = "\n".join(missing.country.unique())
-        raise Exception(f"Missing entities in mapping:\n{missing}")
-
-    df = df.drop(columns=["country"]).rename(columns={"owid_country": "country"})
-
-    df = df.loc[-(df.country == "DROPENTITY")]
-    return df
 
 
 def _assert_unique(df: pd.DataFrame, subset: List[str]) -> None:

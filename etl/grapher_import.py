@@ -18,6 +18,7 @@ from etl.db import get_connection
 from etl.db_utils import DBUtils
 from etl import config
 from owid import catalog
+from owid.catalog import utils
 
 import logging
 import traceback
@@ -30,6 +31,12 @@ logger.setLevel(logging.INFO)
 CURRENT_DIR = os.path.dirname(__file__)
 # CURRENT_DIR = os.path.join(os.getcwd(), 'standard_importer')
 
+INT_TYPES = (
+    "int",
+    "uint64",
+    "Int64",
+)
+
 
 @dataclass
 class DatasetUpsertResult:
@@ -40,6 +47,8 @@ class DatasetUpsertResult:
 def upsert_dataset(
     dataset: catalog.Dataset, namespace: str, sources: List[catalog.meta.Source]
 ) -> DatasetUpsertResult:
+    utils.validate_snake_case(dataset.metadata.short_name, "Dataset's short_name")
+
     # This function creates the dataset table row, a namespace row
     # and the sources table row(s). There is a bit of an open question if we should
     # map one dataset with N tables to one namespace and N datasets in
@@ -113,13 +122,20 @@ def upsert_table(
     assert (
         len(table.columns) == 1
     ), f"Tables to be upserted must have only 1 column. Instead they have: {table.columns.names}"
+    assert (
+        table.iloc[:, 0].notnull().all()
+    ), f"Tables to be upserted must have no null values. Instead they have:\n{table.loc[table.iloc[:, 0].isnull()]}"
     table = table.reorder_levels(["year", "entity_id"])
     assert (
-        table.index.dtypes[0] == "int"
+        table.index.dtypes[0] in INT_TYPES
     ), f"year must be of an integer type but was: {table.index.dtypes[0]}"
     assert (
-        table.index.dtypes[1] == "int"
+        table.index.dtypes[1] in INT_TYPES
     ), f"entity_id must be of an integer type but was: {table.index.dtypes[1]}"
+    utils.validate_snake_case(table.metadata.short_name, "Table's short_name")
+    utils.validate_snake_case(
+        table.iloc[:, 0].metadata.short_name, "Variable's short_name"
+    )
 
     connection = None
     cursor = None
@@ -199,6 +215,7 @@ def upsert_table(
             connection.rollback()
         if config.DEBUG:
             traceback.print_exc()
+        raise e
     finally:
         if cursor:
             cursor.close()
