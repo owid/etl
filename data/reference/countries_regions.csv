@@ -57,7 +57,7 @@ COM,Comoros,KM,COM,632.0,COM,581.0,COI,CQ,CMRS,COM,COM,http://www.wikidata.org/e
 COG,Congo,CG,COG,634.0,CON,484.0,PRC,CF,CNGO,,COG,http://www.wikidata.org/entity/Q971,Republic of the Congo,168.0,603.0,,"[""Congo, Rep."", ""Congo-Brazzaville""]"
 COK,Cook Islands,CK,COK,815.0,,,CKI,CW,,COK,COK,http://www.wikidata.org/entity/Q26988,Cook Islands,199.0,604.0,,
 CRI,Costa Rica,CR,CRI,238.0,COS,94.0,COS,CR,CRCA,CRI,CRI,http://www.wikidata.org/entity/Q800,Costa Rica,166.0,608.0,,
-CIV,Cote d'Ivoire,CI,CIV,662.0,CDI,437.0,IVC,IV,IVCT,CIV,CIV,http://www.wikidata.org/entity/Q1008,Ivory Coast,143.0,600.0,,"[""C\u00c3\u00b4te D'Ivoire"", ""C\u00f4te d'Ivoire"", ""C\u00f4te d\u2019Ivoire""]"
+CIV,Cote d'Ivoire,CI,CIV,662.0,CDI,437.0,IVC,IV,IVCT,CIV,CIV,http://www.wikidata.org/entity/Q1008,Ivory Coast,143.0,600.0,,"[""C\u00c3\u00b4te D'Ivoire"", ""C\u00f4te d'Ivoire"", ""C\u00f4te d\u2019Ivoire"", ""Ivory Coast""]"
 HRV,Croatia,HR,HRV,960.0,CRO,344.0,CRO,CI,,HRV,HRV,http://www.wikidata.org/entity/Q224,Croatia,165.0,653.0,,
 CUB,Cuba,CU,CUB,928.0,CUB,40.0,CUB,CU,CUBA,CUB,CUB,http://www.wikidata.org/entity/Q241,Cuba,164.0,609.0,,
 CUW,Curacao,CW,CUW,,,,,,,,,http://www.wikidata.org/entity/Q25279,Curaçao,279.0,797.0,,"[""Cura\u00c3\u00a7ao"", ""Cura\u00e7ao""]"
@@ -108,7 +108,7 @@ HMD,Heard Island and McDonald Islands,HM,HMD,,,,,,,,,http://www.wikidata.org/ent
 OWID_HSE,Hesse Electoral,,,,HSE,273.0,,,,,,,,370.0,819.0,,
 OWID_HSG,Hesse Grand Ducal,,,,HSG,275.0,,,,,,,,371.0,820.0,,
 HND,Honduras,HN,HND,268.0,HON,91.0,HON,HO,HNDS,HND,HND,http://www.wikidata.org/entity/Q783,Honduras,139.0,652.0,,
-HKG,Hong Kong,HK,HKG,532.0,,,,HK,HGKG,HKG,HKG,http://www.wikidata.org/entity/Q8646,Hong Kong,144.0,651.0,,"[""China, Hong Kong SAR"", ""Hong Kong, China""]"
+HKG,Hong Kong,HK,HKG,532.0,,,,HK,HGKG,HKG,HKG,http://www.wikidata.org/entity/Q8646,Hong Kong,144.0,651.0,,"[""China, Hong Kong SAR"", ""Hong Kong Special Administrative Region (China)"", ""Hong Kong, China""]"
 HUN,Hungary,HU,HUN,944.0,HUN,310.0,HUN,HU,HNGR,HUN,HUN,http://www.wikidata.org/entity/Q28,Hungary,138.0,655.0,,
 ISL,Iceland,IS,ISL,176.0,ICE,395.0,,IC,ICLD,ISL,ISL,http://www.wikidata.org/entity/Q189,Iceland,207.0,661.0,,
 IND,India,IN,IND,534.0,IND,750.0,IND,II,INDA,IND,IND,http://www.wikidata.org/entity/Q668,India,137.0,657.0,,
@@ -138,7 +138,7 @@ LBY,Libya,LY,LBY,672.0,LIB,620.0,LIB,LY,LBYA,LBY,LBY,http://www.wikidata.org/ent
 LIE,Liechtenstein,LI,LIE,,LIE,223.0,LIT,LH,,LIE,LIE,http://www.wikidata.org/entity/Q347,Liechtenstein,209.0,680.0,,
 LTU,Lithuania,LT,LTU,946.0,LIT,368.0,,LI,,LTU,LTU,http://www.wikidata.org/entity/Q37,Lithuania,119.0,683.0,,
 LUX,Luxembourg,LU,LUX,137.0,LUX,212.0,,LU,LXBG,LUX,LUX,http://www.wikidata.org/entity/Q32,Luxembourg,210.0,684.0,,
-MAC,Macao,MO,MAC,,,,,MH,,MAC,MAC,http://www.wikidata.org/entity/Q14773,Macau,262.0,686.0,,"[""China, Macao SAR"", ""Macau""]"
+MAC,Macao,MO,MAC,,,,,MH,,MAC,MAC,http://www.wikidata.org/entity/Q14773,Macau,262.0,686.0,,"[""China, Macao SAR"", ""Macao Special Administrative Region (China)"", ""Macau""]"
 MDG,Madagascar,MG,MDG,674.0,MAG,580.0,MAG,MG,MDGS,MDG,MDG,http://www.wikidata.org/entity/Q1019,Madagascar,118.0,690.0,,
 MWI,Malawi,MW,MWI,676.0,MAW,553.0,MLW,MW,MLWI,MWI,MWI,http://www.wikidata.org/entity/Q1020,Malawi,117.0,705.0,,
 MYS,Malaysia,MY,MYS,548.0,MAL,820.0,MAL,MY,MLYS,MYS,MYS,http://www.wikidata.org/entity/Q833,Malaysia,116.0,706.0,,
@@ -176,7 +176,7 @@ NGA,Nigeria,NG,NGA,694.0,NIG,475.0,NIR,NR,NGRA,NGA,NGA,http://www.wikidata.org/e
 NIU,Niue,NU,NIU,,,,NIU,XH,,NIU,NIU,http://www.wikidata.org/entity/Q34020,Niue,261.0,713.0,,
 NFK,Norfolk Island,NF,NFK,,,,,,,,,http://www.wikidata.org/entity/Q31057,Norfolk Island,285.0,805.0,,"[""Norfolk Isl.""]"
 PRK,North Korea,KP,PRK,,PRK,731.0,DRK,KN,KORN,,PRK,http://www.wikidata.org/entity/Q423,North Korea,128.0,728.0,,"[""D.P.R. of Korea"", ""Dem.Rep.,Korea"", ""Democratic People's Republic of Korea""]"
-MKD,North Macedonia,MK,MKD,962.0,MAC,343.0,MCD,XN,,MKD,MKD,http://www.wikidata.org/entity/Q221,North Macedonia,66.0,694.0,,"[""Macedonia, FYR"", ""Macedonia, The Former Yugoslav Republic Of"", ""TFYR Macedonia"", ""TFYR of Macedonia""]"
+MKD,North Macedonia,MK,MKD,962.0,MAC,343.0,MCD,XN,,MKD,MKD,http://www.wikidata.org/entity/Q221,North Macedonia,66.0,694.0,,"[""Macedonia"", ""Macedonia, FYR"", ""Macedonia, The Former Yugoslav Republic Of"", ""TFYR Macedonia"", ""TFYR of Macedonia""]"
 OWID_CYN,Northern Cyprus,,,,,,,,,,,,,390.0,838.0,,
 MNP,Northern Mariana Islands,MP,MNP,,,,,,,,,http://www.wikidata.org/entity/Q16644,Northern Mariana Islands,266.0,804.0,,"[""Northern Mariana""]"
 NOR,Norway,NO,NOR,142.0,NOR,385.0,,NO,NRWY,NOR,NOR,http://www.wikidata.org/entity/Q20,Norway,102.0,715.0,,
