@@ -214,8 +214,8 @@ def get_published_checksums(bucket: str) -> Dict[str, str]:
 def get_remote_checksum(s3: Any, bucket: str, path: str) -> Optional[str]:
     try:
         obj = s3.head_object(Bucket=bucket, Key=path)
-    except ClientError:
-        if "Not Found" in ClientError.args[0]:
+    except ClientError as e:
+        if "Not Found" in e.args[0]:
             return None
 
         raise
