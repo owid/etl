@@ -274,3 +274,17 @@ steps:
     - github://open-numbers/ddf--world_bank--world_development_indicators
   data://meadow/open_numbers/latest/worldbank__povcalnet:
     - github://open-numbers/ddf--worldbank--povcalnet
+
+
+  # Examples
+  data://examples/script/script_example:
+    - walden://wb/2021-07-01/wb_income
+    - data://garden/owid/latest/key_indicators
+    - data://reference
+  data://examples/jupytext/jupytext_example:
+  data://examples/vs_code_cells/vs_code_cells_example:
+  # private steps that require S3 access keys for private walden
+  data-private://examples/private/2022-03-08/private_example:
+    # NOTE: this dataset is public as we don't have any private data yet
+    - walden-private://faostat/2022-02-10/faostat_metadata
+    - data://reference

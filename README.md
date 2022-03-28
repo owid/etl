@@ -153,6 +153,16 @@ ds.save()
 
 Then run `make etl` to check that it's working correctly before fleshing out your ETL step.
 
+### Examples
+
+Frequently used patterns are provided in the `etl/steps/data/examples` folder. You can run them with
+
+```
+etl examples --force
+```
+
+or use them as starting templates for your own steps.
+
 ## Harmonizing countries
 
 An interactive country harmonizing tool is available, which can generate a country mapping file.
@@ -166,7 +176,6 @@ An interactive country harmonizing tool is available, which can generate a count
 Most of the steps have private versions with `-private` suffix (e.g. `data-private://...`, `walden-private://...`) that remember and enforce a dataset level `is_public` flag.
 
 When publishing, the index is public, but tables in the index that are private are only available over s3 with appropriate credentials. `owid-catalog-py` is also updated to support these private datasets and supports fetching them over s3 transparently.
-
 
 ### Uploading private data to walden
 
