@@ -10,29 +10,30 @@
 
 # +
 import pandas as pd
+from owid.walden import Catalog
 from owid.catalog import Dataset, Table
 
-df = pd.DataFrame({
-    'a': [1, 2, 3]
-})
+walden_ds = Catalog().find_one("wb", "2021-07-01", "wb_income")
+local_path = walden_ds.ensure_downloaded()
+df = pd.read_excel(local_path)
+
 # -
 
 # ## Clean data
 
-df = df[df.a > 1]
+df = df.dropna(subset=["Income group"])
 
 
 # ## Create dataset in the `run` function using module-level variables
 
+
 def run(dest_dir: str) -> None:
     ds = Dataset.create_empty(dest_dir)
-    ds.metadata.short_name = 'jupytext_example'
+    ds.metadata.short_name = "jupytext_example"
 
     # use module-level variables
     t = Table(df.reset_index(drop=True))
-    t.metadata.short_name = 'jupytext_example'
+    t.metadata.short_name = "jupytext_example"
 
     ds.add(t)
     ds.save()
-
-
