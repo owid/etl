@@ -21,7 +21,11 @@ df = pd.read_excel(local_path)
 
 # ## Clean data
 
-df = df.dropna(subset=["Income group"])
+df = df.dropna(subset=["Income group"]).rename(
+    columns={
+        "Other (EMU or HIPC)": "other__emu_or_hipc",
+    }
+)
 
 
 # ## Create dataset in the `run` function using module-level variables
