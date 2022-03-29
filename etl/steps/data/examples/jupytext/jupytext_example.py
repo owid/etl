@@ -11,7 +11,7 @@
 # +
 import pandas as pd
 from owid.walden import Catalog
-from owid.catalog import Dataset, Table
+from owid.catalog import Dataset, Table, utils
 
 walden_ds = Catalog().find_one("wb", "2021-07-01", "wb_income")
 local_path = walden_ds.ensure_downloaded()
@@ -35,5 +35,5 @@ def run(dest_dir: str) -> None:
     t = Table(df.reset_index(drop=True))
     t.metadata.short_name = "jupytext_example"
 
-    ds.add(t)
+    ds.add(utils.underscore_table(t))
     ds.save()
