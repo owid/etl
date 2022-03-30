@@ -1,3 +1,5 @@
+"""This module was copied from https://github.com/owid/importers/blob/master/db_utils.py"""
+
 import json
 from typing import Any, Dict, Iterator, List, Optional, Tuple, cast
 from unidecode import unidecode
@@ -237,6 +239,10 @@ class DBUtils:
     def upsert_source(self, name: str, description: str, dataset_id: int) -> int:
         # There is no UNIQUE key constraint we can rely on to prevent duplicates
         # so we have to do a SELECT before INSERT...
+        # TODO: changing source description and rerunning grapher inserts a new source
+        # without deleting the old one. So we end up with multiple sources in grapher DB.
+        # We could delete & create them on every dataset update, but we risk losing manual
+        # changes to those sources.
         desc_json = json.loads(description)
         query = """
            SELECT id FROM sources
