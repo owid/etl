@@ -10,6 +10,8 @@ from typing import Optional, Dict, Literal, cast, List, Any
 from pydantic import BaseModel
 
 from etl.paths import DATA_DIR
+from etl.db import get_connection
+from etl.db_utils import DBUtils
 
 
 # TODO: remove if it turns out to be useless for real examples
@@ -177,6 +179,13 @@ def country_to_entity_id(
         return cast(pd.Series, entity_id.astype("Int64"))
     else:
         return cast(pd.Series, entity_id.astype(int))
+
+
+def get_or_create_entity(name: str) -> int:
+    cursor = get_connection().cursor()
+    db = DBUtils(cursor)
+    print(name)
+    return db.get_or_create_entity(name)
 
 
 def _unique(x: List[Any]) -> List[Any]:
