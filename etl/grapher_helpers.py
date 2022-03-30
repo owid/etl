@@ -4,14 +4,20 @@ from collections.abc import Iterable
 import yaml
 import slugify
 import warnings
+import logging
 from pathlib import Path
 
-from typing import Optional, Dict, Literal, cast, List, Any
+from typing import Optional, Dict, Literal, cast, List, Any, Set
 from pydantic import BaseModel
 
 from etl.paths import DATA_DIR
-from etl.db import get_connection
+from etl.db import get_connection, get_engine
 from etl.db_utils import DBUtils
+
+
+logging.basicConfig()
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 
 # TODO: remove if it turns out to be useless for real examples
@@ -157,17 +163,55 @@ def yield_long_table(
         yield from yield_wide_table(cast(catalog.Table, t))
 
 
-def country_to_entity_id(
-    country: pd.Series, errors: Literal["raise", "ignore", "warn"] = "raise"
-) -> pd.Series:
-    """Convert country name to grapher entity_id."""
+def _get_entities_from_countries_regions() -> Dict[str, int]:
     reference_dataset = catalog.Dataset(DATA_DIR / "reference")
     countries_regions = reference_dataset["countries_regions"]
-    country_map = countries_regions.set_index("name")["legacy_entity_id"]
-    entity_id = country.map(country_map)
+    return cast(Dict[str, int], countries_regions.set_index("name")["legacy_entity_id"])
+
+
+def _get_entities_from_db(countries: Set[str]) -> Dict[str, int]:
+    q = "select id as entity_id, name from entities where name in %(names)s"
+    df = pd.read_sql(q, get_engine(), params={"names": list(countries)})
+    return cast(Dict[str, int], df.set_index("name").entity_id.to_dict())
+
+
+def _get_and_create_entities_in_db(countries: Set[str]) -> Dict[str, int]:
+    cursor = get_connection().cursor()
+    db = DBUtils(cursor)
+    logging.info(f"Creating entities in DB: {countries}")
+    return {name: db.get_or_create_entity(name) for name in countries}
+
+
+def country_to_entity_id(
+    country: pd.Series,
+    fill_from_db: bool = True,
+    create_entities: bool = False,
+    errors: Literal["raise", "ignore", "warn"] = "raise",
+) -> pd.Series:
+    """Convert country name to grapher entity_id. Most of countries should be in countries_regions.csv,
+    however some regions could be only in `entities` table in MySQL or doesn't exist at all.
+    :param fill_from_db: if True, fill missing countries from `entities` table
+    :param create_entities: if True, create missing countries in `entities` table
+    :param errors: how to handle missing countries
+    """
+    # get entities from countries_regions.csv
+    entity_id = country.map(_get_entities_from_countries_regions())
+
+    # fill entities from DB
+    if entity_id.isnull().any() and fill_from_db:
+        ix = entity_id.isnull()
+        entity_id[ix] = country[ix].map(_get_entities_from_db(set(country[ix])))
+
+    # create entities in DB
+    if entity_id.isnull().any() and create_entities:
+        assert fill_from_db, "fill_from_db must be True to create entities"
+        ix = entity_id.isnull()
+        entity_id[ix] = country[ix].map(
+            _get_and_create_entities_in_db(set(country[ix]))
+        )
 
     if entity_id.isnull().any():
-        msg = f"Some countries are not in the reference dataset: {set(country[entity_id.isnull()])}"
+        msg = f"Some countries have not been mapped: {set(country[entity_id.isnull()])}"
         if errors == "raise":
             raise ValueError(msg)
         elif errors == "warn":
@@ -179,13 +223,6 @@ def country_to_entity_id(
         return cast(pd.Series, entity_id.astype("Int64"))
     else:
         return cast(pd.Series, entity_id.astype(int))
-
-
-def get_or_create_entity(name: str) -> int:
-    cursor = get_connection().cursor()
-    db = DBUtils(cursor)
-    print(name)
-    return db.get_or_create_entity(name)
 
 
 def _unique(x: List[Any]) -> List[Any]:

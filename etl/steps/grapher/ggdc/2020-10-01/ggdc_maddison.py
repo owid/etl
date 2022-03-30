@@ -23,17 +23,7 @@ def get_grapher_dataset() -> catalog.Dataset:
 def get_grapher_tables(dataset: catalog.Dataset) -> Iterable[catalog.Table]:
     table = dataset["maddison_gdp"].reset_index()
 
-    table["entity_id"] = gh.country_to_entity_id(table["country"], errors="warn")
-
-    # TODO: this is really slow, create a separate batch query and nice helper in grapher_helpers
-    # get the remaining entities directly from the DB
-    ix = table.entity_id.isnull()
-    country_entity_id_map = {
-        country: gh.get_or_create_entity(country)
-        for country in set(table.loc[ix, "country"])
-    }
-    table.loc[ix, "entity_id"] = table.loc[ix, "country"].map(country_entity_id_map)
-    assert table.entity_id.notnull().all()
+    table["entity_id"] = gh.country_to_entity_id(table["country"])
 
     table.dropna(subset=["gdp"], inplace=True)
 
