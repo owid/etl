@@ -16,9 +16,11 @@ import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
 from owid.walden import Catalog
+from pathlib import Path
 
 from etl.paths import STEP_DIR
 from etl.steps.data.converters import convert_walden_metadata
+
 
 # Institution name.
 NAMESPACE = "ggdc"
@@ -30,22 +32,11 @@ VERSION = "2020-10-01"
 GDP_COLUMN = "gdp"
 # Column name for GDP per capita in output dataset.
 GDP_PER_CAPITA_COLUMN = "gdp_per_capita"
-# Name for table of GDP to be included in the dataset in garden.
-TABLE_SHORT_NAME = "maddison_gdp"
 # Additional description to be prepended to the description given in walden.
-ADDITIONAL_DESCRIPTION = """
-Note:
+ADDITIONAL_DESCRIPTION = """Note:
 Tanzania refers only to Mainland Tanzania.
 
 """
-# Define variable titles.
-VARIABLE_TITLES = {
-    "country": "Country",
-    "year": "Year",
-    "population": "Population",
-    GDP_COLUMN: "GDP",
-    GDP_PER_CAPITA_COLUMN: "GDP per capita",
-}
 
 
 def load_countries() -> Dict[str, str]:
@@ -244,18 +235,17 @@ def run(dest_dir: str) -> None:
     # Load and process data.
     df = generate_ggdc_data(data_file=walden_ds.local_path)
 
+    # Set meaningful indexes.
+    df = df.set_index(["country", "year"])
+
     # Create a new table with the processed data.
     t = Table(df)
 
-    # Assign metadata.
-    t.metadata.short_name = TABLE_SHORT_NAME
-    t.metadata.title = ds.metadata.title
-    t.metadata.description = ADDITIONAL_DESCRIPTION + ds.metadata.description
-    for variable in VARIABLE_TITLES:
-        t[variable].metadata.title = VARIABLE_TITLES[variable]
-
-    # Set meaningful indexes.
-    t = t.set_index(["country", "year"])
+    # Update metadata
+    meta_path = Path(__file__).parent / "ggdc_maddison.meta.yml"
+    ds.metadata.update_from_yaml(meta_path)
+    t.update_metadata_from_yaml(meta_path, "maddison_gdp")
+    ds.metadata.description = ADDITIONAL_DESCRIPTION + ds.metadata.description
 
     # Add table to current dataset.
     ds.add(t)
