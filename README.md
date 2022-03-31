@@ -22,6 +22,11 @@ You can build all known data tables into the `data/` folder with:
 
 `make etl`
 
+👆 If either of this fails because of some mysql or levenshtein dependency install error in the `poetry install` step then you need to make sure that you have a mysql client and python dev headers (for the version you are using) installed. On Ubuntu, this should do it:
+```bash
+sudo apt install python3.9-dev mysql-client
+```
+
 ## Reporting problems
 
 Please file any bugs or issues at https://github.com/owid/etl/issues. We are not currently seeking external contributions, but any member of the public should be able to run this codebase and recreate our catalog.
