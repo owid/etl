@@ -6,8 +6,7 @@ from owid.catalog.utils import underscore_table
 from owid.walden import Catalog
 
 from etl.grapher_model import GrapherConfig
-from etl.steps.data.converters import (convert_grapher_dataset,
-                                       convert_grapher_variable)
+from etl.steps.data.converters import convert_grapher_dataset, convert_grapher_variable
 
 
 def load_values(short_name: str) -> pd.DataFrame:
