@@ -25,10 +25,8 @@ def get_grapher_tables(dataset: catalog.Dataset) -> Iterable[catalog.Table]:
 
     table["entity_id"] = gh.country_to_entity_id(table["country"])
 
-    table.dropna(subset=["gdp"], inplace=True)
-
     table = table.set_index(["entity_id", "year"])[
         ["gdp", "gdp_per_capita", "population"]
     ]
 
-    yield from gh.yield_wide_table(table)
+    yield from gh.yield_wide_table(table, na_action="drop")

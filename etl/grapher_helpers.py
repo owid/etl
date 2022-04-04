@@ -100,16 +100,27 @@ def annotate_table(
     return table
 
 
-def yield_wide_table(table: catalog.Table) -> Iterable[catalog.Table]:
+def yield_wide_table(
+    table: catalog.Table,
+    na_action: Literal["drop", "raise"] = "raise",
+) -> Iterable[catalog.Table]:
     """We have 5 dimensions but graphers data model can only handle 2 (year and entityId). This means
     we have to iterate all combinations of the remaining 3 dimensions and create a new variable for
     every combination that cuts out only the data points for a specific combination of these 3 dimensions
-    Grapher can only handle 2 dimensions (year and entityId)"""
+    Grapher can only handle 2 dimensions (year and entityId)
+
+    :param na_action: grapher does not support missing values, you can either drop them using this argument
+        or raise an exception
+    """
     # Validation
     if "year" not in table.primary_key:
         raise Exception("Table is missing `year` primary key")
     if "entity_id" not in table.primary_key:
         raise Exception("Table is missing `entity_id` primary key")
+    if na_action == "raise":
+        for col in table.columns:
+            if table[col].isna().any():
+                raise ValueError(f"Column `{col}` contains missing values")
 
     dim_names = [k for k in table.primary_key if k not in ("year", "entity_id")]
 
@@ -123,7 +134,6 @@ def yield_wide_table(table: catalog.Table) -> Iterable[catalog.Table]:
         # Now iterate over every column in the original dataset and export the
         # subset of data that we prepared above
         for column in table_to_yield.columns:
-
             # Add column and dimensions as short_name
             table_to_yield.metadata.short_name = slugify.slugify(
                 "__".join([column] + list(dims)), separator="_"
@@ -134,11 +144,16 @@ def yield_wide_table(table: catalog.Table) -> Iterable[catalog.Table]:
                 table_to_yield[column].metadata.unit is not None
             ), f"Unit for column {column} should not be None here!"
 
-            print(f"Yielding table {table_to_yield.metadata.short_name}")
+            # Drop NA values
+            tab = (
+                table_to_yield.dropna(subset=[column])
+                if na_action == "drop"
+                else table_to_yield
+            )
 
-            yield table_to_yield.reset_index().set_index(["entity_id", "year"])[
-                [column]
-            ]
+            print(f"Yielding table {tab.metadata.short_name}")
+
+            yield tab.reset_index().set_index(["entity_id", "year"])[[column]]
 
 
 def yield_long_table(
