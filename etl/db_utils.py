@@ -241,8 +241,6 @@ class DBUtils:
         # so we have to do a SELECT before INSERT...
         # TODO: changing source description and rerunning grapher inserts a new source
         # without deleting the old one. So we end up with multiple sources in grapher DB.
-        # We could delete & create them on every dataset update, but we risk losing manual
-        # changes to those sources.
         desc_json = json.loads(description)
         query = """
            SELECT id FROM sources
