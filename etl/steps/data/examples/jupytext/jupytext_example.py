@@ -11,7 +11,7 @@
 # +
 import pandas as pd
 from owid.walden import Catalog
-from owid.catalog import Dataset, Table
+from owid.catalog import Dataset, Table, utils
 
 walden_ds = Catalog().find_one("wb", "2021-07-01", "wb_income")
 local_path = walden_ds.ensure_downloaded()
@@ -21,7 +21,11 @@ df = pd.read_excel(local_path)
 
 # ## Clean data
 
-df = df.dropna(subset=["Income group"])
+df = df.dropna(subset=["Income group"]).rename(
+    columns={
+        "Other (EMU or HIPC)": "other__emu_or_hipc",
+    }
+)
 
 
 # ## Create dataset in the `run` function using module-level variables
@@ -35,5 +39,5 @@ def run(dest_dir: str) -> None:
     t = Table(df.reset_index(drop=True))
     t.metadata.short_name = "jupytext_example"
 
-    ds.add(t)
+    ds.add(utils.underscore_table(t))
     ds.save()

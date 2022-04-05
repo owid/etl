@@ -23,6 +23,11 @@ def checksum_file(filename: Union[str, Path]) -> str:
     return _hash.hexdigest()
 
 
+def checksum_str(s: str) -> str:
+    "Return the md5 hex digest of the string."
+    return hashlib.md5(s.encode()).hexdigest()
+
+
 def walk(
     folder: Path, ignore_set: Set[str] = {"__pycache__", ".ipynb_checkpoints"}
 ) -> List[Path]:
