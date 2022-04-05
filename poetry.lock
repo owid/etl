@@ -394,7 +394,7 @@ woff = ["zopfli (>=0.1.4)", "brotlicffi (>=0.8.0)", "brotli (>=1.0.1)"]
 
 [[package]]
 name = "frictionless"
-version = "4.26.0"
+version = "4.28.0"
 description = "Data management framework for Python that provides functionality to describe, extract, validate, and transform tabular data"
 category = "main"
 optional = false
@@ -836,7 +836,7 @@ python-versions = ">=3.7"
 name = "markdown-it-py"
 version = "1.1.0"
 description = "Python port of markdown-it. Markdown parsing, done right!"
-category = "dev"
+category = "main"
 optional = false
 python-versions = "~=3.6"
 
@@ -939,7 +939,7 @@ python-versions = "*"
 name = "mdit-py-plugins"
 version = "0.3.0"
 description = "Collection of plugins for markdown-it-py"
-category = "dev"
+category = "main"
 optional = false
 python-versions = "~=3.6"
 
@@ -2085,7 +2085,7 @@ requests = ">=2.0.0,<3.0.0"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "0df483422abf2a852a612c56093359eaabea3bd13ca33aec0a36fe66fc45fadd"
+content-hash = "41e31f8b7e198a625680f0be76c0d59dd59285c7551044be91bec864fcdd20e4"
 
 [metadata.files]
 ansiwrap = [
@@ -2347,8 +2347,8 @@ fonttools = [
     {file = "fonttools-4.29.1.zip", hash = "sha256:2b18a172120e32128a80efee04cff487d5d140fe7d817deb648b2eee023a40e4"},
 ]
 frictionless = [
-    {file = "frictionless-4.26.0-py2.py3-none-any.whl", hash = "sha256:5b72d94d73a6544fa4b2d31fcb29d05ed8fae714cdaf47f4e4d8759ec613f6b8"},
-    {file = "frictionless-4.26.0.tar.gz", hash = "sha256:4fbbba13fa3076bc5849dbc9d03bbf89135ed5bf04262352a5525b85abfdcc8b"},
+    {file = "frictionless-4.28.0-py2.py3-none-any.whl", hash = "sha256:038a62d3a64df03dd0f55c29efdaeb64e2c017b22dd55110835363206796a512"},
+    {file = "frictionless-4.28.0.tar.gz", hash = "sha256:744139f1df111733de0cb3d02554e5de2ef36d62509c64bd13c34d480d499ffb"},
 ]
 idna = [
     {file = "idna-3.3-py3-none-any.whl", hash = "sha256:84d9dd047ffa80596e0f246e2eab0b391788b0503584e8945f2368256d2735ff"},
