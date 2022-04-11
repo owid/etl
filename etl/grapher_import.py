@@ -71,7 +71,7 @@ def upsert_dataset(
             dataset.metadata.short_name,
             namespace,
             int(cast(str, config.GRAPHER_USER_ID)),
-            description=dataset.metadata.description,
+            description=dataset.metadata.description or "",
         )
 
         source_ids: Dict[str, int] = dict()
@@ -81,7 +81,11 @@ def upsert_dataset(
                     {
                         "link": source.url,
                         "retrievedDate": source.date_accessed,
-                        "dataPublishedBy": source.name,
+                        "dataPublishedBy": source.published_by,
+                        "dataPublisherSource": source.publisher_source,
+                        # NOTE: we remap `description` to additionalInfo since that is what is shown as `Description` in
+                        # the admin UI. Clean this up with the new data model
+                        "additionalInfo": source.description,
                     }
                 )
                 source_id = db.upsert_source(source.name, json_description, dataset_id)
@@ -106,6 +110,18 @@ def upsert_dataset(
             cursor.close()
         if connection:
             connection.close()
+
+
+def _update_variables_display(table: catalog.Table) -> None:
+    """Grapher uses units from field `display` instead of fields `unit` and `short_unit`
+    before we fix grapher data model, copy them to `display`.
+    """
+    for col in table.columns:
+        meta = table[col].metadata
+        meta.display = meta.display or {}
+        meta.display.setdefault("shortUnit", meta.short_unit)
+        if meta.unit:
+            meta.display.setdefault("unit", meta.unit)
 
 
 def upsert_table(
@@ -133,9 +149,9 @@ def upsert_table(
         table.index.dtypes[1] in INT_TYPES
     ), f"entity_id must be of an integer type but was: {table.index.dtypes[1]}"
     utils.validate_underscore(table.metadata.short_name, "Table's short_name")
-    utils.validate_underscore(
-        table.iloc[:, 0].metadata.short_name, "Variable's short_name"
-    )
+    utils.validate_underscore(table.columns[0], "Variable's name")
+
+    _update_variables_display(table)
 
     connection = None
     cursor = None
@@ -158,6 +174,7 @@ def upsert_table(
 
         table.reset_index(inplace=True)
 
+        # Use variable source if specified, otherwise use dataset source
         source_id = None
         if len(table[column_name].metadata.sources) > 0:
             source_name = table[column_name].metadata.sources[0].name
@@ -167,7 +184,7 @@ def upsert_table(
             source_id = list(dataset_upsert_result.source_ids.values())[0]
 
         db_variable_id = db.upsert_variable(
-            name=table.metadata.short_name,
+            name=table[column_name].title,
             source_id=source_id,
             dataset_id=dataset_upsert_result.dataset_id,
             description=table[column_name].metadata.description,

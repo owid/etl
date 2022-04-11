@@ -110,7 +110,8 @@ def get_grapher_tables(dataset: catalog.Dataset) -> Iterable[catalog.Table]:
                 # subset of data that we prepared above
                 for column in columns_to_export:
                     short_name = slugify.slugify(
-                        f"{column}__{ghe_cause_title}__{sex_code}__{agegroup_code}"
+                        f"{column}__{ghe_cause_title}__{sex_code}__{agegroup_code}",
+                        separator="_",
                     )
 
                     table_to_yield = cutout_table[[column]]

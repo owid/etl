@@ -59,8 +59,7 @@ def as_table(df: pd.DataFrame, table: catalog.Table) -> catalog.Table:
     """Convert dataframe into Table and add metadata from other table if available."""
     t = catalog.Table(df, metadata=table.metadata)
     for col in set(df.columns) & set(table.columns):
-        # TODO: setter on metadata would be nicer
-        t[col]._fields[t[col].checked_name] = table[col].metadata
+        t[col].metadata = table[col].metadata
     return t
 
 
@@ -119,13 +118,13 @@ def yield_wide_table(table: catalog.Table) -> Iterable[catalog.Table]:
 
             # Add column and dimensions as short_name
             table_to_yield.metadata.short_name = slugify.slugify(
-                "__".join([column] + list(dims))
+                "__".join([column] + list(dims)), separator="_"
             )
 
             # Safety check to see if the metadata is still intact
             assert (
                 table_to_yield[column].metadata.unit is not None
-            ), "Unit should not be None here!"
+            ), f"Unit for column {column} should not be None here!"
 
             print(f"Yielding table {table_to_yield.metadata.short_name}")
 
@@ -178,3 +177,28 @@ def country_to_entity_id(
         return cast(pd.Series, entity_id.astype("Int64"))
     else:
         return cast(pd.Series, entity_id.astype(int))
+
+
+def _unique(x: List[Any]) -> List[Any]:
+    """Uniquify a list, preserving order."""
+    return list(dict.fromkeys(x))
+
+
+def join_sources(sources: List[catalog.meta.Source]) -> catalog.meta.Source:
+    """Join multiple sources into one for the grapher."""
+    meta = {}
+    for key, sep in [
+        ("name", ", "),
+        ("description", "\n\n"),
+        ("url", "; "),
+        ("source_data_url", "; "),
+        ("owid_data_url", "; "),
+        ("published_by", ", "),
+        ("publisher_source", ", "),
+        ("date_accessed", "; "),
+    ]:
+        keys = _unique([getattr(s, key) for s in sources if getattr(s, key)])
+        if keys:
+            meta[key] = sep.join(keys)
+
+    return catalog.meta.Source(**meta)

@@ -21,6 +21,7 @@ def harmonize_countries(source_ds_path: str, dest_dir: str) -> None:
     mapping = load_mapping()
 
     ds = Dataset.create_empty(dest_dir, metadata=source_ds.metadata)
+    ds.metadata.short_name = "standard_projections"
 
     for table in source_ds:
         # harmonize this specific table
