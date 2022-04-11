@@ -73,6 +73,9 @@ steps:
   data://garden/ggdc/2020-10-01/ggdc_maddison:
     - walden://ggdc/2020-10-01/ggdc_maddison
 
+  grapher://ggdc/2020-10-01/ggdc_maddison:
+    - data://garden/ggdc/2020-10-01/ggdc_maddison
+
   #
   #  Backported data
   #

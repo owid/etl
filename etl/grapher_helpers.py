@@ -4,12 +4,20 @@ from collections.abc import Iterable
 import yaml
 import slugify
 import warnings
+import logging
 from pathlib import Path
 
-from typing import Optional, Dict, Literal, cast, List, Any
+from typing import Optional, Dict, Literal, cast, List, Any, Set
 from pydantic import BaseModel
 
 from etl.paths import DATA_DIR
+from etl.db import get_connection, get_engine
+from etl.db_utils import DBUtils
+
+
+logging.basicConfig()
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 
 # TODO: remove if it turns out to be useless for real examples
@@ -92,16 +100,27 @@ def annotate_table(
     return table
 
 
-def yield_wide_table(table: catalog.Table) -> Iterable[catalog.Table]:
+def yield_wide_table(
+    table: catalog.Table,
+    na_action: Literal["drop", "raise"] = "raise",
+) -> Iterable[catalog.Table]:
     """We have 5 dimensions but graphers data model can only handle 2 (year and entityId). This means
     we have to iterate all combinations of the remaining 3 dimensions and create a new variable for
     every combination that cuts out only the data points for a specific combination of these 3 dimensions
-    Grapher can only handle 2 dimensions (year and entityId)"""
+    Grapher can only handle 2 dimensions (year and entityId)
+
+    :param na_action: grapher does not support missing values, you can either drop them using this argument
+        or raise an exception
+    """
     # Validation
     if "year" not in table.primary_key:
         raise Exception("Table is missing `year` primary key")
     if "entity_id" not in table.primary_key:
         raise Exception("Table is missing `entity_id` primary key")
+    if na_action == "raise":
+        for col in table.columns:
+            if table[col].isna().any():
+                raise ValueError(f"Column `{col}` contains missing values")
 
     dim_names = [k for k in table.primary_key if k not in ("year", "entity_id")]
 
@@ -115,7 +134,6 @@ def yield_wide_table(table: catalog.Table) -> Iterable[catalog.Table]:
         # Now iterate over every column in the original dataset and export the
         # subset of data that we prepared above
         for column in table_to_yield.columns:
-
             # Add column and dimensions as short_name
             table_to_yield.metadata.short_name = slugify.slugify(
                 "__".join([column] + list(dims)), separator="_"
@@ -126,11 +144,16 @@ def yield_wide_table(table: catalog.Table) -> Iterable[catalog.Table]:
                 table_to_yield[column].metadata.unit is not None
             ), f"Unit for column {column} should not be None here!"
 
-            print(f"Yielding table {table_to_yield.metadata.short_name}")
+            # Drop NA values
+            tab = (
+                table_to_yield.dropna(subset=[column])
+                if na_action == "drop"
+                else table_to_yield
+            )
 
-            yield table_to_yield.reset_index().set_index(["entity_id", "year"])[
-                [column]
-            ]
+            print(f"Yielding table {tab.metadata.short_name}")
+
+            yield tab.reset_index().set_index(["entity_id", "year"])[[column]]
 
 
 def yield_long_table(
@@ -155,17 +178,55 @@ def yield_long_table(
         yield from yield_wide_table(cast(catalog.Table, t))
 
 
-def country_to_entity_id(
-    country: pd.Series, errors: Literal["raise", "ignore", "warn"] = "raise"
-) -> pd.Series:
-    """Convert country name to grapher entity_id."""
+def _get_entities_from_countries_regions() -> Dict[str, int]:
     reference_dataset = catalog.Dataset(DATA_DIR / "reference")
     countries_regions = reference_dataset["countries_regions"]
-    country_map = countries_regions.set_index("name")["legacy_entity_id"]
-    entity_id = country.map(country_map)
+    return cast(Dict[str, int], countries_regions.set_index("name")["legacy_entity_id"])
+
+
+def _get_entities_from_db(countries: Set[str]) -> Dict[str, int]:
+    q = "select id as entity_id, name from entities where name in %(names)s"
+    df = pd.read_sql(q, get_engine(), params={"names": list(countries)})
+    return cast(Dict[str, int], df.set_index("name").entity_id.to_dict())
+
+
+def _get_and_create_entities_in_db(countries: Set[str]) -> Dict[str, int]:
+    cursor = get_connection().cursor()
+    db = DBUtils(cursor)
+    logging.info(f"Creating entities in DB: {countries}")
+    return {name: db.get_or_create_entity(name) for name in countries}
+
+
+def country_to_entity_id(
+    country: pd.Series,
+    fill_from_db: bool = True,
+    create_entities: bool = False,
+    errors: Literal["raise", "ignore", "warn"] = "raise",
+) -> pd.Series:
+    """Convert country name to grapher entity_id. Most of countries should be in countries_regions.csv,
+    however some regions could be only in `entities` table in MySQL or doesn't exist at all.
+    :param fill_from_db: if True, fill missing countries from `entities` table
+    :param create_entities: if True, create missing countries in `entities` table
+    :param errors: how to handle missing countries
+    """
+    # get entities from countries_regions.csv
+    entity_id = country.map(_get_entities_from_countries_regions())
+
+    # fill entities from DB
+    if entity_id.isnull().any() and fill_from_db:
+        ix = entity_id.isnull()
+        entity_id[ix] = country[ix].map(_get_entities_from_db(set(country[ix])))
+
+    # create entities in DB
+    if entity_id.isnull().any() and create_entities:
+        assert fill_from_db, "fill_from_db must be True to create entities"
+        ix = entity_id.isnull()
+        entity_id[ix] = country[ix].map(
+            _get_and_create_entities_in_db(set(country[ix]))
+        )
 
     if entity_id.isnull().any():
-        msg = f"Some countries are not in the reference dataset: {set(country[entity_id.isnull()])}"
+        msg = f"Some countries have not been mapped: {set(country[entity_id.isnull()])}"
         if errors == "raise":
             raise ValueError(msg)
         elif errors == "warn":
