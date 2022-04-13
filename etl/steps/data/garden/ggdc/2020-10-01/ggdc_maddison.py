@@ -248,6 +248,8 @@ def run(dest_dir: str) -> None:
     t.update_metadata_from_yaml(meta_path, "maddison_gdp")
     ds.metadata.description = ADDITIONAL_DESCRIPTION + ds.metadata.description
 
+    assert len(ds.metadata.sources) == 1
+
     # Add table to current dataset.
     ds.add(t)
 
