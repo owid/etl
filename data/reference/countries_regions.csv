@@ -182,8 +182,8 @@ MNP,Northern Mariana Islands,MP,MNP,,,,,,,,,http://www.wikidata.org/entity/Q1664
 NOR,Norway,NO,NOR,142.0,NOR,385.0,,NO,NRWY,NOR,NOR,http://www.wikidata.org/entity/Q20,Norway,102.0,715.0,,
 OMN,Oman,OM,OMN,449.0,OMA,698.0,OMA,MK,OMAN,OMN,OMN,http://www.wikidata.org/entity/Q842,Oman,217.0,719.0,,
 PAK,Pakistan,PK,PAK,564.0,PAK,770.0,PAK,PK,PKST,PAK,PAK,http://www.wikidata.org/entity/Q843,Pakistan,101.0,720.0,,
-PLW,Palau,PW,PLW,565.0,PAL,986.0,,PW,,PLW,PLW,http://www.wikidata.org/entity/Q695,Palau,224.0,724.0,,
-PSE,Palestine,PS,PSE,,,,PAL,,,PSE,PSE,http://www.wikidata.org/entity/Q219060,State of Palestine,140.0,731.0,,"[""Occupied Palestinian Terr."", ""Palestine, State of"", ""Palestinian Territories"", ""State of Palestine""]"
+PLW,Palau,PW,PLW,565.0,PAL,986.0,,PW,,PLW,PLW,http://www.wikidata.org/entity/Q695,Palau,224.0,724.0,,"[""Pacific Islands (Palau)""]"
+PSE,Palestine,PS,PSE,,,,PAL,,,PSE,PSE,http://www.wikidata.org/entity/Q219060,State of Palestine,140.0,731.0,,"[""Occupied Palestinian Terr."", ""Occupied Palestinian Territory"", ""Palestine, State of"", ""Palestinian Territories"", ""State of Palestine""]"
 PAN,Panama,PA,PAN,283.0,PAN,95.0,PAN,PN,PNMA,PAN,PAN,http://www.wikidata.org/entity/Q804,Panama,100.0,721.0,,
 PNG,Papua New Guinea,PG,PNG,853.0,PNG,910.0,PNG,PP,PPNG,PNG,PNG,http://www.wikidata.org/entity/Q691,Papua New Guinea,99.0,725.0,,
 PRY,Paraguay,PY,PRY,288.0,PAR,150.0,PAR,PY,PRGY,PRY,PRY,http://www.wikidata.org/entity/Q733,Paraguay,98.0,730.0,,
@@ -255,7 +255,7 @@ UGA,Uganda,UG,UGA,746.0,UGA,500.0,UGA,UG,UGND,UGA,UGA,http://www.wikidata.org/en
 UKR,Ukraine,UA,UKR,926.0,UKR,369.0,UKR,UN,,UKR,UKR,http://www.wikidata.org/entity/Q212,Ukraine,67.0,774.0,,
 ARE,United Arab Emirates,AE,ARE,466.0,UAE,696.0,UAE,TS,UAR0,ARE,ARE,http://www.wikidata.org/entity/Q878,United Arab Emirates,72.0,568.0,,"[""U.Arab Emirates""]"
 GBR,United Kingdom,GB,GBR,112.0,UKG,200.0,,XXK,UK00,GBR,GBR,http://www.wikidata.org/entity/Q145,United Kingdom,1.0,635.0,,"[""United Kingdom of Great Britain and Northern Ireland""]"
-USA,United States,US,USA,111.0,USA,2.0,,XXU,USA0,USA,USA,http://www.wikidata.org/entity/Q30,United States of America,13.0,776.0,,"[""United States of America""]"
+USA,United States,US,USA,111.0,USA,2.0,,XXU,USA0,USA,USA,http://www.wikidata.org/entity/Q30,United States of America,13.0,776.0,,"[""USA"", ""United States of America""]"
 UMI,United States Minor Outlying Islands,UM,UMI,,,,,,,,,http://www.wikidata.org/entity/Q16645,United States Minor Outlying Islands,354.0,811.0,,
 VIR,United States Virgin Islands,VI,VIR,,,,,VI,,VIR,VIR,http://www.wikidata.org/entity/Q11703,United States Virgin Islands,256.0,782.0,,"[""U.S. Virgin Is."", ""U.S. Virgin Islands"", ""Virgin Islands (U.S.)"", ""Virgin Islands, U.S.""]"
 URY,Uruguay,UY,URY,298.0,URU,165.0,URU,UY,URGY,URY,URY,http://www.wikidata.org/entity/Q77,Uruguay,63.0,775.0,,
@@ -294,4 +294,4 @@ OWID_SAM,South America,,,,,,,,,,,,,5403.0,,"[""ARG"", ""BOL"", ""BRA"", ""CHL"",
 OWID_NAM,North America,,,,,,,,,,,,,294.0,,"[""AIA"", ""ATG"", ""ABW"", ""BHS"", ""BRB"", ""BLZ"", ""BMU"", ""BES"", ""VGB"", ""CAN"", ""CYM"", ""CRI"", ""CUB"", ""CUW"", ""DMA"", ""DOM"", ""SLV"", ""GRL"", ""GRD"", ""GLP"", ""GTM"", ""HTI"", ""HND"", ""JAM"", ""MTQ"", ""MEX"", ""MSR"", ""ANT"", ""NIC"", ""PAN"", ""PRI"", ""BLM"", ""KNA"", ""LCA"", ""MAF"", ""SPM"", ""VCT"", ""SXM"", ""TTO"", ""TCA"", ""USA"", ""VIR""]",
 OWID_OCE,Oceania,,,,,,,,,,,,,277.0,,"[""ASM"", ""AUS"", ""COK"", ""FJI"", ""PYF"", ""GUM"", ""KIR"", ""MHL"", ""FSM"", ""NRU"", ""NCL"", ""NZL"", ""NIU"", ""NFK"", ""MNP"", ""PLW"", ""PNG"", ""PCN"", ""WSM"", ""SLB"", ""TKL"", ""TON"", ""TUV"", ""UMI"", ""VUT"", ""WLF""]",
 ATA,Antarctica,AQ,ATA,,,,,,,,,http://www.wikidata.org/entity/Q21590062,Antarctic Treaty area,346.0,792.0,"[""BVT"", ""ATF"", ""HMD"", ""ATA""]",
-OWID_EU27,European Union (27),,,,,,,,,,,,,135114.0,,"[""AUT"", ""BEL"", ""BGR"", ""HRV"", ""CYP"", ""CZE"", ""DNK"", ""EST"", ""FIN"", ""FRA"", ""DEU"", ""GRC"", ""HUN"", ""IRL"", ""ITA"", ""LVA"", ""LTU"", ""LUX"", ""MLT"", ""NLD"", ""POL"", ""PRT"", ""ROU"", ""SVK"", ""SVN"", ""ESP"", ""SWE""]","[""EU"", ""EU-27""]"
+OWID_EU27,European Union (27),,,,,,,,,,,,,135114.0,,"[""AUT"", ""BEL"", ""BGR"", ""HRV"", ""CYP"", ""CZE"", ""DNK"", ""EST"", ""FIN"", ""FRA"", ""DEU"", ""GRC"", ""HUN"", ""IRL"", ""ITA"", ""LVA"", ""LTU"", ""LUX"", ""MLT"", ""NLD"", ""POL"", ""PRT"", ""ROU"", ""SVK"", ""SVN"", ""ESP"", ""SWE""]","[""EU"", ""EU-27"", ""EU27""]"
