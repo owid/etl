@@ -12,7 +12,10 @@ Usage:
 from dataclasses import dataclass
 import json
 import os
+import pandas as pd
 from typing import Dict, List, cast
+from contextlib import contextmanager
+from collections.abc import Generator
 
 from etl.db import get_connection
 from etl.db_utils import DBUtils
@@ -44,23 +47,27 @@ class DatasetUpsertResult:
     source_ids: Dict[str, int]
 
 
+@dataclass
+class VariableUpsertResult:
+    variable_id: int
+    source_id: int
+
+
 def upsert_dataset(
     dataset: catalog.Dataset, namespace: str, sources: List[catalog.meta.Source]
 ) -> DatasetUpsertResult:
     utils.validate_underscore(dataset.metadata.short_name, "Dataset's short_name")
 
+    if len(sources) > 1:
+        raise NotImplementedError(
+            "only a single source is supported for grapher datasets, use `join_sources` to join multiple sources"
+        )
+
     # This function creates the dataset table row, a namespace row
     # and the sources table row(s). There is a bit of an open question if we should
     # map one dataset with N tables to one namespace and N datasets in
     # mysql or if we should just flatten it into one dataset?
-    connection = None
-    cursor = None
-    try:
-        connection = get_connection()
-        connection.autocommit(False)
-        cursor = connection.cursor()
-        db = DBUtils(cursor)
-
+    with open_db() as db:
         print("Verifying namespace is present")
         ns = db.fetch_one_or_none("SELECT * from namespaces where name=%s", [namespace])
         if ns is None:
@@ -76,40 +83,28 @@ def upsert_dataset(
 
         source_ids: Dict[str, int] = dict()
         for source in sources:
-            if source.name is not None:
-                json_description = json.dumps(
-                    {
-                        "link": source.url,
-                        "retrievedDate": source.date_accessed,
-                        "dataPublishedBy": source.published_by,
-                        "dataPublisherSource": source.publisher_source,
-                        # NOTE: we remap `description` to additionalInfo since that is what is shown as `Description` in
-                        # the admin UI. Clean this up with the new data model
-                        "additionalInfo": source.description,
-                    }
-                )
-                source_id = db.upsert_source(source.name, json_description, dataset_id)
-                source_ids[source.name] = source_id
-            else:
-                print(
-                    "Source name was None - please fix this in the metadata. Continuing"
-                )
-        connection.commit()
+            source_ids[source.name] = _upsert_source_to_db(db, source, dataset_id)
 
         return DatasetUpsertResult(dataset_id, source_ids)
-    except Exception as e:
-        logger.error(f"Error encountered during import: {e}")
-        logger.error("Rolling back changes...")
-        if connection:
-            connection.rollback()
-        if config.DEBUG:
-            traceback.print_exc()
-        raise e
-    finally:
-        if cursor:
-            cursor.close()
-        if connection:
-            connection.close()
+
+
+def _upsert_source_to_db(db: DBUtils, source: catalog.Source, dataset_id: int) -> int:
+    """Upsert source and return its id"""
+    if source.name is None:
+        raise ValueError("Source name was None - please fix this in the metadata.")
+
+    json_description = json.dumps(
+        {
+            "link": source.url,
+            "retrievedDate": source.date_accessed,
+            "dataPublishedBy": source.published_by,
+            "dataPublisherSource": source.publisher_source,
+            # NOTE: we remap `description` to additionalInfo since that is what is shown as `Description` in
+            # the admin UI. Clean this up with the new data model
+            "additionalInfo": source.description,
+        }
+    )
+    return db.upsert_source(source.name, json_description, dataset_id)
 
 
 def _update_variables_display(table: catalog.Table) -> None:
@@ -126,10 +121,11 @@ def _update_variables_display(table: catalog.Table) -> None:
 
 def upsert_table(
     table: catalog.Table, dataset_upsert_result: DatasetUpsertResult
-) -> None:
-    # This function is used to put one ready to go formatted Table (i.e.
-    # in the format (year, entityId, value)) into mysql. The metadata
-    # of the variable is used to fill the required fields
+) -> VariableUpsertResult:
+    """This function is used to put one ready to go formatted Table (i.e.
+    in the format (year, entityId, value)) into mysql. The metadata
+    of the variable is used to fill the required fields.
+    """
 
     assert set(table.index.names) == {
         "year",
@@ -151,17 +147,14 @@ def upsert_table(
     utils.validate_underscore(table.metadata.short_name, "Table's short_name")
     utils.validate_underscore(table.columns[0], "Variable's name")
 
+    if len(table.iloc[:, 0].metadata.sources) > 1:
+        raise NotImplementedError(
+            "only a single source is supported for grapher variables, use `join_sources` to join multiple sources"
+        )
+
     _update_variables_display(table)
 
-    connection = None
-    cursor = None
-    try:
-
-        connection = get_connection()
-        connection.autocommit(False)
-        cursor = connection.cursor()
-        db = DBUtils(cursor)
-
+    with open_db() as db:
         logger.info("---Upserting variable...")
 
         # For easy retrieveal of the value series we store the name
@@ -174,13 +167,21 @@ def upsert_table(
 
         table.reset_index(inplace=True)
 
-        # Use variable source if specified, otherwise use dataset source
-        source_id = None
+        # Every variable must have a source. Use variable source if specified, otherwise use dataset source
         if len(table[column_name].metadata.sources) > 0:
-            source_name = table[column_name].metadata.sources[0].name
-            if source_name is not None:
-                source_id = dataset_upsert_result.source_ids.get(source_name)
-        if source_id is None:
+            source = table[column_name].metadata.sources[0]
+
+            # Does it already exist in the database?
+            source_id = dataset_upsert_result.source_ids.get(source.name)
+            if not source_id:
+                # Not exists, upsert it
+                # NOTE: this could be quite inefficient as we upsert source for every variable
+                #   optimize this if this turns out to be a bottleneck
+                source_id = _upsert_source_to_db(
+                    db, source, dataset_upsert_result.dataset_id
+                )
+        else:
+            # Use dataset source
             source_id = list(dataset_upsert_result.source_ids.values())[0]
 
         db_variable_id = db.upsert_variable(
@@ -223,8 +224,95 @@ def upsert_table(
         )
         logger.info(f"Upserted {len(table)} datapoints.")
 
-        connection.commit()
+        return VariableUpsertResult(db_variable_id, source_id)
 
+
+def cleanup_ghost_variables(dataset_id: int, upserted_variable_ids: List[int]) -> None:
+    """Remove all leftover variables that didn't get upserted into DB during grapher step.
+    This could happen when you rename or delete a variable in ETL.
+    Raise an error if we try to delete variable used by any chart.
+
+    :param dataset_id: ID of the dataset
+    :param upserted_variable_ids: variables upserted in grapher step
+    """
+    with open_db() as db:
+        # get all those variables first
+        db.cursor.execute(
+            """
+            SELECT id FROM variables WHERE datasetId=%(dataset_id)s AND id NOT IN %(variable_ids)s
+        """,
+            {"dataset_id": dataset_id, "variable_ids": upserted_variable_ids},
+        )
+        rows = db.cursor.fetchall()
+
+        variable_ids_to_delete = [row[0] for row in rows]
+
+        # nothing to delete, quit
+        if not variable_ids_to_delete:
+            return
+
+        # raise an exception if they're used in any charts
+        db.cursor.execute(
+            """
+            SELECT chartId, variableId FROM chart_dimensions WHERE variableId IN %(variable_ids)s
+        """,
+            {"dataset_id": dataset_id, "variable_ids": variable_ids_to_delete},
+        )
+        rows = db.cursor.fetchall()
+        if rows:
+            rows = pd.DataFrame(rows, columns=["chartId", "variableId"])
+            raise ValueError(
+                f"Variables used in charts will not be deleted automatically:\n{rows}"
+            )
+
+        # first delete data_values
+        db.cursor.execute(
+            """
+            DELETE FROM data_values WHERE variableId IN %(variable_ids)s
+        """,
+            {"variable_ids": variable_ids_to_delete},
+        )
+
+        # then variables themselves
+        db.cursor.execute(
+            """
+            DELETE FROM variables WHERE datasetId=%(dataset_id)s AND id IN %(variable_ids)s
+        """,
+            {"dataset_id": dataset_id, "variable_ids": variable_ids_to_delete},
+        )
+
+        logging.warning(
+            f"Deleted {db.cursor.rowcount} ghost variables ({variable_ids_to_delete})"
+        )
+
+
+def cleanup_ghost_sources(dataset_id: int, upserted_source_ids: List[int]) -> None:
+    """Remove all leftover sources that didn't get upserted into DB during grapher step.
+    This could happen when you rename or delete sources.
+    :param dataset_id: ID of the dataset
+    :param upserted_source_ids: sources upserted in grapher step
+    """
+    with open_db() as db:
+        db.cursor.execute(
+            """
+            DELETE FROM sources WHERE datasetId=%(dataset_id)s AND id NOT IN %(source_ids)s
+        """,
+            {"dataset_id": dataset_id, "source_ids": upserted_source_ids},
+        )
+        if db.cursor.rowcount > 0:
+            logging.warning(f"Deleted {db.cursor.rowcount} ghost sources")
+
+
+@contextmanager
+def open_db() -> Generator[DBUtils, None, None]:
+    connection = None
+    cursor = None
+    try:
+        connection = get_connection()
+        connection.autocommit(False)
+        cursor = connection.cursor()
+        yield DBUtils(cursor)
+        connection.commit()
     except Exception as e:
         logger.error(f"Error encountered during import: {e}")
         logger.error("Rolling back changes...")
