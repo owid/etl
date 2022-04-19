@@ -8,7 +8,7 @@ from etl import data_helpers
 def load_land_area() -> Table:
     d = Dataset(
         DATA_DIR
-        / "meadow/open_numbers/latest/open_numbers__world_development_indicators"
+        / "open_numbers/open_numbers/latest/open_numbers__world_development_indicators"
     )
     table = d["ag_lnd_totl_k2"]
 
