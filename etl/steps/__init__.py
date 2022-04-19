@@ -264,6 +264,9 @@ def parse_step(step_name: str, dag: Dict[str, Any]) -> "Step":
     elif step_type == "grapher-private":
         step = GrapherStepPrivate(path, dependencies)
 
+    elif step_type == "backport-private":
+        step = BackportStepPrivate(path, dependencies)
+
     else:
         raise Exception(f"no recipe for executing step: {step_name}")
 
@@ -696,6 +699,9 @@ class BackportStep(DataStep):
 class DataStepPrivate(DataStep):
     is_public = False
 
+    def __str__(self) -> str:
+        return f"data-private://{self.path}"
+
     def after_run(self) -> None:
         """Make dataset private"""
         ds = catalog.Dataset(self._dest_dir.as_posix())
@@ -706,9 +712,22 @@ class DataStepPrivate(DataStep):
 class WaldenStepPrivate(WaldenStep):
     is_public = False
 
+    def __str__(self) -> str:
+        return f"walden-private://{self.path}"
+
 
 class GrapherStepPrivate(GrapherStep):
     is_public = False
+
+    def __str__(self) -> str:
+        return f"grapher-private://{self.path}"
+
+
+class BackportStepPrivate(BackportStep):
+    is_public = False
+
+    def __str__(self) -> str:
+        return f"backport-private://{self.path}"
 
 
 def select_dirty_steps(steps: List[Step], max_workers: int) -> List[Step]:
