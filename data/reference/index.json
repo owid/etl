@@ -1,5 +1,0 @@
-{
-  "namespace": "owid",
-  "short_name": "reference",
-  "description": "Our World In Data reference datasets. These datasets define the vocabulary for important dimensions that we harmonized across different datasets. \nEvery table represents the vocabulary for one dimensions and can include additional columns like third party identifiers, hierarchical grouping etc."
-}

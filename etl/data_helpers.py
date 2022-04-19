@@ -4,9 +4,7 @@ from typing import cast
 import pandas as pd
 
 from owid.catalog import Dataset
-from etl.paths import DATA_DIR
-
-REFERENCE = DATA_DIR / "reference"
+from etl.paths import REFERENCE_DATASET
 
 
 def calculate_region_sums(df: pd.DataFrame) -> pd.DataFrame:
@@ -33,7 +31,7 @@ def calculate_region_sums(df: pd.DataFrame) -> pd.DataFrame:
         ],
     )
 
-    countries = Dataset(REFERENCE)["countries_regions"]
+    countries = Dataset(REFERENCE_DATASET)["countries_regions"]
 
     continent_rows = []
     for code, row in countries.iterrows():

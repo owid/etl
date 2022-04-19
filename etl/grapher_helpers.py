@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import Optional, Dict, Literal, cast, List, Any, Set
 from pydantic import BaseModel
 
-from etl.paths import DATA_DIR
+from etl.paths import REFERENCE_DATASET
 from etl.db import get_connection, get_engine
 from etl.db_utils import DBUtils
 
@@ -179,7 +179,7 @@ def yield_long_table(
 
 
 def _get_entities_from_countries_regions() -> Dict[str, int]:
-    reference_dataset = catalog.Dataset(DATA_DIR / "reference")
+    reference_dataset = catalog.Dataset(REFERENCE_DATASET)
     countries_regions = reference_dataset["countries_regions"]
     return cast(Dict[str, int], countries_regions.set_index("name")["legacy_entity_id"])
 

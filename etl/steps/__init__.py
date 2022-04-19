@@ -211,7 +211,7 @@ def parse_step(step_name: str, dag: Dict[str, Any]) -> "Step":
 
     step: Step
     if step_type == "data":
-        if path == "reference":
+        if path == "garden/reference":
             step = ReferenceStep(path)
         else:
             step = DataStep(path, dependencies)
