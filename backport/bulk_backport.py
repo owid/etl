@@ -35,12 +35,13 @@ def bulk_backport(
     engine = get_engine()
 
     q = """
-    select id, name, dataEditedAt, metadataEditedAt from datasets
-    where not isPrivate
-        and id in (
-            select distinct v.datasetId from chart_dimensions as cd
-            join variables as v on cd.variableId = v.id
-        )
+    select
+        id, name, dataEditedAt, metadataEditedAt, isPrivate
+    from datasets
+    where id in (
+        select distinct v.datasetId from chart_dimensions as cd
+        join variables as v on cd.variableId = v.id
+    )
     order by rand()
     limit %(limit)s
     """
@@ -58,6 +59,7 @@ def bulk_backport(
             "bulk_backport",
             dataset_id=ds.id,
             name=ds.name,
+            private=ds.isPrivate,
             progress=f"{i + 1}/{len(df)}",
         )
         backport(

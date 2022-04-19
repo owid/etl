@@ -166,10 +166,12 @@ def _backporting_steps() -> DAG:
     for ds in WaldenCatalog().find(namespace=WALDEN_NAMESPACE):
         # two files are generated for each dataset, skip one
         if ds.short_name.endswith("_values"):
+            private_suffix = "" if ds.is_public else "-private"
+
             short_name = ds.short_name.replace("_values", "")
-            dag[f"backport://backport/owid/latest/{short_name}"] = {
-                f"walden://{ds.namespace}/latest/{short_name}_values",
-                f"walden://{ds.namespace}/latest/{short_name}_config",
+            dag[f"backport{private_suffix}://backport/owid/latest/{short_name}"] = {
+                f"walden{private_suffix}://{ds.namespace}/latest/{short_name}_values",
+                f"walden{private_suffix}://{ds.namespace}/latest/{short_name}_config",
             }
 
     return dag

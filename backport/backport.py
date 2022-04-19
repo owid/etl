@@ -118,14 +118,18 @@ def _load_config(
 
 
 def _upload_config_to_walden(
-    config: GrapherConfig, meta: WaldenDataset, dry_run: bool, upload: bool
+    config: GrapherConfig,
+    meta: WaldenDataset,
+    dry_run: bool,
+    upload: bool,
+    public: bool,
 ) -> None:
     with tempfile.NamedTemporaryFile(mode="w") as f:
         f.write(config.json())
         f.flush()
 
         if not dry_run:
-            add_to_catalog(meta, f.name, upload)
+            add_to_catalog(meta, f.name, upload, public=public)
 
 
 def _upload_values_to_walden(
@@ -133,11 +137,12 @@ def _upload_values_to_walden(
     meta: WaldenDataset,
     dry_run: bool,
     upload: bool,
+    public: bool,
 ) -> None:
     with tempfile.NamedTemporaryFile(mode="wb") as f:
         df.to_feather(f.name, compression="lz4")
         if not dry_run:
-            add_to_catalog(meta, f.name, upload)
+            add_to_catalog(meta, f.name, upload, public=public)
 
 
 def _checksum_match(short_name: str, md5: str) -> bool:
@@ -218,10 +223,17 @@ def backport(
                 # should return False... if this is not the case, something is wrong
                 raise AssertionError("This should never happen")
 
+    # don't make private datasets public
+    public = not ds.isPrivate
+
     # upload config to walden
     lg.info("backport.upload_config")
     _upload_config_to_walden(
-        config, _walden_config_metadata(ds, short_name, md5_config), dry_run, upload
+        config,
+        _walden_config_metadata(ds, short_name, md5_config),
+        dry_run,
+        upload,
+        public=public,
     )
 
     # upload values to walden
@@ -229,7 +241,11 @@ def backport(
     df = _load_values(engine, variable_ids)
     lg.info("backport.upload_values", size=len(df))
     _upload_values_to_walden(
-        df, _walden_values_metadata(ds, short_name), dry_run, upload
+        df,
+        _walden_values_metadata(ds, short_name),
+        dry_run,
+        upload,
+        public=public,
     )
 
     lg.info("backport.finished")

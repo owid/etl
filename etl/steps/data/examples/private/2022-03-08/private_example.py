@@ -3,11 +3,12 @@ from owid.catalog import Dataset, Table
 from owid.walden import Catalog
 
 from etl.steps.data.converters import convert_walden_metadata
+from owid.catalog.utils import underscore_table
 
 
 def run(dest_dir: str) -> None:
-    walden_ds = Catalog().find_one("private", "2021", "private_test")
-    df = pd.read_csv(walden_ds.ensure_downloaded())
+    walden_ds = Catalog().find_one("ggdc", "2020-10-01", "ggdc_maddison")
+    df = pd.read_excel(walden_ds.ensure_downloaded())
 
     ds = Dataset.create_empty(dest_dir)
     ds.metadata = convert_walden_metadata(walden_ds)
@@ -17,5 +18,5 @@ def run(dest_dir: str) -> None:
     t.metadata.title = ds.metadata.title
     t.metadata.description = ds.metadata.description
 
-    ds.add(t)
+    ds.add(underscore_table(t))
     ds.save()
