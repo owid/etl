@@ -75,6 +75,26 @@ steps:
   grapher://ggdc/2020-10-01/ggdc_maddison:
     - data://garden/ggdc/2020-10-01/ggdc_maddison
 
+  data://garden/sdg/latest/sdg:
+    - backport://backport/owid/latest/dataset_5457_ihme__global_burden_of_disease__deaths_and_dalys__institute_for_health_metrics_and_evaluation__2021_09
+    - backport://backport/owid/latest/dataset_1047_world_bank_gender_statistics__gender
+    - backport://backport/owid/latest/dataset_5357_world_development_indicators__world_bank__2021_07_30
+    - backport://backport/owid/latest/dataset_5362_world_bank_edstats_2020
+    - backport://backport/owid/latest/dataset_5575_united_nations_sustainable_development_goals__united_nations__2022_04
+    - backport://backport/owid/latest/dataset_829_food_security__suite_of_food_security_indicators__fao__2017
+    - backport://backport/owid/latest/dataset_3093_economic_losses_from_disasters_as_a_share_of_gdp__pielke__2018
+    - backport://backport/owid/latest/dataset_115_countries_continents
+    - backport://backport/owid/latest/dataset_5438_global_health_observatory__world_health_organization__2021_12
+    - backport://backport/owid/latest/dataset_5520_united_nations_sustainable_development_goals__united_nations__2022_02
+    - backport://backport/owid/latest/dataset_70_population__gapminder__hyde__and__un
+    - backport://backport/owid/latest/dataset_792_investment__credit_to_agriculture__fao__2017
+    - backport://backport/owid/latest/dataset_5201_forest_land__deforestation_and_change__fao__2020
+    - backport://backport/owid/latest/dataset_564_world_development_indicators__poverty
+    - backport://backport/owid/latest/dataset_943_sexual_violence__unicef__2017
+    - backport://backport/owid/latest/dataset_1070_statistical_capacity_indicator__sci__world_bank_data_on_statistical_capacity
+  data://garden/wb/latest/world_development_indicators:
+    - backport://backport/owid/latest/dataset_5357_world_development_indicators__world_bank__2021_07_30
+
   # Examples
   data://examples/script/script_example:
     - walden://wb/2021-07-01/wb_income
