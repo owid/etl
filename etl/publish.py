@@ -14,7 +14,7 @@ import boto3
 from botocore.client import ClientError
 import pandas as pd
 
-from owid.catalog import LocalCatalog
+from owid.catalog import LocalCatalog, CHANNEL
 
 from etl import config, files
 from etl.paths import DATA_DIR
@@ -28,7 +28,15 @@ class CannotPublish(Exception):
 @click.option("--dry-run", is_flag=True, default=False)
 @click.option("--private", is_flag=True, default=False)
 @click.option("--bucket", type=str, help="Bucket name", default=config.S3_BUCKET)
-def publish(dry_run: bool, private: bool, bucket: str) -> None:
+@click.option(
+    "--channel",
+    "-c",
+    multiple=True,
+    type=click.Choice(CHANNEL.__args__),
+    default=CHANNEL.__args__,
+    help="Publish only selected channel (subfolder of data/), push all by default",
+)
+def publish(dry_run: bool, private: bool, bucket: str, channel: tuple[CHANNEL]) -> None:
     """
     Publish the generated data catalog to S3.
     """
@@ -37,45 +45,54 @@ def publish(dry_run: bool, private: bool, bucket: str) -> None:
         raise Exception(
             "You cannot publish public catalog yet, only private catalogs with flag --private are supported"
         )
-    sanity_checks(catalog)
-    sync_catalog_to_s3(bucket, catalog, dry_run=dry_run)
+    for c in channel:
+        sanity_checks(catalog, channel=c)
+
+    for c in channel:
+        sync_catalog_to_s3(bucket, catalog, channel=c, dry_run=dry_run)
 
 
-def sanity_checks(catalog: Path) -> None:
-    if not (catalog / "catalog.feather").exists():
+def sanity_checks(catalog: Path, channel: CHANNEL) -> None:
+    if not (catalog / _channel_path(channel)).exists():
         print(
             "ERROR: catalog has not been indexed, refusing to publish", file=sys.stderr
         )
         sys.exit(1)
 
 
-def sync_catalog_to_s3(bucket: str, catalog: Path, dry_run: bool = False) -> None:
+def sync_catalog_to_s3(
+    bucket: str, catalog: Path, channel: CHANNEL, dry_run: bool = False
+) -> None:
     s3 = connect_s3()
-    if is_catalog_up_to_date(s3, bucket, catalog):
-        print("Catalog is up to date!")
+    if is_catalog_up_to_date(s3, bucket, catalog, channel):
+        print(f"Catalog's channel {channel} is up to date!")
         return
 
-    sync_datasets(s3, bucket, catalog, dry_run=dry_run)
+    sync_datasets(s3, bucket, catalog, channel, dry_run=dry_run)
     if not dry_run:
-        update_catalog(s3, bucket, catalog)
+        update_catalog(s3, bucket, catalog, channel)
 
 
-def is_catalog_up_to_date(s3: Any, bucket: str, catalog: Path) -> bool:
+def is_catalog_up_to_date(
+    s3: Any, bucket: str, catalog: Path, channel: CHANNEL
+) -> bool:
     """The catalog file is synced last -- if it is the same as our local one, then all the remote
     files will be the same as our local ones too."""
-    remote = get_remote_checksum(s3, bucket, "catalog.feather")
-    local = files.checksum_file(catalog / "catalog.feather")
+    remote = get_remote_checksum(s3, bucket, _channel_path(channel).as_posix())
+    local = files.checksum_file(catalog / _channel_path(channel))
     return remote == local
 
 
-def sync_datasets(s3: Any, bucket: str, catalog: Path, dry_run: bool = False) -> None:
+def sync_datasets(
+    s3: Any, bucket: str, catalog: Path, channel: CHANNEL, dry_run: bool = False
+) -> None:
     "Go dataset by dataset and check if each one needs updating."
-    existing = get_published_checksums(bucket)
+    existing = get_published_checksums(bucket, channel)
 
     to_delete = set(existing)
     local = LocalCatalog(catalog)
     print("Datasets to sync:")
-    for ds in local.iter_datasets():
+    for ds in local.iter_datasets(channel):
         # ignore datasets with no tables
         if len(ds._data_files) == 0:
             continue
@@ -177,27 +194,29 @@ def delete_dataset(s3: Any, bucket: str, relative_path: str) -> None:
         to_delete = to_delete[1000:]
 
 
-def update_catalog(s3: Any, bucket: str, catalog: Path) -> None:
-    catalog_filename = catalog / "catalog.feather"
+def update_catalog(s3: Any, bucket: str, catalog: Path, channel: CHANNEL) -> None:
+    catalog_filename = catalog / _channel_path(channel)
     s3.upload_file(
         catalog_filename.as_posix(),
         bucket,
-        "catalog.feather",
+        _channel_path(channel).as_posix(),
         ExtraArgs={"ACL": "public-read"},
     )
 
     s3.upload_file(
-        catalog_filename.with_suffix(".meta.json").as_posix(),
+        (catalog / "catalog.meta.json").as_posix(),
         bucket,
         "catalog.meta.json",
         ExtraArgs={"ACL": "public-read"},
     )
 
 
-def get_published_checksums(bucket: str) -> Dict[str, str]:
+def get_published_checksums(bucket: str, channel: CHANNEL) -> Dict[str, str]:
     "Get the checksum of every dataset that's been published."
     try:
-        existing = pd.read_feather(f"https://{bucket}.{config.S3_HOST}/catalog.feather")
+        existing = pd.read_feather(
+            f"https://{bucket}.{config.S3_HOST}/{_channel_path(channel)}"
+        )
         existing["path"] = existing["path"].apply(lambda p: p.rsplit("/", 1)[0])
         existing = (
             existing[["path", "checksum"]]
@@ -224,8 +243,7 @@ def get_remote_checksum(s3: Any, bucket: str, path: str) -> Optional[str]:
 
 
 def connect_s3() -> Any:
-    # TODO: consider using AWS_PROFILE just like we do here https://github.com/owid/walden/blob/master/owid/walden/owid_cache.py#L52
-    # to be consistent
+    # TODO: use https://github.com/owid/data-utils-py/blob/main/owid/datautils/io/s3.py
     session = boto3.Session()
     return session.client(
         "s3",
@@ -234,6 +252,10 @@ def connect_s3() -> Any:
         aws_access_key_id=config.S3_ACCESS_KEY,
         aws_secret_access_key=config.S3_SECRET_KEY,
     )
+
+
+def _channel_path(channel: CHANNEL) -> Path:
+    return Path(f"catalog-{channel}.feather")
 
 
 if __name__ == "__main__":
