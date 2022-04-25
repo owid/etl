@@ -1,13 +1,12 @@
 import pandas as pd
 from owid import catalog
-from collections.abc import Iterable
 import yaml
 import slugify
 import warnings
 import logging
 from pathlib import Path
 
-from typing import Optional, Dict, Literal, cast, List, Any, Set
+from typing import Optional, Dict, Literal, cast, List, Any, Set, Iterable
 from pydantic import BaseModel
 
 from etl.paths import REFERENCE_DATASET

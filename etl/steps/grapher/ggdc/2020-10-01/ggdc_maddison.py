@@ -1,5 +1,6 @@
+from typing import Iterable
+
 from owid import catalog
-from collections.abc import Iterable
 
 from etl.paths import DATA_DIR
 from etl import grapher_helpers as gh

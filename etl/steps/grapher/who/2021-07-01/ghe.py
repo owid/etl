@@ -1,9 +1,9 @@
 from owid import catalog
-from collections.abc import Iterable
 import pandas as pd
 import slugify
 import yaml
 from pathlib import Path
+from typing import Iterable
 
 from etl.paths import DATA_DIR, REFERENCE_DATASET
 
