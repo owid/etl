@@ -6,6 +6,7 @@
 import re
 import sys
 from typing import Any, Dict, Iterator, Optional, cast
+from collections.abc import Iterable
 from urllib.error import HTTPError
 from pathlib import Path
 
@@ -36,7 +37,9 @@ class CannotPublish(Exception):
     default=CHANNEL.__args__,
     help="Publish only selected channel (subfolder of data/), push all by default",
 )
-def publish(dry_run: bool, private: bool, bucket: str, channel: tuple[CHANNEL]) -> None:
+def publish(
+    dry_run: bool, private: bool, bucket: str, channel: Iterable[CHANNEL]
+) -> None:
     """
     Publish the generated data catalog to S3.
     """
