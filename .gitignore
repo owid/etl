@@ -12,6 +12,9 @@ etl/scripts/countries-regions/intermediate
 !data/
 data/*
 !data/reference/
+!data/reference
+!data/garden/
+data/garden/*
 !data/garden/reference/
 .env
 *.dot
