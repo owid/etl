@@ -12,7 +12,7 @@ def checksum_file(filename: Union[str, Path]) -> str:
     if isinstance(filename, Path):
         filename = filename.as_posix()
 
-    chunk_size = 2 ** 20
+    chunk_size = 2**20
     _hash = hashlib.md5()
     with open(filename, "rb") as istream:
         chunk = istream.read(chunk_size)
