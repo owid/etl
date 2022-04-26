@@ -18,7 +18,7 @@ def downloaded(url: str) -> Iterator[str]:
     with tempfile.NamedTemporaryFile() as tmp:
         with requests.get(url, stream=True) as r:
             r.raise_for_status()
-            chunk_size = 2 ** 16  # 64k
+            chunk_size = 2**16  # 64k
             for chunk in r.iter_content(chunk_size=chunk_size):
                 tmp.write(chunk)
 

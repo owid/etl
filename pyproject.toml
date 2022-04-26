@@ -42,7 +42,7 @@ rich = "^12.1.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
-black = {extras = ["jupyter"], version = "^21.9b0"}
+black = {version = "^22.3.0", extras = ["jupyter"]}
 mypy = "^0.910"
 flake8 = "^3.9.2"
 watchdog = "^2.1.5"
