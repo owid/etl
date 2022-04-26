@@ -30,6 +30,12 @@ steps:
     - walden://hyde/2017/general_files
   data://garden/hyde/2017/baseline:
     - data://meadow/hyde/2017/baseline
+  data://meadow/faostat/2022-04-26/faostat_fbsh:
+    - walden://faostat/2022-04-26/faostat_fbsh
+  data://meadow/faostat/2022-04-26/faostat_qcl:
+    - walden://faostat/2022-04-26/faostat_qcl
+  data://meadow/faostat/2022-04-26/faostat_fbs:
+    - walden://faostat/2022-04-26/faostat_fbs
   data://meadow/faostat/2022-02-10/faostat_metadata:
     - walden://faostat/2022-02-10/faostat_metadata
   data://meadow/faostat/2017-12-11/faostat_fbsh:
