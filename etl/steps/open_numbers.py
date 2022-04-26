@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import Dict, List, Tuple, cast
 import hashlib
 from owid.catalog.meta import Source
+from owid.catalog import utils
 import datetime as dt
 import tempfile
 
@@ -72,7 +73,7 @@ def run(dest_dir: str) -> None:
 
         t = Table(df)
         t.metadata.short_name = short_name
-        ds.add(t)
+        ds.add(utils.underscore_table(t))
 
 
 def load_all_resources(
