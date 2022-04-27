@@ -37,7 +37,7 @@ default_domain_records = [
         "index": ["Unit Name"],
         "short_name": "unit",
     }]
-additional_metadata_paths = {domain: deepcopy(default_domain_records) for domain in ['FBS', 'FBSH', 'QCL']}
+additional_metadata_paths = {domain: deepcopy(default_domain_records) for domain in ['FBS', 'FBSH', 'QCL', 'RL']}
 # Fix different spelling of QCL "itemsgroup" to the more common "itemgroup".
 additional_metadata_paths['QCL'][0]['category'] = 'itemsgroup'
 
@@ -61,7 +61,8 @@ def run(dest_dir: str) -> None:
         for record in additional_metadata_paths[domain]:
             json_data = additional_metadata[domain][record["category"]]["data"]
             df = pd.DataFrame.from_dict(json_data)
-            df.set_index(record["index"], verify_integrity=True, inplace=True)
-            t = Table(df)
-            t.metadata.short_name = f'meta_{domain.lower()}_{record["short_name"]}'
-            ds.add(utils.underscore_table(t))
+            if len(df) > 0:
+                df.set_index(record["index"], verify_integrity=True, inplace=True)
+                t = Table(df)
+                t.metadata.short_name = f'meta_{domain.lower()}_{record["short_name"]}'
+                ds.add(utils.underscore_table(t))
