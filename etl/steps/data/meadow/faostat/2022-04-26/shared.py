@@ -40,7 +40,7 @@ def run_sanity_checks(data: pd.DataFrame) -> None:
 def prepare_output_table(data: pd.DataFrame) -> pd.DataFrame:
     df = data.copy()
 
-    df = df.drop(columns=["Area", "Item", "Element", "Year Code"])
+    df = df.drop(columns=["Year Code"])
     df = df.set_index(
         ["Area Code", "Item Code", "Element Code", "Year", "Flag"],
         verify_integrity=True,
@@ -66,6 +66,9 @@ def generate_dataset(dest_dir: str, namespace: str, dataset_short_name: str) -> 
 
     # Run sanity checks.
     run_sanity_checks(data=data)
+
+    # Prepare output data.
+    data = prepare_output_table(data=data)
 
     # Add tables to dataset.
     t = Table(data)
