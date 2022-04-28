@@ -72,6 +72,10 @@ def to_dependency_order(
         # cut the graph to just the listed steps and the things that
         # then depend on them (transitive closure)
         subgraph = filter_to_subgraph(graph, includes)
+
+        # make sure we also include all dependencies of the subgraph
+        nodes = set(subgraph.keys()) | {e for v in subgraph.values() for e in v}
+        subgraph = reverse_graph(maximal_subgraph(dag, nodes))
     else:
         subgraph = graph
 
@@ -107,6 +111,32 @@ def reverse_graph(graph: Graph) -> Graph:
         g[dest]
 
     return dict(g)
+
+
+def maximal_subgraph(graph: Graph, nodes: Set[str]) -> Graph:
+    """
+    Take a graph and a set of nodes and return a subgraph that only includes
+    those nodes and their dependencies. (Return subgraph that contains all nodes
+    reachable from given nodes... is there a name for it?)
+    """
+    subgraph = defaultdict(set)
+
+    while nodes:
+        node = nodes.pop()
+        # already traversed
+        if node in subgraph:
+            continue
+        subgraph[node] = set(graph.get(node, set()))
+        nodes |= subgraph[node]
+
+    return dict(subgraph)
+
+
+def graph_nodes(graph: Graph) -> Set[str]:
+    all_steps = set(graph)
+    for children in graph.values():
+        all_steps.update(children)
+    return all_steps
 
 
 def filter_to_subgraph(graph: Graph, includes: Iterable[str]) -> Graph:
@@ -389,6 +419,9 @@ class ReferenceStep(DataStep):
 @dataclass
 class WaldenStep(Step):
     path: str
+    # NOTE: reusing catalog between steps improves performance a lot
+    #   call `refresh` to refresh cache and get the latest version
+    _walden_catalog = walden.Catalog()
 
     def __init__(self, path: str) -> None:
         self.path = path
@@ -427,7 +460,7 @@ class WaldenStep(Step):
             raise ValueError(f"malformed walden path: {self.path}")
 
         namespace, version, short_name = self.path.split("/")
-        catalog = walden.Catalog()
+        catalog = self._walden_catalog
 
         # normally version is a year or date, but we also accept "latest"
         if version == "latest":
@@ -459,7 +492,7 @@ class GrapherStep(Step):
         return f"grapher://{self.path}"
 
     def run(self) -> None:
-        # make sure the encosing folder is there
+        # make sure the enclosing folder is there
         self._dest_dir.parent.mkdir(parents=True, exist_ok=True)
 
         sp = self._search_path
