@@ -1380,6 +1380,18 @@ docs = ["Sphinx (>=4)", "furo (>=2021.7.5b38)", "proselint (>=0.10.2)", "sphinx-
 test = ["appdirs (==1.4.4)", "pytest (>=6)", "pytest-cov (>=2.7)", "pytest-mock (>=3.6)"]
 
 [[package]]
+name = "plotly"
+version = "5.7.0"
+description = "An open-source, interactive data visualization library for Python"
+category = "dev"
+optional = false
+python-versions = ">=3.6"
+
+[package.dependencies]
+six = "*"
+tenacity = ">=6.2.0"
+
+[[package]]
 name = "pluggy"
 version = "0.13.1"
 description = "plugin and hook calling mechanisms for python"
@@ -2247,7 +2259,7 @@ python-versions = ">=3.4"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "eb5b4fb9c36b7535df699e016b150de9c569c4efff716fbe30c40fe375499df1"
+content-hash = "ba36473b7dd2eb0e0bc1b5d5bf3ced14d5b57edbcdf6e0abc95a3ca3c65d5c91"
 
 [metadata.files]
 ansiwrap = [
@@ -3068,6 +3080,10 @@ pillow = [
 platformdirs = [
     {file = "platformdirs-2.4.1-py3-none-any.whl", hash = "sha256:1d7385c7db91728b83efd0ca99a5afb296cab9d0ed8313a45ed8ba17967ecfca"},
     {file = "platformdirs-2.4.1.tar.gz", hash = "sha256:440633ddfebcc36264232365d7840a970e75e1018d15b4327d11f91909045fda"},
+]
+plotly = [
+    {file = "plotly-5.7.0-py2.py3-none-any.whl", hash = "sha256:3a35131762c6567813012462e1d496e1d3898f56ab3d386b32f103f7f0c79cf1"},
+    {file = "plotly-5.7.0.tar.gz", hash = "sha256:15ab20e9ed8b55f669b3d35e186eb48f9e1fe07321a1337b8b7df8d3573d265a"},
 ]
 pluggy = [
     {file = "pluggy-0.13.1-py2.py3-none-any.whl", hash = "sha256:966c145cd83c96502c3c3868f50408687b38434af77734af1e9ca461a4081d2d"},
