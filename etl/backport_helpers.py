@@ -1,6 +1,7 @@
 from typing import cast
 
 import structlog
+import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
 from owid.catalog.utils import underscore_table
@@ -10,8 +11,7 @@ from etl.grapher_model import GrapherConfig
 from etl.steps.data.converters import convert_grapher_dataset, convert_grapher_variable
 
 
-from owid.catalog import VariableMeta
-
+SPARSE_DATASET_VARIABLES_CHUNKSIZE = 1000
 
 log = structlog.get_logger()
 
@@ -47,16 +47,24 @@ def create_wide_table(
             short_name=short_name,
             wide_mb=wide_mem_usage_mb,
             long_mb=long_mem_usage_mb,
+            density=f"{df.notnull().sum().sum() / (df.shape[0] * df.shape[1]):.1%}",
             compression=f"{wide_mem_usage_mb / long_mem_usage_mb:.1%}",
         )
 
-    # TODO: what about Table metadata? should I reuse what I have in a dataset?
     t = Table(df)
     t.metadata.short_name = short_name
 
     # add variables metadata
+    # NOTE: some datasets such as `dataset_5438_global_health_observatory__world_health_organization__2021_12`
+    #   would benefit from compression metadata as it is almost as large as the data itself (uncompressed)
+    variable_dict = {v.name: v for v in config.variables}
+    variable_source_dict = {s.id: s for s in config.sources}
+
     for col in t.columns:
-        t[col].metadata = get_metadata_for_variable_name(config, col)
+        variable = variable_dict[col]
+        t[col].metadata = convert_grapher_variable(
+            variable, variable_source_dict[variable.sourceId]
+        )
 
     return underscore_table(t)
 
@@ -80,30 +88,30 @@ def create_dataset(dest_dir: str, short_name: str) -> Dataset:
         dest_dir, convert_grapher_dataset(config.dataset, ds_sources, short_name)
     )
 
-    # in rare cases when wide table would be too sparse, we keep the dataset in long format
+    tables = []
+
+    # if table is too sparse, split it into multiple tables to make them fit in memory
+    # this happens very rarely, e.g. for datasets
+    #   dataset_5520_united_nations_sustainable_development_goals__united_nations__2022_02
+    #   dataset_5438_global_health_observatory__world_health_organization__2021_12
+    # ideally we would have custom scripts for those datasets doing grouping in a logical way
+    # rather than by variable ids
     n_variables = len(set(values.variable_id))
     wide_size = n_variables * len(set(values.entity_id))
     long_size = len(values)
 
-    tables = []
-
     if wide_size >= 1e6 and wide_size / long_size > 0.5:
-        # log.info(
-        #     "create_dataset.long_format", short_name=short_name, wide_size=wide_size
-        # )
-        # # keep config in additional_info for later use
-        # ds.metadata.additional_info["grapher_config"] = config.dict()
+        log.warning(
+            "create_dataset.sparse_dataset",
+            short_name=short_name,
+        )
 
-        # t = Table(values)
-        # t.metadata.short_name = short_name
-        # tables.append(t)
-
-        # group it by 1000 variables
-        import numpy as np
-
+        # group it by chunks
         for variable_ids in np.array_split(
-            values.variable_id.unique().sort_values(), n_variables / 1000
+            values.variable_id.unique().sort_values(),
+            int(n_variables / SPARSE_DATASET_VARIABLES_CHUNKSIZE),
         ):
+            variable_ids = variable_ids.astype(int)
             chunk = values.loc[values.variable_id.isin(variable_ids)]
             t = create_wide_table(
                 chunk,
@@ -120,14 +128,3 @@ def create_dataset(dest_dir: str, short_name: str) -> Dataset:
         ds.add(t)
 
     return ds
-
-
-def get_metadata_for_variable_name(
-    config: GrapherConfig, variable_name: str
-) -> VariableMeta:
-    variable = [v for v in config.variables if v.name == variable_name][0]
-    variable_source = [s for s in config.sources if s.id == variable.sourceId][0]
-    return convert_grapher_variable(
-        variable,
-        variable_source,
-    )

@@ -35,7 +35,7 @@ THREADPOOL_WORKERS = 5
 @click.option(
     "--backport",
     is_flag=True,
-    help="Add steps for backporting OWID datasets (OWID staff only)",
+    help="Add steps for backporting OWID datasets",
 )
 @click.option("--exclude", help="Comma-separated patterns to exclude")
 @click.option(
@@ -58,7 +58,7 @@ def main(
     """
     Execute all ETL steps listed in dag.yaml
     """
-    if grapher or backport:
+    if grapher:
         sanity_check_db_settings()
 
     # Load our graph of steps and the things they depend on
