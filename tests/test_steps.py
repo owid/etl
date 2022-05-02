@@ -21,6 +21,7 @@ from etl.steps import (
     DataStepPrivate,
     compile_steps,
     to_dependency_order,
+    select_dirty_steps,
     Step,
 )
 
@@ -117,3 +118,14 @@ def test_date_step_private():
         DataStepPrivate(step_name, []).run()
         ds = Dataset((paths.DATA_DIR / step_name).as_posix())
         assert not ds.metadata.is_public
+
+
+def test_select_dirty_steps():
+    """select_dirty_steps should only select dirty steps, this can be tricky when using threads"""
+    steps = [DummyStep(f"{i}") for i in range(20)]
+    for s in steps:
+        if random.random() < 0.5:
+            s.is_dirty = lambda: False  # type: ignore
+        else:
+            s.is_dirty = lambda: True  # type: ignore
+    assert all([s.is_dirty() for s in select_dirty_steps(steps, 10)])  # type: ignore

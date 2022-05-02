@@ -8,11 +8,10 @@ import time
 import sys
 import re
 from pathlib import Path
-import concurrent.futures
 
 import click
 
-from etl.steps import load_dag, compile_steps, DAG, paths
+from etl.steps import load_dag, compile_steps, select_dirty_steps, DAG, paths
 from etl import config
 
 
@@ -107,15 +106,7 @@ def run_dag(
 
     if not force:
         print("Detecting which steps need rebuilding...")
-        with concurrent.futures.ThreadPoolExecutor(
-            max_workers=THREADPOOL_WORKERS
-        ) as executor:
-            futures = [executor.submit(s.is_dirty) for s in steps]
-            steps = [
-                s
-                for s, future in zip(steps, concurrent.futures.as_completed(futures))
-                if future.result()
-            ]
+        steps = select_dirty_steps(steps, THREADPOOL_WORKERS)
 
     if not steps:
         print("All datasets up to date!")
