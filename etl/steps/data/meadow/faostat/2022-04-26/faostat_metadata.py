@@ -36,10 +36,18 @@ default_domain_records = [
         "category": "unit",
         "index": ["Unit Name"],
         "short_name": "unit",
-    }]
-additional_metadata_paths = {domain: deepcopy(default_domain_records) for domain in ['FBS', 'FBSH', 'QCL', 'RL']}
+    },
+    {
+        "category": "flag",
+        "index": ["Flag"],
+        "short_name": "flag",
+    },
+]
+additional_metadata_paths = {
+    domain: deepcopy(default_domain_records) for domain in ["FBS", "FBSH", "QCL", "RL"]
+}
 # Fix different spelling of QCL "itemsgroup" to the more common "itemgroup".
-additional_metadata_paths['QCL'][0]['category'] = 'itemsgroup'
+additional_metadata_paths["QCL"][0]["category"] = "itemsgroup"
 
 
 def run(dest_dir: str) -> None:
@@ -56,9 +64,13 @@ def run(dest_dir: str) -> None:
     # Create new meadow dataset, importing metadata from walden.
     ds = Dataset.create_empty(dest_dir)
     ds.metadata = convert_walden_metadata(walden_ds)
+    ds.metadata.short_name = DATASET_SHORT_NAME
+    ds.save()
     # Create a new table within the dataset for each domain-record.
     for domain in additional_metadata:
+        print(domain)
         for record in additional_metadata_paths[domain]:
+            print(record)
             json_data = additional_metadata[domain][record["category"]]["data"]
             df = pd.DataFrame.from_dict(json_data)
             if len(df) > 0:
