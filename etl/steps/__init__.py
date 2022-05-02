@@ -26,6 +26,7 @@ from glob import glob
 from importlib import import_module
 import warnings
 import graphlib
+import concurrent.futures
 
 import yaml
 
@@ -641,3 +642,11 @@ class WaldenStepPrivate(WaldenStep):
 
 class GrapherStepPrivate(GrapherStep):
     is_public = False
+
+
+def select_dirty_steps(steps: List[Step], max_workers: int) -> List[Step]:
+    """Select dirty steps using threadpool."""
+    with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
+        steps_dirty = executor.map(lambda s: s.is_dirty(), steps)  # type: ignore
+        steps = [s for s, is_dirty in zip(steps, steps_dirty) if is_dirty]
+    return steps
