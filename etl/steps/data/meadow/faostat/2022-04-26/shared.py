@@ -72,5 +72,5 @@ def generate_dataset(dest_dir: str, namespace: str, dataset_short_name: str) -> 
 
     # Add tables to dataset.
     t = Table(data)
-    t.metadata.short_name = "bulk"
+    t.metadata.short_name = dataset_short_name
     ds.add(utils.underscore_table(t))

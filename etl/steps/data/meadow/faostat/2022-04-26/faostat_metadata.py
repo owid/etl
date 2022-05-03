@@ -68,9 +68,7 @@ def run(dest_dir: str) -> None:
     ds.save()
     # Create a new table within the dataset for each domain-record.
     for domain in additional_metadata:
-        print(domain)
         for record in additional_metadata_paths[domain]:
-            print(record)
             json_data = additional_metadata[domain][record["category"]]["data"]
             df = pd.DataFrame.from_dict(json_data)
             if len(df) > 0:
