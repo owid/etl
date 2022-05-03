@@ -1,11 +1,11 @@
 from owid import catalog
-from collections.abc import Iterable
 import pandas as pd
 import slugify
 import yaml
 from pathlib import Path
+from typing import Iterable
 
-from etl.paths import DATA_DIR
+from etl.paths import DATA_DIR, REFERENCE_DATASET
 
 
 def get_grapher_dataset() -> catalog.Dataset:
@@ -48,7 +48,7 @@ def get_grapher_tables(dataset: catalog.Dataset) -> Iterable[catalog.Table]:
         )
 
     # Get the legacy_entity_id from the country_code via the countries_regions dimension table
-    reference_dataset = catalog.Dataset(DATA_DIR / "reference")
+    reference_dataset = catalog.Dataset(REFERENCE_DATASET)
     countries_regions = reference_dataset["countries_regions"]
     table = table.merge(
         right=countries_regions[["legacy_entity_id"]],

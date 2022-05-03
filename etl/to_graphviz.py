@@ -72,7 +72,7 @@ def to_graphviz(output_file: str) -> None:
 
         link("Meadow", "Data catalog")
         link("Garden", "Data catalog")
-        link("data://reference", "Reference")
+        link("data://garden/reference", "Reference")
         link("Reference", "Data catalog")
 
         for n in nodes:
