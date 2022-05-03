@@ -22,7 +22,6 @@ UNWPP = DATA_DIR / "garden/wpp/2019/standard_projections"
 GAPMINDER = DATA_DIR / "garden/gapminder/2019-12-10/population"
 HYDE = DATA_DIR / "garden/hyde/2017/baseline"
 WB_INCOME = DATA_DIR / "garden/wb/2021-07-01/wb_income"
-REFERENCE = DATA_DIR / "reference"
 
 DIR_PATH = Path(__file__).parent
 

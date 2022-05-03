@@ -2,7 +2,7 @@ import pandas as pd
 
 from owid.walden import Catalog
 from owid.catalog import Dataset, Table
-from etl.paths import DATA_DIR
+from etl.paths import DATA_DIR, REFERENCE_DATASET
 
 
 def load_wb_income() -> pd.DataFrame:
@@ -16,7 +16,7 @@ def run(dest_dir: str) -> None:
     df = load_wb_income()
 
     # Convert iso codes to country names
-    reference_dataset = Dataset(DATA_DIR / "reference")
+    reference_dataset = Dataset(REFERENCE_DATASET)
     countries_regions = reference_dataset["countries_regions"]
     df["country"] = df.Code.map(countries_regions.name)
 

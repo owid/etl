@@ -6,19 +6,19 @@ steps:
     - etag://raw.githubusercontent.com/owid/covid-19-data/master/public/data/owid-covid-data.csv
   data://garden/owid/latest/population_density:
     - data://garden/owid/latest/key_indicators
-    - data://reference
+    - data://garden/reference
   data://garden/owid/latest/key_indicators:
     - data://garden/hyde/2017/baseline
     - data://garden/gapminder/2019-12-10/population
     - data://garden/wpp/2019/standard_projections
     - data://garden/wb/2021-07-01/wb_income
     - data://open_numbers/open_numbers/latest/open_numbers__world_development_indicators
-    - data://reference
+    - data://garden/reference
   data://garden/wpp/2019/standard_projections:
     - data://meadow/wpp/2019/standard_projections
   data://garden/who/2021-07-01/ghe:
     - data://meadow/who/2021-07-01/ghe
-    - data://reference
+    - data://garden/reference
   data://garden/gapminder/2019-12-10/population:
     - data://meadow/gapminder/2019-12-10/population
   data://meadow/gapminder/2019-12-10/population:
@@ -315,11 +315,11 @@ steps:
   data://examples/script/script_example:
     - walden://wb/2021-07-01/wb_income
     - data://garden/owid/latest/key_indicators
-    - data://reference
+    - data://garden/reference
   data://examples/jupytext/jupytext_example:
   data://examples/vs_code_cells/vs_code_cells_example:
   # private steps that require S3 access keys for private walden
   data-private://examples/private/2022-03-08/private_example:
     # NOTE: this dataset is public as we don't have any private data yet
     - walden-private://faostat/2022-02-10/faostat_metadata
-    - data://reference
+    - data://garden/reference

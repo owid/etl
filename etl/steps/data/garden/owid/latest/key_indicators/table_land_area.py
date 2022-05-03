@@ -1,7 +1,7 @@
 from owid.catalog import Dataset, Table, Source
 from owid import catalog
 
-from etl.paths import DATA_DIR
+from etl.paths import DATA_DIR, REFERENCE_DATASET
 from etl import data_helpers
 
 
@@ -15,7 +15,7 @@ def load_land_area() -> Table:
     table = table.reset_index()
 
     # convert iso codes to country names
-    reference_dataset = catalog.Dataset(DATA_DIR / "reference")
+    reference_dataset = catalog.Dataset(REFERENCE_DATASET)
     countries_regions = reference_dataset["countries_regions"]
 
     table = (
