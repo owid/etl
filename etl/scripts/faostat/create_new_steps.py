@@ -5,6 +5,7 @@
 import argparse
 import datetime
 import shutil
+from pathlib import Path
 
 import pandas as pd
 from owid import catalog
@@ -17,10 +18,16 @@ ADDITIONAL_METADATA_FILE_NAME = f"{NAMESPACE}_metadata"
 RUN_FILE_NAME = "shared"
 
 
-def create_steps_for_new_version(new_version_dir, latest_version_dir, latest_metadata_file,
-                                 create_all_files_from_scratch=False):
+def create_steps_for_new_version(
+    new_version_dir: Path,
+    latest_version_dir: Path,
+    latest_metadata_file: Path,
+    create_all_files_from_scratch: bool = False,
+) -> None:
     if new_version_dir.is_dir():
-        print(f"Steps for new version already exist (remove folder {new_version_dir} and re-run). Skipping.")
+        print(
+            f"Steps for new version already exist (remove folder {new_version_dir} and re-run). Skipping."
+        )
     else:
         print(f"Creating steps for new version: {new_version_dir}")
         new_version_dir.mkdir()
@@ -28,7 +35,12 @@ def create_steps_for_new_version(new_version_dir, latest_version_dir, latest_met
         if create_all_files_from_scratch:
             # Get list of domains from additional metadata generated in latest version.
             additional_metadata = catalog.Dataset(latest_metadata_file)
-            domains = pd.unique([table_name.split('_')[1] for table_name in additional_metadata.table_names]).tolist()
+            domains = pd.unique(
+                [
+                    table_name.split("_")[1]
+                    for table_name in additional_metadata.table_names
+                ]
+            ).tolist()
 
             # Copy run file from latest step to new step.
             latest_run_file = latest_version_dir / (RUN_FILE_NAME + ".py")
@@ -36,8 +48,12 @@ def create_steps_for_new_version(new_version_dir, latest_version_dir, latest_met
             new_run_file.write_text(latest_run_file.read_text())
 
             # Copy additional metadata file from latest step to new step.
-            latest_metadata_file = latest_version_dir / (ADDITIONAL_METADATA_FILE_NAME + ".py")
-            new_metadata_file = new_version_dir / (ADDITIONAL_METADATA_FILE_NAME + ".py")
+            latest_metadata_file = latest_version_dir / (
+                ADDITIONAL_METADATA_FILE_NAME + ".py"
+            )
+            new_metadata_file = new_version_dir / (
+                ADDITIONAL_METADATA_FILE_NAME + ".py"
+            )
             new_metadata_file.write_text(latest_metadata_file.read_text())
 
             # Write the same import line in each of the step files.
@@ -53,7 +69,7 @@ def create_steps_for_new_version(new_version_dir, latest_version_dir, latest_met
                 shutil.copy(old_file_path, new_file_path)
 
 
-def main(workspace, create_all_files_from_scratch=False):
+def main(workspace: str, create_all_files_from_scratch: bool = False) -> None:
     # Path to folder containing steps in this workspace.
     versions_dir = STEP_DIR / "data" / workspace / NAMESPACE
     # Latest version (taken from the name of the most recent folder).
@@ -69,9 +85,12 @@ def main(workspace, create_all_files_from_scratch=False):
     # Path to folder to be created with new steps.
     new_version_dir = versions_dir / new_version
 
-    create_steps_for_new_version(new_version_dir=new_version_dir, latest_version_dir=latest_version_dir,
-                                 latest_metadata_file=latest_metadata_file,
-                                 create_all_files_from_scratch=create_all_files_from_scratch)
+    create_steps_for_new_version(
+        new_version_dir=new_version_dir,
+        latest_version_dir=latest_version_dir,
+        latest_metadata_file=latest_metadata_file,
+        create_all_files_from_scratch=create_all_files_from_scratch,
+    )
 
 
 if __name__ == "__main__":
@@ -89,4 +108,7 @@ if __name__ == "__main__":
         help="If given, create all files in new step from scratch. Otherwise copy them from latest step.",
     )
     args = parser.parse_args()
-    main(workspace=args.workspace, create_all_files_from_scratch=args.create_all_files_from_scratch)
+    main(
+        workspace=args.workspace,
+        create_all_files_from_scratch=args.create_all_files_from_scratch,
+    )
