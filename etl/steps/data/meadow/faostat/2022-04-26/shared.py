@@ -49,7 +49,12 @@ def prepare_output_table(data: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def generate_dataset(dest_dir: str, namespace: str, dataset_short_name: str) -> None:
+def run(dest_dir: str) -> None:
+    # Assume dest_dir is a path to the step that needs to be run, e.g. "faostat_qcl", and fetch namespace and dataset
+    # short name from that path.
+    dataset_short_name = os.path.basename(dest_dir)
+    namespace = dataset_short_name.split("_")[0]
+
     # Fetch latest walden dataset.
     walden_ds = Catalog().find_latest(
         namespace=namespace, short_name=dataset_short_name
