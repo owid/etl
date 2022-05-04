@@ -40,7 +40,12 @@ from owid import walden
 
 from etl import files, paths, git
 from etl.helpers import get_etag
-from etl.grapher_import import upsert_table, upsert_dataset
+from etl.grapher_import import (
+    upsert_table,
+    upsert_dataset,
+    cleanup_ghost_sources,
+    cleanup_ghost_variables,
+)
 
 Graph = Dict[str, Set[str]]
 DAG = Dict[str, Any]
@@ -480,6 +485,9 @@ class GrapherStep(Step):
     by making a Python module with a to_grapher_table function that takes a
     table and returns a sequence of tables with the fixed grapher structure of
     (year, entitiyId, value)
+
+    If the dataset with the same short name already exists, it will be updated.
+    All variables and sources related to the dataset
     """
 
     path: str
@@ -566,8 +574,24 @@ class GrapherStep(Step):
         dataset_upsert_results = upsert_dataset(
             dataset, dataset.metadata.namespace, dataset.metadata.sources
         )
-        for table in step_module.get_grapher_tables(dataset):  # type: ignore
+        variable_upsert_results = [
             upsert_table(table, dataset_upsert_results)
+            for table in step_module.get_grapher_tables(dataset)  # type: ignore
+        ]
+
+        # Cleanup all ghost variables and sources that weren't upserted
+        # NOTE: we can't just remove all dataset variables before starting this step because
+        # there could be charts that use them and we can't remove and recreate with a new ID
+        upserted_variable_ids = [r.variable_id for r in variable_upsert_results]
+        upserted_source_ids = list(dataset_upsert_results.source_ids.values()) + [
+            r.source_id for r in variable_upsert_results
+        ]
+        # Try to cleanup ghost variables, but make sure to raise an error if they are used
+        # in any chart
+        cleanup_ghost_variables(
+            dataset_upsert_results.dataset_id, upserted_variable_ids
+        )
+        cleanup_ghost_sources(dataset_upsert_results.dataset_id, upserted_source_ids)
 
 
 @dataclass
