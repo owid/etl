@@ -5,8 +5,6 @@ from typing import Any, Dict, Iterator, List, Optional, Tuple, cast
 from unidecode import unidecode
 from MySQLdb.cursors import Cursor
 
-import pandas as pd
-
 UNMODIFIED = 0
 INSERT = 1
 UPDATE = 2
@@ -237,57 +235,38 @@ class DBUtils:
         return cast(int, namespace_id)
 
     def upsert_source(self, name: str, description: str, dataset_id: int) -> int:
-        # There is no UNIQUE key constraint we can rely on to prevent duplicates
-        # so we have to do a SELECT before INSERT...
-        # TODO: changing source description and rerunning grapher inserts a new source
-        # without deleting the old one. So we end up with multiple sources in grapher DB.
-        desc_json = json.loads(description)
+        """Upsert source into DB. If source with the same name and dataset id already exists,
+        update it.
+        There is no UNIQUE key constraint we can rely on to prevent duplicates
+        so we have to do a SELECT before INSERT...
+        """
         query = """
            SELECT id FROM sources
            WHERE name = %(name)s
-           AND IF(%(dataPublishedBy)s IS NULL, description->>"$.dataPublishedBy" IS NULL OR description->>"$.dataPublishedBy" = 'null', description->"$.dataPublishedBy" = %(dataPublishedBy)s)
-           AND IF(%(dataPublisherSource)s IS NULL, description->>"$.dataPublisherSource" IS NULL OR description->>"$.dataPublisherSource" = 'null', description->"$.dataPublisherSource" = %(dataPublisherSource)s)
-           AND IF(%(additionalInfo)s IS NULL, description->>"$.additionalInfo" IS NULL OR description->>"$.additionalInfo" = 'null', description->"$.additionalInfo" = %(additionalInfo)s)
+             AND datasetId = %(dataset_id)s
         """
-        if pd.isnull(dataset_id):
-            query += "AND datasetId IS NULL"
-        else:
-            query += f"AND datasetId = {dataset_id}"
         row = self.fetch_one_or_none(
             query,
             {
                 "name": name,
-                "dataPublishedBy": desc_json.get("dataPublishedBy"),
-                "dataPublisherSource": desc_json.get("dataPublisherSource"),
-                "additionalInfo": desc_json.get("additionalInfo"),
+                "dataset_id": dataset_id,
             },
         )
 
         if row is None:
-            if pd.isnull(dataset_id):
-                self.upsert_one(
-                    """
-                    INSERT INTO sources (name, description, createdAt, updatedAt)
-                    VALUES (%s, %s, NOW(), NOW())
-                    """,
-                    [name, description],
-                )
-            else:
-                self.upsert_one(
-                    """
-                    INSERT INTO sources (name, description, datasetId, createdAt, updatedAt)
-                    VALUES (%s, %s, %s, NOW(), NOW())
-                    """,
-                    [name, description, dataset_id],
-                )
+            self.upsert_one(
+                """
+                INSERT INTO sources (name, description, datasetId, createdAt, updatedAt)
+                VALUES (%s, %s, %s, NOW(), NOW())
+                """,
+                [name, description, dataset_id],
+            )
             self.counts["sources_inserted"] += 1
             row = self.fetch_one(
                 query,
                 {
                     "name": name,
-                    "dataPublishedBy": desc_json.get("dataPublishedBy"),
-                    "dataPublisherSource": desc_json.get("dataPublisherSource"),
-                    "additionalInfo": desc_json.get("additionalInfo"),
+                    "dataset_id": dataset_id,
                 },
             )
         else:
