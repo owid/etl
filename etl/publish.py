@@ -168,7 +168,7 @@ def sync_folder(
 
 def object_md5(s3: Any, bucket: str, key: str, obj: Dict[str, Any]) -> Optional[str]:
     maybe_md5 = obj["ETag"].strip('"')
-    if re.match("^[0-9a-f]{40}$", maybe_md5):
+    if re.match("^[0-9a-f]{32}$", maybe_md5):
         return cast(str, maybe_md5)
 
     return cast(
