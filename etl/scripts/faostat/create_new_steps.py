@@ -155,11 +155,13 @@ def get_dataset_name_from_dag_line(dag_line: str) -> str:
     return dataset_name
 
 
-def list_updated_steps(namespace: str = NAMESPACE) -> List[str]:
+def list_updated_steps(channel: str, namespace: str = NAMESPACE) -> List[str]:
     """List all datasets in a namespace that were updated in the latest walden ingest.
 
     Parameters
     ----------
+    channel : str
+        Channel name (required to check the latest version for the considered namespace).
     namespace : str
         Namespace.
 
@@ -173,9 +175,17 @@ def list_updated_steps(namespace: str = NAMESPACE) -> List[str]:
     all_walden_datasets = Catalog().find(namespace=namespace)
     latest_walden_version = sorted([walden_ds.version for walden_ds in all_walden_datasets])[-1]
 
-    # Now find what steps have that version.
-    step_names = [walden_ds.short_name for walden_ds in all_walden_datasets
-                  if walden_ds.version == latest_walden_version]
+    # Find latest version in current channel for the considered namespace.
+    latest_version_in_channel = find_latest_version_for_namespace_in_channel(channel=channel)
+
+    if latest_walden_version > latest_version_in_channel:
+        # Now find what steps have the latest version in walden.
+        step_names = [walden_ds.short_name for walden_ds in all_walden_datasets
+                      if walden_ds.version == latest_walden_version]
+    else:
+        # There is already a version for this namespace and channel that is posterior to the latest additions to walden.
+        step_names = []
+        print(f"There was no new additions to walden since the latest {channel} version, {latest_version_in_channel}.")
 
     return step_names
 
@@ -261,11 +271,6 @@ def find_latest_version_for_step(channel: str, step_name: str, namespace: str = 
         except ValueError:
             print(warning_message)
     elif channel in ["meadow", "garden"]:
-        ################################################################################################################
-        # TODO: The following line would look for the latest version in the data.
-        #  Check that this is never necessary, and remove.
-        # dataset_versions = sorted(list((DATA_DIR / channel / namespace).glob(f"*/{step_name}")))
-        ################################################################################################################
         # Find the latest version of this step in the code.
         dataset_versions = sorted(list((STEP_DIR / "data" / channel / namespace).glob(f"*/{step_name}.py")))
         if len(dataset_versions) > 0:
@@ -297,7 +302,14 @@ def create_step_file(channel: str, step_name: str) -> None:
     # Path to folder containing steps in this channel.
     versions_dir = STEP_DIR / "data" / channel / NAMESPACE
     # Path to folder to be created with new steps.
-    new_step_file = versions_dir / NEW_VERSION / f"{step_name}.py"
+    new_step_dir = versions_dir / NEW_VERSION
+    # Path to new step file.
+    new_step_file = new_step_dir / f"{step_name}.py"
+
+    # Create folder if not existing.
+    if not new_step_dir.is_dir():
+        new_step_dir.mkdir()
+
     # Find latest version of this dataset in channel.
     step_latest_version = find_latest_version_for_step(channel=channel, step_name=step_name)
     if step_latest_version is None:
@@ -333,16 +345,14 @@ def create_steps(channel: str, step_names: List[str]) -> None:
     # Path to folder to be created with new steps.
     new_version_dir = versions_dir / NEW_VERSION
 
-    # Create new folder.
-    new_version_dir.mkdir()
-
-    # Copy run file from latest step to new step.
-    latest_run_file = latest_version_dir / (RUN_FILE_NAME + ".py")
-    new_run_file = new_version_dir / (RUN_FILE_NAME + ".py")
-    new_run_file.write_text(latest_run_file.read_text())
-
     for step_name in step_names:
         create_step_file(channel=channel, step_name=step_name)
+
+    if len(step_names) > 0:
+        # If at least one step was created, copy the latest shared module to the new folder.
+        latest_run_file = latest_version_dir / (RUN_FILE_NAME + ".py")
+        new_run_file = new_version_dir / (RUN_FILE_NAME + ".py")
+        new_run_file.write_text(latest_run_file.read_text())
 
 
 def create_dag_line_for_latest_natural_dependency(channel: str, step_name: str, namespace: str = NAMESPACE
@@ -514,28 +524,22 @@ def write_steps_to_dag_file(
 
 
 def main(channel: str, include_all_datasets: bool = False) -> None:
-    # Latest version (taken from the name of the most recent folder).
-    latest_version = find_latest_version_for_namespace_in_channel(channel=channel)
-
-    if latest_version == NEW_VERSION:
-        print(f"Dataset is already up-to-date with version: {NEW_VERSION}")
+    if include_all_datasets:
+        # List all datasets, even if their source data was not updated.
+        step_names = list_all_steps()
     else:
-        if include_all_datasets:
-            # List all datasets, even if their source data was not updated.
-            step_names = list_all_steps()
-        else:
-            # List steps for which source data was updated.
-            step_names = list_updated_steps()
+        # List steps for which source data was updated.
+        step_names = list_updated_steps(channel=channel)
 
-        # Create folder for new version and add a step file for each dataset.
-        create_steps(channel=channel, step_names=step_names)
+    # Create folder for new version and add a step file for each dataset.
+    create_steps(channel=channel, step_names=step_names)
 
-        # Generate dictionary of new step dependencies.
-        dag_steps = create_updated_dependency_graph(channel=channel, step_names=step_names)
+    # Generate dictionary of new step dependencies.
+    dag_steps = create_updated_dependency_graph(channel=channel, step_names=step_names)
 
-        # Update dag file with new dependencies.
-        header_line = f"# FAOSTAT {channel} steps for version {NEW_VERSION}"
-        write_steps_to_dag_file(dag_steps=dag_steps, header_line=header_line)
+    # Update dag file with new dependencies.
+    header_line = f"# FAOSTAT {channel} steps for version {NEW_VERSION}"
+    write_steps_to_dag_file(dag_steps=dag_steps, header_line=header_line)
 
 
 if __name__ == "__main__":
