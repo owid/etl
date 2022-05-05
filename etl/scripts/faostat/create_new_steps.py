@@ -47,8 +47,24 @@ RUN_FILE_NAME = "shared"
 GLOB_VERSION_PATTERN = "[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]"
 # New version tag to be created.
 NEW_VERSION = datetime.datetime.today().strftime("%Y-%m-%d")
-# List additional custom datasets that will be created in garden.
-ADDITIONAL_GARDEN_DATASETS = ["faostat_fbsc"]
+# Datasets to add or omit to the default list.
+CUSTOM_STEPS_TO_ADD = {
+    "meadow": [],
+    "garden": ["faostat_fbsc"],
+    "grapher": [],
+}
+CUSTOM_STEPS_TO_OMIT = {
+    "meadow": [],
+    "garden": ["faostat_fbs", "faostat_fbsh", "faostat_metadata"],
+    "grapher": []
+}
+# List of additional files (with extension) that, if existing, should be copied over from the latest version to the new
+# (besides the files of each of the steps).
+ADDITIONAL_FILES_TO_COPY = [
+    RUN_FILE_NAME + ".py",
+    ADDITIONAL_METADATA_FILE_NAME + ".py",
+    f"{NAMESPACE}.countries.json"
+]
 
 
 def get_channel_from_dag_line(dag_line: str) -> str:
@@ -348,10 +364,12 @@ def create_steps(channel: str, step_names: List[str]) -> None:
 
     # Create folder.
     new_version_dir.mkdir()
-    # Copy the latest shared module to the new folder.
-    latest_run_file = latest_version_dir / (RUN_FILE_NAME + ".py")
-    new_run_file = new_version_dir / (RUN_FILE_NAME + ".py")
-    new_run_file.write_text(latest_run_file.read_text())
+    # Copy additional files from the latest to the new folder (if the files exist in the latest folder).
+    for file in ADDITIONAL_FILES_TO_COPY:
+        if list(latest_version_dir.glob(file)):
+            latest_file = latest_version_dir / file
+            new_file = new_version_dir / file
+            new_file.write_text(latest_file.read_text())
 
     for step_name in step_names:
         create_step_file(channel=channel, step_name=step_name)
@@ -532,6 +550,9 @@ def main(channel: str, include_all_datasets: bool = False) -> None:
     else:
         # List steps for which source data was updated.
         step_names = list_updated_steps(channel=channel)
+
+    # Add or remove custom steps (as defined at the beginning of the script).
+    step_names = sorted(set(step_names + CUSTOM_STEPS_TO_ADD[channel]) - set(CUSTOM_STEPS_TO_OMIT[channel]))
 
     if len(step_names) > 0:
         # Create folder for new version and add a step file for each dataset.
