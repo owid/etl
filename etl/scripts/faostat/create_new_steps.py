@@ -48,6 +48,8 @@ GLOB_VERSION_PATTERN = "[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]"
 # New version tag to be created.
 NEW_VERSION = datetime.datetime.today().strftime("%Y-%m-%d")
 # Datasets to add or omit to the default list.
+# Note: The additional steps will only be added to the new version if at least one other dataset was updated. If so, it
+# will be added to the new folder even if its dependencies were not updated.
 CUSTOM_STEPS_TO_ADD = {
     "meadow": [],
     "garden": ["faostat_fbsc"],
@@ -551,10 +553,13 @@ def main(channel: str, include_all_datasets: bool = False) -> None:
         # List steps for which source data was updated.
         step_names = list_updated_steps(channel=channel)
 
-    # Add or remove custom steps (as defined at the beginning of the script).
-    step_names = sorted(set(step_names + CUSTOM_STEPS_TO_ADD[channel]) - set(CUSTOM_STEPS_TO_OMIT[channel]))
+    # Remove custom steps (as defined at the beginning of the script).
+    step_names = sorted(set(step_names) - set(CUSTOM_STEPS_TO_OMIT[channel]))
 
     if len(step_names) > 0:
+        # Add custom steps (as defined at the beginning of the script).
+        step_names = sorted(set(step_names + CUSTOM_STEPS_TO_ADD[channel]))
+
         # Create folder for new version and add a step file for each dataset.
         create_steps(channel=channel, step_names=step_names)
 
