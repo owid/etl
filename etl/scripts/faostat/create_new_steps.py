@@ -34,6 +34,7 @@ from owid.walden import Catalog
 
 from etl.paths import DAG_FILE, STEP_DIR
 from etl.steps import load_dag
+from etl.files import checksum_file
 
 # Current namespace.
 NAMESPACE = "faostat"
@@ -306,10 +307,6 @@ def create_step_file(channel: str, step_name: str) -> None:
     # Path to new step file.
     new_step_file = new_step_dir / f"{step_name}.py"
 
-    # Create folder if not existing.
-    if not new_step_dir.is_dir():
-        new_step_dir.mkdir()
-
     # Find latest version of this dataset in channel.
     step_latest_version = find_latest_version_for_step(channel=channel, step_name=step_name)
     if step_latest_version is None:
@@ -318,11 +315,15 @@ def create_step_file(channel: str, step_name: str) -> None:
         file_content = f"from .{RUN_FILE_NAME} import run\n"
         new_step_file.write_text(file_content)
     else:
-        # TODO: Compare md5 of shared module in step_latest_version with md5 of latest shared module.
-        #  If they differ, raise warning.
         # Copy the file from its latest version.
         latest_step_file = versions_dir / step_latest_version / f"{step_name}.py"
         new_step_file.write_text(latest_step_file.read_text())
+
+        # Check if shared module in the latest version of the step is identical to the new shared module.
+        latest_shared_file = versions_dir / step_latest_version / f"{RUN_FILE_NAME}.py"
+        new_shared_file = new_step_dir / f"{RUN_FILE_NAME}.py"
+        if checksum_file(latest_shared_file) != checksum_file(new_shared_file):
+            print(f"WARNING: Shared module in version {step_latest_version} differs from new shared module.")
 
 
 def create_steps(channel: str, step_names: List[str]) -> None:
@@ -345,14 +346,15 @@ def create_steps(channel: str, step_names: List[str]) -> None:
     # Path to folder to be created with new steps.
     new_version_dir = versions_dir / NEW_VERSION
 
+    # Create folder.
+    new_version_dir.mkdir()
+    # Copy the latest shared module to the new folder.
+    latest_run_file = latest_version_dir / (RUN_FILE_NAME + ".py")
+    new_run_file = new_version_dir / (RUN_FILE_NAME + ".py")
+    new_run_file.write_text(latest_run_file.read_text())
+
     for step_name in step_names:
         create_step_file(channel=channel, step_name=step_name)
-
-    if len(step_names) > 0:
-        # If at least one step was created, copy the latest shared module to the new folder.
-        latest_run_file = latest_version_dir / (RUN_FILE_NAME + ".py")
-        new_run_file = new_version_dir / (RUN_FILE_NAME + ".py")
-        new_run_file.write_text(latest_run_file.read_text())
 
 
 def create_dag_line_for_latest_natural_dependency(channel: str, step_name: str, namespace: str = NAMESPACE
@@ -531,15 +533,18 @@ def main(channel: str, include_all_datasets: bool = False) -> None:
         # List steps for which source data was updated.
         step_names = list_updated_steps(channel=channel)
 
-    # Create folder for new version and add a step file for each dataset.
-    create_steps(channel=channel, step_names=step_names)
+    if len(step_names) > 0:
+        # Create folder for new version and add a step file for each dataset.
+        create_steps(channel=channel, step_names=step_names)
 
-    # Generate dictionary of new step dependencies.
-    dag_steps = create_updated_dependency_graph(channel=channel, step_names=step_names)
+        # Generate dictionary of new step dependencies.
+        dag_steps = create_updated_dependency_graph(channel=channel, step_names=step_names)
 
-    # Update dag file with new dependencies.
-    header_line = f"# FAOSTAT {channel} steps for version {NEW_VERSION}"
-    write_steps_to_dag_file(dag_steps=dag_steps, header_line=header_line)
+        # Update dag file with new dependencies.
+        header_line = f"# FAOSTAT {channel} steps for version {NEW_VERSION}"
+        write_steps_to_dag_file(dag_steps=dag_steps, header_line=header_line)
+    else:
+        print("Nothing to update.")
 
 
 if __name__ == "__main__":
