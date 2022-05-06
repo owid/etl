@@ -27,7 +27,7 @@ Workflow to create a new version of the FAOSTAT datasets (with version YYYY-MM-D
 import argparse
 import datetime
 import re
-from typing import Dict, List, Optional
+from typing import cast, Dict, List, Optional, Set
 
 import pandas as pd
 from owid.walden import Catalog
@@ -50,12 +50,12 @@ NEW_VERSION = datetime.datetime.today().strftime("%Y-%m-%d")
 # Datasets to add or omit to the default list.
 # Note: The additional steps will only be added to the new version if at least one other dataset was updated. If so, it
 # will be added to the new folder even if its dependencies were not updated.
-CUSTOM_STEPS_TO_ADD = {
+CUSTOM_STEPS_TO_ADD: Dict[str, List[str]] = {
     "meadow": [],
     "garden": ["faostat_fbsc"],
     "grapher": [],
 }
-CUSTOM_STEPS_TO_OMIT = {
+CUSTOM_STEPS_TO_OMIT: Dict[str, List[str]] = {
     "meadow": [],
     "garden": ["faostat_fbs", "faostat_fbsh", "faostat_metadata"],
     "grapher": [],
@@ -155,7 +155,7 @@ def get_version_from_dag_line(
     else:
         raise ValueError("dag line not understood")
 
-    return version
+    return cast(str, version)
 
 
 def get_dataset_name_from_dag_line(dag_line: str) -> str:
@@ -442,6 +442,7 @@ def create_dag_line_for_latest_natural_dependency(
     dependency_version = find_latest_version_for_step(
         channel=dependency_channel, step_name=step_name, namespace=namespace
     )
+    dependency_step: Optional[str] = None
     if dependency_version is not None:
         # Create dag line for the dependency.
         dependency_step = create_dag_line_name(
@@ -450,8 +451,6 @@ def create_dag_line_for_latest_natural_dependency(
             namespace=namespace,
             version=dependency_version,
         )
-    else:
-        dependency_step = None
 
     return dependency_step
 
@@ -461,7 +460,7 @@ def create_updated_dependency_graph(
     step_names: List[str],
     namespace: str = NAMESPACE,
     new_version: str = NEW_VERSION,
-) -> Dict[str, set]:
+) -> Dict[str, Set[str]]:
     """Create additional part of the graph that will need be added to the dag to update it.
 
     Note: This function simply returns that part of the graph, without actually modifying the dag.
@@ -553,7 +552,7 @@ def create_updated_dependency_graph(
 
 
 def write_steps_to_dag_file(
-    dag_steps: Dict[str, set], header_line: Optional[str]
+    dag_steps: Dict[str, Set[str]], header_line: Optional[str]
 ) -> None:
     """Add new lines to the dag, given a graph of additional dependencies.
 
@@ -634,7 +633,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "-c",
         "--channel",
-        help=f"Name of channel where new step will be created (either meadow or garden).",
+        help="Name of channel where new step will be created (either meadow or garden).",
         required=True,
     )
     parser.add_argument(
