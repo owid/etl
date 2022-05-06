@@ -33,8 +33,9 @@ GDP_COLUMN = "gdp"
 # Column name for GDP per capita in output dataset.
 GDP_PER_CAPITA_COLUMN = "gdp_per_capita"
 # Additional description to be prepended to the description given in walden.
-ADDITIONAL_DESCRIPTION = """Note:
-Tanzania refers only to Mainland Tanzania.
+ADDITIONAL_DESCRIPTION = """Notes:
+- Tanzania refers only to Mainland Tanzania.
+- Time series for former countries and territories are calculated forward in time by estimating values based on their last official borders.
 
 """
 
