@@ -58,14 +58,14 @@ CUSTOM_STEPS_TO_ADD = {
 CUSTOM_STEPS_TO_OMIT = {
     "meadow": [],
     "garden": ["faostat_fbs", "faostat_fbsh", "faostat_metadata"],
-    "grapher": []
+    "grapher": [],
 }
 # List of additional files (with extension) that, if existing, should be copied over from the latest version to the new
 # (besides the files of each of the steps).
 ADDITIONAL_FILES_TO_COPY = [
     RUN_FILE_NAME + ".py",
     ADDITIONAL_METADATA_FILE_NAME + ".py",
-    f"{NAMESPACE}.countries.json"
+    f"{NAMESPACE}.countries.json",
 ]
 
 
@@ -97,7 +97,9 @@ def get_channel_from_dag_line(dag_line: str) -> str:
     return channel
 
 
-def create_dag_line_name(channel: str, step_name: str, namespace: str = NAMESPACE, version: str = NEW_VERSION) -> str:
+def create_dag_line_name(
+    channel: str, step_name: str, namespace: str = NAMESPACE, version: str = NEW_VERSION
+) -> str:
     """Create the name of a dag line given its content (e.g. return 'data://garden/faostat/2022-05-05/faostat_qcl').
 
     Parameters
@@ -127,7 +129,9 @@ def create_dag_line_name(channel: str, step_name: str, namespace: str = NAMESPAC
     return dag_line
 
 
-def get_version_from_dag_line(dag_line: str, regex_version_pattern: str = GLOB_VERSION_PATTERN) -> str:
+def get_version_from_dag_line(
+    dag_line: str, regex_version_pattern: str = GLOB_VERSION_PATTERN
+) -> str:
     """Get the version of a certain step from the name of a dag line (e.g. given
     'data://garden/faostat/2022-05-05/faostat_qcl', return '2022-05-05').
 
@@ -192,19 +196,28 @@ def list_updated_steps(channel: str, namespace: str = NAMESPACE) -> List[str]:
     """
     # Find latest walden folder.
     all_walden_datasets = Catalog().find(namespace=namespace)
-    latest_walden_version = sorted([walden_ds.version for walden_ds in all_walden_datasets])[-1]
+    latest_walden_version = sorted(
+        [walden_ds.version for walden_ds in all_walden_datasets]
+    )[-1]
 
     # Find latest version in current channel for the considered namespace.
-    latest_version_in_channel = find_latest_version_for_namespace_in_channel(channel=channel)
+    latest_version_in_channel = find_latest_version_for_namespace_in_channel(
+        channel=channel
+    )
 
     if latest_walden_version > latest_version_in_channel:
         # Now find what steps have the latest version in walden.
-        step_names = [walden_ds.short_name for walden_ds in all_walden_datasets
-                      if walden_ds.version == latest_walden_version]
+        step_names = [
+            walden_ds.short_name
+            for walden_ds in all_walden_datasets
+            if walden_ds.version == latest_walden_version
+        ]
     else:
         # There is already a version for this namespace and channel that is posterior to the latest additions to walden.
         step_names = []
-        print(f"There was no new additions to walden since the latest {channel} version, {latest_version_in_channel}.")
+        print(
+            f"There was no new additions to walden since the latest {channel} version, {latest_version_in_channel}."
+        )
 
     return step_names
 
@@ -234,8 +247,11 @@ def list_all_steps() -> List[str]:
     return step_names
 
 
-def find_latest_version_for_namespace_in_channel(channel: str, namespace: str = NAMESPACE,
-                                                 regex_version_pattern: str = GLOB_VERSION_PATTERN) -> str:
+def find_latest_version_for_namespace_in_channel(
+    channel: str,
+    namespace: str = NAMESPACE,
+    regex_version_pattern: str = GLOB_VERSION_PATTERN,
+) -> str:
     """Find latest version for any dataset of a given namespace in a channel.
 
     Parameters
@@ -261,7 +277,9 @@ def find_latest_version_for_namespace_in_channel(channel: str, namespace: str = 
     return latest_version
 
 
-def find_latest_version_for_step(channel: str, step_name: str, namespace: str = NAMESPACE) -> Optional[str]:
+def find_latest_version_for_step(
+    channel: str, step_name: str, namespace: str = NAMESPACE
+) -> Optional[str]:
     """Find the latest version of a certain step of a namespace in a channel.
 
     Parameters
@@ -291,13 +309,17 @@ def find_latest_version_for_step(channel: str, step_name: str, namespace: str = 
             print(warning_message)
     elif channel in ["meadow", "garden"]:
         # Find the latest version of this step in the code.
-        dataset_versions = sorted(list((STEP_DIR / "data" / channel / namespace).glob(f"*/{step_name}.py")))
+        dataset_versions = sorted(
+            list((STEP_DIR / "data" / channel / namespace).glob(f"*/{step_name}.py"))
+        )
         if len(dataset_versions) > 0:
             latest_version = dataset_versions[-1].parent.name
         else:
             print(warning_message)
-    elif channel == 'grapher':
-        dataset_versions = sorted(list((STEP_DIR / channel / namespace).glob(f"*/{step_name}.py")))
+    elif channel == "grapher":
+        dataset_versions = sorted(
+            list((STEP_DIR / channel / namespace).glob(f"*/{step_name}.py"))
+        )
         if len(dataset_versions) > 0:
             latest_version = dataset_versions[-1].parent.name
         else:
@@ -326,7 +348,9 @@ def create_step_file(channel: str, step_name: str) -> None:
     new_step_file = new_step_dir / f"{step_name}.py"
 
     # Find latest version of this dataset in channel.
-    step_latest_version = find_latest_version_for_step(channel=channel, step_name=step_name)
+    step_latest_version = find_latest_version_for_step(
+        channel=channel, step_name=step_name
+    )
     if step_latest_version is None:
         print(f"Creating file from scratch for dataset {step_name}.")
         # Content of the file to be created.
@@ -341,7 +365,9 @@ def create_step_file(channel: str, step_name: str) -> None:
         latest_shared_file = versions_dir / step_latest_version / f"{RUN_FILE_NAME}.py"
         new_shared_file = new_step_dir / f"{RUN_FILE_NAME}.py"
         if checksum_file(latest_shared_file) != checksum_file(new_shared_file):
-            print(f"WARNING: Shared module in version {step_latest_version} differs from new shared module.")
+            print(
+                f"WARNING: Shared module in version {step_latest_version} differs from new shared module."
+            )
 
 
 def create_steps(channel: str, step_names: List[str]) -> None:
@@ -377,8 +403,9 @@ def create_steps(channel: str, step_names: List[str]) -> None:
         create_step_file(channel=channel, step_name=step_name)
 
 
-def create_dag_line_for_latest_natural_dependency(channel: str, step_name: str, namespace: str = NAMESPACE
-                                                  ) -> Optional[str]:
+def create_dag_line_for_latest_natural_dependency(
+    channel: str, step_name: str, namespace: str = NAMESPACE
+) -> Optional[str]:
     """Create dag line for latest version of the natural dependency of a given step.
 
     Natural dependency refers to the analogous step from the previous channel. For example, for a dag line
@@ -413,19 +440,28 @@ def create_dag_line_for_latest_natural_dependency(channel: str, step_name: str, 
 
     # Find latest version of the natural dependency for current step.
     dependency_version = find_latest_version_for_step(
-        channel=dependency_channel, step_name=step_name, namespace=namespace)
+        channel=dependency_channel, step_name=step_name, namespace=namespace
+    )
     if dependency_version is not None:
         # Create dag line for the dependency.
         dependency_step = create_dag_line_name(
-            channel=dependency_channel, step_name=step_name, namespace=namespace, version=dependency_version)
+            channel=dependency_channel,
+            step_name=step_name,
+            namespace=namespace,
+            version=dependency_version,
+        )
     else:
         dependency_step = None
 
     return dependency_step
 
 
-def create_updated_dependency_graph(channel: str, step_names: List[str], namespace: str = NAMESPACE,
-                                    new_version: str = NEW_VERSION) -> Dict[str, set]:
+def create_updated_dependency_graph(
+    channel: str,
+    step_names: List[str],
+    namespace: str = NAMESPACE,
+    new_version: str = NEW_VERSION,
+) -> Dict[str, set]:
     """Create additional part of the graph that will need be added to the dag to update it.
 
     Note: This function simply returns that part of the graph, without actually modifying the dag.
@@ -455,24 +491,38 @@ def create_updated_dependency_graph(channel: str, step_names: List[str], namespa
     new_steps = {}
     for step_name in step_names:
         # Find all occurrence in the dag of this dataset for the considered channel.
-        candidates = {step: dag[step] for step in dag
-                      if step_name == get_dataset_name_from_dag_line(step)
-                      if get_channel_from_dag_line(step) == channel}
+        candidates = {
+            step: dag[step]
+            for step in dag
+            if step_name == get_dataset_name_from_dag_line(step)
+            if get_channel_from_dag_line(step) == channel
+        }
 
         if len(candidates) == 0:
             # For this dataset there is no dag line yet. Create a new one.
             new_step_name = create_dag_line_name(
-                channel=channel, step_name=step_name, namespace=namespace, version=new_version)
+                channel=channel,
+                step_name=step_name,
+                namespace=namespace,
+                version=new_version,
+            )
             new_dependencies = []
             # Create dag lines for its natural dependency, if any is found.
-            natural_dependency = create_dag_line_for_latest_natural_dependency(channel=channel, step_name=step_name)
+            natural_dependency = create_dag_line_for_latest_natural_dependency(
+                channel=channel, step_name=step_name
+            )
             if natural_dependency is not None:
                 new_dependencies.append(natural_dependency)
         else:
             # Identify the latest version of the dataset in the dag. That will be the step to be updated.
-            latest_version = sorted([get_version_from_dag_line(candidate) for candidate in candidates])[-1]
-            step_to_update = {step: dag[step] for step in candidates
-                              if get_version_from_dag_line(step) == latest_version}
+            latest_version = sorted(
+                [get_version_from_dag_line(candidate) for candidate in candidates]
+            )[-1]
+            step_to_update = {
+                step: dag[step]
+                for step in candidates
+                if get_version_from_dag_line(step) == latest_version
+            }
             assert len(list(step_to_update)) == 1
             step_name = list(step_to_update)[0]
             # Gather the dependencies for that dataset.
@@ -486,9 +536,13 @@ def create_updated_dependency_graph(channel: str, step_names: List[str], namespa
                 dependency_old_version = get_version_from_dag_line(dependency)
                 # Find the latest existing version of that dependency.
                 dependency_new_version = find_latest_version_for_step(
-                    channel=get_channel_from_dag_line(dependency), step_name=get_dataset_name_from_dag_line(dependency))
+                    channel=get_channel_from_dag_line(dependency),
+                    step_name=get_dataset_name_from_dag_line(dependency),
+                )
                 # Rename the dag line of the dependency appropriately (if its version changed).
-                new_dependency = dependency.replace(dependency_old_version, dependency_new_version)
+                new_dependency = dependency.replace(
+                    dependency_old_version, dependency_new_version
+                )
                 new_dependencies.append(new_dependency)
 
         if len(new_dependencies) > 0:
@@ -564,7 +618,9 @@ def main(channel: str, include_all_datasets: bool = False) -> None:
         create_steps(channel=channel, step_names=step_names)
 
         # Generate dictionary of new step dependencies.
-        dag_steps = create_updated_dependency_graph(channel=channel, step_names=step_names)
+        dag_steps = create_updated_dependency_graph(
+            channel=channel, step_names=step_names
+        )
 
         # Update dag file with new dependencies.
         header_line = f"# FAOSTAT {channel} steps for version {NEW_VERSION}"
@@ -587,7 +643,7 @@ if __name__ == "__main__":
         default=False,
         action="store_true",
         help="If given, create step files for all datasets, even if the source data was not updated. Otherwise create "
-             "step files only for datasets that were updated.",
+        "step files only for datasets that were updated.",
     )
     args = parser.parse_args()
     main(
