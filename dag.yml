@@ -384,10 +384,6 @@ steps:
     - data://meadow/faostat/2022-05-05/faostat_emn
   data://garden/faostat/2022-05-05/faostat_ep:
     - data://meadow/faostat/2022-05-05/faostat_ep
-  data://garden/faostat/2022-05-05/faostat_fbsc:
-    - data://meadow/faostat/2022-04-26/faostat_fbsh
-    - data://meadow/faostat/2022-05-05/faostat_metadata
-    - data://meadow/faostat/2022-04-26/faostat_fbs
   data://garden/faostat/2022-05-05/faostat_fo:
     - data://meadow/faostat/2022-05-05/faostat_fo
   data://garden/faostat/2022-05-05/faostat_lc:
