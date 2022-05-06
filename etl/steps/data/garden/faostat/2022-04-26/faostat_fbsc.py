@@ -273,9 +273,8 @@ def run(dest_dir: str) -> None:
     # - Add `variable_name` column, with some more verbosity about each row info.
     fbsc_bulk = pd.concat([fbs_bulk, fbsh_bulk])
     # Filter countries + Area Code -> Country
-    index_new = [
-        (col_map := {"area_code": "country"}).get(x, x) for x in fbsc_bulk.index.names
-    ]
+    col_map = {"area_code": "country"}
+    index_new = [col_map.get(x, x) for x in fbsc_bulk.index.names]
     fbsc_bulk = fbsc_bulk.loc[map_area].reset_index()
     fbsc_bulk[col_map["area_code"]] = fbsc_bulk["area_code"].replace(map_area).tolist()
     fbsc_bulk = fbsc_bulk.set_index(index_new)
