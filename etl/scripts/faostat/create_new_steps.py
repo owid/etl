@@ -354,7 +354,7 @@ def create_step_file(channel: str, step_name: str) -> None:
     if step_latest_version is None:
         print(f"Creating file from scratch for dataset {step_name}.")
         # Content of the file to be created.
-        file_content = f"from .{RUN_FILE_NAME} import run\n"
+        file_content = f"from .{RUN_FILE_NAME} import run  # noqa:F401\n"
         new_step_file.write_text(file_content)
     else:
         # Copy the file from its latest version.
