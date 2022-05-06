@@ -8,7 +8,7 @@ import pandas as pd
 from owid import catalog
 
 from etl.paths import BASE_DIR, DATA_DIR
-from .shared import run
+from .shared import run  # noqa:F401
 
 
 ########################################################################################################################
@@ -68,7 +68,9 @@ def old_run(dest_dir: str) -> None:
     msk = x["item_code"].astype(str).isin(codes_present)
     y = x[msk]
     yy = y.groupby("item_code")["item_group_code"].agg(set)
-    ll = yy[yy == {"QC"}].index.tolist()  # Change to see other groups with unique childs
+    ll = yy[
+        yy == {"QC"}
+    ].index.tolist()  # Change to see other groups with unique childs
     x[x["item_code"].isin(ll)].head()
     qcl_item = qcl_item[["item_group", "item"]]
     ####################################################################################################################

@@ -1,1 +1,1 @@
-from .shared import run
+from .shared import run  # noqa:F401
