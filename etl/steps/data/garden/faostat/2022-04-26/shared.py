@@ -260,16 +260,8 @@ def run(dest_dir: str) -> None:
     )
 
     # Combine item, element and unit into one column.
-    data["variable"] = (
-        data["item"].astype(str)
-        + " - "
-        + data["element"].astype(str)
-        + " ("
-        + data["unit"].astype(str)
-        + ")"
-    )
-
-    data = data.drop(columns=["item", "element", "unit"])
+    data["title"] = data["item"].astype(str) + " - " + data["element"].astype(str)
+    data = data.drop(columns=["item", "element"])
 
     # Column 'value' was stored as integer, therefore nans are of a special kind.
     # Transform column to object type, and convert nans to normal ones.
@@ -281,7 +273,11 @@ def run(dest_dir: str) -> None:
     data = data[~data["country"].str.endswith("(FAO)")].reset_index(drop=True)
     ####################################################################################################################
 
-    data = data.pivot(index=["country", "year"], columns=["variable"], values="value")
+    # This will create a table with an inconvenient multi-level column (for title and unit).
+    # But this will become convenient later.
+    data = data.pivot(
+        index=["country", "year"], columns=["title", "unit"], values="value"
+    )
 
     # TODO: Run more sanity checks on the new dataset.
 
@@ -291,7 +287,18 @@ def run(dest_dir: str) -> None:
     dataset_garden.metadata = deepcopy(dataset_meadow.metadata)
 
     # Create new table for garden dataset.
-    data_table_garden = catalog.Table(data)
+    data_table_garden = catalog.Table(data).copy()
+
+    # Drop the second level of the columns (the unit, which we don't need in the table).
+    # But keep it in the original data.
+    data_table_garden.columns = data_table_garden.columns.droplevel(1)
+
+    # Add title and unit to each column in the table.
+    for title, unit in data.columns:
+        # Check that each variable in the original data has only one unit.
+        assert len(data[title].columns) == 1
+        data_table_garden[title].metadata.title = title
+        data_table_garden[title].metadata.unit = unit
 
     # Make all column names snake_case.
     data_table_garden = catalog.utils.underscore_table(data_table_garden)
