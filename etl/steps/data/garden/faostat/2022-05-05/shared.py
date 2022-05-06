@@ -2,6 +2,7 @@
 
 """
 
+import re
 from copy import deepcopy
 from pathlib import Path
 
@@ -260,8 +261,15 @@ def run(dest_dir: str) -> None:
     )
 
     # Combine item, element and unit into one column.
-    data["title"] = data["item"].astype(str) + " - " + data["element"].astype(str)
-    data = data.drop(columns=["item", "element"])
+    data["title"] = (
+        data["item"].astype(str)
+        + " - "
+        + data["element"].astype(str)
+        + " ("
+        + data["unit"].astype(str)
+        + ")"
+    )
+    data = data.drop(columns=["item", "element", "unit"])
 
     # Column 'value' was stored as integer, therefore nans are of a special kind.
     # Transform column to object type, and convert nans to normal ones.
@@ -273,11 +281,8 @@ def run(dest_dir: str) -> None:
     data = data[~data["country"].str.endswith("(FAO)")].reset_index(drop=True)
     ####################################################################################################################
 
-    # This will create a table with an inconvenient multi-level column (for title and unit).
-    # But this will become convenient later.
-    data = data.pivot(
-        index=["country", "year"], columns=["title", "unit"], values="value"
-    )
+    # This will create a table with just one column and country-year as index.
+    data = data.pivot(index=["country", "year"], columns=["title"], values="value")
 
     # TODO: Run more sanity checks on the new dataset.
 
@@ -289,16 +294,15 @@ def run(dest_dir: str) -> None:
     # Create new table for garden dataset.
     data_table_garden = catalog.Table(data).copy()
 
-    # Drop the second level of the columns (the unit, which we don't need in the table).
-    # But keep it in the original data.
-    data_table_garden.columns = data_table_garden.columns.droplevel(1)
+    for column in data_table_garden.columns:
+        # By construction, I added the unit in parenthesis at the end of the title.
+        matches = re.findall("\((.*)\)", column)
+        unit = matches[-1]
+        title = column.replace(f" ({unit})", "")
 
-    # Add title and unit to each column in the table.
-    for title, unit in data.columns:
-        # Check that each variable in the original data has only one unit.
-        assert len(data[title].columns) == 1
-        data_table_garden[title].metadata.title = title
-        data_table_garden[title].metadata.unit = unit
+        # Add title and unit to each column in the table.
+        data_table_garden[column].metadata.title = title
+        data_table_garden[column].metadata.unit = unit
 
     # Make all column names snake_case.
     data_table_garden = catalog.utils.underscore_table(data_table_garden)
