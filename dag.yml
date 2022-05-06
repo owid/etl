@@ -404,3 +404,8 @@ steps:
     - data://meadow/faostat/2022-05-05/faostat_rp
   data://garden/faostat/2022-05-05/faostat_rt:
     - data://meadow/faostat/2022-05-05/faostat_rt
+  #
+  # FAOSTAT grapher steps for version 2022-04-26
+  #
+  grapher://faostat/2022-04-26/faostat_rl:
+    - data://garden/faostat/2022-04-26/faostat_rl
