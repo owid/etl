@@ -276,6 +276,11 @@ def run(dest_dir: str) -> None:
     data["value"] = data["value"].astype(object)
     data.loc[data["value"].isnull(), "value"] = np.nan
 
+    ####################################################################################################################
+    # TODO: Remove this temporary solution once grapher accepts mapping of all countries.
+    data = data[~data["country"].str.endswith("(FAO)")].reset_index(drop=True)
+    ####################################################################################################################
+
     data = data.pivot(index=["country", "year"], columns=["variable"], values="value")
 
     # TODO: Run more sanity checks on the new dataset.
