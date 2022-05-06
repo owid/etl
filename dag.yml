@@ -405,3 +405,5 @@ steps:
   #
   grapher://faostat/2022-04-26/faostat_rl:
     - data://garden/faostat/2022-04-26/faostat_rl
+  grapher://faostat/2022-04-26/faostat_qcl:
+    - data://garden/faostat/2022-04-26/faostat_qcl
