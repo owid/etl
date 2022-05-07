@@ -12,9 +12,27 @@ This project is the spiritual successor to [importers](https://github.com/owid/i
 
 ## Getting started
 
-You need Python 3.9+, `poetry` and `make` installed.
+#### Installations
 
-Then you can run all checks with:
+You need to install the following:
+
+* Python 3.9+. Guide for all platforms [here](https://realpython.com/installing-python/). If you are using multiple different versions of Python on your machine, you may want to use `pyenv` to manage them (instructions [here](https://github.com/pyenv/pyenv)).
+* `poetry`, for managing dependencies, virtual envs, and packages. Installation guide [here](https://python-poetry.org/docs/#installation).
+* `make`. You likely already have this, but otherwise it can be installed using your usual package manager (e.g. on Mac, `brew install make`).
+* MYSQL client (and Python dev headers). If you don't have this already,
+  * On Ubuntu: `sudo apt install python3.9-dev mysql-client`
+  * On Mac: `brew install mysql-client`
+
+#### Creating and using the virtual environment
+
+We use `poetry` to manage the virtual environment for the project, and you'll typically do your work within that virtual environment.
+
+1. Run `poetry install`, which creates a virtual environment in `.venv` using `make`
+2. Activate the virtual env with `poetry shell`
+
+#### Example commands
+
+To run all the checks and make sure you have everything set up correctly, try
 
 `make test`
 
@@ -22,10 +40,11 @@ You can build all known data tables into the `data/` folder with:
 
 `make etl`
 
-👆 If either of this fails because of some mysql or levenshtein dependency install error in the `poetry install` step then you need to make sure that you have a mysql client and python dev headers (for the version you are using) installed. On Ubuntu, this should do it:
-```bash
-sudo apt install python3.9-dev mysql-client
-```
+However, processing all the datasets will take a long time! So to run a subset of examples, you can try (for example)
+
+`etl examples`
+
+*Note*: this is from within the virtual environment (`poetry shell`). You can also run such commands from outside the venv, using `poetry run` (so for this example, `poetry run etl examples`).
 
 ## Reporting problems
 
