@@ -78,6 +78,11 @@ FLAGS_RANKING = (
 )
 
 
+def _create_warning_list(elements):
+    message = "\n" + "".join([f"  * {item}\n" for item in elements])
+    return message
+
+
 def run(dest_dir: str) -> None:
     # Assume dest_dir is a path to the step that needs to be run, e.g. "faostat_qcl", and fetch namespace and dataset
     # short name from that path.
@@ -283,6 +288,17 @@ def run(dest_dir: str) -> None:
 
     # This will create a table with just one column and country-year as index.
     data = data.pivot(index=["country", "year"], columns=["title"], values="value")
+
+    # Remove columns that only have nans, and raise warning.
+    columns_of_nans = data.columns[data.isnull().all(axis=0)]
+    if len(columns_of_nans) > 0:
+        print(f"WARNING: Remove columns that have only nans:")
+        print(_create_warning_list(columns_of_nans))
+        data = data.drop(columns=columns_of_nans)
+
+    # Sort data columns and rows conveniently.
+    data = data[sorted(data.columns)]
+    data = data.sort_index(level=['country', 'year'])
 
     # TODO: Run more sanity checks on the new dataset.
 
