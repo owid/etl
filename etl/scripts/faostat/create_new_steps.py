@@ -27,6 +27,7 @@ Workflow to create a new version of the FAOSTAT datasets (with version YYYY-MM-D
 import argparse
 import datetime
 import re
+from pathlib import Path
 from typing import cast, Dict, List, Optional, Set
 
 import pandas as pd
@@ -53,12 +54,12 @@ NEW_VERSION = datetime.datetime.today().strftime("%Y-%m-%d")
 CUSTOM_STEPS_TO_ADD: Dict[str, List[str]] = {
     "meadow": [],
     "garden": ["faostat_fbsc"],
-    "grapher": [],
+    "grapher": ["faostat_fbsc"],
 }
 CUSTOM_STEPS_TO_OMIT: Dict[str, List[str]] = {
     "meadow": [],
     "garden": ["faostat_fbs", "faostat_fbsh", "faostat_metadata"],
-    "grapher": [],
+    "grapher": ["faostat_fbs", "faostat_fbsh", "faostat_metadata"],
 }
 # List of additional files (with extension) that, if existing, should be copied over from the latest version to the new
 # (besides the files of each of the steps).
@@ -270,7 +271,8 @@ def find_latest_version_for_namespace_in_channel(
 
     """
     # Path to folder containing steps in this channel.
-    versions_dir = STEP_DIR / "data" / channel / namespace
+    versions_dir = get_path_to_step_files(channel=channel, namespace=namespace)
+
     # Latest version (taken from the name of the most recent folder).
     latest_version = sorted(list(versions_dir.glob(regex_version_pattern)))[-1].name
 
@@ -307,18 +309,10 @@ def find_latest_version_for_step(
             )
         except ValueError:
             print(warning_message)
-    elif channel in ["meadow", "garden"]:
-        # Find the latest version of this step in the code.
+    elif channel in ["meadow", "garden", "grapher"]:
+        versions_dir = get_path_to_step_files(channel=channel, namespace=namespace)
         dataset_versions = sorted(
-            list((STEP_DIR / "data" / channel / namespace).glob(f"*/{step_name}.py"))
-        )
-        if len(dataset_versions) > 0:
-            latest_version = dataset_versions[-1].parent.name
-        else:
-            print(warning_message)
-    elif channel == "grapher":
-        dataset_versions = sorted(
-            list((STEP_DIR / channel / namespace).glob(f"*/{step_name}.py"))
+            list(versions_dir.glob(f"*/{step_name}.py"))
         )
         if len(dataset_versions) > 0:
             latest_version = dataset_versions[-1].parent.name
@@ -326,6 +320,32 @@ def find_latest_version_for_step(
             print(warning_message)
 
     return latest_version
+
+
+def generate_content_for_new_step_file(channel: str) -> str:
+    """Generate the content of a new step file when creating it from scratch.
+
+    Parameters
+    ----------
+    channel : str
+        Channel name.
+
+    Returns
+    -------
+    file_content : str
+        Content of the new step file.
+
+    """
+    if channel in ["meadow", "garden"]:
+        file_content = f"from .{RUN_FILE_NAME} import run  # noqa:F401\n"
+    elif channel == "grapher":
+        file_content = f"from .{RUN_FILE_NAME} import catalog, get_grapher_dataset_from_file_name, get_grapher_tables  # noqa:F401 \n\n\n" \
+                       f"def get_grapher_dataset() -> catalog.Dataset:\n" \
+                       f"    return get_grapher_dataset_from_file_name(__file__)\n"
+    else:
+        raise ValueError("channel name not understood")
+
+    return file_content
 
 
 def create_step_file(channel: str, step_name: str) -> None:
@@ -341,7 +361,7 @@ def create_step_file(channel: str, step_name: str) -> None:
 
     """
     # Path to folder containing steps in this channel.
-    versions_dir = STEP_DIR / "data" / channel / NAMESPACE
+    versions_dir = get_path_to_step_files(channel=channel)
     # Path to folder to be created with new steps.
     new_step_dir = versions_dir / NEW_VERSION
     # Path to new step file.
@@ -354,7 +374,7 @@ def create_step_file(channel: str, step_name: str) -> None:
     if step_latest_version is None:
         print(f"Creating file from scratch for dataset {step_name}.")
         # Content of the file to be created.
-        file_content = f"from .{RUN_FILE_NAME} import run  # noqa:F401\n"
+        file_content = generate_content_for_new_step_file(channel=channel)
         new_step_file.write_text(file_content)
     else:
         # Copy the file from its latest version.
@@ -370,6 +390,32 @@ def create_step_file(channel: str, step_name: str) -> None:
             )
 
 
+def get_path_to_step_files(channel: str, namespace: str = NAMESPACE) -> Path:
+    """Get path to folder containing different versions of step files, for a given channel and namespace.
+
+    Parameters
+    ----------
+    channel : str
+        Channel name.
+    namespace : str
+        Namespace.
+
+    Returns
+    -------
+    versions_dir : Path
+        Path to folder of versions of step files.
+
+    """
+    if channel in ["meadow", "garden"]:
+        versions_dir = STEP_DIR / "data" / channel / namespace
+    elif channel == "grapher":
+        versions_dir = STEP_DIR / channel / namespace
+    else:
+        raise ValueError("channel name not understood")
+
+    return versions_dir
+
+
 def create_steps(channel: str, step_names: List[str]) -> None:
     """Create all steps in a new version folder for a namespace in a channel.
 
@@ -382,7 +428,7 @@ def create_steps(channel: str, step_names: List[str]) -> None:
 
     """
     # Path to folder containing steps in this channel.
-    versions_dir = STEP_DIR / "data" / channel / NAMESPACE
+    versions_dir = get_path_to_step_files(channel=channel)
     # Latest version (taken from the name of the most recent folder).
     latest_version = find_latest_version_for_namespace_in_channel(channel=channel)
     # Path to folder containing code for steps in the latest version.
