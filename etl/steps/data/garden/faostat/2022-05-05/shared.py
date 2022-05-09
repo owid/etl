@@ -265,17 +265,6 @@ def run(dest_dir: str) -> None:
         columns=["area_code", "element_code", "item_code", "flag", "flag_ranking"]
     )
 
-    # Combine item, element and unit into one column.
-    data["title"] = (
-        data["item"].astype(str)
-        + " - "
-        + data["element"].astype(str)
-        + " ("
-        + data["unit"].astype(str)
-        + ")"
-    )
-    data = data.drop(columns=["item", "element", "unit"])
-
     # Column 'value' was stored as integer, therefore nans are of a special kind.
     # Transform column to object type, and convert nans to normal ones.
     data["value"] = data["value"].astype(object)
@@ -285,6 +274,19 @@ def run(dest_dir: str) -> None:
     # TODO: Remove this temporary solution once grapher accepts mapping of all countries.
     data = data[~data["country"].str.endswith("(FAO)")].reset_index(drop=True)
     ####################################################################################################################
+
+    # Combine item, element and unit into one column.
+    data["title"] = (
+        data["item"].astype(str)
+        + " - "
+        + data["element"].astype(str)
+        + " ("
+        + data["unit"].astype(str)
+        + ")"
+    )
+
+    # Keep a dataframe of just units (which will be required later on).
+    units = data.pivot(index=["country", "year"], columns=["title"], values="unit")
 
     # This will create a table with just one column and country-year as index.
     data = data.pivot(index=["country", "year"], columns=["title"], values="value")
@@ -311,9 +313,12 @@ def run(dest_dir: str) -> None:
     data_table_garden = catalog.Table(data).copy()
 
     for column in data_table_garden.columns:
+        variable_units = units[column].dropna().unique()
+        assert len(variable_units)== 1, f"Variable {column} has ambiguous units."
+        unit = variable_units[0]
         # By construction, I added the unit in parenthesis at the end of the title.
-        matches = re.findall("\((.*)\)", column)
-        unit = matches[-1]
+        #matches = re.findall(r"\((.*)\)", column)
+        #unit = matches[-1]
         title = column.replace(f" ({unit})", "")
 
         # Add title and unit to each column in the table.

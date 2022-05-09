@@ -422,8 +422,9 @@ steps:
     - data://garden/faostat/2022-05-05/faostat_emn
   grapher://faostat/2022-05-09/faostat_ep:
     - data://garden/faostat/2022-05-05/faostat_ep
-  grapher://faostat/2022-05-09/faostat_fbsc:
-    - data://garden/faostat/2022-04-26/faostat_fbsc
+#  TODO: Solve issues with fbsc dataset.
+#  grapher://faostat/2022-05-09/faostat_fbsc:
+#    - data://garden/faostat/2022-04-26/faostat_fbsc
   grapher://faostat/2022-05-09/faostat_fo:
     - data://garden/faostat/2022-05-05/faostat_fo
   grapher://faostat/2022-05-09/faostat_lc:
