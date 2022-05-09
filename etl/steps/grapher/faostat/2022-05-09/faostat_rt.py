@@ -1,4 +1,4 @@
-from .shared import catalog, get_grapher_dataset_from_file_name, get_grapher_tables  # noqa:F401
+from .shared import catalog, get_grapher_dataset_from_file_name, get_grapher_tables  # noqa:F401 
 
 
 def get_grapher_dataset() -> catalog.Dataset:

@@ -3,3 +3,4 @@ from .shared import catalog, get_grapher_dataset_from_file_name, get_grapher_tab
 
 def get_grapher_dataset() -> catalog.Dataset:
     return get_grapher_dataset_from_file_name(__file__)
+
