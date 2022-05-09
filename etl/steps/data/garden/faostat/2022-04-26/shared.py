@@ -71,6 +71,14 @@ FLAGS_RANKING = (
             ("R", "Estimated data using trading partners database"),
             ("SD", "Statistical Discrepancy"),
             ("S", "Standardized data"),
+            ('Qm', 'Official data from questionnaires and/or national sources and/or COMTRADE (reporters)'),
+            ('Fk', 'Calculated data on the basis of official figures'),
+            ('Fb', 'Data obtained as a balance'),
+            ('E', 'Expert sources from FAO (including other divisions)'),
+            ('X', 'International reliable sources'),
+            ('Bk', 'Break in series'),
+            ('NV', 'Data not available'),
+            ('FC', 'Calculated data'),
         ],
     )
     .reset_index()
