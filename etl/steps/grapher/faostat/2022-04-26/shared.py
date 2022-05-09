@@ -11,12 +11,18 @@ from etl.scripts.faostat.create_new_steps import find_latest_version_for_step
 def get_grapher_dataset_from_file_name(file_path: str) -> catalog.Dataset:
     # Get details of this grapher step from the file path.
     namespace, grapher_version, file_name = Path(file_path).parts[-3:]
-    dataset_short_name = file_name.split('.')[0]
+    dataset_short_name = file_name.split(".")[0]
     # Get details of the corresponding latest garden step.
-    garden_version = find_latest_version_for_step(channel="garden", step_name=dataset_short_name, namespace=namespace)
-    dataset = catalog.Dataset(DATA_DIR / "garden" / namespace / garden_version / dataset_short_name)
+    garden_version = find_latest_version_for_step(
+        channel="garden", step_name=dataset_short_name, namespace=namespace
+    )
+    dataset = catalog.Dataset(
+        DATA_DIR / "garden" / namespace / garden_version / dataset_short_name
+    )
     # Short name for new grapher dataset.
-    dataset.metadata.short_name = f"{dataset_short_name}__{grapher_version}".replace("-", "_")
+    dataset.metadata.short_name = f"{dataset_short_name}__{grapher_version}".replace(
+        "-", "_"
+    )
 
     # move description to source as that is what is shown in grapher
     # (dataset.description would be displayed under `Internal notes` in the admin UI otherwise)

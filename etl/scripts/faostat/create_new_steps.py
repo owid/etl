@@ -311,9 +311,7 @@ def find_latest_version_for_step(
             print(warning_message)
     elif channel in ["meadow", "garden", "grapher"]:
         versions_dir = get_path_to_step_files(channel=channel, namespace=namespace)
-        dataset_versions = sorted(
-            list(versions_dir.glob(f"*/{step_name}.py"))
-        )
+        dataset_versions = sorted(list(versions_dir.glob(f"*/{step_name}.py")))
         if len(dataset_versions) > 0:
             latest_version = dataset_versions[-1].parent.name
         else:
@@ -339,9 +337,12 @@ def generate_content_for_new_step_file(channel: str) -> str:
     if channel in ["meadow", "garden"]:
         file_content = f"from .{RUN_FILE_NAME} import run  # noqa:F401\n"
     elif channel == "grapher":
-        file_content = f"from .{RUN_FILE_NAME} import catalog, get_grapher_dataset_from_file_name, get_grapher_tables  # noqa:F401 \n\n\n" \
-                       f"def get_grapher_dataset() -> catalog.Dataset:\n" \
-                       f"    return get_grapher_dataset_from_file_name(__file__)\n"
+        file_content = (
+            f"from .{RUN_FILE_NAME} import catalog, get_grapher_dataset_from_file_name\n"
+            f"from .{RUN_FILE_NAME} import get_grapher_tables  # noqa:F401\n\n\n"
+            f"def get_grapher_dataset() -> catalog.Dataset:\n"
+            f"    return get_grapher_dataset_from_file_name(__file__)\n"
+        )
     else:
         raise ValueError("channel name not understood")
 

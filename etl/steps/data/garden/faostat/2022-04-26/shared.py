@@ -2,9 +2,9 @@
 
 """
 
-import re
 from copy import deepcopy
 from pathlib import Path
+from typing import List
 
 import numpy as np
 import pandas as pd
@@ -28,7 +28,6 @@ REGIONS_TO_ADD = [
     "High-income countries",
 ]
 
-# +
 # We have created a manual ranking of FAOSTAT flags.
 # These flags are only used when there is ambiguity in the data.
 # This means that a certain country-year has more than one data point with different flags.
@@ -40,7 +39,7 @@ REGIONS_TO_ADD = [
 #   (namely flag "R", found in qcl dataset).
 #   This flag was added manually, using the definition in List / Flags in:
 #   https://www.fao.org/faostat/en/#definitions
-# -
+
 
 # Rank flags by priority (where lowest index is highest priority).
 # TODO: Discuss this flag ranking with others (they are quite arbitrary at the moment).
@@ -71,14 +70,17 @@ FLAGS_RANKING = (
             ("R", "Estimated data using trading partners database"),
             ("SD", "Statistical Discrepancy"),
             ("S", "Standardized data"),
-            ('Qm', 'Official data from questionnaires and/or national sources and/or COMTRADE (reporters)'),
-            ('Fk', 'Calculated data on the basis of official figures'),
-            ('Fb', 'Data obtained as a balance'),
-            ('E', 'Expert sources from FAO (including other divisions)'),
-            ('X', 'International reliable sources'),
-            ('Bk', 'Break in series'),
-            ('NV', 'Data not available'),
-            ('FC', 'Calculated data'),
+            (
+                "Qm",
+                "Official data from questionnaires and/or national sources and/or COMTRADE (reporters)",
+            ),
+            ("Fk", "Calculated data on the basis of official figures"),
+            ("Fb", "Data obtained as a balance"),
+            ("E", "Expert sources from FAO (including other divisions)"),
+            ("X", "International reliable sources"),
+            ("Bk", "Break in series"),
+            ("NV", "Data not available"),
+            ("FC", "Calculated data"),
         ],
     )
     .reset_index()
@@ -86,7 +88,7 @@ FLAGS_RANKING = (
 )
 
 
-def _create_warning_list(elements):
+def _create_warning_list(elements: List[str]) -> str:
     message = "\n" + "".join([f"  * {item}\n" for item in elements])
     return message
 
@@ -302,13 +304,13 @@ def run(dest_dir: str) -> None:
     # Remove columns that only have nans, and raise warning.
     columns_of_nans = data.columns[data.isnull().all(axis=0)]
     if len(columns_of_nans) > 0:
-        print(f"WARNING: Remove columns that have only nans:")
+        print("WARNING: Removing columns that have only nans:")
         print(_create_warning_list(columns_of_nans))
         data = data.drop(columns=columns_of_nans)
 
     # Sort data columns and rows conveniently.
     data = data[sorted(data.columns)]
-    data = data.sort_index(level=['country', 'year'])
+    data = data.sort_index(level=["country", "year"])
 
     # TODO: Run more sanity checks on the new dataset.
 
@@ -322,11 +324,11 @@ def run(dest_dir: str) -> None:
 
     for column in data_table_garden.columns:
         variable_units = units[column].dropna().unique()
-        assert len(variable_units)== 1, f"Variable {column} has ambiguous units."
+        assert len(variable_units) == 1, f"Variable {column} has ambiguous units."
         unit = variable_units[0]
         # By construction, I added the unit in parenthesis at the end of the title.
-        #matches = re.findall(r"\((.*)\)", column)
-        #unit = matches[-1]
+        # matches = re.findall(r"\((.*)\)", column)
+        # unit = matches[-1]
         title = column.replace(f" ({unit})", "")
 
         # Add title and unit to each column in the table.
