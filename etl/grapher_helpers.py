@@ -134,8 +134,8 @@ def yield_wide_table(
         # subset of data that we prepared above
         for column in table_to_yield.columns:
             # Add column and dimensions as short_name
-            table_to_yield.metadata.short_name = slugify.slugify(
-                "__".join([column] + list(dims)), separator="_"
+            table_to_yield.metadata.short_name = _slugify_column_and_dimensions(
+                column, dims
             )
 
             # Safety check to see if the metadata is still intact
@@ -153,6 +153,16 @@ def yield_wide_table(
             print(f"Yielding table {tab.metadata.short_name}")
 
             yield tab.reset_index().set_index(["entity_id", "year"])[[column]]
+
+
+def _slugify_column_and_dimensions(column: str, dims: List[str]) -> str:
+    slug = slugify.slugify("__".join([column] + list(dims)), separator="_")
+
+    # slugify would strip the leading underscore, put it back in that case
+    if column.startswith("_"):
+        slug = f"_{slug}"
+
+    return cast(str, slug)
 
 
 def yield_long_table(
