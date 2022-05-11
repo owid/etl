@@ -134,6 +134,9 @@ def upsert_table(
     assert (
         len(table.columns) == 1
     ), f"Tables to be upserted must have only 1 column. Instead they have: {table.columns.names}"
+    assert table[
+        table.columns[0]
+    ].title, f"Column {table.columns.names} must have a title in metadata"
     assert (
         table.iloc[:, 0].notnull().all()
     ), f"Tables to be upserted must have no null values. Instead they have:\n{table.loc[table.iloc[:, 0].isnull()]}"
