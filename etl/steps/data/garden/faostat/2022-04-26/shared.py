@@ -14,6 +14,9 @@ from owid.datautils import geo
 from etl.paths import DATA_DIR, STEP_DIR
 
 
+NAMESPACE = Path(__file__).parent.parent.name
+VERSION = Path(__file__).parent.name
+
 REGIONS_TO_ADD = [
     "North America",
     "South America",

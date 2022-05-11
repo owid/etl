@@ -29,12 +29,13 @@ def load_data(local_path: str) -> pd.DataFrame:
 def run_sanity_checks(data: pd.DataFrame) -> None:
     df = data.copy()
 
-    # Check nulls
-    df.isnull().any()
+    # Check that column "Year Code" is identical to "Year", and can therefore be dropped.
+    error = "Column 'Year Code' does not coincide with column 'Year'."
+    assert (df["Year Code"] == df["Year"]).all(), error
 
-    x = df.groupby(["Element", "Unit"])["Element Code"].nunique()
-    if (x > 1).any():
-        raise ValueError("Element-Unit not unique!")
+    # Check that there is only one element-unit for each element code.
+    error = "Multiple element-unit for the same element code."
+    assert (df.groupby(["Element", "Unit"])["Element Code"].nunique() == 1).all(), error
 
 
 def prepare_output_table(data: pd.DataFrame) -> pd.DataFrame:
@@ -42,7 +43,7 @@ def prepare_output_table(data: pd.DataFrame) -> pd.DataFrame:
 
     df = df.drop(columns=["Year Code"])
     df = df.set_index(
-        ["Area Code", "Item Code", "Element Code", "Year", "Flag"],
+        ["Area Code", "Item Code", "Element Code", "Year"],
         verify_integrity=True,
     )
 
