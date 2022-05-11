@@ -28,7 +28,7 @@ import argparse
 import datetime
 import re
 from pathlib import Path
-from typing import cast, Dict, List, Optional, Set
+from typing import cast, Dict, List, Optional, Set, Tuple
 
 import pandas as pd
 from owid.walden import Catalog
@@ -60,6 +60,13 @@ CUSTOM_STEPS_TO_OMIT: Dict[str, List[str]] = {
     "meadow": [],
     "garden": ["faostat_fbs", "faostat_fbsh", "faostat_metadata"],
     "grapher": ["faostat_fbs", "faostat_fbsh", "faostat_metadata"],
+}
+# Additional dependencies to add to each dag line of a specific channel. Give each dependency as a tuple of
+# (channel, step_name). The latest version of that step will be assumed.
+ADDITIONAL_DEPENDENCIES: Dict[str, List[Tuple[str, str]]] = {
+    "meadow": [],
+    "garden": [("meadow", "faostat_metadata")],
+    "grapher": [],
 }
 # List of additional files (with extension) that, if existing, should be copied over from the latest version to the new
 # (besides the files of each of the steps).
@@ -507,6 +514,7 @@ def create_updated_dependency_graph(
     step_names: List[str],
     namespace: str = NAMESPACE,
     new_version: str = NEW_VERSION,
+    additional_dependencies: Optional[Dict[str, List[str]]] = None,
 ) -> Dict[str, Set[str]]:
     """Create additional part of the graph that will need be added to the dag to update it.
 
@@ -523,6 +531,8 @@ def create_updated_dependency_graph(
         Namespace.
     new_version : str
         New version of the considered steps.
+    additional_dependencies : dict or None
+        Additional dependencies to add to any dag line of a particular channel.
 
     Returns
     -------
@@ -592,7 +602,17 @@ def create_updated_dependency_graph(
                 new_dependencies.append(new_dependency)
 
         if len(new_dependencies) > 0:
-            # Collect the new dag line and its dependencies, that will later be be added to the updated dag.
+            if additional_dependencies is not None:
+                # Optionally include additional dependencies.
+                for additional_dependency in additional_dependencies[channel]:
+                    dependency_channel, dependency_step = additional_dependency
+                    dependency_version = find_latest_version_for_step(
+                        channel=dependency_channel, step_name=dependency_step, namespace=namespace)
+                    new_dependencies.append(create_dag_line_name(
+                        channel=dependency_channel, step_name=dependency_step, namespace=namespace,
+                        version=dependency_version))
+
+            # Collect the new dag line and its dependencies, that will later be added to the updated dag.
             new_steps[new_step_name] = set(new_dependencies)
 
     return new_steps
@@ -665,7 +685,7 @@ def main(channel: str, include_all_datasets: bool = False) -> None:
 
         # Generate dictionary of new step dependencies.
         dag_steps = create_updated_dependency_graph(
-            channel=channel, step_names=step_names
+            channel=channel, step_names=step_names, additional_dependencies=ADDITIONAL_DEPENDENCIES
         )
 
         # Update dag file with new dependencies.
