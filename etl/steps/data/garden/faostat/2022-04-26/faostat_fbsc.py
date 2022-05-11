@@ -1,9 +1,12 @@
 """FAOstat: Food Balances Combined.
 
-This step integrates two FAOstat datasets (previously imported to _meadow_) into a single _garden_ dataset.
+Combine the old and new food balances datasets:
+* Old (historical) dataset: "faostat_fbsh".
+* Current dataset: "faostat_fbs".
+Into a new (combined) dataset: "fabosta_fbsc".
+
 This is because a new version of the _Food Balances_ dataset was launched in 2014 with a slightly new methodology
 ([more info](https://fenixservices.fao.org/faostat/static/documents/FBS/New%20FBS%20methodology.pdf)).
-The new dataset is named FBSC (Food Balances Combined).
 
 """
 
@@ -13,148 +16,118 @@ from typing import List
 import pandas as pd
 from owid import catalog
 from owid.catalog.meta import DatasetMeta
+from owid.datautils import geo
 
-from etl.paths import DATA_DIR, BASE_DIR
+from etl.paths import DATA_DIR, BASE_DIR, STEP_DIR
+from etl.scripts.faostat.create_new_steps import find_latest_version_for_step
+from shared import NAMESPACE, VERSION
 
 # TODO: Clean up code, which has been imported from the latest notebook.
 
-# side-car file containing manual country mapping
-COUNTRY_MAPPING = (
-    BASE_DIR / "etl/steps/data/garden/faostat/2021-04-09/faostat_fbsc.country_std.json"
-)
+# Path to countries mapping file.
+COUNTRIES_FILE = STEP_DIR / "data" / "garden" / NAMESPACE / VERSION / f"{NAMESPACE}.countries.json"
+
+# Some items seem to have been renamed from fbsh to fbs. Ensure the old names are mapped to the new ones.
+# TODO: Check that this mapping makes sense.
+ITEMS_MAPPING = {
+    "Groundnuts (Shelled Eq)": "Groundnuts",
+    "Rice (Milled Equivalent)": "Rice and products",
+}
+
+assert COUNTRIES_FILE.is_file()
 
 
 def run(dest_dir: str) -> None:
 
-    # Load meadow datasets
-    # In this step we load the required datasets from Garden: FBS and FBSH
+    # Load latest faostat_fbs dataset from meadow.
+    fbs_version = find_latest_version_for_step(channel="meadow", step_name="faostat_fbs", namespace=NAMESPACE)
+    fbs_file = DATA_DIR / "meadow" / NAMESPACE / fbs_version / "faostat_fbs"
+    fbs_dataset = catalog.Dataset(fbs_file)
 
-    # Read datasets
-    fbs_meadow = catalog.Dataset(DATA_DIR / "meadow/faostat/2021-04-09/faostat_fbs")
-    fbsh_meadow = catalog.Dataset(DATA_DIR / "meadow/faostat/2017-12-11/faostat_fbsh")
-    metadata = catalog.Dataset(DATA_DIR / "meadow/faostat/2022-02-10/faostat_metadata")
+    # Load latest faostat_fbsh dataset from meadow.
+    fbsh_version = find_latest_version_for_step(channel="meadow", step_name="faostat_fbsh", namespace=NAMESPACE)
+    fbsh_file = DATA_DIR / "meadow" / NAMESPACE / fbsh_version / "faostat_fbsh"
+    fbsh_dataset = catalog.Dataset(fbsh_file)
 
-    # Bulk data and items metadata
-    fbs_bulk = fbs_meadow["bulk"]
-    fbsh_bulk = fbsh_meadow["bulk"]
+    # Load latest faostat_metadata from meadow.
+    metadata_version = find_latest_version_for_step(channel="meadow", step_name="faostat_metadata", namespace=NAMESPACE)
+    metadata_file = DATA_DIR / "meadow" / NAMESPACE / metadata_version / "faostat_metadata"
+    metadata_dataset = catalog.Dataset(metadata_file)
+
+    # Load dataframes for fbs and fbsh datasets.
+    fbs = pd.DataFrame(fbs_dataset["faostat_fbs"]).reset_index()
+    fbsh = pd.DataFrame(fbsh_dataset["faostat_fbsh"]).reset_index()
 
     # Sanity checks.
-    # As we are fusing two different datasets, we will be doing some checks to ensure the consistency of the dataset.
-    # Specially in the identifying fields (i.e. `Year`, `Area Code`, `Item Code`, `Element Code`, `Flag`)
-    # Check data files
+    assert fbsh["year"].min() < fbsh["year"].max()
+    assert fbs["year"].min() < fbs["year"].max()
 
-    ####################################################################################################################
-    # Year
-    # Check if the time window of both datasets is disjoint, otherwise we could end up with duplicates.
-    fbs_year_min, fbs_year_max = (
-        fbs_bulk.index.get_level_values("year").min(),
-        fbs_bulk.index.get_level_values("year").max(),
-    )
-    fbsh_year_min, fbsh_year_max = (
-        fbsh_bulk.index.get_level_values("year").min(),
-        fbsh_bulk.index.get_level_values("year").max(),
-    )
-    # Year disjoints
-    assert (fbsh_year_min < fbsh_year_max) & (
-        fbsh_year_max + 1 == fbs_year_min < fbs_year_max
-    )
+    if (fbsh["year"].max() >= fbs["year"].min()):
+        print("WARNING: There is overlapping data between fbsh and fbs datasets. Prioritising fbs over fbsh.")
+        fbsh = fbsh[fbsh["year"] < fbs["year"].min()].reset_index(drop=True)    
 
-    ####################################################################################################################
-    # Area
-    # Here we check which Areas (i.e. countries/regions) appear in one dataset but not in the other.
-    # We observe that former countries only appear in FBSH (USSR, Serbia and Montenegro, Sudan (fromer),
-    # Belgium-Luxembourg, Checkoslovakia, Netherland Antilles, Yugoslavia, Ethiopia PDR), which makes sense.
-    # There are some special cases where countries stopped or started appearing (Bermuda, Brunei and Papua New Guinea,
-    # Seychelles and Comoros).
-    fbsh_area = metadata["meta_fbsh_area"]
-    fbs_area = metadata["meta_fbs_area"]
-    # Get unique codes
-    codes_fbs = set(fbs_bulk.index.get_level_values("area_code"))
-    codes_fbsh = set(fbsh_bulk.index.get_level_values("area_code"))
-    # Find missing codes
-    miss_in_fbs = codes_fbsh.difference(codes_fbs)
-    miss_in_fbsh = codes_fbs.difference(codes_fbsh)
-    if len(miss_in_fbs) > 0:
-        print(
-            "- FBSH but not FBS:",
-            fbsh_area.loc[sorted(miss_in_fbs), "country"].to_dict(),
-        )
-    if len(miss_in_fbsh) > 0:
-        print(
-            "- FBS but not FBSH:",
-            fbs_area.loc[sorted(miss_in_fbsh), "country"].to_dict(),
-        )
-    # Next, we check that all codes correspond to the same country name in both datasets.
-    x = fbs_area.merge(fbsh_area, left_index=True, right_index=True)
-    assert (x.country_x.astype(str) == x.country_y.astype(str)).all()
+    if (fbsh["year"].max() + 1) < fbs["year"].min():
+        print("WARNING: Data is missing for one or more years between fbsh and fbs datasets.")
 
-    ####################################################################################################################
-    # Item
-    # Here we check which items appear and disappear from dataset to dataset.
-    # It seems that some elements were deprecated in favour of others:  `Groundnuts (Shelled Eq) --> Groundnuts` and
-    # `Rice (Milled Equivalent) --> Rice and products`
-    fbsh_item = metadata["meta_fbsh_item"]
-    fbs_item = metadata["meta_fbs_item"]
+    # Harmonize country names in both dataframes.
+    fbs = geo.harmonize_countries(df=fbs, countries_file=COUNTRIES_FILE, country_col="area",
+                                  warn_on_unused_countries=False).rename(columns={"area": "country"})
+    fbsh = geo.harmonize_countries(df=fbsh, countries_file=COUNTRIES_FILE, country_col="area",
+                                   warn_on_unused_countries=False).rename(columns={"area": "country"})
 
-    def build_item_all_df(df: pd.DataFrame) -> pd.DataFrame:
-        """Flatten item dataframe."""
+    # Remove unused columns.
+    unused_columns = ["area_code", "item_code", "element_code"]
+    fbs = fbs.drop(columns=unused_columns)
+    fbsh = fbsh.drop(columns=unused_columns)
 
-        def _process_df(df: pd.DataFrame, cols: List[str]) -> pd.DataFrame:
-            return (
-                df.drop_duplicates(cols)[cols]
-                .rename(columns=dict(zip(cols, ["code", "name"])))
-                .set_index("code")
-            )
+    # There are items in fbsh that are not in fbs and vice versa.
+    # We manually created a mapping from old to new names (define above).
 
-        df = df.reset_index()
-        a = _process_df(df, ["item_group_code", "item_group"])
-        b = _process_df(df, ["item_code", "item"])
-        df = pd.concat([a, b])
-        assert df.index.value_counts().max() == 1
-        return df
+    # Ensure the elements that are in fbsh but not in fbs are covered in the mapping.
+    error = "Mismatch between items in fbsh and fbs. Redefine items mapping."
+    assert set(fbsh["item"]) - set(fbs["item"]) == set(ITEMS_MAPPING), error
+    assert set(fbs["item"]) - set(fbsh["item"]) == set(ITEMS_MAPPING.values()), error
 
-    # Build flattened version (item group, item in same column)
-    fbsh_item_ = build_item_all_df(fbsh_item)
-    fbs_item_ = build_item_all_df(fbs_item)
-    # Get unique codes
-    codes_fbs = set(fbs_bulk.index.get_level_values("item_code"))
-    codes_fbsh = set(fbsh_bulk.index.get_level_values("item_code"))
-    # Find missing codes
-    miss_in_fbs = codes_fbsh.difference(codes_fbs)
-    miss_in_fbsh = codes_fbs.difference(codes_fbsh)
-    # print("- FBSH but not FBS:", fbsh_item_.loc[sorted(miss_in_fbs), "name"].to_dict())
-    # print("- FBS but not FBSH:", fbs_item_.loc[sorted(miss_in_fbsh), "name"].to_dict())
-    # fbsh_item.reset_index().set_index(["item_code", "item_group_code"]).loc[2805]
-    # fbs_item.reset_index().set_index(["item_code", "item_group_code"]).loc[2807]
-    # We check that all codes are mapped to the same names.
-    x = fbs_item_.merge(fbsh_item_, left_index=True, right_index=True)
-    assert (x.name_x.astype(str) == x.name_y.astype(str)).all()
-    # print(x[x.name_x != x.name_y])
+    # Some elements are found in fbs but not in fbsh. This is understandable, since fbs is more recent and may have
+    # additional elements. However, ensure that there are no elements in fbsh that are not in fbs.
+    error = "There are elements in fbsh that are not in fbs."
+    assert set(fbsh["element"]) < set(fbs["element"]), error
 
-    ####################################################################################################################
-    # Element
-    # We see that two items were introduced in FBS (not present in FBSH): `Residuals` and `Tourist consumption`.
-    # Load element info
-    fbsh_element = metadata["meta_fbsh_element"]
-    fbs_element = metadata["meta_fbs_element"]
-    # Get unique codes
-    codes_fbs = set(fbs_bulk.index.get_level_values("element_code"))
-    codes_fbsh = set(fbsh_bulk.index.get_level_values("element_code"))
-    # Find missing codes
-    miss_in_fbs = codes_fbsh.difference(codes_fbs)
-    miss_in_fbsh = codes_fbs.difference(codes_fbsh)
-    # print("- FBSH but not FBS:", fbsh_element.loc[miss_in_fbs, "element"].to_dict())
-    # print("- FBS but not FBSH:", fbs_element.loc[miss_in_fbsh, "element"].to_dict())
-    # First, we check if all element codes just have one unit associated. Next, we verify that in both datasets we have
-    # the same mappings `code -> name`, `code -> unit` and `code -> description`.
-    # Only one unit per element code
-    assert fbs_bulk.reset_index().groupby("element_code").unit.nunique().max() == 1
-    assert fbsh_bulk.reset_index().groupby("element_code").unit.nunique().max() == 1
-    # Given an element code, we have the same element name, unit and description in fbs and fbsh
-    x = fbs_element.merge(fbsh_element, left_index=True, right_index=True)
-    assert (x.element_x.astype(str) == x.element_y.astype(str)).all()
-    assert (x.unit_x.astype(str) == x.unit_y.astype(str)).all()
-    assert (x.description_x.astype(str) == x.description_y.astype(str)).all()
+    # Add description of each element (from metadata) to fbs and to fbsh.
+    # Add also "unit", just to check that data in the original dataset and in metadata coincide.
+    fbsh = pd.merge(fbsh, metadata_dataset["meta_fbsh_element"].rename(columns={'unit': 'unit_check'}),
+                    on="element", how="left")
+    fbs = pd.merge(fbs, metadata_dataset["meta_fbs_element"].rename(columns={'unit': 'unit_check'}),
+                    on="element", how="left")
+
+    # Check that units of elements in fbsh and in the corresponding metadata coincide.
+    error = "Elements in fbsh have different units in dataset and in its corresponding metadata."
+    assert (fbsh["unit"] == fbsh["unit_check"]).all(), error
+    fbsh = fbsh.drop(columns="unit_check")
+
+    # Check that units of elements in fbs and in the corresponding metadata coincide.
+    error = "Elements in fbs have different units in dataset and in its corresponding metadata."
+    assert (fbs["unit"] == fbs["unit_check"]).all(), error
+    fbs = fbs.drop(columns="unit_check")
+
+    # Concatenate old and new dataframes.
+    fbsc = pd.concat([fbsh, fbs]).sort_values(["country", "year"]).reset_index(drop=True)
+
+    # Map old item names to new item names.
+    fbsc["item"] = fbsc["item"].replace(ITEMS_MAPPING)
+
+    # Ensure that each element has only one unit.
+    error = "Some elements in the combined dataset have more than one unit."
+    assert fbsc.groupby("element")["unit"].nunique().max() == 1, error
+
+    # Ensure that each element has only one unit.
+    error = "Some elements in the combined dataset have more than one unit."
+    assert fbsc.groupby("element")["description"].nunique().max() == 1, error
+
+    # TODO: Continue here. Deal with duplicated data.
+
+    warning = "WARNING: Some elements in the combined dataset have more than one description."
+    assert fbsc.groupby("element")["description"].nunique().max() == 1, warning
 
     ####################################################################################################################
     # Flag
