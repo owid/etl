@@ -11,12 +11,13 @@ SRC = etl tests
 help:
 	@echo 'Available commands:'
 	@echo
-	@echo '  make etl       Fetch data and run all transformations'
+	@echo '  make etl       Fetch data and run all transformations for garden'
+	@echo '  make full      Fetch all data and run full transformations'
 	@echo '  make lab       Start a Jupyter Lab server'
 	@echo '  make test      Run all linting and unit tests'
 	@echo '  make publish   Publish the generated catalog to S3'
 	@echo '  make grapher   Publish supported datasets to Grapher'
-	@echo '  make dot   	Build a visual graph of the dependencies'
+	@echo '  make dot       Build a visual graph of the dependencies'
 	@echo '  make watch     Run all tests, watching for changes'
 	@echo '  make clean     Delete all non-reference data in the data/ folder'
 	@echo '  make clobber   Delete non-reference data and .venv'
@@ -53,6 +54,10 @@ coverage: .venv
 	.venv/bin/pytest --cov=etl --cov-report=term-missing tests
 
 etl: .venv
+	@echo '==> Running etl on garden'
+	.venv/bin/etl garden
+
+full: .venv
 	@echo '==> Running full etl'
 	.venv/bin/etl
 
