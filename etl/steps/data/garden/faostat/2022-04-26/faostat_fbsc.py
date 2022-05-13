@@ -28,7 +28,7 @@ from .shared import (
 DATASET_NAME = f"{NAMESPACE}_fbsc"
 
 # First year for which we have data in fbs dataset (it defines the first year when new methodology is used).
-FBS_FIRST_YEAR = 2014
+FBS_FIRST_YEAR = 2010
 DATASET_TITLE = f"Food Balances (old methodology before {FBS_FIRST_YEAR}, and new from {FBS_FIRST_YEAR} onwards)."
 
 # Path to countries mapping file.
@@ -99,13 +99,19 @@ def combine_fbsh_and_fbs_datasets(fbsh_dataset, fbs_dataset, additional_metadata
     fbs = fbs.drop(columns="unit_check")
 
     # Concatenate old and new dataframes.
-    fbsc = pd.concat([fbsh, fbs]).sort_values(["country", "year"]).reset_index(drop=True)
+    fbsc = pd.concat([fbsh, fbs]).sort_values(["area", "year"]).reset_index(drop=True)
 
     # Map old item names to new item names.
     fbsc["item"] = fbsc["item"].replace(ITEMS_MAPPING)
 
     # Remove unnecessary elements.
     fbsc = fbsc[~fbsc["element"].isin(ELEMENTS_TO_REMOVE)].reset_index(drop=True)
+
+    # Ensure that each element has only one unit and one description.
+    error = "Some elements in the combined dataset have more than one unit."
+    assert fbsc.groupby("element")["unit"].nunique().max() == 1, error
+    error = "Some elements in the combined dataset have more than one description."
+    assert fbsc.groupby("element")["description"].nunique().max() == 1, error
 
     return fbsc
 

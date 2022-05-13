@@ -6,17 +6,18 @@ NOTES:
 * We check that the definitions in our manual ranking agree with the ones provided by FAOSTAT.
 * We do not include all flags: We include only the ones that solve an ambiguity in a particular case,
   and add more flags as we see need.
-* We have found at least one flag that appeared in a dataset, but was not included in the additional metadata
-  (namely flag "R", found in qcl dataset).
-  This flag was added manually, using the definition in List / Flags in:
+* We have found flags that appeared in a dataset, but were not included in the additional metadata
+  (namely flag "R", found in qcl dataset, and "W" in rt dataset). These flags were added manually, using the definition
+  in List / Flags in:
   https://www.fao.org/faostat/en/#definitions
+* Other flags (namel "B", in rl dataset and "w" in rt dataset) were not found either in the additional metadata or in
+  the website definitions. They have been assigned the description "Unknown flag".
 * Unfortunately, flags do not remove all ambiguities: remaining duplicates are dropped without any meaningful criterion.
 
 """
 
 from copy import deepcopy
 from pathlib import Path
-from typing import List
 
 import numpy as np
 import pandas as pd
@@ -85,6 +86,11 @@ FLAGS_RANKING = (
             ("Bk", "Break in series"),
             ("NV", "Data not available"),
             ("FC", "Calculated data"),
+            ('Z', 'When the Fertilizer Utilization Account (FUA) does not balance due to utilization from stockpiles, apparent consumption has been set to zero'),
+            ('P', 'Provisional official data'),
+            ('W', 'Data reported on country official publications or web sites (Official) or trade country files'),
+            ("B", "Unknown flag"),
+            ("w", "Unknown flag"),
         ],
     )
     .reset_index()
@@ -107,17 +113,18 @@ def check_that_flag_definitions_in_dataset_agree_with_those_in_flags_ranking(add
             ).all(), error_message
 
 
-def check_that_all_flags_in_dataset_are_in_ranking(data, additional_metadata_for_flags):
+def check_that_all_flags_in_dataset_are_in_ranking(data, additional_metadata_for_flags, country_col="area"):
     """TODO"""
     if not set(data['flag']) < set(FLAGS_RANKING["flag"]):
-        missing_flags = list(
-            set(
-                data[data.duplicated(subset=["country", "year", "item", "element"])][
-                    "flag"
-                ]
-            )
-            - set(FLAGS_RANKING["flag"])
-        )
+        missing_flags = set(data['flag']) - set(FLAGS_RANKING['flag'])
+        # missing_flags = list(
+        #     set(
+        #         data[data.duplicated(subset=[country_col, "year", "item", "element"])][
+        #             "flag"
+        #         ]
+        #     )
+        #     - set(FLAGS_RANKING["flag"])
+        # )
         flags_data = pd.DataFrame(additional_metadata_for_flags).reset_index()
         if set(missing_flags) < set(flags_data["flag"]):
             print(
@@ -125,7 +132,7 @@ def check_that_all_flags_in_dataset_are_in_ranking(data, additional_metadata_for
             )
             for i, j in (
                 pd.DataFrame(additional_metadata_for_flags)
-                .loc[missing_flags]
+                .loc[list(missing_flags)]
                 .iterrows()
             ):
                 print(f"{(i, j['flags'])},")
@@ -273,11 +280,6 @@ def clean_data(data, countries_file):
 
     # Sanity checks.
     check_that_there_are_as_many_entity_codes_as_entities(data)
-    # Ensure that each element has only one unit.
-    error = "Some elements in the combined dataset have more than one unit."
-    assert data.groupby("element")["unit"].nunique().max() == 1, error
-    error = "Some elements in the combined dataset have more than one description."
-    assert data.groupby("element")["description"].nunique().max() == 1, error
 
     # Harmonize country names.
     assert countries_file.is_file(), "countries file not found."
