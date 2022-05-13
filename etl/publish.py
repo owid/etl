@@ -9,6 +9,7 @@ from typing import Any, Dict, Iterator, Optional, cast
 from collections.abc import Iterable
 from urllib.error import HTTPError
 from pathlib import Path
+import concurrent.futures
 
 import click
 import boto3
@@ -139,36 +140,47 @@ def sync_folder(
         for o in walk_s3(s3, bucket, dest_path)
     }
 
-    for filename in files.walk(local_folder):
-        checksum = files.checksum_file(filename)
-        rel_filename = filename.relative_to(catalog).as_posix()
+    # some datasets like `open_numbers/open_numbers/latest/gapminder__gapminder_world`
+    # have huge number of tables, upload them in parallel
+    futures = []
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        for filename in files.walk(local_folder):
+            checksum = files.checksum_file(filename)
+            rel_filename = filename.relative_to(catalog).as_posix()
 
-        existing_checksum = existing.get(rel_filename)
+            existing_checksum = existing.get(rel_filename)
 
-        if checksum != existing_checksum:
-            print("  PUT", rel_filename)
-            ExtraArgs: Dict[str, Any] = {"Metadata": {"md5": checksum}}
-            if public:
-                ExtraArgs["ACL"] = "public-read"
-            s3.upload_file(
-                filename.as_posix(),
-                bucket,
-                rel_filename,
-                ExtraArgs=ExtraArgs,
-            )
+            if checksum != existing_checksum:
+                print("  PUT", rel_filename)
+                ExtraArgs: Dict[str, Any] = {"Metadata": {"md5": checksum}}
+                if public:
+                    ExtraArgs["ACL"] = "public-read"
+                futures.append(
+                    executor.submit(
+                        s3.upload_file,
+                        filename.as_posix(),
+                        bucket,
+                        rel_filename,
+                        ExtraArgs=ExtraArgs,
+                    )
+                )
 
-        if rel_filename in existing:
-            del existing[rel_filename]
+            if rel_filename in existing:
+                del existing[rel_filename]
 
-    if delete:
-        for rel_filename in existing:
-            print("  DEL", rel_filename)
-            s3.delete_object(Bucket=bucket, Key=rel_filename)
+        if delete:
+            for rel_filename in existing:
+                print("  DEL", rel_filename)
+                futures.append(
+                    executor.submit(s3.delete_object, Bucket=bucket, Key=rel_filename)
+                )
+
+        concurrent.futures.wait(futures)
 
 
 def object_md5(s3: Any, bucket: str, key: str, obj: Dict[str, Any]) -> Optional[str]:
     maybe_md5 = obj["ETag"].strip('"')
-    if re.match("^[0-9a-f]{40}$", maybe_md5):
+    if re.match("^[0-9a-f]{32}$", maybe_md5):
         return cast(str, maybe_md5)
 
     return cast(
