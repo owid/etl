@@ -10,19 +10,21 @@ This is because a new version of the _Food Balances_ dataset was launched in 201
 
 """
 
-import json
+from copy import deepcopy
 from typing import List
 
 import pandas as pd
 from owid import catalog
-from owid.catalog.meta import DatasetMeta
+from owid.catalog.meta import DatasetMeta, TableMeta
 from owid.datautils import geo
 
-from etl.paths import DATA_DIR, BASE_DIR, STEP_DIR
+from etl.paths import DATA_DIR, STEP_DIR
 from etl.scripts.faostat.create_new_steps import find_latest_version_for_step
-from shared import NAMESPACE, VERSION
+from .shared import NAMESPACE, VERSION, FLAGS_RANKING,\
+    create_wide_table_with_metadata_from_long_dataframe
 
-# TODO: Clean up code, which has been imported from the latest notebook.
+# Dataset name.
+DATASET_NAME = f"{NAMESPACE}_fbsc"
 
 # Path to countries mapping file.
 COUNTRIES_FILE = STEP_DIR / "data" / "garden" / NAMESPACE / VERSION / f"{NAMESPACE}.countries.json"
@@ -34,11 +36,12 @@ ITEMS_MAPPING = {
     "Rice (Milled Equivalent)": "Rice and products",
 }
 
-assert COUNTRIES_FILE.is_file()
+# Elements to remove from data.
+# TODO: Check that we do not want to keep FAO population.
+ELEMENTS_TO_REMOVE = ['Total Population - Both sexes']
 
 
 def run(dest_dir: str) -> None:
-
     # Load latest faostat_fbs dataset from meadow.
     fbs_version = find_latest_version_for_step(channel="meadow", step_name="faostat_fbs", namespace=NAMESPACE)
     fbs_file = DATA_DIR / "meadow" / NAMESPACE / fbs_version / "faostat_fbs"
@@ -49,6 +52,12 @@ def run(dest_dir: str) -> None:
     fbsh_file = DATA_DIR / "meadow" / NAMESPACE / fbsh_version / "faostat_fbsh"
     fbsh_dataset = catalog.Dataset(fbsh_file)
 
+    # Sanity checks.
+    error = "Description of fbs and fbsh datasets is different."
+    assert fbsh_dataset.metadata.description == fbs_dataset.metadata.description, error
+    error = "Licenses of fbsh and fbs are different."
+    assert fbsh_dataset.metadata.licenses == fbs_dataset.metadata.licenses, error
+
     # Load latest faostat_metadata from meadow.
     metadata_version = find_latest_version_for_step(channel="meadow", step_name="faostat_metadata", namespace=NAMESPACE)
     metadata_file = DATA_DIR / "meadow" / NAMESPACE / metadata_version / "faostat_metadata"
@@ -58,18 +67,16 @@ def run(dest_dir: str) -> None:
     fbs = pd.DataFrame(fbs_dataset["faostat_fbs"]).reset_index()
     fbsh = pd.DataFrame(fbsh_dataset["faostat_fbsh"]).reset_index()
 
-    # Sanity checks.
-    assert fbsh["year"].min() < fbsh["year"].max()
-    assert fbs["year"].min() < fbs["year"].max()
-
-    if (fbsh["year"].max() >= fbs["year"].min()):
-        print("WARNING: There is overlapping data between fbsh and fbs datasets. Prioritising fbs over fbsh.")
-        fbsh = fbsh[fbsh["year"] < fbs["year"].min()].reset_index(drop=True)    
-
+    # Ensure there is no overlap in data between the two datasets, and that there is no gap 
+    # between them.
+    if fbsh["year"].max() >= fbs["year"].min():
+        print("There is overlapping data between fbsh and fbs datasets. Prioritising fbs over fbsh.")
+        fbsh = fbsh[fbsh["year"] < fbs["year"].min()].reset_index(drop=True)
     if (fbsh["year"].max() + 1) < fbs["year"].min():
         print("WARNING: Data is missing for one or more years between fbsh and fbs datasets.")
 
     # Harmonize country names in both dataframes.
+    assert COUNTRIES_FILE.is_file(), "countries file not found."
     fbs = geo.harmonize_countries(df=fbs, countries_file=COUNTRIES_FILE, country_col="area",
                                   warn_on_unused_countries=False).rename(columns={"area": "country"})
     fbsh = geo.harmonize_countries(df=fbsh, countries_file=COUNTRIES_FILE, country_col="area",
@@ -83,13 +90,14 @@ def run(dest_dir: str) -> None:
     # There are items in fbsh that are not in fbs and vice versa.
     # We manually created a mapping from old to new names (define above).
 
-    # Ensure the elements that are in fbsh but not in fbs are covered in the mapping.
+    # Sanity checks.
+    # Ensure the elements that are in fbsh but not in fbs are covered by ITEMS_MAPPING.
     error = "Mismatch between items in fbsh and fbs. Redefine items mapping."
     assert set(fbsh["item"]) - set(fbs["item"]) == set(ITEMS_MAPPING), error
     assert set(fbs["item"]) - set(fbsh["item"]) == set(ITEMS_MAPPING.values()), error
-
-    # Some elements are found in fbs but not in fbsh. This is understandable, since fbs is more recent and may have
-    # additional elements. However, ensure that there are no elements in fbsh that are not in fbs.
+    # Some elements are found in fbs but not in fbsh. This is understandable, since fbs is
+    # more recent and may have additional elements. However, ensure that there are no 
+    # elements in fbsh that are not in fbs.
     error = "There are elements in fbsh that are not in fbs."
     assert set(fbsh["element"]) < set(fbs["element"]), error
 
@@ -98,13 +106,13 @@ def run(dest_dir: str) -> None:
     fbsh = pd.merge(fbsh, metadata_dataset["meta_fbsh_element"].rename(columns={'unit': 'unit_check'}),
                     on="element", how="left")
     fbs = pd.merge(fbs, metadata_dataset["meta_fbs_element"].rename(columns={'unit': 'unit_check'}),
-                    on="element", how="left")
+                   on="element", how="left")
 
+    # Sanity checks.
     # Check that units of elements in fbsh and in the corresponding metadata coincide.
     error = "Elements in fbsh have different units in dataset and in its corresponding metadata."
     assert (fbsh["unit"] == fbsh["unit_check"]).all(), error
     fbsh = fbsh.drop(columns="unit_check")
-
     # Check that units of elements in fbs and in the corresponding metadata coincide.
     error = "Elements in fbs have different units in dataset and in its corresponding metadata."
     assert (fbs["unit"] == fbs["unit_check"]).all(), error
@@ -116,203 +124,87 @@ def run(dest_dir: str) -> None:
     # Map old item names to new item names.
     fbsc["item"] = fbsc["item"].replace(ITEMS_MAPPING)
 
+    # Remove unnecessary elements
+    fbsc = fbsc[~fbsc["element"].isin(ELEMENTS_TO_REMOVE)].reset_index(drop=True)
+
+    ####################################################################################################################
+    # TODO: Remove this temporary solution once grapher accepts mapping of all countries.
+    fbsc = fbsc[~fbsc["country"].str.endswith("(FAO)")].reset_index(drop=True)
+    ####################################################################################################################
+
+    # Sanity checks.
     # Ensure that each element has only one unit.
     error = "Some elements in the combined dataset have more than one unit."
     assert fbsc.groupby("element")["unit"].nunique().max() == 1, error
-
     # Ensure that each element has only one unit.
     error = "Some elements in the combined dataset have more than one unit."
     assert fbsc.groupby("element")["description"].nunique().max() == 1, error
+    error = "Some elements in the combined dataset have more than one description."
+    assert fbsc.groupby("element")["description"].nunique().max() == 1, error
 
-    # TODO: Continue here. Deal with duplicated data.
+    # Sanity checks.
+    def _check_that_flag_definitions_agree_with_those_in_metadata(dataset_name: str) -> None:
+        flag_df = metadata_dataset[f"meta_{dataset_name}_flag"].reset_index()
+        flag_df["flag"] = flag_df["flag"].astype(str)
+        flag_df["flags"] = flag_df["flags"].astype(str)
+        comparison = pd.merge(FLAGS_RANKING, flag_df, on="flag", how="inner")
+        error = f"Flag definitions in {dataset_name} are different to those in our flag ranking. Redefine flag ranking."
+        assert (comparison["description"] == comparison["flags"]).all(), error
+    _check_that_flag_definitions_agree_with_those_in_metadata(dataset_name="fbsh")
+    _check_that_flag_definitions_agree_with_those_in_metadata(dataset_name="fbs")
 
-    warning = "WARNING: Some elements in the combined dataset have more than one description."
-    assert fbsc.groupby("element")["description"].nunique().max() == 1, warning
+    # Check that all flags in the dataset are included in the flags ranking.
+    error = "Flags in dataset not found in FLAGS_RANKING. Manually add those flags."
+    assert set(fbsc['flag']) < set(FLAGS_RANKING["flag"]), error
 
-    ####################################################################################################################
-    # Flag
-    # Next, we compare which flags appear in each dataset. We observe that some flags only appear in one of the
-    # datasets. This is fine.
-    # In particular:
-    # - `Im` (Imputed) ist most common in new dataset, whereas `S` (Standardized data) was in the old one.
-    # - `Im` (Imputed) and `*` (Unofficial) appear first in new FBS.
-    # - `nan` (Official data), `SD` (Statistical Discrepancy) and `F` (FAO estimate) appear only in old FBSH.
-    # Get unique codes
-    codes_fbs = set(fbs_bulk.index.get_level_values("flag"))
-    codes_fbsh = set(fbsh_bulk.index.get_level_values("flag"))
-    # Find missing codes
-    miss_in_fbs = codes_fbsh.difference(codes_fbs)
-    miss_in_fbsh = codes_fbs.difference(codes_fbsh)
-    # print("- FBSH but not FBS:", miss_in_fbs)
-    # print("- FBS but not FBSH:", miss_in_fbsh)
-    # pd.value_counts(fbsh_bulk.index.get_level_values("flag").fillna("nan"))
-    # pd.value_counts(fbs_bulk.index.get_level_values("flag").fillna("nan"))
+    # Add flag ranking to dataset.
+    fbsc = pd.merge(fbsc, FLAGS_RANKING[["flag", "ranking"]], on="flag", how="left")
 
-    ####################################################################################################################
-    # Merge dataset
-    # The moment has arrived. Now we attempt to merge both FBS and FBSH datasets into one: FBSC dataset. For this, we
-    # will be merging several files:
-    # - **bulk file**: The data itself.
-    # - **item file**: The file containing the mapping from item code to item name.
-    # - **element file**: The file containing the mapping from element to element name and unit.
-    #
-    # In addition, we will transition from `Area Code ---> Country`.
+    # Number of ambiguous indices (those that have multiple data values).
+    index_columns = ["country", "year", "item", "element", "unit"]
+    n_ambiguous_indices = len(fbsc[fbsc.duplicated(subset=index_columns, keep="first")])
+    if n_ambiguous_indices > 0:
+        # Number of ambiguous indices that cannot be solved using flags.
+        n_ambiguous_indices_unsolvable = len(fbsc[
+            fbsc.duplicated(subset=index_columns + ["ranking"], keep="first")])
+        # Remove ambiguous indices (those that have multiple data values).
+        # When possible, use flags to prioritise among duplicates.
+        fbsc = fbsc.sort_values(index_columns + ['ranking']).drop_duplicates(
+            subset=index_columns, keep="first")
+        frac_ambiguous = n_ambiguous_indices / len(fbsc)
+        frac_ambiguous_solved_by_flags = 1 - (n_ambiguous_indices_unsolvable / n_ambiguous_indices)
+        print(f"Removing {n_ambiguous_indices} ambiguous indices ({frac_ambiguous: .2%}).")
+        print(f"{frac_ambiguous_solved_by_flags: .2%} of ambiguities were solved with flags.")
 
-    # Area
-    # In this step, we standardise the country names. We first go from `Area Code` to `Area` (country name as per the
-    # FAO), and then `Area` to `Country`, using our country standardisation file.
-    # Load our country standardisation file
-    with open(COUNTRY_MAPPING) as f:
-        country_mapping = json.load(f)
-    # Merge both datasets Area Code -> Area mapping dataframe
-    fbsc_area = pd.concat([fbs_area, fbsh_area]).drop_duplicates(subset=["country"])
-    # fbsc_area[fbsc_area.country.apply(lambda x: "sudan" in x.lower())]
-    # Check which countries will be discarded based on our country standardisation file (those without a mapped
-    # standardised name)
-    msk = fbsc_area.country.isin(country_mapping)
-    # print(fbsc_area.loc[-msk, "country"].tolist())
-    # Finally, we build the `Area Code ---> Country` mapping dictionary.
-    map_area = (
-        fbsc_area.loc[msk, "country"].replace(country_mapping).sort_index().to_dict()
+    # Initialize new garden dataset.
+    fbsc_dataset = catalog.Dataset.create_empty(dest_dir)
+
+    # Define metadata for new fbsc garden dataset.
+    fbsc_sources = deepcopy(fbs_dataset.metadata.sources[0])
+    fbsc_sources.source_data_url = None
+    fbsc_sources.owid_data_url = None
+    fbsc_dataset.metadata = DatasetMeta(
+        namespace=NAMESPACE,
+        short_name=DATASET_NAME,
+        title=f"Food Balances (old methodology from {fbsh['year'].min()} to {fbsh['year'].max()}, and new methodology "
+              f"from {fbs['year'].min()} to {fbs['year'].max()}).",
+        # Take description from any of the datasets (since they should be identical).
+        description=fbs_dataset.metadata.description,
+        # For sources and licenses, assume those of fbs.
+        sources=fbs_dataset.metadata.sources,
+        licenses=fbs_dataset.metadata.licenses,
     )
+    # Create new dataset in garden.
+    fbsc_dataset.save()
 
-    # Item
-    # Merging the item dataframe is straight forward. There are some exceptions, which we accept, due to the renaming
-    # of items such as Groundnuts and Rice.
-    fbsc_item = pd.concat([fbs_item, fbsh_item]).drop_duplicates(
-        subset=["item_group", "item"]
+    # Create wide table from long dataframe.
+    table_metadata = TableMeta(
+        short_name=DATASET_NAME,
+        primary_key=["country", "year"],
     )
-    # Check differences are as expected
-    a = fbs_item.index
-    b = fbsh_item.index
-    c = fbsc_item.index
-    assert not {cc for cc in c if cc not in a}.difference(
-        {
-            (2905, 2805),
-            (2901, 2805),
-            (2903, 2805),
-            (2901, 2556),
-            (2913, 2556),
-            (2903, 2556),
-            (2960, 2769),
-        }
-    )
-    assert not {cc for cc in c if cc not in b}.difference(
-        {
-            (2905, 2807),
-            (2901, 2807),
-            (2903, 2807),
-            (2901, 2552),
-            (2913, 2552),
-            (2903, 2552),
-            (2961, 2769),
-        }
-    )
-    # fbsh_item.loc[2960, 2769]
-    # fbs_item.loc[2961, 2769]
-    fbsc_item = fbsc_item[["item_group", "item"]]
+    fbsc_table = create_wide_table_with_metadata_from_long_dataframe(
+        data_long=fbsc, table_metadata=table_metadata)
+    # Add table to dataset.
+    fbsc_dataset.add(fbsc_table)
 
-    # Element
-    # We merge element and unit dataframes, in order to obtain all the info in one. Next, we combine both FBS and FBSH
-    # datasets.
-    # Load unit table
-    fbs_unit = metadata["meta_fbs_unit"]
-    fbsh_unit = metadata["meta_fbsh_unit"]
-    # Merge element and unit
-    fbs_element_unit = fbs_element.merge(
-        fbs_unit.rename(columns={"description": "unit_description"}),
-        left_on="unit",
-        right_index=True,
-    )
-    assert fbs_element_unit.shape[0] == fbs_element.shape[0]
-    fbsh_element_unit = fbsh_element.merge(
-        fbsh_unit.rename(columns={"description": "unit_description"}),
-        left_on="unit",
-        right_index=True,
-    )
-    assert fbsh_element_unit.shape[0] == fbsh_element.shape[0]
-
-    # Merge
-    fbsc_element_unit = pd.concat(
-        [fbs_element_unit, fbsh_element_unit]
-    ).drop_duplicates(subset=["element", "unit", "unit_description"])
-    assert fbsc_element_unit.shape == fbsh_element_unit.shape == fbs_element_unit.shape
-
-    # Bulk
-    # Time to merge the core of the dataset, the bulk file! We do this by:
-    # - Concatenating both datasets
-    # - Renaming `Area Code --> Country`
-    # - Drop unused columns (`Unit`, `Area Code`)
-    # - Drop data related to population (`2501`) item.
-    # - Add `variable_name` column, with some more verbosity about each row info.
-    fbsc_bulk = pd.concat([fbs_bulk, fbsh_bulk])
-    # Filter countries + Area Code -> Country
-    col_map = {"area_code": "country"}
-    index_new = [col_map.get(x, x) for x in fbsc_bulk.index.names]
-    fbsc_bulk = fbsc_bulk.loc[map_area].reset_index()
-    fbsc_bulk[col_map["area_code"]] = fbsc_bulk["area_code"].replace(map_area).tolist()
-    fbsc_bulk = fbsc_bulk.set_index(index_new)
-    # Drop Unit, Area Code
-    fbsc_bulk = fbsc_bulk.drop(columns=["unit", "area_code"])
-    # Drop population (2501) item
-    msk = fbsc_bulk.index.get_level_values("item_code").isin([2501])
-    fbsc_bulk = fbsc_bulk[~msk]
-
-    # Variable name
-    # Variable name is built using the name of the item, element and unit: `item - element - [unit]`
-    # Get item names
-    fbsc_item_ = build_item_all_df(fbsc_item)
-    map_items = fbsc_item_.astype(str)["name"].to_dict()  # type: ignore
-    item_names = [map_items[i] for i in fbsc_bulk.index.get_level_values("item_code")]  # type: ignore
-    # Get Element + Unit names
-    x = fbsc_element_unit.reset_index()
-    y = list(x["element"].astype(str) + " [" + x["unit"].astype(str) + "]")
-    map_elems = dict(zip(x["element_code"], y))
-    elem_names = [map_elems[el] for el in fbsc_bulk.index.get_level_values(2)]
-    # Construct variable name
-    variable_names = [f"{i} - {e}" for i, e in zip(item_names, elem_names)]
-    # Add variable name to index
-    fbsc_bulk["variable_name"] = variable_names
-    fbsc_bulk = fbsc_bulk.reset_index()
-    fbsc_bulk = fbsc_bulk.set_index(
-        ["country", "item_code", "element_code", "variable_name", "year", "flag"]
-    )
-    # fbsc_bulk.head()
-
-    ####################################################################################################################
-    # Create Garden dataset
-
-    # Metadata
-    # First, we create the metadata for this new dataset FBSC. Most of its content comes from concatenating FBS and
-    # FBSH fields. Checksum field is left to `None`, as it is unclear what we should use here (TODO).
-    # Check description field in FBS and FBSH
-    assert fbsh_meadow.metadata.description == fbs_meadow.metadata.description
-    # Define metadata
-    metadata = DatasetMeta(
-        namespace="faostat",
-        short_name="faostat_fbsc",
-        title="Food Balance: Food Balances (-2013 old methodology and 2014-) - FAO (2017, 2021)",
-        description=fbsh_meadow.metadata.description,
-        sources=fbsh_meadow.metadata.sources + fbs_meadow.metadata.sources,
-        licenses=fbsh_meadow.metadata.licenses + fbs_meadow.metadata.licenses,
-    )
-    # Create dataset and add tables
-    # Finally, we add the tables to the dataset.
-    fbsc_garden = catalog.Dataset.create_empty(dest_dir)
-    # Propagate metadata
-    fbsc_garden.metadata = metadata
-    fbsc_garden.save()
-    # Add bulk table
-    fbsc_bulk.metadata.short_name = "bulk"
-    fbsc_garden.add(fbsc_bulk)
-    # Add table items
-    fbsc_item.metadata.short_name = "meta_item"
-    fbsc_garden.add(fbsc_item)
-    # Add table elements
-    fbsc_element_unit.metadata = fbs_element.metadata
-    fbsc_element_unit.metadata.description = (
-        "List of elements, with their units and the respective descriptions of "
-        "both. It also includes the element codes."
-    )
-    fbsc_garden.add(fbsc_element_unit)
-    fbsc_garden.save()
+    # TODO: Check why tables for items and elements were added in previous version.

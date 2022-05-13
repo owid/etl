@@ -1,4 +1,16 @@
-"""FAO Land Use (2021).
+"""Common processing of FAOSTAT datasets.
+
+We have created a manual ranking of FAOSTAT flags. These flags are only used when there is ambiguity in the data,
+namely, when there is more than one data value for a certain country-year-item-element-unit.
+NOTES:
+* We check that the definitions in our manual ranking agree with the ones provided by FAOSTAT.
+* We do not include all flags: We include only the ones that solve an ambiguity in a particular case,
+  and add more flags as we see need.
+* We have found at least one flag that appeared in a dataset, but was not included in the additional metadata
+  (namely flag "R", found in qcl dataset).
+  This flag was added manually, using the definition in List / Flags in:
+  https://www.fao.org/faostat/en/#definitions
+* Unfortunately, flags do not remove all ambiguities: remaining duplicates are dropped without any meaningful criterion.
 
 """
 
@@ -14,6 +26,11 @@ from owid.datautils import geo
 from etl.paths import DATA_DIR, STEP_DIR
 
 
+NAMESPACE = Path(__file__).parent.parent.name
+VERSION = Path(__file__).parent.name
+
+# Regions to add to the data.
+# TODO: Add region aggregates to relevant columns.
 REGIONS_TO_ADD = [
     "North America",
     "South America",
@@ -27,19 +44,6 @@ REGIONS_TO_ADD = [
     "Lower-middle-income countries",
     "High-income countries",
 ]
-
-# We have created a manual ranking of FAOSTAT flags.
-# These flags are only used when there is ambiguity in the data.
-# This means that a certain country-year has more than one data point with different flags.
-# NOTES:
-# * We check that the definitions in our manual ranking agree with the ones provided by FAOSTAT.
-# * We do not include all flags: We include only the ones that solve an ambiguity in a particular case,
-#   and add more flags as we see need.
-# * We have found at least one flag that appeard in a dataset, but was not included in the additional metadata
-#   (namely flag "R", found in qcl dataset).
-#   This flag was added manually, using the definition in List / Flags in:
-#   https://www.fao.org/faostat/en/#definitions
-
 
 # Rank flags by priority (where lowest index is highest priority).
 # TODO: Discuss this flag ranking with others (they are quite arbitrary at the moment).
@@ -163,11 +167,6 @@ def run(dest_dir: str) -> None:
                 f"of unique {entity}s. Consider ignoring '{entity}' column, and instead mapping '{entity}_code' "
                 f"using the {entity} from metadata."
             )
-    # Check problematic rows:
-    # cols_to_check = ['area_code', 'country', 'area']
-    # df_to_check = data[data['country'] != data['area']].drop_duplicates(subset=cols_to_check)[cols_to_check]
-    # Create a dictionary that maps FAO area codes to FAO country names:
-    # areas_mapping = metadata[f"meta_{DATASET_CODE}_area"][['country']].to_dict("dict")['country']
 
     # Add flag ranking to data.
     data = pd.merge(
@@ -285,65 +284,86 @@ def run(dest_dir: str) -> None:
     data = data[~data["country"].str.endswith("(FAO)")].reset_index(drop=True)
     ####################################################################################################################
 
-    # Combine item, element and unit into one column.
-    data["title"] = (
-        data["item"].astype(str)
-        + " - "
-        + data["element"].astype(str)
-        + " ("
-        + data["unit"].astype(str)
-        + ")"
-    )
+    # Create new table for garden dataset (use metadata from original meadow table).
+    data_table_garden = create_wide_table_with_metadata_from_long_dataframe(
+        data_long=data, table_metadata=data_table_meadow.metadata)
 
-    # Keep a dataframe of just units (which will be required later on).
-    units = data.pivot(index=["country", "year"], columns=["title"], values="unit")
-
-    # This will create a table with just one column and country-year as index.
-    data = data.pivot(index=["country", "year"], columns=["title"], values="value")
-
-    # Remove columns that only have nans, and raise warning.
-    columns_of_nans = data.columns[data.isnull().all(axis=0)]
-    if len(columns_of_nans) > 0:
-        print("WARNING: Removing columns that have only nans:")
-        print(_create_warning_list(columns_of_nans))
-        data = data.drop(columns=columns_of_nans)
-
-    # Sort data columns and rows conveniently.
-    data = data[sorted(data.columns)]
-    data = data.sort_index(level=["country", "year"])
-
-    # TODO: Run more sanity checks on the new dataset.
+    # TODO: Run more sanity checks on the new wide data.
 
     # Initialize new garden dataset.
     dataset_garden = catalog.Dataset.create_empty(dest_dir)
     # Keep original dataset's metadata from meadow.
     dataset_garden.metadata = deepcopy(dataset_meadow.metadata)
-
-    # Create new table for garden dataset.
-    data_table_garden = catalog.Table(data).copy()
-
-    for column in data_table_garden.columns:
-        variable_units = units[column].dropna().unique()
-        assert len(variable_units) == 1, f"Variable {column} has ambiguous units."
-        unit = variable_units[0]
-        # By construction, I added the unit in parenthesis at the end of the title.
-        # matches = re.findall(r"\((.*)\)", column)
-        # unit = matches[-1]
-        title = column.replace(f" ({unit})", "")
-
-        # Add title and unit to each column in the table.
-        data_table_garden[column].metadata.title = title
-        data_table_garden[column].metadata.unit = unit
-
-    # Make all column names snake_case.
-    data_table_garden = catalog.utils.underscore_table(data_table_garden)
-
-    # Use the same table metadata as from original meadow table, but update index.
-    data_table_garden.metadata = deepcopy(data_table_meadow.metadata)
-    data_table_garden.metadata.primary_key = ["country", "year"]
-    # TODO: Check why in food_explorer, _fields are also added to the table.
-    # data_table_garden._fields = fields
     # Create new dataset in garden.
     dataset_garden.save()
     # Add table to dataset.
     dataset_garden.add(data_table_garden)
+
+
+def remove_columns_that_only_have_nans(data, verbose=True):
+    """TODO"""
+    data = data.copy()
+    # Remove columns that only have nans.
+    columns_of_nans = data.columns[data.isnull().all(axis=0)]
+    if len(columns_of_nans) > 0:
+        if verbose:
+            print(f"Removing {len(columns_of_nans)} columns "
+                  f"({len(columns_of_nans) / len(data.columns): .2%}) that have only nans.")
+        # print(_create_warning_list(columns_of_nans))
+        data = data.drop(columns=columns_of_nans)
+
+    return data
+
+
+def create_wide_table_with_metadata_from_long_dataframe(data_long, table_metadata):
+    """TODO"""
+    data_long = data_long.copy()
+    table_metadata = deepcopy(table_metadata)
+
+    # Combine item, element and unit into one column.
+    data_long["title"] = (
+        data_long["item"].astype(str)
+        + " - "
+        + data_long["element"].astype(str)
+        + " ("
+        + data_long["unit"].astype(str)
+        + ")"
+    )
+
+    # Keep a dataframe of just units (which will be required later on).
+    units = data_long.pivot(index=["country", "year"], columns=["title"], values="unit")
+
+    # This will create a table with just one column and country-year as index.
+    data = data_long.pivot(index=["country", "year"], columns=["title"], values="value")
+
+    # Remove columns that only have nans.
+    data = remove_columns_that_only_have_nans(data)
+
+    # Sort data columns and rows conveniently.
+    data = data[sorted(data.columns)]
+    data = data.sort_index(level=["country", "year"])
+
+    # Create new table for garden dataset.
+    wide_table = catalog.Table(data).copy()
+    for column in wide_table.columns:
+        variable_units = units[column].dropna().unique()
+        assert len(variable_units) == 1, f"Variable {column} has ambiguous units."
+        unit = variable_units[0]
+        # Remove unit from title (only last occurrence of the unit).
+        title = " ".join(column.rsplit(f" ({unit})", 1)).strip()
+
+        # Add title and unit to each column in the table.
+        wide_table[column].metadata.title = title
+        wide_table[column].metadata.unit = unit
+
+    # Make all column names snake_case.
+    wide_table = catalog.utils.underscore_table(wide_table)
+
+    # Use the same table metadata as from original meadow table, but update index.
+    wide_table.metadata = deepcopy(table_metadata)
+    wide_table.metadata.primary_key = ["country", "year"]
+
+    # TODO: Check why in food_explorer, _fields are also added to the table.
+    # data_table_garden._fields = fields
+
+    return wide_table
