@@ -86,9 +86,15 @@ FLAGS_RANKING = (
             ("Bk", "Break in series"),
             ("NV", "Data not available"),
             ("FC", "Calculated data"),
-            ('Z', 'When the Fertilizer Utilization Account (FUA) does not balance due to utilization from stockpiles, apparent consumption has been set to zero'),
-            ('P', 'Provisional official data'),
-            ('W', 'Data reported on country official publications or web sites (Official) or trade country files'),
+            (
+                "Z",
+                "When the Fertilizer Utilization Account (FUA) does not balance due to utilization from stockpiles, apparent consumption has been set to zero",
+            ),
+            ("P", "Provisional official data"),
+            (
+                "W",
+                "Data reported on country official publications or web sites (Official) or trade country files",
+            ),
             ("B", "Unknown flag"),
             ("w", "Unknown flag"),
         ],
@@ -98,7 +104,9 @@ FLAGS_RANKING = (
 )
 
 
-def check_that_flag_definitions_in_dataset_agree_with_those_in_flags_ranking(additional_metadata):
+def check_that_flag_definitions_in_dataset_agree_with_those_in_flags_ranking(
+    additional_metadata: catalog.Dataset,
+) -> None:
     """TODO"""
     for table_name in additional_metadata.table_names:
         if "flag" in table_name:
@@ -113,10 +121,14 @@ def check_that_flag_definitions_in_dataset_agree_with_those_in_flags_ranking(add
             ).all(), error_message
 
 
-def check_that_all_flags_in_dataset_are_in_ranking(data, additional_metadata_for_flags, country_col="area"):
+def check_that_all_flags_in_dataset_are_in_ranking(
+    data: pd.DataFrame,
+    additional_metadata_for_flags: catalog.Table,
+    country_col: str = "area",
+) -> None:
     """TODO"""
-    if not set(data['flag']) < set(FLAGS_RANKING["flag"]):
-        missing_flags = set(data['flag']) - set(FLAGS_RANKING['flag'])
+    if not set(data["flag"]) < set(FLAGS_RANKING["flag"]):
+        missing_flags = set(data["flag"]) - set(FLAGS_RANKING["flag"])
         # missing_flags = list(
         #     set(
         #         data[data.duplicated(subset=[country_col, "year", "item", "element"])][
@@ -141,10 +153,12 @@ def check_that_all_flags_in_dataset_are_in_ranking(data, additional_metadata_for
                 f"Not all flags ({missing_flags}) are defined in additional metadata. Get their definition from "
                 f"https://www.fao.org/faostat/en/#definitions"
             )
-        raise AssertionError("Flags in dataset not found in FLAGS_RANKING. Manually add those flags.")
+        raise AssertionError(
+            "Flags in dataset not found in FLAGS_RANKING. Manually add those flags."
+        )
 
 
-def check_that_there_are_as_many_entity_codes_as_entities(data):
+def check_that_there_are_as_many_entity_codes_as_entities(data: pd.DataFrame) -> None:
     """TODO"""
     # Check that there are as many codes for area, element and unit and actual areas, elements and units.
     for entity in ["area", "element", "item"]:
@@ -156,7 +170,9 @@ def check_that_there_are_as_many_entity_codes_as_entities(data):
             )
 
 
-def remove_rows_with_nan_value(data, verbose=True):
+def remove_rows_with_nan_value(
+    data: pd.DataFrame, verbose: bool = True
+) -> pd.DataFrame:
     """TODO"""
     data = data.copy()
     # Number of rows with a nan in column "value".
@@ -164,28 +180,36 @@ def remove_rows_with_nan_value(data, verbose=True):
     n_rows_with_nan_value = len(data[data["value"].isnull()])
     if n_rows_with_nan_value > 0:
         if verbose:
-            print(f"Removing {n_rows_with_nan_value} rows ({n_rows_with_nan_value / len(data): .2%}) "
-                  f"with nan in column 'value'.")
+            print(
+                f"Removing {n_rows_with_nan_value} rows ({n_rows_with_nan_value / len(data): .2%}) "
+                f"with nan in column 'value'."
+            )
         data = data.dropna(subset="value").reset_index(drop=True)
 
     return data
 
 
-def remove_columns_that_only_have_nans(data, verbose=True):
+def remove_columns_that_only_have_nans(
+    data: pd.DataFrame, verbose: bool = True
+) -> pd.DataFrame:
     """TODO"""
     data = data.copy()
     # Remove columns that only have nans.
     columns_of_nans = data.columns[data.isnull().all(axis=0)]
     if len(columns_of_nans) > 0:
         if verbose:
-            print(f"Removing {len(columns_of_nans)} columns ({len(columns_of_nans) / len(data.columns): .2%}) "
-                  f"that have only nans.")
+            print(
+                f"Removing {len(columns_of_nans)} columns ({len(columns_of_nans) / len(data.columns): .2%}) "
+                f"that have only nans."
+            )
         data = data.drop(columns=columns_of_nans)
 
     return data
 
 
-def create_wide_table_with_metadata_from_long_dataframe(data_long, table_metadata):
+def create_wide_table_with_metadata_from_long_dataframe(
+    data_long: pd.DataFrame, table_metadata: catalog.Table
+) -> catalog.Table:
     """TODO"""
     data_long = data_long.copy()
     table_metadata = deepcopy(table_metadata)
@@ -239,36 +263,48 @@ def create_wide_table_with_metadata_from_long_dataframe(data_long, table_metadat
     return wide_table
 
 
-def remove_duplicates(data):
+def remove_duplicates(data: pd.DataFrame) -> pd.DataFrame:
     """TODO"""
     data = data.copy()
 
     # Add flag ranking to dataset.
-    data = pd.merge(data, FLAGS_RANKING[["flag", "ranking"]].rename(columns={"ranking": "flag_ranking"}),
-                    on="flag", how="left")
+    data = pd.merge(
+        data,
+        FLAGS_RANKING[["flag", "ranking"]].rename(columns={"ranking": "flag_ranking"}),
+        on="flag",
+        how="left",
+    )
 
     # Number of ambiguous indices (those that have multiple data values).
     index_columns = ["country", "year", "item", "element", "unit"]
     n_ambiguous_indices = len(data[data.duplicated(subset=index_columns, keep="first")])
     if n_ambiguous_indices > 0:
         # Number of ambiguous indices that cannot be solved using flags.
-        n_ambiguous_indices_unsolvable = len(data[
-            data.duplicated(subset=index_columns + ["flag_ranking"], keep="first")])
+        n_ambiguous_indices_unsolvable = len(
+            data[data.duplicated(subset=index_columns + ["flag_ranking"], keep="first")]
+        )
         # Remove ambiguous indices (those that have multiple data values).
         # When possible, use flags to prioritise among duplicates.
-        data = data.sort_values(index_columns + ['flag_ranking']).drop_duplicates(
-            subset=index_columns, keep="first")
+        data = data.sort_values(index_columns + ["flag_ranking"]).drop_duplicates(
+            subset=index_columns, keep="first"
+        )
         frac_ambiguous = n_ambiguous_indices / len(data)
-        frac_ambiguous_solved_by_flags = 1 - (n_ambiguous_indices_unsolvable / n_ambiguous_indices)
-        print(f"Removing {n_ambiguous_indices} ambiguous indices ({frac_ambiguous: .2%}).")
-        print(f"{frac_ambiguous_solved_by_flags: .2%} of ambiguities were solved with flags.")
+        frac_ambiguous_solved_by_flags = 1 - (
+            n_ambiguous_indices_unsolvable / n_ambiguous_indices
+        )
+        print(
+            f"Removing {n_ambiguous_indices} ambiguous indices ({frac_ambiguous: .2%})."
+        )
+        print(
+            f"{frac_ambiguous_solved_by_flags: .2%} of ambiguities were solved with flags."
+        )
 
     data = data.drop(columns=["flag_ranking"])
 
     return data
 
 
-def clean_data(data, countries_file):
+def clean_data(data: pd.DataFrame, countries_file: Path) -> pd.DataFrame:
     data = data.copy()
 
     # Remove rows with nan value.
@@ -285,7 +321,7 @@ def clean_data(data, countries_file):
     assert countries_file.is_file(), "countries file not found."
     data = geo.harmonize_countries(
         df=data,
-        countries_file=countries_file,
+        countries_file=str(countries_file),
         country_col="area",
         warn_on_unused_countries=False,
     ).rename(columns={"area": "country"})
@@ -308,15 +344,15 @@ def clean_data(data, countries_file):
     try:
         data["year"] = data["year"].astype(int)
     except ValueError:
-        print(f"WARNING: Dataset may have years defined by intervals. Map them to a year.")
+        print(
+            "WARNING: Dataset may have years defined by intervals. Map them to a year."
+        )
 
     # Remove duplicated data points keeping the one with lowest ranking (i.e. highest priority).
     data = remove_duplicates(data)
 
     # We can now remove entity codes and flags.
-    data = data.drop(
-        columns=["area_code", "element_code", "item_code", "flag"]
-    )
+    data = data.drop(columns=["area_code", "element_code", "item_code", "flag"])
 
     return data
 
@@ -351,7 +387,9 @@ def run(dest_dir: str) -> None:
     additional_metadata = catalog.Dataset(additional_metadata_dir)
 
     # Sanity checks.
-    check_that_flag_definitions_in_dataset_agree_with_those_in_flags_ranking(additional_metadata)
+    check_that_flag_definitions_in_dataset_agree_with_those_in_flags_ranking(
+        additional_metadata
+    )
 
     # Load meadow dataset and keep its metadata.
     dataset_meadow = catalog.Dataset(meadow_data_dir)
@@ -361,7 +399,9 @@ def run(dest_dir: str) -> None:
     data = pd.DataFrame(data_table_meadow).reset_index()
 
     # Sanity checks.
-    check_that_all_flags_in_dataset_are_in_ranking(data, additional_metadata[f"meta_{dataset_code}_flag"])
+    check_that_all_flags_in_dataset_are_in_ranking(
+        data, additional_metadata[f"meta_{dataset_code}_flag"]
+    )
 
     ####################################################################################################################
     # Process data.
@@ -371,7 +411,8 @@ def run(dest_dir: str) -> None:
 
     # Create new table for garden dataset (use metadata from original meadow table).
     data_table_garden = create_wide_table_with_metadata_from_long_dataframe(
-        data_long=data, table_metadata=data_table_meadow.metadata)
+        data_long=data, table_metadata=data_table_meadow.metadata
+    )
 
     # TODO: Run more sanity checks on the new wide data.
 

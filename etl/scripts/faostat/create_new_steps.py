@@ -514,7 +514,7 @@ def create_updated_dependency_graph(
     step_names: List[str],
     namespace: str = NAMESPACE,
     new_version: str = NEW_VERSION,
-    additional_dependencies: Optional[Dict[str, List[str]]] = None,
+    additional_dependencies: Optional[Dict[str, List[Tuple[str, str]]]] = None,
 ) -> Dict[str, Set[str]]:
     """Create additional part of the graph that will need be added to the dag to update it.
 
@@ -607,10 +607,19 @@ def create_updated_dependency_graph(
                 for additional_dependency in additional_dependencies[channel]:
                     dependency_channel, dependency_step = additional_dependency
                     dependency_version = find_latest_version_for_step(
-                        channel=dependency_channel, step_name=dependency_step, namespace=namespace)
-                    new_dependencies.append(create_dag_line_name(
-                        channel=dependency_channel, step_name=dependency_step, namespace=namespace,
-                        version=dependency_version))
+                        channel=dependency_channel,
+                        step_name=dependency_step,
+                        namespace=namespace,
+                    )
+                    if dependency_version is not None:
+                        new_dependencies.append(
+                            create_dag_line_name(
+                                channel=dependency_channel,
+                                step_name=dependency_step,
+                                namespace=namespace,
+                                version=dependency_version,
+                            )
+                        )
 
             # Collect the new dag line and its dependencies, that will later be added to the updated dag.
             new_steps[new_step_name] = set(new_dependencies)
@@ -685,7 +694,9 @@ def main(channel: str, include_all_datasets: bool = False) -> None:
 
         # Generate dictionary of new step dependencies.
         dag_steps = create_updated_dependency_graph(
-            channel=channel, step_names=step_names, additional_dependencies=ADDITIONAL_DEPENDENCIES
+            channel=channel,
+            step_names=step_names,
+            additional_dependencies=ADDITIONAL_DEPENDENCIES,
         )
 
         # Update dag file with new dependencies.

@@ -19,9 +19,12 @@ from owid.catalog.meta import DatasetMeta, TableMeta
 from etl.paths import DATA_DIR, STEP_DIR
 from etl.scripts.faostat.create_new_steps import find_latest_version_for_step
 from .shared import (
-    NAMESPACE, VERSION, create_wide_table_with_metadata_from_long_dataframe,
+    NAMESPACE,
+    VERSION,
+    create_wide_table_with_metadata_from_long_dataframe,
     check_that_flag_definitions_in_dataset_agree_with_those_in_flags_ranking,
-    check_that_all_flags_in_dataset_are_in_ranking, clean_data
+    check_that_all_flags_in_dataset_are_in_ranking,
+    clean_data,
 )
 
 # Dataset name.
@@ -32,7 +35,9 @@ FBS_FIRST_YEAR = 2010
 DATASET_TITLE = f"Food Balances (old methodology before {FBS_FIRST_YEAR}, and new from {FBS_FIRST_YEAR} onwards)."
 
 # Path to countries mapping file.
-COUNTRIES_FILE = STEP_DIR / "data" / "garden" / NAMESPACE / VERSION / f"{NAMESPACE}.countries.json"
+COUNTRIES_FILE = (
+    STEP_DIR / "data" / "garden" / NAMESPACE / VERSION / f"{NAMESPACE}.countries.json"
+)
 
 # Some items seem to have been renamed from fbsh to fbs. Ensure the old names are mapped to the new ones.
 # TODO: Check that this mapping makes sense.
@@ -43,10 +48,14 @@ ITEMS_MAPPING = {
 
 # Elements to remove from data.
 # TODO: Check that we do not want to keep FAO population.
-ELEMENTS_TO_REMOVE = ['Total Population - Both sexes']
+ELEMENTS_TO_REMOVE = ["Total Population - Both sexes"]
 
 
-def combine_fbsh_and_fbs_datasets(fbsh_dataset, fbs_dataset, additional_metadata):
+def combine_fbsh_and_fbs_datasets(
+    fbsh_dataset: catalog.Dataset,
+    fbs_dataset: catalog.Dataset,
+    additional_metadata: catalog.Dataset,
+) -> pd.DataFrame:
     # Sanity checks.
     error = "Description of fbs and fbsh datasets is different."
     assert fbsh_dataset.metadata.description == fbs_dataset.metadata.description, error
@@ -58,12 +67,18 @@ def combine_fbsh_and_fbs_datasets(fbsh_dataset, fbs_dataset, additional_metadata
     fbsh = pd.DataFrame(fbsh_dataset["faostat_fbsh"]).reset_index()
 
     # Ensure there is no overlap in data between the two datasets, and that there is no gap between them.
-    assert fbs["year"].min() == FBS_FIRST_YEAR, f"First year of fbs dataset is not {FBS_FIRST_YEAR}"
+    assert (
+        fbs["year"].min() == FBS_FIRST_YEAR
+    ), f"First year of fbs dataset is not {FBS_FIRST_YEAR}"
     if fbsh["year"].max() >= fbs["year"].min():
-        print("There is overlapping data between fbsh and fbs datasets. Prioritising fbs over fbsh.")
+        print(
+            "There is overlapping data between fbsh and fbs datasets. Prioritising fbs over fbsh."
+        )
         fbsh = fbsh[fbsh["year"] < fbs["year"].min()].reset_index(drop=True)
     if (fbsh["year"].max() + 1) < fbs["year"].min():
-        print("WARNING: Data is missing for one or more years between fbsh and fbs datasets.")
+        print(
+            "WARNING: Data is missing for one or more years between fbsh and fbs datasets."
+        )
 
     # Sanity checks.
     # Ensure the elements that are in fbsh but not in fbs are covered by ITEMS_MAPPING.
@@ -78,17 +93,29 @@ def combine_fbsh_and_fbs_datasets(fbsh_dataset, fbs_dataset, additional_metadata
 
     # Add description of each element (from metadata) to fbs and to fbsh.
     # Add also "unit", just to check that data in the original dataset and in metadata coincide.
-    fbsh = pd.merge(fbsh, additional_metadata["meta_fbsh_element"].rename(columns={'unit': 'unit_check'}),
-                    on="element", how="left")
-    fbs = pd.merge(fbs, additional_metadata["meta_fbs_element"].rename(columns={'unit': 'unit_check'}),
-                   on="element", how="left")
+    fbsh = pd.merge(
+        fbsh,
+        additional_metadata["meta_fbsh_element"].rename(columns={"unit": "unit_check"}),
+        on="element",
+        how="left",
+    )
+    fbs = pd.merge(
+        fbs,
+        additional_metadata["meta_fbs_element"].rename(columns={"unit": "unit_check"}),
+        on="element",
+        how="left",
+    )
 
     # Sanity checks.
-    check_that_flag_definitions_in_dataset_agree_with_those_in_flags_ranking(additional_metadata=additional_metadata)
+    check_that_flag_definitions_in_dataset_agree_with_those_in_flags_ranking(
+        additional_metadata=additional_metadata
+    )
     check_that_all_flags_in_dataset_are_in_ranking(
-        data=fbsh, additional_metadata_for_flags=additional_metadata["meta_fbsh_flag"])
+        data=fbsh, additional_metadata_for_flags=additional_metadata["meta_fbsh_flag"]
+    )
     check_that_all_flags_in_dataset_are_in_ranking(
-        data=fbs, additional_metadata_for_flags=additional_metadata[f"meta_fbs_flag"])
+        data=fbs, additional_metadata_for_flags=additional_metadata["meta_fbs_flag"]
+    )
     # Check that units of elements in fbsh and in the corresponding metadata coincide.
     error = "Elements in fbsh have different units in dataset and in its corresponding metadata."
     assert (fbsh["unit"] == fbsh["unit_check"]).all(), error
@@ -122,17 +149,28 @@ def run(dest_dir: str) -> None:
     ####################################################################################################################
 
     # Find path to latest versions of fbsh dataset.
-    fbsh_version = find_latest_version_for_step(channel="meadow", step_name="faostat_fbsh", namespace=NAMESPACE)
+    fbsh_version = find_latest_version_for_step(
+        channel="meadow", step_name="faostat_fbsh", namespace=NAMESPACE
+    )
     fbsh_file = DATA_DIR / "meadow" / NAMESPACE / fbsh_version / "faostat_fbsh"
 
     # Find path to latest versions of fbs dataset.
-    fbs_version = find_latest_version_for_step(channel="meadow", step_name="faostat_fbs", namespace=NAMESPACE)
+    fbs_version = find_latest_version_for_step(
+        channel="meadow", step_name="faostat_fbs", namespace=NAMESPACE
+    )
     fbs_file = DATA_DIR / "meadow" / NAMESPACE / fbs_version / "faostat_fbs"
 
     # Find path to latest versions of additional metadata dataset.
     additional_metadata_version = find_latest_version_for_step(
-        channel="meadow", step_name="faostat_metadata", namespace=NAMESPACE)
-    additional_metadata_file = DATA_DIR / "meadow" / NAMESPACE / additional_metadata_version / "faostat_metadata"
+        channel="meadow", step_name="faostat_metadata", namespace=NAMESPACE
+    )
+    additional_metadata_file = (
+        DATA_DIR
+        / "meadow"
+        / NAMESPACE
+        / additional_metadata_version
+        / "faostat_metadata"
+    )
 
     ####################################################################################################################
     # Load data.
@@ -156,7 +194,8 @@ def run(dest_dir: str) -> None:
     # Create new table for garden dataset.
     table_metadata = TableMeta(short_name=DATASET_NAME, primary_key=["country", "year"])
     fbsc_table = create_wide_table_with_metadata_from_long_dataframe(
-        data_long=fbsc, table_metadata=table_metadata)
+        data_long=fbsc, table_metadata=table_metadata
+    )
 
     ####################################################################################################################
     # Prepare outputs.
