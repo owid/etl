@@ -31,7 +31,12 @@ def run_sanity_checks(data: pd.DataFrame) -> None:
 
     # Check that column "Year Code" is identical to "Year", and can therefore be dropped.
     error = "Column 'Year Code' does not coincide with column 'Year'."
-    assert (df["Year Code"] == df["Year"]).all(), error
+    if df["Year"].dtype == int:
+        # In most cases, columns "Year Code" and "Year" are simply the year.
+        assert (df["Year Code"] == df["Year"]).all(), error
+    else:
+        # Sometimes (e.g. for dataset fs) there are year ranges (e.g. with "Year Code" 20002002 and "Year" "2000-2002").
+        assert (df["Year Code"] == df["Year"].str.replace("-", "").astype(int)).all(), error
 
     # Check that there is only one element-unit for each element code.
     error = "Multiple element-unit for the same element code."

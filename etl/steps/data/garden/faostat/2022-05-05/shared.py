@@ -97,6 +97,7 @@ FLAGS_RANKING = (
             ),
             ("B", "Unknown flag"),
             ("w", "Unknown flag"),
+            ('NR', 'Not reported'),
         ],
     )
     .reset_index()
@@ -304,14 +305,49 @@ def remove_duplicates(data: pd.DataFrame) -> pd.DataFrame:
     return data
 
 
+def clean_year_column(year_column):
+    """Clean year column.
+
+    Year is given almost always as an integer value. But sometimes (e.g. in the faostat_fs dataset) it is a range of
+    years (that differ by exactly 2 years, e.g. "2010-2012"). This function returns a series of integer years, which, in
+    the cases where the original year was a range, corresponds to the mean of the range.
+
+    Parameters
+    ----------
+    year_column : pd.Series
+        Original column of year values (which may be integer, or ranges of values).
+
+    Returns
+    -------
+    year_clean : pd.Series
+        Clean column of years, as integer values.
+
+    """
+    year_clean = []
+    for year in year_column:
+        if "-" in str(year):
+            year_range = year.split("-")
+            year_min = int(year_range[0])
+            year_max = int(year_range[1])
+            assert year_max - year_min == 2
+            year_clean.append(year_min + 1)
+        else:
+            year_clean.append(int(year))
+
+    # Prepare series of integer year values.
+    year_clean = pd.Series(year_clean)
+    year_clean.name = "year"
+
+    return year_clean
+
+
 def clean_data(data: pd.DataFrame, countries_file: Path) -> pd.DataFrame:
     data = data.copy()
 
-    # Remove rows with nan value.
-    data = remove_rows_with_nan_value(data)
-
-    # Ensure column of values is numeric (transform any possible value like "<1" into a nan, and remove those rows).
+    # Ensure column of values is numeric (transform any possible value like "<1" into a nan).
     data["value"] = pd.to_numeric(data["value"], errors="coerce")
+
+    # Remove rows with nan value.
     data = remove_rows_with_nan_value(data)
 
     # Sanity checks.
@@ -336,13 +372,8 @@ def clean_data(data: pd.DataFrame, countries_file: Path) -> pd.DataFrame:
     # In cases where a country-year has more than one item-element, try to remove duplicates by looking at the flags.
     # If flags do not remove the duplicates, raise an error.
 
-    # Ensure year column is integer (in previous versions it seems sometimes there were ranges, like 2013-2015).
-    try:
-        data["year"] = data["year"].astype(int)
-    except ValueError:
-        print(
-            "WARNING: Dataset may have years defined by intervals. Map them to a year."
-        )
+    # Ensure year column is integer (sometimes it is given as a range of years, e.g. 2013-2015).
+    data["year"] = clean_year_column(data["year"])
 
     # Remove duplicated data points keeping the one with lowest ranking (i.e. highest priority).
     data = remove_duplicates(data)

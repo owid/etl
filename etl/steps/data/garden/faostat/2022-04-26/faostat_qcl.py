@@ -1,7 +1,3 @@
-"""FAOstat: Crops and livestock products.
-
-"""
-
 import json
 import pandas as pd
 
