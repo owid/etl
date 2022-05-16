@@ -39,7 +39,7 @@ def get_grapher_tables(dataset: catalog.Dataset) -> Iterable[catalog.Table]:
     table = dataset[table_name].reset_index()
 
     # Convert country names into grapher entity ids, and set index appropriately.
-    table["entity_id"] = gh.country_to_entity_id(table["country"])
+    table["entity_id"] = gh.country_to_entity_id(table["country"], create_entities=True)
     table = table.set_index(["entity_id", "year"]).drop(columns=["country"])
 
     yield from gh.yield_wide_table(table, na_action="drop")

@@ -326,10 +326,6 @@ def clean_data(data: pd.DataFrame, countries_file: Path) -> pd.DataFrame:
         warn_on_unused_countries=False,
     ).rename(columns={"area": "country"})
     # If countries are missing in countries file, execute etl.harmonize again and update countries file.
-    ####################################################################################################################
-    # TODO: Remove this temporary solution once grapher accepts mapping of all countries.
-    data = data[~data["country"].str.endswith("(FAO)")].reset_index(drop=True)
-    ####################################################################################################################
 
     # After harmonizing, there are some country-year with more than one item-element.
     # This happens for example because there is different data for "Micronesia" and "Micronesia (Federated States of)",
