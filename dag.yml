@@ -359,105 +359,61 @@ steps:
     - data://garden/owid/latest/key_indicators
     - data://open_numbers/open_numbers/latest/gapminder__systema_globalis
   #
-  # FAOSTAT garden steps for version 2022-04-26
+  # FAOSTAT meadow steps for version 2022-05-17
   #
-  data://garden/faostat/2022-04-26/faostat_fbsc:
-    - data://meadow/faostat/2022-04-26/faostat_fbsh
-    - data://meadow/faostat/2022-04-26/faostat_fbs
-    - data://meadow/faostat/2022-04-26/faostat_metadata
-  data://garden/faostat/2022-04-26/faostat_fs:
-    - data://meadow/faostat/2022-04-26/faostat_fs
-    - data://meadow/faostat/2022-04-26/faostat_metadata
-  data://garden/faostat/2022-04-26/faostat_qcl:
-    - data://meadow/faostat/2022-04-26/faostat_qcl
-    - data://meadow/faostat/2022-04-26/faostat_metadata
-  data://garden/faostat/2022-04-26/faostat_rl:
-    - data://meadow/faostat/2022-04-26/faostat_rl
-    - data://meadow/faostat/2022-04-26/faostat_metadata
-  #
-  # FAOSTAT garden steps for version 2022-05-05
-  #
-  data://garden/faostat/2022-05-05/faostat_ae:
-    - data://meadow/faostat/2022-05-05/faostat_ae
-    - data://meadow/faostat/2022-05-05/faostat_metadata
-  data://garden/faostat/2022-05-05/faostat_af:
-    - data://meadow/faostat/2022-05-05/faostat_af
-    - data://meadow/faostat/2022-05-05/faostat_metadata
-  data://garden/faostat/2022-05-05/faostat_ef:
-    - data://meadow/faostat/2022-05-05/faostat_ef
-    - data://meadow/faostat/2022-05-05/faostat_metadata
-  data://garden/faostat/2022-05-05/faostat_ei:
-    - data://meadow/faostat/2022-05-05/faostat_ei
-    - data://meadow/faostat/2022-05-05/faostat_metadata
-  data://garden/faostat/2022-05-05/faostat_emn:
-    - data://meadow/faostat/2022-05-05/faostat_emn
-    - data://meadow/faostat/2022-05-05/faostat_metadata
-  data://garden/faostat/2022-05-05/faostat_ep:
-    - data://meadow/faostat/2022-05-05/faostat_ep
-    - data://meadow/faostat/2022-05-05/faostat_metadata
-  data://garden/faostat/2022-05-05/faostat_fo:
-    - data://meadow/faostat/2022-05-05/faostat_fo
-    - data://meadow/faostat/2022-05-05/faostat_metadata
-  data://garden/faostat/2022-05-05/faostat_lc:
-    - data://meadow/faostat/2022-05-05/faostat_lc
-    - data://meadow/faostat/2022-05-05/faostat_metadata
-  data://garden/faostat/2022-05-05/faostat_qi:
-    - data://meadow/faostat/2022-05-05/faostat_qi
-    - data://meadow/faostat/2022-05-05/faostat_metadata
-  data://garden/faostat/2022-05-05/faostat_qv:
-    - data://meadow/faostat/2022-05-05/faostat_qv
-    - data://meadow/faostat/2022-05-05/faostat_metadata
-  data://garden/faostat/2022-05-05/faostat_rfb:
-    - data://meadow/faostat/2022-05-05/faostat_rfb
-    - data://meadow/faostat/2022-05-05/faostat_metadata
-  data://garden/faostat/2022-05-05/faostat_rfn:
-    - data://meadow/faostat/2022-05-05/faostat_rfn
-    - data://meadow/faostat/2022-05-05/faostat_metadata
-  data://garden/faostat/2022-05-05/faostat_rp:
-    - data://meadow/faostat/2022-05-05/faostat_rp
-    - data://meadow/faostat/2022-05-05/faostat_metadata
-  data://garden/faostat/2022-05-05/faostat_rt:
-    - data://meadow/faostat/2022-05-05/faostat_rt
-    - data://meadow/faostat/2022-05-05/faostat_metadata
-  #
-  # FAOSTAT grapher steps for version 2022-04-26
-  #
-  grapher://faostat/2022-04-26/faostat_fbsc:
-    - data://garden/faostat/2022-04-26/faostat_fbsc
-  grapher://faostat/2022-04-26/faostat_fs:
-    - data://garden/faostat/2022-04-26/faostat_fs
-  grapher://faostat/2022-04-26/faostat_qcl:
-    - data://garden/faostat/2022-04-26/faostat_qcl
-  grapher://faostat/2022-04-26/faostat_rl:
-    - data://garden/faostat/2022-04-26/faostat_rl
-  #
-  # FAOSTAT grapher steps for version 2022-05-09
-  #
-  grapher://faostat/2022-05-09/faostat_ae:
-    - data://garden/faostat/2022-05-05/faostat_ae
-  grapher://faostat/2022-05-09/faostat_af:
-    - data://garden/faostat/2022-05-05/faostat_af
-  grapher://faostat/2022-05-09/faostat_ef:
-    - data://garden/faostat/2022-05-05/faostat_ef
-  grapher://faostat/2022-05-09/faostat_ei:
-    - data://garden/faostat/2022-05-05/faostat_ei
-  grapher://faostat/2022-05-09/faostat_emn:
-    - data://garden/faostat/2022-05-05/faostat_emn
-  grapher://faostat/2022-05-09/faostat_ep:
-    - data://garden/faostat/2022-05-05/faostat_ep
-  grapher://faostat/2022-05-09/faostat_fo:
-    - data://garden/faostat/2022-05-05/faostat_fo
-  grapher://faostat/2022-05-09/faostat_lc:
-    - data://garden/faostat/2022-05-05/faostat_lc
-  grapher://faostat/2022-05-09/faostat_qi:
-    - data://garden/faostat/2022-05-05/faostat_qi
-  grapher://faostat/2022-05-09/faostat_qv:
-    - data://garden/faostat/2022-05-05/faostat_qv
-  grapher://faostat/2022-05-09/faostat_rfb:
-    - data://garden/faostat/2022-05-05/faostat_rfb
-  grapher://faostat/2022-05-09/faostat_rfn:
-    - data://garden/faostat/2022-05-05/faostat_rfn
-  grapher://faostat/2022-05-09/faostat_rp:
-    - data://garden/faostat/2022-05-05/faostat_rp
-  grapher://faostat/2022-05-09/faostat_rt:
-    - data://garden/faostat/2022-05-05/faostat_rt
+  data://meadow/faostat/2022-05-17/faostat_ef:
+    - walden://faostat/2022-05-17/faostat_ef
+  data://meadow/faostat/2022-05-17/faostat_ei:
+    - walden://faostat/2022-05-17/faostat_ei
+  data://meadow/faostat/2022-05-17/faostat_ek:
+    - walden://faostat/2022-05-17/faostat_ek
+  data://meadow/faostat/2022-05-17/faostat_el:
+    - walden://faostat/2022-05-17/faostat_el
+  data://meadow/faostat/2022-05-17/faostat_emn:
+    - walden://faostat/2022-05-17/faostat_emn
+  data://meadow/faostat/2022-05-17/faostat_ep:
+    - walden://faostat/2022-05-17/faostat_ep
+  data://meadow/faostat/2022-05-17/faostat_esb:
+    - walden://faostat/2022-05-17/faostat_esb
+  data://meadow/faostat/2022-05-17/faostat_et:
+    - walden://faostat/2022-05-17/faostat_et
+  data://meadow/faostat/2022-05-17/faostat_fa:
+    - walden://faostat/2022-05-17/faostat_fa
+  data://meadow/faostat/2022-05-17/faostat_fbs:
+    - walden://faostat/2022-05-17/faostat_fbs
+  data://meadow/faostat/2022-05-17/faostat_fbsh:
+    - walden://faostat/2022-05-17/faostat_fbsh
+  data://meadow/faostat/2022-05-17/faostat_fo:
+    - walden://faostat/2022-05-17/faostat_fo
+  data://meadow/faostat/2022-05-17/faostat_fs:
+    - walden://faostat/2022-05-17/faostat_fs
+  data://meadow/faostat/2022-05-17/faostat_ft:
+    - walden://faostat/2022-05-17/faostat_ft
+  data://meadow/faostat/2022-05-17/faostat_lc:
+    - walden://faostat/2022-05-17/faostat_lc
+  data://meadow/faostat/2022-05-17/faostat_metadata:
+    - walden://faostat/2022-05-17/faostat_metadata
+  data://meadow/faostat/2022-05-17/faostat_qcl:
+    - walden://faostat/2022-05-17/faostat_qcl
+  data://meadow/faostat/2022-05-17/faostat_qi:
+    - walden://faostat/2022-05-17/faostat_qi
+  data://meadow/faostat/2022-05-17/faostat_qv:
+    - walden://faostat/2022-05-17/faostat_qv
+  data://meadow/faostat/2022-05-17/faostat_rfb:
+    - walden://faostat/2022-05-17/faostat_rfb
+  data://meadow/faostat/2022-05-17/faostat_rfn:
+    - walden://faostat/2022-05-17/faostat_rfn
+  data://meadow/faostat/2022-05-17/faostat_rl:
+    - walden://faostat/2021-06-17/faostat_rl
+  data://meadow/faostat/2022-05-17/faostat_rp:
+    - walden://faostat/2022-05-17/faostat_rp
+  data://meadow/faostat/2022-05-17/faostat_rt:
+    - walden://faostat/2022-05-17/faostat_rt
+  data://meadow/faostat/2022-05-17/faostat_scl:
+    - walden://faostat/2022-05-17/faostat_scl
+  data://meadow/faostat/2022-05-17/faostat_sdgb:
+    - walden://faostat/2022-05-17/faostat_sdgb
+  data://meadow/faostat/2022-05-17/faostat_tcl:
+    - walden://faostat/2022-05-17/faostat_tcl
+  data://meadow/faostat/2022-05-17/faostat_ti:
+    - walden://faostat/2022-05-17/faostat_ti
