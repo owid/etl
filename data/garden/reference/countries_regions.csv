@@ -1,6 +1,6 @@
 code,name,iso_alpha2,iso_alpha3,imf_code,cow_letter,cow_code,unctad_code,marc_code,ncd_code,kansas_code,penn_code,wikidata_uri,wikidata_label,legacy_entity_id,legacy_country_id,members,aliases
 AFG,Afghanistan,AF,AFG,512.0,AFG,700.0,AFG,AF,AFGN,AFG,AFG,http://www.wikidata.org/entity/Q889,Afghanistan,15.0,562.0,,
-ALA,Aland Islands,AX,ALA,,,,,,,,,http://www.wikidata.org/entity/Q5689,Åland,296.0,791.0,,"[""\u00c3\u0081EEland Islands""]"
+ALA,Aland Islands,AX,ALA,,,,,,,,,http://www.wikidata.org/entity/Q5689,Åland,296.0,791.0,,"[""\u00c3\u0081EEland Islands"", ""\u00c5land Islands""]"
 ALB,Albania,AL,ALB,914.0,ALB,339.0,ALB,AA,ALBN,ALB,ALB,http://www.wikidata.org/entity/Q222,Albania,16.0,565.0,,
 DZA,Algeria,DZ,DZA,612.0,ALG,615.0,ALG,AE,ALGR,DZA,DZA,http://www.wikidata.org/entity/Q262,Algeria,17.0,619.0,,
 ASM,American Samoa,AS,ASM,859.0,,,,AS,,ASM,ASM,http://www.wikidata.org/entity/Q16641,American Samoa,246.0,571.0,,
