@@ -51,13 +51,21 @@ ITEMS_MAPPING = {
 ELEMENTS_TO_REMOVE = ["Total Population - Both sexes"]
 
 
-def check_if_element_descriptions_coincide_in_fbsh_and_fbs(fbsh, fbs, fbsc):
+def check_if_element_descriptions_coincide_in_fbsh_and_fbs(
+    fbsh: pd.DataFrame, fbs: pd.DataFrame, fbsc: pd.DataFrame
+) -> None:
     element_counts = fbsc.groupby("element")["description"].nunique()
     if not element_counts.max() == 1:
-        print("WARNING: Some elements in the combined dataset have more than one description.")
+        print(
+            "WARNING: Some elements in the combined dataset have more than one description."
+        )
         for element in element_counts[element_counts > 1].index.unique().tolist():
-            print(f"Description of element '{element}' in fbsh:\n{fbsh[fbsh['element'] == element]['description'].unique()[0]}")
-            print(f"Description of element '{element}' in fbs:\n{fbs[fbs['element'] == element]['description'].unique()[0]}\n")
+            print(
+                f"Description of element '{element}' in fbsh:\n{fbsh[fbsh['element'] == element]['description'].unique()[0]}"
+            )
+            print(
+                f"Description of element '{element}' in fbs:\n{fbs[fbs['element'] == element]['description'].unique()[0]}\n"
+            )
 
 
 def combine_fbsh_and_fbs_datasets(
@@ -124,7 +132,7 @@ def combine_fbsh_and_fbs_datasets(
     )
     check_that_all_flags_in_dataset_are_in_ranking(
         data=fbs, additional_metadata_for_flags=additional_metadata["meta_fbs_flag"]
-    )    
+    )
 
     # Check that units of elements in fbsh and in the corresponding metadata coincide.
     error = "Elements in fbsh have different units in dataset and in its corresponding metadata."

@@ -97,7 +97,7 @@ FLAGS_RANKING = (
             ),
             ("B", "Unknown flag"),
             ("w", "Unknown flag"),
-            ('NR', 'Not reported'),
+            ("NR", "Not reported"),
             ("_P", "Provisional value"),
             ("_O", "Missing value"),
             ("_M", "Unknown flag"),
@@ -293,10 +293,14 @@ def remove_duplicates(data: pd.DataFrame) -> pd.DataFrame:
     )
 
     # Select columns that should be used as indexes.
-    index_columns = [column for column in ["country", "year", "item", "element", "unit"] if column in data.columns]    
+    index_columns = [
+        column
+        for column in ["country", "year", "item", "element", "unit"]
+        if column in data.columns
+    ]
 
     # Number of ambiguous indices (those that have multiple data values).
-    n_ambiguous_indices = len(data[data.duplicated(subset=index_columns, keep="first")])    
+    n_ambiguous_indices = len(data[data.duplicated(subset=index_columns, keep="first")])
 
     if n_ambiguous_indices > 0:
         # Number of ambiguous indices that cannot be solved using flags.
@@ -324,7 +328,7 @@ def remove_duplicates(data: pd.DataFrame) -> pd.DataFrame:
     return data
 
 
-def clean_year_column(year_column):
+def clean_year_column(year_column: pd.Series) -> pd.Series:
     """Clean year column.
 
     Year is given almost always as an integer value. But sometimes (e.g. in the faostat_fs dataset) it is a range of
@@ -338,7 +342,7 @@ def clean_year_column(year_column):
 
     Returns
     -------
-    year_clean : pd.Series
+    year_clean_series : pd.Series
         Clean column of years, as integer values.
 
     """
@@ -354,10 +358,10 @@ def clean_year_column(year_column):
             year_clean.append(int(year))
 
     # Prepare series of integer year values.
-    year_clean = pd.Series(year_clean)
-    year_clean.name = "year"
+    year_clean_series = pd.Series(year_clean)
+    year_clean_series.name = "year"
 
-    return year_clean
+    return year_clean_series
 
 
 def clean_data(data: pd.DataFrame, countries_file: Path) -> pd.DataFrame:
@@ -369,7 +373,9 @@ def clean_data(data: pd.DataFrame, countries_file: Path) -> pd.DataFrame:
 
     # Some datasets (at least faostat_fa) use "recipient_country" instead of "area". For consistency, change this.
     if "recipient_country" in data.columns:
-        data = data.rename(columns={"recipient_country": "area", "recipient_country_code": "area_code"})
+        data = data.rename(
+            columns={"recipient_country": "area", "recipient_country_code": "area_code"}
+        )
 
     # Remove rows with nan value.
     data = remove_rows_with_nan_value(data)
@@ -403,7 +409,9 @@ def clean_data(data: pd.DataFrame, countries_file: Path) -> pd.DataFrame:
     data = remove_duplicates(data)
 
     # We can now remove entity codes and flags.
-    columns_to_drop = list({"area_code", "element_code", "item_code", "flag"} & set(data.columns))
+    columns_to_drop = list(
+        {"area_code", "element_code", "item_code", "flag"} & set(data.columns)
+    )
     data = data.drop(columns=columns_to_drop)
 
     return data

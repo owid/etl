@@ -5,6 +5,7 @@
 import os
 import tempfile
 import zipfile
+import warnings
 
 import pandas as pd
 from owid.catalog import Dataset, Table, utils
@@ -36,7 +37,9 @@ def run_sanity_checks(data: pd.DataFrame) -> None:
         assert (df["Year Code"] == df["Year"]).all(), error
     else:
         # Sometimes (e.g. for dataset fs) there are year ranges (e.g. with "Year Code" 20002002 and "Year" "2000-2002").
-        assert (df["Year Code"] == df["Year"].str.replace("-", "").astype(int)).all(), error
+        assert (
+            df["Year Code"] == df["Year"].str.replace("-", "").astype(int)
+        ).all(), error
 
     # Check that there is only one element-unit for each element code.
     error = "Multiple element-unit for the same element code."
@@ -49,9 +52,11 @@ def prepare_output_table(data: pd.DataFrame) -> pd.DataFrame:
     df = df.drop(columns=["Year Code"])
 
     # Set index columns depending on what columns are available in the dataframe.
-    index_columns = list({"Area Code", "Item Code", "Element Code", "Year"} & set(df.columns))
+    index_columns = list(
+        {"Area Code", "Item Code", "Element Code", "Year"} & set(df.columns)
+    )
     if df.duplicated(subset=index_columns).any():
-        print(f"WARNING: Index has duplicated keys.")
+        warnings.warn("Index has duplicated keys.")
     df = df.set_index(index_columns)
 
     return df
