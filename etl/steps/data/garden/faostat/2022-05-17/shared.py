@@ -98,6 +98,18 @@ FLAGS_RANKING = (
             ("B", "Unknown flag"),
             ("w", "Unknown flag"),
             ('NR', 'Not reported'),
+            ("_P", "Provisional value"),
+            ("_O", "Missing value"),
+            ("_M", "Unknown flag"),
+            ("_U", "Unknown flag"),
+            ("_I", "Imputed value (CCSA definition)"),
+            ("_V", "Unvalidated value"),
+            ("_L", "Unknown flag"),
+            ("_A", "Normal value"),
+            ("_E", "Estimated value"),
+            ("Cv", "Calculated through value"),
+            # The definition of flag "_" exists, but it's empty.
+            ("_", ""),
         ],
     )
     .reset_index()
@@ -162,7 +174,8 @@ def check_that_all_flags_in_dataset_are_in_ranking(
 def check_that_there_are_as_many_entity_codes_as_entities(data: pd.DataFrame) -> None:
     """TODO"""
     # Check that there are as many codes for area, element and unit and actual areas, elements and units.
-    for entity in ["area", "element", "item"]:
+    entities = list({"area", "element", "item"} & set(data.columns))
+    for entity in entities:
         if len(data[f"{entity}_code"].unique()) != len(data[f"{entity}"].unique()):
             print(
                 f"WARNING: The number of unique {entity} codes is different to the number "
@@ -216,6 +229,9 @@ def create_wide_table_with_metadata_from_long_dataframe(
     table_metadata = deepcopy(table_metadata)
 
     # Combine item, element and unit into one column.
+    if "item" not in data_long.columns:
+        data_long["item"] = ""
+
     data_long["title"] = (
         data_long["item"].astype(str)
         + " - "
@@ -276,9 +292,12 @@ def remove_duplicates(data: pd.DataFrame) -> pd.DataFrame:
         how="left",
     )
 
+    # Select columns that should be used as indexes.
+    index_columns = [column for column in ["country", "year", "item", "element", "unit"] if column in data.columns]    
+
     # Number of ambiguous indices (those that have multiple data values).
-    index_columns = ["country", "year", "item", "element", "unit"]
-    n_ambiguous_indices = len(data[data.duplicated(subset=index_columns, keep="first")])
+    n_ambiguous_indices = len(data[data.duplicated(subset=index_columns, keep="first")])    
+
     if n_ambiguous_indices > 0:
         # Number of ambiguous indices that cannot be solved using flags.
         n_ambiguous_indices_unsolvable = len(
@@ -342,10 +361,15 @@ def clean_year_column(year_column):
 
 
 def clean_data(data: pd.DataFrame, countries_file: Path) -> pd.DataFrame:
+    """TODO"""
     data = data.copy()
 
     # Ensure column of values is numeric (transform any possible value like "<1" into a nan).
     data["value"] = pd.to_numeric(data["value"], errors="coerce")
+
+    # Some datasets (at least faostat_fa) use "recipient_country" instead of "area". For consistency, change this.
+    if "recipient_country" in data.columns:
+        data = data.rename(columns={"recipient_country": "area", "recipient_country_code": "area_code"})
 
     # Remove rows with nan value.
     data = remove_rows_with_nan_value(data)
@@ -379,7 +403,8 @@ def clean_data(data: pd.DataFrame, countries_file: Path) -> pd.DataFrame:
     data = remove_duplicates(data)
 
     # We can now remove entity codes and flags.
-    data = data.drop(columns=["area_code", "element_code", "item_code", "flag"])
+    columns_to_drop = list({"area_code", "element_code", "item_code", "flag"} & set(data.columns))
+    data = data.drop(columns=columns_to_drop)
 
     return data
 

@@ -47,10 +47,12 @@ def prepare_output_table(data: pd.DataFrame) -> pd.DataFrame:
     df = data.copy()
 
     df = df.drop(columns=["Year Code"])
-    df = df.set_index(
-        ["Area Code", "Item Code", "Element Code", "Year"],
-        verify_integrity=True,
-    )
+
+    # Set index columns depending on what columns are available in the dataframe.
+    index_columns = list({"Area Code", "Item Code", "Element Code", "Year"} & set(df.columns))
+    if df.duplicated(subset=index_columns).any():
+        print(f"WARNING: Index has duplicated keys.")
+    df = df.set_index(index_columns)
 
     return df
 
