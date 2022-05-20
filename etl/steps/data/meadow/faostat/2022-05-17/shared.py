@@ -15,6 +15,19 @@ from etl.steps.data.converters import convert_walden_metadata
 
 
 def load_data(local_path: str) -> pd.DataFrame:
+    """Load walden data (as a dataframe) for current dataset.
+
+    Parameters
+    ----------
+    local_path : Path or str
+        Path to local walden dataset.
+
+    Returns
+    -------
+    data : pd.DataFrame
+        Data loaded from walden.
+
+    """
     # Unzip data into a temporary folder.
     with tempfile.TemporaryDirectory() as temp_dir:
         z = zipfile.ZipFile(local_path)
@@ -28,6 +41,14 @@ def load_data(local_path: str) -> pd.DataFrame:
 
 
 def run_sanity_checks(data: pd.DataFrame) -> None:
+    """Run basic sanity checks on loaded data (raise assertion errors if any check fails).
+
+    Parameters
+    ----------
+    data : pd.DataFrame
+        Data to be checked.
+
+    """
     df = data.copy()
 
     # Check that column "Year Code" is identical to "Year", and can therefore be dropped.
@@ -46,7 +67,20 @@ def run_sanity_checks(data: pd.DataFrame) -> None:
     assert (df.groupby(["Element", "Unit"])["Element Code"].nunique() == 1).all(), error
 
 
-def prepare_output_table(data: pd.DataFrame) -> pd.DataFrame:
+def prepare_output_data(data: pd.DataFrame) -> pd.DataFrame:
+    """Prepare data before saving it to meadow.
+
+    Parameters
+    ----------
+    data : pd.DataFrame
+        Data.
+
+    Returns
+    -------
+    df : pd.DataFrame
+        Data ready to be stored as a table in meadow.
+
+    """
     df = data.copy()
 
     df = df.drop(columns=["Year Code"])
@@ -92,7 +126,7 @@ def run(dest_dir: str) -> None:
     ####################################################################################################################
 
     # Prepare output data.
-    data = prepare_output_table(data=data)
+    data = prepare_output_data(data=data)
 
     # Initialise meadow dataset.
     ds = Dataset.create_empty(dest_dir)

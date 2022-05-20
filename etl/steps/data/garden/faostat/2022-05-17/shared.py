@@ -16,6 +16,7 @@ NOTES:
 
 """
 
+import warnings
 from copy import deepcopy
 from pathlib import Path
 
@@ -120,7 +121,15 @@ FLAGS_RANKING = (
 def check_that_flag_definitions_in_dataset_agree_with_those_in_flags_ranking(
     additional_metadata: catalog.Dataset,
 ) -> None:
-    """TODO"""
+    """Check that the definition of flags in the additional metadata for current dataset agree with the ones we have
+    manually written down in our flags ranking (raise error otherwise).
+
+    Parameters
+    ----------
+    additional_metadata : catalog.Dataset
+        Additional metadata dataset (that must contain one table for current dataset).
+
+    """
     for table_name in additional_metadata.table_names:
         if "flag" in table_name:
             flag_df = additional_metadata[table_name].reset_index()
@@ -137,19 +146,19 @@ def check_that_flag_definitions_in_dataset_agree_with_those_in_flags_ranking(
 def check_that_all_flags_in_dataset_are_in_ranking(
     data: pd.DataFrame,
     additional_metadata_for_flags: catalog.Table,
-    country_col: str = "area",
 ) -> None:
-    """TODO"""
+    """Check that all flags found in current dataset are defined in our flags ranking (raise error otherwise).
+
+    Parameters
+    ----------
+    data : pd.DataFrame
+        Data for current dataset.
+    additional_metadata_for_flags : catalog.Table
+        Flags for current dataset, as defined in dataset of additional metadata.
+
+    """
     if not set(data["flag"]) < set(FLAGS_RANKING["flag"]):
         missing_flags = set(data["flag"]) - set(FLAGS_RANKING["flag"])
-        # missing_flags = list(
-        #     set(
-        #         data[data.duplicated(subset=[country_col, "year", "item", "element"])][
-        #             "flag"
-        #         ]
-        #     )
-        #     - set(FLAGS_RANKING["flag"])
-        # )
         flags_data = pd.DataFrame(additional_metadata_for_flags).reset_index()
         if set(missing_flags) < set(flags_data["flag"]):
             print(
@@ -172,22 +181,42 @@ def check_that_all_flags_in_dataset_are_in_ranking(
 
 
 def check_that_there_are_as_many_entity_codes_as_entities(data: pd.DataFrame) -> None:
-    """TODO"""
+    """Check that there are as many entity codes (e.g. "item_code") as entities (e.g. "item") (raise warning otherwise).
+
+    Parameters
+    ----------
+    data : pd.DataFrame
+        Data for current dataset.
+
+    """
     # Check that there are as many codes for area, element and unit and actual areas, elements and units.
     entities = list({"area", "element", "item"} & set(data.columns))
     for entity in entities:
         if len(data[f"{entity}_code"].unique()) != len(data[f"{entity}"].unique()):
-            print(
-                f"WARNING: The number of unique {entity} codes is different to the number "
-                f"of unique {entity}s. Consider ignoring '{entity}' column, and instead mapping '{entity}_code' "
-                f"using the {entity} from metadata."
+            warnings.warn(
+                f"The number of unique {entity} codes is different to the number of unique {entity}s. Consider "
+                f"ignoring '{entity}' column, and instead mapping '{entity}_code' using the {entity} from metadata."
             )
 
 
 def remove_rows_with_nan_value(
     data: pd.DataFrame, verbose: bool = True
 ) -> pd.DataFrame:
-    """TODO"""
+    """Remove rows for which column "value" is nan.
+
+    Parameters
+    ----------
+    data : pd.DataFrame
+        Data for current dataset.
+    verbose : bool
+        True to print information about the number and fraction of rows removed.
+
+    Returns
+    -------
+    data : pd.DataFrame
+        Data after removing nan values.
+
+    """
     data = data.copy()
     # Number of rows with a nan in column "value".
     # We could also remove rows with any nan, however, before doing that, we would need to assign a value to nan flags.
@@ -204,7 +233,21 @@ def remove_rows_with_nan_value(
 
 
 def remove_duplicates(data: pd.DataFrame) -> pd.DataFrame:
-    """TODO"""
+    """Remove rows with duplicated index (country, year, item, element, unit).
+
+    First attempt to use flags to remove duplicates. If there are still duplicates, remove in whatever way possible.
+
+    Parameters
+    ----------
+    data : pd.DataFrame
+        Data for current dataset.
+
+    Returns
+    -------
+    data : pd.DataFrame
+        Data (with a dummy numerical index) after removing duplicates.
+
+    """
     data = data.copy()
 
     # Add flag ranking to dataset.
@@ -288,7 +331,21 @@ def clean_year_column(year_column: pd.Series) -> pd.Series:
 
 
 def clean_data(data: pd.DataFrame, countries_file: Path) -> pd.DataFrame:
-    """TODO"""
+    """Process data (including harmonization of countries and regions) and prepare it for new garden dataset.
+
+    Parameters
+    ----------
+    data : pd.DataFrame
+        Unprocessed data for current dataset.
+    countries_file : Path or str
+        Path to mapping of country names.
+
+    Returns
+    -------
+    data : pd.DataFrame
+        Processed data, ready to be made into a table for a garden dataset.
+
+    """
     data = data.copy()
 
     # Ensure column of values is numeric (transform any possible value like "<1" into a nan).
@@ -371,19 +428,15 @@ def run(dest_dir: str) -> None:
 
     # Additional metadata of all FAO datasets (used for sanity checks).
     additional_metadata = catalog.Dataset(additional_metadata_dir)
-
     # Sanity checks.
     check_that_flag_definitions_in_dataset_agree_with_those_in_flags_ranking(
         additional_metadata
     )
-
     # Load meadow dataset and keep its metadata.
     dataset_meadow = catalog.Dataset(meadow_data_dir)
-
     # Load main table from dataset.
     data_table_meadow = dataset_meadow[dataset_short_name]
     data = pd.DataFrame(data_table_meadow).reset_index()
-
     # Sanity checks.
     check_that_all_flags_in_dataset_are_in_ranking(
         data, additional_metadata[f"meta_{dataset_code}_flag"]
@@ -394,14 +447,7 @@ def run(dest_dir: str) -> None:
     ####################################################################################################################
 
     data = clean_data(data=data, countries_file=countries_file)
-
-    # Move to grapher step.
-    #     # Create new table for garden dataset (use metadata from original meadow table).
-    #     data_table_garden = create_wide_table_with_metadata_from_long_dataframe(
-    #         data_long=data, table_metadata=data_table_meadow.metadata
-    #     )
-
-    # TODO: Run more sanity checks on the new wide data.
+    # TODO: Run more sanity checks.
 
     ####################################################################################################################
     # Save outputs.
