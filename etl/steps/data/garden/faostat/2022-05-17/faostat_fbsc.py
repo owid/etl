@@ -21,7 +21,6 @@ from etl.scripts.faostat.create_new_steps import find_latest_version_for_step
 from .shared import (
     NAMESPACE,
     VERSION,
-    create_wide_table_with_metadata_from_long_dataframe,
     check_that_flag_definitions_in_dataset_agree_with_those_in_flags_ranking,
     check_that_all_flags_in_dataset_are_in_ranking,
     clean_data,
@@ -210,9 +209,8 @@ def run(dest_dir: str) -> None:
 
     # Create new table for garden dataset.
     table_metadata = TableMeta(short_name=DATASET_NAME, primary_key=["country", "year"])
-    fbsc_table = create_wide_table_with_metadata_from_long_dataframe(
-        data_long=fbsc, table_metadata=table_metadata
-    )
+    fbsc_table = catalog.Table(fbsc)
+    fbsc_table.metadata = table_metadata
 
     ####################################################################################################################
     # Prepare outputs.

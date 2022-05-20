@@ -1,4 +1,4 @@
-"""Shared functions for steps in this version.
+"""Shared functions for meadow steps in this version.
 
 """
 
@@ -53,7 +53,7 @@ def prepare_output_table(data: pd.DataFrame) -> pd.DataFrame:
 
     # Set index columns depending on what columns are available in the dataframe.
     index_columns = list(
-        {"Area Code", "Item Code", "Element Code", "Year"} & set(df.columns)
+        {"Area Code", "Year", "Item Code", "Element Code", "Unit"} & set(df.columns)
     )
     if df.duplicated(subset=index_columns).any():
         warnings.warn("Index has duplicated keys.")
@@ -63,21 +63,23 @@ def prepare_output_table(data: pd.DataFrame) -> pd.DataFrame:
 
 
 def run(dest_dir: str) -> None:
+    ####################################################################################################################
+    # Common definitions.
+    ####################################################################################################################
+
     # Assume dest_dir is a path to the step that needs to be run, e.g. "faostat_qcl", and fetch namespace and dataset
     # short name from that path.
     dataset_short_name = os.path.basename(dest_dir)
     namespace = dataset_short_name.split("_")[0]
 
+    ####################################################################################################################
+    # Load data.
+    ####################################################################################################################
+
     # Fetch latest walden dataset.
     walden_ds = Catalog().find_latest(
         namespace=namespace, short_name=dataset_short_name
     )
-
-    # Initialise meadow dataset.
-    ds = Dataset.create_empty(dest_dir)
-    ds.metadata = convert_walden_metadata(walden_ds)
-    ds.metadata.short_name = dataset_short_name
-    ds.save()
 
     # Load and prepare data.
     data = load_data(walden_ds.local_path)
@@ -85,8 +87,18 @@ def run(dest_dir: str) -> None:
     # Run sanity checks.
     run_sanity_checks(data=data)
 
+    ####################################################################################################################
+    # Save outputs.
+    ####################################################################################################################
+
     # Prepare output data.
     data = prepare_output_table(data=data)
+
+    # Initialise meadow dataset.
+    ds = Dataset.create_empty(dest_dir)
+    ds.metadata = convert_walden_metadata(walden_ds)
+    ds.metadata.short_name = dataset_short_name
+    ds.save()
 
     # Add tables to dataset.
     t = Table(data)
