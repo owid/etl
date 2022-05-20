@@ -53,7 +53,7 @@ NEW_VERSION = datetime.datetime.today().strftime("%Y-%m-%d")
 # will be added to the new folder even if its dependencies were not updated.
 CUSTOM_STEPS_TO_ADD: Dict[str, List[str]] = {
     "meadow": [],
-    "garden": ["faostat_fbsc"],
+    "garden": ["faostat_fbsc", "faostat_food_explorer"],
     "grapher": ["faostat_fbsc"],
 }
 CUSTOM_STEPS_TO_OMIT: Dict[str, List[str]] = {
@@ -61,8 +61,8 @@ CUSTOM_STEPS_TO_OMIT: Dict[str, List[str]] = {
     "garden": ["faostat_fbs", "faostat_fbsh", "faostat_metadata"],
     "grapher": ["faostat_fbs", "faostat_fbsh", "faostat_metadata"],
 }
-# Additional dependencies to add to each dag line of a specific channel. Give each dependency as a tuple of
-# (channel, step_name). The latest version of that step will be assumed.
+# Additional dependencies to add to each dag line of a specific channel, for new datasets (ones not in the dag).
+# Give each dependency as a tuple of (channel, step_name). The latest version of that step will be assumed.
 ADDITIONAL_DEPENDENCIES: Dict[str, List[Tuple[str, str]]] = {
     "meadow": [],
     "garden": [("meadow", "faostat_metadata")],
@@ -569,6 +569,24 @@ def create_updated_dependency_graph(
             )
             if natural_dependency is not None:
                 new_dependencies.append(natural_dependency)
+            if additional_dependencies is not None:
+                # Optionally include additional dependencies.
+                for additional_dependency in additional_dependencies[channel]:
+                    dependency_channel, dependency_step = additional_dependency
+                    dependency_version = find_latest_version_for_step(
+                        channel=dependency_channel,
+                        step_name=dependency_step,
+                        namespace=namespace,
+                    )
+                    if dependency_version is not None:
+                        new_dependencies.append(
+                            create_dag_line_name(
+                                channel=dependency_channel,
+                                step_name=dependency_step,
+                                namespace=namespace,
+                                version=dependency_version,
+                            )
+                        )
         else:
             # Identify the latest version of the dataset in the dag. That will be the step to be updated.
             latest_version = sorted(
@@ -602,25 +620,6 @@ def create_updated_dependency_graph(
                 new_dependencies.append(new_dependency)
 
         if len(new_dependencies) > 0:
-            if additional_dependencies is not None:
-                # Optionally include additional dependencies.
-                for additional_dependency in additional_dependencies[channel]:
-                    dependency_channel, dependency_step = additional_dependency
-                    dependency_version = find_latest_version_for_step(
-                        channel=dependency_channel,
-                        step_name=dependency_step,
-                        namespace=namespace,
-                    )
-                    if dependency_version is not None:
-                        new_dependencies.append(
-                            create_dag_line_name(
-                                channel=dependency_channel,
-                                step_name=dependency_step,
-                                namespace=namespace,
-                                version=dependency_version,
-                            )
-                        )
-
             # Collect the new dag line and its dependencies, that will later be added to the updated dag.
             new_steps[new_step_name] = set(new_dependencies)
 
