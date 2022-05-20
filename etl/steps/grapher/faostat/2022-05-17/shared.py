@@ -81,7 +81,7 @@ def prepare_wide_table(data_table: catalog.Table) -> catalog.Table:
 
     # TODO: Check why in food_explorer, _fields are also added to the table.
     # data_table_garden._fields = fields
-    
+
     # Reset index, since countries will need to be converted into entities.
     wide_table = wide_table.reset_index()
 

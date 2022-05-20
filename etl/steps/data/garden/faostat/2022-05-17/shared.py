@@ -338,7 +338,7 @@ def clean_data(data: pd.DataFrame, countries_file: Path) -> pd.DataFrame:
     data = data.drop(columns=columns_to_drop)
 
     # Set appropriate indexes.
-    data = data.set_index(['country', 'year', 'item', 'element', 'unit']).sort_index()
+    data = data.set_index(["country", "year", "item", "element", "unit"]).sort_index()
 
     return data
 
