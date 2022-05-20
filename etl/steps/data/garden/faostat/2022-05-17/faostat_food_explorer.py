@@ -15,7 +15,7 @@ from owid.datautils import geo
 from etl.paths import DATA_DIR
 
 # Dataset name and title.
-DATASET_TITLE = f"Food Explorer."
+DATASET_TITLE = "Food Explorer."
 
 
 # TODO: Consider not removing the population variable in garden datasets. It seems in the old explorer we multiply
@@ -27,7 +27,9 @@ DATASET_TITLE = f"Food Explorer."
 #  The main issue with that is that we would need to check which variables (and what aggregation).
 
 
-def combine_qcl_and_fbsc(qcl_table: catalog.Table, fbsc_table: catalog.Table) -> pd.DataFrame:
+def combine_qcl_and_fbsc(
+    qcl_table: catalog.Table, fbsc_table: catalog.Table
+) -> pd.DataFrame:
     qcl = pd.DataFrame(qcl_table).reset_index()
     qcl["value"] = qcl["value"].astype(float)
     fbsc = pd.DataFrame(fbsc_table).reset_index()
@@ -35,11 +37,17 @@ def combine_qcl_and_fbsc(qcl_table: catalog.Table, fbsc_table: catalog.Table) ->
 
     rename_columns = {"item": "product"}
     index_columns = ["country", "year", "product", "element", "unit"]
-    combined = pd.concat([qcl, fbsc.drop(columns="description")], ignore_index=True).rename(columns=rename_columns).\
-        sort_values(index_columns).reset_index(drop=True)
+    combined = (
+        pd.concat([qcl, fbsc.drop(columns="description")], ignore_index=True)
+        .rename(columns=rename_columns)
+        .sort_values(index_columns)
+        .reset_index(drop=True)
+    )
 
-    assert len(combined) == (len(qcl) + len(fbsc)), "Unexpected number of rows after combining qcl and fbsc datasets."
-    assert len(combined[combined['value'].isnull()]) == 0, "Unexpected nan values."
+    assert len(combined) == (
+        len(qcl) + len(fbsc)
+    ), "Unexpected number of rows after combining qcl and fbsc datasets."
+    assert len(combined[combined["value"].isnull()]) == 0, "Unexpected nan values."
 
     return combined
 
@@ -51,14 +59,18 @@ def process_combined_data(data: pd.DataFrame) -> pd.DataFrame:
     data["title"] = data["element"] + "-" + data["unit"]
 
     # This will create a table with just one column and country-year as index.
-    data_wide = data.pivot(index=index_columns, columns=["title"], values="value").reset_index()
+    data_wide = data.pivot(
+        index=index_columns, columns=["title"], values="value"
+    ).reset_index()
 
     # Add column for population.
     data_wide = geo.add_population_to_dataframe(df=data_wide)
 
     # TODO: Select relevant products.
 
-    assert len(data_wide.columns[data_wide.isnull().all(axis=0)]) == 0, "Unexpected columns with only nan values."
+    assert (
+        len(data_wide.columns[data_wide.isnull().all(axis=0)]) == 0
+    ), "Unexpected columns with only nan values."
 
     # Set a reasonable index.
     data_wide = data_wide.set_index(index_columns)
@@ -77,8 +89,12 @@ def run(dest_dir: str) -> None:
     dataset_short_name = Path(dest_dir).name
     namespace = dataset_short_name.split("_")[0]
     # Path to latest qcl and fbsc datasets in garden.
-    qcl_latest_dir = sorted((DATA_DIR / "garden" / namespace).glob(f"*/{namespace}_qcl*"))[-1]
-    fbsc_latest_dir = sorted((DATA_DIR / "garden" / namespace).glob(f"*/{namespace}_fbsc*"))[-1]
+    qcl_latest_dir = sorted(
+        (DATA_DIR / "garden" / namespace).glob(f"*/{namespace}_qcl*")
+    )[-1]
+    fbsc_latest_dir = sorted(
+        (DATA_DIR / "garden" / namespace).glob(f"*/{namespace}_fbsc*")
+    )[-1]
 
     ####################################################################################################################
     # Load data.
