@@ -97,11 +97,16 @@ def to_dependency_order(
 
 
 def load_dag(filename: Union[str, Path] = paths.DAG_FILE) -> Dict[str, Any]:
-    with open(str(filename)) as istream:
-        dag: Dict[str, Any] = yaml.safe_load(istream)
+    return _parse_dag_yaml(_load_dag_yaml(str(filename)))
 
-    dag = {node: set(deps) if deps else set() for node, deps in dag["steps"].items()}
-    return dag
+
+def _load_dag_yaml(filename: str) -> Dict[str, Any]:
+    with open(filename) as istream:
+        return yaml.safe_load(istream)
+
+
+def _parse_dag_yaml(dag: Dict[str, Any]) -> Dict[str, Any]:
+    return {node: set(deps) if deps else set() for node, deps in dag["steps"].items()}
 
 
 def reverse_graph(graph: Graph) -> Graph:
