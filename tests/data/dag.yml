@@ -1,0 +1,9 @@
+
+steps:
+  data://garden/url/two:
+    - data://garden/url/one
+  data://garden/url/one:
+    - data://garden/baseline
+
+include:
+  - tests/data/sub_dag.yml
