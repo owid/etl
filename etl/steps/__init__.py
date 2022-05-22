@@ -104,6 +104,7 @@ def load_dag(filename: Union[str, Path] = paths.DAG_FILE) -> Dict[str, Any]:
         dag = {**dag, **sub_dag}
     return dag
 
+
 def _load_dag_yaml(filename: str) -> Dict[str, Any]:
     with open(filename) as istream:
         return yaml.safe_load(istream)

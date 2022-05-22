@@ -31,9 +31,11 @@ def test_all_data_steps_have_code():
 
 def test_sub_dag_import():
     # Ensure that sub-dag is imported from separate file
-    sub_dag_step = 'general_files'
+    sub_dag_step = "general_files"
     assert [
-        s for s in get_all_steps(filename='tests/data/dag.yml') if "general_files" in s.path
+        s
+        for s in get_all_steps(filename="tests/data/dag.yml")
+        if sub_dag_step in s.path
     ], "sub-dag steps not found"
 
 
