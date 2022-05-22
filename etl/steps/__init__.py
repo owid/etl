@@ -97,8 +97,12 @@ def to_dependency_order(
 
 
 def load_dag(filename: Union[str, Path] = paths.DAG_FILE) -> Dict[str, Any]:
-    return _parse_dag_yaml(_load_dag_yaml(str(filename)))
-
+    base_dag_yml = _load_dag_yaml(str(filename))
+    dag = _parse_dag_yaml(base_dag_yml)
+    for sub_dag_filename in base_dag_yml["include"]:
+        sub_dag = _parse_dag_yaml(_load_dag_yaml(sub_dag_filename))
+        dag = {**dag, **sub_dag}
+    return dag
 
 def _load_dag_yaml(filename: str) -> Dict[str, Any]:
     with open(filename) as istream:
