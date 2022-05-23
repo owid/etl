@@ -97,12 +97,24 @@ def to_dependency_order(
 
 
 def load_dag(filename: Union[str, Path] = paths.DAG_FILE) -> Dict[str, Any]:
-    base_dag_yml = _load_dag_yaml(str(filename))
-    dag = _parse_dag_yaml(base_dag_yml)
-    for sub_dag_filename in base_dag_yml["include"]:
-        sub_dag = _parse_dag_yaml(_load_dag_yaml(sub_dag_filename))
-        dag = {**dag, **sub_dag}
-    return dag
+    return _load_dag(filename, {})
+
+
+def _load_dag(filename: Union[str, Path], prev_dag: Dict[str, Any]):
+    """
+    Recursive helper to 1) load a dag itself, and 2) load any sub-dags
+    included in the dag via 'include' statements
+    """
+    dag_yml = _load_dag_yaml(filename)
+    curr_dag = _parse_dag_yaml(dag_yml)
+    curr_dag.update(prev_dag)
+
+    if "include" in dag_yml:
+        for sub_dag_filename in dag_yml["include"]:
+            sub_dag = _load_dag(sub_dag_filename, curr_dag)
+            curr_dag.update(sub_dag)
+
+    return curr_dag
 
 
 def _load_dag_yaml(filename: str) -> Dict[str, Any]:
