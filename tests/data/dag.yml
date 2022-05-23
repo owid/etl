@@ -1,7 +1,7 @@
 
 steps:
-  data://garden/wpp/2019/standard_projections:
-    - data://meadow/wpp/2019/standard_projections
+  data://test/step_1:
+    - data://test/step_0
 
 include:
   - tests/data/sub_dag.yml
