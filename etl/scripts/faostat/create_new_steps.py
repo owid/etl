@@ -626,6 +626,45 @@ def create_updated_dependency_graph(
     return new_steps
 
 
+def update_food_explorer_dependency_version():
+    """Ensure the dependency of the food explorer corresponds to the latest version of the garden dataset of the food
+    explorer.
+
+    """
+    # Load the full content of the dag.
+    with open(DAG_FILE, "r") as _dag_file:
+        dag_lines = _dag_file.read()
+
+    # Exact dag line for the OWID food explorer.
+    dag_line_explorer = "data://explorer/owid/latest/food_explorer"
+    # Find the latest version of the FAOSTAT food explorer dataset in garden.
+    new_version = find_latest_version_for_step(channel="garden", step_name="faostat_food_explorer")
+    # To begin with, assume old version is identical to new.
+    old_version = new_version
+    # Find dag line for the food explorer, and replace the following line with the new version of the garden dataset.
+    replace_line = False
+    new_lines = ""
+    for line in dag_lines.split("\n"):
+        if replace_line:
+            # Current line corresponds to the dependency of the food explorer.
+            # Get version of the dependency of the food explorer that is written currently in the dag.
+            old_version = get_version_from_dag_line(line)
+            # Replace that version with the latest one.
+            new_lines += line.replace(old_version, new_version) + "\n"
+            replace_line = False
+        else:
+            new_lines += line + "\n"
+        if dag_line_explorer in line:
+            # The next line is the one corresponding to the dependency of the food explorer.
+            replace_line = True
+
+    if old_version != new_version:
+        print("Updating version of the dependency dataset of the food explorer.")
+        # Write new lines to dag file.
+        with open(DAG_FILE, "w") as _dag_file:
+            _dag_file.write(new_lines[:-1])
+
+
 def write_steps_to_dag_file(
     dag_steps: Dict[str, Set[str]], header_line: Optional[str]
 ) -> None:
@@ -671,6 +710,9 @@ def write_steps_to_dag_file(
         # Add new lines to dag file.
         with open(DAG_FILE, "a") as _dag_file:
             _dag_file.write(new_step_lines)
+
+        # Ensure the dependency of the food explorer corresponds is the latest version.
+        update_food_explorer_dependency_version()
 
 
 def main(channel: str, include_all_datasets: bool = False) -> None:
