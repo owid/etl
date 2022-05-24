@@ -5,9 +5,10 @@
 """
 Check the integrity of the DAG.
 """
+from pathlib import Path
+from typing import List, Union
 
-from typing import List
-
+from etl import paths
 from etl.steps import load_dag, compile_steps, WaldenStep, DataStep, Step
 
 
@@ -28,7 +29,14 @@ def test_all_data_steps_have_code():
         assert s.can_execute(), f'no code found for step "data://{s.path}"'
 
 
-def get_all_steps() -> List[Step]:
-    dag = load_dag()
+def test_sub_dag_import():
+    # Ensure that sub-dag is imported from separate file
+    assert any(
+        ["sub_dag_step" in step for step in load_dag("tests/data/dag.yml")]
+    ), "sub-dag steps not found"
+
+
+def get_all_steps(filename: Union[str, Path] = paths.DAG_FILE) -> List[Step]:
+    dag = load_dag(filename)
     steps = compile_steps(dag, [])
     return steps
