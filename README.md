@@ -239,3 +239,14 @@ etl --private
 reindex
 publish --private
 ```
+
+## Release process
+
+CRON job is running on a server every 5 minutes looking for changes on master on the etl repo. If there are changes it will run `make publish` which is equivalent to running
+
+```
+1. `etl` (build/rebuild anything that’s missing/out of date)
+2. `reindex` (generate a catalog index in `data/` for each channel)
+3. `publish` (rsync the `data/` folder to an s3 bucket s3://owid-catalog/)
+
+Then the s3 bucket has a CloudFlare proxy on top (https://catalog.ourworldindata.org/). If you use the [owid-catalog-py](https://github.com/owid/owid-catalog-py) project from Python and call `find()` or `find_one()` you will be doing HTTP requests against the static files in the catalog.
