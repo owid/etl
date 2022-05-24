@@ -93,6 +93,11 @@ def _load_values(engine: Engine, variable_ids: list[int]) -> pd.DataFrame:
             "entity_name": "category",
         }
     )
+
+    # special case for empty dataframes (would fail otherwise when saving to feather)
+    if df.empty:
+        df = df.reset_index(drop=True)
+
     return df
 
 
