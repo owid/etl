@@ -39,7 +39,7 @@ watch: .venv
 	git submodule update --init
 	touch $@
 
-.venv: pyproject.toml poetry.toml poetry.lock .submodule-init vendor/*/*
+.venv: pyproject.toml poetry.toml poetry.lock .submodule-init
 	@echo '==> Installing packages'
 	poetry install
 	touch $@
