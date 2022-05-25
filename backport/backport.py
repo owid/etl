@@ -27,6 +27,9 @@ log = structlog.get_logger()
 
 engine = get_engine()
 
+# preload walden catalog to improve performance (initializing the catalog takes a while)
+walden_catalog = WaldenCatalog()
+
 
 def _walden_values_metadata(ds: GrapherDatasetModel, short_name: str) -> WaldenDataset:
     """Create walden dataset for grapher dataset values.
@@ -138,7 +141,7 @@ def _upload_values_to_walden(
 
 def _checksum_match(short_name: str, md5: str) -> bool:
     try:
-        walden_ds = WaldenCatalog().find_one(short_name=short_name)
+        walden_ds = walden_catalog.find_one(short_name=short_name)
     except KeyError:
         # datasets not found in catalog
         return False
@@ -147,7 +150,7 @@ def _checksum_match(short_name: str, md5: str) -> bool:
 
 
 def _walden_timestamp(short_name: str) -> dt.datetime:
-    t = WaldenCatalog().find_one(short_name=short_name).date_accessed
+    t = walden_catalog.find_one(short_name=short_name).date_accessed
     return cast(dt.datetime, pd.to_datetime(t))
 
 
