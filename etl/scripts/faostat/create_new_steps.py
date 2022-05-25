@@ -33,7 +33,7 @@ from typing import cast, Dict, List, Optional, Set, Tuple
 import pandas as pd
 from owid.walden import Catalog
 
-from etl.paths import DAG_FILE, STEP_DIR
+from etl.paths import BASE_DIR, STEP_DIR
 from etl.steps import load_dag
 from etl.files import checksum_file
 
@@ -41,6 +41,8 @@ from etl.files import checksum_file
 NAMESPACE = "faostat"
 # Name of additional metadata file (without extension).
 ADDITIONAL_METADATA_FILE_NAME = f"{NAMESPACE}_metadata"
+# Path to dag file for FAOSTAT steps.
+DAG_FILE = BASE_DIR / "dag_faostat.yml"
 # Name of shared module containing the run function (without extension).
 RUN_FILE_NAME = "shared"
 # Glob pattern to match version folders like "YYYY-MM-DD".
