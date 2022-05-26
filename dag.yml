@@ -67,6 +67,5 @@ steps:
 
 # Sub-dags to import
 include:
-  - dag_open_numbers.yml
-  - dag_faostat.yml
-
+  - dag_files/dag_open_numbers.yml
+  - dag_files/dag_faostat.yml
