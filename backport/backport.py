@@ -43,7 +43,7 @@ def _walden_values_metadata(ds: GrapherDatasetModel, short_name: str) -> WaldenD
         name=ds.name,
         date_accessed=dt.datetime.utcnow().isoformat(),
         description=ds.description,
-        source_name="Our World in Data",
+        source_name="Our World in Data catalog backport",
         url=f"https://owid.cloud/admin/datasets/{ds.id}",
         publication_date="latest",
         file_extension="feather",
@@ -228,7 +228,9 @@ def backport(
     lg.info("backport.loading_values", variables=variable_ids)
     df = _load_values(engine, variable_ids)
     lg.info("backport.upload_values", size=len(df))
-    _upload_values_to_walden(df, _walden_values_metadata(ds, short_name), dry_run, upload)
+    _upload_values_to_walden(
+        df, _walden_values_metadata(ds, short_name), dry_run, upload
+    )
 
     lg.info("backport.finished")
 

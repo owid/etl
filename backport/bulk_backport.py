@@ -29,7 +29,9 @@ log = structlog.get_logger()
     type=bool,
     help="Upload dataset to Walden",
 )
-def bulk_backport(dataset_ids: list[int], dry_run: bool, limit: int, upload: bool) -> None:
+def bulk_backport(
+    dataset_ids: list[int], dry_run: bool, limit: int, upload: bool
+) -> None:
     engine = get_engine()
 
     q = """
