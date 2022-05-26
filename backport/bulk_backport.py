@@ -23,7 +23,13 @@ log = structlog.get_logger()
     default=1000000,
     type=int,
 )
-def bulk_backport(dataset_ids: list[int], dry_run: bool, limit: int) -> None:
+@click.option(
+    "--upload/--skip-upload",
+    default=True,
+    type=bool,
+    help="Upload dataset to Walden",
+)
+def bulk_backport(dataset_ids: list[int], dry_run: bool, limit: int, upload: bool) -> None:
     engine = get_engine()
 
     q = """
@@ -56,6 +62,7 @@ def bulk_backport(dataset_ids: list[int], dry_run: bool, limit: int) -> None:
             dataset_id=ds.id,
             short_name=ds.short_name,
             dry_run=dry_run,
+            upload=upload,
         )
 
     log.info("bulk_backport.finished")

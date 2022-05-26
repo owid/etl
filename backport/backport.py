@@ -118,25 +118,26 @@ def _load_config(
 
 
 def _upload_config_to_walden(
-    config: GrapherConfig, meta: WaldenDataset, dry_run: bool
+    config: GrapherConfig, meta: WaldenDataset, dry_run: bool, upload: bool
 ) -> None:
     with tempfile.NamedTemporaryFile(mode="w") as f:
         f.write(config.json())
         f.flush()
 
         if not dry_run:
-            add_to_catalog(meta, f.name, upload=True)
+            add_to_catalog(meta, f.name, upload)
 
 
 def _upload_values_to_walden(
     df: pd.DataFrame,
     meta: WaldenDataset,
     dry_run: bool,
+    upload: bool,
 ) -> None:
     with tempfile.NamedTemporaryFile(mode="wb") as f:
         df.to_feather(f.name, compression="lz4")
         if not dry_run:
-            add_to_catalog(meta, f.name, upload=True)
+            add_to_catalog(meta, f.name, upload)
 
 
 def _checksum_match(short_name: str, md5: str) -> bool:
@@ -175,6 +176,7 @@ def backport(
     short_name: Optional[str] = None,
     force: bool = False,
     dry_run: bool = False,
+    upload: bool = True,
 ) -> None:
     lg = log.bind(dataset_id=dataset_id)
 
@@ -219,14 +221,14 @@ def backport(
     # upload config to walden
     lg.info("backport.upload_config")
     _upload_config_to_walden(
-        config, _walden_config_metadata(ds, short_name, md5_config), dry_run
+        config, _walden_config_metadata(ds, short_name, md5_config), dry_run, upload
     )
 
     # upload values to walden
     lg.info("backport.loading_values", variables=variable_ids)
     df = _load_values(engine, variable_ids)
     lg.info("backport.upload_values", size=len(df))
-    _upload_values_to_walden(df, _walden_values_metadata(ds, short_name), dry_run)
+    _upload_values_to_walden(df, _walden_values_metadata(ds, short_name), dry_run, upload)
 
     lg.info("backport.finished")
 
@@ -249,12 +251,19 @@ def backport(
     type=bool,
     help="Do not add dataset to a catalog on dry-run",
 )
+@click.option(
+    "--upload/--skip-upload",
+    default=True,
+    type=bool,
+    help="Upload dataset to Walden",
+)
 def backport_cli(
     dataset_id: int,
     variable_id: Optional[int] = None,
     short_name: Optional[str] = None,
     force: bool = False,
     dry_run: bool = False,
+    upload: bool = True,
 ) -> None:
     return backport(
         dataset_id,
@@ -262,6 +271,7 @@ def backport_cli(
         short_name,
         force,
         dry_run,
+        upload,
     )
 
 
