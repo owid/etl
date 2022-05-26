@@ -6,7 +6,7 @@
 
 include default.mk
 
-SRC = etl tests
+SRC = etl backport tests
 
 help:
 	@echo 'Available commands:'

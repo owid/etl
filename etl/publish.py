@@ -72,6 +72,7 @@ def sync_catalog_to_s3(
         print(f"Catalog's channel {channel} is up to date!")
         return
 
+    print(f"Syncing datasets from channel {channel}")
     sync_datasets(s3, bucket, catalog, channel, dry_run=dry_run)
     if not dry_run:
         update_catalog(s3, bucket, catalog, channel)

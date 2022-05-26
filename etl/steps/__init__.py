@@ -46,6 +46,7 @@ from etl.grapher_import import (
     cleanup_ghost_sources,
     cleanup_ghost_variables,
 )
+from etl import backport_helpers
 
 Graph = Dict[str, Set[str]]
 DAG = Dict[str, Any]
@@ -171,10 +172,7 @@ def filter_to_subgraph(graph: Graph, includes: Iterable[str]) -> Graph:
     For each step to be included, find all its ancestors and all its descendents
     recursively and include them too.
     """
-    all_steps = set(graph)
-    for children in graph.values():
-        all_steps.update(children)
-
+    all_steps = graph_nodes(graph)
     subgraph: Graph = defaultdict(set)
 
     included = [
@@ -254,6 +252,9 @@ def parse_step(step_name: str, dag: Dict[str, Any]) -> "Step":
     elif step_type == "grapher":
         step = GrapherStep(path, dependencies)
 
+    elif step_type == "backport":
+        step = BackportStep(path, dependencies)
+
     elif step_type == "data-private":
         step = DataStepPrivate(path, dependencies)
 
@@ -302,7 +303,7 @@ class DataStep(Step):
         return f"data://{self.path}"
 
     def run(self) -> None:
-        # make sure the encosing folder is there
+        # make sure the enclosing folder is there
         self._dest_dir.parent.mkdir(parents=True, exist_ok=True)
 
         sp = self._search_path
@@ -669,6 +670,27 @@ class ETagStep(Step):
 
     def checksum_output(self) -> str:
         return get_etag(f"https://{self.path}")
+
+
+class BackportStep(DataStep):
+    def __str__(self) -> str:
+        return f"backport://{self.path}"
+
+    def run(self) -> None:
+        # make sure the enclosing folder is there
+        self._dest_dir.parent.mkdir(parents=True, exist_ok=True)
+
+        dataset = backport_helpers.create_dataset(
+            self._dest_dir.as_posix(), self._dest_dir.name
+        )
+
+        # modify the dataset to remember what inputs were used to build it
+        dataset.metadata.source_checksum = self.checksum_input()
+        dataset.save()
+
+    @property
+    def _dest_dir(self) -> Path:
+        return paths.DATA_DIR / self.path.lstrip("/")
 
 
 class DataStepPrivate(DataStep):
