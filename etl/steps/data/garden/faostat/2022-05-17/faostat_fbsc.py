@@ -107,13 +107,17 @@ def combine_fbsh_and_fbs_datasets(
     # Add also "unit", just to check that data in the original dataset and in metadata coincide.
     fbsh = pd.merge(
         fbsh,
-        additional_metadata["faostat_fbsh_element"].rename(columns={"unit": "unit_check"}),
+        additional_metadata["faostat_fbsh_element"].rename(
+            columns={"unit": "unit_check"}
+        ),
         on="element",
         how="left",
     )
     fbs = pd.merge(
         fbs,
-        additional_metadata["faostat_fbs_element"].rename(columns={"unit": "unit_check"}),
+        additional_metadata["faostat_fbs_element"].rename(
+            columns={"unit": "unit_check"}
+        ),
         on="element",
         how="left",
     )
@@ -123,7 +127,8 @@ def combine_fbsh_and_fbs_datasets(
         additional_metadata=additional_metadata
     )
     check_that_all_flags_in_dataset_are_in_ranking(
-        data=fbsh, additional_metadata_for_flags=additional_metadata["faostat_fbsh_flag"]
+        data=fbsh,
+        additional_metadata_for_flags=additional_metadata["faostat_fbsh_flag"],
     )
     check_that_all_flags_in_dataset_are_in_ranking(
         data=fbs, additional_metadata_for_flags=additional_metadata["faostat_fbs_flag"]

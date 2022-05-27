@@ -628,7 +628,7 @@ def create_updated_dependency_graph(
     return new_steps
 
 
-def update_food_explorer_dependency_version():
+def update_food_explorer_dependency_version() -> None:
     """Ensure the dependency of the food explorer corresponds to the latest version of the garden dataset of the food
     explorer.
 
@@ -640,7 +640,11 @@ def update_food_explorer_dependency_version():
     # Exact dag line for the OWID food explorer.
     dag_line_explorer = "data://explorer/owid/latest/food_explorer"
     # Find the latest version of the FAOSTAT food explorer dataset in garden.
-    new_version = find_latest_version_for_step(channel="garden", step_name="faostat_food_explorer")
+    new_version = find_latest_version_for_step(
+        channel="garden", step_name="faostat_food_explorer"
+    )
+    if new_version is None:
+        raise FileNotFoundError("Food explorer step file not found.")
     # To begin with, assume old version is identical to new.
     old_version = new_version
     # Find dag line for the food explorer, and replace the following line with the new version of the garden dataset.

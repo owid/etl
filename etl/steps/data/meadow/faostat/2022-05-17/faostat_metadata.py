@@ -83,8 +83,10 @@ def check_that_category_structure_is_well_defined(md: Dict[str, Any]) -> None:
                 category_metadata = md[dataset][category]["data"]
                 for entry in category_metadata:
                     for category_index in category_indexes:
-                        error = f"Index {category_index} not found in {category} for {dataset}. " \
-                                f"Redefine category_structure."
+                        error = (
+                            f"Index {category_index} not found in {category} for {dataset}. "
+                            "Redefine category_structure."
+                        )
                         assert category_index in entry, error
 
 
