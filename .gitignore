@@ -5,6 +5,7 @@
 .submodule-init
 .mypy-cache
 .pytest-cache
+.python-version
 .venv
 __pycache__
 .ipynb_checkpoints
