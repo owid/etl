@@ -1,24 +1,72 @@
 from typing import cast
 
+import structlog
+import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
 from owid.catalog.utils import underscore_table
-from owid.walden import Catalog
+from owid.walden import Catalog as WaldenCatalog
 
 from etl.grapher_model import GrapherConfig
 from etl.steps.data.converters import convert_grapher_dataset, convert_grapher_variable
 
 
+SPARSE_DATASET_VARIABLES_CHUNKSIZE = 1000
+
+log = structlog.get_logger()
+
+
 def load_values(short_name: str) -> pd.DataFrame:
-    walden_ds = Catalog().find_one(short_name=f"{short_name}_values")
+    walden_ds = WaldenCatalog().find_one(short_name=f"{short_name}_values")
     local_path = walden_ds.ensure_downloaded()
     return cast(pd.DataFrame, pd.read_feather(local_path))
 
 
 def load_config(short_name: str) -> GrapherConfig:
-    walden_ds = Catalog().find_one(short_name=f"{short_name}_config")
+    walden_ds = WaldenCatalog().find_one(short_name=f"{short_name}_config")
     local_path = walden_ds.ensure_downloaded()
     return GrapherConfig.parse_file(local_path)
+
+
+def create_wide_table(
+    values: pd.DataFrame, short_name: str, config: GrapherConfig
+) -> Table:
+    """Convert backported table from long to wide format."""
+    # convert to wide format
+    long_mem_usage_mb = values.memory_usage().sum() / 1e6
+    df = values.pivot(
+        index=["entity_name", "year"], columns="variable_name", values="value"
+    )
+
+    # report compression ratio if the file is larger than >1MB
+    # NOTE: memory usage can further drop later after repack_frame is called
+    wide_mem_usage_mb = df.memory_usage().sum() / 1e6
+    if wide_mem_usage_mb > 1:
+        log.info(
+            "create_wide_table",
+            short_name=short_name,
+            wide_mb=wide_mem_usage_mb,
+            long_mb=long_mem_usage_mb,
+            density=f"{df.notnull().sum().sum() / (df.shape[0] * df.shape[1]):.1%}",
+            compression=f"{wide_mem_usage_mb / long_mem_usage_mb:.1%}",
+        )
+
+    t = Table(df)
+    t.metadata.short_name = short_name
+
+    # add variables metadata
+    # NOTE: some datasets such as `dataset_5438_global_health_observatory__world_health_organization__2021_12`
+    #   would benefit from compression metadata as it is almost as large as the data itself (uncompressed)
+    variable_dict = {v.name: v for v in config.variables}
+    variable_source_dict = {s.id: s for s in config.sources}
+
+    for col in t.columns:
+        variable = variable_dict[col]
+        t[col].metadata = convert_grapher_variable(
+            variable, variable_source_dict[variable.sourceId]
+        )
+
+    return underscore_table(t)
 
 
 def create_dataset(dest_dir: str, short_name: str) -> Dataset:
@@ -27,35 +75,56 @@ def create_dataset(dest_dir: str, short_name: str) -> Dataset:
     values = load_values(short_name)
     config = load_config(short_name)
 
-    # find sources belonging to this dataset
-    ds_sources = [s for s in config.sources if s.datasetId == config.dataset.id]
+    # put sources belonging to a dataset but not to a variable into dataset metadata
+    variable_source_ids = {v.sourceId for v in config.variables}
+    ds_sources = [
+        s
+        for s in config.sources
+        if s.datasetId == config.dataset.id and s.id not in variable_source_ids
+    ]
 
     # create dataset with metadata
     ds = Dataset.create_empty(
         dest_dir, convert_grapher_dataset(config.dataset, ds_sources, short_name)
     )
 
-    # convert to wide format
-    df = values.pivot(
-        index=["entity_name", "year"], columns="variable_name", values="value"
-    )
+    tables = []
 
-    # convert to float all columns we can
-    for col in df.columns:
-        df[col] = df[col].astype(float, errors="ignore")
+    # if table is too sparse, split it into multiple tables to make them fit in memory
+    # this happens very rarely, e.g. for datasets
+    #   dataset_5520_united_nations_sustainable_development_goals__united_nations__2022_02
+    #   dataset_5438_global_health_observatory__world_health_organization__2021_12
+    # ideally we would have custom scripts for those datasets doing grouping in a logical way
+    # rather than by variable ids
+    n_variables = len(set(values.variable_id))
+    wide_size = n_variables * len(set(values.entity_id))
+    long_size = len(values)
 
-    # TODO: what about Table metadata? should I reuse what I have in a dataset?
-    t = Table(df)
-    t.metadata.short_name = short_name
-
-    # add variables metadata
-    for col in df.columns:
-        variable = [v for v in config.variables if v.name == col][0]
-        variable_source = [s for s in config.sources if s.id == variable.sourceId][0]
-        df[col].metadata = convert_grapher_variable(
-            variable,
-            variable_source,
+    if wide_size >= 1e6 and wide_size / long_size > 0.5:
+        log.warning(
+            "create_dataset.sparse_dataset",
+            short_name=short_name,
         )
 
-    ds.add(underscore_table(t))
+        # group it by chunks
+        for variable_ids in np.array_split(
+            values.variable_id.unique().sort_values(),
+            int(n_variables / SPARSE_DATASET_VARIABLES_CHUNKSIZE),
+        ):
+            variable_ids = variable_ids.astype(int)
+            chunk = values.loc[values.variable_id.isin(variable_ids)]
+            t = create_wide_table(
+                chunk,
+                f"variable_ids_{variable_ids.min()}_to_{variable_ids.max()}",
+                config,
+            )
+            tables.append(t)
+    else:
+        t = create_wide_table(values, short_name, config)
+        tables.append(t)
+
+    # create tables
+    for t in tables:
+        ds.add(t)
+
     return ds

@@ -1,0 +1,3 @@
+steps:
+  data://test/sub_dag_step:
+    - data://test/step_0

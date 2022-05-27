@@ -46,6 +46,7 @@ from etl.grapher_import import (
     cleanup_ghost_sources,
     cleanup_ghost_variables,
 )
+from etl import backport_helpers
 
 Graph = Dict[str, Set[str]]
 DAG = Dict[str, Any]
@@ -97,11 +98,32 @@ def to_dependency_order(
 
 
 def load_dag(filename: Union[str, Path] = paths.DAG_FILE) -> Dict[str, Any]:
-    with open(str(filename)) as istream:
-        dag: Dict[str, Any] = yaml.safe_load(istream)
+    return _load_dag(filename, {})
 
-    dag = {node: set(deps) if deps else set() for node, deps in dag["steps"].items()}
-    return dag
+
+def _load_dag(filename: Union[str, Path], prev_dag: Dict[str, Any]):
+    """
+    Recursive helper to 1) load a dag itself, and 2) load any sub-dags
+    included in the dag via 'include' statements
+    """
+    dag_yml = _load_dag_yaml(filename)
+    curr_dag = _parse_dag_yaml(dag_yml)
+    curr_dag.update(prev_dag)
+
+    for sub_dag_filename in dag_yml.get("include", []):
+        sub_dag = _load_dag(sub_dag_filename, curr_dag)
+        curr_dag.update(sub_dag)
+
+    return curr_dag
+
+
+def _load_dag_yaml(filename: str) -> Dict[str, Any]:
+    with open(filename) as istream:
+        return yaml.safe_load(istream)
+
+
+def _parse_dag_yaml(dag: Dict[str, Any]) -> Dict[str, Any]:
+    return {node: set(deps) if deps else set() for node, deps in dag["steps"].items()}
 
 
 def reverse_graph(graph: Graph) -> Graph:
@@ -150,10 +172,7 @@ def filter_to_subgraph(graph: Graph, includes: Iterable[str]) -> Graph:
     For each step to be included, find all its ancestors and all its descendents
     recursively and include them too.
     """
-    all_steps = set(graph)
-    for children in graph.values():
-        all_steps.update(children)
-
+    all_steps = graph_nodes(graph)
     subgraph: Graph = defaultdict(set)
 
     included = [
@@ -233,6 +252,9 @@ def parse_step(step_name: str, dag: Dict[str, Any]) -> "Step":
     elif step_type == "grapher":
         step = GrapherStep(path, dependencies)
 
+    elif step_type == "backport":
+        step = BackportStep(path, dependencies)
+
     elif step_type == "data-private":
         step = DataStepPrivate(path, dependencies)
 
@@ -281,7 +303,7 @@ class DataStep(Step):
         return f"data://{self.path}"
 
     def run(self) -> None:
-        # make sure the encosing folder is there
+        # make sure the enclosing folder is there
         self._dest_dir.parent.mkdir(parents=True, exist_ok=True)
 
         sp = self._search_path
@@ -648,6 +670,27 @@ class ETagStep(Step):
 
     def checksum_output(self) -> str:
         return get_etag(f"https://{self.path}")
+
+
+class BackportStep(DataStep):
+    def __str__(self) -> str:
+        return f"backport://{self.path}"
+
+    def run(self) -> None:
+        # make sure the enclosing folder is there
+        self._dest_dir.parent.mkdir(parents=True, exist_ok=True)
+
+        dataset = backport_helpers.create_dataset(
+            self._dest_dir.as_posix(), self._dest_dir.name
+        )
+
+        # modify the dataset to remember what inputs were used to build it
+        dataset.metadata.source_checksum = self.checksum_input()
+        dataset.save()
+
+    @property
+    def _dest_dir(self) -> Path:
+        return paths.DATA_DIR / self.path.lstrip("/")
 
 
 class DataStepPrivate(DataStep):
