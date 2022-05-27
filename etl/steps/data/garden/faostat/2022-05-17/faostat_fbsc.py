@@ -45,10 +45,6 @@ ITEMS_MAPPING = {
     "Rice (Milled Equivalent)": "Rice and products",
 }
 
-# Elements to remove from data.
-# TODO: Check that we do not want to keep FAO population.
-ELEMENTS_TO_REMOVE = ["Total Population - Both sexes"]
-
 
 def check_if_element_descriptions_coincide_in_fbsh_and_fbs(
     fbsh: pd.DataFrame, fbs: pd.DataFrame, fbsc: pd.DataFrame
@@ -111,13 +107,13 @@ def combine_fbsh_and_fbs_datasets(
     # Add also "unit", just to check that data in the original dataset and in metadata coincide.
     fbsh = pd.merge(
         fbsh,
-        additional_metadata["meta_fbsh_element"].rename(columns={"unit": "unit_check"}),
+        additional_metadata["faostat_fbsh_element"].rename(columns={"unit": "unit_check"}),
         on="element",
         how="left",
     )
     fbs = pd.merge(
         fbs,
-        additional_metadata["meta_fbs_element"].rename(columns={"unit": "unit_check"}),
+        additional_metadata["faostat_fbs_element"].rename(columns={"unit": "unit_check"}),
         on="element",
         how="left",
     )
@@ -127,10 +123,10 @@ def combine_fbsh_and_fbs_datasets(
         additional_metadata=additional_metadata
     )
     check_that_all_flags_in_dataset_are_in_ranking(
-        data=fbsh, additional_metadata_for_flags=additional_metadata["meta_fbsh_flag"]
+        data=fbsh, additional_metadata_for_flags=additional_metadata["faostat_fbsh_flag"]
     )
     check_that_all_flags_in_dataset_are_in_ranking(
-        data=fbs, additional_metadata_for_flags=additional_metadata["meta_fbs_flag"]
+        data=fbs, additional_metadata_for_flags=additional_metadata["faostat_fbs_flag"]
     )
 
     # Check that units of elements in fbsh and in the corresponding metadata coincide.
@@ -147,9 +143,6 @@ def combine_fbsh_and_fbs_datasets(
 
     # Map old item names to new item names.
     fbsc["item"] = fbsc["item"].replace(ITEMS_MAPPING)
-
-    # Remove unnecessary elements.
-    fbsc = fbsc[~fbsc["element"].isin(ELEMENTS_TO_REMOVE)].reset_index(drop=True)
 
     # Ensure that each element has only one unit and one description.
     error = "Some elements in the combined dataset have more than one unit."

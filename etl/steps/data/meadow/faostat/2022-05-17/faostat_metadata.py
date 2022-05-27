@@ -1,10 +1,9 @@
-"""Additional FAOSTAT metadata.
-
-Several FAO datasets need identifiers that come from the FAO API. Here we reconstruct them from a snapshot.
+"""Additional FAOSTAT metadata from the FAO API.
 
 """
 
 import json
+from typing import Any, Dict
 
 import pandas as pd
 from owid.walden import Catalog
@@ -17,32 +16,76 @@ DATASET_SHORT_NAME = f"{NAMESPACE}_metadata"
 
 # Define the structure of the additional metadata file.
 category_structure = {
-    "itemgroup": {
-        "index": ["Item Group Code", "Item Code"],
-        "short_name": "item",
-    },
-    # Category "itemsgroup" seems to only exist for qcl.
-    "itemsgroup": {
-        "index": ["Item Group Code", "Item Code"],
-        "short_name": "item",
-    },
     "area": {
         "index": ["Country Code"],
         "short_name": "area",
+    },
+    "areagroup": {
+        "index": ["Country Group Code", "Country Code"],
+        "short_name": "area_group",
     },
     "element": {
         "index": ["Element Code"],
         "short_name": "element",
     },
-    "unit": {
-        "index": ["Unit Name"],
-        "short_name": "unit",
-    },
     "flag": {
         "index": ["Flag"],
         "short_name": "flag",
     },
+    "glossary": {
+        "index": ["Glossary Code"],
+        "short_name": "glossary",
+    },
+    "item": {
+        "index": ["Item Code"],
+        "short_name": "item",
+    },
+    "itemfactor": {
+        "index": ["Item Group Code", "Item Code", "Element Code"],
+        "short_name": "item_factor",
+    },
+    "itemgroup": {
+        "index": ["Item Group Code", "Item Code"],
+        "short_name": "item_group",
+    },
+    "items": {
+        "index": ["Item Code"],
+        "short_name": "item",
+    },
+    "itemsgroup": {
+        "index": ["Item Group Code", "Item Code"],
+        "short_name": "item_group",
+    },
+    "recipientarea": {
+        "index": ["Recipient Country Code"],
+        "short_name": "area",
+    },
+    "unit": {
+        "index": ["Unit Name"],
+        "short_name": "unit",
+    },
+    "year": {
+        "index": ["Year Code"],
+        "short_name": "year",
+    },
+    "year3": {
+        "index": ["Year Code"],
+        "short_name": "year",
+    },
 }
+
+
+def check_that_category_structure_is_well_defined(md: Dict[str, Any]) -> None:
+    for dataset in list(md):
+        for category in category_structure:
+            category_indexes = category_structure[category]["index"]
+            if category in md[dataset]:
+                category_metadata = md[dataset][category]["data"]
+                for entry in category_metadata:
+                    for category_index in category_indexes:
+                        error = f"Index {category_index} not found in {category} for {dataset}. " \
+                                f"Redefine category_structure."
+                        assert category_index in entry, error
 
 
 def run(dest_dir: str) -> None:
@@ -55,6 +98,9 @@ def run(dest_dir: str) -> None:
     # Load and restructure
     with open(local_file) as _local_file:
         additional_metadata = json.load(_local_file)
+
+    # Check that category_structure is well defined.
+    check_that_category_structure_is_well_defined(md=additional_metadata)
 
     # Create new meadow dataset, importing metadata from walden.
     ds = Dataset.create_empty(dest_dir)
@@ -73,5 +119,5 @@ def run(dest_dir: str) -> None:
                     inplace=True,
                 )
                 t = Table(df)
-                t.metadata.short_name = f'meta_{domain.lower()}_{category_structure[category]["short_name"]}'
+                t.metadata.short_name = f'{NAMESPACE}_{domain.lower()}_{category_structure[category]["short_name"]}'
                 ds.add(utils.underscore_table(t))

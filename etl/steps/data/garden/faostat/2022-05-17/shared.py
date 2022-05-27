@@ -409,7 +409,6 @@ def run(dest_dir: str) -> None:
     # short name from that path.
     dataset_short_name = Path(dest_dir).name
     namespace = dataset_short_name.split("_")[0]
-    dataset_code = dataset_short_name.split("_")[1]
     # Path to latest dataset in meadow.
     meadow_version_dir = sorted(
         (DATA_DIR / "meadow" / namespace).glob(f"*/{dataset_short_name}")
@@ -439,7 +438,7 @@ def run(dest_dir: str) -> None:
     data = pd.DataFrame(data_table_meadow).reset_index()
     # Sanity checks.
     check_that_all_flags_in_dataset_are_in_ranking(
-        data, additional_metadata[f"meta_{dataset_code}_flag"]
+        data, additional_metadata[f"{dataset_short_name}_flag"]
     )
 
     ####################################################################################################################
