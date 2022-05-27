@@ -7,6 +7,11 @@ from pydantic import BaseModel
 from sqlalchemy.engine import Engine
 from sqlmodel import JSON, Column, Field, Session, SQLModel, select
 from sqlmodel.sql.expression import Select, SelectOfScalar
+import structlog
+
+
+log = structlog.get_logger()
+
 
 # get rid of warning from https://github.com/tiangolo/sqlmodel/issues/189
 SelectOfScalar.inherit_cache = True  # type: ignore
@@ -115,11 +120,11 @@ class GrapherVariableModel(SQLModel, table=True):
 
 
 class GrapherSourceDescription(BaseModel):
-    link: str
-    retrievedDate: str
+    link: Optional[str] = None
+    retrievedDate: Optional[str] = None
     additionalInfo: Optional[str] = None
-    dataPublishedBy: str
-    dataPublisherSource: str
+    dataPublishedBy: Optional[str] = None
+    dataPublisherSource: Optional[str] = None
 
 
 class GrapherSourceModel(SQLModel, table=True):
@@ -189,6 +194,15 @@ class GrapherSourceModel(SQLModel, table=True):
             },
         )
         sources.description = sources.description.map(json.loads)
+
+        # sources are rarely missing datasetId (that is most likely a bug)
+        if sources.datasetId.isnull().any():
+            log.warning(
+                "load_sources.sources_missing_datasetId",
+                source_ids=sources.id[sources.datasetId.isnull()].tolist(),
+            )
+            sources.datasetId = sources.datasetId.fillna(dataset_id).astype(int)
+
         return [cls(**d) for d in sources.to_dict(orient="records") if cls.validate(d)]
 
 

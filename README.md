@@ -220,3 +220,24 @@ etl --private
 reindex
 publish --private
 ```
+
+
+## Backporting
+
+Datasets from our production grapher database can be backported to ETL catalog. The first step is getting them to Walden using
+
+```
+bulk_backport
+```
+
+(specify `--limit` to make it process only a subset of datasets). It goes through all public datasets with at least one variable used in a chart and uploads them to Walden catalog (or skip them if they're already there and have the same checksum). If you set `--skip-upload` flag, it will only persist the datasets locally. **You need S3 credentials to upload them to Walden.**
+
+Note that you still have to commit those updates to [Walden index](https://github.com/owid/walden/tree/master/owid/walden/index), otherwise others won't be able to rerun the ETL. (If you don't commit them, running `etl` and `publish` steps will still work for you in your local repository, but not for others).
+
+Backported walden datasets can be processed with ETL using
+
+```
+etl --backport
+```
+
+(or `etl backport --backport`). This will transform original datasets from long format to wide format, optimize their data types, convert metadata and add them to the catalog. Then you can run `publish` to publish the datasets as usual.
