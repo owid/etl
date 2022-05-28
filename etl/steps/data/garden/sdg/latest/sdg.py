@@ -9,9 +9,6 @@ from owid.catalog import Dataset, Table, Variable
 from owid.catalog.utils import concat_variables
 from etl.paths import DATA_DIR
 
-from etl import backport_helpers as bh
-from etl.grapher_model import GrapherConfig
-
 log = structlog.get_logger(__name__)
 
 
