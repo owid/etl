@@ -51,6 +51,10 @@ def bulk_backport(
     order by rand()
     limit %(limit)s
     """
+    # ignore limit if using dataset ids
+    if dataset_ids:
+        limit = 1000000
+
     df = pd.read_sql(q, engine, params={"limit": limit})
 
     if dataset_ids:
