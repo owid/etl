@@ -693,6 +693,9 @@ class BackportStep(DataStep):
 
         self.after_run()
 
+    def can_execute(self) -> bool:
+        return True
+
     @property
     def _dest_dir(self) -> Path:
         return paths.DATA_DIR / self.path.lstrip("/")
