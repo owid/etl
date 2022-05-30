@@ -38,6 +38,7 @@ from owid import catalog
 from owid import walden
 from owid.walden import CATALOG as WALDEN_CATALOG
 
+import walden
 from etl import files, paths, git
 from etl.helpers import get_etag
 from etl.grapher_import import (
@@ -459,7 +460,7 @@ class WaldenStep(Step):
         return checksum
 
     @property
-    def _walden_dataset(self) -> walden.Dataset:
+    def _walden_dataset(self) -> walden.WaldenDataset:
         if self.path.count("/") != 2:
             raise ValueError(f"malformed walden path: {self.path}")
 
