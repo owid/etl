@@ -2,7 +2,7 @@ import pandas as pd
 import structlog
 import copy
 from pathlib import Path
-from typing import List
+from typing import List, Optional
 from collections import defaultdict
 
 from owid.catalog import Dataset, Table, Variable
@@ -26,7 +26,9 @@ def _load_sdg_sources() -> pd.DataFrame:
     return sdg_sources
 
 
-def _get_variable_from_backported_table(table: Table, variable_id: str) -> Variable:
+def _get_variable_from_backported_table(
+    table: Table, variable_id: str
+) -> Optional[Variable]:
     """Get variable from backported table."""
     for col in table.columns:
         var_id = table[col].metadata.additional_info["grapher_meta"]["id"]
@@ -36,7 +38,7 @@ def _get_variable_from_backported_table(table: Table, variable_id: str) -> Varia
             v.metadata = copy.deepcopy(table[col].metadata)
             return v
     else:
-        raise Exception(f"Variable {variable_id} not found")
+        return None
 
 
 def _indicator_prefix(name: str, indicator: str) -> str:
@@ -58,18 +60,25 @@ def run(dest_dir: str) -> None:
     for dataset_name, sdg_group in sdg_sources.groupby("dataset_name"):
         ds = Dataset(DATA_DIR / "backport/owid/latest" / dataset_name)
 
-        assert (
-            len(ds.table_names) == 1
-        ), "Backproted dataset should have exactly one table"
-        table = ds[ds.table_names[0]]
-
         # go over all indicators from that dataset
         for r in sdg_group.itertuples():
-            log.info("sdg.run", indicator=r.indicator, variable_name=r.variable_name)
 
-            v = _get_variable_from_backported_table(table, r.variable_id)
-            v.name = _indicator_prefix(v.name, r.indicator)
-            vars[r.goal].append(v)
+            # iterate over all tables in a dataset (backported datasets would
+            # usually have only one)
+            for table_name in ds.table_names:
+                table = ds[table_name]
+
+                log.info(
+                    "sdg.run", indicator=r.indicator, variable_name=r.variable_name
+                )
+                v = _get_variable_from_backported_table(table, r.variable_id)
+                if v is not None:
+                    v.name = _indicator_prefix(v.name, r.indicator)
+                    vars[r.goal].append(v)
+                    # variable found, continue with another indicator
+                    break
+            else:
+                raise Exception(f"Variable {r.variable_id} not found in tables")
 
     # create new dataset
     new_ds = Dataset.create_empty(dest_dir)
