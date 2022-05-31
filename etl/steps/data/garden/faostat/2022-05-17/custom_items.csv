@@ -1,0 +1,131 @@
+dataset,item_code,fao_item,owid_item
+faostat_fbsc,00002617,Apples and products,Apples
+faostat_fbsc,00002513,Barley and products,Barley
+faostat_fbsc,00002546,Beans,"Beans, dry"
+faostat_fbsc,00002731,Bovine Meat,"Meat, beef"
+faostat_fbsc,00002532,Cassava and products,Cassava
+faostat_fbsc,00002633,Cocoa Beans and products,Cocoa beans
+faostat_fbsc,00002578,Coconut Oil,Coconut oil
+faostat_fbsc,00002560,Coconuts - Incl Copra,Coconuts
+faostat_fbsc,00002575,Cottonseed Oil,Cottonseed oil
+faostat_fbsc,00002737,"Fats, Animals, Raw",Animal fats
+faostat_fbsc,00002960,"Fish, Seafood",Fish and seafood
+faostat_fbsc,00002919,Fruits - Excluding Wine,Fruit
+faostat_fbsc,00002901,Grand Total,Total
+faostat_fbsc,00002613,Grapefruit and products,Grapefruit
+faostat_fbsc,00002572,Groundnut Oil,Groundnut oil
+faostat_fbsc,00002556,Groundnuts (Shelled Eq),Groundnuts
+faostat_fbsc,00002612,"Lemons, Limes and products",Lemons and limes
+faostat_fbsc,00002582,Maize Germ Oil,Maize oil
+faostat_fbsc,00002514,Maize and products,Maize
+faostat_fbsc,00002943,Meat,"Meat, Total"
+faostat_fbsc,00002948,Milk - Excluding Butter,Milk
+faostat_fbsc,00002517,Millet and products,Millet
+faostat_fbsc,00002732,Mutton & Goat Meat,"Meat, sheep and goat"
+faostat_fbsc,00002551,Nuts and products,Nuts
+faostat_fbsc,00002736,"Offals, Edible",Offals
+faostat_fbsc,00002580,Olive Oil,Olive oil
+faostat_fbsc,00002563,Olives (including preserved),Olives
+faostat_fbsc,00002611,"Oranges, Mandarines",Oranges
+faostat_fbsc,00002576,Palmkernel Oil,Palm kernel oil
+faostat_fbsc,00002547,Peas,"Peas, dry"
+faostat_fbsc,00002733,Pigmeat,Pork
+faostat_fbsc,00002641,Pimento,Chillies and peppers
+faostat_fbsc,00002618,Pineapples and products,Pineapples
+faostat_fbsc,00002531,Potatoes and products,Potatoes
+faostat_fbsc,00002734,Poultry Meat,"Meat, poultry"
+faostat_fbsc,00002805,Rice (Milled Equivalent),Rice
+faostat_fbsc,00002515,Rye and products,Rye
+faostat_fbsc,00002579,Sesameseed Oil,Sesame oil
+faostat_fbsc,00002518,Sorghum and products,Sorghum
+faostat_fbsc,00002571,Soyabean Oil,Soybean oil
+faostat_fbsc,00002555,Soyabeans,Soybeans
+faostat_fbsc,00002908,Sugar Crops,Sugar crops
+faostat_fbsc,00002573,Sunflowerseed Oil,Sunflower oil
+faostat_fbsc,00002601,Tomatoes and products,Tomatoes
+faostat_fbsc,00002511,Wheat and products,Wheat
+faostat_qcl,00000221,"Almonds, with shell",Almonds
+faostat_qcl,00000711,"Anise, badian, fennel, coriander",Herbs (e.g. fennel)
+faostat_qcl,00001806,Beef and Buffalo Meat,"Meat, beef and buffalo"
+faostat_qcl,00000181,"Broad beans, horse beans, dry",Broad beans
+faostat_qcl,00000358,Cabbages and other brassicas,Cabbages
+faostat_qcl,00000217,"Cashew nuts, with shell",Cashew nuts
+faostat_qcl,00001717,"Cereals, Total",Cereals
+faostat_qcl,00001745,Cheese (All Kinds),Cheese
+faostat_qcl,00000191,Chick peas,Chickpeas
+faostat_qcl,00000689,"Chillies and peppers, dry",Chillies and peppers
+faostat_qcl,00001804,"Citrus Fruit, Total",Citrus Fruit
+faostat_qcl,00000767,Cotton lint,Cotton
+faostat_qcl,00000195,"Cow peas, dry",Cow peas
+faostat_qcl,00000399,Eggplants (aubergines),Eggplants
+faostat_qcl,00001783,Eggs Primary,Eggs
+faostat_qcl,00001062,"Eggs, hen, in shell",Eggs from hens
+faostat_qcl,00001067,"Eggs, hen, in shell (number)",Number of hen eggs
+faostat_qcl,00001091,"Eggs, other bird, in shell",Eggs from other birds (excl. hens)
+faostat_qcl,00001092,"Eggs, other bird, in shell (number)",Number of eggs from other birds
+faostat_qcl,00001753,Fibre Crops Primary,Fibre crops
+faostat_qcl,00000773,Flax fibre and tow,Flax fibre
+faostat_qcl,00001738,Fruit Primary,Fruit
+faostat_qcl,00000103,"Grain, mixed",Mixed grains
+faostat_qcl,00000507,Grapefruit (inc. pomelos),Grapefruit
+faostat_qcl,00000242,"Groundnuts, with shell",Groundnuts
+faostat_qcl,00000225,"Hazelnuts, with shell",Hazelnuts
+faostat_qcl,00000957,"Hides, buffalo, fresh",Buffalo hides
+faostat_qcl,00000919,"Hides, cattle, fresh",Cattle hides
+faostat_qcl,00001182,"Honey, natural",Honey
+faostat_qcl,00000263,Karite nuts (sheanuts),Karite nuts
+faostat_qcl,00000592,Kiwi fruit,Kiwi
+faostat_qcl,00000407,"Leeks, other alliaceous vegetables",Leeks
+faostat_qcl,00000372,Lettuce and chicory,Lettuce
+faostat_qcl,00000446,"Maize, green",Green maize
+faostat_qcl,00000571,"Mangoes, mangosteens, guavas",Mangoes
+faostat_qcl,00001242,"Margarine, short",Margarine
+faostat_qcl,00001808,"Meat, Poultry","Meat, poultry"
+faostat_qcl,00000977,"Meat, sheep","Meat, lamb and mutton"
+faostat_qcl,00000568,"Melons, other (inc.cantaloupes)",Melon
+faostat_qcl,00001780,"Milk, Total",Milk
+faostat_qcl,00000449,Mushrooms and truffles,Mushrooms
+faostat_qcl,00000948,"Offals, edible, buffaloes","Offals, buffaloes"
+faostat_qcl,00001128,"Offals, edible, camels","Offals, camels"
+faostat_qcl,00000868,"Offals, edible, cattle","Offals, cattle"
+faostat_qcl,00001018,"Offals, edible, goats","Offals, goats"
+faostat_qcl,00001036,"Offals, pigs, edible","Offals, pigs"
+faostat_qcl,00000978,"Offals, sheep,edible","Offals, sheep"
+faostat_qcl,00000254,Oil palm fruit,Palm fruit oil
+faostat_qcl,00000252,"Oil, coconut (copra)",Coconut oil
+faostat_qcl,00000331,"Oil, cottonseed",Cottonseed oil
+faostat_qcl,00000244,"Oil, groundnut",Groundnut oil
+faostat_qcl,00000334,"Oil, linseed",Linseed oil
+faostat_qcl,00000060,"Oil, maize",Maize oil
+faostat_qcl,00000261,"Oil, olive, virgin",Olive oil
+faostat_qcl,00000257,"Oil, palm",Palm oil
+faostat_qcl,00000258,"Oil, palm kernel",Palm kernel oil
+faostat_qcl,00000271,"Oil, rapeseed",Rapeseed oil
+faostat_qcl,00000281,"Oil, safflower",Safflower oil
+faostat_qcl,00000290,"Oil, sesame",Sesame oil
+faostat_qcl,00000237,"Oil, soybean",Soybean oil
+faostat_qcl,00000268,"Oil, sunflower",Sunflower oil
+faostat_qcl,00000403,"Onions, dry",Onions
+faostat_qcl,00000687,Pepper (piper spp.),Pepper
+faostat_qcl,00000489,Plantains and others,Plantains
+faostat_qcl,00000536,Plums and sloes,Plums
+faostat_qcl,00000296,Poppy seed,Poppy seeds
+faostat_qcl,00002029,Poultry Birds,Poultry
+faostat_qcl,00001726,"Pulses, Total",Pulses
+faostat_qcl,00001140,Rabbits and hares,Rabbits
+faostat_qcl,00000027,"Rice, paddy",Rice
+faostat_qcl,00001720,"Roots and Tubers, Total",Roots and tubers
+faostat_qcl,00001807,Sheep and Goat Meat,"Meat, sheep and goat"
+faostat_qcl,00001749,Sheep and Goats,Sheep and goats
+faostat_qcl,00001186,"Silk, raw",Silk
+faostat_qcl,00001025,"Skins, goat, fresh","Skins, goat"
+faostat_qcl,00000995,"Skins, sheep, fresh","Skins, sheep"
+faostat_qcl,00001723,Sugar Crops Primary,Sugar crops
+faostat_qcl,00000162,Sugar Raw Centrifugal,Sugar (raw)
+faostat_qcl,00000495,"Tangerines, mandarins, clementines, satsumas",Tangerines
+faostat_qcl,00000826,"Tobacco, unmanufactured",Tobacco
+faostat_qcl,00001729,"Treenuts, Total",Treenuts
+faostat_qcl,00001735,Vegetables Primary,Vegetables
+faostat_qcl,00000222,"Walnuts, with shell",Walnuts
+faostat_qcl,00000900,"Whey, dry",Whey
+faostat_qcl,00000987,"Wool, greasy",Wool

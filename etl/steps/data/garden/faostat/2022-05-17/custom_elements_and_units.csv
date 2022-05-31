@@ -1,0 +1,9 @@
+dataset,element_code,fao_element,owid_element,fao_unit,owid_unit,owid_unit_factor
+faostat_fbsc,005301,Domestic supply quantity,Domestic supply,1000 tonnes,tonnes,1000.0
+faostat_fbsc,005911,Export Quantity,Exports,1000 tonnes,tonnes,1000.0
+faostat_fbsc,005611,Import Quantity,Imports,1000 tonnes,tonnes,1000.0
+faostat_fbsc,005123,Losses,Waste in Supply Chain,1000 tonnes,tonnes,1000.0
+faostat_fbsc,005154,Other uses (non-food),Other uses,1000 tonnes,tonnes,1000.0
+faostat_qcl,005321,Producing Animals/Slaughtered,Producing or slaughtered animals,1000 Head,animals,1000.0
+faostat_qcl,005424,Yield/Carcass Weight,Yield,0.1g/An,kg_per_animal,0.0001
+faostat_qcl,005417,Yield/Carcass Weight,Yield,hg/An,kg_per_animal,0.1
