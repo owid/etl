@@ -31,6 +31,45 @@ from etl.paths import DATA_DIR, STEP_DIR
 NAMESPACE = Path(__file__).parent.parent.name
 VERSION = Path(__file__).parent.name
 
+# Maximum number of characters for item_code.
+# FAOSTAT "item_code" is usually an integer number, however sometimes it has decimals and sometimes it contains letters.
+# So we will convert it into a string of this number of characters (integers will be prepended with zeros).
+N_CHARACTERS_ITEM_CODE = 8
+# Maximum number of characters for element_code (integers will be prepended with zeros).
+N_CHARACTERS_ELEMENT_CODE = 6
+# Manual fixes to item codes to avoid ambiguities.
+ITEM_AMENDMENTS = {
+    "faostat_sdgb": [
+        {
+            "item_code": "AG_PRD_FIESMSN_",
+            "fao_item": "2.1.2 Population in moderate or severe food insecurity (thousands of people) (female)",
+            "new_item_code": "AG_PRD_FIESMSN_FEMALE",
+            "new_fao_item": "2.1.2 Population in moderate or severe food insecurity (thousands of people) (female)",
+        },
+        {
+            "item_code": "AG_PRD_FIESMSN_",
+            "fao_item": "2.1.2 Population in moderate or severe food insecurity (thousands of people) (male)",
+            "new_item_code": "AG_PRD_FIESMSN_MALE",
+            "new_fao_item": "2.1.2 Population in moderate or severe food insecurity (thousands of people) (male)",
+        },
+    ],
+    "faostat_fbsh": [
+        # Mappings to harmonize item names of fbsh with those of fbs.
+        {
+            "item_code": "00002556",
+            "fao_item": "Groundnuts (Shelled Eq)",
+            "new_item_code": "00002552",
+            "new_fao_item": "Groundnuts",
+        },
+        {
+            "item_code": "00002805",
+            "fao_item": "Rice (Milled Equivalent)",
+            "new_item_code": "00002807",
+            "new_fao_item": "Rice and products",
+        }
+    ],
+}
+
 # Regions to add to the data.
 # TODO: Add region aggregates to relevant columns.
 REGIONS_TO_ADD = [
@@ -118,66 +157,27 @@ FLAGS_RANKING = (
 )
 
 
-def check_that_flag_definitions_in_dataset_agree_with_those_in_flags_ranking(
-    additional_metadata: catalog.Dataset,
-) -> None:
-    """Check that the definition of flags in the additional metadata for current dataset agree with the ones we have
-    manually written down in our flags ranking (raise error otherwise).
+def harmonize_items(df, dataset_short_name, item_col="item"):
+    df = df.copy()
+    df["item_code"] = df["item_code"].astype(str).str.zfill(N_CHARACTERS_ITEM_CODE)
+    df[item_col] = df[item_col].astype(str)
 
-    Parameters
-    ----------
-    additional_metadata : catalog.Dataset
-        Additional metadata dataset (that must contain one table for current dataset).
+    # Fix those few cases where there is more than one item per item code within a given dataset.
+    if dataset_short_name in ITEM_AMENDMENTS:
+        for amendment in ITEM_AMENDMENTS[dataset_short_name]:
+            df.loc[(df["item_code"] == amendment["item_code"]) &
+                   (df[item_col] == amendment["fao_item"]), ("item_code", item_col)] = \
+                (amendment["new_item_code"], amendment["new_fao_item"])
 
-    """
-    for table_name in additional_metadata.table_names:
-        if "flag" in table_name:
-            flag_df = additional_metadata[table_name].reset_index()
-            comparison = pd.merge(FLAGS_RANKING, flag_df, on="flag", how="inner")
-            error_message = (
-                f"Flag definitions in file {table_name} are different to those in our flag ranking. "
-                f"Redefine flag ranking."
-            )
-            assert (
-                comparison["description"] == comparison["flags"]
-            ).all(), error_message
+    return df
 
 
-def check_that_all_flags_in_dataset_are_in_ranking(
-    data: pd.DataFrame,
-    additional_metadata_for_flags: catalog.Table,
-) -> None:
-    """Check that all flags found in current dataset are defined in our flags ranking (raise error otherwise).
+def harmonize_elements(df, element_col="element"):
+    df = df.copy()
+    df["element_code"] = df["element_code"].astype(str).str.zfill(N_CHARACTERS_ELEMENT_CODE)
+    df[element_col] = df[element_col].astype(str)
 
-    Parameters
-    ----------
-    data : pd.DataFrame
-        Data for current dataset.
-    additional_metadata_for_flags : catalog.Table
-        Flags for current dataset, as defined in dataset of additional metadata.
-
-    """
-    if not set(data["flag"]) < set(FLAGS_RANKING["flag"]):
-        missing_flags = set(data["flag"]) - set(FLAGS_RANKING["flag"])
-        flags_data = pd.DataFrame(additional_metadata_for_flags).reset_index()
-        if set(missing_flags) < set(flags_data["flag"]):
-            print(
-                "Manually copy the following lines to FLAGS_RANKING (and put them in the right order):"
-            )
-            for i, j in (
-                pd.DataFrame(additional_metadata_for_flags)
-                .loc[list(missing_flags)]
-                .iterrows()
-            ):
-                print(f"{(i, j['flags'])},")
-        else:
-            print(
-                f"Not all flags ({missing_flags}) are defined in additional metadata. Get their definition from "
-                f"https://www.fao.org/faostat/en/#definitions"
-            )
-        raise AssertionError(
-            "Flags in dataset not found in FLAGS_RANKING. Manually add those flags."
-        )
+    return df
 
 
 def check_that_there_are_as_many_entity_codes_as_entities(data: pd.DataFrame) -> None:
@@ -193,14 +193,11 @@ def check_that_there_are_as_many_entity_codes_as_entities(data: pd.DataFrame) ->
     entities = list({"area", "element", "item"} & set(data.columns))
     for entity in entities:
         if len(data[f"{entity}_code"].unique()) != len(data[f"{entity}"].unique()):
-            warnings.warn(
-                f"The number of unique {entity} codes is different to the number of unique {entity}s. Consider "
-                f"ignoring '{entity}' column, and instead mapping '{entity}_code' using the {entity} from metadata."
-            )
+            warnings.warn(f"The number of unique {entity} codes is different to the number of unique {entity}s.")
 
 
 def remove_rows_with_nan_value(
-    data: pd.DataFrame, verbose: bool = True
+    data: pd.DataFrame, verbose: bool = False
 ) -> pd.DataFrame:
     """Remove rows for which column "value" is nan.
 
@@ -222,17 +219,20 @@ def remove_rows_with_nan_value(
     # We could also remove rows with any nan, however, before doing that, we would need to assign a value to nan flags.
     n_rows_with_nan_value = len(data[data["value"].isnull()])
     if n_rows_with_nan_value > 0:
+        frac_nan_rows = n_rows_with_nan_value / len(data)
         if verbose:
             print(
-                f"Removing {n_rows_with_nan_value} rows ({n_rows_with_nan_value / len(data): .2%}) "
+                f"Removing {n_rows_with_nan_value} rows ({frac_nan_rows: .2%}) "
                 f"with nan in column 'value'."
             )
+        if frac_nan_rows > 0.15:
+            warnings.warn(f"{frac_nan_rows: .0%} rows of nan values removed.")
         data = data.dropna(subset="value").reset_index(drop=True)
 
     return data
 
 
-def remove_duplicates(data: pd.DataFrame) -> pd.DataFrame:
+def remove_duplicates(data: pd.DataFrame, verbose: bool = True) -> pd.DataFrame:
     """Remove rows with duplicated index (country, year, item, element, unit).
 
     First attempt to use flags to remove duplicates. If there are still duplicates, remove in whatever way possible.
@@ -241,6 +241,8 @@ def remove_duplicates(data: pd.DataFrame) -> pd.DataFrame:
     ----------
     data : pd.DataFrame
         Data for current dataset.
+    verbose : bool
+        True to print a summary of the removed duplicates.
 
     Returns
     -------
@@ -282,12 +284,13 @@ def remove_duplicates(data: pd.DataFrame) -> pd.DataFrame:
         frac_ambiguous_solved_by_flags = 1 - (
             n_ambiguous_indices_unsolvable / n_ambiguous_indices
         )
-        print(
-            f"Removing {n_ambiguous_indices} ambiguous indices ({frac_ambiguous: .2%})."
-        )
-        print(
-            f"{frac_ambiguous_solved_by_flags: .2%} of ambiguities were solved with flags."
-        )
+        if verbose:
+            print(
+                f"Removing {n_ambiguous_indices} ambiguous indices ({frac_ambiguous: .2%})."
+            )
+            print(
+                f"{frac_ambiguous_solved_by_flags: .2%} of ambiguities were solved with flags."
+            )
 
     data = data.drop(columns=["flag_ranking"])
 
@@ -388,14 +391,17 @@ def clean_data(data: pd.DataFrame, countries_file: Path) -> pd.DataFrame:
     # Remove duplicated data points keeping the one with lowest ranking (i.e. highest priority).
     data = remove_duplicates(data)
 
-    # We can now remove entity codes and flags.
-    columns_to_drop = list(
-        {"area_code", "element_code", "item_code", "flag"} & set(data.columns)
-    )
-    data = data.drop(columns=columns_to_drop)
+    # # We can now remove entity codes and flags.
+    # columns_to_drop = list(
+    #     {"area_code", "element_code", "item_code", "flag"} & set(data.columns)
+    # )
+    # data = data.drop(columns=columns_to_drop)
 
     # Set appropriate indexes.
-    data = data.set_index(["country", "year", "item", "element", "unit"]).sort_index()
+    index_columns = ["area_code", "year", "item_code", "element_code"]
+    if data.duplicated(subset=index_columns).any():
+        warnings.warn("Index has duplicated keys.")
+    data = data.set_index(index_columns).sort_index()
 
     return data
 
@@ -419,32 +425,24 @@ def run(dest_dir: str) -> None:
     meadow_data_dir = meadow_version_dir / dataset_short_name
     garden_code_dir = STEP_DIR / "data" / "garden" / namespace / version
     countries_file = garden_code_dir / f"{namespace}.countries.json"
-    additional_metadata_dir = meadow_version_dir / f"{namespace}_metadata"
 
     ####################################################################################################################
     # Load data.
     ####################################################################################################################
 
-    # Additional metadata of all FAO datasets (used for sanity checks).
-    additional_metadata = catalog.Dataset(additional_metadata_dir)
-    # Sanity checks.
-    check_that_flag_definitions_in_dataset_agree_with_those_in_flags_ranking(
-        additional_metadata
-    )
     # Load meadow dataset and keep its metadata.
     dataset_meadow = catalog.Dataset(meadow_data_dir)
     # Load main table from dataset.
     data_table_meadow = dataset_meadow[dataset_short_name]
     data = pd.DataFrame(data_table_meadow).reset_index()
-    # Sanity checks.
-    check_that_all_flags_in_dataset_are_in_ranking(
-        data, additional_metadata[f"{dataset_short_name}_flag"]
-    )
 
     ####################################################################################################################
     # Process data.
     ####################################################################################################################
 
+    # Harmonize items and elements, and clean data.
+    data = harmonize_items(df=data, dataset_short_name=dataset_short_name)
+    data = harmonize_elements(df=data)
     data = clean_data(data=data, countries_file=countries_file)
     # TODO: Run more sanity checks.
 

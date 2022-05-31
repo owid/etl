@@ -38,7 +38,7 @@ def combine_qcl_and_fbsc(
     rename_columns = {"item": "product"}
     index_columns = ["country", "year", "product", "element", "unit"]
     combined = (
-        pd.concat([qcl, fbsc.drop(columns="description")], ignore_index=True)
+        pd.concat([qcl, fbsc], ignore_index=True)
         .rename(columns=rename_columns)
         .sort_values(index_columns)
         .reset_index(drop=True)

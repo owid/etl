@@ -21,9 +21,9 @@ from etl.scripts.faostat.create_new_steps import find_latest_version_for_step
 from .shared import (
     NAMESPACE,
     VERSION,
-    check_that_flag_definitions_in_dataset_agree_with_those_in_flags_ranking,
-    check_that_all_flags_in_dataset_are_in_ranking,
     clean_data,
+    harmonize_elements,
+    harmonize_items,
 )
 
 # Dataset name.
@@ -38,35 +38,10 @@ COUNTRIES_FILE = (
     STEP_DIR / "data" / "garden" / NAMESPACE / VERSION / f"{NAMESPACE}.countries.json"
 )
 
-# Some items seem to have been renamed from fbsh to fbs. Ensure the old names are mapped to the new ones.
-# TODO: Check that this mapping makes sense.
-ITEMS_MAPPING = {
-    "Groundnuts (Shelled Eq)": "Groundnuts",
-    "Rice (Milled Equivalent)": "Rice and products",
-}
-
-
-def check_if_element_descriptions_coincide_in_fbsh_and_fbs(
-    fbsh: pd.DataFrame, fbs: pd.DataFrame, fbsc: pd.DataFrame
-) -> None:
-    element_counts = fbsc.groupby("element")["description"].nunique()
-    if not element_counts.max() == 1:
-        print(
-            "WARNING: Some elements in the combined dataset have more than one description."
-        )
-        for element in element_counts[element_counts > 1].index.unique().tolist():
-            print(
-                f"Description of element '{element}' in fbsh:\n{fbsh[fbsh['element'] == element]['description'].unique()[0]}"
-            )
-            print(
-                f"Description of element '{element}' in fbs:\n{fbs[fbs['element'] == element]['description'].unique()[0]}\n"
-            )
-
 
 def combine_fbsh_and_fbs_datasets(
     fbsh_dataset: catalog.Dataset,
     fbs_dataset: catalog.Dataset,
-    additional_metadata: catalog.Dataset,
 ) -> pd.DataFrame:
     # Sanity checks.
     error = "Description of fbs and fbsh datasets is different."
@@ -75,8 +50,14 @@ def combine_fbsh_and_fbs_datasets(
     assert fbsh_dataset.metadata.licenses == fbs_dataset.metadata.licenses, error
 
     # Load dataframes for fbs and fbsh datasets.
-    fbs = pd.DataFrame(fbs_dataset["faostat_fbs"]).reset_index()
     fbsh = pd.DataFrame(fbsh_dataset["faostat_fbsh"]).reset_index()
+    fbs = pd.DataFrame(fbs_dataset["faostat_fbs"]).reset_index()
+
+    # Harmonize items and elements in both datasets.
+    fbsh = harmonize_items(df=fbsh, dataset_short_name="faostat_fbsh")
+    fbsh = harmonize_elements(df=fbsh)
+    fbs = harmonize_items(df=fbs, dataset_short_name="faostat_fbs")
+    fbs = harmonize_elements(df=fbs)
 
     # Ensure there is no overlap in data between the two datasets, and that there is no gap between them.
     assert (
@@ -94,65 +75,20 @@ def combine_fbsh_and_fbs_datasets(
 
     # Sanity checks.
     # Ensure the elements that are in fbsh but not in fbs are covered by ITEMS_MAPPING.
-    error = "Mismatch between items in fbsh and fbs. Redefine items mapping."
-    assert set(fbsh["item"]) - set(fbs["item"]) == set(ITEMS_MAPPING), error
-    assert set(fbs["item"]) - set(fbsh["item"]) == set(ITEMS_MAPPING.values()), error
+    error = "Mismatch between items in fbsh and fbs. Redefine shared.ITEM_AMENDMENTS."
+    assert set(fbsh["item"]) == set(fbs["item"]), error
     # Some elements are found in fbs but not in fbsh. This is understandable, since fbs is
     # more recent and may have additional elements. However, ensure that there are no
     # elements in fbsh that are not in fbs.
     error = "There are elements in fbsh that are not in fbs."
     assert set(fbsh["element"]) < set(fbs["element"]), error
 
-    # Add description of each element (from metadata) to fbs and to fbsh.
-    # Add also "unit", just to check that data in the original dataset and in metadata coincide.
-    fbsh = pd.merge(
-        fbsh,
-        additional_metadata["faostat_fbsh_element"].rename(
-            columns={"unit": "unit_check"}
-        ),
-        on="element",
-        how="left",
-    )
-    fbs = pd.merge(
-        fbs,
-        additional_metadata["faostat_fbs_element"].rename(
-            columns={"unit": "unit_check"}
-        ),
-        on="element",
-        how="left",
-    )
-
-    # Sanity checks.
-    check_that_flag_definitions_in_dataset_agree_with_those_in_flags_ranking(
-        additional_metadata=additional_metadata
-    )
-    check_that_all_flags_in_dataset_are_in_ranking(
-        data=fbsh,
-        additional_metadata_for_flags=additional_metadata["faostat_fbsh_flag"],
-    )
-    check_that_all_flags_in_dataset_are_in_ranking(
-        data=fbs, additional_metadata_for_flags=additional_metadata["faostat_fbs_flag"]
-    )
-
-    # Check that units of elements in fbsh and in the corresponding metadata coincide.
-    error = "Elements in fbsh have different units in dataset and in its corresponding metadata."
-    assert (fbsh["unit"] == fbsh["unit_check"]).all(), error
-    fbsh = fbsh.drop(columns="unit_check")
-    # Check that units of elements in fbs and in the corresponding metadata coincide.
-    error = "Elements in fbs have different units in dataset and in its corresponding metadata."
-    assert (fbs["unit"] == fbs["unit_check"]).all(), error
-    fbs = fbs.drop(columns="unit_check")
-
     # Concatenate old and new dataframes.
     fbsc = pd.concat([fbsh, fbs]).sort_values(["area", "year"]).reset_index(drop=True)
-
-    # Map old item names to new item names.
-    fbsc["item"] = fbsc["item"].replace(ITEMS_MAPPING)
 
     # Ensure that each element has only one unit and one description.
     error = "Some elements in the combined dataset have more than one unit."
     assert fbsc.groupby("element")["unit"].nunique().max() == 1, error
-    check_if_element_descriptions_coincide_in_fbsh_and_fbs(fbsh, fbs, fbsc)
 
     return fbsc
 
@@ -174,33 +110,20 @@ def run(dest_dir: str) -> None:
     )
     fbs_file = DATA_DIR / "meadow" / NAMESPACE / fbs_version / "faostat_fbs"
 
-    # Find path to latest versions of additional metadata dataset.
-    additional_metadata_version = find_latest_version_for_step(
-        channel="meadow", step_name="faostat_metadata", namespace=NAMESPACE
-    )
-    additional_metadata_file = (
-        DATA_DIR
-        / "meadow"
-        / NAMESPACE
-        / additional_metadata_version
-        / "faostat_metadata"
-    )
-
     ####################################################################################################################
     # Load data.
     ####################################################################################################################
 
-    # Load fbsh, fbs, and additional metadata datasets.
+    # Load fbsh and fbs.
     fbsh_dataset = catalog.Dataset(fbsh_file)
     fbs_dataset = catalog.Dataset(fbs_file)
-    additional_metadata = catalog.Dataset(additional_metadata_file)
 
     ####################################################################################################################
     # Process data.
     ####################################################################################################################
 
     # Combine fbsh and fbs datasets.
-    fbsc = combine_fbsh_and_fbs_datasets(fbsh_dataset, fbs_dataset, additional_metadata)
+    fbsc = combine_fbsh_and_fbs_datasets(fbsh_dataset, fbs_dataset)
 
     # Clean data.
     fbsc = clean_data(data=fbsc, countries_file=COUNTRIES_FILE)
@@ -235,5 +158,3 @@ def run(dest_dir: str) -> None:
 
     # Add table to dataset.
     fbsc_dataset.add(fbsc_table)
-
-    # TODO: Check why tables for items and elements were added in previous version.

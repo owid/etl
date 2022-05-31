@@ -87,7 +87,7 @@ def prepare_output_data(data: pd.DataFrame) -> pd.DataFrame:
 
     # Set index columns depending on what columns are available in the dataframe.
     index_columns = list(
-        {"Area Code", "Year", "Item Code", "Element Code", "Unit"} & set(df.columns)
+        {"Area Code", "Year", "Item Code", "Element Code"} & set(df.columns)
     )
     if df.duplicated(subset=index_columns).any():
         warnings.warn("Index has duplicated keys.")

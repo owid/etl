@@ -6,8 +6,15 @@ import pandas as pd
 from owid import catalog
 
 from etl import grapher_helpers as gh
-from etl.paths import DATA_DIR
+from etl.paths import DATA_DIR, STEP_DIR
 from etl.scripts.faostat.create_new_steps import find_latest_version_for_step
+
+# TODO: I need to harmonize item codes again here because etl stores string columns of integer characters as an
+#  integer column.
+# Maximum number of characters for item_code.
+N_CHARACTERS_ITEM_CODE = 8
+# Maximum number of characters for element_code (integers will be prepended with zeros).
+N_CHARACTERS_ELEMENT_CODE = 6
 
 
 def remove_columns_that_only_have_nans(
@@ -44,7 +51,43 @@ def remove_columns_that_only_have_nans(
     return data
 
 
-def prepare_wide_table(data_table: catalog.Table) -> catalog.Table:
+def customize_names_in_data(data, items_metadata, elements_metadata):
+    data["item_code"] = data["item_code"].astype(str).str.zfill(N_CHARACTERS_ITEM_CODE)
+    data["element_code"] = data["element_code"].astype(str).str.zfill(N_CHARACTERS_ELEMENT_CODE)
+
+    error = f"There are missing item codes from {dataset_short_name} in metadata."
+    assert set(data["item_code"]) <= set(items_metadata["item_code"]), error
+
+    error = f"There are missing element codes from {dataset_short_name} in metadata."
+    assert set(data["element_code"]) <= set(elements_metadata["element_code"]), error
+
+    _expected_n_rows = len(data)
+
+    # TODO: Remove "n_items_per_item_code" from items_metadata, and check why it has been included.
+    #  Idem for "n_elements_per_element_code".
+
+    data = pd.merge(data.rename(columns={"item": "fao_item"}),
+                    items_metadata[['item_code', 'owid_item', 'owid_item_description']], on="item_code", how="left")
+    assert len(data) == _expected_n_rows, f"Something went wrong when merging data with items metadata."
+
+    data = pd.merge(data.rename(columns={"element": "fao_element", "unit": "fao_unit"}),
+                    elements_metadata[['element_code', 'owid_element', 'owid_unit', 'owid_unit_factor',
+                                       'owid_element_description', 'owid_unit_description']],
+                    on=["element_code"], how="left")
+    assert len(data) == _expected_n_rows, f"Something went wrong when merging data with elements metadata."
+
+    # Select necessary columns, and sort conveniently.
+    data = data[['country', 'year', 'owid_item', 'owid_element', 'owid_unit', 'value',
+                 'owid_item_description', 'owid_element_description', 'owid_unit_description', 'owid_unit_factor']]
+    data = data.sort_values(["country", "year", "owid_item", "owid_element"]).reset_index(drop=True)
+
+    # Remove "owid_" from column names.
+    data = data.rename(columns={column.replace("owid_", "") for column in data.columns})
+
+    return data
+
+
+def prepare_data_table(dataset: catalog.Dataset, metadata: catalog.Dataset) -> catalog.Table:
     """Prepare multi-index garden table to have a grapher-friendly format.
 
     The input table will be pivoted to have [country, year] as index, and as many columns as combinations of
@@ -52,8 +95,8 @@ def prepare_wide_table(data_table: catalog.Table) -> catalog.Table:
 
     Parameters
     ----------
-    data_table : catalog.Table
-        Data table for current dataset, usually with index [country, year, item, element, unit].
+    dataset : catalog.Dataset
+        Current dataset, containing one table.
 
     Returns
     -------
@@ -61,7 +104,22 @@ def prepare_wide_table(data_table: catalog.Table) -> catalog.Table:
         Data table with index [country, year].
 
     """
-    data_long = pd.DataFrame(data_table).reset_index()
+    # By construction there should only be one table in each dataset. Load that table.
+    assert len(dataset.table_names) == 1, "Expected only one table inside the dataset."
+    table_name = dataset.table_names[0]
+    table_long = dataset[table_name]
+    data = pd.DataFrame(table_long).reset_index()
+
+    # Load and prepare items and element-units metadata.
+    items_metadata = pd.DataFrame(metadata["items"]).reset_index()
+    items_metadata = items_metadata[items_metadata["dataset"] == dataset_short_name].reset_index(drop=True)
+    items_metadata["item_code"] = items_metadata["item_code"].astype(str).str.zfill(N_CHARACTERS_ITEM_CODE)
+    elements_metadata = pd.DataFrame(metadata["elements"]).reset_index()
+    elements_metadata = elements_metadata[elements_metadata["dataset"] == dataset_short_name].reset_index(drop=True)
+    elements_metadata["element_code"] = elements_metadata["element_code"].astype(str).str.zfill(N_CHARACTERS_ELEMENT_CODE)
+
+    # Add custom names to data, and add description columns.
+    data_long = customize_names_in_data(data, items_metadata, elements_metadata)
     table_metadata = deepcopy(data_table.metadata)
 
     # Combine item, element and unit into one column.
@@ -77,8 +135,21 @@ def prepare_wide_table(data_table: catalog.Table) -> catalog.Table:
         + ")"
     )
 
+    # Create a column with item, element, and variable descriptions.
+    data_long["description"] = ""
+    rows_with_item_description_mask = data_long["item_description"] != ""
+    data_long.loc[rows_with_item_description_mask, "description"] += "Item description: " + data_long[rows_with_item_description_mask]["item_description"] + " "
+    rows_with_element_description_mask = data_long["element_description"] != ""
+    data_long.loc[rows_with_element_description_mask, "description"] = "Element description: " + data_long[rows_with_element_description_mask]["element_description"] + " "
+    rows_with_unit_description_mask = data_long["unit_description"] != ""
+    data_long.loc[rows_with_unit_description_mask, "description"] = "Unit description: " + data_long[rows_with_unit_description_mask]["unit_description"]
+
     # Keep a dataframe of just units (which will be required later on).
     units = data_long.pivot(index=["country", "year"], columns=["title"], values="unit")
+    unit_description = data_long.pivot(index=["country", "year"], columns=["title"], values="unit_description")
+
+    # Keep a dataframe of just variable descriptions (which will be required later on).
+    descriptions = data_long.pivot(index=["country", "year"], columns=["title"], values="description")
 
     # This will create a table with just one column and country-year as index.
     data = data_long.pivot(index=["country", "year"], columns=["title"], values="value")
@@ -93,15 +164,23 @@ def prepare_wide_table(data_table: catalog.Table) -> catalog.Table:
     # Create new table for garden dataset.
     wide_table = catalog.Table(data).copy()
     for column in wide_table.columns:
-        variable_units = units[column].dropna().unique()
-        assert len(variable_units) == 1, f"Variable {column} has ambiguous units."
+        variable_units = unit_description[column].dropna().unique()
+        variable_unit_short_names = units[column].dropna().unique()
+        variable_descriptions = descriptions[column].dropna().unique()
+        assert len(variable_units) == 1, f"Variable {column} has ambiguous unit descriptions."
+        assert len(variable_units_short_names) == 1, f"Variable {column} has ambiguous units."
+        assert len(variable_descriptions) == 1, f"Variable {column} has ambiguous descriptions."
         unit = variable_units[0]
+        unit_short_name = variable_unit_short_names[0]
+        description = variable_descriptions[0]
         # Remove unit from title (only last occurrence of the unit).
         title = " ".join(column.rsplit(f" ({unit})", 1)).strip()
 
         # Add title and unit to each column in the table.
         wide_table[column].metadata.title = title
         wide_table[column].metadata.unit = unit
+        wide_table[column].metadata.short_unit = unit_short_name
+        wide_table[column].metadata.description = description
 
     # Make all column names snake_case.
     wide_table = catalog.utils.underscore_table(wide_table)
@@ -156,6 +235,26 @@ def get_grapher_dataset_from_file_name(file_path: str) -> catalog.Dataset:
     return dataset
 
 
+def get_latest_metadata() -> catalog.Dataset:
+    """Get latest faostat_metadata dataset from garden.
+
+    Returns
+    -------
+    metadata : catalog.Dataset
+        Latest version of the garden faostat_metadata dataset.
+
+    """
+    dataset_short_name = "faostat_metadata"
+    # Get details of the corresponding latest garden step.
+    garden_version = find_latest_version_for_step(
+        channel="garden", step_name="faostat_metadata", namespace="faostat")
+    metadata_dir = DATA_DIR / "garden" / "faostat" / garden_version / dataset_short_name
+    assert metadata_dir.is_dir(), f"Metadata dataset not found."
+    metadata = catalog.Dataset(metadata_dir)
+
+    return metadata
+
+
 def get_grapher_tables(dataset: catalog.Dataset) -> Iterable[catalog.Table]:
     """Yield each of the columns of the table of a dataset, with a format that is ready to be inserted into grapher.
 
@@ -173,13 +272,11 @@ def get_grapher_tables(dataset: catalog.Dataset) -> Iterable[catalog.Table]:
         in the original table of the dataset.
 
     """
-    # By construction there should only be one table in each dataset. Load that table.
-    assert len(dataset.table_names) == 1, "Expected only one table inside the dataset."
-    table_name = dataset.table_names[0]
-    table_long = dataset[table_name]
+    # Get latest metadata from garden.
+    metadata = get_latest_metadata()
 
     # Create a wide table.
-    table = prepare_wide_table(data_table=table_long)
+    table = prepare_data_table(dataset=dataset, metadata=metadata)
 
     # Convert country names into grapher entity ids, and set index appropriately.
     # WARNING: This will create new entities in grapher if not already existing.
