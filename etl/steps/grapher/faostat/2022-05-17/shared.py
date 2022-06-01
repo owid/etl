@@ -17,6 +17,78 @@ N_CHARACTERS_ITEM_CODE = 8
 N_CHARACTERS_ELEMENT_CODE = 6
 
 
+def get_metadata(dataset: catalog.Dataset) -> catalog.Dataset:
+    """Get faostat_metadata dataset from garden for current dataset version.
+
+    Parameters
+    ----------
+    dataset : catalog.Dataset
+        Current dataset.
+
+    Returns
+    -------
+    metadata : catalog.Dataset
+        Latest version of the garden faostat_metadata dataset.
+    """
+    # Get metadata for current dataset from garden.
+    dataset_version = dataset.metadata.version
+    #################################################################
+    # TODO: Remove this once meadow datasets are created with the correct metadata.version
+    #  (once convert_walden_metadata is updated to receive "version").
+    dataset_version = find_latest_version_for_step(
+        channel="garden", step_name=dataset.metadata.short_name.split("__")[0], namespace="faostat"
+    )
+    #################################################################
+    metadata_dir = DATA_DIR / "garden" / "faostat" / dataset_version / "faostat_metadata"
+    assert metadata_dir.is_dir(), f"Metadata dataset not found."
+    metadata = catalog.Dataset(metadata_dir)
+
+    return metadata
+
+
+def get_grapher_dataset_from_file_name(file_path: str) -> catalog.Dataset:
+    """Get dataset that needs to be inserted into grapher, given a path to a grapher step.
+
+    Parameters
+    ----------
+    file_path : Path or str
+        Path to code of grapher step being executed.
+
+    Returns
+    -------
+    dataset : catalog.Dataset
+        Latest version of the garden dataset to be inserted into grapher.
+
+    """
+    # Get details of this grapher step from the file path.
+    namespace, grapher_version, file_name = Path(file_path).parts[-3:]
+    dataset_short_name = file_name.split(".")[0]
+    # Get details of the corresponding latest garden step.
+    garden_version = find_latest_version_for_step(
+        channel="garden", step_name=dataset_short_name, namespace=namespace
+    )
+    dataset = catalog.Dataset(
+        DATA_DIR / "garden" / namespace / garden_version / dataset_short_name
+    )
+
+    # Get metadata for current dataset from garden (to get a description for the dataset).
+    metadata = get_metadata(dataset)
+
+    # Short name for new grapher dataset.
+    dataset.metadata.short_name = f"{dataset_short_name}__{grapher_version}".replace(
+        "-", "_"
+    )
+    # Add dataset description (taken from metadata).
+    dataset.metadata.description = metadata["datasets"].loc[dataset_short_name]["owid_dataset_description"]
+
+    # move description to source as that is what is shown in grapher
+    # (dataset.description would be displayed under `Internal notes` in the admin UI otherwise)
+    dataset.metadata.sources[0].description = dataset.metadata.description
+    dataset.metadata.description = ""
+
+    return dataset
+
+
 def remove_columns_that_only_have_nans(
     data: pd.DataFrame, verbose: bool = True
 ) -> pd.DataFrame:
@@ -82,9 +154,10 @@ def customize_names_in_data(data, items_metadata, elements_metadata):
     data["owid_element_description"] = [i for i in data["owid_element_description"]]
     data["owid_unit_description"] = [i for i in data["owid_unit_description"]]
 
-    # Select necessary columns, and sort conveniently.
+    # Select columns and rows conveniently.
     data = data[['country', 'year', 'owid_item', 'owid_element', 'owid_unit', 'value',
-                 'owid_item_description', 'owid_element_description', 'owid_unit_description', 'owid_unit_factor']]
+                 'owid_item_description', 'owid_element_description', 'owid_unit_description', 'owid_unit_factor',
+                 'fao_item', 'fao_element', 'fao_unit', 'item_code', 'element_code']]
     data = data.sort_values(["country", "year", "owid_item", "owid_element"]).reset_index(drop=True)
 
     # Remove "owid_" from column names.
@@ -118,6 +191,8 @@ def prepare_data_table(dataset: catalog.Dataset, metadata: catalog.Dataset) -> c
     data = pd.DataFrame(long_table).reset_index()
 
     # Load and prepare items and element-units metadata.
+    dataset_titles = pd.DataFrame(metadata["datasets"]).reset_index()
+    dataset_title = dataset_titles[dataset_titles["dataset"] == table_name]["owid_dataset_title"].item()
     items_metadata = pd.DataFrame(metadata["items"]).reset_index()
     items_metadata = items_metadata[items_metadata["dataset"] == table_name].reset_index(drop=True)
     items_metadata["item_code"] = items_metadata["item_code"].astype(str).str.zfill(N_CHARACTERS_ITEM_CODE)
@@ -125,7 +200,7 @@ def prepare_data_table(dataset: catalog.Dataset, metadata: catalog.Dataset) -> c
     elements_metadata = elements_metadata[elements_metadata["dataset"] == table_name].reset_index(drop=True)
     elements_metadata["element_code"] = elements_metadata["element_code"].astype(str).str.zfill(N_CHARACTERS_ELEMENT_CODE)
 
-    # Add custom names to data, and add description columns.
+    # Add custom names to items, elements and units, and add description columns.
     data_long = customize_names_in_data(data, items_metadata, elements_metadata)
 
     table_metadata = deepcopy(long_table.metadata)
@@ -134,12 +209,25 @@ def prepare_data_table(dataset: catalog.Dataset, metadata: catalog.Dataset) -> c
     if "item" not in data_long.columns:
         data_long["item"] = ""
 
+    # Construct variable title following a similar criterion as in the previous dataset in grapher:
+    # TODO: Remove prepended zeros from item code and element code for the title.
+    # dataset_title - fao_item - item_code - fao_element - element_code - fao_unit
     data_long["title"] = (
-        data_long["item"].astype(str)
-        + " - "
-        + data_long["element"].astype(str)
-        + " ("
+        dataset_title + " - "
+        + data_long["item"].astype(str) + " - "
+        + data_long["item_code"] + " - "
+        + data_long["element"].astype(str) + " - "
+        + data_long["element_code"] + " - "
         + data_long["unit"].astype(str)
+    )
+
+    # Variable name should be easier to read.
+    data_long["variable_name"] = (
+        data_long["fao_item"].astype(str)
+        + " - "
+        + data_long["fao_element"].astype(str)
+        + " ("
+        + data_long["fao_unit"].astype(str)
         + ")"
     )
 
@@ -154,9 +242,11 @@ def prepare_data_table(dataset: catalog.Dataset, metadata: catalog.Dataset) -> c
 
     # Keep a dataframe of just units (which will be required later on).
     unit_short_names = data_long.pivot(index=["country", "year"], columns=["title"], values="unit")
-
     unit_long_names = data_long.pivot(index=["country", "year"], columns=["title"], values="unit_description")
     unit_factors = data_long.pivot(index=["country", "year"], columns=["title"], values="unit_factor")
+
+    # Keep a dataframe of just variable names (which will be required later on).
+    variable_names = data_long.pivot(index=["country", "year"], columns=["title"], values="variable_name")
 
     # Keep a dataframe of just variable descriptions (which will be required later on).
     descriptions = data_long.pivot(index=["country", "year"], columns=["title"], values="description")
@@ -195,15 +285,22 @@ def prepare_data_table(dataset: catalog.Dataset, metadata: catalog.Dataset) -> c
             unit_factor = unit_factor[0]
             wide_table[column].metadata.display = {"conversionFactor": unit_factor}
 
+        # Name for this variable.
+        # TODO: This should be "display name"; variable name should be "title".
+        variable_name = variable_names[column].dropna().unique()
+        assert len(variable_name) == 1, f"Variable {column} has ambiguous names."
+        variable_name = variable_name[0]
+        wide_table[column].metadata.title = variable_name
+
         # Description for this variable.
         description = descriptions[column].dropna().unique()
         assert len(description) == 1, f"Variable {column} has ambiguous descriptions."
         description = description[0]
         wide_table[column].metadata.description = description
 
-        # Remove unit from title (only last occurrence of the unit).
-        title = " ".join(column.rsplit(f" ({unit_long_name})", 1)).strip()
-        wide_table[column].metadata.title = title
+        # # Remove unit from title (only last occurrence of the unit).
+        # title = " ".join(column.rsplit(f" ({unit_long_name})", 1)).strip()
+        # wide_table[column].metadata.title = title
 
     # Make all column names snake_case.
     wide_table = catalog.utils.underscore_table(wide_table)
@@ -216,78 +313,6 @@ def prepare_data_table(dataset: catalog.Dataset, metadata: catalog.Dataset) -> c
     wide_table = wide_table.reset_index()
 
     return wide_table
-
-
-def get_grapher_dataset_from_file_name(file_path: str) -> catalog.Dataset:
-    """Get dataset that needs to be inserted into grapher, given a path to a grapher step.
-
-    Parameters
-    ----------
-    file_path : Path or str
-        Path to code of grapher step being executed.
-
-    Returns
-    -------
-    dataset : catalog.Dataset
-        Latest version of the garden dataset to be inserted into grapher.
-
-    """
-    # Get details of this grapher step from the file path.
-    namespace, grapher_version, file_name = Path(file_path).parts[-3:]
-    dataset_short_name = file_name.split(".")[0]
-    # Get details of the corresponding latest garden step.
-    garden_version = find_latest_version_for_step(
-        channel="garden", step_name=dataset_short_name, namespace=namespace
-    )
-    dataset = catalog.Dataset(
-        DATA_DIR / "garden" / namespace / garden_version / dataset_short_name
-    )
-
-    # Get metadata for current dataset from garden (to get a description for the dataset).
-    metadata = get_metadata(dataset)
-
-    # Short name for new grapher dataset.
-    dataset.metadata.short_name = f"{dataset_short_name}__{grapher_version}".replace(
-        "-", "_"
-    )
-    # Add dataset description (taken from metadata).
-    dataset.metadata.description = metadata["datasets"].loc[dataset_short_name]["owid_dataset_description"]
-
-    # move description to source as that is what is shown in grapher
-    # (dataset.description would be displayed under `Internal notes` in the admin UI otherwise)
-    dataset.metadata.sources[0].description = dataset.metadata.description
-    dataset.metadata.description = ""
-
-    return dataset
-
-
-def get_metadata(dataset: catalog.Dataset) -> catalog.Dataset:
-    """Get faostat_metadata dataset from garden for current dataset version.
-
-    Parameters
-    ----------
-    dataset : catalog.Dataset
-        Current dataset.
-
-    Returns
-    -------
-    metadata : catalog.Dataset
-        Latest version of the garden faostat_metadata dataset.
-    """
-    # Get metadata for current dataset from garden.
-    dataset_version = dataset.metadata.version
-    #################################################################
-    # TODO: Remove this once meadow datasets are created with the correct metadata.version
-    #  (once convert_walden_metadata is updated to receive "version").
-    dataset_version = find_latest_version_for_step(
-        channel="garden", step_name=dataset.metadata.short_name.split("__")[0], namespace="faostat"
-    )
-    #################################################################
-    metadata_dir = DATA_DIR / "garden" / "faostat" / dataset_version / "faostat_metadata"
-    assert metadata_dir.is_dir(), f"Metadata dataset not found."
-    metadata = catalog.Dataset(metadata_dir)
-
-    return metadata
 
 
 def get_grapher_tables(dataset: catalog.Dataset) -> Iterable[catalog.Table]:

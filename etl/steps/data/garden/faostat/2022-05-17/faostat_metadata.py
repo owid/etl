@@ -103,12 +103,14 @@ def load_latest_data_table_for_dataset(dataset_short_name: str) -> catalog.Table
 
 def create_dataset_descriptions_dataframe_for_domain(table: catalog.Table, dataset_short_name: str) -> pd.DataFrame:
     dataset_descriptions_df = pd.DataFrame({"dataset": [dataset_short_name],
+                                            "fao_title": [table.metadata.dataset.title],
                                             "fao_dataset_description": [table.metadata.dataset.description]})
 
     return dataset_descriptions_df
 
 
 def clean_global_dataset_descriptions_dataframe(datasets_df: pd.DataFrame,
+                                                custom_datasets: pd.DataFrame,
                                                 custom_descriptions: Dict[str, Dict[str, str]]) -> pd.DataFrame:
     datasets_df = datasets_df.copy()
 
@@ -121,9 +123,19 @@ def clean_global_dataset_descriptions_dataframe(datasets_df: pd.DataFrame,
     datasets_df = datasets_df[datasets_df["dataset"] != "faostat_fbsh"].reset_index(drop=True)
     datasets_df.loc[datasets_df["dataset"] == "faostat_fbs", "dataset"] = "faostat_fbsc"
 
+    # Add custom dataset titles.
+    datasets_df = pd.merge(datasets_df, custom_datasets, on="dataset", how="left")
+    datasets_df["owid_dataset_title"] = datasets_df["owid_dataset_title"].fillna(datasets_df["fao_dataset_title"])
+    error = "Custom titles for different datasets are equal. Edit custom_datasets.csv file."
+    assert len(set(datasets_df["dataset"])) == len(set(datasets_df["owid_dataset_title"])), error
+
     # Add custom descriptions.
     datasets_df["owid_dataset_description"] = datasets_df["dataset"].map(custom_descriptions["datasets"]).\
         fillna(datasets_df["fao_dataset_description"])
+
+    # Reorder columns.
+    datasets_df = datasets_df[["dataset", "fao_dataset_title", "owid_dataset_title", "fao_dataset_description",
+                               "owid_dataset_description"]]
 
     return datasets_df
 
@@ -448,6 +460,8 @@ def run(dest_dir: str) -> None:
     garden_code_dir = STEP_DIR / "data" / "garden" / NAMESPACE / garden_latest_version
     # Path to file with custom descriptions for datasets, items, elements and units.
     custom_descriptions_file = garden_code_dir / "custom_descriptions.json"
+    # Path to file with custom dataset titles.
+    custom_datasets_file = garden_code_dir / "custom_datasets.csv"
     # Path to file with custom names for items.
     custom_items_file = garden_code_dir / "custom_items.csv"
     # Path to file with custom names for elements and units.
@@ -470,7 +484,8 @@ def run(dest_dir: str) -> None:
     # Load custom descriptions for datasets, items, and element-units.
     # TODO: Change to warn_on_duplicated_keys=True once function has been reviewed.
     custom_descriptions = load_json(custom_descriptions_file, warn_on_duplicated_keys=False)
-    # Load custom items, and element-unit names.
+    # Load custom dataset names, items, and element-unit names.
+    custom_datasets = pd.read_csv(custom_datasets_file, dtype=str)
     custom_elements = pd.read_csv(custom_elements_and_units_file, dtype=str)
     custom_items = pd.read_csv(custom_items_file, dtype=str)
 
@@ -506,7 +521,7 @@ def run(dest_dir: str) -> None:
         elements_df = pd.concat([elements_df, elements_from_data], ignore_index=True)
 
     datasets_df = clean_global_dataset_descriptions_dataframe(
-        datasets_df=datasets_df, custom_descriptions=custom_descriptions)
+        datasets_df=datasets_df, custom_datasets=custom_datasets, custom_descriptions=custom_descriptions)
     items_df = clean_global_items_dataframe(
         items_df=items_df, custom_items=custom_items, custom_descriptions=custom_descriptions)
     elements_df = clean_global_elements_dataframe(
