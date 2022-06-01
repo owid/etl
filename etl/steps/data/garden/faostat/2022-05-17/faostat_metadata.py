@@ -33,6 +33,7 @@ Given all this, we decided to use the metadata only to fetch descriptions, but w
 mapping in the data is the correct one (except possibly in the examples mentioned above).
 
 """
+
 from copy import deepcopy
 from typing import Dict
 
@@ -100,8 +101,8 @@ def load_latest_data_table_for_dataset(dataset_short_name: str) -> catalog.Table
     return table
 
 
-def create_dataset_descriptions_dataframe_for_domain(table: catalog.Table) -> pd.DataFrame:
-    dataset_descriptions_df = pd.DataFrame({"dataset": [DATASET_SHORT_NAME],
+def create_dataset_descriptions_dataframe_for_domain(table: catalog.Table, dataset_short_name: str) -> pd.DataFrame:
+    dataset_descriptions_df = pd.DataFrame({"dataset": [dataset_short_name],
                                             "fao_dataset_description": [table.metadata.dataset.description]})
 
     return dataset_descriptions_df
@@ -110,8 +111,19 @@ def create_dataset_descriptions_dataframe_for_domain(table: catalog.Table) -> pd
 def clean_global_dataset_descriptions_dataframe(datasets_df: pd.DataFrame,
                                                 custom_descriptions: Dict[str, Dict[str, str]]) -> pd.DataFrame:
     datasets_df = datasets_df.copy()
+
+    # Check that the dataset descriptions of fbsh and fbs are identical.
+    error = "Datasets fbsh and fbs have different descriptions. " \
+        "This may happen in the future: Simply check that nothing significant has changed and remove this assertion."
+    assert datasets_df[datasets_df["dataset"] == "faostat_fbsh"]["fao_dataset_description"].item() ==\
+        datasets_df[datasets_df["dataset"] == "faostat_fbs"]["fao_dataset_description"].item(), error
+    # Drop row for fbsh, and rename "fbs" to "fbsc" (since this will be the name for the combined dataset).
+    datasets_df = datasets_df[datasets_df["dataset"] != "faostat_fbsh"].reset_index(drop=True)
+    datasets_df.loc[datasets_df["dataset"] == "faostat_fbs", "dataset"] = "faostat_fbsc"
+
     # Add custom descriptions.
-    datasets_df["owid_dataset_description"] = datasets_df["dataset"].map(custom_descriptions["datasets"]).fillna("")
+    datasets_df["owid_dataset_description"] = datasets_df["dataset"].map(custom_descriptions["datasets"]).\
+        fillna(datasets_df["fao_dataset_description"])
 
     return datasets_df
 
@@ -247,15 +259,15 @@ def create_elements_dataframe_for_domain(table: catalog.Table, metadata: catalog
     # Sanity checks:
 
     # Check that in data, there is only one unit per element code.
-    df["n_units_per_element_code"] = df.groupby("element_code")["unit"].transform("nunique")
+    n_units_per_element_code = df.groupby("element_code")["unit"].transform("nunique")
     error = f"Multiple units for a given element code in dataset {dataset_short_name}."
-    assert df[df["n_units_per_element_code"] > 1].empty, error
+    assert df[n_units_per_element_code > 1].empty, error
 
     # Check that in data, there is only one element per element code.
-    elements_from_data["n_elements_per_element_code"] = elements_from_data.groupby("element_code")["fao_element"].\
+    n_elements_per_element_code = elements_from_data.groupby("element_code")["fao_element"].\
         transform("nunique")
     error = f"Multiple elements for a given element code in dataset {dataset_short_name}."
-    assert elements_from_data[elements_from_data["n_elements_per_element_code"] > 1].empty, error
+    assert elements_from_data[n_elements_per_element_code > 1].empty, error
 
     return elements_from_data
 
@@ -263,6 +275,13 @@ def create_elements_dataframe_for_domain(table: catalog.Table, metadata: catalog
 def clean_global_elements_dataframe(elements_df: pd.DataFrame, custom_elements: pd.DataFrame,
                                     custom_descriptions: Dict[str, Dict[str, str]]) -> pd.DataFrame:
     elements_df = elements_df.copy()
+
+    # Check that all elements of fbsh are in fbs (although fbs may contain additional elements).
+    assert set(elements_df[elements_df["dataset"] == "faostat_fbsh"]["element_code"]) <= \
+           set(elements_df[elements_df["dataset"] == "faostat_fbs"]["element_code"])
+    # Drop all rows for fbsh, and rename "fbs" to "fbsc" (since this will be the name for the combined dataset).
+    elements_df = elements_df[elements_df["dataset"] != "faostat_fbsh"].reset_index(drop=True)
+    elements_df.loc[elements_df["dataset"] == "faostat_fbs", "dataset"] = "faostat_fbsc"
 
     elements_df = pd.merge(elements_df, custom_elements.rename(columns={
         "fao_element": "fao_element_check", "fao_unit": "fao_unit_check"}),
@@ -304,6 +323,9 @@ def clean_global_elements_dataframe(elements_df: pd.DataFrame, custom_elements: 
         transform("nunique")
     error = "Multiple owid elements for a given element code in a dataset."
     assert check[check["n_owid_units_per_element_code"] > 1].empty, error
+
+    # NOTE: We assert that there is one element for each element code. But the opposite may not be true: there can be
+    # multiple element codes with the same element. And idem for items.
 
     return elements_df
 
@@ -471,7 +493,8 @@ def run(dest_dir: str) -> None:
             table=table, metadata_for_flags=metadata[f"{dataset_short_name}_flag"])
 
         # Gather dataset descriptions, items, and element-units for current domain.
-        datasets_from_data = create_dataset_descriptions_dataframe_for_domain(table)
+        datasets_from_data = create_dataset_descriptions_dataframe_for_domain(
+            table, dataset_short_name=dataset_short_name)
         items_from_data = create_items_dataframe_for_domain(
             table=table, metadata=metadata, dataset_short_name=dataset_short_name)
         elements_from_data = create_elements_dataframe_for_domain(

@@ -55,16 +55,13 @@ def customize_names_in_data(data, items_metadata, elements_metadata):
     data["item_code"] = data["item_code"].astype(str).str.zfill(N_CHARACTERS_ITEM_CODE)
     data["element_code"] = data["element_code"].astype(str).str.zfill(N_CHARACTERS_ELEMENT_CODE)
 
-    error = f"There are missing item codes from {dataset_short_name} in metadata."
+    error = f"There are missing item codes in metadata."
     assert set(data["item_code"]) <= set(items_metadata["item_code"]), error
 
-    error = f"There are missing element codes from {dataset_short_name} in metadata."
+    error = f"There are missing element codes in metadata."
     assert set(data["element_code"]) <= set(elements_metadata["element_code"]), error
 
     _expected_n_rows = len(data)
-
-    # TODO: Remove "n_items_per_item_code" from items_metadata, and check why it has been included.
-    #  Idem for "n_elements_per_element_code".
 
     data = pd.merge(data.rename(columns={"item": "fao_item"}),
                     items_metadata[['item_code', 'owid_item', 'owid_item_description']], on="item_code", how="left")
@@ -76,13 +73,22 @@ def customize_names_in_data(data, items_metadata, elements_metadata):
                     on=["element_code"], how="left")
     assert len(data) == _expected_n_rows, f"Something went wrong when merging data with elements metadata."
 
+    # Ensure columns have the right type.
+    # For some reason, doing .astype(str) kills the kernel.
+    # data["owid_item_description"] = data["owid_item_description"].astype(str)
+    # data["owid_element_description"] = data["owid_element_description"].astype(str)
+    # data["owid_unit_description"] = data["owid_unit_description"].astype(str)
+    data["owid_item_description"] = [i for i in data["owid_item_description"]]
+    data["owid_element_description"] = [i for i in data["owid_element_description"]]
+    data["owid_unit_description"] = [i for i in data["owid_unit_description"]]
+
     # Select necessary columns, and sort conveniently.
     data = data[['country', 'year', 'owid_item', 'owid_element', 'owid_unit', 'value',
                  'owid_item_description', 'owid_element_description', 'owid_unit_description', 'owid_unit_factor']]
     data = data.sort_values(["country", "year", "owid_item", "owid_element"]).reset_index(drop=True)
 
     # Remove "owid_" from column names.
-    data = data.rename(columns={column.replace("owid_", "") for column in data.columns})
+    data = data.rename(columns={column: column.replace("owid_", "") for column in data.columns})
 
     return data
 
@@ -106,21 +112,23 @@ def prepare_data_table(dataset: catalog.Dataset, metadata: catalog.Dataset) -> c
     """
     # By construction there should only be one table in each dataset. Load that table.
     assert len(dataset.table_names) == 1, "Expected only one table inside the dataset."
+    # The name of the only table should coincide with the original dataset short name (e.g. faostat_XXX).
     table_name = dataset.table_names[0]
-    table_long = dataset[table_name]
-    data = pd.DataFrame(table_long).reset_index()
+    long_table = dataset[table_name]
+    data = pd.DataFrame(long_table).reset_index()
 
     # Load and prepare items and element-units metadata.
     items_metadata = pd.DataFrame(metadata["items"]).reset_index()
-    items_metadata = items_metadata[items_metadata["dataset"] == dataset_short_name].reset_index(drop=True)
+    items_metadata = items_metadata[items_metadata["dataset"] == table_name].reset_index(drop=True)
     items_metadata["item_code"] = items_metadata["item_code"].astype(str).str.zfill(N_CHARACTERS_ITEM_CODE)
     elements_metadata = pd.DataFrame(metadata["elements"]).reset_index()
-    elements_metadata = elements_metadata[elements_metadata["dataset"] == dataset_short_name].reset_index(drop=True)
+    elements_metadata = elements_metadata[elements_metadata["dataset"] == table_name].reset_index(drop=True)
     elements_metadata["element_code"] = elements_metadata["element_code"].astype(str).str.zfill(N_CHARACTERS_ELEMENT_CODE)
 
     # Add custom names to data, and add description columns.
     data_long = customize_names_in_data(data, items_metadata, elements_metadata)
-    table_metadata = deepcopy(data_table.metadata)
+
+    table_metadata = deepcopy(long_table.metadata)
 
     # Combine item, element and unit into one column.
     if "item" not in data_long.columns:
@@ -135,18 +143,20 @@ def prepare_data_table(dataset: catalog.Dataset, metadata: catalog.Dataset) -> c
         + ")"
     )
 
-    # Create a column with item, element, and variable descriptions.
+    # Create a column with item and element descriptions.
     data_long["description"] = ""
-    rows_with_item_description_mask = data_long["item_description"] != ""
-    data_long.loc[rows_with_item_description_mask, "description"] += "Item description: " + data_long[rows_with_item_description_mask]["item_description"] + " "
     rows_with_element_description_mask = data_long["element_description"] != ""
-    data_long.loc[rows_with_element_description_mask, "description"] = "Element description: " + data_long[rows_with_element_description_mask]["element_description"] + " "
-    rows_with_unit_description_mask = data_long["unit_description"] != ""
-    data_long.loc[rows_with_unit_description_mask, "description"] = "Unit description: " + data_long[rows_with_unit_description_mask]["unit_description"]
+    data_long.loc[rows_with_element_description_mask, "description"] += data_long[rows_with_element_description_mask]["element_description"] + "\n"
+    rows_with_item_description_mask = data_long["item_description"] != ""
+    data_long.loc[rows_with_item_description_mask, "description"] += data_long[rows_with_item_description_mask]["item_description"]
+
+    # TODO: Is there a quicker way to achieve the same result, maybe just with one pivot?
 
     # Keep a dataframe of just units (which will be required later on).
-    units = data_long.pivot(index=["country", "year"], columns=["title"], values="unit")
-    unit_description = data_long.pivot(index=["country", "year"], columns=["title"], values="unit_description")
+    unit_short_names = data_long.pivot(index=["country", "year"], columns=["title"], values="unit")
+
+    unit_long_names = data_long.pivot(index=["country", "year"], columns=["title"], values="unit_description")
+    unit_factors = data_long.pivot(index=["country", "year"], columns=["title"], values="unit_factor")
 
     # Keep a dataframe of just variable descriptions (which will be required later on).
     descriptions = data_long.pivot(index=["country", "year"], columns=["title"], values="description")
@@ -163,24 +173,37 @@ def prepare_data_table(dataset: catalog.Dataset, metadata: catalog.Dataset) -> c
 
     # Create new table for garden dataset.
     wide_table = catalog.Table(data).copy()
+    # Each column will become a new variable of the grapher dataset.
+    # Create the required metadata for each variable.
     for column in wide_table.columns:
-        variable_units = unit_description[column].dropna().unique()
-        variable_unit_short_names = units[column].dropna().unique()
-        variable_descriptions = descriptions[column].dropna().unique()
-        assert len(variable_units) == 1, f"Variable {column} has ambiguous unit descriptions."
-        assert len(variable_units_short_names) == 1, f"Variable {column} has ambiguous units."
-        assert len(variable_descriptions) == 1, f"Variable {column} has ambiguous descriptions."
-        unit = variable_units[0]
-        unit_short_name = variable_unit_short_names[0]
-        description = variable_descriptions[0]
-        # Remove unit from title (only last occurrence of the unit).
-        title = " ".join(column.rsplit(f" ({unit})", 1)).strip()
+        # Unit (long name) for this variable.
+        unit_long_name = unit_long_names[column].dropna().unique()
+        assert len(unit_long_name) == 1, f"Variable {column} has ambiguous unit descriptions."
+        unit_long_name = unit_long_name[0]
+        wide_table[column].metadata.unit = unit_long_name
 
-        # Add title and unit to each column in the table.
-        wide_table[column].metadata.title = title
-        wide_table[column].metadata.unit = unit
+        # Unit (short name) for this variable.
+        unit_short_name = unit_short_names[column].dropna().unique()
+        assert len(unit_short_name) == 1, f"Variable {column} has ambiguous units."
+        unit_short_name = unit_short_name[0]
         wide_table[column].metadata.short_unit = unit_short_name
+
+        # Conversion factor to apply to the unit (it can be empty, in which case it will be ignored).
+        unit_factor = unit_factors[column].dropna().unique()
+        if len(unit_factor) > 0:
+            assert len(unit_factor) == 1, f"Variable {column} has ambiguous unit conversion factors."
+            unit_factor = unit_factor[0]
+            wide_table[column].metadata.display = {"conversionFactor": unit_factor}
+
+        # Description for this variable.
+        description = descriptions[column].dropna().unique()
+        assert len(description) == 1, f"Variable {column} has ambiguous descriptions."
+        description = description[0]
         wide_table[column].metadata.description = description
+
+        # Remove unit from title (only last occurrence of the unit).
+        title = " ".join(column.rsplit(f" ({unit_long_name})", 1)).strip()
+        wide_table[column].metadata.title = title
 
     # Make all column names snake_case.
     wide_table = catalog.utils.underscore_table(wide_table)
@@ -188,9 +211,6 @@ def prepare_data_table(dataset: catalog.Dataset, metadata: catalog.Dataset) -> c
     # Use the same table metadata as from original meadow table, but update index.
     wide_table.metadata = deepcopy(table_metadata)
     wide_table.metadata.primary_key = ["country", "year"]
-
-    # TODO: Check why in food_explorer, _fields are also added to the table.
-    # data_table_garden._fields = fields
 
     # Reset index, since countries will need to be converted into entities.
     wide_table = wide_table.reset_index()
@@ -222,10 +242,16 @@ def get_grapher_dataset_from_file_name(file_path: str) -> catalog.Dataset:
     dataset = catalog.Dataset(
         DATA_DIR / "garden" / namespace / garden_version / dataset_short_name
     )
+
+    # Get metadata for current dataset from garden (to get a description for the dataset).
+    metadata = get_metadata(dataset)
+
     # Short name for new grapher dataset.
     dataset.metadata.short_name = f"{dataset_short_name}__{grapher_version}".replace(
         "-", "_"
     )
+    # Add dataset description (taken from metadata).
+    dataset.metadata.description = metadata["datasets"].loc[dataset_short_name]["owid_dataset_description"]
 
     # move description to source as that is what is shown in grapher
     # (dataset.description would be displayed under `Internal notes` in the admin UI otherwise)
@@ -235,20 +261,29 @@ def get_grapher_dataset_from_file_name(file_path: str) -> catalog.Dataset:
     return dataset
 
 
-def get_latest_metadata() -> catalog.Dataset:
-    """Get latest faostat_metadata dataset from garden.
+def get_metadata(dataset: catalog.Dataset) -> catalog.Dataset:
+    """Get faostat_metadata dataset from garden for current dataset version.
+
+    Parameters
+    ----------
+    dataset : catalog.Dataset
+        Current dataset.
 
     Returns
     -------
     metadata : catalog.Dataset
         Latest version of the garden faostat_metadata dataset.
-
     """
-    dataset_short_name = "faostat_metadata"
-    # Get details of the corresponding latest garden step.
-    garden_version = find_latest_version_for_step(
-        channel="garden", step_name="faostat_metadata", namespace="faostat")
-    metadata_dir = DATA_DIR / "garden" / "faostat" / garden_version / dataset_short_name
+    # Get metadata for current dataset from garden.
+    dataset_version = dataset.metadata.version
+    #################################################################
+    # TODO: Remove this once meadow datasets are created with the correct metadata.version
+    #  (once convert_walden_metadata is updated to receive "version").
+    dataset_version = find_latest_version_for_step(
+        channel="garden", step_name=dataset.metadata.short_name.split("__")[0], namespace="faostat"
+    )
+    #################################################################
+    metadata_dir = DATA_DIR / "garden" / "faostat" / dataset_version / "faostat_metadata"
     assert metadata_dir.is_dir(), f"Metadata dataset not found."
     metadata = catalog.Dataset(metadata_dir)
 
@@ -272,8 +307,8 @@ def get_grapher_tables(dataset: catalog.Dataset) -> Iterable[catalog.Table]:
         in the original table of the dataset.
 
     """
-    # Get latest metadata from garden.
-    metadata = get_latest_metadata()
+    # Get metadata for current dataset from garden.
+    metadata = get_metadata(dataset)
 
     # Create a wide table.
     table = prepare_data_table(dataset=dataset, metadata=metadata)
