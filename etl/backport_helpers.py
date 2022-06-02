@@ -33,6 +33,7 @@ def create_wide_table(
 ) -> Table:
     """Convert backported table from long to wide format."""
     # convert to wide format
+    # NOTE: we keep both entity_name and entity_id
     long_mem_usage_mb = values.memory_usage().sum() / 1e6
     df = values.pivot(
         index=["entity_name", "entity_id", "year"],
