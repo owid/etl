@@ -159,7 +159,8 @@ FLAGS_RANKING = (
 
 def harmonize_items(df, dataset_short_name, item_col="item"):
     df = df.copy()
-    df["item_code"] = df["item_code"].astype(str).str.zfill(N_CHARACTERS_ITEM_CODE)
+    # Note: Here list comprehension is faster than doing .astype(str).str.zfill(...).
+    df["item_code"] = [str(item_code).zfill(N_CHARACTERS_ITEM_CODE) for item_code in df["item_code"]]
     df[item_col] = df[item_col].astype(str)
 
     # Fix those few cases where there is more than one item per item code within a given dataset.
@@ -174,26 +175,10 @@ def harmonize_items(df, dataset_short_name, item_col="item"):
 
 def harmonize_elements(df, element_col="element"):
     df = df.copy()
-    df["element_code"] = df["element_code"].astype(str).str.zfill(N_CHARACTERS_ELEMENT_CODE)
+    df["element_code"] = [str(element_code).zfill(N_CHARACTERS_ELEMENT_CODE) for element_code in df["element_code"]]
     df[element_col] = df[element_col].astype(str)
 
     return df
-
-
-def check_that_there_are_as_many_entity_codes_as_entities(data: pd.DataFrame) -> None:
-    """Check that there are as many entity codes (e.g. "item_code") as entities (e.g. "item") (raise warning otherwise).
-
-    Parameters
-    ----------
-    data : pd.DataFrame
-        Data for current dataset.
-
-    """
-    # Check that there are as many codes for area, element and unit and actual areas, elements and units.
-    entities = list({"area", "element", "item"} & set(data.columns))
-    for entity in entities:
-        if len(data[f"{entity}_code"].unique()) != len(data[f"{entity}"].unique()):
-            warnings.warn(f"The number of unique {entity} codes is different to the number of unique {entity}s.")
 
 
 def remove_rows_with_nan_value(
@@ -228,6 +213,40 @@ def remove_rows_with_nan_value(
         if frac_nan_rows > 0.15:
             warnings.warn(f"{frac_nan_rows: .0%} rows of nan values removed.")
         data = data.dropna(subset="value").reset_index(drop=True)
+
+    return data
+
+
+def remove_columns_with_only_nans(
+    data: pd.DataFrame, verbose: bool = True
+) -> pd.DataFrame:
+    """Remove columns that only have nans.
+
+    In principle, it should not be possible that columns have only nan values, but we use this function just in case.
+
+    Parameters
+    ----------
+    data : pd.DataFrame
+        Data for current dataset.
+    verbose : bool
+        True to print information about the removal of columns with nan values.
+
+    Returns
+    -------
+    data : pd.DataFrame
+        Data after removing columns of nans.
+
+    """
+    data = data.copy()
+    # Remove columns that only have nans.
+    columns_of_nans = data.columns[data.isnull().all(axis=0)]
+    if len(columns_of_nans) > 0:
+        if verbose:
+            print(
+                f"Removing {len(columns_of_nans)} columns ({len(columns_of_nans) / len(data.columns): .2%}) "
+                f"that have only nans."
+            )
+        data = data.drop(columns=columns_of_nans)
 
     return data
 
@@ -333,7 +352,39 @@ def clean_year_column(year_column: pd.Series) -> pd.Series:
     return year_clean_series
 
 
-def clean_data(data: pd.DataFrame, countries_file: Path) -> pd.DataFrame:
+def add_custom_names_and_descriptions(data, items_metadata, elements_metadata):
+    data = data.copy()
+
+    error = f"There are missing item codes in metadata."
+    assert set(data["item_code"]) <= set(items_metadata["item_code"]), error
+
+    error = f"There are missing element codes in metadata."
+    assert set(data["element_code"]) <= set(elements_metadata["element_code"]), error
+
+    _expected_n_rows = len(data)
+    data = pd.merge(data.rename(columns={"item": "fao_item"}),
+                    items_metadata[['item_code', 'owid_item', 'owid_item_description']], on="item_code", how="left")
+    assert len(data) == _expected_n_rows, f"Something went wrong when merging data with items metadata."
+
+    data = pd.merge(data.rename(columns={"element": "fao_element", "unit": "fao_unit"}),
+                    elements_metadata[['element_code', 'owid_element', 'owid_unit', 'owid_unit_factor',
+                                       'owid_element_description', 'owid_unit_description']],
+                    on=["element_code"], how="left")
+    assert len(data) == _expected_n_rows, f"Something went wrong when merging data with elements metadata."
+
+    # Ensure columns have the right type (this is a faster way to do .astype(str)).
+    data["owid_item_description"] = [i for i in data["owid_item_description"]]
+    data["owid_element_description"] = [i for i in data["owid_element_description"]]
+    data["owid_unit_description"] = [i for i in data["owid_unit_description"]]
+
+    # Remove "owid_" from column names.
+    data = data.rename(columns={column: column.replace("owid_", "") for column in data.columns})
+
+    return data
+
+
+def clean_data(data: pd.DataFrame, items_metadata: pd.DataFrame, elements_metadata: pd.DataFrame,
+               countries_file: Path) -> pd.DataFrame:
     """Process data (including harmonization of countries and regions) and prepare it for new garden dataset.
 
     Parameters
@@ -342,6 +393,10 @@ def clean_data(data: pd.DataFrame, countries_file: Path) -> pd.DataFrame:
         Unprocessed data for current dataset.
     countries_file : Path or str
         Path to mapping of country names.
+    items_metadata : pd.DataFrame
+        Items metadata (from the metadata dataset).
+    elements_metadata : pd.DataFrame
+        Elements metadata (from the metadata dataset).
 
     Returns
     -------
@@ -360,11 +415,14 @@ def clean_data(data: pd.DataFrame, countries_file: Path) -> pd.DataFrame:
             columns={"recipient_country": "area", "recipient_country_code": "area_code"}
         )
 
+    # Ensure year column is integer (sometimes it is given as a range of years, e.g. 2013-2015).
+    data["year"] = clean_year_column(data["year"])
+
     # Remove rows with nan value.
     data = remove_rows_with_nan_value(data)
 
-    # Sanity checks.
-    check_that_there_are_as_many_entity_codes_as_entities(data)
+    # Use custom names for items, elements and units (and keep original names in "fao_*" columns).
+    data = add_custom_names_and_descriptions(data, items_metadata, elements_metadata)
 
     # Harmonize country names.
     assert countries_file.is_file(), "countries file not found."
@@ -376,6 +434,29 @@ def clean_data(data: pd.DataFrame, countries_file: Path) -> pd.DataFrame:
     ).rename(columns={"area": "country"})
     # If countries are missing in countries file, execute etl.harmonize again and update countries file.
 
+    # Sanity checks.
+
+    # TODO: Properly deal with duplicates.
+    print(f"WARNING: Temporarily removing areas with duplicates.")
+    data = data[~data["country"].isin(["China", "Micronesia (country)"])].reset_index(drop=True)
+
+    # TODO: Move this to remove_duplicates.
+    n_countries_per_area_code = data.groupby("area_code")["country"].transform("nunique")
+    ambiguous_area_codes = data[n_countries_per_area_code > 1][["area_code", "country"]].\
+        drop_duplicates().set_index("area_code")["country"].to_dict()
+    error = f"There cannot be multiple countries for the same area code. " \
+            f"Redefine countries file for:\n{ambiguous_area_codes}."
+    assert len(ambiguous_area_codes) == 0, error
+    n_area_codes_per_country = data.groupby("country")["area_code"].transform("nunique")
+    ambiguous_countries = data[n_area_codes_per_country > 1][["area_code", "country"]].\
+        drop_duplicates().set_index("area_code")["country"].to_dict()
+    error = f"There cannot be multiple area codes for the same countries. " \
+            f"Redefine countries file for:\n{ambiguous_countries}."
+    assert len(ambiguous_countries) == 0, error
+
+    # TODO: Check for ambiguous indexes in the long table.
+    # TODO: Check for ambiguous indexes in the wide table.
+
     # After harmonizing, there are some country-year with more than one item-element.
     # This happens for example because there is different data for "Micronesia" and "Micronesia (Federated States of)",
     # which are both mapped to the same country, "Micronesia (country)".
@@ -385,25 +466,124 @@ def clean_data(data: pd.DataFrame, countries_file: Path) -> pd.DataFrame:
     # In cases where a country-year has more than one item-element, try to remove duplicates by looking at the flags.
     # If flags do not remove the duplicates, raise an error.
 
-    # Ensure year column is integer (sometimes it is given as a range of years, e.g. 2013-2015).
-    data["year"] = clean_year_column(data["year"])
-
-    # Remove duplicated data points keeping the one with lowest ranking (i.e. highest priority).
+    # Remove duplicated data points keeping the one with lowest ranking flag (i.e. highest priority).
     data = remove_duplicates(data)
 
-    # # We can now remove entity codes and flags.
-    # columns_to_drop = list(
-    #     {"area_code", "element_code", "item_code", "flag"} & set(data.columns)
-    # )
-    # data = data.drop(columns=columns_to_drop)
+    return data
 
+
+def prepare_long_table(data: pd.DataFrame):
     # Set appropriate indexes.
     index_columns = ["area_code", "year", "item_code", "element_code"]
     if data.duplicated(subset=index_columns).any():
         warnings.warn("Index has duplicated keys.")
-    data = data.set_index(index_columns).sort_index()
+    data_long = data.set_index(index_columns, verify_integrity=True).sort_index()
 
-    return data
+    # Create new table with long data.
+    data_table_long = catalog.Table(data_long).copy()
+
+    return data_table_long
+
+
+def prepare_wide_table(data: pd.DataFrame, dataset_title: str) -> catalog.Table:
+    """Flatten a long table to obtain a wide table with ["country", "year"] as index.
+
+    The input table will be pivoted to have [country, year] as index, and as many columns as combinations of
+    item-element-unit entities.
+
+    Parameters
+    ----------
+    data : pd.DataFrame
+        Data for current domain.
+    dataset_title : str
+        Title for the dataset of current domain (only needed to include it in the name of the new variables).
+
+    Returns
+    -------
+    wide_table : catalog.Table
+        Data table with index [country, year].
+
+    """
+    data = data.copy()
+
+    # Ensure "item" exists in data (there are some datasets where it may be missing).
+    if "item" not in data.columns:
+        data["item"] = ""
+
+    # Construct a variable name that will not yield any possible duplicates.
+    # This will be used as column names (which will then be formatted properly with underscores and lower case),
+    # and also as the variable titles in grapher.
+    # Also, for convenience, keep a similar structure as in the previous OWID dataset release.
+    data["variable_name"] = [f"{dataset_title} || {item} | {item_code} || {element} | {element_code} || {unit}"
+                             for item, item_code, element, element_code, unit
+                             in data[["item", "item_code", "element", "element_code", "unit"]].values]
+
+    # Construct a human-readable variable display name (which will be shown in grapher charts).
+    data["variable_display_name"] = [f"{item} - {element} ({unit})"
+                                     for item, element, unit
+                                     in data[["item", "element", "unit"]].values]
+
+    # Construct a human-readable variable description (for the variable metadata).
+    data["variable_description"] = [f"{item_description}\n{element_description}".lstrip().rstrip()
+                                    for item_description, element_description
+                                    in data[["item_description", "element_description"]].values]
+
+    # Pivot over long dataframe to generate a wide dataframe with country-year as index, and as many columns as
+    # unique elements in "variable_name" (which should be as many as combinations of item-elements).
+    # Note: We include area_code in the index for completeness, but by construction country-year should not have
+    # duplicates.
+    data_pivot = data.pivot(index=["area_code", "country", "year"], columns=["variable_name"],
+                            values=["value", "unit", "unit_description", "unit_factor", "variable_display_name",
+                                    "variable_description"])
+    # For convenience, create a dictionary for each zeroth-level multi-index.
+    data_wide = {pivot_column: data_pivot[pivot_column] for pivot_column in data_pivot.columns.levels[0]}
+
+    # Create a wide table with just the data values.
+    wide_table = catalog.Table(data_wide["value"]).copy()
+
+    # Add metadata to each new variable in the wide data table.
+    for column in wide_table.columns:
+        # Add variable name.
+        wide_table[column].metadata.title = column
+
+        # Add variable unit (long name).
+        variable_unit = data_wide["unit_description"][column].dropna().unique()
+        assert len(variable_unit) == 1
+        wide_table[column].metadata.unit = variable_unit[0]
+
+        # Add variable unit (short name).
+        variable_unit_short_name = data_wide["unit"][column].dropna().unique()
+        assert len(variable_unit_short_name) == 1
+        wide_table[column].metadata.short_unit = variable_unit_short_name[0]
+
+        # Add variable description.
+        variable_description = data_wide["variable_description"][column].dropna().unique()
+        assert len(variable_description) == 1
+        wide_table[column].metadata.description = variable_description[0]
+
+        # Add display parameters (for grapher).
+        wide_table[column].metadata.display = {}
+        # Display name.
+        variable_display_name = data_wide["variable_display_name"][column].dropna().unique()
+        assert len(variable_display_name) == 1
+        wide_table[column].metadata.display["name"] = variable_display_name[0]
+        # Unit conversion factor (if given).
+        variable_unit_factor = data_wide["unit_factor"][column].dropna().unique()
+        if len(variable_unit_factor) > 0:
+            assert len(variable_unit_factor) == 1
+            wide_table[column].metadata.display["conversionFactor"] = variable_unit_factor[0]
+
+    # Sort columns and rows conveniently.
+    wide_table = wide_table.reset_index().set_index(["country", "year"], verify_integrity=True)
+    wide_table = wide_table[["area_code"] + sorted([column for column in wide_table.columns if column != "area_code"])]
+    wide_table = wide_table.sort_index(level=["country", "year"]).sort_index()
+
+    # Make all column names snake_case.
+    # TODO: Add vertical bar to utils.underscore_table. When done, there will be no need to rename columns.
+    wide_table = catalog.utils.underscore_table(
+        wide_table.rename(columns={column: column.replace("|", "_") for column in wide_table.columns}))
+
+    return wide_table
 
 
 def run(dest_dir: str) -> None:
@@ -414,17 +594,14 @@ def run(dest_dir: str) -> None:
     # Assume dest_dir is a path to the step that needs to be run, e.g. "faostat_qcl", and fetch namespace and dataset
     # short name from that path.
     dataset_short_name = Path(dest_dir).name
-    namespace = dataset_short_name.split("_")[0]
-    # Path to latest dataset in meadow.
-    meadow_version_dir = sorted(
-        (DATA_DIR / "meadow" / namespace).glob(f"*/{dataset_short_name}")
-    )[-1].parent
-    # Version of meadow dataset, which will also be the version of the analogous garden dataset.
-    version = meadow_version_dir.name
-    # Get dataset version from folder name with latest date.
-    meadow_data_dir = meadow_version_dir / dataset_short_name
-    garden_code_dir = STEP_DIR / "data" / "garden" / namespace / version
-    countries_file = garden_code_dir / f"{namespace}.countries.json"
+    # namespace = dataset_short_name.split("_")[0]
+    # Path to latest dataset in meadow for current FAOSTAT domain.
+    meadow_data_dir = sorted((DATA_DIR / "meadow" / NAMESPACE).glob(f"*/{dataset_short_name}"))[-1].parent /\
+        dataset_short_name
+    # Path to countries file.
+    countries_file = STEP_DIR / "data" / "garden" / NAMESPACE / VERSION / f"{NAMESPACE}.countries.json"
+    # Path to dataset of FAOSTAT metadata.
+    garden_metadata_dir = DATA_DIR / "garden" / NAMESPACE / VERSION / f"{NAMESPACE}_metadata"
 
     ####################################################################################################################
     # Load data.
@@ -436,6 +613,22 @@ def run(dest_dir: str) -> None:
     data_table_meadow = dataset_meadow[dataset_short_name]
     data = pd.DataFrame(data_table_meadow).reset_index()
 
+    # Load dataset of FAOSTAT metadata.
+    metadata = catalog.Dataset(garden_metadata_dir)
+
+    # Load and prepare dataset, items and element-units metadata.
+    datasets_metadata = pd.DataFrame(metadata["datasets"]).reset_index()
+    datasets_metadata = datasets_metadata[datasets_metadata["dataset"] == dataset_short_name].reset_index(drop=True)
+    items_metadata = pd.DataFrame(metadata["items"]).reset_index()
+    items_metadata = items_metadata[items_metadata["dataset"] == dataset_short_name].reset_index(drop=True)
+    # TODO: Remove this line once items are stored with the right format.
+    items_metadata["item_code"] = items_metadata["item_code"].astype(str).str.zfill(N_CHARACTERS_ITEM_CODE)
+    elements_metadata = pd.DataFrame(metadata["elements"]).reset_index()
+    elements_metadata = elements_metadata[elements_metadata["dataset"] == dataset_short_name].reset_index(drop=True)
+    # TODO: Remove this line once elements are stored with the right format.
+    elements_metadata["element_code"] = elements_metadata["element_code"].astype(str).str.zfill(
+        N_CHARACTERS_ELEMENT_CODE)
+
     ####################################################################################################################
     # Process data.
     ####################################################################################################################
@@ -443,8 +636,17 @@ def run(dest_dir: str) -> None:
     # Harmonize items and elements, and clean data.
     data = harmonize_items(df=data, dataset_short_name=dataset_short_name)
     data = harmonize_elements(df=data)
-    data = clean_data(data=data, countries_file=countries_file)
-    # TODO: Run more sanity checks.
+
+    data = clean_data(data=data, items_metadata=items_metadata, elements_metadata=elements_metadata,
+                      countries_file=countries_file)
+
+    # TODO: Run more sanity checks (i.e. compare with previous version of the same domain).
+
+    # Create a long table (with item code and element code as part of the index).
+    data_table_long = prepare_long_table(data=data)
+
+    # Create a wide table (with only country and year as index).
+    data_table_wide = prepare_wide_table(data=data, dataset_title=datasets_metadata["owid_dataset_title"].item())
 
     ####################################################################################################################
     # Save outputs.
@@ -452,14 +654,34 @@ def run(dest_dir: str) -> None:
 
     # Initialize new garden dataset.
     dataset_garden = catalog.Dataset.create_empty(dest_dir)
-    # Keep original dataset's metadata from meadow.
-    dataset_garden.metadata = deepcopy(dataset_meadow.metadata)
+    # Prepare metadata for new garden dataset (starting with the metadata from the meadow version).
+    dataset_garden_metadata = deepcopy(dataset_meadow.metadata)
+    # TODO: Uncomment when datasets can have a version property:
+    # dataset_garden_metadata.metadata.version = VERSION
+    dataset_garden_metadata.description = datasets_metadata["owid_dataset_description"].item()
+    dataset_garden_metadata.title = datasets_metadata["owid_dataset_title"].item()
+    # Add metadata to dataset.
+    dataset_garden.metadata = dataset_garden_metadata
     # Create new dataset in garden.
     dataset_garden.save()
-    # Create new table for garden dataset.
-    data_table = catalog.Table(data).copy()
-    # Table metadatata will be identical to the meadow table except for the index.
-    data_table.metadata = deepcopy(data_table_meadow.metadata)
-    data_table.metadata.primary_key = list(data.index.names)
-    # Add table to dataset.
-    dataset_garden.add(data_table)
+
+    # Prepare metadata for new garden long table (starting with the metadata from the meadow version).
+    data_table_long.metadata = deepcopy(data_table_meadow.metadata)
+    data_table_long.metadata.title = dataset_garden_metadata.title
+    data_table_long.metadata.description = dataset_garden_metadata.description
+    data_table_long.metadata.primary_key = list(data_table_long.index.names)
+    data_table_long.metadata.dataset = dataset_garden_metadata
+    # Add long table to the dataset.
+    dataset_garden.add(data_table_long)
+
+    # Prepare metadata for new garden wide table (starting with the metadata from the long table).
+    # Add wide table to the dataset.
+    data_table_wide.metadata = deepcopy(data_table_long.metadata)
+
+    data_table_wide.metadata.title += " - Flattened table indexed by country-year."
+    data_table_wide.metadata.short_name += "_flat"
+    data_table_wide.metadata.primary_key = list(data_table_wide.index.names)
+
+    # Add wide table to the dataset.
+    # TODO: Check why repack=True now fails.
+    dataset_garden.add(data_table_wide, repack=False)
