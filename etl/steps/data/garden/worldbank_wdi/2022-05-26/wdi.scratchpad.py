@@ -3,6 +3,7 @@ Indicators bulk update.
 
 The code in this file is not intended to be run as part of any etl step. 
 """
+# flake8: noqa
 
 import os
 from pathlib import Path

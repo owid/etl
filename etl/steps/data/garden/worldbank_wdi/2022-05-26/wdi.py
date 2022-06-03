@@ -30,7 +30,7 @@ def run(dest_dir: str) -> None:
 
     # harmonize entity names
     country_mapping = load_country_mapping()
-    excluded_countries = load_excluded_countries()
+    excluded_countries = load_excluded_countries()  # noqa: F841
     df = df.query("country not in @excluded_countries")
     assert df["country"].notnull().all()
     countries = df["country"].apply(lambda x: country_mapping.get(x, None))

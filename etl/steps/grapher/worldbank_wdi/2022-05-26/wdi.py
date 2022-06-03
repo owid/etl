@@ -247,8 +247,8 @@ class VariableMatcher:
         self._variable_mapping = value
 
     def fetch_grapher_variables(self) -> pd.DataFrame:
-        query = f"""
-            WITH 
+        query = """
+            WITH
             datasets AS (
                 SELECT
                     id,
@@ -256,8 +256,8 @@ class VariableMatcher:
                     createdAt,
                     updatedAt
                 FROM datasets
-                WHERE 
-                    namespace REGEXP "^worldbank_wdi" 
+                WHERE
+                    namespace REGEXP "^worldbank_wdi"
                     OR name REGEXP "[Ww]orld [Dd]evelopment [Ii]ndicators"
             )
             SELECT
@@ -297,7 +297,7 @@ class VariableMatcher:
                 names.append(rev_mapping[name])
 
         matches = (
-            self.grapher_variables.query(f"name in @names")
+            self.grapher_variables.query("name in @names")
             .sort_values("updatedAt", ascending=False)
             .to_dict(orient="records")
         )

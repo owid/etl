@@ -7,14 +7,14 @@ the newest version of the World Development Indicators.
 For use after the grapher step has been executed.
 
 Usage:
-    
+
     $ python -m etl.steps.grapher.worldbank_wdi.{version}.wdi_variable_replacements
-    
+
     // output:
     // wdi.variable_replacements.json
     {
         // old_id: new_id
-        "157342": 445693,  
+        "157342": 445693,
         "2037": 445693,
         ...
     }
