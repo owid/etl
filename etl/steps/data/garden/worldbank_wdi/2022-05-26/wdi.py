@@ -6,7 +6,7 @@ Harmonize country names:
 """
 import json
 from pathlib import Path
-from typing import List
+from typing import List, Dict
 
 import pandas as pd
 
@@ -58,9 +58,10 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
-def load_country_mapping() -> dict:
+def load_country_mapping() -> Dict[str, str]:
     with open(COUNTRY_MAPPING_PATH, "r") as f:
         mapping = json.load(f)
+        assert isinstance(mapping, dict)
     return mapping
 
 
@@ -68,4 +69,5 @@ def load_excluded_countries() -> List[str]:
     fname = Path(__file__).stem.split(".")[0]
     with open(Path(__file__).parent / f"{fname}.country_exclude.json", "r") as f:
         data = json.load(f)
+        assert isinstance(data, list)
     return data
