@@ -17,21 +17,24 @@ from owid import catalog
 from owid.catalog.meta import DatasetMeta, TableMeta
 
 from etl.paths import DATA_DIR, STEP_DIR
-from etl.scripts.faostat.create_new_steps import find_latest_version_for_step
 from .shared import (
     NAMESPACE,
     VERSION,
     clean_data,
     harmonize_elements,
     harmonize_items,
+    N_CHARACTERS_ELEMENT_CODE,
+    N_CHARACTERS_ITEM_CODE,
+    prepare_long_table,
+    prepare_wide_table,
 )
 
 # Dataset name.
-DATASET_NAME = f"{NAMESPACE}_fbsc"
+DATASET_SHORT_NAME = f"{NAMESPACE}_fbsc"
 
 # First year for which we have data in fbs dataset (it defines the first year when new methodology is used).
 FBS_FIRST_YEAR = 2010
-DATASET_TITLE = f"Food Balances (old methodology before {FBS_FIRST_YEAR}, and new from {FBS_FIRST_YEAR} onwards)."
+DATASET_TITLE = f"Food Balances (old methodology before {FBS_FIRST_YEAR}, and new from {FBS_FIRST_YEAR} onwards)"
 
 # Path to countries mapping file.
 COUNTRIES_FILE = (
@@ -64,9 +67,7 @@ def combine_fbsh_and_fbs_datasets(
         fbs["year"].min() == FBS_FIRST_YEAR
     ), f"First year of fbs dataset is not {FBS_FIRST_YEAR}"
     if fbsh["year"].max() >= fbs["year"].min():
-        print(
-            "There is overlapping data between fbsh and fbs datasets. Prioritising fbs over fbsh."
-        )
+        # There is overlapping data between fbsh and fbs datasets. Prioritising fbs over fbsh."
         fbsh = fbsh[fbsh["year"] < fbs["year"].min()].reset_index(drop=True)
     if (fbsh["year"].max() + 1) < fbs["year"].min():
         print(
@@ -99,16 +100,13 @@ def run(dest_dir: str) -> None:
     ####################################################################################################################
 
     # Find path to latest versions of fbsh dataset.
-    fbsh_version = find_latest_version_for_step(
-        channel="meadow", step_name="faostat_fbsh", namespace=NAMESPACE
-    )
+    fbsh_version = sorted((DATA_DIR / "meadow" / NAMESPACE).glob(f"*/faostat_fbsh"))[-1].parent.name
     fbsh_file = DATA_DIR / "meadow" / NAMESPACE / fbsh_version / "faostat_fbsh"
-
     # Find path to latest versions of fbs dataset.
-    fbs_version = find_latest_version_for_step(
-        channel="meadow", step_name="faostat_fbs", namespace=NAMESPACE
-    )
+    fbs_version = sorted((DATA_DIR / "meadow" / NAMESPACE).glob(f"*/faostat_fbs"))[-1].parent.name
     fbs_file = DATA_DIR / "meadow" / NAMESPACE / fbs_version / "faostat_fbs"
+    # Path to dataset of FAOSTAT metadata.
+    garden_metadata_dir = DATA_DIR / "garden" / NAMESPACE / VERSION / f"{NAMESPACE}_metadata"
 
     ####################################################################################################################
     # Load data.
@@ -118,6 +116,22 @@ def run(dest_dir: str) -> None:
     fbsh_dataset = catalog.Dataset(fbsh_file)
     fbs_dataset = catalog.Dataset(fbs_file)
 
+    # Load dataset of FAOSTAT metadata.
+    metadata = catalog.Dataset(garden_metadata_dir)
+
+    # Load and prepare dataset, items and element-units metadata.
+    datasets_metadata = pd.DataFrame(metadata["datasets"]).reset_index()
+    datasets_metadata = datasets_metadata[datasets_metadata["dataset"] == DATASET_SHORT_NAME].reset_index(drop=True)
+    items_metadata = pd.DataFrame(metadata["items"]).reset_index()
+    items_metadata = items_metadata[items_metadata["dataset"] == DATASET_SHORT_NAME].reset_index(drop=True)
+    # TODO: Remove this line once items are stored with the right format.
+    items_metadata["item_code"] = items_metadata["item_code"].astype(str).str.zfill(N_CHARACTERS_ITEM_CODE)
+    elements_metadata = pd.DataFrame(metadata["elements"]).reset_index()
+    elements_metadata = elements_metadata[elements_metadata["dataset"] == DATASET_SHORT_NAME].reset_index(drop=True)
+    # TODO: Remove this line once elements are stored with the right format.
+    elements_metadata["element_code"] = elements_metadata["element_code"].astype(str).str.zfill(
+        N_CHARACTERS_ELEMENT_CODE)
+
     ####################################################################################################################
     # Process data.
     ####################################################################################################################
@@ -126,35 +140,60 @@ def run(dest_dir: str) -> None:
     fbsc = combine_fbsh_and_fbs_datasets(fbsh_dataset, fbs_dataset)
 
     # Clean data.
-    fbsc = clean_data(data=fbsc, countries_file=COUNTRIES_FILE)
+    data = clean_data(data=fbsc, items_metadata=items_metadata, elements_metadata=elements_metadata,
+                      countries_file=COUNTRIES_FILE)
 
-    # Create new table for garden dataset.
-    table_metadata = TableMeta(short_name=DATASET_NAME, primary_key=["country", "year"])
-    fbsc_table = catalog.Table(fbsc)
-    fbsc_table.metadata = table_metadata
+    # Create a long table (with item code and element code as part of the index).
+    data_table_long = prepare_long_table(data=data)
+
+    # Create a wide table (with only country and year as index).
+    data_table_wide = prepare_wide_table(data=data, dataset_title=datasets_metadata["owid_dataset_title"].item())
 
     ####################################################################################################################
     # Prepare outputs.
     ####################################################################################################################
 
     # Initialize new garden dataset.
-    fbsc_dataset = catalog.Dataset.create_empty(dest_dir)
+    dataset_garden = catalog.Dataset.create_empty(dest_dir)
     # Define metadata for new fbsc garden dataset (by default, take metadata from fbs dataset).
     fbsc_sources = deepcopy(fbs_dataset.metadata.sources[0])
     fbsc_sources.source_data_url = None
     fbsc_sources.owid_data_url = None
-    fbsc_dataset.metadata = DatasetMeta(
+    # Check that the title assigned here coincides with the one in custom_datasets.csv (for consistency).
+    error = "Dataset title given to fbsc is different to the one in custom_datasets.csv. Update the latter file."
+    assert DATASET_TITLE == datasets_metadata["owid_dataset_title"].item(), error
+    dataset_garden_metadata = DatasetMeta(
         namespace=NAMESPACE,
-        short_name=DATASET_NAME,
+        short_name=DATASET_SHORT_NAME,
         title=DATASET_TITLE,
         # Take description from any of the datasets (since they should be identical).
-        description=fbs_dataset.metadata.description,
+        description=datasets_metadata["owid_dataset_description"].item(),
         # For sources and licenses, assume those of fbs.
         sources=[fbsc_sources],
         licenses=fbs_dataset.metadata.licenses,
     )
+    dataset_garden.metadata = dataset_garden_metadata
+    # TODO: Uncomment when datasets can have a version property:
+    # dataset_garden_metadata.metadata.version = VERSION
     # Create new dataset in garden.
-    fbsc_dataset.save()
+    dataset_garden.save()
 
-    # Add table to dataset.
-    fbsc_dataset.add(fbsc_table)
+    # Prepare metadata for new garden long table.
+    data_table_long.metadata = TableMeta(short_name=DATASET_SHORT_NAME)
+    data_table_long.metadata.title = dataset_garden_metadata.title
+    data_table_long.metadata.description = dataset_garden_metadata.description
+    data_table_long.metadata.primary_key = list(data_table_long.index.names)
+    data_table_long.metadata.dataset = dataset_garden_metadata
+    # Add long table to the dataset.
+    dataset_garden.add(data_table_long)
+
+    # Prepare metadata for new garden wide table (starting with the metadata from the long table).
+    # Add wide table to the dataset.
+    data_table_wide.metadata = deepcopy(data_table_long.metadata)
+    data_table_wide.metadata.title += " - Flattened table indexed by country-year."
+    data_table_wide.metadata.short_name += "_flat"
+    data_table_wide.metadata.primary_key = list(data_table_wide.index.names)
+
+    # Add wide table to the dataset.
+    # TODO: Check why repack=True now fails.
+    dataset_garden.add(data_table_wide, repack=False)

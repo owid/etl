@@ -368,14 +368,15 @@ def add_custom_names_and_descriptions(data, items_metadata, elements_metadata):
 
     data = pd.merge(data.rename(columns={"element": "fao_element", "unit": "fao_unit"}),
                     elements_metadata[['element_code', 'owid_element', 'owid_unit', 'owid_unit_factor',
-                                       'owid_element_description', 'owid_unit_description']],
+                                       'owid_element_description', 'owid_unit_short_name']],
                     on=["element_code"], how="left")
     assert len(data) == _expected_n_rows, f"Something went wrong when merging data with elements metadata."
 
     # Ensure columns have the right type (this is a faster way to do .astype(str)).
     data["owid_item_description"] = [i for i in data["owid_item_description"]]
     data["owid_element_description"] = [i for i in data["owid_element_description"]]
-    data["owid_unit_description"] = [i for i in data["owid_unit_description"]]
+    data["owid_unit"] = [i for i in data["owid_unit"]]
+    data["owid_unit_short_name"] = [i for i in data["owid_unit_short_name"]]
 
     # Remove "owid_" from column names.
     data = data.rename(columns={column: column.replace("owid_", "") for column in data.columns})
@@ -533,8 +534,9 @@ def prepare_wide_table(data: pd.DataFrame, dataset_title: str) -> catalog.Table:
     # Note: We include area_code in the index for completeness, but by construction country-year should not have
     # duplicates.
     data_pivot = data.pivot(index=["area_code", "country", "year"], columns=["variable_name"],
-                            values=["value", "unit", "unit_description", "unit_factor", "variable_display_name",
+                            values=["value", "unit", "unit_short_name", "unit_factor", "variable_display_name",
                                     "variable_description"])
+
     # For convenience, create a dictionary for each zeroth-level multi-index.
     data_wide = {pivot_column: data_pivot[pivot_column] for pivot_column in data_pivot.columns.levels[0]}
 
@@ -547,12 +549,12 @@ def prepare_wide_table(data: pd.DataFrame, dataset_title: str) -> catalog.Table:
         wide_table[column].metadata.title = column
 
         # Add variable unit (long name).
-        variable_unit = data_wide["unit_description"][column].dropna().unique()
+        variable_unit = data_wide["unit"][column].dropna().unique()
         assert len(variable_unit) == 1
         wide_table[column].metadata.unit = variable_unit[0]
 
         # Add variable unit (short name).
-        variable_unit_short_name = data_wide["unit"][column].dropna().unique()
+        variable_unit_short_name = data_wide["unit_short_name"][column].dropna().unique()
         assert len(variable_unit_short_name) == 1
         wide_table[column].metadata.short_unit = variable_unit_short_name[0]
 
