@@ -78,6 +78,8 @@ steps:
     - walden://worldbank_wdi/2022-05-26/wdi
   data://garden/worldbank_wdi/2022-05-26/wdi:
     - data://meadow/worldbank_wdi/2022-05-26/wdi
+  grapher://worldbank_wdi/2022-05-26/wdi:
+    - data://garden/worldbank_wdi/2022-05-26/wdi
 
   # Examples
   data://examples/script/script_example:
@@ -94,5 +96,9 @@ steps:
 
 # Sub-dags to import
 include:
+<<<<<<< HEAD
   - dag_files/dag_open_numbers.yml
 
+=======
+  - dag_open_numbers.yml
+>>>>>>> data(worldbank_wdi): add grapher step
