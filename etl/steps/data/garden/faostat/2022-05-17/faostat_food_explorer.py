@@ -9,10 +9,10 @@ from copy import deepcopy
 import pandas as pd
 from owid import catalog
 from owid.catalog.meta import DatasetMeta
-from owid.datautils import geo
+from owid.datautils import dataframes, geo
 
-from etl.paths import DATA_DIR
-from .shared import NAMESPACE, harmonize_elements, harmonize_items
+from etl.paths import DATA_DIR, STEP_DIR
+from .shared import NAMESPACE, VERSION, harmonize_elements, harmonize_items
 
 # Dataset name and title.
 DATASET_TITLE = "Food Explorer"
@@ -40,8 +40,6 @@ def combine_qcl_and_fbsc(
     fbsc = harmonize_items(fbsc, dataset_short_name=f"{NAMESPACE}_fbsc", item_col="fao_item")
     fbsc = harmonize_elements(fbsc, element_col="fao_element")
     ##########################################
-
-    # TODO: Before combining, select the products we need.
 
     columns = ['country', 'year', 'item_code', 'element_code', 'item', 'element', 'unit', 'unit_short_name', 'value',
                'unit_factor']
@@ -72,19 +70,38 @@ def combine_qcl_and_fbsc(
     return combined
 
 
-def process_combined_data(data: pd.DataFrame) -> pd.DataFrame:
+def process_combined_data(combined: pd.DataFrame, custom_products: pd.DataFrame) -> pd.DataFrame:
+    # Create a mapping from product name in data to product name in explorer (for those products that need renaming).
+    products_renaming = custom_products[custom_products["product_in_explorer"].notnull()].\
+        set_index("product_in_data")["product_in_explorer"].to_dict()
+
+    # Rename products.
+    combined["product"] = dataframes.map_series(combined["product"], mapping=products_renaming,
+                                                warn_on_unused_mappings=True)
+
+    # Get list of products that will be used in food explorer.
+    products = sorted(custom_products["product_in_explorer"].fillna(custom_products["product_in_data"]).
+                      unique().tolist())
+
+    # Check that all expected products are included in the data.
+    missing_products = sorted(set(products) - set(set(combined["product"])))
+    assert len(missing_products) == 0, f"{len(missing_products)} missing products for food explorer."
+
+    # Select relevant products for the food explorer.
+    combined = combined[combined["product"].isin(products)].reset_index(drop=True)
+
     # For the food explorer we have to multiply data by the unit factor, since these conversions
     # will not be applied in grapher.
-    rows_to_convert_mask = data["unit_factor"].notnull()
-    data.loc[rows_to_convert_mask, "value"] = data[rows_to_convert_mask]["value"] * \
-        data[rows_to_convert_mask]["unit_factor"]
+    rows_to_convert_mask = combined["unit_factor"].notnull()
+    combined.loc[rows_to_convert_mask, "value"] = combined[rows_to_convert_mask]["value"] * \
+        combined[rows_to_convert_mask]["unit_factor"]
 
     # Join element and unit into one title column.
-    data["title"] = data["element"] + "-" + data["unit"]
+    combined["title"] = combined["element"] + " (" + combined["unit"] + ")"
 
     # This will create a table with just one column and country-year as index.
     index_columns = ["product", "country", "year"]
-    data_wide = data.pivot(
+    data_wide = combined.pivot(
         index=index_columns, columns=["title"], values="value"
     ).reset_index()
 
@@ -109,6 +126,8 @@ def run(dest_dir: str) -> None:
     # Path to latest qcl and fbsc datasets in garden.
     qcl_latest_dir = sorted((DATA_DIR / "garden" / NAMESPACE).glob(f"*/{NAMESPACE}_qcl*"))[-1]
     fbsc_latest_dir = sorted((DATA_DIR / "garden" / NAMESPACE).glob(f"*/{NAMESPACE}_fbsc*"))[-1]
+    # Path to file with custom product names for the food explorer.
+    custom_products_file = STEP_DIR / "data" / "garden" / NAMESPACE / VERSION / "custom_food_explorer_products.csv"
 
     ####################################################################################################################
     # Load data.
@@ -123,13 +142,15 @@ def run(dest_dir: str) -> None:
     # Idem for fbsc.
     fbsc_table = fbsc_dataset[f"{NAMESPACE}_fbsc"]
 
+    # Load names of products used in food explorer.
+    custom_products = pd.read_csv(custom_products_file, dtype=str)
+
     ####################################################################################################################
     # Process data.
     ####################################################################################################################
 
-    data = combine_qcl_and_fbsc(qcl_table=qcl_table, fbsc_table=fbsc_table)
-
-    data = process_combined_data(data=data)
+    combined = combine_qcl_and_fbsc(qcl_table=qcl_table, fbsc_table=fbsc_table)
+    data = process_combined_data(combined=combined, custom_products=custom_products)
 
     # TODO: Add per capita variables. It seems in the old explorer we multiply per capita variables by *our*
     #  population, and then divide again. It makes more sense to multiply by FAOSTAT population and then divide by

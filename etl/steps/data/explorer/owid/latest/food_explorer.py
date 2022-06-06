@@ -5,12 +5,47 @@ Loads the latest faostat_food_explorer dataset from garden and stores a table (a
 NOTE: It will overwrite csv files inside "data/explorer/owid/latest/food_explorer".
 
 """
+
 from copy import deepcopy
 
 from owid import catalog
 from tqdm.auto import tqdm
 
 from etl.paths import DATA_DIR
+
+# Rename columns to be used by the food explorer.
+# Note: Include here all columns, even if the name is not changed.
+# TODO: Uncomment columns here once per capita variables have been added.
+EXPECTED_COLUMNS = {
+    'product': 'product',
+    'population': 'population',
+    'area_harvested__ha': 'area_harvested__ha',
+    # 'area_harvested__ha__per_capita': 'area_harvested__ha__per_capita',
+    'domestic_supply__tonnes': 'domestic_supply__tonnes',
+    # 'domestic_supply__tonnes__per_capita',
+    'exports__tonnes': 'exports__tonnes',
+    # 'exports__tonnes__per_capita',
+    'feed__tonnes': 'feed__tonnes',
+    # 'feed__tonnes__per_capita',
+    'food__tonnes': 'food__tonnes',
+    # 'food__tonnes__per_capita',
+    # 'food_available_for_consumption__grams_of_fat_per_day__per_capita': 'food_available_for_consumption__fat_g_per_day__per_capita',
+    # 'food_available_for_consumption__kilocalories_per_day__per_capita': 'food_available_for_consumption__kcal_per_day__per_capita',
+    # 'food_available_for_consumption__kilograms_per_capita_per_year': 'food_available_for_consumption__kg_per_year__per_capita',
+    # 'food_available_for_consumption__grams_of_protein_per_day_per_capita': 'food_available_for_consumption__protein_g_per_day__per_capita',
+    'imports__tonnes': 'imports__tonnes',
+    # 'imports__tonnes__per_capita': 'imports__tonnes__per_capita',
+    'other_uses__tonnes': 'other_uses__tonnes',
+    # 'other_uses__tonnes__per_capita': 'other_uses__tonnes__per_capita',
+    'producing_or_slaughtered_animals__animals': 'producing_or_slaughtered_animals__animals',
+    # 'producing_or_slaughtered_animals__animals__per_capita': 'producing_or_slaughtered_animals__animals__per_capita',
+    'production__tonnes': 'production__tonnes',
+    # 'production__tonnes__per_capita': 'production__tonnes__per_capita',
+    'waste_in_supply_chain__tonnes': 'waste_in_supply_chain__tonnes',
+    # 'waste_in_supply_chain__tonnes__per_capita': 'waste_in_supply_chain__tonnes__per_capita',
+    'yield__kilograms_per_animal': 'yield__kg_per_animal',
+    'yield__tonnes_per_hectare': 'yield__tonnes_per_ha',
+}
 
 
 def run(dest_dir: str) -> None:
@@ -33,13 +68,24 @@ def run(dest_dir: str) -> None:
 
     # List all products in table
     products = sorted(table_garden.index.get_level_values("product").unique().tolist())
+
     for product in tqdm(products):
         # Save a table (as a separate csv file) for each food product.
-        table_product = table_garden.loc[product]
+        table_product = table_garden.loc[product].copy()
         # Update table metadata.
         table_product.title = product
+
+        # Create a column with the product name (required for food explorer).
+        table_product["product"] = product
+
+        # Rename columns, select the required ones, and sort columns and rows conveniently.
+        table_product = table_product[list(EXPECTED_COLUMNS)].rename(columns=EXPECTED_COLUMNS)
+        table_product = table_product[["product", "population"] + [column for column in sorted(table_product.columns)
+                                                                   if column not in ["product", "population"]]]
+        table_product = table_product.sort_index()
+
         table_product.metadata.short_name = catalog.utils.underscore(
             name=product, validate=True
-        )
+        ).replace("__", "_").replace("_e_g_", "_eg_")
         # Add table to dataset.
         dataset.add(table_product, format="csv")
