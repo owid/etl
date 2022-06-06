@@ -27,6 +27,7 @@ from .shared import (
     N_CHARACTERS_ITEM_CODE,
     prepare_long_table,
     prepare_wide_table,
+    concatenate,
 )
 
 # Dataset name.
@@ -68,7 +69,7 @@ def combine_fbsh_and_fbs_datasets(
     ), f"First year of fbs dataset is not {FBS_FIRST_YEAR}"
     if fbsh["year"].max() >= fbs["year"].min():
         # There is overlapping data between fbsh and fbs datasets. Prioritising fbs over fbsh."
-        fbsh = fbsh[fbsh["year"] < fbs["year"].min()].reset_index(drop=True)
+        fbsh = fbsh.loc[fbsh["year"] < fbs["year"].min()].reset_index(drop=True)
     if (fbsh["year"].max() + 1) < fbs["year"].min():
         print(
             "WARNING: Data is missing for one or more years between fbsh and fbs datasets."
@@ -84,14 +85,20 @@ def combine_fbsh_and_fbs_datasets(
     error = "There are elements in fbsh that are not in fbs."
     assert set(fbsh["element"]) < set(fbs["element"]), error
 
-    # Concatenate old and new dataframes.
-    fbsc = pd.concat([fbsh, fbs]).sort_values(["area", "year"]).reset_index(drop=True)
+    # Concatenate old and new dataframes using function that keeps categoricals.
+    fbsc = concatenate([fbsh, fbs]).sort_values(["area", "year"]).reset_index(drop=True)
 
     # Ensure that each element has only one unit and one description.
     error = "Some elements in the combined dataset have more than one unit."
     assert fbsc.groupby("element")["unit"].nunique().max() == 1, error
 
     return fbsc
+
+
+def _assert_df_size(df: pd.DataFrame, size_mb: float) -> None:
+    """Check that dataframe is smaller than given size to prevent OOM errors."""
+    real_size_mb = df.memory_usage(deep=True).sum() / 1e6
+    assert real_size_mb / 1e6 <= size_mb, f'DataFrame size is too big: {real_size_mb} MB > {size_mb} MB'
 
 
 def run(dest_dir: str) -> None:
@@ -125,12 +132,12 @@ def run(dest_dir: str) -> None:
     items_metadata = pd.DataFrame(metadata["items"]).reset_index()
     items_metadata = items_metadata[items_metadata["dataset"] == DATASET_SHORT_NAME].reset_index(drop=True)
     # TODO: Remove this line once items are stored with the right format.
-    items_metadata["item_code"] = items_metadata["item_code"].astype(str).str.zfill(N_CHARACTERS_ITEM_CODE)
+    items_metadata["item_code"] = items_metadata["item_code"].astype(str).str.zfill(N_CHARACTERS_ITEM_CODE).astype("category")
     elements_metadata = pd.DataFrame(metadata["elements"]).reset_index()
     elements_metadata = elements_metadata[elements_metadata["dataset"] == DATASET_SHORT_NAME].reset_index(drop=True)
     # TODO: Remove this line once elements are stored with the right format.
     elements_metadata["element_code"] = elements_metadata["element_code"].astype(str).str.zfill(
-        N_CHARACTERS_ELEMENT_CODE)
+        N_CHARACTERS_ELEMENT_CODE).astype("category")
 
     ####################################################################################################################
     # Process data.
@@ -139,12 +146,18 @@ def run(dest_dir: str) -> None:
     # Combine fbsh and fbs datasets.
     fbsc = combine_fbsh_and_fbs_datasets(fbsh_dataset, fbs_dataset)
 
+    _assert_df_size(fbsc, 1000)
+
     # Clean data.
     data = clean_data(data=fbsc, items_metadata=items_metadata, elements_metadata=elements_metadata,
                       countries_file=COUNTRIES_FILE)
 
+    _assert_df_size(data, 1000)
+
     # Create a long table (with item code and element code as part of the index).
     data_table_long = prepare_long_table(data=data)
+
+    _assert_df_size(data_table_long, 1000)
 
     # Create a wide table (with only country and year as index).
     data_table_wide = prepare_wide_table(data=data, dataset_title=datasets_metadata["owid_dataset_title"].item())
@@ -195,5 +208,4 @@ def run(dest_dir: str) -> None:
     data_table_wide.metadata.primary_key = list(data_table_wide.index.names)
 
     # Add wide table to the dataset.
-    # TODO: Check why repack=True now fails.
-    dataset_garden.add(data_table_wide, repack=False)
+    dataset_garden.add(data_table_wide, repack=True)
