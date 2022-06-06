@@ -78,6 +78,7 @@ def upsert_dataset(
             dataset.metadata.short_name,
             namespace,
             int(cast(str, config.GRAPHER_USER_ID)),
+            source_checksum=dataset.metadata.source_checksum,
             description=dataset.metadata.description or "",
         )
 
