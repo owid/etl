@@ -19,6 +19,7 @@ def convert_walden_metadata(wd: WaldenDataset) -> DatasetMeta:
         short_name=wd.short_name,
         namespace=wd.namespace,
         title=wd.name,
+        version=wd.version,
         description=wd.description,
         sources=[
             Source(
