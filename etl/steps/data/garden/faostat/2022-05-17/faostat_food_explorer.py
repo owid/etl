@@ -18,6 +18,26 @@ from .shared import NAMESPACE, VERSION, harmonize_elements, harmonize_items
 DATASET_TITLE = "Food Explorer"
 DATASET_SHORT_NAME = f"{NAMESPACE}_food_explorer"
 
+# List of columns from combined (qcl + fbsc) dataframe that should have a per capita variable.
+# Note: Some of the columns may already be given as "per capita" variables in the original data.
+# In those cases we will divide by FAO population and multiply by OWID population, for consistency.
+PER_CAPITA_COLUMNS = [
+    'Area harvested (ha)',
+    'Domestic supply (tonnes)',
+    'Exports (tonnes)',
+    'Feed (tonnes)',
+    'Food (tonnes)',
+    'Food available for consumption (grams of fat per day per capita)',
+    'Food available for consumption (grams of protein per day per capita)',
+    'Food available for consumption (kilocalories per day per capita)',
+    'Food available for consumption (kilograms per year per capita)',
+    'Imports (tonnes)',
+    'Other uses (tonnes)',
+    'Producing or slaughtered animals (animals)',
+    'Production (tonnes)',
+    'Waste in Supply Chain (tonnes)',
+]
+
 
 def combine_qcl_and_fbsc(
     qcl_table: catalog.Table, fbsc_table: catalog.Table
@@ -70,7 +90,30 @@ def combine_qcl_and_fbsc(
     return combined
 
 
+def get_fao_population(combined: pd.DataFrame) -> pd.DataFrame:
+    fao_population_item_name = "Population"
+    fao_population_element_name = "Total Population - Both sexes"
+
+    fao_population = combined[(combined["product"] == fao_population_item_name) &
+                              (combined["element"] == fao_population_element_name)].reset_index(drop=True)
+
+    # Check that population is given in "1000 persons" and convert to persons.
+    error = "FAOSTAT population changed item, element, or unit."
+    assert fao_population["unit"].unique().tolist() == ["1000 persons"], error
+    fao_population["value"] *= 1000
+
+    fao_population = fao_population[["country", "year", "value"]].dropna(how="any").\
+        rename(columns={"value": "fao_population"})
+
+    return fao_population
+
+
 def process_combined_data(combined: pd.DataFrame, custom_products: pd.DataFrame) -> pd.DataFrame:
+    combined = combined.copy()
+
+    # Get FAO population from data (it is given as another item).
+    fao_population = get_fao_population(combined=combined)
+
     # Create a mapping from product name in data to product name in explorer (for those products that need renaming).
     products_renaming = custom_products[custom_products["product_in_explorer"].notnull()].\
         set_index("product_in_data")["product_in_explorer"].to_dict()
@@ -105,8 +148,22 @@ def process_combined_data(combined: pd.DataFrame, custom_products: pd.DataFrame)
         index=index_columns, columns=["title"], values="value"
     ).reset_index()
 
-    # Add column for population.
+    # Add column for FAO population.
+    data_wide = pd.merge(data_wide, fao_population, on=["country", "year"], how="left")
+
+    # Add column for OWID population.
     data_wide = geo.add_population_to_dataframe(df=data_wide, warn_on_missing_countries=False)
+
+    # Add per capita variables.
+    for column in PER_CAPITA_COLUMNS:
+        if "per capita" in column.lower():
+            # Some variables are already given per capita in the FAOSTAT dataset.
+            # But, since their population may differ with ours, for consistency, we multiply their per capita variables
+            # by their population, to obtain the total variable, and then we divide by our own population.
+            data_wide[column] = data_wide[column] * data_wide["fao_population"] / data_wide["population"]
+        else:
+            # Create a new column with the same name, but adding "per capita" to the unit.
+            data_wide[column[:-1] + " per capita)"] = data_wide[column] / data_wide["population"]
 
     assert (
         len(data_wide.columns[data_wide.isnull().all(axis=0)]) == 0
@@ -152,11 +209,6 @@ def run(dest_dir: str) -> None:
     combined = combine_qcl_and_fbsc(qcl_table=qcl_table, fbsc_table=fbsc_table)
     data = process_combined_data(combined=combined, custom_products=custom_products)
 
-    # TODO: Add per capita variables. It seems in the old explorer we multiply per capita variables by *our*
-    #  population, and then divide again. It makes more sense to multiply by FAOSTAT population and then divide by
-    #  our population. Or maybe we could just drop those per capita variables, if we have the analogous
-    #  non-per-capita variables.
-
     ####################################################################################################################
     # Save outputs.
     ####################################################################################################################
@@ -175,6 +227,7 @@ def run(dest_dir: str) -> None:
         description=fbsc_dataset.metadata.description,
         sources=fbsc_dataset.metadata.sources + qcl_dataset.metadata.sources,
         licenses=fbsc_dataset.metadata.licenses + qcl_dataset.metadata.licenses,
+        version=VERSION,
     )
     # Create new dataset in garden.
     explorer_dataset.save()

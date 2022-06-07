@@ -15,34 +15,37 @@ from etl.paths import DATA_DIR
 
 # Rename columns to be used by the food explorer.
 # Note: Include here all columns, even if the name is not changed.
-# TODO: Uncomment columns here once per capita variables have been added.
 EXPECTED_COLUMNS = {
     'product': 'product',
     'population': 'population',
     'area_harvested__ha': 'area_harvested__ha',
-    # 'area_harvested__ha__per_capita': 'area_harvested__ha__per_capita',
+    'area_harvested__ha_per_capita': 'area_harvested__ha__per_capita',
     'domestic_supply__tonnes': 'domestic_supply__tonnes',
-    # 'domestic_supply__tonnes__per_capita',
+    'domestic_supply__tonnes_per_capita': 'domestic_supply__tonnes__per_capita',
     'exports__tonnes': 'exports__tonnes',
-    # 'exports__tonnes__per_capita',
+    'exports__tonnes_per_capita': 'exports__tonnes__per_capita',
     'feed__tonnes': 'feed__tonnes',
-    # 'feed__tonnes__per_capita',
+    'feed__tonnes_per_capita': 'feed__tonnes__per_capita',
     'food__tonnes': 'food__tonnes',
-    # 'food__tonnes__per_capita',
-    # 'food_available_for_consumption__grams_of_fat_per_day__per_capita': 'food_available_for_consumption__fat_g_per_day__per_capita',
-    # 'food_available_for_consumption__kilocalories_per_day__per_capita': 'food_available_for_consumption__kcal_per_day__per_capita',
-    # 'food_available_for_consumption__kilograms_per_capita_per_year': 'food_available_for_consumption__kg_per_year__per_capita',
-    # 'food_available_for_consumption__grams_of_protein_per_day_per_capita': 'food_available_for_consumption__protein_g_per_day__per_capita',
+    'food__tonnes_per_capita': 'food__tonnes__per_capita',
+    'food_available_for_consumption__grams_of_fat_per_day_per_capita':
+        'food_available_for_consumption__fat_g_per_day__per_capita',
+    'food_available_for_consumption__kilocalories_per_day_per_capita':
+        'food_available_for_consumption__kcal_per_day__per_capita',
+    'food_available_for_consumption__kilograms_per_year_per_capita':
+        'food_available_for_consumption__kg_per_year__per_capita',
+    'food_available_for_consumption__grams_of_protein_per_day_per_capita':
+        'food_available_for_consumption__protein_g_per_day__per_capita',
     'imports__tonnes': 'imports__tonnes',
-    # 'imports__tonnes__per_capita': 'imports__tonnes__per_capita',
+    'imports__tonnes_per_capita': 'imports__tonnes__per_capita',
     'other_uses__tonnes': 'other_uses__tonnes',
-    # 'other_uses__tonnes__per_capita': 'other_uses__tonnes__per_capita',
+    'other_uses__tonnes_per_capita': 'other_uses__tonnes__per_capita',
     'producing_or_slaughtered_animals__animals': 'producing_or_slaughtered_animals__animals',
-    # 'producing_or_slaughtered_animals__animals__per_capita': 'producing_or_slaughtered_animals__animals__per_capita',
+    'producing_or_slaughtered_animals__animals_per_capita': 'producing_or_slaughtered_animals__animals__per_capita',
     'production__tonnes': 'production__tonnes',
-    # 'production__tonnes__per_capita': 'production__tonnes__per_capita',
+    'production__tonnes_per_capita': 'production__tonnes__per_capita',
     'waste_in_supply_chain__tonnes': 'waste_in_supply_chain__tonnes',
-    # 'waste_in_supply_chain__tonnes__per_capita': 'waste_in_supply_chain__tonnes__per_capita',
+    'waste_in_supply_chain__tonnes_per_capita': 'waste_in_supply_chain__tonnes__per_capita',
     'yield__kilograms_per_animal': 'yield__kg_per_animal',
     'yield__tonnes_per_hectare': 'yield__tonnes_per_ha',
 }
