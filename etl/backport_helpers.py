@@ -35,7 +35,9 @@ def create_wide_table(
     # convert to wide format
     long_mem_usage_mb = values.memory_usage().sum() / 1e6
     df = values.pivot(
-        index=["entity_name", "year"], columns="variable_name", values="value"
+        index=["year", "entity_name", "entity_id", "entity_code"],
+        columns="variable_name",
+        values="value",
     )
 
     # report compression ratio if the file is larger than >1MB

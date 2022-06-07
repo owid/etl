@@ -64,8 +64,6 @@ def _walden_config_metadata(
 
 def _load_values(engine: Engine, variable_ids: list[int]) -> pd.DataFrame:
     """Get data values of a variable."""
-    # NOTE: loading entity_name and variable_name is perhaps unnecessary, consider removing it
-    # to speed up loading
     q = """
     select
         d.entityId as entity_id,
@@ -73,6 +71,7 @@ def _load_values(engine: Engine, variable_ids: list[int]) -> pd.DataFrame:
         -- it would be more efficient to load entity name and variable name separately and
         -- then join it before uploading to walden
         e.name as entity_name,
+        e.code as entity_code,
         v.name as variable_name,
         d.year,
         d.value as value
@@ -94,6 +93,7 @@ def _load_values(engine: Engine, variable_ids: list[int]) -> pd.DataFrame:
             "variable_name": "category",
             "entity_id": "category",
             "entity_name": "category",
+            "entity_code": "category",
         }
     )
 
