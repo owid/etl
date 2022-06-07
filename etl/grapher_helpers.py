@@ -213,7 +213,7 @@ def country_to_entity_id(
     errors: Literal["raise", "ignore", "warn"] = "raise",
 ) -> pd.Series:
     """Convert country name to grapher entity_id. Most of countries should be in countries_regions.csv,
-    however some regions could be only in `entities` table in MySQL or doesn't exist at all.
+    however some regions only exist in `entities` table in MySQL or don't exist at all.
     :param fill_from_db: if True, fill missing countries from `entities` table
     :param create_entities: if True, create missing countries in `entities` table
     :param errors: how to handle missing countries
