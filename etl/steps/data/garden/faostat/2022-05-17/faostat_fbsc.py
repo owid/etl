@@ -184,10 +184,9 @@ def run(dest_dir: str) -> None:
         # For sources and licenses, assume those of fbs.
         sources=[fbsc_sources],
         licenses=fbs_dataset.metadata.licenses,
+        version=VERSION,
     )
     dataset_garden.metadata = dataset_garden_metadata
-    # TODO: Uncomment when datasets can have a version property:
-    # dataset_garden_metadata.metadata.version = VERSION
     # Create new dataset in garden.
     dataset_garden.save()
 
@@ -201,11 +200,9 @@ def run(dest_dir: str) -> None:
     dataset_garden.add(data_table_long)
 
     # Prepare metadata for new garden wide table (starting with the metadata from the long table).
-    # Add wide table to the dataset.
     data_table_wide.metadata = deepcopy(data_table_long.metadata)
     data_table_wide.metadata.title += " - Flattened table indexed by country-year."
     data_table_wide.metadata.short_name += "_flat"
     data_table_wide.metadata.primary_key = list(data_table_wide.index.names)
-
     # Add wide table to the dataset.
     dataset_garden.add(data_table_wide, repack=True)

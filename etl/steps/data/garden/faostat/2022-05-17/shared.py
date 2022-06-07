@@ -726,8 +726,7 @@ def run(dest_dir: str) -> None:
     dataset_garden = catalog.Dataset.create_empty(dest_dir)
     # Prepare metadata for new garden dataset (starting with the metadata from the meadow version).
     dataset_garden_metadata = deepcopy(dataset_meadow.metadata)
-    # TODO: Uncomment when datasets can have a version property:
-    # dataset_garden_metadata.metadata.version = VERSION
+    dataset_garden_metadata.version = VERSION
     dataset_garden_metadata.description = datasets_metadata["owid_dataset_description"].item()
     dataset_garden_metadata.title = datasets_metadata["owid_dataset_title"].item()
     # Add metadata to dataset.
@@ -753,5 +752,4 @@ def run(dest_dir: str) -> None:
     data_table_wide.metadata.primary_key = list(data_table_wide.index.names)
 
     # Add wide table to the dataset.
-    # TODO: Check why repack=True now fails.
-    dataset_garden.add(data_table_wide, repack=False)
+    dataset_garden.add(data_table_wide, repack=True)
