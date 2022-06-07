@@ -19,9 +19,12 @@ NOTES:
 import warnings
 from copy import deepcopy
 from pathlib import Path
+from typing import List, cast, Any
+from collections.abc import Callable
 
 import numpy as np
 import pandas as pd
+from pandas.api.types import union_categoricals
 from owid import catalog
 from owid.datautils import geo
 
@@ -157,7 +160,7 @@ FLAGS_RANKING = (
 )
 
 
-def harmonize_items(df, dataset_short_name, item_col="item"):
+def harmonize_items(df, dataset_short_name, item_col="item") -> pd.DataFrame:
     df = df.copy()
     # Note: Here list comprehension is faster than doing .astype(str).str.zfill(...).
     df["item_code"] = [str(item_code).zfill(N_CHARACTERS_ITEM_CODE) for item_code in df["item_code"]]
@@ -170,13 +173,24 @@ def harmonize_items(df, dataset_short_name, item_col="item"):
                    (df[item_col] == amendment["fao_item"]), ("item_code", item_col)] = \
                 (amendment["new_item_code"], amendment["new_fao_item"])
 
+    # Convert both columns to category to reduce memory
+    df = df.astype({
+        'item_code': 'category',
+        item_col: 'category'
+    })
+
     return df
 
 
-def harmonize_elements(df, element_col="element"):
+def harmonize_elements(df, element_col="element") -> pd.DataFrame:
     df = df.copy()
     df["element_code"] = [str(element_code).zfill(N_CHARACTERS_ELEMENT_CODE) for element_code in df["element_code"]]
-    df[element_col] = df[element_col].astype(str)
+
+    # Convert both columns to category to reduce memory
+    df = df.astype({
+        'element_code': 'category',
+        element_col: 'category'
+    })
 
     return df
 
@@ -277,7 +291,7 @@ def remove_duplicates(data: pd.DataFrame, verbose: bool = True) -> pd.DataFrame:
         FLAGS_RANKING[["flag", "ranking"]].rename(columns={"ranking": "flag_ranking"}),
         on="flag",
         how="left",
-    )
+    ).astype({"flag": "category"})
 
     # Select columns that should be used as indexes.
     index_columns = [
@@ -372,11 +386,11 @@ def add_custom_names_and_descriptions(data, items_metadata, elements_metadata):
                     on=["element_code"], how="left")
     assert len(data) == _expected_n_rows, f"Something went wrong when merging data with elements metadata."
 
-    # Ensure columns have the right type (this is a faster way to do .astype(str)).
-    data["owid_item_description"] = [i for i in data["owid_item_description"]]
-    data["owid_element_description"] = [i for i in data["owid_element_description"]]
-    data["owid_unit"] = [i for i in data["owid_unit"]]
-    data["owid_unit_short_name"] = [i for i in data["owid_unit_short_name"]]
+    # `category` type was lost during merge, convert it back
+    data = data.astype({
+        "element_code": "category",
+        "item_code": "category",
+    })
 
     # Remove "owid_" from column names.
     data = data.rename(columns={column: column.replace("owid_", "") for column in data.columns})
@@ -432,7 +446,7 @@ def clean_data(data: pd.DataFrame, items_metadata: pd.DataFrame, elements_metada
         countries_file=str(countries_file),
         country_col="area",
         warn_on_unused_countries=False,
-    ).rename(columns={"area": "country"})
+    ).rename(columns={"area": "country"}).astype({"country": "category"})
     # If countries are missing in countries file, execute etl.harmonize again and update countries file.
 
     # Sanity checks.
@@ -486,6 +500,61 @@ def prepare_long_table(data: pd.DataFrame):
     return data_table_long
 
 
+def concatenate(dfs: List[pd.DataFrame], **kwargs: Any) -> pd.DataFrame:
+    """Concatenate while preserving categorical columns. Original [source code]
+    (https://stackoverflow.com/a/57809778/1275818)."""
+    # Iterate on categorical columns common to all dfs
+    for col in set.intersection(
+        *[
+            set(df.select_dtypes(include='category').columns)
+            for df in dfs
+        ]
+    ):
+        # Generate the union category across dfs for this column
+        uc = union_categoricals([df[col] for df in dfs])
+        # Change to union category for all dataframes
+        for df in dfs:
+            df[col] = pd.Categorical(df[col].values, categories=uc.categories)
+    return pd.concat(dfs, **kwargs)
+
+
+def apply_on_categoricals(cat_series: List[pd.Series], func: Callable[..., str]) -> pd.Series:
+    """Apply a function on a list of categorical series. This is much faster than converting
+    them to strings first and then applying the function and it prevents memory explosion.
+
+    It uses category codes instead of using values directly and it builds the output categorical
+    mapping from codes to strings on the fly.
+
+    Parameters
+    ----------
+    cat_series :
+        List of categorical series.
+    func :
+        Function taking as many arguments as there are categorical series and returning str.
+
+    Returns
+    -------
+    final_cat_series :
+        Categorical series.
+
+    """
+    seen = {}
+    codes = []
+    categories = []
+    for cat_codes in zip(*[s.cat.codes for s in cat_series]):
+        if cat_codes not in seen:
+            # add category
+            cat_values = [s.cat.categories[code] for s, code in zip(cat_series, cat_codes)]
+            categories.append(func(*cat_values))
+            seen[cat_codes] = len(categories) - 1
+
+        # use existing category
+        codes.append(seen[cat_codes])
+
+    final_cat_series = pd.Categorical.from_codes(codes, categories=categories)
+    return cast(pd.Series, final_cat_series)
+
+
 def prepare_wide_table(data: pd.DataFrame, dataset_title: str) -> catalog.Table:
     """Flatten a long table to obtain a wide table with ["country", "year"] as index.
 
@@ -515,24 +584,23 @@ def prepare_wide_table(data: pd.DataFrame, dataset_title: str) -> catalog.Table:
     # This will be used as column names (which will then be formatted properly with underscores and lower case),
     # and also as the variable titles in grapher.
     # Also, for convenience, keep a similar structure as in the previous OWID dataset release.
-    data["variable_name"] = [f"{dataset_title} || {item} | {item_code} || {element} | {element_code} || {unit}"
-                             for item, item_code, element, element_code, unit
-                             in data[["item", "item_code", "element", "element_code", "unit"]].values]
+    data["variable_name"] = apply_on_categoricals(
+        [data.item, data.item_code, data.element, data.element_code, data.unit],
+        lambda item, item_code, element, element_code, unit: f"{dataset_title} || {item} | {item_code} || {element} | {element_code} || {unit}"
+    )
 
     # Construct a human-readable variable display name (which will be shown in grapher charts).
-    data["variable_display_name"] = [f"{item} - {element} ({unit})"
-                                     for item, element, unit
-                                     in data[["item", "element", "unit"]].values]
+    data['variable_display_name'] = apply_on_categoricals([data.item, data.element, data.unit], lambda item, element, unit: f"{item} - {element} ({unit})")
 
     # Construct a human-readable variable description (for the variable metadata).
-    data["variable_description"] = [f"{item_description}\n{element_description}".lstrip().rstrip()
-                                    for item_description, element_description
-                                    in data[["item_description", "element_description"]].values]
+    data['variable_description'] = apply_on_categoricals([data.item_description, data.element_description], lambda item_desc, element_desc: f"{item_desc}\n{element_desc}".lstrip().rstrip())
+
 
     # Pivot over long dataframe to generate a wide dataframe with country-year as index, and as many columns as
     # unique elements in "variable_name" (which should be as many as combinations of item-elements).
     # Note: We include area_code in the index for completeness, but by construction country-year should not have
     # duplicates.
+    # Note: `pivot` operation is usually faster on categorical columns
     data_pivot = data.pivot(index=["area_code", "country", "year"], columns=["variable_name"],
                             values=["value", "unit", "unit_short_name", "unit_factor", "variable_display_name",
                                     "variable_description"])
