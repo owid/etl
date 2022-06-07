@@ -451,10 +451,6 @@ def clean_data(data: pd.DataFrame, items_metadata: pd.DataFrame, elements_metada
 
     # Sanity checks.
 
-    # TODO: Properly deal with duplicates.
-    print(f"WARNING: Temporarily removing areas with duplicates.")
-    data = data[~data["country"].isin(["China", "Micronesia (country)"])].reset_index(drop=True)
-
     # TODO: Move this to remove_duplicates.
     n_countries_per_area_code = data.groupby("area_code")["country"].transform("nunique")
     ambiguous_area_codes = data[n_countries_per_area_code > 1][["area_code", "country"]].\
