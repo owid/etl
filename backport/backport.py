@@ -64,8 +64,6 @@ def _walden_config_metadata(
 
 def _load_values(engine: Engine, variable_ids: list[int]) -> pd.DataFrame:
     """Get data values of a variable."""
-    # NOTE: loading entity_name and variable_name is perhaps unnecessary, consider removing it
-    # to speed up loading
     q = """
     select
         d.entityId as entity_id,
@@ -73,6 +71,7 @@ def _load_values(engine: Engine, variable_ids: list[int]) -> pd.DataFrame:
         -- it would be more efficient to load entity name and variable name separately and
         -- then join it before uploading to walden
         e.name as entity_name,
+        e.code as entity_code,
         v.name as variable_name,
         d.year,
         d.value as value
@@ -94,6 +93,7 @@ def _load_values(engine: Engine, variable_ids: list[int]) -> pd.DataFrame:
             "variable_name": "category",
             "entity_id": "category",
             "entity_name": "category",
+            "entity_code": "category",
         }
     )
 
@@ -118,14 +118,18 @@ def _load_config(
 
 
 def _upload_config_to_walden(
-    config: GrapherConfig, meta: WaldenDataset, dry_run: bool, upload: bool
+    config: GrapherConfig,
+    meta: WaldenDataset,
+    dry_run: bool,
+    upload: bool,
+    public: bool,
 ) -> None:
     with tempfile.NamedTemporaryFile(mode="w") as f:
         f.write(config.json())
         f.flush()
 
         if not dry_run:
-            add_to_catalog(meta, f.name, upload)
+            add_to_catalog(meta, f.name, upload, public=public)
 
 
 def _upload_values_to_walden(
@@ -133,11 +137,12 @@ def _upload_values_to_walden(
     meta: WaldenDataset,
     dry_run: bool,
     upload: bool,
+    public: bool,
 ) -> None:
     with tempfile.NamedTemporaryFile(mode="wb") as f:
         df.to_feather(f.name, compression="lz4")
         if not dry_run:
-            add_to_catalog(meta, f.name, upload)
+            add_to_catalog(meta, f.name, upload, public=public)
 
 
 def _checksum_match(short_name: str, md5: str) -> bool:
@@ -159,21 +164,15 @@ def _create_short_name(
     short_name: Optional[str], dataset_id: int, variable_id: Optional[int]
 ) -> str:
     """Create sensible short name for dataset."""
-    if short_name:
-        validate_underscore(short_name, "short-name")
-        # prepend dataset id to short name
-        return f"dataset_{dataset_id}_{short_name}"
-    else:
-        if variable_id:
-            return f"dataset_{dataset_id}_{variable_id}"
-        else:
-            return f"dataset_{dataset_id}"
+    validate_underscore(short_name, "short-name")
+    # prepend dataset id to short name
+    return f"dataset_{dataset_id}_{short_name}"
 
 
 def backport(
     dataset_id: int,
+    short_name: str,
     variable_id: Optional[int] = None,
-    short_name: Optional[str] = None,
     force: bool = False,
     dry_run: bool = False,
     upload: bool = True,
@@ -218,10 +217,17 @@ def backport(
                 # should return False... if this is not the case, something is wrong
                 raise AssertionError("This should never happen")
 
+    # don't make private datasets public
+    public = not ds.isPrivate
+
     # upload config to walden
     lg.info("backport.upload_config")
     _upload_config_to_walden(
-        config, _walden_config_metadata(ds, short_name, md5_config), dry_run, upload
+        config,
+        _walden_config_metadata(ds, short_name, md5_config),
+        dry_run,
+        upload,
+        public=public,
     )
 
     # upload values to walden
@@ -229,17 +235,24 @@ def backport(
     df = _load_values(engine, variable_ids)
     lg.info("backport.upload_values", size=len(df))
     _upload_values_to_walden(
-        df, _walden_values_metadata(ds, short_name), dry_run, upload
+        df,
+        _walden_values_metadata(ds, short_name),
+        dry_run,
+        upload,
+        public=public,
     )
 
     lg.info("backport.finished")
 
 
 @click.command()
-@click.option("--dataset-id", type=int)
+@click.option("--dataset-id", type=int, required=True)
 @click.option("--variable-id", type=int)
 @click.option(
-    "--short-name", type=str, help="Short name of a dataset, must be under_score"
+    "--short-name",
+    type=str,
+    help="Short name of a dataset, must be under_score",
+    required=True,
 )
 @click.option(
     "--force/--no-force",
@@ -261,16 +274,16 @@ def backport(
 )
 def backport_cli(
     dataset_id: int,
+    short_name: str,
     variable_id: Optional[int] = None,
-    short_name: Optional[str] = None,
     force: bool = False,
     dry_run: bool = False,
     upload: bool = True,
 ) -> None:
     return backport(
         dataset_id,
-        variable_id,
         short_name,
+        variable_id,
         force,
         dry_run,
         upload,
