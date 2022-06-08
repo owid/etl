@@ -164,21 +164,15 @@ def _create_short_name(
     short_name: Optional[str], dataset_id: int, variable_id: Optional[int]
 ) -> str:
     """Create sensible short name for dataset."""
-    if short_name:
-        validate_underscore(short_name, "short-name")
-        # prepend dataset id to short name
-        return f"dataset_{dataset_id}_{short_name}"
-    else:
-        if variable_id:
-            return f"dataset_{dataset_id}_{variable_id}"
-        else:
-            return f"dataset_{dataset_id}"
+    validate_underscore(short_name, "short-name")
+    # prepend dataset id to short name
+    return f"dataset_{dataset_id}_{short_name}"
 
 
 def backport(
     dataset_id: int,
+    short_name: str,
     variable_id: Optional[int] = None,
-    short_name: Optional[str] = None,
     force: bool = False,
     dry_run: bool = False,
     upload: bool = True,
@@ -252,10 +246,13 @@ def backport(
 
 
 @click.command()
-@click.option("--dataset-id", type=int)
+@click.option("--dataset-id", type=int, required=True)
 @click.option("--variable-id", type=int)
 @click.option(
-    "--short-name", type=str, help="Short name of a dataset, must be under_score"
+    "--short-name",
+    type=str,
+    help="Short name of a dataset, must be under_score",
+    required=True,
 )
 @click.option(
     "--force/--no-force",
@@ -277,16 +274,16 @@ def backport(
 )
 def backport_cli(
     dataset_id: int,
+    short_name: str,
     variable_id: Optional[int] = None,
-    short_name: Optional[str] = None,
     force: bool = False,
     dry_run: bool = False,
     upload: bool = True,
 ) -> None:
     return backport(
         dataset_id,
-        variable_id,
         short_name,
+        variable_id,
         force,
         dry_run,
         upload,
