@@ -27,9 +27,23 @@ import pandas as pd
 from pandas.api.types import union_categoricals
 from owid import catalog
 from owid.datautils import geo
+from tqdm.auto import tqdm
 
 from etl.paths import DATA_DIR, STEP_DIR
 
+
+# When creating region aggregates for a certain variable in a certain year, some mandatory countries must be
+# informed, otherwise the aggregate will be nan (since we consider that there is not enough information).
+# A country will be considered mandatory if they exceed this minimum fraction of the total population of the region.
+MIN_FRAC_INDIVIDUAL_POPULATION = 0.0
+# A country will be considered mandatory if the sum of the population of all countries (sorted by decreasing
+# population until reaching this country) exceeds the following fraction of the total population of the region.
+# TODO: Decide about this fraction, it seems FAO creates region aggregates even when only a few countries are informed.
+#  However those informed countries may be the only relevant ones for that particular item (even if they
+#  have low population).
+MIN_FRAC_CUMULATIVE_POPULATION = 0.3
+# Reference year to build the list of mandatory countries.
+REFERENCE_YEAR = 2018
 
 NAMESPACE = Path(__file__).parent.parent.name
 VERSION = Path(__file__).parent.name
@@ -398,6 +412,49 @@ def add_custom_names_and_descriptions(data, items_metadata, elements_metadata):
     return data
 
 
+def add_regions(data, aggregations):
+    # TODO: This step takes very long, it should be optimised.
+    for region in tqdm(REGIONS_TO_ADD):
+        # List countries in region.
+        countries_in_region = geo.list_countries_in_region(region=region)
+        # List countries that should present in the data (since they are expected to contribute the most).
+        countries_that_must_have_data = geo.list_countries_in_region_that_must_have_data(
+            region=region, min_frac_individual_population=MIN_FRAC_INDIVIDUAL_POPULATION,
+            min_frac_cumulative_population=MIN_FRAC_CUMULATIVE_POPULATION)
+        for element_code, aggregation in aggregations.items():
+            # TODO: Use groupby_agg instead.
+            data_region = data[(data["country"].isin(countries_in_region)) & (data["element_code"] == element_code)].\
+                dropna(subset="value").groupby(["year", "item_code"]).agg({
+                    "item": "first",
+                    "area_code": lambda x: np.nan,
+                    "value": "sum",
+                    "country": lambda x: set(countries_that_must_have_data).issubset(set(list(x))),
+                    "element": "first",
+                    "fao_element": "first",
+                    "element_code": "first",
+                    "fao_item": "first",
+                    "item_description": "first",
+                    "unit": "first",
+                    "unit_short_name": "first",
+                    "unit_factor": "first",
+                    "fao_unit": "first",
+                    "element_description": "first",
+                    "flag": lambda x: list(set(x)),
+                }).reset_index().dropna(subset="element")
+
+            # Keep only rows for which mandatory countries had data.
+            data_region = data_region[data_region["country"]].reset_index(drop=True)
+            # Replace column that was used to check if most contributing countries were present by the region's name.
+            data_region["country"] = region
+            # Add data for current region to data.
+            data = pd.concat([data[data["country"] != region], data_region], ignore_index=True)
+
+    # Sort conveniently.
+    data = data.sort_values(["country", "year"]).reset_index(drop=True)
+
+    return data
+
+
 def clean_data(data: pd.DataFrame, items_metadata: pd.DataFrame, elements_metadata: pd.DataFrame,
                countries_file: Path) -> pd.DataFrame:
     """Process data (including harmonization of countries and regions) and prepare it for new garden dataset.
@@ -449,6 +506,18 @@ def clean_data(data: pd.DataFrame, items_metadata: pd.DataFrame, elements_metada
     ).rename(columns={"area": "country"}).astype({"country": "category"})
     # If countries are missing in countries file, execute etl.harmonize again and update countries file.
 
+    # Create a dictionary of aggregations, specifying the operation to use when creating regions.
+    # These aggregations are defined in the custom_elements_and_units.csv file, and added to the metadata dataset.
+    # TODO: Should we select here elements_data["dataset"] == dataset_short_name (and make the latter an argument of
+    #  clean_data)?
+    aggregations = elements_metadata[(elements_metadata["owid_aggregation"].notnull())].\
+        set_index("element_code").to_dict()["owid_aggregation"]
+    if len(aggregations) > 0:
+        # Add data for regions.
+        data = add_regions(data=data, aggregations=aggregations)
+
+    # TODO: Add population dependency to garden steps in the dag.
+
     # Sanity checks.
 
     # TODO: Move this to remove_duplicates.
@@ -467,15 +536,6 @@ def clean_data(data: pd.DataFrame, items_metadata: pd.DataFrame, elements_metada
 
     # TODO: Check for ambiguous indexes in the long table.
     # TODO: Check for ambiguous indexes in the wide table.
-
-    # After harmonizing, there are some country-year with more than one item-element.
-    # This happens for example because there is different data for "Micronesia" and "Micronesia (Federated States of)",
-    # which are both mapped to the same country, "Micronesia (country)".
-    # The same happens with "China", and "China, mainland".
-    # TODO: Solve possible issue of duplicated regions in China
-    # (https://github.com/owid/owid-issues/issues/130#issuecomment-1114859105).
-    # In cases where a country-year has more than one item-element, try to remove duplicates by looking at the flags.
-    # If flags do not remove the duplicates, raise an error.
 
     # Remove duplicated data points keeping the one with lowest ranking flag (i.e. highest priority).
     data = remove_duplicates(data)
