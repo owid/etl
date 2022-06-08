@@ -29,8 +29,14 @@ log = structlog.get_logger()
     type=bool,
     help="Upload dataset to Walden",
 )
+@click.option(
+    "--force/--no-force",
+    default=False,
+    type=bool,
+    help="Force overwrite even if checksums match",
+)
 def bulk_backport(
-    dataset_ids: list[int], dry_run: bool, limit: int, upload: bool
+    dataset_ids: list[int], dry_run: bool, limit: int, upload: bool, force: bool
 ) -> None:
     engine = get_engine()
 
@@ -67,6 +73,7 @@ def bulk_backport(
             short_name=ds.short_name,
             dry_run=dry_run,
             upload=upload,
+            force=force,
         )
 
     log.info("bulk_backport.finished")
