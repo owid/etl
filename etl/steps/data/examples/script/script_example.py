@@ -35,6 +35,7 @@ def run(dest_dir: str) -> None:
 
     ds = Dataset.create_empty(dest_dir)
     ds.metadata.short_name = "dataset_example"
+    ds.metadata.namespace = "examples"
 
     t = Table(df.reset_index(drop=True))
     t.metadata.short_name = "table_example"

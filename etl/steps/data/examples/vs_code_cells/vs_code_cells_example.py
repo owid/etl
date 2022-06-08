@@ -24,6 +24,7 @@ df = df[df.a > 1]
 def run(dest_dir: str) -> None:
     ds = Dataset.create_empty(dest_dir)
     ds.metadata.short_name = "vs_code_cells_example"
+    ds.metadata.namespace = "examples"
 
     # use module-level variables
     t = Table(df.reset_index(drop=True))
