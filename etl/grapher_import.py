@@ -54,7 +54,10 @@ class VariableUpsertResult:
 
 
 def upsert_dataset(
-    dataset: catalog.Dataset, namespace: str, sources: List[catalog.meta.Source], source_checksum: str
+    dataset: catalog.Dataset,
+    namespace: str,
+    sources: List[catalog.meta.Source],
+    source_checksum: str,
 ) -> DatasetUpsertResult:
     utils.validate_underscore(dataset.metadata.short_name, "Dataset's short_name")
 
