@@ -68,7 +68,10 @@ def create_wide_table(
             variable, variable_source_dict[variable.sourceId]
         )
 
-    return underscore_table(t)
+    # NOTE: collision happens for dataset 5629 with column names
+    # Indicator:On-premise sales restrictions to intoxicated persons (archived) - Beverage Types:Spirits
+    # Indicator:On-premise sales restrictions to intoxicated persons - Archived - Beverage Types:Spirits
+    return underscore_table(t, collision="rename")
 
 
 def create_dataset(dest_dir: str, short_name: str) -> Dataset:
