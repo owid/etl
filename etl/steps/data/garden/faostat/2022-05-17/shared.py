@@ -32,19 +32,6 @@ from tqdm.auto import tqdm
 from etl.paths import DATA_DIR, STEP_DIR
 
 
-# When creating region aggregates for a certain variable in a certain year, some mandatory countries must be
-# informed, otherwise the aggregate will be nan (since we consider that there is not enough information).
-# A country will be considered mandatory if they exceed this minimum fraction of the total population of the region.
-MIN_FRAC_INDIVIDUAL_POPULATION = 0.0
-# A country will be considered mandatory if the sum of the population of all countries (sorted by decreasing
-# population until reaching this country) exceeds the following fraction of the total population of the region.
-# TODO: Decide about this fraction, it seems FAO creates region aggregates even when only a few countries are informed.
-#  However those informed countries may be the only relevant ones for that particular item (even if they
-#  have low population).
-MIN_FRAC_CUMULATIVE_POPULATION = 0.3
-# Reference year to build the list of mandatory countries.
-REFERENCE_YEAR = 2018
-
 NAMESPACE = Path(__file__).parent.parent.name
 VERSION = Path(__file__).parent.name
 
@@ -88,20 +75,75 @@ ITEM_AMENDMENTS = {
 }
 
 # Regions to add to the data.
-# TODO: Add region aggregates to relevant columns.
-REGIONS_TO_ADD = [
-    "North America",
-    "South America",
-    "Europe",
-    "European Union (27)",
-    "Africa",
-    "Asia",
-    "Oceania",
-    "Low-income countries",
-    "Upper-middle-income countries",
-    "Lower-middle-income countries",
-    "High-income countries",
-]
+# When creating region aggregates for a certain variable in a certain year, some mandatory countries must be
+# informed, otherwise the aggregate will be nan (since we consider that there is not enough information).
+# * A country will be considered mandatory if they exceed "min_frac_individual_population", the minimum fraction of
+#   the total population of the region.
+# * A country will be considered mandatory if the sum of the population of all countries (sorted by decreasing
+#   population until reaching this country) exceeds "min_frac_cumulative_population", the fraction of the total
+#   population of the region.
+# TODO: Decide about this fraction, it seems FAO creates region aggregates even when only a few countries are informed.
+#  However those informed countries may be the only relevant ones for that particular item (even if they
+#  have low population).
+# Reference year to build the list of mandatory countries.
+REFERENCE_YEAR = 2018
+REGIONS_TO_ADD = {
+    "North America": {
+        "area_code": "OWID_NAM",
+        "min_frac_individual_population": 0,
+        "min_frac_cumulative_population": 0.3,
+    },
+    "South America": {
+        "area_code": "OWID_SAM",
+        "min_frac_individual_population": 0,
+        "min_frac_cumulative_population": 0.3,
+    },
+    "Europe": {
+        "area_code": "OWID_EUR",
+        "min_frac_individual_population": 0,
+        "min_frac_cumulative_population": 0.3,
+    },
+    "European Union (27)": {
+        "area_code": "OWID_EU27",
+        "min_frac_individual_population": 0,
+        "min_frac_cumulative_population": 0.3,
+    },
+    "Africa": {
+        "area_code": "OWID_AFR",
+        "min_frac_individual_population": 0,
+        "min_frac_cumulative_population": 0.3,
+    },
+    "Asia": {
+        "area_code": "OWID_ASI",
+        "min_frac_individual_population": 0,
+        "min_frac_cumulative_population": 0.3,
+    },
+    "Oceania": {
+        "area_code": "OWID_OCE",
+        "min_frac_individual_population": 0,
+        "min_frac_cumulative_population": 0.3,
+    },
+    "Low-income countries": {
+        "area_code": "OWID_LIC",
+        "min_frac_individual_population": 0,
+        "min_frac_cumulative_population": 0.3,
+    },
+    "Upper-middle-income countries": {
+        "area_code": "OWID_UMC",
+        "min_frac_individual_population": 0,
+        "min_frac_cumulative_population": 0.3,
+    },
+    "Lower-middle-income countries": {
+        "area_code": "OWID_LMC",
+        "min_frac_individual_population": 0,
+        "min_frac_cumulative_population": 0.3,
+    },
+    "High-income countries": {
+        "area_code": "OWID_HIC",
+        "min_frac_individual_population": 0,
+        "min_frac_cumulative_population": 0.3,
+    },
+}
 
 # Rank flags by priority (where lowest index is highest priority).
 # TODO: Discuss this flag ranking with others (they are quite arbitrary at the moment).
@@ -419,35 +461,41 @@ def add_regions(data, aggregations):
         countries_in_region = geo.list_countries_in_region(region=region)
         # List countries that should present in the data (since they are expected to contribute the most).
         countries_that_must_have_data = geo.list_countries_in_region_that_must_have_data(
-            region=region, min_frac_individual_population=MIN_FRAC_INDIVIDUAL_POPULATION,
-            min_frac_cumulative_population=MIN_FRAC_CUMULATIVE_POPULATION)
+            region=region,
+            min_frac_individual_population=REGIONS_TO_ADD[region]["min_frac_individual_population"],
+            min_frac_cumulative_population=REGIONS_TO_ADD[region]["min_frac_cumulative_population"],
+            reference_year=REFERENCE_YEAR,
+        )
         for element_code, aggregation in aggregations.items():
             # TODO: Use groupby_agg instead.
-            data_region = data[(data["country"].isin(countries_in_region)) & (data["element_code"] == element_code)].\
-                dropna(subset="value").groupby(["year", "item_code"]).agg({
-                    "item": "first",
-                    "area_code": lambda x: np.nan,
-                    "value": "sum",
-                    "country": lambda x: set(countries_that_must_have_data).issubset(set(list(x))),
-                    "element": "first",
-                    "fao_element": "first",
-                    "element_code": "first",
-                    "fao_item": "first",
-                    "item_description": "first",
-                    "unit": "first",
-                    "unit_short_name": "first",
-                    "unit_factor": "first",
-                    "fao_unit": "first",
-                    "element_description": "first",
-                    "flag": lambda x: list(set(x)),
-                }).reset_index().dropna(subset="element")
+            data_region = data[(data["country"].isin(countries_in_region)) & (data["element_code"] == element_code)]
+            if len(data_region) > 0:
+                data_region = data_region.\
+                    dropna(subset="value").groupby(["year", "item_code"]).agg({
+                        "item": "first",
+                        "area_code": lambda x: REGIONS_TO_ADD[region]["area_code"],
+                        "value": "sum",
+                        "country": lambda x: set(countries_that_must_have_data).issubset(set(list(x))),
+                        "element": "first",
+                        "fao_element": "first",
+                        "element_code": "first",
+                        "fao_item": "first",
+                        "item_description": "first",
+                        "unit": "first",
+                        "unit_short_name": "first",
+                        "unit_factor": "first",
+                        "fao_unit": "first",
+                        "element_description": "first",
+                        # "flag": lambda x: list(set(x)),
+                        "flag": lambda x: np.nan,
+                    }).reset_index().dropna(subset="element")
 
-            # Keep only rows for which mandatory countries had data.
-            data_region = data_region[data_region["country"]].reset_index(drop=True)
-            # Replace column that was used to check if most contributing countries were present by the region's name.
-            data_region["country"] = region
-            # Add data for current region to data.
-            data = pd.concat([data[data["country"] != region], data_region], ignore_index=True)
+                # Keep only rows for which mandatory countries had data.
+                data_region = data_region[data_region["country"]].reset_index(drop=True)
+                # Replace column used to check if most contributing countries were present by the region's name.
+                data_region["country"] = region
+                # Add data for current region to data.
+                data = pd.concat([data[data["country"] != region], data_region], ignore_index=True)
 
     # Sort conveniently.
     data = data.sort_values(["country", "year"]).reset_index(drop=True)
@@ -650,7 +698,6 @@ def prepare_wide_table(data: pd.DataFrame, dataset_title: str) -> catalog.Table:
 
     # Construct a human-readable variable description (for the variable metadata).
     data['variable_description'] = apply_on_categoricals([data.item_description, data.element_description], lambda item_desc, element_desc: f"{item_desc}\n{element_desc}".lstrip().rstrip())
-
 
     # Pivot over long dataframe to generate a wide dataframe with country-year as index, and as many columns as
     # unique elements in "variable_name" (which should be as many as combinations of item-elements).
