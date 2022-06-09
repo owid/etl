@@ -466,19 +466,25 @@ def add_regions(data, aggregations):
             min_frac_cumulative_population=REGIONS_TO_ADD[region]["min_frac_cumulative_population"],
             reference_year=REFERENCE_YEAR,
         )
-        for element_code, aggregation in aggregations.items():
+
+        # Invert dictionary of aggregations to have the aggregation as key, and the list of element codes as value.
+        # TODO: Is there a clearer way to achieve the same thing than the following line?
+        aggregations_inverted = pd.DataFrame.from_dict(aggregations, orient="index").reset_index().\
+            groupby(0).agg({"index": list}).to_dict()["index"]
+        for aggregation in aggregations_inverted:
+            element_codes = aggregations_inverted[aggregation]
             # TODO: Use groupby_agg instead.
-            data_region = data[(data["country"].isin(countries_in_region)) & (data["element_code"] == element_code)]
+            data_region = data[(data["country"].isin(countries_in_region)) & (data["element_code"].isin(element_codes))]
+
             if len(data_region) > 0:
                 data_region = data_region.\
-                    dropna(subset="value").groupby(["year", "item_code"]).agg({
+                    dropna(subset="value").groupby(["year", "item_code", "element_code"]).agg({
                         "item": "first",
                         "area_code": lambda x: REGIONS_TO_ADD[region]["area_code"],
-                        "value": "sum",
+                        "value": aggregation,
                         "country": lambda x: set(countries_that_must_have_data).issubset(set(list(x))),
                         "element": "first",
                         "fao_element": "first",
-                        "element_code": "first",
                         "fao_item": "first",
                         "item_description": "first",
                         "unit": "first",
@@ -560,6 +566,7 @@ def clean_data(data: pd.DataFrame, items_metadata: pd.DataFrame, elements_metada
     #  clean_data)?
     aggregations = elements_metadata[(elements_metadata["owid_aggregation"].notnull())].\
         set_index("element_code").to_dict()["owid_aggregation"]
+
     if len(aggregations) > 0:
         # Add data for regions.
         data = add_regions(data=data, aggregations=aggregations)
