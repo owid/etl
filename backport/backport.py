@@ -209,7 +209,10 @@ def backport(
             # then check dataEditedAt field
             if ds.dataEditedAt < _walden_timestamp(f"{short_name}_config"):
                 lg.info(
-                    "backport.skip", short_name=short_name, reason="checksums match"
+                    "backport.skip",
+                    short_name=short_name,
+                    reason="checksums match",
+                    checksum=md5_config,
                 )
                 return
             else:
