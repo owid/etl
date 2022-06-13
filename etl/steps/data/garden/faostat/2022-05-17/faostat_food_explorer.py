@@ -17,6 +17,10 @@ from .shared import NAMESPACE, VERSION, harmonize_elements, harmonize_items
 # Dataset name and title.
 DATASET_TITLE = "Food Explorer"
 DATASET_SHORT_NAME = f"{NAMESPACE}_food_explorer"
+DATASET_DESCRIPTION = "This dataset has been created by Our World in Data, merging existing FAOstat datsets. In " \
+                      "particular, we have used 'Crops and livestock products' (QCL) and 'Food Balances' (FBSH and " \
+                      "FBS) datasets. Each row contains all the metrics for a specific combination of (country, " \
+                      "product, year). The metrics may come from different datasets."
 
 # List of columns from combined (qcl + fbsc) dataframe that should have a per capita variable.
 # Note: Some of the columns may already be given as "per capita" variables in the original data.
@@ -223,8 +227,7 @@ def run(dest_dir: str) -> None:
         namespace=NAMESPACE,
         short_name=DATASET_SHORT_NAME,
         title=DATASET_TITLE,
-        # TODO: Add custom description and combine sources.
-        description=fbsc_dataset.metadata.description,
+        description=DATASET_DESCRIPTION,
         sources=fbsc_dataset.metadata.sources + qcl_dataset.metadata.sources,
         licenses=fbsc_dataset.metadata.licenses + qcl_dataset.metadata.licenses,
         version=VERSION,
@@ -232,7 +235,6 @@ def run(dest_dir: str) -> None:
     # Create new dataset in garden.
     explorer_dataset.save()
     # Create table of products.
-    # TODO: Decide if storing one big table, or one small table per product.
     table = catalog.Table(data)
     # Make all column names snake_case.
     table = catalog.utils.underscore_table(table)
