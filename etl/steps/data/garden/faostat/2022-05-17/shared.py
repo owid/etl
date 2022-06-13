@@ -233,6 +233,22 @@ def harmonize_elements(df, element_col="element") -> pd.DataFrame:
     return df
 
 
+def check_that_countries_are_well_defined(data):
+    # Ensure area codes and countries are well defined, and no ambiguities were introduced when mapping country names.
+    n_countries_per_area_code = data.groupby("area_code")["country"].transform("nunique")
+    ambiguous_area_codes = data[n_countries_per_area_code > 1][["area_code", "country"]].\
+        drop_duplicates().set_index("area_code")["country"].to_dict()
+    error = f"There cannot be multiple countries for the same area code. " \
+            f"Redefine countries file for:\n{ambiguous_area_codes}."
+    assert len(ambiguous_area_codes) == 0, error
+    n_area_codes_per_country = data.groupby("country")["area_code"].transform("nunique")
+    ambiguous_countries = data[n_area_codes_per_country > 1][["area_code", "country"]].\
+        drop_duplicates().set_index("area_code")["country"].to_dict()
+    error = f"There cannot be multiple area codes for the same countries. " \
+            f"Redefine countries file for:\n{ambiguous_countries}."
+    assert len(ambiguous_countries) == 0, error
+
+
 def remove_rows_with_nan_value(
     data: pd.DataFrame, verbose: bool = False
 ) -> pd.DataFrame:
@@ -303,7 +319,7 @@ def remove_columns_with_only_nans(
     return data
 
 
-def remove_duplicates(data: pd.DataFrame, verbose: bool = True) -> pd.DataFrame:
+def remove_duplicates(data: pd.DataFrame, index_columns: List[str], verbose: bool = True) -> pd.DataFrame:
     """Remove rows with duplicated index (country, year, item, element, unit).
 
     First attempt to use flags to remove duplicates. If there are still duplicates, remove in whatever way possible.
@@ -312,6 +328,8 @@ def remove_duplicates(data: pd.DataFrame, verbose: bool = True) -> pd.DataFrame:
     ----------
     data : pd.DataFrame
         Data for current dataset.
+    index_columns : list
+        Columns expected to be used as index of the data.
     verbose : bool
         True to print a summary of the removed duplicates.
 
@@ -323,47 +341,41 @@ def remove_duplicates(data: pd.DataFrame, verbose: bool = True) -> pd.DataFrame:
     """
     data = data.copy()
 
-    # Add flag ranking to dataset.
-    data = pd.merge(
-        data,
-        FLAGS_RANKING[["flag", "ranking"]].rename(columns={"ranking": "flag_ranking"}),
-        on="flag",
-        how="left",
-    ).astype({"flag": "category"})
+    # Select columns that will be used as indexes.
+    _index_columns = [column for column in index_columns if column in data.columns]
+    # Number of ambiguous indexes (those that have multiple data values).
+    n_ambiguous_indexes = len(data[data.duplicated(subset=_index_columns, keep="first")])
+    if n_ambiguous_indexes > 0:
+        # Add flag ranking to dataset.
+        data = pd.merge(
+            data,
+            FLAGS_RANKING[["flag", "ranking"]].rename(columns={"ranking": "flag_ranking"}),
+            on="flag",
+            how="left",
+        ).astype({"flag": "category"})
 
-    # Select columns that should be used as indexes.
-    index_columns = [
-        column
-        for column in ["country", "year", "item", "element", "unit"]
-        if column in data.columns
-    ]
-
-    # Number of ambiguous indices (those that have multiple data values).
-    n_ambiguous_indices = len(data[data.duplicated(subset=index_columns, keep="first")])
-
-    if n_ambiguous_indices > 0:
-        # Number of ambiguous indices that cannot be solved using flags.
-        n_ambiguous_indices_unsolvable = len(
-            data[data.duplicated(subset=index_columns + ["flag_ranking"], keep="first")]
+        # Number of ambiguous indexes that cannot be solved using flags.
+        n_ambiguous_indexes_unsolvable = len(
+            data[data.duplicated(subset=_index_columns + ["flag_ranking"], keep="first")]
         )
-        # Remove ambiguous indices (those that have multiple data values).
+        # Remove ambiguous indexes (those that have multiple data values).
         # When possible, use flags to prioritise among duplicates.
-        data = data.sort_values(index_columns + ["flag_ranking"]).drop_duplicates(
-            subset=index_columns, keep="first"
+        data = data.sort_values(_index_columns + ["flag_ranking"]).drop_duplicates(
+            subset=_index_columns, keep="first"
         )
-        frac_ambiguous = n_ambiguous_indices / len(data)
+        frac_ambiguous = n_ambiguous_indexes / len(data)
         frac_ambiguous_solved_by_flags = 1 - (
-            n_ambiguous_indices_unsolvable / n_ambiguous_indices
+            n_ambiguous_indexes_unsolvable / n_ambiguous_indexes
         )
         if verbose:
             print(
-                f"Removing {n_ambiguous_indices} ambiguous indices ({frac_ambiguous: .2%})."
+                f"Removing {n_ambiguous_indexes} ambiguous indexes ({frac_ambiguous: .2%})."
             )
             print(
                 f"{frac_ambiguous_solved_by_flags: .2%} of ambiguities were solved with flags."
             )
 
-    data = data.drop(columns=["flag_ranking"])
+        data = data.drop(columns=["flag_ranking"])
 
     return data
 
@@ -436,17 +448,64 @@ def add_custom_names_and_descriptions(data, items_metadata, elements_metadata):
     return data
 
 
+def _load_countries_regions() -> pd.DataFrame:
+    countries_regions = catalog.find("countries_regions", dataset="reference", namespace="owid").load()
+
+    return cast(pd.DataFrame, countries_regions)
+
+
+def _list_countries_in_region(region, countries_regions):
+    # Number of attempts to fetch countries regions data.
+    attempts = 5
+    attempt = 0
+    countries_in_region = None
+    while attempt < attempts:
+        try:
+            # List countries in region.
+            countries_in_region = geo.list_countries_in_region(region=region, countries_regions=countries_regions)
+            break
+        except ConnectionResetError:
+            attempt += 1
+        finally:
+            assert countries_in_region is not None, "Unable to fetch countries-regions data."
+
+    return countries_in_region
+
+
+def _list_countries_in_region_that_must_have_data(region, min_frac_individual_population,
+                                                  min_frac_cumulative_population, countries_regions):
+    # Number of attempts to fetch countries regions data.
+    attempts = 5
+    attempt = 0
+    countries_that_must_have_data = None
+    while attempt < attempts:
+        try:
+            # List countries that should present in the data (since they are expected to contribute the most).
+            countries_that_must_have_data = geo.list_countries_in_region_that_must_have_data(
+                region=region,
+                min_frac_individual_population=min_frac_individual_population,
+                min_frac_cumulative_population=min_frac_cumulative_population,
+                reference_year=REFERENCE_YEAR,
+                countries_regions=countries_regions,
+            )
+            break
+        except ConnectionResetError:
+            attempt += 1
+        finally:
+            assert countries_that_must_have_data is not None, "Unable to fetch list of countries that must have data."
+
+    return countries_that_must_have_data
+
+
 def add_regions(data, aggregations):
     # TODO: This step takes very long, it should be optimised.
     for region in tqdm(REGIONS_TO_ADD):
-        # List countries in region.
-        countries_in_region = geo.list_countries_in_region(region=region)
-        # List countries that should present in the data (since they are expected to contribute the most).
-        countries_that_must_have_data = geo.list_countries_in_region_that_must_have_data(
-            region=region,
-            min_frac_individual_population=REGIONS_TO_ADD[region]["min_frac_individual_population"],
+        countries_regions = _load_countries_regions()
+        countries_in_region = _list_countries_in_region(region, countries_regions=countries_regions)
+        countries_that_must_have_data = _list_countries_in_region_that_must_have_data(
+            region=region, min_frac_individual_population=REGIONS_TO_ADD[region]["min_frac_individual_population"],
             min_frac_cumulative_population=REGIONS_TO_ADD[region]["min_frac_cumulative_population"],
-            reference_year=REFERENCE_YEAR,
+            countries_regions=countries_regions,
         )
 
         # Invert dictionary of aggregations to have the aggregation as key, and the list of element codes as value.
@@ -474,8 +533,7 @@ def add_regions(data, aggregations):
                         "unit_factor": "first",
                         "fao_unit": "first",
                         "element_description": "first",
-                        # "flag": lambda x: list(set(x)),
-                        "flag": lambda x: np.nan,
+                        "flag": lambda x: x if len(x) == 1 else "multiple_flags",
                     }).reset_index().dropna(subset="element")
 
                 # Keep only rows for which mandatory countries had data.
@@ -486,7 +544,7 @@ def add_regions(data, aggregations):
                 data = pd.concat([data[data["country"] != region], data_region], ignore_index=True)
 
     # Make area_code of category type (it contains integers and strings, and feather does not support object types).
-    data["area_code"] = data["area_code"].astype("str")
+    data["area_code"] = data["area_code"].astype("str").astype("category")
 
     # Sort conveniently.
     data = data.sort_values(["country", "year"]).reset_index(drop=True)
@@ -545,6 +603,12 @@ def clean_data(data: pd.DataFrame, items_metadata: pd.DataFrame, elements_metada
     ).rename(columns={"area": "country"}).astype({"country": "category"})
     # If countries are missing in countries file, execute etl.harmonize again and update countries file.
 
+    check_that_countries_are_well_defined(data)
+
+    # Remove duplicated data points (if any) keeping the one with lowest ranking flag (i.e. highest priority).
+    data = remove_duplicates(data=data, index_columns=["area_code", "year", "item_code", "element_code"],
+                             verbose=True)
+
     # Create a dictionary of aggregations, specifying the operation to use when creating regions.
     # These aggregations are defined in the custom_elements_and_units.csv file, and added to the metadata dataset.
     aggregations = elements_metadata[(elements_metadata["owid_aggregation"].notnull())].\
@@ -553,28 +617,7 @@ def clean_data(data: pd.DataFrame, items_metadata: pd.DataFrame, elements_metada
     if len(aggregations) > 0:
         # Add data for regions.
         data = add_regions(data=data, aggregations=aggregations)
-
-    # Sanity checks.
-
-    # TODO: Move this to remove_duplicates.
-    n_countries_per_area_code = data.groupby("area_code")["country"].transform("nunique")
-    ambiguous_area_codes = data[n_countries_per_area_code > 1][["area_code", "country"]].\
-        drop_duplicates().set_index("area_code")["country"].to_dict()
-    error = f"There cannot be multiple countries for the same area code. " \
-            f"Redefine countries file for:\n{ambiguous_area_codes}."
-    assert len(ambiguous_area_codes) == 0, error
-    n_area_codes_per_country = data.groupby("country")["area_code"].transform("nunique")
-    ambiguous_countries = data[n_area_codes_per_country > 1][["area_code", "country"]].\
-        drop_duplicates().set_index("area_code")["country"].to_dict()
-    error = f"There cannot be multiple area codes for the same countries. " \
-            f"Redefine countries file for:\n{ambiguous_countries}."
-    assert len(ambiguous_countries) == 0, error
-
-    # TODO: Check for ambiguous indexes in the long table.
-    # TODO: Check for ambiguous indexes in the wide table.
-
-    # Remove duplicated data points keeping the one with lowest ranking flag (i.e. highest priority).
-    data = remove_duplicates(data, verbose=False)
+        check_that_countries_are_well_defined(data)
 
     return data
 
@@ -582,8 +625,6 @@ def clean_data(data: pd.DataFrame, items_metadata: pd.DataFrame, elements_metada
 def prepare_long_table(data: pd.DataFrame):
     # Set appropriate indexes.
     index_columns = ["area_code", "year", "item_code", "element_code"]
-    if data.duplicated(subset=index_columns).any():
-        warnings.warn("Index has duplicated keys.")
     data_long = data.set_index(index_columns, verify_integrity=True).sort_index()
 
     # Create new table with long data.
@@ -678,14 +719,18 @@ def prepare_wide_table(data: pd.DataFrame, dataset_title: str) -> catalog.Table:
     # Also, for convenience, keep a similar structure as in the previous OWID dataset release.
     data["variable_name"] = apply_on_categoricals(
         [data.item, data.item_code, data.element, data.element_code, data.unit],
-        lambda item, item_code, element, element_code, unit: f"{dataset_title} || {item} | {item_code} || {element} | {element_code} || {unit}"
+        lambda item, item_code, element, element_code, unit:
+        f"{dataset_title} || {item} | {item_code} || {element} | {element_code} || {unit}"
     )
 
     # Construct a human-readable variable display name (which will be shown in grapher charts).
-    data['variable_display_name'] = apply_on_categoricals([data.item, data.element, data.unit], lambda item, element, unit: f"{item} - {element} ({unit})")
+    data['variable_display_name'] = apply_on_categoricals(
+        [data.item, data.element, data.unit], lambda item, element, unit: f"{item} - {element} ({unit})")
 
     # Construct a human-readable variable description (for the variable metadata).
-    data['variable_description'] = apply_on_categoricals([data.item_description, data.element_description], lambda item_desc, element_desc: f"{item_desc}\n{element_desc}".lstrip().rstrip())
+    data['variable_description'] = apply_on_categoricals(
+        [data.item_description, data.element_description],
+        lambda item_desc, element_desc: f"{item_desc}\n{element_desc}".lstrip().rstrip())
 
     # Pivot over long dataframe to generate a wide dataframe with country-year as index, and as many columns as
     # unique elements in "variable_name" (which should be as many as combinations of item-elements).
