@@ -485,6 +485,9 @@ def add_regions(data, aggregations):
                 # Add data for current region to data.
                 data = pd.concat([data[data["country"] != region], data_region], ignore_index=True)
 
+    # Make area_code of category type (it contains integers and strings, and feather does not support object types).
+    data["area_code"] = data["area_code"].astype("str")
+
     # Sort conveniently.
     data = data.sort_values(["country", "year"]).reset_index(drop=True)
 
@@ -544,16 +547,12 @@ def clean_data(data: pd.DataFrame, items_metadata: pd.DataFrame, elements_metada
 
     # Create a dictionary of aggregations, specifying the operation to use when creating regions.
     # These aggregations are defined in the custom_elements_and_units.csv file, and added to the metadata dataset.
-    # TODO: Should we select here elements_data["dataset"] == dataset_short_name (and make the latter an argument of
-    #  clean_data)?
     aggregations = elements_metadata[(elements_metadata["owid_aggregation"].notnull())].\
         set_index("element_code").to_dict()["owid_aggregation"]
 
     if len(aggregations) > 0:
         # Add data for regions.
         data = add_regions(data=data, aggregations=aggregations)
-
-    # TODO: Add population dependency to garden steps in the dag.
 
     # Sanity checks.
 
@@ -575,7 +574,7 @@ def clean_data(data: pd.DataFrame, items_metadata: pd.DataFrame, elements_metada
     # TODO: Check for ambiguous indexes in the wide table.
 
     # Remove duplicated data points keeping the one with lowest ranking flag (i.e. highest priority).
-    data = remove_duplicates(data)
+    data = remove_duplicates(data, verbose=False)
 
     return data
 
