@@ -26,7 +26,7 @@ import numpy as np
 import pandas as pd
 from pandas.api.types import union_categoricals
 from owid import catalog
-from owid.datautils import geo
+from owid.datautils import dataframes, geo
 from tqdm.auto import tqdm
 
 from etl.paths import DATA_DIR, STEP_DIR
@@ -145,11 +145,16 @@ REGIONS_TO_ADD = {
     },
 }
 
+# Flag to assign to data points with nan flag (which by definition is considered official data).
+FLAG_OFFICIAL_DATA = "official_data"
+# Flag to assign to data points for regions that are the result of aggregating data points with different flags.
+FLAG_MULTIPLE_FLAGS = "multiple_flags"
 # Rank flags by priority (where lowest index is highest priority).
 FLAGS_RANKING = (
     pd.DataFrame.from_records(
         columns=["flag", "description"],
         data=[
+            # FAO uses nan flag for official data; in our datasets we will replace nans by FLAG_OFFICIAL_DATA.
             (np.nan, "Official data"),
             ("S", "Standardized data"),
             ("X", "International reliable sources"),
@@ -347,9 +352,11 @@ def remove_duplicates(data: pd.DataFrame, index_columns: List[str], verbose: boo
     n_ambiguous_indexes = len(data[data.duplicated(subset=_index_columns, keep="first")])
     if n_ambiguous_indexes > 0:
         # Add flag ranking to dataset.
+        flags_ranking = FLAGS_RANKING.copy()
+        flags_ranking["flag"] = flags_ranking["flag"].fillna(FLAG_OFFICIAL_DATA)
         data = pd.merge(
             data,
-            FLAGS_RANKING[["flag", "ranking"]].rename(columns={"ranking": "flag_ranking"}),
+            flags_ranking[["flag", "ranking"]].rename(columns={"ranking": "flag_ranking"}),
             on="flag",
             how="left",
         ).astype({"flag": "category"})
@@ -514,12 +521,12 @@ def add_regions(data, aggregations):
             groupby(0).agg({"index": list}).to_dict()["index"]
         for aggregation in aggregations_inverted:
             element_codes = aggregations_inverted[aggregation]
-            # TODO: Use groupby_agg instead.
-            data_region = data[(data["country"].isin(countries_in_region)) & (data["element_code"].isin(element_codes))]
-
+            data_region = data[(data["country"].isin(countries_in_region)) &
+                               (data["element_code"].isin(element_codes))]
             if len(data_region) > 0:
-                data_region = data_region.\
-                    dropna(subset="value").groupby(["year", "item_code", "element_code"]).agg({
+                data_region = dataframes.groupby_agg(
+                    df=data_region.dropna(subset="value"), groupby_columns=["year", "item_code", "element_code"],
+                    aggregations={
                         "item": "first",
                         "area_code": lambda x: REGIONS_TO_ADD[region]["area_code"],
                         "value": aggregation,
@@ -533,8 +540,9 @@ def add_regions(data, aggregations):
                         "unit_factor": "first",
                         "fao_unit": "first",
                         "element_description": "first",
-                        "flag": lambda x: x if len(x) == 1 else "multiple_flags",
-                    }).reset_index().dropna(subset="element")
+                        "flag": lambda x: x if len(x) == 1 else FLAG_MULTIPLE_FLAGS,
+                    }
+                ).reset_index().dropna(subset="element")
 
                 # Keep only rows for which mandatory countries had data.
                 data_region = data_region[data_region["country"]].reset_index(drop=True)
@@ -577,6 +585,10 @@ def clean_data(data: pd.DataFrame, items_metadata: pd.DataFrame, elements_metada
 
     # Ensure column of values is numeric (transform any possible value like "<1" into a nan).
     data["value"] = pd.to_numeric(data["value"], errors="coerce")
+
+    # Convert nan flags into "official" (to avoid issues later on when dealing with flags).
+    data["flag"] = pd.Series([flag if not pd.isnull(flag) else FLAG_OFFICIAL_DATA
+                              for flag in data["flag"]], dtype="category")
 
     # Some datasets (at least faostat_fa) use "recipient_country" instead of "area". For consistency, change this.
     if "recipient_country" in data.columns:
