@@ -19,6 +19,7 @@ from etl import paths
 from etl.steps import (
     DataStep,
     DataStepPrivate,
+    BackportStepPrivate,
     compile_steps,
     to_dependency_order,
     select_dirty_steps,
@@ -112,12 +113,21 @@ class DummyStep(Step):
         return self.path
 
 
-def test_date_step_private():
+def test_data_step_private():
     with temporary_step() as step_name:
         _create_mock_py_file(step_name)
         DataStepPrivate(step_name, []).run()
         ds = Dataset((paths.DATA_DIR / step_name).as_posix())
         assert not ds.metadata.is_public
+
+
+@patch("etl.backport_helpers.create_dataset")
+def test_backport_step_private(mock_create_dataset):
+    with temporary_step() as step_name:
+        path = paths.DATA_DIR / step_name
+        mock_create_dataset.return_value = Dataset.create_empty(path)
+        BackportStepPrivate(step_name, []).run()
+        assert not Dataset(path).metadata.is_public
 
 
 def test_select_dirty_steps():
