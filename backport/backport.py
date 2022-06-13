@@ -1,12 +1,11 @@
+import datetime as dt
 import os
 import tempfile
-import datetime as dt
 from typing import Optional, cast
 
 import click
 import pandas as pd
 import structlog
-from owid.catalog.utils import validate_underscore
 from owid.walden import Catalog as WaldenCatalog
 from owid.walden.catalog import Dataset as WaldenDataset
 from owid.walden.ingest import add_to_catalog
@@ -20,6 +19,8 @@ from etl.grapher_model import (
     GrapherSourceModel,
     GrapherVariableModel,
 )
+
+from . import utils
 
 WALDEN_NAMESPACE = os.environ.get("WALDEN_NAMESPACE", "backport")
 
@@ -160,15 +161,6 @@ def _walden_timestamp(short_name: str) -> dt.datetime:
     return cast(dt.datetime, pd.to_datetime(t))
 
 
-def _create_short_name(
-    short_name: Optional[str], dataset_id: int, variable_id: Optional[int]
-) -> str:
-    """Create sensible short name for dataset."""
-    validate_underscore(short_name, "short-name")
-    # prepend dataset id to short name
-    return f"dataset_{dataset_id}_{short_name}"
-
-
 def backport(
     dataset_id: int,
     short_name: str,
@@ -196,7 +188,7 @@ def backport(
         engine, dataset_id=ds.id, variable_ids=variable_ids
     )
 
-    short_name = _create_short_name(short_name, dataset_id, variable_id)
+    short_name = utils.create_short_name(short_name, dataset_id)
 
     config = _load_config(ds, vars, sources)
 
