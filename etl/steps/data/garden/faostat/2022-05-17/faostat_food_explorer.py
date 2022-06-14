@@ -57,14 +57,6 @@ def combine_qcl_and_fbsc(
     fbsc["unit"] = [unit for unit in fbsc["unit"]]
     fbsc["item"] = [item for item in fbsc["item"]]
 
-    ##########################################
-    # TODO: Remove these lines once item_code and element_code are stored with the right format.
-    qcl = harmonize_items(qcl, dataset_short_name=f"{NAMESPACE}_qcl", item_col="fao_item")
-    qcl = harmonize_elements(qcl, element_col="fao_element")
-    fbsc = harmonize_items(fbsc, dataset_short_name=f"{NAMESPACE}_fbsc", item_col="fao_item")
-    fbsc = harmonize_elements(fbsc, element_col="fao_element")
-    ##########################################
-
     columns = ['country', 'year', 'item_code', 'element_code', 'item', 'element', 'unit', 'unit_short_name', 'value',
                'unit_factor']
     rename_columns = {"item": "product"}

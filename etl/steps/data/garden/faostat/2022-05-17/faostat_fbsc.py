@@ -189,13 +189,13 @@ def run(dest_dir: str) -> None:
     data_table_long.metadata.description = dataset_garden_metadata.description
     data_table_long.metadata.primary_key = list(data_table_long.index.names)
     data_table_long.metadata.dataset = dataset_garden_metadata
-    # Add long table to the dataset.
-    dataset_garden.add(data_table_long)
+    # Add long table to the dataset (no need to repack, since columns already have optimal dtypes).
+    dataset_garden.add(data_table_long, repack=False)
 
     # Prepare metadata for new garden wide table (starting with the metadata from the long table).
     data_table_wide.metadata = deepcopy(data_table_long.metadata)
     data_table_wide.metadata.title += " - Flattened table indexed by country-year."
     data_table_wide.metadata.short_name += "_flat"
     data_table_wide.metadata.primary_key = list(data_table_wide.index.names)
-    # Add wide table to the dataset.
-    dataset_garden.add(data_table_wide, repack=True)
+    # Add wide table to the dataset (no need to repack, since columns already have optimal dtypes).
+    dataset_garden.add(data_table_wide, repack=False)

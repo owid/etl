@@ -634,13 +634,34 @@ def clean_data(data: pd.DataFrame, items_metadata: pd.DataFrame, elements_metada
     return data
 
 
+def optimize_table_dtypes(table):
+    table = table.copy()
+
+    # Find optimal dtypes.
+    optimal_dtypes = catalog.frames.repack_frame(table).dtypes.apply(lambda x: x.name).to_dict()
+
+    # Ensure codes are kept as category (and not as int).
+    optimal_dtypes["area_code"] = "category"
+    optimal_dtypes["item_code"] = "category"
+    optimal_dtypes["element_code"] = "category"
+
+    for column in table.columns:
+        if table[column].dtype != optimal_dtypes[column]:
+            table[column] = table[column].astype(optimal_dtypes[column])
+
+    return table
+
+
 def prepare_long_table(data: pd.DataFrame):
+    # Create new table with long data.
+    data_table_long = catalog.Table(data).copy()
+
+    # Ensure table has the optimal dtypes before storing it as feather file.
+    data_table_long = optimize_table_dtypes(table=data_table_long)
+
     # Set appropriate indexes.
     index_columns = ["area_code", "year", "item_code", "element_code"]
-    data_long = data.set_index(index_columns, verify_integrity=True).sort_index()
-
-    # Create new table with long data.
-    data_table_long = catalog.Table(data_long).copy()
+    data_table_long = data_table_long.set_index(index_columns, verify_integrity=True).sort_index()
 
     return data_table_long
 
@@ -791,8 +812,11 @@ def prepare_wide_table(data: pd.DataFrame, dataset_title: str) -> catalog.Table:
             assert len(variable_unit_factor) == 1
             wide_table[column].metadata.display["conversionFactor"] = variable_unit_factor[0]
 
+    # Ensure columns have the optimal dtypes, but codes are categories.
+    wide_table = optimize_table_dtypes(table=wide_table.reset_index())
+
     # Sort columns and rows conveniently.
-    wide_table = wide_table.reset_index().set_index(["country", "year"], verify_integrity=True)
+    wide_table = wide_table.set_index(["country", "year"], verify_integrity=True)
     wide_table = wide_table[["area_code"] + sorted([column for column in wide_table.columns if column != "area_code"])]
     wide_table = wide_table.sort_index(level=["country", "year"]).sort_index()
 
@@ -883,8 +907,8 @@ def run(dest_dir: str) -> None:
     data_table_long.metadata.description = dataset_garden_metadata.description
     data_table_long.metadata.primary_key = list(data_table_long.index.names)
     data_table_long.metadata.dataset = dataset_garden_metadata
-    # Add long table to the dataset.
-    dataset_garden.add(data_table_long)
+    # Add long table to the dataset (no need to repack, since columns already have optimal dtypes).
+    dataset_garden.add(data_table_long, repack=False)
 
     # Prepare metadata for new garden wide table (starting with the metadata from the long table).
     # Add wide table to the dataset.
@@ -894,5 +918,5 @@ def run(dest_dir: str) -> None:
     data_table_wide.metadata.short_name += "_flat"
     data_table_wide.metadata.primary_key = list(data_table_wide.index.names)
 
-    # Add wide table to the dataset.
-    dataset_garden.add(data_table_wide, repack=True)
+    # Add wide table to the dataset (no need to repack, since columns already have optimal dtypes).
+    dataset_garden.add(data_table_wide, repack=False)

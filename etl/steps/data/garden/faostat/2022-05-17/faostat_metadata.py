@@ -42,36 +42,11 @@ from owid import catalog
 from tqdm.auto import tqdm
 
 from etl.paths import DATA_DIR, STEP_DIR
-from .shared import FLAGS_RANKING, harmonize_elements, harmonize_items, VERSION
+from .shared import FLAGS_RANKING, harmonize_elements, harmonize_items, VERSION, optimize_table_dtypes
 
 # Define namespace and short name for output dataset.
 NAMESPACE = "faostat"
 DATASET_SHORT_NAME = f"{NAMESPACE}_metadata"
-
-# Define the format of each column to be saved in feather files.
-DTYPES = {
-    'dataset': 'category',
-    'fao_dataset_title': 'category',
-    'owid_dataset_title': 'category',
-    'fao_dataset_description': 'category',
-    'owid_dataset_description': 'category',
-    'item_code': 'category',
-    'fao_item': 'category',
-    'owid_item': 'category',
-    'fao_item_description': 'category',
-    'owid_item_description': 'category',
-    'element_code': 'category',
-    'fao_element': 'category',
-    'fao_element_description': 'category',
-    'fao_unit': 'category',
-    'fao_unit_short_name': 'category',
-    'owid_element': 'category',
-    'owid_unit': 'category',
-    'owid_unit_short_name': 'category',
-    'owid_unit_factor': 'float32',
-    'owid_element_description': 'category',
-    'owid_aggregation': 'category',
-}
 
 # There are several cases in which one or a few item codes in the data are missing in the metadata. Also, there are
 # several cases in which an item code in the data has an item name slightly different in the metadata. But these are not
@@ -365,14 +340,15 @@ def clean_global_elements_dataframe(elements_df: pd.DataFrame, custom_elements: 
 
 
 def create_table(df: pd.DataFrame, short_name: str, index_cols: List[str]) -> catalog.Table:
-    table = catalog.Table(df).set_index(index_cols)
+    table = catalog.Table(df).copy()
+
+    # Optimize column dtypes before storing feather file, and ensure codes are categories (instead of ints).
+    table = optimize_table_dtypes(table)
+
+    # Set indexes and other necessary metadata.
+    table = table.set_index(index_cols)
     table.metadata.short_name = short_name
     table.metadata.primary_key = index_cols
-
-    # Ensure each column has the optimal format before creating the feather file.
-    for column in table.columns:
-        if table[column].dtype != DTYPES[column]:
-            table[column] = table[column].astype(DTYPES[column])
 
     return table
 
@@ -531,7 +507,7 @@ def run(dest_dir: str) -> None:
     items_table = create_table(df=items_df, short_name="items", index_cols=["item_code"])
     elements_table = create_table(df=elements_df, short_name="elements", index_cols=["element_code"])
 
-    # Add tables to dataset.
+    # Add tables to dataset (no need to repack, since columns already have optimal dtypes).
     dataset_garden.add(datasets_table, repack=False)
     dataset_garden.add(items_table, repack=False)
     dataset_garden.add(elements_table, repack=False)
