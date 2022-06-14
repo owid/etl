@@ -111,7 +111,7 @@ def _load_dag(filename: Union[str, Path], prev_dag: Dict[str, Any]):
     curr_dag.update(prev_dag)
 
     for sub_dag_filename in dag_yml.get("include", []):
-        sub_dag = _load_dag(sub_dag_filename, curr_dag)
+        sub_dag = _load_dag(paths.BASE_DIR / sub_dag_filename, curr_dag)
         curr_dag.update(sub_dag)
 
     return curr_dag
