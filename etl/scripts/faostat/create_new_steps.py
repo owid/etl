@@ -42,7 +42,7 @@ NAMESPACE = "faostat"
 # Name of additional metadata file (without extension).
 ADDITIONAL_METADATA_FILE_NAME = f"{NAMESPACE}_metadata"
 # Path to dag file for FAOSTAT steps.
-DAG_FILE = BASE_DIR / "dag_faostat.yml"
+DAG_FILE = BASE_DIR / "dag_files" / "dag_faostat.yml"
 # Name of shared module containing the run function (without extension).
 RUN_FILE_NAME = "shared"
 # Glob pattern to match version folders like "YYYY-MM-DD".
@@ -50,33 +50,25 @@ RUN_FILE_NAME = "shared"
 GLOB_VERSION_PATTERN = "[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]"
 # New version tag to be created.
 NEW_VERSION = datetime.datetime.today().strftime("%Y-%m-%d")
-# Datasets to add or omit to the default list.
-# Note: The additional steps will only be added to the new version if at least one other dataset was updated. If so, it
-# will be added to the new folder even if its dependencies were not updated.
-CUSTOM_STEPS_TO_ADD: Dict[str, List[str]] = {
-    "meadow": [],
-    "garden": ["faostat_fbsc", "faostat_food_explorer"],
-    "grapher": ["faostat_fbsc"],
-}
-CUSTOM_STEPS_TO_OMIT: Dict[str, List[str]] = {
-    "meadow": [],
-    "garden": ["faostat_fbs", "faostat_fbsh", "faostat_metadata"],
-    "grapher": ["faostat_fbs", "faostat_fbsh", "faostat_metadata"],
-}
 # Additional dependencies to add to each dag line of a specific channel, for new datasets (ones not in the dag).
 # Give each dependency as a tuple of (channel, step_name). The latest version of that step will be assumed.
 ADDITIONAL_DEPENDENCIES: Dict[str, List[Tuple[str, str]]] = {
     "meadow": [],
-    "garden": [("meadow", "faostat_metadata")],
+    "garden": [("meadow", "faostat_metadata"), ("garden", "owid/latest/key_indicators")],
     "grapher": [],
 }
 # List of additional files (with extension) that, if existing, should be copied over from the latest version to the new
 # (besides the files of each of the steps).
 ADDITIONAL_FILES_TO_COPY = [
     RUN_FILE_NAME + ".py",
-    ADDITIONAL_METADATA_FILE_NAME + ".py",
     f"{NAMESPACE}.countries.json",
+    "custom_datasets.csv",
+    "custom_elements_and_units.csv",
+    "custom_food_explorer_products.csv",
+    "custom_items.csv",
 ]
+# Note: Further custom rules are applied to the list of steps to run.
+# These rules are defined in apply_custom_rules_to_list_of_steps_to_run.
 
 
 def get_channel_from_dag_line(dag_line: str) -> str:
@@ -608,17 +600,19 @@ def create_updated_dependency_graph(
             # Update the version of each of the dataset dependencies.
             new_dependencies = []
             for dependency in dependencies:
-                # Get old dependency version from the old dag line.
-                dependency_old_version = get_version_from_dag_line(dependency)
-                # Find the latest existing version of that dependency.
-                dependency_new_version = find_latest_version_for_step(
-                    channel=get_channel_from_dag_line(dependency),
-                    step_name=get_dataset_name_from_dag_line(dependency),
-                )
-                # Rename the dag line of the dependency appropriately (if its version changed).
-                new_dependency = dependency.replace(
-                    dependency_old_version, dependency_new_version
-                )
+                if Path(dependency).parent.name == "latest":
+                    # This step that is always up-to-date, so the new dependency will be the same as the current one.
+                    new_dependency = dependency
+                else:
+                    # Get old dependency version from the old dag line.
+                    dependency_old_version = get_version_from_dag_line(dependency)
+                    # Find the latest existing version of that dependency.
+                    dependency_new_version = find_latest_version_for_step(
+                        channel=get_channel_from_dag_line(dependency),
+                        step_name=get_dataset_name_from_dag_line(dependency),
+                    )
+                    # Rename the dag line of the dependency appropriately (if its version changed).
+                    new_dependency = dependency.replace(dependency_old_version, dependency_new_version)
                 new_dependencies.append(new_dependency)
 
         if len(new_dependencies) > 0:
@@ -721,6 +715,23 @@ def write_steps_to_dag_file(
         update_food_explorer_dependency_version()
 
 
+def apply_custom_rules_to_list_of_steps_to_run(step_names, channel):
+    # In garden or grapher, if fbs or fbsh were updated, update fbsc (but omit steps for fbs and fbsh).
+    if (channel in ["garden", "grapher"]) and (any({f"{NAMESPACE}_fbs", f"{NAMESPACE}_fbsh"} & set(step_names))):
+        step_names += [f"{NAMESPACE}_fbsc"]
+        step_names = [step for step in step_names if step not in [f"{NAMESPACE}_fbs", f"{NAMESPACE}_fbsh"]]
+
+    # In garden, if either fbsc or qcl were updated, update food explorer.
+    if (channel == "garden") and (any({f"{NAMESPACE}_fbsc", f"{NAMESPACE}_qcl"} & set(step_names))):
+        step_names += [f"{NAMESPACE}_food_explorer"]
+
+    # In grapher there is never a step for metadata.
+    if channel == "grapher":
+        step_names = [step for step in step_names if step not in [f"{NAMESPACE}_metadata"]]
+
+    return step_names
+
+
 def main(channel: str, include_all_datasets: bool = False) -> None:
     if include_all_datasets:
         # List all datasets, even if their source data was not updated.
@@ -729,13 +740,10 @@ def main(channel: str, include_all_datasets: bool = False) -> None:
         # List steps for which source data was updated.
         step_names = list_updated_steps(channel=channel)
 
-    # Remove custom steps (as defined at the beginning of the script).
-    step_names = sorted(set(step_names) - set(CUSTOM_STEPS_TO_OMIT[channel]))
+        # Apply custom rules to list of steps to run.
+        step_names = apply_custom_rules_to_list_of_steps_to_run(step_names=step_names, channel=channel)
 
     if len(step_names) > 0:
-        # Add custom steps (as defined at the beginning of the script).
-        step_names = sorted(set(step_names + CUSTOM_STEPS_TO_ADD[channel]))
-
         # Create folder for new version and add a step file for each dataset.
         create_steps(channel=channel, step_names=step_names)
 
