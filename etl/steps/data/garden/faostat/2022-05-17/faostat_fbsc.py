@@ -15,6 +15,7 @@ from copy import deepcopy
 import pandas as pd
 from owid import catalog
 from owid.catalog.meta import DatasetMeta, TableMeta
+from owid.datautils import dataframes
 
 from etl.paths import DATA_DIR, STEP_DIR
 from .shared import (
@@ -25,7 +26,6 @@ from .shared import (
     harmonize_items,
     prepare_long_table,
     prepare_wide_table,
-    concatenate,
 )
 
 # Dataset name.
@@ -84,7 +84,7 @@ def combine_fbsh_and_fbs_datasets(
     assert set(fbsh["element"]) < set(fbs["element"]), error
 
     # Concatenate old and new dataframes using function that keeps categoricals.
-    fbsc = concatenate([fbsh, fbs]).sort_values(["area", "year"]).reset_index(drop=True)
+    fbsc = dataframes.concatenate([fbsh, fbs]).sort_values(["area", "year"]).reset_index(drop=True)
 
     # Ensure that each element has only one unit and one description.
     error = "Some elements in the combined dataset have more than one unit."

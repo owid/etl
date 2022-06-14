@@ -12,7 +12,7 @@ from owid.catalog.meta import DatasetMeta
 from owid.datautils import dataframes, geo
 
 from etl.paths import DATA_DIR, STEP_DIR
-from .shared import NAMESPACE, VERSION, harmonize_elements, harmonize_items
+from .shared import NAMESPACE, VERSION
 
 # Dataset name and title.
 DATASET_TITLE = "Food Explorer"
@@ -61,7 +61,7 @@ def combine_qcl_and_fbsc(
                'unit_factor']
     rename_columns = {"item": "product"}
     combined = (
-        pd.concat([qcl[columns], fbsc[columns]], ignore_index=True)
+        dataframes.concatenate([qcl[columns], fbsc[columns]], ignore_index=True)
         .rename(columns=rename_columns)
         .reset_index(drop=True)
     )

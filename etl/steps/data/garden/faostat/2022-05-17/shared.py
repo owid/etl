@@ -505,7 +505,11 @@ def _list_countries_in_region_that_must_have_data(region, min_frac_individual_po
 
 
 def add_regions(data, aggregations):
-    # TODO: This step takes very long, it should be optimised.
+    # TODO: This function takes very long, it should be optimised.
+    # Invert dictionary of aggregations to have the aggregation as key, and the list of element codes as value.
+    aggregations_inverted = {unique_value: pd.unique([item for item, value in aggregations.items()
+                                                      if value == unique_value]).tolist()
+                             for unique_value in aggregations.values()}
     for region in tqdm(REGIONS_TO_ADD):
         countries_regions = _load_countries_regions()
         countries_in_region = _list_countries_in_region(region, countries_regions=countries_regions)
@@ -514,11 +518,6 @@ def add_regions(data, aggregations):
             min_frac_cumulative_population=REGIONS_TO_ADD[region]["min_frac_cumulative_population"],
             countries_regions=countries_regions,
         )
-
-        # Invert dictionary of aggregations to have the aggregation as key, and the list of element codes as value.
-        # TODO: Is there a clearer way to achieve the same thing than the following line?
-        aggregations_inverted = pd.DataFrame.from_dict(aggregations, orient="index").reset_index().\
-            groupby(0).agg({"index": list}).to_dict()["index"]
         for aggregation in aggregations_inverted:
             element_codes = aggregations_inverted[aggregation]
             data_region = data[(data["country"].isin(countries_in_region)) &
@@ -549,7 +548,7 @@ def add_regions(data, aggregations):
                 # Replace column used to check if most contributing countries were present by the region's name.
                 data_region["country"] = region
                 # Add data for current region to data.
-                data = pd.concat([data[data["country"] != region], data_region], ignore_index=True)
+                data = dataframes.concatenate([data[data["country"] != region], data_region], ignore_index=True)
 
     # Make area_code of category type (it contains integers and strings, and feather does not support object types).
     data["area_code"] = data["area_code"].astype("str").astype("category")
@@ -666,61 +665,6 @@ def prepare_long_table(data: pd.DataFrame):
     return data_table_long
 
 
-def concatenate(dfs: List[pd.DataFrame], **kwargs: Any) -> pd.DataFrame:
-    """Concatenate while preserving categorical columns. Original [source code]
-    (https://stackoverflow.com/a/57809778/1275818)."""
-    # Iterate on categorical columns common to all dfs
-    for col in set.intersection(
-        *[
-            set(df.select_dtypes(include='category').columns)
-            for df in dfs
-        ]
-    ):
-        # Generate the union category across dfs for this column
-        uc = union_categoricals([df[col] for df in dfs])
-        # Change to union category for all dataframes
-        for df in dfs:
-            df[col] = pd.Categorical(df[col].values, categories=uc.categories)
-    return pd.concat(dfs, **kwargs)
-
-
-def apply_on_categoricals(cat_series: List[pd.Series], func: Callable[..., str]) -> pd.Series:
-    """Apply a function on a list of categorical series. This is much faster than converting
-    them to strings first and then applying the function and it prevents memory explosion.
-
-    It uses category codes instead of using values directly and it builds the output categorical
-    mapping from codes to strings on the fly.
-
-    Parameters
-    ----------
-    cat_series :
-        List of categorical series.
-    func :
-        Function taking as many arguments as there are categorical series and returning str.
-
-    Returns
-    -------
-    final_cat_series :
-        Categorical series.
-
-    """
-    seen = {}
-    codes = []
-    categories = []
-    for cat_codes in zip(*[s.cat.codes for s in cat_series]):
-        if cat_codes not in seen:
-            # add category
-            cat_values = [s.cat.categories[code] for s, code in zip(cat_series, cat_codes)]
-            categories.append(func(*cat_values))
-            seen[cat_codes] = len(categories) - 1
-
-        # use existing category
-        codes.append(seen[cat_codes])
-
-    final_cat_series = pd.Categorical.from_codes(codes, categories=categories)
-    return cast(pd.Series, final_cat_series)
-
-
 def prepare_wide_table(data: pd.DataFrame, dataset_title: str) -> catalog.Table:
     """Flatten a long table to obtain a wide table with ["country", "year"] as index.
 
@@ -750,18 +694,18 @@ def prepare_wide_table(data: pd.DataFrame, dataset_title: str) -> catalog.Table:
     # This will be used as column names (which will then be formatted properly with underscores and lower case),
     # and also as the variable titles in grapher.
     # Also, for convenience, keep a similar structure as in the previous OWID dataset release.
-    data["variable_name"] = apply_on_categoricals(
+    data["variable_name"] = dataframes.apply_on_categoricals(
         [data.item, data.item_code, data.element, data.element_code, data.unit],
         lambda item, item_code, element, element_code, unit:
         f"{dataset_title} || {item} | {item_code} || {element} | {element_code} || {unit}"
     )
 
     # Construct a human-readable variable display name (which will be shown in grapher charts).
-    data['variable_display_name'] = apply_on_categoricals(
+    data['variable_display_name'] = dataframes.apply_on_categoricals(
         [data.item, data.element, data.unit], lambda item, element, unit: f"{item} - {element} ({unit})")
 
     # Construct a human-readable variable description (for the variable metadata).
-    data['variable_description'] = apply_on_categoricals(
+    data['variable_description'] = dataframes.apply_on_categoricals(
         [data.item_description, data.element_description],
         lambda item_desc, element_desc: f"{item_desc}\n{element_desc}".lstrip().rstrip())
 

@@ -39,6 +39,7 @@ from typing import List
 
 import pandas as pd
 from owid import catalog
+from owid.datautils import dataframes
 from tqdm.auto import tqdm
 
 from etl.paths import DATA_DIR, STEP_DIR
@@ -480,9 +481,9 @@ def run(dest_dir: str) -> None:
             table=table, metadata=metadata, dataset_short_name=dataset_short_name)
 
         # Add dataset descriptions, items, and element-units from current dataset to global dataframes.
-        datasets_df = pd.concat([datasets_df, datasets_from_data], ignore_index=True)
-        items_df = pd.concat([items_df, items_from_data], ignore_index=True)
-        elements_df = pd.concat([elements_df, elements_from_data], ignore_index=True)
+        datasets_df = dataframes.concatenate([datasets_df, datasets_from_data], ignore_index=True)
+        items_df = dataframes.concatenate([items_df, items_from_data], ignore_index=True)
+        elements_df = dataframes.concatenate([elements_df, elements_from_data], ignore_index=True)
 
     datasets_df = clean_global_dataset_descriptions_dataframe(
         datasets_df=datasets_df, custom_datasets=custom_datasets)
