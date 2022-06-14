@@ -35,6 +35,7 @@ mapping in the data is the correct one (except possibly in the examples mentione
 """
 
 from copy import deepcopy
+from typing import List
 
 import pandas as pd
 from owid import catalog
@@ -46,6 +47,39 @@ from .shared import FLAGS_RANKING, harmonize_elements, harmonize_items, VERSION
 # Define namespace and short name for output dataset.
 NAMESPACE = "faostat"
 DATASET_SHORT_NAME = f"{NAMESPACE}_metadata"
+
+# Define the format of each column to be saved in feather files.
+DTYPES = {
+    'dataset': 'category',
+    'fao_dataset_title': 'category',
+    'owid_dataset_title': 'category',
+    'fao_dataset_description': 'category',
+    'owid_dataset_description': 'category',
+    'item_code': 'category',
+    'fao_item': 'category',
+    'owid_item': 'category',
+    'fao_item_description': 'category',
+    'owid_item_description': 'category',
+    'element_code': 'category',
+    'fao_element': 'category',
+    'fao_element_description': 'category',
+    'fao_unit': 'category',
+    'fao_unit_short_name': 'category',
+    'owid_element': 'category',
+    'owid_unit': 'category',
+    'owid_unit_short_name': 'category',
+    'owid_unit_factor': 'float32',
+    'owid_element_description': 'category',
+    'owid_aggregation': 'category',
+}
+
+# There are several cases in which one or a few item codes in the data are missing in the metadata. Also, there are
+# several cases in which an item code in the data has an item name slightly different in the metadata. But these are not
+# important issues (since we use item_code to merge different datasets, and we use metadata only to fetch descriptions).
+# However, for some domains there are too many differences between items in the data and in the metadata (as explained
+# above). For this reason, raise a warning only when there is a reasonable number of issues found.
+# Minimum number of issues in the comparison of items and item codes from data and metadata to raise a warning.
+N_ISSUES_ON_ITEMS_FOR_WARNING = 10
 
 
 def load_latest_data_table_for_dataset(dataset_short_name: str) -> catalog.Table:
@@ -152,7 +186,7 @@ def create_items_dataframe_for_domain(table: catalog.Table, metadata: catalog.Da
                         on="item_code", how="left", suffixes=("_in_data", "_in_metadata"))
     different_items = compared[compared["fao_item_in_data"] != compared["fao_item_in_metadata"]]
     missing_item_codes = set(items_from_data["item_code"]) - set(_items_df["item_code"])
-    if (len(different_items) + len(missing_item_codes)) > 0:
+    if (len(different_items) + len(missing_item_codes)) > N_ISSUES_ON_ITEMS_FOR_WARNING:
         print(f"WARNING: {len(missing_item_codes)} item codes in {dataset_short_name} missing in metadata. "
               f"{len(different_items)} item codes in data mapping to different items in metadata.")
 
@@ -330,31 +364,17 @@ def clean_global_elements_dataframe(elements_df: pd.DataFrame, custom_elements: 
     return elements_df
 
 
-def create_global_items_table(items_df: pd.DataFrame) -> catalog.Table:
-    # Create items table.
-    items_table = catalog.Table(items_df).set_index("item_code")
-    items_table.metadata.short_name = "items"
-    items_table.metadata.primary_key = ["item_code"]
+def create_table(df: pd.DataFrame, short_name: str, index_cols: List[str]) -> catalog.Table:
+    table = catalog.Table(df).set_index(index_cols)
+    table.metadata.short_name = short_name
+    table.metadata.primary_key = index_cols
 
-    return items_table
+    # Ensure each column has the optimal format before creating the feather file.
+    for column in table.columns:
+        if table[column].dtype != DTYPES[column]:
+            table[column] = table[column].astype(DTYPES[column])
 
-
-def create_global_elements_table(elements_df: pd.DataFrame) -> catalog.Table:
-    # Create elements table.
-    elements_table = catalog.Table(elements_df).set_index("element_code")
-    elements_table.metadata.short_name = "elements"
-    elements_table.metadata.primary_key = ["element_code"]
-
-    return elements_table
-
-
-def create_global_dataset_descriptions_table(datasets_df: pd.DataFrame) -> catalog.Table:
-    # Create new table.
-    datasets_table = catalog.Table(datasets_df).set_index("dataset")
-    datasets_table.metadata.short_name = "datasets"
-    datasets_table.metadata.primary_key = ["datasets"]
-
-    return datasets_table
+    return table
 
 
 def check_that_flag_definitions_in_dataset_agree_with_those_in_flags_ranking(
@@ -507,11 +527,11 @@ def run(dest_dir: str) -> None:
     dataset_garden.save()
 
     # Create new garden dataset with all dataset descriptions, items, and element-units.
-    datasets_table = create_global_dataset_descriptions_table(datasets_df=datasets_df)
-    items_table = create_global_items_table(items_df=items_df)
-    elements_table = create_global_elements_table(elements_df=elements_df)
+    datasets_table = create_table(df=datasets_df, short_name="datasets", index_cols=["dataset"])
+    items_table = create_table(df=items_df, short_name="items", index_cols=["item_code"])
+    elements_table = create_table(df=elements_df, short_name="elements", index_cols=["element_code"])
 
     # Add tables to dataset.
-    dataset_garden.add(datasets_table)
-    dataset_garden.add(items_table)
-    dataset_garden.add(elements_table)
+    dataset_garden.add(datasets_table, repack=False)
+    dataset_garden.add(items_table, repack=False)
+    dataset_garden.add(elements_table, repack=False)

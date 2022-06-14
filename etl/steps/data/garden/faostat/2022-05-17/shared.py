@@ -839,13 +839,8 @@ def run(dest_dir: str) -> None:
     datasets_metadata = datasets_metadata[datasets_metadata["dataset"] == dataset_short_name].reset_index(drop=True)
     items_metadata = pd.DataFrame(metadata["items"]).reset_index()
     items_metadata = items_metadata[items_metadata["dataset"] == dataset_short_name].reset_index(drop=True)
-    # TODO: Remove this line once items are stored with the right format.
-    items_metadata["item_code"] = items_metadata["item_code"].astype(str).str.zfill(N_CHARACTERS_ITEM_CODE)
     elements_metadata = pd.DataFrame(metadata["elements"]).reset_index()
     elements_metadata = elements_metadata[elements_metadata["dataset"] == dataset_short_name].reset_index(drop=True)
-    # TODO: Remove this line once elements are stored with the right format.
-    elements_metadata["element_code"] = elements_metadata["element_code"].astype(str).str.zfill(
-        N_CHARACTERS_ELEMENT_CODE)
 
     ####################################################################################################################
     # Process data.
