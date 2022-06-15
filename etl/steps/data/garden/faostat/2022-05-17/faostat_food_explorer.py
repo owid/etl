@@ -46,25 +46,26 @@ PER_CAPITA_COLUMNS = [
 def combine_qcl_and_fbsc(
     qcl_table: catalog.Table, fbsc_table: catalog.Table
 ) -> pd.DataFrame:
-    qcl = pd.DataFrame(qcl_table).reset_index()
+    columns = ['country', 'year', 'item_code', 'element_code', 'item', 'element', 'unit', 'unit_short_name', 'value',
+               'unit_factor']
+    qcl = pd.DataFrame(qcl_table).reset_index()[columns]
     qcl["value"] = qcl["value"].astype(float)
     qcl["element"] = [element for element in qcl["element"]]
     qcl["unit"] = [unit for unit in qcl["unit"]]
     qcl["item"] = [item for item in qcl["item"]]
-    fbsc = pd.DataFrame(fbsc_table).reset_index()
+    fbsc = pd.DataFrame(fbsc_table).reset_index()[columns]
     fbsc["value"] = fbsc["value"].astype(float)
     fbsc["element"] = [element for element in fbsc["element"]]
     fbsc["unit"] = [unit for unit in fbsc["unit"]]
     fbsc["item"] = [item for item in fbsc["item"]]
 
-    columns = ['country', 'year', 'item_code', 'element_code', 'item', 'element', 'unit', 'unit_short_name', 'value',
-               'unit_factor']
     rename_columns = {"item": "product"}
     combined = (
-        dataframes.concatenate([qcl[columns], fbsc[columns]], ignore_index=True)
+        dataframes.concatenate([qcl, fbsc], ignore_index=True)
         .rename(columns=rename_columns)
         .reset_index(drop=True)
     )
+
     # Sanity checks.
     assert len(combined) == (
         len(qcl) + len(fbsc)
@@ -80,7 +81,7 @@ def combine_qcl_and_fbsc(
     n_units_per_element_code = combined.groupby("element_code")["unit"].transform("nunique")
     assert combined[n_units_per_element_code > 1].empty, "There are element codes with multiple units."
 
-    error = "There are unexpected duplicate rows."
+    error = "There are unexpected duplicate rows. Rename items in custom_items.csv to avoid clashes."
     assert combined[combined.duplicated(subset=["product", "country", "year", "element", "unit"])].empty, error
 
     return combined
