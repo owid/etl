@@ -47,7 +47,7 @@ def combine_qcl_and_fbsc(
     qcl_table: catalog.Table, fbsc_table: catalog.Table
 ) -> pd.DataFrame:
     columns = ['country', 'year', 'item_code', 'element_code', 'item', 'element', 'unit', 'unit_short_name', 'value',
-               'unit_factor']
+               'unit_factor', 'population_with_data']
     qcl = pd.DataFrame(qcl_table).reset_index()[columns]
     qcl["value"] = qcl["value"].astype(float)
     qcl["element"] = [element for element in qcl["element"]]
@@ -149,7 +149,9 @@ def process_combined_data(combined: pd.DataFrame, custom_products: pd.DataFrame)
     data_wide = pd.merge(data_wide, fao_population, on=["country", "year"], how="left")
 
     # Add column for OWID population.
-    data_wide = geo.add_population_to_dataframe(df=data_wide, warn_on_missing_countries=False)
+    # data_wide = geo.add_population_to_dataframe(df=data_wide, warn_on_missing_countries=False)
+    # Add population of countries for which we have data.
+    population = combined.pivot(index=index_columns, columns=["title"], values="population_with_data").reset_index()
 
     # Add per capita variables.
     for column in PER_CAPITA_COLUMNS:
@@ -157,17 +159,17 @@ def process_combined_data(combined: pd.DataFrame, custom_products: pd.DataFrame)
             # Some variables are already given per capita in the FAOSTAT dataset.
             # But, since their population may differ with ours, for consistency, we multiply their per capita variables
             # by their population, to obtain the total variable, and then we divide by our own population.
-            data_wide[column] = data_wide[column] * data_wide["fao_population"] / data_wide["population"]
+            data_wide[column] = data_wide[column] * data_wide["fao_population"] / population[column]
         else:
             # Create a new column with the same name, but adding "per capita" to the unit.
-            data_wide[column[:-1] + " per capita)"] = data_wide[column] / data_wide["population"]
+            data_wide[column[:-1] + " per capita)"] = data_wide[column] / population[column]
 
     assert (
         len(data_wide.columns[data_wide.isnull().all(axis=0)]) == 0
     ), "Unexpected columns with only nan values."
 
     # Set a reasonable index.
-    data_wide = data_wide.set_index(index_columns)
+    data_wide = data_wide.set_index(index_columns, verify_integrity=True)
 
     return data_wide
 

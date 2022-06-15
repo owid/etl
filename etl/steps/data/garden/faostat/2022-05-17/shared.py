@@ -691,6 +691,7 @@ def add_regions(data, aggregations):
                         "fao_unit": "first",
                         "element_description": "first",
                         "flag": lambda x: x if len(x) == 1 else FLAG_MULTIPLE_FLAGS,
+                        "population_with_data": "sum",
                     }
                 ).reset_index().dropna(subset="element")
 
@@ -770,6 +771,12 @@ def clean_data(data: pd.DataFrame, items_metadata: pd.DataFrame, elements_metada
     # Remove duplicated data points (if any) keeping the one with lowest ranking flag (i.e. highest priority).
     data = remove_duplicates(data=data, index_columns=["area_code", "year", "item_code", "element_code"],
                              verbose=True)
+
+    # Add a column for population; when creating region aggregates, this column will have the population of the countries
+    # for which there was data. For example, for Europe in a specific year, the population may differ from item to item,
+    # because for one item we may have more European countries informed than for the other.
+    data = geo.add_population_to_dataframe(df=data, population_col="population_with_data",
+                                           warn_on_missing_countries=False)
 
     # Create a dictionary of aggregations, specifying the operation to use when creating regions.
     # These aggregations are defined in the custom_elements_and_units.csv file, and added to the metadata dataset.
