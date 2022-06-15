@@ -319,15 +319,15 @@ class DataStep(Step):
         else:
             raise Exception(f"have no idea how to run step: {self.path}")
 
-        self.after_run()
-
         # modify the dataset to remember what inputs were used to build it
         dataset = self._output_dataset
         dataset.metadata.source_checksum = self.checksum_input()
         dataset.save()
 
+        self.after_run()
+
     def after_run(self) -> None:
-        """Optional post-hook"""
+        """Optional post-hook, needs to resave the dataset again."""
         ...
 
     def is_dirty(self) -> bool:
@@ -691,22 +691,29 @@ class BackportStep(DataStep):
         dataset.metadata.source_checksum = self.checksum_input()
         dataset.save()
 
+        self.after_run()
+
+    def can_execute(self) -> bool:
+        return True
+
     @property
     def _dest_dir(self) -> Path:
         return paths.DATA_DIR / self.path.lstrip("/")
 
 
-class DataStepPrivate(DataStep):
+class PrivateMixin:
+    def after_run(self) -> None:
+        """Make dataset private"""
+        ds = catalog.Dataset(self._dest_dir.as_posix())  # type: ignore
+        ds.metadata.is_public = False
+        ds.save()
+
+
+class DataStepPrivate(PrivateMixin, DataStep):
     is_public = False
 
     def __str__(self) -> str:
         return f"data-private://{self.path}"
-
-    def after_run(self) -> None:
-        """Make dataset private"""
-        ds = catalog.Dataset(self._dest_dir.as_posix())
-        ds.metadata.is_public = False
-        ds.save()
 
 
 class WaldenStepPrivate(WaldenStep):
@@ -723,7 +730,7 @@ class GrapherStepPrivate(GrapherStep):
         return f"grapher-private://{self.path}"
 
 
-class BackportStepPrivate(BackportStep):
+class BackportStepPrivate(PrivateMixin, BackportStep):
     is_public = False
 
     def __str__(self) -> str:
