@@ -16,15 +16,14 @@ NOTES:
 
 """
 
+import json
 import warnings
 from copy import deepcopy
 from pathlib import Path
-from typing import List, cast, Any
-from collections.abc import Callable
+from typing import List, cast
 
 import numpy as np
 import pandas as pd
-from pandas.api.types import union_categoricals
 from owid import catalog
 from owid.datautils import dataframes, geo
 from tqdm.auto import tqdm
@@ -85,64 +84,145 @@ ITEM_AMENDMENTS = {
 # TODO: Decide about this fraction, it seems FAO creates region aggregates even when only a few countries are informed.
 #  However those informed countries may be the only relevant ones for that particular item (even if they
 #  have low population).
+MIN_FRAC_INDIVIDUAL_POPULATION = 0
+MIN_FRAC_CUMULATIVE_POPULATION = 0.3
 # Reference year to build the list of mandatory countries.
 REFERENCE_YEAR = 2018
 REGIONS_TO_ADD = {
     "North America": {
         "area_code": "OWID_NAM",
-        "min_frac_individual_population": 0,
-        "min_frac_cumulative_population": 0.3,
+        "min_frac_individual_population": MIN_FRAC_INDIVIDUAL_POPULATION,
+        "min_frac_cumulative_population": MIN_FRAC_CUMULATIVE_POPULATION,
     },
     "South America": {
         "area_code": "OWID_SAM",
-        "min_frac_individual_population": 0,
-        "min_frac_cumulative_population": 0.3,
+        "min_frac_individual_population": MIN_FRAC_INDIVIDUAL_POPULATION,
+        "min_frac_cumulative_population": MIN_FRAC_CUMULATIVE_POPULATION,
     },
     "Europe": {
         "area_code": "OWID_EUR",
-        "min_frac_individual_population": 0,
-        "min_frac_cumulative_population": 0.3,
+        "min_frac_individual_population": MIN_FRAC_INDIVIDUAL_POPULATION,
+        "min_frac_cumulative_population": MIN_FRAC_CUMULATIVE_POPULATION,
     },
     "European Union (27)": {
         "area_code": "OWID_EU27",
-        "min_frac_individual_population": 0,
-        "min_frac_cumulative_population": 0.3,
+        "min_frac_individual_population": MIN_FRAC_INDIVIDUAL_POPULATION,
+        "min_frac_cumulative_population": MIN_FRAC_CUMULATIVE_POPULATION,
     },
     "Africa": {
         "area_code": "OWID_AFR",
-        "min_frac_individual_population": 0,
-        "min_frac_cumulative_population": 0.3,
+        "min_frac_individual_population": MIN_FRAC_INDIVIDUAL_POPULATION,
+        "min_frac_cumulative_population": MIN_FRAC_CUMULATIVE_POPULATION,
     },
     "Asia": {
         "area_code": "OWID_ASI",
-        "min_frac_individual_population": 0,
-        "min_frac_cumulative_population": 0.3,
+        "min_frac_individual_population": MIN_FRAC_INDIVIDUAL_POPULATION,
+        "min_frac_cumulative_population": MIN_FRAC_CUMULATIVE_POPULATION,
     },
     "Oceania": {
         "area_code": "OWID_OCE",
-        "min_frac_individual_population": 0,
-        "min_frac_cumulative_population": 0.3,
+        "min_frac_individual_population": MIN_FRAC_INDIVIDUAL_POPULATION,
+        "min_frac_cumulative_population": MIN_FRAC_CUMULATIVE_POPULATION,
     },
     "Low-income countries": {
         "area_code": "OWID_LIC",
-        "min_frac_individual_population": 0,
-        "min_frac_cumulative_population": 0.3,
+        "min_frac_individual_population": MIN_FRAC_INDIVIDUAL_POPULATION,
+        "min_frac_cumulative_population": MIN_FRAC_CUMULATIVE_POPULATION,
     },
     "Upper-middle-income countries": {
         "area_code": "OWID_UMC",
-        "min_frac_individual_population": 0,
-        "min_frac_cumulative_population": 0.3,
+        "min_frac_individual_population": MIN_FRAC_INDIVIDUAL_POPULATION,
+        "min_frac_cumulative_population": MIN_FRAC_CUMULATIVE_POPULATION,
     },
     "Lower-middle-income countries": {
         "area_code": "OWID_LMC",
-        "min_frac_individual_population": 0,
-        "min_frac_cumulative_population": 0.3,
+        "min_frac_individual_population": MIN_FRAC_INDIVIDUAL_POPULATION,
+        "min_frac_cumulative_population": MIN_FRAC_CUMULATIVE_POPULATION,
     },
     "High-income countries": {
         "area_code": "OWID_HIC",
-        "min_frac_individual_population": 0,
-        "min_frac_cumulative_population": 0.3,
+        "min_frac_individual_population": MIN_FRAC_INDIVIDUAL_POPULATION,
+        "min_frac_cumulative_population": MIN_FRAC_CUMULATIVE_POPULATION,
     },
+}
+
+# When creating region aggregates, we need to ignore regions that are historical (i.e. they do not exist today as
+# countries) or are geographical regions (instead of countries). We ignore them to avoid the risk of counting the
+# contribution of certain countries twice.
+REGIONS_TO_IGNORE_IN_AGGREGATES = [
+    'Czechoslovakia',  # Historic
+    'Eritrea and Ethiopia',  # Historic
+    'French Southern Territories',  # Region
+    'Melanesia',  # Region
+    'Netherlands Antilles',  # Historic
+    'Polynesia',  # Region
+    'Serbia and Montenegro',  # Historic
+    'Svalbard and Jan Mayen',  # Region
+    'Timor',  # Region
+    'USSR',  # Historic
+    'United States Minor Outlying Islands',  # Region
+    'Yugoslavia',  # Historic
+]
+# When creating region aggregates, we need to know if we are counting certain regions twice.
+# This could happen if, for example, we have data for Gibraltar and United Kingdom, and we sum them to generate data
+# for Europe.
+# TODO: It is possible that FAO is not including, e.g. the contribution of Gibraltar in United Kingdom's data.
+#  Confirm whether the following regions on the left are indeed included in the data of the country on the right.
+TERRITORIES_OF_COUNTRIES = {
+    'Finland': [
+        'Aland Islands'
+    ],
+    'New Zealand': [
+        'Tokelau'
+    ],
+    'Costa Rica': [
+        'Cocos Islands'
+    ],
+    'Netherlands': [
+        'Bonaire Sint Eustatius and Saba',
+        'Sint Maarten (Dutch part)'
+    ],
+    'United Kingdom': [
+        'Bermuda',
+        'British Virgin Islands',
+        'Cayman Islands',
+        'Channel Islands',
+        'Falkland Islands',
+        'Gibraltar',
+        'Guernsey',
+        'Isle of Man',
+        'Montserrat',
+        'Pitcairn',
+        'Saint Helena',
+        'South Georgia and the South Sandwich Islands',
+        'Turks and Caicos Islands'
+    ],
+    'France': [
+        'French Guiana',
+        'French Polynesia',
+        'Guadeloupe',
+        'Martinique',
+        'Mayotte',
+        'New Caledonia',
+        'Reunion',
+        'Saint Barthlemy',
+        'Saint Pierre and Miquelon',
+        'Saint Martin (French part)',
+        'Wallis and Futuna'
+    ],
+    'Denmark': [
+        'Faeroe Islands'
+    ],
+    'Australia': [
+        'Christmas Island',
+        'Heard Island and McDonald Islands',
+        'Norfolk Island'
+    ],
+    'United States': [
+        'Guam',
+        'Northern Mariana Islands',
+        'United States Virgin Islands'
+    ]
 }
 
 # Flag to assign to data points with nan flag (which by definition is considered official data).
@@ -455,8 +535,31 @@ def add_custom_names_and_descriptions(data, items_metadata, elements_metadata):
     return data
 
 
+def remove_regions_from_countries_regions_members(countries_regions, regions_to_remove):
+    countries_regions = countries_regions.copy()
+
+    # Get the owid code for each region that needs to be ignored when creating region aggregates.
+    regions_to_ignore_codes = []
+    for region in set(regions_to_remove):
+        selected_region = countries_regions[countries_regions["name"] == region]
+        assert len(selected_region) == 1, f"Region {region} ambiguous or not found in countries_regions dataset."
+        regions_to_ignore_codes.append(selected_region.index.values.item())
+
+    # Remove those regions to ignore from lists of members of each region.
+    regions_mask = countries_regions["members"].notnull()
+    countries_regions.loc[regions_mask, "members"] = [
+        json.dumps(list(set(json.loads(members)) - set(regions_to_ignore_codes)))
+        for members in countries_regions[regions_mask]["members"]]
+
+    return countries_regions
+
+
 def _load_countries_regions() -> pd.DataFrame:
+    # Load dataset of countries and regions.
     countries_regions = catalog.find("countries_regions", dataset="reference", namespace="owid").load()
+
+    countries_regions = remove_regions_from_countries_regions_members(
+        countries_regions, regions_to_remove=REGIONS_TO_IGNORE_IN_AGGREGATES)
 
     return cast(pd.DataFrame, countries_regions)
 
@@ -481,6 +584,15 @@ def _list_countries_in_region(region, countries_regions):
 
 def _list_countries_in_region_that_must_have_data(region, min_frac_individual_population,
                                                   min_frac_cumulative_population, countries_regions):
+    # List of countries that are part of another country (and should be removed to avoid double counting).
+    subregions_to_remove = sum(list(TERRITORIES_OF_COUNTRIES.values()), [])
+    # Remove those countries from countries_regions.
+    # NOTE: A more sophisticated approach would be to see what countries are in the data, and, if only subregions
+    #  were given (but not the containing region), then the containing regions should be removed instead. But this
+    #  scenario is unlikely, and would overcomplicate things.
+    countries_regions_without_subregions = remove_regions_from_countries_regions_members(
+        countries_regions=countries_regions, regions_to_remove=subregions_to_remove)
+
     # Number of attempts to fetch countries regions data.
     attempts = 5
     attempt = 0
@@ -493,7 +605,7 @@ def _list_countries_in_region_that_must_have_data(region, min_frac_individual_po
                 min_frac_individual_population=min_frac_individual_population,
                 min_frac_cumulative_population=min_frac_cumulative_population,
                 reference_year=REFERENCE_YEAR,
-                countries_regions=countries_regions,
+                countries_regions=countries_regions_without_subregions,
             )
             break
         except ConnectionResetError:
@@ -504,8 +616,44 @@ def _list_countries_in_region_that_must_have_data(region, min_frac_individual_po
     return countries_that_must_have_data
 
 
+def _find_subregions_to_remove_in_aggregation(countries):
+    country_set = set(countries)
+    subregions_to_remove = []
+    for country in country_set:
+        if country in TERRITORIES_OF_COUNTRIES:
+            # If the bigger region (e.g. United Kingdom) is given in the data, remove subregions (e.g. Gibraltar).
+            subregions_to_remove.extend(list(country_set & {territories
+                                                            for territories in TERRITORIES_OF_COUNTRIES[country]}))
+
+    return subregions_to_remove
+
+
+def select_data_to_aggregate_without_repeating_subregions(data, countries_in_region, element_codes):
+    # Select relevant portion of the data that will be aggregated.
+    data_region = data[(data["country"].isin(countries_in_region)) &
+                       (data["element_code"].isin(element_codes))]
+    # Find subregions that have data for the same item-element as their corresponding region.
+    regions_to_remove = dataframes.groupby_agg(
+        data_region, groupby_columns=["item_code", "element_code"], aggregations={
+            "country": lambda x: _find_subregions_to_remove_in_aggregation(x)}).dropna(subset="country")
+    regions_to_remove_mask = [len(regions) > 0 for regions in regions_to_remove["country"]]
+    regions_to_remove = regions_to_remove[regions_to_remove_mask].to_dict()["country"]
+
+    # Find indexes of the previous item-element-region that have to be removed, and then remove those indexes.
+    indexes_to_remove = []
+    for item_element, countries_to_remove in regions_to_remove.items():
+        indexes_to_remove.extend(data_region[(data_region["item_code"] == item_element[0]) &
+                                             (data_region["element_code"] == item_element[1]) &
+                                             (data_region["country"].isin(countries_to_remove))].index.tolist())
+    data_region = data_region.drop(indexes_to_remove).reset_index(drop=True)
+
+    return data_region
+
+
 def add_regions(data, aggregations):
+    data = data.copy()
     # TODO: This function takes very long, it should be optimised.
+
     # Invert dictionary of aggregations to have the aggregation as key, and the list of element codes as value.
     aggregations_inverted = {unique_value: pd.unique([item for item, value in aggregations.items()
                                                       if value == unique_value]).tolist()
@@ -519,9 +667,12 @@ def add_regions(data, aggregations):
             countries_regions=countries_regions,
         )
         for aggregation in aggregations_inverted:
+            # List of element codes for which the same aggregate method (e.g. "sum") will be applied.
             element_codes = aggregations_inverted[aggregation]
-            data_region = data[(data["country"].isin(countries_in_region)) &
-                               (data["element_code"].isin(element_codes))]
+
+            data_region = select_data_to_aggregate_without_repeating_subregions(
+                data=data, countries_in_region=countries_in_region, element_codes=element_codes)
+
             if len(data_region) > 0:
                 data_region = dataframes.groupby_agg(
                     df=data_region.dropna(subset="value"), groupby_columns=["year", "item_code", "element_code"],
