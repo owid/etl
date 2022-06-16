@@ -246,7 +246,7 @@ def fetch_db_checksum(dataset: catalog.Dataset) -> Optional[str]:
             FROM datasets
             WHERE name=%s
             """,
-            [dataset.metadata.short_name]
+            [dataset.metadata.short_name],
         )
         return None if source_checksum is None else source_checksum[0]
 
