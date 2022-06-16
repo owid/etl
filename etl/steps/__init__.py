@@ -2,7 +2,7 @@
 #  __init__.py
 #  steps
 #
-
+import types
 from typing import (
     Any,
     Dict,
@@ -45,6 +45,7 @@ from etl.grapher_import import (
     upsert_dataset,
     cleanup_ghost_sources,
     cleanup_ghost_variables,
+    fetch_db_checksum,
 )
 from etl import backport_helpers
 
@@ -537,7 +538,8 @@ class GrapherStep(Step):
             raise Exception(f"have no idea how to run step: {self.path}")
 
     def is_dirty(self) -> bool:
-        return True
+        dataset = self._get_step_module().get_grapher_dataset()
+        return fetch_db_checksum(dataset) != self.checksum_input()
 
     def can_execute(self) -> bool:
         sp = self._search_path
@@ -583,18 +585,7 @@ class GrapherStep(Step):
         """
         Import the Python module for this step and call get_grapher_tables() on it.
         """
-        module_path = self.path.lstrip("/").replace("/", ".")
-        step_module = import_module(f"etl.steps.grapher.{module_path}")
-        if not hasattr(step_module, "get_grapher_dataset"):
-            raise Exception(
-                f'no get_grapher_dataset() method defined for module "{step_module}"'
-            )
-        if not hasattr(step_module, "get_grapher_tables"):
-            raise Exception(
-                f'no get_grapher_tables() method defined for module "{step_module}"'
-            )
-
-        # data steps
+        step_module = self._get_step_module()
         dataset = step_module.get_grapher_dataset()  # type: ignore
         dataset_upsert_results = upsert_dataset(
             dataset,
@@ -620,6 +611,19 @@ class GrapherStep(Step):
             dataset_upsert_results.dataset_id, upserted_variable_ids
         )
         cleanup_ghost_sources(dataset_upsert_results.dataset_id, upserted_source_ids)
+
+    def _get_step_module(self) -> types.ModuleType:
+        module_path = self.path.lstrip("/").replace("/", ".")
+        step_module = import_module(f"etl.steps.grapher.{module_path}")
+        if not hasattr(step_module, "get_grapher_dataset"):
+            raise Exception(
+                f'no get_grapher_dataset() method defined for module "{step_module}"'
+            )
+        if not hasattr(step_module, "get_grapher_tables"):
+            raise Exception(
+                f'no get_grapher_tables() method defined for module "{step_module}"'
+            )
+        return step_module
 
 
 @dataclass
