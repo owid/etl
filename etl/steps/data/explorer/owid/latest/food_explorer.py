@@ -17,6 +17,7 @@ from etl.paths import DATA_DIR
 # Note: Include here all columns, even if the name is not changed.
 EXPECTED_COLUMNS = {
     'product': 'product',
+    'population': 'population',
     'area_harvested__ha': 'area_harvested__ha',
     'area_harvested__ha_per_capita': 'area_harvested__ha__per_capita',
     'domestic_supply__tonnes': 'domestic_supply__tonnes',
@@ -82,8 +83,8 @@ def run(dest_dir: str) -> None:
 
         # Rename columns, select the required ones, and sort columns and rows conveniently.
         table_product = table_product[list(EXPECTED_COLUMNS)].rename(columns=EXPECTED_COLUMNS)
-        table_product = table_product[["product"] + [column for column in sorted(table_product.columns)
-                                                                   if column not in ["product"]]]
+        table_product = table_product[["product", "population"] + [column for column in sorted(table_product.columns)
+                                                                   if column not in ["product", "population"]]]
         table_product = table_product.sort_index()
 
         table_product.metadata.short_name = catalog.utils.underscore(

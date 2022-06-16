@@ -149,9 +149,13 @@ def process_combined_data(combined: pd.DataFrame, custom_products: pd.DataFrame)
     data_wide = pd.merge(data_wide, fao_population, on=["country", "year"], how="left")
 
     # Add column for OWID population.
-    # data_wide = geo.add_population_to_dataframe(df=data_wide, warn_on_missing_countries=False)
+    data_wide = geo.add_population_to_dataframe(df=data_wide, warn_on_missing_countries=False)
     # Add population of countries for which we have data.
-    population = combined.pivot(index=index_columns, columns=["title"], values="population_with_data").reset_index()
+    population_with_data = combined.pivot(index=index_columns, columns=["title"],
+                                          values="population_with_data").reset_index()
+
+    # TODO: Check that population and population with data are exactly the same for non-regions.
+    # TODO: Warn on regions where population with data is much smaller than total population.
 
     # Add per capita variables.
     for column in PER_CAPITA_COLUMNS:
@@ -159,10 +163,10 @@ def process_combined_data(combined: pd.DataFrame, custom_products: pd.DataFrame)
             # Some variables are already given per capita in the FAOSTAT dataset.
             # But, since their population may differ with ours, for consistency, we multiply their per capita variables
             # by their population, to obtain the total variable, and then we divide by our own population.
-            data_wide[column] = data_wide[column] * data_wide["fao_population"] / population[column]
+            data_wide[column] = data_wide[column] * data_wide["fao_population"] / population_with_data[column]
         else:
             # Create a new column with the same name, but adding "per capita" to the unit.
-            data_wide[column[:-1] + " per capita)"] = data_wide[column] / population[column]
+            data_wide[column[:-1] + " per capita)"] = data_wide[column] / population_with_data[column]
 
     assert (
         len(data_wide.columns[data_wide.isnull().all(axis=0)]) == 0
