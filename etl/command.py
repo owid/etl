@@ -44,6 +44,12 @@ THREADPOOL_WORKERS = 5
     help="Path to DAG yaml file",
     default=paths.DAG_FILE,
 )
+@click.option(
+    "--workers",
+    type=int,
+    help="Thread workers to parallelize which steps need rebuilding (steps execution is not parallelized)",
+    default=5,
+)
 @click.argument("steps", nargs=-1)
 def main(
     steps: List[str],
@@ -54,6 +60,7 @@ def main(
     backport: bool = False,
     exclude: Optional[str] = None,
     dag_path: Path = paths.DAG_FILE,
+    workers: int = 5,
 ) -> None:
     """
     Execute all ETL steps listed in dag.yaml
@@ -79,6 +86,7 @@ def main(
         private=private,
         include_grapher=grapher,
         excludes=excludes,
+        workers=workers,
     )
 
 
@@ -100,6 +108,7 @@ def run_dag(
     private: bool = False,
     include_grapher: bool = False,
     excludes: Optional[List[str]] = None,
+    workers: int = 1,
 ) -> None:
     """
     Run the selected steps, and anything that needs updating based on them. An empty
@@ -121,7 +130,7 @@ def run_dag(
 
     if not force:
         print("Detecting which steps need rebuilding...")
-        steps = select_dirty_steps(steps, THREADPOOL_WORKERS)
+        steps = select_dirty_steps(steps, workers)
 
     if not steps:
         print("All datasets up to date!")
@@ -168,7 +177,7 @@ def _backporting_steps() -> DAG:
         if ds.short_name.endswith("_values"):
             private_suffix = "" if ds.is_public else "-private"
 
-            short_name = ds.short_name.replace("_values", "")
+            short_name = ds.short_name.removesuffix("_values")
             dag[f"backport{private_suffix}://backport/owid/latest/{short_name}"] = {
                 f"walden{private_suffix}://{ds.namespace}/latest/{short_name}_values",
                 f"walden{private_suffix}://{ds.namespace}/latest/{short_name}_config",
