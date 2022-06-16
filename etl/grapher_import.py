@@ -242,7 +242,7 @@ def fetch_db_checksum(dataset: catalog.Dataset) -> Optional[str]:
     with open_db() as db:
         source_checksum = db.fetch_one_or_none(
             """
-            SELECT sourceChecksum 
+            SELECT sourceChecksum
             FROM datasets
             WHERE name=%s
             """,
