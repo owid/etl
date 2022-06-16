@@ -73,76 +73,61 @@ ITEM_AMENDMENTS = {
     ],
 }
 
-# Regions to add to the data.
-# When creating region aggregates for a certain variable in a certain year, some mandatory countries must be
-# informed, otherwise the aggregate will be nan (since we consider that there is not enough information).
-# * A country will be considered mandatory if they exceed "min_frac_individual_population", the minimum fraction of
-#   the total population of the region.
-# * A country will be considered mandatory if the sum of the population of all countries (sorted by decreasing
-#   population until reaching this country) exceeds "min_frac_cumulative_population", the fraction of the total
-#   population of the region.
-# TODO: Decide about this fraction, it seems FAO creates region aggregates even when only a few countries are informed.
-#  However those informed countries may be the only relevant ones for that particular item (even if they
-#  have low population).
-MIN_FRAC_INDIVIDUAL_POPULATION = 0
-MIN_FRAC_CUMULATIVE_POPULATION = 0.3
+# When creating region aggregates for a certain variable in a certain year, we want to ensure that we have enough
+# data to create the aggregate. There is no straightforward way to do so. Our criterion is to:
+#  * sum the data of all countries in the region, and then
+#  * remove rows such that the sum of the population of countries with data (for a given year) is too small, compared
+#    to the total population of the region.
+# For example, if for a certain variable in a certain year, only a few countries with little population have data,
+# then assign nan to that region-variable-year.
+# Define here that minimum fraction of population that must have data to create an aggregate.
+MIN_FRAC_POPULATION_WITH_DATA = 0.7
 # Reference year to build the list of mandatory countries.
 REFERENCE_YEAR = 2018
 REGIONS_TO_ADD = {
     "North America": {
         "area_code": "OWID_NAM",
-        "min_frac_individual_population": MIN_FRAC_INDIVIDUAL_POPULATION,
-        "min_frac_cumulative_population": MIN_FRAC_CUMULATIVE_POPULATION,
+        "min_frac_population_with_data": MIN_FRAC_POPULATION_WITH_DATA,
     },
     "South America": {
         "area_code": "OWID_SAM",
-        "min_frac_individual_population": MIN_FRAC_INDIVIDUAL_POPULATION,
-        "min_frac_cumulative_population": MIN_FRAC_CUMULATIVE_POPULATION,
+        "min_frac_population_with_data": MIN_FRAC_POPULATION_WITH_DATA,
     },
     "Europe": {
         "area_code": "OWID_EUR",
-        "min_frac_individual_population": MIN_FRAC_INDIVIDUAL_POPULATION,
-        "min_frac_cumulative_population": MIN_FRAC_CUMULATIVE_POPULATION,
+        "min_frac_population_with_data": MIN_FRAC_POPULATION_WITH_DATA,
     },
     "European Union (27)": {
         "area_code": "OWID_EU27",
-        "min_frac_individual_population": MIN_FRAC_INDIVIDUAL_POPULATION,
-        "min_frac_cumulative_population": MIN_FRAC_CUMULATIVE_POPULATION,
+        "min_frac_population_with_data": MIN_FRAC_POPULATION_WITH_DATA,
     },
     "Africa": {
         "area_code": "OWID_AFR",
-        "min_frac_individual_population": MIN_FRAC_INDIVIDUAL_POPULATION,
-        "min_frac_cumulative_population": MIN_FRAC_CUMULATIVE_POPULATION,
+        "min_frac_population_with_data": MIN_FRAC_POPULATION_WITH_DATA,
     },
     "Asia": {
         "area_code": "OWID_ASI",
-        "min_frac_individual_population": MIN_FRAC_INDIVIDUAL_POPULATION,
-        "min_frac_cumulative_population": MIN_FRAC_CUMULATIVE_POPULATION,
+        "min_frac_population_with_data": MIN_FRAC_POPULATION_WITH_DATA,
     },
     "Oceania": {
         "area_code": "OWID_OCE",
-        "min_frac_individual_population": MIN_FRAC_INDIVIDUAL_POPULATION,
-        "min_frac_cumulative_population": MIN_FRAC_CUMULATIVE_POPULATION,
+        "min_frac_population_with_data": MIN_FRAC_POPULATION_WITH_DATA,
     },
     "Low-income countries": {
         "area_code": "OWID_LIC",
-        "min_frac_individual_population": MIN_FRAC_INDIVIDUAL_POPULATION,
-        "min_frac_cumulative_population": MIN_FRAC_CUMULATIVE_POPULATION,
+        "min_frac_population_with_data": MIN_FRAC_POPULATION_WITH_DATA,
     },
     "Upper-middle-income countries": {
         "area_code": "OWID_UMC",
-        "min_frac_individual_population": MIN_FRAC_INDIVIDUAL_POPULATION,
-        "min_frac_cumulative_population": MIN_FRAC_CUMULATIVE_POPULATION,
+        "min_frac_population_with_data": MIN_FRAC_POPULATION_WITH_DATA,
     },
     "Lower-middle-income countries": {
         "area_code": "OWID_LMC",
-        "min_frac_individual_population": MIN_FRAC_INDIVIDUAL_POPULATION,
-        "min_frac_cumulative_population": MIN_FRAC_CUMULATIVE_POPULATION,
+        "min_frac_population_with_data": MIN_FRAC_POPULATION_WITH_DATA,
     },
     "High-income countries": {
         "area_code": "OWID_HIC",
-        "min_frac_individual_population": MIN_FRAC_INDIVIDUAL_POPULATION,
-        "min_frac_cumulative_population": MIN_FRAC_CUMULATIVE_POPULATION,
+        "min_frac_population_with_data": MIN_FRAC_POPULATION_WITH_DATA,
     },
 }
 
@@ -554,6 +539,16 @@ def remove_regions_from_countries_regions_members(countries_regions, regions_to_
     return countries_regions
 
 
+def _load_population() -> pd.DataFrame:
+    population = (
+        catalog.find("population", namespace="owid", dataset="key_indicators")
+        .load()
+        .reset_index()
+    )
+
+    return cast(pd.DataFrame, population)
+
+
 def _load_countries_regions() -> pd.DataFrame:
     # Load dataset of countries and regions.
     countries_regions = catalog.find("countries_regions", dataset="reference", namespace="owid").load()
@@ -580,40 +575,6 @@ def _list_countries_in_region(region, countries_regions):
             assert countries_in_region is not None, "Unable to fetch countries-regions data."
 
     return countries_in_region
-
-
-def _list_countries_in_region_that_must_have_data(region, min_frac_individual_population,
-                                                  min_frac_cumulative_population, countries_regions):
-    # List of countries that are part of another country (and should be removed to avoid double counting).
-    subregions_to_remove = sum(list(TERRITORIES_OF_COUNTRIES.values()), [])
-    # Remove those countries from countries_regions.
-    # NOTE: A more sophisticated approach would be to see what countries are in the data, and, if only subregions
-    #  were given (but not the containing region), then the containing regions should be removed instead. But this
-    #  scenario is unlikely, and would overcomplicate things.
-    countries_regions_without_subregions = remove_regions_from_countries_regions_members(
-        countries_regions=countries_regions, regions_to_remove=subregions_to_remove)
-
-    # Number of attempts to fetch countries regions data.
-    attempts = 5
-    attempt = 0
-    countries_that_must_have_data = None
-    while attempt < attempts:
-        try:
-            # List countries that should present in the data (since they are expected to contribute the most).
-            countries_that_must_have_data = geo.list_countries_in_region_that_must_have_data(
-                region=region,
-                min_frac_individual_population=min_frac_individual_population,
-                min_frac_cumulative_population=min_frac_cumulative_population,
-                reference_year=REFERENCE_YEAR,
-                countries_regions=countries_regions_without_subregions,
-            )
-            break
-        except ConnectionResetError:
-            attempt += 1
-        finally:
-            assert countries_that_must_have_data is not None, "Unable to fetch list of countries that must have data."
-
-    return countries_that_must_have_data
 
 
 def _find_subregions_to_remove_in_aggregation(countries):
@@ -654,33 +615,35 @@ def add_regions(data, aggregations):
     data = data.copy()
     # TODO: This function takes very long, it should be optimised.
 
+    # Load population dataset and countries-regions dataset.
+    population = _load_population()
+    countries_regions = _load_countries_regions()
+
     # Invert dictionary of aggregations to have the aggregation as key, and the list of element codes as value.
     aggregations_inverted = {unique_value: pd.unique([item for item, value in aggregations.items()
                                                       if value == unique_value]).tolist()
                              for unique_value in aggregations.values()}
+
     for region in tqdm(REGIONS_TO_ADD):
-        countries_regions = _load_countries_regions()
         countries_in_region = _list_countries_in_region(region, countries_regions=countries_regions)
-        countries_that_must_have_data = _list_countries_in_region_that_must_have_data(
-            region=region, min_frac_individual_population=REGIONS_TO_ADD[region]["min_frac_individual_population"],
-            min_frac_cumulative_population=REGIONS_TO_ADD[region]["min_frac_cumulative_population"],
-            countries_regions=countries_regions,
-        )
+        region_code = REGIONS_TO_ADD[region]["area_code"]
+        region_population = population[population["country"] == region][["year", "population"]].reset_index(drop=True)
+        region_min_frac_population_with_data = REGIONS_TO_ADD[region]["min_frac_population_with_data"]
         for aggregation in aggregations_inverted:
             # List of element codes for which the same aggregate method (e.g. "sum") will be applied.
             element_codes = aggregations_inverted[aggregation]
 
+            # Select relevant rows in the data.
             data_region = select_data_to_aggregate_without_repeating_subregions(
                 data=data, countries_in_region=countries_in_region, element_codes=element_codes)
 
             if len(data_region) > 0:
                 data_region = dataframes.groupby_agg(
                     df=data_region.dropna(subset="value"), groupby_columns=["year", "item_code", "element_code"],
+                    num_allowed_nans=None, frac_allowed_nans=None,
                     aggregations={
                         "item": "first",
-                        "area_code": lambda x: REGIONS_TO_ADD[region]["area_code"],
                         "value": aggregation,
-                        "country": lambda x: set(countries_that_must_have_data).issubset(set(list(x))),
                         "element": "first",
                         "fao_element": "first",
                         "fao_item": "first",
@@ -695,15 +658,29 @@ def add_regions(data, aggregations):
                     }
                 ).reset_index().dropna(subset="element")
 
-                # Keep only rows for which mandatory countries had data.
-                data_region = data_region[data_region["country"]].reset_index(drop=True)
-                # Replace column used to check if most contributing countries were present by the region's name.
+                # Add total population of the region (for each year) to the relevant data.
+                data_region = pd.merge(data_region, region_population, on="year", how="left")
+
+                # Keep only rows for which we have sufficient data.
+                data_region = data_region[(data_region["population_with_data"] / data_region["population"])
+                                          >= region_min_frac_population_with_data].reset_index(drop=True)
+
+                # Add region's name and area code.
                 data_region["country"] = region
+                data_region["area_code"] = region_code
+
                 # Add data for current region to data.
                 data = dataframes.concatenate([data[data["country"] != region], data_region], ignore_index=True)
 
+        # Check that the fraction of population with data is as high as expected.
+        frac_population = data["population_with_data"] / data["population"]
+        assert frac_population[frac_population.notnull()].min() >= region_min_frac_population_with_data
+
+    # Drop column of total population (we will still keep population_with_data).
+    data = data.drop(columns=["population"])
+
     # Make area_code of category type (it contains integers and strings, and feather does not support object types).
-    data["area_code"] = data["area_code"].astype("str").astype("category")
+    data["area_code"] = data["area_code"].astype(str).astype("category")
 
     # Sort conveniently.
     data = data.sort_values(["country", "year"]).reset_index(drop=True)
@@ -772,7 +749,7 @@ def clean_data(data: pd.DataFrame, items_metadata: pd.DataFrame, elements_metada
     data = remove_duplicates(data=data, index_columns=["area_code", "year", "item_code", "element_code"],
                              verbose=True)
 
-    # Add a column for population; when creating region aggregates, this column will have the population of the countries
+    # Add column for population; when creating region aggregates, this column will have the population of the countries
     # for which there was data. For example, for Europe in a specific year, the population may differ from item to item,
     # because for one item we may have more European countries informed than for the other.
     data = geo.add_population_to_dataframe(df=data, population_col="population_with_data",
