@@ -13,7 +13,7 @@ from dataclasses import dataclass
 import json
 import os
 import pandas as pd
-from typing import Dict, List, cast
+from typing import Dict, List, cast, Optional
 from contextlib import contextmanager
 from collections.abc import Generator
 
@@ -232,6 +232,23 @@ def upsert_table(
         logger.info(f"Upserted {len(table)} datapoints.")
 
         return VariableUpsertResult(db_variable_id, source_id)
+
+
+def fetch_db_checksum(dataset: catalog.Dataset) -> Optional[str]:
+    """
+    Fetch the latest source checksum associated with a given dataset in the db. Can be compared
+    with the current source checksum to determine whether the db is up-to-date.
+    """
+    with open_db() as db:
+        source_checksum = db.fetch_one_or_none(
+            """
+            SELECT sourceChecksum
+            FROM datasets
+            WHERE name=%s
+            """,
+            [dataset.metadata.short_name],
+        )
+        return None if source_checksum is None else source_checksum[0]
 
 
 def cleanup_ghost_variables(dataset_id: int, upserted_variable_ids: List[int]) -> None:
