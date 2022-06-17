@@ -54,7 +54,10 @@ class VariableUpsertResult:
 
 
 def upsert_dataset(
-    dataset: catalog.Dataset, namespace: str, sources: List[catalog.meta.Source]
+    dataset: catalog.Dataset,
+    namespace: str,
+    sources: List[catalog.meta.Source],
+    source_checksum: str,
 ) -> DatasetUpsertResult:
     utils.validate_underscore(dataset.metadata.short_name, "Dataset's short_name")
 
@@ -78,6 +81,7 @@ def upsert_dataset(
             dataset.metadata.short_name,
             namespace,
             int(cast(str, config.GRAPHER_USER_ID)),
+            source_checksum=source_checksum,
             description=dataset.metadata.description or "",
         )
 

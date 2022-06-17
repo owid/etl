@@ -73,7 +73,7 @@ def main(
 
     # Add all steps for backporting datasets (there are currently >800 of them)
     if backport:
-        dag.update(_backporting_steps())
+        dag.update(_backporting_steps(private))
 
     excludes = exclude.split(",") if exclude else []
 
@@ -167,17 +167,23 @@ def _is_private_step(step_name: str) -> bool:
     return bool(re.findall(r".*?-private://", step_name))
 
 
-def _backporting_steps() -> DAG:
+def _backporting_steps(private: bool) -> DAG:
     """Return a DAG of steps for backporting datasets."""
     dag: DAG = {}
 
     # load all backported datasets from walden
     for ds in WaldenCatalog().find(namespace=WALDEN_NAMESPACE):
+
+        # skip private backported steps
+        if not private and not ds.is_public:
+            continue
+
         # two files are generated for each dataset, skip one
         if ds.short_name.endswith("_values"):
+            short_name = ds.short_name.removesuffix("_values")
+
             private_suffix = "" if ds.is_public else "-private"
 
-            short_name = ds.short_name.removesuffix("_values")
             dag[f"backport{private_suffix}://backport/owid/latest/{short_name}"] = {
                 f"walden{private_suffix}://{ds.namespace}/latest/{short_name}_values",
                 f"walden{private_suffix}://{ds.namespace}/latest/{short_name}_config",

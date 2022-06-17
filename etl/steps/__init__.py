@@ -597,7 +597,10 @@ class GrapherStep(Step):
         # data steps
         dataset = step_module.get_grapher_dataset()  # type: ignore
         dataset_upsert_results = upsert_dataset(
-            dataset, dataset.metadata.namespace, dataset.metadata.sources
+            dataset,
+            dataset.metadata.namespace,
+            dataset.metadata.sources,
+            self.checksum_input(),
         )
         variable_upsert_results = [
             upsert_table(table, dataset_upsert_results)

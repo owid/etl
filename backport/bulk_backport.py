@@ -1,9 +1,12 @@
+import re
+
 import click
 import pandas as pd
 import structlog
 from owid.catalog.utils import underscore
 
 from etl.db import get_engine
+from etl.steps import load_dag
 
 from .backport import backport
 
@@ -40,6 +43,12 @@ def bulk_backport(
 ) -> None:
     engine = get_engine()
 
+    dag_backported_ids = _backported_ids_in_dag()
+
+    # NOTE: pd.read_sql needs at least one value in a list, use arbitrary 0
+    if not dag_backported_ids:
+        dag_backported_ids = [0]
+
     q = """
     select
         id, name, dataEditedAt, metadataEditedAt, isPrivate
@@ -47,15 +56,20 @@ def bulk_backport(
     where id in (
         select distinct v.datasetId from chart_dimensions as cd
         join variables as v on cd.variableId = v.id
-    )
+    ) or id in %(dataset_ids)s
     order by rand()
     limit %(limit)s
     """
+
     # ignore limit if using dataset ids
     if dataset_ids:
         limit = 1000000
 
-    df = pd.read_sql(q, engine, params={"limit": limit})
+    df = pd.read_sql(
+        q,
+        engine,
+        params={"limit": limit, "dataset_ids": dag_backported_ids},
+    )
 
     if dataset_ids:
         df = df[df.id.isin(dataset_ids)]
@@ -81,6 +95,22 @@ def bulk_backport(
         )
 
     log.info("bulk_backport.finished")
+
+
+def _backported_ids_in_dag() -> list[int]:
+    """Get all backported dataset ids used in DAG. This is helpful if someone uses backported
+    dataset without any charts."""
+    dag = load_dag()
+
+    all_steps = list(dag.keys()) + [x for vals in dag.values() for x in vals]
+
+    out = set()
+    for s in all_steps:
+        match = re.search(r"backport\/owid\/latest\/dataset_(\d+)_", s)
+        if match:
+            out.add(int(match.group(1)))
+
+    return list(out)
 
 
 if __name__ == "__main__":
