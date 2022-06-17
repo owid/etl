@@ -5,7 +5,7 @@ from click.testing import CliRunner
 from etl.prune import prune
 
 
-def test_hello_world(tmp_path: Path) -> None:
+def test_prune(tmp_path: Path) -> None:
     # create dag file
     dag_file = tmp_path / "dag.yml"
     dag_file.write_text("steps:\n  data://garden/owid/latest/covid:")
