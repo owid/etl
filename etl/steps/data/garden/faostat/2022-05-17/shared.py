@@ -504,7 +504,7 @@ def add_custom_names_and_descriptions(data, items_metadata, elements_metadata):
 
     data = pd.merge(data.rename(columns={"element": "fao_element", "unit": "fao_unit"}),
                     elements_metadata[['element_code', 'owid_element', 'owid_unit', 'owid_unit_factor',
-                                       'owid_element_description', 'owid_unit_short_name']],
+                                       'owid_element_description', 'owid_unit_short_name', 'owid_unit_per_capita']],
                     on=["element_code"], how="left")
     assert len(data) == _expected_n_rows, f"Something went wrong when merging data with elements metadata."
 
@@ -688,6 +688,104 @@ def add_regions(data, aggregations):
     return data
 
 
+def add_fao_population_if_given(data):
+    # Select rows that correspond to FAO population.
+    fao_population_item_name = "Population"
+    fao_population_element_name = "Total Population - Both sexes"
+    population_rows_mask = (data["fao_item"] == fao_population_item_name) &\
+                           (data["fao_element"] == fao_population_element_name)
+    if len(population_rows_mask) > 0:
+        data = data.copy()
+
+        fao_population = data[population_rows_mask].reset_index(drop=True)
+
+        # Check that population is given in "1000 persons" and convert to persons.
+        assert fao_population["unit"].unique().tolist() == ["1000 persons"], "FAO population may have changed units."
+        fao_population["value"] *= 1000
+
+        # Note: Here we will dismiss the flags related to population. But they are only relevant for those columns
+        # that were given as per capita variables.
+        fao_population = fao_population[["area_code", "year", "value"]].drop_duplicates().\
+            dropna(how="any").rename(columns={"value": "fao_population"})
+
+        # Add FAO population as a new column in data.
+        data = pd.merge(data, fao_population, how="left", on=["area_code", "year"])
+
+    return data
+
+
+def convert_variables_given_per_capita_to_total_value(data, elements_metadata):
+    # Select element codes that need to be converted from per capita to total values.
+    # This selection is done in the custom_elements_and_units.csv file: any row with a not empty value for
+    # "per_capita_to_total_added_element_description" will be converted.
+    element_codes_to_convert = elements_metadata[elements_metadata["per_capita_to_total_added_element_description"].
+                                                 notnull()]["element_code"].tolist()
+
+    if (len(element_codes_to_convert) > 0):
+        data = data.copy()
+
+        assert "fao_population" in data.columns, "fao_population not found, maybe it changed item, element."
+
+        # Select variables that were given as per capita variables in the original data and that need to be converted.
+        per_capita_mask = data["element_code"].isin(element_codes_to_convert)
+
+        # Multiply them by the FAO population to convert them into total value.
+        data.loc[per_capita_mask, "value"] = data[per_capita_mask]["value"] * data[per_capita_mask]["fao_population"]
+
+        elements_converted = data[per_capita_mask]["fao_element"].unique().tolist()
+        print(f"{len(elements_converted)} elements converted from per-capita to total values: {elements_converted}")
+
+        # Include an additional description to all elements that were converted from per capita to total variables.
+        added_element_description = elements_metadata[elements_metadata["per_capita_to_total_added_element_description"].notnull()][["element_code", "per_capita_to_total_added_element_description"]].astype(str)
+        data = pd.merge(data, added_element_description, how="left", on="element_code")
+        data["element_description"] = pd.Series([description for description in data["element_description"]])
+        data.loc[per_capita_mask, "element_description"] = (data[per_capita_mask]["element_description"].fillna("") + " " +
+                     data[per_capita_mask]["per_capita_to_total_added_element_description"]).str.lstrip()
+        data["element_description"] = data["element_description"].astype("category")
+
+        # Drop unnecessary columns.
+        data = data.drop(columns=["per_capita_to_total_added_element_description"])
+
+    return data
+
+
+def add_per_capita_variables(data):
+    # TODO: Add per capita variables. Do it with FAO population for *(FAO) entities, and with OWID population for others.
+
+    # TODO: Define and move to top.
+    WAS_PER_CAPITA_ADDED_ELEMENT_DESCRIPTION = "Originally given per-capita, and converted into total figures by multiplying by population (given by FAO)."
+    NEW_FAO_PER_CAPITA_ADDED_ELEMENT_DESCRIPTION = ""
+    NEW_OWID_PER_CAPITA_ADDED_ELEMENT_DESCRIPTION = ""
+
+    # Make unit a string instead of categorical variable (since we will edit their values).
+    data["unit"] = [unit for unit in data["unit"]]
+    data["element_description"] = [unit for unit in data["element_description"]]
+
+    per_capita_data = data[data["unit_per_capita"].notnull()].reset_index(drop=True)
+
+    if "fao_population" in per_capita_data.columns:
+        fao_regions_mask = (per_capita_data["country"].str.contains("(FAO)", regex=False)) &\
+            (per_capita_data["fao_population"].notnull())
+
+    # TODO: Add description to FAO per capita and OWID per capita.
+
+    per_capita_data.loc[fao_regions_mask, "value"] = per_capita_data[fao_regions_mask]["value"] / per_capita_data[fao_regions_mask]["fao_population"]
+
+    owid_regions_mask = (~per_capita_data["country"].str.contains("(FAO)", regex=False)) &\
+        (per_capita_data["population_with_data"].notnull())
+
+    per_capita_data.loc[owid_regions_mask, "value"] = per_capita_data[owid_regions_mask]["value"] / per_capita_data[owid_regions_mask]["population_with_data"]
+
+    per_capita_data["unit"] = per_capita_data["unit_per_capita"]
+
+    # TODO: Continue here with descriptions.
+
+    # Add new rows with per capita variables to data.
+    data = pd.concat([data, per_capita_data], ignore_index=True).reset_index(drop=True)
+
+    return data
+
+
 def clean_data(data: pd.DataFrame, items_metadata: pd.DataFrame, elements_metadata: pd.DataFrame,
                countries_file: Path) -> pd.DataFrame:
     """Process data (including harmonization of countries and regions) and prepare it for new garden dataset.
@@ -731,7 +829,14 @@ def clean_data(data: pd.DataFrame, items_metadata: pd.DataFrame, elements_metada
     data = remove_rows_with_nan_value(data)
 
     # Use custom names for items, elements and units (and keep original names in "fao_*" columns).
-    data = add_custom_names_and_descriptions(data, items_metadata, elements_metadata)
+    data = add_custom_names_and_descriptions(data, items_metadata, elements_metadata)    
+
+    # Add FAO population as an additional column (if given in the original data).
+    data = add_fao_population_if_given(data)
+
+    # Select variables that were originally given as per capita variables (if any), and, if FAO population is given,
+    # make them total variables instead of per capita.
+    data = convert_variables_given_per_capita_to_total_value(data, elements_metadata)
 
     # Harmonize country names.
     assert countries_file.is_file(), "countries file not found."
@@ -764,6 +869,8 @@ def clean_data(data: pd.DataFrame, items_metadata: pd.DataFrame, elements_metada
         # Add data for regions.
         data = add_regions(data=data, aggregations=aggregations)
         check_that_countries_are_well_defined(data)
+
+    # TODO: Add per capita variables here.
 
     return data
 
