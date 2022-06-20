@@ -53,10 +53,18 @@ def bulk_backport(
     select
         id, name, dataEditedAt, metadataEditedAt, isPrivate
     from datasets
-    where id in (
-        select distinct v.datasetId from chart_dimensions as cd
-        join variables as v on cd.variableId = v.id
-    ) or id in %(dataset_ids)s
+    where
+    (
+        -- must be used in at least one chart
+        id in (
+            select distinct v.datasetId from chart_dimensions as cd
+            join variables as v on cd.variableId = v.id
+        )
+        -- or be used in DAG
+        or id in %(dataset_ids)s
+    )
+    -- and must not come from ETL
+    and sourceChecksum is null
     order by rand()
     limit %(limit)s
     """
