@@ -623,7 +623,7 @@ def add_regions(data, aggregations):
     aggregations_inverted = {unique_value: pd.unique([item for item, value in aggregations.items()
                                                       if value == unique_value]).tolist()
                              for unique_value in aggregations.values()}
-
+                             
     for region in tqdm(REGIONS_TO_ADD):
         countries_in_region = _list_countries_in_region(region, countries_regions=countries_regions)
         region_code = REGIONS_TO_ADD[region]["area_code"]
@@ -638,21 +638,23 @@ def add_regions(data, aggregations):
                 data=data, countries_in_region=countries_in_region, element_codes=element_codes)
 
             if len(data_region) > 0:
+                # NOTE: using columns in groupby is faster than using `first`
                 data_region = dataframes.groupby_agg(
-                    df=data_region.dropna(subset="value"), groupby_columns=["year", "item_code", "element_code"],
+                    df=data_region.dropna(subset="value"), groupby_columns=[
+                        "year", "item_code", "element_code",
+                        "item",
+                        "element",
+                        "fao_element",
+                        "fao_item",
+                        "item_description",
+                        "unit",
+                        "unit_short_name",
+                        "unit_factor",
+                        "fao_unit",
+                        "element_description"],
                     num_allowed_nans=None, frac_allowed_nans=None,
                     aggregations={
-                        "item": "first",
                         "value": aggregation,
-                        "element": "first",
-                        "fao_element": "first",
-                        "fao_item": "first",
-                        "item_description": "first",
-                        "unit": "first",
-                        "unit_short_name": "first",
-                        "unit_factor": "first",
-                        "fao_unit": "first",
-                        "element_description": "first",
                         "flag": lambda x: x if len(x) == 1 else FLAG_MULTIPLE_FLAGS,
                         "population_with_data": "sum",
                     }
@@ -769,21 +771,12 @@ def clean_data(data: pd.DataFrame, items_metadata: pd.DataFrame, elements_metada
 
 
 def optimize_table_dtypes(table):
-    table = table.copy()
-
-    # Find optimal dtypes.
-    optimal_dtypes = catalog.frames.repack_frame(table).dtypes.apply(lambda x: x.name).to_dict()
-
-    # Ensure codes are kept as category (and not as int).
-    optimal_dtypes["area_code"] = "category"
-    optimal_dtypes["item_code"] = "category"
-    optimal_dtypes["element_code"] = "category"
-
-    for column in table.columns:
-        if table[column].dtype != optimal_dtypes[column]:
-            table[column] = table[column].astype(optimal_dtypes[column])
-
-    return table
+    dtypes = {
+        c: "category" for c in ["area_code", "item_code", "element_code"] if c in table.columns
+    }
+    # NOTE: setting `.astype` in a loop over columns is slow, it is better to use
+    # map all columns at once or call `repack_frame` with dtypes arg
+    return catalog.frames.repack_frame(table, dtypes=dtypes)
 
 
 def prepare_long_table(data: pd.DataFrame):
@@ -901,8 +894,7 @@ def prepare_wide_table(data: pd.DataFrame, dataset_title: str) -> catalog.Table:
 
     # Make all column names snake_case.
     # TODO: Add vertical bar to utils.underscore_table. When done, there will be no need to rename columns.
-    wide_table = catalog.utils.underscore_table(
-        wide_table.rename(columns={column: column.replace("|", "_") for column in wide_table.columns}))
+    wide_table = catalog.utils.underscore_table(wide_table)
 
     return wide_table
 
