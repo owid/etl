@@ -322,6 +322,12 @@ def clean_global_elements_dataframe(elements_df: pd.DataFrame, custom_elements: 
     elements_df["owid_unit_short_name"] = elements_df["owid_unit_short_name"].\
         fillna(elements_df["fao_unit_short_name"])
 
+    # Assume variables were not per capita, if was_per_capita is not informed, and make boolean.
+    elements_df["was_per_capita"] = elements_df["was_per_capita"].fillna("0").replace({"0": False, "1": True})
+
+    # Idem for variables to make per capita.
+    elements_df["make_per_capita"] = elements_df["make_per_capita"].fillna("0").replace({"0": False, "1": True})
+
     # Check that we have not introduced ambiguities when assigning custom element or unit names.
     n_owid_elements_per_element_code = elements_df.groupby(["dataset", "element_code"])["owid_element"].\
         transform("nunique")

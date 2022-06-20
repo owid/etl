@@ -131,6 +131,11 @@ REGIONS_TO_ADD = {
     },
 }
 
+# TODO: Describe and review.
+WAS_PER_CAPITA_ADDED_ELEMENT_DESCRIPTION = "Originally given per-capita, and converted into total figures by multiplying by population (given by FAO)."
+NEW_FAO_PER_CAPITA_ADDED_ELEMENT_DESCRIPTION = "Per-capita values are obtained by dividing the original values by the population provided by FAO."
+NEW_OWID_PER_CAPITA_ADDED_ELEMENT_DESCRIPTION = "Per-capita values are obtained by dividing the original values by OWID's population dataset."
+
 # When creating region aggregates, we need to ignore regions that are historical (i.e. they do not exist today as
 # countries) or are geographical regions (instead of countries). We ignore them to avoid the risk of counting the
 # contribution of certain countries twice.
@@ -504,7 +509,7 @@ def add_custom_names_and_descriptions(data, items_metadata, elements_metadata):
 
     data = pd.merge(data.rename(columns={"element": "fao_element", "unit": "fao_unit"}),
                     elements_metadata[['element_code', 'owid_element', 'owid_unit', 'owid_unit_factor',
-                                       'owid_element_description', 'owid_unit_short_name', 'owid_unit_per_capita']],
+                                       'owid_element_description', 'owid_unit_short_name']],
                     on=["element_code"], how="left")
     assert len(data) == _expected_n_rows, f"Something went wrong when merging data with elements metadata."
 
@@ -613,7 +618,6 @@ def select_data_to_aggregate_without_repeating_subregions(data, countries_in_reg
 
 def add_regions(data, aggregations):
     data = data.copy()
-    # TODO: This function takes very long, it should be optimised.
 
     # Load population dataset and countries-regions dataset.
     population = _load_population()
@@ -720,8 +724,7 @@ def convert_variables_given_per_capita_to_total_value(data, elements_metadata):
     # Select element codes that need to be converted from per capita to total values.
     # This selection is done in the custom_elements_and_units.csv file: any row with a not empty value for
     # "per_capita_to_total_added_element_description" will be converted.
-    element_codes_to_convert = elements_metadata[elements_metadata["per_capita_to_total_added_element_description"].
-                                                 notnull()]["element_code"].tolist()
+    element_codes_to_convert = elements_metadata[elements_metadata["was_per_capita"]]["element_code"].unique().tolist()
 
     if (len(element_codes_to_convert) > 0):
         data = data.copy()
@@ -738,52 +741,51 @@ def convert_variables_given_per_capita_to_total_value(data, elements_metadata):
         print(f"{len(elements_converted)} elements converted from per-capita to total values: {elements_converted}")
 
         # Include an additional description to all elements that were converted from per capita to total variables.
-        added_element_description = elements_metadata[elements_metadata["per_capita_to_total_added_element_description"].notnull()][["element_code", "per_capita_to_total_added_element_description"]].astype(str)
-        data = pd.merge(data, added_element_description, how="left", on="element_code")
+        data.loc[per_capita_mask, "element_description"]
         data["element_description"] = pd.Series([description for description in data["element_description"]])
-        data.loc[per_capita_mask, "element_description"] = (data[per_capita_mask]["element_description"].fillna("") + " " +
-                     data[per_capita_mask]["per_capita_to_total_added_element_description"]).str.lstrip()
+        data.loc[per_capita_mask, "element_description"] = (data[per_capita_mask]["element_description"].fillna("") +
+            " " + WAS_PER_CAPITA_ADDED_ELEMENT_DESCRIPTION).str.lstrip()
         data["element_description"] = data["element_description"].astype("category")
-
-        # Drop unnecessary columns.
-        data = data.drop(columns=["per_capita_to_total_added_element_description"])
 
     return data
 
 
-def add_per_capita_variables(data):
-    # TODO: Add per capita variables. Do it with FAO population for *(FAO) entities, and with OWID population for others.
+def add_per_capita_variables(data, elements_metadata):
 
-    # TODO: Define and move to top.
-    WAS_PER_CAPITA_ADDED_ELEMENT_DESCRIPTION = "Originally given per-capita, and converted into total figures by multiplying by population (given by FAO)."
-    NEW_FAO_PER_CAPITA_ADDED_ELEMENT_DESCRIPTION = ""
-    NEW_OWID_PER_CAPITA_ADDED_ELEMENT_DESCRIPTION = ""
-
-    # Make unit a string instead of categorical variable (since we will edit their values).
+    # Make columns string instead of categorical (since their values will be edited).
     data["unit"] = [unit for unit in data["unit"]]
     data["element_description"] = [unit for unit in data["element_description"]]
 
-    per_capita_data = data[data["unit_per_capita"].notnull()].reset_index(drop=True)
+    # Find element codes that have to be made per capita.
+    per_capita_element_codes = elements_metadata[elements_metadata["make_per_capita"]]["element_code"].unique().tolist()
 
+    per_capita_data = data[data["element_code"].isin(per_capita_element_codes)].reset_index(drop=True)
+
+    fao_regions_mask = (per_capita_data["country"].str.contains("(FAO)", regex=False))
     if "fao_population" in per_capita_data.columns:
-        fao_regions_mask = (per_capita_data["country"].str.contains("(FAO)", regex=False)) &\
-            (per_capita_data["fao_population"].notnull())
+        per_capita_data.loc[fao_regions_mask, "value"] = per_capita_data[fao_regions_mask]["value"] /\
+            per_capita_data[fao_regions_mask]["fao_population"]
+        # Include an additional note in the description on affected elements.
+        per_capita_data.loc[fao_regions_mask, "element_description"] = (per_capita_data["element_description"] + " " +\
+            NEW_FAO_PER_CAPITA_ADDED_ELEMENT_DESCRIPTION).str.lstrip()
 
-    # TODO: Add description to FAO per capita and OWID per capita.
+    # Add per capita values to all other regions that are not FAO regions.
+    owid_regions_mask = ~fao_regions_mask
+    per_capita_data.loc[owid_regions_mask, "value"] = per_capita_data[owid_regions_mask]["value"] /\
+        per_capita_data[owid_regions_mask]["population_with_data"]
+    # Include an additional note in the description on affected elements.
+    per_capita_data.loc[fao_regions_mask, "element_description"] = (per_capita_data["element_description"] + " " +\
+        NEW_OWID_PER_CAPITA_ADDED_ELEMENT_DESCRIPTION).str.lstrip()
 
-    per_capita_data.loc[fao_regions_mask, "value"] = per_capita_data[fao_regions_mask]["value"] / per_capita_data[fao_regions_mask]["fao_population"]
-
-    owid_regions_mask = (~per_capita_data["country"].str.contains("(FAO)", regex=False)) &\
-        (per_capita_data["population_with_data"].notnull())
-
-    per_capita_data.loc[owid_regions_mask, "value"] = per_capita_data[owid_regions_mask]["value"] / per_capita_data[owid_regions_mask]["population_with_data"]
-
-    per_capita_data["unit"] = per_capita_data["unit_per_capita"]
-
-    # TODO: Continue here with descriptions.
+    # Add "per capita" to all units.
+    per_capita_data["unit"] = per_capita_data["unit"] + " per capita"
 
     # Add new rows with per capita variables to data.
     data = pd.concat([data, per_capita_data], ignore_index=True).reset_index(drop=True)
+
+    # Make categorical columns again.
+    data["unit"] = data["unit"].astype("category")
+    data["element_description"] = data["element_description"].astype("category")
 
     return data
 
@@ -872,7 +874,8 @@ def clean_data(data: pd.DataFrame, items_metadata: pd.DataFrame, elements_metada
         data = add_regions(data=data, aggregations=aggregations)
         check_that_countries_are_well_defined(data)
 
-    # TODO: Add per capita variables here.
+    # Add per-capita variables.
+    data = add_per_capita_variables(data, elements_metadata)
 
     return data
 
@@ -1006,7 +1009,7 @@ def prepare_wide_table(data: pd.DataFrame, dataset_title: str) -> catalog.Table:
     return wide_table
 
 
-def run(dest_dir: str) -> None:
+def run(dest_dir: str) -> None:    
     ####################################################################################################################
     # Common definitions.
     ####################################################################################################################
