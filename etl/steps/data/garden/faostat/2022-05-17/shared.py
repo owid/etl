@@ -626,7 +626,7 @@ def add_regions(data, aggregations):
     aggregations_inverted = {unique_value: pd.unique([item for item, value in aggregations.items()
                                                       if value == unique_value]).tolist()
                              for unique_value in aggregations.values()}
-                             
+
     for region in tqdm(REGIONS_TO_ADD):
         countries_in_region = _list_countries_in_region(region, countries_regions=countries_regions)
         region_code = REGIONS_TO_ADD[region]["area_code"]
@@ -788,11 +788,14 @@ def add_per_capita_variables(data, elements_metadata):
     per_capita_data.loc[owid_regions_mask, "value"] = per_capita_data[owid_regions_mask]["value"] /\
         per_capita_data[owid_regions_mask]["population_with_data"]
 
+    # Remove nans (which may have been created because of missing FAO population).
+    per_capita_data = per_capita_data.dropna(subset="value").reset_index(drop=True)
+
     # Add "per capita" to all units.
     per_capita_data["unit"] = per_capita_data["unit"] + " per capita"
     # Include an additional note in the description on affected elements.
-    per_capita_data["element_description"] = (per_capita_data["element_description"] + " " +\
-        NEW_PER_CAPITA_ADDED_ELEMENT_DESCRIPTION).str.lstrip()
+    per_capita_data["element_description"] = (per_capita_data["element_description"] + " " +
+                                              NEW_PER_CAPITA_ADDED_ELEMENT_DESCRIPTION).str.lstrip()
     # Add new rows with per capita variables to data.
     data = pd.concat([data, per_capita_data], ignore_index=True).reset_index(drop=True)
 
@@ -827,8 +830,10 @@ def clean_data(data: pd.DataFrame, items_metadata: pd.DataFrame, elements_metada
     """
     data = data.copy()
 
-    # Ensure column of values is numeric (transform any possible value like "<1" into a nan).
-    data["value"] = pd.to_numeric(data["value"], errors="coerce")
+    # Ensure column of values is float.
+    # Note: Int64 would also work, but when dividing by a float, it changes to Float64 dtype, which, for some reason,
+    # makes nans undetectable (i.e. .isnull() does not detect nans and .dropna() does not drop nans).
+    data["value"] = data["value"].astype(float)
 
     # Convert nan flags into "official" (to avoid issues later on when dealing with flags).
     data["flag"] = pd.Series([flag if not pd.isnull(flag) else FLAG_OFFICIAL_DATA
