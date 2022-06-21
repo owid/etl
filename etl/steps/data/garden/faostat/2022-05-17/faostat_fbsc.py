@@ -13,6 +13,7 @@ https://fenixservices.fao.org/faostat/static/documents/FBS/New%20FBS%20methodolo
 from copy import deepcopy
 
 import pandas as pd
+import structlog
 from owid import catalog
 from owid.catalog.meta import DatasetMeta, TableMeta
 from owid.datautils import dataframes
@@ -39,6 +40,8 @@ DATASET_TITLE = f"Food Balances (old methodology before {FBS_FIRST_YEAR}, and ne
 COUNTRIES_FILE = (
     STEP_DIR / "data" / "garden" / NAMESPACE / VERSION / f"{NAMESPACE}.countries.json"
 )
+
+log = structlog.get_logger()
 
 
 def combine_fbsh_and_fbs_datasets(
@@ -96,7 +99,7 @@ def combine_fbsh_and_fbs_datasets(
 def _assert_df_size(df: pd.DataFrame, size_mb: float) -> None:
     """Check that dataframe is smaller than given size to prevent OOM errors."""
     real_size_mb = df.memory_usage(deep=True).sum() / 1e6
-    assert real_size_mb / 1e6 <= size_mb, f'DataFrame size is too big: {real_size_mb} MB > {size_mb} MB'
+    assert real_size_mb <= size_mb, f'DataFrame size is too big: {real_size_mb} MB > {size_mb} MB'
 
 
 def run(dest_dir: str) -> None:
@@ -118,6 +121,7 @@ def run(dest_dir: str) -> None:
     ####################################################################################################################
 
     # Load fbsh and fbs.
+    log.info("faostat_fbsc.loading_datasets")
     fbsh_dataset = catalog.Dataset(fbsh_file)
     fbs_dataset = catalog.Dataset(fbs_file)
 
@@ -137,27 +141,36 @@ def run(dest_dir: str) -> None:
     ####################################################################################################################
 
     # Combine fbsh and fbs datasets.
+    log.info("faostat_fbsc.combine_fbsh_and_fbs_datasets", fbsh_shape=fbsh_dataset["faostat_fbsh"].shape, fbs_shape=fbs_dataset["faostat_fbs"].shape)
     fbsc = combine_fbsh_and_fbs_datasets(fbsh_dataset, fbs_dataset)
 
-    _assert_df_size(fbsc, 1000)
+    _assert_df_size(fbsc, 2000)
 
     # Clean data.
     data = clean_data(data=fbsc, items_metadata=items_metadata, elements_metadata=elements_metadata,
                       countries_file=COUNTRIES_FILE)
 
-    _assert_df_size(data, 1000)
+    # Avoid objects as they would explode memory, use categoricals instead.
+    for col in data.columns:
+        assert data[col].dtype != object, f'Column {col} should not have object type'
+
+    _assert_df_size(data, 2000)
 
     # Create a long table (with item code and element code as part of the index).
+    log.info("faostat_fbsc.prepare_long_table", shape=data.shape)
     data_table_long = prepare_long_table(data=data)
 
-    _assert_df_size(data_table_long, 1000)
+    _assert_df_size(data_table_long, 2000)
 
     # Create a wide table (with only country and year as index).
+    log.info("faostat_fbsc.prepare_wide_table", shape=data.shape)
     data_table_wide = prepare_wide_table(data=data, dataset_title=datasets_metadata["owid_dataset_title"].item())
 
     ####################################################################################################################
     # Prepare outputs.
     ####################################################################################################################
+
+    log.info("faostat_fbsc.prepare_outputs")
 
     # Initialize new garden dataset.
     dataset_garden = catalog.Dataset.create_empty(dest_dir)
