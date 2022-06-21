@@ -34,17 +34,36 @@ We use `poetry` to manage the virtual environment for the project, and you'll ty
 
 To run all the checks and make sure you have everything set up correctly, try
 
-`make test`
+```
+make test
+```
 
-You can build all known data tables into the `data/` folder with:
+To run a subset of examples, you can try (for example)
 
-`make etl`
+```
+poetry run etl covid
+```
 
-However, processing all the datasets will take a long time! So to run a subset of examples, you can try (for example)
+or
 
-`etl examples`
+```
+poetry run etl examples
+```
 
-*Note*: this is from within the virtual environment (`poetry shell`). You can also run such commands from outside the venv, using `poetry run` (so for this example, `poetry run etl examples`).
+These will generate files in `./data` directory according to their recipes in `./etl/steps` (with their dependencies defined in `dag.yml`).
+
+Scripts in `./etl/steps/data/examples/examples/latest` showcase basic functionality and can help you get started (mainly `script_example.py`).
+
+You can also build all known data tables into the `data/` folder with:
+
+```
+poetry run etl
+```
+
+However, processing all the datasets will take a long time and memory.
+
+*Note*: `poetry run` runs commands from within the virtual environment. You can also activate it with `poetry shell` and then simply run `etl ...`.
+
 
 ## Reporting problems
 

@@ -1,15 +1,17 @@
-import pandas as pd
+from typing import cast
 
-from owid.walden import Catalog
+import pandas as pd
 from owid.catalog import Dataset, Table
+from owid.walden import Catalog as WaldenCatalog
+
 from etl.paths import DATA_DIR, REFERENCE_DATASET
 
 
 def load_wb_income() -> pd.DataFrame:
     """Load WB income groups dataset from walden."""
-    walden_ds = Catalog().find_one("wb", "2021-07-01", "wb_income")
+    walden_ds = WaldenCatalog().find_one("wb", "2021-07-01", "wb_income")
     local_path = walden_ds.ensure_downloaded()
-    return pd.read_excel(local_path)
+    return cast(pd.DataFrame, pd.read_excel(local_path))
 
 
 def run(dest_dir: str) -> None:
@@ -20,10 +22,14 @@ def run(dest_dir: str) -> None:
     countries_regions = reference_dataset["countries_regions"]
     df["country"] = df.Code.map(countries_regions.name)
 
-    # Add population
-    indicators = Dataset(DATA_DIR / "garden/owid/latest/key_indicators")
-    population = indicators["population"]["population"].xs(2022, level="year")
+    # NOTE: For simplicity we are loading population from Maddison, but in practive
+    # you would load it from `garden/owid/latest/key_indicators`, i.e.
+    # indicators = Dataset(DATA_DIR / "garden/owid/latest/key_indicators")
+    # population = indicators["population"]["population"].xs(2022, level="year")
 
+    # Add population
+    maddison = Dataset(DATA_DIR / "garden/ggdc/2020-10-01/ggdc_maddison")
+    population = maddison["maddison_gdp"]["population"].xs(2018, level="year")
     df["population"] = df.country.map(population)
 
     df = df.reset_index().rename(
