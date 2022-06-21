@@ -22,6 +22,7 @@ from copy import deepcopy
 from pathlib import Path
 from typing import List, cast
 
+import structlog
 import numpy as np
 import pandas as pd
 from owid import catalog
@@ -30,6 +31,7 @@ from tqdm.auto import tqdm
 
 from etl.paths import DATA_DIR, STEP_DIR
 
+log = structlog.get_logger()
 
 NAMESPACE = Path(__file__).parent.parent.name
 VERSION = Path(__file__).parent.name
@@ -674,6 +676,12 @@ def add_regions(data, aggregations):
                 data_region["country"] = region
                 data_region["area_code"] = region_code
 
+                # Use category type which is more efficient than using strings
+                data_region = data_region.astype({
+                    "flag": "category",
+                    "country": "category",
+                })
+
                 # Add data for current region to data.
                 data = dataframes.concatenate([data[data["country"] != region], data_region], ignore_index=True)
 
@@ -698,7 +706,7 @@ def add_fao_population_if_given(data):
     fao_population_item_name = "Population"
     fao_population_element_name = "Total Population - Both sexes"
     population_rows_mask = (data["fao_item"] == fao_population_item_name) &\
-                           (data["fao_element"] == fao_population_element_name)    
+                           (data["fao_element"] == fao_population_element_name)
 
     if population_rows_mask.any():
         data = data.copy()
@@ -753,11 +761,6 @@ def convert_variables_given_per_capita_to_total_value(data, elements_metadata):
 def add_per_capita_variables(data, elements_metadata):
     data = data.copy()
 
-    # Make columns string instead of categorical (since their values will be edited).
-    data["unit"] = [unit for unit in data["unit"]]
-    data["element_description"] = [unit for unit in data["element_description"]]
-    data["element_code"] = [element_code for element_code in data["element_code"]]
-
     # Find element codes that have to be made per capita.
     per_capita_element_codes = elements_metadata[elements_metadata["make_per_capita"]]["element_code"].unique().tolist()
 
@@ -765,8 +768,9 @@ def add_per_capita_variables(data, elements_metadata):
     per_capita_data = data[data["element_code"].isin(per_capita_element_codes)].reset_index(drop=True)
 
     # Change element codes of per capita variables.
-    per_capita_data["element_code"] = [(element_code.lstrip("0") + "pc").zfill(N_CHARACTERS_ELEMENT_CODE)
-                                       for element_code in per_capita_data["element_code"]]
+    per_capita_data["element_code"] = per_capita_data["element_code"].cat.rename_categories(
+        lambda c: (c.lstrip("0") + "pc").zfill(N_CHARACTERS_ELEMENT_CODE)
+    )
 
     # Create a mask that selects FAO regions (regions that, in the countries.json file, were not harmonized, and
     # have '(FAO)' at the end of the name).
@@ -792,17 +796,15 @@ def add_per_capita_variables(data, elements_metadata):
     per_capita_data = per_capita_data.dropna(subset="value").reset_index(drop=True)
 
     # Add "per capita" to all units.
-    per_capita_data["unit"] = per_capita_data["unit"] + " per capita"
+    per_capita_data["unit"] = per_capita_data["unit"].cat.rename_categories(
+        lambda c: f"{c} per capita"
+    )
     # Include an additional note in the description on affected elements.
-    per_capita_data["element_description"] = (per_capita_data["element_description"] + " " +
-                                              NEW_PER_CAPITA_ADDED_ELEMENT_DESCRIPTION).str.lstrip()
+    per_capita_data["element_description"] = per_capita_data["element_description"].cat.rename_categories(
+        lambda c: f"{c} {NEW_PER_CAPITA_ADDED_ELEMENT_DESCRIPTION}"
+    )
     # Add new rows with per capita variables to data.
-    data = pd.concat([data, per_capita_data], ignore_index=True).reset_index(drop=True)
-
-    # Make categorical columns again.
-    data["unit"] = data["unit"].astype("category")
-    data["element_description"] = data["element_description"].astype("category")
-    data["element_code"] = data["element_code"].astype("category")
+    data = dataframes.concatenate([data, per_capita_data], ignore_index=True).reset_index(drop=True)
 
     return data
 
@@ -852,7 +854,7 @@ def clean_data(data: pd.DataFrame, items_metadata: pd.DataFrame, elements_metada
     data = remove_rows_with_nan_value(data)
 
     # Use custom names for items, elements and units (and keep original names in "fao_*" columns).
-    data = add_custom_names_and_descriptions(data, items_metadata, elements_metadata)    
+    data = add_custom_names_and_descriptions(data, items_metadata, elements_metadata)
 
     # Add FAO population as an additional column (if given in the original data).
     data = add_fao_population_if_given(data)
@@ -883,17 +885,22 @@ def clean_data(data: pd.DataFrame, items_metadata: pd.DataFrame, elements_metada
     data = geo.add_population_to_dataframe(df=data, population_col="population_with_data",
                                            warn_on_missing_countries=False)
 
+    # Convert back to categorical columns (maybe this should be handled automatically in `add_population_to_dataframe`)
+    data = data.astype({"country": "category"})
+
     # Create a dictionary of aggregations, specifying the operation to use when creating regions.
     # These aggregations are defined in the custom_elements_and_units.csv file, and added to the metadata dataset.
     aggregations = elements_metadata[(elements_metadata["owid_aggregation"].notnull())].\
         set_index("element_code").to_dict()["owid_aggregation"]
 
     if len(aggregations) > 0:
+        log.info("clean_data.add_regions", shape=data.shape)
         # Add data for regions.
         data = add_regions(data=data, aggregations=aggregations)
         check_that_countries_are_well_defined(data)
 
     # Add per-capita variables.
+    log.info("clean_data.add_per_capita_variables", shape=data.shape)
     data = add_per_capita_variables(data, elements_metadata)
 
     return data

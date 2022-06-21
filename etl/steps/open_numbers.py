@@ -67,6 +67,13 @@ def run(dest_dir: str) -> None:
                 print("  ERROR: skipping")
                 continue
 
+            except KeyError as e:
+                if e.args == ('type',):
+                    print("  ERROR: skipping due to KeyError('type')")
+                    continue
+                else:
+                    raise e
+
             # use smaller, more accurate column types that minimise space
             if "global" in df.columns:
                 df["geo"] = df.pop("global")

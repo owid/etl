@@ -416,7 +416,7 @@ woff = ["zopfli (>=0.1.4)", "brotlicffi (>=0.8.0)", "brotli (>=1.0.1)"]
 
 [[package]]
 name = "frictionless"
-version = "4.40.0"
+version = "4.40.2"
 description = "Data management framework for Python that provides functionality to describe, extract, validate, and transform tabular data"
 category = "main"
 optional = false
@@ -428,7 +428,6 @@ isodate = ">=0.6"
 jinja2 = ">=3.0.3"
 jsonschema = ">=2.5"
 marko = ">=1.0"
-pandas = {version = ">=1.0", optional = true, markers = "extra == \"pandas\""}
 petl = ">=1.6"
 python-dateutil = ">=2.8"
 python-slugify = ">=1.2"
@@ -2366,7 +2365,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "0cff2e02139f3ce871623f1ca73fdd8241ea866694f8139b2a93f6d45905f28a"
+content-hash = "52e71a26b2c079e486d9d1e5f41fe791a0e61d944024a22c0df8cff2a378fac9"
 
 [metadata.files]
 ansiwrap = [
@@ -2653,8 +2652,8 @@ fonttools = [
     {file = "fonttools-4.33.3.zip", hash = "sha256:c0fdcfa8ceebd7c1b2021240bd46ef77aa8e7408cf10434be55df52384865f8e"},
 ]
 frictionless = [
-    {file = "frictionless-4.40.0-py2.py3-none-any.whl", hash = "sha256:19460d984ff570c832756cf07631b7ca79505443b4d6f79e3a505059d85ab274"},
-    {file = "frictionless-4.40.0.tar.gz", hash = "sha256:7a90d84b6702a312dfa32a14b0e16d78274c2d1cdafcf50c4d4b9bd3d3a92c3a"},
+    {file = "frictionless-4.40.2-py2.py3-none-any.whl", hash = "sha256:70918dbe35bd0c797be037c22eeba51990fc86e2fa17274ec6810c0df8befd1b"},
+    {file = "frictionless-4.40.2.tar.gz", hash = "sha256:7f0b3291a63d91092d0a6259fb60f7fb064a7e5d662404ac38fe67a143b407a9"},
 ]
 greenlet = [
     {file = "greenlet-1.1.2-cp27-cp27m-macosx_10_14_x86_64.whl", hash = "sha256:58df5c2a0e293bf665a51f8a100d3e9956febfbf1d9aaf8c0677cf70218910c6"},
