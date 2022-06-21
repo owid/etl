@@ -133,8 +133,7 @@ REGIONS_TO_ADD = {
 
 # TODO: Describe and review.
 WAS_PER_CAPITA_ADDED_ELEMENT_DESCRIPTION = "Originally given per-capita, and converted into total figures by multiplying by population (given by FAO)."
-NEW_FAO_PER_CAPITA_ADDED_ELEMENT_DESCRIPTION = "Per-capita values are obtained by dividing the original values by the population provided by FAO."
-NEW_OWID_PER_CAPITA_ADDED_ELEMENT_DESCRIPTION = "Per-capita values are obtained by dividing the original values by OWID's population dataset."
+NEW_PER_CAPITA_ADDED_ELEMENT_DESCRIPTION = "Per-capita values are obtained by dividing the original values by the population (either provided by FAO or by OWID)."
 
 # When creating region aggregates, we need to ignore regions that are historical (i.e. they do not exist today as
 # countries) or are geographical regions (instead of countries). We ignore them to avoid the risk of counting the
@@ -699,8 +698,9 @@ def add_fao_population_if_given(data):
     fao_population_item_name = "Population"
     fao_population_element_name = "Total Population - Both sexes"
     population_rows_mask = (data["fao_item"] == fao_population_item_name) &\
-                           (data["fao_element"] == fao_population_element_name)
-    if len(population_rows_mask) > 0:
+                           (data["fao_element"] == fao_population_element_name)    
+
+    if population_rows_mask.any():
         data = data.copy()
 
         fao_population = data[population_rows_mask].reset_index(drop=True)
@@ -751,41 +751,55 @@ def convert_variables_given_per_capita_to_total_value(data, elements_metadata):
 
 
 def add_per_capita_variables(data, elements_metadata):
+    data = data.copy()
 
     # Make columns string instead of categorical (since their values will be edited).
     data["unit"] = [unit for unit in data["unit"]]
     data["element_description"] = [unit for unit in data["element_description"]]
+    data["element_code"] = [element_code for element_code in data["element_code"]]
 
     # Find element codes that have to be made per capita.
     per_capita_element_codes = elements_metadata[elements_metadata["make_per_capita"]]["element_code"].unique().tolist()
 
+    # Create a new dataframe that will have all per capita variables.
     per_capita_data = data[data["element_code"].isin(per_capita_element_codes)].reset_index(drop=True)
 
+    # Change element codes of per capita variables.
+    per_capita_data["element_code"] = [(element_code.lstrip("0") + "pc").zfill(N_CHARACTERS_ELEMENT_CODE)
+                                       for element_code in per_capita_data["element_code"]]
+
+    # Create a mask that selects FAO regions (regions that, in the countries.json file, were not harmonized, and
+    # have '(FAO)' at the end of the name).
     fao_regions_mask = (per_capita_data["country"].str.contains("(FAO)", regex=False))
+    # Create a mask that selects all other regions (i.e. harmonized countries).
+    owid_regions_mask = ~fao_regions_mask
+
+    # Create per capita variables for FAO regions (this can only be done if a column for FAO population is given).
     if "fao_population" in per_capita_data.columns:
         per_capita_data.loc[fao_regions_mask, "value"] = per_capita_data[fao_regions_mask]["value"] /\
             per_capita_data[fao_regions_mask]["fao_population"]
-        # Include an additional note in the description on affected elements.
-        per_capita_data.loc[fao_regions_mask, "element_description"] = (per_capita_data["element_description"] + " " +\
-            NEW_FAO_PER_CAPITA_ADDED_ELEMENT_DESCRIPTION).str.lstrip()
+    else:
+        # Per capita variables can't be created for FAO regions, since we don't have FAO population.
+        # Remove these regions from the per capita dataframe; only OWID harmonized countries will be kept.
+        per_capita_data = per_capita_data[~fao_regions_mask].reset_index(drop=True)
+        owid_regions_mask = np.ones(len(per_capita_data), dtype=bool)
 
     # Add per capita values to all other regions that are not FAO regions.
-    owid_regions_mask = ~fao_regions_mask
     per_capita_data.loc[owid_regions_mask, "value"] = per_capita_data[owid_regions_mask]["value"] /\
         per_capita_data[owid_regions_mask]["population_with_data"]
-    # Include an additional note in the description on affected elements.
-    per_capita_data.loc[fao_regions_mask, "element_description"] = (per_capita_data["element_description"] + " " +\
-        NEW_OWID_PER_CAPITA_ADDED_ELEMENT_DESCRIPTION).str.lstrip()
 
     # Add "per capita" to all units.
     per_capita_data["unit"] = per_capita_data["unit"] + " per capita"
-
+    # Include an additional note in the description on affected elements.
+    per_capita_data["element_description"] = (per_capita_data["element_description"] + " " +\
+        NEW_PER_CAPITA_ADDED_ELEMENT_DESCRIPTION).str.lstrip()
     # Add new rows with per capita variables to data.
     data = pd.concat([data, per_capita_data], ignore_index=True).reset_index(drop=True)
 
     # Make categorical columns again.
     data["unit"] = data["unit"].astype("category")
     data["element_description"] = data["element_description"].astype("category")
+    data["element_code"] = data["element_code"].astype("category")
 
     return data
 
@@ -1009,7 +1023,7 @@ def prepare_wide_table(data: pd.DataFrame, dataset_title: str) -> catalog.Table:
     return wide_table
 
 
-def run(dest_dir: str) -> None:    
+def run(dest_dir: str) -> None:
     ####################################################################################################################
     # Common definitions.
     ####################################################################################################################
