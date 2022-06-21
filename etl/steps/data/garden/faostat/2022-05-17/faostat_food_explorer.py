@@ -22,30 +22,11 @@ DATASET_DESCRIPTION = "This dataset has been created by Our World in Data, mergi
                       "FBS) datasets. Each row contains all the metrics for a specific combination of (country, " \
                       "product, year). The metrics may come from different datasets."
 
-# List of columns from combined (qcl + fbsc) dataframe that should have a per capita variable.
-# Note: Some of the columns may already be given as "per capita" variables in the original data.
-# In those cases we will divide by FAO population and multiply by OWID population, for consistency.
-PER_CAPITA_COLUMNS = [
-    'Area harvested (ha)',
-    'Domestic supply (tonnes)',
-    'Exports (tonnes)',
-    'Feed (tonnes)',
-    'Food (tonnes)',
-    'Food available for consumption (grams of fat per day per capita)',
-    'Food available for consumption (grams of protein per day per capita)',
-    'Food available for consumption (kilocalories per day per capita)',
-    'Food available for consumption (kilograms per year per capita)',
-    'Imports (tonnes)',
-    'Other uses (tonnes)',
-    'Producing or slaughtered animals (animals)',
-    'Production (tonnes)',
-    'Waste in Supply Chain (tonnes)',
-]
-
 
 def combine_qcl_and_fbsc(
     qcl_table: catalog.Table, fbsc_table: catalog.Table
 ) -> pd.DataFrame:
+
     columns = ['country', 'year', 'item_code', 'element_code', 'item', 'element', 'unit', 'unit_short_name', 'value',
                'unit_factor', 'population_with_data']
     qcl = pd.DataFrame(qcl_table).reset_index()[columns]
@@ -67,9 +48,8 @@ def combine_qcl_and_fbsc(
     )
 
     # Sanity checks.
-    assert len(combined) == (
-        len(qcl) + len(fbsc)
-    ), "Unexpected number of rows after combining qcl and fbsc datasets."
+    assert len(combined) == (len(qcl) + len(fbsc)), "Unexpected number of rows after combining qcl and fbsc datasets."
+
     assert len(combined[combined["value"].isnull()]) == 0, "Unexpected nan values."
 
     n_items_per_item_code = combined.groupby("item_code")["product"].transform("nunique")
@@ -150,27 +130,14 @@ def process_combined_data(combined: pd.DataFrame, custom_products: pd.DataFrame)
 
     # Add column for OWID population.
     data_wide = geo.add_population_to_dataframe(df=data_wide, warn_on_missing_countries=False)
-    # Add population of countries for which we have data.
-    population_with_data = combined.pivot(index=index_columns, columns=["title"],
-                                          values="population_with_data").reset_index()
 
-    # TODO: Check that population and population with data are exactly the same for non-regions.
-    # TODO: Warn on regions where population with data is much smaller than total population.
+    # Fill gaps in OWID population with FAO population (for "* (FAO)" countries, i.e. countries that were not
+    # harmonized and for which there is no OWID population).
+    # Then drop "fao_population", since it is no longer needed.
+    data_wide["population"] = data_wide["population"].fillna(data_wide["fao_population"])
+    data_wide = data_wide.drop(columns="fao_population")
 
-    # Add per capita variables.
-    for column in PER_CAPITA_COLUMNS:
-        if "per capita" in column.lower():
-            # Some variables are already given per capita in the FAOSTAT dataset.
-            # But, since their population may differ with ours, for consistency, we multiply their per capita variables
-            # by their population, to obtain the total variable, and then we divide by our own population.
-            data_wide[column] = data_wide[column] * data_wide["fao_population"] / population_with_data[column]
-        else:
-            # Create a new column with the same name, but adding "per capita" to the unit.
-            data_wide[column[:-1] + " per capita)"] = data_wide[column] / population_with_data[column]
-
-    assert (
-        len(data_wide.columns[data_wide.isnull().all(axis=0)]) == 0
-    ), "Unexpected columns with only nan values."
+    assert len(data_wide.columns[data_wide.isnull().all(axis=0)]) == 0, "Unexpected columns with only nan values."
 
     # Set a reasonable index.
     data_wide = data_wide.set_index(index_columns, verify_integrity=True)
@@ -210,6 +177,7 @@ def run(dest_dir: str) -> None:
     ####################################################################################################################
 
     combined = combine_qcl_and_fbsc(qcl_table=qcl_table, fbsc_table=fbsc_table)
+
     data = process_combined_data(combined=combined, custom_products=custom_products)
 
     ####################################################################################################################

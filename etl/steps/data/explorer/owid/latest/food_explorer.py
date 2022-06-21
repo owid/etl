@@ -18,8 +18,8 @@ from etl.paths import DATA_DIR
 EXPECTED_COLUMNS = {
     'product': 'product',
     'population': 'population',
-    'area_harvested__ha': 'area_harvested__ha',
-    'area_harvested__ha_per_capita': 'area_harvested__ha__per_capita',
+    'area_harvested__hectares': 'area_harvested__ha',
+    'area_harvested__hectares_per_capita': 'area_harvested__ha__per_capita',
     'domestic_supply__tonnes': 'domestic_supply__tonnes',
     'domestic_supply__tonnes_per_capita': 'domestic_supply__tonnes__per_capita',
     'exports__tonnes': 'exports__tonnes',
