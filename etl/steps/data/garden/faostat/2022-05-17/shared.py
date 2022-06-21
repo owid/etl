@@ -728,25 +728,20 @@ def add_fao_population_if_given(data):
     return data
 
 
-def convert_variables_given_per_capita_to_total_value(data, elements_metadata):
-    # Select element codes that need to be converted from per capita to total values.
-    # This selection is done in the custom_elements_and_units.csv file: any row with a not empty value for
-    # "per_capita_to_total_added_element_description" will be converted.
-    element_codes_to_convert = elements_metadata[elements_metadata["was_per_capita"]]["element_code"].unique().tolist()
-
-    if (len(element_codes_to_convert) > 0):
+def convert_variables_given_per_capita_to_total_value(data, element_codes_that_were_per_capita):
+    if (len(element_codes_that_were_per_capita) > 0):
         data = data.copy()
 
         assert "fao_population" in data.columns, "fao_population not found, maybe it changed item, element."
 
         # Select variables that were given as per capita variables in the original data and that need to be converted.
-        per_capita_mask = data["element_code"].isin(element_codes_to_convert)
+        per_capita_mask = data["element_code"].isin(element_codes_that_were_per_capita)
 
         # Multiply them by the FAO population to convert them into total value.
         data.loc[per_capita_mask, "value"] = data[per_capita_mask]["value"] * data[per_capita_mask]["fao_population"]
 
         elements_converted = data[per_capita_mask]["fao_element"].unique().tolist()
-        print(f"{len(elements_converted)} elements converted from per-capita to total values: {elements_converted}")
+        log.info(f"{len(elements_converted)} elements converted from per-capita to total values: {elements_converted}")
 
         # Include an additional description to all elements that were converted from per capita to total variables.
         data.loc[per_capita_mask, "element_description"]
@@ -758,14 +753,11 @@ def convert_variables_given_per_capita_to_total_value(data, elements_metadata):
     return data
 
 
-def add_per_capita_variables(data, elements_metadata):
+def add_per_capita_variables(data, element_codes_to_make_per_capita):
     data = data.copy()
 
-    # Find element codes that have to be made per capita.
-    per_capita_element_codes = elements_metadata[elements_metadata["make_per_capita"]]["element_code"].unique().tolist()
-
     # Create a new dataframe that will have all per capita variables.
-    per_capita_data = data[data["element_code"].isin(per_capita_element_codes)].reset_index(drop=True)
+    per_capita_data = data[data["element_code"].isin(element_codes_to_make_per_capita)].reset_index(drop=True)
 
     # Change element codes of per capita variables.
     per_capita_data["element_code"] = per_capita_data["element_code"].cat.rename_categories(
@@ -832,6 +824,11 @@ def clean_data(data: pd.DataFrame, items_metadata: pd.DataFrame, elements_metada
     """
     data = data.copy()
 
+    # Ensure column of values is numeric (transform any possible value like "<1" into a nan).
+    # TODO: Dataset faostat_sdgb contains instances of numbers like "<1" or "<2.5" or comma for thousands "1,173.92",
+    #  which they will be converted to nan here. Instead, create a function that properly cleans the values.
+    data["value"] = pd.to_numeric(data["value"], errors="coerce")
+
     # Ensure column of values is float.
     # Note: Int64 would also work, but when dividing by a float, it changes to Float64 dtype, which, for some reason,
     # makes nans undetectable (i.e. .isnull() does not detect nans and .dropna() does not drop nans).
@@ -859,9 +856,13 @@ def clean_data(data: pd.DataFrame, items_metadata: pd.DataFrame, elements_metada
     # Add FAO population as an additional column (if given in the original data).
     data = add_fao_population_if_given(data)
 
-    # Select variables that were originally given as per capita variables (if any), and, if FAO population is given,
-    # make them total variables instead of per capita.
-    data = convert_variables_given_per_capita_to_total_value(data, elements_metadata)
+    # Select element codes that were originally given as per capita variables (if any), and, if FAO population is
+    # given, make them total variables instead of per capita.
+    # All variables in the custom_elements_and_units.csv file with "was_per_capita" True will be converted into
+    # total (non-per-capita) values.
+    element_codes_that_were_per_capita = elements_metadata[elements_metadata["was_per_capita"]]["element_code"].unique().tolist()
+    if len(element_codes_that_were_per_capita) > 0:
+        data = convert_variables_given_per_capita_to_total_value(data, element_codes_that_were_per_capita)
 
     # Harmonize country names.
     assert countries_file.is_file(), "countries file not found."
@@ -892,16 +893,17 @@ def clean_data(data: pd.DataFrame, items_metadata: pd.DataFrame, elements_metada
     # These aggregations are defined in the custom_elements_and_units.csv file, and added to the metadata dataset.
     aggregations = elements_metadata[(elements_metadata["owid_aggregation"].notnull())].\
         set_index("element_code").to_dict()["owid_aggregation"]
-
     if len(aggregations) > 0:
         log.info("clean_data.add_regions", shape=data.shape)
         # Add data for regions.
         data = add_regions(data=data, aggregations=aggregations)
         check_that_countries_are_well_defined(data)
 
-    # Add per-capita variables.
-    log.info("clean_data.add_per_capita_variables", shape=data.shape)
-    data = add_per_capita_variables(data, elements_metadata)
+    # Find element codes that have to be made per capita.
+    element_codes_to_make_per_capita = elements_metadata[elements_metadata["make_per_capita"]]["element_code"].unique().tolist()
+    if len(element_codes_to_make_per_capita):
+        log.info("clean_data.add_per_capita_variables", shape=data.shape)
+        data = add_per_capita_variables(data, element_codes_to_make_per_capita)
 
     return data
 
