@@ -43,7 +43,7 @@ rich = "^12.1.0"
 owid-datautils = {git = "https://github.com/owid/data-utils-py.git", rev = "v0.4.4-alpha"}
 
 [tool.poetry.dev-dependencies]
-pytest = "^5.2"
+pytest = "^7.1.2"
 black = {version = "^22.3.0", extras = ["jupyter"]}
 mypy = "^0.910"
 flake8 = "^3.9.2"
