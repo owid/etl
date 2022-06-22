@@ -149,22 +149,14 @@ def run(dest_dir: str) -> None:
     # Clean data.
     data = clean_data(data=fbsc, items_metadata=items_metadata, elements_metadata=elements_metadata,
                       countries_file=COUNTRIES_FILE)
+    # Free up memory
+    del fbsc
 
     # Avoid objects as they would explode memory, use categoricals instead.
     for col in data.columns:
         assert data[col].dtype != object, f'Column {col} should not have object type'
 
     _assert_df_size(data, 2000)
-
-    # Create a long table (with item code and element code as part of the index).
-    log.info("faostat_fbsc.prepare_long_table", shape=data.shape)
-    data_table_long = prepare_long_table(data=data)
-
-    _assert_df_size(data_table_long, 2000)
-
-    # Create a wide table (with only country and year as index).
-    log.info("faostat_fbsc.prepare_wide_table", shape=data.shape)
-    data_table_wide = prepare_wide_table(data=data, dataset_title=datasets_metadata["owid_dataset_title"].item())
 
     ####################################################################################################################
     # Prepare outputs.
@@ -196,6 +188,11 @@ def run(dest_dir: str) -> None:
     # Create new dataset in garden.
     dataset_garden.save()
 
+    # Create a long table (with item code and element code as part of the index).
+    log.info("faostat_fbsc.prepare_long_table", shape=data.shape)
+    data_table_long = prepare_long_table(data=data)
+    _assert_df_size(data_table_long, 2000)
+
     # Prepare metadata for new garden long table.
     data_table_long.metadata = TableMeta(short_name=DATASET_SHORT_NAME)
     data_table_long.metadata.title = dataset_garden_metadata.title
@@ -204,11 +201,18 @@ def run(dest_dir: str) -> None:
     data_table_long.metadata.dataset = dataset_garden_metadata
     # Add long table to the dataset (no need to repack, since columns already have optimal dtypes).
     dataset_garden.add(data_table_long, repack=False)
+    data_table_long_metadata = deepcopy(data_table_long.metadata)
+    del data_table_long
+
+    # Create a wide table (with only country and year as index).
+    log.info("faostat_fbsc.prepare_wide_table", shape=data.shape)
+    data_table_wide = prepare_wide_table(data=data, dataset_title=datasets_metadata["owid_dataset_title"].item())
 
     # Prepare metadata for new garden wide table (starting with the metadata from the long table).
-    data_table_wide.metadata = deepcopy(data_table_long.metadata)
+    data_table_wide.metadata = data_table_long_metadata
     data_table_wide.metadata.title += " - Flattened table indexed by country-year."
     data_table_wide.metadata.short_name += "_flat"
     data_table_wide.metadata.primary_key = list(data_table_wide.index.names)
     # Add wide table to the dataset (no need to repack, since columns already have optimal dtypes).
     dataset_garden.add(data_table_wide, repack=False)
+    del data_table_wide
