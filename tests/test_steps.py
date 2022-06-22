@@ -23,7 +23,9 @@ from etl.steps import (
     compile_steps,
     to_dependency_order,
     select_dirty_steps,
-    Step, reverse_graph, filter_to_subgraph,
+    Step,
+    reverse_graph,
+    filter_to_subgraph,
 )
 
 
@@ -78,8 +80,16 @@ def test_dependency_ordering():
 
 def test_dependency_filtering():
     dag = {"e": {"a"}, "c": {"b", "d"}, "b": {"a"}}
-    assert filter_to_subgraph(dag, ["b"]) == { "d": set(), "c": {"b", "d"}, "b": {"a"}, "a": set()}
-    assert filter_to_subgraph(dag, ["b"], incl_forward=False) == {"b": {"a"}, "a": set()}
+    assert filter_to_subgraph(dag, ["b"]) == {
+        "d": set(),
+        "c": {"b", "d"},
+        "b": {"a"},
+        "a": set(),
+    }
+    assert filter_to_subgraph(dag, ["b"], incl_forward=False) == {
+        "b": {"a"},
+        "a": set(),
+    }
 
 
 @patch("etl.steps.parse_step")
