@@ -79,7 +79,11 @@ def test_dependency_ordering():
 
 
 def test_dependency_filtering():
-    dag = {"e": {"a"}, "c": {"b", "d"}, "b": {"a"}}
+    dag = {
+        "e": {"a"},
+        "c": {"b", "d"},
+        "b": {"a"},
+    }
     assert filter_to_subgraph(dag, ["b"]) == {
         "d": set(),
         "c": {"b", "d"},
