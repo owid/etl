@@ -29,7 +29,9 @@ awscli = "^1.20.54"
 Unidecode = "^1.3.2"
 python-dotenv = "^0.19.0"
 python-slugify = {extras = ["unidecode"], version = "^5.0.2"}
-frictionless = {extras = ["pandas"], version = "^4.19.5"}
+# NOTE: this is currently fixed, but we should update as soon as https://github.com/frictionlessdata/frictionless-py/issues/1143
+#   gets resolved
+frictionless = {version = "4.38.0", extras = ["pandas"]}
 thefuzz = "^0.19.0"
 python-Levenshtein = "^0.12.2"
 regex = "^2022.1.18"
@@ -40,10 +42,10 @@ pydantic = "^1.9.0"
 structlog = "^21.5.0"
 sqlmodel = "^0.0.6"
 rich = "^12.1.0"
-owid-datautils = {git = "https://github.com/owid/data-utils-py.git", rev = "v0.4.3-alpha"}
+owid-datautils = {git = "https://github.com/owid/data-utils-py.git", rev = "v0.4.4-alpha"}
 
 [tool.poetry.dev-dependencies]
-pytest = "^5.2"
+pytest = "^7.1.2"
 black = {version = "^22.3.0", extras = ["jupyter"]}
 mypy = "^0.910"
 flake8 = "^3.9.2"

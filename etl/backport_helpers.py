@@ -130,6 +130,9 @@ def create_dataset(dest_dir: str, short_name: str) -> Dataset:
 
     # create tables
     for t in tables:
+        if "year" in t.columns:
+            t = t.rename(columns={"year": "year_"})
+
         ds.add(t)
 
     return ds
