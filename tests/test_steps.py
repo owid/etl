@@ -23,7 +23,7 @@ from etl.steps import (
     compile_steps,
     to_dependency_order,
     select_dirty_steps,
-    Step,
+    Step, reverse_graph, filter_to_subgraph,
 )
 
 
@@ -74,6 +74,16 @@ def test_topological_sort():
     "Check that a dependency will be scheduled to run before things that need it."
     dag = {"a": ["b", "c"], "b": ["c"]}
     assert to_dependency_order(dag, [], []) == ["c", "b", "a"]
+
+
+def test_dependency_filtering():
+    dag = {"a": {"b", "e"}, "b": {"c"}, "d": {"c"}}
+    dag = reverse_graph(dag)
+    # Without maximal_subgraph, we just get B's parents and children
+    assert reverse_graph(filter_to_subgraph(dag, ['b'])) == {'a': {'b'}, 'b': {'c'}, 'c': set()}
+    # With maximal_subgraph, we also include dependencies of B's parents + children, ie D
+    # TODO remove this nondeterministic test, just for Bill's understanding
+    assert to_dependency_order(dag, ['b'], []) == ['a', 'd', 'b', 'c']
 
 
 @patch("etl.steps.parse_step")

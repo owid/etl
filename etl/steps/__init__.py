@@ -74,6 +74,7 @@ def to_dependency_order(
     dag: DAG, includes: List[str], excludes: List[str]
 ) -> List[str]:
     # reverse the graph so that dependencies point to their dependents
+    # ie after this reverse, the graph looks like Lars' drawings (A -> B means B depends on A)
     graph = reverse_graph(dag)
 
     if includes:
