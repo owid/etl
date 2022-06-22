@@ -88,7 +88,9 @@ def to_dependency_order(
     return filtered
 
 
-def filter_to_subgraph(graph: Graph, includes: Iterable[str], incl_forward: bool = True) -> Graph:
+def filter_to_subgraph(
+    graph: Graph, includes: Iterable[str], incl_forward: bool = True
+) -> Graph:
     """
     Filter the full graph to only the included nodes, and all their dependencies.
 
