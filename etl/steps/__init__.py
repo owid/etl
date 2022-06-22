@@ -78,13 +78,7 @@ def to_dependency_order(
     graph = reverse_graph(dag)
 
     if includes:
-        # cut the graph to just the listed steps and the things that
-        # then depend on them (transitive closure)
         subgraph = filter_to_subgraph(graph, includes)
-
-        # make sure we also include all dependencies of the subgraph
-        nodes = set(subgraph.keys()) | {e for v in subgraph.values() for e in v}
-        subgraph = reverse_graph(maximal_subgraph(dag, nodes))
     else:
         subgraph = graph
 
@@ -97,6 +91,50 @@ def to_dependency_order(
     ]
 
     return filtered
+
+
+def filter_to_subgraph(graph: Graph, includes: Iterable[str], incl_forward: bool = True) -> Graph:
+    """
+    Filter the full graph to only the included nodes, and all their dependencies.
+
+    If the incl_forward flag is true, also include "forward dependencies" (dependents),
+    and their own (backward) dependencies.
+
+    TODO Assumes that the graph is organized dependency -> dependent (A -> B means B is
+    dependent on A).
+    """
+    all_steps = graph_nodes(graph)
+    subgraph: Graph = defaultdict(set)
+
+    included = {
+        s for s in all_steps if any(re.findall(pattern, s) for pattern in includes)
+    }
+
+    if incl_forward:
+        # Traverse the graph to find all dependent nodes (forward dependencies)
+        forward_deps = set(traverse(graph, included))
+        included = included.union(forward_deps)
+
+    # Now reverse the graph, and BFS the other way to find all dependencies
+    return reverse_graph(traverse(reverse_graph(graph), included))
+
+
+def traverse(graph: Graph, nodes: Set[str]) -> Graph:
+    """
+    Use BFS to find all nodes in a graph that are reachable from a given
+    subset of nodes.
+    """
+    reachable: Graph = defaultdict(set)
+    to_visit = nodes.copy()
+
+    while to_visit:
+        node = to_visit.pop()
+        if node in reachable:
+            continue  # already visited
+        reachable[node] = set(graph.get(node, set()))
+        to_visit = to_visit.union(reachable[node])
+
+    return dict(reachable)
 
 
 def load_dag(filename: Union[str, Path] = paths.DAG_FILE) -> Dict[str, Any]:
@@ -143,73 +181,11 @@ def reverse_graph(graph: Graph) -> Graph:
     return dict(g)
 
 
-def maximal_subgraph(graph: Graph, nodes: Set[str]) -> Graph:
-    """
-    Take a graph and a set of nodes and return a subgraph that only includes
-    those nodes and their dependencies. (Return subgraph that contains all nodes
-    reachable from given nodes... is there a name for it?)
-    """
-    subgraph = defaultdict(set)
-
-    while nodes:
-        node = nodes.pop()
-        # already traversed
-        if node in subgraph:
-            continue
-        subgraph[node] = set(graph.get(node, set()))
-        nodes |= subgraph[node]
-
-    return dict(subgraph)
-
-
 def graph_nodes(graph: Graph) -> Set[str]:
     all_steps = set(graph)
     for children in graph.values():
         all_steps.update(children)
     return all_steps
-
-
-def filter_to_subgraph(graph: Graph, includes: Iterable[str]) -> Graph:
-    """
-    For each step to be included, find all its ancestors and all its descendents
-    recursively and include them too.
-    """
-    all_steps = graph_nodes(graph)
-    subgraph: Graph = defaultdict(set)
-
-    included = [
-        s for s in all_steps if any(re.findall(pattern, s) for pattern in includes)
-    ]
-
-    child_frontier: List[str] = []
-    parent_frontier: List[Tuple[str, str]] = []
-    for node in included:
-        children = graph.get(node, set())
-        child_frontier.extend(children)
-
-        parents = set((n, node) for n in graph if node in graph.get(n, set()))
-        parent_frontier.extend(parents)
-
-        subgraph[node] = children
-
-    # follow all children and their children, recursively
-    while child_frontier:
-        node = child_frontier.pop()
-        children = graph.get(node, set())
-        child_frontier.extend(children)
-
-        subgraph[node] = children
-
-    # follow all parents and their parents, recursively
-    while parent_frontier:
-        parent, child = parent_frontier.pop()
-        parents = set((n, parent) for n in graph if parent in graph.get(n, set()))
-        parent_frontier.extend(parents)
-
-        # ignore other children of this parent
-        subgraph[parent] = {child}
-
-    return dict(subgraph)
 
 
 def topological_sort(graph: Graph) -> List[str]:
