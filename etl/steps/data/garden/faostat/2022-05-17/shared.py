@@ -994,34 +994,34 @@ def prepare_wide_table(data: pd.DataFrame, dataset_title: str) -> catalog.Table:
         wide_table[column].metadata.title = column
 
     # Add variable unit (long name).
-    m = _variable_name_map(data, "unit")
+    variable_name_mapping = _variable_name_map(data, "unit")
     for column in wide_table.columns:
-        wide_table[column].metadata.unit = m[column]
+        wide_table[column].metadata.unit = variable_name_mapping[column]
 
     # Add variable unit (short name).
-    m = _variable_name_map(data, "unit_short_name")
+    variable_name_mapping = _variable_name_map(data, "unit_short_name")
     for column in wide_table.columns:
-        wide_table[column].metadata.short_unit = m[column]
+        wide_table[column].metadata.short_unit = variable_name_mapping[column]
 
     # Add variable description.
-    m = _variable_name_map(data, "variable_description")
+    variable_name_mapping = _variable_name_map(data, "variable_description")
     for column in wide_table.columns:
-        wide_table[column].metadata.description = m[column]
+        wide_table[column].metadata.description = variable_name_mapping[column]
 
     # Add display parameters (for grapher).
     for column in wide_table.columns:
         wide_table[column].metadata.display = {}
 
     # Display name.
-    m = _variable_name_map(data, "variable_display_name")
+    variable_name_mapping = _variable_name_map(data, "variable_display_name")
     for column in wide_table.columns:
-        wide_table[column].metadata.display["name"] = m[column]
+        wide_table[column].metadata.display["name"] = variable_name_mapping[column]
 
     # Unit conversion factor (if given).
-    m = _variable_name_map(data, "unit_factor")
+    variable_name_mapping = _variable_name_map(data, "unit_factor")
     for column in wide_table.columns:
-        if column in m:
-            wide_table[column].metadata.display["conversionFactor"] = m[column]
+        if column in variable_name_mapping:
+            wide_table[column].metadata.display["conversionFactor"] = variable_name_mapping[column]
 
     # Ensure columns have the optimal dtypes, but codes are categories.
     log.info("prepare_wide_table.optimize_table_dtypes", shape=wide_table.shape)
