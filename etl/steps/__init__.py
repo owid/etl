@@ -10,7 +10,6 @@ from typing import (
     Protocol,
     List,
     Set,
-    Tuple,
     Union,
     cast,
     Iterable,
@@ -73,17 +72,13 @@ def compile_steps(
 def to_dependency_order(
     dag: DAG, includes: List[str], excludes: List[str]
 ) -> List[str]:
-    # reverse the graph so that dependencies point to their dependents
-    # ie after this reverse, the graph looks like Lars' drawings (A -> B means B depends on A)
-    graph = reverse_graph(dag)
-
-    if includes:
-        subgraph = filter_to_subgraph(graph, includes)
-    else:
-        subgraph = graph
-
-    # make sure dependencies are built before running the things that depend on them
-    in_order = topological_sort(subgraph)
+    """
+    Organize the steps in dependency order with a topological sort. In other words,
+    the resulting list of steps is a valid ordering of steps such that no step is run
+    before the steps it depends on. Note: this ordering is not necessarily unique.
+    """
+    subgraph = filter_to_subgraph(dag, includes) if includes else dag
+    in_order = list(graphlib.TopologicalSorter(subgraph).static_order())
 
     # filter out explicit excludes
     filtered = [
@@ -100,8 +95,8 @@ def filter_to_subgraph(graph: Graph, includes: Iterable[str], incl_forward: bool
     If the incl_forward flag is true, also include "forward dependencies" (dependents),
     and their own (backward) dependencies.
 
-    TODO Assumes that the graph is organized dependency -> dependent (A -> B means B is
-    dependent on A).
+    Assumes that the graph is organized dependent -> dependency (A -> B means A is
+    dependent on B).
     """
     all_steps = graph_nodes(graph)
     subgraph: Graph = defaultdict(set)
@@ -111,12 +106,12 @@ def filter_to_subgraph(graph: Graph, includes: Iterable[str], incl_forward: bool
     }
 
     if incl_forward:
-        # Traverse the graph to find all dependent nodes (forward dependencies)
-        forward_deps = set(traverse(graph, included))
+        # Reverse the graph to find all nodes dependent on included nodes (forward deps)
+        forward_deps = set(traverse(reverse_graph(graph), included))
         included = included.union(forward_deps)
 
-    # Now reverse the graph, and BFS the other way to find all dependencies
-    return reverse_graph(traverse(reverse_graph(graph), included))
+    # Now traverse the other way to find all dependencies of included nodes (backward deps)
+    return traverse(graph, included)
 
 
 def traverse(graph: Graph, nodes: Set[str]) -> Graph:
@@ -186,22 +181,6 @@ def graph_nodes(graph: Graph) -> Set[str]:
     for children in graph.values():
         all_steps.update(children)
     return all_steps
-
-
-def topological_sort(graph: Graph) -> List[str]:
-    """
-    Take a directed graph mapping dependencies to parents, and return a list of
-    steps that, if run in this order, make sure that every dependency is run before
-    anything that needs it.
-
-    E.g. you have steps, "a" and "b", where you need "a" to build "b". Then you
-    will have a graph like {"a": "b"}. This method will return ["a", "b"] as the
-    correct build order.
-
-    In general, there can be many build orders which can work for a graph, we don't
-    care which one we get, just that it build dependencies first.
-    """
-    return list(reversed(list(graphlib.TopologicalSorter(graph).static_order())))
 
 
 def parse_step(step_name: str, dag: Dict[str, Any]) -> "Step":
