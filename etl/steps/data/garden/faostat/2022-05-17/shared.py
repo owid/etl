@@ -20,7 +20,7 @@ import json
 import warnings
 from copy import deepcopy
 from pathlib import Path
-from typing import List, cast
+from typing import List, cast, Dict
 
 import structlog
 import numpy as np
@@ -919,7 +919,7 @@ def optimize_table_dtypes(table):
 
 def prepare_long_table(data: pd.DataFrame):
     # Create new table with long data.
-    data_table_long = catalog.Table(data).copy()
+    data_table_long = catalog.Table(data)
 
     # Ensure table has the optimal dtypes before storing it as feather file.
     data_table_long = optimize_table_dtypes(table=data_table_long)
@@ -950,7 +950,7 @@ def prepare_wide_table(data: pd.DataFrame, dataset_title: str) -> catalog.Table:
         Data table with index [country, year].
 
     """
-    data = data.copy()
+    data = data.copy(deep=False)
 
     # Ensure "item" exists in data (there are some datasets where it may be missing).
     if "item" not in data.columns:
@@ -980,49 +980,51 @@ def prepare_wide_table(data: pd.DataFrame, dataset_title: str) -> catalog.Table:
     # Note: We include area_code in the index for completeness, but by construction country-year should not have
     # duplicates.
     # Note: `pivot` operation is usually faster on categorical columns
-    data_pivot = data.pivot(index=["area_code", "country", "year"], columns=["variable_name"],
-                            values=["value", "unit", "unit_short_name", "unit_factor", "variable_display_name",
-                                    "variable_description"])
-
-    # For convenience, create a dictionary for each zeroth-level multi-index.
-    data_wide = {pivot_column: data_pivot[pivot_column] for pivot_column in data_pivot.columns.levels[0]}
-
+    log.info("prepare_wide_table.pivot", shape=data.shape)
     # Create a wide table with just the data values.
-    wide_table = catalog.Table(data_wide["value"]).copy()
+    wide_table = catalog.Table(
+        data.pivot(index=["area_code", "country", "year"], columns=["variable_name"], values="value")
+    )
 
-    # Add metadata to each new variable in the wide data table.
+    ### Add metadata to each new variable in the wide data table.
+    log.info("prepare_wide_table.adding_metadata", shape=wide_table.shape)
+
+    # Add variable name.
     for column in wide_table.columns:
-        # Add variable name.
         wide_table[column].metadata.title = column
 
-        # Add variable unit (long name).
-        variable_unit = data_wide["unit"][column].dropna().unique()
-        assert len(variable_unit) == 1
-        wide_table[column].metadata.unit = variable_unit[0]
+    # Add variable unit (long name).
+    variable_name_mapping = _variable_name_map(data, "unit")
+    for column in wide_table.columns:
+        wide_table[column].metadata.unit = variable_name_mapping[column]
 
-        # Add variable unit (short name).
-        variable_unit_short_name = data_wide["unit_short_name"][column].dropna().unique()
-        assert len(variable_unit_short_name) == 1
-        wide_table[column].metadata.short_unit = variable_unit_short_name[0]
+    # Add variable unit (short name).
+    variable_name_mapping = _variable_name_map(data, "unit_short_name")
+    for column in wide_table.columns:
+        wide_table[column].metadata.short_unit = variable_name_mapping[column]
 
-        # Add variable description.
-        variable_description = data_wide["variable_description"][column].dropna().unique()
-        assert len(variable_description) == 1
-        wide_table[column].metadata.description = variable_description[0]
+    # Add variable description.
+    variable_name_mapping = _variable_name_map(data, "variable_description")
+    for column in wide_table.columns:
+        wide_table[column].metadata.description = variable_name_mapping[column]
 
-        # Add display parameters (for grapher).
+    # Add display parameters (for grapher).
+    for column in wide_table.columns:
         wide_table[column].metadata.display = {}
-        # Display name.
-        variable_display_name = data_wide["variable_display_name"][column].dropna().unique()
-        assert len(variable_display_name) == 1
-        wide_table[column].metadata.display["name"] = variable_display_name[0]
-        # Unit conversion factor (if given).
-        variable_unit_factor = data_wide["unit_factor"][column].dropna().unique()
-        if len(variable_unit_factor) > 0:
-            assert len(variable_unit_factor) == 1
-            wide_table[column].metadata.display["conversionFactor"] = variable_unit_factor[0]
+
+    # Display name.
+    variable_name_mapping = _variable_name_map(data, "variable_display_name")
+    for column in wide_table.columns:
+        wide_table[column].metadata.display["name"] = variable_name_mapping[column]
+
+    # Unit conversion factor (if given).
+    variable_name_mapping = _variable_name_map(data, "unit_factor")
+    for column in wide_table.columns:
+        if column in variable_name_mapping:
+            wide_table[column].metadata.display["conversionFactor"] = variable_name_mapping[column]
 
     # Ensure columns have the optimal dtypes, but codes are categories.
+    log.info("prepare_wide_table.optimize_table_dtypes", shape=wide_table.shape)
     wide_table = optimize_table_dtypes(table=wide_table.reset_index())
 
     # Sort columns and rows conveniently.
@@ -1031,10 +1033,17 @@ def prepare_wide_table(data: pd.DataFrame, dataset_title: str) -> catalog.Table:
     wide_table = wide_table.sort_index(level=["country", "year"]).sort_index()
 
     # Make all column names snake_case.
-    # TODO: Add vertical bar to utils.underscore_table. When done, there will be no need to rename columns.
     wide_table = catalog.utils.underscore_table(wide_table)
 
     return wide_table
+
+
+def _variable_name_map(data: pd.DataFrame, column: str) -> Dict[str, str]:
+    """Extract map {variable name -> column} from dataframe and make sure it is unique (one variable
+    does not map to two distinct values)."""
+    pivot = data.dropna(subset=[column]).groupby(["variable_name"], observed=True)[column].apply(set)
+    assert all(pivot.map(len) == 1)
+    return pivot.map(lambda x: list(x)[0]).to_dict()
 
 
 def run(dest_dir: str) -> None:

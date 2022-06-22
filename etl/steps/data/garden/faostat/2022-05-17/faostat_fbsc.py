@@ -142,12 +142,12 @@ def run(dest_dir: str) -> None:
 
     # Combine fbsh and fbs datasets.
     log.info("faostat_fbsc.combine_fbsh_and_fbs_datasets", fbsh_shape=fbsh_dataset["faostat_fbsh"].shape, fbs_shape=fbs_dataset["faostat_fbs"].shape)
-    fbsc = combine_fbsh_and_fbs_datasets(fbsh_dataset, fbs_dataset)
+    data = combine_fbsh_and_fbs_datasets(fbsh_dataset, fbs_dataset)
 
-    _assert_df_size(fbsc, 2000)
+    _assert_df_size(data, 2000)
 
     # Clean data.
-    data = clean_data(data=fbsc, items_metadata=items_metadata, elements_metadata=elements_metadata,
+    data = clean_data(data=data, items_metadata=items_metadata, elements_metadata=elements_metadata,
                       countries_file=COUNTRIES_FILE)
 
     # Avoid objects as they would explode memory, use categoricals instead.
@@ -164,7 +164,9 @@ def run(dest_dir: str) -> None:
 
     # Create a wide table (with only country and year as index).
     log.info("faostat_fbsc.prepare_wide_table", shape=data.shape)
-    data_table_wide = prepare_wide_table(data=data, dataset_title=datasets_metadata["owid_dataset_title"].item())
+    data_table_wide = prepare_wide_table(
+        data=data, dataset_title=datasets_metadata["owid_dataset_title"].item()
+    )
 
     ####################################################################################################################
     # Prepare outputs.
