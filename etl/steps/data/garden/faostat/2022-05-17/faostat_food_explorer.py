@@ -85,11 +85,10 @@ def get_fao_population(combined: pd.DataFrame) -> pd.DataFrame:
     return fao_population
 
 
-def add_slaughtered_animals_to_world_meat_total(combined):
+def add_slaughtered_animals_to_meat_total(combined):
     # There is no FAO data on "Producing or slaughtered animals" for "Meat, Total".
-    # We construct this data by aggregating that element for:
-    # * all countries, ignoring regions, historical regions, and "* (FAO)" (i.e. not harmonized) countries, and
-    # * the following products (which corresponds to all meat products removing redundances):
+    # We construct this data by aggregating that element for the following items (which corresponds to all meat
+    # products removing redundances):
     products_to_aggregate = [
         'Meat, ass',
         'Meat, beef and buffalo',
@@ -102,13 +101,16 @@ def add_slaughtered_animals_to_world_meat_total(combined):
         'Meat, rabbit',
         'Meat, sheep and goat',
     ]
+    error = "Some items required to get the aggregate 'Meat, Total' are missing in data."
+    assert set(products_to_aggregate) < set(combined["product"]), error    
 
     total_meat_item = "Meat, Total"
     slaughtered_animals_element = "Producing or slaughtered animals"
     slaughtered_animals_unit = "animals"
     slaughtered_animals_unit_short_name = "animals"
     assert slaughtered_animals_element in combined["element"].unique()
-    assert slaughtered_animals_unit in combined["unit"].unique()
+    assert slaughtered_animals_unit in combined["unit"].unique()    
+
     # For some reason, there are two element codes for the same element (they have different items assigned).
     error = "Element codes for 'Producing or slaughtered animals' may have changed."
     assert combined[(combined["element"] == slaughtered_animals_element) &
@@ -121,41 +123,49 @@ def add_slaughtered_animals_to_world_meat_total(combined):
     total_meat_item_code = "00001765"
 
     # Check that, indeed, this variable is not given in the original data.
-    assert combined[(combined["product"] == total_meat_item) & (combined["country"] == "World") &
+    assert combined[(combined["product"] == total_meat_item) &
          (combined["element"]==slaughtered_animals_element) & (combined["unit"] == slaughtered_animals_unit)].empty
-    
-    # Select relevant data to aggregate.
-    data_to_aggregate = combined[
-        (combined["element"] == slaughtered_animals_element) &
-        (combined["unit"] == slaughtered_animals_unit) &
-        (combined["country"] != "World") &
-        (~combined["country"].isin(REGIONS_TO_ADD)) &
-        (~combined["country"].isin(REGIONS_TO_IGNORE_IN_AGGREGATES)) &
-        (~combined["country"].str.contains("(FAO)", regex=False)) &
-        (combined["product"].isin(products_to_aggregate))
-    ].dropna(subset="value").reset_index(drop=True)
 
-    # Create a dataframe counting the total number of slaughtered animals used for meat.
-    slaughtered_animals = dataframes.groupby_agg(
-        data_to_aggregate, groupby_columns=["year"],
-        aggregations={"value": "sum"}).reset_index()
+    # Select the subset of data to aggregate.
+    data_to_aggregate = combined[(combined["element"] == slaughtered_animals_element) &
+                                 (combined["unit"] == slaughtered_animals_unit) &
+                                 (combined["product"].isin(products_to_aggregate))
+                                ].dropna(subset="value").reset_index(drop=True)
+
+    # Create a dataframe with the total number of animals used for meat.
+    animals = dataframes.groupby_agg(data_to_aggregate, groupby_columns=["country", "year"],
+                           aggregations={"value": "sum"}).reset_index()
+
     # Manually include the rest of columns.
-    slaughtered_animals["country"] = "World"
-    slaughtered_animals["product"] = total_meat_item
-    slaughtered_animals["element"] = slaughtered_animals_element
-    slaughtered_animals["unit"] = slaughtered_animals_unit
-    slaughtered_animals["unit_short_name"] = slaughtered_animals_unit_short_name
-    slaughtered_animals["element_code"] = slaughtered_animals_element_code
-    slaughtered_animals["item_code"] = total_meat_item_code
+    animals["product"] = total_meat_item
+    animals["element"] = slaughtered_animals_element
+    animals["unit"] = slaughtered_animals_unit
+    animals["unit_short_name"] = slaughtered_animals_unit_short_name
+    animals["element_code"] = slaughtered_animals_element_code
+    animals["item_code"] = total_meat_item_code
 
-    # Add world population.
-    world_population = combined[(combined["country"] == "World")][["year", "population_with_data"]].drop_duplicates()
-    slaughtered_animals = pd.merge(slaughtered_animals, world_population, how="left", on="year")
-
-    # Combine with the rest of the data.
-    combined_data = pd.concat([combined, slaughtered_animals], ignore_index=True).reset_index(drop=True)
+    # Add animals data to the original dataframe.
+    combined_data = pd.concat([combined, animals], ignore_index=True).reset_index(drop=True)
 
     return combined_data
+
+
+def add_slaughtered_animals_per_capita_to_meat_total(data_wide):
+    slaughtered_animals_element = "Producing or slaughtered animals (animals)"
+    slaughtered_animals_per_capita_element = "Producing or slaughtered animals (animals per capita)"
+    total_meat_item = "Meat, Total"
+
+    # Check that there is no data for slaughtered animals per capita in the total meat item.
+    assert data_wide[data_wide["product"] == total_meat_item][slaughtered_animals_per_capita_element].dropna().empty
+
+    # Add per capita slaugthred animals.
+
+    total_meat_item_mask = data_wide["product"] == total_meat_item
+
+    data_wide.loc[total_meat_item_mask, slaughtered_animals_per_capita_element] =\
+        data_wide[total_meat_item_mask][slaughtered_animals_element] / data_wide[total_meat_item_mask]["population"]
+
+    return data_wide
 
 
 def process_combined_data(combined: pd.DataFrame, custom_products: pd.DataFrame) -> pd.DataFrame:
@@ -172,6 +182,15 @@ def process_combined_data(combined: pd.DataFrame, custom_products: pd.DataFrame)
     combined["product"] = dataframes.map_series(combined["product"], mapping=products_renaming,
                                                 warn_on_unused_mappings=True)
 
+    # For the food explorer we have to multiply data by the unit factor, since these conversions
+    # will not be applied in grapher.
+    rows_to_convert_mask = combined["unit_factor"].notnull()
+    combined.loc[rows_to_convert_mask, "value"] = combined[rows_to_convert_mask]["value"] * \
+        combined[rows_to_convert_mask]["unit_factor"]
+
+    # Include number of slaughtered animals in 'Meat, Total' (which is missing).
+    combined = add_slaughtered_animals_to_meat_total(combined)
+
     # Get list of products that will be used in food explorer.
     products = sorted(custom_products["product_in_explorer"].fillna(custom_products["product_in_data"]).
                       unique().tolist())
@@ -180,18 +199,9 @@ def process_combined_data(combined: pd.DataFrame, custom_products: pd.DataFrame)
     missing_products = sorted(set(products) - set(set(combined["product"])))
     assert len(missing_products) == 0, f"{len(missing_products)} missing products for food explorer."
 
-    # Include number of slaughtered animals in 'Meat, Total' (which is missing).
-    combined = add_slaughtered_animals_to_world_meat_total(combined)
-
     # Select relevant products for the food explorer.
     combined = combined[combined["product"].isin(products)].reset_index(drop=True)
-
-    # For the food explorer we have to multiply data by the unit factor, since these conversions
-    # will not be applied in grapher.
-    rows_to_convert_mask = combined["unit_factor"].notnull()
-    combined.loc[rows_to_convert_mask, "value"] = combined[rows_to_convert_mask]["value"] * \
-        combined[rows_to_convert_mask]["unit_factor"]
-
+    
     # Join element and unit into one title column.
     combined["title"] = combined["element"] + " (" + combined["unit"] + ")"
 
@@ -212,6 +222,9 @@ def process_combined_data(combined: pd.DataFrame, custom_products: pd.DataFrame)
     # Then drop "fao_population", since it is no longer needed.
     data_wide["population"] = data_wide["population"].fillna(data_wide["fao_population"])
     data_wide = data_wide.drop(columns="fao_population")
+
+    # Add per capita number of slaughtered animals for total meat.
+    data_wide = add_slaughtered_animals_per_capita_to_meat_total(data_wide)
 
     assert len(data_wide.columns[data_wide.isnull().all(axis=0)]) == 0, "Unexpected columns with only nan values."
 
@@ -252,9 +265,9 @@ def run(dest_dir: str) -> None:
     # Process data.
     ####################################################################################################################
 
-    combined = combine_qcl_and_fbsc(qcl_table=qcl_table, fbsc_table=fbsc_table)
+    data = combine_qcl_and_fbsc(qcl_table=qcl_table, fbsc_table=fbsc_table)
 
-    data = process_combined_data(combined=combined, custom_products=custom_products)
+    data = process_combined_data(combined=data, custom_products=custom_products)
 
     ####################################################################################################################
     # Save outputs.
