@@ -18,7 +18,7 @@ from owid import catalog
 from owid.catalog.meta import DatasetMeta, TableMeta
 from owid.datautils import dataframes
 
-from etl.paths import DATA_DIR, STEP_DIR
+from etl.paths import DATA_DIR
 from .shared import (
     NAMESPACE,
     VERSION,
@@ -35,11 +35,6 @@ DATASET_SHORT_NAME = f"{NAMESPACE}_fbsc"
 # First year for which we have data in fbs dataset (it defines the first year when new methodology is used).
 FBS_FIRST_YEAR = 2010
 DATASET_TITLE = f"Food Balances (old methodology before {FBS_FIRST_YEAR}, and new from {FBS_FIRST_YEAR} onwards)"
-
-# Path to countries mapping file.
-COUNTRIES_FILE = (
-    STEP_DIR / "data" / "garden" / NAMESPACE / VERSION / f"{NAMESPACE}.countries.json"
-)
 
 log = structlog.get_logger()
 
@@ -135,20 +130,22 @@ def run(dest_dir: str) -> None:
     items_metadata = items_metadata[items_metadata["dataset"] == DATASET_SHORT_NAME].reset_index(drop=True)
     elements_metadata = pd.DataFrame(metadata["elements"]).reset_index()
     elements_metadata = elements_metadata[elements_metadata["dataset"] == DATASET_SHORT_NAME].reset_index(drop=True)
+    countries_metadata = pd.DataFrame(metadata["countries"]).reset_index()
 
     ####################################################################################################################
     # Process data.
     ####################################################################################################################
 
     # Combine fbsh and fbs datasets.
-    log.info("faostat_fbsc.combine_fbsh_and_fbs_datasets", fbsh_shape=fbsh_dataset["faostat_fbsh"].shape, fbs_shape=fbs_dataset["faostat_fbs"].shape)
+    log.info("faostat_fbsc.combine_fbsh_and_fbs_datasets", fbsh_shape=fbsh_dataset["faostat_fbsh"].shape,
+             fbs_shape=fbs_dataset["faostat_fbs"].shape)
     data = combine_fbsh_and_fbs_datasets(fbsh_dataset, fbs_dataset)
 
     _assert_df_size(data, 2000)
 
     # Clean data.
     data = clean_data(data=data, items_metadata=items_metadata, elements_metadata=elements_metadata,
-                      countries_file=COUNTRIES_FILE)
+                      countries_metadata=countries_metadata)
 
     # Avoid objects as they would explode memory, use categoricals instead.
     for col in data.columns:

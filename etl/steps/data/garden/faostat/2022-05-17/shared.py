@@ -618,6 +618,27 @@ def select_data_to_aggregate_without_repeating_subregions(data, countries_in_reg
     return data_region
 
 
+def harmonize_country_names(data, countries_metadata):
+    data = data.copy()
+
+    # Add harmonized country names (from countries metadata) to data.
+    data = pd.merge(data,
+             countries_metadata[["area_code", "fao_country", "country"]].\
+                 rename(columns={"fao_country": "fao_country_check"}),
+             on="area_code",
+             how="left"
+            )
+    # Sanity checks.
+    error = "Mismatch between fao_country in data and in metadata."
+    assert (data["fao_country"].astype(str) == data["fao_country_check"]).all(), error
+    check_that_countries_are_well_defined(data)
+
+    # Drop unnecessary column and set appropriate dtypes.
+    data = data.drop(columns="fao_country_check").astype({"country": "category", "fao_country": "category"})
+
+    return data
+
+
 def add_regions(data, aggregations):
     data = data.copy()
 
@@ -803,19 +824,19 @@ def add_per_capita_variables(data, element_codes_to_make_per_capita):
 
 
 def clean_data(data: pd.DataFrame, items_metadata: pd.DataFrame, elements_metadata: pd.DataFrame,
-               countries_file: Path) -> pd.DataFrame:
+               countries_metadata: pd.DataFrame) -> pd.DataFrame:
     """Process data (including harmonization of countries and regions) and prepare it for new garden dataset.
 
     Parameters
     ----------
     data : pd.DataFrame
         Unprocessed data for current dataset.
-    countries_file : Path or str
-        Path to mapping of country names.
     items_metadata : pd.DataFrame
         Items metadata (from the metadata dataset).
     elements_metadata : pd.DataFrame
         Elements metadata (from the metadata dataset).
+    countries_metadata : pd.DataFrame
+        Countries metadata (from the metadata dataset).
 
     Returns
     -------
@@ -840,10 +861,8 @@ def clean_data(data: pd.DataFrame, items_metadata: pd.DataFrame, elements_metada
                               for flag in data["flag"]], dtype="category")
 
     # Some datasets (at least faostat_fa) use "recipient_country" instead of "area". For consistency, change this.
-    if "recipient_country" in data.columns:
-        data = data.rename(
-            columns={"recipient_country": "area", "recipient_country_code": "area_code"}
-        )
+    data = data.rename(columns={"area": "fao_country", "recipient_country": "fao_country",
+                         "recipient_country_code": "area_code"})
 
     # Ensure year column is integer (sometimes it is given as a range of years, e.g. 2013-2015).
     data["year"] = clean_year_column(data["year"])
@@ -866,16 +885,7 @@ def clean_data(data: pd.DataFrame, items_metadata: pd.DataFrame, elements_metada
         data = convert_variables_given_per_capita_to_total_value(data, element_codes_that_were_per_capita)
 
     # Harmonize country names.
-    assert countries_file.is_file(), "countries file not found."
-    data = geo.harmonize_countries(
-        df=data,
-        countries_file=str(countries_file),
-        country_col="area",
-        warn_on_unused_countries=False,
-    ).rename(columns={"area": "country"}).astype({"country": "category"})
-    # If countries are missing in countries file, execute etl.harmonize again and update countries file.
-
-    check_that_countries_are_well_defined(data)
+    data = harmonize_country_names(data=data, countries_metadata=countries_metadata)
 
     # Remove duplicated data points (if any) keeping the one with lowest ranking flag (i.e. highest priority).
     data = remove_duplicates(data=data, index_columns=["area_code", "year", "item_code", "element_code"],
@@ -1059,8 +1069,6 @@ def run(dest_dir: str) -> None:
     # Path to latest dataset in meadow for current FAOSTAT domain.
     meadow_data_dir = sorted((DATA_DIR / "meadow" / NAMESPACE).glob(f"*/{dataset_short_name}"))[-1].parent /\
         dataset_short_name
-    # Path to countries file.
-    countries_file = STEP_DIR / "data" / "garden" / NAMESPACE / VERSION / f"{NAMESPACE}.countries.json"
     # Path to dataset of FAOSTAT metadata.
     garden_metadata_dir = DATA_DIR / "garden" / NAMESPACE / VERSION / f"{NAMESPACE}_metadata"
 
@@ -1077,13 +1085,14 @@ def run(dest_dir: str) -> None:
     # Load dataset of FAOSTAT metadata.
     metadata = catalog.Dataset(garden_metadata_dir)
 
-    # Load and prepare dataset, items and element-units metadata.
+    # Load and prepare dataset, items, element-units, and countries metadata.
     datasets_metadata = pd.DataFrame(metadata["datasets"]).reset_index()
     datasets_metadata = datasets_metadata[datasets_metadata["dataset"] == dataset_short_name].reset_index(drop=True)
     items_metadata = pd.DataFrame(metadata["items"]).reset_index()
     items_metadata = items_metadata[items_metadata["dataset"] == dataset_short_name].reset_index(drop=True)
     elements_metadata = pd.DataFrame(metadata["elements"]).reset_index()
     elements_metadata = elements_metadata[elements_metadata["dataset"] == dataset_short_name].reset_index(drop=True)
+    countries_metadata = pd.DataFrame(metadata["countries"]).reset_index()
 
     ####################################################################################################################
     # Process data.
@@ -1094,7 +1103,7 @@ def run(dest_dir: str) -> None:
     data = harmonize_elements(df=data)
 
     data = clean_data(data=data, items_metadata=items_metadata, elements_metadata=elements_metadata,
-                      countries_file=countries_file)
+                      countries_metadata=countries_metadata)
 
     # TODO: Run more sanity checks (i.e. compare with previous version of the same domain).
 

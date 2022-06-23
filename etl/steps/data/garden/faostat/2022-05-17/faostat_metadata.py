@@ -44,7 +44,7 @@ from owid.datautils import dataframes, io
 from tqdm.auto import tqdm
 
 from etl.paths import DATA_DIR, STEP_DIR
-from .shared import FLAGS_RANKING, harmonize_elements, harmonize_items, VERSION, optimize_table_dtypes
+from .shared import FLAGS_RANKING, harmonize_elements, harmonize_items, VERSION, optimize_table_dtypes, log
 
 # Define namespace and short name for output dataset.
 NAMESPACE = "faostat"
@@ -99,10 +99,10 @@ def clean_global_dataset_descriptions_dataframe(datasets_df: pd.DataFrame,
     changed_descriptions = datasets_df[datasets_df["fao_dataset_description_old"] !=
                                        datasets_df["fao_dataset_description_new"]]
     if len(changed_titles) > 0:
-        print(f"WARNING: {len(changed_titles)} domains have changed titles, consider updating custom_datasets.csv.")
+        log.warning(f"{len(changed_titles)} domains have changed titles, consider updating custom_datasets.csv.")
     if len(changed_descriptions) > 0:
-        print(f"WARNING: {len(changed_descriptions)} domains have changed descriptions. "
-              f"Consider updating custom_datasets.csv.")
+        log.warning(f"{len(changed_descriptions)} domains have changed descriptions. "
+                    f"Consider updating custom_datasets.csv.")
 
     datasets_df = datasets_df.drop(columns=["fao_dataset_title_old", "fao_dataset_description_old"]).rename(columns={
         "fao_dataset_title_new": "fao_dataset_title", "fao_dataset_description_new": "fao_dataset_description"})
@@ -164,8 +164,8 @@ def create_items_dataframe_for_domain(table: catalog.Table, metadata: catalog.Da
     different_items = compared[compared["fao_item_in_data"] != compared["fao_item_in_metadata"]]
     missing_item_codes = set(items_from_data["item_code"]) - set(_items_df["item_code"])
     if (len(different_items) + len(missing_item_codes)) > N_ISSUES_ON_ITEMS_FOR_WARNING:
-        print(f"WARNING: {len(missing_item_codes)} item codes in {dataset_short_name} missing in metadata. "
-              f"{len(different_items)} item codes in data mapping to different items in metadata.")
+        log.warning(f"{len(missing_item_codes)} item codes in {dataset_short_name} missing in metadata. "
+                    f"{len(different_items)} item codes in data mapping to different items in metadata.")
 
     return items_from_data
 
@@ -189,8 +189,8 @@ def clean_global_items_dataframe(items_df: pd.DataFrame, custom_items: pd.DataFr
     changed_descriptions = items_df[(items_df["fao_item_description_old"] != items_df["fao_item_description_new"]) &
                                     (items_df["fao_item_description_old"].notnull())]
     if len(changed_descriptions) > 0:
-        print(f"WARNING: {len(changed_descriptions)} domains have changed descriptions. "
-              f"Consider updating custom_items.csv.")
+        log.warning(f"WARNING: {len(changed_descriptions)} domains have changed descriptions. "
+                    f"Consider updating custom_items.csv.")
 
     items_df = items_df.drop(columns="fao_item_description_old").rename(
         columns={"fao_item_description_new": "fao_item_description"})
@@ -293,14 +293,14 @@ def clean_global_elements_dataframe(elements_df: pd.DataFrame, custom_elements: 
     changed_units = elements_df[(elements_df["fao_unit_new"] != elements_df["fao_unit_old"]) &
                                 (elements_df["fao_unit_old"].notnull())]
     if len(changed_units) > 0:
-        print(f"WARNING: {len(changed_units)} domains have changed units, consider updating custom_elements.csv.")
+        log.warning(f"{len(changed_units)} domains have changed units, consider updating custom_elements.csv.")
 
     changed_descriptions = elements_df[(elements_df["fao_element_description_new"] !=
                                         elements_df["fao_element_description_old"]) &
                                        (elements_df["fao_element_description_old"].notnull())]
     if len(changed_descriptions) > 0:
-        print(f"WARNING: {len(changed_descriptions)} domains have changed descriptions. "
-              f"Consider updating custom_elements.csv.")
+        log.warning(f"{len(changed_descriptions)} domains have changed descriptions. "
+                    f"Consider updating custom_elements.csv.")
 
     elements_df = elements_df.drop(columns=["fao_unit_old", "fao_element_description_old"]).rename(
         columns={"fao_element_description_new": "fao_element_description", "fao_unit_new": "fao_unit"})
@@ -350,7 +350,7 @@ def clean_global_elements_dataframe(elements_df: pd.DataFrame, custom_elements: 
 def clean_global_countries_dataframe(countries_in_data, country_groups, countries_harmonization):
     countries_df = countries_in_data.copy()
     countries_missing_in_harmonization = sorted(set(countries_df["fao_country"]) - set(countries_harmonization))
-    error = f"Country harmonization file is incomplete. Add the following countries: {countries_missing_in_harmonization}"
+    error = f"Countries file is incomplete. Add the following countries: {countries_missing_in_harmonization}"
     assert len(countries_missing_in_harmonization) == 0, error
 
     # Harmonize country groups and members.
@@ -368,7 +368,8 @@ def clean_global_countries_dataframe(countries_in_data, country_groups, countrie
         series=countries_df["country"], mapping=country_groups_harmonized, make_unmapped_values_nan=True)
 
     # Feather does not support object types, so convert column of lists to column of strings.
-    countries_df["members"] = [str(members) if isinstance(members, list) else members for members in countries_df["members"]]
+    countries_df["members"] = [str(members) if isinstance(members, list) else members
+                               for members in countries_df["members"]]
 
     return countries_df
 
@@ -430,18 +431,17 @@ def check_that_all_flags_in_dataset_are_in_ranking(
         missing_flags = set(table["flag"]) - set(FLAGS_RANKING["flag"])
         flags_data = pd.DataFrame(metadata_for_flags).reset_index()
         if set(missing_flags) < set(flags_data["flag"]):
-            print(
-                "Manually copy the following lines to FLAGS_RANKING (and put them in the right order):"
-            )
+            message = "Missing flags. Copy the following lines to FLAGS_RANKING (and put them in the right order):"
             for i, j in (
                 pd.DataFrame(metadata_for_flags)
                 .loc[list(missing_flags)]
                 .iterrows()
             ):
-                print(f"{(i, j['flags'])},")
+                message += f"\n{(i, j['flags'])},"
+            log.warning(message)
         else:
-            print(
-                f"Not all flags ({missing_flags}) are defined in additional metadata. Get their definition from "
+            log.warning(
+                f"Missing flags. {missing_flags} are not defined in additional metadata. Get definition from "
                 f"https://www.fao.org/faostat/en/#definitions"
             )
         raise AssertionError(
@@ -500,21 +500,26 @@ def run(dest_dir: str) -> None:
     items_df = pd.DataFrame({"dataset": [], "item_code": [], "fao_item": [], "fao_item_description": []})
     elements_df = pd.DataFrame({"dataset": [], "element_code": [], "fao_element": [], "fao_element_description": [],
                                 "fao_unit": [], "fao_unit_short_name": []})
-    # Initialise dataframe of countries (unharmonized and harmonized names), their area code, and their sub-regions
-    # (if they happen to contain any).
-    countries_df = pd.DataFrame({"area_code": [], "fao_country": [], "members": []})
 
     # Initialise list of all countries in all datasets, and all country groups.
-    countries_in_data = pd.DataFrame({"area_code": [], "fao_country": []})
+    countries_in_data = pd.DataFrame({"area_code": [], "fao_country": []}).astype({"area_code": "Int64"})
     country_groups_in_data = {}
-
     # Gather all variables from the latest version of each meadow dataset.
     for dataset_short_name in tqdm(dataset_short_names, file=sys.stdout):
         # Load latest meadow table for current dataset.
         table = load_latest_data_table_for_dataset(dataset_short_name=dataset_short_name)
         df = pd.DataFrame(table.reset_index()).rename(
             columns={"area": "fao_country", "recipient_country": "fao_country",
-                     "recipient_country_code": "area_code"}).astype({"area_code": str})
+                     "recipient_country_code": "area_code"})
+
+        # Column 'area_code' in faostat_sdgb is float instead of integer, and it does not seem to agree
+        # with the usual area codes. For example, Afghanistan has area code 4.0 in faostat_sdgb, whereas
+        # in other dataset it is 2. Also, there are area codes in faostat_sdgb with many decimals, like area
+        # "FAO Major Fishing Area: Atlantic, Eastern Central (14.4.1)", which has area code 920.710022.
+        # Therefore, we make these area codes nans if they are not integers.
+        if df["area_code"].dtype == "float64":
+            df["area_code"] = pd.NA
+        df["area_code"] = df["area_code"].astype("Int64")
 
         check_that_all_flags_in_dataset_are_in_ranking(
             table=table, metadata_for_flags=metadata[f"{dataset_short_name}_flag"])
@@ -534,11 +539,12 @@ def run(dest_dir: str) -> None:
 
         # Get country groups in this dataset.
         area_group_table_name = f"{dataset_short_name}_area_group"
+        country_groups = {}
         if area_group_table_name in metadata:
             country_groups = metadata[f"{dataset_short_name}_area_group"].reset_index().\
                 drop_duplicates(subset=["country_group", "country"]).groupby("country_group").agg({"country": list}).\
                 to_dict()["country"]
-            # Add new groups to country_groups_in_data; if they are already there, ensure they contain all possible members.
+            # Add new groups to country_groups_in_data; if they are already there, ensure they contain all members.
             for group in list(country_groups):
                 if group not in countries_in_data["fao_country"]:
                     # This should not happen, but skip just in case.
