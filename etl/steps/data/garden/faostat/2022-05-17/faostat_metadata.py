@@ -367,6 +367,9 @@ def clean_global_countries_dataframe(countries_in_data, country_groups, countrie
     countries_df["members"] = dataframes.map_series(
         series=countries_df["country"], mapping=country_groups_harmonized, make_unmapped_values_nan=True)
 
+    # Feather does not support object types, so convert column of lists to column of strings.
+    countries_df["members"] = [str(members) if isinstance(members, list) else members for members in countries_df["members"]]
+
     return countries_df
 
 
@@ -578,12 +581,8 @@ def run(dest_dir: str) -> None:
     elements_table = create_table(df=elements_df, short_name="elements", index_cols=["element_code"])
     countries_table = create_table(df=countries_df, short_name="countries", index_cols=["area_code"])
 
-    # Set indexes and other necessary metadata.
-    table = table.set_index(index_cols)
-    table.metadata.short_name = short_name
-    table.metadata.primary_key = index_cols
-
     # Add tables to dataset (no need to repack, since columns already have optimal dtypes).
     dataset_garden.add(datasets_table, repack=False)
     dataset_garden.add(items_table, repack=False)
     dataset_garden.add(elements_table, repack=False)
+    dataset_garden.add(countries_table, repack=False)
