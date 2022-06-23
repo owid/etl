@@ -101,8 +101,6 @@ def filter_to_subgraph(
     dependent on B).
     """
     all_steps = graph_nodes(graph)
-    subgraph: Graph = defaultdict(set)
-
     included = {
         s for s in all_steps if any(re.findall(pattern, s) for pattern in includes)
     }

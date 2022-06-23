@@ -24,7 +24,6 @@ from etl.steps import (
     to_dependency_order,
     select_dirty_steps,
     Step,
-    reverse_graph,
     filter_to_subgraph,
 )
 
