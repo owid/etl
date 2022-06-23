@@ -28,7 +28,7 @@ def combine_qcl_and_fbsc(
 ) -> pd.DataFrame:
 
     columns = ['country', 'year', 'item_code', 'element_code', 'item', 'element', 'unit', 'unit_short_name', 'value',
-               'unit_factor', 'population_with_data']
+               'population_with_data']
     qcl = pd.DataFrame(qcl_table).reset_index()[columns]
     qcl["value"] = qcl["value"].astype(float)
     qcl["element"] = [element for element in qcl["element"]]
@@ -181,12 +181,6 @@ def process_combined_data(combined: pd.DataFrame, custom_products: pd.DataFrame)
     # Rename products.
     combined["product"] = dataframes.map_series(combined["product"], mapping=products_renaming,
                                                 warn_on_unused_mappings=True)
-
-    # For the food explorer we have to multiply data by the unit factor, since these conversions
-    # will not be applied in grapher.
-    rows_to_convert_mask = combined["unit_factor"].notnull()
-    combined.loc[rows_to_convert_mask, "value"] = combined[rows_to_convert_mask]["value"] * \
-        combined[rows_to_convert_mask]["unit_factor"]
 
     # Include number of slaughtered animals in 'Meat, Total' (which is missing).
     combined = add_slaughtered_animals_to_meat_total(combined)

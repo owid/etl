@@ -603,7 +603,7 @@ def add_regions(data, aggregations):
                         "item_description",
                         "unit",
                         "unit_short_name",
-                        "unit_factor",
+                        #"unit_factor",
                         "fao_unit",
                         "element_description"],
                     num_allowed_nans=None, frac_allowed_nans=None,
@@ -799,6 +799,11 @@ def clean_data(data: pd.DataFrame, items_metadata: pd.DataFrame, elements_metada
     # Use custom names for items, elements and units (and keep original names in "fao_*" columns).
     data = add_custom_names_and_descriptions(data, items_metadata, elements_metadata)
 
+    # Multiply data values by their corresponding unit factor, if any was given, and then drop unit_factor column.
+    unit_factor_mask = data["unit_factor"].notnull()
+    data.loc[unit_factor_mask, "value"] = data[unit_factor_mask]["value"] * data[unit_factor_mask]["unit_factor"]
+    data = data.drop(columns=["unit_factor"])
+
     # Add FAO population as an additional column (if given in the original data).
     data = add_fao_population_if_given(data)
 
@@ -957,11 +962,11 @@ def prepare_wide_table(data: pd.DataFrame, dataset_title: str) -> catalog.Table:
     for column in wide_table.columns:
         wide_table[column].metadata.display["name"] = variable_name_mapping[column]
 
-    # Unit conversion factor (if given).
-    variable_name_mapping = _variable_name_map(data, "unit_factor")
-    for column in wide_table.columns:
-        if column in variable_name_mapping:
-            wide_table[column].metadata.display["conversionFactor"] = variable_name_mapping[column]
+    # # Unit conversion factor (if given).
+    # variable_name_mapping = _variable_name_map(data, "unit_factor")
+    # for column in wide_table.columns:
+    #     if column in variable_name_mapping:
+    #         wide_table[column].metadata.display["conversionFactor"] = variable_name_mapping[column]
 
     # Ensure columns have the optimal dtypes, but codes are categories.
     log.info("prepare_wide_table.optimize_table_dtypes", shape=wide_table.shape)
