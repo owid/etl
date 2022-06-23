@@ -24,6 +24,7 @@ from etl.steps import (
     to_dependency_order,
     select_dirty_steps,
     Step,
+    filter_to_subgraph,
 )
 
 
@@ -70,10 +71,28 @@ def temporary_step() -> Iterator[str]:
             ipy_file.unlink()
 
 
-def test_topological_sort():
+def test_dependency_ordering():
     "Check that a dependency will be scheduled to run before things that need it."
     dag = {"a": ["b", "c"], "b": ["c"]}
     assert to_dependency_order(dag, [], []) == ["c", "b", "a"]
+
+
+def test_dependency_filtering():
+    dag = {
+        "e": {"a"},
+        "c": {"b", "d"},
+        "b": {"a"},
+    }
+    assert filter_to_subgraph(dag, ["b"]) == {
+        "d": set(),
+        "c": {"b", "d"},
+        "b": {"a"},
+        "a": set(),
+    }
+    assert filter_to_subgraph(dag, ["b"], incl_forward=False) == {
+        "b": {"a"},
+        "a": set(),
+    }
 
 
 @patch("etl.steps.parse_step")

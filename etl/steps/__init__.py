@@ -10,7 +10,6 @@ from typing import (
     Protocol,
     List,
     Set,
-    Tuple,
     Union,
     cast,
     Iterable,
@@ -73,22 +72,13 @@ def compile_steps(
 def to_dependency_order(
     dag: DAG, includes: List[str], excludes: List[str]
 ) -> List[str]:
-    # reverse the graph so that dependencies point to their dependents
-    graph = reverse_graph(dag)
-
-    if includes:
-        # cut the graph to just the listed steps and the things that
-        # then depend on them (transitive closure)
-        subgraph = filter_to_subgraph(graph, includes)
-
-        # make sure we also include all dependencies of the subgraph
-        nodes = set(subgraph.keys()) | {e for v in subgraph.values() for e in v}
-        subgraph = reverse_graph(maximal_subgraph(dag, nodes))
-    else:
-        subgraph = graph
-
-    # make sure dependencies are built before running the things that depend on them
-    in_order = topological_sort(subgraph)
+    """
+    Organize the steps in dependency order with a topological sort. In other words,
+    the resulting list of steps is a valid ordering of steps such that no step is run
+    before the steps it depends on. Note: this ordering is not necessarily unique.
+    """
+    subgraph = filter_to_subgraph(dag, includes) if includes else dag
+    in_order = list(graphlib.TopologicalSorter(subgraph).static_order())
 
     # filter out explicit excludes
     filtered = [
@@ -96,6 +86,50 @@ def to_dependency_order(
     ]
 
     return filtered
+
+
+def filter_to_subgraph(
+    graph: Graph, includes: Iterable[str], incl_forward: bool = True
+) -> Graph:
+    """
+    Filter the full graph to only the included nodes, and all their dependencies.
+
+    If the incl_forward flag is true, also include "forward dependencies" (dependents),
+    and their own (backward) dependencies.
+
+    Assumes that the graph is organized dependent -> dependency (A -> B means A is
+    dependent on B).
+    """
+    all_steps = graph_nodes(graph)
+    included = {
+        s for s in all_steps if any(re.findall(pattern, s) for pattern in includes)
+    }
+
+    if incl_forward:
+        # Reverse the graph to find all nodes dependent on included nodes (forward deps)
+        forward_deps = set(traverse(reverse_graph(graph), included))
+        included = included.union(forward_deps)
+
+    # Now traverse the other way to find all dependencies of included nodes (backward deps)
+    return traverse(graph, included)
+
+
+def traverse(graph: Graph, nodes: Set[str]) -> Graph:
+    """
+    Use BFS to find all nodes in a graph that are reachable from a given
+    subset of nodes.
+    """
+    reachable: Graph = defaultdict(set)
+    to_visit = nodes.copy()
+
+    while to_visit:
+        node = to_visit.pop()
+        if node in reachable:
+            continue  # already visited
+        reachable[node] = set(graph.get(node, set()))
+        to_visit = to_visit.union(reachable[node])
+
+    return dict(reachable)
 
 
 def load_dag(filename: Union[str, Path] = paths.DAG_FILE) -> Dict[str, Any]:
@@ -142,89 +176,11 @@ def reverse_graph(graph: Graph) -> Graph:
     return dict(g)
 
 
-def maximal_subgraph(graph: Graph, nodes: Set[str]) -> Graph:
-    """
-    Take a graph and a set of nodes and return a subgraph that only includes
-    those nodes and their dependencies. (Return subgraph that contains all nodes
-    reachable from given nodes... is there a name for it?)
-    """
-    subgraph = defaultdict(set)
-
-    while nodes:
-        node = nodes.pop()
-        # already traversed
-        if node in subgraph:
-            continue
-        subgraph[node] = set(graph.get(node, set()))
-        nodes |= subgraph[node]
-
-    return dict(subgraph)
-
-
 def graph_nodes(graph: Graph) -> Set[str]:
     all_steps = set(graph)
     for children in graph.values():
         all_steps.update(children)
     return all_steps
-
-
-def filter_to_subgraph(graph: Graph, includes: Iterable[str]) -> Graph:
-    """
-    For each step to be included, find all its ancestors and all its descendents
-    recursively and include them too.
-    """
-    all_steps = graph_nodes(graph)
-    subgraph: Graph = defaultdict(set)
-
-    included = [
-        s for s in all_steps if any(re.findall(pattern, s) for pattern in includes)
-    ]
-
-    child_frontier: List[str] = []
-    parent_frontier: List[Tuple[str, str]] = []
-    for node in included:
-        children = graph.get(node, set())
-        child_frontier.extend(children)
-
-        parents = set((n, node) for n in graph if node in graph.get(n, set()))
-        parent_frontier.extend(parents)
-
-        subgraph[node] = children
-
-    # follow all children and their children, recursively
-    while child_frontier:
-        node = child_frontier.pop()
-        children = graph.get(node, set())
-        child_frontier.extend(children)
-
-        subgraph[node] = children
-
-    # follow all parents and their parents, recursively
-    while parent_frontier:
-        parent, child = parent_frontier.pop()
-        parents = set((n, parent) for n in graph if parent in graph.get(n, set()))
-        parent_frontier.extend(parents)
-
-        # ignore other children of this parent
-        subgraph[parent] = {child}
-
-    return dict(subgraph)
-
-
-def topological_sort(graph: Graph) -> List[str]:
-    """
-    Take a directed graph mapping dependencies to parents, and return a list of
-    steps that, if run in this order, make sure that every dependency is run before
-    anything that needs it.
-
-    E.g. you have steps, "a" and "b", where you need "a" to build "b". Then you
-    will have a graph like {"a": "b"}. This method will return ["a", "b"] as the
-    correct build order.
-
-    In general, there can be many build orders which can work for a graph, we don't
-    care which one we get, just that it build dependencies first.
-    """
-    return list(reversed(list(graphlib.TopologicalSorter(graph).static_order())))
 
 
 def parse_step(step_name: str, dag: Dict[str, Any]) -> "Step":
