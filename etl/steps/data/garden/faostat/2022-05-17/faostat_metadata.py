@@ -34,9 +34,9 @@ mapping in the data is the correct one (except possibly in the examples mentione
 
 """
 
+import sys
 from copy import deepcopy
 from typing import List
-import sys
 
 import pandas as pd
 from owid import catalog
