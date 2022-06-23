@@ -34,6 +34,7 @@ mapping in the data is the correct one (except possibly in the examples mentione
 
 """
 
+import sys
 from copy import deepcopy
 from typing import List
 
@@ -505,7 +506,7 @@ def run(dest_dir: str) -> None:
     country_groups_in_data = {}
 
     # Gather all variables from the latest version of each meadow dataset.
-    for dataset_short_name in tqdm(dataset_short_names):
+    for dataset_short_name in tqdm(dataset_short_names, file=sys.stdout):
         # Load latest meadow table for current dataset.
         table = load_latest_data_table_for_dataset(dataset_short_name=dataset_short_name)
         df = pd.DataFrame(table.reset_index()).rename(
