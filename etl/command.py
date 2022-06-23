@@ -40,7 +40,7 @@ THREADPOOL_WORKERS = 5
 @click.option(
     "--downstream",
     is_flag=True,
-    help="Include downstream dependencies (steps that depend on the included steps)"
+    help="Include downstream dependencies (steps that depend on the included steps)",
 )
 @click.option("--exclude", help="Comma-separated patterns to exclude")
 @click.option(
@@ -55,7 +55,6 @@ THREADPOOL_WORKERS = 5
     help="Thread workers to parallelize which steps need rebuilding (steps execution is not parallelized)",
     default=5,
 )
-
 @click.argument("steps", nargs=-1)
 def main(
     steps: List[str],

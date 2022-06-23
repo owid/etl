@@ -53,7 +53,10 @@ DAG = Dict[str, Any]
 
 
 def compile_steps(
-    dag: DAG, includes: Optional[List[str]] = None, excludes: Optional[List[str]] = None, downstream: bool = False,
+    dag: DAG,
+    includes: Optional[List[str]] = None,
+    excludes: Optional[List[str]] = None,
+    downstream: bool = False,
 ) -> List["Step"]:
     """
     Return the list of steps which, if executed in order, mean that every
@@ -70,14 +73,19 @@ def compile_steps(
 
 
 def to_dependency_order(
-    dag: DAG, includes: List[str], excludes: List[str], downstream: bool = False,
+    dag: DAG,
+    includes: List[str],
+    excludes: List[str],
+    downstream: bool = False,
 ) -> List[str]:
     """
     Organize the steps in dependency order with a topological sort. In other words,
     the resulting list of steps is a valid ordering of steps such that no step is run
     before the steps it depends on. Note: this ordering is not necessarily unique.
     """
-    subgraph = filter_to_subgraph(dag, includes, downstream=downstream) if includes else dag
+    subgraph = (
+        filter_to_subgraph(dag, includes, downstream=downstream) if includes else dag
+    )
     in_order = list(graphlib.TopologicalSorter(subgraph).static_order())
 
     # filter out explicit excludes
