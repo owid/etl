@@ -6,6 +6,7 @@ NOTE: It will overwrite csv files inside "data/explorer/owid/latest/food_explore
 
 """
 
+import sys
 from copy import deepcopy
 
 from owid import catalog
@@ -72,7 +73,7 @@ def run(dest_dir: str) -> None:
     # List all products in table
     products = sorted(table_garden.index.get_level_values("product").unique().tolist())
 
-    for product in tqdm(products):
+    for product in tqdm(products, file=sys.stdout):
         # Save a table (as a separate csv file) for each food product.
         table_product = table_garden.loc[product].copy()
         # Update table metadata.
