@@ -83,31 +83,16 @@ def test_dependency_filtering():
         "c": {"b", "d"},
         "b": {"a"},
     }
-    assert filter_to_subgraph(dag, ["b"]) == {
+    assert filter_to_subgraph(dag, ["b"], downstream=True) == {
         "d": set(),
         "c": {"b", "d"},
         "b": {"a"},
         "a": set(),
     }
-    assert filter_to_subgraph(dag, ["b"], incl_forward=False) == {
+    assert filter_to_subgraph(dag, ["b"], downstream=False) == {
         "b": {"a"},
         "a": set(),
     }
-
-
-@patch("etl.steps.parse_step")
-def test_selection_selects_children(parse_step):
-    """When you pick a step, it should rebuild everything that depends on that step
-    and all dependencies of those steps"""
-    parse_step.side_effect = lambda name, _: DummyStep(name)
-
-    dag = {"a": ["b", "c"], "d": ["a"], "e": ["b"]}
-
-    # selecting "c" should cause "c" -> "a" -> "d" to all be selected
-    #                            "b" to be ignored
-    steps = compile_steps(dag, ["c"], [])
-    assert len(steps) == 4
-    assert set(s.path for s in steps) == {"b", "c", "a", "d"}
 
 
 @patch("etl.steps.parse_step")

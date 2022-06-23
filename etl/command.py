@@ -37,6 +37,11 @@ THREADPOOL_WORKERS = 5
     is_flag=True,
     help="Add steps for backporting OWID datasets",
 )
+@click.option(
+    "--downstream",
+    is_flag=True,
+    help="Include downstream dependencies (steps that depend on the included steps)"
+)
 @click.option("--exclude", help="Comma-separated patterns to exclude")
 @click.option(
     "--dag-path",
@@ -50,6 +55,7 @@ THREADPOOL_WORKERS = 5
     help="Thread workers to parallelize which steps need rebuilding (steps execution is not parallelized)",
     default=5,
 )
+
 @click.argument("steps", nargs=-1)
 def main(
     steps: List[str],
@@ -58,6 +64,7 @@ def main(
     private: bool = False,
     grapher: bool = False,
     backport: bool = False,
+    downstream: bool = False,
     exclude: Optional[str] = None,
     dag_path: Path = paths.DAG_FILE,
     workers: int = 5,
@@ -85,6 +92,7 @@ def main(
         force=force,
         private=private,
         include_grapher=grapher,
+        downstream=downstream,
         excludes=excludes,
         workers=workers,
     )
@@ -107,6 +115,7 @@ def run_dag(
     force: bool = False,
     private: bool = False,
     include_grapher: bool = False,
+    downstream: bool = False,
     excludes: Optional[List[str]] = None,
     workers: int = 1,
 ) -> None:
@@ -126,7 +135,7 @@ def run_dag(
     if not private:
         excludes.append("-private://")
 
-    steps = compile_steps(dag, includes, excludes)
+    steps = compile_steps(dag, includes, excludes, downstream=downstream)
 
     if not force:
         print("Detecting which steps need rebuilding...")
