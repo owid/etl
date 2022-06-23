@@ -36,6 +36,7 @@ mapping in the data is the correct one (except possibly in the examples mentione
 
 from copy import deepcopy
 from typing import List
+import sys
 
 import pandas as pd
 from owid import catalog
@@ -469,7 +470,7 @@ def run(dest_dir: str) -> None:
                                 "fao_unit": [], "fao_unit_short_name": []})
 
     # Gather all variables from the latest version of each meadow dataset.
-    for dataset_short_name in tqdm(dataset_short_names):
+    for dataset_short_name in tqdm(dataset_short_names, file=sys.stdout):
         # Load latest meadow table for current dataset.
         table = load_latest_data_table_for_dataset(dataset_short_name=dataset_short_name)
 

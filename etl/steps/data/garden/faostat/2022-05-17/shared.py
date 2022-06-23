@@ -17,6 +17,7 @@ NOTES:
 """
 
 import json
+import sys
 import warnings
 from copy import deepcopy
 from pathlib import Path
@@ -629,7 +630,7 @@ def add_regions(data, aggregations):
                                                       if value == unique_value]).tolist()
                              for unique_value in aggregations.values()}
 
-    for region in tqdm(REGIONS_TO_ADD):
+    for region in tqdm(REGIONS_TO_ADD, file=sys.stdout):
         countries_in_region = _list_countries_in_region(region, countries_regions=countries_regions)
         region_code = REGIONS_TO_ADD[region]["area_code"]
         region_population = population[population["country"] == region][["year", "population"]].reset_index(drop=True)
