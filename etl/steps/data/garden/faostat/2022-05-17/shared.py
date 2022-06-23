@@ -285,17 +285,26 @@ def harmonize_elements(df, element_col="element") -> pd.DataFrame:
 def harmonize_countries(data, countries_metadata):
     data = data.copy()
 
-    # Add harmonized country names (from countries metadata) to data.
-    data = pd.merge(data, countries_metadata[["area_code", "fao_country", "country"]].
-                    rename(columns={"fao_country": "fao_country_check"}), on="area_code", how="left")
-    # Sanity checks.
-    error = "Mismatch between fao_country in data and in metadata."
-    assert (data["fao_country"].astype(str) == data["fao_country_check"]).all(), error
+    if data["area_code"].dtype == "float64":
+        # This happens at least for faostat_sdgb, where area code is totally different to the usual one.
+        # See further explanations in garden step for faostat_metadata.
+        # When this happens, merge using the old country name instead of the area code.
+        data = pd.merge(data, countries_metadata[["fao_country", "country"]], on="fao_country", how="left")
+    else:
+        # Add harmonized country names (from countries metadata) to data.
+        data = pd.merge(data, countries_metadata[["area_code", "fao_country", "country"]].
+                        rename(columns={"fao_country": "fao_country_check"}), on="area_code", how="left")
+        # Sanity check.
+        error = "Mismatch between fao_country in data and in metadata."
+        assert (data["fao_country"].astype(str) == data["fao_country_check"]).all(), error
+        data = data.drop(columns="fao_country_check")
+
+    # Further sanity checks.
     check_that_countries_are_well_defined(data)
     check_that_regions_with_subregions_are_ignored_when_constructing_aggregates(countries_metadata)
     
-    # Drop unnecessary column and set appropriate dtypes.
-    data = data.drop(columns="fao_country_check").astype({"country": "category", "fao_country": "category"})
+    # Set appropriate dtypes.
+    data = data.astype({"country": "category", "fao_country": "category"})
 
     return data
 
