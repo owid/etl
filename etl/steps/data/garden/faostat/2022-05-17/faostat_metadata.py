@@ -34,6 +34,7 @@ mapping in the data is the correct one (except possibly in the examples mentione
 
 """
 
+import json
 import sys
 from copy import deepcopy
 from typing import List
@@ -368,7 +369,7 @@ def clean_global_countries_dataframe(countries_in_data, country_groups, countrie
         series=countries_df["country"], mapping=country_groups_harmonized, make_unmapped_values_nan=True)
 
     # Feather does not support object types, so convert column of lists to column of strings.
-    countries_df["members"] = [str(members) if isinstance(members, list) else members
+    countries_df["members"] = [json.dumps(members) if isinstance(members, list) else members
                                for members in countries_df["members"]]
 
     return countries_df
