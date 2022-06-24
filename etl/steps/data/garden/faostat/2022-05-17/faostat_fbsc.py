@@ -13,7 +13,6 @@ https://fenixservices.fao.org/faostat/static/documents/FBS/New%20FBS%20methodolo
 from copy import deepcopy
 
 import pandas as pd
-import structlog
 from owid import catalog
 from owid.catalog.meta import DatasetMeta, TableMeta
 from owid.datautils import dataframes
@@ -22,9 +21,12 @@ from etl.paths import DATA_DIR
 from .shared import (
     NAMESPACE,
     VERSION,
+    add_per_capita_variables,
+    add_regions,
     clean_data,
     harmonize_elements,
     harmonize_items,
+    log,
     prepare_long_table,
     prepare_wide_table,
 )
@@ -35,8 +37,6 @@ DATASET_SHORT_NAME = f"{NAMESPACE}_fbsc"
 # First year for which we have data in fbs dataset (it defines the first year when new methodology is used).
 FBS_FIRST_YEAR = 2010
 DATASET_TITLE = f"Food Balances (old methodology before {FBS_FIRST_YEAR}, and new from {FBS_FIRST_YEAR} onwards)"
-
-log = structlog.get_logger()
 
 
 def combine_fbsh_and_fbs_datasets(
@@ -67,9 +67,7 @@ def combine_fbsh_and_fbs_datasets(
         # There is overlapping data between fbsh and fbs datasets. Prioritising fbs over fbsh."
         fbsh = fbsh.loc[fbsh["year"] < fbs["year"].min()].reset_index(drop=True)
     if (fbsh["year"].max() + 1) < fbs["year"].min():
-        print(
-            "WARNING: Data is missing for one or more years between fbsh and fbs datasets."
-        )
+        log.warning("Data is missing for one or more years between fbsh and fbs datasets.")
 
     # Sanity checks.
     # Ensure the elements that are in fbsh but not in fbs are covered by ITEMS_MAPPING.
@@ -143,9 +141,15 @@ def run(dest_dir: str) -> None:
 
     _assert_df_size(data, 2000)
 
-    # Clean data.
+    # Prepare data.
     data = clean_data(data=data, items_metadata=items_metadata, elements_metadata=elements_metadata,
                       countries_metadata=countries_metadata)
+
+    # Add data for aggregate regions.
+    data = add_regions(data=data, elements_metadata=elements_metadata)
+
+    # Add per-capita variables.
+    data = add_per_capita_variables(data=data, elements_metadata=elements_metadata)
 
     # Avoid objects as they would explode memory, use categoricals instead.
     for col in data.columns:

@@ -18,7 +18,6 @@ NOTES:
 
 import json
 import sys
-import warnings
 from copy import deepcopy
 from pathlib import Path
 from typing import List, cast, Dict
@@ -319,7 +318,7 @@ def remove_rows_with_nan_value(
     data : pd.DataFrame
         Data for current dataset.
     verbose : bool
-        True to print information about the number and fraction of rows removed.
+        True to display information about the number and fraction of rows removed.
 
     Returns
     -------
@@ -334,12 +333,12 @@ def remove_rows_with_nan_value(
     if n_rows_with_nan_value > 0:
         frac_nan_rows = n_rows_with_nan_value / len(data)
         if verbose:
-            print(
+            log.info(
                 f"Removing {n_rows_with_nan_value} rows ({frac_nan_rows: .2%}) "
                 f"with nan in column 'value'."
             )
         if frac_nan_rows > 0.15:
-            warnings.warn(f"{frac_nan_rows: .0%} rows of nan values removed.")
+            log.warning(f"{frac_nan_rows: .0%} rows of nan values removed.")
         data = data.dropna(subset="value").reset_index(drop=True)
 
     return data
@@ -357,7 +356,7 @@ def remove_columns_with_only_nans(
     data : pd.DataFrame
         Data for current dataset.
     verbose : bool
-        True to print information about the removal of columns with nan values.
+        True to display information about the removal of columns with nan values.
 
     Returns
     -------
@@ -370,7 +369,7 @@ def remove_columns_with_only_nans(
     columns_of_nans = data.columns[data.isnull().all(axis=0)]
     if len(columns_of_nans) > 0:
         if verbose:
-            print(
+            log.info(
                 f"Removing {len(columns_of_nans)} columns ({len(columns_of_nans) / len(data.columns): .2%}) "
                 f"that have only nans."
             )
@@ -391,7 +390,7 @@ def remove_duplicates(data: pd.DataFrame, index_columns: List[str], verbose: boo
     index_columns : list
         Columns expected to be used as index of the data.
     verbose : bool
-        True to print a summary of the removed duplicates.
+        True to display a summary of the removed duplicates.
 
     Returns
     -------
@@ -430,12 +429,8 @@ def remove_duplicates(data: pd.DataFrame, index_columns: List[str], verbose: boo
             n_ambiguous_indexes_unsolvable / n_ambiguous_indexes
         )
         if verbose:
-            print(
-                f"Removing {n_ambiguous_indexes} ambiguous indexes ({frac_ambiguous: .2%})."
-            )
-            print(
-                f"{frac_ambiguous_solved_by_flags: .2%} of ambiguities were solved with flags."
-            )
+            log.info(f"Removing {n_ambiguous_indexes} ambiguous indexes ({frac_ambiguous: .2%}). "
+                     f"{frac_ambiguous_solved_by_flags: .2%} of ambiguities were solved with flags.")
 
         data = data.drop(columns=["flag_ranking"])
 
@@ -567,85 +562,94 @@ def _list_countries_in_region(region, countries_regions):
     return countries_in_region
 
 
-def add_regions(data, aggregations):
+def add_regions(data, elements_metadata):
     data = data.copy()
 
-    # Load population dataset and countries-regions dataset.
-    population = _load_population()
-    countries_regions = _load_countries_regions()
+    # Create a dictionary of aggregations, specifying the operation to use when creating regions.
+    # These aggregations are defined in the custom_elements_and_units.csv file, and added to the metadata dataset.
+    aggregations = elements_metadata[(elements_metadata["owid_aggregation"].notnull())].\
+        set_index("element_code").to_dict()["owid_aggregation"]
+    if len(aggregations) > 0:
+        log.info("clean_data.add_regions", shape=data.shape)
 
-    # Invert dictionary of aggregations to have the aggregation as key, and the list of element codes as value.
-    aggregations_inverted = {unique_value: pd.unique([item for item, value in aggregations.items()
-                                                      if value == unique_value]).tolist()
-                             for unique_value in aggregations.values()}
+        # Load population dataset and countries-regions dataset.
+        population = _load_population()
+        countries_regions = _load_countries_regions()
 
-    for region in tqdm(REGIONS_TO_ADD, file=sys.stdout):
-        countries_in_region = _list_countries_in_region(region, countries_regions=countries_regions)
-        region_code = REGIONS_TO_ADD[region]["area_code"]
-        region_population = population[population["country"] == region][["year", "population"]].reset_index(drop=True)
-        region_min_frac_population_with_data = REGIONS_TO_ADD[region]["min_frac_population_with_data"]
-        for aggregation in aggregations_inverted:
-            # List of element codes for which the same aggregate method (e.g. "sum") will be applied.
-            element_codes = aggregations_inverted[aggregation]
+        # Invert dictionary of aggregations to have the aggregation as key, and the list of element codes as value.
+        aggregations_inverted = {unique_value: pd.unique([item for item, value in aggregations.items()
+                                                          if value == unique_value]).tolist()
+                                 for unique_value in aggregations.values()}
 
-            # Select relevant rows in the data.
-            data_region = data[(data["country"].isin(countries_in_region)) &
-                               (data["element_code"].isin(element_codes))]
-            if len(data_region) > 0:
-                # NOTE: using columns in groupby is faster than using `first`
-                data_region = dataframes.groupby_agg(
-                    df=data_region.dropna(subset="value"), groupby_columns=[
-                        "year", "item_code", "element_code",
-                        "item",
-                        "element",
-                        "fao_element",
-                        "fao_item",
-                        "item_description",
-                        "unit",
-                        "unit_short_name",
-                        #"unit_factor",
-                        "fao_unit",
-                        "element_description"],
-                    num_allowed_nans=None, frac_allowed_nans=None,
-                    aggregations={
-                        "value": aggregation,
-                        "flag": lambda x: x if len(x) == 1 else FLAG_MULTIPLE_FLAGS,
-                        "population_with_data": "sum",
-                    }
-                ).reset_index().dropna(subset="element")
+        for region in tqdm(REGIONS_TO_ADD, file=sys.stdout):
+            countries_in_region = _list_countries_in_region(region, countries_regions=countries_regions)
+            region_code = REGIONS_TO_ADD[region]["area_code"]
+            region_population = population[population["country"] == region][["year", "population"]].\
+                reset_index(drop=True)
+            region_min_frac_population_with_data = REGIONS_TO_ADD[region]["min_frac_population_with_data"]
+            for aggregation in aggregations_inverted:
+                # List of element codes for which the same aggregate method (e.g. "sum") will be applied.
+                element_codes = aggregations_inverted[aggregation]
 
-                # Add total population of the region (for each year) to the relevant data.
-                data_region = pd.merge(data_region, region_population, on="year", how="left")
+                # Select relevant rows in the data.
+                data_region = data[(data["country"].isin(countries_in_region)) &
+                                   (data["element_code"].isin(element_codes))]
+                if len(data_region) > 0:
+                    # NOTE: using columns in groupby is faster than using `first`
+                    data_region = dataframes.groupby_agg(
+                        df=data_region.dropna(subset="value"), groupby_columns=[
+                            "year", "item_code", "element_code",
+                            "item",
+                            "element",
+                            "fao_element",
+                            "fao_item",
+                            "item_description",
+                            "unit",
+                            "unit_short_name",
+                            "fao_unit",
+                            "element_description"],
+                        num_allowed_nans=None, frac_allowed_nans=None,
+                        aggregations={
+                            "value": aggregation,
+                            "flag": lambda x: x if len(x) == 1 else FLAG_MULTIPLE_FLAGS,
+                            "population_with_data": "sum",
+                        }
+                    ).reset_index().dropna(subset="element")
 
-                # Keep only rows for which we have sufficient data.
-                data_region = data_region[(data_region["population_with_data"] / data_region["population"])
-                                          >= region_min_frac_population_with_data].reset_index(drop=True)
+                    # Add total population of the region (for each year) to the relevant data.
+                    data_region = pd.merge(data_region, region_population, on="year", how="left")
 
-                # Add region's name and area code.
-                data_region["country"] = region
-                data_region["area_code"] = region_code
+                    # Keep only rows for which we have sufficient data.
+                    data_region = data_region[(data_region["population_with_data"] / data_region["population"])
+                                              >= region_min_frac_population_with_data].reset_index(drop=True)
 
-                # Use category type which is more efficient than using strings
-                data_region = data_region.astype({
-                    "flag": "category",
-                    "country": "category",
-                })
+                    # Add region's name and area code.
+                    data_region["country"] = region
+                    data_region["area_code"] = region_code
 
-                # Add data for current region to data.
-                data = dataframes.concatenate([data[data["country"] != region], data_region], ignore_index=True)
+                    # Use category type which is more efficient than using strings
+                    data_region = data_region.astype({
+                        "flag": "category",
+                        "country": "category",
+                    })
 
-        # Check that the fraction of population with data is as high as expected.
-        frac_population = data["population_with_data"] / data["population"]
-        assert frac_population[frac_population.notnull()].min() >= region_min_frac_population_with_data
+                    # Add data for current region to data.
+                    data = dataframes.concatenate([data[data["country"] != region], data_region], ignore_index=True)
 
-    # Drop column of total population (we will still keep population_with_data).
-    data = data.drop(columns=["population"])
+            # Check that the fraction of population with data is as high as expected.
+            frac_population = data["population_with_data"] / data["population"]
+            assert frac_population[frac_population.notnull()].min() >= region_min_frac_population_with_data
 
-    # Make area_code of category type (it contains integers and strings, and feather does not support object types).
-    data["area_code"] = data["area_code"].astype(str).astype("category")
+        # Drop column of total population (we will still keep population_with_data).
+        data = data.drop(columns=["population"])
 
-    # Sort conveniently.
-    data = data.sort_values(["country", "year"]).reset_index(drop=True)
+        # Make area_code of category type (it contains integers and strings, and feather does not support object types).
+        data["area_code"] = data["area_code"].astype(str).astype("category")
+
+        # Sort conveniently.
+        data = data.sort_values(["country", "year"]).reset_index(drop=True)
+
+        check_that_countries_are_well_defined(data)
 
     return data
 
@@ -677,7 +681,13 @@ def add_fao_population_if_given(data):
     return data
 
 
-def convert_variables_given_per_capita_to_total_value(data, element_codes_that_were_per_capita):
+def convert_variables_given_per_capita_to_total_value(data, elements_metadata):
+    # Select element codes that were originally given as per capita variables (if any), and, if FAO population is
+    # given, make them total variables instead of per capita.
+    # All variables in the custom_elements_and_units.csv file with "was_per_capita" True will be converted into
+    # total (non-per-capita) values.
+    element_codes_that_were_per_capita = elements_metadata[elements_metadata["was_per_capita"]]["element_code"].\
+        unique().tolist()
     if len(element_codes_that_were_per_capita) > 0:
         data = data.copy()
 
@@ -701,50 +711,56 @@ def convert_variables_given_per_capita_to_total_value(data, element_codes_that_w
     return data
 
 
-def add_per_capita_variables(data, element_codes_to_make_per_capita):
+def add_per_capita_variables(data, elements_metadata):
     data = data.copy()
 
-    # Create a new dataframe that will have all per capita variables.
-    per_capita_data = data[data["element_code"].isin(element_codes_to_make_per_capita)].reset_index(drop=True)
+    # Find element codes that have to be made per capita.
+    element_codes_to_make_per_capita = elements_metadata[elements_metadata["make_per_capita"]]["element_code"].\
+        unique().tolist()
+    if len(element_codes_to_make_per_capita) > 0:
+        log.info("clean_data.add_per_capita_variables", shape=data.shape)
 
-    # Change element codes of per capita variables.
-    per_capita_data["element_code"] = per_capita_data["element_code"].cat.rename_categories(
-        lambda c: (c.lstrip("0") + "pc").zfill(N_CHARACTERS_ELEMENT_CODE)
-    )
+        # Create a new dataframe that will have all per capita variables.
+        per_capita_data = data[data["element_code"].isin(element_codes_to_make_per_capita)].reset_index(drop=True)
 
-    # Create a mask that selects FAO regions (regions that, in the countries.json file, were not harmonized, and
-    # have '(FAO)' at the end of the name).
-    fao_regions_mask = (per_capita_data["country"].str.contains("(FAO)", regex=False))
-    # Create a mask that selects all other regions (i.e. harmonized countries).
-    owid_regions_mask = ~fao_regions_mask
+        # Change element codes of per capita variables.
+        per_capita_data["element_code"] = per_capita_data["element_code"].cat.rename_categories(
+            lambda c: (c.lstrip("0") + "pc").zfill(N_CHARACTERS_ELEMENT_CODE)
+        )
 
-    # Create per capita variables for FAO regions (this can only be done if a column for FAO population is given).
-    if "fao_population" in per_capita_data.columns:
-        per_capita_data.loc[fao_regions_mask, "value"] = per_capita_data[fao_regions_mask]["value"] /\
-            per_capita_data[fao_regions_mask]["fao_population"]
-    else:
-        # Per capita variables can't be created for FAO regions, since we don't have FAO population.
-        # Remove these regions from the per capita dataframe; only OWID harmonized countries will be kept.
-        per_capita_data = per_capita_data[~fao_regions_mask].reset_index(drop=True)
-        owid_regions_mask = np.ones(len(per_capita_data), dtype=bool)
+        # Create a mask that selects FAO regions (regions that, in the countries.json file, were not harmonized, and
+        # have '(FAO)' at the end of the name).
+        fao_regions_mask = (per_capita_data["country"].str.contains("(FAO)", regex=False))
+        # Create a mask that selects all other regions (i.e. harmonized countries).
+        owid_regions_mask = ~fao_regions_mask
 
-    # Add per capita values to all other regions that are not FAO regions.
-    per_capita_data.loc[owid_regions_mask, "value"] = per_capita_data[owid_regions_mask]["value"] /\
-        per_capita_data[owid_regions_mask]["population_with_data"]
+        # Create per capita variables for FAO regions (this can only be done if a column for FAO population is given).
+        if "fao_population" in per_capita_data.columns:
+            per_capita_data.loc[fao_regions_mask, "value"] = per_capita_data[fao_regions_mask]["value"] /\
+                per_capita_data[fao_regions_mask]["fao_population"]
+        else:
+            # Per capita variables can't be created for FAO regions, since we don't have FAO population.
+            # Remove these regions from the per capita dataframe; only OWID harmonized countries will be kept.
+            per_capita_data = per_capita_data[~fao_regions_mask].reset_index(drop=True)
+            owid_regions_mask = np.ones(len(per_capita_data), dtype=bool)
 
-    # Remove nans (which may have been created because of missing FAO population).
-    per_capita_data = per_capita_data.dropna(subset="value").reset_index(drop=True)
+        # Add per capita values to all other regions that are not FAO regions.
+        per_capita_data.loc[owid_regions_mask, "value"] = per_capita_data[owid_regions_mask]["value"] /\
+            per_capita_data[owid_regions_mask]["population_with_data"]
 
-    # Add "per capita" to all units.
-    per_capita_data["unit"] = per_capita_data["unit"].cat.rename_categories(
-        lambda c: f"{c} per capita"
-    )
-    # Include an additional note in the description on affected elements.
-    per_capita_data["element_description"] = per_capita_data["element_description"].cat.rename_categories(
-        lambda c: f"{c} {NEW_PER_CAPITA_ADDED_ELEMENT_DESCRIPTION}"
-    )
-    # Add new rows with per capita variables to data.
-    data = dataframes.concatenate([data, per_capita_data], ignore_index=True).reset_index(drop=True)
+        # Remove nans (which may have been created because of missing FAO population).
+        per_capita_data = per_capita_data.dropna(subset="value").reset_index(drop=True)
+
+        # Add "per capita" to all units.
+        per_capita_data["unit"] = per_capita_data["unit"].cat.rename_categories(
+            lambda c: f"{c} per capita"
+        )
+        # Include an additional note in the description on affected elements.
+        per_capita_data["element_description"] = per_capita_data["element_description"].cat.rename_categories(
+            lambda c: f"{c} {NEW_PER_CAPITA_ADDED_ELEMENT_DESCRIPTION}"
+        )
+        # Add new rows with per capita variables to data.
+        data = dataframes.concatenate([data, per_capita_data], ignore_index=True).reset_index(drop=True)
 
     return data
 
@@ -807,14 +823,8 @@ def clean_data(data: pd.DataFrame, items_metadata: pd.DataFrame, elements_metada
     # Add FAO population as an additional column (if given in the original data).
     data = add_fao_population_if_given(data)
 
-    # Select element codes that were originally given as per capita variables (if any), and, if FAO population is
-    # given, make them total variables instead of per capita.
-    # All variables in the custom_elements_and_units.csv file with "was_per_capita" True will be converted into
-    # total (non-per-capita) values.
-    element_codes_that_were_per_capita = elements_metadata[elements_metadata["was_per_capita"]]["element_code"].\
-        unique().tolist()
-    if len(element_codes_that_were_per_capita) > 0:
-        data = convert_variables_given_per_capita_to_total_value(data, element_codes_that_were_per_capita)
+    # Convert variables that were given per-capita to total value.
+    data = convert_variables_given_per_capita_to_total_value(data, elements_metadata=elements_metadata)
 
     # Harmonize country names.
     data = harmonize_countries(data=data, countries_metadata=countries_metadata)
@@ -831,24 +841,6 @@ def clean_data(data: pd.DataFrame, items_metadata: pd.DataFrame, elements_metada
 
     # Convert back to categorical columns (maybe this should be handled automatically in `add_population_to_dataframe`)
     data = data.astype({"country": "category"})
-
-    # Create a dictionary of aggregations, specifying the operation to use when creating regions.
-    # These aggregations are defined in the custom_elements_and_units.csv file, and added to the metadata dataset.
-    aggregations = elements_metadata[(elements_metadata["owid_aggregation"].notnull())].\
-        set_index("element_code").to_dict()["owid_aggregation"]    
-
-    if len(aggregations) > 0:
-        log.info("clean_data.add_regions", shape=data.shape)
-        # Add data for regions.
-        data = add_regions(data=data, aggregations=aggregations)
-        check_that_countries_are_well_defined(data)
-
-    # Find element codes that have to be made per capita.
-    element_codes_to_make_per_capita = elements_metadata[elements_metadata["make_per_capita"]]["element_code"].\
-        unique().tolist()
-    if len(element_codes_to_make_per_capita):
-        log.info("clean_data.add_per_capita_variables", shape=data.shape)
-        data = add_per_capita_variables(data, element_codes_to_make_per_capita)
 
     return data
 
@@ -962,12 +954,6 @@ def prepare_wide_table(data: pd.DataFrame, dataset_title: str) -> catalog.Table:
     for column in wide_table.columns:
         wide_table[column].metadata.display["name"] = variable_name_mapping[column]
 
-    # # Unit conversion factor (if given).
-    # variable_name_mapping = _variable_name_map(data, "unit_factor")
-    # for column in wide_table.columns:
-    #     if column in variable_name_mapping:
-    #         wide_table[column].metadata.display["conversionFactor"] = variable_name_mapping[column]
-
     # Ensure columns have the optimal dtypes, but codes are categories.
     log.info("prepare_wide_table.optimize_table_dtypes", shape=wide_table.shape)
     wide_table = optimize_table_dtypes(table=wide_table.reset_index())
@@ -1036,8 +1022,15 @@ def run(dest_dir: str) -> None:
     data = harmonize_items(df=data, dataset_short_name=dataset_short_name)
     data = harmonize_elements(df=data)
 
+    # Prepare data.
     data = clean_data(data=data, items_metadata=items_metadata, elements_metadata=elements_metadata,
                       countries_metadata=countries_metadata)
+
+    # Add data for aggregate regions.
+    data = add_regions(data=data, elements_metadata=elements_metadata)
+
+    # Add per-capita variables.
+    data = add_per_capita_variables(data=data, elements_metadata=elements_metadata)
 
     # TODO: Run more sanity checks (i.e. compare with previous version of the same domain).
 
