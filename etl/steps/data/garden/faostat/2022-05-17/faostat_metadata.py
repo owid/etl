@@ -350,19 +350,20 @@ def clean_global_elements_dataframe(elements_df: pd.DataFrame, custom_elements: 
 
 def clean_global_countries_dataframe(countries_in_data, country_groups, countries_harmonization):
     countries_df = countries_in_data.copy()
-    countries_missing_in_harmonization = sorted(set(countries_df["fao_country"]) - set(countries_harmonization))
-    error = f"Countries file is incomplete. Add the following countries: {countries_missing_in_harmonization}"
-    assert len(countries_missing_in_harmonization) == 0, error
+    countries_not_harmonized = sorted(set(countries_df["fao_country"]) - set(countries_harmonization))
+    if len(countries_not_harmonized) > 0:
+        log.info(f"{len(countries_not_harmonized)} countries not included in countries file. "
+                 f"They will not have data after countries are harmonized in a further step.")
 
     # Harmonize country groups and members.
     country_groups_harmonized = {
         countries_harmonization[group]: sorted([countries_harmonization[member] for member in country_groups[group]])
-        for group in country_groups}
+        for group in country_groups if group in countries_harmonization}
 
     # Harmonize country names.
     countries_df["country"] = dataframes.map_series(
-        series=countries_df["fao_country"], mapping=countries_harmonization, warn_on_missing_mappings=True,
-        warn_on_unused_mappings=True, show_full_warning=True)
+        series=countries_df["fao_country"], mapping=countries_harmonization, warn_on_unused_mappings=True,
+        make_unmapped_values_nan=True, show_full_warning=False)
 
     # Add country members to countries dataframe.
     countries_df["members"] = dataframes.map_series(
@@ -565,7 +566,8 @@ def run(dest_dir: str) -> None:
         datasets_df=datasets_df, custom_datasets=custom_datasets)
     items_df = clean_global_items_dataframe(items_df=items_df, custom_items=custom_items)
     elements_df = clean_global_elements_dataframe(
-        elements_df=elements_df, custom_elements=custom_elements)
+        elements_df=elements_df, custom_elements=custom_elements)    
+
     countries_df = clean_global_countries_dataframe(
         countries_in_data=countries_in_data, country_groups=country_groups,
         countries_harmonization=countries_harmonization)

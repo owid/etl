@@ -239,8 +239,9 @@ def check_that_regions_with_subregions_are_ignored_when_constructing_aggregates(
         (countries_metadata["country"] != "World") &
         (~countries_metadata["country"].isin(REGIONS_TO_ADD)) &
         (~countries_metadata["country"].isin(REGIONS_TO_IGNORE_IN_AGGREGATES)) &
-        (~countries_metadata["country"].str.contains("(FAO)", regex=False)) &
-        (countries_metadata["members"].notnull())]["country"].unique().tolist()
+        (~countries_metadata["country"].str.contains("(FAO)", regex=False).fillna(False)) &
+        (countries_metadata["members"].notnull())]["country"].unique().tolist()    
+
     error = f"Regions {countries_with_subregions} contain subregions. Add them to REGIONS_TO_IGNORE_IN_AGGREGATES to " \
             f"avoid double-counting subregions when constructing aggregates."
     assert len(countries_with_subregions) == 0, error
@@ -298,10 +299,13 @@ def harmonize_countries(data, countries_metadata):
         assert (data["fao_country"].astype(str) == data["fao_country_check"]).all(), error
         data = data.drop(columns="fao_country_check")
 
+    # Remove unmapped countries.
+    data = data[data["country"].notnull()].reset_index(drop=True)
+
     # Further sanity checks.
     check_that_countries_are_well_defined(data)
     check_that_regions_with_subregions_are_ignored_when_constructing_aggregates(countries_metadata)
-    
+
     # Set appropriate dtypes.
     data = data.astype({"country": "category", "fao_country": "category"})
 
