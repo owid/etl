@@ -17,7 +17,6 @@ from etl.paths import DATA_DIR
 # Rename columns to be used by the food explorer.
 # Note: Include here all columns, even if the name is not changed.
 EXPECTED_COLUMNS = {
-    'product': 'product',
     'population': 'population',
     'area_harvested__hectares': 'area_harvested__ha',
     'area_harvested__hectares_per_capita': 'area_harvested__ha__per_capita',
@@ -79,13 +78,10 @@ def run(dest_dir: str) -> None:
         # Update table metadata.
         table_product.title = product
 
-        # Create a column with the product name (required for food explorer).
-        table_product["product"] = product
-
         # Rename columns, select the required ones, and sort columns and rows conveniently.
         table_product = table_product[list(EXPECTED_COLUMNS)].rename(columns=EXPECTED_COLUMNS)
-        table_product = table_product[["product", "population"] + [column for column in sorted(table_product.columns)
-                                                                   if column not in ["product", "population"]]]
+        table_product = table_product[["population"] + [column for column in sorted(table_product.columns)
+                                                        if column not in ["population"]]]
         table_product = table_product.sort_index()
 
         table_product.metadata.short_name = catalog.utils.underscore(

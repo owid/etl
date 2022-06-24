@@ -22,6 +22,202 @@ DATASET_DESCRIPTION = "This dataset has been created by Our World in Data, mergi
                       "FBS) datasets. Each row contains all the metrics for a specific combination of (country, " \
                       "product, year). The metrics may come from different datasets."
 
+# List of items (OWID names) to include in the global food explorer.
+# Note: The names of the products will be further edited in owid-content, following to the following file:
+# https://github.com/owid/owid-content/blob/master/scripts/global-food-explorer/foods.csv
+PRODUCTS = [
+    'Almonds',
+    'Animal fats',
+    'Apples',
+    'Apricots',
+    'Areca nuts',
+    'Artichokes',
+    'Asparagus',
+    'Avocados',
+    'Bananas',
+    'Barley',
+    'Beans, dry',
+    'Beeswax',
+    'Blueberries',
+    'Brazil nuts, with shell',
+    'Broad beans',
+    'Buckwheat',
+    'Buffalo hides',
+    'Butter and ghee',
+    'Cabbages',
+    'Canary seed',
+    'Carrots and turnips',
+    'Cashew nuts',
+    'Cassava',
+    'Castor oil seed',
+    'Cattle hides',
+    'Cauliflowers and broccoli',
+    'Cereals',
+    'Cheese',
+    'Cherries',
+    'Chestnut',
+    'Chickpeas',
+    'Chillies and peppers',
+    'Citrus Fruit',
+    'Cocoa beans',
+    'Coconut oil',
+    'Coconuts',
+    'Coffee, green',
+    'Cotton',
+    'Cottonseed',
+    'Cottonseed oil',
+    'Cow peas',
+    'Cranberries',
+    'Cucumbers and gherkins',
+    'Currants',
+    'Dates',
+    'Eggplants',
+    'Eggs',
+    'Eggs from hens',
+    'Eggs from other birds (excl. hens)',
+    'Fat, buffaloes',
+    'Fat, camels',
+    'Fat, cattle',
+    'Fat, goats',
+    'Fat, pigs',
+    'Fat, sheep',
+    'Fibre crops',
+    'Fish and seafood',
+    'Flax fibre',
+    'Fruit',
+    'Garlic',
+    'Grapefruit',
+    'Grapes',
+    'Beans, green',
+    'Green maize',
+    'Groundnut oil',
+    'Groundnuts',
+    'Hazelnuts',
+    'Hempseed',
+    'Herbs (e.g. fennel)',
+    'Honey',
+    'Jute',
+    'Karite nuts',
+    'Kiwi',
+    'Kola nuts',
+    'Leeks',
+    'Lemons and limes',
+    'Lentils',
+    'Lettuce',
+    'Linseed',
+    'Linseed oil',
+    'Maize',
+    'Maize oil',
+    'Mangoes',
+    'Margarine',
+    'Meat, total',
+    'Meat, ass',
+    'Meat, beef',
+    'Meat, beef and buffalo',
+    'Meat, buffalo',
+    'Meat, camel',
+    'Meat, chicken',
+    'Meat, duck',
+    'Meat, game',
+    'Meat, goat',
+    'Meat, goose and guinea fowl',
+    'Meat, horse',
+    'Meat, lamb and mutton',
+    'Meat, mule',
+    'Meat, pig',
+    'Meat, poultry',
+    'Meat, rabbit',
+    'Meat, sheep and goat',
+    'Meat, turkey',
+    'Melon',
+    'Melonseed',
+    'Milk',
+    'Millet',
+    'Mixed grains',
+    'Molasses',
+    'Mushrooms',
+    'Mustard seed',
+    'Nuts',
+    'Oats',
+    'Offals',
+    'Offals, buffaloes',
+    'Offals, camels',
+    'Offals, cattle',
+    'Offals, goats',
+    'Offals, horses',
+    'Offals, pigs',
+    'Offals, sheep',
+    'Oilcrops',
+    'Oilcrops, Cake Equivalent',
+    'Oilcrops, Oil Equivalent',
+    'Okra',
+    'Olive oil',
+    'Olives',
+    'Onions',
+    'Oranges',
+    'Palm fruit oil',
+    'Palm kernel oil',
+    'Palm kernels',
+    'Palm oil',
+    'Papayas',
+    'Peaches and nectarines',
+    'Pears',
+    'Peas, dry',
+    'Peas, green',
+    'Pepper',
+    'Pigeon peas',
+    'Pineapples',
+    'Pistachios',
+    'Plantains',
+    'Plums',
+    'Poppy seeds',
+    'Pork',
+    'Potatoes',
+    'Pulses',
+    'Quinoa',
+    'Rapeseed',
+    'Rapeseed oil',
+    'Raspberries',
+    'Rice',
+    'Roots and tubers',
+    'Rye',
+    'Safflower oil',
+    'Safflower seed',
+    'Seed cotton',
+    'Sesame oil',
+    'Sesame seed',
+    'Silk',
+    'Skins, goat',
+    'Skins, sheep',
+    'Sorghum',
+    'Soybean oil',
+    'Soybeans',
+    'Spinach',
+    'Strawberries',
+    'String beans',
+    'Sugar (raw)',
+    'Sugar beet',
+    'Sugar cane',
+    'Sugar crops',
+    'Sunflower oil',
+    'Sunflower seed',
+    'Sweet potatoes',
+    'Tangerines',
+    'Tea',
+    'Tobacco',
+    'Tomatoes',
+    'Total',
+    'Treenuts',
+    'Vegetables',
+    'Walnuts',
+    'Watermelons',
+    'Wheat',
+    'Whey',
+    'Wine',
+    'Wool',
+    'Yams',
+]
+
 
 def combine_qcl_and_fbsc(
     qcl_table: catalog.Table, fbsc_table: catalog.Table
@@ -86,9 +282,10 @@ def get_fao_population(combined: pd.DataFrame) -> pd.DataFrame:
 
 
 def add_slaughtered_animals_to_meat_total(combined):
-    # There is no FAO data on "Producing or slaughtered animals" for "Meat, Total".
+    # There is no FAO data on slaughtered animals for total meat.
     # We construct this data by aggregating that element for the following items (which corresponds to all meat
     # products removing redundances):
+    total_meat_item = "Meat, total"
     products_to_aggregate = [
         'Meat, ass',
         'Meat, beef and buffalo',
@@ -101,10 +298,9 @@ def add_slaughtered_animals_to_meat_total(combined):
         'Meat, rabbit',
         'Meat, sheep and goat',
     ]
-    error = "Some items required to get the aggregate 'Meat, Total' are missing in data."
+    error = f"Some items required to get the aggregate '{total_meat_item}' are missing in data."
     assert set(products_to_aggregate) < set(combined["product"]), error    
 
-    total_meat_item = "Meat, Total"
     slaughtered_animals_element = "Producing or slaughtered animals"
     slaughtered_animals_unit = "animals"
     slaughtered_animals_unit_short_name = "animals"
@@ -116,7 +312,7 @@ def add_slaughtered_animals_to_meat_total(combined):
     assert combined[(combined["element"] == slaughtered_animals_element) &
              ~(combined["element_code"].str.contains("pc"))]["element_code"].unique().tolist() == ['005320', '005321'], error
     # Similarly, there are two items for meat total.
-    error = "Item codes for 'Meat, Total' may have changed."
+    error = f"Item codes for '{total_meat_item}' may have changed."
     assert combined[combined["product"] == total_meat_item]["item_code"].unique().tolist() == ['00001765', '00002943'], error
     # We arbitrarily choose the first element code and the first item code.
     slaughtered_animals_element_code = "005320"
@@ -137,7 +333,6 @@ def add_slaughtered_animals_to_meat_total(combined):
                            aggregations={"value": "sum"}).reset_index()
 
     # Manually include the rest of columns.
-    animals["product"] = total_meat_item
     animals["element"] = slaughtered_animals_element
     animals["unit"] = slaughtered_animals_unit
     animals["unit_short_name"] = slaughtered_animals_unit_short_name
@@ -153,7 +348,7 @@ def add_slaughtered_animals_to_meat_total(combined):
 def add_slaughtered_animals_per_capita_to_meat_total(data_wide):
     slaughtered_animals_element = "Producing or slaughtered animals (animals)"
     slaughtered_animals_per_capita_element = "Producing or slaughtered animals (animals per capita)"
-    total_meat_item = "Meat, Total"
+    total_meat_item = "Meat, total"
 
     # Check that there is no data for slaughtered animals per capita in the total meat item.
     assert data_wide[data_wide["product"] == total_meat_item][slaughtered_animals_per_capita_element].dropna().empty
@@ -168,34 +363,22 @@ def add_slaughtered_animals_per_capita_to_meat_total(data_wide):
     return data_wide
 
 
-def process_combined_data(combined: pd.DataFrame, custom_products: pd.DataFrame) -> pd.DataFrame:
+def process_combined_data(combined: pd.DataFrame) -> pd.DataFrame:
     combined = combined.copy()
 
     # Get FAO population from data (it is given as another item).
     fao_population = get_fao_population(combined=combined)
 
-    # Create a mapping from product name in data to product name in explorer (for those products that need renaming).
-    products_renaming = custom_products[custom_products["product_in_explorer"].notnull()].\
-        set_index("product_in_data")["product_in_explorer"].to_dict()
-
-    # Rename products.
-    combined["product"] = dataframes.map_series(combined["product"], mapping=products_renaming,
-                                                warn_on_unused_mappings=True)
-
-    # Include number of slaughtered animals in 'Meat, Total' (which is missing).
+    # Include number of slaughtered animals in total meat (which is missing).
     combined = add_slaughtered_animals_to_meat_total(combined)
 
-    # Get list of products that will be used in food explorer.
-    products = sorted(custom_products["product_in_explorer"].fillna(custom_products["product_in_data"]).
-                      unique().tolist())
-
     # Check that all expected products are included in the data.
-    missing_products = sorted(set(products) - set(set(combined["product"])))
+    missing_products = sorted(set(PRODUCTS) - set(set(combined["product"])))
     assert len(missing_products) == 0, f"{len(missing_products)} missing products for food explorer."
 
     # Select relevant products for the food explorer.
-    combined = combined[combined["product"].isin(products)].reset_index(drop=True)
-    
+    combined = combined[combined["product"].isin(PRODUCTS)].reset_index(drop=True)    
+
     # Join element and unit into one title column.
     combined["title"] = combined["element"] + " (" + combined["unit"] + ")"
 
@@ -236,8 +419,6 @@ def run(dest_dir: str) -> None:
     # Path to latest qcl and fbsc datasets in garden.
     qcl_latest_dir = sorted((DATA_DIR / "garden" / NAMESPACE).glob(f"*/{NAMESPACE}_qcl*"))[-1]
     fbsc_latest_dir = sorted((DATA_DIR / "garden" / NAMESPACE).glob(f"*/{NAMESPACE}_fbsc*"))[-1]
-    # Path to file with custom product names for the food explorer.
-    custom_products_file = STEP_DIR / "data" / "garden" / NAMESPACE / VERSION / "custom_food_explorer_products.csv"
 
     ####################################################################################################################
     # Load data.
@@ -252,16 +433,13 @@ def run(dest_dir: str) -> None:
     # Idem for fbsc.
     fbsc_table = fbsc_dataset[f"{NAMESPACE}_fbsc"]
 
-    # Load names of products used in food explorer.
-    custom_products = pd.read_csv(custom_products_file, dtype=str)
-
     ####################################################################################################################
     # Process data.
     ####################################################################################################################
 
     data = combine_qcl_and_fbsc(qcl_table=qcl_table, fbsc_table=fbsc_table)
 
-    data = process_combined_data(combined=data, custom_products=custom_products)
+    data = process_combined_data(combined=data)
 
     ####################################################################################################################
     # Save outputs.
