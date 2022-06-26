@@ -42,6 +42,11 @@ THREADPOOL_WORKERS = 5
     is_flag=True,
     help="Include downstream dependencies (steps that depend on the included steps)",
 )
+@click.option(
+    "--only",
+    is_flag=True,
+    help="Only run the selected step (no upstream or downstream dependencies). Overrides `downstream` option",
+)
 @click.option("--exclude", help="Comma-separated patterns to exclude")
 @click.option(
     "--dag-path",
@@ -64,6 +69,7 @@ def main(
     grapher: bool = False,
     backport: bool = False,
     downstream: bool = False,
+    only: bool = False,
     exclude: Optional[str] = None,
     dag_path: Path = paths.DAG_FILE,
     workers: int = 5,
@@ -92,6 +98,7 @@ def main(
         private=private,
         include_grapher=grapher,
         downstream=downstream,
+        only=only,
         excludes=excludes,
         workers=workers,
     )
@@ -115,6 +122,7 @@ def run_dag(
     private: bool = False,
     include_grapher: bool = False,
     downstream: bool = False,
+    only: bool = False,
     excludes: Optional[List[str]] = None,
     workers: int = 1,
 ) -> None:
@@ -134,7 +142,7 @@ def run_dag(
     if not private:
         excludes.append("-private://")
 
-    steps = compile_steps(dag, includes, excludes, downstream=downstream)
+    steps = compile_steps(dag, includes, excludes, downstream=downstream, only=only)
 
     if not force:
         print("Detecting which steps need rebuilding...")

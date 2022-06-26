@@ -57,6 +57,7 @@ def compile_steps(
     includes: Optional[List[str]] = None,
     excludes: Optional[List[str]] = None,
     downstream: bool = False,
+    only: bool = False,
 ) -> List["Step"]:
     """
     Return the list of steps which, if executed in order, mean that every
@@ -66,7 +67,9 @@ def compile_steps(
     excludes = excludes or []
 
     # make sure each step runs after its dependencies
-    steps = to_dependency_order(dag, includes, excludes, downstream=downstream)
+    steps = to_dependency_order(
+        dag, includes, excludes, downstream=downstream, only=only
+    )
 
     # parse the steps into Python objects
     return [parse_step(name, dag) for name in steps]
@@ -77,6 +80,7 @@ def to_dependency_order(
     includes: List[str],
     excludes: List[str],
     downstream: bool = False,
+    only: bool = False,
 ) -> List[str]:
     """
     Organize the steps in dependency order with a topological sort. In other words,
@@ -84,7 +88,9 @@ def to_dependency_order(
     before the steps it depends on. Note: this ordering is not necessarily unique.
     """
     subgraph = (
-        filter_to_subgraph(dag, includes, downstream=downstream) if includes else dag
+        filter_to_subgraph(dag, includes, downstream=downstream, only=only)
+        if includes
+        else dag
     )
     in_order = list(graphlib.TopologicalSorter(subgraph).static_order())
 
@@ -97,7 +103,7 @@ def to_dependency_order(
 
 
 def filter_to_subgraph(
-    graph: Graph, includes: Iterable[str], downstream: bool = False
+    graph: Graph, includes: Iterable[str], downstream: bool = False, only: bool = False
 ) -> Graph:
     """
     Filter the full graph to only the included nodes, and all their dependencies.
@@ -112,6 +118,10 @@ def filter_to_subgraph(
     included = {
         s for s in all_steps if any(re.findall(pattern, s) for pattern in includes)
     }
+
+    if only:
+        # Do not search for dependencies, only include explicitly selected nodes
+        return {step: set() for step in included}
 
     if downstream:
         # Reverse the graph to find all nodes dependent on included nodes (forward deps)
