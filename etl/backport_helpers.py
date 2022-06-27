@@ -74,11 +74,18 @@ def create_wide_table(
     return underscore_table(t, collision="rename")
 
 
+import concurrent.futures
+
+
 def create_dataset(dest_dir: str, short_name: str) -> Dataset:
     """Create Dataset from backported dataset in walden. Convert
     it into wide format and add metadata."""
-    values = load_values(short_name)
-    config = load_config(short_name)
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        values_future = executor.submit(load_values, short_name)
+        config_future = executor.submit(load_config, short_name)
+
+    values = values_future.result()
+    config = config_future.result()
 
     # put sources belonging to a dataset but not to a variable into dataset metadata
     variable_source_ids = {v.sourceId for v in config.variables}

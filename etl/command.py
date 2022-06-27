@@ -61,6 +61,30 @@ THREADPOOL_WORKERS = 5
     default=5,
 )
 @click.argument("steps", nargs=-1)
+def main_cli(
+    steps: List[str],
+    dry_run: bool = False,
+    force: bool = False,
+    private: bool = False,
+    grapher: bool = False,
+    backport: bool = False,
+    exclude: Optional[str] = None,
+    dag_path: Path = paths.DAG_FILE,
+    workers: int = 5,
+) -> None:
+    return main(
+        steps=steps,
+        dry_run=dry_run,
+        force=force,
+        private=private,
+        grapher=grapher,
+        backport=backport,
+        exclude=exclude,
+        dag_path=dag_path,
+        workers=workers,
+    )
+
+
 def main(
     steps: List[str],
     dry_run: bool = False,
@@ -73,6 +97,7 @@ def main(
     exclude: Optional[str] = None,
     dag_path: Path = paths.DAG_FILE,
     workers: int = 5,
+    walden_catalog: Optional[WaldenCatalog] = None,
 ) -> None:
     """
     Execute all ETL steps listed in dag.yaml
@@ -85,7 +110,7 @@ def main(
 
     # Add all steps for backporting datasets (there are currently >800 of them)
     if backport:
-        dag.update(_backporting_steps(private))
+        dag.update(_backporting_steps(private, walden_catalog=walden_catalog))
 
     excludes = exclude.split(",") if exclude else []
 
@@ -183,12 +208,18 @@ def _is_private_step(step_name: str) -> bool:
     return bool(re.findall(r".*?-private://", step_name))
 
 
-def _backporting_steps(private: bool) -> DAG:
+def _backporting_steps(
+    private: bool, walden_catalog: Optional[WaldenCatalog] = None
+) -> DAG:
     """Return a DAG of steps for backporting datasets."""
     dag: DAG = {}
 
+    # initialize catalog (this takes ~2s so it's better to supply it from args if possible)
+    if not walden_catalog:
+        walden_catalog = WaldenCatalog()
+
     # load all backported datasets from walden
-    for ds in WaldenCatalog().find(namespace=WALDEN_NAMESPACE):
+    for ds in walden_catalog.find(namespace=WALDEN_NAMESPACE):
 
         # skip private backported steps
         if not private and not ds.is_public:

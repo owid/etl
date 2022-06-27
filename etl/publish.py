@@ -38,12 +38,26 @@ class CannotPublish(Exception):
     default=CHANNEL.__args__,
     help="Publish only selected channel (subfolder of data/), push all by default",
 )
-def publish(
+def publish_cli(
     dry_run: bool, private: bool, bucket: str, channel: Iterable[CHANNEL]
 ) -> None:
     """
     Publish the generated data catalog to S3.
     """
+    return publish(
+        dry_run=dry_run,
+        private=private,
+        bucket=bucket,
+        channel=channel,
+    )
+
+
+def publish(
+    dry_run: bool = False,
+    private: bool = False,
+    bucket: str = config.S3_BUCKET,
+    channel: Iterable[CHANNEL] = CHANNEL.__args__,
+) -> None:
     catalog = Path(DATA_DIR)
     if not dry_run and not private:
         raise Exception(
@@ -275,4 +289,4 @@ def _channel_path(channel: CHANNEL) -> Path:
 
 
 if __name__ == "__main__":
-    publish()
+    publish_cli()

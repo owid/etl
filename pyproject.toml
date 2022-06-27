@@ -11,6 +11,7 @@ publish = 'etl.publish:publish'
 harmonize = 'etl.harmonize:harmonize'
 backport = 'backport.backport:backport_cli'
 bulk_backport = 'backport.bulk_backport:bulk_backport'
+fasttrack = 'backport.fasttrack:fasttrack'
 
 [tool.poetry.dependencies]
 python = "^3.9"
