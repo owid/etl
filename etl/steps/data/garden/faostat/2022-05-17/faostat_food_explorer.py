@@ -11,13 +11,13 @@ from owid import catalog
 from owid.catalog.meta import DatasetMeta
 from owid.datautils import dataframes, geo
 
-from etl.paths import DATA_DIR, STEP_DIR
-from .shared import NAMESPACE, VERSION, REGIONS_TO_ADD, REGIONS_TO_IGNORE_IN_AGGREGATES
+from etl.paths import DATA_DIR
+from .shared import NAMESPACE, VERSION
 
 # Dataset name and title.
 DATASET_TITLE = "Food Explorer"
 DATASET_SHORT_NAME = f"{NAMESPACE}_food_explorer"
-DATASET_DESCRIPTION = "This dataset has been created by Our World in Data, merging existing FAOstat datsets. In " \
+DATASET_DESCRIPTION = "This dataset has been created by Our World in Data, merging existing FAOSTAT datasets. In " \
                       "particular, we have used 'Crops and livestock products' (QCL) and 'Food Balances' (FBSH and " \
                       "FBS) datasets. Each row contains all the metrics for a specific combination of (country, " \
                       "product, year). The metrics may come from different datasets."
@@ -217,6 +217,20 @@ PRODUCTS = [
     'Wool',
     'Yams',
 ]
+# OWID item name, element name, and unit name for population (as given in faostat_qcl and faostat_fbsc datasets).
+FAO_POPULATION_ITEM_NAME = "Population"
+FAO_POPULATION_ELEMENT_NAME = "Total Population - Both sexes"
+FAO_POPULATION_UNIT = "1000 persons"
+# OWID item name for total meat  (as given in faostat_qcl and faostat_fbsc datasets).
+TOTAL_MEAT_ITEM = "Meat, total"
+# OWID element name, unit name, and unit short name for number of slaughtered animals  (as given in faostat_qcl and
+# faostat_fbsc datasets).
+SLAUGHTERED_ANIMALS_ELEMENT = "Producing or slaughtered animals"
+SLAUGHTERED_ANIMALS_UNIT = "animals"
+SLAUGHTERED_ANIMALS_UNIT_SHORT_NAME = "animals"
+SLAUGHTERED_ANIMALS_PER_CAPITA_ELEMENT = "Producing or slaughtered animals (animals per capita)"
+
+slaughtered_animals_element = "Producing or slaughtered animals (animals)"
 
 
 def combine_qcl_and_fbsc(
@@ -264,15 +278,12 @@ def combine_qcl_and_fbsc(
 
 
 def get_fao_population(combined: pd.DataFrame) -> pd.DataFrame:
-    fao_population_item_name = "Population"
-    fao_population_element_name = "Total Population - Both sexes"
-
-    fao_population = combined[(combined["product"] == fao_population_item_name) &
-                              (combined["element"] == fao_population_element_name)].reset_index(drop=True)
+    fao_population = combined[(combined["product"] == FAO_POPULATION_ITEM_NAME) &
+                              (combined["element"] == FAO_POPULATION_ELEMENT_NAME)].reset_index(drop=True)
 
     # Check that population is given in "1000 persons" and convert to persons.
     error = "FAOSTAT population changed item, element, or unit."
-    assert fao_population["unit"].unique().tolist() == ["1000 persons"], error
+    assert fao_population["unit"].unique().tolist() == [FAO_POPULATION_UNIT], error
     fao_population["value"] *= 1000
 
     fao_population = fao_population[["country", "year", "value"]].dropna(how="any").\
@@ -284,8 +295,7 @@ def get_fao_population(combined: pd.DataFrame) -> pd.DataFrame:
 def add_slaughtered_animals_to_meat_total(combined):
     # There is no FAO data on slaughtered animals for total meat.
     # We construct this data by aggregating that element for the following items (which corresponds to all meat
-    # products removing redundances):
-    total_meat_item = "Meat, total"
+    # products removing redundancies):
     products_to_aggregate = [
         'Meat, ass',
         'Meat, beef and buffalo',
@@ -298,47 +308,46 @@ def add_slaughtered_animals_to_meat_total(combined):
         'Meat, rabbit',
         'Meat, sheep and goat',
     ]
-    error = f"Some items required to get the aggregate '{total_meat_item}' are missing in data."
-    assert set(products_to_aggregate) < set(combined["product"]), error    
-
-    slaughtered_animals_element = "Producing or slaughtered animals"
-    slaughtered_animals_unit = "animals"
-    slaughtered_animals_unit_short_name = "animals"
-    assert slaughtered_animals_element in combined["element"].unique()
-    assert slaughtered_animals_unit in combined["unit"].unique()    
+    error = f"Some items required to get the aggregate '{TOTAL_MEAT_ITEM}' are missing in data."
+    assert set(products_to_aggregate) < set(combined["product"]), error
+    assert SLAUGHTERED_ANIMALS_ELEMENT in combined["element"].unique()
+    assert SLAUGHTERED_ANIMALS_UNIT in combined["unit"].unique()
 
     # For some reason, there are two element codes for the same element (they have different items assigned).
     error = "Element codes for 'Producing or slaughtered animals' may have changed."
-    assert combined[(combined["element"] == slaughtered_animals_element) &
-             ~(combined["element_code"].str.contains("pc"))]["element_code"].unique().tolist() == ['005320', '005321'], error
+    assert combined[(combined["element"] == SLAUGHTERED_ANIMALS_ELEMENT) &
+                    ~(combined["element_code"].str.contains("pc"))]["element_code"].unique().tolist() == \
+           ['005320', '005321'], error
     # Similarly, there are two items for meat total.
-    error = f"Item codes for '{total_meat_item}' may have changed."
-    assert combined[combined["product"] == total_meat_item]["item_code"].unique().tolist() == ['00001765', '00002943'], error
+    error = f"Item codes for '{TOTAL_MEAT_ITEM}' may have changed."
+    assert combined[combined["product"] == TOTAL_MEAT_ITEM]["item_code"].unique().tolist() == \
+           ['00001765', '00002943'], error
     # We arbitrarily choose the first element code and the first item code.
     slaughtered_animals_element_code = "005320"
     total_meat_item_code = "00001765"
 
     # Check that, indeed, this variable is not given in the original data.
-    assert combined[(combined["product"] == total_meat_item) &
-         (combined["element"]==slaughtered_animals_element) & (combined["unit"] == slaughtered_animals_unit)].empty
+    assert combined[(combined["product"] == TOTAL_MEAT_ITEM) &
+                    (combined["element"] == SLAUGHTERED_ANIMALS_ELEMENT) &
+                    (combined["unit"] == SLAUGHTERED_ANIMALS_UNIT)].empty
 
     # Select the subset of data to aggregate.
-    data_to_aggregate = combined[(combined["element"] == slaughtered_animals_element) &
-                                 (combined["unit"] == slaughtered_animals_unit) &
-                                 (combined["product"].isin(products_to_aggregate))
-                                ].dropna(subset="value").reset_index(drop=True)
+    data_to_aggregate = combined[(combined["element"] == SLAUGHTERED_ANIMALS_ELEMENT) &
+                                 (combined["unit"] == SLAUGHTERED_ANIMALS_UNIT) &
+                                 (combined["product"].isin(products_to_aggregate))].\
+        dropna(subset="value").reset_index(drop=True)
 
     # Create a dataframe with the total number of animals used for meat.
     animals = dataframes.groupby_agg(data_to_aggregate, groupby_columns=["country", "year"],
-                           aggregations={"value": "sum"}).reset_index()
+                                     aggregations={"value": "sum"}).reset_index()
 
     # Manually include the rest of columns.
-    animals["element"] = slaughtered_animals_element
-    animals["unit"] = slaughtered_animals_unit
-    animals["unit_short_name"] = slaughtered_animals_unit_short_name
+    animals["element"] = SLAUGHTERED_ANIMALS_ELEMENT
+    animals["unit"] = SLAUGHTERED_ANIMALS_UNIT
+    animals["unit_short_name"] = SLAUGHTERED_ANIMALS_UNIT_SHORT_NAME
     animals["element_code"] = slaughtered_animals_element_code
     animals["item_code"] = total_meat_item_code
-    animals["product"] = total_meat_item
+    animals["product"] = TOTAL_MEAT_ITEM
 
     # Add animals data to the original dataframe.
     combined_data = pd.concat([combined, animals], ignore_index=True).reset_index(drop=True)
@@ -347,18 +356,14 @@ def add_slaughtered_animals_to_meat_total(combined):
 
 
 def add_slaughtered_animals_per_capita_to_meat_total(data_wide):
-    slaughtered_animals_element = "Producing or slaughtered animals (animals)"
-    slaughtered_animals_per_capita_element = "Producing or slaughtered animals (animals per capita)"
-    total_meat_item = "Meat, total"
-
     # Check that there is no data for slaughtered animals per capita in the total meat item.
-    assert data_wide[data_wide["product"] == total_meat_item][slaughtered_animals_per_capita_element].dropna().empty
+    assert data_wide[data_wide["product"] == TOTAL_MEAT_ITEM][SLAUGHTERED_ANIMALS_PER_CAPITA_ELEMENT].dropna().empty
 
-    # Add per capita slaugthred animals.
+    # Add per capita slaughtered animals.
 
-    total_meat_item_mask = data_wide["product"] == total_meat_item
+    total_meat_item_mask = data_wide["product"] == TOTAL_MEAT_ITEM
 
-    data_wide.loc[total_meat_item_mask, slaughtered_animals_per_capita_element] =\
+    data_wide.loc[total_meat_item_mask, SLAUGHTERED_ANIMALS_PER_CAPITA_ELEMENT] =\
         data_wide[total_meat_item_mask][slaughtered_animals_element] / data_wide[total_meat_item_mask]["population"]
 
     return data_wide
