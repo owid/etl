@@ -14,7 +14,7 @@ import click
 
 from etl.steps import load_dag, compile_steps, select_dirty_steps, DAG, paths
 from etl import config
-from owid.walden import Catalog as WaldenCatalog
+from owid.walden import Catalog as WaldenCatalog, CATALOG as WALDEN_CATALOG
 
 
 WALDEN_NAMESPACE = os.environ.get("WALDEN_NAMESPACE", "backport")
@@ -97,7 +97,6 @@ def main(
     exclude: Optional[str] = None,
     dag_path: Path = paths.DAG_FILE,
     workers: int = 5,
-    walden_catalog: Optional[WaldenCatalog] = None,
 ) -> None:
     """
     Execute all ETL steps listed in dag.yaml
@@ -110,7 +109,7 @@ def main(
 
     # Add all steps for backporting datasets (there are currently >800 of them)
     if backport:
-        dag.update(_backporting_steps(private, walden_catalog=walden_catalog))
+        dag.update(_backporting_steps(private, walden_catalog=WALDEN_CATALOG))
 
     excludes = exclude.split(",") if exclude else []
 
@@ -208,15 +207,9 @@ def _is_private_step(step_name: str) -> bool:
     return bool(re.findall(r".*?-private://", step_name))
 
 
-def _backporting_steps(
-    private: bool, walden_catalog: Optional[WaldenCatalog] = None
-) -> DAG:
+def _backporting_steps(private: bool, walden_catalog: WaldenCatalog) -> DAG:
     """Return a DAG of steps for backporting datasets."""
     dag: DAG = {}
-
-    # initialize catalog (this takes ~2s so it's better to supply it from args if possible)
-    if not walden_catalog:
-        walden_catalog = WaldenCatalog()
 
     # load all backported datasets from walden
     for ds in walden_catalog.find(namespace=WALDEN_NAMESPACE):
@@ -240,4 +233,4 @@ def _backporting_steps(
 
 
 if __name__ == "__main__":
-    main()
+    main_cli()

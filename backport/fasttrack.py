@@ -1,38 +1,19 @@
-import os
-import tempfile
-import time
+import concurrent.futures
 import datetime as dt
-from typing import Optional, cast
+import time
 
 import click
 import pandas as pd
 import structlog
-from owid.catalog.utils import validate_underscore
-from owid.walden import Catalog as WaldenCatalog
-from owid.walden.catalog import Dataset as WaldenDataset
-from owid.walden.ingest import add_to_catalog
-from sqlalchemy.engine import Engine
+from owid.catalog.utils import underscore
+from owid.walden import CATALOG as WALDEN_CATALOG
 
-import concurrent.futures
+from etl.command import main as etl
+from etl.db import get_engine
+from etl.publish import publish
+from etl.reindex import reindex
 
 from .backport import backport
-
-from owid.catalog.utils import underscore
-
-from etl.db import get_engine
-from etl.files import checksum_str
-from etl.grapher_model import (
-    GrapherConfig,
-    GrapherDatasetModel,
-    GrapherSourceModel,
-    GrapherVariableModel,
-)
-from etl.steps import WaldenStep
-
-from etl.reindex import reindex
-from etl.publish import publish
-from etl.command import main as etl
-from etl.command import run_dag
 
 log = structlog.get_logger()
 
@@ -45,6 +26,12 @@ SLEEP_BETWEEN_RUNS = 1
     default=False,
     type=bool,
     help="dry-run is applied only to publishing, other steps are executed without dry-run",
+)
+@click.option(
+    "--force/--no-force",
+    default=False,
+    type=bool,
+    help="force backport of a dataset, only useful for testing",
 )
 @click.option(
     "--dt-start",
@@ -60,6 +47,7 @@ SLEEP_BETWEEN_RUNS = 1
 )
 def fasttrack(
     dry_run: bool = False,
+    force: bool = False,
     dt_start: dt.datetime = dt.datetime.utcnow(),
     batch_size: int = 10,
 ) -> None:
@@ -94,31 +82,35 @@ def fasttrack(
         # use latest timestamp of processed datasets as start for next batch
         dt_start = df.latest_timestamp.max().to_pydatetime()
 
-        # run walden
+        # run backport to walden in parallel
         with concurrent.futures.ThreadPoolExecutor() as executor:
             executor.map(
-                lambda r: process_dataset(r.dataset_id, r.dataset_name, dry_run=False),
+                lambda r: process_dataset(
+                    r.dataset_id, r.dataset_name, dry_run=dry_run, force=force
+                ),
                 df.itertuples(),
             )
 
         # refresh walden catalog manually
         log.info("fasttrack.refresh_walden", dt_start=dt_start)
-        WaldenStep._walden_catalog.refresh()
+        WALDEN_CATALOG.refresh()
 
         # run ETL
         log.info("fasttrack.etl", dt_start=dt_start)
         etl(
-            steps=[f"dataset_{r.dataset_id}" for r in df.itertuples()],
+            steps=[f"dataset_{ds_id}" for ds_id in df.dataset_id],
             dry_run=False,
             force=True,
             private=True,
             backport=True,
             workers=1,
-            walden_catalog=WaldenStep._walden_catalog,
         )
 
         # reindex and publish catalog
-        reindex(channel=["backport"])
+        reindex(
+            channel=["backport"],
+            include=r"|".join([f"dataset_{ds_id}_" for ds_id in df.dataset_id]),
+        )
         log.info("fasttrack.end", dt_start=dt_start)
         publish(
             dry_run=dry_run,
@@ -128,16 +120,20 @@ def fasttrack(
         )
 
 
-def process_dataset(dataset_id: int, dataset_name: str, dry_run: bool) -> None:
+def process_dataset(
+    dataset_id: int, dataset_name: str, dry_run: bool, force: bool
+) -> None:
     log.info("process_dataset.start", dataset_id=dataset_id)
     # NOTE: we are not commiting changes to walden repo, this could be problematic
     # if the other processes are trying to rebase the repo
+    # NOTE: we are not uploading files to walden S3 bucket, this will be done during periodic
+    # etl run
     backport(
         dataset_id=dataset_id,
-        short_name=underscore(dataset_name),  # type: ignore
+        short_name=underscore(dataset_name),
         dry_run=dry_run,
-        force=True,
-        upload=True,
+        force=force,
+        upload=False,
     )
     log.info("process_dataset.end", dataset_id=dataset_id)
 

@@ -36,6 +36,7 @@ with warnings.catch_warnings():
 
 from owid import catalog
 from owid import walden
+from owid.walden import CATALOG as WALDEN_CATALOG
 
 from etl import files, paths, git
 from etl.helpers import get_etag
@@ -425,9 +426,6 @@ class ReferenceStep(DataStep):
 @dataclass
 class WaldenStep(Step):
     path: str
-    # NOTE: reusing catalog between steps improves performance a lot
-    #   call `refresh` to refresh cache and get the latest version
-    _walden_catalog = walden.Catalog()
 
     def __init__(self, path: str) -> None:
         self.path = path
@@ -466,13 +464,14 @@ class WaldenStep(Step):
             raise ValueError(f"malformed walden path: {self.path}")
 
         namespace, version, short_name = self.path.split("/")
-        catalog = self._walden_catalog
 
         # normally version is a year or date, but we also accept "latest"
         if version == "latest":
-            dataset = catalog.find_latest(namespace=namespace, short_name=short_name)
+            dataset = WALDEN_CATALOG.find_latest(
+                namespace=namespace, short_name=short_name
+            )
         else:
-            dataset = catalog.find_one(
+            dataset = WALDEN_CATALOG.find_one(
                 namespace=namespace, version=version, short_name=short_name
             )
 
