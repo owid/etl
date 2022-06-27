@@ -338,6 +338,7 @@ def add_slaughtered_animals_to_meat_total(combined):
     animals["unit_short_name"] = slaughtered_animals_unit_short_name
     animals["element_code"] = slaughtered_animals_element_code
     animals["item_code"] = total_meat_item_code
+    animals["product"] = total_meat_item
 
     # Add animals data to the original dataframe.
     combined_data = pd.concat([combined, animals], ignore_index=True).reset_index(drop=True)
