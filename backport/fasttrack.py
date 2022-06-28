@@ -54,12 +54,10 @@ def fasttrack(
     engine = get_engine()
 
     while True:
-        # TODO: ORM might be nicer
         q = """
         select
             id as dataset_id,
             name as dataset_name,
-            -- NOTE: updatedAt might be unnecessary
             GREATEST(updatedAt, metadataEditedAt, dataEditedAt) as latest_timestamp
         from datasets
         -- this assumes there are no ties if we are processing a lot of datasets
