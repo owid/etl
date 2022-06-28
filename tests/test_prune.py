@@ -1,6 +1,5 @@
+import json
 from pathlib import Path
-
-from click.testing import CliRunner
 
 from etl.prune import prune
 
@@ -10,24 +9,23 @@ def test_prune(tmp_path: Path) -> None:
     dag_file = tmp_path / "dag.yml"
     dag_file.write_text("steps:\n  data://garden/owid/latest/covid:")
 
-    feather_file = tmp_path / "data/garden/owid/latest/todelete/todelete.feather"
-    feather_file.parent.mkdir(exist_ok=True, parents=True)
-    feather_file.write_text("")
-
-    assert feather_file.exists()
-
-    # NOTE: this is pain to work with, I should have separated CLI from the functionality
-    # and test it like regular python function
-    runner = CliRunner()
-    result = runner.invoke(
-        prune,
-        [
-            "--dag-path",
-            dag_file,  # type: ignore
-            "--data-dir",
-            tmp_path / "data",  # type: ignore
-        ],
+    index_file = tmp_path / "data/garden/owid/latest/todelete/index.json"
+    index_file.parent.mkdir(exist_ok=True, parents=True)
+    index_file.write_text(
+        json.dumps(
+            {"namespace": "owid", "short_name": "todelete", "description": "test"}
+        )
     )
 
-    assert result.exit_code == 0
-    assert not feather_file.exists()
+    meta_file = tmp_path / "data/garden/owid/latest/todelete/todelete.meta.json"
+    meta_file.write_text(json.dumps({"short_name": "todelete"}))
+
+    assert index_file.exists()
+    assert meta_file.exists()
+
+    prune(
+        dag_path=dag_file,
+        data_dir=tmp_path / "data",
+    )
+    assert not index_file.exists()
+    assert not meta_file.exists()

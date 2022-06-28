@@ -30,12 +30,20 @@ EXCLUDE_STEP_TYPES = ("grapher", "walden", "walden-private", "github")
     default=paths.DATA_DIR,
 )
 @click.option("--dry-run", is_flag=True, help="Only print files that would be deleted")
+def prune_cli(
+    dag_path: Path,
+    data_dir: Path,
+    dry_run: bool,
+) -> None:
+    """Prune data without steps in the DAG."""
+    return prune(dag_path=dag_path, data_dir=data_dir, dry_run=dry_run)
+
+
 def prune(
     dag_path: Path = paths.DAG_FILE,
     data_dir: Path = paths.DATA_DIR,
     dry_run: bool = False,
 ) -> None:
-    """Prune data without steps in the DAG."""
     dag_dirs = dag_datasets_dirs(dag_path)
     data_dirs = local_datasets_dirs(data_dir)
 
