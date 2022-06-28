@@ -617,8 +617,11 @@ def _load_population() -> pd.DataFrame:
     population = catalog.find("population", namespace="owid", dataset="key_indicators").load().\
         reset_index()[["country", "year", "population"]]
 
-    # Add data for historical regions by adding the population of its current successors.
-    for country in HISTORIC_TO_CURRENT_REGION:
+    # Add data for historical regions (if not in population) by adding the population of its current successors.
+    countries_with_population = population["country"].unique()
+    missing_countries = [country for country in HISTORIC_TO_CURRENT_REGION
+                         if country not in countries_with_population]
+    for country in missing_countries:
         members = HISTORIC_TO_CURRENT_REGION[country]["members"]
         _population = population[population["country"].isin(members)].\
             groupby("year").agg({"population": "sum", "country": "nunique"}).reset_index()
@@ -626,6 +629,9 @@ def _load_population() -> pd.DataFrame:
         _population = _population[_population["country"] == len(members)].reset_index(drop=True)
         _population["country"] = country
         population = pd.concat([population, _population], ignore_index=True).reset_index(drop=True)
+
+    error = "Duplicate country-years found in population. Check if historical regions changed."
+    assert population[population.duplicated(subset=["country", "year"])].empty, error
 
     return cast(pd.DataFrame, population)
 
