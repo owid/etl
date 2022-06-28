@@ -64,7 +64,6 @@ ADDITIONAL_FILES_TO_COPY = [
     f"{NAMESPACE}.countries.json",
     "custom_datasets.csv",
     "custom_elements_and_units.csv",
-    "custom_food_explorer_products.csv",
     "custom_items.csv",
 ]
 # Note: Further custom rules are applied to the list of steps to run.
