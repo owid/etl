@@ -5,12 +5,13 @@ description = ""
 authors = ["Our World In Data <tech@worldindata.org>"]
 
 [tool.poetry.scripts]
-etl = 'etl.command:main'
-reindex = 'etl.reindex:reindex'
-publish = 'etl.publish:publish'
+etl = 'etl.command:main_cli'
+reindex = 'etl.reindex:reindex_cli'
+publish = 'etl.publish:publish_cli'
 harmonize = 'etl.harmonize:harmonize'
 backport = 'backport.backport:backport_cli'
 bulk_backport = 'backport.bulk_backport:bulk_backport'
+fasttrack = 'backport.fasttrack:fasttrack'
 
 [tool.poetry.dependencies]
 python = "^3.9"

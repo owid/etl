@@ -1,15 +1,15 @@
+import concurrent.futures
 from typing import cast
 
-import structlog
 import numpy as np
 import pandas as pd
+import structlog
 from owid.catalog import Dataset, Table
 from owid.catalog.utils import underscore_table
-from owid.walden import Catalog as WaldenCatalog
+from owid.walden import CATALOG as WALDEN_CATALOG
 
 from etl.grapher_model import GrapherConfig
 from etl.steps.data.converters import convert_grapher_dataset, convert_grapher_variable
-
 
 SPARSE_DATASET_VARIABLES_CHUNKSIZE = 1000
 
@@ -17,13 +17,13 @@ log = structlog.get_logger()
 
 
 def load_values(short_name: str) -> pd.DataFrame:
-    walden_ds = WaldenCatalog().find_one(short_name=f"{short_name}_values")
+    walden_ds = WALDEN_CATALOG.find_one(short_name=f"{short_name}_values")
     local_path = walden_ds.ensure_downloaded()
     return cast(pd.DataFrame, pd.read_feather(local_path))
 
 
 def load_config(short_name: str) -> GrapherConfig:
-    walden_ds = WaldenCatalog().find_one(short_name=f"{short_name}_config")
+    walden_ds = WALDEN_CATALOG.find_one(short_name=f"{short_name}_config")
     local_path = walden_ds.ensure_downloaded()
     return GrapherConfig.parse_file(local_path)
 
@@ -42,7 +42,7 @@ def create_wide_table(
 
     # report compression ratio if the file is larger than >1MB
     # NOTE: memory usage can further drop later after repack_frame is called
-    wide_mem_usage_mb = df.memory_usage().sum() / 1e6
+    wide_mem_usage_mb = df.memory_usage().sum() / 1e6 if not df.empty else 0
     if wide_mem_usage_mb > 1:
         log.info(
             "create_wide_table",
@@ -77,8 +77,12 @@ def create_wide_table(
 def create_dataset(dest_dir: str, short_name: str) -> Dataset:
     """Create Dataset from backported dataset in walden. Convert
     it into wide format and add metadata."""
-    values = load_values(short_name)
-    config = load_config(short_name)
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        values_future = executor.submit(load_values, short_name)
+        config_future = executor.submit(load_config, short_name)
+
+    values = values_future.result()
+    config = config_future.result()
 
     # put sources belonging to a dataset but not to a variable into dataset metadata
     variable_source_ids = {v.sourceId for v in config.variables}
