@@ -14,7 +14,7 @@ import click
 
 from etl.steps import load_dag, compile_steps, select_dirty_steps, DAG, paths
 from etl import config
-from owid.walden import Catalog as WaldenCatalog
+from owid.walden import Catalog as WaldenCatalog, CATALOG as WALDEN_CATALOG
 
 
 WALDEN_NAMESPACE = os.environ.get("WALDEN_NAMESPACE", "backport")
@@ -61,6 +61,30 @@ THREADPOOL_WORKERS = 5
     default=5,
 )
 @click.argument("steps", nargs=-1)
+def main_cli(
+    steps: List[str],
+    dry_run: bool = False,
+    force: bool = False,
+    private: bool = False,
+    grapher: bool = False,
+    backport: bool = False,
+    exclude: Optional[str] = None,
+    dag_path: Path = paths.DAG_FILE,
+    workers: int = 5,
+) -> None:
+    return main(
+        steps=steps,
+        dry_run=dry_run,
+        force=force,
+        private=private,
+        grapher=grapher,
+        backport=backport,
+        exclude=exclude,
+        dag_path=dag_path,
+        workers=workers,
+    )
+
+
 def main(
     steps: List[str],
     dry_run: bool = False,
@@ -85,7 +109,7 @@ def main(
 
     # Add all steps for backporting datasets (there are currently >800 of them)
     if backport:
-        dag.update(_backporting_steps(private))
+        dag.update(_backporting_steps(private, walden_catalog=WALDEN_CATALOG))
 
     excludes = exclude.split(",") if exclude else []
 
@@ -183,12 +207,12 @@ def _is_private_step(step_name: str) -> bool:
     return bool(re.findall(r".*?-private://", step_name))
 
 
-def _backporting_steps(private: bool) -> DAG:
+def _backporting_steps(private: bool, walden_catalog: WaldenCatalog) -> DAG:
     """Return a DAG of steps for backporting datasets."""
     dag: DAG = {}
 
     # load all backported datasets from walden
-    for ds in WaldenCatalog().find(namespace=WALDEN_NAMESPACE):
+    for ds in walden_catalog.find(namespace=WALDEN_NAMESPACE):
 
         # skip private backported steps
         if not private and not ds.is_public:
@@ -209,4 +233,4 @@ def _backporting_steps(private: bool) -> DAG:
 
 
 if __name__ == "__main__":
-    main()
+    main_cli()

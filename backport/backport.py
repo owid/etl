@@ -224,7 +224,7 @@ def backport(
     public = not ds.isPrivate
 
     # upload config to walden
-    lg.info("backport.upload_config")
+    lg.info("backport.upload_config", upload=upload, dry_run=dry_run, public=public)
     _upload_config_to_walden(
         config,
         _walden_config_metadata(ds, short_name, md5_config),
@@ -236,7 +236,13 @@ def backport(
     # upload values to walden
     lg.info("backport.loading_values", variables=variable_ids)
     df = _load_values(engine, variable_ids)
-    lg.info("backport.upload_values", size=len(df))
+    lg.info(
+        "backport.upload_values",
+        size=len(df),
+        upload=upload,
+        dry_run=dry_run,
+        public=public,
+    )
     _upload_values_to_walden(
         df,
         _walden_values_metadata(ds, short_name),
@@ -284,12 +290,12 @@ def backport_cli(
     upload: bool = True,
 ) -> None:
     return backport(
-        dataset_id,
-        short_name,
-        variable_id,
-        force,
-        dry_run,
-        upload,
+        dataset_id=dataset_id,
+        short_name=short_name,
+        variable_id=variable_id,
+        force=force,
+        dry_run=dry_run,
+        upload=upload,
     )
 
 
