@@ -158,74 +158,86 @@ HISTORIC_TO_CURRENT_REGION = {
         "continent": "Europe",
         "income_group": "High-income countries",
         "members": [
-            "Czechia",  # Europe - High-income countries.
-            "Slovakia",  # Europe - High-income countries.
+            # Europe - High-income countries.
+            "Czechia",
+            "Slovakia",
         ],
     },
     "Eritrea and Ethiopia": {
         "continent": "Africa",
         "income_group": "Low-income countries",
         "members": [
-            "Ethiopia",  # Africa - Low-income countries.
-            "Eritrea",  # Africa - Low-income countries.
+            # Africa - Low-income countries.
+            "Ethiopia",
+            "Eritrea",
         ],
     },
     "Netherlands Antilles": {
         "continent": "North America",
         "income_group": "High-income countries",
         "members": [
-            "Aruba",  # North America - High-income countries.
-            "Curacao",  # North America - High-income countries.
-            "Sint Maarten (Dutch part)",  # North America - High-income countries.
+            # North America - High-income countries.
+            "Aruba",
+            "Curacao",
+            "Sint Maarten (Dutch part)",
         ],
     },
     "Serbia and Montenegro": {
         "continent": "Europe",
         "income_group": "Upper-middle-income countries",
         "members": [
-            "Serbia",  # Europe - Upper-middle-income countries.
-            "Montenegro",  # Europe - Upper-middle-income countries.
+            # Europe - Upper-middle-income countries.
+            "Serbia",
+            "Montenegro",
         ],
     },
     "Sudan (former)": {
         "continent": "Africa",
         "income_group": "Low-income countries",
         "members": [
-            "Sudan",  # Africa - Low-income countries.
-            "South Sudan",  # Africa - Low-income countries.
+            # Africa - Low-income countries.
+            "Sudan",
+            "South Sudan",
         ],
     },
     "USSR": {
         "continent": "Europe",
         "income_group": "Upper-middle-income countries",
         "members": [
-            "Lithuania",  # Europe - High-income countries.
-            "Georgia",  # Asia - Upper-middle-income countries.
-            "Estonia",  # Europe - High-income countries.
-            "Latvia",  # Europe - High-income countries.
-            "Ukraine",  # Europe - Lower-middle-income countries.
-            "Moldova",  # Europe - Upper-middle-income countries.
-            "Kyrgyzstan",  # Asia - Lower-middle-income countries.
-            "Uzbekistan",  # Asia - Lower-middle-income countries.
-            "Tajikistan",  # Asia - Lower-middle-income countries.
-            "Armenia",  # Asia - Upper-middle-income countries.
-            "Azerbaijan",  # Asia - Upper-middle-income countries.
-            "Turkmenistan",  # Asia - Upper-middle-income countries.
-            "Belarus",  # Europe - Upper-middle-income countries.
-            "Russia",  # Europe - Upper-middle-income countries.
-            "Kazakhstan",  # Asia - Upper-middle-income countries.
+            # Europe - High-income countries.
+            "Lithuania",
+            "Estonia",
+            "Latvia",
+            # Europe - Upper-middle-income countries.
+            "Moldova",
+            "Belarus",
+            "Russia",
+            # Europe - Lower-middle-income countries.
+            "Ukraine",
+            # Asia - Upper-middle-income countries.
+            "Georgia",
+            "Armenia",
+            "Azerbaijan",
+            "Turkmenistan",
+            "Kazakhstan",
+            # Asia - Lower-middle-income countries.
+            "Kyrgyzstan",
+            "Uzbekistan",
+            "Tajikistan",
         ],
     },
     "Yugoslavia": {
         "continent": "Europe",
         "income_group": "Upper-middle-income countries",
         "members": [
-            "Croatia",  # Europe - High-income countries.
-            "Slovenia",  # Europe - High-income countries.
-            "North Macedonia",  # Europe - Upper-middle-income countries.
-            "Bosnia and Herzegovina",  # Europe - Upper-middle-income countries.
-            "Serbia",  # Europe - Upper-middle-income countries.
-            "Montenegro",  # Europe - Upper-middle-income countries.
+            # Europe - High-income countries.
+            "Croatia",
+            "Slovenia",
+            # Europe - Upper-middle-income countries.
+            "North Macedonia",
+            "Bosnia and Herzegovina",
+            "Serbia",
+            "Montenegro",
         ],
     },
 }
@@ -601,11 +613,19 @@ def remove_regions_from_countries_regions_members(countries_regions, regions_to_
 
 
 def _load_population() -> pd.DataFrame:
-    population = (
-        catalog.find("population", namespace="owid", dataset="key_indicators")
-        .load()
-        .reset_index()
-    )
+    # Load population dataset.
+    population = catalog.find("population", namespace="owid", dataset="key_indicators").load().\
+        reset_index()[["country", "year", "population"]]
+
+    # Add data for historical regions by adding the population of its current successors.
+    for country in HISTORIC_TO_CURRENT_REGION:
+        members = HISTORIC_TO_CURRENT_REGION[country]["members"]
+        _population = population[population["country"].isin(members)].\
+            groupby("year").agg({"population": "sum", "country": "nunique"}).reset_index()
+        # Select only years for which we have data for all member countries.
+        _population = _population[_population["country"] == len(members)].reset_index(drop=True)
+        _population["country"] = country
+        population = pd.concat([population, _population], ignore_index=True).reset_index(drop=True)
 
     return cast(pd.DataFrame, population)
 
@@ -690,7 +710,7 @@ def add_regions(data, elements_metadata):
     aggregations = elements_metadata[(elements_metadata["owid_aggregation"].notnull())].\
         set_index("element_code").to_dict()["owid_aggregation"]
     if len(aggregations) > 0:
-        log.info("clean_data.add_regions", shape=data.shape)
+        log.info("add_regions", shape=data.shape)
 
         # Load population dataset, countries-regions, and income groups datasets.
         population = _load_population()
@@ -707,7 +727,7 @@ def add_regions(data, elements_metadata):
             region_code = REGIONS_TO_ADD[region]["area_code"]
             region_population = population[population["country"] == region][["year", "population"]].\
                 reset_index(drop=True)
-            region_min_frac_population_with_data = REGIONS_TO_ADD[region]["min_frac_population_with_data"]            
+            region_min_frac_population_with_data = REGIONS_TO_ADD[region]["min_frac_population_with_data"]
             for aggregation in aggregations_inverted:
                 # List of element codes for which the same aggregate method (e.g. "sum") will be applied.
                 element_codes = aggregations_inverted[aggregation]
@@ -805,6 +825,43 @@ def add_fao_population_if_given(data):
     return data
 
 
+def add_population(df: pd.DataFrame, country_col: str = "country", year_col: str = "year",
+                   population_col: str = "population", warn_on_missing_countries: bool = True,
+                   show_full_warning: bool = True):
+    # This function has been adapted from datautils.geo, because population currently does not include historic
+    # regions. We include them here.
+
+    # Load population dataset.
+    population = _load_population().rename(
+        columns={
+            "country": country_col,
+            "year": year_col,
+            "population": population_col,
+        }
+    )[[country_col, year_col, population_col]]
+
+    # Check if there is any missing country.
+    missing_countries = set(df[country_col]) - set(population[country_col])
+    if len(missing_countries) > 0:
+        if warn_on_missing_countries:
+            warn_on_list_of_entities(
+                list_of_entities=missing_countries,
+                warning_message=(
+                    f"{len(missing_countries)} countries not found in population"
+                    " dataset. They will remain in the dataset, but have nan"
+                    " population."
+                ),
+                show_list=show_full_warning,
+            )
+
+    # Add population to original dataframe.
+    df_with_population = pd.merge(
+        df, population, on=[country_col, year_col], how="left"
+    )
+
+    return df_with_population
+
+
 def convert_variables_given_per_capita_to_total_value(data, elements_metadata):
     # Select element codes that were originally given as per capita variables (if any), and, if FAO population is
     # given, make them total variables instead of per capita.
@@ -842,7 +899,7 @@ def add_per_capita_variables(data, elements_metadata):
     element_codes_to_make_per_capita = elements_metadata[elements_metadata["make_per_capita"]]["element_code"].\
         unique().tolist()
     if len(element_codes_to_make_per_capita) > 0:
-        log.info("clean_data.add_per_capita_variables", shape=data.shape)
+        log.info("add_per_capita_variables", shape=data.shape)
 
         # Create a new dataframe that will have all per capita variables.
         per_capita_data = data[data["element_code"].isin(element_codes_to_make_per_capita)].reset_index(drop=True)
@@ -960,8 +1017,7 @@ def clean_data(data: pd.DataFrame, items_metadata: pd.DataFrame, elements_metada
     # Add column for population; when creating region aggregates, this column will have the population of the countries
     # for which there was data. For example, for Europe in a specific year, the population may differ from item to item,
     # because for one item we may have more European countries informed than for the other.
-    data = geo.add_population_to_dataframe(df=data, population_col="population_with_data",
-                                           warn_on_missing_countries=False)
+    data = add_population(df=data, population_col="population_with_data", warn_on_missing_countries=False)
 
     # Convert back to categorical columns (maybe this should be handled automatically in `add_population_to_dataframe`)
     data = data.astype({"country": "category"})
