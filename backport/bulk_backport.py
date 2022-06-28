@@ -90,22 +90,6 @@ def bulk_backport(
     log.info("bulk_backport.finished")
 
 
-def _backported_ids_in_dag() -> list[int]:
-    """Get all backported dataset ids used in DAG. This is helpful if someone uses backported
-    dataset without any charts."""
-    dag = load_dag()
-
-    all_steps = list(dag.keys()) + [x for vals in dag.values() for x in vals]
-
-    out = set()
-    for s in all_steps:
-        match = re.search(r"backport\/owid\/latest\/dataset_(\d+)_", s)
-        if match:
-            out.add(int(match.group(1)))
-
-    return list(out)
-
-
 def _active_datasets(engine: Engine, limit: int = 1000000) -> pd.DataFrame:
     """Return dataframe of datasets with at least one chart that should be backported."""
 
@@ -169,6 +153,22 @@ def _prune_walden_datasets(engine: Engine, dry_run: bool) -> None:
         if not dry_run:
             ds.delete()
             ds.delete_from_remote()
+
+
+def _backported_ids_in_dag() -> list[int]:
+    """Get all backported dataset ids used in DAG. This is helpful if someone uses backported
+    dataset without any charts."""
+    dag = load_dag()
+
+    all_steps = list(dag.keys()) + [x for vals in dag.values() for x in vals]
+
+    out = set()
+    for s in all_steps:
+        match = re.search(r"backport\/owid\/latest\/dataset_(\d+)_", s)
+        if match:
+            out.add(int(match.group(1)))
+
+    return list(out)
 
 
 if __name__ == "__main__":
