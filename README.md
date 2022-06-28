@@ -274,7 +274,7 @@ etl --backport
 
 ### Fasttrack
 
-Fastrack script is meant to backport updated datasets as soon as possible. It listens to grapher DB for updates and when it detects a change it will:
+Fastrack is a service that polls grapher database for dataset updates and backports them as fast as possible. When it detects a change it will:
 
 1. Run `backport` to get the backported dataset to **local** Walden catalog (without uploading to S3)
 2. Run ETL on the backported dataset

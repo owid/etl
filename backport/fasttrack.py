@@ -1,13 +1,16 @@
 import concurrent.futures
 import datetime as dt
 import time
+from typing import cast
 
 import click
 import pandas as pd
 import structlog
 from owid.catalog.utils import underscore
 from owid.walden import CATALOG as WALDEN_CATALOG
+from sqlalchemy.engine import Engine
 
+from etl import config
 from etl.command import main as etl
 from etl.db import get_engine
 from etl.publish import publish
@@ -45,29 +48,18 @@ SLEEP_BETWEEN_RUNS = 1
     type=int,
     help="How many datasets to process in parallel",
 )
+@click.option("--bucket", type=str, help="Bucket name", default=config.S3_BUCKET)
 def fasttrack(
     dry_run: bool = False,
     force: bool = False,
     dt_start: dt.datetime = dt.datetime.utcnow(),
     batch_size: int = 10,
+    bucket: str = config.S3_BUCKET,
 ) -> None:
     engine = get_engine()
 
     while True:
-        q = """
-        select
-            id as dataset_id,
-            name as dataset_name,
-            GREATEST(updatedAt, metadataEditedAt, dataEditedAt) as latest_timestamp
-        from datasets
-        -- this assumes there are no ties if we are processing a lot of datasets
-        where GREATEST(updatedAt, metadataEditedAt, dataEditedAt) > %(start)s
-        order by latest_timestamp asc
-        limit %(batch_size)s
-        """
-        df = pd.read_sql(
-            q, engine, params={"start": dt_start, "batch_size": batch_size}
-        )
+        df = _updated_datasets(engine, dt_start, batch_size)
 
         # wait if no results
         if df.empty:
@@ -80,17 +72,11 @@ def fasttrack(
         # use latest timestamp of processed datasets as start for next batch
         dt_start = df.latest_timestamp.max().to_pydatetime()
 
-        # run backport to walden in parallel
-        with concurrent.futures.ThreadPoolExecutor() as executor:
-            executor.map(
-                lambda r: process_dataset(
-                    r.dataset_id, r.dataset_name, dry_run=dry_run, force=force
-                ),
-                df.itertuples(),
-            )
+        # run backport to walden
+        _backport_datasets_to_walden(df, dry_run=dry_run, force=force)
 
-        # refresh walden catalog manually
-        log.info("fasttrack.refresh_walden", dt_start=dt_start)
+        # refresh local walden catalog manually
+        log.info("fasttrack.refresh_local_walden", dt_start=dt_start)
         WALDEN_CATALOG.refresh()
 
         # run ETL
@@ -113,27 +99,50 @@ def fasttrack(
         publish(
             dry_run=dry_run,
             private=True,
-            bucket="owid-catalog-staging",
+            bucket=bucket,
             channel=["backport"],
         )
 
 
-def process_dataset(
-    dataset_id: int, dataset_name: str, dry_run: bool, force: bool
-) -> None:
-    log.info("process_dataset.start", dataset_id=dataset_id)
+def _updated_datasets(
+    engine: Engine, start: dt.datetime, batch_size: int
+) -> pd.DataFrame:
+    q = """
+    select
+        id as dataset_id,
+        name as dataset_name,
+        GREATEST(updatedAt, metadataEditedAt, dataEditedAt) as latest_timestamp
+    from datasets
+    -- this assumes there are no ties if we are processing a lot of datasets
+    where GREATEST(updatedAt, metadataEditedAt, dataEditedAt) > %(start)s
+    order by latest_timestamp asc
+    limit %(batch_size)s
+    """
+    return cast(
+        pd.DataFrame,
+        pd.read_sql(q, engine, params={"start": start, "batch_size": batch_size}),
+    )
+
+
+def _backport_datasets_to_walden(df: pd.DataFrame, dry_run: bool, force: bool) -> None:
+    """Add datasets to local walden if missing or checksums are out of date; on prod, a cron job will commit."""
     # NOTE: we are not commiting changes to walden repo, this could be problematic
     # if the other processes are trying to rebase the repo
     # NOTE: we are not uploading files to walden S3 bucket, this will be done during periodic
     # etl run
-    backport(
-        dataset_id=dataset_id,
-        short_name=underscore(dataset_name),
-        dry_run=dry_run,
-        force=force,
-        upload=False,
-    )
-    log.info("process_dataset.end", dataset_id=dataset_id)
+    log.info("backport_dataset_to_walden.start")
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        executor.map(
+            lambda r: backport(
+                dataset_id=r.dataset_id,
+                short_name=underscore(r.dataset_name),
+                dry_run=dry_run,
+                force=force,
+                upload=False,
+            ),
+            df.itertuples(),
+        )
+    log.info("backport_dataset_to_walden.end")
 
 
 if __name__ == "__main__":
