@@ -1,16 +1,19 @@
-import os
 import shutil
 from pathlib import Path
-from typing import List
+from typing import Set
 from urllib.parse import urlparse
 
 import click
 import structlog
+from owid.catalog import LocalCatalog, CHANNEL
 
 from etl.command import construct_dag
 from etl.steps import paths
 
 log = structlog.get_logger()
+
+
+EXCLUDE_STEP_TYPES = ("grapher", "walden", "walden-private", "github")
 
 
 @click.command()
@@ -44,7 +47,7 @@ def prune(
             shutil.rmtree(data_dir / path)
 
 
-def dag_datasets_dirs(dag_path: Path) -> List[str]:
+def dag_datasets_dirs(dag_path: Path) -> Set[str]:
     """Return a list of directories that contain datasets in the DAG."""
     # make sure we get as many datasets as possible to avoid deleting `backport`
     # if `--backport` flag is not used
@@ -53,29 +56,19 @@ def dag_datasets_dirs(dag_path: Path) -> List[str]:
     dataset_dirs = []
     for step_name in dag.keys():
         parts = urlparse(step_name)
-        path = parts.netloc + parts.path
-        dataset_dirs.append(path)
+        # NOTE: it is safer to exclude step types to avoid silently deleting unwanted data
+        # if we ever add a new step type
+        if parts.scheme not in EXCLUDE_STEP_TYPES:
+            path = parts.netloc + parts.path
+            dataset_dirs.append(path)
 
-    return dataset_dirs
+    # NOTE: garden/reference is a special dataset with tables commited to git
+    return set(dataset_dirs) | {"garden/reference"}
 
 
-def local_datasets_dirs(data_dir: Path) -> List[str]:
-    """Walk /data folder and return all directories that contain datasets, i.e.
-    any feather file."""
-    dataset_dirs = []
-
-    # old approach, but extremely fast
-    for root, _, files in os.walk(data_dir):
-        if str(data_dir) == root:
-            continue
-
-        if any(f.endswith(".feather") for f in files):
-            # safeguard against deleting unwanted files
-            assert all(f.split(".")[-1] in {"feather", "json", "csv"} for f in files)
-
-            dataset_dirs.append(Path(root).relative_to(data_dir))
-
-    return [str(d) for d in dataset_dirs]
+def local_datasets_dirs(data_dir: Path) -> Set[str]:
+    lc = LocalCatalog(data_dir, channels=CHANNEL.__args__)
+    return {str(Path(p).parent) for p in lc.frame.path}
 
 
 if __name__ == "__main__":
