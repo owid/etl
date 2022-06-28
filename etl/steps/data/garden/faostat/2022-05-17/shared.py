@@ -83,7 +83,7 @@ ITEM_AMENDMENTS = {
 # For example, if for a certain variable in a certain year, only a few countries with little population have data,
 # then assign nan to that region-variable-year.
 # Define here that minimum fraction of population that must have data to create an aggregate.
-MIN_FRAC_POPULATION_WITH_DATA = 0.7
+MIN_FRAC_POPULATION_WITH_DATA = 0.
 # Reference year to build the list of mandatory countries.
 REFERENCE_YEAR = 2018
 REGIONS_TO_ADD = {
@@ -140,23 +140,95 @@ WAS_PER_CAPITA_ADDED_ELEMENT_DESCRIPTION = "Originally given per-capita, and con
 NEW_PER_CAPITA_ADDED_ELEMENT_DESCRIPTION = "Per-capita values are obtained by dividing the original values by the " \
                                            "population (either provided by FAO or by OWID)."
 
-# When creating region aggregates, we need to ignore regions that are historical (i.e. they do not exist today as
-# countries) or are geographical regions (instead of countries). We ignore them to avoid the risk of counting the
-# contribution of certain countries twice.
+# When creating region aggregates, we need to ignore geographical regions that contain aggregate data from other
+# countries, to avoid double-counting the data of those countries.
+# Note: This list does not contain all country groups, but only those that are in our list of harmonized countries
+# (without the *(FAO) suffix).
 REGIONS_TO_IGNORE_IN_AGGREGATES = [
-    'Czechoslovakia',  # Historic
-    'Eritrea and Ethiopia',  # Historic
-    'French Southern Territories',  # Region
-    'Melanesia',  # Region
-    'Netherlands Antilles',  # Historic
-    'Polynesia',  # Region
-    'Serbia and Montenegro',  # Historic
-    'Svalbard and Jan Mayen',  # Region
-    'Timor',  # Region
-    'USSR',  # Historic
-    'United States Minor Outlying Islands',  # Region
-    'Yugoslavia',  # Historic
+    'Melanesia',
+    'Polynesia',
 ]
+
+# When creating region aggregates, decide how to distribute historical regions.
+# The following decisions are based on the current location of the countries that succeeded the region, and their income
+# group. Continent and income group assigned corresponds to the continent and income group of the majority of the
+# population in the member countries.
+HISTORIC_TO_CURRENT_REGION = {
+    "Czechoslovakia": {
+        "continent": "Europe",
+        "income_group": "High-income countries",
+        "members": [
+            "Czechia",  # Europe - High-income countries.
+            "Slovakia",  # Europe - High-income countries.
+        ],
+    },
+    "Eritrea and Ethiopia": {
+        "continent": "Africa",
+        "income_group": "Low-income countries",
+        "members": [
+            "Ethiopia",  # Africa - Low-income countries.
+            "Eritrea",  # Africa - Low-income countries.
+        ],
+    },
+    "Netherlands Antilles": {
+        "continent": "North America",
+        "income_group": "High-income countries",
+        "members": [
+            "Aruba",  # North America - High-income countries.
+            "Curacao",  # North America - High-income countries.
+            "Sint Maarten (Dutch part)",  # North America - High-income countries.
+        ],
+    },
+    "Serbia and Montenegro": {
+        "continent": "Europe",
+        "income_group": "Upper-middle-income countries",
+        "members": [
+            "Serbia",  # Europe - Upper-middle-income countries.
+            "Montenegro",  # Europe - Upper-middle-income countries.
+        ],
+    },
+    "Sudan (former)": {
+        "continent": "Africa",
+        "income_group": "Low-income countries",
+        "members": [
+            "Sudan",  # Africa - Low-income countries.
+            "South Sudan",  # Africa - Low-income countries.
+        ],
+    },
+    "USSR": {
+        "continent": "Europe",
+        "income_group": "Upper-middle-income countries",
+        "members": [
+            "Lithuania",  # Europe - High-income countries.
+            "Georgia",  # Asia - Upper-middle-income countries.
+            "Estonia",  # Europe - High-income countries.
+            "Latvia",  # Europe - High-income countries.
+            "Ukraine",  # Europe - Lower-middle-income countries.
+            "Moldova",  # Europe - Upper-middle-income countries.
+            "Kyrgyzstan",  # Asia - Lower-middle-income countries.
+            "Uzbekistan",  # Asia - Lower-middle-income countries.
+            "Tajikistan",  # Asia - Lower-middle-income countries.
+            "Armenia",  # Asia - Upper-middle-income countries.
+            "Azerbaijan",  # Asia - Upper-middle-income countries.
+            "Turkmenistan",  # Asia - Upper-middle-income countries.
+            "Belarus",  # Europe - Upper-middle-income countries.
+            "Russia",  # Europe - Upper-middle-income countries.
+            "Kazakhstan",  # Asia - Upper-middle-income countries.
+        ],
+    },
+    "Yugoslavia": {
+        "continent": "Europe",
+        "income_group": "Upper-middle-income countries",
+        "members": [
+            "Croatia",  # Europe - High-income countries.
+            "Slovenia",  # Europe - High-income countries.
+            "North Macedonia",  # Europe - Upper-middle-income countries.
+            "Bosnia and Herzegovina",  # Europe - Upper-middle-income countries.
+            "Serbia",  # Europe - Upper-middle-income countries.
+            "Montenegro",  # Europe - Upper-middle-income countries.
+        ],
+    },
+}
 
 # Flag to assign to data points with nan flag (which by definition is considered official data).
 FLAG_OFFICIAL_DATA = "official_data"
@@ -566,6 +638,35 @@ def _list_countries_in_region(region, countries_regions):
     return countries_in_region
 
 
+def remove_overlapping_data_between_historical_regions_and_successors(data_region):
+    data_region = data_region.copy()
+    # Sometimes, data for historical regions (e.g. USSR) overlaps with data of the successor countries (e.g. Russia).
+    # Ideally, we would keep only data for the newer countries. However, if not all successors have data, we would be
+    # having an incomplete aggregation, and therefore it would be better to keep data from the historical region.
+    columns = ["item_code", "element_code", "year"]
+
+    indexes_to_drop = []
+    for historical_region in HISTORIC_TO_CURRENT_REGION:
+        historical_successors = HISTORIC_TO_CURRENT_REGION[historical_region]["members"]
+        historical_region_years = data_region[(data_region["country"] == historical_region)][columns].\
+            drop_duplicates()
+        historical_successors_years = data_region[(data_region["country"].isin(historical_successors))][columns].\
+            drop_duplicates()
+        overlapping_years = pd.concat([historical_region_years, historical_successors_years], ignore_index=True)
+        overlapping_years = overlapping_years[overlapping_years.duplicated()]
+        if not overlapping_years.empty:
+            log.warning(f"Removing rows where historical region {historical_region} overlaps with its successors (years {sorted(set(overlapping_years['year']))}).")
+            # Select rows in data_region to drop.
+            overlapping_years["country"] = historical_region
+            indexes_to_drop.extend(pd.merge(data_region.reset_index(), overlapping_years, how='inner',
+                                        on=["country"] + columns)["index"].tolist())
+
+    if len(indexes_to_drop) > 0:
+        data_region = data_region.drop(index=indexes_to_drop)
+
+    return data_region
+
+
 def add_regions(data, elements_metadata):
     data = data.copy()
 
@@ -585,12 +686,13 @@ def add_regions(data, elements_metadata):
                                                           if value == unique_value]).tolist()
                                  for unique_value in aggregations.values()}
 
-        for region in tqdm(REGIONS_TO_ADD, file=sys.stdout):
+        for region in tqdm(REGIONS_TO_ADD, file=sys.stdout):        
+
             countries_in_region = _list_countries_in_region(region, countries_regions=countries_regions)
             region_code = REGIONS_TO_ADD[region]["area_code"]
             region_population = population[population["country"] == region][["year", "population"]].\
                 reset_index(drop=True)
-            region_min_frac_population_with_data = REGIONS_TO_ADD[region]["min_frac_population_with_data"]
+            region_min_frac_population_with_data = REGIONS_TO_ADD[region]["min_frac_population_with_data"]            
             for aggregation in aggregations_inverted:
                 # List of element codes for which the same aggregate method (e.g. "sum") will be applied.
                 element_codes = aggregations_inverted[aggregation]
@@ -598,8 +700,11 @@ def add_regions(data, elements_metadata):
                 # Select relevant rows in the data.
                 data_region = data[(data["country"].isin(countries_in_region)) &
                                    (data["element_code"].isin(element_codes))]
+                
+                # Ensure there is no overlap between historical regions and their successors.
+                data_region = remove_overlapping_data_between_historical_regions_and_successors(data_region)
+
                 if len(data_region) > 0:
-                    # NOTE: using columns in groupby is faster than using `first`
                     data_region = dataframes.groupby_agg(
                         df=data_region.dropna(subset="value"), groupby_columns=[
                             "year", "item_code", "element_code",
