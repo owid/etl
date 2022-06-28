@@ -620,7 +620,21 @@ def _load_countries_regions() -> pd.DataFrame:
     return cast(pd.DataFrame, countries_regions)
 
 
-def _list_countries_in_region(region, countries_regions):
+def _load_income_groups() -> pd.DataFrame:
+    income_groups = catalog.find(table="wb_income_group", dataset="wb_income", namespace="wb", channels=["garden"]).\
+        load().reset_index()
+    # Add historical regions to income groups.
+    for historic_region in HISTORIC_TO_CURRENT_REGION:
+        historic_region_income_group = HISTORIC_TO_CURRENT_REGION[historic_region]["income_group"]
+        if not historic_region in income_groups["country"]:
+            historic_region_df = pd.DataFrame({"country": [historic_region],
+                                               "income_group": [historic_region_income_group]})
+            income_groups = pd.concat([income_groups, historic_region_df], ignore_index=True)
+
+    return income_groups
+
+
+def _list_countries_in_region(region, countries_regions, income_groups):
     # Number of attempts to fetch countries regions data.
     attempts = 5
     attempt = 0
@@ -628,7 +642,8 @@ def _list_countries_in_region(region, countries_regions):
     while attempt < attempts:
         try:
             # List countries in region.
-            countries_in_region = geo.list_countries_in_region(region=region, countries_regions=countries_regions)
+            countries_in_region = geo.list_countries_in_region(region=region, countries_regions=countries_regions,
+                                                               income_groups=income_groups)
             break
         except ConnectionResetError:
             attempt += 1
@@ -677,18 +692,18 @@ def add_regions(data, elements_metadata):
     if len(aggregations) > 0:
         log.info("clean_data.add_regions", shape=data.shape)
 
-        # Load population dataset and countries-regions dataset.
+        # Load population dataset, countries-regions, and income groups datasets.
         population = _load_population()
         countries_regions = _load_countries_regions()
+        income_groups = _load_income_groups()
 
         # Invert dictionary of aggregations to have the aggregation as key, and the list of element codes as value.
         aggregations_inverted = {unique_value: pd.unique([item for item, value in aggregations.items()
                                                           if value == unique_value]).tolist()
                                  for unique_value in aggregations.values()}
-
-        for region in tqdm(REGIONS_TO_ADD, file=sys.stdout):        
-
-            countries_in_region = _list_countries_in_region(region, countries_regions=countries_regions)
+        for region in tqdm(REGIONS_TO_ADD, file=sys.stdout):
+            countries_in_region = _list_countries_in_region(
+                region, countries_regions=countries_regions, income_groups=income_groups)
             region_code = REGIONS_TO_ADD[region]["area_code"]
             region_population = population[population["country"] == region][["year", "population"]].\
                 reset_index(drop=True)
