@@ -221,16 +221,6 @@ PRODUCTS = [
 FAO_POPULATION_ITEM_NAME = "Population"
 FAO_POPULATION_ELEMENT_NAME = "Total Population - Both sexes"
 FAO_POPULATION_UNIT = "1000 persons"
-# OWID item name for total meat  (as given in faostat_qcl and faostat_fbsc datasets).
-TOTAL_MEAT_ITEM = "Meat, total"
-# OWID element name, unit name, and unit short name for number of slaughtered animals  (as given in faostat_qcl and
-# faostat_fbsc datasets).
-SLAUGHTERED_ANIMALS_ELEMENT = "Producing or slaughtered animals"
-SLAUGHTERED_ANIMALS_UNIT = "animals"
-SLAUGHTERED_ANIMALS_UNIT_SHORT_NAME = "animals"
-SLAUGHTERED_ANIMALS_PER_CAPITA_ELEMENT = "Producing or slaughtered animals (animals per capita)"
-
-slaughtered_animals_element = "Producing or slaughtered animals (animals)"
 
 
 def combine_qcl_and_fbsc(
@@ -292,91 +282,11 @@ def get_fao_population(combined: pd.DataFrame) -> pd.DataFrame:
     return fao_population
 
 
-def add_slaughtered_animals_to_meat_total(combined):
-    # There is no FAO data on slaughtered animals for total meat.
-    # We construct this data by aggregating that element for the following items (which corresponds to all meat
-    # products removing redundancies):
-    products_to_aggregate = [
-        'Meat, ass',
-        'Meat, beef and buffalo',
-        'Meat, camel',
-        'Meat, horse',
-        'Meat, lamb and mutton',
-        'Meat, mule',
-        'Meat, pig',
-        'Meat, poultry',
-        'Meat, rabbit',
-        'Meat, sheep and goat',
-    ]
-    error = f"Some items required to get the aggregate '{TOTAL_MEAT_ITEM}' are missing in data."
-    assert set(products_to_aggregate) < set(combined["product"]), error
-    assert SLAUGHTERED_ANIMALS_ELEMENT in combined["element"].unique()
-    assert SLAUGHTERED_ANIMALS_UNIT in combined["unit"].unique()
-
-    # For some reason, there are two element codes for the same element (they have different items assigned).
-    error = "Element codes for 'Producing or slaughtered animals' may have changed."
-    assert combined[(combined["element"] == SLAUGHTERED_ANIMALS_ELEMENT) &
-                    ~(combined["element_code"].str.contains("pc"))]["element_code"].unique().tolist() == \
-           ['005320', '005321'], error
-    # Similarly, there are two items for meat total.
-    error = f"Item codes for '{TOTAL_MEAT_ITEM}' may have changed."
-    assert combined[combined["product"] == TOTAL_MEAT_ITEM]["item_code"].unique().tolist() == \
-           ['00001765', '00002943'], error
-    # We arbitrarily choose the first element code and the first item code.
-    slaughtered_animals_element_code = "005320"
-    total_meat_item_code = "00001765"
-
-    # Check that, indeed, this variable is not given in the original data.
-    assert combined[(combined["product"] == TOTAL_MEAT_ITEM) &
-                    (combined["element"] == SLAUGHTERED_ANIMALS_ELEMENT) &
-                    (combined["unit"] == SLAUGHTERED_ANIMALS_UNIT)].empty
-
-    # Select the subset of data to aggregate.
-    data_to_aggregate = combined[(combined["element"] == SLAUGHTERED_ANIMALS_ELEMENT) &
-                                 (combined["unit"] == SLAUGHTERED_ANIMALS_UNIT) &
-                                 (combined["product"].isin(products_to_aggregate))].\
-        dropna(subset="value").reset_index(drop=True)
-
-    # Create a dataframe with the total number of animals used for meat.
-    animals = dataframes.groupby_agg(data_to_aggregate, groupby_columns=["country", "year"],
-                                     aggregations={"value": "sum"}).reset_index()
-
-    # Manually include the rest of columns.
-    animals["element"] = SLAUGHTERED_ANIMALS_ELEMENT
-    animals["unit"] = SLAUGHTERED_ANIMALS_UNIT
-    animals["unit_short_name"] = SLAUGHTERED_ANIMALS_UNIT_SHORT_NAME
-    animals["element_code"] = slaughtered_animals_element_code
-    animals["item_code"] = total_meat_item_code
-    animals["product"] = TOTAL_MEAT_ITEM
-
-    # Add animals data to the original dataframe.
-    combined_data = pd.concat([combined, animals], ignore_index=True).reset_index(drop=True)
-
-    return combined_data
-
-
-def add_slaughtered_animals_per_capita_to_meat_total(data_wide):
-    # Check that there is no data for slaughtered animals per capita in the total meat item.
-    assert data_wide[data_wide["product"] == TOTAL_MEAT_ITEM][SLAUGHTERED_ANIMALS_PER_CAPITA_ELEMENT].dropna().empty
-
-    # Add per capita slaughtered animals.
-
-    total_meat_item_mask = data_wide["product"] == TOTAL_MEAT_ITEM
-
-    data_wide.loc[total_meat_item_mask, SLAUGHTERED_ANIMALS_PER_CAPITA_ELEMENT] =\
-        data_wide[total_meat_item_mask][slaughtered_animals_element] / data_wide[total_meat_item_mask]["population"]
-
-    return data_wide
-
-
 def process_combined_data(combined: pd.DataFrame) -> pd.DataFrame:
     combined = combined.copy()
 
     # Get FAO population from data (it is given as another item).
     fao_population = get_fao_population(combined=combined)
-
-    # Include number of slaughtered animals in total meat (which is missing).
-    combined = add_slaughtered_animals_to_meat_total(combined)
 
     # Check that all expected products are included in the data.
     missing_products = sorted(set(PRODUCTS) - set(set(combined["product"])))
@@ -405,9 +315,6 @@ def process_combined_data(combined: pd.DataFrame) -> pd.DataFrame:
     # Then drop "fao_population", since it is no longer needed.
     data_wide["population"] = data_wide["population"].fillna(data_wide["fao_population"])
     data_wide = data_wide.drop(columns="fao_population")
-
-    # Add per capita number of slaughtered animals for total meat.
-    data_wide = add_slaughtered_animals_per_capita_to_meat_total(data_wide)
 
     assert len(data_wide.columns[data_wide.isnull().all(axis=0)]) == 0, "Unexpected columns with only nan values."
 

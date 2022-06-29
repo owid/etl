@@ -242,6 +242,9 @@ HISTORIC_TO_CURRENT_REGION = {
     },
 }
 
+# Additional text to include in the metadata title of the output wide table.
+ADDED_TITLE_TO_WIDE_TABLE = " - Flattened table indexed by country-year."
+
 # Flag to assign to data points with nan flag (which by definition is considered official data).
 FLAG_OFFICIAL_DATA = "official_data"
 # Flag to assign to data points for regions that are the result of aggregating data points with different flags.
@@ -1169,10 +1172,8 @@ def run(dest_dir: str) -> None:
     # Common definitions.
     ####################################################################################################################
 
-    # Assume dest_dir is a path to the step that needs to be run, e.g. "faostat_qcl", and fetch namespace and dataset
-    # short name from that path.
+    # Assume dest_dir is a path to the step to be run, e.g. "faostat_qcl", and get the dataset short name from it.
     dataset_short_name = Path(dest_dir).name
-    # namespace = dataset_short_name.split("_")[0]
     # Path to latest dataset in meadow for current FAOSTAT domain.
     meadow_data_dir = sorted((DATA_DIR / "meadow" / NAMESPACE).glob(f"*/{dataset_short_name}"))[-1].parent /\
         dataset_short_name
@@ -1256,7 +1257,7 @@ def run(dest_dir: str) -> None:
     # Add wide table to the dataset.
     data_table_wide.metadata = deepcopy(data_table_long.metadata)
 
-    data_table_wide.metadata.title += " - Flattened table indexed by country-year."
+    data_table_wide.metadata.title += ADDED_TITLE_TO_WIDE_TABLE
     data_table_wide.metadata.short_name += "_flat"
     data_table_wide.metadata.primary_key = list(data_table_wide.index.names)
 

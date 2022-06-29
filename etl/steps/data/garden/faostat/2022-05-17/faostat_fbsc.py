@@ -21,6 +21,7 @@ from etl.paths import DATA_DIR
 from .shared import (
     NAMESPACE,
     VERSION,
+    ADDED_TITLE_TO_WIDE_TABLE,
     add_per_capita_variables,
     add_regions,
     clean_data,
@@ -210,7 +211,7 @@ def run(dest_dir: str) -> None:
 
     # Prepare metadata for new garden wide table (starting with the metadata from the long table).
     data_table_wide.metadata = deepcopy(data_table_long.metadata)
-    data_table_wide.metadata.title += " - Flattened table indexed by country-year."
+    data_table_wide.metadata.title += ADDED_TITLE_TO_WIDE_TABLE
     data_table_wide.metadata.short_name += "_flat"
     data_table_wide.metadata.primary_key = list(data_table_wide.index.names)
     # Add wide table to the dataset (no need to repack, since columns already have optimal dtypes).
