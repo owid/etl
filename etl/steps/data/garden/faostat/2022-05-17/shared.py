@@ -327,7 +327,7 @@ def check_that_regions_with_subregions_are_ignored_when_constructing_aggregates(
         (~countries_metadata["country"].isin(REGIONS_TO_ADD)) &
         (~countries_metadata["country"].isin(REGIONS_TO_IGNORE_IN_AGGREGATES)) &
         (~countries_metadata["country"].str.contains("(FAO)", regex=False).fillna(False)) &
-        (countries_metadata["members"].notnull())]["country"].unique().tolist()    
+        (countries_metadata["members"].notnull())]["country"].unique().tolist()
 
     error = f"Regions {countries_with_subregions} contain subregions. Add them to REGIONS_TO_IGNORE_IN_AGGREGATES to " \
             f"avoid double-counting subregions when constructing aggregates."
@@ -745,7 +745,7 @@ def add_regions(data, elements_metadata):
                 # Select relevant rows in the data.
                 data_region = data[(data["country"].isin(countries_in_region)) &
                                    (data["element_code"].isin(element_codes))]
-                
+
                 # Ensure there is no overlap between historical regions and their successors.
                 data_region = remove_overlapping_data_between_historical_regions_and_successors(data_region)
 
@@ -894,10 +894,13 @@ def convert_variables_given_per_capita_to_total_value(data, elements_metadata):
         log.info(f"{len(elements_converted)} elements converted from per-capita to total values: {elements_converted}")
 
         # Include an additional description to all elements that were converted from per capita to total variables.
-        data["element_description"] = pd.Series([description for description in data["element_description"]])
-        data.loc[per_capita_mask, "element_description"] = (data[per_capita_mask]["element_description"].fillna("") +
-                                                            " " + WAS_PER_CAPITA_ADDED_ELEMENT_DESCRIPTION).str.lstrip()
-        data["element_description"] = data["element_description"].astype("category")
+        if "" not in data["element_description"].cat.categories:
+            data["element_description"] = data["element_description"].cat.add_categories([""])
+        data.loc[per_capita_mask, "element_description"] = data.loc[per_capita_mask, "element_description"].fillna('')
+        data["element_description"] = dataframes.apply_on_categoricals(
+            [data.element_description, per_capita_mask.astype("category")],
+            lambda desc, mask: f"{desc} {WAS_PER_CAPITA_ADDED_ELEMENT_DESCRIPTION}".lstrip() if mask else f"{desc}",
+        )
 
     return data
 
