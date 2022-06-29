@@ -184,6 +184,7 @@ OMN,Oman,OM,OMN,449.0,OMA,698.0,OMA,MK,OMAN,OMN,OMN,http://www.wikidata.org/enti
 PAK,Pakistan,PK,PAK,564.0,PAK,770.0,PAK,PK,PKST,PAK,PAK,http://www.wikidata.org/entity/Q843,Pakistan,101.0,720.0,,
 PLW,Palau,PW,PLW,565.0,PAL,986.0,,PW,,PLW,PLW,http://www.wikidata.org/entity/Q695,Palau,224.0,724.0,,"[""Pacific Islands (Palau)""]"
 PSE,Palestine,PS,PSE,,,,PAL,,,PSE,PSE,http://www.wikidata.org/entity/Q219060,State of Palestine,140.0,731.0,,"[""Occupied Palestinian Terr."", ""Occupied Palestinian Territory"", ""Palestine, State of"", ""Palestinian Territories"", ""State of Palestine""]"
+PS_GZA,Gaza Strip,PS-GZA,PS-GZA,,,,,,,,,https://www.wikidata.org/wiki/Q39760,Gaza Strip,,,,
 PAN,Panama,PA,PAN,283.0,PAN,95.0,PAN,PN,PNMA,PAN,PAN,http://www.wikidata.org/entity/Q804,Panama,100.0,721.0,,
 PNG,Papua New Guinea,PG,PNG,853.0,PNG,910.0,PNG,PP,PPNG,PNG,PNG,http://www.wikidata.org/entity/Q691,Papua New Guinea,99.0,725.0,,
 PRY,Paraguay,PY,PRY,288.0,PAR,150.0,PAR,PY,PRGY,PRY,PRY,http://www.wikidata.org/entity/Q733,Paraguay,98.0,730.0,,
@@ -230,6 +231,7 @@ SSD,South Sudan,SS,SSD,,SSD,626.0,,SD,,,,http://www.wikidata.org/entity/Q958,Sou
 ESP,Spain,ES,ESP,184.0,SPN,230.0,,SP,SPAN,ESP,ESP,http://www.wikidata.org/entity/Q29,Spain,9.0,624.0,,
 LKA,Sri Lanka,LK,LKA,524.0,SRI,780.0,SRL,CE,SRLK,LKA,LKA,http://www.wikidata.org/entity/Q854,Sri Lanka,141.0,681.0,,
 SDN,Sudan,SD,SDN,732.0,SUD,625.0,SUD,SJ,,SDN,SDN,http://www.wikidata.org/entity/Q1049,Sudan,79.0,739.0,,"[""Sudan (the)""]"
+OWID_SDN,Sudan (former),,,,,,,,,,,,,,,,
 SUR,Suriname,SR,SUR,366.0,SUR,115.0,SUR,SR,SRNM,SUR,SUR,http://www.wikidata.org/entity/Q730,Suriname,234.0,752.0,,
 SJM,Svalbard and Jan Mayen,SJ,SJM,,,,,,,,,http://www.wikidata.org/entity/Q842829,Svalbard and Jan Mayen,298.0,808.0,,"[""Svalbard & Jan Mayen Isl."", ""Svalbard and Jan Mayen Islands""]"
 SWE,Sweden,SE,SWE,144.0,SWD,380.0,,SW,SWDN,SWE,SWE,http://www.wikidata.org/entity/Q34,Sweden,10.0,755.0,,
