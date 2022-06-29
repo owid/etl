@@ -295,5 +295,5 @@ steps:
   #
   # Food explorer step
   #
-  data://explorer/owid/latest/food_explorer:
+  data://explorers/owid/latest/food_explorer:
     - data://garden/faostat/2022-05-17/faostat_food_explorer
