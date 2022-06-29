@@ -9,21 +9,9 @@ from owid import catalog
 from owid.datautils import dataframes
 
 from etl.paths import DATA_DIR
-from .shared import NAMESPACE, VERSION, ADDED_TITLE_TO_WIDE_TABLE, FLAG_MULTIPLE_FLAGS, harmonize_elements,\
-    harmonize_items, clean_data, add_regions, add_per_capita_variables, prepare_long_table, prepare_wide_table
-
-
-# FAO item name, element name, and unit name for population.
-FAO_POPULATION_ITEM_NAME = "Population"
-FAO_POPULATION_ELEMENT_NAME = "Total Population - Both sexes"
-FAO_POPULATION_UNIT = "1000 persons"
-# OWID item name for total meat.
-TOTAL_MEAT_ITEM = "Meat, total"
-# OWID element name, unit name, and unit short name for number of slaughtered animals.
-SLAUGHTERED_ANIMALS_ELEMENT = "Producing or slaughtered animals"
-SLAUGHTERED_ANIMALS_UNIT = "animals"
-SLAUGHTERED_ANIMALS_UNIT_SHORT_NAME = "animals"
-SLAUGHTERED_ANIMALS_PER_CAPITA_ELEMENT = "Producing or slaughtered animals (animals per capita)"
+from .shared import NAMESPACE, VERSION, ADDED_TITLE_TO_WIDE_TABLE, FLAG_MULTIPLE_FLAGS, REGIONS_TO_ADD,\
+    harmonize_elements, harmonize_items, clean_data, add_regions, add_per_capita_variables, prepare_long_table,\
+    prepare_wide_table
 
 
 def add_slaughtered_animals_to_meat_total(data):
@@ -42,33 +30,39 @@ def add_slaughtered_animals_to_meat_total(data):
         'Meat, rabbit',
         'Meat, sheep and goat',
     ]
-    error = f"Some items required to get the aggregate '{TOTAL_MEAT_ITEM}' are missing in data."
+    # OWID item name for total meat.
+    total_meat_item = "Meat, total"
+    # OWID element name, unit name, and unit short name for number of slaughtered animals.
+    slaughtered_animals_element = "Producing or slaughtered animals"
+    slaughtered_animals_unit = "animals"
+    slaughtered_animals_unit_short_name = "animals"
+    error = f"Some items required to get the aggregate '{total_meat_item}' are missing in data."
     assert set(items_to_aggregate) < set(data["item"]), error
-    assert SLAUGHTERED_ANIMALS_ELEMENT in data["element"].unique()
-    assert SLAUGHTERED_ANIMALS_UNIT in data["unit"].unique()
+    assert slaughtered_animals_element in data["element"].unique()
+    assert slaughtered_animals_unit in data["unit"].unique()
 
     # For some reason, there are two element codes for the same element (they have different items assigned).
     error = "Element codes for 'Producing or slaughtered animals' may have changed."
-    assert data[(data["element"] == SLAUGHTERED_ANIMALS_ELEMENT) &
+    assert data[(data["element"] == slaughtered_animals_element) &
                 ~(data["element_code"].str.contains("pc"))]["element_code"].unique().tolist() == \
            ['005320', '005321'], error    
 
     # Similarly, there are two items for meat total.
-    error = f"Item codes for '{TOTAL_MEAT_ITEM}' may have changed."
-    assert data[data["item"] == TOTAL_MEAT_ITEM]["item_code"].unique().tolist() == ['00001765'], error    
+    error = f"Item codes for '{total_meat_item}' may have changed."
+    assert data[data["item"] == total_meat_item]["item_code"].unique().tolist() == ['00001765'], error
 
     # We arbitrarily choose the first element code and the first item code.
     slaughtered_animals_element_code = "005320"
     total_meat_item_code = "00001765"
 
     # Check that, indeed, this variable is not given in the original data.
-    assert data[(data["item"] == TOTAL_MEAT_ITEM) &
-                (data["element"] == SLAUGHTERED_ANIMALS_ELEMENT) &
-                (data["unit"] == SLAUGHTERED_ANIMALS_UNIT)].empty
+    assert data[(data["item"] == total_meat_item) &
+                (data["element"] == slaughtered_animals_element) &
+                (data["unit"] == slaughtered_animals_unit)].empty
 
     # Select the subset of data to aggregate.
-    data_to_aggregate = data[(data["element"] == SLAUGHTERED_ANIMALS_ELEMENT) &
-                             (data["unit"] == SLAUGHTERED_ANIMALS_UNIT) &
+    data_to_aggregate = data[(data["element"] == slaughtered_animals_element) &
+                             (data["unit"] == slaughtered_animals_unit) &
                              (data["item"].isin(items_to_aggregate))].\
         dropna(subset="value").reset_index(drop=True)
 
@@ -99,13 +93,13 @@ def add_slaughtered_animals_to_meat_total(data):
     total_meat_fao_unit = total_meat_fao_unit[0]
 
     # Manually include the rest of columns.
-    animals["element"] = SLAUGHTERED_ANIMALS_ELEMENT
+    animals["element"] = slaughtered_animals_element
     animals["element_description"] = slaughtered_animals_element_description
-    animals["unit"] = SLAUGHTERED_ANIMALS_UNIT
-    animals["unit_short_name"] = SLAUGHTERED_ANIMALS_UNIT_SHORT_NAME
+    animals["unit"] = slaughtered_animals_unit
+    animals["unit_short_name"] = slaughtered_animals_unit_short_name
     animals["element_code"] = slaughtered_animals_element_code
     animals["item_code"] = total_meat_item_code
-    animals["item"] = TOTAL_MEAT_ITEM
+    animals["item"] = total_meat_item
     animals["item_description"] = total_meat_item_description
     animals["fao_item"] = total_meat_fao_item
     animals["fao_unit"] = total_meat_fao_unit
@@ -121,6 +115,68 @@ def add_slaughtered_animals_to_meat_total(data):
                 "element_description": "category", "unit_short_name": "category"})
 
     return combined_data
+
+
+def add_yield_to_aggregate_regions(data):
+    # Given that Yield (tonnes per hectare) cannot be simply summed from different regions, we create this variable from
+    # the aggregate of production divided by the aggregate of area.
+
+    # Element code of production, area harvested, and yield.
+    production_element_code = "005510"
+    area_element_code = "005312"
+    yield_element_code = "005419"
+
+    # Check that indeed regions do not contain any data for yield.
+    assert data[(data["country"].isin(REGIONS_TO_ADD)) & (data["element_code"] == yield_element_code)].empty
+
+    # Gather all fields that should stay the same.
+    additional_fields = data[data["element_code"] == yield_element_code][[
+        "element", "element_description", "fao_element", "fao_unit", "unit", "unit_short_name"]].drop_duplicates()
+    assert len(additional_fields) == 1
+
+    # Create a dataframe of production of regions.
+    data_production = data[(data["country"].isin(REGIONS_TO_ADD)) & (data["element_code"] == production_element_code)]
+
+    # Create a dataframe of area of regions.
+    data_area = data[(data["country"].isin(REGIONS_TO_ADD)) & (data["element_code"] == area_element_code)]
+
+    # Merge the two dataframes and create the new yield variable.
+    # Note: Here, we divide production (the sum of the production from a list of countries in a region) by area (the sum
+    # of the area from a list of countries in a region) to obtain yield. But the list of countries that contributed to
+    # production may not be the same as the list of countries that contributed to area. To impose that they must be the
+    # same, we could merge also by "population_with_data". However, this causes the resulting series to have gaps.
+    # Additionally, it seems that FAO also constructs yield in the same way. This was checked by comparing the resulting
+    # yield curves for 'Almonds' for all aggregate regions with their corresponding *(FAO) regions; they were identical.
+    merge_cols = ['area_code', 'year', 'item_code', 'fao_country', 'fao_item', 'item',
+                  'item_description', 'country']
+    combined = pd.merge(data_production, data_area[merge_cols + ["flag", "value"]], on=merge_cols, how="inner",
+                        suffixes=("_production", "_area"))    
+
+    combined["value"] = combined["value_production"] / combined["value_area"]
+
+    # If both fields have the same flag, use that, otherwise use the flag of multiple flags.
+    combined["flag"] = [flag_production if flag_production == flag_area else FLAG_MULTIPLE_FLAGS
+                        for flag_production, flag_area in zip(combined["flag_production"], combined["flag_area"])]
+
+    # Drop rows of nan and unnecessary columns.
+    combined = combined.drop(columns=["flag_production", "flag_area", "value_production", "value_area"])
+    combined = combined.dropna(subset="value").reset_index(drop=True)
+
+    # Replace fields appropriately.
+    combined["element_code"] = yield_element_code
+    # Replace all other fields from the corresponding fields in yield (tonnes per hectare) variable.
+    for field in additional_fields.columns:
+        combined[field] = additional_fields[field].item()
+
+    assert set(data.columns) == set(combined.columns)
+
+    combined = combined
+
+    data_combined = pd.concat([data, combined], ignore_index=True).reset_index(drop=True).astype({
+        "element_code": "category", "fao_element": "category", "fao_unit": "category", "flag": "category",
+        "element": "category", "unit": "category", "element_description": "category", "unit_short_name": "category"})
+
+    return data_combined
 
 
 def run(dest_dir: str) -> None:
@@ -179,7 +235,8 @@ def run(dest_dir: str) -> None:
     # Add per-capita variables.
     data = add_per_capita_variables(data=data, elements_metadata=elements_metadata)
 
-    # TODO: Add yield (production / area) variable.
+    # Add yield (production per area) to aggregate regions.
+    data = add_yield_to_aggregate_regions(data)
 
     # TODO: Run more sanity checks (i.e. compare with previous version of the same domain).
 
