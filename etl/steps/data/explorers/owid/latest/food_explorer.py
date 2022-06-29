@@ -2,7 +2,7 @@
 
 Loads the latest faostat_food_explorer dataset from garden and stores a table (as a csv file) for each food product.
 
-NOTE: It will overwrite csv files inside "data/explorer/owid/latest/food_explorer".
+NOTE: It will overwrite csv files inside "data/explorers/owid/latest/food_explorer".
 
 """
 
