@@ -10,7 +10,7 @@ NOTES:
   (namely flag "R", found in qcl dataset, and "W" in rt dataset). These flags were added manually, using the definition
   in List / Flags in:
   https://www.fao.org/faostat/en/#definitions
-* Other flags (namel "B", in rl dataset and "w" in rt dataset) were not found either in the additional metadata or in
+* Other flags (namely "B", in rl dataset and "w" in rt dataset) were not found either in the additional metadata or in
   the website definitions. They have been assigned the description "Unknown flag".
 * Unfortunately, flags do not remove all ambiguities: remaining duplicates are dropped without any meaningful criterion.
 
@@ -652,7 +652,7 @@ def _load_income_groups() -> pd.DataFrame:
     # Add historical regions to income groups.
     for historic_region in HISTORIC_TO_CURRENT_REGION:
         historic_region_income_group = HISTORIC_TO_CURRENT_REGION[historic_region]["income_group"]
-        if not historic_region in income_groups["country"]:
+        if historic_region not in income_groups["country"]:
             historic_region_df = pd.DataFrame({"country": [historic_region],
                                                "income_group": [historic_region_income_group]})
             income_groups = pd.concat([income_groups, historic_region_df], ignore_index=True)
@@ -696,11 +696,12 @@ def remove_overlapping_data_between_historical_regions_and_successors(data_regio
         overlapping_years = pd.concat([historical_region_years, historical_successors_years], ignore_index=True)
         overlapping_years = overlapping_years[overlapping_years.duplicated()]
         if not overlapping_years.empty:
-            log.warning(f"Removing rows where historical region {historical_region} overlaps with its successors (years {sorted(set(overlapping_years['year']))}).")
+            log.warning(f"Removing rows where historical region {historical_region} overlaps with its successors "
+                        f"(years {sorted(set(overlapping_years['year']))}).")
             # Select rows in data_region to drop.
             overlapping_years["country"] = historical_region
             indexes_to_drop.extend(pd.merge(data_region.reset_index(), overlapping_years, how='inner',
-                                        on=["country"] + columns)["index"].tolist())
+                                            on=["country"] + columns)["index"].tolist())
 
     if len(indexes_to_drop) > 0:
         data_region = data_region.drop(index=indexes_to_drop)
@@ -850,7 +851,7 @@ def add_population(df: pd.DataFrame, country_col: str = "country", year_col: str
     missing_countries = set(df[country_col]) - set(population[country_col])
     if len(missing_countries) > 0:
         if warn_on_missing_countries:
-            warn_on_list_of_entities(
+            geo.warn_on_list_of_entities(
                 list_of_entities=missing_countries,
                 warning_message=(
                     f"{len(missing_countries)} countries not found in population"
