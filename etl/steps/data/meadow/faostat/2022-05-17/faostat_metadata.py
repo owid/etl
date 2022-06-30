@@ -1,4 +1,9 @@
-"""Additional FAOSTAT metadata from the FAO API.
+"""FAOSTAT (additional) metadata dataset (originally ingested in walden using the FAOSTAT API).
+
+Load the (additional) metadata dataset from walden, and create a meadow dataset with as many tables as domain-categories
+(e.g. 'faostat_qcl_area', 'faostat_fbs_item', ...).
+
+All categories are defined below in 'category_structure'.
 
 """
 
@@ -6,12 +11,13 @@ import json
 from typing import Any, Dict
 
 import pandas as pd
-from owid.walden import Catalog
-from owid.catalog import Dataset, Table, utils
 
 from etl.steps.data.converters import convert_walden_metadata
+from owid.catalog import Dataset, Table, utils
+from owid.walden import Catalog
+from .shared import NAMESPACE
 
-NAMESPACE = "faostat"
+# Name for new meadow dataset.
 DATASET_SHORT_NAME = f"{NAMESPACE}_metadata"
 
 # Define the structure of the additional metadata file.
@@ -76,6 +82,17 @@ category_structure = {
 
 
 def check_that_category_structure_is_well_defined(md: Dict[str, Any]) -> None:
+    """Check that metadata content is consistent with category_structure (defined above).
+
+    If that is not the case, it is possible that the content of metadata has changed, and therefore category_structure
+    may need to be edited.
+
+    Parameters
+    ----------
+    md : dict
+        Raw FAOSTAT (additional) metadata of all datasets.
+
+    """
     for dataset in list(md):
         for category in category_structure:
             category_indexes = category_structure[category]["index"]
@@ -85,31 +102,29 @@ def check_that_category_structure_is_well_defined(md: Dict[str, Any]) -> None:
                     for category_index in category_indexes:
                         error = (
                             f"Index {category_index} not found in {category} for {dataset}. "
-                            "Redefine category_structure."
+                            f"Consider redefining category_structure."
                         )
                         assert category_index in entry, error
 
 
 def run(dest_dir: str) -> None:
-    # Load walden dataset.
+    # Load FAOSTAT (additional) metadata dataset from walden.
     walden_ds = Catalog().find_latest(
         namespace=NAMESPACE, short_name=DATASET_SHORT_NAME
     )
     local_file = walden_ds.ensure_downloaded()
-
-    # Load and restructure
     with open(local_file) as _local_file:
         additional_metadata = json.load(_local_file)
 
-    # Check that category_structure is well defined.
+    # Check that metadata content is consistent with category_structure (defined above).
     check_that_category_structure_is_well_defined(md=additional_metadata)
 
-    # Create new meadow dataset, importing metadata from walden.
+    # Create new meadow dataset, importing its metadata from walden.
     ds = Dataset.create_empty(dest_dir)
     ds.metadata = convert_walden_metadata(walden_ds)
     ds.metadata.short_name = DATASET_SHORT_NAME
     ds.save()
-    # Create a new table within the dataset for each domain-record.
+    # Create a new table within the dataset for each domain-record (e.g. 'faostat_qcl_item').
     for domain in additional_metadata:
         for category in list(additional_metadata[domain]):
             json_data = additional_metadata[domain][category]["data"]

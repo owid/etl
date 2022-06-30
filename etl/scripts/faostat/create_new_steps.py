@@ -11,11 +11,11 @@ When running this script for a given channel (e.g. 'meadow'), it will:
 import argparse
 import datetime
 import re
-import structlog
 from pathlib import Path
 from typing import cast, Dict, List, Optional, Set, Tuple
 
 import pandas as pd
+import structlog
 
 from etl.files import checksum_file
 from etl.paths import BASE_DIR, STEP_DIR
@@ -707,7 +707,22 @@ def write_steps_to_dag_file(
         update_food_explorer_dependency_version()
 
 
-def apply_custom_rules_to_list_of_steps_to_run(step_names, channel):
+def apply_custom_rules_to_list_of_steps_to_create(step_names: List[str], channel: str):
+    """Apply some custom rules to add or remove steps from the list of steps to be created.
+
+    Parameters
+    ----------
+    step_names : list
+        Names of steps to be created (before applying custom rules).
+    channel : str
+        Channel name.
+
+    Returns
+    -------
+    step_names : list
+        Names of steps to be created (after applying custom rules).
+
+    """
     # In garden or grapher, if fbs or fbsh were updated, update fbsc (but omit steps for fbs and fbsh).
     if (channel in ["garden", "grapher"]) and (
         any({f"{NAMESPACE}_fbs", f"{NAMESPACE}_fbsh"} & set(step_names))
@@ -742,8 +757,8 @@ def main(channel: str, include_all_datasets: bool = False) -> None:
         # List steps for which source data was updated.
         step_names = list_updated_steps(channel=channel)
 
-        # Apply custom rules to list of steps to run.
-        step_names = apply_custom_rules_to_list_of_steps_to_run(
+        # Apply custom rules to list of steps to create.
+        step_names = apply_custom_rules_to_list_of_steps_to_create(
             step_names=step_names, channel=channel
         )
 

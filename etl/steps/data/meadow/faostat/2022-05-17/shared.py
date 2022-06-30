@@ -1,17 +1,24 @@
-"""Shared functions for meadow steps in this version.
+"""Shared functions for FAOSTAT meadow steps.
 
 """
 
 import os
 import tempfile
 import zipfile
-import warnings
+from pathlib import Path
 
 import pandas as pd
+import structlog
+
+from etl.steps.data.converters import convert_walden_metadata
 from owid.catalog import Dataset, Table, utils
 from owid.walden import Catalog
 
-from etl.steps.data.converters import convert_walden_metadata
+# Initialise log.
+log = structlog.get_logger()
+
+# Namespace to be used in all dataset names.
+NAMESPACE = Path(__file__).parent.parent.name
 
 
 def load_data(local_path: str) -> pd.DataFrame:
@@ -83,6 +90,7 @@ def prepare_output_data(data: pd.DataFrame) -> pd.DataFrame:
     """
     df = data.copy()
 
+    # Drop 'Year Code' columns, which seems redundant (almost always identical to 'Year').
     df = df.drop(columns=["Year Code"])
 
     # Set index columns depending on what columns are available in the dataframe.
@@ -90,7 +98,7 @@ def prepare_output_data(data: pd.DataFrame) -> pd.DataFrame:
         {"Area Code", "Year", "Item Code", "Element Code"} & set(df.columns)
     )
     if df.duplicated(subset=index_columns).any():
-        warnings.warn("Index has duplicated keys.")
+        log.warning("Index has duplicated keys.")
     df = df.set_index(index_columns)
 
     return df
@@ -107,7 +115,7 @@ def run(dest_dir: str) -> None:
     namespace = dataset_short_name.split("_")[0]
 
     ####################################################################################################################
-    # Load data.
+    # Load and process data.
     ####################################################################################################################
 
     # Fetch latest walden dataset.
