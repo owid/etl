@@ -1,4 +1,4 @@
-"""FAOSTAT: Food Balances Combined.
+"""FAOSTAT garden step for faostat_fbsc dataset (Food Balances Combined).
 
 Combine the old and new food balances datasets:
 * Old (historical) dataset: "faostat_fbsh".

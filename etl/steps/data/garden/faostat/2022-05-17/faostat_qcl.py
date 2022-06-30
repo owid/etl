@@ -1,6 +1,4 @@
-"""FAOSTAT Production: Crops and livestock products.
-
-"""
+"""FAOSTAT garden step for faostat_qcl dataset."""
 
 from copy import deepcopy
 

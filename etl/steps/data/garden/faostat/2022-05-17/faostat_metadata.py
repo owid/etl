@@ -1,16 +1,19 @@
-"""Harmonization of variables (items, elements and units).
+"""FAOSTAT garden step for faostat_metadata dataset.
 
 This step will:
 * Fix some known issues with items.
+* Add titles and descriptions to datasets.
 * Adds descriptions to items, elements and units.
-* Apply custom definitions of items, elements and units.
-* Ensures there are no degeneracies within a dataset.
-* Ensures there are no degeneracies between datasets (using dataset, item_code, element_code as keys).
-* Outputs a dataset that will be loaded by all garden datasets, with tables:
+* Apply custom names and descriptions to datasets, elements, items and units.
+* Harmonize country names.
+* Find countries that correspond to aggregates of other countries.
+* Ensure there are no degeneracies within a dataset.
+* Ensure there are no degeneracies between datasets (using dataset, item_code, element_code as keys).
+* Output a dataset that will be loaded by all garden datasets, with tables:
+    * countries.
+    * datasets.
     * items.
-    * elements.
-    * units.
-    * countries?
+    * elements (and units).
 
 There are some non-trivial issues with the definitions of items at FAOSTAT:
 * Some item codes in the data are missing in the metadata, and vice versa.
