@@ -81,6 +81,10 @@ reindex: .venv
 	@echo '==> Creating a catalog index'
 	.venv/bin/reindex
 
+prune: .venv
+	@echo '==> Prune datasets with no recipe from catalog'
+	.venv/bin/prune
+
 grapher: .venv
 	@echo '==> Running full etl with grapher upsert'
 	.venv/bin/etl --grapher

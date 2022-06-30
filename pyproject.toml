@@ -8,6 +8,7 @@ authors = ["Our World In Data <tech@worldindata.org>"]
 etl = 'etl.command:main_cli'
 reindex = 'etl.reindex:reindex_cli'
 publish = 'etl.publish:publish_cli'
+prune = 'etl.prune:prune_cli'
 harmonize = 'etl.harmonize:harmonize'
 backport = 'backport.backport:backport_cli'
 bulk_backport = 'backport.bulk_backport:bulk_backport'
