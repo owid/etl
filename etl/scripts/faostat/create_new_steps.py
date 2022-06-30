@@ -1,45 +1,33 @@
-"""Create a new version of FAOSTAT steps in a channel (meadow or garden) and update the dag.
+"""Create a new version of FAOSTAT steps in a channel (meadow or garden) and update the dag accordingly.
 
-This script will, for a given channel:
-* Create a new folder in the channel (named after today's date).
-* For every dataset that had an update in the latest walden ingest, copy their latest step files onto the new folder.
-  * Optionally (with the -a argument), this can be done for all datasets, not just the ones that had an update.
-* Update the dag file with the new steps in the channel and and their dependencies.
-
-Workflow to create a new version of the FAOSTAT datasets (with version YYYY-MM-DD):
-0. Execute the walden ingest script, to fetch data for any dataset that may have been updated.
-  > python vendor/walden/ingests/faostat.py
-1. Execute this script for the meadow channel.
-  > python etl/scripts/faostat/create_new_steps.py -c meadow
-2. Run the new etl meadow steps, to generate the meadow datasets.
-  > etl meadow/faostat/YYYY-MM-DD
-3. Run this script again for the garden channel.
-  > python etl/scripts/faostat/create_new_steps.py -c garden
-4. Run the new etl garden steps, to generate the garden datasets.
-  > etl garden/faostat/YYYY-MM-DD
-5. Run this script again for the grapher channel.
-  > python etl/scripts/faostat/create_new_steps.py -c grapher
-6. Run the new etl grapher steps, to generate the grapher charts.
-  > etl faostat/YYYY-MM-DD --grapher
+When running this script for a given channel (e.g. 'meadow'), it will:
+* If any dataset was updated in the latest walden ingest, create a new folder in the channel (named after today's date).
+* For every dataset that was updated, copy their latest step files onto the new folder.
+  * Optionally (with the -a argument), this will be done for all datasets, not just the ones that were updated.
+* Add the new steps in the channel to the dag (as well as their corresponding dependencies).
 
 """
 
 import argparse
 import datetime
 import re
+import structlog
 from pathlib import Path
 from typing import cast, Dict, List, Optional, Set, Tuple
 
 import pandas as pd
-from owid.walden import Catalog
 
+from etl.files import checksum_file
 from etl.paths import BASE_DIR, STEP_DIR
 from etl.steps import load_dag
-from etl.files import checksum_file
+from owid.walden import Catalog
+
+# Initialise log.
+log = structlog.get_logger()
 
 # Current namespace.
 NAMESPACE = "faostat"
-# Name of additional metadata file (without extension).
+# Name of additional metadata step file (without extension).
 ADDITIONAL_METADATA_FILE_NAME = f"{NAMESPACE}_metadata"
 # Path to dag file for FAOSTAT steps.
 DAG_FILE = BASE_DIR / "dag_files" / "dag_faostat.yml"
@@ -54,7 +42,10 @@ NEW_VERSION = datetime.datetime.today().strftime("%Y-%m-%d")
 # Give each dependency as a tuple of (channel, step_name). The latest version of that step will be assumed.
 ADDITIONAL_DEPENDENCIES: Dict[str, List[Tuple[str, str]]] = {
     "meadow": [],
-    "garden": [("meadow", "faostat_metadata"), ("garden", "owid/latest/key_indicators")],
+    "garden": [
+        ("meadow", f"{NAMESPACE}_metadata"),
+        ("garden", "owid/latest/key_indicators"),
+    ],
     "grapher": [],
 }
 # List of additional files (with extension) that, if existing, should be copied over from the latest version to the new
@@ -216,8 +207,8 @@ def list_updated_steps(channel: str, namespace: str = NAMESPACE) -> List[str]:
     else:
         # There is already a version for this namespace and channel that is posterior to the latest additions to walden.
         step_names = []
-        print(
-            f"There was no new additions to walden since the latest {channel} version, {latest_version_in_channel}."
+        log.info(
+            f"There were no additions to walden since the latest {channel} version, {latest_version_in_channel}."
         )
 
     return step_names
@@ -300,7 +291,7 @@ def find_latest_version_for_step(
 
     """
     latest_version = None
-    warning_message = f"WARNING: Dataset {step_name} not found in {channel}."
+    warning_message = f"Dataset {step_name} not found in {channel}."
     if channel == "walden":
         # Find latest version for current step in walden.
         try:
@@ -308,14 +299,14 @@ def find_latest_version_for_step(
                 Catalog().find_latest(namespace=namespace, short_name=step_name).version
             )
         except ValueError:
-            print(warning_message)
+            log.warning(warning_message)
     elif channel in ["meadow", "garden", "grapher"]:
         versions_dir = get_path_to_step_files(channel=channel, namespace=namespace)
         dataset_versions = sorted(list(versions_dir.glob(f"*/{step_name}.py")))
         if len(dataset_versions) > 0:
             latest_version = dataset_versions[-1].parent.name
         else:
-            print(warning_message)
+            log.warning(warning_message)
 
     return latest_version
 
@@ -373,7 +364,7 @@ def create_step_file(channel: str, step_name: str) -> None:
         channel=channel, step_name=step_name
     )
     if step_latest_version is None:
-        print(f"Creating file from scratch for dataset {step_name}.")
+        log.info(f"Creating file from scratch for dataset {step_name}.")
         # Content of the file to be created.
         file_content = generate_content_for_new_step_file(channel=channel)
         new_step_file.write_text(file_content)
@@ -386,8 +377,8 @@ def create_step_file(channel: str, step_name: str) -> None:
         latest_shared_file = versions_dir / step_latest_version / f"{RUN_FILE_NAME}.py"
         new_shared_file = new_step_dir / f"{RUN_FILE_NAME}.py"
         if checksum_file(latest_shared_file) != checksum_file(new_shared_file):
-            print(
-                f"WARNING: Shared module in version {step_latest_version} differs from new shared module."
+            log.warning(
+                f"Shared module in version {step_latest_version} differs from new shared module."
             )
 
 
@@ -611,7 +602,9 @@ def create_updated_dependency_graph(
                         step_name=get_dataset_name_from_dag_line(dependency),
                     )
                     # Rename the dag line of the dependency appropriately (if its version changed).
-                    new_dependency = dependency.replace(dependency_old_version, dependency_new_version)
+                    new_dependency = dependency.replace(
+                        dependency_old_version, dependency_new_version
+                    )
                 new_dependencies.append(new_dependency)
 
         if len(new_dependencies) > 0:
@@ -634,7 +627,7 @@ def update_food_explorer_dependency_version() -> None:
     dag_line_explorer = "data://explorer/owid/latest/food_explorer"
     # Find the latest version of the FAOSTAT food explorer dataset in garden.
     new_version = find_latest_version_for_step(
-        channel="garden", step_name="faostat_food_explorer"
+        channel="garden", step_name=f"{NAMESPACE}_food_explorer"
     )
     if new_version is None:
         raise FileNotFoundError("Food explorer step file not found.")
@@ -658,7 +651,7 @@ def update_food_explorer_dependency_version() -> None:
             replace_line = True
 
     if old_version != new_version:
-        print("Updating version of the dependency dataset of the food explorer.")
+        log.info("Updating version of the dependency dataset of the food explorer.")
         # Write new lines to dag file.
         with open(DAG_FILE, "w") as _dag_file:
             _dag_file.write(new_lines[:-1])
@@ -696,7 +689,7 @@ def write_steps_to_dag_file(
     for dag_step in dag_steps:
         # Add new step to the dag if the step is not already there.
         if dag_step in dag:
-            print(f"Dag step {dag_step} already in dag. Skipping.")
+            log.info(f"Dag step {dag_step} already in dag. Skipping.")
         else:
             # Add lines for this step and its dependencies.
             any_step_updated = True
@@ -705,7 +698,7 @@ def write_steps_to_dag_file(
                 new_step_lines += f"{dependency_indent}{dependency}\n"
 
     if any_step_updated:
-        print("Writing new steps to dag file.")
+        log.info("Writing new steps to dag file.")
         # Add new lines to dag file.
         with open(DAG_FILE, "a") as _dag_file:
             _dag_file.write(new_step_lines)
@@ -716,17 +709,27 @@ def write_steps_to_dag_file(
 
 def apply_custom_rules_to_list_of_steps_to_run(step_names, channel):
     # In garden or grapher, if fbs or fbsh were updated, update fbsc (but omit steps for fbs and fbsh).
-    if (channel in ["garden", "grapher"]) and (any({f"{NAMESPACE}_fbs", f"{NAMESPACE}_fbsh"} & set(step_names))):
+    if (channel in ["garden", "grapher"]) and (
+        any({f"{NAMESPACE}_fbs", f"{NAMESPACE}_fbsh"} & set(step_names))
+    ):
         step_names += [f"{NAMESPACE}_fbsc"]
-        step_names = [step for step in step_names if step not in [f"{NAMESPACE}_fbs", f"{NAMESPACE}_fbsh"]]
+        step_names = [
+            step
+            for step in step_names
+            if step not in [f"{NAMESPACE}_fbs", f"{NAMESPACE}_fbsh"]
+        ]
 
     # In garden, if either fbsc or qcl were updated, update food explorer.
-    if (channel == "garden") and (any({f"{NAMESPACE}_fbsc", f"{NAMESPACE}_qcl"} & set(step_names))):
+    if (channel == "garden") and (
+        any({f"{NAMESPACE}_fbsc", f"{NAMESPACE}_qcl"} & set(step_names))
+    ):
         step_names += [f"{NAMESPACE}_food_explorer"]
 
     # In grapher there is never a step for metadata.
     if channel == "grapher":
-        step_names = [step for step in step_names if step not in [f"{NAMESPACE}_metadata"]]
+        step_names = [
+            step for step in step_names if step not in [f"{NAMESPACE}_metadata"]
+        ]
 
     return step_names
 
@@ -740,7 +743,9 @@ def main(channel: str, include_all_datasets: bool = False) -> None:
         step_names = list_updated_steps(channel=channel)
 
         # Apply custom rules to list of steps to run.
-        step_names = apply_custom_rules_to_list_of_steps_to_run(step_names=step_names, channel=channel)
+        step_names = apply_custom_rules_to_list_of_steps_to_run(
+            step_names=step_names, channel=channel
+        )
 
     if len(step_names) > 0:
         # Create folder for new version and add a step file for each dataset.
@@ -757,7 +762,7 @@ def main(channel: str, include_all_datasets: bool = False) -> None:
         header_line = f"# FAOSTAT {channel} steps for version {NEW_VERSION}"
         write_steps_to_dag_file(dag_steps=dag_steps, header_line=header_line)
     else:
-        print("Nothing to update.")
+        log.info("Nothing to update.")
 
 
 if __name__ == "__main__":
