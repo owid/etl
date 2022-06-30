@@ -16,6 +16,7 @@ NOTES:
 
 """
 
+import itertools
 import json
 import sys
 from copy import deepcopy
@@ -301,6 +302,24 @@ FLAGS_RANKING = (
     .reset_index()
     .rename(columns={"index": "ranking"})
 )
+
+# Outliers to remove (data points that are wrong and create artefacts in the charts).
+# For each dictionary, all possible combinations of the field values will be considered
+# (e.g. if two countries are given and three years, all three years will be removed for both countries).
+OUTLIERS_TO_REMOVE = [
+    # China mainland in 1984 has no data for area harvested of Spinach. This causes a big dip in China
+    # (the aggregate of mainland, Hong Kong, Taiwan and Macau), as well as other regions containing China.
+    {
+        # Harmonized country names affected by outliers.
+        "country": ["China (FAO)", "Asia", "Asia (FAO)", "Upper-middle-income countries", "World",
+                    "Eastern Asia (FAO)"],
+        "year": [1984],
+        # Item code for "Spinach".
+        "item_code": ["00000373"],
+        # Element codes for "Area harvested" (total and per-capita) and "Yield".
+        "element_code": ["005312", "5312pc", "005419"],
+    }
+]
 
 
 def check_that_countries_are_well_defined(data):
@@ -710,6 +729,31 @@ def remove_overlapping_data_between_historical_regions_and_successors(data_regio
         data_region = data_region.drop(index=indexes_to_drop)
 
     return data_region
+
+
+def remove_outliers(data):
+    data = data.copy()
+
+    # Make a dataframe with all rows that need to be removed from the data.
+    rows_to_drop = pd.DataFrame()
+    for outlier in OUTLIERS_TO_REMOVE:
+        # Find all possible combinations of the field values in the outlier dictionary.
+        _rows_to_drop = pd.DataFrame.from_records(list(itertools.product(*outlier.values())), columns=list(outlier))
+        rows_to_drop = pd.concat([rows_to_drop, _rows_to_drop], ignore_index=True).reset_index(drop=True)
+
+    # Quickly find out if there will be rows to drop in current dataset; if not, ignore.
+    if (len(set(rows_to_drop["item_code"]) & set(data["item_code"])) > 0) & \
+        (len(set(rows_to_drop["element_code"]) & set(data["element_code"])) > 0):
+        log.info(f"Removing {len(rows_to_drop)} rows of outliers.")
+
+        # Get indexes of data that correspond to the rows we want to drop.
+        indexes_to_drop = pd.merge(data.reset_index(), rows_to_drop, on=rows_to_drop.columns.tolist(),
+                                   how="inner")["index"].unique().tolist()
+
+        # Drop those rows in data.
+        data = data.drop(indexes_to_drop).reset_index(drop=True)
+
+    return data
 
 
 def add_regions(data, elements_metadata):
@@ -1222,6 +1266,9 @@ def run(dest_dir: str) -> None:
 
     # Add per-capita variables.
     data = add_per_capita_variables(data=data, elements_metadata=elements_metadata)
+
+    # Remove outliers (this step needs to happen after creating regions and per capita variables).
+    data = remove_outliers(data)
 
     # TODO: Run more sanity checks (i.e. compare with previous version of the same domain).
 

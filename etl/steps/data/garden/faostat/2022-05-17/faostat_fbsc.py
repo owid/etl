@@ -30,6 +30,7 @@ from .shared import (
     log,
     prepare_long_table,
     prepare_wide_table,
+    remove_outliers,
 )
 
 # Dataset name.
@@ -151,6 +152,9 @@ def run(dest_dir: str) -> None:
 
     # Add per-capita variables.
     data = add_per_capita_variables(data=data, elements_metadata=elements_metadata)
+
+    # Remove outliers from data.
+    data = remove_outliers(data)
 
     # Avoid objects as they would explode memory, use categoricals instead.
     for col in data.columns:

@@ -9,9 +9,9 @@ from owid import catalog
 from owid.datautils import dataframes
 
 from etl.paths import DATA_DIR
-from .shared import NAMESPACE, VERSION, ADDED_TITLE_TO_WIDE_TABLE, FLAG_MULTIPLE_FLAGS, REGIONS_TO_ADD,\
-    harmonize_elements, harmonize_items, clean_data, add_regions, add_per_capita_variables, prepare_long_table,\
-    prepare_wide_table
+from .shared import NAMESPACE, VERSION, ADDED_TITLE_TO_WIDE_TABLE, FLAG_MULTIPLE_FLAGS, REGIONS_TO_ADD, \
+    harmonize_elements, harmonize_items, clean_data, add_regions, add_per_capita_variables, prepare_long_table, \
+    prepare_wide_table, remove_outliers
 
 
 def add_slaughtered_animals_to_meat_total(data):
@@ -237,6 +237,9 @@ def run(dest_dir: str) -> None:
 
     # Add yield (production per area) to aggregate regions.
     data = add_yield_to_aggregate_regions(data)
+
+    # Remove outliers from data.
+    data = remove_outliers(data)
 
     # TODO: Run more sanity checks (i.e. compare with previous version of the same domain).
 
