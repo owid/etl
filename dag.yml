@@ -127,3 +127,5 @@ steps:
 # Sub-dags to import
 include:
   - dag_files/dag_open_numbers.yml
+  data://meadow/un_sdg/2021-09-30/un_sdg:
+    - walden://un_sdg/2021-09-30/un_sdg
