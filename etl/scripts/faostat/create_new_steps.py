@@ -39,12 +39,13 @@ GLOB_VERSION_PATTERN = "[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]"
 # New version tag to be created.
 NEW_VERSION = datetime.datetime.today().strftime("%Y-%m-%d")
 # Additional dependencies to add to each dag line of a specific channel, for new datasets (ones not in the dag).
-# Give each dependency as a tuple of (channel, step_name). The latest version of that step will be assumed.
-ADDITIONAL_DEPENDENCIES: Dict[str, List[Tuple[str, str]]] = {
+# Give each dependency as a tuple of (namespace, channel, step_name). The latest version of that step will be assumed.
+ADDITIONAL_DEPENDENCIES: Dict[str, List[Tuple[str, str, str]]] = {
     "meadow": [],
     "garden": [
-        ("meadow", f"{NAMESPACE}_metadata"),
-        ("garden", "owid/latest/key_indicators"),
+        (NAMESPACE, "meadow", f"{NAMESPACE}_metadata"),
+        ("owid", "garden", "key_indicators"),
+        ("wb", "garden", "wb_income"),
     ],
     "grapher": [],
 }
@@ -87,6 +88,30 @@ def get_channel_from_dag_line(dag_line: str) -> str:
         raise ValueError("dag line not understood")
 
     return channel
+
+
+def get_namespace_from_dag_line(dag_line: str) -> str:
+    """Get namespace from an entry in the dag (e.g. for a dag line 'data://garden/wb/...', return 'wb').
+
+    Parameters
+    ----------
+    dag_line : str
+        Entry in the dag.
+
+    Returns
+    -------
+    namespace : str
+        Namespace.
+
+    """
+    channel = get_channel_from_dag_line(dag_line)
+
+    if channel in ["meadow", "garden"]:
+        namespace = Path(dag_line).parts[2]
+    else:
+        namespace = Path(dag_line).parts[1]
+
+    return namespace
 
 
 def create_dag_line_name(
@@ -302,9 +327,12 @@ def find_latest_version_for_step(
             log.warning(warning_message)
     elif channel in ["meadow", "garden", "grapher"]:
         versions_dir = get_path_to_step_files(channel=channel, namespace=namespace)
-        dataset_versions = sorted(list(versions_dir.glob(f"*/{step_name}.py")))
+        dataset_versions = sorted(list(versions_dir.glob(f"*/{step_name}.ipynb")) +
+                                  list(versions_dir.glob(f"*/{step_name}.py")))
         if len(dataset_versions) > 0:
             latest_version = dataset_versions[-1].parent.name
+        elif len(list(versions_dir.glob("latest"))) > 0:
+            latest_version = "latest"
         else:
             log.warning(warning_message)
 
@@ -502,7 +530,7 @@ def create_updated_dependency_graph(
     step_names: List[str],
     namespace: str = NAMESPACE,
     new_version: str = NEW_VERSION,
-    additional_dependencies: Optional[Dict[str, List[Tuple[str, str]]]] = None,
+    additional_dependencies: Optional[Dict[str, List[Tuple[str, str, str]]]] = None,
 ) -> Dict[str, Set[str]]:
     """Create additional part of the graph that will need be added to the dag to update it.
 
@@ -534,7 +562,7 @@ def create_updated_dependency_graph(
     # Initialise the additional part of the graph that will have to be added to the dag (in another function).
     new_steps = {}
     for step_name in step_names:
-        # Find all occurrence in the dag of this dataset for the considered channel.
+        # Find all occurrences in the dag of this dataset for the considered channel.
         candidates = {
             step: dag[step]
             for step in dag
@@ -560,18 +588,18 @@ def create_updated_dependency_graph(
             if additional_dependencies is not None:
                 # Optionally include additional dependencies.
                 for additional_dependency in additional_dependencies[channel]:
-                    dependency_channel, dependency_step = additional_dependency
+                    dependency_namespace, dependency_channel, dependency_step = additional_dependency
                     dependency_version = find_latest_version_for_step(
                         channel=dependency_channel,
                         step_name=dependency_step,
-                        namespace=namespace,
+                        namespace=dependency_namespace,
                     )
                     if dependency_version is not None:
                         new_dependencies.append(
                             create_dag_line_name(
                                 channel=dependency_channel,
                                 step_name=dependency_step,
-                                namespace=namespace,
+                                namespace=dependency_namespace,
                                 version=dependency_version,
                             )
                         )
@@ -604,6 +632,7 @@ def create_updated_dependency_graph(
                     dependency_new_version = find_latest_version_for_step(
                         channel=get_channel_from_dag_line(dependency),
                         step_name=get_dataset_name_from_dag_line(dependency),
+                        namespace=get_namespace_from_dag_line(dependency),
                     )
                     # Rename the dag line of the dependency appropriately (if its version changed).
                     new_dependency = dependency.replace(
