@@ -1,18 +1,13 @@
-"""Common processing of FAOSTAT datasets.
+"""Shared definitions in FAOSTAT garden steps.
 
-We have created a manual ranking of FAOSTAT flags. These flags are only used when there is ambiguity in the data,
-namely, when there is more than one data value for a certain country-year-item-element-unit.
-NOTES:
-* We check that the definitions in our manual ranking agree with the ones provided by FAOSTAT.
-* We do not include all flags: We include only the ones that solve an ambiguity in a particular case,
-  and add more flags as we see need.
-* We have found flags that appeared in a dataset, but were not included in the additional metadata
-  (namely flag "R", found in qcl dataset, and "W" in rt dataset). These flags were added manually, using the definition
-  in List / Flags in:
-  https://www.fao.org/faostat/en/#definitions
-* Other flags (namely "B", in rl dataset and "w" in rt dataset) were not found either in the additional metadata or in
-  the website definitions. They have been assigned the description "Unknown flag".
-* Unfortunately, flags do not remove all ambiguities: remaining duplicates are dropped without any meaningful criterion.
+This module contains:
+* Common functions used in garden steps.
+* Definitions related to elements and items (e.g. item amendments).
+* Definitions related to countries and regions (e.g. aggregate regions to generate and definition of historic regions).
+* Definitions of flags (found in the original FAOSTAT data) and their ranking (i.e. the priority of data points when
+  there are duplicates).
+* Identified outliers.
+* Other additional definitions (e.g. texts to include in the definitions of generated per-capita variables).
 
 """
 
@@ -23,19 +18,26 @@ from copy import deepcopy
 from pathlib import Path
 from typing import List, cast, Dict
 
-import structlog
 import numpy as np
 import pandas as pd
-from owid import catalog
+import structlog
 from owid.datautils import dataframes, geo
 from tqdm.auto import tqdm
 
 from etl.paths import DATA_DIR
+from owid import catalog
 
+# Initialise log.
 log = structlog.get_logger()
 
+# Namespace and version that will be assumed in all garden steps.
 NAMESPACE = Path(__file__).parent.parent.name
 VERSION = Path(__file__).parent.name
+
+
+########################################################################################################################
+# Elements and items.
+########################################################################################################################
 
 # Maximum number of characters for item_code.
 # FAOSTAT "item_code" is usually an integer number, however sometimes it has decimals and sometimes it contains letters.
@@ -75,6 +77,11 @@ ITEM_AMENDMENTS = {
         }
     ],
 }
+
+
+########################################################################################################################
+# Countries and regions.
+########################################################################################################################
 
 # When creating region aggregates for a certain variable in a certain year, we want to ensure that we have enough
 # data to create the aggregate. There is no straightforward way to do so. Our criterion is to:
@@ -133,13 +140,6 @@ REGIONS_TO_ADD = {
         "min_frac_population_with_data": MIN_FRAC_POPULATION_WITH_DATA,
     },
 }
-
-# Additional explanation to append to element description for variables that were originally given per capita.
-WAS_PER_CAPITA_ADDED_ELEMENT_DESCRIPTION = "Originally given per-capita, and converted into total figures by " \
-                                           "multiplying by population (given by FAO)."
-# Additional explanation to append to element description for created per-capita variables.
-NEW_PER_CAPITA_ADDED_ELEMENT_DESCRIPTION = "Per-capita values are obtained by dividing the original values by the " \
-                                           "population (either provided by FAO or by OWID)."
 
 # When creating region aggregates, we need to ignore geographical regions that contain aggregate data from other
 # countries, to avoid double-counting the data of those countries.
@@ -243,9 +243,25 @@ HISTORIC_TO_CURRENT_REGION = {
     },
 }
 
-# Additional text to include in the metadata title of the output wide table.
-ADDED_TITLE_TO_WIDE_TABLE = " - Flattened table indexed by country-year."
 
+########################################################################################################################
+# Flags.
+########################################################################################################################
+
+# We have created a manual ranking of FAOSTAT flags. These flags are only used when there is ambiguity in the data,
+# namely, when there is more than one data value for a certain country-year-item-element-unit.
+# NOTES:
+# * We check that the definitions in our manual ranking agree with the ones provided by FAOSTAT.
+# * We do not include all flags: We include only the ones that solve an ambiguity in a particular case, and add more
+#   flags as we see need.
+# * We have found flags that appeared in a dataset, but were not included in the additional metadata
+#   (namely flag "R", found in qcl dataset, and "W" in rt dataset). These flags were added manually, using the
+#   definition in List / Flags in:
+#   https://www.fao.org/faostat/en/#definitions
+# * Other flags (namely "B", in rl dataset and "w" in rt dataset) were not found either in the additional metadata or in
+#   the website definitions. They have been assigned the description "Unknown flag".
+# * Unfortunately, flags do not remove all ambiguities: remaining duplicates are dropped without any meaningful
+#   criterion.
 # Flag to assign to data points with nan flag (which by definition is considered official data).
 FLAG_OFFICIAL_DATA = "official_data"
 # Flag to assign to data points for regions that are the result of aggregating data points with different flags.
@@ -303,6 +319,11 @@ FLAGS_RANKING = (
     .rename(columns={"index": "ranking"})
 )
 
+
+########################################################################################################################
+# Identified outliers.
+########################################################################################################################
+
 # Outliers to remove (data points that are wrong and create artefacts in the charts).
 # For each dictionary, all possible combinations of the field values will be considered
 # (e.g. if two countries are given and three years, all three years will be removed for both countries).
@@ -321,6 +342,25 @@ OUTLIERS_TO_REMOVE = [
     }
 ]
 
+
+########################################################################################################################
+# Additional descriptions.
+########################################################################################################################
+
+# Additional explanation to append to element description for variables that were originally given per capita.
+WAS_PER_CAPITA_ADDED_ELEMENT_DESCRIPTION = "Originally given per-capita, and converted into total figures by " \
+                                           "multiplying by population (given by FAO)."
+# Additional explanation to append to element description for created per-capita variables.
+NEW_PER_CAPITA_ADDED_ELEMENT_DESCRIPTION = "Per-capita values are obtained by dividing the original values by the " \
+                                           "population (either provided by FAO or by OWID)."
+
+# Additional text to include in the metadata title of the output wide table.
+ADDED_TITLE_TO_WIDE_TABLE = " - Flattened table indexed by country-year."
+
+
+########################################################################################################################
+# Shared functions.
+########################################################################################################################
 
 def check_that_countries_are_well_defined(data):
     # Ensure area codes and countries are well defined, and no ambiguities were introduced when mapping country names.

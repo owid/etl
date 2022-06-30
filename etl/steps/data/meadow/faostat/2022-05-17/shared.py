@@ -1,4 +1,4 @@
-"""Shared functions for FAOSTAT meadow steps.
+"""Shared definitions in FAOSTAT meadow steps.
 
 """
 

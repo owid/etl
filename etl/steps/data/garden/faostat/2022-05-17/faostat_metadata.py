@@ -1,29 +1,59 @@
 """FAOSTAT garden step for faostat_metadata dataset.
 
+This step reads from:
+* The (additional) metadata dataset. The only crucial ingredients from here (that will be used later on in other garden
+  steps are element, item and units descriptions, and country groups (used to check that we do not double count
+  countries when aggregating data for regions).
+* Custom datasets file ('./custom_datasets.csv'), with the following columns:
+    * 'dataset':
+    * 'fao_dataset_title':
+    * 'owid_dataset_title':
+    * 'fao_dataset_description':
+    * 'owid_dataset_description':
+* Custom elements and units file ('./custom_elements_and_units.csv'), with the following columns:
+    * 'dataset':
+    * 'element_code':
+    * 'fao_element':
+    * 'owid_element':
+    * 'fao_unit':
+    * 'fao_unit_short_name':
+    * 'owid_unit':
+    * 'owid_unit_short_name':
+    * 'owid_unit_factor':
+    * 'fao_element_description':
+    * 'owid_element_description':
+    * 'owid_aggregation':
+    * 'was_per_capita':
+    * 'make_per_capita':
+* Custom items file ('./custom_items.csv'), with the following columns:
+    * 'dataset':
+    * 'item_code':
+    * 'fao_item':
+    * 'owid_item':
+    * 'fao_item_description':
+    * 'owid_item_description':
+
 This step will:
-* Fix some known issues with items.
-* Add titles and descriptions to datasets.
-* Adds descriptions to items, elements and units.
-* Apply custom names and descriptions to datasets, elements, items and units.
-* Harmonize country names.
-* Find countries that correspond to aggregates of other countries.
-* Ensure there are no degeneracies within a dataset.
-* Ensure there are no degeneracies between datasets (using dataset, item_code, element_code as keys).
 * Output a dataset that will be loaded by all garden datasets, with tables:
     * countries.
     * datasets.
     * items.
     * elements (and units).
+* Apply sanity checks to countries, elements, items, and units.
+* Apply custom names and descriptions to datasets, elements, items and units.
+* Harmonize country names.
+* Find countries that correspond to aggregates of other countries (e.g. 'Melanesia').
+* Ensure there are no degeneracies within a dataset (i.e. ensure each index is unique).
+* Ensure there are no degeneracies between datasets (using dataset, item_code, element_code as keys).
 
 There are some non-trivial issues with the definitions of items at FAOSTAT:
 * Some item codes in the data are missing in the metadata, and vice versa.
 * The mapping item_code -> item in the data files is sometimes different from the mapping item_code -> item
-  in the metadata retrieved with the API. Some examples:
+  in the (additional) metadata dataset. Some examples:
   * For the scl dataset, it seems that item_code in the data corresponds to cpc_code in the metadata. For example,
-    item "Wheat" in the data has item code "0111", but in the metadata, "Wheat" has item code 15 (and cpc code "0111").
+    item "Wheat" in the data has item code 111, but in the metadata, "Wheat" has item code 15 (and cpc code 111).
     This does not affect the data values, but if we wanted to merge this dataset with another one using item code,
     we would get wrong results. Also, descriptions fetched from the metadata may be wrong for this dataset.
-    The issue could be solved in this script.
     TODO: Consider fixing this issue by mapping item code in data to cpc code in metadata, and retrieving item code
      from metadata (after checking that it is indeed correct).
   * In dataset qv, item code 221 in the data corresponds to item "Almonds, in shell", whereas in the metadata,
@@ -32,8 +62,6 @@ There are some non-trivial issues with the definitions of items at FAOSTAT:
     using the naming from the metadata. We can safely ignore this issue, and stick to the names in the data.
   * In dataset sdgb, item codes have very unusual names, and they are not found in the metadata. We haven't figured
     out the root of the issue yet.
-Given all this, we decided to use the metadata only to fetch descriptions, but we trust that the item code -> item
-mapping in the data is the correct one (except possibly in the examples mentioned above).
 
 """
 
@@ -43,15 +71,14 @@ from copy import deepcopy
 from typing import List
 
 import pandas as pd
-from owid import catalog
 from owid.datautils import dataframes, io
 from tqdm.auto import tqdm
 
 from etl.paths import DATA_DIR, STEP_DIR
-from .shared import FLAGS_RANKING, harmonize_elements, harmonize_items, VERSION, optimize_table_dtypes, log
+from owid import catalog
+from .shared import NAMESPACE, FLAGS_RANKING, harmonize_elements, harmonize_items, VERSION, optimize_table_dtypes, log
 
-# Define namespace and short name for output dataset.
-NAMESPACE = "faostat"
+# Define short name for output dataset.
 DATASET_SHORT_NAME = f"{NAMESPACE}_metadata"
 
 # There are several cases in which one or a few item codes in the data are missing in the metadata. Also, there are
@@ -454,45 +481,9 @@ def check_that_all_flags_in_dataset_are_in_ranking(
         )
 
 
-def run(dest_dir: str) -> None:
-    ####################################################################################################################
-    # Common definitions.
-    ####################################################################################################################
-
-    # Path to latest garden version for FAOSTAT.
-    garden_code_dir = STEP_DIR / "data" / "garden" / NAMESPACE / VERSION
-    # Path to file with custom dataset titles and descriptions.
-    custom_datasets_file = garden_code_dir / "custom_datasets.csv"
-    # Path to file with custom item names and descriptions.
-    custom_items_file = garden_code_dir / "custom_items.csv"
-    # Path to file with custom element and unit names and descriptions.
-    custom_elements_and_units_file = garden_code_dir / "custom_elements_and_units.csv"
-
-    # Find latest meadow version of dataset of FAOSTAT metadata.
-    metadata_version = sorted((DATA_DIR / "meadow" / NAMESPACE).glob(f"*/{DATASET_SHORT_NAME}"))[-1].parent.name
-    metadata_path = DATA_DIR / "meadow" / NAMESPACE / metadata_version / DATASET_SHORT_NAME
-
-    # Countries file, with mapping from FAO names to OWID harmonized country names.
-    countries_file = garden_code_dir / f"{NAMESPACE}.countries.json"
-
-    ####################################################################################################################
-    # Load and process data.
-    ####################################################################################################################
-
-    # Get metadata from meadow.
-    assert metadata_path.is_dir()
-    metadata = catalog.Dataset(metadata_path)
-
+def process_metadata(metadata, custom_datasets, custom_elements, custom_items, countries_harmonization):
     # Check if flags definitions need to be updated.
     check_that_flag_definitions_in_dataset_agree_with_those_in_flags_ranking(metadata)
-
-    # Load custom dataset names, items, and element-unit names.
-    custom_datasets = pd.read_csv(custom_datasets_file, dtype=str)
-    custom_elements = pd.read_csv(custom_elements_and_units_file, dtype=str)
-    custom_items = pd.read_csv(custom_items_file, dtype=str)
-
-    # Load countries file.
-    countries_harmonization = io.local.load_json(countries_file)
 
     # List all FAOSTAT dataset short names.
     dataset_short_names = sorted(set([NAMESPACE + "_" + table_name.split("_")[1]
@@ -546,8 +537,9 @@ def run(dest_dir: str) -> None:
         area_group_table_name = f"{dataset_short_name}_area_group"
         country_groups = {}
         if area_group_table_name in metadata:
-            country_groups = metadata[f"{dataset_short_name}_area_group"].reset_index().\
-                drop_duplicates(subset=["country_group", "country"]).groupby("country_group").agg({"country": list}).\
+            country_groups = metadata[f"{dataset_short_name}_area_group"].reset_index(). \
+                drop_duplicates(subset=["country_group", "country"]).groupby("country_group").agg(
+                {"country": list}). \
                 to_dict()["country"]
             # Add new groups to country_groups_in_data; if they are already there, ensure they contain all members.
             for group in list(country_groups):
@@ -569,10 +561,54 @@ def run(dest_dir: str) -> None:
         datasets_df=datasets_df, custom_datasets=custom_datasets)
     items_df = clean_global_items_dataframe(items_df=items_df, custom_items=custom_items)
     elements_df = clean_global_elements_dataframe(
-        elements_df=elements_df, custom_elements=custom_elements)    
+        elements_df=elements_df, custom_elements=custom_elements)
 
     countries_df = clean_global_countries_dataframe(
         countries_in_data=countries_in_data, country_groups=country_groups,
+        countries_harmonization=countries_harmonization)
+
+    return countries_df, datasets_df, elements_df, items_df
+
+
+def run(dest_dir: str) -> None:
+    ####################################################################################################################
+    # Common definitions.
+    ####################################################################################################################
+
+    # Path to latest garden version for FAOSTAT.
+    garden_code_dir = STEP_DIR / "data" / "garden" / NAMESPACE / VERSION
+    # Path to file with custom dataset titles and descriptions.
+    custom_datasets_file = garden_code_dir / "custom_datasets.csv"
+    # Path to file with custom item names and descriptions.
+    custom_items_file = garden_code_dir / "custom_items.csv"
+    # Path to file with custom element and unit names and descriptions.
+    custom_elements_and_units_file = garden_code_dir / "custom_elements_and_units.csv"
+
+    # Find latest meadow version of dataset of FAOSTAT metadata.
+    metadata_version = sorted((DATA_DIR / "meadow" / NAMESPACE).glob(f"*/{DATASET_SHORT_NAME}"))[-1].parent.name
+    metadata_path = DATA_DIR / "meadow" / NAMESPACE / metadata_version / DATASET_SHORT_NAME
+
+    # Countries file, with mapping from FAO names to OWID harmonized country names.
+    countries_file = garden_code_dir / f"{NAMESPACE}.countries.json"
+
+    ####################################################################################################################
+    # Load and process data.
+    ####################################################################################################################
+
+    # Load metadata from meadow.
+    assert metadata_path.is_dir()
+    metadata = catalog.Dataset(metadata_path)
+
+    # Load custom dataset names, items, and element-unit names.
+    custom_datasets = pd.read_csv(custom_datasets_file, dtype=str)
+    custom_elements = pd.read_csv(custom_elements_and_units_file, dtype=str)
+    custom_items = pd.read_csv(custom_items_file, dtype=str)
+
+    # Load countries file.
+    countries_harmonization = io.local.load_json(countries_file)
+
+    countries_df, datasets_df, elements_df, items_df = process_metadata(
+        metadata=metadata, custom_datasets=custom_datasets, custom_elements=custom_elements, custom_items=custom_items,
         countries_harmonization=countries_harmonization)
 
     ####################################################################################################################
