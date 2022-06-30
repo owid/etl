@@ -311,13 +311,15 @@ def find_latest_version_for_step(
     return latest_version
 
 
-def generate_content_for_new_step_file(channel: str) -> str:
+def generate_content_for_new_step_file(channel: str, step_name: str) -> str:
     """Generate the content of a new step file when creating it from scratch.
 
     Parameters
     ----------
     channel : str
         Channel name.
+    step_name : str
+        Name of current step (i.e. dataset short name, e.g. 'faostat_qcl').
 
     Returns
     -------
@@ -325,10 +327,12 @@ def generate_content_for_new_step_file(channel: str) -> str:
         Content of the new step file.
 
     """
+    # Define common docstring to add to the header of the new step file.
+    docstring = f'"""FAOSTAT {channel} step for {step_name} dataset."""\n'
     if channel in ["meadow", "garden"]:
-        file_content = f"from .{RUN_FILE_NAME} import run  # noqa:F401\n"
+        file_content = docstring + f"from .{RUN_FILE_NAME} import run  # noqa:F401\n"
     elif channel == "grapher":
-        file_content = (
+        file_content = docstring + (
             f"from .{RUN_FILE_NAME} import catalog, get_grapher_dataset_from_file_name\n"
             f"from .{RUN_FILE_NAME} import get_grapher_tables  # noqa:F401\n\n\n"
             f"def get_grapher_dataset() -> catalog.Dataset:\n"
@@ -366,7 +370,7 @@ def create_step_file(channel: str, step_name: str) -> None:
     if step_latest_version is None:
         log.info(f"Creating file from scratch for dataset {step_name}.")
         # Content of the file to be created.
-        file_content = generate_content_for_new_step_file(channel=channel)
+        file_content = generate_content_for_new_step_file(channel=channel, step_name=step_name)
         new_step_file.write_text(file_content)
     else:
         # Copy the file from its latest version.
