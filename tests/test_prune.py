@@ -1,7 +1,8 @@
 import json
 from pathlib import Path
+from unittest import mock
 
-from etl.prune import prune
+from etl.prune import prune, LocalCatalog
 
 
 def test_prune(tmp_path: Path) -> None:
@@ -23,9 +24,10 @@ def test_prune(tmp_path: Path) -> None:
     assert index_file.exists()
     assert meta_file.exists()
 
-    prune(
-        dag_path=dag_file,
-        data_dir=tmp_path / "data",
-    )
+    with mock.patch("etl.prune.reindex_catalog"):
+        prune(
+            dag_path=dag_file,
+            data_dir=tmp_path / "data",
+        )
     assert not index_file.exists()
     assert not meta_file.exists()
