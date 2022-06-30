@@ -54,6 +54,10 @@ def prune(
         if not dry_run:
             shutil.rmtree(data_dir / path)
 
+    if to_delete:
+        # the index on disk is out of date, reindex
+        LocalCatalog(data_dir, channels=CHANNEL.__args__).reindex()
+
 
 def dag_datasets_dirs(dag_path: Path) -> Set[str]:
     """Return a list of directories that contain datasets in the DAG."""
