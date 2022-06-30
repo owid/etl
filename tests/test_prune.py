@@ -2,7 +2,7 @@ import json
 from pathlib import Path
 from unittest import mock
 
-from etl.prune import prune, LocalCatalog
+from etl.prune import prune
 
 
 def test_prune(tmp_path: Path) -> None:
