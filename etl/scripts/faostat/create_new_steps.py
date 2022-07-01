@@ -644,6 +644,9 @@ def create_updated_dependency_graph(
             # Collect the new dag line and its dependencies, that will later be added to the updated dag.
             new_steps[new_step_name] = set(new_dependencies)
 
+    # Sort dag lines alphabetically.
+    new_steps = {step: new_steps[step] for step in sorted(new_steps)}
+
     return new_steps
 
 
@@ -740,7 +743,7 @@ def write_steps_to_dag_file(
         update_food_explorer_dependency_version()
 
 
-def apply_custom_rules_to_list_of_steps_to_create(step_names: List[str], channel: str):
+def apply_custom_rules_to_list_of_steps_to_create(step_names: List[str], channel: str) -> List[str]:
     """Apply some custom rules to add or remove steps from the list of steps to be created.
 
     Parameters
@@ -790,10 +793,8 @@ def main(channel: str, include_all_datasets: bool = False) -> None:
         # List steps for which source data was updated.
         step_names = list_updated_steps(channel=channel)
 
-        # Apply custom rules to list of steps to create.
-        step_names = apply_custom_rules_to_list_of_steps_to_create(
-            step_names=step_names, channel=channel
-        )
+    # Apply custom rules to list of steps to create.
+    step_names = apply_custom_rules_to_list_of_steps_to_create(step_names=step_names, channel=channel)
 
     if len(step_names) > 0:
         # Create folder for new version and add a step file for each dataset.
