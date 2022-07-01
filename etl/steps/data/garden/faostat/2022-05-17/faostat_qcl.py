@@ -3,19 +3,33 @@
 from copy import deepcopy
 
 import pandas as pd
-from owid import catalog
 from owid.datautils import dataframes
 
 from etl.paths import DATA_DIR
-from .shared import NAMESPACE, VERSION, ADDED_TITLE_TO_WIDE_TABLE, FLAG_MULTIPLE_FLAGS, REGIONS_TO_ADD, \
-    harmonize_elements, harmonize_items, clean_data, add_regions, add_per_capita_variables, prepare_long_table, \
+from owid import catalog
+from .shared import ADDED_TITLE_TO_WIDE_TABLE, FLAG_MULTIPLE_FLAGS, NAMESPACE, REGIONS_TO_ADD, VERSION, \
+    add_per_capita_variables, add_regions, clean_data, harmonize_elements, harmonize_items, prepare_long_table, \
     prepare_wide_table, remove_outliers
 
 
-def add_slaughtered_animals_to_meat_total(data):
-    # There is no FAO data on slaughtered animals for total meat.
-    # We construct this data by aggregating that element for the following items (which corresponds to all meat
-    # items removing redundancies):
+def add_slaughtered_animals_to_meat_total(data: pd.DataFrame) -> pd.DataFrame:
+    """Add number of slaughtered animals to meat total.
+
+    There is no FAOSTAT data on slaughtered animals for total meat. We construct this data by aggregating that element
+    for the items specified in items_to_aggregate (which corresponds to all meat items after removing redundancies).
+
+    Parameters
+    ----------
+    data : pd.DataFrame
+        Processed data where meat total does not have number of slaughtered animals.
+
+    Returns
+    -------
+    combined_data : pd.DataFrame
+        Data after adding the new variable.
+
+    """
+    # List of items to sum as part of "Meat, total" (avoiding double-counting items).
     items_to_aggregate = [
         'Meat, ass',
         'Meat, beef and buffalo',
@@ -115,10 +129,31 @@ def add_slaughtered_animals_to_meat_total(data):
     return combined_data
 
 
-def add_yield_to_aggregate_regions(data):
-    # Given that Yield (tonnes per hectare) cannot be simply summed from different regions, we create this variable from
-    # the aggregate of production divided by the aggregate of area.
+def add_yield_to_aggregate_regions(data: pd.DataFrame) -> pd.DataFrame:
+    """Add yield (production / area harvested) to data for aggregate regions (i.e. continents and income groups).
 
+    This data is not included in aggregate regions because it cannot be aggregated by simply summing the contribution of
+    the individual countries. Instead, we need to aggregate production, then aggregate area harvested, and then divide
+    one by the other.
+
+    Note: Here, we divide production (the sum of the production from a list of countries in a region) by area (the sum
+    of the area from a list of countries in a region) to obtain yield. But the list of countries that contributed to
+    production may not be the same as the list of countries that contributed to area. We could impose that they must be
+    the same, but this causes the resulting series to have gaps. Additionally, it seems that FAO also constructs yield
+    in the same way. This was checked by comparing the resulting yield curves for 'Almonds' for all aggregate regions
+    with their corresponding *(FAO) regions; they were identical.
+
+    Parameters
+    ----------
+    data : pd.DataFrame
+        Data that does not contain yield for aggregate regions.
+
+    Returns
+    -------
+    combined_data : pd.DataFrame
+        Data after adding yield.
+
+    """
     # Element code of production, area harvested, and yield.
     production_element_code = "005510"
     area_element_code = "005312"
@@ -139,12 +174,6 @@ def add_yield_to_aggregate_regions(data):
     data_area = data[(data["country"].isin(REGIONS_TO_ADD)) & (data["element_code"] == area_element_code)]
 
     # Merge the two dataframes and create the new yield variable.
-    # Note: Here, we divide production (the sum of the production from a list of countries in a region) by area (the sum
-    # of the area from a list of countries in a region) to obtain yield. But the list of countries that contributed to
-    # production may not be the same as the list of countries that contributed to area. To impose that they must be the
-    # same, we could merge also by "population_with_data". However, this causes the resulting series to have gaps.
-    # Additionally, it seems that FAO also constructs yield in the same way. This was checked by comparing the resulting
-    # yield curves for 'Almonds' for all aggregate regions with their corresponding *(FAO) regions; they were identical.
     merge_cols = ['area_code', 'year', 'item_code', 'fao_country', 'fao_item', 'item',
                   'item_description', 'country']
     combined = pd.merge(data_production, data_area[merge_cols + ["flag", "value"]], on=merge_cols, how="inner",
@@ -170,11 +199,11 @@ def add_yield_to_aggregate_regions(data):
 
     combined = combined
 
-    data_combined = pd.concat([data, combined], ignore_index=True).reset_index(drop=True).astype({
+    combined_data = pd.concat([data, combined], ignore_index=True).reset_index(drop=True).astype({
         "element_code": "category", "fao_element": "category", "fao_unit": "category", "flag": "category",
         "element": "category", "unit": "category", "element_description": "category", "unit_short_name": "category"})
 
-    return data_combined
+    return combined_data
 
 
 def run(dest_dir: str) -> None:

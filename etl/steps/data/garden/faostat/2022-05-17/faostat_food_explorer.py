@@ -1,17 +1,21 @@
-"""FAOSTAT food explorer.
+"""Dataset feeding the global food explorer.
 
-Load the qcl and fbsc (combination of fbsh and fbs) datasets, and create a combined dataset of food products.
+Load the qcl and fbsc (combination of fbsh and fbs) datasets, and create a combined dataset of food items (now called
+products).
+
+The resulting dataset will later be loaded by the `explorer/food_explorer` which feeds our
+[Global food explorer](https://ourworldindata.org/explorers/global-food).
 
 """
 
 from copy import deepcopy
 
 import pandas as pd
-from owid import catalog
-from owid.catalog.meta import DatasetMeta
 from owid.datautils import dataframes, geo
 
 from etl.paths import DATA_DIR
+from owid import catalog
+from owid.catalog.meta import DatasetMeta
 from .shared import NAMESPACE, VERSION
 
 # Dataset name and title.

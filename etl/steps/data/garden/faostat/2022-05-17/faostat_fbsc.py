@@ -13,25 +13,13 @@ https://fenixservices.fao.org/faostat/static/documents/FBS/New%20FBS%20methodolo
 from copy import deepcopy
 
 import pandas as pd
-from owid import catalog
-from owid.catalog.meta import DatasetMeta, TableMeta
 from owid.datautils import dataframes
 
 from etl.paths import DATA_DIR
-from .shared import (
-    NAMESPACE,
-    VERSION,
-    ADDED_TITLE_TO_WIDE_TABLE,
-    add_per_capita_variables,
-    add_regions,
-    clean_data,
-    harmonize_elements,
-    harmonize_items,
-    log,
-    prepare_long_table,
-    prepare_wide_table,
-    remove_outliers,
-)
+from owid import catalog
+from owid.catalog.meta import DatasetMeta, TableMeta
+from .shared import ADDED_TITLE_TO_WIDE_TABLE, NAMESPACE, VERSION, add_per_capita_variables, add_regions, clean_data,\
+    harmonize_elements, harmonize_items, log, prepare_long_table, prepare_wide_table, remove_outliers
 
 # Dataset name.
 DATASET_SHORT_NAME = f"{NAMESPACE}_fbsc"

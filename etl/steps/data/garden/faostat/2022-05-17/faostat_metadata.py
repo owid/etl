@@ -4,34 +4,11 @@ This step reads from:
 * The (additional) metadata dataset. The only crucial ingredients from here (that will be used later on in other garden
   steps are element, item and units descriptions, and country groups (used to check that we do not double count
   countries when aggregating data for regions).
-* Custom datasets file ('./custom_datasets.csv'), with the following columns:
-    * 'dataset':
-    * 'fao_dataset_title':
-    * 'owid_dataset_title':
-    * 'fao_dataset_description':
-    * 'owid_dataset_description':
-* Custom elements and units file ('./custom_elements_and_units.csv'), with the following columns:
-    * 'dataset':
-    * 'element_code':
-    * 'fao_element':
-    * 'owid_element':
-    * 'fao_unit':
-    * 'fao_unit_short_name':
-    * 'owid_unit':
-    * 'owid_unit_short_name':
-    * 'owid_unit_factor':
-    * 'fao_element_description':
-    * 'owid_element_description':
-    * 'owid_aggregation':
-    * 'was_per_capita':
-    * 'make_per_capita':
-* Custom items file ('./custom_items.csv'), with the following columns:
-    * 'dataset':
-    * 'item_code':
-    * 'fao_item':
-    * 'owid_item':
-    * 'fao_item_description':
-    * 'owid_item_description':
+* Custom datasets file ('./custom_datasets.csv').
+* Custom elements and units file ('./custom_elements_and_units.csv').
+* Custom items file ('./custom_items.csv').
+* Each of the individual meadow datasets. They are loaded to extract their countries, items, elements and units, and
+  some sanity checks are performed.
 
 This step will:
 * Output a dataset that will be loaded by all garden datasets, with tables:
@@ -76,7 +53,7 @@ from tqdm.auto import tqdm
 
 from etl.paths import DATA_DIR, STEP_DIR
 from owid import catalog
-from .shared import NAMESPACE, FLAGS_RANKING, harmonize_elements, harmonize_items, VERSION, optimize_table_dtypes, log
+from .shared import FLAGS_RANKING, NAMESPACE, VERSION, harmonize_elements, harmonize_items, log, optimize_table_dtypes
 
 # Define short name for output dataset.
 DATASET_SHORT_NAME = f"{NAMESPACE}_metadata"
