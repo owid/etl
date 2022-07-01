@@ -85,6 +85,7 @@ def bulk_backport(
         )
 
     if prune:
+        assert not dataset_ids, "Pruning cannot be used together with dataset-ids"
         _prune_walden_datasets(engine, dry_run)
 
     log.info("bulk_backport.finished")
@@ -121,16 +122,12 @@ def _active_datasets(engine: Engine, limit: int = 1000000) -> pd.DataFrame:
     limit %(limit)s
     """
 
-    # ignore limit if using dataset ids
-    if dataset_ids:
-        limit = 1000000
-
     df = pd.read_sql(
         q,
         engine,
         params={"limit": limit, "dataset_ids": dag_backported_ids},
     )
-    return cast(df, pd.read_sql(q, engine, params={"limit": limit}))
+    return cast(pd.DataFrame, df)
 
 
 def _prune_walden_datasets(engine: Engine, dry_run: bool) -> None:
