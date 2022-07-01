@@ -230,6 +230,21 @@ FAO_POPULATION_UNIT = "1000 persons"
 def combine_qcl_and_fbsc(
     qcl_table: catalog.Table, fbsc_table: catalog.Table
 ) -> pd.DataFrame:
+    """Combine garden `faostat_qcl` and `faostat_fbsc` datasets.
+
+    Parameters
+    ----------
+    qcl_table : catalog.Table
+        Main table (in long format) of the `faostat_qcl` dataset.
+    fbsc_table : catalog.Table
+        Main table (in long format) of the `faostat_fbsc` dataset.
+
+    Returns
+    -------
+    combined : pd.DataFrame
+        Combined data (as a dataframe, not a table).
+
+    """
 
     columns = ['country', 'year', 'item_code', 'element_code', 'item', 'element', 'unit', 'unit_short_name', 'value',
                'population_with_data']
@@ -272,6 +287,21 @@ def combine_qcl_and_fbsc(
 
 
 def get_fao_population(combined: pd.DataFrame) -> pd.DataFrame:
+    """Extract the FAO population data from data (in long format).
+
+    Parameters
+    ----------
+    combined : pd.DataFrame
+        Combination of `faostat_qcl` and `faostat_fbsc` data (although this function could also be applied to just
+        `faostat_fbsc` data, since `faostat_qcl` does not contain FAO population data).
+
+    Returns
+    -------
+    fao_population : pd.DataFrame
+        Population (by country and year) according to FAO, extracted from the `faostat_fbsc` dataset.
+
+    """
+    # Select the item and element that corresponds to population values.
     fao_population = combined[(combined["product"] == FAO_POPULATION_ITEM_NAME) &
                               (combined["element"] == FAO_POPULATION_ELEMENT_NAME)].reset_index(drop=True)
 
@@ -280,6 +310,7 @@ def get_fao_population(combined: pd.DataFrame) -> pd.DataFrame:
     assert fao_population["unit"].unique().tolist() == [FAO_POPULATION_UNIT], error
     fao_population["value"] *= 1000
 
+    # Drop missing values and prepare output dataframe.
     fao_population = fao_population[["country", "year", "value"]].dropna(how="any").\
         rename(columns={"value": "fao_population"})
 
@@ -287,6 +318,20 @@ def get_fao_population(combined: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_combined_data(combined: pd.DataFrame) -> pd.DataFrame:
+    """Process combined data (combination of `faostat_qcl` and `faostat_fbsc` data) to have the content and format
+    required by the food explorer.
+
+    Parameters
+    ----------
+    combined : pd.DataFrame
+        Combination of `faostat_qcl` and `faostat_fbsc` data.
+
+    Returns
+    -------
+    data_wide : pd.DataFrame
+        Processed data (in wide format).
+
+    """
     combined = combined.copy()
 
     # Get FAO population from data (it is given as another item).
@@ -354,8 +399,10 @@ def run(dest_dir: str) -> None:
     # Process data.
     ####################################################################################################################
 
+    # Combine `faostat_qcl` and `faostat_fbsc` data.
     data = combine_qcl_and_fbsc(qcl_table=qcl_table, fbsc_table=fbsc_table)
 
+    # Prepare data in the format required by the food explorer.
     data = process_combined_data(combined=data)
 
     ####################################################################################################################

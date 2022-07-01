@@ -1,12 +1,17 @@
 """FAOSTAT garden step for faostat_fbsc dataset (Food Balances Combined).
 
 Combine the old and new food balances datasets:
-* Old (historical) dataset: "faostat_fbsh".
-* Current dataset: "faostat_fbs".
-Into a new (combined) dataset: "faostat_fbsc", and process it like any other FAOSTAT dataset.
+* `faostat_fbsh`: Old (historical) dataset.
+* `faostat_fbs`: Current dataset.
 
-This is because a new version of the _Food Balances_ dataset was launched in 2014 with a slightly new methodology:
+A new (combined) dataset will be generated: "faostat_fbsc".
+
+This is because a new version of the Food Balances dataset was launched in 2014 with a slightly new methodology:
 https://fenixservices.fao.org/faostat/static/documents/FBS/New%20FBS%20methodology.pdf
+
+NOTE: It seems that FAOSTAT is possibly extending the coverage of the new methodology. So the year of intersection of
+both datasets will be earlier and earlier. The global variable `FBS_FIRST_YEAR` may have to be redefined in a future
+update.
 
 """
 
@@ -33,6 +38,21 @@ def combine_fbsh_and_fbs_datasets(
     fbsh_dataset: catalog.Dataset,
     fbs_dataset: catalog.Dataset,
 ) -> pd.DataFrame:
+    """Combine `faostat_fbsh` and `faostat_fbs` meadow datasets.
+
+    Parameters
+    ----------
+    fbsh_dataset : catalog.Dataset
+        Meadow `faostat_fbsh` dataset.
+    fbs_dataset : catalog.Dataset
+        Meadow `faostat_fbs` dataset.
+
+    Returns
+    -------
+    fbsc : pd.DataFrame
+        Combination of the tables of the two input datasets (as a dataframe, not a dataset).
+
+    """
     # Sanity checks.
     error = "Description of fbs and fbsh datasets is different."
     assert fbsh_dataset.metadata.description == fbs_dataset.metadata.description, error

@@ -91,6 +91,8 @@ ITEM_AMENDMENTS = {
 # For example, if for a certain variable in a certain year, only a few countries with little population have data,
 # then assign nan to that region-variable-year.
 # Define here that minimum fraction of population that must have data to create an aggregate.
+# A fraction of 0 means that we do accept aggregates even if only a few countries contribute (which seems to be the
+# default approach by FAOSTAT).
 MIN_FRAC_POPULATION_WITH_DATA = 0.
 # Reference year to build the list of mandatory countries.
 REFERENCE_YEAR = 2018
@@ -362,7 +364,7 @@ ADDED_TITLE_TO_WIDE_TABLE = " - Flattened table indexed by country-year."
 # Shared functions.
 ########################################################################################################################
 
-def check_that_countries_are_well_defined(data):
+def check_that_countries_are_well_defined(data: pd.DataFrame) -> None:
     # Ensure area codes and countries are well defined, and no ambiguities were introduced when mapping country names.
     n_countries_per_area_code = data.groupby("area_code")["country"].transform("nunique")
     ambiguous_area_codes = data[n_countries_per_area_code > 1][["area_code", "country"]].\
@@ -378,7 +380,8 @@ def check_that_countries_are_well_defined(data):
     assert len(ambiguous_countries) == 0, error
 
 
-def check_that_regions_with_subregions_are_ignored_when_constructing_aggregates(countries_metadata):
+def check_that_regions_with_subregions_are_ignored_when_constructing_aggregates(
+        countries_metadata: pd.DataFrame) -> None:
     # Check if there is any harmonized regions that contain subregions.
     # If so, they should be ignored when constructing region aggregates, to avoid double-counting them.
     countries_with_subregions = countries_metadata[
@@ -393,7 +396,7 @@ def check_that_regions_with_subregions_are_ignored_when_constructing_aggregates(
     assert len(countries_with_subregions) == 0, error
 
 
-def harmonize_items(df, dataset_short_name, item_col="item") -> pd.DataFrame:
+def harmonize_items(df: pd.DataFrame, dataset_short_name: str, item_col: str = "item") -> pd.DataFrame:
     df = df.copy()
     # Note: Here list comprehension is faster than doing .astype(str).str.zfill(...).
     df["item_code"] = [str(item_code).zfill(N_CHARACTERS_ITEM_CODE) for item_code in df["item_code"]]
@@ -415,7 +418,7 @@ def harmonize_items(df, dataset_short_name, item_col="item") -> pd.DataFrame:
     return df
 
 
-def harmonize_elements(df, element_col="element") -> pd.DataFrame:
+def harmonize_elements(df: pd.DataFrame, element_col: str = "element") -> pd.DataFrame:
     df = df.copy()
     df["element_code"] = [str(element_code).zfill(N_CHARACTERS_ELEMENT_CODE) for element_code in df["element_code"]]
 
@@ -428,7 +431,7 @@ def harmonize_elements(df, element_col="element") -> pd.DataFrame:
     return df
 
 
-def harmonize_countries(data, countries_metadata):
+def harmonize_countries(data: pd.DataFrame, countries_metadata: pd.DataFrame) -> pd.DataFrame:
     data = data.copy()
 
     if data["area_code"].dtype == "float64":
@@ -458,9 +461,7 @@ def harmonize_countries(data, countries_metadata):
     return data
 
 
-def remove_rows_with_nan_value(
-    data: pd.DataFrame, verbose: bool = False
-) -> pd.DataFrame:
+def remove_rows_with_nan_value(data: pd.DataFrame, verbose: bool = False) -> pd.DataFrame:
     """Remove rows for which column "value" is nan.
 
     Parameters
@@ -494,9 +495,7 @@ def remove_rows_with_nan_value(
     return data
 
 
-def remove_columns_with_only_nans(
-    data: pd.DataFrame, verbose: bool = True
-) -> pd.DataFrame:
+def remove_columns_with_only_nans(data: pd.DataFrame, verbose: bool = True) -> pd.DataFrame:
     """Remove columns that only have nans.
 
     In principle, it should not be possible that columns have only nan values, but we use this function just in case.
@@ -623,7 +622,8 @@ def clean_year_column(year_column: pd.Series) -> pd.Series:
     return year_clean_series
 
 
-def add_custom_names_and_descriptions(data, items_metadata, elements_metadata):
+def add_custom_names_and_descriptions(data: pd.DataFrame, items_metadata: pd.DataFrame,
+                                      elements_metadata: pd.DataFrame) -> pd.DataFrame:
     data = data.copy()
 
     error = f"There are missing item codes in metadata."
@@ -655,7 +655,8 @@ def add_custom_names_and_descriptions(data, items_metadata, elements_metadata):
     return data
 
 
-def remove_regions_from_countries_regions_members(countries_regions, regions_to_remove):
+def remove_regions_from_countries_regions_members(countries_regions: pd.DataFrame,
+                                                  regions_to_remove: List[str]) -> pd.DataFrame:
     countries_regions = countries_regions.copy()
 
     # Get the owid code for each region that needs to be ignored when creating region aggregates.
@@ -722,7 +723,7 @@ def _load_income_groups() -> pd.DataFrame:
     return income_groups
 
 
-def _list_countries_in_region(region, countries_regions, income_groups):
+def _list_countries_in_region(region: str, countries_regions: pd.DataFrame, income_groups: pd.DataFrame) -> List[str]:
     # Number of attempts to fetch countries regions data.
     attempts = 5
     attempt = 0
@@ -741,7 +742,7 @@ def _list_countries_in_region(region, countries_regions, income_groups):
     return countries_in_region
 
 
-def remove_overlapping_data_between_historical_regions_and_successors(data_region):
+def remove_overlapping_data_between_historical_regions_and_successors(data_region: pd.DataFrame) -> pd.DataFrame:
     data_region = data_region.copy()
     # Sometimes, data for historical regions (e.g. USSR) overlaps with data of the successor countries (e.g. Russia).
     # Ideally, we would keep only data for the newer countries. However, if not all successors have data, we would be
@@ -771,7 +772,7 @@ def remove_overlapping_data_between_historical_regions_and_successors(data_regio
     return data_region
 
 
-def remove_outliers(data):
+def remove_outliers(data: pd.DataFrame) -> pd.DataFrame:
     data = data.copy()
 
     # Make a dataframe with all rows that need to be removed from the data.
@@ -796,7 +797,7 @@ def remove_outliers(data):
     return data
 
 
-def add_regions(data, elements_metadata):
+def add_regions(data: pd.DataFrame, elements_metadata: pd.DataFrame) -> pd.DataFrame:
     data = data.copy()
 
     # Create a dictionary of aggregations, specifying the operation to use when creating regions.
@@ -892,7 +893,7 @@ def add_regions(data, elements_metadata):
     return data
 
 
-def add_fao_population_if_given(data):
+def add_fao_population_if_given(data: pd.DataFrame) -> pd.DataFrame:
     # Select rows that correspond to FAO population.
     fao_population_item_name = "Population"
     fao_population_element_name = "Total Population - Both sexes"
@@ -921,7 +922,7 @@ def add_fao_population_if_given(data):
 
 def add_population(df: pd.DataFrame, country_col: str = "country", year_col: str = "year",
                    population_col: str = "population", warn_on_missing_countries: bool = True,
-                   show_full_warning: bool = True):
+                   show_full_warning: bool = True) -> pd.DataFrame:
     # This function has been adapted from datautils.geo, because population currently does not include historic
     # regions. We include them here.
 
@@ -956,7 +957,8 @@ def add_population(df: pd.DataFrame, country_col: str = "country", year_col: str
     return df_with_population
 
 
-def convert_variables_given_per_capita_to_total_value(data, elements_metadata):
+def convert_variables_given_per_capita_to_total_value(data: pd.DataFrame,
+                                                      elements_metadata: pd.DataFrame) -> pd.DataFrame:
     # Select element codes that were originally given as per capita variables (if any), and, if FAO population is
     # given, make them total variables instead of per capita.
     # All variables in the custom_elements_and_units.csv file with "was_per_capita" True will be converted into
@@ -989,7 +991,7 @@ def convert_variables_given_per_capita_to_total_value(data, elements_metadata):
     return data
 
 
-def add_per_capita_variables(data, elements_metadata):
+def add_per_capita_variables(data: pd.DataFrame, elements_metadata: pd.DataFrame) -> pd.DataFrame:
     data = data.copy()
 
     # Find element codes that have to be made per capita.
@@ -1122,7 +1124,7 @@ def clean_data(data: pd.DataFrame, items_metadata: pd.DataFrame, elements_metada
     return data
 
 
-def optimize_table_dtypes(table):
+def optimize_table_dtypes(table: catalog.Table) -> catalog.Table:
     dtypes = {
         c: "category" for c in ["area_code", "item_code", "element_code"] if c in table.columns
     }
@@ -1131,7 +1133,7 @@ def optimize_table_dtypes(table):
     return catalog.frames.repack_frame(table, dtypes=dtypes)
 
 
-def prepare_long_table(data: pd.DataFrame):
+def prepare_long_table(data: pd.DataFrame) -> catalog.Table:
     # Create new table with long data.
     data_table_long = catalog.Table(data)
 
@@ -1142,7 +1144,7 @@ def prepare_long_table(data: pd.DataFrame):
     index_columns = ["area_code", "year", "item_code", "element_code"]
     data_table_long = data_table_long.set_index(index_columns, verify_integrity=True).sort_index()
 
-    return data_table_long
+    return cast(catalog.Table, data_table_long)
 
 
 def prepare_wide_table(data: pd.DataFrame, dataset_title: str) -> catalog.Table:

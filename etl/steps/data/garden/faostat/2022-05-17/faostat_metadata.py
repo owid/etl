@@ -40,12 +40,18 @@ There are some non-trivial issues with the definitions of items at FAOSTAT:
   * In dataset sdgb, item codes have very unusual names, and they are not found in the metadata. We haven't figured
     out the root of the issue yet.
 
+There are several cases in which one or a few item codes in the data are missing in the metadata. Also, there are
+several cases in which an item code in the data has an item name slightly different in the metadata. But these are not
+important issues (since we use item_code to merge different datasets, and we use metadata only to fetch descriptions).
+However, for some domains there are too many differences between items in the data and in the metadata (as explained
+above). For this reason, raise a warning only when there is a reasonable number of issues found.
+
 """
 
 import json
 import sys
 from copy import deepcopy
-from typing import List
+from typing import Dict, List, Tuple, cast
 
 import pandas as pd
 from owid.datautils import dataframes, io
@@ -58,11 +64,6 @@ from .shared import FLAGS_RANKING, NAMESPACE, VERSION, harmonize_elements, harmo
 # Define short name for output dataset.
 DATASET_SHORT_NAME = f"{NAMESPACE}_metadata"
 
-# There are several cases in which one or a few item codes in the data are missing in the metadata. Also, there are
-# several cases in which an item code in the data has an item name slightly different in the metadata. But these are not
-# important issues (since we use item_code to merge different datasets, and we use metadata only to fetch descriptions).
-# However, for some domains there are too many differences between items in the data and in the metadata (as explained
-# above). For this reason, raise a warning only when there is a reasonable number of issues found.
 # Minimum number of issues in the comparison of items and item codes from data and metadata to raise a warning.
 N_ISSUES_ON_ITEMS_FOR_WARNING = 10
 
@@ -226,8 +227,8 @@ def clean_global_items_dataframe(items_df: pd.DataFrame, custom_items: pd.DataFr
     return items_df
 
 
-def create_elements_dataframe_for_domain(table: catalog.Table, metadata: catalog.Dataset, dataset_short_name: str
-                                         ) -> pd.DataFrame:
+def create_elements_dataframe_for_domain(table: catalog.Table, metadata: catalog.Dataset,
+                                         dataset_short_name: str) -> pd.DataFrame:
     df = pd.DataFrame(table).reset_index()
     # Load elements from data.
     elements_from_data = df.rename(columns={"element": "fao_element", "unit": "fao_unit_short_name"})[[
@@ -355,7 +356,8 @@ def clean_global_elements_dataframe(elements_df: pd.DataFrame, custom_elements: 
     return elements_df
 
 
-def clean_global_countries_dataframe(countries_in_data, country_groups, countries_harmonization):
+def clean_global_countries_dataframe(countries_in_data: pd.DataFrame, country_groups: Dict[str, List[str]],
+                                     countries_harmonization: Dict[str, str]) -> pd.DataFrame:
     countries_df = countries_in_data.copy()
     countries_not_harmonized = sorted(set(countries_df["fao_country"]) - set(countries_harmonization))
     if len(countries_not_harmonized) > 0:
@@ -394,12 +396,10 @@ def create_table(df: pd.DataFrame, short_name: str, index_cols: List[str]) -> ca
     table.metadata.short_name = short_name
     table.metadata.primary_key = index_cols
 
-    return table
+    return cast(catalog.Table, table)
 
 
-def check_that_flag_definitions_in_dataset_agree_with_those_in_flags_ranking(
-    metadata: catalog.Dataset,
-) -> None:
+def check_that_flag_definitions_in_dataset_agree_with_those_in_flags_ranking(metadata: catalog.Dataset) -> None:
     """Check that the definition of flags in the additional metadata for current dataset agree with the ones we have
     manually written down in our flags ranking (raise error otherwise).
 
@@ -422,10 +422,7 @@ def check_that_flag_definitions_in_dataset_agree_with_those_in_flags_ranking(
             ).all(), error_message
 
 
-def check_that_all_flags_in_dataset_are_in_ranking(
-    table: catalog.Table,
-    metadata_for_flags: catalog.Table,
-) -> None:
+def check_that_all_flags_in_dataset_are_in_ranking(table: catalog.Table, metadata_for_flags: catalog.Table) -> None:
     """Check that all flags found in current dataset are defined in our flags ranking (raise error otherwise).
 
     Parameters
@@ -458,7 +455,9 @@ def check_that_all_flags_in_dataset_are_in_ranking(
         )
 
 
-def process_metadata(metadata, custom_datasets, custom_elements, custom_items, countries_harmonization):
+def process_metadata(metadata: catalog.Dataset, custom_datasets: pd.DataFrame, custom_elements: pd.DataFrame,
+                     custom_items: pd.DataFrame, countries_harmonization: Dict[str, str]
+                     ) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     # Check if flags definitions need to be updated.
     check_that_flag_definitions_in_dataset_agree_with_those_in_flags_ranking(metadata)
 
@@ -512,7 +511,6 @@ def process_metadata(metadata, custom_datasets, custom_elements, custom_items, c
 
         # Get country groups in this dataset.
         area_group_table_name = f"{dataset_short_name}_area_group"
-        country_groups = {}
         if area_group_table_name in metadata:
             country_groups = metadata[f"{dataset_short_name}_area_group"].reset_index(). \
                 drop_duplicates(subset=["country_group", "country"]).groupby("country_group").agg(
@@ -541,7 +539,7 @@ def process_metadata(metadata, custom_datasets, custom_elements, custom_items, c
         elements_df=elements_df, custom_elements=custom_elements)
 
     countries_df = clean_global_countries_dataframe(
-        countries_in_data=countries_in_data, country_groups=country_groups,
+        countries_in_data=countries_in_data, country_groups=country_groups_in_data,
         countries_harmonization=countries_harmonization)
 
     return countries_df, datasets_df, elements_df, items_df
