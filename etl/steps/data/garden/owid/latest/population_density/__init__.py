@@ -74,6 +74,7 @@ def run(dest_dir: str) -> None:
     # add metadata, use values from variable 123 in grapher
     ds.metadata = DatasetMeta(
         namespace="owid",
+        short_name="population_density",
         title="Population density (World Bank, Gapminder, HYDE & UN)",
         sources=load_sources(),
     )
