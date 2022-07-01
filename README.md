@@ -54,7 +54,7 @@ Please file any bugs or issues at https://github.com/owid/etl/issues. We are not
 
 The `etl` project is the heart of OWID's future data architecture, containing all data transformations and publishing rules to take data from the raw snapshots kept in [walden](https://github.com/owid/walden) to the MySQL copy kept by [grapher](https://github.com/owid/grapher) for publishing the OWID charts and site.
 
-![Architectural overview](doc/future-architecture.png)
+![Architectural overview](docs/future-architecture.png)
 
 The ETL is the place where several key steps can be done:
 
