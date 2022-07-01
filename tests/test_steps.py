@@ -36,7 +36,9 @@ def _create_mock_py_file(step_name: str) -> None:
             """
 from owid.catalog import Dataset
 def run(dest_dir):
-    Dataset.create_empty(dest_dir)
+    ds = Dataset.create_empty(dest_dir)
+    ds.metadata.short_name = "test"
+    ds.save()
             """,
             file=ostream,
         )
@@ -129,7 +131,9 @@ def test_data_step_private():
 def test_backport_step_private(mock_create_dataset):
     with temporary_step() as step_name:
         path = paths.DATA_DIR / step_name
-        mock_create_dataset.return_value = Dataset.create_empty(path)
+        ds = Dataset.create_empty(path)
+        ds.metadata.short_name = "test"
+        mock_create_dataset.return_value = ds
         BackportStepPrivate(step_name, []).run()
         assert not Dataset(path).metadata.is_public
 
