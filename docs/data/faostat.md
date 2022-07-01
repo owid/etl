@@ -9,6 +9,8 @@ The data is distributed among different domains, each one with a unique dataset 
 We will create a new dataset (named, e.g. `faostat_qcl`) for each domain, although we are not including all FAOSTAT
 domains, only the ones listed below.
 
+TODO: Further explain how data is overall structured, with some examples.
+
 ## Output datasets
 
 ### Meadow (unprocessed) datasets
@@ -47,7 +49,7 @@ There is an additional dataset:
   This dataset contains as many tables as domain-categories (e.g. 'faostat_qcl_area', 'faostat_fbs_item', ...).
   All categories are defined in `category_structure` in the meadow `faostat_metadata.py` step file.
 
-# Garden (processed) datasets
+### Garden (processed) datasets
 
 The list of garden datasets is identical to the list of meadow datasets, except for the following changes:
 * Datasets `faostat_fbsh` and `faostat_fbs` are not be present.
@@ -57,17 +59,83 @@ The list of garden datasets is identical to the list of meadow datasets, except 
 * `faostat_metadata`: This dataset mainly feeds from the meadow `faostat_metadata`, but it also loads the `custom_*`
   files, and each individual meadow dataset.
 
-All datasets (except `faostat_metadata`) contain two tables:
-* One with the same name as the original dataset.
-* A flat table, named after the original dataset, appended by `_flat`.
-  This table is indexed by only `country` and `year`.
-Exceptionally, the `faostat_metadata` contains the following tables:
-* countries:
-* datasets:
-* items:
-* elements:
+All datasets `faostat_*` (except `faostat_metadata`) contain two tables:
+* `faostat_*`: Processed data in long format.
+  * Indexes:
+    * `area_code`: Area code (identical to the original FAO area code).
+    * `year`: Year.
+    * `item_code`: Harmonized item code.
+    * `element_code`: Harmonized element code.
+  * Columns:
+    * `country`: Harmonized country/region name.
+    * `fao_country`: Original FAO country/region name.
+    * `item`: Customized item name.
+    * `fao_item`: Original FAO item name.
+    * `element`: Customized element name.
+    * `fao_element`: Original FAO element name. This is only meaningful if the variable existed in the original dataset;
+      for example, OWID-generated per-capita variables did not exist in the original dataset, therefore the `fao_element`
+      is irrelevant.
+    * `unit`: Customized unit name (long version).
+    * `fao_unit`: Original FAO unit name (long version).
+    * `unit short name`: Customized unit name (short version).
+    * `fao_unit_short_name`: Original FAO unit name (short version).
+    * `item_description`: Customized item description.
+    * `element_description`: Customized element description.
+    * `flag`: Original FAO flags (with some small modifications).
+    * `population_with_data`: Population of a country, or, for aggregate regions, the population of countries in the
+      region for which there was data to aggregate.
+    * `value`: Actual data values.
+* `faostat_*_flat`: Flattened table in wide format.
+  * Indexes:
+    * `country`: Harmonized country/region name.
+    * `year`: Year.
+  * Columns: As many columns as combinations of harmonized element codes and harmonized item codes (plus an additional
+    column for area code).
 
-# Explorers
+The `faostat_metadata` contains the following tables:
+* `countries`: Metadata related to countries/regions.
+  * Indexes:
+    * `area_code`: Area code.
+  * Columns:
+    * `fao_country`: Original FAO country/region name.
+    * `country`: Harmonized country/region name.
+    * `members`: Members of each country/region (if any).
+* `datasets`: Metadata related to datasets titles and descriptions.
+  * Indexes:
+    * `dataset`: Dataset short name.
+  * Columns:
+    * `fao_dataset_title`: Original FAO title for the dataset.
+    * `owid_dataset_title`: Customized dataset title.
+    * `fao_dataset_description`: Original FAO dataset description.
+    * `owid_dataset_description`: Customized dataset description.
+* `elements`: Metadata related to elements and units.
+  * Indexes:
+    * `element_code`: Harmonized element code.
+  * Columns:
+    * `dataset`: dataset short name.
+    * `element`: Customized element name.
+    * `fao_element`: Original FAO element name.
+    * `element_description`: Customized element description.
+    * `fao_element_description`: Original FAO element description.
+    * `unit`: Customized unit name (long version).
+    * `fao_unit`: Original FAO unit name (long versino).
+    * `unit_short_name`: Customized unit name (short version).
+    * `fao_unit_short_name`: Original FAO unit (short version).
+    * `owid_unit_factor`: Factor by which data should be multiplied to.
+    * `owid_aggregation`: Type of aggregation to do to construct regions.
+    * `was_per_capita`: 1 if a particular element was given per capita in the original data (0 otherwise).
+    * `make_per_capita`: 1 to construct a per-capita element for a given element (0 otherwise).
+* `items`: Metadata related to items.
+  * Indexes:
+    * `item_code`: Harmonized item code.
+  * Columns:
+    * `dataset`: Dataset short name.
+    * `item`: Customized item name.
+    * `fao_item`: Original FAO name.
+    * `item_description`: Customized item description.
+    * `fao_item_description`: Original FAO item description.
+
+### Explorers
 
 Using data from garden, we create an additional dataset in the `explorers` channel:
 * `food_explorer`: Global food explorer. It contains the same data as the garden `faostat_food_explorer`. But, instead
