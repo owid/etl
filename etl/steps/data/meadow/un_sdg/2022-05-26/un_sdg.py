@@ -22,9 +22,9 @@ def run(dest_dir: str) -> None:
     fname = Path(__file__).stem
     namespace = Path(__file__).parent.parent.stem
 
-    # version = "2022-05-26"
-    # namespace = "un_sdg"
-    # fname = "un_sdg"
+    version = "2022-05-26"
+    namespace = "un_sdg"
+    fname = "un_sdg"
     walden_ds = Catalog().find_one(
         namespace=namespace, short_name=fname, version=version
     )
@@ -33,28 +33,27 @@ def run(dest_dir: str) -> None:
     df = load_and_clean(df)
     log.info(f"Size of dataframe", rows=df.shape[0], colums=df.shape[1])
     full_df = create_dataframe(df)
+    full_df.columns = [underscore(c) for c in full_df.columns]
     full_df = full_df[
         [
-            "Country",
-            "Year",
+            "country",
+            "year",
             "variable_name",
-            "Source",
-            "Value",
-            "Units_long",
+            "source",
+            "value",
+            "units_long",
             "short_unit",
         ]
     ]
-    full_df = full_df.set_index(
-        ["Country", "Year", "variable_name"], verify_integrity=True
-    )  # verify_integrity checks for duplicates
+    # verify_integrity checks for duplicates
     log.info(f"Size of dataframe", rows=full_df.shape[0], colums=full_df.shape[1])
 
-    assert full_df["Country"].notnull().all()
+    assert full_df["country"].notnull().all()
     assert full_df["variable_name"].notnull().all()
     assert (
         full_df[
             (
-                full_df[["Country", "Year", "variable_name", "Value"]].duplicated(
+                full_df[["country", "year", "variable_name", "value"]].duplicated(
                     keep=False
                 )
             )
@@ -64,6 +63,11 @@ def run(dest_dir: str) -> None:
     assert (
         not full_df.isnull().all(axis=1).any()
     ), "Unexpected state: One or more rows contains only NaN values."
+
+    # Create a primary key index
+    full_df = full_df.set_index(
+        ["country", "year", "variable_name"], verify_integrity=True
+    )
 
     # creates the dataset and adds a table
     ds = Dataset.create_empty(dest_dir)
