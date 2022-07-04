@@ -94,8 +94,9 @@ def prepare_output_data(data: pd.DataFrame) -> pd.DataFrame:
     df = df.drop(columns=["Year Code"])
 
     # Set index columns depending on what columns are available in the dataframe.
+    # Note: "Recipient Country Code" appears only in faostat_fa, and seems to replace "Area Code".
     index_columns = list(
-        {"Area Code", "Year", "Item Code", "Element Code"} & set(df.columns)
+        {"Area Code", "Recipient Country Code", "Year", "Item Code", "Element Code"} & set(df.columns)
     )
     if df.duplicated(subset=index_columns).any():
         log.warning("Index has duplicated keys.")
