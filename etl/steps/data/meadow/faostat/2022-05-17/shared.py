@@ -96,8 +96,20 @@ def prepare_output_data(data: pd.DataFrame) -> pd.DataFrame:
     # * Ignore column "Note" (which is included only in faostat_fa, faostat_fs, and faostat_sdgb datasets).
     # * Add "Recipient Country Code" and "Recipient Code", which are the names for "Area Code" and "Area", respectively,
     #   for dataset faostat_fa.
-    columns_to_keep = ["Area Code", "Area", "Year", "Item Code", "Item", "Element Code", "Element", "Unit", "Value",
-                       "Flag", "Recipient Country Code", "Recipient Country"]
+    columns_to_keep = [
+        "Area Code",
+        "Area",
+        "Year",
+        "Item Code",
+        "Item",
+        "Element Code",
+        "Element",
+        "Unit",
+        "Value",
+        "Flag",
+        "Recipient Country Code",
+        "Recipient Country",
+    ]
     # Select only columns that are found in the dataframe.
     columns_to_keep = list(set(columns_to_keep) & set(df.columns))
     df = df[columns_to_keep]
@@ -105,7 +117,8 @@ def prepare_output_data(data: pd.DataFrame) -> pd.DataFrame:
     # Set index columns depending on what columns are available in the dataframe.
     # Note: "Recipient Country Code" appears only in faostat_fa, and seems to replace "Area Code".
     index_columns = list(
-        {"Area Code", "Recipient Country Code", "Year", "Item Code", "Element Code"} & set(df.columns)
+        {"Area Code", "Recipient Country Code", "Year", "Item Code", "Element Code"}
+        & set(df.columns)
     )
     if df.duplicated(subset=index_columns).any():
         log.warning("Index has duplicated keys.")

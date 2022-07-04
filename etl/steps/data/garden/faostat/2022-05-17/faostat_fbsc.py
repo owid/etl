@@ -23,8 +23,20 @@ from owid.datautils import dataframes
 from etl.paths import DATA_DIR
 from owid import catalog
 from owid.catalog.meta import DatasetMeta, TableMeta
-from .shared import ADDED_TITLE_TO_WIDE_TABLE, NAMESPACE, VERSION, add_per_capita_variables, add_regions, clean_data,\
-    harmonize_elements, harmonize_items, log, prepare_long_table, prepare_wide_table, remove_outliers
+from .shared import (
+    ADDED_TITLE_TO_WIDE_TABLE,
+    NAMESPACE,
+    VERSION,
+    add_per_capita_variables,
+    add_regions,
+    clean_data,
+    harmonize_elements,
+    harmonize_items,
+    log,
+    prepare_long_table,
+    prepare_wide_table,
+    remove_outliers,
+)
 
 # Dataset name.
 DATASET_SHORT_NAME = f"{NAMESPACE}_fbsc"
@@ -77,7 +89,9 @@ def combine_fbsh_and_fbs_datasets(
         # There is overlapping data between fbsh and fbs datasets. Prioritising fbs over fbsh."
         fbsh = fbsh.loc[fbsh["year"] < fbs["year"].min()].reset_index(drop=True)
     if (fbsh["year"].max() + 1) < fbs["year"].min():
-        log.warning("Data is missing for one or more years between fbsh and fbs datasets.")
+        log.warning(
+            "Data is missing for one or more years between fbsh and fbs datasets."
+        )
 
     # Sanity checks.
     # Ensure the elements that are in fbsh but not in fbs are covered by ITEMS_MAPPING.
@@ -90,7 +104,11 @@ def combine_fbsh_and_fbs_datasets(
     assert set(fbsh["element"]) < set(fbs["element"]), error
 
     # Concatenate old and new dataframes using function that keeps categoricals.
-    fbsc = dataframes.concatenate([fbsh, fbs]).sort_values(["area", "year"]).reset_index(drop=True)
+    fbsc = (
+        dataframes.concatenate([fbsh, fbs])
+        .sort_values(["area", "year"])
+        .reset_index(drop=True)
+    )
 
     # Ensure that each element has only one unit and one description.
     error = "Some elements in the combined dataset have more than one unit."
@@ -102,7 +120,9 @@ def combine_fbsh_and_fbs_datasets(
 def _assert_df_size(df: pd.DataFrame, size_mb: float) -> None:
     """Check that dataframe is smaller than given size to prevent OOM errors."""
     real_size_mb = df.memory_usage(deep=True).sum() / 1e6
-    assert real_size_mb <= size_mb, f'DataFrame size is too big: {real_size_mb} MB > {size_mb} MB'
+    assert (
+        real_size_mb <= size_mb
+    ), f"DataFrame size is too big: {real_size_mb} MB > {size_mb} MB"
 
 
 def run(dest_dir: str) -> None:
@@ -111,13 +131,19 @@ def run(dest_dir: str) -> None:
     ####################################################################################################################
 
     # Find path to latest versions of fbsh dataset.
-    fbsh_version = sorted((DATA_DIR / "meadow" / NAMESPACE).glob(f"*/faostat_fbsh"))[-1].parent.name
+    fbsh_version = sorted((DATA_DIR / "meadow" / NAMESPACE).glob(f"*/faostat_fbsh"))[
+        -1
+    ].parent.name
     fbsh_file = DATA_DIR / "meadow" / NAMESPACE / fbsh_version / "faostat_fbsh"
     # Find path to latest versions of fbs dataset.
-    fbs_version = sorted((DATA_DIR / "meadow" / NAMESPACE).glob(f"*/faostat_fbs"))[-1].parent.name
+    fbs_version = sorted((DATA_DIR / "meadow" / NAMESPACE).glob(f"*/faostat_fbs"))[
+        -1
+    ].parent.name
     fbs_file = DATA_DIR / "meadow" / NAMESPACE / fbs_version / "faostat_fbs"
     # Path to dataset of FAOSTAT metadata.
-    garden_metadata_dir = DATA_DIR / "garden" / NAMESPACE / VERSION / f"{NAMESPACE}_metadata"
+    garden_metadata_dir = (
+        DATA_DIR / "garden" / NAMESPACE / VERSION / f"{NAMESPACE}_metadata"
+    )
 
     ####################################################################################################################
     # Load data.
@@ -133,11 +159,17 @@ def run(dest_dir: str) -> None:
 
     # Load and prepare dataset, items and element-units metadata.
     datasets_metadata = pd.DataFrame(metadata["datasets"]).reset_index()
-    datasets_metadata = datasets_metadata[datasets_metadata["dataset"] == DATASET_SHORT_NAME].reset_index(drop=True)
+    datasets_metadata = datasets_metadata[
+        datasets_metadata["dataset"] == DATASET_SHORT_NAME
+    ].reset_index(drop=True)
     items_metadata = pd.DataFrame(metadata["items"]).reset_index()
-    items_metadata = items_metadata[items_metadata["dataset"] == DATASET_SHORT_NAME].reset_index(drop=True)
+    items_metadata = items_metadata[
+        items_metadata["dataset"] == DATASET_SHORT_NAME
+    ].reset_index(drop=True)
     elements_metadata = pd.DataFrame(metadata["elements"]).reset_index()
-    elements_metadata = elements_metadata[elements_metadata["dataset"] == DATASET_SHORT_NAME].reset_index(drop=True)
+    elements_metadata = elements_metadata[
+        elements_metadata["dataset"] == DATASET_SHORT_NAME
+    ].reset_index(drop=True)
     countries_metadata = pd.DataFrame(metadata["countries"]).reset_index()
 
     ####################################################################################################################
@@ -145,15 +177,22 @@ def run(dest_dir: str) -> None:
     ####################################################################################################################
 
     # Combine fbsh and fbs datasets.
-    log.info("faostat_fbsc.combine_fbsh_and_fbs_datasets", fbsh_shape=fbsh_dataset["faostat_fbsh"].shape,
-             fbs_shape=fbs_dataset["faostat_fbs"].shape)
+    log.info(
+        "faostat_fbsc.combine_fbsh_and_fbs_datasets",
+        fbsh_shape=fbsh_dataset["faostat_fbsh"].shape,
+        fbs_shape=fbs_dataset["faostat_fbs"].shape,
+    )
     data = combine_fbsh_and_fbs_datasets(fbsh_dataset, fbs_dataset)
 
     _assert_df_size(data, 2000)
 
     # Prepare data.
-    data = clean_data(data=data, items_metadata=items_metadata, elements_metadata=elements_metadata,
-                      countries_metadata=countries_metadata)
+    data = clean_data(
+        data=data,
+        items_metadata=items_metadata,
+        elements_metadata=elements_metadata,
+        countries_metadata=countries_metadata,
+    )
 
     # Add data for aggregate regions.
     data = add_regions(data=data, elements_metadata=elements_metadata)
@@ -166,7 +205,7 @@ def run(dest_dir: str) -> None:
 
     # Avoid objects as they would explode memory, use categoricals instead.
     for col in data.columns:
-        assert data[col].dtype != object, f'Column {col} should not have object type'
+        assert data[col].dtype != object, f"Column {col} should not have object type"
 
     _assert_df_size(data, 2000)
 

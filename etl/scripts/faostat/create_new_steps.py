@@ -327,8 +327,10 @@ def find_latest_version_for_step(
             log.warning(warning_message)
     elif channel in ["meadow", "garden", "grapher"]:
         versions_dir = get_path_to_step_files(channel=channel, namespace=namespace)
-        dataset_versions = sorted(list(versions_dir.glob(f"*/{step_name}.ipynb")) +
-                                  list(versions_dir.glob(f"*/{step_name}.py")))
+        dataset_versions = sorted(
+            list(versions_dir.glob(f"*/{step_name}.ipynb"))
+            + list(versions_dir.glob(f"*/{step_name}.py"))
+        )
         if len(dataset_versions) > 0:
             latest_version = dataset_versions[-1].parent.name
         elif len(list(versions_dir.glob("latest"))) > 0:
@@ -398,7 +400,9 @@ def create_step_file(channel: str, step_name: str) -> None:
     if step_latest_version is None:
         log.info(f"Creating file from scratch for dataset {step_name}.")
         # Content of the file to be created.
-        file_content = generate_content_for_new_step_file(channel=channel, step_name=step_name)
+        file_content = generate_content_for_new_step_file(
+            channel=channel, step_name=step_name
+        )
         new_step_file.write_text(file_content)
     else:
         # Copy the file from its latest version.
@@ -588,7 +592,11 @@ def create_updated_dependency_graph(
             if additional_dependencies is not None:
                 # Optionally include additional dependencies.
                 for additional_dependency in additional_dependencies[channel]:
-                    dependency_namespace, dependency_channel, dependency_step = additional_dependency
+                    (
+                        dependency_namespace,
+                        dependency_channel,
+                        dependency_step,
+                    ) = additional_dependency
                     dependency_version = find_latest_version_for_step(
                         channel=dependency_channel,
                         step_name=dependency_step,
@@ -743,7 +751,9 @@ def write_steps_to_dag_file(
         update_food_explorer_dependency_version()
 
 
-def apply_custom_rules_to_list_of_steps_to_create(step_names: List[str], channel: str) -> List[str]:
+def apply_custom_rules_to_list_of_steps_to_create(
+    step_names: List[str], channel: str
+) -> List[str]:
     """Apply some custom rules to add or remove steps from the list of steps to be created.
 
     Parameters
@@ -794,7 +804,9 @@ def main(channel: str, include_all_datasets: bool = False) -> None:
         step_names = list_updated_steps(channel=channel)
 
     # Apply custom rules to list of steps to create.
-    step_names = apply_custom_rules_to_list_of_steps_to_create(step_names=step_names, channel=channel)
+    step_names = apply_custom_rules_to_list_of_steps_to_create(
+        step_names=step_names, channel=channel
+    )
 
     if len(step_names) > 0:
         # Create folder for new version and add a step file for each dataset.

@@ -29,7 +29,9 @@ def get_grapher_dataset_from_file_name(file_path: str) -> catalog.Dataset:
     dataset_short_name = file_name.split(".")[0]
 
     # Find latest garden dataset for current FAOSTAT domain.
-    garden_version = sorted((DATA_DIR / "garden" / namespace).glob(f"*/{dataset_short_name}"))[-1].parent.name
+    garden_version = sorted(
+        (DATA_DIR / "garden" / namespace).glob(f"*/{dataset_short_name}")
+    )[-1].parent.name
 
     # Load latest garden dataset.
     dataset = catalog.Dataset(
@@ -67,7 +69,9 @@ def get_grapher_tables(dataset: catalog.Dataset) -> Iterable[catalog.Table]:
 
     """
     # Fetch wide table from dataset.
-    flat_table_names = [table_name for table_name in dataset.table_names if table_name.endswith("_flat")]
+    flat_table_names = [
+        table_name for table_name in dataset.table_names if table_name.endswith("_flat")
+    ]
     assert len(flat_table_names) == 1
     table = dataset[flat_table_names[0]].reset_index().drop(columns=["area_code"])
 

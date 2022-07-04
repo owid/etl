@@ -7,9 +7,21 @@ from owid.datautils import dataframes
 
 from etl.paths import DATA_DIR
 from owid import catalog
-from .shared import ADDED_TITLE_TO_WIDE_TABLE, FLAG_MULTIPLE_FLAGS, NAMESPACE, REGIONS_TO_ADD, VERSION, \
-    add_per_capita_variables, add_regions, clean_data, harmonize_elements, harmonize_items, prepare_long_table, \
-    prepare_wide_table, remove_outliers
+from .shared import (
+    ADDED_TITLE_TO_WIDE_TABLE,
+    FLAG_MULTIPLE_FLAGS,
+    NAMESPACE,
+    REGIONS_TO_ADD,
+    VERSION,
+    add_per_capita_variables,
+    add_regions,
+    clean_data,
+    harmonize_elements,
+    harmonize_items,
+    prepare_long_table,
+    prepare_wide_table,
+    remove_outliers,
+)
 
 
 def add_slaughtered_animals_to_meat_total(data: pd.DataFrame) -> pd.DataFrame:
@@ -31,16 +43,16 @@ def add_slaughtered_animals_to_meat_total(data: pd.DataFrame) -> pd.DataFrame:
     """
     # List of items to sum as part of "Meat, total" (avoiding double-counting items).
     items_to_aggregate = [
-        'Meat, ass',
-        'Meat, beef and buffalo',
-        'Meat, camel',
-        'Meat, horse',
-        'Meat, lamb and mutton',
-        'Meat, mule',
-        'Meat, pig',
-        'Meat, poultry',
-        'Meat, rabbit',
-        'Meat, sheep and goat',
+        "Meat, ass",
+        "Meat, beef and buffalo",
+        "Meat, camel",
+        "Meat, horse",
+        "Meat, lamb and mutton",
+        "Meat, mule",
+        "Meat, pig",
+        "Meat, poultry",
+        "Meat, rabbit",
+        "Meat, sheep and goat",
     ]
     # OWID item name for total meat.
     total_meat_item = "Meat, total"
@@ -55,52 +67,81 @@ def add_slaughtered_animals_to_meat_total(data: pd.DataFrame) -> pd.DataFrame:
 
     # For some reason, there are two element codes for the same element (they have different items assigned).
     error = "Element codes for 'Producing or slaughtered animals' may have changed."
-    assert data[(data["element"] == slaughtered_animals_element) &
-                ~(data["element_code"].str.contains("pc"))]["element_code"].unique().tolist() == \
-           ['005320', '005321'], error    
+    assert data[
+        (data["element"] == slaughtered_animals_element)
+        & ~(data["element_code"].str.contains("pc"))
+    ]["element_code"].unique().tolist() == ["005320", "005321"], error
 
     # Similarly, there are two items for meat total.
     error = f"Item codes for '{total_meat_item}' may have changed."
-    assert data[data["item"] == total_meat_item]["item_code"].unique().tolist() == ['00001765'], error
+    assert data[data["item"] == total_meat_item]["item_code"].unique().tolist() == [
+        "00001765"
+    ], error
 
     # We arbitrarily choose the first element code and the first item code.
     slaughtered_animals_element_code = "005320"
     total_meat_item_code = "00001765"
 
     # Check that, indeed, this variable is not given in the original data.
-    assert data[(data["item"] == total_meat_item) &
-                (data["element"] == slaughtered_animals_element) &
-                (data["unit"] == slaughtered_animals_unit)].empty
+    assert data[
+        (data["item"] == total_meat_item)
+        & (data["element"] == slaughtered_animals_element)
+        & (data["unit"] == slaughtered_animals_unit)
+    ].empty
 
     # Select the subset of data to aggregate.
-    data_to_aggregate = data[(data["element"] == slaughtered_animals_element) &
-                             (data["unit"] == slaughtered_animals_unit) &
-                             (data["item"].isin(items_to_aggregate))].\
-        dropna(subset="value").reset_index(drop=True)
+    data_to_aggregate = (
+        data[
+            (data["element"] == slaughtered_animals_element)
+            & (data["unit"] == slaughtered_animals_unit)
+            & (data["item"].isin(items_to_aggregate))
+        ]
+        .dropna(subset="value")
+        .reset_index(drop=True)
+    )
 
     # Create a dataframe with the total number of animals used for meat.
-    animals = dataframes.groupby_agg(data_to_aggregate, groupby_columns=[
-        "area_code", "fao_country", "fao_element", "country", "year", "population_with_data"], aggregations={
-        "value": "sum", "flag": lambda x: x if len(x) == 1 else FLAG_MULTIPLE_FLAGS}).reset_index()
+    animals = dataframes.groupby_agg(
+        data_to_aggregate,
+        groupby_columns=[
+            "area_code",
+            "fao_country",
+            "fao_element",
+            "country",
+            "year",
+            "population_with_data",
+        ],
+        aggregations={
+            "value": "sum",
+            "flag": lambda x: x if len(x) == 1 else FLAG_MULTIPLE_FLAGS,
+        },
+    ).reset_index()
 
     # Get element description for selected element code.
     slaughtered_animals_element_description = data[
-        data["element_code"] == slaughtered_animals_element_code]["element_description"].unique()
+        data["element_code"] == slaughtered_animals_element_code
+    ]["element_description"].unique()
     assert len(slaughtered_animals_element_description) == 1
     slaughtered_animals_element_description = slaughtered_animals_element_description[0]
 
     # Get item description for selected item code.
-    total_meat_item_description = data[data["item_code"] == total_meat_item_code]["item_description"].unique()
+    total_meat_item_description = data[data["item_code"] == total_meat_item_code][
+        "item_description"
+    ].unique()
     assert len(total_meat_item_description) == 1
     total_meat_item_description = total_meat_item_description[0]
-    
+
     # Get FAO item name for selected item code.
-    total_meat_fao_item = data[data["item_code"] == total_meat_item_code]["fao_item"].unique()
+    total_meat_fao_item = data[data["item_code"] == total_meat_item_code][
+        "fao_item"
+    ].unique()
     assert len(total_meat_fao_item) == 1
     total_meat_fao_item = total_meat_fao_item[0]
 
     # Get FAO unit for selected item code.
-    total_meat_fao_unit = data[data["item_code"] == total_meat_item_code]["fao_unit"].unique()
+    total_meat_fao_unit = data[data["item_code"] == total_meat_item_code][
+        "fao_unit"
+    ].unique()
     assert len(total_meat_fao_unit) == 1
     total_meat_fao_unit = total_meat_fao_unit[0]
 
@@ -120,11 +161,25 @@ def add_slaughtered_animals_to_meat_total(data: pd.DataFrame) -> pd.DataFrame:
     assert set(data.columns) == set(animals.columns)
 
     # Add animals data to the original dataframe.
-    combined_data = pd.concat([data, animals], ignore_index=True).reset_index(drop=True).\
-        astype({"element_code": "category", "item_code": "category", "fao_item": "category",
-                "fao_unit": "category", "flag": "category", "item": "category",
-                "item_description": "category", "element": "category", "unit": "category",
-                "element_description": "category", "unit_short_name": "category"})
+    combined_data = (
+        pd.concat([data, animals], ignore_index=True)
+        .reset_index(drop=True)
+        .astype(
+            {
+                "element_code": "category",
+                "item_code": "category",
+                "fao_item": "category",
+                "fao_unit": "category",
+                "flag": "category",
+                "item": "category",
+                "item_description": "category",
+                "element": "category",
+                "unit": "category",
+                "element_description": "category",
+                "unit_short_name": "category",
+            }
+        )
+    )
 
     return combined_data
 
@@ -160,33 +215,69 @@ def add_yield_to_aggregate_regions(data: pd.DataFrame) -> pd.DataFrame:
     yield_element_code = "005419"
 
     # Check that indeed regions do not contain any data for yield.
-    assert data[(data["country"].isin(REGIONS_TO_ADD)) & (data["element_code"] == yield_element_code)].empty
+    assert data[
+        (data["country"].isin(REGIONS_TO_ADD))
+        & (data["element_code"] == yield_element_code)
+    ].empty
 
     # Gather all fields that should stay the same.
-    additional_fields = data[data["element_code"] == yield_element_code][[
-        "element", "element_description", "fao_element", "fao_unit", "unit", "unit_short_name"]].drop_duplicates()
+    additional_fields = data[data["element_code"] == yield_element_code][
+        [
+            "element",
+            "element_description",
+            "fao_element",
+            "fao_unit",
+            "unit",
+            "unit_short_name",
+        ]
+    ].drop_duplicates()
     assert len(additional_fields) == 1
 
     # Create a dataframe of production of regions.
-    data_production = data[(data["country"].isin(REGIONS_TO_ADD)) & (data["element_code"] == production_element_code)]
+    data_production = data[
+        (data["country"].isin(REGIONS_TO_ADD))
+        & (data["element_code"] == production_element_code)
+    ]
 
     # Create a dataframe of area of regions.
-    data_area = data[(data["country"].isin(REGIONS_TO_ADD)) & (data["element_code"] == area_element_code)]
+    data_area = data[
+        (data["country"].isin(REGIONS_TO_ADD))
+        & (data["element_code"] == area_element_code)
+    ]
 
     # Merge the two dataframes and create the new yield variable.
-    merge_cols = ['area_code', 'year', 'item_code', 'fao_country', 'fao_item', 'item',
-                  'item_description', 'country']
-    combined = pd.merge(data_production, data_area[merge_cols + ["flag", "value"]], on=merge_cols, how="inner",
-                        suffixes=("_production", "_area"))    
+    merge_cols = [
+        "area_code",
+        "year",
+        "item_code",
+        "fao_country",
+        "fao_item",
+        "item",
+        "item_description",
+        "country",
+    ]
+    combined = pd.merge(
+        data_production,
+        data_area[merge_cols + ["flag", "value"]],
+        on=merge_cols,
+        how="inner",
+        suffixes=("_production", "_area"),
+    )
 
     combined["value"] = combined["value_production"] / combined["value_area"]
 
     # If both fields have the same flag, use that, otherwise use the flag of multiple flags.
-    combined["flag"] = [flag_production if flag_production == flag_area else FLAG_MULTIPLE_FLAGS
-                        for flag_production, flag_area in zip(combined["flag_production"], combined["flag_area"])]
+    combined["flag"] = [
+        flag_production if flag_production == flag_area else FLAG_MULTIPLE_FLAGS
+        for flag_production, flag_area in zip(
+            combined["flag_production"], combined["flag_area"]
+        )
+    ]
 
     # Drop rows of nan and unnecessary columns.
-    combined = combined.drop(columns=["flag_production", "flag_area", "value_production", "value_area"])
+    combined = combined.drop(
+        columns=["flag_production", "flag_area", "value_production", "value_area"]
+    )
     combined = combined.dropna(subset="value").reset_index(drop=True)
 
     # Replace fields appropriately.
@@ -199,9 +290,22 @@ def add_yield_to_aggregate_regions(data: pd.DataFrame) -> pd.DataFrame:
 
     combined = combined
 
-    combined_data = pd.concat([data, combined], ignore_index=True).reset_index(drop=True).astype({
-        "element_code": "category", "fao_element": "category", "fao_unit": "category", "flag": "category",
-        "element": "category", "unit": "category", "element_description": "category", "unit_short_name": "category"})
+    combined_data = (
+        pd.concat([data, combined], ignore_index=True)
+        .reset_index(drop=True)
+        .astype(
+            {
+                "element_code": "category",
+                "fao_element": "category",
+                "fao_unit": "category",
+                "flag": "category",
+                "element": "category",
+                "unit": "category",
+                "element_description": "category",
+                "unit_short_name": "category",
+            }
+        )
+    )
 
     return combined_data
 
@@ -214,10 +318,16 @@ def run(dest_dir: str) -> None:
     # Dataset short name.
     dataset_short_name = f"{NAMESPACE}_qcl"
     # Path to latest dataset in meadow for current FAOSTAT domain.
-    meadow_data_dir = sorted((DATA_DIR / "meadow" / NAMESPACE).glob(f"*/{dataset_short_name}"))[-1].parent /\
-        dataset_short_name
+    meadow_data_dir = (
+        sorted((DATA_DIR / "meadow" / NAMESPACE).glob(f"*/{dataset_short_name}"))[
+            -1
+        ].parent
+        / dataset_short_name
+    )
     # Path to dataset of FAOSTAT metadata.
-    garden_metadata_dir = DATA_DIR / "garden" / NAMESPACE / VERSION / f"{NAMESPACE}_metadata"
+    garden_metadata_dir = (
+        DATA_DIR / "garden" / NAMESPACE / VERSION / f"{NAMESPACE}_metadata"
+    )
 
     ####################################################################################################################
     # Load data.
@@ -234,11 +344,17 @@ def run(dest_dir: str) -> None:
 
     # Load and prepare dataset, items, element-units, and countries metadata.
     datasets_metadata = pd.DataFrame(metadata["datasets"]).reset_index()
-    datasets_metadata = datasets_metadata[datasets_metadata["dataset"] == dataset_short_name].reset_index(drop=True)
+    datasets_metadata = datasets_metadata[
+        datasets_metadata["dataset"] == dataset_short_name
+    ].reset_index(drop=True)
     items_metadata = pd.DataFrame(metadata["items"]).reset_index()
-    items_metadata = items_metadata[items_metadata["dataset"] == dataset_short_name].reset_index(drop=True)
+    items_metadata = items_metadata[
+        items_metadata["dataset"] == dataset_short_name
+    ].reset_index(drop=True)
     elements_metadata = pd.DataFrame(metadata["elements"]).reset_index()
-    elements_metadata = elements_metadata[elements_metadata["dataset"] == dataset_short_name].reset_index(drop=True)
+    elements_metadata = elements_metadata[
+        elements_metadata["dataset"] == dataset_short_name
+    ].reset_index(drop=True)
     countries_metadata = pd.DataFrame(metadata["countries"]).reset_index()
 
     ####################################################################################################################
@@ -250,8 +366,12 @@ def run(dest_dir: str) -> None:
     data = harmonize_elements(df=data)
 
     # Prepare data.
-    data = clean_data(data=data, items_metadata=items_metadata, elements_metadata=elements_metadata,
-                      countries_metadata=countries_metadata)
+    data = clean_data(
+        data=data,
+        items_metadata=items_metadata,
+        elements_metadata=elements_metadata,
+        countries_metadata=countries_metadata,
+    )
 
     # Include number of slaughtered animals in total meat (which is missing).
     data = add_slaughtered_animals_to_meat_total(data=data)
@@ -272,7 +392,9 @@ def run(dest_dir: str) -> None:
     data_table_long = prepare_long_table(data=data)
 
     # Create a wide table (with only country and year as index).
-    data_table_wide = prepare_wide_table(data=data, dataset_title=datasets_metadata["owid_dataset_title"].item())
+    data_table_wide = prepare_wide_table(
+        data=data, dataset_title=datasets_metadata["owid_dataset_title"].item()
+    )
 
     ####################################################################################################################
     # Save outputs.
@@ -283,7 +405,9 @@ def run(dest_dir: str) -> None:
     # Prepare metadata for new garden dataset (starting with the metadata from the meadow version).
     dataset_garden_metadata = deepcopy(dataset_meadow.metadata)
     dataset_garden_metadata.version = VERSION
-    dataset_garden_metadata.description = datasets_metadata["owid_dataset_description"].item()
+    dataset_garden_metadata.description = datasets_metadata[
+        "owid_dataset_description"
+    ].item()
     dataset_garden_metadata.title = datasets_metadata["owid_dataset_title"].item()
     # Add metadata to dataset.
     dataset_garden.metadata = dataset_garden_metadata
