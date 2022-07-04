@@ -268,8 +268,6 @@ def run(dest_dir: str) -> None:
     # Remove outliers from data.
     data = remove_outliers(data)
 
-    # TODO: Run more sanity checks (i.e. compare with previous version of the same domain).
-
     # Create a long table (with item code and element code as part of the index).
     data_table_long = prepare_long_table(data=data)
 

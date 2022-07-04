@@ -359,6 +359,14 @@ def clean_global_elements_dataframe(elements_df: pd.DataFrame, custom_elements: 
 def clean_global_countries_dataframe(countries_in_data: pd.DataFrame, country_groups: Dict[str, List[str]],
                                      countries_harmonization: Dict[str, str]) -> pd.DataFrame:
     countries_df = countries_in_data.copy()
+
+    # Remove duplicates of area_code and fao_country, ensuring to keep m49_code when it is given.
+    if "m49_code" in countries_df.columns:
+        # Sort so that nans in m49_code are at the bottom, and then keep only the first duplicated row.
+        countries_df = countries_df.sort_values("m49_code")
+    countries_df = countries_df.drop_duplicates(subset=["area_code", "fao_country"], keep="first").\
+        sort_values(["area_code"]).reset_index(drop=True)
+
     countries_not_harmonized = sorted(set(countries_df["fao_country"]) - set(countries_harmonization))
     if len(countries_not_harmonized) > 0:
         log.info(f"{len(countries_not_harmonized)} countries not included in countries file. "
@@ -392,7 +400,7 @@ def create_table(df: pd.DataFrame, short_name: str, index_cols: List[str]) -> ca
     table = optimize_table_dtypes(table)
 
     # Set indexes and other necessary metadata.
-    table = table.set_index(index_cols)
+    table = table.set_index(index_cols, verify_integrity=True)
     table.metadata.short_name = short_name
     table.metadata.primary_key = index_cols
 
@@ -475,22 +483,25 @@ def process_metadata(metadata: catalog.Dataset, custom_datasets: pd.DataFrame, c
 
     # Initialise list of all countries in all datasets, and all country groups.
     countries_in_data = pd.DataFrame({"area_code": [], "fao_country": []}).astype({"area_code": "Int64"})
-    country_groups_in_data = {}
+    country_groups_in_data = {}    
+
     # Gather all variables from the latest version of each meadow dataset.
     for dataset_short_name in tqdm(dataset_short_names, file=sys.stdout):
         # Load latest meadow table for current dataset.
         table = load_latest_data_table_for_dataset(dataset_short_name=dataset_short_name)
         df = pd.DataFrame(table.reset_index()).rename(
             columns={"area": "fao_country", "recipient_country": "fao_country",
-                     "recipient_country_code": "area_code"})
+                     "recipient_country_code": "area_code"})[["area_code", "fao_country"]]
 
-        # Column 'area_code' in faostat_sdgb is float instead of integer, and it does not seem to agree
-        # with the usual area codes. For example, Afghanistan has area code 4.0 in faostat_sdgb, whereas
-        # in other dataset it is 2. Also, there are area codes in faostat_sdgb with many decimals, like area
-        # "FAO Major Fishing Area: Atlantic, Eastern Central (14.4.1)", which has area code 920.710022.
-        # Therefore, we make these area codes nans if they are not integers.
+        # Column 'area_code' in faostat_sdgb is float instead of integer, and it does not agree with the usual area
+        # codes. For example, Afghanistan has area code 4.0 in faostat_sdgb, whereas in other dataset it is 2.
+        # It seems to be the UN M49 code.
+        # So we add this code as a new column to the countries dataframe, to be able to map sdgb area codes later on.
         if df["area_code"].dtype == "float64":
-            df["area_code"] = pd.NA
+            sdgb_codes_df = metadata["faostat_sdgb_area"].reset_index()[["country_code", "m49_code"]].\
+                rename(columns={"country_code": "area_code"})
+            df = pd.merge(df.rename(columns={"area_code": "m49_code"}), sdgb_codes_df, on="m49_code", how="left")
+
         df["area_code"] = df["area_code"].astype("Int64")
 
         check_that_all_flags_in_dataset_are_in_ranking(
@@ -507,7 +518,7 @@ def process_metadata(metadata: catalog.Dataset, custom_datasets: pd.DataFrame, c
             table=table, metadata=metadata, dataset_short_name=dataset_short_name)
 
         # Add countries in this dataset to the list of all countries.
-        countries_in_data = pd.concat([countries_in_data, df[["area_code", "fao_country"]]]).drop_duplicates()
+        countries_in_data = pd.concat([countries_in_data, df]).drop_duplicates()
 
         # Get country groups in this dataset.
         area_group_table_name = f"{dataset_short_name}_area_group"
@@ -600,8 +611,9 @@ def run(dest_dir: str) -> None:
 
     # Create new garden dataset with all dataset descriptions, items, element-units, and countries.
     datasets_table = create_table(df=datasets_df, short_name="datasets", index_cols=["dataset"])
-    items_table = create_table(df=items_df, short_name="items", index_cols=["item_code"])
-    elements_table = create_table(df=elements_df, short_name="elements", index_cols=["element_code"])
+    items_table = create_table(df=items_df, short_name="items", index_cols=["dataset", "item_code"])
+    elements_table = create_table(df=elements_df, short_name="elements", index_cols=["dataset", "element_code"])    
+
     countries_table = create_table(df=countries_df, short_name="countries", index_cols=["area_code"])
 
     # Add tables to dataset (no need to repack, since columns already have optimal dtypes).

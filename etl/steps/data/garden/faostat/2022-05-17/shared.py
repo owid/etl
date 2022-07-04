@@ -35,9 +35,7 @@ NAMESPACE = Path(__file__).parent.parent.name
 VERSION = Path(__file__).parent.name
 
 
-########################################################################################################################
 # Elements and items.
-########################################################################################################################
 
 # Maximum number of characters for item_code.
 # FAOSTAT "item_code" is usually an integer number, however sometimes it has decimals and sometimes it contains letters.
@@ -79,9 +77,7 @@ ITEM_AMENDMENTS = {
 }
 
 
-########################################################################################################################
 # Countries and regions.
-########################################################################################################################
 
 # When creating region aggregates for a certain variable in a certain year, we want to ensure that we have enough
 # data to create the aggregate. There is no straightforward way to do so. Our criterion is to:
@@ -246,9 +242,7 @@ HISTORIC_TO_CURRENT_REGION = {
 }
 
 
-########################################################################################################################
 # Flags.
-########################################################################################################################
 
 # We have created a manual ranking of FAOSTAT flags. These flags are only used when there is ambiguity in the data,
 # namely, when there is more than one data value for a certain country-year-item-element-unit.
@@ -322,9 +316,7 @@ FLAGS_RANKING = (
 )
 
 
-########################################################################################################################
 # Identified outliers.
-########################################################################################################################
 
 # Outliers to remove (data points that are wrong and create artefacts in the charts).
 # For each dictionary, all possible combinations of the field values will be considered
@@ -344,10 +336,7 @@ OUTLIERS_TO_REMOVE = [
     }
 ]
 
-
-########################################################################################################################
 # Additional descriptions.
-########################################################################################################################
 
 # Additional explanation to append to element description for variables that were originally given per capita.
 WAS_PER_CAPITA_ADDED_ELEMENT_DESCRIPTION = "Originally given per-capita, and converted into total figures by " \
@@ -360,9 +349,7 @@ NEW_PER_CAPITA_ADDED_ELEMENT_DESCRIPTION = "Per-capita values are obtained by di
 ADDED_TITLE_TO_WIDE_TABLE = " - Flattened table indexed by country-year."
 
 
-########################################################################################################################
 # Shared functions.
-########################################################################################################################
 
 def check_that_countries_are_well_defined(data: pd.DataFrame) -> None:
     # Ensure area codes and countries are well defined, and no ambiguities were introduced when mapping country names.
@@ -433,20 +420,23 @@ def harmonize_elements(df: pd.DataFrame, element_col: str = "element") -> pd.Dat
 
 def harmonize_countries(data: pd.DataFrame, countries_metadata: pd.DataFrame) -> pd.DataFrame:
     data = data.copy()
-
     if data["area_code"].dtype == "float64":
         # This happens at least for faostat_sdgb, where area code is totally different to the usual one.
         # See further explanations in garden step for faostat_metadata.
         # When this happens, merge using the old country name instead of the area code.
-        data = pd.merge(data, countries_metadata[["fao_country", "country"]], on="fao_country", how="left")
+        data = pd.merge(data.rename(columns={"area_code": "m49_code"}),
+                        countries_metadata[["area_code", "m49_code", "fao_country", "country"]].rename(
+                            columns={"fao_country": "fao_country_check"}),
+                        on="m49_code", how="left").drop(columns="m49_code")
     else:
         # Add harmonized country names (from countries metadata) to data.
         data = pd.merge(data, countries_metadata[["area_code", "fao_country", "country"]].
-                        rename(columns={"fao_country": "fao_country_check"}), on="area_code", how="left")
-        # Sanity check.
-        error = "Mismatch between fao_country in data and in metadata."
-        assert (data["fao_country"].astype(str) == data["fao_country_check"]).all(), error
-        data = data.drop(columns="fao_country_check")
+                        rename(columns={"fao_country": "fao_country_check"}), on="area_code", how="left")        
+
+    # Sanity check.
+    error = "Mismatch between fao_country in data and in metadata."
+    assert (data["fao_country"].astype(str) == data["fao_country_check"]).all(), error
+    data = data.drop(columns="fao_country_check")
 
     # Remove unmapped countries.
     data = data[data["country"].notnull()].reset_index(drop=True)
@@ -784,7 +774,7 @@ def remove_outliers(data: pd.DataFrame) -> pd.DataFrame:
 
     # Quickly find out if there will be rows to drop in current dataset; if not, ignore.
     if (len(set(rows_to_drop["item_code"]) & set(data["item_code"])) > 0) & \
-        (len(set(rows_to_drop["element_code"]) & set(data["element_code"])) > 0):
+            (len(set(rows_to_drop["element_code"]) & set(data["element_code"])) > 0):
         log.info(f"Removing {len(rows_to_drop)} rows of outliers.")
 
         # Get indexes of data that correspond to the rows we want to drop.
@@ -1311,8 +1301,6 @@ def run(dest_dir: str) -> None:
 
     # Remove outliers (this step needs to happen after creating regions and per capita variables).
     data = remove_outliers(data)
-
-    # TODO: Run more sanity checks (i.e. compare with previous version of the same domain).
 
     # Create a long table (with item code and element code as part of the index).
     data_table_long = prepare_long_table(data=data)
