@@ -4,8 +4,8 @@ import re
 import itertools
 import math
 import pandas as pd
-
-
+from structlog import get_logger
+from pathlib import Path
 from typing import Tuple
 
 from owid.walden import Catalog
@@ -13,41 +13,75 @@ from owid.catalog import Dataset, Table, DatasetMeta, TableMeta
 from owid.catalog.utils import underscore
 
 BASE_URL = "https://unstats.un.org/sdgapi"
+log = get_logger()
 
 
 def run(dest_dir: str) -> None:
     # retrieves raw data from walden
-    # version = Path(__file__).parent.stem
-    # fname = Path(__file__).stem
-    # namespace = Path(__file__).parent.parent.stem
+    version = Path(__file__).parent.stem
+    fname = Path(__file__).stem
+    namespace = Path(__file__).parent.parent.stem
 
-    version = "2022-05-26"
-    fname = "un_sdg"
-    namespace = "un_sdg"
+    # version = "2022-05-26"
+    # namespace = "un_sdg"
+    # fname = "un_sdg"
     walden_ds = Catalog().find_one(
         namespace=namespace, short_name=fname, version=version
     )
     local_file = walden_ds.ensure_downloaded()
     df = pd.read_csv(local_file, low_memory=False)
     df = load_and_clean(df)
-
-    # drops rows with only NaN in the year column
-    years = "Time_Detail"
-    df.dropna(subset=years, how="all", inplace=True)
-    df.shape
+    log.info(f"Size of dataframe", rows=df.shape[0], colums=df.shape[1])
     full_df = create_dataframe(df)
-    full_df.shape
+    full_df = full_df[
+        [
+            "Country",
+            "Year",
+            "variable_name",
+            "Source",
+            "Value",
+            "Units_long",
+            "short_unit",
+        ]
+    ]
+    full_df = full_df.set_index(
+        ["Country", "Year", "variable_name"], verify_integrity=True
+    )  # verify_integrity checks for duplicates
+    log.info(f"Size of dataframe", rows=full_df.shape[0], colums=full_df.shape[1])
 
     assert full_df["Country"].notnull().all()
     assert full_df["variable_name"].notnull().all()
+    assert (
+        full_df[
+            (
+                full_df[["Country", "Year", "variable_name", "Value"]].duplicated(
+                    keep=False
+                )
+            )
+        ].shape[0]
+        == 0
+    ), "Unexpected duplicates in dataframe."
+    assert (
+        not full_df.isnull().all(axis=1).any()
+    ), "Unexpected state: One or more rows contains only NaN values."
 
-    full_df[
-        (full_df[["Country", "Time_Detail", "variable_name", "Value"]].duplicated())
-        & (full_df["SeriesCode"] == "EN_ATM_CO2")
-        & (full_df["Country"] == "Other Africa (IEA)")
-    ]
-
-    return full_df
+    # creates the dataset and adds a table
+    ds = Dataset.create_empty(dest_dir)
+    ds.metadata = DatasetMeta(
+        short_name=walden_ds.short_name,
+        title=walden_ds.name,
+        namespace=walden_ds.namespace,
+        description=walden_ds.description,
+    )
+    tb = Table(full_df)
+    tb.metadata = TableMeta(
+        short_name=Path(__file__).stem,
+        title=walden_ds.name,
+        description=walden_ds.description,
+        primary_key=list(full_df.index.names),
+    )
+    ds.add(tb)
+    ds.save()
 
 
 def create_dataframe(original_df: pd.DataFrame) -> None:
@@ -225,13 +259,16 @@ def dimensions_description() -> pd.DataFrame:
 
 def load_and_clean(original_df: pd.DataFrame) -> pd.DataFrame:
     # Load and clean the data
-    print("Reading in original data...")
+    log.info("Reading in original data...")
     # removing values that aren't numeric e.g. Null and N values
     original_df.dropna(subset=["Value"], inplace=True)
+    original_df.dropna(subset=["TimePeriod"], how="all", inplace=True)
     original_df = original_df[
         pd.to_numeric(original_df["Value"], errors="coerce").notnull()
     ]
-    original_df.rename(columns={"GeoAreaName": "Country"}, inplace=True)
+    original_df.rename(
+        columns={"GeoAreaName": "Country", "TimePeriod": "Year"}, inplace=True
+    )
     return original_df
 
 
