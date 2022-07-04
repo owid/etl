@@ -700,10 +700,10 @@ def add_custom_names_and_descriptions(
 ) -> pd.DataFrame:
     data = data.copy()
 
-    error = f"There are missing item codes in metadata."
+    error = "There are missing item codes in metadata."
     assert set(data["item_code"]) <= set(items_metadata["item_code"]), error
 
-    error = f"There are missing element codes in metadata."
+    error = "There are missing element codes in metadata."
     assert set(data["element_code"]) <= set(elements_metadata["element_code"]), error
 
     _expected_n_rows = len(data)
@@ -715,7 +715,7 @@ def add_custom_names_and_descriptions(
     )
     assert (
         len(data) == _expected_n_rows
-    ), f"Something went wrong when merging data with items metadata."
+    ), "Something went wrong when merging data with items metadata."
 
     data = pd.merge(
         data.rename(columns={"element": "fao_element", "unit": "fao_unit"}),
@@ -734,7 +734,7 @@ def add_custom_names_and_descriptions(
     )
     assert (
         len(data) == _expected_n_rows
-    ), f"Something went wrong when merging data with elements metadata."
+    ), "Something went wrong when merging data with elements metadata."
 
     # `category` type was lost during merge, convert it back
     data = data.astype(

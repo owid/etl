@@ -312,7 +312,7 @@ def clean_global_items_dataframe(
         columns={"fao_item_description_new": "fao_item_description"}
     )
 
-    error = f"Item names may have changed with respect to custom items file. Update custom items file."
+    error = "Item names may have changed with respect to custom items file. Update custom items file."
     assert (
         items_df[items_df["fao_item_check"].notnull()]["fao_item_check"]
         == items_df[items_df["fao_item_check"].notnull()]["fao_item"]
@@ -505,14 +505,14 @@ def clean_global_elements_dataframe(
         }
     )
 
-    error = f"Element names have changed with respect to custom elements file. Update custom elements file."
+    error = "Element names have changed with respect to custom elements file. Update custom elements file."
     assert (
         elements_df[elements_df["fao_element_check"].notnull()]["fao_element_check"]
         == elements_df[elements_df["fao_element_check"].notnull()]["fao_element"]
     ).all(), error
     elements_df = elements_df.drop(columns=["fao_element_check"])
 
-    error = f"Unit names have changed with respect to custom elements file. Update custom elements file."
+    error = "Unit names have changed with respect to custom elements file. Update custom elements file."
     assert (
         elements_df[elements_df["fao_unit_short_name_check"].notnull()][
             "fao_unit_short_name_check"

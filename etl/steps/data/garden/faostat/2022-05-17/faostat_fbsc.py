@@ -131,12 +131,12 @@ def run(dest_dir: str) -> None:
     ####################################################################################################################
 
     # Find path to latest versions of fbsh dataset.
-    fbsh_version = sorted((DATA_DIR / "meadow" / NAMESPACE).glob(f"*/faostat_fbsh"))[
+    fbsh_version = sorted((DATA_DIR / "meadow" / NAMESPACE).glob("*/faostat_fbsh"))[
         -1
     ].parent.name
     fbsh_file = DATA_DIR / "meadow" / NAMESPACE / fbsh_version / "faostat_fbsh"
     # Find path to latest versions of fbs dataset.
-    fbs_version = sorted((DATA_DIR / "meadow" / NAMESPACE).glob(f"*/faostat_fbs"))[
+    fbs_version = sorted((DATA_DIR / "meadow" / NAMESPACE).glob("*/faostat_fbs"))[
         -1
     ].parent.name
     fbs_file = DATA_DIR / "meadow" / NAMESPACE / fbs_version / "faostat_fbs"
