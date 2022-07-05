@@ -6,7 +6,7 @@
 provides free access to food and agriculture data from 1961 to the most recent year available.
 
 The data is distributed among different domains, each one with a unique dataset code (e.g. `qcl`).
-We will create a new dataset (named, e.g. `faostat_qcl`) for each domain, although we are not including all FAOSTAT
+We create a new dataset (named, e.g. `faostat_qcl`) for each domain, although we are not including all FAOSTAT
 domains, only the ones listed below in section [Output datasets](##output-datasets).
 
 The main data from each domain is downloaded as a file.
@@ -22,24 +22,23 @@ Each FAO dataset is typically given as a long table with the following columns:
 * `Area`: FAO name of the country/region. It contains countries and continents, but also geographical regions (e.g.
   Polynesia), and other aggregations (e.g. Developing regions).
 * `Item Code`: Identifier code for items.
-* `Item`: Relevant item (e.g. 'Olive oil').
+* `Item`: Item name (e.g. 'Olive oil').
 * `Element Code`: Identifier code for element-units. It is possible to find multiple elements with the same element 
   code, if there are multiple units for the same element (e.g. `faostat_qcl` has element codes 5513 and 5510 for element
-  'Production', but they have different units, namely 'thousand number' and 'tonnes').
+  'Production', because they have different units, namely 'thousand number' and 'tonnes').
 * `Element`: Variable measured (e.g. 'Area harvested').
 * `Year Code`: Identifier code for year. We ignore this field, since it is almost identical to `Year`, and does not
-  add any information to column `Year`.
+  add any information to it.
 * `Year`: Year. It is given almost always as an integer value. But sometimes (e.g. in the `faostat_fs` dataset) it is a
   range of years (e.g. '2010-2012').
 * `Unit`: Unit of measurement of the specific element (e.g. 'hectares').
 * `Value`: Actual value of the specific data point.
-* `Flag`: Short text (e.g. `A`) informing of the source or of possible issues of the data point. We used these flags
+* `Flag`: Short text (e.g. `A`) informing of the source or of possible issues of a data point. We use these flags
   only to prioritize data points in cases of ambiguity.
 
 However, there are some datasets with different columns, namely:
 * `faostat_fa` contains `Recipient Country` and `Recipient Country Code` instead of `Area` and `Area Code`.
-* Datasets `faostat_fa`, `faostat_fs`, and `faostat_sdgb` contain an additional field called `Note`, which we will
-  disregard.
+* Datasets `faostat_fa`, `faostat_fs`, and `faostat_sdgb` contain an additional field called `Note`, which we disregard.
 
 The data can be manually inspected on [their website](https://www.fao.org/faostat/en/#data/domains_table).
 The dataset code can be typed on the search bar to select data of a specific domain.
@@ -83,16 +82,16 @@ Each dataset `faostat_*` contains only one table:
     * `year`: Year (usually an integer, but sometimes a range, e.g. '2010-2012').
     * `element_code`: FAO element code.
     * `item_code`: FAO item code.
-    * `area_code`: FAO country code.
+    * `area_code`: FAO country/region code.
   * Columns:
-    * `area`: FAO country name.
+    * `area`: FAO country/region name.
     * `item`: FAO item name.
     * `element`: FAO element name.
-    * `unit`: FAO unit.
+    * `unit`: FAO unit name (a short name).
     * `value`: Data value.
     * `flag`: Flag for current data point.
 
-Exceptionally, one dataset has different column names, namely:
+Exceptionally, one dataset has different column names:
 * `faostat_fa`, that contains `recipient_country_code` instead of `area_code` in the index, and column
   `recipient_country` instead of `area`.
 
@@ -104,10 +103,10 @@ There is an additional dataset:
 ### Garden (processed) datasets
 
 The list of garden datasets is identical to the list of meadow datasets, except for the following changes:
-* Datasets `faostat_fbsh` and `faostat_fbs` are not be present.
+* Datasets `faostat_fbsh` and `faostat_fbs` are not present.
 * `faostat_fbsc`: Food Balances Combined. This dataset is the combination of `faostat_fbsh` and `faostat_fbs`.
-* `faostat_food_explorer`: Dataset feeding the global food explorer.
-  It uses data from the `faostat_fbsc` and `faostat_qcl` garden datasets.
+* `faostat_food_explorer`: Dataset that generates the data that is ingested by the food explorer step
+  (see [below](###explorers)). It uses data from the `faostat_fbsc` and `faostat_qcl` garden datasets.
 * `faostat_metadata`: This dataset mainly feeds from the meadow `faostat_metadata`, but it also loads the `custom_*`
   files, and each individual meadow dataset.
 
@@ -125,17 +124,17 @@ All datasets `faostat_*` (except `faostat_metadata`) contain two tables:
     * `fao_item`: Original FAO item name.
     * `element`: Customized element name.
     * `fao_element`: Original FAO element name. This is only meaningful if the variable existed in the original dataset;
-      for example, OWID-generated per-capita variables did not exist in the original dataset, therefore the `fao_element`
-      is irrelevant.
+      for example, OWID-generated per-capita variables did not exist in the original dataset, therefore their
+      `fao_element` is irrelevant.
     * `unit`: Customized unit name (long version).
     * `unit short name`: Customized unit name (short version).
     * `fao_unit_short_name`: Original FAO unit name (short version).
     * `item_description`: Customized item description.
     * `element_description`: Customized element description.
-    * `flag`: Original FAO flags (with some small modifications).
+    * `flag`: Original FAO flag (with some modifications).
     * `population_with_data`: Population of a country, or, for aggregate regions, the population of countries in the
       region for which there was data to aggregate.
-    * `value`: Actual data values.
+    * `value`: Actual data value.
 * `faostat_*_flat`: Flattened table in wide format.
   * Indexes:
     * `country`: Harmonized country/region name.
@@ -150,8 +149,9 @@ The `faostat_metadata` contains the following tables:
   * Columns:
     * `fao_country`: Original FAO country/region name.
     * `country`: Harmonized country/region name.
-    * `members`: Members of each country/region (if any).
-* `datasets`: Metadata related to datasets titles and descriptions.
+    * `members`: Members of each country/region, if any (e.g. the list of members for 'Europe' will contain the
+      harmonized names of all current European countries).
+* `datasets`: Metadata related to dataset titles and descriptions.
   * Indexes:
     * `dataset`: Dataset short name.
   * Columns:
@@ -169,7 +169,7 @@ The `faostat_metadata` contains the following tables:
     * `element_description`: Customized element description.
     * `fao_element_description`: Original FAO element description.
     * `unit`: Customized unit name (long version).
-    * `fao_unit`: Original FAO unit name (long versino).
+    * `fao_unit`: Original FAO unit name (long version).
     * `unit_short_name`: Customized unit name (short version).
     * `fao_unit_short_name`: Original FAO unit (short version).
     * `owid_unit_factor`: Factor by which data should be multiplied to.
@@ -210,7 +210,7 @@ If no dataset requires an update, the workflow stops here.
 ```bash
 python vendor/walden/ingests/faostat.py
 ```
-2. Execute this script for the meadow channel.
+2. Create new meadow steps.
 ```bash
 python etl/scripts/faostat/create_new_steps.py -c meadow
 ```
@@ -218,7 +218,7 @@ python etl/scripts/faostat/create_new_steps.py -c meadow
 ```bash
 etl meadow/faostat/YYYY-MM-DD
 ```
-4. Run this script again for the garden channel.
+4. Create new garden steps.
 ```bash
 python etl/scripts/faostat/create_new_steps.py -c garden
 ```
@@ -226,7 +226,7 @@ python etl/scripts/faostat/create_new_steps.py -c garden
 ```bash
 etl garden/faostat/YYYY-MM-DD
 ```
-6. Run this script again for the grapher channel.
+6. Create new grapher steps.
 ```bash
 python etl/scripts/faostat/create_new_steps.py -c grapher
 ```
@@ -239,16 +239,16 @@ accept or reject changes.
 
 ## Workflow to make changes to a dataset
 
-### Adding outliers
+### Removing outliers
 
 If a new outlier in a dataset is detected, it can be added to `OUTLIERS_TO_REMOVE` in the latest garden `shared.py`
 module.
 Since that module is not a data step itself, `etl` will not recognise that there has been a change.
 Therefore, the garden step of the dataset with the outlier has to be forced (using the `--force` flag).
 
-### Adding or removing a dataset
+### Adding or removing a domain
 
-To add or remove a new dataset, in principle it should be enough to add or remove its dataset code from the
+To add or remove a new domain, in principle it should be enough to add or remove its dataset code from the
 `INCLUDED_DATASETS_CODES` list in walden's `ingests/faostat.py` script.
 With this change, the next time that script is executed, it will only search for updates for the new list of datasets.
 And then, the `create_new_steps.py` should only create steps for datasets (among those in the new lists) that have been
@@ -333,8 +333,8 @@ folder, which contains the following columns:
   be present in region aggregates (meaning continents and income groups will miss this element). If it is `sum`, the
   values of the elements of the members of the region will be added together for each year. 
 * `was_per_capita`: 1 if the original element was given per capita, 0 otherwise. If it is 1, it will be multiplied by
-  the population given by FAOSTAT (if it is given, otherwise the execution of the corresponding garden step will raise
-  an assertion error, in which case the variable should be kept as per-capita).
+  the population given by FAOSTAT (if this population is given, otherwise the execution of the corresponding garden step
+  will raise an assertion error, in which case the variable should be kept as per-capita).
 * `make_per_capita`: 1 to create an additional per-capita element, 0 otherwise. If it is 1, the element will be divided
   by the OWID population. The element code of the new variable will be the same as the original element code, but with
   the letters `pc` prepended (e.g. the per-capita variable of the original element with code `001234` will be `pc1234`).
@@ -348,7 +348,7 @@ NOTE:
 
 ## Data harmonization
 
-In the garden steps, several fields need to be harmonized.
+In the garden steps, several fields are harmonized.
 
 ### Harmonization of year
 
@@ -413,5 +413,5 @@ As an exception, item codes from `faostat_sdgb` can have more than 8 characters.
 ### Harmonization of element code
 
 We have not identified issues with element codes like those in item codes.
-However, for consistency (and just in case similar issues occur in the future), we also converted element code into a
-string of 6 digits (e.g. 1234 -> '001234').
+However, for consistency (and just in case similar issues occur in the future), we also convert element codes into
+strings of 6 digits (e.g. 1234 -> '001234').
