@@ -27,7 +27,7 @@ steps:
   data://meadow/gapminder/2019-12-10/population:
     - walden://gapminder/2019-12-10/population
   data://meadow/hyde/2017/baseline:
-    - walden://hyde/2017/baseline
+    - snapshot://hyde/2017/baseline.zip
     - data://meadow/hyde/2017/general_files
   data://meadow/hyde/2017/general_files:
     - walden://hyde/2017/general_files
@@ -56,7 +56,7 @@ steps:
   data://grapher/wb/2022-10-29/wb_gender:
     - data://garden/wb/2022-10-29/wb_gender
   data://garden/ggdc/2020-10-01/ggdc_maddison:
-    - walden://ggdc/2020-10-01/ggdc_maddison
+    - snapshot://ggdc/2020-10-01/ggdc_maddison.xlsx
   data://grapher/ggdc/2020-10-01/ggdc_maddison:
     - data://garden/ggdc/2020-10-01/ggdc_maddison
   data://meadow/worldbank_wdi/2022-05-26/wdi:

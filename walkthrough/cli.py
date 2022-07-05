@@ -5,9 +5,9 @@ import click
 from pywebio import start_server
 from rich import print
 
-from . import garden, grapher, meadow, walden
+from . import garden, grapher, meadow, snapshot, walden
 
-PHASES = Literal["walden", "meadow", "garden", "grapher"]
+PHASES = Literal["walden", "snapshot", "meadow", "garden", "grapher"]
 
 
 @click.command()
@@ -36,6 +36,8 @@ def cli(phase: Iterable[PHASES], run_checks: bool, dummy_data: bool, auto_open: 
     print("Walkthrough has been opened at http://localhost:8082/")
     if phase == "walden":
         phase_func = walden.app
+    elif phase == "snapshot":
+        phase_func = snapshot.app
     elif phase == "meadow":
         phase_func = meadow.app
     elif phase == "garden":

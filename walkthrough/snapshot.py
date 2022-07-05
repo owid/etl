@@ -19,10 +19,10 @@ class Options(Enum):
     IS_PRIVATE = "Make dataset private"
 
 
-class WaldenForm(BaseModel):
+class SnapshotForm(BaseModel):
 
     namespace: str
-    walden_version: str
+    snapshot_version: str
     short_name: str
     name: str
     source_name: str
@@ -43,15 +43,13 @@ class WaldenForm(BaseModel):
 
     @property
     def version(self) -> str:
-        return self.walden_version or self.publication_year or self.publication_date  # type: ignore
+        return self.snapshot_version or self.publication_year or self.publication_date  # type: ignore
 
 
 def app(run_checks: bool, dummy_data: bool) -> None:
     dummies = utils.DUMMY_DATA if dummy_data else {}
 
-    po.put_error("Walden has been deprecated, please use `walkthrough snapshot` instead")
-
-    with open(CURRENT_DIR / "walden.md", "r") as f:
+    with open(CURRENT_DIR / "snapshot.md", "r") as f:
         po.put_markdown(f.read())
 
     # run checks
@@ -73,11 +71,11 @@ def app(run_checks: bool, dummy_data: bool) -> None:
             ),
             pi.input(
                 "Version",
-                name="walden_version",
+                name="snapshot_version",
                 placeholder=str(dt.date.today()),
                 help_text="E.g. current date, publication date or year is used if not given",
                 required=False,
-                value=dummies.get("walden_version", str(dt.date.today())),
+                value=dummies.get("snapshot_version", str(dt.date.today())),
             ),
             pi.input(
                 "Short name",
@@ -156,18 +154,18 @@ def app(run_checks: bool, dummy_data: bool) -> None:
             ),
         ],
     )
-    form = WaldenForm(**data)
+    form = SnapshotForm(**data)
 
     # use multi-line description
     form.description = form.description.replace("\n", "\n  ")
 
     # cookiecutter on python files
-    WALDEN_INGEST_DIR = utils.generate_step(
-        CURRENT_DIR / "walden_cookiecutter/", dict(**form.dict(), version=form.walden_version, channel="walden")
+    SNAPSHOT_DIR = utils.generate_step(
+        CURRENT_DIR / "snapshot_cookiecutter/", dict(**form.dict(), version=form.snapshot_version, channel="snapshots")
     )
 
-    ingest_path = WALDEN_INGEST_DIR / (form.short_name + ".py")
-    meta_path = WALDEN_INGEST_DIR / (form.short_name + ".meta.yml")
+    ingest_path = SNAPSHOT_DIR / (form.short_name + ".py")
+    meta_path = SNAPSHOT_DIR / f"{form.short_name}.{form.file_extension}.dvc"
 
     po.put_markdown(
         f"""
@@ -177,25 +175,22 @@ def app(run_checks: bool, dummy_data: bool) -> None:
 
 2. Test your ingest script with
 ```bash
-python vendor/walden/ingests/{form.namespace}/{form.version}/{form.short_name}.py --skip-upload
+python snapshots/{form.namespace}/{form.version}/{form.short_name}.py --skip-upload
 ```
 
 3. Once you are happy with the ingest script, run it without the `--skip-upload` flag to upload files to S3. Running it again will overwrite the dataset.
 
-4. Commit changes to walden (if you develop locally you don't need to commit it, but you need to upload the dataset to S3)
+4. Exit the process and run next step with `poetry run walkthrough meadow`
 
-5. Exit the process and run next step with `poetry run walkthrough meadow`
-
-## Getting dataset from Walden
-
-If you have uploaded your dataset to Walden, you can get it from Walden catalog with the following snippet (to be used in meadow phase).
+## Loading snapshots
 
 ```python
-from owid.walden import Catalog as WaldenCatalog
+from etl.snapshot import Snapshot
+from etl.paths import SNAPSHOTS_DIR
 
-walden_ds = WaldenCatalog().find_one(namespace="{form.namespace}", short_name="{form.short_name}", version="{form.version}")
-local_file = walden_ds.ensure_downloaded()
-df = pd.read_csv(local_file)
+snap = Snapshot(SNAPSHOTS_DIR / "{form.namespace}" / "{form.version}" / "{form.short_name}.{form.file_extension}")
+# call snap.pull() if you don't have it locally in snapshots/
+df = pd.read_excel(snap.path)
 ```
 
 ## Generated files
@@ -230,6 +225,6 @@ def _check_s3_connection() -> None:
         raise e
 
     bucket_names = [b["Name"] for b in buckets]
-    if "walden" not in bucket_names:
-        po.put_error(po.put_markdown("`walden` bucket not found"))
+    if "owid-catalog" not in bucket_names:
+        po.put_error(po.put_markdown("`owid-catalog` bucket not found"))
         raise Exception()
