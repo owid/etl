@@ -128,7 +128,6 @@ All datasets `faostat_*` (except `faostat_metadata`) contain two tables:
       for example, OWID-generated per-capita variables did not exist in the original dataset, therefore the `fao_element`
       is irrelevant.
     * `unit`: Customized unit name (long version).
-    * `fao_unit`: Original FAO unit name (long version).
     * `unit short name`: Customized unit name (short version).
     * `fao_unit_short_name`: Original FAO unit name (short version).
     * `item_description`: Customized item description.
@@ -190,9 +189,10 @@ The `faostat_metadata` contains the following tables:
 ### Explorers
 
 Using data from garden, we create an additional dataset in the `explorers` channel:
-* `food_explorer`: Global food explorer. It contains the same data as the garden `faostat_food_explorer`. But, instead
-  of having a bit table with all products, each individual product is stored as a `csv` file. This data, stored in S3,
-  is the one that feeds our [Global food explorer](https://ourworldindata.org/explorers/global-food).
+* `food_explorer`: Global food explorer. It loads the data from the garden `faostat_food_explorer` (although not all of
+  its data is used), but, instead of containing a big table with all products, each individual product is stored as a
+  `csv` file. This data, stored in S3, is the one that feeds our
+  [Global food explorer](https://ourworldindata.org/explorers/global-food).
 
 ## Workflow to keep data up-to-date
 
@@ -245,6 +245,18 @@ If a new outlier in a dataset is detected, it can be added to `OUTLIERS_TO_REMOV
 module.
 Since that module is not a data step itself, `etl` will not recognise that there has been a change.
 Therefore, the garden step of the dataset with the outlier has to be forced (using the `--force` flag).
+
+### Adding or removing a dataset
+
+To add or remove a new dataset, in principle it should be enough to add or remove its dataset code from the
+`INCLUDED_DATASETS_CODES` list in walden's `ingests/faostat.py` script.
+With this change, the next time that script is executed, it will only search for updates for the new list of datasets.
+And then, the `create_new_steps.py` should only create steps for datasets (among those in the new lists) that have been
+updated.
+
+NOTE: This workflow will add or remove a dataset from a new version. To add or remove a dataset from the current
+version, the dataset needs to be manually added or removed from the dag, and the appropriate step files need to be
+created or removed from the meadow, garden or grapher step folders.
 
 ### Customizing individual fields in a dataset
 

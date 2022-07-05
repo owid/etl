@@ -378,6 +378,14 @@ ADDED_TITLE_TO_WIDE_TABLE = " - Flattened table indexed by country-year."
 
 
 def check_that_countries_are_well_defined(data: pd.DataFrame) -> None:
+    """Apply sanity checks related to the definition of countries.
+
+    Parameters
+    ----------
+    data : pd.DataFrame
+        Data, right after harmonizing country names.
+
+    """
     # Ensure area codes and countries are well defined, and no ambiguities were introduced when mapping country names.
     n_countries_per_area_code = data.groupby("area_code")["country"].transform(
         "nunique"
@@ -410,6 +418,15 @@ def check_that_countries_are_well_defined(data: pd.DataFrame) -> None:
 def check_that_regions_with_subregions_are_ignored_when_constructing_aggregates(
     countries_metadata: pd.DataFrame,
 ) -> None:
+    """Check that regions that contain subregions are ignored when constructing region aggregates, to avoid
+    double-counting those subregions.
+
+    Parameters
+    ----------
+    countries_metadata : pd.DataFrame
+        Table 'countries' from garden faostat_metadata dataset.
+
+    """
     # Check if there is any harmonized regions that contain subregions.
     # If so, they should be ignored when constructing region aggregates, to avoid double-counting them.
     countries_with_subregions = (
@@ -509,6 +526,24 @@ def harmonize_elements(df: pd.DataFrame, element_col: str = "element") -> pd.Dat
 def harmonize_countries(
     data: pd.DataFrame, countries_metadata: pd.DataFrame
 ) -> pd.DataFrame:
+    """Harmonize country names.
+
+    A new column 'country' will be added, with the harmonized country names. Column 'fao_country' will remain, to have
+    the original FAO country name as a reference.
+
+    Parameters
+    ----------
+    data : pd.DataFrame
+        Data before harmonizing country names.
+    countries_metadata : pd.DataFrame
+        Table 'countries' from garden faostat_metadata dataset.
+
+    Returns
+    -------
+    data : pd.DataFrame
+        Data after harmonizing country names.
+
+    """
     data = data.copy()
     if data["area_code"].dtype == "float64":
         # This happens at least for faostat_sdgb, where area code is totally different to the usual one.
@@ -825,6 +860,21 @@ def add_custom_names_and_descriptions(
 def remove_regions_from_countries_regions_members(
     countries_regions: pd.DataFrame, regions_to_remove: List[str]
 ) -> pd.DataFrame:
+    """Remove regions that have to be ignored from the lists of members in the countries-regions dataset.
+
+    Parameters
+    ----------
+    countries_regions : pd.DataFrame
+        Countries-regions dataset (from the OWID catalog).
+    regions_to_remove : list
+        Regions to ignore.
+
+    Returns
+    -------
+    countries_regions : pd.DataFrame
+        Countries-regions dataset after removing regions from the lists of members of each country or region.
+
+    """
     countries_regions = countries_regions.copy()
 
     # Get the owid code for each region that needs to be ignored when creating region aggregates.
@@ -846,7 +896,15 @@ def remove_regions_from_countries_regions_members(
     return countries_regions
 
 
-def _load_population() -> pd.DataFrame:
+def load_population() -> pd.DataFrame:
+    """Load OWID population dataset, and add historical regions to it.
+
+    Returns
+    -------
+    population : pd.DataFrame
+        Population dataset.
+
+    """
     # Load population dataset.
     population = (
         catalog.find("population", namespace="owid", dataset="key_indicators")
@@ -884,7 +942,16 @@ def _load_population() -> pd.DataFrame:
     return cast(pd.DataFrame, population)
 
 
-def _load_countries_regions() -> pd.DataFrame:
+def load_countries_regions() -> pd.DataFrame:
+    """Load countries-regions dataset from the OWID catalog, and remove certain regions (defined in
+    REGIONS_TO_IGNORE_IN_AGGREGATES) from the lists of members of countries or regions.
+
+    Returns
+    -------
+    countries_regions : pd.DataFrame
+        Countries-regions dataset.
+
+    """
     # Load dataset of countries and regions.
     countries_regions = catalog.find(
         "countries_regions", dataset="reference", namespace="owid"
@@ -897,7 +964,15 @@ def _load_countries_regions() -> pd.DataFrame:
     return cast(pd.DataFrame, countries_regions)
 
 
-def _load_income_groups() -> pd.DataFrame:
+def load_income_groups() -> pd.DataFrame:
+    """Load dataset of income groups and add historical regions to it.
+
+    Returns
+    -------
+    income_groups : pd.DataFrame
+        Income groups data.
+
+    """
     income_groups = (
         catalog.find(
             table="wb_income_group",
@@ -927,9 +1002,26 @@ def _load_income_groups() -> pd.DataFrame:
     return cast(pd.DataFrame, income_groups)
 
 
-def _list_countries_in_region(
+def list_countries_in_region(
     region: str, countries_regions: pd.DataFrame, income_groups: pd.DataFrame
 ) -> List[str]:
+    """List all countries in a specific region or income group.
+
+    Parameters
+    ----------
+    region : str
+        Name of the region.
+    countries_regions : pd.DataFrame
+        Countries-regions dataset (after removing certain regions from the lists of members).
+    income_groups : pd.DataFrame
+        Dataset of income groups, which includes historical regions.
+
+    Returns
+    -------
+    countries_in_regions : list
+        List of countries in the given region or income group.
+
+    """
     # Number of attempts to fetch countries regions data.
     attempts = 5
     attempt = 0
@@ -1047,9 +1139,9 @@ def add_regions(data: pd.DataFrame, elements_metadata: pd.DataFrame) -> pd.DataF
         log.info("add_regions", shape=data.shape)
 
         # Load population dataset, countries-regions, and income groups datasets.
-        population = _load_population()
-        countries_regions = _load_countries_regions()
-        income_groups = _load_income_groups()
+        population = load_population()
+        countries_regions = load_countries_regions()
+        income_groups = load_income_groups()
 
         # Invert dictionary of aggregations to have the aggregation as key, and the list of element codes as value.
         aggregations_inverted = {
@@ -1059,7 +1151,7 @@ def add_regions(data: pd.DataFrame, elements_metadata: pd.DataFrame) -> pd.DataF
             for unique_value in aggregations.values()
         }
         for region in tqdm(REGIONS_TO_ADD, file=sys.stdout):
-            countries_in_region = _list_countries_in_region(
+            countries_in_region = list_countries_in_region(
                 region, countries_regions=countries_regions, income_groups=income_groups
             )
             region_code = REGIONS_TO_ADD[region]["area_code"]
@@ -1217,7 +1309,7 @@ def add_population(
     # regions. We include them here.
 
     # Load population dataset.
-    population = _load_population().rename(
+    population = load_population().rename(
         columns={
             "country": country_col,
             "year": year_col,
