@@ -438,6 +438,24 @@ def check_that_regions_with_subregions_are_ignored_when_constructing_aggregates(
 def harmonize_items(
     df: pd.DataFrame, dataset_short_name: str, item_col: str = "item"
 ) -> pd.DataFrame:
+    """Harmonize item codes (by ensuring they are strings of numbers with a fixed length, prepended with zeros), make
+    amendments to faulty items, and make item codes and items of categorical dtype.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Data before harmonizing item codes.
+    dataset_short_name : str
+        Dataset short name.
+    item_col : str
+        Name of items column.
+
+    Returns
+    -------
+    df : pd.DataFrame
+        Data after harmonizing item codes.
+
+    """
     df = df.copy()
     # Note: Here list comprehension is faster than doing .astype(str).str.zfill(...).
     df["item_code"] = [
@@ -461,6 +479,21 @@ def harmonize_items(
 
 
 def harmonize_elements(df: pd.DataFrame, element_col: str = "element") -> pd.DataFrame:
+    """Harmonize element codes (by ensuring they are strings of numbers with a fixed length, prepended with zeros), and
+    make element codes and elements of categorical dtype.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+    element_col : str
+        Name of element column (this is only necessary to convert element column into categorical dtype).
+
+    Returns
+    -------
+    df : pd.DataFrame
+        Data after harmonizing element codes.
+
+    """
     df = df.copy()
     df["element_code"] = [
         str(element_code).zfill(N_CHARACTERS_ELEMENT_CODE)
@@ -698,6 +731,43 @@ def clean_year_column(year_column: pd.Series) -> pd.Series:
 def add_custom_names_and_descriptions(
     data: pd.DataFrame, items_metadata: pd.DataFrame, elements_metadata: pd.DataFrame
 ) -> pd.DataFrame:
+    """Add columns with custom names, descriptions and conversion factors for elements, items and units.
+
+    The returned dataframe will have the same number of rows as the ingested data, but:
+    * Column 'element' will become the customized OWID element name.
+    * A new column 'fao_element' will be added, with the original FAO element name.
+    * A new column 'element_description' will be added, with the customized OWID element description.
+    * Column 'item' will become the customized OWID item name.
+    * A new column 'fao_item' will be added, with the original FAO item name.
+    * A new column 'item_description' will be added, with the customized OWID item description.
+    * Column 'unit' will become the customized OWID unit name (long version).
+    * A new column 'unit_short_name' will be added, with the customized OWID unit name (short version).
+    * A new column 'fao_unit_short_name' will be added, with the original FAO unit name (short version).
+    * A new column 'unit_factor' will be added, with the custom factor that values have to be multiplied by (which is
+      not done by this function).
+
+    NOTE:
+    * Given that an item code can have different item names in different datasets, it is important that items_metadata
+    argument contains only item codes only for the relevant domain. For example, if data comes from the faostat_qcl
+    dataset, items_metadata should contain only items from that dataset. This can be achieved by selecting
+    `items_metadata["dataset"] == 'faostat_qcl']` before passing it to this function.
+    * The same applies to elements_metadata: For safety, it should only contain elements of the relevant domain.
+
+    Parameters
+    ----------
+    data : pd.DataFrame
+        Data for a particular domain, with harmonized item codes and element codes.
+    items_metadata : pd.DataFrame
+        Table 'items' from the garden faostat_metadata dataset, after selecting items for the current dataset.
+    elements_metadata : pd.DataFrame
+        Table 'elements' from the garden faostat_metadata dataset, after selecting elements for the current dataset.
+
+    Returns
+    -------
+    data : pd.DataFrame
+        Data after adding and editing its columns as described above.
+
+    """
     data = data.copy()
 
     error = "There are missing item codes in metadata."
@@ -718,7 +788,7 @@ def add_custom_names_and_descriptions(
     ), "Something went wrong when merging data with items metadata."
 
     data = pd.merge(
-        data.rename(columns={"element": "fao_element", "unit": "fao_unit"}),
+        data.rename(columns={"element": "fao_element", "unit": "fao_unit_short_name"}),
         elements_metadata[
             [
                 "element_code",
@@ -1031,7 +1101,7 @@ def add_regions(data: pd.DataFrame, elements_metadata: pd.DataFrame) -> pd.DataF
                                 "item_description",
                                 "unit",
                                 "unit_short_name",
-                                "fao_unit",
+                                "fao_unit_short_name",
                                 "element_description",
                             ],
                             num_allowed_nans=None,
@@ -1228,6 +1298,21 @@ def convert_variables_given_per_capita_to_total_value(
 def add_per_capita_variables(
     data: pd.DataFrame, elements_metadata: pd.DataFrame
 ) -> pd.DataFrame:
+    """Add per-capita variables to data in a long format.
+
+    Parameters
+    ----------
+    data : pd.DataFrame
+        Clean data (after harmonizing item codes and element codes, and countries, and adding aggregate regions).
+    elements_metadata : pd.DataFrame
+        Elements table from the garden faostat_metadata dataset, after selecting elements for the relevant domain.
+
+    Returns
+    -------
+    data : pd.DataFrame
+        Data with per-capita variables.
+
+    """
     data = data.copy()
 
     # Find element codes that have to be made per capita.
@@ -1300,16 +1385,24 @@ def clean_data(
     elements_metadata: pd.DataFrame,
     countries_metadata: pd.DataFrame,
 ) -> pd.DataFrame:
-    """Process data (including harmonization of countries and regions) and prepare it for new garden dataset.
+    """Process data (with already harmonized item codes and element codes), before adding aggregate regions and
+    per-capita variables.
+
+    NOTE:
+    * Given that an item code can have different item names in different datasets, it is important that items_metadata
+    argument contains only item codes only for the relevant domain. For example, if data comes from the faostat_qcl
+    dataset, items_metadata should contain only items from that dataset. This can be achieved by selecting
+    `items_metadata["dataset"] == 'faostat_qcl']` before passing it to this function.
+    * The same applies to elements_metadata: For safety, it should only contain elements of the relevant domain.
 
     Parameters
     ----------
     data : pd.DataFrame
-        Unprocessed data for current dataset.
+        Unprocessed data for current dataset (with harmonized item codes and element codes).
     items_metadata : pd.DataFrame
-        Items metadata (from the metadata dataset).
+        Items metadata (from the metadata dataset) after selecting items for only the relevant domain.
     elements_metadata : pd.DataFrame
-        Elements metadata (from the metadata dataset).
+        Elements metadata (from the metadata dataset) after selecting elements for only the relevant domain.
     countries_metadata : pd.DataFrame
         Countries metadata (from the metadata dataset).
 

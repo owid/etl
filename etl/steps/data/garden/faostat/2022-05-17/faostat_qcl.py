@@ -142,7 +142,7 @@ def add_slaughtered_animals_to_meat_total(data: pd.DataFrame) -> pd.DataFrame:
 
     # Get FAO unit for selected item code.
     _total_meat_fao_unit = data[data["item_code"] == total_meat_item_code][
-        "fao_unit"
+        "fao_unit_short_name"
     ].unique()
     assert len(_total_meat_fao_unit) == 1
     total_meat_fao_unit = _total_meat_fao_unit[0]
@@ -157,7 +157,7 @@ def add_slaughtered_animals_to_meat_total(data: pd.DataFrame) -> pd.DataFrame:
     animals["item"] = total_meat_item
     animals["item_description"] = total_meat_item_description
     animals["fao_item"] = total_meat_fao_item
-    animals["fao_unit"] = total_meat_fao_unit
+    animals["fao_unit_short_name"] = total_meat_fao_unit
 
     # Check that we are not missing any column.
     assert set(data.columns) == set(animals.columns)
@@ -171,7 +171,7 @@ def add_slaughtered_animals_to_meat_total(data: pd.DataFrame) -> pd.DataFrame:
                 "element_code": "category",
                 "item_code": "category",
                 "fao_item": "category",
-                "fao_unit": "category",
+                "fao_unit_short_name": "category",
                 "flag": "category",
                 "item": "category",
                 "item_description": "category",
@@ -228,7 +228,7 @@ def add_yield_to_aggregate_regions(data: pd.DataFrame) -> pd.DataFrame:
             "element",
             "element_description",
             "fao_element",
-            "fao_unit",
+            "fao_unit_short_name",
             "unit",
             "unit_short_name",
         ]
@@ -299,7 +299,7 @@ def add_yield_to_aggregate_regions(data: pd.DataFrame) -> pd.DataFrame:
             {
                 "element_code": "category",
                 "fao_element": "category",
-                "fao_unit": "category",
+                "fao_unit_short_name": "category",
                 "flag": "category",
                 "element": "category",
                 "unit": "category",
