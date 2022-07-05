@@ -1,0 +1,6 @@
+[core]
+    remote = storage
+['remote "storage"']
+    url = s3://owid-test/dvcstore
+    endpointurl = https://nyc3.digitaloceanspaces.com
+    acl = public-read

@@ -10,6 +10,7 @@ Definitions according to the Notes in the data file:
 """
 
 import json
+import yaml
 from typing import cast, Dict
 
 import numpy as np
@@ -221,20 +222,33 @@ def generate_ggdc_data(data_file: str) -> pd.DataFrame:
     return combined
 
 
-def run(dest_dir: str) -> None:
-    # Load dataset from walden.
-    walden_ds = Catalog().find_one(
-        namespace=NAMESPACE, version=VERSION, short_name=DATASET_NAME
-    )
+DATA_PATH = "snapshots/ggdc/2020-10-01/ggdc_maddison/ggdc_maddison.xlsx"
+META_PATH = "snapshots/ggdc/2020-10-01/ggdc_maddison/ggdc_maddison.meta.yml"
 
+
+# NOTE: dotdict is a hack to avoid rewriting `convert_walden_metadata`
+# this would be obviously done differently in production (e.g. by loading
+# metadata into dataclass / pydantic with validation)
+class dotdict(dict):
+    """dot.notation access to dictionary attributes"""
+
+    __getattr__ = dict.get
+    __setattr__ = dict.__setitem__
+    __delattr__ = dict.__delitem__
+
+
+def run(dest_dir: str) -> None:
     # Initialise dataset.
     ds = Dataset.create_empty(dest_dir)
 
+    with open(META_PATH, "r") as istream:
+        meta = dotdict(yaml.safe_load(istream))
+
     # Assign the same metadata of the walden dataset to this dataset.
-    ds.metadata = convert_walden_metadata(walden_ds)
+    ds.metadata = convert_walden_metadata(meta)
 
     # Load and process data.
-    df = generate_ggdc_data(data_file=walden_ds.local_path)
+    df = generate_ggdc_data(data_file=DATA_PATH)
 
     # Set meaningful indexes.
     df = df.set_index(["country", "year"])

@@ -71,7 +71,7 @@ steps:
   data://garden/wb/2021-07-01/wb_income:
     - data://meadow/wb/2021-07-01/wb_income
   data://garden/ggdc/2020-10-01/ggdc_maddison:
-    - walden://ggdc/2020-10-01/ggdc_maddison
+    - snapshot://ggdc/2020-10-01/ggdc_maddison/ggdc_maddison.xlsx
   grapher://ggdc/2020-10-01/ggdc_maddison:
     - data://garden/ggdc/2020-10-01/ggdc_maddison
   data://meadow/worldbank_wdi/2022-05-26/wdi:

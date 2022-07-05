@@ -26,6 +26,9 @@ from importlib import import_module
 import warnings
 import graphlib
 import concurrent.futures
+import sh
+import yaml
+
 
 import yaml
 
@@ -51,6 +54,8 @@ from etl import backport_helpers
 
 Graph = Dict[str, Set[str]]
 DAG = Dict[str, Any]
+
+dvc = sh.Command(".venv/bin/dvc")
 
 
 def compile_steps(
@@ -218,6 +223,9 @@ def parse_step(step_name: str, dag: Dict[str, Any]) -> "Step":
 
     elif step_type == "walden":
         step = WaldenStep(path)
+
+    elif step_type == "snapshot":
+        step = SnapshotStep(path)
 
     elif step_type == "github":
         step = GithubStep(path)
@@ -476,6 +484,42 @@ class WaldenStep(Step):
             )
 
         return dataset
+
+
+@dataclass
+class SnapshotStep(Step):
+    path: str
+
+    def __init__(self, path: str) -> None:
+        self.path = path
+
+    def __str__(self) -> str:
+        return f"snapshot://{self.path}"
+
+    def run(self) -> None:
+        dvc.pull(self._path)
+
+    def is_dirty(self) -> bool:
+        s = dvc.status(self._path)
+        if "Data and pipelines are up to date" in s.stdout.decode():
+            return False
+        else:
+            return True
+
+    def has_existing_data(self) -> bool:
+        return True
+
+    def checksum_output(self) -> str:
+        with open(self._dvc_path, "r") as f:
+            return yaml.safe_load(f)["outs"][0]["md5"]
+
+    @property
+    def _dvc_path(self):
+        return "snapshots/" + self.path + ".dvc"
+
+    @property
+    def _path(self):
+        return self._dvc_path.rsplit(".", 1)[0]
 
 
 class GrapherStep(Step):
