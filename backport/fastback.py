@@ -1,3 +1,6 @@
+# WARNING: fast-back is currently disabled and might be deprecated. We've decided to go with fast-track approach
+# that would let authors create datasets in ETL rather than going back and forth with backports.
+
 import concurrent.futures
 import datetime as dt
 import time

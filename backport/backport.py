@@ -1,14 +1,9 @@
 import datetime as dt
-import os
-import tempfile
-from typing import List, cast
+from typing import List
 
 import click
 import pandas as pd
 import structlog
-from owid.walden import Catalog as WaldenCatalog
-from owid.walden.catalog import Dataset as WaldenDataset
-from owid.walden.ingest import add_to_catalog
 from sqlalchemy.engine import Engine
 from sqlmodel import Session
 
@@ -17,19 +12,15 @@ from etl import grapher_model as gm
 from etl.backport_helpers import GrapherConfig
 from etl.db import get_engine
 from etl.files import checksum_str
+from etl.snapshot import Snapshot, SnapshotMeta
 
 from . import utils
 
 config.enable_bugsnag()
 
-WALDEN_NAMESPACE = os.environ.get("WALDEN_NAMESPACE", "backport")
-
 log = structlog.get_logger()
 
 engine = get_engine()
-
-# preload walden catalog to improve performance (initializing the catalog takes a while)
-walden_catalog = WaldenCatalog()
 
 
 @click.command()
@@ -50,7 +41,7 @@ walden_catalog = WaldenCatalog()
     "--upload/--skip-upload",
     default=True,
     type=bool,
-    help="Upload dataset to Walden",
+    help="Upload dataset to S3 as snapshot",
 )
 def backport_cli(
     dataset_id: int,
@@ -89,8 +80,8 @@ class PotentialBackport:
             sources = gm.Source.load_sources(session, dataset_id=ds.id, variable_ids=self.variable_ids)
 
         self.ds = ds
-        self.config = _load_config(ds, vars, sources)
-        self.md5_config = checksum_str(self.config.json(sort_keys=True, indent=0))
+        self.config = GrapherConfig.from_grapher_objects(ds, vars, sources)
+        self.md5_config = checksum_str(self.config.to_json())
 
     @property
     def short_name(self) -> str:
@@ -100,48 +91,43 @@ class PotentialBackport:
     def public(self) -> bool:
         return not self.ds.isPrivate
 
+    @property
+    def config_snapshot(self) -> Snapshot:
+        return Snapshot(f"backport/latest/{self.short_name}_config.json")
+
     def needs_update(self) -> bool:
         # find existing entry in catalog
         try:
-            walden_ds = walden_catalog.find_one(short_name=f"{self.short_name}_config")
-        except KeyError:
-            # datasets not found in catalog
-            return True
-
-        # fastrack does not upload data to S3 and leaves owid_data_url empty, if we find
-        # such a dataset, we backport and upload it again
-        if not walden_ds.owid_data_url:
+            snap = self.config_snapshot
+        except FileNotFoundError:
             return True
 
         # compare checksums
-        if walden_ds.origin_md5 == self.md5_config:
-            # then check dataEditedAt field
-            if self.ds.dataEditedAt < _walden_timestamp(f"{self.short_name}_config"):
-                return False
-            else:
-                # since `dataEditedAt` is part of config, its checksum should change and _checksum_match
-                # should return False... if this is not the case, something is wrong
-                raise AssertionError("This should never happen")
-        else:
+        # since `dataEditedAt` is part of config, its checksum should change
+        try:
+            return snap.metadata.md5 != self.md5_config
+        except ValueError:
             return True
 
     def upload(self, upload: bool, dry_run: bool) -> None:
-        _upload_config_to_walden(
+        config_metadata = _snapshot_config_metadata(self.ds, self.short_name, self.public)
+        config_metadata.save()
+        _upload_config_to_snapshot(
             self.config,
-            _walden_config_metadata(self.ds, self.short_name, self.md5_config, self.public),
+            config_metadata,
             dry_run,
             upload,
-            public=self.public,
         )
 
-        # upload values to walden
+        # upload values to snapshot
         df = _load_values(engine, self.variable_ids)
-        _upload_values_to_walden(
+        values_metadata = _snapshot_values_metadata(self.ds, self.short_name, self.public)
+        values_metadata.save()
+        _upload_values_to_snapshot(
             df,
-            _walden_values_metadata(self.ds, self.short_name, self.public),
+            values_metadata,
             dry_run,
             upload,
-            public=self.public,
         )
 
 
@@ -180,30 +166,17 @@ def backport(
     lg.info("backport.finished")
 
 
-def _load_config(
-    ds: gm.Dataset,
-    vars: list[gm.Variable],
-    sources: list[gm.Source],
-) -> GrapherConfig:
-    """Get the configuration of a variable."""
-    return GrapherConfig(
-        dataset=ds,
-        variables=vars,
-        sources=sources,
-    )
-
-
-def _walden_values_metadata(ds: gm.Dataset, short_name: str, public: bool) -> WaldenDataset:
+def _snapshot_values_metadata(ds: gm.Dataset, short_name: str, public: bool) -> SnapshotMeta:
     """Create walden dataset for grapher dataset values.
     These datasets are not meant for direct consumption from the catalog, but rather
     for postprocessing in etl.
     :param short_name: short name of the dataset in catalog
     """
-    return WaldenDataset(
-        namespace=WALDEN_NAMESPACE,
+    return SnapshotMeta(
+        namespace="backport",
         short_name=f"{short_name}_values",
         name=ds.name,
-        date_accessed=dt.datetime.utcnow().isoformat(),
+        date_accessed=dt.datetime.utcnow(),
         description=ds.description,
         source_name="Our World in Data catalog backport",
         url=f"https://owid.cloud/admin/datasets/{ds.id}",
@@ -213,13 +186,12 @@ def _walden_values_metadata(ds: gm.Dataset, short_name: str, public: bool) -> Wa
     )
 
 
-def _walden_config_metadata(ds: gm.Dataset, short_name: str, origin_md5: str, public: bool) -> WaldenDataset:
+def _snapshot_config_metadata(ds: gm.Dataset, short_name: str, public: bool) -> SnapshotMeta:
     """Create walden dataset for grapher dataset variables and metadata."""
-    config = _walden_values_metadata(ds, short_name, public)
+    config = _snapshot_values_metadata(ds, short_name, public)
     config.short_name = short_name + "_config"
     config.name = f"Grapher metadata for {short_name}"
     config.file_extension = "json"
-    config.origin_md5 = origin_md5
     return config
 
 
@@ -265,37 +237,31 @@ def _load_values(engine: Engine, variable_ids: list[int]) -> pd.DataFrame:
     return df
 
 
-def _upload_config_to_walden(
+def _upload_config_to_snapshot(
     config: GrapherConfig,
-    meta: WaldenDataset,
+    snap_meta: SnapshotMeta,
     dry_run: bool,
     upload: bool,
-    public: bool,
 ) -> None:
-    with tempfile.NamedTemporaryFile(mode="w") as f:
-        f.write(config.json())
-        f.flush()
+    snap = Snapshot(snap_meta.uri)
+    snap.path.parent.mkdir(parents=True, exist_ok=True)
+    with open(snap.path, "w") as f:
+        f.write(config.to_json())
 
-        if not dry_run:
-            add_to_catalog(meta, filename=f.name, upload=upload, public=public)
+    if not dry_run:
+        snap.dvc_add(upload=upload)
 
 
-def _upload_values_to_walden(
+def _upload_values_to_snapshot(
     df: pd.DataFrame,
-    meta: WaldenDataset,
+    snap_meta: SnapshotMeta,
     dry_run: bool,
     upload: bool,
-    public: bool,
 ) -> None:
-    with tempfile.NamedTemporaryFile(mode="wb") as f:
-        df.to_feather(f.name, compression="lz4")
-        if not dry_run:
-            add_to_catalog(meta, filename=f.name, upload=upload, public=public)
-
-
-def _walden_timestamp(short_name: str) -> dt.datetime:
-    t = walden_catalog.find_one(short_name=short_name).date_accessed
-    return cast(dt.datetime, pd.to_datetime(t))
+    snap = Snapshot(snap_meta.uri)
+    df.to_feather(snap.path, compression="lz4")
+    if not dry_run:
+        snap.dvc_add(upload=upload)
 
 
 if __name__ == "__main__":
