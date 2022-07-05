@@ -16,7 +16,7 @@ BASE_URL = "https://unstats.un.org/sdgapi"
 log = get_logger()
 
 
-def run(dest_dir: str) -> None:
+def run(dest_dir: str, query: str = "") -> None:
     # retrieves raw data from walden
     version = Path(__file__).parent.stem
     fname = Path(__file__).stem
@@ -28,10 +28,20 @@ def run(dest_dir: str) -> None:
     walden_ds = Catalog().find_one(
         namespace=namespace, short_name=fname, version=version
     )
+
+    log.info("un_sdg.start")
     local_file = walden_ds.ensure_downloaded()
+    # NOTE: using feather format instead of csv would make it 5x smaller and
+    # load significantly faster
     df = pd.read_csv(local_file, low_memory=False)
+
+    if query:
+        df = df.query(query)
+
+    log.info("un_sdg.load_and_clean")
     df = load_and_clean(df)
-    log.info(f"Size of dataframe", rows=df.shape[0], colums=df.shape[1])
+    log.info("Size of dataframe", rows=df.shape[0], colums=df.shape[1])
+    log.info("un_sdg.create_dataframe")
     full_df = create_dataframe(df)
     full_df.columns = [underscore(c) for c in full_df.columns]
     full_df = full_df[
@@ -46,7 +56,7 @@ def run(dest_dir: str) -> None:
         ]
     ]
     # verify_integrity checks for duplicates
-    log.info(f"Size of dataframe", rows=full_df.shape[0], colums=full_df.shape[1])
+    log.info("Size of dataframe", rows=full_df.shape[0], colums=full_df.shape[1])
 
     assert full_df["country"].notnull().all()
     assert full_df["variable_name"].notnull().all()
@@ -86,23 +96,20 @@ def run(dest_dir: str) -> None:
     )
     ds.add(tb)
     ds.save()
+    log.info("un_sdg.end")
 
 
 def create_dataframe(original_df: pd.DataFrame) -> None:
     # Removing the square brackets from the indicator column
-    new_columns = []
-    for k in original_df.columns:
-        new_columns.append(re.sub(r"[\[\]]", "", k))
+    original_df = original_df.copy(deep=False)
 
-    original_df.columns = new_columns
+    original_df = original_df.rename(columns=lambda k: re.sub(r"[\[\]]", "", k))  # type: ignore
 
     unit_description = attributes_description()
 
     dim_description = dimensions_description()
 
-    original_df["Units_long"] = original_df["Units"].apply(
-        lambda x: unit_description[x]
-    )
+    original_df["Units_long"] = original_df["Units"].map(unit_description)
     original_df["short_unit"] = create_short_unit(original_df["Units_long"])
 
     original_df = manual_clean_data(original_df)
@@ -120,6 +127,11 @@ def create_dataframe(original_df: pd.DataFrame) -> None:
     output_tables = []
 
     for group_name, df_group in all_series:
+        log.info(
+            "un_sdg.create_dataframe.group",
+            indicator=group_name[0],
+            series=group_name[1],
+        )
         _, dimensions, dimension_members = get_series_with_relevant_dimensions(
             df_group, init_dimensions, init_non_dimensions
         )
@@ -166,11 +178,14 @@ def manual_clean_data(df: pd.DataFrame) -> pd.DataFrame:
     Returns:
         pd.DataFrame with cleaned values for 15.2.1
     """
+    df = df.copy(deep=False)
+
     df["Value"] = df["Value"].astype(float)
-    df["Value"][
+    df.loc[
         (df["Units_long"] == "Percentage")
         & (df["Value"] > 100)
-        & (df["Indicator"] == "15.2.1")
+        & (df["Indicator"] == "15.2.1"),
+        "Value",
     ] = 100
 
     # Clean the IHR Capacity column, duplicate labelling of some attributes which doesn't work well with the grapher
@@ -264,6 +279,8 @@ def dimensions_description() -> pd.DataFrame:
 def load_and_clean(original_df: pd.DataFrame) -> pd.DataFrame:
     # Load and clean the data
     log.info("Reading in original data...")
+    original_df = original_df.copy(deep=False)
+
     # removing values that aren't numeric e.g. Null and N values
     original_df.dropna(subset=["Value"], inplace=True)
     original_df.dropna(subset=["TimePeriod"], how="all", inplace=True)
@@ -314,6 +331,7 @@ def generate_tables_for_indicator_and_series(
             .to_dict()
         )
         dim_desc["nan"] = ""
+        dim_desc["None"] = ""
         i = 0
         # Mapping the dimension value codes to more meaningful descriptions
         for i in range(len(dimension_values)):
@@ -370,11 +388,17 @@ def get_series_with_relevant_dimensions(
             dimension_names.append(c)
             dimension_unique_values.append(list(uniques))
     return (
-        data_series[
+        data_series.loc[
+            :,
             data_series.columns.intersection(
                 list(init_non_dimensions) + list(dimension_names)
-            )
+            ),
         ],
         dimension_names,
         dimension_unique_values,
     )
+
+
+if __name__ == "__main__":
+    # test script for a single indicator with `python etl/steps/data/meadow/un_sdg/2022-05-26/un_sdg.py`
+    run("/tmp/un_sdg", query="Indicator == '1.1.1'")
