@@ -11,11 +11,7 @@ This step reads from:
   some sanity checks are performed.
 
 This step will:
-* Output a dataset that will be loaded by all garden datasets, with tables:
-    * countries.
-    * datasets.
-    * items.
-    * elements (and units).
+* Output a dataset (to be loaded by all garden datasets) with tables 'countries, 'datasets', 'elements' and 'items'.
 * Apply sanity checks to countries, elements, items, and units.
 * Apply custom names and descriptions to datasets, elements, items and units.
 * Harmonize country names.
@@ -77,12 +73,30 @@ N_ISSUES_ON_ITEMS_FOR_WARNING = 10
 
 
 def load_latest_data_table_for_dataset(dataset_short_name: str) -> catalog.Table:
+    """Load data table (in long format) from the latest version of a dataset for a given domain.
+
+    Parameters
+    ----------
+    dataset_short_name : str
+        Dataset short name (e.g. 'faostat_qcl').
+
+    Returns
+    -------
+    table : catalog.Table
+        Latest version of table in long format for given domain.
+
+    """
+    # Path to folder with all versions of meadow datasets for FAOSTAT.
     meadow_dir = DATA_DIR / "meadow" / NAMESPACE
+    # Find latest meadow version for given dataset.
     dataset_version = sorted(meadow_dir.glob(f"*/{dataset_short_name}"))[-1].parent.name
+    # Path to latest dataset folder.
     dataset_path = meadow_dir / dataset_version / dataset_short_name
     assert dataset_path.is_dir(), f"Dataset {dataset_short_name} not found in meadow."
+    # Load dataset.
     dataset = catalog.Dataset(dataset_path)
     assert len(dataset.table_names) == 1
+    # Load table in long format from dataset.
     table = dataset[dataset_short_name]
 
     return table
@@ -91,6 +105,21 @@ def load_latest_data_table_for_dataset(dataset_short_name: str) -> catalog.Table
 def create_dataset_descriptions_dataframe_for_domain(
     table: catalog.Table, dataset_short_name: str
 ) -> pd.DataFrame:
+    """Create a single row dataframe with the dataset name, title and description, for a given domain.
+
+    Parameters
+    ----------
+    table : catalog.Table
+        Latest table for considered domain.
+    dataset_short_name : str
+        Dataset short name (e.g. 'faostat_qcl').
+
+    Returns
+    -------
+    dataset_descriptions_df : pd.DataFrame
+        Dataframe of name, title and description of a domain.
+
+    """
     dataset_descriptions_df = pd.DataFrame(
         {
             "dataset": [dataset_short_name],
@@ -105,6 +134,22 @@ def create_dataset_descriptions_dataframe_for_domain(
 def clean_global_dataset_descriptions_dataframe(
     datasets_df: pd.DataFrame, custom_datasets: pd.DataFrame
 ) -> pd.DataFrame:
+    """Apply sanity checks to the dataframe gathered from the data of each individual datasets, and add custom dataset
+    titles and descriptions.
+
+    Parameters
+    ----------
+    datasets_df : pd.DataFrame
+        Dataframe of descriptions gathered from the data of each individual dataset.
+    custom_datasets : pd.DataFrame
+        Data from the custom_datasets.csv file.
+
+    Returns
+    -------
+    datasets_df : pd.Dataframe
+        Clean dataframe of dataset titles and descriptions (customized and original FAO ones).
+
+    """
     datasets_df = datasets_df.copy()
 
     # Check that the dataset descriptions of fbsh and fbs are identical.
@@ -193,6 +238,24 @@ def clean_global_dataset_descriptions_dataframe(
 def create_items_dataframe_for_domain(
     table: catalog.Table, metadata: catalog.Dataset, dataset_short_name: str
 ) -> pd.DataFrame:
+    """Apply sanity checks to the items of a table in a dataset, and to the items from the metadata, harmonize all item
+    codes and items, and add item descriptions.
+
+    Parameters
+    ----------
+    table : catalog.Table
+        Data for a given domain.
+    metadata: catalog.Dataset
+         Metadata dataset from meadow.
+    dataset_short_name : str
+        Dataset short name (e.g. 'faostat_qcl').
+
+    Returns
+    -------
+    items_from_data : pd.Dataframe
+        Item names and descriptions (customized ones and FAO original ones) for a particular domain.
+
+    """
     df = pd.DataFrame(table).reset_index()
 
     # Load items from data.
@@ -270,6 +333,21 @@ def create_items_dataframe_for_domain(
 def clean_global_items_dataframe(
     items_df: pd.DataFrame, custom_items: pd.DataFrame
 ) -> pd.DataFrame:
+    """Apply global sanity checks to items gathered from all datasets, and create a clean global items dataframe.
+
+    Parameters
+    ----------
+    items_df : pd.DataFrame
+        Items dataframe gathered from all domains.
+    custom_items : pd.DataFrame
+        Data from custom_items.csv file.
+
+    Returns
+    -------
+    items_df : pd.DataFrame
+        Clean global items dataframe.
+
+    """
     items_df = items_df.copy()
 
     # Check that fbs and fbsh have the same contributions, remove one of them, and rename the other to fbsc.
@@ -355,6 +433,26 @@ def clean_global_items_dataframe(
 def create_elements_dataframe_for_domain(
     table: catalog.Table, metadata: catalog.Dataset, dataset_short_name: str
 ) -> pd.DataFrame:
+    """Apply sanity checks to the elements and units of a table in a dataset, and to the elements and units from the
+    metadata, harmonize all element code, and add descriptions.
+
+    Parameters
+    ----------
+    table : catalog.Table
+        Data for a given domain.
+    metadata: catalog.Dataset
+         Additional metadata dataset from meadow.
+    dataset_short_name : str
+        Dataset short name (e.g. 'faostat_qcl').
+
+    Returns
+    -------
+    elements_from_data : pd.Dataframe
+        Element names and descriptions and unit names and descriptions (customized ones and FAO original ones) for a
+        particular domain.
+
+    """
+
     df = pd.DataFrame(table).reset_index()
     # Load elements from data.
     elements_from_data = (
@@ -449,6 +547,22 @@ def create_elements_dataframe_for_domain(
 def clean_global_elements_dataframe(
     elements_df: pd.DataFrame, custom_elements: pd.DataFrame
 ) -> pd.DataFrame:
+    """Apply global sanity checks to elements and units gathered from all datasets, and create a clean global elements
+    and units dataframe.
+
+    Parameters
+    ----------
+    elements_df : pd.DataFrame
+        Elements and units dataframe gathered from all domains.
+    custom_elements : pd.DataFrame
+        Data from custom_items.csv file.
+
+    Returns
+    -------
+    elements_df : pd.DataFrame
+        Clean global elements and units dataframe.
+
+    """
     elements_df = elements_df.copy()
 
     # Check that all elements of fbsh are in fbs (although fbs may contain additional elements).
@@ -570,6 +684,24 @@ def clean_global_countries_dataframe(
     country_groups: Dict[str, List[str]],
     countries_harmonization: Dict[str, str],
 ) -> pd.DataFrame:
+    """Clean dataframe of countries gathered from the data of the individual domains, harmonize country names (and
+    country names of members of regions), and create a clean global countries dataframe.
+
+    Parameters
+    ----------
+    countries_in_data : pd.DataFrame
+        Countries gathered from the data of all domains.
+    country_groups : dict
+        Countries and their members, gathered from the data.
+    countries_harmonization : dict
+        Mapping of country names (from FAO names to OWID names).
+
+    Returns
+    -------
+    countries_df : pd.DataFrame
+        Clean global countries dataframe.
+
+    """
     countries_df = countries_in_data.copy()
 
     # Remove duplicates of area_code and fao_country, ensuring to keep m49_code when it is given.
@@ -628,6 +760,23 @@ def clean_global_countries_dataframe(
 def create_table(
     df: pd.DataFrame, short_name: str, index_cols: List[str]
 ) -> catalog.Table:
+    """Create a table with optimal format and basic metadata, out of a dataframe.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Input dataframe.
+    short_name : str
+        Short name to add in the metadata of the new table.
+    index_cols : list
+        Columns to use as indexes of the new table.
+
+    Returns
+    -------
+    table : catalog.Table
+        New table.
+
+    """
     table = catalog.Table(df).copy()
 
     # Optimize column dtypes before storing feather file, and ensure codes are categories (instead of ints).
@@ -706,6 +855,35 @@ def process_metadata(
     custom_items: pd.DataFrame,
     countries_harmonization: Dict[str, str],
 ) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    """Apply various sanity checks, gather data (about dataset, item, element and unit names and descriptions) from all
+    domains, compare with data from its corresponding metadata file, and create clean dataframes of metadata about
+    dataset, elements, units, items, and countries.
+
+    Parameters
+    ----------
+    metadata : catalog.Dataset
+        Additional metadata dataset from meadow.
+    custom_datasets : pd.DataFrame
+        Data from custom_datasets.csv file.
+    custom_elements : pd.DataFrame
+        Data from custom_elements_and_units.csv file.
+    custom_items : pd.DataFrame
+        Data from custom_items.csv file.
+    countries_harmonization : dict
+        Data from faostat.countries.json file.
+
+    Returns
+    -------
+    countries_df : pd.DataFrame
+        Clean dataframe of global countries.
+    datasets_df : pd.DataFrame
+        Clean dataframe of global dataset names and descriptions.
+    elements_df : pd.DataFrame
+        Clean dataframe of global element and unit names and descriptions.
+    items_df : pd.DataFrame
+        Clean dataframe of global item names and descriptions.
+
+    """
     # Check if flags definitions need to be updated.
     check_that_flag_definitions_in_dataset_agree_with_those_in_flags_ranking(metadata)
 
