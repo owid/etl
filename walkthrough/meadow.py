@@ -4,7 +4,6 @@ from enum import Enum
 from pathlib import Path
 from typing import Any
 
-from owid.walden import Catalog as WaldenCatalog
 from pydantic import BaseModel
 from pywebio import input as pi
 from pywebio import output as po
@@ -20,7 +19,7 @@ ETL_DIR = Path(etl.__file__).parent.parent
 
 class Options(Enum):
 
-    ADD_TO_DAG = "Add steps into dag.yml file"
+    ADD_TO_DAG = "Add steps into dag_walkthrough.yaml file"
     INCLUDE_METADATA_YAML = "Include *.meta.yaml file with metadata"
     GENERATE_NOTEBOOK = "Generate playground notebook"
     LOAD_COUNTRIES_REGIONS = "Load countries regions in the script"
@@ -33,7 +32,8 @@ class MeadowForm(BaseModel):
     short_name: str
     namespace: str
     version: str
-    walden_version: str
+    snapshot_version: str
+    snapshot_file_extension: str
     add_to_dag: bool
     load_countries_regions: bool
     load_population: bool
@@ -76,14 +76,6 @@ def app(run_checks: bool, dummy_data: bool) -> None:
                 value=dummies.get("version", str(dt.date.today())),
             ),
             pi.input(
-                "Walden version",
-                name="walden_version",
-                placeholder=str(dt.date.today()),
-                required=True,
-                value=dummies.get("version", str(dt.date.today())),
-                help_text="Usually same as Version",
-            ),
-            pi.input(
                 "Short name",
                 name="short_name",
                 placeholder="ggdc_maddison",
@@ -91,6 +83,20 @@ def app(run_checks: bool, dummy_data: bool) -> None:
                 value=dummies.get("short_name"),
                 validate=utils.validate_short_name,
                 help_text="Underscored short name",
+            ),
+            pi.input(
+                "Snapshot version",
+                name="snapshot_version",
+                placeholder=str(dt.date.today()),
+                required=True,
+                value=dummies.get("version", str(dt.date.today())),
+                help_text="Usually same as Version",
+            ),
+            pi.input(
+                "Snapshot file extension",
+                name="snapshot_file_extension",
+                placeholder="xlsx",
+                value=dummies.get("file_extension"),
             ),
             pi.checkbox(
                 "Additional Options",
@@ -113,13 +119,12 @@ def app(run_checks: bool, dummy_data: bool) -> None:
     )
     form = MeadowForm(**data)
 
-    if run_checks:
-        _check_dataset_in_walden(form)
-
     private_suffix = "-private" if form.is_private else ""
 
     if form.add_to_dag:
-        deps = [f"walden{private_suffix}://{form.namespace}/{form.walden_version}/{form.short_name}"]
+        deps = [
+            f"snapshot{private_suffix}://{form.namespace}/{form.snapshot_version}/{form.short_name}.{form.snapshot_file_extension}"
+        ]
         if form.load_population:
             deps.append("data://garden/owid/latest/key_indicators")
         if form.load_countries_regions:
@@ -190,18 +195,3 @@ def app(run_checks: bool, dummy_data: bool) -> None:
 
     if dag_content:
         utils.preview_dag(dag_content)
-
-
-def _check_dataset_in_walden(form: MeadowForm) -> None:
-    po.put_markdown("""## Checking Walden dataset...""")
-    try:
-        WaldenCatalog().find_one(
-            namespace=form.namespace,
-            short_name=form.short_name,
-            version=form.walden_version,
-        )
-        po.put_success("Dataset found in Walden")
-    except KeyError as e:
-        # raise a warning, but continue
-        if "no match for dataset" in e.args[0]:
-            po.put_warning("Dataset not found in Walden, did you upload it?")
