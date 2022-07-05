@@ -1048,21 +1048,39 @@ def list_countries_in_region(
 def remove_overlapping_data_between_historical_regions_and_successors(
     data_region: pd.DataFrame,
 ) -> pd.DataFrame:
-    data_region = data_region.copy()
-    # Sometimes, data for historical regions (e.g. USSR) overlaps with data of the successor countries (e.g. Russia).
-    # Ideally, we would keep only data for the newer countries. However, if not all successors have data, we would be
-    # having an incomplete aggregation, and therefore it would be better to keep data from the historical region.
-    columns = ["item_code", "element_code", "year"]
+    """Remove overlapping data between a historical region and any of its successors (if there is any overlap), to avoid
+    double-counting those regions when aggregating data.
 
+    Data for historical regions (e.g. USSR) could overlap with data of the successor countries (e.g. Russia). If this
+    happens, remove data (on the overlapping element-item-years) of the historical country.
+
+    Parameters
+    ----------
+    data_region : pd.DataFrame
+        Data (after selecting the countries of a certain relevant region).
+
+    Returns
+    -------
+    data_region : pd.DataFrame
+        Data after removing data with overlapping regions.
+
+    """
+    data_region = data_region.copy()
+
+    columns = ["item_code", "element_code", "year"]
     indexes_to_drop = []
     for historical_region in HISTORIC_TO_CURRENT_REGION:
+        # Successors of the current historical region.
         historical_successors = HISTORIC_TO_CURRENT_REGION[historical_region]["members"]
+        # Unique combinations of item codes, element codes, and years for which historical region has data.
         historical_region_years = data_region[
             (data_region["country"] == historical_region)
         ][columns].drop_duplicates()
+        # Unique combinations of item codes, element codes, and years for which successors have data.
         historical_successors_years = data_region[
             (data_region["country"].isin(historical_successors))
         ][columns].drop_duplicates()
+        # Find unique years where the above combinations of item-element-years of region and successors overlap.
         overlapping_years = pd.concat(
             [historical_region_years, historical_successors_years], ignore_index=True
         )
@@ -1084,12 +1102,26 @@ def remove_overlapping_data_between_historical_regions_and_successors(
             )
 
     if len(indexes_to_drop) > 0:
+        # Remove rows of data of the historical region where its data overlaps with data from its successors.
         data_region = data_region.drop(index=indexes_to_drop)
 
     return data_region
 
 
 def remove_outliers(data: pd.DataFrame) -> pd.DataFrame:
+    """Remove known outliers (defined in OUTLIERS_TO_REMOVE) from processed data.
+
+    Parameters
+    ----------
+    data : pd.DataFrame
+        Processed data (after harmonizing items, elements and countries, and adding regions and per-capita variables).
+
+    Returns
+    -------
+    data : pd.DataFrame
+        Data after removing known outliers.
+
+    """
     data = data.copy()
 
     # Make a dataframe with all rows that need to be removed from the data.
@@ -1126,6 +1158,28 @@ def remove_outliers(data: pd.DataFrame) -> pd.DataFrame:
 
 
 def add_regions(data: pd.DataFrame, elements_metadata: pd.DataFrame) -> pd.DataFrame:
+    """Add region aggregates (i.e. aggregate data for continents and income groups).
+
+    Regions to be created are defined above, in REGIONS_TO_ADD, and the variables for which data will be aggregated are
+    those that, in the custom_elements_and_units.csv file, have a non-empty 'owid_aggregation' field (usually with
+    'sum', or 'mean'). The latter field determines the type of aggregation to create.
+
+    Historical regions (if any) will be included in the aggregations, after ensuring that there is no overlap between
+    the data for the region, and the data of any of its successor countries (for each item-element-year).
+
+    Parameters
+    ----------
+    data : pd.DataFrame
+        Clean data (after harmonizing items, element and countries).
+    elements_metadata : pd.DataFrame
+        Table 'elements' from the garden faostat_metadata dataset, after selecting elements for the current domain.
+
+    Returns
+    -------
+    data : pd.DataFrame
+        Data after adding rows for aggregate regions.
+
+    """
     data = data.copy()
 
     # Create a dictionary of aggregations, specifying the operation to use when creating regions.
@@ -1264,6 +1318,23 @@ def add_regions(data: pd.DataFrame, elements_metadata: pd.DataFrame) -> pd.DataF
 
 
 def add_fao_population_if_given(data: pd.DataFrame) -> pd.DataFrame:
+    """Add a new column for FAO population, if population values are given in the data.
+
+    Some datasets (e.g. faostat_fbsh and faostat_fbs) include per-capita variables from the beginning. When this
+    happens, FAO population may be given as another item-element. To be able to convert those per-capita variables into
+    total values, we need to extract that population data and make it a new column.
+
+    Parameters
+    ----------
+    data : pd.DataFrame
+        Data (after harmonizing elements and items, but before harmonizing countries).
+
+    Returns
+    -------
+    data : pd.DataFrame
+        Data, after adding a column 'fao_population', if FAO population was found in the data.
+
+    """
     # Select rows that correspond to FAO population.
     fao_population_item_name = "Population"
     fao_population_element_name = "Total Population - Both sexes"
@@ -1305,8 +1376,32 @@ def add_population(
     warn_on_missing_countries: bool = True,
     show_full_warning: bool = True,
 ) -> pd.DataFrame:
-    # This function has been adapted from datautils.geo, because population currently does not include historic
-    # regions. We include them here.
+    """Add a column of OWID population to the countries in the data, including population of historical regions.
+
+    This function has been adapted from datautils.geo, because population currently does not include historic regions.
+    We include them in this function.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Data without a column for population (after harmonizing elements, items and country names).
+    country_col : str
+        Name of country column in data.
+    year_col : str
+        Name of year column in data.
+    population_col : str
+        Name for new population column in data.
+    warn_on_missing_countries : bool
+        True to warn if population is not found for any of the countries in the data.
+    show_full_warning : bool
+        True to show affected countries if the previous warning is raised.
+
+    Returns
+    -------
+    df_with_population : pd.DataFrame
+        Data after adding a column for population for all countries in the data.
+
+    """
 
     # Load population dataset.
     population = load_population().rename(
@@ -1342,6 +1437,26 @@ def add_population(
 def convert_variables_given_per_capita_to_total_value(
     data: pd.DataFrame, elements_metadata: pd.DataFrame
 ) -> pd.DataFrame:
+    """Replace variables given per capita in the original data by total values.
+
+    NOTE:
+    * Per-capita variables to be replaced by their total values are those with 'was_per_capita' equal to 1 in the
+      custom_elements_and_units.csv file.
+    * The new variables will have the same element codes as the original per-capita variables.
+
+    Parameters
+    ----------
+    data : pd.DataFrame
+        Data (after harmonizing elements and items, but before harmonizing countries).
+    elements_metadata : pd.DataFrame
+        Table 'elements' from the garden faostat_metadata dataset, after selecting the elements of the relevant domain.
+
+    Returns
+    -------
+    data : pd.DataFrame
+        Data, after converting per-capita variables to total value.
+
+    """
     # Select element codes that were originally given as per capita variables (if any), and, if FAO population is
     # given, make them total variables instead of per capita.
     # All variables in the custom_elements_and_units.csv file with "was_per_capita" True will be converted into
@@ -1390,7 +1505,13 @@ def convert_variables_given_per_capita_to_total_value(
 def add_per_capita_variables(
     data: pd.DataFrame, elements_metadata: pd.DataFrame
 ) -> pd.DataFrame:
-    """Add per-capita variables to data in a long format.
+    """Add per-capita variables to data in a long format (and keep original variables as well).
+
+    NOTE:
+    * Variables for which new per-capita rows will be created are those with 'make_per_capita' equal to 1 in the
+      custom_elements_and_units.csv file.
+    * The new variables will have the same element codes as the original per-capita variables, with 'pc' prepended to
+    the number.
 
     Parameters
     ----------
@@ -1579,17 +1700,45 @@ def clean_data(
 
 
 def optimize_table_dtypes(table: catalog.Table) -> catalog.Table:
+    """Optimize the dtypes of the columns in a table.
+
+    NOTE: Using `.astype` in a loop over different columns is slow. Instead, it is better to map all columns at once or
+    call `repack_frame` with dtypes arg
+
+    Parameters
+    ----------
+    table : catalog.Table
+        Table with possibly non-optimal column dtypes.
+
+    Returns
+    -------
+    catalog.Table
+        Table with optimized dtypes.
+
+    """
     dtypes = {
         c: "category"
         for c in ["area_code", "item_code", "element_code"]
         if c in table.columns
     }
-    # NOTE: setting `.astype` in a loop over columns is slow, it is better to use
-    # map all columns at once or call `repack_frame` with dtypes arg
+
     return catalog.frames.repack_frame(table, dtypes=dtypes)
 
 
 def prepare_long_table(data: pd.DataFrame) -> catalog.Table:
+    """Prepare a data table in long format.
+
+    Parameters
+    ----------
+    data : pd.DataFrame
+        Data (as a dataframe) in long format.
+
+    Returns
+    -------
+    data_table_long : catalog.Table
+        Data (as a table) in long format.
+
+    """
     # Create new table with long data.
     data_table_long = catalog.Table(data)
 
@@ -1716,7 +1865,7 @@ def prepare_wide_table(data: pd.DataFrame, dataset_title: str) -> catalog.Table:
 
 
 def _variable_name_map(data: pd.DataFrame, column: str) -> Dict[str, str]:
-    """Extract map {variable name -> column} from dataframe and make sure it is unique (one variable
+    """Extract map {variable name -> column} from dataframe and make sure it is unique (i.e. ensure that one variable
     does not map to two distinct values)."""
     pivot = (
         data.dropna(subset=[column])
