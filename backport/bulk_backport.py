@@ -46,7 +46,13 @@ log = structlog.get_logger()
     "--prune/--no-prune",
     default=False,
     type=bool,
-    help="Prune datasets from walden that are not in DB anymore",
+    help="Prune datasets from local walden that are not in DB anymore",
+)
+@click.option(
+    "--prune-remote/--no-prune-remote",
+    default=False,
+    type=bool,
+    help="Prune datasets from remote walden that are not in DB anymore",
 )
 def bulk_backport(
     dataset_ids: list[int],
@@ -55,7 +61,11 @@ def bulk_backport(
     upload: bool,
     force: bool,
     prune: bool,
+    prune_remote: bool,
 ) -> None:
+    if prune_remote:
+        assert prune, "--prune-remote must be used together with --prune flag"
+
     engine = get_engine()
 
     df = _active_datasets(engine, limit=limit)
@@ -86,7 +96,7 @@ def bulk_backport(
 
     if prune:
         assert not dataset_ids, "Pruning cannot be used together with dataset-ids"
-        _prune_walden_datasets(engine, dry_run)
+        _prune_walden_datasets(engine, dry_run, prune_remote)
 
     log.info("bulk_backport.finished")
 
@@ -130,7 +140,7 @@ def _active_datasets(engine: Engine, limit: int = 1000000) -> pd.DataFrame:
     return cast(pd.DataFrame, df)
 
 
-def _prune_walden_datasets(engine: Engine, dry_run: bool) -> None:
+def _prune_walden_datasets(engine: Engine, dry_run: bool, prune_remote: bool) -> None:
     active_dataset_ids = set(_active_datasets(engine)["id"])
 
     walden_catalog = WaldenCatalog()
@@ -149,7 +159,8 @@ def _prune_walden_datasets(engine: Engine, dry_run: bool) -> None:
         # delete it from local and remote catalog
         if not dry_run:
             ds.delete()
-            ds.delete_from_remote()
+            if prune_remote:
+                ds.delete_from_remote()
 
 
 def _backported_ids_in_dag() -> list[int]:
