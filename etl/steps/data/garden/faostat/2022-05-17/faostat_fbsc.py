@@ -16,6 +16,7 @@ update.
 """
 
 from copy import deepcopy
+from typing import cast
 
 import pandas as pd
 from owid.datautils import dataframes
@@ -114,7 +115,7 @@ def combine_fbsh_and_fbs_datasets(
     error = "Some elements in the combined dataset have more than one unit."
     assert fbsc.groupby("element")["unit"].nunique().max() == 1, error
 
-    return fbsc
+    return cast(pd.DataFrame, fbsc)
 
 
 def _assert_df_size(df: pd.DataFrame, size_mb: float) -> None:

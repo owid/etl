@@ -16,7 +16,7 @@ import json
 import sys
 from copy import deepcopy
 from pathlib import Path
-from typing import List, cast, Dict
+from typing import List, Dict, cast
 
 import numpy as np
 import pandas as pd
@@ -854,7 +854,7 @@ def _load_income_groups() -> pd.DataFrame:
                 [income_groups, historic_region_df], ignore_index=True
             )
 
-    return income_groups
+    return cast(pd.DataFrame, income_groups)
 
 
 def _list_countries_in_region(
@@ -863,7 +863,7 @@ def _list_countries_in_region(
     # Number of attempts to fetch countries regions data.
     attempts = 5
     attempt = 0
-    countries_in_region = None
+    countries_in_region = list()
     while attempt < attempts:
         try:
             # List countries in region.
@@ -877,7 +877,7 @@ def _list_countries_in_region(
             attempt += 1
         finally:
             assert (
-                countries_in_region is not None
+                len(countries_in_region) > 0
             ), "Unable to fetch countries-regions data."
 
     return countries_in_region
@@ -935,7 +935,7 @@ def remove_outliers(data: pd.DataFrame) -> pd.DataFrame:
     for outlier in OUTLIERS_TO_REMOVE:
         # Find all possible combinations of the field values in the outlier dictionary.
         _rows_to_drop = pd.DataFrame.from_records(
-            list(itertools.product(*outlier.values())), columns=list(outlier)
+            list(itertools.product(*outlier.values())), columns=list(outlier)  # type: ignore
         )
         rows_to_drop = pd.concat(
             [rows_to_drop, _rows_to_drop], ignore_index=True
@@ -948,15 +948,13 @@ def remove_outliers(data: pd.DataFrame) -> pd.DataFrame:
         log.info(f"Removing {len(rows_to_drop)} rows of outliers.")
 
         # Get indexes of data that correspond to the rows we want to drop.
-        indexes_to_drop = (
+        indexes_to_drop = list(
             pd.merge(
                 data.reset_index(),
                 rows_to_drop,
                 on=rows_to_drop.columns.tolist(),
                 how="inner",
-            )["index"]
-            .unique()
-            .tolist()
+            )["index"].unique()
         )
 
         # Drop those rows in data.
@@ -1117,7 +1115,7 @@ def add_fao_population_if_given(data: pd.DataFrame) -> pd.DataFrame:
         fao_population = data[population_rows_mask].reset_index(drop=True)
 
         # Check that population is given in "1000 persons" and convert to persons.
-        assert fao_population["unit"].unique().tolist() == [
+        assert list(fao_population["unit"].unique()) == [
             "1000 persons"
         ], "FAO population may have changed units."
         fao_population["value"] *= 1000
@@ -1186,10 +1184,8 @@ def convert_variables_given_per_capita_to_total_value(
     # given, make them total variables instead of per capita.
     # All variables in the custom_elements_and_units.csv file with "was_per_capita" True will be converted into
     # total (non-per-capita) values.
-    element_codes_that_were_per_capita = (
-        elements_metadata[elements_metadata["was_per_capita"]]["element_code"]
-        .unique()
-        .tolist()
+    element_codes_that_were_per_capita = list(
+        elements_metadata[elements_metadata["was_per_capita"]]["element_code"].unique()
     )
     if len(element_codes_that_were_per_capita) > 0:
         data = data.copy()
@@ -1206,7 +1202,7 @@ def convert_variables_given_per_capita_to_total_value(
             data[per_capita_mask]["value"] * data[per_capita_mask]["fao_population"]
         )
 
-        elements_converted = data[per_capita_mask]["fao_element"].unique().tolist()
+        elements_converted = list(data[per_capita_mask]["fao_element"].unique())
         log.info(
             f"{len(elements_converted)} elements converted from per-capita to total values: {elements_converted}"
         )
@@ -1235,10 +1231,8 @@ def add_per_capita_variables(
     data = data.copy()
 
     # Find element codes that have to be made per capita.
-    element_codes_to_make_per_capita = (
-        elements_metadata[elements_metadata["make_per_capita"]]["element_code"]
-        .unique()
-        .tolist()
+    element_codes_to_make_per_capita = list(
+        elements_metadata[elements_metadata["make_per_capita"]]["element_code"].unique()
     )
     if len(element_codes_to_make_per_capita) > 0:
         log.info("add_per_capita_variables", shape=data.shape)
@@ -1545,7 +1539,7 @@ def _variable_name_map(data: pd.DataFrame, column: str) -> Dict[str, str]:
         .apply(set)
     )
     assert all(pivot.map(len) == 1)
-    return pivot.map(lambda x: list(x)[0]).to_dict()
+    return pivot.map(lambda x: list(x)[0]).to_dict()  # type: ignore
 
 
 def run(dest_dir: str) -> None:

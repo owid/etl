@@ -9,6 +9,7 @@ The resulting dataset will later be loaded by the `explorer/food_explorer` which
 """
 
 from copy import deepcopy
+from typing import cast
 
 import pandas as pd
 from owid.datautils import dataframes, geo
@@ -311,7 +312,7 @@ def combine_qcl_and_fbsc(
         combined.duplicated(subset=["product", "country", "year", "element", "unit"])
     ].empty, error
 
-    return combined
+    return cast(pd.DataFrame, combined)
 
 
 def get_fao_population(combined: pd.DataFrame) -> pd.DataFrame:
@@ -337,7 +338,7 @@ def get_fao_population(combined: pd.DataFrame) -> pd.DataFrame:
 
     # Check that population is given in "1000 persons" and convert to persons.
     error = "FAOSTAT population changed item, element, or unit."
-    assert fao_population["unit"].unique().tolist() == [FAO_POPULATION_UNIT], error
+    assert list(fao_population["unit"].unique()) == [FAO_POPULATION_UNIT], error
     fao_population["value"] *= 1000
 
     # Drop missing values and prepare output dataframe.

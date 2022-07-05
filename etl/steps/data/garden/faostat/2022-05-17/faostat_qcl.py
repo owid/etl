@@ -74,7 +74,7 @@ def add_slaughtered_animals_to_meat_total(data: pd.DataFrame) -> pd.DataFrame:
 
     # Similarly, there are two items for meat total.
     error = f"Item codes for '{total_meat_item}' may have changed."
-    assert data[data["item"] == total_meat_item]["item_code"].unique().tolist() == [
+    assert list(data[data["item"] == total_meat_item]["item_code"].unique()) == [
         "00001765"
     ], error
 
@@ -118,32 +118,34 @@ def add_slaughtered_animals_to_meat_total(data: pd.DataFrame) -> pd.DataFrame:
     ).reset_index()
 
     # Get element description for selected element code.
-    slaughtered_animals_element_description = data[
+    _slaughtered_animals_element_description = data[
         data["element_code"] == slaughtered_animals_element_code
     ]["element_description"].unique()
-    assert len(slaughtered_animals_element_description) == 1
-    slaughtered_animals_element_description = slaughtered_animals_element_description[0]
+    assert len(_slaughtered_animals_element_description) == 1
+    slaughtered_animals_element_description = _slaughtered_animals_element_description[
+        0
+    ]
 
     # Get item description for selected item code.
-    total_meat_item_description = data[data["item_code"] == total_meat_item_code][
+    _total_meat_item_description = data[data["item_code"] == total_meat_item_code][
         "item_description"
     ].unique()
-    assert len(total_meat_item_description) == 1
-    total_meat_item_description = total_meat_item_description[0]
+    assert len(_total_meat_item_description) == 1
+    total_meat_item_description = _total_meat_item_description[0]
 
     # Get FAO item name for selected item code.
-    total_meat_fao_item = data[data["item_code"] == total_meat_item_code][
+    _total_meat_fao_item = data[data["item_code"] == total_meat_item_code][
         "fao_item"
     ].unique()
-    assert len(total_meat_fao_item) == 1
-    total_meat_fao_item = total_meat_fao_item[0]
+    assert len(_total_meat_fao_item) == 1
+    total_meat_fao_item = _total_meat_fao_item[0]
 
     # Get FAO unit for selected item code.
-    total_meat_fao_unit = data[data["item_code"] == total_meat_item_code][
+    _total_meat_fao_unit = data[data["item_code"] == total_meat_item_code][
         "fao_unit"
     ].unique()
-    assert len(total_meat_fao_unit) == 1
-    total_meat_fao_unit = total_meat_fao_unit[0]
+    assert len(_total_meat_fao_unit) == 1
+    total_meat_fao_unit = _total_meat_fao_unit[0]
 
     # Manually include the rest of columns.
     animals["element"] = slaughtered_animals_element

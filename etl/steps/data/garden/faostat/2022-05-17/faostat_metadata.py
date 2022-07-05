@@ -743,8 +743,7 @@ def process_metadata(
     countries_in_data = pd.DataFrame({"area_code": [], "fao_country": []}).astype(
         {"area_code": "Int64"}
     )
-    country_groups_in_data = {}
-
+    country_groups_in_data: Dict[str, List[str]] = {}
     # Gather all variables from the latest version of each meadow dataset.
     for dataset_short_name in tqdm(dataset_short_names, file=sys.stdout):
         # Load latest meadow table for current dataset.
@@ -818,7 +817,7 @@ def process_metadata(
                     all_members = set(country_groups_in_data[group]) | set(
                         country_groups[group]
                     )
-                    country_groups_in_data[group] = all_members
+                    country_groups_in_data[group] = list(all_members)
                 else:
                     country_groups_in_data[group] = country_groups[group]
 
