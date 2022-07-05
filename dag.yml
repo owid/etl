@@ -56,6 +56,8 @@ steps:
     - data://meadow/worldbank_wdi/2022-05-26/wdi
   grapher://worldbank_wdi/2022-05-26/wdi:
     - data://garden/worldbank_wdi/2022-05-26/wdi
+  grapher://owid/latest/population_density:
+    - data://garden/owid/latest/population_density
 
   data://garden/sdg/latest/sdg:
     - backport://backport/owid/latest/dataset_563_world_development_indicators__health
@@ -88,17 +90,21 @@ steps:
     - backport://backport/owid/latest/dataset_115_countries_continents
 
   # Examples
-  data://examples/script/script_example:
+  data://examples/examples/latest/script_example:
     - walden://wb/2021-07-01/wb_income
-    - data://garden/owid/latest/key_indicators
+    - data://garden/ggdc/2020-10-01/ggdc_maddison
     - data://garden/reference
-  data://examples/jupytext/jupytext_example:
-  data://examples/vs_code_cells/vs_code_cells_example:
-  # private steps that require S3 access keys for private walden
-  data-private://examples/private/2022-03-08/private_example:
+  data://examples/examples/latest/jupytext_example:
+    - data://garden/ggdc/2020-10-01/ggdc_maddison
+  data://examples/examples/latest/notebook_example:
+    - data://garden/ggdc/2020-10-01/ggdc_maddison
+  data://examples/examples/latest/vs_code_cells_example:
+    - data://garden/ggdc/2020-10-01/ggdc_maddison
+  # private steps that require S3 access keys for private walden and are run with `etl --private`
+  data-private://examples/examples/latest/private_example:
     # NOTE: this dataset is public as we don't have any private data yet
     - walden-private://ggdc/2020-10-01/ggdc_maddison
-    - data://garden/reference
+
 
 # Sub-dags to import
 include:

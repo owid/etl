@@ -10,6 +10,7 @@ def get_grapher_dataset() -> catalog.Dataset:
     dataset = catalog.Dataset(
         DATA_DIR / "garden" / "ggdc" / "2020-10-01" / "ggdc_maddison"
     )
+    assert len(dataset.metadata.sources) == 1
     # short_name should include dataset name and version
     dataset.metadata.short_name = "ggdc_maddison__2020_10_01"
 
