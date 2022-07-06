@@ -6,8 +6,8 @@ import math
 import pandas as pd
 from structlog import get_logger
 from pathlib import Path
-from typing import Tuple
-
+from typing import Tuple, List, Any, Dict
+from etl.steps.data.converters import convert_walden_metadata
 from owid.walden import Catalog
 from owid.catalog import Dataset, Table, DatasetMeta, TableMeta
 from owid.catalog.utils import underscore
@@ -23,8 +23,8 @@ def run(dest_dir: str, query: str = "") -> None:
     namespace = Path(__file__).parent.parent.stem
 
     version = "2022-05-26"
-    namespace = "un_sdg"
     fname = "un_sdg"
+    namespace = "un_sdg"
     walden_ds = Catalog().find_one(
         namespace=namespace, short_name=fname, version=version
     )
@@ -81,25 +81,20 @@ def run(dest_dir: str, query: str = "") -> None:
 
     # creates the dataset and adds a table
     ds = Dataset.create_empty(dest_dir)
-    ds.metadata = DatasetMeta(
-        short_name=walden_ds.short_name,
-        title=walden_ds.name,
-        namespace=walden_ds.namespace,
-        description=walden_ds.description,
-    )
+
+    ds.metadata = convert_walden_metadata(walden_ds)
     tb = Table(full_df)
     tb.metadata = TableMeta(
         short_name=Path(__file__).stem,
         title=walden_ds.name,
         description=walden_ds.description,
-        primary_key=list(full_df.index.names),
     )
     ds.add(tb)
     ds.save()
     log.info("un_sdg.end")
 
 
-def create_dataframe(original_df: pd.DataFrame) -> None:
+def create_dataframe(original_df: pd.DataFrame) -> pd.DataFrame:
     # Removing the square brackets from the indicator column
     original_df = original_df.copy(deep=False)
 
@@ -114,12 +109,9 @@ def create_dataframe(original_df: pd.DataFrame) -> None:
 
     original_df = manual_clean_data(original_df)
 
-    init_dimensions = tuple(dim_description["id"].unique())
-    init_non_dimensions = tuple(
+    init_dimensions = list(dim_description["id"].unique())
+    init_non_dimensions = list(
         [c for c in original_df.columns if c not in set(init_dimensions)]
-    )
-    all_series = (
-        original_df[["Indicator", "SeriesCode"]].drop_duplicates().reset_index()
     )
 
     all_series = original_df.groupby(["Indicator", "SeriesCode"])
@@ -163,9 +155,9 @@ def create_dataframe(original_df: pd.DataFrame) -> None:
                 )
                 tables.append(tab)
 
-            tables = pd.concat(tables)
+            tables_con = pd.concat(tables)
 
-            output_tables.append(tables)
+            output_tables.append(tables_con)
 
         output_table = pd.concat(output_tables)
 
@@ -216,7 +208,7 @@ def manual_clean_data(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def get_goal_codes() -> list:
+def get_goal_codes() -> List[int]:
     # retrieves all goal codes
     url = f"{BASE_URL}/v1/sdg/Goal/List"
     res = requests.get(url)
@@ -226,7 +218,7 @@ def get_goal_codes() -> list:
     return goal_codes
 
 
-def attributes_description() -> dict:
+def attributes_description() -> Dict[str, str]:
     goal_codes = get_goal_codes()
     a = []
     for goal in goal_codes:
@@ -310,10 +302,10 @@ def create_short_unit(long_unit: pd.Series) -> np.ndarray:
 
 def generate_tables_for_indicator_and_series(
     data_series: pd.DataFrame,
-    init_dimensions: tuple,
-    init_non_dimensions: tuple,
-    dim_dict: dict,
-) -> pd.DataFrame:
+    init_dimensions: List[str],
+    init_non_dimensions: List[str],
+    dim_dict: pd.DataFrame,
+) -> Dict[Any, Any]:
     tables_by_combination = {}
     data_dimensions, dimensions, dimension_values = get_series_with_relevant_dimensions(
         data_series, init_dimensions, init_non_dimensions
@@ -348,7 +340,9 @@ def generate_tables_for_indicator_and_series(
             filt = [True] * len(data_dimensions)
             for dim_idx, dim_value in enumerate(dimension_value_combination):
                 dimension_name = dimensions[dim_idx]
-                value_is_nan = type(dim_value) == float and math.isnan(dim_value)
+                value_is_nan = isinstance(dim_value, float) == float and math.isnan(
+                    dim_value
+                )
                 # Boolean identifying which rows contain the dimension combination
                 filt = filt & (
                     data_dimensions[dimension_name].isnull()
@@ -367,8 +361,10 @@ def generate_tables_for_indicator_and_series(
 
 
 def get_series_with_relevant_dimensions(
-    data_series: pd.DataFrame, init_dimensions: tuple, init_non_dimensions: tuple
-) -> Tuple[pd.DataFrame, list, list]:
+    data_series: pd.DataFrame,
+    init_dimensions: List[str],
+    init_non_dimensions: List[str],
+) -> Tuple[pd.DataFrame, List[str], List[List[Any]]]:
     """For a given indicator and series, return a tuple:
     - data filtered to that indicator and series
     - names of relevant dimensions
@@ -391,7 +387,7 @@ def get_series_with_relevant_dimensions(
         data_series.loc[
             :,
             data_series.columns.intersection(
-                list(init_non_dimensions) + list(dimension_names)
+                init_non_dimensions + list(dimension_names)
             ),
         ],
         dimension_names,
