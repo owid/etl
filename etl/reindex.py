@@ -3,14 +3,17 @@
 #  etl
 #
 
-import click
-from pathlib import Path
 from collections.abc import Iterable
+from pathlib import Path
 from typing import Optional
 
-from owid.catalog import LocalCatalog, CHANNEL
+import click
+from owid.catalog import CHANNEL, LocalCatalog
 
+from etl import config
 from etl.paths import DATA_DIR
+
+config.enable_bugsnag()
 
 
 @click.command()

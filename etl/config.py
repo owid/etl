@@ -9,6 +9,7 @@ only important for OWID staff.
 
 from os import environ as env
 
+import bugsnag
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -30,3 +31,11 @@ DB_HOST = env.get("DB_HOST", "localhost")
 DB_PORT = int(env.get("DB_PORT", "3306"))
 DB_USER = env.get("DB_USER", "root")
 DB_PASS = env.get("DB_PASS", "")
+
+
+def enable_bugsnag() -> None:
+    BUGSNAG_API_KEY = env.get("BUGSNAG_API_KEY")
+    if BUGSNAG_API_KEY and not DEBUG:
+        bugsnag.configure(
+            api_key=BUGSNAG_API_KEY,
+        )  # type: ignore

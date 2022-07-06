@@ -7,8 +7,11 @@ from owid.catalog.utils import underscore
 
 from etl.db import get_engine
 from etl.steps import load_dag
+from etl import config
 
 from .backport import backport
+
+config.enable_bugsnag()
 
 log = structlog.get_logger()
 

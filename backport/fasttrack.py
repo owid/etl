@@ -18,6 +18,8 @@ from etl.reindex import reindex
 
 from .backport import backport
 
+config.enable_bugsnag()
+
 log = structlog.get_logger()
 
 SLEEP_BETWEEN_RUNS = 1

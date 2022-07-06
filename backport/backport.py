@@ -13,6 +13,7 @@ from owid.walden.ingest import add_to_catalog
 from sqlalchemy.engine import Engine
 
 from etl.db import get_engine
+from etl import config
 from etl.files import checksum_str
 from etl.grapher_model import (
     GrapherConfig,
@@ -20,6 +21,8 @@ from etl.grapher_model import (
     GrapherSourceModel,
     GrapherVariableModel,
 )
+
+config.enable_bugsnag()
 
 WALDEN_NAMESPACE = os.environ.get("WALDEN_NAMESPACE", "backport")
 

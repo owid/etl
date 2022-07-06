@@ -9,6 +9,9 @@ from owid.catalog import LocalCatalog, CHANNEL
 
 from etl.command import construct_dag
 from etl.steps import paths
+from etl import config
+
+config.enable_bugsnag()
 
 log = structlog.get_logger()
 

@@ -21,6 +21,8 @@ from owid.catalog import LocalCatalog, CHANNEL
 from etl import config, files
 from etl.paths import DATA_DIR
 
+config.enable_bugsnag()
+
 
 class CannotPublish(Exception):
     pass
