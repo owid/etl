@@ -8,6 +8,7 @@ import os
 import time
 import sys
 import re
+import warnings
 from pathlib import Path
 
 import click
@@ -60,6 +61,12 @@ THREADPOOL_WORKERS = 5
     help="Thread workers to parallelize which steps need rebuilding (steps execution is not parallelized)",
     default=5,
 )
+@click.option(
+    "--filter-warnings/--no-filter-warnings",
+    default=False,
+    type=bool,
+    help="Filter FutureWarnings to exclude them from stderr",
+)
 @click.argument("steps", nargs=-1)
 def main_cli(
     steps: List[str],
@@ -73,6 +80,7 @@ def main_cli(
     exclude: Optional[str] = None,
     dag_path: Path = paths.DAG_FILE,
     workers: int = 5,
+    filter_warnings: bool = False,
 ) -> None:
     return main(
         steps=steps,
@@ -86,6 +94,7 @@ def main_cli(
         exclude=exclude,
         dag_path=dag_path,
         workers=workers,
+        filter_warnings=filter_warnings,
     )
 
 
@@ -101,6 +110,7 @@ def main(
     exclude: Optional[str] = None,
     dag_path: Path = paths.DAG_FILE,
     workers: int = 5,
+    filter_warnings: bool = False,
 ) -> None:
     """
     Execute all ETL steps listed in dag.yaml
@@ -124,6 +134,7 @@ def main(
         only=only,
         excludes=excludes,
         workers=workers,
+        filter_warnings=filter_warnings,
     )
 
 
@@ -161,6 +172,7 @@ def run_dag(
     only: bool = False,
     excludes: Optional[List[str]] = None,
     workers: int = 1,
+    filter_warnings: bool = False,
 ) -> None:
     """
     Run the selected steps, and anything that needs updating based on them. An empty
@@ -192,7 +204,11 @@ def run_dag(
     for i, step in enumerate(steps, 1):
         print(f"{i}. {step}...")
         if not dry_run:
-            time_taken = timed_run(lambda: step.run())
+            with warnings.catch_warnings():
+                if filter_warnings:
+                    warnings.simplefilter(action="ignore", category=FutureWarning)
+
+                time_taken = timed_run(lambda: step.run())
             click.echo(f"{click.style('OK', fg='blue')} ({time_taken:.0f}s)")
             print()
 
