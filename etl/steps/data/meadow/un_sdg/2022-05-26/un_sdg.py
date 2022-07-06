@@ -4,6 +4,8 @@ import re
 import itertools
 import math
 import pandas as pd
+from collections import defaultdict
+
 from structlog import get_logger
 from pathlib import Path
 from typing import Tuple, List, Any, Dict
@@ -109,7 +111,8 @@ def create_dataframe(original_df: pd.DataFrame) -> pd.DataFrame:
 
     original_df = manual_clean_data(original_df)
 
-    init_dimensions = list(dim_description["id"].unique())
+    init_dimensions = list(dim_description.keys())
+    # init_dimensions.extend(["Country", "Year"])
     init_non_dimensions = list(
         [c for c in original_df.columns if c not in set(init_dimensions)]
     )
@@ -124,40 +127,26 @@ def create_dataframe(original_df: pd.DataFrame) -> pd.DataFrame:
             indicator=group_name[0],
             series=group_name[1],
         )
-        _, dimensions, dimension_members = get_series_with_relevant_dimensions(
+        df_dim, dimensions = get_series_with_relevant_dimensions(
             df_group, init_dimensions, init_non_dimensions
         )
-
         if len(dimensions) == 0:
             # no additional dimensions
             table = generate_tables_for_indicator_and_series(
-                df_group, init_dimensions, init_non_dimensions, dim_description
+                dim_dict=dim_description, data_dimensions=df_dim, dimensions=dimensions
             )
-            table["variable_name"] = "%s - %s - %s" % (
-                table["Indicator"].iloc[0],
-                table["SeriesDescription"].iloc[0],
-                table["SeriesCode"].iloc[0],
-            )
+            table.set_index(["Country", "Year"])
             output_tables.append(table)
+
         else:
             # has additional dimensions
-            table = generate_tables_for_indicator_and_series(
-                df_group, init_dimensions, init_non_dimensions, dim_description
+            tables = generate_tables_for_indicator_and_series(
+                dim_dict=dim_description, data_dimensions=df_dim, dimensions=dimensions
             )
 
-            tables = []
-            for tab, key in zip(table.values(), table.keys()):
-                tab["variable_name"] = "%s - %s - %s - %s" % (
-                    tab["Indicator"].iloc[0],
-                    tab["SeriesDescription"].iloc[0],
-                    tab["SeriesCode"].iloc[0],
-                    " - ".join(map(str, key)),
-                )
-                tables.append(tab)
+            tables.set_index(["Country", "Year"] + dimensions, verify_integrity=True)
 
-            tables_con = pd.concat(tables)
-
-            output_tables.append(tables_con)
+            output_tables.append(tables)
 
         output_table = pd.concat(output_tables)
 
@@ -218,7 +207,7 @@ def get_goal_codes() -> List[int]:
     return goal_codes
 
 
-def attributes_description() -> Dict[str, str]:
+def attributes_description() -> Dict[Any, Any]:
     goal_codes = get_goal_codes()
     a = []
     for goal in goal_codes:
@@ -239,7 +228,7 @@ def attributes_description() -> Dict[str, str]:
     return att_dict
 
 
-def dimensions_description() -> pd.DataFrame:
+def dimensions_description() -> dict:
     goal_codes = get_goal_codes()
     d = []
     for goal in goal_codes:
@@ -256,15 +245,20 @@ def dimensions_description() -> pd.DataFrame:
                         "description": code["description"],
                     }
                 )
-    dim_dict = pd.DataFrame(d).drop_duplicates()
-    # adding an nan code for each id - a problem for the Coverage dimension
-    nan_data = {
-        "id": dim_dict.id.unique(),
-        "code": np.repeat(np.nan, len(dim_dict.id.unique()), axis=0),
-        "description": np.repeat("", len(dim_dict.id.unique()), axis=0),
-    }
-    nan_df = pd.DataFrame(nan_data)
-    dim_dict = pd.concat([dim_dict, nan_df])
+    # Making a nested dictionary of the dimensions - probably could be done in the loop but I'm not sure how
+    dim_dict = defaultdict(dict)
+    for dimen in d:
+        dim_dict[dimen["id"]][dimen["code"]] = dimen["description"]
+
+    ### This is wrong - need to just add one key on
+    nan_dict = defaultdict(dict)
+    for key in dim_dict.keys():
+        nan_dict[key][np.nan] = ""
+
+    for key in dim_dict:
+        if key in nan_dict:
+            dim_dict[key].update(nan_dict[key])
+
     return dim_dict
 
 
@@ -301,70 +295,25 @@ def create_short_unit(long_unit: pd.Series) -> np.ndarray:
 
 
 def generate_tables_for_indicator_and_series(
-    data_series: pd.DataFrame,
-    init_dimensions: List[str],
-    init_non_dimensions: List[str],
-    dim_dict: pd.DataFrame,
-) -> Dict[Any, Any]:
-    tables_by_combination = {}
-    data_dimensions, dimensions, dimension_values = get_series_with_relevant_dimensions(
-        data_series, init_dimensions, init_non_dimensions
-    )
-    if len(dimensions) == 0:  # not the best solution.
-        # no additional dimensions
-        export = data_dimensions
-        return export
+    dim_dict: dict,
+    data_dimensions: pd.DataFrame,
+    dimensions: List[str],
+) -> pd.DataFrame:
+
+    if len(dimensions) == 0:
+        return data_dimensions
     else:
-        dim_desc = (
-            dim_dict.set_index("id")
-            .loc[dimensions]
-            .set_index("code")
-            .squeeze()
-            .to_dict()
-        )
-        dim_desc["nan"] = ""
-        dim_desc["None"] = ""
-        i = 0
-        # Mapping the dimension value codes to more meaningful descriptions
-        for i in range(len(dimension_values)):
-            df = pd.DataFrame({"value": dimension_values[i]})
-            df["value"] = df["value"].astype(str)
-            dimension_values[i] = [dim_desc[k] for k in df["value"].to_list()]
-        # Mapping the descriptions into the dataframe
         for dim in dimensions:
-            data_dimensions[dim] = data_dimensions[dim].astype(str)
-            data_dimensions[dim] = [dim_desc[k] for k in data_dimensions[dim]]
-        # Create each combination of dimension values, e.g. each age group & sex combination. Not all combinations will have associated data.
-        for dimension_value_combination in itertools.product(*dimension_values):
-            # build filter by reducing, start with a constant True boolean array
-            filt = [True] * len(data_dimensions)
-            for dim_idx, dim_value in enumerate(dimension_value_combination):
-                dimension_name = dimensions[dim_idx]
-                value_is_nan = isinstance(dim_value, float) == float and math.isnan(
-                    dim_value
-                )
-                # Boolean identifying which rows contain the dimension combination
-                filt = filt & (
-                    data_dimensions[dimension_name].isnull()
-                    if value_is_nan
-                    else data_dimensions[dimension_name] == dim_value
-                )
-                # Pulling out the data for a given combination
-                tables_by_combination[dimension_value_combination] = data_dimensions[
-                    filt
-                ].drop(dimensions, axis=1)
-                # Removing tables for the combinations that don't exist
-                tables_by_combination = {
-                    k: v for (k, v) in tables_by_combination.items() if not v.empty
-                }  # removing empty combinations
-    return tables_by_combination
+            data_dimensions[dim] = data_dimensions[dim].map(dim_dict[dim])
+
+    return data_dimensions
 
 
 def get_series_with_relevant_dimensions(
     data_series: pd.DataFrame,
     init_dimensions: List[str],
     init_non_dimensions: List[str],
-) -> Tuple[pd.DataFrame, List[str], List[List[Any]]]:
+) -> Tuple[pd.DataFrame, List[str]]:
     """For a given indicator and series, return a tuple:
     - data filtered to that indicator and series
     - names of relevant dimensions
@@ -374,7 +323,6 @@ def get_series_with_relevant_dimensions(
         col for col in init_dimensions if data_series.loc[:, col].notna().any()
     ]
     dimension_names = []
-    dimension_unique_values = []
 
     for c in non_null_dimensions_columns:
         uniques = data_series[c].unique()
@@ -382,7 +330,6 @@ def get_series_with_relevant_dimensions(
             len(uniques) > 1
         ):  # Means that columns where the value doesn't change aren't included e.g. Nature is typically consistent across a dimension whereas Age and Sex are less likely to be.
             dimension_names.append(c)
-            dimension_unique_values.append(list(uniques))
     return (
         data_series.loc[
             :,
@@ -391,7 +338,6 @@ def get_series_with_relevant_dimensions(
             ),
         ],
         dimension_names,
-        dimension_unique_values,
     )
 
 
