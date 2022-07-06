@@ -64,6 +64,48 @@ However, processing all the datasets will take a long time and memory.
 
 *Note*: `poetry run` runs commands from within the virtual environment. You can also activate it with `poetry shell` and then simply run `etl ...`.
 
+#### Creating the pipeline of a new dataset
+
+These are the steps to create a data pipeline for a dataset called `example_dataset` from an institution called
+`example_institution`, with version `YYYY-MM-DD` (where this date tag can typically be the current date when the dataset
+is being added to `etl`, or the date when the source data was released or updated):
+
+0. Activate the virtual environment (running `poetry shell`).
+1. Create a new branch in the `walden` submodule.
+2. If the source of data is a single file, you can manually download it and upload it as a new data snapshot into the
+S3 `walden` bucket.
+Alternatively, you can create an ingest script to do that (e.g. `etl/vendor/walden/ingests/example_institution.py`).
+The latter is preferable for example when the data is retrieved using an API.
+For more complex pipelines (e.g. the FAOSTAT data pipeline), the ingest script can download multiple files.
+Keep in mind that, if there is additional metadata, it should also be ingested into `walden` as part of the snapshot.
+3. Create an index file `etl/vendor/walden/index/example_institution/YYYY-MM-DD/example_dataset.json` for the new
+dataset.
+You can simply copy another existing index file and adapt its content.
+This can be done manually, or, alternatively, the ingest script can also write one (or multiple) index files.
+4. Run `make test` and make changes to ensure the new files in the repository have the right style and structure.
+5. Create a pull request to merge the new branch with the master branch in `walden`.
+6. Create a new branch in `etl`.
+7. Create a new `meadow` step file (e.g. `etl/etl/steps/data/meadow/example_institution/YYYY-MM-DD/example_dataset.py`).
+The step must contain a `run(dest_dir)` function that loads data from the `walden` bucket in S3 and creates a dataset
+(a `catalog.Dataset` object) with one or more tables (`catalog.Table` objects) containing the raw data.
+Keep in mind that, both the dataset and its table(s) should contain metadata.
+8. Add the new meadow step to the dag, including its dependencies.
+9. Ensure the step runs well, and that `make test` does not return errors.
+10. Create a new garden step (e.g. `etl/etl/steps/data/garden/example_institution/YYYY-MM-DD/example_dataset.py`).
+The step must contain a `run(dest_dir)` function that loads data from the last `meadow` step, processes the data and
+creates a dataset with one or more tables and the necessary metadata.
+Country names must be harmonized (for which the `harmonize` tool of `etl` can be used).
+Add plenty of assertions and sanity checks on the data (if possible, compare with the previous version of the data and
+check for abrupt changes).
+11. Add the new garden step to the dag, including its dependencies.
+12. Ensure the step runs well, and that `make test` does not return errors.
+13. Create a new grapher step (e.g. `etl/etl/steps/grapher/example_institution/YYYY-MM-DD/example_dataset.py`).
+The step must contain a `get_grapher_dataset()` function and `get_grapher_tables()` function.
+You can run that step using
+[a local grapher](https://github.com/owid/owid-grapher/blob/master/docs/docker-compose-mysql.md).
+14. Create a pull request to merge the new branch with the master branch in `etl`.
+At this point, there may be some further editing of the previous steps before merging the branch to master.
+
 
 ## Reporting problems
 
