@@ -8,11 +8,14 @@ from owid.catalog.utils import underscore
 from owid.walden import Catalog as WaldenCatalog
 from sqlalchemy.engine import Engine
 
+from etl import config
 from etl.db import get_engine
 from etl.steps import load_dag
 
 from . import utils
 from .backport import backport as backport_step
+
+config.enable_bugsnag()
 
 log = structlog.get_logger()
 
