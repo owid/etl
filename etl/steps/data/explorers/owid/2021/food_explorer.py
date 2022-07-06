@@ -43,7 +43,7 @@ from owid.catalog.meta import DatasetMeta
 from typing import List, Dict, Any, Optional, cast
 
 # %%
-HERE = BASE_DIR / "etl/steps/data/garden/explorers/2021"
+HERE = BASE_DIR / "etl/steps/data/explorers/owid/2021"
 
 # %%
 PATH_DATASET_QCL = DATA_DIR / "garden/faostat/2021-03-18/faostat_qcl"
