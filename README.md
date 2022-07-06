@@ -103,7 +103,7 @@ check for abrupt changes).
 12. Ensure the step runs well and that `make test` does not return errors.
 13. Create a new grapher step (e.g. `etl/etl/steps/grapher/example_institution/YYYY-MM-DD/example_dataset.py`).
 The step must contain a `get_grapher_dataset()` function and a `get_grapher_tables()` function.
-You can run that step using
+To test the step, you can run it on the grapher `staging` database, or using
 [a local grapher](https://github.com/owid/owid-grapher/blob/master/docs/docker-compose-mysql.md).
 14. Create a pull request to merge the new branch with the master branch in `etl`.
 At this point, some further editing of the step files may be required before merging the branch with master.
