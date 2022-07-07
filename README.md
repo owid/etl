@@ -22,6 +22,8 @@ You need to install the following:
 * MYSQL client (and Python dev headers). If you don't have this already,
   * On Ubuntu: `sudo apt install python3.9-dev mysql-client`
   * On Mac: `brew install mysql-client`
+* AWS CLI and you should have an `~/.aws/config` file configured so that you can upload to walden etc.
+
 
 #### Creating and using the virtual environment
 
@@ -37,6 +39,8 @@ To run all the checks and make sure you have everything set up correctly, try
 ```
 make test
 ```
+if `make test` fails report it in #data-architecture or #tech-issues. The `etl` is undergoing constant development so it may not be your local setup causing `make test` to fail and therefore shouldn't stop you progressing to the next step.
+
 
 To run a subset of examples, you can try (for example)
 
@@ -84,12 +88,12 @@ dataset.
 You can simply copy another existing index file and adapt its content.
 This can be done manually, or, alternatively, the ingest script can also write one (or multiple) index files.
 4. **Run `make test` in `walden`** and make changes to ensure the new files in the repository have the right style and structure.
-5. **Create a pull request** to merge the new branch with the master branch in `walden`.
-6. **Create a new branch in `etl`**.
-7. **Create a new `meadow` step file** (e.g. `etl/etl/steps/data/meadow/example_institution/YYYY-MM-DD/example_dataset.py`).
+5. **Create a pull request** to merge the new branch with the master branch in `walden`. When getting started with the `etl` you should request a code review from a more experienced `etl` user.
+7. **Create a new branch in `etl`**.
+8. **Create a new `meadow` step file** (e.g. `etl/etl/steps/data/meadow/example_institution/YYYY-MM-DD/example_dataset.py`).
 The step must contain a `run(dest_dir)` function that loads data from the `walden` bucket in S3 and creates a dataset
 (a `catalog.Dataset` object) with one or more tables (`catalog.Table` objects) containing the raw data.
-Keep in mind that both the dataset and its table(s) should contain metadata.
+Keep in mind that both the dataset and its table(s) should contain metadata. Additionally, all of the column names must be snake case before uploading to `meadow`. There is a function in the `owid.catalog.utils` module that will do this for you: `tb = underscore_table(Table(full_df))`.
 8. **Add the new meadow step to the dag**, including its dependencies.
 9. **Run `make test` in `etl`** and  ensure the step runs well.
 10. **Create a new garden step** (e.g. `etl/etl/steps/data/garden/example_institution/YYYY-MM-DD/example_dataset.py`).
