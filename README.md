@@ -71,41 +71,40 @@ These are the steps to create a data pipeline for a dataset called `example_data
 is being added to `etl`, or the date when the source data was released or updated):
 
 0. Activate the virtual environment (running `poetry shell`).
-1. Create a new branch in the `walden` submodule.
-2. If the source of data is a single file, you can manually download it and upload it as a new data snapshot into the
-S3 `walden` bucket.
-Alternatively, you can create an ingest script to do that (e.g. `etl/vendor/walden/ingests/example_institution.py`).
-The latter is preferable for example when the data is retrieved using an API.
-For more complex pipelines (e.g.
-[the FAOSTAT data pipeline](https://github.com/owid/etl/blob/master/docs/data/faostat.md)), the ingest script can
-download multiple files.
+1. **Create a new branch in the `walden` submodule**.
+2. **Create an ingest script** (e.g. `etl/vendor/walden/ingests/example_institution.py`) to download the data from its
+original source and upload it as a new data snapshot into the S3 `walden` bucket.
+This step can also be done manually (although it is preferable to do it via script, to have a record of how the data was
+obtained, and to be able to repeat the process in the future, for instance if another version of the data is released).
 Keep in mind that, if there is additional metadata, it should also be ingested into `walden` as part of the snapshot.
-3. Create an index file `etl/vendor/walden/index/example_institution/YYYY-MM-DD/example_dataset.json` for the new
+If the data is in a single file for which you have a download link, this script may not be required: you can add
+this link directly in the index file (see next point).
+3. **Create an index file** `etl/vendor/walden/index/example_institution/YYYY-MM-DD/example_dataset.json` for the new
 dataset.
 You can simply copy another existing index file and adapt its content.
 This can be done manually, or, alternatively, the ingest script can also write one (or multiple) index files.
-4. Run `make test` and make changes to ensure the new files in the repository have the right style and structure.
-5. Create a pull request to merge the new branch with the master branch in `walden`.
-6. Create a new branch in `etl`.
-7. Create a new `meadow` step file (e.g. `etl/etl/steps/data/meadow/example_institution/YYYY-MM-DD/example_dataset.py`).
+4. **Run `make test` in `walden`** and make changes to ensure the new files in the repository have the right style and structure.
+5. **Create a pull request** to merge the new branch with the master branch in `walden`.
+6. **Create a new branch in `etl`**.
+7. **Create a new `meadow` step file** (e.g. `etl/etl/steps/data/meadow/example_institution/YYYY-MM-DD/example_dataset.py`).
 The step must contain a `run(dest_dir)` function that loads data from the `walden` bucket in S3 and creates a dataset
 (a `catalog.Dataset` object) with one or more tables (`catalog.Table` objects) containing the raw data.
 Keep in mind that both the dataset and its table(s) should contain metadata.
-8. Add the new meadow step to the dag, including its dependencies.
-9. Ensure the step runs well and that `make test` does not return errors.
-10. Create a new garden step (e.g. `etl/etl/steps/data/garden/example_institution/YYYY-MM-DD/example_dataset.py`).
+8. **Add the new meadow step to the dag**, including its dependencies.
+9. **Run `make test` in `etl`** and  ensure the step runs well.
+10. **Create a new garden step** (e.g. `etl/etl/steps/data/garden/example_institution/YYYY-MM-DD/example_dataset.py`).
 The step must contain a `run(dest_dir)` function that loads data from the last `meadow` step, processes the data and
 creates a dataset with one or more tables and the necessary metadata.
 Country names must be harmonized (for which the `harmonize` tool of `etl` can be used).
 Add plenty of assertions and sanity checks to the step (if possible, compare the data with its previous version and
 check for abrupt changes).
-11. Add the new garden step to the dag, including its dependencies.
-12. Ensure the step runs well and that `make test` does not return errors.
-13. Create a new grapher step (e.g. `etl/etl/steps/grapher/example_institution/YYYY-MM-DD/example_dataset.py`).
+11. **Add the new garden step to the dag**, including its dependencies.
+12. **Run `make test` in `etl`** and  ensure the step runs well.
+13. **Create a new grapher step** (e.g. `etl/etl/steps/grapher/example_institution/YYYY-MM-DD/example_dataset.py`).
 The step must contain a `get_grapher_dataset()` function and a `get_grapher_tables()` function.
 To test the step, you can run it on the grapher `staging` database, or using
 [a local grapher](https://github.com/owid/owid-grapher/blob/master/docs/docker-compose-mysql.md).
-14. Create a pull request to merge the new branch with the master branch in `etl`.
+14. **Create a pull request** to merge the new branch with the master branch in `etl`.
 At this point, some further editing of the step files may be required before merging the branch with master.
 
 ## Reporting problems
