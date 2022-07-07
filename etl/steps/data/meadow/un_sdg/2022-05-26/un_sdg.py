@@ -1,17 +1,11 @@
-import requests
-import numpy as np
 import re
-import itertools
-import math
 import pandas as pd
-from collections import defaultdict
 
 from structlog import get_logger
 from pathlib import Path
-from typing import Tuple, List, Any, Dict
 from etl.steps.data.converters import convert_walden_metadata
 from owid.walden import Catalog
-from owid.catalog import Dataset, Table, DatasetMeta, TableMeta
+from owid.catalog import Dataset, Table, TableMeta
 from owid.catalog.utils import underscore
 
 BASE_URL = "https://unstats.un.org/sdgapi"
