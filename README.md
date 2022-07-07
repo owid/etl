@@ -82,7 +82,7 @@ This step can also be done manually (although it is preferable to do it via scri
 obtained, and to be able to repeat the process in the future, for instance if another version of the data is released).
 Keep in mind that, if there is additional metadata, it should also be ingested into `walden` as part of the snapshot.
 If the data is in a single file for which you have a download link, this script may not be required: you can add
-this link directly in the index file (see next point).
+this link directly in the index file (see next point). There is guidance on how to upload to `walden` manually in the [`walden` README](https://github.com/owid/walden#manually).
 3. **Create an index file** `etl/vendor/walden/index/example_institution/YYYY-MM-DD/example_dataset.json` for the new
 dataset.
 You can simply copy another existing index file and adapt its content.
