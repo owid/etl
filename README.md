@@ -12,7 +12,7 @@ This project is the spiritual successor to [importers](https://github.com/owid/i
 
 ## Getting started
 
-#### Installations
+### Installations
 
 You need to install the following:
 
@@ -22,21 +22,25 @@ You need to install the following:
 * MYSQL client (and Python dev headers). If you don't have this already,
   * On Ubuntu: `sudo apt install python3.9-dev mysql-client`
   * On Mac: `brew install mysql-client`
+* AWS CLI and you should have an `~/.aws/config` file configured so that you can upload to walden etc.
 
-#### Creating and using the virtual environment
+
+### Creating and using the virtual environment
 
 We use `poetry` to manage the virtual environment for the project, and you'll typically do your work within that virtual environment.
 
 1. Run `poetry install`, which creates a virtual environment in `.venv` using `make`
 2. Activate the virtual env with `poetry shell`
 
-#### Example commands
+### Example commands
 
 To run all the checks and make sure you have everything set up correctly, try
 
 ```
 make test
 ```
+if `make test` fails report it in #data-architecture or #tech-issues. The `etl` is undergoing constant development so it may not be your local setup causing `make test` to fail and therefore shouldn't stop you progressing to the next step.
+
 
 To run a subset of examples, you can try (for example)
 
@@ -64,6 +68,48 @@ However, processing all the datasets will take a long time and memory.
 
 *Note*: `poetry run` runs commands from within the virtual environment. You can also activate it with `poetry shell` and then simply run `etl ...`.
 
+### Creating the pipeline of a new dataset
+
+These are the steps to create a data pipeline for a dataset called `example_dataset`, from an institution called
+`example_institution`, with version `YYYY-MM-DD` (where this date tag can typically be the current date when the dataset
+is being added to `etl`, or the date when the source data was released or updated):
+
+0. Activate the virtual environment (running `poetry shell`).
+1. **Create a new branch in the `walden` submodule**.
+2. **Create an ingest script** (e.g. `etl/vendor/walden/ingests/example_institution.py`) to download the data from its
+original source and upload it as a new data snapshot into the S3 `walden` bucket.
+This step can also be done manually (although it is preferable to do it via script, to have a record of how the data was
+obtained, and to be able to repeat the process in the future, for instance if another version of the data is released).
+Keep in mind that, if there is additional metadata, it should also be ingested into `walden` as part of the snapshot.
+If the data is in a single file for which you have a download link, this script may not be required: you can add
+this link directly in the index file (see next point). There is guidance on how to upload to `walden` manually in the [`walden` README](https://github.com/owid/walden#manually).
+3. **Create an index file** `etl/vendor/walden/index/example_institution/YYYY-MM-DD/example_dataset.json` for the new
+dataset.
+You can simply copy another existing index file and adapt its content.
+This can be done manually, or, alternatively, the ingest script can also write one (or multiple) index files.
+4. **Run `make test` in `walden`** and make changes to ensure the new files in the repository have the right style and structure.
+5. **Create a pull request** to merge the new branch with the master branch in `walden`. When getting started with the `etl` you should request a code review from a more experienced `etl` user.
+7. **Create a new branch in `etl`**.
+8. **Create a new `meadow` step file** (e.g. `etl/etl/steps/data/meadow/example_institution/YYYY-MM-DD/example_dataset.py`).
+The step must contain a `run(dest_dir)` function that loads data from the `walden` bucket in S3 and creates a dataset
+(a `catalog.Dataset` object) with one or more tables (`catalog.Table` objects) containing the raw data.
+Keep in mind that both the dataset and its table(s) should contain metadata. Additionally, all of the column names must be snake case before uploading to `meadow`. There is a function in the `owid.catalog.utils` module that will do this for you: `tb = underscore_table(Table(full_df))`.
+8. **Add the new meadow step to the dag**, including its dependencies.
+9. **Run `make test` in `etl`** and  ensure the step runs well. To run the step: `etl data://meadow/example_institution/YYYY-MM-DD/example_dataset`
+10. **Create a new garden step** (e.g. `etl/etl/steps/data/garden/example_institution/YYYY-MM-DD/example_dataset.py`).
+The step must contain a `run(dest_dir)` function that loads data from the last `meadow` step, processes the data and
+creates a dataset with one or more tables and the necessary metadata.
+Country names must be harmonized (for which the `harmonize` tool of `etl` can be used).
+Add plenty of assertions and sanity checks to the step (if possible, compare the data with its previous version and
+check for abrupt changes).
+11. **Add the new garden step to the dag**, including its dependencies.
+12. **Run `make test` in `etl`** and  ensure the step runs well.
+13. **Create a new grapher step** (e.g. `etl/etl/steps/grapher/example_institution/YYYY-MM-DD/example_dataset.py`).
+The step must contain a `get_grapher_dataset()` function and a `get_grapher_tables()` function.
+To test the step, you can run it on the grapher `staging` database, or using
+[a local grapher](https://github.com/owid/owid-grapher/blob/master/docs/docker-compose-mysql.md).
+14. **Create a pull request** to merge the new branch with the master branch in `etl`.
+At this point, some further editing of the step files may be required before merging the branch with master.
 
 ## Reporting problems
 
