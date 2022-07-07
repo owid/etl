@@ -95,7 +95,7 @@ The step must contain a `run(dest_dir)` function that loads data from the `walde
 (a `catalog.Dataset` object) with one or more tables (`catalog.Table` objects) containing the raw data.
 Keep in mind that both the dataset and its table(s) should contain metadata. Additionally, all of the column names must be snake case before uploading to `meadow`. There is a function in the `owid.catalog.utils` module that will do this for you: `tb = underscore_table(Table(full_df))`.
 8. **Add the new meadow step to the dag**, including its dependencies.
-9. **Run `make test` in `etl`** and  ensure the step runs well.
+9. **Run `make test` in `etl`** and  ensure the step runs well. To run the step: `etl data://meadow/example_institution/YYYY-MM-DD/example_dataset`
 10. **Create a new garden step** (e.g. `etl/etl/steps/data/garden/example_institution/YYYY-MM-DD/example_dataset.py`).
 The step must contain a `run(dest_dir)` function that loads data from the last `meadow` step, processes the data and
 creates a dataset with one or more tables and the necessary metadata.
