@@ -12,7 +12,7 @@ This project is the spiritual successor to [importers](https://github.com/owid/i
 
 ## Getting started
 
-#### Installations
+### Installations
 
 You need to install the following:
 
@@ -25,14 +25,14 @@ You need to install the following:
 * AWS CLI and you should have an `~/.aws/config` file configured so that you can upload to walden etc.
 
 
-#### Creating and using the virtual environment
+### Creating and using the virtual environment
 
 We use `poetry` to manage the virtual environment for the project, and you'll typically do your work within that virtual environment.
 
 1. Run `poetry install`, which creates a virtual environment in `.venv` using `make`
 2. Activate the virtual env with `poetry shell`
 
-#### Example commands
+### Example commands
 
 To run all the checks and make sure you have everything set up correctly, try
 
@@ -68,7 +68,7 @@ However, processing all the datasets will take a long time and memory.
 
 *Note*: `poetry run` runs commands from within the virtual environment. You can also activate it with `poetry shell` and then simply run `etl ...`.
 
-#### Creating the pipeline of a new dataset
+### Creating the pipeline of a new dataset
 
 These are the steps to create a data pipeline for a dataset called `example_dataset`, from an institution called
 `example_institution`, with version `YYYY-MM-DD` (where this date tag can typically be the current date when the dataset
