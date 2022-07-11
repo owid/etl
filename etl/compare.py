@@ -4,7 +4,8 @@
 
 from pathlib import Path
 import click
-from rich_click import RichCommand, RichGroup
+from rich_click.rich_command import RichCommand
+from rich_click.rich_group import RichGroup
 from rich import print
 from typing import cast
 import pandas as pd
@@ -13,7 +14,7 @@ from owid import catalog
 
 
 @click.group(cls=RichGroup)
-def cli():
+def cli() -> None:
     """Compare two dataframes, both structurally and the values.
 
     This tool loads two dataframes, either from the local ETL and the remote catalog
@@ -37,11 +38,9 @@ def diff_print_and_exit(
     show_values: bool,
     show_shared: bool,
     truncate_lists_at: int,
-):
+) -> None:
     """Runs the comparison and prints the differences, then exits with the appropriate exit code."""
-    diff = tempcompare.DataFrameHighLevelDiff(
-        df1, df2, absolute_tolerance, relative_tolerance
-    )
+    diff = tempcompare.HighLevelDiff(df1, df2, absolute_tolerance, relative_tolerance)
     if diff.are_equal:
         print("[green]Dataframes are equal (within the given thresholds)[/green]")
         exit(0)
@@ -119,7 +118,9 @@ def etl_catalog(
     are structurally equal but are otherwise different, 3 if the dataframes have different structure and/or different values.
     """
     try:
-        remote_df = catalog.find_one(table=table, namespace=namespace, dataset=dataset, channels=[cast(catalog.CHANNEL, channel)])  # type: ignore
+        remote_df = catalog.find_one(
+            table=table, namespace=namespace, dataset=dataset, channels=channel
+        )
         local_catalog = catalog.LocalCatalog("data")
         local_df = local_catalog.find_one(
             table=table,
@@ -165,11 +166,11 @@ def load_dataframe(path_str: str) -> pd.DataFrame:
         raise Exception("File does not exist: " + path_str)
 
     if path.suffix.lower() == ".feather":
-        return pd.read_feather(path_str)
+        return cast(pd.DataFrame, pd.read_feather(path_str))
     elif path.suffix.lower() == ".csv":
         return pd.read_csv(path_str)
     elif path.suffix.lower() == ".parquet":
-        return pd.read_parquet(path_str)
+        return cast(pd.DataFrame, pd.read_parquet(path_str))
     else:
         raise Exception("Unknown file format: " + path_str)
 
