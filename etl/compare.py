@@ -218,6 +218,7 @@ def dataframes(
     """
     df1: pd.DataFrame
     df2: pd.DataFrame
+    print("🦸 OWID's friendly dataframe comparision tool - at your service! 🦸")
     try:
         df1 = load_table(dataframe1)
     except Exception as e:

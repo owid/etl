@@ -303,9 +303,9 @@ class DataFrameHighLevelDiff:
         blue, blue_end = ("[blue]", "[/blue]") if use_color_tags else ("", "")
 
         if self.are_equal:
-            yield (f"{green}{df1_label} is equal to {df2_label}{green_end}")
+            yield (f"{green}{df1_label} == {df2_label}{green_end}")
         else:
-            yield (f"{red}{df1_label} is not equal to {df2_label}{red_end}")
+            yield (f"{red}{df1_label} ≠ {df2_label}{red_end}")
 
             if self.are_structurally_equal:
                 yield (f"The structure is {green}identical{green_end}")
@@ -320,6 +320,10 @@ class DataFrameHighLevelDiff:
                         ),
                         f"{red}No shared columns{red_end}",
                     )
+                elif len(self.columns_shared) == 0:
+                    # Warn about no shared columns even if show_shared is not set
+                    yield f"{red}No shared columns{red_end}"
+
                 yield from yield_formatted_if_not_empty(
                     self.columns_missing_in_df1,
                     lambda item: yield_list_lines(
