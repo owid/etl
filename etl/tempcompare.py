@@ -5,6 +5,7 @@ import numpy as np
 
 # ######## Note - this file will be moved to owid-catalog-py before the branch is merged ##############
 
+
 def get_list_description_with_max_length(items: List[Any], max_items: int = 20) -> str:
     if len(items) > max_items:
         return (
@@ -16,16 +17,16 @@ def get_list_description_with_max_length(items: List[Any], max_items: int = 20) 
 
 
 def yield_list_lines(
-            description: str, items: Iterable[Any]
-        ) -> Generator[str, None, None]:
-            sublines = [item for item in items]
-            if len(sublines) > 1:
-                yield f"{description}:"
-                for subline in sublines:
-                    if subline != "":
-                        yield f"  {subline}"
-            elif len(sublines) == 1:
-                yield f"{description}: {sublines[0]}"
+    description: str, items: Iterable[Any]
+) -> Generator[str, None, None]:
+    sublines = [item for item in items]
+    if len(sublines) > 1:
+        yield f"{description}:"
+        for subline in sublines:
+            if subline != "":
+                yield f"  {subline}"
+    elif len(sublines) == 1:
+        yield f"{description}: {sublines[0]}"
 
 
 def get_compact_list_description(
@@ -68,13 +69,16 @@ def get_compact_list_description(
 
 
 def yield_formatted_if_not_empty(
-    item: Any, format_function: Callable[[Any], Generator[str, None, None]], fallback_message: str = ""
+    item: Any,
+    format_function: Callable[[Any], Generator[str, None, None]],
+    fallback_message: str = "",
 ) -> Generator[str, None, None]:
     """Yield an item formatted with the given function if it is not empty."""
     if item is not None and any(item):
         yield from format_function(item)
     elif fallback_message != "":
         yield fallback_message
+
 
 class DataFrameHighLevelDiff:
     """Class for comparing two dataframes.
@@ -118,7 +122,6 @@ class DataFrameHighLevelDiff:
     duplicate_index_values_in_df1: pd.Series
     duplicate_index_values_in_df2: pd.Series
     value_differences: Optional[pd.DataFrame] = None
-
 
     def __init__(
         self,
@@ -175,7 +178,9 @@ class DataFrameHighLevelDiff:
         df2_index_names = set(self.df2.index.names)
         self.index_columns_missing_in_df1 = sorted(df2_index_names - df1_index_names)
         self.index_columns_missing_in_df2 = sorted(df1_index_names - df2_index_names)
-        self.index_columns_shared = sorted(df1_index_names.intersection(df2_index_names))
+        self.index_columns_shared = sorted(
+            df1_index_names.intersection(df2_index_names)
+        )
 
         self.index_values_missing_in_df1 = self.df2.index.difference(self.df1.index)
         self.index_values_missing_in_df2 = self.df1.index.difference(self.df2.index)
@@ -189,8 +194,12 @@ class DataFrameHighLevelDiff:
 
         # Now we calculate the value differences in the intersection of the two dataframes.
         if self.columns_shared and any(self.index_values_shared):
-            df1_intersected = self.df1.loc[self.index_values_shared, list(self.columns_shared)]
-            df2_intersected = self.df2.loc[self.index_values_shared, list(self.columns_shared)]
+            df1_intersected = self.df1.loc[
+                self.index_values_shared, list(self.columns_shared)
+            ]
+            df2_intersected = self.df2.loc[
+                self.index_values_shared, list(self.columns_shared)
+            ]
             # We don't use the compare function here from above because it builds a new
             # dataframe and we want to leave indices intact so we can know which rows and columns
             # were different once we drop the ones with no differences
@@ -316,7 +325,9 @@ class DataFrameHighLevelDiff:
                         self.columns_shared,
                         lambda item: yield_list_lines(
                             f"{blue}Shared columns{blue_end}",
-                            get_compact_list_description(item, max_items=truncate_lists_longer_than),
+                            get_compact_list_description(
+                                item, max_items=truncate_lists_longer_than
+                            ),
                         ),
                         f"{red}No shared columns{red_end}",
                     )
@@ -328,14 +339,18 @@ class DataFrameHighLevelDiff:
                     self.columns_missing_in_df1,
                     lambda item: yield_list_lines(
                         f"Columns missing in {df1_label}",
-                        get_compact_list_description(item, max_items=truncate_lists_longer_than),
+                        get_compact_list_description(
+                            item, max_items=truncate_lists_longer_than
+                        ),
                     ),
                 )
                 yield from yield_formatted_if_not_empty(
                     self.columns_missing_in_df2,
                     lambda item: yield_list_lines(
                         f"Columns missing in {df2_label}",
-                        get_compact_list_description(item, max_items=truncate_lists_longer_than),
+                        get_compact_list_description(
+                            item, max_items=truncate_lists_longer_than
+                        ),
                     ),
                 )
                 if show_shared:
@@ -343,7 +358,9 @@ class DataFrameHighLevelDiff:
                         self.index_columns_shared,
                         lambda item: yield_list_lines(
                             f"{blue}Shared index columns{blue_end}",
-                            get_compact_list_description(item, max_items=truncate_lists_longer_than),
+                            get_compact_list_description(
+                                item, max_items=truncate_lists_longer_than
+                            ),
                         ),
                         f"{red}No shared index columns{red_end}",
                     )
@@ -351,14 +368,18 @@ class DataFrameHighLevelDiff:
                     self.index_columns_missing_in_df1,
                     lambda item: yield_list_lines(
                         f"Index columns missing in {df1_label}",
-                        get_compact_list_description(item, max_items=truncate_lists_longer_than),
+                        get_compact_list_description(
+                            item, max_items=truncate_lists_longer_than
+                        ),
                     ),
                 )
                 yield from yield_formatted_if_not_empty(
                     self.index_columns_missing_in_df2,
                     lambda item: yield_list_lines(
                         f"Index columns missing in {df2_label}",
-                        get_compact_list_description(item, max_items=truncate_lists_longer_than),
+                        get_compact_list_description(
+                            item, max_items=truncate_lists_longer_than
+                        ),
                     ),
                 )
                 if show_shared:
@@ -366,7 +387,9 @@ class DataFrameHighLevelDiff:
                         self.index_values_shared,
                         lambda item: yield_list_lines(
                             f"{blue}Shared index values{blue_end}",
-                            get_compact_list_description(item, max_items=truncate_lists_longer_than),
+                            get_compact_list_description(
+                                item, max_items=truncate_lists_longer_than
+                            ),
                         ),
                         f"{red}No shared index values{red_end}",
                     )
@@ -374,44 +397,69 @@ class DataFrameHighLevelDiff:
                     self.index_values_missing_in_df1,
                     lambda item: yield_list_lines(
                         f"Index values missing in {df1_label}",
-                        get_compact_list_description(item, self.df1.index.names, max_items=truncate_lists_longer_than),
+                        get_compact_list_description(
+                            item,
+                            self.df1.index.names,
+                            max_items=truncate_lists_longer_than,
+                        ),
                     ),
                 )
                 yield from yield_formatted_if_not_empty(
                     self.index_values_missing_in_df2,
                     lambda item: yield_list_lines(
                         f"Index values missing in {df2_label}",
-                        get_compact_list_description(item, self.df2.index.names, max_items=truncate_lists_longer_than),
+                        get_compact_list_description(
+                            item,
+                            self.df2.index.names,
+                            max_items=truncate_lists_longer_than,
+                        ),
                     ),
                 )
                 yield from yield_formatted_if_not_empty(
                     self.duplicate_index_values_in_df1,
                     lambda item: yield_list_lines(
                         f"Duplicate index values in {df1_label}",
-                        get_compact_list_description(item, self.df1.index.names, max_items=truncate_lists_longer_than),
+                        get_compact_list_description(
+                            item,
+                            self.df1.index.names,
+                            max_items=truncate_lists_longer_than,
+                        ),
                     ),
                 )
                 yield from yield_formatted_if_not_empty(
                     self.duplicate_index_values_in_df2,
                     lambda item: yield_list_lines(
                         f"Duplicate index values in {df2_label}",
-                        get_compact_list_description(item, self.df2.index.names, max_items=truncate_lists_longer_than),
+                        get_compact_list_description(
+                            item,
+                            self.df2.index.names,
+                            max_items=truncate_lists_longer_than,
+                        ),
                     ),
                 )
 
             if self.value_differences is not None:
-                yield (f"Values in the shared columns/rows are {red}different{red_end}. ({self.value_differences_count} different cells)")
+                yield (
+                    f"Values in the shared columns/rows are {red}different{red_end}. ({self.value_differences_count} different cells)"
+                )
                 yield from yield_formatted_if_not_empty(
                     self.columns_with_differences,
                     lambda item: yield_list_lines(
-                        f"Columns with diffs", get_compact_list_description(item, max_items=truncate_lists_longer_than)
+                        "Columns with diffs",
+                        get_compact_list_description(
+                            item, max_items=truncate_lists_longer_than
+                        ),
                     ),
                 )
                 yield from yield_formatted_if_not_empty(
                     self.rows_with_differences,
                     lambda item: yield_list_lines(
-                        f"Rows with diffs",
-                        get_compact_list_description(item, self.df1.index.names, max_items=truncate_lists_longer_than),
+                        "Rows with diffs",
+                        get_compact_list_description(
+                            item,
+                            self.df1.index.names,
+                            max_items=truncate_lists_longer_than,
+                        ),
                     ),
                 )
 
@@ -434,4 +482,4 @@ class DataFrameHighLevelDiff:
                     )
                 )
             else:
-                yield f"The datasets have no overlapping columns/rows."
+                yield "The datasets have no overlapping columns/rows."

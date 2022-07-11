@@ -131,7 +131,17 @@ def etl_catalog(
         print(e)
         exit(1)
 
-    diff_print_and_exit(remote_df, local_df, "remote", "local", absolute_tolerance, relative_tolerance, show_values, show_shared, truncate_lists_at)
+    diff_print_and_exit(
+        remote_df,
+        local_df,
+        "remote",
+        "local",
+        absolute_tolerance,
+        relative_tolerance,
+        show_values,
+        show_shared,
+        truncate_lists_at,
+    )
 
 
 def load_table(path_str: str) -> catalog.Table:
@@ -221,7 +231,7 @@ def dataframes(
     print("🦸 OWID's friendly dataframe comparision tool - at your service! 🦸")
     try:
         df1 = load_table(dataframe1)
-    except Exception as e:
+    except Exception:
         print(
             f"[yellow]Reading {dataframe1} as table with metadata failed, trying to read as plain dataframe[/yellow]"
         )
@@ -234,7 +244,7 @@ def dataframes(
 
     try:
         df2 = load_table(dataframe2)
-    except Exception as e:
+    except Exception:
         print(
             f"[yellow]Reading {dataframe2} as table with metadata failed, trying to read as plain dataframe[/yellow]"
         )
@@ -245,7 +255,17 @@ def dataframes(
             print(e)
             exit(1)
 
-    diff_print_and_exit(df1, df2, "dataframe1", "dataframe2", absolute_tolerance, relative_tolerance, show_values, show_shared, truncate_lists_at)
+    diff_print_and_exit(
+        df1,
+        df2,
+        "dataframe1",
+        "dataframe2",
+        absolute_tolerance,
+        relative_tolerance,
+        show_values,
+        show_shared,
+        truncate_lists_at,
+    )
 
 
 if __name__ == "__main__":
