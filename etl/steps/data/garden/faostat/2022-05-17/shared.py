@@ -568,6 +568,9 @@ def harmonize_countries(
             how="left",
         )
 
+    # area_code should always be an int
+    data["area_code"] = data["area_code"].astype(int)
+
     # Sanity check.
     error = "Mismatch between fao_country in data and in metadata."
     assert (data["fao_country"].astype(str) == data["fao_country_check"]).all(), error
