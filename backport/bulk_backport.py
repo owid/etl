@@ -121,7 +121,7 @@ def _active_datasets(engine: Engine, limit: int = 1000000) -> pd.DataFrame:
             select distinct v.datasetId from chart_dimensions as cd
             join variables as v on cd.variableId = v.id
         )
-        -- or be used in DAG
+        -- or be used in DAG or specified in CLI
         or id in %(dataset_ids)s
     )
     -- and must not come from ETL
@@ -135,7 +135,10 @@ def _active_datasets(engine: Engine, limit: int = 1000000) -> pd.DataFrame:
     df = pd.read_sql(
         q,
         engine,
-        params={"limit": limit, "dataset_ids": dag_backported_ids},
+        params={
+            "limit": limit,
+            "dataset_ids": dag_backported_ids + (list(dataset_ids) or []),
+        },
     )
     return cast(pd.DataFrame, df)
 
