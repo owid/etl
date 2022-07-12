@@ -12,7 +12,7 @@ from etl.db import get_engine
 from etl.steps import load_dag
 
 from . import utils
-from .backport import backport
+from .backport import backport as backport_step
 
 log = structlog.get_logger()
 
@@ -54,6 +54,12 @@ log = structlog.get_logger()
     type=bool,
     help="Prune datasets from remote walden that are not in DB anymore",
 )
+@click.option(
+    "--backport/--skip-backport",
+    default=True,
+    type=bool,
+    help="Backport datasets, can be skipped if you only want to prune",
+)
 def bulk_backport(
     dataset_ids: tuple[int],
     dry_run: bool,
@@ -62,41 +68,40 @@ def bulk_backport(
     force: bool,
     prune: bool,
     prune_remote: bool,
+    backport: bool,
 ) -> None:
     if prune_remote:
         assert prune, "--prune-remote must be used together with --prune flag"
 
     engine = get_engine()
 
-    df = _active_datasets(engine, dataset_ids=list(dataset_ids), limit=limit)
+    if backport:
+        df = _active_datasets(engine, dataset_ids=list(dataset_ids), limit=limit)
 
-    if dataset_ids:
-        df = df.loc[df.id.isin(dataset_ids)]
+        if dataset_ids:
+            df = df.loc[df.id.isin(dataset_ids)]
 
-    df["short_name"] = df.name.map(underscore)
+        log.info("bulk_backport.start", n=len(df))
 
-    log.info("bulk_backport.start", n=len(df))
-
-    ds_row: Any
-    for i, ds_row in enumerate(df.itertuples()):
-        log.info(
-            "bulk_backport",
-            dataset_id=ds_row.id,
-            name=ds_row.name,
-            private=ds_row.isPrivate,
-            progress=f"{i + 1}/{len(df)}",
-        )
-        backport(
-            dataset_id=ds_row.id,
-            short_name=ds_row.short_name,
-            dry_run=dry_run,
-            upload=upload,
-            force=force,
-        )
+        ds_row: Any
+        for i, ds_row in enumerate(df.itertuples()):
+            log.info(
+                "bulk_backport",
+                dataset_id=ds_row.id,
+                name=ds_row.name,
+                private=ds_row.isPrivate,
+                progress=f"{i + 1}/{len(df)}",
+            )
+            backport_step(
+                dataset_id=ds_row.id,
+                short_name=ds_row.short_name,
+                dry_run=dry_run,
+                upload=upload,
+                force=force,
+            )
 
     if prune:
-        assert not dataset_ids, "Pruning cannot be used together with dataset-ids"
-        _prune_walden_datasets(engine, dry_run, prune_remote)
+        _prune_walden_datasets(engine, dataset_ids, dry_run, prune_remote)
 
     log.info("bulk_backport.finished")
 
@@ -142,18 +147,45 @@ def _active_datasets(
             "dataset_ids": dag_backported_ids + dataset_ids,
         },
     )
+
+    df["short_name"] = df.name.map(underscore)
+
     return cast(pd.DataFrame, df)
 
 
-def _prune_walden_datasets(engine: Engine, dry_run: bool, prune_remote: bool) -> None:
-    active_dataset_ids = set(_active_datasets(engine)["id"])
+def _active_datasets_names(engine: Engine) -> set[str]:
+    """Load all active datasets from grapher and return dataset names of their config
+    and value files."""
+    active_datasets_df = _active_datasets(engine)
+    names = set(
+        active_datasets_df.apply(
+            lambda r: utils.create_short_name(r.short_name, r.id), axis=1
+        )
+    )
+    return {n + "_config" for n in names} | {n + "_values" for n in names}
+
+
+def _prune_walden_datasets(
+    engine: Engine, dataset_ids: tuple[int], dry_run: bool, prune_remote: bool
+) -> None:
+    active_dataset_names = _active_datasets_names(engine)
 
     walden_catalog = WaldenCatalog()
+    datasets = walden_catalog.find(namespace="backport")
 
+    # if given dataset ids, only prune those
+    if dataset_ids:
+        datasets = [
+            ds
+            for ds in datasets
+            if utils.extract_id_from_short_name(ds.short_name) in dataset_ids
+        ]
+
+    # datasets that are not among active datasets
+    # NOTE: it is important to compare not just dataset id, but the whole name as dataset name
+    # can be changed by the user
     datasets_to_delete = [
-        ds
-        for ds in walden_catalog.find(namespace="backport")
-        if utils.extract_id_from_short_name(ds.short_name) not in active_dataset_ids
+        ds for ds in datasets if ds.short_name not in active_dataset_names
     ]
 
     log.info("bulk_backport.delete", n=len(datasets_to_delete))
