@@ -13,6 +13,7 @@ harmonize = 'etl.harmonize:harmonize'
 backport = 'backport.backport:backport_cli'
 bulk_backport = 'backport.bulk_backport:bulk_backport'
 fasttrack = 'backport.fasttrack:fasttrack'
+walkthrough = 'walkthrough.cli:cli'
 
 [tool.poetry.dependencies]
 python = "^3.9"
@@ -60,6 +61,8 @@ matplotlib = "^3.4.3"
 jupytext = "^1.13.7"
 jupyter_nbextensions_configurator = "^0.4.1"
 plotly = "^5.7.0"
+pywebio = "^1.6.1"
+cookiecutter = "^2.1.1"
 
 [tool.black]
 exclude = ".ipynb_checkpoints"
