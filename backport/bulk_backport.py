@@ -55,7 +55,7 @@ log = structlog.get_logger()
     help="Prune datasets from remote walden that are not in DB anymore",
 )
 def bulk_backport(
-    dataset_ids: list[int],
+    dataset_ids: tuple[int],
     dry_run: bool,
     limit: int,
     upload: bool,
@@ -68,7 +68,7 @@ def bulk_backport(
 
     engine = get_engine()
 
-    df = _active_datasets(engine, limit=limit)
+    df = _active_datasets(engine, dataset_ids=list(dataset_ids), limit=limit)
 
     if dataset_ids:
         df = df.loc[df.id.isin(dataset_ids)]
@@ -101,7 +101,9 @@ def bulk_backport(
     log.info("bulk_backport.finished")
 
 
-def _active_datasets(engine: Engine, limit: int = 1000000) -> pd.DataFrame:
+def _active_datasets(
+    engine: Engine, dataset_ids: list[int] = [], limit: int = 1000000
+) -> pd.DataFrame:
     """Return dataframe of datasets with at least one chart that should be backported."""
 
     dag_backported_ids = _backported_ids_in_dag()
@@ -137,7 +139,7 @@ def _active_datasets(engine: Engine, limit: int = 1000000) -> pd.DataFrame:
         engine,
         params={
             "limit": limit,
-            "dataset_ids": dag_backported_ids + (list(dataset_ids) or []),
+            "dataset_ids": dag_backported_ids + dataset_ids,
         },
     )
     return cast(pd.DataFrame, df)
