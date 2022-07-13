@@ -1,13 +1,12 @@
-from typing import Optional
+from owid.catalog.utils import underscore
 
-from owid.catalog.utils import validate_underscore
+from etl.grapher_model import GrapherDatasetModel
 
 
-def create_short_name(short_name: Optional[str], dataset_id: int) -> str:
+def create_short_name(ds: GrapherDatasetModel) -> str:
     """Create sensible short name for dataset."""
-    validate_underscore(short_name, "short-name")
     # prepend dataset id to short name
-    return f"dataset_{dataset_id}_{short_name}"
+    return f"dataset_{ds.id}_{underscore(ds.name)}"
 
 
 def extract_id_from_short_name(short_name: str) -> int:

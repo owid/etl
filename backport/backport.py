@@ -163,8 +163,6 @@ def _walden_timestamp(short_name: str) -> dt.datetime:
 
 def backport(
     dataset_id: int,
-    short_name: str,
-    variable_id: Optional[int] = None,
     force: bool = False,
     dry_run: bool = False,
     upload: bool = True,
@@ -174,12 +172,9 @@ def backport(
     # get data from database
     lg.info("backport.loading_dataset")
     ds = GrapherDatasetModel.load_dataset(engine, dataset_id)
-    lg.info("backport.loading_variable", variable_id=variable_id or "all")
-    if variable_id:
-        vars = [GrapherVariableModel.load_variable(engine, variable_id)]
-    else:
-        # load all variables from a dataset
-        vars = GrapherDatasetModel.load_variables_for_dataset(engine, dataset_id)
+    lg.info("backport.loading_variables")
+    vars = GrapherDatasetModel.load_variables_for_dataset(engine, dataset_id)
+
     variable_ids = [v.id for v in vars]
 
     # get sources for dataset and all variables
@@ -188,7 +183,7 @@ def backport(
         engine, dataset_id=ds.id, variable_ids=variable_ids
     )
 
-    short_name = utils.create_short_name(short_name, dataset_id)
+    short_name = utils.create_short_name(ds)
 
     config = _load_config(ds, vars, sources)
 
@@ -248,13 +243,6 @@ def backport(
 
 @click.command()
 @click.option("--dataset-id", type=int, required=True)
-@click.option("--variable-id", type=int)
-@click.option(
-    "--short-name",
-    type=str,
-    help="Short name of a dataset, must be under_score",
-    required=True,
-)
 @click.option(
     "--force/--no-force",
     default=False,
@@ -275,16 +263,12 @@ def backport(
 )
 def backport_cli(
     dataset_id: int,
-    short_name: str,
-    variable_id: Optional[int] = None,
     force: bool = False,
     dry_run: bool = False,
     upload: bool = True,
 ) -> None:
     return backport(
         dataset_id=dataset_id,
-        short_name=short_name,
-        variable_id=variable_id,
         force=force,
         dry_run=dry_run,
         upload=upload,
@@ -293,7 +277,5 @@ def backport_cli(
 
 if __name__ == "__main__":
     # Example (run against staging DB):
-    #   backport --dataset-id 5426 --variable-id 244087 --name political_regimes --dry-run --force
-    #   or entire dataset
-    #   backport --dataset-id 5426 --short-name political_regimes --force
+    #   backport --dataset-id 5426 --dry-run --force
     backport_cli()
