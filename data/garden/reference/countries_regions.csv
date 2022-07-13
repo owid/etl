@@ -54,7 +54,7 @@ CXR,Christmas Island,CX,CXR,,,,,XA,,,CXR,http://www.wikidata.org/entity/Q31063,C
 CCK,Cocos Islands,CC,CCK,,,,,XB,,,CCK,http://www.wikidata.org/entity/Q36004,Cocos (Keeling) Islands,263.0,596.0,,"[""Cocos (Keeling) Isl."", ""Cocos (Keeling) Islands""]"
 COL,Colombia,CO,COL,233.0,COL,100.0,COL,CK,CLMB,COL,COL,http://www.wikidata.org/entity/Q739,Colombia,170.0,605.0,,
 COM,Comoros,KM,COM,632.0,COM,581.0,COI,CQ,CMRS,COM,COM,http://www.wikidata.org/entity/Q970,Comoros,169.0,606.0,,"[""Comoros (the)""]"
-COG,Congo,CG,COG,634.0,CON,484.0,PRC,CF,CNGO,,COG,http://www.wikidata.org/entity/Q971,Republic of the Congo,168.0,603.0,,"[""Congo (the)"", ""Congo, Rep."", ""Congo-Brazzaville""]"
+COG,Congo,CG,COG,634.0,CON,484.0,PRC,CF,CNGO,,COG,http://www.wikidata.org/entity/Q971,Republic of the Congo,168.0,603.0,,"[""Congo (the)"", ""Congo, Rep."", ""Congo-Brazzaville"", ""Republic of Congo""]"
 COK,Cook Islands,CK,COK,815.0,,,CKI,CW,,COK,COK,http://www.wikidata.org/entity/Q26988,Cook Islands,199.0,604.0,,"[""Cook Islands (the)""]"
 CRI,Costa Rica,CR,CRI,238.0,COS,94.0,COS,CR,CRCA,CRI,CRI,http://www.wikidata.org/entity/Q800,Costa Rica,166.0,608.0,,
 CIV,Cote d'Ivoire,CI,CIV,662.0,CDI,437.0,IVC,IV,IVCT,CIV,CIV,http://www.wikidata.org/entity/Q1008,Ivory Coast,143.0,600.0,,"[""C\u00c3\u00b4te D'Ivoire"", ""C\u00f4te d'Ivoire"", ""C\u00f4te d\u2019Ivoire"", ""Ivory Coast""]"
@@ -108,7 +108,7 @@ HMD,Heard Island and McDonald Islands,HM,HMD,,,,,,,,,http://www.wikidata.org/ent
 OWID_HSE,Hesse Electoral,,,,HSE,273.0,,,,,,,,370.0,819.0,,
 OWID_HSG,Hesse Grand Ducal,,,,HSG,275.0,,,,,,,,371.0,820.0,,
 HND,Honduras,HN,HND,268.0,HON,91.0,HON,HO,HNDS,HND,HND,http://www.wikidata.org/entity/Q783,Honduras,139.0,652.0,,
-HKG,Hong Kong,HK,HKG,532.0,,,,HK,HGKG,HKG,HKG,http://www.wikidata.org/entity/Q8646,Hong Kong,144.0,651.0,,"[""China, Hong Kong SAR"", ""Hong Kong SAR, China"", ""Hong Kong Special Administrative Region (China)"", ""Hong Kong, China""]"
+HKG,Hong Kong,HK,HKG,532.0,,,,HK,HGKG,HKG,HKG,http://www.wikidata.org/entity/Q8646,Hong Kong,144.0,651.0,,"[""China Hong Kong SAR"", ""China, Hong Kong SAR"", ""Hong Kong SAR, China"", ""Hong Kong Special Administrative Region (China)"", ""Hong Kong, China""]"
 HUN,Hungary,HU,HUN,944.0,HUN,310.0,HUN,HU,HNGR,HUN,HUN,http://www.wikidata.org/entity/Q28,Hungary,138.0,655.0,,
 ISL,Iceland,IS,ISL,176.0,ICE,395.0,,IC,ICLD,ISL,ISL,http://www.wikidata.org/entity/Q189,Iceland,207.0,661.0,,
 IND,India,IN,IND,534.0,IND,750.0,IND,II,INDA,IND,IND,http://www.wikidata.org/entity/Q668,India,137.0,657.0,,
@@ -245,7 +245,7 @@ TLS,Timor,TL,TLS,537.0,,860.0,,EM,,TMP,TLS,http://www.wikidata.org/entity/Q574,E
 TGO,Togo,TG,TGO,742.0,TOG,461.0,TOG,TG,TOGO,TGO,TGO,http://www.wikidata.org/entity/Q945,Togo,74.0,761.0,,
 TKL,Tokelau,TK,TKL,,,,,,,,,http://www.wikidata.org/entity/Q36823,Tokelau,287.0,810.0,,
 TON,Tonga,TO,TON,866.0,TON,955.0,TON,TO,,TON,TON,http://www.wikidata.org/entity/Q678,Tonga,235.0,766.0,,
-TTO,Trinidad and Tobago,TT,TTO,369.0,TRI,52.0,TRI,TR,TRNT,TTO,TTO,http://www.wikidata.org/entity/Q754,Trinidad and Tobago,73.0,767.0,,"[""Trin. & Tobago""]"
+TTO,Trinidad and Tobago,TT,TTO,369.0,TRI,52.0,TRI,TR,TRNT,TTO,TTO,http://www.wikidata.org/entity/Q754,Trinidad and Tobago,73.0,767.0,,"[""Trin. & Tobago"", ""Trinidad & Tobago""]"
 TUN,Tunisia,TN,TUN,744.0,TUN,616.0,TUN,TI,TNSA,TUN,TUN,http://www.wikidata.org/entity/Q948,Tunisia,71.0,768.0,,
 TUR,Turkey,TR,TUR,186.0,TUR,640.0,TUR,TU,TRKY,TUR,TUR,http://www.wikidata.org/entity/Q43,Turkey,70.0,769.0,,
 TKM,Turkmenistan,TM,TKM,925.0,TKM,701.0,TUK,TK,,TKM,TKM,http://www.wikidata.org/entity/Q874,Turkmenistan,69.0,764.0,,
@@ -257,7 +257,7 @@ UGA,Uganda,UG,UGA,746.0,UGA,500.0,UGA,UG,UGND,UGA,UGA,http://www.wikidata.org/en
 UKR,Ukraine,UA,UKR,926.0,UKR,369.0,UKR,UN,,UKR,UKR,http://www.wikidata.org/entity/Q212,Ukraine,67.0,774.0,,
 ARE,United Arab Emirates,AE,ARE,466.0,UAE,696.0,UAE,TS,UAR0,ARE,ARE,http://www.wikidata.org/entity/Q878,United Arab Emirates,72.0,568.0,,"[""U.Arab Emirates""]"
 GBR,United Kingdom,GB,GBR,112.0,UKG,200.0,,XXK,UK00,GBR,GBR,http://www.wikidata.org/entity/Q145,United Kingdom,1.0,635.0,,"[""United Kingdom of Great Britain and Northern Ireland""]"
-USA,United States,US,USA,111.0,USA,2.0,,XXU,USA0,USA,USA,http://www.wikidata.org/entity/Q30,United States of America,13.0,776.0,,"[""USA"", ""United States of America""]"
+USA,United States,US,USA,111.0,USA,2.0,,XXU,USA0,USA,USA,http://www.wikidata.org/entity/Q30,United States of America,13.0,776.0,,"[""US"", ""USA"", ""United States of America""]"
 UMI,United States Minor Outlying Islands,UM,UMI,,,,,,,,,http://www.wikidata.org/entity/Q16645,United States Minor Outlying Islands,354.0,811.0,,
 VIR,United States Virgin Islands,VI,VIR,,,,,VI,,VIR,VIR,http://www.wikidata.org/entity/Q11703,United States Virgin Islands,256.0,782.0,,"[""U.S. Virgin Is."", ""U.S. Virgin Islands"", ""Virgin Islands (U.S.)"", ""Virgin Islands, U.S.""]"
 URY,Uruguay,UY,URY,298.0,URU,165.0,URU,UY,URGY,URY,URY,http://www.wikidata.org/entity/Q77,Uruguay,63.0,775.0,,

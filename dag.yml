@@ -30,30 +30,6 @@ steps:
     - walden://hyde/2017/general_files
   data://garden/hyde/2017/baseline:
     - data://meadow/hyde/2017/baseline
-  data://meadow/faostat/2022-02-10/faostat_metadata:
-    - walden://faostat/2022-02-10/faostat_metadata
-  data://meadow/faostat/2017-12-11/faostat_fbsh:
-    - walden://faostat/2017-12-11/faostat_FBSH
-  data://meadow/faostat/2021-03-18/faostat_qcl:
-    - walden://faostat/2021-03-18/faostat_QCL
-  data://meadow/faostat/2021-04-09/faostat_fbs:
-    - walden://faostat/2021-04-09/faostat_FBS
-  data://meadow/faostat/2021-06-17/faostat_rl:
-    - walden://faostat/2021-06-17/faostat_rl
-  data://garden/faostat/2021-03-18/faostat_qcl:
-    - data://meadow/faostat/2021-03-18/faostat_qcl
-    - data://meadow/faostat/2022-02-10/faostat_metadata
-  data://garden/faostat/2021-04-09/faostat_fbsc:
-    - data://meadow/faostat/2017-12-11/faostat_fbsh
-    - data://meadow/faostat/2021-04-09/faostat_fbs
-    - data://meadow/faostat/2022-02-10/faostat_metadata
-  data://garden/faostat/2021-06-17/faostat_rl:
-    - data://meadow/faostat/2021-06-17/faostat_rl
-  data://garden/explorers/2021/food_explorer:
-    - data://garden/faostat/2021-03-18/faostat_qcl
-    - data://garden/faostat/2021-04-09/faostat_fbsc
-    - data://garden/owid/latest/key_indicators
-    - data://open_numbers/open_numbers/latest/gapminder__systema_globalis
   data://meadow/who/2021-07-01/ghe:
     - walden://who/2021-07-01/ghe
   data://meadow/who/2021-07-01/gho:
@@ -80,10 +56,15 @@ steps:
     - data://meadow/worldbank_wdi/2022-05-26/wdi
   grapher://worldbank_wdi/2022-05-26/wdi:
     - data://garden/worldbank_wdi/2022-05-26/wdi
+<<<<<<< HEAD
   data://meadow/un_sdg/2022-07-07/un_sdg:
     - walden://un_sdg/2022-07-07/un_sdg
   data://garden/un_sdg/2022-07-07/un_sdg:
     - data://meadow/un_sdg/2022-07-07/un_sdg
+=======
+  grapher://owid/latest/population_density:
+    - data://garden/owid/latest/population_density
+>>>>>>> master
 
   data://garden/sdg/latest/sdg:
     - backport://backport/owid/latest/dataset_563_world_development_indicators__health
@@ -116,18 +97,23 @@ steps:
     - backport://backport/owid/latest/dataset_115_countries_continents
 
   # Examples
-  data://examples/script/script_example:
+  data://examples/examples/latest/script_example:
     - walden://wb/2021-07-01/wb_income
-    - data://garden/owid/latest/key_indicators
+    - data://garden/ggdc/2020-10-01/ggdc_maddison
     - data://garden/reference
-  data://examples/jupytext/jupytext_example:
-  data://examples/vs_code_cells/vs_code_cells_example:
-  # private steps that require S3 access keys for private walden
-  data-private://examples/private/2022-03-08/private_example:
+  data://examples/examples/latest/jupytext_example:
+    - data://garden/ggdc/2020-10-01/ggdc_maddison
+  data://examples/examples/latest/notebook_example:
+    - data://garden/ggdc/2020-10-01/ggdc_maddison
+  data://examples/examples/latest/vs_code_cells_example:
+    - data://garden/ggdc/2020-10-01/ggdc_maddison
+  # private steps that require S3 access keys for private walden and are run with `etl --private`
+  data-private://examples/examples/latest/private_example:
     # NOTE: this dataset is public as we don't have any private data yet
     - walden-private://ggdc/2020-10-01/ggdc_maddison
-    - data://garden/reference
+
 
 # Sub-dags to import
 include:
   - dag_files/dag_open_numbers.yml
+  - dag_files/dag_faostat.yml

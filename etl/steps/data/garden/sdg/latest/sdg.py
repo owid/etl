@@ -60,13 +60,21 @@ def run(dest_dir: str) -> None:
     for dataset_name, sdg_group in sdg_sources.groupby("dataset_name"):
         ds = Dataset(DATA_DIR / "backport/owid/latest" / dataset_name)
 
+        # Since ds[table] reads from a feather file, it becomes the bottleneck in
+        # runtime. Caching saves us from repeated reads
+        table_cache: dict[str, Table] = {}
+
         # go over all indicators from that dataset
         for r in sdg_group.itertuples():
 
             # iterate over all tables in a dataset (backported datasets would
             # usually have only one)
             for table_name in ds.table_names:
-                table = ds[table_name]
+                if table_name in table_cache:
+                    table = table_cache[table_name]
+                else:
+                    table = ds[table_name]
+                    table_cache[table_name] = table
 
                 log.info(
                     "sdg.run", indicator=r.indicator, variable_name=r.variable_name
