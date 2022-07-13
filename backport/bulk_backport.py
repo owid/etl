@@ -94,7 +94,6 @@ def bulk_backport(
             )
             backport_step(
                 dataset_id=ds_row.id,
-                short_name=ds_row.short_name,
                 dry_run=dry_run,
                 upload=upload,
                 force=force,
@@ -159,7 +158,7 @@ def _active_datasets_names(engine: Engine) -> set[str]:
     active_datasets_df = _active_datasets(engine)
     names = set(
         active_datasets_df.apply(
-            lambda r: utils.create_short_name(r.short_name, r.id), axis=1
+            lambda r: utils.create_short_name(r.id, r.name), axis=1
         )
     )
     return {n + "_config" for n in names} | {n + "_values" for n in names}

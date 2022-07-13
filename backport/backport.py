@@ -1,7 +1,7 @@
 import datetime as dt
 import os
 import tempfile
-from typing import Optional, cast
+from typing import cast
 
 import click
 import pandas as pd
@@ -32,7 +32,9 @@ engine = get_engine()
 walden_catalog = WaldenCatalog()
 
 
-def _walden_values_metadata(ds: GrapherDatasetModel, short_name: str) -> WaldenDataset:
+def _walden_values_metadata(
+    ds: GrapherDatasetModel, short_name: str, public: bool
+) -> WaldenDataset:
     """Create walden dataset for grapher dataset values.
     These datasets are not meant for direct consumption from the catalog, but rather
     for postprocessing in etl.
@@ -48,14 +50,15 @@ def _walden_values_metadata(ds: GrapherDatasetModel, short_name: str) -> WaldenD
         url=f"https://owid.cloud/admin/datasets/{ds.id}",
         publication_date="latest",
         file_extension="feather",
+        is_public=public,
     )
 
 
 def _walden_config_metadata(
-    ds: GrapherDatasetModel, short_name: str, origin_md5: str
+    ds: GrapherDatasetModel, short_name: str, origin_md5: str, public: bool
 ) -> WaldenDataset:
     """Create walden dataset for grapher dataset variables and metadata."""
-    config = _walden_values_metadata(ds, short_name)
+    config = _walden_values_metadata(ds, short_name, public)
     config.short_name = short_name + "_config"
     config.name = f"Grapher metadata for {short_name}"
     config.file_extension = "json"
@@ -146,25 +149,39 @@ def _upload_values_to_walden(
             add_to_catalog(meta, f.name, upload, public=public)
 
 
-def _checksum_match(short_name: str, md5: str) -> bool:
-    try:
-        walden_ds = walden_catalog.find_one(short_name=short_name)
-    except KeyError:
-        # datasets not found in catalog
-        return False
-
-    return (walden_ds.origin_md5 or "") == md5
-
-
 def _walden_timestamp(short_name: str) -> dt.datetime:
     t = walden_catalog.find_one(short_name=short_name).date_accessed
     return cast(dt.datetime, pd.to_datetime(t))
 
 
+def _needs_update(ds: GrapherDatasetModel, short_name: str, md5_config: str) -> bool:
+    # find existing entry in catalog
+    try:
+        walden_ds = walden_catalog.find_one(short_name=f"{short_name}_config")
+    except KeyError:
+        # datasets not found in catalog
+        return True
+
+    # fastrack does not upload data to S3 and leaves owid_data_url empty, if we find
+    # such a dataset, we backport and upload it again
+    if not walden_ds.owid_data_url:
+        return True
+
+    # compare checksums
+    if walden_ds.origin_md5 == md5_config:
+        # then check dataEditedAt field
+        if ds.dataEditedAt < _walden_timestamp(f"{short_name}_config"):
+            return False
+        else:
+            # since `dataEditedAt` is part of config, its checksum should change and _checksum_match
+            # should return False... if this is not the case, something is wrong
+            raise AssertionError("This should never happen")
+    else:
+        return True
+
+
 def backport(
     dataset_id: int,
-    short_name: str,
-    variable_id: Optional[int] = None,
     force: bool = False,
     dry_run: bool = False,
     upload: bool = True,
@@ -174,12 +191,9 @@ def backport(
     # get data from database
     lg.info("backport.loading_dataset")
     ds = GrapherDatasetModel.load_dataset(engine, dataset_id)
-    lg.info("backport.loading_variable", variable_id=variable_id or "all")
-    if variable_id:
-        vars = [GrapherVariableModel.load_variable(engine, variable_id)]
-    else:
-        # load all variables from a dataset
-        vars = GrapherDatasetModel.load_variables_for_dataset(engine, dataset_id)
+    lg.info("backport.loading_variables")
+    vars = GrapherDatasetModel.load_variables_for_dataset(engine, dataset_id)
+
     variable_ids = [v.id for v in vars]
 
     # get sources for dataset and all variables
@@ -188,7 +202,7 @@ def backport(
         engine, dataset_id=ds.id, variable_ids=variable_ids
     )
 
-    short_name = utils.create_short_name(short_name, dataset_id)
+    short_name = utils.create_short_name(ds.id, ds.name)
 
     config = _load_config(ds, vars, sources)
 
@@ -196,21 +210,15 @@ def backport(
     md5_config = checksum_str(config.json(sort_keys=True, indent=0))
 
     if not force:
-        # first check config checksum
-        if _checksum_match(f"{short_name}_config", md5_config):
-            # then check dataEditedAt field
-            if ds.dataEditedAt < _walden_timestamp(f"{short_name}_config"):
-                lg.info(
-                    "backport.skip",
-                    short_name=short_name,
-                    reason="checksums match",
-                    checksum=md5_config,
-                )
-                return
-            else:
-                # since `dataEditedAt` is part of config, its checksum should change and _checksum_match
-                # should return False... if this is not the case, something is wrong
-                raise AssertionError("This should never happen")
+        if not _needs_update(ds, short_name, md5_config):
+            lg.info(
+                "backport.skip",
+                short_name=short_name,
+                reason="checksums match",
+                checksum=md5_config,
+            )
+            lg.info("backport.finished")
+            return
 
     # don't make private datasets public
     public = not ds.isPrivate
@@ -219,7 +227,7 @@ def backport(
     lg.info("backport.upload_config", upload=upload, dry_run=dry_run, public=public)
     _upload_config_to_walden(
         config,
-        _walden_config_metadata(ds, short_name, md5_config),
+        _walden_config_metadata(ds, short_name, md5_config, public),
         dry_run,
         upload,
         public=public,
@@ -237,7 +245,7 @@ def backport(
     )
     _upload_values_to_walden(
         df,
-        _walden_values_metadata(ds, short_name),
+        _walden_values_metadata(ds, short_name, public),
         dry_run,
         upload,
         public=public,
@@ -248,13 +256,6 @@ def backport(
 
 @click.command()
 @click.option("--dataset-id", type=int, required=True)
-@click.option("--variable-id", type=int)
-@click.option(
-    "--short-name",
-    type=str,
-    help="Short name of a dataset, must be under_score",
-    required=True,
-)
 @click.option(
     "--force/--no-force",
     default=False,
@@ -275,16 +276,12 @@ def backport(
 )
 def backport_cli(
     dataset_id: int,
-    short_name: str,
-    variable_id: Optional[int] = None,
     force: bool = False,
     dry_run: bool = False,
     upload: bool = True,
 ) -> None:
     return backport(
         dataset_id=dataset_id,
-        short_name=short_name,
-        variable_id=variable_id,
         force=force,
         dry_run=dry_run,
         upload=upload,
@@ -293,7 +290,5 @@ def backport_cli(
 
 if __name__ == "__main__":
     # Example (run against staging DB):
-    #   backport --dataset-id 5426 --variable-id 244087 --name political_regimes --dry-run --force
-    #   or entire dataset
-    #   backport --dataset-id 5426 --short-name political_regimes --force
+    #   backport --dataset-id 5426 --dry-run --force
     backport_cli()
