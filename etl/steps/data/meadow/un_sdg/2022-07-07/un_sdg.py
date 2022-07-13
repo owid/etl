@@ -18,17 +18,12 @@ def run(dest_dir: str, query: str = "") -> None:
     fname = Path(__file__).stem
     namespace = Path(__file__).parent.parent.stem
 
-    version = "2022-07-07"
-    fname = "un_sdg"
-    namespace = "un_sdg"
     walden_ds = Catalog().find_one(
         namespace=namespace, short_name=fname, version=version
     )
 
     log.info("un_sdg.start")
     local_file = walden_ds.ensure_downloaded()
-    # NOTE: using feather format instead of csv would make it 5x smaller and
-    # load significantly faster
     df = pd.read_feather(local_file)
 
     if query:

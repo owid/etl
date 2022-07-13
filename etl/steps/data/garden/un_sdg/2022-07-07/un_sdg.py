@@ -1,3 +1,4 @@
+import json
 import requests
 import numpy as np
 import re
@@ -14,21 +15,29 @@ from owid.walden import Catalog
 from owid.catalog import Dataset, Table, DatasetMeta, TableMeta
 from owid.catalog.utils import underscore
 
+from owid.catalog import Dataset, Table
+from etl.paths import DATA_DIR
+
 BASE_URL = "https://unstats.un.org/sdgapi"
+VERSION = Path(__file__).parent.stem
+FNAME = Path(__file__).stem
+NAMESPACE = Path(__file__).parent.parent.stem
+
+VERSION = "2022-07-07"
+FNAME = "un_sdg"
+NAMESPACE = "un_sdg"
 log = get_logger()
 
 
 def run(dest_dir: str, query: str = "") -> None:
-    version = Path(__file__).parent.stem
-    fname = Path(__file__).stem
-    namespace = Path(__file__).parent.parent.stem
-    ds_meadow = Dataset((DATA_DIR / f"meadow/{namespace}/{version}/{fname}").as_posix())
+
+    ds_meadow = Dataset((DATA_DIR / f"meadow/{NAMESPACE}/{VERSION}/{FNAME}").as_posix())
 
     assert (
         len(ds_meadow.table_names) == 1
     ), "Expected meadow dataset to have only one table, but found > 1 table names."
-    tb_meadow = ds_meadow[fname]
-    df = pd.DataFrame(tb_meadow).reset_index()
+    tb_meadow = ds_meadow[FNAME]
+    df = pd.DataFrame(tb_meadow)
 
     full_df = create_dataframe(df)
     full_df = full_df[
@@ -55,7 +64,7 @@ def create_dataframe(original_df: pd.DataFrame) -> pd.DataFrame:
     # Removing the square brackets from the indicator column
     original_df = original_df.copy(deep=False)
 
-    unit_description = attributes_description()
+    unit_description = get_attributes_description()
 
     dim_description = dimensions_description()
 
@@ -153,9 +162,6 @@ def get_series_with_relevant_dimensions(
     )
 
 
-
-
-
 def create_short_unit(long_unit: pd.Series) -> np.ndarray:
 
     conditions = [
@@ -213,3 +219,13 @@ def manual_clean_data(df: pd.DataFrame) -> pd.DataFrame:
         ],
     )
     return df
+
+
+def get_attributes_description() -> dict:
+    walden_ds = Catalog().find_one(
+        namespace=NAMESPACE, short_name="unit", version=VERSION
+    )
+    local_file = walden_ds.ensure_downloaded()
+    with open(local_file) as json_file:
+        units = json.load(json_file)
+    return units
