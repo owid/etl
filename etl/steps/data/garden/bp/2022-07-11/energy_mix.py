@@ -1,0 +1,579 @@
+"""Generate energy mix dataset using data from BP's statistical review of the world energy.
+
+We construct two variables for primary energy consumption:
+* One is "direct primary energy", where fossil fuel primary energy (in EJ converted to TWh) is added to the electricity
+  generation from non-fossil sources (in TWh).
+* The other is "primary energy using the substitution method", where fossil fuel primary energy (in EJ) is converted to
+  TWh, and added to the "input-equivalent primary energy" from non-fossil sources (in EJ, converted to TWh).
+  This is the amount of fuel that would be required by thermal power stations to generate the reported electricity
+  output, as explained in
+  [their methodology document](https://www.bp.com/content/dam/bp/business-sites/en/global/corporate/pdfs/energy-economics/statistical-review/bp-stats-review-2022-methodology.pdf).
+  For example, if a country's nuclear power generated 100 TWh, and assuming that the efficiency of a standard thermal
+  power plant is 38%, the input equivalent primary energy for this country would be 100/0.38 = 263 TWh = 0.95 EJ.
+
+NOTE:
+* For non-fossil based electricity (nuclear, hydro, wind, solar, geothermal, biomass in power, and other renewable
+  sources), BP's generation (in TWh) corresponds to gross generation and not accounting for cross-border electricity
+  supply.
+
+"""
+
+import argparse
+from typing import cast
+
+import numpy as np
+import pandas as pd
+from owid.datautils import geo
+
+from owid import catalog
+
+NAMESPACE = "bp"
+VERSION = 2022
+# Dataset name in the owid catalog (without the institution and year).
+DATASET_CATALOG_NAME = "statistical_review_of_world_energy"
+DATASET_TITLE = "Energy mix from BP"
+DATASET_DESCRIPTION = "Energy mix from BP's statistical review of the world energy."
+# Dataset short name.
+DATASET_SHORT_NAME = f"bp_energy_mix__bp_{VERSION}"
+NAMESPACE_IN_CATALOG = "bp_statreview"
+
+# Conversion factors.
+# Terawatt-hours to kilowatt-hours.
+TWH_TO_KWH = 1e9
+# Exajoules to terawatt-hours.
+EJ_TO_TWH = 277.778
+# Petajoules to exajoules.
+PJ_TO_EJ = 1e-3
+
+# List all energy sources in the data.
+HIGH_CARBON_SOURCES = ['Coal', 'Fossil Fuels', 'Gas', 'Oil']
+LOW_CARBON_SOURCES = ['Biofuels', 'Hydro', 'Low-carbon energy', 'Nuclear', 'Other renewables', 'Renewables', 'Solar',
+                      'Wind']
+ALL_SOURCES = sorted(HIGH_CARBON_SOURCES + LOW_CARBON_SOURCES)
+
+REGIONS_TO_ADD = {
+    "North America": {
+        "area_code": "OWID_NAM",
+    },
+    "South America": {
+        "area_code": "OWID_SAM",
+    },
+    "Europe": {
+        "area_code": "OWID_EUR",
+    },
+    "European Union (27)": {
+        "area_code": "OWID_EU27",
+    },
+    "Africa": {
+        "area_code": "OWID_AFR",
+    },
+    "Asia": {
+        "area_code": "OWID_ASI",
+    },
+    "Oceania": {
+        "area_code": "OWID_OCE",
+    },
+    "Low-income countries": {
+        "area_code": "OWID_LIC",
+    },
+    "Upper-middle-income countries": {
+        "area_code": "OWID_UMC",
+    },
+    "Lower-middle-income countries": {
+        "area_code": "OWID_LMC",
+    },
+    "High-income countries": {
+        "area_code": "OWID_HIC",
+    },
+}
+
+# When creating region aggregates, decide how to distribute historical regions.
+# The following decisions are based on the current location of the countries that succeeded the region, and their income
+# group. Continent and income group assigned corresponds to the continent and income group of the majority of the
+# population in the member countries.
+HISTORIC_TO_CURRENT_REGION = {
+    "USSR": {
+        "continent": "Europe",
+        "income_group": "Upper-middle-income countries",
+        "members": [
+            # Europe - High-income countries.
+            "Lithuania",
+            "Estonia",
+            "Latvia",
+            # Europe - Upper-middle-income countries.
+            "Moldova",
+            "Belarus",
+            "Russia",
+            # Europe - Lower-middle-income countries.
+            "Ukraine",
+            # Asia - Upper-middle-income countries.
+            "Georgia",
+            "Armenia",
+            "Azerbaijan",
+            "Turkmenistan",
+            "Kazakhstan",
+            # Asia - Lower-middle-income countries.
+            "Kyrgyzstan",
+            "Uzbekistan",
+            "Tajikistan",
+        ],
+    },
+}
+
+
+def load_population() -> pd.DataFrame:
+    """Load OWID population dataset, and add historical regions to it.
+
+    Returns
+    -------
+    population : pd.DataFrame
+        Population dataset.
+
+    """
+    # Load population dataset.
+    population = (
+        catalog.find("population", namespace="owid", dataset="key_indicators")
+        .load()
+        .reset_index()[["country", "year", "population"]]
+    )
+
+    # Add data for historical regions (if not in population) by adding the population of its current successors.
+    countries_with_population = population["country"].unique()
+    missing_countries = [
+        country
+        for country in HISTORIC_TO_CURRENT_REGION
+        if country not in countries_with_population
+    ]
+    for country in missing_countries:
+        members = HISTORIC_TO_CURRENT_REGION[country]["members"]
+        _population = (
+            population[population["country"].isin(members)]
+            .groupby("year")
+            .agg({"population": "sum", "country": "nunique"})
+            .reset_index()
+        )
+        # Select only years for which we have data for all member countries.
+        _population = _population[_population["country"] == len(members)].reset_index(
+            drop=True
+        )
+        _population["country"] = country
+        population = pd.concat(
+            [population, _population], ignore_index=True
+        ).reset_index(drop=True)
+
+    error = "Duplicate country-years found in population. Check if historical regions changed."
+    assert population[population.duplicated(subset=["country", "year"])].empty, error
+
+    return cast(pd.DataFrame, population)
+
+
+def load_income_groups() -> pd.DataFrame:
+    """Load dataset of income groups and add historical regions to it.
+
+    Returns
+    -------
+    income_groups : pd.DataFrame
+        Income groups data.
+
+    """
+    income_groups = (
+        catalog.find(
+            table="wb_income_group",
+            dataset="wb_income",
+            namespace="wb",
+            channels=["garden"],
+        )
+        .load()
+        .reset_index()
+    )
+    # Add historical regions to income groups.
+    for historic_region in HISTORIC_TO_CURRENT_REGION:
+        historic_region_income_group = HISTORIC_TO_CURRENT_REGION[historic_region][
+            "income_group"
+        ]
+        if historic_region not in income_groups["country"]:
+            historic_region_df = pd.DataFrame(
+                {
+                    "country": [historic_region],
+                    "income_group": [historic_region_income_group],
+                }
+            )
+            income_groups = pd.concat(
+                [income_groups, historic_region_df], ignore_index=True
+            )
+
+    return cast(pd.DataFrame, income_groups)
+
+
+def add_population(
+    df: pd.DataFrame,
+    country_col: str = "country",
+    year_col: str = "year",
+    population_col: str = "population",
+    warn_on_missing_countries: bool = True,
+    show_full_warning: bool = True,
+) -> pd.DataFrame:
+    """Add a column of OWID population to the countries in the data, including population of historical regions.
+
+    This function has been adapted from datautils.geo, because population currently does not include historic regions.
+    We include them in this function.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Data without a column for population (after harmonizing elements, items and country names).
+    country_col : str
+        Name of country column in data.
+    year_col : str
+        Name of year column in data.
+    population_col : str
+        Name for new population column in data.
+    warn_on_missing_countries : bool
+        True to warn if population is not found for any of the countries in the data.
+    show_full_warning : bool
+        True to show affected countries if the previous warning is raised.
+
+    Returns
+    -------
+    df_with_population : pd.DataFrame
+        Data after adding a column for population for all countries in the data.
+
+    """
+
+    # Load population dataset.
+    population = load_population().rename(
+        columns={
+            "country": country_col,
+            "year": year_col,
+            "population": population_col,
+        }
+    )[[country_col, year_col, population_col]]
+
+    # Check if there is any missing country.
+    missing_countries = set(df[country_col]) - set(population[country_col])
+    if len(missing_countries) > 0:
+        if warn_on_missing_countries:
+            geo.warn_on_list_of_entities(
+                list_of_entities=missing_countries,
+                warning_message=(
+                    f"{len(missing_countries)} countries not found in population"
+                    " dataset. They will remain in the dataset, but have nan"
+                    " population."
+                ),
+                show_list=show_full_warning,
+            )
+
+    # Add population to original dataframe.
+    df_with_population = pd.merge(
+        df, population, on=[country_col, year_col], how="left"
+    )
+
+    return df_with_population
+
+
+def get_bp_data(bp_table: catalog.Table) -> pd.DataFrame:
+    bp_table = bp_table.copy()
+
+    # Convert table (snake case) column names to human readable names.
+    bp_table = bp_table.rename(columns={column: bp_table[column].metadata.title for column in bp_table.columns}).\
+        reset_index()
+
+    # Rename human-readable columns (and select only the ones that will be used).
+    columns = {
+        "entity_name": "Country",
+        "entity_code": "Country code",
+        "year": "Year",
+        # Fossil fuel primary energy (in EJ).
+        "Coal Consumption - EJ": "Coal (EJ)",
+        "Gas Consumption - EJ": "Gas (EJ)",
+        "Oil Consumption - EJ": "Oil (EJ)",
+        # Non-fossil based electricity generation (in TWh).
+        "Hydro Generation - TWh": "Hydro (TWh)",
+        "Nuclear Generation - TWh": "Nuclear (TWh)",
+        "Solar Generation - TWh": "Solar (TWh)",
+        "Wind Generation - TWh": "Wind (TWh)",
+        "Geo Biomass Other - TWh": "Other renewables (TWh)",
+        # Non-fossil based electricity generation converted into input-equivalent primary energy (in EJ).
+        "Hydro Consumption - EJ": "Hydro (EJ)",
+        "Nuclear Consumption - EJ": "Nuclear (EJ)",
+        "Solar Consumption - EJ": "Solar (EJ)",
+        "Wind Consumption - EJ": "Wind (EJ)",
+        "Geo Biomass Other - EJ": "Other renewables (EJ)",
+        # Total, input-equivalent primary energy consumption (in EJ).
+        "Primary Energy Consumption - EJ": "Primary Energy (EJ)",
+        # Biofuels consumption (in PJ, that will be converted into EJ).
+        "Biofuels Consumption - PJ - Total": "Biofuels (PJ)",
+    }
+
+    # Create a simple dataframe (without metadata and with a dummy index).
+    assert set(columns) < set(bp_table.columns), "Column names have changed in BP data."
+    bp_data = pd.DataFrame(bp_table)[list(columns)].rename(errors="raise", columns=columns).\
+        astype({"Country code": str})
+
+    return bp_data
+
+
+def check_that_substitution_method_is_well_calculated(primary_energy: pd.DataFrame) -> pd.DataFrame:
+    # Check that the constructed primary energy using the substitution method (in TWh) coincides with the
+    # input-equivalent primary energy (converted from EJ into TWh) given in the original data.
+    check = primary_energy[["Year", "Country", "Primary Energy (EJ)", "Primary energy (TWh)"]].reset_index(drop=True)
+    check["Primary Energy (TWh) - original"] = check["Primary Energy (EJ)"] * EJ_TO_TWH
+    check = check.dropna().reset_index(drop=True)
+    # They may not coincide exactly, but at least check that they differ (point by point) by less than 10%.
+    max_deviation = max(abs((check["Primary energy (TWh)"] - check["Primary Energy (TWh) - original"]) /
+                            check["Primary Energy (TWh) - original"]))
+    assert max_deviation < 0.1
+
+
+def calculate_direct_primary_energy(primary_energy: pd.DataFrame) -> pd.DataFrame:
+    primary_energy = primary_energy.copy()
+
+    # Convert units of biofuels consumption.
+    primary_energy["Biofuels (EJ)"] = primary_energy["Biofuels (PJ)"] * PJ_TO_EJ    
+
+    # Create column for fossil fuels primary energy (if any of them is nan, the sum will be nan).
+    primary_energy["Fossil Fuels (EJ)"] = primary_energy["Coal (EJ)"] + primary_energy["Oil (EJ)"] +\
+        primary_energy["Gas (EJ)"]    
+
+    # Convert primary energy of fossil fuels and biofuels into TWh.
+    for cat in ["Coal", "Oil", "Gas", "Biofuels"]:
+        primary_energy[f"{cat} (TWh)"] = primary_energy[f"{cat} (EJ)"] * EJ_TO_TWH
+
+    # Create column for primary energy from fossil fuels (in TWh).
+    primary_energy["Fossil Fuels (TWh)"] = primary_energy["Coal (TWh)"] + primary_energy["Oil (TWh)"] +\
+        primary_energy["Gas (TWh)"]    
+
+    # Create column for direct primary energy from renewable sources in TWh.
+    # (total renewable electricity generation and biofuels) (in TWh).
+    # Fill nan in biofuels with zeros (see comment above on the same issue).
+    primary_energy["Renewables (TWh)"] = primary_energy["Hydro (TWh)"] + primary_energy["Solar (TWh)"] +\
+        primary_energy["Wind (TWh)"] + primary_energy["Other renewables (TWh)"] +\
+        primary_energy["Biofuels (TWh)"].fillna(0)
+    # Create column for direct primary energy from low-carbon sources in TWh.
+    # (total renewable electricity generation, biofuels, and nuclear power) (in TWh).
+    primary_energy["Low-carbon energy (TWh)"] = primary_energy["Renewables (TWh)"] + primary_energy["Nuclear (TWh)"]
+    # Create column for total direct primary energy.
+    primary_energy["Primary energy – direct (TWh)"] = primary_energy["Fossil Fuels (TWh)"] +\
+        primary_energy["Low-carbon energy (TWh)"]
+
+    return primary_energy
+
+
+def calculate_primary_energy_using_substitution_method(primary_energy: pd.DataFrame) -> pd.DataFrame:
+    primary_energy = primary_energy.copy()
+    # Create column for total renewable input-equivalent primary energy (in EJ).
+    # To avoid many missing values in total renewable energy, assume missing values in Biofuels mean zero consumption.
+    # By visually inspecting the original data, this seems to be a reasonable assumption.
+    primary_energy["Renewables (EJ)"] = primary_energy["Hydro (EJ)"] + primary_energy["Solar (EJ)"] +\
+        primary_energy["Wind (EJ)"] + primary_energy["Other renewables (EJ)"] +\
+        primary_energy["Biofuels (EJ)"].fillna(0)
+    # Create column for low carbon energy (i.e. renewable plus nuclear energy).
+    primary_energy["Low-carbon energy (EJ)"] = primary_energy["Renewables (EJ)"] + primary_energy["Nuclear (EJ)"]
+    # Convert input-equivalent primary energy of non-fossil based electricity into TWh.
+    # The result is primary energy using the "substitution method".
+    for cat in ["Hydro", "Nuclear", "Renewables", "Solar", "Wind", "Other renewables", "Low-carbon energy"]:
+        primary_energy[f"{cat} (TWh – sub method)"] = primary_energy[f"{cat} (EJ)"] * EJ_TO_TWH
+    # Create column for primary energy from all sources (which corresponds to input-equivalent primary
+    # energy for non-fossil based sources).
+    primary_energy["Primary energy (TWh)"] = primary_energy["Fossil Fuels (TWh)"] +\
+        primary_energy["Low-carbon energy (TWh – sub method)"]
+    # Check that the primary energy constructed using the substitution method coincides with the
+    # input-equivalent primary energy.
+    check_that_substitution_method_is_well_calculated(primary_energy)
+
+    return primary_energy
+
+
+def calculate_share_of_primary_energy(primary_energy: pd.DataFrame) -> pd.DataFrame:
+    primary_energy = primary_energy.copy()
+    # Check that all sources are included in the data.
+    expected_sources = sorted(set([source.split("(")[0].strip() for source in primary_energy.columns
+                                   if not source.startswith(("Country", "Year", "Primary"))]))
+    assert expected_sources == ALL_SOURCES, "Sources may have changed names."
+
+    for cat in ALL_SOURCES:
+        # Calculate each source as share of direct primary energy.
+        primary_energy[f"{cat} (% primary direct energy)"] = primary_energy[f"{cat} (TWh)"] /\
+            primary_energy["Primary energy – direct (TWh)"] * 100
+        # Calculate each source as share of input-equivalent primary energy (i.e. substitution method).
+        primary_energy[f"{cat} (% sub energy)"] = primary_energy[f"{cat} (EJ)"] /\
+            primary_energy["Primary Energy (EJ)"] * 100
+
+    return primary_energy
+
+
+def calculate_primary_energy_annual_change(primary_energy: pd.DataFrame) -> pd.DataFrame:
+    primary_energy = primary_energy.copy()
+
+    # Calculate annual change in each source.
+    primary_energy = primary_energy.sort_values(["Country", "Year"]).reset_index(drop=True)
+    for source in ALL_SOURCES:
+        source_in_twh = f"{source} (TWh)"
+        source_in_twh_sub_method = f"{source} (TWh – sub method)"
+        # Create column for source percentage growth as a function of direct primary energy.
+        primary_energy[f"{source} (% growth)"] = primary_energy.\
+                groupby("Country")[source_in_twh].pct_change() * 100
+        # Create column for source percentage growth as a function of primary energy using the substitution method.
+        if source_in_twh_sub_method in primary_energy.columns:
+            # This applies to non-fossil based electricity sources (for which the substitution method is applicable).
+            primary_energy[f"{source} (TWh growth – sub method)"] = primary_energy.\
+                groupby("Country")[source_in_twh_sub_method].diff()
+        else:
+            # This applies to fossil fuels and biofuels.
+            # NOTE: This column may not be necessary, since sub method and direct primary energy for these sources
+            # should be identical.
+            primary_energy[f"{source} (TWh growth – sub method)"] = primary_energy.\
+                groupby("Country")[source_in_twh].diff()
+
+    return primary_energy
+
+
+def add_region_aggregates(primary_energy: pd.DataFrame) -> pd.DataFrame:
+    primary_energy = primary_energy.copy()
+
+    income_groups = load_income_groups()
+    aggregates = {column: "sum" for column in primary_energy.columns
+                  if column not in ["Country", "Year", "Country code"]}
+    for region in REGIONS_TO_ADD:
+        countries_in_region = geo.list_countries_in_region(region=region, income_groups=income_groups)
+        primary_energy = geo.add_region_aggregates(
+            df=primary_energy, region=region, country_col="Country", year_col="Year", aggregations=aggregates,
+            countries_in_region=countries_in_region)
+        # Add country code for current region.
+        primary_energy.loc[primary_energy["Country"] == region, "Country code"] = REGIONS_TO_ADD[region]["area_code"]
+
+    return primary_energy
+
+
+def add_per_capita_variables(primary_energy: pd.DataFrame) -> pd.DataFrame:
+    primary_energy = primary_energy.copy()
+
+    primary_energy = add_population(df=primary_energy, country_col="Country", year_col="Year",
+                                    population_col="Population", warn_on_missing_countries=False)
+
+    for source in ALL_SOURCES:
+        source_in_twh = f"{source} (TWh)"
+        source_in_twh_sub_method = f"{source} (TWh – sub method)"
+        primary_energy[f"{source} per capita (kWh)"] = primary_energy[source_in_twh] /\
+            primary_energy["Population"] * TWH_TO_KWH
+        if source_in_twh_sub_method in primary_energy.columns:
+            primary_energy[f"{source} per capita (kWh – sub method)"] = primary_energy[source_in_twh_sub_method] /\
+                primary_energy["Population"] * TWH_TO_KWH
+
+    # Drop unnecessary column.
+    primary_energy = primary_energy.drop(columns=["Population"])
+
+    return primary_energy
+
+
+def prepare_output_table(primary_energy: pd.DataFrame) -> catalog.Table:
+    # Remove unnecessary columns.
+    table = catalog.Table(primary_energy).drop(
+        errors="raise",
+        columns=[
+            "Coal (EJ)",
+            "Gas (EJ)",
+            "Oil (EJ)",
+            "Biofuels (PJ)",
+            "Biofuels (EJ)",
+            "Hydro (EJ)",
+            "Nuclear (EJ)",
+            "Renewables (EJ)",
+            "Solar (EJ)",
+            "Wind (EJ)",
+            "Other renewables (EJ)",
+            "Primary Energy (EJ)",
+            "Fossil Fuels (EJ)",
+            "Low-carbon energy (EJ)",
+            "Hydro (TWh)",
+            "Nuclear (TWh)",
+            "Solar (TWh)",
+            "Wind (TWh)",
+            "Other renewables (TWh)",
+            "Renewables (TWh)",
+            "Coal (TWh)",
+            "Oil (TWh)",
+            "Gas (TWh)",
+        ],
+    )
+
+    # Replace spurious inf values by nan.
+    table = table.replace([np.inf, -np.inf], np.nan)
+
+    # Sort conveniently and add an index.
+    table = table.sort_values(["Country", "Year"]).reset_index(drop=True).\
+        set_index(["Country", "Year"], verify_integrity=True).astype({"Country code": "category"})
+
+    # Add unit to each column.
+    for column in table.columns:
+        table[column].metadata.title = column
+        for unit in ["TWh", "kWh", "%"]:
+            if unit in column:
+                table[column].metadata.unit = "TWh"
+
+    table = catalog.utils.underscore_table(table)
+    # Prepare metadata for new garden table.
+    table.metadata.title = DATASET_TITLE
+    table.metadata.short_name = DATASET_SHORT_NAME
+    table.metadata.primary_key = list(table.index.names)
+                
+    return table
+
+
+def run(dest_dir: str) -> None:
+    #
+    # Load data.
+    #
+    # Load table from latest BP dataset.
+    bp_table = catalog.find_one(
+        DATASET_CATALOG_NAME, channels=["backport"], namespace=f"{NAMESPACE_IN_CATALOG}@{VERSION}")    
+
+    #
+    # Process data.
+    #
+    # Get a dataframe out of the BP table.
+    primary_energy = get_bp_data(bp_table=bp_table)
+
+    # Calculate direct and primary energy using the substitution method.
+    primary_energy = calculate_direct_primary_energy(primary_energy=primary_energy)    
+    primary_energy = calculate_primary_energy_using_substitution_method(primary_energy=primary_energy)
+
+    # Add region aggregates.
+    primary_energy = add_region_aggregates(primary_energy=primary_energy)
+
+    # Calculate share of (direct and sub-method) primary energy.
+    primary_energy = calculate_share_of_primary_energy(primary_energy=primary_energy)
+
+    # Calculate annual change of primary energy.
+    primary_energy = calculate_primary_energy_annual_change(primary_energy)
+
+    # Add per-capita variables.
+    primary_energy = add_per_capita_variables(primary_energy=primary_energy)
+
+    # Prepare output data in a convenient way.
+    table = prepare_output_table(primary_energy)
+
+    #
+    # Save outputs.
+    #
+    # Initialize new garden dataset.
+    dataset = catalog.Dataset.create_empty(dest_dir)
+    # Prepare metadata for new garden dataset.
+    dataset.metadata.namespace = NAMESPACE
+    dataset.metadata.version = VERSION
+    dataset.metadata.description = DATASET_DESCRIPTION
+    dataset.metadata.title = DATASET_TITLE
+    dataset.metadata.short_name = DATASET_SHORT_NAME
+    # Create new dataset in garden.
+    dataset.save()
+
+    # Add table to the dataset.
+    table.metadata.description = dataset.metadata.description
+    table.metadata.dataset = dataset.metadata
+    dataset.add(table, repack=True)
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description=__doc__)
+    args = parser.parse_args()
+    run(dest_dir="/tmp/bp_energy_mix")
