@@ -32,7 +32,9 @@ engine = get_engine()
 walden_catalog = WaldenCatalog()
 
 
-def _walden_values_metadata(ds: GrapherDatasetModel, short_name: str) -> WaldenDataset:
+def _walden_values_metadata(
+    ds: GrapherDatasetModel, short_name: str, public: bool
+) -> WaldenDataset:
     """Create walden dataset for grapher dataset values.
     These datasets are not meant for direct consumption from the catalog, but rather
     for postprocessing in etl.
@@ -48,14 +50,15 @@ def _walden_values_metadata(ds: GrapherDatasetModel, short_name: str) -> WaldenD
         url=f"https://owid.cloud/admin/datasets/{ds.id}",
         publication_date="latest",
         file_extension="feather",
+        is_public=public,
     )
 
 
 def _walden_config_metadata(
-    ds: GrapherDatasetModel, short_name: str, origin_md5: str
+    ds: GrapherDatasetModel, short_name: str, origin_md5: str, public: bool
 ) -> WaldenDataset:
     """Create walden dataset for grapher dataset variables and metadata."""
-    config = _walden_values_metadata(ds, short_name)
+    config = _walden_values_metadata(ds, short_name, public)
     config.short_name = short_name + "_config"
     config.name = f"Grapher metadata for {short_name}"
     config.file_extension = "json"
@@ -224,7 +227,7 @@ def backport(
     lg.info("backport.upload_config", upload=upload, dry_run=dry_run, public=public)
     _upload_config_to_walden(
         config,
-        _walden_config_metadata(ds, short_name, md5_config),
+        _walden_config_metadata(ds, short_name, md5_config, public),
         dry_run,
         upload,
         public=public,
@@ -242,7 +245,7 @@ def backport(
     )
     _upload_values_to_walden(
         df,
-        _walden_values_metadata(ds, short_name),
+        _walden_values_metadata(ds, short_name, public),
         dry_run,
         upload,
         public=public,
