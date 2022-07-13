@@ -1,11 +1,6 @@
 import json
-import requests
 import numpy as np
-import re
-import itertools
-import math
 import pandas as pd
-from collections import defaultdict
 
 from structlog import get_logger
 from pathlib import Path
@@ -18,10 +13,18 @@ from owid.catalog.utils import underscore
 from owid.catalog import Dataset, Table
 from etl.paths import DATA_DIR
 
+COUNTRY_MAPPING_PATH = (
+    Path(__file__).parent / "un_sdg.country_mapping.json"
+).as_posix()
+
 BASE_URL = "https://unstats.un.org/sdgapi"
 VERSION = Path(__file__).parent.stem
 FNAME = Path(__file__).stem
 NAMESPACE = Path(__file__).parent.parent.stem
+
+COUNTRY_MAPPING_PATH = (
+    "etl/steps/data/garden/un_sdg/2022-07-07/un_sdg.country_mapping.json"
+)
 
 VERSION = "2022-07-07"
 FNAME = "un_sdg"
@@ -30,7 +33,7 @@ log = get_logger()
 
 
 def run(dest_dir: str, query: str = "") -> None:
-
+    log.info("Reading in dataset from Meadow...")
     ds_meadow = Dataset((DATA_DIR / f"meadow/{NAMESPACE}/{VERSION}/{FNAME}").as_posix())
 
     assert (
@@ -38,38 +41,53 @@ def run(dest_dir: str, query: str = "") -> None:
     ), "Expected meadow dataset to have only one table, but found > 1 table names."
     tb_meadow = ds_meadow[FNAME]
     df = pd.DataFrame(tb_meadow)
+    df = create_units(df)
+    df = manual_clean_data(df)
 
-    full_df = create_dataframe(df)
-    full_df = full_df[
-        [
-            "country",
-            "year",
-            "source",
-            "value",
-            "units_long",
-            "short_unit",
+    log.info("Harmonizing entity names...")
+    country_mapping = load_country_mapping()
+    excluded_countries = load_excluded_countries()
+    df = df[~df.country.isin(excluded_countries)]
+    assert df["country"].notnull().all()
+    countries = df["country"].apply(lambda x: country_mapping.get(x, None))
+    if countries.isnull().any():
+        missing_countries = [
+            x for x in df["country"].drop_duplicates() if x not in country_mapping
         ]
-    ]
-    # verify_integrity checks for duplicates
-    log.info("Size of dataframe", rows=full_df.shape[0], colums=full_df.shape[1])
+        raise RuntimeError(
+            "The following raw country names have not been harmonized. "
+            f"Please: (a) edit {COUNTRY_MAPPING_PATH} to include these country "
+            "names; or (b) remove these country names from the raw table."
+            f"Raw country names: {missing_countries}"
+        )
 
-    assert full_df["country"].notnull().all()
-    assert full_df["value"].notnull().all()
+    assert df["country"].notnull().all()
+    assert df["value"].notnull().all()
     assert (
-        not full_df.isnull().all(axis=1).any()
+        not df.isnull().all(axis=1).any()
     ), "Unexpected state: One or more rows contains only NaN values."
 
+    log.info("Creating data tables...")
+    all_tables = create_tables(df)
 
-def create_dataframe(original_df: pd.DataFrame) -> pd.DataFrame:
+    log.info("Saving data tables...")
+    for table in all_tables:
+        log.info("un_sdg.create_garden_table", series_code=table.index[0][5])
+        ds_garden = Dataset.create_empty(dest_dir)
+        ds_garden.metadata = ds_meadow.metadata
+
+        tb_garden = Table(table)
+        tb_garden.metadata = tb_meadow.metadata
+        ds_garden.add(tb_garden)
+
+        ds_garden.save()
+
+
+def create_tables(original_df: pd.DataFrame) -> List[pd.DataFrame]:
     # Removing the square brackets from the indicator column
     original_df = original_df.copy(deep=False)
 
-    unit_description = get_attributes_description()
-
-    dim_description = dimensions_description()
-
-    original_df["Units_long"] = original_df["Units"].map(unit_description)
-    original_df["short_unit"] = create_short_unit(original_df["Units_long"])
+    dim_description = get_dimension_description()
 
     init_dimensions = list(dim_description.keys())
     init_dimensions = list(set(init_dimensions).intersection(list(original_df.columns)))
@@ -78,7 +96,7 @@ def create_dataframe(original_df: pd.DataFrame) -> pd.DataFrame:
         [c for c in original_df.columns if c not in set(init_dimensions)]
     )
 
-    all_series = original_df.groupby(["Indicator", "SeriesCode"])
+    all_series = original_df.groupby(["indicator", "seriescode"])
 
     output_tables = []
     len_dimensions = []
@@ -97,25 +115,85 @@ def create_dataframe(original_df: pd.DataFrame) -> pd.DataFrame:
             table = generate_tables_for_indicator_and_series(
                 dim_dict=dim_description, data_dimensions=df_dim, dimensions=dimensions
             )
-            table.set_index(["Country", "Year"])
-            output_tables.append(table)
+            table_fil = table[
+                [
+                    "country",
+                    "year",
+                    "goal",
+                    "target",
+                    "indicator",
+                    "seriescode",
+                    "seriesdescription",
+                    "value",
+                    "units_long",
+                    "short_unit",
+                ]
+            ]
+            table_fil.set_index(
+                [
+                    "country",
+                    "year",
+                    "goal",
+                    "target",
+                    "indicator",
+                    "seriescode",
+                ],
+                inplace=True,
+                verify_integrity=True,
+            )
+            output_tables.append(table_fil)
 
         else:
             # has additional dimensions
             tables = generate_tables_for_indicator_and_series(
                 dim_dict=dim_description, data_dimensions=df_dim, dimensions=dimensions
             )
+            tables_fil = tables[
+                [
+                    "country",
+                    "year",
+                    "goal",
+                    "target",
+                    "indicator",
+                    "seriescode",
+                    "seriesdescription",
+                    "value",
+                    "units_long",
+                    "short_unit",
+                ]
+                + dimensions
+            ]
 
-            tables.set_index(["Country", "Year"] + dimensions, verify_integrity=True)
+            tables_fil.set_index(
+                [
+                    "country",
+                    "year",
+                    "goal",
+                    "target",
+                    "indicator",
+                    "seriescode",
+                ]
+                + dimensions,
+                inplace=True,
+                verify_integrity=True,
+            )
 
-            output_tables.append(tables)
+            output_tables.append(tables_fil)
 
-        output_table = pd.concat(output_tables)
-    return output_table
+        # output_table = pd.concat(output_tables)
+    return output_tables
+
+
+def create_units(df: pd.DataFrame) -> pd.DataFrame:
+    df = df.copy(deep=False)
+    unit_description = get_attributes_description()
+    df["units_long"] = df["units"].map(unit_description)
+    df["short_unit"] = create_short_unit(df["units_long"])
+    return df
 
 
 def generate_tables_for_indicator_and_series(
-    dim_dict: dict,
+    dim_dict: dict[Any, Any],
     data_dimensions: pd.DataFrame,
     dimensions: List[str],
 ) -> pd.DataFrame:
@@ -162,7 +240,7 @@ def get_series_with_relevant_dimensions(
     )
 
 
-def create_short_unit(long_unit: pd.Series) -> np.ndarray:
+def create_short_unit(long_unit: pd.Series) -> np.ndarray[Any, np.dtype[Any]]:
 
     conditions = [
         (long_unit.str.contains("PERCENT"))
@@ -173,7 +251,7 @@ def create_short_unit(long_unit: pd.Series) -> np.ndarray:
 
     choices = ["%", "kg", "$"]
 
-    short_unit = np.select(conditions, choices, default=None)
+    short_unit = np.select(conditions, choices, default="str")
     return short_unit
 
 
@@ -185,16 +263,16 @@ def manual_clean_data(df: pd.DataFrame) -> pd.DataFrame:
     """
     df = df.copy(deep=False)
 
-    df["Value"] = df["Value"].astype(float)
+    df["value"] = df["value"].astype(float)
     df.loc[
-        (df["Units_long"] == "Percentage")
-        & (df["Value"] > 100)
-        & (df["Indicator"] == "15.2.1"),
-        "Value",
+        (df["units_long"] == "Percentage")
+        & (df["value"] > 100)
+        & (df["indicator"] == "15.2.1"),
+        "value",
     ] = 100
 
     # Clean the IHR Capacity column, duplicate labelling of some attributes which doesn't work well with the grapher
-    df["IHR Capacity"] = df["IHR Capacity"].replace(
+    df["ihr_capacity"] = df["ihr_capacity"].replace(
         [
             "IHR02",
             "IHR03",
@@ -218,10 +296,13 @@ def manual_clean_data(df: pd.DataFrame) -> pd.DataFrame:
             "SPAR12",
         ],
     )
+
+    df = df.drop(["level_0", "index"], axis=1, errors="ignore")
+
     return df
 
 
-def get_attributes_description() -> dict:
+def get_attributes_description() -> Any:
     walden_ds = Catalog().find_one(
         namespace=NAMESPACE, short_name="unit", version=VERSION
     )
@@ -229,3 +310,34 @@ def get_attributes_description() -> dict:
     with open(local_file) as json_file:
         units = json.load(json_file)
     return units
+
+
+# not sure about this type return but it's what make check-typing demanded!
+def get_dimension_description() -> Any:
+    walden_ds = Catalog().find_one(
+        namespace=NAMESPACE, short_name="dimension", version=VERSION
+    )
+    local_file = walden_ds.ensure_downloaded()
+    with open(local_file) as json_file:
+        dims = json.load(json_file)
+    # underscore to match the df column names
+    for key in dims.copy():
+        dims[underscore(key)] = dims.pop(key)
+    return dims
+
+
+def load_country_mapping() -> Dict[str, str]:
+    with open(COUNTRY_MAPPING_PATH, "r") as f:
+        mapping = json.load(f)
+        assert isinstance(mapping, dict)
+    return mapping
+
+
+def load_excluded_countries() -> List[str]:
+    # with open(Path(__file__).parent / f"{FNAME}.country_exclude.json", "r") as f:
+    with open(
+        "etl/steps/data/garden/un_sdg/2022-07-07/un_sdg.country_exclude.json"
+    ) as f:
+        data = json.load(f)
+        assert isinstance(data, list)
+    return data
