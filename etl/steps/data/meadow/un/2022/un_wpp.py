@@ -352,7 +352,7 @@ def df_cols_as_str(
 def fix_types(
     df_depratio: pd.DataFrame, df_deaths: pd.DataFrame
 ) -> Tuple[pd.DataFrame, ...]:
-    _type = "category"
+    _type = pd.StringDtype()
     df_depratio = df_depratio.assign(Notes=df_depratio.Notes.astype(_type))
     df_deaths = df_deaths.assign(Notes=df_deaths.Notes.astype(_type))
     return df_depratio, df_deaths
@@ -400,8 +400,8 @@ def add_tables_to_ds(
         (df_population, "population"),
         (df_fertility, "fertility"),
         (df_demographics, "demographics"),
-        (df_deaths, "deaths"),
         (df_depratio, "dependency_ratio"),
+        (df_deaths, "deaths"),
     ]
     for elem in data:
         print(elem[1])
