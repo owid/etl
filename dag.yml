@@ -80,8 +80,8 @@ steps:
     - data://meadow/worldbank_wdi/2022-05-26/wdi
   grapher://worldbank_wdi/2022-05-26/wdi:
     - data://garden/worldbank_wdi/2022-05-26/wdi
-  data://meadow/un_sdg/2022-05-26/un_sdg:
-    - walden://un_sdg/2022-05-26/un_sdg
+  data://meadow/un_sdg/2022-07-07/un_sdg:
+    - walden://un_sdg/2022-07-07/un_sdg
   data://garden/un_sdg/2022-07-07/un_sdg:
     - data://meadow/un_sdg/2022-07-07/un_sdg
 
