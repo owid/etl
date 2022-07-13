@@ -1,13 +1,10 @@
-import json
-import numpy as np
 import pandas as pd
-
+import numpy as np
 from structlog import get_logger
 from pathlib import Path
 from typing import Tuple, List, Any, Dict
 from etl.steps.data.converters import convert_walden_metadata
-from owid.walden import Catalog
-from owid.catalog import Dataset, Table, DatasetMeta, TableMeta
+from owid.catalog import Dataset
 from owid.catalog.utils import underscore
 
 from owid.catalog import Dataset, Table
