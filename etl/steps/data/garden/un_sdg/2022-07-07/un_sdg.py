@@ -23,9 +23,6 @@ COUNTRY_MAPPING_PATH = (
     "etl/steps/data/garden/un_sdg/2022-07-07/un_sdg.country_mapping.json"
 )
 
-VERSION = "2022-07-07"
-FNAME = "un_sdg"
-NAMESPACE = "un_sdg"
 log = get_logger()
 
 
@@ -331,10 +328,7 @@ def load_country_mapping() -> Dict[str, str]:
 
 
 def load_excluded_countries() -> List[str]:
-    # with open(Path(__file__).parent / f"{FNAME}.country_exclude.json", "r") as f:
-    with open(
-        "etl/steps/data/garden/un_sdg/2022-07-07/un_sdg.country_exclude.json"
-    ) as f:
+    with open(Path(__file__).parent / f"{FNAME}.country_exclude.json", "r") as f:
         data = json.load(f)
         assert isinstance(data, list)
     return data
