@@ -159,6 +159,11 @@ def _needs_update(ds: GrapherDatasetModel, short_name: str, md5_config: str) -> 
         # datasets not found in catalog
         return True
 
+    # fastrack does not upload data to S3 and leaves owid_data_url empty, if we find
+    # such a dataset, we backport and upload it again
+    if not walden_ds.owid_data_url:
+        return True
+
     # compare checksums
     if walden_ds.origin_md5 == md5_config:
         # then check dataEditedAt field
