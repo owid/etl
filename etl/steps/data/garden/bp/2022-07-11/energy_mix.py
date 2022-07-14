@@ -455,12 +455,18 @@ def add_region_aggregates(primary_energy: pd.DataFrame) -> pd.DataFrame:
 
     income_groups = load_income_groups()
     aggregates = {column: "sum" for column in primary_energy.columns
-                  if column not in ["Country", "Year", "Country code"]}
+                  if column not in ["Country", "Year", "Country code"]}    
+
     for region in REGIONS_TO_ADD:
         countries_in_region = geo.list_countries_in_region(region=region, income_groups=income_groups)
+        # We do not impose a list of countries that must have data, because, for example, prior to 1985, there is
+        # no data for Russia, and therefore we would have no data for Europe.
+        # Also, for a similar reason, the fraction of nans allowed in the data is increased to avoid losing all
+        # data in Europe prior to 1985.
         primary_energy = geo.add_region_aggregates(
             df=primary_energy, region=region, country_col="Country", year_col="Year", aggregations=aggregates,
-            countries_in_region=countries_in_region)
+            countries_in_region=countries_in_region, countries_that_must_have_data=[],
+            frac_allowed_nans_per_year=0.3)
         # Add country code for current region.
         primary_energy.loc[primary_energy["Country"] == region, "Country code"] = REGIONS_TO_ADD[region]["area_code"]
 
