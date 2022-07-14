@@ -46,7 +46,7 @@ NAMESPACE_IN_CATALOG = "bp_statreview"
 # Terawatt-hours to kilowatt-hours.
 TWH_TO_KWH = 1e9
 # Exajoules to terawatt-hours.
-EJ_TO_TWH = 277.778
+EJ_TO_TWH = 1e6/3600
 # Petajoules to exajoules.
 PJ_TO_EJ = 1e-3
 
@@ -461,7 +461,6 @@ def add_region_aggregates(primary_energy: pd.DataFrame) -> pd.DataFrame:
 
     for region in REGIONS_TO_ADD:
         countries_in_region = geo.list_countries_in_region(region=region, income_groups=income_groups)    
-
         # We do not impose a list of countries that must have data, because, for example, prior to 1985, there is
         # no data for Russia, and therefore we would have no data for Europe.
         # Also, for a similar reason, the fraction of nans allowed in the data is increased to avoid losing all
@@ -593,13 +592,13 @@ def run(dest_dir: str) -> None:
     # Get a dataframe out of the BP table.
     primary_energy = get_bp_data(bp_table=bp_table)
 
+    # Add region aggregates.
+    primary_energy = add_region_aggregates(primary_energy=primary_energy)
+
     # Calculate direct and primary energy using the substitution method.
     primary_energy = calculate_direct_primary_energy(primary_energy=primary_energy)    
 
     primary_energy = calculate_equivalent_primary_energy(primary_energy=primary_energy)
-
-    # Add region aggregates.
-    primary_energy = add_region_aggregates(primary_energy=primary_energy)
 
     # Calculate share of (direct and sub-method) primary energy.
     primary_energy = calculate_share_of_primary_energy(primary_energy=primary_energy)
