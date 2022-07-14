@@ -298,7 +298,7 @@ def get_attributes_description() -> dict[str, str]:
     local_file = walden_ds.ensure_downloaded()
     with open(local_file) as json_file:
         units = json.load(json_file)
-    return cast(dict[str, str], units)
+    return units
 
 
 def get_dimension_description() -> dict[str, str]:
@@ -307,11 +307,11 @@ def get_dimension_description() -> dict[str, str]:
     )
     local_file = walden_ds.ensure_downloaded()
     with open(local_file) as json_file:
-        dims = json.load(json_file)
+        dims: dict[str, str] = json.load(json_file)
     # underscore to match the df column names
     for key in dims.copy():
         dims[underscore(key)] = dims.pop(key)
-    return cast(dict[str, str], dims)
+    return dims
 
 
 def load_country_mapping() -> Dict[str, str]:
