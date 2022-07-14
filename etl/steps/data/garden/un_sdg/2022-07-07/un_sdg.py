@@ -3,7 +3,7 @@ import numpy as np
 import json
 from structlog import get_logger
 from pathlib import Path
-from typing import Tuple, List, Any, Dict, cast
+from typing import Tuple, List, Any, Dict
 from owid.catalog.utils import underscore
 
 from owid.walden import Catalog
@@ -291,7 +291,7 @@ def manual_clean_data(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def get_attributes_description() -> dict[str, str]:
+def get_attributes_description() -> Any:
     walden_ds = Catalog().find_one(
         namespace=NAMESPACE, short_name="unit", version=VERSION
     )
