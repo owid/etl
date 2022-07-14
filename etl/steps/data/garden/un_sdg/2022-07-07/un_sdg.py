@@ -3,7 +3,7 @@ import numpy as np
 import json
 from structlog import get_logger
 from pathlib import Path
-from typing import Tuple, List, Any, Dict
+from typing import Tuple, List, Any, Dict, cast
 from owid.catalog.utils import underscore
 
 from owid.walden import Catalog
@@ -18,10 +18,6 @@ BASE_URL = "https://unstats.un.org/sdgapi"
 VERSION = Path(__file__).parent.stem
 FNAME = Path(__file__).stem
 NAMESPACE = Path(__file__).parent.parent.stem
-
-COUNTRY_MAPPING_PATH = (
-    "etl/steps/data/garden/un_sdg/2022-07-07/un_sdg.country_mapping.json"
-)
 
 log = get_logger()
 
@@ -43,7 +39,7 @@ def run(dest_dir: str, query: str = "") -> None:
     excluded_countries = load_excluded_countries()
     df = df[~df.country.isin(excluded_countries)]
     assert df["country"].notnull().all()
-    countries = df["country"].apply(lambda x: country_mapping.get(x, None))
+    countries = df["country"].map(country_mapping)
     if countries.isnull().any():
         missing_countries = [
             x for x in df["country"].drop_duplicates() if x not in country_mapping
@@ -65,16 +61,19 @@ def run(dest_dir: str, query: str = "") -> None:
     all_tables = create_tables(df)
 
     log.info("Saving data tables...")
+
+    ds_garden = Dataset.create_empty(dest_dir)
+    ds_garden.metadata = ds_meadow.metadata
+
     for table in all_tables:
         log.info("un_sdg.create_garden_table", series_code=table.index[0][5])
-        ds_garden = Dataset.create_empty(dest_dir)
-        ds_garden.metadata = ds_meadow.metadata
 
         tb_garden = Table(table)
         tb_garden.metadata = tb_meadow.metadata
+        tb_garden.metadata = underscore(table.index[0][5])
         ds_garden.add(tb_garden)
 
-        ds_garden.save()
+    ds_garden.save()
 
 
 def create_tables(original_df: pd.DataFrame) -> List[pd.DataFrame]:
@@ -296,18 +295,18 @@ def manual_clean_data(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def get_attributes_description() -> Any:
+def get_attributes_description() -> dict[str, str]:
     walden_ds = Catalog().find_one(
         namespace=NAMESPACE, short_name="unit", version=VERSION
     )
     local_file = walden_ds.ensure_downloaded()
     with open(local_file) as json_file:
         units = json.load(json_file)
-    return units
+    return cast(dict[str, str], units)
 
 
 # not sure about this type return but it's what make check-typing demanded!
-def get_dimension_description() -> Any:
+def get_dimension_description() -> dict[str, str]:
     walden_ds = Catalog().find_one(
         namespace=NAMESPACE, short_name="dimension", version=VERSION
     )
@@ -317,7 +316,7 @@ def get_dimension_description() -> Any:
     # underscore to match the df column names
     for key in dims.copy():
         dims[underscore(key)] = dims.pop(key)
-    return dims
+    return cast(dict[str, str], dims)
 
 
 def load_country_mapping() -> Dict[str, str]:
