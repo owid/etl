@@ -1,20 +1,23 @@
 """Generate energy mix dataset using data from BP's statistical review of the world energy.
 
-We construct two variables for primary energy consumption:
-* One is "direct primary energy", where fossil fuel primary energy (in EJ converted to TWh) is added to the electricity
-  generation from non-fossil sources (in TWh).
-* The other is "primary energy using the substitution method", where fossil fuel primary energy (in EJ) is converted to
-  TWh, and added to the "input-equivalent primary energy" from non-fossil sources (in EJ, converted to TWh).
-  This is the amount of fuel that would be required by thermal power stations to generate the reported electricity
-  output, as explained in
-  [their methodology document](https://www.bp.com/content/dam/bp/business-sites/en/global/corporate/pdfs/energy-economics/statistical-review/bp-stats-review-2022-methodology.pdf).
-  For example, if a country's nuclear power generated 100 TWh, and assuming that the efficiency of a standard thermal
-  power plant is 38%, the input equivalent primary energy for this country would be 100/0.38 = 263 TWh = 0.95 EJ.
+For non-fossil based electricity sources (nuclear, hydro, wind, solar, geothermal, biomass in power, and other
+renewable sources), BP's generation (in TWh) corresponds to gross generation and not accounting for cross-border
+electricity supply.
 
-NOTE:
-* For non-fossil based electricity (nuclear, hydro, wind, solar, geothermal, biomass in power, and other renewable
-  sources), BP's generation (in TWh) corresponds to gross generation and not accounting for cross-border electricity
-  supply.
+Also, for non-fossil based electricity, there are two ways to define primary energy:
+* One is "direct primary energy", which correspond to the electricity generation (in TWh).
+* The other is "input-equivalent primary energy" (also called "primary energy using the substitution method").
+  This is the amount of fuel that would be required by thermal power stations to generate the reported electricity,
+  as explained in
+  [their methodology document](https://www.bp.com/content/dam/bp/business-sites/en/global/corporate/pdfs/energy-economics/statistical-review/bp-stats-review-2022-methodology.pdf).
+  For example, if a country's nuclear power generated 100 TWh of electricity, and assuming that the efficiency of a
+  standard thermal power plant is 38%, the input equivalent primary energy for this country would be
+  100/0.38 = 263 TWh = 0.95 EJ.
+This consideration is only relevant for non-fossil based electricity sources (i.e. hydro, nuclear, solar, wind, and
+other renewables).
+For fossil fuels and biofuels, there is only direct primary energy.
+However, when calculating the share of fossil fuels to the total primary energy, this will be done both with respect
+to the total direct primary energy, and the total input-equivalent primary energy.
 
 """
 
@@ -46,10 +49,10 @@ EJ_TO_TWH = 277.778
 PJ_TO_EJ = 1e-3
 
 # List all energy sources in the data.
-HIGH_CARBON_SOURCES = ['Coal', 'Fossil Fuels', 'Gas', 'Oil']
-LOW_CARBON_SOURCES = ['Biofuels', 'Hydro', 'Low-carbon energy', 'Nuclear', 'Other renewables', 'Renewables', 'Solar',
-                      'Wind']
-ALL_SOURCES = sorted(HIGH_CARBON_SOURCES + LOW_CARBON_SOURCES)
+ONLY_DIRECT_ENERGY = ['Coal', 'Fossil Fuels', 'Gas', 'Oil', 'Biofuels']
+DIRECT_AND_EQUIVALENT_ENERGY = ['Hydro', 'Low-carbon energy', 'Nuclear', 'Other renewables', 'Renewables', 'Solar',
+                                'Wind']
+ALL_SOURCES = sorted(ONLY_DIRECT_ENERGY + DIRECT_AND_EQUIVALENT_ENERGY)
 
 REGIONS_TO_ADD = {
     "North America": {
@@ -288,19 +291,19 @@ def get_bp_data(bp_table: catalog.Table) -> pd.DataFrame:
         "Gas Consumption - EJ": "Gas (EJ)",
         "Oil Consumption - EJ": "Oil (EJ)",
         # Non-fossil based electricity generation (in TWh).
-        "Hydro Generation - TWh": "Hydro (TWh)",
-        "Nuclear Generation - TWh": "Nuclear (TWh)",
-        "Solar Generation - TWh": "Solar (TWh)",
-        "Wind Generation - TWh": "Wind (TWh)",
-        "Geo Biomass Other - TWh": "Other renewables (TWh)",
+        "Hydro Generation - TWh": "Hydro (TWh - direct)",
+        "Nuclear Generation - TWh": "Nuclear (TWh - direct)",
+        "Solar Generation - TWh": "Solar (TWh - direct)",
+        "Wind Generation - TWh": "Wind (TWh - direct)",
+        "Geo Biomass Other - TWh": "Other renewables (TWh - direct)",
         # Non-fossil based electricity generation converted into input-equivalent primary energy (in EJ).
-        "Hydro Consumption - EJ": "Hydro (EJ)",
-        "Nuclear Consumption - EJ": "Nuclear (EJ)",
-        "Solar Consumption - EJ": "Solar (EJ)",
-        "Wind Consumption - EJ": "Wind (EJ)",
-        "Geo Biomass Other - EJ": "Other renewables (EJ)",
+        "Hydro Consumption - EJ": "Hydro (EJ - equivalent)",
+        "Nuclear Consumption - EJ": "Nuclear (EJ - equivalent)",
+        "Solar Consumption - EJ": "Solar (EJ - equivalent)",
+        "Wind Consumption - EJ": "Wind (EJ - equivalent)",
+        "Geo Biomass Other - EJ": "Other renewables (EJ - equivalent)",
         # Total, input-equivalent primary energy consumption (in EJ).
-        "Primary Energy Consumption - EJ": "Primary Energy (EJ)",
+        "Primary Energy Consumption - EJ": "Primary energy (EJ - equivalent)",
         # Biofuels consumption (in PJ, that will be converted into EJ).
         "Biofuels Consumption - PJ - Total": "Biofuels (PJ)",
     }
@@ -313,15 +316,17 @@ def get_bp_data(bp_table: catalog.Table) -> pd.DataFrame:
     return bp_data
 
 
-def check_that_substitution_method_is_well_calculated(primary_energy: pd.DataFrame) -> pd.DataFrame:
+def check_that_substitution_method_is_well_calculated(primary_energy: pd.DataFrame) -> None:
     # Check that the constructed primary energy using the substitution method (in TWh) coincides with the
     # input-equivalent primary energy (converted from EJ into TWh) given in the original data.
-    check = primary_energy[["Year", "Country", "Primary Energy (EJ)", "Primary energy (TWh)"]].reset_index(drop=True)
-    check["Primary Energy (TWh) - original"] = check["Primary Energy (EJ)"] * EJ_TO_TWH
+    check = primary_energy[["Year", "Country", "Primary energy (EJ - equivalent)",
+                            "Primary energy (TWh - equivalent)"]].reset_index(drop=True)
+    check["Primary energy (TWh - equivalent) - original"] = check["Primary energy (EJ - equivalent)"] * EJ_TO_TWH
     check = check.dropna().reset_index(drop=True)
     # They may not coincide exactly, but at least check that they differ (point by point) by less than 10%.
-    max_deviation = max(abs((check["Primary energy (TWh)"] - check["Primary Energy (TWh) - original"]) /
-                            check["Primary Energy (TWh) - original"]))
+    max_deviation = max(abs((check["Primary energy (TWh - equivalent)"] -
+                             check["Primary energy (TWh - equivalent) - original"]) /
+                            check["Primary energy (TWh - equivalent) - original"]))
     assert max_deviation < 0.1
 
 
@@ -345,38 +350,45 @@ def calculate_direct_primary_energy(primary_energy: pd.DataFrame) -> pd.DataFram
 
     # Create column for direct primary energy from renewable sources in TWh.
     # (total renewable electricity generation and biofuels) (in TWh).
-    # Fill nan in biofuels with zeros (see comment above on the same issue).
-    primary_energy["Renewables (TWh)"] = primary_energy["Hydro (TWh)"] + primary_energy["Solar (TWh)"] +\
-        primary_energy["Wind (TWh)"] + primary_energy["Other renewables (TWh)"] +\
+    # By visually inspecting the original data, it seems that many data points that used to be zero are
+    # missing in the 2022 release, so filling nan with zeros seems to be a reasonable approach to avoids losing a
+    # significant amount of data.
+    primary_energy["Renewables (TWh - direct)"] = primary_energy["Hydro (TWh - direct)"] +\
+        primary_energy["Solar (TWh - direct)"].fillna(0) +\
+        primary_energy["Wind (TWh - direct)"].fillna(0) +\
+        primary_energy["Other renewables (TWh - direct)"].fillna(0) +\
         primary_energy["Biofuels (TWh)"].fillna(0)
     # Create column for direct primary energy from low-carbon sources in TWh.
     # (total renewable electricity generation, biofuels, and nuclear power) (in TWh).
-    primary_energy["Low-carbon energy (TWh)"] = primary_energy["Renewables (TWh)"] + primary_energy["Nuclear (TWh)"]
+    primary_energy["Low-carbon energy (TWh - direct)"] = primary_energy["Renewables (TWh - direct)"] +\
+        primary_energy["Nuclear (TWh - direct)"].fillna(0)
     # Create column for total direct primary energy.
-    primary_energy["Primary energy – direct (TWh)"] = primary_energy["Fossil Fuels (TWh)"] +\
-        primary_energy["Low-carbon energy (TWh)"]
+    primary_energy["Primary energy (TWh - direct)"] = primary_energy["Fossil Fuels (TWh)"] +\
+        primary_energy["Low-carbon energy (TWh - direct)"]
 
     return primary_energy
 
 
-def calculate_primary_energy_using_substitution_method(primary_energy: pd.DataFrame) -> pd.DataFrame:
+def calculate_equivalent_primary_energy(primary_energy: pd.DataFrame) -> pd.DataFrame:
     primary_energy = primary_energy.copy()
     # Create column for total renewable input-equivalent primary energy (in EJ).
-    # To avoid many missing values in total renewable energy, assume missing values in Biofuels mean zero consumption.
-    # By visually inspecting the original data, this seems to be a reasonable assumption.
-    primary_energy["Renewables (EJ)"] = primary_energy["Hydro (EJ)"] + primary_energy["Solar (EJ)"] +\
-        primary_energy["Wind (EJ)"] + primary_energy["Other renewables (EJ)"] +\
+    # Fill missing values with zeros (see comment above).
+    primary_energy["Renewables (EJ - equivalent)"] = primary_energy["Hydro (EJ - equivalent)"] +\
+        primary_energy["Solar (EJ - equivalent)"].fillna(0) +\
+        primary_energy["Wind (EJ - equivalent)"].fillna(0) +\
+        primary_energy["Other renewables (EJ - equivalent)"].fillna(0) +\
         primary_energy["Biofuels (EJ)"].fillna(0)
     # Create column for low carbon energy (i.e. renewable plus nuclear energy).
-    primary_energy["Low-carbon energy (EJ)"] = primary_energy["Renewables (EJ)"] + primary_energy["Nuclear (EJ)"]
+    primary_energy["Low-carbon energy (EJ - equivalent)"] = primary_energy["Renewables (EJ - equivalent)"] +\
+        primary_energy["Nuclear (EJ - equivalent)"].fillna(0)
     # Convert input-equivalent primary energy of non-fossil based electricity into TWh.
     # The result is primary energy using the "substitution method".
-    for cat in ["Hydro", "Nuclear", "Renewables", "Solar", "Wind", "Other renewables", "Low-carbon energy"]:
-        primary_energy[f"{cat} (TWh – sub method)"] = primary_energy[f"{cat} (EJ)"] * EJ_TO_TWH
+    for cat in DIRECT_AND_EQUIVALENT_ENERGY:
+        primary_energy[f"{cat} (TWh - equivalent)"] = primary_energy[f"{cat} (EJ - equivalent)"] * EJ_TO_TWH
     # Create column for primary energy from all sources (which corresponds to input-equivalent primary
     # energy for non-fossil based sources).
-    primary_energy["Primary energy (TWh)"] = primary_energy["Fossil Fuels (TWh)"] +\
-        primary_energy["Low-carbon energy (TWh – sub method)"]
+    primary_energy["Primary energy (TWh - equivalent)"] = primary_energy["Fossil Fuels (TWh)"] +\
+        primary_energy["Low-carbon energy (TWh - equivalent)"]
     # Check that the primary energy constructed using the substitution method coincides with the
     # input-equivalent primary energy.
     check_that_substitution_method_is_well_calculated(primary_energy)
@@ -391,13 +403,21 @@ def calculate_share_of_primary_energy(primary_energy: pd.DataFrame) -> pd.DataFr
                                    if not source.startswith(("Country", "Year", "Primary"))]))
     assert expected_sources == ALL_SOURCES, "Sources may have changed names."
 
-    for cat in ALL_SOURCES:
+    for source in ONLY_DIRECT_ENERGY:
         # Calculate each source as share of direct primary energy.
-        primary_energy[f"{cat} (% primary direct energy)"] = primary_energy[f"{cat} (TWh)"] /\
-            primary_energy["Primary energy – direct (TWh)"] * 100
+        primary_energy[f"{source} (% direct primary energy)"] = primary_energy[f"{source} (TWh)"] /\
+            primary_energy["Primary energy (TWh - direct)"] * 100
         # Calculate each source as share of input-equivalent primary energy (i.e. substitution method).
-        primary_energy[f"{cat} (% sub energy)"] = primary_energy[f"{cat} (EJ)"] /\
-            primary_energy["Primary Energy (EJ)"] * 100
+        primary_energy[f"{source} (% equivalent primary energy)"] = primary_energy[f"{source} (EJ)"] /\
+            primary_energy["Primary energy (EJ - equivalent)"] * 100
+
+    for source in DIRECT_AND_EQUIVALENT_ENERGY:
+        # Calculate each source as share of direct primary energy.
+        primary_energy[f"{source} (% direct primary energy)"] = primary_energy[f"{source} (TWh - direct)"] /\
+            primary_energy["Primary energy (TWh - direct)"] * 100
+        # Calculate each source as share of input-equivalent primary energy (i.e. substitution method).
+        primary_energy[f"{source} (% equivalent primary energy)"] = primary_energy[f"{source} (EJ - equivalent)"] /\
+            primary_energy["Primary energy (EJ - equivalent)"] * 100
 
     return primary_energy
 
@@ -407,23 +427,25 @@ def calculate_primary_energy_annual_change(primary_energy: pd.DataFrame) -> pd.D
 
     # Calculate annual change in each source.
     primary_energy = primary_energy.sort_values(["Country", "Year"]).reset_index(drop=True)
-    for source in ALL_SOURCES:
-        source_in_twh = f"{source} (TWh)"
-        source_in_twh_sub_method = f"{source} (TWh – sub method)"
+    for source in ONLY_DIRECT_ENERGY:
         # Create column for source percentage growth as a function of direct primary energy.
         primary_energy[f"{source} (% growth)"] = primary_energy.\
-                groupby("Country")[source_in_twh].pct_change() * 100
-        # Create column for source percentage growth as a function of primary energy using the substitution method.
-        if source_in_twh_sub_method in primary_energy.columns:
-            # This applies to non-fossil based electricity sources (for which the substitution method is applicable).
-            primary_energy[f"{source} (TWh growth – sub method)"] = primary_energy.\
-                groupby("Country")[source_in_twh_sub_method].diff()
-        else:
-            # This applies to fossil fuels and biofuels.
-            # NOTE: This column may not be necessary, since sub method and direct primary energy for these sources
-            # should be identical.
-            primary_energy[f"{source} (TWh growth – sub method)"] = primary_energy.\
-                groupby("Country")[source_in_twh].diff()
+                groupby("Country")[f"{source} (TWh)"].pct_change() * 100
+        # Create column for source absolute growth as a function of direct primary energy.
+        primary_energy[f"{source} (TWh growth)"] = primary_energy.\
+            groupby("Country")[f"{source} (TWh)"].diff()
+
+    for source in DIRECT_AND_EQUIVALENT_ENERGY:
+        # Create column for source percentage growth as a function of primary energy
+        # (as a percentage, it is irrelevant whether it is direct or equivalent).
+        primary_energy[f"{source} (% growth)"] = primary_energy.\
+                groupby("Country")[f"{source} (TWh - direct)"].pct_change() * 100
+        # Create column for source absolute growth as a function of direct primary energy.
+        primary_energy[f"{source} (TWh growth - direct)"] = primary_energy.\
+            groupby("Country")[f"{source} (TWh - direct)"].diff()
+        # Create column for source absolute growth as a function of input-equivalent primary energy.
+        primary_energy[f"{source} (TWh growth - equivalent)"] = primary_energy.\
+            groupby("Country")[f"{source} (TWh - equivalent)"].diff()
 
     return primary_energy
 
@@ -450,15 +472,14 @@ def add_per_capita_variables(primary_energy: pd.DataFrame) -> pd.DataFrame:
 
     primary_energy = add_population(df=primary_energy, country_col="Country", year_col="Year",
                                     population_col="Population", warn_on_missing_countries=False)
-
-    for source in ALL_SOURCES:
-        source_in_twh = f"{source} (TWh)"
-        source_in_twh_sub_method = f"{source} (TWh – sub method)"
-        primary_energy[f"{source} per capita (kWh)"] = primary_energy[source_in_twh] /\
+    for source in ONLY_DIRECT_ENERGY:
+        primary_energy[f"{source} per capita (kWh)"] = primary_energy[f"{source} (TWh)"] /\
             primary_energy["Population"] * TWH_TO_KWH
-        if source_in_twh_sub_method in primary_energy.columns:
-            primary_energy[f"{source} per capita (kWh – sub method)"] = primary_energy[source_in_twh_sub_method] /\
-                primary_energy["Population"] * TWH_TO_KWH
+    for source in DIRECT_AND_EQUIVALENT_ENERGY:
+        primary_energy[f"{source} per capita (kWh - direct)"] = primary_energy[f"{source} (TWh - direct)"] /\
+            primary_energy["Population"] * TWH_TO_KWH
+        primary_energy[f"{source} per capita (kWh - equivalent)"] = primary_energy[f"{source} (TWh - equivalent)"] /\
+            primary_energy["Population"] * TWH_TO_KWH
 
     # Drop unnecessary column.
     primary_energy = primary_energy.drop(columns=["Population"])
@@ -467,35 +488,10 @@ def add_per_capita_variables(primary_energy: pd.DataFrame) -> pd.DataFrame:
 
 
 def prepare_output_table(primary_energy: pd.DataFrame) -> catalog.Table:
-    # Remove unnecessary columns.
+    # Keep only columns in TWh (and not EJ or PJ).
     table = catalog.Table(primary_energy).drop(
         errors="raise",
-        columns=[
-            "Coal (EJ)",
-            "Gas (EJ)",
-            "Oil (EJ)",
-            "Biofuels (PJ)",
-            "Biofuels (EJ)",
-            "Hydro (EJ)",
-            "Nuclear (EJ)",
-            "Renewables (EJ)",
-            "Solar (EJ)",
-            "Wind (EJ)",
-            "Other renewables (EJ)",
-            "Primary Energy (EJ)",
-            "Fossil Fuels (EJ)",
-            "Low-carbon energy (EJ)",
-            "Hydro (TWh)",
-            "Nuclear (TWh)",
-            "Solar (TWh)",
-            "Wind (TWh)",
-            "Other renewables (TWh)",
-            "Renewables (TWh)",
-            "Coal (TWh)",
-            "Oil (TWh)",
-            "Gas (TWh)",
-        ],
-    )
+        columns=[column for column in primary_energy.columns if (("(EJ" in column) or ("(PJ" in column))])
 
     # Replace spurious inf values by nan.
     table = table.replace([np.inf, -np.inf], np.nan)
@@ -536,7 +532,8 @@ def run(dest_dir: str) -> None:
 
     # Calculate direct and primary energy using the substitution method.
     primary_energy = calculate_direct_primary_energy(primary_energy=primary_energy)    
-    primary_energy = calculate_primary_energy_using_substitution_method(primary_energy=primary_energy)
+
+    primary_energy = calculate_equivalent_primary_energy(primary_energy=primary_energy)
 
     # Add region aggregates.
     primary_energy = add_region_aggregates(primary_energy=primary_energy)
