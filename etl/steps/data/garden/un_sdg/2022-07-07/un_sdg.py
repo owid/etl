@@ -70,7 +70,7 @@ def run(dest_dir: str, query: str = "") -> None:
 
         tb_garden = Table(table)
         tb_garden.metadata = tb_meadow.metadata
-        tb_garden.metadata = underscore(table.index[0][5])
+        tb_garden.metadata.short_name = underscore(table.index[0][5])
         ds_garden.add(tb_garden)
 
     ds_garden.save()
