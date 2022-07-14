@@ -1,4 +1,4 @@
-"""Generate energy mix dataset using data from BP's statistical review of the world energy.
+"""Generate BP energy mix 2021 dataset using data from BP's statistical review of the world energy.
 
 For non-fossil based electricity sources (nuclear, hydro, wind, solar, geothermal, biomass in power, and other
 renewable sources), BP's generation (in TWh) corresponds to gross generation and not accounting for cross-border
@@ -31,7 +31,7 @@ from owid.datautils import geo
 from owid import catalog
 
 NAMESPACE = "bp"
-VERSION = 2022
+VERSION = 2021
 # Dataset name in the owid catalog (without the institution and year).
 DATASET_CATALOG_NAME = "statistical_review_of_world_energy"
 DATASET_TITLE = "Energy mix from BP"
@@ -350,18 +350,16 @@ def calculate_direct_primary_energy(primary_energy: pd.DataFrame) -> pd.DataFram
 
     # Create column for direct primary energy from renewable sources in TWh.
     # (total renewable electricity generation and biofuels) (in TWh).
-    # By visually inspecting the original data, it seems that many data points that used to be zero are
-    # missing in the 2022 release, so filling nan with zeros seems to be a reasonable approach to avoids losing a
-    # significant amount of data.
+    # By visually inspecting the original data, it seems that biofuels is missing zeros in the data, so we do fillna(0).
     primary_energy["Renewables (TWh - direct)"] = primary_energy["Hydro (TWh - direct)"] +\
-        primary_energy["Solar (TWh - direct)"].fillna(0) +\
-        primary_energy["Wind (TWh - direct)"].fillna(0) +\
-        primary_energy["Other renewables (TWh - direct)"].fillna(0) +\
+        primary_energy["Solar (TWh - direct)"] +\
+        primary_energy["Wind (TWh - direct)"] +\
+        primary_energy["Other renewables (TWh - direct)"] +\
         primary_energy["Biofuels (TWh)"].fillna(0)
     # Create column for direct primary energy from low-carbon sources in TWh.
     # (total renewable electricity generation, biofuels, and nuclear power) (in TWh).
     primary_energy["Low-carbon energy (TWh - direct)"] = primary_energy["Renewables (TWh - direct)"] +\
-        primary_energy["Nuclear (TWh - direct)"].fillna(0)
+        primary_energy["Nuclear (TWh - direct)"]
     # Create column for total direct primary energy.
     primary_energy["Primary energy (TWh - direct)"] = primary_energy["Fossil Fuels (TWh)"] +\
         primary_energy["Low-carbon energy (TWh - direct)"]
@@ -374,13 +372,13 @@ def calculate_equivalent_primary_energy(primary_energy: pd.DataFrame) -> pd.Data
     # Create column for total renewable input-equivalent primary energy (in EJ).
     # Fill missing values with zeros (see comment above).
     primary_energy["Renewables (EJ - equivalent)"] = primary_energy["Hydro (EJ - equivalent)"] +\
-        primary_energy["Solar (EJ - equivalent)"].fillna(0) +\
-        primary_energy["Wind (EJ - equivalent)"].fillna(0) +\
-        primary_energy["Other renewables (EJ - equivalent)"].fillna(0) +\
+        primary_energy["Solar (EJ - equivalent)"] +\
+        primary_energy["Wind (EJ - equivalent)"] +\
+        primary_energy["Other renewables (EJ - equivalent)"] +\
         primary_energy["Biofuels (EJ)"].fillna(0)
     # Create column for low carbon energy (i.e. renewable plus nuclear energy).
     primary_energy["Low-carbon energy (EJ - equivalent)"] = primary_energy["Renewables (EJ - equivalent)"] +\
-        primary_energy["Nuclear (EJ - equivalent)"].fillna(0)
+        primary_energy["Nuclear (EJ - equivalent)"]
     # Convert input-equivalent primary energy of non-fossil based electricity into TWh.
     # The result is primary energy using the "substitution method".
     for cat in DIRECT_AND_EQUIVALENT_ENERGY:
