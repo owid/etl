@@ -10,9 +10,7 @@ from owid.walden import Catalog
 from owid.catalog import Dataset, Table
 from etl.paths import DATA_DIR
 
-COUNTRY_MAPPING_PATH = (
-    Path(__file__).parent / "un_sdg.country_mapping.json"
-).as_posix()
+COUNTRY_MAPPING_PATH = Path(__file__).parent / "un_sdg.country_mapping.json"
 
 BASE_URL = "https://unstats.un.org/sdgapi"
 VERSION = Path(__file__).parent.stem
@@ -57,6 +55,9 @@ def run(dest_dir: str, query: str = "") -> None:
         not df.isnull().all(axis=1).any()
     ), "Unexpected state: One or more rows contains only NaN values."
 
+    if query:
+        df = df.query(query)
+
     log.info("Creating data tables...")
     all_tables = create_tables(df)
 
@@ -77,14 +78,11 @@ def run(dest_dir: str, query: str = "") -> None:
 
 
 def create_tables(original_df: pd.DataFrame) -> List[pd.DataFrame]:
-    # Removing the square brackets from the indicator column
     original_df = original_df.copy(deep=False)
 
     dim_description = get_dimension_description()
-
     init_dimensions = list(dim_description.keys())
     init_dimensions = list(set(init_dimensions).intersection(list(original_df.columns)))
-    # init_dimensions.extend(["Country", "Year"])
     init_non_dimensions = list(
         [c for c in original_df.columns if c not in set(init_dimensions)]
     )
@@ -172,8 +170,6 @@ def create_tables(original_df: pd.DataFrame) -> List[pd.DataFrame]:
             )
 
             output_tables.append(tables_fil)
-
-        # output_table = pd.concat(output_tables)
     return output_tables
 
 
@@ -305,7 +301,6 @@ def get_attributes_description() -> dict[str, str]:
     return cast(dict[str, str], units)
 
 
-# not sure about this type return but it's what make check-typing demanded!
 def get_dimension_description() -> dict[str, str]:
     walden_ds = Catalog().find_one(
         namespace=NAMESPACE, short_name="dimension", version=VERSION
@@ -331,3 +326,8 @@ def load_excluded_countries() -> List[str]:
         data = json.load(f)
         assert isinstance(data, list)
     return data
+
+
+if __name__ == "__main__":
+    # test script for a single indicator with `python etl/steps/data/meadow/un_sdg/2022-05-26/un_sdg.py`
+    run("/tmp/un_sdg", query="Indicator == '1.1.1'")
