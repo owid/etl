@@ -1,0 +1,56 @@
+dataset:
+  namespace: bp
+  version: 2021
+  title: Energy mix from BP
+  short_name: bp_energy_mix__bp_2021
+  url: https://www.bp.com/en/global/corporate/energy-economics/statistical-review-of-world-energy.html
+  publication_year: 2021
+  sources:
+    -
+      name: Our World in Data based on BP Statistical Review of World Energy (2021)
+      published_by: BP Statistical Review of World Energy
+      date_accessed: 31st March 2022
+  description: |
+    Raw data on energy consumption is sourced from the BP Statistical Review of World Energy, available at:
+    https://www.bp.com/en/global/corporate/energy-economics/statistical-review-of-world-energy.html
+
+    BP's definitions of regions sometimes differ from Our World in Data's definitions.
+    For example, BP's North America includes only Canada, Mexico and United States, whereas Our World in Data's North
+    America includes countries in Central America (see a map with
+    [our region definitions](https://ourworldindata.org/world-region-map-definitions)).
+    For this reason, we include in the dataset regions like "North America (BP)" to refer to BP's original data using
+    their definition of the region, as well as "North America", which is data aggregated by Our World in Data using our
+    definition.
+    These aggregates are constructed by adding up (when possible) the contributions from the countries in the region.
+
+    Primary energy in exajoules (EJ) has been converted to TWh by Our World in Data based on a conversion factor of
+    1,000,000 / 3,600 (~277.778).
+
+    For non-fossil based electricity sources (nuclear, hydro, wind, solar, geothermal, biomass in power, and other
+    renewable sources), BP's generation (in TWh) corresponds to gross generation and not accounting for cross-border
+    electricity supply.
+    Also, for non-fossil based electricity, there are two ways to define primary energy:
+    * One is "direct primary energy", which correspond to the electricity generation (in TWh).
+    * The other is "input-equivalent primary energy" (also called "primary energy using the substitution method").
+      This is the amount of fuel that would be required by thermal power stations to generate the reported electricity,
+      as explained in
+      [their methodology document](https://www.bp.com/content/dam/bp/business-sites/en/global/corporate/pdfs/energy-economics/statistical-review/bp-stats-review-2022-methodology.pdf).
+      For example, if a country's nuclear power generated 100 TWh of electricity, and assuming that the efficiency of a
+      standard thermal power plant is 38%, the input equivalent primary energy for this country would be
+      100/0.38 = 263 TWh = 0.95 EJ.
+      This input-equivalent primary energy takes account of the inefficiencies in fossil fuel production and is a better
+      approximation of "final energy" consumption.
+
+    For fossil fuels and biofuels, there is only direct primary energy.
+    However, when calculating the share of fossil fuels to the total primary energy, this will be done both with respect
+    to the total direct primary energy, and the total input-equivalent primary energy.
+
+    Additional metrics have been calculated by Our World in Data:
+    – Annual change in energy consumption by source: this is calculated as the difference from the previous year.
+    – % of total primary energy: calculated as each source's share of primary energy (direct energy and primary energy
+      using the substitution method) from all sources.
+    – Per capita energy by source: calculated as primary energy consumption by source, divided by population.
+
+    Per capita figures have been calculated using a population dataset that is built and maintained by Our World in
+    Data, based on different sources:
+    https://ourworldindata.org/population-sources

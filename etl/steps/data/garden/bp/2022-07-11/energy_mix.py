@@ -1,24 +1,5 @@
 """Generate BP energy mix 2021 dataset using data from BP's statistical review of the world energy.
 
-For non-fossil based electricity sources (nuclear, hydro, wind, solar, geothermal, biomass in power, and other
-renewable sources), BP's generation (in TWh) corresponds to gross generation and not accounting for cross-border
-electricity supply.
-
-Also, for non-fossil based electricity, there are two ways to define primary energy:
-* One is "direct primary energy", which correspond to the electricity generation (in TWh).
-* The other is "input-equivalent primary energy" (also called "primary energy using the substitution method").
-  This is the amount of fuel that would be required by thermal power stations to generate the reported electricity,
-  as explained in
-  [their methodology document](https://www.bp.com/content/dam/bp/business-sites/en/global/corporate/pdfs/energy-economics/statistical-review/bp-stats-review-2022-methodology.pdf).
-  For example, if a country's nuclear power generated 100 TWh of electricity, and assuming that the efficiency of a
-  standard thermal power plant is 38%, the input equivalent primary energy for this country would be
-  100/0.38 = 263 TWh = 0.95 EJ.
-This consideration is only relevant for non-fossil based electricity sources (i.e. hydro, nuclear, solar, wind, and
-other renewables).
-For fossil fuels and biofuels, there is only direct primary energy.
-However, when calculating the share of fossil fuels to the total primary energy, this will be done both with respect
-to the total direct primary energy, and the total input-equivalent primary energy.
-
 """
 
 import argparse
@@ -29,15 +10,12 @@ import pandas as pd
 from owid.datautils import geo
 
 from owid import catalog
+from . import METADATA_FILE_PATH
 
 NAMESPACE = "bp"
 VERSION = 2021
-# Dataset name in the owid catalog (without the institution and year).
+# Original BP's Statistical Review Dataset name in the owid catalog (without the institution and year).
 DATASET_CATALOG_NAME = "statistical_review_of_world_energy"
-DATASET_TITLE = "Energy mix from BP"
-DATASET_DESCRIPTION = "Energy mix from BP's statistical review of the world energy."
-# Dataset short name.
-DATASET_SHORT_NAME = f"bp_energy_mix__bp_{VERSION}"
 NAMESPACE_IN_CATALOG = "bp_statreview"
 
 # Conversion factors.
@@ -512,11 +490,7 @@ def prepare_output_table(primary_energy: pd.DataFrame) -> catalog.Table:
                 table[column].metadata.unit = "TWh"
 
     table = catalog.utils.underscore_table(table)
-    # Prepare metadata for new garden table.
-    table.metadata.title = DATASET_TITLE
-    table.metadata.short_name = DATASET_SHORT_NAME
-    table.metadata.primary_key = list(table.index.names)
-                
+
     return table
 
 
@@ -526,7 +500,7 @@ def run(dest_dir: str) -> None:
     #
     # Load table from latest BP dataset.
     bp_table = catalog.find_one(
-        DATASET_CATALOG_NAME, channels=["backport"], namespace=f"{NAMESPACE_IN_CATALOG}@{VERSION}")    
+        DATASET_CATALOG_NAME, channels=["backport"], namespace=f"{NAMESPACE_IN_CATALOG}@{VERSION}")
 
     #
     # Process data.
@@ -562,18 +536,17 @@ def run(dest_dir: str) -> None:
     #
     # Initialize new garden dataset.
     dataset = catalog.Dataset.create_empty(dest_dir)
-    # Prepare metadata for new garden dataset.
-    dataset.metadata.namespace = NAMESPACE
-    dataset.metadata.version = VERSION
-    dataset.metadata.description = DATASET_DESCRIPTION
-    dataset.metadata.title = DATASET_TITLE
-    dataset.metadata.short_name = DATASET_SHORT_NAME
+    # Add metadata to dataset.
+    dataset.metadata.update_from_yaml(METADATA_FILE_PATH)
     # Create new dataset in garden.
     dataset.save()
 
     # Add table to the dataset.
+    table.metadata.title = dataset.metadata.title
     table.metadata.description = dataset.metadata.description
     table.metadata.dataset = dataset.metadata
+    table.metadata.short_name = dataset.metadata.short_name
+    table.metadata.primary_key = list(table.index.names)
     dataset.add(table, repack=True)
 
 

@@ -27,20 +27,18 @@ from typing import cast
 
 import numpy as np
 import pandas as pd
-from owid import catalog
 from owid.datautils import geo
 
 from etl.paths import DATA_DIR
+from owid import catalog
+from . import METADATA_FILE_PATH
 
 NAMESPACE = "bp"
 VERSION = 2022
-# Dataset name in the owid catalog (without the institution and year).
+# Original BP's Statistical Review Dataset name in the owid catalog (without the institution and year).
 DATASET_CATALOG_NAME = "statistical_review_of_world_energy"
-DATASET_TITLE = "Energy mix from BP"
-DATASET_DESCRIPTION = "Energy mix from BP's statistical review of the world energy."
-# Dataset short name.
-DATASET_SHORT_NAME = f"bp_energy_mix__bp_{VERSION}"
 NAMESPACE_IN_CATALOG = "bp_statreview"
+
 
 # Conversion factors.
 # Terawatt-hours to kilowatt-hours.
@@ -520,11 +518,7 @@ def prepare_output_table(primary_energy: pd.DataFrame) -> catalog.Table:
                 table[column].metadata.unit = "TWh"
 
     table = catalog.utils.underscore_table(table)
-    # Prepare metadata for new garden table.
-    table.metadata.title = DATASET_TITLE
-    table.metadata.short_name = DATASET_SHORT_NAME
-    table.metadata.primary_key = list(table.index.names)
-                
+
     return table
 
 
@@ -535,7 +529,7 @@ def load_table_from_previous_dataset():
     # Load one by one each dataset and stop if the version is the one from previous year.
     for dataset_path in dataset_paths:
         dataset = catalog.Dataset(dataset_path)
-        if dataset.metadata.version == VERSION -1:
+        if dataset.metadata.version == VERSION - 1:
             break
     # Extract the (expected only one) table in that dataset.
     table_old = dataset[dataset.table_names[0]]
@@ -620,18 +614,17 @@ def run(dest_dir: str) -> None:
     #
     # Initialize new garden dataset.
     dataset = catalog.Dataset.create_empty(dest_dir)
-    # Prepare metadata for new garden dataset.
-    dataset.metadata.namespace = NAMESPACE
-    dataset.metadata.version = VERSION
-    dataset.metadata.description = DATASET_DESCRIPTION
-    dataset.metadata.title = DATASET_TITLE
-    dataset.metadata.short_name = DATASET_SHORT_NAME
+    # Add metadata to dataset.
+    dataset.metadata.update_from_yaml(METADATA_FILE_PATH)
     # Create new dataset in garden.
     dataset.save()
 
     # Add table to the dataset.
-    table.metadata.description = dataset.metadata.description
-    table.metadata.dataset = dataset.metadata
+    combined.metadata.title = dataset.metadata.title
+    combined.metadata.description = dataset.metadata.description
+    combined.metadata.dataset = dataset.metadata
+    combined.metadata.short_name = dataset.metadata.short_name
+    combined.metadata.primary_key = list(combined.index.names)
     dataset.add(combined, repack=True)
 
 
