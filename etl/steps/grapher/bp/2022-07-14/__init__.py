@@ -1,4 +1,5 @@
 from pathlib import Path
 
-# Path to current folder.
-LOCAL_DIR_PATH = Path(__file__).parent
+# Current namespace and version (which should coincide with the name of the parent directories).
+NAMESPACE = Path(__file__).parent.parent.name
+VERSION = Path(__file__).parent.name

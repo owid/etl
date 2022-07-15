@@ -3,13 +3,13 @@ dataset:
   version: 2021
   title: Energy mix from BP
   short_name: bp_energy_mix__bp_2021
-  url: https://www.bp.com/en/global/corporate/energy-economics/statistical-review-of-world-energy.html
   publication_year: 2021
   sources:
     -
       name: Our World in Data based on BP Statistical Review of World Energy (2021)
       published_by: BP Statistical Review of World Energy
       date_accessed: 31st March 2022
+      url: https://www.bp.com/en/global/corporate/energy-economics/statistical-review-of-world-energy.html
   description: |
     Raw data on energy consumption is sourced from the BP Statistical Review of World Energy, available at:
     https://www.bp.com/en/global/corporate/energy-economics/statistical-review-of-world-energy.html
