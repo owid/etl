@@ -17,10 +17,6 @@ VERSION = Path(__file__).parent.stem
 FNAME = Path(__file__).stem
 NAMESPACE = Path(__file__).parent.parent.stem
 
-VERSION = "2022-07-07"
-FNAME = "un_sdg"
-NAMESPACE = "un_sdg"
-
 log = get_logger()
 
 
