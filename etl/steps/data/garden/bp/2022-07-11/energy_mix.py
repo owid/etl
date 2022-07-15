@@ -482,12 +482,30 @@ def prepare_output_table(primary_energy: pd.DataFrame) -> catalog.Table:
     table = table.sort_values(["Country", "Year"]).reset_index(drop=True).\
         set_index(["Country", "Year"], verify_integrity=True).astype({"Country code": "category"})
 
-    # Add unit to each column.
+    # Add metadata (e.g. unit) to each column.
+    # Define unit names (these are the long and short unit names that will be shown in grapher).
+    # The keys of the dictionary should correspond to units expected to be found in each of the variable names in table.
+    short_unit_to_unit = {
+        "TWh": "terawatt-hours",
+        "kWh": "kilowatt-hours",
+        "%": "%",
+    }
+    # Define number of decimal places to show (only relevant for grapher, not for the data).
+    short_unit_to_num_decimals = {
+        "TWh": 0,
+        "kWh": 0,
+    }
     for column in table.columns:
         table[column].metadata.title = column
-        for unit in ["TWh", "kWh", "%"]:
-            if unit in column:
-                table[column].metadata.unit = "TWh"
+        for short_unit in ["TWh", "kWh", "%"]:
+            if short_unit in column:
+                table[column].metadata.short_unit = short_unit
+                table[column].metadata.unit = short_unit_to_unit[short_unit]
+                table[column].metadata.display = {}
+                if short_unit in short_unit_to_num_decimals:
+                    table[column].metadata.display["numDecimalPlaces"] = short_unit_to_num_decimals[short_unit]
+                # Add the variable name without unit (only relevant for grapher).
+                table[column].metadata.display["name"] = column.split(" (")[0]
 
     table = catalog.utils.underscore_table(table)
 
