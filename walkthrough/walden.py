@@ -1,16 +1,16 @@
 import shutil
 import tempfile
 from pathlib import Path
-from typing import Optional
 
 from botocore.exceptions import ClientError
 from cookiecutter.main import cookiecutter
 from owid import walden
 from owid.catalog import s3_utils
-from owid.catalog.utils import validate_underscore
 from pydantic import BaseModel
 from pywebio import input as pi
 from pywebio import output as po
+
+from . import utils
 
 CURRENT_DIR = Path(__file__).parent
 WALDEN_INGEST_DIR = Path(walden.__file__).parent.parent.parent / "ingests"
@@ -18,15 +18,18 @@ WALDEN_INGEST_DIR = Path(walden.__file__).parent.parent.parent / "ingests"
 
 DUMMY_DATA = {
     "short_name": "dummy",
+    "name": "Dummy dataset",
     "description": "This\nis\na\ndummy\ndataset",
     "file_extension": "xlsx",
     "source_data_url": "https://www.rug.nl/ggdc/historicaldevelopment/maddison/data/mpd2020.xlsx",
     "namespace": "dummy",
     "publication_year": 2020,
+    "source_name": "dummy source",
+    "url": "https://www.dummy.com/",
 }
 
 
-class DatasetForm(BaseModel):
+class WaldenForm(BaseModel):
 
     short_name: str
     namespace: str
@@ -49,6 +52,7 @@ class DatasetForm(BaseModel):
 def app(run_checks: bool, dummy_data: bool) -> None:
     dummies = DUMMY_DATA if dummy_data else {}
 
+    # TODO: move section from README here
     po.put_markdown(
         r"""# Walkthrough - Walden
 
@@ -71,13 +75,15 @@ def app(run_checks: bool, dummy_data: bool) -> None:
                 placeholder="ggdc_maddison",
                 required=True,
                 value=dummies.get("short_name"),
-                validate=_validate_short_name,
+                validate=utils.validate_short_name,
                 help_text="Underscored short name",
             ),
             pi.input(
                 "Full name",
                 name="name",
                 placeholder="Maddison Project Database (GGDC, 2020)",
+                required=True,
+                value=dummies.get("name"),
             ),
             pi.input(
                 "Namespace",
@@ -91,6 +97,8 @@ def app(run_checks: bool, dummy_data: bool) -> None:
                 "Source name",
                 name="source_name",
                 placeholder="Maddison Project Database 2020 (Bolt and van Zanden, 2020)",
+                required=True,
+                value=dummies.get("source_name"),
             ),
             pi.input(
                 "Publication year",
@@ -111,6 +119,8 @@ def app(run_checks: bool, dummy_data: bool) -> None:
                 name="url",
                 placeholder="https://www.rug.nl/ggdc/historicaldevelopment/maddison/releases/maddison-project-database-2020",
                 help_text="Url to the main page of the project",
+                required=True,
+                value=dummies.get("url"),
             ),
             pi.input(
                 "Dataset download URL",
@@ -139,7 +149,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
             ),
         ],
     )
-    form = DatasetForm(**data)  # type: ignore
+    form = WaldenForm(**data)  # type: ignore
 
     # use multi-line description
     form.description = form.description.replace("\n", "\n  ")
@@ -167,7 +177,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
 
         po.put_markdown(
             f"""
-## Instructions
+## Next steps
 
 1. Verify that generated files are correct and update them if necessary
 2. Test your ingest script with
@@ -193,26 +203,10 @@ df = pd.read_csv(local_file)
 """
         )
 
-        # preview files
-        _preview_file(meta_path, "yaml")
-        _preview_file(ingest_path, "python")
+        utils.preview_file(meta_path, "yaml")
+        utils.preview_file(ingest_path, "python")
 
     return
-
-
-def _preview_file(path: Path, language: str) -> None:
-    with open(path) as f:
-        t = f.read()
-    po.put_success(po.put_markdown(f"File `{path}` was successfully generated"))
-    po.put_markdown(f"```{language}\n{t}```")
-
-
-def _validate_short_name(short_name: str) -> Optional[str]:
-    try:
-        validate_underscore(short_name, "Short name")
-        return None
-    except Exception as e:
-        return str(e)
 
 
 def _check_aws_profile() -> None:

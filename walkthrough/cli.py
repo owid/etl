@@ -5,7 +5,7 @@ import click
 from pywebio import start_server
 from rich import print
 
-from . import walden
+from . import meadow, walden
 
 PHASES = Literal["walden", "meadow", "garden", "grapher"]
 
@@ -31,6 +31,13 @@ def cli(phase: Iterable[PHASES], run_checks: bool, dummy_data: bool) -> None:
     if phase == "walden":
         start_server(
             lambda: walden.app(run_checks=run_checks, dummy_data=dummy_data),
+            port=8082,
+            debug=True,
+            auto_open_webbrowser=True,
+        )
+    elif phase == "meadow":
+        start_server(
+            lambda: meadow.app(run_checks=run_checks, dummy_data=dummy_data),
             port=8082,
             debug=True,
             auto_open_webbrowser=True,
