@@ -17,6 +17,10 @@ VERSION = Path(__file__).parent.stem
 FNAME = Path(__file__).stem
 NAMESPACE = Path(__file__).parent.parent.stem
 
+VERSION = "2022-07-07"
+FNAME = "un_sdg"
+NAMESPACE = "un_sdg"
+
 log = get_logger()
 
 
@@ -59,7 +63,10 @@ def run(dest_dir: str, query: str = "") -> None:
         df = df.query(query)
 
     log.info("Creating data tables...")
+
     all_tables = create_tables(df)
+
+    all_tables = create_omms(all_tables)
 
     log.info("Saving data tables...")
 
@@ -240,7 +247,7 @@ def create_short_unit(long_unit: pd.Series) -> np.ndarray[Any, np.dtype[Any]]:
 
     choices = ["%", "kg", "$"]
 
-    short_unit = np.select(conditions, choices, default="str")
+    short_unit = np.select(conditions, choices, default="")
     return short_unit
 
 
@@ -326,6 +333,32 @@ def load_excluded_countries() -> List[str]:
         data = json.load(f)
         assert isinstance(data, list)
     return data
+
+
+def create_omms(all_tabs: List[pd.DataFrame]) -> List[pd.DataFrame]:
+    i = 0
+    for table in all_tabs:
+        if table.index[0][5] == "ER_BDY_ABT2NP":
+            table = table.copy(deep=False)
+            table = table.query('level_status != "No breakdown"')
+            table.reset_index(level=["level_status"], inplace=True)
+            table["value"] = table["level_status"]
+            table.drop(columns=["level_status"], inplace=True)
+            print(i)
+            all_tabs[i] = table
+
+        if table.index[0][5] == "SG_SCP_PROCN":
+            table = table.copy(deep=False)
+            table = table.query('level_status != "No breakdown"')
+            table.reset_index(level=["level_status"], inplace=True)
+            table["value"] = table["level_status"]
+            table.drop(columns=["level_status"], inplace=True)
+            print(i)
+            all_tabs[i] = table
+
+        i += 1
+
+    return all_tabs
 
 
 if __name__ == "__main__":
