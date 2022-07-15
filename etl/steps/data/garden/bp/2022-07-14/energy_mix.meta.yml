@@ -38,12 +38,8 @@ dataset:
       For example, if a country's nuclear power generated 100 TWh of electricity, and assuming that the efficiency of a
       standard thermal power plant is 38%, the input equivalent primary energy for this country would be
       100/0.38 = 263 TWh = 0.95 EJ.
-      This input-equivalent primary energy takes account of the inefficiencies in fossil fuel production and is a better
-      approximation of "final energy" consumption.
-
-    For fossil fuels and biofuels, there is only direct primary energy.
-    However, when calculating the share of fossil fuels to the total primary energy, this will be done both with respect
-    to the total direct primary energy, and the total input-equivalent primary energy.
+      This input-equivalent primary energy takes account of the inefficiencies in fossil fuel production and provides a better
+      approximation of each source's share of "final energy" consumption.
 
     Additional metrics have been calculated by Our World in Data:
     – Annual change in energy consumption by source: this is calculated as the difference from the previous year.
