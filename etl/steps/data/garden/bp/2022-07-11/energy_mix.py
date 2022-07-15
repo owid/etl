@@ -49,7 +49,7 @@ EJ_TO_TWH = 1e6/3600
 PJ_TO_EJ = 1e-3
 
 # List all energy sources in the data.
-ONLY_DIRECT_ENERGY = ['Coal', 'Fossil Fuels', 'Gas', 'Oil', 'Biofuels']
+ONLY_DIRECT_ENERGY = ['Coal', 'Fossil fuels', 'Gas', 'Oil', 'Biofuels']
 DIRECT_AND_EQUIVALENT_ENERGY = ['Hydro', 'Low-carbon energy', 'Nuclear', 'Other renewables', 'Renewables', 'Solar',
                                 'Wind']
 ALL_SOURCES = sorted(ONLY_DIRECT_ENERGY + DIRECT_AND_EQUIVALENT_ENERGY)
@@ -337,7 +337,7 @@ def calculate_direct_primary_energy(primary_energy: pd.DataFrame) -> pd.DataFram
     primary_energy["Biofuels (EJ)"] = primary_energy["Biofuels (PJ)"] * PJ_TO_EJ    
 
     # Create column for fossil fuels primary energy (if any of them is nan, the sum will be nan).
-    primary_energy["Fossil Fuels (EJ)"] = primary_energy["Coal (EJ)"] + primary_energy["Oil (EJ)"] +\
+    primary_energy["Fossil fuels (EJ)"] = primary_energy["Coal (EJ)"] + primary_energy["Oil (EJ)"] +\
         primary_energy["Gas (EJ)"]    
 
     # Convert primary energy of fossil fuels and biofuels into TWh.
@@ -345,7 +345,7 @@ def calculate_direct_primary_energy(primary_energy: pd.DataFrame) -> pd.DataFram
         primary_energy[f"{cat} (TWh)"] = primary_energy[f"{cat} (EJ)"] * EJ_TO_TWH
 
     # Create column for primary energy from fossil fuels (in TWh).
-    primary_energy["Fossil Fuels (TWh)"] = primary_energy["Coal (TWh)"] + primary_energy["Oil (TWh)"] +\
+    primary_energy["Fossil fuels (TWh)"] = primary_energy["Coal (TWh)"] + primary_energy["Oil (TWh)"] +\
         primary_energy["Gas (TWh)"]    
 
     # Create column for direct primary energy from renewable sources in TWh.
@@ -361,7 +361,7 @@ def calculate_direct_primary_energy(primary_energy: pd.DataFrame) -> pd.DataFram
     primary_energy["Low-carbon energy (TWh - direct)"] = primary_energy["Renewables (TWh - direct)"] +\
         primary_energy["Nuclear (TWh - direct)"]
     # Create column for total direct primary energy.
-    primary_energy["Primary energy (TWh - direct)"] = primary_energy["Fossil Fuels (TWh)"] +\
+    primary_energy["Primary energy (TWh - direct)"] = primary_energy["Fossil fuels (TWh)"] +\
         primary_energy["Low-carbon energy (TWh - direct)"]
 
     return primary_energy
@@ -385,7 +385,7 @@ def calculate_equivalent_primary_energy(primary_energy: pd.DataFrame) -> pd.Data
         primary_energy[f"{cat} (TWh - equivalent)"] = primary_energy[f"{cat} (EJ - equivalent)"] * EJ_TO_TWH
     # Create column for primary energy from all sources (which corresponds to input-equivalent primary
     # energy for non-fossil based sources).
-    primary_energy["Primary energy (TWh - equivalent)"] = primary_energy["Fossil Fuels (TWh)"] +\
+    primary_energy["Primary energy (TWh - equivalent)"] = primary_energy["Fossil fuels (TWh)"] +\
         primary_energy["Low-carbon energy (TWh - equivalent)"]
     # Check that the primary energy constructed using the substitution method coincides with the
     # input-equivalent primary energy.
