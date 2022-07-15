@@ -2,7 +2,6 @@
 
 """
 
-import argparse
 from pathlib import Path
 from typing import cast
 
@@ -262,6 +261,19 @@ def add_population(
 
 
 def get_bp_data(bp_table: catalog.Table) -> pd.DataFrame:
+    """Extract a simple dataframe of BP statistical review data from the table in the dataset.
+
+    Parameters
+    ----------
+    bp_table : catalog.Table
+        BP table (from the dataset of BP statistical review).
+
+    Returns
+    -------
+    bp_data : pd.DataFrame
+        BP statistical review data.
+
+    """
     bp_table = bp_table.copy()
 
     # Convert table (snake case) column names to human readable names.
@@ -307,7 +319,7 @@ def get_bp_data(bp_table: catalog.Table) -> pd.DataFrame:
     return bp_data
 
 
-def check_that_substitution_method_is_well_calculated(
+def _check_that_substitution_method_is_well_calculated(
     primary_energy: pd.DataFrame,
 ) -> None:
     # Check that the constructed primary energy using the substitution method (in TWh) coincides with the
@@ -338,6 +350,19 @@ def check_that_substitution_method_is_well_calculated(
 
 
 def calculate_direct_primary_energy(primary_energy: pd.DataFrame) -> pd.DataFrame:
+    """Convert direct primary energy into TWh and create various aggregates (e.g. Fossil fuels and Renewables).
+
+    Parameters
+    ----------
+    primary_energy : pd.DataFrame
+        BP data.
+
+    Returns
+    -------
+    primary_energy : pd.DataFrame
+        Data, after adding direct primary energy.
+
+    """
     primary_energy = primary_energy.copy()
 
     # Convert units of biofuels consumption.
@@ -387,6 +412,20 @@ def calculate_direct_primary_energy(primary_energy: pd.DataFrame) -> pd.DataFram
 
 
 def calculate_equivalent_primary_energy(primary_energy: pd.DataFrame) -> pd.DataFrame:
+    """Convert input-equivalent primary energy into TWh and create various aggregates (e.g. Fossil fuels and
+    Renewables).
+
+    Parameters
+    ----------
+    primary_energy : pd.DataFrame
+        BP data.
+
+    Returns
+    -------
+    primary_energy : pd.DataFrame
+        Data, after adding input-equivalent primary energy.
+
+    """
     primary_energy = primary_energy.copy()
     # Create column for total renewable input-equivalent primary energy (in EJ).
     # Fill missing values with zeros (see comment above).
@@ -416,12 +455,26 @@ def calculate_equivalent_primary_energy(primary_energy: pd.DataFrame) -> pd.Data
     )
     # Check that the primary energy constructed using the substitution method coincides with the
     # input-equivalent primary energy.
-    check_that_substitution_method_is_well_calculated(primary_energy)
+    _check_that_substitution_method_is_well_calculated(primary_energy)
 
     return primary_energy
 
 
 def calculate_share_of_primary_energy(primary_energy: pd.DataFrame) -> pd.DataFrame:
+    """Calculate the share (percentage) of (direct or direct and input-equivalent) primary energy for each energy
+     source.
+
+    Parameters
+    ----------
+    primary_energy : pd.DataFrame
+        BP data.
+
+    Returns
+    -------
+    primary_energy : pd.DataFrame
+        BP data after adding columns for the share of primary energy.
+
+    """
     primary_energy = primary_energy.copy()
     # Check that all sources are included in the data.
     expected_sources = sorted(
@@ -469,6 +522,19 @@ def calculate_share_of_primary_energy(primary_energy: pd.DataFrame) -> pd.DataFr
 def calculate_primary_energy_annual_change(
     primary_energy: pd.DataFrame,
 ) -> pd.DataFrame:
+    """Calculate annual change of (direct or direct and input-equivalent) primary energy for each energy source.
+
+    Parameters
+    ----------
+    primary_energy : pd.DataFrame
+        BP data.
+
+    Returns
+    -------
+    primary_energy : pd.DataFrame
+        BP data after adding annual changes.
+
+    """
     primary_energy = primary_energy.copy()
 
     # Calculate annual change in each source.
@@ -505,6 +571,21 @@ def calculate_primary_energy_annual_change(
 
 
 def add_region_aggregates(primary_energy: pd.DataFrame) -> pd.DataFrame:
+    """Add region aggregate for all regions.
+
+    Regions are defined above, in REGIONS_TO_ADD.
+
+    Parameters
+    ----------
+    primary_energy : pd.DataFrame
+        BP data.
+
+    Returns
+    -------
+    primary_energy : pd.DataFrame
+        BP data after adding regions.
+
+    """
     primary_energy = primary_energy.copy()
 
     income_groups = load_income_groups()
@@ -541,6 +622,19 @@ def add_region_aggregates(primary_energy: pd.DataFrame) -> pd.DataFrame:
 
 
 def add_per_capita_variables(primary_energy: pd.DataFrame) -> pd.DataFrame:
+    """Add per-capita variables.
+
+    Parameters
+    ----------
+    primary_energy : pd.DataFrame
+        BP data.
+
+    Returns
+    -------
+    primary_energy : pd.DataFrame
+        BP data after adding per-capita variables.
+
+    """
     primary_energy = primary_energy.copy()
 
     primary_energy = add_population(
@@ -575,6 +669,20 @@ def add_per_capita_variables(primary_energy: pd.DataFrame) -> pd.DataFrame:
 
 
 def prepare_output_table(primary_energy: pd.DataFrame) -> catalog.Table:
+    """Create a table with the processed data, ready to be in a garden dataset and to be uploaded to grapher (although
+    additional metadata may need to be added to the table).
+
+    Parameters
+    ----------
+    primary_energy : pd.DataFrame
+        Processed BP data.
+
+    Returns
+    -------
+    table : catalog.Table
+        Table, ready to be added to a new garden dataset.
+
+    """
     # Keep only columns in TWh (and not EJ or PJ).
     table = catalog.Table(primary_energy).drop(
         errors="raise",
@@ -684,9 +792,3 @@ def run(dest_dir: str) -> None:
     table.metadata.short_name = dataset.metadata.short_name
     table.metadata.primary_key = list(table.index.names)
     dataset.add(table, repack=True)
-
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description=__doc__)
-    args = parser.parse_args()
-    run(dest_dir="/tmp/bp_energy_mix")

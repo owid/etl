@@ -1,27 +1,7 @@
 """Generate BP energy mix 2022 dataset using data from BP's statistical review of the world energy.
 
-For non-fossil based electricity sources (nuclear, hydro, wind, solar, geothermal, biomass in power, and other
-renewable sources), BP's generation (in TWh) corresponds to gross generation and not accounting for cross-border
-electricity supply.
-
-Also, for non-fossil based electricity, there are two ways to define primary energy:
-* One is "direct primary energy", which correspond to the electricity generation (in TWh).
-* The other is "input-equivalent primary energy" (also called "primary energy using the substitution method").
-  This is the amount of fuel that would be required by thermal power stations to generate the reported electricity,
-  as explained in
-  [their methodology document](https://www.bp.com/content/dam/bp/business-sites/en/global/corporate/pdfs/energy-economics/statistical-review/bp-stats-review-2022-methodology.pdf).
-  For example, if a country's nuclear power generated 100 TWh of electricity, and assuming that the efficiency of a
-  standard thermal power plant is 38%, the input equivalent primary energy for this country would be
-  100/0.38 = 263 TWh = 0.95 EJ.
-This consideration is only relevant for non-fossil based electricity sources (i.e. hydro, nuclear, solar, wind, and
-other renewables).
-For fossil fuels and biofuels, there is only direct primary energy.
-However, when calculating the share of fossil fuels to the total primary energy, this will be done both with respect
-to the total direct primary energy, and the total input-equivalent primary energy.
-
 """
 
-import argparse
 from copy import deepcopy
 from pathlib import Path
 from typing import cast
@@ -283,6 +263,19 @@ def add_population(
 
 
 def get_bp_data(bp_table: catalog.Table) -> pd.DataFrame:
+    """Extract a simple dataframe of BP statistical review data from the table in the dataset.
+
+    Parameters
+    ----------
+    bp_table : catalog.Table
+        BP table (from the dataset of BP statistical review).
+
+    Returns
+    -------
+    bp_data : pd.DataFrame
+        BP statistical review data.
+
+    """
     bp_table = bp_table.copy()
 
     # Convert table (snake case) column names to human readable names.
@@ -328,7 +321,7 @@ def get_bp_data(bp_table: catalog.Table) -> pd.DataFrame:
     return bp_data
 
 
-def check_that_substitution_method_is_well_calculated(
+def _check_that_substitution_method_is_well_calculated(
     primary_energy: pd.DataFrame,
 ) -> None:
     # Check that the constructed primary energy using the substitution method (in TWh) coincides with the
@@ -359,6 +352,19 @@ def check_that_substitution_method_is_well_calculated(
 
 
 def calculate_direct_primary_energy(primary_energy: pd.DataFrame) -> pd.DataFrame:
+    """Convert direct primary energy into TWh and create various aggregates (e.g. Fossil fuels and Renewables).
+
+    Parameters
+    ----------
+    primary_energy : pd.DataFrame
+        BP data.
+
+    Returns
+    -------
+    primary_energy : pd.DataFrame
+        Data, after adding direct primary energy.
+
+    """
     primary_energy = primary_energy.copy()
 
     # Convert units of biofuels consumption.
@@ -409,6 +415,20 @@ def calculate_direct_primary_energy(primary_energy: pd.DataFrame) -> pd.DataFram
 
 
 def calculate_equivalent_primary_energy(primary_energy: pd.DataFrame) -> pd.DataFrame:
+    """Convert input-equivalent primary energy into TWh and create various aggregates (e.g. Fossil fuels and
+    Renewables).
+
+    Parameters
+    ----------
+    primary_energy : pd.DataFrame
+        BP data.
+
+    Returns
+    -------
+    primary_energy : pd.DataFrame
+        Data, after adding input-equivalent primary energy.
+
+    """
     primary_energy = primary_energy.copy()
     # Create column for total renewable input-equivalent primary energy (in EJ).
     # Fill missing values with zeros (see comment above).
@@ -437,12 +457,26 @@ def calculate_equivalent_primary_energy(primary_energy: pd.DataFrame) -> pd.Data
     )
     # Check that the primary energy constructed using the substitution method coincides with the
     # input-equivalent primary energy.
-    check_that_substitution_method_is_well_calculated(primary_energy)
+    _check_that_substitution_method_is_well_calculated(primary_energy)
 
     return primary_energy
 
 
 def calculate_share_of_primary_energy(primary_energy: pd.DataFrame) -> pd.DataFrame:
+    """Calculate the share (percentage) of (direct or direct and input-equivalent) primary energy for each energy
+     source.
+
+    Parameters
+    ----------
+    primary_energy : pd.DataFrame
+        BP data.
+
+    Returns
+    -------
+    primary_energy : pd.DataFrame
+        BP data after adding columns for the share of primary energy.
+
+    """
     primary_energy = primary_energy.copy()
     # Check that all sources are included in the data.
     expected_sources = sorted(
@@ -490,6 +524,19 @@ def calculate_share_of_primary_energy(primary_energy: pd.DataFrame) -> pd.DataFr
 def calculate_primary_energy_annual_change(
     primary_energy: pd.DataFrame,
 ) -> pd.DataFrame:
+    """Calculate annual change of (direct or direct and input-equivalent) primary energy for each energy source.
+
+    Parameters
+    ----------
+    primary_energy : pd.DataFrame
+        BP data.
+
+    Returns
+    -------
+    primary_energy : pd.DataFrame
+        BP data after adding annual changes.
+
+    """
     primary_energy = primary_energy.copy()
 
     # Calculate annual change in each source.
@@ -526,6 +573,21 @@ def calculate_primary_energy_annual_change(
 
 
 def add_region_aggregates(primary_energy: pd.DataFrame) -> pd.DataFrame:
+    """Add region aggregate for all regions.
+
+    Regions are defined above, in REGIONS_TO_ADD.
+
+    Parameters
+    ----------
+    primary_energy : pd.DataFrame
+        BP data.
+
+    Returns
+    -------
+    primary_energy : pd.DataFrame
+        BP data after adding regions.
+
+    """
     primary_energy = primary_energy.copy()
 
     income_groups = load_income_groups()
@@ -567,6 +629,19 @@ def add_region_aggregates(primary_energy: pd.DataFrame) -> pd.DataFrame:
 
 
 def add_per_capita_variables(primary_energy: pd.DataFrame) -> pd.DataFrame:
+    """Add per-capita variables.
+
+    Parameters
+    ----------
+    primary_energy : pd.DataFrame
+        BP data.
+
+    Returns
+    -------
+    primary_energy : pd.DataFrame
+        BP data after adding per-capita variables.
+
+    """
     primary_energy = primary_energy.copy()
 
     primary_energy = add_population(
@@ -601,6 +676,20 @@ def add_per_capita_variables(primary_energy: pd.DataFrame) -> pd.DataFrame:
 
 
 def prepare_output_table(primary_energy: pd.DataFrame) -> catalog.Table:
+    """Create a table with the processed data, ready to be in a garden dataset and to be uploaded to grapher (although
+    additional metadata may need to be added to the table).
+
+    Parameters
+    ----------
+    primary_energy : pd.DataFrame
+        Processed BP data.
+
+    Returns
+    -------
+    table : catalog.Table
+        Table, ready to be added to a new garden dataset.
+
+    """
     # Keep only columns in TWh (and not EJ or PJ).
     table = catalog.Table(primary_energy).drop(
         errors="raise",
@@ -655,6 +744,14 @@ def prepare_output_table(primary_energy: pd.DataFrame) -> catalog.Table:
 
 
 def load_table_from_previous_dataset() -> catalog.Table:
+    """Load table from previous version of the dataset of the current step.
+
+    Returns
+    -------
+    table_old : catalog.Table
+        Table from the previous version of the current dataset to be created.
+
+    """
     # Sort the paths of candidate datasets from newest to oldest.
     dataset_paths = sorted((DATA_DIR / "garden" / NAMESPACE).glob("*/energy_mix"))[::-1]
 
@@ -672,6 +769,22 @@ def load_table_from_previous_dataset() -> catalog.Table:
 def fill_missing_values_with_previous_version(
     table: catalog.Table, table_old: catalog.Table
 ) -> catalog.Table:
+    """Fill missing values in current data with values from the previous version of the dataset.
+
+    Parameters
+    ----------
+    table : catalog.Table
+        Processed data from current dataset.
+    table_old : catalog.Table
+        Processed data from previous dataset.
+
+    Returns
+    -------
+    combined : catalog.Table
+        Combined table, with data from the current data, but after filling missing values with data from the previous
+        version of the dataset.
+
+    """
     # For region aggregates, avoid filling nan with values from previous releases.
     # The reason is that aggregates each year may include data from different countries.
     # This is especially necessary in 2022 because regions had different definitions in 2021 (the ones by BP).
@@ -770,9 +883,3 @@ def run(dest_dir: str) -> None:
     combined.metadata.short_name = dataset.metadata.short_name
     combined.metadata.primary_key = list(combined.index.names)
     dataset.add(combined, repack=True)
-
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description=__doc__)
-    args = parser.parse_args()
-    run(dest_dir="/tmp/bp_energy_mix")
