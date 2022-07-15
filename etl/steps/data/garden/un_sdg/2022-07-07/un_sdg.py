@@ -48,7 +48,7 @@ def run(dest_dir: str, query: str = "") -> None:
             "names; or (b) remove these country names from the raw table."
             f"Raw country names: {missing_countries}"
         )
-
+    df["country"] = countries
     assert df["country"].notnull().all()
     assert df["value"].notnull().all()
     assert (
