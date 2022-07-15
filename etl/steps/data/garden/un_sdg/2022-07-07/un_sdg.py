@@ -340,7 +340,6 @@ def create_omms(all_tabs: List[pd.DataFrame]) -> List[pd.DataFrame]:
             table.reset_index(level=["level_status"], inplace=True)
             table["value"] = table["level_status"]
             table.drop(columns=["level_status"], inplace=True)
-            print(i)
             all_tabs[i] = table
 
         if table.index[0][5] == "SG_SCP_PROCN":
@@ -349,7 +348,6 @@ def create_omms(all_tabs: List[pd.DataFrame]) -> List[pd.DataFrame]:
             table.reset_index(level=["level_status"], inplace=True)
             table["value"] = table["level_status"]
             table.drop(columns=["level_status"], inplace=True)
-            print(i)
             all_tabs[i] = table
 
         i += 1
