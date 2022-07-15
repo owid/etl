@@ -16,19 +16,6 @@ CURRENT_DIR = Path(__file__).parent
 WALDEN_INGEST_DIR = Path(walden.__file__).parent.parent.parent / "ingests"
 
 
-DUMMY_DATA = {
-    "short_name": "dummy",
-    "name": "Dummy dataset",
-    "description": "This\nis\na\ndummy\ndataset",
-    "file_extension": "xlsx",
-    "source_data_url": "https://www.rug.nl/ggdc/historicaldevelopment/maddison/data/mpd2020.xlsx",
-    "namespace": "dummy",
-    "publication_year": 2020,
-    "source_name": "dummy source",
-    "url": "https://www.dummy.com/",
-}
-
-
 class WaldenForm(BaseModel):
 
     short_name: str
@@ -50,15 +37,10 @@ class WaldenForm(BaseModel):
 
 
 def app(run_checks: bool, dummy_data: bool) -> None:
-    dummies = DUMMY_DATA if dummy_data else {}
+    dummies = utils.DUMMY_DATA if dummy_data else {}
 
-    # TODO: move section from README here
-    po.put_markdown(
-        r"""# Walkthrough - Walden
-
-    This is a walkthrough that will generate ingest script for uploading dataset to Walden. It downloads a dataset from a URL and uploads it S3 bucket `walden`. You can also start from this template and then update the script to your needs.
-    """
-    )
+    with open(CURRENT_DIR / "walden.md", "r") as f:
+        po.put_markdown(f.read())
 
     # run checks
     if run_checks:
@@ -149,7 +131,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
             ),
         ],
     )
-    form = WaldenForm(**data)  # type: ignore
+    form = WaldenForm(**data)
 
     # use multi-line description
     form.description = form.description.replace("\n", "\n  ")
@@ -180,12 +162,17 @@ def app(run_checks: bool, dummy_data: bool) -> None:
 ## Next steps
 
 1. Verify that generated files are correct and update them if necessary
+
 2. Test your ingest script with
 ```bash
 python vendor/walden/ingests/{form.short_name}.py --skip-upload
 ```
+
 3. Once you are happy with the ingest script, run it without the `--skip-upload` flag to upload files to S3. Running it again will overwrite the dataset.
+
 4. Commit changes to walden (if you develop locally you don't need to commit it, but you need to upload the dataset to S3)
+
+5. Exit the process and run next step with `poetry run walkthrough meadow`
 
 ## Getting dataset from Walden
 

@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import pandas as pd
 from owid.catalog import Dataset, Table, TableMeta
 from owid.catalog.utils import underscore_table
@@ -8,24 +10,23 @@ from etl.paths import DATA_DIR, REFERENCE_DATASET
 from etl.steps.data.converters import convert_walden_metadata
 
 log = get_logger()
-
-
-{%- if cookiecutter.load_countries_regions -%}
+{% if cookiecutter.load_countries_regions == "True" %}
 def load_countries_regions() -> Table:
     # load countries regions (e.g. to map from iso codes to country names)
     reference_dataset = Dataset(REFERENCE_DATASET)
     return reference_dataset["countries_regions"]
 {% endif %}
-
-
-{%- if cookiecutter.load_population -%}
+{% if cookiecutter.load_population == "True" %}
 def load_population() -> Table:
     # load countries regions (e.g. to map from iso codes to country names)
     indicators = Dataset(DATA_DIR / "garden/owid/latest/key_indicators")
     return indicators["population"]
 {% endif %}
-
-
+{% if cookiecutter.include_metadata_yaml == "True" %}
+METADATA_PATH = (
+    Path(__file__).parent / "{{cookiecutter.short_name}}.meta.yml"
+)
+{% endif %}
 def run(dest_dir: str) -> None:
     log.info("{{cookiecutter.short_name}}.start")
 
@@ -34,7 +35,8 @@ def run(dest_dir: str) -> None:
         namespace="{{cookiecutter.namespace}}", short_name="{{cookiecutter.short_name}}", version="{{cookiecutter.version}}"
     )
     local_file = walden_ds.ensure_downloaded()
-    df = pd.read_excel(local_file)
+
+    df = pd.read_excel(local_file, sheet_name="Full data")
 
     # clean and transform data
     df = clean_data(df)
@@ -53,7 +55,10 @@ def run(dest_dir: str) -> None:
 
     # underscore all table columns
     tb = underscore_table(tb)
-
+    {% if cookiecutter.include_metadata_yaml == "True" %}
+    ds.metadata.update_from_yaml(METADATA_PATH)
+    tb.update_metadata_from_yaml(METADATA_PATH, "{{cookiecutter.short_name}}")
+    {% endif %}
     # add table to a dataset
     ds.add(tb)
 
@@ -64,4 +69,11 @@ def run(dest_dir: str) -> None:
 
 
 def clean_data(df: pd.DataFrame) -> pd.DataFrame:
-    return df
+    return df.rename(
+        columns={
+            "country": "country",
+            "year": "year",
+            "pop": "population",
+            "gdppc": "gdp",
+        }
+    )

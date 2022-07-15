@@ -5,7 +5,7 @@ import click
 from pywebio import start_server
 from rich import print
 
-from . import meadow, walden
+from . import meadow, walden, garden
 
 PHASES = Literal["walden", "meadow", "garden", "grapher"]
 
@@ -13,7 +13,7 @@ PHASES = Literal["walden", "meadow", "garden", "grapher"]
 @click.command()
 @click.argument(
     "phase",
-    type=click.Choice(PHASES.__args__),
+    type=click.Choice(PHASES.__args__),  # type: ignore
 )
 @click.option(
     "--run-checks/--skip-checks",
@@ -24,26 +24,25 @@ PHASES = Literal["walden", "meadow", "garden", "grapher"]
 @click.option(
     "--dummy-data",
     is_flag=True,
-    help="Prefill form with dummy data",
+    help="Prefill form with dummy data, useful for development",
 )
 def cli(phase: Iterable[PHASES], run_checks: bool, dummy_data: bool) -> None:
     print("Walkthrough has been opened at http://localhost:8082/")
     if phase == "walden":
-        start_server(
-            lambda: walden.app(run_checks=run_checks, dummy_data=dummy_data),
-            port=8082,
-            debug=True,
-            auto_open_webbrowser=True,
-        )
+        phase_func = walden.app
     elif phase == "meadow":
-        start_server(
-            lambda: meadow.app(run_checks=run_checks, dummy_data=dummy_data),
-            port=8082,
-            debug=True,
-            auto_open_webbrowser=True,
-        )
+        phase_func = meadow.app
+    elif phase == "garden":
+        phase_func = garden.app
     else:
         raise NotImplementedError(f"{phase} is not implemented yet.")
+
+    start_server(
+        lambda: phase_func(run_checks=run_checks, dummy_data=dummy_data),
+        port=8082,
+        debug=True,
+        auto_open_webbrowser=True,
+    )
 
 
 if __name__ == "__main__":
