@@ -23,6 +23,8 @@ steps:
     - data://meadow/gapminder/2019-12-10/population
   data://meadow/un/2022/un_wpp:
     - walden://un/2022/un_wpp
+  data://garden/un/2022/un_wpp:
+    - data://meadow/un/2022/un_wpp
   data://meadow/gapminder/2019-12-10/population:
     - walden://gapminder/2019-12-10/population
   data://meadow/hyde/2017/baseline:
