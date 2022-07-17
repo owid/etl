@@ -180,6 +180,11 @@ def run_dag(
 
     steps = compile_steps(dag, includes, excludes, downstream=downstream, only=only)
 
+    if not steps:
+        raise ValueError(
+            "No steps matched the given input. Check spelling or consult `etl --help` for more options"
+        )
+
     if not force:
         print("Detecting which steps need rebuilding...")
         steps = select_dirty_steps(steps, workers)
