@@ -166,7 +166,9 @@ def app(run_checks: bool, dummy_data: bool) -> None:
     df = ds["{form.short_name}"]
     ```
 
-4. Once your dataset is merged and published in the OWID catalog, it can be found by anyone using:
+4. Create a branch in [Walden](https://github.com/owid/walden) and [ETL](https://github.com/owid/etl) repositories, get it reviewed and merged.
+
+5. Once your changes are merged, your steps will be run automatically by our server and published to the OWID catalog. Once that is finished, it can be found by anyone using:
 
     ```python
     from owid.catalog import find_one
