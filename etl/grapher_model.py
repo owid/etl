@@ -3,11 +3,11 @@ import json
 from typing import Any, Dict, Optional
 
 import pandas as pd
+import structlog
 from pydantic import BaseModel
 from sqlalchemy.engine import Engine
 from sqlmodel import JSON, Column, Field, Session, SQLModel, select
 from sqlmodel.sql.expression import Select, SelectOfScalar
-import structlog
 
 
 log = structlog.get_logger()

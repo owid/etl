@@ -6,7 +6,6 @@ from typing import cast
 import click
 import pandas as pd
 import structlog
-from owid.catalog.utils import underscore
 from owid.walden import CATALOG as WALDEN_CATALOG
 from sqlalchemy.engine import Engine
 
@@ -128,14 +127,13 @@ def _backport_datasets_to_walden(df: pd.DataFrame, dry_run: bool, force: bool) -
     """Add datasets to local walden if missing or checksums are out of date; on prod, a cron job will commit."""
     # NOTE: we are not commiting changes to walden repo, this could be problematic
     # if the other processes are trying to rebase the repo
-    # NOTE: we are not uploading files to walden S3 bucket, this will be done during periodic
-    # etl run
+    # NOTE: we are not uploading files to walden S3 bucket and hence leaving owid_data_url attribute empty, these
+    # files will be uploaded during periodic backport run
     log.info("backport_dataset_to_walden.start")
     with concurrent.futures.ThreadPoolExecutor() as executor:
         executor.map(
             lambda r: backport(
                 dataset_id=r.dataset_id,
-                short_name=underscore(r.dataset_name),
                 dry_run=dry_run,
                 force=force,
                 upload=False,
