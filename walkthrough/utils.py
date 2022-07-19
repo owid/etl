@@ -13,11 +13,47 @@ def validate_short_name(short_name: str) -> Optional[str]:
         return str(e)
 
 
+WIDGET_TEMPLATE = """
+<details {{#open}}open{{/open}}>
+    <summary>
+    {{#title}}
+        {{& pywebio_output_parse}}
+    {{/title}}
+    </summary>
+    {{#contents}}
+        {{& pywebio_output_parse}}
+    {{/contents}}
+</details>
+"""
+
+
 def preview_file(path: Path, language: str) -> None:
     with open(path) as f:
         t = f.read()
-    po.put_success(po.put_markdown(f"File `{path}` was successfully generated"))
-    po.put_markdown(f"```{language}\n{t}```")
+
+    po.put_widget(
+        WIDGET_TEMPLATE,
+        {
+            "open": False,
+            "title": po.put_success(
+                po.put_markdown(f"File `{path}` was successfully generated")
+            ),
+            "contents": [po.put_markdown(f"```{language}\n{t}```")],
+        },
+    )
+
+
+def preview_dag(dag_content: str) -> None:
+    po.put_widget(
+        WIDGET_TEMPLATE,
+        {
+            "open": False,
+            "title": po.put_success(
+                po.put_markdown("Steps in dag.yml were successfully generated")
+            ),
+            "contents": [po.put_markdown(f"```yml\n  {dag_content}\n```")],
+        },
+    )
 
 
 DUMMY_DATA = {

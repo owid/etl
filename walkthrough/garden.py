@@ -181,14 +181,11 @@ def app(run_checks: bool, dummy_data: bool) -> None:
 """
         )
 
+        utils.preview_file(metadata_path, "yaml")
         utils.preview_file(step_path, "python")
 
-        # preview DAG
         if dag_content:
-            po.put_success(
-                po.put_markdown("Steps in dag.yml were successfully generated")
-            )
-            po.put_markdown(f"```yml\n  {dag_content}\n```")
+            utils.preview_dag(dag_content)
 
 
 def _check_dataset_in_meadow(form: GardenForm) -> None:
