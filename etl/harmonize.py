@@ -22,7 +22,10 @@ from etl.paths import REFERENCE_DATASET
 @click.argument("data_file")
 @click.argument("column")
 @click.argument("output_file")
-def harmonize(data_file: str, column: str, output_file: str) -> None:
+@click.argument("institution", required=False)
+def harmonize(
+    data_file: str, column: str, output_file: str, institution: Optional[str] = None
+) -> None:
     """
     Given a data file in feather or CSV format, and the name of the column representing
     country or region names, interactively generate a JSON mapping from the given names
@@ -48,7 +51,7 @@ def harmonize(data_file: str, column: str, output_file: str) -> None:
     else:
         mapping = {}
 
-    mapping = interactive_harmonize(geo_column, mapping)
+    mapping = interactive_harmonize(geo_column, mapping, institution=institution)
     with open(output_file, "w") as ostream:
         json.dump(mapping, ostream, indent=2)
 
@@ -69,7 +72,9 @@ def read_table(input_file: str) -> pd.DataFrame:
 
 
 def interactive_harmonize(
-    geo: pd.Series, mapping: Optional[Dict[str, str]] = None
+    geo: pd.Series,
+    mapping: Optional[Dict[str, str]] = None,
+    institution: Optional[str] = None,
 ) -> Dict[str, str]:
     mapping = mapping or {}
 
@@ -101,7 +106,7 @@ def interactive_harmonize(
     for i, region in enumerate(ambiguous, 1):
         print(f"\n[{i}/{len(ambiguous)}] {region}")
         # no exact match, get nearby matches
-        suggestions = mapper.suggestions(region)
+        suggestions = mapper.suggestions(region, institution=institution)
 
         # ask interactively how to proceed
         picker = GeoPickerCmd(region, suggestions, mapper.valid_names)
@@ -153,7 +158,7 @@ class CountryRegionMapper:
     def __getitem__(self, key: str) -> str:
         return self.aliases[key.lower()]
 
-    def suggestions(self, region: str) -> List[str]:
+    def suggestions(self, region: str, institution: Optional[str] = None) -> List[str]:
         # get the aliases which score highest on fuzzy matching
         results = process.extract(region.lower(), self.aliases.keys(), limit=5)
         if not results:
@@ -168,6 +173,10 @@ class CountryRegionMapper:
 
         # return them in descending order
         pairs = sorted([(s, m) for m, s in best.items()], reverse=True)
+
+        if institution is not None:
+            # Prepend the option to include this region as a custom entry for the given institution.
+            pairs = [(0, f"{region} ({institution})")] + pairs
         return [m for _, m in pairs]
 
 
@@ -214,20 +223,19 @@ class GeoPickerCmd(cmd.Cmd):
             # it's one of the suggested options
             i = int(choice)
             self.match = self.suggestions[i]
-
         else:
             # it's a manual entry, make sure it's valid
             choice = choice.strip()
             if choice in self.valid_names:
                 self.match = choice.strip()
-
+                self.save_alias = input_bool("Save this alias")
             else:
+                # it's a manual entry that does not correspond to any known country
                 print(
-                    f"{choice} does not match a country/region from the reference set"
+                    f"Using custom entry '{choice}' that does not match a country/region from the reference set"
                 )
-                return None
+                self.match = choice
 
-        self.save_alias = input_bool("Save this alias")
         return True
 
     def help_s(self) -> None:
