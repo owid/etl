@@ -23,7 +23,9 @@ from etl.paths import REFERENCE_DATASET
 @click.argument("column")
 @click.argument("output_file")
 @click.argument("institution", required=False)
-def harmonize(data_file: str, column: str, output_file: str, institution: Optional[str] = None) -> None:
+def harmonize(
+    data_file: str, column: str, output_file: str, institution: Optional[str] = None
+) -> None:
     """
     Given a data file in feather or CSV format, and the name of the column representing
     country or region names, interactively generate a JSON mapping from the given names
@@ -70,7 +72,9 @@ def read_table(input_file: str) -> pd.DataFrame:
 
 
 def interactive_harmonize(
-    geo: pd.Series, mapping: Optional[Dict[str, str]] = None, institution: Optional[str] = None,
+    geo: pd.Series,
+    mapping: Optional[Dict[str, str]] = None,
+    institution: Optional[str] = None,
 ) -> Dict[str, str]:
     mapping = mapping or {}
 
@@ -294,4 +298,3 @@ def print_mapping(region: str, name: str) -> None:
 
 if __name__ == "__main__":
     harmonize()
-
