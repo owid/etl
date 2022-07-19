@@ -2,6 +2,8 @@
 import pandas as pd
 from typing import Dict, List, Any
 
+from .dtypes import optimize_dtypes
+
 
 # rename columns
 COLUMNS_ID: Dict[str, str] = {
@@ -45,6 +47,8 @@ def process(df: pd.DataFrame, country_std: str) -> pd.DataFrame:
         variant=df.variant.apply(lambda x: x.lower()),
         location=df.location.map(country_std),
     )
+    # dtypes
+    df = optimize_dtypes(df, simple=True)
     # Column order
     df = df[COLUMNS_ORDER]
     # Discard unmapped regions
@@ -55,4 +59,5 @@ def process(df: pd.DataFrame, country_std: str) -> pd.DataFrame:
     }
     for m in df.metric.unique():
         df.loc[df.metric == m, "value"] = ops[m](df.loc[df.metric == m, "value"])
+    df = optimize_dtypes(df)
     return df

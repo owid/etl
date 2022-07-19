@@ -1,6 +1,7 @@
 """Depenndency ratio table"""
 import pandas as pd
 
+from .dtypes import optimize_dtypes
 
 # Initial settings
 COLUMNS_ID = {
@@ -41,6 +42,8 @@ def process(df: pd.DataFrame, country_std: str) -> pd.DataFrame:
         location=df.location.map(country_std),
         value=(df.value).astype(float).round(2),
     )
+    # dtypes
+    df = optimize_dtypes(df)
     # Column order
     df = df[COLUMNS_ORDER]
     # Drop unmapped regions

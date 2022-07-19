@@ -2,6 +2,8 @@
 import pandas as pd
 from typing import Dict, Any
 
+from .dtypes import optimize_dtypes
+
 
 # Initial settings
 COLUMNS_ID = {
@@ -21,7 +23,7 @@ COLUMNS_METRICS: Dict[str, Dict[str, Any]] = {
     **{
         "_100plus": {
             "name": "deaths",
-            "age": "100+",
+            "age": "100-",
         }
     },
 }
@@ -47,6 +49,8 @@ def process(df: pd.DataFrame, country_std: str) -> pd.DataFrame:
         metric="deaths",
         value=(df.value * 1000).astype(int),
     )
+    # Dtypes
+    df = optimize_dtypes(df)
     # Column order
     df = df[COLUMNS_ORDER]
     # Drop unmapped regions
@@ -60,7 +64,11 @@ def add_age_groups(df: pd.DataFrame) -> pd.DataFrame:
     # 1-4
     df_1_4 = df[df.age.isin([1, 2, 3, 4])].copy()
     df_1_4 = (
-        df_1_4.groupby(["location", "year", "metric", "sex", "variant"], as_index=False)
+        df_1_4.groupby(
+            ["location", "year", "metric", "sex", "variant"],
+            as_index=False,
+            observed=True,
+        )
         .sum()
         .assign(age="1-4")
     )
@@ -71,7 +79,9 @@ def add_age_groups(df: pd.DataFrame) -> pd.DataFrame:
     }
     df = df.assign(age=df.age.map(age_map))
     df = df.groupby(
-        ["location", "year", "metric", "sex", "age", "variant"], as_index=False
+        ["location", "year", "metric", "sex", "age", "variant"],
+        as_index=False,
+        observed=True,
     ).sum()
     # Merge all age groups
     df = pd.concat([df, df_0, df_1_4], ignore_index=True)
