@@ -3,19 +3,19 @@
 #  etl.py
 #
 
-from typing import Callable, List, Any, Optional
 import os
-import time
-import sys
 import re
+import sys
+import time
 from pathlib import Path
+from typing import Any, Callable, List, Optional
 
 import click
+from owid.walden import CATALOG as WALDEN_CATALOG
+from owid.walden import Catalog as WaldenCatalog
 
-from etl.steps import load_dag, compile_steps, select_dirty_steps, DAG, paths
 from etl import config
-from owid.walden import Catalog as WaldenCatalog, CATALOG as WALDEN_CATALOG
-
+from etl.steps import DAG, compile_steps, load_dag, paths, select_dirty_steps
 
 WALDEN_NAMESPACE = os.environ.get("WALDEN_NAMESPACE", "backport")
 

@@ -76,7 +76,7 @@ You can start an interactive walkthrough that will guide you through all the ste
 poetry run walkthrough walden
 ```
 
-and then follow the instructions (two more steps are ran subsequently with `poetry run walkthrough meadow` and `poetry run walkthrough garden`). `walkthrough grapher` step has not been implemented yet.
+and then follow the instructions (two more steps are ran subsequently with `poetry run walkthrough meadow` and `poetry run walkthrough garden`).
 
 In case you only want to get a better intuition of the process and see what files get generated, run
 

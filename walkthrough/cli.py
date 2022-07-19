@@ -5,7 +5,7 @@ import click
 from pywebio import start_server
 from rich import print
 
-from . import meadow, walden, garden
+from . import garden, grapher, meadow, walden
 
 PHASES = Literal["walden", "meadow", "garden", "grapher"]
 
@@ -34,6 +34,8 @@ def cli(phase: Iterable[PHASES], run_checks: bool, dummy_data: bool) -> None:
         phase_func = meadow.app
     elif phase == "garden":
         phase_func = garden.app
+    elif phase == "grapher":
+        phase_func = grapher.app
     else:
         raise NotImplementedError(f"{phase} is not implemented yet.")
 
