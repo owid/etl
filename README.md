@@ -70,7 +70,21 @@ However, processing all the datasets will take a long time and memory.
 
 ### Creating the pipeline of a new dataset
 
-These are the steps to create a data pipeline for a dataset called `example_dataset`, from an institution called
+You can start an interactive walkthrough that will guide you through all the steps of creating a new dataset. Start it with
+
+```
+poetry run walkthrough walden
+```
+
+and then follow the instructions (two more steps are ran subsequently with `poetry run walkthrough meadow` and `poetry run walkthrough garden`). `walkthrough grapher` step has not been implemented yet.
+
+In case you only want to get a better intuition of the process and see what files get generated, run
+
+```
+poetry run walkthrough walden --dummy-data
+```
+
+Alternatively, these are the steps to create a data pipeline for a dataset called `example_dataset`, from an institution called
 `example_institution`, with version `YYYY-MM-DD` (where this date tag can typically be the current date when the dataset
 is being added to `etl`, or the date when the source data was released or updated):
 
@@ -313,6 +327,7 @@ CRON job is running on a server every 5 minutes looking for changes on master on
 1. `etl` (build/rebuild anything that’s missing/out of date)
 2. `reindex` (generate a catalog index in `data/` for each channel)
 3. `publish` (rsync the `data/` folder to an s3 bucket s3://owid-catalog/)
+```
 
 Then the s3 bucket has a CloudFlare proxy on top (https://catalog.ourworldindata.org/). If you use the [owid-catalog-py](https://github.com/owid/owid-catalog-py) project from Python and call `find()` or `find_one()` you will be doing HTTP requests against the static files in the catalog.
 
