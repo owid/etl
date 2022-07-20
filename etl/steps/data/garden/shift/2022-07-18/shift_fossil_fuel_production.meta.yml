@@ -3,11 +3,24 @@ dataset:
 tables:
   shift_fossil_fuel_production:
     variables:
-      # gdp:
-      #   title: GDP
-      #   short_unit: $
-      #   unit: 2011 int-$
-      #   description: Gross domestic product measured in international-$ using 2011 prices to adjust for price changes over time (inflation) and price differences between countries. Calculated by multiplying GDP per capita with population.
-      #   display:
-      #     entityAnnotationsMap: "Western Offshoots: United States, Canada, Australia and New Zealand"
-      #     numDecimalPlaces: 0
+      coal:
+        title: "Coal production"
+        short_unit: "TWh"
+        unit: "terawatt-hours"
+        description:
+         display:
+           numDecimalPlaces: 0
+      gas:
+        title: "Gas production"
+        short_unit: "TWh"
+        unit: "terawatt-hours"
+        description:
+         display:
+           numDecimalPlaces: 0
+      oil:
+        title: "Oil production"
+        short_unit: "TWh"
+        unit: "terawatt-hours"
+        description:
+         display:
+           numDecimalPlaces: 0
