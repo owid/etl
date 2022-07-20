@@ -6,7 +6,7 @@
 
 include default.mk
 
-SRC = etl backport tests
+SRC = etl backport walkthrough tests
 
 help:
 	@echo 'Available commands:'
@@ -46,7 +46,7 @@ watch: .venv
 
 check-typing: .venv
 	@echo '==> Checking types'
-	.venv/bin/mypy --exclude=etl/steps $(SRC)
+	.venv/bin/mypy --exclude='etl/steps|walkthrough/.*_cookiecutter'  $(SRC)
 	@./scripts/typecheck_steps.sh
 
 coverage: .venv

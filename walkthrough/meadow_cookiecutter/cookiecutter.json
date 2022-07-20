@@ -1,0 +1,10 @@
+{
+    "directory_name": "",
+    "short_name": "",
+    "namespace": "",
+    "version": "",
+    "load_population": false,
+    "load_countries_regions": false,
+    "include_metadata_yaml": false,
+    "add_to_dag": false
+}
