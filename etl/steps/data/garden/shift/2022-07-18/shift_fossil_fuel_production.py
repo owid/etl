@@ -53,15 +53,6 @@ HISTORIC_TO_CURRENT_REGION = {
             "Slovakia",
         ],
     },
-    "Eritrea and Ethiopia": {
-        "continent": "Africa",
-        "income_group": "Low-income countries",
-        "members": [
-            # Africa - Low-income countries.
-            "Ethiopia",
-            "Eritrea",
-        ],
-    },
     "Netherlands Antilles": {
         "continent": "North America",
         "income_group": "High-income countries",
@@ -70,24 +61,6 @@ HISTORIC_TO_CURRENT_REGION = {
             "Aruba",
             "Curacao",
             "Sint Maarten (Dutch part)",
-        ],
-    },
-    "Serbia and Montenegro": {
-        "continent": "Europe",
-        "income_group": "Upper-middle-income countries",
-        "members": [
-            # Europe - Upper-middle-income countries.
-            "Serbia",
-            "Montenegro",
-        ],
-    },
-    "Sudan (former)": {
-        "continent": "Africa",
-        "income_group": "Low-income countries",
-        "members": [
-            # Africa - Low-income countries.
-            "Sudan",
-            "South Sudan",
         ],
     },
     "USSR": {
@@ -176,7 +149,7 @@ def remove_overlapping_data_between_historical_regions_and_successors(
     index_columns: List[str],
     country_column: str,
     year_column: str,
-    ignore_zeros=True,
+    ignore_zeros: bool = True,
 ) -> pd.DataFrame:
     """Remove overlapping data between a historical region and any of its successors (if there is any overlap), to avoid
     double-counting those regions when aggregating data.
