@@ -2,9 +2,8 @@
 
 """
 
-import json
 from pathlib import Path
-from typing import Dict, List, cast
+from typing import List, cast
 
 import numpy as np
 import pandas as pd
@@ -21,7 +20,9 @@ NAMESPACE = "shift"
 DATASET_SHORT_NAME = "shift_fossil_fuel_production"
 
 VERSION = Path(__file__).parent.name
-COUNTRY_MAPPING_PATH = Path(__file__).parent / f"{DATASET_SHORT_NAME}.country_mapping.json"
+COUNTRY_MAPPING_PATH = (
+    Path(__file__).parent / f"{DATASET_SHORT_NAME}.country_mapping.json"
+)
 METADATA_PATH = Path(__file__).parent / f"{DATASET_SHORT_NAME}.meta.yml"
 
 REGIONS_TO_ADD = [
@@ -171,7 +172,12 @@ def load_income_groups() -> pd.DataFrame:
 
 
 def remove_overlapping_data_between_historical_regions_and_successors(
-    data_region: pd.DataFrame, index_columns, country_column, year_column, ignore_zeros=True) -> pd.DataFrame:
+    data_region: pd.DataFrame,
+    index_columns: List[str],
+    country_column: str,
+    year_column: str,
+    ignore_zeros=True,
+) -> pd.DataFrame:
     """Remove overlapping data between a historical region and any of its successors (if there is any overlap), to avoid
     double-counting those regions when aggregating data.
 
@@ -182,6 +188,16 @@ def remove_overlapping_data_between_historical_regions_and_successors(
     ----------
     data_region : pd.DataFrame
         Data (after selecting the countries of a certain relevant region).
+    index_columns : list
+        Index columns
+    country_column : str
+        Name of column for country names.
+    year_column : str
+        Name of column for year.
+    ignore_zeros : bool
+        True to ignore zeros when checking if historical regions overlap with their member countries; this means that,
+        if a historical region overlaps with a member, but the member only has zeros in the data, this will not be
+        considered an overlap.
 
     Returns
     -------
@@ -192,10 +208,12 @@ def remove_overlapping_data_between_historical_regions_and_successors(
     data_region = data_region.copy()
 
     # Select data columns.
-    data_columns = [column for column in data_region.columns if column not in index_columns]
+    data_columns = [
+        column for column in data_region.columns if column not in index_columns
+    ]
     # Select index columns without country column.
     _index_columns = [column for column in index_columns if column != country_column]
-    indexes_to_drop = []    
+    indexes_to_drop = []
 
     if ignore_zeros:
         overlapping_values_to_ignore = [0]
@@ -206,16 +224,26 @@ def remove_overlapping_data_between_historical_regions_and_successors(
         # Successors of the current historical region.
         historical_successors = HISTORIC_TO_CURRENT_REGION[historical_region]["members"]
         # Unique combinations of index for which historical region has data.
-        historical_region_years = data_region[(data_region[country_column] == historical_region)].\
-            replace(overlapping_values_to_ignore, np.nan).dropna(subset=data_columns, how="all")[_index_columns].\
-            dropna().drop_duplicates()
+        historical_region_years = (
+            data_region[(data_region[country_column] == historical_region)]
+            .replace(overlapping_values_to_ignore, np.nan)
+            .dropna(subset=data_columns, how="all")[_index_columns]
+            .dropna()
+            .drop_duplicates()
+        )
         # Unique combinations of index for which successors have data.
-        historical_successors_years = data_region[(data_region[country_column].isin(historical_successors))].\
-            replace(overlapping_values_to_ignore, np.nan).dropna(subset=data_columns, how="all")[_index_columns].\
-            dropna().drop_duplicates()
+        historical_successors_years = (
+            data_region[(data_region[country_column].isin(historical_successors))]
+            .replace(overlapping_values_to_ignore, np.nan)
+            .dropna(subset=data_columns, how="all")[_index_columns]
+            .dropna()
+            .drop_duplicates()
+        )
 
         # Find unique years where the above combinations of region and successors overlap.
-        overlapping_years = pd.concat([historical_region_years, historical_successors_years], ignore_index=True)
+        overlapping_years = pd.concat(
+            [historical_region_years, historical_successors_years], ignore_index=True
+        )
         overlapping_years = overlapping_years[overlapping_years.duplicated()]
         if not overlapping_years.empty:
             log.warning(
@@ -225,8 +253,13 @@ def remove_overlapping_data_between_historical_regions_and_successors(
             # Select rows in data_region to drop.
             overlapping_years[country_column] = historical_region
             indexes_to_drop.extend(
-                pd.merge(data_region.reset_index(), overlapping_years, how="inner", on=[country_column] + _index_columns
-                        )["index"].tolist())
+                pd.merge(
+                    data_region.reset_index(),
+                    overlapping_years,
+                    how="inner",
+                    on=[country_column] + _index_columns,
+                )["index"].tolist()
+            )
 
     if len(indexes_to_drop) > 0:
         # Remove rows of data of the historical region where its data overlaps with data from its successors.
@@ -235,8 +268,12 @@ def remove_overlapping_data_between_historical_regions_and_successors(
     return data_region
 
 
-def add_region_aggregates(data: pd.DataFrame, index_columns: List[str], country_column: str = "country",
-                          year_column:str = "year") -> pd.DataFrame:
+def add_region_aggregates(
+    data: pd.DataFrame,
+    index_columns: List[str],
+    country_column: str = "country",
+    year_column: str = "year",
+) -> pd.DataFrame:
     """Add region aggregate for all regions.
 
     Regions are defined above, in REGIONS_TO_ADD.
@@ -245,6 +282,12 @@ def add_region_aggregates(data: pd.DataFrame, index_columns: List[str], country_
     ----------
     data : pd.DataFrame
         Data.
+    index_columns : list
+        Index columns
+    country_column : str
+        Name of country column.
+    year_column : str
+        Name of year column.
 
     Returns
     -------
@@ -255,16 +298,21 @@ def add_region_aggregates(data: pd.DataFrame, index_columns: List[str], country_
     data = data.copy()
 
     income_groups = load_income_groups()
-    aggregates = {column: "sum" for column in data.columns if column not in index_columns}
+    aggregates = {
+        column: "sum" for column in data.columns if column not in index_columns
+    }
     for region in REGIONS_TO_ADD:
         countries_in_region = geo.list_countries_in_region(
             region=region, income_groups=income_groups
         )
-        data_region = data[data[country_column].isin(countries_in_region)]        
+        data_region = data[data[country_column].isin(countries_in_region)]
 
         data_region = remove_overlapping_data_between_historical_regions_and_successors(
-            data_region=data_region, index_columns=index_columns, country_column=country_column,
-            year_column=year_column)    
+            data_region=data_region,
+            index_columns=index_columns,
+            country_column=country_column,
+            year_column=year_column,
+        )
 
         data_region = geo.add_region_aggregates(
             df=data_region,
@@ -277,8 +325,9 @@ def add_region_aggregates(data: pd.DataFrame, index_columns: List[str], country_
             frac_allowed_nans_per_year=None,
             num_allowed_nans_per_year=None,
         )
-        data = pd.concat([data, data_region[data_region["country"] == region]], ignore_index=True).\
-            reset_index(drop=True)
+        data = pd.concat(
+            [data, data_region[data_region["country"] == region]], ignore_index=True
+        ).reset_index(drop=True)
 
     return data
 
@@ -289,19 +338,28 @@ def split_ussr_and_russia(df):
     # This part of the data is originally from EIA, who have the first data point for Russia in 1992.
     # Therefore we use this year to split USSR and Russia.
     # Name that The Shift Data Portal uses for Russia and USSR.
-    SHIFT_USSR_RUSSIA_NAME = 'Russian Federation & USSR (Shift)'
-    RUSSIA_START_YEAR = 1992
+    shift_ussr_russia_name = "Russian Federation & USSR (Shift)"
+    russia_start_year = 1992
     # Filter to select rows of USSR & Russia data.
-    ussr_russia_filter = (df["country"] == SHIFT_USSR_RUSSIA_NAME)
-    ussr_data = df[ussr_russia_filter & (df["year"] < RUSSIA_START_YEAR)].\
-        replace({SHIFT_USSR_RUSSIA_NAME: "USSR"}).reset_index(drop=True)
-    russia_data = df[ussr_russia_filter & (df["year"] >= RUSSIA_START_YEAR)].\
-        replace({SHIFT_USSR_RUSSIA_NAME: "Russia"}).reset_index(drop=True)
+    ussr_russia_filter = df["country"] == shift_ussr_russia_name
+    ussr_data = (
+        df[ussr_russia_filter & (df["year"] < russia_start_year)]
+        .replace({shift_ussr_russia_name: "USSR"})
+        .reset_index(drop=True)
+    )
+    russia_data = (
+        df[ussr_russia_filter & (df["year"] >= russia_start_year)]
+        .replace({shift_ussr_russia_name: "Russia"})
+        .reset_index(drop=True)
+    )
     # Remove rows where Russia and USSR are combined.
     df = df[~ussr_russia_filter].reset_index(drop=True)
     # Combine original data (without USSR and Russia as one entity) with USSR and Russia as separate entities.
-    df = pd.concat([df, ussr_data, russia_data], ignore_index=True).sort_values(["country", "year"]).\
-        reset_index(drop=True)
+    df = (
+        pd.concat([df, ussr_data, russia_data], ignore_index=True)
+        .sort_values(["country", "year"])
+        .reset_index(drop=True)
+    )
 
     return df
 
@@ -312,13 +370,24 @@ def correct_historical_regions(data: pd.DataFrame) -> pd.DataFrame:
     # For coal and oil, Czechoslovakia's data become Czechia and Slovakia in 1993.
     # However, for gas, Czechia appear at an earlier date.
     # We correct those rows to be part of Czechoslovakia.
-    data_to_add = pd.merge(data[(data["year"] < 1980) & (data["country"] == "Czechoslovakia")].\
-                 reset_index(drop=True).drop(columns=["gas"]),
-             data[(data["year"] < 1980) & (data["country"]=="Czechia")].\
-                 reset_index(drop=True)[["year", "gas"]], how="left", on="year")
-    select_rows_to_correct = (data["country"].isin(["Czechia", "Czechoslovakia"])) & (data["year"] < 1980)
-    data = pd.concat([data[~select_rows_to_correct], data_to_add], ignore_index=True).sort_values(["country", "year"]).\
-                              reset_index(drop=True)
+    data_to_add = pd.merge(
+        data[(data["year"] < 1980) & (data["country"] == "Czechoslovakia")]
+        .reset_index(drop=True)
+        .drop(columns=["gas"]),
+        data[(data["year"] < 1980) & (data["country"] == "Czechia")].reset_index(
+            drop=True
+        )[["year", "gas"]],
+        how="left",
+        on="year",
+    )
+    select_rows_to_correct = (data["country"].isin(["Czechia", "Czechoslovakia"])) & (
+        data["year"] < 1980
+    )
+    data = (
+        pd.concat([data[~select_rows_to_correct], data_to_add], ignore_index=True)
+        .sort_values(["country", "year"])
+        .reset_index(drop=True)
+    )
 
     return data
 
@@ -329,7 +398,9 @@ def run(dest_dir: str) -> None:
     # Load data.
     #
     # Load meadow dataset and get the only table inside (with the same name).
-    ds_meadow = catalog.Dataset(DATA_DIR / f"meadow/{NAMESPACE}/{VERSION}/{DATASET_SHORT_NAME}")
+    ds_meadow = catalog.Dataset(
+        DATA_DIR / f"meadow/{NAMESPACE}/{VERSION}/{DATASET_SHORT_NAME}"
+    )
     tb_meadow = ds_meadow[DATASET_SHORT_NAME]
 
     # Convert table into a dataframe.
@@ -346,15 +417,19 @@ def run(dest_dir: str) -> None:
     df = df.dropna(subset=["coal", "oil", "gas"], how="all").reset_index(drop=True)
 
     # Treat USSR and Russia as separate entities.
-    df = split_ussr_and_russia(df=df)    
+    df = split_ussr_and_russia(df=df)
 
     # Correct gas data where Czechia and Czechoslovakia overlap.
     df = correct_historical_regions(data=df)
 
     # Create aggregate regions.
     log.info(f"{DATASET_SHORT_NAME}.add_region_aggregates")
-    df = add_region_aggregates(data=df, index_columns=["country", "year"], country_column="country",
-                              year_column="year")
+    df = add_region_aggregates(
+        data=df,
+        index_columns=["country", "year"],
+        country_column="country",
+        year_column="year",
+    )
 
     # Prepare output data.
     df = df.set_index(["country", "year"], verify_integrity=True).sort_index()
