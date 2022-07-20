@@ -332,13 +332,26 @@ def add_region_aggregates(
     return data
 
 
-def split_ussr_and_russia(df):
+def split_ussr_and_russia(df: pd.DataFrame) -> pd.DataFrame:
+    """Split data for USSR & Russia into two separate entities (given that Shift treats them as the same entity).
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Shift data after harmonizing country names.
+
+    Returns
+    -------
+    df : pd.DataFrame
+        Shift data after separating data for USSR and Russia as separate entities.
+
+    """
     df = df.copy()
-    # The Shift Data Portal treats Russia and USSR as the same entity.
-    # This part of the data is originally from EIA, who have the first data point for Russia in 1992.
-    # Therefore we use this year to split USSR and Russia.
+
     # Name that The Shift Data Portal uses for Russia and USSR.
     shift_ussr_russia_name = "Russian Federation & USSR (Shift)"
+    # The relevant part of the data is originally from EIA, who have the first data point for Russia in 1992.
+    # Therefore we use this year to split USSR and Russia.
     russia_start_year = 1992
     # Filter to select rows of USSR & Russia data.
     ussr_russia_filter = df["country"] == shift_ussr_russia_name
@@ -365,6 +378,19 @@ def split_ussr_and_russia(df):
 
 
 def correct_historical_regions(data: pd.DataFrame) -> pd.DataFrame:
+    """Correct some issues in Shift data involving historical regions.
+
+    Parameters
+    ----------
+    data : pd.DataFrame
+        Shift data after harmonization of country names.
+
+    Returns
+    -------
+    data : pd.DataFrame
+        Shift data after doing some corrections related to historical regions.
+
+    """
     data = data.copy()
 
     # For coal and oil, Czechoslovakia's data become Czechia and Slovakia in 1993.
