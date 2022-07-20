@@ -100,8 +100,9 @@ HISTORIC_TO_CURRENT_REGION = {
 
 def load_bp_data() -> catalog.Table:
     # Load table from latest BP dataset.
-    bp_table = catalog.find_one(BP_DATASET_NAME, channels=["backport"],
-                                namespace=f"{BP_NAMESPACE}@{BP_VERSION}").reset_index()
+    bp_table = catalog.find_one(
+        BP_DATASET_NAME, channels=["backport"], namespace=f"{BP_NAMESPACE}@{BP_VERSION}"
+    ).reset_index()
     bp_columns = {
         "entity_name": "country",
         "year": "year",
@@ -109,7 +110,7 @@ def load_bp_data() -> catalog.Table:
         "gas_production__twh": "Gas production (TWh)",
         "oil_production__twh": "Oil production (TWh)",
     }
-    bp_table = bp_table[list(bp_columns)].rename(columns=bp_columns)    
+    bp_table = bp_table[list(bp_columns)].rename(columns=bp_columns)
 
     return bp_table
 
@@ -122,17 +123,25 @@ def load_shift_data() -> catalog.Table:
         "gas": "Gas production (TWh)",
         "oil": "Oil production (TWh)",
     }
-    shift_dataset = catalog.Dataset(DATA_DIR / "garden" / "shift" / SHIFT_VERSION / SHIFT_DATASET_NAME)
+    shift_dataset = catalog.Dataset(
+        DATA_DIR / "garden" / "shift" / SHIFT_VERSION / SHIFT_DATASET_NAME
+    )
     shift_table = shift_dataset[shift_dataset.table_names[0]].reset_index()
     shift_table = shift_table[list(shift_columns)].rename(columns=shift_columns)
 
     return shift_table
 
 
-def combine_bp_and_shift_data(bp_table: catalog.Table, shift_table: catalog.Table) -> pd.DataFrame:
+def combine_bp_and_shift_data(
+    bp_table: catalog.Table, shift_table: catalog.Table
+) -> pd.DataFrame:
     # Check that there are no duplicated rows in any of the two datasets.
-    assert bp_table[bp_table.duplicated(subset=["country", "year"])].empty, "Duplicated rows in BP data."
-    assert shift_table[shift_table.duplicated(subset=["country", "year"])].empty, "Duplicated rows in Shift data."
+    assert bp_table[
+        bp_table.duplicated(subset=["country", "year"])
+    ].empty, "Duplicated rows in BP data."
+    assert shift_table[
+        shift_table.duplicated(subset=["country", "year"])
+    ].empty, "Duplicated rows in Shift data."
 
     # Combine Shift data (which goes further back in the past) with BP data (which is more up-to-date).
     # On coincident rows, prioritise BP data.
@@ -179,9 +188,9 @@ def add_annual_change(df: pd.DataFrame) -> pd.DataFrame:
         combined[f"Annual change in {cat.lower()} production (%)"] = (
             combined.groupby("country")[f"{cat} production (TWh)"].pct_change() * 100
         )
-        combined[f"Annual change in {cat.lower()} production (TWh)"] = (
-            combined.groupby("country")[f"{cat} production (TWh)"].diff()
-        )
+        combined[f"Annual change in {cat.lower()} production (TWh)"] = combined.groupby(
+            "country"
+        )[f"{cat} production (TWh)"].diff()
 
     return combined
 
