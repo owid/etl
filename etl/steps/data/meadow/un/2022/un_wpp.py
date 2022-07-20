@@ -51,11 +51,11 @@ def _load_population(tmp_dir: str) -> pd.DataFrame:
         "Location": "category",
         "VarID": CategoricalDtype(categories=["2", "3", "4"]),
         "Variant": CategoricalDtype(categories=["Medium", "High", "Low"]),
-        "Time": "int",
-        "MidPeriod": "int",
+        "Time": "uint16",
+        "MidPeriod": "uint16",
         "AgeGrp": "category",
-        "AgeGrpStart": "int",
-        "AgeGrpSpan": "int",
+        "AgeGrpStart": "uint8",
+        "AgeGrpSpan": "uint8",
         "PopMale": "float",
         "PopFemale": "float",
         "PopTotal": "float",
@@ -89,11 +89,11 @@ def _load_fertility(tmp_dir: str) -> pd.DataFrame:
         "Location": "category",
         "VarID": "category",
         "Variant": "category",
-        "Time": "int",
-        "MidPeriod": "float",
+        "Time": "uint16",
+        "MidPeriod": "float32",
         "AgeGrp": "category",
-        "AgeGrpStart": "int",
-        "AgeGrpSpan": "int",
+        "AgeGrpStart": "uint8",
+        "AgeGrpSpan": "uint8",
         "ASFR": "float",
         "PASFR": "float",
         "Births": "float",
@@ -136,7 +136,7 @@ def _load_demographics(tmp_dir: str) -> pd.DataFrame:
                 "Instant replacement zero migration",
             ]
         ),
-        "Time": "int",
+        "Time": "uint16",
     }
     return pd.concat(
         [
@@ -175,7 +175,7 @@ def _read_xlsx_file(tmp_dir: str, filename: str) -> Any:
         "SDMX code**": "category",
         "Type": "category",
         "Parent code": "category",
-        "Year": "int",
+        "Year": "uint16",
     }
     # Load excel
     df = pd.read_excel(
