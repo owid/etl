@@ -158,7 +158,7 @@ def _active_datasets_names(engine: Engine) -> set[str]:
     active_datasets_df = _active_datasets(engine)
     names = set(
         active_datasets_df.apply(
-            lambda r: utils.create_short_name(r.id, r.name), axis=1
+            lambda r: utils.create_short_name(r["id"], r["name"]), axis=1
         )
     )
     return {n + "_config" for n in names} | {n + "_values" for n in names}
