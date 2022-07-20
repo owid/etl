@@ -51,13 +51,10 @@ metric_categories = {
 
 def merge_dfs(dfs: List[pd.DataFrame]) -> pd.DataFrame:
     """Merge all datasets"""
-    print(41)
     df = pd.concat(dfs, ignore_index=True)
     # Fix variant name
-    print(42)
     df.loc[df.year < YEAR_SPLIT, "variant"] = "estimates"
     # Index
-    print(46)
     df = df.set_index(["location", "year", "metric", "sex", "age", "variant"])
     df = df.dropna(subset=["value"])
     # df = df.sort_index()
