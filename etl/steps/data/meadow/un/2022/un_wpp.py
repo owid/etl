@@ -133,6 +133,7 @@ def _load_demographics(tmp_dir: str) -> pd.DataFrame:
                 "Constant mortality",
                 "No change",
                 "Momentum",
+                "Instant replacement zero migration",
             ]
         ),
         "Time": "int",
