@@ -12,7 +12,7 @@ from etl.steps.data.converters import convert_walden_metadata
 
 
 def load_walden_ds() -> walden.catalog.Dataset:
-    walden_ds = walden.Catalog().find_one("un", "2022", "un_wpp")
+    walden_ds = walden.Catalog().find_one("un", "2022-07-11", "un_wpp")
     return walden_ds
 
 
