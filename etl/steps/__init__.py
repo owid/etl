@@ -16,6 +16,7 @@ from typing import (
 )
 from pathlib import Path
 import re
+import sys
 import hashlib
 import tempfile
 from collections import defaultdict
@@ -378,12 +379,20 @@ class DataStep(Step):
         Import the Python module for this step and call run() on it.
         """
         module_path = self.path.lstrip("/").replace("/", ".")
+        module_dir = (paths.STEP_DIR / "data" / self.path).parent.as_posix()
+
+        # add module dir to pythonpath
+        sys.path.append(module_dir)
+
         step_module = import_module(f"{paths.BASE_PACKAGE}.steps.data.{module_path}")
         if not hasattr(step_module, "run"):
             raise Exception(f'no run() method defined for module "{step_module}"')
 
         # data steps
         step_module.run(self._dest_dir.as_posix())  # type: ignore
+
+        # remove module dir from pythonpath
+        sys.path.remove(module_dir)
 
     def _run_notebook(self) -> None:
         "Run a parameterised Jupyter notebook."
