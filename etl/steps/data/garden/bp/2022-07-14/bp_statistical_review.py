@@ -30,10 +30,6 @@ BP_CATALOG_NAME_OLD = "statistical_review_of_world_energy"
 BP_NAMESPACE_IN_CATALOG_OLD = "bp_statreview"
 BP_VERSION_OLD = 2021
 
-# Conversion factors.
-# Terawatt-hours to kilowatt-hours.
-TWH_TO_KWH = 1e9
-
 REGIONS_TO_ADD = {
     "North America": {
         "country_code": "OWID_NAM",
@@ -127,6 +123,34 @@ OVERLAPPING_DATA_TO_REMOVE_IN_AGGREGATES = [
         "variable": "Gas - Proved reserves",
     }
 ]
+
+# TODO: Confirm these assignments.
+ADDITIONAL_COUNTRIES_IN_REGIONS = {
+    "Africa": [
+        "Other Africa (BP)",
+        "Other Eastern Africa (BP)",
+        "Other Middle Africa (BP)",
+        "Other Northern Africa (BP)",
+        "Other Southern Africa (BP)",
+        "Other Western Africa (BP)",
+    ],
+    "Asia": [
+        "Other Asia Pacific (BP)",
+        "Other CIS (BP)",
+        "Other Middle East (BP)",
+    ],
+    "Europe": [
+        "Other Europe (BP)",
+    ],
+    "North America": [
+        "Other Caribbean (BP)",
+        "Other North America (BP)",
+    ],
+    "South America": [
+        "Other South America (BP)",
+        "Other South and Central America (BP)",
+    ],
+}
 
 # Variables that can be summed when constructing region aggregates.
 AGGREGATES_BY_SUM = [
@@ -222,52 +246,6 @@ AGGREGATES_BY_SUM = [
     ]
 
 
-def load_population() -> pd.DataFrame:
-    """Load OWID population dataset, and add historical regions to it.
-
-    Returns
-    -------
-    population : pd.DataFrame
-        Population dataset.
-
-    """
-    # Load population dataset.
-    population = (
-        catalog.find("population", namespace="owid", dataset="key_indicators")
-        .load()
-        .reset_index()[["country", "year", "population"]]
-    )
-
-    # Add data for historical regions (if not in population) by adding the population of its current successors.
-    countries_with_population = population["country"].unique()
-    missing_countries = [
-        country
-        for country in HISTORIC_TO_CURRENT_REGION
-        if country not in countries_with_population
-    ]
-    for country in missing_countries:
-        members = HISTORIC_TO_CURRENT_REGION[country]["members"]
-        _population = (
-            population[population["country"].isin(members)]
-            .groupby("year")
-            .agg({"population": "sum", "country": "nunique"})
-            .reset_index()
-        )
-        # Select only years for which we have data for all member countries.
-        _population = _population[_population["country"] == len(members)].reset_index(
-            drop=True
-        )
-        _population["country"] = country
-        population = pd.concat(
-            [population, _population], ignore_index=True
-        ).reset_index(drop=True)
-
-    error = "Duplicate country-years found in population. Check if historical regions changed."
-    assert population[population.duplicated(subset=["country", "year"])].empty, error
-
-    return cast(pd.DataFrame, population)
-
-
 def load_income_groups() -> pd.DataFrame:
     """Load dataset of income groups and add historical regions to it.
 
@@ -304,72 +282,6 @@ def load_income_groups() -> pd.DataFrame:
             )
 
     return cast(pd.DataFrame, income_groups)
-
-
-def add_population(
-    df: pd.DataFrame,
-    country_col: str = "country",
-    year_col: str = "year",
-    population_col: str = "population",
-    warn_on_missing_countries: bool = True,
-    show_full_warning: bool = True,
-) -> pd.DataFrame:
-    """Add a column of OWID population to the countries in the data, including population of historical regions.
-
-    This function has been adapted from datautils.geo, because population currently does not include historic regions.
-    We include them in this function.
-
-    Parameters
-    ----------
-    df : pd.DataFrame
-        Data without a column for population (after harmonizing elements, items and country names).
-    country_col : str
-        Name of country column in data.
-    year_col : str
-        Name of year column in data.
-    population_col : str
-        Name for new population column in data.
-    warn_on_missing_countries : bool
-        True to warn if population is not found for any of the countries in the data.
-    show_full_warning : bool
-        True to show affected countries if the previous warning is raised.
-
-    Returns
-    -------
-    df_with_population : pd.DataFrame
-        Data after adding a column for population for all countries in the data.
-
-    """
-
-    # Load population dataset.
-    population = load_population().rename(
-        columns={
-            "country": country_col,
-            "year": year_col,
-            "population": population_col,
-        }
-    )[[country_col, year_col, population_col]]
-
-    # Check if there is any missing country.
-    missing_countries = set(df[country_col]) - set(population[country_col])
-    if len(missing_countries) > 0:
-        if warn_on_missing_countries:
-            geo.warn_on_list_of_entities(
-                list_of_entities=missing_countries,
-                warning_message=(
-                    f"{len(missing_countries)} countries not found in population"
-                    " dataset. They will remain in the dataset, but have nan"
-                    " population."
-                ),
-                show_list=show_full_warning,
-            )
-
-    # Add population to original dataframe.
-    df_with_population = pd.merge(
-        df, population, on=[country_col, year_col], how="left"
-    )
-
-    return df_with_population
 
 
 def detect_overlapping_data_for_regions_and_members(
@@ -444,6 +356,21 @@ def remove_overlapping_data_for_regions_and_members(
     return df
 
 
+def load_countries_in_regions():
+    income_groups=load_income_groups()
+
+    countries_in_region = {}
+    for region in list(REGIONS_TO_ADD):
+        countries_in_region[region] = geo.list_countries_in_region(
+                    region=region, income_groups=income_groups
+        )
+
+    for region in ADDITIONAL_COUNTRIES_IN_REGIONS:
+        countries_in_region[region] = countries_in_region[region] + ADDITIONAL_COUNTRIES_IN_REGIONS[region]
+
+    return countries_in_region
+
+
 def add_region_aggregates(
     data: pd.DataFrame,
     regions: List[str],
@@ -478,16 +405,13 @@ def add_region_aggregates(
     """
     data = data.copy()
 
-    income_groups = load_income_groups()
     if aggregates is None:
         aggregates = {
             column: "sum" for column in data.columns if column not in index_columns
-        }        
-
+        }
+    countries_in_regions = load_countries_in_regions()
     for region in regions:
-        countries_in_region = geo.list_countries_in_region(
-            region=region, income_groups=income_groups
-        )
+        countries_in_region = countries_in_regions[region]
         data_region = data[data[country_column].isin(countries_in_region)]
         data_region = remove_overlapping_data_for_regions_and_members(
             df=data_region, known_overlaps=known_overlaps)        
@@ -495,8 +419,9 @@ def add_region_aggregates(
         # Check that there are no other overlaps in the data.
         detect_overlapping_data_for_regions_and_members(
             df=data_region, list_of_countries=countries_in_region,
-            index_columns=index_columns, known_overlaps=known_overlaps)        
+            index_columns=index_columns, known_overlaps=known_overlaps)
 
+        # Add regions.
         data_region = geo.add_region_aggregates(
             df=data_region,
             region=region,
@@ -650,10 +575,12 @@ def fill_missing_values_with_previous_version(
 def amend_zero_filled_variables_for_region_aggregates(df):
     df = df.copy()
 
-    # Fill nans with zeros for "* (zero filled)" variables for region aggregates (which were ignored).
+    # Fill the "* (zero filled)" variables (which were ignored when creating aggregates) with the new aggregate
+    # data, and fill any possible nan with zero.
     zero_filled_variables = [column for column in df.columns if "(zero filled)" in column]
-    select_regions = df["country"].isin(REGIONS_TO_ADD)
-    df.loc[select_regions, zero_filled_variables] = df[select_regions][zero_filled_variables].fillna(0)
+    original_variables = [column.replace(" (zero filled)", "") for column in df.columns if "(zero filled)" in column]
+    select_regions = df["country"].isin(REGIONS_TO_ADD)    
+    df.loc[select_regions, zero_filled_variables] = df[select_regions][original_variables].fillna(0).values
 
     return df
 
