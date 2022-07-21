@@ -1,10 +1,10 @@
 import pandas as pd
 from pandas.api.types import CategoricalDtype
-from etl.paths import BASE_DIR as base_path
+from pathlib import Path
 
 
 _countries = pd.read_csv(
-    base_path / "etl/steps/data/garden/un/2022/un_wpp.country_std.csv",
+    Path(__file__).parent / "un_wpp.country_std.csv",
     index_col="Country",
 )
 countries = set(_countries["Our World In Data Name"].tolist())

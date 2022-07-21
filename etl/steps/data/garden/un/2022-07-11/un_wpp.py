@@ -2,8 +2,9 @@ from typing import List, Any
 
 
 import pandas as pd
-from etl.paths import BASE_DIR as base_path
+from pathlib import Path
 
+from etl.paths import BASE_DIR as base_path
 from owid import catalog
 from owid.catalog import Table
 from owid.catalog.meta import TableMeta
@@ -70,7 +71,7 @@ def df_to_table(df: pd.DataFrame, **kwargs: Any) -> Table:
 def load_country_mapping() -> Any:
     return (
         pd.read_csv(
-            base_path / "etl/steps/data/garden/un/2022/un_wpp.country_std.csv",
+            Path(__file__).parent / f"{Path(__file__).stem}.country_std.csv",
             index_col="Country",
         )
         .squeeze()

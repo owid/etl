@@ -16,11 +16,9 @@ def load_walden_ds() -> walden.catalog.Dataset:
     return walden_ds
 
 
-def extract_data(walden_ds: walden.catalog.Dataset) -> str:
-    tmp_dir = tempfile.mkdtemp()
+def extract_data(walden_ds: walden.catalog.Dataset, output_dir: str) -> None:
     z = zipfile.ZipFile(walden_ds.local_path)
-    z.extractall(tmp_dir)
-    return tmp_dir
+    z.extractall(output_dir)
 
 
 def load_data(tmp_dir: str) -> Tuple[pd.DataFrame, ...]:
@@ -134,6 +132,11 @@ def _load_demographics(tmp_dir: str) -> pd.DataFrame:
                 "No change",
                 "Momentum",
                 "Instant replacement zero migration",
+                "Median PI",
+                "Upper 80 PI",
+                "Lower 80 PI",
+                "Upper 95 PI",
+                "Lower 95 PI",
             ]
         ),
         "Time": "uint16",
@@ -415,10 +418,15 @@ def add_tables_to_ds(
 def run(dest_dir: str) -> None:
     # Load
     walden_ds = load_walden_ds()
-    tmp_dir = extract_data(walden_ds)
-    df_population, df_fertility, df_demographics, df_depratio, df_deaths = load_data(
-        tmp_dir
-    )
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        extract_data(walden_ds, tmp_dir)
+        (
+            df_population,
+            df_fertility,
+            df_demographics,
+            df_depratio,
+            df_deaths,
+        ) = load_data(tmp_dir)
     # Process
     df_population, df_fertility, df_demographics, df_depratio, df_deaths = process(
         df_population, df_fertility, df_demographics, df_depratio, df_deaths
