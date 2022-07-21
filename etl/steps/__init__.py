@@ -399,6 +399,7 @@ class DataStep(Step):
                     progress_bar=False,
                     stdout_file=ostream,
                     stderr_file=ostream,
+                    cwd=notebook_path.parent.as_posix(),
                 )
 
 
