@@ -1,0 +1,21 @@
+dataset:
+  namespace: bp
+  version: 2022
+  title: Statistical Review of World Energy - BP (2022)
+  short_name: bp_statistical_review__bp_2022
+  publication_year: 2022
+  sources:
+    -
+      name: Our World in Data based on BP Statistical Review of World Energy (2022)
+      published_by: BP Statistical Review of World Energy
+      date_accessed: 8th July 2022
+      url: https://www.bp.com/en/global/corporate/energy-economics/statistical-review-of-world-energy.html
+  description: |
+    BP's definitions of regions sometimes differ from Our World in Data's definitions.
+    For example, BP's North America includes only Canada, Mexico and United States, whereas Our World in Data's North
+    America includes countries in Central America (see a map with
+    [our region definitions](https://ourworldindata.org/world-region-map-definitions)).
+    For this reason, we include in the dataset regions like "North America (BP)" to refer to BP's original data using
+    their definition of the region, as well as "North America", which is data aggregated by Our World in Data using our
+    definition.
+    These aggregates are constructed by adding up (when possible) the contributions from the countries in the region.
