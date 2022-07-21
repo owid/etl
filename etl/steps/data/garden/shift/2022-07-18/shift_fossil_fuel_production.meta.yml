@@ -1,0 +1,26 @@
+dataset:
+  sources:
+tables:
+  shift_fossil_fuel_production:
+    variables:
+      coal:
+        title: "Coal production"
+        short_unit: "TWh"
+        unit: "terawatt-hours"
+        description:
+         display:
+           numDecimalPlaces: 0
+      gas:
+        title: "Gas production"
+        short_unit: "TWh"
+        unit: "terawatt-hours"
+        description:
+         display:
+           numDecimalPlaces: 0
+      oil:
+        title: "Oil production"
+        short_unit: "TWh"
+        unit: "terawatt-hours"
+        description:
+         display:
+           numDecimalPlaces: 0
