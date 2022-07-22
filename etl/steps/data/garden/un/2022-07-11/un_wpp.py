@@ -141,4 +141,4 @@ def run(dest_dir: str) -> None:
         )
     tables += [table_long]
     # create dataset
-    dataset_to_garden([table_long], ds.metadata, dest_dir)
+    dataset_to_garden(tables, ds.metadata, dest_dir)
