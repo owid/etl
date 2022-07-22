@@ -1,6 +1,6 @@
 """Process the BP Statistical Review of World Energy 2022.
 
-For the moment, this dataset is downloaded and processed by 
+For the moment, this dataset is downloaded and processed by
 https://github.com/owid/importers/tree/master/bp_statreview
 
 However, in this additional step we add region aggregates following OWID definitions of regions.
@@ -121,19 +121,12 @@ OVERLAPPING_DATA_TO_REMOVE_IN_AGGREGATES = [
 ]
 
 # We need to include the 'Other * (BP)' regions, otherwise continents have incomplete data.
-# For example, when constructing the aggregate for Africa, we need to include 'Other Africa (BP)' as an additional
-# country; after doing this we recover very precisely the data for 'Africa (BP)'.
-# Note:
-# * Biodiesels are ignored in region aggregates, because they are only given for continents and a few countries.
-# * Biofuels do have data for many countries. Although for Africa they show only the total, but not the contribution of
-#   the individual countries.
-#   This causes that our aggregate for 'Africa' is zero, while the original 'Africa (BP)' is not.
-#   TODO: Remove biofuels data for Africa (make a list of outliers).
-#    Also remove biodiesels zero filled for all aggregates.
-# * Additional regions in BP's data (e.g. 'Other Western Africa (BP)') seem to be included in 'Other Africa (BP)'.
-#   Therefore we ignore them when creating aggregates.
+# For example, when constructing the aggregate for Africa, we need to include 'Other Africa (BP)'.
+# Otherwise we would be underestimating the region's total contribution.
 ADDITIONAL_COUNTRIES_IN_REGIONS = {
     "Africa": [
+        # Additional African regions in BP's data (e.g. 'Other Western Africa (BP)') seem to be included in
+        # 'Other Africa (BP)', therefore we ignore them when creating aggregates.
         "Other Africa (BP)",
     ],
     "Asia": [
@@ -165,78 +158,82 @@ ADDITIONAL_COUNTRIES_IN_REGIONS = {
 }
 
 # Variables that can be summed when constructing region aggregates.
+# Biofuels in Africa have a non-zero total, while there is no contribution from African countries.
+# This causes that our aggregate for 'Africa' would be zero, while the original 'Africa (BP)' is not.
+# Also, biodiesels are only given for continents and a few countries.
+# For this reason we avoid creating aggregates for biofuels and biodiesels.
 AGGREGATES_BY_SUM = [
-    'Biofuels Consumption - Kboed - Total',
-    'Biofuels Consumption - PJ - Total',
-    'Biofuels Consumption - TWh - Total',
-    'Biofuels Production - Kboed - Total',
-    'Biofuels Production - PJ - Total',
-    'Biofuels Production - TWh - Total',
-    'Carbon Dioxide Emissions',
-    'Coal - Reserves - Anthracite and bituminous',
-    'Coal - Reserves - Sub-bituminous and lignite',
-    'Coal - Reserves - Total',
-    'Coal Consumption - EJ',
-    'Coal Consumption - TWh',
-    'Coal Production - EJ',
-    'Coal Production - TWh',
-    'Coal Production - Tonnes',
-    'Cobalt Production-Reserves',
-    'Elec Gen from Coal',
-    'Elec Gen from Gas',
-    'Elec Gen from Oil',
-    'Electricity Generation',
-    'Gas - Proved reserves',
-    'Gas Consumption - Bcf',
-    'Gas Consumption - Bcm',
-    'Gas Consumption - EJ',
-    'Gas Consumption - TWh',
-    'Gas Production - Bcf',
-    'Gas Production - Bcm',
-    'Gas Production - EJ',
-    'Gas Production - TWh',
-    'Geo Biomass Other - EJ',
-    'Geo Biomass Other - TWh',
-    'Graphite Production-Reserves',
-    'Hydro Consumption - EJ',
-    'Hydro Consumption - TWh',
-    'Hydro Generation - TWh',
-    'Lithium Production-Reserves',
-    'Nuclear Consumption - EJ',
-    'Nuclear Consumption - TWh',
-    'Nuclear Generation - TWh',
-    'Oil - Proved reserves',
-    'Oil - Refinery throughput',
-    'Oil - Refining capacity',
-    'Oil Consumption - Barrels',
-    'Oil Consumption - EJ',
-    'Oil Consumption - TWh',
-    'Oil Consumption - Tonnes',
-    'Oil Production - Barrels',
-    'Oil Production - Crude Conds',
-    'Oil Production - NGLs',
-    'Oil Production - TWh',
-    'Oil Production - Tonnes',
-    'Primary Energy Consumption - EJ',
-    'Primary Energy Consumption - TWh',
-    'Renewables Consumption - EJ',
-    'Renewables Consumption - TWh',
-    'Renewables Power - EJ',
-    'Renewables power - TWh',
-    'Solar Capacity',
-    'Solar Consumption - EJ',
-    'Solar Consumption - TWh',
-    'Solar Generation - TWh',
-    'Total Liquids - Consumption',
-    'Wind Capacity',
-    'Wind Consumption - EJ',
-    'Wind Consumption - TWh',
-    'Wind Generation - TWh',
+    "Carbon Dioxide Emissions",
+    "Coal - Reserves - Anthracite and bituminous",
+    "Coal - Reserves - Sub-bituminous and lignite",
+    "Coal - Reserves - Total",
+    "Coal Consumption - EJ",
+    "Coal Consumption - TWh",
+    "Coal Production - EJ",
+    "Coal Production - TWh",
+    "Coal Production - Tonnes",
+    "Cobalt Production-Reserves",
+    "Elec Gen from Coal",
+    "Elec Gen from Gas",
+    "Elec Gen from Oil",
+    "Electricity Generation",
+    "Gas - Proved reserves",
+    "Gas Consumption - Bcf",
+    "Gas Consumption - Bcm",
+    "Gas Consumption - EJ",
+    "Gas Consumption - TWh",
+    "Gas Production - Bcf",
+    "Gas Production - Bcm",
+    "Gas Production - EJ",
+    "Gas Production - TWh",
+    "Geo Biomass Other - EJ",
+    "Geo Biomass Other - TWh",
+    "Graphite Production-Reserves",
+    "Hydro Consumption - EJ",
+    "Hydro Consumption - TWh",
+    "Hydro Generation - TWh",
+    "Lithium Production-Reserves",
+    "Nuclear Consumption - EJ",
+    "Nuclear Consumption - TWh",
+    "Nuclear Generation - TWh",
+    "Oil - Proved reserves",
+    "Oil - Refinery throughput",
+    "Oil - Refining capacity",
+    "Oil Consumption - Barrels",
+    "Oil Consumption - EJ",
+    "Oil Consumption - TWh",
+    "Oil Consumption - Tonnes",
+    "Oil Production - Barrels",
+    "Oil Production - Crude Conds",
+    "Oil Production - NGLs",
+    "Oil Production - TWh",
+    "Oil Production - Tonnes",
+    "Primary Energy Consumption - EJ",
+    "Primary Energy Consumption - TWh",
+    "Renewables Consumption - EJ",
+    "Renewables Consumption - TWh",
+    "Renewables Power - EJ",
+    "Renewables power - TWh",
+    "Solar Capacity",
+    "Solar Consumption - EJ",
+    "Solar Consumption - TWh",
+    "Solar Generation - TWh",
+    "Total Liquids - Consumption",
+    "Wind Capacity",
+    "Wind Consumption - EJ",
+    "Wind Consumption - TWh",
+    "Wind Generation - TWh",
+    # 'Biofuels Consumption - Kboed - Total',
     # 'Biofuels Consumption - Kboed - Biodiesel',
+    # 'Biofuels Consumption - PJ - Total',
     # 'Biofuels Consumption - PJ - Biodiesel',
+    # 'Biofuels Consumption - TWh - Total',
     # 'Biofuels Consumption - TWh - Biodiesel',
     # 'Biofuels Consumption - TWh - Biodiesel (zero filled)',
     # 'Biofuels Consumption - TWh - Total (zero filled)',
+    # 'Biofuels Production - Kboed - Total',
+    # 'Biofuels Production - PJ - Total',
+    # 'Biofuels Production - TWh - Total',
     # 'Biofuels Production - Kboed - Biodiesel',
     # 'Biofuels Production - PJ - Biodiesel',
     # 'Biofuels Production - TWh - Biodiesel',
@@ -255,7 +252,7 @@ AGGREGATES_BY_SUM = [
     # 'Rare Earth Production-Reserves',
     # 'Solar Consumption - TWh (zero filled)',
     # 'Wind Consumption - TWh (zero filled)',
-    ]
+]
 
 
 def load_income_groups() -> pd.DataFrame:
@@ -297,8 +294,12 @@ def load_income_groups() -> pd.DataFrame:
 
 
 def detect_overlapping_data_for_regions_and_members(
-    df: pd.DataFrame, list_of_countries: List[str], index_columns: List[str],
-        known_overlaps: Optional[List[Dict[str, Union[str, List[int]]]]], ignore_zeros: bool = True) -> None:
+    df: pd.DataFrame,
+    list_of_countries: List[str],
+    index_columns: List[str],
+    known_overlaps: Optional[List[Dict[str, Union[str, List[int]]]]],
+    ignore_zeros: bool = True,
+) -> None:
     if known_overlaps is not None:
         df = df.copy()
 
@@ -310,17 +311,35 @@ def detect_overlapping_data_for_regions_and_members(
 
         regions = sorted(set(list_of_countries) & set(HISTORIC_TO_CURRENT_REGION))
         for region in regions:
-            region_df = df[df["country"] == region].replace(overlapping_values_to_ignore, np.nan).\
-                dropna(axis=1, how="all")
+            region_df = (
+                df[df["country"] == region]
+                .replace(overlapping_values_to_ignore, np.nan)
+                .dropna(axis=1, how="all")
+            )
             members = HISTORIC_TO_CURRENT_REGION[region]["members"]
             for member in members:
-                member_df = df[df["country"] == member].\
-                    replace(overlapping_values_to_ignore, np.nan).dropna(axis=1, how="all")
-                variables = [column for column in (set(region_df.columns) & set(member_df.columns))
-                             if column not in index_columns]
+                member_df = (
+                    df[df["country"] == member]
+                    .replace(overlapping_values_to_ignore, np.nan)
+                    .dropna(axis=1, how="all")
+                )
+                variables = [
+                    column
+                    for column in (set(region_df.columns) & set(member_df.columns))
+                    if column not in index_columns
+                ]
                 for variable in variables:
-                    combined = pd.concat([region_df[["year", variable]], member_df[["year", variable]]],
-                                         ignore_index=True).dropna().reset_index(drop=True)
+                    combined = (
+                        pd.concat(
+                            [
+                                region_df[["year", variable]],
+                                member_df[["year", variable]],
+                            ],
+                            ignore_index=True,
+                        )
+                        .dropna()
+                        .reset_index(drop=True)
+                    )
                     overlapping = combined[combined.duplicated(subset="year")]
                     if not overlapping.empty:
                         overlapping_years = sorted(set(overlapping["year"]))
@@ -328,23 +347,31 @@ def detect_overlapping_data_for_regions_and_members(
                             "region": region,
                             "member": member,
                             "years": overlapping_years,
-                            "variable": variable
+                            "variable": variable,
                         }
                         # If this overlap is not known, raise a warning.
                         # Omit the field "entity_to_make_nan" when checking if this overlap is known.
-                        _known_overlaps = {{key for key in overlap if key != "entity_to_make_nan"}
-                                           for overlap in known_overlaps}
-                        if new_overlap not in _known_overlaps:
-                            log.warning(f"Data for '{region}' overlaps with '{member}' on '{variable}' "
-                                        f"and years: {overlapping_years}")
+                        _known_overlaps = [
+                            {key for key in overlap if key != "entity_to_make_nan"}
+                            for overlap in known_overlaps
+                        ]
+                        if new_overlap not in _known_overlaps:  # type: ignore
+                            log.warning(
+                                f"Data for '{region}' overlaps with '{member}' on '{variable}' "
+                                f"and years: {overlapping_years}"
+                            )
 
 
 def remove_overlapping_data_for_regions_and_members(
-    df, known_overlaps: Optional[List[Dict[str, Union[str, List[int]]]]], country_col: str = "country",
-        year_col: str = "year", ignore_zeros: bool = True) -> pd.DataFrame:
+    df: pd.DataFrame,
+    known_overlaps: Optional[List[Dict[str, Union[str, List[int]]]]],
+    country_col: str = "country",
+    year_col: str = "year",
+    ignore_zeros: bool = True,
+) -> pd.DataFrame:
     if known_overlaps is not None:
         df = df.copy()
-        
+
         if ignore_zeros:
             overlapping_values_to_ignore = [0]
         else:
@@ -353,32 +380,43 @@ def remove_overlapping_data_for_regions_and_members(
         for i, overlap in enumerate(known_overlaps):
             if set([overlap["region"], overlap["member"]]) <= set(df["country"]):
                 # Check that the overlap exists indeed.
-                duplicated_rows = df[(df[country_col].isin([overlap["region"], overlap["member"]]))][
-                    [country_col, year_col, overlap["variable"]]].replace(overlapping_values_to_ignore, np.nan).\
-                    dropna(subset=overlap["variable"])
-                duplicated_rows = duplicated_rows[duplicated_rows.duplicated(subset="year", keep=False)]
+                duplicated_rows = (
+                    df[(df[country_col].isin([overlap["region"], overlap["member"]]))][
+                        [country_col, year_col, overlap["variable"]]
+                    ]
+                    .replace(overlapping_values_to_ignore, np.nan)
+                    .dropna(subset=overlap["variable"])
+                )
+                duplicated_rows = duplicated_rows[
+                    duplicated_rows.duplicated(subset="year", keep=False)
+                ]
                 overlapping_years = sorted(set(duplicated_rows["year"]))
                 if overlapping_years != overlap["years"]:
-                    log.warning(f"Given overlap number {i} is not found in the data; redefine this list.")
+                    log.warning(
+                        f"Given overlap number {i} is not found in the data; redefine this list."
+                    )
                 # Make nan data points for either the region or the member (which is specified by "entity to make nan").
-                indexes_to_make_nan = duplicated_rows[duplicated_rows["country"] ==
-                                                      overlap[overlap["entity_to_make_nan"]]].index.tolist()
+                indexes_to_make_nan = duplicated_rows[
+                    duplicated_rows["country"] == overlap[overlap["entity_to_make_nan"]]  # type: ignore
+                ].index.tolist()
                 df.loc[indexes_to_make_nan, overlap["variable"]] = np.nan
 
     return df
 
 
-def load_countries_in_regions():
-    income_groups=load_income_groups()
+def load_countries_in_regions() -> Dict[str, List[str]]:
+    income_groups = load_income_groups()
 
     countries_in_region = {}
     for region in list(REGIONS_TO_ADD):
         countries_in_region[region] = geo.list_countries_in_region(
-                    region=region, income_groups=income_groups
+            region=region, income_groups=income_groups
         )
 
     for region in ADDITIONAL_COUNTRIES_IN_REGIONS:
-        countries_in_region[region] = countries_in_region[region] + ADDITIONAL_COUNTRIES_IN_REGIONS[region]
+        countries_in_region[region] = (
+            countries_in_region[region] + ADDITIONAL_COUNTRIES_IN_REGIONS[region]
+        )
 
     return countries_in_region
 
@@ -426,12 +464,16 @@ def add_region_aggregates(
         countries_in_region = countries_in_regions[region]
         data_region = data[data[country_column].isin(countries_in_region)]
         data_region = remove_overlapping_data_for_regions_and_members(
-            df=data_region, known_overlaps=known_overlaps)        
+            df=data_region, known_overlaps=known_overlaps
+        )
 
         # Check that there are no other overlaps in the data.
         detect_overlapping_data_for_regions_and_members(
-            df=data_region, list_of_countries=countries_in_region,
-            index_columns=index_columns, known_overlaps=known_overlaps)
+            df=data_region,
+            list_of_countries=countries_in_region,
+            index_columns=index_columns,
+            known_overlaps=known_overlaps,
+        )
 
         # Add regions.
         data_region = geo.add_region_aggregates(
@@ -446,20 +488,25 @@ def add_region_aggregates(
             num_allowed_nans_per_year=None,
         )
         data = pd.concat(
-            [data, data_region[data_region[country_column] == region]], ignore_index=True
+            [data, data_region[data_region[country_column] == region]],
+            ignore_index=True,
         ).reset_index(drop=True)
 
     if region_codes is not None:
         # Add region codes to regions.
         if data[country_code_column].dtype == "category":
-            data[country_code_column] = data[country_code_column].cat.add_categories(region_codes)
+            data[country_code_column] = data[country_code_column].cat.add_categories(
+                region_codes
+            )
         for i, region in enumerate(regions):
-            data.loc[data[country_column] == region, country_code_column] = region_codes[i]
+            data.loc[
+                data[country_column] == region, country_code_column
+            ] = region_codes[i]
 
     return data
 
 
-def prepare_output_table(df: pd.DataFrame) -> catalog.Table:
+def prepare_output_table(df: pd.DataFrame, bp_table: catalog.Table) -> catalog.Table:
     """Create a table with the processed data, ready to be in a garden dataset and to be uploaded to grapher (although
     additional metadata may need to be added to the table).
 
@@ -475,7 +522,7 @@ def prepare_output_table(df: pd.DataFrame) -> catalog.Table:
 
     """
     # Create new table.
-    table = catalog.Table(df)
+    table = catalog.Table(df).copy()
 
     # Replace spurious inf values by nan.
     table = table.replace([np.inf, -np.inf], np.nan)
@@ -488,34 +535,45 @@ def prepare_output_table(df: pd.DataFrame) -> catalog.Table:
         .astype({"country_code": "category"})
     )
 
+    table = catalog.utils.underscore_table(table)
+
+    # Get the table metadata from the original table.
+    table.metadata = deepcopy(bp_table.metadata)
+
+    # Get the metadata of each variable from the original table.
+    for column in table.drop(columns="country_code").columns:
+        table[column].metadata = deepcopy(bp_table[column].metadata)
+
+    #
+    # All the code below is not necessary for now, given that we already have metadata for all variables.
+    # But we keep it just in case it is necessary when migrating the full dataset processing from importers to etl.
     # Add metadata (e.g. unit) to each column.
     # Define unit names (these are the long and short unit names that will be shown in grapher).
     # The keys of the dictionary should correspond to units expected to be found in each of the variable names in table.
-    short_unit_to_unit = {
-        "TWh": "terawatt-hours",
-        "kWh": "kilowatt-hours",
-        "%": "%",
-    }
+    # short_unit_to_unit = {
+    #     "TWh": "terawatt-hours",
+    #     "kWh": "kilowatt-hours",
+    #     "%": "%",
+    # }
     # Define number of decimal places to show (only relevant for grapher, not for the data).
-    short_unit_to_num_decimals = {
-        "TWh": 0,
-        "kWh": 0,
-    }
-    for column in table.columns:
-        table[column].metadata.title = column
-        for short_unit in ["TWh", "kWh", "%"]:
-            if short_unit in column:
-                table[column].metadata.short_unit = short_unit
-                table[column].metadata.unit = short_unit_to_unit[short_unit]
-                table[column].metadata.display = {}
-                if short_unit in short_unit_to_num_decimals:
-                    table[column].metadata.display[
-                        "numDecimalPlaces"
-                    ] = short_unit_to_num_decimals[short_unit]
-                # Add the variable name without unit (only relevant for grapher).
-                table[column].metadata.display["name"] = column.split(" (")[0]
-
-    table = catalog.utils.underscore_table(table)
+    # short_unit_to_num_decimals = {
+    #     "TWh": 0,
+    #     "kWh": 0,
+    # }
+    # for column in table.columns:
+    #     table[column].metadata.title = column
+    #     for short_unit in ["TWh", "kWh", "%"]:
+    #         if short_unit in column:
+    #             table[column].metadata.short_unit = short_unit
+    #             table[column].metadata.unit = short_unit_to_unit[short_unit]
+    #             table[column].metadata.display = {}
+    #             if short_unit in short_unit_to_num_decimals:
+    #                 table[column].metadata.display[
+    #                     "numDecimalPlaces"
+    #                 ] = short_unit_to_num_decimals[short_unit]
+    #             # Add the variable name without unit (only relevant for grapher).
+    #             table[column].metadata.display["name"] = column.split(" (")[0]
+    #
 
     return table
 
@@ -543,10 +601,16 @@ def fill_missing_values_with_previous_version(
     # The reason is that aggregates each year may include data from different countries.
     # This is especially necessary in 2022 because regions had different definitions in 2021 (the ones by BP).
     # Remove region aggregates from the old table.
-    table_old = table_old.reset_index().rename(columns={"entity_name": "country", "entity_code": "country_code"}).\
-        drop(columns=["entity_id"])
-    table_old = table_old[~table_old["country"].isin(list(REGIONS_TO_ADD))].reset_index(drop=True).\
-        set_index(["country", "year"])    
+    table_old = (
+        table_old.reset_index()
+        .rename(columns={"entity_name": "country", "entity_code": "country_code"})
+        .drop(columns=["entity_id"])
+    )
+    table_old = (
+        table_old[~table_old["country"].isin(list(REGIONS_TO_ADD))]
+        .reset_index(drop=True)
+        .set_index(["country", "year"])
+    )
 
     # Combine the current output table with the table from the previous version the dataset.
     combined = pd.merge(
@@ -556,10 +620,10 @@ def fill_missing_values_with_previous_version(
         right_index=True,
         how="left",
         suffixes=("", "_old"),
-    )    
+    )
 
     # List the common columns that can be filled with values from the previous version.
-    columns = [column for column in combined.columns if column.endswith("_old")]    
+    columns = [column for column in combined.columns if column.endswith("_old")]
 
     # Fill missing values in the current table with values from the old table.
     for column_old in columns:
@@ -569,7 +633,9 @@ def fill_missing_values_with_previous_version(
     combined = combined.drop(columns=columns)
 
     # Transfer metadata from the table of the current dataset into the combined table.
-    combined.metadata = deepcopy(table.metadata)    
+    combined.metadata = deepcopy(table.metadata)
+    # When that is not possible (for columns that were only in the old but not in the new table),
+    # get the metadata from the old table.
 
     for column in combined.columns:
         try:
@@ -584,15 +650,23 @@ def fill_missing_values_with_previous_version(
     return combined
 
 
-def amend_zero_filled_variables_for_region_aggregates(df):
+def amend_zero_filled_variables_for_region_aggregates(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
 
     # Fill the "* (zero filled)" variables (which were ignored when creating aggregates) with the new aggregate
     # data, and fill any possible nan with zero.
-    zero_filled_variables = [column for column in df.columns if "(zero filled)" in column]
-    original_variables = [column.replace(" (zero filled)", "") for column in df.columns if "(zero filled)" in column]
-    select_regions = df["country"].isin(REGIONS_TO_ADD)    
-    df.loc[select_regions, zero_filled_variables] = df[select_regions][original_variables].fillna(0).values
+    zero_filled_variables = [
+        column for column in df.columns if "(zero filled)" in column
+    ]
+    original_variables = [
+        column.replace(" (zero filled)", "")
+        for column in df.columns
+        if "(zero filled)" in column
+    ]
+    select_regions = df["country"].isin(REGIONS_TO_ADD)
+    df.loc[select_regions, zero_filled_variables] = (
+        df[select_regions][original_variables].fillna(0).values
+    )
 
     return df
 
@@ -620,9 +694,17 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     # Extract dataframe of BP data from table.
-    bp_data = pd.DataFrame(bp_table).reset_index().\
-        rename(columns={column: bp_table[column].metadata.title for column in bp_table.columns}).\
-        rename(columns={"entity_name": "country", "entity_code": "country_code"}).drop(columns="entity_id")
+    bp_data = (
+        pd.DataFrame(bp_table)
+        .reset_index()
+        .rename(
+            columns={
+                column: bp_table[column].metadata.title for column in bp_table.columns
+            }
+        )
+        .rename(columns={"entity_name": "country", "entity_code": "country_code"})
+        .drop(columns="entity_id")
+    )
 
     # Add region aggregates.
     df = add_region_aggregates(
@@ -632,15 +714,17 @@ def run(dest_dir: str) -> None:
         country_column="country",
         year_column="year",
         aggregates={column: "sum" for column in AGGREGATES_BY_SUM},
-        known_overlaps=OVERLAPPING_DATA_TO_REMOVE_IN_AGGREGATES,
-        region_codes=[REGIONS_TO_ADD[region]["country_code"] for region in REGIONS_TO_ADD],
+        known_overlaps=OVERLAPPING_DATA_TO_REMOVE_IN_AGGREGATES,  # type: ignore
+        region_codes=[
+            REGIONS_TO_ADD[region]["country_code"] for region in REGIONS_TO_ADD
+        ],
     )
 
     # Fill nans with zeros for "* (zero filled)" variables for region aggregates (which were ignored).
     df = amend_zero_filled_variables_for_region_aggregates(df)
 
     # Prepare output data in a convenient way.
-    table = prepare_output_table(df)
+    table = prepare_output_table(df, bp_table)
 
     # Fill missing values in current table with values from the previous dataset, when possible.
     combined = fill_missing_values_with_previous_version(
