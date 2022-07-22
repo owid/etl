@@ -20,9 +20,9 @@ VERSION = Path(__file__).parent.stem
 FNAME = Path(__file__).stem
 NAMESPACE = Path(__file__).parent.parent.stem
 
-# VERSION = "2022-07-07"
-# FNAME = "un_sdg"
-# NAMESPACE = "un_sdg"
+VERSION = "2022-07-07"
+FNAME = "un_sdg"
+NAMESPACE = "un_sdg"
 
 
 def get_grapher_dataset() -> Dataset:
@@ -46,11 +46,13 @@ def get_grapher_tables(dataset: Dataset) -> Iterable[Table]:
             "Loading data from garden and creating a dataframe with variable names to match grapher..."
         )
         var_df = create_dataframe_with_variable_name(ds_garden, var)
-        indicator = var_df["variable_name"].iloc[0].split("-")[0]
+        indicator = var_df["variable_name"].iloc[0].split("-")[0].strip()
+        print(indicator)
         if len(var_df["variable_name"].drop_duplicates()) > 1:
             var_gr = var_df.groupby("variable_name")
             for var_name, df_var in var_gr:
-                if len(df_var["source"].drop_duplicates() > 1):
+
+                if len(df_var["source"].drop_duplicates()) > 1:
                     clean_source = "Data from multiple sources compiled by the UN"
                 else:
                     source_name = df_var["source"].drop_duplicates().iloc[0]
@@ -72,21 +74,24 @@ def get_grapher_tables(dataset: Dataset) -> Iterable[Table]:
                     published_by=walden_ds.metadata["name"],
                     publisher_source=clean_source,
                 )
+
+                df_var = Table(df_var)
+                df_var.metadata = VariableMeta(
+                    title=var_name,
+                    description="",
+                    sources=[source],
+                    unit=df_var["long_unit"].iloc[0],
+                    short_unit=df_var["short_unit"].iloc[0],
+                    additional_info=None,
+                )
                 df_var = df_var[["country", "year", "value"]]
+                if df_var["value"].apply(isinstance, args=[float]).all():
+                    df_var["value"] = df_var["value"].round(2)
                 df_var["entity_id"] = gh.country_to_entity_id(
                     df_var["country"], create_entities=True
                 )
                 df_var = df_var.drop(columns=["country"]).set_index(
                     ["year", "entity_id"]
-                )
-                df_var = Table(df_var)
-                df_var.metadata = VariableMeta(
-                    title=var_name,
-                    description="",
-                    source=source,
-                    unit=df_var["long_unit"].iloc[0],
-                    short_unit=df_var["short_unit"].iloc[0],
-                    additional_info=None,
                 )
 
             yield df_var

@@ -38,6 +38,7 @@
     "FAOSTAT Data/ Consumer Price Indices: http://www.fao.org/faostat/en/#data/CP.": "Food and Agriculture Organization of the United Nations",
     "Food and Agriculture Organisation of the United Nations (FAO), with data collected through the Gallup World Poll.; National Entity": "Food and Agriculture Organization of the United Nations",
     "Food and Agriculture Organisation of United Nations (FAO)": "Food and Agriculture Organization of the United Nations",
+    "Food and Agriculture Organization of the United Nations (FAO)": "Food and Agriculture Organization of the United Nations",
     "Food and Agriculture Organization of the United Nations (FAO); National Entity": "Food and Agriculture Organization of the United Nations",
     "Food Price Monitoring and Analysis (FPMA) online database: https://fpma.apps.fao.org/giews/food-prices/tool/public/#/dataset/domestic.": "Food and Agriculture Organization of the United Nations",
     "Food Waste Index Report 2021 / WESR": "UN Environment Programme",
@@ -227,5 +228,14 @@
     "UNSD/UNEP Questionnaire on Environment Statistics": "United Nations Environment Programme and United Nations Statistics Division",
     "UNSD / UNITAR / WESR": "United Nations Statistics Division",
     "Refinitiv": "Refinitiv",
-    "Source: ILO estimates based on country data compled through the ILO Social Security Inquiry (SSI); Source: ILO estimates based on country data compled through the ILO Social Security Inquiry (SSI).  Based on information from federal programmes only.": "International Labour Organization"
+    "Source: ILO estimates based on country data compled through the ILO Social Security Inquiry (SSI); Source: ILO estimates based on country data compled through the ILO Social Security Inquiry (SSI).  Based on information from federal programmes only.": "International Labour Organization",
+    "UN-Habitat Urban Indicators Database": "UN Habitat",
+    "OECD": "Organisation for Economic Co-operation and Development (OECD)",
+    "Eurostat": "Eurostat",
+    "ICAO": "International Civil Aviation Organization",
+    "the International Transport Forum at the OECD (ITF-OECD)": "Organisation for Economic Co-operation and Development (OECD)",
+    "Ministry of Social Development": "Ministry of Social Development",
+    "UNESCO Institute for Statistics.  Data extracted on 01 April 2022.": "UNESCO",
+    "DHS 2016": "Demographic and Health Surveys",
+    "Trends in International Mathematics and Science Study (TIMSS). Students achieving at least Intermediate International Benchmark. Grade 4 Data extracted on 01 April 2022.": "National Centre for Education Statistics"
 }
