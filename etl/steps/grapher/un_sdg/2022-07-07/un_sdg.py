@@ -34,6 +34,9 @@ def get_grapher_dataset() -> Dataset:
     return dataset
 
 
+dataset = get_grapher_dataset()
+
+
 def get_grapher_tables(dataset: Dataset) -> Iterable[Table]:
     clean_source_map = load_clean_source_mapping()
     walden_ds = Catalog().find_one(
