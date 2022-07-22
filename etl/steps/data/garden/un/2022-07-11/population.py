@@ -122,7 +122,7 @@ def _add_metric_population(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame
     age_map = {
         **{str(i): f"{i - i%5}-{i + 4 - i%5}" for i in range(0, 20)},
         **{str(i): f"{i - i%10}-{i + 9 - i%10}" for i in range(20, 100)},
-        **{"100+": "100-"},
+        **{"100+": "100+"},
     }
     df_p_granular = df_p.assign(age=df_p.age.map(age_map).astype("category"))
     df_p_granular = df_p_granular.groupby(
@@ -177,7 +177,7 @@ def _add_metric_population(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame
 
 def map_broad_age(age: str) -> str:
     if age == "100+":
-        return "65-"
+        return "65+"
     elif int(age) < 5:
         return "0-4"
     elif int(age) < 15:
@@ -187,7 +187,7 @@ def map_broad_age(age: str) -> str:
     elif int(age) < 65:
         return "25-64"
     else:
-        return "65-"
+        return "65+"
 
 
 def _add_metric_population_change(df_p_granular: pd.DataFrame) -> pd.DataFrame:

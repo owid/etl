@@ -23,7 +23,7 @@ COLUMNS_METRICS: Dict[str, Dict[str, Any]] = {
     **{
         "_100plus": {
             "name": "deaths",
-            "age": "100-",
+            "age": "100+",
         }
     },
 }
