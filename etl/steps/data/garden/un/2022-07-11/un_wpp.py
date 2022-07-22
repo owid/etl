@@ -101,7 +101,7 @@ def dataset_to_garden(tables: List[Table], metadata: TableMeta, dest_dir: str) -
 
 
 def run(dest_dir: str) -> None:
-    meadow_path = base_path / "data/meadow/un/2022/un_wpp"
+    meadow_path = base_path / "data/meadow/un/2022-07-11/un_wpp"
     ds = catalog.Dataset(meadow_path)
     # country rename
     country_std = load_country_mapping()
