@@ -45,13 +45,9 @@ dataset:
     * Other Asia Pacific (BP): Asia.
     * Other CIS (BP): Asia.
     * Other Caribbean (BP): North America.
-    * Other Eastern Africa (BP): Africa.
     * Other Europe (BP): Europe.
-    * Other Middle Africa (BP): Africa.
     * Other Middle East (BP): Asia.
     * Other North America (BP): North America.
-    * Other Northern Africa (BP): Africa.
     * Other South America (BP): South America.
     * Other South and Central America (BP): South America.
-    * Other Southern Africa (BP): Africa.
-    * Other Western Africa (BP): Africa.
+    Additional BP regions are ignored, since they belong to other regions already included (e.g. the data for 'Other Western Africa (BP)' is included in 'Other Africa (BP)').

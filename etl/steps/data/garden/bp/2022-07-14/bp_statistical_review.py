@@ -3,7 +3,7 @@
 For the moment, this dataset is downloaded and processed by 
 https://github.com/owid/importers/tree/master/bp_statreview
 
-However, in this additional step we add region aggregates.
+However, in this additional step we add region aggregates following OWID definitions of regions.
 
 """
 
@@ -67,10 +67,6 @@ REGIONS_TO_ADD = {
     },
 }
 
-# +
-# TODO: Consider ignoring regions when constructing aggregates, like New Caledonia
-# -
-
 # When creating region aggregates, decide how to distribute historical regions.
 # The following decisions are based on the current location of the countries that succeeded the region, and their income
 # group. Continent and income group assigned corresponds to the continent and income group of the majority of the
@@ -124,19 +120,31 @@ OVERLAPPING_DATA_TO_REMOVE_IN_AGGREGATES = [
     }
 ]
 
-# TODO: Confirm these assignments.
+# We need to include the 'Other * (BP)' regions, otherwise continents have incomplete data.
+# For example, when constructing the aggregate for Africa, we need to include 'Other Africa (BP)' as an additional
+# country; after doing this we recover very precisely the data for 'Africa (BP)'.
+# Note:
+# * Biodiesels are ignored in region aggregates, because they are only given for continents and a few countries.
+# * Biofuels do have data for many countries. Although for Africa they show only the total, but not the contribution of
+#   the individual countries.
+#   This causes that our aggregate for 'Africa' is zero, while the original 'Africa (BP)' is not.
+#   TODO: Remove biofuels data for Africa (make a list of outliers).
+#    Also remove biodiesels zero filled for all aggregates.
+# * Additional regions in BP's data (e.g. 'Other Western Africa (BP)') seem to be included in 'Other Africa (BP)'.
+#   Therefore we ignore them when creating aggregates.
 ADDITIONAL_COUNTRIES_IN_REGIONS = {
     "Africa": [
         "Other Africa (BP)",
-        "Other Eastern Africa (BP)",
-        "Other Middle Africa (BP)",
-        "Other Northern Africa (BP)",
-        "Other Southern Africa (BP)",
-        "Other Western Africa (BP)",
     ],
     "Asia": [
+        # Adding 'Other Asia Pacific (BP)' may include areas of Oceania in Asia.
+        # However, it seems that this region is usually significantly smaller than Asia.
+        # So, we are possibly overestimating Asia, but not by a significant amount.
         "Other Asia Pacific (BP)",
+        # Similarly, adding 'Other CIS (BP)' in Asia may include areas of Europe in Asia (e.g. Moldova).
+        # However, since most countries in 'Other CIS (BP)' are Asian, adding it is more accurate than not adding it.
         "Other CIS (BP)",
+        # Countries defined by BP in 'Middle East' are fully included in OWID's definition of Asia.
         "Other Middle East (BP)",
     ],
     "Europe": [
@@ -148,23 +156,21 @@ ADDITIONAL_COUNTRIES_IN_REGIONS = {
     ],
     "South America": [
         "Other South America (BP)",
-        "Other South and Central America (BP)",
     ],
+    # Given that 'Other Asia and Pacific (BP)' is often similar or even larger than Oceania, we avoid including it in
+    # Oceania (and include it in Asia, see comment above).
+    # This means that we may be underestimating Oceania by a significant amount, but BP does not provide unambiguous
+    # data to avoid this.
+    "Oceania": [],
 }
 
 # Variables that can be summed when constructing region aggregates.
 AGGREGATES_BY_SUM = [
-    'Biofuels Consumption - Kboed - Biodiesel',
     'Biofuels Consumption - Kboed - Total',
-    'Biofuels Consumption - PJ - Biodiesel',
     'Biofuels Consumption - PJ - Total',
-    'Biofuels Consumption - TWh - Biodiesel',
     'Biofuels Consumption - TWh - Total',
-    'Biofuels Production - Kboed - Biodiesel',
     'Biofuels Production - Kboed - Total',
-    'Biofuels Production - PJ - Biodiesel',
     'Biofuels Production - PJ - Total',
-    'Biofuels Production - TWh - Biodiesel',
     'Biofuels Production - TWh - Total',
     'Carbon Dioxide Emissions',
     'Coal - Reserves - Anthracite and bituminous',
@@ -213,7 +219,6 @@ AGGREGATES_BY_SUM = [
     'Oil Production - Tonnes',
     'Primary Energy Consumption - EJ',
     'Primary Energy Consumption - TWh',
-    'Rare Earth Production-Reserves',
     'Renewables Consumption - EJ',
     'Renewables Consumption - TWh',
     'Renewables Power - EJ',
@@ -227,8 +232,14 @@ AGGREGATES_BY_SUM = [
     'Wind Consumption - EJ',
     'Wind Consumption - TWh',
     'Wind Generation - TWh',
+    # 'Biofuels Consumption - Kboed - Biodiesel',
+    # 'Biofuels Consumption - PJ - Biodiesel',
+    # 'Biofuels Consumption - TWh - Biodiesel',
     # 'Biofuels Consumption - TWh - Biodiesel (zero filled)',
     # 'Biofuels Consumption - TWh - Total (zero filled)',
+    # 'Biofuels Production - Kboed - Biodiesel',
+    # 'Biofuels Production - PJ - Biodiesel',
+    # 'Biofuels Production - TWh - Biodiesel',
     # 'Coal - Prices',
     # 'Coal Consumption - TWh (zero filled)',
     # 'Gas - Prices',
@@ -241,6 +252,7 @@ AGGREGATES_BY_SUM = [
     # 'Oil - Spot crude prices',
     # 'Oil Consumption - TWh (zero filled)',
     # 'Primary Energy - Cons capita',
+    # 'Rare Earth Production-Reserves',
     # 'Solar Consumption - TWh (zero filled)',
     # 'Wind Consumption - TWh (zero filled)',
     ]
