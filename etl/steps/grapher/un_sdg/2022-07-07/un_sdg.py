@@ -20,9 +20,9 @@ VERSION = Path(__file__).parent.stem
 FNAME = Path(__file__).stem
 NAMESPACE = Path(__file__).parent.parent.stem
 
-VERSION = "2022-07-07"
-FNAME = "un_sdg"
-NAMESPACE = "un_sdg"
+# VERSION = "2022-07-07"
+# NAMESPACE = "un_sdg"
+# FNAME = "un_sdg"
 
 
 def get_grapher_dataset() -> Dataset:
@@ -32,10 +32,6 @@ def get_grapher_dataset() -> Dataset:
         f"{dataset.metadata.short_name}__{VERSION.replace('-', '_')}"
     )
     return dataset
-
-
-dataset = get_grapher_dataset()
-tables = get_grapher_tables(dataset)
 
 
 def get_grapher_tables(dataset: Dataset) -> Iterable[Table]:
@@ -50,42 +46,41 @@ def get_grapher_tables(dataset: Dataset) -> Iterable[Table]:
             "Loading data from garden and creating a dataframe with variable names to match grapher..."
         )
         var_df = create_dataframe_with_variable_name(ds_garden, var)
-
+        var_df["source"] = clean_source_name(var_df["source"], clean_source_map)
         if len(var_df["variable_name"].drop_duplicates()) > 1:
             var_gr = var_df.groupby("variable_name")
             for var_name, df_var in var_gr:
-                print(var_name)
                 df_tab = add_metadata_and_prepare_for_grapher(
-                    df_var, var_name, clean_source_map, walden_ds
+                    df_var, var_name, walden_ds
                 )
-                print(df_tab.head())
-                # yield df_tab
+                yield df_tab
         else:
             var_name = var_df["variable_name"].drop_duplicates().iloc[0]
             assert (
                 var_df["variable_name"].drop_duplicates().shape[0] == 1
             ), f"{var_name} has multiple disaggregrations"
-            df_tab = add_metadata_and_prepare_for_grapher(
-                var_df, var_name, clean_source_map, walden_ds
-            )
-            print(df_tab.head())
-            # yield df_tab
+            df_tab = add_metadata_and_prepare_for_grapher(var_df, var_name, walden_ds)
+            yield df_tab
 
 
-def add_metadata_and_prepare_for_grapher(
-    df_var: pd.DataFrame, var_name: str, clean_source_map: dict, walden_ds: Dataset
-) -> Table:
-
-    indicator = df_var["variable_name"].iloc[0].split("-")[0].strip()
-    if len(df_var["source"].drop_duplicates()) > 1:
+def clean_source_name(raw_source: pd.Series, clean_source_map: dict) -> pd.Series:
+    if len(raw_source.drop_duplicates()) > 1:
         clean_source = "Data from multiple sources compiled by the UN"
     else:
-        source_name = df_var["source"].drop_duplicates().iloc[0]
+        source_name = raw_source.drop_duplicates().iloc[0]
         assert (
             source_name in clean_source_map
         ), f"{source_name} not in un_sdg.sources.json - please add"
         clean_source = clean_source_map[source_name]
 
+    return clean_source
+
+
+def add_metadata_and_prepare_for_grapher(
+    df_var: pd.DataFrame, var_name: str, walden_ds: Dataset
+) -> Table:
+
+    indicator = df_var["variable_name"].iloc[0].split("-")[0].strip()
     source = Source(
         name="UN SDG",
         description="%s: %s" % ("Metadata available at", get_metadata_link(indicator)),
@@ -96,7 +91,7 @@ def add_metadata_and_prepare_for_grapher(
         publication_date=walden_ds.metadata["publication_date"],
         publication_year=walden_ds.metadata["publication_year"],
         published_by=walden_ds.metadata["name"],
-        publisher_source=clean_source,
+        publisher_source=df_var["source"].iloc[0],
     )
 
     df_tab = Table(df_var)
