@@ -102,6 +102,8 @@ steps:
   #  This garden step loads the dataset and adds region aggregates properly, plus some other minor improvements.
   data://garden/bp/2022-07-14/bp_statistical_review:
     - backport://backport/owid/latest/dataset_5347_statistical_review_of_world_energy__bp__2021
+  grapher://bp/2022-07-14/bp_statistical_review:
+    - data://garden/bp/2022-07-14/bp_statistical_review
   # Garden step for BP energy mix 2021.
   data://garden/bp/2022-07-11/energy_mix:
     - backport://backport/owid/latest/dataset_5347_statistical_review_of_world_energy__bp__2021
