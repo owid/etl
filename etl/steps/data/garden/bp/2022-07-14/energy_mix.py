@@ -56,7 +56,11 @@ def get_bp_data(bp_table: catalog.Table) -> pd.DataFrame:
 
     # Convert table (snake case) column names to human readable names.
     bp_table = bp_table.rename(
-        columns={column: bp_table[column].metadata.title for column in bp_table.columns if column != "country_code"}
+        columns={
+            column: bp_table[column].metadata.title
+            for column in bp_table.columns
+            if column != "country_code"
+        }
     ).reset_index()
 
     # Rename human-readable columns (and select only the ones that will be used).
@@ -87,7 +91,7 @@ def get_bp_data(bp_table: catalog.Table) -> pd.DataFrame:
     }
 
     # Create a simple dataframe (without metadata and with a dummy index).
-    assert set(columns) < set(bp_table.columns), "Column names have changed in BP data."    
+    assert set(columns) < set(bp_table.columns), "Column names have changed in BP data."
 
     bp_data = (
         pd.DataFrame(bp_table)[list(columns)]
@@ -469,7 +473,13 @@ def run(dest_dir: str) -> None:
     # Load data.
     #
     # Load the latest BP statistical review.
-    bp_dataset_path = DATA_DIR / "garden" / STAT_REVIEW_NAMESPACE / STAT_REVIEW_VERSION / STAT_REVIEW_SHORT_NAME
+    bp_dataset_path = (
+        DATA_DIR
+        / "garden"
+        / STAT_REVIEW_NAMESPACE
+        / STAT_REVIEW_VERSION
+        / STAT_REVIEW_SHORT_NAME
+    )
     bp_dataset = catalog.Dataset(bp_dataset_path)
     bp_table = bp_dataset[bp_dataset.table_names[0]]
 

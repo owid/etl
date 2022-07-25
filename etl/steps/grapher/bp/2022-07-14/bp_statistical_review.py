@@ -10,7 +10,9 @@ from . import NAMESPACE, VERSION
 
 
 def get_grapher_dataset() -> catalog.Dataset:
-    dataset = catalog.Dataset(DATA_DIR / "garden" / NAMESPACE / VERSION / "bp_statistical_review")
+    dataset = catalog.Dataset(
+        DATA_DIR / "garden" / NAMESPACE / VERSION / "bp_statistical_review"
+    )
     assert len(dataset.metadata.sources) == 1
 
     # Copy the dataset description to the source's description, since this is what is shown in grapher.
@@ -26,9 +28,13 @@ def get_grapher_tables(dataset: catalog.Dataset) -> Iterable[catalog.Table]:
     table = dataset[dataset.table_names[0]].reset_index()
 
     # Copy the new dataset description (which is now stored in sources) to the variable sources' description.
-    data_columns = [col for col in table.columns if col not in ["year", "country", "country_code"]]
+    data_columns = [
+        col for col in table.columns if col not in ["year", "country", "country_code"]
+    ]
     for col in data_columns:
-        table[col].metadata.sources[0].description = dataset.metadata.sources[0].description
+        table[col].metadata.sources[0].description = dataset.metadata.sources[
+            0
+        ].description
 
     # Grapher needs a column entity id, that is constructed based on the unique entity names in the database.
     table["entity_id"] = gh.country_to_entity_id(table["country"])
