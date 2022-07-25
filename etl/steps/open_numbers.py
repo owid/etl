@@ -8,6 +8,7 @@ Convert repositories with data in DDF format to OWID's Dataset and Table
 format.
 """
 
+from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
 from typing import Dict, List, Tuple, cast
 import hashlib
@@ -53,27 +54,32 @@ def run(dest_dir: str) -> None:
     resource_map = remap_names(package.resources)
 
     # copy tables one by one
-    for short_name, resources in resource_map.items():
-        print(f"- {short_name}")
-        if len(resources) > 1:
-            df = load_all_resources(repo.cache_dir, resources)
-        else:
-            (resource,) = resources
-            try:
-                df = resource.to_pandas()
+    with ProcessPoolExecutor() as executor:
+        for short_name, resources in resource_map.items():
+            executor.submit(add_resource, ds, short_name, resources)
 
-            except FrictionlessException:
-                # see: https://github.com/owid/etl/issues/36
-                print("  ERROR: skipping")
-                continue
 
-            # use smaller, more accurate column types that minimise space
-            if "global" in df.columns:
-                df["geo"] = df.pop("global")
+def add_resource(ds: Dataset, short_name: str, resources: List[frictionless.Resource]):
+    print(f"- {short_name}")
+    if len(resources) > 1:
+        df = load_all_resources(repo.cache_dir, resources)
+    else:
+        (resource,) = resources
+        try:
+            df = resource.to_pandas()
 
-        t = Table(df)
-        t.metadata.short_name = short_name
-        ds.add(utils.underscore_table(t))
+        except FrictionlessException:
+            # see: https://github.com/owid/etl/issues/36
+            print("  ERROR: skipping")
+            return
+
+        # use smaller, more accurate column types that minimise space
+        if "global" in df.columns:
+            df["geo"] = df.pop("global")
+
+    t = Table(df)
+    t.metadata.short_name = short_name
+    ds.add(utils.underscore_table(t))
 
 
 def load_all_resources(
