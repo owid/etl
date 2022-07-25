@@ -7,6 +7,7 @@ import pandas as pd
 
 from structlog import get_logger
 from owid.catalog import Dataset, Table, Source, VariableMeta
+from owid.catalog.utils import underscore
 from owid.walden import Catalog
 from etl.paths import DATA_DIR
 from etl import grapher_helpers as gh
@@ -53,14 +54,16 @@ def get_grapher_tables(dataset: Dataset) -> Iterable[Table]:
                 df_tab = add_metadata_and_prepare_for_grapher(
                     df_var, var_name, walden_ds
                 )
-                yield df_tab
+                yield from gh.yield_long_table(df_tab)
         else:
             var_name = var_df["variable_name"].drop_duplicates().iloc[0]
             assert (
                 var_df["variable_name"].drop_duplicates().shape[0] == 1
             ), f"{var_name} has multiple disaggregrations"
-            df_tab = add_metadata_and_prepare_for_grapher(var_df, var_name, walden_ds)
-            yield df_tab
+            df_tab = add_metadata_and_prepare_for_grapher(
+                var_df, var_name, clean_source_map, walden_ds
+            )
+            yield from gh.yield_long_table(df_tab)
 
 
 def clean_source_name(raw_source: pd.Series, clean_source_map: dict) -> pd.Series:
@@ -94,8 +97,7 @@ def add_metadata_and_prepare_for_grapher(
         publisher_source=df_var["source"].iloc[0],
     )
 
-    df_tab = Table(df_var)
-    df_tab.metadata = VariableMeta(
+    df_var["meta"] = VariableMeta(
         title=var_name,
         description=df_var["seriesdescription"].iloc[0],
         sources=[source],
@@ -103,14 +105,22 @@ def add_metadata_and_prepare_for_grapher(
         short_unit=df_var["short_unit"].iloc[0],
         additional_info=None,
     )
-    df_tab = df_tab[["country", "year", "value"]]
-    if df_tab["value"].apply(isinstance, args=[float]).all():
-        df_tab["value"] = df_tab["value"].round(2)
-    df_tab["entity_id"] = gh.country_to_entity_id(
-        df_tab["country"], create_entities=True
+
+    # 12.3.1 - Food waste (Tonnes) - AG_FOOD_WST - Households
+    # would become
+    # _12_3_1__food_waste__tonnes__ag_food_wst__households
+    # maybe we'd want to remove the leading indicator?
+    df_var["variable"] = underscore(var_name)
+
+    df_var = df_var[["country", "year", "value", "variable", "meta"]].copy()
+    if df_var["value"].apply(isinstance, args=[float]).all():
+        df_var["value"] = df_var["value"].round(2)
+    df_var["entity_id"] = gh.country_to_entity_id(
+        df_var["country"], create_entities=True
     )
-    df_tab = df_tab.drop(columns=["country"]).set_index(["year", "entity_id"])
-    return df_tab
+    df_var = df_var.drop(columns=["country"]).set_index(["year", "entity_id"])
+
+    return Table(df_var)
 
 
 def create_dataframe_with_variable_name(dataset: Dataset, tab: str) -> pd.DataFrame:
