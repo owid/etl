@@ -80,7 +80,7 @@ def add_metadata_and_prepare_for_grapher(
 
     indicator = df_var["variable_name"].iloc[0].split("-")[0].strip()
     source = Source(
-        name="UN SDG",
+        name=df_var["source"].iloc[0],
         description="%s: %s" % ("Metadata available at", get_metadata_link(indicator)),
         url=walden_ds.metadata["url"],
         source_data_url=walden_ds.metadata["source_data_url"],
