@@ -251,6 +251,18 @@ def fetch_db_checksum(dataset: catalog.Dataset) -> Optional[str]:
         return None if source_checksum is None else source_checksum[0]
 
 
+def set_dataset_checksum_to_null(dataset_id: int) -> None:
+    with open_db() as db:
+        db.cursor.execute(
+            """
+            UPDATE datasets
+            SET sourceChecksum = NULL
+            WHERE id=%s
+        """,
+            [dataset_id],
+        )
+
+
 def cleanup_ghost_variables(dataset_id: int, upserted_variable_ids: List[int]) -> None:
     """Remove all leftover variables that didn't get upserted into DB during grapher step.
     This could happen when you rename or delete a variable in ETL.
