@@ -21,10 +21,6 @@ VERSION = Path(__file__).parent.stem
 FNAME = Path(__file__).stem
 NAMESPACE = Path(__file__).parent.parent.stem
 
-# VERSION = "2022-07-07"
-# NAMESPACE = "un_sdg"
-# FNAME = "un_sdg"
-
 
 def get_grapher_dataset() -> Dataset:
     dataset = Dataset(DATA_DIR / f"garden/{NAMESPACE}/{VERSION}/{FNAME}")
@@ -51,6 +47,7 @@ def get_grapher_tables(dataset: Dataset) -> Iterable[Table]:
         if len(var_df["variable_name"].drop_duplicates()) > 1:
             var_gr = var_df.groupby("variable_name")
             for var_name, df_var in var_gr:
+                print(var_name)
                 df_tab = add_metadata_and_prepare_for_grapher(
                     df_var, var_name, walden_ds
                 )
@@ -60,9 +57,7 @@ def get_grapher_tables(dataset: Dataset) -> Iterable[Table]:
             assert (
                 var_df["variable_name"].drop_duplicates().shape[0] == 1
             ), f"{var_name} has multiple disaggregrations"
-            df_tab = add_metadata_and_prepare_for_grapher(
-                var_df, var_name, clean_source_map, walden_ds
-            )
+            df_tab = add_metadata_and_prepare_for_grapher(var_df, var_name, walden_ds)
             yield from gh.yield_long_table(df_tab)
 
 
