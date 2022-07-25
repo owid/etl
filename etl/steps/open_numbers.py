@@ -56,10 +56,15 @@ def run(dest_dir: str) -> None:
     # copy tables one by one
     with ProcessPoolExecutor() as executor:
         for short_name, resources in resource_map.items():
-            executor.submit(add_resource, ds, short_name, resources)
+            executor.submit(add_resource, ds, repo, short_name, resources)
 
 
-def add_resource(ds: Dataset, short_name: str, resources: List[frictionless.Resource]):
+def add_resource(
+    ds: Dataset,
+    repo: GithubRepo,
+    short_name: str,
+    resources: List[frictionless.Resource],
+) -> None:
     print(f"- {short_name}")
     if len(resources) > 1:
         df = load_all_resources(repo.cache_dir, resources)
