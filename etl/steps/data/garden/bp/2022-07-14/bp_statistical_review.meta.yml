@@ -39,15 +39,14 @@ dataset:
     * Southern Africa (BP): Botswana, Lesotho, Namibia, South Africa, Swaziland.
     * Western Africa (BP): Territories on the west coast of Africa from Mauritania to Nigeria, including Burkina Faso, Cape Verde, Mali and Niger.
 
-    BP includes some regions that are not explicitly defined (e.g. 'Other Europe').
-    We distribute these regions in the following way:
-    * Other Africa (BP): Africa.
-    * Other Asia Pacific (BP): Asia.
-    * Other CIS (BP): Asia.
-    * Other Caribbean (BP): North America.
-    * Other Europe (BP): Europe.
-    * Other Middle East (BP): Asia.
-    * Other North America (BP): North America.
-    * Other South America (BP): South America.
-    * Other South and Central America (BP): South America.
+    Additionally, BP includes some regions that are not explicitly defined (e.g. 'Other Europe (BP)', or 'Other CIS (BP)').
+    We define our regions in the following way:
+    * Africa - All African countries + Other Africa (BP).
+    * Asia - All Asian countries + Other Middle East (BP) + Other CIS (BP) + Other Asia Pacific (BP).
+    * Europe - All European countries + Other Europe (BP).
+    * North America - All North American countries + Other Caribbean (BP) + Other North America (BP).
+    * Oceania - All Oceanian countries.
+    * South America - All South American countries + Other South America (BP).
+    Where the individual countries in each region are defined [in this map](https://ourworldindata.org/world-region-map-definitions).
     Additional BP regions are ignored, since they belong to other regions already included (e.g. the data for 'Other Western Africa (BP)' is included in 'Other Africa (BP)').
+    Finally, income groups are constructed following the definitions [in this map](https://ourworldindata.org/grapher/world-banks-income-groups).

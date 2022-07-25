@@ -17,19 +17,22 @@ from owid.datautils import geo
 from owid import catalog
 from shared import CURRENT_DIR, log
 
+# Namespace and short name for output dataset.
 NAMESPACE = "bp"
 DATASET_SHORT_NAME = "bp_statistical_review"
-# Path to metadata file.
+# Path to metadata file for current dataset.
 METADATA_FILE_PATH = CURRENT_DIR / "bp_statistical_review.meta.yml"
-# Original BP's Statistical Review dataset name in the owid catalog (without the institution and year).
+# Original BP's Statistical Review dataset name in the OWID catalog (without the institution and year).
 BP_CATALOG_NAME = "statistical_review_of_world_energy"
 BP_NAMESPACE_IN_CATALOG = "bp_statreview"
 BP_VERSION = 2022
 # Previous BP's Statistical Review dataset.
+# It will be used to fill missing data in the new dataset.
 BP_CATALOG_NAME_OLD = "statistical_review_of_world_energy"
 BP_NAMESPACE_IN_CATALOG_OLD = "bp_statreview"
 BP_VERSION_OLD = 2021
 
+# Aggregate regions to add, following OWID definitions.
 REGIONS_TO_ADD = {
     "North America": {
         "country_code": "OWID_NAM",
@@ -71,7 +74,7 @@ REGIONS_TO_ADD = {
 # The following decisions are based on the current location of the countries that succeeded the region, and their income
 # group. Continent and income group assigned corresponds to the continent and income group of the majority of the
 # population in the member countries.
-HISTORIC_TO_CURRENT_REGION = {
+HISTORIC_TO_CURRENT_REGION: Dict[str, Dict[str, Union[str, List[str]]]] = {
     "Netherlands Antilles": {
         "continent": "North America",
         "income_group": "High-income countries",
@@ -110,6 +113,7 @@ HISTORIC_TO_CURRENT_REGION = {
     },
 }
 
+# List of known overlaps between regions and member countries (or successor countries).
 OVERLAPPING_DATA_TO_REMOVE_IN_AGGREGATES = [
     {
         "region": "USSR",
@@ -119,6 +123,11 @@ OVERLAPPING_DATA_TO_REMOVE_IN_AGGREGATES = [
         "variable": "Gas - Proved reserves",
     }
 ]
+
+# True to ignore zeros when checking for overlaps between regions and member countries.
+# This means that, if a region (e.g. USSR) and a member country or successor country (e.g. Russia) overlap, but in a
+# variable that only has zeros, it will not be considered an overlap.
+IGNORE_ZEROS_WHEN_CHECKING_FOR_OVERLAPPING_DATA = True
 
 # We need to include the 'Other * (BP)' regions, otherwise continents have incomplete data.
 # For example, when constructing the aggregate for Africa, we need to include 'Other Africa (BP)'.
@@ -295,40 +304,66 @@ def load_income_groups() -> pd.DataFrame:
 
 def detect_overlapping_data_for_regions_and_members(
     df: pd.DataFrame,
-    list_of_countries: List[str],
     index_columns: List[str],
+    regions_and_members: Dict[str, Dict[str, Union[str, List[str]]]],
     known_overlaps: Optional[List[Dict[str, Union[str, List[int]]]]],
     ignore_zeros: bool = True,
 ) -> None:
+    """Raise a warning if there is data for a particular region and for a country that is a member of that region.
+
+    For example, if there is data for USSR and Russia on the same years, a warning will be raised.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Data.
+    index_columns : list
+        Names of columns that should be index of the data.
+    regions_and_members : dict
+        Regions and members (where each key corresponds to a region, and each region is a dictionary of various keys,
+        one of which is 'members', which is a list of member countries).
+    known_overlaps : list or None
+        Instances of known overlaps in the data. If this function raises a warning, new instances should be added to the
+        list.
+    ignore_zeros : bool
+        True to consider zeros in the data as missing values. Doing this, if a region has overlapping data with a member
+        country, but one of their data points is zero, it will not be considered an overlap.
+
+    """
     if known_overlaps is not None:
         df = df.copy()
 
-        # TODO: Add documentation.
         if ignore_zeros:
+            # Replace zeros by nans, so that zeros are ignored when looking for overlapping data.
             overlapping_values_to_ignore = [0]
         else:
             overlapping_values_to_ignore = []
 
-        regions = sorted(set(list_of_countries) & set(HISTORIC_TO_CURRENT_REGION))
+        regions = list(regions_and_members)
         for region in regions:
+            # Create a dataframe with only data for the region, and remove columns that only have nans.
+            # Optionally, replace zeros by nans, to also remove columns that only have zeros or nans.
             region_df = (
                 df[df["country"] == region]
                 .replace(overlapping_values_to_ignore, np.nan)
                 .dropna(axis=1, how="all")
             )
-            members = HISTORIC_TO_CURRENT_REGION[region]["members"]
+            members = regions_and_members[region]["members"]
             for member in members:
+                # Create a dataframe for this particular member country.
                 member_df = (
                     df[df["country"] == member]
                     .replace(overlapping_values_to_ignore, np.nan)
                     .dropna(axis=1, how="all")
                 )
+                # Find common columns with (non-nan) data between region and member country.
                 variables = [
                     column
                     for column in (set(region_df.columns) & set(member_df.columns))
                     if column not in index_columns
                 ]
                 for variable in variables:
+                    # Concatenate region and member country's data for this variable.
                     combined = (
                         pd.concat(
                             [
@@ -340,6 +375,7 @@ def detect_overlapping_data_for_regions_and_members(
                         .dropna()
                         .reset_index(drop=True)
                     )
+                    # Find years where region and member country overlap.
                     overlapping = combined[combined.duplicated(subset="year")]
                     if not overlapping.empty:
                         overlapping_years = sorted(set(overlapping["year"]))
@@ -349,6 +385,7 @@ def detect_overlapping_data_for_regions_and_members(
                             "years": overlapping_years,
                             "variable": variable,
                         }
+                        # Check if the overlap found is already in the list of known overlaps.
                         # If this overlap is not known, raise a warning.
                         # Omit the field "entity_to_make_nan" when checking if this overlap is known.
                         _known_overlaps = [
@@ -369,6 +406,28 @@ def remove_overlapping_data_for_regions_and_members(
     year_col: str = "year",
     ignore_zeros: bool = True,
 ) -> pd.DataFrame:
+    """Check if list of known overlaps between region (e.g. a historical region like the USSR) and a member country (or
+    a successor country, like Russia) do overlap, and remove them from the data.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Data.
+    known_overlaps : list or None
+        List of known overlaps between region and member country.
+    country_col : str
+        Name of country column.
+    year_col : str
+        Name of year column.
+    ignore_zeros : bool
+        True to ignore columns of zeros when checking if known overlaps are indeed overlaps.
+
+    Returns
+    -------
+    df : pd.DataFrame
+        Data after removing known overlapping rows between a region and a member country.
+
+    """
     if known_overlaps is not None:
         df = df.copy()
 
@@ -379,7 +438,7 @@ def remove_overlapping_data_for_regions_and_members(
 
         for i, overlap in enumerate(known_overlaps):
             if set([overlap["region"], overlap["member"]]) <= set(df["country"]):
-                # Check that the overlap exists indeed.
+                # Check that the known overlap is indeed found in the data.
                 duplicated_rows = (
                     df[(df[country_col].isin([overlap["region"], overlap["member"]]))][
                         [country_col, year_col, overlap["variable"]]
@@ -405,20 +464,34 @@ def remove_overlapping_data_for_regions_and_members(
 
 
 def load_countries_in_regions() -> Dict[str, List[str]]:
+    """Create a dictionary of regions (continents and income groups) and their member countries.
+
+    Regions to include are defined above, in REGIONS_TO_ADD.
+    Additional countries are added to regions following the definitions in ADDITIONAL_COUNTRIES_IN_REGIONS.
+
+    Returns
+    -------
+    countries_in_regions : dict
+        Dictionary of regions, where the value is a list of member countries in the region.
+
+    """
+    # Load income groups.
     income_groups = load_income_groups()
 
-    countries_in_region = {}
+    countries_in_regions = {}
     for region in list(REGIONS_TO_ADD):
-        countries_in_region[region] = geo.list_countries_in_region(
+        # Add default OWID list of countries in region (which includes historical regions).
+        countries_in_regions[region] = geo.list_countries_in_region(
             region=region, income_groups=income_groups
         )
 
+    # Include additional countries in the region (if any given).
     for region in ADDITIONAL_COUNTRIES_IN_REGIONS:
-        countries_in_region[region] = (
-            countries_in_region[region] + ADDITIONAL_COUNTRIES_IN_REGIONS[region]
+        countries_in_regions[region] = (
+            countries_in_regions[region] + ADDITIONAL_COUNTRIES_IN_REGIONS[region]
         )
 
-    return countries_in_region
+    return countries_in_regions
 
 
 def add_region_aggregates(
@@ -432,50 +505,66 @@ def add_region_aggregates(
     region_codes: Optional[List[str]] = None,
     country_code_column: str = "country_code",
 ) -> pd.DataFrame:
-    """Add region aggregate for all regions.
-
-    Regions are defined above, in REGIONS_TO_ADD.
+    """Add region aggregates for all regions (which may include continents and income groups).
 
     Parameters
     ----------
     data : pd.DataFrame
         Data.
+    regions : list
+        Regions to include.
     index_columns : list
         Name of index columns.
-    index_columns : str
-        Index columns.
+    country_column : str
+        Name of country column.
     year_column : str
         Name of year column.
+    aggregates : dict or None
+        Dictionary of type of aggregation to use for each variable. If None, variables will be aggregated by summing.
+    known_overlaps : list or None
+        List of known overlaps between regions and their member countries.
+    region_codes : list or None
+        List of country codes for each new region. It must have the same number of elements, and in the same order, as
+        the 'regions' argument.
+    country_code_column : str
+        Name of country codes column (only relevant of region_codes is not None).
 
     Returns
     -------
     data : pd.DataFrame
-        Data after adding regions.
+        Data after adding aggregate regions.
 
     """
     data = data.copy()
 
     if aggregates is None:
+        # If aggregations are not specified, assume all variables are to be aggregated, by summing.
         aggregates = {
             column: "sum" for column in data.columns if column not in index_columns
         }
+    # Get the list of regions to create, and their member countries.
     countries_in_regions = load_countries_in_regions()
     for region in regions:
+        # List of countries in region.
         countries_in_region = countries_in_regions[region]
+        # Select rows of data for member countries.
         data_region = data[data[country_column].isin(countries_in_region)]
+        # Remove any known overlaps between regions (e.g. USSR, which is a historical region) in current region (e.g.
+        # Europe) and their member countries (or successor countries, like Russia).
+        # If any overlap in known_overlaps is not found, a warning will be raised.
         data_region = remove_overlapping_data_for_regions_and_members(
             df=data_region, known_overlaps=known_overlaps
         )
 
-        # Check that there are no other overlaps in the data.
+        # Check that there are no other overlaps in the data (after having removed the known ones).
         detect_overlapping_data_for_regions_and_members(
             df=data_region,
-            list_of_countries=countries_in_region,
+            regions_and_members=HISTORIC_TO_CURRENT_REGION,
             index_columns=index_columns,
             known_overlaps=known_overlaps,
         )
 
-        # Add regions.
+        # Add region aggregates.
         data_region = geo.add_region_aggregates(
             df=data_region,
             region=region,
@@ -514,6 +603,8 @@ def prepare_output_table(df: pd.DataFrame, bp_table: catalog.Table) -> catalog.T
     ----------
     df : pd.DataFrame
         Processed BP data.
+    bp_table : catalog.Table
+        Original table of BP statistical review data (used to transfer its metadata to the new table).
 
     Returns
     -------
@@ -535,6 +626,7 @@ def prepare_output_table(df: pd.DataFrame, bp_table: catalog.Table) -> catalog.T
         .astype({"country_code": "category"})
     )
 
+    # Convert column names to lower, snake case.
     table = catalog.utils.underscore_table(table)
 
     # Get the table metadata from the original table.
@@ -543,37 +635,6 @@ def prepare_output_table(df: pd.DataFrame, bp_table: catalog.Table) -> catalog.T
     # Get the metadata of each variable from the original table.
     for column in table.drop(columns="country_code").columns:
         table[column].metadata = deepcopy(bp_table[column].metadata)
-
-    #
-    # All the code below is not necessary for now, given that we already have metadata for all variables.
-    # But we keep it just in case it is necessary when migrating the full dataset processing from importers to etl.
-    # Add metadata (e.g. unit) to each column.
-    # Define unit names (these are the long and short unit names that will be shown in grapher).
-    # The keys of the dictionary should correspond to units expected to be found in each of the variable names in table.
-    # short_unit_to_unit = {
-    #     "TWh": "terawatt-hours",
-    #     "kWh": "kilowatt-hours",
-    #     "%": "%",
-    # }
-    # Define number of decimal places to show (only relevant for grapher, not for the data).
-    # short_unit_to_num_decimals = {
-    #     "TWh": 0,
-    #     "kWh": 0,
-    # }
-    # for column in table.columns:
-    #     table[column].metadata.title = column
-    #     for short_unit in ["TWh", "kWh", "%"]:
-    #         if short_unit in column:
-    #             table[column].metadata.short_unit = short_unit
-    #             table[column].metadata.unit = short_unit_to_unit[short_unit]
-    #             table[column].metadata.display = {}
-    #             if short_unit in short_unit_to_num_decimals:
-    #                 table[column].metadata.display[
-    #                     "numDecimalPlaces"
-    #                 ] = short_unit_to_num_decimals[short_unit]
-    #             # Add the variable name without unit (only relevant for grapher).
-    #             table[column].metadata.display["name"] = column.split(" (")[0]
-    #
 
     return table
 
@@ -651,10 +712,22 @@ def fill_missing_values_with_previous_version(
 
 
 def amend_zero_filled_variables_for_region_aggregates(df: pd.DataFrame) -> pd.DataFrame:
+    """Fill the "* (zero filled)" variables (which were ignored when creating aggregates) with the new aggregate data,
+    and fill any possible nan with zeros.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Data after having created region aggregates (which ignore '* (zero filled)' variables).
+
+    Returns
+    -------
+    df : pd.DataFrame
+        Data after amending zero filled variables for region aggregates.
+
+    """
     df = df.copy()
 
-    # Fill the "* (zero filled)" variables (which were ignored when creating aggregates) with the new aggregate
-    # data, and fill any possible nan with zero.
     zero_filled_variables = [
         column for column in df.columns if "(zero filled)" in column
     ]
