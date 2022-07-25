@@ -1,10 +1,11 @@
-from owid import catalog
-import pandas as pd
-import slugify
-import yaml
 from pathlib import Path
 from typing import Iterable
 
+import pandas as pd
+import yaml
+from owid import catalog
+
+from etl import grapher_helpers as gh
 from etl.paths import DATA_DIR, REFERENCE_DATASET
 
 
@@ -85,41 +86,6 @@ def get_grapher_tables(dataset: catalog.Dataset) -> Iterable[catalog.Table]:
     for column in columns_to_export:
         assert table[column].metadata.unit is not None, "Unit should not be None here!"
 
-    # We have 5 dimensions but graphers data model can only handle 2 (year and entityId). This means
-    # we have to iterate all combinations of the remaining 3 dimensions and create a new variable for
-    # every combination that cuts out only the data points for a specific combination of these 3 dimensions
-    for ghe_cause_title in table.index.unique(level="ghe_cause_title").values:
-        for sex_code in table.index.unique(level="sex_code").values:
-            for agegroup_code in table.index.unique(level="agegroup_code").values:
-                print(f"{ghe_cause_title} - {sex_code} - {agegroup_code}")
-                # This is supposed to fix all dimensions except year and country_code to one excact value,
-                # collapsing this part of the dataframe so that for exactly this dimension tuple all countries
-                # and years are retrained and a Table with this subset is yielded
-                idx = pd.IndexSlice
-                cutout_table = table.loc[
-                    idx[:, :, ghe_cause_title, sex_code, agegroup_code], :
-                ]
+    __import__("ipdb").set_trace()
 
-                # drop the indices of the dimensions we fixed. The table to be yielded
-                # should only have the year and entity_id index and one value column
-                cutout_table.reset_index(level=4, drop=True, inplace=True)
-                cutout_table.reset_index(level=3, drop=True, inplace=True)
-                cutout_table.reset_index(level=2, drop=True, inplace=True)
-
-                # Now iterate over every column in the original dataset and export the
-                # subset of data that we prepared above
-                for column in columns_to_export:
-                    short_name = slugify.slugify(
-                        f"{column}__{ghe_cause_title}__{sex_code}__{agegroup_code}",
-                        separator="_",
-                    )
-
-                    table_to_yield = cutout_table[[column]]
-                    table_to_yield.metadata.short_name = short_name
-
-                    # Safety check to see if the metadata is still intact
-                    assert (
-                        table_to_yield[column].metadata.unit is not None
-                    ), "Unit should not be None here!"
-
-                    yield table_to_yield
+    yield from gh.yield_wide_table(table, na_action="drop")
