@@ -11,14 +11,7 @@ dataset:
       date_accessed: 8th July 2022
       url: https://www.bp.com/en/global/corporate/energy-economics/statistical-review-of-world-energy.html
   description: |
-    BP's definitions of regions sometimes differ from Our World in Data's definitions.
-    For example, BP's North America includes only Canada, Mexico and United States, whereas Our World in Data's North
-    America includes countries in Central America (see a map with
-    [our region definitions](https://ourworldindata.org/world-region-map-definitions)).
-    For this reason, we include in the dataset regions like "North America (BP)" to refer to BP's original data using
-    their definition of the region, as well as "North America", which is data aggregated by Our World in Data using our
-    definition.
-    These aggregates are constructed by adding up (when possible) the contributions from the countries in the region.
+    BP's definitions of regions sometimes differ from Our World in Data's definitions. For example, BP's North America includes only Canada, Mexico and United States, whereas Our World in Data's North America includes countries in Central America (see a map with [our region definitions](https://ourworldindata.org/world-region-map-definitions)). For this reason, we include in the dataset regions like "North America (BP)" to refer to BP's original data using their definition of the region, as well as "North America", which is data aggregated by Our World in Data using our definition. These aggregates are constructed by adding up (when possible) the contributions from the countries in the region.
 
     [BP's region definitions](https://www.bp.com/en/global/corporate/energy-economics/statistical-review-of-world-energy/using-the-review/definitions-and-explanatory-notes.html#accordion_Regional%20definitions), denoted with '(BP)', are:
     * Asia Pacific (BP): Brunei, Cambodia, China (Mainland), China Hong Kong SAR (Special Administrative Region), China Macau SAR (Special Administrative Region), Indonesia, Japan, Laos, Malaysia, Mongolia, North Korea, Philippines, Singapore, South Asia (Afghanistan, Bangladesh, India, Myanmar, Nepal, Pakistan and Sri Lanka), South Korea, Taiwan, Thailand, Vietnam, Australia, New Zealand, Papua New Guinea and Oceania.
@@ -39,14 +32,11 @@ dataset:
     * Southern Africa (BP): Botswana, Lesotho, Namibia, South Africa, Swaziland.
     * Western Africa (BP): Territories on the west coast of Africa from Mauritania to Nigeria, including Burkina Faso, Cape Verde, Mali and Niger.
 
-    Additionally, BP includes some regions that are not explicitly defined (e.g. 'Other Europe (BP)', or 'Other CIS (BP)').
-    We define our regions in the following way:
+    Additionally, BP includes some regions that are not explicitly defined (e.g. 'Other Europe (BP)', or 'Other CIS (BP)'). We define our regions in the following way:
     * Africa - All African countries + Other Africa (BP).
     * Asia - All Asian countries + Other Middle East (BP) + Other CIS (BP) + Other Asia Pacific (BP).
     * Europe - All European countries + Other Europe (BP).
     * North America - All North American countries + Other Caribbean (BP) + Other North America (BP).
     * Oceania - All Oceanian countries.
     * South America - All South American countries + Other South America (BP).
-    Where the individual countries in each region are defined [in this map](https://ourworldindata.org/world-region-map-definitions).
-    Additional BP regions are ignored, since they belong to other regions already included (e.g. the data for 'Other Western Africa (BP)' is included in 'Other Africa (BP)').
-    Finally, income groups are constructed following the definitions [in this map](https://ourworldindata.org/grapher/world-banks-income-groups).
+    Where the individual countries in each region are defined [in this map](https://ourworldindata.org/world-region-map-definitions). Additional BP regions are ignored, since they belong to other regions already included (e.g. the data for 'Other Western Africa (BP)' is included in 'Other Africa (BP)'). Finally, income groups are constructed following the definitions [in this map](https://ourworldindata.org/grapher/world-banks-income-groups).
