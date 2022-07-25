@@ -20,6 +20,10 @@ VERSION = Path(__file__).parent.stem
 FNAME = Path(__file__).stem
 NAMESPACE = Path(__file__).parent.parent.stem
 
+VERSION = "2022-07-07"
+FNAME = "un_sdg"
+NAMESPACE = "un_sdg"
+
 
 def get_grapher_dataset() -> Dataset:
     dataset = Dataset(DATA_DIR / f"garden/{NAMESPACE}/{VERSION}/{FNAME}")
@@ -28,6 +32,10 @@ def get_grapher_dataset() -> Dataset:
         f"{dataset.metadata.short_name}__{VERSION.replace('-', '_')}"
     )
     return dataset
+
+
+dataset = get_grapher_dataset()
+tables = get_grapher_tables(dataset)
 
 
 def get_grapher_tables(dataset: Dataset) -> Iterable[Table]:
@@ -42,55 +50,72 @@ def get_grapher_tables(dataset: Dataset) -> Iterable[Table]:
             "Loading data from garden and creating a dataframe with variable names to match grapher..."
         )
         var_df = create_dataframe_with_variable_name(ds_garden, var)
-        indicator = var_df["variable_name"].iloc[0].split("-")[0].strip()
-        print(indicator)
+
         if len(var_df["variable_name"].drop_duplicates()) > 1:
             var_gr = var_df.groupby("variable_name")
             for var_name, df_var in var_gr:
-
-                if len(df_var["source"].drop_duplicates()) > 1:
-                    clean_source = "Data from multiple sources compiled by the UN"
-                else:
-                    source_name = df_var["source"].drop_duplicates().iloc[0]
-                    assert (
-                        source_name in clean_source_map
-                    ), f"{source_name} not in un_sdg.sources.json - please add"
-                    clean_source = clean_source_map[source_name]
-
-                source = Source(
-                    name="UN SDG",
-                    description="%s: %s"
-                    % ("Metadata available at", get_metadata_link(indicator)),
-                    url=walden_ds.metadata["url"],
-                    source_data_url=walden_ds.metadata["source_data_url"],
-                    owid_data_url=walden_ds.metadata["owid_data_url"],
-                    date_accessed=walden_ds.metadata["date_accessed"],
-                    publication_date=walden_ds.metadata["publication_date"],
-                    publication_year=walden_ds.metadata["publication_year"],
-                    published_by=walden_ds.metadata["name"],
-                    publisher_source=clean_source,
+                print(var_name)
+                df_tab = add_metadata_and_prepare_for_grapher(
+                    df_var, var_name, clean_source_map, walden_ds
                 )
+                print(df_tab.head())
+                # yield df_tab
+        else:
+            var_name = var_df["variable_name"].drop_duplicates().iloc[0]
+            assert (
+                var_df["variable_name"].drop_duplicates().shape[0] == 1
+            ), f"{var_name} has multiple disaggregrations"
+            df_tab = add_metadata_and_prepare_for_grapher(
+                var_df, var_name, clean_source_map, walden_ds
+            )
+            print(df_tab.head())
+            # yield df_tab
 
-                df_var = Table(df_var)
-                df_var.metadata = VariableMeta(
-                    title=var_name,
-                    description="",
-                    sources=[source],
-                    unit=df_var["long_unit"].iloc[0],
-                    short_unit=df_var["short_unit"].iloc[0],
-                    additional_info=None,
-                )
-                df_var = df_var[["country", "year", "value"]]
-                if df_var["value"].apply(isinstance, args=[float]).all():
-                    df_var["value"] = df_var["value"].round(2)
-                df_var["entity_id"] = gh.country_to_entity_id(
-                    df_var["country"], create_entities=True
-                )
-                df_var = df_var.drop(columns=["country"]).set_index(
-                    ["year", "entity_id"]
-                )
 
-            yield df_var
+def add_metadata_and_prepare_for_grapher(
+    df_var: pd.DataFrame, var_name: str, clean_source_map: dict, walden_ds: Dataset
+) -> Table:
+
+    indicator = df_var["variable_name"].iloc[0].split("-")[0].strip()
+    if len(df_var["source"].drop_duplicates()) > 1:
+        clean_source = "Data from multiple sources compiled by the UN"
+    else:
+        source_name = df_var["source"].drop_duplicates().iloc[0]
+        assert (
+            source_name in clean_source_map
+        ), f"{source_name} not in un_sdg.sources.json - please add"
+        clean_source = clean_source_map[source_name]
+
+    source = Source(
+        name="UN SDG",
+        description="%s: %s" % ("Metadata available at", get_metadata_link(indicator)),
+        url=walden_ds.metadata["url"],
+        source_data_url=walden_ds.metadata["source_data_url"],
+        owid_data_url=walden_ds.metadata["owid_data_url"],
+        date_accessed=walden_ds.metadata["date_accessed"],
+        publication_date=walden_ds.metadata["publication_date"],
+        publication_year=walden_ds.metadata["publication_year"],
+        published_by=walden_ds.metadata["name"],
+        publisher_source=clean_source,
+    )
+
+    df_tab = Table(df_var)
+    df_tab.metadata = VariableMeta(
+        title=var_name,
+        description=df_var["seriesdescription"].iloc[0],
+        sources=[source],
+        unit=df_var["long_unit"].iloc[0],
+        short_unit=df_var["short_unit"].iloc[0],
+        additional_info=None,
+    )
+    df_tab = df_tab[["country", "year", "value"]]
+    if df_tab["value"].apply(isinstance, args=[float]).all():
+        df_tab["value"] = df_tab["value"].round(2)
+    df_tab["entity_id"] = gh.country_to_entity_id(
+        df_tab["country"], create_entities=True
+    )
+    df_tab = df_tab.drop(columns=["country"]).set_index(["year", "entity_id"])
+    return df_tab
 
 
 def create_dataframe_with_variable_name(dataset: Dataset, tab: str) -> pd.DataFrame:
@@ -99,6 +124,7 @@ def create_dataframe_with_variable_name(dataset: Dataset, tab: str) -> pd.DataFr
         "country",
         "year",
         "seriescode",
+        "seriesdescription",
         "variable_name",
         "value",
         "source",
