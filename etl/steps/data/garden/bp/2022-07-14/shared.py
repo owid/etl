@@ -553,7 +553,10 @@ def add_region_aggregates(
             aggregations=aggregates,
             countries_in_region=countries_in_region,
             countries_that_must_have_data=[],
-            frac_allowed_nans_per_year=None,
+            # Here we allow aggregating even when there are few countries informed (which seems to agree with BP's
+            # criterion for aggregates).
+            # However, if absolutely all countries have nan, we want the aggregate to be nan, not zero.
+            frac_allowed_nans_per_year=0.999,
             num_allowed_nans_per_year=None,
         )
         data = pd.concat(
