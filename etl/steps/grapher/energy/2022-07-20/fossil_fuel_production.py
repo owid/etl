@@ -14,7 +14,9 @@ GARDEN_DATASET_SHORT_NAME = "fossil_fuel_production"
 
 
 def get_grapher_dataset() -> catalog.Dataset:
-    dataset = catalog.Dataset(DATA_DIR / "garden" / NAMESPACE / GARDEN_VERSION / GARDEN_DATASET_SHORT_NAME)
+    dataset = catalog.Dataset(
+        DATA_DIR / "garden" / NAMESPACE / GARDEN_VERSION / GARDEN_DATASET_SHORT_NAME
+    )
     assert len(dataset.metadata.sources) == 1
 
     # Add institution and year to dataset short name (the name that will be used in grapher database).

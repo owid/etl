@@ -99,7 +99,9 @@ HISTORIC_TO_CURRENT_REGION = {
 
 def load_bp_data() -> catalog.Table:
     # Load BP Statistical Review dataset.
-    bp_dataset = catalog.Dataset(DATA_DIR / "garden" / BP_NAMESPACE / BP_VERSION / BP_DATASET_NAME)
+    bp_dataset = catalog.Dataset(
+        DATA_DIR / "garden" / BP_NAMESPACE / BP_VERSION / BP_DATASET_NAME
+    )
 
     # Get table.
     bp_table = bp_dataset[bp_dataset.table_names[0]].reset_index()
