@@ -21,6 +21,10 @@ VERSION = Path(__file__).parent.stem
 FNAME = Path(__file__).stem
 NAMESPACE = Path(__file__).parent.parent.stem
 
+VERSION = "2022-07-07"
+FNAME = "un_sdg"
+NAMESPACE = "un_sdg"
+
 
 def get_grapher_dataset() -> Dataset:
     dataset = Dataset(DATA_DIR / f"garden/{NAMESPACE}/{VERSION}/{FNAME}")
@@ -108,8 +112,8 @@ def add_metadata_and_prepare_for_grapher(
     df_var["variable"] = underscore(var_name)
 
     df_var = df_var[["country", "year", "value", "variable", "meta"]].copy()
-    if df_var["value"].apply(isinstance, args=[float]).all():
-        df_var["value"] = df_var["value"].round(2)
+    # convert integer values to int but round float to 2 decimal places, string remain as string
+    df_var["value"] = df_var["value"].apply(value_convert)
     df_var["entity_id"] = gh.country_to_entity_id(
         df_var["country"], create_entities=True
     )
@@ -189,3 +193,14 @@ def get_metadata_link(indicator: str) -> None:
         ctype_a = url_check.headers["Content-Type"]
         assert ctype_a == "application/pdf", url_a + "does not link to a pdf"
     return url_out
+
+
+def value_convert(value):
+    if isinstance(value, float) or isinstance(value, int):
+        if int(value) == value:
+            return int(value)
+        if float(value) == value:
+            value = round(value, 2)
+            return value
+    else:
+        return value
