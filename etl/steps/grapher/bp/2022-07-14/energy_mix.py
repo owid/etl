@@ -13,9 +13,11 @@ def get_grapher_dataset() -> catalog.Dataset:
     dataset = catalog.Dataset(DATA_DIR / "garden" / NAMESPACE / VERSION / "energy_mix")
     assert len(dataset.metadata.sources) == 1
 
-    # move description to source as that is what is shown in grapher
-    # (dataset.description would be displayed under `Internal notes` in the admin UI otherwise)
+    # Add institution and year to dataset short name (the name that will be used in grapher database).
+    dataset.metadata.short_name = dataset.metadata.short_name + f"__bp_2022"
+    # Copy the dataset description to the source's description, since this is what is shown in grapher.
     dataset.metadata.sources[0].description = dataset.metadata.description
+    # Empty dataset description (otherwise it will appear in `Internal notes` in the admin UI).
     dataset.metadata.description = ""
 
     return dataset
