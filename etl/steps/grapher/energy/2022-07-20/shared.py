@@ -3,12 +3,29 @@
 """
 
 from copy import deepcopy
+from typing import cast
 
 from etl import grapher_helpers as gh
+from owid import catalog
 from owid.catalog.utils import underscore
 
 
-def adapt_dataset_metadata_for_grapher(metadata):
+def adapt_dataset_metadata_for_grapher(
+    metadata: catalog.DatasetMeta,
+) -> catalog.DatasetMeta:
+    """Adapt metadata of a garden dataset to be used in a grapher step.
+
+    Parameters
+    ----------
+    metadata : catalog.DatasetMeta
+        Dataset metadata.
+
+    Returns
+    -------
+    metadata : catalog.DatasetMeta
+        Adapted dataset metadata, ready to be inserted into grapher.
+
+    """
     metadata = deepcopy(metadata)
 
     assert (
@@ -72,7 +89,26 @@ def adapt_dataset_metadata_for_grapher(metadata):
     return metadata
 
 
-def adapt_table_for_grapher(table, country_col="country", year_col="year"):
+def adapt_table_for_grapher(
+    table: catalog.Table, country_col: str = "country", year_col: str = "year"
+) -> catalog.Table:
+    """Adapt table (from a garden dataset) to be used in a grapher step.
+
+    Parameters
+    ----------
+    table : catalog.Table
+        Table from garden dataset.
+    country_col : str
+        Name of country column in table.
+    year_col : str
+        Name of year column in table.
+
+    Returns
+    -------
+    table : catalog.Table
+        Adapted table, ready to be inserted into grapher.
+
+    """
     table = deepcopy(table)
     # Grapher needs a column entity id, that is constructed based on the unique entity names in the database.
     table["entity_id"] = gh.country_to_entity_id(
@@ -81,4 +117,4 @@ def adapt_table_for_grapher(table, country_col="country", year_col="year"):
     table = table.drop(columns=[country_col]).rename(columns={year_col: "year"})
     table = table.set_index(["entity_id", "year"])
 
-    return table
+    return cast(catalog.Table, table)
