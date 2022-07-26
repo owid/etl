@@ -6,15 +6,19 @@ from typing import Iterable
 from etl import grapher_helpers as gh
 from etl.paths import DATA_DIR
 from owid import catalog
-from . import NAMESPACE, VERSION
+
+NAMESPACE = "bp"
+YEAR = "2022"
+GARDEN_VERSION = "2022-07-14"
+GARDEN_DATASET_SHORT_NAME = "energy_mix"
 
 
 def get_grapher_dataset() -> catalog.Dataset:
-    dataset = catalog.Dataset(DATA_DIR / "garden" / NAMESPACE / VERSION / "energy_mix")
+    dataset = catalog.Dataset(DATA_DIR / "garden" / NAMESPACE / GARDEN_VERSION / GARDEN_DATASET_SHORT_NAME)
     assert len(dataset.metadata.sources) == 1
 
     # Add institution and year to dataset short name (the name that will be used in grapher database).
-    dataset.metadata.short_name = dataset.metadata.short_name + f"__bp_2022"
+    dataset.metadata.short_name = dataset.metadata.short_name + f"__{NAMESPACE}_{YEAR}"
     # Copy the dataset description to the source's description, since this is what is shown in grapher.
     dataset.metadata.sources[0].description = dataset.metadata.description
     # Empty dataset description (otherwise it will appear in `Internal notes` in the admin UI).
