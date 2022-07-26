@@ -17,7 +17,7 @@ from etl.paths import DATA_DIR
 log = get_logger()
 
 NAMESPACE = "shift"
-DATASET_SHORT_NAME = "shift_fossil_fuel_production"
+DATASET_SHORT_NAME = "fossil_fuel_production"
 
 VERSION = Path(__file__).parent.name
 COUNTRY_MAPPING_PATH = (

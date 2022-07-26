@@ -11,7 +11,7 @@ from . import NAMESPACE, VERSION
 
 def get_grapher_dataset() -> catalog.Dataset:
     dataset = catalog.Dataset(
-        DATA_DIR / "garden" / NAMESPACE / VERSION / "bp_statistical_review"
+        DATA_DIR / "garden" / NAMESPACE / VERSION / "statistical_review"
     )
     assert len(dataset.metadata.sources) == 1
 

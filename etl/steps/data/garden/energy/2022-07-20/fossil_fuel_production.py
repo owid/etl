@@ -16,10 +16,10 @@ from .shared import CURRENT_DIR
 log = get_logger()
 
 NAMESPACE = "energy"
-DATASET_SHORT_NAME = "energy_fossil_fuel_production"
+DATASET_SHORT_NAME = "fossil_fuel_production"
 METADATA_PATH = CURRENT_DIR / f"{DATASET_SHORT_NAME}.meta.yml"
+SHIFT_DATASET_NAME = "fossil_fuel_production"
 SHIFT_VERSION = "2022-07-18"
-SHIFT_DATASET_NAME = "shift_fossil_fuel_production"
 
 # Original BP's Statistical Review Dataset name in the owid catalog (without the institution and year).
 # TODO: Instead of loading the backported stat review create a garden statistical review dataset with proper aggregates.

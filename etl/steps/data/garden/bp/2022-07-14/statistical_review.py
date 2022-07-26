@@ -17,9 +17,8 @@ from shared import CURRENT_DIR, REGIONS_TO_ADD, add_region_aggregates
 
 # Namespace and short name for output dataset.
 NAMESPACE = "bp"
-DATASET_SHORT_NAME = "bp_statistical_review"
 # Path to metadata file for current dataset.
-METADATA_FILE_PATH = CURRENT_DIR / "bp_statistical_review.meta.yml"
+METADATA_FILE_PATH = CURRENT_DIR / "statistical_review.meta.yml"
 # Original BP's Statistical Review dataset name in the OWID catalog (without the institution and year).
 BP_CATALOG_NAME = "statistical_review_of_world_energy"
 BP_NAMESPACE_IN_CATALOG = "bp_statreview"

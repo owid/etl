@@ -2,7 +2,7 @@ dataset:
   namespace: bp
   version: 2022-07-14
   title: Statistical Review of World Energy - BP (2022)
-  short_name: bp_statistical_review__bp_2022
+  short_name: statistical_review
   publication_year: 2022
   sources:
     -
