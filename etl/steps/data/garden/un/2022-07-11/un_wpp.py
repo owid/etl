@@ -16,7 +16,7 @@ from .dep_ratio import process as process_depratio
 from .deaths import process as process_deaths
 
 YEAR_SPLIT = 2022
-
+METADATA_PATH = Path(__file__).parent / "un_wpp.meta.yml"
 
 metric_categories = {
     "migration": [
