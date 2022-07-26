@@ -2,31 +2,21 @@
 #  __init__.py
 #  steps
 #
-import types
-from typing import (
-    Any,
-    Dict,
-    Optional,
-    Protocol,
-    List,
-    Set,
-    Union,
-    cast,
-    Iterable,
-)
-from pathlib import Path
+import concurrent.futures
+import graphlib
+import hashlib
 import re
 import sys
-import hashlib
 import tempfile
+import types
+import warnings
 from collections import defaultdict
-from urllib.parse import urlparse
 from dataclasses import dataclass, field
 from glob import glob
 from importlib import import_module
-import warnings
-import graphlib
-import concurrent.futures
+from pathlib import Path
+from typing import Any, Dict, Iterable, List, Optional, Protocol, Set, Union, cast
+from urllib.parse import urlparse
 
 import yaml
 
@@ -35,20 +25,19 @@ with warnings.catch_warnings():
     warnings.simplefilter("ignore")
     import papermill as pm
 
-from owid import catalog
-from owid import walden
+from owid import catalog, walden
 from owid.walden import CATALOG as WALDEN_CATALOG
 
-from etl import files, paths, git
-from etl.helpers import get_etag
+from etl import backport_helpers, files, git, paths
 from etl.grapher_import import (
-    upsert_table,
-    upsert_dataset,
     cleanup_ghost_sources,
     cleanup_ghost_variables,
     fetch_db_checksum,
+    set_dataset_checksum_to_null,
+    upsert_dataset,
+    upsert_table,
 )
-from etl import backport_helpers
+from etl.helpers import get_etag
 
 Graph = Dict[str, Set[str]]
 DAG = Dict[str, Any]
@@ -576,10 +565,16 @@ class GrapherStep(Step):
             dataset.metadata.sources,
             self.checksum_input(),
         )
-        variable_upsert_results = [
-            upsert_table(table, dataset_upsert_results)
-            for table in step_module.get_grapher_tables(dataset)  # type: ignore
-        ]
+        try:
+            variable_upsert_results = [
+                upsert_table(table, dataset_upsert_results)
+                for table in step_module.get_grapher_tables(dataset)  # type: ignore
+            ]
+        except Exception as e:
+            # dataset has been already inserted into DB with checksum, make it null again so that the
+            # step remains dirty
+            set_dataset_checksum_to_null(dataset_upsert_results.dataset_id)
+            raise e
 
         # Cleanup all ghost variables and sources that weren't upserted
         # NOTE: we can't just remove all dataset variables before starting this step because

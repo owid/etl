@@ -1,7 +1,7 @@
 dataset:
   sources:
 tables:
-  shift_fossil_fuel_production:
+  fossil_fuel_production:
     variables:
       coal:
         title: "Coal production"
