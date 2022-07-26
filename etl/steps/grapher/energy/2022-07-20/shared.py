@@ -11,18 +11,37 @@ from owid.catalog.utils import underscore
 def adapt_dataset_metadata_for_grapher(metadata):
     metadata = deepcopy(metadata)
 
-    assert len(metadata.sources) >= 1, "Dataset needs to have at least one source in metadata."
+    assert (
+        len(metadata.sources) >= 1
+    ), "Dataset needs to have at least one source in metadata."
 
     # Define the 'default_source', which will be the one where all sources' attributes are combined.
     default_source = metadata.sources[0]
     # Attributes to combine from sources.
-    attributes = ["name", "description", "url", "source_data_url", "owid_data_url", "date_accessed",
-                  "publication_date", "publication_year", "published_by", "publisher_source"]
+    attributes = [
+        "name",
+        "description",
+        "url",
+        "source_data_url",
+        "owid_data_url",
+        "date_accessed",
+        "publication_date",
+        "publication_year",
+        "published_by",
+        "publisher_source",
+    ]
     # Combine sources' attributes into the first source (which is the only one that grapher will interpret).
     for attribute in attributes:
         # Gather non-empty values from each source for current attribute.
-        values = list(set([getattr(source, attribute)
-                           for source in metadata.sources if getattr(source, attribute) is not None]))
+        values = list(
+            set(
+                [
+                    getattr(source, attribute)
+                    for source in metadata.sources
+                    if getattr(source, attribute) is not None
+                ]
+            )
+        )
         if attribute == "description":
             if metadata.description is not None:
                 # Add the dataset description as if it was a source's description.
@@ -56,7 +75,9 @@ def adapt_dataset_metadata_for_grapher(metadata):
 def adapt_table_for_grapher(table, country_col="country", year_col="year"):
     table = deepcopy(table)
     # Grapher needs a column entity id, that is constructed based on the unique entity names in the database.
-    table["entity_id"] = gh.country_to_entity_id(table[country_col], create_entities=True)
+    table["entity_id"] = gh.country_to_entity_id(
+        table[country_col], create_entities=True
+    )
     table = table.drop(columns=[country_col]).rename(columns={year_col: "year"})
     table = table.set_index(["entity_id", "year"])
 
