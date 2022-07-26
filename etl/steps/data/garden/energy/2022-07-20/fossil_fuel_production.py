@@ -1,5 +1,5 @@
-"""Garden step for Fossil fuel production dataset (part of the OWID Energy dataset), based on a combination of BP energy
-mix dataset and Shift data on fossil fuel production.
+"""Garden step for Fossil fuel production dataset (part of the OWID Energy dataset), based on a combination of
+BP Statistical Review dataset and Shift data on fossil fuel production.
 
 """
 
@@ -11,7 +11,7 @@ from structlog import get_logger
 from typing import cast
 
 from etl.paths import DATA_DIR
-from .shared import CURRENT_DIR
+from shared import CURRENT_DIR
 
 log = get_logger()
 
@@ -22,10 +22,9 @@ SHIFT_DATASET_NAME = "fossil_fuel_production"
 SHIFT_VERSION = "2022-07-18"
 
 # Original BP's Statistical Review Dataset name in the owid catalog (without the institution and year).
-# TODO: Instead of loading the backported stat review create a garden statistical review dataset with proper aggregates.
-BP_DATASET_NAME = "statistical_review_of_world_energy"
-BP_NAMESPACE = "bp_statreview"
-BP_VERSION = 2022
+BP_DATASET_NAME = "statistical_review"
+BP_NAMESPACE = "bp"
+BP_VERSION = "2022-07-14"
 
 # Conversion factors.
 # Terawatt-hours to kilowatt-hours.
@@ -99,12 +98,13 @@ HISTORIC_TO_CURRENT_REGION = {
 
 
 def load_bp_data() -> catalog.Table:
-    # Load table from latest BP dataset.
-    bp_table = catalog.find_one(
-        BP_DATASET_NAME, channels=["backport"], namespace=f"{BP_NAMESPACE}@{BP_VERSION}"
-    ).reset_index()
+    # Load BP Statistical Review dataset.
+    bp_dataset = catalog.Dataset(DATA_DIR / "garden" / BP_NAMESPACE / BP_VERSION / BP_DATASET_NAME)
+
+    # Get table.
+    bp_table = bp_dataset[bp_dataset.table_names[0]].reset_index()
     bp_columns = {
-        "entity_name": "country",
+        "country": "country",
         "year": "year",
         "coal_production__twh": "Coal production (TWh)",
         "gas_production__twh": "Gas production (TWh)",
@@ -348,7 +348,7 @@ def run(dest_dir: str) -> None:
     #
     # Load data.
     #
-    # Load BP energy mix dataset.
+    # Load BP statistical review dataset.
     bp_table = load_bp_data()
 
     # Load Shift data on fossil fuel production.

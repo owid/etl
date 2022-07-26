@@ -132,9 +132,9 @@ steps:
     - data://meadow/shift/2022-07-18/fossil_fuel_production
   # Garden step for Fossil Fuel Production 2022.
   data://garden/energy/2022-07-20/fossil_fuel_production:
-    # TODO: Instead of energy_mix, it should depend on a new garden statistical review dataset with proper aggregates.
-    - data://garden/bp/2022-07-14/energy_mix
+    - data://garden/bp/2022-07-14/statistical_review
     - data://garden/shift/2022-07-18/fossil_fuel_production
+    - data://garden/owid/latest/key_indicators
 
   # Examples
   data://examples/examples/latest/script_example:
