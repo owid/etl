@@ -87,41 +87,35 @@ tables:
         title: "Coal production"
         short_unit: "TWh"
         unit: "terawatt-hours"
-        description:
-          display:
-            numDecimalPlaces: 0
+        display:
+          numDecimalPlaces: 0
       coal_production_per_capita__kwh:
         title: "Coal production per capita"
         short_unit: "kWh"
         unit: "kilowatt-hours"
-        description:
-          display:
-            numDecimalPlaces: 0
+        display:
+          numDecimalPlaces: 0
       gas_production__twh:
         title: "Gas production"
         short_unit: "TWh"
         unit: "terawatt-hours"
-        description:
-          display:
-            numDecimalPlaces: 0
+        display:
+          numDecimalPlaces: 0
       gas_production_per_capita__kwh:
         title: "Gas production per capita"
         short_unit: "kWh"
         unit: "kilowatt-hours"
-        description:
-          display:
-            numDecimalPlaces: 0
+        display:
+          numDecimalPlaces: 0
       oil_production__twh:
         title: "Oil production"
         short_unit: "TWh"
         unit: "terawatt-hours"
-        description:
-          display:
-            numDecimalPlaces: 0
+        display:
+          numDecimalPlaces: 0
       oil_production_per_capita__kwh:
         title: "Oil production per capita"
         short_unit: "kWh"
         unit: "kilowatt-hours"
-        description:
-          display:
-            numDecimalPlaces: 0
+        display:
+          numDecimalPlaces: 0
