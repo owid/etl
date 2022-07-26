@@ -1,6 +1,6 @@
 dataset:
   namespace: bp
-  version: 2021
+  version: 2022-07-11
   title: Energy mix from BP
   short_name: bp_energy_mix__bp_2021
   publication_year: 2021
