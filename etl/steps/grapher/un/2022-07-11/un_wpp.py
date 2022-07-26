@@ -11,7 +11,7 @@ def get_grapher_dataset() -> catalog.Dataset:
     assert len(dataset.metadata.sources) == 1
 
     # short_name should include dataset name and version
-    dataset.metadata.short_name = "un_wpp__2022-07-11"
+    dataset.metadata.short_name = "un_wpp__2022_07_11"
 
     # move description to source as that is what is shown in grapher
     # (dataset.description would be displayed under `Internal notes` in the admin UI otherwise)
