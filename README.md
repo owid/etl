@@ -361,3 +361,31 @@ Fastrack is a service that polls grapher database for dataset updates and backpo
 3. Publish new ETL catalog to S3
 
 All these steps have been optimized to run in a few seconds (except of huge datasets) and make them available through [data-api](https://github.com/owid/data-api).
+
+
+## Staging
+
+_Internal OWID staff only_
+
+We have a staging environment for ETL that runs automatically on every push to `staging` branch. You can push directly to `staging` branch as it's quite unlikely someone else would be using it at the same time. Don't bother with creating pull requests for merging to `staging`. Pushing to staging goes something like this:
+
+```bash
+# rebase your branch on master
+git checkout mybranch
+git rebase origin/master
+
+# reset staging to your branch
+git checkout staging
+git reset --hard mybranch
+
+# push staging and let it execute automatically
+git push
+```
+
+If the ETL fails on staging, you'll see it in `#analytics-errors` channel on Slack. You can check logs in `/tmp/etl-staging.log` on our `owid-analytics` server or ssh into it and rerun the ETL manually:
+
+```bash
+ssh owid-analytics
+cd etl-staging
+.venv/bin/etl garden explorers
+```
