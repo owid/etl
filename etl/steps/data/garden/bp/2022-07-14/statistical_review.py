@@ -12,8 +12,9 @@ from copy import deepcopy
 import numpy as np
 import pandas as pd
 
+from etl.paths import DATA_DIR
 from owid import catalog
-from shared import CURRENT_DIR, REGIONS_TO_ADD, add_region_aggregates
+from shared import CURRENT_DIR, HISTORIC_TO_CURRENT_REGION, REGIONS_TO_ADD, add_region_aggregates
 
 # Namespace and short name for output dataset.
 NAMESPACE = "bp"
@@ -23,11 +24,8 @@ METADATA_FILE_PATH = CURRENT_DIR / "statistical_review.meta.yml"
 BP_CATALOG_NAME = "statistical_review_of_world_energy"
 BP_NAMESPACE_IN_CATALOG = "bp_statreview"
 BP_VERSION = 2022
-# Previous BP's Statistical Review dataset.
-# It will be used to fill missing data in the new dataset.
-BP_CATALOG_NAME_OLD = "statistical_review_of_world_energy"
-BP_NAMESPACE_IN_CATALOG_OLD = "bp_statreview"
-BP_VERSION_OLD = 2021
+# Path to previous (processed) Statistical Review dataset.
+BP_DATASET_OLD_PATH = DATA_DIR / "garden" / "bp" / "2022-07-11" / "statistical_review"
 
 # List of known overlaps between regions and member countries (or successor countries).
 OVERLAPPING_DATA_TO_REMOVE_IN_AGGREGATES = [
@@ -39,6 +37,15 @@ OVERLAPPING_DATA_TO_REMOVE_IN_AGGREGATES = [
         "variable": "Gas - Proved reserves",
     }
 ]
+
+# In the new dataset there are many missing values that were not missing in the previous release.
+# We use data from the previous dataset to fill those gaps.
+# However, we avoid certain countries in regions:
+# * All region aggregates, since aggregates each year may include data from different countries.
+# * USSR and their successor countries, since, in the old dataset, there is plenty of overlap between them (which does
+#   not happen in the new release).
+COUNTRIES_TO_AVOID_WHEN_FILLING_NANS_WITH_PREVIOUS_RELEASE = \
+    list(REGIONS_TO_ADD) + ["USSR"] + HISTORIC_TO_CURRENT_REGION["USSR"]["members"]
 
 # True to ignore zeros when checking for overlaps between regions and member countries.
 # This means that, if a region (e.g. USSR) and a member country or successor country (e.g. Russia) overlap, but in a
@@ -206,25 +213,16 @@ def fill_missing_values_with_previous_version(
         version of the dataset.
 
     """
-    # For region aggregates, avoid filling nan with values from previous releases.
-    # The reason is that aggregates each year may include data from different countries.
-    # This is especially necessary in 2022 because regions had different definitions in 2021 (the ones by BP).
+
     # Remove region aggregates from the old table.
-    table_old = (
-        table_old.reset_index()
-        .rename(columns={"entity_name": "country", "entity_code": "country_code"})
-        .drop(columns=["entity_id"])
-    )
-    table_old = (
-        table_old[~table_old["country"].isin(list(REGIONS_TO_ADD))]
-        .reset_index(drop=True)
-        .set_index(["country", "year"])
-    )
+    table_old = table_old.reset_index().drop(columns="country_code")
+    table_old = table_old[~table_old["country"].isin(COUNTRIES_TO_AVOID_WHEN_FILLING_NANS_WITH_PREVIOUS_RELEASE)].\
+        reset_index(drop=True).set_index(["country", "year"])
 
     # Combine the current output table with the table from the previous version the dataset.
     combined = pd.merge(
         table,
-        table_old.drop(columns="country_code"),
+        table_old,
         left_index=True,
         right_index=True,
         how="left",
@@ -237,7 +235,8 @@ def fill_missing_values_with_previous_version(
     # Fill missing values in the current table with values from the old table.
     for column_old in columns:
         column = column_old.replace("_old", "")
-        combined[column] = combined[column].fillna(combined[column_old])
+        combined[column] = combined[column].fillna(combined[column_old])        
+
     # Remove columns from the old table.
     combined = combined.drop(columns=columns)
 
@@ -305,11 +304,8 @@ def run(dest_dir: str) -> None:
 
     # Load previous version of the BP energy mix dataset, that will be used at the end to fill missing values in the
     # current dataset.
-    bp_table_old = catalog.find_one(
-        BP_CATALOG_NAME_OLD,
-        channels=["backport"],
-        namespace=f"{BP_NAMESPACE_IN_CATALOG_OLD}@{BP_VERSION_OLD}",
-    )
+    bp_dataset_old = catalog.Dataset(BP_DATASET_OLD_PATH)
+    bp_table_old = bp_dataset_old[bp_dataset_old.table_names[0]]
 
     #
     # Process data.
@@ -348,7 +344,7 @@ def run(dest_dir: str) -> None:
     table = prepare_output_table(df, bp_table)
 
     # Fill missing values in current table with values from the previous dataset, when possible.
-    combined = fill_missing_values_with_previous_version(
+    table = fill_missing_values_with_previous_version(
         table=table, table_old=bp_table_old
     )
 
@@ -363,9 +359,9 @@ def run(dest_dir: str) -> None:
     dataset.save()
 
     # Add table to the dataset.
-    combined.metadata.title = dataset.metadata.title
-    combined.metadata.description = dataset.metadata.description
-    combined.metadata.dataset = dataset.metadata
-    combined.metadata.short_name = dataset.metadata.short_name
-    combined.metadata.primary_key = list(combined.index.names)
-    dataset.add(combined, repack=True)
+    table.metadata.title = dataset.metadata.title
+    table.metadata.description = dataset.metadata.description
+    table.metadata.dataset = dataset.metadata
+    table.metadata.short_name = dataset.metadata.short_name
+    table.metadata.primary_key = list(table.index.names)
+    dataset.add(table, repack=True)
