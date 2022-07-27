@@ -1,4 +1,3 @@
-# type: ignore
 import os
 import re
 import logging
@@ -15,7 +14,7 @@ from pandas.api.types import is_numeric_dtype
 from pymysql.err import IntegrityError
 from etl.db_utils import DBUtils
 from etl.db import get_connection
-from etl.utils import IntRange
+from etl.grapher_helpers import IntRange
 
 load_dotenv()
 
