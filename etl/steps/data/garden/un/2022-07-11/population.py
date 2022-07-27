@@ -99,6 +99,8 @@ def _add_metric_sexratio(df: pd.DataFrame) -> pd.DataFrame:
         df_sr.age.isin(
             [
                 "0",
+                "5",
+                "10",
                 "15",
                 "20",
                 "30",
