@@ -11,10 +11,10 @@ manually. This script is a CLI tool that may help in either scenario.
 import argparse
 import json
 import os
-
+from typing import Callable, Any
 import pandas as pd
 from fuzzywuzzy import fuzz
-
+import MySQLdb
 from etl.db import get_connection
 
 # CURRENT_DIR = "etl/steps/grapher/un_sdg/2022-07-07"
@@ -38,8 +38,8 @@ SIMILARITY_NAMES = {
 
 
 def get_similarity_function(
-    similarity_name=SIMILARITY_NAME, similarity_names=SIMILARITY_NAMES
-):
+    similarity_name: str, similarity_names: dict[str, Callable[[str, str], int]]
+) -> Callable[[str, str], int]:
     """Return a similarity function given its name.
 
     Parameters
@@ -61,14 +61,14 @@ def get_similarity_function(
     return similarity_function
 
 
-def get_dataset_id(db_conn, dataset_name):
+def get_dataset_id(db_conn: MySQLdb.Connection, dataset_name: str) -> Any:
     """Get the dataset ID of a specific dataset name from database.
 
     If more than one dataset is found for the same name, or if no dataset is found, an error is raised.
 
     Parameters
     ----------
-    db_conn : pymysql.connections.Connection
+    db_conn : MySQLdb.Connection
         Connection to database.
     dataset_name : str
         Dataset name.
@@ -94,7 +94,9 @@ def get_dataset_id(db_conn, dataset_name):
     return dataset_id
 
 
-def get_variables_in_dataset(db_conn, dataset_id, only_used_in_charts=False):
+def get_variables_in_dataset(
+    db_conn: MySQLdb.Connection, dataset_id: int, only_used_in_charts: bool = False
+) -> Any:
     """Get all variables data for a specific dataset ID from database.
 
     Parameters
@@ -128,7 +130,7 @@ def get_variables_in_dataset(db_conn, dataset_id, only_used_in_charts=False):
     return variables_data
 
 
-def load_from_json_file(json_file):
+def load_from_json_file(json_file: str) -> Any:
     """Load data from a json file.
 
     Parameters
@@ -148,7 +150,7 @@ def load_from_json_file(json_file):
     return data
 
 
-def save_data_to_json_file(data, json_file, **kwargs):
+def save_data_to_json_file(data: list[str], json_file: str, **kwargs: Any) -> None:
     """Save data to a json file.
 
     Parameters
@@ -169,18 +171,21 @@ def save_data_to_json_file(data, json_file, **kwargs):
 
 
 def _display_compared_variables(
-    old_name, new_name, missing_new, n_max_suggestions=N_MAX_SUGGESTIONS
-):
+    old_name: str,
+    new_name: str,
+    missing_new: pd.DataFrame,
+    n_max_suggestions: int = N_MAX_SUGGESTIONS,
+) -> None:
     print(f"\nOld variable: {old_name}")
     print(f"New variable: {new_name}")
-    print(f"\n Other options:")
+    print("\n Other options:")
     for i, row in missing_new.iloc[1 : 1 + n_max_suggestions].iterrows():
         print(
             f"  {i:5} - {row['name_new']} (id={row['id_new']}, similarity={row['similarity']:.0f})"
         )
 
 
-def _input_manual_decision(new_indexes):
+def _input_manual_decision(new_indexes: list[Any]) -> Any:
     decision = input(
         "Press enter to accept this option, or type chosen index. To ignore this variable, type i."
     )
@@ -202,11 +207,11 @@ def _input_manual_decision(new_indexes):
 
 
 def map_old_and_new_variables(
-    old_variables,
-    new_variables,
-    omit_identical=True,
-    matching_function=fuzz.partial_ratio,
-):
+    old_variables: pd.DataFrame,
+    new_variables: pd.DataFrame,
+    omit_identical: bool = True,
+    matching_function: Callable[[str, str], int] = fuzz.partial_ratio,
+) -> pd.DataFrame:
     """Map old variables to new variables, either automatically (when they match perfectly) or manually.
 
     Parameters
@@ -307,7 +312,9 @@ def map_old_and_new_variables(
     return mapping
 
 
-def display_summary(old_variables, new_variables, mapping):
+def display_summary(
+    old_variables: pd.DataFrame, new_variables: pd.DataFrame, mapping: pd.DataFrame
+) -> None:
     """Display summary of the result of the mapping.
 
     Parameters
@@ -345,7 +352,7 @@ def display_summary(old_variables, new_variables, mapping):
         print("\nAll variables in the new dataset have been matched.")
 
 
-def save_variable_replacements_file(mapping, output_file):
+def save_variable_replacements_file(mapping: pd.DataFrame, output_file: str) -> None:
     """Save a json file with the mapping from old to new variable ids.
 
     Parameters
@@ -369,12 +376,12 @@ def save_variable_replacements_file(mapping, output_file):
 
 
 def main(
-    old_dataset_name,
-    new_dataset_name,
-    output_file,
-    omit_identical=OMIT_IDENTICAL,
-    similarity_name=SIMILARITY_NAME,
-):
+    old_dataset_name: str,
+    new_dataset_name: str,
+    output_file: str,
+    omit_identical: bool = OMIT_IDENTICAL,
+    similarity_name: str = SIMILARITY_NAME,
+) -> None:
     with get_connection() as db_conn:
         # Get old and new dataset ids.
         old_dataset_id = get_dataset_id(db_conn=db_conn, dataset_name=old_dataset_name)
@@ -390,7 +397,7 @@ def main(
         )
 
     # Select similarity function.
-    similarity_function = get_similarity_function(similarity_name=similarity_name)
+    similarity_function = get_similarity_function(similarity_name, SIMILARITY_NAMES)
 
     # Manually map old variable names to new variable names.
     mapping = map_old_and_new_variables(
@@ -416,17 +423,17 @@ if __name__ == "__main__":
     parser.add_argument(
         "-f",
         "--output_file",
-        help=f"Path to output json file.",
+        help="Path to output json file.",
     )
     parser.add_argument(
         "-old",
         "--old_dataset_name",
-        help=f"Old dataset name (as defined in grapher).",
+        help="Old dataset name (as defined in grapher).",
     )
     parser.add_argument(
         "-new",
         "--new_dataset_name",
-        help=f"New dataset name (as defined in grapher).",
+        help="New dataset name (as defined in grapher).",
     )
     parser.add_argument(
         "-s",

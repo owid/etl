@@ -11,9 +11,9 @@ def import_from(module: str, name: str) -> Any:
 
 @dataclass
 class IntRange:
-    min: int  # type: ignore
+    min: int
     _min: int = field(init=False, repr=False)
-    max: int  # type: ignore
+    max: int
     _max: int = field(init=False, repr=False)
 
     @property  # type: ignore
@@ -33,8 +33,8 @@ class IntRange:
         self._max = int(x)
 
     @staticmethod
-    def from_values(xs: List[int]):
+    def from_values(xs: List[int]) -> Any:
         return IntRange(min(xs), max(xs))
 
-    def to_values(self):
+    def to_values(self) -> list[int]:
         return [self.min, self.max]

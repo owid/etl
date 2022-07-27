@@ -24,7 +24,7 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 DEBUG = os.getenv("DEBUG") == "True"
-USER_ID = int(os.getenv("GRAPHER_USER_ID"))  # type: ignore
+USER_ID = int(os.getenv("GRAPHER_USER_ID"))
 
 
 class ChartRevisionSuggester:
