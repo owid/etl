@@ -169,21 +169,35 @@ def _slugify_column_and_dimensions(column: str, dims: List[str]) -> str:
 def yield_long_table(
     table: catalog.Table, annot: Optional[Annotation] = None
 ) -> Iterable[catalog.Table]:
-    """Yield from long table with columns `variable`, `value` and optionally `unit`."""
-    assert set(table.columns) <= {"variable", "value", "unit"}
+    """Yield from long table with the following columns:
+    - variable: short variable name (needs to be underscored)
+    - value: variable value
+    - meta: either VariableMeta object or null in every row
+    """
+    assert set(table.columns) == {
+        "variable",
+        "meta",
+        "value",
+    }, "Table must have columns `variable`, `meta` and `value`"
+    assert isinstance(table, catalog.Table), "Table must be instance of `catalog.Table`"
+    assert (
+        table["meta"].dropna().map(lambda x: isinstance(x, catalog.VariableMeta)).all()
+    ), "Values in column `meta` must be either instances of `catalog.VariableMeta` or null"
 
     for var_name, t in table.groupby("variable"):
         t = t.rename(columns={"value": var_name})
 
-        if "unit" in t.columns:
-            # move variable to its own column and annotate it
-            assert len(set(t["unit"])) == 1, "units must be the same for all rows"
-            t[var_name].metadata.unit = t.unit.iloc[0]
+        # extract metadata from column and make sure it is identical for all rows
+        meta = t.pop("meta")
+        assert set(meta.map(id)) == {
+            id(meta.iloc[0])
+        }, f"Variable `{var_name}` must have same metadata objects in column `meta` for all rows"
+        t[var_name].metadata = meta.iloc[0]
 
         if annot:
             t = annotate_table(t, annot, missing_col="ignore")
 
-        t = t.drop(["variable", "unit"], axis=1, errors="ignore")
+        t = t.drop(["variable", "meta"], axis=1, errors="ignore")
 
         yield from yield_wide_table(cast(catalog.Table, t))
 
