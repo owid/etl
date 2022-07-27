@@ -21,10 +21,6 @@ VERSION = Path(__file__).parent.stem
 FNAME = Path(__file__).stem
 NAMESPACE = Path(__file__).parent.parent.stem
 
-# VERSION = "2022-07-07"
-# FNAME = "un_sdg"
-# NAMESPACE = "un_sdg"
-
 
 def get_grapher_dataset() -> Dataset:
     dataset = Dataset(DATA_DIR / f"garden/{NAMESPACE}/{VERSION}/{FNAME}")
