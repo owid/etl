@@ -10,11 +10,11 @@ import simplejson as json
 from dotenv import load_dotenv
 import pandas as pd
 from tqdm import tqdm
-from pandas.api.types import is_numeric_dtype
 from pymysql.err import IntegrityError
 from etl.db_utils import DBUtils
 from etl.db import get_connection
 from etl.grapher_helpers import IntRange
+
 
 load_dotenv()
 
@@ -63,9 +63,7 @@ class ChartRevisionSuggester:
 
     def suggest(self, *args, **kwargs) -> None:
         kwargs["suggested_chart_revisions"] = self.prepare()
-        self.insert(
-            *args, **kwargs, version=self.version, dataset_name=self.dataset_name
-        )
+        self.insert(*args, **kwargs, dataset_name=self.dataset_name)
 
     def load_variable_replacements(self) -> Dict[int, int]:
         try:
@@ -134,7 +132,6 @@ class ChartRevisionSuggester:
 
     def insert(
         self,
-        version,
         dataset_name,
         suggested_chart_revisions: List[dict],
         suggested_reason: str = None,
@@ -436,8 +433,8 @@ class ChartRevisionSuggester:
                     chart_config["minTime"] == "earliest"
                     or chart_config["maxTime"] == "earliest"
                     or (
-                        is_numeric_dtype(chart_config["minTime"])
-                        and is_numeric_dtype(chart_config["maxTime"])
+                        pd.api.types.is_numeric_dtype(chart_config["minTime"])
+                        and pd.api.types.is_numeric_dtype(chart_config["maxTime"])
                         and abs(chart_config["minTime"] - old_range.min)
                         < abs(chart_config["maxTime"] - old_range.max)
                     )
