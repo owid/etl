@@ -11,7 +11,7 @@ from shared import CURRENT_DIR, add_population
 
 # Namespace, dataset short name, and version of the garden dataset of the BP statistical review.
 STAT_REVIEW_NAMESPACE = "bp"
-STAT_REVIEW_SHORT_NAME = "bp_statistical_review"
+STAT_REVIEW_SHORT_NAME = "statistical_review"
 STAT_REVIEW_VERSION = "2022-07-14"
 # Path to metadata file.
 METADATA_FILE_PATH = CURRENT_DIR / "energy_mix.meta.yml"
