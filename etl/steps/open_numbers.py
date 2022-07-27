@@ -8,7 +8,7 @@ Convert repositories with data in DDF format to OWID's Dataset and Table
 format.
 """
 
-from concurrent.futures import ProcessPoolExecutor
+from multiprocessing import Pool
 from pathlib import Path
 from typing import Dict, List, Tuple, cast
 import hashlib
@@ -54,9 +54,12 @@ def run(dest_dir: str) -> None:
     resource_map = remap_names(package.resources)
 
     # copy tables one by one
-    with ProcessPoolExecutor() as executor:
-        for short_name, resources in resource_map.items():
-            executor.submit(add_resource, ds, repo, short_name, resources)
+    with Pool() as pool:
+        args = [
+            (ds, repo, short_name, resources)
+            for short_name, resources in resource_map.items()
+        ]
+        pool.starmap(add_resource, args)
 
 
 def add_resource(
