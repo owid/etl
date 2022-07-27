@@ -14,7 +14,12 @@ import pandas as pd
 
 from etl.paths import DATA_DIR
 from owid import catalog
-from shared import CURRENT_DIR, HISTORIC_TO_CURRENT_REGION, REGIONS_TO_ADD, add_region_aggregates
+from shared import (
+    CURRENT_DIR,
+    HISTORIC_TO_CURRENT_REGION,
+    REGIONS_TO_ADD,
+    add_region_aggregates,
+)
 
 # Namespace and short name for output dataset.
 NAMESPACE = "bp"
@@ -44,8 +49,9 @@ OVERLAPPING_DATA_TO_REMOVE_IN_AGGREGATES = [
 # * All region aggregates, since aggregates each year may include data from different countries.
 # * USSR and their successor countries, since, in the old dataset, there is plenty of overlap between them (which does
 #   not happen in the new release).
-COUNTRIES_TO_AVOID_WHEN_FILLING_NANS_WITH_PREVIOUS_RELEASE = \
-    list(REGIONS_TO_ADD) + ["USSR"] + HISTORIC_TO_CURRENT_REGION["USSR"]["members"]
+COUNTRIES_TO_AVOID_WHEN_FILLING_NANS_WITH_PREVIOUS_RELEASE = (
+    list(REGIONS_TO_ADD) + ["USSR"] + HISTORIC_TO_CURRENT_REGION["USSR"]["members"]  # type: ignore
+)
 
 # True to ignore zeros when checking for overlaps between regions and member countries.
 # This means that, if a region (e.g. USSR) and a member country or successor country (e.g. Russia) overlap, but in a
@@ -216,8 +222,15 @@ def fill_missing_values_with_previous_version(
 
     # Remove region aggregates from the old table.
     table_old = table_old.reset_index().drop(columns="country_code")
-    table_old = table_old[~table_old["country"].isin(COUNTRIES_TO_AVOID_WHEN_FILLING_NANS_WITH_PREVIOUS_RELEASE)].\
-        reset_index(drop=True).set_index(["country", "year"])
+    table_old = (
+        table_old[
+            ~table_old["country"].isin(
+                COUNTRIES_TO_AVOID_WHEN_FILLING_NANS_WITH_PREVIOUS_RELEASE
+            )
+        ]
+        .reset_index(drop=True)
+        .set_index(["country", "year"])
+    )
 
     # Combine the current output table with the table from the previous version the dataset.
     combined = pd.merge(
@@ -235,7 +248,7 @@ def fill_missing_values_with_previous_version(
     # Fill missing values in the current table with values from the old table.
     for column_old in columns:
         column = column_old.replace("_old", "")
-        combined[column] = combined[column].fillna(combined[column_old])        
+        combined[column] = combined[column].fillna(combined[column_old])
 
     # Remove columns from the old table.
     combined = combined.drop(columns=columns)

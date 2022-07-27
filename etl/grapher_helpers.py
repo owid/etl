@@ -276,7 +276,7 @@ def join_sources(sources: List[catalog.meta.Source]) -> catalog.meta.Source:
 
 
 # TODO: The following function and join_sources are redundant. Merge the functionality of both into one function.
-def combine_metadata_sources(metadata):
+def combine_metadata_sources(metadata: catalog.DatasetMeta) -> catalog.DatasetMeta:
     """Combine each of the attributes in the sources of a dataset's metadata, and assign them to the first source, since
     that is the only source that grapher will read.
 
@@ -398,9 +398,7 @@ def adapt_table_for_grapher(
     """
     table = deepcopy(table)
     # Grapher needs a column entity id, that is constructed based on the unique entity names in the database.
-    table["entity_id"] = country_to_entity_id(
-        table[country_col], create_entities=True
-    )
+    table["entity_id"] = country_to_entity_id(table[country_col], create_entities=True)
     table = table.drop(columns=[country_col]).rename(columns={year_col: "year"})
     table = table.set_index(["entity_id", "year"])
 
@@ -409,7 +407,9 @@ def adapt_table_for_grapher(
     for column in table.columns:
         if len(table[column].metadata.sources) == 0:
             # Take the metadata sources from the dataset's metadata (after combining them into one).
-            table[column].metadata.sources = combine_metadata_sources(table.metadata.dataset).sources
+            table[column].metadata.sources = combine_metadata_sources(
+                table.metadata.dataset
+            ).sources
         if table[column].metadata.sources[0].description is None:
             # Add the table description to the first source, so that it is displayed on the SOURCES tab.
             table[column].metadata.sources[0].description = table.metadata.description

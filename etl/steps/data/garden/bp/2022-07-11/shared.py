@@ -560,7 +560,10 @@ def add_region_aggregates(
             num_allowed_nans_per_year=None,
         )
         data = pd.concat(
-            [data[~(data[country_column].astype(str) == region)], data_region[data_region[country_column] == region]],
+            [
+                data[~(data[country_column].astype(str) == region)],
+                data_region[data_region[country_column] == region],
+            ],
             ignore_index=True,
         ).reset_index(drop=True)
 
