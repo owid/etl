@@ -315,14 +315,12 @@ def combine_metadata_sources(metadata: catalog.DatasetMeta) -> catalog.DatasetMe
     # Combine sources' attributes into the first source (which is the only one that grapher will interpret).
     for attribute in attributes:
         # Gather non-empty values from each source for current attribute.
-        values = list(
-            set(
+        values = _unique(
                 [
                     getattr(source, attribute)
                     for source in metadata.sources
                     if getattr(source, attribute) is not None
                 ]
-            )
         )
         if attribute == "description":
             if metadata.description is not None:
