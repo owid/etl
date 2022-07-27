@@ -1,9 +1,11 @@
 from typing import Iterable
+from owid.catalog.meta import VariableMeta
+import yaml
 
 from owid import catalog
 
 from etl import grapher_helpers as gh
-from etl.paths import DATA_DIR
+from etl.paths import DATA_DIR, STEP_DIR
 
 
 def get_grapher_dataset() -> catalog.Dataset:
@@ -28,8 +30,21 @@ def get_grapher_tables(dataset: catalog.Dataset) -> Iterable[catalog.Table]:
     table["entity_id"] = gh.country_to_entity_id(table["location"])
 
     # use entity_id and year as indexes in grapher
-    table = table.set_index(["entity_id", "year"])
+    table = table.set_index(["entity_id", "year", "sex", "age", "variant"])[
+        ["metric", "value"]
+    ].rename(
+        columns={
+            "metric": "variable",
+        }
+    )
 
-    # convert table into grapher format
-    # if you data is in long format, use gh.yield_long_table
-    yield from gh.yield_wide_table(table, na_action="drop")
+    with open(STEP_DIR / "data/garden/un/2022-07-11/un_wpp.meta.yml", "r") as f:
+        meta = yaml.safe_load(f)
+
+    meta_map = {}
+    for var_name, var_meta in meta["tables"]["long"]["variables"].items():
+        meta_map[var_name] = catalog.VariableMeta(**var_meta)
+
+    table["meta"] = table["variable"].astype(object).map(meta_map)
+
+    yield from gh.yield_long_table(catalog.Table(table))
