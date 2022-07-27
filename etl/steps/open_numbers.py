@@ -8,6 +8,7 @@ Convert repositories with data in DDF format to OWID's Dataset and Table
 format.
 """
 
+from multiprocessing import Pool
 from pathlib import Path
 from typing import Dict, List, Tuple, cast
 import hashlib
@@ -53,30 +54,52 @@ def run(dest_dir: str) -> None:
     resource_map = remap_names(package.resources)
 
     # copy tables one by one
-    for short_name, resources in resource_map.items():
-        print(f"- {short_name}")
+    with Pool() as pool:
+        args = [
+            (ds, repo, short_name, resources)
+            for short_name, resources in resource_map.items()
+        ]
+        pool.starmap(add_resource, args)
+
+
+def add_resource(
+    ds: Dataset,
+    repo: GithubRepo,
+    short_name: str,
+    resources: List[frictionless.Resource],
+) -> None:
+    print(f"- {short_name}")
+    try:
         if len(resources) > 1:
-            df = load_all_resources(repo.cache_dir, resources)
+            df = load_and_combine(repo.cache_dir, resources)
         else:
-            (resource,) = resources
-            try:
-                df = resource.to_pandas()
+            df = load_table(resources[0])
 
-            except FrictionlessException:
-                # see: https://github.com/owid/etl/issues/36
-                print("  ERROR: skipping")
-                continue
+    except FrictionlessException:
+        # see: https://github.com/owid/etl/issues/36
+        print("  ERROR: skipping")
+        return
 
-            # use smaller, more accurate column types that minimise space
-            if "global" in df.columns:
-                df["geo"] = df.pop("global")
+    t = Table(df)
+    t.metadata.short_name = short_name
 
-        t = Table(df)
-        t.metadata.short_name = short_name
-        ds.add(utils.underscore_table(t))
+    # adapt the table name and its column names to our naming convention
+    t = utils.underscore_table(t)
+
+    ds.add(t)
 
 
-def load_all_resources(
+def load_table(resource: frictionless.Resource) -> pd.DataFrame:
+    df = cast(pd.DataFrame, resource.to_pandas())
+
+    # use smaller, more accurate column types that minimise space
+    if "global" in df.columns:
+        df["geo"] = df.pop("global")
+
+    return df
+
+
+def load_and_combine(
     path: Path, resources: List[frictionless.Resource]
 ) -> pd.DataFrame:
     first = True
