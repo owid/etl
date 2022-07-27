@@ -316,11 +316,11 @@ def combine_metadata_sources(metadata: catalog.DatasetMeta) -> catalog.DatasetMe
     for attribute in attributes:
         # Gather non-empty values from each source for current attribute.
         values = _unique(
-                [
-                    getattr(source, attribute)
-                    for source in metadata.sources
-                    if getattr(source, attribute) is not None
-                ]
+            [
+                getattr(source, attribute)
+                for source in metadata.sources
+                if getattr(source, attribute) is not None
+            ]
         )
         if attribute == "description":
             if metadata.description is not None:
