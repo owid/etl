@@ -10,7 +10,6 @@ from typing import Iterable, List, Optional, Tuple, Dict
 from copy import deepcopy
 
 import simplejson as json
-from dotenv import load_dotenv
 import pandas as pd
 from tqdm import tqdm
 from pymysql.err import IntegrityError
