@@ -3,8 +3,11 @@
 #  etl
 #
 
-from contextlib import contextmanager
+import sys
 import tempfile
+from collections.abc import Generator
+from contextlib import contextmanager
+from pathlib import Path
 from typing import Any, Iterator, List, cast
 
 import requests
@@ -50,3 +53,27 @@ def _get_github_branches(org: str, repo: str) -> List[Any]:
         raise Exception("reached single page limit, should paginate request")
 
     return branches
+
+
+@contextmanager
+def isolated_env(working_dir: Path) -> Generator[None, None, None]:
+    """Add given directory to pythonpath, run code in context, and
+    then remove from pythonpath and unimport modules imported in context.
+
+    Note that unimporting modules means they'll have to be imported again, but
+    it has minimal impact on performance (ms).
+    """
+    # add module dir to pythonpath
+    sys.path.append(working_dir.as_posix())
+
+    # remember modules that were imported before
+    imported_modules = set(sys.modules.keys())
+
+    yield
+
+    # unimport modules imported during execution
+    for module_name in set(sys.modules.keys()) - imported_modules:
+        sys.modules.pop(module_name)
+
+    # remove module dir from pythonpath
+    sys.path.remove(working_dir.as_posix())
