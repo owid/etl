@@ -6,6 +6,8 @@ variables and map them to the indexes of the identical variables in the new data
 However, if variable names have changed (or the number of variables have changed) the pairing may need to be done
 manually. This script is a CLI tool that may help in either scenario.
 
+The original script was originally from the owid/importers repo: https://github.com/owid/importers/blob/master/standard_revisions/match_variables_from_two_versions_of_a_dataset.py
+
 """
 
 import argparse

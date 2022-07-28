@@ -42,9 +42,11 @@ class ChartRevisionSuggester:
                 {"2032": 147395, "2033": 147396, ...}
 
     Usage:
-        >>> from standard_importer.chart_revision_suggester import ChartRevisionSuggester
+        >>> from etl.chart_revision_suggester import ChartRevisionSuggester
         >>> dataset_dir = "worldbank_wdi"
-        >>> suggester = ChartRevisionSuggester(dataset_dir)
+        >>> version = "2022-05-26"
+        >>> new_dataset_name = "wdi__2022_05_26"
+        >>> suggester = ChartRevisionSuggester(dataset_dir, version, new_dataset_name)
         >>> suggester.suggest()
     """
 
