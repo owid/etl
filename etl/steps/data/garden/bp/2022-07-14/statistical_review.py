@@ -219,7 +219,6 @@ def fill_missing_values_with_previous_version(
         version of the dataset.
 
     """
-
     # Remove region aggregates from the old table.
     table_old = table_old.reset_index().drop(columns="country_code")
     table_old = (
@@ -232,10 +231,19 @@ def fill_missing_values_with_previous_version(
         .set_index(["country", "year"])
     )
 
+    # We should only merge on columns that exist in the new dataset.
+    # If we merge on all columns, we would get old columns from the old dataset that do not exist in the current one.
+    # This could be thought of a possitive outcome, but we avoid it because:
+    # * It would be misleading to claim that this data is from BP Statistical Review (2022), since it would be
+    #   a mix of different releases.
+    # * By doing an outer join, some countries in the old dataset that may not be present in the current dataset
+    #   may be added (e.g. Kenya and Ethiopia were present in the 2021 release because they had data for
+    #   geothermal_capacity, but they are not included in the 2022 release, since they don't have data for any other
+    #   variable). This could lead to unharmonized country names appearing in the current dataset.
     # Combine the current output table with the table from the previous version the dataset.
     combined = pd.merge(
         table,
-        table_old,
+        table_old[[column for column in table_old.columns if column in table.columns]],
         left_index=True,
         right_index=True,
         how="left",
