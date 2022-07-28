@@ -58,6 +58,8 @@ def extract_variable_from_raw_eia_data(raw_data: pd.DataFrame, variable_name: st
         Extracted data for given variable and unit, as a dataframe indexed by country-year.
 
     """
+    
+
     columns = {
         "name": "country",
         "geography": "members",
@@ -65,9 +67,13 @@ def extract_variable_from_raw_eia_data(raw_data: pd.DataFrame, variable_name: st
     }
     # Keep only rows with data for the given variable and unit.
     data = raw_data[raw_data["name"].str.contains(variable_name, regex=False) &
-                    (raw_data["units"] == unit_name)].reset_index(drop=True)
+                    (raw_data["units"] == unit_name)].reset_index(drop=True)    
+
     # Select and rename columns.
     data = data[list(columns)].rename(columns=columns)
+
+    # Remove rows without data.
+    data = data.dropna(subset=["values"])
 
     # Extract the country name.
     data["country"] = data["country"].str.split(f"{variable_name}, ").str[1].str.split(f", {data_time_interval}").str[0]
@@ -122,7 +128,7 @@ def run(dest_dir: str) -> None:
     ds.save()
 
     # Create a table in the dataset with the same metadata as the dataset.
-    table_metadata = TableMeta(short_name=walden_ds.short_name, title=walden_ds.name, description=walden_ds.description)
+    table_metadata = TableMeta(short_name=DATASET_SHORT_NAME, title=DATASET_TITLE, description=DATASET_DESCRIPTION)
     tb = Table(data, metadata=table_metadata)
 
     # Ensure all columns are lower-case and snake-case.
