@@ -333,8 +333,8 @@ def combine_metadata_sources(metadata: catalog.DatasetMeta) -> catalog.DatasetMe
             combined_value = " ; ".join(values)
 
         # Instead of leaving an empty string, make any empty field None.
-        if combined_value == '':
-            combined_value = None
+        if combined_value == "":
+            combined_value = None  # type: ignore
 
         setattr(default_source, attribute, combined_value)
 

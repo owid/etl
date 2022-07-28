@@ -170,8 +170,42 @@ OVERLAPPING_DATA_TO_REMOVE_IN_AGGREGATES = [
         "region": "Netherlands Antilles",
         "member": "Aruba",
         "entity_to_make_nan": "region",
-        "years": [1986, 1987, 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002,
-                  2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019],
+        "years": [
+            1986,
+            1987,
+            1988,
+            1989,
+            1990,
+            1991,
+            1992,
+            1993,
+            1994,
+            1995,
+            1996,
+            1997,
+            1998,
+            1999,
+            2000,
+            2001,
+            2002,
+            2003,
+            2004,
+            2005,
+            2006,
+            2007,
+            2008,
+            2009,
+            2010,
+            2011,
+            2012,
+            2013,
+            2014,
+            2015,
+            2016,
+            2017,
+            2018,
+            2019,
+        ],
         "variable": "energy_consumption",
     }
 ]
@@ -529,7 +563,7 @@ def add_region_aggregates(
     known_overlaps: Optional[List[Dict[str, Union[str, List[int]]]]] = None,
     region_codes: Optional[List[str]] = None,
     country_code_column: str = "country_code",
-    keep_original_region_with_suffix: Optional[str] = False,
+    keep_original_region_with_suffix: Optional[str] = None,
 ) -> pd.DataFrame:
     """Add region aggregates for all regions (which may include continents and income groups).
 
@@ -611,7 +645,10 @@ def add_region_aggregates(
             keep_original_region_with_suffix=keep_original_region_with_suffix,
         )
         data = pd.concat(
-            [data[data[country_column] != region], data_region[data_region[country_column] == region]],
+            [
+                data[data[country_column] != region],
+                data_region[data_region[country_column] == region],
+            ],
             ignore_index=True,
         ).reset_index(drop=True)
 

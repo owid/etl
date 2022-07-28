@@ -2,6 +2,8 @@
 
 """
 
+from typing import cast
+
 import numpy as np
 import pandas as pd
 from structlog import get_logger
@@ -10,7 +12,6 @@ from etl.steps.data.converters import convert_walden_metadata
 from owid.catalog import Dataset, Table, TableMeta
 from owid.catalog.utils import underscore_table
 from owid.walden import Catalog as WaldenCatalog
-from shared import VERSION
 
 log = get_logger()
 
@@ -27,8 +28,12 @@ VARIABLE_NAME = "Total energy consumption"
 UNIT_NAME = "terajoules"
 
 
-def extract_variable_from_raw_eia_data(raw_data: pd.DataFrame, variable_name: str, unit_name: str,
-                                       data_time_interval: str = "Annual") -> pd.DataFrame:
+def extract_variable_from_raw_eia_data(
+    raw_data: pd.DataFrame,
+    variable_name: str,
+    unit_name: str,
+    data_time_interval: str = "Annual",
+) -> pd.DataFrame:
     """Extract data for a certain variable and unit from the raw EIA data (the International Energy Data obtained via
     bulk download).
 
@@ -58,7 +63,6 @@ def extract_variable_from_raw_eia_data(raw_data: pd.DataFrame, variable_name: st
         Extracted data for given variable and unit, as a dataframe indexed by country-year.
 
     """
-    
 
     columns = {
         "name": "country",
@@ -66,8 +70,10 @@ def extract_variable_from_raw_eia_data(raw_data: pd.DataFrame, variable_name: st
         "data": "values",
     }
     # Keep only rows with data for the given variable and unit.
-    data = raw_data[raw_data["name"].str.contains(variable_name, regex=False) &
-                    (raw_data["units"] == unit_name)].reset_index(drop=True)    
+    data = raw_data[
+        raw_data["name"].str.contains(variable_name, regex=False)
+        & (raw_data["units"] == unit_name)
+    ].reset_index(drop=True)
 
     # Select and rename columns.
     data = data[list(columns)].rename(columns=columns)
@@ -76,7 +82,13 @@ def extract_variable_from_raw_eia_data(raw_data: pd.DataFrame, variable_name: st
     data = data.dropna(subset=["values"])
 
     # Extract the country name.
-    data["country"] = data["country"].str.split(f"{variable_name}, ").str[1].str.split(f", {data_time_interval}").str[0]
+    data["country"] = (
+        data["country"]
+        .str.split(f"{variable_name}, ")
+        .str[1]
+        .str.split(f", {data_time_interval}")
+        .str[0]
+    )
 
     # For some reason some countries are duplicated; drop those duplicates.
     data = data.drop_duplicates(subset="country", keep="last")
@@ -94,7 +106,7 @@ def extract_variable_from_raw_eia_data(raw_data: pd.DataFrame, variable_name: st
     # Set index and sort appropriately.
     data = data.set_index(["country", "year"], verify_integrity=True).sort_index()
 
-    return data
+    return cast(pd.DataFrame, data)
 
 
 def run(dest_dir: str) -> None:
@@ -104,8 +116,11 @@ def run(dest_dir: str) -> None:
     # Load data.
     #
     # Load ingested raw data from walden.
-    walden_ds = WaldenCatalog().find_one(namespace=NAMESPACE, short_name=WALDEN_DATASET_SHORT_NAME,
-                                         version=WALDEN_VERSION)
+    walden_ds = WaldenCatalog().find_one(
+        namespace=NAMESPACE,
+        short_name=WALDEN_DATASET_SHORT_NAME,
+        version=WALDEN_VERSION,
+    )
     local_file = walden_ds.ensure_downloaded()
     raw_data = pd.read_json(local_file, lines=True)
 
@@ -113,7 +128,9 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     # Extract total energy consumption from the raw data.
-    data = extract_variable_from_raw_eia_data(raw_data=raw_data, variable_name=VARIABLE_NAME, unit_name=UNIT_NAME)
+    data = extract_variable_from_raw_eia_data(
+        raw_data=raw_data, variable_name=VARIABLE_NAME, unit_name=UNIT_NAME
+    )
 
     #
     # Save outputs.
@@ -128,7 +145,11 @@ def run(dest_dir: str) -> None:
     ds.save()
 
     # Create a table in the dataset with the same metadata as the dataset.
-    table_metadata = TableMeta(short_name=DATASET_SHORT_NAME, title=DATASET_TITLE, description=DATASET_DESCRIPTION)
+    table_metadata = TableMeta(
+        short_name=DATASET_SHORT_NAME,
+        title=DATASET_TITLE,
+        description=DATASET_DESCRIPTION,
+    )
     tb = Table(data, metadata=table_metadata)
 
     # Ensure all columns are lower-case and snake-case.

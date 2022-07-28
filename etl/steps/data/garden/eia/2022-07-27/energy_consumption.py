@@ -8,7 +8,15 @@ from owid.catalog.utils import underscore_table
 from owid.datautils import geo
 
 from etl.paths import DATA_DIR
-from shared import CURRENT_DIR, NAMESPACE, OVERLAPPING_DATA_TO_REMOVE_IN_AGGREGATES, REGIONS_TO_ADD, VERSION, add_region_aggregates, log
+from shared import (
+    CURRENT_DIR,
+    NAMESPACE,
+    OVERLAPPING_DATA_TO_REMOVE_IN_AGGREGATES,
+    REGIONS_TO_ADD,
+    VERSION,
+    add_region_aggregates,
+    log,
+)
 
 
 DATASET_SHORT_NAME = "energy_consumption"
@@ -27,7 +35,9 @@ def run(dest_dir: str) -> None:
     # Load data.
     #
     # Load meadow dataset and get the only table inside (with the same name).
-    ds_meadow = catalog.Dataset(DATA_DIR / f"meadow/{NAMESPACE}/{VERSION}/{DATASET_SHORT_NAME}")
+    ds_meadow = catalog.Dataset(
+        DATA_DIR / f"meadow/{NAMESPACE}/{VERSION}/{DATASET_SHORT_NAME}"
+    )
     tb_meadow = ds_meadow[DATASET_SHORT_NAME]
 
     # Convert table into a dataframe.
@@ -48,9 +58,9 @@ def run(dest_dir: str) -> None:
     log.info(f"{DATASET_SHORT_NAME}.add_region_aggregates")
     df = add_region_aggregates(
         data=df,
-        regions=REGIONS_TO_ADD,
+        regions=list(REGIONS_TO_ADD),
         index_columns=["country", "year"],
-        known_overlaps=OVERLAPPING_DATA_TO_REMOVE_IN_AGGREGATES,
+        known_overlaps=OVERLAPPING_DATA_TO_REMOVE_IN_AGGREGATES,  # type: ignore
     )
 
     # Prepare output data.
