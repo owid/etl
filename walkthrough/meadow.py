@@ -197,5 +197,5 @@ def _check_dataset_in_walden(form: MeadowForm) -> None:
         po.put_success("Dataset found in Walden")
     except KeyError as e:
         # raise a warning, but continue
-        if e.args[0] == "no match for dataset":
+        if "no match for dataset" in e.args[0]:
             po.put_warning("Dataset not found in Walden, did you upload it?")
