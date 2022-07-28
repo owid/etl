@@ -344,9 +344,9 @@ def combine_metadata_sources(metadata: catalog.DatasetMeta) -> catalog.DatasetMe
             # Descriptions are usually long, so it is better so put together descriptions from different sources in
             # separate lines.
             combined_value = "\n".join(values)
-        elif attribute == "date_accessed":
+        elif attribute in ["date_accessed", "publication_year"]:
             # For dates simply take the one from the first source.
-            combined_value = values[0]
+            combined_value = values[0] if values else None
         else:
             # For any other attribute, values from different sources can be in the same line, separated by ;.
             combined_value = " ; ".join(values)
