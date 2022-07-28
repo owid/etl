@@ -61,9 +61,9 @@ def run(dest_dir: str) -> None:
     #
     # Create a new garden dataset (with the same metadata as the meadow version).
     ds_garden = catalog.Dataset.create_empty(dest_dir)
-    ds_garden.metadata = ds_meadow.metadata
-    ds_garden.save()
+    # ds_garden.metadata = ds_meadow.metadata
     ds_garden.metadata.update_from_yaml(METADATA_PATH)
+    ds_garden.save()
 
     # Create a new table.
     tb_garden = underscore_table(catalog.Table(df))

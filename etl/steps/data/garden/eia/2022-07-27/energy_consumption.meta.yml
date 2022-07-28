@@ -14,6 +14,7 @@ dataset:
      -
        name: Our World in Data based on EIA's total energy consumption (2022)
        published_by: U.S. Energy Information Administration (EIA)
+       publication_year: 2022
        date_accessed: 2022-07-27
        url: https://www.eia.gov/opendata/bulkfiles.php
 
@@ -24,3 +25,5 @@ tables:
          title: Total energy consumption (TWh)
          short_unit: TWh
          unit: terawatt-hours
+         display:
+           name: Total energy consumption
