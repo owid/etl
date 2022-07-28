@@ -25,10 +25,9 @@ REGIONS_TO_ADD = {
     "Europe": {
         "country_code": "OWID_EUR",
     },
-    # The EU27 is already included in the original BP data, with the same definition as OWID.
-    # "European Union (27)": {
-    #     "country_code": "OWID_EU27",
-    # },
+    "European Union (27)": {
+        "country_code": "OWID_EU27",
+    },
     "Africa": {
         "country_code": "OWID_AFR",
     },
@@ -52,42 +51,13 @@ REGIONS_TO_ADD = {
     },
 }
 
-# We need to include the 'Other * (BP)' regions, otherwise continents have incomplete data.
-# For example, when constructing the aggregate for Africa, we need to include 'Other Africa (BP)'.
-# Otherwise we would be underestimating the region's total contribution.
-ADDITIONAL_COUNTRIES_IN_REGIONS = {
-    "Africa": [
-        # Additional African regions in BP's data (e.g. 'Other Western Africa (BP)') seem to be included in
-        # 'Other Africa (BP)', therefore we ignore them when creating aggregates.
-        "Other Africa (BP)",
-    ],
-    "Asia": [
-        # Adding 'Other Asia Pacific (BP)' may include areas of Oceania in Asia.
-        # However, it seems that this region is usually significantly smaller than Asia.
-        # So, we are possibly overestimating Asia, but not by a significant amount.
-        "Other Asia Pacific (BP)",
-        # Similarly, adding 'Other CIS (BP)' in Asia may include areas of Europe in Asia (e.g. Moldova).
-        # However, since most countries in 'Other CIS (BP)' are Asian, adding it is more accurate than not adding it.
-        "Other CIS (BP)",
-        # Countries defined by BP in 'Middle East' are fully included in OWID's definition of Asia.
-        "Other Middle East (BP)",
-    ],
-    "Europe": [
-        "Other Europe (BP)",
-    ],
-    "North America": [
-        "Other Caribbean (BP)",
-        "Other North America (BP)",
-    ],
-    "South America": [
-        "Other South America (BP)",
-    ],
-    # Given that 'Other Asia and Pacific (BP)' is often similar or even larger than Oceania, we avoid including it in
-    # Oceania (and include it in Asia, see comment above).
-    # This means that we may be underestimating Oceania by a significant amount, but BP does not provide unambiguous
-    # data to avoid this.
-    "Oceania": [],
-}
+# Additional countries to include in region aggregates.
+ADDITIONAL_COUNTRIES_IN_REGIONS: Dict[str, List[str]] = {}
+# ADDITIONAL_COUNTRIES_IN_REGIONS = {
+#     "Africa": [
+#         "Other Africa (BP)",
+#     ],
+# }
 
 # When creating region aggregates, decide how to distribute historical regions.
 # The following decisions are based on the current location of the countries that succeeded the region, and their income
@@ -637,8 +607,7 @@ def add_region_aggregates(
             aggregations=aggregates,
             countries_in_region=countries_in_region,
             countries_that_must_have_data=[],
-            # Here we allow aggregating even when there are few countries informed (which seems to agree with BP's
-            # criterion for aggregates).
+            # Here we allow aggregating even when there are few countries informed.
             # However, if absolutely all countries have nan, we want the aggregate to be nan, not zero.
             frac_allowed_nans_per_year=0.999,
             num_allowed_nans_per_year=None,
