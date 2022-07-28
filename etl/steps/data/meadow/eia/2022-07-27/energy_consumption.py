@@ -14,9 +14,11 @@ from shared import VERSION
 
 log = get_logger()
 
-# Namespace and short name of output dataset.
+# Namespace, short name, title and description of the output dataset.
 NAMESPACE = "eia"
 DATASET_SHORT_NAME = "energy_consumption"
+DATASET_TITLE = "Energy consumption (EIA, 2022)"
+DATASET_DESCRIPTION = "Total energy consumption."
 # Short name of raw data in walden.
 WALDEN_DATASET_SHORT_NAME = "international_energy_data"
 WALDEN_VERSION = "2022-07-27"
@@ -113,6 +115,10 @@ def run(dest_dir: str) -> None:
     # Create new dataset using metadata from walden.
     ds = Dataset.create_empty(dest_dir)
     ds.metadata = convert_walden_metadata(walden_ds)
+    # Update metadata appropriately.
+    ds.metadata.short_name = DATASET_SHORT_NAME
+    ds.metadata.title = DATASET_TITLE
+    ds.metadata.description = DATASET_DESCRIPTION
     ds.save()
 
     # Create a table in the dataset with the same metadata as the dataset.
