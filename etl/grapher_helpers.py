@@ -1,18 +1,20 @@
-import pandas as pd
-from owid import catalog
-import yaml
-import slugify
-import warnings
 import logging
+import warnings
+from copy import deepcopy
+from dataclasses import dataclass, field
 from pathlib import Path
-
 from typing import Optional, Dict, Literal, cast, List, Any, Set, Iterable
+
+import pandas as pd
+import slugify
+import yaml
 from pydantic import BaseModel
 
-from etl.paths import REFERENCE_DATASET
 from etl.db import get_connection, get_engine
 from etl.db_utils import DBUtils
-
+from etl.paths import REFERENCE_DATASET
+from owid import catalog
+from owid.catalog.utils import underscore
 
 logging.basicConfig()
 logger = logging.getLogger(__name__)
@@ -168,21 +170,35 @@ def _slugify_column_and_dimensions(column: str, dims: List[str]) -> str:
 def yield_long_table(
     table: catalog.Table, annot: Optional[Annotation] = None
 ) -> Iterable[catalog.Table]:
-    """Yield from long table with columns `variable`, `value` and optionally `unit`."""
-    assert set(table.columns) <= {"variable", "value", "unit"}
+    """Yield from long table with the following columns:
+    - variable: short variable name (needs to be underscored)
+    - value: variable value
+    - meta: either VariableMeta object or null in every row
+    """
+    assert set(table.columns) == {
+        "variable",
+        "meta",
+        "value",
+    }, "Table must have columns `variable`, `meta` and `value`"
+    assert isinstance(table, catalog.Table), "Table must be instance of `catalog.Table`"
+    assert (
+        table["meta"].dropna().map(lambda x: isinstance(x, catalog.VariableMeta)).all()
+    ), "Values in column `meta` must be either instances of `catalog.VariableMeta` or null"
 
     for var_name, t in table.groupby("variable"):
         t = t.rename(columns={"value": var_name})
 
-        if "unit" in t.columns:
-            # move variable to its own column and annotate it
-            assert len(set(t["unit"])) == 1, "units must be the same for all rows"
-            t[var_name].metadata.unit = t.unit.iloc[0]
+        # extract metadata from column and make sure it is identical for all rows
+        meta = t.pop("meta")
+        assert set(meta.map(id)) == {
+            id(meta.iloc[0])
+        }, f"Variable `{var_name}` must have same metadata objects in column `meta` for all rows"
+        t[var_name].metadata = meta.iloc[0]
 
         if annot:
             t = annotate_table(t, annot, missing_col="ignore")
 
-        t = t.drop(["variable", "unit"], axis=1, errors="ignore")
+        t = t.drop(["variable", "meta"], axis=1, errors="ignore")
 
         yield from yield_wide_table(cast(catalog.Table, t))
 
@@ -254,21 +270,176 @@ def _unique(x: List[Any]) -> List[Any]:
     return list(dict.fromkeys(x))
 
 
-def join_sources(sources: List[catalog.meta.Source]) -> catalog.meta.Source:
-    """Join multiple sources into one for the grapher."""
-    meta = {}
-    for key, sep in [
-        ("name", ", "),
-        ("description", "\n\n"),
-        ("url", "; "),
-        ("source_data_url", "; "),
-        ("owid_data_url", "; "),
-        ("published_by", ", "),
-        ("publisher_source", ", "),
-        ("date_accessed", "; "),
-    ]:
-        keys = _unique([getattr(s, key) for s in sources if getattr(s, key)])
-        if keys:
-            meta[key] = sep.join(keys)
+def combine_metadata_sources(metadata: catalog.DatasetMeta) -> catalog.DatasetMeta:
+    """Combine each of the attributes in the sources of a dataset's metadata, and assign them to the first source, since
+    that is the only source that grapher will read.
 
-    return catalog.meta.Source(**meta)
+    Parameters
+    ----------
+    metadata : catalog.DatasetMeta
+        Dataset metadata.
+
+    Returns
+    -------
+    metadata : catalog.DatasetMeta
+        Dataset metadata, after combining its sources.
+
+    """
+    metadata = deepcopy(metadata)
+
+    assert (
+        len(metadata.sources) >= 1
+    ), "Dataset needs to have at least one source in metadata."
+
+    # Define the 'default_source', which will be the one where all sources' attributes are combined.
+    default_source = metadata.sources[0]
+    # Attributes to combine from sources.
+    attributes = [
+        "name",
+        "description",
+        "url",
+        "source_data_url",
+        "owid_data_url",
+        "date_accessed",
+        "publication_date",
+        "publication_year",
+        "published_by",
+        "publisher_source",
+    ]
+    # Combine sources' attributes into the first source (which is the only one that grapher will interpret).
+    for attribute in attributes:
+        # Gather non-empty values from each source for current attribute.
+        values = _unique(
+            [
+                getattr(source, attribute)
+                for source in metadata.sources
+                if getattr(source, attribute) is not None
+            ]
+        )
+        if attribute == "description":
+            if metadata.description is not None:
+                # Add the dataset description as if it was a source's description.
+                values = [metadata.description] + values
+
+            # Descriptions are usually long, so it is better so put together descriptions from different sources in
+            # separate lines.
+            combined_value = "\n".join(values)
+        elif attribute in ["date_accessed", "publication_year"]:
+            # For dates simply take the one from the first source.
+            # TODO: Instead of picking the first source, choose the most recent date.
+            combined_value = values[0] if values else None
+        else:
+            # For any other attribute, values from different sources can be in the same line, separated by ;.
+            combined_value = " ; ".join(values)
+
+        # Instead of leaving an empty string, make any empty field None.
+        if combined_value == "":
+            combined_value = None  # type: ignore
+
+        setattr(default_source, attribute, combined_value)
+
+    # Remove other sources and keep only the default one.
+    metadata.sources = [default_source]
+
+    return metadata
+
+
+def adapt_dataset_metadata_for_grapher(
+    metadata: catalog.DatasetMeta,
+) -> catalog.DatasetMeta:
+    """Adapt metadata of a garden dataset to be used in a grapher step.
+
+    Parameters
+    ----------
+    metadata : catalog.DatasetMeta
+        Dataset metadata.
+
+    Returns
+    -------
+    metadata : catalog.DatasetMeta
+        Adapted dataset metadata, ready to be inserted into grapher.
+
+    """
+    # Combine metadata sources into one.
+    metadata = combine_metadata_sources(metadata)
+
+    # Add institution and year to dataset short name (the name that will be used in grapher database).
+    short_name_ending = "__" + underscore(f"{metadata.namespace}_{metadata.version}")
+    if not metadata.short_name.endswith(short_name_ending):
+        metadata.short_name = metadata.short_name + short_name_ending
+    # Empty dataset description (otherwise it will appear in `Internal notes` in the admin UI).
+    metadata.description = ""
+
+    return metadata
+
+
+def adapt_table_for_grapher(
+    table: catalog.Table, country_col: str = "country", year_col: str = "year"
+) -> catalog.Table:
+    """Adapt table (from a garden dataset) to be used in a grapher step.
+
+    Parameters
+    ----------
+    table : catalog.Table
+        Table from garden dataset.
+    country_col : str
+        Name of country column in table.
+    year_col : str
+        Name of year column in table.
+
+    Returns
+    -------
+    table : catalog.Table
+        Adapted table, ready to be inserted into grapher.
+
+    """
+    table = deepcopy(table)
+    # Grapher needs a column entity id, that is constructed based on the unique entity names in the database.
+    table["entity_id"] = country_to_entity_id(table[country_col], create_entities=True)
+    table = table.drop(columns=[country_col]).rename(columns={year_col: "year"})
+    table = table.set_index(["entity_id", "year"])
+
+    # Ensure the default source of each column includes the description of the table (since that is the description that
+    # will appear in grapher on the SOURCES tab).
+    for column in table.columns:
+        if len(table[column].metadata.sources) == 0:
+            # Take the metadata sources from the dataset's metadata (after combining them into one).
+            table[column].metadata.sources = combine_metadata_sources(
+                table.metadata.dataset
+            ).sources
+        if table[column].metadata.sources[0].description is None:
+            # Add the table description to the first source, so that it is displayed on the SOURCES tab.
+            table[column].metadata.sources[0].description = table.metadata.description
+
+    return cast(catalog.Table, table)
+
+
+@dataclass
+class IntRange:
+    min: int
+    _min: int = field(init=False, repr=False)
+    max: int
+    _max: int = field(init=False, repr=False)
+
+    @property  # type: ignore
+    def min(self) -> int:
+        return self._min
+
+    @min.setter
+    def min(self, x: int) -> None:
+        self._min = int(x)
+
+    @property  # type: ignore
+    def max(self) -> int:
+        return self._max
+
+    @max.setter
+    def max(self, x: int) -> None:
+        self._max = int(x)
+
+    @staticmethod
+    def from_values(xs: List[int]) -> Any:
+        return IntRange(min(xs), max(xs))
+
+    def to_values(self) -> list[int]:
+        return [self.min, self.max]

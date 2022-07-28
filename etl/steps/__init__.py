@@ -2,30 +2,20 @@
 #  __init__.py
 #  steps
 #
-import types
-from typing import (
-    Any,
-    Dict,
-    Optional,
-    Protocol,
-    List,
-    Set,
-    Union,
-    cast,
-    Iterable,
-)
-from pathlib import Path
-import re
+import concurrent.futures
+import graphlib
 import hashlib
+import re
 import tempfile
+import types
+import warnings
 from collections import defaultdict
-from urllib.parse import urlparse
 from dataclasses import dataclass, field
 from glob import glob
 from importlib import import_module
-import warnings
-import graphlib
-import concurrent.futures
+from pathlib import Path
+from typing import Any, Dict, Iterable, List, Optional, Protocol, Set, Union, cast
+from urllib.parse import urlparse
 
 import yaml
 
@@ -34,20 +24,19 @@ with warnings.catch_warnings():
     warnings.simplefilter("ignore")
     import papermill as pm
 
-from owid import catalog
-from owid import walden
+from owid import catalog, walden
 from owid.walden import CATALOG as WALDEN_CATALOG
 
-from etl import files, paths, git
-from etl.helpers import get_etag
+from etl import backport_helpers, files, git, paths
 from etl.grapher_import import (
-    upsert_table,
-    upsert_dataset,
     cleanup_ghost_sources,
     cleanup_ghost_variables,
     fetch_db_checksum,
+    set_dataset_checksum_to_null,
+    upsert_dataset,
+    upsert_table,
 )
-from etl import backport_helpers
+from etl.helpers import get_etag, isolated_env
 
 Graph = Dict[str, Set[str]]
 DAG = Dict[str, Any]
@@ -378,12 +367,17 @@ class DataStep(Step):
         Import the Python module for this step and call run() on it.
         """
         module_path = self.path.lstrip("/").replace("/", ".")
-        step_module = import_module(f"{paths.BASE_PACKAGE}.steps.data.{module_path}")
-        if not hasattr(step_module, "run"):
-            raise Exception(f'no run() method defined for module "{step_module}"')
+        module_dir = (paths.STEP_DIR / "data" / self.path).parent
 
-        # data steps
-        step_module.run(self._dest_dir.as_posix())  # type: ignore
+        with isolated_env(module_dir):
+            step_module = import_module(
+                f"{paths.BASE_PACKAGE}.steps.data.{module_path}"
+            )
+            if not hasattr(step_module, "run"):
+                raise Exception(f'no run() method defined for module "{step_module}"')
+
+            # data steps
+            step_module.run(self._dest_dir.as_posix())  # type: ignore
 
     def _run_notebook(self) -> None:
         "Run a parameterised Jupyter notebook."
@@ -399,6 +393,7 @@ class DataStep(Step):
                     progress_bar=False,
                     stdout_file=ostream,
                     stderr_file=ostream,
+                    cwd=notebook_path.parent.as_posix(),
                 )
 
 
@@ -511,7 +506,12 @@ class GrapherStep(Step):
             raise Exception(f"have no idea how to run step: {self.path}")
 
     def is_dirty(self) -> bool:
-        dataset = self._get_step_module().get_grapher_dataset()
+        try:
+            dataset = self._get_step_module().get_grapher_dataset()
+        except FileNotFoundError:
+            # get_grapher_dataset might depend on garden step which won't be ready yet when this
+            # method is run
+            return True
         return fetch_db_checksum(dataset) != self.checksum_input()
 
     def can_execute(self) -> bool:
@@ -566,10 +566,16 @@ class GrapherStep(Step):
             dataset.metadata.sources,
             self.checksum_input(),
         )
-        variable_upsert_results = [
-            upsert_table(table, dataset_upsert_results)
-            for table in step_module.get_grapher_tables(dataset)  # type: ignore
-        ]
+        try:
+            variable_upsert_results = [
+                upsert_table(table, dataset_upsert_results)
+                for table in step_module.get_grapher_tables(dataset)  # type: ignore
+            ]
+        except Exception as e:
+            # dataset has been already inserted into DB with checksum, make it null again so that the
+            # step remains dirty
+            set_dataset_checksum_to_null(dataset_upsert_results.dataset_id)
+            raise e
 
         # Cleanup all ghost variables and sources that weren't upserted
         # NOTE: we can't just remove all dataset variables before starting this step because

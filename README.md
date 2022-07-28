@@ -70,7 +70,21 @@ However, processing all the datasets will take a long time and memory.
 
 ### Creating the pipeline of a new dataset
 
-These are the steps to create a data pipeline for a dataset called `example_dataset`, from an institution called
+You can start an interactive walkthrough that will guide you through all the steps of creating a new dataset. Start it with
+
+```
+poetry run walkthrough walden
+```
+
+and then follow the instructions (two more steps are ran subsequently with `poetry run walkthrough meadow` and `poetry run walkthrough garden`).
+
+In case you only want to get a better intuition of the process and see what files get generated, run
+
+```
+poetry run walkthrough walden --dummy-data
+```
+
+Alternatively, these are the steps to create a data pipeline for a dataset called `example_dataset`, from an institution called
 `example_institution`, with version `YYYY-MM-DD` (where this date tag can typically be the current date when the dataset
 is being added to `etl`, or the date when the source data was released or updated):
 
@@ -313,6 +327,7 @@ CRON job is running on a server every 5 minutes looking for changes on master on
 1. `etl` (build/rebuild anything that’s missing/out of date)
 2. `reindex` (generate a catalog index in `data/` for each channel)
 3. `publish` (rsync the `data/` folder to an s3 bucket s3://owid-catalog/)
+```
 
 Then the s3 bucket has a CloudFlare proxy on top (https://catalog.ourworldindata.org/). If you use the [owid-catalog-py](https://github.com/owid/owid-catalog-py) project from Python and call `find()` or `find_one()` you will be doing HTTP requests against the static files in the catalog.
 
@@ -346,3 +361,31 @@ Fastrack is a service that polls grapher database for dataset updates and backpo
 3. Publish new ETL catalog to S3
 
 All these steps have been optimized to run in a few seconds (except of huge datasets) and make them available through [data-api](https://github.com/owid/data-api).
+
+
+## Staging
+
+_Internal OWID staff only_
+
+We have a staging environment for ETL that runs automatically on every push to `staging` branch. You can push directly to `staging` branch as it's quite unlikely someone else would be using it at the same time. Don't bother with creating pull requests for merging to `staging`. Pushing to staging goes something like this:
+
+```bash
+# rebase your branch on master
+git checkout mybranch
+git rebase origin/master
+
+# reset staging to your branch
+git checkout staging
+git reset --hard mybranch
+
+# push staging and let it execute automatically
+git push
+```
+
+If the ETL fails on staging, you'll see it in `#analytics-errors` channel on Slack. You can check logs in `/tmp/etl-staging.log` on our `owid-analytics` server or ssh into it and rerun the ETL manually:
+
+```bash
+ssh owid-analytics
+cd etl-staging
+.venv/bin/etl garden explorers
+```

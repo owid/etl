@@ -7,15 +7,7 @@ from etl import grapher_helpers as gh
 
 def get_grapher_dataset() -> catalog.Dataset:
     dataset = catalog.Dataset(DATA_DIR / "garden/owid/latest/population_density")
-
-    # grapher does not allow multiple sources
-    source = gh.join_sources(dataset.metadata.sources)
-
-    # move description to source as that is what is shown in grapher
-    # (dataset.description would be displayed under `Internal notes` in the admin UI otherwise)
-    source.description = dataset.metadata.description
-
-    dataset.metadata.sources = [source]
+    dataset.metadata = gh.combine_metadata_sources(metadata=dataset.metadata)
 
     return dataset
 

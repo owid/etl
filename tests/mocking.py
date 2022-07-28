@@ -6,7 +6,7 @@ from typing import Any, Union
 import datetime as dt
 import random
 
-_MOCK_STRINGS = None
+_MOCK_STRINGS: Any = None
 
 
 def is_optional_type(_type: type) -> bool:

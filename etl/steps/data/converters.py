@@ -78,6 +78,7 @@ def convert_grapher_dataset(
         title=g.name,
         namespace=g.namespace,
         description=g.description,
+        is_public=not g.isPrivate,
         sources=[convert_grapher_source(s) for s in sources],
         additional_info={
             "grapher_meta": g.dict(),
