@@ -1,4 +1,6 @@
 # type: ignore
+# The original script was originally from the owid/importers repo: https://github.com/owid/importers/blob/master/standard_importer/chart_revision_suggester.py
+
 import os
 import re
 import logging
@@ -15,16 +17,12 @@ from pymysql.err import IntegrityError
 from etl.db_utils import DBUtils
 from etl.db import get_connection
 from etl.grapher_helpers import IntRange
+from etl.config import DEBUG, USER_ID
 
-
-load_dotenv()
 
 logging.basicConfig()
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
-
-DEBUG = os.getenv("DEBUG") == "True"
-USER_ID = int(os.getenv("GRAPHER_USER_ID"))
 
 
 class ChartRevisionSuggester:
