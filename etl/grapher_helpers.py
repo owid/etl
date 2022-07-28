@@ -270,27 +270,6 @@ def _unique(x: List[Any]) -> List[Any]:
     return list(dict.fromkeys(x))
 
 
-def join_sources(sources: List[catalog.meta.Source]) -> catalog.meta.Source:
-    """Join multiple sources into one for the grapher."""
-    meta = {}
-    for key, sep in [
-        ("name", ", "),
-        ("description", "\n\n"),
-        ("url", "; "),
-        ("source_data_url", "; "),
-        ("owid_data_url", "; "),
-        ("published_by", ", "),
-        ("publisher_source", ", "),
-        ("date_accessed", "; "),
-    ]:
-        keys = _unique([getattr(s, key) for s in sources if getattr(s, key)])
-        if keys:
-            meta[key] = sep.join(keys)
-
-    return catalog.meta.Source(**meta)
-
-
-# TODO: The following function and join_sources are redundant. Merge the functionality of both into one function.
 def combine_metadata_sources(metadata: catalog.DatasetMeta) -> catalog.DatasetMeta:
     """Combine each of the attributes in the sources of a dataset's metadata, and assign them to the first source, since
     that is the only source that grapher will read.
@@ -345,12 +324,17 @@ def combine_metadata_sources(metadata: catalog.DatasetMeta) -> catalog.DatasetMe
             # Descriptions are usually long, so it is better so put together descriptions from different sources in
             # separate lines.
             combined_value = "\n".join(values)
-        elif attribute == "date_accessed":
+        elif attribute in ["date_accessed", "publication_year"]:
             # For dates simply take the one from the first source.
-            combined_value = values[0]
+            # TODO: Instead of picking the first source, choose the most recent date.
+            combined_value = values[0] if values else None
         else:
             # For any other attribute, values from different sources can be in the same line, separated by ;.
             combined_value = " ; ".join(values)
+
+        # Instead of leaving an empty string, make any empty field None.
+        if combined_value == "":
+            combined_value = None  # type: ignore
 
         setattr(default_source, attribute, combined_value)
 
