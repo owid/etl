@@ -1,20 +1,20 @@
-import pandas as pd
-from owid import catalog
-import yaml
-import slugify
-import warnings
 import logging
+import warnings
+from copy import deepcopy
 from dataclasses import dataclass, field
-
 from pathlib import Path
-
 from typing import Optional, Dict, Literal, cast, List, Any, Set, Iterable
+
+import pandas as pd
+import slugify
+import yaml
 from pydantic import BaseModel
 
-from etl.paths import REFERENCE_DATASET
 from etl.db import get_connection, get_engine
 from etl.db_utils import DBUtils
-
+from etl.paths import REFERENCE_DATASET
+from owid import catalog
+from owid.catalog.utils import underscore
 
 logging.basicConfig()
 logger = logging.getLogger(__name__)
@@ -288,6 +288,146 @@ def join_sources(sources: List[catalog.meta.Source]) -> catalog.meta.Source:
             meta[key] = sep.join(keys)
 
     return catalog.meta.Source(**meta)
+
+
+# TODO: The following function and join_sources are redundant. Merge the functionality of both into one function.
+def combine_metadata_sources(metadata: catalog.DatasetMeta) -> catalog.DatasetMeta:
+    """Combine each of the attributes in the sources of a dataset's metadata, and assign them to the first source, since
+    that is the only source that grapher will read.
+
+    Parameters
+    ----------
+    metadata : catalog.DatasetMeta
+        Dataset metadata.
+
+    Returns
+    -------
+    metadata : catalog.DatasetMeta
+        Dataset metadata, after combining its sources.
+
+    """
+    metadata = deepcopy(metadata)
+
+    assert (
+        len(metadata.sources) >= 1
+    ), "Dataset needs to have at least one source in metadata."
+
+    # Define the 'default_source', which will be the one where all sources' attributes are combined.
+    default_source = metadata.sources[0]
+    # Attributes to combine from sources.
+    attributes = [
+        "name",
+        "description",
+        "url",
+        "source_data_url",
+        "owid_data_url",
+        "date_accessed",
+        "publication_date",
+        "publication_year",
+        "published_by",
+        "publisher_source",
+    ]
+    # Combine sources' attributes into the first source (which is the only one that grapher will interpret).
+    for attribute in attributes:
+        # Gather non-empty values from each source for current attribute.
+        values = _unique(
+            [
+                getattr(source, attribute)
+                for source in metadata.sources
+                if getattr(source, attribute) is not None
+            ]
+        )
+        if attribute == "description":
+            if metadata.description is not None:
+                # Add the dataset description as if it was a source's description.
+                values = [metadata.description] + values
+
+            # Descriptions are usually long, so it is better so put together descriptions from different sources in
+            # separate lines.
+            combined_value = "\n".join(values)
+        elif attribute == "date_accessed":
+            # For dates simply take the one from the first source.
+            combined_value = values[0]
+        else:
+            # For any other attribute, values from different sources can be in the same line, separated by ;.
+            combined_value = " ; ".join(values)
+
+        setattr(default_source, attribute, combined_value)
+
+    # Remove other sources and keep only the default one.
+    metadata.sources = [default_source]
+
+    return metadata
+
+
+def adapt_dataset_metadata_for_grapher(
+    metadata: catalog.DatasetMeta,
+) -> catalog.DatasetMeta:
+    """Adapt metadata of a garden dataset to be used in a grapher step.
+
+    Parameters
+    ----------
+    metadata : catalog.DatasetMeta
+        Dataset metadata.
+
+    Returns
+    -------
+    metadata : catalog.DatasetMeta
+        Adapted dataset metadata, ready to be inserted into grapher.
+
+    """
+    # Combine metadata sources into one.
+    metadata = combine_metadata_sources(metadata)
+
+    # Add institution and year to dataset short name (the name that will be used in grapher database).
+    short_name_ending = "__" + underscore(f"{metadata.namespace}_{metadata.version}")
+    if not metadata.short_name.endswith(short_name_ending):
+        metadata.short_name = metadata.short_name + short_name_ending
+    # Empty dataset description (otherwise it will appear in `Internal notes` in the admin UI).
+    metadata.description = ""
+
+    return metadata
+
+
+def adapt_table_for_grapher(
+    table: catalog.Table, country_col: str = "country", year_col: str = "year"
+) -> catalog.Table:
+    """Adapt table (from a garden dataset) to be used in a grapher step.
+
+    Parameters
+    ----------
+    table : catalog.Table
+        Table from garden dataset.
+    country_col : str
+        Name of country column in table.
+    year_col : str
+        Name of year column in table.
+
+    Returns
+    -------
+    table : catalog.Table
+        Adapted table, ready to be inserted into grapher.
+
+    """
+    table = deepcopy(table)
+    # Grapher needs a column entity id, that is constructed based on the unique entity names in the database.
+    table["entity_id"] = country_to_entity_id(table[country_col], create_entities=True)
+    table = table.drop(columns=[country_col]).rename(columns={year_col: "year"})
+    table = table.set_index(["entity_id", "year"])
+
+    # Ensure the default source of each column includes the description of the table (since that is the description that
+    # will appear in grapher on the SOURCES tab).
+    for column in table.columns:
+        if len(table[column].metadata.sources) == 0:
+            # Take the metadata sources from the dataset's metadata (after combining them into one).
+            table[column].metadata.sources = combine_metadata_sources(
+                table.metadata.dataset
+            ).sources
+        if table[column].metadata.sources[0].description is None:
+            # Add the table description to the first source, so that it is displayed on the SOURCES tab.
+            table[column].metadata.sources[0].description = table.metadata.description
+
+    return cast(catalog.Table, table)
 
 
 @dataclass

@@ -1,4 +1,4 @@
-"""Grapher step for BP's energy mix 2022 dataset.
+"""Grapher step for BP's statistical review 2022 dataset.
 
 """
 
@@ -8,7 +8,7 @@ from etl import grapher_helpers as gh
 from etl.paths import DATA_DIR
 from owid import catalog
 
-DATASET_PATH = DATA_DIR / "garden" / "bp" / "2022-07-14" / "energy_mix"
+DATASET_PATH = DATA_DIR / "garden" / "bp" / "2022-07-14" / "statistical_review"
 
 
 def get_grapher_dataset() -> catalog.Dataset:
