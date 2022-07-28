@@ -510,7 +510,12 @@ class GrapherStep(Step):
             raise Exception(f"have no idea how to run step: {self.path}")
 
     def is_dirty(self) -> bool:
-        dataset = self._get_step_module().get_grapher_dataset()
+        try:
+            dataset = self._get_step_module().get_grapher_dataset()
+        except FileNotFoundError:
+            # get_grapher_dataset might depend on garden step which won't be ready yet when this
+            # method is run
+            return True
         return fetch_db_checksum(dataset) != self.checksum_input()
 
     def can_execute(self) -> bool:
