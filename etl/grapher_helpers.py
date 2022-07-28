@@ -1,6 +1,7 @@
 import logging
 import warnings
 from copy import deepcopy
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Optional, Dict, Literal, cast, List, Any, Set, Iterable
 
@@ -427,3 +428,34 @@ def adapt_table_for_grapher(
             table[column].metadata.sources[0].description = table.metadata.description
 
     return cast(catalog.Table, table)
+
+
+@dataclass
+class IntRange:
+    min: int
+    _min: int = field(init=False, repr=False)
+    max: int
+    _max: int = field(init=False, repr=False)
+
+    @property  # type: ignore
+    def min(self) -> int:
+        return self._min
+
+    @min.setter
+    def min(self, x: int) -> None:
+        self._min = int(x)
+
+    @property  # type: ignore
+    def max(self) -> int:
+        return self._max
+
+    @max.setter
+    def max(self, x: int) -> None:
+        self._max = int(x)
+
+    @staticmethod
+    def from_values(xs: List[int]) -> Any:
+        return IntRange(min(xs), max(xs))
+
+    def to_values(self) -> list[int]:
+        return [self.min, self.max]

@@ -6,7 +6,6 @@ import concurrent.futures
 import graphlib
 import hashlib
 import re
-import sys
 import tempfile
 import types
 import warnings
@@ -37,7 +36,7 @@ from etl.grapher_import import (
     upsert_dataset,
     upsert_table,
 )
-from etl.helpers import get_etag
+from etl.helpers import get_etag, isolated_env
 
 Graph = Dict[str, Set[str]]
 DAG = Dict[str, Any]
@@ -368,20 +367,17 @@ class DataStep(Step):
         Import the Python module for this step and call run() on it.
         """
         module_path = self.path.lstrip("/").replace("/", ".")
-        module_dir = (paths.STEP_DIR / "data" / self.path).parent.as_posix()
+        module_dir = (paths.STEP_DIR / "data" / self.path).parent
 
-        # add module dir to pythonpath
-        sys.path.append(module_dir)
+        with isolated_env(module_dir):
+            step_module = import_module(
+                f"{paths.BASE_PACKAGE}.steps.data.{module_path}"
+            )
+            if not hasattr(step_module, "run"):
+                raise Exception(f'no run() method defined for module "{step_module}"')
 
-        step_module = import_module(f"{paths.BASE_PACKAGE}.steps.data.{module_path}")
-        if not hasattr(step_module, "run"):
-            raise Exception(f'no run() method defined for module "{step_module}"')
-
-        # data steps
-        step_module.run(self._dest_dir.as_posix())  # type: ignore
-
-        # remove module dir from pythonpath
-        sys.path.remove(module_dir)
+            # data steps
+            step_module.run(self._dest_dir.as_posix())  # type: ignore
 
     def _run_notebook(self) -> None:
         "Run a parameterised Jupyter notebook."
