@@ -164,6 +164,7 @@ def yield_wide_table(
             tab = tab.rename(columns={column: short_name})
 
             # Add dimensions to title (which will be used as variable name in grapher)
+            title_with_dims: Optional[str]
             if tab[short_name].metadata.title:
                 title_with_dims = _title_column_and_dimensions(
                     tab[short_name].metadata.title, dims, dim_titles
