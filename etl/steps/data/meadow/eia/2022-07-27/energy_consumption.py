@@ -2,6 +2,7 @@
 
 """
 
+import numpy as np
 import pandas as pd
 from structlog import get_logger
 
@@ -16,6 +17,9 @@ log = get_logger()
 # Namespace and short name of output dataset.
 NAMESPACE = "eia"
 DATASET_SHORT_NAME = "energy_consumption"
+# Short name of raw data in walden.
+WALDEN_DATASET_SHORT_NAME = "international_energy_data"
+WALDEN_VERSION = "2022-07-27"
 # Name of variable and unit as given in the raw data file.
 VARIABLE_NAME = "Total energy consumption"
 UNIT_NAME = "terajoules"
@@ -76,6 +80,9 @@ def extract_variable_from_raw_eia_data(raw_data: pd.DataFrame, variable_name: st
     data["year"] = data["values"].str[0]
     data["values"] = data["values"].str[1]
 
+    # Missing values are given as '--' in the original data, replace them with nan.
+    data["values"] = data["values"].replace("--", np.nan).astype(float)
+
     # Set index and sort appropriately.
     data = data.set_index(["country", "year"], verify_integrity=True).sort_index()
 
@@ -89,9 +96,10 @@ def run(dest_dir: str) -> None:
     # Load data.
     #
     # Load ingested raw data from walden.
-    walden_ds = WaldenCatalog().find_one(namespace=NAMESPACE, short_name=DATASET_SHORT_NAME, version=VERSION)
+    walden_ds = WaldenCatalog().find_one(namespace=NAMESPACE, short_name=WALDEN_DATASET_SHORT_NAME,
+                                         version=WALDEN_VERSION)
     local_file = walden_ds.ensure_downloaded()
-    raw_data = pd.read_csv(local_file)
+    raw_data = pd.read_json(local_file, lines=True)
 
     #
     # Process data.
