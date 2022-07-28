@@ -173,7 +173,11 @@ def yield_wide_table(
             else:
                 title_with_dims = None  # type: ignore
 
-            log.info("yield_wide_table", short_name=short_name, title=title_with_dims)
+            log.info(
+                "yield_wide_table.create_variable",
+                short_name=short_name,
+                title=title_with_dims,
+            )
 
             yield tab.reset_index().set_index(["entity_id", "year"])[[short_name]]
 
