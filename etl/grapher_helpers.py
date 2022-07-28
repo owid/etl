@@ -3,7 +3,7 @@ from owid import catalog
 import yaml
 import slugify
 import warnings
-import logging
+import structlog
 from pathlib import Path
 
 from typing import Optional, Dict, Literal, cast, List, Any, Set, Iterable
@@ -14,9 +14,7 @@ from etl.db import get_connection, get_engine
 from etl.db_utils import DBUtils
 
 
-logging.basicConfig()
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
+log = structlog.get_logger()
 
 
 # TODO: remove if it turns out to be useless for real examples
@@ -159,17 +157,20 @@ def yield_wide_table(
             # Create underscored name of a new column from the combination of column and dimensions
             short_name = _slugify_column_and_dimensions(column, dims, dim_names)
 
-            # Add dimensions to title (which will be used as variable name in grapher)
-            title_with_dims = _title_column_and_dimensions(
-                table_to_yield[column].metadata.title, dims, dim_titles
-            )
-
             # set new metadata with dimensions
             tab.metadata.short_name = short_name
             tab = tab.rename(columns={column: short_name})
-            tab[short_name].metadata.title = title_with_dims
 
-            print(f"Yielding table {short_name} with title {title_with_dims}")
+            # Add dimensions to title (which will be used as variable name in grapher)
+            if tab[short_name].metadata.title:
+                title_with_dims = _title_column_and_dimensions(
+                    tab[short_name].metadata.title, dims, dim_titles
+                )
+                tab[short_name].metadata.title = title_with_dims
+            else:
+                title_with_dims = None
+
+            log.info("yield_wide_table", short_name=short_name, title=title_with_dims)
 
             yield tab.reset_index().set_index(["entity_id", "year"])[[short_name]]
 
@@ -230,6 +231,7 @@ def yield_long_table(
 
         # extract metadata from column and make sure it is identical for all rows
         meta = t.pop("meta")
+        t.pop("variable")
         assert set(meta.map(id)) == {
             id(meta.iloc[0])
         }, f"Variable `{var_name}` must have same metadata objects in column `meta` for all rows"
@@ -256,7 +258,7 @@ def _get_entities_from_db(countries: Set[str]) -> Dict[str, int]:
 def _get_and_create_entities_in_db(countries: Set[str]) -> Dict[str, int]:
     cursor = get_connection().cursor()
     db = DBUtils(cursor)
-    logging.info(f"Creating entities in DB: {countries}")
+    log.info("Creating entities in DB", countries=countries)
     return {name: db.get_or_create_entity(name) for name in countries}
 
 
