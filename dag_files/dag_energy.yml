@@ -57,3 +57,7 @@ steps:
   data://garden/energy/2022-07-29/primary_energy_consumption:
     - data://garden/bp/2022-07-14/statistical_review
     - data://garden/eia/2022-07-27/energy_consumption
+    - data://garden/ggdc/2020-10-01/ggdc_maddison
+    - data://garden/owid/latest/key_indicators
+  grapher://energy/2022-07-29/primary_energy_consumption:
+    - data://garden/energy/2022-07-29/primary_energy_consumption
