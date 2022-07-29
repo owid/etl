@@ -22,11 +22,8 @@ def test_get_etag():
 
 
 def test_run_isolated(tmp_path):
-    # local process mutates the global
-    assert _example_function() == 2
-    assert _example_function() == 3
-
     # isolated process gets its own copy
+    assert helpers.run_isolated(_example_function) == 2
     assert helpers.run_isolated(_example_function) == 2
     assert helpers.run_isolated(_example_function) == 2
 
