@@ -107,7 +107,7 @@ tables:
         display:
           name: Energy consumption per dollar
       primary_energy_consumption_per_capita__kwh:
-        title: Primary energy consumption per capita
+        title: Primary energy consumption per capita (kWh/person)
         short_unit: kWh
         unit: kilowatt-hours per capita
         description: Primary energy consumption per capita, measured in kilowatt-hours per person per year.
