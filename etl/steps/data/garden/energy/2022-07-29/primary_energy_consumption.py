@@ -3,6 +3,9 @@ Statistical Review dataset and EIA data on energy consumption.
 
 """
 
+from typing import cast
+
+import numpy as np
 import pandas as pd
 from structlog import get_logger
 
@@ -18,14 +21,12 @@ NAMESPACE = "energy"
 DATASET_SHORT_NAME = "primary_energy_consumption"
 # Metadata file.
 METADATA_PATH = CURRENT_DIR / f"{DATASET_SHORT_NAME}.meta.yml"
-# Namespace, dataset short name and version for required EIA dataset (energy consumption).
-EIA_NAMESPACE = "eia"
-EIA_DATASET_NAME = "energy_consumption"
-EIA_VERSION = "2022-07-27"
-# Namespace, dataset short name and version for required BP dataset (processed Statistical Review from garden).
-BP_NAMESPACE = "bp"
-BP_DATASET_NAME = "statistical_review"
-BP_VERSION = "2022-07-14"
+# Path to EIA energy consumption dataset.
+EIA_DATASET_PATH = DATA_DIR / "garden" / "eia" / "2022-07-27" / "energy_consumption"
+# Path to BP statistical review dataset.
+BP_DATASET_PATH = DATA_DIR / "garden" / "bp" / "2022-07-14" / "statistical_review"
+# Path to GGDC Maddison 2020 GDP dataset.
+GGDC_DATASET_PATH = DATA_DIR / "garden" / "ggdc" / "2020-10-01" / "ggdc_maddison"
 
 # Conversion factors.
 # Terawatt-hours to kilowatt-hours.
@@ -42,22 +43,21 @@ def load_bp_data() -> catalog.Table:
 
     """
     # Load BP Statistical Review dataset.
-    bp_dataset = catalog.Dataset(
-        DATA_DIR / "garden" / BP_NAMESPACE / BP_VERSION / BP_DATASET_NAME
-    )
+    bp_dataset = catalog.Dataset(BP_DATASET_PATH)
 
     # Get table.
     bp_table = bp_dataset[bp_dataset.table_names[0]].reset_index()
     bp_columns = {
         "country": "country",
         "year": "year",
-        "coal_production__twh": "Coal production (TWh)",
-        "gas_production__twh": "Gas production (TWh)",
-        "oil_production__twh": "Oil production (TWh)",
+        "primary_energy_consumption__twh": "Primary energy consumption (TWh)",
     }
     bp_table = bp_table[list(bp_columns)].rename(columns=bp_columns)
 
-    return bp_table
+    # Drop rows with missing values.
+    bp_table = bp_table.dropna(how="any").reset_index(drop=True)
+
+    return cast(catalog.Table, bp_table)
 
 
 def load_eia_data() -> catalog.Table:
@@ -70,18 +70,48 @@ def load_eia_data() -> catalog.Table:
 
     """
     # Load EIA energy consumption dataset.
-    eia_dataset = catalog.Dataset(DATA_DIR / "garden" / EIA_NAMESPACE / EIA_VERSION / EIA_DATASET_NAME)
+    eia_dataset = catalog.Dataset(EIA_DATASET_PATH)
 
     # Get table.
     eia_table = eia_dataset[eia_dataset.table_names[0]].reset_index()
     eia_columns = {
         "country": "country",
         "year": "year",
-        "energy_consumption": "energy_consumption",
+        "energy_consumption": "Primary energy consumption (TWh)",
     }
     eia_table = eia_table[list(eia_columns)].rename(columns=eia_columns)
+    
+    # Drop rows with missing values.
+    eia_table = eia_table.dropna(how="any").reset_index(drop=True)
 
-    return eia_table
+    return cast(catalog.Table, eia_table)
+
+
+def load_ggdc_data() -> catalog.Table:
+    """Load GGDC data on GDP from the local catalog, and rename columns conveniently.
+
+    Returns
+    -------
+    ggdc_table : catalog.Table
+        GGDC data as a table with metadata.
+
+    """
+    # Load GGDC Maddison 2020 dataset on GDP.
+    ggdc_dataset = catalog.Dataset(GGDC_DATASET_PATH)
+
+    # Get table.
+    ggdc_table = ggdc_dataset[ggdc_dataset.table_names[0]].reset_index()
+    ggdc_columns = {
+        "country": "country",
+        "year": "year",
+        "gdp": "GDP",
+    }
+    ggdc_table = ggdc_table[list(ggdc_columns)].rename(columns=ggdc_columns)
+
+    # Drop rows with missing values.
+    ggdc_table = ggdc_table.dropna(how="any").reset_index(drop=True)
+
+    return cast(catalog.Table, ggdc_table)
 
 
 def combine_bp_and_eia_data(
@@ -110,31 +140,22 @@ def combine_bp_and_eia_data(
         eia_table.duplicated(subset=["country", "year"])
     ].empty, "Duplicated rows in EIA data."
 
+    bp_table["source"] = "bp"
+    eia_table["source"] = "eia"
     # Combine EIA data (which goes further back in the past) with BP data (which is more up-to-date).
     # On coincident rows, prioritise BP data.
     index_columns = ["country", "year"]
-    data_columns = [col for col in bp_table.columns if col not in index_columns]
-    # We should not concatenate bp and EIA data directly, since there are nans in different places.
-    # Instead, go column by column, concatenate, remove nans, and then keep the BP version on duplicated rows.
+    combined = pd.concat([bp_table, eia_table], ignore_index=True).\
+        drop_duplicates(subset=index_columns, keep="last")
 
-    combined = pd.DataFrame({column: [] for column in index_columns})
-    for variable in data_columns:
-        _eia_data = eia_table[index_columns + [variable]].dropna(subset=variable)
-        _bp_data = bp_table[index_columns + [variable]].dropna(subset=variable)
-        _combined = pd.concat([_eia_data, _bp_data], ignore_index=True)
-        # On rows where both datasets overlap, give priority to BP data.
-        _combined = _combined.drop_duplicates(subset=index_columns, keep="last")
-        # Combine data for different variables.
-        combined = pd.merge(combined, _combined, on=index_columns, how="outer")
-
-    # Sort data appropriately.
-    combined = combined.sort_values(index_columns).reset_index(drop=True)
+    # Convert to conventional dataframe, and sort conveniently.
+    combined = pd.DataFrame(combined).sort_values(index_columns).reset_index(drop=True)
 
     return combined
 
 
-def add_per_capita_variables(df: pd.DataFrame) -> pd.DataFrame:
-    """Add per-capita variables to combined BP & EIA dataset.
+def add_annual_change(df: pd.DataFrame) -> pd.DataFrame:
+    """Add annual change variables to combined BP & EIA dataset.
 
     Parameters
     ----------
@@ -144,28 +165,79 @@ def add_per_capita_variables(df: pd.DataFrame) -> pd.DataFrame:
     Returns
     -------
     combined : pd.DataFrame
-        Combined BP & EIA dataset after adding per-capita variables.
+        Combined BP & EIA dataset after adding annual change variables.
+
+    """
+    combined = df.copy()
+
+    # Calculate annual change.
+    combined = combined.sort_values(["country", "year"]).reset_index(drop=True)
+    combined[f"Annual change in primary energy consumption (%)"] = \
+        combined.groupby("country")[f"Primary energy consumption (TWh)"].pct_change() * 100
+    combined[f"Annual change in primary energy consumption (TWh)"] = \
+        combined.groupby("country")[f"Primary energy consumption (TWh)"].diff()
+
+    return combined
+
+
+def add_per_capita_variables(df: pd.DataFrame) -> pd.DataFrame:
+    """Add a population column and add per-capita variables.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Data.
+
+    Returns
+    -------
+    df : pd.DataFrame
+        Data after adding population and per-capita variables.
 
     """
     df = df.copy()
 
     # Add population to data.
-    combined = add_population(
+    df = add_population(
         df=df,
         country_col="country",
         year_col="year",
-        population_col="population",
+        population_col="Population",
         warn_on_missing_countries=False,
     )
 
-    # Calculate production per capita.
-    for cat in ("Coal", "Oil", "Gas"):
-        combined[f"{cat} production per capita (kWh)"] = (
-            combined[f"{cat} production (TWh)"] / combined["population"] * TWH_TO_KWH
-        )
-    combined = combined.drop(errors="raise", columns=["population"])
+    # Calculate consumption per capita.
+    df["Primary energy consumption per capita (kWh)"] = \
+        df["Primary energy consumption (TWh)"] / df["Population"] * TWH_TO_KWH    
 
-    return combined
+    return df
+
+
+def add_per_gdp_variables(df: pd.DataFrame, ggdc_table) -> pd.DataFrame:
+    """Add a GDP column and add per-gdp variables.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Data.
+    ggdc_table : catalog.Table
+        GDP data from the GGDC Maddison dataset.
+
+    Returns
+    -------
+    df : pd.DataFrame
+        Data after adding GDP and per-gdp variables.
+
+    """
+    df = df.copy()
+
+    # Add population to data.
+    df = pd.merge(df, ggdc_table, on=["country", "year"], how="left")
+
+    # Calculate consumption per GDP.
+    df["Primary energy consumption per GDP (kWh per $)"] = \
+        df["Primary energy consumption (TWh)"] / df["GDP"] * TWH_TO_KWH    
+
+    return df
 
 
 def run(dest_dir: str) -> None:
@@ -179,6 +251,9 @@ def run(dest_dir: str) -> None:
 
     # Load EIA data on energy_consumption.
     eia_table = load_eia_data()
+    
+    # Load GGDC Maddison data on GDP.
+    ggdc_table = load_ggdc_data()
 
     #
     # Process data.
@@ -186,8 +261,17 @@ def run(dest_dir: str) -> None:
     # Combine BP and EIA data.
     df = combine_bp_and_eia_data(bp_table=bp_table, eia_table=eia_table)
 
+    # Add annual change.
+    df = add_annual_change(df=df)
+
     # Add per-capita variables.
     df = add_per_capita_variables(df=df)
+
+    # Add per-GDP variables.
+    df = add_per_gdp_variables(df=df, ggdc_table=ggdc_table)
+
+    # Remove spurious values.
+    df = df.replace(np.inf, np.nan)
 
     #
     # Save outputs.
@@ -201,6 +285,7 @@ def run(dest_dir: str) -> None:
 
     # Create new table and add it to new dataset.
     tb_garden = underscore_table(catalog.Table(df))
+
     tb_garden = tb_garden.set_index(["country", "year"])
     tb_garden.update_metadata_from_yaml(METADATA_PATH, DATASET_SHORT_NAME)
     dataset.add(tb_garden)
