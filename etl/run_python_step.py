@@ -12,7 +12,7 @@ from etl.paths import STEP_DIR, BASE_PACKAGE
 @click.command()
 @click.argument("uri")
 @click.argument("dest_dir")
-def main(uri: str, dest_dir: str):
+def main(uri: str, dest_dir: str) -> None:
     """
     Import and run a specific step of the ETL. Meant to be ran as
     a subprocess by the main `etl` command.

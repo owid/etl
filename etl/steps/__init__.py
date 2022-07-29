@@ -7,7 +7,6 @@ import graphlib
 import hashlib
 import re
 import subprocess
-import sys
 import tempfile
 import types
 import warnings
