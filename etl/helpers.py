@@ -3,13 +3,10 @@
 #  etl
 #
 
-import re
-import sys
+from concurrent.futures import ProcessPoolExecutor
 import tempfile
-from collections.abc import Generator
 from contextlib import contextmanager
-from pathlib import Path
-from typing import Any, Iterator, List, cast
+from typing import Any, Iterator, List, cast, Callable
 
 import requests
 
@@ -54,3 +51,11 @@ def _get_github_branches(org: str, repo: str) -> List[Any]:
         raise Exception("reached single page limit, should paginate request")
 
     return branches
+
+
+def run_isolated(f: Callable[..., Any], *args: Any, **kwargs: Any) -> Any:
+    """
+    Run a function in a separate process.
+    """
+    with ProcessPoolExecutor(1) as executor:
+        return executor.submit(f, *args, **kwargs).result()

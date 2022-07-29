@@ -36,7 +36,7 @@ from etl.grapher_import import (
     upsert_dataset,
     upsert_table,
 )
-from etl.helpers import get_etag
+from etl.helpers import get_etag, run_isolated
 
 Graph = Dict[str, Set[str]]
 DAG = Dict[str, Any]
@@ -369,8 +369,7 @@ class DataStep(Step):
         module_path = self.path.lstrip("/").replace("/", ".")
 
         # isolate the python step in a new process to avoid any bleed-over between steps
-        with concurrent.futures.ProcessPoolExecutor(1) as executor:
-            executor.submit(_run_python_data_step, module_path, self._dest_dir).result()
+        run_isolated(_run_python_data_step, module_path, self._dest_dir)
 
     def _run_notebook(self) -> None:
         "Run a parameterised Jupyter notebook."
