@@ -80,7 +80,7 @@ def load_eia_data() -> catalog.Table:
         "energy_consumption": "Primary energy consumption (TWh)",
     }
     eia_table = eia_table[list(eia_columns)].rename(columns=eia_columns)
-    
+
     # Drop rows with missing values.
     eia_table = eia_table.dropna(how="any").reset_index(drop=True)
 
@@ -145,13 +145,14 @@ def combine_bp_and_eia_data(
     # Combine EIA data (which goes further back in the past) with BP data (which is more up-to-date).
     # On coincident rows, prioritise BP data.
     index_columns = ["country", "year"]
-    combined = pd.concat([bp_table, eia_table], ignore_index=True).\
-        drop_duplicates(subset=index_columns, keep="last")
+    combined = pd.concat([bp_table, eia_table], ignore_index=True).drop_duplicates(
+        subset=index_columns, keep="last"
+    )
 
     # Convert to conventional dataframe, and sort conveniently.
     combined = pd.DataFrame(combined).sort_values(index_columns).reset_index(drop=True)
 
-    return combined
+    return cast(pd.DataFrame, combined)
 
 
 def add_annual_change(df: pd.DataFrame) -> pd.DataFrame:
@@ -172,10 +173,13 @@ def add_annual_change(df: pd.DataFrame) -> pd.DataFrame:
 
     # Calculate annual change.
     combined = combined.sort_values(["country", "year"]).reset_index(drop=True)
-    combined[f"Annual change in primary energy consumption (%)"] = \
-        combined.groupby("country")[f"Primary energy consumption (TWh)"].pct_change() * 100
-    combined[f"Annual change in primary energy consumption (TWh)"] = \
-        combined.groupby("country")[f"Primary energy consumption (TWh)"].diff()
+    combined["Annual change in primary energy consumption (%)"] = (
+        combined.groupby("country")["Primary energy consumption (TWh)"].pct_change()
+        * 100
+    )
+    combined["Annual change in primary energy consumption (TWh)"] = combined.groupby(
+        "country"
+    )["Primary energy consumption (TWh)"].diff()
 
     return combined
 
@@ -206,13 +210,14 @@ def add_per_capita_variables(df: pd.DataFrame) -> pd.DataFrame:
     )
 
     # Calculate consumption per capita.
-    df["Primary energy consumption per capita (kWh)"] = \
-        df["Primary energy consumption (TWh)"] / df["Population"] * TWH_TO_KWH    
+    df["Primary energy consumption per capita (kWh)"] = (
+        df["Primary energy consumption (TWh)"] / df["Population"] * TWH_TO_KWH
+    )
 
     return df
 
 
-def add_per_gdp_variables(df: pd.DataFrame, ggdc_table) -> pd.DataFrame:
+def add_per_gdp_variables(df: pd.DataFrame, ggdc_table: catalog.Table) -> pd.DataFrame:
     """Add a GDP column and add per-gdp variables.
 
     Parameters
@@ -234,8 +239,9 @@ def add_per_gdp_variables(df: pd.DataFrame, ggdc_table) -> pd.DataFrame:
     df = pd.merge(df, ggdc_table, on=["country", "year"], how="left")
 
     # Calculate consumption per GDP.
-    df["Primary energy consumption per GDP (kWh per $)"] = \
-        df["Primary energy consumption (TWh)"] / df["GDP"] * TWH_TO_KWH    
+    df["Primary energy consumption per GDP (kWh per $)"] = (
+        df["Primary energy consumption (TWh)"] / df["GDP"] * TWH_TO_KWH
+    )
 
     return df
 
@@ -251,7 +257,7 @@ def run(dest_dir: str) -> None:
 
     # Load EIA data on energy_consumption.
     eia_table = load_eia_data()
-    
+
     # Load GGDC Maddison data on GDP.
     ggdc_table = load_ggdc_data()
 
