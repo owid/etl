@@ -32,6 +32,9 @@ GGDC_DATASET_PATH = DATA_DIR / "garden" / "ggdc" / "2020-10-01" / "ggdc_maddison
 # Terawatt-hours to kilowatt-hours.
 TWH_TO_KWH = 1e9
 
+# Countries whose data have to be removed since they were identified as outliers.
+OUTLIERS = ["Gibraltar"]
+
 
 def load_bp_data() -> catalog.Table:
     """Load BP data from the local catalog, and rename columns conveniently.
@@ -246,6 +249,31 @@ def add_per_gdp_variables(df: pd.DataFrame, ggdc_table: catalog.Table) -> pd.Dat
     return df
 
 
+def remove_outliers(df: pd.DataFrame) -> pd.DataFrame:
+    """Remove infinity values and data that has been identified as spurious outliers.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Data.
+
+    Returns
+    -------
+    df : pd.DataFrame
+        Data after removing spurious data.
+
+    """
+    df = df.copy()
+
+    # Remove spurious values.
+    df = df.replace(np.inf, np.nan)
+
+    # Remove indexes of outliers from data.
+    df = df[~df["country"].isin(OUTLIERS)].reset_index(drop=True)
+
+    return df
+
+
 def run(dest_dir: str) -> None:
     log.info(f"{DATASET_SHORT_NAME}.start")
 
@@ -276,8 +304,8 @@ def run(dest_dir: str) -> None:
     # Add per-GDP variables.
     df = add_per_gdp_variables(df=df, ggdc_table=ggdc_table)
 
-    # Remove spurious values.
-    df = df.replace(np.inf, np.nan)
+    # Remove outliers.
+    df = remove_outliers(df=df)
 
     #
     # Save outputs.
