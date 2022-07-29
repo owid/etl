@@ -145,7 +145,7 @@ def combine_bp_and_eia_data(
     # Combine EIA data (which goes further back in the past) with BP data (which is more up-to-date).
     # On coincident rows, prioritise BP data.
     index_columns = ["country", "year"]
-    combined = pd.concat([bp_table, eia_table], ignore_index=True).drop_duplicates(
+    combined = pd.concat([eia_table, bp_table], ignore_index=True).drop_duplicates(
         subset=index_columns, keep="last"
     )
 
