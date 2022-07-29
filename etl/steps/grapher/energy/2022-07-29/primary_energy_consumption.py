@@ -9,7 +9,9 @@ from etl.paths import DATA_DIR
 from owid import catalog
 
 # Path to garden dataset to be loaded.
-DATASET_PATH = DATA_DIR / "garden" / "energy" / "2022-07-29" / "primary_energy_consumption"
+DATASET_PATH = (
+    DATA_DIR / "garden" / "energy" / "2022-07-29" / "primary_energy_consumption"
+)
 
 
 def get_grapher_dataset() -> catalog.Dataset:
