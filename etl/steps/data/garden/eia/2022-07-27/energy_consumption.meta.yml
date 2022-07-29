@@ -5,8 +5,7 @@ dataset:
   short_name: energy_consumption
   publication_year: 2022
   description: |
-   Total energy consumption, extracted from EIA's international energy data from the EIA, downloaded using their
-   Bulk Download Facility (https://www.eia.gov/opendata/bulkfiles.php).
+   Total energy consumption, extracted from EIA's international energy data from the EIA, downloaded using their <a href="https://www.eia.gov/opendata/bulkfiles.php">Bulk Download Facility</a>.
 
    EIA's region definitions sometimes differ from Our World in Data's definitions. For example, in EIA's data, Russia is not included in Europe, whereas Our World in Data includes Russia in Europe (see a map with <a href="https://ourworldindata.org/world-region-map-definitions">our region definitions</a>). For this reason, we include in the dataset regions like "Europe (EIA)" to refer to EIA's original data using their definition of the region, as well as "Europe", which is data aggregated by Our World in Data using our definition. These aggregates are constructed by adding up (when possible) the contributions from the countries in the region.
 
