@@ -6,6 +6,7 @@ import concurrent.futures
 import graphlib
 import hashlib
 import re
+import subprocess
 import sys
 import tempfile
 import types
@@ -37,7 +38,7 @@ from etl.grapher_import import (
     upsert_dataset,
     upsert_table,
 )
-from etl.helpers import get_etag, run_isolated
+from etl.helpers import get_etag
 
 Graph = Dict[str, Set[str]]
 DAG = Dict[str, Any]
@@ -367,11 +368,15 @@ class DataStep(Step):
         """
         Import the Python module for this step and call run() on it.
         """
-        module_path = self.path.lstrip("/").replace("/", ".")
-        module_dir = (paths.STEP_DIR / "data" / self.path).parent
-
-        # isolate the python step in a new process to avoid any bleed-over between steps
-        run_isolated(_run_python_data_step, module_path, module_dir, self._dest_dir)
+        # use a subprocess to isolate each step from the others, and avoid state bleeding
+        # between them
+        subprocess.check_call(
+            [
+                f"{paths.BASE_DIR}/.venv/bin/run_python_step",
+                str(self),
+                self._dest_dir.as_posix(),
+            ]
+        )
 
     def _run_notebook(self) -> None:
         "Run a parameterised Jupyter notebook."
@@ -723,20 +728,3 @@ def select_dirty_steps(steps: List[Step], max_workers: int) -> List[Step]:
         steps_dirty = executor.map(lambda s: s.is_dirty(), steps)  # type: ignore
         steps = [s for s, is_dirty in zip(steps, steps_dirty) if is_dirty]
     return steps
-
-
-def _run_python_data_step(module_path: Path, module_dir: Path, dest_dir: Path) -> None:
-    """
-    Import a Python data step and execute its run() method.
-
-    NOTE: Should not be run from the main process, but instead in an isolated process.
-    """
-    # add the working directory to the import path
-    sys.path.append(module_dir.as_posix())
-
-    step_module = import_module(f"{paths.BASE_PACKAGE}.steps.data.{module_path}")
-    if not hasattr(step_module, "run"):
-        raise Exception(f'no run() method defined for module "{step_module}"')
-
-    # data steps
-    step_module.run(dest_dir.as_posix())  # type: ignore
