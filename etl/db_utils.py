@@ -1,9 +1,10 @@
 """This module was copied from https://github.com/owid/importers/blob/master/db_utils.py"""
 
 import json
-from typing import Any, Dict, Iterator, List, Optional, Tuple, cast
-from unidecode import unidecode
+from typing import Any, Dict, Iterable, List, Optional, Tuple, cast
+
 from MySQLdb.cursors import Cursor
+from unidecode import unidecode
 
 UNMODIFIED = 0
 INSERT = 1
@@ -80,7 +81,7 @@ class DBUtils:
             return UPDATE
         return None
 
-    def upsert_many(self, query: str, tuples: Iterator[Tuple[Any, ...]]) -> None:
+    def upsert_many(self, query: str, tuples: Iterable[Tuple[Any, ...]]) -> None:
         self.cursor.executemany(query, tuples)
 
     def execute_until_empty(self, *args: Any, **kwargs: Any) -> None:
