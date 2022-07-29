@@ -36,7 +36,7 @@ from etl.grapher_import import (
     upsert_dataset,
     upsert_table,
 )
-from etl.helpers import get_etag, isolated_env
+from etl.helpers import get_etag
 
 Graph = Dict[str, Set[str]]
 DAG = Dict[str, Any]
@@ -367,17 +367,10 @@ class DataStep(Step):
         Import the Python module for this step and call run() on it.
         """
         module_path = self.path.lstrip("/").replace("/", ".")
-        module_dir = (paths.STEP_DIR / "data" / self.path).parent
 
-        with isolated_env(module_dir):
-            step_module = import_module(
-                f"{paths.BASE_PACKAGE}.steps.data.{module_path}"
-            )
-            if not hasattr(step_module, "run"):
-                raise Exception(f'no run() method defined for module "{step_module}"')
-
-            # data steps
-            step_module.run(self._dest_dir.as_posix())  # type: ignore
+        # isolate the python step in a new process to avoid any bleed-over between steps
+        with concurrent.futures.ProcessPoolExecutor(1) as executor:
+            executor.submit(_run_python_data_step, module_path, self._dest_dir).result()
 
     def _run_notebook(self) -> None:
         "Run a parameterised Jupyter notebook."
@@ -729,3 +722,16 @@ def select_dirty_steps(steps: List[Step], max_workers: int) -> List[Step]:
         steps_dirty = executor.map(lambda s: s.is_dirty(), steps)  # type: ignore
         steps = [s for s, is_dirty in zip(steps, steps_dirty) if is_dirty]
     return steps
+
+
+# split out from the
+def _run_python_data_step(module_path, dest_dir) -> None:
+    """
+    Import a Python data step and execute its run() method.
+    """
+    step_module = import_module(f"{paths.BASE_PACKAGE}.steps.data.{module_path}")
+    if not hasattr(step_module, "run"):
+        raise Exception(f'no run() method defined for module "{step_module}"')
+
+    # data steps
+    step_module.run(dest_dir.as_posix())  # type: ignore
