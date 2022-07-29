@@ -9,26 +9,21 @@ Usage:
     >>> import_dataset.main(dataset_dir, dataset_namespace)
 """
 
-from dataclasses import dataclass
 import json
 import os
-import pandas as pd
-from typing import Dict, List, cast, Optional
-from contextlib import contextmanager
-from collections.abc import Generator
+from dataclasses import dataclass
+from typing import Dict, List, Optional, cast
 
-from etl.db import get_connection
-from etl.db_utils import DBUtils
-from etl import config
+import pandas as pd
+import structlog
 from owid import catalog
 from owid.catalog import utils
 
-import logging
-import traceback
+from etl import config
+from etl.db import open_db
+from etl.db_utils import DBUtils
 
-logging.basicConfig()
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
+log = structlog.get_logger()
 
 
 CURRENT_DIR = os.path.dirname(__file__)
@@ -63,7 +58,7 @@ def upsert_dataset(
 
     if len(sources) > 1:
         raise NotImplementedError(
-            "only a single source is supported for grapher datasets, use `join_sources` to join multiple sources"
+            "only a single source is supported for grapher datasets, use `combine_metadata_sources` or `adapt_dataset_metadata_for_grapher` to join multiple sources"
         )
 
     # This function creates the dataset table row, a namespace row
@@ -156,13 +151,13 @@ def upsert_table(
 
     if len(table.iloc[:, 0].metadata.sources) > 1:
         raise NotImplementedError(
-            "only a single source is supported for grapher variables, use `join_sources` to join multiple sources"
+            "only a single source is supported for grapher datasets, use `combine_metadata_sources` or `adapt_dataset_metadata_for_grapher` to join multiple sources"
         )
 
     _update_variables_display(table)
 
     with open_db() as db:
-        logger.info("---Upserting variable...")
+        log.info("---Upserting variable...")
 
         # For easy retrieveal of the value series we store the name
         column_name = table.columns[0]
@@ -229,7 +224,7 @@ def upsert_table(
                 for index, row in table.iterrows()
             ),
         )
-        logger.info(f"Upserted {len(table)} datapoints.")
+        log.info(f"Upserted {len(table)} datapoints.")
 
         return VariableUpsertResult(db_variable_id, source_id)
 
@@ -317,7 +312,7 @@ def cleanup_ghost_variables(dataset_id: int, upserted_variable_ids: List[int]) -
             {"dataset_id": dataset_id, "variable_ids": variable_ids_to_delete},
         )
 
-        logging.warning(
+        log.warning(
             f"Deleted {db.cursor.rowcount} ghost variables ({variable_ids_to_delete})"
         )
 
@@ -336,29 +331,4 @@ def cleanup_ghost_sources(dataset_id: int, upserted_source_ids: List[int]) -> No
             {"dataset_id": dataset_id, "source_ids": upserted_source_ids},
         )
         if db.cursor.rowcount > 0:
-            logging.warning(f"Deleted {db.cursor.rowcount} ghost sources")
-
-
-@contextmanager
-def open_db() -> Generator[DBUtils, None, None]:
-    connection = None
-    cursor = None
-    try:
-        connection = get_connection()
-        connection.autocommit(False)
-        cursor = connection.cursor()
-        yield DBUtils(cursor)
-        connection.commit()
-    except Exception as e:
-        logger.error(f"Error encountered during import: {e}")
-        logger.error("Rolling back changes...")
-        if connection:
-            connection.rollback()
-        if config.DEBUG:
-            traceback.print_exc()
-        raise e
-    finally:
-        if cursor:
-            cursor.close()
-        if connection:
-            connection.close()
+            log.warning(f"Deleted {db.cursor.rowcount} ghost sources")
