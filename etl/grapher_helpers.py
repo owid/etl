@@ -3,18 +3,18 @@ import warnings
 from copy import deepcopy
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Optional, Dict, Literal, cast, List, Any, Set, Iterable
+from typing import Any, Dict, Iterable, List, Literal, Optional, Set, cast
 
 import pandas as pd
 import slugify
 import yaml
+from owid import catalog
+from owid.catalog.utils import underscore
 from pydantic import BaseModel
 
 from etl.db import get_connection, get_engine
 from etl.db_utils import DBUtils
 from etl.paths import REFERENCE_DATASET
-from owid import catalog
-from owid.catalog.utils import underscore
 
 logging.basicConfig()
 logger = logging.getLogger(__name__)
@@ -438,7 +438,7 @@ class IntRange:
         self._max = int(x)
 
     @staticmethod
-    def from_values(xs: List[int]) -> Any:
+    def from_values(xs: List[int]) -> "IntRange":
         return IntRange(min(xs), max(xs))
 
     def to_values(self) -> list[int]:
