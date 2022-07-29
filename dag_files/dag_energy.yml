@@ -51,4 +51,9 @@ steps:
     - walden://eia/2022-07-27/international_energy_data
   data://garden/eia/2022-07-27/energy_consumption:
     - data://meadow/eia/2022-07-27/energy_consumption
-
+  #
+  # Energy- Primary energy consumption 2022.
+  #
+  data://garden/energy/2022-07-29/primary_energy_consumption:
+    - data://garden/bp/2022-07-14/statistical_review
+    - data://garden/eia/2022-07-27/energy_consumption
