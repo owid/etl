@@ -171,22 +171,21 @@ def upsert_table(
 
         table.reset_index(inplace=True)
 
-        # Every variable must have a source. Use variable source if specified, otherwise use dataset source
-        if len(table[column_name].metadata.sources) > 0:
-            source = table[column_name].metadata.sources[0]
+        # Every variable must have exactly one source
+        if len(table[column_name].metadata.sources) != 1:
+            raise NotImplementedError(f"Variable `{column_name}` must have exactly one source, see function `adapt_table_for_grapher` that can do that for you")
 
-            # Does it already exist in the database?
-            source_id = dataset_upsert_result.source_ids.get(source.name)
-            if not source_id:
-                # Not exists, upsert it
-                # NOTE: this could be quite inefficient as we upsert source for every variable
-                #   optimize this if this turns out to be a bottleneck
-                source_id = _upsert_source_to_db(
-                    db, source, dataset_upsert_result.dataset_id
-                )
-        else:
-            # Use dataset source
-            source_id = list(dataset_upsert_result.source_ids.values())[0]
+        source = table[column_name].metadata.sources[0]
+
+        # Does it already exist in the database?
+        source_id = dataset_upsert_result.source_ids.get(source.name)
+        if not source_id:
+            # Not exists, upsert it
+            # NOTE: this could be quite inefficient as we upsert source for every variable
+            #   optimize this if this turns out to be a bottleneck
+            source_id = _upsert_source_to_db(
+                db, source, dataset_upsert_result.dataset_id
+            )
 
         db_variable_id = db.upsert_variable(
             name=table[column_name].title,
