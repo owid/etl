@@ -4,11 +4,29 @@
 
 _A compute graph for loading and transforming data for OWID._
 
-**Status: work in progress**
+**Status: in production**
 
 ## Overview
 
 This project is the spiritual successor to [importers](https://github.com/owid/importers), meant to eventually replace it. Its job is to assemble and republish OWID's _data science catalog_, the richest and easiest to use version of the datasets we can create. The catalog it creates is also meant to eventually replace Grapher's database as our source of truth for all data.
+
+```mermaid
+graph TB
+
+upstream[Upstream data providers] -->|snapshot| walden[Walden snapshot]
+upstream -->|publish| github
+github[Datasets on Github] --> etl:::focus
+walden --> etl(ETL steps)
+etl -->|generate| catalog[Data catalog]
+catalog -->|ingested| mysql
+catalog -->|renders| explorers
+catalog -->|published| api
+mysql[Grapher MySQL] --> owid[Our World in Data site]
+explorers --> owid
+api --> jupyter[Jupyter notebooks]
+
+classDef focus stroke-width:4px
+```
 
 ## Getting started
 
