@@ -163,7 +163,9 @@ class DBUtils:
 
     def upsert_dataset(
         self,
-        name: str,
+        short_name: str,
+        title: str,
+        version: str,
         namespace: str,
         user_id: int,
         tag_id: Optional[int] = None,
@@ -173,11 +175,13 @@ class DBUtils:
         operation = self.upsert_one(
             """
             INSERT INTO datasets
-                (name, description, namespace, sourceChecksum, createdAt, createdByUserId, updatedAt, metadataEditedAt, metadataEditedByUserId, dataEditedAt, dataEditedByUserId)
+                (shortName, name, version, description, namespace, sourceChecksum, createdAt, createdByUserId, updatedAt, metadataEditedAt, metadataEditedByUserId, dataEditedAt, dataEditedByUserId)
             VALUES
-                (%s, %s, %s, %s, NOW(), %s, NOW(), NOW(), %s, NOW(), %s)
+                (%s, %s, %s, %s, %s, %s, NOW(), %s, NOW(), NOW(), %s, NOW(), %s)
             ON DUPLICATE KEY UPDATE
+                shortName = VALUES(shortName),
                 name = VALUES(name),
+                version = VALUES(version),
                 description = VALUES(description),
                 namespace = VALUES(namespace),
                 sourceChecksum = VALUES(sourceChecksum),
@@ -187,15 +191,26 @@ class DBUtils:
                 dataEditedAt = VALUES(dataEditedAt),
                 dataEditedByUserId = VALUES(dataEditedByUserId)
         """,
-            [name, description, namespace, source_checksum, user_id, user_id, user_id],
+            [
+                short_name,
+                title,
+                version,
+                description,
+                namespace,
+                source_checksum,
+                user_id,
+                user_id,
+                user_id,
+            ],
         )
         (v,) = self.fetch_one(
             """
             SELECT id FROM datasets
-            WHERE name = %s
+            WHERE shortName = %s
+            AND version = %s
             AND namespace = %s
         """,
-            [name, namespace],
+            [short_name, version, namespace],
         )
         dataset_id = cast(int, v)
 

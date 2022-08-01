@@ -74,6 +74,8 @@ def upsert_dataset(
         print("Upserting dataset")
         dataset_id = db.upsert_dataset(
             dataset.metadata.short_name,
+            dataset.metadata.title,
+            dataset.metadata.version,
             namespace,
             int(cast(str, config.GRAPHER_USER_ID)),
             source_checksum=source_checksum,

@@ -2,8 +2,8 @@ from typing import Iterable
 
 from owid import catalog
 
-from etl.paths import DATA_DIR
 from etl import grapher_helpers as gh
+from etl.paths import DATA_DIR
 
 
 def get_grapher_dataset() -> catalog.Dataset:
