@@ -182,7 +182,7 @@ def run_dag(
 
     if not steps:
         raise ValueError(
-            "No steps matched the given input. Check spelling or consult `etl --help` for more options"
+            f"No steps matched the given input `{' '.join(includes or [])}`. Check spelling or consult `etl --help` for more options"
         )
 
     if not force:
