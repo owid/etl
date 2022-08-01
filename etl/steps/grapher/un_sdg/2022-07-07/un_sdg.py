@@ -38,6 +38,35 @@ def get_grapher_tables(dataset: Dataset) -> Iterable[Table]:
     )
     ds_garden = Dataset((DATA_DIR / f"garden/{NAMESPACE}/{VERSION}/{FNAME}").as_posix())
     sdg_tables = ds_garden.table_names
+    sdg_tables = [
+        "_17_3_2_bx_trf_pwkr",
+        "_7_2_1_eg_fec_rnew",
+        "_11_4_1_gb_xpd_culnat_pbpv",
+        "_14_2_1_en_scp_ecsyba",
+        "_15_9_1_er_bdy_abt2np",
+        "_3_7_2_sp_dyn_adkl",
+        "_6_5_1_er_h2o_iwrmd",
+        "_13_a_1_dc_fin_tot",
+        "_3_b_1_sh_acs_hpv",
+        "_17_7_1_dc_envtech_exp",
+        "_17_13_1_ne_con_govt_kd_zg",
+        "_13_2_1_en_nad_contr",
+        "_17_16_1_sg_pln_mstksdg_p",
+        "_6_6_1_en_wbe_wtlp",
+        "_17_13_1_ny_gdp_mktp_kd_zg",
+        "_17_13_1_bn_cab_xoka_gd_zs",
+        "_17_13_1_tg_val_totl_gd_zs",
+        "_17_13_1_bn_klt_ptxl_cd",
+        "_17_13_1_dp_dod_dld2_cr_cg_z1",
+        "_17_13_1_fp_cpi_totl_zg",
+        "_10_7_4_sm_pop_refg_or",
+        "_17_13_1_ne_imp_gnfs_kd_zg",
+        "_10_7_3_sm_dth_migr",
+        "_17_13_1_ne_exp_gnfs_kd_zg",
+        "_17_13_1_fm_lbl_bmny_ir_zs",
+        "_17_13_1_fb_bnk_capa_zs",
+        "_5_2_1_vc_vaw_marr",
+    ]
     for var in sdg_tables:
         var_df = create_dataframe_with_variable_name(ds_garden, var)
         var_df["source"] = clean_source_name(var_df["source"], clean_source_map)
