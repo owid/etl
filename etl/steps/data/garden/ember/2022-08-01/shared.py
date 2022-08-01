@@ -135,7 +135,7 @@ HISTORIC_TO_CURRENT_REGION: Dict[str, Dict[str, Union[str, List[str]]]] = {
 }
 
 # List of known overlaps between regions and member countries (or successor countries).
-OVERLAPPING_DATA_TO_REMOVE_IN_AGGREGATES = []
+OVERLAPPING_DATA_TO_REMOVE_IN_AGGREGATES: List[Dict[str, Union[str, List[int]]]] = []
 # OVERLAPPING_DATA_TO_REMOVE_IN_AGGREGATES = [
 #     {
 #         "region": "Netherlands Antilles",

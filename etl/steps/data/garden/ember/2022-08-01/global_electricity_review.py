@@ -7,8 +7,14 @@ from owid import catalog
 from owid.datautils import geo
 
 from etl.paths import DATA_DIR
-from shared import CURRENT_DIR, OVERLAPPING_DATA_TO_REMOVE_IN_AGGREGATES, REGIONS_TO_ADD, add_population,\
-    add_region_aggregates, log
+from shared import (
+    CURRENT_DIR,
+    OVERLAPPING_DATA_TO_REMOVE_IN_AGGREGATES,
+    REGIONS_TO_ADD,
+    add_population,
+    add_region_aggregates,
+    log,
+)
 
 # Details for dataset to export.
 DATASET_SHORT_NAME = "global_electricity_review"
@@ -26,81 +32,81 @@ MT_TO_G = 1e12
 
 # Categories expected to exist in the data.
 CATEGORIES = [
-    'Capacity',
-    'Electricity demand',
-    'Electricity generation',
-    'Electricity imports',
-    'Power sector emissions',
+    "Capacity",
+    "Electricity demand",
+    "Electricity generation",
+    "Electricity imports",
+    "Power sector emissions",
 ]
 
-# TODO: Choose columns for which region aggregates should be created.
+# Choose columns for which region aggregates should be created.
 SUM_AGGREGATES = [
-    # 'Bioenergy (%)',
-    'Bioenergy (GW)',
-    'Bioenergy (TWh)',
-    'Bioenergy (mtCO2)',
-    # 'CO2 intensity (gCO2/kWh)',
-    # 'Clean (%)',
-    'Clean (GW)',
-    'Clean (TWh)',
-    'Clean (mtCO2)',
-    # 'Coal (%)',
-    'Coal (GW)',
-    'Coal (TWh)',
-    'Coal (mtCO2)',
-    'Demand (TWh)',
-    # 'Demand per capita (MWh)',
-    # 'Fossil (%)',
-    'Fossil (GW)',
-    'Fossil (TWh)',
-    'Fossil (mtCO2)',
-    # 'Gas (%)',
-    'Gas (GW)',
-    'Gas (TWh)',
-    'Gas (mtCO2)',
-    'Gas and Other Fossil (%)',
-    'Gas and Other Fossil (GW)',
-    'Gas and Other Fossil (TWh)',
-    'Gas and Other Fossil (mtCO2)',
-    # 'Hydro (%)',
-    'Hydro (GW)',
-    'Hydro (TWh)',
-    'Hydro (mtCO2)',
-    'Hydro, Bioenergy and Other Renewables (%)',
-    'Hydro, Bioenergy and Other Renewables (GW)',
-    'Hydro, Bioenergy and Other Renewables (TWh)',
-    'Hydro, Bioenergy and Other Renewables (mtCO2)',
-    'Net Imports (TWh)',
-    # 'Nuclear (%)',
-    'Nuclear (GW)',
-    'Nuclear (TWh)',
-    'Nuclear (mtCO2)',
-    # 'Other Fossil (%)',
-    'Other Fossil (GW)',
-    'Other Fossil (TWh)',
-    'Other Fossil (mtCO2)',
-    # 'Other Renewables (%)',
-    'Other Renewables (GW)',
-    'Other Renewables (TWh)',
-    'Other Renewables (mtCO2)',
-    # 'Renewables (%)',
-    'Renewables (GW)',
-    'Renewables (TWh)',
-    'Renewables (mtCO2)',
-    # 'Solar (%)',
-    'Solar (GW)',
-    'Solar (TWh)',
-    'Solar (mtCO2)',
-    'Total Generation (TWh)',
-    'Total emissions (mtCO2)',
-    # 'Wind (%)',
-    'Wind (GW)',
-    'Wind (TWh)',
-    'Wind (mtCO2)',
-    # 'Wind and Solar (%)',
-    'Wind and Solar (GW)',
-    'Wind and Solar (TWh)',
-    'Wind and Solar (mtCO2)',
+    # "Bioenergy (%)",
+    "Bioenergy (GW)",
+    "Bioenergy (TWh)",
+    "Bioenergy (mtCO2)",
+    # "CO2 intensity (gCO2/kWh)",
+    # "Clean (%)",
+    "Clean (GW)",
+    "Clean (TWh)",
+    "Clean (mtCO2)",
+    # "Coal (%)",
+    "Coal (GW)",
+    "Coal (TWh)",
+    "Coal (mtCO2)",
+    "Demand (TWh)",
+    # "Demand per capita (MWh)",
+    # "Fossil (%)",
+    "Fossil (GW)",
+    "Fossil (TWh)",
+    "Fossil (mtCO2)",
+    # "Gas (%)",
+    "Gas (GW)",
+    "Gas (TWh)",
+    "Gas (mtCO2)",
+    "Gas and Other Fossil (%)",
+    "Gas and Other Fossil (GW)",
+    "Gas and Other Fossil (TWh)",
+    "Gas and Other Fossil (mtCO2)",
+    # "Hydro (%)",
+    "Hydro (GW)",
+    "Hydro (TWh)",
+    "Hydro (mtCO2)",
+    "Hydro, Bioenergy and Other Renewables (%)",
+    "Hydro, Bioenergy and Other Renewables (GW)",
+    "Hydro, Bioenergy and Other Renewables (TWh)",
+    "Hydro, Bioenergy and Other Renewables (mtCO2)",
+    "Net Imports (TWh)",
+    # "Nuclear (%)",
+    "Nuclear (GW)",
+    "Nuclear (TWh)",
+    "Nuclear (mtCO2)",
+    # "Other Fossil (%)",
+    "Other Fossil (GW)",
+    "Other Fossil (TWh)",
+    "Other Fossil (mtCO2)",
+    # "Other Renewables (%)",
+    "Other Renewables (GW)",
+    "Other Renewables (TWh)",
+    "Other Renewables (mtCO2)",
+    # "Renewables (%)",
+    "Renewables (GW)",
+    "Renewables (TWh)",
+    "Renewables (mtCO2)",
+    # "Solar (%)",
+    "Solar (GW)",
+    "Solar (TWh)",
+    "Solar (mtCO2)",
+    "Total Generation (TWh)",
+    "Total emissions (mtCO2)",
+    # "Wind (%)",
+    "Wind (GW)",
+    "Wind (TWh)",
+    "Wind (mtCO2)",
+    # "Wind and Solar (%)",
+    "Wind and Solar (GW)",
+    "Wind and Solar (TWh)",
+    "Wind and Solar (mtCO2)",
 ]
 
 
@@ -111,7 +117,11 @@ def prepare_wide_table(df: pd.DataFrame, category: str) -> catalog.Table:
     _df = df[df["category"] == category].copy()
 
     # Pivot dataframe to have a column for each variable.
-    table = catalog.Table(_df.pivot(index=["country", "year"], columns=["variable", "unit"], values="value"))
+    table = catalog.Table(
+        _df.pivot(
+            index=["country", "year"], columns=["variable", "unit"], values="value"
+        )
+    )
 
     # Get units for each column.
     units = table.columns.get_level_values(1).tolist()
@@ -159,7 +169,9 @@ def process_electricity_generation(df: pd.DataFrame) -> catalog.Table:
                 raise ValueError(f"Column {value_column} not found.")
             # Select only regions.
             select_regions = table["country"].isin(list(REGIONS_TO_ADD))
-            table.loc[select_regions, column] = table[value_column] / table["Total Generation (TWh)"] * 100
+            table.loc[select_regions, column] = (
+                table[value_column] / table["Total Generation (TWh)"] * 100
+            )
 
     return table
 
@@ -168,17 +180,17 @@ def process_electricity_demand(df: pd.DataFrame) -> catalog.Table:
     # Prepare wide table.
     table = prepare_wide_table(df=df, category="Electricity demand")
 
-    # TODO: Consider creating a dataframe with all aggregate columns but giving informed population (to create more
-    #  accurate per-capita variables).
-
     # Add population to data
     table = add_population(df=table, warn_on_missing_countries=False)
 
     # Recalculate demand per capita.
     # We could do this only for region aggregates (since they do not have per capita values),
     # but we do this for all countries, to ensure per-capita variables are consistent with our population data.
-    table["Demand per capita (kWh)"] = pd.DataFrame(table)["Demand (TWh)"] * TWH_TO_KWH / \
-        pd.DataFrame(table)["population"]
+    table["Demand per capita (kWh)"] = (
+        pd.DataFrame(table)["Demand (TWh)"]
+        * TWH_TO_KWH
+        / pd.DataFrame(table)["population"]
+    )
 
     # Delete the original demand per capita column.
     table = table.drop(columns="Demand per capita (MWh)")
@@ -201,20 +213,30 @@ def process_power_sector_emissions(df: pd.DataFrame) -> catalog.Table:
     # In principle this only needs to be done for region aggregates, but we do it for all countries and check that
     # the results are consistent with the original data.
     # Prepare wide table also for electricity generation (required to calculate carbon intensity).
-    electricity = prepare_wide_table(
-        df=df, category="Electricity generation")[["country", "year", "Total Generation (TWh)"]]
+    electricity = prepare_wide_table(df=df, category="Electricity generation")[
+        ["country", "year", "Total Generation (TWh)"]
+    ]
     # Add total electricity generation to emissions table.
     table = pd.merge(table, electricity, on=["country", "year"], how="left")
     # Rename the original carbon intensity column as a temporary column called "check".
     intensity_col = "CO2 intensity (gCO2/kWh)"
     table = table.rename(columns={intensity_col: "check"})
     # Calculate carbon intensity for all countries and regions.
-    table[intensity_col] = pd.DataFrame(table)["Total emissions (mtCO2)"] * MT_TO_G /\
-        (table["Total Generation (TWh)"] * TWH_TO_KWH)
+    table[intensity_col] = (
+        pd.DataFrame(table)["Total emissions (mtCO2)"]
+        * MT_TO_G
+        / (table["Total Generation (TWh)"] * TWH_TO_KWH)
+    )
     # Check that the new carbon intensities agree (within 1 % of mean average percentage error) with the original
     # ones (where carbon intensity was given, namely for countries, not aggregate regions).
-    mape = 100 * abs(table.dropna(subset="check")[intensity_col] - table["check"].dropna()) / table["check"].dropna()
-    assert mape.max() < 1, "Calculated carbon intensities differ from original ones by more than 1 percent."
+    mape = (
+        100
+        * abs(table.dropna(subset="check")[intensity_col] - table["check"].dropna())
+        / table["check"].dropna()
+    )
+    assert (
+        mape.max() < 1
+    ), "Calculated carbon intensities differ from original ones by more than 1 percent."
     # Remove temporary column.
     table = table.drop(columns="check")
 
