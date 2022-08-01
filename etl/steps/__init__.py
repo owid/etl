@@ -6,6 +6,7 @@ import concurrent.futures
 import graphlib
 import hashlib
 import re
+import subprocess
 import tempfile
 import types
 import warnings
@@ -36,7 +37,7 @@ from etl.grapher_import import (
     upsert_dataset,
     upsert_table,
 )
-from etl.helpers import get_etag, isolated_env
+from etl.helpers import get_etag
 
 Graph = Dict[str, Set[str]]
 DAG = Dict[str, Any]
@@ -366,18 +367,15 @@ class DataStep(Step):
         """
         Import the Python module for this step and call run() on it.
         """
-        module_path = self.path.lstrip("/").replace("/", ".")
-        module_dir = (paths.STEP_DIR / "data" / self.path).parent
-
-        with isolated_env(module_dir):
-            step_module = import_module(
-                f"{paths.BASE_PACKAGE}.steps.data.{module_path}"
-            )
-            if not hasattr(step_module, "run"):
-                raise Exception(f'no run() method defined for module "{step_module}"')
-
-            # data steps
-            step_module.run(self._dest_dir.as_posix())  # type: ignore
+        # use a subprocess to isolate each step from the others, and avoid state bleeding
+        # between them
+        subprocess.check_call(
+            [
+                f"{paths.BASE_DIR}/.venv/bin/run_python_step",
+                str(self),
+                self._dest_dir.as_posix(),
+            ]
+        )
 
     def _run_notebook(self) -> None:
         "Run a parameterised Jupyter notebook."
