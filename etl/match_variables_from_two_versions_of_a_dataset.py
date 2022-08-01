@@ -6,8 +6,6 @@ variables and map them to the indexes of the identical variables in the new data
 However, if variable names have changed (or the number of variables have changed) the pairing may need to be done
 manually. This script is a CLI tool that may help in either scenario.
 
-The original script was originally from the owid/importers repo: https://github.com/owid/importers/blob/master/standard_revisions/match_variables_from_two_versions_of_a_dataset.py
-
 """
 
 import argparse
@@ -19,7 +17,6 @@ from fuzzywuzzy import fuzz
 import MySQLdb
 from etl.db import get_connection
 
-# CURRENT_DIR = "etl/steps/grapher/un_sdg/2022-07-07"
 # True to skip variables that are identical in old and new datasets, when running comparison.
 # If so, identical variables will be matched automatically.
 # False to include variables with identical names in comparison.
@@ -419,23 +416,24 @@ def main(
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description="Map variable names from an old version of a dataset to variables of a new dataset."
-    )
+    parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "-f",
         "--output_file",
         help="Path to output json file.",
+        required=True,
     )
     parser.add_argument(
         "-old",
         "--old_dataset_name",
         help="Old dataset name (as defined in grapher).",
+        required=True,
     )
     parser.add_argument(
         "-new",
         "--new_dataset_name",
         help="New dataset name (as defined in grapher).",
+        required=True,
     )
     parser.add_argument(
         "-s",
