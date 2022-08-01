@@ -15,6 +15,7 @@ bulk_backport = 'backport.bulk_backport:bulk_backport'
 fasttrack = 'backport.fasttrack:fasttrack'
 walkthrough = 'walkthrough.cli:cli'
 run_python_step = 'etl.run_python_step:main'
+compare = 'etl.compare:cli'
 
 [tool.poetry.dependencies]
 python = "^3.9"
@@ -48,6 +49,8 @@ sqlmodel = "^0.0.6"
 rich = "^12.1.0"
 owid-datautils = {git = "https://github.com/owid/data-utils-py.git", rev = "v0.4.4-alpha"}
 fuzzywuzzy = "^0.18.0"
+mistune = "^2.0.4"
+rich-click = "^1.5.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.1.2"
