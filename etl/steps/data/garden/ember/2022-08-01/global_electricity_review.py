@@ -30,6 +30,17 @@ TWH_TO_KWH = 1e9
 # Megatonnes to grams.
 MT_TO_G = 1e12
 
+# Map units (short version) to unit name (long version).
+SHORT_UNIT_TO_UNIT = {
+    "TWh": "terawatt-hours",
+    "MWh": "megawatt-hours",
+    "kWh": "kilowatt-hours",
+    "mtCO2": "megatonnes of CO2 equivalent",
+    "gCO2/kWh": "grams of CO2 equivalent per kilowatt-hour",
+    "GW": "gigawatts",
+    "%": "%",
+}
+
 # Categories expected to exist in the data.
 CATEGORIES = [
     "Capacity",
@@ -123,17 +134,16 @@ def prepare_wide_table(df: pd.DataFrame, category: str) -> catalog.Table:
         )
     )
 
-    # Get units for each column.
+    # Get variable names, units, and variable-units (a name that combines both) for each column.
+    variables = table.columns.get_level_values(0).tolist()
     units = table.columns.get_level_values(1).tolist()
+    variable_units = [f"{variable} ({unit})" for variable, unit in table.columns]
+
+    assert len(variable_units) == len(units) == len(variables)
 
     # Collapse the two column levels into one, with the naming "variable (unit)" (except for country and year, that
     # have no units).
-    table.columns = [f"{variable} ({unit})" for variable, unit in table.columns]
-
-    # Add variable names and units to the metadata.
-    for column, unit in zip(table.columns, units):
-        table[column].metadata.title = column
-        table[column].metadata.unit = unit
+    table.columns = variable_units
 
     # Add region aggregates.
     aggregates = {column: "sum" for column in SUM_AGGREGATES if column in table.columns}
@@ -145,6 +155,13 @@ def prepare_wide_table(df: pd.DataFrame, category: str) -> catalog.Table:
         known_overlaps=OVERLAPPING_DATA_TO_REMOVE_IN_AGGREGATES,
         keep_original_region_with_suffix=" (Ember)",
     )
+
+    # Add variable names and units to the metadata.
+    for column, variable, unit in zip(variable_units, variables, units):
+        table[column].metadata.title = column
+        table[column].metadata.short_unit = unit
+        table[column].metadata.unit = SHORT_UNIT_TO_UNIT[unit]
+        table[column].metadata.display = {"name": variable}
 
     return table
 
@@ -180,6 +197,20 @@ def process_electricity_demand(df: pd.DataFrame) -> catalog.Table:
     # Prepare wide table.
     table = prepare_wide_table(df=df, category="Electricity demand")
 
+    # Store variable metadata in a dictionary, since it will be lost when processing data.
+    table_metadata = {column: table[column].metadata for column in table.columns}
+
+    # Include variable metadata for additional variables that will be created.
+    table_metadata["population"] = catalog.VariableMeta(
+        title="Population", unit="people", short_unit="people"
+    )
+    table_metadata["Demand per capita (kWh)"] = catalog.VariableMeta(
+        title="Demand per capita (kWh)",
+        unit="kilowatt-hours",
+        short_unit="kWh",
+        display={"name": "Demand per capita"},
+    )
+
     # Add population to data
     table = add_population(df=table, warn_on_missing_countries=False)
 
@@ -191,6 +222,10 @@ def process_electricity_demand(df: pd.DataFrame) -> catalog.Table:
         * TWH_TO_KWH
         / pd.DataFrame(table)["population"]
     )
+
+    # Restore original metadata for each column (and add the new ones).
+    for column in table.columns:
+        table[column].metadata = table_metadata[column]
 
     # Delete the original demand per capita column.
     table = table.drop(columns="Demand per capita (MWh)")
@@ -208,6 +243,17 @@ def process_electricity_imports(df: pd.DataFrame) -> catalog.Table:
 def process_power_sector_emissions(df: pd.DataFrame) -> catalog.Table:
     # Prepare wide table of emissions data.
     table = prepare_wide_table(df=df, category="Power sector emissions")
+
+    # Store variable metadata in a dictionary, since it will be lost when processing data.
+    table_metadata = {column: table[column].metadata for column in table.columns}
+
+    # Include variable metadata for additional variables that will be created.
+    table_metadata["Total Generation (TWh)"] = catalog.VariableMeta(
+        title="Total Generation (TWh)",
+        unit="terawatt-hours",
+        short_unit="TWh",
+        display={"name": "Total Generation"},
+    )
 
     # Add carbon intensity.
     # In principle this only needs to be done for region aggregates, but we do it for all countries and check that
@@ -239,6 +285,10 @@ def process_power_sector_emissions(df: pd.DataFrame) -> catalog.Table:
     ), "Calculated carbon intensities differ from original ones by more than 1 percent."
     # Remove temporary column.
     table = table.drop(columns="check")
+
+    # Restore original metadata for each column (and add the new ones).
+    for column in table.columns:
+        table[column].metadata = table_metadata[column]
 
     return table
 
@@ -302,7 +352,7 @@ def run(dest_dir: str) -> None:
         table = table.set_index(["country", "year"], verify_integrity=True).sort_index()
         table = catalog.utils.underscore_table(table)
         table.metadata = tb_meadow.metadata
-        table.update_metadata_from_yaml(METADATA_PATH, DATASET_SHORT_NAME)
+        # table.update_metadata_from_yaml(METADATA_PATH, DATASET_SHORT_NAME)
         table.metadata.title = table_name
         table.metadata.short_name = catalog.utils.underscore(table_name)
         ds_garden.add(table)

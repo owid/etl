@@ -1,20 +1,14 @@
 dataset:
+  namespace: ember
   version: 2022-08-01
+  title: Global Electricity Review (Ember, 2022)
+  short_name: global_electricity_review
+  publication_year: 2022
+  publication_date: 2022-07-25
   sources:
-  #   -
-  #     name: Maddison Project Database 2020 (Bolt and van Zanden, 2020)
-  #     published_by: Bolt, Jutta and Jan Luiten van Zanden (2020), “Maddison style estimates of the evolution of the world economy. A new 2020 update“.
-  #     publisher_source: |
-  #       The Maddison Project Database is based on the work of many researchers that have produced estimates of...
-
-tables:
-  global_electricity_review:
-    variables:
-      # gdp:
-      #   title: GDP
-      #   short_unit: $
-      #   unit: 2011 int-$
-      #   description: Gross domestic product measured in international-$ using 2011 prices to adjust for price changes over time (inflation) and price differences between countries. Calculated by multiplying GDP per capita with population.
-      #   display:
-      #     entityAnnotationsMap: "Western Offshoots: United States, Canada, Australia and New Zealand"
-      #     numDecimalPlaces: 0
+    -
+      name: Our World in Data based on Ember's Global Electricity Review (2022).
+      published_by: Ember
+      publication_year: 2022
+      date_accessed: 2022-08-01
+      url: https://ember-climate.org/data/data-catalogue/yearly-electricity-data/
