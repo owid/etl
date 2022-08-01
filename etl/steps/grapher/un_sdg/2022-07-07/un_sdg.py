@@ -72,8 +72,8 @@ def get_grapher_tables(dataset: Dataset) -> Iterable[Table]:
         var_df["source"] = clean_source_name(var_df["source"], clean_source_map)
         var_gr = var_df.groupby("variable_name")
         for var_name, df_var in var_gr:
-            print(var_name)
             df_tab = add_metadata_and_prepare_for_grapher(df_var, walden_ds)
+            log.info("Existing metadata:", df_tab["meta"].iloc[0])
             yield from gh.yield_long_table(df_tab)
 
 
