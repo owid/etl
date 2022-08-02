@@ -21,6 +21,10 @@ VERSION = Path(__file__).parent.stem
 FNAME = Path(__file__).stem
 NAMESPACE = Path(__file__).parent.parent.stem
 
+VERSION = "2022-07-07"
+FNAME = "un_sdg"
+NAMESPACE = "un_sdg"
+
 
 def get_grapher_dataset() -> Dataset:
     dataset = Dataset(DATA_DIR / f"garden/{NAMESPACE}/{VERSION}/{FNAME}")
@@ -73,7 +77,7 @@ def get_grapher_tables(dataset: Dataset) -> Iterable[Table]:
         var_gr = var_df.groupby("variable_name")
         for var_name, df_var in var_gr:
             df_tab = add_metadata_and_prepare_for_grapher(df_var, walden_ds)
-            log.info("Existing metadata:", df_tab["meta"].iloc[0])
+            # log.info("Existing metadata:", metadata=df_tab["meta"].iloc[0])
             yield from gh.yield_long_table(df_tab)
 
 
@@ -104,7 +108,7 @@ def add_metadata_and_prepare_for_grapher(
     )
     source = Source(
         name=df_gr["source"].iloc[0],
-        description="Metadata available at: %s" % (source_url),
+        description="Further information available at: %s" % (source_url),
         url=walden_ds.metadata["url"],
         source_data_url=walden_ds.metadata["source_data_url"],
         owid_data_url=walden_ds.metadata["owid_data_url"],
