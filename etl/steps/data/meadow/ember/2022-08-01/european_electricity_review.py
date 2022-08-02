@@ -2,18 +2,16 @@
 
 """
 
-from tempfile import TemporaryDirectory
 from pathlib import Path
-
-from zipfile import ZipFile
+from tempfile import TemporaryDirectory
 from typing import Dict
+from zipfile import ZipFile
 
 import pandas as pd
 from owid import catalog
 from owid.walden import Catalog as WaldenCatalog
 
 from etl.steps.data.converters import convert_walden_metadata
-
 from shared import VERSION, log
 
 # Details of dataset to export.
@@ -40,7 +38,9 @@ TABLE_NAMES = {
 }
 
 
-def load_dataframes_from_compressed_folder(zip_file_path: str) -> Dict[str, pd.DataFrame]:
+def load_dataframes_from_compressed_folder(
+    zip_file_path: str,
+) -> Dict[str, pd.DataFrame]:
     # Initialise dictionary that will contain the dataframes.
     dfs = {}
     with TemporaryDirectory() as _temp_folder:
@@ -50,7 +50,9 @@ def load_dataframes_from_compressed_folder(zip_file_path: str) -> Dict[str, pd.D
                 # Check all files in the folder (there are some hidden mac files that start with "__"), and keep only
                 # files of the required extension.
                 if file.endswith(FILES_EXTENSION) and not file.startswith("__"):
-                    df_name = file.replace(FILES_EXTENSION, "").replace(FILES_NAME_START, "")
+                    df_name = file.replace(FILES_EXTENSION, "").replace(
+                        FILES_NAME_START, ""
+                    )
                     # Extract file, read it as a dataframe, and store it in dictionary.
                     _zip_folder.extract(file, path=_temp_folder)
                     dfs[df_name] = pd.read_csv(temp_file)
@@ -72,7 +74,9 @@ def run(dest_dir: str) -> None:
     log.info(f"{DATASET_SHORT_NAME}.start")
 
     # Retrieve raw data from walden.
-    walden_ds = WaldenCatalog().find_one(namespace=NAMESPACE, short_name=DATASET_SHORT_NAME, version=WALDEN_VERSION)
+    walden_ds = WaldenCatalog().find_one(
+        namespace=NAMESPACE, short_name=DATASET_SHORT_NAME, version=WALDEN_VERSION
+    )
     local_file = walden_ds.ensure_downloaded()
 
     # Original zip file contains various csv files.
