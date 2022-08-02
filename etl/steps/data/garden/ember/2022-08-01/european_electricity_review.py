@@ -23,7 +23,9 @@ METADATA_PATH = CURRENT_DIR / f"{DATASET_SHORT_NAME}.meta.yml"
 MWH_TO_KWH = 1000
 
 
-def process_net_flows_data(table: catalog.Table, countries_regions: catalog.Table) -> catalog.Table:
+def process_net_flows_data(
+    table: catalog.Table, countries_regions: catalog.Table
+) -> catalog.Table:
     df = pd.DataFrame(table).reset_index()
 
     # Create dictionary mapping country codes to harmonized country names.
@@ -41,11 +43,18 @@ def process_net_flows_data(table: catalog.Table, countries_regions: catalog.Tabl
     df = df[list(columns)].rename(columns=columns)
     # Change country codes to harmonized country names in both columns.
     for column in ["source_country", "target_country"]:
-        df[column] = dataframes.map_series(series=df[column], mapping=country_code_to_name,
-                                           warn_on_missing_mappings=True, show_full_warning=True)
+        df[column] = dataframes.map_series(
+            series=df[column],
+            mapping=country_code_to_name,
+            warn_on_missing_mappings=True,
+            show_full_warning=True,
+        )
 
-    table = catalog.Table(df).set_index(["source_country", "target_country", "year"],
-                                        verify_integrity=True).sort_index()
+    table = (
+        catalog.Table(df)
+        .set_index(["source_country", "target_country", "year"], verify_integrity=True)
+        .sort_index()
+    )
 
     return table
 
@@ -55,8 +64,12 @@ def process_generation_data(table: catalog.Table) -> catalog.Table:
 
     # Sanity checks.
     error = "Columns fuel_code and fuel_desc have inconsistencies."
-    assert df.groupby("fuel_code").agg({"fuel_desc": "nunique"})["fuel_desc"].max() == 1, error
-    assert df.groupby("fuel_desc").agg({"fuel_code": "nunique"})["fuel_code"].max() == 1, error
+    assert (
+        df.groupby("fuel_code").agg({"fuel_desc": "nunique"})["fuel_desc"].max() == 1
+    ), error
+    assert (
+        df.groupby("fuel_desc").agg({"fuel_code": "nunique"})["fuel_code"].max() == 1
+    ), error
 
     columns = {
         "country_name": "country",
@@ -65,18 +78,29 @@ def process_generation_data(table: catalog.Table) -> catalog.Table:
         "generation_twh": "TWh",
         "share_of_generation_pct": "%",
     }
-    df = df[list(columns)].rename(columns=columns).\
-        pivot(index=["country", "year"], columns=["fuel_desc"])
+    df = (
+        df[list(columns)]
+        .rename(columns=columns)
+        .pivot(index=["country", "year"], columns=["fuel_desc"])
+    )
 
     # Collapse the two column levels into one, with the naming "variable (unit)" (except for country and year, that
     # have no units).
     df.columns = [f"{variable} ({unit})" for unit, variable in df.columns]
 
     # Harmonize country names.
-    df = geo.harmonize_countries(df=df.reset_index(), countries_file=str(COUNTRY_MAPPING_PATH),
-                                 warn_on_unused_countries=False, warn_on_missing_countries=True)
+    df = geo.harmonize_countries(
+        df=df.reset_index(),
+        countries_file=str(COUNTRY_MAPPING_PATH),
+        warn_on_unused_countries=False,
+        warn_on_missing_countries=True,
+    )
 
-    table = catalog.Table(df).set_index(["country", "year"], verify_integrity=True).sort_index()
+    table = (
+        catalog.Table(df)
+        .set_index(["country", "year"], verify_integrity=True)
+        .sort_index()
+    )
 
     return table
 
@@ -84,21 +108,29 @@ def process_generation_data(table: catalog.Table) -> catalog.Table:
 def process_country_overview_data(table: catalog.Table) -> catalog.Table:
     # Rename columns for consistency with global electricity review.
     columns = {
-        'country_name': 'country',
-        'year': 'year',
-        'generation_twh': "generation__twh",
-        'net_import_twh': "net_imports__twh",
-        'demand_twh': "demand__twh",
-        'demand_mwh_per_capita': "demand_per_capita__kwh",
+        "country_name": "country",
+        "year": "year",
+        "generation_twh": "generation__twh",
+        "net_import_twh": "net_imports__twh",
+        "demand_twh": "demand__twh",
+        "demand_mwh_per_capita": "demand_per_capita__kwh",
     }
     df = pd.DataFrame(table).reset_index()[list(columns)].rename(columns=columns)
     # Harmonize country names.
-    df = geo.harmonize_countries(df=df, countries_file=str(COUNTRY_MAPPING_PATH),
-                                 warn_on_unused_countries=False, warn_on_missing_countries=True)
-    
+    df = geo.harmonize_countries(
+        df=df,
+        countries_file=str(COUNTRY_MAPPING_PATH),
+        warn_on_unused_countries=False,
+        warn_on_missing_countries=True,
+    )
+
     # Convert units of demand per capita.
     df["demand_per_capita__kwh"] = df["demand_per_capita__kwh"] * MWH_TO_KWH
-    table = catalog.Table(df).set_index(["country", "year"], verify_integrity=True).sort_index()
+    table = (
+        catalog.Table(df)
+        .set_index(["country", "year"], verify_integrity=True)
+        .sort_index()
+    )
 
     return table
 
@@ -106,16 +138,24 @@ def process_country_overview_data(table: catalog.Table) -> catalog.Table:
 def process_emissions_data(table: catalog.Table) -> catalog.Table:
     # Rename columns for consistency with global electricity review.
     columns = {
-        'country_name': 'country',
-        'year': 'year',
-        'emissions_intensity_gco2_kwh': "co2_intensity__gco2_kwh",
-        'emissions_mtc02e': "total_emissions__mtco2",
+        "country_name": "country",
+        "year": "year",
+        "emissions_intensity_gco2_kwh": "co2_intensity__gco2_kwh",
+        "emissions_mtc02e": "total_emissions__mtco2",
     }
     df = pd.DataFrame(table).reset_index()[list(columns)].rename(columns=columns)
     # Harmonize country names.
-    df = geo.harmonize_countries(df=df, countries_file=str(COUNTRY_MAPPING_PATH),
-                                 warn_on_unused_countries=False, warn_on_missing_countries=True)
-    table = catalog.Table(df).set_index(["country", "year"], verify_integrity=True).sort_index()
+    df = geo.harmonize_countries(
+        df=df,
+        countries_file=str(COUNTRY_MAPPING_PATH),
+        warn_on_unused_countries=False,
+        warn_on_missing_countries=True,
+    )
+    table = (
+        catalog.Table(df)
+        .set_index(["country", "year"], verify_integrity=True)
+        .sort_index()
+    )
 
     return table
 
@@ -126,20 +166,28 @@ def run(dest_dir: str) -> None:
     #
     # Read dataset from meadow.
     ds_meadow = catalog.Dataset(MEADOW_DATASET_PATH)
-    
+
     # Load countries-regions table (required to convert country codes to country names in net flows table).
     countries_regions = catalog.find(
-        table="countries_regions", dataset="reference", channels=["garden"], namespace="owid").load()
+        table="countries_regions",
+        dataset="reference",
+        channels=["garden"],
+        namespace="owid",
+    ).load()
 
     #
     # Process data.
     #
     # Process each individual table.
     tables = {
-        "Country overview": process_country_overview_data(table=ds_meadow["country_overview"]),
+        "Country overview": process_country_overview_data(
+            table=ds_meadow["country_overview"]
+        ),
         "Emissions": process_emissions_data(table=ds_meadow["emissions"]),
         "Generation": process_generation_data(table=ds_meadow["generation"]),
-        "Net flows": process_net_flows_data(table=ds_meadow["net_flows"], countries_regions=countries_regions),
+        "Net flows": process_net_flows_data(
+            table=ds_meadow["net_flows"], countries_regions=countries_regions
+        ),
     }
 
     #
@@ -158,7 +206,9 @@ def run(dest_dir: str) -> None:
         # Make column names snake lower case.
         table = catalog.utils.underscore_table(table)
         # Import metadata from meadow and update attributes that have changed.
-        table.update_metadata_from_yaml(METADATA_PATH, catalog.utils.underscore(table_name))
+        table.update_metadata_from_yaml(
+            METADATA_PATH, catalog.utils.underscore(table_name)
+        )
         table.metadata.title = table_name
         table.metadata.short_name = catalog.utils.underscore(table_name)
         # Add table to dataset.
