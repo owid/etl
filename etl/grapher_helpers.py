@@ -175,7 +175,6 @@ def yield_long_table(
     - value: variable value
     - meta: either VariableMeta object or null in every row
     """
-
     assert set(table.columns) == {
         "variable",
         "meta",
