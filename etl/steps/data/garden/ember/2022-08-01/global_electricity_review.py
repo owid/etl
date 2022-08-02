@@ -121,7 +121,57 @@ SUM_AGGREGATES = [
 ]
 
 
+def load_global_electricity_review(tb_meadow: catalog.Table) -> pd.DataFrame:
+    """Load global electricity data from meadow table.
+
+    Parameters
+    ----------
+    tb_meadow : catalog.Table
+        Table from the global electricity review dataset in meadow.
+
+    Returns
+    -------
+    df : pd.DataFrame
+        Global electricity data, in a dataframe format, with a dummy index, and only required columns.
+
+    """
+    # Make a dataframe out of the data in the table.
+    raw = pd.DataFrame(tb_meadow)
+
+    # Select and rename columns conveniently.
+    columns = {
+        "area": "country",
+        "year": "year",
+        "variable": "variable",
+        "value": "value",
+        "unit": "unit",
+        "category": "category",
+        "subcategory": "subcategory",
+    }
+    df = raw.reset_index()[list(columns)].rename(columns=columns)
+
+    # Sanity check.
+    assert set(df["category"]) == set(CATEGORIES), "Categories have changed in data."
+
+    return df
+
+
 def prepare_wide_table(df: pd.DataFrame, category: str) -> catalog.Table:
+    """Convert data from long to wide format for a specific category and prepare a table where variables have metadata.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Data, after harmonising country names.
+    category : str
+        Name of category (as defined above in CATEGORIES) to process.
+
+    Returns
+    -------
+    table : catalog.Table
+        Table in wide format.
+
+    """
     # Common processing for all categories in the data.
 
     # Select data for given category.
@@ -166,14 +216,20 @@ def prepare_wide_table(df: pd.DataFrame, category: str) -> catalog.Table:
     return table
 
 
-def process_capacity_data(df: pd.DataFrame) -> catalog.Table:
-    # Prepare wide table.
-    table = prepare_wide_table(df=df, category="Capacity")
-
-    return table
-
-
 def process_electricity_generation(df: pd.DataFrame) -> catalog.Table:
+    """Create table with processed data of category "Electricity generation".
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Data in long format for all categories, after harmonizing country names.
+
+    Returns
+    -------
+    table : catalog.Table
+        Table (with variables metadata) of processed data for the given category.
+
+    """
     # Prepare wide table.
     table = prepare_wide_table(df=df, category="Electricity generation")
 
@@ -194,6 +250,19 @@ def process_electricity_generation(df: pd.DataFrame) -> catalog.Table:
 
 
 def process_electricity_demand(df: pd.DataFrame) -> catalog.Table:
+    """Create table with processed data of category "Electricity demand".
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Data in long format for all categories, after harmonizing country names.
+
+    Returns
+    -------
+    table : catalog.Table
+        Table (with variables metadata) of processed data for the given category.
+
+    """
     # Prepare wide table.
     table = prepare_wide_table(df=df, category="Electricity demand")
 
@@ -233,14 +302,20 @@ def process_electricity_demand(df: pd.DataFrame) -> catalog.Table:
     return table
 
 
-def process_electricity_imports(df: pd.DataFrame) -> catalog.Table:
-    # Prepare wide table.
-    table = prepare_wide_table(df=df, category="Electricity imports")
-
-    return table
-
-
 def process_power_sector_emissions(df: pd.DataFrame) -> catalog.Table:
+    """Create table with processed data of category "Power sector emissions".
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Data in long format for all categories, after harmonizing country names.
+
+    Returns
+    -------
+    table : catalog.Table
+        Table (with variables metadata) of processed data for the given category.
+
+    """
     # Prepare wide table of emissions data.
     table = prepare_wide_table(df=df, category="Power sector emissions")
 
@@ -303,27 +378,12 @@ def run(dest_dir: str) -> None:
     ds_meadow = catalog.Dataset(MEADOW_DATASET_PATH)
     # Get table from dataset.
     tb_meadow = ds_meadow[DATASET_SHORT_NAME]
-    # Make a dataframe out of the data in the table.
-    raw = pd.DataFrame(tb_meadow)
+    # Make a dataframe out of the data in the table, with the required columns.
+    df = load_global_electricity_review(tb_meadow)
 
     #
     # Process data.
     #
-    # Select and rename columns conveniently.
-    columns = {
-        "area": "country",
-        "year": "year",
-        "variable": "variable",
-        "value": "value",
-        "unit": "unit",
-        "category": "category",
-        "subcategory": "subcategory",
-    }
-    df = raw.reset_index()[list(columns)].rename(columns=columns)
-
-    # Sanity check.
-    assert set(df["category"]) == set(CATEGORIES), "Categories have changed in data."
-
     # Harmonize country names.
     log.info(f"{DATASET_SHORT_NAME}.harmonize_countries")
     df = geo.harmonize_countries(df=df, countries_file=str(COUNTRY_MAPPING_PATH))
@@ -331,10 +391,12 @@ def run(dest_dir: str) -> None:
     # Split data into different tables, one per category, and process each one individually.
     log.info(f"{DATASET_SHORT_NAME}.prepare_wide_tables")
     tables = {
-        "Capacity": process_capacity_data(df=df),
+        "Capacity": prepare_wide_table(df=df, category="Capacity"),
         "Electricity demand": process_electricity_demand(df=df),
         "Electricity generation": process_electricity_generation(df=df),
-        "Electricity imports": process_electricity_imports(df=df),
+        "Electricity imports": prepare_wide_table(
+            df=df, category="Electricity imports"
+        ),
         "Power sector emissions": process_power_sector_emissions(df=df),
     }
 
@@ -342,19 +404,24 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     ds_garden = catalog.Dataset.create_empty(dest_dir)
+    # Import metadata from meadow dataset and update attributes using the metadata yaml file.
     ds_garden.metadata = ds_meadow.metadata
     ds_garden.metadata.update_from_yaml(METADATA_PATH)
+    # Create dataset.
     ds_garden.save()
 
     # Add all tables to dataset.
     for table_name in list(tables):
         table = tables[table_name]
+        # Set index and sort conveniently.
         table = table.set_index(["country", "year"], verify_integrity=True).sort_index()
+        # Make column names snake lower case.
         table = catalog.utils.underscore_table(table)
+        # Import metadata from meadow and update attributes that have changed.
         table.metadata = tb_meadow.metadata
-        # table.update_metadata_from_yaml(METADATA_PATH, DATASET_SHORT_NAME)
         table.metadata.title = table_name
         table.metadata.short_name = catalog.utils.underscore(table_name)
+        # Add table to dataset.
         ds_garden.add(table)
 
     log.info(f"{DATASET_SHORT_NAME}.end")
