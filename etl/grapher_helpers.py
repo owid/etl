@@ -175,8 +175,6 @@ def yield_long_table(
     - value: variable value
     - meta: either VariableMeta object or null in every row
     """
-    print(table["meta"].reset_index()["meta"].iloc[0].title)
-    print(table["meta"].reset_index()["meta"].iloc[0].sources[0].description)
 
     assert set(table.columns) == {
         "variable",
@@ -201,8 +199,6 @@ def yield_long_table(
         if annot:
             t = annotate_table(t, annot, missing_col="ignore")
 
-        print(t[var_name].metadata.title)
-        print(t[var_name].metadata.sources[0].description)
         t = t.drop(["variable", "meta"], axis=1, errors="ignore")
 
         yield from yield_wide_table(cast(catalog.Table, t))
