@@ -49,7 +49,6 @@ sqlmodel = "^0.0.6"
 rich = "^12.1.0"
 owid-datautils = {git = "https://github.com/owid/data-utils-py.git", rev = "v0.4.4-alpha"}
 fuzzywuzzy = "^0.18.0"
-mistune = "^2.0.4"
 rich-click = "^1.5.1"
 
 [tool.poetry.dev-dependencies]
