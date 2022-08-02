@@ -54,6 +54,10 @@ def upsert_dataset(
     sources: List[catalog.meta.Source],
     source_checksum: str,
 ) -> DatasetUpsertResult:
+    assert dataset.metadata.short_name, "Dataset must have a short_name"
+    assert dataset.metadata.version, "Dataset must have a version"
+    assert dataset.metadata.title, "Dataset must have a title"
+
     utils.validate_underscore(dataset.metadata.short_name, "Dataset's short_name")
 
     if len(sources) > 1:
@@ -137,7 +141,7 @@ def upsert_table(
     ), f"Tables to be upserted must have only 1 column. Instead they have: {table.columns.names}"
     assert table[
         table.columns[0]
-    ].title, f"Column {table.columns.names} must have a title in metadata"
+    ].title, f"Column `{table.columns[0]}` must have a title in metadata"
     assert (
         table.iloc[:, 0].notnull().all()
     ), f"Tables to be upserted must have no null values. Instead they have:\n{table.loc[table.iloc[:, 0].isnull()]}"
@@ -173,7 +177,9 @@ def upsert_table(
 
         # Every variable must have exactly one source
         if len(table[column_name].metadata.sources) != 1:
-            raise NotImplementedError(f"Variable `{column_name}` must have exactly one source, see function `adapt_table_for_grapher` that can do that for you")
+            raise NotImplementedError(
+                f"Variable `{column_name}` must have exactly one source, see function `adapt_table_for_grapher` that can do that for you"
+            )
 
         source = table[column_name].metadata.sources[0]
 
@@ -188,7 +194,8 @@ def upsert_table(
             )
 
         db_variable_id = db.upsert_variable(
-            name=table[column_name].title,
+            short_name=column_name,
+            title=table[column_name].title,
             source_id=source_id,
             dataset_id=dataset_upsert_result.dataset_id,
             description=table[column_name].metadata.description,

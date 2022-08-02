@@ -303,7 +303,8 @@ class DBUtils:
 
     def upsert_variable(
         self,
-        name: str,
+        short_name: str,
+        title: str,
         code: Optional[str],
         unit: Optional[str],
         short_unit: Optional[str],
@@ -323,13 +324,13 @@ class DBUtils:
         operation = self.upsert_one(
             """
             INSERT INTO variables (
-                name, code, description, unit, shortUnit, timespan, coverage,
-                display, originalMetadata, sourceId, datasetId, createdAt,
-                updatedAt
+                shortName, name, code, description, unit, shortUnit, timespan, coverage,
+                display, originalMetadata, sourceId, datasetId, createdAt, updatedAt
             )
             VALUES
-                (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW())
+                (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW())
             ON DUPLICATE KEY UPDATE
+                shortName = VALUES(shortName),
                 name = VALUES(name),
                 code = VALUES(code),
                 description = VALUES(description),
@@ -341,11 +342,11 @@ class DBUtils:
                 originalMetadata = VALUES(originalMetadata),
                 datasetId = VALUES(datasetId),
                 sourceId = VALUES(sourceId),
-                datasetId = VALUES(datasetId),
                 updatedAt = VALUES(updatedAt)
         """,
             [
-                name,
+                short_name,
+                title,
                 code,
                 description,
                 unit,
@@ -367,11 +368,11 @@ class DBUtils:
         (var_id,) = self.fetch_one(
             """
             SELECT id FROM variables
-            WHERE (name = %s OR code = %s)
+            WHERE (shortName = %s OR code = %s)
             AND datasetId = %s
             AND sourceId = %s
         """,
-            [name, code, dataset_id, source_id],
+            [short_name, code, dataset_id, source_id],
         )
 
         return cast(int, var_id)
