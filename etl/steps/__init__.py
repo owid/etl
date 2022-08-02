@@ -11,6 +11,7 @@ import tempfile
 import types
 import warnings
 from collections import defaultdict
+from collections.abc import Generator
 from dataclasses import dataclass, field
 from glob import glob
 from importlib import import_module
@@ -565,10 +566,19 @@ class GrapherStep(Step):
             self.checksum_input(),
         )
         try:
-            variable_upsert_results = [
-                upsert_table(table, dataset_upsert_results)
-                for table in step_module.get_grapher_tables(dataset)  # type: ignore
-            ]
+            source_checker = _source_checker_generator()
+            name_checker = _name_checker_generator()
+            next(source_checker)
+            next(name_checker)
+
+            variable_upsert_results = []
+            for table in step_module.get_grapher_tables(dataset):  # type: ignore
+                source_checker.send(table)
+                name_checker.send(table)
+
+                variable_upsert_results.append(
+                    upsert_table(table, dataset_upsert_results)
+                )
         except Exception as e:
             # dataset has been already inserted into DB with checksum, make it null again so that the
             # step remains dirty
@@ -727,3 +737,58 @@ def select_dirty_steps(steps: List[Step], max_workers: int) -> List[Step]:
         steps_dirty = executor.map(lambda s: s.is_dirty(), steps)  # type: ignore
         steps = [s for s, is_dirty in zip(steps, steps_dirty) if is_dirty]
     return steps
+
+
+def _source_checker_generator() -> Generator[None, catalog.Table, None]:
+    """Generator that checks if all sources with the same `name` have the same contents.
+    Source name is used as an identifier for upserting sources and must be unique. Note
+    that source name is not shown anywhere in the UI, it is only used as an identifier."""
+    source_name_to_hash: Dict[str, Any] = {}
+
+    while True:
+        # receive new table to check
+        table = yield
+
+        variable_name = table.columns[0]
+
+        if len(table.iloc[:, 0].sources) == 0:
+            continue
+        source = table.iloc[:, 0].sources[0]
+
+        # get unique hash of a source
+        source_hash = hash(source.to_json(sort_keys=True))
+
+        if source.name in source_name_to_hash:
+            if source_name_to_hash[source.name]["hash"] != source_hash:
+                raise Exception(
+                    f"Source with name `{source.name}` has different contents for variables `{variable_name}` "
+                    f"and `{source_name_to_hash[source.name]['variable_name']}`"
+                )
+
+        # remember hash and variable name of this source
+        source_name_to_hash[source.name] = {
+            "hash": source_hash,
+            "variable_name": variable_name,
+        }
+
+
+def _name_checker_generator() -> Generator[None, catalog.Table, None]:
+    """Generator that checks if all tables have unique column names and titles. If these were
+    not unique they would be overwritten later when inserting to grapher."""
+    seen_short_names = set()
+    seen_titles = set()
+
+    while True:
+        # receive new table to check
+        table = yield
+
+        short_name = table.columns[0]
+        title = table.iloc[:, 0].metadata.title
+
+        assert (
+            short_name not in seen_short_names
+        ), f"Variable `{short_name}` is not unique"
+        assert title not in seen_titles, f"Title `{title}` is not unique"
+
+        seen_short_names.add(short_name)
+        seen_titles.add(title)
