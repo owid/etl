@@ -26,6 +26,21 @@ MWH_TO_KWH = 1000
 def process_net_flows_data(
     table: catalog.Table, countries_regions: catalog.Table
 ) -> catalog.Table:
+    """Process net flows data, including country harmonization.
+
+    Parameters
+    ----------
+    table : catalog.Table
+        Table from the meadow dataset on net flows.
+    countries_regions : catalog.Table
+        Table from the owid countries-regions dataset.
+
+    Returns
+    -------
+    table: catalog.Table
+        Processed table.
+
+    """
     df = pd.DataFrame(table).reset_index()
 
     # Create dictionary mapping country codes to harmonized country names.
@@ -60,6 +75,19 @@ def process_net_flows_data(
 
 
 def process_generation_data(table: catalog.Table) -> catalog.Table:
+    """Process electricity generation data, including country harmonization.
+
+    Parameters
+    ----------
+    table : catalog.Table
+        Table from the meadow dataset on electricity generation.
+
+    Returns
+    -------
+    table: catalog.Table
+        Processed table.
+
+    """
     df = pd.DataFrame(table).reset_index()
 
     # Sanity checks.
@@ -71,6 +99,7 @@ def process_generation_data(table: catalog.Table) -> catalog.Table:
         df.groupby("fuel_desc").agg({"fuel_code": "nunique"})["fuel_code"].max() == 1
     ), error
 
+    # Select useful columns and rename them conveniently.
     columns = {
         "country_name": "country",
         "year": "year",
@@ -78,6 +107,7 @@ def process_generation_data(table: catalog.Table) -> catalog.Table:
         "generation_twh": "TWh",
         "share_of_generation_pct": "%",
     }
+    # Convert from long to wide format dataframe.
     df = (
         df[list(columns)]
         .rename(columns=columns)
@@ -96,6 +126,7 @@ def process_generation_data(table: catalog.Table) -> catalog.Table:
         warn_on_missing_countries=True,
     )
 
+    # Create a table with a well-constructed index.
     table = (
         catalog.Table(df)
         .set_index(["country", "year"], verify_integrity=True)
@@ -106,6 +137,19 @@ def process_generation_data(table: catalog.Table) -> catalog.Table:
 
 
 def process_country_overview_data(table: catalog.Table) -> catalog.Table:
+    """Process country overview data, including country harmonization.
+
+    Parameters
+    ----------
+    table : catalog.Table
+        Table from the meadow dataset.
+
+    Returns
+    -------
+    table: catalog.Table
+        Processed table.
+
+    """
     # Rename columns for consistency with global electricity review.
     columns = {
         "country_name": "country",
@@ -126,6 +170,8 @@ def process_country_overview_data(table: catalog.Table) -> catalog.Table:
 
     # Convert units of demand per capita.
     df["demand_per_capita__kwh"] = df["demand_per_capita__kwh"] * MWH_TO_KWH
+
+    # Create a table with a well-constructed index.
     table = (
         catalog.Table(df)
         .set_index(["country", "year"], verify_integrity=True)
@@ -136,6 +182,19 @@ def process_country_overview_data(table: catalog.Table) -> catalog.Table:
 
 
 def process_emissions_data(table: catalog.Table) -> catalog.Table:
+    """Process emissions data, including country harmonization.
+
+    Parameters
+    ----------
+    table : catalog.Table
+        Table from the meadow dataset on emissions.
+
+    Returns
+    -------
+    table: catalog.Table
+        Processed table.
+
+    """
     # Rename columns for consistency with global electricity review.
     columns = {
         "country_name": "country",
@@ -151,6 +210,8 @@ def process_emissions_data(table: catalog.Table) -> catalog.Table:
         warn_on_unused_countries=False,
         warn_on_missing_countries=True,
     )
+
+    # Create a table with a well-constructed index.
     table = (
         catalog.Table(df)
         .set_index(["country", "year"], verify_integrity=True)
