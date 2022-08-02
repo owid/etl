@@ -18,7 +18,7 @@ from owid.catalog.catalogs import INDEX_FORMATS
 from owid.catalog.datasets import FileFormat
 
 from owid.catalog import LocalCatalog, CHANNEL
-from owid.catalog.helpers import read_frame
+import pandas as pd
 
 from etl import config, files
 from etl.paths import DATA_DIR
@@ -293,6 +293,20 @@ def connect_s3() -> Any:
 
 def _channel_path(channel: CHANNEL, format: FileFormat) -> Path:
     return Path(f"catalog-{channel}.{format}")
+
+
+def read_frame(uri: str) -> pd.DataFrame:
+    if uri.endswith(".feather"):
+        return pd.read_feather(uri)
+
+    elif uri.endswith(".parquet"):
+        return pd.read_parquet(uri)
+
+    elif uri.endswith(".csv"):
+        return pd.read_csv(uri)
+
+    else:
+        raise ValueError(f"Unknown format for {uri}")
 
 
 if __name__ == "__main__":
