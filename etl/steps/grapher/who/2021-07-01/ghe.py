@@ -81,9 +81,13 @@ def get_grapher_tables(dataset: catalog.Dataset) -> Iterable[catalog.Table]:
         table[column].metadata.description = annotation["description"]
         table[column].metadata.unit = annotation["unit"]
         table[column].metadata.short_unit = annotation["short_unit"]
+        table[column].metadata.title = annotation["title"]
+
+        # use dataset source
+        table[column].metadata.sources = dataset.metadata.sources
 
     # Sanity check
     for column in columns_to_export:
         assert table[column].metadata.unit is not None, "Unit should not be None here!"
 
-    yield from gh.yield_wide_table(table, na_action="drop")
+    yield from gh.yield_wide_table(table[columns_to_export], na_action="drop")

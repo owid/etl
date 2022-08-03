@@ -163,7 +163,9 @@ class DBUtils:
 
     def upsert_dataset(
         self,
-        name: str,
+        short_name: str,
+        title: str,
+        version: str,
         namespace: str,
         user_id: int,
         tag_id: Optional[int] = None,
@@ -173,11 +175,13 @@ class DBUtils:
         operation = self.upsert_one(
             """
             INSERT INTO datasets
-                (name, description, namespace, sourceChecksum, createdAt, createdByUserId, updatedAt, metadataEditedAt, metadataEditedByUserId, dataEditedAt, dataEditedByUserId)
+                (shortName, name, version, description, namespace, sourceChecksum, createdAt, createdByUserId, updatedAt, metadataEditedAt, metadataEditedByUserId, dataEditedAt, dataEditedByUserId)
             VALUES
-                (%s, %s, %s, %s, NOW(), %s, NOW(), NOW(), %s, NOW(), %s)
+                (%s, %s, %s, %s, %s, %s, NOW(), %s, NOW(), NOW(), %s, NOW(), %s)
             ON DUPLICATE KEY UPDATE
+                shortName = VALUES(shortName),
                 name = VALUES(name),
+                version = VALUES(version),
                 description = VALUES(description),
                 namespace = VALUES(namespace),
                 sourceChecksum = VALUES(sourceChecksum),
@@ -187,15 +191,26 @@ class DBUtils:
                 dataEditedAt = VALUES(dataEditedAt),
                 dataEditedByUserId = VALUES(dataEditedByUserId)
         """,
-            [name, description, namespace, source_checksum, user_id, user_id, user_id],
+            [
+                short_name,
+                title,
+                version,
+                description,
+                namespace,
+                source_checksum,
+                user_id,
+                user_id,
+                user_id,
+            ],
         )
         (v,) = self.fetch_one(
             """
             SELECT id FROM datasets
-            WHERE name = %s
+            WHERE shortName = %s
+            AND version = %s
             AND namespace = %s
         """,
-            [name, namespace],
+            [short_name, version, namespace],
         )
         dataset_id = cast(int, v)
 
@@ -288,7 +303,8 @@ class DBUtils:
 
     def upsert_variable(
         self,
-        name: str,
+        short_name: str,
+        title: str,
         code: Optional[str],
         unit: Optional[str],
         short_unit: Optional[str],
@@ -308,13 +324,13 @@ class DBUtils:
         operation = self.upsert_one(
             """
             INSERT INTO variables (
-                name, code, description, unit, shortUnit, timespan, coverage,
-                display, originalMetadata, sourceId, datasetId, createdAt,
-                updatedAt
+                shortName, name, code, description, unit, shortUnit, timespan, coverage,
+                display, originalMetadata, sourceId, datasetId, createdAt, updatedAt
             )
             VALUES
-                (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW())
+                (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW())
             ON DUPLICATE KEY UPDATE
+                shortName = VALUES(shortName),
                 name = VALUES(name),
                 code = VALUES(code),
                 description = VALUES(description),
@@ -326,11 +342,11 @@ class DBUtils:
                 originalMetadata = VALUES(originalMetadata),
                 datasetId = VALUES(datasetId),
                 sourceId = VALUES(sourceId),
-                datasetId = VALUES(datasetId),
                 updatedAt = VALUES(updatedAt)
         """,
             [
-                name,
+                short_name,
+                title,
                 code,
                 description,
                 unit,
@@ -352,11 +368,11 @@ class DBUtils:
         (var_id,) = self.fetch_one(
             """
             SELECT id FROM variables
-            WHERE (name = %s OR code = %s)
+            WHERE (shortName = %s OR code = %s)
             AND datasetId = %s
             AND sourceId = %s
         """,
-            [name, code, dataset_id, source_id],
+            [short_name, code, dataset_id, source_id],
         )
 
         return cast(int, var_id)
