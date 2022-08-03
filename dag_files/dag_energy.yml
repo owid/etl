@@ -52,7 +52,7 @@ steps:
   data://garden/eia/2022-07-27/energy_consumption:
     - data://meadow/eia/2022-07-27/energy_consumption
   #
-  # Energy- Primary energy consumption 2022.
+  # Energy - Primary energy consumption 2022.
   #
   data://garden/energy/2022-07-29/primary_energy_consumption:
     - data://garden/bp/2022-07-14/statistical_review
@@ -61,3 +61,18 @@ steps:
     - data://garden/owid/latest/key_indicators
   grapher://energy/2022-07-29/primary_energy_consumption:
     - data://garden/energy/2022-07-29/primary_energy_consumption
+  #
+  # Ember - Global electricity review 2022.
+  #
+  data://meadow/ember/2022-08-01/global_electricity_review:
+    - walden://ember/2022-07-25/global_electricity_review
+  data://garden/ember/2022-08-01/global_electricity_review:
+    - data://meadow/ember/2022-08-01/global_electricity_review
+  #
+  # Ember - European electricity review 2022.
+  #
+  data://meadow/ember/2022-08-01/european_electricity_review:
+    - walden://ember/2022-02-01/european_electricity_review
+  data://garden/ember/2022-08-01/european_electricity_review:
+    - data://meadow/ember/2022-08-01/european_electricity_review
+    - data://garden/reference

@@ -3,22 +3,21 @@
 #  etl
 #
 
+import concurrent.futures
 import re
 import sys
-from typing import Any, Dict, Iterator, Optional, cast
 from collections.abc import Iterable
-from urllib.error import HTTPError
 from pathlib import Path
-import concurrent.futures
+from typing import Any, Dict, Iterator, Optional, cast
+from urllib.error import HTTPError
 
-import click
 import boto3
+import click
+import pandas as pd
 from botocore.client import ClientError
+from owid.catalog import CHANNEL, LocalCatalog
 from owid.catalog.catalogs import INDEX_FORMATS
 from owid.catalog.datasets import FileFormat
-
-from owid.catalog import LocalCatalog, CHANNEL
-import pandas as pd
 
 from etl import config, files
 from etl.paths import DATA_DIR
@@ -262,7 +261,7 @@ def get_published_checksums(bucket: str, channel: CHANNEL) -> Dict[str, str]:
             .checksum.to_dict()
         )
     except HTTPError:
-        existing = {}
+        existing = {}  # type: ignore
 
     return cast(Dict[str, str], existing)
 
@@ -297,10 +296,10 @@ def _channel_path(channel: CHANNEL, format: FileFormat) -> Path:
 
 def read_frame(uri: str) -> pd.DataFrame:
     if uri.endswith(".feather"):
-        return pd.read_feather(uri)
+        return cast(pd.DataFrame, pd.read_feather(uri))
 
     elif uri.endswith(".parquet"):
-        return pd.read_parquet(uri)
+        return cast(pd.DataFrame, pd.read_parquet(uri))
 
     elif uri.endswith(".csv"):
         return pd.read_csv(uri)

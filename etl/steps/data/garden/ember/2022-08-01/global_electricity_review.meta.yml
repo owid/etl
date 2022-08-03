@@ -1,0 +1,14 @@
+dataset:
+  namespace: ember
+  version: 2022-08-01
+  title: Global Electricity Review (Ember, 2022)
+  short_name: global_electricity_review
+  publication_year: 2022
+  publication_date: 2022-07-25
+  sources:
+    -
+      name: Our World in Data based on Ember's Global Electricity Review (2022).
+      published_by: Ember
+      publication_year: 2022
+      date_accessed: 2022-08-01
+      url: https://ember-climate.org/data/data-catalogue/yearly-electricity-data/
