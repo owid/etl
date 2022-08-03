@@ -156,7 +156,7 @@ def process_country_overview_data(table: catalog.Table) -> catalog.Table:
     columns = {
         "country_name": "country",
         "year": "year",
-        "generation_twh": "generation__twh",
+        "generation_twh": "total_generation__twh",
         "net_import_twh": "net_imports__twh",
         "demand_twh": "demand__twh",
         "demand_mwh_per_capita": "demand_per_capita__kwh",

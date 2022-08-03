@@ -16,7 +16,7 @@ dataset:
 tables:
   country_overview:
     variables:
-      generation__twh:
+      total_generation__twh:
         title: Generation (TWh)
         short_unit: terawatt-hours
         unit: TWh
