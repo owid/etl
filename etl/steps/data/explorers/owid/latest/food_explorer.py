@@ -93,5 +93,5 @@ def run(dest_dir: str) -> None:
             .replace("__", "_")
             .replace("_e_g_", "_eg_")
         )
-        # Add table to dataset.
-        dataset.add(table_product, format="csv")
+        # Add table to dataset. Force publication in csv.
+        dataset.add(table_product, formats=["csv"])

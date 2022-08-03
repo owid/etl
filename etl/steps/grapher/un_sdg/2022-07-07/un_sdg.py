@@ -73,8 +73,7 @@ def add_metadata_and_prepare_for_grapher(
         var_name=df_gr["variable_name"].iloc[0][0:10],
     )
     source = Source(
-        name=var_name,
-        description="Further information available at: %s" % (source_url),
+        name=df_gr["source"].iloc[0],
         url=walden_ds.metadata["url"],
         source_data_url=walden_ds.metadata["source_data_url"],
         owid_data_url=walden_ds.metadata["owid_data_url"],
@@ -84,14 +83,11 @@ def add_metadata_and_prepare_for_grapher(
         published_by=walden_ds.metadata["name"],
         publisher_source=df_gr["source"].iloc[0],
     )
-    assert (
-        "-".join([part.rjust(2, "0") for part in indicator.split(".")])
-        in source.description
-    )
 
     df_gr["meta"] = VariableMeta(
         title=df_gr["variable_name"].iloc[0],
-        description=df_gr["seriesdescription"].iloc[0],
+        description=df_gr["seriesdescription"].iloc[0]
+        + "\n\nFurther information available at: %s" % (source_url),
         sources=[source],
         unit=df_gr["long_unit"].iloc[0],
         short_unit=df_gr["short_unit"].iloc[0],

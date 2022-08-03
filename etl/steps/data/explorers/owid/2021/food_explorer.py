@@ -1468,7 +1468,7 @@ def run(dest_dir: str) -> None:
 
     # Add products
     for _, t in tables_products.items():
-        fe_garden.add(t, format="csv")  # <-- note we choose CSV format here
+        fe_garden.add(t, formats=["csv"])  # <-- note we include CSV format here
 
 
 # %% [markdown]
