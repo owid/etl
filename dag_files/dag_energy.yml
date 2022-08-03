@@ -75,3 +75,4 @@ steps:
     - walden://ember/2022-02-01/european_electricity_review
   data://garden/ember/2022-08-01/european_electricity_review:
     - data://meadow/ember/2022-08-01/european_electricity_review
+    - data://garden/reference

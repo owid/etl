@@ -15,6 +15,8 @@ from shared import CURRENT_DIR
 DATASET_SHORT_NAME = "european_electricity_review"
 # Details for dataset to import.
 MEADOW_DATASET_PATH = DATA_DIR / f"meadow/ember/2022-08-01/{DATASET_SHORT_NAME}"
+# Path to countries-regions dataset.
+COUNTRIES_REGIONS_DATASET_PATH = DATA_DIR / "garden/reference"
 
 COUNTRY_MAPPING_PATH = CURRENT_DIR / f"{DATASET_SHORT_NAME}.countries.json"
 METADATA_PATH = CURRENT_DIR / f"{DATASET_SHORT_NAME}.meta.yml"
@@ -229,12 +231,9 @@ def run(dest_dir: str) -> None:
     ds_meadow = catalog.Dataset(MEADOW_DATASET_PATH)
 
     # Load countries-regions table (required to convert country codes to country names in net flows table).
-    countries_regions = catalog.find(
-        table="countries_regions",
-        dataset="reference",
-        channels=["garden"],
-        namespace="owid",
-    ).load()
+    countries_regions = catalog.Dataset(COUNTRIES_REGIONS_DATASET_PATH)[
+        "countries_regions"
+    ]
 
     #
     # Process data.
