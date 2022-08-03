@@ -418,7 +418,9 @@ def run(dest_dir: str) -> None:
         # Make column names snake lower case.
         table = catalog.utils.underscore_table(table)
         # Import metadata from meadow and update attributes that have changed.
-        table.metadata = tb_meadow.metadata
+        table.update_metadata_from_yaml(
+            METADATA_PATH, catalog.utils.underscore(table_name)
+        )
         table.metadata.title = table_name
         table.metadata.short_name = catalog.utils.underscore(table_name)
         # Add table to dataset.
