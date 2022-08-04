@@ -478,6 +478,6 @@ def run(dest_dir: str) -> None:
     table = catalog.utils.underscore_table(table)
     # Add metadata for the table.
     table.metadata.short_name = "all_products"
-    table.metadata.primary_key = list(table.index)
+    table.metadata.primary_key = list(table.index.names)
     # Add table to dataset.
     explorer_dataset.add(table)
