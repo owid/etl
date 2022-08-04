@@ -270,8 +270,6 @@ def run(dest_dir: str) -> None:
         combined["total_emissions__mtco2"] * MT_TO_G
     ) / (combined["total_generation__twh"] * TWH_TO_KWH)
 
-    # TODO: It seems that the intensities of Slovenia and Slovakia change significantly, check why.
-
     # Add per capita variables.
     combined = add_per_capita_variables(combined=combined)
 
