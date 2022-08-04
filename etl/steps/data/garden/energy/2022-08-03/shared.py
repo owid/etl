@@ -49,7 +49,9 @@ HISTORIC_TO_CURRENT_REGION: Dict[str, Dict[str, Union[str, List[str]]]] = {
 }
 
 
-def combine_two_overlapping_dataframes(df1: pd.DataFrame, df2: pd.DataFrame, index_columns: List[str]) -> pd.DataFrame:
+def combine_two_overlapping_dataframes(
+    df1: pd.DataFrame, df2: pd.DataFrame, index_columns: List[str]
+) -> pd.DataFrame:
     """Combine two dataframes that may have identical columns, prioritising the first one.
 
     Both dataframes must have a dummy index (if not, use reset_index() on both of them).
@@ -79,7 +81,9 @@ def combine_two_overlapping_dataframes(df1: pd.DataFrame, df2: pd.DataFrame, ind
 
     """
     # Find columns of data (those that are not index columns).
-    data_columns = [col for col in (set(df1.columns) | set(df2.columns)) if col not in index_columns]
+    data_columns = [
+        col for col in (set(df1.columns) | set(df2.columns)) if col not in index_columns
+    ]
 
     # Go column by column, concatenate, remove nans, and then keep df1 version on duplicated rows.
     # Note: There may be a faster, simpler way to achieve this.
@@ -97,7 +101,9 @@ def combine_two_overlapping_dataframes(df1: pd.DataFrame, df2: pd.DataFrame, ind
         # Add the current variable to the combined dataframe.
         combined = pd.merge(combined, _combined, on=index_columns, how="outer")
 
-    assert len([column for column in combined.columns if column.endswith("_x")]) == 0, "There are repeated columns."
+    assert (
+        len([column for column in combined.columns if column.endswith("_x")]) == 0
+    ), "There are repeated columns."
 
     return combined
 

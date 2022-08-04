@@ -41,30 +41,48 @@ def process_bp_data(table_bp: catalog.Table) -> pd.DataFrame:
     # New columns to be created by summing other columns.
     aggregates = {
         "fossil_generation__twh": {
-            "columns": ["oil_generation__twh", "coal_generation__twh", "gas_generation__twh"],
+            "columns": [
+                "oil_generation__twh",
+                "coal_generation__twh",
+                "gas_generation__twh",
+            ],
             "metadata": catalog.VariableMeta(
                 title="Generation - Fossil fuels (TWh)",
-                unit="terawatt-hours", short_unit="TWh", display={"name": "Fossil fuels"}),
+                unit="terawatt-hours",
+                short_unit="TWh",
+                display={"name": "Fossil fuels"},
+            ),
         },
         "renewable_generation__twh": {
-            "columns": ["hydro_generation__twh", "solar_generation__twh", "wind_generation__twh",
-                        "other_renewables_including_bioenergy_generation__twh"],
+            "columns": [
+                "hydro_generation__twh",
+                "solar_generation__twh",
+                "wind_generation__twh",
+                "other_renewables_including_bioenergy_generation__twh",
+            ],
             "metadata": catalog.VariableMeta(
                 title="Generation - Renewables (TWh)",
-                unit="terawatt-hours", short_unit="TWh", display={"name": "Renewables"}),
+                unit="terawatt-hours",
+                short_unit="TWh",
+                display={"name": "Renewables"},
+            ),
         },
         "low_carbon_generation__twh": {
             "columns": ["renewable_generation__twh", "nuclear_generation__twh"],
             "metadata": catalog.VariableMeta(
                 title="Generation - Low-carbon sources (TWh)",
-                unit="terawatt-hours", short_unit="TWh", display={"name": "Low-carbon sources"}),
+                unit="terawatt-hours",
+                short_unit="TWh",
+                display={"name": "Low-carbon sources"},
+            ),
         },
     }
 
     # Create new columns, by adding up other columns (and allowing for only one nan in each sum).
     for new_column, aggregate in aggregates.items():
         table_bp[new_column] = pd.DataFrame(table_bp)[aggregate["columns"]].sum(
-            axis=1, min_count=len(aggregate["columns"]) - 1)
+            axis=1, min_count=len(aggregate["columns"]) - 1
+        )
         # Create metadata for this new variable.
         table_bp[new_column].metadata = aggregate["metadata"]
 
@@ -100,14 +118,21 @@ def process_ember_data(table_ember: catalog.Table) -> pd.DataFrame:
     # In BP data, there is a variable "Geo Biomass Other", which combines all other renewables.
     # In Ember data, "other rewenables" excludes bioenergy.
     # To be able to combine both datasets, create a new variable for generation of other renewables including bioenergy.
-    table_ember["other_renewables_including_bioenergy_generation__twh"] = \
-        pd.DataFrame(table_ember)["other_renewables_excluding_bioenergy_generation__twh"] + \
-        table_ember["bioenergy_generation__twh"]
+    table_ember["other_renewables_including_bioenergy_generation__twh"] = (
+        pd.DataFrame(table_ember)[
+            "other_renewables_excluding_bioenergy_generation__twh"
+        ]
+        + table_ember["bioenergy_generation__twh"]
+    )
 
     # Add variable metadata to this new variable.
-    table_ember["other_renewables_including_bioenergy_generation__twh"].metadata = catalog.VariableMeta(
+    table_ember[
+        "other_renewables_including_bioenergy_generation__twh"
+    ].metadata = catalog.VariableMeta(
         title="Generation - Other renewables including bioenergy (TWh)",
-        unit="terawatt-hours", short_unit="TWh", display={"name": "Other renewables including bioenergy"},
+        unit="terawatt-hours",
+        short_unit="TWh",
+        display={"name": "Other renewables including bioenergy"},
     )
 
     # Prepare data in a dataframe with a dummy index.
@@ -121,26 +146,28 @@ def add_per_capita_variables(combined: pd.DataFrame) -> pd.DataFrame:
 
     # Variables to make per capita (new variable names will be 'per_capita_' followed by the original variable name).
     per_capita_variables = [
-        'bioenergy_generation__twh',
-        'coal_generation__twh',
-        'fossil_generation__twh',
-        'gas_generation__twh',
-        'hydro_generation__twh',
-        'low_carbon_generation__twh',
-        'nuclear_generation__twh',
-        'oil_generation__twh',
-        'other_renewables_excluding_bioenergy_generation__twh',
-        'other_renewables_including_bioenergy_generation__twh',
-        'renewable_generation__twh',
-        'solar_generation__twh',
-        'total_generation__twh',
-        'wind_generation__twh',
+        "bioenergy_generation__twh",
+        "coal_generation__twh",
+        "fossil_generation__twh",
+        "gas_generation__twh",
+        "hydro_generation__twh",
+        "low_carbon_generation__twh",
+        "nuclear_generation__twh",
+        "oil_generation__twh",
+        "other_renewables_excluding_bioenergy_generation__twh",
+        "other_renewables_including_bioenergy_generation__twh",
+        "renewable_generation__twh",
+        "solar_generation__twh",
+        "total_generation__twh",
+        "wind_generation__twh",
     ]
     # Add a column for population (only for harmonized countries).
     combined = add_population(df=combined, warn_on_missing_countries=False)
 
     for variable in per_capita_variables:
-        assert "twh" in variable, f"Variables are assumed to be in TWh, but {variable} is not."
+        assert (
+            "twh" in variable
+        ), f"Variables are assumed to be in TWh, but {variable} is not."
         new_column = "per_capita_" + variable.replace("__twh", "__kwh")
         combined[new_column] = combined[variable] * TWH_TO_KWH / combined["population"]
 
@@ -151,47 +178,57 @@ def add_share_variables(combined: pd.DataFrame) -> pd.DataFrame:
     # Variables to make as share of electricity (new variable names will be the name of the original variable followed
     # by '_share_of_electricity__pct').
     share_variables = [
-        'bioenergy_generation__twh',
-        'coal_generation__twh',
-        'fossil_generation__twh',
-        'gas_generation__twh',
-        'hydro_generation__twh',
-        'low_carbon_generation__twh',
-        'nuclear_generation__twh',
-        'oil_generation__twh',
-        'other_renewables_excluding_bioenergy_generation__twh',
-        'other_renewables_including_bioenergy_generation__twh',
-        'renewable_generation__twh',
-        'solar_generation__twh',
-        'total_generation__twh',
-        'wind_generation__twh',
+        "bioenergy_generation__twh",
+        "coal_generation__twh",
+        "fossil_generation__twh",
+        "gas_generation__twh",
+        "hydro_generation__twh",
+        "low_carbon_generation__twh",
+        "nuclear_generation__twh",
+        "oil_generation__twh",
+        "other_renewables_excluding_bioenergy_generation__twh",
+        "other_renewables_including_bioenergy_generation__twh",
+        "renewable_generation__twh",
+        "solar_generation__twh",
+        "total_generation__twh",
+        "wind_generation__twh",
     ]
     for variable in share_variables:
         new_column = variable.replace("_generation__twh", "_share_of_electricity__pct")
-        combined[new_column] = 100 * combined[variable] / combined["total_generation__twh"]
+        combined[new_column] = (
+            100 * combined[variable] / combined["total_generation__twh"]
+        )
 
     # Calculate the percentage of electricity as a share of primary energy.
-    combined["total_electricity_share_of_primary_energy__pct"] = 100 * combined["total_generation__twh"] /\
-        combined["primary_energy_consumption__twh"]
+    combined["total_electricity_share_of_primary_energy__pct"] = (
+        100
+        * combined["total_generation__twh"]
+        / combined["primary_energy_consumption__twh"]
+    )
 
     # Calculate the percentage of electricity demand that is imported.
-    combined["net_imports_share_of_demand__pct"] = 100 * combined["total_net_imports__twh"] /\
-        combined["total_demand__twh"]
+    combined["net_imports_share_of_demand__pct"] = (
+        100 * combined["total_net_imports__twh"] / combined["total_demand__twh"]
+    )
 
     # Sanity check.
     error = "Total electricity share does not add up to 100%."
-    assert all(abs(combined["total_share_of_electricity__pct"].dropna() - 100) < 0.01), error
-    
+    assert all(
+        abs(combined["total_share_of_electricity__pct"].dropna() - 100) < 0.01
+    ), error
+
     # Remove unnecessary columns.
     combined = combined.drop(columns=["total_share_of_electricity__pct"])
-    
+
     return combined
 
 
 def prepare_output_table(combined: pd.DataFrame) -> catalog.Table:
     # Sort rows and columns conveniently and set an index.
     combined = combined[sorted(combined.columns)]
-    combined = combined.set_index(["country", "year"], verify_integrity=True).sort_index()
+    combined = combined.set_index(
+        ["country", "year"], verify_integrity=True
+    ).sort_index()
 
     # Convert dataframe into a table (with no metadata).
     table = catalog.Table(combined)
@@ -222,13 +259,16 @@ def run(dest_dir: str) -> None:
     df_ember = process_ember_data(table_ember=table_ember)
 
     # Combine both tables, giving priority to BP data (on overlapping values).
-    combined = combine_two_overlapping_dataframes(df1=df_bp, df2=df_ember, index_columns=["country", "year"])
+    combined = combine_two_overlapping_dataframes(
+        df1=df_bp, df2=df_ember, index_columns=["country", "year"]
+    )
 
     # Add carbon intensities.
     # There is already a variable for this in the Ember dataset, but now that we have combined
     # BP and Ember data, intensities should be recalculated for consistency.
-    combined["co2_intensity__gco2_kwh"] = (combined["total_emissions__mtco2"] * MT_TO_G) /\
-                                          (combined["total_generation__twh"] * TWH_TO_KWH)
+    combined["co2_intensity__gco2_kwh"] = (
+        combined["total_emissions__mtco2"] * MT_TO_G
+    ) / (combined["total_generation__twh"] * TWH_TO_KWH)
 
     # TODO: It seems that the intensities of Slovenia and Slovakia change significantly, check why.
 
