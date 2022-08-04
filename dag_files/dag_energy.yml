@@ -89,3 +89,5 @@ steps:
     - data://garden/bp/2022-07-14/statistical_review
     - data://garden/ember/2022-08-01/combined_electricity_review
     - data://garden/owid/latest/key_indicators
+  grapher://energy/2022-08-03/electricity_mix:
+    - data://garden/energy/2022-08-03/electricity_mix
