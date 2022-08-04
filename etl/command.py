@@ -9,6 +9,7 @@ import sys
 import time
 from pathlib import Path
 from typing import Any, Callable, List, Optional
+import resource
 
 import click
 from owid.walden import CATALOG as WALDEN_CATALOG
@@ -19,8 +20,10 @@ from etl.steps import DAG, compile_steps, load_dag, paths, select_dirty_steps
 
 WALDEN_NAMESPACE = os.environ.get("WALDEN_NAMESPACE", "backport")
 
-
 THREADPOOL_WORKERS = 5
+
+# if the number of open files allowed is less than this, increase it
+LIMIT_NOFILE = 5000
 
 
 @click.command()
@@ -74,6 +77,7 @@ def main_cli(
     dag_path: Path = paths.DAG_FILE,
     workers: int = 5,
 ) -> None:
+    _update_open_file_limit()
     return main(
         steps=steps,
         dry_run=dry_run,
@@ -247,6 +251,13 @@ def _backporting_steps(private: bool, walden_catalog: WaldenCatalog) -> DAG:
             }
 
     return dag
+
+
+def _update_open_file_limit() -> None:
+    # avoid errors due to not enough allowed open files
+    soft_limit, hard_limit = resource.getrlimit(resource.RLIMIT_NOFILE)
+    if soft_limit < LIMIT_NOFILE:
+        resource.setrlimit(resource.RLIMIT_NOFILE, (LIMIT_NOFILE, hard_limit))
 
 
 if __name__ == "__main__":
