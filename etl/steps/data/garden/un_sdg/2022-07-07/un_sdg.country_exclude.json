@@ -51,14 +51,11 @@
     "Southern Asia",
     "South-Eastern Asia",
     "Southern Europe",
-    "Least Developed Countries (LDCs)",
     "Landlocked developing countries (LLDCs)",
     "Western Asia (exc. Armenia, Azerbaijan, Cyprus, Israel and Georgia)",
     "Developed regions (Europe, Cyprus, Israel, Northern America, Japan, Australia & New Zealand)",
-    "Developing regions",
     "Eastern Asia (excluding Japan)",
     "Oceania (exc. Australia and New Zealand)",
-    "Small island developing States (SIDS)",
     "Sub-Saharan Africa (inc. Sudan)",
     "Northern Africa (exc. Sudan)",
     "Northern Africa and Western Asia",
@@ -69,5 +66,10 @@
     "Regional Centres (FAO)",
     "ODA residual",
     "European Union",
-    "Development Assistance Committee members (DAC)"
+    "Development Assistance Committee members (DAC)",
+    "Polynesia",
+    "Northern Europe",
+    "Micronesia",
+    "Western Asia",
+    "Western Europe"
 ]
