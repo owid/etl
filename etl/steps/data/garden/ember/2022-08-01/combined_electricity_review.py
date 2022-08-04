@@ -198,6 +198,7 @@ def combine_european_electricity_review_data(
             generation.reset_index(),
         ],
         on=index_columns,
+        how="outer",
     )
 
     # If any column was repeated in the merge, it will have a "_x" at the end of the name.
