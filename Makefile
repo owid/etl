@@ -21,6 +21,7 @@ help:
 	@echo '  make watch     Run all tests, watching for changes'
 	@echo '  make clean     Delete all non-reference data in the data/ folder'
 	@echo '  make clobber   Delete non-reference data and .venv'
+	@echo '  make deploy    Re-run the full ETL on production'
 	@echo
 
 
@@ -95,3 +96,7 @@ dependencies.pdf: .venv dag.yml etl/to_graphviz.py
 	.venv/bin/python etl/to_graphviz.py dependencies.dot
 	dot -Tpdf dependencies.dot >$@.tmp
 	mv -f $@.tmp $@
+
+deploy:
+	@echo '==> Rebuilding the production ETL from origin/master'
+	ssh -t owid@analytics.owid.io /home/owid/analytics/ops/scripts/etl-prod.sh
