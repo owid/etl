@@ -54,6 +54,20 @@ AGGREGATES = {
 
 
 def combine_global_electricity_review_data(ds_global: catalog.Dataset) -> catalog.Table:
+    """Combine all tables in Ember's Global Electricity Review dataset into one table.
+
+    Parameters
+    ----------
+    ds_global : catalog.Dataset
+        Global Electricity Review dataset (containing tables for capacity, electricity demand, generation, imports and
+        emissions).
+
+    Returns
+    -------
+    combined_global : catalog.Table
+        Combined table containing all data in the Global Electricity Review dataset.
+
+    """
     category_renaming = {
         "capacity": "Capacity - ",
         "electricity_demand": "",
@@ -126,6 +140,22 @@ def combine_global_electricity_review_data(ds_global: catalog.Dataset) -> catalo
 def combine_european_electricity_review_data(
     ds_european: catalog.Dataset,
 ) -> catalog.Table:
+    """Combine tables in Ember's European Electricity Review dataset into one table.
+
+    The tables to be combined are 'country_overview', 'generation', and 'emissions'. The remaining table on net flows
+    has a different structure and cannot be combined with the others, so it will remain as a separate table.
+
+    Parameters
+    ----------
+    ds_european : catalog.Dataset
+        European Electricity Review dataset.
+
+    Returns
+    -------
+    combined_european : catalog.Table
+        Combined table containing all data in the European Electricity Review dataset (except net flows).
+
+    """
     index_columns = ["country", "year"]
     # Extract the necessary tables from the dataset.
     country_overview = ds_european["country_overview"].copy()
@@ -234,6 +264,22 @@ def combine_european_electricity_review_data(
 def combine_global_and_european_electricity_review_data(
     combined_global: catalog.Table, combined_european: catalog.Table
 ) -> catalog.Table:
+    """Combine the combined table of the Global Electricity Review with the combined table of the European Electricity
+    Review.
+
+    Parameters
+    ----------
+    combined_global : catalog.Table
+        Table that combines all tables of the Global Electricity Review.
+    combined_european : catalog.Table
+        Table that combines all tables of the European Electricity Review (except net flows).
+
+    Returns
+    -------
+    combined : catalog.Table
+        Combination of the combined Global and European Electricity Reviews.
+
+    """
     # Concatenate variables one by one, so that, if one of the two sources does not have data, we can take the
     # source that is complete.
     # When both sources are complete (for european countries), prioritise the european review (since it has more data,
@@ -288,6 +334,20 @@ def combine_global_and_european_electricity_review_data(
 
 
 def create_net_flows_table(ds_european: catalog.Dataset) -> catalog.Table:
+    """Create a table for the net flows of the European Electricity Review, since it has a different structure and
+    cannot be combined with the rest of tables in the Global or European Electricity Reviews.
+
+    Parameters
+    ----------
+    ds_european : catalog.Dataset
+        European Electricity Review.
+
+    Returns
+    -------
+    net_flows : catalog.Table
+        Table of net flows.
+
+    """
     # Keep the net flows table as in the original european review (this table was not present in the global review).
     net_flows = ds_european["net_flows"].copy()
     # Import metadata from metadata yaml file.

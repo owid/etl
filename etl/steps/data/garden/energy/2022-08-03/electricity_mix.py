@@ -24,6 +24,20 @@ MT_TO_G = 1e12
 
 
 def process_bp_data(table_bp: catalog.Table) -> pd.DataFrame:
+    """Load necessary columns from BP's Statistical Review dataset, and create some new variables (e.g. electricity
+    generation from fossil fuels).
+
+    Parameters
+    ----------
+    table_bp : catalog.Table
+        BP's Statistical Review (already processed, with harmonized countries and region aggregates).
+
+    Returns
+    -------
+    df_bp : pd.DataFrame
+        Processed BP data.
+
+    """
     # Columns to load from BP dataset.
     columns = {
         "electricity_generation": "total_generation__twh",
@@ -40,51 +54,25 @@ def process_bp_data(table_bp: catalog.Table) -> pd.DataFrame:
     table_bp = table_bp[list(columns)].rename(columns=columns, errors="raise")
     # New columns to be created by summing other columns.
     aggregates = {
-        "fossil_generation__twh": {
-            "columns": [
+        "fossil_generation__twh": [
                 "oil_generation__twh",
                 "coal_generation__twh",
                 "gas_generation__twh",
             ],
-            "metadata": catalog.VariableMeta(
-                title="Generation - Fossil fuels (TWh)",
-                unit="terawatt-hours",
-                short_unit="TWh",
-                display={"name": "Fossil fuels"},
-            ),
-        },
-        "renewable_generation__twh": {
-            "columns": [
+        "renewable_generation__twh": [
                 "hydro_generation__twh",
                 "solar_generation__twh",
                 "wind_generation__twh",
                 "other_renewables_including_bioenergy_generation__twh",
             ],
-            "metadata": catalog.VariableMeta(
-                title="Generation - Renewables (TWh)",
-                unit="terawatt-hours",
-                short_unit="TWh",
-                display={"name": "Renewables"},
-            ),
-        },
-        "low_carbon_generation__twh": {
-            "columns": ["renewable_generation__twh", "nuclear_generation__twh"],
-            "metadata": catalog.VariableMeta(
-                title="Generation - Low-carbon sources (TWh)",
-                unit="terawatt-hours",
-                short_unit="TWh",
-                display={"name": "Low-carbon sources"},
-            ),
-        },
+        "low_carbon_generation__twh": ["renewable_generation__twh", "nuclear_generation__twh"],
     }
 
     # Create new columns, by adding up other columns (and allowing for only one nan in each sum).
-    for new_column, aggregate in aggregates.items():
-        table_bp[new_column] = pd.DataFrame(table_bp)[aggregate["columns"]].sum(
-            axis=1, min_count=len(aggregate["columns"]) - 1
+    for new_column, columns in aggregates.items():
+        table_bp[new_column] = pd.DataFrame(table_bp)[columns].sum(
+            axis=1, min_count=len(columns) - 1
         )
-        # Create metadata for this new variable.
-        table_bp[new_column].metadata = aggregate["metadata"]
 
     # Prepare data in a dataframe with a dummy index.
     df_bp = pd.DataFrame(table_bp).reset_index()
@@ -93,6 +81,19 @@ def process_bp_data(table_bp: catalog.Table) -> pd.DataFrame:
 
 
 def process_ember_data(table_ember: catalog.Table) -> pd.DataFrame:
+    """Load necessary columns from the Combined Electricity Review and prepare a dataframe with the required variables.
+
+    Parameters
+    ----------
+    table_ember : catalog.Table
+        Combined Electricity Review (combination of Ember's Global and European Electricity Reviews).
+
+    Returns
+    -------
+    df_ember : pd.DataFrame
+        Processed Combined Electricity Review.
+
+    """
     # Columns to load from Ember dataset.
     columns = {
         "generation__bioenergy__twh": "bioenergy_generation__twh",
@@ -125,16 +126,6 @@ def process_ember_data(table_ember: catalog.Table) -> pd.DataFrame:
         + table_ember["bioenergy_generation__twh"]
     )
 
-    # Add variable metadata to this new variable.
-    table_ember[
-        "other_renewables_including_bioenergy_generation__twh"
-    ].metadata = catalog.VariableMeta(
-        title="Generation - Other renewables including bioenergy (TWh)",
-        unit="terawatt-hours",
-        short_unit="TWh",
-        display={"name": "Other renewables including bioenergy"},
-    )
-
     # Prepare data in a dataframe with a dummy index.
     df_ember = pd.DataFrame(table_ember).reset_index()
 
@@ -142,9 +133,25 @@ def process_ember_data(table_ember: catalog.Table) -> pd.DataFrame:
 
 
 def add_per_capita_variables(combined: pd.DataFrame) -> pd.DataFrame:
+    """Add per capita variables (in kWh per person) to the combined BP and Ember dataframe.
+
+    The list of variables to make per capita are given in this function. The new variable names will be 'per_capita_'
+    followed by the original variable's name.
+
+    Parameters
+    ----------
+    combined : pd.DataFrame
+        Combination of BP's Statistical Review and Ember's Combined Electricity Review.
+
+    Returns
+    -------
+    combined : pd.DataFrame
+        Input dataframe after adding per capita variables.
+
+    """
     combined = combined.copy()
 
-    # Variables to make per capita (new variable names will be 'per_capita_' followed by the original variable name).
+    # Variables to make per capita.
     per_capita_variables = [
         "bioenergy_generation__twh",
         "coal_generation__twh",
@@ -175,6 +182,25 @@ def add_per_capita_variables(combined: pd.DataFrame) -> pd.DataFrame:
 
 
 def add_share_variables(combined: pd.DataFrame) -> pd.DataFrame:
+    """Add variables for the electricity generation as a share of the total electricity generation (as a percentage).
+
+    The following new variables will be created:
+    * For each source (e.g. coal_generation__twh) in a list given in this function, a new variable will be created
+      (named, e.g. coal_share_of_electricity__pct).
+    * Total electricity generation as a share of primary energy consumption.
+    * Total net electricity imports as a share of total electricity demand.
+
+    Parameters
+    ----------
+    combined : pd.DataFrame
+        Combination of BP's Statistical Review and Ember's Combined Electricity Review.
+
+    Returns
+    -------
+    combined : pd.DataFrame
+        Input dataframe after adding share variables.
+
+    """
     # Variables to make as share of electricity (new variable names will be the name of the original variable followed
     # by '_share_of_electricity__pct').
     share_variables = [
@@ -224,6 +250,20 @@ def add_share_variables(combined: pd.DataFrame) -> pd.DataFrame:
 
 
 def prepare_output_table(combined: pd.DataFrame) -> catalog.Table:
+    """Convert the combined (BP + Ember) dataframe into a table with the appropriate metadata and variables metadata.
+
+    Parameters
+    ----------
+    combined : pd.DataFrame
+        BP's Statistical Review combined with Ember's Combined Electricity Review, after adding per capita variables and
+        share variables.
+
+    Returns
+    -------
+    table : catalog.Table
+        Original data in a table format with metadata.
+
+    """
     # Sort rows and columns conveniently and set an index.
     combined = combined[sorted(combined.columns)]
     combined = combined.set_index(
@@ -289,5 +329,4 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
     # Add combined tables to the new dataset.
-    # Import metadata from meadow and update attributes that have changed.
     ds_garden.add(table)
