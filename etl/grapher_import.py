@@ -247,7 +247,7 @@ def fetch_db_checksum(dataset: catalog.Dataset) -> Optional[str]:
             """
             SELECT sourceChecksum
             FROM datasets
-            WHERE name=%s
+            WHERE shortName=%s
             """,
             [dataset.metadata.short_name],
         )
