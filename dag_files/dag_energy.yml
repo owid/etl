@@ -91,3 +91,12 @@ steps:
     - data://garden/owid/latest/key_indicators
   grapher://energy/2022-08-03/electricity_mix:
     - data://garden/energy/2022-08-03/electricity_mix
+  #
+  # Energy - Combined Energy dataset 2022 (that will be loaded in the energy-data repos as the OWID Energy dataset).
+  #
+  data://garden/energy/2022-08-05/combined_energy:
+    - data://garden/bp/2022-07-14/statistical_review
+    - data://garden/bp/2022-07-14/energy_mix
+    - data://garden/energy/2022-07-20/fossil_fuel_production
+    - data://garden/energy/2022-07-29/primary_energy_consumption
+    - data://garden/energy/2022-08-03/electricity_mix
