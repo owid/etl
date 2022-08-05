@@ -25,7 +25,7 @@ class Options(Enum):
 
     ADD_TO_DAG = "Add steps into dag.yml file"
     INCLUDE_METADATA_YAML = "Include *.meta.yaml file with metadata"
-    GENERATE_NOTEBOOK = "Generate validation notebook"
+    GENERATE_NOTEBOOK = "Generate playground notebook"
     LOAD_COUNTRIES_REGIONS = "Load countries regions in the script"
     LOAD_POPULATION = "Load population in the script"
 
@@ -159,7 +159,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
     etl data://meadow/{form.namespace}/{form.version}/{form.short_name}
     ```
 
-2. Generated notebook `{notebook_path.relative_to(ETL_DIR)}` can be used to validate the dataset output
+2. Generated notebook `{notebook_path.relative_to(ETL_DIR)}` can be used to examine the dataset output interactively.
 
 3. Loading the dataset is also possible with this snippet:
 

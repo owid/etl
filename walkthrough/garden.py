@@ -25,7 +25,7 @@ class Options(Enum):
 
     ADD_TO_DAG = "Add steps into dag.yml file"
     INCLUDE_METADATA_YAML = "Include *.meta.yaml file with metadata"
-    GENERATE_NOTEBOOK = "Generate validation notebook"
+    GENERATE_NOTEBOOK = "Generate playground notebook"
 
 
 class GardenForm(BaseModel):
@@ -131,7 +131,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
         )
 
         step_path = DATASET_DIR / (form.short_name + ".py")
-        notebook_path = DATASET_DIR / "validate.ipynb"
+        notebook_path = DATASET_DIR / "playground.ipynb"
         metadata_path = DATASET_DIR / (form.short_name + ".meta.yml")
 
         if not form.generate_notebook:
@@ -158,7 +158,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
     etl data://garden/{form.namespace}/{form.version}/{form.short_name}
     ```
 
-2. Generated notebook `{notebook_path.relative_to(ETL_DIR)}` can be used to validate the dataset output
+2. Generated notebook `{notebook_path.relative_to(ETL_DIR)}` can be used to examine the dataset output interactively.
 
 3. Loading the dataset is also possible with this snippet:
 
