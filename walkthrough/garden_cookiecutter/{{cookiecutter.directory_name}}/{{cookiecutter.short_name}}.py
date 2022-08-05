@@ -13,10 +13,10 @@ log = get_logger()
 
 
 COUNTRY_MAPPING_PATH = (
-    Path(__file__).parent / "{{cookiecutter.short_name}}.country_mapping.json"
+    Path(__file__).parent / "{{cookiecutter.short_name}}.countries.json"
 )
 EXCLUDED_COUNTRIES_PATH = (
-    Path(__file__).parent / "{{cookiecutter.short_name}}.country_exclude.json"
+    Path(__file__).parent / "{{cookiecutter.short_name}}.countries_exclude.json"
 )
 {% if cookiecutter.include_metadata_yaml == "True" %}
 METADATA_PATH = (
