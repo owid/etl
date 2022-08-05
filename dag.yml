@@ -66,6 +66,8 @@ steps:
     - data://meadow/un_sdg/2022-07-07/un_sdg
   grapher://owid/latest/population_density:
     - data://garden/owid/latest/population_density
+  data://meadow/oecd/2016-06-01/regional_wellbeing:
+    - walden://oecd/2016-06-01/regional_wellbeing
 
   data://garden/sdg/latest/sdg:
     - backport://backport/owid/latest/dataset_563_world_development_indicators__health
