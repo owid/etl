@@ -10,3 +10,5 @@ Here's a summary of this walkthrough, you don't have to manually execute anythin
 2. **Add the new meadow step to the dag**, including its dependencies.
 
 3. **Run `make test` in `etl`** and  ensure the step runs well. To run the step: `etl data://meadow/example_institution/YYYY-MM-DD/example_dataset`
+
+`meadow` is for _syntactic harmonisation_, meaning getting something into the right format. The idea is that instead of sitting on the dataset that you're working on for a long time without sharing it, you could spend a few hours and get it into a form where others can already reuse it. Out of this you get more, smaller pull-requests. It's also important to have this form for debugging, so that we can compare changes we make later to the "original data".

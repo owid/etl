@@ -3,40 +3,26 @@ from typing import Iterable
 from owid import catalog
 
 from etl import grapher_helpers as gh
-from etl.paths import DATA_DIR
+from etl.helpers import Names
+
+N = Names(__file__)
 
 
 def get_grapher_dataset() -> catalog.Dataset:
-    dataset = catalog.Dataset(
-        DATA_DIR
-        / "garden"
-        / "{{cookiecutter.namespace}}"
-        / "{{cookiecutter.version}}"
-        / "{{cookiecutter.short_name}}"
-    )
-    assert len(dataset.metadata.sources) == 1
-
-    # short_name should include dataset name and version
-    dataset.metadata.short_name = (
-        "{{cookiecutter.short_name}}__{{cookiecutter.version}}"
-    )
-
-    # move description to source as that is what is shown in grapher
-    # (dataset.description would be displayed under `Internal notes` in the admin UI otherwise)
-    dataset.metadata.sources[0].description = dataset.metadata.description
-    dataset.metadata.description = ""
-
+    dataset = N.garden_dataset
+    # combine sources into a single one and create proper names
+    dataset.metadata = gh.adapt_dataset_metadata_for_grapher(dataset.metadata)
     return dataset
 
 
 def get_grapher_tables(dataset: catalog.Dataset) -> Iterable[catalog.Table]:
     table = dataset["{{cookiecutter.short_name}}"].reset_index()
 
-    # grapher needs a column entity id, that is constructed based on the unique entity names in the database
-    table["entity_id"] = gh.country_to_entity_id(table["country"])
+    # convert `country` into `entity_id` and set indexes for `yield_wide_table`
+    table = gh.adapt_table_for_grapher(table)
 
-    # use entity_id and year as indexes in grapher
-    table = table.set_index(["entity_id", "year"])
+    # optionally set dimensions
+    # table = table.set_index(["dim1", "dim2"], append=True)
 
     # convert table into grapher format
     # if you data is in long format, use gh.yield_long_table
