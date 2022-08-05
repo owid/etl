@@ -22,7 +22,7 @@ dataset:
     – A complete list of data sources for each individual country in Ember's Global Electricity Review can be found <a href="https://ember-climate.org/app/uploads/2022/03/GER22-Methodology.pdf">here</a>.
     – A complete list of data sources for each individual country in Ember's European Electricity Review can be found <a href="https://ember-climate.org/app/uploads/2022/02/EER-Methodology.pdf">here</a>.
 
-    BP provides primary energy (not just electricity) consumption data, and it also provides a longer time-series (dating back to 1965) than Ember (1990). However, BP does not provide data for all countries. So, where data from BP is available for a given country and year, we rely on it as the primary source. We then supplement this with data from Ember where BP's data is not available.
+    We rely on BP as the primary source of electricity consumption data for two reasons. BP provides primary energy (not just electricity) consumption data, and it provides a longer time-series (dating back to 1965) than Ember (which only dates back to 1990). However, BP does not provide data for all countries. So, where data from BP is available for a given country and year, we rely on it as the primary source. We then supplement this with data from Ember where data from BP is not available.
 
     Our World in Data has converted absolute electricity production by source to the share in the mix by dividing each by total electricity production.
 
