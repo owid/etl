@@ -5,6 +5,13 @@ dataset:
   short_name: global_electricity_review
   publication_year: 2022
   publication_date: 2022-07-25
+  description: |
+    <a href="https://ember-climate.org/countries-and-regions/">Ember's region definitions</a>, denoted with "(Ember)", are:
+    * "G20 (Ember)" - Group of Twenty: Argentina, Australia, Brazil, Canada, China, France, Germany, India, Indonesia, Italy, Japan, Mexico, Russia, Saudi Arabia, South Africa, South Korea, Turkey, United Kingdom, United States and the 27 members of the European Union.
+    * "G7 (Ember)" - Group of Seven: Canada, France, Germany, Italy, Japan, United Kingdom and United States.
+    * "Latin America and Caribbean (Ember)": Antigua and Barbuda, Argentina, Bahamas, Barbados, Belize, Bolivia, Brazil, Chile, Colombia, Costa Rica, Cuba, Dominica, Dominican Republic, Ecuador, El Salvador, Grenada, Guatemala, Guyana, Haiti, Honduras, Jamaica, Mexico, Nicaragua, Panama, Paraguay, Peru, Saint Kitts and Nevis, Saint Lucia, Saint Vincent and the Grenadines, Suriname, Trinidad and Tobago, Uruguay, Venezuela, Aruba, British Virgin Islands, Cayman Islands, Falkland Islands, French Guiana, Guadeloupe, Martinique, Montserrat, Puerto Rico, Turks and Caicos Islands and United States Virgin Islands.
+    * "Middle East (Ember)": Bahrain, Iran, Iraq, Israel, Jordan, Kuwait, Lebanon, Oman, Palestine, Qatar, Saudi Arabia, Syria, United Arab Emirates and Yemen.
+    * "OECD (Ember)" - Organization For Economic Co-operation and Development: Austria, Belgium, Czech Republic, Denmark, Estonia, Finland, France, Germany, Greece, Hungary, Iceland, Ireland, Italy, Latvia, Lithuania, Luxembourg, Netherlands, Norway, Poland, Portugal, Slovakia, Slovenia, Spain, Sweden, Switzerland, Turkey, United Kingdom, Australia, Canada, Chile, Colombia, Israel, Japan, Mexico, New Zealand, South Korea, and United States.
   sources:
     -
       name: Our World in Data based on Ember's Global Electricity Review (2022).
