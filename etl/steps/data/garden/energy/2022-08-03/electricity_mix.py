@@ -3,6 +3,8 @@ to create the Electricity Mix (BP & Ember) dataset.
 
 """
 
+from typing import Dict, List
+
 import pandas as pd
 from owid import catalog
 
@@ -53,25 +55,28 @@ def process_bp_data(table_bp: catalog.Table) -> pd.DataFrame:
     }
     table_bp = table_bp[list(columns)].rename(columns=columns, errors="raise")
     # New columns to be created by summing other columns.
-    aggregates = {
+    aggregates: Dict[str, List[str]] = {
         "fossil_generation__twh": [
-                "oil_generation__twh",
-                "coal_generation__twh",
-                "gas_generation__twh",
-            ],
+            "oil_generation__twh",
+            "coal_generation__twh",
+            "gas_generation__twh",
+        ],
         "renewable_generation__twh": [
-                "hydro_generation__twh",
-                "solar_generation__twh",
-                "wind_generation__twh",
-                "other_renewables_including_bioenergy_generation__twh",
-            ],
-        "low_carbon_generation__twh": ["renewable_generation__twh", "nuclear_generation__twh"],
+            "hydro_generation__twh",
+            "solar_generation__twh",
+            "wind_generation__twh",
+            "other_renewables_including_bioenergy_generation__twh",
+        ],
+        "low_carbon_generation__twh": [
+            "renewable_generation__twh",
+            "nuclear_generation__twh",
+        ],
     }
 
     # Create new columns, by adding up other columns (and allowing for only one nan in each sum).
-    for new_column, columns in aggregates.items():
-        table_bp[new_column] = pd.DataFrame(table_bp)[columns].sum(
-            axis=1, min_count=len(columns) - 1
+    for new_column in aggregates:
+        table_bp[new_column] = pd.DataFrame(table_bp)[aggregates[new_column]].sum(
+            axis=1, min_count=len(aggregates[new_column]) - 1
         )
 
     # Prepare data in a dataframe with a dummy index.
