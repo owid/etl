@@ -12,6 +12,7 @@ DUMMY_DATA = {
     "short_name": "dummy",
     "namespace": "dummy",
     "version": "2020",
+    "walden_version": "2020",
     "name": "Dummy dataset",
     "description": "This\nis\na\ndummy\ndataset",
     "file_extension": "xlsx",

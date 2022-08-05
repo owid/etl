@@ -189,7 +189,8 @@ def app(run_checks: bool, dummy_data: bool) -> None:
 """
         )
 
-        utils.preview_file(metadata_path, "yaml")
+        if form.include_metadata_yaml:
+            utils.preview_file(metadata_path, "yaml")
         utils.preview_file(step_path, "python")
 
         if dag_content:
