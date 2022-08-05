@@ -76,3 +76,18 @@ steps:
   data://garden/ember/2022-08-01/european_electricity_review:
     - data://meadow/ember/2022-08-01/european_electricity_review
     - data://garden/reference
+  #
+  # Ember - Combined electricity review 2022.
+  #
+  data://garden/ember/2022-08-01/combined_electricity_review:
+    - data://garden/ember/2022-08-01/european_electricity_review
+    - data://garden/ember/2022-08-01/global_electricity_review
+  #
+  # Energy - Electricity mix (BP & Ember, 2022).
+  #
+  data://garden/energy/2022-08-03/electricity_mix:
+    - data://garden/bp/2022-07-14/statistical_review
+    - data://garden/ember/2022-08-01/combined_electricity_review
+    - data://garden/owid/latest/key_indicators
+  grapher://energy/2022-08-03/electricity_mix:
+    - data://garden/energy/2022-08-03/electricity_mix

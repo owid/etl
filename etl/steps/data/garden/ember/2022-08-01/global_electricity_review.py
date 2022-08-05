@@ -157,7 +157,7 @@ def load_global_electricity_review(tb_meadow: catalog.Table) -> pd.DataFrame:
 
 
 def prepare_wide_table(df: pd.DataFrame, category: str) -> catalog.Table:
-    """Convert data from long to wide format for a specific category and prepare a table where variables have metadata.
+    """Convert data from long to wide format for a specific category.
 
     Parameters
     ----------
@@ -206,13 +206,6 @@ def prepare_wide_table(df: pd.DataFrame, category: str) -> catalog.Table:
         keep_original_region_with_suffix=" (Ember)",
     )
 
-    # Add variable names and units to the metadata.
-    for column, variable, unit in zip(variable_units, variables, units):
-        table[column].metadata.title = column
-        table[column].metadata.short_unit = unit
-        table[column].metadata.unit = SHORT_UNIT_TO_UNIT[unit]
-        table[column].metadata.display = {"name": variable}
-
     return table
 
 
@@ -227,7 +220,7 @@ def process_electricity_generation(df: pd.DataFrame) -> catalog.Table:
     Returns
     -------
     table : catalog.Table
-        Table (with variables metadata) of processed data for the given category.
+        Table of processed data for the given category.
 
     """
     # Prepare wide table.
@@ -260,25 +253,11 @@ def process_electricity_demand(df: pd.DataFrame) -> catalog.Table:
     Returns
     -------
     table : catalog.Table
-        Table (with variables metadata) of processed data for the given category.
+        Table of processed data for the given category.
 
     """
     # Prepare wide table.
     table = prepare_wide_table(df=df, category="Electricity demand")
-
-    # Store variable metadata in a dictionary, since it will be lost when processing data.
-    table_metadata = {column: table[column].metadata for column in table.columns}
-
-    # Include variable metadata for additional variables that will be created.
-    table_metadata["population"] = catalog.VariableMeta(
-        title="Population", unit="people", short_unit="people"
-    )
-    table_metadata["Demand per capita (kWh)"] = catalog.VariableMeta(
-        title="Demand per capita (kWh)",
-        unit="kilowatt-hours",
-        short_unit="kWh",
-        display={"name": "Demand per capita"},
-    )
 
     # Add population to data
     table = add_population(df=table, warn_on_missing_countries=False)
@@ -291,10 +270,6 @@ def process_electricity_demand(df: pd.DataFrame) -> catalog.Table:
         * TWH_TO_KWH
         / pd.DataFrame(table)["population"]
     )
-
-    # Restore original metadata for each column (and add the new ones).
-    for column in table.columns:
-        table[column].metadata = table_metadata[column]
 
     # Delete the original demand per capita column.
     table = table.drop(columns="Demand per capita (MWh)")
@@ -313,22 +288,11 @@ def process_power_sector_emissions(df: pd.DataFrame) -> catalog.Table:
     Returns
     -------
     table : catalog.Table
-        Table (with variables metadata) of processed data for the given category.
+        Table of processed data for the given category.
 
     """
     # Prepare wide table of emissions data.
     table = prepare_wide_table(df=df, category="Power sector emissions")
-
-    # Store variable metadata in a dictionary, since it will be lost when processing data.
-    table_metadata = {column: table[column].metadata for column in table.columns}
-
-    # Include variable metadata for additional variables that will be created.
-    table_metadata["Total Generation (TWh)"] = catalog.VariableMeta(
-        title="Total Generation (TWh)",
-        unit="terawatt-hours",
-        short_unit="TWh",
-        display={"name": "Total Generation"},
-    )
 
     # Add carbon intensity.
     # In principle this only needs to be done for region aggregates, but we do it for all countries and check that
@@ -360,10 +324,6 @@ def process_power_sector_emissions(df: pd.DataFrame) -> catalog.Table:
     ), "Calculated carbon intensities differ from original ones by more than 1 percent."
     # Remove temporary column.
     table = table.drop(columns="check")
-
-    # Restore original metadata for each column (and add the new ones).
-    for column in table.columns:
-        table[column].metadata = table_metadata[column]
 
     return table
 
@@ -418,7 +378,9 @@ def run(dest_dir: str) -> None:
         # Make column names snake lower case.
         table = catalog.utils.underscore_table(table)
         # Import metadata from meadow and update attributes that have changed.
-        table.metadata = tb_meadow.metadata
+        table.update_metadata_from_yaml(
+            METADATA_PATH, catalog.utils.underscore(table_name)
+        )
         table.metadata.title = table_name
         table.metadata.short_name = catalog.utils.underscore(table_name)
         # Add table to dataset.
