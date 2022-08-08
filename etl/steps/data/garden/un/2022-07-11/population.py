@@ -83,13 +83,17 @@ def add_metrics(df: pd.DataFrame) -> pd.DataFrame:
     df_sr = _add_metric_sexratio(df)
     df_p_granular, df_p_broad = _add_metric_population(df)
     df_p_diff = _add_metric_population_change(df_p_granular)
+    df_sr_all = _add_metric_sexratio_all(df_p_granular)
     # Optimize field types
     df_sr = optimize_dtypes(df_sr)
+    df_sr_all = optimize_dtypes(df_sr_all)
     df_p_granular = optimize_dtypes(df_p_granular)
     df_p_broad = optimize_dtypes(df_p_broad)
     df_p_diff = optimize_dtypes(df_p_diff)
     # Concatenate
-    df = pd.concat([df_sr, df_p_granular, df_p_broad, df_p_diff], ignore_index=True)
+    df = pd.concat(
+        [df_sr, df_sr_all, df_p_granular, df_p_broad, df_p_diff], ignore_index=True
+    )
     return df
 
 
@@ -210,3 +214,24 @@ def _add_metric_population_change(df_p_granular: pd.DataFrame) -> pd.DataFrame:
         axis=1,
     ).dropna(subset="value")
     return df_p_diff
+
+
+def _add_metric_sexratio_all(df_p_granular: pd.DataFrame) -> Any:
+    # Check
+    (df_p_granular.metric.unique() == ["population"]).all()
+    # Get M/F values
+    df_male = df_p_granular[
+        (df_p_granular.age == "all") & (df_p_granular.sex == "male")
+    ].rename(columns={"value": "value_male"})
+    df_female = df_p_granular[
+        (df_p_granular.age == "all") & (df_p_granular.sex == "female")
+    ].rename(columns={"value": "value_female"})
+    # Check
+    assert len(df_male) == len(df_female)
+    # Build df
+    cols_merge = ["location", "year", "variant"]
+    df_ = df_male.merge(df_female[cols_merge + ["value_female"]], on=cols_merge)
+    df_ = df_.assign(value=(100 * df_.value_male / df_.value_female).round(2)).drop(
+        columns=["value_male", "value_female"]
+    )
+    return df_
