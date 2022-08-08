@@ -231,7 +231,8 @@ def _add_metric_sexratio_all(df_p_granular: pd.DataFrame) -> Any:
     # Build df
     cols_merge = ["location", "year", "variant"]
     df_ = df_male.merge(df_female[cols_merge + ["value_female"]], on=cols_merge)
-    df_ = df_.assign(value=(100 * df_.value_male / df_.value_female).round(2)).drop(
-        columns=["value_male", "value_female"]
-    )
+    df_ = df_.assign(
+        value=(100 * df_.value_male / df_.value_female).round(2),
+        metric="sex_ratio",
+    ).drop(columns=["value_male", "value_female"])
     return df_
