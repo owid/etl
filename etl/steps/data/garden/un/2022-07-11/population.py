@@ -217,6 +217,7 @@ def _add_metric_population_change(df_p_granular: pd.DataFrame) -> pd.DataFrame:
 
 
 def _add_metric_sexratio_all(df_p_granular: pd.DataFrame) -> Any:
+    # print(df_p_granular.head())
     # Check
     (df_p_granular.metric.unique() == ["population"]).all()
     # Get M/F values
@@ -234,5 +235,8 @@ def _add_metric_sexratio_all(df_p_granular: pd.DataFrame) -> Any:
     df_ = df_.assign(
         value=(100 * df_.value_male / df_.value_female).round(2),
         metric="sex_ratio",
+        age="all",
+        sex="none",
     ).drop(columns=["value_male", "value_female"])
+    # print(df_.head())
     return df_
