@@ -70,11 +70,16 @@ def run(dest_dir: str, query: str = "") -> None:
     ds_garden.metadata = ds_meadow.metadata
 
     for table in all_tables:
-        log.info("un_sdg.create_garden_table", series_code=table.index[0][5])
+        log.info(
+            "un_sdg.create_garden_table",
+            indicator=table.index[0][4],
+            series_code=table.index[0][5],
+        )
 
         tb_garden = Table(table)
         tb_garden.metadata = tb_meadow.metadata
-        tb_garden.metadata.short_name = underscore(table.index[0][5])
+        short_name = tb_garden.index[0][4] + "_" + tb_garden.index[0][5]
+        tb_garden.metadata.short_name = underscore(short_name)
         ds_garden.add(tb_garden)
 
     ds_garden.save()
@@ -119,10 +124,12 @@ def create_tables(original_df: pd.DataFrame) -> List[pd.DataFrame]:
                     "seriescode",
                     "seriesdescription",
                     "value",
-                    "units_long",
+                    "long_unit",
                     "short_unit",
+                    "source",
                 ]
             ]
+            table_fil = table_fil.dropna()
             table_fil.set_index(
                 [
                     "country",
@@ -135,6 +142,7 @@ def create_tables(original_df: pd.DataFrame) -> List[pd.DataFrame]:
                 inplace=True,
                 verify_integrity=True,
             )
+
             output_tables.append(table_fil)
 
         else:
@@ -152,12 +160,13 @@ def create_tables(original_df: pd.DataFrame) -> List[pd.DataFrame]:
                     "seriescode",
                     "seriesdescription",
                     "value",
-                    "units_long",
+                    "long_unit",
                     "short_unit",
+                    "source",
                 ]
                 + dimensions
             ]
-
+            tables_fil = tables_fil.dropna()
             tables_fil.set_index(
                 [
                     "country",
@@ -179,8 +188,8 @@ def create_tables(original_df: pd.DataFrame) -> List[pd.DataFrame]:
 def create_units(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy(deep=False)
     unit_description = get_attributes_description()
-    df["units_long"] = df["units"].map(unit_description)
-    df["short_unit"] = create_short_unit(df["units_long"])
+    df["long_unit"] = df["units"].map(unit_description)
+    df["short_unit"] = create_short_unit(df["long_unit"])
     return df
 
 
@@ -257,7 +266,7 @@ def manual_clean_data(df: pd.DataFrame) -> pd.DataFrame:
 
     df["value"] = df["value"].astype(float)
     df.loc[
-        (df["units_long"] == "Percentage")
+        (df["long_unit"] == "Percentage")
         & (df["value"] > 100)
         & (df["indicator"] == "15.2.1"),
         "value",

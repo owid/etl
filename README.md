@@ -4,11 +4,29 @@
 
 _A compute graph for loading and transforming data for OWID._
 
-**Status: work in progress**
+**Status: in production**
 
 ## Overview
 
 This project is the spiritual successor to [importers](https://github.com/owid/importers), meant to eventually replace it. Its job is to assemble and republish OWID's _data science catalog_, the richest and easiest to use version of the datasets we can create. The catalog it creates is also meant to eventually replace Grapher's database as our source of truth for all data.
+
+```mermaid
+graph TB
+
+upstream[Upstream data providers] -->|snapshot| walden[Walden snapshot]
+upstream -->|publish| github
+github[Datasets on Github] --> etl:::focus
+walden --> etl(ETL steps)
+etl -->|generate| catalog[Data catalog]
+catalog -->|ingested| mysql
+catalog -->|renders| explorers
+catalog -->|published| api
+mysql[Grapher MySQL] --> owid[Our World in Data site]
+explorers --> owid
+api --> jupyter[Jupyter notebooks]
+
+classDef focus stroke-width:4px
+```
 
 ## Getting started
 
@@ -361,3 +379,31 @@ Fastrack is a service that polls grapher database for dataset updates and backpo
 3. Publish new ETL catalog to S3
 
 All these steps have been optimized to run in a few seconds (except of huge datasets) and make them available through [data-api](https://github.com/owid/data-api).
+
+
+## Staging
+
+_Internal OWID staff only_
+
+We have a staging environment for ETL that runs automatically on every push to `staging` branch. You can push directly to `staging` branch as it's quite unlikely someone else would be using it at the same time. Don't bother with creating pull requests for merging to `staging`. Pushing to staging goes something like this:
+
+```bash
+# rebase your branch on master
+git checkout mybranch
+git rebase origin/master
+
+# reset staging to your branch
+git checkout staging
+git reset --hard mybranch
+
+# push staging and let it execute automatically
+git push
+```
+
+If the ETL fails on staging, you'll see it in `#analytics-errors` channel on Slack. You can check logs in `/tmp/etl-staging.log` on our `owid-analytics` server or ssh into it and rerun the ETL manually:
+
+```bash
+ssh owid-analytics
+cd etl-staging
+.venv/bin/etl garden explorers
+```
