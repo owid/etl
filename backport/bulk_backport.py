@@ -130,8 +130,8 @@ def _active_datasets(
         -- or be used in DAG or specified in CLI
         or id in %(dataset_ids)s
     )
-    -- and must not come from ETL
-    and sourceChecksum is null
+    -- and must not come from ETL, unless they're in DAG
+    and (sourceChecksum is null or id in %(dataset_ids)s)
     -- and must not be archived
     and not isArchived
     order by rand()

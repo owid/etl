@@ -3,8 +3,8 @@
 #  etl
 #
 
-from contextlib import contextmanager
 import tempfile
+from contextlib import contextmanager
 from typing import Any, Iterator, List, cast
 
 import requests

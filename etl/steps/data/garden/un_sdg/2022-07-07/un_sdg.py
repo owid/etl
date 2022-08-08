@@ -70,11 +70,16 @@ def run(dest_dir: str, query: str = "") -> None:
     ds_garden.metadata = ds_meadow.metadata
 
     for table in all_tables:
-        log.info("un_sdg.create_garden_table", series_code=table.index[0][5])
+        log.info(
+            "un_sdg.create_garden_table",
+            indicator=table.index[0][4],
+            series_code=table.index[0][5],
+        )
 
         tb_garden = Table(table)
         tb_garden.metadata = tb_meadow.metadata
-        tb_garden.metadata.short_name = underscore(table.index[0][5])
+        short_name = tb_garden.index[0][4] + "_" + tb_garden.index[0][5]
+        tb_garden.metadata.short_name = underscore(short_name)
         ds_garden.add(tb_garden)
 
     ds_garden.save()

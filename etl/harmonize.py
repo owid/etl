@@ -286,7 +286,7 @@ def save_alias(name: str, alias: str) -> None:
 
     # pack up and save
     rc.loc[rc.name == name, "aliases"] = json.dumps(sorted(aliases))
-    ref.add(rc, "csv")
+    ref.add(rc, formats=["csv"])
 
 
 def print_mapping(region: str, name: str) -> None:

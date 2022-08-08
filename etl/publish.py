@@ -3,20 +3,21 @@
 #  etl
 #
 
+import concurrent.futures
 import re
 import sys
-from typing import Any, Dict, Iterator, Optional, cast
 from collections.abc import Iterable
-from urllib.error import HTTPError
 from pathlib import Path
-import concurrent.futures
+from typing import Any, Dict, Iterator, Optional, cast
+from urllib.error import HTTPError
 
-import click
 import boto3
-from botocore.client import ClientError
+import click
 import pandas as pd
-
-from owid.catalog import LocalCatalog, CHANNEL
+from botocore.client import ClientError
+from owid.catalog import CHANNEL, LocalCatalog
+from owid.catalog.catalogs import INDEX_FORMATS
+from owid.catalog.datasets import FileFormat
 
 from etl import config, files
 from etl.paths import DATA_DIR
@@ -71,11 +72,13 @@ def publish(
 
 
 def sanity_checks(catalog: Path, channel: CHANNEL) -> None:
-    if not (catalog / _channel_path(channel)).exists():
-        print(
-            "ERROR: catalog has not been indexed, refusing to publish", file=sys.stderr
-        )
-        sys.exit(1)
+    for format in INDEX_FORMATS:
+        if not (catalog / _channel_path(channel, format)).exists():
+            print(
+                "ERROR: catalog has not been fully indexed, refusing to publish",
+                file=sys.stderr,
+            )
+            sys.exit(1)
 
 
 def sync_catalog_to_s3(
@@ -97,8 +100,10 @@ def is_catalog_up_to_date(
 ) -> bool:
     """The catalog file is synced last -- if it is the same as our local one, then all the remote
     files will be the same as our local ones too."""
-    remote = get_remote_checksum(s3, bucket, _channel_path(channel).as_posix())
-    local = files.checksum_file(catalog / _channel_path(channel))
+    # note: we only check the md5 of the first index format, not all of them
+    format = INDEX_FORMATS[0]
+    remote = get_remote_checksum(s3, bucket, _channel_path(channel, format).as_posix())
+    local = files.checksum_file(catalog / _channel_path(channel, format))
     return remote == local
 
 
@@ -225,13 +230,14 @@ def delete_dataset(s3: Any, bucket: str, relative_path: str) -> None:
 
 
 def update_catalog(s3: Any, bucket: str, catalog: Path, channel: CHANNEL) -> None:
-    catalog_filename = catalog / _channel_path(channel)
-    s3.upload_file(
-        catalog_filename.as_posix(),
-        bucket,
-        _channel_path(channel).as_posix(),
-        ExtraArgs={"ACL": "public-read"},
-    )
+    for format in INDEX_FORMATS:
+        catalog_filename = catalog / _channel_path(channel, format)
+        s3.upload_file(
+            catalog_filename.as_posix(),
+            bucket,
+            _channel_path(channel, format).as_posix(),
+            ExtraArgs={"ACL": "public-read"},
+        )
 
     s3.upload_file(
         (catalog / "catalog.meta.json").as_posix(),
@@ -243,10 +249,10 @@ def update_catalog(s3: Any, bucket: str, catalog: Path, channel: CHANNEL) -> Non
 
 def get_published_checksums(bucket: str, channel: CHANNEL) -> Dict[str, str]:
     "Get the checksum of every dataset that's been published."
+    format = INDEX_FORMATS[0]
+    uri = f"https://{bucket}.{config.S3_HOST}/{_channel_path(channel, format)}"
     try:
-        existing = pd.read_feather(
-            f"https://{bucket}.{config.S3_HOST}/{_channel_path(channel)}"
-        )
+        existing = read_frame(uri)
         existing["path"] = existing["path"].apply(lambda p: p.rsplit("/", 1)[0])
         existing = (
             existing[["path", "checksum"]]
@@ -255,7 +261,7 @@ def get_published_checksums(bucket: str, channel: CHANNEL) -> Dict[str, str]:
             .checksum.to_dict()
         )
     except HTTPError:
-        existing = {}
+        existing = {}  # type: ignore
 
     return cast(Dict[str, str], existing)
 
@@ -284,8 +290,22 @@ def connect_s3() -> Any:
     )
 
 
-def _channel_path(channel: CHANNEL) -> Path:
-    return Path(f"catalog-{channel}.feather")
+def _channel_path(channel: CHANNEL, format: FileFormat) -> Path:
+    return Path(f"catalog-{channel}.{format}")
+
+
+def read_frame(uri: str) -> pd.DataFrame:
+    if uri.endswith(".feather"):
+        return cast(pd.DataFrame, pd.read_feather(uri))
+
+    elif uri.endswith(".parquet"):
+        return cast(pd.DataFrame, pd.read_parquet(uri))
+
+    elif uri.endswith(".csv"):
+        return pd.read_csv(uri)
+
+    else:
+        raise ValueError(f"Unknown format for {uri}")
 
 
 if __name__ == "__main__":

@@ -39,25 +39,11 @@ def get_grapher_tables(dataset: Dataset) -> Iterable[Table]:
     ds_garden = Dataset((DATA_DIR / f"garden/{NAMESPACE}/{VERSION}/{FNAME}").as_posix())
     sdg_tables = ds_garden.table_names
     for var in sdg_tables:
-        log.info(
-            "Loading data from garden and creating a dataframe with variable names to match grapher..."
-        )
         var_df = create_dataframe_with_variable_name(ds_garden, var)
         var_df["source"] = clean_source_name(var_df["source"], clean_source_map)
-        if len(var_df["variable_name"].drop_duplicates()) > 1:
-            var_gr = var_df.groupby("variable_name")
-            for var_name, df_var in var_gr:
-                print(var_name)
-                df_tab = add_metadata_and_prepare_for_grapher(
-                    df_var, var_name, walden_ds
-                )
-                yield from gh.yield_long_table(df_tab)
-        else:
-            var_name = var_df["variable_name"].drop_duplicates().iloc[0]
-            assert (
-                var_df["variable_name"].drop_duplicates().shape[0] == 1
-            ), f"{var_name} has multiple disaggregrations"
-            df_tab = add_metadata_and_prepare_for_grapher(var_df, var_name, walden_ds)
+        var_gr = var_df.groupby("variable_name")
+        for var_name, df_var in var_gr:
+            df_tab = add_metadata_and_prepare_for_grapher(df_var, var_name, walden_ds)
             yield from gh.yield_long_table(df_tab)
 
 
@@ -75,13 +61,19 @@ def clean_source_name(raw_source: pd.Series, clean_source_map: dict) -> pd.Serie
 
 
 def add_metadata_and_prepare_for_grapher(
-    df_var: pd.DataFrame, var_name: str, walden_ds: Dataset
+    df_gr: pd.DataFrame, var_name: str, walden_ds: Dataset
 ) -> Table:
 
-    indicator = df_var["variable_name"].iloc[0].split("-")[0].strip()
+    indicator = df_gr["variable_name"].iloc[0].split("-")[0].strip()
+    source_url = get_metadata_link(indicator)
+    log.info(
+        "Getting the metadata url...",
+        url=source_url,
+        indicator=indicator,
+        var_name=df_gr["variable_name"].iloc[0][0:10],
+    )
     source = Source(
-        name=df_var["source"].iloc[0],
-        description="%s: %s" % ("Metadata available at", get_metadata_link(indicator)),
+        name=df_gr["source"].iloc[0],
         url=walden_ds.metadata["url"],
         source_data_url=walden_ds.metadata["source_data_url"],
         owid_data_url=walden_ds.metadata["owid_data_url"],
@@ -89,15 +81,16 @@ def add_metadata_and_prepare_for_grapher(
         publication_date=walden_ds.metadata["publication_date"],
         publication_year=walden_ds.metadata["publication_year"],
         published_by=walden_ds.metadata["name"],
-        publisher_source=df_var["source"].iloc[0],
+        publisher_source=df_gr["source"].iloc[0],
     )
 
-    df_var["meta"] = VariableMeta(
-        title=var_name,
-        description=df_var["seriesdescription"].iloc[0],
+    df_gr["meta"] = VariableMeta(
+        title=df_gr["variable_name"].iloc[0],
+        description=df_gr["seriesdescription"].iloc[0]
+        + "\n\nFurther information available at: %s" % (source_url),
         sources=[source],
-        unit=df_var["long_unit"].iloc[0],
-        short_unit=df_var["short_unit"].iloc[0],
+        unit=df_gr["long_unit"].iloc[0],
+        short_unit=df_gr["short_unit"].iloc[0],
         additional_info=None,
     )
 
@@ -105,17 +98,15 @@ def add_metadata_and_prepare_for_grapher(
     # would become
     # _12_3_1__food_waste__tonnes__ag_food_wst__households
     # maybe we'd want to remove the leading indicator?
-    df_var["variable"] = underscore(var_name)
+    df_gr["variable"] = underscore(df_gr["variable_name"].iloc[0])
 
-    df_var = df_var[["country", "year", "value", "variable", "meta"]].copy()
+    df_gr = df_gr[["country", "year", "value", "variable", "meta"]].copy()
     # convert integer values to int but round float to 2 decimal places, string remain as string
-    df_var["value"] = df_var["value"].apply(value_convert)
-    df_var["entity_id"] = gh.country_to_entity_id(
-        df_var["country"], create_entities=True
-    )
-    df_var = df_var.drop(columns=["country"]).set_index(["year", "entity_id"])
+    df_gr["value"] = df_gr["value"].apply(value_convert)
+    df_gr["entity_id"] = gh.country_to_entity_id(df_gr["country"], create_entities=True)
+    df_gr = df_gr.drop(columns=["country"]).set_index(["year", "entity_id"])
 
-    return Table(df_var)
+    return Table(df_gr)
 
 
 def create_dataframe_with_variable_name(dataset: Dataset, tab: str) -> pd.DataFrame:
@@ -170,6 +161,7 @@ def load_clean_source_mapping() -> dict:
 
 
 def get_metadata_link(indicator: str) -> None:
+
     url = os.path.join(
         "https://unstats.un.org/sdgs/metadata/files/", "Metadata-%s.pdf"
     ) % "-".join([part.rjust(2, "0") for part in indicator.split(".")])
