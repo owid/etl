@@ -132,6 +132,16 @@ def combine_tables_data_and_metadata(
         columns=variable_mapping.to_dict()["variable"]
     )
 
+    # Remove rows that only have nan (ignoring if country, year, iso_code, population and gdp do have data).
+    columns_that_must_have_data = [
+        column
+        for column in tb_combined.columns
+        if column not in ["country", "year", "iso_code", "population", "gdp"]
+    ]
+    tb_combined = tb_combined.dropna(
+        subset=columns_that_must_have_data, how="all"
+    ).reset_index(drop=True)
+
     # Sanity check.
     columns_with_inf = [
         column
