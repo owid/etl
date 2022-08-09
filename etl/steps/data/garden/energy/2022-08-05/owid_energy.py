@@ -34,41 +34,32 @@ ELECTRICITY_MIX_DATASET_PATH = DATA_DIR / "garden/energy/2022-08-03/electricity_
 VARIABLE_MAPPING_FILE = CURRENT_DIR / "owid_energy_variable_mapping.csv"
 
 
-def prepare_output_table(combined: pd.DataFrame) -> catalog.Table:
-    """Convert the combined dataframe into a table with the appropriate metadata and variables metadata.
-
-    Parameters
-    ----------
-    combined : pd.DataFrame
-        Combined data from all tables.
-
-    Returns
-    -------
-    table : catalog.Table
-        Original data in a table format with metadata.
-
-    """
-    # Sort rows and columns conveniently and set an index.
-    combined = combined[sorted(combined.columns)]
-    combined = combined.set_index(
-        ["country", "year"], verify_integrity=True
-    ).sort_index()
-
-    # Convert dataframe into a table (with no metadata).
-    table = catalog.Table(combined)
-
-    # Load metadata from yaml file.
-    table.update_metadata_from_yaml(METADATA_PATH, DATASET_SHORT_NAME)
-
-    return table
-
-
 def combine_tables_data_and_metadata(
     tables: Dict[str, catalog.Table],
     countries_regions: catalog.Table,
     variable_mapping: pd.DataFrame,
 ) -> catalog.Table:
-    # Merge all dataframes.
+    """Combine data and metadata of a list of tables, map variable names and add variables metadata.
+
+    Parameters
+    ----------
+    tables : dict
+        Dictionary where the key is the short name of the table, and the value is the actual table, for all tables to be
+        combined.
+    countries_regions : catalog.Table
+        Main table from countries-regions dataset.
+    variable_mapping : pd.DataFrame
+        Dataframe (with columns variable, source_variable, source_dataset, description, source) that specifies the names
+        of variables to take from each table, and their new name in the output table. It also gives a description of the
+        variable, and the sources of the table.
+
+    Returns
+    -------
+    tb_combined : catalog.Table
+        Combined table with metadata.
+
+    """
+    # Merge all tables as a dataframe (without metadata).
     dfs = [pd.DataFrame(table) for table in tables.values()]
     df_combined = dataframes.multi_merge(dfs, on=["country", "year"], how="outer")
 
@@ -83,10 +74,10 @@ def combine_tables_data_and_metadata(
         len([column for column in set(df_combined.columns) if "_x" in column]) == 0
     ), error
 
-    # Create a table with combined data with no metadata.
+    # Create a table with combined data and no metadata.
     tb_combined = catalog.Table(df_combined)
 
-    # Select only variables described in the variable mapping file.
+    # List the names of the variables described in the variable mapping file.
     source_variables = variable_mapping.index.get_level_values(0).tolist()
 
     # Gather original metadata for each variable, add the descriptions and sources from the variable mapping file.
