@@ -21,10 +21,8 @@ df.dropna(how="all", axis=1, inplace=True)
 
 # some columns have only a single value for the whole table -- not informative
 for col in df.columns:
-    if len(df[col].unique()) == 1:
+    if len(df[col].unique()) == 1 and col != "Time":
         df.drop(col, axis=1, inplace=True)
-
-df.head()
 
 # ## Standardise names
 
@@ -33,12 +31,11 @@ df.columns = [
     "region_name",
     "ind_code",
     "ind_name",
+    "year",
     "unit_code",
     "unit_name",
     "value",
 ]
-
-df.head()
 
 df["ind_code"] = df.ind_code.apply(lambda s: s.lower())
 
@@ -89,7 +86,7 @@ df = df.drop(["region_name", "ind_name", "unit_name", "unit_code"], axis=1)
 
 df.head()
 
-df = df.pivot("region_code", "ind_code", "value")
+df = df.pivot(["region_code", "year"], "ind_code", "value")
 
 df.head()
 
