@@ -147,4 +147,4 @@ def run(dest_dir: str) -> None:
         # Table per variable (and dimensions)
         table = _build_table_variable(df, metric, sex, age, variant)
         # Add table to dataset.
-        dataset_explorer.add(table, format="csv")
+        dataset_explorer.add(table, formats=["csv"])
