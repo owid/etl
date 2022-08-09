@@ -15,7 +15,7 @@ from owid import catalog
 from owid.datautils import dataframes
 
 from etl.paths import DATA_DIR
-from shared import CURRENT_DIR, gather_sources_from_tables
+from shared import CURRENT_DIR, add_population, gather_sources_from_tables
 
 # Details for dataset to export.
 DATASET_SHORT_NAME = "owid_energy"
@@ -30,6 +30,8 @@ PRIMARY_ENERGY_CONSUMPTION_DATASET_PATH = (
     DATA_DIR / "garden/energy/2022-07-29/primary_energy_consumption"
 )
 ELECTRICITY_MIX_DATASET_PATH = DATA_DIR / "garden/energy/2022-08-03/electricity_mix"
+COUNTRIES_REGIONS_DATASET_PATH = DATA_DIR / "garden/reference/"
+POPULATION_DATASET_PATH = DATA_DIR / "garden/owid/latest/key_indicators/"
 # Path to file with mapping of variable names from one of the datasets to the final energy dataset.
 VARIABLE_MAPPING_FILE = CURRENT_DIR / "owid_energy_variable_mapping.csv"
 
@@ -37,6 +39,7 @@ VARIABLE_MAPPING_FILE = CURRENT_DIR / "owid_energy_variable_mapping.csv"
 def combine_tables_data_and_metadata(
     tables: Dict[str, catalog.Table],
     countries_regions: catalog.Table,
+    population: pd.DataFrame,
     variable_mapping: pd.DataFrame,
 ) -> catalog.Table:
     """Combine data and metadata of a list of tables, map variable names and add variables metadata.
@@ -48,6 +51,8 @@ def combine_tables_data_and_metadata(
         combined.
     countries_regions : catalog.Table
         Main table from countries-regions dataset.
+    population: pd.DataFrame
+        Population (from the owid catalog, after converting into a dataframe and resetting index).
     variable_mapping : pd.DataFrame
         Dataframe (with columns variable, source_variable, source_dataset, description, source) that specifies the names
         of variables to take from each table, and their new name in the output table. It also gives a description of the
@@ -66,6 +71,11 @@ def combine_tables_data_and_metadata(
     # Add ISO codes for countries (regions that are not in countries-regions dataset will have nan iso_code).
     df_combined = pd.merge(
         df_combined, countries_regions, left_on="country", right_on="name", how="left"
+    )
+
+    # Add population of countries (except for regions specific of a dataset, e.g. those ending in (BP) or (Shift)).
+    df_combined = add_population(
+        df=df_combined, population=population, warn_on_missing_countries=False
     )
 
     # Check that there were no repetition in column names.
@@ -138,9 +148,16 @@ def run(dest_dir: str) -> None:
     ].reset_index()
 
     # Load countries-regions dataset (required to get ISO codes).
-    countries_regions = catalog.Dataset(DATA_DIR / "garden/reference/")[
+    countries_regions = catalog.Dataset(COUNTRIES_REGIONS_DATASET_PATH)[
         "countries_regions"
     ].reset_index()[["name", "iso_alpha3"]]
+
+    # Load population.
+    # This will be used only to add a population column (not to create per capita variables).
+    # Historical regions will be added to the population.
+    population = pd.DataFrame(
+        catalog.Dataset(POPULATION_DATASET_PATH)["population"]
+    ).reset_index()
 
     # Load mapping from variable names in the component dataset to the final variable name in the output dataset.
     variable_mapping = pd.read_csv(VARIABLE_MAPPING_FILE).set_index(["source_variable"])
@@ -162,6 +179,7 @@ def run(dest_dir: str) -> None:
     tb_combined = combine_tables_data_and_metadata(
         tables=tables,
         countries_regions=countries_regions,
+        population=population,
         variable_mapping=variable_mapping,
     )
 

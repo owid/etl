@@ -99,4 +99,5 @@ steps:
     - data://garden/energy/2022-07-20/fossil_fuel_production
     - data://garden/energy/2022-07-29/primary_energy_consumption
     - data://garden/energy/2022-08-03/electricity_mix
+    - data://garden/owid/latest/key_indicators
     - data://garden/reference
