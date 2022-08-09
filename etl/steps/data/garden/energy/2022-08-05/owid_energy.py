@@ -95,9 +95,13 @@ def combine_tables_data_and_metadata(
         variable_metadata = variable_mapping.loc[source_variable]
         source_dataset = variable_metadata["source_dataset"]
         # Check that the variable indeed exists in the original dataset that the variable mapping says.
-        # Ignore columns "country", "year" (assigned to a dummy dataset 'various_datasets'),
-        # and "iso_alpha3" (that comes from countries_regions dataset).
-        if source_dataset not in ["various_datasets", "countries_regions"]:
+        # Ignore columns "country", "year" (assigned to a dummy dataset 'various_datasets'), "population" (that comes
+        # from key_indicators) and "iso_alpha3" (that comes from countries_regions dataset).
+        if source_dataset not in [
+            "various_datasets",
+            "countries_regions",
+            "key_indicators",
+        ]:
             error = (
                 f"Variable {source_variable} not found in any of the original datasets."
             )
