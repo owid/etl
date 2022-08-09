@@ -31,7 +31,9 @@ PRIMARY_ENERGY_CONSUMPTION_DATASET_PATH = (
 )
 ELECTRICITY_MIX_DATASET_PATH = DATA_DIR / "garden/energy/2022-08-03/electricity_mix"
 COUNTRIES_REGIONS_DATASET_PATH = DATA_DIR / "garden/reference/"
+# Population and GDP are only used to add the population and gdp columns (and no other derived variables).
 POPULATION_DATASET_PATH = DATA_DIR / "garden/owid/latest/key_indicators/"
+GDP_DATASET_PATH = DATA_DIR / "garden/ggdc/2020-10-01/ggdc_maddison"
 # Path to file with mapping of variable names from one of the datasets to the final energy dataset.
 VARIABLE_MAPPING_FILE = CURRENT_DIR / "owid_energy_variable_mapping.csv"
 
@@ -40,6 +42,7 @@ def combine_tables_data_and_metadata(
     tables: Dict[str, catalog.Table],
     countries_regions: catalog.Table,
     population: pd.DataFrame,
+    gdp: pd.DataFrame,
     variable_mapping: pd.DataFrame,
 ) -> catalog.Table:
     """Combine data and metadata of a list of tables, map variable names and add variables metadata.
@@ -53,6 +56,9 @@ def combine_tables_data_and_metadata(
         Main table from countries-regions dataset.
     population: pd.DataFrame
         Population (from the owid catalog, after converting into a dataframe and resetting index).
+    gdp: pd.DataFrame
+        GDP (from owid catalog, after converting into a dataframe, resetting index, and selecting country, year and gdp
+        columns).
     variable_mapping : pd.DataFrame
         Dataframe (with columns variable, source_variable, source_dataset, description, source) that specifies the names
         of variables to take from each table, and their new name in the output table. It also gives a description of the
@@ -73,10 +79,11 @@ def combine_tables_data_and_metadata(
         df_combined, countries_regions, left_on="country", right_on="name", how="left"
     )
 
-    # Add population of countries (except for regions specific of a dataset, e.g. those ending in (BP) or (Shift)).
+    # Add population and gdp of countries (except for dataset-specific regions e.g. those ending in (BP) or (Shift)).
     df_combined = add_population(
         df=df_combined, population=population, warn_on_missing_countries=False
     )
+    df_combined = pd.merge(df_combined, gdp, on=["country", "year"], how="left")
 
     # Check that there were no repetition in column names.
     error = "Repeated columns in combined data."
@@ -101,6 +108,7 @@ def combine_tables_data_and_metadata(
             "various_datasets",
             "countries_regions",
             "key_indicators",
+            "maddison_gdp",
         ]:
             error = (
                 f"Variable {source_variable} not found in any of the original datasets."
@@ -156,12 +164,18 @@ def run(dest_dir: str) -> None:
         "countries_regions"
     ].reset_index()[["name", "iso_alpha3"]]
 
-    # Load population.
-    # This will be used only to add a population column (not to create per capita variables).
+    # Load population (used only to add a population column, and not to create any other derived variables).
     # Historical regions will be added to the population.
     population = pd.DataFrame(
         catalog.Dataset(POPULATION_DATASET_PATH)["population"]
     ).reset_index()
+
+    # Load gdp (used only to add gdp column, and no other derived variables).
+    gdp = (
+        pd.DataFrame(catalog.Dataset(GDP_DATASET_PATH)["maddison_gdp"])
+        .reset_index()[["country", "year", "gdp"]]
+        .dropna()
+    )
 
     # Load mapping from variable names in the component dataset to the final variable name in the output dataset.
     variable_mapping = pd.read_csv(VARIABLE_MAPPING_FILE).set_index(["source_variable"])
@@ -174,7 +188,7 @@ def run(dest_dir: str) -> None:
         "energy_mix": tb_energy_mix.drop(columns=["country_code"], errors="ignore"),
         "fossil_fuel_production": tb_fossil_fuels,
         "primary_energy_consumption": tb_primary_energy.drop(
-            columns=["population", "source"], errors="ignore"
+            columns=["gdp", "population", "source"], errors="ignore"
         ),
         "electricity_mix": tb_electricity_mix.drop(
             columns=["population", "primary_energy_consumption__twh"], errors="ignore"
@@ -184,6 +198,7 @@ def run(dest_dir: str) -> None:
         tables=tables,
         countries_regions=countries_regions,
         population=population,
+        gdp=gdp,
         variable_mapping=variable_mapping,
     )
 
