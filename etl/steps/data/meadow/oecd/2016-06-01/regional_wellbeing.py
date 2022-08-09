@@ -26,18 +26,21 @@ for col in df.columns:
 
 # ## Standardise names
 
-df.columns = [
-    "region_code",
-    "region_name",
-    "ind_code",
-    "ind_name",
-    "year",
-    "unit_code",
-    "unit_name",
-    "value",
-]
+df = df.rename(
+    columns={
+        "REG_ID": "region_code",
+        "Regions": "region_name",
+        "IND": "ind_code",
+        "Indicator": "ind_name",
+        "Time": "year",
+        "Unit Code": "unit_code",
+        "Unit": "unit_name",
+        "Value": "value",
+    }
+)
 
-df["ind_code"] = df.ind_code.apply(lambda s: s.lower())
+df["ind_code"] = df.ind_code.str.lower()
+df["unit_code"] = df.unit_code.str.lower()
 
 # ## Sanity checks
 
@@ -63,12 +66,15 @@ assert len(df[["region_code", "region_name"]].drop_duplicates()) == len(
 
 # ## Capture important metadata pre-pivot
 
+# name of each indicator
 ind = df[["ind_code", "ind_name"]].drop_duplicates().set_index("ind_code").ind_name
 
+# unit short_name of each indicator
 ind_unit_code = (
     df[["ind_code", "unit_code"]].drop_duplicates().set_index("ind_code").unit_code
 )
 
+# unit title for each indicator
 ind_unit_name = (
     df[["ind_code", "unit_name"]].drop_duplicates().set_index("ind_code").unit_name
 )
@@ -96,10 +102,10 @@ t = Table(df)
 
 for ind_code in t.columns:
     meta = t[ind_code].metadata
-    meta.short_name = ind_code.lower()
+    meta.short_name = ind_code
     meta.title = ind.loc[ind_code]
     short_unit = ind_unit_code[ind_code]
-    meta.short_unit = short_unit.lower() if not pd.isnull(short_unit) else None
+    meta.short_unit = short_unit if not pd.isnull(short_unit) else None
     meta.unit = ind_unit_name[ind_code]
 
 t.head()
@@ -112,6 +118,14 @@ regions = Table(regions)
 regions.metadata.short_name = "regions"
 
 
+# ## Metadata checks
+
+for col in t.columns:
+    assert t[col].metadata.short_name
+    assert t[col].metadata.title
+    assert t[col].metadata.short_unit or col == "unem_ra"
+    assert t[col].metadata.unit
+
 # ## Save the dataset
 
 
@@ -120,3 +134,4 @@ def run(dest_dir: str) -> None:
     ds = Dataset.create_empty(dest_dir, ds_meta)
     ds.add(t)
     ds.add(regions)
+    ds.save()
