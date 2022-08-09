@@ -10,6 +10,7 @@ Datasets combined:
 
 from typing import Dict, cast
 
+import numpy as np
 import pandas as pd
 from owid import catalog
 from owid.datautils import dataframes
@@ -130,6 +131,16 @@ def combine_tables_data_and_metadata(
     tb_combined = tb_combined[source_variables].rename(
         columns=variable_mapping.to_dict()["variable"]
     )
+
+    # Sanity check.
+    columns_with_inf = [
+        column
+        for column in tb_combined.columns
+        if len(tb_combined[tb_combined[column] == np.inf]) > 0
+    ]
+    assert (
+        len(columns_with_inf) == 0
+    ), f"Infinity values detected in columns: {columns_with_inf}"
 
     # Set index and sort conveniently.
     tb_combined = tb_combined.set_index(
