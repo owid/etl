@@ -6,7 +6,6 @@ from pathlib import Path
 from typing import Any, Dict, Iterable, List, Literal, Optional, Set, cast
 
 import pandas as pd
-import slugify
 import yaml
 from owid import catalog
 from owid.catalog.utils import underscore
@@ -158,11 +157,13 @@ def yield_wide_table(
 
 
 def _slugify_column_and_dimensions(column: str, dims: List[str]) -> str:
-    slug = "__".join([column] + list(dims))
-
+    if dims:
+        slug = "__".join([column] + [str(dims)])
+    else:
+        slug = column
     # slugify would strip the leading underscore, put it back in that case
-    if column.startswith("_"):
-        slug = f"_{slug}"
+    # if column.startswith("_"):
+    #     slug = f"_{slug}"
 
     return cast(str, slug)
 
@@ -183,16 +184,20 @@ def yield_long_table(
     assert isinstance(table, catalog.Table), "Table must be instance of `catalog.Table`"
     assert (
         table["meta"].dropna().map(lambda x: isinstance(x, catalog.VariableMeta)).all()
-    ), "Values in column `meta` must be either instances of `catalog.VariableMeta` or null"
+    ), (
+        "Values in column `meta` must be either instances of `catalog.VariableMeta` or"
+        " null"
+    )
 
     for var_name, t in table.groupby("variable"):
         t = t.rename(columns={"value": var_name})
 
         # extract metadata from column and make sure it is identical for all rows
         meta = t.pop("meta")
-        assert set(meta.map(id)) == {
-            id(meta.iloc[0])
-        }, f"Variable `{var_name}` must have same metadata objects in column `meta` for all rows"
+        assert set(meta.map(id)) == {id(meta.iloc[0])}, (
+            f"Variable `{var_name}` must have same metadata objects in column `meta`"
+            " for all rows"
+        )
         t[var_name].metadata = meta.iloc[0]
 
         if annot:
