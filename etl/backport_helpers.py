@@ -137,6 +137,7 @@ def create_dataset(dest_dir: str, short_name: str) -> Dataset:
         if "year" in t.columns:
             t = t.rename(columns={"year": "year_"})
 
-        ds.add(t)
+        # add CSV to the format list, for re-consumption in explorers
+        ds.add(t, formats=["feather", "parquet", "csv"])
 
     return ds
