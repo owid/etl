@@ -158,7 +158,7 @@ def yield_wide_table(
 
 
 def _slugify_column_and_dimensions(column: str, dims: List[str]) -> str:
-    slug = slugify.slugify("__".join([column] + list(dims)), separator="_")
+    slug = "__".join([column] + list(dims))
 
     # slugify would strip the leading underscore, put it back in that case
     if column.startswith("_"):
