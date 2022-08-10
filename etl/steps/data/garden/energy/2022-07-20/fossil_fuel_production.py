@@ -3,6 +3,7 @@ Statistical Review dataset and Shift data on fossil fuel production.
 
 """
 
+import numpy as np
 import pandas as pd
 from owid import catalog
 from owid.catalog.utils import underscore_table
@@ -198,6 +199,31 @@ def add_per_capita_variables(df: pd.DataFrame) -> pd.DataFrame:
     return combined
 
 
+def remove_spurious_values(df: pd.DataFrame) -> pd.DataFrame:
+    """Remove spurious infinity values.
+
+    These values are generated when calculating the annual change of a variable that is zero or nan the previous year.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Data that may contain infinity values.
+
+    Returns
+    -------
+    df : pd.DataFrame
+        Corrected data.
+
+    """
+    for column in df.columns:
+        issues_mask = df[column] == np.inf
+        issues = df[issues_mask]
+        if len(issues) > 0:
+            df.loc[issues_mask, column] = np.nan
+
+    return df
+
+
 def run(dest_dir: str) -> None:
     log.info(f"{DATASET_SHORT_NAME}.start")
 
@@ -221,6 +247,9 @@ def run(dest_dir: str) -> None:
 
     # Add per-capita variables.
     df = add_per_capita_variables(df=df)
+
+    # Remove spurious values.
+    df = remove_spurious_values(df=df)
 
     #
     # Save outputs.

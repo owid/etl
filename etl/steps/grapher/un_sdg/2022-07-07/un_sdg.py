@@ -85,7 +85,7 @@ def add_metadata_and_prepare_for_grapher(
     )
 
     df_gr["meta"] = VariableMeta(
-        title=df_gr["variable_name"].iloc[0],
+        title=df_gr["variable_name_meta"].iloc[0],
         description=df_gr["seriesdescription"].iloc[0]
         + "\n\nFurther information available at: %s" % (source_url),
         sources=[source],
@@ -93,12 +93,8 @@ def add_metadata_and_prepare_for_grapher(
         short_unit=df_gr["short_unit"].iloc[0],
         additional_info=None,
     )
-
-    # 12.3.1 - Food waste (Tonnes) - AG_FOOD_WST - Households
-    # would become
-    # _12_3_1__food_waste__tonnes__ag_food_wst__households
-    # maybe we'd want to remove the leading indicator?
-    df_gr["variable"] = underscore(df_gr["variable_name"].iloc[0])
+    # Taking only the first 255 characters of the var name as this is the limit (there is at least one that is too long)
+    df_gr["variable"] = underscore(df_gr["variable_name"].iloc[0][0:254])
 
     df_gr = df_gr[["country", "year", "value", "variable", "meta"]].copy()
     # convert integer values to int but round float to 2 decimal places, string remain as string
@@ -117,6 +113,7 @@ def create_dataframe_with_variable_name(dataset: Dataset, tab: str) -> pd.DataFr
         "seriescode",
         "seriesdescription",
         "variable_name",
+        "variable_name_meta",
         "value",
         "source",
         "long_unit",
@@ -124,7 +121,8 @@ def create_dataframe_with_variable_name(dataset: Dataset, tab: str) -> pd.DataFr
     ]
 
     tab_df = pd.DataFrame(dataset[tab]).reset_index()
-    cols = ["indicator", "seriesdescription", "seriescode"]
+    cols_meta = ["indicator", "seriesdescription", "seriescode"]
+    cols = ["indicator", "seriescode"]
     if tab_df.shape[1] > 11:
         col_list = tab_df.columns.to_list()
         drop_cols = [
@@ -142,11 +140,14 @@ def create_dataframe_with_variable_name(dataset: Dataset, tab: str) -> pd.DataFr
             "variable_name",
         ]
         dim_cols = [x for x in col_list if x not in drop_cols]
+        cols_meta_dim = cols_meta + dim_cols
         cols_dim = cols + dim_cols
+        tab_df["variable_name_meta"] = tab_df[cols_meta_dim].agg(" - ".join, axis=1)
         tab_df["variable_name"] = tab_df[cols_dim].agg(" - ".join, axis=1)
         tab_df = tab_df[cols_keep]
         tab_df["seriescode"] = tab_df["seriescode"].str.lower()
     else:
+        tab_df["variable_name_meta"] = tab_df[cols_meta].agg(" - ".join, axis=1)
         tab_df["variable_name"] = tab_df[cols].agg(" - ".join, axis=1)
         tab_df = tab_df[cols_keep]
         tab_df["seriescode"] = tab_df["seriescode"].str.lower()
