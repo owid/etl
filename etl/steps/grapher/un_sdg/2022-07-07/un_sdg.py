@@ -21,6 +21,10 @@ VERSION = Path(__file__).parent.stem
 FNAME = Path(__file__).stem
 NAMESPACE = Path(__file__).parent.parent.stem
 
+VERSION = "2022-07-07"
+FNAME = "un_sdg"
+NAMESPACE = "un_sdg"
+
 
 def get_grapher_dataset() -> Dataset:
     dataset = Dataset(DATA_DIR / f"garden/{NAMESPACE}/{VERSION}/{FNAME}")
@@ -85,7 +89,7 @@ def add_metadata_and_prepare_for_grapher(
     )
 
     df_gr["meta"] = VariableMeta(
-        title=df_gr["variable_name"].iloc[0],
+        title=df_gr["variable_name_meta"].iloc[0],
         description=df_gr["seriesdescription"].iloc[0]
         + "\n\nFurther information available at: %s" % (source_url),
         sources=[source],
@@ -117,6 +121,7 @@ def create_dataframe_with_variable_name(dataset: Dataset, tab: str) -> pd.DataFr
         "seriescode",
         "seriesdescription",
         "variable_name",
+        "variable_name_meta",
         "value",
         "source",
         "long_unit",
@@ -124,7 +129,8 @@ def create_dataframe_with_variable_name(dataset: Dataset, tab: str) -> pd.DataFr
     ]
 
     tab_df = pd.DataFrame(dataset[tab]).reset_index()
-    cols = ["indicator", "seriesdescription", "seriescode"]
+    cols_meta = ["indicator", "seriesdescription", "seriescode"]
+    cols = ["indicator", "seriescode"]
     if tab_df.shape[1] > 11:
         col_list = tab_df.columns.to_list()
         drop_cols = [
@@ -142,11 +148,14 @@ def create_dataframe_with_variable_name(dataset: Dataset, tab: str) -> pd.DataFr
             "variable_name",
         ]
         dim_cols = [x for x in col_list if x not in drop_cols]
+        cols_meta_dim = cols_meta + dim_cols
         cols_dim = cols + dim_cols
+        tab_df["variable_name_meta"] = tab_df[cols_meta_dim].agg(" - ".join, axis=1)
         tab_df["variable_name"] = tab_df[cols_dim].agg(" - ".join, axis=1)
         tab_df = tab_df[cols_keep]
         tab_df["seriescode"] = tab_df["seriescode"].str.lower()
     else:
+        tab_df["variable_name_meta"] = tab_df[cols_meta].agg(" - ".join, axis=1)
         tab_df["variable_name"] = tab_df[cols].agg(" - ".join, axis=1)
         tab_df = tab_df[cols_keep]
         tab_df["seriescode"] = tab_df["seriescode"].str.lower()
