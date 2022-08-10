@@ -98,10 +98,6 @@ def add_metadata_and_prepare_for_grapher(
         additional_info=None,
     )
 
-    # 12.3.1 - Food waste (Tonnes) - AG_FOOD_WST - Households
-    # would become
-    # _12_3_1__food_waste__tonnes__ag_food_wst__households
-    # maybe we'd want to remove the leading indicator?
     df_gr["variable"] = underscore(df_gr["variable_name"].iloc[0])
 
     df_gr = df_gr[["country", "year", "value", "variable", "meta"]].copy()

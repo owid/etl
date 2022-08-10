@@ -17,6 +17,10 @@ VERSION = Path(__file__).parent.stem
 FNAME = Path(__file__).stem
 NAMESPACE = Path(__file__).parent.parent.stem
 
+VERSION = "2022-07-07"
+FNAME = "un_sdg"
+NAMESPACE = "un_sdg"
+
 log = get_logger()
 
 
@@ -297,7 +301,8 @@ def manual_clean_data(df: pd.DataFrame) -> pd.DataFrame:
             "SPAR12",
         ],
     )
-
+    # Dropping average marine acidity as we don't have a way to visualise it
+    df = df[~df["seriescode"].isin(["ER_OAW_MNACD", "EN_REF_WASCOL"])]
     df = df.drop(["level_0", "index"], axis=1, errors="ignore")
 
     return df
