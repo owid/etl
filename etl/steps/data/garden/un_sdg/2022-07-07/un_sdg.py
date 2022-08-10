@@ -297,7 +297,8 @@ def manual_clean_data(df: pd.DataFrame) -> pd.DataFrame:
             "SPAR12",
         ],
     )
-
+    # Dropping average marine acidity as we don't have a way to visualise it
+    df = df[~df["seriescode"].isin(["ER_OAW_MNACD", "EN_REF_WASCOL"])]
     df = df.drop(["level_0", "index"], axis=1, errors="ignore")
 
     return df
