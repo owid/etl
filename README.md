@@ -47,8 +47,9 @@ You need to install the following:
 
 We use `poetry` to manage the virtual environment for the project, and you'll typically do your work within that virtual environment.
 
-1. Run `poetry install`, which creates a virtual environment in `.venv` using `make`
-2. Activate the virtual env with `poetry shell`
+1. Run `git submodule update --init`
+2. Run `poetry install`, which creates a virtual environment in `.venv` using `make`
+3. Activate the virtual env with `poetry shell`
 
 ### Example commands
 
