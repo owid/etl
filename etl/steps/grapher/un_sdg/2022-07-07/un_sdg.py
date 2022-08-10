@@ -97,8 +97,8 @@ def add_metadata_and_prepare_for_grapher(
         short_unit=df_gr["short_unit"].iloc[0],
         additional_info=None,
     )
-
-    df_gr["variable"] = underscore(df_gr["variable_name"].iloc[0])
+    # Taking only the first 255 characters of the var name as this is the limit (there is at least one that is too long)
+    df_gr["variable"] = underscore(df_gr["variable_name"].iloc[0][0:254])
 
     df_gr = df_gr[["country", "year", "value", "variable", "meta"]].copy()
     # convert integer values to int but round float to 2 decimal places, string remain as string
