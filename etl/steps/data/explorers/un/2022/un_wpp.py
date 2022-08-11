@@ -128,7 +128,7 @@ def _build_table_variable(
 def run(dest_dir: str) -> None:
     # Load table
     dataset_garden = _load_dataset()
-    df = dataset_garden["long"]
+    df = dataset_garden["un_wpp"]
     # Keep relevant rows for explorer
     df = _keep_relevant_rows(df)
     # Add estimates to projections timeseries
