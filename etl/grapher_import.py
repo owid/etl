@@ -182,7 +182,6 @@ def upsert_table(
         table.reset_index(inplace=True)
 
         # Every variable must have exactly one source
-        print(2, table[column_name].metadata.sources)
         if len(table[column_name].metadata.sources) != 1:
             raise NotImplementedError(
                 f"Variable `{column_name}` must have exactly one source, see function"
