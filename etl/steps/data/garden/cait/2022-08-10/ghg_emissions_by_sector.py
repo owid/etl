@@ -69,6 +69,23 @@ MT_TO_T = 1e6
 def create_table_for_gas(
     df: pd.DataFrame, gas: str, countries_in_regions: Dict[str, List[str]]
 ) -> catalog.Table:
+    """Extract data for a particular gas and create a table with variables' metadata.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+    gas : str
+        Name of gas to consider (as called in "gas" column of the original data).
+    countries_in_regions : dict
+        Countries in regions (a dictionary where each key is the name of the region, and the value is a list of country
+        names in that region). This is used to avoid loading the list of countries in a region for each gas.
+
+    Returns
+    -------
+    table_gas : catalog.Table
+        Table with data for considered gas, and metadata for each variable.
+
+    """
     # Select data for current gas.
     df_gas = df[df["gas"] == gas].drop(columns="gas").reset_index(drop=True)
 

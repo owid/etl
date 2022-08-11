@@ -16,6 +16,19 @@ WALDEN_VERSION = "2022-08-10"
 
 
 def load_data(local_file: str) -> pd.DataFrame:
+    """Create a dataframe out of the raw data.
+
+    Parameters
+    ----------
+    local_file : str
+        Path to local file of raw data.
+
+    Returns
+    -------
+    df : pd.DataFrame
+        Raw data in dataframe format.
+
+    """
     with gzip.open(local_file) as _file:
         data = json.loads(_file.read())
 
@@ -25,6 +38,19 @@ def load_data(local_file: str) -> pd.DataFrame:
 
 
 def prepare_data(df: pd.DataFrame) -> pd.DataFrame:
+    """Prepare raw data in a more convenient format.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Original raw data as a dataframe.
+
+    Returns
+    -------
+    df : pd.DataFrame
+        Original data in a more convenient format.
+
+    """
     # Extract data from column "emissions", which is given as a list of dictionaries with year and value.
     df = df.explode("emissions").reset_index(drop=True)
     df["year"] = [emissions["year"] for emissions in df["emissions"]]
