@@ -42,8 +42,10 @@ def get_grapher_tables(dataset: catalog.Dataset) -> Iterable[catalog.Table]:
 
     meta_map = {}
     for var_name, var_meta in meta["tables"]["long"]["variables"].items():
-        meta_map[var_name] = catalog.VariableMeta(**var_meta)
+        var_meta = catalog.VariableMeta(**var_meta)
+        meta_map[var_name] = var_meta
+        var_meta.sources = dataset.metadata.sources
 
     table["meta"] = table["variable"].astype(object).map(meta_map)
 
-    yield from gh.yield_long_table(catalog.Table(table))
+    yield from gh.yield_long_table(table)

@@ -223,6 +223,10 @@ def yield_long_table(
     :param dim_titles: Custom names to use for the dimensions, if not provided, the default names will be used.
         Dimension title will be used to create variable name, e.g. `Deaths - Age: 10-18` instead of `Deaths - age: 10-18`
     """
+    assert (
+        table.metadata.dataset and table.metadata.dataset.sources
+    ), "Table must have a dataset with sources in its metadata"
+
     assert set(table.columns) == {
         "variable",
         "meta",
