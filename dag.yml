@@ -68,7 +68,11 @@ steps:
     - data://garden/owid/latest/population_density
   data://meadow/oecd/2016-06-01/regional_wellbeing:
     - walden://oecd/2016-06-01/regional_wellbeing
-
+  #
+  # CAIT - Greenhouse gas emissions by sector (2022).
+  #
+  data://meadow/cait/2022-08-10/ghg_emissions:
+    - walden://cait/2022-08-10/cait_ghg_emissions
   data://garden/sdg/latest/sdg:
     - backport://backport/owid/latest/dataset_563_world_development_indicators__health
     - backport://backport/owid/latest/dataset_5629_global_health_observatory__world_health_organization__2022_05
