@@ -465,6 +465,7 @@ def _ensure_source_per_variable(table: catalog.Table):
             table[column].metadata.sources[0].description = table.metadata.description
     return table
 
+
 @dataclass
 class IntRange:
     min: int

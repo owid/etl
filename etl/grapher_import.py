@@ -134,10 +134,7 @@ def upsert_table(
     of the variable is used to fill the required fields.
     """
 
-    assert set(table.index.names) == {
-        "year",
-        "entity_id",
-    }, (
+    assert set(table.index.names) == {"year", "entity_id",}, (
         "Tables to be upserted must have only 2 indices: year and entity_id. Instead"
         f" they have: {table.index.names}"
     )
