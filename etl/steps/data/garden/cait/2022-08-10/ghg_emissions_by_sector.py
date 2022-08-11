@@ -16,20 +16,20 @@ MEADOW_DATASET_PATH = DATA_DIR / f"meadow/cait/2022-08-10/{DATASET_SHORT_NAME}"
 
 # All sectors expected in the data, and how to rename them.
 SECTORS = {
-    'Agriculture': "Agriculture",
-    'Building': "Buildings",
-    'Bunker Fuels': "Aviation and shipping",
-    'Electricity/Heat': "Electricity and heat",
-    'Energy': "Energy",
-    'Fugitive Emissions': "Fugitive emissions",
-    'Industrial Processes': "Industry",
-    'Land-Use Change and Forestry': "Land-use change and forestry",
-    'Manufacturing/Construction': "Manufacturing and construction",
-    'Other Fuel Combustion': "Other fuel combustion",
-    'Total excluding LUCF': "Total excluding LUCF",
-    'Total including LUCF': "Total including LUCF",
-    'Transportation': "Transport",
-    'Waste': "Waste",
+    "Agriculture": "Agriculture",
+    "Building": "Buildings",
+    "Bunker Fuels": "Aviation and shipping",
+    "Electricity/Heat": "Electricity and heat",
+    "Energy": "Energy",
+    "Fugitive Emissions": "Fugitive emissions",
+    "Industrial Processes": "Industry",
+    "Land-Use Change and Forestry": "Land-use change and forestry",
+    "Manufacturing/Construction": "Manufacturing and construction",
+    "Other Fuel Combustion": "Other fuel combustion",
+    "Total excluding LUCF": "Total excluding LUCF",
+    "Total including LUCF": "Total including LUCF",
+    "Transportation": "Transport",
+    "Waste": "Waste",
 }
 
 # Suffix to add to the name of per capita variables.
@@ -66,12 +66,16 @@ REGIONS_TO_ADD = [
 MT_TO_T = 1e6
 
 
-def create_table_for_gas(df: pd.DataFrame, gas: str, countries_in_regions: Dict[str, List[str]]) -> catalog.Table:
+def create_table_for_gas(
+    df: pd.DataFrame, gas: str, countries_in_regions: Dict[str, List[str]]
+) -> catalog.Table:
     # Select data for current gas.
     df_gas = df[df["gas"] == gas].drop(columns="gas").reset_index(drop=True)
 
     # Pivot table to have a column for each sector.
-    df_gas = df_gas.pivot(index=["country", "year"], columns="sector", values="value").reset_index()
+    df_gas = df_gas.pivot(
+        index=["country", "year"], columns="sector", values="value"
+    ).reset_index()
 
     # Create region aggregates.
     for region in REGIONS_TO_ADD:
@@ -90,7 +94,11 @@ def create_table_for_gas(df: pd.DataFrame, gas: str, countries_in_regions: Dict[
     df_gas = geo.add_population_to_dataframe(df=df_gas)
 
     # Add per capita variables.
-    variables = [column for column in df_gas.columns if column not in ["country", "year", "population"]]
+    variables = [
+        column
+        for column in df_gas.columns
+        if column not in ["country", "year", "population"]
+    ]
     for variable in variables:
         new_column = variable + PER_CAPITA_SUFFIX
         df_gas[new_column] = MT_TO_T * df_gas[variable] / df_gas["population"]
@@ -98,8 +106,12 @@ def create_table_for_gas(df: pd.DataFrame, gas: str, countries_in_regions: Dict[
     # Remove columns that only have nans.
     df_gas = df_gas.drop(columns=df_gas.columns[df_gas.isnull().all()])
     # Remove rows that only have nans.
-    df_gas = df_gas.dropna(subset=[column for column in df_gas.columns if column not in ["country", "year"]],
-                           how="all").reset_index(drop=True)
+    df_gas = df_gas.dropna(
+        subset=[
+            column for column in df_gas.columns if column not in ["country", "year"]
+        ],
+        how="all",
+    ).reset_index(drop=True)
 
     # Set index and sort rows and columns conveniently.
     df_gas = df_gas.set_index(["country", "year"], verify_integrity=True).sort_index()
@@ -113,12 +125,17 @@ def create_table_for_gas(df: pd.DataFrame, gas: str, countries_in_regions: Dict[
             table_gas[variable].metadata.unit = "tonnes per capita"
             table_gas[variable].metadata.short_unit = "t"
             table_gas[variable].metadata.title = variable
-            table_gas[variable].metadata.display = {"name": variable.replace(PER_CAPITA_SUFFIX, "")}
+            table_gas[variable].metadata.display = {
+                "name": variable.replace(PER_CAPITA_SUFFIX, "")
+            }
         else:
             table_gas[variable].metadata.unit = "million tonnes"
             table_gas[variable].metadata.short_unit = "million t"
             table_gas[variable].metadata.title = variable
-            table_gas[variable].metadata.display = {"name": variable, "numDecimalPlaces": 0}
+            table_gas[variable].metadata.display = {
+                "name": variable,
+                "numDecimalPlaces": 0,
+            }
 
     return table_gas
 
@@ -135,8 +152,10 @@ def run(dest_dir: str) -> None:
     df = pd.DataFrame(tb_meadow).reset_index()
 
     # List all countries inside each region.
-    countries_in_regions = {region: sorted(set(geo.list_countries_in_region(region)) & set(df["country"]))
-                            for region in REGIONS_TO_ADD}
+    countries_in_regions = {
+        region: sorted(set(geo.list_countries_in_region(region)) & set(df["country"]))
+        for region in REGIONS_TO_ADD
+    }
 
     #
     # Process data.
@@ -145,21 +164,33 @@ def run(dest_dir: str) -> None:
     df = df[df["data_source"] == "CAIT"].reset_index(drop=True)
 
     # Check that there is only one unit in dataset.
-    assert set(df["unit"]) == {'MtCO₂e'}, "Unknown units in dataset"
+    assert set(df["unit"]) == {"MtCO₂e"}, "Unknown units in dataset"
     # Remove unnecessary columns.
     df = df.drop(columns=["unit", "id", "data_source", "iso_code3"])
 
     # Rename sectors.
-    df["sector"] = dataframes.map_series(series=df["sector"], mapping=SECTORS,
-                                         warn_on_missing_mappings=True, warn_on_unused_mappings=True)
+    df["sector"] = dataframes.map_series(
+        series=df["sector"],
+        mapping=SECTORS,
+        warn_on_missing_mappings=True,
+        warn_on_unused_mappings=True,
+    )
 
     # Harmonize country names.
-    df = geo.harmonize_countries(df=df, countries_file=COUNTRY_MAPPING_PATH,
-                                 warn_on_missing_countries=True, warn_on_unused_countries=True)
+    df = geo.harmonize_countries(
+        df=df,
+        countries_file=COUNTRY_MAPPING_PATH,
+        warn_on_missing_countries=True,
+        warn_on_unused_countries=True,
+    )
 
     # Create one table for each gas, and one for all gases combined.
-    tables = {gas: create_table_for_gas(df=df, gas=gas, countries_in_regions=countries_in_regions)
-              for gas in df["gas"].unique()}
+    tables = {
+        gas: create_table_for_gas(
+            df=df, gas=gas, countries_in_regions=countries_in_regions
+        )
+        for gas in df["gas"].unique()
+    }
 
     #
     # Save outputs.
