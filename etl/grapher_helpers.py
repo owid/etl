@@ -1,7 +1,9 @@
-import logging
+import pandas as pd
+from owid import catalog
+import yaml
+import slugify
 import warnings
-from copy import deepcopy
-from dataclasses import dataclass, field
+import logging
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Literal, Optional, Set, cast
 
@@ -13,7 +15,7 @@ from pydantic import BaseModel
 
 from etl.db import get_connection, get_engine
 from etl.db_utils import DBUtils
-from etl.paths import REFERENCE_DATASET
+
 
 logging.basicConfig()
 logger = logging.getLogger(__name__)
@@ -103,6 +105,7 @@ def annotate_table(
 def yield_wide_table(
     table: catalog.Table,
     na_action: Literal["drop", "raise"] = "raise",
+    dim_titles: Optional[List[str]] = None,
 ) -> Iterable[catalog.Table]:
     """We have 5 dimensions but graphers data model can only handle 2 (year and entityId). This means
     we have to iterate all combinations of the remaining 3 dimensions and create a new variable for
@@ -111,6 +114,8 @@ def yield_wide_table(
 
     :param na_action: grapher does not support missing values, you can either drop them using this argument
         or raise an exception
+    :param dim_titles: Custom names to use for the dimensions, if not provided, the default names will be used.
+        Dimension title will be used to create variable name, e.g. `Deaths - Age: 10-18` instead of `Deaths - age: 10-18`
     """
     # Validation
     if "year" not in table.primary_key:
@@ -123,6 +128,12 @@ def yield_wide_table(
                 raise ValueError(f"Column `{col}` contains missing values")
 
     dim_names = [k for k in table.primary_key if k not in ("year", "entity_id")]
+    if dim_titles:
+        assert len(dim_names) == len(
+            dim_titles
+        ), "`dim_titles` must be the same length as your index without year and entity_id"
+    else:
+        dim_titles = dim_names
 
     if dim_names:
         grouped = table.groupby(dim_names, as_index=False)
@@ -131,14 +142,11 @@ def yield_wide_table(
         grouped = [([], table)]
 
     for dims, table_to_yield in grouped:
+        dims = [dims] if isinstance(dims, str) else dims
+
         # Now iterate over every column in the original dataset and export the
         # subset of data that we prepared above
         for column in table_to_yield.columns:
-            # Add column and dimensions as short_name
-            table_to_yield.metadata.short_name = _slugify_column_and_dimensions(
-                column, dims
-            )
-
             # Safety check to see if the metadata is still intact
             assert (
                 table_to_yield[column].metadata.unit is not None
@@ -155,16 +163,19 @@ def yield_wide_table(
 
             yield tab.reset_index().set_index(["entity_id", "year"])[[column]]
 
+            # Add dimensions to title (which will be used as variable name in grapher)
+            title_with_dims: Optional[str]
+            if tab[short_name].metadata.title:
+                title_with_dims = _title_column_and_dimensions(
+                    tab[short_name].metadata.title, dims, dim_titles
+                )
+                tab[short_name].metadata.title = title_with_dims
+            else:
+                title_with_dims = None
 
 def _slugify_column_and_dimensions(column: str, dims: List[str]) -> str:
-    if dims:
-        if isinstance(dims, (list, tuple)):
-            dims = [str(d) for d in dims]
-        else:
-            dims = [str(dims)]
-        slug = "__".join([column] + dims)
-    else:
-        slug = column
+    slug = slugify.slugify("__".join([column] + list(dims)), separator="_")
+
     # slugify would strip the leading underscore, put it back in that case
     # if column.startswith("_"):
     #     slug = f"_{slug}"
@@ -173,12 +184,17 @@ def _slugify_column_and_dimensions(column: str, dims: List[str]) -> str:
 
 
 def yield_long_table(
-    table: catalog.Table, annot: Optional[Annotation] = None
+    table: catalog.Table,
+    annot: Optional[Annotation] = None,
+    dim_titles: Optional[List[str]] = None,
 ) -> Iterable[catalog.Table]:
     """Yield from long table with the following columns:
     - variable: short variable name (needs to be underscored)
     - value: variable value
     - meta: either VariableMeta object or null in every row
+
+    :param dim_titles: Custom names to use for the dimensions, if not provided, the default names will be used.
+        Dimension title will be used to create variable name, e.g. `Deaths - Age: 10-18` instead of `Deaths - age: 10-18`
     """
     assert set(table.columns) == {
         "variable",
@@ -198,18 +214,15 @@ def yield_long_table(
 
         # extract metadata from column and make sure it is identical for all rows
         meta = t.pop("meta")
-        assert set(meta.map(id)) == {id(meta.iloc[0])}, (
-            f"Variable `{var_name}` must have same metadata objects in column `meta`"
-            " for all rows"
-        )
+        assert set(meta.map(id)) == {
+            id(meta.iloc[0])
+        }, f"Variable `{var_name}` must have same metadata objects in column `meta` for all rows"
         t[var_name].metadata = meta.iloc[0]
 
         if annot:
             t = annotate_table(t, annot, missing_col="ignore")
 
-        t = t.drop(["variable", "meta"], axis=1, errors="ignore")
-
-        yield from yield_wide_table(cast(catalog.Table, t))
+        yield from yield_wide_table(cast(catalog.Table, t), dim_titles=dim_titles)
 
 
 def _get_entities_from_countries_regions() -> Dict[str, int]:
@@ -227,7 +240,7 @@ def _get_entities_from_db(countries: Set[str]) -> Dict[str, int]:
 def _get_and_create_entities_in_db(countries: Set[str]) -> Dict[str, int]:
     cursor = get_connection().cursor()
     db = DBUtils(cursor)
-    logging.info(f"Creating entities in DB: {countries}")
+    log.info("Creating entities in DB", countries=countries)
     return {name: db.get_or_create_entity(name) for name in countries}
 
 
