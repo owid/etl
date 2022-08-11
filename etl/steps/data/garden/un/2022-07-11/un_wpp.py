@@ -118,7 +118,7 @@ def run(dest_dir: str) -> None:
     # create tables
     table_long = df_to_table(
         df,
-        short_name="long",
+        short_name="un_wpp",
         description=(
             "Main UN WPP dataset by OWID. It comes in 'long' format, i.e. column"
             " 'metric' gives the metric name and column 'value' its corresponding"
