@@ -1,5 +1,4 @@
 from typing import Iterable
-from owid.catalog.meta import VariableMeta
 import yaml
 
 from owid import catalog

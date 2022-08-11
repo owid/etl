@@ -453,7 +453,7 @@ def adapt_table_for_grapher(
     return cast(catalog.Table, table)
 
 
-def _ensure_source_per_variable(table: catalog.Table):
+def _ensure_source_per_variable(table: catalog.Table) -> catalog.Table:
     for column in table.columns:
         if len(table[column].metadata.sources) == 0:
             # Take the metadata sources from the dataset's metadata (after combining them into one).
