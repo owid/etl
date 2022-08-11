@@ -32,7 +32,9 @@ def prepare_data(df: pd.DataFrame) -> pd.DataFrame:
     df = df.drop(columns="emissions")
 
     # Set an appropriate index and sort conveniently.
-    df = df.set_index(["country", "year", "gas", "sector", "data_source"], verify_integrity=True).sort_index()
+    df = df.set_index(
+        ["country", "year", "gas", "sector", "data_source"], verify_integrity=True
+    ).sort_index()
 
     return df
 
@@ -42,7 +44,9 @@ def run(dest_dir: str) -> None:
     # Load data.
     #
     # Retrieve raw data from walden.
-    walden_ds = WaldenCatalog().find_one(namespace=NAMESPACE, short_name=WALDEN_SHORT_NAME, version=WALDEN_VERSION)
+    walden_ds = WaldenCatalog().find_one(
+        namespace=NAMESPACE, short_name=WALDEN_SHORT_NAME, version=WALDEN_VERSION
+    )
     local_file = walden_ds.ensure_downloaded()
 
     # Create a dataframe from compressed file.
