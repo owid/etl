@@ -171,7 +171,7 @@ def yield_wide_table(
                 )
                 tab[short_name].metadata.title = title_with_dims
             else:
-                title_with_dims = None  # type: ignore
+                title_with_dims = None
 
             log.info(
                 "yield_wide_table.create_variable",
