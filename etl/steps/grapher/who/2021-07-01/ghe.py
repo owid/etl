@@ -89,5 +89,7 @@ def get_grapher_tables(dataset: catalog.Dataset) -> Iterable[catalog.Table]:
     # Sanity check
     for column in columns_to_export:
         assert table[column].metadata.unit is not None, "Unit should not be None here!"
+        # Use short names as titles
+        table[column].metadata.title = column
 
     yield from gh.yield_wide_table(table[columns_to_export], na_action="drop")
