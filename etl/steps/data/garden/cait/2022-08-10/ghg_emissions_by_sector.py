@@ -120,7 +120,7 @@ def create_table_for_gas(
     # Create table with this data but no metadata.
     table_gas = catalog.Table(df_gas)
     # Create variable metadata.
-    for variable in variables:
+    for variable in table_gas.columns:
         if PER_CAPITA_SUFFIX in variable:
             table_gas[variable].metadata.unit = "tonnes per capita"
             table_gas[variable].metadata.short_unit = "t"
@@ -197,7 +197,6 @@ def run(dest_dir: str) -> None:
     #
     ds_garden = catalog.Dataset.create_empty(dest_dir)
     # Import metadata from meadow dataset and update attributes using the metadata yaml file.
-    ds_garden.metadata = ds_meadow.metadata
     ds_garden.metadata.update_from_yaml(METADATA_PATH)
     # Create dataset.
     ds_garden.save()
