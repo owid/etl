@@ -7,7 +7,7 @@ dataset:
   #       The Maddison Project Database is based on the work of many researchers that have produced estimates of...
 
 tables:
-  long:
+  un_wpp:
     variables:
       birth_rate:
         title: Birth rate
