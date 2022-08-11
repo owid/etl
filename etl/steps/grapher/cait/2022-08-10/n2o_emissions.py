@@ -11,7 +11,9 @@ TABLE_NAME = "nitrous_oxide_emissions_by_sector"
 # Name of output grapher dataset.
 GRAPHER_DATASET_TITLE = "Nitrous oxide emissions by sector (CAIT, 2022)"
 # Path to garden dataset to be loaded.
-DATASET_PATH = DATA_DIR / "garden" / NAMESPACE / GARDEN_DATASET_VERSION / "ghg_emissions_by_sector"
+DATASET_PATH = (
+    DATA_DIR / "garden" / NAMESPACE / GARDEN_DATASET_VERSION / "ghg_emissions_by_sector"
+)
 
 
 def get_grapher_dataset() -> catalog.Dataset:
@@ -33,7 +35,9 @@ def get_grapher_tables(dataset: catalog.Dataset) -> Iterable[catalog.Table]:
     table = dataset[TABLE_NAME].reset_index().drop(columns=["population"])
     # For convenience, change units from "million tonnes" to "tonnes" and multiply all variables by a million.
     # Doing this, grapher will know when to use the word "million" and when to use "billion".
-    variables = [column for column in table.columns if column not in ["country", "year"]]
+    variables = [
+        column for column in table.columns if column not in ["country", "year"]
+    ]
     for column in variables:
         if table[column].metadata.unit == "million tonnes":
             table[column].metadata.unit = "tonnes"
