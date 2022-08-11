@@ -71,7 +71,7 @@ steps:
   #
   # CAIT - Greenhouse gas emissions by sector (2022).
   #
-  data://meadow/cait/2022-08-10/ghg_emissions:
+  data://meadow/cait/2022-08-10/ghg_emissions_by_sector:
     - walden://cait/2022-08-10/cait_ghg_emissions
   data://garden/sdg/latest/sdg:
     - backport://backport/owid/latest/dataset_563_world_development_indicators__health
