@@ -23,7 +23,7 @@ COLUMNS_METRICS: Dict[str, Dict[str, Any]] = {
     **{
         "_100plus": {
             "name": "deaths",
-            "age": "100-",
+            "age": "100+",
         }
     },
 }
@@ -49,6 +49,9 @@ def process(df: pd.DataFrame, country_std: str) -> pd.DataFrame:
         metric="deaths",
         value=(df.value * 1000).astype(int),
     )
+    df = optimize_dtypes(df, simple=True)
+    # Add/Build age groups
+    df = add_age_groups(df)
     # Dtypes
     df = optimize_dtypes(df)
     # Column order
@@ -60,9 +63,9 @@ def process(df: pd.DataFrame, country_std: str) -> pd.DataFrame:
 
 def add_age_groups(df: pd.DataFrame) -> pd.DataFrame:
     # <1
-    df_0 = df[df.age == 0].copy()
+    df_0 = df[df.age == "0"].copy()
     # 1-4
-    df_1_4 = df[df.age.isin([1, 2, 3, 4])].copy()
+    df_1_4 = df[df.age.isin(["1", "2", "3", "4"])].copy()
     df_1_4 = (
         df_1_4.groupby(
             ["location", "year", "metric", "sex", "variant"],
@@ -74,8 +77,8 @@ def add_age_groups(df: pd.DataFrame) -> pd.DataFrame:
     )
     # Basic age groups
     age_map = {
-        **{i: f"{i - i%5}-{i + 4 - i%5}" for i in range(0, 20)},
-        **{i: f"{i - i%10}-{i + 9 - i%10}" for i in range(20, 100)},
+        **{str(i): f"{i - i%5}-{i + 4 - i%5}" for i in range(0, 20)},
+        **{str(i): f"{i - i%10}-{i + 9 - i%10}" for i in range(20, 100)},
     }
     df = df.assign(age=df.age.map(age_map))
     df = df.groupby(

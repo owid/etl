@@ -53,7 +53,7 @@ def _load_population(tmp_dir: str) -> pd.DataFrame:
         "MidPeriod": "uint16",
         "AgeGrp": "category",
         "AgeGrpStart": "uint8",
-        "AgeGrpSpan": "uint8",
+        "AgeGrpSpan": "int8",
         "PopMale": "float",
         "PopFemale": "float",
         "PopTotal": "float",
