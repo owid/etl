@@ -36,48 +36,26 @@ SIMILARITY_NAMES = {
 }
 
 
-def get_similarity_function(
-    similarity_name: str, similarity_names: dict[str, Callable[[str, str], int]]
-) -> Callable[[str, str], int]:
+def get_similarity_function(similarity_name: str) -> Callable[[str, str], int]:
     """Return a similarity function given its name.
 
     Parameters
     ----------
     similarity_name : str
         Name of similarity function.
-    similarity_names : dict
-        Similarity methods currently considered.
 
     Returns
     -------
+    Callable :
+        Similarity function.
 
     """
-    if similarity_name in similarity_names:
-        similarity_function = similarity_names[similarity_name]
+    if similarity_name in SIMILARITY_NAMES:
+        similarity_function = SIMILARITY_NAMES[similarity_name]
     else:
         raise ValueError(f"ERROR: Unknown similarity function: {similarity_name}")
 
     return similarity_function
-
-
-def load_from_json_file(json_file: str) -> Any:
-    """Load data from a json file.
-
-    Parameters
-    ----------
-    json_file : str
-        Path to json file.
-
-    Returns
-    -------
-    data : dict
-        Data.
-
-    """
-    with open(json_file) as _json_file:
-        data = json.load(_json_file)
-
-    return data
 
 
 def save_data_to_json_file(data: list[str], json_file: str, **kwargs: Any) -> None:
@@ -106,19 +84,21 @@ def _display_compared_variables(
     missing_new: pd.DataFrame,
     n_max_suggestions: int = N_MAX_SUGGESTIONS,
 ) -> None:
-    print(f"\nOld variable: {old_name}")
-    print(f"New variable: {new_name}")
-    print("\n Other options:")
+    click.secho(f"\nOld variable: {old_name}", fg="red", bold=True, blink=True)
+    click.secho(f"New variable: {new_name}", fg="green", bold=True)
+    click.secho("\n\tOther options:", italic=True)
     for i, row in missing_new.iloc[1 : 1 + n_max_suggestions].iterrows():
-        print(
-            f"  {i:5} - {row['name_new']} (id={row['id_new']},"
-            f" similarity={row['similarity']:.0f})"
+        click.secho(
+            f"\t{i:5} - {row['name_new']} (id={row['id_new']},"
+            f" similarity={row['similarity']:.0f})",
+            fg="bright_green",
         )
+    click.echo("\n")
 
 
 def _input_manual_decision(new_indexes: list[Any]) -> Any:
     decision = input(
-        "Press enter to accept this option, or type chosen index. To ignore this"
+        "> Press enter to accept this option, or type chosen index. To ignore this"
         " variable, type i."
     )
     if decision == "":
@@ -195,7 +175,10 @@ def map_old_and_new_variables(
     ].reset_index(drop=True)
 
     # Iterate over old variables, and find the right match among new variables.
+    num_variables = len(missing_old)
+    count = 0
     while len(missing_old) > 0:
+        count += 1
         # Indexes of the old dataframe.
         old_indexes = missing_old.index.tolist()
         # Choose variable on the first row of the old dataframe.
@@ -217,6 +200,7 @@ def map_old_and_new_variables(
         new_name = missing_new.loc[suggested_index]["name_new"]
 
         # Display comparison.
+        click.secho(f"\nVARIABLE {count}/{num_variables}", bold=True, bg="white", fg="black")
         _display_compared_variables(
             old_name=old_name,
             new_name=new_name,
@@ -334,7 +318,7 @@ def main(
         )
 
     # Select similarity function.
-    similarity_function = get_similarity_function(similarity_name, SIMILARITY_NAMES)
+    similarity_function = get_similarity_function(similarity_name)
 
     # Manually map old variable names to new variable names.
     mapping = map_old_and_new_variables(
