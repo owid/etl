@@ -1715,7 +1715,7 @@ def optimize_table_dtypes(table: catalog.Table) -> catalog.Table:
 
     Returns
     -------
-    catalog.Table
+    optimized_table : catalog.Table
         Table with optimized dtypes.
 
     """
@@ -1725,7 +1725,16 @@ def optimize_table_dtypes(table: catalog.Table) -> catalog.Table:
         if c in table.columns
     }
 
-    return catalog.frames.repack_frame(table, dtypes=dtypes)
+    # Store variables metadata before optimizing table dtypes (otherwise they will be lost).
+    variables_metadata = {variable: table[variable].metadata for variable in table.columns}
+
+    optimized_table = catalog.frames.repack_frame(table, dtypes=dtypes)
+
+    # Recover variable metadata (that was lost when optimizing table dtypes).
+    for variable in variables_metadata:
+        optimized_table[variable].metadata = variables_metadata[variable]
+
+    return optimized_table
 
 
 def prepare_long_table(data: pd.DataFrame) -> catalog.Table:

@@ -1,6 +1,7 @@
 """Common grapher step for all FAOSTAT domains.
 
 """
+
 from pathlib import Path
 from typing import Iterable
 
@@ -38,15 +39,12 @@ def get_grapher_dataset_from_file_name(file_path: str) -> catalog.Dataset:
         DATA_DIR / "garden" / namespace / garden_version / dataset_short_name
     )
 
-    # Short name for new grapher dataset.
-    dataset.metadata.short_name = f"{dataset_short_name}__{grapher_version}".replace(
-        "-", "_"
-    )
+    # Adapt dataset metadata to grapher requirements.
+    dataset.metadata = gh.adapt_dataset_metadata_for_grapher(dataset.metadata)
 
-    # move description to source as that is what is shown in grapher
-    # (dataset.description would be displayed under `Internal notes` in the admin UI otherwise)
-    dataset.metadata.sources[0].description = dataset.metadata.description
-    dataset.metadata.description = ""
+    # Some datasets have " - FAO (YYYY)" at the end, and some others do not.
+    # For consistency, remove that ending of the title, and add something consistent across all datasets.
+    dataset.metadata.title = dataset.metadata.title.split(" - FAO (")[0] + f" (FAO, {grapher_version})"
 
     return dataset
 
@@ -75,9 +73,7 @@ def get_grapher_tables(dataset: catalog.Dataset) -> Iterable[catalog.Table]:
     assert len(flat_table_names) == 1
     table = dataset[flat_table_names[0]].reset_index().drop(columns=["area_code"])
 
-    # Convert country names into grapher entity ids, and set index appropriately.
-    # WARNING: This will create new entities in grapher if not already existing.
-    table["entity_id"] = gh.country_to_entity_id(table["country"], create_entities=True)
-    table = table.set_index(["entity_id", "year"]).drop(columns=["country"])
+    # Adapt table to grapher requirements.
+    table = gh.adapt_table_for_grapher(table=table)
 
     yield from gh.yield_wide_table(table, na_action="drop")
