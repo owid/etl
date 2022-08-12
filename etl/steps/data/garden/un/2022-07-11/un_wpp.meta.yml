@@ -98,7 +98,7 @@ tables:
         unit: Persons
         description: De facto population in a country, area or region as of 1 July of the year indicated.
       population_broad:
-        title: Population (broad age groups)
+        title: Population by broad age group
         short_unit:
         unit: Persons
         description: De facto population in a country, area or region as of 1 July of the year indicated. Figures are presented in thousands. Alternative metric to 'population', used for different (and groader) age groups.
