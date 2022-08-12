@@ -36,7 +36,7 @@ SIMILARITY_NAMES = {
 }
 
 
-def get_similarity_function(similarity_name: str) -> Callable[[str, str], int]:
+def get_similarity_function(similarity_name: str) -> Any:
     """Return a similarity function given its name.
 
     Parameters
@@ -200,7 +200,9 @@ def map_old_and_new_variables(
         new_name = missing_new.loc[suggested_index]["name_new"]
 
         # Display comparison.
-        click.secho(f"\nVARIABLE {count}/{num_variables}", bold=True, bg="white", fg="black")
+        click.secho(
+            f"\nVARIABLE {count}/{num_variables}", bold=True, bg="white", fg="black"
+        )
         _display_compared_variables(
             old_name=old_name,
             new_name=new_name,
@@ -394,13 +396,13 @@ def main(
     ),
 )
 def main_cli(
-    old_dataset_name,
-    new_dataset_name,
-    add_identical_pairs,
-    similarity_name,
-    output_file,
-    max_suggestions,
-):
+    old_dataset_name: str,
+    new_dataset_name: str,
+    output_file: str,
+    add_identical_pairs: bool,
+    similarity_name: str,
+    max_suggestions: int,
+) -> None:
     main(
         old_dataset_name=old_dataset_name,
         new_dataset_name=new_dataset_name,

@@ -126,6 +126,6 @@ def get_variables_in_dataset(
             )
         """
     with warnings.catch_warnings():
-        warnings.simplefilter('ignore', UserWarning)
+        warnings.simplefilter("ignore", UserWarning)
         variables_data = pd.read_sql(query, con=db_conn)
     return variables_data
