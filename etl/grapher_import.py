@@ -62,7 +62,9 @@ def upsert_dataset(
 
     if len(sources) > 1:
         raise NotImplementedError(
-            "only a single source is supported for grapher datasets, use `combine_metadata_sources` or `adapt_dataset_metadata_for_grapher` to join multiple sources"
+            "only a single source is supported for grapher datasets, use"
+            " `combine_metadata_sources` or `adapt_dataset_metadata_for_grapher` to"
+            " join multiple sources"
         )
 
     # This function creates the dataset table row, a namespace row
@@ -132,19 +134,21 @@ def upsert_table(
     of the variable is used to fill the required fields.
     """
 
-    assert set(table.index.names) == {
-        "year",
-        "entity_id",
-    }, f"Tables to be upserted must have only 2 indices: year and entity_id. Instead they have: {table.index.names}"
-    assert (
-        len(table.columns) == 1
-    ), f"Tables to be upserted must have only 1 column. Instead they have: {table.columns.names}"
+    assert set(table.index.names) == {"year", "entity_id"}, (
+        "Tables to be upserted must have only 2 indices: year and entity_id. Instead"
+        f" they have: {table.index.names}"
+    )
+    assert len(table.columns) == 1, (
+        "Tables to be upserted must have only 1 column. Instead they have:"
+        f" {table.columns.names}"
+    )
     assert table[
         table.columns[0]
     ].title, f"Column `{table.columns[0]}` must have a title in metadata"
-    assert (
-        table.iloc[:, 0].notnull().all()
-    ), f"Tables to be upserted must have no null values. Instead they have:\n{table.loc[table.iloc[:, 0].isnull()]}"
+    assert table.iloc[:, 0].notnull().all(), (
+        "Tables to be upserted must have no null values. Instead they"
+        f" have:\n{table.loc[table.iloc[:, 0].isnull()]}"
+    )
     table = table.reorder_levels(["year", "entity_id"])
     assert (
         table.index.dtypes[0] in INT_TYPES
@@ -157,7 +161,9 @@ def upsert_table(
 
     if len(table.iloc[:, 0].metadata.sources) > 1:
         raise NotImplementedError(
-            "only a single source is supported for grapher datasets, use `combine_metadata_sources` or `adapt_dataset_metadata_for_grapher` to join multiple sources"
+            "only a single source is supported for grapher datasets, use"
+            " `combine_metadata_sources` or `adapt_dataset_metadata_for_grapher` to"
+            " join multiple sources"
         )
 
     _update_variables_display(table)
@@ -178,7 +184,8 @@ def upsert_table(
         # Every variable must have exactly one source
         if len(table[column_name].metadata.sources) != 1:
             raise NotImplementedError(
-                f"Variable `{column_name}` must have exactly one source, see function `adapt_table_for_grapher` that can do that for you"
+                f"Variable `{column_name}` must have exactly one source, see function"
+                " `adapt_table_for_grapher` that can do that for you"
             )
 
         source = table[column_name].metadata.sources[0]

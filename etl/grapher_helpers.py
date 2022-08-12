@@ -223,6 +223,10 @@ def yield_long_table(
     :param dim_titles: Custom names to use for the dimensions, if not provided, the default names will be used.
         Dimension title will be used to create variable name, e.g. `Deaths - Age: 10-18` instead of `Deaths - age: 10-18`
     """
+    assert (
+        table.metadata.dataset and table.metadata.dataset.sources
+    ), "Table must have a dataset with sources in its metadata"
+
     assert set(table.columns) == {
         "variable",
         "meta",
@@ -448,6 +452,12 @@ def adapt_table_for_grapher(
 
     # Ensure the default source of each column includes the description of the table (since that is the description that
     # will appear in grapher on the SOURCES tab).
+    table = _ensure_source_per_variable(table)
+
+    return cast(catalog.Table, table)
+
+
+def _ensure_source_per_variable(table: catalog.Table) -> catalog.Table:
     for column in table.columns:
         if len(table[column].metadata.sources) == 0:
             # Take the metadata sources from the dataset's metadata (after combining them into one).
@@ -457,8 +467,7 @@ def adapt_table_for_grapher(
         if table[column].metadata.sources[0].description is None:
             # Add the table description to the first source, so that it is displayed on the SOURCES tab.
             table[column].metadata.sources[0].description = table.metadata.description
-
-    return cast(catalog.Table, table)
+    return table
 
 
 @dataclass

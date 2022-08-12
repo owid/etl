@@ -16,7 +16,7 @@ from .dep_ratio import process as process_depratio
 from .deaths import process as process_deaths
 
 YEAR_SPLIT = 2022
-
+METADATA_PATH = Path(__file__).parent / "un_wpp.meta.yml"
 
 metric_categories = {
     "migration": [
@@ -118,7 +118,7 @@ def run(dest_dir: str) -> None:
     # create tables
     table_long = df_to_table(
         df,
-        short_name="long",
+        short_name="un_wpp",
         description=(
             "Main UN WPP dataset by OWID. It comes in 'long' format, i.e. column"
             " 'metric' gives the metric name and column 'value' its corresponding"
@@ -141,4 +141,4 @@ def run(dest_dir: str) -> None:
         )
     tables += [table_long]
     # create dataset
-    dataset_to_garden([table_long], ds.metadata, dest_dir)
+    dataset_to_garden(tables, ds.metadata, dest_dir)

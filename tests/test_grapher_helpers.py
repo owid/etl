@@ -1,6 +1,7 @@
 import pandas as pd
+import pytest
 
-from owid.catalog import Table, VariableMeta
+from owid.catalog import Table, VariableMeta, TableMeta, DatasetMeta, Source
 from etl.grapher_helpers import yield_wide_table, yield_long_table
 
 
@@ -60,7 +61,8 @@ def test_yield_long_table_with_dimensions():
             "sex": ["male", "female", "male", "female"],
         }
     ).set_index(["year", "entity_id", "sex"])
-    grapher_tables = list(yield_long_table(Table(long), dim_titles=["Sex"]))
+    table = Table(long, metadata=TableMeta(dataset=DatasetMeta(sources=[Source()])))
+    grapher_tables = list(yield_long_table(table, dim_titles=["Sex"]))
 
     t = grapher_tables[0]
     assert t.columns[0] == "births__sex_female"
@@ -77,3 +79,22 @@ def test_yield_long_table_with_dimensions():
     t = grapher_tables[3]
     assert t.columns[0] == "deaths__sex_male"
     assert t[t.columns[0]].metadata.title == "Deaths - Sex: male"
+
+
+def test_yield_long_table_with_dimensions_error():
+    deaths_meta = VariableMeta(title="Deaths", unit="people")
+    births_meta = VariableMeta(title="Births", unit="people")
+
+    long = pd.DataFrame(
+        {
+            "year": [2019, 2019, 2019, 2019],
+            "entity_id": [1, 1, 1, 1],
+            "variable": ["deaths", "deaths", "births", "births"],
+            "meta": [deaths_meta, deaths_meta, births_meta, births_meta],
+            "value": [1, 2, 3, 4],
+            "sex": ["male", "female", "male", "female"],
+        }
+    ).set_index(["year", "entity_id", "sex"])
+    table = Table(long)  # no metadata with sources
+    with pytest.raises(AssertionError):
+        _ = list(yield_long_table(table, dim_titles=["Sex"]))
