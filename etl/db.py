@@ -3,6 +3,7 @@ from collections.abc import Generator
 from contextlib import contextmanager
 from urllib.parse import quote
 from typing import Any
+import warnings
 
 import pandas as pd
 import MySQLdb
@@ -124,6 +125,7 @@ def get_variables_in_dataset(
                 FROM chart_dimensions
             )
         """
-    variables_data = pd.read_sql(query, con=db_conn)
-
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore', UserWarning)
+        variables_data = pd.read_sql(query, con=db_conn)
     return variables_data
