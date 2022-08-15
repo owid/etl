@@ -23,12 +23,6 @@ There are some non-trivial issues with the definitions of items at FAOSTAT:
 * Some item codes in the data are missing in the metadata, and vice versa.
 * The mapping item_code -> item in the data files is sometimes different from the mapping item_code -> item
   in the (additional) metadata dataset. Some examples:
-  * For the scl dataset, it seems that item_code in the data corresponds to cpc_code in the metadata. For example,
-    item "Wheat" in the data has item code 111, but in the metadata, "Wheat" has item code 15 (and cpc code 111).
-    This does not affect the data values, but if we wanted to merge this dataset with another one using item code,
-    we would get wrong results. Also, descriptions fetched from the metadata may be wrong for this dataset.
-    TODO: Consider fixing this issue by mapping item code in data to cpc code in metadata, and retrieving item code
-     from metadata (after checking that it is indeed correct).
   * In dataset qv, item code 221 in the data corresponds to item "Almonds, in shell", whereas in the metadata,
     item code 221 corresponds to item "Almonds, with shell", which is the same item, but with a slightly different
     name. This happens with many items. On the website (https://www.fao.org/faostat/en/?#data/QV) they seem to be
@@ -55,7 +49,7 @@ from tqdm.auto import tqdm
 
 from etl.paths import DATA_DIR, STEP_DIR
 from owid import catalog
-from .shared import (
+from shared import (
     FLAGS_RANKING,
     LATEST_VERSIONS_FILE,
     NAMESPACE,

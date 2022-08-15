@@ -77,6 +77,7 @@ steps:
   data://meadow/faostat/2022-05-17/faostat_rt:
     - walden://faostat/2022-05-17/faostat_rt
   data://meadow/faostat/2022-05-17/faostat_scl:
+    - data://meadow/faostat/2022-05-17/faostat_metadata
     - walden://faostat/2022-05-17/faostat_scl
   data://meadow/faostat/2022-05-17/faostat_sdgb:
     - walden://faostat/2022-05-17/faostat_sdgb
