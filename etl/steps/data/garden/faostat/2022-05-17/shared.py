@@ -1772,30 +1772,17 @@ def prepare_long_table(data: pd.DataFrame) -> catalog.Table:
     return cast(catalog.Table, data_table_long)
 
 
-def create_variable_names(
-    dataset_title: str,
-    item: str,
-    item_code: str,
-    element: str,
-    element_code: str,
-    unit: str,
-) -> str:
-    """Create variable names for the wide (flatten) output table, ensuring that the short names are not too long.
+def create_variable_short_names(variable_name: str) -> str:
+    """Create lower-snake-case short names for the columns in the wide (flatten) output table, ensuring that they are
+    not too long (to avoid issues when inserting variable in grapher).
+
+    If a new name is too long, the ending of the item name will be reduced.
+    If the item name is not long enough to solve the problem, this function will raise an assertion error.
 
     Parameters
     ----------
-    dataset_title : str
-        Dataset title.
-    item : str
-        Item name.
-    item_code : str
-        Harmonized item code.
-    element : str
-        Element name.
-    element_code : str
-        Harmonized element code.
-    unit : str
-        Unit name (long version).
+    variable_name : str
+        Variable name.
 
     Returns
     -------
@@ -1803,28 +1790,39 @@ def create_variable_names(
         New variable name.
 
     """
-    new_name = f"{dataset_title} || {item} | {item_code} || {element} | {element_code} || {unit}"
+
+    # Extract all the necessary fields from the variable name.
+    dataset_title, item, item_code, element, element_code, unit = variable_name.replace(
+        "||", "|"
+    ).split(" | ")
+
+    # Check that the extraction was correct by constructing the variable name again and comparing with the original.
+    assert (
+        variable_name
+        == f"{dataset_title} || {item} | {item_code} || {element} | {element_code} || {unit}"
+    )
+
+    new_name = catalog.utils.underscore(variable_name)
 
     # Check that the number of characters of the short name is not too long.
-    n_char = len(catalog.utils.underscore(new_name))
+    n_char = len(new_name)
     if n_char > 255:
         # This name will cause an issue when uploading to grapher (because of a limit of 255 characters in short name).
-        # Remove the extra characters from item name (if possible), and add "..." at the end of the item name.
-        # Note that here the "-3" is to allow for "..." at the end of the item name.
-        n_char_to_be_removed = n_char - 255 - 3
+        # Remove the extra characters from the ending of the item name (if possible).
+        n_char_to_be_removed = n_char - 255
         # It could happen that it is not the item name that is long, but the element name, dataset, or unit.
         # But for the moment, assume it is the item name.
         assert (
             len(item) > n_char_to_be_removed
         ), "Variable name is too long, but it is not due to item name."
-        new_name = (
-            f"{dataset_title} || {item[0:-n_char_to_be_removed] + '...'} | {item_code} || {element} | "
-            f"{element_code} || {unit}"
+        new_item = catalog.utils.underscore(item)[0:-n_char_to_be_removed]
+        new_name = catalog.utils.underscore(
+            f"{dataset_title} || {new_item} | {item_code} || {element} | {element_code} || {unit}"
         )
 
-    # Check that now the underscore version of new_name indeed fulfils the length requirement.
-    error = "Variable name is too long. Improve create_variable_names function."
-    assert len(catalog.utils.underscore(new_name)) <= 255, error
+    # Check that now the new name now fulfils the length requirement.
+    error = "Variable short name is too long. Improve create_variable_names function to account for this case."
+    assert len(new_name) <= 255, error
 
     return new_name
 
@@ -1862,9 +1860,7 @@ def prepare_wide_table(data: pd.DataFrame, dataset_title: str) -> catalog.Table:
     # (which would cause issues when uploading to grapher).
     data["variable_name"] = dataframes.apply_on_categoricals(
         [data.item, data.item_code, data.element, data.element_code, data.unit],
-        lambda item, item_code, element, element_code, unit: create_variable_names(
-            dataset_title, item, item_code, element, element_code, unit
-        ),
+        lambda item, item_code, element, element_code, unit: f"{dataset_title} || {item} | {item_code} || {element} | {element_code} || {unit}",
     )
 
     # Construct a human-readable variable display name (which will be shown in grapher charts).
@@ -1938,7 +1934,14 @@ def prepare_wide_table(data: pd.DataFrame, dataset_title: str) -> catalog.Table:
     wide_table = wide_table.sort_index(level=["country", "year"]).sort_index()
 
     # Make all column names snake_case.
-    wide_table = catalog.utils.underscore_table(wide_table)
+    variable_to_short_name = {
+        column: create_variable_short_names(
+            variable_name=wide_table[column].metadata.title
+        )
+        for column in wide_table.columns
+        if wide_table[column].metadata.title is not None
+    }
+    wide_table = wide_table.rename(columns=variable_to_short_name, errors="raise")
 
     return wide_table
 
