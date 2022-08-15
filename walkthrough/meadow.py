@@ -165,7 +165,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
 1. Run `etl` to generate the dataset
 
     ```
-    etl data://meadow/{form.namespace}/{form.version}/{form.short_name}
+    poetry run etl data://meadow/{form.namespace}/{form.version}/{form.short_name}
     ```
 
 2. Generated notebook `{notebook_path.relative_to(ETL_DIR)}` can be used to examine the dataset output interactively.
