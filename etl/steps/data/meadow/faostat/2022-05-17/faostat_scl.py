@@ -18,10 +18,16 @@ from etl.steps.data.converters import convert_walden_metadata
 from owid.walden import Catalog
 from owid.catalog import Dataset, Table, utils
 
-from shared import LATEST_VERSIONS_FILE, NAMESPACE, load_data, prepare_output_data, run_sanity_checks
+from shared import (
+    LATEST_VERSIONS_FILE,
+    NAMESPACE,
+    load_data,
+    prepare_output_data,
+    run_sanity_checks,
+)
 
 
-def fix_items(data, metadata):
+def fix_items(data: pd.DataFrame, metadata: Dataset) -> pd.DataFrame:
     """Add the true item codes to the data, extracted from the metadata.
 
     Parameters
@@ -41,9 +47,16 @@ def fix_items(data, metadata):
     items_metadata = metadata[f"{NAMESPACE}_scl_item"]
 
     # Replace item_code by cpc_code, join with items metadata for this dataset, and get the right item_codes.
-    data_fixed = pd.merge(data.reset_index(drop=True).rename(columns={"Item Code": "cpc_code"}),
-                          items_metadata.reset_index()[["cpc_code", "item_code"]],
-                          on="cpc_code", how="left").drop(columns="cpc_code").rename(columns={"item_code": "Item Code"})
+    data_fixed = (
+        pd.merge(
+            data.reset_index(drop=True).rename(columns={"Item Code": "cpc_code"}),
+            items_metadata.reset_index()[["cpc_code", "item_code"]],
+            on="cpc_code",
+            how="left",
+        )
+        .drop(columns="cpc_code")
+        .rename(columns={"item_code": "Item Code"})
+    )
 
     return data_fixed
 
@@ -77,7 +90,9 @@ def run(dest_dir: str) -> None:
 
     # Load metadata.
     metadata_version = latest_versions.loc["meadow", f"{NAMESPACE}_metadata"].item()
-    metadata = Dataset(DATA_DIR / "meadow" / NAMESPACE / metadata_version / f"{NAMESPACE}_metadata")
+    metadata = Dataset(
+        DATA_DIR / "meadow" / NAMESPACE / metadata_version / f"{NAMESPACE}_metadata"
+    )
 
     ####################################################################################################################
     # Prepare data.

@@ -1824,7 +1824,7 @@ def create_variable_short_names(variable_name: str) -> str:
     error = "Variable short name is too long. Improve create_variable_names function to account for this case."
     assert len(new_name) <= 255, error
 
-    return new_name
+    return cast(str, new_name)
 
 
 def prepare_wide_table(data: pd.DataFrame, dataset_title: str) -> catalog.Table:
