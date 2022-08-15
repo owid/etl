@@ -15,7 +15,7 @@ import pandas as pd
 from etl.steps.data.converters import convert_walden_metadata
 from owid.catalog import Dataset, Table, utils
 from owid.walden import Catalog
-from .shared import NAMESPACE
+from shared import NAMESPACE, LATEST_VERSIONS_FILE
 
 # Name for new meadow dataset.
 DATASET_SHORT_NAME = f"{NAMESPACE}_metadata"
@@ -108,10 +108,13 @@ def check_that_category_structure_is_well_defined(md: Dict[str, Any]) -> None:
 
 
 def run(dest_dir: str) -> None:
+    # Load file of versions.
+    latest_versions = pd.read_csv(LATEST_VERSIONS_FILE).set_index(["channel", "dataset"])
+
     # Load FAOSTAT (additional) metadata dataset from walden.
-    walden_ds = Catalog().find_latest(
-        namespace=NAMESPACE, short_name=DATASET_SHORT_NAME
-    )
+    walden_latest_version = latest_versions.loc["walden", DATASET_SHORT_NAME].item()
+    walden_ds = Catalog().find_one(namespace=NAMESPACE, version=walden_latest_version, short_name=DATASET_SHORT_NAME)
+
     local_file = walden_ds.ensure_downloaded()
     with open(local_file) as _local_file:
         additional_metadata = json.load(_local_file)

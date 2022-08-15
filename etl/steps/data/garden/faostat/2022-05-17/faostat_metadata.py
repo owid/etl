@@ -57,6 +57,7 @@ from etl.paths import DATA_DIR, STEP_DIR
 from owid import catalog
 from .shared import (
     FLAGS_RANKING,
+    LATEST_VERSIONS_FILE,
     NAMESPACE,
     VERSION,
     harmonize_elements,
@@ -88,8 +89,10 @@ def load_latest_data_table_for_dataset(dataset_short_name: str) -> catalog.Table
     """
     # Path to folder with all versions of meadow datasets for FAOSTAT.
     meadow_dir = DATA_DIR / "meadow" / NAMESPACE
+    # Load file of versions.
+    latest_versions = pd.read_csv(LATEST_VERSIONS_FILE).set_index(["channel", "dataset"])
     # Find latest meadow version for given dataset.
-    dataset_version = sorted(meadow_dir.glob(f"*/{dataset_short_name}"))[-1].parent.name
+    dataset_version = latest_versions.loc["meadow", dataset_short_name].item()
     # Path to latest dataset folder.
     dataset_path = meadow_dir / dataset_version / dataset_short_name
     assert dataset_path.is_dir(), f"Dataset {dataset_short_name} not found in meadow."
@@ -1043,10 +1046,11 @@ def run(dest_dir: str) -> None:
     # Path to file with custom element and unit names and descriptions.
     custom_elements_and_units_file = garden_code_dir / "custom_elements_and_units.csv"
 
+    # Load file of versions.
+    latest_versions = pd.read_csv(LATEST_VERSIONS_FILE).set_index(["channel", "dataset"])
+
     # Find latest meadow version of dataset of FAOSTAT metadata.
-    metadata_version = sorted(
-        (DATA_DIR / "meadow" / NAMESPACE).glob(f"*/{DATASET_SHORT_NAME}")
-    )[-1].parent.name
+    metadata_version = latest_versions.loc["meadow", DATASET_SHORT_NAME].item()
     metadata_path = (
         DATA_DIR / "meadow" / NAMESPACE / metadata_version / DATASET_SHORT_NAME
     )

@@ -17,7 +17,7 @@ from owid.datautils import dataframes, geo
 from etl.paths import DATA_DIR
 from owid import catalog
 from owid.catalog.meta import DatasetMeta
-from .shared import NAMESPACE, VERSION
+from shared import LATEST_VERSIONS_FILE, NAMESPACE, VERSION
 
 # Dataset name and title.
 DATASET_TITLE = "Food Explorer"
@@ -417,20 +417,17 @@ def process_combined_data(combined: pd.DataFrame) -> pd.DataFrame:
 
 def run(dest_dir: str) -> None:
     ####################################################################################################################
-    # Common definitions.
-    ####################################################################################################################
-
-    # Path to latest qcl and fbsc datasets in garden.
-    qcl_latest_dir = sorted(
-        (DATA_DIR / "garden" / NAMESPACE).glob(f"*/{NAMESPACE}_qcl*")
-    )[-1]
-    fbsc_latest_dir = sorted(
-        (DATA_DIR / "garden" / NAMESPACE).glob(f"*/{NAMESPACE}_fbsc*")
-    )[-1]
-
-    ####################################################################################################################
     # Load data.
     ####################################################################################################################
+
+    # Load file of versions.
+    latest_versions = pd.read_csv(LATEST_VERSIONS_FILE).set_index(["channel", "dataset"])
+
+    # Path to latest qcl and fbsc datasets in garden.
+    qcl_latest_version = latest_versions.loc["garden", f"{NAMESPACE}_qcl"].item()
+    qcl_latest_dir = DATA_DIR / "garden" / NAMESPACE / qcl_latest_version
+    fbsc_latest_version = latest_versions.loc["garden", f"{NAMESPACE}_fbsc"].item()
+    fbsc_latest_dir = DATA_DIR / "garden" / NAMESPACE / fbsc_latest_version
 
     # Load qcl dataset and keep its metadata.
     qcl_dataset = catalog.Dataset(qcl_latest_dir)

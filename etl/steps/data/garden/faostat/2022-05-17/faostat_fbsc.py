@@ -27,6 +27,7 @@ from owid.catalog.meta import DatasetMeta, TableMeta
 from .shared import (
     ADDED_TITLE_TO_WIDE_TABLE,
     NAMESPACE,
+    LATEST_VERSIONS_FILE,
     VERSION,
     add_per_capita_variables,
     add_regions,
@@ -131,15 +132,14 @@ def run(dest_dir: str) -> None:
     # Common definitions.
     ####################################################################################################################
 
+    # Load file of versions.
+    latest_versions = pd.read_csv(LATEST_VERSIONS_FILE).set_index(["channel", "dataset"])
+
     # Find path to latest versions of fbsh dataset.
-    fbsh_version = sorted((DATA_DIR / "meadow" / NAMESPACE).glob("*/faostat_fbsh"))[
-        -1
-    ].parent.name
+    fbsh_version = latest_versions.loc["meadow", "faostat_fbsh"].item()
     fbsh_file = DATA_DIR / "meadow" / NAMESPACE / fbsh_version / "faostat_fbsh"
     # Find path to latest versions of fbs dataset.
-    fbs_version = sorted((DATA_DIR / "meadow" / NAMESPACE).glob("*/faostat_fbs"))[
-        -1
-    ].parent.name
+    fbs_version = latest_versions.loc["meadow", "faostat_fbs"].item()
     fbs_file = DATA_DIR / "meadow" / NAMESPACE / fbs_version / "faostat_fbs"
     # Path to dataset of FAOSTAT metadata.
     garden_metadata_dir = (

@@ -24,7 +24,7 @@ import structlog
 from owid.datautils import dataframes, geo
 from tqdm.auto import tqdm
 
-from etl.paths import DATA_DIR
+from etl.paths import DATA_DIR, STEP_DIR
 from owid import catalog
 
 # Initialise log.
@@ -34,6 +34,8 @@ log = structlog.get_logger()
 NAMESPACE = Path(__file__).parent.parent.name
 VERSION = Path(__file__).parent.name
 
+# Path to file containing information of the latest versions of the relevant datasets.
+LATEST_VERSIONS_FILE = STEP_DIR / "data" / "garden" / NAMESPACE / VERSION / "versions.csv"
 
 # Elements and items.
 
@@ -1958,23 +1960,20 @@ def run(dest_dir: str) -> None:
 
     # Assume dest_dir is a path to the step to be run, e.g. "faostat_qcl", and get the dataset short name from it.
     dataset_short_name = Path(dest_dir).name
-    # Path to latest dataset in meadow for current FAOSTAT domain.
-    meadow_data_dir = (
-        sorted((DATA_DIR / "meadow" / NAMESPACE).glob(f"*/{dataset_short_name}"))[
-            -1
-        ].parent
-        / dataset_short_name
-    )
     # Path to dataset of FAOSTAT metadata.
-    garden_metadata_dir = (
-        DATA_DIR / "garden" / NAMESPACE / VERSION / f"{NAMESPACE}_metadata"
-    )
+    garden_metadata_dir = DATA_DIR / "garden" / NAMESPACE / VERSION / f"{NAMESPACE}_metadata"
 
     ####################################################################################################################
     # Load data.
     ####################################################################################################################
 
-    # Load meadow dataset and keep its metadata.
+    # Load file of versions.
+    latest_versions = pd.read_csv(LATEST_VERSIONS_FILE).set_index(["channel", "dataset"])
+
+    # Path to latest dataset in meadow for current FAOSTAT domain.
+    meadow_version = latest_versions.loc["meadow", dataset_short_name].item()
+    meadow_data_dir = DATA_DIR / "meadow" / NAMESPACE / meadow_version / dataset_short_name
+    # Load latest meadow dataset and keep its metadata.
     dataset_meadow = catalog.Dataset(meadow_data_dir)
     # Load main table from dataset.
     data_table_meadow = dataset_meadow[dataset_short_name]
