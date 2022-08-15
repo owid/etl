@@ -427,9 +427,13 @@ def run(dest_dir: str) -> None:
 
     # Path to latest qcl and fbsc datasets in garden.
     qcl_latest_version = latest_versions.loc["garden", f"{NAMESPACE}_qcl"].item()
-    qcl_latest_dir = DATA_DIR / "garden" / NAMESPACE / qcl_latest_version
+    qcl_latest_dir = (
+        DATA_DIR / "garden" / NAMESPACE / qcl_latest_version / f"{NAMESPACE}_qcl"
+    )
     fbsc_latest_version = latest_versions.loc["garden", f"{NAMESPACE}_fbsc"].item()
-    fbsc_latest_dir = DATA_DIR / "garden" / NAMESPACE / fbsc_latest_version
+    fbsc_latest_dir = (
+        DATA_DIR / "garden" / NAMESPACE / fbsc_latest_version / f"{NAMESPACE}_fbsc"
+    )
 
     # Load qcl dataset and keep its metadata.
     qcl_dataset = catalog.Dataset(qcl_latest_dir)
