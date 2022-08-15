@@ -10,24 +10,17 @@ Definitions according to the Notes in the data file:
 """
 
 import json
-from typing import cast, Dict
+from typing import Dict, cast
 
 import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
-from owid.walden import Catalog
-from pathlib import Path
 
-from etl.paths import STEP_DIR
+from etl.helpers import Names
 from etl.steps.data.converters import convert_walden_metadata
 
+N = Names(__file__)
 
-# Institution name.
-NAMESPACE = "ggdc"
-# Dataset name.
-DATASET_NAME = "ggdc_maddison"
-# Original dataset publication date.
-VERSION = "2020-10-01"
 # Column name for GDP in output dataset.
 GDP_COLUMN = "gdp"
 # Column name for GDP per capita in output dataset.
@@ -49,13 +42,8 @@ def load_countries() -> Dict[str, str]:
         Country mappings.
 
     """
-    # Define path to countries file.
-    garden_dir = STEP_DIR / "data" / "garden" / NAMESPACE / VERSION
-    # Identify countries file.
-    # If none, or more than one files are found, this step will raise an error.
-    (countries_file,) = list(garden_dir.glob("*countries.json"))
     # Load countries from file.
-    with open(countries_file, "r") as _file:
+    with open(N.country_mapping_path, "r") as _file:
         countries = json.loads(_file.read())
 
     return cast(Dict[str, str], countries)
@@ -223,9 +211,7 @@ def generate_ggdc_data(data_file: str) -> pd.DataFrame:
 
 def run(dest_dir: str) -> None:
     # Load dataset from walden.
-    walden_ds = Catalog().find_one(
-        namespace=NAMESPACE, version=VERSION, short_name=DATASET_NAME
-    )
+    walden_ds = N.walden_dataset
 
     # Initialise dataset.
     ds = Dataset.create_empty(dest_dir)
@@ -243,9 +229,8 @@ def run(dest_dir: str) -> None:
     t = Table(df)
 
     # Update metadata
-    meta_path = Path(__file__).parent / "ggdc_maddison.meta.yml"
-    ds.metadata.update_from_yaml(meta_path)
-    t.update_metadata_from_yaml(meta_path, "maddison_gdp")
+    ds.metadata.update_from_yaml(N.metadata_path)
+    t.update_metadata_from_yaml(N.metadata_path, "maddison_gdp")
     ds.metadata.description = ADDITIONAL_DESCRIPTION + ds.metadata.description
 
     assert len(ds.metadata.sources) == 1

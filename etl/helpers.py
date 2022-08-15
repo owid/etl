@@ -5,9 +5,13 @@
 
 import tempfile
 from contextlib import contextmanager
+from pathlib import Path
 from typing import Any, Iterator, List, cast
 
 import requests
+from owid import catalog, walden
+
+from etl import paths
 
 
 @contextmanager
@@ -50,3 +54,59 @@ def _get_github_branches(org: str, repo: str) -> List[Any]:
         raise Exception("reached single page limit, should paginate request")
 
     return branches
+
+
+class Names:
+    """Helper object with naming conventions. It uses your module path (__file__) and
+    extracts from it commonly used attributes like channel / namespace / version / short_name or
+    paths to datasets from different channels.
+
+    Usage:
+        N = Names(__file__)
+        ds_garden = N.garden_dataset
+    """
+
+    def __init__(self, __file__: str):
+        self.f = Path(__file__)
+
+    @property
+    def channel(self) -> str:
+        return self.f.parent.parent.parent.name
+
+    @property
+    def namespace(self) -> str:
+        return self.f.parent.parent.name
+
+    @property
+    def version(self) -> str:
+        return self.f.parent.name
+
+    @property
+    def short_name(self) -> str:
+        return self.f.stem
+
+    @property
+    def country_mapping_path(self) -> Path:
+        return self.f.parent / (self.short_name + ".countries.json")
+
+    @property
+    def metadata_path(self) -> Path:
+        return self.f.parent / (self.short_name + ".meta.yml")
+
+    @property
+    def meadow_dataset(self) -> catalog.Dataset:
+        return catalog.Dataset(
+            paths.DATA_DIR / f"meadow/{self.namespace}/{self.version}/{self.short_name}"
+        )
+
+    @property
+    def garden_dataset(self) -> catalog.Dataset:
+        return catalog.Dataset(
+            paths.DATA_DIR / f"garden/{self.namespace}/{self.version}/{self.short_name}"
+        )
+
+    @property
+    def walden_dataset(self) -> walden.Dataset:
+        return walden.Catalog().find_one(
+            namespace=self.namespace, version=self.version, short_name=self.short_name
+        )

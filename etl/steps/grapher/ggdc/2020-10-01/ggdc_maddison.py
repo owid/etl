@@ -3,13 +3,13 @@ from typing import Iterable
 from owid import catalog
 
 from etl import grapher_helpers as gh
-from etl.paths import DATA_DIR
+from etl.helpers import Names
+
+N = Names(__file__)
 
 
 def get_grapher_dataset() -> catalog.Dataset:
-    dataset = catalog.Dataset(
-        DATA_DIR / "garden" / "ggdc" / "2020-10-01" / "ggdc_maddison"
-    )
+    dataset = N.garden_dataset
     dataset.metadata = gh.adapt_dataset_metadata_for_grapher(dataset.metadata)
 
     # backward compatibility
