@@ -44,7 +44,9 @@ def get_grapher_dataset_from_file_name(file_path: str) -> catalog.Dataset:
 
     # Some datasets have " - FAO (YYYY)" at the end, and some others do not.
     # For consistency, remove that ending of the title, and add something consistent across all datasets.
-    dataset.metadata.title = dataset.metadata.title.split(" - FAO (")[0] + f" (FAO, {grapher_version})"
+    dataset.metadata.title = (
+        dataset.metadata.title.split(" - FAO (")[0] + f" (FAO, {grapher_version})"
+    )
 
     return dataset
 

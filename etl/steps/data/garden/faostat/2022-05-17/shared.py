@@ -1726,7 +1726,9 @@ def optimize_table_dtypes(table: catalog.Table) -> catalog.Table:
     }
 
     # Store variables metadata before optimizing table dtypes (otherwise they will be lost).
-    variables_metadata = {variable: table[variable].metadata for variable in table.columns}
+    variables_metadata = {
+        variable: table[variable].metadata for variable in table.columns
+    }
 
     optimized_table = catalog.frames.repack_frame(table, dtypes=dtypes)
 
@@ -1766,8 +1768,14 @@ def prepare_long_table(data: pd.DataFrame) -> catalog.Table:
     return cast(catalog.Table, data_table_long)
 
 
-def create_variable_names(dataset_title: str, item: str, item_code: str, element: str, element_code: str, unit: str
-                          ) -> str:
+def create_variable_names(
+    dataset_title: str,
+    item: str,
+    item_code: str,
+    element: str,
+    element_code: str,
+    unit: str,
+) -> str:
     """Create variable names for the wide (flatten) output table, ensuring that the short names are not too long.
 
     Parameters
@@ -1802,9 +1810,13 @@ def create_variable_names(dataset_title: str, item: str, item_code: str, element
         n_char_to_be_removed = n_char - 255 - 3
         # It could happen that it is not the item name that is long, but the element name, dataset, or unit.
         # But for the moment, assume it is the item name.
-        assert len(item) > n_char_to_be_removed, "Variable name is too long, but it is not due to item name."
-        new_name = f"{dataset_title} || {item[0:-n_char_to_be_removed] + '...'} | {item_code} || {element} | " \
-                   f"{element_code} || {unit}"
+        assert (
+            len(item) > n_char_to_be_removed
+        ), "Variable name is too long, but it is not due to item name."
+        new_name = (
+            f"{dataset_title} || {item[0:-n_char_to_be_removed] + '...'} | {item_code} || {element} | "
+            f"{element_code} || {unit}"
+        )
 
     # Check that now the underscore version of new_name indeed fulfils the length requirement.
     error = "Variable name is too long. Improve create_variable_names function."
@@ -1846,8 +1858,9 @@ def prepare_wide_table(data: pd.DataFrame, dataset_title: str) -> catalog.Table:
     # (which would cause issues when uploading to grapher).
     data["variable_name"] = dataframes.apply_on_categoricals(
         [data.item, data.item_code, data.element, data.element_code, data.unit],
-        lambda item, item_code, element, element_code, unit:
-        create_variable_names(dataset_title, item, item_code, element, element_code, unit),
+        lambda item, item_code, element, element_code, unit: create_variable_names(
+            dataset_title, item, item_code, element, element_code, unit
+        ),
     )
 
     # Construct a human-readable variable display name (which will be shown in grapher charts).
