@@ -319,15 +319,21 @@ def run(dest_dir: str) -> None:
     ####################################################################################################################
 
     # Load file of versions.
-    latest_versions = pd.read_csv(LATEST_VERSIONS_FILE).set_index(["channel", "dataset"])
+    latest_versions = pd.read_csv(LATEST_VERSIONS_FILE).set_index(
+        ["channel", "dataset"]
+    )
 
     # Dataset short name.
     dataset_short_name = f"{NAMESPACE}_qcl"
     # Path to latest dataset in meadow for current FAOSTAT domain.
     meadow_version = latest_versions.loc["meadow", dataset_short_name].item()
-    meadow_data_dir = DATA_DIR / "meadow" / NAMESPACE / meadow_version / dataset_short_name
+    meadow_data_dir = (
+        DATA_DIR / "meadow" / NAMESPACE / meadow_version / dataset_short_name
+    )
     # Path to dataset of FAOSTAT metadata.
-    garden_metadata_dir = DATA_DIR / "garden" / NAMESPACE / VERSION / f"{NAMESPACE}_metadata"
+    garden_metadata_dir = (
+        DATA_DIR / "garden" / NAMESPACE / VERSION / f"{NAMESPACE}_metadata"
+    )
 
     ####################################################################################################################
     # Load data.

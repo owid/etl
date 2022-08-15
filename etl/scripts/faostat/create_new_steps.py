@@ -825,7 +825,7 @@ def create_file_with_latest_versions(dag_steps: Dict[str, Set[str]]) -> None:
     latest_versions_file = new_version_dir / "versions.csv"
 
     # Extract the latest versions of steps from the dag of new dependencies.
-    steps = {"channel": [], "dataset": [], "version": []}
+    steps: Dict[str, List[str]] = {"channel": [], "dataset": [], "version": []}
     for step in dag_steps:
         steps["dataset"].append(get_dataset_name_from_dag_line(step))
         steps["channel"].append(channel)
@@ -838,8 +838,12 @@ def create_file_with_latest_versions(dag_steps: Dict[str, Set[str]]) -> None:
 
     # Create a dataframe, remove rows that have the same step (with identical version), then verify that
     # there are no different versions for a given channel-dataset, and sort conveniently.
-    step_versions = pd.DataFrame(steps).drop_duplicates().set_index(["channel", "dataset"], verify_integrity=True).\
-        sort_index()
+    step_versions = (
+        pd.DataFrame(steps)
+        .drop_duplicates()
+        .set_index(["channel", "dataset"], verify_integrity=True)
+        .sort_index()
+    )
 
     # Save dataframe to file.
     step_versions.to_csv(latest_versions_file)

@@ -90,7 +90,9 @@ def load_latest_data_table_for_dataset(dataset_short_name: str) -> catalog.Table
     # Path to folder with all versions of meadow datasets for FAOSTAT.
     meadow_dir = DATA_DIR / "meadow" / NAMESPACE
     # Load file of versions.
-    latest_versions = pd.read_csv(LATEST_VERSIONS_FILE).set_index(["channel", "dataset"])
+    latest_versions = pd.read_csv(LATEST_VERSIONS_FILE).set_index(
+        ["channel", "dataset"]
+    )
     # Find latest meadow version for given dataset.
     dataset_version = latest_versions.loc["meadow", dataset_short_name].item()
     # Path to latest dataset folder.
@@ -1047,7 +1049,9 @@ def run(dest_dir: str) -> None:
     custom_elements_and_units_file = garden_code_dir / "custom_elements_and_units.csv"
 
     # Load file of versions.
-    latest_versions = pd.read_csv(LATEST_VERSIONS_FILE).set_index(["channel", "dataset"])
+    latest_versions = pd.read_csv(LATEST_VERSIONS_FILE).set_index(
+        ["channel", "dataset"]
+    )
 
     # Find latest meadow version of dataset of FAOSTAT metadata.
     metadata_version = latest_versions.loc["meadow", DATASET_SHORT_NAME].item()

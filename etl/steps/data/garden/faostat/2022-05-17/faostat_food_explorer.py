@@ -421,7 +421,9 @@ def run(dest_dir: str) -> None:
     ####################################################################################################################
 
     # Load file of versions.
-    latest_versions = pd.read_csv(LATEST_VERSIONS_FILE).set_index(["channel", "dataset"])
+    latest_versions = pd.read_csv(LATEST_VERSIONS_FILE).set_index(
+        ["channel", "dataset"]
+    )
 
     # Path to latest qcl and fbsc datasets in garden.
     qcl_latest_version = latest_versions.loc["garden", f"{NAMESPACE}_qcl"].item()

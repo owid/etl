@@ -133,7 +133,9 @@ def run(dest_dir: str) -> None:
     ####################################################################################################################
 
     # Load file of versions.
-    latest_versions = pd.read_csv(LATEST_VERSIONS_FILE).set_index(["channel", "dataset"])
+    latest_versions = pd.read_csv(LATEST_VERSIONS_FILE).set_index(
+        ["channel", "dataset"]
+    )
 
     # Find path to latest versions of fbsh dataset.
     fbsh_version = latest_versions.loc["meadow", "faostat_fbsh"].item()

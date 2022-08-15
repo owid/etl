@@ -23,7 +23,9 @@ NAMESPACE = Path(__file__).parent.parent.name
 VERSION = Path(__file__).parent.name
 
 # Path to file containing information of the latest versions of the relevant datasets.
-LATEST_VERSIONS_FILE = STEP_DIR / "data" / "meadow" / NAMESPACE / VERSION / "versions.csv"
+LATEST_VERSIONS_FILE = (
+    STEP_DIR / "data" / "meadow" / NAMESPACE / VERSION / "versions.csv"
+)
 
 
 def load_data(local_path: str) -> pd.DataFrame:
@@ -146,11 +148,15 @@ def run(dest_dir: str) -> None:
     ####################################################################################################################
 
     # Load file of versions.
-    latest_versions = pd.read_csv(LATEST_VERSIONS_FILE).set_index(["channel", "dataset"])
+    latest_versions = pd.read_csv(LATEST_VERSIONS_FILE).set_index(
+        ["channel", "dataset"]
+    )
 
     # Fetch latest walden dataset.
     walden_version = latest_versions.loc["walden", dataset_short_name].item()
-    walden_ds = Catalog().find_one(namespace=NAMESPACE, version=walden_version, short_name=dataset_short_name)
+    walden_ds = Catalog().find_one(
+        namespace=NAMESPACE, version=walden_version, short_name=dataset_short_name
+    )
 
     # Load and prepare data.
     data = load_data(walden_ds.local_path)
