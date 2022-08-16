@@ -16,12 +16,13 @@ import json
 import sys
 from copy import deepcopy
 from pathlib import Path
-from typing import List, Dict, cast
+from typing import Any, List, Dict, cast
 
 import numpy as np
 import pandas as pd
 import structlog
 from owid.datautils import dataframes, geo
+from owid.datautils.dataframes import warn_on_list_of_entities
 from tqdm.auto import tqdm
 
 from etl.paths import DATA_DIR, STEP_DIR
@@ -360,6 +361,23 @@ OUTLIERS_TO_REMOVE = [
         "element_code": ["005312", "5312pc", "005419"],
     }
 ]
+
+# Amendments to apply to data values.
+# They will only be applied if "value" column is of type "category".
+VALUE_AMENDMENTS = {
+    # Replace values given as upper bounds (e.g. "<0.1") by the average between 0 and that value.
+    "<0.1": "0.05",
+    "<2.5": "1.25",
+    # Remove spurious comma values (this could be done simply by .str.replace(",", ""), however, given that it happens
+    # only in a few cases, it seems safer to explicitly correct them here).
+    "1,173.92": "1173.92",
+    "1,688.37": "1688.37",
+    "1,439.14": "1439.14",
+    "1,248.25": "1248.25",
+    "1,775.32": "1775.32",
+    # Replace missing values by nan.
+    "N": np.nan,
+}
 
 # Additional descriptions.
 
@@ -1599,6 +1617,121 @@ def add_per_capita_variables(
     return data
 
 
+# TODO: Remove this function once dataframes.map_series has been fixed and values can be mapped to nan.
+def TEMP_map_series(
+    series: pd.Series,
+    mapping: Dict[Any, Any],
+    make_unmapped_values_nan: bool = False,
+    warn_on_missing_mappings: bool = False,
+    warn_on_unused_mappings: bool = False,
+    show_full_warning: bool = False,
+) -> pd.Series:
+    """Map values of a series given a certain mapping.
+
+    This function does almost the same as
+    > series.map(mapping)
+    However, map() translates values into nan if those values are not in the mapping, whereas this function allows to
+    optionally keep the original values.
+
+    This function should do the same as
+    > series.replace(mapping)
+    However .replace() becomes very slow on big dataframes.
+
+    Parameters
+    ----------
+    series : pd.Series
+        Original series to be mapped.
+    mapping : dict
+        Mapping.
+    make_unmapped_values_nan : bool
+        If true, values in the series that are not in the mapping will be translated into nan; otherwise, they will keep
+        their original values.
+    warn_on_missing_mappings : bool
+        True to warn if elements in series are missing in mapping.
+    warn_on_unused_mappings : bool
+        True to warn if the mapping contains values that are not present in the series. False to ignore.
+    show_full_warning : bool
+        True to print the entire list of unused mappings (only relevant if warn_on_unused_mappings is True).
+
+    Returns
+    -------
+    series_mapped : pd.Series
+        Mapped series.
+
+    """
+    # Translate values in series following the mapping.
+    series_mapped = series.map(mapping)
+    if not make_unmapped_values_nan:
+        # Rows that had values that were not in the mapping are now nan.
+        # Replace those nans with their original values, except if they were actually meant to be mapped to nan.
+        # For example, if {"bad_value": np.nan} was part of the mapping, do not replace those nans back to "bad_value".
+
+        # Detect values in the mapping that were intended to be mapped to nan.
+        values_mapped_to_nan = [
+            original_value
+            for original_value, target_value in mapping.items()
+            if pd.isnull(target_value)
+        ]
+
+        # Make a mask that is True for new nans that need to be replaced back to their original values.
+        missing = series_mapped.isnull() & (~series.isin(values_mapped_to_nan))
+        if missing.any():
+            # Replace those nans by their original values.
+            series_mapped.loc[missing] = series[missing]
+
+    if warn_on_missing_mappings:
+        unmapped = set(series) - set(mapping)
+        if len(unmapped) > 0:
+            warn_on_list_of_entities(
+                unmapped,
+                f"{len(unmapped)} missing values in mapping.",
+                show_list=show_full_warning,
+            )
+
+    if warn_on_unused_mappings:
+        unused = set(mapping) - set(series)
+        if len(unused) > 0:
+            warn_on_list_of_entities(
+                unused,
+                f"{len(unused)} unused values in mapping.",
+                show_list=show_full_warning,
+            )
+
+    return series_mapped
+
+
+def clean_data_values(values: pd.Series) -> pd.Series:
+    """Fix spurious data values (defined in VALUE_AMENDMENTS) and make values a float column.
+
+    Note: The mapping of VALUE_AMENDMENTS will only be applied if the input series of values is of type "category".
+    At the moment, this fixes issues only in faostat_sdgb dataset.
+
+    Parameters
+    ----------
+    values : pd.Series
+        Content of the "value" column in the original data.
+
+    Returns
+    -------
+    values_clean : pd.Series
+        Original values after fixing known issues and converting to float.
+
+    """
+    values_clean = values.copy()
+    if values_clean.dtype == "category":
+        # Replace spurious values by either nan, or their correct numeric values (defined in VALUE_AMENDMENTS).
+        # TODO: Use dataframes.map_series instead of TEMP_map_series once the former has been updated.
+        values_clean = TEMP_map_series(series=values_clean, mapping=VALUE_AMENDMENTS,
+                                       warn_on_missing_mappings=False, warn_on_unused_mappings=True)
+
+    # Convert all numbers into numeric.
+    # Note: If this step fails with a ValueError, it may be because other spurious values have been introduced.
+    # If so, add them to the VALUE_AMENDMENTS.
+    values_clean = values_clean.astype(float)
+
+    return values_clean
+
+
 def clean_data(
     data: pd.DataFrame,
     items_metadata: pd.DataFrame,
@@ -1634,15 +1767,8 @@ def clean_data(
     """
     data = data.copy()
 
-    # Ensure column of values is numeric (transform any possible value like "<1" into a nan).
-    # TODO: Dataset faostat_sdgb contains instances of numbers like "<1" or "<2.5" or comma for thousands "1,173.92",
-    #  which they will be converted to nan here. Instead, create a function that properly cleans the values.
-    data["value"] = pd.to_numeric(data["value"], errors="coerce")
-
-    # Ensure column of values is float.
-    # Note: Int64 would also work, but when dividing by a float, it changes to Float64 dtype, which, for some reason,
-    # makes nans undetectable (i.e. .isnull() does not detect nans and .dropna() does not drop nans).
-    data["value"] = data["value"].astype(float)
+    # Fix spurious data values (applying mapping in VALUE_AMENDMENTS) and ensure column of values is float.
+    data["value"] = clean_data_values(data["value"])
 
     # Convert nan flags into "official" (to avoid issues later on when dealing with flags).
     data["flag"] = pd.Series(
@@ -1790,7 +1916,6 @@ def create_variable_short_names(variable_name: str) -> str:
         New variable name.
 
     """
-
     # Extract all the necessary fields from the variable name.
     dataset_title, item, item_code, element, element_code, unit = variable_name.replace(
         "||", "|"
@@ -1860,7 +1985,8 @@ def prepare_wide_table(data: pd.DataFrame, dataset_title: str) -> catalog.Table:
     # (which would cause issues when uploading to grapher).
     data["variable_name"] = dataframes.apply_on_categoricals(
         [data.item, data.item_code, data.element, data.element_code, data.unit],
-        lambda item, item_code, element, element_code, unit: f"{dataset_title} || {item} | {item_code} || {element} | {element_code} || {unit}",
+        lambda item, item_code, element, element_code, unit:
+        f"{dataset_title} || {item} | {item_code} || {element} | {element_code} || {unit}",
     )
 
     # Construct a human-readable variable display name (which will be shown in grapher charts).
