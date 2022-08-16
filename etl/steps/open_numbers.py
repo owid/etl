@@ -8,21 +8,21 @@ Convert repositories with data in DDF format to OWID's Dataset and Table
 format.
 """
 
+import datetime as dt
+import hashlib
+import tempfile
+import warnings
 from multiprocessing import Pool
 from pathlib import Path
 from typing import Dict, List, Tuple, cast
-import hashlib
-from owid.catalog.meta import Source
-from owid.catalog import utils
-import datetime as dt
-import tempfile
 
-import pandas as pd
-from etl.git import GithubRepo
 import frictionless
+import pandas as pd
 from frictionless.exception import FrictionlessException
+from owid.catalog import Dataset, Table, utils
+from owid.catalog.meta import Source
 
-from owid.catalog import Dataset, Table
+from etl.git import GithubRepo
 
 
 def run(dest_dir: str) -> None:
@@ -128,7 +128,20 @@ def load_and_combine(
                     f.write(line)
 
         f.flush()
-        df = pd.read_csv(f.name)
+
+        # ignore mixed type warnings
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", pd.errors.DtypeWarning)
+            df = pd.read_csv(f.name)
+
+    # fix mixed types of object columns
+    for col in df.select_dtypes(object).columns:
+        if pd.api.types.infer_dtype(df[col]).startswith("mixed"):
+            # try numeric first and fall back to string
+            try:
+                df[col] = pd.to_numeric(df[col])
+            except ValueError:
+                df[col] = df[col].astype(str)
 
     df.set_index(primary_key, inplace=True)
 
