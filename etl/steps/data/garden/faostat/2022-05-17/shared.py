@@ -1721,8 +1721,12 @@ def clean_data_values(values: pd.Series) -> pd.Series:
     if values_clean.dtype == "category":
         # Replace spurious values by either nan, or their correct numeric values (defined in VALUE_AMENDMENTS).
         # TODO: Use dataframes.map_series instead of TEMP_map_series once the former has been updated.
-        values_clean = TEMP_map_series(series=values_clean, mapping=VALUE_AMENDMENTS,
-                                       warn_on_missing_mappings=False, warn_on_unused_mappings=True)
+        values_clean = TEMP_map_series(
+            series=values_clean,
+            mapping=VALUE_AMENDMENTS,
+            warn_on_missing_mappings=False,
+            warn_on_unused_mappings=True,
+        )
 
     # Convert all numbers into numeric.
     # Note: If this step fails with a ValueError, it may be because other spurious values have been introduced.
@@ -1985,8 +1989,7 @@ def prepare_wide_table(data: pd.DataFrame, dataset_title: str) -> catalog.Table:
     # (which would cause issues when uploading to grapher).
     data["variable_name"] = dataframes.apply_on_categoricals(
         [data.item, data.item_code, data.element, data.element_code, data.unit],
-        lambda item, item_code, element, element_code, unit:
-        f"{dataset_title} || {item} | {item_code} || {element} | {element_code} || {unit}",
+        lambda item, item_code, element, element_code, unit: f"{dataset_title} || {item} | {item_code} || {element} | {element_code} || {unit}",
     )
 
     # Construct a human-readable variable display name (which will be shown in grapher charts).
