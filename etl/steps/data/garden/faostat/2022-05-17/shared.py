@@ -16,13 +16,12 @@ import json
 import sys
 from copy import deepcopy
 from pathlib import Path
-from typing import Any, List, Dict, cast
+from typing import List, Dict, cast
 
 import numpy as np
 import pandas as pd
 import structlog
 from owid.datautils import dataframes, geo
-from owid.datautils.dataframes import warn_on_list_of_entities
 from tqdm.auto import tqdm
 
 from etl.paths import DATA_DIR, STEP_DIR
@@ -1617,89 +1616,6 @@ def add_per_capita_variables(
     return data
 
 
-# TODO: Remove this function once dataframes.map_series has been fixed and values can be mapped to nan.
-def TEMP_map_series(
-    series: pd.Series,
-    mapping: Dict[Any, Any],
-    make_unmapped_values_nan: bool = False,
-    warn_on_missing_mappings: bool = False,
-    warn_on_unused_mappings: bool = False,
-    show_full_warning: bool = False,
-) -> pd.Series:
-    """Map values of a series given a certain mapping.
-
-    This function does almost the same as
-    > series.map(mapping)
-    However, map() translates values into nan if those values are not in the mapping, whereas this function allows to
-    optionally keep the original values.
-
-    This function should do the same as
-    > series.replace(mapping)
-    However .replace() becomes very slow on big dataframes.
-
-    Parameters
-    ----------
-    series : pd.Series
-        Original series to be mapped.
-    mapping : dict
-        Mapping.
-    make_unmapped_values_nan : bool
-        If true, values in the series that are not in the mapping will be translated into nan; otherwise, they will keep
-        their original values.
-    warn_on_missing_mappings : bool
-        True to warn if elements in series are missing in mapping.
-    warn_on_unused_mappings : bool
-        True to warn if the mapping contains values that are not present in the series. False to ignore.
-    show_full_warning : bool
-        True to print the entire list of unused mappings (only relevant if warn_on_unused_mappings is True).
-
-    Returns
-    -------
-    series_mapped : pd.Series
-        Mapped series.
-
-    """
-    # Translate values in series following the mapping.
-    series_mapped = series.map(mapping)
-    if not make_unmapped_values_nan:
-        # Rows that had values that were not in the mapping are now nan.
-        # Replace those nans with their original values, except if they were actually meant to be mapped to nan.
-        # For example, if {"bad_value": np.nan} was part of the mapping, do not replace those nans back to "bad_value".
-
-        # Detect values in the mapping that were intended to be mapped to nan.
-        values_mapped_to_nan = [
-            original_value
-            for original_value, target_value in mapping.items()
-            if pd.isnull(target_value)
-        ]
-
-        # Make a mask that is True for new nans that need to be replaced back to their original values.
-        missing = series_mapped.isnull() & (~series.isin(values_mapped_to_nan))
-        if missing.any():
-            # Replace those nans by their original values.
-            series_mapped.loc[missing] = series[missing]
-
-    if warn_on_missing_mappings:
-        unmapped = set(series) - set(mapping)
-        if len(unmapped) > 0:
-            warn_on_list_of_entities(
-                unmapped,
-                f"{len(unmapped)} missing values in mapping.",
-                show_list=show_full_warning,
-            )
-
-    if warn_on_unused_mappings:
-        unused = set(mapping) - set(series)
-        if len(unused) > 0:
-            warn_on_list_of_entities(
-                unused,
-                f"{len(unused)} unused values in mapping.",
-                show_list=show_full_warning,
-            )
-
-    return series_mapped
-
-
 def clean_data_values(values: pd.Series) -> pd.Series:
     """Fix spurious data values (defined in VALUE_AMENDMENTS) and make values a float column.
 
@@ -1720,8 +1636,7 @@ def clean_data_values(values: pd.Series) -> pd.Series:
     values_clean = values.copy()
     if values_clean.dtype == "category":
         # Replace spurious values by either nan, or their correct numeric values (defined in VALUE_AMENDMENTS).
-        # TODO: Use dataframes.map_series instead of TEMP_map_series once the former has been updated.
-        values_clean = TEMP_map_series(
+        values_clean = dataframes.map_series(
             series=values_clean,
             mapping=VALUE_AMENDMENTS,
             warn_on_missing_mappings=False,
