@@ -23,4 +23,4 @@ def get_grapher_tables(dataset: catalog.Dataset) -> Iterable[catalog.Table]:
 
     table = gh.adapt_table_for_grapher(table[["country", "year", "gdp", "gdp_per_capita", "population"]])
 
-    yield from gh.yield_wide_table(table, na_action="drop")
+    yield table

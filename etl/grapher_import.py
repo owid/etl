@@ -118,6 +118,8 @@ def upsert_dataset(dataset: catalog.Dataset, namespace: str, sources: List[catal
 
         return DatasetUpsertResult(ds.id, source_ids)
 
+        return DatasetUpsertResult(ds.id, source_ids)
+
 
 def _upsert_source_to_db(source: catalog.Source, dataset_id: int) -> int:
     """Upsert source and return its id"""
@@ -148,6 +150,8 @@ def upsert_table(table: catalog.Table, dataset_upsert_result: DatasetUpsertResul
     in the format (year, entityId, value)) into mysql. The metadata
     of the variable is used to fill the required fields.
     """
+
+    __import__("ipdb").set_trace()
 
     assert set(table.index.names) == {"year", "entity_id"}, (
         "Tables to be upserted must have only 2 indices: year and entity_id. Instead" f" they have: {table.index.names}"
