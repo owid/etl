@@ -1837,14 +1837,13 @@ def create_variable_short_names(variable_name: str) -> str:
 
     """
     # Extract all the necessary fields from the variable name.
-    dataset_title, item, item_code, element, element_code, unit = variable_name.replace(
+    item, item_code, element, element_code, unit = variable_name.replace(
         "||", "|"
     ).split(" | ")
 
     # Check that the extraction was correct by constructing the variable name again and comparing with the original.
     assert (
-        variable_name
-        == f"{dataset_title} || {item} | {item_code} || {element} | {element_code} || {unit}"
+        variable_name == f"{item} | {item_code} || {element} | {element_code} || {unit}"
     )
 
     new_name = catalog.utils.underscore(variable_name)
@@ -1862,7 +1861,7 @@ def create_variable_short_names(variable_name: str) -> str:
         ), "Variable name is too long, but it is not due to item name."
         new_item = catalog.utils.underscore(item)[0:-n_char_to_be_removed]
         new_name = catalog.utils.underscore(
-            f"{dataset_title} || {new_item} | {item_code} || {element} | {element_code} || {unit}"
+            f"{new_item} | {item_code} || {element} | {element_code} || {unit}"
         )
 
     # Check that now the new name now fulfils the length requirement.
@@ -1905,7 +1904,7 @@ def prepare_wide_table(data: pd.DataFrame, dataset_title: str) -> catalog.Table:
     # (which would cause issues when uploading to grapher).
     data["variable_name"] = dataframes.apply_on_categoricals(
         [data.item, data.item_code, data.element, data.element_code, data.unit],
-        lambda item, item_code, element, element_code, unit: f"{dataset_title} || {item} | {item_code} || {element} | {element_code} || {unit}",
+        lambda item, item_code, element, element_code, unit: f"{item} | {item_code} || {element} | {element_code} || {unit}",
     )
 
     # Construct a human-readable variable display name (which will be shown in grapher charts).
