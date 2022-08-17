@@ -229,6 +229,65 @@ FAO_POPULATION_ITEM_NAME = "Population"
 FAO_POPULATION_ELEMENT_NAME = "Total Population - Both sexes"
 FAO_POPULATION_UNIT = "1000 persons"
 
+# List of element codes to consider from faostat_qcl.
+ELEMENT_CODES_QCL = [
+    "005312",
+    "005313",
+    "005314",
+    "005318",
+    "005320",
+    "005321",
+    "005410",
+    "005413",
+    "005417",
+    "005419",
+    "005420",
+    "005422",
+    "005424",
+    "005510",
+    "005513",
+    "5312pc",
+    "5320pc",
+    "5321pc",
+    "5510pc",
+]
+# List of element codes to consider from faostat_fbsc.
+ELEMENT_CODES_FBSC = [
+    "000645",
+    "000664",
+    "000674",
+    "000684",
+    "005072",
+    "005123",
+    "005131",
+    "005142",
+    "005154",
+    "005170",
+    "005171",
+    "005301",
+    # Element 'Production' (in tonnes, originally given in 1000 tonnes) is taken from qcl.
+    # Although fbsc has items for this element that are not in qcl, they overlap in a number of items with slightly
+    # different values. To avoid this issue, we ignore the element from fbsc and use only the one in qcl.
+    # '005511',
+    "005521",
+    "005527",
+    "005611",
+    "005911",
+    "0645pc",
+    "0664pc",
+    "0674pc",
+    "0684pc",
+    "5123pc",
+    "5142pc",
+    "5154pc",
+    "5301pc",
+    "5521pc",
+    "5611pc",
+    "5911pc",
+    # The following element code is for population.
+    "000511",
+]
+
 
 def combine_qcl_and_fbsc(
     qcl_table: catalog.Table, fbsc_table: catalog.Table
@@ -248,7 +307,6 @@ def combine_qcl_and_fbsc(
         Combined data (as a dataframe, not a table).
 
     """
-
     columns = [
         "country",
         "year",
@@ -262,11 +320,15 @@ def combine_qcl_and_fbsc(
         "population_with_data",
     ]
     qcl = pd.DataFrame(qcl_table).reset_index()[columns]
+    # Select relevant element codes.
+    qcl = qcl[qcl["element_code"].isin(ELEMENT_CODES_QCL)].reset_index(drop=True)
     qcl["value"] = qcl["value"].astype(float)
     qcl["element"] = [element for element in qcl["element"]]
     qcl["unit"] = [unit for unit in qcl["unit"]]
     qcl["item"] = [item for item in qcl["item"]]
     fbsc = pd.DataFrame(fbsc_table).reset_index()[columns]
+    # Select relevant element codes.
+    fbsc = fbsc[fbsc["element_code"].isin(ELEMENT_CODES_FBSC)].reset_index(drop=True)
     fbsc["value"] = fbsc["value"].astype(float)
     fbsc["element"] = [element for element in fbsc["element"]]
     fbsc["unit"] = [unit for unit in fbsc["unit"]]
