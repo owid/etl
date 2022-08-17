@@ -367,6 +367,7 @@ VALUE_AMENDMENTS = {
     # Replace values given as upper bounds (e.g. "<0.1") by the average between 0 and that value.
     "<0.1": "0.05",
     "<2.5": "1.25",
+    "<0.5": "0.25",
     # Remove spurious comma values (this could be done simply by .str.replace(",", ""), however, given that it happens
     # only in a few cases, it seems safer to explicitly correct them here).
     "1,173.92": "1173.92",
@@ -1640,7 +1641,7 @@ def clean_data_values(values: pd.Series) -> pd.Series:
             series=values_clean,
             mapping=VALUE_AMENDMENTS,
             warn_on_missing_mappings=False,
-            warn_on_unused_mappings=True,
+            warn_on_unused_mappings=False,
         )
 
     # Convert all numbers into numeric.
