@@ -29,21 +29,10 @@ def run(dest_dir: str) -> None:
     df = pd.DataFrame(tb_meadow)
 
     log.info("{{cookiecutter.short_name}}.exclude_countries")
-    excluded_countries = load_excluded_countries()
-    df = df.loc[~df.country.isin(excluded_countries)]
+    df = exclude_countries(df)
 
     log.info("{{cookiecutter.short_name}}.harmonize_countries")
-    unharmonized_countries = df["country"]
-    df = geo.harmonize_countries(df=df, countries_file=str(N.country_mapping_path))
-
-    missing_countries = set(unharmonized_countries[df.country.isnull()])
-    if any(missing_countries):
-        raise RuntimeError(
-            "The following raw country names have not been harmonized. "
-            f"Please: (a) edit {N.country_mapping_path} to include these country "
-            f"names; or (b) add them to {N.excluded_countries_path}."
-            f"Raw country names: {missing_countries}"
-        )
+    df = harmonize_countries(df)
 
     ds_garden = Dataset.create_empty(dest_dir)
     ds_garden.metadata = ds_meadow.metadata
@@ -65,3 +54,24 @@ def load_excluded_countries() -> List[str]:
         data = json.load(f)
         assert isinstance(data, list)
     return data
+
+
+def exclude_countries(df: pd.DataFrame) -> pd.DataFrame:
+    excluded_countries = load_excluded_countries()
+    return df.loc[~df.country.isin(excluded_countries)]
+
+
+def harmonize_countries(df: pd.DataFrame) -> pd.DataFrame:
+    unharmonized_countries = df["country"]
+    df = geo.harmonize_countries(df=df, countries_file=str(N.country_mapping_path))
+
+    missing_countries = set(unharmonized_countries[df.country.isnull()])
+    if any(missing_countries):
+        raise RuntimeError(
+            "The following raw country names have not been harmonized. "
+            f"Please: (a) edit {N.country_mapping_path} to include these country "
+            f"names; or (b) add them to {N.excluded_countries_path}."
+            f"Raw country names: {missing_countries}"
+        )
+
+    return df

@@ -21,8 +21,8 @@ def get_grapher_tables(dataset: catalog.Dataset) -> Iterable[catalog.Table]:
     # convert `country` into `entity_id` and set indexes for `yield_wide_table`
     table = gh.adapt_table_for_grapher(table)
 
-    # optionally set dimensions
-    # table = table.set_index(["dim1", "dim2"], append=True)
+    # optionally set additional dimensions
+    # table = table.set_index(["sex", "income_group"], append=True)
 
     # convert table into grapher format
     # if you data is in long format, use gh.yield_long_table

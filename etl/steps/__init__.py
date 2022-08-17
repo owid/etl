@@ -167,7 +167,10 @@ def _load_dag_yaml(filename: str) -> Dict[str, Any]:
 
 
 def _parse_dag_yaml(dag: Dict[str, Any]) -> Dict[str, Any]:
-    return {node: set(deps) if deps else set() for node, deps in dag["steps"].items()}
+    return {
+        node: set(deps) if deps else set()
+        for node, deps in (dag["steps"] or {}).items()
+    }
 
 
 def reverse_graph(graph: Graph) -> Graph:
