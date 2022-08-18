@@ -14,13 +14,16 @@ import os
 from dataclasses import dataclass
 from typing import Dict, List, Optional, cast
 
+import numpy as np
 import pandas as pd
 import structlog
 from owid import catalog
 from owid.catalog import utils
+from sqlalchemy import Integer, String
+from tenacity import retry, stop
 
 from etl import config
-from etl.db import open_db
+from etl.db import get_engine, open_db
 from etl.db_utils import DBUtils
 
 log = structlog.get_logger()
@@ -72,12 +75,15 @@ def upsert_dataset(
     # map one dataset with N tables to one namespace and N datasets in
     # mysql or if we should just flatten it into one dataset?
     with open_db() as db:
-        print("Verifying namespace is present")
+        log.info("upsert_dataset.verify_namespace", namespace=namespace)
         ns = db.fetch_one_or_none("SELECT * from namespaces where name=%s", [namespace])
         if ns is None:
             db.upsert_namespace(namespace, "")
 
-        print("Upserting dataset")
+        log.info(
+            "upsert_dataset.upsert_dataset.start",
+            short_name=dataset.metadata.short_name,
+        )
         dataset_id = db.upsert_dataset(
             dataset.metadata.short_name,
             dataset.metadata.title,
@@ -86,6 +92,11 @@ def upsert_dataset(
             int(cast(str, config.GRAPHER_USER_ID)),
             source_checksum=source_checksum,
             description=dataset.metadata.description or "",
+        )
+        log.info(
+            "upsert_dataset.upsert_dataset.end",
+            short_name=dataset.metadata.short_name,
+            id=dataset_id,
         )
 
         source_ids: Dict[str, int] = dict()
@@ -166,10 +177,16 @@ def upsert_table(
             " join multiple sources"
         )
 
+    # make sure there are no inf values
+    assert (
+        pd.api.types.is_numeric_dtype(table.dtypes[0])
+        and not np.isinf(table.iloc[:, 0]).any()
+    ), f"Column `{table.columns[0]}` has inf values"
+
     _update_variables_display(table)
 
     with open_db() as db:
-        log.info("---Upserting variable...")
+        log.info("upsert_table.upsert_variable", variable=table.columns[0])
 
         # For easy retrieveal of the value series we store the name
         column_name = table.columns[0]
@@ -222,26 +239,15 @@ def upsert_table(
             [int(db_variable_id)],
         )
 
-        query = """
-            INSERT INTO data_values
-                (value, year, entityId, variableId)
-            VALUES (%s, %s, %s, %s)
-            ON DUPLICATE KEY UPDATE
-                value = VALUES(value),
-                year = VALUES(year),
-                entityId = VALUES(entityId),
-                variableId = VALUES(variableId)
-        """
-        db.upsert_many(
-            query,
-            (
-                (row[column_name], row["year"], row["entity_id"], db_variable_id)
-                for index, row in table.iterrows()
-            ),
-        )
-        log.info(f"Upserted {len(table)} datapoints.")
+    df = table.rename(columns={column_name: "value", "entity_id": "entityId"}).assign(
+        variableId=db_variable_id
+    )
 
-        return VariableUpsertResult(db_variable_id, source_id)
+    insert_to_data_values(df)
+
+    log.info("upsert_table.upserted_data_values", size=len(table))
+
+    return VariableUpsertResult(db_variable_id, source_id)
 
 
 def fetch_db_checksum(dataset: catalog.Dataset) -> Optional[str]:
@@ -297,6 +303,8 @@ def cleanup_ghost_variables(dataset_id: int, upserted_variable_ids: List[int]) -
         if not variable_ids_to_delete:
             return
 
+        log.info("cleanup_ghost_variables.start", size=len(variable_ids_to_delete))
+
         # raise an exception if they're used in any charts
         db.cursor.execute(
             """
@@ -328,7 +336,9 @@ def cleanup_ghost_variables(dataset_id: int, upserted_variable_ids: List[int]) -
         )
 
         log.warning(
-            f"Deleted {db.cursor.rowcount} ghost variables ({variable_ids_to_delete})"
+            "cleanup_ghost_variables.end",
+            size=db.cursor.rowcount,
+            variables=variable_ids_to_delete,
         )
 
 
@@ -347,3 +357,22 @@ def cleanup_ghost_sources(dataset_id: int, upserted_source_ids: List[int]) -> No
         )
         if db.cursor.rowcount > 0:
             log.warning(f"Deleted {db.cursor.rowcount} ghost sources")
+
+
+@retry(stop=stop.stop_after_attempt(3))
+def insert_to_data_values(df: pd.DataFrame) -> None:
+    """Insert data into data_values table. Retry in case we get Deadlock error."""
+    # insert data to data_values using pandas which is both faster and doesn't raise
+    # deadlocks
+    df.to_sql(
+        "data_values",
+        get_engine(),
+        if_exists="append",
+        index=False,
+        dtype={
+            "value": String(255),
+            "year": Integer(),
+            "entityId": Integer(),
+            "variableId": Integer(),
+        },
+    )

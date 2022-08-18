@@ -5,11 +5,11 @@
 
 import os
 import re
+import resource
 import sys
 import time
 from pathlib import Path
 from typing import Any, Callable, List, Optional
-import resource
 
 import click
 from owid.walden import CATALOG as WALDEN_CATALOG
