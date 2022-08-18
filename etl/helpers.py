@@ -90,6 +90,10 @@ class Names:
         return self.f.parent / (self.short_name + ".countries.json")
 
     @property
+    def excluded_countries_path(self) -> Path:
+        return self.f.parent / (self.short_name + ".excluded_countries.json")
+
+    @property
     def metadata_path(self) -> Path:
         return self.f.parent / (self.short_name + ".meta.yml")
 

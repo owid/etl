@@ -5,6 +5,7 @@
 import concurrent.futures
 import graphlib
 import hashlib
+import os
 import re
 import subprocess
 import tempfile
@@ -41,6 +42,8 @@ from etl.helpers import get_etag
 
 Graph = Dict[str, Set[str]]
 DAG = Dict[str, Any]
+
+GRAPHER_INSERT_WORKERS = int(os.environ.get("GRAPHER_INSERT_WORKERS", 20))
 
 
 def compile_steps(
@@ -167,7 +170,10 @@ def _load_dag_yaml(filename: str) -> Dict[str, Any]:
 
 
 def _parse_dag_yaml(dag: Dict[str, Any]) -> Dict[str, Any]:
-    return {node: set(deps) if deps else set() for node, deps in dag["steps"].items()}
+    return {
+        node: set(deps) if deps else set()
+        for node, deps in (dag["steps"] or {}).items()
+    }
 
 
 def reverse_graph(graph: Graph) -> Graph:
@@ -565,10 +571,16 @@ class GrapherStep(Step):
             self.checksum_input(),
         )
         try:
-            variable_upsert_results = [
-                upsert_table(table, dataset_upsert_results)
-                for table in step_module.get_grapher_tables(dataset)  # type: ignore
-            ]
+            # insert data in parallel, this speeds it up considerably and is even faster than loading
+            # data with LOAD DATA INFILE
+            with concurrent.futures.ThreadPoolExecutor(
+                max_workers=GRAPHER_INSERT_WORKERS
+            ) as executor:
+                variable_upsert_results = executor.map(
+                    lambda table: upsert_table(table, dataset_upsert_results),
+                    step_module.get_grapher_tables(dataset),  # type: ignore
+                )
+
         except Exception as e:
             # dataset has been already inserted into DB with checksum, make it null again so that the
             # step remains dirty
