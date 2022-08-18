@@ -25,7 +25,7 @@ class Options(Enum):
 
     ADD_TO_DAG = "Add steps into dag.yml file"
     INCLUDE_METADATA_YAML = "Include *.meta.yaml file with metadata"
-    GENERATE_NOTEBOOK = "Generate validation notebook"
+    GENERATE_NOTEBOOK = "Generate playground notebook"
     LOAD_COUNTRIES_REGIONS = "Load countries regions in the script"
     LOAD_POPULATION = "Load population in the script"
 
@@ -35,6 +35,7 @@ class MeadowForm(BaseModel):
     short_name: str
     namespace: str
     version: str
+    walden_version: str
     add_to_dag: bool
     load_countries_regions: bool
     load_population: bool
@@ -83,6 +84,14 @@ def app(run_checks: bool, dummy_data: bool) -> None:
                 required=True,
                 value=dummies.get("version"),
             ),
+            pi.input(
+                "Walden version",
+                name="walden_version",
+                placeholder="2020",
+                required=True,
+                value=dummies.get("version"),
+                help_text="Usually same as Version",
+            ),
             pi.checkbox(
                 "Additional Options",
                 options=[
@@ -107,7 +116,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
         _check_dataset_in_walden(form)
 
     if form.add_to_dag:
-        deps = [f"walden://{form.namespace}/{form.version}/{form.short_name}"]
+        deps = [f"walden://{form.namespace}/{form.walden_version}/{form.short_name}"]
         if form.load_population:
             deps.append("data://garden/owid/latest/key_indicators")
         if form.load_countries_regions:
@@ -140,7 +149,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
         )
 
         step_path = DATASET_DIR / (form.short_name + ".py")
-        notebook_path = DATASET_DIR / "validate.ipynb"
+        notebook_path = DATASET_DIR / "playground.ipynb"
         metadata_path = DATASET_DIR / (form.short_name + ".meta.yml")
 
         if not form.generate_notebook:
@@ -156,10 +165,10 @@ def app(run_checks: bool, dummy_data: bool) -> None:
 1. Run `etl` to generate the dataset
 
     ```
-    etl data://meadow/{form.namespace}/{form.version}/{form.short_name}
+    poetry run etl data://meadow/{form.namespace}/{form.version}/{form.short_name}
     ```
 
-2. Generated notebook `{notebook_path.relative_to(ETL_DIR)}` can be used to validate the dataset output
+2. Generated notebook `{notebook_path.relative_to(ETL_DIR)}` can be used to examine the dataset output interactively.
 
 3. Loading the dataset is also possible with this snippet:
 
@@ -179,7 +188,8 @@ def app(run_checks: bool, dummy_data: bool) -> None:
 """
         )
 
-        utils.preview_file(metadata_path, "yaml")
+        if form.include_metadata_yaml:
+            utils.preview_file(metadata_path, "yaml")
         utils.preview_file(step_path, "python")
 
         if dag_content:
@@ -192,7 +202,7 @@ def _check_dataset_in_walden(form: MeadowForm) -> None:
         WaldenCatalog().find_one(
             namespace=form.namespace,
             short_name=form.short_name,
-            version=form.version,
+            version=form.walden_version,
         )
         po.put_success("Dataset found in Walden")
     except KeyError as e:
