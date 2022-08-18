@@ -75,12 +75,15 @@ def upsert_dataset(
     # map one dataset with N tables to one namespace and N datasets in
     # mysql or if we should just flatten it into one dataset?
     with open_db() as db:
-        print("Verifying namespace is present")
+        log.info("upsert_dataset.verify_namespace", namespace=namespace)
         ns = db.fetch_one_or_none("SELECT * from namespaces where name=%s", [namespace])
         if ns is None:
             db.upsert_namespace(namespace, "")
 
-        print("Upserting dataset")
+        log.info(
+            "upsert_dataset.upsert_dataset.start",
+            short_name=dataset.metadata.short_name,
+        )
         dataset_id = db.upsert_dataset(
             dataset.metadata.short_name,
             dataset.metadata.title,
@@ -90,8 +93,11 @@ def upsert_dataset(
             source_checksum=source_checksum,
             description=dataset.metadata.description or "",
         )
-
-        print(f"Upserted dataset with id {dataset_id}")
+        log.info(
+            "upsert_dataset.upsert_dataset.end",
+            short_name=dataset.metadata.short_name,
+            id=dataset_id,
+        )
 
         source_ids: Dict[str, int] = dict()
         for source in sources:
@@ -180,7 +186,7 @@ def upsert_table(
     _update_variables_display(table)
 
     with open_db() as db:
-        log.info("---Upserting variable...")
+        log.info("upsert_table.upsert_variable", variable=table.columns[0])
 
         # For easy retrieveal of the value series we store the name
         column_name = table.columns[0]
@@ -239,7 +245,7 @@ def upsert_table(
 
     insert_to_data_values(df)
 
-    log.info(f"Upserted {len(table)} datapoints.")
+    log.info("upsert_table.upserted_data_values", size=len(table))
 
     return VariableUpsertResult(db_variable_id, source_id)
 
@@ -297,7 +303,7 @@ def cleanup_ghost_variables(dataset_id: int, upserted_variable_ids: List[int]) -
         if not variable_ids_to_delete:
             return
 
-        print(f"Deleting {len(variable_ids_to_delete)} ghost variables...")
+        log.info("cleanup_ghost_variables.start", size=len(variable_ids_to_delete))
 
         # raise an exception if they're used in any charts
         db.cursor.execute(
@@ -330,7 +336,9 @@ def cleanup_ghost_variables(dataset_id: int, upserted_variable_ids: List[int]) -
         )
 
         log.warning(
-            f"Deleted {db.cursor.rowcount} ghost variables ({variable_ids_to_delete})"
+            "cleanup_ghost_variables.end",
+            size=db.cursor.rowcount,
+            variables=variable_ids_to_delete,
         )
 
 
