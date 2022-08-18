@@ -2,12 +2,13 @@
 
 from copy import deepcopy
 
+import numpy as np
 import pandas as pd
 from owid.datautils import dataframes
 
 from etl.paths import DATA_DIR
 from owid import catalog
-from .shared import (
+from shared import (
     ADDED_TITLE_TO_WIDE_TABLE,
     FLAG_MULTIPLE_FLAGS,
     LATEST_VERSIONS_FILE,
@@ -268,6 +269,9 @@ def add_yield_to_aggregate_regions(data: pd.DataFrame) -> pd.DataFrame:
     )
 
     combined["value"] = combined["value_production"] / combined["value_area"]
+
+    # Replace infinities (caused by dividing by zero) by nan.
+    combined["value"] = combined["value"].replace(np.inf, np.nan)
 
     # If both fields have the same flag, use that, otherwise use the flag of multiple flags.
     combined["flag"] = [

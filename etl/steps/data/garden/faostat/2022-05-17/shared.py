@@ -1815,6 +1815,12 @@ def prepare_long_table(data: pd.DataFrame) -> catalog.Table:
         index_columns, verify_integrity=True
     ).sort_index()
 
+    # Sanity check.
+    number_of_infinities = len(data_table_long[data_table_long["value"] == np.inf])
+    assert (
+        number_of_infinities == 0
+    ), f"There are {number_of_infinities} infinity values in the long table."
+
     return cast(catalog.Table, data_table_long)
 
 
@@ -1986,6 +1992,14 @@ def prepare_wide_table(data: pd.DataFrame, dataset_title: str) -> catalog.Table:
         if wide_table[column].metadata.title is not None
     }
     wide_table = wide_table.rename(columns=variable_to_short_name, errors="raise")
+
+    # Sanity check.
+    number_of_infinities = np.isinf(
+        wide_table.select_dtypes(include=np.number).fillna(0)
+    ).values.sum()
+    assert (
+        number_of_infinities == 0
+    ), f"There are {number_of_infinities} infinity values in the wide table."
 
     return wide_table
 
