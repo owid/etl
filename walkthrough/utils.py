@@ -11,8 +11,8 @@ from etl.steps import DAG
 DAG_WALKTHROUGH_PATH = BASE_DIR / "dag_files/dag_walkthrough.yml"
 
 DUMMY_DATA = {
+    "namespace": "examples",
     "short_name": "dummy",
-    "namespace": "dummy",
     "version": "2020",
     "walden_version": "2020",
     "name": "Dummy dataset",
