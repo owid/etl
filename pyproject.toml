@@ -16,6 +16,7 @@ fasttrack = 'backport.fasttrack:fasttrack'
 walkthrough = 'walkthrough.cli:cli'
 run_python_step = 'etl.run_python_step:main'
 compare = 'etl.compare:cli'
+etl-match-variables = 'etl.match_variables_from_two_versions_of_a_dataset:main_cli'
 
 [tool.poetry.dependencies]
 python = "^3.9"
@@ -47,9 +48,10 @@ pydantic = "^1.9.0"
 structlog = "^21.5.0"
 sqlmodel = "^0.0.6"
 rich = "^12.1.0"
-owid-datautils = {git = "https://github.com/owid/owid-datautils-py.git", rev = "v0.4.4-alpha"}
+owid-datautils = {git = "https://github.com/owid/owid-datautils-py.git", rev = "v0.4.7-alpha"}
 fuzzywuzzy = "^0.18.0"
 rich-click = "^1.5.1"
+tenacity = "^8.0.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.1.2"

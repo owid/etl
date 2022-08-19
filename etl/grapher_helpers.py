@@ -1,12 +1,12 @@
+import warnings
 from copy import deepcopy
 from dataclasses import dataclass, field
-import warnings
-import structlog
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Literal, Optional, Set, cast
 
 import pandas as pd
 import slugify
+import structlog
 import yaml
 from owid import catalog
 from owid.catalog.utils import underscore

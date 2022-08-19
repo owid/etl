@@ -11,3 +11,5 @@ Here's a summary of this walkthrough, you don't have to manually execute anythin
 2. **Add the new garden step to the dag**, including its dependencies.
 
 3. **Run `make test` in `etl`** and  ensure the step runs well.
+
+`garden` is for _semantic harmonisation_, meaning the field names and field values are harmonised whenever possible. So all datasets in garden should play well together, you should be able to join across datasets easily and without accidents. At the same time, this is the place where we want to add metadata standards.

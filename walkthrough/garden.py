@@ -25,7 +25,7 @@ class Options(Enum):
 
     ADD_TO_DAG = "Add steps into dag.yml file"
     INCLUDE_METADATA_YAML = "Include *.meta.yaml file with metadata"
-    GENERATE_NOTEBOOK = "Generate validation notebook"
+    GENERATE_NOTEBOOK = "Generate playground notebook"
 
 
 class GardenForm(BaseModel):
@@ -131,7 +131,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
         )
 
         step_path = DATASET_DIR / (form.short_name + ".py")
-        notebook_path = DATASET_DIR / "validate.ipynb"
+        notebook_path = DATASET_DIR / "playground.ipynb"
         metadata_path = DATASET_DIR / (form.short_name + ".meta.yml")
 
         if not form.generate_notebook:
@@ -147,7 +147,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
 1. Harmonize country names with the following command (assuming country field is called `country`). Check out a [short demo](https://drive.google.com/file/d/1tBFMkgOgy4MmB7E7NmfMlfa4noWaiG3t/view) of the tool
 
     ```
-    harmonize data/meadow/{form.namespace}/{form.version}/{form.short_name}/{form.short_name}.feather country etl/steps/data/garden/{form.namespace}/{form.version}/{form.short_name}.country_mapping.json
+    poetry run harmonize data/meadow/{form.namespace}/{form.version}/{form.short_name}/{form.short_name}.feather country etl/steps/data/garden/{form.namespace}/{form.version}/{form.short_name}.country_mapping.json
     ```
 
     you can also add more countries manually there or to `{form.short_name}.country_excluded.json` file.
@@ -155,10 +155,10 @@ def app(run_checks: bool, dummy_data: bool) -> None:
 2. Run `etl` to generate the dataset
 
     ```
-    etl data://garden/{form.namespace}/{form.version}/{form.short_name}
+    poetry run etl data://garden/{form.namespace}/{form.version}/{form.short_name}
     ```
 
-2. Generated notebook `{notebook_path.relative_to(ETL_DIR)}` can be used to validate the dataset output
+2. Generated notebook `{notebook_path.relative_to(ETL_DIR)}` can be used to examine the dataset output interactively.
 
 3. Loading the dataset is also possible with this snippet:
 
@@ -189,7 +189,8 @@ def app(run_checks: bool, dummy_data: bool) -> None:
 """
         )
 
-        utils.preview_file(metadata_path, "yaml")
+        if form.include_metadata_yaml:
+            utils.preview_file(metadata_path, "yaml")
         utils.preview_file(step_path, "python")
 
         if dag_content:
