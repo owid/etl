@@ -390,9 +390,8 @@ def main(
     type=str,
     default=N_MAX_SUGGESTIONS,
     help=(
-        "Name of similarity function to use when fuzzy matching variables."
-        f" Default: {SIMILARITY_NAME}. Available methods:"
-        f" {', '.join(list(SIMILARITY_NAMES))}."
+        "Number of suggestions to show per old variable. That is, for every old"
+        " variable at most [--max-suggestions] suggestions will be listed."
     ),
 )
 def main_cli(
