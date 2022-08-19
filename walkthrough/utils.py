@@ -75,6 +75,15 @@ def preview_dag(dag_content: str) -> None:
 def add_to_dag(dag: DAG) -> str:
     with open(DAG_WALKTHROUGH_PATH, "r") as f:
         dag_str = f.read()
+        f.seek(0)
+        dag_dict = yaml.safe_load(f)
+
+    # exclude steps which are already there
+    dag = {k: v for k, v in dag.items() if k not in dag_dict["steps"]}
+
+    # step is already there don't add anything
+    if not dag:
+        return dag_str
 
     steps = yaml.dump({"steps": dag}).split("\n", 1)[1]
 
