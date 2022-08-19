@@ -387,7 +387,7 @@ def main(
 @click.option(
     "-m",
     "--max-suggestions",
-    type=str,
+    type=int,
     default=N_MAX_SUGGESTIONS,
     help=(
         "Number of suggestions to show per old variable. That is, for every old"
