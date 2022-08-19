@@ -13,7 +13,7 @@ import concurrent.futures
 import os
 from dataclasses import dataclass
 from threading import Lock
-from typing import Dict, List, Optional, cast
+from typing import Any, Dict, List, Optional, TypedDict, cast
 
 import pandas as pd
 import structlog
@@ -146,7 +146,12 @@ def _update_variables_display(table: catalog.Table) -> None:
             meta.display.setdefault("unit", meta.unit)
 
 
-def upsert_table(table: catalog.Table, dataset_upsert_result: DatasetUpsertResult) -> VariableUpsertResult:
+def upsert_table(
+    table: catalog.Table,
+    dataset_upsert_result: DatasetUpsertResult,
+    catalog_path: Optional[str] = None,
+    dimensions: Optional[gm.Dimensions] = None,
+) -> VariableUpsertResult:
     """This function is used to put one ready to go formatted Table (i.e.
     in the format (year, entityId, value)) into mysql. The metadata
     of the variable is used to fill the required fields.
@@ -220,6 +225,8 @@ def upsert_table(table: catalog.Table, dataset_upsert_result: DatasetUpsertResul
             timespan=timespan,
             dataset_id=dataset_upsert_result.dataset_id,
             source_id=source_id,
+            catalog_path=catalog_path,
+            dimensions=dimensions,
         ).upsert(session)
         assert variable.id
 
