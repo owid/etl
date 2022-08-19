@@ -7,7 +7,7 @@ dataset:
         The Maddison Project Database is based on the work of many researchers that have produced estimates of...
 
 tables:
-  {{cookiecutter.short_name}}:
+  dummy:
     variables:
       population:
         title: Population

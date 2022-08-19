@@ -18,7 +18,7 @@ def run(dest_dir: str) -> None:
 
     # retrieve raw data from walden
     walden_ds = WaldenCatalog().find_one(
-        namespace="examples", short_name="dummy", version="2020"
+        namespace="dummy", short_name="dummy", version="2020"
     )
     local_file = walden_ds.ensure_downloaded()
 
@@ -63,4 +63,4 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
             "pop": "population",
             "gdppc": "gdp",
         }
-    )
+    ).drop(columns=["countrycode"])

@@ -17,21 +17,18 @@ N = Names(__file__)
 
 
 def run(dest_dir: str) -> None:
-    log.info("{{cookiecutter.short_name}}.start")
+    log.info("dummy.start")
 
     # read dataset from meadow
-    ds_meadow = Dataset(
-        DATA_DIR
-        / "meadow/{{cookiecutter.namespace}}/{{cookiecutter.version}}/{{cookiecutter.short_name}}"
-    )
-    tb_meadow = ds_meadow["{{cookiecutter.short_name}}"]
+    ds_meadow = Dataset(DATA_DIR / "meadow/dummy/2020/dummy")
+    tb_meadow = ds_meadow["dummy"]
 
     df = pd.DataFrame(tb_meadow)
 
-    log.info("{{cookiecutter.short_name}}.exclude_countries")
+    log.info("dummy.exclude_countries")
     df = exclude_countries(df)
 
-    log.info("{{cookiecutter.short_name}}.harmonize_countries")
+    log.info("dummy.harmonize_countries")
     df = harmonize_countries(df)
 
     ds_garden = Dataset.create_empty(dest_dir)
@@ -41,14 +38,14 @@ def run(dest_dir: str) -> None:
     tb_garden.metadata = tb_meadow.metadata
     for col in tb_garden.columns:
         tb_garden[col].metadata = tb_meadow[col].metadata
-    {% if cookiecutter.include_metadata_yaml == "True" %}
+
     ds_garden.metadata.update_from_yaml(N.metadata_path)
-    tb_garden.update_metadata_from_yaml(N.metadata_path, "{{cookiecutter.short_name}}")
-    {% endif %}
+    tb_garden.update_metadata_from_yaml(N.metadata_path, "dummy")
+
     ds_garden.add(tb_garden)
     ds_garden.save()
 
-    log.info("{{cookiecutter.short_name}}.end")
+    log.info("dummy.end")
 
 
 def load_excluded_countries() -> List[str]:
