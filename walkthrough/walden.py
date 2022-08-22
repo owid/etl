@@ -1,6 +1,7 @@
 import shutil
 import tempfile
 from pathlib import Path
+from typing import Optional
 
 from botocore.exceptions import ClientError
 from cookiecutter.main import cookiecutter
@@ -22,8 +23,8 @@ class WaldenForm(BaseModel):
     namespace: str
     name: str
     source_name: str
-    publication_year: str
-    publication_date: str
+    publication_year: Optional[str]
+    publication_date: Optional[str]
     url: str
     source_data_url: str
     file_extension: str
@@ -33,7 +34,7 @@ class WaldenForm(BaseModel):
 
     @property
     def version(self) -> str:
-        return self.publication_year or self.publication_date
+        return self.publication_year or self.publication_date  # type: ignore
 
 
 def app(run_checks: bool, dummy_data: bool) -> None:
@@ -88,13 +89,13 @@ def app(run_checks: bool, dummy_data: bool) -> None:
                 type=pi.NUMBER,
                 placeholder="2020",
                 help_text="Fill either publication year or publication date",
-                value=dummies.get("publication_year"),
             ),
             pi.input(
                 "Publication date",
                 name="publication_date",
                 placeholder="2020-10-01",
                 help_text="Fill either publication year or publication date",
+                value=dummies.get("publication_date"),
             ),
             pi.input(
                 "Dataset webpage URL",

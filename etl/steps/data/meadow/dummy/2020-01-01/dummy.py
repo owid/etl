@@ -18,7 +18,7 @@ def run(dest_dir: str) -> None:
 
     # retrieve raw data from walden
     walden_ds = WaldenCatalog().find_one(
-        namespace="dummy", short_name="dummy", version="2020"
+        namespace="dummy", short_name="dummy", version="2020-01-01"
     )
     local_file = walden_ds.ensure_downloaded()
 
@@ -30,7 +30,7 @@ def run(dest_dir: str) -> None:
     # create new dataset and reuse walden metadata
     ds = Dataset.create_empty(dest_dir)
     ds.metadata = convert_walden_metadata(walden_ds)
-    ds.metadata.version = "2020"
+    ds.metadata.version = "2020-01-01"
 
     # create table with metadata from dataframe
     table_metadata = TableMeta(

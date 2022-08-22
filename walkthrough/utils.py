@@ -13,13 +13,13 @@ DAG_WALKTHROUGH_PATH = BASE_DIR / "dag_files/dag_walkthrough.yml"
 DUMMY_DATA = {
     "namespace": "dummy",
     "short_name": "dummy",
-    "version": "2020",
-    "walden_version": "2020",
+    "version": "2020-01-01",
+    "walden_version": "2020-01-01",
     "name": "Dummy dataset",
     "description": "This\nis\na\ndummy\ndataset",
     "file_extension": "xlsx",
     "source_data_url": "https://www.rug.nl/ggdc/historicaldevelopment/maddison/data/mpd2020.xlsx",
-    "publication_year": 2020,
+    "publication_date": "2020-01-01",
     "source_name": "dummy source",
     "url": "https://www.dummy.com/",
 }
