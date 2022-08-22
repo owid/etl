@@ -1,5 +1,6 @@
 """FAOSTAT garden step for faostat_qcl dataset."""
 
+import json
 from copy import deepcopy
 
 import numpy as np
@@ -14,6 +15,7 @@ from shared import (
     LATEST_VERSIONS_FILE,
     NAMESPACE,
     REGIONS_TO_ADD,
+    STEP_DIR,
     VERSION,
     add_per_capita_variables,
     add_regions,
@@ -339,6 +341,9 @@ def run(dest_dir: str) -> None:
         DATA_DIR / "garden" / NAMESPACE / VERSION / f"{NAMESPACE}_metadata"
     )
 
+    # Path to outliers file.
+    outliers_file = STEP_DIR / "data" / "garden" / NAMESPACE / VERSION / "detected_outliers.json"
+
     ####################################################################################################################
     # Load data.
     ####################################################################################################################
@@ -366,6 +371,10 @@ def run(dest_dir: str) -> None:
         elements_metadata["dataset"] == dataset_short_name
     ].reset_index(drop=True)
     countries_metadata = pd.DataFrame(metadata["countries"]).reset_index()
+
+    # Load file of detected outliers.
+    with open(outliers_file, "r") as _json_file:
+        outliers = json.loads(_json_file.read())
 
     ####################################################################################################################
     # Process data.
@@ -396,7 +405,7 @@ def run(dest_dir: str) -> None:
     data = add_yield_to_aggregate_regions(data)
 
     # Remove outliers from data.
-    data = remove_outliers(data)
+    data = remove_outliers(data, outliers=outliers)
 
     # Create a long table (with item code and element code as part of the index).
     data_table_long = prepare_long_table(data=data)

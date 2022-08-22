@@ -15,6 +15,7 @@ update.
 
 """
 
+import json
 from copy import deepcopy
 from typing import cast
 
@@ -24,10 +25,11 @@ from owid.datautils import dataframes
 from etl.paths import DATA_DIR
 from owid import catalog
 from owid.catalog.meta import DatasetMeta, TableMeta
-from .shared import (
+from shared import (
     ADDED_TITLE_TO_WIDE_TABLE,
     NAMESPACE,
     LATEST_VERSIONS_FILE,
+    STEP_DIR,
     VERSION,
     add_per_capita_variables,
     add_regions,
@@ -148,6 +150,9 @@ def run(dest_dir: str) -> None:
         DATA_DIR / "garden" / NAMESPACE / VERSION / f"{NAMESPACE}_metadata"
     )
 
+    # Path to outliers file.
+    outliers_file = STEP_DIR / "data" / "garden" / NAMESPACE / VERSION / "detected_outliers.json"
+
     ####################################################################################################################
     # Load data.
     ####################################################################################################################
@@ -174,6 +179,10 @@ def run(dest_dir: str) -> None:
         elements_metadata["dataset"] == DATASET_SHORT_NAME
     ].reset_index(drop=True)
     countries_metadata = pd.DataFrame(metadata["countries"]).reset_index()
+
+    # Load file of detected outliers.
+    with open(outliers_file, "r") as _json_file:
+        outliers = json.loads(_json_file.read())
 
     ####################################################################################################################
     # Process data.
@@ -204,7 +213,7 @@ def run(dest_dir: str) -> None:
     data = add_per_capita_variables(data=data, elements_metadata=elements_metadata)
 
     # Remove outliers from data.
-    data = remove_outliers(data)
+    data = remove_outliers(data, outliers=outliers)
 
     # Avoid objects as they would explode memory, use categoricals instead.
     for col in data.columns:

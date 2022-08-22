@@ -57,6 +57,7 @@ ADDITIONAL_FILES_TO_COPY = [
     "custom_datasets.csv",
     "custom_elements_and_units.csv",
     "custom_items.csv",
+    "detected_outliers.json",
 ]
 # Note: Further custom rules are applied to the list of steps to run.
 # These rules are defined in apply_custom_rules_to_list_of_steps_to_run.

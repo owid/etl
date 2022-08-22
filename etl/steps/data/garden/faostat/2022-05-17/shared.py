@@ -16,7 +16,7 @@ import json
 import sys
 from copy import deepcopy
 from pathlib import Path
-from typing import List, Dict, cast
+from typing import List, Dict, Union, cast
 
 import numpy as np
 import pandas as pd
@@ -334,32 +334,6 @@ FLAGS_RANKING = (
     .rename(columns={"index": "ranking"})
 )
 
-
-# Identified outliers.
-
-# Outliers to remove (data points that are wrong and create artefacts in the charts).
-# For each dictionary, all possible combinations of the field values will be considered
-# (e.g. if two countries are given and three years, all three years will be removed for both countries).
-OUTLIERS_TO_REMOVE = [
-    # China mainland in 1984 has no data for area harvested of Spinach. This causes a big dip in China
-    # (the aggregate of mainland, Hong Kong, Taiwan and Macau), as well as other regions containing China.
-    {
-        # Harmonized country names affected by outliers.
-        "country": [
-            "China (FAO)",
-            "Asia",
-            "Asia (FAO)",
-            "Upper-middle-income countries",
-            "World",
-            "Eastern Asia (FAO)",
-        ],
-        "year": [1984],
-        # Item code for "Spinach".
-        "item_code": ["00000373"],
-        # Element codes for "Area harvested" (total and per-capita) and "Yield".
-        "element_code": ["005312", "5312pc", "005419"],
-    }
-]
 
 # Amendments to apply to data values.
 # They will only be applied if "value" column is of type "category".
@@ -1133,13 +1107,19 @@ def remove_overlapping_data_between_historical_regions_and_successors(
     return data_region
 
 
-def remove_outliers(data: pd.DataFrame) -> pd.DataFrame:
+def remove_outliers(data: pd.DataFrame, outliers: List[Dict[str, List[Union[str, int]]]]) -> pd.DataFrame:
     """Remove known outliers (defined in OUTLIERS_TO_REMOVE) from processed data.
+
+    The argument "outliers" is the list of outliers to remove: data points that are wrong and create artefacts in the
+    charts. For each dictionary in the list, all possible combinations of the field values will be considered outliers
+    (e.g. if two countries are given and three years, all three years will be removed for both countries).
 
     Parameters
     ----------
     data : pd.DataFrame
         Processed data (after harmonizing items, elements and countries, and adding regions and per-capita variables).
+    outliers : list
+
 
     Returns
     -------
@@ -1151,10 +1131,12 @@ def remove_outliers(data: pd.DataFrame) -> pd.DataFrame:
 
     # Make a dataframe with all rows that need to be removed from the data.
     rows_to_drop = pd.DataFrame()
-    for outlier in OUTLIERS_TO_REMOVE:
-        # Find all possible combinations of the field values in the outlier dictionary.
+    for outlier in outliers:
+        # Find all possible combinations of the field values in the outlier dictionary (and ignore "notes").
+        _outlier = {key: value for key, value in outlier.items() if key != "notes"}
         _rows_to_drop = pd.DataFrame.from_records(
-            list(itertools.product(*outlier.values())), columns=list(outlier)  # type: ignore
+            list(itertools.product(*_outlier.values())),
+            columns=list(_outlier)  # type: ignore
         )
         rows_to_drop = pd.concat(
             [rows_to_drop, _rows_to_drop], ignore_index=True
@@ -1502,11 +1484,6 @@ def convert_variables_given_per_capita_to_total_value(
         # Multiply them by the FAO population to convert them into total value.
         data.loc[per_capita_mask, "value"] = (
             data[per_capita_mask]["value"] * data[per_capita_mask]["fao_population"]
-        )
-
-        elements_converted = list(data[per_capita_mask]["fao_element"].unique())
-        log.info(
-            f"{len(elements_converted)} elements converted from per-capita to total values: {elements_converted}"
         )
 
         # Include an additional description to all elements that were converted from per capita to total variables.
@@ -1910,7 +1887,8 @@ def prepare_wide_table(data: pd.DataFrame, dataset_title: str) -> catalog.Table:
     # (which would cause issues when uploading to grapher).
     data["variable_name"] = dataframes.apply_on_categoricals(
         [data.item, data.item_code, data.element, data.element_code, data.unit],
-        lambda item, item_code, element, element_code, unit: f"{item} | {item_code} || {element} | {element_code} || {unit}",
+        lambda item, item_code, element, element_code, unit:
+        f"{item} | {item_code} || {element} | {element_code} || {unit}",
     )
 
     # Construct a human-readable variable display name (which will be shown in grapher charts).
@@ -2028,6 +2006,9 @@ def run(dest_dir: str) -> None:
         DATA_DIR / "garden" / NAMESPACE / VERSION / f"{NAMESPACE}_metadata"
     )
 
+    # Path to outliers file.
+    outliers_file = STEP_DIR / "data" / "garden" / NAMESPACE / VERSION / "detected_outliers.json"
+
     ####################################################################################################################
     # Load data.
     ####################################################################################################################
@@ -2066,6 +2047,10 @@ def run(dest_dir: str) -> None:
     ].reset_index(drop=True)
     countries_metadata = pd.DataFrame(metadata["countries"]).reset_index()
 
+    # Load file of detected outliers.
+    with open(outliers_file, "r") as _json_file:
+        outliers = json.loads(_json_file.read())
+
     ####################################################################################################################
     # Process data.
     ####################################################################################################################
@@ -2089,7 +2074,7 @@ def run(dest_dir: str) -> None:
     data = add_per_capita_variables(data=data, elements_metadata=elements_metadata)
 
     # Remove outliers (this step needs to happen after creating regions and per capita variables).
-    data = remove_outliers(data)
+    data = remove_outliers(data, outliers=outliers)
 
     # Create a long table (with item code and element code as part of the index).
     data_table_long = prepare_long_table(data=data)
