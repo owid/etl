@@ -8,17 +8,16 @@ N = Names(__file__)
 
 def run(dest_dir: str) -> None:
     dataset = catalog.Dataset.create_empty(
-        dest_dir, gh.adapt_dataset_metadata_for_grapher(N.garden_dataset)
+        dest_dir, gh.adapt_dataset_metadata_for_grapher(N.garden_dataset.metadata)
     )
-    dataset.save()
-
     # backward compatibility
     dataset.metadata.short_name = "ggdc_maddison__2020_10_01"
+    dataset.save()
 
-    table = dataset["maddison_gdp"].reset_index()
+    table = N.garden_dataset["maddison_gdp"].reset_index()
 
-    table = gh.adapt_table_for_grapher(table[["country", "year", "gdp", "gdp_per_capita", "population"]])
-
-    __import__("ipdb").set_trace()
+    table = gh.adapt_table_for_grapher(
+        table[["country", "year", "gdp", "gdp_per_capita", "population"]]
+    )
 
     dataset.add(table)

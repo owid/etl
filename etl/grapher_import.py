@@ -145,13 +145,15 @@ def _update_variables_display(table: catalog.Table) -> None:
             meta.display.setdefault("unit", meta.unit)
 
 
-def upsert_table(table: catalog.Table, dataset_upsert_result: DatasetUpsertResult) -> VariableUpsertResult:
+def upsert_table(
+    table: catalog.Table,
+    dataset_upsert_result: DatasetUpsertResult,
+    catalog_path: Optional[str] = None,
+) -> VariableUpsertResult:
     """This function is used to put one ready to go formatted Table (i.e.
     in the format (year, entityId, value)) into mysql. The metadata
     of the variable is used to fill the required fields.
     """
-
-    __import__("ipdb").set_trace()
 
     assert set(table.index.names) == {"year", "entity_id"}, (
         "Tables to be upserted must have only 2 indices: year and entity_id. Instead" f" they have: {table.index.names}"
@@ -216,6 +218,7 @@ def upsert_table(table: catalog.Table, dataset_upsert_result: DatasetUpsertResul
             timespan=timespan,
             dataset_id=dataset_upsert_result.dataset_id,
             source_id=source_id,
+            catalog_path=catalog_path,
         ).upsert(session)
         assert variable.id
 

@@ -29,7 +29,9 @@ with warnings.catch_warnings():
 from owid import catalog, walden
 from owid.walden import CATALOG as WALDEN_CATALOG
 
-from etl import backport_helpers, files, git, paths
+from etl import backport_helpers, files, git
+from etl import grapher_helpers as gh
+from etl import paths
 from etl.grapher_import import (
     cleanup_ghost_sources,
     cleanup_ghost_variables,
@@ -42,8 +44,6 @@ from etl.helpers import get_etag
 
 Graph = Dict[str, Set[str]]
 DAG = Dict[str, Any]
-
-GRAPHER_INSERT_WORKERS = int(os.environ.get("GRAPHER_INSERT_WORKERS", 10))
 
 
 def compile_steps(
@@ -208,6 +208,9 @@ def parse_step(step_name: str, dag: Dict[str, Any]) -> "Step":
 
     elif step_type == "grapher":
         step = GrapherStep(path, dependencies)
+
+    elif step_type == "grapher-new":
+        step = GrapherNewStep(path, dependencies)
 
     elif step_type == "backport":
         step = BackportStep(path, dependencies)
@@ -542,7 +545,7 @@ class GrapherStep(Step):
         Import the Python module for this step and call get_grapher_tables() on it.
         """
         step_module = self._get_step_module()
-        dataset = step_module.get_grapher_dataset()  # type: ignore
+        dataset: catalog.Dataset = step_module.get_grapher_dataset()  # type: ignore
         dataset_upsert_results = upsert_dataset(
             dataset,
             dataset.metadata.namespace,
@@ -589,6 +592,65 @@ class GrapherStep(Step):
         if not hasattr(step_module, "get_grapher_tables"):
             raise Exception(f'no get_grapher_tables() method defined for module "{step_module}"')
         return step_module
+
+
+@dataclass
+class GrapherNewStep(DataStep):
+    path: str
+    dependencies: List[Step]
+
+    def __init__(self, path: str, dependencies: List[Step]) -> None:
+        self.path = path
+        self.dependencies = dependencies
+
+    def __str__(self) -> str:
+        return f"grapher-new://{self.path}"
+
+    def _upsert_wide_table(self, table: catalog.Table, dataset_upsert_results):
+        # TODO: add path to parquet file
+        for tab in gh.yield_wide_table(table, na_action="drop"):
+            ds_meta = tab.metadata.dataset
+            assert ds_meta
+            catalog_path = (
+                f"grapher/{ds_meta.namespace}/{ds_meta.version}/{ds_meta.short_name}/{table.metadata.short_name}"
+            )
+            yield upsert_table(tab, dataset_upsert_results, catalog_path)
+
+    def after_run(self) -> None:
+        """Optional post-hook, needs to resave the dataset again."""
+        super().after_run()
+
+        # save dataset to grapher DB
+        dataset = self._output_dataset
+
+        dataset_upsert_results = upsert_dataset(
+            dataset,
+            dataset.metadata.namespace,
+            dataset.metadata.sources,
+            self.checksum_input(),
+        )
+
+        try:
+            variable_upsert_results = []
+            for table in dataset:
+                variable_upsert_results += list(self._upsert_wide_table(table, dataset_upsert_results))
+        except Exception as e:
+            # dataset has been already inserted into DB with checksum, make it null again so that the
+            # step remains dirty
+            set_dataset_checksum_to_null(dataset_upsert_results.dataset_id)
+            raise e
+
+        # Cleanup all ghost variables and sources that weren't upserted
+        # NOTE: we can't just remove all dataset variables before starting this step because
+        # there could be charts that use them and we can't remove and recreate with a new ID
+        upserted_variable_ids = [r.variable_id for r in variable_upsert_results]
+        upserted_source_ids = list(dataset_upsert_results.source_ids.values()) + [
+            r.source_id for r in variable_upsert_results
+        ]
+        # Try to cleanup ghost variables, but make sure to raise an error if they are used
+        # in any chart
+        cleanup_ghost_variables(dataset_upsert_results.dataset_id, upserted_variable_ids)
+        cleanup_ghost_sources(dataset_upsert_results.dataset_id, upserted_source_ids)
 
 
 @dataclass
