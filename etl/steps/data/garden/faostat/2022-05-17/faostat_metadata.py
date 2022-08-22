@@ -46,9 +46,6 @@ from typing import Dict, List, Tuple, cast
 import pandas as pd
 from owid import catalog
 from owid.datautils import dataframes, io
-from tqdm.auto import tqdm
-
-from etl.paths import DATA_DIR, STEP_DIR
 from shared import (
     FLAGS_RANKING,
     LATEST_VERSIONS_FILE,
@@ -59,6 +56,9 @@ from shared import (
     log,
     optimize_table_dtypes,
 )
+from tqdm.auto import tqdm
+
+from etl.paths import DATA_DIR, STEP_DIR
 
 # Define short name for output dataset.
 DATASET_SHORT_NAME = f"{NAMESPACE}_metadata"

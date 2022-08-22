@@ -23,12 +23,10 @@ import pandas as pd
 from owid import catalog
 from owid.catalog.meta import DatasetMeta, TableMeta
 from owid.datautils import dataframes
-
-from etl.paths import DATA_DIR, STEP_DIR
 from shared import (
     ADDED_TITLE_TO_WIDE_TABLE,
-    NAMESPACE,
     LATEST_VERSIONS_FILE,
+    NAMESPACE,
     VERSION,
     add_per_capita_variables,
     add_regions,
@@ -40,6 +38,8 @@ from shared import (
     prepare_wide_table,
     remove_outliers,
 )
+
+from etl.paths import DATA_DIR, STEP_DIR
 
 # Dataset name.
 DATASET_SHORT_NAME = f"{NAMESPACE}_fbsc"

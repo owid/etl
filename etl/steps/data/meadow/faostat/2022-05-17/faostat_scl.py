@@ -13,11 +13,8 @@ Apart from this issue, the rest of the processing of the dataset is identical to
 from pathlib import Path
 
 import pandas as pd
-from etl.paths import DATA_DIR
-from etl.steps.data.converters import convert_walden_metadata
-from owid.walden import Catalog
 from owid.catalog import Dataset, Table, utils
-
+from owid.walden import Catalog
 from shared import (
     LATEST_VERSIONS_FILE,
     NAMESPACE,
@@ -25,6 +22,9 @@ from shared import (
     prepare_output_data,
     run_sanity_checks,
 )
+
+from etl.paths import DATA_DIR
+from etl.steps.data.converters import convert_walden_metadata
 
 
 def fix_items(data: pd.DataFrame, metadata: Dataset) -> pd.DataFrame:

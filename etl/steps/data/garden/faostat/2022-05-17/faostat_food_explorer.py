@@ -15,9 +15,9 @@ import pandas as pd
 from owid import catalog
 from owid.catalog.meta import DatasetMeta
 from owid.datautils import dataframes, geo
+from shared import LATEST_VERSIONS_FILE, NAMESPACE, VERSION
 
 from etl.paths import DATA_DIR
-from shared import LATEST_VERSIONS_FILE, NAMESPACE, VERSION
 
 # Dataset name and title.
 DATASET_TITLE = "Food Explorer"

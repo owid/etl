@@ -13,8 +13,8 @@ from typing import Any, Dict
 import pandas as pd
 from owid.catalog import Dataset, Table, utils
 from owid.walden import Catalog
+from shared import LATEST_VERSIONS_FILE, NAMESPACE
 
-from shared import NAMESPACE, LATEST_VERSIONS_FILE
 from etl.steps.data.converters import convert_walden_metadata
 
 # Name for new meadow dataset.

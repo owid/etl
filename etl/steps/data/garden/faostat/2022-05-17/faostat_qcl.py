@@ -7,8 +7,6 @@ import numpy as np
 import pandas as pd
 from owid import catalog
 from owid.datautils import dataframes
-
-from etl.paths import DATA_DIR, STEP_DIR
 from shared import (
     ADDED_TITLE_TO_WIDE_TABLE,
     FLAG_MULTIPLE_FLAGS,
@@ -25,6 +23,8 @@ from shared import (
     prepare_wide_table,
     remove_outliers,
 )
+
+from etl.paths import DATA_DIR, STEP_DIR
 
 
 def add_slaughtered_animals_to_meat_total(data: pd.DataFrame) -> pd.DataFrame:
