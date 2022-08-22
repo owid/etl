@@ -8,14 +8,14 @@ manually. This script is a CLI tool that may help in either scenario.
 
 """
 
-import argparse
 import json
 import os
 from typing import Callable, Any
+
+import click
 import pandas as pd
 from fuzzywuzzy import fuzz
-import MySQLdb
-from etl.db import get_connection
+from etl.db import get_connection, get_dataset_id, get_variables_in_dataset
 
 # True to skip variables that are identical in old and new datasets, when running comparison.
 # If so, identical variables will be matched automatically.
@@ -36,117 +36,26 @@ SIMILARITY_NAMES = {
 }
 
 
-def get_similarity_function(
-    similarity_name: str, similarity_names: dict[str, Callable[[str, str], int]]
-) -> Callable[[str, str], int]:
+def get_similarity_function(similarity_name: str) -> Any:
     """Return a similarity function given its name.
 
     Parameters
     ----------
     similarity_name : str
         Name of similarity function.
-    similarity_names : dict
-        Similarity methods currently considered.
 
     Returns
     -------
+    Callable :
+        Similarity function.
 
     """
-    if similarity_name in similarity_names:
-        similarity_function = similarity_names[similarity_name]
+    if similarity_name in SIMILARITY_NAMES:
+        similarity_function = SIMILARITY_NAMES[similarity_name]
     else:
         raise ValueError(f"ERROR: Unknown similarity function: {similarity_name}")
 
     return similarity_function
-
-
-def get_dataset_id(db_conn: MySQLdb.Connection, dataset_name: str) -> Any:
-    """Get the dataset ID of a specific dataset name from database.
-
-    If more than one dataset is found for the same name, or if no dataset is found, an error is raised.
-
-    Parameters
-    ----------
-    db_conn : MySQLdb.Connection
-        Connection to database.
-    dataset_name : str
-        Dataset name.
-
-    Returns
-    -------
-    dataset_id : int
-        Dataset ID.
-
-    """
-    query = f"""
-        SELECT id
-        FROM datasets
-        WHERE name = '{dataset_name}'
-    """
-    with db_conn.cursor() as cursor:
-        cursor.execute(query)
-        result = cursor.fetchall()
-
-    assert len(result) == 1, f"Ambiguous or unknown dataset name '{dataset_name}'"
-    dataset_id = result[0][0]
-
-    return dataset_id
-
-
-def get_variables_in_dataset(
-    db_conn: MySQLdb.Connection, dataset_id: int, only_used_in_charts: bool = False
-) -> Any:
-    """Get all variables data for a specific dataset ID from database.
-
-    Parameters
-    ----------
-    db_conn : pymysql.connections.Connection
-    dataset_id : int
-        Dataset ID.
-    only_used_in_charts : bool
-        True to select variables only if they have been used in at least one chart. False to select all variables.
-
-    Returns
-    -------
-    variables_data : pd.DataFrame
-        Variables data for considered dataset.
-
-    """
-    query = f"""
-        SELECT *
-        FROM variables
-        WHERE datasetId = {dataset_id}
-    """
-    if only_used_in_charts:
-        query += """
-            AND id IN (
-                SELECT DISTINCT variableId
-                FROM chart_dimensions
-            )
-        """
-    variables_data = pd.read_sql(query, con=db_conn)
-
-    return variables_data
-
-
-def load_from_json_file(json_file: str) -> Any:
-    """Load data from a json file.
-
-    Parameters
-    ----------
-    json_file : str
-        Path to json file.
-
-    Returns
-    -------
-    data : dict
-        Data.
-
-    """
-    with open(json_file) as _json_file:
-        data = json.load(_json_file)
-
-    return data
 
 
 def save_data_to_json_file(data: list[str], json_file: str, **kwargs: Any) -> None:
@@ -175,18 +84,22 @@ def _display_compared_variables(
     missing_new: pd.DataFrame,
     n_max_suggestions: int = N_MAX_SUGGESTIONS,
 ) -> None:
-    print(f"\nOld variable: {old_name}")
-    print(f"New variable: {new_name}")
-    print("\n Other options:")
+    click.secho(f"\nOld variable: {old_name}", fg="red", bold=True, blink=True)
+    click.secho(f"New variable: {new_name}", fg="green", bold=True)
+    click.secho("\n\tOther options:", italic=True)
     for i, row in missing_new.iloc[1 : 1 + n_max_suggestions].iterrows():
-        print(
-            f"  {i:5} - {row['name_new']} (id={row['id_new']}, similarity={row['similarity']:.0f})"
+        click.secho(
+            f"\t{i:5} - {row['name_new']} (id={row['id_new']},"
+            f" similarity={row['similarity']:.0f})",
+            fg="bright_green",
         )
+    click.echo("\n")
 
 
 def _input_manual_decision(new_indexes: list[Any]) -> Any:
     decision = input(
-        "Press enter to accept this option, or type chosen index. To ignore this variable, type i."
+        "> Press enter to accept this option, or type chosen index. To ignore this"
+        " variable, type i."
     )
     if decision == "":
         chosen_index = new_indexes[0]
@@ -208,6 +121,7 @@ def _input_manual_decision(new_indexes: list[Any]) -> Any:
 def map_old_and_new_variables(
     old_variables: pd.DataFrame,
     new_variables: pd.DataFrame,
+    max_suggestions: int,
     omit_identical: bool = True,
     matching_function: Callable[[str, str], int] = fuzz.partial_ratio,
 ) -> pd.DataFrame:
@@ -261,7 +175,10 @@ def map_old_and_new_variables(
     ].reset_index(drop=True)
 
     # Iterate over old variables, and find the right match among new variables.
+    num_variables = len(missing_old)
+    count = 0
     while len(missing_old) > 0:
+        count += 1
         # Indexes of the old dataframe.
         old_indexes = missing_old.index.tolist()
         # Choose variable on the first row of the old dataframe.
@@ -283,8 +200,14 @@ def map_old_and_new_variables(
         new_name = missing_new.loc[suggested_index]["name_new"]
 
         # Display comparison.
+        click.secho(
+            f"\nVARIABLE {count}/{num_variables}", bold=True, bg="white", fg="black"
+        )
         _display_compared_variables(
-            old_name=old_name, new_name=new_name, missing_new=missing_new
+            old_name=old_name,
+            new_name=new_name,
+            missing_new=missing_new,
+            n_max_suggestions=max_suggestions,
         )
 
         # Get chosen option from manual input.
@@ -380,6 +303,7 @@ def main(
     output_file: str,
     omit_identical: bool = OMIT_IDENTICAL,
     similarity_name: str = SIMILARITY_NAME,
+    max_suggestions: int = N_MAX_SUGGESTIONS,
 ) -> None:
     with get_connection() as db_conn:
         # Get old and new dataset ids.
@@ -396,7 +320,7 @@ def main(
         )
 
     # Select similarity function.
-    similarity_function = get_similarity_function(similarity_name, SIMILARITY_NAMES)
+    similarity_function = get_similarity_function(similarity_name)
 
     # Manually map old variable names to new variable names.
     mapping = map_old_and_new_variables(
@@ -404,6 +328,7 @@ def main(
         new_variables=new_variables,
         omit_identical=omit_identical,
         matching_function=similarity_function,
+        max_suggestions=max_suggestions,
     )
 
     # Display summary.
@@ -415,47 +340,73 @@ def main(
     save_variable_replacements_file(mapping, output_file)
 
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument(
-        "-f",
-        "--output_file",
-        help="Path to output json file.",
-        required=True,
-    )
-    parser.add_argument(
-        "-old",
-        "--old_dataset_name",
-        help="Old dataset name (as defined in grapher).",
-        required=True,
-    )
-    parser.add_argument(
-        "-new",
-        "--new_dataset_name",
-        help="New dataset name (as defined in grapher).",
-        required=True,
-    )
-    parser.add_argument(
-        "-s",
-        "--similarity_name",
-        help=f"Name of similarity function to use when fuzzy matching variables. Default: {SIMILARITY_NAME}. "
-        f"Available methods: {', '.join(list(SIMILARITY_NAMES))}.",
-        default=SIMILARITY_NAME,
-    )
-    parser.add_argument(
-        "-a",
-        "--add_identical_pairs",
-        default=False,
-        action="store_true",
-        help="If given, add variables with identical names in both datasets to the comparison. "
-        "If not given, omit such variables and assume they should be paired.",
-    )
-    args = parser.parse_args()
-
+@click.command(help=__doc__)
+@click.option(
+    "-f",
+    "--output-file",
+    type=str,
+    help="Path to output json file.",
+    required=True,
+)
+@click.option(
+    "-old",
+    "--old-dataset-name",
+    type=str,
+    help="Old dataset name (as defined in grapher).",
+    required=True,
+)
+@click.option(
+    "-new",
+    "--new-dataset-name",
+    type=str,
+    help="New dataset name (as defined in grapher).",
+    required=True,
+)
+@click.option(
+    "-s",
+    "--similarity-name",
+    type=str,
+    default=SIMILARITY_NAME,
+    help=(
+        "Name of similarity function to use when fuzzy matching variables."
+        f" Default: {SIMILARITY_NAME}. Available methods:"
+        f" {', '.join(list(SIMILARITY_NAMES))}."
+    ),
+)
+@click.option(
+    "-a",
+    "--add-identical-pairs",
+    is_flag=True,
+    default=False,
+    help=(
+        "If given, add variables with identical names in both datasets to the"
+        " comparison. If not given, omit such variables and assume they should be"
+        " paired."
+    ),
+)
+@click.option(
+    "-m",
+    "--max-suggestions",
+    type=int,
+    default=N_MAX_SUGGESTIONS,
+    help=(
+        "Number of suggestions to show per old variable. That is, for every old"
+        " variable at most [--max-suggestions] suggestions will be listed."
+    ),
+)
+def main_cli(
+    old_dataset_name: str,
+    new_dataset_name: str,
+    output_file: str,
+    add_identical_pairs: bool,
+    similarity_name: str,
+    max_suggestions: int,
+) -> None:
     main(
-        old_dataset_name=args.old_dataset_name,
-        new_dataset_name=args.new_dataset_name,
-        omit_identical=not args.add_identical_pairs,
-        similarity_name=args.similarity_name,
-        output_file=args.output_file,
+        old_dataset_name=old_dataset_name,
+        new_dataset_name=new_dataset_name,
+        omit_identical=not add_identical_pairs,
+        similarity_name=similarity_name,
+        output_file=output_file,
+        max_suggestions=int(max_suggestions),
     )
