@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 from owid.datautils import dataframes
 
-from etl.paths import DATA_DIR
+from etl.paths import DATA_DIR, STEP_DIR
 from owid import catalog
 from shared import (
     ADDED_TITLE_TO_WIDE_TABLE,
@@ -15,7 +15,6 @@ from shared import (
     LATEST_VERSIONS_FILE,
     NAMESPACE,
     REGIONS_TO_ADD,
-    STEP_DIR,
     VERSION,
     add_per_capita_variables,
     add_regions,
@@ -342,7 +341,9 @@ def run(dest_dir: str) -> None:
     )
 
     # Path to outliers file.
-    outliers_file = STEP_DIR / "data" / "garden" / NAMESPACE / VERSION / "detected_outliers.json"
+    outliers_file = (
+        STEP_DIR / "data" / "garden" / NAMESPACE / VERSION / "detected_outliers.json"
+    )
 
     ####################################################################################################################
     # Load data.
@@ -411,9 +412,7 @@ def run(dest_dir: str) -> None:
     data_table_long = prepare_long_table(data=data)
 
     # Create a wide table (with only country and year as index).
-    data_table_wide = prepare_wide_table(
-        data=data, dataset_title=datasets_metadata["owid_dataset_title"].item()
-    )
+    data_table_wide = prepare_wide_table(data=data)
 
     ####################################################################################################################
     # Save outputs.

@@ -1107,7 +1107,9 @@ def remove_overlapping_data_between_historical_regions_and_successors(
     return data_region
 
 
-def remove_outliers(data: pd.DataFrame, outliers: List[Dict[str, List[Union[str, int]]]]) -> pd.DataFrame:
+def remove_outliers(
+    data: pd.DataFrame, outliers: List[Dict[str, List[Union[str, int]]]]
+) -> pd.DataFrame:
     """Remove known outliers (defined in OUTLIERS_TO_REMOVE) from processed data.
 
     The argument "outliers" is the list of outliers to remove: data points that are wrong and create artefacts in the
@@ -1136,7 +1138,7 @@ def remove_outliers(data: pd.DataFrame, outliers: List[Dict[str, List[Union[str,
         _outlier = {key: value for key, value in outlier.items() if key != "notes"}
         _rows_to_drop = pd.DataFrame.from_records(
             list(itertools.product(*_outlier.values())),
-            columns=list(_outlier)  # type: ignore
+            columns=list(_outlier),
         )
         rows_to_drop = pd.concat(
             [rows_to_drop, _rows_to_drop], ignore_index=True
@@ -1854,7 +1856,7 @@ def create_variable_short_names(variable_name: str) -> str:
     return cast(str, new_name)
 
 
-def prepare_wide_table(data: pd.DataFrame, dataset_title: str) -> catalog.Table:
+def prepare_wide_table(data: pd.DataFrame) -> catalog.Table:
     """Flatten a long table to obtain a wide table with ["country", "year"] as index.
 
     The input table will be pivoted to have [country, year] as index, and as many columns as combinations of
@@ -1864,8 +1866,6 @@ def prepare_wide_table(data: pd.DataFrame, dataset_title: str) -> catalog.Table:
     ----------
     data : pd.DataFrame
         Data for current domain.
-    dataset_title : str
-        Title for the dataset of current domain (only needed to include it in the name of the new variables).
 
     Returns
     -------
@@ -1887,8 +1887,7 @@ def prepare_wide_table(data: pd.DataFrame, dataset_title: str) -> catalog.Table:
     # (which would cause issues when uploading to grapher).
     data["variable_name"] = dataframes.apply_on_categoricals(
         [data.item, data.item_code, data.element, data.element_code, data.unit],
-        lambda item, item_code, element, element_code, unit:
-        f"{item} | {item_code} || {element} | {element_code} || {unit}",
+        lambda item, item_code, element, element_code, unit: f"{item} | {item_code} || {element} | {element_code} || {unit}",
     )
 
     # Construct a human-readable variable display name (which will be shown in grapher charts).
@@ -2007,7 +2006,9 @@ def run(dest_dir: str) -> None:
     )
 
     # Path to outliers file.
-    outliers_file = STEP_DIR / "data" / "garden" / NAMESPACE / VERSION / "detected_outliers.json"
+    outliers_file = (
+        STEP_DIR / "data" / "garden" / NAMESPACE / VERSION / "detected_outliers.json"
+    )
 
     ####################################################################################################################
     # Load data.
@@ -2080,9 +2081,7 @@ def run(dest_dir: str) -> None:
     data_table_long = prepare_long_table(data=data)
 
     # Create a wide table (with only country and year as index).
-    data_table_wide = prepare_wide_table(
-        data=data, dataset_title=datasets_metadata["owid_dataset_title"].item()
-    )
+    data_table_wide = prepare_wide_table(data=data)
 
     ####################################################################################################################
     # Save outputs.
