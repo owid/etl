@@ -68,7 +68,7 @@ tables:
         unit: Percentage
         description: Average exponential rate of growth of the population over a given period. It is calculated as ln(P2/P1)/n where P1 and P2 are the populations on 1 January of subsequent years, and n is the length of the period between t1 and t2 (n=1 for annual data).
       infant_mortality_rate:
-        title: Infant moratility rate
+        title: Infant mortality rate
         short_unit: "%"
         unit: Percentage
         description: Probability of dying between birth and exact age 1.
