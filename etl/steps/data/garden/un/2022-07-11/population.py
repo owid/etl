@@ -1,5 +1,6 @@
 """Population table."""
 import pandas as pd
+import numpy as np
 from typing import Dict, Tuple, List, Any
 
 from .dtypes import optimize_dtypes
@@ -94,6 +95,9 @@ def add_metrics(df: pd.DataFrame) -> pd.DataFrame:
     df = pd.concat(
         [df_sr, df_sr_all, df_p_granular, df_p_broad, df_p_diff], ignore_index=True
     )
+    # Remove infs
+    msk = np.isinf(df["value"])
+    df.loc[msk, "value"] = np.nan
     return df
 
 
