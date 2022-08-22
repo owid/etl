@@ -6,11 +6,11 @@ Harmonize country names:
 """
 import json
 from pathlib import Path
-from typing import List, Dict
+from typing import Dict, List
 
 import pandas as pd
-
 from owid.catalog import Dataset, Table
+
 from etl.paths import DATA_DIR
 
 COUNTRY_MAPPING_PATH = (Path(__file__).parent / "wdi.country_mapping.json").as_posix()

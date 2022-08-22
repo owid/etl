@@ -3,8 +3,8 @@
 #  owid/latest/key_indicators
 #
 
-from pathlib import Path
 from importlib import import_module
+from pathlib import Path
 
 from owid.catalog import Dataset, DatasetMeta, Table
 

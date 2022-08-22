@@ -29,6 +29,8 @@ lint-default: .venv
 check-formatting-default: .venv
 	@echo '==> Checking formatting'
 	@.venv/bin/black --check $(SRC)
+	@echo '==> Checking import sorting'
+	@.venv/bin/isort --check-only $(SRC)
 
 check-typing-default: .venv
 	@echo '==> Checking types'
@@ -41,6 +43,8 @@ unittest-default: .venv
 format-default: .venv
 	@echo '==> Reformatting files'
 	@.venv/bin/black $(SRC)
+	@echo '==> Sorting imports'
+	@.venv/bin/isort $(SRC)
 
 watch-default: .venv
 	.venv/bin/watchmedo shell-command -c 'clear; make test' --recursive --drop .

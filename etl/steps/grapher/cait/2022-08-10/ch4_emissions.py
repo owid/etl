@@ -1,10 +1,11 @@
 from typing import Iterable
 
-from etl import grapher_helpers as gh
-from etl.paths import DATA_DIR
 from owid import catalog
 
-from .shared import NAMESPACE, GARDEN_DATASET_VERSION
+from etl import grapher_helpers as gh
+from etl.paths import DATA_DIR
+
+from .shared import GARDEN_DATASET_VERSION, NAMESPACE
 
 # Name of table to load from garden dataset to convert into a grapher dataset.
 TABLE_NAME = "methane_emissions_by_sector"

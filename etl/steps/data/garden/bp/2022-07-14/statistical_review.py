@@ -11,8 +11,6 @@ from copy import deepcopy
 
 import numpy as np
 import pandas as pd
-
-from etl.paths import DATA_DIR
 from owid import catalog
 from shared import (
     CURRENT_DIR,
@@ -20,6 +18,8 @@ from shared import (
     REGIONS_TO_ADD,
     add_region_aggregates,
 )
+
+from etl.paths import DATA_DIR
 
 # Namespace and short name for output dataset.
 NAMESPACE = "bp"

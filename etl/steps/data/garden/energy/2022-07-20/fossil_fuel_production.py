@@ -7,10 +7,10 @@ import numpy as np
 import pandas as pd
 from owid import catalog
 from owid.catalog.utils import underscore_table
+from shared import CURRENT_DIR, add_population
 from structlog import get_logger
 
 from etl.paths import DATA_DIR
-from shared import CURRENT_DIR, add_population
 
 log = get_logger()
 

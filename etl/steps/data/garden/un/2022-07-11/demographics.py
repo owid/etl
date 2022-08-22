@@ -1,9 +1,9 @@
 """Demographics table."""
+from typing import Any, Dict
+
 import pandas as pd
-from typing import Dict, Any
 
 from .dtypes import optimize_dtypes
-
 
 # rename columns
 COLUMNNS_ID = {

@@ -10,13 +10,13 @@ https://github.com/owid/importers/blob/master/population/etl.py
 """
 
 from pathlib import Path
-from typing import cast, List
+from typing import List, cast
 
 import pandas as pd
-
 from owid.catalog import Dataset, Table
-from etl.paths import DATA_DIR
+
 from etl import data_helpers
+from etl.paths import DATA_DIR
 
 UNWPP = DATA_DIR / "garden/wpp/2019/standard_projections"
 GAPMINDER = DATA_DIR / "garden/gapminder/2019-12-10/population"

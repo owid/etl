@@ -50,11 +50,12 @@ from copy import deepcopy
 from typing import Dict, List, Tuple, cast
 
 import pandas as pd
+from owid import catalog
 from owid.datautils import dataframes, io
 from tqdm.auto import tqdm
 
 from etl.paths import DATA_DIR, STEP_DIR
-from owid import catalog
+
 from .shared import (
     FLAGS_RANKING,
     NAMESPACE,

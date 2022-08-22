@@ -3,17 +3,16 @@
 #  etl
 #
 
+import cmd
+import json
+from collections import defaultdict
 from pathlib import Path
 from typing import DefaultDict, Dict, List, Optional, Set, cast
-from collections import defaultdict
-import json
-import cmd
 
 import click
 import pandas as pd
-from thefuzz import process
-
 from owid.catalog import Dataset
+from thefuzz import process
 
 from etl.paths import REFERENCE_DATASET
 

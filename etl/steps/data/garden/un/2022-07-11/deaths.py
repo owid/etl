@@ -1,9 +1,9 @@
 """Deaths table"""
+from typing import Any, Dict
+
 import pandas as pd
-from typing import Dict, Any
 
 from .dtypes import optimize_dtypes
-
 
 # Initial settings
 COLUMNS_ID = {

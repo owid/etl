@@ -32,15 +32,14 @@
 
 # %%
 import json
+from typing import Any, Dict, List, Optional, cast
 
-import pandas as pd
 import numpy as np
-
+import pandas as pd
 from owid import catalog
-from etl.paths import BASE_DIR, DATA_DIR
 from owid.catalog.meta import DatasetMeta
 
-from typing import List, Dict, Any, Optional, cast
+from etl.paths import BASE_DIR, DATA_DIR
 
 # %%
 HERE = BASE_DIR / "etl/steps/data/explorers/owid/2021"
