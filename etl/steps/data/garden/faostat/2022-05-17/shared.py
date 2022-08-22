@@ -1148,7 +1148,7 @@ def remove_outliers(
     if (len(set(rows_to_drop["item_code"]) & set(data["item_code"])) > 0) & (
         len(set(rows_to_drop["element_code"]) & set(data["element_code"])) > 0
     ):
-        log.info(f"Removing {len(rows_to_drop)} rows of outliers.")
+        log.info(f"Removing {len(rows_to_drop)} rows of known outliers.")
 
         # Get indexes of data that correspond to the rows we want to drop.
         indexes_to_drop = list(
