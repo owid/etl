@@ -9,14 +9,13 @@ Adapted from Ed's population density script:
 https://github.com/owid/notebooks/blob/main/EdouardMathieu/omm_population_density/script.py
 """
 
-import pandas as pd
-from typing import cast
 from pathlib import Path
+from typing import cast
 
-from owid.catalog import Dataset, Table, Source
+import pandas as pd
+from owid.catalog import Dataset, Source, Table
 
 from etl.paths import DATA_DIR
-
 
 KEY_INDICATORS = DATA_DIR / "garden/owid/latest/key_indicators"
 

@@ -3,10 +3,9 @@ from typing import Dict, List, Optional, Union, cast
 
 import numpy as np
 import pandas as pd
+from owid import catalog
 from owid.datautils import geo
 from structlog import get_logger
-
-from owid import catalog
 
 log = get_logger()
 

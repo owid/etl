@@ -1,12 +1,13 @@
 import re
-import pandas as pd
-
-from structlog import get_logger
 from pathlib import Path
-from etl.steps.data.converters import convert_walden_metadata
-from owid.walden import Catalog
+
+import pandas as pd
 from owid.catalog import Dataset, Table, TableMeta
 from owid.catalog.utils import underscore
+from owid.walden import Catalog
+from structlog import get_logger
+
+from etl.steps.data.converters import convert_walden_metadata
 
 BASE_URL = "https://unstats.un.org/sdgapi"
 log = get_logger()

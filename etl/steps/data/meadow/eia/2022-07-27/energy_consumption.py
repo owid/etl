@@ -6,12 +6,12 @@ from typing import cast
 
 import numpy as np
 import pandas as pd
-from structlog import get_logger
-
-from etl.steps.data.converters import convert_walden_metadata
 from owid.catalog import Dataset, Table, TableMeta
 from owid.catalog.utils import underscore_table
 from owid.walden import Catalog as WaldenCatalog
+from structlog import get_logger
+
+from etl.steps.data.converters import convert_walden_metadata
 
 log = get_logger()
 

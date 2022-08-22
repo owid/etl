@@ -1,13 +1,13 @@
 import re
-from copy import deepcopy
-from typing import List, Any
 import sys
+from copy import deepcopy
+from typing import Any, List
 
 import pandas as pd
+from owid import catalog
+from owid.datautils.io.s3 import S3
 from tqdm.auto import tqdm
 
-from owid.datautils.io.s3 import S3
-from owid import catalog
 from etl.paths import DATA_DIR
 
 YEAR_SPLIT = 2022

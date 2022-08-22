@@ -1,19 +1,18 @@
-from typing import List, Any
-
+from pathlib import Path
+from typing import Any, List
 
 import pandas as pd
-from pathlib import Path
-
-from etl.paths import BASE_DIR as base_path
 from owid import catalog
 from owid.catalog import Table
 from owid.catalog.meta import TableMeta
 
-from .population import process as process_population
-from .fertility import process as process_fertility
+from etl.paths import BASE_DIR as base_path
+
+from .deaths import process as process_deaths
 from .demographics import process as process_demographics
 from .dep_ratio import process as process_depratio
-from .deaths import process as process_deaths
+from .fertility import process as process_fertility
+from .population import process as process_population
 
 YEAR_SPLIT = 2022
 METADATA_PATH = Path(__file__).parent / "un_wpp.meta.yml"

@@ -11,10 +11,11 @@ import json
 from typing import Any, Dict
 
 import pandas as pd
-
-from etl.steps.data.converters import convert_walden_metadata
 from owid.catalog import Dataset, Table, utils
 from owid.walden import Catalog
+
+from etl.steps.data.converters import convert_walden_metadata
+
 from .shared import NAMESPACE
 
 # Name for new meadow dataset.

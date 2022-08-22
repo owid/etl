@@ -14,9 +14,9 @@ import numpy as np
 import pandas as pd
 from owid import catalog
 from owid.datautils import dataframes
+from shared import CURRENT_DIR, add_population, gather_sources_from_tables
 
 from etl.paths import DATA_DIR
-from shared import CURRENT_DIR, add_population, gather_sources_from_tables
 
 # Details for dataset to export.
 DATASET_SHORT_NAME = "owid_energy"

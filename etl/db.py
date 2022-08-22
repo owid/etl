@@ -1,12 +1,12 @@
 import traceback
+import warnings
 from collections.abc import Generator
 from contextlib import contextmanager
-from urllib.parse import quote
 from typing import Any
-import warnings
+from urllib.parse import quote
 
-import pandas as pd
 import MySQLdb
+import pandas as pd
 import structlog
 from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine

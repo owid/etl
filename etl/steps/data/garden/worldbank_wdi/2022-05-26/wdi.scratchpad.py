@@ -5,18 +5,18 @@ The code in this file is not intended to be run as part of any etl step.
 """
 # flake8: noqa
 
+import json
 import os
 from pathlib import Path
 from typing import List
 
-import requests
-import json
 import pandas as pd
+import requests
 from dotenv import load_dotenv
-
 from owid.catalog import Dataset
-from etl.paths import DATA_DIR
+
 from etl.db import get_connection
+from etl.paths import DATA_DIR
 
 raise NotImplementedError("This script is not intended to be executed.")
 

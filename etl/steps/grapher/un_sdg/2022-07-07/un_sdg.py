@@ -1,17 +1,17 @@
 import json
 import os
-import requests
-from typing import Iterable
 from pathlib import Path
-import pandas as pd
+from typing import Iterable
 
-from structlog import get_logger
-from owid.catalog import Dataset, Table, Source, VariableMeta
+import pandas as pd
+import requests
+from owid.catalog import Dataset, Source, Table, VariableMeta
 from owid.catalog.utils import underscore
 from owid.walden import Catalog
-from etl.paths import DATA_DIR
-from etl import grapher_helpers as gh
+from structlog import get_logger
 
+from etl import grapher_helpers as gh
+from etl.paths import DATA_DIR
 
 log = get_logger()
 

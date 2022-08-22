@@ -4,9 +4,10 @@
 
 from typing import Iterable
 
+from owid import catalog
+
 from etl import grapher_helpers as gh
 from etl.paths import DATA_DIR
-from owid import catalog
 
 DATASET_PATH = DATA_DIR / "garden" / "energy" / "2022-07-20" / "fossil_fuel_production"
 

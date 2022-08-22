@@ -1,18 +1,18 @@
-import re
 import json
+import re
 import zipfile
-from typing import Iterable, Optional, List, Union
 from pathlib import Path
+from typing import Iterable, List, Optional, Union
 
-import structlog
 import pandas as pd
-
-from owid.catalog import Dataset, Table, Source, VariableMeta
+import structlog
+from owid.catalog import Dataset, Source, Table, VariableMeta
 from owid.catalog.utils import underscore
 from owid.walden import Catalog
-from etl.paths import DATA_DIR
+
 from etl import grapher_helpers as gh
 from etl.db import get_connection
+from etl.paths import DATA_DIR
 
 log = structlog.get_logger()
 

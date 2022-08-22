@@ -6,25 +6,25 @@
 Test that the different step types work as expected.
 """
 
+import random
+import shutil
+import string
 from contextlib import contextmanager
 from typing import Iterator
-import random
-import string
-import shutil
 from unittest.mock import patch
 
 from owid.catalog import Dataset
 
 from etl import paths
 from etl.steps import (
+    BackportStepPrivate,
     DataStep,
     DataStepPrivate,
-    BackportStepPrivate,
-    compile_steps,
-    to_dependency_order,
-    select_dirty_steps,
     Step,
+    compile_steps,
     filter_to_subgraph,
+    select_dirty_steps,
+    to_dependency_order,
 )
 
 

@@ -5,9 +5,9 @@ import pandas as pd
 from owid.catalog import Dataset, Table, TableMeta
 from owid.catalog.utils import underscore_table
 from owid.walden import Catalog as WaldenCatalog
+from shared import NAMESPACE, VERSION
 
 from etl.steps.data.converters import convert_walden_metadata
-from shared import NAMESPACE, VERSION
 
 DATASET_SHORT_NAME = "ghg_emissions_by_sector"
 DATASET_TITLE = "Greenhouse gas emissions by sector"

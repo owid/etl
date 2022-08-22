@@ -1,9 +1,9 @@
 """Fertility table."""
+from typing import Any, Dict, List
+
 import pandas as pd
-from typing import Dict, List, Any
 
 from .dtypes import optimize_dtypes
-
 
 # rename columns
 COLUMNS_ID: Dict[str, str] = {
