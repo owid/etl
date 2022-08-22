@@ -3,12 +3,12 @@
 #  owid/latest/covid
 #
 
-from owid.catalog.meta import License, Source
 import datetime as dt
 
 import pandas as pd
-
 from owid.catalog import Dataset, Table
+from owid.catalog.meta import License, Source
+
 from etl.helpers import downloaded
 
 MEGAFILE_URL = "https://raw.githubusercontent.com/owid/covid-19-data/master/public/data/owid-covid-data.csv"

@@ -1,11 +1,11 @@
 from typing import Iterable
-import yaml
+
 import structlog
+import yaml
 from owid import catalog
 
 from etl import grapher_helpers as gh
 from etl.paths import DATA_DIR, STEP_DIR
-
 
 NAMESPACE = "un"
 VERSION = "2022-07-11"

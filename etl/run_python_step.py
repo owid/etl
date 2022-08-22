@@ -2,11 +2,12 @@
 #  run_python_step
 #
 
-from importlib import import_module
-import click
 import sys
+from importlib import import_module
 
-from etl.paths import STEP_DIR, BASE_PACKAGE
+import click
+
+from etl.paths import BASE_PACKAGE, STEP_DIR
 
 
 @click.command()

@@ -1,13 +1,13 @@
-import zipfile
-import tempfile
 import os
-from typing import Tuple, Optional, List, Any
-
-import pandas as pd
-from pandas.api.types import CategoricalDtype
+import tempfile
+import zipfile
+from typing import Any, List, Optional, Tuple
 
 import owid.walden as walden
-from owid.catalog import utils, Dataset, Table
+import pandas as pd
+from owid.catalog import Dataset, Table, utils
+from pandas.api.types import CategoricalDtype
+
 from etl.steps.data.converters import convert_walden_metadata
 
 

@@ -1,7 +1,7 @@
-import pandas as pd
-from pandas.api.types import CategoricalDtype
 from pathlib import Path
 
+import pandas as pd
+from pandas.api.types import CategoricalDtype
 
 _countries = pd.read_csv(
     Path(__file__).parent / "un_wpp.country_std.csv",

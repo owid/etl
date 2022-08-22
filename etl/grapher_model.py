@@ -9,7 +9,6 @@ from sqlalchemy.engine import Engine
 from sqlmodel import JSON, Column, Field, Session, SQLModel, select
 from sqlmodel.sql.expression import Select, SelectOfScalar
 
-
 log = structlog.get_logger()
 
 

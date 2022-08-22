@@ -20,11 +20,11 @@ from copy import deepcopy
 from typing import cast
 
 import pandas as pd
+from owid import catalog
+from owid.catalog.meta import DatasetMeta, TableMeta
 from owid.datautils import dataframes
 
 from etl.paths import DATA_DIR, STEP_DIR
-from owid import catalog
-from owid.catalog.meta import DatasetMeta, TableMeta
 from shared import (
     ADDED_TITLE_TO_WIDE_TABLE,
     NAMESPACE,

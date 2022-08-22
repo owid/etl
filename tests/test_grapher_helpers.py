@@ -1,8 +1,8 @@
 import pandas as pd
 import pytest
+from owid.catalog import DatasetMeta, Source, Table, TableMeta, VariableMeta
 
-from owid.catalog import Table, VariableMeta, TableMeta, DatasetMeta, Source
-from etl.grapher_helpers import yield_wide_table, yield_long_table
+from etl.grapher_helpers import yield_long_table, yield_wide_table
 
 
 def test_yield_wide_table():

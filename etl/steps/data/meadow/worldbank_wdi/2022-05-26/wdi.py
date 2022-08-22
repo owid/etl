@@ -2,11 +2,10 @@ import zipfile
 from pathlib import Path
 
 import pandas as pd
-from pandas.api.types import is_numeric_dtype  # type: ignore
-
-from owid.walden import Catalog
-from owid.catalog import Dataset, Table, DatasetMeta, TableMeta
+from owid.catalog import Dataset, DatasetMeta, Table, TableMeta
 from owid.catalog.utils import underscore
+from owid.walden import Catalog
+from pandas.api.types import is_numeric_dtype  # type: ignore
 
 
 def run(dest_dir: str) -> None:

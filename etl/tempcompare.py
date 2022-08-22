@@ -1,7 +1,7 @@
-from typing import Callable, Generator, Iterable, cast
-import pandas as pd
-from typing import List, Optional, Any
+from typing import Any, Callable, Generator, Iterable, List, Optional, cast
+
 import numpy as np
+import pandas as pd
 
 # ######## Note - this file will be moved to owid-catalog-py before the branch is merged ##############
 

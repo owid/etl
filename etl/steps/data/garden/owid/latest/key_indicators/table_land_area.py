@@ -1,8 +1,8 @@
-from owid.catalog import Dataset, Table, Source
 from owid import catalog
+from owid.catalog import Dataset, Source, Table
 
-from etl.paths import DATA_DIR, REFERENCE_DATASET
 from etl import data_helpers
+from etl.paths import DATA_DIR, REFERENCE_DATASET
 
 
 def load_land_area() -> Table:

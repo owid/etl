@@ -12,15 +12,15 @@ import argparse
 import datetime
 import re
 from pathlib import Path
-from typing import cast, Dict, List, Optional, Set, Tuple
+from typing import Dict, List, Optional, Set, Tuple, cast
 
 import pandas as pd
 import structlog
+from owid.walden import Catalog
 
 from etl.files import checksum_file
 from etl.paths import BASE_DIR, STEP_DIR
 from etl.steps import load_dag
-from owid.walden import Catalog
 
 # Initialise log.
 log = structlog.get_logger()

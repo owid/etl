@@ -69,9 +69,13 @@ jupyter_nbextensions_configurator = "^0.4.1"
 plotly = "^5.7.0"
 pywebio = "^1.6.1"
 cookiecutter = "^2.1.1"
+isort = "^5.10.1"
 
 [tool.black]
 exclude = ".ipynb_checkpoints|walkthrough/.*_cookiecutter"
+
+[tool.isort]
+profile = "black"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

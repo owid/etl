@@ -16,16 +16,16 @@ import json
 import sys
 from copy import deepcopy
 from pathlib import Path
-from typing import List, Dict, Union, cast
+from typing import Dict, List, Union, cast
 
 import numpy as np
 import pandas as pd
 import structlog
+from owid import catalog
 from owid.datautils import dataframes, geo
 from tqdm.auto import tqdm
 
 from etl.paths import DATA_DIR, STEP_DIR
-from owid import catalog
 
 # Initialise log.
 log = structlog.get_logger()

@@ -2,9 +2,9 @@
 #  files.py
 #
 
-from pathlib import Path
 import hashlib
-from typing import Set, List, Union
+from pathlib import Path
+from typing import List, Set, Union
 
 
 def checksum_file(filename: Union[str, Path]) -> str:

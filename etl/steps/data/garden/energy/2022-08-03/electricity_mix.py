@@ -7,9 +7,9 @@ from typing import Dict, List
 
 import pandas as pd
 from owid import catalog
+from shared import CURRENT_DIR, add_population, combine_two_overlapping_dataframes
 
 from etl.paths import DATA_DIR
-from shared import CURRENT_DIR, add_population, combine_two_overlapping_dataframes
 
 # Details for dataset to export.
 DATASET_SHORT_NAME = "electricity_mix"

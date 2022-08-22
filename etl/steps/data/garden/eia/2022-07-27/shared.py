@@ -1,11 +1,11 @@
 from pathlib import Path
-from structlog import get_logger
 from typing import Dict, List, Optional, Union, cast
 
 import numpy as np
 import pandas as pd
 from owid import catalog
 from owid.datautils import geo
+from structlog import get_logger
 
 log = get_logger()
 

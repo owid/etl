@@ -5,7 +5,7 @@ from urllib.parse import urlparse
 
 import click
 import structlog
-from owid.catalog import LocalCatalog, CHANNEL
+from owid.catalog import CHANNEL, LocalCatalog
 
 from etl.command import construct_dag
 from etl.steps import paths

@@ -4,12 +4,10 @@
 
 import pandas as pd
 from owid import catalog
-from owid.datautils import geo
-
-from owid.datautils import dataframes
+from owid.datautils import dataframes, geo
+from shared import CURRENT_DIR
 
 from etl.paths import DATA_DIR
-from shared import CURRENT_DIR
 
 # Details for dataset to export.
 DATASET_SHORT_NAME = "european_electricity_review"
