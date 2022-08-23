@@ -165,6 +165,19 @@ def yield_wide_table(
             tab.metadata.short_name = short_name
             tab = tab.rename(columns={column: short_name})
 
+            # add info about dimensions to metadata
+            if dims:
+                tab[short_name].metadata.additional_info = {
+                    "dimensions": {
+                        "originalShortName": column,
+                        "originalName": tab[short_name].metadata.title,
+                        "filters": [{
+                            "name": dim_name,
+                            "value": dim_value
+                        } for dim_name, dim_value in zip(dim_names, dims)]
+                    }
+                }
+
             # Add dimensions to title (which will be used as variable name in grapher)
             title_with_dims: Optional[str]
             if tab[short_name].metadata.title:
@@ -437,7 +450,7 @@ def adapt_table_for_grapher(
     # Grapher needs a column entity id, that is constructed based on the unique entity names in the database.
     table["entity_id"] = country_to_entity_id(table[country_col], create_entities=True)
     table = table.drop(columns=[country_col]).rename(columns={year_col: "year"})
-    table = table.set_index(["entity_id", "year"])
+    table = table.set_index(["entity_id", "year"], append=True)
 
     # Ensure the default source of each column includes the description of the table (since that is the description that
     # will appear in grapher on the SOURCES tab).

@@ -149,6 +149,7 @@ def upsert_table(
     table: catalog.Table,
     dataset_upsert_result: DatasetUpsertResult,
     catalog_path: Optional[str] = None,
+    dimensions: Optional[Dict] = None,
 ) -> VariableUpsertResult:
     """This function is used to put one ready to go formatted Table (i.e.
     in the format (year, entityId, value)) into mysql. The metadata
@@ -219,6 +220,7 @@ def upsert_table(
             dataset_id=dataset_upsert_result.dataset_id,
             source_id=source_id,
             catalog_path=catalog_path,
+            dimensions=dimensions,
         ).upsert(session)
         assert variable.id
 

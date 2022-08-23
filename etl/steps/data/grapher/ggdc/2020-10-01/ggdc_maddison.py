@@ -10,7 +10,6 @@ def run(dest_dir: str) -> None:
     dataset = catalog.Dataset.create_empty(
         dest_dir, gh.adapt_dataset_metadata_for_grapher(N.garden_dataset.metadata)
     )
-    # backward compatibility
     dataset.metadata.short_name = "ggdc_maddison__2020_10_01"
     dataset.save()
 

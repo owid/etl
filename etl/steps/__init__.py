@@ -609,12 +609,13 @@ class GrapherNewStep(DataStep):
     def _upsert_wide_table(self, table: catalog.Table, dataset_upsert_results):
         # TODO: add path to parquet file
         for tab in gh.yield_wide_table(table, na_action="drop"):
-            ds_meta = tab.metadata.dataset
-            assert ds_meta
-            catalog_path = (
-                f"grapher/{ds_meta.namespace}/{ds_meta.version}/{ds_meta.short_name}/{table.metadata.short_name}"
+            catalog_path = f"{self.path}/{table.metadata.short_name}"
+            yield upsert_table(
+                tab,
+                dataset_upsert_results,
+                catalog_path,
+                tab.iloc[:, 0].metadata.additional_info.get("dimensions"),
             )
-            yield upsert_table(tab, dataset_upsert_results, catalog_path)
 
     def after_run(self) -> None:
         """Optional post-hook, needs to resave the dataset again."""
@@ -632,6 +633,9 @@ class GrapherNewStep(DataStep):
 
         try:
             variable_upsert_results = []
+            # WARNING: multiple tables will be saved under a single dataset, this could cause problems if someone
+            # is fetching the whole dataset from data-api as they would receive all tables merged in a single
+            # table
             for table in dataset:
                 variable_upsert_results += list(self._upsert_wide_table(table, dataset_upsert_results))
         except Exception as e:
