@@ -169,22 +169,21 @@ class DBUtils:
         namespace: str,
         user_id: int,
         tag_id: Optional[int] = None,
-        source_checksum: Optional[str] = None,
         description: str = "This is a dataset imported by the automated fetcher",
     ) -> int:
         operation = self.upsert_one(
             """
             INSERT INTO datasets
-                (shortName, name, version, description, namespace, sourceChecksum, createdAt, createdByUserId, updatedAt, metadataEditedAt, metadataEditedByUserId, dataEditedAt, dataEditedByUserId)
+                (shortName, name, version, description, namespace, createdAt, createdByUserId, updatedAt, metadataEditedAt, metadataEditedByUserId, dataEditedAt, dataEditedByUserId)
             VALUES
-                (%s, %s, %s, %s, %s, %s, NOW(), %s, NOW(), NOW(), %s, NOW(), %s)
+                (%s, %s, %s, %s, %s, NOW(), %s, NOW(), NOW(), %s, NOW(), %s)
             ON DUPLICATE KEY UPDATE
                 shortName = VALUES(shortName),
                 name = VALUES(name),
                 version = VALUES(version),
                 description = VALUES(description),
                 namespace = VALUES(namespace),
-                sourceChecksum = VALUES(sourceChecksum),
+                sourceChecksum = NULL,
                 updatedAt = VALUES(updatedAt),
                 metadataEditedAt = VALUES(metadataEditedAt),
                 metadataEditedByUserId = VALUES(metadataEditedByUserId),
@@ -197,7 +196,6 @@ class DBUtils:
                 version,
                 description,
                 namespace,
-                source_checksum,
                 user_id,
                 user_id,
                 user_id,
