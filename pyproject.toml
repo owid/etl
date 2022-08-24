@@ -76,6 +76,7 @@ exclude = ".ipynb_checkpoints|walkthrough/.*_cookiecutter"
 
 [tool.isort]
 profile = "black"
+extend_skip = [".ipynb_checkpoints"]
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

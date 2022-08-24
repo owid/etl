@@ -9,6 +9,7 @@ Usage:
     >>> import_dataset.main(dataset_dir, dataset_namespace)
 """
 
+import concurrent.futures
 import json
 import os
 from dataclasses import dataclass
@@ -52,10 +53,7 @@ class VariableUpsertResult:
 
 
 def upsert_dataset(
-    dataset: catalog.Dataset,
-    namespace: str,
-    sources: List[catalog.meta.Source],
-    source_checksum: str,
+    dataset: catalog.Dataset, namespace: str, sources: List[catalog.meta.Source]
 ) -> DatasetUpsertResult:
     assert dataset.metadata.short_name, "Dataset must have a short_name"
     assert dataset.metadata.version, "Dataset must have a version"
@@ -90,7 +88,6 @@ def upsert_dataset(
             dataset.metadata.version,
             namespace,
             int(cast(str, config.GRAPHER_USER_ID)),
-            source_checksum=source_checksum,
             description=dataset.metadata.description or "",
         )
         log.info(
@@ -267,25 +264,28 @@ def fetch_db_checksum(dataset: catalog.Dataset) -> Optional[str]:
         return None if source_checksum is None else source_checksum[0]
 
 
-def set_dataset_checksum_to_null(dataset_id: int) -> None:
+def set_dataset_checksum(dataset_id: int, checksum: str) -> None:
     with open_db() as db:
         db.cursor.execute(
             """
             UPDATE datasets
-            SET sourceChecksum = NULL
+            SET sourceChecksum = %s
             WHERE id=%s
         """,
-            [dataset_id],
+            [checksum, dataset_id],
         )
 
 
-def cleanup_ghost_variables(dataset_id: int, upserted_variable_ids: List[int]) -> None:
+def cleanup_ghost_variables(
+    dataset_id: int, upserted_variable_ids: List[int], workers: int = 1
+) -> None:
     """Remove all leftover variables that didn't get upserted into DB during grapher step.
     This could happen when you rename or delete a variable in ETL.
     Raise an error if we try to delete variable used by any chart.
 
     :param dataset_id: ID of the dataset
     :param upserted_variable_ids: variables upserted in grapher step
+    :param workers: delete variables in parallel
     """
     with open_db() as db:
         # get all those variables first
@@ -320,12 +320,12 @@ def cleanup_ghost_variables(dataset_id: int, upserted_variable_ids: List[int]) -
             )
 
         # first delete data_values
-        db.cursor.execute(
-            """
-            DELETE FROM data_values WHERE variableId IN %(variable_ids)s
-        """,
-            {"variable_ids": variable_ids_to_delete},
-        )
+        # NOTE: deleting 100 variables takes ~30s with 10 workers with threading
+        # and about ~3mins when deleting them in batch
+        with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as executor:
+            list(
+                executor.map(_delete_variable_from_data_values, variable_ids_to_delete)
+            )
 
         # then variables themselves
         db.cursor.execute(
@@ -339,6 +339,16 @@ def cleanup_ghost_variables(dataset_id: int, upserted_variable_ids: List[int]) -
             "cleanup_ghost_variables.end",
             size=db.cursor.rowcount,
             variables=variable_ids_to_delete,
+        )
+
+
+def _delete_variable_from_data_values(variable_id: int) -> None:
+    with open_db() as db:
+        db.cursor.execute(
+            """
+                    DELETE FROM data_values WHERE variableId = %(variable_id)s
+                """,
+            {"variable_id": variable_id},
         )
 
 
