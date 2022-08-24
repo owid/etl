@@ -592,7 +592,9 @@ class GrapherStep(Step):
         # Try to cleanup ghost variables, but make sure to raise an error if they are used
         # in any chart
         cleanup_ghost_variables(
-            dataset_upsert_results.dataset_id, upserted_variable_ids
+            dataset_upsert_results.dataset_id,
+            upserted_variable_ids,
+            workers=GRAPHER_INSERT_WORKERS,
         )
         cleanup_ghost_sources(dataset_upsert_results.dataset_id, upserted_source_ids)
 
