@@ -52,10 +52,7 @@ class VariableUpsertResult:
 
 
 def upsert_dataset(
-    dataset: catalog.Dataset,
-    namespace: str,
-    sources: List[catalog.meta.Source],
-    source_checksum: str,
+    dataset: catalog.Dataset, namespace: str, sources: List[catalog.meta.Source]
 ) -> DatasetUpsertResult:
     assert dataset.metadata.short_name, "Dataset must have a short_name"
     assert dataset.metadata.version, "Dataset must have a version"
@@ -90,7 +87,6 @@ def upsert_dataset(
             dataset.metadata.version,
             namespace,
             int(cast(str, config.GRAPHER_USER_ID)),
-            source_checksum=source_checksum,
             description=dataset.metadata.description or "",
         )
         log.info(
@@ -267,15 +263,15 @@ def fetch_db_checksum(dataset: catalog.Dataset) -> Optional[str]:
         return None if source_checksum is None else source_checksum[0]
 
 
-def set_dataset_checksum_to_null(dataset_id: int) -> None:
+def set_dataset_checksum(dataset_id: int, checksum: str) -> None:
     with open_db() as db:
         db.cursor.execute(
             """
             UPDATE datasets
-            SET sourceChecksum = NULL
+            SET sourceChecksum = %s
             WHERE id=%s
         """,
-            [dataset_id],
+            [checksum, dataset_id],
         )
 
 
