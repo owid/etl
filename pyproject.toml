@@ -71,6 +71,9 @@ plotly = "^5.7.0"
 pywebio = "^1.6.1"
 cookiecutter = "^2.1.1"
 isort = "^5.10.1"
+Sphinx = "^5.1.1"
+sphinx-rtd-theme = "^1.0.0"
+sphinxcontrib-mermaid = "^0.7.1"
 
 [tool.black]
 exclude = ".ipynb_checkpoints|walkthrough/.*_cookiecutter"
