@@ -166,13 +166,13 @@ COLUMNS_METRICS: Dict[str, Dict[str, Any]] = {
     "imr": {
         "name": "infant_mortality_rate",
         "sex": "all",
-        "age": "all",
+        "age": "0",
         "operation": lambda x: (x / 10),
     },
     "q5": {
         "name": "child_mortality_rate",
         "sex": "all",
-        "age": "all",
+        "age": "0-4",
         "operation": lambda x: (x / 10),
     },
 }
