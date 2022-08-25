@@ -5,10 +5,11 @@
 from pathlib import Path
 from typing import Iterable
 
+import pandas as pd
 from owid import catalog
 
 from etl import grapher_helpers as gh
-from etl.paths import DATA_DIR
+from etl.paths import DATA_DIR, STEP_DIR
 
 
 def get_grapher_dataset_from_file_name(file_path: str) -> catalog.Dataset:
@@ -29,15 +30,24 @@ def get_grapher_dataset_from_file_name(file_path: str) -> catalog.Dataset:
     namespace, grapher_version, file_name = Path(file_path).parts[-3:]
     dataset_short_name = file_name.split(".")[0]
 
-    # Find latest garden dataset for current FAOSTAT domain.
-    garden_version = sorted(
-        (DATA_DIR / "garden" / namespace).glob(f"*/{dataset_short_name}")
-    )[-1].parent.name
+    # Path to file containing information of the latest versions of the relevant datasets.
+    latest_versions_file = (
+        STEP_DIR / "grapher" / namespace / grapher_version / "versions.csv"
+    )
 
-    # Load latest garden dataset.
-    dataset = catalog.Dataset(
+    # Load file of versions.
+    latest_versions = pd.read_csv(latest_versions_file).set_index(
+        ["channel", "dataset"]
+    )
+
+    # Path to latest dataset in garden for current FAOSTAT domain.
+    garden_version = latest_versions.loc["garden", dataset_short_name].item()
+    garden_data_dir = (
         DATA_DIR / "garden" / namespace / garden_version / dataset_short_name
     )
+
+    # Load latest garden dataset.
+    dataset = catalog.Dataset(garden_data_dir)
 
     # Adapt dataset metadata to grapher requirements.
     dataset.metadata = gh.adapt_dataset_metadata_for_grapher(dataset.metadata)
