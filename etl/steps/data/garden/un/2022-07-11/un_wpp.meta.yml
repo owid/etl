@@ -38,17 +38,17 @@ tables:
         title: Child dependency ratio
         short_unit: "%"
         unit: Percentage
-        description: The ratio of the population under age x1 (e.g., 0-24) to the number of persons of working age x1-x2 (e.g., 25-64). It is expressed as number of dependants per 100 persons of working age (e.g., 25-64). Data are presented for different age categories.
+        description: The ratio of the population under age 15 (e.g., 0-14) to the number of persons of working age 15-64 (e.g., 15-64). It is expressed as number of dependants per 100 persons of working age (e.g., 25-64). Data are presented for different age categories.
       dependency_ratio_old:
         title: Old-age dependency ratio
         short_unit: "%"
         unit: Percentage
-        description: The ratio of the population aged x2 and over (e.g., 65+) to the number of persons of working age x1-x2 (e.g., 25-64). It is expressed as number of dependants per 100 persons of working age (e.g., 25-64). Data are presented for different age categories.
+        description: The ratio of the population aged 65 and over (e.g., 65+) to the number of persons of working age 15-64 (e.g., 15-64). It is expressed as number of dependants per 100 persons of working age (e.g., 25-64). Data are presented for different age categories.
       dependency_ratio_total:
         title: Total dependency ratio
         short_unit: "%"
         unit: Percentage
-        description: The ratio of the sum of the population under age x1 (e.g., 0-24) and that aged x2 and over (e.g., 65+) to the number of persons of working age x1-x2 (e.g., 25-64). It is expressed as number of dependants per 100 persons of working age (e.g., 25-64). Data are presented for different age categories.
+        description: The ratio of the sum of the population under age 15 (e.g., 0-14) and that aged 65 and over (e.g., 65+) to the number of persons of working age 15-64 (e.g., 15-64). It is expressed as number of dependants per 100 persons of working age (e.g., 25-64). Data are presented for different age categories.
       fertility_rate:
         title: Fertility rate
         short_unit:
