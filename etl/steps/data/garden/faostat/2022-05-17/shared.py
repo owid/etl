@@ -16,7 +16,7 @@ import json
 import sys
 from copy import deepcopy
 from pathlib import Path
-from typing import Dict, List, cast
+from typing import Dict, List, Union, cast
 
 import numpy as np
 import pandas as pd
@@ -25,7 +25,7 @@ from owid import catalog
 from owid.datautils import dataframes, geo
 from tqdm.auto import tqdm
 
-from etl.paths import DATA_DIR
+from etl.paths import DATA_DIR, STEP_DIR
 
 # Initialise log.
 log = structlog.get_logger()
@@ -34,6 +34,10 @@ log = structlog.get_logger()
 NAMESPACE = Path(__file__).parent.parent.name
 VERSION = Path(__file__).parent.name
 
+# Path to file containing information of the latest versions of the relevant datasets.
+LATEST_VERSIONS_FILE = (
+    STEP_DIR / "data" / "garden" / NAMESPACE / VERSION / "versions.csv"
+)
 
 # Elements and items.
 
@@ -331,31 +335,23 @@ FLAGS_RANKING = (
 )
 
 
-# Identified outliers.
-
-# Outliers to remove (data points that are wrong and create artefacts in the charts).
-# For each dictionary, all possible combinations of the field values will be considered
-# (e.g. if two countries are given and three years, all three years will be removed for both countries).
-OUTLIERS_TO_REMOVE = [
-    # China mainland in 1984 has no data for area harvested of Spinach. This causes a big dip in China
-    # (the aggregate of mainland, Hong Kong, Taiwan and Macau), as well as other regions containing China.
-    {
-        # Harmonized country names affected by outliers.
-        "country": [
-            "China (FAO)",
-            "Asia",
-            "Asia (FAO)",
-            "Upper-middle-income countries",
-            "World",
-            "Eastern Asia (FAO)",
-        ],
-        "year": [1984],
-        # Item code for "Spinach".
-        "item_code": ["00000373"],
-        # Element codes for "Area harvested" (total and per-capita) and "Yield".
-        "element_code": ["005312", "5312pc", "005419"],
-    }
-]
+# Amendments to apply to data values.
+# They will only be applied if "value" column is of type "category".
+VALUE_AMENDMENTS = {
+    # Replace values given as upper bounds (e.g. "<0.1") by the average between 0 and that value.
+    "<0.1": "0.05",
+    "<2.5": "1.25",
+    "<0.5": "0.25",
+    # Remove spurious comma values (this could be done simply by .str.replace(",", ""), however, given that it happens
+    # only in a few cases, it seems safer to explicitly correct them here).
+    "1,173.92": "1173.92",
+    "1,688.37": "1688.37",
+    "1,439.14": "1439.14",
+    "1,248.25": "1248.25",
+    "1,775.32": "1775.32",
+    # Replace missing values by nan.
+    "N": np.nan,
+}
 
 # Additional descriptions.
 
@@ -1111,13 +1107,21 @@ def remove_overlapping_data_between_historical_regions_and_successors(
     return data_region
 
 
-def remove_outliers(data: pd.DataFrame) -> pd.DataFrame:
+def remove_outliers(
+    data: pd.DataFrame, outliers: List[Dict[str, List[Union[str, int]]]]
+) -> pd.DataFrame:
     """Remove known outliers (defined in OUTLIERS_TO_REMOVE) from processed data.
+
+    The argument "outliers" is the list of outliers to remove: data points that are wrong and create artefacts in the
+    charts. For each dictionary in the list, all possible combinations of the field values will be considered outliers
+    (e.g. if two countries are given and three years, all three years will be removed for both countries).
 
     Parameters
     ----------
     data : pd.DataFrame
         Processed data (after harmonizing items, elements and countries, and adding regions and per-capita variables).
+    outliers : list
+
 
     Returns
     -------
@@ -1129,10 +1133,12 @@ def remove_outliers(data: pd.DataFrame) -> pd.DataFrame:
 
     # Make a dataframe with all rows that need to be removed from the data.
     rows_to_drop = pd.DataFrame()
-    for outlier in OUTLIERS_TO_REMOVE:
-        # Find all possible combinations of the field values in the outlier dictionary.
+    for outlier in outliers:
+        # Find all possible combinations of the field values in the outlier dictionary (and ignore "notes").
+        _outlier = {key: value for key, value in outlier.items() if key != "notes"}
         _rows_to_drop = pd.DataFrame.from_records(
-            list(itertools.product(*outlier.values())), columns=list(outlier)  # type: ignore
+            list(itertools.product(*_outlier.values())),
+            columns=list(_outlier),
         )
         rows_to_drop = pd.concat(
             [rows_to_drop, _rows_to_drop], ignore_index=True
@@ -1142,7 +1148,7 @@ def remove_outliers(data: pd.DataFrame) -> pd.DataFrame:
     if (len(set(rows_to_drop["item_code"]) & set(data["item_code"])) > 0) & (
         len(set(rows_to_drop["element_code"]) & set(data["element_code"])) > 0
     ):
-        log.info(f"Removing {len(rows_to_drop)} rows of outliers.")
+        log.info(f"Removing {len(rows_to_drop)} rows of known outliers.")
 
         # Get indexes of data that correspond to the rows we want to drop.
         indexes_to_drop = list(
@@ -1482,11 +1488,6 @@ def convert_variables_given_per_capita_to_total_value(
             data[per_capita_mask]["value"] * data[per_capita_mask]["fao_population"]
         )
 
-        elements_converted = list(data[per_capita_mask]["fao_element"].unique())
-        log.info(
-            f"{len(elements_converted)} elements converted from per-capita to total values: {elements_converted}"
-        )
-
         # Include an additional description to all elements that were converted from per capita to total variables.
         if "" not in data["element_description"].cat.categories:
             data["element_description"] = data[
@@ -1595,6 +1596,41 @@ def add_per_capita_variables(
     return data
 
 
+def clean_data_values(values: pd.Series) -> pd.Series:
+    """Fix spurious data values (defined in VALUE_AMENDMENTS) and make values a float column.
+
+    Note: The mapping of VALUE_AMENDMENTS will only be applied if the input series of values is of type "category".
+    At the moment, this fixes issues only in faostat_sdgb dataset.
+
+    Parameters
+    ----------
+    values : pd.Series
+        Content of the "value" column in the original data.
+
+    Returns
+    -------
+    values_clean : pd.Series
+        Original values after fixing known issues and converting to float.
+
+    """
+    values_clean = values.copy()
+    if values_clean.dtype == "category":
+        # Replace spurious values by either nan, or their correct numeric values (defined in VALUE_AMENDMENTS).
+        values_clean = dataframes.map_series(
+            series=values_clean,
+            mapping=VALUE_AMENDMENTS,
+            warn_on_missing_mappings=False,
+            warn_on_unused_mappings=False,
+        )
+
+    # Convert all numbers into numeric.
+    # Note: If this step fails with a ValueError, it may be because other spurious values have been introduced.
+    # If so, add them to the VALUE_AMENDMENTS.
+    values_clean = values_clean.astype(float)
+
+    return values_clean
+
+
 def clean_data(
     data: pd.DataFrame,
     items_metadata: pd.DataFrame,
@@ -1630,15 +1666,8 @@ def clean_data(
     """
     data = data.copy()
 
-    # Ensure column of values is numeric (transform any possible value like "<1" into a nan).
-    # TODO: Dataset faostat_sdgb contains instances of numbers like "<1" or "<2.5" or comma for thousands "1,173.92",
-    #  which they will be converted to nan here. Instead, create a function that properly cleans the values.
-    data["value"] = pd.to_numeric(data["value"], errors="coerce")
-
-    # Ensure column of values is float.
-    # Note: Int64 would also work, but when dividing by a float, it changes to Float64 dtype, which, for some reason,
-    # makes nans undetectable (i.e. .isnull() does not detect nans and .dropna() does not drop nans).
-    data["value"] = data["value"].astype(float)
+    # Fix spurious data values (applying mapping in VALUE_AMENDMENTS) and ensure column of values is float.
+    data["value"] = clean_data_values(data["value"])
 
     # Convert nan flags into "official" (to avoid issues later on when dealing with flags).
     data["flag"] = pd.Series(
@@ -1715,7 +1744,7 @@ def optimize_table_dtypes(table: catalog.Table) -> catalog.Table:
 
     Returns
     -------
-    catalog.Table
+    optimized_table : catalog.Table
         Table with optimized dtypes.
 
     """
@@ -1725,7 +1754,18 @@ def optimize_table_dtypes(table: catalog.Table) -> catalog.Table:
         if c in table.columns
     }
 
-    return catalog.frames.repack_frame(table, dtypes=dtypes)
+    # Store variables metadata before optimizing table dtypes (otherwise they will be lost).
+    variables_metadata = {
+        variable: table[variable].metadata for variable in table.columns
+    }
+
+    optimized_table = catalog.frames.repack_frame(table, dtypes=dtypes)
+
+    # Recover variable metadata (that was lost when optimizing table dtypes).
+    for variable in variables_metadata:
+        optimized_table[variable].metadata = variables_metadata[variable]
+
+    return optimized_table
 
 
 def prepare_long_table(data: pd.DataFrame) -> catalog.Table:
@@ -1754,10 +1794,69 @@ def prepare_long_table(data: pd.DataFrame) -> catalog.Table:
         index_columns, verify_integrity=True
     ).sort_index()
 
+    # Sanity check.
+    number_of_infinities = len(data_table_long[data_table_long["value"] == np.inf])
+    assert (
+        number_of_infinities == 0
+    ), f"There are {number_of_infinities} infinity values in the long table."
+
     return cast(catalog.Table, data_table_long)
 
 
-def prepare_wide_table(data: pd.DataFrame, dataset_title: str) -> catalog.Table:
+def create_variable_short_names(variable_name: str) -> str:
+    """Create lower-snake-case short names for the columns in the wide (flatten) output table, ensuring that they are
+    not too long (to avoid issues when inserting variable in grapher).
+
+    If a new name is too long, the ending of the item name will be reduced.
+    If the item name is not long enough to solve the problem, this function will raise an assertion error.
+
+    Parameters
+    ----------
+    variable_name : str
+        Variable name.
+
+    Returns
+    -------
+    new_name : str
+        New variable name.
+
+    """
+    # Extract all the necessary fields from the variable name.
+    item, item_code, element, element_code, unit = variable_name.replace(
+        "||", "|"
+    ).split(" | ")
+
+    # Check that the extraction was correct by constructing the variable name again and comparing with the original.
+    assert (
+        variable_name == f"{item} | {item_code} || {element} | {element_code} || {unit}"
+    )
+
+    new_name = catalog.utils.underscore(variable_name)
+
+    # Check that the number of characters of the short name is not too long.
+    n_char = len(new_name)
+    if n_char > 255:
+        # This name will cause an issue when uploading to grapher (because of a limit of 255 characters in short name).
+        # Remove the extra characters from the ending of the item name (if possible).
+        n_char_to_be_removed = n_char - 255
+        # It could happen that it is not the item name that is long, but the element name, dataset, or unit.
+        # But for the moment, assume it is the item name.
+        assert (
+            len(item) > n_char_to_be_removed
+        ), "Variable name is too long, but it is not due to item name."
+        new_item = catalog.utils.underscore(item)[0:-n_char_to_be_removed]
+        new_name = catalog.utils.underscore(
+            f"{new_item} | {item_code} || {element} | {element_code} || {unit}"
+        )
+
+    # Check that now the new name now fulfils the length requirement.
+    error = "Variable short name is too long. Improve create_variable_names function to account for this case."
+    assert len(new_name) <= 255, error
+
+    return cast(str, new_name)
+
+
+def prepare_wide_table(data: pd.DataFrame) -> catalog.Table:
     """Flatten a long table to obtain a wide table with ["country", "year"] as index.
 
     The input table will be pivoted to have [country, year] as index, and as many columns as combinations of
@@ -1767,8 +1866,6 @@ def prepare_wide_table(data: pd.DataFrame, dataset_title: str) -> catalog.Table:
     ----------
     data : pd.DataFrame
         Data for current domain.
-    dataset_title : str
-        Title for the dataset of current domain (only needed to include it in the name of the new variables).
 
     Returns
     -------
@@ -1786,9 +1883,11 @@ def prepare_wide_table(data: pd.DataFrame, dataset_title: str) -> catalog.Table:
     # This will be used as column names (which will then be formatted properly with underscores and lower case),
     # and also as the variable titles in grapher.
     # Also, for convenience, keep a similar structure as in the previous OWID dataset release.
+    # Finally, ensure that the short name version of the variable is not too long
+    # (which would cause issues when uploading to grapher).
     data["variable_name"] = dataframes.apply_on_categoricals(
         [data.item, data.item_code, data.element, data.element_code, data.unit],
-        lambda item, item_code, element, element_code, unit: f"{dataset_title} || {item} | {item_code} || {element} | {element_code} || {unit}",
+        lambda item, item_code, element, element_code, unit: f"{item} | {item_code} || {element} | {element_code} || {unit}",
     )
 
     # Construct a human-readable variable display name (which will be shown in grapher charts).
@@ -1862,7 +1961,22 @@ def prepare_wide_table(data: pd.DataFrame, dataset_title: str) -> catalog.Table:
     wide_table = wide_table.sort_index(level=["country", "year"]).sort_index()
 
     # Make all column names snake_case.
-    wide_table = catalog.utils.underscore_table(wide_table)
+    variable_to_short_name = {
+        column: create_variable_short_names(
+            variable_name=wide_table[column].metadata.title
+        )
+        for column in wide_table.columns
+        if wide_table[column].metadata.title is not None
+    }
+    wide_table = wide_table.rename(columns=variable_to_short_name, errors="raise")
+
+    # Sanity check.
+    number_of_infinities = np.isinf(
+        wide_table.select_dtypes(include=np.number).fillna(0)
+    ).values.sum()
+    assert (
+        number_of_infinities == 0
+    ), f"There are {number_of_infinities} infinity values in the wide table."
 
     return wide_table
 
@@ -1886,23 +2000,31 @@ def run(dest_dir: str) -> None:
 
     # Assume dest_dir is a path to the step to be run, e.g. "faostat_qcl", and get the dataset short name from it.
     dataset_short_name = Path(dest_dir).name
-    # Path to latest dataset in meadow for current FAOSTAT domain.
-    meadow_data_dir = (
-        sorted((DATA_DIR / "meadow" / NAMESPACE).glob(f"*/{dataset_short_name}"))[
-            -1
-        ].parent
-        / dataset_short_name
-    )
     # Path to dataset of FAOSTAT metadata.
     garden_metadata_dir = (
         DATA_DIR / "garden" / NAMESPACE / VERSION / f"{NAMESPACE}_metadata"
+    )
+
+    # Path to outliers file.
+    outliers_file = (
+        STEP_DIR / "data" / "garden" / NAMESPACE / VERSION / "detected_outliers.json"
     )
 
     ####################################################################################################################
     # Load data.
     ####################################################################################################################
 
-    # Load meadow dataset and keep its metadata.
+    # Load file of versions.
+    latest_versions = pd.read_csv(LATEST_VERSIONS_FILE).set_index(
+        ["channel", "dataset"]
+    )
+
+    # Path to latest dataset in meadow for current FAOSTAT domain.
+    meadow_version = latest_versions.loc["meadow", dataset_short_name].item()
+    meadow_data_dir = (
+        DATA_DIR / "meadow" / NAMESPACE / meadow_version / dataset_short_name
+    )
+    # Load latest meadow dataset and keep its metadata.
     dataset_meadow = catalog.Dataset(meadow_data_dir)
     # Load main table from dataset.
     data_table_meadow = dataset_meadow[dataset_short_name]
@@ -1925,6 +2047,10 @@ def run(dest_dir: str) -> None:
         elements_metadata["dataset"] == dataset_short_name
     ].reset_index(drop=True)
     countries_metadata = pd.DataFrame(metadata["countries"]).reset_index()
+
+    # Load file of detected outliers.
+    with open(outliers_file, "r") as _json_file:
+        outliers = json.loads(_json_file.read())
 
     ####################################################################################################################
     # Process data.
@@ -1949,15 +2075,13 @@ def run(dest_dir: str) -> None:
     data = add_per_capita_variables(data=data, elements_metadata=elements_metadata)
 
     # Remove outliers (this step needs to happen after creating regions and per capita variables).
-    data = remove_outliers(data)
+    data = remove_outliers(data, outliers=outliers)
 
     # Create a long table (with item code and element code as part of the index).
     data_table_long = prepare_long_table(data=data)
 
     # Create a wide table (with only country and year as index).
-    data_table_wide = prepare_wide_table(
-        data=data, dataset_title=datasets_metadata["owid_dataset_title"].item()
-    )
+    data_table_wide = prepare_wide_table(data=data)
 
     ####################################################################################################################
     # Save outputs.

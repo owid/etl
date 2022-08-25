@@ -15,6 +15,7 @@ update.
 
 """
 
+import json
 from copy import deepcopy
 from typing import cast
 
@@ -22,11 +23,9 @@ import pandas as pd
 from owid import catalog
 from owid.catalog.meta import DatasetMeta, TableMeta
 from owid.datautils import dataframes
-
-from etl.paths import DATA_DIR
-
-from .shared import (
+from shared import (
     ADDED_TITLE_TO_WIDE_TABLE,
+    LATEST_VERSIONS_FILE,
     NAMESPACE,
     VERSION,
     add_per_capita_variables,
@@ -39,6 +38,8 @@ from .shared import (
     prepare_wide_table,
     remove_outliers,
 )
+
+from etl.paths import DATA_DIR, STEP_DIR
 
 # Dataset name.
 DATASET_SHORT_NAME = f"{NAMESPACE}_fbsc"
@@ -132,19 +133,25 @@ def run(dest_dir: str) -> None:
     # Common definitions.
     ####################################################################################################################
 
+    # Load file of versions.
+    latest_versions = pd.read_csv(LATEST_VERSIONS_FILE).set_index(
+        ["channel", "dataset"]
+    )
+
     # Find path to latest versions of fbsh dataset.
-    fbsh_version = sorted((DATA_DIR / "meadow" / NAMESPACE).glob("*/faostat_fbsh"))[
-        -1
-    ].parent.name
+    fbsh_version = latest_versions.loc["meadow", "faostat_fbsh"].item()
     fbsh_file = DATA_DIR / "meadow" / NAMESPACE / fbsh_version / "faostat_fbsh"
     # Find path to latest versions of fbs dataset.
-    fbs_version = sorted((DATA_DIR / "meadow" / NAMESPACE).glob("*/faostat_fbs"))[
-        -1
-    ].parent.name
+    fbs_version = latest_versions.loc["meadow", "faostat_fbs"].item()
     fbs_file = DATA_DIR / "meadow" / NAMESPACE / fbs_version / "faostat_fbs"
     # Path to dataset of FAOSTAT metadata.
     garden_metadata_dir = (
         DATA_DIR / "garden" / NAMESPACE / VERSION / f"{NAMESPACE}_metadata"
+    )
+
+    # Path to outliers file.
+    outliers_file = (
+        STEP_DIR / "data" / "garden" / NAMESPACE / VERSION / "detected_outliers.json"
     )
 
     ####################################################################################################################
@@ -173,6 +180,10 @@ def run(dest_dir: str) -> None:
         elements_metadata["dataset"] == DATASET_SHORT_NAME
     ].reset_index(drop=True)
     countries_metadata = pd.DataFrame(metadata["countries"]).reset_index()
+
+    # Load file of detected outliers.
+    with open(outliers_file, "r") as _json_file:
+        outliers = json.loads(_json_file.read())
 
     ####################################################################################################################
     # Process data.
@@ -203,7 +214,7 @@ def run(dest_dir: str) -> None:
     data = add_per_capita_variables(data=data, elements_metadata=elements_metadata)
 
     # Remove outliers from data.
-    data = remove_outliers(data)
+    data = remove_outliers(data, outliers=outliers)
 
     # Avoid objects as they would explode memory, use categoricals instead.
     for col in data.columns:
@@ -219,9 +230,7 @@ def run(dest_dir: str) -> None:
 
     # Create a wide table (with only country and year as index).
     log.info("faostat_fbsc.prepare_wide_table", shape=data.shape)
-    data_table_wide = prepare_wide_table(
-        data=data, dataset_title=datasets_metadata["owid_dataset_title"].item()
-    )
+    data_table_wide = prepare_wide_table(data=data)
 
     ####################################################################################################################
     # Prepare outputs.

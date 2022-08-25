@@ -1,13 +1,15 @@
 """Common grapher step for all FAOSTAT domains.
 
 """
+
 from pathlib import Path
 from typing import Iterable
 
+import pandas as pd
 from owid import catalog
 
 from etl import grapher_helpers as gh
-from etl.paths import DATA_DIR
+from etl.paths import DATA_DIR, STEP_DIR
 
 
 def get_grapher_dataset_from_file_name(file_path: str) -> catalog.Dataset:
@@ -28,25 +30,33 @@ def get_grapher_dataset_from_file_name(file_path: str) -> catalog.Dataset:
     namespace, grapher_version, file_name = Path(file_path).parts[-3:]
     dataset_short_name = file_name.split(".")[0]
 
-    # Find latest garden dataset for current FAOSTAT domain.
-    garden_version = sorted(
-        (DATA_DIR / "garden" / namespace).glob(f"*/{dataset_short_name}")
-    )[-1].parent.name
+    # Path to file containing information of the latest versions of the relevant datasets.
+    latest_versions_file = (
+        STEP_DIR / "grapher" / namespace / grapher_version / "versions.csv"
+    )
 
-    # Load latest garden dataset.
-    dataset = catalog.Dataset(
+    # Load file of versions.
+    latest_versions = pd.read_csv(latest_versions_file).set_index(
+        ["channel", "dataset"]
+    )
+
+    # Path to latest dataset in garden for current FAOSTAT domain.
+    garden_version = latest_versions.loc["garden", dataset_short_name].item()
+    garden_data_dir = (
         DATA_DIR / "garden" / namespace / garden_version / dataset_short_name
     )
 
-    # Short name for new grapher dataset.
-    dataset.metadata.short_name = f"{dataset_short_name}__{grapher_version}".replace(
-        "-", "_"
-    )
+    # Load latest garden dataset.
+    dataset = catalog.Dataset(garden_data_dir)
 
-    # move description to source as that is what is shown in grapher
-    # (dataset.description would be displayed under `Internal notes` in the admin UI otherwise)
-    dataset.metadata.sources[0].description = dataset.metadata.description
-    dataset.metadata.description = ""
+    # Adapt dataset metadata to grapher requirements.
+    dataset.metadata = gh.adapt_dataset_metadata_for_grapher(dataset.metadata)
+
+    # Some datasets have " - FAO (YYYY)" at the end, and some others do not.
+    # For consistency, remove that ending of the title, and add something consistent across all datasets.
+    dataset.metadata.title = (
+        dataset.metadata.title.split(" - FAO (")[0] + f" (FAO, {grapher_version})"
+    )
 
     return dataset
 
@@ -75,9 +85,7 @@ def get_grapher_tables(dataset: catalog.Dataset) -> Iterable[catalog.Table]:
     assert len(flat_table_names) == 1
     table = dataset[flat_table_names[0]].reset_index().drop(columns=["area_code"])
 
-    # Convert country names into grapher entity ids, and set index appropriately.
-    # WARNING: This will create new entities in grapher if not already existing.
-    table["entity_id"] = gh.country_to_entity_id(table["country"], create_entities=True)
-    table = table.set_index(["entity_id", "year"]).drop(columns=["country"])
+    # Adapt table to grapher requirements.
+    table = gh.adapt_table_for_grapher(table=table)
 
     yield from gh.yield_wide_table(table, na_action="drop")

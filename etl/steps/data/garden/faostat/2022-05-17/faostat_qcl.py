@@ -1,16 +1,16 @@
 """FAOSTAT garden step for faostat_qcl dataset."""
 
+import json
 from copy import deepcopy
 
+import numpy as np
 import pandas as pd
 from owid import catalog
 from owid.datautils import dataframes
-
-from etl.paths import DATA_DIR
-
-from .shared import (
+from shared import (
     ADDED_TITLE_TO_WIDE_TABLE,
     FLAG_MULTIPLE_FLAGS,
+    LATEST_VERSIONS_FILE,
     NAMESPACE,
     REGIONS_TO_ADD,
     VERSION,
@@ -23,6 +23,8 @@ from .shared import (
     prepare_wide_table,
     remove_outliers,
 )
+
+from etl.paths import DATA_DIR, STEP_DIR
 
 
 def add_slaughtered_animals_to_meat_total(data: pd.DataFrame) -> pd.DataFrame:
@@ -269,6 +271,9 @@ def add_yield_to_aggregate_regions(data: pd.DataFrame) -> pd.DataFrame:
 
     combined["value"] = combined["value_production"] / combined["value_area"]
 
+    # Replace infinities (caused by dividing by zero) by nan.
+    combined["value"] = combined["value"].replace(np.inf, np.nan)
+
     # If both fields have the same flag, use that, otherwise use the flag of multiple flags.
     combined["flag"] = [
         flag_production if flag_production == flag_area else FLAG_MULTIPLE_FLAGS
@@ -318,18 +323,26 @@ def run(dest_dir: str) -> None:
     # Common definitions.
     ####################################################################################################################
 
+    # Load file of versions.
+    latest_versions = pd.read_csv(LATEST_VERSIONS_FILE).set_index(
+        ["channel", "dataset"]
+    )
+
     # Dataset short name.
     dataset_short_name = f"{NAMESPACE}_qcl"
     # Path to latest dataset in meadow for current FAOSTAT domain.
+    meadow_version = latest_versions.loc["meadow", dataset_short_name].item()
     meadow_data_dir = (
-        sorted((DATA_DIR / "meadow" / NAMESPACE).glob(f"*/{dataset_short_name}"))[
-            -1
-        ].parent
-        / dataset_short_name
+        DATA_DIR / "meadow" / NAMESPACE / meadow_version / dataset_short_name
     )
     # Path to dataset of FAOSTAT metadata.
     garden_metadata_dir = (
         DATA_DIR / "garden" / NAMESPACE / VERSION / f"{NAMESPACE}_metadata"
+    )
+
+    # Path to outliers file.
+    outliers_file = (
+        STEP_DIR / "data" / "garden" / NAMESPACE / VERSION / "detected_outliers.json"
     )
 
     ####################################################################################################################
@@ -360,6 +373,10 @@ def run(dest_dir: str) -> None:
     ].reset_index(drop=True)
     countries_metadata = pd.DataFrame(metadata["countries"]).reset_index()
 
+    # Load file of detected outliers.
+    with open(outliers_file, "r") as _json_file:
+        outliers = json.loads(_json_file.read())
+
     ####################################################################################################################
     # Process data.
     ####################################################################################################################
@@ -389,15 +406,13 @@ def run(dest_dir: str) -> None:
     data = add_yield_to_aggregate_regions(data)
 
     # Remove outliers from data.
-    data = remove_outliers(data)
+    data = remove_outliers(data, outliers=outliers)
 
     # Create a long table (with item code and element code as part of the index).
     data_table_long = prepare_long_table(data=data)
 
     # Create a wide table (with only country and year as index).
-    data_table_wide = prepare_wide_table(
-        data=data, dataset_title=datasets_metadata["owid_dataset_title"].item()
-    )
+    data_table_wide = prepare_wide_table(data=data)
 
     ####################################################################################################################
     # Save outputs.
