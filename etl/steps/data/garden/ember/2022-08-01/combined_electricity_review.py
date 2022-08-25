@@ -5,9 +5,9 @@
 import pandas as pd
 from owid import catalog
 from owid.datautils import dataframes
+from shared import CURRENT_DIR
 
 from etl.paths import DATA_DIR
-from shared import CURRENT_DIR
 
 # Details for dataset to export.
 DATASET_SHORT_NAME = "combined_electricity_review"

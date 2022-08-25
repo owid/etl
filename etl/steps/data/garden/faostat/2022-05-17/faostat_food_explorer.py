@@ -12,11 +12,12 @@ from copy import deepcopy
 from typing import cast
 
 import pandas as pd
+from owid import catalog
+from owid.catalog.meta import DatasetMeta
 from owid.datautils import dataframes, geo
 
 from etl.paths import DATA_DIR
-from owid import catalog
-from owid.catalog.meta import DatasetMeta
+
 from .shared import NAMESPACE, VERSION
 
 # Dataset name and title.

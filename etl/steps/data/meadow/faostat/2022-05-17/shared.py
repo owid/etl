@@ -9,10 +9,10 @@ from pathlib import Path
 
 import pandas as pd
 import structlog
-
-from etl.steps.data.converters import convert_walden_metadata
 from owid.catalog import Dataset, Table, utils
 from owid.walden import Catalog
+
+from etl.steps.data.converters import convert_walden_metadata
 
 # Initialise log.
 log = structlog.get_logger()

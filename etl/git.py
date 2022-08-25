@@ -14,7 +14,6 @@ from typing import Any, cast
 import requests
 import sh
 
-
 CACHE_DIR = Path("~/.owid/git")
 
 

@@ -10,11 +10,12 @@ manually. This script is a CLI tool that may help in either scenario.
 
 import json
 import os
-from typing import Callable, Any
+from typing import Any, Callable
 
 import click
 import pandas as pd
 from fuzzywuzzy import fuzz
+
 from etl.db import get_connection, get_dataset_id, get_variables_in_dataset
 
 # True to skip variables that are identical in old and new datasets, when running comparison.

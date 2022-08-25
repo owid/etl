@@ -4,6 +4,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Literal, Optional, Set, cast
 
+import numpy as np
 import pandas as pd
 import slugify
 import structlog
@@ -149,12 +150,11 @@ def yield_wide_table(
                 table_to_yield[column].metadata.unit is not None
             ), f"Unit for column {column} should not be None here!"
 
+            # Select only one column and dimensions for performance
+            tab = table_to_yield[[column]]
+
             # Drop NA values
-            tab = (
-                table_to_yield.dropna(subset=[column])
-                if na_action == "drop"
-                else table_to_yield
-            )
+            tab = tab.dropna() if na_action == "drop" else table_to_yield
 
             # Create underscored name of a new column from the combination of column and dimensions
             short_name = _slugify_column_and_dimensions(column, dims, dim_names)
@@ -179,6 +179,7 @@ def yield_wide_table(
                 title=title_with_dims,
             )
 
+            # Keep only entity_id and year in index
             yield tab.reset_index().set_index(["entity_id", "year"])[[short_name]]
 
 
@@ -499,3 +500,8 @@ class IntRange:
 
     def to_values(self) -> list[int]:
         return [self.min, self.max]
+
+
+def contains_inf(s: pd.Series) -> bool:
+    """Check if a series contains infinity."""
+    return pd.api.types.is_numeric_dtype(s.dtype) and np.isinf(s).any()  # type: ignore

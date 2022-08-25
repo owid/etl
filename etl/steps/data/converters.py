@@ -2,12 +2,13 @@
 #  converters.py
 #
 
+from owid.catalog import DatasetMeta, License, Source, VariableMeta
 from owid.walden import Dataset as WaldenDataset
-from owid.catalog import DatasetMeta, Source, License, VariableMeta
+
 from etl.grapher_model import (
     GrapherDatasetModel,
-    GrapherVariableModel,
     GrapherSourceModel,
+    GrapherVariableModel,
 )
 
 

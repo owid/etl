@@ -7,6 +7,7 @@ Test components of the etl command-line tool.
 """
 
 import time
+
 import pytest
 
 from etl import command as cmd

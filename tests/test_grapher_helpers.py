@@ -1,8 +1,9 @@
+import numpy as np
 import pandas as pd
 import pytest
+from owid.catalog import DatasetMeta, Source, Table, TableMeta, VariableMeta
 
-from owid.catalog import Table, VariableMeta, TableMeta, DatasetMeta, Source
-from etl.grapher_helpers import yield_wide_table, yield_long_table
+from etl.grapher_helpers import contains_inf, yield_long_table, yield_wide_table
 
 
 def test_yield_wide_table():
@@ -98,3 +99,11 @@ def test_yield_long_table_with_dimensions_error():
     table = Table(long)  # no metadata with sources
     with pytest.raises(AssertionError):
         _ = list(yield_long_table(table, dim_titles=["Sex"]))
+
+
+def test_contains_inf():
+    assert contains_inf(pd.Series([1, np.inf]))
+    assert not contains_inf(pd.Series([1, 2]))
+    assert not contains_inf(pd.Series(["a", 2]))
+    assert not contains_inf(pd.Series(["a", "b"]))
+    assert not contains_inf(pd.Series(["a", "b"]).astype("category"))

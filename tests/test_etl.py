@@ -9,7 +9,7 @@ from pathlib import Path
 from typing import List, Union
 
 from etl import paths
-from etl.steps import load_dag, compile_steps, WaldenStep, DataStep, Step
+from etl.steps import DataStep, Step, WaldenStep, compile_steps, load_dag
 
 
 def test_all_walden_deps_exist():

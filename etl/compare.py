@@ -3,14 +3,16 @@
 #
 
 from pathlib import Path
+from typing import cast
+
 import click
+import pandas as pd
+from owid import catalog
+from rich import print
 from rich_click.rich_command import RichCommand
 from rich_click.rich_group import RichGroup
-from rich import print
-from typing import cast
-import pandas as pd
+
 from etl import tempcompare
-from owid import catalog
 
 
 @click.group(cls=RichGroup)

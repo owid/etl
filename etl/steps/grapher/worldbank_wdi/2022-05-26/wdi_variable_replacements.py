@@ -23,12 +23,13 @@ Usage:
 import json
 from pathlib import Path
 
-import structlog
 import pandas as pd
-
+import structlog
 from owid.catalog import Dataset
-from etl.paths import DATA_DIR
+
 from etl.db import get_connection
+from etl.paths import DATA_DIR
+
 from .wdi import VariableMatcher
 
 log = structlog.get_logger()

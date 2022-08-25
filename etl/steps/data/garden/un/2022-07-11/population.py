@@ -1,7 +1,8 @@
 """Population table."""
-import pandas as pd
+from typing import Any, Dict, List, Tuple
+
 import numpy as np
-from typing import Dict, Tuple, List, Any
+import pandas as pd
 
 from .dtypes import optimize_dtypes
 

@@ -34,7 +34,7 @@ from etl.grapher_import import (
     cleanup_ghost_sources,
     cleanup_ghost_variables,
     fetch_db_checksum,
-    set_dataset_checksum_to_null,
+    set_dataset_checksum,
     upsert_dataset,
     upsert_table,
 )
@@ -43,7 +43,7 @@ from etl.helpers import get_etag
 Graph = Dict[str, Set[str]]
 DAG = Dict[str, Any]
 
-GRAPHER_INSERT_WORKERS = int(os.environ.get("GRAPHER_INSERT_WORKERS", 20))
+GRAPHER_INSERT_WORKERS = int(os.environ.get("GRAPHER_INSERT_WORKERS", 10))
 
 
 def compile_steps(
@@ -568,24 +568,19 @@ class GrapherStep(Step):
             dataset,
             dataset.metadata.namespace,
             dataset.metadata.sources,
-            self.checksum_input(),
         )
-        try:
-            # insert data in parallel, this speeds it up considerably and is even faster than loading
-            # data with LOAD DATA INFILE
-            with concurrent.futures.ThreadPoolExecutor(
-                max_workers=GRAPHER_INSERT_WORKERS
-            ) as executor:
-                variable_upsert_results = executor.map(
+
+        # insert data in parallel, this speeds it up considerably and is even faster than loading
+        # data with LOAD DATA INFILE
+        with concurrent.futures.ThreadPoolExecutor(
+            max_workers=GRAPHER_INSERT_WORKERS
+        ) as executor:
+            variable_upsert_results = list(
+                executor.map(
                     lambda table: upsert_table(table, dataset_upsert_results),
                     step_module.get_grapher_tables(dataset),  # type: ignore
                 )
-
-        except Exception as e:
-            # dataset has been already inserted into DB with checksum, make it null again so that the
-            # step remains dirty
-            set_dataset_checksum_to_null(dataset_upsert_results.dataset_id)
-            raise e
+            )
 
         # Cleanup all ghost variables and sources that weren't upserted
         # NOTE: we can't just remove all dataset variables before starting this step because
@@ -597,9 +592,14 @@ class GrapherStep(Step):
         # Try to cleanup ghost variables, but make sure to raise an error if they are used
         # in any chart
         cleanup_ghost_variables(
-            dataset_upsert_results.dataset_id, upserted_variable_ids
+            dataset_upsert_results.dataset_id,
+            upserted_variable_ids,
+            workers=GRAPHER_INSERT_WORKERS,
         )
         cleanup_ghost_sources(dataset_upsert_results.dataset_id, upserted_source_ids)
+
+        # set checksum after all data got inserted
+        set_dataset_checksum(dataset_upsert_results.dataset_id, self.checksum_input())
 
     def _get_step_module(self) -> types.ModuleType:
         module_path = self.path.lstrip("/").replace("/", ".")

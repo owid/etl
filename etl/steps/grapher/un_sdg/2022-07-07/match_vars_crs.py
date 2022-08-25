@@ -1,6 +1,7 @@
-from etl.chart_revision_suggester import ChartRevisionSuggester
-from etl import match_variables_from_two_versions_of_a_dataset
 from pathlib import Path
+
+from etl import match_variables_from_two_versions_of_a_dataset
+from etl.chart_revision_suggester import ChartRevisionSuggester
 
 VERSION = Path(__file__).parent.stem
 FNAME = Path(__file__).stem

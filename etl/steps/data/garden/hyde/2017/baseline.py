@@ -4,11 +4,12 @@
 #  Harmonize countries in the Hyde baseline.
 #
 
+import json
 from pathlib import Path
 from typing import Dict, cast
-import json
 
 from owid.catalog import Dataset
+
 from etl.paths import DATA_DIR
 
 MAPPING_FILE = Path(__file__).with_suffix(".mapping.json")

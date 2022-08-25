@@ -1,12 +1,13 @@
-import pandas as pd
-import structlog
 import copy
+from collections import defaultdict
 from pathlib import Path
 from typing import List, Optional
-from collections import defaultdict
 
+import pandas as pd
+import structlog
 from owid.catalog import Dataset, Table, Variable
 from owid.catalog.utils import concat_variables
+
 from etl.paths import DATA_DIR
 
 log = structlog.get_logger(__name__)

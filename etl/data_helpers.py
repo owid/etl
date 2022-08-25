@@ -2,8 +2,8 @@ import json
 from typing import cast
 
 import pandas as pd
-
 from owid.catalog import Dataset
+
 from etl.paths import REFERENCE_DATASET
 
 

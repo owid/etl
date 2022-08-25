@@ -4,10 +4,10 @@
 
 import numpy as np
 import pandas as pd
-
-from etl.paths import DATA_DIR
 from owid import catalog
 from shared import CURRENT_DIR, add_population
+
+from etl.paths import DATA_DIR
 
 # Namespace, dataset short name, and version of the garden dataset of the BP statistical review.
 STAT_REVIEW_NAMESPACE = "bp"

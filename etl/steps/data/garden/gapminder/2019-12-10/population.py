@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Dict, cast
 
 from owid.catalog import Dataset
+
 from etl.paths import DATA_DIR
 
 MAPPING_FILE = Path(__file__).with_suffix(".mapping.json")

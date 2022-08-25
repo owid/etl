@@ -1,13 +1,14 @@
-import pandas as pd
-import numpy as np
 import json
-from structlog import get_logger
 from pathlib import Path
-from typing import Tuple, List, Any, Dict
-from owid.catalog.utils import underscore
+from typing import Any, Dict, List, Tuple
 
-from owid.walden import Catalog
+import numpy as np
+import pandas as pd
 from owid.catalog import Dataset, Table
+from owid.catalog.utils import underscore
+from owid.walden import Catalog
+from structlog import get_logger
+
 from etl.paths import DATA_DIR
 
 COUNTRY_MAPPING_PATH = Path(__file__).parent / "un_sdg.country_mapping.json"

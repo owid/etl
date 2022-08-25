@@ -5,8 +5,6 @@
 import pandas as pd
 from owid import catalog
 from owid.datautils import geo
-
-from etl.paths import DATA_DIR
 from shared import (
     CURRENT_DIR,
     OVERLAPPING_DATA_TO_REMOVE_IN_AGGREGATES,
@@ -15,6 +13,8 @@ from shared import (
     add_region_aggregates,
     log,
 )
+
+from etl.paths import DATA_DIR
 
 # Details for dataset to export.
 DATASET_SHORT_NAME = "global_electricity_review"
