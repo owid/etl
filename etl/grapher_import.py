@@ -15,7 +15,6 @@ import os
 from dataclasses import dataclass
 from typing import Dict, List, Optional, cast
 
-import numpy as np
 import pandas as pd
 import structlog
 from owid import catalog
@@ -26,6 +25,8 @@ from tenacity import retry, stop
 from etl import config
 from etl.db import get_engine, open_db
 from etl.db_utils import DBUtils
+
+from . import grapher_helpers as gh
 
 log = structlog.get_logger()
 
@@ -174,10 +175,8 @@ def upsert_table(
             " join multiple sources"
         )
 
-    # make sure there are no inf values
-    assert (
-        pd.api.types.is_numeric_dtype(table.dtypes[0])
-        and not np.isinf(table.iloc[:, 0]).any()
+    assert not gh.contains_inf(
+        table.iloc[:, 0]
     ), f"Column `{table.columns[0]}` has inf values"
 
     _update_variables_display(table)

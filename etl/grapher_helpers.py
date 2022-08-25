@@ -4,6 +4,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Literal, Optional, Set, cast
 
+import numpy as np
 import pandas as pd
 import slugify
 import structlog
@@ -499,3 +500,8 @@ class IntRange:
 
     def to_values(self) -> list[int]:
         return [self.min, self.max]
+
+
+def contains_inf(s: pd.Series) -> bool:
+    """Check if a series contains infinity."""
+    return pd.api.types.is_numeric_dtype(s.dtype) and np.isinf(s).any()  # type: ignore
