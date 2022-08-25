@@ -57,6 +57,7 @@ ADDITIONAL_FILES_TO_COPY = [
     "custom_datasets.csv",
     "custom_elements_and_units.csv",
     "custom_items.csv",
+    "detected_outliers.json",
 ]
 # Note: Further custom rules are applied to the list of steps to run.
 # These rules are defined in apply_custom_rules_to_list_of_steps_to_run.
@@ -169,6 +170,8 @@ def get_version_from_dag_line(
     matches = re.findall(regex_version_pattern, dag_line)
     if len(matches) == 1:
         version = matches[0]
+    elif "latest" in dag_line:
+        version = "latest"
     else:
         raise ValueError("dag line not understood")
 
@@ -795,6 +798,58 @@ def apply_custom_rules_to_list_of_steps_to_create(
     return step_names
 
 
+def create_file_with_latest_versions(dag_steps: Dict[str, Set[str]]) -> None:
+    """Create a csv file in the new version folder, that keeps track of all relevant channel-dataset-versions for the
+    current update.
+
+    This file of versions is necessary because, in the future, when running old steps, they shouldn't simply load the
+    latest versions; they should load the version that was latest when the step was created. Otherwise, old steps would
+    always load the latest datasets and we would not be able to recreate the old data.
+
+    Parameters
+    ----------
+    dag_steps : dict
+        New steps (and their dependencies) to be added to the dag, as returned by function
+        create_updated_dependency_graph.
+
+    """
+    # Get the channel for the new steps and check that all new steps belong to the same channel.
+    step_channels = list(set([get_channel_from_dag_line(step) for step in dag_steps]))
+    assert len(step_channels) == 1
+    channel = step_channels[0]
+
+    # Path to folder containing steps in this channel.
+    versions_dir = get_path_to_step_files(channel=channel)
+    # Path to folder that will contain the file with latest step versions.
+    new_version_dir = versions_dir / NEW_VERSION
+    # File with latest step versions.
+    latest_versions_file = new_version_dir / "versions.csv"
+
+    # Extract the latest versions of steps from the dag of new dependencies.
+    steps: Dict[str, List[str]] = {"channel": [], "dataset": [], "version": []}
+    for step in dag_steps:
+        steps["dataset"].append(get_dataset_name_from_dag_line(step))
+        steps["channel"].append(channel)
+        steps["version"].append(get_version_from_dag_line(step))
+        dependencies = list(dag_steps[step])
+        for dependency in dependencies:
+            steps["dataset"].append(get_dataset_name_from_dag_line(dependency))
+            steps["channel"].append(get_channel_from_dag_line(dependency))
+            steps["version"].append(get_version_from_dag_line(dependency))
+
+    # Create a dataframe, remove rows that have the same step (with identical version), then verify that
+    # there are no different versions for a given channel-dataset, and sort conveniently.
+    step_versions = (
+        pd.DataFrame(steps)
+        .drop_duplicates()
+        .set_index(["channel", "dataset"], verify_integrity=True)
+        .sort_index()
+    )
+
+    # Save dataframe to file.
+    step_versions.to_csv(latest_versions_file)
+
+
 def main(channel: str, include_all_datasets: bool = False) -> None:
     if include_all_datasets:
         # List all datasets, even if their source data was not updated.
@@ -818,6 +873,9 @@ def main(channel: str, include_all_datasets: bool = False) -> None:
             step_names=step_names,
             additional_dependencies=ADDITIONAL_DEPENDENCIES,
         )
+
+        # For each new line in the dag, extract the channel, dataset name, and version, and write it to a file.
+        create_file_with_latest_versions(dag_steps=dag_steps)
 
         # Update dag file with new dependencies.
         header_line = f"# FAOSTAT {channel} steps for version {NEW_VERSION}"
