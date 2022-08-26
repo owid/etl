@@ -2,7 +2,7 @@
 #  Makefile
 #
 
-.PHONY: etl
+.PHONY: etl docs
 
 include default.mk
 
@@ -100,3 +100,7 @@ dependencies.pdf: .venv dag.yml etl/to_graphviz.py
 deploy:
 	@echo '==> Rebuilding the production ETL from origin/master'
 	ssh -t owid@analytics.owid.io /home/owid/analytics/ops/scripts/etl-prod.sh
+
+docs:
+	@echo '==> Building docs'
+	cd docs && make html
