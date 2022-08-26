@@ -1,5 +1,5 @@
 import json
-from typing import List
+from typing import List, cast
 
 import pandas as pd
 from owid.catalog import Dataset, Table
@@ -39,6 +39,8 @@ def run(dest_dir: str) -> None:
 
     tb_garden = underscore_table(Table(df))
     tb_garden.metadata = tb_meadow.metadata
+    for col in tb_garden.columns:
+        tb_garden[col].metadata = tb_meadow[col].metadata
     {% if cookiecutter.include_metadata_yaml == "True" %}
     ds_garden.metadata.update_from_yaml(N.metadata_path)
     tb_garden.update_metadata_from_yaml(N.metadata_path, "{{cookiecutter.short_name}}")
@@ -58,7 +60,7 @@ def load_excluded_countries() -> List[str]:
 
 def exclude_countries(df: pd.DataFrame) -> pd.DataFrame:
     excluded_countries = load_excluded_countries()
-    return df.loc[~df.country.isin(excluded_countries)]
+    return cast(pd.DataFrame, df.loc[~df.country.isin(excluded_countries)])
 
 
 def harmonize_countries(df: pd.DataFrame) -> pd.DataFrame:

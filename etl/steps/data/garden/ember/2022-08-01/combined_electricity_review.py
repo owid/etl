@@ -105,23 +105,16 @@ def combine_global_electricity_review_data(ds_global: catalog.Dataset) -> catalo
     )
 
     # Sanity check.
-    error = (
-        "Total generation column in emissions and generation tables are not identical."
-    )
+    error = "Total generation column in emissions and generation tables are not identical."
     assert all(
-        combined_global["emissions__total_generation__twh"]
-        == combined_global["generation__total_generation__twh"]
+        combined_global["emissions__total_generation__twh"] == combined_global["generation__total_generation__twh"]
     ), error
 
     # Remove unnecessary columns and any possible rows with no data.
-    combined_global = combined_global.drop(
-        columns=["population", "emissions__total_generation__twh"]
-    ).dropna(how="all")
+    combined_global = combined_global.drop(columns=["population", "emissions__total_generation__twh"]).dropna(how="all")
 
     # Set a convenient index and sort.
-    combined_global = combined_global.set_index(
-        ["country", "year"], verify_integrity=True
-    ).sort_index()
+    combined_global = combined_global.set_index(["country", "year"], verify_integrity=True).sort_index()
 
     # Sort columns conveniently.
     combined_global = combined_global[sorted(combined_global.columns)]
@@ -130,9 +123,7 @@ def combine_global_electricity_review_data(ds_global: catalog.Dataset) -> catalo
     combined_global = catalog.utils.underscore_table(combined_global)
 
     # Import metadata from metadata yaml file.
-    combined_global.update_metadata_from_yaml(
-        METADATA_PATH, "global_electricity_review"
-    )
+    combined_global.update_metadata_from_yaml(METADATA_PATH, "global_electricity_review")
 
     return combined_global
 
@@ -164,18 +155,12 @@ def combine_european_electricity_review_data(
 
     # Create aggregates (defined in AGGREGATES) that are in global review but not in european review.
     for aggregate in AGGREGATES:
-        generation[aggregate] = pd.DataFrame(generation)[AGGREGATES[aggregate]].sum(
-            axis=1
-        )
+        generation[aggregate] = pd.DataFrame(generation)[AGGREGATES[aggregate]].sum(axis=1)
 
     # Create a column for each of those new aggregates, giving percentage share of total generation.
     for aggregate in AGGREGATES:
         column = aggregate.replace("__twh", "__pct")
-        generation[column] = (
-            pd.DataFrame(generation)[aggregate]
-            / generation["total_generation__twh"]
-            * 100
-        )
+        generation[column] = pd.DataFrame(generation)[aggregate] / generation["total_generation__twh"] * 100
 
     # Check that total generation adds up to 100%.
     error = "Total generation does not add up to 100%."
@@ -191,25 +176,16 @@ def combine_european_electricity_review_data(
     # Assert that the percentage change is smaller than 1%
     error = "Total generation does not agree with the on in country_overview."
     assert all(
-        (
-            abs(check["total_generation__twh_x"] - check["total_generation__twh_y"])
-            / check["total_generation__twh_x"]
-        )
+        (abs(check["total_generation__twh_x"] - check["total_generation__twh_y"]) / check["total_generation__twh_x"])
         < 0.01
     ), error
 
     # Remove unnecessary columns.
-    generation = generation.drop(
-        columns=["total_generation__pct", "total_generation__twh"]
-    )
+    generation = generation.drop(columns=["total_generation__pct", "total_generation__twh"])
 
     # Rename all column names to start with the category, before combining all categories.
-    generation = generation.rename(
-        columns={column: "generation__" + column for column in generation.columns}
-    )
-    emissions = emissions.rename(
-        columns={column: "emissions__" + column for column in emissions.columns}
-    )
+    generation = generation.rename(columns={column: "generation__" + column for column in generation.columns})
+    emissions = emissions.rename(columns={column: "emissions__" + column for column in emissions.columns})
     country_overview = country_overview.rename(
         columns={
             "total_generation__twh": "generation__total_generation__twh",
@@ -234,18 +210,13 @@ def combine_european_electricity_review_data(
     # If any column was repeated in the merge, it will have a "_x" at the end of the name.
     # Check that no other columns were repeated.
     error = "There are repeated columns in combined dataframe."
-    assert (
-        len([column for column in combined_european.columns if column.endswith("_x")])
-        == 0
-    ), error
+    assert len([column for column in combined_european.columns if column.endswith("_x")]) == 0, error
 
     # Remove any possible rows with no data.
     combined_european = combined_european.dropna(how="all")
 
     # Ensure that the index is well constructed.
-    combined_european = combined_european.set_index(
-        index_columns, verify_integrity=True
-    ).sort_index()
+    combined_european = combined_european.set_index(index_columns, verify_integrity=True).sort_index()
 
     # Sort columns conveniently.
     combined_european = combined_european[sorted(combined_european.columns)]
@@ -254,9 +225,7 @@ def combine_european_electricity_review_data(
     combined_european = catalog.utils.underscore_table(combined_european)
 
     # Import metadata from metadata yaml file.
-    combined_european.update_metadata_from_yaml(
-        METADATA_PATH, "european_electricity_review"
-    )
+    combined_european.update_metadata_from_yaml(METADATA_PATH, "european_electricity_review")
 
     return combined_european
 
@@ -289,11 +258,7 @@ def combine_global_and_european_electricity_review_data(
 
     index_columns = ["country", "year"]
     data_columns = sorted(
-        [
-            col
-            for col in (set(combined_global.columns) | set(combined_european.columns))
-            if col not in index_columns
-        ]
+        [col for col in (set(combined_global.columns) | set(combined_european.columns)) if col not in index_columns]
     )
     # We should not concatenate bp and shift data directly, since there are nans in different places.
     # Instead, go column by column, concatenate, remove nans, and then keep the BP version on duplicated rows.
@@ -302,24 +267,16 @@ def combine_global_and_european_electricity_review_data(
         _global_data = pd.DataFrame()
         _european_data = pd.DataFrame()
         if variable in combined_global.columns:
-            _global_data = combined_global[index_columns + [variable]].dropna(
-                subset=variable
-            )
+            _global_data = combined_global[index_columns + [variable]].dropna(subset=variable)
         if variable in combined_european.columns:
-            _european_data = combined_european[index_columns + [variable]].dropna(
-                subset=variable
-            )
+            _european_data = combined_european[index_columns + [variable]].dropna(subset=variable)
         _combined = pd.concat([_global_data, _european_data], ignore_index=True)
         # On rows where both datasets overlap, give priority to european review data.
         _combined = _combined.drop_duplicates(subset=index_columns, keep="last")
         # Combine data for different variables.
         combined = pd.merge(combined, _combined, on=index_columns, how="outer")
-    error = (
-        "There are repeated columns when combining global and european review tables."
-    )
-    assert (
-        len([column for column in combined.columns if column.endswith("_x")]) == 0
-    ), error
+    error = "There are repeated columns when combining global and european review tables."
+    assert len([column for column in combined.columns if column.endswith("_x")]) == 0, error
 
     # Create a table (with no metadata) and sort data appropriately.
     combined = catalog.Table(combined).set_index(index_columns).sort_index()
@@ -371,9 +328,7 @@ def run(dest_dir: str) -> None:
     combined_global = combine_global_electricity_review_data(ds_global=ds_global)
 
     # Combine all tables of the european electricity review into one.
-    combined_european = combine_european_electricity_review_data(
-        ds_european=ds_european
-    )
+    combined_european = combine_european_electricity_review_data(ds_european=ds_european)
 
     # Combine global and european reviews.
     combined = combine_global_and_european_electricity_review_data(

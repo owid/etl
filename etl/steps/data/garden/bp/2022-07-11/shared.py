@@ -149,11 +149,7 @@ def load_population() -> pd.DataFrame:
 
     # Add data for historical regions (if not in population) by adding the population of its current successors.
     countries_with_population = population["country"].unique()
-    missing_countries = [
-        country
-        for country in HISTORIC_TO_CURRENT_REGION
-        if country not in countries_with_population
-    ]
+    missing_countries = [country for country in HISTORIC_TO_CURRENT_REGION if country not in countries_with_population]
     for country in missing_countries:
         members = HISTORIC_TO_CURRENT_REGION[country]["members"]
         _population = (
@@ -163,13 +159,9 @@ def load_population() -> pd.DataFrame:
             .reset_index()
         )
         # Select only years for which we have data for all member countries.
-        _population = _population[_population["country"] == len(members)].reset_index(
-            drop=True
-        )
+        _population = _population[_population["country"] == len(members)].reset_index(drop=True)
         _population["country"] = country
-        population = pd.concat(
-            [population, _population], ignore_index=True
-        ).reset_index(drop=True)
+        population = pd.concat([population, _population], ignore_index=True).reset_index(drop=True)
 
     error = "Duplicate country-years found in population. Check if historical regions changed."
     assert population[population.duplicated(subset=["country", "year"])].empty, error
@@ -198,9 +190,7 @@ def load_income_groups() -> pd.DataFrame:
     )
     # Add historical regions to income groups.
     for historic_region in HISTORIC_TO_CURRENT_REGION:
-        historic_region_income_group = HISTORIC_TO_CURRENT_REGION[historic_region][
-            "income_group"
-        ]
+        historic_region_income_group = HISTORIC_TO_CURRENT_REGION[historic_region]["income_group"]
         if historic_region not in income_groups["country"]:
             historic_region_df = pd.DataFrame(
                 {
@@ -208,9 +198,7 @@ def load_income_groups() -> pd.DataFrame:
                     "income_group": [historic_region_income_group],
                 }
             )
-            income_groups = pd.concat(
-                [income_groups, historic_region_df], ignore_index=True
-            )
+            income_groups = pd.concat([income_groups, historic_region_df], ignore_index=True)
 
     return cast(pd.DataFrame, income_groups)
 
@@ -274,9 +262,7 @@ def add_population(
             )
 
     # Add population to original dataframe.
-    df_with_population = pd.merge(
-        df, population, on=[country_col, year_col], how="left"
-    )
+    df_with_population = pd.merge(df, population, on=[country_col, year_col], how="left")
 
     return df_with_population
 
@@ -323,17 +309,13 @@ def detect_overlapping_data_for_regions_and_members(
             # Create a dataframe with only data for the region, and remove columns that only have nans.
             # Optionally, replace zeros by nans, to also remove columns that only have zeros or nans.
             region_df = (
-                df[df["country"] == region]
-                .replace(overlapping_values_to_ignore, np.nan)
-                .dropna(axis=1, how="all")
+                df[df["country"] == region].replace(overlapping_values_to_ignore, np.nan).dropna(axis=1, how="all")
             )
             members = regions_and_members[region]["members"]
             for member in members:
                 # Create a dataframe for this particular member country.
                 member_df = (
-                    df[df["country"] == member]
-                    .replace(overlapping_values_to_ignore, np.nan)
-                    .dropna(axis=1, how="all")
+                    df[df["country"] == member].replace(overlapping_values_to_ignore, np.nan).dropna(axis=1, how="all")
                 )
                 # Find common columns with (non-nan) data between region and member country.
                 variables = [
@@ -368,8 +350,7 @@ def detect_overlapping_data_for_regions_and_members(
                         # If this overlap is not known, raise a warning.
                         # Omit the field "entity_to_make_nan" when checking if this overlap is known.
                         _known_overlaps = [
-                            {key for key in overlap if key != "entity_to_make_nan"}
-                            for overlap in known_overlaps
+                            {key for key in overlap if key != "entity_to_make_nan"} for overlap in known_overlaps
                         ]
                         if new_overlap not in _known_overlaps:  # type: ignore
                             log.warning(
@@ -425,14 +406,10 @@ def remove_overlapping_data_for_regions_and_members(
                     .replace(overlapping_values_to_ignore, np.nan)
                     .dropna(subset=overlap["variable"])
                 )
-                duplicated_rows = duplicated_rows[
-                    duplicated_rows.duplicated(subset="year", keep=False)
-                ]
+                duplicated_rows = duplicated_rows[duplicated_rows.duplicated(subset="year", keep=False)]
                 overlapping_years = sorted(set(duplicated_rows["year"]))
                 if overlapping_years != overlap["years"]:
-                    log.warning(
-                        f"Given overlap number {i} is not found in the data; redefine this list."
-                    )
+                    log.warning(f"Given overlap number {i} is not found in the data; redefine this list.")
                 # Make nan data points for either the region or the member (which is specified by "entity to make nan").
                 indexes_to_make_nan = duplicated_rows[
                     duplicated_rows["country"] == overlap[overlap["entity_to_make_nan"]]  # type: ignore
@@ -460,15 +437,11 @@ def load_countries_in_regions() -> Dict[str, List[str]]:
     countries_in_regions = {}
     for region in list(REGIONS_TO_ADD):
         # Add default OWID list of countries in region (which includes historical regions).
-        countries_in_regions[region] = geo.list_countries_in_region(
-            region=region, income_groups=income_groups
-        )
+        countries_in_regions[region] = geo.list_countries_in_region(region=region, income_groups=income_groups)
 
     # Include additional countries in the region (if any given).
     for region in ADDITIONAL_COUNTRIES_IN_REGIONS:
-        countries_in_regions[region] = (
-            countries_in_regions[region] + ADDITIONAL_COUNTRIES_IN_REGIONS[region]
-        )
+        countries_in_regions[region] = countries_in_regions[region] + ADDITIONAL_COUNTRIES_IN_REGIONS[region]
 
     return countries_in_regions
 
@@ -518,9 +491,7 @@ def add_region_aggregates(
 
     if aggregates is None:
         # If aggregations are not specified, assume all variables are to be aggregated, by summing.
-        aggregates = {
-            column: "sum" for column in data.columns if column not in index_columns
-        }
+        aggregates = {column: "sum" for column in data.columns if column not in index_columns}
     # Get the list of regions to create, and their member countries.
     countries_in_regions = load_countries_in_regions()
     for region in regions:
@@ -531,9 +502,7 @@ def add_region_aggregates(
         # Remove any known overlaps between regions (e.g. USSR, which is a historical region) in current region (e.g.
         # Europe) and their member countries (or successor countries, like Russia).
         # If any overlap in known_overlaps is not found, a warning will be raised.
-        data_region = remove_overlapping_data_for_regions_and_members(
-            df=data_region, known_overlaps=known_overlaps
-        )
+        data_region = remove_overlapping_data_for_regions_and_members(df=data_region, known_overlaps=known_overlaps)
 
         # Check that there are no other overlaps in the data (after having removed the known ones).
         detect_overlapping_data_for_regions_and_members(
@@ -569,12 +538,8 @@ def add_region_aggregates(
     if region_codes is not None:
         # Add region codes to regions.
         if data[country_code_column].dtype == "category":
-            data[country_code_column] = data[country_code_column].cat.add_categories(
-                region_codes
-            )
+            data[country_code_column] = data[country_code_column].cat.add_categories(region_codes)
         for i, region in enumerate(regions):
-            data.loc[
-                data[country_column] == region, country_code_column
-            ] = region_codes[i]
+            data.loc[data[country_column] == region, country_code_column] = region_codes[i]
 
     return data

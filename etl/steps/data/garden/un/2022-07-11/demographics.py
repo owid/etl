@@ -199,9 +199,7 @@ def process(df: pd.DataFrame, country_std: str) -> pd.DataFrame:
     for m in df.metric.unique():
         df.loc[df.metric == m, "value"] = ops[m](df.loc[df.metric == m, "value"])
     # Metric name
-    df = df.assign(
-        metric=df.metric.map({k: v["name"] for k, v in COLUMNS_METRICS.items()})
-    )
+    df = df.assign(metric=df.metric.map({k: v["name"] for k, v in COLUMNS_METRICS.items()}))
     # Column order
     df = df[COLUMNS_ORDER]
     # Discard unmapped regions

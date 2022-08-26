@@ -109,9 +109,7 @@ def check_that_category_structure_is_well_defined(md: Dict[str, Any]) -> None:
 
 def run(dest_dir: str) -> None:
     # Load file of versions.
-    latest_versions = pd.read_csv(LATEST_VERSIONS_FILE).set_index(
-        ["channel", "dataset"]
-    )
+    latest_versions = pd.read_csv(LATEST_VERSIONS_FILE).set_index(["channel", "dataset"])
 
     # Load FAOSTAT (additional) metadata dataset from walden.
     walden_latest_version = latest_versions.loc["walden", DATASET_SHORT_NAME].item()

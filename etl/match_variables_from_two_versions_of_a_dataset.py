@@ -90,18 +90,14 @@ def _display_compared_variables(
     click.secho("\n\tOther options:", italic=True)
     for i, row in missing_new.iloc[1 : 1 + n_max_suggestions].iterrows():
         click.secho(
-            f"\t{i:5} - {row['name_new']} (id={row['id_new']},"
-            f" similarity={row['similarity']:.0f})",
+            f"\t{i:5} - {row['name_new']} (id={row['id_new']}," f" similarity={row['similarity']:.0f})",
             fg="bright_green",
         )
     click.echo("\n")
 
 
 def _input_manual_decision(new_indexes: list[Any]) -> Any:
-    decision = input(
-        "> Press enter to accept this option, or type chosen index. To ignore this"
-        " variable, type i."
-    )
+    decision = input("> Press enter to accept this option, or type chosen index. To ignore this" " variable, type i.")
     if decision == "":
         chosen_index = new_indexes[0]
     elif decision.lower() == "i":
@@ -147,12 +143,8 @@ def map_old_and_new_variables(
 
     """
     # Prepare dataframes of old and new variables.
-    old_variables = old_variables[["id", "name"]].rename(
-        columns={"id": "id_old", "name": "name_old"}
-    )
-    new_variables = new_variables[["id", "name"]].rename(
-        columns={"id": "id_new", "name": "name_new"}
-    )
+    old_variables = old_variables[["id", "name"]].rename(columns={"id": "id_old", "name": "name_old"})
+    new_variables = new_variables[["id", "name"]].rename(columns={"id": "id_new", "name": "name_new"})
     # Find variables with identical names in old and new dataset (optionally).
     if omit_identical:
         mapping = pd.merge(
@@ -168,12 +160,8 @@ def map_old_and_new_variables(
         names_to_omit = []
 
     # Prepare dataframe of variables to sweep through in old and new datasets.
-    missing_old = old_variables[
-        ~old_variables["name_old"].isin(names_to_omit)
-    ].reset_index(drop=True)
-    missing_new = new_variables[
-        ~new_variables["name_new"].isin(names_to_omit)
-    ].reset_index(drop=True)
+    missing_old = old_variables[~old_variables["name_old"].isin(names_to_omit)].reset_index(drop=True)
+    missing_new = new_variables[~new_variables["name_new"].isin(names_to_omit)].reset_index(drop=True)
 
     # Iterate over old variables, and find the right match among new variables.
     num_variables = len(missing_old)
@@ -188,10 +176,7 @@ def map_old_and_new_variables(
         old_index = missing_old.loc[current_old_index]["id_old"]
 
         # Sort new variables from most to least similar to current variable.
-        missing_new["similarity"] = [
-            matching_function(old_name, new_name)
-            for new_name in missing_new["name_new"]
-        ]
+        missing_new["similarity"] = [matching_function(old_name, new_name) for new_name in missing_new["name_new"]]
         missing_new = missing_new.sort_values("similarity", ascending=False)
 
         # Indexes of the new dataframe.
@@ -201,9 +186,7 @@ def map_old_and_new_variables(
         new_name = missing_new.loc[suggested_index]["name_new"]
 
         # Display comparison.
-        click.secho(
-            f"\nVARIABLE {count}/{num_variables}", bold=True, bg="white", fg="black"
-        )
+        click.secho(f"\nVARIABLE {count}/{num_variables}", bold=True, bg="white", fg="black")
         _display_compared_variables(
             old_name=old_name,
             new_name=new_name,
@@ -235,9 +218,7 @@ def map_old_and_new_variables(
     return mapping
 
 
-def display_summary(
-    old_variables: pd.DataFrame, new_variables: pd.DataFrame, mapping: pd.DataFrame
-) -> None:
+def display_summary(old_variables: pd.DataFrame, new_variables: pd.DataFrame, mapping: pd.DataFrame) -> None:
     """Display summary of the result of the mapping.
 
     Parameters
@@ -255,12 +236,8 @@ def display_summary(
         print(f"\n  {row['name_old']} ({row['id_old']})")
         print(f"  {row['name_new']} ({row['id_new']})")
 
-    unmatched_old = old_variables[
-        ~old_variables["name"].isin(mapping["name_old"])
-    ].reset_index(drop=True)
-    unmatched_new = new_variables[
-        ~new_variables["name"].isin(mapping["name_new"])
-    ].reset_index(drop=True)
+    unmatched_old = old_variables[~old_variables["name"].isin(mapping["name_old"])].reset_index(drop=True)
+    unmatched_new = new_variables[~new_variables["name"].isin(mapping["name_new"])].reset_index(drop=True)
     if len(unmatched_old) > 0:
         print("\nUnmatched variables in the old dataset:")
         for i, row in unmatched_old.iterrows():
@@ -287,15 +264,11 @@ def save_variable_replacements_file(mapping: pd.DataFrame, output_file: str) -> 
 
     """
     # Create a dictionary mapping from old variable id to new variable id.
-    mapping_indexes = (
-        mapping[["id_old", "id_new"]].set_index("id_old").to_dict()["id_new"]
-    )
+    mapping_indexes = mapping[["id_old", "id_new"]].set_index("id_old").to_dict()["id_new"]
     mapping_indexes = {str(key): str(mapping_indexes[key]) for key in mapping_indexes}
 
     print(f"Saving index mapping to json file: {output_file}")
-    save_data_to_json_file(
-        data=mapping_indexes, json_file=output_file, **{"indent": 4, "sort_keys": True}
-    )
+    save_data_to_json_file(data=mapping_indexes, json_file=output_file, **{"indent": 4, "sort_keys": True})
 
 
 def main(
@@ -312,13 +285,9 @@ def main(
         new_dataset_id = get_dataset_id(db_conn=db_conn, dataset_name=new_dataset_name)
 
         # Get variables from old dataset that have been used in at least one chart.
-        old_variables = get_variables_in_dataset(
-            db_conn=db_conn, dataset_id=old_dataset_id, only_used_in_charts=True
-        )
+        old_variables = get_variables_in_dataset(db_conn=db_conn, dataset_id=old_dataset_id, only_used_in_charts=True)
         # Get all variables from new dataset.
-        new_variables = get_variables_in_dataset(
-            db_conn=db_conn, dataset_id=new_dataset_id, only_used_in_charts=False
-        )
+        new_variables = get_variables_in_dataset(db_conn=db_conn, dataset_id=new_dataset_id, only_used_in_charts=False)
 
     # Select similarity function.
     similarity_function = get_similarity_function(similarity_name)
@@ -333,9 +302,7 @@ def main(
     )
 
     # Display summary.
-    display_summary(
-        old_variables=old_variables, new_variables=new_variables, mapping=mapping
-    )
+    display_summary(old_variables=old_variables, new_variables=new_variables, mapping=mapping)
 
     # Save mapping to json file.
     save_variable_replacements_file(mapping, output_file)

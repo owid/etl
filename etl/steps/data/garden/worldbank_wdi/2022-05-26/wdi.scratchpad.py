@@ -80,12 +80,8 @@ q = """
     FROM charts
 """
 df = pd.read_sql(q, get_connection())
-df["selectedEntityNames"] = df["selectedEntityNames"].apply(
-    lambda x: json.loads(x) if pd.notnull(x) else []
-)
-df_dummies = pd.get_dummies(df["selectedEntityNames"].apply(pd.Series).stack()).sum(
-    level=0
-)
+df["selectedEntityNames"] = df["selectedEntityNames"].apply(lambda x: json.loads(x) if pd.notnull(x) else [])
+df_dummies = pd.get_dummies(df["selectedEntityNames"].apply(pd.Series).stack()).sum(level=0)
 df_counts = (
     df_dummies.sum(axis=0)
     .reindex(uniq_entities)

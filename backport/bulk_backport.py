@@ -105,9 +105,7 @@ def bulk_backport(
     log.info("bulk_backport.finished")
 
 
-def _active_datasets(
-    engine: Engine, dataset_ids: list[int] = [], limit: int = 1000000
-) -> pd.DataFrame:
+def _active_datasets(engine: Engine, dataset_ids: list[int] = [], limit: int = 1000000) -> pd.DataFrame:
     """Return dataframe of datasets with at least one chart that should be backported."""
 
     dag_backported_ids = _backported_ids_in_dag()
@@ -156,17 +154,11 @@ def _active_datasets_names(engine: Engine) -> set[str]:
     """Load all active datasets from grapher and return dataset names of their config
     and value files."""
     active_datasets_df = _active_datasets(engine)
-    names = set(
-        active_datasets_df.apply(
-            lambda r: utils.create_short_name(r["id"], r["name"]), axis=1
-        )
-    )
+    names = set(active_datasets_df.apply(lambda r: utils.create_short_name(r["id"], r["name"]), axis=1))
     return {n + "_config" for n in names} | {n + "_values" for n in names}
 
 
-def _prune_walden_datasets(
-    engine: Engine, dataset_ids: tuple[int], dry_run: bool, prune_remote: bool
-) -> None:
+def _prune_walden_datasets(engine: Engine, dataset_ids: tuple[int], dry_run: bool, prune_remote: bool) -> None:
     active_dataset_names = _active_datasets_names(engine)
 
     walden_catalog = WaldenCatalog()
@@ -174,18 +166,12 @@ def _prune_walden_datasets(
 
     # if given dataset ids, only prune those
     if dataset_ids:
-        datasets = [
-            ds
-            for ds in datasets
-            if utils.extract_id_from_short_name(ds.short_name) in dataset_ids
-        ]
+        datasets = [ds for ds in datasets if utils.extract_id_from_short_name(ds.short_name) in dataset_ids]
 
     # datasets that are not among active datasets
     # NOTE: it is important to compare not just dataset id, but the whole name as dataset name
     # can be changed by the user
-    datasets_to_delete = [
-        ds for ds in datasets if ds.short_name not in active_dataset_names
-    ]
+    datasets_to_delete = [ds for ds in datasets if ds.short_name not in active_dataset_names]
 
     log.info("bulk_backport.delete", n=len(datasets_to_delete))
 

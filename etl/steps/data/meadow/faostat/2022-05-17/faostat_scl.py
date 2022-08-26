@@ -75,24 +75,18 @@ def run(dest_dir: str) -> None:
     ####################################################################################################################
 
     # Load file of versions.
-    latest_versions = pd.read_csv(LATEST_VERSIONS_FILE).set_index(
-        ["channel", "dataset"]
-    )
+    latest_versions = pd.read_csv(LATEST_VERSIONS_FILE).set_index(["channel", "dataset"])
 
     # Fetch latest walden dataset.
     walden_version = latest_versions.loc["walden", dataset_short_name].item()
-    walden_ds = Catalog().find_one(
-        namespace=NAMESPACE, version=walden_version, short_name=dataset_short_name
-    )
+    walden_ds = Catalog().find_one(namespace=NAMESPACE, version=walden_version, short_name=dataset_short_name)
 
     # Load data.
     data = load_data(walden_ds.local_path)
 
     # Load metadata.
     metadata_version = latest_versions.loc["meadow", f"{NAMESPACE}_metadata"].item()
-    metadata = Dataset(
-        DATA_DIR / "meadow" / NAMESPACE / metadata_version / f"{NAMESPACE}_metadata"
-    )
+    metadata = Dataset(DATA_DIR / "meadow" / NAMESPACE / metadata_version / f"{NAMESPACE}_metadata")
 
     ####################################################################################################################
     # Prepare data.

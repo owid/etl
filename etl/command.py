@@ -28,13 +28,9 @@ LIMIT_NOFILE = 5000
 
 @click.command()
 @click.option("--dry-run", is_flag=True, help="Only print the steps that would be run")
-@click.option(
-    "--force", is_flag=True, help="Redo a step even if it appears done and up-to-date"
-)
+@click.option("--force", is_flag=True, help="Redo a step even if it appears done and up-to-date")
 @click.option("--private", is_flag=True, help="Execute private steps")
-@click.option(
-    "--grapher", is_flag=True, help="Publish changes to grapher (OWID staff only)"
-)
+@click.option("--grapher", is_flag=True, help="Publish changes to grapher (OWID staff only)")
 @click.option(
     "--backport",
     is_flag=True,
@@ -219,9 +215,7 @@ def _validate_private_steps(dag: DAG) -> None:
             continue
         for dependency in step_dependencies:
             if _is_private_step(dependency):
-                raise ValueError(
-                    f"Public step {step_name} has a dependency on private {dependency}"
-                )
+                raise ValueError(f"Public step {step_name} has a dependency on private {dependency}")
 
 
 def _is_private_step(step_name: str) -> bool:

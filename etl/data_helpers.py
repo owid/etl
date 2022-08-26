@@ -42,9 +42,7 @@ def calculate_region_sums(df: pd.DataFrame) -> pd.DataFrame:
         for member in members:
             # use ['name'] instead of .name, since .name references name of the object,
             # not the actual value
-            continent_rows.append(
-                {"country": countries.loc[member]["name"], "continent": row["name"]}
-            )
+            continent_rows.append({"country": countries.loc[member]["name"], "continent": row["name"]})
 
     continent_list = pd.DataFrame.from_records(continent_rows)
 

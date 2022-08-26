@@ -39,9 +39,7 @@ class CannotPublish(Exception):
     default=CHANNEL.__args__,
     help="Publish only selected channel (subfolder of data/), push all by default",
 )
-def publish_cli(
-    dry_run: bool, private: bool, bucket: str, channel: Iterable[CHANNEL]
-) -> None:
+def publish_cli(dry_run: bool, private: bool, bucket: str, channel: Iterable[CHANNEL]) -> None:
     """
     Publish the generated data catalog to S3.
     """
@@ -81,9 +79,7 @@ def sanity_checks(catalog: Path, channel: CHANNEL) -> None:
             sys.exit(1)
 
 
-def sync_catalog_to_s3(
-    bucket: str, catalog: Path, channel: CHANNEL, dry_run: bool = False
-) -> None:
+def sync_catalog_to_s3(bucket: str, catalog: Path, channel: CHANNEL, dry_run: bool = False) -> None:
     s3 = connect_s3()
     if is_catalog_up_to_date(s3, bucket, catalog, channel):
         print(f"Catalog's channel {channel} is up to date!")
@@ -95,9 +91,7 @@ def sync_catalog_to_s3(
         update_catalog(s3, bucket, catalog, channel)
 
 
-def is_catalog_up_to_date(
-    s3: Any, bucket: str, catalog: Path, channel: CHANNEL
-) -> bool:
+def is_catalog_up_to_date(s3: Any, bucket: str, catalog: Path, channel: CHANNEL) -> bool:
     """The catalog file is synced last -- if it is the same as our local one, then all the remote
     files will be the same as our local ones too."""
     # note: we only check the md5 of the first index format, not all of them
@@ -107,9 +101,7 @@ def is_catalog_up_to_date(
     return remote == local
 
 
-def sync_datasets(
-    s3: Any, bucket: str, catalog: Path, channel: CHANNEL, dry_run: bool = False
-) -> None:
+def sync_datasets(s3: Any, bucket: str, catalog: Path, channel: CHANNEL, dry_run: bool = False) -> None:
     "Go dataset by dataset and check if each one needs updating."
     existing = get_published_checksums(bucket, channel)
 
@@ -131,9 +123,7 @@ def sync_datasets(
 
         print("-", path)
         if not dry_run:
-            sync_folder(
-                s3, bucket, catalog, catalog / path, path, public=ds.metadata.is_public
-            )
+            sync_folder(s3, bucket, catalog, catalog / path, path, public=ds.metadata.is_public)
 
     print("Datasets to delete:")
     for path in to_delete:
@@ -155,10 +145,7 @@ def sync_folder(
     Perform a content-based sync of a local folder with a "folder" on an S3 bucket,
     by comparing checksums and only uploading files that have changed.
     """
-    existing = {
-        o["Key"]: object_md5(s3, bucket, o["Key"], o)
-        for o in walk_s3(s3, bucket, dest_path)
-    }
+    existing = {o["Key"]: object_md5(s3, bucket, o["Key"], o) for o in walk_s3(s3, bucket, dest_path)}
 
     # some datasets like `open_numbers/open_numbers/latest/gapminder__gapminder_world`
     # have huge number of tables, upload them in parallel
@@ -191,9 +178,7 @@ def sync_folder(
         if delete:
             for rel_filename in existing:
                 print("  DEL", rel_filename)
-                futures.append(
-                    executor.submit(s3.delete_object, Bucket=bucket, Key=rel_filename)
-                )
+                futures.append(executor.submit(s3.delete_object, Bucket=bucket, Key=rel_filename))
 
         concurrent.futures.wait(futures)
 
@@ -254,12 +239,7 @@ def get_published_checksums(bucket: str, channel: CHANNEL) -> Dict[str, str]:
     try:
         existing = read_frame(uri)
         existing["path"] = existing["path"].apply(lambda p: p.rsplit("/", 1)[0])
-        existing = (
-            existing[["path", "checksum"]]
-            .drop_duplicates()
-            .set_index("path")
-            .checksum.to_dict()
-        )
+        existing = existing[["path", "checksum"]].drop_duplicates().set_index("path").checksum.to_dict()
     except HTTPError:
         existing = {}  # type: ignore
 

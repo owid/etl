@@ -66,9 +66,7 @@ REGIONS_TO_ADD = [
 MT_TO_T = 1e6
 
 
-def create_table_for_gas(
-    df: pd.DataFrame, gas: str, countries_in_regions: Dict[str, List[str]]
-) -> catalog.Table:
+def create_table_for_gas(df: pd.DataFrame, gas: str, countries_in_regions: Dict[str, List[str]]) -> catalog.Table:
     """Extract data for a particular gas and create a table with variables' metadata.
 
     Parameters
@@ -90,9 +88,7 @@ def create_table_for_gas(
     df_gas = df[df["gas"] == gas].drop(columns="gas").reset_index(drop=True)
 
     # Pivot table to have a column for each sector.
-    df_gas = df_gas.pivot(
-        index=["country", "year"], columns="sector", values="value"
-    ).reset_index()
+    df_gas = df_gas.pivot(index=["country", "year"], columns="sector", values="value").reset_index()
 
     # Create region aggregates.
     for region in REGIONS_TO_ADD:
@@ -111,11 +107,7 @@ def create_table_for_gas(
     df_gas = geo.add_population_to_dataframe(df=df_gas)
 
     # Add per capita variables.
-    variables = [
-        column
-        for column in df_gas.columns
-        if column not in ["country", "year", "population"]
-    ]
+    variables = [column for column in df_gas.columns if column not in ["country", "year", "population"]]
     for variable in variables:
         new_column = variable + PER_CAPITA_SUFFIX
         df_gas[new_column] = MT_TO_T * df_gas[variable] / df_gas["population"]
@@ -124,9 +116,7 @@ def create_table_for_gas(
     df_gas = df_gas.drop(columns=df_gas.columns[df_gas.isnull().all()])
     # Remove rows that only have nans.
     df_gas = df_gas.dropna(
-        subset=[
-            column for column in df_gas.columns if column not in ["country", "year"]
-        ],
+        subset=[column for column in df_gas.columns if column not in ["country", "year"]],
         how="all",
     ).reset_index(drop=True)
 
@@ -142,9 +132,7 @@ def create_table_for_gas(
             table_gas[variable].metadata.unit = "tonnes per capita"
             table_gas[variable].metadata.short_unit = "t"
             table_gas[variable].metadata.title = variable
-            table_gas[variable].metadata.display = {
-                "name": variable.replace(PER_CAPITA_SUFFIX, "")
-            }
+            table_gas[variable].metadata.display = {"name": variable.replace(PER_CAPITA_SUFFIX, "")}
         else:
             table_gas[variable].metadata.unit = "million tonnes"
             table_gas[variable].metadata.short_unit = "million t"
@@ -170,8 +158,7 @@ def run(dest_dir: str) -> None:
 
     # List all countries inside each region.
     countries_in_regions = {
-        region: sorted(set(geo.list_countries_in_region(region)) & set(df["country"]))
-        for region in REGIONS_TO_ADD
+        region: sorted(set(geo.list_countries_in_region(region)) & set(df["country"])) for region in REGIONS_TO_ADD
     }
 
     #
@@ -203,9 +190,7 @@ def run(dest_dir: str) -> None:
 
     # Create one table for each gas, and one for all gases combined.
     tables = {
-        gas: create_table_for_gas(
-            df=df, gas=gas, countries_in_regions=countries_in_regions
-        )
+        gas: create_table_for_gas(df=df, gas=gas, countries_in_regions=countries_in_regions)
         for gas in df["gas"].unique()
     }
 

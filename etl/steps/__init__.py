@@ -61,9 +61,7 @@ def compile_steps(
     excludes = excludes or []
 
     # make sure each step runs after its dependencies
-    steps = to_dependency_order(
-        dag, includes, excludes, downstream=downstream, only=only
-    )
+    steps = to_dependency_order(dag, includes, excludes, downstream=downstream, only=only)
 
     # parse the steps into Python objects
     return [parse_step(name, dag) for name in steps]
@@ -81,24 +79,16 @@ def to_dependency_order(
     the resulting list of steps is a valid ordering of steps such that no step is run
     before the steps it depends on. Note: this ordering is not necessarily unique.
     """
-    subgraph = (
-        filter_to_subgraph(dag, includes, downstream=downstream, only=only)
-        if includes
-        else dag
-    )
+    subgraph = filter_to_subgraph(dag, includes, downstream=downstream, only=only) if includes else dag
     in_order = list(graphlib.TopologicalSorter(subgraph).static_order())
 
     # filter out explicit excludes
-    filtered = [
-        s for s in in_order if not any(re.findall(pattern, s) for pattern in excludes)
-    ]
+    filtered = [s for s in in_order if not any(re.findall(pattern, s) for pattern in excludes)]
 
     return filtered
 
 
-def filter_to_subgraph(
-    graph: Graph, includes: Iterable[str], downstream: bool = False, only: bool = False
-) -> Graph:
+def filter_to_subgraph(graph: Graph, includes: Iterable[str], downstream: bool = False, only: bool = False) -> Graph:
     """
     Filter the full graph to only the included nodes, and all their dependencies.
 
@@ -109,9 +99,7 @@ def filter_to_subgraph(
     dependent on B).
     """
     all_steps = graph_nodes(graph)
-    included = {
-        s for s in all_steps if any(re.findall(pattern, s) for pattern in includes)
-    }
+    included = {s for s in all_steps if any(re.findall(pattern, s) for pattern in includes)}
 
     if only:
         # Do not search for dependencies, only include explicitly selected nodes
@@ -170,10 +158,7 @@ def _load_dag_yaml(filename: str) -> Dict[str, Any]:
 
 
 def _parse_dag_yaml(dag: Dict[str, Any]) -> Dict[str, Any]:
-    return {
-        node: set(deps) if deps else set()
-        for node, deps in (dag["steps"] or {}).items()
-    }
+    return {node: set(deps) if deps else set() for node, deps in (dag["steps"] or {}).items()}
 
 
 def reverse_graph(graph: Graph) -> Graph:
@@ -306,9 +291,7 @@ class DataStep(Step):
         if not self.has_existing_data() or any(d.is_dirty() for d in self.dependencies):
             return True
 
-        found_source_checksum = catalog.Dataset(
-            self._dest_dir.as_posix()
-        ).metadata.source_checksum
+        found_source_checksum = catalog.Dataset(self._dest_dir.as_posix()).metadata.source_checksum
         exp_source_checksum = self.checksum_input()
 
         if found_source_checksum != exp_source_checksum:
@@ -466,13 +449,9 @@ class WaldenStep(Step):
 
         # normally version is a year or date, but we also accept "latest"
         if version == "latest":
-            dataset = WALDEN_CATALOG.find_latest(
-                namespace=namespace, short_name=short_name
-            )
+            dataset = WALDEN_CATALOG.find_latest(namespace=namespace, short_name=short_name)
         else:
-            dataset = WALDEN_CATALOG.find_one(
-                namespace=namespace, version=version, short_name=short_name
-            )
+            dataset = WALDEN_CATALOG.find_one(namespace=namespace, version=version, short_name=short_name)
 
         return dataset
 
@@ -572,9 +551,7 @@ class GrapherStep(Step):
 
         # insert data in parallel, this speeds it up considerably and is even faster than loading
         # data with LOAD DATA INFILE
-        with concurrent.futures.ThreadPoolExecutor(
-            max_workers=GRAPHER_INSERT_WORKERS
-        ) as executor:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=GRAPHER_INSERT_WORKERS) as executor:
             variable_upsert_results = list(
                 executor.map(
                     lambda table: upsert_table(table, dataset_upsert_results),
@@ -605,13 +582,9 @@ class GrapherStep(Step):
         module_path = self.path.lstrip("/").replace("/", ".")
         step_module = import_module(f"etl.steps.grapher.{module_path}")
         if not hasattr(step_module, "get_grapher_dataset"):
-            raise Exception(
-                f'no get_grapher_dataset() method defined for module "{step_module}"'
-            )
+            raise Exception(f'no get_grapher_dataset() method defined for module "{step_module}"')
         if not hasattr(step_module, "get_grapher_tables"):
-            raise Exception(
-                f'no get_grapher_tables() method defined for module "{step_module}"'
-            )
+            raise Exception(f'no get_grapher_tables() method defined for module "{step_module}"')
         return step_module
 
 
@@ -679,9 +652,7 @@ class BackportStep(DataStep):
         # make sure the enclosing folder is there
         self._dest_dir.parent.mkdir(parents=True, exist_ok=True)
 
-        dataset = backport_helpers.create_dataset(
-            self._dest_dir.as_posix(), self._dest_dir.name
-        )
+        dataset = backport_helpers.create_dataset(self._dest_dir.as_posix(), self._dest_dir.name)
 
         # modify the dataset to remember what inputs were used to build it
         dataset.metadata.source_checksum = self.checksum_input()

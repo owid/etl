@@ -49,9 +49,7 @@ HISTORIC_TO_CURRENT_REGION: Dict[str, Dict[str, Union[str, List[str]]]] = {
 }
 
 
-def combine_two_overlapping_dataframes(
-    df1: pd.DataFrame, df2: pd.DataFrame, index_columns: List[str]
-) -> pd.DataFrame:
+def combine_two_overlapping_dataframes(df1: pd.DataFrame, df2: pd.DataFrame, index_columns: List[str]) -> pd.DataFrame:
     """Combine two dataframes that may have identical columns, prioritising the first one.
 
     Both dataframes must have a dummy index (if not, use reset_index() on both of them).
@@ -81,9 +79,7 @@ def combine_two_overlapping_dataframes(
 
     """
     # Find columns of data (those that are not index columns).
-    data_columns = [
-        col for col in (set(df1.columns) | set(df2.columns)) if col not in index_columns
-    ]
+    data_columns = [col for col in (set(df1.columns) | set(df2.columns)) if col not in index_columns]
 
     # Go column by column, concatenate, remove nans, and then keep df1 version on duplicated rows.
     # Note: There may be a faster, simpler way to achieve this.
@@ -101,9 +97,7 @@ def combine_two_overlapping_dataframes(
         # Add the current variable to the combined dataframe.
         combined = pd.merge(combined, _combined, on=index_columns, how="outer")
 
-    assert (
-        len([column for column in combined.columns if column.endswith("_x")]) == 0
-    ), "There are repeated columns."
+    assert len([column for column in combined.columns if column.endswith("_x")]) == 0, "There are repeated columns."
 
     return combined
 
@@ -126,11 +120,7 @@ def load_population() -> pd.DataFrame:
 
     # Add data for historical regions (if not in population) by adding the population of its current successors.
     countries_with_population = population["country"].unique()
-    missing_countries = [
-        country
-        for country in HISTORIC_TO_CURRENT_REGION
-        if country not in countries_with_population
-    ]
+    missing_countries = [country for country in HISTORIC_TO_CURRENT_REGION if country not in countries_with_population]
     for country in missing_countries:
         members = HISTORIC_TO_CURRENT_REGION[country]["members"]
         _population = (
@@ -140,13 +130,9 @@ def load_population() -> pd.DataFrame:
             .reset_index()
         )
         # Select only years for which we have data for all member countries.
-        _population = _population[_population["country"] == len(members)].reset_index(
-            drop=True
-        )
+        _population = _population[_population["country"] == len(members)].reset_index(drop=True)
         _population["country"] = country
-        population = pd.concat(
-            [population, _population], ignore_index=True
-        ).reset_index(drop=True)
+        population = pd.concat([population, _population], ignore_index=True).reset_index(drop=True)
 
     error = "Duplicate country-years found in population. Check if historical regions changed."
     assert population[population.duplicated(subset=["country", "year"])].empty, error
@@ -213,8 +199,6 @@ def add_population(
             )
 
     # Add population to original dataframe.
-    df_with_population = pd.merge(
-        df, population, on=[country_col, year_col], how="left"
-    )
+    df_with_population = pd.merge(df, population, on=[country_col, year_col], how="left")
 
     return df_with_population

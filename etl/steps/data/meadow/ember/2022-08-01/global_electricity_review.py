@@ -21,9 +21,7 @@ def run(dest_dir: str) -> None:
     log.info(f"{DATASET_SHORT_NAME}.start")
 
     # Retrieve raw data from walden.
-    walden_ds = WaldenCatalog().find_one(
-        namespace=NAMESPACE, short_name=DATASET_SHORT_NAME, version=WALDEN_VERSION
-    )
+    walden_ds = WaldenCatalog().find_one(namespace=NAMESPACE, short_name=DATASET_SHORT_NAME, version=WALDEN_VERSION)
     local_file = walden_ds.ensure_downloaded()
     df = pd.read_csv(local_file)
 

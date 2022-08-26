@@ -53,9 +53,7 @@ class VariableUpsertResult:
     source_id: int
 
 
-def upsert_dataset(
-    dataset: catalog.Dataset, namespace: str, sources: List[catalog.meta.Source]
-) -> DatasetUpsertResult:
+def upsert_dataset(dataset: catalog.Dataset, namespace: str, sources: List[catalog.meta.Source]) -> DatasetUpsertResult:
     assert dataset.metadata.short_name, "Dataset must have a short_name"
     assert dataset.metadata.version, "Dataset must have a version"
     assert dataset.metadata.title, "Dataset must have a title"
@@ -78,6 +76,10 @@ def upsert_dataset(
         ns = db.fetch_one_or_none("SELECT * from namespaces where name=%s", [namespace])
         if ns is None:
             db.upsert_namespace(namespace, "")
+        else:
+            _, ns_name, _, ns_is_archived = ns
+            if ns_is_archived:
+                log.warning("upsert_dataset.namespace_is_archived", namespace=ns_name)
 
         log.info(
             "upsert_dataset.upsert_dataset.start",
@@ -135,36 +137,25 @@ def _update_variables_display(table: catalog.Table) -> None:
             meta.display.setdefault("unit", meta.unit)
 
 
-def upsert_table(
-    table: catalog.Table, dataset_upsert_result: DatasetUpsertResult
-) -> VariableUpsertResult:
+def upsert_table(table: catalog.Table, dataset_upsert_result: DatasetUpsertResult) -> VariableUpsertResult:
     """This function is used to put one ready to go formatted Table (i.e.
     in the format (year, entityId, value)) into mysql. The metadata
     of the variable is used to fill the required fields.
     """
 
     assert set(table.index.names) == {"year", "entity_id"}, (
-        "Tables to be upserted must have only 2 indices: year and entity_id. Instead"
-        f" they have: {table.index.names}"
+        "Tables to be upserted must have only 2 indices: year and entity_id. Instead" f" they have: {table.index.names}"
     )
     assert len(table.columns) == 1, (
-        "Tables to be upserted must have only 1 column. Instead they have:"
-        f" {table.columns.names}"
+        "Tables to be upserted must have only 1 column. Instead they have:" f" {table.columns.names}"
     )
-    assert table[
-        table.columns[0]
-    ].title, f"Column `{table.columns[0]}` must have a title in metadata"
+    assert table[table.columns[0]].title, f"Column `{table.columns[0]}` must have a title in metadata"
     assert table.iloc[:, 0].notnull().all(), (
-        "Tables to be upserted must have no null values. Instead they"
-        f" have:\n{table.loc[table.iloc[:, 0].isnull()]}"
+        "Tables to be upserted must have no null values. Instead they" f" have:\n{table.loc[table.iloc[:, 0].isnull()]}"
     )
     table = table.reorder_levels(["year", "entity_id"])
-    assert (
-        table.index.dtypes[0] in INT_TYPES
-    ), f"year must be of an integer type but was: {table.index.dtypes[0]}"
-    assert (
-        table.index.dtypes[1] in INT_TYPES
-    ), f"entity_id must be of an integer type but was: {table.index.dtypes[1]}"
+    assert table.index.dtypes[0] in INT_TYPES, f"year must be of an integer type but was: {table.index.dtypes[0]}"
+    assert table.index.dtypes[1] in INT_TYPES, f"entity_id must be of an integer type but was: {table.index.dtypes[1]}"
     utils.validate_underscore(table.metadata.short_name, "Table's short_name")
     utils.validate_underscore(table.columns[0], "Variable's name")
 
@@ -175,9 +166,7 @@ def upsert_table(
             " join multiple sources"
         )
 
-    assert not gh.contains_inf(
-        table.iloc[:, 0]
-    ), f"Column `{table.columns[0]}` has inf values"
+    assert not gh.contains_inf(table.iloc[:, 0]), f"Column `{table.columns[0]}` has inf values"
 
     _update_variables_display(table)
 
@@ -209,9 +198,7 @@ def upsert_table(
             # Not exists, upsert it
             # NOTE: this could be quite inefficient as we upsert source for every variable
             #   optimize this if this turns out to be a bottleneck
-            source_id = _upsert_source_to_db(
-                db, source, dataset_upsert_result.dataset_id
-            )
+            source_id = _upsert_source_to_db(db, source, dataset_upsert_result.dataset_id)
 
         db_variable_id = db.upsert_variable(
             short_name=column_name,
@@ -235,9 +222,7 @@ def upsert_table(
             [int(db_variable_id)],
         )
 
-    df = table.rename(columns={column_name: "value", "entity_id": "entityId"}).assign(
-        variableId=db_variable_id
-    )
+    df = table.rename(columns={column_name: "value", "entity_id": "entityId"}).assign(variableId=db_variable_id)
 
     insert_to_data_values(df)
 
@@ -275,9 +260,7 @@ def set_dataset_checksum(dataset_id: int, checksum: str) -> None:
         )
 
 
-def cleanup_ghost_variables(
-    dataset_id: int, upserted_variable_ids: List[int], workers: int = 1
-) -> None:
+def cleanup_ghost_variables(dataset_id: int, upserted_variable_ids: List[int], workers: int = 1) -> None:
     """Remove all leftover variables that didn't get upserted into DB during grapher step.
     This could happen when you rename or delete a variable in ETL.
     Raise an error if we try to delete variable used by any chart.
@@ -314,17 +297,13 @@ def cleanup_ghost_variables(
         rows = db.cursor.fetchall()
         if rows:
             rows = pd.DataFrame(rows, columns=["chartId", "variableId"])
-            raise ValueError(
-                f"Variables used in charts will not be deleted automatically:\n{rows}"
-            )
+            raise ValueError(f"Variables used in charts will not be deleted automatically:\n{rows}")
 
         # first delete data_values
         # NOTE: deleting 100 variables takes ~30s with 10 workers with threading
         # and about ~3mins when deleting them in batch
         with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as executor:
-            list(
-                executor.map(_delete_variable_from_data_values, variable_ids_to_delete)
-            )
+            list(executor.map(_delete_variable_from_data_values, variable_ids_to_delete))
 
         # then variables themselves
         db.cursor.execute(

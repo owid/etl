@@ -33,9 +33,7 @@ def make_table() -> Table:
     land_area = load_land_area()
 
     # take the latest measurement of land area
-    land_area = (
-        land_area.sort_values("year").groupby(["country"], as_index=False).last()
-    )
+    land_area = land_area.sort_values("year").groupby(["country"], as_index=False).last()
 
     df = pd.merge(
         land_area[["country", "land_area"]],
@@ -45,11 +43,7 @@ def make_table() -> Table:
     )
 
     df = (
-        df.assign(
-            population_density=(df.population / df.land_area)
-            .round(3)
-            .rename("population_density")
-        )
+        df.assign(population_density=(df.population / df.land_area).round(3).rename("population_density"))
         .drop(columns=["population", "land_area"])
         .sort_values(["country", "year"])
     )
@@ -62,8 +56,7 @@ def make_table() -> Table:
 def load_sources() -> list[Source]:
     return cast(
         list[Source],
-        load_population().population.metadata.sources
-        + load_land_area().land_area.metadata.sources,
+        load_population().population.metadata.sources + load_land_area().land_area.metadata.sources,
     )
 
 

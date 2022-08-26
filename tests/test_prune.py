@@ -12,11 +12,7 @@ def test_prune(tmp_path: Path) -> None:
 
     index_file = tmp_path / "data/garden/owid/latest/todelete/index.json"
     index_file.parent.mkdir(exist_ok=True, parents=True)
-    index_file.write_text(
-        json.dumps(
-            {"namespace": "owid", "short_name": "todelete", "description": "test"}
-        )
-    )
+    index_file.write_text(json.dumps({"namespace": "owid", "short_name": "todelete", "description": "test"}))
 
     meta_file = tmp_path / "data/garden/owid/latest/todelete/todelete.meta.json"
     meta_file.write_text(json.dumps({"short_name": "todelete"}))

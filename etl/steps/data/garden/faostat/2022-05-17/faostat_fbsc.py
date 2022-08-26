@@ -85,16 +85,12 @@ def combine_fbsh_and_fbs_datasets(
     fbs = harmonize_elements(df=fbs)
 
     # Ensure there is no overlap in data between the two datasets, and that there is no gap between them.
-    assert (
-        fbs["year"].min() == FBS_FIRST_YEAR
-    ), f"First year of fbs dataset is not {FBS_FIRST_YEAR}"
+    assert fbs["year"].min() == FBS_FIRST_YEAR, f"First year of fbs dataset is not {FBS_FIRST_YEAR}"
     if fbsh["year"].max() >= fbs["year"].min():
         # There is overlapping data between fbsh and fbs datasets. Prioritising fbs over fbsh."
         fbsh = fbsh.loc[fbsh["year"] < fbs["year"].min()].reset_index(drop=True)
     if (fbsh["year"].max() + 1) < fbs["year"].min():
-        log.warning(
-            "Data is missing for one or more years between fbsh and fbs datasets."
-        )
+        log.warning("Data is missing for one or more years between fbsh and fbs datasets.")
 
     # Sanity checks.
     # Ensure the elements that are in fbsh but not in fbs are covered by ITEMS_MAPPING.
@@ -107,11 +103,7 @@ def combine_fbsh_and_fbs_datasets(
     assert set(fbsh["element"]) < set(fbs["element"]), error
 
     # Concatenate old and new dataframes using function that keeps categoricals.
-    fbsc = (
-        dataframes.concatenate([fbsh, fbs])
-        .sort_values(["area", "year"])
-        .reset_index(drop=True)
-    )
+    fbsc = dataframes.concatenate([fbsh, fbs]).sort_values(["area", "year"]).reset_index(drop=True)
 
     # Ensure that each element has only one unit and one description.
     error = "Some elements in the combined dataset have more than one unit."
@@ -123,9 +115,7 @@ def combine_fbsh_and_fbs_datasets(
 def _assert_df_size(df: pd.DataFrame, size_mb: float) -> None:
     """Check that dataframe is smaller than given size to prevent OOM errors."""
     real_size_mb = df.memory_usage(deep=True).sum() / 1e6
-    assert (
-        real_size_mb <= size_mb
-    ), f"DataFrame size is too big: {real_size_mb} MB > {size_mb} MB"
+    assert real_size_mb <= size_mb, f"DataFrame size is too big: {real_size_mb} MB > {size_mb} MB"
 
 
 def run(dest_dir: str) -> None:
@@ -134,9 +124,7 @@ def run(dest_dir: str) -> None:
     ####################################################################################################################
 
     # Load file of versions.
-    latest_versions = pd.read_csv(LATEST_VERSIONS_FILE).set_index(
-        ["channel", "dataset"]
-    )
+    latest_versions = pd.read_csv(LATEST_VERSIONS_FILE).set_index(["channel", "dataset"])
 
     # Find path to latest versions of fbsh dataset.
     fbsh_version = latest_versions.loc["meadow", "faostat_fbsh"].item()
@@ -145,14 +133,10 @@ def run(dest_dir: str) -> None:
     fbs_version = latest_versions.loc["meadow", "faostat_fbs"].item()
     fbs_file = DATA_DIR / "meadow" / NAMESPACE / fbs_version / "faostat_fbs"
     # Path to dataset of FAOSTAT metadata.
-    garden_metadata_dir = (
-        DATA_DIR / "garden" / NAMESPACE / VERSION / f"{NAMESPACE}_metadata"
-    )
+    garden_metadata_dir = DATA_DIR / "garden" / NAMESPACE / VERSION / f"{NAMESPACE}_metadata"
 
     # Path to outliers file.
-    outliers_file = (
-        STEP_DIR / "data" / "garden" / NAMESPACE / VERSION / "detected_outliers.json"
-    )
+    outliers_file = STEP_DIR / "data" / "garden" / NAMESPACE / VERSION / "detected_outliers.json"
 
     ####################################################################################################################
     # Load data.
@@ -168,17 +152,11 @@ def run(dest_dir: str) -> None:
 
     # Load and prepare dataset, items and element-units metadata.
     datasets_metadata = pd.DataFrame(metadata["datasets"]).reset_index()
-    datasets_metadata = datasets_metadata[
-        datasets_metadata["dataset"] == DATASET_SHORT_NAME
-    ].reset_index(drop=True)
+    datasets_metadata = datasets_metadata[datasets_metadata["dataset"] == DATASET_SHORT_NAME].reset_index(drop=True)
     items_metadata = pd.DataFrame(metadata["items"]).reset_index()
-    items_metadata = items_metadata[
-        items_metadata["dataset"] == DATASET_SHORT_NAME
-    ].reset_index(drop=True)
+    items_metadata = items_metadata[items_metadata["dataset"] == DATASET_SHORT_NAME].reset_index(drop=True)
     elements_metadata = pd.DataFrame(metadata["elements"]).reset_index()
-    elements_metadata = elements_metadata[
-        elements_metadata["dataset"] == DATASET_SHORT_NAME
-    ].reset_index(drop=True)
+    elements_metadata = elements_metadata[elements_metadata["dataset"] == DATASET_SHORT_NAME].reset_index(drop=True)
     countries_metadata = pd.DataFrame(metadata["countries"]).reset_index()
 
     # Load file of detected outliers.

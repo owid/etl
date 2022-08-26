@@ -24,12 +24,8 @@ DATASET_TITLE = "Energy dataset (OWID, 2022)"
 METADATA_PATH = CURRENT_DIR / f"{DATASET_SHORT_NAME}.meta.yml"
 # Details for datasets to import.
 ENERGY_MIX_DATASET_PATH = DATA_DIR / "garden/bp/2022-07-14/energy_mix"
-FOSSIL_FUEL_PRODUCTION_DATASET_PATH = (
-    DATA_DIR / "garden/energy/2022-07-20/fossil_fuel_production"
-)
-PRIMARY_ENERGY_CONSUMPTION_DATASET_PATH = (
-    DATA_DIR / "garden/energy/2022-07-29/primary_energy_consumption"
-)
+FOSSIL_FUEL_PRODUCTION_DATASET_PATH = DATA_DIR / "garden/energy/2022-07-20/fossil_fuel_production"
+PRIMARY_ENERGY_CONSUMPTION_DATASET_PATH = DATA_DIR / "garden/energy/2022-07-29/primary_energy_consumption"
 ELECTRICITY_MIX_DATASET_PATH = DATA_DIR / "garden/energy/2022-08-03/electricity_mix"
 COUNTRIES_REGIONS_DATASET_PATH = DATA_DIR / "garden/reference/"
 # Population and GDP are only used to add the population and gdp columns (and no other derived variables).
@@ -76,21 +72,15 @@ def combine_tables_data_and_metadata(
     df_combined = dataframes.multi_merge(dfs, on=["country", "year"], how="outer")
 
     # Add ISO codes for countries (regions that are not in countries-regions dataset will have nan iso_code).
-    df_combined = pd.merge(
-        df_combined, countries_regions, left_on="country", right_on="name", how="left"
-    )
+    df_combined = pd.merge(df_combined, countries_regions, left_on="country", right_on="name", how="left")
 
     # Add population and gdp of countries (except for dataset-specific regions e.g. those ending in (BP) or (Shift)).
-    df_combined = add_population(
-        df=df_combined, population=population, warn_on_missing_countries=False
-    )
+    df_combined = add_population(df=df_combined, population=population, warn_on_missing_countries=False)
     df_combined = pd.merge(df_combined, gdp, on=["country", "year"], how="left")
 
     # Check that there were no repetition in column names.
     error = "Repeated columns in combined data."
-    assert (
-        len([column for column in set(df_combined.columns) if "_x" in column]) == 0
-    ), error
+    assert len([column for column in set(df_combined.columns) if "_x" in column]) == 0, error
 
     # Create a table with combined data and no metadata.
     tb_combined = catalog.Table(df_combined)
@@ -111,51 +101,29 @@ def combine_tables_data_and_metadata(
             "key_indicators",
             "maddison_gdp",
         ]:
-            error = (
-                f"Variable {source_variable} not found in any of the original datasets."
-            )
+            error = f"Variable {source_variable} not found in any of the original datasets."
             assert source_variable in tables[source_dataset].columns, error
-            tb_combined[source_variable].metadata = tables[source_dataset][
-                source_variable
-            ].metadata
+            tb_combined[source_variable].metadata = tables[source_dataset][source_variable].metadata
 
         # Update metadata with the content of the variable mapping file.
-        tb_combined[source_variable].metadata.description = variable_metadata[
-            "description"
-        ]
-        tb_combined[source_variable].metadata.sources = [
-            catalog.meta.Source(name=variable_metadata["source"])
-        ]
+        tb_combined[source_variable].metadata.description = variable_metadata["description"]
+        tb_combined[source_variable].metadata.sources = [catalog.meta.Source(name=variable_metadata["source"])]
 
     # Select only variables in the mapping file, and rename variables according to the mapping.
-    tb_combined = tb_combined[source_variables].rename(
-        columns=variable_mapping.to_dict()["variable"]
-    )
+    tb_combined = tb_combined[source_variables].rename(columns=variable_mapping.to_dict()["variable"])
 
     # Remove rows that only have nan (ignoring if country, year, iso_code, population and gdp do have data).
     columns_that_must_have_data = [
-        column
-        for column in tb_combined.columns
-        if column not in ["country", "year", "iso_code", "population", "gdp"]
+        column for column in tb_combined.columns if column not in ["country", "year", "iso_code", "population", "gdp"]
     ]
-    tb_combined = tb_combined.dropna(
-        subset=columns_that_must_have_data, how="all"
-    ).reset_index(drop=True)
+    tb_combined = tb_combined.dropna(subset=columns_that_must_have_data, how="all").reset_index(drop=True)
 
     # Sanity check.
-    columns_with_inf = [
-        column
-        for column in tb_combined.columns
-        if len(tb_combined[tb_combined[column] == np.inf]) > 0
-    ]
-    assert (
-        len(columns_with_inf) == 0
-    ), f"Infinity values detected in columns: {columns_with_inf}"
+    columns_with_inf = [column for column in tb_combined.columns if len(tb_combined[tb_combined[column] == np.inf]) > 0]
+    assert len(columns_with_inf) == 0, f"Infinity values detected in columns: {columns_with_inf}"
 
     # Set index and sort conveniently.
-    tb_combined = tb_combined.set_index(
-        ["country", "year"], verify_integrity=True
-    ).sort_index()
+    tb_combined = tb_combined.set_index(["country", "year"], verify_integrity=True).sort_index()
 
     return cast(catalog.Table, tb_combined)
 
@@ -173,23 +141,17 @@ def run(dest_dir: str) -> None:
     # Gather all required tables from all datasets.
     tb_energy_mix = ds_energy_mix[ds_energy_mix.table_names[0]].reset_index()
     tb_fossil_fuels = ds_fossil_fuels[ds_fossil_fuels.table_names[0]].reset_index()
-    tb_primary_energy = ds_primary_energy[
-        ds_primary_energy.table_names[0]
-    ].reset_index()
-    tb_electricity_mix = ds_electricity_mix[
-        ds_electricity_mix.table_names[0]
-    ].reset_index()
+    tb_primary_energy = ds_primary_energy[ds_primary_energy.table_names[0]].reset_index()
+    tb_electricity_mix = ds_electricity_mix[ds_electricity_mix.table_names[0]].reset_index()
 
     # Load countries-regions dataset (required to get ISO codes).
-    countries_regions = catalog.Dataset(COUNTRIES_REGIONS_DATASET_PATH)[
-        "countries_regions"
-    ].reset_index()[["name", "iso_alpha3"]]
+    countries_regions = catalog.Dataset(COUNTRIES_REGIONS_DATASET_PATH)["countries_regions"].reset_index()[
+        ["name", "iso_alpha3"]
+    ]
 
     # Load population (used only to add a population column, and not to create any other derived variables).
     # Historical regions will be added to the population.
-    population = pd.DataFrame(
-        catalog.Dataset(POPULATION_DATASET_PATH)["population"]
-    ).reset_index()
+    population = pd.DataFrame(catalog.Dataset(POPULATION_DATASET_PATH)["population"]).reset_index()
 
     # Load gdp (used only to add gdp column, and no other derived variables).
     gdp = (
@@ -208,9 +170,7 @@ def run(dest_dir: str) -> None:
     tables = {
         "energy_mix": tb_energy_mix.drop(columns=["country_code"], errors="ignore"),
         "fossil_fuel_production": tb_fossil_fuels,
-        "primary_energy_consumption": tb_primary_energy.drop(
-            columns=["gdp", "population", "source"], errors="ignore"
-        ),
+        "primary_energy_consumption": tb_primary_energy.drop(columns=["gdp", "population", "source"], errors="ignore"),
         "electricity_mix": tb_electricity_mix.drop(
             columns=["population", "primary_energy_consumption__twh"], errors="ignore"
         ),
@@ -228,9 +188,7 @@ def run(dest_dir: str) -> None:
     #
     ds_garden = catalog.Dataset.create_empty(dest_dir)
     # Gather metadata sources from all tables' original dataset sources.
-    ds_garden.metadata.sources = gather_sources_from_tables(
-        tables=list(tables.values())
-    )
+    ds_garden.metadata.sources = gather_sources_from_tables(tables=list(tables.values()))
     # Get the rest of the metadata from the yaml file.
     ds_garden.metadata.update_from_yaml(METADATA_PATH)
     # Create dataset.

@@ -6,10 +6,7 @@ from etl.paths import DATA_DIR, REFERENCE_DATASET
 
 
 def load_land_area() -> Table:
-    d = Dataset(
-        DATA_DIR
-        / "open_numbers/open_numbers/latest/open_numbers__world_development_indicators"
-    )
+    d = Dataset(DATA_DIR / "open_numbers/open_numbers/latest/open_numbers__world_development_indicators")
     table = d["ag_lnd_totl_k2"]
 
     table = table.reset_index()

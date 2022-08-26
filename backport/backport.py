@@ -84,9 +84,7 @@ def backport(
 
     # get sources for dataset and all variables
     lg.info("backport.loading_sources")
-    sources = GrapherSourceModel.load_sources(
-        engine, dataset_id=ds.id, variable_ids=variable_ids
-    )
+    sources = GrapherSourceModel.load_sources(engine, dataset_id=ds.id, variable_ids=variable_ids)
 
     short_name = utils.create_short_name(ds.id, ds.name)
 
@@ -153,9 +151,7 @@ def _load_config(
     )
 
 
-def _walden_values_metadata(
-    ds: GrapherDatasetModel, short_name: str, public: bool
-) -> WaldenDataset:
+def _walden_values_metadata(ds: GrapherDatasetModel, short_name: str, public: bool) -> WaldenDataset:
     """Create walden dataset for grapher dataset values.
     These datasets are not meant for direct consumption from the catalog, but rather
     for postprocessing in etl.
@@ -175,9 +171,7 @@ def _walden_values_metadata(
     )
 
 
-def _walden_config_metadata(
-    ds: GrapherDatasetModel, short_name: str, origin_md5: str, public: bool
-) -> WaldenDataset:
+def _walden_config_metadata(ds: GrapherDatasetModel, short_name: str, origin_md5: str, public: bool) -> WaldenDataset:
     """Create walden dataset for grapher dataset variables and metadata."""
     config = _walden_values_metadata(ds, short_name, public)
     config.short_name = short_name + "_config"

@@ -100,9 +100,7 @@ def load_additional_data(data_file: str) -> pd.DataFrame:
 
     """
     # Load regional data from original excel file.
-    additional_data = pd.read_excel(data_file, sheet_name="Regional data", skiprows=1)[
-        1:
-    ]
+    additional_data = pd.read_excel(data_file, sheet_name="Regional data", skiprows=1)[1:]
 
     # Prepare additional population data.
     population_columns = [
@@ -118,9 +116,7 @@ def load_additional_data(data_file: str) -> pd.DataFrame:
         "World",
     ]
     additional_population_data = additional_data[population_columns]
-    additional_population_data.columns = [
-        region.replace(".1", "") for region in additional_population_data.columns
-    ]
+    additional_population_data.columns = [region.replace(".1", "") for region in additional_population_data.columns]
     additional_population_data = additional_population_data.melt(
         id_vars="Region", var_name="country", value_name="population"
     ).rename(columns={"Region": "year"})
@@ -138,9 +134,7 @@ def load_additional_data(data_file: str) -> pd.DataFrame:
         "Sub-Sahara Africa",
         "World GDP pc",
     ]
-    additional_gdp_data = additional_data[gdp_columns].rename(
-        columns={"World GDP pc": "World"}
-    )
+    additional_gdp_data = additional_data[gdp_columns].rename(columns={"World GDP pc": "World"})
     additional_gdp_data = additional_gdp_data.melt(
         id_vars="Region", var_name="country", value_name=GDP_PER_CAPITA_COLUMN
     ).rename(columns={"Region": "year"})
@@ -153,14 +147,11 @@ def load_additional_data(data_file: str) -> pd.DataFrame:
         how="inner",
     )
     # Convert units.
-    additional_combined_data["population"] = (
-        additional_combined_data["population"] * 1000
-    )
+    additional_combined_data["population"] = additional_combined_data["population"] * 1000
 
     # Create column for GDP.
     additional_combined_data[GDP_COLUMN] = (
-        additional_combined_data[GDP_PER_CAPITA_COLUMN]
-        * additional_combined_data["population"]
+        additional_combined_data[GDP_PER_CAPITA_COLUMN] * additional_combined_data["population"]
     )
 
     assert len(additional_combined_data) == len(additional_population_data)

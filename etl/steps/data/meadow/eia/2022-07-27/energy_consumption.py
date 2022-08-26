@@ -71,8 +71,7 @@ def extract_variable_from_raw_eia_data(
     }
     # Keep only rows with data for the given variable and unit.
     data = raw_data[
-        raw_data["name"].str.contains(variable_name, regex=False)
-        & (raw_data["units"] == unit_name)
+        raw_data["name"].str.contains(variable_name, regex=False) & (raw_data["units"] == unit_name)
     ].reset_index(drop=True)
 
     # Select and rename columns.
@@ -82,13 +81,7 @@ def extract_variable_from_raw_eia_data(
     data = data.dropna(subset=["values"])
 
     # Extract the country name.
-    data["country"] = (
-        data["country"]
-        .str.split(f"{variable_name}, ")
-        .str[1]
-        .str.split(f", {data_time_interval}")
-        .str[0]
-    )
+    data["country"] = data["country"].str.split(f"{variable_name}, ").str[1].str.split(f", {data_time_interval}").str[0]
 
     # For some reason some countries are duplicated; drop those duplicates.
     data = data.drop_duplicates(subset="country", keep="last")
@@ -128,9 +121,7 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     # Extract total energy consumption from the raw data.
-    data = extract_variable_from_raw_eia_data(
-        raw_data=raw_data, variable_name=VARIABLE_NAME, unit_name=UNIT_NAME
-    )
+    data = extract_variable_from_raw_eia_data(raw_data=raw_data, variable_name=VARIABLE_NAME, unit_name=UNIT_NAME)
 
     #
     # Save outputs.

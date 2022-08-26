@@ -75,4 +75,4 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
             "pop": "population",
             "gdppc": "gdp",
         }
-    )
+    ).drop(columns=["countrycode"])

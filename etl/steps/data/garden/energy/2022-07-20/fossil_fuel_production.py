@@ -43,9 +43,7 @@ def load_bp_data() -> catalog.Table:
 
     """
     # Load BP Statistical Review dataset.
-    bp_dataset = catalog.Dataset(
-        DATA_DIR / "garden" / BP_NAMESPACE / BP_VERSION / BP_DATASET_NAME
-    )
+    bp_dataset = catalog.Dataset(DATA_DIR / "garden" / BP_NAMESPACE / BP_VERSION / BP_DATASET_NAME)
 
     # Get table.
     bp_table = bp_dataset[bp_dataset.table_names[0]].reset_index()
@@ -77,18 +75,14 @@ def load_shift_data() -> catalog.Table:
         "gas": "Gas production (TWh)",
         "oil": "Oil production (TWh)",
     }
-    shift_dataset = catalog.Dataset(
-        DATA_DIR / "garden" / SHIFT_NAMESPACE / SHIFT_VERSION / SHIFT_DATASET_NAME
-    )
+    shift_dataset = catalog.Dataset(DATA_DIR / "garden" / SHIFT_NAMESPACE / SHIFT_VERSION / SHIFT_DATASET_NAME)
     shift_table = shift_dataset[shift_dataset.table_names[0]].reset_index()
     shift_table = shift_table[list(shift_columns)].rename(columns=shift_columns)
 
     return shift_table
 
 
-def combine_bp_and_shift_data(
-    bp_table: catalog.Table, shift_table: catalog.Table
-) -> pd.DataFrame:
+def combine_bp_and_shift_data(bp_table: catalog.Table, shift_table: catalog.Table) -> pd.DataFrame:
     """Combine BP and Shift data.
 
     Parameters
@@ -105,12 +99,8 @@ def combine_bp_and_shift_data(
 
     """
     # Check that there are no duplicated rows in any of the two datasets.
-    assert bp_table[
-        bp_table.duplicated(subset=["country", "year"])
-    ].empty, "Duplicated rows in BP data."
-    assert shift_table[
-        shift_table.duplicated(subset=["country", "year"])
-    ].empty, "Duplicated rows in Shift data."
+    assert bp_table[bp_table.duplicated(subset=["country", "year"])].empty, "Duplicated rows in BP data."
+    assert shift_table[shift_table.duplicated(subset=["country", "year"])].empty, "Duplicated rows in Shift data."
 
     # Combine Shift data (which goes further back in the past) with BP data (which is more up-to-date).
     # On coincident rows, prioritise BP data.
@@ -157,9 +147,9 @@ def add_annual_change(df: pd.DataFrame) -> pd.DataFrame:
         combined[f"Annual change in {cat.lower()} production (%)"] = (
             combined.groupby("country")[f"{cat} production (TWh)"].pct_change() * 100
         )
-        combined[f"Annual change in {cat.lower()} production (TWh)"] = combined.groupby(
-            "country"
-        )[f"{cat} production (TWh)"].diff()
+        combined[f"Annual change in {cat.lower()} production (TWh)"] = combined.groupby("country")[
+            f"{cat} production (TWh)"
+        ].diff()
 
     return combined
 

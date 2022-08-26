@@ -121,9 +121,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
             deps.append("data://garden/owid/latest/key_indicators")
         if form.load_countries_regions:
             deps.append("data://garden/reference")
-        dag_content = utils.add_to_dag(
-            {f"data://meadow/{form.namespace}/{form.version}/{form.short_name}": deps}
-        )
+        dag_content = utils.add_to_dag({f"data://meadow/{form.namespace}/{form.version}/{form.short_name}": deps})
     else:
         dag_content = ""
 

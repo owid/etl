@@ -23,8 +23,6 @@ def run(dest_dir: str) -> None:
     # scan this folder for scripts that begin with "table_" and run them
     table_scripts = Path(__file__).parent.glob("table_*.py")
     for script in table_scripts:
-        script_module = (
-            script.relative_to(BASE_DIR).with_suffix("").as_posix().replace("/", ".")
-        )
+        script_module = script.relative_to(BASE_DIR).with_suffix("").as_posix().replace("/", ".")
         t: Table = import_module(script_module).make_table()  # type: ignore
         ds.add(t)
