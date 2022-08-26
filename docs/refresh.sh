@@ -8,7 +8,7 @@
 macos_refresh() {
     osascript << EOF
 tell application "Google Chrome" to repeat with W in windows
-    reload (every tab in W whose URL contains "etl/docs")
+    reload (every tab in W whose URL contains "localhost:8000")
 end repeat
 EOF
 }

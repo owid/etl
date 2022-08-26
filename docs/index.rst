@@ -6,11 +6,7 @@ Intro to the ETL
    :caption: Contents:
 
    intro
-   architecture
-   walden
-   meadow
-   garden
-   grapher
+   quickstart
 
 Indices and tables
 ==================
