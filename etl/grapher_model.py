@@ -58,15 +58,9 @@ class GrapherDatasetModel(SQLModel, table=True):
             return session.exec(select(cls).where(cls.id == dataset_id)).one()
 
     @classmethod
-    def load_variables_for_dataset(
-        cls, engine: Engine, dataset_id: int
-    ) -> list["GrapherVariableModel"]:
+    def load_variables_for_dataset(cls, engine: Engine, dataset_id: int) -> list["GrapherVariableModel"]:
         with Session(engine) as session:
-            vars = session.exec(
-                select(GrapherVariableModel).where(
-                    GrapherVariableModel.datasetId == dataset_id
-                )
-            ).all()
+            vars = session.exec(select(GrapherVariableModel).where(GrapherVariableModel.datasetId == dataset_id)).all()
             assert vars
         return vars
 

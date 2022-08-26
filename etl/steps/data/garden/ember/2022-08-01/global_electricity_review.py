@@ -178,11 +178,7 @@ def prepare_wide_table(df: pd.DataFrame, category: str) -> catalog.Table:
     _df = df[df["category"] == category].copy()
 
     # Pivot dataframe to have a column for each variable.
-    table = catalog.Table(
-        _df.pivot(
-            index=["country", "year"], columns=["variable", "unit"], values="value"
-        )
-    )
+    table = catalog.Table(_df.pivot(index=["country", "year"], columns=["variable", "unit"], values="value"))
 
     # Get variable names, units, and variable-units (a name that combines both) for each column.
     variables = table.columns.get_level_values(0).tolist()
@@ -235,9 +231,7 @@ def process_electricity_generation(df: pd.DataFrame) -> catalog.Table:
                 raise ValueError(f"Column {value_column} not found.")
             # Select only regions.
             select_regions = table["country"].isin(list(REGIONS_TO_ADD))
-            table.loc[select_regions, column] = (
-                table[value_column] / table["Total Generation (TWh)"] * 100
-            )
+            table.loc[select_regions, column] = table[value_column] / table["Total Generation (TWh)"] * 100
 
     return table
 
@@ -266,9 +260,7 @@ def process_electricity_demand(df: pd.DataFrame) -> catalog.Table:
     # We could do this only for region aggregates (since they do not have per capita values),
     # but we do this for all countries, to ensure per-capita variables are consistent with our population data.
     table["Demand per capita (kWh)"] = (
-        pd.DataFrame(table)["Demand (TWh)"]
-        * TWH_TO_KWH
-        / pd.DataFrame(table)["population"]
+        pd.DataFrame(table)["Demand (TWh)"] * TWH_TO_KWH / pd.DataFrame(table)["population"]
     )
 
     # Delete the original demand per capita column.
@@ -308,20 +300,12 @@ def process_power_sector_emissions(df: pd.DataFrame) -> catalog.Table:
     table = table.rename(columns={intensity_col: "check"})
     # Calculate carbon intensity for all countries and regions.
     table[intensity_col] = (
-        pd.DataFrame(table)["Total emissions (mtCO2)"]
-        * MT_TO_G
-        / (table["Total Generation (TWh)"] * TWH_TO_KWH)
+        pd.DataFrame(table)["Total emissions (mtCO2)"] * MT_TO_G / (table["Total Generation (TWh)"] * TWH_TO_KWH)
     )
     # Check that the new carbon intensities agree (within 1 % of mean average percentage error) with the original
     # ones (where carbon intensity was given, namely for countries, not aggregate regions).
-    mape = (
-        100
-        * abs(table.dropna(subset="check")[intensity_col] - table["check"].dropna())
-        / table["check"].dropna()
-    )
-    assert (
-        mape.max() < 1
-    ), "Calculated carbon intensities differ from original ones by more than 1 percent."
+    mape = 100 * abs(table.dropna(subset="check")[intensity_col] - table["check"].dropna()) / table["check"].dropna()
+    assert mape.max() < 1, "Calculated carbon intensities differ from original ones by more than 1 percent."
     # Remove temporary column.
     table = table.drop(columns="check")
 
@@ -354,9 +338,7 @@ def run(dest_dir: str) -> None:
         "Capacity": prepare_wide_table(df=df, category="Capacity"),
         "Electricity demand": process_electricity_demand(df=df),
         "Electricity generation": process_electricity_generation(df=df),
-        "Electricity imports": prepare_wide_table(
-            df=df, category="Electricity imports"
-        ),
+        "Electricity imports": prepare_wide_table(df=df, category="Electricity imports"),
         "Power sector emissions": process_power_sector_emissions(df=df),
     }
 
@@ -378,9 +360,7 @@ def run(dest_dir: str) -> None:
         # Make column names snake lower case.
         table = catalog.utils.underscore_table(table)
         # Import metadata from meadow and update attributes that have changed.
-        table.update_metadata_from_yaml(
-            METADATA_PATH, catalog.utils.underscore(table_name)
-        )
+        table.update_metadata_from_yaml(METADATA_PATH, catalog.utils.underscore(table_name))
         table.metadata.title = table_name
         table.metadata.short_name = catalog.utils.underscore(table_name)
         # Add table to dataset.

@@ -49,9 +49,7 @@ EXPECTED_COLUMNS = {
 
 def run(dest_dir: str) -> None:
     # Load the latest dataset for FAOSTAT food explorer from garden.
-    dataset_garden_latest_dir = sorted(
-        (DATA_DIR / "garden" / "faostat").glob("*/faostat_food_explorer")
-    )[-1]
+    dataset_garden_latest_dir = sorted((DATA_DIR / "garden" / "faostat").glob("*/faostat_food_explorer"))[-1]
     dataset_garden = catalog.Dataset(dataset_garden_latest_dir)
     # Get the table of all food products.
     table_garden = dataset_garden["all_products"]
@@ -75,23 +73,14 @@ def run(dest_dir: str) -> None:
         table_product.title = product
 
         # Rename columns, select the required ones, and sort columns and rows conveniently.
-        table_product = table_product[list(EXPECTED_COLUMNS)].rename(
-            columns=EXPECTED_COLUMNS
-        )
+        table_product = table_product[list(EXPECTED_COLUMNS)].rename(columns=EXPECTED_COLUMNS)
         table_product = table_product[
-            ["population"]
-            + [
-                column
-                for column in sorted(table_product.columns)
-                if column not in ["population"]
-            ]
+            ["population"] + [column for column in sorted(table_product.columns) if column not in ["population"]]
         ]
         table_product = table_product.sort_index()
 
         table_product.metadata.short_name = (
-            catalog.utils.underscore(name=product, validate=True)
-            .replace("__", "_")
-            .replace("_e_g_", "_eg_")
+            catalog.utils.underscore(name=product, validate=True).replace("__", "_").replace("_e_g_", "_eg_")
         )
         # Add table to dataset. Force publication in csv.
         dataset.add(table_product, formats=["csv"])

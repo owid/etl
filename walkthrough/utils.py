@@ -11,15 +11,15 @@ from etl.steps import DAG
 DAG_WALKTHROUGH_PATH = BASE_DIR / "dag_files/dag_walkthrough.yml"
 
 DUMMY_DATA = {
-    "short_name": "dummy",
     "namespace": "dummy",
-    "version": "2020",
-    "walden_version": "2020",
+    "short_name": "dummy",
+    "version": "2020-01-01",
+    "walden_version": "2020-01-01",
     "name": "Dummy dataset",
     "description": "This\nis\na\ndummy\ndataset",
     "file_extension": "xlsx",
     "source_data_url": "https://www.rug.nl/ggdc/historicaldevelopment/maddison/data/mpd2020.xlsx",
-    "publication_year": 2020,
+    "publication_date": "2020-01-01",
     "source_name": "dummy source",
     "url": "https://www.dummy.com/",
 }
@@ -55,9 +55,7 @@ def preview_file(path: Path, language: str) -> None:
         WIDGET_TEMPLATE,
         {
             "open": False,
-            "title": po.put_success(
-                po.put_markdown(f"File `{path}` was successfully generated")
-            ),
+            "title": po.put_success(po.put_markdown(f"File `{path}` was successfully generated")),
             "contents": [po.put_markdown(f"```{language}\n{t}```")],
         },
     )
@@ -68,9 +66,7 @@ def preview_dag(dag_content: str) -> None:
         WIDGET_TEMPLATE,
         {
             "open": False,
-            "title": po.put_success(
-                po.put_markdown("Steps in dag.yml were successfully generated")
-            ),
+            "title": po.put_success(po.put_markdown("Steps in dag.yml were successfully generated")),
             "contents": [po.put_markdown(f"```yml\n  {dag_content}\n```")],
         },
     )
@@ -79,6 +75,15 @@ def preview_dag(dag_content: str) -> None:
 def add_to_dag(dag: DAG) -> str:
     with open(DAG_WALKTHROUGH_PATH, "r") as f:
         dag_str = f.read()
+        f.seek(0)
+        dag_dict = yaml.safe_load(f)
+
+    # exclude steps which are already there
+    dag = {k: v for k, v in dag.items() if k not in dag_dict["steps"]}
+
+    # step is already there don't add anything
+    if not dag:
+        return dag_str
 
     steps = yaml.dump({"steps": dag}).split("\n", 1)[1]
 

@@ -40,9 +40,7 @@ def mock(_type: type) -> Any:
         return 10 * random.random() / random.random()
 
     elif _type == dt.date:
-        return dt.date.fromordinal(
-            dt.date.today().toordinal() - random.randint(0, 1000)
-        )
+        return dt.date.fromordinal(dt.date.today().toordinal() - random.randint(0, 1000))
 
     elif _type == str:
         if not _MOCK_STRINGS:
@@ -62,11 +60,6 @@ def mock(_type: type) -> Any:
 
     elif hasattr(_type, "__dataclass_fields__"):
         # all dataclasses
-        return _type(
-            **{
-                f.name: mock(f.type)
-                for f in _type.__dataclass_fields__.values()  # type: ignore
-            }
-        )
+        return _type(**{f.name: mock(f.type) for f in _type.__dataclass_fields__.values()})  # type: ignore
 
     raise ValueError(f"don't know how to mock type: {_type}")

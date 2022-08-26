@@ -3,8 +3,11 @@
 import json
 from typing import Any, Dict, Iterable, List, Optional, Tuple, cast
 
+import structlog
 from MySQLdb.cursors import Cursor
 from unidecode import unidecode
+
+log = structlog.get_logger()
 
 UNMODIFIED = 0
 INSERT = 1
@@ -201,9 +204,9 @@ class DBUtils:
                 user_id,
             ],
         )
-        (v,) = self.fetch_one(
+        (v, ds_is_archived) = self.fetch_one(
             """
-            SELECT id FROM datasets
+            SELECT id, isArchived FROM datasets
             WHERE shortName = %s
             AND version = %s
             AND namespace = %s
@@ -211,6 +214,13 @@ class DBUtils:
             [short_name, version, namespace],
         )
         dataset_id = cast(int, v)
+
+        if ds_is_archived:
+            log.warning(
+                "upsert_dataset.dataset_is_archived",
+                id=dataset_id,
+                short_name=short_name,
+            )
 
         if operation == INSERT:
             self.counts["datasets_inserted"] += 1
@@ -386,9 +396,7 @@ class DBUtils:
         )
         self.counts["variables_updated"] += self.cursor.rowcount
 
-    def note_import(
-        self, import_type: str, import_notes: str, import_state: str
-    ) -> None:
+    def note_import(self, import_type: str, import_notes: str, import_state: str) -> None:
         self.upsert_one(
             """
             INSERT INTO importer_importhistory (import_type, import_time, import_notes, import_state)

@@ -13,9 +13,7 @@ def run(dest_dir: str) -> None:
     version = Path(__file__).parent.stem
     fname = Path(__file__).stem
     namespace = Path(__file__).parent.parent.stem
-    walden_ds = Catalog().find_one(
-        namespace=namespace, short_name=fname, version=version
-    )
+    walden_ds = Catalog().find_one(namespace=namespace, short_name=fname, version=version)
     local_file = walden_ds.ensure_downloaded()
     zf = zipfile.ZipFile(local_file)
     df = pd.read_csv(zf.open("WDIData.csv"))
@@ -32,18 +30,14 @@ def run(dest_dir: str) -> None:
 
     assert df["country_name"].notnull().all()
     assert df["indicator_code"].notnull().all()
-    assert (
-        df[years].apply(lambda s: is_numeric_dtype(s), axis=0).all()
-    ), "One or more {year} columns is non-numeric"
+    assert df[years].apply(lambda s: is_numeric_dtype(s), axis=0).all(), "One or more {year} columns is non-numeric"
 
     # variable code <-> variable name should be a 1:1 mapping
     assert (
-        df.groupby("indicator_code")["indicator_name"].apply(lambda gp: gp.nunique())
-        == 1
+        df.groupby("indicator_code")["indicator_name"].apply(lambda gp: gp.nunique()) == 1
     ).all(), "A variable code in `WDIData.csv` has multiple variable names."
     assert (
-        df.groupby("indicator_name")["indicator_code"].apply(lambda gp: gp.nunique())
-        == 1
+        df.groupby("indicator_name")["indicator_code"].apply(lambda gp: gp.nunique()) == 1
     ).all(), "A variable name in `WDIData.csv` has multiple variable codes."
 
     # reshapes data from `country indicator 1960 1961 ...` format
@@ -59,9 +53,7 @@ def run(dest_dir: str) -> None:
         .unstack("indicator_code")
         .dropna(how="all")
     )
-    assert (
-        not df_reshaped.isnull().all(axis=1).any()
-    ), "Unexpected state: One or more rows contains only NaN values."
+    assert not df_reshaped.isnull().all(axis=1).any(), "Unexpected state: One or more rows contains only NaN values."
 
     # creates the dataset and adds a table
     ds = Dataset.create_empty(dest_dir)

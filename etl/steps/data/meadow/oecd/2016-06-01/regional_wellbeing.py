@@ -54,15 +54,11 @@ assert len(df[["ind_code", "ind_name"]].drop_duplicates()) == len(df.ind_code.un
 
 # #### One name per unit
 
-assert len(df[["unit_code", "unit_name"]].drop_duplicates()) == len(
-    df.unit_code.unique()
-)
+assert len(df[["unit_code", "unit_name"]].drop_duplicates()) == len(df.unit_code.unique())
 
 # #### One name per region
 
-assert len(df[["region_code", "region_name"]].drop_duplicates()) == len(
-    df.region_code.unique()
-)
+assert len(df[["region_code", "region_name"]].drop_duplicates()) == len(df.region_code.unique())
 
 # ## Capture important metadata pre-pivot
 
@@ -70,21 +66,12 @@ assert len(df[["region_code", "region_name"]].drop_duplicates()) == len(
 ind = df[["ind_code", "ind_name"]].drop_duplicates().set_index("ind_code").ind_name
 
 # unit short_name of each indicator
-ind_unit_code = (
-    df[["ind_code", "unit_code"]].drop_duplicates().set_index("ind_code").unit_code
-)
+ind_unit_code = df[["ind_code", "unit_code"]].drop_duplicates().set_index("ind_code").unit_code
 
 # unit title for each indicator
-ind_unit_name = (
-    df[["ind_code", "unit_name"]].drop_duplicates().set_index("ind_code").unit_name
-)
+ind_unit_name = df[["ind_code", "unit_name"]].drop_duplicates().set_index("ind_code").unit_name
 
-regions = (
-    df[["region_code", "region_name"]]
-    .drop_duplicates()
-    .set_index("region_code")
-    .region_name
-)
+regions = df[["region_code", "region_name"]].drop_duplicates().set_index("region_code").region_name
 
 # ## Strip back and pivot
 

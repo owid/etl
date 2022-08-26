@@ -33,9 +33,7 @@ def load_data(tmp_dir: str) -> Tuple[pd.DataFrame, ...]:
 
 def _load_population(tmp_dir: str) -> pd.DataFrame:
     """Load population dataset (CSV)"""
-    filenames = list(
-        filter(lambda x: "PopulationBySingleAgeSex" in x, os.listdir(tmp_dir))
-    )
+    filenames = list(filter(lambda x: "PopulationBySingleAgeSex" in x, os.listdir(tmp_dir)))
     dtype = {
         "SortOrder": "category",
         "LocID": "category",
@@ -59,21 +57,14 @@ def _load_population(tmp_dir: str) -> pd.DataFrame:
         "PopTotal": "float",
     }
     return pd.concat(
-        [
-            pd.read_csv(os.path.join(tmp_dir, filename), dtype=dtype)
-            for filename in filenames
-        ],
+        [pd.read_csv(os.path.join(tmp_dir, filename), dtype=dtype) for filename in filenames],
         ignore_index=True,
     )
 
 
 def _load_fertility(tmp_dir: str) -> pd.DataFrame:
     """Load fertility dataset (CSV)"""
-    (filename,) = [
-        f
-        for f in filter(lambda x: "Fertility" in x, os.listdir(tmp_dir))
-        if "notes" not in f
-    ]
+    (filename,) = [f for f in filter(lambda x: "Fertility" in x, os.listdir(tmp_dir)) if "notes" not in f]
     dtype = {
         "SortOrder": "category",
         "LocID": "category",
@@ -101,11 +92,7 @@ def _load_fertility(tmp_dir: str) -> pd.DataFrame:
 
 def _load_demographics(tmp_dir: str) -> pd.DataFrame:
     """Load demographics dataset (CSV)"""
-    filenames = [
-        f
-        for f in filter(lambda x: "Demographic" in x, os.listdir(tmp_dir))
-        if "notes" not in f
-    ]
+    filenames = [f for f in filter(lambda x: "Demographic" in x, os.listdir(tmp_dir)) if "notes" not in f]
     dtype = {
         "SortOrder": "category",
         "LocID": "category",
@@ -117,9 +104,7 @@ def _load_demographics(tmp_dir: str) -> pd.DataFrame:
         "LocTypeName": "category",
         "ParentID": "category",
         "Location": "category",
-        "VarID": CategoricalDtype(
-            categories=["2", "3", "4", "5", "6", "7", "8", "9", "10", "16"]
-        ),
+        "VarID": CategoricalDtype(categories=["2", "3", "4", "5", "6", "7", "8", "9", "10", "16"]),
         "Variant": CategoricalDtype(
             categories=[
                 "Medium",
@@ -142,10 +127,7 @@ def _load_demographics(tmp_dir: str) -> pd.DataFrame:
         "Time": "uint16",
     }
     return pd.concat(
-        [
-            pd.read_csv(os.path.join(tmp_dir, filename), dtype=dtype)
-            for filename in filenames
-        ],
+        [pd.read_csv(os.path.join(tmp_dir, filename), dtype=dtype) for filename in filenames],
         ignore_index=True,
     )
 
@@ -218,9 +200,7 @@ def process(
         df_demographics,
         df_depratio,
         df_deaths,
-    ) = sanity_checks(
-        df_population, df_fertility, df_demographics, df_depratio, df_deaths
-    )
+    ) = sanity_checks(df_population, df_fertility, df_demographics, df_depratio, df_deaths)
     # Harmonize column names across datasets (CSV, XLSX)
     df_depratio, df_deaths = std_columns(df_depratio, df_deaths)
     # Set index
@@ -234,9 +214,7 @@ def process(
         df_demographics,
         df_depratio,
         df_deaths,
-    ) = df_cols_as_str(
-        df_population, df_fertility, df_demographics, df_depratio, df_deaths
-    )
+    ) = df_cols_as_str(df_population, df_fertility, df_demographics, df_depratio, df_deaths)
     # Fix column types
     df_depratio, df_deaths = fix_types(df_depratio, df_deaths)
     return df_population, df_fertility, df_demographics, df_depratio, df_deaths
@@ -287,9 +265,7 @@ def sanity_checks(
     return df_population, df_fertility, df_demographics, df_depratio, df_deaths
 
 
-def std_columns(
-    df_depratio: pd.DataFrame, df_deaths: pd.DataFrame
-) -> Tuple[pd.DataFrame, ...]:
+def std_columns(df_depratio: pd.DataFrame, df_deaths: pd.DataFrame) -> Tuple[pd.DataFrame, ...]:
     columns_rename = {
         "Variant": "Variant",
         "Region, subregion, country or area *": "Location",
@@ -353,9 +329,7 @@ def df_cols_as_str(
     return df_population, df_fertility, df_demographics, df_depratio, df_deaths
 
 
-def fix_types(
-    df_depratio: pd.DataFrame, df_deaths: pd.DataFrame
-) -> Tuple[pd.DataFrame, ...]:
+def fix_types(df_depratio: pd.DataFrame, df_deaths: pd.DataFrame) -> Tuple[pd.DataFrame, ...]:
     _type = pd.StringDtype()
     df_depratio = df_depratio.assign(Notes=df_depratio.Notes.astype(_type))
     df_deaths = df_deaths.assign(Notes=df_deaths.Notes.astype(_type))
@@ -434,6 +408,4 @@ def run(dest_dir: str) -> None:
     # Initiate dataset
     ds = init_dataset(dest_dir, walden_ds)
     # Add tables to dataset
-    ds = add_tables_to_ds(
-        ds, df_population, df_fertility, df_demographics, df_depratio, df_deaths
-    )
+    ds = add_tables_to_ds(ds, df_population, df_fertility, df_demographics, df_depratio, df_deaths)

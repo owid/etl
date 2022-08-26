@@ -56,11 +56,7 @@ def get_bp_data(bp_table: catalog.Table) -> pd.DataFrame:
 
     # Convert table (snake case) column names to human readable names.
     bp_table = bp_table.rename(
-        columns={
-            column: bp_table[column].metadata.title
-            for column in bp_table.columns
-            if column != "country_code"
-        }
+        columns={column: bp_table[column].metadata.title for column in bp_table.columns if column != "country_code"}
     ).reset_index()
 
     # Rename human-readable columns (and select only the ones that will be used).
@@ -94,9 +90,7 @@ def get_bp_data(bp_table: catalog.Table) -> pd.DataFrame:
     assert set(columns) < set(bp_table.columns), "Column names have changed in BP data."
 
     bp_data = (
-        pd.DataFrame(bp_table)[list(columns)]
-        .rename(errors="raise", columns=columns)
-        .astype({"Country code": str})
+        pd.DataFrame(bp_table)[list(columns)].rename(errors="raise", columns=columns).astype({"Country code": str})
     )
 
     return bp_data
@@ -115,17 +109,12 @@ def _check_that_substitution_method_is_well_calculated(
             "Primary energy (TWh - equivalent)",
         ]
     ].reset_index(drop=True)
-    check["Primary energy (TWh - equivalent) - original"] = (
-        check["Primary energy (EJ - equivalent)"] * EJ_TO_TWH
-    )
+    check["Primary energy (TWh - equivalent) - original"] = check["Primary energy (EJ - equivalent)"] * EJ_TO_TWH
     check = check.dropna().reset_index(drop=True)
     # They may not coincide exactly, but at least check that they differ (point by point) by less than 10%.
     max_deviation = max(
         abs(
-            (
-                check["Primary energy (TWh - equivalent)"]
-                - check["Primary energy (TWh - equivalent) - original"]
-            )
+            (check["Primary energy (TWh - equivalent)"] - check["Primary energy (TWh - equivalent) - original"])
             / check["Primary energy (TWh - equivalent) - original"]
         )
     )
@@ -153,9 +142,7 @@ def calculate_direct_primary_energy(primary_energy: pd.DataFrame) -> pd.DataFram
 
     # Create column for fossil fuels primary energy (if any of them is nan, the sum will be nan).
     primary_energy["Fossil fuels (EJ)"] = (
-        primary_energy["Coal (EJ)"]
-        + primary_energy["Oil (EJ)"]
-        + primary_energy["Gas (EJ)"]
+        primary_energy["Coal (EJ)"] + primary_energy["Oil (EJ)"] + primary_energy["Gas (EJ)"]
     )
 
     # Convert primary energy of fossil fuels and biofuels into TWh.
@@ -164,9 +151,7 @@ def calculate_direct_primary_energy(primary_energy: pd.DataFrame) -> pd.DataFram
 
     # Create column for primary energy from fossil fuels (in TWh).
     primary_energy["Fossil fuels (TWh)"] = (
-        primary_energy["Coal (TWh)"]
-        + primary_energy["Oil (TWh)"]
-        + primary_energy["Gas (TWh)"]
+        primary_energy["Coal (TWh)"] + primary_energy["Oil (TWh)"] + primary_energy["Gas (TWh)"]
     )
 
     # Create column for direct primary energy from renewable sources in TWh.
@@ -183,13 +168,12 @@ def calculate_direct_primary_energy(primary_energy: pd.DataFrame) -> pd.DataFram
     )
     # Create column for direct primary energy from low-carbon sources in TWh.
     # (total renewable electricity generation, biofuels, and nuclear power) (in TWh).
-    primary_energy["Low-carbon energy (TWh - direct)"] = primary_energy[
-        "Renewables (TWh - direct)"
-    ] + primary_energy["Nuclear (TWh - direct)"].fillna(0)
+    primary_energy["Low-carbon energy (TWh - direct)"] = primary_energy["Renewables (TWh - direct)"] + primary_energy[
+        "Nuclear (TWh - direct)"
+    ].fillna(0)
     # Create column for total direct primary energy.
     primary_energy["Primary energy (TWh - direct)"] = (
-        primary_energy["Fossil fuels (TWh)"]
-        + primary_energy["Low-carbon energy (TWh - direct)"]
+        primary_energy["Fossil fuels (TWh)"] + primary_energy["Low-carbon energy (TWh - direct)"]
     )
 
     return primary_energy
@@ -227,14 +211,11 @@ def calculate_equivalent_primary_energy(primary_energy: pd.DataFrame) -> pd.Data
     # Convert input-equivalent primary energy of non-fossil based electricity into TWh.
     # The result is primary energy using the "substitution method".
     for cat in DIRECT_AND_EQUIVALENT_ENERGY:
-        primary_energy[f"{cat} (TWh - equivalent)"] = (
-            primary_energy[f"{cat} (EJ - equivalent)"] * EJ_TO_TWH
-        )
+        primary_energy[f"{cat} (TWh - equivalent)"] = primary_energy[f"{cat} (EJ - equivalent)"] * EJ_TO_TWH
     # Create column for primary energy from all sources (which corresponds to input-equivalent primary
     # energy for non-fossil based sources).
     primary_energy["Primary energy (TWh - equivalent)"] = (
-        primary_energy["Fossil fuels (TWh)"]
-        + primary_energy["Low-carbon energy (TWh - equivalent)"]
+        primary_energy["Fossil fuels (TWh)"] + primary_energy["Low-carbon energy (TWh - equivalent)"]
     )
     # Check that the primary energy constructed using the substitution method coincides with the
     # input-equivalent primary energy.
@@ -274,29 +255,21 @@ def calculate_share_of_primary_energy(primary_energy: pd.DataFrame) -> pd.DataFr
     for source in ONLY_DIRECT_ENERGY:
         # Calculate each source as share of direct primary energy.
         primary_energy[f"{source} (% direct primary energy)"] = (
-            primary_energy[f"{source} (TWh)"]
-            / primary_energy["Primary energy (TWh - direct)"]
-            * 100
+            primary_energy[f"{source} (TWh)"] / primary_energy["Primary energy (TWh - direct)"] * 100
         )
         # Calculate each source as share of input-equivalent primary energy (i.e. substitution method).
         primary_energy[f"{source} (% equivalent primary energy)"] = (
-            primary_energy[f"{source} (EJ)"]
-            / primary_energy["Primary energy (EJ - equivalent)"]
-            * 100
+            primary_energy[f"{source} (EJ)"] / primary_energy["Primary energy (EJ - equivalent)"] * 100
         )
 
     for source in DIRECT_AND_EQUIVALENT_ENERGY:
         # Calculate each source as share of direct primary energy.
         primary_energy[f"{source} (% direct primary energy)"] = (
-            primary_energy[f"{source} (TWh - direct)"]
-            / primary_energy["Primary energy (TWh - direct)"]
-            * 100
+            primary_energy[f"{source} (TWh - direct)"] / primary_energy["Primary energy (TWh - direct)"] * 100
         )
         # Calculate each source as share of input-equivalent primary energy (i.e. substitution method).
         primary_energy[f"{source} (% equivalent primary energy)"] = (
-            primary_energy[f"{source} (EJ - equivalent)"]
-            / primary_energy["Primary energy (EJ - equivalent)"]
-            * 100
+            primary_energy[f"{source} (EJ - equivalent)"] / primary_energy["Primary energy (EJ - equivalent)"] * 100
         )
 
     return primary_energy
@@ -321,34 +294,27 @@ def calculate_primary_energy_annual_change(
     primary_energy = primary_energy.copy()
 
     # Calculate annual change in each source.
-    primary_energy = primary_energy.sort_values(["Country", "Year"]).reset_index(
-        drop=True
-    )
+    primary_energy = primary_energy.sort_values(["Country", "Year"]).reset_index(drop=True)
     for source in ONLY_DIRECT_ENERGY:
         # Create column for source percentage growth as a function of direct primary energy.
-        primary_energy[f"{source} (% growth)"] = (
-            primary_energy.groupby("Country")[f"{source} (TWh)"].pct_change() * 100
-        )
+        primary_energy[f"{source} (% growth)"] = primary_energy.groupby("Country")[f"{source} (TWh)"].pct_change() * 100
         # Create column for source absolute growth as a function of direct primary energy.
-        primary_energy[f"{source} (TWh growth)"] = primary_energy.groupby("Country")[
-            f"{source} (TWh)"
-        ].diff()
+        primary_energy[f"{source} (TWh growth)"] = primary_energy.groupby("Country")[f"{source} (TWh)"].diff()
 
     for source in DIRECT_AND_EQUIVALENT_ENERGY:
         # Create column for source percentage growth as a function of primary energy
         # (as a percentage, it is irrelevant whether it is direct or equivalent).
         primary_energy[f"{source} (% growth)"] = (
-            primary_energy.groupby("Country")[f"{source} (TWh - direct)"].pct_change()
-            * 100
+            primary_energy.groupby("Country")[f"{source} (TWh - direct)"].pct_change() * 100
         )
         # Create column for source absolute growth as a function of direct primary energy.
-        primary_energy[f"{source} (TWh growth - direct)"] = primary_energy.groupby(
-            "Country"
-        )[f"{source} (TWh - direct)"].diff()
+        primary_energy[f"{source} (TWh growth - direct)"] = primary_energy.groupby("Country")[
+            f"{source} (TWh - direct)"
+        ].diff()
         # Create column for source absolute growth as a function of input-equivalent primary energy.
-        primary_energy[f"{source} (TWh growth - equivalent)"] = primary_energy.groupby(
-            "Country"
-        )[f"{source} (TWh - equivalent)"].diff()
+        primary_energy[f"{source} (TWh growth - equivalent)"] = primary_energy.groupby("Country")[
+            f"{source} (TWh - equivalent)"
+        ].diff()
 
     return primary_energy
 
@@ -378,20 +344,14 @@ def add_per_capita_variables(primary_energy: pd.DataFrame) -> pd.DataFrame:
     )
     for source in ONLY_DIRECT_ENERGY:
         primary_energy[f"{source} per capita (kWh)"] = (
-            primary_energy[f"{source} (TWh)"]
-            / primary_energy["Population"]
-            * TWH_TO_KWH
+            primary_energy[f"{source} (TWh)"] / primary_energy["Population"] * TWH_TO_KWH
         )
     for source in DIRECT_AND_EQUIVALENT_ENERGY:
         primary_energy[f"{source} per capita (kWh - direct)"] = (
-            primary_energy[f"{source} (TWh - direct)"]
-            / primary_energy["Population"]
-            * TWH_TO_KWH
+            primary_energy[f"{source} (TWh - direct)"] / primary_energy["Population"] * TWH_TO_KWH
         )
         primary_energy[f"{source} per capita (kWh - equivalent)"] = (
-            primary_energy[f"{source} (TWh - equivalent)"]
-            / primary_energy["Population"]
-            * TWH_TO_KWH
+            primary_energy[f"{source} (TWh - equivalent)"] / primary_energy["Population"] * TWH_TO_KWH
         )
 
     # Drop unnecessary column.
@@ -418,11 +378,7 @@ def prepare_output_table(primary_energy: pd.DataFrame) -> catalog.Table:
     # Keep only columns in TWh (and not EJ or PJ).
     table = catalog.Table(primary_energy).drop(
         errors="raise",
-        columns=[
-            column
-            for column in primary_energy.columns
-            if (("(EJ" in column) or ("(PJ" in column))
-        ],
+        columns=[column for column in primary_energy.columns if (("(EJ" in column) or ("(PJ" in column))],
     )
 
     # Replace spurious inf values by nan.
@@ -457,9 +413,7 @@ def prepare_output_table(primary_energy: pd.DataFrame) -> catalog.Table:
                 table[column].metadata.unit = short_unit_to_unit[short_unit]
                 table[column].metadata.display = {}
                 if short_unit in short_unit_to_num_decimals:
-                    table[column].metadata.display[
-                        "numDecimalPlaces"
-                    ] = short_unit_to_num_decimals[short_unit]
+                    table[column].metadata.display["numDecimalPlaces"] = short_unit_to_num_decimals[short_unit]
                 # Add the variable name without unit (only relevant for grapher).
                 table[column].metadata.display["name"] = column.split(" (")[0]
 
@@ -473,13 +427,7 @@ def run(dest_dir: str) -> None:
     # Load data.
     #
     # Load the latest BP statistical review.
-    bp_dataset_path = (
-        DATA_DIR
-        / "garden"
-        / STAT_REVIEW_NAMESPACE
-        / STAT_REVIEW_VERSION
-        / STAT_REVIEW_SHORT_NAME
-    )
+    bp_dataset_path = DATA_DIR / "garden" / STAT_REVIEW_NAMESPACE / STAT_REVIEW_VERSION / STAT_REVIEW_SHORT_NAME
     bp_dataset = catalog.Dataset(bp_dataset_path)
     bp_table = bp_dataset[bp_dataset.table_names[0]]
 

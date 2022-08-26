@@ -99,18 +99,12 @@ class Names:
 
     @property
     def meadow_dataset(self) -> catalog.Dataset:
-        return catalog.Dataset(
-            paths.DATA_DIR / f"meadow/{self.namespace}/{self.version}/{self.short_name}"
-        )
+        return catalog.Dataset(paths.DATA_DIR / f"meadow/{self.namespace}/{self.version}/{self.short_name}")
 
     @property
     def garden_dataset(self) -> catalog.Dataset:
-        return catalog.Dataset(
-            paths.DATA_DIR / f"garden/{self.namespace}/{self.version}/{self.short_name}"
-        )
+        return catalog.Dataset(paths.DATA_DIR / f"garden/{self.namespace}/{self.version}/{self.short_name}")
 
     @property
     def walden_dataset(self) -> walden.Dataset:
-        return walden.Catalog().find_one(
-            namespace=self.namespace, version=self.version, short_name=self.short_name
-        )
+        return walden.Catalog().find_one(namespace=self.namespace, version=self.version, short_name=self.short_name)

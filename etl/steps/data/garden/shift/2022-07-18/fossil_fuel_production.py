@@ -20,9 +20,7 @@ NAMESPACE = "shift"
 DATASET_SHORT_NAME = "fossil_fuel_production"
 
 VERSION = Path(__file__).parent.name
-COUNTRY_MAPPING_PATH = (
-    Path(__file__).parent / f"{DATASET_SHORT_NAME}.country_mapping.json"
-)
+COUNTRY_MAPPING_PATH = Path(__file__).parent / f"{DATASET_SHORT_NAME}.country_mapping.json"
 METADATA_PATH = Path(__file__).parent / f"{DATASET_SHORT_NAME}.meta.yml"
 
 REGIONS_TO_ADD = [
@@ -127,9 +125,7 @@ def load_income_groups() -> pd.DataFrame:
     )
     # Add historical regions to income groups.
     for historic_region in HISTORIC_TO_CURRENT_REGION:
-        historic_region_income_group = HISTORIC_TO_CURRENT_REGION[historic_region][
-            "income_group"
-        ]
+        historic_region_income_group = HISTORIC_TO_CURRENT_REGION[historic_region]["income_group"]
         if historic_region not in income_groups["country"]:
             historic_region_df = pd.DataFrame(
                 {
@@ -137,9 +133,7 @@ def load_income_groups() -> pd.DataFrame:
                     "income_group": [historic_region_income_group],
                 }
             )
-            income_groups = pd.concat(
-                [income_groups, historic_region_df], ignore_index=True
-            )
+            income_groups = pd.concat([income_groups, historic_region_df], ignore_index=True)
 
     return cast(pd.DataFrame, income_groups)
 
@@ -181,9 +175,7 @@ def remove_overlapping_data_between_historical_regions_and_successors(
     data_region = data_region.copy()
 
     # Select data columns.
-    data_columns = [
-        column for column in data_region.columns if column not in index_columns
-    ]
+    data_columns = [column for column in data_region.columns if column not in index_columns]
     # Select index columns without country column.
     _index_columns = [column for column in index_columns if column != country_column]
     indexes_to_drop = []
@@ -214,9 +206,7 @@ def remove_overlapping_data_between_historical_regions_and_successors(
         )
 
         # Find unique years where the above combinations of region and successors overlap.
-        overlapping_years = pd.concat(
-            [historical_region_years, historical_successors_years], ignore_index=True
-        )
+        overlapping_years = pd.concat([historical_region_years, historical_successors_years], ignore_index=True)
         overlapping_years = overlapping_years[overlapping_years.duplicated()]
         if not overlapping_years.empty:
             log.warning(
@@ -271,13 +261,9 @@ def add_region_aggregates(
     data = data.copy()
 
     income_groups = load_income_groups()
-    aggregates = {
-        column: "sum" for column in data.columns if column not in index_columns
-    }
+    aggregates = {column: "sum" for column in data.columns if column not in index_columns}
     for region in REGIONS_TO_ADD:
-        countries_in_region = geo.list_countries_in_region(
-            region=region, income_groups=income_groups
-        )
+        countries_in_region = geo.list_countries_in_region(region=region, income_groups=income_groups)
         data_region = data[data[country_column].isin(countries_in_region)]
 
         data_region = remove_overlapping_data_between_historical_regions_and_successors(
@@ -298,9 +284,9 @@ def add_region_aggregates(
             frac_allowed_nans_per_year=None,
             num_allowed_nans_per_year=None,
         )
-        data = pd.concat(
-            [data, data_region[data_region["country"] == region]], ignore_index=True
-        ).reset_index(drop=True)
+        data = pd.concat([data, data_region[data_region["country"] == region]], ignore_index=True).reset_index(
+            drop=True
+        )
 
     return data
 
@@ -373,15 +359,11 @@ def correct_historical_regions(data: pd.DataFrame) -> pd.DataFrame:
         data[(data["year"] < 1980) & (data["country"] == "Czechoslovakia")]
         .reset_index(drop=True)
         .drop(columns=["gas"]),
-        data[(data["year"] < 1980) & (data["country"] == "Czechia")].reset_index(
-            drop=True
-        )[["year", "gas"]],
+        data[(data["year"] < 1980) & (data["country"] == "Czechia")].reset_index(drop=True)[["year", "gas"]],
         how="left",
         on="year",
     )
-    select_rows_to_correct = (data["country"].isin(["Czechia", "Czechoslovakia"])) & (
-        data["year"] < 1980
-    )
+    select_rows_to_correct = (data["country"].isin(["Czechia", "Czechoslovakia"])) & (data["year"] < 1980)
     data = (
         pd.concat([data[~select_rows_to_correct], data_to_add], ignore_index=True)
         .sort_values(["country", "year"])
@@ -397,9 +379,7 @@ def run(dest_dir: str) -> None:
     # Load data.
     #
     # Load meadow dataset and get the only table inside (with the same name).
-    ds_meadow = catalog.Dataset(
-        DATA_DIR / f"meadow/{NAMESPACE}/{VERSION}/{DATASET_SHORT_NAME}"
-    )
+    ds_meadow = catalog.Dataset(DATA_DIR / f"meadow/{NAMESPACE}/{VERSION}/{DATASET_SHORT_NAME}")
     tb_meadow = ds_meadow[DATASET_SHORT_NAME]
 
     # Convert table into a dataframe.

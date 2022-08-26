@@ -54,9 +54,7 @@ def process(df: pd.DataFrame, country_std: str) -> pd.DataFrame:
     # Discard unmapped regions
     df = df.dropna(subset=["location"])
     # Scale units
-    ops = {
-        v["name"]: v.get("operation", lambda x: x) for k, v in COLUMNS_METRICS.items()
-    }
+    ops = {v["name"]: v.get("operation", lambda x: x) for k, v in COLUMNS_METRICS.items()}
     for m in df.metric.unique():
         df.loc[df.metric == m, "value"] = ops[m](df.loc[df.metric == m, "value"])
     df = optimize_dtypes(df)

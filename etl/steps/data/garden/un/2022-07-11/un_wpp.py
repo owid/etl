@@ -111,9 +111,7 @@ def run(dest_dir: str) -> None:
     df_depratio = process_depratio(ds["dependency_ratio"], country_std)
     df_deaths = process_deaths(ds["deaths"], country_std)
     # merge main df
-    df = merge_dfs(
-        [df_population, df_fertility, df_demographics, df_depratio, df_deaths]
-    )
+    df = merge_dfs([df_population, df_fertility, df_demographics, df_depratio, df_deaths])
     # create tables
     table_long = df_to_table(
         df,
@@ -133,8 +131,7 @@ def run(dest_dir: str) -> None:
                 df_c,
                 short_name=category,
                 description=(
-                    "UN WPP dataset by OWID. Contains only metrics corresponding to"
-                    f" sub-group {category}."
+                    "UN WPP dataset by OWID. Contains only metrics corresponding to" f" sub-group {category}."
                 ),
             )
         )

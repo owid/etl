@@ -28,9 +28,7 @@ def load_config(short_name: str) -> GrapherConfig:
     return GrapherConfig.parse_file(local_path)
 
 
-def create_wide_table(
-    values: pd.DataFrame, short_name: str, config: GrapherConfig
-) -> Table:
+def create_wide_table(values: pd.DataFrame, short_name: str, config: GrapherConfig) -> Table:
     """Convert backported table from long to wide format."""
     # convert to wide format
     long_mem_usage_mb = values.memory_usage().sum() / 1e6
@@ -64,9 +62,7 @@ def create_wide_table(
 
     for col in t.columns:
         variable = variable_dict[col]
-        t[col].metadata = convert_grapher_variable(
-            variable, variable_source_dict[variable.sourceId]
-        )
+        t[col].metadata = convert_grapher_variable(variable, variable_source_dict[variable.sourceId])
 
     # NOTE: collision happens for dataset 5629 with column names
     # Indicator:On-premise sales restrictions to intoxicated persons (archived) - Beverage Types:Spirits
@@ -86,16 +82,10 @@ def create_dataset(dest_dir: str, short_name: str) -> Dataset:
 
     # put sources belonging to a dataset but not to a variable into dataset metadata
     variable_source_ids = {v.sourceId for v in config.variables}
-    ds_sources = [
-        s
-        for s in config.sources
-        if s.datasetId == config.dataset.id and s.id not in variable_source_ids
-    ]
+    ds_sources = [s for s in config.sources if s.datasetId == config.dataset.id and s.id not in variable_source_ids]
 
     # create dataset with metadata
-    ds = Dataset.create_empty(
-        dest_dir, convert_grapher_dataset(config.dataset, ds_sources, short_name)
-    )
+    ds = Dataset.create_empty(dest_dir, convert_grapher_dataset(config.dataset, ds_sources, short_name))
 
     tables = []
 

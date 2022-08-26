@@ -94,11 +94,7 @@ def load_population() -> pd.DataFrame:
 
     # Add data for historical regions (if not in population) by adding the population of its current successors.
     countries_with_population = population["country"].unique()
-    missing_countries = [
-        country
-        for country in HISTORIC_TO_CURRENT_REGION
-        if country not in countries_with_population
-    ]
+    missing_countries = [country for country in HISTORIC_TO_CURRENT_REGION if country not in countries_with_population]
     for country in missing_countries:
         members = HISTORIC_TO_CURRENT_REGION[country]["members"]
         _population = (
@@ -108,13 +104,9 @@ def load_population() -> pd.DataFrame:
             .reset_index()
         )
         # Select only years for which we have data for all member countries.
-        _population = _population[_population["country"] == len(members)].reset_index(
-            drop=True
-        )
+        _population = _population[_population["country"] == len(members)].reset_index(drop=True)
         _population["country"] = country
-        population = pd.concat(
-            [population, _population], ignore_index=True
-        ).reset_index(drop=True)
+        population = pd.concat([population, _population], ignore_index=True).reset_index(drop=True)
 
     error = "Duplicate country-years found in population. Check if historical regions changed."
     assert population[population.duplicated(subset=["country", "year"])].empty, error
@@ -181,8 +173,6 @@ def add_population(
             )
 
     # Add population to original dataframe.
-    df_with_population = pd.merge(
-        df, population, on=[country_col, year_col], how="left"
-    )
+    df_with_population = pd.merge(df, population, on=[country_col, year_col], how="left")
 
     return df_with_population

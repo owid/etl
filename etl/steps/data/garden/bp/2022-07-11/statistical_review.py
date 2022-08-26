@@ -198,18 +198,10 @@ def amend_zero_filled_variables_for_region_aggregates(df: pd.DataFrame) -> pd.Da
     """
     df = df.copy()
 
-    zero_filled_variables = [
-        column for column in df.columns if "(zero filled)" in column
-    ]
-    original_variables = [
-        column.replace(" (zero filled)", "")
-        for column in df.columns
-        if "(zero filled)" in column
-    ]
+    zero_filled_variables = [column for column in df.columns if "(zero filled)" in column]
+    original_variables = [column.replace(" (zero filled)", "") for column in df.columns if "(zero filled)" in column]
     select_regions = df["country"].isin(REGIONS_TO_ADD)
-    df.loc[select_regions, zero_filled_variables] = (
-        df[select_regions][original_variables].fillna(0).values
-    )
+    df.loc[select_regions, zero_filled_variables] = df[select_regions][original_variables].fillna(0).values
 
     return df
 
@@ -232,11 +224,7 @@ def run(dest_dir: str) -> None:
     bp_data = (
         pd.DataFrame(bp_table)
         .reset_index()
-        .rename(
-            columns={
-                column: bp_table[column].metadata.title for column in bp_table.columns
-            }
-        )
+        .rename(columns={column: bp_table[column].metadata.title for column in bp_table.columns})
         .rename(columns={"entity_name": "country", "entity_code": "country_code"})
         .drop(columns="entity_id")
     )
@@ -250,9 +238,7 @@ def run(dest_dir: str) -> None:
         year_column="year",
         aggregates={column: "sum" for column in AGGREGATES_BY_SUM},
         known_overlaps=OVERLAPPING_DATA_TO_REMOVE_IN_AGGREGATES,  # type: ignore
-        region_codes=[
-            REGIONS_TO_ADD[region]["country_code"] for region in REGIONS_TO_ADD
-        ],
+        region_codes=[REGIONS_TO_ADD[region]["country_code"] for region in REGIONS_TO_ADD],
     )
 
     # Fill nans with zeros for "* (zero filled)" variables for region aggregates (which were ignored).

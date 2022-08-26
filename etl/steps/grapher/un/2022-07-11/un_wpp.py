@@ -50,9 +50,7 @@ def _get_shaped_table(dataset):
     table["entity_id"] = gh.country_to_entity_id(table["location"])
 
     # use entity_id and year as indexes in grapher
-    table = table.set_index(["entity_id", "year", "sex", "age", "variant"])[
-        ["metric", "value"]
-    ].rename(
+    table = table.set_index(["entity_id", "year", "sex", "age", "variant"])[["metric", "value"]].rename(
         columns={
             "metric": "variable",
         }

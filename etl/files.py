@@ -28,9 +28,7 @@ def checksum_str(s: str) -> str:
     return hashlib.md5(s.encode()).hexdigest()
 
 
-def walk(
-    folder: Path, ignore_set: Set[str] = {"__pycache__", ".ipynb_checkpoints"}
-) -> List[Path]:
+def walk(folder: Path, ignore_set: Set[str] = {"__pycache__", ".ipynb_checkpoints"}) -> List[Path]:
     paths = []
     for p in folder.iterdir():
         if p.is_dir():

@@ -117,9 +117,7 @@ def load_ggdc_data() -> catalog.Table:
     return cast(catalog.Table, ggdc_table)
 
 
-def combine_bp_and_eia_data(
-    bp_table: catalog.Table, eia_table: catalog.Table
-) -> pd.DataFrame:
+def combine_bp_and_eia_data(bp_table: catalog.Table, eia_table: catalog.Table) -> pd.DataFrame:
     """Combine BP and EIA data.
 
     Parameters
@@ -136,21 +134,15 @@ def combine_bp_and_eia_data(
 
     """
     # Check that there are no duplicated rows in any of the two datasets.
-    assert bp_table[
-        bp_table.duplicated(subset=["country", "year"])
-    ].empty, "Duplicated rows in BP data."
-    assert eia_table[
-        eia_table.duplicated(subset=["country", "year"])
-    ].empty, "Duplicated rows in EIA data."
+    assert bp_table[bp_table.duplicated(subset=["country", "year"])].empty, "Duplicated rows in BP data."
+    assert eia_table[eia_table.duplicated(subset=["country", "year"])].empty, "Duplicated rows in EIA data."
 
     bp_table["source"] = "bp"
     eia_table["source"] = "eia"
     # Combine EIA data (which goes further back in the past) with BP data (which is more up-to-date).
     # On coincident rows, prioritise BP data.
     index_columns = ["country", "year"]
-    combined = pd.concat([eia_table, bp_table], ignore_index=True).drop_duplicates(
-        subset=index_columns, keep="last"
-    )
+    combined = pd.concat([eia_table, bp_table], ignore_index=True).drop_duplicates(subset=index_columns, keep="last")
 
     # Convert to conventional dataframe, and sort conveniently.
     combined = pd.DataFrame(combined).sort_values(index_columns).reset_index(drop=True)
@@ -177,12 +169,11 @@ def add_annual_change(df: pd.DataFrame) -> pd.DataFrame:
     # Calculate annual change.
     combined = combined.sort_values(["country", "year"]).reset_index(drop=True)
     combined["Annual change in primary energy consumption (%)"] = (
-        combined.groupby("country")["Primary energy consumption (TWh)"].pct_change()
-        * 100
+        combined.groupby("country")["Primary energy consumption (TWh)"].pct_change() * 100
     )
-    combined["Annual change in primary energy consumption (TWh)"] = combined.groupby(
-        "country"
-    )["Primary energy consumption (TWh)"].diff()
+    combined["Annual change in primary energy consumption (TWh)"] = combined.groupby("country")[
+        "Primary energy consumption (TWh)"
+    ].diff()
 
     return combined
 

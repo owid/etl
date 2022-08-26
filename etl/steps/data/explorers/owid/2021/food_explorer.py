@@ -48,9 +48,7 @@ HERE = BASE_DIR / "etl/steps/data/explorers/owid/2021"
 PATH_DATASET_QCL = DATA_DIR / "garden/faostat/2021-03-18/faostat_qcl"
 PATH_DATASET_FBSC = DATA_DIR / "garden/faostat/2021-04-09/faostat_fbsc"
 PATH_DATASET_POPULATION = DATA_DIR / "garden/owid/latest/key_indicators"
-PATH_DATASET_POPULATION_GAPMINDER = (
-    DATA_DIR / "open_numbers/open_numbers/latest/gapminder__systema_globalis"
-)  # add
+PATH_DATASET_POPULATION_GAPMINDER = DATA_DIR / "open_numbers/open_numbers/latest/gapminder__systema_globalis"  # add
 
 PATH_MAP_ITEM = HERE / "food_explorer.items.std.csv"
 PATH_MAP_ELEM = HERE / "food_explorer.elements.std.csv"
@@ -115,9 +113,7 @@ def group_item_codes(
         assert x.loc[id_new, ("year", "min")] > x.loc[id_old, ("year", "max")]
     # Replace
     if isinstance(assign_to_old, list):
-        id_map = dict(
-            (n, o) if f else (o, n) for o, n, f in zip(ids_old, ids_new, assign_to_old)
-        )
+        id_map = dict((n, o) if f else (o, n) for o, n, f in zip(ids_old, ids_new, assign_to_old))
     elif assign_to_old:
         id_map = dict(zip(ids_new, ids_old))
     else:
@@ -128,9 +124,7 @@ def group_item_codes(
 
 
 # %%
-fbsc_bulk = group_item_codes(
-    fbsc_bulk, ids_old=[2556, 2805], ids_new=[2552, 2807], assign_to_old=[True, True]
-)
+fbsc_bulk = group_item_codes(fbsc_bulk, ids_old=[2556, 2805], ids_new=[2552, 2807], assign_to_old=[True, True])
 
 # %% [markdown]
 # ## 3. Select flags
@@ -155,9 +149,7 @@ fbsc_bulk = group_item_codes(
 # %%
 def check_flags_1(df: pd.DataFrame) -> None:
     i_og = df.index.tolist()
-    i_ne = df.drop_duplicates(
-        subset=["country", "item_code", "element_code", "year"]
-    ).index.tolist()
+    i_ne = df.drop_duplicates(subset=["country", "item_code", "element_code", "year"]).index.tolist()
     print(
         f"Number of datapoints: {len(i_og)}\nNumber of datapoints (after dropping duplicates): {len(i_ne)}\nTotal datapoints removed: {len(i_og)-len(i_ne)}"
     )
@@ -226,9 +218,7 @@ def filter_by_flag_priority(df: pd.DataFrame) -> pd.DataFrame:
     df.loc[df.value.isna(), "flag_priority"] = -1
     # Remove duplicates based on flag value
     df = df.sort_values("flag_priority")
-    df = df.drop_duplicates(
-        subset=["country", "item_code", "element_code", "year"], keep="last"
-    )
+    df = df.drop_duplicates(subset=["country", "item_code", "element_code", "year"], keep="last")
     return df.drop(columns=["flag_priority", "flag"])
 
 
@@ -255,9 +245,7 @@ print(fbsc_bulk.shape)
 def get_stats_elements(df: pd.DataFrame) -> pd.DataFrame:
     res = df.reset_index().groupby("element_code")["item_code"].nunique()
     df_elem = pd.read_csv(PATH_MAP_ELEM, index_col="code")
-    elem_map = (
-        df_elem["name"] + " -- " + df_elem["unit"] + " -- " + df_elem.index.astype(str)
-    )
+    elem_map = df_elem["name"] + " -- " + df_elem["unit"] + " -- " + df_elem.index.astype(str)
     res = res.rename(index=elem_map.to_dict()).sort_values(ascending=False)
     return cast(pd.DataFrame, res)
 
@@ -279,9 +267,7 @@ get_stats_elements(fbsc_bulk)
 # %%
 def reshape_df(df: pd.DataFrame) -> pd.DataFrame:
     df = df.reset_index()
-    df = df.pivot(
-        index=["country", "item_code", "year"], columns="element_code", values="value"
-    )
+    df = df.pivot(index=["country", "item_code", "year"], columns="element_code", values="value")
     return df
 
 
@@ -316,9 +302,7 @@ qcl_elem = qcl_garden["meta_qcl_element"]
 fbsc_elem = fbsc_garden["meta_fbs_element"]
 
 # %%
-def get_elements_to_standardize(
-    df: pd.DataFrame, df_elem: pd.DataFrame
-) -> pd.DataFrame:
+def get_elements_to_standardize(df: pd.DataFrame, df_elem: pd.DataFrame) -> pd.DataFrame:
     # Obtain number of occurrences for each element_code (each column is an element)
     elements = pd.DataFrame(df.notna().sum()).reset_index()
     elements = elements.sort_values(0, ascending=False)  # type: ignore
@@ -390,9 +374,7 @@ def get_items_to_standardize(df: pd.DataFrame, df_item: pd.DataFrame) -> pd.Data
         )
     )
     # Item
-    map_item = dict(
-        zip(df_item.index.get_level_values("item_code").astype(str), df_item["item"])
-    )
+    map_item = dict(zip(df_item.index.get_level_values("item_code").astype(str), df_item["item"]))
 
     # Correct
     map_item = {k: v for k, v in map_item.items() if k not in map_item_g}
@@ -410,9 +392,7 @@ def get_items_to_standardize(df: pd.DataFrame, df_item: pd.DataFrame) -> pd.Data
         )
     )
     # Add flag for groups
-    items["type"] = (
-        items["code"].isin(map_item_g).apply(lambda x: "Group" if x else None)
-    )
+    items["type"] = items["code"].isin(map_item_g).apply(lambda x: "Group" if x else None)
     # Add name
     map_item_all = {**map_item, **map_item_g}
     items["name"] = items.code.replace(map_item_all)
@@ -503,11 +483,7 @@ qcl_bulk = qcl_bulk.drop(columns=items_drop)
 # %%
 # Build element name
 a = df["name_standardised"].apply(lambda x: x.lower().replace(" ", "_")).astype(str)
-b = (
-    df["unit_name_standardised_with_conversion"]
-    .apply(lambda x: x.lower().replace(" ", "_"))
-    .astype(str)
-)
+b = df["unit_name_standardised_with_conversion"].apply(lambda x: x.lower().replace(" ", "_")).astype(str)
 df["element_name"] = (a + "__" + b).tolist()
 # Obtain dict element_code -> element name
 map_elem = df["element_name"].to_dict()
@@ -549,11 +525,7 @@ print("There are", len(x), "fused products:\n", x)
 # %%
 # Check `code` --> `name_standardised` is unique in each dataset
 assert (
-    df.dropna(subset=["name_standardised"])
-    .reset_index()
-    .groupby(["dataset", "name_standardised"])
-    .code.nunique()
-    .max()
+    df.dropna(subset=["name_standardised"]).reset_index().groupby(["dataset", "name_standardised"]).code.nunique().max()
     == 1
 )
 
@@ -645,16 +617,11 @@ gapminder_country_codes = {
 former_states = list(gapminder_country_codes.values())
 
 population_gap = population_gap[population_gap.geo.isin(gapminder_country_codes)]
-population_gap = population_gap.assign(
-    country=population_gap.geo.map(gapminder_country_codes)
-).drop(columns=["geo"])
+population_gap = population_gap.assign(country=population_gap.geo.map(gapminder_country_codes)).drop(columns=["geo"])
 
 # Filter years (former states only for past interval, not overlapping with current countries)
 date_window = (
-    fe_bulk[fe_bulk.country.isin(former_states)]
-    .groupby("country")
-    .year.agg(["min", "max"])
-    .to_dict(orient="index")
+    fe_bulk[fe_bulk.country.isin(former_states)].groupby("country").year.agg(["min", "max"]).to_dict(orient="index")
 )
 population_ = []
 for state, dates in date_window.items():
@@ -714,12 +681,7 @@ for former, current in former_to_current.items():
 # %%
 # Estimate Sudan (former)
 msk = population.country.isin(["South Sudan", "Sudan"]) & (population.year < 2012)
-pop_sudan = (
-    population[msk]
-    .groupby("year", as_index=False)
-    .population.sum()
-    .assign(country="Sudan (former)")
-)
+pop_sudan = population[msk].groupby("year", as_index=False).population.sum().assign(country="Sudan (former)")
 population = pd.concat([pop_sudan, population], ignore_index=True)
 date_window = date_window | {"Sudan (former)": {"min": 1961, "max": 2011}}
 
@@ -728,16 +690,12 @@ date_window = date_window | {"Sudan (former)": {"min": 1961, "max": 2011}}
 msk = None
 for former, current in former_to_current.items():
     if msk is None:
-        msk = population.country.isin(former_to_current[former]) & (
-            population.year <= date_window[former]["max"]
-        )
+        msk = population.country.isin(former_to_current[former]) & (population.year <= date_window[former]["max"])
     else:
-        msk |= population.country.isin(former_to_current[former]) & (
-            population.year <= date_window[former]["max"]
-        )
-population = population[
-    (population.year >= fe_bulk.year.min()) & (population.year <= fe_bulk.year.max())
-].astype({"year": int})
+        msk |= population.country.isin(former_to_current[former]) & (population.year <= date_window[former]["max"])
+population = population[(population.year >= fe_bulk.year.min()) & (population.year <= fe_bulk.year.max())].astype(
+    {"year": int}
+)
 population = population.loc[~msk]
 population = population.set_index(["country", "year"], verify_integrity=True)
 
@@ -755,17 +713,13 @@ population = pd.concat([population, population_gap])
 # %%
 countries_pop = set(population.index.levels[0])
 countries = set(fe_bulk.country)
-print(
-    f"Missing {len(countries_missing := countries.difference(countries_pop))} countries: {countries_missing}"
-)
+print(f"Missing {len(countries_missing := countries.difference(countries_pop))} countries: {countries_missing}")
 if len(countries_missing) > 17:
     raise ValueError("More countries missing than expected!")
 
 # %%
 shape_first = fe_bulk.shape[0]
-fe_bulk = fe_bulk.merge(
-    population, left_on=["country", "year"], right_on=["country", "year"]
-)
+fe_bulk = fe_bulk.merge(population, left_on=["country", "year"], right_on=["country", "year"])
 print(f"Decrease of {round(100*(1-fe_bulk.shape[0]/shape_first))}% rows")
 
 # %% [markdown]
@@ -774,13 +728,9 @@ print(f"Decrease of {round(100*(1-fe_bulk.shape[0]/shape_first))}% rows")
 # %%
 # Define which columns will be weighted
 keyword = "_per_capita"
-columns_per_capita = {
-    col: col.replace(keyword, "") for col in fe_bulk.columns if keyword in col
-}
+columns_per_capita = {col: col.replace(keyword, "") for col in fe_bulk.columns if keyword in col}
 # Normalize and rename columns
-fe_bulk[list(columns_per_capita)] = fe_bulk[list(columns_per_capita)].multiply(
-    fe_bulk["population"], axis=0
-)
+fe_bulk[list(columns_per_capita)] = fe_bulk[list(columns_per_capita)].multiply(fe_bulk["population"], axis=0)
 fe_bulk = fe_bulk.rename(columns=columns_per_capita).drop(columns=["population"])
 
 # %% [markdown]
@@ -851,9 +801,7 @@ def get_df_regions(
     # Continents
     df_regions = df.assign(**{column_location: df[column_location].replace(mapping)})
     if columns_aggregate is not None:
-        df_regions = df_regions.groupby(columns_index, as_index=False)[
-            columns_aggregate
-        ].sum(min_count=1)
+        df_regions = df_regions.groupby(columns_index, as_index=False)[columns_aggregate].sum(min_count=1)
     else:
         df_regions = df_regions.groupby(columns_index, as_index=False).sum(min_count=1)
     # Only keep new regions
@@ -874,19 +822,13 @@ columns_aggregate = [col for col in fe_bulk.columns if col not in columns_exclud
 # %%
 # World
 fe_bulk_world = (
-    fe_bulk.groupby(["product", "year"], as_index=False)[columns_aggregate]
-    .sum(min_count=1)
-    .assign(country="World")
+    fe_bulk.groupby(["product", "year"], as_index=False)[columns_aggregate].sum(min_count=1).assign(country="World")
 )
 print(f"{round(100*fe_bulk_world.shape[0]/fe_bulk.shape[0], 2)}% increase in rows")
 # Continents
-fe_bulk_continent = get_df_regions(
-    fe_bulk, country2continent, "country", columns_index, columns_aggregate
-)
+fe_bulk_continent = get_df_regions(fe_bulk, country2continent, "country", columns_index, columns_aggregate)
 # Income groups
-fe_bulk_income = get_df_regions(
-    fe_bulk, country2income, "country", columns_index, columns_aggregate
-)
+fe_bulk_income = get_df_regions(fe_bulk, country2income, "country", columns_index, columns_aggregate)
 
 # %% [markdown]
 # #### Merge
@@ -900,9 +842,7 @@ fe_bulk = pd.concat([fe_bulk, fe_bulk_world, fe_bulk_continent, fe_bulk_income])
 
 # %%
 msk = (
-    (fe_bulk.country.isin(regions_all))
-    & (fe_bulk["area_harvested__ha"] != 0)
-    & (~fe_bulk["area_harvested__ha"].isna())
+    (fe_bulk.country.isin(regions_all)) & (fe_bulk["area_harvested__ha"] != 0) & (~fe_bulk["area_harvested__ha"].isna())
 )
 fe_bulk.loc[msk, "yield__tonnes_per_ha"] = (
     fe_bulk.loc[msk, "production__tonnes"] / fe_bulk.loc[msk, "area_harvested__ha"]
@@ -926,12 +866,8 @@ population = population[~population.country.isin(set(country2income.values()))]
 # #### Obtain continent and income group populations
 
 # %%
-population_continent = get_df_regions(
-    population, country2continent, "country", ["country", "year"]
-)
-population_income = get_df_regions(
-    population, country2income, "country", ["country", "year"]
-)
+population_continent = get_df_regions(population, country2continent, "country", ["country", "year"])
+population_income = get_df_regions(population, country2income, "country", ["country", "year"])
 
 # %%
 # Concatenate
@@ -945,9 +881,7 @@ population = population.set_index(["country", "year"])
 fe_bulk = fe_bulk.merge(population, left_on=["country", "year"], right_index=True)
 
 # %%
-fe_bulk = fe_bulk.set_index(
-    ["product", "country", "year"], verify_integrity=True
-).sort_index()
+fe_bulk = fe_bulk.set_index(["product", "country", "year"], verify_integrity=True).sort_index()
 
 # %% [markdown]
 # ### 9.4 Value checks
@@ -998,9 +932,7 @@ for datapoints in outliers:
 
 # %%
 fe_bulk_orig = fe_bulk.copy()
-fe_bulk_melted = fe_bulk.reset_index().melt(
-    id_vars=["product", "country", "year", "population"], var_name="metric"
-)
+fe_bulk_melted = fe_bulk.reset_index().melt(id_vars=["product", "country", "year", "population"], var_name="metric")
 
 # %%
 # Drop nan values
@@ -1017,21 +949,17 @@ fe_bulk_melted_regions = fe_bulk_melted[msk]
 # %%
 def build_df(x: pd.DataFrame, ncountries: bool = True) -> pd.DataFrame:
     # add number of countries and population in present countries
-    population_ = (
-        x.groupby(["product", "metric", "region", "year"]).population.sum().tolist()
-    )
-    x = x.groupby(
-        ["product", "metric", "region", "year"], as_index=False
-    ).country.nunique()
+    population_ = x.groupby(["product", "metric", "region", "year"]).population.sum().tolist()
+    x = x.groupby(["product", "metric", "region", "year"], as_index=False).country.nunique()
     x = x.assign(
         population=population_,
     )
 
     # add real population
     population_ = population.reset_index().astype({"year": float})
-    x = x.merge(
-        population_, left_on=["region", "year"], right_on=["country", "year"]
-    ).rename(columns={"population_y": "population_gt", "population_x": "population"})
+    x = x.merge(population_, left_on=["region", "year"], right_on=["country", "year"]).rename(
+        columns={"population_y": "population_gt", "population_x": "population"}
+    )
     if ncountries:
         # add real number of countries
         region_size = []
@@ -1051,17 +979,9 @@ def build_df(x: pd.DataFrame, ncountries: bool = True) -> pd.DataFrame:
 
 # %%
 # continents
-x_cont = build_df(
-    fe_bulk_melted_countries.assign(
-        region=fe_bulk_melted_countries.country.map(country2continent)
-    )
-)
+x_cont = build_df(fe_bulk_melted_countries.assign(region=fe_bulk_melted_countries.country.map(country2continent)))
 # income groups
-x_inco = build_df(
-    fe_bulk_melted_countries.assign(
-        region=fe_bulk_melted_countries.country.map(country2income)
-    )
-)
+x_inco = build_df(fe_bulk_melted_countries.assign(region=fe_bulk_melted_countries.country.map(country2income)))
 # world
 x_world = build_df(fe_bulk_melted_countries.assign(region="World"), ncountries=False)
 # merge
@@ -1079,9 +999,7 @@ fe_bulk_melted_regions = fe_bulk_melted_regions.merge(
     right_on=["product", "region", "year", "metric"],
     how="left",
 )
-fe_bulk_melted_regions = fe_bulk_melted_regions.rename(
-    columns={"population_x": "population"}
-)
+fe_bulk_melted_regions = fe_bulk_melted_regions.rename(columns={"population_x": "population"})
 
 # %%
 # Checks after merge
@@ -1096,9 +1014,7 @@ fe_bulk_melted_regions = fe_bulk_melted_regions[~msk]
 # Filter all samples with > T1
 ## Threshold
 t1 = 0.24  # Selected such that no datapoint for product='Total' is lost
-t1_backup = fe_bulk_melted_regions[
-    (fe_bulk_melted_regions["product"] == "Total")
-].population_diff_perc.max()
+t1_backup = fe_bulk_melted_regions[(fe_bulk_melted_regions["product"] == "Total")].population_diff_perc.max()
 assert t1 > t1_backup
 ## Only apply to these metrics
 metrics = [
@@ -1112,24 +1028,15 @@ metrics = [
 ]
 
 fe_bulk_melted_regions = fe_bulk_melted_regions[
-    ~(
-        (fe_bulk_melted_regions.population_diff_perc >= t1)
-        & (fe_bulk_melted_regions.metric.isin(metrics))
-    )
+    ~((fe_bulk_melted_regions.population_diff_perc >= t1) & (fe_bulk_melted_regions.metric.isin(metrics)))
     | ((fe_bulk_melted_regions["product"] == "Total"))
 ]
 
 # %%
 # Fix population for > 0
-fe_bulk_melted_regions = fe_bulk_melted_regions.assign(
-    population_per_capita=fe_bulk_melted_regions.population
-)
-msk = (fe_bulk_melted_regions.population_per_capita > 0) & (
-    fe_bulk_melted_regions.metric.isin(metrics)
-)
-fe_bulk_melted_regions.loc[msk, "population_per_capita"] = fe_bulk_melted_regions.loc[
-    msk, "population_y"
-]
+fe_bulk_melted_regions = fe_bulk_melted_regions.assign(population_per_capita=fe_bulk_melted_regions.population)
+msk = (fe_bulk_melted_regions.population_per_capita > 0) & (fe_bulk_melted_regions.metric.isin(metrics))
+fe_bulk_melted_regions.loc[msk, "population_per_capita"] = fe_bulk_melted_regions.loc[msk, "population_y"]
 
 # %% [markdown]
 # Next, we estimate per capita values
@@ -1139,8 +1046,7 @@ fe_bulk_melted_regions.loc[msk, "population_per_capita"] = fe_bulk_melted_region
 fe_bulk_melted_regions = pd.DataFrame(fe_bulk_melted_regions)
 fe_bulk_melted_regions = fe_bulk_melted_regions.assign(
     metric_capita=fe_bulk_melted_regions.metric + "__per_capita",
-    value_capita=fe_bulk_melted_regions.value
-    / fe_bulk_melted_regions.population_per_capita,
+    value_capita=fe_bulk_melted_regions.value / fe_bulk_melted_regions.population_per_capita,
 )
 fe_bulk_melted_countries = pd.DataFrame(fe_bulk_melted_countries)
 fe_bulk_melted_countries = fe_bulk_melted_countries.assign(
@@ -1162,9 +1068,7 @@ cols = [
     "metric_capita",
     "value_capita",
 ]
-r = pd.concat(
-    [fe_bulk_melted_countries[cols], fe_bulk_melted_regions[cols]], ignore_index=True
-)
+r = pd.concat([fe_bulk_melted_countries[cols], fe_bulk_melted_regions[cols]], ignore_index=True)
 
 # %%
 # Pivot
@@ -1192,9 +1096,7 @@ fe_bulk_capita = (
 # Build `fe_bulk` back again.
 
 # %%
-fe_bulk = pd.merge(
-    fe_bulk_absolute, fe_bulk_capita, left_index=True, right_index=True, how="outer"
-)
+fe_bulk = pd.merge(fe_bulk_absolute, fe_bulk_capita, left_index=True, right_index=True, how="outer")
 
 # %%
 # CHECK
@@ -1212,9 +1114,7 @@ fe_bulk = fe_bulk.loc[~fe_bulk.country.isin(former_states)]
 # #### Set index
 
 # %%
-fe_bulk = fe_bulk.set_index(
-    ["product", "country", "year"], verify_integrity=True
-).sort_index()
+fe_bulk = fe_bulk.set_index(["product", "country", "year"], verify_integrity=True).sort_index()
 
 # %% [markdown]
 # ### 9.7 Remove unnused columns
@@ -1242,14 +1142,8 @@ x = fe_bulk.melt(var_name="metric", ignore_index=False).reset_index()
 
 # %%
 # Find (product, country, metric) with all zeros (or NaNs)
-res = x.groupby(["product", "country", "metric"]).agg(
-    value_sum=("value", "sum"), value_nunique=("value", "nunique")
-)
-msk = (
-    (res["value_nunique"] == 1)
-    & (res["value_sum"] == 0)
-    & (res.index.get_level_values(2) != "population")
-)
+res = x.groupby(["product", "country", "metric"]).agg(value_sum=("value", "sum"), value_nunique=("value", "nunique"))
+msk = (res["value_nunique"] == 1) & (res["value_sum"] == 0) & (res.index.get_level_values(2) != "population")
 idx = msk[msk].index
 
 # %%
@@ -1260,9 +1154,7 @@ xx = xx.reset_index()
 
 # %%
 # Pivot back
-fe_bulk = xx.pivot(["product", "country", "year"], "metric", "value").astype(
-    fe_bulk.dtypes
-)
+fe_bulk = xx.pivot(["product", "country", "year"], "metric", "value").astype(fe_bulk.dtypes)
 
 # %% [markdown]
 # ## 10. Export
@@ -1306,9 +1198,7 @@ qcl_elem = qcl_garden["meta_qcl_element"]
 fbsc_elem = fbsc_garden["meta_fbs_element"]
 qcl_elem["name_std"] = qcl_elem.index.map(map_elem)
 fbsc_elem["name_std"] = fbsc_elem.index.map(map_elem)
-element_metadata = pd.concat(
-    [qcl_elem.dropna().assign(dataset="QCL"), fbsc_elem.dropna().assign(dataset="FBS")]
-)
+element_metadata = pd.concat([qcl_elem.dropna().assign(dataset="QCL"), fbsc_elem.dropna().assign(dataset="FBS")])
 # Final patch
 patch = {
     "food_available_for_consumption__fat_g_per_day_per_capita": "food_available_for_consumption__fat_g_per_day",
@@ -1321,11 +1211,7 @@ element_metadata["name_std"] = element_metadata["name_std"].replace(patch)
 # %%
 # Fill 'easy' fields
 def _get_source_ids(dataset_code: str) -> List[int]:
-    res = [
-        i
-        for i, source in enumerate(metadata.sources)
-        if f"{dataset_code}" in source.owid_data_url
-    ]
+    res = [i for i, source in enumerate(metadata.sources) if f"{dataset_code}" in source.owid_data_url]
     return res
 
 
@@ -1365,9 +1251,7 @@ for col in columns:
     elif msk.sum() > 1:
         dataset_codes = element_metadata.loc[msk, "dataset"]
         if dataset_codes.nunique() != 1:
-            raise ValueError(
-                f"Merged metrics should all be from the same dataset! Check {col}"
-            )
+            raise ValueError(f"Merged metrics should all be from the same dataset! Check {col}")
         dataset_code = dataset_codes.unique()[0]
         fields[col] = catalog.VariableMeta(
             title="",
@@ -1423,14 +1307,7 @@ table_bulk._fields = fields
 
 # %%
 def to_short_name(raw: str) -> str:
-    return (
-        raw.lower()
-        .replace(" ", "_")
-        .replace(",", "")
-        .replace("(", "")
-        .replace(")", "")
-        .replace(".", "")
-    )
+    return raw.lower().replace(" ", "_").replace(",", "").replace("(", "").replace(")", "").replace(".", "")
 
 
 # the index contains values like "Asses" which have already been filtered out from the data,
