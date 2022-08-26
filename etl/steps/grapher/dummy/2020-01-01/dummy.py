@@ -16,7 +16,7 @@ def get_grapher_dataset() -> catalog.Dataset:
 
 
 def get_grapher_tables(dataset: catalog.Dataset) -> Iterable[catalog.Table]:
-    table = dataset["{{cookiecutter.short_name}}"]
+    table = dataset["dummy"]
 
     # convert `country` into `entity_id` and set indexes for `yield_wide_table`
     table = gh.adapt_table_for_grapher(table)

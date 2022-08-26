@@ -76,6 +76,10 @@ def upsert_dataset(dataset: catalog.Dataset, namespace: str, sources: List[catal
         ns = db.fetch_one_or_none("SELECT * from namespaces where name=%s", [namespace])
         if ns is None:
             db.upsert_namespace(namespace, "")
+        else:
+            _, ns_name, _, ns_is_archived = ns
+            if ns_is_archived:
+                log.warning("upsert_dataset.namespace_is_archived", namespace=ns_name)
 
         log.info(
             "upsert_dataset.upsert_dataset.start",
