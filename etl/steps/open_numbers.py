@@ -42,9 +42,7 @@ def run(dest_dir: str) -> None:
     ds.metadata.namespace = "open_numbers"
     ds.metadata.short_name = short_name
     ds.metadata.title = package.title or None
-    ds.metadata.sources = [
-        Source(url=repo.github_url, date_accessed=str(dt.date.today()))
-    ]
+    ds.metadata.sources = [Source(url=repo.github_url, date_accessed=str(dt.date.today()))]
 
     if package.description and package.title != package.description:
         ds.metadata.description = package.description
@@ -55,10 +53,7 @@ def run(dest_dir: str) -> None:
 
     # copy tables one by one
     with Pool() as pool:
-        args = [
-            (ds, repo, short_name, resources)
-            for short_name, resources in resource_map.items()
-        ]
+        args = [(ds, repo, short_name, resources) for short_name, resources in resource_map.items()]
         pool.starmap(add_resource, args)
 
 
@@ -99,9 +94,7 @@ def load_table(resource: frictionless.Resource) -> pd.DataFrame:
     return df
 
 
-def load_and_combine(
-    path: Path, resources: List[frictionless.Resource]
-) -> pd.DataFrame:
+def load_and_combine(path: Path, resources: List[frictionless.Resource]) -> pd.DataFrame:
     first = True
     primary_key: List[str]
     columns: List[str]

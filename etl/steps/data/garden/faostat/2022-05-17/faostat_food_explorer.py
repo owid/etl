@@ -289,9 +289,7 @@ ELEMENT_CODES_FBSC = [
 ]
 
 
-def combine_qcl_and_fbsc(
-    qcl_table: catalog.Table, fbsc_table: catalog.Table
-) -> pd.DataFrame:
+def combine_qcl_and_fbsc(qcl_table: catalog.Table, fbsc_table: catalog.Table) -> pd.DataFrame:
     """Combine garden `faostat_qcl` and `faostat_fbsc` datasets.
 
     Parameters
@@ -336,43 +334,25 @@ def combine_qcl_and_fbsc(
 
     rename_columns = {"item": "product"}
     combined = (
-        dataframes.concatenate([qcl, fbsc], ignore_index=True)
-        .rename(columns=rename_columns)
-        .reset_index(drop=True)
+        dataframes.concatenate([qcl, fbsc], ignore_index=True).rename(columns=rename_columns).reset_index(drop=True)
     )
 
     # Sanity checks.
-    assert len(combined) == (
-        len(qcl) + len(fbsc)
-    ), "Unexpected number of rows after combining qcl and fbsc datasets."
+    assert len(combined) == (len(qcl) + len(fbsc)), "Unexpected number of rows after combining qcl and fbsc datasets."
 
     assert len(combined[combined["value"].isnull()]) == 0, "Unexpected nan values."
 
-    n_items_per_item_code = combined.groupby("item_code")["product"].transform(
-        "nunique"
-    )
-    assert combined[
-        n_items_per_item_code > 1
-    ].empty, "There are item codes with multiple items."
+    n_items_per_item_code = combined.groupby("item_code")["product"].transform("nunique")
+    assert combined[n_items_per_item_code > 1].empty, "There are item codes with multiple items."
 
-    n_elements_per_element_code = combined.groupby("element_code")["element"].transform(
-        "nunique"
-    )
-    assert combined[
-        n_elements_per_element_code > 1
-    ].empty, "There are element codes with multiple elements."
+    n_elements_per_element_code = combined.groupby("element_code")["element"].transform("nunique")
+    assert combined[n_elements_per_element_code > 1].empty, "There are element codes with multiple elements."
 
-    n_units_per_element_code = combined.groupby("element_code")["unit"].transform(
-        "nunique"
-    )
-    assert combined[
-        n_units_per_element_code > 1
-    ].empty, "There are element codes with multiple units."
+    n_units_per_element_code = combined.groupby("element_code")["unit"].transform("nunique")
+    assert combined[n_units_per_element_code > 1].empty, "There are element codes with multiple units."
 
     error = "There are unexpected duplicate rows. Rename items in custom_items.csv to avoid clashes."
-    assert combined[
-        combined.duplicated(subset=["product", "country", "year", "element", "unit"])
-    ].empty, error
+    assert combined[combined.duplicated(subset=["product", "country", "year", "element", "unit"])].empty, error
 
     return cast(pd.DataFrame, combined)
 
@@ -394,8 +374,7 @@ def get_fao_population(combined: pd.DataFrame) -> pd.DataFrame:
     """
     # Select the item and element that corresponds to population values.
     fao_population = combined[
-        (combined["product"] == FAO_POPULATION_ITEM_NAME)
-        & (combined["element"] == FAO_POPULATION_ELEMENT_NAME)
+        (combined["product"] == FAO_POPULATION_ITEM_NAME) & (combined["element"] == FAO_POPULATION_ELEMENT_NAME)
     ].reset_index(drop=True)
 
     # Check that population is given in "1000 persons" and convert to persons.
@@ -405,9 +384,7 @@ def get_fao_population(combined: pd.DataFrame) -> pd.DataFrame:
 
     # Drop missing values and prepare output dataframe.
     fao_population = (
-        fao_population[["country", "year", "value"]]
-        .dropna(how="any")
-        .rename(columns={"value": "fao_population"})
+        fao_population[["country", "year", "value"]].dropna(how="any").rename(columns={"value": "fao_population"})
     )
 
     return fao_population
@@ -435,9 +412,7 @@ def process_combined_data(combined: pd.DataFrame) -> pd.DataFrame:
 
     # Check that all expected products are included in the data.
     missing_products = sorted(set(PRODUCTS) - set(set(combined["product"])))
-    assert (
-        len(missing_products) == 0
-    ), f"{len(missing_products)} missing products for food explorer."
+    assert len(missing_products) == 0, f"{len(missing_products)} missing products for food explorer."
 
     # Select relevant products for the food explorer.
     combined = combined[combined["product"].isin(PRODUCTS)].reset_index(drop=True)
@@ -447,29 +422,21 @@ def process_combined_data(combined: pd.DataFrame) -> pd.DataFrame:
 
     # This will create a table with just one column and country-year as index.
     index_columns = ["product", "country", "year"]
-    data_wide = combined.pivot(
-        index=index_columns, columns=["title"], values="value"
-    ).reset_index()
+    data_wide = combined.pivot(index=index_columns, columns=["title"], values="value").reset_index()
 
     # Add column for FAO population.
     data_wide = pd.merge(data_wide, fao_population, on=["country", "year"], how="left")
 
     # Add column for OWID population.
-    data_wide = geo.add_population_to_dataframe(
-        df=data_wide, warn_on_missing_countries=False
-    )
+    data_wide = geo.add_population_to_dataframe(df=data_wide, warn_on_missing_countries=False)
 
     # Fill gaps in OWID population with FAO population (for "* (FAO)" countries, i.e. countries that were not
     # harmonized and for which there is no OWID population).
     # Then drop "fao_population", since it is no longer needed.
-    data_wide["population"] = data_wide["population"].fillna(
-        data_wide["fao_population"]
-    )
+    data_wide["population"] = data_wide["population"].fillna(data_wide["fao_population"])
     data_wide = data_wide.drop(columns="fao_population")
 
-    assert (
-        len(data_wide.columns[data_wide.isnull().all(axis=0)]) == 0
-    ), "Unexpected columns with only nan values."
+    assert len(data_wide.columns[data_wide.isnull().all(axis=0)]) == 0, "Unexpected columns with only nan values."
 
     # Set a reasonable index.
     data_wide = data_wide.set_index(index_columns, verify_integrity=True)
@@ -483,19 +450,13 @@ def run(dest_dir: str) -> None:
     ####################################################################################################################
 
     # Load file of versions.
-    latest_versions = pd.read_csv(LATEST_VERSIONS_FILE).set_index(
-        ["channel", "dataset"]
-    )
+    latest_versions = pd.read_csv(LATEST_VERSIONS_FILE).set_index(["channel", "dataset"])
 
     # Path to latest qcl and fbsc datasets in garden.
     qcl_latest_version = latest_versions.loc["garden", f"{NAMESPACE}_qcl"].item()
-    qcl_latest_dir = (
-        DATA_DIR / "garden" / NAMESPACE / qcl_latest_version / f"{NAMESPACE}_qcl"
-    )
+    qcl_latest_dir = DATA_DIR / "garden" / NAMESPACE / qcl_latest_version / f"{NAMESPACE}_qcl"
     fbsc_latest_version = latest_versions.loc["garden", f"{NAMESPACE}_fbsc"].item()
-    fbsc_latest_dir = (
-        DATA_DIR / "garden" / NAMESPACE / fbsc_latest_version / f"{NAMESPACE}_fbsc"
-    )
+    fbsc_latest_dir = DATA_DIR / "garden" / NAMESPACE / fbsc_latest_version / f"{NAMESPACE}_fbsc"
 
     # Load qcl dataset and keep its metadata.
     qcl_dataset = catalog.Dataset(qcl_latest_dir)

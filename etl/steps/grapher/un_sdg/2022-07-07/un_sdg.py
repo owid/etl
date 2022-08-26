@@ -25,17 +25,13 @@ NAMESPACE = Path(__file__).parent.parent.stem
 def get_grapher_dataset() -> Dataset:
     dataset = Dataset(DATA_DIR / f"garden/{NAMESPACE}/{VERSION}/{FNAME}")
     # short_name should include dataset name and version
-    dataset.metadata.short_name = (
-        f"{dataset.metadata.short_name}__{VERSION.replace('-', '_')}"
-    )
+    dataset.metadata.short_name = f"{dataset.metadata.short_name}__{VERSION.replace('-', '_')}"
     return dataset
 
 
 def get_grapher_tables(dataset: Dataset) -> Iterable[Table]:
     clean_source_map = load_clean_source_mapping()
-    walden_ds = Catalog().find_one(
-        namespace=NAMESPACE, short_name=FNAME, version=VERSION
-    )
+    walden_ds = Catalog().find_one(namespace=NAMESPACE, short_name=FNAME, version=VERSION)
     ds_garden = Dataset((DATA_DIR / f"garden/{NAMESPACE}/{VERSION}/{FNAME}").as_posix())
     sdg_tables = ds_garden.table_names
     for var in sdg_tables:
@@ -53,17 +49,13 @@ def clean_source_name(raw_source: pd.Series, clean_source_map: dict) -> pd.Serie
         clean_source = "Data from multiple sources compiled by the UN"
     else:
         source_name = raw_source.drop_duplicates().iloc[0]
-        assert (
-            source_name in clean_source_map
-        ), f"{source_name} not in un_sdg.sources.json - please add"
+        assert source_name in clean_source_map, f"{source_name} not in un_sdg.sources.json - please add"
         clean_source = clean_source_map[source_name]
 
     return clean_source
 
 
-def add_metadata_and_prepare_for_grapher(
-    df_gr: pd.DataFrame, var_name: str, walden_ds: Dataset
-) -> Table:
+def add_metadata_and_prepare_for_grapher(df_gr: pd.DataFrame, var_name: str, walden_ds: Dataset) -> Table:
 
     indicator = df_gr["variable_name"].iloc[0].split("-")[0].strip()
     source_url = get_metadata_link(indicator)
@@ -87,8 +79,7 @@ def add_metadata_and_prepare_for_grapher(
 
     df_gr["meta"] = VariableMeta(
         title=df_gr["variable_name_meta"].iloc[0],
-        description=df_gr["seriesdescription"].iloc[0]
-        + "\n\nFurther information available at: %s" % (source_url),
+        description=df_gr["seriesdescription"].iloc[0] + "\n\nFurther information available at: %s" % (source_url),
         sources=[source],
         unit=df_gr["long_unit"].iloc[0],
         short_unit=df_gr["short_unit"].iloc[0],
@@ -164,20 +155,20 @@ def load_clean_source_mapping() -> dict:
 
 def get_metadata_link(indicator: str) -> None:
 
-    url = os.path.join(
-        "https://unstats.un.org/sdgs/metadata/files/", "Metadata-%s.pdf"
-    ) % "-".join([part.rjust(2, "0") for part in indicator.split(".")])
+    url = os.path.join("https://unstats.un.org/sdgs/metadata/files/", "Metadata-%s.pdf") % "-".join(
+        [part.rjust(2, "0") for part in indicator.split(".")]
+    )
     r = requests.head(url)
     ctype = r.headers["Content-Type"]
     if ctype == "application/pdf":
         url_out = url
     elif ctype == "text/html":
-        url_a = os.path.join(
-            "https://unstats.un.org/sdgs/metadata/files/", "Metadata-%sa.pdf"
-        ) % "-".join([part.rjust(2, "0") for part in indicator.split(".")])
-        url_b = os.path.join(
-            "https://unstats.un.org/sdgs/metadata/files/", "Metadata-%sb.pdf"
-        ) % "-".join([part.rjust(2, "0") for part in indicator.split(".")])
+        url_a = os.path.join("https://unstats.un.org/sdgs/metadata/files/", "Metadata-%sa.pdf") % "-".join(
+            [part.rjust(2, "0") for part in indicator.split(".")]
+        )
+        url_b = os.path.join("https://unstats.un.org/sdgs/metadata/files/", "Metadata-%sb.pdf") % "-".join(
+            [part.rjust(2, "0") for part in indicator.split(".")]
+        )
         url_out = url_a + " and " + url_b
         url_check = requests.head(url_a)
         ctype_a = url_check.headers["Content-Type"]

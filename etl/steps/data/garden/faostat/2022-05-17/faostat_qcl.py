@@ -70,16 +70,13 @@ def add_slaughtered_animals_to_meat_total(data: pd.DataFrame) -> pd.DataFrame:
 
     # For some reason, there are two element codes for the same element (they have different items assigned).
     error = "Element codes for 'Producing or slaughtered animals' may have changed."
-    assert data[
-        (data["element"] == slaughtered_animals_element)
-        & ~(data["element_code"].str.contains("pc"))
-    ]["element_code"].unique().tolist() == ["005320", "005321"], error
+    assert data[(data["element"] == slaughtered_animals_element) & ~(data["element_code"].str.contains("pc"))][
+        "element_code"
+    ].unique().tolist() == ["005320", "005321"], error
 
     # Similarly, there are two items for meat total.
     error = f"Item codes for '{total_meat_item}' may have changed."
-    assert list(data[data["item"] == total_meat_item]["item_code"].unique()) == [
-        "00001765"
-    ], error
+    assert list(data[data["item"] == total_meat_item]["item_code"].unique()) == ["00001765"], error
 
     # We arbitrarily choose the first element code and the first item code.
     slaughtered_animals_element_code = "005320"
@@ -121,32 +118,24 @@ def add_slaughtered_animals_to_meat_total(data: pd.DataFrame) -> pd.DataFrame:
     ).reset_index()
 
     # Get element description for selected element code.
-    _slaughtered_animals_element_description = data[
-        data["element_code"] == slaughtered_animals_element_code
-    ]["element_description"].unique()
+    _slaughtered_animals_element_description = data[data["element_code"] == slaughtered_animals_element_code][
+        "element_description"
+    ].unique()
     assert len(_slaughtered_animals_element_description) == 1
-    slaughtered_animals_element_description = _slaughtered_animals_element_description[
-        0
-    ]
+    slaughtered_animals_element_description = _slaughtered_animals_element_description[0]
 
     # Get item description for selected item code.
-    _total_meat_item_description = data[data["item_code"] == total_meat_item_code][
-        "item_description"
-    ].unique()
+    _total_meat_item_description = data[data["item_code"] == total_meat_item_code]["item_description"].unique()
     assert len(_total_meat_item_description) == 1
     total_meat_item_description = _total_meat_item_description[0]
 
     # Get FAO item name for selected item code.
-    _total_meat_fao_item = data[data["item_code"] == total_meat_item_code][
-        "fao_item"
-    ].unique()
+    _total_meat_fao_item = data[data["item_code"] == total_meat_item_code]["fao_item"].unique()
     assert len(_total_meat_fao_item) == 1
     total_meat_fao_item = _total_meat_fao_item[0]
 
     # Get FAO unit for selected item code.
-    _total_meat_fao_unit = data[data["item_code"] == total_meat_item_code][
-        "fao_unit_short_name"
-    ].unique()
+    _total_meat_fao_unit = data[data["item_code"] == total_meat_item_code]["fao_unit_short_name"].unique()
     assert len(_total_meat_fao_unit) == 1
     total_meat_fao_unit = _total_meat_fao_unit[0]
 
@@ -220,10 +209,7 @@ def add_yield_to_aggregate_regions(data: pd.DataFrame) -> pd.DataFrame:
     yield_element_code = "005419"
 
     # Check that indeed regions do not contain any data for yield.
-    assert data[
-        (data["country"].isin(REGIONS_TO_ADD))
-        & (data["element_code"] == yield_element_code)
-    ].empty
+    assert data[(data["country"].isin(REGIONS_TO_ADD)) & (data["element_code"] == yield_element_code)].empty
 
     # Gather all fields that should stay the same.
     additional_fields = data[data["element_code"] == yield_element_code][
@@ -239,16 +225,10 @@ def add_yield_to_aggregate_regions(data: pd.DataFrame) -> pd.DataFrame:
     assert len(additional_fields) == 1
 
     # Create a dataframe of production of regions.
-    data_production = data[
-        (data["country"].isin(REGIONS_TO_ADD))
-        & (data["element_code"] == production_element_code)
-    ]
+    data_production = data[(data["country"].isin(REGIONS_TO_ADD)) & (data["element_code"] == production_element_code)]
 
     # Create a dataframe of area of regions.
-    data_area = data[
-        (data["country"].isin(REGIONS_TO_ADD))
-        & (data["element_code"] == area_element_code)
-    ]
+    data_area = data[(data["country"].isin(REGIONS_TO_ADD)) & (data["element_code"] == area_element_code)]
 
     # Merge the two dataframes and create the new yield variable.
     merge_cols = [
@@ -277,15 +257,11 @@ def add_yield_to_aggregate_regions(data: pd.DataFrame) -> pd.DataFrame:
     # If both fields have the same flag, use that, otherwise use the flag of multiple flags.
     combined["flag"] = [
         flag_production if flag_production == flag_area else FLAG_MULTIPLE_FLAGS
-        for flag_production, flag_area in zip(
-            combined["flag_production"], combined["flag_area"]
-        )
+        for flag_production, flag_area in zip(combined["flag_production"], combined["flag_area"])
     ]
 
     # Drop rows of nan and unnecessary columns.
-    combined = combined.drop(
-        columns=["flag_production", "flag_area", "value_production", "value_area"]
-    )
+    combined = combined.drop(columns=["flag_production", "flag_area", "value_production", "value_area"])
     combined = combined.dropna(subset="value").reset_index(drop=True)
 
     # Replace fields appropriately.
@@ -324,26 +300,18 @@ def run(dest_dir: str) -> None:
     ####################################################################################################################
 
     # Load file of versions.
-    latest_versions = pd.read_csv(LATEST_VERSIONS_FILE).set_index(
-        ["channel", "dataset"]
-    )
+    latest_versions = pd.read_csv(LATEST_VERSIONS_FILE).set_index(["channel", "dataset"])
 
     # Dataset short name.
     dataset_short_name = f"{NAMESPACE}_qcl"
     # Path to latest dataset in meadow for current FAOSTAT domain.
     meadow_version = latest_versions.loc["meadow", dataset_short_name].item()
-    meadow_data_dir = (
-        DATA_DIR / "meadow" / NAMESPACE / meadow_version / dataset_short_name
-    )
+    meadow_data_dir = DATA_DIR / "meadow" / NAMESPACE / meadow_version / dataset_short_name
     # Path to dataset of FAOSTAT metadata.
-    garden_metadata_dir = (
-        DATA_DIR / "garden" / NAMESPACE / VERSION / f"{NAMESPACE}_metadata"
-    )
+    garden_metadata_dir = DATA_DIR / "garden" / NAMESPACE / VERSION / f"{NAMESPACE}_metadata"
 
     # Path to outliers file.
-    outliers_file = (
-        STEP_DIR / "data" / "garden" / NAMESPACE / VERSION / "detected_outliers.json"
-    )
+    outliers_file = STEP_DIR / "data" / "garden" / NAMESPACE / VERSION / "detected_outliers.json"
 
     ####################################################################################################################
     # Load data.
@@ -360,17 +328,11 @@ def run(dest_dir: str) -> None:
 
     # Load and prepare dataset, items, element-units, and countries metadata.
     datasets_metadata = pd.DataFrame(metadata["datasets"]).reset_index()
-    datasets_metadata = datasets_metadata[
-        datasets_metadata["dataset"] == dataset_short_name
-    ].reset_index(drop=True)
+    datasets_metadata = datasets_metadata[datasets_metadata["dataset"] == dataset_short_name].reset_index(drop=True)
     items_metadata = pd.DataFrame(metadata["items"]).reset_index()
-    items_metadata = items_metadata[
-        items_metadata["dataset"] == dataset_short_name
-    ].reset_index(drop=True)
+    items_metadata = items_metadata[items_metadata["dataset"] == dataset_short_name].reset_index(drop=True)
     elements_metadata = pd.DataFrame(metadata["elements"]).reset_index()
-    elements_metadata = elements_metadata[
-        elements_metadata["dataset"] == dataset_short_name
-    ].reset_index(drop=True)
+    elements_metadata = elements_metadata[elements_metadata["dataset"] == dataset_short_name].reset_index(drop=True)
     countries_metadata = pd.DataFrame(metadata["countries"]).reset_index()
 
     # Load file of detected outliers.
@@ -423,9 +385,7 @@ def run(dest_dir: str) -> None:
     # Prepare metadata for new garden dataset (starting with the metadata from the meadow version).
     dataset_garden_metadata = deepcopy(dataset_meadow.metadata)
     dataset_garden_metadata.version = VERSION
-    dataset_garden_metadata.description = datasets_metadata[
-        "owid_dataset_description"
-    ].item()
+    dataset_garden_metadata.description = datasets_metadata["owid_dataset_description"].item()
     dataset_garden_metadata.title = datasets_metadata["owid_dataset_title"].item()
     # Add metadata to dataset.
     dataset_garden.metadata = dataset_garden_metadata

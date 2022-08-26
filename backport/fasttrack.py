@@ -103,9 +103,7 @@ def fasttrack(
         )
 
 
-def _updated_datasets(
-    engine: Engine, start: dt.datetime, batch_size: int
-) -> pd.DataFrame:
+def _updated_datasets(engine: Engine, start: dt.datetime, batch_size: int) -> pd.DataFrame:
     q = """
     select
         id as dataset_id,

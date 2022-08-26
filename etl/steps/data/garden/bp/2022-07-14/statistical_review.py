@@ -200,9 +200,7 @@ def prepare_output_table(df: pd.DataFrame, bp_table: catalog.Table) -> catalog.T
     return table
 
 
-def fill_missing_values_with_previous_version(
-    table: catalog.Table, table_old: catalog.Table
-) -> catalog.Table:
+def fill_missing_values_with_previous_version(table: catalog.Table, table_old: catalog.Table) -> catalog.Table:
     """Fill missing values in current data with values from the previous version of the dataset.
 
     Parameters
@@ -222,11 +220,7 @@ def fill_missing_values_with_previous_version(
     # Remove region aggregates from the old table.
     table_old = table_old.reset_index().drop(columns="country_code")
     table_old = (
-        table_old[
-            ~table_old["country"].isin(
-                COUNTRIES_TO_AVOID_WHEN_FILLING_NANS_WITH_PREVIOUS_RELEASE
-            )
-        ]
+        table_old[~table_old["country"].isin(COUNTRIES_TO_AVOID_WHEN_FILLING_NANS_WITH_PREVIOUS_RELEASE)]
         .reset_index(drop=True)
         .set_index(["country", "year"])
     )
@@ -296,18 +290,10 @@ def amend_zero_filled_variables_for_region_aggregates(df: pd.DataFrame) -> pd.Da
     """
     df = df.copy()
 
-    zero_filled_variables = [
-        column for column in df.columns if "(zero filled)" in column
-    ]
-    original_variables = [
-        column.replace(" (zero filled)", "")
-        for column in df.columns
-        if "(zero filled)" in column
-    ]
+    zero_filled_variables = [column for column in df.columns if "(zero filled)" in column]
+    original_variables = [column.replace(" (zero filled)", "") for column in df.columns if "(zero filled)" in column]
     select_regions = df["country"].isin(REGIONS_TO_ADD)
-    df.loc[select_regions, zero_filled_variables] = (
-        df[select_regions][original_variables].fillna(0).values
-    )
+    df.loc[select_regions, zero_filled_variables] = df[select_regions][original_variables].fillna(0).values
 
     return df
 
@@ -335,11 +321,7 @@ def run(dest_dir: str) -> None:
     bp_data = (
         pd.DataFrame(bp_table)
         .reset_index()
-        .rename(
-            columns={
-                column: bp_table[column].metadata.title for column in bp_table.columns
-            }
-        )
+        .rename(columns={column: bp_table[column].metadata.title for column in bp_table.columns})
         .rename(columns={"entity_name": "country", "entity_code": "country_code"})
         .drop(columns="entity_id")
     )
@@ -353,9 +335,7 @@ def run(dest_dir: str) -> None:
         year_column="year",
         aggregates={column: "sum" for column in AGGREGATES_BY_SUM},
         known_overlaps=OVERLAPPING_DATA_TO_REMOVE_IN_AGGREGATES,  # type: ignore
-        region_codes=[
-            REGIONS_TO_ADD[region]["country_code"] for region in REGIONS_TO_ADD
-        ],
+        region_codes=[REGIONS_TO_ADD[region]["country_code"] for region in REGIONS_TO_ADD],
     )
 
     # Fill nans with zeros for "* (zero filled)" variables for region aggregates (which were ignored).
@@ -365,9 +345,7 @@ def run(dest_dir: str) -> None:
     table = prepare_output_table(df, bp_table)
 
     # Fill missing values in current table with values from the previous dataset, when possible.
-    table = fill_missing_values_with_previous_version(
-        table=table, table_old=bp_table_old
-    )
+    table = fill_missing_values_with_previous_version(table=table, table_old=bp_table_old)
 
     #
     # Save outputs.

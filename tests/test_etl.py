@@ -31,9 +31,7 @@ def test_all_data_steps_have_code():
 
 def test_sub_dag_import():
     # Ensure that sub-dag is imported from separate file
-    assert any(
-        ["sub_dag_step" in step for step in load_dag("tests/data/dag.yml")]
-    ), "sub-dag steps not found"
+    assert any(["sub_dag_step" in step for step in load_dag("tests/data/dag.yml")]), "sub-dag steps not found"
 
 
 def get_all_steps(filename: Union[str, Path] = paths.DAG_FILE) -> List[Step]:

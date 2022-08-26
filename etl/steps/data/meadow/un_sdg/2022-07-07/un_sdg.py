@@ -19,9 +19,7 @@ def run(dest_dir: str, query: str = "") -> None:
     fname = Path(__file__).stem
     namespace = Path(__file__).parent.parent.stem
 
-    walden_ds = Catalog().find_one(
-        namespace=namespace, short_name=fname, version=version
-    )
+    walden_ds = Catalog().find_one(namespace=namespace, short_name=fname, version=version)
 
     log.info("un_sdg.start")
     local_file = walden_ds.ensure_downloaded()
@@ -57,12 +55,8 @@ def load_and_clean(original_df: pd.DataFrame) -> pd.DataFrame:
     # removing values that aren't numeric e.g. Null and N values
     original_df.dropna(subset=["Value"], inplace=True)
     original_df.dropna(subset=["TimePeriod"], how="all", inplace=True)
-    original_df = original_df[
-        pd.to_numeric(original_df["Value"], errors="coerce").notnull()
-    ]
-    original_df.rename(
-        columns={"GeoAreaName": "Country", "TimePeriod": "Year"}, inplace=True
-    )
+    original_df = original_df[pd.to_numeric(original_df["Value"], errors="coerce").notnull()]
+    original_df.rename(columns={"GeoAreaName": "Country", "TimePeriod": "Year"}, inplace=True)
     original_df = original_df.rename(columns=lambda k: re.sub(r"[\[\]]", "", k))  # type: ignore
     return original_df
 

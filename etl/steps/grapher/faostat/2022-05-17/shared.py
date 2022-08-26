@@ -31,20 +31,14 @@ def get_grapher_dataset_from_file_name(file_path: str) -> catalog.Dataset:
     dataset_short_name = file_name.split(".")[0]
 
     # Path to file containing information of the latest versions of the relevant datasets.
-    latest_versions_file = (
-        STEP_DIR / "grapher" / namespace / grapher_version / "versions.csv"
-    )
+    latest_versions_file = STEP_DIR / "grapher" / namespace / grapher_version / "versions.csv"
 
     # Load file of versions.
-    latest_versions = pd.read_csv(latest_versions_file).set_index(
-        ["channel", "dataset"]
-    )
+    latest_versions = pd.read_csv(latest_versions_file).set_index(["channel", "dataset"])
 
     # Path to latest dataset in garden for current FAOSTAT domain.
     garden_version = latest_versions.loc["garden", dataset_short_name].item()
-    garden_data_dir = (
-        DATA_DIR / "garden" / namespace / garden_version / dataset_short_name
-    )
+    garden_data_dir = DATA_DIR / "garden" / namespace / garden_version / dataset_short_name
 
     # Load latest garden dataset.
     dataset = catalog.Dataset(garden_data_dir)
@@ -54,9 +48,7 @@ def get_grapher_dataset_from_file_name(file_path: str) -> catalog.Dataset:
 
     # Some datasets have " - FAO (YYYY)" at the end, and some others do not.
     # For consistency, remove that ending of the title, and add something consistent across all datasets.
-    dataset.metadata.title = (
-        dataset.metadata.title.split(" - FAO (")[0] + f" (FAO, {grapher_version})"
-    )
+    dataset.metadata.title = dataset.metadata.title.split(" - FAO (")[0] + f" (FAO, {grapher_version})"
 
     return dataset
 
@@ -79,9 +71,7 @@ def get_grapher_tables(dataset: catalog.Dataset) -> Iterable[catalog.Table]:
 
     """
     # Fetch wide table from dataset.
-    flat_table_names = [
-        table_name for table_name in dataset.table_names if table_name.endswith("_flat")
-    ]
+    flat_table_names = [table_name for table_name in dataset.table_names if table_name.endswith("_flat")]
     assert len(flat_table_names) == 1
     table = dataset[flat_table_names[0]].reset_index().drop(columns=["area_code"])
 

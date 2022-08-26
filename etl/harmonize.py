@@ -22,9 +22,7 @@ from etl.paths import REFERENCE_DATASET
 @click.argument("column")
 @click.argument("output_file")
 @click.argument("institution", required=False)
-def harmonize(
-    data_file: str, column: str, output_file: str, institution: Optional[str] = None
-) -> None:
+def harmonize(data_file: str, column: str, output_file: str, institution: Optional[str] = None) -> None:
     """
     Given a data file in feather or CSV format, and the name of the column representing
     country or region names, interactively generate a JSON mapping from the given names
@@ -60,9 +58,7 @@ def read_table(input_file: str) -> pd.DataFrame:
         df = pd.read_feather(input_file)
 
     elif input_file.endswith(".csv"):
-        df = pd.read_csv(
-            input_file, index_col=False, na_values=[""], keep_default_na=False
-        )
+        df = pd.read_csv(input_file, index_col=False, na_values=[""], keep_default_na=False)
 
     else:
         raise ValueError(f"Unsupported file type: {input_file}")
@@ -230,9 +226,7 @@ class GeoPickerCmd(cmd.Cmd):
                 self.save_alias = input_bool("Save this alias")
             else:
                 # it's a manual entry that does not correspond to any known country
-                print(
-                    f"Using custom entry '{choice}' that does not match a country/region from the reference set"
-                )
+                print(f"Using custom entry '{choice}' that does not match a country/region from the reference set")
                 self.match = choice
 
         return True

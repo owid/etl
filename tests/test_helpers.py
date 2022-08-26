@@ -10,7 +10,5 @@ from etl import helpers
 
 
 def test_get_etag():
-    etag = helpers.get_etag(
-        "https://raw.githubusercontent.com/owid/owid-grapher/master/README.md"
-    )
+    etag = helpers.get_etag("https://raw.githubusercontent.com/owid/owid-grapher/master/README.md")
     assert etag

@@ -126,9 +126,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
                 name="license_name",
                 placeholder="Creative Commons BY 4.0",
             ),
-            pi.textarea(
-                "Description", name="description", value=dummies.get("description")
-            ),
+            pi.textarea("Description", name="description", value=dummies.get("description")),
         ],
     )
     form = WaldenForm(**data)
@@ -150,9 +148,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
         )
 
         # move them into the walden ingest directory
-        shutil.copytree(
-            Path(OUTPUT_DIR) / "walden", WALDEN_INGEST_DIR, dirs_exist_ok=True
-        )
+        shutil.copytree(Path(OUTPUT_DIR) / "walden", WALDEN_INGEST_DIR, dirs_exist_ok=True)
 
         ingest_path = WALDEN_INGEST_DIR / (form.short_name + ".py")
         meta_path = WALDEN_INGEST_DIR / (form.short_name + ".meta.yml")

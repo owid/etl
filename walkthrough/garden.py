@@ -202,21 +202,13 @@ def _check_dataset_in_meadow(form: GardenForm) -> None:
     cmd = f"etl data://meadow/{form.namespace}/{form.version}/{form.short_name}"
 
     try:
-        ds = Dataset(
-            DATA_DIR / "meadow" / form.namespace / form.version / form.short_name
-        )
+        ds = Dataset(DATA_DIR / "meadow" / form.namespace / form.version / form.short_name)
         if form.short_name not in ds.table_names:
             po.put_warning(
-                po.put_markdown(
-                    f"Table `{form.short_name}` not found in Meadow dataset, have you run ```\n{cmd}\n```?"
-                )
+                po.put_markdown(f"Table `{form.short_name}` not found in Meadow dataset, have you run ```\n{cmd}\n```?")
             )
         else:
             po.put_success("Dataset found in Meadow")
     except FileNotFoundError:
         # raise a warning, but continue
-        po.put_warning(
-            po.put_markdown(
-                f"Dataset not found in Meadow, have you run ```\n{cmd}\n```?"
-            )
-        )
+        po.put_warning(po.put_markdown(f"Dataset not found in Meadow, have you run ```\n{cmd}\n```?"))

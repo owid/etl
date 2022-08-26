@@ -71,9 +71,7 @@ def as_table(df: pd.DataFrame, table: catalog.Table) -> catalog.Table:
     return t
 
 
-def annotate_table_from_yaml(
-    table: catalog.Table, path: Path, **kwargs: Any
-) -> catalog.Table:
+def annotate_table_from_yaml(table: catalog.Table, path: Path, **kwargs: Any) -> catalog.Table:
     """Load variable descriptions and units from the annotations.yml file and
     store them as column metadata."""
     annot = Annotation.load_from_yaml(path)
@@ -166,9 +164,7 @@ def yield_wide_table(
             # Add dimensions to title (which will be used as variable name in grapher)
             title_with_dims: Optional[str]
             if tab[short_name].metadata.title:
-                title_with_dims = _title_column_and_dimensions(
-                    tab[short_name].metadata.title, dims, dim_titles
-                )
+                title_with_dims = _title_column_and_dimensions(tab[short_name].metadata.title, dims, dim_titles)
                 tab[short_name].metadata.title = title_with_dims
             else:
                 title_with_dims = None
@@ -183,9 +179,7 @@ def yield_wide_table(
             yield tab.reset_index().set_index(["entity_id", "year"])[[short_name]]
 
 
-def _title_column_and_dimensions(
-    title: str, dims: List[str], dim_names: List[str]
-) -> str:
+def _title_column_and_dimensions(title: str, dims: List[str], dim_names: List[str]) -> str:
     """Create new title from column title and dimensions.
     For instance `Deaths`, ["age", "sex"], ["10-18", "male"] will be converted into
     Deaths - age: 10-18 - sex: male
@@ -195,9 +189,7 @@ def _title_column_and_dimensions(
     return " - ".join([title] + dims)
 
 
-def _slugify_column_and_dimensions(
-    column: str, dims: List[str], dim_names: List[str]
-) -> str:
+def _slugify_column_and_dimensions(column: str, dims: List[str], dim_names: List[str]) -> str:
     # add dimension names to dimensions
     dims = [f"{dim_name}_{dim}" for dim, dim_name in zip(dims, dim_names)]
 
@@ -298,9 +290,7 @@ def country_to_entity_id(
     if entity_id.isnull().any() and create_entities:
         assert fill_from_db, "fill_from_db must be True to create entities"
         ix = entity_id.isnull()
-        entity_id[ix] = country[ix].map(
-            _get_and_create_entities_in_db(set(country[ix]))
-        )
+        entity_id[ix] = country[ix].map(_get_and_create_entities_in_db(set(country[ix])))
 
     if entity_id.isnull().any():
         msg = f"Some countries have not been mapped: {set(country[entity_id.isnull()])}"
@@ -339,9 +329,7 @@ def combine_metadata_sources(metadata: catalog.DatasetMeta) -> catalog.DatasetMe
     """
     metadata = deepcopy(metadata)
 
-    assert (
-        len(metadata.sources) >= 1
-    ), "Dataset needs to have at least one source in metadata."
+    assert len(metadata.sources) >= 1, "Dataset needs to have at least one source in metadata."
 
     # Define the 'default_source', which will be the one where all sources' attributes are combined.
     default_source = metadata.sources[0]
@@ -362,11 +350,7 @@ def combine_metadata_sources(metadata: catalog.DatasetMeta) -> catalog.DatasetMe
     for attribute in attributes:
         # Gather non-empty values from each source for current attribute.
         values = _unique(
-            [
-                getattr(source, attribute)
-                for source in metadata.sources
-                if getattr(source, attribute) is not None
-            ]
+            [getattr(source, attribute) for source in metadata.sources if getattr(source, attribute) is not None]
         )
         if attribute == "description":
             if metadata.description is not None:
@@ -462,9 +446,7 @@ def _ensure_source_per_variable(table: catalog.Table) -> catalog.Table:
     for column in table.columns:
         if len(table[column].metadata.sources) == 0:
             # Take the metadata sources from the dataset's metadata (after combining them into one).
-            table[column].metadata.sources = combine_metadata_sources(
-                table.metadata.dataset
-            ).sources
+            table[column].metadata.sources = combine_metadata_sources(table.metadata.dataset).sources
         if table[column].metadata.sources[0].description is None:
             # Add the table description to the first source, so that it is displayed on the SOURCES tab.
             table[column].metadata.sources[0].description = table.metadata.description

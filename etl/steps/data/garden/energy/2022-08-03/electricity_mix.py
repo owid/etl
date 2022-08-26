@@ -125,9 +125,7 @@ def process_ember_data(table_ember: catalog.Table) -> pd.DataFrame:
     # In Ember data, "other rewenables" excludes bioenergy.
     # To be able to combine both datasets, create a new variable for generation of other renewables including bioenergy.
     table_ember["other_renewables_including_bioenergy_generation__twh"] = (
-        pd.DataFrame(table_ember)[
-            "other_renewables_excluding_bioenergy_generation__twh"
-        ]
+        pd.DataFrame(table_ember)["other_renewables_excluding_bioenergy_generation__twh"]
         + table_ember["bioenergy_generation__twh"]
     )
 
@@ -177,9 +175,7 @@ def add_per_capita_variables(combined: pd.DataFrame) -> pd.DataFrame:
     combined = add_population(df=combined, warn_on_missing_countries=False)
 
     for variable in per_capita_variables:
-        assert (
-            "twh" in variable
-        ), f"Variables are assumed to be in TWh, but {variable} is not."
+        assert "twh" in variable, f"Variables are assumed to be in TWh, but {variable} is not."
         new_column = "per_capita_" + variable.replace("__twh", "__kwh")
         combined[new_column] = combined[variable] * TWH_TO_KWH / combined["population"]
 
@@ -226,15 +222,11 @@ def add_share_variables(combined: pd.DataFrame) -> pd.DataFrame:
     ]
     for variable in share_variables:
         new_column = variable.replace("_generation__twh", "_share_of_electricity__pct")
-        combined[new_column] = (
-            100 * combined[variable] / combined["total_generation__twh"]
-        )
+        combined[new_column] = 100 * combined[variable] / combined["total_generation__twh"]
 
     # Calculate the percentage of electricity as a share of primary energy.
     combined["total_electricity_share_of_primary_energy__pct"] = (
-        100
-        * combined["total_generation__twh"]
-        / combined["primary_energy_consumption__twh"]
+        100 * combined["total_generation__twh"] / combined["primary_energy_consumption__twh"]
     )
 
     # Calculate the percentage of electricity demand that is imported.
@@ -244,9 +236,7 @@ def add_share_variables(combined: pd.DataFrame) -> pd.DataFrame:
 
     # Sanity check.
     error = "Total electricity share does not add up to 100%."
-    assert all(
-        abs(combined["total_share_of_electricity__pct"].dropna() - 100) < 0.01
-    ), error
+    assert all(abs(combined["total_share_of_electricity__pct"].dropna() - 100) < 0.01), error
 
     # Remove unnecessary columns.
     combined = combined.drop(columns=["total_share_of_electricity__pct"])
@@ -271,9 +261,7 @@ def prepare_output_table(combined: pd.DataFrame) -> catalog.Table:
     """
     # Sort rows and columns conveniently and set an index.
     combined = combined[sorted(combined.columns)]
-    combined = combined.set_index(
-        ["country", "year"], verify_integrity=True
-    ).sort_index()
+    combined = combined.set_index(["country", "year"], verify_integrity=True).sort_index()
 
     # Convert dataframe into a table (with no metadata).
     table = catalog.Table(combined)
@@ -304,16 +292,14 @@ def run(dest_dir: str) -> None:
     df_ember = process_ember_data(table_ember=table_ember)
 
     # Combine both tables, giving priority to BP data (on overlapping values).
-    combined = combine_two_overlapping_dataframes(
-        df1=df_bp, df2=df_ember, index_columns=["country", "year"]
-    )
+    combined = combine_two_overlapping_dataframes(df1=df_bp, df2=df_ember, index_columns=["country", "year"])
 
     # Add carbon intensities.
     # There is already a variable for this in the Ember dataset, but now that we have combined
     # BP and Ember data, intensities should be recalculated for consistency.
-    combined["co2_intensity__gco2_kwh"] = (
-        combined["total_emissions__mtco2"] * MT_TO_G
-    ) / (combined["total_generation__twh"] * TWH_TO_KWH)
+    combined["co2_intensity__gco2_kwh"] = (combined["total_emissions__mtco2"] * MT_TO_G) / (
+        combined["total_generation__twh"] * TWH_TO_KWH
+    )
 
     # Add per capita variables.
     combined = add_per_capita_variables(combined=combined)

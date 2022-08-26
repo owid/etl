@@ -83,9 +83,7 @@ class ChartRevisionSuggester:
             try:
                 chart_id = row.id
                 # retrieves chart dimensions to be updated.
-                chart_dims = df_chart_dims[
-                    df_chart_dims["chartId"] == chart_id
-                ].to_dict(orient="records")
+                chart_dims = df_chart_dims[df_chart_dims["chartId"] == chart_id].to_dict(orient="records")
                 chart_dims_orig = deepcopy(chart_dims)
                 chart_config = json.loads(row.config)
 
@@ -95,12 +93,8 @@ class ChartRevisionSuggester:
 
                 self._modify_chart_dimensions(chart_dims, chart_config)
 
-                config_has_changed = (
-                    json.dumps(chart_config, ignore_nan=True) != row.config
-                )
-                dims_have_changed = any(
-                    [dim != chart_dims_orig[i] for i, dim in enumerate(chart_dims)]
-                )
+                config_has_changed = json.dumps(chart_config, ignore_nan=True) != row.config
+                dims_have_changed = any([dim != chart_dims_orig[i] for i, dim in enumerate(chart_dims)])
                 assert config_has_changed == dims_have_changed, (
                     f"Chart {chart_id}: Chart config and chart dimensions must "
                     "have either BOTH changed or NEITHER changed, but only "
@@ -134,15 +128,11 @@ class ChartRevisionSuggester:
         if suggested_reason is None:
             dataset_name = self.dataset_name
             dataset_version = self.version
-            suggested_reason = (
-                f"{dataset_name} (v{dataset_version}) bulk dataset update"
-            )
+            suggested_reason = f"{dataset_name} (v{dataset_version}) bulk dataset update"
         try:
             n_before = 0
             with open_db() as db:
-                n_before = db.fetch_one(
-                    "SELECT COUNT(id) FROM suggested_chart_revisions"
-                )[0]
+                n_before = db.fetch_one("SELECT COUNT(id) FROM suggested_chart_revisions")[0]
 
                 res = db.fetch_many(
                     """
@@ -214,20 +204,13 @@ class ChartRevisionSuggester:
                 """
                 )
                 if len(res):
-                    df = pd.DataFrame(
-                        res, columns=["id", "chart_id", "count", "created_at"]
-                    )
-                    df["drop"] = df.groupby("chart_id")["created_at"].transform(
-                        lambda gp: gp == gp.max()
-                    )
+                    df = pd.DataFrame(res, columns=["id", "chart_id", "count", "created_at"])
+                    df["drop"] = df.groupby("chart_id")["created_at"].transform(lambda gp: gp == gp.max())
                     df = df[~df["drop"]]
                     # problem_chart_ids = [r[0] for r in res]
                     s = ""
                     for nm, gp in df.groupby("chart_id"):
-                        s += (
-                            f"Chart ID: {nm}. Suggested chart revision IDs:"
-                            f" {gp['id'].tolist()}\n"
-                        )
+                        s += f"Chart ID: {nm}. Suggested chart revision IDs:" f" {gp['id'].tolist()}\n"
                     raise RuntimeError(
                         "For one or more of the suggested chart revisions that you are "
                         "trying to insert, a suggested chart revision already exists for "
@@ -245,21 +228,13 @@ class ChartRevisionSuggester:
                 f"suggestedVersion, and isPendingOrFlagged. Error: {e}"
             )
         except Exception as e:
-            log.error(
-                "INSERT operation into `suggested_chart_revisions` cancelled."
-                f" Error: {e}"
-            )
+            log.error("INSERT operation into `suggested_chart_revisions` cancelled." f" Error: {e}")
             raise e
         finally:
             with open_db() as db:
-                n_after = db.fetch_one(
-                    "SELECT COUNT(id) FROM suggested_chart_revisions"
-                )[0]
+                n_after = db.fetch_one("SELECT COUNT(id) FROM suggested_chart_revisions")[0]
 
-            log.info(
-                f"{n_after - n_before} of {len(suggested_chart_revisions)} suggested"
-                " chart revisions inserted."
-            )
+            log.info(f"{n_after - n_before} of {len(suggested_chart_revisions)} suggested" " chart revisions inserted.")
 
     def _get_charts_from_old_variables(
         self,
@@ -325,9 +300,7 @@ class ChartRevisionSuggester:
 
     def _get_variable_year_ranges(self) -> Dict[int, List[int]]:
         with open_db() as db:
-            all_var_ids = list(self.old_var_id2new_var_id.keys()) + list(
-                self.old_var_id2new_var_id.values()
-            )
+            all_var_ids = list(self.old_var_id2new_var_id.keys()) + list(self.old_var_id2new_var_id.values())
             variable_ids_str = ",".join([str(_id) for _id in all_var_ids])
             rows = db.fetch_many(
                 f"""
@@ -359,38 +332,26 @@ class ChartRevisionSuggester:
 
             # update targetYear
             if "targetYear" in chart_config["map"]:
-                if (
-                    pd.notnull(new_range.min)
-                    and chart_config["map"]["targetYear"] == old_range.min
-                ):
+                if pd.notnull(new_range.min) and chart_config["map"]["targetYear"] == old_range.min:
                     chart_config["map"]["targetYear"] = new_range.min
                 elif pd.notnull(new_range.max):
                     chart_config["map"]["targetYear"] = new_range.max
 
             # update time
             if "time" in chart_config["map"]:
-                if (
-                    pd.notnull(new_range.min)
-                    and chart_config["map"]["time"] == old_range.min
-                ):
+                if pd.notnull(new_range.min) and chart_config["map"]["time"] == old_range.min:
                     chart_config["map"]["time"] = new_range.min
                 elif pd.notnull(new_range.max):
                     chart_config["map"]["time"] = new_range.max
 
-    def _modify_chart_config_time(
-        self, chart_id: int, chart_config: dict[Any, Any]
-    ) -> None:
+    def _modify_chart_config_time(self, chart_id: int, chart_config: dict[Any, Any]) -> None:
         """modifies chart config maxTime and minTime"""
-        old_variable_ids = set(
-            [dim["variableId"] for dim in chart_config["dimensions"]]
-        )
+        old_variable_ids = set([dim["variableId"] for dim in chart_config["dimensions"]])
         if "map" in chart_config and "variableId" in chart_config["map"]:
             old_variable_ids.add(chart_config["map"]["variableId"])
 
         new_variable_ids = [
-            self.old_var_id2new_var_id[_id]
-            for _id in old_variable_ids
-            if _id in self.old_var_id2new_var_id
+            self.old_var_id2new_var_id[_id] for _id in old_variable_ids if _id in self.old_var_id2new_var_id
         ]
 
         old_range = self._vars_to_range(old_variable_ids)
@@ -425,8 +386,7 @@ class ChartRevisionSuggester:
                     or (
                         pd.api.types.is_numeric_dtype(chart_config["minTime"])
                         and pd.api.types.is_numeric_dtype(chart_config["maxTime"])
-                        and abs(chart_config["minTime"] - old_range.min)
-                        < abs(chart_config["maxTime"] - old_range.max)
+                        and abs(chart_config["minTime"] - old_range.min) < abs(chart_config["maxTime"] - old_range.max)
                     )
                 )
                 if use_min_year:
@@ -437,9 +397,7 @@ class ChartRevisionSuggester:
                     chart_config["maxTime"] = new_range.max
             else:
                 replace_min_time = (
-                    "minTime" in chart_config
-                    and chart_config["minTime"] != "earliest"
-                    and pd.notnull(new_range.min)
+                    "minTime" in chart_config and chart_config["minTime"] != "earliest" and pd.notnull(new_range.min)
                 )
                 if replace_min_time:
                     if pd.notnull(old_range.min) and (new_range.min > old_range.min):
@@ -450,9 +408,7 @@ class ChartRevisionSuggester:
                         )
                     chart_config["minTime"] = new_range.min
                 replace_max_time = (
-                    "maxTime" in chart_config
-                    and chart_config["maxTime"] != "latest"
-                    and pd.notnull(new_range.max)
+                    "maxTime" in chart_config and chart_config["maxTime"] != "latest" and pd.notnull(new_range.max)
                 )
                 if replace_max_time:
                     if pd.notnull(old_range.max) and (new_range.max < old_range.max):
@@ -463,9 +419,7 @@ class ChartRevisionSuggester:
                         )
                     chart_config["maxTime"] = new_range.max
 
-    def _check_chart_config_fastt(
-        self, chart_id: int, chart_config: dict[Any, Any]
-    ) -> None:
+    def _check_chart_config_fastt(self, chart_id: int, chart_config: dict[Any, Any]) -> None:
         """modifies chart config FASTT.
 
         update/check text fields: slug, note, title, subtitle, sourceDesc.
@@ -475,9 +429,7 @@ class ChartRevisionSuggester:
                 f"Chart {chart_id} title may have a hard-coded year in it that "
                 f'will not be updated: "{chart_config["title"]}"'
             )
-        if "subtitle" in chart_config and re.search(
-            r"\b\d{4}\b", chart_config["subtitle"]
-        ):
+        if "subtitle" in chart_config and re.search(r"\b\d{4}\b", chart_config["subtitle"]):
             log.warning(
                 f"Chart {chart_id} subtitle may have a hard-coded year in it "
                 f'that will not be updated: "{chart_config["subtitle"]}"'
@@ -493,17 +445,13 @@ class ChartRevisionSuggester:
                 f'will not be updated: "{chart_config["slug"]}"'
             )
 
-    def _modify_chart_dimensions(
-        self, chart_dimensions: List[dict[str, Any]], chart_config: dict[Any, Any]
-    ) -> None:
+    def _modify_chart_dimensions(self, chart_dimensions: List[dict[str, Any]], chart_config: dict[Any, Any]) -> None:
         """modifies each chart dimension (in both chart_dimensions and chart config)."""
         for dim in chart_dimensions:
             if dim["variableId"] in self.old_var_id2new_var_id:
                 dim["variableId"] = self.old_var_id2new_var_id[dim["variableId"]]
                 config_dim = chart_config["dimensions"][dim["order"]]
-                config_dim["variableId"] = self.old_var_id2new_var_id[
-                    config_dim["variableId"]
-                ]
+                config_dim["variableId"] = self.old_var_id2new_var_id[config_dim["variableId"]]
 
     def _vars_to_range(self, _ids: Iterable[int]) -> IntRange:
         years = []

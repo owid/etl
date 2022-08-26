@@ -22,9 +22,7 @@ def run(dest_dir: str) -> None:
     namespace = Path(__file__).parent.parent.stem
     ds_meadow = Dataset((DATA_DIR / f"meadow/{namespace}/{version}/{fname}").as_posix())
 
-    assert (
-        len(ds_meadow.table_names) == 1
-    ), "Expected meadow dataset to have only one table, but found > 1 table names."
+    assert len(ds_meadow.table_names) == 1, "Expected meadow dataset to have only one table, but found > 1 table names."
     tb_meadow = ds_meadow[fname]
     df = pd.DataFrame(tb_meadow).reset_index()
 
@@ -35,9 +33,7 @@ def run(dest_dir: str) -> None:
     assert df["country"].notnull().all()
     countries = df["country"].apply(lambda x: country_mapping.get(x, None))
     if countries.isnull().any():
-        missing_countries = [
-            x for x in df["country"].drop_duplicates() if x not in country_mapping
-        ]
+        missing_countries = [x for x in df["country"].drop_duplicates() if x not in country_mapping]
         raise RuntimeError(
             "The following raw country names have not been harmonized. "
             f"Please: (a) edit {COUNTRY_MAPPING_PATH} to include these country "
