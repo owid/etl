@@ -48,19 +48,12 @@ def select_source(df: pd.DataFrame) -> pd.DataFrame:
 
     # If a country has UN data, then remove all non-UN data after 1949
     has_un_data = set(df.loc[df.source == "unwpp", "country"])
-    df = df.loc[
-        -((df.country.isin(has_un_data)) & (df.year >= 1950) & (df.source != "unwpp"))
-    ]
+    df = df.loc[-((df.country.isin(has_un_data)) & (df.year >= 1950) & (df.source != "unwpp"))]
 
     # If a country has Gapminder data, then remove all non-Gapminder data between 1800 and 1949
     has_gapminder_data = set(df.loc[df.source == "gapminder", "country"])
     df = df.loc[
-        -(
-            (df.country.isin(has_gapminder_data))
-            & (df.year >= 1800)
-            & (df.year <= 1949)
-            & (df.source != "gapminder")
-        )
+        -((df.country.isin(has_gapminder_data)) & (df.year >= 1800) & (df.year <= 1949) & (df.source != "gapminder"))
     ]
 
     # Test if all countries have only one row per year
@@ -100,9 +93,7 @@ def prepare_dataset(df: pd.DataFrame) -> Table:
     df.year = df.year.astype(int)
 
     # Add a metric "% of world population"
-    world_pop = df[df.country == "World"][["year", "population"]].rename(
-        columns={"population": "world_pop"}
-    )
+    world_pop = df[df.country == "World"][["year", "population"]].rename(columns={"population": "world_pop"})
     df = df.merge(world_pop, on="year", how="left")
     df["world_pop_share"] = (df["population"].div(df.world_pop)).round(4)
 
@@ -124,9 +115,9 @@ def load_unwpp() -> pd.DataFrame:
     df = (
         df[df.variant == "Medium"]
         .drop(columns="variant")
-        .assign(
-            source="unwpp", population=lambda df: df.population.mul(1000).astype(int)
-        )[["country", "year", "population", "source"]]
+        .assign(source="unwpp", population=lambda df: df.population.mul(1000).astype(int))[
+            ["country", "year", "population", "source"]
+        ]
     )
     return cast(pd.DataFrame, df)
 

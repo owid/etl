@@ -120,9 +120,7 @@ def etl_catalog(
     are structurally equal but are otherwise different, 3 if the dataframes have different structure and/or different values.
     """
     try:
-        remote_df = catalog.find_one(
-            table=table, namespace=namespace, dataset=dataset, channels=channel
-        )
+        remote_df = catalog.find_one(table=table, namespace=namespace, dataset=dataset, channels=channel)
         local_catalog = catalog.LocalCatalog("data")
         local_df = local_catalog.find_one(
             table=table,
@@ -235,9 +233,7 @@ def dataframes(
     try:
         df1 = load_table(dataframe1)
     except Exception:
-        print(
-            f"[yellow]Reading {dataframe1} as table with metadata failed, trying to read as plain dataframe[/yellow]"
-        )
+        print(f"[yellow]Reading {dataframe1} as table with metadata failed, trying to read as plain dataframe[/yellow]")
         try:
             df1 = load_dataframe(dataframe1)
         except Exception as e:
@@ -248,9 +244,7 @@ def dataframes(
     try:
         df2 = load_table(dataframe2)
     except Exception:
-        print(
-            f"[yellow]Reading {dataframe2} as table with metadata failed, trying to read as plain dataframe[/yellow]"
-        )
+        print(f"[yellow]Reading {dataframe2} as table with metadata failed, trying to read as plain dataframe[/yellow]")
         try:
             df2 = load_dataframe(dataframe2)
         except Exception as e:

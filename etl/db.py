@@ -94,9 +94,7 @@ def get_dataset_id(db_conn: MySQLdb.Connection, dataset_name: str) -> Any:
     return dataset_id
 
 
-def get_variables_in_dataset(
-    db_conn: MySQLdb.Connection, dataset_id: int, only_used_in_charts: bool = False
-) -> Any:
+def get_variables_in_dataset(db_conn: MySQLdb.Connection, dataset_id: int, only_used_in_charts: bool = False) -> Any:
     """Get all variables data for a specific dataset ID from database.
 
     Parameters

@@ -64,12 +64,8 @@ def process(df: pd.DataFrame, country_std: str) -> pd.DataFrame:
         df.loc[df.metric == m, "value"] = ops[m](df.loc[df.metric == m, "value"])
     # Column value mappings
     df = df.assign(
-        metric=df.metric.map({k: v["name"] for k, v in COLUMNS_METRICS.items()}).astype(
-            "category"
-        ),
-        sex=df.metric.map({k: v["sex"] for k, v in COLUMNS_METRICS.items()}).astype(
-            "category"
-        ),
+        metric=df.metric.map({k: v["name"] for k, v in COLUMNS_METRICS.items()}).astype("category"),
+        sex=df.metric.map({k: v["sex"] for k, v in COLUMNS_METRICS.items()}).astype("category"),
         variant=df.variant.apply(lambda x: x.lower()).astype("category"),
     )
     # Column order
@@ -92,9 +88,7 @@ def add_metrics(df: pd.DataFrame) -> pd.DataFrame:
     df_p_broad = optimize_dtypes(df_p_broad)
     df_p_diff = optimize_dtypes(df_p_diff)
     # Concatenate
-    df = pd.concat(
-        [df_sr, df_sr_all, df_p_granular, df_p_broad, df_p_diff], ignore_index=True
-    )
+    df = pd.concat([df_sr, df_sr_all, df_p_granular, df_p_broad, df_p_diff], ignore_index=True)
     return df
 
 
@@ -166,9 +160,9 @@ def _add_metric_population(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame
     )
     df_p_all = optimize_dtypes(df_p_all, simple=True)
     # Merge all age groups
-    df_p_granular = pd.concat(
-        [df_p_granular, df_p_0, df_p_1_4, df_p_all], ignore_index=True
-    ).astype({"age": "category"})
+    df_p_granular = pd.concat([df_p_granular, df_p_0, df_p_1_4, df_p_all], ignore_index=True).astype(
+        {"age": "category"}
+    )
     # Broad age groups
     df_p_broad = df_p.assign(age=df_p.age.map(map_broad_age).astype("category"))
     df_p_broad = df_p_broad.groupby(
@@ -176,9 +170,7 @@ def _add_metric_population(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame
         as_index=False,
         observed=True,
     ).sum()
-    df_p_broad = df_p_broad.assign(metric="population_broad").astype(
-        {"metric": "category"}
-    )
+    df_p_broad = df_p_broad.assign(metric="population_broad").astype({"metric": "category"})
     return df_p_granular, df_p_broad
 
 
@@ -207,9 +199,7 @@ def _add_metric_population_change(df_p_granular: pd.DataFrame) -> pd.DataFrame:
     )
     df_p_diff = pd.concat(
         [
-            df_p_granular[
-                [col for col in df_p_granular.columns if col not in ["value", "metric"]]
-            ],
+            df_p_granular[[col for col in df_p_granular.columns if col not in ["value", "metric"]]],
             pop_diff,
         ],
         axis=1,
@@ -222,12 +212,12 @@ def _add_metric_sexratio_all(df_p_granular: pd.DataFrame) -> Any:
     # Check
     (df_p_granular.metric.unique() == ["population"]).all()
     # Get M/F values
-    df_male = df_p_granular[
-        (df_p_granular.age == "all") & (df_p_granular.sex == "male")
-    ].rename(columns={"value": "value_male"})
-    df_female = df_p_granular[
-        (df_p_granular.age == "all") & (df_p_granular.sex == "female")
-    ].rename(columns={"value": "value_female"})
+    df_male = df_p_granular[(df_p_granular.age == "all") & (df_p_granular.sex == "male")].rename(
+        columns={"value": "value_male"}
+    )
+    df_female = df_p_granular[(df_p_granular.age == "all") & (df_p_granular.sex == "female")].rename(
+        columns={"value": "value_female"}
+    )
     # Check
     assert len(df_male) == len(df_female)
     # Build df

@@ -25,9 +25,7 @@ def run(dest_dir: str, query: str = "") -> None:
     log.info("Reading in dataset from Meadow...")
     ds_meadow = Dataset((DATA_DIR / f"meadow/{NAMESPACE}/{VERSION}/{FNAME}").as_posix())
 
-    assert (
-        len(ds_meadow.table_names) == 1
-    ), "Expected meadow dataset to have only one table, but found > 1 table names."
+    assert len(ds_meadow.table_names) == 1, "Expected meadow dataset to have only one table, but found > 1 table names."
     tb_meadow = ds_meadow[FNAME]
     df = pd.DataFrame(tb_meadow)
     df = create_units(df)
@@ -40,9 +38,7 @@ def run(dest_dir: str, query: str = "") -> None:
     assert df["country"].notnull().all()
     countries = df["country"].map(country_mapping)
     if countries.isnull().any():
-        missing_countries = [
-            x for x in df["country"].drop_duplicates() if x not in country_mapping
-        ]
+        missing_countries = [x for x in df["country"].drop_duplicates() if x not in country_mapping]
         raise RuntimeError(
             "The following raw country names have not been harmonized. "
             f"Please: (a) edit {COUNTRY_MAPPING_PATH} to include these country "
@@ -52,9 +48,7 @@ def run(dest_dir: str, query: str = "") -> None:
     df["country"] = countries
     assert df["country"].notnull().all()
     assert df["value"].notnull().all()
-    assert (
-        not df.isnull().all(axis=1).any()
-    ), "Unexpected state: One or more rows contains only NaN values."
+    assert not df.isnull().all(axis=1).any(), "Unexpected state: One or more rows contains only NaN values."
 
     if query:
         df = df.query(query)
@@ -92,9 +86,7 @@ def create_tables(original_df: pd.DataFrame) -> List[pd.DataFrame]:
     dim_description = get_dimension_description()
     init_dimensions = list(dim_description.keys())
     init_dimensions = list(set(init_dimensions).intersection(list(original_df.columns)))
-    init_non_dimensions = list(
-        [c for c in original_df.columns if c not in set(init_dimensions)]
-    )
+    init_non_dimensions = list([c for c in original_df.columns if c not in set(init_dimensions)])
 
     all_series = original_df.groupby(["indicator", "seriescode"])
 
@@ -106,9 +98,7 @@ def create_tables(original_df: pd.DataFrame) -> List[pd.DataFrame]:
             indicator=group_name[0],
             series=group_name[1],
         )
-        df_dim, dimensions = get_series_with_relevant_dimensions(
-            df_group, init_dimensions, init_non_dimensions
-        )
+        df_dim, dimensions = get_series_with_relevant_dimensions(df_group, init_dimensions, init_non_dimensions)
         len_dimensions.append(len(dimensions))
         if len(dimensions) == 0:
             # no additional dimensions
@@ -220,9 +210,7 @@ def get_series_with_relevant_dimensions(
     - unique values for each relevant dimension
     """
 
-    non_null_dimensions_columns = [
-        col for col in init_dimensions if data_series.loc[:, col].notna().any()
-    ]
+    non_null_dimensions_columns = [col for col in init_dimensions if data_series.loc[:, col].notna().any()]
     dimension_names = []
 
     for c in non_null_dimensions_columns:
@@ -234,9 +222,7 @@ def get_series_with_relevant_dimensions(
     return (
         data_series.loc[
             :,
-            data_series.columns.intersection(
-                init_non_dimensions + list(dimension_names)
-            ),
+            data_series.columns.intersection(init_non_dimensions + list(dimension_names)),
         ],
         dimension_names,
     )
@@ -245,8 +231,7 @@ def get_series_with_relevant_dimensions(
 def create_short_unit(long_unit: pd.Series) -> np.ndarray[Any, np.dtype[Any]]:
 
     conditions = [
-        (long_unit.str.contains("PERCENT"))
-        | (long_unit.str.contains("Percentage") | (long_unit.str.contains("%"))),
+        (long_unit.str.contains("PERCENT")) | (long_unit.str.contains("Percentage") | (long_unit.str.contains("%"))),
         (long_unit.str.contains("KG")) | (long_unit.str.contains("Kilograms")),
         (long_unit.str.contains("USD")) | (long_unit.str.contains("usd")),
     ]
@@ -267,9 +252,7 @@ def manual_clean_data(df: pd.DataFrame) -> pd.DataFrame:
 
     df["value"] = df["value"].astype(float)
     df.loc[
-        (df["long_unit"] == "Percentage")
-        & (df["value"] > 100)
-        & (df["indicator"] == "15.2.1"),
+        (df["long_unit"] == "Percentage") & (df["value"] > 100) & (df["indicator"] == "15.2.1"),
         "value",
     ] = 100
 
@@ -306,9 +289,7 @@ def manual_clean_data(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def get_attributes_description() -> Any:
-    walden_ds = Catalog().find_one(
-        namespace=NAMESPACE, short_name="unit", version=VERSION
-    )
+    walden_ds = Catalog().find_one(namespace=NAMESPACE, short_name="unit", version=VERSION)
     local_file = walden_ds.ensure_downloaded()
     with open(local_file) as json_file:
         units = json.load(json_file)
@@ -316,9 +297,7 @@ def get_attributes_description() -> Any:
 
 
 def get_dimension_description() -> dict[str, str]:
-    walden_ds = Catalog().find_one(
-        namespace=NAMESPACE, short_name="dimension", version=VERSION
-    )
+    walden_ds = Catalog().find_one(namespace=NAMESPACE, short_name="dimension", version=VERSION)
     local_file = walden_ds.ensure_downloaded()
     with open(local_file) as json_file:
         dims: dict[str, str] = json.load(json_file)

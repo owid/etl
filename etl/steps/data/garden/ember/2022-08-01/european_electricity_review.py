@@ -23,9 +23,7 @@ METADATA_PATH = CURRENT_DIR / f"{DATASET_SHORT_NAME}.meta.yml"
 MWH_TO_KWH = 1000
 
 
-def process_net_flows_data(
-    table: catalog.Table, countries_regions: catalog.Table
-) -> catalog.Table:
+def process_net_flows_data(table: catalog.Table, countries_regions: catalog.Table) -> catalog.Table:
     """Process net flows data, including country harmonization.
 
     Parameters
@@ -66,9 +64,7 @@ def process_net_flows_data(
         )
 
     table = (
-        catalog.Table(df)
-        .set_index(["source_country", "target_country", "year"], verify_integrity=True)
-        .sort_index()
+        catalog.Table(df).set_index(["source_country", "target_country", "year"], verify_integrity=True).sort_index()
     )
 
     return table
@@ -92,12 +88,8 @@ def process_generation_data(table: catalog.Table) -> catalog.Table:
 
     # Sanity checks.
     error = "Columns fuel_code and fuel_desc have inconsistencies."
-    assert (
-        df.groupby("fuel_code").agg({"fuel_desc": "nunique"})["fuel_desc"].max() == 1
-    ), error
-    assert (
-        df.groupby("fuel_desc").agg({"fuel_code": "nunique"})["fuel_code"].max() == 1
-    ), error
+    assert df.groupby("fuel_code").agg({"fuel_desc": "nunique"})["fuel_desc"].max() == 1, error
+    assert df.groupby("fuel_desc").agg({"fuel_code": "nunique"})["fuel_code"].max() == 1, error
 
     # Select useful columns and rename them conveniently.
     columns = {
@@ -108,11 +100,7 @@ def process_generation_data(table: catalog.Table) -> catalog.Table:
         "share_of_generation_pct": "%",
     }
     # Convert from long to wide format dataframe.
-    df = (
-        df[list(columns)]
-        .rename(columns=columns)
-        .pivot(index=["country", "year"], columns=["fuel_desc"])
-    )
+    df = df[list(columns)].rename(columns=columns).pivot(index=["country", "year"], columns=["fuel_desc"])
 
     # Collapse the two column levels into one, with the naming "variable (unit)" (except for country and year, that
     # have no units).
@@ -127,11 +115,7 @@ def process_generation_data(table: catalog.Table) -> catalog.Table:
     )
 
     # Create a table with a well-constructed index.
-    table = (
-        catalog.Table(df)
-        .set_index(["country", "year"], verify_integrity=True)
-        .sort_index()
-    )
+    table = catalog.Table(df).set_index(["country", "year"], verify_integrity=True).sort_index()
 
     return table
 
@@ -172,11 +156,7 @@ def process_country_overview_data(table: catalog.Table) -> catalog.Table:
     df["demand_per_capita__kwh"] = df["demand_per_capita__kwh"] * MWH_TO_KWH
 
     # Create a table with a well-constructed index.
-    table = (
-        catalog.Table(df)
-        .set_index(["country", "year"], verify_integrity=True)
-        .sort_index()
-    )
+    table = catalog.Table(df).set_index(["country", "year"], verify_integrity=True).sort_index()
 
     return table
 
@@ -212,11 +192,7 @@ def process_emissions_data(table: catalog.Table) -> catalog.Table:
     )
 
     # Create a table with a well-constructed index.
-    table = (
-        catalog.Table(df)
-        .set_index(["country", "year"], verify_integrity=True)
-        .sort_index()
-    )
+    table = catalog.Table(df).set_index(["country", "year"], verify_integrity=True).sort_index()
 
     return table
 
@@ -229,23 +205,17 @@ def run(dest_dir: str) -> None:
     ds_meadow = catalog.Dataset(MEADOW_DATASET_PATH)
 
     # Load countries-regions table (required to convert country codes to country names in net flows table).
-    countries_regions = catalog.Dataset(COUNTRIES_REGIONS_DATASET_PATH)[
-        "countries_regions"
-    ]
+    countries_regions = catalog.Dataset(COUNTRIES_REGIONS_DATASET_PATH)["countries_regions"]
 
     #
     # Process data.
     #
     # Process each individual table.
     tables = {
-        "Country overview": process_country_overview_data(
-            table=ds_meadow["country_overview"]
-        ),
+        "Country overview": process_country_overview_data(table=ds_meadow["country_overview"]),
         "Emissions": process_emissions_data(table=ds_meadow["emissions"]),
         "Generation": process_generation_data(table=ds_meadow["generation"]),
-        "Net flows": process_net_flows_data(
-            table=ds_meadow["net_flows"], countries_regions=countries_regions
-        ),
+        "Net flows": process_net_flows_data(table=ds_meadow["net_flows"], countries_regions=countries_regions),
     }
 
     #
@@ -264,9 +234,7 @@ def run(dest_dir: str) -> None:
         # Make column names snake lower case.
         table = catalog.utils.underscore_table(table)
         # Import metadata from meadow and update attributes that have changed.
-        table.update_metadata_from_yaml(
-            METADATA_PATH, catalog.utils.underscore(table_name)
-        )
+        table.update_metadata_from_yaml(METADATA_PATH, catalog.utils.underscore(table_name))
         table.metadata.title = table_name
         table.metadata.short_name = catalog.utils.underscore(table_name)
         # Add table to dataset.

@@ -55,9 +55,7 @@ def preview_file(path: Path, language: str) -> None:
         WIDGET_TEMPLATE,
         {
             "open": False,
-            "title": po.put_success(
-                po.put_markdown(f"File `{path}` was successfully generated")
-            ),
+            "title": po.put_success(po.put_markdown(f"File `{path}` was successfully generated")),
             "contents": [po.put_markdown(f"```{language}\n{t}```")],
         },
     )
@@ -68,9 +66,7 @@ def preview_dag(dag_content: str) -> None:
         WIDGET_TEMPLATE,
         {
             "open": False,
-            "title": po.put_success(
-                po.put_markdown("Steps in dag.yml were successfully generated")
-            ),
+            "title": po.put_success(po.put_markdown("Steps in dag.yml were successfully generated")),
             "contents": [po.put_markdown(f"```yml\n  {dag_content}\n```")],
         },
     )

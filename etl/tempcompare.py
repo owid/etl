@@ -16,9 +16,7 @@ def get_list_description_with_max_length(items: List[Any], max_items: int = 20) 
         return ", ".join(str(item) for item in items)
 
 
-def yield_list_lines(
-    description: str, items: Iterable[Any]
-) -> Generator[str, None, None]:
+def yield_list_lines(description: str, items: Iterable[Any]) -> Generator[str, None, None]:
     sublines = [item for item in items]
     if len(sublines) > 1:
         yield f"{description}:"
@@ -54,13 +52,9 @@ def get_compact_list_description(
                 yield get_list_description_with_max_length(sorted_items, max_items)
     elif all(isinstance(item, tuple) for item in items):
         transposed = zip(*items)
-        lines = [
-            line for item in transposed for line in get_compact_list_description(item)
-        ]
+        lines = [line for item in transposed for line in get_compact_list_description(item)]
         if len(tuple_headers) == len(lines):
-            yield from (
-                f"{header}: {line}" for header, line in zip(tuple_headers, lines)
-            )
+            yield from (f"{header}: {line}" for header, line in zip(tuple_headers, lines))
         else:
             yield from lines
     else:
@@ -182,28 +176,18 @@ class HighLevelDiff:
         df2_index_names = set(self.df2.index.names)
         self.index_columns_missing_in_df1 = sorted(df2_index_names - df1_index_names)
         self.index_columns_missing_in_df2 = sorted(df1_index_names - df2_index_names)
-        self.index_columns_shared = sorted(
-            df1_index_names.intersection(df2_index_names)
-        )
+        self.index_columns_shared = sorted(df1_index_names.intersection(df2_index_names))
 
         self.index_values_missing_in_df1 = self.df2.index.difference(self.df1.index)
         self.index_values_missing_in_df2 = self.df1.index.difference(self.df2.index)
         self.index_values_shared = self.df2.index.intersection(self.df1.index)
-        self.duplicate_index_values_in_df1 = self.df1[
-            self.df1.index.duplicated()
-        ].index.values
-        self.duplicate_index_values_in_df2 = self.df2[
-            self.df2.index.duplicated()
-        ].index.values
+        self.duplicate_index_values_in_df1 = self.df1[self.df1.index.duplicated()].index.values
+        self.duplicate_index_values_in_df2 = self.df2[self.df2.index.duplicated()].index.values
 
         # Now we calculate the value differences in the intersection of the two dataframes.
         if self.columns_shared and any(self.index_values_shared):
-            df1_intersected = self.df1.loc[
-                self.index_values_shared, list(self.columns_shared)
-            ]
-            df2_intersected = self.df2.loc[
-                self.index_values_shared, list(self.columns_shared)
-            ]
+            df1_intersected = self.df1.loc[self.index_values_shared, list(self.columns_shared)]
+            df2_intersected = self.df2.loc[self.index_values_shared, list(self.columns_shared)]
             # We don't use the compare function here from above because it builds a new
             # dataframe and we want to leave indices intact so we can know which rows and columns
             # were different once we drop the ones with no differences
@@ -228,8 +212,7 @@ class HighLevelDiff:
                     )
                     # Treat nans as equal.
                     compared_values[
-                        pd.isnull(df1_intersected[col].values)
-                        & pd.isnull(df2_intersected[col].values)
+                        pd.isnull(df1_intersected[col].values) & pd.isnull(df2_intersected[col].values)
                     ] = True
                     diffs[col] = compared_values
 
@@ -254,9 +237,7 @@ class HighLevelDiff:
                     else:
                         # Here we drop the columns that did not have differences. We are left with a dataframe
                         # with the original indices and only the rows and columns with differences.
-                        self.value_differences = rows_with_diffs.loc[
-                            :, columns_with_diffs
-                        ]
+                        self.value_differences = rows_with_diffs.loc[:, columns_with_diffs]
 
     @property
     def are_structurally_equal(self) -> bool:
@@ -351,9 +332,7 @@ class HighLevelDiff:
                         self.columns_shared,
                         lambda item: yield_list_lines(
                             f"{blue}Shared columns{blue_end}",
-                            get_compact_list_description(
-                                item, max_items=truncate_lists_longer_than
-                            ),
+                            get_compact_list_description(item, max_items=truncate_lists_longer_than),
                         ),
                         f"{red}No shared columns{red_end}",
                     )
@@ -361,18 +340,14 @@ class HighLevelDiff:
                     self.columns_missing_in_df1,
                     lambda item: yield_list_lines(
                         f"Columns missing in {df1_label}",
-                        get_compact_list_description(
-                            item, max_items=truncate_lists_longer_than
-                        ),
+                        get_compact_list_description(item, max_items=truncate_lists_longer_than),
                     ),
                 )
                 yield from yield_formatted_if_not_empty(
                     self.columns_missing_in_df2,
                     lambda item: yield_list_lines(
                         f"Columns missing in {df2_label}",
-                        get_compact_list_description(
-                            item, max_items=truncate_lists_longer_than
-                        ),
+                        get_compact_list_description(item, max_items=truncate_lists_longer_than),
                     ),
                 )
                 if show_shared:
@@ -380,9 +355,7 @@ class HighLevelDiff:
                         self.index_columns_shared,
                         lambda item: yield_list_lines(
                             f"{blue}Shared index columns{blue_end}",
-                            get_compact_list_description(
-                                item, max_items=truncate_lists_longer_than
-                            ),
+                            get_compact_list_description(item, max_items=truncate_lists_longer_than),
                         ),
                         f"{red}No shared index columns{red_end}",
                     )
@@ -390,18 +363,14 @@ class HighLevelDiff:
                     self.index_columns_missing_in_df1,
                     lambda item: yield_list_lines(
                         f"Index columns missing in {df1_label}",
-                        get_compact_list_description(
-                            item, max_items=truncate_lists_longer_than
-                        ),
+                        get_compact_list_description(item, max_items=truncate_lists_longer_than),
                     ),
                 )
                 yield from yield_formatted_if_not_empty(
                     self.index_columns_missing_in_df2,
                     lambda item: yield_list_lines(
                         f"Index columns missing in {df2_label}",
-                        get_compact_list_description(
-                            item, max_items=truncate_lists_longer_than
-                        ),
+                        get_compact_list_description(item, max_items=truncate_lists_longer_than),
                     ),
                 )
                 if show_shared:
@@ -409,9 +378,7 @@ class HighLevelDiff:
                         self.index_values_shared,
                         lambda item: yield_list_lines(
                             f"{blue}Shared index values{blue_end}",
-                            get_compact_list_description(
-                                item, max_items=truncate_lists_longer_than
-                            ),
+                            get_compact_list_description(item, max_items=truncate_lists_longer_than),
                         ),
                         f"{red}No shared index values{red_end}",
                     )
@@ -473,9 +440,7 @@ class HighLevelDiff:
                     self.columns_with_differences,
                     lambda item: yield_list_lines(
                         "Columns with diffs",
-                        get_compact_list_description(
-                            item, max_items=truncate_lists_longer_than
-                        ),
+                        get_compact_list_description(item, max_items=truncate_lists_longer_than),
                     ),
                 )
                 yield from yield_formatted_if_not_empty(
@@ -493,26 +458,10 @@ class HighLevelDiff:
         # This prints the two dataframes one after the other sliced to
         # only the area where they have differences
         if preview_different_dataframe_values:
-            if (
-                self.value_differences
-                and self.columns_shared
-                and self.index_values_shared
-            ):
+            if self.value_differences and self.columns_shared and self.index_values_shared:
                 yield f"Values with differences in {df1_label}:"
-                yield (
-                    str(
-                        self.df1.loc[
-                            self.value_differences.index, self.value_differences.columns
-                        ]
-                    )
-                )
+                yield (str(self.df1.loc[self.value_differences.index, self.value_differences.columns]))
                 yield f"Values with differences in {df2_label}:"
-                yield (
-                    str(
-                        self.df2.loc[
-                            self.value_differences.index, self.value_differences.columns
-                        ]
-                    )
-                )
+                yield (str(self.df2.loc[self.value_differences.index, self.value_differences.columns]))
             else:
                 yield "The datasets have no overlapping columns/rows."

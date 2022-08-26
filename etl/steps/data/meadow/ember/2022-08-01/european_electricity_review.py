@@ -50,9 +50,7 @@ def load_dataframes_from_compressed_folder(
                 # Check all files in the folder (there are some hidden mac files that start with "__"), and keep only
                 # files of the required extension.
                 if file.endswith(FILES_EXTENSION) and not file.startswith("__"):
-                    df_name = file.replace(FILES_EXTENSION, "").replace(
-                        FILES_NAME_START, ""
-                    )
+                    df_name = file.replace(FILES_EXTENSION, "").replace(FILES_NAME_START, "")
                     # Extract file, read it as a dataframe, and store it in dictionary.
                     _zip_folder.extract(file, path=_temp_folder)
                     dfs[df_name] = pd.read_csv(temp_file)
@@ -74,9 +72,7 @@ def run(dest_dir: str) -> None:
     log.info(f"{DATASET_SHORT_NAME}.start")
 
     # Retrieve raw data from walden.
-    walden_ds = WaldenCatalog().find_one(
-        namespace=NAMESPACE, short_name=DATASET_SHORT_NAME, version=WALDEN_VERSION
-    )
+    walden_ds = WaldenCatalog().find_one(namespace=NAMESPACE, short_name=DATASET_SHORT_NAME, version=WALDEN_VERSION)
     local_file = walden_ds.ensure_downloaded()
 
     # Original zip file contains various csv files.

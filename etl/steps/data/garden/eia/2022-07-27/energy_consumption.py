@@ -34,9 +34,7 @@ def run(dest_dir: str) -> None:
     # Load data.
     #
     # Load meadow dataset and get the only table inside (with the same name).
-    ds_meadow = catalog.Dataset(
-        DATA_DIR / f"meadow/{NAMESPACE}/{VERSION}/{DATASET_SHORT_NAME}"
-    )
+    ds_meadow = catalog.Dataset(DATA_DIR / f"meadow/{NAMESPACE}/{VERSION}/{DATASET_SHORT_NAME}")
     tb_meadow = ds_meadow[DATASET_SHORT_NAME]
 
     # Convert table into a dataframe.

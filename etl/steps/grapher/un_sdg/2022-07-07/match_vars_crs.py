@@ -9,9 +9,7 @@ NAMESPACE = Path(__file__).parent.parent.stem
 
 
 NEW_DATASET_NAME = f"{NAMESPACE}__{VERSION.replace('-', '_')}"
-OLD_DATASET_NAME = (
-    "United Nations Sustainable Development Goals - United Nations (2022-04)"
-)
+OLD_DATASET_NAME = "United Nations Sustainable Development Goals - United Nations (2022-04)"
 
 
 match_variables_from_two_versions_of_a_dataset.main(
@@ -21,7 +19,5 @@ match_variables_from_two_versions_of_a_dataset.main(
 )
 
 
-suggester = ChartRevisionSuggester(
-    Path(__file__).parent.resolve(), VERSION, NEW_DATASET_NAME
-)
+suggester = ChartRevisionSuggester(Path(__file__).parent.resolve(), VERSION, NEW_DATASET_NAME)
 suggester.suggest()

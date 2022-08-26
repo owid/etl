@@ -190,9 +190,7 @@ def _check_env() -> None:
         if getattr(config, env_name) is None:
             ok = False
             po.put_warning(
-                po.put_markdown(
-                    f"Environment variable `{env_name}` not found, do you have it in your `.env` file?"
-                )
+                po.put_markdown(f"Environment variable `{env_name}` not found, do you have it in your `.env` file?")
             )
 
     if ok:

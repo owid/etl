@@ -26,10 +26,7 @@ def _keep_relevant_rows(df: pd.DataFrame) -> pd.DataFrame:
     df = df.reset_index()
     df = df[
         df.variant.isin(["estimates", "low", "medium", "high"])
-        & -(
-            df.metric.isin(["net_migration", "net_migration_rate"])
-            & (df.location == "World")
-        )
+        & -(df.metric.isin(["net_migration", "net_migration_rate"]) & (df.location == "World"))
     ].reset_index(drop=True)
     return df
 
@@ -38,18 +35,10 @@ def _organize_variants(df: pd.DataFrame) -> pd.DataFrame:
     print("Filling all gaps (variants)")
     df = pd.concat(
         [
-            df[df.year < YEAR_SPLIT]
-            .assign(variant="records")
-            .astype({"variant": "category"}),
-            df[df.year < YEAR_SPLIT]
-            .assign(variant="low")
-            .astype({"variant": "category"}),
-            df[df.year < YEAR_SPLIT]
-            .assign(variant="medium")
-            .astype({"variant": "category"}),
-            df[df.year < YEAR_SPLIT]
-            .assign(variant="high")
-            .astype({"variant": "category"}),
+            df[df.year < YEAR_SPLIT].assign(variant="records").astype({"variant": "category"}),
+            df[df.year < YEAR_SPLIT].assign(variant="low").astype({"variant": "category"}),
+            df[df.year < YEAR_SPLIT].assign(variant="medium").astype({"variant": "category"}),
+            df[df.year < YEAR_SPLIT].assign(variant="high").astype({"variant": "category"}),
             df[df.year >= YEAR_SPLIT],
         ]
     ).astype({"variant": "category"})
@@ -96,9 +85,7 @@ def _extract_dimension_values(
     return groups_all
 
 
-def _init_dataset_explorer(
-    dataset_garden: catalog.Dataset, dest_dir: str
-) -> catalog.Dataset:
+def _init_dataset_explorer(dataset_garden: catalog.Dataset, dest_dir: str) -> catalog.Dataset:
     # Initialize new garden dataset.
     dataset = catalog.Dataset.create_empty(dest_dir)
     # Add dataset metadata.
@@ -107,9 +94,7 @@ def _init_dataset_explorer(
     return dataset
 
 
-def _build_table_variable(
-    df: pd.DataFrame, metric: str, sex: str, age: str, variant: str
-) -> pd.DataFrame:
+def _build_table_variable(df: pd.DataFrame, metric: str, sex: str, age: str, variant: str) -> pd.DataFrame:
     short_name = f"{metric}__{sex}__{age}__{variant}"
     # Filter
     metric = metric if metric != no_dim_keyword else ".*"
@@ -139,9 +124,7 @@ def run(dest_dir: str) -> None:
     dataset_explorer = _init_dataset_explorer(dataset_garden, dest_dir)
 
     # Export
-    dimension_values = _extract_dimension_values(
-        df, by_metric=True, by_sex=True, by_age=False, by_variant=True
-    )
+    dimension_values = _extract_dimension_values(df, by_metric=True, by_sex=True, by_age=False, by_variant=True)
     # for metric, sex, age, variant in dimension_values:
     for metric, sex, age, variant in tqdm(dimension_values, file=sys.stdout):
         # Table per variable (and dimensions)

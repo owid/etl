@@ -27,9 +27,7 @@ def _load_sdg_sources() -> pd.DataFrame:
     return sdg_sources
 
 
-def _get_variable_from_backported_table(
-    table: Table, variable_id: str
-) -> Optional[Variable]:
+def _get_variable_from_backported_table(table: Table, variable_id: str) -> Optional[Variable]:
     """Get variable from backported table."""
     for col in table.columns:
         var_id = table[col].metadata.additional_info["grapher_meta"]["id"]
@@ -77,9 +75,7 @@ def run(dest_dir: str) -> None:
                     table = ds[table_name]
                     table_cache[table_name] = table
 
-                log.info(
-                    "sdg.run", indicator=r.indicator, variable_name=r.variable_name
-                )
+                log.info("sdg.run", indicator=r.indicator, variable_name=r.variable_name)
                 v = _get_variable_from_backported_table(table, r.variable_id)
                 if v is not None:
                     v.name = _indicator_prefix(v.name, r.indicator)

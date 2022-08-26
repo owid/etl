@@ -386,9 +386,7 @@ class DBUtils:
         )
         self.counts["variables_updated"] += self.cursor.rowcount
 
-    def note_import(
-        self, import_type: str, import_notes: str, import_state: str
-    ) -> None:
+    def note_import(self, import_type: str, import_notes: str, import_state: str) -> None:
         self.upsert_one(
             """
             INSERT INTO importer_importhistory (import_type, import_time, import_notes, import_state)

@@ -110,9 +110,7 @@ def gather_sources_from_tables(
         # Go source by source of current table, and check if its name is not already in the list of known_sources.
         for source in table_sources:
             # Check if this source's name is different to all known_sources.
-            if all(
-                [source.name != known_source.name for known_source in known_sources]
-            ):
+            if all([source.name != known_source.name for known_source in known_sources]):
                 # Add the new source to the list.
                 known_sources.append(source)
 
@@ -137,19 +135,13 @@ def add_population_of_historical_regions(
     """
     if population is None:
         # Load population dataset.
-        population = pd.DataFrame(
-            catalog.Dataset("garden/owid/latest/key_indicators/")["population"]
-        ).reset_index()
+        population = pd.DataFrame(catalog.Dataset("garden/owid/latest/key_indicators/")["population"]).reset_index()
     else:
         population = population.copy()
 
     # Add data for historical regions (if not in population) by adding the population of its current successors.
     countries_with_population = population["country"].unique()
-    missing_countries = [
-        country
-        for country in HISTORIC_TO_CURRENT_REGION
-        if country not in countries_with_population
-    ]
+    missing_countries = [country for country in HISTORIC_TO_CURRENT_REGION if country not in countries_with_population]
     for country in missing_countries:
         members = HISTORIC_TO_CURRENT_REGION[country]["members"]
         _population = (
@@ -159,13 +151,9 @@ def add_population_of_historical_regions(
             .reset_index()
         )
         # Select only years for which we have data for all member countries.
-        _population = _population[_population["country"] == len(members)].reset_index(
-            drop=True
-        )
+        _population = _population[_population["country"] == len(members)].reset_index(drop=True)
         _population["country"] = country
-        population = pd.concat(
-            [population, _population], ignore_index=True
-        ).reset_index(drop=True)
+        population = pd.concat([population, _population], ignore_index=True).reset_index(drop=True)
 
     error = "Duplicate country-years found in population. Check if historical regions changed."
     assert population[population.duplicated(subset=["country", "year"])].empty, error
@@ -234,8 +222,6 @@ def add_population(
             )
 
     # Add population to original dataframe.
-    df_with_population = pd.merge(
-        df, population, on=[country_col, year_col], how="left"
-    )
+    df_with_population = pd.merge(df, population, on=[country_col, year_col], how="left")
 
     return df_with_population

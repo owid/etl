@@ -23,9 +23,7 @@ def get_grapher_dataset() -> Dataset:
     namespace = Path(__file__).parent.parent.stem
     dataset = Dataset(DATA_DIR / f"garden/{namespace}/{version}/{fname}")
     # short_name should include dataset name and version
-    dataset.metadata.short_name = (
-        f"{dataset.metadata.short_name}__{version.replace('-', '_')}"
-    )
+    dataset.metadata.short_name = f"{dataset.metadata.short_name}__{version.replace('-', '_')}"
 
     return dataset
 
@@ -40,9 +38,7 @@ def get_grapher_tables(dataset: Dataset) -> Iterable[Table]:
     version = Path(__file__).parent.stem
     fname = Path(__file__).stem
     namespace = Path(__file__).parent.parent.stem
-    walden_ds = Catalog().find_one(
-        namespace=namespace, short_name=fname, version=version
-    )
+    walden_ds = Catalog().find_one(namespace=namespace, short_name=fname, version=version)
     local_file = walden_ds.ensure_downloaded()
     zf = zipfile.ZipFile(local_file)
     df_vars = pd.read_csv(zf.open("WDISeries.csv"))
@@ -50,9 +46,7 @@ def get_grapher_tables(dataset: Dataset) -> Iterable[Table]:
     df_vars.columns = df_vars.columns.map(underscore)
     df_vars.rename(columns={"series_code": "indicator_code"}, inplace=True)
     df_vars["indicator_code"] = df_vars["indicator_code"].apply(underscore)
-    df_vars = df_vars.query("indicator_code in @var_codes").set_index(
-        "indicator_code", verify_integrity=True
-    )
+    df_vars = df_vars.query("indicator_code in @var_codes").set_index("indicator_code", verify_integrity=True)
 
     df_vars["indicator_name"].str.replace(r"\s+", " ", regex=True)
     clean_source_mapping = load_clean_source_mapping()
@@ -101,9 +95,7 @@ def get_grapher_tables(dataset: Dataset) -> Iterable[Table]:
         # retrieve clean source name, then construct source.
         source_raw_name = var["source"]
         clean_source = clean_source_mapping.get(source_raw_name)
-        assert (
-            clean_source
-        ), f'`rawName` "{source_raw_name}" not found in wdi.sources.json'
+        assert clean_source, f'`rawName` "{source_raw_name}" not found in wdi.sources.json'
         assert table[var_code].metadata.to_dict() == {}, (
             f"Expected metadata for variable {var_code} to be empty, but "
             f"metadata is: {table[var_code].metadata.to_dict()}."
@@ -133,9 +125,7 @@ def get_grapher_tables(dataset: Dataset) -> Iterable[Table]:
         )
 
     if not all([len(table[var_code].sources) == 1 for var_code in var_codes]):
-        missing = [
-            var_code for var_code in var_codes if len(table[var_code].sources) != 1
-        ]
+        missing = [var_code for var_code in var_codes if len(table[var_code].sources) != 1]
         raise RuntimeError(
             "Expected each variable code to have one source, but the following variables "
             f"do not: {missing}. Are the source names for these variables "
@@ -164,15 +154,10 @@ def create_description(var: dict) -> Optional[str]:
     desc = ""
     if pd.notnull(var["long_definition"]) and len(var["long_definition"].strip()) > 0:
         desc += var["long_definition"]
-    elif (
-        pd.notnull(var["short_definition"]) and len(var["short_definition"].strip()) > 0
-    ):
+    elif pd.notnull(var["short_definition"]) and len(var["short_definition"].strip()) > 0:
         desc += var["short_definition"]
 
-    if (
-        pd.notnull(var["limitations_and_exceptions"])
-        and len(var["limitations_and_exceptions"].strip()) > 0
-    ):
+    if pd.notnull(var["limitations_and_exceptions"]) and len(var["limitations_and_exceptions"].strip()) > 0:
         desc += f'\n\nLimitations and exceptions: {var["limitations_and_exceptions"]}'
 
     if (
@@ -182,10 +167,7 @@ def create_description(var: dict) -> Optional[str]:
         desc += f'\n\nStatistical concept and methodology: {var["statistical_concept_and_methodology"]}'
 
     # retrieves additional source info, if it exists.
-    if (
-        pd.notnull(var["notes_from_original_source"])
-        and len(var["notes_from_original_source"].strip()) > 0
-    ):
+    if pd.notnull(var["notes_from_original_source"]) and len(var["notes_from_original_source"].strip()) > 0:
         desc += f'\n\nNotes from original source: {var["notes_from_original_source"]}'
 
     desc = re.sub(r" *(\n+) *", r"\1", re.sub(r"[ \t]+", " ", desc)).strip()
