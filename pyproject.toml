@@ -52,6 +52,7 @@ owid-datautils = {git = "https://github.com/owid/owid-datautils-py.git", rev = "
 fuzzywuzzy = "^0.18.0"
 rich-click = "^1.5.1"
 tenacity = "^8.0.1"
+simplejson = "^3.17.6"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.1.2"

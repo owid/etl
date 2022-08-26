@@ -1,6 +1,5 @@
 # The original script was originally from the owid/importers repo: https://github.com/owid/importers/blob/master/standard_importer/chart_revision_suggester.py
 
-import json
 import os
 import re
 import traceback
@@ -8,6 +7,7 @@ from copy import deepcopy
 from typing import Any, Dict, Iterable, List, Literal, Optional, Tuple, Union
 
 import pandas as pd
+import simplejson as json
 import structlog
 from MySQLdb import IntegrityError
 from tqdm import tqdm
@@ -212,12 +212,12 @@ class ChartRevisionSuggester:
                     for nm, gp in df.groupby("chart_id"):
                         s += f"Chart ID: {nm}. Suggested chart revision IDs:" f" {gp['id'].tolist()}\n"
                     raise RuntimeError(
-                        "For one or more of the suggested chart revisions that you are "
-                        "trying to insert, a suggested chart revision already exists for "
-                        "the same chartId with status IN ('pending', 'flagged'). You "
-                        "must approve/reject these suggested chart revisions before new "
-                        "suggested revisions for the same charts can be created. "
-                        f"Affected charts:\n{s}"
+                        "For one or more of the suggested chart revisions that you are"
+                        " trying to insert, a suggested chart revision already exists"
+                        " for the same chartId with status IN ('pending', 'flagged')."
+                        " You must approve/reject these suggested chart revisions"
+                        " before new suggested revisions for the same charts can be"
+                        f" created. Affected charts:\n{s}"
                     )
         except IntegrityError as e:
             log.error(
