@@ -17,9 +17,7 @@ def run(dest_dir: str) -> None:
     log.info("dummy.start")
 
     # retrieve raw data from walden
-    walden_ds = WaldenCatalog().find_one(
-        namespace="dummy", short_name="dummy", version="2020-01-01"
-    )
+    walden_ds = WaldenCatalog().find_one(namespace="dummy", short_name="dummy", version="2020-01-01")
     local_file = walden_ds.ensure_downloaded()
 
     df = pd.read_excel(local_file, sheet_name="Full data")
