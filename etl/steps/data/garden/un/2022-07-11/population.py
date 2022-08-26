@@ -89,9 +89,7 @@ def add_metrics(df: pd.DataFrame) -> pd.DataFrame:
     df_p_broad = optimize_dtypes(df_p_broad)
     df_p_diff = optimize_dtypes(df_p_diff)
     # Concatenate
-    df = pd.concat(
-        [df_sr, df_sr_all, df_p_granular, df_p_broad, df_p_diff], ignore_index=True
-    )
+    df = pd.concat([df_sr, df_sr_all, df_p_granular, df_p_broad, df_p_diff], ignore_index=True)
     # Remove infs
     msk = np.isinf(df["value"])
     df.loc[msk, "value"] = np.nan
@@ -166,7 +164,17 @@ def _add_metric_population(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame
     df_p_all = optimize_dtypes(df_p_all, simple=True)
     # Merge all age groups
     df_p_granular = pd.concat(
-        [df_p_granular, df_p_0, df_p_1_4, df_p_all], ignore_index=True
+        [
+            df_p_granular,
+            df_p_0,
+            df_p_0_14,
+            df_p_0_24,
+            df_p_1,
+            df_p_1_4,
+            df_p_15_64,
+            df_p_all,
+        ],
+        ignore_index=True,
     ).astype({"age": "category"})
     # Broad age groups
     df_p_broad = df_p.assign(age=df_p.age.map(map_broad_age).astype("category"))
