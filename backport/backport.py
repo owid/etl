@@ -10,6 +10,7 @@ from owid.walden import Catalog as WaldenCatalog
 from owid.walden.catalog import Dataset as WaldenDataset
 from owid.walden.ingest import add_to_catalog
 from sqlalchemy.engine import Engine
+from sqlmodel import Session
 
 from etl import config
 from etl import grapher_model as gm
@@ -74,16 +75,17 @@ def backport(
     lg = log.bind(dataset_id=dataset_id)
 
     # get data from database
-    lg.info("backport.loading_dataset")
-    ds = gm.Datasets.load_dataset(engine, dataset_id)
-    lg.info("backport.loading_variables")
-    vars = gm.Datasets.load_variables_for_dataset(engine, dataset_id)
+    with Session(engine) as session:
+        lg.info("backport.loading_dataset")
+        ds = gm.Datasets.load_dataset(session, dataset_id)
+        lg.info("backport.loading_variables")
+        vars = gm.Datasets.load_variables_for_dataset(session, dataset_id)
 
-    variable_ids = [v.id for v in vars]
+        variable_ids = [v.id for v in vars]
 
-    # get sources for dataset and all variables
-    lg.info("backport.loading_sources")
-    sources = gm.Sources.load_sources(engine, dataset_id=ds.id, variable_ids=variable_ids)
+        # get sources for dataset and all variables
+        lg.info("backport.loading_sources")
+        sources = gm.Sources.load_sources(session, dataset_id=ds.id, variable_ids=variable_ids)
 
     short_name = utils.create_short_name(ds.id, ds.name)
 

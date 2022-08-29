@@ -13,10 +13,8 @@ import pandas as pd
 import structlog
 from pydantic import BaseModel
 from sqlalchemy import (
-    JSON,
     TIMESTAMP,
     BigInteger,
-    Column,
     Computed,
     DateTime,
     ForeignKeyConstraint,
@@ -34,7 +32,6 @@ from sqlalchemy.dialects.mysql import (
     TINYINT,
     VARCHAR,
 )
-from sqlalchemy.engine import Engine
 from sqlalchemy.future import Engine as _FutureEngine
 from sqlmodel import (
     JSON,
@@ -302,7 +299,7 @@ class Charts(SQLModel, table=True):
     )
 
     id: Optional[int] = Field(default=None, sa_column=Column("id", Integer, primary_key=True))
-    config: Dict[Any, Any]] = Field(sa_column=Column("config", JSON, nullable=False))
+    config: Dict[Any, Any] = Field(sa_column=Column("config", JSON, nullable=False))
     createdAt: datetime = Field(sa_column=Column("createdAt", DateTime, nullable=False))
     updatedAt: datetime = Field(sa_column=Column("updatedAt", DateTime, nullable=False))
     lastEditedAt: datetime = Field(sa_column=Column("lastEditedAt", DateTime, nullable=False))
@@ -429,15 +426,13 @@ class Datasets(SQLModel, table=True):
     variables: List["Variables"] = Relationship(back_populates="datasets")
 
     @classmethod
-    def load_dataset(cls, engine: Engine, dataset_id: int) -> "Datasets":
-        with Session(engine) as session:
-            return session.exec(select(cls).where(cls.id == dataset_id)).one()
+    def load_dataset(cls, session: Session, dataset_id: int) -> "Datasets":
+        return session.exec(select(cls).where(cls.id == dataset_id)).one()
 
     @classmethod
-    def load_variables_for_dataset(cls, engine: Engine, dataset_id: int) -> list["Variables"]:
-        with Session(engine) as session:
-            vars = session.exec(select(Variables).where(Variables.datasetId == dataset_id)).all()
-            assert vars
+    def load_variables_for_dataset(cls, session: Session, dataset_id: int) -> list["Variables"]:
+        vars = session.exec(select(Variables).where(Variables.datasetId == dataset_id)).all()
+        assert vars
         return vars
 
 
@@ -567,9 +562,8 @@ class Sources(SQLModel, table=True):
     variables: List["Variables"] = Relationship(back_populates="sources")
 
     @classmethod
-    def load_source(cls, engine: Engine, source_id: int) -> "Sources":
-        with Session(engine) as session:
-            source = session.exec(select(cls).where(cls.id == source_id)).one()
+    def load_source(cls, session: Session, source_id: int) -> "Sources":
+        source = session.exec(select(cls).where(cls.id == source_id)).one()
         GrapherSourceDescription.validate(source.description)
         source.description = GrapherSourceDescription(**source.description)  # type: ignore
         return source
@@ -577,7 +571,7 @@ class Sources(SQLModel, table=True):
     @classmethod
     def load_sources(
         cls,
-        engine: Engine,
+        session: Session,
         source_ids: list[int] = [],
         dataset_id: Optional[int] = None,
         variable_ids: list[int] = [],
@@ -595,7 +589,7 @@ class Sources(SQLModel, table=True):
         """
         sources = pd.read_sql(
             q,
-            engine,
+            session.bind,
             params={
                 "datasetId": dataset_id,
                 # NOTE: query doesn't work with empty list so we use a dummy value
@@ -703,7 +697,7 @@ class Variables(SQLModel, table=True):
         Index("variables_sourceId_31fce80a_fk_sources_id", "sourceId"),
     )
 
-    id: Optional[int] = Field(default=None, sa_column=Column("id", Integer, primary_key=True))
+    id: int = Field(primary_key=True)
     unit: str = Field(sa_column=Column("unit", String(255, "utf8mb4_0900_as_cs"), nullable=False))
     createdAt: datetime = Field(sa_column=Column("createdAt", DateTime, nullable=False))
     updatedAt: datetime = Field(sa_column=Column("updatedAt", DateTime, nullable=False))
@@ -731,9 +725,8 @@ class Variables(SQLModel, table=True):
     data_values: List["DataValues"] = Relationship(back_populates="variables")
 
     @classmethod
-    def load_variable(cls, engine: Engine, variable_id: int) -> "Variables":
-        with Session(engine) as session:
-            return session.exec(select(cls).where(cls.id == variable_id)).one()
+    def load_variable(cls, session: Session, variable_id: int) -> "Variables":
+        return session.exec(select(cls).where(cls.id == variable_id)).one()
 
 
 class ChartDimensions(SQLModel, table=True):
