@@ -4,7 +4,6 @@ sqlacodegen --generator sqlmodels mysql://root@localhost:3306/owid
 ```
 It has been slightly modified since then.
 """
-import datetime as dt
 import json
 from datetime import datetime
 from typing import Any, Dict, List, Optional
@@ -20,7 +19,6 @@ from sqlalchemy import (
     Column,
     Computed,
     DateTime,
-    Float,
     ForeignKeyConstraint,
     Index,
     Integer,
@@ -101,48 +99,6 @@ class CountryNameToolContinent(SQLModel, table=True):
     country_name_tool_countrydata: List["CountryNameToolCountrydata"] = Relationship(
         back_populates="country_name_tool_continent"
     )
-
-
-t_covid_data_wide = Table(
-    "covid_data_wide",
-    metadata,
-    Column("index", BigInteger),
-    Column("year", Integer),
-    Column("entityId", BigInteger),
-    Column("v145448", Float),
-    Column("v145449", Float),
-    Column("v145450", Float),
-    Column("v145451", Float),
-    Column("v145452", Float),
-    Column("v145453", Float),
-    Column("v145454", Float),
-    Column("v145455", Float),
-    Column("v145456", Float),
-    Column("v145457", Float),
-    Column("v145458", Float),
-    Column("v145459", Float),
-    Column("v145471", Float),
-    Column("v145473", Float),
-    Column("v145476", Float),
-    Column("v145477", Float),
-    Column("v145478", Float),
-    Column("v145479", Float),
-    Column("v145481", Float),
-    Column("v145482", Float),
-    Column("v145487", Float),
-    Column("v145488", Float),
-    Column("v145489", Float),
-    Column("v145490", Float),
-    Column("v145491", Float),
-    Column("v145492", Float),
-    Column("v145493", Float),
-    Column("v145494", Float),
-    Column("v145495", Float),
-    Column("v145496", Float),
-    Column("v145497", Float),
-    Column("v145498", Float),
-    Index("ix_covid_data_wide_index", "index"),
-)
 
 
 class Details(SQLModel, table=True):
@@ -408,6 +364,24 @@ class CountryNameToolCountrydata(SQLModel, table=True):
 
 
 class Datasets(SQLModel, table=True):
+    """Example
+        {
+        'id': 5357,
+        'name': 'World Development Indicators - World Bank (2021.07.30)',
+        'description': 'This is a dataset imported by the automated fetcher',
+        'createdAt': Timestamp('2021-08-09 06:23:31'),
+        'updatedAt': Timestamp('2021-08-10 01:58:59'),
+        'namespace': 'worldbank_wdi@2021.07.30',
+        'isPrivate': 0,
+        'createdByUserId': 47,
+        'metadataEditedAt': Timestamp('2021-08-10 01:58:59'),
+        'metadataEditedByUserId': 47,
+        'dataEditedAt': Timestamp('2021-08-10 01:58:59'),
+        'dataEditedByUserId': 47,
+        'nonRedistributable': 0
+    }
+    """
+
     __tablename__: str = "datasets"  # type: ignore
     __table_args__ = (
         ForeignKeyConstraint(["createdByUserId"], ["users.id"], name="datasets_createdByUserId"),
@@ -420,7 +394,9 @@ class Datasets(SQLModel, table=True):
         Index("unique_short_name_version_namespace", "shortName", "version", "namespace", unique=True),
     )
 
-    id: Optional[int] = Field(default=None, sa_column=Column("id", Integer, primary_key=True))
+    id: int = Field(primary_key=True)
+    # NOTE: name allows nulls in MySQL, but there are none in reality
+    name: str = Field(sa_column=Column("name", String(512, "utf8mb4_0900_as_cs")))
     description: str = Field(sa_column=Column("description", LONGTEXT, nullable=False))
     createdAt: datetime = Field(sa_column=Column("createdAt", DateTime, nullable=False))
     updatedAt: datetime = Field(sa_column=Column("updatedAt", DateTime, nullable=False))
@@ -439,7 +415,6 @@ class Datasets(SQLModel, table=True):
     isArchived: Optional[int] = Field(
         default=0, sa_column=Column("isArchived", TINYINT(1), nullable=False, server_default=text("'0'"))
     )
-    name: Optional[str] = Field(default=None, sa_column=Column("name", String(512, "utf8mb4_0900_as_cs")))
     sourceChecksum: Optional[str] = Field(
         default=None, sa_column=Column("sourceChecksum", String(64, "utf8mb4_0900_as_cs"))
     )
@@ -452,6 +427,18 @@ class Datasets(SQLModel, table=True):
     tags: List["Tags"] = Relationship(back_populates="datasets")
     sources: List["Sources"] = Relationship(back_populates="datasets")
     variables: List["Variables"] = Relationship(back_populates="datasets")
+
+    @classmethod
+    def load_dataset(cls, engine: Engine, dataset_id: int) -> "Datasets":
+        with Session(engine) as session:
+            return session.exec(select(cls).where(cls.id == dataset_id)).one()
+
+    @classmethod
+    def load_variables_for_dataset(cls, engine: Engine, dataset_id: int) -> list["Variables"]:
+        with Session(engine) as session:
+            vars = session.exec(select(Variables).where(Variables.datasetId == dataset_id)).all()
+            assert vars
+        return vars
 
 
 t_post_tags = Table(
@@ -536,14 +523,41 @@ t_dataset_tags = Table(
 )
 
 
+class GrapherSourceDescription(BaseModel):
+    link: Optional[str] = None
+    retrievedDate: Optional[str] = None
+    additionalInfo: Optional[str] = None
+    dataPublishedBy: Optional[str] = None
+    dataPublisherSource: Optional[str] = None
+
+
 class Sources(SQLModel, table=True):
+    """Example:
+    {
+        "id": 21261,
+        "name": "OWID based on Boix et al. (2013), V-Dem (v12), and Lührmann et al. (2018)",
+        "description": {
+            "link": "https://sites.google.com/site/mkmtwo/data?authuser=0; http://v-dem.net/vdemds.html",
+            "retrievedDate": "February 9, 2022; March 2, 2022",
+            "additionalInfo": "This dataset provides information on political regimes, ...",
+            "dataPublishedBy": "Our World in Data, Bastian Herre",
+            "dataPublisherSource": "Data comes from Boix et al. (2013), ..."
+        }
+        "createdAt": "2021-11-30 15:14:13",
+        "updatedAt": "2021-11-30 15:14:13",
+        "datasetId": 5426
+    }
+    """
+
     __table_args__ = (
         ForeignKeyConstraint(["datasetId"], ["datasets.id"], name="sources_datasetId"),
         Index("sources_datasetId", "datasetId"),
     )
 
     id: Optional[int] = Field(default=None, sa_column=Column("id", Integer, primary_key=True))
-    description: Dict[Any, Any] = Field(sa_column=Column("description", JSON, nullable=False))
+    # NOTE: description is not converted into GrapherSourceDescription object automatically, I haven't
+    # found an easy solution how to do it, but there's some momentum https://github.com/tiangolo/sqlmodel/issues/63
+    description: GrapherSourceDescription = Field(sa_column=Column(JSON), nullable=False)
     createdAt: datetime = Field(sa_column=Column("createdAt", DateTime, nullable=False))
     updatedAt: datetime = Field(sa_column=Column("updatedAt", DateTime, nullable=False))
     name: Optional[str] = Field(default=None, sa_column=Column("name", String(512, "utf8mb4_0900_as_cs")))
@@ -551,6 +565,55 @@ class Sources(SQLModel, table=True):
 
     datasets: Optional["Datasets"] = Relationship(back_populates="sources")
     variables: List["Variables"] = Relationship(back_populates="sources")
+
+    @classmethod
+    def load_source(cls, engine: Engine, source_id: int) -> "Sources":
+        with Session(engine) as session:
+            source = session.exec(select(cls).where(cls.id == source_id)).one()
+        GrapherSourceDescription.validate(source.description)
+        source.description = GrapherSourceDescription(**source.description)  # type: ignore
+        return source
+
+    @classmethod
+    def load_sources(
+        cls,
+        engine: Engine,
+        source_ids: list[int] = [],
+        dataset_id: Optional[int] = None,
+        variable_ids: list[int] = [],
+    ) -> list["Sources"]:
+        """Load sources for given dataset & variable ids & source ids."""
+        q = """
+        select distinct * from (
+            select * from sources where datasetId = %(datasetId)s
+            union
+            select * from sources where id in (
+                select sourceId from variables where id in %(variableIds)s
+            ) or id in %(sourceIds)s
+        ) t
+        order by t.id
+        """
+        sources = pd.read_sql(
+            q,
+            engine,
+            params={
+                "datasetId": dataset_id,
+                # NOTE: query doesn't work with empty list so we use a dummy value
+                "variableIds": variable_ids or [-1],
+                "sourceIds": source_ids or [-1],
+            },
+        )
+        sources.description = sources.description.map(json.loads)
+
+        # sources are rarely missing datasetId (that is most likely a bug)
+        if sources.datasetId.isnull().any():
+            log.warning(
+                "load_sources.sources_missing_datasetId",
+                source_ids=sources.id[sources.datasetId.isnull()].tolist(),
+            )
+            sources.datasetId = sources.datasetId.fillna(dataset_id).astype(int)
+
+        return [cls(**d) for d in sources.to_dict(orient="records") if cls.validate(d)]
 
 
 class SuggestedChartRevisions(SQLModel, table=True):
@@ -566,8 +629,8 @@ class SuggestedChartRevisions(SQLModel, table=True):
     id: Optional[int] = Field(default=None, sa_column=Column("id", BigInteger, primary_key=True))
     chartId: int = Field(sa_column=Column("chartId", Integer, nullable=False))
     createdBy: int = Field(sa_column=Column("createdBy", Integer, nullable=False))
-    originalConfig: Dict[Any, Any]] = Field(sa_column=Column("originalConfig", JSON, nullable=False))
-    suggestedConfig: Dict[Any, Any]] = Field(sa_column=Column("suggestedConfig", JSON, nullable=False))
+    originalConfig: Dict[Any, Any] = Field(sa_column=Column("originalConfig", JSON, nullable=False))
+    suggestedConfig: Dict[Any, Any] = Field(sa_column=Column("suggestedConfig", JSON, nullable=False))
     status: str = Field(sa_column=Column("status", String(8, "utf8mb4_0900_as_cs"), nullable=False))
     createdAt: datetime = Field(sa_column=Column("createdAt", DateTime, nullable=False))
     updatedAt: datetime = Field(sa_column=Column("updatedAt", DateTime, nullable=False))
@@ -609,6 +672,27 @@ class SuggestedChartRevisions(SQLModel, table=True):
 
 
 class Variables(SQLModel, table=True):
+    """Example:
+    {
+        'id': 157342,
+        'name': 'Agricultural machinery, tractors',
+        'unit': '',
+        'description': 'Agricultural machinery refers to the number of wheel and crawler tractors...',
+        'createdAt': Timestamp('2021-08-10 01:59:02'),
+        'updatedAt': Timestamp('2021-08-10 01:59:02'),
+        'code': 'AG.AGR.TRAC.NO',
+        'coverage': '',
+        'timespan': '1961-2009',
+        'datasetId': 5357,
+        'sourceId': 18106,
+        'shortUnit': '',
+        'display': '{}',
+        'columnOrder': 0,
+        'originalMetadata': '{}',
+        'grapherConfig': None
+    }
+    """
+
     __table_args__ = (
         ForeignKeyConstraint(["datasetId"], ["datasets.id"], name="variables_datasetId_50a98bfd_fk_datasets_id"),
         ForeignKeyConstraint(["sourceId"], ["sources.id"], name="variables_sourceId_31fce80a_fk_sources_id"),
@@ -627,7 +711,7 @@ class Variables(SQLModel, table=True):
     timespan: str = Field(sa_column=Column("timespan", String(255, "utf8mb4_0900_as_cs"), nullable=False))
     datasetId: int = Field(sa_column=Column("datasetId", Integer, nullable=False))
     sourceId: int = Field(sa_column=Column("sourceId", Integer, nullable=False))
-    display: Dict[Any, Any] = Field(sa_column=Column("display", JSON, nullable=False))
+    display: Dict[str, Any] = Field(sa_column=Column("display", JSON, nullable=False))
     columnOrder: int = Field(
         default=0, sa_column=Column("columnOrder", Integer, nullable=False, server_default=text("'0'"))
     )
@@ -645,6 +729,11 @@ class Variables(SQLModel, table=True):
     sources: Optional["Sources"] = Relationship(back_populates="variables")
     chart_dimensions: List["ChartDimensions"] = Relationship(back_populates="variables")
     data_values: List["DataValues"] = Relationship(back_populates="variables")
+
+    @classmethod
+    def load_variable(cls, engine: Engine, variable_id: int) -> "Variables":
+        with Session(engine) as session:
+            return session.exec(select(cls).where(cls.id == variable_id)).one()
 
 
 class ChartDimensions(SQLModel, table=True):
@@ -697,192 +786,3 @@ class DataValues(SQLModel, table=True):
 
     entities: Optional["Entities"] = Relationship(back_populates="data_values")
     variables: Optional["Variables"] = Relationship(back_populates="data_values")
-
-
-class GrapherDatasetModel(SQLModel, table=True):
-    """Example
-        {
-        'id': 5357,
-        'name': 'World Development Indicators - World Bank (2021.07.30)',
-        'description': 'This is a dataset imported by the automated fetcher',
-        'createdAt': Timestamp('2021-08-09 06:23:31'),
-        'updatedAt': Timestamp('2021-08-10 01:58:59'),
-        'namespace': 'worldbank_wdi@2021.07.30',
-        'isPrivate': 0,
-        'createdByUserId': 47,
-        'metadataEditedAt': Timestamp('2021-08-10 01:58:59'),
-        'metadataEditedByUserId': 47,
-        'dataEditedAt': Timestamp('2021-08-10 01:58:59'),
-        'dataEditedByUserId': 47,
-        'nonRedistributable': 0
-    }
-    """
-
-    __tablename__: str = "datasets"  # type: ignore
-
-    id: int = Field(primary_key=True)
-    name: str
-    description: str
-    createdAt: dt.datetime
-    updatedAt: dt.datetime
-    namespace: str
-    isPrivate: bool
-    metadataEditedAt: dt.datetime
-    createdByUserId: int
-    metadataEditedByUserId: int
-    dataEditedAt: dt.datetime
-    dataEditedByUserId: int
-    nonRedistributable: bool
-
-    @classmethod
-    def load_dataset(cls, engine: Engine, dataset_id: int) -> "GrapherDatasetModel":
-        with Session(engine) as session:
-            return session.exec(select(cls).where(cls.id == dataset_id)).one()
-
-    @classmethod
-    def load_variables_for_dataset(cls, engine: Engine, dataset_id: int) -> list["GrapherVariableModel"]:
-        with Session(engine) as session:
-            vars = session.exec(select(GrapherVariableModel).where(GrapherVariableModel.datasetId == dataset_id)).all()
-            assert vars
-        return vars
-
-
-class GrapherVariableModel(SQLModel, table=True):
-    """Example:
-    {
-        'id': 157342,
-        'name': 'Agricultural machinery, tractors',
-        'unit': '',
-        'description': 'Agricultural machinery refers to the number of wheel and crawler tractors...',
-        'createdAt': Timestamp('2021-08-10 01:59:02'),
-        'updatedAt': Timestamp('2021-08-10 01:59:02'),
-        'code': 'AG.AGR.TRAC.NO',
-        'coverage': '',
-        'timespan': '1961-2009',
-        'datasetId': 5357,
-        'sourceId': 18106,
-        'shortUnit': '',
-        'display': '{}',
-        'columnOrder': 0,
-        'originalMetadata': '{}',
-        'grapherConfig': None
-    }
-    """
-
-    __tablename__: str = "variables"  # type: ignore
-
-    id: int = Field(primary_key=True)
-    name: str
-    unit: str
-    description: Optional[str]
-    createdAt: dt.datetime
-    updatedAt: dt.datetime
-    code: Optional[str]
-    coverage: str
-    timespan: str
-    datasetId: int
-    sourceId: int = Field(foreign_key="source.id")
-    shortUnit: Optional[str]
-    display: Dict[str, Any] = Field(sa_column=Column(JSON))
-    columnOrder: int
-    originalMetadata: Optional[Dict[str, Any]] = Field(sa_column=Column(JSON))
-    grapherConfig: Optional[Dict[str, Any]] = Field(sa_column=Column(JSON))
-
-    @classmethod
-    def load_variable(cls, engine: Engine, variable_id: int) -> "GrapherVariableModel":
-        with Session(engine) as session:
-            return session.exec(select(cls).where(cls.id == variable_id)).one()
-
-
-class GrapherSourceDescription(BaseModel):
-    link: Optional[str] = None
-    retrievedDate: Optional[str] = None
-    additionalInfo: Optional[str] = None
-    dataPublishedBy: Optional[str] = None
-    dataPublisherSource: Optional[str] = None
-
-
-class GrapherSourceModel(SQLModel, table=True):
-    """Example:
-    {
-        "id": 21261,
-        "name": "OWID based on Boix et al. (2013), V-Dem (v12), and Lührmann et al. (2018)",
-        "description": {
-            "link": "https://sites.google.com/site/mkmtwo/data?authuser=0; http://v-dem.net/vdemds.html",
-            "retrievedDate": "February 9, 2022; March 2, 2022",
-            "additionalInfo": "This dataset provides information on political regimes, ...",
-            "dataPublishedBy": "Our World in Data, Bastian Herre",
-            "dataPublisherSource": "Data comes from Boix et al. (2013), ..."
-        }
-        "createdAt": "2021-11-30 15:14:13",
-        "updatedAt": "2021-11-30 15:14:13",
-        "datasetId": 5426
-    }
-    """
-
-    __tablename__: str = "sources"  # type: ignore
-
-    id: int = Field(primary_key=True)
-    name: str
-    # NOTE: description is not converted into GrapherSourceDescription object automatically, I haven't
-    # found an easy solution how to do it, but there's some momentum https://github.com/tiangolo/sqlmodel/issues/63
-    description: GrapherSourceDescription = Field(sa_column=Column(JSON))
-    createdAt: dt.datetime
-    updatedAt: dt.datetime
-    datasetId: int = Field(foreign_key="dataset.id")
-
-    @classmethod
-    def load_source(cls, engine: Engine, source_id: int) -> "GrapherSourceModel":
-        with Session(engine) as session:
-            source = session.exec(select(cls).where(cls.id == source_id)).one()
-        GrapherSourceDescription.validate(source.description)
-        source.description = GrapherSourceDescription(**source.description)  # type: ignore
-        return source
-
-    @classmethod
-    def load_sources(
-        cls,
-        engine: Engine,
-        source_ids: list[int] = [],
-        dataset_id: Optional[int] = None,
-        variable_ids: list[int] = [],
-    ) -> list["GrapherSourceModel"]:
-        """Load sources for given dataset & variable ids & source ids."""
-        q = """
-        select distinct * from (
-            select * from sources where datasetId = %(datasetId)s
-            union
-            select * from sources where id in (
-                select sourceId from variables where id in %(variableIds)s
-            ) or id in %(sourceIds)s
-        ) t
-        order by t.id
-        """
-        sources = pd.read_sql(
-            q,
-            engine,
-            params={
-                "datasetId": dataset_id,
-                # NOTE: query doesn't work with empty list so we use a dummy value
-                "variableIds": variable_ids or [-1],
-                "sourceIds": source_ids or [-1],
-            },
-        )
-        sources.description = sources.description.map(json.loads)
-
-        # sources are rarely missing datasetId (that is most likely a bug)
-        if sources.datasetId.isnull().any():
-            log.warning(
-                "load_sources.sources_missing_datasetId",
-                source_ids=sources.id[sources.datasetId.isnull()].tolist(),
-            )
-            sources.datasetId = sources.datasetId.fillna(dataset_id).astype(int)
-
-        return [cls(**d) for d in sources.to_dict(orient="records") if cls.validate(d)]
-
-
-class GrapherConfig(BaseModel):
-    dataset: GrapherDatasetModel
-    variables: list[GrapherVariableModel]
-    # NOTE: sources can belong to dataset or variable
-    sources: list[GrapherSourceModel]

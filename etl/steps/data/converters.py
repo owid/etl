@@ -5,11 +5,7 @@
 from owid.catalog import DatasetMeta, License, Source, VariableMeta
 from owid.walden import Dataset as WaldenDataset
 
-from etl.grapher_model import (
-    GrapherDatasetModel,
-    GrapherSourceModel,
-    GrapherVariableModel,
-)
+from etl import grapher_model as gm
 
 
 def convert_walden_metadata(wd: WaldenDataset) -> DatasetMeta:
@@ -38,7 +34,7 @@ def convert_walden_metadata(wd: WaldenDataset) -> DatasetMeta:
     )
 
 
-def convert_grapher_source(s: GrapherSourceModel) -> Source:
+def convert_grapher_source(s: gm.Sources) -> Source:
     return Source(
         name=s.name,
         description=s.description.additionalInfo,
@@ -49,7 +45,7 @@ def convert_grapher_source(s: GrapherSourceModel) -> Source:
     )
 
 
-def convert_grapher_dataset(g: GrapherDatasetModel, sources: list[GrapherSourceModel], short_name: str) -> DatasetMeta:
+def convert_grapher_dataset(g: gm.Datasets, sources: list[gm.Sources], short_name: str) -> DatasetMeta:
     """
     Convert grapher dataset row into DatasetMeta.
 
@@ -83,7 +79,7 @@ def convert_grapher_dataset(g: GrapherDatasetModel, sources: list[GrapherSourceM
     )
 
 
-def convert_grapher_variable(g: GrapherVariableModel, s: GrapherSourceModel) -> VariableMeta:
+def convert_grapher_variable(g: gm.Variables, s: gm.Sources) -> VariableMeta:
     """Convert grapher variable row into VariableMeta.
 
     Example:
