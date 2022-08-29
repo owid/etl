@@ -6,12 +6,11 @@ It has been slightly modified since then.
 """
 import json
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, TypedDict
 from urllib.parse import quote
 
 import pandas as pd
 import structlog
-from pydantic import BaseModel
 from sqlalchemy import (
     TIMESTAMP,
     BigInteger,
@@ -41,6 +40,7 @@ from sqlmodel import (
     Session,
     SQLModel,
     create_engine,
+    or_,
     select,
 )
 from sqlmodel.sql.expression import Select, SelectOfScalar
@@ -183,10 +183,31 @@ class Namespace(SQLModel, table=True):
     __tablename__: str = "namespaces"  # type: ignore
     __table_args__ = (Index("namespaces_name_uq", "name", unique=True),)
 
-    id: Optional[int] = Field(default=None, sa_column=Column("id", Integer, primary_key=True))
+    id: Optional[int] = Field(default=None, primary_key=True)
     name: str = Field(sa_column=Column("name", String(255, "utf8mb4_0900_as_cs"), nullable=False))
-    isArchived: int = Field(sa_column=Column("isArchived", TINYINT(1), nullable=False, server_default=text("'0'")))
+    isArchived: int = Field(
+        default=0, sa_column=Column("isArchived", TINYINT(1), nullable=False, server_default=text("'0'"))
+    )
     description: Optional[str] = Field(default=None, sa_column=Column("description", String(255, "utf8mb4_0900_as_cs")))
+
+    def upsert(self, session: Session) -> "Namespace":
+        cls = self.__class__
+        q = select(cls).where(
+            cls.name == self.name,
+        )
+        ns = session.exec(q).one_or_none()
+        if ns is None:
+            ns = self
+        else:
+            ns.description = self.description
+
+        session.add(ns)
+
+        # select added object to get its id
+        q = select(cls).where(
+            cls.name == self.name,
+        )
+        return session.exec(q).one()
 
 
 class Posts(SQLModel, table=True):
@@ -396,20 +417,30 @@ class Dataset(SQLModel, table=True):
         Index("unique_short_name_version_namespace", "shortName", "version", "namespace", unique=True),
     )
 
-    id: int = Field(primary_key=True)
+    id: Optional[int] = Field(default=None, primary_key=True)
     # NOTE: name allows nulls in MySQL, but there are none in reality
     name: str = Field(sa_column=Column("name", String(512, "utf8mb4_0900_as_cs")))
-    description: str = Field(sa_column=Column("description", LONGTEXT, nullable=False))
-    createdAt: datetime = Field(sa_column=Column("createdAt", DateTime, nullable=False))
-    updatedAt: datetime = Field(sa_column=Column("updatedAt", DateTime, nullable=False))
+    shortName: Optional[str] = Field(default=None, sa_column=Column("shortName", String(255, "utf8mb4_0900_as_cs")))
+    version: Optional[str] = Field(default=None, sa_column=Column("version", String(255, "utf8mb4_0900_as_cs")))
     namespace: str = Field(sa_column=Column("namespace", String(255, "utf8mb4_0900_as_cs"), nullable=False))
+    description: str = Field(sa_column=Column("description", LONGTEXT, nullable=False))
+    createdAt: Optional[datetime] = Field(
+        default_factory=datetime.utcnow, sa_column=Column("createdAt", DateTime, nullable=False)
+    )
+    updatedAt: Optional[datetime] = Field(
+        default_factory=datetime.utcnow, sa_column=Column("updatedAt", DateTime, nullable=False)
+    )
     isPrivate: Optional[int] = Field(
         default=0, sa_column=Column("isPrivate", TINYINT(1), nullable=False, server_default=text("'0'"))
     )
     createdByUserId: int = Field(sa_column=Column("createdByUserId", Integer, nullable=False))
-    metadataEditedAt: datetime = Field(sa_column=Column("metadataEditedAt", DateTime, nullable=False))
+    metadataEditedAt: datetime = Field(
+        default_factory=datetime.utcnow, sa_column=Column("metadataEditedAt", DateTime, nullable=False)
+    )
     metadataEditedByUserId: int = Field(sa_column=Column("metadataEditedByUserId", Integer, nullable=False))
-    dataEditedAt: datetime = Field(sa_column=Column("dataEditedAt", DateTime, nullable=False))
+    dataEditedAt: datetime = Field(
+        default_factory=datetime.utcnow, sa_column=Column("dataEditedAt", DateTime, nullable=False)
+    )
     dataEditedByUserId: int = Field(sa_column=Column("dataEditedByUserId", Integer, nullable=False))
     nonRedistributable: int = Field(
         default=0, sa_column=Column("nonRedistributable", TINYINT(1), nullable=False, server_default=text("'0'"))
@@ -420,8 +451,6 @@ class Dataset(SQLModel, table=True):
     sourceChecksum: Optional[str] = Field(
         default=None, sa_column=Column("sourceChecksum", String(64, "utf8mb4_0900_as_cs"))
     )
-    shortName: Optional[str] = Field(default=None, sa_column=Column("shortName", String(255, "utf8mb4_0900_as_cs")))
-    version: Optional[str] = Field(default=None, sa_column=Column("version", String(255, "utf8mb4_0900_as_cs")))
 
     users: Optional["User"] = Relationship(back_populates="datasets")
     users_: Optional["User"] = Relationship(back_populates="datasets_")
@@ -429,6 +458,39 @@ class Dataset(SQLModel, table=True):
     tags: List["Tag"] = Relationship(back_populates="datasets")
     sources: List["Source"] = Relationship(back_populates="datasets")
     variables: List["Variable"] = Relationship(back_populates="datasets")
+
+    def upsert(self, session: Session) -> "Dataset":
+        cls = self.__class__
+        q = select(cls).where(
+            cls.shortName == self.shortName,
+            cls.version == self.version,
+            cls.namespace == self.namespace,
+        )
+        ds = session.exec(q).one_or_none()
+        if not ds:
+            ds = self
+        else:
+            ds.name = self.name
+            ds.description = self.description
+            ds.metadataEditedByUserId = self.metadataEditedByUserId
+            ds.dataEditedByUserId = self.dataEditedByUserId
+            ds.createdByUserId = self.createdByUserId
+            ds.updatedAt = datetime.utcnow()
+            ds.metadataEditedAt = datetime.utcnow()
+            ds.dataEditedAt = datetime.utcnow()
+
+        # null checksum to label it as undone
+        ds.sourceChecksum = None
+
+        session.add(ds)
+
+        # select added object to get its id
+        q = select(cls).where(
+            cls.shortName == self.shortName,
+            cls.version == self.version,
+            cls.namespace == self.namespace,
+        )
+        return session.exec(q).one()
 
     @classmethod
     def load_dataset(cls, session: Session, dataset_id: int) -> "Dataset":
@@ -523,12 +585,12 @@ t_dataset_tags = Table(
 )
 
 
-class SourceDescription(BaseModel):
-    link: Optional[str] = None
-    retrievedDate: Optional[str] = None
-    additionalInfo: Optional[str] = None
-    dataPublishedBy: Optional[str] = None
-    dataPublisherSource: Optional[str] = None
+class SourceDescription(TypedDict):
+    link: Optional[str]
+    retrievedDate: Optional[str]
+    additionalInfo: Optional[str]
+    dataPublishedBy: Optional[str]
+    dataPublisherSource: Optional[str]
 
 
 class Source(SQLModel, table=True):
@@ -556,23 +618,46 @@ class Source(SQLModel, table=True):
     )
 
     id: Optional[int] = Field(default=None, sa_column=Column("id", Integer, primary_key=True))
-    # NOTE: description is not converted into SourceDescription object automatically, I haven't
-    # found an easy solution how to do it, but there's some momentum https://github.com/tiangolo/sqlmodel/issues/63
+    # NOTE: nested models are not supported yet in SQLModel so we use TypedDict instead
+    # https://github.com/tiangolo/sqlmodel/issues/63
     description: SourceDescription = Field(sa_column=Column(JSON), nullable=False)
-    createdAt: datetime = Field(sa_column=Column("createdAt", DateTime, nullable=False))
-    updatedAt: datetime = Field(sa_column=Column("updatedAt", DateTime, nullable=False))
+    createdAt: Optional[datetime] = Field(
+        default_factory=datetime.utcnow, sa_column=Column("createdAt", DateTime, nullable=False)
+    )
+    updatedAt: Optional[datetime] = Field(
+        default_factory=datetime.utcnow, sa_column=Column("updatedAt", DateTime, nullable=False)
+    )
     name: Optional[str] = Field(default=None, sa_column=Column("name", String(512, "utf8mb4_0900_as_cs")))
     datasetId: Optional[int] = Field(default=None, sa_column=Column("datasetId", Integer))
 
     datasets: Optional["Dataset"] = Relationship(back_populates="sources")
     variables: List["Variable"] = Relationship(back_populates="sources")
 
+    def upsert(self, session: Session) -> "Source":
+        cls = self.__class__
+        q = select(cls).where(
+            cls.name == self.name,
+            cls.datasetId == self.datasetId,
+        )
+        ds = session.exec(q).one_or_none()
+        if not ds:
+            ds = self
+        else:
+            ds.updatedAt = datetime.utcnow()
+            ds.description = self.description
+
+        session.add(ds)
+
+        # select added object to get its id
+        q = select(cls).where(
+            cls.name == self.name,
+            cls.datasetId == self.datasetId,
+        )
+        return session.exec(q).one()
+
     @classmethod
     def load_source(cls, session: Session, source_id: int) -> "Source":
-        source = session.exec(select(cls).where(cls.id == source_id)).one()
-        SourceDescription.validate(source.description)
-        source.description = SourceDescription(**source.description)  # type: ignore
-        return source
+        return session.exec(select(cls).where(cls.id == source_id)).one()
 
     @classmethod
     def load_sources(
@@ -704,30 +789,77 @@ class Variable(SQLModel, table=True):
         Index("variables_sourceId_31fce80a_fk_sources_id", "sourceId"),
     )
 
-    id: int = Field(primary_key=True)
+    id: Optional[int] = Field(default=None, primary_key=True)
+    datasetId: int = Field(sa_column=Column("datasetId", Integer, nullable=False))
+    name: Optional[str] = Field(default=None, sa_column=Column("name", String(750, "utf8mb4_0900_as_cs")))
+    shortName: Optional[str] = Field(default=None, sa_column=Column("shortName", String(255, "utf8mb4_0900_as_cs")))
+    description: Optional[str] = Field(default=None, sa_column=Column("description", LONGTEXT))
     unit: str = Field(sa_column=Column("unit", String(255, "utf8mb4_0900_as_cs"), nullable=False))
-    createdAt: datetime = Field(sa_column=Column("createdAt", DateTime, nullable=False))
-    updatedAt: datetime = Field(sa_column=Column("updatedAt", DateTime, nullable=False))
+    createdAt: datetime = Field(
+        default_factory=datetime.utcnow, sa_column=Column("createdAt", DateTime, nullable=False)
+    )
+    updatedAt: datetime = Field(
+        default_factory=datetime.utcnow, sa_column=Column("updatedAt", DateTime, nullable=False)
+    )
     coverage: str = Field(sa_column=Column("coverage", String(255, "utf8mb4_0900_as_cs"), nullable=False))
     timespan: str = Field(sa_column=Column("timespan", String(255, "utf8mb4_0900_as_cs"), nullable=False))
-    datasetId: int = Field(sa_column=Column("datasetId", Integer, nullable=False))
     sourceId: int = Field(sa_column=Column("sourceId", Integer, nullable=False))
     display: Dict[str, Any] = Field(sa_column=Column("display", JSON, nullable=False))
     columnOrder: int = Field(
         default=0, sa_column=Column("columnOrder", Integer, nullable=False, server_default=text("'0'"))
     )
-    name: Optional[str] = Field(default=None, sa_column=Column("name", String(750, "utf8mb4_0900_as_cs")))
-    description: Optional[str] = Field(default=None, sa_column=Column("description", LONGTEXT))
     code: Optional[str] = Field(default=None, sa_column=Column("code", String(255, "utf8mb4_0900_as_cs")))
     shortUnit: Optional[str] = Field(default=None, sa_column=Column("shortUnit", String(255, "utf8mb4_0900_as_cs")))
     originalMetadata: Optional[Dict[Any, Any]] = Field(default=None, sa_column=Column("originalMetadata", JSON))
     grapherConfig: Optional[Dict[Any, Any]] = Field(default=None, sa_column=Column("grapherConfig", JSON))
-    shortName: Optional[str] = Field(default=None, sa_column=Column("shortName", String(255, "utf8mb4_0900_as_cs")))
 
     datasets: Optional["Dataset"] = Relationship(back_populates="variables")
     sources: Optional["Source"] = Relationship(back_populates="variables")
     chart_dimensions: List["ChartDimensions"] = Relationship(back_populates="variables")
     data_values: List["DataValues"] = Relationship(back_populates="variables")
+
+    def upsert(self, session: Session) -> "Variable":
+        assert self.shortName
+
+        cls = self.__class__
+        q = select(cls).where(
+            # old variables don't have a shortName, but can be identified with `name`
+            or_(cls.shortName == self.shortName, cls.shortName.is_(None)),  # type: ignore
+            cls.name == self.name,
+            cls.datasetId == self.datasetId,
+        )
+        ds = session.exec(q).one_or_none()
+        if not ds:
+            ds = self
+        else:
+            ds.shortName = self.shortName
+            ds.name = self.name
+            ds.description = self.description
+            ds.unit = self.unit
+            ds.shortUnit = self.shortUnit
+            ds.sourceId = self.sourceId
+            ds.timespan = self.timespan
+            ds.coverage = self.coverage
+            ds.display = self.display
+            ds.updatedAt = datetime.utcnow()
+            # do not update these fields unless they're specified
+            if self.columnOrder is not None:
+                ds.columnOrder = self.columnOrder
+            if self.code is not None:
+                ds.code = self.code
+            if self.originalMetadata is not None:
+                ds.originalMetadata = self.originalMetadata
+            if self.grapherConfig is not None:
+                ds.grapherConfig = self.grapherConfig
+
+        session.add(ds)
+
+        # select added object to get its id
+        q = select(cls).where(
+            cls.shortName == self.shortName,
+            cls.datasetId == self.datasetId,
+        )
+        return session.exec(q).one()
 
     @classmethod
     def load_variable(cls, session: Session, variable_id: int) -> "Variable":

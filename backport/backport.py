@@ -78,6 +78,7 @@ def backport(
     with Session(engine) as session:
         lg.info("backport.loading_dataset")
         ds = gm.Dataset.load_dataset(session, dataset_id)
+        assert ds.id
         lg.info("backport.loading_variables")
         vars = gm.Dataset.load_variables_for_dataset(session, dataset_id)
 
@@ -85,7 +86,7 @@ def backport(
 
         # get sources for dataset and all variables
         lg.info("backport.loading_sources")
-        sources = gm.Source.load_sources(session, dataset_id=ds.id, variable_ids=variable_ids)
+        sources = gm.Source.load_sources(session, dataset_id=ds.id, variable_ids=variable_ids)  # type: ignore
 
     short_name = utils.create_short_name(ds.id, ds.name)
 
@@ -120,7 +121,7 @@ def backport(
 
     # upload values to walden
     lg.info("backport.loading_values", variables=variable_ids)
-    df = _load_values(engine, variable_ids)
+    df = _load_values(engine, variable_ids)  # type: ignore
     lg.info(
         "backport.upload_values",
         size=len(df),

@@ -10,9 +10,9 @@ Usage:
 """
 
 import concurrent.futures
-import json
 import os
 from dataclasses import dataclass
+from threading import Lock
 from typing import Dict, List, Optional, cast
 
 import pandas as pd
@@ -20,15 +20,19 @@ import structlog
 from owid import catalog
 from owid.catalog import utils
 from sqlalchemy import Integer, String
+from sqlmodel import Session, delete, select, update
 from tenacity import retry, stop
 
 from etl import config
 from etl.db import get_engine, open_db
-from etl.db_utils import DBUtils
 
 from . import grapher_helpers as gh
+from . import grapher_model as gm
 
 log = structlog.get_logger()
+
+
+source_table_lock = Lock()
 
 
 CURRENT_DIR = os.path.dirname(__file__)
@@ -67,62 +71,82 @@ def upsert_dataset(dataset: catalog.Dataset, namespace: str, sources: List[catal
             " join multiple sources"
         )
 
+    engine = gm.get_engine()
+
     # This function creates the dataset table row, a namespace row
     # and the sources table row(s). There is a bit of an open question if we should
     # map one dataset with N tables to one namespace and N datasets in
     # mysql or if we should just flatten it into one dataset?
-    with open_db() as db:
+    with Session(engine) as session:
         log.info("upsert_dataset.verify_namespace", namespace=namespace)
-        ns = db.fetch_one_or_none("SELECT * from namespaces where name=%s", [namespace])
-        if ns is None:
-            db.upsert_namespace(namespace, "")
-        else:
-            _, ns_name, _, ns_is_archived = ns
-            if ns_is_archived:
-                log.warning("upsert_dataset.namespace_is_archived", namespace=ns_name)
+        ns = gm.Namespace(name=namespace, description="")
+        ns = ns.upsert(session)
+        if ns.isArchived:
+            log.warning("upsert_dataset.namespace_is_archived", namespace=ns.name)
 
         log.info(
             "upsert_dataset.upsert_dataset.start",
             short_name=dataset.metadata.short_name,
         )
-        dataset_id = db.upsert_dataset(
-            dataset.metadata.short_name,
-            dataset.metadata.title,
-            dataset.metadata.version,
-            namespace,
-            int(cast(str, config.GRAPHER_USER_ID)),
+        user_id = int(cast(str, config.GRAPHER_USER_ID))
+        ds = gm.Dataset(
+            shortName=dataset.metadata.short_name,
+            name=dataset.metadata.title,
+            version=dataset.metadata.version,
+            namespace=namespace,
+            metadataEditedByUserId=user_id,
+            dataEditedByUserId=user_id,
+            createdByUserId=user_id,
             description=dataset.metadata.description or "",
         )
+        ds = ds.upsert(session)
+        assert ds.id
+        if ds.isArchived:
+            log.warning(
+                "upsert_dataset.dataset_is_archived",
+                id=ds.id,
+                short_name=ds.shortName,
+            )
+
         log.info(
             "upsert_dataset.upsert_dataset.end",
             short_name=dataset.metadata.short_name,
-            id=dataset_id,
+            id=ds.id,
         )
 
         source_ids: Dict[str, int] = dict()
         for source in sources:
-            source_ids[source.name] = _upsert_source_to_db(db, source, dataset_id)
+            assert source.name
+            source_ids[source.name] = _upsert_source_to_db(source, ds.id)
 
-        return DatasetUpsertResult(dataset_id, source_ids)
+        session.commit()
+
+        return DatasetUpsertResult(ds.id, source_ids)
 
 
-def _upsert_source_to_db(db: DBUtils, source: catalog.Source, dataset_id: int) -> int:
+def _upsert_source_to_db(source: catalog.Source, dataset_id: int) -> int:
     """Upsert source and return its id"""
     if source.name is None:
         raise ValueError("Source name was None - please fix this in the metadata.")
 
-    json_description = json.dumps(
-        {
-            "link": source.url,
-            "retrievedDate": source.date_accessed,
-            "dataPublishedBy": source.published_by,
-            "dataPublisherSource": source.publisher_source,
-            # NOTE: we remap `description` to additionalInfo since that is what is shown as `Description` in
-            # the admin UI. Clean this up with the new data model
-            "additionalInfo": source.description,
-        }
-    )
-    return db.upsert_source(source.name, json_description, dataset_id)
+    with source_table_lock:
+        with Session(gm.get_engine()) as session:
+            db_source = gm.Source(
+                name=source.name,
+                datasetId=dataset_id,
+                description=gm.SourceDescription(
+                    link=source.url,
+                    retrievedDate=source.date_accessed,
+                    dataPublishedBy=source.published_by,
+                    dataPublisherSource=source.publisher_source,
+                    # NOTE: we remap `description` to additionalInfo since that is what is shown as `Description` in
+                    # the admin UI. Clean this up with the new data model
+                    additionalInfo=source.description,
+                ),
+            )
+            db_source = db_source.upsert(session)
+            assert db_source.id
+            return db_source.id
 
 
 def _update_variables_display(table: catalog.Table) -> None:
@@ -170,7 +194,7 @@ def upsert_table(table: catalog.Table, dataset_upsert_result: DatasetUpsertResul
 
     _update_variables_display(table)
 
-    with open_db() as db:
+    with Session(gm.get_engine()) as session:
         log.info("upsert_table.upsert_variable", variable=table.columns[0])
 
         # For easy retrieveal of the value series we store the name
@@ -198,37 +222,37 @@ def upsert_table(table: catalog.Table, dataset_upsert_result: DatasetUpsertResul
             # Not exists, upsert it
             # NOTE: this could be quite inefficient as we upsert source for every variable
             #   optimize this if this turns out to be a bottleneck
-            source_id = _upsert_source_to_db(db, source, dataset_upsert_result.dataset_id)
+            source_id = _upsert_source_to_db(source, dataset_upsert_result.dataset_id)
 
-        db_variable_id = db.upsert_variable(
-            short_name=column_name,
-            title=table[column_name].title,
-            source_id=source_id,
-            dataset_id=dataset_upsert_result.dataset_id,
+        variable = gm.Variable(
+            shortName=column_name,
+            name=table[column_name].title,
+            sourceId=source_id,
+            datasetId=dataset_upsert_result.dataset_id,
             description=table[column_name].metadata.description,
-            code=None,
             unit=table[column_name].metadata.unit,
-            short_unit=table[column_name].metadata.short_unit,
+            shortUnit=table[column_name].metadata.short_unit,
             timespan=timespan,
             coverage="",
             display=table[column_name].metadata.display,
-            original_metadata=None,
         )
+        variable = variable.upsert(session)
+        assert variable.id
 
-        db.cursor.execute(
-            """
-            DELETE FROM data_values WHERE variableId=%s
-        """,
-            [int(db_variable_id)],
-        )
+        session.commit()
 
-    df = table.rename(columns={column_name: "value", "entity_id": "entityId"}).assign(variableId=db_variable_id)
+        # delete its data to refresh it later
+        q = delete(gm.DataValues).where(gm.DataValues.variableId == variable.id)
+        session.execute(q)
+        session.commit()
+
+        df = table.rename(columns={column_name: "value", "entity_id": "entityId"}).assign(variableId=variable.id)
 
     insert_to_data_values(df)
 
     log.info("upsert_table.upserted_data_values", size=len(table))
 
-    return VariableUpsertResult(db_variable_id, source_id)
+    return VariableUpsertResult(variable.id, source_id)
 
 
 def fetch_db_checksum(dataset: catalog.Dataset) -> Optional[str]:
@@ -236,28 +260,16 @@ def fetch_db_checksum(dataset: catalog.Dataset) -> Optional[str]:
     Fetch the latest source checksum associated with a given dataset in the db. Can be compared
     with the current source checksum to determine whether the db is up-to-date.
     """
-    with open_db() as db:
-        source_checksum = db.fetch_one_or_none(
-            """
-            SELECT sourceChecksum
-            FROM datasets
-            WHERE shortName=%s
-            """,
-            [dataset.metadata.short_name],
-        )
-        return None if source_checksum is None else source_checksum[0]
+    with Session(gm.get_engine()) as session:
+        q = select(gm.Dataset).where(gm.Dataset.shortName == dataset.metadata.short_name)
+        ds = session.exec(q).one_or_none()
+        return ds.sourceChecksum if ds is not None else None
 
 
 def set_dataset_checksum(dataset_id: int, checksum: str) -> None:
-    with open_db() as db:
-        db.cursor.execute(
-            """
-            UPDATE datasets
-            SET sourceChecksum = %s
-            WHERE id=%s
-        """,
-            [checksum, dataset_id],
-        )
+    with Session(gm.get_engine()) as session:
+        q = update(gm.Dataset).where(gm.Dataset.id == dataset_id).values(sourceChecksum=checksum)
+        session.execute(q)
 
 
 def cleanup_ghost_variables(dataset_id: int, upserted_variable_ids: List[int], workers: int = 1) -> None:
