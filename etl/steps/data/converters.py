@@ -34,7 +34,7 @@ def convert_walden_metadata(wd: WaldenDataset) -> DatasetMeta:
     )
 
 
-def convert_grapher_source(s: gm.Sources) -> Source:
+def convert_grapher_source(s: gm.Source) -> Source:
     return Source(
         name=s.name,
         description=s.description.additionalInfo,
@@ -45,7 +45,7 @@ def convert_grapher_source(s: gm.Sources) -> Source:
     )
 
 
-def convert_grapher_dataset(g: gm.Datasets, sources: list[gm.Sources], short_name: str) -> DatasetMeta:
+def convert_grapher_dataset(g: gm.Dataset, sources: list[gm.Source], short_name: str) -> DatasetMeta:
     """
     Convert grapher dataset row into DatasetMeta.
 
@@ -79,7 +79,7 @@ def convert_grapher_dataset(g: gm.Datasets, sources: list[gm.Sources], short_nam
     )
 
 
-def convert_grapher_variable(g: gm.Variables, s: gm.Sources) -> VariableMeta:
+def convert_grapher_variable(g: gm.Variable, s: gm.Source) -> VariableMeta:
     """Convert grapher variable row into VariableMeta.
 
     Example:

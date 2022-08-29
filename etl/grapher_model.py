@@ -108,7 +108,8 @@ class Details(SQLModel, table=True):
     content: str = Field(sa_column=Column("content", String(1023, "utf8mb4_0900_as_cs"), nullable=False))
 
 
-class Entities(SQLModel, table=True):
+class Entity(SQLModel, table=True):
+    __tablename__: str = "entities"  # type: ignore
     __table_args__ = (Index("code", "code", unique=True), Index("name", "name", unique=True))
 
     id: Optional[int] = Field(default=None, sa_column=Column("id", Integer, primary_key=True))
@@ -178,7 +179,8 @@ class Migrations(SQLModel, table=True):
     name: str = Field(sa_column=Column("name", String(255, "utf8mb4_0900_as_cs"), nullable=False))
 
 
-class Namespaces(SQLModel, table=True):
+class Namespace(SQLModel, table=True):
+    __tablename__: str = "namespaces"  # type: ignore
     __table_args__ = (Index("namespaces_name_uq", "name", unique=True),)
 
     id: Optional[int] = Field(default=None, sa_column=Column("id", Integer, primary_key=True))
@@ -197,7 +199,7 @@ class Posts(SQLModel, table=True):
     updated_at: datetime = Field(sa_column=Column("updated_at", DateTime, nullable=False))
     published_at: Optional[datetime] = Field(default=None, sa_column=Column("published_at", DateTime))
 
-    tag: List["Tags"] = Relationship(back_populates="post")
+    tag: List["Tag"] = Relationship(back_populates="post")
 
 
 class Sessions(SQLModel, table=True):
@@ -218,7 +220,8 @@ class Settings(SQLModel, table=True):
     updated_at: datetime = Field(sa_column=Column("updated_at", DateTime, nullable=False))
 
 
-class Tags(SQLModel, table=True):
+class Tag(SQLModel, table=True):
+    __tablename__: "tags"  # type: ignore
     __table_args__ = (
         ForeignKeyConstraint(["parentId"], ["tags.id"], name="tags_ibfk_1"),
         Index("dataset_subcategories_name_fk_dst_cat_id_6ce1cc36_uniq", "name", "parentId", unique=True),
@@ -234,9 +237,9 @@ class Tags(SQLModel, table=True):
     specialType: Optional[str] = Field(default=None, sa_column=Column("specialType", String(255, "utf8mb4_0900_as_cs")))
 
     post: List["Posts"] = Relationship(back_populates="tag")
-    tags: Optional["Tags"] = Relationship(back_populates="tags_reverse")
-    tags_reverse: List["Tags"] = Relationship(back_populates="tags")
-    datasets: List["Datasets"] = Relationship(back_populates="tags")
+    tags: Optional["Tag"] = Relationship(back_populates="tags_reverse")
+    tags_reverse: List["Tag"] = Relationship(back_populates="tags")
+    datasets: List["Dataset"] = Relationship(back_populates="tags")
     chart_tags: List["ChartTags"] = Relationship(back_populates="tags")
 
 
@@ -249,7 +252,8 @@ class UserInvitations(SQLModel, table=True):
     updatedAt: datetime = Field(sa_column=Column("updatedAt", DateTime, nullable=False))
 
 
-class Users(SQLModel, table=True):
+class User(SQLModel, table=True):
+    __tablename__: str = "users"  # type: ignore
     __table_args__ = (Index("email", "email", unique=True),)
 
     id: Optional[int] = Field(default=None, sa_column=Column("id", Integer, primary_key=True))
@@ -264,11 +268,11 @@ class Users(SQLModel, table=True):
     lastSeen: Optional[datetime] = Field(default=None, sa_column=Column("lastSeen", DateTime))
 
     chart_revisions: List["ChartRevisions"] = Relationship(back_populates="users")
-    charts: List["Charts"] = Relationship(back_populates="users")
-    charts_: List["Charts"] = Relationship(back_populates="users_")
-    datasets: List["Datasets"] = Relationship(back_populates="users")
-    datasets_: List["Datasets"] = Relationship(back_populates="users_")
-    datasets1: List["Datasets"] = Relationship(back_populates="users1")
+    charts: List["Chart"] = Relationship(back_populates="users")
+    charts_: List["Chart"] = Relationship(back_populates="users_")
+    datasets: List["Dataset"] = Relationship(back_populates="users")
+    datasets_: List["Dataset"] = Relationship(back_populates="users_")
+    datasets1: List["Dataset"] = Relationship(back_populates="users1")
     suggested_chart_revisions: List["SuggestedChartRevisions"] = Relationship(back_populates="users")
     suggested_chart_revisions_: List["SuggestedChartRevisions"] = Relationship(back_populates="users_")
 
@@ -287,10 +291,11 @@ class ChartRevisions(SQLModel, table=True):
     createdAt: Optional[datetime] = Field(default=None, sa_column=Column("createdAt", DateTime))
     updatedAt: Optional[datetime] = Field(default=None, sa_column=Column("updatedAt", DateTime))
 
-    users: Optional["Users"] = Relationship(back_populates="chart_revisions")
+    users: Optional["User"] = Relationship(back_populates="chart_revisions")
 
 
-class Charts(SQLModel, table=True):
+class Chart(SQLModel, table=True):
+    __tablename__: str = "charts"  # type: ignore
     __table_args__ = (
         ForeignKeyConstraint(["lastEditedByUserId"], ["users.id"], name="charts_lastEditedByUserId"),
         ForeignKeyConstraint(["publishedByUserId"], ["users.id"], name="charts_publishedByUserId"),
@@ -309,8 +314,8 @@ class Charts(SQLModel, table=True):
     publishedAt: Optional[datetime] = Field(default=None, sa_column=Column("publishedAt", DateTime))
     publishedByUserId: Optional[int] = Field(default=None, sa_column=Column("publishedByUserId", Integer))
 
-    users: Optional["Users"] = Relationship(back_populates="charts")
-    users_: Optional["Users"] = Relationship(back_populates="charts_")
+    users: Optional["User"] = Relationship(back_populates="charts")
+    users_: Optional["User"] = Relationship(back_populates="charts_")
     chart_slug_redirects: List["ChartSlugRedirects"] = Relationship(back_populates="chart")
     chart_tags: List["ChartTags"] = Relationship(back_populates="charts")
     suggested_chart_revisions: List["SuggestedChartRevisions"] = Relationship(back_populates="charts")
@@ -360,7 +365,7 @@ class CountryNameToolCountrydata(SQLModel, table=True):
     )
 
 
-class Datasets(SQLModel, table=True):
+class Dataset(SQLModel, table=True):
     """Example
         {
         'id': 5357,
@@ -418,20 +423,20 @@ class Datasets(SQLModel, table=True):
     shortName: Optional[str] = Field(default=None, sa_column=Column("shortName", String(255, "utf8mb4_0900_as_cs")))
     version: Optional[str] = Field(default=None, sa_column=Column("version", String(255, "utf8mb4_0900_as_cs")))
 
-    users: Optional["Users"] = Relationship(back_populates="datasets")
-    users_: Optional["Users"] = Relationship(back_populates="datasets_")
-    users1: Optional["Users"] = Relationship(back_populates="datasets1")
-    tags: List["Tags"] = Relationship(back_populates="datasets")
-    sources: List["Sources"] = Relationship(back_populates="datasets")
-    variables: List["Variables"] = Relationship(back_populates="datasets")
+    users: Optional["User"] = Relationship(back_populates="datasets")
+    users_: Optional["User"] = Relationship(back_populates="datasets_")
+    users1: Optional["User"] = Relationship(back_populates="datasets1")
+    tags: List["Tag"] = Relationship(back_populates="datasets")
+    sources: List["Source"] = Relationship(back_populates="datasets")
+    variables: List["Variable"] = Relationship(back_populates="datasets")
 
     @classmethod
-    def load_dataset(cls, session: Session, dataset_id: int) -> "Datasets":
+    def load_dataset(cls, session: Session, dataset_id: int) -> "Dataset":
         return session.exec(select(cls).where(cls.id == dataset_id)).one()
 
     @classmethod
-    def load_variables_for_dataset(cls, session: Session, dataset_id: int) -> list["Variables"]:
-        vars = session.exec(select(Variables).where(Variables.datasetId == dataset_id)).all()
+    def load_variables_for_dataset(cls, session: Session, dataset_id: int) -> list["Variable"]:
+        vars = session.exec(select(Variable).where(Variable.datasetId == dataset_id)).all()
         assert vars
         return vars
 
@@ -458,7 +463,7 @@ class ChartSlugRedirects(SQLModel, table=True):
     slug: str = Field(sa_column=Column("slug", String(255, "utf8mb4_0900_as_cs"), nullable=False))
     chart_id: int = Field(sa_column=Column("chart_id", Integer, nullable=False))
 
-    chart: Optional["Charts"] = Relationship(back_populates="chart_slug_redirects")
+    chart: Optional["Chart"] = Relationship(back_populates="chart_slug_redirects")
 
 
 class ChartTags(SQLModel, table=True):
@@ -472,8 +477,8 @@ class ChartTags(SQLModel, table=True):
     tagId: int = Field(sa_column=Column("tagId", Integer, primary_key=True, nullable=False))
     isKey: Optional[int] = Field(default=None, sa_column=Column("isKey", TINYINT))
 
-    charts: Optional["Charts"] = Relationship(back_populates="chart_tags")
-    tags: Optional["Tags"] = Relationship(back_populates="chart_tags")
+    charts: Optional["Chart"] = Relationship(back_populates="chart_tags")
+    tags: Optional["Tag"] = Relationship(back_populates="chart_tags")
 
 
 class CountryNameToolCountryname(SQLModel, table=True):
@@ -518,7 +523,7 @@ t_dataset_tags = Table(
 )
 
 
-class GrapherSourceDescription(BaseModel):
+class SourceDescription(BaseModel):
     link: Optional[str] = None
     retrievedDate: Optional[str] = None
     additionalInfo: Optional[str] = None
@@ -526,7 +531,7 @@ class GrapherSourceDescription(BaseModel):
     dataPublisherSource: Optional[str] = None
 
 
-class Sources(SQLModel, table=True):
+class Source(SQLModel, table=True):
     """Example:
     {
         "id": 21261,
@@ -544,28 +549,29 @@ class Sources(SQLModel, table=True):
     }
     """
 
+    __tablename__: str = "sources"  # type: ignore
     __table_args__ = (
         ForeignKeyConstraint(["datasetId"], ["datasets.id"], name="sources_datasetId"),
         Index("sources_datasetId", "datasetId"),
     )
 
     id: Optional[int] = Field(default=None, sa_column=Column("id", Integer, primary_key=True))
-    # NOTE: description is not converted into GrapherSourceDescription object automatically, I haven't
+    # NOTE: description is not converted into SourceDescription object automatically, I haven't
     # found an easy solution how to do it, but there's some momentum https://github.com/tiangolo/sqlmodel/issues/63
-    description: GrapherSourceDescription = Field(sa_column=Column(JSON), nullable=False)
+    description: SourceDescription = Field(sa_column=Column(JSON), nullable=False)
     createdAt: datetime = Field(sa_column=Column("createdAt", DateTime, nullable=False))
     updatedAt: datetime = Field(sa_column=Column("updatedAt", DateTime, nullable=False))
     name: Optional[str] = Field(default=None, sa_column=Column("name", String(512, "utf8mb4_0900_as_cs")))
     datasetId: Optional[int] = Field(default=None, sa_column=Column("datasetId", Integer))
 
-    datasets: Optional["Datasets"] = Relationship(back_populates="sources")
-    variables: List["Variables"] = Relationship(back_populates="sources")
+    datasets: Optional["Dataset"] = Relationship(back_populates="sources")
+    variables: List["Variable"] = Relationship(back_populates="sources")
 
     @classmethod
-    def load_source(cls, session: Session, source_id: int) -> "Sources":
+    def load_source(cls, session: Session, source_id: int) -> "Source":
         source = session.exec(select(cls).where(cls.id == source_id)).one()
-        GrapherSourceDescription.validate(source.description)
-        source.description = GrapherSourceDescription(**source.description)  # type: ignore
+        SourceDescription.validate(source.description)
+        source.description = SourceDescription(**source.description)  # type: ignore
         return source
 
     @classmethod
@@ -575,7 +581,7 @@ class Sources(SQLModel, table=True):
         source_ids: list[int] = [],
         dataset_id: Optional[int] = None,
         variable_ids: list[int] = [],
-    ) -> list["Sources"]:
+    ) -> list["Source"]:
         """Load sources for given dataset & variable ids & source ids."""
         q = """
         select distinct * from (
@@ -660,12 +666,12 @@ class SuggestedChartRevisions(SQLModel, table=True):
         ),
     )
 
-    charts: Optional["Charts"] = Relationship(back_populates="suggested_chart_revisions")
-    users: Optional["Users"] = Relationship(back_populates="suggested_chart_revisions")
-    users_: Optional["Users"] = Relationship(back_populates="suggested_chart_revisions_")
+    charts: Optional["Chart"] = Relationship(back_populates="suggested_chart_revisions")
+    users: Optional["User"] = Relationship(back_populates="suggested_chart_revisions")
+    users_: Optional["User"] = Relationship(back_populates="suggested_chart_revisions_")
 
 
-class Variables(SQLModel, table=True):
+class Variable(SQLModel, table=True):
     """Example:
     {
         'id': 157342,
@@ -687,6 +693,7 @@ class Variables(SQLModel, table=True):
     }
     """
 
+    __tablename__: str = "variables"  # type: ignore
     __table_args__ = (
         ForeignKeyConstraint(["datasetId"], ["datasets.id"], name="variables_datasetId_50a98bfd_fk_datasets_id"),
         ForeignKeyConstraint(["sourceId"], ["sources.id"], name="variables_sourceId_31fce80a_fk_sources_id"),
@@ -719,13 +726,13 @@ class Variables(SQLModel, table=True):
     catalogPath: Optional[str] = Field(default=None, sa_column=Column("catalogPath", String(255, "utf8mb4_0900_as_cs")))
     dimensions: Optional[Dict[Any, Any]] = Field(default=None, sa_column=Column("dimensions", JSON))
 
-    datasets: Optional["Datasets"] = Relationship(back_populates="variables")
-    sources: Optional["Sources"] = Relationship(back_populates="variables")
+    datasets: Optional["Dataset"] = Relationship(back_populates="variables")
+    sources: Optional["Source"] = Relationship(back_populates="variables")
     chart_dimensions: List["ChartDimensions"] = Relationship(back_populates="variables")
     data_values: List["DataValues"] = Relationship(back_populates="variables")
 
     @classmethod
-    def load_variable(cls, session: Session, variable_id: int) -> "Variables":
+    def load_variable(cls, session: Session, variable_id: int) -> "Variable":
         return session.exec(select(cls).where(cls.id == variable_id)).one()
 
 
@@ -745,8 +752,8 @@ class ChartDimensions(SQLModel, table=True):
     chartId: int = Field(sa_column=Column("chartId", Integer, nullable=False))
     variableId: int = Field(sa_column=Column("variableId", Integer, nullable=False))
 
-    charts: Optional["Charts"] = Relationship(back_populates="chart_dimensions")
-    variables: Optional["Variables"] = Relationship(back_populates="chart_dimensions")
+    charts: Optional["Chart"] = Relationship(back_populates="chart_dimensions")
+    variables: Optional["Variable"] = Relationship(back_populates="chart_dimensions")
 
 
 t_country_latest_data = Table(
@@ -777,5 +784,5 @@ class DataValues(SQLModel, table=True):
     entityId: int = Field(sa_column=Column("entityId", Integer, primary_key=True, nullable=False))
     variableId: int = Field(sa_column=Column("variableId", Integer, primary_key=True, nullable=False))
 
-    entities: Optional["Entities"] = Relationship(back_populates="data_values")
-    variables: Optional["Variables"] = Relationship(back_populates="data_values")
+    entities: Optional["Entity"] = Relationship(back_populates="data_values")
+    variables: Optional["Variable"] = Relationship(back_populates="data_values")

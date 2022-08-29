@@ -77,15 +77,15 @@ def backport(
     # get data from database
     with Session(engine) as session:
         lg.info("backport.loading_dataset")
-        ds = gm.Datasets.load_dataset(session, dataset_id)
+        ds = gm.Dataset.load_dataset(session, dataset_id)
         lg.info("backport.loading_variables")
-        vars = gm.Datasets.load_variables_for_dataset(session, dataset_id)
+        vars = gm.Dataset.load_variables_for_dataset(session, dataset_id)
 
         variable_ids = [v.id for v in vars]
 
         # get sources for dataset and all variables
         lg.info("backport.loading_sources")
-        sources = gm.Sources.load_sources(session, dataset_id=ds.id, variable_ids=variable_ids)
+        sources = gm.Source.load_sources(session, dataset_id=ds.id, variable_ids=variable_ids)
 
     short_name = utils.create_short_name(ds.id, ds.name)
 
@@ -140,9 +140,9 @@ def backport(
 
 
 def _load_config(
-    ds: gm.Datasets,
-    vars: list[gm.Variables],
-    sources: list[gm.Sources],
+    ds: gm.Dataset,
+    vars: list[gm.Variable],
+    sources: list[gm.Source],
 ) -> GrapherConfig:
     """Get the configuration of a variable."""
     return GrapherConfig(
@@ -152,7 +152,7 @@ def _load_config(
     )
 
 
-def _walden_values_metadata(ds: gm.Datasets, short_name: str, public: bool) -> WaldenDataset:
+def _walden_values_metadata(ds: gm.Dataset, short_name: str, public: bool) -> WaldenDataset:
     """Create walden dataset for grapher dataset values.
     These datasets are not meant for direct consumption from the catalog, but rather
     for postprocessing in etl.
@@ -172,7 +172,7 @@ def _walden_values_metadata(ds: gm.Datasets, short_name: str, public: bool) -> W
     )
 
 
-def _walden_config_metadata(ds: gm.Datasets, short_name: str, origin_md5: str, public: bool) -> WaldenDataset:
+def _walden_config_metadata(ds: gm.Dataset, short_name: str, origin_md5: str, public: bool) -> WaldenDataset:
     """Create walden dataset for grapher dataset variables and metadata."""
     config = _walden_values_metadata(ds, short_name, public)
     config.short_name = short_name + "_config"
@@ -257,7 +257,7 @@ def _walden_timestamp(short_name: str) -> dt.datetime:
     return cast(dt.datetime, pd.to_datetime(t))
 
 
-def _needs_update(ds: gm.Datasets, short_name: str, md5_config: str) -> bool:
+def _needs_update(ds: gm.Dataset, short_name: str, md5_config: str) -> bool:
     # find existing entry in catalog
     try:
         walden_ds = walden_catalog.find_one(short_name=f"{short_name}_config")

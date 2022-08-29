@@ -18,10 +18,10 @@ log = structlog.get_logger()
 
 
 class GrapherConfig(BaseModel):
-    dataset: gm.Datasets
-    variables: list[gm.Variables]
+    dataset: gm.Dataset
+    variables: list[gm.Variable]
     # NOTE: sources can belong to dataset or variable
-    sources: list[gm.Sources]
+    sources: list[gm.Source]
 
 
 def load_values(short_name: str) -> pd.DataFrame:
