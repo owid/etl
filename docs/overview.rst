@@ -51,6 +51,7 @@ highest level to finest level of detail):
 - **Channel** - this refers
   to the top level folder that communicates the level of processing or the
   special data origin of the data. Important channels are:
+
   - Meadow, Garden and Grapher - these correspond to the logical steps described
     below
   - Backport - these are datasets that were not originally imported
@@ -71,8 +72,7 @@ highest level to finest level of detail):
 A dataset for us is then a collection of at least one data table and
 some metadata. Each table exists in the catalog as three files - one
 json file for the metadata and then one `IPC
-feather <https://arrow.apache.org/docs/python/feather.html>`__ and one
- `Apache
+feather <https://arrow.apache.org/docs/python/feather.html>`__ and one `Apache
 Parquet <https://parquet.apache.org/>`__ that are logically equivalent
 (but some systems prefer one over the other). The
 collection of these files is the end result of running the ETL steps.
@@ -108,6 +108,7 @@ High level pipeline overview
 ----------------------------
 
 On a high level our data pipeline consists of four steps:
+
 - **Ingest the data and store it**. This entails locating data releases,
   downloading the data, storing a snapshot in our external data snaphot
   repository called “Walden”, and collect and store some metadata
@@ -184,7 +185,6 @@ Goals
 -  Enable automatic dependency tracking and recomputing downstream
    dependencies (e.g. all per capita metrics across datasets whenever
    the population dataset is updated)
--
 
 Non-goals
 ~~~~~~~~~
