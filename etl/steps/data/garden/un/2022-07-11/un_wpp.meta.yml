@@ -19,11 +19,15 @@ tables:
         short_unit:
         unit: Persons
         description: Number of births over a given period. Refers to live births for annual civil calendar years from 1 January to 31 December.
+        display:
+          conversionFactor: 1
       child_mortality_rate:
         title: Child mortality rate
         short_unit: "%"
         unit: Percentage
         description: Number of deaths under age 5 over a given period. Refers to annual civil calendar years from 1 January to 31 December.
+        display:
+          conversionFactor: 1
       death_rate:
         title: Death rate
         short_unit: ‰
@@ -34,6 +38,8 @@ tables:
         short_unit:
         unit: Persons
         description: Number of deaths over a given period. Refers to annual civil calendar years from 1 January to 31 December.
+        display:
+          conversionFactor: 1
       dependency_ratio_child:
         title: Child dependency ratio
         short_unit: "%"
@@ -62,11 +68,15 @@ tables:
         short_unit: "%"
         unit: Percentage
         description: Crude birth rate minus the crude death rate. Represents the portion of population growth (or decline) determined exclusively by births and deaths.
+        display:
+          conversionFactor: 1
       growth_rate:
         title: Growth rate
         short_unit: "%"
         unit: Percentage
         description: Average exponential rate of growth of the population over a given period. It is calculated as ln(P2/P1)/n where P1 and P2 are the populations on 1 January of subsequent years, and n is the length of the period between t1 and t2 (n=1 for annual data).
+        display:
+          conversionFactor: 1
       infant_mortality_rate:
         title: Infant mortality rate
         short_unit: "%"
@@ -97,16 +107,22 @@ tables:
         short_unit:
         unit: Persons
         description: De facto population in a country, area or region as of 1 July of the year indicated.
+        display:
+          conversionFactor: 1
       population_broad:
         title: Population by broad age group
         short_unit:
         unit: Persons
         description: De facto population in a country, area or region as of 1 July of the year indicated. Figures are presented in thousands. Alternative metric to 'population', used for different (and groader) age groups.
+        display:
+          conversionFactor: 1
       population_change:
         title: Population change
         short_unit:
         unit: Persons
         description: Population increment over a period, that is, the difference between the population at the end of the period and that at the beginning of the period. Refers to calendar years from 1 July to 30 June.
+        display:
+          conversionFactor: 1
       population_density:
         title: Population density
         short_unit:
