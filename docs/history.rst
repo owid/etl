@@ -1,5 +1,5 @@
-Overview
-========
+History
+=======
 
 .. contents::
     :local:
@@ -8,7 +8,9 @@ Overview
 A brief history
 ---------------
 
-Our World In Data is a data republisher, meaning that we import data from a wide range of upstream data sources and then try to share it with people in standard ways.
+This document gives some more history that is especially relevant for staff at OWID to understand how various pieces of legacy workflows fit in with ETL.
+
+For context, recall that the basic flow of data from institutional publishers to our site is (and has been for a long time), something like this on the high level:
 
 .. mermaid::
     :align: center
@@ -27,7 +29,7 @@ Originally, there was one way to get data in, using the internal Grapher admin s
 
     graph LR
 
-    upstream --> admin --> mysql
+    upstream --> admin (manual upload) --> mysql
 
 Over time, OWID developed a data team and started importing much larger institutional datasets, ones that needed substantial code for importing. This added a second way to get data in, by running code in the ``importers`` repository.
 
@@ -36,7 +38,7 @@ Over time, OWID developed a data team and started importing much larger institut
 
     graph LR
 
-    upstream --> admin --> mysql
+    upstream --> admin (manual upload) --> mysql
     upstream --> importers --> mysql
 
 This project, the ETL, aims replace ``importers``, and make our handling of big institutional datasets even better. It also creates an on-disk data catalog that can be reused outside of our site.
@@ -46,7 +48,7 @@ This project, the ETL, aims replace ``importers``, and make our handling of big 
 
     graph LR
 
-    upstream --> admin --> mysql
+    upstream --> admin (manual upload) --> mysql
     upstream --> etl --> catalog[catalog on disk] --> mysql
 
 The main users of the ETL are data managers. The ETL is desinged to make their work fully repeatable and reviewable. The admin is still available for manual imports, and may be faster for datasets that have been transformed by hand.

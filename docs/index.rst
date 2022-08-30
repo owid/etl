@@ -1,12 +1,22 @@
-Intro to the ETL
-================
+The OWID ETL
+============
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
-   intro
+   overview
    quickstart
+
+Additional information for OWID staff
+=====================================
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Contents:
+
+   histrory
+
 
 Indices and tables
 ==================
