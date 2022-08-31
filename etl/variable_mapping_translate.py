@@ -278,10 +278,6 @@ def _get_partial_df(conn: Engine, var_names: Tuple[str, ...], ds_names: Tuple[st
     return df
 
 
-def _format_query(query: str) -> str:
-    return query.replace("%", "%%")
-
-
 def _sanity_check(conn: Engine, mapping: Dict[str, str]) -> None:
     # build df from local mapping
     df = build_df_from_mapping(conn, mapping)
