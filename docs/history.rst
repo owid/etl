@@ -68,10 +68,10 @@ Our World In Data has a whole team dedicated to data management that takes data 
 To make something chartable on the Our World In Data site, a data manager must:
 
 1. Locate the *upstream* data source
-2. *Download* and keep a copy of the data for later use (:ref:`walden<walden>`)
-3. Bring the data into a *common format* (see: :ref:`meadow<meadow>`)
-4. *Harmonise* the names of countries, genders and any other columns we may want to join on (:ref:`garden<garden>`)
-5. *Import* the data to our internal MySQL database (:ref:`grapher<grapher>`)
+2. *Download* and keep a copy of the data for later use (``walden``)
+3. Bring the data into a *common format* (``meadow``)
+4. *Harmonise* the names of countries, genders and any other columns we may want to join on (``garden``)
+5. *Import* the data to our internal MySQL database (``grapher``)
 
 After these steps, the data is available to be plotted on our site. Alongside the later steps are optional moments for review by data managers or researchers.
 
