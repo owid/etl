@@ -27,14 +27,18 @@ log = structlog.get_logger()
     "-e1",
     "--env-file-1",
     type=str,
-    help=("Path to the configuration file for connection 1. This file should contain all the environment variables required to connect to the SQL. Should be in the format of a .env file."),
+    help=(
+        "Path to the configuration file for connection 1. This file should contain all the environment variables required to connect to the SQL. Should be in the format of a .env file."
+    ),
     required=True,
 )
 @click.option(
     "-e2",
     "--env-file-2",
     type=str,
-    help=("Path to the configuration file for connection 2. This file should contain all the environment variables required to connect to the SQL. Should be in the format of a .env file."),
+    help=(
+        "Path to the configuration file for connection 2. This file should contain all the environment variables required to connect to the SQL. Should be in the format of a .env file."
+    ),
     required=True,
 )
 @click.option(
