@@ -28,7 +28,7 @@ To a first approximation there are two kinds of data sources we ingest in our ET
 Terminology and organization
 ----------------------------
 
-We deal almost exclusively with tabular data. Both our ETL scripts (python scripts or python jupyter notebooks) and the resulting files follow a common hierarchy. Our levels of organization for institutional data matches a structure of nested folders. This means that in the ETL repository you will find a hierarchy of folders in /etl/steps that follows the scheme below and likewise when you run the ETL steps the output data files will end up in /data/ following this hierarchy. Finally, since the output files are published into our catalog, the hierarchy of directories is the same there as well. The levels of hierarchy are as follows (from highest level to finest level of detail):
+We deal almost exclusively with tabular data. Both our ETL scripts (python scripts or python jupyter notebooks) and the resulting files follow a common hierarchy. Our levels of organization for institutional data matches a structure of nested folders. This means that in the ETL repository you will find a hierarchy of folders in ``/etl/steps`` that follows the scheme below and likewise when you run the ETL steps the output data files will end up in ``/data/`` following this hierarchy. Finally, since the output files are published into our catalog, the hierarchy of directories is the same there as well. The levels of hierarchy are as follows (from highest level to finest level of detail):
 
 .. mermaid::
     :align: center
@@ -39,31 +39,31 @@ We deal almost exclusively with tabular data. Both our ETL scripts (python scrip
 
 - **Channel** - this refers to the top level folder that communicates the level of processing or the special data origin of the data. Important channels are:
 
-  - Meadow, Garden and Grapher - these correspond to the logical steps described below
-  - Backport - these are datasets that were not originally imported via scripts here in the ETL repository. This includes both individual research paper data relases and older institutional data imports (roughly before 2022).
-  - Explorer - a special output channel for data that is used by one of our `Data Explorers <https://ourworldindata.org/charts>`__.
-- **Provider** - this is the short form acronym of the institution that is the provider of the data (e.g. WHO, WB, …)
-- **Release** - this level matches the release cadence for datasets that are released yearly, quarterly etc. For datasets that are not released continuously, the special value “latest” is often used
+  - ``meadow``, ``garden`` and ``grapher`` - these correspond to the logical steps described below
+  - ``backport`` - these are datasets that were not originally imported via scripts here in the ETL repository. This includes both individual research paper data relases and older institutional data imports (roughly before 2022).
+  - ``explorers`` - a special output channel for data that is used by one of our `Data Explorers <https://ourworldindata.org/charts>`__.
+- **Provider** - this is the short form acronym of the institution that is the provider of the data (e.g. ``who`` for World Health Organisation, ``wb`` for World Bank, etc.)
+- **Release** - this level matches the release cadence for datasets that are released yearly, quarterly etc. For datasets that are released continuously, the special value ``latest`` is often used
 - **Dataset** - this is a logical grouping of data tables that are released together by the providers as a logical unit.
 
 .. mermaid::
     :align: center
 
     flowchart LR
-      subgraph Dataset1
+      subgraph Dataset
         direction TB
         index.json
-        subgraph Datatable1
+        subgraph Table1
             direction RL
-            datatable1.meta.json
-            datatable1.parquet
-            datatable1.feather
+            table1.meta.json
+            table1.parquet
+            table1.feather
         end
-        subgraph Datatable2
+        subgraph Table2
             direction RL
-            datatable2.meta.json
-            datatable2.parquet
-            datatable2.feather
+            table2.meta.json
+            table2.parquet
+            table2.feather
         end
       end
 
@@ -94,22 +94,72 @@ On a high level our data pipeline consists of four steps:
 
     graph LR
 
-    upstream --> download --> format dataframe --> harmonise --> grapher export --> plot
+    upstream --> download --> format[format dataframe] --> harmonise --> grapher[grapher export] --> plot
 
-- **Ingest the data and store it**. This entails locating data releases, downloading the data, storing a snapshot in our external data snaphot repository called **Walden** (named after `Walden Pond <https://en.wikipedia.org/wiki/Walden_Pond>`_), and collect and store some metadata alongside. At this point in the pipeline, the data exists as a zip file of all the files (or API responses) as they were fetched from the original source.
-- **Extract the data into dataframe form**. This entails bringing the data into pandas data frames and storing them on disk. The data is still in a form very similar to that provided by the upstream data source but it can now be easily loaded as a dataframe. More metadata is often added in this step (e.g. more extensive variable descriptions etc). We call this step **Meadow**, because this is still a relatively “wild” version of the data (as opposed to the more refined and groomed version of the next step which we call “Garden”)
-- **Harmonize common dimensions and enrich the metadata**. This usually involves some data cleaning, adding more metadata like unit information and harmonizing of common dimensions like geographic area. The latter is important so that we can plot data from different data sources in one chart (e.g. a scatter plot of GDP from the world bank and child mortality by the WHO where each mark is a country in a given year). This version of the data is called the **Garden** level as this is a nicely curated, harmonized dataframe optimized for data science work. These dataframes can have more dimensions than our usual country+year combination - for example there can be an additional index column for the age group. For data science uses, this level in our pipeline is the most user friendly one.
-- **Split the data into Grapher’s simpler data model**. Our visualization tool Grapher is optimized for time series display of country level statistics. As such it requires exactly two dimensions for a variable, one of which is the time and the other the “entity” (which is usually the country but can also be something like e.g. fish species for data on fishing that is not country centric). If a variable has additional dimensions like a breakdown by age group, then this has to be split up into several variables, one per distinct value for this dimension (in this case one variable per age group).
+① Ingest the data and store it
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This entails locating data releases, downloading the data, storing a snapshot in our external data snaphot repository called **Walden** (named after `Walden Pond <https://en.wikipedia.org/wiki/Walden_Pond>`_), and collect and store some metadata alongside. At this point in the pipeline, the data exists as a zip file of all the files (or API responses) as they were fetched from the original source.
+
+② Extract the data into dataframe form
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This entails bringing the data into pandas data frames and storing them on disk. The data is still in a form very similar to that provided by the upstream data source but it can now be easily loaded as a dataframe. More metadata is often added in this step (e.g. more extensive variable descriptions etc). We call this step **Meadow**, because this is still a relatively “wild” version of the data (as opposed to the more refined and groomed version of the next step which we call “Garden”)
+
+③ Harmonize common dimensions and enrich the metadata
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This usually involves some data cleaning, adding more metadata like unit information and harmonizing of common dimensions like geographic area. The latter is important so that we can plot data from different data sources in one chart (e.g. a scatter plot of GDP from the world bank and child mortality by the WHO where each mark is a country in a given year). This version of the data is called the **Garden** level as this is a nicely curated, harmonized dataframe optimized for data science work. These dataframes can have more dimensions than our usual country+year combination - for example there can be an additional index column for the age group. For data science uses, this level in our pipeline is the most user friendly one.
+
+④ Split the data into Grapher's simpler data model
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Our visualization tool Grapher is optimized for time series display of country level statistics. As such it uses a restricted data model that makes this use case easier, but makes other use cases harder. 
+
+.. admonition:: Key point
+
+    All data visualised on the Our World In Data site is represented internally as a four-tuple: 
+
+    ``(time, entity, variable, value)``
+
+    This is flexible enough to capture all kinds of data, but struggles with datasets with subcategories, dimensions and fine detail.
+
+For example, a variable representing GDP in international $ will have a value for Australia in 1990. The tuple for the could be ``(1990, "Australia", "GDP intl. $", 31016)``.
+
+In general data analysis, a variable could have extra dimensions. For example, deaths over time could be broken down by country, cause, gender and age group. Since grapher's data model cannot contain these dimensions, we expand them into many variables.
+
+.. mermaid:: 
+
+    graph LR
+
+    Deaths[Deaths] --> male[Deaths - Male]
+    Deaths --> female[Deaths - Female]
+    Deaths --> both[Deaths - Both genders]
+
+    male --> male_0_5[Deaths - Male - 0-5 years old]
+    male --> male_5_10[Deaths - Male - 5-10 years old]
+    male --> male_dot_dot[Deaths - Male - ...]
+
+    female --> female_dot_dot[Deaths - Female - ...]
+
+    both --> both_dot_dot[Deaths - Both genders - ...]
+
+The data now fits grapher's data model and can be charted.
+
+If the ``entity`` is a country, then a map view will be enabled in Grapher plots, but in general the ``entity`` could be anything, for example species of fish, types of energy production, etc.
+
+In general data analysis, the line between what should be interpreted as ``variable`` vs ``entity`` is not always clear cut. The data can often be pivoted either way depending on what makes sense for visualisation.
+
 
 Harmonization tables
 --------------------
 
-For important and common index columns, notably countries/regions, there exists a dataframe that enumerates the set of commonly understood entities - for the most important countries/regions file this is the `countries_regions.csv <../data/garden/reference/countries_regions.csv>`__. In this dataframe all countries and geographic regions are listed with their unique code used at Our World In Data (in the case of country/region we use ISO Alpha 3 country codes as a base but add additional ones for entities that we need that do not have such a code assigned like some historic entities), as well as additional information like contained smaller units, additional third party identifiers, etc.
+For important and common index columns, notably countries/regions, there exists a dataframe that enumerates the set of commonly understood entities - for the most important countries/regions file this is the `countries_regions.csv <../data/garden/reference/countries_regions.csv>`_. In this dataframe all countries and geographic regions are listed with their unique code used at Our World In Data (in the case of country/region we use ISO Alpha 3 country codes as a base but add additional ones for entities that we need that do not have such a code assigned like some historic entities), as well as additional information like contained smaller units, additional third party identifiers, etc.
 
 Layout of the ETL repository
 ----------------------------
 
-The `ETL github repository`_  contains the code of the OWID ETL pipeline. For every dataset release there exists a folder in /etl/steps with the python code to take this dataset from the walden snapshot stage all the way through the pipeline (usually all the way to the Grapher stage). When running the etl command, either a subset or all of these steps are executed and produce their output dataframes and acompanying metadat files in /data. The folder structure between the steps and the produced data files matches closely by convention (some scripts generate more than one table but the folder structure is still mirrored between steps and data folders.)
+The `ETL github repository`_  contains the code of the OWID ETL pipeline. For every dataset release there exists a folder in ``/etl/steps`` with the python code to take this dataset from the walden snapshot stage all the way through the pipeline (usually all the way to the Grapher stage). When running the etl command, either a subset or all of these steps are executed and produce their output dataframes and acompanying metadat files in ``/data``. The folder structure between the steps and the produced data files matches closely by convention (some scripts generate more than one table but the folder structure is still mirrored between steps and data folders.)
 
 Design goals and non-goals of the ETL
 -------------------------------------
