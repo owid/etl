@@ -232,35 +232,35 @@ def sanity_checks(
         "Location",
         "LocID",
         "LocTypeName",
-        ["Geographic region", "Income group", "Country/Area", "World"],
+        ["Geographic region", "Income group", "Country/Area", "World", "Development group"],  # , "SDG region"],
     )
     df_fertility = _sanity_checks(
         df_fertility,
         "Location",
         "LocID",
         "LocTypeName",
-        ["Geographic region", "Income group", "Country/Area", "World"],
+        ["Geographic region", "Income group", "Country/Area", "World", "Development group"],  # , "SDG region"],
     )
     df_demographics = _sanity_checks(
         df_demographics,
         "Location",
         "LocID",
         "LocTypeName",
-        ["Geographic region", "Income group", "Country/Area", "World"],
+        ["Geographic region", "Income group", "Country/Area", "World", "Development group"],  # , "SDG region"],
     )
     df_depratio = _sanity_checks(
         df_depratio,
         "Region, subregion, country or area *",
         "Location code",
         "Type",
-        ["Region", "Income Group", "Country/Area", "World"],
+        ["Region", "Income Group", "Country/Area", "World", "Development Group"],  # , "SDG region"],
     )
     df_deaths = _sanity_checks(
         df_deaths,
         "Region, subregion, country or area *",
         "Location code",
         "Type",
-        ["Region", "Income Group", "Country/Area", "World"],
+        ["Region", "Income Group", "Country/Area", "World", "Development Group"],  # , "SDG region"],
     )
     return df_population, df_fertility, df_demographics, df_depratio, df_deaths
 
@@ -348,6 +348,8 @@ def _sanity_checks(
     column_location_type: Optional[str] = None,
     location_type_values: List[str] = [],
 ) -> pd.DataFrame:
+    # Quick filter
+    # df = df[-((df[column_location] == "Latin America and Caribbean") & (df[column_location_type] == "SDG region"))]
     # There are some duplicates. Some locations appear with two different location IDs, but same data.
     if column_location_type:
         df = df[df[column_location_type].isin(location_type_values)]

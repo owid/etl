@@ -6,7 +6,7 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = "ETL"
+project = "Data at OWID"
 copyright = "2022, Our World In Data <tech@ourworldindata.org>"
 author = "Our World In Data <tech@ourworldindata.org>"
 
