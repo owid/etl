@@ -18,6 +18,7 @@ data/*
 data/garden/*
 !data/garden/reference/
 .env
+.env.*
 *.dot
 *.pdf
 pyrightconfig.json
