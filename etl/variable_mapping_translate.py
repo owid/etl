@@ -1,8 +1,8 @@
-"""Translate the variable mapping dictionary from the old (connection 1) to the new (connection 2) database.
+"""Translate the variable mapping dictionary from environment 1 to environment 2.
 
 
-That is, the variable IDs for the same variables may differ between databases in local, staging or production environments.
-If you have the variable mapping for some of the environments, you can easily translate this mapping based on another environment using this command.
+That is, the variable IDs for the same variables may differ between environments (local, staging or production environments).
+If you have the variable mapping for one of the environments, you can easily obtain the equivalent for another environment using this command.
 
 A common use case is when you have the mapping for your local environment and wish to have the equivalent for the production environment. Instead
 of creating yet again the mapping for the production environment, simply run this command which will 'translate' the mapping you found for your
