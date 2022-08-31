@@ -142,7 +142,7 @@ def _build_engine(conf: Dict[str, str]) -> Engine:
     return create_engine("mysql://{user}:{password}@{host}:{port}/{db}?charset=utf8mb4".format(**conf))
 
 
-def variable_mapping_translate(conn_1: Engine, conn_2: Engine, mapping: Dict[str, str]) -> Dict[str, str]:
+def variable_mapping_translate(sql_1: Engine, sql_2: Engine, mapping: Dict[str, str]) -> Dict[str, str]:
     """Obtain equivalent variable mapping from old to new DB.
 
     Parameters
@@ -160,14 +160,14 @@ def variable_mapping_translate(conn_1: Engine, conn_2: Engine, mapping: Dict[str
     """
     # Get info from connection 1
     log.info("Getting variable details from database 1...")
-    df = build_df_from_mapping(conn_1, mapping)
+    df = build_df_from_mapping(sql_1, mapping)
     # Get ids from connection 2
     log.info("Get IDs from database 2...")
-    mapping_new = build_mapping_from_df(conn_2, df)
+    mapping_new = build_mapping_from_df(sql_2, df)
     return mapping_new
 
 
-def build_df_from_mapping(conn: Engine, mapping: Dict[str, str]) -> pd.DataFrame:
+def build_df_from_mapping(sql: Engine, mapping: Dict[str, str]) -> pd.DataFrame:
     """Build dataframe from variable ids.
 
     Contains variable id, variable name and dataset name for the old and new variables.
@@ -182,17 +182,17 @@ def build_df_from_mapping(conn: Engine, mapping: Dict[str, str]) -> pd.DataFrame
     pandas.DataFrame:
         Dataframe with all variable info.
     """
-    df_old, df_new = _build_dfs(conn, mapping)
+    df_old, df_new = _build_dfs(sql, mapping)
     df = _merge_dfs(df_old, df_new, mapping)
     return df
 
 
-def _run_query_mapping_to_df(conn: Engine, variable_ids: Tuple[str, ...]) -> pd.DataFrame:
+def _run_query_mapping_to_df(sql: Engine, variable_ids: Tuple[str, ...]) -> pd.DataFrame:
     """Get complete variable df from variable ids.
 
     Parameters
     ----------
-    conn : Engine
+    sql : Engine
         DB connection object.
     variable_ids: list
         List with variable ids.
@@ -208,16 +208,16 @@ def _run_query_mapping_to_df(conn: Engine, variable_ids: Tuple[str, ...]) -> pd.
         left join datasets on variables.datasetId=datasets.id
         where variables.id in %(variable_ids)s;
     """
-    df: pd.DataFrame = pd.read_sql_query(query, conn, params={"variable_ids": variable_ids})
+    df: pd.DataFrame = pd.read_sql_query(query, sql, params={"variable_ids": variable_ids})
     return df
 
 
-def _build_dfs(conn: Engine, mapping: Dict[str, str]) -> Tuple[pd.DataFrame, pd.DataFrame]:
+def _build_dfs(sql: Engine, mapping: Dict[str, str]) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """Build dataframes for old and new variable ids using mapping."""
     ids_old: Tuple[str, ...] = tuple(mapping.keys())
     ids_new: Tuple[str, ...] = tuple(mapping.values())
-    df_old = _run_query_mapping_to_df(conn, ids_old)
-    df_new = _run_query_mapping_to_df(conn, ids_new)
+    df_old = _run_query_mapping_to_df(sql, ids_old)
+    df_new = _run_query_mapping_to_df(sql, ids_new)
     return df_old, df_new
 
 
@@ -230,12 +230,12 @@ def _merge_dfs(df_old: pd.DataFrame, df_new: pd.DataFrame, mapping: Dict[str, st
     return df
 
 
-def build_mapping_from_df(conn: Engine, df: pd.DataFrame) -> Dict[str, str]:
+def build_mapping_from_df(sql: Engine, df: pd.DataFrame) -> Dict[str, str]:
     """_summary_
 
     Parameters
     ----------
-        conn: Engine
+        sql: Engine
             DB connection object.
         df: pd.DataFrame
             DataFrame with variable info.
@@ -245,18 +245,18 @@ def build_mapping_from_df(conn: Engine, df: pd.DataFrame) -> Dict[str, str]:
         dict: New variable mapping dictionary.
     """
     # Get old and new data from DB
-    df_old = _build_individual_df(conn, df, "name_old", "dataset_name_old")
-    df_new = _build_individual_df(conn, df, "name_new", "dataset_name_new")
+    df_old = _build_individual_df(sql, df, "name_old", "dataset_name_old")
+    df_new = _build_individual_df(sql, df, "name_new", "dataset_name_new")
     # Merge into single df
     df = _merge_dfs_old_new(df, df_old, df_new)
     dix: Dict[str, str] = df.set_index("id_old").squeeze().to_dict()
     return dix
 
 
-def _build_individual_df(conn: Engine, df: pd.DataFrame, column_name: str, column_dataset_name: str) -> pd.DataFrame:
+def _build_individual_df(sql: Engine, df: pd.DataFrame, column_name: str, column_dataset_name: str) -> pd.DataFrame:
     var_names: Tuple[str, ...] = tuple(df[column_name].tolist())
     ds_names: Tuple[str, ...] = tuple(df[column_dataset_name].tolist())
-    df_ = _get_partial_df(conn, var_names, ds_names)
+    df_ = _get_partial_df(sql, var_names, ds_names)
     return df_
 
 
@@ -267,22 +267,22 @@ def _merge_dfs_old_new(df: pd.DataFrame, df_old: pd.DataFrame, df_new: pd.DataFr
     return df
 
 
-def _get_partial_df(conn: Engine, var_names: Tuple[str, ...], ds_names: Tuple[str, ...]) -> pd.DataFrame:
+def _get_partial_df(sql: Engine, var_names: Tuple[str, ...], ds_names: Tuple[str, ...]) -> pd.DataFrame:
     names = tuple(f"{v}_{d}" for v, d in zip(var_names, ds_names))
     query = """
         select variables.id id, variables.name name, datasets.name dataset_name from variables
         left join datasets on variables.datasetId = datasets.id
         where CONCAT(variables.name, '_', datasets.name) in %(names)s;
     """
-    df: pd.DataFrame = pd.read_sql_query(query, conn, params={"names": names})
+    df: pd.DataFrame = pd.read_sql_query(query, sql, params={"names": names})
     return df
 
 
-def _sanity_check(conn: Engine, mapping: Dict[str, str]) -> None:
+def _sanity_check(sql: Engine, mapping: Dict[str, str]) -> None:
     # build df from local mapping
-    df = build_df_from_mapping(conn, mapping)
+    df = build_df_from_mapping(sql, mapping)
     # build mapping from names
-    mapping_2 = build_mapping_from_df(conn, df)
+    mapping_2 = build_mapping_from_df(sql, df)
 
     # local check
     assert set(mapping_2.keys()) == set(mapping.keys())
