@@ -7,8 +7,11 @@ import click
 import structlog
 from owid.catalog import CHANNEL, LocalCatalog
 
+from etl import config
 from etl.command import construct_dag
 from etl.steps import paths
+
+config.enable_bugsnag()
 
 log = structlog.get_logger()
 

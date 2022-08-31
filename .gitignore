@@ -28,3 +28,6 @@ examples/data/*
 
 playground.ipynb
 !walkthrough/**/playground.ipynb
+
+docs/_build
+docs/.vscode

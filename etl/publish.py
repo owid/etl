@@ -22,6 +22,8 @@ from owid.catalog.datasets import FileFormat
 from etl import config, files
 from etl.paths import DATA_DIR
 
+config.enable_bugsnag()
+
 
 class CannotPublish(Exception):
     pass
