@@ -1,5 +1,5 @@
-Our World In Data ETL overview
-==============================
+Overview
+========
 
 At Our World In Data we ingest, transform and curate data from many different sources. We call this process the Our World in Data ETL (ETL is short for Extract, Transform & Load). The `ETL github repository <https://github.com/owid/etl>`_  is a crucial part of this process. It is set up in a way that allows anyone to rebuild and inspect all steps in our data processing on their own computers so that all of curation choices can be understood, alternatives investigated and problems fixed if there are any.
 
