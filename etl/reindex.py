@@ -10,7 +10,10 @@ from typing import Optional
 import click
 from owid.catalog import CHANNEL, LocalCatalog
 
+from etl import config
 from etl.paths import DATA_DIR
+
+config.enable_bugsnag()
 
 
 @click.command()
