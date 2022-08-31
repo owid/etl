@@ -1,4 +1,4 @@
-The OWID ETL
+Data at OWID
 ============
 
 .. toctree::
@@ -7,16 +7,7 @@ The OWID ETL
 
    overview
    quickstart
-
-Additional information for OWID staff
-=====================================
-
-.. toctree::
-   :maxdepth: 2
-   :caption: Contents:
-
-   histrory
-
+   staff
 
 Indices and tables
 ==================
