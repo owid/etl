@@ -28,7 +28,8 @@ log = structlog.get_logger()
     "--env-file-1",
     type=str,
     help=(
-        "Path to the configuration file for connection 1. This file should contain all the environment variables required to connect to the SQL. Should be in the format of a .env file."
+        "Path to the configuration file for connection 1. This file should contain all the environment variables"
+        " required to connect to the SQL. Should be in the format of a .env file."
     ),
     required=True,
 )
@@ -37,7 +38,8 @@ log = structlog.get_logger()
     "--env-file-2",
     type=str,
     help=(
-        "Path to the configuration file for connection 2. This file should contain all the environment variables required to connect to the SQL. Should be in the format of a .env file."
+        "Path to the configuration file for connection 2. This file should contain all the environment variables"
+        " required to connect to the SQL. Should be in the format of a .env file."
     ),
     required=True,
 )
@@ -45,7 +47,10 @@ log = structlog.get_logger()
     "-m1",
     "--mapping-file-1",
     type=str,
-    help="Path to the JSON file containing the variable mapping from connection 1. This file should have been previously created and curated by the user. See command `etl-match-variables` to create this file.",
+    help=(
+        "Path to the JSON file containing the variable mapping from connection 1. This file should have been previously"
+        " created and curated by the user. See command `etl-match-variables` to create this file."
+    ),
     required=True,
 )
 @click.option(
@@ -197,13 +202,13 @@ def _run_query_mapping_to_df(conn: Engine, variable_ids: Tuple[str, ...]) -> pd.
     pandas.DataFrame :
         Dataframe with variable fields: `id`, `name` and `dataset_name`.
     """
-    query = f"""
+    query = """
         select variables.id id, variables.name name, datasets.name dataset_name
         from variables
         left join datasets on variables.datasetId=datasets.id
-        where variables.id in {variable_ids};
+        where variables.id in %(variable_ids)s;
     """
-    df: pd.DataFrame = pd.read_sql_query(_format_query(query), conn)
+    df: pd.DataFrame = pd.read_sql_query(query, conn, params={"variable_ids": variable_ids})
     return df
 
 
@@ -264,12 +269,12 @@ def _merge_dfs_old_new(df: pd.DataFrame, df_old: pd.DataFrame, df_new: pd.DataFr
 
 def _get_partial_df(conn: Engine, var_names: Tuple[str, ...], ds_names: Tuple[str, ...]) -> pd.DataFrame:
     names = tuple(f"{v}_{d}" for v, d in zip(var_names, ds_names))
-    query = f"""
+    query = """
         select variables.id id, variables.name name, datasets.name dataset_name from variables
         left join datasets on variables.datasetId = datasets.id
-        where CONCAT(variables.name, '_', datasets.name) in {names}
+        where CONCAT(variables.name, '_', datasets.name) in %(names)s;
     """
-    df: pd.DataFrame = pd.read_sql_query(_format_query(query), conn)
+    df: pd.DataFrame = pd.read_sql_query(query, conn, params={"names": names})
     return df
 
 
