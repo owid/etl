@@ -19,8 +19,8 @@ To a first approximation there are two kinds of data sources we ingest in our ET
 
     graph LR
 
-    institutional data --> etl --> catalog[catalog on disk] --> Grapher
-    individual research dataset --> Grapher web admin --> Grapher
+    upstream[institutional data] --> etl --> catalog[catalog on disk] --> Grapher
+    researchers[individual research dataset] --> admin[Grapher web admin] --> Grapher
 
 -  **Institutional data** like that published by the World Bank, the World Health Organisation etc.. These are often large, complex and periodically updated data releases. This kind of data is the main focus of this repository for the time being.
 -  **Individual research dataset releases**. These are usually small datasets published as part of academic papers. They are often originally only a single CSV or Excel file. Such files have historically been uploaded directly into the MySQL database of Grapher, our visualisation system. While these kinds of data sources will be ingested as part of this repository eventually, as of Summer 2022 they exist in ETL only as backported artifacts.
