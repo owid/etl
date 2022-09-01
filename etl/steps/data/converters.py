@@ -37,11 +37,11 @@ def convert_walden_metadata(wd: WaldenDataset) -> DatasetMeta:
 def convert_grapher_source(s: gm.Source) -> Source:
     return Source(
         name=s.name,
-        description=s.description.additionalInfo,
-        url=s.description.link,
-        date_accessed=s.description.retrievedDate,
-        published_by=s.description.dataPublishedBy,
-        publisher_source=s.description.dataPublisherSource,
+        description=s.description.get("additionalInfo"),
+        url=s.description.get("link"),
+        date_accessed=s.description.get("retrievedDate"),
+        published_by=s.description.get("dataPublishedBy"),
+        publisher_source=s.description.get("dataPublisherSource"),
     )
 
 
