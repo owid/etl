@@ -406,7 +406,7 @@ t_dataset_tags = Table(
 )
 
 
-class SourceDescription(TypedDict):
+class SourceDescription(TypedDict, total=False):
     link: Optional[str]
     retrievedDate: Optional[str]
     additionalInfo: Optional[str]
