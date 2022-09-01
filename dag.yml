@@ -10,12 +10,12 @@ steps:
   data://garden/owid/latest/key_indicators:
     - data://garden/hyde/2017/baseline
     - data://garden/gapminder/2019-12-10/population
-    - data://garden/wpp/2019/standard_projections
+    - data://garden/un/2019/un_wpp
     - data://garden/wb/2021-07-01/wb_income
     - data://open_numbers/open_numbers/latest/open_numbers__world_development_indicators
     - data://garden/reference
-  data://garden/wpp/2019/standard_projections:
-    - data://meadow/wpp/2019/standard_projections
+  data://garden/un/2019/un_wpp:
+    - data://meadow/un/2019/un_wpp
   data://garden/who/2021-07-01/ghe:
     - data://meadow/who/2021-07-01/ghe
     - data://garden/reference
@@ -40,7 +40,7 @@ steps:
     - walden://who/2021-07-01/ghe
   data://meadow/who/2021-07-01/gho:
     - walden://who/2021-07-01/gho
-  data://meadow/wpp/2019/standard_projections:
+  data://meadow/un/2019/un_wpp:
     - walden://wpp/2019/standard_projections
   grapher://who/2021-07-01/ghe:
     - data://garden/who/2021-07-01/ghe
