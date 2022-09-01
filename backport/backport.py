@@ -86,7 +86,7 @@ class PotentialBackport:
             self.variable_ids = [v.id for v in vars]  # type: ignore
 
             # get sources for dataset and all variables
-            sources = gm.Source.load_sources(session, dataset_id=ds.id, variable_ids=self.variable_ids)  # type: ignore
+            sources = gm.Source.load_sources(session, dataset_id=ds.id, variable_ids=self.variable_ids)
 
         self.ds = ds
         self.config = _load_config(ds, vars, sources)

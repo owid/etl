@@ -11,6 +11,7 @@ from urllib.parse import quote
 
 import pandas as pd
 import structlog
+from owid import catalog
 from sqlalchemy import (
     BigInteger,
     Computed,
@@ -345,6 +346,20 @@ class Dataset(SQLModel, table=True):
         return session.exec(q).one()
 
     @classmethod
+    def from_dataset_metadata(cls, metadata: catalog.DatasetMeta, namespace: str, user_id: int) -> "Dataset":
+        assert metadata.title
+        return cls(
+            shortName=metadata.short_name,
+            name=metadata.title,
+            version=metadata.version,
+            namespace=namespace,
+            metadataEditedByUserId=user_id,
+            dataEditedByUserId=user_id,
+            createdByUserId=user_id,
+            description=metadata.description or "",
+        )
+
+    @classmethod
     def load_dataset(cls, session: Session, dataset_id: int) -> "Dataset":
         return session.exec(select(cls).where(cls.id == dataset_id)).one()
 
@@ -475,6 +490,25 @@ class Source(SQLModel, table=True):
             cls.datasetId == self.datasetId,
         )
         return session.exec(q).one()
+
+    @classmethod
+    def from_catalog_source(cls, source: catalog.Source, dataset_id: int) -> "Source":
+        if source.name is None:
+            raise ValueError("Source name was None - please fix this in the metadata.")
+
+        return Source(
+            name=source.name,
+            datasetId=dataset_id,
+            description=SourceDescription(
+                link=source.url,
+                retrievedDate=source.date_accessed,
+                dataPublishedBy=source.published_by,
+                dataPublisherSource=source.publisher_source,
+                # NOTE: we remap `description` to additionalInfo since that is what is shown as `Description` in
+                # the admin UI. Clean this up with the new data model
+                additionalInfo=source.description,
+            ),
+        )
 
     @classmethod
     def load_source(cls, session: Session, source_id: int) -> "Source":
@@ -681,6 +715,25 @@ class Variable(SQLModel, table=True):
             cls.datasetId == self.datasetId,
         )
         return session.exec(q).one()
+
+    @classmethod
+    def from_variable_metadata(
+        cls, metadata: catalog.VariableMeta, short_name: str, timespan: str, dataset_id: int, source_id: int
+    ) -> "Variable":
+        assert metadata.unit
+        assert metadata.display
+        return cls(
+            shortName=short_name,
+            name=metadata.title,
+            sourceId=source_id,
+            datasetId=dataset_id,
+            description=metadata.description,
+            unit=metadata.unit,
+            shortUnit=metadata.short_unit,
+            timespan=timespan,
+            coverage="",
+            display=metadata.display,
+        )
 
     @classmethod
     def load_variable(cls, session: Session, variable_id: int) -> "Variable":

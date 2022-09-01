@@ -73,6 +73,8 @@ def upsert_dataset(dataset: catalog.Dataset, namespace: str, sources: List[catal
 
     engine = gm.get_engine()
 
+    short_name = dataset.metadata.short_name
+
     # This function creates the dataset table row, a namespace row
     # and the sources table row(s). There is a bit of an open question if we should
     # map one dataset with N tables to one namespace and N datasets in
@@ -86,31 +88,24 @@ def upsert_dataset(dataset: catalog.Dataset, namespace: str, sources: List[catal
 
         log.info(
             "upsert_dataset.upsert_dataset.start",
-            short_name=dataset.metadata.short_name,
+            short_name=short_name,
         )
-        user_id = int(cast(str, config.GRAPHER_USER_ID))
-        ds = gm.Dataset(
-            shortName=dataset.metadata.short_name,
-            name=dataset.metadata.title,
-            version=dataset.metadata.version,
-            namespace=namespace,
-            metadataEditedByUserId=user_id,
-            dataEditedByUserId=user_id,
-            createdByUserId=user_id,
-            description=dataset.metadata.description or "",
-        )
+        ds = gm.Dataset.from_dataset_metadata(
+            dataset.metadata, namespace=namespace, user_id=int(cast(str, config.GRAPHER_USER_ID))
+        ).upsert(session)
+
         ds = ds.upsert(session)
         assert ds.id
         if ds.isArchived:
             log.warning(
                 "upsert_dataset.dataset_is_archived",
                 id=ds.id,
-                short_name=ds.shortName,
+                short_name=short_name,
             )
 
         log.info(
             "upsert_dataset.upsert_dataset.end",
-            short_name=dataset.metadata.short_name,
+            short_name=short_name,
             id=ds.id,
         )
 
@@ -126,25 +121,12 @@ def upsert_dataset(dataset: catalog.Dataset, namespace: str, sources: List[catal
 
 def _upsert_source_to_db(source: catalog.Source, dataset_id: int) -> int:
     """Upsert source and return its id"""
-    if source.name is None:
-        raise ValueError("Source name was None - please fix this in the metadata.")
-
+    # NOTE: we need the lock because upserts can happen in multiple threads and `sources` table
+    # has no unique constraint on `name`. It can be removed once we switch to variable views
+    # and stop using threads
     with source_table_lock:
         with Session(gm.get_engine()) as session:
-            db_source = gm.Source(
-                name=source.name,
-                datasetId=dataset_id,
-                description=gm.SourceDescription(
-                    link=source.url,
-                    retrievedDate=source.date_accessed,
-                    dataPublishedBy=source.published_by,
-                    dataPublisherSource=source.publisher_source,
-                    # NOTE: we remap `description` to additionalInfo since that is what is shown as `Description` in
-                    # the admin UI. Clean this up with the new data model
-                    additionalInfo=source.description,
-                ),
-            )
-            db_source = db_source.upsert(session)
+            db_source = gm.Source.from_catalog_source(source, dataset_id).upsert(session)
             assert db_source.id
             return db_source.id
 
@@ -224,19 +206,13 @@ def upsert_table(table: catalog.Table, dataset_upsert_result: DatasetUpsertResul
             #   optimize this if this turns out to be a bottleneck
             source_id = _upsert_source_to_db(source, dataset_upsert_result.dataset_id)
 
-        variable = gm.Variable(
-            shortName=column_name,
-            name=table[column_name].title,
-            sourceId=source_id,
-            datasetId=dataset_upsert_result.dataset_id,
-            description=table[column_name].metadata.description,
-            unit=table[column_name].metadata.unit,
-            shortUnit=table[column_name].metadata.short_unit,
+        variable = gm.Variable.from_variable_metadata(
+            table[column_name].metadata,
+            short_name=column_name,
             timespan=timespan,
-            coverage="",
-            display=table[column_name].metadata.display,
-        )
-        variable = variable.upsert(session)
+            dataset_id=dataset_upsert_result.dataset_id,
+            source_id=source_id,
+        ).upsert(session)
         assert variable.id
 
         session.commit()
