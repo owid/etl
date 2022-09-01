@@ -16,6 +16,7 @@ fasttrack = 'backport.fasttrack:fasttrack'
 walkthrough = 'walkthrough.cli:cli'
 run_python_step = 'etl.run_python_step:main'
 compare = 'etl.compare:cli'
+generate_graph = 'etl.to_graphviz:to_graphviz'
 etl-match-variables = 'etl.match_variables_from_two_versions_of_a_dataset:main_cli'
 etl-translate-varmap = 'etl.variable_mapping_translate:main_cli'
 

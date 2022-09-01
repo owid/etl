@@ -2,18 +2,23 @@
 #  to_graphviz.py
 #
 
+from typing import Optional
+
 import click
 
-from etl.steps import load_dag
+from etl.steps import filter_to_subgraph, load_dag
 
 
 @click.command()
 @click.argument("output_file")
-def to_graphviz(output_file: str) -> None:
+@click.option("--filter", help="Filter the DAG by regex")
+def to_graphviz(output_file: str, filter: Optional[str] = None) -> None:
     """
     Generate a DOT file that can be rendered by Graphviz to see all dependencies.
     """
     dag = load_dag()
+    if filter:
+        dag = filter_to_subgraph(dag, includes=[filter])
 
     font_name = "Lato"
 
