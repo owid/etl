@@ -12,7 +12,6 @@ from urllib.parse import quote
 import pandas as pd
 import structlog
 from sqlalchemy import (
-    TIMESTAMP,
     BigInteger,
     Computed,
     DateTime,
@@ -23,14 +22,7 @@ from sqlalchemy import (
     Table,
     text,
 )
-from sqlalchemy.dialects.mysql import (
-    INTEGER,
-    LONGBLOB,
-    LONGTEXT,
-    MEDIUMTEXT,
-    TINYINT,
-    VARCHAR,
-)
+from sqlalchemy.dialects.mysql import LONGBLOB, LONGTEXT, MEDIUMTEXT, TINYINT, VARCHAR
 from sqlalchemy.future import Engine as _FutureEngine
 from sqlmodel import (
     JSON,
@@ -83,31 +75,6 @@ t_active_datasets = Table(
 )
 
 
-class CountryNameToolContinent(SQLModel, table=True):
-    __table_args__ = (
-        Index("continent_code", "continent_code", unique=True),
-        Index("continent_name", "continent_name", unique=True),
-    )
-
-    id: Optional[int] = Field(default=None, sa_column=Column("id", Integer, primary_key=True))
-    continent_code: str = Field(sa_column=Column("continent_code", String(255, "utf8mb4_0900_as_cs"), nullable=False))
-    continent_name: str = Field(sa_column=Column("continent_name", String(255, "utf8mb4_0900_as_cs"), nullable=False))
-
-    country_name_tool_countrydata: List["CountryNameToolCountrydata"] = Relationship(
-        back_populates="country_name_tool_continent"
-    )
-
-
-class Details(SQLModel, table=True):
-    __table_args__ = (Index("category", "category", "term", unique=True),)
-
-    id: Optional[int] = Field(default=None, sa_column=Column("id", Integer, primary_key=True))
-    category: str = Field(sa_column=Column("category", String(255, "utf8mb4_0900_as_cs"), nullable=False))
-    term: str = Field(sa_column=Column("term", String(255, "utf8mb4_0900_as_cs"), nullable=False))
-    title: str = Field(sa_column=Column("title", String(255, "utf8mb4_0900_as_cs"), nullable=False))
-    content: str = Field(sa_column=Column("content", String(1023, "utf8mb4_0900_as_cs"), nullable=False))
-
-
 class Entity(SQLModel, table=True):
     __tablename__: str = "entities"  # type: ignore
     __table_args__ = (Index("code", "code", unique=True), Index("name", "name", unique=True))
@@ -121,62 +88,6 @@ class Entity(SQLModel, table=True):
     code: Optional[str] = Field(default=None, sa_column=Column("code", String(255, "utf8mb4_0900_as_cs")))
 
     data_values: List["DataValues"] = Relationship(back_populates="entities")
-
-
-class ImporterAdditionalcountryinfo(SQLModel, table=True):
-    id: Optional[int] = Field(default=None, sa_column=Column("id", Integer, primary_key=True))
-    country_code: str = Field(sa_column=Column("country_code", String(255, "utf8mb4_0900_as_cs"), nullable=False))
-    country_name: str = Field(sa_column=Column("country_name", String(255, "utf8mb4_0900_as_cs"), nullable=False))
-    dataset: str = Field(sa_column=Column("dataset", String(255, "utf8mb4_0900_as_cs"), nullable=False))
-    country_wb_region: Optional[str] = Field(
-        default=None, sa_column=Column("country_wb_region", String(255, "utf8mb4_0900_as_cs"))
-    )
-    country_wb_income_group: Optional[str] = Field(
-        default=None, sa_column=Column("country_wb_income_group", String(255, "utf8mb4_0900_as_cs"))
-    )
-    country_special_notes: Optional[str] = Field(default=None, sa_column=Column("country_special_notes", LONGTEXT))
-    country_latest_census: Optional[str] = Field(
-        default=None, sa_column=Column("country_latest_census", String(255, "utf8mb4_0900_as_cs"))
-    )
-    country_latest_survey: Optional[str] = Field(
-        default=None, sa_column=Column("country_latest_survey", String(255, "utf8mb4_0900_as_cs"))
-    )
-    country_recent_income_source: Optional[str] = Field(
-        default=None, sa_column=Column("country_recent_income_source", String(255, "utf8mb4_0900_as_cs"))
-    )
-
-
-class ImporterImporthistory(SQLModel, table=True):
-    id: Optional[int] = Field(default=None, sa_column=Column("id", Integer, primary_key=True))
-    import_type: str = Field(sa_column=Column("import_type", String(255, "utf8mb4_0900_as_cs"), nullable=False))
-    import_time: datetime = Field(sa_column=Column("import_time", DateTime, nullable=False))
-    import_notes: str = Field(sa_column=Column("import_notes", LONGTEXT, nullable=False))
-    import_state: str = Field(sa_column=Column("import_state", LONGTEXT, nullable=False))
-
-
-class KnexMigrations(SQLModel, table=True):
-    id: Optional[int] = Field(default=None, sa_column=Column("id", INTEGER, primary_key=True))
-    migration_time: datetime = Field(
-        sa_column=Column(
-            "migration_time",
-            TIMESTAMP,
-            nullable=False,
-            server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"),
-        )
-    )
-    name: Optional[str] = Field(default=None, sa_column=Column("name", String(255, "utf8mb4_0900_as_cs")))
-    batch: Optional[int] = Field(default=None, sa_column=Column("batch", Integer))
-
-
-class KnexMigrationsLock(SQLModel, table=True):
-    index: Optional[int] = Field(default=None, sa_column=Column("index", INTEGER, primary_key=True))
-    is_locked: Optional[int] = Field(default=None, sa_column=Column("is_locked", Integer))
-
-
-class Migrations(SQLModel, table=True):
-    id: Optional[int] = Field(default=None, sa_column=Column("id", Integer, primary_key=True))
-    timestamp: int = Field(sa_column=Column("timestamp", BigInteger, nullable=False))
-    name: str = Field(sa_column=Column("name", String(255, "utf8mb4_0900_as_cs"), nullable=False))
 
 
 class Namespace(SQLModel, table=True):
@@ -223,22 +134,15 @@ class Posts(SQLModel, table=True):
     tag: List["Tag"] = Relationship(back_populates="post")
 
 
-class Sessions(SQLModel, table=True):
-    __table_args__ = (Index("django_session_expire_date_a5c62663", "expire_date"),)
-
-    session_key: Optional[str] = Field(
-        default=None, sa_column=Column("session_key", String(40, "utf8mb4_0900_as_cs"), primary_key=True)
-    )
-    session_data: str = Field(sa_column=Column("session_data", LONGTEXT, nullable=False))
-    expire_date: datetime = Field(sa_column=Column("expire_date", DateTime, nullable=False))
-
-
-class Settings(SQLModel, table=True):
-    id: Optional[int] = Field(default=None, sa_column=Column("id", Integer, primary_key=True))
-    meta_name: str = Field(sa_column=Column("meta_name", String(255, "utf8mb4_0900_as_cs"), nullable=False))
-    meta_value: str = Field(sa_column=Column("meta_value", LONGTEXT, nullable=False))
-    created_at: datetime = Field(sa_column=Column("created_at", DateTime, nullable=False))
-    updated_at: datetime = Field(sa_column=Column("updated_at", DateTime, nullable=False))
+t_post_tags = Table(
+    "post_tags",
+    metadata,
+    Column("post_id", Integer, primary_key=True, nullable=False),
+    Column("tag_id", Integer, primary_key=True, nullable=False),
+    ForeignKeyConstraint(["post_id"], ["posts.id"], ondelete="CASCADE", name="FK_post_tags_post_id"),
+    ForeignKeyConstraint(["tag_id"], ["tags.id"], ondelete="CASCADE", name="FK_post_tags_tag_id"),
+    Index("FK_post_tags_tag_id", "tag_id"),
+)
 
 
 class Tag(SQLModel, table=True):
@@ -262,15 +166,6 @@ class Tag(SQLModel, table=True):
     tags_reverse: List["Tag"] = Relationship(back_populates="tags")
     datasets: List["Dataset"] = Relationship(back_populates="tags")
     chart_tags: List["ChartTags"] = Relationship(back_populates="tags")
-
-
-class UserInvitations(SQLModel, table=True):
-    id: Optional[int] = Field(default=None, sa_column=Column("id", Integer, primary_key=True))
-    code: str = Field(sa_column=Column("code", String(255, "utf8mb4_0900_as_cs"), nullable=False))
-    email: str = Field(sa_column=Column("email", String(255, "utf8mb4_0900_as_cs"), nullable=False))
-    validTill: datetime = Field(sa_column=Column("validTill", DateTime, nullable=False))
-    createdAt: datetime = Field(sa_column=Column("createdAt", DateTime, nullable=False))
-    updatedAt: datetime = Field(sa_column=Column("updatedAt", DateTime, nullable=False))
 
 
 class User(SQLModel, table=True):
@@ -341,49 +236,6 @@ class Chart(SQLModel, table=True):
     chart_tags: List["ChartTags"] = Relationship(back_populates="charts")
     suggested_chart_revisions: List["SuggestedChartRevisions"] = Relationship(back_populates="charts")
     chart_dimensions: List["ChartDimensions"] = Relationship(back_populates="charts")
-
-
-class CountryNameToolCountrydata(SQLModel, table=True):
-    __table_args__ = (
-        ForeignKeyConstraint(
-            ["continent"],
-            ["country_name_tool_continent.id"],
-            name="country_name_tool_co_continent_217c90d2_fk_country_n",
-        ),
-        Index("country_name_tool_co_continent_217c90d2_fk_country_n", "continent"),
-        Index("cow_code", "cow_code", unique=True),
-        Index("cow_letter", "cow_letter", unique=True),
-        Index("imf_code", "imf_code", unique=True),
-        Index("iso_alpha2", "iso_alpha2", unique=True),
-        Index("iso_alpha3", "iso_alpha3", unique=True),
-        Index("kansas_code", "kansas_code", unique=True),
-        Index("marc_code", "marc_code", unique=True),
-        Index("ncd_code", "ncd_code", unique=True),
-        Index("owid_name", "owid_name", unique=True),
-        Index("penn_code", "penn_code", unique=True),
-        Index("unctad_code", "unctad_code", unique=True),
-    )
-
-    id: Optional[int] = Field(default=None, sa_column=Column("id", Integer, primary_key=True))
-    owid_name: str = Field(sa_column=Column("owid_name", String(255, "utf8mb4_0900_as_cs"), nullable=False))
-    iso_alpha2: Optional[str] = Field(default=None, sa_column=Column("iso_alpha2", String(255, "utf8mb4_0900_as_cs")))
-    iso_alpha3: Optional[str] = Field(default=None, sa_column=Column("iso_alpha3", String(255, "utf8mb4_0900_as_cs")))
-    imf_code: Optional[int] = Field(default=None, sa_column=Column("imf_code", Integer))
-    cow_letter: Optional[str] = Field(default=None, sa_column=Column("cow_letter", String(255, "utf8mb4_0900_as_cs")))
-    cow_code: Optional[int] = Field(default=None, sa_column=Column("cow_code", Integer))
-    unctad_code: Optional[str] = Field(default=None, sa_column=Column("unctad_code", String(255, "utf8mb4_0900_as_cs")))
-    marc_code: Optional[str] = Field(default=None, sa_column=Column("marc_code", String(255, "utf8mb4_0900_as_cs")))
-    ncd_code: Optional[str] = Field(default=None, sa_column=Column("ncd_code", String(255, "utf8mb4_0900_as_cs")))
-    kansas_code: Optional[str] = Field(default=None, sa_column=Column("kansas_code", String(255, "utf8mb4_0900_as_cs")))
-    penn_code: Optional[str] = Field(default=None, sa_column=Column("penn_code", String(255, "utf8mb4_0900_as_cs")))
-    continent: Optional[int] = Field(default=None, sa_column=Column("continent", Integer))
-
-    country_name_tool_continent: Optional["CountryNameToolContinent"] = Relationship(
-        back_populates="country_name_tool_countrydata"
-    )
-    country_name_tool_countryname: List["CountryNameToolCountryname"] = Relationship(
-        back_populates="country_name_tool_countrydata"
-    )
 
 
 class Dataset(SQLModel, table=True):
@@ -503,17 +355,6 @@ class Dataset(SQLModel, table=True):
         return vars
 
 
-t_post_tags = Table(
-    "post_tags",
-    metadata,
-    Column("post_id", Integer, primary_key=True, nullable=False),
-    Column("tag_id", Integer, primary_key=True, nullable=False),
-    ForeignKeyConstraint(["post_id"], ["posts.id"], ondelete="CASCADE", name="FK_post_tags_post_id"),
-    ForeignKeyConstraint(["tag_id"], ["tags.id"], ondelete="CASCADE", name="FK_post_tags_tag_id"),
-    Index("FK_post_tags_tag_id", "tag_id"),
-)
-
-
 class ChartSlugRedirects(SQLModel, table=True):
     __table_args__ = (
         ForeignKeyConstraint(["chart_id"], ["charts.id"], name="chart_slug_redirects_chart_id"),
@@ -541,26 +382,6 @@ class ChartTags(SQLModel, table=True):
 
     charts: Optional["Chart"] = Relationship(back_populates="chart_tags")
     tags: Optional["Tag"] = Relationship(back_populates="chart_tags")
-
-
-class CountryNameToolCountryname(SQLModel, table=True):
-    __table_args__ = (
-        ForeignKeyConstraint(
-            ["owid_country"],
-            ["country_name_tool_countrydata.id"],
-            name="country_name_tool_co_owid_country_fefc8efa_fk_country_n",
-        ),
-        Index("country_name", "country_name", unique=True),
-        Index("country_name_tool_co_owid_country_fefc8efa_fk_country_n", "owid_country"),
-    )
-
-    id: Optional[int] = Field(default=None, sa_column=Column("id", Integer, primary_key=True))
-    country_name: str = Field(sa_column=Column("country_name", String(255, "utf8mb4_0900_as_cs"), nullable=False))
-    owid_country: int = Field(sa_column=Column("owid_country", Integer, nullable=False))
-
-    country_name_tool_countrydata: Optional["CountryNameToolCountrydata"] = Relationship(
-        back_populates="country_name_tool_countryname"
-    )
 
 
 t_dataset_files = Table(
