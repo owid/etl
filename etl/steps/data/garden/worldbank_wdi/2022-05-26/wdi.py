@@ -54,15 +54,262 @@ def run(dest_dir: str) -> None:
     df["country"] = countries
     df.set_index(tb_meadow.metadata.primary_key, inplace=True)
 
+    df_cust = mk_custom_entities(df)
+    assert all([col in df.columns for col in df_cust.columns])
+    df = pd.concat([df, df_cust], axis=0)
+
     ds_garden = Dataset.create_empty(dest_dir)
     ds_garden.metadata = ds_meadow.metadata
 
     tb_garden = Table(df)
     tb_garden.metadata = tb_meadow.metadata
+
     tb_garden = add_variable_metadata(tb_garden)
 
-    ds_garden.add(tb_garden)
+    tb_omm = mk_omms(tb_garden)
+    tb_garden2 = tb_garden.join(tb_omm, how="outer")
+    tb_garden2.metadata = tb_garden.metadata
+    for col in tb_garden2.columns:
+        if col in tb_garden:
+            tb_garden2[col].metadata = tb_garden[col].metadata
+        else:
+            tb_garden2[col].metadata = tb_omm[col].metadata
+
+    ds_garden.add(tb_garden2)  # type: ignore
+
     ds_garden.save()
+
+
+def mk_omms(table: Table) -> Table:
+    """calculates custom variables (aka "owid-maintained metrics")"""
+    df = pd.DataFrame(table)
+    orig_df_shape = df.shape[0]
+    omms = []
+    tb_omm = Table()
+
+    # for convenience, uses the same generic "Our World in Data based on..."
+    # source for all OMMs created here
+    source = deepcopy(table["sp_pop_totl"].metadata.sources[0])
+    omm_source = Source(
+        name="Our World in Data based on World Bank",
+        description=None,
+        url=source.url,
+        source_data_url=source.source_data_url,
+        owid_data_url=source.owid_data_url,
+        date_accessed=source.date_accessed,
+        publication_date=source.publication_date,
+        publication_year=source.publication_year,
+        published_by="Our World in Data",
+        publisher_source=f"Our World in Data based on {source.published_by}",
+    )
+
+    # omm: urban population living in slums
+    urb_pop_code = "sp_urb_totl"  # Urban population
+    slums_pct_code = "en_pop_slum_ur_zs"  # Population living in slums (% of urban population)
+    omm_urb_pop_slum = "omm_urb_pop_slum"
+    omm_urb_pop_nonslum = "omm_urb_pop_nonslum"
+    assert df[slums_pct_code].min() >= 0.0 and df[slums_pct_code].max() <= 100.0 and df[slums_pct_code].max() > 1.0
+    tb_omm[omm_urb_pop_slum] = df[urb_pop_code].astype(float).multiply(df[slums_pct_code].divide(100)).round(0)
+    tb_omm[omm_urb_pop_nonslum] = df[urb_pop_code].astype(float) - tb_omm[omm_urb_pop_slum]
+    omms += [omm_urb_pop_slum, omm_urb_pop_nonslum]
+    tb_omm[omm_urb_pop_slum].metadata = VariableMeta(
+        title="Urban population living in slums",
+        description=(
+            "Total urban population living in slums. This variable is calculated"
+            f" by Our World in Data based on the following variables from {source.published_by}:"
+            f' "{table[urb_pop_code].metadata.title}"'
+            " and"
+            f' "{table[slums_pct_code].metadata.title}"'
+            "\n\n----\n"
+            f"{table[urb_pop_code].metadata.title}:"
+            f" {table[urb_pop_code].metadata.description}"
+            "\n\n----\n"
+            f"{table[slums_pct_code].metadata.title}:"
+            f" {table[slums_pct_code].metadata.description}"
+        ),
+        sources=[omm_source],
+        unit="",
+        short_unit="",
+        display={},
+        additional_info=None,
+    )
+
+    tb_omm[omm_urb_pop_nonslum].metadata = VariableMeta(
+        title="Urban population not living in slums",
+        description=(
+            "Total urban population not living in slums. This variable is calculated"
+            f" by Our World in Data based on the following variables from {source.published_by}:"
+            f' "{table[urb_pop_code].metadata.title}"'
+            " and"
+            f' "{table[slums_pct_code].metadata.title}"'
+            "\n\n----\n"
+            f"{table[urb_pop_code].metadata.title}:"
+            f" {table[urb_pop_code].metadata.description}"
+            "\n\n----\n"
+            f"{table[slums_pct_code].metadata.title}:"
+            f" {table[slums_pct_code].metadata.description}"
+        ),
+        sources=[omm_source],
+        unit="",
+        short_unit="",
+        display={},
+        additional_info=None,
+    )
+
+    # omm: services exports as % of goods+services exports
+    service_exp_code = "bx_gsr_nfsv_cd"
+    goods_exp_code = "bx_gsr_mrch_cd"
+    omm_service_pct_code = "omm_share_service_exports"
+    tb_omm[omm_service_pct_code] = (
+        (df[service_exp_code] / (df[service_exp_code] + df[goods_exp_code])).multiply(100).round(2)
+    )
+    omms.append(omm_service_pct_code)
+    tb_omm[omm_service_pct_code].metadata = VariableMeta(
+        title="Share of services in total goods and services exports",
+        description=(
+            "Service exports as a share of total exports of goods and services. This variable is calculated"
+            f" by Our World in Data based on the following variables from {source.published_by}:"
+            f' "{table[service_exp_code].metadata.title}"'
+            " and"
+            f' "{table[goods_exp_code].metadata.title}"'
+            "\n\n----\n"
+            f"{table[service_exp_code].metadata.title}:"
+            f" {table[service_exp_code].metadata.description}"
+            "\n\n----\n"
+            f"{table[goods_exp_code].metadata.title}:"
+            f" {table[goods_exp_code].metadata.description}"
+        ),
+        sources=[omm_source],
+        unit="% of goods and services exports",
+        short_unit="%",
+        display={},
+        additional_info=None,
+    )
+
+    # merchandise exports as % of GDP; goods exports as % of GDP
+    merch_code = "tx_val_mrch_cd_wt"
+    goods_code = "bx_gsr_mrch_cd"
+    gdp_code = "ny_gdp_mktp_cd"
+    omm_merch_code = "omm_merch_exp_share_gdp"
+    omm_goods_code = "omm_goods_exp_share_gdp"
+    tb_omm[omm_merch_code] = df[merch_code].divide(df[gdp_code]).multiply(100).round(2)
+    tb_omm[omm_goods_code] = df[goods_code].divide(df[gdp_code]).multiply(100).round(2)
+    omms += [omm_merch_code, omm_goods_code]
+
+    tb_omm[omm_merch_code].metadata = VariableMeta(
+        title="Merchandise exports as a share of GDP",
+        description=(
+            "Merchandise exports as a share of GDP. This variable is calculated"
+            f" by Our World in Data based on the following variables from {source.published_by}:"
+            f' "{table[merch_code].metadata.title}"'
+            " and"
+            f' "{table[gdp_code].metadata.title}"'
+            "\n\n----\n"
+            f"{table[merch_code].metadata.title}:"
+            f" {table[merch_code].metadata.description}"
+            "\n\n----\n"
+            f"{table[gdp_code].metadata.title}:"
+            f" {table[gdp_code].metadata.description}"
+        ),
+        sources=[omm_source],
+        unit="% of GDP",
+        short_unit="%",
+        display={},
+        additional_info=None,
+    )
+
+    tb_omm[omm_goods_code].metadata = VariableMeta(
+        title="Goods exports as a share of GDP",
+        description=(
+            "Goods exports as a share of GDP. This variable is calculated"
+            f" by Our World in Data based on the following variables from {source.published_by}:"
+            f' "{table[goods_code].metadata.title}"'
+            " and"
+            f' "{table[gdp_code].metadata.title}"'
+            "\n\n----\n"
+            f"{table[goods_code].metadata.title}:"
+            f" {table[goods_code].metadata.description}"
+            "\n\n----\n"
+            f"{table[gdp_code].metadata.title}:"
+            f" {table[gdp_code].metadata.description}"
+        ),
+        sources=[omm_source],
+        unit="% of GDP",
+        short_unit="%",
+        display={},
+        additional_info=None,
+    )
+
+    # tax revenue (PPP)
+    tax_rev_share_gdp_code = "gc_tax_totl_gd_zs"
+    gdp_percap_code = "ny_gdp_pcap_pp_cd"
+    omm_tax_rev_code = "omm_tax_rev_percap"
+    assert (
+        df[tax_rev_share_gdp_code].min() >= 0.0
+        and df[tax_rev_share_gdp_code].quantile(0.995)
+        <= 100.0  # timor has > 100 tax revenue as a % of GDP for 2010-2012
+        and df[tax_rev_share_gdp_code].max() > 1.0
+    )
+    tb_omm[omm_tax_rev_code] = df[gdp_percap_code].multiply(df[tax_rev_share_gdp_code].divide(100)).round(2)
+    omms.append(omm_tax_rev_code)
+
+    tb_omm[omm_tax_rev_code].metadata = VariableMeta(
+        title="Tax revenues per capita (current international $)",
+        description=(
+            "Tax revenues per capita, expressed in current international $. This variable is calculated"
+            f" by Our World in Data based on the following variables from {source.published_by}:"
+            f' "{table[tax_rev_share_gdp_code].metadata.title}"'
+            " and"
+            f' "{table[gdp_percap_code].metadata.title}"'
+            "\n\n----\n"
+            f"{table[tax_rev_share_gdp_code].metadata.title}:"
+            f" {table[tax_rev_share_gdp_code].metadata.description}"
+            "\n\n----\n"
+            f"{table[gdp_percap_code].metadata.title}:"
+            f" {table[gdp_percap_code].metadata.description}"
+        ),
+        sources=[omm_source],
+        unit=table[gdp_percap_code].metadata.unit,
+        short_unit=table[gdp_percap_code].metadata.short_unit,
+        display={},
+        additional_info=None,
+    )
+
+    assert orig_df_shape == df.shape[0], "unexpected behavior: original df changed shape in `mk_omms(...)`"
+    return tb_omm[omms]  # type: ignore
+
+
+def mk_custom_entities(df: pd.DataFrame) -> pd.DataFrame:
+    """constructs observations for custom entities, to be appended to existing df
+
+    e.g. poverty headcount for "World (excluding China)"
+    """
+    # poverty headcount for world (excluding china)
+    pop_code = "sp_pop_totl"
+    pov_share_code = "si_pov_dday"
+    omm_pov_count_code = "omm_pov_count"
+    assert df[pov_share_code].min() >= 0.0 and df[pov_share_code].max() <= 100.0 and df[pov_share_code].max() > 1.0
+    s_temp = df[pop_code].astype(float).multiply(df[pov_share_code].divide(100)).round(0)
+    s_temp.name = omm_pov_count_code
+
+    res = []
+    country = "World (excluding China)"
+    df_temp = pd.merge(
+        df[[pop_code]].query('country in ["World", "China"]'),
+        s_temp.to_frame().query('country in ["World", "China"]'),
+        left_index=True,
+        right_index=True,
+    ).unstack("country")
+    for yr, gp in df_temp.groupby("year"):
+        world_exc_pop = (gp[(pop_code, "World")] - gp[(pop_code, "China")]).squeeze()
+        world_exc_pov = (gp[(omm_pov_count_code, "World")] - gp[(omm_pov_count_code, "China")]).squeeze()
+        world_exc_share_pov = (world_exc_pov / world_exc_pop) * 100
+        if pd.notnull(world_exc_share_pov):
+            res.append([country, yr, world_exc_share_pov])
+
+    df_cust = pd.DataFrame(res, columns=["country", "year", pov_share_code]).set_index(["country", "year"])
+    df_cust[pov_share_code] = df_cust[pov_share_code].round(1)
+    return df_cust
 
 
 def add_variable_metadata(table: Table) -> Table:
