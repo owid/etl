@@ -22,6 +22,7 @@ Usage:
 
 import json
 from pathlib import Path
+from importlib import import_module
 
 import pandas as pd
 import structlog
@@ -30,7 +31,12 @@ from owid.catalog import Dataset
 from etl.db import get_connection
 from etl.paths import DATA_DIR
 
-from .wdi import VariableMatcher
+VariableMatcher = getattr(
+    import_module(
+        f'etl.steps.data.garden.{Path(__file__).parent.as_posix().split("/grapher/")[1].replace("/", ".")}.wdi'
+    ),
+    "VariableMatcher",
+)
 
 log = structlog.get_logger()
 
