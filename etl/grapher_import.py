@@ -13,6 +13,7 @@ import concurrent.futures
 import json
 import os
 from dataclasses import dataclass
+from threading import Lock
 from typing import Dict, List, Optional, cast
 
 import pandas as pd
@@ -24,12 +25,12 @@ from tenacity import retry, stop
 
 from etl import config
 from etl.db import get_engine, open_db
-from etl.db_utils import DBUtils
 
 from . import grapher_helpers as gh
 
 log = structlog.get_logger()
 
+source_table_lock = Lock()
 
 CURRENT_DIR = os.path.dirname(__file__)
 # CURRENT_DIR = os.path.join(os.getcwd(), 'standard_importer')
@@ -101,12 +102,12 @@ def upsert_dataset(dataset: catalog.Dataset, namespace: str, sources: List[catal
 
         source_ids: Dict[str, int] = dict()
         for source in sources:
-            source_ids[source.name] = _upsert_source_to_db(db, source, dataset_id)
+            source_ids[source.name] = _upsert_source_to_db(source, dataset_id)
 
         return DatasetUpsertResult(dataset_id, source_ids)
 
 
-def _upsert_source_to_db(db: DBUtils, source: catalog.Source, dataset_id: int) -> int:
+def _upsert_source_to_db(source: catalog.Source, dataset_id: int) -> int:
     """Upsert source and return its id"""
     if source.name is None:
         raise ValueError("Source name was None - please fix this in the metadata.")
@@ -122,7 +123,9 @@ def _upsert_source_to_db(db: DBUtils, source: catalog.Source, dataset_id: int) -
             "additionalInfo": source.description,
         }
     )
-    return db.upsert_source(source.name, json_description, dataset_id)
+    with source_table_lock:
+        with open_db() as db:
+            return db.upsert_source(source.name, json_description, dataset_id)
 
 
 def _update_variables_display(table: catalog.Table) -> None:
@@ -198,7 +201,7 @@ def upsert_table(table: catalog.Table, dataset_upsert_result: DatasetUpsertResul
             # Not exists, upsert it
             # NOTE: this could be quite inefficient as we upsert source for every variable
             #   optimize this if this turns out to be a bottleneck
-            source_id = _upsert_source_to_db(db, source, dataset_upsert_result.dataset_id)
+            source_id = _upsert_source_to_db(source, dataset_upsert_result.dataset_id)
 
         db_variable_id = db.upsert_variable(
             short_name=column_name,
