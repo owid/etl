@@ -7,13 +7,21 @@ import structlog
 from owid.catalog import Dataset, Table
 from owid.catalog.utils import underscore_table
 from owid.walden import CATALOG as WALDEN_CATALOG
+from pydantic import BaseModel
 
-from etl.grapher_model import GrapherConfig
+from etl import grapher_model as gm
 from etl.steps.data.converters import convert_grapher_dataset, convert_grapher_variable
 
 SPARSE_DATASET_VARIABLES_CHUNKSIZE = 1000
 
 log = structlog.get_logger()
+
+
+class GrapherConfig(BaseModel):
+    dataset: gm.Dataset
+    variables: list[gm.Variable]
+    # NOTE: sources can belong to dataset or variable
+    sources: list[gm.Source]
 
 
 def load_values(short_name: str) -> pd.DataFrame:

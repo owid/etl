@@ -1,12 +1,13 @@
-Intro to the ETL
-================
+Data at OWID
+============
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
-   intro
+   overview
    quickstart
+   staff
 
 Indices and tables
 ==================
