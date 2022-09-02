@@ -1,6 +1,5 @@
 from collections.abc import Iterable
 
-import pandas as pd
 from owid import catalog
 
 from etl import grapher_helpers as gh
@@ -15,16 +14,7 @@ def get_grapher_dataset() -> catalog.Dataset:
 
 
 def get_grapher_tables(dataset: catalog.Dataset) -> Iterable[catalog.Table]:
-    orig_table = dataset["population_density"].reset_index()
-
-    # add dimension artificially
-    table = pd.concat([orig_table.assign(sex="male"), orig_table.assign(sex="female")])
-    table.metadata = orig_table.metadata
-    for col in table.columns:
-        if col != "sex":
-            table[col].metadata = orig_table[col].metadata
-
-    table = table.set_index("sex")
+    table = dataset["population_density"].reset_index()
 
     table = gh.adapt_table_for_grapher(table)
 
