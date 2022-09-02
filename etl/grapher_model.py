@@ -679,7 +679,7 @@ class Variable(SQLModel, table=True):
     originalMetadata: Optional[Dict[Any, Any]] = Field(default=None, sa_column=Column("originalMetadata", JSON))
     grapherConfig: Optional[Dict[Any, Any]] = Field(default=None, sa_column=Column("grapherConfig", JSON))
     catalogPath: Optional[str]
-    dimensions: Dimensions = Field(sa_column=Column("dimensions", JSON, nullable=False))
+    dimensions: Optional[Dimensions] = Field(sa_column=Column("dimensions", JSON, nullable=False))
 
     datasets: Optional["Dataset"] = Relationship(back_populates="variables")
     sources: Optional["Source"] = Relationship(back_populates="variables")
@@ -739,8 +739,8 @@ class Variable(SQLModel, table=True):
         timespan: str,
         dataset_id: int,
         source_id: int,
-        catalog_path: str,
-        dimensions: Dimensions,
+        catalog_path: Optional[str],
+        dimensions: Optional[Dimensions],
     ) -> "Variable":
         # TODO: catalog_path and dimensions can be fetched from variable metadata
         assert metadata.unit

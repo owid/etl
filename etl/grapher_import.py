@@ -13,7 +13,7 @@ import concurrent.futures
 import os
 from dataclasses import dataclass
 from threading import Lock
-from typing import Any, Dict, List, Optional, TypedDict, cast
+from typing import Dict, List, Optional, cast
 
 import pandas as pd
 import structlog

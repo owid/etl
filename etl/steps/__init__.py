@@ -643,12 +643,12 @@ class GrapherNewStep(DataStep):
 
             # generate table with entity_id, year and value for every column
             tables = gh.yield_wide_table(table, na_action="drop")
-            upsert = lambda t: upsert_table(
+            upsert = lambda t: upsert_table(  # noqa: E731
                 t,
                 dataset_upsert_results,
                 catalog_path=catalog_path,
                 dimensions=(t.iloc[:, 0].metadata.additional_info or {}).get("dimensions"),
-            )  # noqa: E731
+            )
 
             # insert data in parallel, this speeds it up considerably and is even faster than loading
             # data with LOAD DATA INFILE
