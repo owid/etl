@@ -450,7 +450,7 @@ def adapt_table_for_grapher(
     # Grapher needs a column entity id, that is constructed based on the unique entity names in the database.
     table["entity_id"] = country_to_entity_id(table[country_col], create_entities=True)
     table = table.drop(columns=[country_col]).rename(columns={year_col: "year"})
-    table = table.set_index(["entity_id", "year"], append=True)
+    table = table.set_index(["entity_id", "year"])
 
     # Ensure the default source of each column includes the description of the table (since that is the description that
     # will appear in grapher on the SOURCES tab).
