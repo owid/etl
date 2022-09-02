@@ -21,8 +21,8 @@ Usage:
 """
 
 import json
-from pathlib import Path
 from importlib import import_module
+from pathlib import Path
 
 import pandas as pd
 import structlog

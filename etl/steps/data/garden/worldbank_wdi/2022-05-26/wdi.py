@@ -5,8 +5,8 @@ Harmonize country names:
     $ harmonize data/meadow/worldbank_wdi/{version}/wdi/wdi.feather country etl/steps/data/garden/worldbank_wdi/{version}/wdi.country_mapping.json
 """
 
-import re
 import json
+import re
 import zipfile
 from copy import deepcopy
 from pathlib import Path
@@ -14,7 +14,7 @@ from typing import Dict, List, Optional, Union
 
 import pandas as pd
 import structlog
-from owid.catalog import Dataset, Table, Source, VariableMeta
+from owid.catalog import Dataset, Source, Table, VariableMeta
 from owid.catalog.utils import underscore
 from owid.walden import Catalog
 
