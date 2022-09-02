@@ -82,7 +82,7 @@ steps:
     - backport://backport/owid/latest/dataset_792_investment__credit_to_agriculture__fao__2017
     # wdi__2022_05_26 is a dataset that comes from grapher `grapher://worldbank_wdi/2022-05-26/wdi` step, this might cause circular
     # dependency and we should instead use garden dataset (which does not have proper metadata yet unfortunately)
-    - backport://backport/owid/latest/dataset_5637_wdi__2022_05_26
+    - backport://backport/owid/latest/dataset_5637_world_development_indicators__world_bank__2022_05_26
     - backport://backport/owid/latest/dataset_560_world_development_indicators__social_protection__and__labor
     - backport://backport/owid/latest/dataset_943_sexual_violence__unicef__2017
     - backport://backport/owid/latest/dataset_5357_world_development_indicators__world_bank__2021_07_30
