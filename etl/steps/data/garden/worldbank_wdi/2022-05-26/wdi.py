@@ -10,7 +10,7 @@ import re
 import zipfile
 from copy import deepcopy
 from pathlib import Path
-from typing import Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 
 import pandas as pd
 import structlog
@@ -75,7 +75,7 @@ def run(dest_dir: str) -> None:
         else:
             tb_garden2[col].metadata = tb_omm[col].metadata
 
-    ds_garden.add(tb_garden2)  # type: ignore
+    ds_garden.add(tb_garden2)
 
     ds_garden.save()
 
@@ -308,7 +308,7 @@ def mk_omms(table: Table) -> Table:
     )
 
     assert orig_df_shape == df.shape[0], "unexpected behavior: original df changed shape in `mk_omms(...)`"
-    return tb_omm[omms]  # type: ignore
+    return tb_omm[omms]
 
 
 def mk_custom_entities(df: pd.DataFrame) -> pd.DataFrame:
@@ -345,7 +345,7 @@ def mk_custom_entities(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def add_variable_metadata(table: Table) -> Table:
-    var_codes = table.columns.tolist()  # type: ignore
+    var_codes = table.columns.tolist()
 
     # retrieves raw data from walden
     version = Path(__file__).parent.stem
@@ -463,7 +463,7 @@ def load_excluded_countries() -> List[str]:
     return data
 
 
-def load_clean_source_mapping() -> dict:
+def load_clean_source_mapping() -> Dict[str, Dict[str, str]]:
     with open(Path(__file__).parent / "wdi.sources.json", "r") as f:
         sources = json.load(f)
         source_mapping = {source["rawName"]: source for source in sources}
@@ -471,7 +471,7 @@ def load_clean_source_mapping() -> dict:
     return source_mapping
 
 
-def create_description(var: dict) -> Optional[str]:
+def create_description(var: Dict[str, Any]) -> Optional[str]:
     desc = ""
     if pd.notnull(var["long_definition"]) and len(var["long_definition"].strip()) > 0:
         desc += var["long_definition"]
@@ -494,7 +494,7 @@ def create_description(var: dict) -> Optional[str]:
     desc = re.sub(r" *(\n+) *", r"\1", re.sub(r"[ \t]+", " ", desc)).strip()
 
     if len(desc) == 0:
-        desc = None
+        return None
 
     return desc
 
@@ -527,7 +527,7 @@ class VariableMatcher:
         [(147787, 'Gini index (World Bank estimate)')]
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.grapher_variables = self.fetch_grapher_variables()
         self.variable_mapping = self.load_variable_mapping()
 
@@ -541,15 +541,15 @@ class VariableMatcher:
         self._grapher_variables = value
 
     @property
-    def variable_mapping(self) -> dict:
+    def variable_mapping(self) -> Dict[str, Any]:
         return self._variable_mapping
 
     @variable_mapping.setter
-    def variable_mapping(self, value: dict) -> None:
+    def variable_mapping(self, value: Dict[str, Any]) -> None:
         assert isinstance(value, dict)
         self._variable_mapping = value
 
-    def fetch_grapher_variables(self) -> pd.DataFrame:
+    def fetch_grapher_variables(self) -> Any:
         query = """
             WITH
             datasets AS (
@@ -581,13 +581,14 @@ class VariableMatcher:
         df_vars = pd.read_sql(query, get_connection())
         return df_vars
 
-    def load_variable_mapping(self) -> dict:
+    def load_variable_mapping(self) -> Dict[str, Any]:
         fname = Path(__file__).stem
         with open(Path(__file__).parent / f"{fname}.variable_mapping.json", "r") as f:
             mapping = json.load(f)
+            assert isinstance(mapping, dict)
         return mapping
 
-    def find_grapher_variables(self, name: str) -> Optional[List[dict]]:
+    def find_grapher_variables(self, name: str) -> Optional[List[Any]]:
         """returns grapher variables that match {name}, ordered by updatedAt
         (most recent -> least recent)."""
         names = [name]
