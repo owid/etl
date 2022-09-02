@@ -275,6 +275,38 @@ def mk_omms(table: Table) -> Table:
         additional_info=None,
     )
 
+    # adjusted net savings per capita
+    net_savings_code = "ny_adj_svnx_cd"
+    pop_code = "sp_pop_totl"
+    omm_net_savings_code = "omm_net_savings_percap"
+    tb_omm[omm_net_savings_code] = df[net_savings_code].divide(df[pop_code].astype(float)).round(2)
+    omms.append(omm_net_savings_code)
+
+    title = re.sub("Adjusted net savings", "Adjusted net savings per capita", table[net_savings_code].metadata.title)
+    assert "per capita" in title
+    tb_omm[omm_net_savings_code].metadata = VariableMeta(
+        title=title,
+        description=(
+            "Adjusted net savings per capita (excluding particulate emission"
+            " damage), expressed in current US$. This variable is calculated"
+            f" by Our World in Data based on the following variables from {source.published_by}:"
+            f' "{table[net_savings_code].metadata.title}"'
+            " and"
+            f' "{table[pop_code].metadata.title}"'
+            "\n\n----\n"
+            f"{table[net_savings_code].metadata.title}:"
+            f" {table[net_savings_code].metadata.description}"
+            "\n\n----\n"
+            f"{table[pop_code].metadata.title}:"
+            f" {table[pop_code].metadata.description}"
+        ),
+        sources=[omm_source],
+        unit=table[net_savings_code].metadata.unit,
+        short_unit=table[net_savings_code].metadata.short_unit,
+        display={},
+        additional_info=None,
+    )
+
     assert orig_df_shape == df.shape[0], "unexpected behavior: original df changed shape in `mk_omms(...)`"
     return tb_omm[omms]  # type: ignore
 
