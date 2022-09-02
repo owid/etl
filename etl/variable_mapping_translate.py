@@ -248,8 +248,8 @@ def build_mapping_from_df(sql: Engine, df: pd.DataFrame) -> Dict[str, str]:
     df_old = _build_individual_df(sql, df, "name_old", "dataset_name_old")
     df_new = _build_individual_df(sql, df, "name_new", "dataset_name_new")
     # Merge into single df
-    df = _merge_dfs_old_new(df, df_old, df_new)
-    dix: Dict[str, str] = df.set_index("id_old").squeeze().to_dict()
+    df = _merge_dfs_old_new(df_old, df_new)
+    dix: Dict[str, str] = df.set_index("id_old")["id_new"].squeeze().to_dict()
     return dix
 
 
@@ -257,13 +257,25 @@ def _build_individual_df(sql: Engine, df: pd.DataFrame, column_name: str, column
     var_names: Tuple[str, ...] = tuple(df[column_name].tolist())
     ds_names: Tuple[str, ...] = tuple(df[column_dataset_name].tolist())
     df_ = _get_partial_df(sql, var_names, ds_names)
+
+    # sort
+    df_ = df.merge(df_, left_on=[column_name, column_dataset_name], right_on=["name", "dataset_name"])[
+        ["id", "name", "dataset_name"]
+    ]
+    # sanity check
+    assert len(df) == len(df_)
+    assert df_.isna().sum().sum() == 0
     return df_
 
 
-def _merge_dfs_old_new(df: pd.DataFrame, df_old: pd.DataFrame, df_new: pd.DataFrame) -> pd.DataFrame:
-    df = pd.concat([df_old, df[["name_new", "dataset_name_new"]]], axis=1)
-    df = df.merge(df_new, how="left", left_on=["name_new", "dataset_name_new"], right_on=["name", "dataset_name"])
-    df = df.rename(columns={"id_x": "id_old", "id_y": "id_new"})[["id_old", "id_new"]].astype(str)
+def _merge_dfs_old_new(df_old: pd.DataFrame, df_new: pd.DataFrame) -> pd.DataFrame:
+    df = pd.concat(
+        [
+            df_old.rename(columns={col: f"{col}_old" for col in df_old.columns}),
+            df_new.rename(columns={col: f"{col}_new" for col in df_new.columns}),
+        ],
+        axis=1,
+    ).astype(str)
     return df
 
 
