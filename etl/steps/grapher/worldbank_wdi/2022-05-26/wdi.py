@@ -17,6 +17,7 @@ def get_grapher_dataset() -> Dataset:
     dataset = Dataset(DATA_DIR / f"garden/{namespace}/{version}/{fname}")
     # short_name should include dataset name and version
     dataset.metadata.short_name = f"{dataset.metadata.short_name}__{version.replace('-', '_')}"
+    dataset.metadata.version = version
 
     return dataset
 

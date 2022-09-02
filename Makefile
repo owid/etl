@@ -64,7 +64,7 @@ full: .venv
 
 clean:
 	@echo '==> Cleaning data/ folder'
-	rm -rf $$(ls -d data/* | grep -v reference)
+	rm -rf data && git checkout data
 
 clobber: clean
 	find . -name .venv | xargs rm -rf

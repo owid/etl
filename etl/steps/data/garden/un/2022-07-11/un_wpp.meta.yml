@@ -19,11 +19,15 @@ tables:
         short_unit:
         unit: Persons
         description: Number of births over a given period. Refers to live births for annual civil calendar years from 1 January to 31 December.
+        display:
+          conversionFactor: 1
       child_mortality_rate:
         title: Child mortality rate
         short_unit: "%"
         unit: Percentage
         description: Number of deaths under age 5 over a given period. Refers to annual civil calendar years from 1 January to 31 December.
+        display:
+          conversionFactor: 1
       death_rate:
         title: Death rate
         short_unit: ‰
@@ -34,21 +38,23 @@ tables:
         short_unit:
         unit: Persons
         description: Number of deaths over a given period. Refers to annual civil calendar years from 1 January to 31 December.
+        display:
+          conversionFactor: 1
       dependency_ratio_child:
         title: Child dependency ratio
         short_unit: "%"
         unit: Percentage
-        description: The ratio of the population under age x1 (e.g., 0-24) to the number of persons of working age x1-x2 (e.g., 25-64). It is expressed as number of dependants per 100 persons of working age (e.g., 25-64). Data are presented for different age categories.
+        description: The ratio of the population under age 15 (e.g., 0-14) to the number of persons of working age 15-64 (e.g., 15-64). It is expressed as number of dependants per 100 persons of working age (e.g., 25-64). Data are presented for different age categories.
       dependency_ratio_old:
         title: Old-age dependency ratio
         short_unit: "%"
         unit: Percentage
-        description: The ratio of the population aged x2 and over (e.g., 65+) to the number of persons of working age x1-x2 (e.g., 25-64). It is expressed as number of dependants per 100 persons of working age (e.g., 25-64). Data are presented for different age categories.
+        description: The ratio of the population aged 65 and over (e.g., 65+) to the number of persons of working age 15-64 (e.g., 15-64). It is expressed as number of dependants per 100 persons of working age (e.g., 25-64). Data are presented for different age categories.
       dependency_ratio_total:
         title: Total dependency ratio
         short_unit: "%"
         unit: Percentage
-        description: The ratio of the sum of the population under age x1 (e.g., 0-24) and that aged x2 and over (e.g., 65+) to the number of persons of working age x1-x2 (e.g., 25-64). It is expressed as number of dependants per 100 persons of working age (e.g., 25-64). Data are presented for different age categories.
+        description: The ratio of the sum of the population under age 15 (e.g., 0-14) and that aged 65 and over (e.g., 65+) to the number of persons of working age 15-64 (e.g., 15-64). It is expressed as number of dependants per 100 persons of working age (e.g., 25-64). Data are presented for different age categories.
       fertility_rate:
         title: Fertility rate
         short_unit:
@@ -62,13 +68,17 @@ tables:
         short_unit: "%"
         unit: Percentage
         description: Crude birth rate minus the crude death rate. Represents the portion of population growth (or decline) determined exclusively by births and deaths.
+        display:
+          conversionFactor: 1
       growth_rate:
         title: Growth rate
         short_unit: "%"
         unit: Percentage
         description: Average exponential rate of growth of the population over a given period. It is calculated as ln(P2/P1)/n where P1 and P2 are the populations on 1 January of subsequent years, and n is the length of the period between t1 and t2 (n=1 for annual data).
+        display:
+          conversionFactor: 1
       infant_mortality_rate:
-        title: Infant moratility rate
+        title: Infant mortality rate
         short_unit: "%"
         unit: Percentage
         description: Probability of dying between birth and exact age 1.
@@ -97,16 +107,22 @@ tables:
         short_unit:
         unit: Persons
         description: De facto population in a country, area or region as of 1 July of the year indicated.
+        display:
+          conversionFactor: 1
       population_broad:
-        title: Population (broad age groups)
+        title: Population by broad age group
         short_unit:
         unit: Persons
         description: De facto population in a country, area or region as of 1 July of the year indicated. Figures are presented in thousands. Alternative metric to 'population', used for different (and groader) age groups.
+        display:
+          conversionFactor: 1
       population_change:
         title: Population change
         short_unit:
         unit: Persons
         description: Population increment over a period, that is, the difference between the population at the end of the period and that at the beginning of the period. Refers to calendar years from 1 July to 30 June.
+        display:
+          conversionFactor: 1
       population_density:
         title: Population density
         short_unit:

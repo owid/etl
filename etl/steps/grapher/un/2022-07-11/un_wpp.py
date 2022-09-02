@@ -47,7 +47,7 @@ def _get_shaped_table(dataset):
     table = dataset[TNAME].reset_index()
 
     # grapher needs a column entity id, that is constructed based on the unique entity names in the database
-    table["entity_id"] = gh.country_to_entity_id(table["location"])
+    table["entity_id"] = gh.country_to_entity_id(table["location"], create_entities=True)
 
     # use entity_id and year as indexes in grapher
     table = table.set_index(["entity_id", "year", "sex", "age", "variant"])[["metric", "value"]].rename(
@@ -73,7 +73,7 @@ def _propagate_metadata(dataset, table):
 
 
 def _filter_rows(table):
-    variants_valid = ["estimates", "low", "medium", "high"]
+    variants_valid = ["estimates", "low", "medium", "high", "constant fertility"]
     shape_0 = table.shape[0]
     table = table[table.index.isin(variants_valid, level=4)]
     r = 100 - 100 * round(table.shape[0] / shape_0, 2)
