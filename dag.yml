@@ -66,8 +66,6 @@ steps:
     - walden://un_sdg/2022-07-07/un_sdg
   data://garden/un_sdg/2022-07-07/un_sdg:
     - data://meadow/un_sdg/2022-07-07/un_sdg
-  grapher://owid/latest/population_density:
-    - data://garden/owid/latest/population_density
   grapher-new://grapher/owid/latest/population_density:
     - data://garden/owid/latest/population_density
   data://meadow/oecd/2016-06-01/regional_wellbeing:
