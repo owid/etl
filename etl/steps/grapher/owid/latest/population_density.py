@@ -18,4 +18,6 @@ def get_grapher_tables(dataset: catalog.Dataset) -> Iterable[catalog.Table]:
 
     table = gh.adapt_table_for_grapher(table)
 
+    __import__("ipdb").set_trace()
+
     yield from gh.yield_wide_table(table)
