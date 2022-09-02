@@ -19,6 +19,8 @@ def get_grapher_dataset() -> catalog.Dataset:
 def get_grapher_tables(dataset: catalog.Dataset) -> Iterable[catalog.Table]:
     table = dataset["estimates"]
 
+    __import__("ipdb").set_trace()
+
     # Since this script expects a certain structure make sure it is actually met
     expected_primary_keys = [
         "country_code",
@@ -91,9 +93,5 @@ def get_grapher_tables(dataset: catalog.Dataset) -> Iterable[catalog.Table]:
         assert table[column].metadata.unit is not None, "Unit should not be None here!"
         # Use short names as titles
         table[column].metadata.title = column
-
-    table = table.query('ghe_cause_title == "Alcohol use disorders" and agegroup_code == "ALLAges"')
-
-    __import__("ipdb").set_trace()
 
     yield from gh.yield_wide_table(table[columns_to_export], na_action="drop")

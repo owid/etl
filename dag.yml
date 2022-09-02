@@ -42,6 +42,8 @@ steps:
     - walden://who/2021-07-01/gho
   data://meadow/wpp/2019/standard_projections:
     - walden://wpp/2019/standard_projections
+  # grapher-new://grapher/who/2021-07-01/ghe:
+  #   - data://garden/who/2021-07-01/ghe
   grapher://who/2021-07-01/ghe:
     - data://garden/who/2021-07-01/ghe
   data://meadow/living_planet/2020-09-10/lpd:
