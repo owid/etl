@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import Any, Callable, List, Optional
 
 import click
+from ipdb import launch_ipdb_on_exception
 from owid.walden import CATALOG as WALDEN_CATALOG
 from owid.walden import Catalog as WaldenCatalog
 
@@ -33,6 +34,7 @@ LIMIT_NOFILE = 5000
 @click.option("--force", is_flag=True, help="Redo a step even if it appears done and up-to-date")
 @click.option("--private", is_flag=True, help="Execute private steps")
 @click.option("--grapher", is_flag=True, help="Publish changes to grapher (OWID staff only)")
+@click.option("--ipdb", is_flag=True, help="Run the debugger on uncaught exceptions")
 @click.option(
     "--backport",
     is_flag=True,
@@ -69,6 +71,7 @@ def main_cli(
     private: bool = False,
     grapher: bool = False,
     backport: bool = False,
+    ipdb: bool = False,
     downstream: bool = False,
     only: bool = False,
     exclude: Optional[str] = None,
@@ -76,7 +79,8 @@ def main_cli(
     workers: int = 5,
 ) -> None:
     _update_open_file_limit()
-    return main(
+
+    kwargs = dict(
         steps=steps,
         dry_run=dry_run,
         force=force,
@@ -89,6 +93,13 @@ def main_cli(
         dag_path=dag_path,
         workers=workers,
     )
+
+    if ipdb:
+        config.IPDB_ENABLED = True
+        with launch_ipdb_on_exception():
+            main(**kwargs)  # type: ignore
+    else:
+        main(**kwargs)  # type: ignore
 
 
 def main(

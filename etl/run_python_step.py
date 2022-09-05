@@ -4,8 +4,10 @@
 
 import sys
 from importlib import import_module
+from typing import Optional
 
 import click
+from ipdb import launch_ipdb_on_exception
 
 from etl.paths import BASE_PACKAGE, STEP_DIR
 
@@ -13,7 +15,8 @@ from etl.paths import BASE_PACKAGE, STEP_DIR
 @click.command()
 @click.argument("uri")
 @click.argument("dest_dir")
-def main(uri: str, dest_dir: str) -> None:
+@click.option("--ipdb", is_flag=True)
+def main(uri: str, dest_dir: str, ipdb: Optional[bool]) -> None:
     """
     Import and run a specific step of the ETL. Meant to be ran as
     a subprocess by the main `etl` command.
@@ -23,7 +26,11 @@ def main(uri: str, dest_dir: str) -> None:
 
     path = uri.split("//", 1)[1]
 
-    _import_and_run(path, dest_dir)
+    if ipdb:
+        with launch_ipdb_on_exception():
+            _import_and_run(path, dest_dir)
+    else:
+        _import_and_run(path, dest_dir)
 
 
 def _import_and_run(path: str, dest_dir: str) -> None:
