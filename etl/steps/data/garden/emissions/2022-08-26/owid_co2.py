@@ -1,8 +1,10 @@
 """Garden step that combines various datasets related to greenhouse emissions and produces the OWID CO2 dataset (2022).
 
-TODO: Add list of combined datasets below.
 Datasets combined:
-* 
+* Global Carbon Budget (Global Carbon Project, 2021).
+* Greenhouse gas emissions by sector (CAIT, 2022).
+
+Additionally, OWID's population dataset and the Maddison Project Database (Bolt and van Zanden, 2020) on GDP are included.
 
 """
 
@@ -10,7 +12,11 @@ import numpy as np
 import pandas as pd
 from owid import catalog
 from owid.datautils import dataframes
-from shared import CURRENT_DIR, add_population_of_historical_regions, gather_sources_from_tables
+from shared import (
+    CURRENT_DIR,
+    add_population_of_historical_regions,
+    gather_sources_from_tables,
+)
 
 from etl.paths import DATA_DIR
 
@@ -114,23 +120,32 @@ GDP_COLUMNS = {
     "gdp": "gdp",
 }
 
-UNITS = {
-    "tonnes": {
-        "conversion": TONNES_TO_MEGATONNES,
-        "new_unit": "million_tonnes"
-    }
-}
+UNITS = {"tonnes": {"conversion": TONNES_TO_MEGATONNES, "new_unit": "million_tonnes"}}
 
 
-def convert_units(table):
+def convert_units(table: catalog.Table) -> catalog.Table:
+    """Convert units of table.
+
+    Parameters
+    ----------
+    table : catalog.Table
+        Data with its original units.
+
+    Returns
+    -------
+    catalog.Table
+        Data after converting units of specific columns.
+
+    """
     table = table.copy()
     # Check units and convert to more convenient ones.
     for column in table.columns:
         unit = table[column].metadata.unit
         if unit in list(UNITS):
             table[column] *= UNITS[unit]["conversion"]
-            table[column].metadata.description = table[column].metadata.description.\
-                replace(unit, UNITS[unit]["new_unit"])
+            table[column].metadata.description = table[column].metadata.description.replace(
+                unit, UNITS[unit]["new_unit"]
+            )
 
     return table
 
@@ -170,8 +185,9 @@ def run(dest_dir: str) -> None:
     tb_cait_n2o = tb_cait_n2o.reset_index()[list(CAIT_N2O_COLUMNS)].rename(columns=CAIT_N2O_COLUMNS)
     tb_gdp = tb_gdp.reset_index()[list(GDP_COLUMNS)].rename(columns=GDP_COLUMNS)
     tb_population = tb_population.reset_index()[list(POPULATION_COLUMNS)].rename(columns=POPULATION_COLUMNS)
-    tb_countries_regions = tb_countries_regions.reset_index()[list(COUNTRIES_REGIONS_COLUMNS)].\
-        rename(columns=COUNTRIES_REGIONS_COLUMNS)
+    tb_countries_regions = tb_countries_regions.reset_index()[list(COUNTRIES_REGIONS_COLUMNS)].rename(
+        columns=COUNTRIES_REGIONS_COLUMNS
+    )
 
     # Gather all variables' metadata from all tables.
     tables = [tb_gcp, tb_cait_ghg, tb_cait_ch4, tb_cait_n2o, tb_gdp, tb_population, tb_countries_regions]
