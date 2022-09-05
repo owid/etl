@@ -113,6 +113,16 @@ steps:
   grapher://cait/2022-08-10/n2o_emissions:
     - data://garden/cait/2022-08-10/ghg_emissions_by_sector
 
+  #
+  # Emissions - CO2 dataset (2022).
+  #
+  data://garden/emissions/2022-08-26/owid_co2:
+  - backport://backport/owid/latest/dataset_5582_global_carbon_budget__global_carbon_project__v2021
+  - data://garden/cait/2022-08-10/ghg_emissions_by_sector
+  - data://garden/energy/2022-07-29/primary_energy_consumption
+  - data://garden/owid/latest/key_indicators
+  - data://garden/ggdc/2020-10-01/ggdc_maddison
+
   grapher://un_sdg/2022-07-07/un_sdg:
     - data://garden/un_sdg/2022-07-07/un_sdg
   grapher://un/2022-07-11/un_wpp:
