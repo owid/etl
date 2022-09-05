@@ -23,6 +23,7 @@ Usage:
 import json
 from importlib import import_module
 from pathlib import Path
+from typing import cast
 
 import pandas as pd
 import structlog
@@ -43,7 +44,7 @@ log = structlog.get_logger()
 OUTPATH = Path(__file__).parent / "wdi.variable_replacements.json"
 
 
-def main():
+def main() -> None:
     fname = Path(__file__).stem.split("_")[0]
 
     dataset_id = fetch_new_dataset_id()
@@ -93,7 +94,7 @@ def fetch_new_variables() -> pd.DataFrame:
         WHERE datasetId = {dataset_id}
     """
     df = pd.read_sql(query, get_connection())
-    return df
+    return cast(pd.DataFrame, df)
 
 
 if __name__ == "__main__":

@@ -1,13 +1,14 @@
 import json
 import os
 from pathlib import Path
-from typing import Iterable
+from typing import Any, Dict, Iterable, cast
 
 import pandas as pd
 import requests
 from owid.catalog import Dataset, Source, Table, VariableMeta
 from owid.catalog.utils import underscore
 from owid.walden import Catalog
+from owid.walden import Dataset as WaldenDataset
 from structlog import get_logger
 
 from etl import grapher_helpers as gh
@@ -39,12 +40,12 @@ def get_grapher_tables(dataset: Dataset) -> Iterable[Table]:
         var_df["source"] = clean_source_name(var_df["source"], clean_source_map)
         var_gr = var_df.groupby("variable_name")
         for var_name, df_var in var_gr:
-            df_tab = add_metadata_and_prepare_for_grapher(df_var, var_name, walden_ds)
+            df_tab = add_metadata_and_prepare_for_grapher(df_var, walden_ds)
             df_tab.metadata.dataset = dataset.metadata
             yield from gh.yield_long_table(df_tab)
 
 
-def clean_source_name(raw_source: pd.Series, clean_source_map: dict) -> pd.Series:
+def clean_source_name(raw_source: pd.Series, clean_source_map: Dict[str, str]) -> str:
     if len(raw_source.drop_duplicates()) > 1:
         clean_source = "Data from multiple sources compiled by the UN"
     else:
@@ -55,7 +56,7 @@ def clean_source_name(raw_source: pd.Series, clean_source_map: dict) -> pd.Serie
     return clean_source
 
 
-def add_metadata_and_prepare_for_grapher(df_gr: pd.DataFrame, var_name: str, walden_ds: Dataset) -> Table:
+def add_metadata_and_prepare_for_grapher(df_gr: pd.DataFrame, walden_ds: WaldenDataset) -> Table:
 
     indicator = df_gr["variable_name"].iloc[0].split("-")[0].strip()
     source_url = get_metadata_link(indicator)
@@ -147,13 +148,13 @@ def create_dataframe_with_variable_name(dataset: Dataset, tab: str) -> pd.DataFr
     return tab_df
 
 
-def load_clean_source_mapping() -> dict:
+def load_clean_source_mapping() -> Dict[str, str]:
     with open("etl/steps/grapher/un_sdg/2022-07-07/un_sdg.sources.json", "r") as f:
         sources = json.load(f)
-        return sources
+        return cast(Dict[str, str], sources)
 
 
-def get_metadata_link(indicator: str) -> None:
+def get_metadata_link(indicator: str) -> str:
 
     url = os.path.join("https://unstats.un.org/sdgs/metadata/files/", "Metadata-%s.pdf") % "-".join(
         [part.rjust(2, "0") for part in indicator.split(".")]
@@ -173,10 +174,13 @@ def get_metadata_link(indicator: str) -> None:
         url_check = requests.head(url_a)
         ctype_a = url_check.headers["Content-Type"]
         assert ctype_a == "application/pdf", url_a + "does not link to a pdf"
+    else:
+        raise NotImplementedError()
+
     return url_out
 
 
-def value_convert(value):
+def value_convert(value: Any) -> Any:
     if isinstance(value, float) or isinstance(value, int):
         if int(value) == value:
             return int(value)
