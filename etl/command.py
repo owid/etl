@@ -185,6 +185,7 @@ def run_dag(
     excludes = excludes or []
     if not include_grapher:
         excludes.append("grapher://")
+        excludes.append("grapher-new://")
 
     _validate_private_steps(dag)
 
