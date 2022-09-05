@@ -3,6 +3,7 @@
 Datasets combined:
 * Global Carbon Budget (Global Carbon Project, 2021).
 * Greenhouse gas emissions by sector (CAIT, 2022).
+* Primary energy consumption (BP & EIA, 2022)
 
 Additionally, OWID's population dataset and the Maddison Project Database (Bolt and van Zanden, 2020) on GDP are included.
 
@@ -27,6 +28,7 @@ METADATA_PATH = CURRENT_DIR / f"{DATASET_SHORT_NAME}.meta.yml"
 # Details for datasets to import.
 GCP_PATH = DATA_DIR / "backport/owid/latest/dataset_5582_global_carbon_budget__global_carbon_project__v2021/"
 CAIT_PATH = DATA_DIR / "garden/cait/2022-08-10/ghg_emissions_by_sector"
+PRIMARY_ENERGY_PATH = DATA_DIR / "garden/energy/2022-07-29/primary_energy_consumption"
 # Countries-regions dataset is only used to add ISO country codes.
 COUNTRIES_REGIONS_PATH = DATA_DIR / "garden/reference/"
 # Population is only used to add the population column (and no other derived variables).
@@ -105,6 +107,13 @@ CAIT_N2O_COLUMNS = {
     "total_including_lucf": "nitrous_oxide",
     "total_including_lucf__per_capita": "nitrous_oxide_per_capita",
 }
+PRIMARY_ENERGY_COLUMNS = {
+    "country": "country",
+    "year": "year",
+    "primary_energy_consumption__twh": "primary_energy_consumption",
+    "primary_energy_consumption_per_capita__kwh": "energy_per_capita",
+    "primary_energy_consumption_per_gdp__kwh_per_dollar": "energy_per_gdp",
+}
 COUNTRIES_REGIONS_COLUMNS = {
     "name": "country",
     "iso_alpha3": "iso_code",
@@ -161,6 +170,8 @@ def run(dest_dir: str) -> None:
     ds_cait = catalog.Dataset(CAIT_PATH)
     # Load Maddison GDP dataset.
     ds_gdp = catalog.Dataset(GDP_PATH)
+    # Load primary energy consumption dataset.
+    ds_energy = catalog.Dataset(PRIMARY_ENERGY_PATH)
     # Load population dataset.
     ds_population = catalog.Dataset(POPULATION_PATH)
     # Load countries-regions dataset (required to get ISO codes).
@@ -171,6 +182,7 @@ def run(dest_dir: str) -> None:
     tb_cait_ghg = ds_cait["greenhouse_gas_emissions_by_sector"]
     tb_cait_ch4 = ds_cait["methane_emissions_by_sector"]
     tb_cait_n2o = ds_cait["nitrous_oxide_emissions_by_sector"]
+    tb_energy = ds_energy["primary_energy_consumption"]
     tb_gdp = ds_gdp["maddison_gdp"]
     tb_population = ds_population["population"]
     tb_countries_regions = ds_countries_regions["countries_regions"]
@@ -183,6 +195,7 @@ def run(dest_dir: str) -> None:
     tb_cait_ghg = tb_cait_ghg.reset_index()[list(CAIT_GHG_COLUMNS)].rename(columns=CAIT_GHG_COLUMNS)
     tb_cait_ch4 = tb_cait_ch4.reset_index()[list(CAIT_CH4_COLUMNS)].rename(columns=CAIT_CH4_COLUMNS)
     tb_cait_n2o = tb_cait_n2o.reset_index()[list(CAIT_N2O_COLUMNS)].rename(columns=CAIT_N2O_COLUMNS)
+    tb_energy = tb_energy.reset_index()[list(PRIMARY_ENERGY_COLUMNS)].rename(columns=PRIMARY_ENERGY_COLUMNS)
     tb_gdp = tb_gdp.reset_index()[list(GDP_COLUMNS)].rename(columns=GDP_COLUMNS)
     tb_population = tb_population.reset_index()[list(POPULATION_COLUMNS)].rename(columns=POPULATION_COLUMNS)
     tb_countries_regions = tb_countries_regions.reset_index()[list(COUNTRIES_REGIONS_COLUMNS)].rename(
@@ -190,7 +203,7 @@ def run(dest_dir: str) -> None:
     )
 
     # Gather all variables' metadata from all tables.
-    tables = [tb_gcp, tb_cait_ghg, tb_cait_ch4, tb_cait_n2o, tb_gdp, tb_population, tb_countries_regions]
+    tables = [tb_gcp, tb_cait_ghg, tb_cait_ch4, tb_cait_n2o, tb_energy, tb_gdp, tb_population, tb_countries_regions]
     variables_metadata = {variable: table[variable].metadata for table in tables for variable in table.columns}
 
     # Add historical regions to population.
@@ -198,9 +211,21 @@ def run(dest_dir: str) -> None:
 
     # Combine all tables.
     # Table countries-regions does not have a year column. Merge it separately.
-    tables = [tb_gcp, tb_cait_ghg, tb_cait_ch4, tb_cait_n2o, tb_gdp, tb_population]
+    tables = [tb_gcp, tb_cait_ghg, tb_cait_ch4, tb_cait_n2o, tb_energy, tb_gdp, tb_population]
     combined = dataframes.multi_merge(dfs=tables, on=["country", "year"], how="outer")
     combined = pd.merge(combined, tb_countries_regions, on="country", how="left")
+
+    # Since GCP data is backported, it does not have sources metadata.
+    # Similarly, OWID population dataset does not have sources metadata.
+    # Add those sources manually.
+    tb_gcp.metadata.dataset.sources = [catalog.meta.Source(name="Our World in Data based on Global Carbon Project.")]
+    tb_population.metadata.dataset = catalog.meta.DatasetMeta(
+        sources=[
+            catalog.meta.Source(
+                name="Our World in Data based on different sources (https://ourworldindata.org/population-sources)."
+            )
+        ]
+    )
 
     # Assign variables metadata back to combined dataframe.
     for variable in variables_metadata:
@@ -231,7 +256,9 @@ def run(dest_dir: str) -> None:
     #
     ds_garden = catalog.Dataset.create_empty(dest_dir)
     # Gather metadata sources from all tables' original dataset sources.
+    tables = [tb_gcp, tb_cait_ghg, tb_cait_ch4, tb_cait_n2o, tb_energy, tb_gdp, tb_population]
     ds_garden.metadata.sources = gather_sources_from_tables(tables=tables)
+
     # Get the rest of the metadata from the yaml file.
     ds_garden.metadata.update_from_yaml(METADATA_PATH)
     # Create dataset.
@@ -244,3 +271,6 @@ def run(dest_dir: str) -> None:
 
     # Add combined tables to the new dataset.
     ds_garden.add(combined)
+
+    # TODO:
+    # * Consider creating a new garden step to harmonize GCP data. Check that all other datasets are harmonized.
