@@ -1,7 +1,7 @@
 import datetime as dt
 import os
 import tempfile
-from typing import cast
+from typing import List, cast
 
 import click
 import pandas as pd
@@ -10,17 +10,17 @@ from owid.walden import Catalog as WaldenCatalog
 from owid.walden.catalog import Dataset as WaldenDataset
 from owid.walden.ingest import add_to_catalog
 from sqlalchemy.engine import Engine
+from sqlmodel import Session
 
+from etl import config
+from etl import grapher_model as gm
+from etl.backport_helpers import GrapherConfig
 from etl.db import get_engine
 from etl.files import checksum_str
-from etl.grapher_model import (
-    GrapherConfig,
-    GrapherDatasetModel,
-    GrapherSourceModel,
-    GrapherVariableModel,
-)
 
 from . import utils
+
+config.enable_bugsnag()
 
 WALDEN_NAMESPACE = os.environ.get("WALDEN_NAMESPACE", "backport")
 
@@ -66,6 +66,85 @@ def backport_cli(
     )
 
 
+class PotentialBackport:
+
+    dataset_id: int
+    ds: gm.Dataset
+    config: GrapherConfig
+    md5_config: str
+    variable_ids: List[int]
+
+    def __init__(self, dataset_id: int):
+        self.dataset_id = dataset_id
+
+    def load(self, engine: Engine) -> None:
+        # get data from database
+        with Session(engine) as session:
+            ds = gm.Dataset.load_dataset(session, self.dataset_id)
+            vars = gm.Dataset.load_variables_for_dataset(session, self.dataset_id)
+
+            self.variable_ids = [v.id for v in vars]  # type: ignore
+
+            # get sources for dataset and all variables
+            sources = gm.Source.load_sources(session, dataset_id=ds.id, variable_ids=self.variable_ids)
+
+        self.ds = ds
+        self.config = _load_config(ds, vars, sources)
+        self.md5_config = checksum_str(self.config.json(sort_keys=True, indent=0))
+
+    @property
+    def short_name(self) -> str:
+        return utils.create_short_name(self.dataset_id, self.ds.name)
+
+    @property
+    def public(self) -> bool:
+        return not self.ds.isPrivate
+
+    def needs_update(self) -> bool:
+        # find existing entry in catalog
+        try:
+            walden_ds = walden_catalog.find_one(short_name=f"{self.short_name}_config")
+        except KeyError:
+            # datasets not found in catalog
+            return True
+
+        # fastrack does not upload data to S3 and leaves owid_data_url empty, if we find
+        # such a dataset, we backport and upload it again
+        if not walden_ds.owid_data_url:
+            return True
+
+        # compare checksums
+        if walden_ds.origin_md5 == self.md5_config:
+            # then check dataEditedAt field
+            if self.ds.dataEditedAt < _walden_timestamp(f"{self.short_name}_config"):
+                return False
+            else:
+                # since `dataEditedAt` is part of config, its checksum should change and _checksum_match
+                # should return False... if this is not the case, something is wrong
+                raise AssertionError("This should never happen")
+        else:
+            return True
+
+    def upload(self, upload: bool, dry_run: bool) -> None:
+        _upload_config_to_walden(
+            self.config,
+            _walden_config_metadata(self.ds, self.short_name, self.md5_config, self.public),
+            dry_run,
+            upload,
+            public=self.public,
+        )
+
+        # upload values to walden
+        df = _load_values(engine, self.variable_ids)
+        _upload_values_to_walden(
+            df,
+            _walden_values_metadata(self.ds, self.short_name, self.public),
+            dry_run,
+            upload,
+            public=self.public,
+        )
+
+
 def backport(
     dataset_id: int,
     force: bool = False,
@@ -74,74 +153,37 @@ def backport(
 ) -> None:
     lg = log.bind(dataset_id=dataset_id)
 
-    # get data from database
+    dataset = PotentialBackport(dataset_id)
     lg.info("backport.loading_dataset")
-    ds = GrapherDatasetModel.load_dataset(engine, dataset_id)
-    lg.info("backport.loading_variables")
-    vars = GrapherDatasetModel.load_variables_for_dataset(engine, dataset_id)
-
-    variable_ids = [v.id for v in vars]
-
-    # get sources for dataset and all variables
-    lg.info("backport.loading_sources")
-    sources = GrapherSourceModel.load_sources(engine, dataset_id=ds.id, variable_ids=variable_ids)
-
-    short_name = utils.create_short_name(ds.id, ds.name)
-
-    config = _load_config(ds, vars, sources)
-
-    # get checksums of config
-    md5_config = checksum_str(config.json(sort_keys=True, indent=0))
+    dataset.load(engine)
 
     if not force:
-        if not _needs_update(ds, short_name, md5_config):
+        if not dataset.needs_update():
             lg.info(
                 "backport.skip",
-                short_name=short_name,
+                short_name=dataset.short_name,
                 reason="checksums match",
-                checksum=md5_config,
+                checksum=dataset.md5_config,
             )
             lg.info("backport.finished")
             return
 
-    # don't make private datasets public
-    public = not ds.isPrivate
+    dataset.upload(upload, dry_run)
 
-    # upload config to walden
-    lg.info("backport.upload_config", upload=upload, dry_run=dry_run, public=public)
-    _upload_config_to_walden(
-        config,
-        _walden_config_metadata(ds, short_name, md5_config, public),
-        dry_run,
-        upload,
-        public=public,
-    )
-
-    # upload values to walden
-    lg.info("backport.loading_values", variables=variable_ids)
-    df = _load_values(engine, variable_ids)
     lg.info(
-        "backport.upload_values",
-        size=len(df),
+        "backport.upload",
         upload=upload,
         dry_run=dry_run,
-        public=public,
-    )
-    _upload_values_to_walden(
-        df,
-        _walden_values_metadata(ds, short_name, public),
-        dry_run,
-        upload,
-        public=public,
+        public=dataset.public,
     )
 
     lg.info("backport.finished")
 
 
 def _load_config(
-    ds: GrapherDatasetModel,
-    vars: list[GrapherVariableModel],
-    sources: list[GrapherSourceModel],
+    ds: gm.Dataset,
+    vars: list[gm.Variable],
+    sources: list[gm.Source],
 ) -> GrapherConfig:
     """Get the configuration of a variable."""
     return GrapherConfig(
@@ -151,7 +193,7 @@ def _load_config(
     )
 
 
-def _walden_values_metadata(ds: GrapherDatasetModel, short_name: str, public: bool) -> WaldenDataset:
+def _walden_values_metadata(ds: gm.Dataset, short_name: str, public: bool) -> WaldenDataset:
     """Create walden dataset for grapher dataset values.
     These datasets are not meant for direct consumption from the catalog, but rather
     for postprocessing in etl.
@@ -171,7 +213,7 @@ def _walden_values_metadata(ds: GrapherDatasetModel, short_name: str, public: bo
     )
 
 
-def _walden_config_metadata(ds: GrapherDatasetModel, short_name: str, origin_md5: str, public: bool) -> WaldenDataset:
+def _walden_config_metadata(ds: gm.Dataset, short_name: str, origin_md5: str, public: bool) -> WaldenDataset:
     """Create walden dataset for grapher dataset variables and metadata."""
     config = _walden_values_metadata(ds, short_name, public)
     config.short_name = short_name + "_config"
@@ -254,32 +296,6 @@ def _upload_values_to_walden(
 def _walden_timestamp(short_name: str) -> dt.datetime:
     t = walden_catalog.find_one(short_name=short_name).date_accessed
     return cast(dt.datetime, pd.to_datetime(t))
-
-
-def _needs_update(ds: GrapherDatasetModel, short_name: str, md5_config: str) -> bool:
-    # find existing entry in catalog
-    try:
-        walden_ds = walden_catalog.find_one(short_name=f"{short_name}_config")
-    except KeyError:
-        # datasets not found in catalog
-        return True
-
-    # fastrack does not upload data to S3 and leaves owid_data_url empty, if we find
-    # such a dataset, we backport and upload it again
-    if not walden_ds.owid_data_url:
-        return True
-
-    # compare checksums
-    if walden_ds.origin_md5 == md5_config:
-        # then check dataEditedAt field
-        if ds.dataEditedAt < _walden_timestamp(f"{short_name}_config"):
-            return False
-        else:
-            # since `dataEditedAt` is part of config, its checksum should change and _checksum_match
-            # should return False... if this is not the case, something is wrong
-            raise AssertionError("This should never happen")
-    else:
-        return True
 
 
 if __name__ == "__main__":

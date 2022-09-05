@@ -1,4 +1,5 @@
-![build status](https://github.com/owid/etl/actions/workflows/python-package.yml/badge.svg) ![](https://img.shields.io/badge/python-3.9-blue.svg)
+![build status](https://github.com/owid/etl/actions/workflows/python-package.yml/badge.svg) ![](https://img.shields.io/badge/python-3.9-blue.svg) [![Documentation Status](https://readthedocs.org/projects/owid-etl/badge/?version=latest)](https://owid-etl.readthedocs.io/en/latest/?badge=latest)
+
 
 # etl
 

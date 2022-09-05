@@ -18,6 +18,8 @@ from owid.walden import Catalog as WaldenCatalog
 from etl import config
 from etl.steps import DAG, compile_steps, load_dag, paths, select_dirty_steps
 
+config.enable_bugsnag()
+
 WALDEN_NAMESPACE = os.environ.get("WALDEN_NAMESPACE", "backport")
 
 THREADPOOL_WORKERS = 5

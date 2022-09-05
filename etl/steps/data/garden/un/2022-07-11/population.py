@@ -1,6 +1,7 @@
 """Population table."""
 from typing import Any, Dict, List, Tuple
 
+import numpy as np
 import pandas as pd
 
 from .dtypes import optimize_dtypes
@@ -89,6 +90,9 @@ def add_metrics(df: pd.DataFrame) -> pd.DataFrame:
     df_p_diff = optimize_dtypes(df_p_diff)
     # Concatenate
     df = pd.concat([df_sr, df_sr_all, df_p_granular, df_p_broad, df_p_diff], ignore_index=True)
+    # Remove infs
+    msk = np.isinf(df["value"])
+    df.loc[msk, "value"] = np.nan
     return df
 
 
@@ -136,18 +140,17 @@ def _add_metric_population(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame
     # <1
     df_p_0 = df_p[df_p.age == "0"].copy()
     df_p_0 = optimize_dtypes(df_p_0, simple=True)
+    # 1
+    df_p_1 = df_p[df_p.age == "1"].copy()
+    df_p_1 = optimize_dtypes(df_p_1, simple=True)
     # 1-4
-    df_p_1_4 = df_p[df_p.age.isin(["1", "2", "3", "4"])].copy()
-    df_p_1_4 = (
-        df_p_1_4.groupby(
-            ["location", "year", "metric", "sex", "variant"],
-            as_index=False,
-            observed=True,
-        )
-        .sum()
-        .assign(age="1-4")
-    )
-    df_p_1_4 = optimize_dtypes(df_p_1_4, simple=True)
+    df_p_1_4 = _add_age_group(df_p, 1, 4)
+    # 0 - 14
+    df_p_0_14 = _add_age_group(df_p, 0, 14)
+    # 0 - 24
+    df_p_0_24 = _add_age_group(df_p, 0, 24)
+    # 15 - 64
+    df_p_15_64 = _add_age_group(df_p, 15, 64)
     # all
     df_p_all = (
         df_p.groupby(
@@ -160,9 +163,19 @@ def _add_metric_population(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame
     )
     df_p_all = optimize_dtypes(df_p_all, simple=True)
     # Merge all age groups
-    df_p_granular = pd.concat([df_p_granular, df_p_0, df_p_1_4, df_p_all], ignore_index=True).astype(
-        {"age": "category"}
-    )
+    df_p_granular = pd.concat(
+        [
+            df_p_granular,
+            df_p_0,
+            df_p_0_14,
+            df_p_0_24,
+            df_p_1,
+            df_p_1_4,
+            df_p_15_64,
+            df_p_all,
+        ],
+        ignore_index=True,
+    ).astype({"age": "category"})
     # Broad age groups
     df_p_broad = df_p.assign(age=df_p.age.map(map_broad_age).astype("category"))
     df_p_broad = df_p_broad.groupby(
@@ -172,6 +185,22 @@ def _add_metric_population(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame
     ).sum()
     df_p_broad = df_p_broad.assign(metric="population_broad").astype({"metric": "category"})
     return df_p_granular, df_p_broad
+
+
+def _add_age_group(df: pd.DataFrame, age_min: int, age_max: int) -> pd.DataFrame:
+    ages_accepted = [str(i) for i in range(age_min, age_max + 1)]
+    dfx: pd.DataFrame = df[df.age.isin(ages_accepted)].copy()
+    dfx = (
+        dfx.groupby(
+            ["location", "year", "metric", "sex", "variant"],
+            as_index=False,
+            observed=True,
+        )
+        .sum()
+        .assign(age=f"{age_min}-{age_max}")
+    )
+    dfx = optimize_dtypes(dfx, simple=True)
+    return dfx
 
 
 def map_broad_age(age: str) -> str:

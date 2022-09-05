@@ -549,15 +549,18 @@ class GrapherStep(Step):
             dataset.metadata.sources,
         )
 
+        tables = step_module.get_grapher_tables(dataset)  # type: ignore
+        upsert = lambda t: upsert_table(t, dataset_upsert_results)  # noqa: E731
+
         # insert data in parallel, this speeds it up considerably and is even faster than loading
         # data with LOAD DATA INFILE
-        with concurrent.futures.ThreadPoolExecutor(max_workers=GRAPHER_INSERT_WORKERS) as executor:
-            variable_upsert_results = list(
-                executor.map(
-                    lambda table: upsert_table(table, dataset_upsert_results),
-                    step_module.get_grapher_tables(dataset),  # type: ignore
-                )
-            )
+        if GRAPHER_INSERT_WORKERS > 1:
+            with concurrent.futures.ThreadPoolExecutor(max_workers=GRAPHER_INSERT_WORKERS) as executor:
+                results = executor.map(upsert, tables)
+        else:
+            results = map(upsert, tables)
+
+        variable_upsert_results = list(results)
 
         # Cleanup all ghost variables and sources that weren't upserted
         # NOTE: we can't just remove all dataset variables before starting this step because
