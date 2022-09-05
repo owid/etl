@@ -95,6 +95,7 @@ def main_cli(
     )
 
     if ipdb:
+        config.IPDB_ENABLED = True
         with launch_ipdb_on_exception():
             main(**kwargs)  # type: ignore
     else:
