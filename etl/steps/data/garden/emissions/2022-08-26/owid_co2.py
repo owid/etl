@@ -125,7 +125,7 @@ GDP_COLUMNS = {
     "gdp": "gdp",
 }
 
-UNITS = {"tonnes": {"conversion": TONNES_TO_MILLION_TONNES, "new_unit": "million_tonnes"}}
+UNITS = {"tonnes": {"conversion": TONNES_TO_MILLION_TONNES, "new_unit": "million tonnes"}}
 
 
 def convert_units(table: catalog.Table) -> catalog.Table:
