@@ -620,6 +620,15 @@ class GrapherNewStep(DataStep):
     def __str__(self) -> str:
         return f"grapher-new://{self.path}"
 
+    def is_dirty(self) -> bool:
+        if super().is_dirty():
+            return True
+
+        # dataset exists, but it is possible that we haven't inserted everything into DB
+        dataset = self._output_dataset
+
+        return fetch_db_checksum(dataset) != self.checksum_input()
+
     def after_run(self) -> None:
         """Optional post-hook, needs to resave the dataset again."""
         super().after_run()
