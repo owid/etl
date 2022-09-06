@@ -13,10 +13,7 @@ import numpy as np
 import pandas as pd
 from owid import catalog
 from owid.datautils import dataframes
-from shared import (
-    CURRENT_DIR,
-    gather_sources_from_tables,
-)
+from shared import CURRENT_DIR, gather_sources_from_tables
 
 from etl.paths import DATA_DIR
 
@@ -158,9 +155,16 @@ def convert_units(table: catalog.Table) -> catalog.Table:
     return table
 
 
-def combine_tables(tb_gcp: catalog.Table, tb_cait_ghg: catalog.Table, tb_cait_ch4: catalog.Table,
-                   tb_cait_n2o: catalog.Table, tb_energy: catalog.Table, tb_gdp: catalog.Table,
-                   tb_population: catalog.Table, tb_countries_regions: catalog.Table) -> catalog.Table:
+def combine_tables(
+    tb_gcp: catalog.Table,
+    tb_cait_ghg: catalog.Table,
+    tb_cait_ch4: catalog.Table,
+    tb_cait_n2o: catalog.Table,
+    tb_energy: catalog.Table,
+    tb_gdp: catalog.Table,
+    tb_population: catalog.Table,
+    tb_countries_regions: catalog.Table,
+) -> catalog.Table:
     """Combine tables.
 
     Parameters
@@ -303,9 +307,16 @@ def run(dest_dir: str) -> None:
     )
 
     # Combine tables.
-    combined = combine_tables(tb_gcp=tb_gcp, tb_cait_ghg=tb_cait_ghg, tb_cait_ch4=tb_cait_ch4, tb_cait_n2o=tb_cait_n2o,
-                              tb_energy=tb_energy, tb_gdp=tb_gdp, tb_population=tb_population,
-                              tb_countries_regions=tb_countries_regions)
+    combined = combine_tables(
+        tb_gcp=tb_gcp,
+        tb_cait_ghg=tb_cait_ghg,
+        tb_cait_ch4=tb_cait_ch4,
+        tb_cait_n2o=tb_cait_n2o,
+        tb_energy=tb_energy,
+        tb_gdp=tb_gdp,
+        tb_population=tb_population,
+        tb_countries_regions=tb_countries_regions,
+    )
 
     # Prepare outputs.
     combined = prepare_outputs(combined=combined)
