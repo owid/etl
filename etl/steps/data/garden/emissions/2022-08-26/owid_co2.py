@@ -194,7 +194,17 @@ def combine_tables(
     """
     # Gather all variables' metadata from all tables.
     tables = [tb_gcp, tb_cait_ghg, tb_cait_ch4, tb_cait_n2o, tb_energy, tb_gdp, tb_population, tb_countries_regions]
-    variables_metadata = {variable: table[variable].metadata for table in tables for variable in table.columns}
+    variables_metadata = {}
+    for table in tables:
+        for variable in table.columns:
+            # If variable does not have sources metadata, take them from the dataset metadata.
+            if len(table[variable].metadata.sources) == 0:
+                if type(table.metadata.dataset) == dict:
+                    # This happens for countries-regions, which has a different metadata format.
+                    table[variable].metadata.sources = []
+                else:
+                    table[variable].metadata.sources = table.metadata.dataset.sources
+            variables_metadata[variable] = table[variable].metadata
 
     # Combine main tables (with an outer join, to gather all entities from all tables).
     tables = [tb_gcp, tb_cait_ghg, tb_cait_ch4, tb_cait_n2o]
