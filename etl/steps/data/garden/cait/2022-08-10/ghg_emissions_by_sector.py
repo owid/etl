@@ -205,10 +205,13 @@ def run(dest_dir: str) -> None:
 
     # Add all tables to dataset.
     for table_name in list(tables):
+        table_title = TABLE_NAMES[table_name]
+        table_short_name = catalog.utils.underscore(table_title)
         table = tables[table_name]
         # Make column names snake lower case.
         table = catalog.utils.underscore_table(table)
-        table.metadata.title = TABLE_NAMES[table_name]
-        table.metadata.short_name = catalog.utils.underscore(TABLE_NAMES[table_name])
+        table.metadata.title = table_title
+        table.metadata.short_name = table_short_name
+        table.update_metadata_from_yaml(METADATA_PATH, table_short_name)
         # Add table to dataset.
         ds_garden.add(table)
