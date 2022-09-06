@@ -678,7 +678,7 @@ class Variable(SQLModel, table=True):
     shortUnit: Optional[str] = Field(default=None, sa_column=Column("shortUnit", String(255, "utf8mb4_0900_as_cs")))
     originalMetadata: Optional[Dict[Any, Any]] = Field(default=None, sa_column=Column("originalMetadata", JSON))
     grapherConfig: Optional[Dict[Any, Any]] = Field(default=None, sa_column=Column("grapherConfig", JSON))
-    catalogPath: Optional[str]
+    catalogPath: Optional[str] = Field(default=None, sa_column=Column("catalogPath", LONGTEXT))
     dimensions: Optional[Dimensions] = Field(sa_column=Column("dimensions", JSON, nullable=False))
 
     datasets: Optional["Dataset"] = Relationship(back_populates="variables")
