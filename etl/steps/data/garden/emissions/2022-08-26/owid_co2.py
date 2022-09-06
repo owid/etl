@@ -5,7 +5,7 @@ Datasets combined:
 * Greenhouse gas emissions by sector (CAIT, 2022).
 * Primary energy consumption (BP & EIA, 2022)
 
-Additionally, OWID's population dataset and the Maddison Project Database (Bolt and van Zanden, 2020) on GDP are included.
+Additionally, OWID's population dataset and Maddison Project Database (Bolt and van Zanden, 2020) on GDP are included.
 
 """
 
@@ -15,7 +15,6 @@ from owid import catalog
 from owid.datautils import dataframes
 from shared import (
     CURRENT_DIR,
-    add_population_of_historical_regions,
     gather_sources_from_tables,
 )
 
@@ -37,7 +36,7 @@ POPULATION_PATH = DATA_DIR / "garden/owid/latest/key_indicators/"
 GDP_PATH = DATA_DIR / "garden/ggdc/2020-10-01/ggdc_maddison"
 
 # Conversion factor from tonnes to million tonnes.
-TONNES_TO_MEGATONNES = 1e-6
+TONNES_TO_MILLION_TONNES = 1e-6
 
 GCP_COLUMNS = {
     "entity_name": "country",
@@ -129,7 +128,7 @@ GDP_COLUMNS = {
     "gdp": "gdp",
 }
 
-UNITS = {"tonnes": {"conversion": TONNES_TO_MEGATONNES, "new_unit": "million_tonnes"}}
+UNITS = {"tonnes": {"conversion": TONNES_TO_MILLION_TONNES, "new_unit": "million_tonnes"}}
 
 
 def convert_units(table: catalog.Table) -> catalog.Table:
@@ -157,6 +156,107 @@ def convert_units(table: catalog.Table) -> catalog.Table:
             )
 
     return table
+
+
+def combine_tables(tb_gcp: catalog.Table, tb_cait_ghg: catalog.Table, tb_cait_ch4: catalog.Table,
+                   tb_cait_n2o: catalog.Table, tb_energy: catalog.Table, tb_gdp: catalog.Table,
+                   tb_population: catalog.Table, tb_countries_regions: catalog.Table) -> catalog.Table:
+    """Combine tables.
+
+    Parameters
+    ----------
+    tb_gcp : catalog.Table
+        Global Carbon Budget table (from Global Carbon Project).
+    tb_cait_ghg : catalog.Table
+        Greenhouse gas emissions table (from CAIT).
+    tb_cait_ch4 : catalog.Table
+        CH4 emissions table (from CAIT).
+    tb_cait_n2o : catalog.Table
+        N2O emissions table (from CAIT).
+    tb_energy : catalog.Table
+        Primary energy consumption table (from BP & EIA).
+    tb_gdp : catalog.Table
+        Maddison GDP table (from GGDC).
+    tb_population : catalog.Table
+        OWID population table (from various sources).
+    tb_countries_regions : catalog.Table
+        OWID countries-regions table.
+
+    Returns
+    -------
+    combined : catalog.Table
+        Combined table with metadata and variables metadata.
+
+    """
+    # Gather all variables' metadata from all tables.
+    tables = [tb_gcp, tb_cait_ghg, tb_cait_ch4, tb_cait_n2o, tb_energy, tb_gdp, tb_population, tb_countries_regions]
+    variables_metadata = {variable: table[variable].metadata for table in tables for variable in table.columns}
+
+    # Combine main tables (with an outer join, to gather all entities from all tables).
+    tables = [tb_gcp, tb_cait_ghg, tb_cait_ch4, tb_cait_n2o]
+    combined = dataframes.multi_merge(dfs=tables, on=["country", "year"], how="outer")
+
+    # Add secondary tables (with a left join, to keep only entities for which we have emissions data).
+    tables = [combined, tb_energy, tb_gdp, tb_population]
+    combined = dataframes.multi_merge(dfs=tables, on=["country", "year"], how="left")
+
+    # Countries-regions dataset does not have a year column, so it has to be merged on country.
+    combined = pd.merge(combined, tb_countries_regions, on="country", how="left")
+
+    # Since GCP data is backported, it does not have sources metadata.
+    # Similarly, OWID population dataset does not have sources metadata.
+    # Add those sources manually.
+    tb_gcp.metadata.dataset.sources = [catalog.meta.Source(name="Our World in Data based on Global Carbon Project.")]
+    tb_population.metadata.dataset = catalog.meta.DatasetMeta(
+        sources=[
+            catalog.meta.Source(
+                name="Our World in Data based on different sources (https://ourworldindata.org/population-sources)."
+            )
+        ]
+    )
+
+    # Assign variables metadata back to combined dataframe.
+    for variable in variables_metadata:
+        combined[variable].metadata = variables_metadata[variable]
+
+    # Check that there were no repetition in column names.
+    error = "Repeated columns in combined data."
+    assert len([column for column in set(combined.columns) if "_x" in column]) == 0, error
+
+    # Adjust units.
+    combined = convert_units(combined)
+
+    return combined
+
+
+def prepare_outputs(combined: catalog.Table) -> catalog.Table:
+    """Clean and prepare output table.
+
+    Parameters
+    ----------
+    combined : catalog.Table
+        Combined table.
+
+    Returns
+    -------
+    combined: catalog.Table
+        Cleaned combined table.
+
+    """
+    # Remove rows that only have nan (ignoring if country, year, iso_code, population and gdp do have data).
+    columns_that_must_have_data = [
+        column for column in combined.columns if column not in ["country", "year", "iso_code", "population", "gdp"]
+    ]
+    combined = combined.dropna(subset=columns_that_must_have_data, how="all").reset_index(drop=True)
+
+    # Sanity check.
+    columns_with_inf = [column for column in combined.columns if len(combined[combined[column] == np.inf]) > 0]
+    assert len(columns_with_inf) == 0, f"Infinity values detected in columns: {columns_with_inf}"
+
+    # Set index and sort conveniently.
+    combined = combined.set_index(["country", "year"], verify_integrity=True).sort_index()
+
+    return combined
 
 
 def run(dest_dir: str) -> None:
@@ -202,54 +302,13 @@ def run(dest_dir: str) -> None:
         columns=COUNTRIES_REGIONS_COLUMNS
     )
 
-    # Gather all variables' metadata from all tables.
-    tables = [tb_gcp, tb_cait_ghg, tb_cait_ch4, tb_cait_n2o, tb_energy, tb_gdp, tb_population, tb_countries_regions]
-    variables_metadata = {variable: table[variable].metadata for table in tables for variable in table.columns}
+    # Combine tables.
+    combined = combine_tables(tb_gcp=tb_gcp, tb_cait_ghg=tb_cait_ghg, tb_cait_ch4=tb_cait_ch4, tb_cait_n2o=tb_cait_n2o,
+                              tb_energy=tb_energy, tb_gdp=tb_gdp, tb_population=tb_population,
+                              tb_countries_regions=tb_countries_regions)
 
-    # Add historical regions to population.
-    tb_population = add_population_of_historical_regions(tb_population)
-
-    # Combine all tables.
-    # Table countries-regions does not have a year column. Merge it separately.
-    tables = [tb_gcp, tb_cait_ghg, tb_cait_ch4, tb_cait_n2o, tb_energy, tb_gdp, tb_population]
-    combined = dataframes.multi_merge(dfs=tables, on=["country", "year"], how="outer")
-    combined = pd.merge(combined, tb_countries_regions, on="country", how="left")
-
-    # Since GCP data is backported, it does not have sources metadata.
-    # Similarly, OWID population dataset does not have sources metadata.
-    # Add those sources manually.
-    tb_gcp.metadata.dataset.sources = [catalog.meta.Source(name="Our World in Data based on Global Carbon Project.")]
-    tb_population.metadata.dataset = catalog.meta.DatasetMeta(
-        sources=[
-            catalog.meta.Source(
-                name="Our World in Data based on different sources (https://ourworldindata.org/population-sources)."
-            )
-        ]
-    )
-
-    # Assign variables metadata back to combined dataframe.
-    for variable in variables_metadata:
-        combined[variable].metadata = variables_metadata[variable]
-
-    # Check that there were no repetition in column names.
-    error = "Repeated columns in combined data."
-    assert len([column for column in set(combined.columns) if "_x" in column]) == 0, error
-
-    # Adjust units.
-    combined = convert_units(combined)
-
-    # Remove rows that only have nan (ignoring if country, year, iso_code, population and gdp do have data).
-    columns_that_must_have_data = [
-        column for column in combined.columns if column not in ["country", "year", "iso_code", "population", "gdp"]
-    ]
-    combined = combined.dropna(subset=columns_that_must_have_data, how="all").reset_index(drop=True)
-
-    # Sanity check.
-    columns_with_inf = [column for column in combined.columns if len(combined[combined[column] == np.inf]) > 0]
-    assert len(columns_with_inf) == 0, f"Infinity values detected in columns: {columns_with_inf}"
-
-    # Set index and sort conveniently.
-    combined = combined.set_index(["country", "year"], verify_integrity=True).sort_index()
+    # Prepare outputs.
+    combined = prepare_outputs(combined=combined)
 
     #
     # Save outputs.
@@ -271,6 +330,3 @@ def run(dest_dir: str) -> None:
 
     # Add combined tables to the new dataset.
     ds_garden.add(combined)
-
-    # TODO:
-    # * Consider creating a new garden step to harmonize GCP data. Check that all other datasets are harmonized.
