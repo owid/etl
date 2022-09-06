@@ -322,25 +322,21 @@ def load_excluded_countries() -> List[str]:
 
 
 def create_omms(all_tabs: List[pd.DataFrame]) -> List[pd.DataFrame]:
-    i = 0
-    for table in all_tabs:
-        if table.index[0][5] == "ER_BDY_ABT2NP":
+    for i, table in enumerate(all_tabs):
+        if table.index[0][5] in ("ER_BDY_ABT2NP", "SG_SCP_PROCN"):
             table = table.copy(deep=False)
             table = table.query('level_status != "No breakdown"')
+
+            # exclude regions which contain more than one country and cannot be
+            # converted to a level_status for a single country
+            vc = table.groupby(["country", "year"]).value.sum().sort_values(ascending=False)
+            regions = set(vc[vc > 1].index.get_level_values(0))
+            table = table[~table.index.get_level_values("country").isin(regions)]
+
             table.reset_index(level=["level_status"], inplace=True)
             table["value"] = table["level_status"]
             table.drop(columns=["level_status"], inplace=True)
             all_tabs[i] = table
-
-        if table.index[0][5] == "SG_SCP_PROCN":
-            table = table.copy(deep=False)
-            table = table.query('level_status != "No breakdown"')
-            table.reset_index(level=["level_status"], inplace=True)
-            table["value"] = table["level_status"]
-            table.drop(columns=["level_status"], inplace=True)
-            all_tabs[i] = table
-
-        i += 1
 
     return all_tabs
 
