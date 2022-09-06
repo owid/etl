@@ -249,6 +249,7 @@ def set_dataset_checksum(dataset_id: int, checksum: str) -> None:
     with Session(gm.get_engine()) as session:
         q = update(gm.Dataset).where(gm.Dataset.id == dataset_id).values(sourceChecksum=checksum)
         session.execute(q)
+        session.commit()
 
 
 def cleanup_ghost_variables(dataset_id: int, upserted_variable_ids: List[int], workers: int = 1) -> None:
