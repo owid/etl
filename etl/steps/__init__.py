@@ -29,7 +29,7 @@ with warnings.catch_warnings():
 from owid import catalog, walden
 from owid.walden import CATALOG as WALDEN_CATALOG
 
-from etl import backport_helpers, files, git, paths
+from etl import backport_helpers, config, files, git, paths
 from etl.grapher_import import (
     cleanup_ghost_sources,
     cleanup_ghost_variables,
@@ -358,13 +358,15 @@ class DataStep(Step):
         """
         # use a subprocess to isolate each step from the others, and avoid state bleeding
         # between them
-        subprocess.check_call(
-            [
-                f"{paths.BASE_DIR}/.venv/bin/run_python_step",
-                str(self),
-                self._dest_dir.as_posix(),
-            ]
-        )
+        args = [
+            f"{paths.BASE_DIR}/.venv/bin/run_python_step",
+            str(self),
+            self._dest_dir.as_posix(),
+        ]
+        if config.IPDB_ENABLED:
+            args[1:1] = ["--ipdb"]
+
+        subprocess.check_call(args)
 
     def _run_notebook(self) -> None:
         "Run a parameterised Jupyter notebook."

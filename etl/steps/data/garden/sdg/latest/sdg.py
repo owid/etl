@@ -63,6 +63,18 @@ def _indicator_prefix(name: str, indicator: str) -> str:
     return f"indicator_{indicator.replace('.', '_').lower()}__{name}"
 
 
+def _align_multiindex(index: pd.Index) -> pd.Index:
+    """Align multiindex (year, entity_name, entity_id, entity_code) to (country, year)."""
+    index = index.rename([n.replace("entity_name", "country") for n in index.names])
+    return pd.MultiIndex.from_arrays(
+        [
+            index.get_level_values("country").astype("category"),
+            index.get_level_values("year").astype(int),
+        ],
+        names=("country", "year"),
+    )
+
+
 def run(dest_dir: str) -> None:
     """Assemble SDG dataset."""
     sdg_sources = _load_sdg_sources()
@@ -97,6 +109,8 @@ def run(dest_dir: str) -> None:
                     table = table_cache[table_name]
                 else:
                     table = ds[table_name]
+                    table.index = _align_multiindex(table.index)
+
                     table_cache[table_name] = table
 
                 log.info("sdg.run", indicator=r.indicator, variable_name=r.variable_name)

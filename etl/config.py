@@ -32,6 +32,9 @@ DB_PORT = int(env.get("DB_PORT", "3306"))
 DB_USER = env.get("DB_USER", "root")
 DB_PASS = env.get("DB_PASS", "")
 
+# run ETL steps with debugger on exception
+IPDB_ENABLED = False
+
 
 def enable_bugsnag() -> None:
     BUGSNAG_API_KEY = env.get("BUGSNAG_API_KEY")
