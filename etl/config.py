@@ -12,7 +12,9 @@ from os import environ as env
 import bugsnag
 from dotenv import load_dotenv
 
-load_dotenv()
+ENV_FILE = env.get("ENV", ".env")
+
+load_dotenv(ENV_FILE)
 
 DEBUG = env.get("DEBUG") == "True"
 
