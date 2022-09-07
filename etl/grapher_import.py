@@ -94,7 +94,8 @@ def upsert_dataset(dataset: catalog.Dataset, namespace: str, sources: List[catal
             dataset.metadata, namespace=namespace, user_id=int(cast(str, config.GRAPHER_USER_ID))
         ).upsert(session)
 
-        ds = ds.upsert(session)
+        session.commit()
+
         assert ds.id
         if ds.isArchived:
             log.warning(
@@ -112,23 +113,25 @@ def upsert_dataset(dataset: catalog.Dataset, namespace: str, sources: List[catal
         source_ids: Dict[str, int] = dict()
         for source in sources:
             assert source.name
-            source_ids[source.name] = _upsert_source_to_db(source, ds.id)
+            source_ids[source.name] = _upsert_source_to_db(session, source, ds.id)
 
         session.commit()
 
         return DatasetUpsertResult(ds.id, source_ids)
 
 
-def _upsert_source_to_db(source: catalog.Source, dataset_id: int) -> int:
+def _upsert_source_to_db(session: Session, source: catalog.Source, dataset_id: int) -> int:
     """Upsert source and return its id"""
     # NOTE: we need the lock because upserts can happen in multiple threads and `sources` table
     # has no unique constraint on `name`. It can be removed once we switch to variable views
     # and stop using threads
     with source_table_lock:
-        with Session(gm.get_engine()) as session:
-            db_source = gm.Source.from_catalog_source(source, dataset_id).upsert(session)
-            assert db_source.id
-            return db_source.id
+        db_source = gm.Source.from_catalog_source(source, dataset_id).upsert(session)
+
+        session.commit()
+
+        assert db_source.id
+        return db_source.id
 
 
 def _update_variables_display(table: catalog.Table) -> None:
@@ -204,7 +207,7 @@ def upsert_table(table: catalog.Table, dataset_upsert_result: DatasetUpsertResul
             # Not exists, upsert it
             # NOTE: this could be quite inefficient as we upsert source for every variable
             #   optimize this if this turns out to be a bottleneck
-            source_id = _upsert_source_to_db(source, dataset_upsert_result.dataset_id)
+            source_id = _upsert_source_to_db(session, source, dataset_upsert_result.dataset_id)
 
         variable = gm.Variable.from_variable_metadata(
             table[column_name].metadata,
@@ -246,6 +249,7 @@ def set_dataset_checksum(dataset_id: int, checksum: str) -> None:
     with Session(gm.get_engine()) as session:
         q = update(gm.Dataset).where(gm.Dataset.id == dataset_id).values(sourceChecksum=checksum)
         session.execute(q)
+        session.commit()
 
 
 def cleanup_ghost_variables(dataset_id: int, upserted_variable_ids: List[int], workers: int = 1) -> None:
