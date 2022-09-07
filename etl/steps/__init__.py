@@ -29,7 +29,7 @@ with warnings.catch_warnings():
 from owid import catalog, walden
 from owid.walden import CATALOG as WALDEN_CATALOG
 
-from etl import backport_helpers, files, git
+from etl import backport_helpers, config, files, git
 from etl import grapher_helpers as gh
 from etl import paths
 from etl.grapher_import import (
