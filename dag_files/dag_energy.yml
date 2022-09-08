@@ -106,3 +106,5 @@ steps:
   #
   data://meadow/smil/2017-01-01/global_primary_energy:
     - walden://smil/2017-01-01/global_primary_energy
+  data://garden/smil/2017-01-01/global_primary_energy:
+    - data://meadow/smil/2017-01-01/global_primary_energy
