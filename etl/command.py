@@ -121,7 +121,7 @@ def main(
     if grapher:
         sanity_check_db_settings()
 
-    dag = construct_dag(dag_path, backport=backport, private=private)
+    dag = construct_dag(dag_path, backport=backport, private=private, grapher=grapher)
 
     excludes = exclude.split(",") if exclude else []
 
@@ -150,7 +150,7 @@ def sanity_check_db_settings() -> None:
         sys.exit(1)
 
 
-def construct_dag(dag_path: Path, backport: bool, private: bool) -> DAG:
+def construct_dag(dag_path: Path, backport: bool, private: bool, grapher: bool) -> DAG:
     """Construct full DAG."""
 
     # Load our graph of steps and the things they depend on
@@ -159,6 +159,10 @@ def construct_dag(dag_path: Path, backport: bool, private: bool) -> DAG:
     # Add all steps for backporting datasets (there are currently >800 of them)
     if backport:
         dag.update(_backporting_steps(private, walden_catalog=WALDEN_CATALOG))
+
+    # If --grapher is set, add steps for upserting to DB
+    if grapher:
+        dag.update(_grapher_steps(dag))
 
     return dag
 
@@ -259,6 +263,16 @@ def _backporting_steps(private: bool, walden_catalog: WaldenCatalog) -> DAG:
             }
 
     return dag
+
+
+def _grapher_steps(dag: DAG) -> DAG:
+    new_dag = {}
+    for step in list(dag.keys()):
+        # match regex with prefix data or data-private
+        if re.match(r"^(data|data-private)://grapher/", step):
+            new_dag[re.sub(r"^(data|data-private)://", "grapher-new://", step)] = {step}
+
+    return new_dag
 
 
 def _update_open_file_limit() -> None:

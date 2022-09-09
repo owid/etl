@@ -21,7 +21,7 @@ def main(uri: str, dest_dir: str, ipdb: Optional[bool]) -> None:
     Import and run a specific step of the ETL. Meant to be ran as
     a subprocess by the main `etl` command.
     """
-    if not uri.startswith("data://") and not uri.startswith("data-private://") and not uri.startswith("grapher-new://"):
+    if not uri.startswith("data://") and not uri.startswith("data-private://"):
         raise ValueError("Only data:// or data-private:// URIs are supported")
 
     path = uri.split("//", 1)[1]
