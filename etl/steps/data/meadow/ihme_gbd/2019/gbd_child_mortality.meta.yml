@@ -1,7 +1,7 @@
 dataset:
   sources:
     -
-      name: Global Burden of Disease Study (2019) - Deaths and DALYs
+      name: Global Burden of Disease Study (2019) - Child mortality
       published_by: Institute of Health Metrics and Evaluation
 
 tables:
@@ -12,9 +12,7 @@ tables:
         description: Deaths or DALYs - ways of measuring the impact of causes of death.
       cause_name:
         title: Causes of death
-        description: Disease or injuries that result in or contribute to an individuals death.
+        description: Disease or injuries that result in or contribute to a childs death.
       value:
         title: Deaths or DALYs
         description: The number of deaths or disability adjusted life years (DALYs) caused by a given disease or injury.
-
-

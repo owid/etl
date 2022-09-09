@@ -6,3 +6,7 @@ steps:
   - data://meadow/dummy/2020-01-01/dummy
   grapher://dummy/2020-01-01/dummy:
   - data://garden/dummy/2020-01-01/dummy
+  data://meadow/ihme_gbd/2019/gbd_cause:
+  - walden://ihme_gbd/2019/gbd_cause
+  data://meadow/ihme_gbd/2019/gbd_child_mortality:
+  - walden://ihme_gbd/2019/gbd_child_mortality
