@@ -10,7 +10,7 @@ MAPPING_FILE = Path(__file__).with_suffix(".mapping.json")
 
 
 def run(dest_dir: str) -> None:
-    harmonize_countries("meadow/wpp/2019/standard_projections", dest_dir)
+    harmonize_countries("meadow/un/2019/un_wpp", dest_dir)
 
 
 def harmonize_countries(source_ds_path: str, dest_dir: str) -> None:
