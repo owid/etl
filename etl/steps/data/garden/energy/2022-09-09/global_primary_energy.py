@@ -121,6 +121,22 @@ def combine_bp_and_smil_data(df_bp: pd.DataFrame, df_smil: pd.DataFrame) -> pd.D
     return combined
 
 
+def add_total_consumption_and_share_variables(combined: pd.DataFrame) -> pd.DataFrame:
+    # Create a column with the total direct energy (ignoring nans when summing).
+    combined["total_consumption__twh_direct_energy"] = combined[[column for column in combined.columns if "direct_energy" in column]].sum(axis=1)
+    # Create a column with the total substituted energy (ignoring nans when summing).
+    combined["total_consumption__twh_substituted_energy"] = combined[[column for column in combined.columns if "substituted_energy" in column]].sum(axis=1)
+    # Add share variables.
+    sources = ['biofuels', 'coal', 'gas', 'hydropower', 'nuclear', 'oil', 'other_renewables', 'solar', 'traditional_biomass', 'wind']
+    for source in sources:
+        # Add percentage of each source with respect to the total direct energy.
+        combined[f"{source}__pct_of_direct_energy"] = 100 * combined[f"{source}__twh_direct_energy"] / combined["total_consumption__twh_direct_energy"]
+        # Add percentage of each source with respect to the total substituted energy.
+        combined[f"{source}__pct_of_substituted_energy"] = 100 * combined[f"{source}__twh_substituted_energy"] / combined["total_consumption__twh_substituted_energy"]
+
+    return combined
+
+
 def run(dest_dir: str) -> None:
     #
     # Load data.
@@ -143,6 +159,9 @@ def run(dest_dir: str) -> None:
 
     # Combine BP and Smil data.
     combined = combine_bp_and_smil_data(df_bp=df_bp, df_smil=df_smil)
+
+    # Add variables for total consumption and variables of % share of each source.
+    combined = add_total_consumption_and_share_variables(combined=combined)
 
     # Create a new table with combined data (and no metadata).
     tb_combined = catalog.Table(combined)
