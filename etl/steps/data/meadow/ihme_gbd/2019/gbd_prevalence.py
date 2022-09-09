@@ -11,14 +11,16 @@ log = get_logger()
 
 # naming conventions
 N = Names(__file__)
+N = Names("/Users/fionaspooner/Documents/OWID/repos/etl/etl/steps/data/meadow/ihme_gbd/2019/gbd_prevalence.yml")
 
 
 def run(dest_dir: str) -> None:
-    log.info("gbd_cause.start")
+    log.info("gbd_prevalence.start")
 
     # retrieve raw data from walden
-    walden_ds = WaldenCatalog().find_one(namespace="ihme_gbd", short_name="gbd_cause", version="2019")
+    walden_ds = WaldenCatalog().find_one(namespace="ihme_gbd", short_name="gbd_prevalence", version="2019")
     local_file = walden_ds.ensure_downloaded()
+
     df = pd.read_feather(local_file)
 
     # clean and transform data
@@ -41,7 +43,7 @@ def run(dest_dir: str) -> None:
     tb = underscore_table(tb)
 
     ds.metadata.update_from_yaml(N.metadata_path)
-    tb.update_metadata_from_yaml(N.metadata_path, "gbd_cause")
+    tb.update_metadata_from_yaml(N.metadata_path, "gbd_prevalence")
 
     # add table to a dataset
     ds.add(tb)
@@ -49,7 +51,7 @@ def run(dest_dir: str) -> None:
     # finally save the dataset
     ds.save()
 
-    log.info("gbd_cause.end")
+    log.info("gbd_prevalence.end")
 
 
 def clean_data(df: pd.DataFrame) -> pd.DataFrame:

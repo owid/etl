@@ -1,0 +1,19 @@
+dataset:
+  sources:
+    -
+      name: Global Burden of Disease Study (2019) - Risk factors
+      published_by: Institute of Health Metrics and Evaluation
+
+
+tables:
+  gbd_risk:
+    variables:
+      measure:
+        title: Measure name
+        description: Deaths and DALYs that given risk factors contribute to
+      cause:
+        title: Type of risk factor
+        description: Risk factors that contribute to an individuals death or reduction in life length.
+      value:
+        title: Deaths and DALYS
+        description: The number/rate/percent of deaths or DALYs a given risk factor contributes to.

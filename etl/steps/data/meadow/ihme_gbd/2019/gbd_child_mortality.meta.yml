@@ -5,12 +5,12 @@ dataset:
       published_by: Institute of Health Metrics and Evaluation
 
 tables:
-  gbd_cause:
+  gbd_child_mortality:
     variables:
-      measure_name:
+      measure:
         title: Measure name
         description: Deaths or DALYs - ways of measuring the impact of causes of death.
-      cause_name:
+      cause:
         title: Causes of death
         description: Disease or injuries that result in or contribute to a childs death.
       value:

@@ -5,7 +5,6 @@ from owid.walden import Catalog as WaldenCatalog
 from structlog import get_logger
 
 from etl.helpers import Names
-from etl.paths import DATA_DIR, REFERENCE_DATASET
 from etl.steps.data.converters import convert_walden_metadata
 
 log = get_logger()
@@ -56,7 +55,7 @@ def run(dest_dir: str) -> None:
 
 
 def clean_data(df: pd.DataFrame) -> pd.DataFrame:
-    return df.rename(columns={"location_name": "country", "val": "value",}).drop(
+    return df.rename(columns={"location_name": "country", "val": "value"}).drop(
         columns=["measure_id", "location_id", "sex_id", "age_id", "cause_id", "metric_id", "upper", "lower"],
         errors="ignore",
     )

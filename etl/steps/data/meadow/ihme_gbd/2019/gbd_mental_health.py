@@ -14,11 +14,12 @@ N = Names(__file__)
 
 
 def run(dest_dir: str) -> None:
-    log.info("gbd_cause.start")
+    log.info("gbd_mental_health.start")
 
     # retrieve raw data from walden
-    walden_ds = WaldenCatalog().find_one(namespace="ihme_gbd", short_name="gbd_cause", version="2019")
+    walden_ds = WaldenCatalog().find_one(namespace="ihme_gbd", short_name="gbd_mental_health", version="2019")
     local_file = walden_ds.ensure_downloaded()
+
     df = pd.read_feather(local_file)
 
     # clean and transform data
@@ -41,7 +42,7 @@ def run(dest_dir: str) -> None:
     tb = underscore_table(tb)
 
     ds.metadata.update_from_yaml(N.metadata_path)
-    tb.update_metadata_from_yaml(N.metadata_path, "gbd_cause")
+    tb.update_metadata_from_yaml(N.metadata_path, "gbd_mental_health")
 
     # add table to a dataset
     ds.add(tb)
@@ -49,7 +50,7 @@ def run(dest_dir: str) -> None:
     # finally save the dataset
     ds.save()
 
-    log.info("gbd_cause.end")
+    log.info("gbd_mental_health.end")
 
 
 def clean_data(df: pd.DataFrame) -> pd.DataFrame:
