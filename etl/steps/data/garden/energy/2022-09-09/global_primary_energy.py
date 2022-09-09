@@ -111,8 +111,9 @@ def combine_bp_and_smil_data(df_bp: pd.DataFrame, df_smil: pd.DataFrame) -> pd.D
     # We do not have data for traditional biomass after 2015 (BP does not provide it).
     # So, to be able to visualize the complete mix of global energy consumption,
     # we extrapolate Smil's data for traditional biomass from 2015 onwards, by repeating its last value.
-    combined["traditional_biomass__twh_direct_energy"] = combined["traditional_biomass__twh_direct_energy"].ffill()
-    combined["traditional_biomass__twh_substituted_energy"] = combined["traditional_biomass__twh_substituted_energy"].ffill()
+    missing_years_mask = combined["year"] >= df_smil["year"].max()
+    combined.loc[missing_years_mask, "traditional_biomass__twh_direct_energy"] = combined[missing_years_mask]["traditional_biomass__twh_direct_energy"].ffill()
+    combined.loc[missing_years_mask, "traditional_biomass__twh_substituted_energy"] = combined[missing_years_mask]["traditional_biomass__twh_substituted_energy"].ffill()
 
     # Create an index and sort conveniently.
     combined = combined.set_index(["country", "year"], verify_integrity=True).sort_index()
@@ -121,11 +122,11 @@ def combine_bp_and_smil_data(df_bp: pd.DataFrame, df_smil: pd.DataFrame) -> pd.D
     return combined
 
 
-def add_total_consumption_and_share_variables(combined: pd.DataFrame) -> pd.DataFrame:
-    # Create a column with the total direct energy (ignoring nans when summing).
-    combined["total_consumption__twh_direct_energy"] = combined[[column for column in combined.columns if "direct_energy" in column]].sum(axis=1)
-    # Create a column with the total substituted energy (ignoring nans when summing).
-    combined["total_consumption__twh_substituted_energy"] = combined[[column for column in combined.columns if "substituted_energy" in column]].sum(axis=1)
+def add_total_consumption_and_percentages(combined: pd.DataFrame) -> pd.DataFrame:
+    # Create a column with the total direct energy (ensuring there is at least one non-nan value).
+    combined["total_consumption__twh_direct_energy"] = combined[[column for column in combined.columns if "direct_energy" in column]].sum(axis=1, min_count=1)
+    # Create a column with the total substituted energy (ensuring there is at least one non-nan value).
+    combined["total_consumption__twh_substituted_energy"] = combined[[column for column in combined.columns if "substituted_energy" in column]].sum(axis=1, min_count=1)
     # Add share variables.
     sources = ['biofuels', 'coal', 'gas', 'hydropower', 'nuclear', 'oil', 'other_renewables', 'solar', 'traditional_biomass', 'wind']
     for source in sources:
@@ -161,7 +162,7 @@ def run(dest_dir: str) -> None:
     combined = combine_bp_and_smil_data(df_bp=df_bp, df_smil=df_smil)
 
     # Add variables for total consumption and variables of % share of each source.
-    combined = add_total_consumption_and_share_variables(combined=combined)
+    combined = add_total_consumption_and_percentages(combined=combined)
 
     # Create a new table with combined data (and no metadata).
     tb_combined = catalog.Table(combined)
