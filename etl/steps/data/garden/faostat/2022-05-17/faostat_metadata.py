@@ -470,7 +470,7 @@ def create_elements_dataframe_for_domain(
         .sort_values(["fao_unit_short_name"])
         .reset_index(drop=True)
     )
-    elements_from_data["fao_unit"] = elements_from_data["fao_unit"].fillna("")
+    elements_from_data["fao_unit"] = elements_from_data["fao_unit"].fillna(elements_from_data["fao_unit_short_name"])
 
     # Sanity checks:
 

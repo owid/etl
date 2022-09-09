@@ -12,7 +12,9 @@ from os import environ as env
 import bugsnag
 from dotenv import load_dotenv
 
-load_dotenv()
+ENV_FILE = env.get("ENV", ".env")
+
+load_dotenv(ENV_FILE)
 
 DEBUG = env.get("DEBUG") == "True"
 
@@ -31,6 +33,9 @@ DB_HOST = env.get("DB_HOST", "localhost")
 DB_PORT = int(env.get("DB_PORT", "3306"))
 DB_USER = env.get("DB_USER", "root")
 DB_PASS = env.get("DB_PASS", "")
+
+# run ETL steps with debugger on exception
+IPDB_ENABLED = False
 
 
 def enable_bugsnag() -> None:

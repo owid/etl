@@ -1,4 +1,5 @@
 import copy
+import re
 from collections import defaultdict
 from pathlib import Path
 from typing import List, Optional
@@ -40,6 +41,19 @@ def _get_variable_from_backported_table(table: Table, variable_id: str) -> Optio
         return None
 
 
+def _get_variable_from_table(table: Table, variable_title: str) -> Optional[Variable]:
+    """Get variable from table based on variable's title."""
+    for col in table.columns:
+        var_title = table[col].metadata.title
+        if var_title == variable_title:
+            # return a copy
+            v = Variable(table[col].dropna())
+            v.metadata = copy.deepcopy(table[col].metadata)
+            return v
+    else:
+        return None
+
+
 def _indicator_prefix(name: str, indicator: str) -> str:
     """Create new variable name by adding indicator prefix (if data comes directly from UN
     and prefix already exists then replace it)."""
@@ -47,6 +61,18 @@ def _indicator_prefix(name: str, indicator: str) -> str:
         name = name.split("__", 1)[1]
 
     return f"indicator_{indicator.replace('.', '_').lower()}__{name}"
+
+
+def _align_multiindex(index: pd.Index) -> pd.Index:
+    """Align multiindex (year, entity_name, entity_id, entity_code) to (country, year)."""
+    index = index.rename([n.replace("entity_name", "country") for n in index.names])
+    return pd.MultiIndex.from_arrays(
+        [
+            index.get_level_values("country").astype("category"),
+            index.get_level_values("year").astype(int),
+        ],
+        names=("country", "year"),
+    )
 
 
 def run(dest_dir: str) -> None:
@@ -57,7 +83,17 @@ def run(dest_dir: str) -> None:
 
     # group by datasets to make sure we load each one only once
     for dataset_name, sdg_group in sdg_sources.groupby("dataset_name"):
-        ds = Dataset(DATA_DIR / "backport/owid/latest" / dataset_name)
+
+        # kludge: if dataset is World Bank WDI, then grab metadata from the
+        # corresponding garden dataset
+        regex = re.search(r"world_development_indicators__world_bank__(\d{4}_\d{2}_\d{2})$", dataset_name)
+        if regex:
+            from_backport = False
+            version = regex.groups()[0].replace("_", "-")
+            ds = Dataset(DATA_DIR / f"garden/worldbank_wdi/{version}/wdi")
+        else:
+            from_backport = True
+            ds = Dataset(DATA_DIR / "backport/owid/latest" / dataset_name)
 
         # Since ds[table] reads from a feather file, it becomes the bottleneck in
         # runtime. Caching saves us from repeated reads
@@ -73,10 +109,15 @@ def run(dest_dir: str) -> None:
                     table = table_cache[table_name]
                 else:
                     table = ds[table_name]
+                    table.index = _align_multiindex(table.index)
+
                     table_cache[table_name] = table
 
                 log.info("sdg.run", indicator=r.indicator, variable_name=r.variable_name)
-                v = _get_variable_from_backported_table(table, r.variable_id)
+                if from_backport:
+                    v = _get_variable_from_backported_table(table, r.variable_id)
+                else:
+                    v = _get_variable_from_table(table, r.variable_name)
                 if v is not None:
                     v.name = _indicator_prefix(v.name, r.indicator)
                     vars[r.goal].append(v)

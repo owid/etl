@@ -168,6 +168,11 @@ def upsert_table(table: catalog.Table, dataset_upsert_result: DatasetUpsertResul
     utils.validate_underscore(table.metadata.short_name, "Table's short_name")
     utils.validate_underscore(table.columns[0], "Variable's name")
 
+    # make sure we have unique (year, entity_id) pairs
+    vc = table.index.value_counts()
+    if (vc > 1).any():
+        raise AssertionError(f"Duplicate (year, entity_id) pairs:\n {vc[vc > 1].index.tolist()}")
+
     if len(table.iloc[:, 0].metadata.sources) > 1:
         raise NotImplementedError(
             "only a single source is supported for grapher datasets, use"
@@ -249,6 +254,7 @@ def set_dataset_checksum(dataset_id: int, checksum: str) -> None:
     with Session(gm.get_engine()) as session:
         q = update(gm.Dataset).where(gm.Dataset.id == dataset_id).values(sourceChecksum=checksum)
         session.execute(q)
+        session.commit()
 
 
 def cleanup_ghost_variables(dataset_id: int, upserted_variable_ids: List[int], workers: int = 1) -> None:

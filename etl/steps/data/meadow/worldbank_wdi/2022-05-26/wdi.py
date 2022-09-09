@@ -62,6 +62,7 @@ def run(dest_dir: str) -> None:
         title=walden_ds.name,
         namespace=walden_ds.namespace,
         description=walden_ds.description,
+        version=walden_ds.version,
     )
     tb = Table(df_reshaped)
     tb.metadata = TableMeta(

@@ -40,6 +40,7 @@ def get_grapher_tables(dataset: catalog.Dataset) -> Iterable[catalog.Table]:
             table[column].metadata.unit = "tonnes"
             table[column].metadata.short_unit = "t"
             table[column].metadata.display["conversionFactor"] = 1e6
+            table[column].metadata.description = table[column].metadata.description.replace("million tonnes", "tonnes")
     table = gh.adapt_table_for_grapher(table)
 
     yield from gh.yield_wide_table(table, na_action="drop")
