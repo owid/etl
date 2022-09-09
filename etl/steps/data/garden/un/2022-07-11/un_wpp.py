@@ -112,6 +112,8 @@ def run(dest_dir: str) -> None:
     df_deaths = process_deaths(ds["deaths"], country_std)
     # merge main df
     df = merge_dfs([df_population, df_fertility, df_demographics, df_depratio, df_deaths])
+    # Remove Sint Maarten
+    df = df.loc[~df.index.get_level_values("location").isin(["SXM"])]
     # create tables
     table_long = df_to_table(
         df,
