@@ -33,7 +33,8 @@ EFFICIENCY_FACTOR = 0.36
 def prepare_bp_data(tb_bp: catalog.Table) -> pd.DataFrame:
     df_bp = pd.DataFrame(tb_bp).reset_index()
 
-    # BP gives consumption of direct energy in TWh, and, for non-fossil sources of electricity, consumption of input-equivalent energy in EJ.
+    # BP gives generation of direct energy in TWh, and, for non-fossil sources of electricity,
+    # consumption of input-equivalent energy in EJ.
     # The input-equivalent energy is the amount of energy that would be required to generate a given amount of (direct) electricity if non-fossil sources were as inefficient as a standard thermal power plant.
     # Therefore, direct and substituted energies for Biofuels, Coal, Gas and Oil are identical.
     # On the other hand, direct and substituted energy are different for non-fossil electricity sources, namely Hydropower, Nuclear, Solar, Other renewables, and Wind.
@@ -51,10 +52,10 @@ def prepare_bp_data(tb_bp: catalog.Table) -> pd.DataFrame:
         'oil_consumption__twh': "oil__twh_direct_energy",
         # Non-fossil electricity sources (direct energy).
         'geo_biomass_other__twh': "other_renewables__twh_direct_energy",
-        'hydro_consumption__twh': "hydropower__twh_direct_energy",
-        'nuclear_consumption__twh': "nuclear__twh_direct_energy",
-        'solar_consumption__twh': "solar__twh_direct_energy",
-        'wind_consumption__twh': "wind__twh_direct_energy",
+        'hydro_generation__twh': "hydropower__twh_direct_energy",
+        'nuclear_generation__twh': "nuclear__twh_direct_energy",
+        'solar_generation__twh': "solar__twh_direct_energy",
+        'wind_generation__twh': "wind__twh_direct_energy",
         # Non-fossil electricity sources (substituted energy).
         'geo_biomass_other__ej': "other_renewables__ej_substituted_energy",
         'hydro_consumption__ej': "hydropower__ej_substituted_energy",
