@@ -17,7 +17,7 @@ steps:
     - data://garden/bp/2022-07-11/statistical_review
     - data://garden/owid/latest/key_indicators
     - data://garden/wb/2021-07-01/wb_income
-  grapher://bp/2022-07-14/statistical_review:
+  data://grapher/bp/2022-07-14/statistical_review:
     - data://garden/bp/2022-07-14/statistical_review
   #
   # BP - Energy mix 2022.
@@ -26,7 +26,7 @@ steps:
     - data://garden/bp/2022-07-14/statistical_review
     - data://garden/owid/latest/key_indicators
     - data://garden/wb/2021-07-01/wb_income
-  grapher://bp/2022-07-14/energy_mix:
+  data://grapher/bp/2022-07-14/energy_mix:
     - data://garden/bp/2022-07-14/energy_mix
   #
   # Shift - Fossil fuel production 2022.
@@ -42,7 +42,7 @@ steps:
     - data://garden/bp/2022-07-14/statistical_review
     - data://garden/shift/2022-07-18/fossil_fuel_production
     - data://garden/owid/latest/key_indicators
-  grapher://energy/2022-07-20/fossil_fuel_production:
+  data://grapher/energy/2022-07-20/fossil_fuel_production:
     - data://garden/energy/2022-07-20/fossil_fuel_production
   #
   # EIA - Energy consumption 2022.
@@ -59,7 +59,7 @@ steps:
     - data://garden/eia/2022-07-27/energy_consumption
     - data://garden/ggdc/2020-10-01/ggdc_maddison
     - data://garden/owid/latest/key_indicators
-  grapher://energy/2022-07-29/primary_energy_consumption:
+  data://grapher/energy/2022-07-29/primary_energy_consumption:
     - data://garden/energy/2022-07-29/primary_energy_consumption
   #
   # Ember - Global electricity review 2022.
@@ -89,7 +89,7 @@ steps:
     - data://garden/bp/2022-07-14/statistical_review
     - data://garden/ember/2022-08-01/combined_electricity_review
     - data://garden/owid/latest/key_indicators
-  grapher://energy/2022-08-03/electricity_mix:
+  data://grapher/energy/2022-08-03/electricity_mix:
     - data://garden/energy/2022-08-03/electricity_mix
   #
   # Energy - OWID Energy dataset (2022).

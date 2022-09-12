@@ -104,13 +104,13 @@ steps:
     - walden://cait/2022-08-10/cait_ghg_emissions
   data://garden/cait/2022-08-10/ghg_emissions_by_sector:
     - data://meadow/cait/2022-08-10/ghg_emissions_by_sector
-  grapher://cait/2022-08-10/all_ghg_emissions:
+  data://grapher/cait/2022-08-10/all_ghg_emissions:
     - data://garden/cait/2022-08-10/ghg_emissions_by_sector
-  grapher://cait/2022-08-10/ch4_emissions:
+  data://grapher/cait/2022-08-10/ch4_emissions:
     - data://garden/cait/2022-08-10/ghg_emissions_by_sector
-  grapher://cait/2022-08-10/co2_emissions:
+  data://grapher/cait/2022-08-10/co2_emissions:
     - data://garden/cait/2022-08-10/ghg_emissions_by_sector
-  grapher://cait/2022-08-10/n2o_emissions:
+  data://grapher/cait/2022-08-10/n2o_emissions:
     - data://garden/cait/2022-08-10/ghg_emissions_by_sector
 
   #
@@ -123,9 +123,9 @@ steps:
     - data://garden/owid/latest/key_indicators
     - data://garden/ggdc/2020-10-01/ggdc_maddison
 
-  grapher://un_sdg/2022-07-07/un_sdg:
+  data://grapher/un_sdg/2022-07-07/un_sdg:
     - data://garden/un_sdg/2022-07-07/un_sdg
-  grapher://un/2022-07-11/un_wpp:
+  data://grapher/un/2022-07-11/un_wpp:
     - data://garden/un/2022-07-11/un_wpp
 
 # Sub-dags to import

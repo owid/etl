@@ -142,7 +142,7 @@ is being added to `etl`, or the date when the source data was released or update
 11. **Add the new garden step to the dag**, including its dependencies.
 12. **Run `make test` in `etl`** and ensure the step runs well.
 13. **Create a new grapher step** (e.g. `etl/etl/steps/grapher/example_institution/YYYY-MM-DD/example_dataset.py`).
-    The step must contain a `get_grapher_dataset()` function and a `get_grapher_tables()` function.
+    The step must contain a `run(dest_dir)` function.
     To test the step, you can run it on the grapher `staging` database, or using
     [a local grapher](https://github.com/owid/owid-grapher/blob/master/docs/docker-compose-mysql.md).
 14. **Create a pull request** to merge the new branch with the master branch in `etl`.
@@ -219,6 +219,8 @@ A step used to mark dependencies on HTTPS resources. The path is interpreted as 
 Example: `etag://raw.githubusercontent.com/owid/covid-19-data/master/public/data/owid-covid-data.csv`
 
 ### Grapher (`grapher://...`)
+
+_TODO: rewrite to reflect the new grapher step_
 
 A step to load a dataset into the grapher mysql database. Similar to `data` steps the path is interpreted as the path to a python script. The job of this script is to make the input dataset fit the constrained grapher data model where we only have the exact dimensions of year and entity id. The latter is the numeric id of the entity (usually the country) and the former can also be the number of days since a reference date.
 

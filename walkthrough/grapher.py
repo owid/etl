@@ -92,7 +92,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
     if form.add_to_dag:
         dag_content = utils.add_to_dag(
             {
-                f"grapher://{form.namespace}/{form.version}/{form.short_name}": [
+                f"data://grapher/{form.namespace}/{form.version}/{form.short_name}": [
                     f"data://garden/{form.namespace}/{form.version}/{form.short_name}"
                 ]
             }
@@ -113,6 +113,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
             extra_context=dict(directory_name="grapher", **form.dict()),
         )
 
+        # TODO: this will soon change to `STEP_DIR / "data" / "grapher" / form.namespace / form.version`
         DATASET_DIR = STEP_DIR / "grapher" / form.namespace / form.version
 
         shutil.copytree(
@@ -139,7 +140,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
     Then run the grapher step:
 
     ```
-    etl grapher://{form.namespace}/{form.version}/{form.short_name} --grapher
+    etl grapher/{form.namespace}/{form.version}/{form.short_name} --grapher
     ```
 
 2. When you feel confident, change your `.env` to staging which looks something like this:
@@ -162,7 +163,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
     After you run
 
     ```
-    etl grapher://{form.namespace}/{form.version}/{form.short_name} --grapher
+    etl grapher/{form.namespace}/{form.version}/{form.short_name} --grapher
     ```
 
     you should see it [in staging admin](https://staging.owid.cloud/admin/datasets).

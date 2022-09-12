@@ -11,6 +11,8 @@ Note that pushing to a grapher DB is **not yet automated** and must be done manu
 
 ## Grapher step
 
+_TODO: rewrite to reflect the new grapher step_
+
 A step to load a dataset into the grapher mysql database. Similar to `data` steps the path is interpreted as the path to a python script. The job of this script is to make the input dataset fit the constrained grapher data model where we only have the exact dimensions of year and entity id. The latter is the numeric id of the entity (usually the country) and the former can also be the number of days since a reference date.
 
 The python script that does this re-fitting of the data for the grapher datamodel only has to reformat the data and ensure the metadata exists. Actually interfacing with the database is taken care of by the ETL library.
