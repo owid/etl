@@ -1,12 +1,12 @@
 from pathlib import Path
-from typing import List, Optional, cast
+from typing import List
 
 import pandas as pd
 from owid import catalog
-from owid.datautils import geo
 
 CURRENT_DIR = Path(__file__).parent
 VERSION = CURRENT_DIR.name
+
 
 def gather_sources_from_tables(
     tables: List[catalog.Table],
@@ -42,9 +42,7 @@ def gather_sources_from_tables(
     return known_sources
 
 
-def combine_two_overlapping_dataframes(
-    df1: pd.DataFrame, df2: pd.DataFrame, index_columns: List[str]
-) -> pd.DataFrame:
+def combine_two_overlapping_dataframes(df1: pd.DataFrame, df2: pd.DataFrame, index_columns: List[str]) -> pd.DataFrame:
     """Combine two dataframes that may have identical columns, prioritizing the first one.
 
     Both dataframes must have a dummy index (if not, use reset_index() on both of them).
@@ -77,7 +75,9 @@ def combine_two_overlapping_dataframes(
     # Find columns of data (those that are not index columns).
     df1_columns = df1.columns.tolist()
     df2_columns = df2.columns.tolist()
-    common_columns = [column for column in df1_columns if column not in index_columns] + [column for column in df2_columns if column not in df1_columns]
+    common_columns = [column for column in df1_columns if column not in index_columns] + [
+        column for column in df2_columns if column not in df1_columns
+    ]
 
     # Go column by column, concatenate, remove nans, and then keep df1 version on duplicated rows.
     # Note: There may be a faster, simpler way to achieve this.
