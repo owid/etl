@@ -266,6 +266,7 @@ def _backporting_steps(private: bool, walden_catalog: WaldenCatalog) -> DAG:
 
 
 def _grapher_steps(dag: DAG) -> DAG:
+    # dynamically generate a grapher-new:// step for every grapher data step
     new_dag = {}
     for step in list(dag.keys()):
         # match regex with prefix data or data-private
