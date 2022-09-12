@@ -742,7 +742,6 @@ class Variable(SQLModel, table=True):
         catalog_path: Optional[str],
         dimensions: Optional[Dimensions],
     ) -> "Variable":
-        # TODO: catalog_path and dimensions can be fetched from variable metadata
         assert metadata.unit
         assert metadata.display
         return cls(

@@ -127,6 +127,10 @@ def _upsert_source_to_db(session: Session, source: catalog.Source, dataset_id: i
     # and stop using threads
     with source_table_lock:
         db_source = gm.Source.from_catalog_source(source, dataset_id).upsert(session)
+
+        # commit within the lock to make sure other threads get the latest sources
+        session.commit()
+
         assert db_source.id
         return db_source.id
 

@@ -641,9 +641,9 @@ class GrapherNewStep(DataStep):
 
         variable_upsert_results = []
 
-        # WARNING: multiple tables will be saved under a single dataset, this could cause problems if someone
+        # NOTE: multiple tables will be saved under a single dataset, this could cause problems if someone
         # is fetching the whole dataset from data-api as they would receive all tables merged in a single
-        # table
+        # table. This won't be a problem after we introduce the concept of "tables"
         for table in dataset:
             catalog_path = f"{self.path}/{table.metadata.short_name}"
 
