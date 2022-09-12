@@ -114,3 +114,5 @@ steps:
   data://garden/energy/2022-09-09/global_primary_energy:
     - data://garden/smil/2017-01-01/global_primary_energy
     - data://garden/bp/2022-07-14/statistical_review
+  grapher://energy/2022-09-09/global_primary_energy:
+    - data://garden/energy/2022-09-09/global_primary_energy
