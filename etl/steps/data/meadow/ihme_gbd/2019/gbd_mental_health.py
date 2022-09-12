@@ -2,6 +2,7 @@ import pandas as pd
 from owid.catalog import Dataset, Table, TableMeta
 from owid.catalog.utils import underscore_table
 from owid.walden import Catalog as WaldenCatalog
+from shared import clean_data
 from structlog import get_logger
 
 from etl.helpers import Names
@@ -51,10 +52,3 @@ def run(dest_dir: str) -> None:
     ds.save()
 
     log.info("gbd_mental_health.end")
-
-
-def clean_data(df: pd.DataFrame) -> pd.DataFrame:
-    return df.rename(columns={"location_name": "country", "val": "value"}).drop(
-        columns=["measure_id", "location_id", "sex_id", "age_id", "cause_id", "metric_id", "upper", "lower"],
-        errors="ignore",
-    )
