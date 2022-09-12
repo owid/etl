@@ -217,7 +217,7 @@ def run(dest_dir: str) -> None:
     # Add other metadata fields to table.
     tb_combined.metadata.short_name = DATASET_SHORT_NAME
     tb_combined.metadata.title = DATASET_TITLE
-    tb_combined.metadata.dataset = ds_garden.metadata
+    tb_combined.update_metadata_from_yaml(METADATA_PATH, "global_primary_energy")
 
     # Add combined tables to the new dataset.
     ds_garden.add(tb_combined)
