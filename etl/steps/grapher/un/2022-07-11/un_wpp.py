@@ -17,7 +17,7 @@ log = structlog.get_logger()
 
 def run(dest_dir: str) -> None:
     garden_dataset = catalog.Dataset(DATA_DIR / "garden" / NAMESPACE / VERSION / FNAME)
-    dataset = catalog.Dataset.create_empty(dest_dir, gh.adapt_dataset_metadata_for_grapher(garden_dataset.metadata))
+    dataset = catalog.Dataset.create_empty(dest_dir, garden_dataset.metadata)
     dataset.save()
 
     # Get table (in appropriate format)

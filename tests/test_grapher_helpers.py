@@ -5,10 +5,10 @@ from owid.catalog import DatasetMeta, Source, Table, TableMeta, VariableMeta
 
 from etl.grapher_helpers import (
     _ensure_source_per_variable,
+    _yield_long_table,
+    _yield_wide_table,
     combine_metadata_sources,
     contains_inf,
-    yield_long_table,
-    yield_wide_table,
 )
 
 
@@ -56,7 +56,7 @@ def test_yield_wide_table_with_dimensions():
     table = Table(df.set_index(["entity_id", "year", "age"]))
     table.deaths.metadata.unit = "people"
     table.deaths.metadata.title = "Deaths"
-    grapher_tables = list(yield_wide_table(table, dim_titles=["Age group"]))
+    grapher_tables = list(_yield_wide_table(table, dim_titles=["Age group"]))
 
     t = grapher_tables[0]
     assert t.columns[0] == "deaths__age_10_18"
@@ -82,7 +82,7 @@ def test_yield_long_table_with_dimensions():
         }
     ).set_index(["year", "entity_id", "sex"])
     table = Table(long, metadata=TableMeta(dataset=DatasetMeta(sources=[Source()])))
-    grapher_tables = list(yield_long_table(table, dim_titles=["Sex"]))
+    grapher_tables = list(_yield_long_table(table, dim_titles=["Sex"]))
 
     t = grapher_tables[0]
     assert t.columns[0] == "births__sex_female"
@@ -117,7 +117,7 @@ def test_yield_long_table_with_dimensions_error():
     ).set_index(["year", "entity_id", "sex"])
     table = Table(long)  # no metadata with sources
     with pytest.raises(AssertionError):
-        _ = list(yield_long_table(table, dim_titles=["Sex"]))
+        _ = list(_yield_long_table(table, dim_titles=["Sex"]))
 
 
 def test_contains_inf():
