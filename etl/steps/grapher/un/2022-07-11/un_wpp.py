@@ -45,7 +45,7 @@ def get_grapher_tables(dataset: catalog.Dataset) -> Iterable[catalog.Table]:
     yield from gh.yield_long_table(table)
 
 
-def _get_shaped_table(dataset):
+def _get_shaped_table(dataset: catalog.Dataset) -> catalog.Table:
     table = dataset[TNAME].reset_index()
 
     # grapher needs a column entity id, that is constructed based on the unique entity names in the database
@@ -60,7 +60,7 @@ def _get_shaped_table(dataset):
     return table
 
 
-def _propagate_metadata(dataset, table):
+def _propagate_metadata(dataset: catalog.Dataset, table: catalog.Table) -> catalog.Table:
     with open(STEP_DIR / "data/garden/un/2022-07-11/un_wpp.meta.yml", "r") as f:
         meta = yaml.safe_load(f)
 
@@ -76,7 +76,7 @@ def _propagate_metadata(dataset, table):
     return table
 
 
-def _filter_rows(table):
+def _filter_rows(table: catalog.Table) -> catalog.Table:
     variants_valid = ["estimates", "low", "medium", "high", "constant fertility"]
     shape_0 = table.shape[0]
     table = table[table.index.isin(variants_valid, level=4)]

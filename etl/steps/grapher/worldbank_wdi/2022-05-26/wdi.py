@@ -34,4 +34,4 @@ def get_grapher_tables(dataset: Dataset) -> Iterable[Table]:
     for col in table.columns:
         tb = table[[col]].dropna()
         if tb.shape[0]:
-            yield tb  # type: ignore
+            yield tb

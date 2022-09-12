@@ -15,9 +15,9 @@ OLD_DATASET_NAME = "United Nations Sustainable Development Goals - United Nation
 match_variables_from_two_versions_of_a_dataset.main(
     old_dataset_name=OLD_DATASET_NAME,
     new_dataset_name=NEW_DATASET_NAME,
-    output_file=Path(__file__).parent.resolve() / "output/variable_replacements.json",
+    output_file=(Path(__file__).parent.resolve() / "output/variable_replacements.json").as_posix(),
 )
 
 
-suggester = ChartRevisionSuggester(Path(__file__).parent.resolve(), VERSION, NEW_DATASET_NAME)
+suggester = ChartRevisionSuggester(Path(__file__).parent.resolve().as_posix(), VERSION, NEW_DATASET_NAME)
 suggester.suggest()
