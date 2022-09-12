@@ -133,8 +133,7 @@ def combine_bp_and_smil_data(df_bp: pd.DataFrame, df_smil: pd.DataFrame) -> pd.D
     ].ffill()
 
     # Create an index and sort conveniently.
-    combined = combined.set_index(["country", "year"], verify_integrity=True).sort_index()
-    combined = combined[sorted(combined.columns)]
+    combined = combined.set_index(["country", "year"], verify_integrity=True).sort_index().sort_axis(axis=1)
 
     return combined
 
