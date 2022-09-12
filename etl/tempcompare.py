@@ -3,7 +3,7 @@ from typing import Any, Callable, Generator, Iterable, List, Optional, cast
 
 import numpy as np
 import pandas as pd
-from pandas.api.types import union_categoricals
+from pandas.api.types import is_datetime64_any_dtype, union_categoricals  # type: ignore
 
 # ######## Note - this file will be moved to owid-catalog-py before the branch is merged ##############
 
@@ -194,7 +194,7 @@ class HighLevelDiff:
         self.duplicate_index_values_in_df2 = self.df2[self.df2.index.duplicated()].index.values
 
         # Now we calculate the value differences in the intersection of the two dataframes.
-        if self.columns_shared and any(self.index_values_shared):
+        if self.columns_shared and not self.index_values_shared.empty:
             df1_intersected = self.df1.loc[self.index_values_shared, list(self.columns_shared)]
             df2_intersected = self.df2.loc[self.index_values_shared, list(self.columns_shared)]
 
@@ -208,7 +208,7 @@ class HighLevelDiff:
             # We don't use the compare function here from above because it builds a new
             # dataframe and we want to leave indices intact so we can know which rows and columns
             # were different once we drop the ones with no differences
-            diffs = df1_intersected.eq(df2_intersected)
+            diffs = df1_intersected.eq(df2_intersected) | (df1_intersected.isnull() & df2_intersected.isnull())
 
             # Eq above does not take tolerance into account so compare again with tolerance
             # for columns that are numeric. this could probably be sped up with a check on any on
@@ -218,6 +218,9 @@ class HighLevelDiff:
                     df2_intersected[col].dtype in (object, "category")
                 ):
                     # Apply a direct comparison for strings or categories
+                    pass
+                elif is_datetime64_any_dtype(df1_intersected[col]):
+                    # Apply a direct comparison for datetimes
                     pass
                 else:
                     # Comparison does not work for Int64
