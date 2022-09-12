@@ -25,6 +25,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.dialects.mysql import LONGBLOB, LONGTEXT, MEDIUMTEXT, TINYINT, VARCHAR
 from sqlalchemy.future import Engine as _FutureEngine
+from sqlalchemy.orm import load_only
 from sqlmodel import (
     JSON,
     Column,
@@ -365,7 +366,9 @@ class Dataset(SQLModel, table=True):
 
     @classmethod
     def load_variables_for_dataset(cls, session: Session, dataset_id: int) -> list["Variable"]:
-        vars = session.exec(select(Variable).where(Variable.datasetId == dataset_id)).all()
+        # TODO: include columns `catalogPath` and `dimensions` once we have them in MySQL
+        fields = [k for k in Variable.__fields__.keys() if k not in ("catalogPath", "dimensions")]
+        vars = session.exec(select(Variable).options(load_only(*fields)).where(Variable.datasetId == dataset_id)).all()
         assert vars
         return vars
 
