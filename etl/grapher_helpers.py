@@ -1,3 +1,4 @@
+import copy
 import warnings
 from copy import deepcopy
 from dataclasses import dataclass, field
@@ -113,6 +114,9 @@ def yield_wide_table(
     :param dim_titles: Custom names to use for the dimensions, if not provided, the default names will be used.
         Dimension title will be used to create variable name, e.g. `Deaths - Age: 10-18` instead of `Deaths - age: 10-18`
     """
+    table = copy.deepcopy(table)
+    table.metadata = copy.deepcopy(table.metadata)
+
     # Validation
     if "year" not in table.primary_key:
         raise Exception("Table is missing `year` primary key")
@@ -160,6 +164,18 @@ def yield_wide_table(
             # set new metadata with dimensions
             tab.metadata.short_name = short_name
             tab = tab.rename(columns={column: short_name})
+
+            # add info about dimensions to metadata
+            if dims:
+                tab[short_name].metadata.additional_info = {
+                    "dimensions": {
+                        "originalShortName": column,
+                        "originalName": tab[short_name].metadata.title,
+                        "filters": [
+                            {"name": dim_name, "value": dim_value} for dim_name, dim_value in zip(dim_names, dims)
+                        ],
+                    }
+                }
 
             # Add dimensions to title (which will be used as variable name in grapher)
             title_with_dims: Optional[str]

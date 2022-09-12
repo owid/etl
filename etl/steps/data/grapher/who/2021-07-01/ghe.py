@@ -1,23 +1,21 @@
-from pathlib import Path
-from typing import Iterable
+import copy
 
 import pandas as pd
-import yaml
 from owid import catalog
 
 from etl import grapher_helpers as gh
-from etl.paths import DATA_DIR, REFERENCE_DATASET
+from etl.helpers import Names
+from etl.paths import REFERENCE_DATASET
+
+N = Names(__file__)
 
 
-def get_grapher_dataset() -> catalog.Dataset:
-    dataset = catalog.Dataset(DATA_DIR / "garden" / "who" / "2021-07-01" / "ghe")
+def run(dest_dir: str) -> None:
+    dataset = catalog.Dataset.create_empty(dest_dir, gh.adapt_dataset_metadata_for_grapher(N.garden_dataset.metadata))
     dataset.metadata.short_name = "ghe__2021_07_01"
-    dataset.metadata.namespace = "who"
-    return dataset
+    dataset.save()
 
-
-def get_grapher_tables(dataset: catalog.Dataset) -> Iterable[catalog.Table]:
-    table = dataset["estimates"]
+    table = N.garden_dataset["estimates"]
 
     # Since this script expects a certain structure make sure it is actually met
     expected_primary_keys = [
@@ -51,13 +49,19 @@ def get_grapher_tables(dataset: catalog.Dataset) -> Iterable[catalog.Table]:
     # Get the legacy_entity_id from the country_code via the countries_regions dimension table
     reference_dataset = catalog.Dataset(REFERENCE_DATASET)
     countries_regions = reference_dataset["countries_regions"]
-    table = table.merge(
+
+    orig_table = copy.deepcopy(table)
+
+    # TODO: update `gh.adapt_table_for_grapher(table)` to support country codes
+    # and reuse it
+    table = orig_table.merge(
         right=countries_regions[["legacy_entity_id"]],
         how="left",
         left_on="country_code",
         right_index=True,
         validate="m:1",
     )
+    table.metadata = orig_table.metadata
 
     # Add entity_id, drop country_code
     table.reset_index(inplace=True)
@@ -70,26 +74,15 @@ def get_grapher_tables(dataset: catalog.Dataset) -> Iterable[catalog.Table]:
         inplace=True,
     )
 
-    # Load variable descriptions and units from the annotations.yml file and
-    # store them as column metadata
-    script_dir = Path(__file__).parent
-    with open(script_dir / "annotations.yml") as istream:
-        annotations = yaml.safe_load(istream)
+    table.update_metadata_from_yaml(N.metadata_path, "estimates")
 
     for column in columns_to_export:
-        annotation = annotations["variables"][column]
-        table[column].metadata.description = annotation["description"]
-        table[column].metadata.unit = annotation["unit"]
-        table[column].metadata.short_unit = annotation["short_unit"]
-        table[column].metadata.title = annotation["title"]
-
         # use dataset source
         table[column].metadata.sources = dataset.metadata.sources
 
-    # Sanity check
-    for column in columns_to_export:
-        assert table[column].metadata.unit is not None, "Unit should not be None here!"
         # Use short names as titles
         table[column].metadata.title = column
 
-    yield from gh.yield_wide_table(table[columns_to_export], na_action="drop")
+    table = table.loc[:, columns_to_export]
+
+    dataset.add(table)
