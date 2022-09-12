@@ -21,7 +21,45 @@ from etl import tempcompare
 
 
 @click.group(cls=RichGroup)
-def cli() -> None:
+@click.option(
+    "--absolute-tolerance",
+    default=0.00000001,
+    show_default=True,
+    help="The absolute tolerance for floating point comparisons.",
+)
+@click.option(
+    "--relative-tolerance",
+    default=0.05,
+    show_default=True,
+    help="The relative tolerance for floating point comparisons.",
+)
+@click.option(
+    "--show-values/--hide-values",
+    default=False,
+    show_default=True,
+    help="Show a preview of the values where the dataframes are different.",
+)
+@click.option(
+    "--show-shared/--hide-shared",
+    default=False,
+    show_default=True,
+    help="Show the structural overlap of the two dataframes (shared columns, index columns and index values).",
+)
+@click.option(
+    "--truncate-lists-at",
+    default=20,
+    show_default=True,
+    help="Print truncated lists if they are longer than the given length.",
+)
+@click.pass_context
+def cli(
+    ctx: click.core.Context,
+    absolute_tolerance: float,
+    relative_tolerance: float,
+    show_values: bool,
+    show_shared: bool,
+    truncate_lists_at: int,
+) -> None:
     """Compare two dataframes, both structurally and the values.
 
     This tool loads two dataframes, either from the local ETL and the remote catalog
@@ -32,7 +70,12 @@ def cli() -> None:
     The exit code is 0 if the dataframes are equal, 1 if there is an error loading the dataframes, 2 if the dataframes
     are structurally equal but are otherwise different, 3 if the dataframes have different structure and/or different values.
     """
-    pass
+    ctx.ensure_object(dict)
+    ctx.obj["absolute_tolerance"] = absolute_tolerance
+    ctx.obj["relative_tolerance"] = relative_tolerance
+    ctx.obj["show_values"] = show_values
+    ctx.obj["show_shared"] = show_shared
+    ctx.obj["truncate_lists_at"] = truncate_lists_at
 
 
 def diff_print(
@@ -73,47 +116,14 @@ def diff_print(
 @click.argument("namespace")
 @click.argument("dataset")
 @click.argument("table")
-@click.option(
-    "--absolute-tolerance",
-    default=0.00000001,
-    show_default=True,
-    help="The absolute tolerance for floating point comparisons.",
-)
-@click.option(
-    "--relative-tolerance",
-    default=0.05,
-    show_default=True,
-    help="The relative tolerance for floating point comparisons.",
-)
-@click.option(
-    "--show-values/--hide-values",
-    default=False,
-    show_default=True,
-    help="Show a preview of the values where the dataframes are different.",
-)
-@click.option(
-    "--show-shared/--hide-shared",
-    default=False,
-    show_default=True,
-    help="Show the structural overlap of the two dataframes (shared columns, index columns and index values).",
-)
-@click.option(
-    "--truncate-lists-at",
-    default=20,
-    show_default=True,
-    help="Print truncated lists if they are longer than the given length.",
-)
 @click.option("--debug", is_flag=True, help="Print debug information.")
+@click.pass_context
 def etl_catalog(
+    ctx: click.core.Context,
     channel: str,
     namespace: str,
     dataset: str,
     table: str,
-    absolute_tolerance: float,
-    relative_tolerance: float,
-    show_values: bool,
-    show_shared: bool,
-    truncate_lists_at: int,
     debug: bool,
 ) -> None:
     """
@@ -166,11 +176,7 @@ def etl_catalog(
         local_df,
         "remote",
         "local",
-        absolute_tolerance,
-        relative_tolerance,
-        show_values,
-        show_shared,
-        truncate_lists_at,
+        **ctx.obj,
     )
     exit(return_code)
 
@@ -180,40 +186,10 @@ def etl_catalog(
 @click.argument("version")
 @click.argument("dataset")
 @click.option(
-    "--absolute-tolerance",
-    default=0.00000001,
-    show_default=True,
-    help="The absolute tolerance for floating point comparisons.",
-)
-@click.option(
-    "--relative-tolerance",
-    default=0.05,
-    show_default=True,
-    help="The relative tolerance for floating point comparisons.",
-)
-@click.option(
-    "--show-values/--hide-values",
-    default=False,
-    show_default=True,
-    help="Show a preview of the values where the dataframes are different.",
-)
-@click.option(
-    "--show-shared/--hide-shared",
-    default=False,
-    show_default=True,
-    help="Show the structural overlap of the two dataframes (shared columns, index columns and index values).",
-)
-@click.option(
-    "--truncate-lists-at",
-    default=20,
-    show_default=True,
-    help="Print truncated lists if they are longer than the given length.",
-)
-@click.option(
     "--remote-env",
     type=click.Path(exists=True),
     help="Path to .env file with remote database credentials.",
-    default=".env.production",
+    default=".env.prod",
 )
 @click.option(
     "--local-env",
@@ -222,15 +198,12 @@ def etl_catalog(
     default=".env",
 )
 @click.option("--data-values", is_flag=True, help="Compare data_values table.")
+@click.pass_context
 def grapher(
+    ctx: click.core.Context,
     namespace: str,
     version: str,
     dataset: str,
-    absolute_tolerance: float,
-    relative_tolerance: float,
-    show_values: bool,
-    show_shared: bool,
-    truncate_lists_at: int,
     remote_env: str,
     local_env: str,
     data_values: bool,
@@ -244,7 +217,7 @@ def grapher(
     The exit code is always 0 even if dataframes are different.
 
     Example usage:
-        compare grapher ggdc 2020-10-01 ggdc_maddison__2020_10_01 --show-values --data-values
+        compare  --show-values grapher ggdc 2020-10-01 ggdc_maddison__2020_10_01 --data-values
     """
     remote_dataset_df = read_dataset_from_db(remote_env, namespace, version, dataset)
     local_dataset_df = read_dataset_from_db(local_env, namespace, version, dataset)
@@ -255,11 +228,7 @@ def grapher(
         local_dataset_df,
         "remote",
         "local",
-        absolute_tolerance,
-        relative_tolerance,
-        show_values,
-        show_shared,
-        truncate_lists_at,
+        **ctx.obj,
     )
 
     remote_variables_df = read_variables_from_db(remote_env, namespace, version, dataset)
@@ -271,18 +240,12 @@ def grapher(
         local_variables_df,
         "remote",
         "local",
-        absolute_tolerance,
-        relative_tolerance,
-        show_values,
-        show_shared,
-        truncate_lists_at,
+        **ctx.obj,
     )
 
     if data_values:
         remote_data_values_df = read_data_values_from_db(remote_env, namespace, version, dataset)
         local_data_values_df = read_data_values_from_db(local_env, namespace, version, dataset)
-
-        __import__("ipdb").set_trace()
 
         print("\n[magenta]=== Comparing data_values ===[/magenta]")
         diff_print(
@@ -290,11 +253,7 @@ def grapher(
             local_data_values_df,
             "remote",
             "local",
-            absolute_tolerance,
-            relative_tolerance,
-            show_values,
-            show_shared,
-            truncate_lists_at,
+            **ctx.obj,
         )
 
 
@@ -408,44 +367,11 @@ def load_dataframe(path_str: str) -> pd.DataFrame:
 @cli.command(cls=RichCommand)
 @click.argument("dataframe1")
 @click.argument("dataframe2")
-@click.option(
-    "--absolute-tolerance",
-    default=0.00000001,
-    show_default=True,
-    help="The absolute tolerance for floating point comparisons.",
-)
-@click.option(
-    "--relative-tolerance",
-    default=0.05,
-    show_default=True,
-    help="The relative tolerance for floating point comparisons.",
-)
-@click.option(
-    "--show-values/--hide-values",
-    default=False,
-    show_default=True,
-    help="Show a preview of the values where the dataframes are different.",
-)
-@click.option(
-    "--show-shared/--hide-shared",
-    default=False,
-    show_default=True,
-    help="Show the structural overlap of the two dataframes (shared columns, index columns and index values).",
-)
-@click.option(
-    "--truncate-lists-at",
-    default=20,
-    show_default=True,
-    help="Print truncated lists if they are longer than the given length.",
-)
+@click.pass_context
 def dataframes(
+    ctx: click.core.Context,
     dataframe1: str,
     dataframe2: str,
-    absolute_tolerance: float,
-    relative_tolerance: float,
-    show_values: bool,
-    show_shared: bool,
-    truncate_lists_at: int,
 ) -> None:
     """
     Compare two dataframes given as paths.
@@ -487,11 +413,7 @@ def dataframes(
         df2,
         "dataframe1",
         "dataframe2",
-        absolute_tolerance,
-        relative_tolerance,
-        show_values,
-        show_shared,
-        truncate_lists_at,
+        **ctx.obj,
     )
     exit(return_code)
 
