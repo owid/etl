@@ -609,29 +609,37 @@ class GrapherStep(Step):
 
 
 @dataclass
-class GrapherNewStep(DataStep):
+class GrapherNewStep(Step):
     path: str
-    dependencies: List[Step]
+    data_step: DataStep
 
     def __init__(self, path: str, dependencies: List[Step]) -> None:
+        # GrapherNewStep should have exactly one DataStep dependency
+        assert len(dependencies) == 1
+        assert path == dependencies[0].path
+        assert isinstance(dependencies[0], DataStep)
         self.path = path
-        self.dependencies = dependencies
+        self.data_step = dependencies[0]
 
     def __str__(self) -> str:
         return f"grapher-new://{self.path}"
 
+    @property
+    def dataset(self) -> catalog.Dataset:
+        """Grapher dataset we are upserting."""
+        return self.data_step._output_dataset
+
     def is_dirty(self) -> bool:
-        if any(d.is_dirty() for d in self.dependencies):
+        if self.data_step.is_dirty():
             return True
 
         # dataset exists, but it is possible that we haven't inserted everything into DB
-        dataset = self._output_dataset
-
-        return fetch_db_checksum(dataset) != self.checksum_input()
+        dataset = self.dataset
+        return fetch_db_checksum(dataset) != self.data_step.checksum_input()
 
     def run(self) -> None:
         # save dataset to grapher DB
-        dataset = self._output_dataset
+        dataset = self.dataset
 
         dataset_upsert_results = upsert_dataset(
             dataset,
@@ -670,7 +678,10 @@ class GrapherNewStep(DataStep):
         GrapherStep._cleanup_ghost_resources(dataset_upsert_results, variable_upsert_results)
 
         # set checksum after all data got inserted
-        set_dataset_checksum(dataset_upsert_results.dataset_id, self.checksum_input())
+        set_dataset_checksum(dataset_upsert_results.dataset_id, self.data_step.checksum_input())
+
+    def checksum_output(self) -> str:
+        raise NotImplementedError("GrapherNewStep should not be used as an input")
 
 
 @dataclass
