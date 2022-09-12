@@ -611,6 +611,17 @@ class SuggestedChartRevisions(SQLModel, table=True):
     users_: Optional["User"] = Relationship(back_populates="suggested_chart_revisions_")
 
 
+class DimensionFilter(TypedDict):
+    name: str
+    value: Any
+
+
+class Dimensions(TypedDict):
+    originalShortName: str
+    originalName: str
+    filters: List[DimensionFilter]
+
+
 class Variable(SQLModel, table=True):
     """Example:
     {
@@ -667,6 +678,8 @@ class Variable(SQLModel, table=True):
     shortUnit: Optional[str] = Field(default=None, sa_column=Column("shortUnit", String(255, "utf8mb4_0900_as_cs")))
     originalMetadata: Optional[Dict[Any, Any]] = Field(default=None, sa_column=Column("originalMetadata", JSON))
     grapherConfig: Optional[Dict[Any, Any]] = Field(default=None, sa_column=Column("grapherConfig", JSON))
+    catalogPath: Optional[str] = Field(default=None, sa_column=Column("catalogPath", LONGTEXT))
+    dimensions: Optional[Dimensions] = Field(sa_column=Column("dimensions", JSON, nullable=False))
 
     datasets: Optional["Dataset"] = Relationship(back_populates="variables")
     sources: Optional["Source"] = Relationship(back_populates="variables")
@@ -696,6 +709,8 @@ class Variable(SQLModel, table=True):
             ds.timespan = self.timespan
             ds.coverage = self.coverage
             ds.display = self.display
+            ds.catalogPath = self.catalogPath
+            ds.dimensions = self.dimensions
             ds.updatedAt = datetime.utcnow()
             # do not update these fields unless they're specified
             if self.columnOrder is not None:
@@ -718,7 +733,14 @@ class Variable(SQLModel, table=True):
 
     @classmethod
     def from_variable_metadata(
-        cls, metadata: catalog.VariableMeta, short_name: str, timespan: str, dataset_id: int, source_id: int
+        cls,
+        metadata: catalog.VariableMeta,
+        short_name: str,
+        timespan: str,
+        dataset_id: int,
+        source_id: int,
+        catalog_path: Optional[str],
+        dimensions: Optional[Dimensions],
     ) -> "Variable":
         assert metadata.unit
         assert metadata.display
@@ -733,6 +755,8 @@ class Variable(SQLModel, table=True):
             timespan=timespan,
             coverage="",
             display=metadata.display,
+            catalogPath=catalog_path,
+            dimensions=dimensions,
         )
 
     @classmethod

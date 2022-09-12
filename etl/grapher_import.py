@@ -128,6 +128,7 @@ def _upsert_source_to_db(session: Session, source: catalog.Source, dataset_id: i
     with source_table_lock:
         db_source = gm.Source.from_catalog_source(source, dataset_id).upsert(session)
 
+        # commit within the lock to make sure other threads get the latest sources
         session.commit()
 
         assert db_source.id
@@ -146,7 +147,12 @@ def _update_variables_display(table: catalog.Table) -> None:
             meta.display.setdefault("unit", meta.unit)
 
 
-def upsert_table(table: catalog.Table, dataset_upsert_result: DatasetUpsertResult) -> VariableUpsertResult:
+def upsert_table(
+    table: catalog.Table,
+    dataset_upsert_result: DatasetUpsertResult,
+    catalog_path: Optional[str] = None,
+    dimensions: Optional[gm.Dimensions] = None,
+) -> VariableUpsertResult:
     """This function is used to put one ready to go formatted Table (i.e.
     in the format (year, entityId, value)) into mysql. The metadata
     of the variable is used to fill the required fields.
@@ -220,6 +226,8 @@ def upsert_table(table: catalog.Table, dataset_upsert_result: DatasetUpsertResul
             timespan=timespan,
             dataset_id=dataset_upsert_result.dataset_id,
             source_id=source_id,
+            catalog_path=catalog_path,
+            dimensions=dimensions,
         ).upsert(session)
         assert variable.id
 

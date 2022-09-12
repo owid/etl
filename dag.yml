@@ -42,7 +42,7 @@ steps:
     - walden://who/2021-07-01/gho
   data://meadow/wpp/2019/standard_projections:
     - walden://wpp/2019/standard_projections
-  grapher://who/2021-07-01/ghe:
+  data://grapher/who/2021-07-01/ghe:
     - data://garden/who/2021-07-01/ghe
   data://meadow/living_planet/2020-09-10/lpd:
     - walden://living_planet/2020-09-10/lpd
@@ -54,7 +54,7 @@ steps:
     - data://meadow/wb/2021-07-01/wb_income
   data://garden/ggdc/2020-10-01/ggdc_maddison:
     - walden://ggdc/2020-10-01/ggdc_maddison
-  grapher://ggdc/2020-10-01/ggdc_maddison:
+  data://grapher/ggdc/2020-10-01/ggdc_maddison:
     - data://garden/ggdc/2020-10-01/ggdc_maddison
   data://meadow/worldbank_wdi/2022-05-26/wdi:
     - walden://worldbank_wdi/2022-05-26/wdi
@@ -66,7 +66,7 @@ steps:
     - walden://un_sdg/2022-07-07/un_sdg
   data://garden/un_sdg/2022-07-07/un_sdg:
     - data://meadow/un_sdg/2022-07-07/un_sdg
-  grapher://owid/latest/population_density:
+  data://grapher/owid/latest/population_density:
     - data://garden/owid/latest/population_density
   data://meadow/oecd/2016-06-01/regional_wellbeing:
     - walden://oecd/2016-06-01/regional_wellbeing
