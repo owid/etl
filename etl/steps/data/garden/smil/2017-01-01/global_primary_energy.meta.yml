@@ -1,9 +1,3 @@
-dataset:
-  sources:
-     -
-       name: Global Primary Energy (Smil, 2017)
-       published_by: "Vaclav Smil (2017), Energy Transitions: Global and National Perspectives, 2nd edition, Appendix A"
-
 tables:
   global_primary_energy:
     variables:

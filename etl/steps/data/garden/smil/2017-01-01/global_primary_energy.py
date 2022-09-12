@@ -29,7 +29,17 @@ def run(dest_dir: str) -> None:
     tb_garden = tb_garden[sorted(tb_garden.columns)].sort_index()
 
     # Update metadata using yaml file.
-    ds_garden.metadata.update_from_yaml(N.metadata_path)
+    ####################################################################################################################
+    # Temporary solution: At the moment, 'published_by' cannot be added to walden metadata.
+    # I could add a new source to the yaml file in this step (with the appropriate 'published_by') and use
+    # > ds_garden.metadata.update_from_yaml(N.metadata_path)
+    # but this would keep the original source (without 'published_by') and add a new one (with 'published_by').
+    # Therefore, for the moment the only solution I see is to manually input the 'published_by' field here.
+    # Alternatively, I could ignore the metadata from walden and add all the relevant metadata in this step's yaml file.
+    ds_garden.metadata.sources[
+        0
+    ].published_by = "Vaclav Smil (2017), Energy Transitions: Global and National Perspectives, 2nd edition, Appendix A"
+    ####################################################################################################################
     tb_garden.update_metadata_from_yaml(N.metadata_path, "global_primary_energy")
 
     # Add table to dataset.
