@@ -12,7 +12,7 @@ def run(dest_dir: str) -> None:
     dataset = catalog.Dataset.create_empty(dest_dir, gh.adapt_dataset_metadata_for_grapher(garden_dataset.metadata))
 
     # There is only one table in the dataset, with the same name as the dataset.
-    table = dataset[dataset.table_names[0]].reset_index().drop(columns=["data_source"])
+    table = garden_dataset[garden_dataset.table_names[0]].reset_index().drop(columns=["data_source"])
     table = gh.adapt_table_for_grapher(table)
 
     dataset.add(table)

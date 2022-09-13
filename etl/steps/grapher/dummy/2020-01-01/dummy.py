@@ -11,7 +11,7 @@ def run(dest_dir: str) -> None:
 
     table = N.garden_dataset["dummy"]
 
-    # convert `country` into `entity_id` and set indexes for `yield_wide_table`
+    # convert `country` into `entity_id`
     table = gh.adapt_table_for_grapher(table)
 
     # optionally set additional dimensions
