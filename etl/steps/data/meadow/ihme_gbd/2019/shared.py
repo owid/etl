@@ -5,6 +5,7 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
     return df.rename(
         columns={
             "location_name": "country",
+            "location": "country",
             "val": "value",
             "measure_name": "measure",
             "sex_name": "sex",

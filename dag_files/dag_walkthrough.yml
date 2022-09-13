@@ -16,3 +16,13 @@ steps:
   - walden://ihme_gbd/2019/gbd_risk
   data://meadow/ihme_gbd/2019/gbd_prevalence:
   - walden://ihme_gbd/2019/gbd_prevalence
+  data://garden/ihme_gbd/2019/gbd_cause:
+  - data://meadow/ihme_gbd/2019/gbd_cause
+  data://garden/ihme_gbd/2019/gbd_risk:
+  - data://meadow/ihme_gbd/2019/gbd_risk
+  data://garden/ihme_gbd/2019/gbd_child_mortality:
+  - data://meadow/ihme_gbd/2019/gbd_child_mortality
+  data://garden/ihme_gbd/2019/gbd_mental_health:
+  - data://meadow/ihme_gbd/2019/gbd_mental_health
+  data://garden/ihme_gbd/2019/gbd_prevalence:
+  - data://meadow/ihme_gbd/2019/gbd_prevalence
