@@ -2,7 +2,7 @@ import json
 import os
 from functools import cache
 from pathlib import Path
-from typing import Any, Dict, Iterable, cast
+from typing import Any, Dict, cast
 
 import pandas as pd
 import requests

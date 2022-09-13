@@ -25,7 +25,6 @@ from sqlalchemy import (
 )
 from sqlalchemy.dialects.mysql import LONGBLOB, LONGTEXT, MEDIUMTEXT, TINYINT, VARCHAR
 from sqlalchemy.future import Engine as _FutureEngine
-from sqlalchemy.orm import load_only
 from sqlmodel import JSON as _JSON
 from sqlmodel import (
     Column,
