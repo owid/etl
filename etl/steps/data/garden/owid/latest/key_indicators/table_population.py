@@ -18,7 +18,7 @@ from owid.catalog import Dataset, Table
 from etl import data_helpers
 from etl.paths import DATA_DIR
 
-UNWPP = DATA_DIR / "garden/wpp/2019/standard_projections"
+UNWPP = DATA_DIR / "garden/un/2019/un_wpp"
 GAPMINDER = DATA_DIR / "garden/gapminder/2019-12-10/population"
 HYDE = DATA_DIR / "garden/hyde/2017/baseline"
 WB_INCOME = DATA_DIR / "garden/wb/2021-07-01/wb_income"
