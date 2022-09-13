@@ -143,7 +143,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
     etl grapher/{form.namespace}/{form.version}/{form.short_name} --grapher
     ```
 
-2. When you feel confident, change your `.env` to staging which looks something like this:
+2. When you feel confident, use `.env.staging` for staging which looks something like this:
 
     ```
     GRAPHER_USER_ID=59
@@ -163,12 +163,16 @@ def app(run_checks: bool, dummy_data: bool) -> None:
     After you run
 
     ```
-    etl grapher/{form.namespace}/{form.version}/{form.short_name} --grapher
+    ENV=.env.staging etl grapher/{form.namespace}/{form.version}/{form.short_name} --grapher
     ```
 
     you should see it [in staging admin](https://staging.owid.cloud/admin/datasets).
 
-3. Pushing to production grapher is **not yet automated**. After you get it reviewed and approved, you should again change your `.env` to production (and open SSH tunnel on port 3308 if necessary) and then run the command again from your local.
+3. Pushing to production grapher is **not yet automated**. After you get it reviewed and approved, you can use `.env.prod` file and run
+
+    ```
+    ENV=.env.prod etl grapher/{form.namespace}/{form.version}/{form.short_name} --grapher
+    ```
 
 4. Check your dataset in [admin](https://owid.cloud/admin/datasets).
 
