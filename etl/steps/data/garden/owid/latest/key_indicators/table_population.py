@@ -13,8 +13,8 @@ from pathlib import Path
 from typing import List, cast
 
 import pandas as pd
-from pandas.api.types import CategoricalDtype
 from owid.catalog import Dataset, Table
+from pandas.api.types import CategoricalDtype
 
 from etl import data_helpers
 from etl.paths import DATA_DIR
