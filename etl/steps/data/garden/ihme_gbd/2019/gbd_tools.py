@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from typing import Any, List, cast
+from typing import List, cast
 
 import numpy as np
 import pandas as pd
@@ -134,7 +134,7 @@ def prepare_garden(df: pd.DataFrame) -> Table:
 
 def run_wrapper(
     dataset: str, country_mapping_path: Path, excluded_countries_path: Path, dest_dir: str, metadata_path: Path
-):
+) -> None:
     # read dataset from meadow
     ds_meadow = Dataset(DATA_DIR / f"meadow/ihme_gbd/2019/{dataset}")
 

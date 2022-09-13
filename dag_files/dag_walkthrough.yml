@@ -26,3 +26,5 @@ steps:
   - data://meadow/ihme_gbd/2019/gbd_mental_health
   data://garden/ihme_gbd/2019/gbd_prevalence:
   - data://meadow/ihme_gbd/2019/gbd_prevalence
+  grapher://ihme_gbd/2019/gbd_cause:
+  - data://garden/ihme_gbd/2019/gbd_cause
