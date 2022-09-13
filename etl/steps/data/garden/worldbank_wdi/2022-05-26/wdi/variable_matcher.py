@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, cast
 
 import pandas as pd
+from owid.catalog.frames import repack_frame
 
 from etl.db import get_connection
 
@@ -21,7 +22,7 @@ class VariableMatcher:
     Example usage::
 
         # first generate static file with
-        # python etl/steps/data/garden/worldbank_wdi/2022-05-26/variable_matcher.py
+        # python etl/steps/data/garden/worldbank_wdi/2022-05-26/wdi/variable_matcher.py
 
         >>> vm = VariableMatcher()
         >>> matches = vm.find_grapher_variables('Gini index')
@@ -85,7 +86,11 @@ class VariableMatcher:
             ORDER BY updatedAt DESC
         """
         df_vars = pd.read_sql(query, get_connection())
-        return cast(pd.DataFrame, df_vars)
+
+        # make it smaller
+        df_vars = repack_frame(df_vars)
+
+        return cast(pd.DataFrame, df_vars.reset_index(drop=True))
 
     def load_variable_mapping(self, fname: str) -> Dict[str, Any]:
         with open(Path(__file__).parent / f"{fname}.variable_mapping.json", "r") as f:

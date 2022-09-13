@@ -28,9 +28,9 @@ log = structlog.get_logger()
 
 
 def run(dest_dir: str) -> None:
-    version = Path(__file__).parent.stem
-    fname = Path(__file__).stem
-    namespace = Path(__file__).parent.parent.stem
+    version = Path(__file__).parent.parent.stem
+    fname = Path(__file__).parent.stem
+    namespace = Path(__file__).parent.parent.parent.stem
     ds_meadow = Dataset((DATA_DIR / f"meadow/{namespace}/{version}/{fname}").as_posix())
 
     assert len(ds_meadow.table_names) == 1, "Expected meadow dataset to have only one table, but found > 1 table names."
@@ -349,9 +349,9 @@ def add_variable_metadata(table: Table) -> Table:
     var_codes = table.columns.tolist()
 
     # retrieves raw data from walden
-    version = Path(__file__).parent.stem
-    fname = Path(__file__).stem
-    namespace = Path(__file__).parent.parent.stem
+    version = Path(__file__).parent.parent.stem
+    fname = Path(__file__).parent.stem
+    namespace = Path(__file__).parent.parent.parent.stem
     walden_ds = Catalog().find_one(namespace=namespace, short_name=fname, version=version)
     local_file = walden_ds.ensure_downloaded()
     zf = zipfile.ZipFile(local_file)
@@ -457,8 +457,7 @@ def load_country_mapping() -> Dict[str, str]:
 
 
 def load_excluded_countries() -> List[str]:
-    fname = Path(__file__).stem.split(".")[0]
-    with open(Path(__file__).parent / f"{fname}.country_exclude.json", "r") as f:
+    with open(Path(__file__).parent / "wdi.country_exclude.json", "r") as f:
         data = json.load(f)
         assert isinstance(data, list)
     return data
