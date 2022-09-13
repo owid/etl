@@ -1,13 +1,15 @@
 import json
 from pathlib import Path
-from typing import List, cast
+from typing import Any, List, cast
 
 import numpy as np
 import pandas as pd
-from owid.catalog import Table
+from owid.catalog import Dataset, Table
 from owid.catalog.utils import underscore_table
 from owid.datautils import geo
 from structlog import get_logger
+
+from etl.paths import DATA_DIR
 
 log = get_logger()
 
@@ -43,7 +45,8 @@ def create_units(df: pd.DataFrame) -> pd.DataFrame:
         "",
         "%",
     ]
-    df["metric"] = np.select(conds, choices)
+    df["unit"] = ""
+    df["unit"] = np.select(conds, choices)
     return df
 
 
@@ -127,3 +130,29 @@ def prepare_garden(df: pd.DataFrame) -> Table:
 #        df.groupby(["country", "year"])["value"].sum().reset_index().to_csv(
 #            os.path.join(outpath, "datapoints", "datapoints_%d.csv" % id)
 #        )
+
+
+def run_wrapper(
+    dataset: str, country_mapping_path: Path, excluded_countries_path: Path, dest_dir: str, metadata_path: Path
+):
+    # read dataset from meadow
+    ds_meadow = Dataset(DATA_DIR / f"meadow/ihme_gbd/2019/{dataset}")
+
+    tb_meadow = ds_meadow[f"{dataset}"]
+
+    df = pd.DataFrame(tb_meadow)
+    df = tidy_countries(country_mapping_path, excluded_countries_path, df)
+    ds_garden = Dataset.create_empty(dest_dir)
+    ds_garden.metadata = ds_meadow.metadata
+
+    # underscore column names and add units column
+    tb_garden = prepare_garden(df)
+
+    tb_garden.metadata = tb_meadow.metadata
+
+    ds_garden.metadata.update_from_yaml(metadata_path)
+    tb_garden.update_metadata_from_yaml(metadata_path, f"{dataset}")
+    tb_garden = tb_garden.set_index(["measure", "cause", "metric"])
+
+    ds_garden.add(tb_garden)
+    ds_garden.save()
