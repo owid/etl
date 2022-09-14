@@ -19,32 +19,32 @@ MAX_YEAR = 2022
 
 # Columns to keep from raw dataset and how to rename them.
 COLUMNS = {
-    'jurisdiction': 'country',
-    'year': 'year',
-    'ipcc_code': 'ipcc_code',
-    'product': 'product',
-    'tax': 'tax',
-    'ets': 'ets',
-    'tax_rate_excl_ex_clcu': 'tax_rate_excl_ex_clcu',
-    'tax_rate_incl_ex_clcu': 'tax_rate_incl_ex_clcu',
-    'ets_price': 'ets_price',
+    "jurisdiction": "country",
+    "year": "year",
+    "ipcc_code": "ipcc_code",
+    "product": "product",
+    "tax": "tax",
+    "ets": "ets",
+    "tax_rate_excl_ex_clcu": "tax_rate_excl_ex_clcu",
+    "tax_rate_incl_ex_clcu": "tax_rate_incl_ex_clcu",
+    "ets_price": "ets_price",
 }
 
 # Types of columns to keep.
 DTYPES = {
-        'country': str,
-        'year': int,
-        'ipcc_code': str,
-        'product': str,
-        'tax': int,
-        'ets': int,
-        'tax_rate_excl_ex_clcu': float,
-        'tax_rate_incl_ex_clcu': float,
-        'ets_price': float,
-    }
+    "country": str,
+    "year": int,
+    "ipcc_code": str,
+    "product": str,
+    "tax": int,
+    "ets": int,
+    "tax_rate_excl_ex_clcu": float,
+    "tax_rate_incl_ex_clcu": float,
+    "ets_price": float,
+}
 
 
-def sanity_checks(data):
+def sanity_checks(data: pd.DataFrame) -> None:
     # TODO: Simplify the following by grouping by country and doing different aggregates.
     for country in tqdm(data["country"].unique()):
         df = data[data["country"] == country].reset_index(drop=True)
@@ -118,10 +118,10 @@ def run(dest_dir: str) -> None:
     tb_garden.metadata = tb_meadow.metadata
     for col in tb_garden.columns:
         tb_garden[col].metadata = tb_meadow[col].metadata
-    
+
     ds_garden.metadata.update_from_yaml(N.metadata_path)
     tb_garden.update_metadata_from_yaml(N.metadata_path, "world_carbon_pricing")
-    
+
     ds_garden.add(tb_garden)
     ds_garden.save()
 
