@@ -1,8 +1,4 @@
 import pandas as pd
-from owid.catalog import Dataset, Source, Table, VariableMeta
-from owid.catalog.utils import underscore
-
-from etl import grapher_helpers as gh
 
 
 def create_var_name(df: pd.DataFrame) -> pd.Series:
@@ -21,7 +17,7 @@ def create_var_name(df: pd.DataFrame) -> pd.Series:
             df[["measure", "cause", "rei", "sex", "age", "metric"]] = df[
                 ["measure", "cause", "rei", "sex", "age", "metric"]
             ].astype(str)
-            df["name"] = (
+            df["variable"] = (
                 df["measure"]
                 + " - Cause: "
                 + df["cause"]
@@ -39,7 +35,7 @@ def create_var_name(df: pd.DataFrame) -> pd.Series:
             df[["measure", "cause", "sex", "age", "metric"]] = df[["measure", "cause", "sex", "age", "metric"]].astype(
                 str
             )
-            df["name"] = (
+            df["variable"] = (
                 df["measure"]
                 + " - "
                 + df["cause"]
@@ -54,7 +50,7 @@ def create_var_name(df: pd.DataFrame) -> pd.Series:
     except ValueError:
         pass
 
-    assert "name" in df.columns
+    assert "variable" in df.columns
     return df
 
 
@@ -83,33 +79,3 @@ def create_var_name(df: pd.DataFrame) -> pd.Series:
 #        df.groupby(["country", "year"])["value"].sum().reset_index().to_csv(
 #            os.path.join(outpath, "datapoints", "datapoints_%d.csv" % id)
 #        )
-def add_metadata_and_prepare_for_grapher(df_gr: pd.DataFrame, var_name: str, walden_ds: Dataset) -> Table:
-    source = Source(
-        name=df_gr["source"].iloc[0],
-        url=walden_ds.metadata["url"],
-        source_data_url=walden_ds.metadata["source_data_url"],
-        owid_data_url=walden_ds.metadata["owid_data_url"],
-        date_accessed=walden_ds.metadata["date_accessed"],
-        publication_date=walden_ds.metadata["publication_date"],
-        publication_year=walden_ds.metadata["publication_year"],
-        published_by=walden_ds.metadata["name"],
-        publisher_source=df_gr["source"].iloc[0],
-    )
-
-    df_gr["meta"] = VariableMeta(
-        title=df_gr["variable_name_meta"].iloc[0],
-        description=df_gr["seriesdescription"].iloc[0] + "\n\nFurther information available at: %s" % (source_url),
-        sources=[source],
-        unit=df_gr["long_unit"].iloc[0],
-        short_unit=df_gr["short_unit"].iloc[0],
-        additional_info=None,
-    )
-    # Taking only the first 255 characters of the var name as this is the limit (there is at least one that is too long)
-    df_gr["variable"] = underscore(df_gr["variable_name"].iloc[0][0:254])
-
-    df_gr = df_gr[["country", "year", "value", "variable", "meta"]].copy()
-    # convert integer values to int but round float to 2 decimal places, string remain as string
-    df_gr["entity_id"] = gh.country_to_entity_id(df_gr["country"], create_entities=True)
-    df_gr = df_gr.drop(columns=["country"]).set_index(["year", "entity_id"])
-
-    return Table(df_gr)

@@ -1,13 +1,12 @@
 from typing import Iterable
-from venv import create
 
-import pandas as pd
-from gbd_tools import create_var_name
 from owid import catalog
-from owid.catalog import Dataset, Table, TableMeta, VariableMeta
+from owid.catalog import Dataset, VariableMeta
 
 from etl import grapher_helpers as gh
 from etl.helpers import Names
+
+from .gbd_tools import create_var_name
 
 N = Names(__file__)
 N = Names("/Users/fionaspooner/Documents/OWID/repos/etl/etl/steps/grapher/ihme_gbd/2019/gbd_cause.py")
@@ -29,7 +28,7 @@ def get_grapher_tables(dataset: catalog.Dataset) -> Iterable[catalog.Table]:
     for table in gbd_tables:
         df = dataset[table]
         df = create_var_name(df)
-        df_gr = df.groupby("name")
+        df_gr = df.groupby("variable")
         for var_name, df_var in df_gr:
             df_var["meta"] = VariableMeta(
                 title=var_name,
@@ -39,7 +38,7 @@ def get_grapher_tables(dataset: catalog.Dataset) -> Iterable[catalog.Table]:
                 # short_unit=df_var["short_unit"].iloc[0],
                 additional_info=None,
             )
-            df_var = df_var[["country", "year", "value", "name", "meta"]].copy()
+            df_var = df_var[["country", "year", "value", "variable", "meta"]].copy()
             # convert `country` into `entity_id` and set indexes for `yield_wide_table`
             table = gh.adapt_table_for_grapher(df_var)
 
@@ -48,4 +47,4 @@ def get_grapher_tables(dataset: catalog.Dataset) -> Iterable[catalog.Table]:
 
             # convert table into grapher format
             # if you data is in long format, use gh.yield_long_table
-            yield from gh.yield_long_table(table, na_action="drop")
+            yield from gh.yield_long_table(table)
