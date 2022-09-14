@@ -88,7 +88,7 @@ prune: .venv
 
 grapher: .venv
 	@echo '==> Running full etl with grapher upsert'
-	.venv/bin/etl --grapher
+	.venv/bin/etl --grapher --upsert
 
 dot: dependencies.pdf
 

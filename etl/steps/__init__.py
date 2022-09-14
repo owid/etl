@@ -213,8 +213,8 @@ def parse_step(step_name: str, dag: Dict[str, Any]) -> "Step":
     elif step_type == "grapher":
         step = GrapherStep(path, dependencies)
 
-    elif step_type == "grapher-new":
-        step = GrapherNewStep(path, dependencies)
+    elif step_type == "upsert":
+        step = UpsertStep(path, dependencies)
 
     elif step_type == "backport":
         step = BackportStep(path, dependencies)
@@ -609,12 +609,12 @@ class GrapherStep(Step):
 
 
 @dataclass
-class GrapherNewStep(Step):
+class UpsertStep(Step):
     path: str
     data_step: DataStep
 
     def __init__(self, path: str, dependencies: List[Step]) -> None:
-        # GrapherNewStep should have exactly one DataStep dependency
+        # UpsertStep should have exactly one DataStep dependency
         assert len(dependencies) == 1
         assert path == dependencies[0].path
         assert isinstance(dependencies[0], DataStep)
@@ -622,7 +622,7 @@ class GrapherNewStep(Step):
         self.data_step = dependencies[0]
 
     def __str__(self) -> str:
-        return f"grapher-new://{self.path}"
+        return f"upsert://{self.path}"
 
     @property
     def dataset(self) -> catalog.Dataset:
@@ -681,7 +681,7 @@ class GrapherNewStep(Step):
         set_dataset_checksum(dataset_upsert_results.dataset_id, self.data_step.checksum_input())
 
     def checksum_output(self) -> str:
-        raise NotImplementedError("GrapherNewStep should not be used as an input")
+        raise NotImplementedError("UpsertStep should not be used as an input")
 
 
 @dataclass

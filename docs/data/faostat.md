@@ -2,7 +2,7 @@
 
 ## Overview of the original data
 
-[FAOSTAT (Food and Agriculture Organization Corporate Statistical Database)](https://www.fao.org/faostat/en/#home) 
+[FAOSTAT (Food and Agriculture Organization Corporate Statistical Database)](https://www.fao.org/faostat/en/#home)
 provides free access to food and agriculture data from 1961 to the most recent year available.
 
 The data is distributed among different domains, each one with a unique dataset code (e.g. `qcl`).
@@ -23,7 +23,7 @@ Each FAO dataset is typically given as a long table with the following columns:
   Polynesia), and other aggregations (e.g. Developing regions).
 * `Item Code`: Identifier code for items.
 * `Item`: Item name (e.g. 'Olive oil').
-* `Element Code`: Identifier code for element-units. It is possible to find multiple elements with the same element 
+* `Element Code`: Identifier code for element-units. It is possible to find multiple elements with the same element
   code, if there are multiple units for the same element (e.g. `faostat_qcl` has element codes 5513 and 5510 for element
   'Production', because they have different units, namely 'thousand number' and 'tonnes').
 * `Element`: Variable measured (e.g. 'Area harvested').
@@ -232,7 +232,7 @@ python etl/scripts/faostat/create_new_steps.py -c grapher
 ```
 7. Run the new etl grapher steps, to generate the grapher charts.
 ```bash
-etl faostat/YYYY-MM-DD --grapher
+etl faostat/YYYY-MM-DD --grapher --upsert
 ```
 8. Use OWID's internal approval tool to visually inspect changes between the old and new versions of updated charts, and
 accept or reject changes.
@@ -299,7 +299,7 @@ To customize the name or description of an item, edit the `custom_items.csv` fil
 contains the following columns:
 * `dataset`: Dataset short name (e.g. `faostat_qcl`).
 * `item_code`: FAOSTAT item code (after OWID harmonization).
-* `fao_item`: Original FAOSTAT item name. 
+* `fao_item`: Original FAOSTAT item name.
 * `owid_item`: Customized item name.
 * `fao_item_description`: Original FAOSTAT item description. This field is sometimes missing.
 * `owid_item_description`: Customized item description.
@@ -331,7 +331,7 @@ folder, which contains the following columns:
 * `owid_aggregation`: Operation to apply to the data when creating region aggregates. It is either empty or it
   determines the operation to perform when aggregating (e.g. `sum` or `mean`). If this is empty, the element will not
   be present in region aggregates (meaning continents and income groups will miss this element). If it is `sum`, the
-  values of the elements of the members of the region will be added together for each year. 
+  values of the elements of the members of the region will be added together for each year.
 * `was_per_capita`: 1 if the original element was given per capita, 0 otherwise. If it is 1, it will be multiplied by
   the population given by FAOSTAT (if this population is given, otherwise the execution of the corresponding garden step
   will raise an assertion error, in which case the variable should be kept as per-capita).
@@ -398,7 +398,7 @@ However, there are some exceptions:
   `AG_FLS_IDX`), which seem to have no connection to other item codes.
 * Dataset `faostat_scl` has item codes with decimals (e.g. '23120.01' for item `Flour, rice`). These items do not seem
   to be related to the usual item codes. For example, item code "0115" in `faostat_scl` corresponds to item `Barley`,
-  whereas in `faostat_tcl`, item code 115 corresponds to item `Food preparations, flour, malt extract`.  
+  whereas in `faostat_tcl`, item code 115 corresponds to item `Food preparations, flour, malt extract`.
 
 Ignoring these two exceptions, the rest of the datasets seem to be consistent in their item codes:
 Although for the same item code one can find slightly different item names in different datasets, they seem to always

@@ -33,7 +33,13 @@ LIMIT_NOFILE = 5000
 @click.option("--dry-run", is_flag=True, help="Only print the steps that would be run")
 @click.option("--force", is_flag=True, help="Redo a step even if it appears done and up-to-date")
 @click.option("--private", is_flag=True, help="Execute private steps")
-@click.option("--grapher", is_flag=True, help="Publish changes to grapher (OWID staff only)")
+@click.option("--grapher", is_flag=True, help="Include grapher channel (OWID staff only, needs access to DB)")
+@click.option(
+    "--upsert/--no-upsert",
+    default=False,
+    type=bool,
+    help="Upsert datasets from grapher channel to DB (OWID staff only, needs access to DB)",
+)
 @click.option("--ipdb", is_flag=True, help="Run the debugger on uncaught exceptions")
 @click.option(
     "--backport",
@@ -70,6 +76,7 @@ def main_cli(
     force: bool = False,
     private: bool = False,
     grapher: bool = False,
+    upsert: bool = False,
     backport: bool = False,
     ipdb: bool = False,
     downstream: bool = False,
@@ -80,12 +87,17 @@ def main_cli(
 ) -> None:
     _update_open_file_limit()
 
+    if upsert and not grapher:
+        click.echo("ERROR: --upsert also requires --grapher")
+        sys.exit(1)
+
     kwargs = dict(
         steps=steps,
         dry_run=dry_run,
         force=force,
         private=private,
         grapher=grapher,
+        upsert=upsert,
         backport=backport,
         downstream=downstream,
         only=only,
@@ -108,6 +120,7 @@ def main(
     force: bool = False,
     private: bool = False,
     grapher: bool = False,
+    upsert: bool = False,
     backport: bool = False,
     downstream: bool = False,
     only: bool = False,
@@ -121,7 +134,7 @@ def main(
     if grapher:
         sanity_check_db_settings()
 
-    dag = construct_dag(dag_path, backport=backport, private=private, grapher=grapher)
+    dag = construct_dag(dag_path, backport=backport, private=private, upsert=upsert)
 
     excludes = exclude.split(",") if exclude else []
 
@@ -150,7 +163,7 @@ def sanity_check_db_settings() -> None:
         sys.exit(1)
 
 
-def construct_dag(dag_path: Path, backport: bool, private: bool, grapher: bool) -> DAG:
+def construct_dag(dag_path: Path, backport: bool, private: bool, upsert: bool) -> DAG:
     """Construct full DAG."""
 
     # Load our graph of steps and the things they depend on
@@ -160,9 +173,9 @@ def construct_dag(dag_path: Path, backport: bool, private: bool, grapher: bool) 
     if backport:
         dag.update(_backporting_steps(private, walden_catalog=WALDEN_CATALOG))
 
-    # If --grapher is set, add steps for upserting to DB
-    if grapher:
-        dag.update(_grapher_steps(dag))
+    # If --upsert is set, add steps for upserting to DB
+    if upsert:
+        dag.update(_upsert_steps(dag))
 
     return dag
 
@@ -188,8 +201,9 @@ def run_dag(
     """
     excludes = excludes or []
     if not include_grapher:
+        # exclude grapher channel
+        excludes.append("data://grapher")
         excludes.append("grapher://")
-        excludes.append("grapher-new://")
 
     _validate_private_steps(dag)
 
@@ -265,13 +279,13 @@ def _backporting_steps(private: bool, walden_catalog: WaldenCatalog) -> DAG:
     return dag
 
 
-def _grapher_steps(dag: DAG) -> DAG:
-    # dynamically generate a grapher-new:// step for every grapher data step
+def _upsert_steps(dag: DAG) -> DAG:
+    # dynamically generate a upsert:// step for every grapher data step
     new_dag = {}
     for step in list(dag.keys()):
         # match regex with prefix data or data-private
         if re.match(r"^(data|data-private)://grapher/", step):
-            new_dag[re.sub(r"^(data|data-private)://", "grapher-new://", step)] = {step}
+            new_dag[re.sub(r"^(data|data-private)://", "upsert://", step)] = {step}
 
     return new_dag
 

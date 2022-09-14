@@ -143,6 +143,12 @@ def app(run_checks: bool, dummy_data: bool) -> None:
     etl grapher/{form.namespace}/{form.version}/{form.short_name} --grapher
     ```
 
+    This will generate dataset that can be loaded and examined in data-catalog (use `grapher` channel). To upsert the dataset into the database, add `--upsert` flag
+
+    ```
+    etl grapher/{form.namespace}/{form.version}/{form.short_name} --grapher --upsert
+    ```
+
 2. When you feel confident, use `.env.staging` for staging which looks something like this:
 
     ```
@@ -163,7 +169,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
     After you run
 
     ```
-    ENV=.env.staging etl grapher/{form.namespace}/{form.version}/{form.short_name} --grapher
+    ENV=.env.staging etl grapher/{form.namespace}/{form.version}/{form.short_name} --grapher --upsert
     ```
 
     you should see it [in staging admin](https://staging.owid.cloud/admin/datasets).
@@ -171,7 +177,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
 3. Pushing to production grapher is **not yet automated**. After you get it reviewed and approved, you can use `.env.prod` file and run
 
     ```
-    ENV=.env.prod etl grapher/{form.namespace}/{form.version}/{form.short_name} --grapher
+    ENV=.env.prod etl grapher/{form.namespace}/{form.version}/{form.short_name} --grapher --upsert
     ```
 
 4. Check your dataset in [admin](https://owid.cloud/admin/datasets).

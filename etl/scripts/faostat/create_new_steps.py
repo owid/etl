@@ -83,7 +83,7 @@ def get_channel_from_dag_line(dag_line: str) -> str:
         channel = "meadow"
     elif dag_line.startswith("walden://"):
         channel = "walden"
-    elif dag_line.startswith("grapher://") or dag_line.startswith("grapher-new://"):
+    elif dag_line.startswith("grapher://"):
         channel = "grapher"
     else:
         raise ValueError("dag line not understood")
