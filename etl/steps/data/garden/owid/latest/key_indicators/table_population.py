@@ -148,6 +148,10 @@ def load_unwpp() -> pd.DataFrame:
                 "Less developed regions, excluding least developed countries",
                 "More developed regions",
                 "Small island developing states (SIDS)",
+                "High-income countries",
+                "Low-income countries",
+                "Lower-middle-income countries",
+                "Upper-middle-income countries",
             ]
         )
     ]
