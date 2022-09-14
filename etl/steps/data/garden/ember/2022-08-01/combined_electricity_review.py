@@ -343,7 +343,7 @@ def run(dest_dir: str) -> None:
     #
     ds_garden = catalog.Dataset.create_empty(dest_dir)
     # Import metadata from the metadata yaml file.
-    ds_garden.metadata.update_from_yaml(METADATA_PATH)
+    ds_garden.metadata.update_from_yaml(METADATA_PATH, if_source_exists="replace")
     # Create dataset.
     ds_garden.save()
 
