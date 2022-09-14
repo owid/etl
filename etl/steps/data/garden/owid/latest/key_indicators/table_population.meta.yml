@@ -8,23 +8,20 @@ tables:
     variables:
       population:
         title: Population
-        description: Population by country, available from 1800 to 2021 based on Gapminder data, HYDE, and UN Population Division (2019) estimates.
+        description: Population by country, available from 1800 to 2021 based on Gapminder data, HYDE, and UN Population Division (2022) estimates.
         display:
           name: Population
           includeInTable: true
         sources:
-          -
-            name: Gapminder (v6)
+          - name: Gapminder (v6)
             published_by: Gapminder (v6)
             url: https://www.gapminder.org/data/documentation/gd003/
             date_accessed: October 8, 2021
-          -
-            name: UN (2019)
-            published_by: United Nations Population Division (2019)
+          - name: UN (2022)
+            published_by: United Nations - Population Division (2022)
             url: https://population.un.org/wpp/Download/Standard/Population/
-            date_accessed: October 8, 2021
-          -
-            name: HYDE (v3.2)
+            date_accessed: September 9, 2022
+          - name: HYDE (v3.2)
             published_by: HYDE (v3.2)
             url: https://dataportaal.pbl.nl/downloads/HYDE/
             date_accessed: October 8, 2021
