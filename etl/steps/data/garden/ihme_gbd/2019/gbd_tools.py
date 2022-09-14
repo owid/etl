@@ -105,33 +105,6 @@ def prepare_garden(df: pd.DataFrame) -> Table:
     return tb_garden
 
 
-# Use in grapher step
-# def calculate_omms(N: Any, df: pd.DataFrame) -> pd.DataFrame:
-#    f = str(N.directory) +'/' + N.short_name + ".variables_to_sum.json"
-#    with open(f) as file:
-#        vars_to_calc = json.load(file)
-#
-#    for var in vars_to_calc:
-#        print(var)
-#        id = vars.loc[vars["name"] == var].id
-#        assert (vars["name"] == var).any(), "%s not in list of variables, check spelling!" % (var)
-#        vars_to_sum = vars[vars.name.isin(vars_to_calc[var])].id.to_list()
-#        df_sum = []
-#        for file in vars_to_sum:
-#            df = pd.read_csv(
-#                os.path.join(outpath, "datapoints", "datapoints_%d.csv" % file),
-#                index_col=None,
-#                header=0,
-#            )
-#            df["id"] = file
-#            df_sum.append(df)
-#        df = pd.concat(df_sum, ignore_index=True)
-#        df = df.drop_duplicates()
-#        df.groupby(["country", "year"])["value"].sum().reset_index().to_csv(
-#            os.path.join(outpath, "datapoints", "datapoints_%d.csv" % id)
-#        )
-
-
 def run_wrapper(
     dataset: str, country_mapping_path: Path, excluded_countries_path: Path, dest_dir: str, metadata_path: Path
 ) -> None:

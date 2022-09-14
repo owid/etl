@@ -1,7 +1,10 @@
 from typing import Iterable
+from venv import create
 
+import pandas as pd
+from gbd_tools import create_var_name
 from owid import catalog
-from owid.catalog import Dataset
+from owid.catalog import Dataset, Table, TableMeta, VariableMeta
 
 from etl import grapher_helpers as gh
 from etl.helpers import Names
@@ -17,18 +20,32 @@ def get_grapher_dataset() -> catalog.Dataset:
     return dataset
 
 
+N.garden_dataset.path
+
+
 def get_grapher_tables(dataset: catalog.Dataset) -> Iterable[catalog.Table]:
-    ds_garden = Dataset((DATA_DIR / f"garden/{NAMESPACE}/{VERSION}/{FNAME}").as_posix())
+    ds_garden = Dataset(N.garden_dataset.path)
     gbd_tables = ds_garden.table_names
-    table = dataset["gbd_cause"]
-    table = table.reset_index()
+    for table in gbd_tables:
+        df = dataset[table]
+        df = create_var_name(df)
+        df_gr = df.groupby("name")
+        for var_name, df_var in df_gr:
+            df_var["meta"] = VariableMeta(
+                title=var_name,
+                description=ds_garden.metadata.description,
+                sources="Institute for Health Metrics and Evaluation - Global Burden of Disease (2019)",
+                unit=df_var["unit"].iloc[0],
+                # short_unit=df_var["short_unit"].iloc[0],
+                additional_info=None,
+            )
+            df_var = df_var[["country", "year", "value", "name", "meta"]].copy()
+            # convert `country` into `entity_id` and set indexes for `yield_wide_table`
+            table = gh.adapt_table_for_grapher(df_var)
 
-    # convert `country` into `entity_id` and set indexes for `yield_wide_table`
-    table = gh.adapt_table_for_grapher(table)
+            # optionally set additional dimensions
+            # table = table.set_index(["sex", "income_group"], append=True)
 
-    # optionally set additional dimensions
-    # table = table.set_index(["sex", "income_group"], append=True)
-
-    # convert table into grapher format
-    # if you data is in long format, use gh.yield_long_table
-    yield from gh.yield_wide_table(table, na_action="drop")
+            # convert table into grapher format
+            # if you data is in long format, use gh.yield_long_table
+            yield from gh.yield_long_table(table, na_action="drop")
