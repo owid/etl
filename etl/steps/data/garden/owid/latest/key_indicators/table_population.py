@@ -135,7 +135,22 @@ def load_unwpp() -> pd.DataFrame:
     )
 
     # Remove special regions
-    df = df[~df.country.isin(["Northern America", "Latin America & Caribbean"])]
+    df = df[
+        ~df.country.isin(
+            [
+                "Northern America",
+                "Latin America & Caribbean",
+                "Land-locked developing countries (LLDC)",
+                "Latin America and the Caribbean",
+                "Least developed countries",
+                "Less developed regions",
+                "Less developed regions, excluding China",
+                "Less developed regions, excluding least developed countries",
+                "More developed regions",
+                "Small island developing states (SIDS)",
+            ]
+        )
+    ]
 
     # Check no (country, year) duplicates
     assert df.groupby(["country", "year"]).population.count().max() == 1
