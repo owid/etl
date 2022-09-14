@@ -1,13 +1,14 @@
 from typing import Iterable
 
+import pandas as pd
+from gbd_tools import create_var_name
 from owid import catalog
-from owid.catalog import Dataset
 
 from etl import grapher_helpers as gh
 from etl.helpers import Names
 
 N = Names(__file__)
-N = Names("/Users/fionaspooner/Documents/OWID/repos/etl/etl/steps/grapher/ihme_gbd/2019/gbd_cause.py")
+N = Names("/Users/fionaspooner/Documents/OWID/repos/etl/etl/steps/grapher/ihme_gbd/2019/gbd_risk.py")
 
 
 def get_grapher_dataset() -> catalog.Dataset:
@@ -18,11 +19,9 @@ def get_grapher_dataset() -> catalog.Dataset:
 
 
 def get_grapher_tables(dataset: catalog.Dataset) -> Iterable[catalog.Table]:
-    ds_garden = Dataset((DATA_DIR / f"garden/{NAMESPACE}/{VERSION}/{FNAME}").as_posix())
-    gbd_tables = ds_garden.table_names
-    table = dataset["gbd_cause"]
-    table = table.reset_index()
-
+    table = dataset["gbd_risk"]
+    table = pd.DataFrame(table.reset_index())
+    create_var_name(table)
     # convert `country` into `entity_id` and set indexes for `yield_wide_table`
     table = gh.adapt_table_for_grapher(table)
 

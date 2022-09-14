@@ -5,7 +5,7 @@ from typing import List, cast
 import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
-from owid.catalog.utils import underscore_table
+from owid.catalog.utils import underscore, underscore_table
 from owid.datautils import geo
 from structlog import get_logger
 
@@ -142,17 +142,49 @@ def run_wrapper(
 
     df = pd.DataFrame(tb_meadow)
     df = tidy_countries(country_mapping_path, excluded_countries_path, df)
+    df_garden = prepare_garden(df)
+
+    all_tables = create_tables(df_garden)
+
     ds_garden = Dataset.create_empty(dest_dir)
     ds_garden.metadata = ds_meadow.metadata
 
-    # underscore column names and add units column
-    tb_garden = prepare_garden(df)
+    for table in all_tables:
+        if "rei" in table.columns:
+            short_name = (
+                dataset + "_" + table["measure"].iloc[0] + "_" + table["cause"].iloc[0] + "_" + table["rei"].iloc[0]
+            )
+            log.info(
+                f"{dataset}.create_garden_table",
+                measure=table["measure"].iloc[0],
+                cause=table["cause"].iloc[0],
+                risk_factor=table["rei"].iloc[0],
+            )
+        else:
+            short_name = dataset + "_" + table["measure"].iloc[0] + "_" + table["cause"].iloc[0]
+            log.info(
+                f"{dataset}.create_garden_table",
+                measure=table["measure"].iloc[0],
+                cause=table["cause"].iloc[0],
+            )
 
-    tb_garden.metadata = tb_meadow.metadata
-
-    ds_garden.metadata.update_from_yaml(metadata_path)
-    tb_garden.update_metadata_from_yaml(metadata_path, f"{dataset}")
-    tb_garden = tb_garden.set_index(["measure", "cause", "metric"])
-
-    ds_garden.add(tb_garden)
+        tb_garden = Table(table)
+        tb_garden.metadata = tb_meadow.metadata
+        ds_garden.metadata.update_from_yaml(metadata_path)
+        tb_garden.update_metadata_from_yaml(metadata_path, f"{dataset}")
+        tb_garden.metadata.short_name = underscore(short_name)
+        tb_garden = tb_garden.reset_index(drop=True)
+        ds_garden.add(tb_garden)
     ds_garden.save()
+
+
+def create_tables(df: pd.DataFrame) -> List[pd.DataFrame]:
+    if "rei" in df.columns:
+        df_group = df.groupby(["measure", "cause", "rei"])
+    else:
+        df_group = df.groupby(["measure", "cause"])
+
+    output_tables = []
+    for group_name, df_g in df_group:
+        output_tables.append(df_g)
+    return output_tables
