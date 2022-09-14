@@ -134,6 +134,9 @@ def load_unwpp() -> pd.DataFrame:
         .reset_index(drop=True)
     )
 
+    # Remove special regions
+    df = df[~df.country.isin(["Northern America", "Latin America & Caribbean"])]
+
     # Check no (country, year) duplicates
     assert df.groupby(["country", "year"]).population.count().max() == 1
     return cast(pd.DataFrame, df)
