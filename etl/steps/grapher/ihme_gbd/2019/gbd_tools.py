@@ -1,7 +1,7 @@
 import pandas as pd
 
 
-def create_var_name(df: pd.DataFrame) -> pd.Series:
+def create_var_name(df: pd.DataFrame) -> pd.DataFrame:
 
     age_dict = {
         "Early Neonatal": "0-6 days",
