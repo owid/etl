@@ -19,3 +19,5 @@ def run(dest_dir: str) -> None:
 
     # if you data is in long format, check gh.long_to_wide_tables
     dataset.add(table)
+
+    dataset.save()
