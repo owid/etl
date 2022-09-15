@@ -5,7 +5,6 @@
 
 from importlib import import_module
 from pathlib import Path
-from typing import cast
 
 from owid.catalog import Dataset, DatasetMeta, Table
 
