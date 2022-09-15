@@ -47,13 +47,15 @@ def run(dest_dir: str) -> None:
     #
     # Save outputs.
     #
-    # Create a new grapher dataset (and modify the title of the original one).
-    ds_garden.metadata.title = GRAPHER_DATASET_TITLE
-    ds_grapher = catalog.Dataset.create_empty(dest_dir, gh.adapt_dataset_metadata_for_grapher(ds_garden.metadata))
-    # Fetch metadata from garden step (if any).
-    ds_garden.metadata.update_from_yaml(GRAPHER_METADATA_PATH, if_source_exists="append")
+    # Prepare metadata for new grapher dataset.
+    # Start with the garden metadata, and updated it using the grapher metadata yaml file.
+    grapher_metadata = ds_garden.metadata
+    grapher_metadata.update_from_yaml(GRAPHER_METADATA_PATH, if_source_exists="append")
+    # Create new grapher dataset.
+    ds_grapher = catalog.Dataset.create_empty(dest_dir, gh.adapt_dataset_metadata_for_grapher(grapher_metadata))
+    # Prepare metadata for new grapher table.
+    # Start with the garden metadata and update it using the grapher metadata yaml file.
     tb_grapher_any_sector.metadata = tb_garden.metadata
-    # Update table metadata using metadata yaml file.
     tb_grapher_any_sector.update_metadata_from_yaml(GRAPHER_METADATA_PATH, GRAPHER_DATASET_NAME)
     # Add table to new dataset.
     ds_grapher.add(gh.adapt_table_for_grapher(tb_grapher_any_sector))
