@@ -9,12 +9,10 @@ import os
 import re
 import subprocess
 import tempfile
-import types
 import warnings
 from collections import defaultdict
 from dataclasses import dataclass, field
 from glob import glob
-from importlib import import_module
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Protocol, Set, Union, cast
 from urllib.parse import urlparse
@@ -212,9 +210,6 @@ def parse_step(step_name: str, dag: Dict[str, Any]) -> "Step":
 
     elif step_type == "grapher":
         step = GrapherStep(path, dependencies)
-
-    elif step_type == "upsert":
-        step = UpsertStep(path, dependencies)
 
     elif step_type == "backport":
         step = BackportStep(path, dependencies)
@@ -465,151 +460,15 @@ class WaldenStep(Step):
         return dataset
 
 
+@dataclass
 class GrapherStep(Step):
     """
-    A step which ingests data into a local mysql database. You specify it by
-    by making a Python module with a to_grapher_table function that takes a
-    table and returns a sequence of tables with the fixed grapher structure of
-    (year, entitiyId, value)
+    A step which ingests data from grapher channel into a local mysql database.
 
     If the dataset with the same short name already exists, it will be updated.
     All variables and sources related to the dataset
     """
 
-    path: str
-    dependencies: List[Step]
-
-    def __init__(self, path: str, dependencies: List[Step]) -> None:
-        self.path = path
-        self.dependencies = dependencies
-
-    def __str__(self) -> str:
-        return f"grapher://{self.path}"
-
-    def run(self) -> None:
-        # make sure the enclosing folder is there
-        self._dest_dir.parent.mkdir(parents=True, exist_ok=True)
-
-        sp = self._search_path
-        if sp.with_suffix(".py").exists() or (sp / "__init__.py").exists():
-            self._run_py()
-
-        else:
-            raise Exception(f"have no idea how to run step: {self.path}")
-
-    def is_dirty(self) -> bool:
-        try:
-            dataset = self._get_step_module().get_grapher_dataset()
-        except FileNotFoundError:
-            # get_grapher_dataset might depend on garden step which won't be ready yet when this
-            # method is run
-            return True
-        return fetch_db_checksum(dataset) != self.checksum_input()
-
-    def can_execute(self) -> bool:
-        sp = self._search_path
-        return (
-            # python script
-            sp.with_suffix(".py").exists()
-            # folder of scripts with __init__.py
-            or (sp / "__init__.py").exists()
-        )
-
-    def checksum_input(self) -> str:
-        "Return the MD5 of all ingredients for making this step."
-        checksums = {}
-        for d in self.dependencies:
-            checksums[d.path] = d.checksum_output()
-
-        for f in self._step_files():
-            checksums[f] = files.checksum_file(f)
-
-        in_order = [v for _, v in sorted(checksums.items())]
-        return hashlib.md5(",".join(in_order).encode("utf8")).hexdigest()
-
-    def checksum_output(self) -> str:
-        # This cast from str to str is IMHO unnecessary but MyPy complains about this without it...
-        raise Exception("grapher steps do not output a dataset")
-
-    def _step_files(self) -> List[str]:
-        "Return a list of code files defining this step."
-        if self._search_path.is_dir():
-            return [p.as_posix() for p in files.walk(self._search_path)]
-
-        return glob(self._search_path.as_posix() + ".*")
-
-    @property
-    def _search_path(self) -> Path:
-        return paths.STEP_DIR / "grapher" / self.path
-
-    @property
-    def _dest_dir(self) -> Path:
-        return paths.DATA_DIR / self.path.lstrip("/")
-
-    def _run_py(self) -> None:
-        """
-        Import the Python module for this step and call get_grapher_tables() on it.
-        """
-        step_module = self._get_step_module()
-        dataset: catalog.Dataset = step_module.get_grapher_dataset()  # type: ignore
-        dataset_upsert_results = upsert_dataset(
-            dataset,
-            dataset.metadata.namespace,
-            dataset.metadata.sources,
-        )
-
-        tables = step_module.get_grapher_tables(dataset)  # type: ignore
-        upsert = lambda t: upsert_table(t, dataset_upsert_results)  # noqa: E731
-
-        # insert data in parallel, this speeds it up considerably and is even faster than loading
-        # data with LOAD DATA INFILE
-        if GRAPHER_INSERT_WORKERS > 1:
-            with concurrent.futures.ThreadPoolExecutor(max_workers=GRAPHER_INSERT_WORKERS) as executor:
-                results = executor.map(upsert, tables)
-        else:
-            results = map(upsert, tables)
-
-        variable_upsert_results = list(results)
-
-        self._cleanup_ghost_resources(dataset_upsert_results, variable_upsert_results)
-
-        # set checksum after all data got inserted
-        set_dataset_checksum(dataset_upsert_results.dataset_id, self.checksum_input())
-
-    @classmethod
-    def _cleanup_ghost_resources(
-        cls, dataset_upsert_results: DatasetUpsertResult, variable_upsert_results: List[VariableUpsertResult]
-    ) -> None:
-        """
-        Cleanup all ghost variables and sources that weren't upserted
-        NOTE: we can't just remove all dataset variables before starting this step because
-        there could be charts that use them and we can't remove and recreate with a new ID
-        """
-        upserted_variable_ids = [r.variable_id for r in variable_upsert_results]
-        upserted_source_ids = list(dataset_upsert_results.source_ids.values()) + [
-            r.source_id for r in variable_upsert_results
-        ]
-        # Try to cleanup ghost variables, but make sure to raise an error if they are used
-        # in any chart
-        cleanup_ghost_variables(
-            dataset_upsert_results.dataset_id,
-            upserted_variable_ids,
-            workers=GRAPHER_INSERT_WORKERS,
-        )
-        cleanup_ghost_sources(dataset_upsert_results.dataset_id, upserted_source_ids)
-
-    def _get_step_module(self) -> types.ModuleType:
-        module_path = self.path.lstrip("/").replace("/", ".")
-        step_module = import_module(f"etl.steps.grapher.{module_path}")
-        if not hasattr(step_module, "get_grapher_dataset"):
-            raise Exception(f'no get_grapher_dataset() method defined for module "{step_module}"')
-        if not hasattr(step_module, "get_grapher_tables"):
-            raise Exception(f'no get_grapher_tables() method defined for module "{step_module}"')
-        return step_module
-
-
-@dataclass
-class UpsertStep(Step):
     path: str
     data_step: DataStep
 
@@ -675,13 +534,35 @@ class UpsertStep(Step):
 
             variable_upsert_results += list(results)
 
-        GrapherStep._cleanup_ghost_resources(dataset_upsert_results, variable_upsert_results)
+        self._cleanup_ghost_resources(dataset_upsert_results, variable_upsert_results)
 
         # set checksum after all data got inserted
         set_dataset_checksum(dataset_upsert_results.dataset_id, self.data_step.checksum_input())
 
     def checksum_output(self) -> str:
         raise NotImplementedError("UpsertStep should not be used as an input")
+
+    @classmethod
+    def _cleanup_ghost_resources(
+        cls, dataset_upsert_results: DatasetUpsertResult, variable_upsert_results: List[VariableUpsertResult]
+    ) -> None:
+        """
+        Cleanup all ghost variables and sources that weren't upserted
+        NOTE: we can't just remove all dataset variables before starting this step because
+        there could be charts that use them and we can't remove and recreate with a new ID
+        """
+        upserted_variable_ids = [r.variable_id for r in variable_upsert_results]
+        upserted_source_ids = list(dataset_upsert_results.source_ids.values()) + [
+            r.source_id for r in variable_upsert_results
+        ]
+        # Try to cleanup ghost variables, but make sure to raise an error if they are used
+        # in any chart
+        cleanup_ghost_variables(
+            dataset_upsert_results.dataset_id,
+            upserted_variable_ids,
+            workers=GRAPHER_INSERT_WORKERS,
+        )
+        cleanup_ghost_sources(dataset_upsert_results.dataset_id, upserted_source_ids)
 
 
 @dataclass
