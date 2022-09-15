@@ -17,6 +17,7 @@ COLUMNS = {
     "year": "year",
     "ipcc_code": "ipcc_code",
     "product": "product",
+    "sector_name": "sector_name",
     "tax": "tax",
     "ets": "ets",
     "tax_rate_excl_ex_clcu": "tax_rate_gross",
@@ -87,10 +88,11 @@ def prepare_data(df: pd.DataFrame) -> pd.DataFrame:
     df["tax"] = df["tax"].replace(0, np.nan)
     df["ets"] = df["ets"].replace(0, np.nan)
 
-    # Remove rows where all data columns are nan.
-    df = df.dropna(subset=[column for column in df.columns if column not in INDEX_COLUMNS], how="all").reset_index(
-        drop=True
-    )
+    # Remove rows where all data columns are nan (ignore index columns and sector names).
+    columns_that_must_have_data = [column for column in df.columns
+                                   if column not in INDEX_COLUMNS if column != "sector_name"]
+    assert set(columns_that_must_have_data) < set(df.columns)
+    df = df.dropna(subset=columns_that_must_have_data, how="all").reset_index(drop=True)
 
     # Columns 'tax' and 'ets' were converted to float (because we introduced nans).
     # Now that nans have been removed, make them integer again.

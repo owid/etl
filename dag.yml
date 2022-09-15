@@ -133,6 +133,7 @@ steps:
   #
   data://meadow/rff/2022-09-14/world_carbon_pricing:
     - walden://rff/2022-09-14/world_carbon_pricing
+    - walden://rff/2022-09-14/ipcc_codes
   data://garden/rff/2022-09-14/world_carbon_pricing:
     - data://meadow/rff/2022-09-14/world_carbon_pricing
   grapher://rff/2022-09-14/world_carbon_pricing:
