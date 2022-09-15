@@ -232,7 +232,7 @@ python etl/scripts/faostat/create_new_steps.py -c grapher
 ```
 7. Run the new etl grapher steps, to generate the grapher charts.
 ```bash
-etl faostat/YYYY-MM-DD --grapher --upsert
+etl faostat/YYYY-MM-DD --grapher
 ```
 8. Use OWID's internal approval tool to visually inspect changes between the old and new versions of updated charts, and
 accept or reject changes.

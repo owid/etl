@@ -144,8 +144,7 @@ is being added to `etl`, or the date when the source data was released or update
 13. **Create a new grapher step** (e.g. `etl/etl/steps/data/grapher/example_institution/YYYY-MM-DD/example_dataset.py`).
     The step must contain a `run(dest_dir)` function that loads data from the last `garden` step, processes the data and
     creates a dataset with one or more tables and the necessary metadata.
-    Add `--grapher` and `--upsert` flags to `etl` command to upsert data into grapher database. Using just the `--grapher` flag will
-    create a dataset in the grapher channel, but won't upsert it into the database.
+    Add `--grapher` flags to `etl` command to upsert data into grapher database.
     To test the step, you can run it on the grapher `staging` database, or using
     [a local grapher](https://github.com/owid/owid-grapher/blob/master/docs/docker-compose-mysql.md).
 14. **Create a pull request** to merge the new branch with the master branch in `etl`.
