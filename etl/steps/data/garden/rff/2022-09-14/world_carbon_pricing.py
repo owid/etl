@@ -141,6 +141,6 @@ def run(dest_dir: str) -> None:
     # Update table metadata using metadata yaml file.
     tb_garden.update_metadata_from_yaml(N.metadata_path, DATASET_SHORT_NAME)
     # Add table to dataset.
-    ds_garden.add(tb_garden.reset_index())
+    ds_garden.add(tb_garden)
     # Save dataset.
     ds_garden.save()
