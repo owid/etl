@@ -19,8 +19,8 @@ COLUMNS = {
     "product": "product",
     "tax": "tax",
     "ets": "ets",
-    "tax_rate_excl_ex_clcu": "tax_rate_excl_ex_clcu",
-    "tax_rate_incl_ex_clcu": "tax_rate_incl_ex_clcu",
+    "tax_rate_excl_ex_clcu": "tax_rate_gross",
+    "tax_rate_incl_ex_clcu": "tax_rate_net",
     "ets_price": "ets_price",
 }
 
@@ -137,7 +137,7 @@ def run(dest_dir: str) -> None:
     # Ensure all columns are snake, lower case.
     tb_garden = underscore_table(Table(df))
     # Update dataset metadata using metadata yaml file.
-    ds_garden.metadata.update_from_yaml(N.metadata_path)
+    ds_garden.metadata.update_from_yaml(N.metadata_path, if_source_exists="replace")
     # Update table metadata using metadata yaml file.
     tb_garden.update_metadata_from_yaml(N.metadata_path, DATASET_SHORT_NAME)
     # Add table to dataset.

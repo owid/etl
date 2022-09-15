@@ -1,19 +1,41 @@
 dataset:
   sources:
-  #   -
-  #     name: Maddison Project Database 2020 (Bolt and van Zanden, 2020)
-  #     published_by: Bolt, Jutta and Jan Luiten van Zanden (2020), “Maddison style estimates of the evolution of the world economy. A new 2020 update“.
-  #     publisher_source: |
-  #       The Maddison Project Database is based on the work of many researchers that have produced estimates of...
+      -
+        name: World Carbon Pricing Database
+        published_by: "Dolphin, G., Pollitt, M. and Newbery, D. 2020. The political economy of carbon pricing: a panel analysis. Oxford Economic Papers 72(2): 472-500."
+        publication_year: 2022
+        publication_date: 2022-09-14
+        url: https://github.com/g-dolphin/WorldCarbonPricingDatabase
 
 tables:
   world_carbon_pricing:
     variables:
-      # gdp:
-      #   title: GDP
-      #   short_unit: $
-      #   unit: 2011 int-$
-      #   description: Gross domestic product measured in international-$ using 2011 prices to adjust for price changes over time (inflation) and price differences between countries. Calculated by multiplying GDP per capita with population.
-      #   display:
-      #     entityAnnotationsMap: "Western Offshoots: United States, Canada, Australia and New Zealand"
-      #     numDecimalPlaces: 0
+      ets:
+        title: Covered by emissions trading system
+        unit: "#"
+        description: A binary value indicating whether the sector(-fuel) is covered by at least one emissions trading system.
+      ets_price:
+        title: ETS price
+        short_unit: current LCU / t CO2e
+        unit: Current local currency unit per ton of CO2 equivalent
+        description: Price of an emissions allowance in current local currency unit per ton of CO2 equivalent.
+        display:
+          numDecimalPlaces: 2
+      tax:
+        title: Covered by tax instrument
+        unit: "#"
+        description: A binary value indicating whether the sector(-fuel) is covered by at least one tax instrument.
+      tax_rate_gross:
+        title: Gross tax rate
+        short_unit: current LCU / t CO2e
+        unit: Current local currenty unit per ton of CO2 equivalent
+        description: Tax rate in current local currency unit (LCU) per ton of CO2 equivalent
+        display:
+          numDecimalPlaces: 2
+      tax_rate_net:
+        title: Net tax rate
+        short_unit: current LCU / t CO2e
+        unit: Current local currenty unit per ton of CO2 equivalent
+        description: Net tax rate (accounting for exemption) in current LCU per ton of CO2 equivalent.
+        display:
+          numDecimalPlaces: 2
