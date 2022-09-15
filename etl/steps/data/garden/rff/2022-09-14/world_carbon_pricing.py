@@ -138,8 +138,13 @@ def run(dest_dir: str) -> None:
 
     # Create a simplified table that simply gives, for each country and year, whether the country has any sector(-fuel)
     # that is covered by at least one tax instrument. And idem for ets.
-    df_any_sector = df.reset_index().groupby(["country", "year"], observed=True).\
-        agg({"ets": lambda x: x.sum() > 0, "tax": lambda x: x.sum() > 0}).astype(int).reset_index()
+    df_any_sector = (
+        df.reset_index()
+        .groupby(["country", "year"], observed=True)
+        .agg({"ets": lambda x: x.sum() > 0, "tax": lambda x: x.sum() > 0})
+        .astype(int)
+        .reset_index()
+    )
 
     # Set an appropriate index and sort conveniently.
     df_any_sector = df_any_sector.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
