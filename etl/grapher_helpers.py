@@ -502,6 +502,9 @@ def _ensure_source_per_variable(table: catalog.Table) -> catalog.Table:
         if table[column].metadata.sources[0].description is None:
             # Add the table description to the first source, so that it is displayed on the SOURCES tab.
             table[column].metadata.sources[0].description = table.metadata.description
+        # Combine multiple sources into one.
+        if len(table[column].metadata.sources) > 1:
+            table[column].metadata.sources = combine_metadata_sources(table[column].metadata).sources
     return table
 
 
