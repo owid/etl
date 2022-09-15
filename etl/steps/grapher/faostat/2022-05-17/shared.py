@@ -3,7 +3,6 @@
 """
 
 from pathlib import Path
-from typing import Iterable
 
 import pandas as pd
 from owid import catalog
@@ -31,6 +30,7 @@ def get_grapher_dataset_from_file_name(file_path: str) -> catalog.Dataset:
     dataset_short_name = file_name.split(".")[0]
 
     # Path to file containing information of the latest versions of the relevant datasets.
+    # TODO: this will be soon moved to `STEP_DIR / "data" / "grapher" / namespace / grapher_version / "versions.csv"`
     latest_versions_file = STEP_DIR / "grapher" / namespace / grapher_version / "versions.csv"
 
     # Load file of versions.
@@ -53,7 +53,7 @@ def get_grapher_dataset_from_file_name(file_path: str) -> catalog.Dataset:
     return dataset
 
 
-def get_grapher_tables(dataset: catalog.Dataset) -> Iterable[catalog.Table]:
+def get_grapher_table(dataset: catalog.Dataset) -> catalog.Table:
     """Yield each of the columns of the table of a dataset, with a format that is ready to be inserted into grapher.
 
     This function will also create all entities in grapher that do not already exist.
@@ -76,6 +76,4 @@ def get_grapher_tables(dataset: catalog.Dataset) -> Iterable[catalog.Table]:
     table = dataset[flat_table_names[0]].reset_index().drop(columns=["area_code"])
 
     # Adapt table to grapher requirements.
-    table = gh.adapt_table_for_grapher(table=table)
-
-    yield from gh.yield_wide_table(table, na_action="drop")
+    return gh.adapt_table_for_grapher(table=table)

@@ -1,10 +1,12 @@
 import json
 import os
+from functools import cache
 from pathlib import Path
-from typing import Any, Dict, Iterable, cast
+from typing import Any, Dict, cast
 
 import pandas as pd
 import requests
+from owid import catalog
 from owid.catalog import Dataset, Source, Table, VariableMeta
 from owid.catalog.utils import underscore
 from owid.walden import Catalog
@@ -16,6 +18,7 @@ from etl.paths import DATA_DIR
 
 log = get_logger()
 
+CURRENT_DIR = Path(__file__).parent
 
 BASE_URL = "https://unstats.un.org/sdgapi"
 VERSION = Path(__file__).parent.stem
@@ -23,14 +26,16 @@ FNAME = Path(__file__).stem
 NAMESPACE = Path(__file__).parent.parent.stem
 
 
-def get_grapher_dataset() -> Dataset:
-    dataset = Dataset(DATA_DIR / f"garden/{NAMESPACE}/{VERSION}/{FNAME}")
+def run(dest_dir: str) -> None:
+    garden_dataset = catalog.Dataset(DATA_DIR / f"garden/{NAMESPACE}/{VERSION}/{FNAME}")
+    dataset = catalog.Dataset.create_empty(dest_dir, gh.adapt_dataset_metadata_for_grapher(garden_dataset.metadata))
+
     # short_name should include dataset name and version
-    dataset.metadata.short_name = f"{dataset.metadata.short_name}__{VERSION.replace('-', '_')}"
-    return dataset
+    dataset.metadata.short_name = f"{garden_dataset.metadata.short_name}__{VERSION.replace('-', '_')}"
 
+    dataset.save()
 
-def get_grapher_tables(dataset: Dataset) -> Iterable[Table]:
+    # add tables to dataset
     clean_source_map = load_clean_source_mapping()
     walden_ds = Catalog().find_one(namespace=NAMESPACE, short_name=FNAME, version=VERSION)
     ds_garden = Dataset((DATA_DIR / f"garden/{NAMESPACE}/{VERSION}/{FNAME}").as_posix())
@@ -38,11 +43,25 @@ def get_grapher_tables(dataset: Dataset) -> Iterable[Table]:
     for var in sdg_tables:
         var_df = create_dataframe_with_variable_name(ds_garden, var)
         var_df["source"] = clean_source_name(var_df["source"], clean_source_map)
+
         var_gr = var_df.groupby("variable_name")
+
         for var_name, df_var in var_gr:
             df_tab = add_metadata_and_prepare_for_grapher(df_var, walden_ds)
             df_tab.metadata.dataset = dataset.metadata
-            yield from gh.yield_long_table(df_tab)
+
+            # NOTE: long format is quite inefficient, we're creating a table for every variable
+            # converting it to wide format would be too sparse, but we could move dimensions from
+            # variable names to proper dimensions
+            # currently we generate ~10000 files with total size 73MB (grapher step runs in 692s
+            # and both reindex and publishing is fast, so this is not a real bottleneck besides
+            # polluting `grapher` channel in our catalog)
+            # see https://github.com/owid/etl/issues/447
+            for wide_table in gh.long_to_wide_tables(df_tab):
+                # table is generated for every column, use it as a table name
+                # shorten it under 255 characteres as this is the limit for file name
+                wide_table.metadata.short_name = wide_table.columns[0][:245]
+                dataset.add(wide_table)
 
 
 def clean_source_name(raw_source: pd.Series, clean_source_map: Dict[str, str]) -> str:
@@ -64,7 +83,7 @@ def add_metadata_and_prepare_for_grapher(df_gr: pd.DataFrame, walden_ds: WaldenD
         "Getting the metadata url...",
         url=source_url,
         indicator=indicator,
-        var_name=df_gr["variable_name"].iloc[0][0:10],
+        var_name=df_gr["variable_name"].iloc[0],
     )
     source = Source(
         name=df_gr["source"].iloc[0],
@@ -149,11 +168,12 @@ def create_dataframe_with_variable_name(dataset: Dataset, tab: str) -> pd.DataFr
 
 
 def load_clean_source_mapping() -> Dict[str, str]:
-    with open("etl/steps/grapher/un_sdg/2022-07-07/un_sdg.sources.json", "r") as f:
+    with open(CURRENT_DIR / "un_sdg.sources.json", "r") as f:
         sources = json.load(f)
         return cast(Dict[str, str], sources)
 
 
+@cache
 def get_metadata_link(indicator: str) -> str:
 
     url = os.path.join("https://unstats.un.org/sdgs/metadata/files/", "Metadata-%s.pdf") % "-".join(
