@@ -183,7 +183,7 @@ NOR,Norway,NO,NOR,142.0,NOR,385.0,,NO,NRWY,NOR,NOR,http://www.wikidata.org/entit
 OMN,Oman,OM,OMN,449.0,OMA,698.0,OMA,MK,OMAN,OMN,OMN,http://www.wikidata.org/entity/Q842,Oman,217.0,719.0,,
 PAK,Pakistan,PK,PAK,564.0,PAK,770.0,PAK,PK,PKST,PAK,PAK,http://www.wikidata.org/entity/Q843,Pakistan,101.0,720.0,,
 PLW,Palau,PW,PLW,565.0,PAL,986.0,,PW,,PLW,PLW,http://www.wikidata.org/entity/Q695,Palau,224.0,724.0,,"[""Pacific Islands (Palau)""]"
-PSE,Palestine,PS,PSE,,,,PAL,,,PSE,PSE,http://www.wikidata.org/entity/Q219060,State of Palestine,140.0,731.0,,"[""Occupied Palestinian Terr."", ""Occupied Palestinian Territory"", ""Palestine, State of"", ""Palestinian Territories"", ""State of Palestine""]"
+PSE,Palestine,PS,PSE,,,,PAL,,,PSE,PSE,http://www.wikidata.org/entity/Q219060,State of Palestine,140.0,731.0,,"[""Occupied Palestinian Terr."", ""Occupied Palestinian Territory"", ""Palestine, State of"", ""Palestinian Territories"", ""State of Palestine"", ""West Bank and Gaza""]"
 PS_GZA,Gaza Strip,PS-GZA,PS-GZA,,,,,,,,,https://www.wikidata.org/wiki/Q39760,Gaza Strip,,,,
 PAN,Panama,PA,PAN,283.0,PAN,95.0,PAN,PN,PNMA,PAN,PAN,http://www.wikidata.org/entity/Q804,Panama,100.0,721.0,,
 PNG,Papua New Guinea,PG,PNG,853.0,PNG,910.0,PNG,PP,PPNG,PNG,PNG,http://www.wikidata.org/entity/Q691,Papua New Guinea,99.0,725.0,,
@@ -202,7 +202,7 @@ REU,Reunion,RE,REU,696.0,,,,RE,,REU,REU,http://www.wikidata.org/entity/Q17070,R�
 ROU,Romania,RO,ROU,968.0,ROM,360.0,ROM,RM,RMNA,ROM,ROM,http://www.wikidata.org/entity/Q218,Romania,92.0,735.0,,
 RUS,Russia,RU,RUS,922.0,RUS,365.0,RUS,RU,USSR,RUS,RUS,http://www.wikidata.org/entity/Q159,Russia,12.0,736.0,,"[""Russian Fed."", ""Russian Federation"", ""Russian Federation (the)""]"
 RWA,Rwanda,RW,RWA,714.0,RWA,517.0,RWA,RW,RWND,RWA,RWA,http://www.wikidata.org/entity/Q1037,Rwanda,91.0,737.0,,
-BLM,Saint Barthelemy,BL,BLM,,,,,,,,,http://www.wikidata.org/entity/Q25362,Saint Barthélemy,60094,795.0,,"[""Saint Barth\u00e9lemy"", ""Saint Barthlemy""]"
+BLM,Saint Barthelemy,BL,BLM,,,,,,,,,http://www.wikidata.org/entity/Q25362,Saint Barthélemy,60094.0,795.0,,"[""Saint Barth\u00e9lemy"", ""Saint Barthlemy""]"
 SHN,Saint Helena,SH,SHN,855.0,,,STH,XJ,,SHN,SHN,http://www.wikidata.org/entity/Q192184,"Saint Helena, Ascension and Tristan da Cunha",260.0,742.0,,"[""Saint Helena, Ascension and Tristan da Cunha"", ""St. Helena""]"
 KNA,Saint Kitts and Nevis,KN,KNA,361.0,SKN,60.0,STK,XD,,KNA,KNA,http://www.wikidata.org/entity/Q763,Saint Kitts and Nevis,227.0,672.0,,"[""St. Kitts and Nevis"", ""St.Kitts & Nevis""]"
 LCA,Saint Lucia,LC,LCA,362.0,SLU,56.0,STL,XK,,LCA,LCA,http://www.wikidata.org/entity/Q760,Saint Lucia,229.0,679.0,,"[""St. Lucia""]"
