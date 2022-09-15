@@ -135,6 +135,8 @@ steps:
     - walden://rff/2022-09-14/world_carbon_pricing
   data://garden/rff/2022-09-14/world_carbon_pricing:
     - data://meadow/rff/2022-09-14/world_carbon_pricing
+  grapher://rff/2022-09-14/world_carbon_pricing:
+    - data://garden/rff/2022-09-14/world_carbon_pricing
 
 # Sub-dags to import
 include:
