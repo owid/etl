@@ -1,4 +1,8 @@
 import pandas as pd
+from owid.catalog import Dataset, Table, VariableMeta
+from owid.catalog.utils import underscore
+
+from etl import grapher_helpers as gh
 
 
 def create_var_name(df: pd.DataFrame) -> pd.DataFrame:
@@ -54,28 +58,49 @@ def create_var_name(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-# Use in grapher step
-# def calculate_omms(N: Any, df: pd.DataFrame) -> pd.DataFrame:
-#    f = str(N.directory) +'/' + N.short_name + ".variables_to_sum.json"
-#    with open(f) as file:
-#        vars_to_calc = json.load(file)
-#
-#    for var in vars_to_calc:
-#        print(var)
-#        id = vars.loc[vars["name"] == var].id
-#        assert (vars["name"] == var).any(), "%s not in list of variables, check spelling!" % (var)
-#        vars_to_sum = vars[vars.name.isin(vars_to_calc[var])].id.to_list()
-#        df_sum = []
-#        for file in vars_to_sum:
-#            df = pd.read_csv(
-#                os.path.join(outpath, "datapoints", "datapoints_%d.csv" % file),
-#                index_col=None,
-#                header=0,
-#            )
-#            df["id"] = file
-#            df_sum.append(df)
-#        df = pd.concat(df_sum, ignore_index=True)
-#        df = df.drop_duplicates()
-#        df.groupby(["country", "year"])["value"].sum().reset_index().to_csv(
-#            os.path.join(outpath, "datapoints", "datapoints_%d.csv" % id)
-#        )
+def add_metadata_and_prepare_for_grapher(df_gr: pd.DataFrame, garden_ds: Dataset) -> Table:
+
+    df_gr["meta"] = VariableMeta(
+        title=df_gr["variable"].iloc[0],
+        sources=[garden_ds.metadata.sources],
+        unit=df_gr["unit"].iloc[0],
+        short_unit=df_gr["unit"].iloc[0],
+        additional_info=None,
+    )
+    # Taking only the first 255 characters of the var name as this is the limit (there is at least one that is too long)
+    df_gr["variable"] = underscore(df_gr["variable"].iloc[0])
+
+    df_gr = df_gr[["country", "year", "value", "variable", "meta"]].copy()
+    # convert integer values to int but round float to 2 decimal places, string remain as string
+    df_gr["entity_id"] = gh.country_to_entity_id(df_gr["country"], create_entities=True)
+    df_gr = df_gr.drop(columns=["country"]).set_index(["year", "entity_id"])
+
+    return Table(df_gr)
+
+
+def run_wrapper(garden_dataset: Dataset, dataset: Dataset) -> None:
+    # add tables to dataset
+    tables = garden_dataset.table_names
+    for table in tables:
+        df = garden_dataset[table]
+        df = create_var_name(df)
+        df["source"] = "Institute for Health Metrics and Evaluation - Global Burden of Disease (2019)"
+
+        var_gr = df.groupby("variable")
+
+        for var_name, df_var in var_gr:
+            df_tab = add_metadata_and_prepare_for_grapher(df_var, garden_dataset)
+            df_tab.metadata.dataset = dataset.metadata
+
+            # NOTE: long format is quite inefficient, we're creating a table for every variable
+            # converting it to wide format would be too sparse, but we could move dimensions from
+            # variable names to proper dimensions
+            # currently we generate ~10000 files with total size 73MB (grapher step runs in 692s
+            # and both reindex and publishing is fast, so this is not a real bottleneck besides
+            # polluting `grapher` channel in our catalog)
+            # see https://github.com/owid/etl/issues/447
+            for wide_table in gh.long_to_wide_tables(df_tab):
+                # table is generated for every column, use it as a table name
+                # shorten it under 255 characteres as this is the limit for file name
+                wide_table.metadata.short_name = wide_table.columns[0]
+                dataset.add(wide_table)
