@@ -8,6 +8,9 @@ from shared import CURRENT_DIR
 from etl.helpers import Names
 
 DATASET_SHORT_NAME = "world_carbon_pricing"
+MEADOW_TABLE_NAME = DATASET_SHORT_NAME
+GARDEN_TABLE_NAME = MEADOW_TABLE_NAME
+GARDEN_TABLE_NAME_ANY_SECTOR = f"{GARDEN_TABLE_NAME}_any_sector"
 # Get naming convention for this dataset.
 N = Names(str(CURRENT_DIR / DATASET_SHORT_NAME))
 
@@ -111,7 +114,7 @@ def run(dest_dir: str) -> None:
     # Read dataset from meadow.
     ds_meadow = N.meadow_dataset
     # Get table from dataset.
-    tb_meadow = ds_meadow["world_carbon_pricing"]
+    tb_meadow = ds_meadow[MEADOW_TABLE_NAME]
     # Construct a dataframe from the table.
     df = pd.DataFrame(tb_meadow)
 
@@ -130,6 +133,20 @@ def run(dest_dir: str) -> None:
     # Set an appropriate index and sort conveniently.
     df = df.set_index(INDEX_COLUMNS, verify_integrity=True).sort_index().sort_index(axis=1)
 
+    # Create main table.
+    tb_garden = underscore_table(Table(df))
+
+    # Create a simplified table that simply gives, for each country and year, whether the country has any sector(-fuel)
+    # that is covered by at least one tax instrument. And idem for ets.
+    df_any_sector = df.reset_index().groupby(["country", "year"], observed=True).\
+        agg({"ets": lambda x: x.sum() > 0, "tax": lambda x: x.sum() > 0}).astype(int).reset_index()
+
+    # Set an appropriate index and sort conveniently.
+    df_any_sector = df_any_sector.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
+
+    # Create table for simplified data.
+    tb_garden_any_sector = underscore_table(Table(df_any_sector))
+
     #
     # Save outputs.
     #
@@ -137,13 +154,14 @@ def run(dest_dir: str) -> None:
     ds_garden = Dataset.create_empty(dest_dir)
     # Fetch metadata from meadow step (if any).
     ds_garden.metadata = ds_meadow.metadata
-    # Ensure all columns are snake, lower case.
-    tb_garden = underscore_table(Table(df))
     # Update dataset metadata using metadata yaml file.
     ds_garden.metadata.update_from_yaml(N.metadata_path, if_source_exists="replace")
-    # Update table metadata using metadata yaml file.
-    tb_garden.update_metadata_from_yaml(N.metadata_path, DATASET_SHORT_NAME)
-    # Add table to dataset.
+    # Update main table metadata using metadata yaml file.
+    tb_garden.update_metadata_from_yaml(N.metadata_path, GARDEN_TABLE_NAME)
+    # Update simplified table metadata using metadata yaml file.
+    tb_garden_any_sector.update_metadata_from_yaml(N.metadata_path, GARDEN_TABLE_NAME_ANY_SECTOR)
+    # Add tables to dataset.
     ds_garden.add(tb_garden)
+    ds_garden.add(tb_garden_any_sector)
     # Save dataset.
     ds_garden.save()

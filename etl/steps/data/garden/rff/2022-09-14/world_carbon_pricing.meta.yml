@@ -1,4 +1,6 @@
 dataset:
+  description: |
+
   sources:
       -
         name: World Carbon Pricing Database
@@ -9,10 +11,11 @@ dataset:
 
 tables:
   world_carbon_pricing:
+    title: World carbon pricing
     variables:
       ets:
         title: Covered by emissions trading system
-        unit: "#"
+        unit: ""
         description: A binary value indicating whether the sector(-fuel) is covered by at least one emissions trading system.
       ets_price:
         title: ETS price
@@ -21,9 +24,13 @@ tables:
         description: Price of an emissions allowance in current local currency unit per ton of CO2 equivalent.
         display:
           numDecimalPlaces: 2
+      sector_name:
+        title: IPCC sector name.
+        unit: ""
+        description: IPCC sector name.
       tax:
         title: Covered by tax instrument
-        unit: "#"
+        unit: ""
         description: A binary value indicating whether the sector(-fuel) is covered by at least one tax instrument.
       tax_rate_gross:
         title: Gross tax rate
@@ -39,3 +46,14 @@ tables:
         description: Net tax rate (accounting for exemption) in current LCU per ton of CO2 equivalent.
         display:
           numDecimalPlaces: 2
+  world_carbon_pricing_any_sector:
+    title: World carbon pricing for any sector
+    variables:
+      ets:
+        title: Covered by emissions trading system in at least one sector
+        unit: ""
+        description: A binary value indicating whether at least one sector(-fuel) is covered by at least one emissions trading system.
+      tax:
+        title: Covered by tax instrument in at least one sector
+        unit: ""
+        description: A binary value indicating whether at least one sector(-fuel) is covered by at least one tax instrument.
