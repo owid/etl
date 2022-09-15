@@ -1,27 +1,16 @@
-from typing import Iterable
-
 from owid import catalog
 
 from etl import grapher_helpers as gh
-from etl.helpers import Names
+from etl.paths import DATA_DIR
 
-from .shared import CURRENT_DIR
-
-N = Names(str(CURRENT_DIR / "world_carbon_pricing"))
+DATASET_PATH = DATA_DIR / "garden" / "rff" / "2022-09-14" / "world_carbon_pricing"
+GRAPHER_DATASET_TITLE = "World carbon pricing for any sector"
 TABLE_NAME = "world_carbon_pricing_any_sector"
-# GRAPHER_DATASET_NAME = "World carbon pricing for any sector"
 
 
-def get_grapher_dataset() -> catalog.Dataset:
-    dataset = N.garden_dataset
-    # dataset.metadata.title = GRAPHER_DATASET_NAME
-    # combine sources into a single one and create proper names
-    dataset.metadata = gh.adapt_dataset_metadata_for_grapher(dataset.metadata)
-    return dataset
-
-
-def get_grapher_tables(dataset: catalog.Dataset) -> Iterable[catalog.Table]:
-    table = dataset[TABLE_NAME].reset_index()
-    table = gh.adapt_table_for_grapher(table)
-
-    yield from gh.yield_wide_table(table, na_action="drop")
+def run(dest_dir: str) -> None:
+    garden_dataset = catalog.Dataset(DATASET_PATH)
+    garden_dataset.metadata.title = GRAPHER_DATASET_TITLE
+    dataset = catalog.Dataset.create_empty(dest_dir, gh.adapt_dataset_metadata_for_grapher(garden_dataset.metadata))
+    table = garden_dataset[TABLE_NAME].reset_index()
+    dataset.add(gh.adapt_table_for_grapher(table))
