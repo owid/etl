@@ -3,7 +3,12 @@ import pandas as pd
 import pytest
 from owid.catalog import DatasetMeta, Source, Table, TableMeta, VariableMeta
 
-from etl.grapher_helpers import contains_inf, yield_long_table, yield_wide_table
+from etl.grapher_helpers import (
+    _ensure_source_per_variable,
+    contains_inf,
+    yield_long_table,
+    yield_wide_table,
+)
 
 
 def test_yield_wide_table():
@@ -107,3 +112,44 @@ def test_contains_inf():
     assert not contains_inf(pd.Series(["a", 2]))
     assert not contains_inf(pd.Series(["a", "b"]))
     assert not contains_inf(pd.Series(["a", "b"]).astype("category"))
+
+
+def test_ensure_source_per_variable_multiple_sources():
+    table = Table(
+        pd.DataFrame(
+            {
+                "deaths": [0, 1],
+            }
+        )
+    )
+    table.metadata.dataset = DatasetMeta(
+        description="Dataset description", sources=[Source(name="s3", description="s3 description")]
+    )
+    table.metadata.description = "Table description"
+
+    # multiple sources
+    table.deaths.metadata.sources = [
+        Source(name="s1", description="s1 description"),
+        Source(name="s2", description="s2 description"),
+    ]
+    new_table = _ensure_source_per_variable(table)
+    assert len(new_table.deaths.metadata.sources) == 1
+    source = new_table.deaths.metadata.sources[0]
+    assert source.name == "s1 ; s2"
+    assert source.description == "s1 description\ns2 description"
+
+    # no sources
+    table.deaths.metadata.sources = []
+    new_table = _ensure_source_per_variable(table)
+    assert len(new_table.deaths.metadata.sources) == 1
+    source = new_table.deaths.metadata.sources[0]
+    assert source.name == "s3"
+    assert source.description == "Dataset description\ns3 description"
+
+    # sources have no description, but table has
+    table.deaths.metadata.sources = [Source(name="s1")]
+    new_table = _ensure_source_per_variable(table)
+    assert len(new_table.deaths.metadata.sources) == 1
+    source = new_table.deaths.metadata.sources[0]
+    assert source.name == "s1"
+    assert source.description == "Table description"
