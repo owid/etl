@@ -11,7 +11,6 @@ import slugify
 import structlog
 import yaml
 from owid import catalog
-from owid.catalog.utils import underscore
 from pydantic import BaseModel
 
 from etl.db import get_connection, get_engine
