@@ -5,8 +5,9 @@
 
 from importlib import import_module
 from pathlib import Path
+from typing import cast
 
-from owid.catalog import Dataset, DatasetMeta, Table
+from owid.catalog import Dataset, DatasetMeta, Table, Source
 
 from etl.paths import BASE_DIR
 
@@ -18,11 +19,15 @@ def run(dest_dir: str) -> None:
         short_name="key_indicators",
         description="The most important handful of indicators for use directly and in transforming other statistics.",
     )
-    ds.save()
 
     # scan this folder for scripts that begin with "table_" and run them
+    sources = []
     table_scripts = Path(__file__).parent.glob("table_*.py")
     for script in table_scripts:
         script_module = script.relative_to(BASE_DIR).with_suffix("").as_posix().replace("/", ".")
         t: Table = import_module(script_module).make_table()  # type: ignore
-        ds.add(t)
+        # ds.add(t)
+        sources.extend([source for col in t.columns for source in t[col].metadata.sources])
+    # ds.metadata.sources = cast(list[Source], sources)
+    print(ds.metadata.sources)
+    # ds.save()
