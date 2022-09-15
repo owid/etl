@@ -1,5 +1,3 @@
-from typing import Iterable
-
 import structlog
 import yaml
 from owid import catalog
@@ -17,24 +15,17 @@ SOURCE_NAME_DISPLAY = "United Nations - Population Division (2022)"
 log = structlog.get_logger()
 
 
-def get_grapher_dataset() -> catalog.Dataset:
-    dataset = catalog.Dataset(DATA_DIR / "garden" / NAMESPACE / VERSION / FNAME)
-    assert len(dataset.metadata.sources) == 1
+def run(dest_dir: str) -> None:
+    garden_dataset = catalog.Dataset(DATA_DIR / "garden" / NAMESPACE / VERSION / FNAME)
+    dataset = catalog.Dataset.create_empty(dest_dir, gh.adapt_dataset_metadata_for_grapher(garden_dataset.metadata))
 
     # short_name should include dataset name and version
     dataset.metadata.short_name = "un_wpp__2022_07_11"
 
-    # move description to source as that is what is shown in grapher
-    # (dataset.description would be displayed under `Internal notes` in the admin UI otherwise)
-    dataset.metadata.sources[0].description = dataset.metadata.description
-    dataset.metadata.description = ""
+    dataset.save()
 
-    return dataset
-
-
-def get_grapher_tables(dataset: catalog.Dataset) -> Iterable[catalog.Table]:
     # Get table (in appropriate format)
-    table = _get_shaped_table(dataset)
+    table = _get_shaped_table(garden_dataset)
 
     # Filter rows
     table = _filter_rows(table)
@@ -42,10 +33,13 @@ def get_grapher_tables(dataset: catalog.Dataset) -> Iterable[catalog.Table]:
     # Add metadata
     table = _propagate_metadata(dataset, table)
 
-    yield from gh.yield_long_table(table)
+    for wide_table in gh.long_to_wide_tables(table):
+        # table is generated for every column, use it as a table name
+        wide_table.metadata.short_name = wide_table.columns[0]
+        dataset.add(wide_table)
 
 
-def _get_shaped_table(dataset):
+def _get_shaped_table(dataset: catalog.Dataset) -> catalog.Table:
     table = dataset[TNAME].reset_index()
 
     # grapher needs a column entity id, that is constructed based on the unique entity names in the database
@@ -60,7 +54,7 @@ def _get_shaped_table(dataset):
     return table
 
 
-def _propagate_metadata(dataset, table):
+def _propagate_metadata(dataset: catalog.Dataset, table: catalog.Table) -> catalog.Table:
     with open(STEP_DIR / "data/garden/un/2022-07-11/un_wpp.meta.yml", "r") as f:
         meta = yaml.safe_load(f)
 
@@ -76,7 +70,7 @@ def _propagate_metadata(dataset, table):
     return table
 
 
-def _filter_rows(table):
+def _filter_rows(table: catalog.Table) -> catalog.Table:
     variants_valid = ["estimates", "low", "medium", "high", "constant fertility"]
     shape_0 = table.shape[0]
     table = table[table.index.isin(variants_valid, level=4)]

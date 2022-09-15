@@ -98,6 +98,7 @@ def diff_print_and_exit(
     show_default=True,
     help="Print truncated lists if they are longer than the given length.",
 )
+@click.option("--debug", is_flag=True, help="Print debug information.")
 def etl_catalog(
     channel: str,
     namespace: str,
@@ -108,6 +109,7 @@ def etl_catalog(
     show_values: bool,
     show_shared: bool,
     truncate_lists_at: int,
+    debug: bool,
 ) -> None:
     """
     Compare a table in the local catalog with the one in the remote catalog.
@@ -120,16 +122,38 @@ def etl_catalog(
     are structurally equal but are otherwise different, 3 if the dataframes have different structure and/or different values.
     """
     try:
-        remote_df = catalog.find_one(table=table, namespace=namespace, dataset=dataset, channels=channel)
-        local_catalog = catalog.LocalCatalog("data")
-        local_df = local_catalog.find_one(
-            table=table,
-            namespace=namespace,
-            dataset=dataset,
-            channel=cast(catalog.CHANNEL, channel),
-        )
+        remote_df = catalog.find_one(table=table, namespace=namespace, dataset=dataset, channels=[channel])
     except Exception as e:
-        print(e)
+        if debug:
+            raise e
+        print(f"[red]Error loading table from remote catalog:\n{e}[/red]")
+        exit(1)
+
+    try:
+        local_catalog = catalog.LocalCatalog("data")
+        try:
+            local_df = local_catalog.find_one(
+                table=table,
+                namespace=namespace,
+                dataset=dataset,
+                channel=cast(catalog.CHANNEL, channel),
+            )
+        except ValueError as e:
+            # try again after reindexing
+            if str(e) == "no tables found":
+                local_catalog.reindex(include=f"{channel}/{namespace}")
+                local_df = local_catalog.find_one(
+                    table=table,
+                    namespace=namespace,
+                    dataset=dataset,
+                    channel=cast(catalog.CHANNEL, channel),
+                )
+            else:
+                raise e
+    except Exception as e:
+        if debug:
+            raise e
+        print(f"[red]Error loading table from local catalog:\n{e}[/red]")
         exit(1)
 
     diff_print_and_exit(

@@ -14,11 +14,12 @@ from typing import List, cast
 
 import pandas as pd
 from owid.catalog import Dataset, Table
+from pandas.api.types import CategoricalDtype
 
 from etl import data_helpers
 from etl.paths import DATA_DIR
 
-UNWPP = DATA_DIR / "garden/wpp/2019/standard_projections"
+UNWPP = DATA_DIR / "garden/un/2022-07-11/un_wpp"
 GAPMINDER = DATA_DIR / "garden/gapminder/2019-12-10/population"
 HYDE = DATA_DIR / "garden/hyde/2017/baseline"
 WB_INCOME = DATA_DIR / "garden/wb/2021-07-01/wb_income"
@@ -106,19 +107,57 @@ def prepare_dataset(df: pd.DataFrame) -> Table:
 
 
 def load_unwpp() -> pd.DataFrame:
-    df = Dataset(UNWPP)["total_population"]
-    df = df.reset_index().rename(
-        columns={
-            "population_total": "population",
-        }
-    )
+    # Load
+    df = Dataset(UNWPP)["population"]
+
+    # Filter
+    df = df.reset_index()
+    df = df[
+        (df.metric == "population") & (df.age == "all") & (df.sex == "all") & (df.variant.isin(["estimates", "medium"]))
+    ]
+    # Year check
+    assert df[df.variant == "medium"].year.min() == 2022
+    assert df[df.variant == "estimates"].year.max() == 2021
+
+    # Rename columns, sort rows, reset index
+    countries = sorted(df.location.unique())
+    columns_rename = {
+        "location": "country",
+        "year": "year",
+        "value": "population",
+    }
     df = (
-        df[df.variant == "Medium"]
-        .drop(columns="variant")
-        .assign(source="unwpp", population=lambda df: df.population.mul(1000).astype(int))[
-            ["country", "year", "population", "source"]
-        ]
+        df.rename(columns=columns_rename)[columns_rename.values()]
+        .assign(source="unwpp")
+        .astype({"source": "category", "country": CategoricalDtype(countries, ordered=True), "population": "uint64"})
+        .sort_values(["country", "year"])
+        .reset_index(drop=True)
     )
+
+    # Remove special regions
+    df = df[
+        ~df.country.isin(
+            [
+                "Northern America",
+                "Latin America & Caribbean",
+                "Land-locked developing countries (LLDC)",
+                "Latin America and the Caribbean",
+                "Least developed countries",
+                "Less developed regions",
+                "Less developed regions, excluding China",
+                "Less developed regions, excluding least developed countries",
+                "More developed regions",
+                "Small island developing states (SIDS)",
+                "High-income countries",
+                "Low-income countries",
+                "Lower-middle-income countries",
+                "Upper-middle-income countries",
+            ]
+        )
+    ]
+
+    # Check no (country, year) duplicates
+    assert df.groupby(["country", "year"]).population.count().max() == 1
     return cast(pd.DataFrame, df)
 
 

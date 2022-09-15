@@ -219,19 +219,7 @@ def _slugify_column_and_dimensions(column: str, dims: List[str], dim_names: List
     return cast(str, slug)
 
 
-def yield_long_table(
-    table: catalog.Table,
-    annot: Optional[Annotation] = None,
-    dim_titles: Optional[List[str]] = None,
-) -> Iterable[catalog.Table]:
-    """Yield from long table with the following columns:
-    - variable: short variable name (needs to be underscored)
-    - value: variable value
-    - meta: either VariableMeta object or null in every row
-
-    :param dim_titles: Custom names to use for the dimensions, if not provided, the default names will be used.
-        Dimension title will be used to create variable name, e.g. `Deaths - Age: 10-18` instead of `Deaths - age: 10-18`
-    """
+def _assert_long_table(table: catalog.Table) -> None:
     assert (
         table.metadata.dataset and table.metadata.dataset.sources
     ), "Table must have a dataset with sources in its metadata"
@@ -245,6 +233,24 @@ def yield_long_table(
     assert (
         table["meta"].dropna().map(lambda x: isinstance(x, catalog.VariableMeta)).all()
     ), "Values in column `meta` must be either instances of `catalog.VariableMeta` or null"
+
+
+def yield_long_table(
+    table: catalog.Table,
+    annot: Optional[Annotation] = None,
+    dim_titles: Optional[List[str]] = None,
+) -> Iterable[catalog.Table]:
+    """Takes as input a long table, which must have columns: ...
+    - variable: short variable name (needs to be underscored)
+    - value: variable value
+    - meta: either VariableMeta object or null in every row
+
+    Yields one or more wide tables from it, which have one column per variable.
+
+    :param dim_titles: Custom names to use for the dimensions, if not provided, the default names will be used.
+        Dimension title will be used to create variable name, e.g. `Deaths - Age: 10-18` instead of `Deaths - age: 10-18`
+    """
+    _assert_long_table(table)
 
     for var_name, t in table.groupby("variable"):
         t = t.rename(columns={"value": var_name})
@@ -261,6 +267,36 @@ def yield_long_table(
             t = annotate_table(t, annot, missing_col="ignore")
 
         yield from yield_wide_table(cast(catalog.Table, t), dim_titles=dim_titles)
+
+
+def long_to_wide_tables(
+    table: catalog.Table,
+    annot: Optional[Annotation] = None,
+) -> Iterable[catalog.Table]:
+    """Yield wide tables from long table with the following columns:
+    - variable: short variable name (needs to be underscored)
+    - value: variable value
+    - meta: either VariableMeta object or null in every row
+
+    This function is similar to `yield_long_table`, but does not call `yield_wide_table` internally.
+    """
+    _assert_long_table(table)
+
+    for var_name, t in table.groupby("variable"):
+        t = t.rename(columns={"value": var_name})
+
+        # extract metadata from column and make sure it is identical for all rows
+        meta = t.pop("meta")
+        t.pop("variable")
+        assert set(meta.map(id)) == {
+            id(meta.iloc[0])
+        }, f"Variable `{var_name}` must have same metadata objects in column `meta` for all rows"
+        t[var_name].metadata = meta.iloc[0]
+
+        if annot:
+            t = annotate_table(t, annot, missing_col="ignore")
+
+        yield cast(catalog.Table, t)
 
 
 def _get_entities_from_countries_regions() -> Dict[str, int]:

@@ -247,7 +247,7 @@ def run(dest_dir: str) -> None:
     # Initialize new garden dataset.
     dataset = catalog.Dataset.create_empty(dest_dir)
     # Add metadata to dataset.
-    dataset.metadata.update_from_yaml(METADATA_PATH)
+    dataset.metadata.update_from_yaml(METADATA_PATH, if_source_exists="replace")
     # Create new dataset in garden.
     dataset.save()
 

@@ -10,12 +10,12 @@ steps:
   data://garden/owid/latest/key_indicators:
     - data://garden/hyde/2017/baseline
     - data://garden/gapminder/2019-12-10/population
-    - data://garden/wpp/2019/standard_projections
+    - data://garden/un/2022-07-11/un_wpp
     - data://garden/wb/2021-07-01/wb_income
     - data://open_numbers/open_numbers/latest/open_numbers__world_development_indicators
     - data://garden/reference
-  data://garden/wpp/2019/standard_projections:
-    - data://meadow/wpp/2019/standard_projections
+  data://garden/un/2019/un_wpp:
+    - data://meadow/un/2019/un_wpp
   data://garden/who/2021-07-01/ghe:
     - data://meadow/who/2021-07-01/ghe
     - data://garden/reference
@@ -40,7 +40,7 @@ steps:
     - walden://who/2021-07-01/ghe
   data://meadow/who/2021-07-01/gho:
     - walden://who/2021-07-01/gho
-  data://meadow/wpp/2019/standard_projections:
+  data://meadow/un/2019/un_wpp:
     - walden://wpp/2019/standard_projections
   data://grapher/who/2021-07-01/ghe:
     - data://garden/who/2021-07-01/ghe
@@ -60,7 +60,7 @@ steps:
     - walden://worldbank_wdi/2022-05-26/wdi
   data://garden/worldbank_wdi/2022-05-26/wdi:
     - data://meadow/worldbank_wdi/2022-05-26/wdi
-  grapher://worldbank_wdi/2022-05-26/wdi:
+  data://grapher/worldbank_wdi/2022-05-26/wdi:
     - data://garden/worldbank_wdi/2022-05-26/wdi
   data://meadow/un_sdg/2022-07-07/un_sdg:
     - walden://un_sdg/2022-07-07/un_sdg
@@ -104,28 +104,28 @@ steps:
     - walden://cait/2022-08-10/cait_ghg_emissions
   data://garden/cait/2022-08-10/ghg_emissions_by_sector:
     - data://meadow/cait/2022-08-10/ghg_emissions_by_sector
-  grapher://cait/2022-08-10/all_ghg_emissions:
+  data://grapher/cait/2022-08-10/all_ghg_emissions:
     - data://garden/cait/2022-08-10/ghg_emissions_by_sector
-  grapher://cait/2022-08-10/ch4_emissions:
+  data://grapher/cait/2022-08-10/ch4_emissions:
     - data://garden/cait/2022-08-10/ghg_emissions_by_sector
-  grapher://cait/2022-08-10/co2_emissions:
+  data://grapher/cait/2022-08-10/co2_emissions:
     - data://garden/cait/2022-08-10/ghg_emissions_by_sector
-  grapher://cait/2022-08-10/n2o_emissions:
+  data://grapher/cait/2022-08-10/n2o_emissions:
     - data://garden/cait/2022-08-10/ghg_emissions_by_sector
 
   #
   # Emissions - CO2 dataset (2022).
   #
   data://garden/emissions/2022-08-26/owid_co2:
-  - backport://backport/owid/latest/dataset_5582_global_carbon_budget__global_carbon_project__v2021
-  - data://garden/cait/2022-08-10/ghg_emissions_by_sector
-  - data://garden/energy/2022-07-29/primary_energy_consumption
-  - data://garden/owid/latest/key_indicators
-  - data://garden/ggdc/2020-10-01/ggdc_maddison
+    - backport://backport/owid/latest/dataset_5582_global_carbon_budget__global_carbon_project__v2021
+    - data://garden/cait/2022-08-10/ghg_emissions_by_sector
+    - data://garden/energy/2022-07-29/primary_energy_consumption
+    - data://garden/owid/latest/key_indicators
+    - data://garden/ggdc/2020-10-01/ggdc_maddison
 
-  grapher://un_sdg/2022-07-07/un_sdg:
+  data://grapher/un_sdg/2022-07-07/un_sdg:
     - data://garden/un_sdg/2022-07-07/un_sdg
-  grapher://un/2022-07-11/un_wpp:
+  data://grapher/un/2022-07-11/un_wpp:
     - data://garden/un/2022-07-11/un_wpp
 
 # Sub-dags to import

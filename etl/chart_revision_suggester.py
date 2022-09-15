@@ -384,8 +384,8 @@ class ChartRevisionSuggester:
                     chart_config["minTime"] == "earliest"
                     or chart_config["maxTime"] == "earliest"
                     or (
-                        pd.api.types.is_numeric_dtype(chart_config["minTime"])
-                        and pd.api.types.is_numeric_dtype(chart_config["maxTime"])
+                        pd.api.types.is_numeric_dtype(chart_config["minTime"])  # type: ignore
+                        and pd.api.types.is_numeric_dtype(chart_config["maxTime"])  # type: ignore
                         and abs(chart_config["minTime"] - old_range.min) < abs(chart_config["maxTime"] - old_range.max)
                     )
                 )

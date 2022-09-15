@@ -1,8 +1,7 @@
 from pathlib import Path
-from typing import Iterable
 
 import structlog
-from owid.catalog import Dataset, Table
+from owid.catalog import Dataset
 
 from etl import grapher_helpers as gh
 from etl.paths import DATA_DIR
@@ -10,28 +9,26 @@ from etl.paths import DATA_DIR
 log = structlog.get_logger()
 
 
-def get_grapher_dataset() -> Dataset:
+def run(dest_dir: str) -> None:
     version = Path(__file__).parent.stem
     fname = Path(__file__).stem
     namespace = Path(__file__).parent.parent.stem
-    dataset = Dataset(DATA_DIR / f"garden/{namespace}/{version}/{fname}")
+
+    garden_dataset = Dataset(DATA_DIR / f"garden/{namespace}/{version}/{fname}")
+    dataset = Dataset.create_empty(dest_dir, garden_dataset.metadata)
+
     # short_name should include dataset name and version
     dataset.metadata.short_name = f"{dataset.metadata.short_name}__{version.replace('-', '_')}"
     dataset.metadata.version = version
 
-    return dataset
+    dataset.save()
 
-
-def get_grapher_tables(dataset: Dataset) -> Iterable[Table]:
     fname = Path(__file__).stem
-    table = dataset[fname]
+    table = garden_dataset[fname]
     assert len(table.metadata.primary_key) == 2
 
     table.reset_index(inplace=True)
     table["entity_id"] = gh.country_to_entity_id(table["country"], create_entities=True)
     table = table.drop(columns=["country"]).set_index(["year", "entity_id"])
 
-    for col in table.columns:
-        tb = table[[col]].dropna()
-        if tb.shape[0]:
-            yield tb  # type: ignore
+    dataset.add(table)

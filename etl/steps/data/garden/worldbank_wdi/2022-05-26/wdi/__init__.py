@@ -18,8 +18,9 @@ from owid.catalog import Dataset, Source, Table, VariableMeta
 from owid.catalog.utils import underscore
 from owid.walden import Catalog
 
-from etl.db import get_connection
 from etl.paths import DATA_DIR
+
+from .variable_matcher import VariableMatcher
 
 COUNTRY_MAPPING_PATH = (Path(__file__).parent / "wdi.country_mapping.json").as_posix()
 
@@ -27,9 +28,9 @@ log = structlog.get_logger()
 
 
 def run(dest_dir: str) -> None:
-    version = Path(__file__).parent.stem
-    fname = Path(__file__).stem
-    namespace = Path(__file__).parent.parent.stem
+    version = Path(__file__).parent.parent.stem
+    fname = Path(__file__).parent.stem
+    namespace = Path(__file__).parent.parent.parent.stem
     ds_meadow = Dataset((DATA_DIR / f"meadow/{namespace}/{version}/{fname}").as_posix())
 
     assert len(ds_meadow.table_names) == 1, "Expected meadow dataset to have only one table, but found > 1 table names."
@@ -39,7 +40,7 @@ def run(dest_dir: str) -> None:
     # harmonize entity names
     country_mapping = load_country_mapping()
     excluded_countries = load_excluded_countries()  # noqa: F841
-    df = df.query("country not in @excluded_countries")
+    df = df.query("country not in @excluded_countries").copy()
     assert df["country"].notnull().all()
     countries = df["country"].apply(lambda x: country_mapping.get(x, None))
     if countries.isnull().any():
@@ -348,9 +349,9 @@ def add_variable_metadata(table: Table) -> Table:
     var_codes = table.columns.tolist()
 
     # retrieves raw data from walden
-    version = Path(__file__).parent.stem
-    fname = Path(__file__).stem
-    namespace = Path(__file__).parent.parent.stem
+    version = Path(__file__).parent.parent.stem
+    fname = Path(__file__).parent.stem
+    namespace = Path(__file__).parent.parent.parent.stem
     walden_ds = Catalog().find_one(namespace=namespace, short_name=fname, version=version)
     local_file = walden_ds.ensure_downloaded()
     zf = zipfile.ZipFile(local_file)
@@ -456,8 +457,7 @@ def load_country_mapping() -> Dict[str, str]:
 
 
 def load_excluded_countries() -> List[str]:
-    fname = Path(__file__).stem.split(".")[0]
-    with open(Path(__file__).parent / f"{fname}.country_exclude.json", "r") as f:
+    with open(Path(__file__).parent / "wdi.country_exclude.json", "r") as f:
         data = json.load(f)
         assert isinstance(data, list)
     return data
@@ -510,99 +510,3 @@ def replace_years(s: str, year: Union[int, str]) -> str:
     year_regex = re.compile(r"\b([1-2]\d{3})\b")
     s_new = year_regex.sub(str(year), s)
     return s_new
-
-
-class VariableMatcher:
-    """Matches a variable name to one or more variables in the grapher database,
-    if any matching variables exist.
-
-    Matches are conducted using exact string matching (case sensitive), as well
-    as name changes tracked in `wdi.variable_mapping.json` (case sensitive).
-
-    Example usage::
-
-        >>> vm = VariableMatcher()
-        >>> matches = vm.find_grapher_variables('Gini index')
-        >>> print([(v['id'], v['name']) for v in matches])
-        [(147787, 'Gini index (World Bank estimate)')]
-    """
-
-    def __init__(self) -> None:
-        self.grapher_variables = self.fetch_grapher_variables()
-        self.variable_mapping = self.load_variable_mapping()
-
-    @property
-    def grapher_variables(self) -> pd.DataFrame:
-        return self._grapher_variables
-
-    @grapher_variables.setter
-    def grapher_variables(self, value: pd.DataFrame) -> None:
-        assert isinstance(value, pd.DataFrame)
-        self._grapher_variables = value
-
-    @property
-    def variable_mapping(self) -> Dict[str, Any]:
-        return self._variable_mapping
-
-    @variable_mapping.setter
-    def variable_mapping(self, value: Dict[str, Any]) -> None:
-        assert isinstance(value, dict)
-        self._variable_mapping = value
-
-    def fetch_grapher_variables(self) -> Any:
-        query = """
-            WITH
-            datasets AS (
-                SELECT
-                    id,
-                    name,
-                    createdAt,
-                    updatedAt
-                FROM datasets
-                WHERE
-                    namespace REGEXP "^worldbank_wdi"
-                    OR name REGEXP "[Ww]orld [Dd]evelopment [Ii]ndicators"
-            )
-            SELECT
-                id,
-                name,
-                description,
-                unit,
-                shortUnit,
-                display,
-                createdAt,
-                updatedAt,
-                datasetId,
-                sourceId
-            FROM variables
-            WHERE datasetId IN (SELECT id FROM datasets)
-            ORDER BY updatedAt DESC
-        """
-        df_vars = pd.read_sql(query, get_connection())
-        return df_vars
-
-    def load_variable_mapping(self) -> Dict[str, Any]:
-        fname = Path(__file__).stem
-        with open(Path(__file__).parent / f"{fname}.variable_mapping.json", "r") as f:
-            mapping = json.load(f)
-            assert isinstance(mapping, dict)
-        return mapping
-
-    def find_grapher_variables(self, name: str) -> Optional[List[Any]]:
-        """returns grapher variables that match {name}, ordered by updatedAt
-        (most recent -> least recent)."""
-        names = [name]
-        # retrieve alternate names of the variable
-        for d in self.variable_mapping.values():
-            mapping = d.get("change_in_description", {})
-            if name in mapping.values():
-                rev_mapping = {new: old for old, new in mapping.items()}
-                assert len(mapping) == len(rev_mapping)
-                names.append(rev_mapping[name])
-
-        matches = (
-            self.grapher_variables.query("name in @names")
-            .sort_values("updatedAt", ascending=False)
-            .to_dict(orient="records")
-        )
-        return matches

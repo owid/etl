@@ -7,7 +7,7 @@ _countries = pd.read_csv(
     Path(__file__).parent / "un_wpp.country_std.csv",
     index_col="Country",
 )
-countries = set(_countries["Our World In Data Name"].tolist())
+countries = sorted(set(_countries["Our World In Data Name"].tolist()))
 metrics = {
     "birth_rate",
     "births",
@@ -73,7 +73,7 @@ ages = {
 
 # Type
 dtypes = {
-    "location": CategoricalDtype(categories=countries),
+    "location": CategoricalDtype(categories=countries, ordered=True),
     "year": "uint16",
     "sex": CategoricalDtype(categories=["all", "male", "female", "none"]),
     "age": CategoricalDtype(categories=ages),

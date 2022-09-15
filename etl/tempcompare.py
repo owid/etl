@@ -1,7 +1,9 @@
+import random
 from typing import Any, Callable, Generator, Iterable, List, Optional, cast
 
 import numpy as np
 import pandas as pd
+from pandas.api.types import union_categoricals
 
 # ######## Note - this file will be moved to owid-catalog-py before the branch is merged ##############
 
@@ -72,6 +74,13 @@ def yield_formatted_if_not_empty(
         yield from format_function(item)
     elif fallback_message != "":
         yield fallback_message
+
+
+def sample_from_dataframe(df: pd.DataFrame, **kwargs: Any) -> pd.DataFrame:
+    """Sample from dataframe with sorted output index and maximum `n`."""
+    if "n" in kwargs:
+        kwargs["n"] = min(kwargs["n"], len(df))
+    return cast(pd.DataFrame, df.sample(**kwargs).sort_index())
 
 
 class HighLevelDiff:
@@ -188,6 +197,14 @@ class HighLevelDiff:
         if self.columns_shared and any(self.index_values_shared):
             df1_intersected = self.df1.loc[self.index_values_shared, list(self.columns_shared)]
             df2_intersected = self.df2.loc[self.index_values_shared, list(self.columns_shared)]
+
+            # Union categories of categorical columns to enable comparison
+            for col in self.columns_shared:
+                if df1_intersected[col].dtype == "category":
+                    uc = union_categoricals([df1_intersected[col], df2_intersected[col]])
+                    for df in [df1_intersected, df2_intersected]:
+                        df[col] = pd.Categorical(df[col].values, categories=uc.categories)
+
             # We don't use the compare function here from above because it builds a new
             # dataframe and we want to leave indices intact so we can know which rows and columns
             # were different once we drop the ones with no differences
@@ -203,18 +220,19 @@ class HighLevelDiff:
                     # Apply a direct comparison for strings or categories
                     pass
                 else:
+                    # Comparison does not work for Int64
+                    for df in [df1_intersected, df2_intersected]:
+                        if df[col].dtype == "Int64":
+                            df[col] = df[col].astype(float)
+
                     # For numeric data, consider them equal within certain absolute and relative tolerances.
-                    compared_values = np.isclose(
+                    diffs[col] = np.isclose(
                         df1_intersected[col].values,
                         df2_intersected[col].values,
                         atol=self.absolute_tolerance,
                         rtol=self.relative_tolerance,
+                        equal_nan=True,
                     )
-                    # Treat nans as equal.
-                    compared_values[
-                        pd.isnull(df1_intersected[col].values) & pd.isnull(df2_intersected[col].values)
-                    ] = True
-                    diffs[col] = compared_values
 
             # We now have a dataframe with the same shape and indices as df1 and df2, filled with
             # True where the values are the same. We want to use true for different values, so invert
@@ -299,6 +317,7 @@ class HighLevelDiff:
         preview_different_dataframe_values: bool = False,
         show_shared: bool = False,
         truncate_lists_longer_than: int = 20,
+        preview_samples: int = 20,
     ) -> Generator[str, None, None]:
         """Generate a human readable description of the differences between the two dataframes.
 
@@ -457,11 +476,35 @@ class HighLevelDiff:
 
         # This prints the two dataframes one after the other sliced to
         # only the area where they have differences
+        # IDEA: we could show columns side by side for easier comparison
         if preview_different_dataframe_values:
-            if self.value_differences and self.columns_shared and self.index_values_shared:
-                yield f"Values with differences in {df1_label}:"
-                yield (str(self.df1.loc[self.value_differences.index, self.value_differences.columns]))
-                yield f"Values with differences in {df2_label}:"
-                yield (str(self.df2.loc[self.value_differences.index, self.value_differences.columns]))
+            if self.value_differences is not None and self.columns_shared and self.index_values_shared is not None:
+                if preview_samples < len(self.value_differences.index):
+                    extra_msg = f" (showing {preview_samples} samples)"
+                else:
+                    extra_msg = ""
+
+                random_state = random.randint(0, 100000)
+
+                yield f"Values with differences in {df1_label}{extra_msg}:"
+                yield (
+                    str(
+                        sample_from_dataframe(
+                            self.df1.loc[self.value_differences.index, self.value_differences.columns],
+                            n=preview_samples,
+                            random_state=random_state,
+                        )
+                    )
+                )
+                yield f"Values with differences in {df2_label}{extra_msg}:"
+                yield (
+                    str(
+                        sample_from_dataframe(
+                            self.df2.loc[self.value_differences.index, self.value_differences.columns],
+                            n=preview_samples,
+                            random_state=random_state,
+                        )
+                    )
+                )
             else:
                 yield "The datasets have no overlapping columns/rows."

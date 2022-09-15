@@ -25,8 +25,8 @@ from sqlalchemy import (
 )
 from sqlalchemy.dialects.mysql import LONGBLOB, LONGTEXT, MEDIUMTEXT, TINYINT, VARCHAR
 from sqlalchemy.future import Engine as _FutureEngine
+from sqlmodel import JSON as _JSON
 from sqlmodel import (
-    JSON,
     Column,
     Field,
     Relationship,
@@ -47,6 +47,10 @@ SelectOfScalar.inherit_cache = True  # type: ignore
 Select.inherit_cache = True  # type: ignore
 
 metadata = SQLModel.metadata
+
+
+# persist the value None as a SQL NULL value, not the JSON encoding of null
+JSON = _JSON(none_as_null=True)
 
 
 def get_engine() -> _FutureEngine:
@@ -679,7 +683,7 @@ class Variable(SQLModel, table=True):
     originalMetadata: Optional[Dict[Any, Any]] = Field(default=None, sa_column=Column("originalMetadata", JSON))
     grapherConfig: Optional[Dict[Any, Any]] = Field(default=None, sa_column=Column("grapherConfig", JSON))
     catalogPath: Optional[str] = Field(default=None, sa_column=Column("catalogPath", LONGTEXT))
-    dimensions: Optional[Dimensions] = Field(sa_column=Column("dimensions", JSON, nullable=False))
+    dimensions: Optional[Dimensions] = Field(sa_column=Column("dimensions", JSON, nullable=True))
 
     datasets: Optional["Dataset"] = Relationship(back_populates="variables")
     sources: Optional["Source"] = Relationship(back_populates="variables")
@@ -742,7 +746,8 @@ class Variable(SQLModel, table=True):
         catalog_path: Optional[str],
         dimensions: Optional[Dimensions],
     ) -> "Variable":
-        assert metadata.unit
+        # `unit` can be an empty string, but cannot be null
+        assert metadata.unit is not None
         assert metadata.display
         return cls(
             shortName=short_name,
