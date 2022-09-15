@@ -743,7 +743,7 @@ class Variable(SQLModel, table=True):
         catalog_path: Optional[str],
         dimensions: Optional[Dimensions],
     ) -> "Variable":
-        assert metadata.unit
+        assert metadata.unit is not None
         assert metadata.display
         return cls(
             shortName=short_name,
