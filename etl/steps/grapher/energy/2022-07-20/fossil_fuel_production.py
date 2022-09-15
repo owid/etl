@@ -17,3 +17,4 @@ def run(dest_dir: str) -> None:
     # There is only one table in the dataset, with the same name as the dataset.
     table = garden_dataset[garden_dataset.table_names[0]].reset_index()
     dataset.add(gh.adapt_table_for_grapher(table))
+    dataset.save()

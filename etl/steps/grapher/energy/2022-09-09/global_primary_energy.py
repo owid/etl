@@ -16,3 +16,4 @@ def run(dest_dir: str) -> None:
     table = gh.adapt_table_for_grapher(table)
 
     dataset.add(table)
+    dataset.save()
