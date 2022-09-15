@@ -1,6 +1,5 @@
 dataset:
   title: World carbon pricing for any source
-  description: |
 
 tables:
   world_carbon_pricing_any_sector:
