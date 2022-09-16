@@ -135,7 +135,7 @@ def yield_wide_table(
         dim_titles = dim_names
 
     if dim_names:
-        grouped = table.groupby(dim_names, as_index=False)
+        grouped = table.groupby(dim_names, as_index=False, observed=True)
     else:
         # a situation when there's only year and entity_id in index with no additional dimensions
         grouped = [([], table)]
@@ -146,6 +146,11 @@ def yield_wide_table(
         # Now iterate over every column in the original dataset and export the
         # subset of data that we prepared above
         for column in table_to_yield.columns:
+            # If all values are null, skip variable
+            if table_to_yield[column].isnull().all():
+                log.warning("yield_wide_table.null_variable", column=column, dims=dims)
+                continue
+
             # Safety check to see if the metadata is still intact
             assert (
                 table_to_yield[column].metadata.unit is not None
@@ -197,9 +202,9 @@ def yield_wide_table(
 def _title_column_and_dimensions(title: str, dims: List[str], dim_names: List[str]) -> str:
     """Create new title from column title and dimensions.
     For instance `Deaths`, ["age", "sex"], ["10-18", "male"] will be converted into
-    Deaths - age: 10-18 - sex: male
+    Deaths - Age: 10-18 - Sex: male
     """
-    dims = [f"{dim_name}: {dim}" for dim, dim_name in zip(dims, dim_names)]
+    dims = [f"{dim_name.capitalize()}: {dim}" for dim, dim_name in zip(dims, dim_names)]
 
     return " - ".join([title] + dims)
 
