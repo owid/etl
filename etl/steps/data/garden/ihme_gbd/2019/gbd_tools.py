@@ -102,12 +102,41 @@ def pivot(df: pd.DataFrame) -> Table:
     df_rate = _pivot_rate(df)
 
     tb_garden = Table(pd.concat([df_number, df_percent, df_rate], axis=1))
-    # add titles of columns (TODO: this should happen in underscore_table)
-    for col in tb_garden.columns:
-        tb_garden[col].metadata.title = col
     tb_garden = underscore_table(tb_garden)
 
     return tb_garden
+
+
+def omm_metrics(df: pd.DataFrame) -> pd.DataFrame:
+    """Generate dataframe with OMM metrics with the same columns as input."""
+    # {
+    #     "All forms of violence": [
+    #         "Deaths - Interpersonal violence - Sex: Both - Age: Age-standardized (Rate)",
+    #         "Deaths - Conflict and terrorism - Sex: Both - Age: Age-standardized (Rate)",
+    #         "Deaths - Executions and police conflict - Sex: Both - Age: Age-standardized (Rate)",
+    #     ]
+    # }
+
+    # list of all OMMs
+    omms = []
+
+    # All forms of violence
+    om = df[
+        df.cause.isin({"Interpersonal violence", "Conflict and terrorism", "Executions and police conflict"})
+        & (df.measure == "Deaths")
+        & (df.sex == "Both")
+        & (df.age == "Age-standardized")
+        & (df.metric == "Rate")
+    ]
+
+    cols = [c for c in om.columns if c not in ("value", "cause")]
+    gr = om.groupby(cols, observed=True, as_index=False).sum()
+    gr["cause"] = "All forms of violence"
+    omms.append(gr)
+
+    # ...
+
+    return pd.concat(omms, axis=0)
 
 
 def run_wrapper(
@@ -119,12 +148,21 @@ def run_wrapper(
     tb_meadow = ds_meadow[f"{dataset}"]
 
     # TODO: test causes, remove this before merging
-    CAUSES = ["Vascular intestinal disorders", "Onchocerciasis", "Lymphatic filariasis"]
+    CAUSES = [
+        "Vascular intestinal disorders",
+        "Onchocerciasis",
+        "Lymphatic filariasis",
+        "Interpersonal violence",
+        "Conflict and terrorism",
+    ]
     tb_meadow = tb_meadow[tb_meadow.cause.isin(CAUSES)]
 
     df_garden = pd.DataFrame(tb_meadow)
     df_garden = tidy_countries(country_mapping_path, excluded_countries_path, df_garden)
     df_garden = prepare_garden(df_garden)
+
+    omm = omm_metrics(df_garden)
+    df_garden = pd.concat([df_garden, omm], axis=0)
 
     tb_garden = pivot(df_garden)
 

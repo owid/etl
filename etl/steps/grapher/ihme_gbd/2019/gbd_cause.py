@@ -20,5 +20,5 @@ def run(dest_dir: str) -> None:
     run_wrapper(
         garden_dataset=garden_dataset,
         dataset=dataset,
-        old_dataset_name="IHME - Global Burden of Disease - Deaths and DALYs - Institute for Health Metrics and Evaluation  (2022-04)",
+        # old_dataset_name="IHME - Global Burden of Disease - Deaths and DALYs - Institute for Health Metrics and Evaluation  (2022-04)",
     )
