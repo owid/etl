@@ -197,9 +197,12 @@ def upsert_table(
         column_name = table.columns[0]
 
         years = table.index.unique(level="year").values
-        min_year = min(years)
-        max_year = max(years)
-        timespan = f"{min_year}-{max_year}"
+        if len(years) == 0:
+            timespan = ""
+        else:
+            min_year = min(years)
+            max_year = max(years)
+            timespan = f"{min_year}-{max_year}"
 
         table.reset_index(inplace=True)
 

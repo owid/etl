@@ -52,7 +52,7 @@ def run_wrapper(dataset: Path, metadata_path: Path, namespace: Path, version: Pa
     # underscore all table columns
     tb = underscore_table(tb)
 
-    ds.metadata.update_from_yaml(metadata_path)
+    ds.metadata.update_from_yaml(metadata_path, if_source_exists="replace")
     tb.update_metadata_from_yaml(metadata_path, f"{dataset}")
 
     # add table to a dataset

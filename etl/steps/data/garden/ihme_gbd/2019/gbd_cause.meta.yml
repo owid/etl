@@ -6,15 +6,51 @@ dataset:
 
 tables:
   gbd_cause:
+    # variables:
+    #   measure:
+    #     title: Measure name
+    #     description: Deaths or DALYs - ways of measuring the impact of causes of death.
+    #   cause:
+    #     title: Causes of death
+    #     description: Disease or injuries that result in or contribute to an individuals death.
+    #   value:
+    #     title: Deaths or DALYs
+    #     description: The number of deaths or disability adjusted life years (DALYs) caused by a given disease or injury.
     variables:
-      measure:
-        title: Measure name
-        description: Deaths or DALYs - ways of measuring the impact of causes of death.
-      cause:
-        title: Causes of death
-        description: Disease or injuries that result in or contribute to an individuals death.
-      value:
-        title: Deaths or DALYs
-        description: The number of deaths or disability adjusted life years (DALYs) caused by a given disease or injury.
-
-
+      dalys__disability_adjusted_life_years__rate:
+        title: DALYs (rate)
+        unit: DALYs per 100,000 people
+      dalys__disability_adjusted_life_years__number:
+        title: DALYs (number)
+        unit: DALYs
+      dalys__disability_adjusted_life_years__percent:
+        title: DALYs (percent)
+        unit: "%"
+      deaths__number:
+        title: Deaths (number)
+        unit: deaths
+      deaths__rate:
+        title: Deaths (rate)
+        unit: deaths per 100,000 people
+      deaths__percent:
+        title: Deaths (percent)
+        unit: "%"
+      # uncommenting this makes the step fail, but we should add `errors="ignore"` to `update_metadata_from_yaml` function
+      # prevalence__number:
+      #   title:
+      #   unit: ""
+      # prevalence__rate:
+      #   title:
+      #   unit: ""
+      # prevalence__percent:
+      #   title:
+      #   unit: "%"
+      # incidence__number:
+      #   title:
+      #   unit: ""
+      # incidence__rate:
+      #   title:
+      #   unit: ""
+      # incidence__percent:
+      #   title:
+      #   unit: "%"
