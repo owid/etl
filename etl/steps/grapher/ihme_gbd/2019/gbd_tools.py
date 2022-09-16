@@ -1,11 +1,13 @@
 from typing import List
 
 import pandas as pd
-from owid.catalog import Dataset, Source, Table, VariableMeta
-from owid.catalog.utils import underscore
+from owid.catalog import Dataset, Source
+from structlog import get_logger
 
 from etl import grapher_helpers as gh
 from etl.db import get_connection, get_dataset_id, get_variables_in_dataset
+
+log = get_logger()
 
 
 def map_age(age: pd.Series) -> pd.Series:
@@ -18,14 +20,12 @@ def map_age(age: pd.Series) -> pd.Series:
     return age.replace(age_dict, regex=False)
 
 
-def run_wrapper(garden_dataset: Dataset, dataset: Dataset) -> None:
+def run_wrapper(garden_dataset: Dataset, dataset: Dataset, dims: List[str]) -> None:
     # variables_in_charts = get_variables_used_in_charts(old_dataset_name)
 
     # NOTE: it was `Global Burden of Disease Study (2019) - Deaths and DALYs` originally
     # all variables will inherit this source from dataset
-    dataset.metadata.sources = [
-        Source(name="Institute for Health Metrics and Evaluation - Global Burden of Disease (2019)")
-    ]
+    dataset.metadata.sources = [Source(name="Global Burden of Disease Study (2019) - Deaths and DALYs")]
 
     # add tables to dataset
     tables = garden_dataset.table_names
@@ -41,7 +41,7 @@ def run_wrapper(garden_dataset: Dataset, dataset: Dataset) -> None:
         tab = gh.adapt_table_for_grapher(tab)
 
         # add more dimensions
-        tab = tab.set_index(["sex", "age", "cause"], append=True)
+        tab = tab.set_index(dims, append=True)
 
         dataset.add(tab)
 
