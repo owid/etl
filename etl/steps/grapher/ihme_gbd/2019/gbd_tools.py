@@ -1,8 +1,11 @@
+from typing import List
+
 import pandas as pd
 from owid.catalog import Dataset, Table, VariableMeta
 from owid.catalog.utils import underscore
 
 from etl import grapher_helpers as gh
+from etl.db import get_connection, get_dataset_id, get_variables_in_dataset
 
 
 def create_var_name(df: pd.DataFrame) -> pd.DataFrame:
@@ -78,12 +81,16 @@ def add_metadata_and_prepare_for_grapher(df_gr: pd.DataFrame, garden_ds: Dataset
     return Table(df_gr)
 
 
-def run_wrapper(garden_dataset: Dataset, dataset: Dataset) -> None:
+def run_wrapper(garden_dataset: Dataset, dataset: Dataset, old_dataset_name: str) -> None:
     # add tables to dataset
+    variables_in_charts = get_variables_used_in_charts(old_dataset_name)
     tables = garden_dataset.table_names
     for table in tables:
         df = garden_dataset[table]
         df = create_var_name(df)
+        # Get variables used in existing charts
+        df = df[df['variable'].isin(variables_in_charts)]
+        if df.shape[0] >0:
         df["source"] = "Institute for Health Metrics and Evaluation - Global Burden of Disease (2019)"
 
         var_gr = df.groupby("variable")
@@ -104,3 +111,11 @@ def run_wrapper(garden_dataset: Dataset, dataset: Dataset) -> None:
                 # shorten it under 255 characteres as this is the limit for file name
                 wide_table.metadata.short_name = wide_table.columns[0]
                 dataset.add(wide_table)
+
+
+def get_variables_used_in_charts(old_dataset_name: str) -> List:
+    with get_connection() as db_conn:
+        old_dataset_id = get_dataset_id(db_conn=db_conn, dataset_name=old_dataset_name)
+        old_variables = get_variables_in_dataset(db_conn=db_conn, dataset_id=old_dataset_id, only_used_in_charts=True)
+        old_variable_names = old_variables["name"].tolist()
+    return old_variable_names
