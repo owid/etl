@@ -11,7 +11,6 @@ import slugify
 import structlog
 import yaml
 from owid import catalog
-from owid.catalog.utils import underscore
 from pydantic import BaseModel
 
 from etl.db import get_connection, get_engine
@@ -451,10 +450,6 @@ def adapt_dataset_metadata_for_grapher(
     # Combine metadata sources into one.
     metadata = combine_metadata_sources(metadata)
 
-    # Add institution and year to dataset short name (the name that will be used in grapher database).
-    short_name_ending = "__" + underscore(f"{metadata.namespace}_{metadata.version}")
-    if not metadata.short_name.endswith(short_name_ending):
-        metadata.short_name = metadata.short_name + short_name_ending
     # Empty dataset description (otherwise it will appear in `Internal notes` in the admin UI).
     metadata.description = ""
 

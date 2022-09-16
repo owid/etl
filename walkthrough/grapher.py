@@ -139,7 +139,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
 
     Then run the grapher step:
     ```
-    etl grapher://{form.namespace}/{form.version}/{form.short_name} --grapher
+    etl grapher/{form.namespace}/{form.version}/{form.short_name} --grapher
     ```
 
 2. When you feel confident, use `.env.staging` for staging which looks something like this:

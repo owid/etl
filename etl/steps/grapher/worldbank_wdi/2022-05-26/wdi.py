@@ -16,11 +16,6 @@ def run(dest_dir: str) -> None:
 
     garden_dataset = Dataset(DATA_DIR / f"garden/{namespace}/{version}/{fname}")
     dataset = Dataset.create_empty(dest_dir, garden_dataset.metadata)
-
-    # short_name should include dataset name and version
-    dataset.metadata.short_name = f"{dataset.metadata.short_name}__{version.replace('-', '_')}"
-    dataset.metadata.version = version
-
     dataset.save()
 
     fname = Path(__file__).stem
