@@ -46,7 +46,6 @@ def run_wrapper(garden_dataset: Dataset, dataset: Dataset, dims: List[str]) -> N
         dataset.add(tab)
 
 
-
 def get_variables_used_in_charts(old_dataset_name: str) -> List[str]:
     with get_connection() as db_conn:
         old_dataset_id = get_dataset_id(db_conn=db_conn, dataset_name=old_dataset_name)

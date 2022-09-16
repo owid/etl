@@ -1,11 +1,10 @@
 import json
 from pathlib import Path
-from typing import List, cast
+from typing import Any, List, cast
 
-import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
-from owid.catalog.utils import underscore, underscore_table
+from owid.catalog.utils import underscore_table
 from owid.datautils import geo
 from structlog import get_logger
 
@@ -66,7 +65,7 @@ def prepare_garden(df: pd.DataFrame) -> Table:
     return tb_garden
 
 
-def _pivot_number(df: pd.DataFrame) -> pd.DataFrame:
+def _pivot_number(df: pd.DataFrame) -> Any:
     # round 'number' rows to integer and 'percent' and 'rate' to 2dp - Feel like there is maybe a nicer way to do this?
     df_number = df[df.metric == "Number"].pivot(
         index=["country", "year", "sex", "age", "cause"], columns="measure", values="value"
@@ -76,7 +75,7 @@ def _pivot_number(df: pd.DataFrame) -> pd.DataFrame:
     return df_number
 
 
-def _pivot_percent(df: pd.DataFrame) -> pd.DataFrame:
+def _pivot_percent(df: pd.DataFrame) -> Any:
     df_percent = df[df.metric == "Percent"].pivot(
         index=["country", "year", "sex", "age", "cause"], columns="measure", values="value"
     )
@@ -85,7 +84,7 @@ def _pivot_percent(df: pd.DataFrame) -> pd.DataFrame:
     return df_percent
 
 
-def _pivot_rate(df: pd.DataFrame) -> pd.DataFrame:
+def _pivot_rate(df: pd.DataFrame) -> Any:
     df_rate = df[df.metric == "Rate"].pivot(
         index=["country", "year", "sex", "age", "cause"], columns="measure", values="value"
     )
@@ -107,7 +106,7 @@ def pivot(df: pd.DataFrame) -> Table:
     return tb_garden
 
 
-def omm_metrics(df: pd.DataFrame) -> pd.DataFrame:
+def omm_metrics(df: pd.DataFrame) -> Any:
     """Generate dataframe with OMM metrics with the same columns as input."""
     # {
     #     "All forms of violence": [
