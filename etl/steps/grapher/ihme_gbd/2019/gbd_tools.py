@@ -90,7 +90,6 @@ def run_wrapper(garden_dataset: Dataset, dataset: Dataset, old_dataset_name: str
         df = create_var_name(df)
         # Get variables used in existing charts
         df = df[df["variable"].isin(variables_in_charts)]
-
         if df.shape[0] > 0:
             df["source"] = "Institute for Health Metrics and Evaluation - Global Burden of Disease (2019)"
 
@@ -114,7 +113,7 @@ def run_wrapper(garden_dataset: Dataset, dataset: Dataset, old_dataset_name: str
                     dataset.add(wide_table)
 
 
-def get_variables_used_in_charts(old_dataset_name: str) -> List:
+def get_variables_used_in_charts(old_dataset_name: str) -> List[str]:
     with get_connection() as db_conn:
         old_dataset_id = get_dataset_id(db_conn=db_conn, dataset_name=old_dataset_name)
         old_variables = get_variables_in_dataset(db_conn=db_conn, dataset_id=old_dataset_id, only_used_in_charts=True)
