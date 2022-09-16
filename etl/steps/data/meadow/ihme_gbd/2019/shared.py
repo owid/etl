@@ -40,11 +40,12 @@ def run_wrapper(dataset: Path, metadata_path: Path, namespace: Path, version: Pa
     ds = Dataset.create_empty(dest_dir)
     ds.metadata = convert_walden_metadata(walden_ds)
     ds.metadata.version = "2019"
+    ds.metadata.title = ds.metadata.title + " - " + ds.metadata.description
 
     # create table with metadata from dataframe
     table_metadata = TableMeta(
-        short_name=walden_ds.short_name,
-        title=walden_ds.name,
+        short_name=ds.metadata.short_name,
+        title=ds.metadata.title,
         description=walden_ds.description,
     )
     tb = Table(df, metadata=table_metadata)

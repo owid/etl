@@ -147,16 +147,6 @@ def run_wrapper(
 
     tb_meadow = ds_meadow[f"{dataset}"]
 
-    # TODO: test causes, remove this before merging
-    CAUSES = [
-        "Vascular intestinal disorders",
-        "Onchocerciasis",
-        "Lymphatic filariasis",
-        "Interpersonal violence",
-        "Conflict and terrorism",
-    ]
-    tb_meadow = tb_meadow[tb_meadow.cause.isin(CAUSES)]
-
     df_garden = pd.DataFrame(tb_meadow)
     df_garden = tidy_countries(country_mapping_path, excluded_countries_path, df_garden)
     df_garden = prepare_garden(df_garden)

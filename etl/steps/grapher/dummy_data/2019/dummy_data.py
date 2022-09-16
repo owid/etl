@@ -9,7 +9,7 @@ N = Names(__file__)
 def run(dest_dir: str) -> None:
     dataset = catalog.Dataset.create_empty(dest_dir, gh.adapt_dataset_metadata_for_grapher(N.garden_dataset.metadata))
 
-    table = N.garden_dataset["dummy"]
+    table = N.garden_dataset["dummy_data"]
 
     # convert `country` into `entity_id`
     table = gh.adapt_table_for_grapher(table)

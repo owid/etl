@@ -7,12 +7,21 @@ dataset:
 tables:
   gbd_prevalence:
     variables:
-      measure:
-        title: Measure name
-        description: Prevalence or incidence of conditions within a population. Prevalence is total population with a condition, incidence is the number of new cases each year. 
-      cause:
-        title: Type of condition
-        description: A condition that impacts an individuals health or well-being.
-      value:
-        title: Number of individuals
-        description: The number/rate/percent of individuals within a population that are currently or newly impacted by a given condition.
+      incidence__number:
+        title: Number of new cases per year
+        unit: new cases per year
+      prevalence__number:
+        title: Current number of cases in the population
+        unit: total cases
+      incidence__percent:
+        title: Proportion of total incidence
+        unit: "%"
+      prevalence__percent:
+        title: Proportion of total prevalence
+        unit: "%"
+      incidence__rate:
+        title: Number of new cases per year per 100,000 people
+        unit: new cases per 100,000 people
+      prevalence__rate:
+        title: Current number of cases in the population per 100,000 people
+        unit: cases per 100,000 people
