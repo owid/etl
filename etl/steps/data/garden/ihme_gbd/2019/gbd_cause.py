@@ -5,7 +5,6 @@ from etl.helpers import Names
 
 # naming conventions
 N = Names(__file__)
-
 log = get_logger()
 
 
