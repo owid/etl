@@ -78,8 +78,7 @@ def fetch_new_dataset_id() -> int:
     fname = Path(__file__).stem.split("_")[0]
     namespace = Path(__file__).parent.parent.stem
     dataset = Dataset(DATA_DIR / f"garden/{namespace}/{version}/{fname}")
-    dataset_name = f"{dataset.metadata.short_name}__{version.replace('-', '_')}"
-    q = f"SELECT id FROM datasets WHERE name = '{dataset_name}'"
+    q = f"SELECT id FROM datasets WHERE name = '{dataset.metadata.short_name}' AND version = '{version}'"
     datasets = pd.read_sql(q, get_connection())
     assert datasets.shape[0] == 1
     dataset_id = int(datasets.squeeze())
