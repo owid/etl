@@ -1,10 +1,15 @@
 dataset:
   description: |
+    The World Carbon Pricing Database covers national and subnational economic mechanisms relating to carbon emissions from 1990 onwards. It was developed from several key sources: most notably, policy documents from countries and regions themselves. Secondly, from other sources such as the International Carbon Action Partnership.
+
+    The dataset primarily focuses on economic instruments targeting carbon dioxide (CO2) emissions. In some cases these instruments also cover other greenhouse gases. However, any pricing mechanisms that target non-CO2 gases (such as methane or nitrouse oxide) specifically, are not included.
+
+    A country is considered to have a carbon tax or emissions trading system if at least one IPCC sector or gas is covered by the instrument. These instruments do not need to cover all sectors within the economy for this to apply.
 
   sources:
       -
-        name: World Carbon Pricing Database
-        published_by: "Dolphin, G., Pollitt, M. and Newbery, D. 2020. The political economy of carbon pricing: a panel analysis. Oxford Economic Papers 72(2): 472-500."
+        name: Dolphin and Xiahou (2022). World carbon pricing database.
+        published_by: "Dolphin, G., Xiahou, Q. World carbon pricing database: sources and methods. Sci Data 9, 573 (2022)."
         publication_year: 2022
         publication_date: 2022-09-14
         url: https://github.com/g-dolphin/WorldCarbonPricingDatabase
