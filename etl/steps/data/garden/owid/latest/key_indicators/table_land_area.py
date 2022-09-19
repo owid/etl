@@ -6,7 +6,6 @@ from owid.catalog import Dataset, Source, Table
 from etl import data_helpers
 from etl.paths import DATA_DIR, REFERENCE_DATASET
 
-
 DIR_PATH = Path(__file__).parent
 
 
