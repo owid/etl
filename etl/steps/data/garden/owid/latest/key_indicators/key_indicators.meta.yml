@@ -13,7 +13,7 @@ tables:
 
           10,000 BCE - 1799: Historical estimates by HYDE (v3.2).
           1800-1949: Historical estimates by Gapminder.
-          1950-2022: Population records by the United Nations - Population Division (2022).
+          1950-2021: Population records by the United Nations - Population Division (2022).
           2022-2100: Projections based on Medium variant by the United Nations - Population Division (2022).
         unit: persons
         display:
@@ -39,7 +39,7 @@ tables:
 
           10,000 BCE - 1799: Historical estimates by HYDE (v3.2).
           1800-1949: Historical estimates by Gapminder.
-          1950-2022: Population records by the United Nations - Population Division (2022).
+          1950-2021: Population records by the United Nations - Population Division (2022).
           2022-2100: Projections based on Medium variant by the United Nations - Population Division (2022).
         unit: "%"
         display:
