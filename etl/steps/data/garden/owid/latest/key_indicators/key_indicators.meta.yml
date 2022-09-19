@@ -33,7 +33,7 @@ tables:
             url: https://dataportaal.pbl.nl/downloads/HYDE/
             date_accessed: October 8, 2021
       world_pop_share:
-        title: Population share
+        title: Share of world population
         description: |
           Share of the world's population by country, available from 10,000 BCE to 2100 based on Gapminder data, HYDE, and UN Population Division (2022) estimates.
 
