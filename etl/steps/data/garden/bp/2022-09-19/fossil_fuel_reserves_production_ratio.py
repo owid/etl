@@ -27,7 +27,7 @@ def prepare_bp_data(tb_bp: catalog.Table) -> catalog.Table:
     df_bp = pd.DataFrame(tb_bp).reset_index()[list(columns)].rename(columns=columns)
 
     # Select only global data.
-    df_bp = df_bp[df_bp["country"] == "World"].drop(columns="country").reset_index(drop=True)
+    df_bp = df_bp[df_bp["country"] == "World"].reset_index(drop=True)
 
     # Check that the units are the expected ones.
     assert tb_bp["coal__reserves__total"].metadata.unit == "Million tonnes"
@@ -58,7 +58,7 @@ def prepare_bp_data(tb_bp: catalog.Table) -> catalog.Table:
     df_bp["gas_left"] = df_bp["gas_reserves"] / df_bp["gas_production"]
 
     # Set index, drop rows that only have nans, and sort conveniently.
-    df_bp = df_bp.set_index("year").dropna(how="all").sort_index().sort_index(axis=1)
+    df_bp = df_bp.set_index(["country", "year"]).dropna(how="all").sort_index().sort_index(axis=1)
 
     # Create a new table.
     tb = catalog.Table(df_bp)

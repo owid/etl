@@ -49,6 +49,6 @@ tables:
         short_unit: t
         unit: tonnes
       oil_reserves:
-        title: Oil reserves of coal
+        title: Global reserves of oil
         short_unit: t
         unit: tonnes
