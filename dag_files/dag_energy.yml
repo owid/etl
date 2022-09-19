@@ -116,3 +116,10 @@ steps:
     - data://garden/bp/2022-07-14/statistical_review
   data://grapher/energy/2022-09-09/global_primary_energy:
     - data://garden/energy/2022-09-09/global_primary_energy
+  #
+  # BP - Fossil fuel reserves/production ratio (2022).
+  #
+  data://garden/bp/2022-09-19/fossil_fuel_reserves_production_ratio:
+    - data://garden/bp/2022-07-14/statistical_review
+  data://grapher/bp/2022-09-19/fossil_fuel_reserves_production_ratio:
+    - data://garden/bp/2022-09-19/fossil_fuel_reserves_production_ratio
