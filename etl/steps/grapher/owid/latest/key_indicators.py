@@ -1,5 +1,5 @@
 from copy import deepcopy
-from typing import List
+from typing import Any, List
 
 import numpy as np
 from owid import catalog
@@ -41,11 +41,16 @@ def _split_in_projection_and_historical(table: catalog.Table, year_threshold: in
     mask = table["year"] < year_threshold
     # Add historical metric
     table = _add_metric_new(
-        table, metric, mask, "historical", "(historical estimates)", ["10,000 BCE to 2100", f"10,000 BCE to {year_threshold - 1}"]
+        table,
+        metric,
+        mask,
+        "historical",
+        "(historical estimates)",
+        ["10,000 BCE to 2100", f"10,000 BCE to {year_threshold - 1}"],
     )
     # Add projection metric
     table = _add_metric_new(
-        table, metric, mask, "projection", "(future projections)", ["10,000 BCE to 2100", f"{year_threshold} to 2100"]
+        table, metric, -mask, "projection", "(future projections)", ["10,000 BCE to 2100", f"{year_threshold} to 2100"],
     )
     return table
 
@@ -53,17 +58,17 @@ def _split_in_projection_and_historical(table: catalog.Table, year_threshold: in
 def _add_metric_new(
     table: catalog.Table,
     metric: str,
-    mask: list,
+    mask: List[Any],
     metric_suffix: str,
     title_suffix: str,
     description_year_replace: List[str],
-):
+) -> catalog.Table:
     # Get dtype
     dtype = table[metric].dtype
     if np.issubdtype(table[metric].dtype, np.integer):
         dtype = "Int64"
     metric_new = f"{metric}_{metric_suffix}"
-    table.loc[-mask, metric_new] = deepcopy(table.loc[-mask, metric])
+    table.loc[mask, metric_new] = deepcopy(table.loc[mask, metric])
     table[metric_new].metadata = deepcopy(table[metric].metadata)
     table[metric_new].metadata.title = f"{table[metric_new].metadata.title} {title_suffix}"
     table[metric_new].metadata.description = table[metric_new].metadata.description.replace(*description_year_replace)
