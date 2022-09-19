@@ -268,6 +268,8 @@ class DataStep(Step):
         # make sure the enclosing folder is there
         self._dest_dir.parent.mkdir(parents=True, exist_ok=True)
 
+        ds_index_mtime = os.stat(self._output_dataset._index_file).st_mtime
+
         sp = self._search_path
         if sp.with_suffix(".py").exists() or (sp / "__init__.py").exists():
             self._run_py()
@@ -277,6 +279,11 @@ class DataStep(Step):
 
         else:
             raise Exception(f"have no idea how to run step: {self.path}")
+
+        # was the index file modified? if not then `save` was not called
+        # NOTE: we se warnings.warn instead of log.warning because we want this in stderr
+        if ds_index_mtime == os.stat(self._output_dataset._index_file).st_mtime:
+            warnings.warn(f"Step {self.path} did not call .save() on its output dataset")
 
         # modify the dataset to remember what inputs were used to build it
         dataset = self._output_dataset
