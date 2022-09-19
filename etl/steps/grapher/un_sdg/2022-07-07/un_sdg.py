@@ -29,10 +29,6 @@ NAMESPACE = Path(__file__).parent.parent.stem
 def run(dest_dir: str) -> None:
     garden_dataset = catalog.Dataset(DATA_DIR / f"garden/{NAMESPACE}/{VERSION}/{FNAME}")
     dataset = catalog.Dataset.create_empty(dest_dir, gh.adapt_dataset_metadata_for_grapher(garden_dataset.metadata))
-
-    # short_name should include dataset name and version
-    dataset.metadata.short_name = f"{garden_dataset.metadata.short_name}__{VERSION.replace('-', '_')}"
-
     dataset.save()
 
     # add tables to dataset

@@ -473,7 +473,7 @@ class GrapherStep(Step):
     data_step: DataStep
 
     def __init__(self, path: str, dependencies: List[Step]) -> None:
-        # UpsertStep should have exactly one DataStep dependency
+        # GrapherStep should have exactly one DataStep dependency
         assert len(dependencies) == 1
         assert path == dependencies[0].path
         assert isinstance(dependencies[0], DataStep)
@@ -481,7 +481,7 @@ class GrapherStep(Step):
         self.data_step = dependencies[0]
 
     def __str__(self) -> str:
-        return f"upsert://{self.path}"
+        return f"grapher://{self.path}"
 
     @property
     def dataset(self) -> catalog.Dataset:
