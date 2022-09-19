@@ -234,6 +234,14 @@ def grapher(
     remote_variables_df = read_variables_from_db(remote_env, namespace, version, dataset)
     local_variables_df = read_variables_from_db(local_env, namespace, version, dataset)
 
+    # use preferably shortName as index or name if shortName is missing
+    if remote_variables_df.shortName.notnull().all() and local_variables_df.shortName.notnull().all():
+        index_name = "shortName"
+    else:
+        index_name = "name"
+    remote_variables_df = remote_variables_df.set_index(index_name)
+    local_variables_df = local_variables_df.set_index(index_name)
+
     print("\n[magenta]=== Comparing variables ===[/magenta]")
     diff_print(
         remote_variables_df,
@@ -301,7 +309,7 @@ def read_variables_from_db(env_path: str, namespace: str, version: str, dataset:
     )
 
     # drop uninteresting columns
-    df = df.drop(["updatedAt"], axis=1)
+    df = df.drop(["updatedAt", "createdAt"], axis=1)
 
     return cast(pd.DataFrame, df)
 

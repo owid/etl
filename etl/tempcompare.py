@@ -225,7 +225,7 @@ class HighLevelDiff:
                 else:
                     # Comparison does not work for Int64
                     for df in [df1_intersected, df2_intersected]:
-                        if df[col].dtype == "Int64":
+                        if df[col].dtype in ("Int64", "UInt64", "Int32", "UInt32", "Int16", "UInt16", "Int8", "UInt8"):
                             df[col] = df[col].astype(float)
 
                     # For numeric data, consider them equal within certain absolute and relative tolerances.
@@ -481,33 +481,36 @@ class HighLevelDiff:
         # only the area where they have differences
         # IDEA: we could show columns side by side for easier comparison
         if preview_different_dataframe_values:
-            if self.value_differences is not None and self.columns_shared and self.index_values_shared is not None:
-                if preview_samples < len(self.value_differences.index):
-                    extra_msg = f" (showing {preview_samples} samples)"
+            if self.columns_shared and self.index_values_shared is not None:
+                if self.value_differences is not None:
+                    if preview_samples < len(self.value_differences.index):
+                        extra_msg = f" (showing {preview_samples} samples)"
+                    else:
+                        extra_msg = ""
+
+                    random_state = random.randint(0, 100000)
+
+                    yield f"Values with differences in {df1_label}{extra_msg}:"
+                    yield (
+                        str(
+                            sample_from_dataframe(
+                                self.df1.loc[self.value_differences.index, self.value_differences.columns],
+                                n=preview_samples,
+                                random_state=random_state,
+                            )
+                        )
+                    )
+                    yield f"Values with differences in {df2_label}{extra_msg}:"
+                    yield (
+                        str(
+                            sample_from_dataframe(
+                                self.df2.loc[self.value_differences.index, self.value_differences.columns],
+                                n=preview_samples,
+                                random_state=random_state,
+                            )
+                        )
+                    )
                 else:
-                    extra_msg = ""
-
-                random_state = random.randint(0, 100000)
-
-                yield f"Values with differences in {df1_label}{extra_msg}:"
-                yield (
-                    str(
-                        sample_from_dataframe(
-                            self.df1.loc[self.value_differences.index, self.value_differences.columns],
-                            n=preview_samples,
-                            random_state=random_state,
-                        )
-                    )
-                )
-                yield f"Values with differences in {df2_label}{extra_msg}:"
-                yield (
-                    str(
-                        sample_from_dataframe(
-                            self.df2.loc[self.value_differences.index, self.value_differences.columns],
-                            n=preview_samples,
-                            random_state=random_state,
-                        )
-                    )
-                )
+                    yield "[orange1]Dataframes are structurally different, but are equal within overlapping columns/rows.[/orange1]"
             else:
                 yield "The datasets have no overlapping columns/rows."
