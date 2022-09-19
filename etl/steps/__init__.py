@@ -264,11 +264,20 @@ class DataStep(Step):
     def __str__(self) -> str:
         return f"data://{self.path}"
 
+    def _dataset_index_mtime(self) -> Optional[float]:
+        try:
+            return os.stat(self._output_dataset._index_file).st_mtime
+        except Exception as e:
+            if str(e) == "dataset has not been created yet":
+                return None
+            else:
+                raise e
+
     def run(self) -> None:
         # make sure the enclosing folder is there
         self._dest_dir.parent.mkdir(parents=True, exist_ok=True)
 
-        ds_index_mtime = os.stat(self._output_dataset._index_file).st_mtime
+        ds_idex_mtime = self._dataset_index_mtime()
 
         sp = self._search_path
         if sp.with_suffix(".py").exists() or (sp / "__init__.py").exists():
@@ -282,7 +291,8 @@ class DataStep(Step):
 
         # was the index file modified? if not then `save` was not called
         # NOTE: we se warnings.warn instead of log.warning because we want this in stderr
-        if ds_index_mtime == os.stat(self._output_dataset._index_file).st_mtime:
+        new_ds_index_mtime = self._dataset_index_mtime()
+        if new_ds_index_mtime is None or ds_idex_mtime == new_ds_index_mtime:
             warnings.warn(f"Step {self.path} did not call .save() on its output dataset")
 
         # modify the dataset to remember what inputs were used to build it
