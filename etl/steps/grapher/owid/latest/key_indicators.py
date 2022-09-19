@@ -1,40 +1,71 @@
 from copy import deepcopy
+from typing import List
 
+import numpy as np
 from owid import catalog
 
 from etl import grapher_helpers as gh
 from etl.paths import DATA_DIR
 
 KEY_INDICATORS_GARDEN = DATA_DIR / "garden/owid/latest/key_indicators"
+YEAR_THRESHOLD = 2022
 
 
 def run(dest_dir: str) -> None:
     # NOTE: this generates shortName `population_density__owid_latest`, perhaps we should keep it as `population_density`
     # and create unique constraint on (shortName, version, namespace) instead of just (shortName, namespace)
     garden_dataset = catalog.Dataset(KEY_INDICATORS_GARDEN)
-
-    # Temporary sources metadata
-    # garden_dataset.metadata.sources = [
-    #     catalog.Source(name="Gapminder (v6)", published_by="Gapminder (v6)", url="https://www.gapminder.org/data/documentation/gd003/", date_accessed="October 8, 2021"),
-    #     catalog.Source(name="UN", published_by="United Nations - Population Division (2022)", url="https://population.un.org/wpp/Download/Standard/Population", date_accessed="October 8, 2021"),
-    #     catalog.Source(name="HYDE (v3.2)", published_by="HYDE (v3.2)", url="https://dataportaal.pbl.nl/downloads/HYDE/", date_accessed="September 9, 2022"),
-    # ]
-    print("_____________________")
-    print(garden_dataset.metadata)
-    print("_____________________")
     dataset = catalog.Dataset.create_empty(dest_dir, gh.adapt_dataset_metadata_for_grapher(garden_dataset.metadata))
 
-    # Add population table
+    # Get population table
     table = garden_dataset["population"].reset_index()
-    # table["something"] = table["population"]
+    # Create population new metrics
+    table = _split_in_projection_and_historical(table, YEAR_THRESHOLD, "population")
+    table = _split_in_projection_and_historical(table, YEAR_THRESHOLD, "world_pop_share")
+    # table["population_historical"] = deepcopy(table["population"])
+    # table["population_projection"] = deepcopy(table["population"])
+    # Add population table to dataset
     table = gh.adapt_table_for_grapher(table)
     dataset.add(table)
 
-    # Add land area table
+    # Add land area table to dataset
     table = gh.adapt_table_for_grapher(garden_dataset["land_area"].reset_index())
     dataset.add(table)
-    
+
+    # Save dataset
     dataset.save()
-    print("_____________________")
-    print(dataset.metadata)
-    print("_____________________")
+
+
+def _split_in_projection_and_historical(table: catalog.Table, year_threshold: int, metric: str) -> catalog.Table:
+    # Get mask
+    mask = table["year"] < year_threshold
+    # Add historical metric
+    table = _add_metric_new(
+        table, metric, mask, "historical", "(historical estimates)", ["10,000 BCE to 2100", f"10,000 BCE to {year_threshold - 1}"]
+    )
+    # Add projection metric
+    table = _add_metric_new(
+        table, metric, mask, "projection", "(future projections)", ["10,000 BCE to 2100", f"{year_threshold} to 2100"]
+    )
+    return table
+
+
+def _add_metric_new(
+    table: catalog.Table,
+    metric: str,
+    mask: list,
+    metric_suffix: str,
+    title_suffix: str,
+    description_year_replace: List[str],
+):
+    # Get dtype
+    dtype = table[metric].dtype
+    if np.issubdtype(table[metric].dtype, np.integer):
+        dtype = "Int64"
+    metric_new = f"{metric}_{metric_suffix}"
+    table.loc[-mask, metric_new] = deepcopy(table.loc[-mask, metric])
+    table[metric_new].metadata = deepcopy(table[metric].metadata)
+    table[metric_new].metadata.title = f"{table[metric_new].metadata.title} {title_suffix}"
+    table[metric_new].metadata.description = table[metric_new].metadata.description.replace(*description_year_replace)
+    table[metric_new].metadata.display["name"] = f"{table[metric_new].metadata.display['name']} {title_suffix}"
+    return table.astype({metric_new: dtype})
