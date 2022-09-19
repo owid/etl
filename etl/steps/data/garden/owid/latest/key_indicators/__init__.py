@@ -3,12 +3,9 @@
 #  owid/latest/key_indicators
 #
 
-from importlib import import_module
-from pathlib import Path
-
 from owid.catalog import Dataset, DatasetMeta, Table
 
-from etl.paths import BASE_DIR
+from etl.steps.data.garden.owid.latest.key_indicators import table_land_area, table_population, table_population_density
 
 
 def run(dest_dir: str) -> None:
@@ -18,17 +15,22 @@ def run(dest_dir: str) -> None:
         short_name="key_indicators",
         title="Key Indicators",
         description="The most important handful of indicators for use directly and in transforming other statistics.",
+        version="latest",
     )
 
-    # scan this folder for scripts that begin with "table_" and run them
+    # Add main tables
     sources = []
-    table_scripts = Path(__file__).parent.glob("table_*.py")
-    for script in table_scripts:
-        script_module = script.relative_to(BASE_DIR).with_suffix("").as_posix().replace("/", ".")
-        t: Table = import_module(script_module).make_table()  # type: ignore
+    table_modules = [table_land_area, table_population]
+    for module in table_modules:
+        t: Table = module.make_table()  # type: ignore
         ds.add(t)
         # Collect sources from variables
         sources.extend([source for col in t.columns for source in t[col].metadata.sources])
+
+    # Add derived table
+    t: Table = table_population_density.make_table(ds)
+    ds.add(t)
+    sources.extend([source for col in t.columns for source in t[col].metadata.sources])
 
     # Add sources from variables (ensure sources are not duplicated)
     ds.metadata.sources = [dict(ss) for ss in set(frozenset(s.items()) for s in sources)]
