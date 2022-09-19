@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from owid import catalog
-from owid.catalog import Dataset, Source, Table
+from owid.catalog import Dataset, Table
 
 from etl import data_helpers
 from etl.paths import DATA_DIR, REFERENCE_DATASET
