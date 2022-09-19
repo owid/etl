@@ -32,8 +32,39 @@ def run(dest_dir: str) -> None:
     table = gh.adapt_table_for_grapher(garden_dataset["land_area"].reset_index())
     dataset.add(table)
 
+    # Add population density table to dataset
+    table = gh.adapt_table_for_grapher(garden_dataset["population_density"].reset_index())
+    dataset.add(table)
+
+    # Fix source separator
+    dataset = _patch_source_separator(dataset)
     # Save dataset
     dataset.save()
+
+
+def _patch_source_separator(dataset: catalog.Dataset) -> catalog.Dataset:
+    # Variables
+    for table_name in dataset.table_names:
+        table = dataset[table_name]
+        for col in table.columns:
+            sources = _patch_source_separator_field(dataset[table_name][col].metadata.sources)
+            print(sources)
+            dataset[table_name][col].metadata.sources = sources
+            # assert len(dataset[table_name][col].metadata.sources) == 1
+            # dataset[table_name][col].metadata.sources[0].name = dataset[table_name][col].metadata.sources[0].name.replace(" ; ", "; ")
+    # Dataset
+    assert len(dataset.metadata.sources) == 1
+    dataset.metadata.sources[0].name = dataset.metadata.sources[0].name.replace(" ; ", "; ")
+    # Tables
+    assert len(dataset["population_density"].metadata.dataset.sources) == 1
+    dataset["population_density"].metadata.dataset.sources[0].name = dataset.metadata.sources[0].name.replace(" ; ", "; ")
+    return dataset
+
+
+def _patch_source_separator_field(sources):
+    assert len(sources) == 1
+    sources[0].name = sources[0].name.replace(" ; ", "; ")
+    return sources
 
 
 def _split_in_projection_and_historical(table: catalog.Table, year_threshold: int, metric: str) -> catalog.Table:
@@ -50,7 +81,12 @@ def _split_in_projection_and_historical(table: catalog.Table, year_threshold: in
     )
     # Add projection metric
     table = _add_metric_new(
-        table, metric, -mask, "projection", "(future projections)", ["10,000 BCE to 2100", f"{year_threshold} to 2100"],
+        table,
+        metric,
+        -mask,
+        "projection",
+        "(future projections)",
+        ["10,000 BCE to 2100", f"{year_threshold} to 2100"],
     )
     return table
 
