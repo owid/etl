@@ -1,4 +1,4 @@
-from typing import List
+from typing import Any, List
 
 import pandas as pd
 from owid.catalog import Dataset, Source
@@ -46,7 +46,7 @@ def run_wrapper(garden_dataset: Dataset, dataset: Dataset, dims: List[str]) -> N
         dataset.add(tab)
 
 
-def get_variables_used_in_charts(old_dataset_name: str) -> List[str]:
+def get_variables_used_in_charts(old_dataset_name: str) -> Any:
     with get_connection() as db_conn:
         old_dataset_id = get_dataset_id(db_conn=db_conn, dataset_name=old_dataset_name)
         old_variables = get_variables_in_dataset(db_conn=db_conn, dataset_id=old_dataset_id, only_used_in_charts=True)

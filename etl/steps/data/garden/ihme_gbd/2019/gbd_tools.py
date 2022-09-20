@@ -144,7 +144,7 @@ def run_wrapper(
     ds_meadow = Dataset(DATA_DIR / f"meadow/ihme_gbd/2019/{dataset}")
 
     tb_meadow = ds_meadow[f"{dataset}"]
-
+    tb_meadow = tb_meadow.drop(["index"], axis=1, errors="ignore")
     df_garden = pd.DataFrame(tb_meadow)
     df_garden = tidy_countries(country_mapping_path, excluded_countries_path, df_garden)
     df_garden = prepare_garden(df_garden)

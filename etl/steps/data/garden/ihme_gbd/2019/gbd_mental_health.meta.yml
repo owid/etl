@@ -6,13 +6,13 @@ dataset:
 
 tables:
   gbd_mental_health:
-    variables:
-      measure:
-        title: Measure name
-        description: Prevalence of conditions within populations - the total number of people with a condition in a given year.
-      cause:
-        title: Type of condition
-        description: A mental health condition impacting an individuals health or well-being.
-      value:
-        title: Number of individuals
-        description: The number/rate/percent of individuals within a population that are currently impacted by a given condition.
+     variables:
+      prevalence__number:
+        title: Prevalence (number)
+        unit: cases
+      prevalence__rate:
+        title: Prevalence (rate)
+        unit: cases per 100,000 people
+      prevalence__percent:
+        title: Prevalence (percent)
+        unit: "%"

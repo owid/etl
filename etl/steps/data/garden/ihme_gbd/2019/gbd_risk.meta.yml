@@ -8,12 +8,21 @@ dataset:
 tables:
   gbd_risk:
     variables:
-      measure:
-        title: Measure name
-        description: Deaths and DALYs that given risk factors contribute to
-      cause:
-        title: Type of risk factor
-        description: Risk factors that contribute to an individuals death or reduction in life length.
-      value:
-        title: Deaths and DALYS
-        description: The number/rate/percent of deaths or DALYs a given risk factor contributes to.
+      dalys__disability_adjusted_life_years__rate:
+        title: DALYs attributed to risk (rate)
+        unit: DALYs per 100,000 people
+      dalys__disability_adjusted_life_years__number:
+        title: DALYs attributed to risk (number)
+        unit: DALYs
+      dalys__disability_adjusted_life_years__percent:
+        title: DALYs attributed to risk (percent)
+        unit: "%"
+      deaths__number:
+        title: Deaths attributed to risk (number)
+        unit: deaths
+      deaths__rate:
+        title: Deaths attributed to risk (rate)
+        unit: deaths per 100,000 people
+      deaths__percent:
+        title: Deaths attributed to risk (percent)
+        unit: "%"

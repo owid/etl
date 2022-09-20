@@ -5,7 +5,7 @@ from etl.helpers import Names
 
 # naming conventions
 N = Names(__file__)
-
+N = Names("/Users/fionaspooner/Documents/OWID/repos/etl/etl/steps/data/garden/ihme_gbd/2019/gbd_mental_health.py")
 log = get_logger()
 
 
