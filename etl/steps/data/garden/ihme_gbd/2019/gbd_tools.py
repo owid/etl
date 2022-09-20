@@ -127,7 +127,21 @@ def omm_metrics(df: pd.DataFrame) -> Any:
     gr["cause"] = "All forms of violence"
     omms.append(gr)
 
-    # ...
+    # 0-27 days - child mortality age group
+
+    om = df[
+        df.cause.isin({"Interpersonal violence", "Conflict and terrorism", "Executions and police conflict"})
+        & (df.measure == "Deaths")
+        & (df.sex == "Both")
+        & (df.age.isin({"0-6 days", "7-27 days"}))
+        & (df.metric == "Number")
+    ]
+    cols = [c for c in om.columns if c not in ("value", "cause")]
+    gr = om.groupby(cols, observed=True, as_index=False).sum()
+    gr["cause"] = "All forms of violence"
+    omms.append(gr)
+
+    # Smoking and air pollution still to figure out. See https://github.com/owid/importers/blob/master/ihme_gbd/ihme_gbd_risk/config/variables_to_sum.json
 
     return pd.concat(omms, axis=0)
 
