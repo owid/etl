@@ -123,3 +123,8 @@ steps:
     - data://garden/bp/2022-07-14/statistical_review
   data://grapher/bp/2022-09-19/fossil_fuel_reserves_production_ratio:
     - data://garden/bp/2022-09-19/fossil_fuel_reserves_production_ratio
+  #
+  # UK BEIS - UK historical electricity (2022).
+  #
+  data://meadow/uk_beis/2022-07-28/uk_historical_electricity:
+    - walden://uk_beis/2022-07-28/uk_historical_electricity
