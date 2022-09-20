@@ -7,6 +7,7 @@
 include default.mk
 
 SRC = etl backport walkthrough tests
+PYTHON_PLATFORM = $(shell python -c "import sys; print(sys.platform)")
 
 help:
 	@echo 'Available commands:'
@@ -40,7 +41,16 @@ watch: .venv
 	git submodule update --init
 	touch $@
 
-.venv: pyproject.toml poetry.toml poetry.lock .submodule-init
+sanity-check:
+	@echo '==> Checking your Python setup'
+	@if [[ $(PYTHON_PLATFORM) = 'Windows' ]]; then \
+		echo 'ERROR: you are using a non-WSL Python interpreter, please consult the'; \
+		echo '       docs on how to swich to WSL Python on windows'; \
+		echo '       https://github.com/owid/etl/'; \
+		exit 1; \
+	fi
+
+.venv: sanity-check pyproject.toml poetry.toml poetry.lock .submodule-init
 	@echo '==> Installing packages'
 	poetry install
 	touch $@
