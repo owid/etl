@@ -65,7 +65,7 @@ def prepare_garden(df: pd.DataFrame) -> Table:
     return tb_garden
 
 
-def _pivot_number(df: pd.DataFrame, dims: list) -> Any:
+def _pivot_number(df: pd.DataFrame, dims: List[str]) -> Any:
     # round 'number' rows to integer and 'percent' and 'rate' to 2dp - Feel like there is maybe a nicer way to do this?
     df_number = df[df.metric == "Number"].pivot(index=["country", "year"] + dims, columns="measure", values="value")
     df_number = df_number.round(0).astype("Int64")
@@ -73,21 +73,21 @@ def _pivot_number(df: pd.DataFrame, dims: list) -> Any:
     return df_number
 
 
-def _pivot_percent(df: pd.DataFrame, dims: list) -> Any:
+def _pivot_percent(df: pd.DataFrame, dims: List[str]) -> Any:
     df_percent = df[df.metric == "Percent"].pivot(index=["country", "year"] + dims, columns="measure", values="value")
     df_percent = df_percent.round(2)
     df_percent = df_percent.rename(columns=lambda c: c + " - Percent")
     return df_percent
 
 
-def _pivot_rate(df: pd.DataFrame, dims: list) -> Any:
+def _pivot_rate(df: pd.DataFrame, dims: List[str]) -> Any:
     df_rate = df[df.metric == "Rate"].pivot(index=["country", "year"] + dims, columns="measure", values="value")
     df_rate = df_rate.round(2)
     df_rate = df_rate.rename(columns=lambda c: c + " - Rate")
     return df_rate
 
 
-def pivot(df: pd.DataFrame, dims: list) -> Table:
+def pivot(df: pd.DataFrame, dims: List[str]) -> Table:
     # NOTE: processing them separately simplifies the code and is faster (and less memory heavy) than
     # doing it all in one pivot operation
     df_number = _pivot_number(df, dims)
@@ -138,7 +138,7 @@ def run_wrapper(
     excluded_countries_path: Path,
     dest_dir: str,
     metadata_path: Path,
-    dims: list,
+    dims: List[str],
 ) -> None:
     # read dataset from meadow
     ds_meadow = Dataset(DATA_DIR / f"meadow/ihme_gbd/2019/{dataset}")
