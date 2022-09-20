@@ -696,7 +696,14 @@ class Variable(SQLModel, table=True):
         cls = self.__class__
         q = select(cls).where(
             # old variables don't have a shortName, but can be identified with `name`
-            or_(cls.shortName == self.shortName, cls.shortName.is_(None)),  # type: ignore
+            or_(
+                cls.shortName == self.shortName,
+                # NOTE: we used to slugify shortName which replaced double underscore by a single underscore
+                # this was a bug, we should have kept the double underscore
+                # match even those variables and correct their shortName
+                cls.shortName == self.shortName.replace("__", "_"),
+                cls.shortName.is_(None),  # type: ignore
+            ),
             cls.name == self.name,
             cls.datasetId == self.datasetId,
         )

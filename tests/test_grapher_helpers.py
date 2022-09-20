@@ -12,17 +12,30 @@ def test_yield_wide_table():
             "year": [2019, 2020, 2021],
             "entity_id": [1, 2, 3],
             "_1": [1, 2, 3],
+            "a__pct": [1, 2, 3],
         }
     )
     table = Table(df.set_index(["entity_id", "year"]))
     table._1.metadata.unit = "kg"
-    grapher_tab = list(yield_wide_table(table))[0]
-    assert grapher_tab.reset_index().to_dict(orient="list") == {
+    table.a__pct.metadata.unit = "pct"
+
+    tables = list(yield_wide_table(table))
+
+    assert tables[0].reset_index().to_dict(orient="list") == {
         "_1": [1, 2, 3],
         "entity_id": [1, 2, 3],
         "year": [2019, 2020, 2021],
     }
-    assert grapher_tab.metadata.short_name == "_1"
+    assert tables[0].metadata.short_name == "_1"
+    assert tables[0]["_1"].metadata.unit == "kg"
+
+    assert tables[1].reset_index().to_dict(orient="list") == {
+        "a__pct": [1, 2, 3],
+        "entity_id": [1, 2, 3],
+        "year": [2019, 2020, 2021],
+    }
+    assert tables[1].metadata.short_name == "a__pct"
+    assert tables[1]["a__pct"].metadata.unit == "pct"
 
 
 def test_yield_wide_table_with_dimensions():
