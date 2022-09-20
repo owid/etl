@@ -50,6 +50,17 @@ def _build_sources(population: Table, land_area: Table) -> list[Source]:
 def _add_metadata(t: Table, population: Table, land_area: Table) -> Table:
     t.update_metadata_from_yaml(DIR_PATH / "key_indicators.meta.yml", "population_density")
     t.metadata.sources = _build_sources(population, land_area)
+    # Build description
+    phrase = (
+        "Population by country, available from 10,000 BCE to 2100 based on Gapminder data, HYDE, and UN Population"
+        " Division (2022) estimates."
+    )
+    phrase_new = (
+        "Population density by country, available from 10,000 BCE to 2100 based on Gapminder data, HYDE, and UN"
+        " Population Division (2022) estimates. Estimated by dividing a country's population by its land area (from FAO"
+        " via World Bank)."
+    )
+    t.population_density.metadata.description = population.population.metadata.description.replace(phrase, phrase_new)
     return t
 
 
