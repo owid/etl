@@ -6,13 +6,22 @@ dataset:
 
 tables:
   gbd_child_mortality:
-    variables:
-      measure:
-        title: Measure name
-        description: Deaths or DALYs - ways of measuring the impact of causes of death.
-      cause:
-        title: Causes of death
-        description: Disease or injuries that result in or contribute to a childs death.
-      value:
-        title: Deaths or DALYs
-        description: The number of deaths or disability adjusted life years (DALYs) caused by a given disease or injury.
+     variables:
+      dalys__disability_adjusted_life_years__rate:
+        title: DALYs (rate)
+        unit: DALYs per 100,000 people
+      dalys__disability_adjusted_life_years__number:
+        title: DALYs (number)
+        unit: DALYs
+      dalys__disability_adjusted_life_years__percent:
+        title: DALYs (percent)
+        unit: "%"
+      deaths__number:
+        title: Deaths (number)
+        unit: deaths
+      deaths__rate:
+        title: Deaths (rate)
+        unit: deaths per 100,000 people
+      deaths__percent:
+        title: Deaths (percent)
+        unit: "%"

@@ -65,40 +65,34 @@ def prepare_garden(df: pd.DataFrame) -> Table:
     return tb_garden
 
 
-def _pivot_number(df: pd.DataFrame) -> Any:
+def _pivot_number(df: pd.DataFrame, dims: list) -> Any:
     # round 'number' rows to integer and 'percent' and 'rate' to 2dp - Feel like there is maybe a nicer way to do this?
-    df_number = df[df.metric == "Number"].pivot(
-        index=["country", "year", "sex", "age", "cause"], columns="measure", values="value"
-    )
+    df_number = df[df.metric == "Number"].pivot(index=["country", "year"] + dims, columns="measure", values="value")
     df_number = df_number.round(0).astype("Int64")
     df_number = df_number.rename(columns=lambda c: c + " - Number")
     return df_number
 
 
-def _pivot_percent(df: pd.DataFrame) -> Any:
-    df_percent = df[df.metric == "Percent"].pivot(
-        index=["country", "year", "sex", "age", "cause"], columns="measure", values="value"
-    )
+def _pivot_percent(df: pd.DataFrame, dims: list) -> Any:
+    df_percent = df[df.metric == "Percent"].pivot(index=["country", "year"] + dims, columns="measure", values="value")
     df_percent = df_percent.round(2)
     df_percent = df_percent.rename(columns=lambda c: c + " - Percent")
     return df_percent
 
 
-def _pivot_rate(df: pd.DataFrame) -> Any:
-    df_rate = df[df.metric == "Rate"].pivot(
-        index=["country", "year", "sex", "age", "cause"], columns="measure", values="value"
-    )
+def _pivot_rate(df: pd.DataFrame, dims: list) -> Any:
+    df_rate = df[df.metric == "Rate"].pivot(index=["country", "year"] + dims, columns="measure", values="value")
     df_rate = df_rate.round(2)
     df_rate = df_rate.rename(columns=lambda c: c + " - Rate")
     return df_rate
 
 
-def pivot(df: pd.DataFrame) -> Table:
+def pivot(df: pd.DataFrame, dims: list) -> Table:
     # NOTE: processing them separately simplifies the code and is faster (and less memory heavy) than
     # doing it all in one pivot operation
-    df_number = _pivot_number(df)
-    df_percent = _pivot_percent(df)
-    df_rate = _pivot_rate(df)
+    df_number = _pivot_number(df, dims)
+    df_percent = _pivot_percent(df, dims)
+    df_rate = _pivot_rate(df, dims)
 
     tb_garden = Table(pd.concat([df_number, df_percent, df_rate], axis=1))
     tb_garden = underscore_table(tb_garden)
@@ -139,7 +133,12 @@ def omm_metrics(df: pd.DataFrame) -> Any:
 
 
 def run_wrapper(
-    dataset: str, country_mapping_path: Path, excluded_countries_path: Path, dest_dir: str, metadata_path: Path
+    dataset: str,
+    country_mapping_path: Path,
+    excluded_countries_path: Path,
+    dest_dir: str,
+    metadata_path: Path,
+    dims: list,
 ) -> None:
     # read dataset from meadow
     ds_meadow = Dataset(DATA_DIR / f"meadow/ihme_gbd/2019/{dataset}")
@@ -153,7 +152,7 @@ def run_wrapper(
     omm = omm_metrics(df_garden)
     df_garden = pd.concat([df_garden, omm], axis=0)
 
-    tb_garden = pivot(df_garden)
+    tb_garden = pivot(df_garden, dims)
 
     # free up memory
     del df_garden

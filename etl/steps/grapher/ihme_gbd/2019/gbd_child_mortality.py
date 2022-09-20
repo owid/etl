@@ -7,7 +7,6 @@ from etl.paths import DATA_DIR
 from .gbd_tools import run_wrapper
 
 N = Names(__file__)
-N = Names("/Users/fionaspooner/Documents/OWID/repos/etl/etl/steps/data/grapher/ihme_gbd/2019/gbd_prevalence.py")
 
 
 def run(dest_dir: str) -> None:
