@@ -5,7 +5,11 @@
 
 from owid.catalog import Dataset, DatasetMeta, Table
 
-from etl.steps.data.garden.owid.latest.key_indicators import table_land_area, table_population, table_population_density
+from etl.steps.data.garden.owid.latest.key_indicators import (
+    table_land_area,
+    table_population,
+    table_population_density,
+)
 
 
 def run(dest_dir: str) -> None:
@@ -22,13 +26,13 @@ def run(dest_dir: str) -> None:
     sources = []
     table_modules = [table_land_area, table_population]
     for module in table_modules:
-        t: Table = module.make_table()  # type: ignore
+        t: Table = module.make_table()
         ds.add(t)
         # Collect sources from variables
         sources.extend([source for col in t.columns for source in t[col].metadata.sources])
 
     # Add derived table
-    t: Table = table_population_density.make_table(ds)
+    t = table_population_density.make_table(ds)
     ds.add(t)
     sources.extend([source for col in t.columns for source in t[col].metadata.sources])
 

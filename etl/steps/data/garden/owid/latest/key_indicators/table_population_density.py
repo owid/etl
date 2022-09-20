@@ -18,7 +18,7 @@ from owid.catalog import Dataset, Source, Table
 DIR_PATH = Path(__file__).parent
 
 
-def _combine_tables(population: Table, land_area: Table):
+def _combine_tables(population: Table, land_area: Table) -> Table:
     return pd.merge(
         land_area[["country", "land_area"]],
         population[["country", "population", "year"]],
@@ -47,7 +47,7 @@ def _build_sources(population: Table, land_area: Table) -> list[Source]:
     )
 
 
-def _add_metadata(t: Table, population, land_area) -> Table:
+def _add_metadata(t: Table, population: Table, land_area: Table) -> Table:
     t.update_metadata_from_yaml(DIR_PATH / "key_indicators.meta.yml", "population_density")
     t.metadata.sources = _build_sources(population, land_area)
     return t
@@ -55,8 +55,8 @@ def _add_metadata(t: Table, population, land_area) -> Table:
 
 def make_table(ds: Dataset) -> Table:
     # Reset indices
-    population = ds['population'].reset_index()
-    land_area = ds['land_area'].reset_index()
+    population = ds["population"].reset_index()
+    land_area = ds["land_area"].reset_index()
     # Take the latest measurement of land area
     land_area = land_area.sort_values("year").groupby(["country"], as_index=False).last()
     # Combine tables

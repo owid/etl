@@ -2,8 +2,7 @@ from copy import deepcopy
 from typing import Any, List
 
 import numpy as np
-from owid import catalog
-from owid import walden
+from owid import catalog, walden
 
 from etl import grapher_helpers as gh
 from etl.paths import DATA_DIR
@@ -56,7 +55,7 @@ def _adapt_table_for_grapher_patch(table: catalog.Table) -> catalog.Table:
     return table
 
 
-def _patch_source_separator_field(sources):
+def _patch_source_separator_field(sources: List[catalog.Source]) -> List[catalog.Source]:
     assert len(sources) == 1
     sources[0].name = sources[0].name.replace(" ; ", "; ")
     return sources
