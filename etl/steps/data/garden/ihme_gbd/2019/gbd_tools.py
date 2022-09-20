@@ -130,8 +130,7 @@ def omm_metrics(df: pd.DataFrame) -> Any:
     # 0-27 days - child mortality age group
 
     om = df[
-        df.cause.isin({"Interpersonal violence", "Conflict and terrorism", "Executions and police conflict"})
-        & (df.measure == "Deaths")
+        (df.measure == "Deaths")
         & (df.sex == "Both")
         & (df.age.isin({"0-6 days", "7-27 days"}))
         & (df.metric == "Number")
