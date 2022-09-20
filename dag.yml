@@ -4,9 +4,6 @@ steps:
   #
   data://garden/owid/latest/covid:
     - etag://raw.githubusercontent.com/owid/covid-19-data/master/public/data/owid-covid-data.csv
-  data://garden/owid/latest/population_density:
-    - data://garden/owid/latest/key_indicators
-    - data://garden/reference
   data://garden/owid/latest/key_indicators:
     - data://garden/hyde/2017/baseline
     - data://garden/gapminder/2019-12-10/population
@@ -66,8 +63,8 @@ steps:
     - walden://un_sdg/2022-07-07/un_sdg
   data://garden/un_sdg/2022-07-07/un_sdg:
     - data://meadow/un_sdg/2022-07-07/un_sdg
-  data://grapher/owid/latest/population_density:
-    - data://garden/owid/latest/population_density
+  data://grapher/owid/latest/key_indicators:
+    - data://garden/owid/latest/key_indicators
   data://meadow/oecd/2016-06-01/regional_wellbeing:
     - walden://oecd/2016-06-01/regional_wellbeing
   data://garden/sdg/latest/sdg:
