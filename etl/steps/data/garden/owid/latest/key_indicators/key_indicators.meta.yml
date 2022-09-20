@@ -3,7 +3,7 @@ tables:
     title: Population (Gapminder, HYDE & UN)
     description: |
       Our World in Data builds and maintains a long-run dataset on population by country, region, and for the world, based on three key sources: HYDE, Gapminder, and the UN World Population Prospects.
-      You can find more information on these sources and how our time series is constructed on this page: <a href="https://ourworldindata.org/population-sources">What sources do we rely on for population estimates?</a>'
+      You can find more information on these sources and how our time series is constructed on this page: <a href="https://ourworldindata.org/population-sources">What sources do we rely on for population estimates?</a>
 
     variables:
       population:
@@ -95,7 +95,7 @@ tables:
 
           The data collected from official national sources through the questionnaire are supplemented with information from official secondary data sources. The secondary sources cover official country data from websites of national ministries, national publications and related country data reported by various international organizations.
 
-          Statistical concept and methodology: Total land area does not include inland water bodies such as major rivers and lakes. Variations from year to year may be due to updated or revised data rather than to change in area."
+          Statistical concept and methodology: Total land area does not include inland water bodies such as major rivers and lakes. Variations from year to year may be due to updated or revised data rather than to change in area.
         unit: sq. km
         short_unit: sq. km
         display:
