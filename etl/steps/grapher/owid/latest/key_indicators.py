@@ -3,6 +3,7 @@ from typing import Any, List
 
 import numpy as np
 from owid import catalog
+from owid import walden
 
 from etl import grapher_helpers as gh
 from etl.paths import DATA_DIR
@@ -15,7 +16,7 @@ def run(dest_dir: str) -> None:
     # NOTE: this generates shortName `population_density__owid_latest`, perhaps we should keep it as `population_density`
     # and create unique constraint on (shortName, version, namespace) instead of just (shortName, namespace)
     garden_dataset = catalog.Dataset(KEY_INDICATORS_GARDEN)
-    dataset = catalog.Dataset.create_empty(dest_dir, gh.adapt_dataset_metadata_for_grapher(garden_dataset.metadata))
+    dataset = _adapt_dataset_metadata_for_grapher_patch(dest_dir, garden_dataset)
 
     # Get population table
     table = garden_dataset["population"].reset_index()
@@ -25,40 +26,34 @@ def run(dest_dir: str) -> None:
     # table["population_historical"] = deepcopy(table["population"])
     # table["population_projection"] = deepcopy(table["population"])
     # Add population table to dataset
-    table = gh.adapt_table_for_grapher(table)
+    table = _adapt_table_for_grapher_patch(table)
     dataset.add(table)
 
     # Add land area table to dataset
-    table = gh.adapt_table_for_grapher(garden_dataset["land_area"].reset_index())
+    table = _adapt_table_for_grapher_patch(garden_dataset["land_area"].reset_index())
     dataset.add(table)
 
     # Add population density table to dataset
-    table = gh.adapt_table_for_grapher(garden_dataset["population_density"].reset_index())
+    table = _adapt_table_for_grapher_patch(garden_dataset["population_density"].reset_index())
     dataset.add(table)
 
-    # Fix source separator
-    dataset = _patch_source_separator(dataset)
     # Save dataset
     dataset.save()
 
 
-def _patch_source_separator(dataset: catalog.Dataset) -> catalog.Dataset:
-    # Variables
-    for table_name in dataset.table_names:
-        table = dataset[table_name]
-        for col in table.columns:
-            sources = _patch_source_separator_field(dataset[table_name][col].metadata.sources)
-            print(sources)
-            dataset[table_name][col].metadata.sources = sources
-            # assert len(dataset[table_name][col].metadata.sources) == 1
-            # dataset[table_name][col].metadata.sources[0].name = dataset[table_name][col].metadata.sources[0].name.replace(" ; ", "; ")
-    # Dataset
-    assert len(dataset.metadata.sources) == 1
-    dataset.metadata.sources[0].name = dataset.metadata.sources[0].name.replace(" ; ", "; ")
-    # Tables
-    assert len(dataset["population_density"].metadata.dataset.sources) == 1
-    dataset["population_density"].metadata.dataset.sources[0].name = dataset.metadata.sources[0].name.replace(" ; ", "; ")
+def _adapt_dataset_metadata_for_grapher_patch(dest_dir: str, garden_dataset: walden.Dataset) -> catalog.Dataset:
+    """Fixes source separator in dataset ' ; ' -> '; '"""
+    dataset = catalog.Dataset.create_empty(dest_dir, gh.adapt_dataset_metadata_for_grapher(garden_dataset.metadata))
+    dataset.metadata.sources = _patch_source_separator_field(dataset.metadata.sources)
     return dataset
+
+
+def _adapt_table_for_grapher_patch(table: catalog.Table) -> catalog.Table:
+    """Fixes source separator in variables ' ; ' -> '; '"""
+    table = gh.adapt_table_for_grapher(table)
+    for col in table.columns:
+        table[col].metadata.sources = _patch_source_separator_field(table[col].metadata.sources)
+    return table
 
 
 def _patch_source_separator_field(sources):
