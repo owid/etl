@@ -70,7 +70,7 @@ def _split_in_projection_and_historical(table: catalog.Table, year_threshold: in
         metric,
         mask,
         "historical",
-        "(historical estimates)",
+        "",
         ["10,000 BCE to 2100", f"10,000 BCE to {year_threshold - 1}"],
     )
     # Add projection metric
@@ -100,7 +100,8 @@ def _add_metric_new(
     metric_new = f"{metric}_{metric_suffix}"
     table.loc[mask, metric_new] = deepcopy(table.loc[mask, metric])
     table[metric_new].metadata = deepcopy(table[metric].metadata)
-    table[metric_new].metadata.title = f"{table[metric_new].metadata.title} {title_suffix}"
+    if title_suffix:
+        table[metric_new].metadata.title = f"{table[metric_new].metadata.title} {title_suffix}"
+        table[metric_new].metadata.display["name"] = f"{table[metric_new].metadata.display['name']} {title_suffix}"
     table[metric_new].metadata.description = table[metric_new].metadata.description.replace(*description_year_replace)
-    table[metric_new].metadata.display["name"] = f"{table[metric_new].metadata.display['name']} {title_suffix}"
     return table.astype({metric_new: dtype})
