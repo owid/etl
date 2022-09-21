@@ -44,6 +44,14 @@ INT_TYPES = (
     "Int64",
 )
 
+# exclude the following datasets from upserting into data_values table as they
+# are too large
+# once we switch to catalogPath, no data will be upserted to data_values
+BLACKLIST_DATASETS_DATA_VALUES_UPSERTS = [
+    "gbd_cause",
+    "gbd_prevalence",
+]
+
 
 @dataclass
 class DatasetUpsertResult:
@@ -243,7 +251,8 @@ def upsert_table(
 
         df = table.rename(columns={column_name: "value", "entity_id": "entityId"}).assign(variableId=variable.id)
 
-    insert_to_data_values(df)
+    if table.metadata.dataset.short_name not in BLACKLIST_DATASETS_DATA_VALUES_UPSERTS:
+        insert_to_data_values(df)
 
     log.info("upsert_table.upserted_data_values", size=len(table))
 
