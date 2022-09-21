@@ -5,15 +5,15 @@ It connects to Grapher based on the environment file found in the project's root
 """
 # The original script was originally from the owid/importers repo: https://github.com/owid/importers/blob/master/standard_importer/chart_revision_suggester.py
 
-import click
 import os
 import re
+import shutil
+import time
 import traceback
 from copy import deepcopy
 from typing import Any, Dict, Iterable, List, Literal, Optional, Tuple, Union
-import time
-import shutil
 
+import click
 import pandas as pd
 import simplejson as json
 import structlog
@@ -57,7 +57,7 @@ log = structlog.get_logger()
     help="Name of the dataset.",
     required=True,
 )
-def main_cli(mapping_file: str, namespace: str, version: str, dataset_name: str):
+def main_cli(mapping_file: str, namespace: str, version: str, dataset_name: str) -> None:
     dataset_dir = os.path.join(STEP_DIR, "grapher", namespace, version)
 
     handler = MappingFileHandler(dataset_dir, mapping_file)
@@ -81,13 +81,13 @@ class MappingFileHandler:
         self.config_mapping_file = os.path.join(self.config_dir, "variable_replacements.json")
         self.config_mapping_file_tmp = f"{self.config_mapping_file}.{round(100 * time.time())}"
 
-    def init(self):
+    def init(self) -> None:
         os.makedirs(self.config_dir, exist_ok=True)
         if os.path.isfile(self.config_mapping_file):
             os.rename(self.config_mapping_file, self.config_mapping_file_tmp)
         shutil.copy2(self.mapping_file, self.config_mapping_file)
 
-    def reset(self):
+    def reset(self) -> None:
         if os.path.isfile(self.config_mapping_file_tmp):
             os.remove(self.config_mapping_file)
             os.rename(self.config_mapping_file_tmp, self.config_mapping_file)
