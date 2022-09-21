@@ -2,7 +2,6 @@ from owid import catalog
 
 from etl import grapher_helpers as gh
 from etl.helpers import Names
-from etl.paths import DATA_DIR
 
 from .gbd_tools import run_wrapper
 
@@ -14,7 +13,7 @@ OLD_DATASET_NAME = (
 
 
 def run(dest_dir: str) -> None:
-    garden_dataset = catalog.Dataset(DATA_DIR / f"garden/{N.namespace}/{N.version}/{N.short_name}")
+    garden_dataset = catalog.Dataset(N.garden_dataset)
     dataset = catalog.Dataset.create_empty(dest_dir, gh.adapt_dataset_metadata_for_grapher(garden_dataset.metadata))
     dataset.save()
 

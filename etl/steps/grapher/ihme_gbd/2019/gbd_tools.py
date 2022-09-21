@@ -5,7 +5,6 @@ from owid.catalog import Dataset, Source
 from structlog import get_logger
 
 from etl import grapher_helpers as gh
-from etl.db import get_connection, get_dataset_id, get_variables_in_dataset
 
 log = get_logger()
 
@@ -44,11 +43,3 @@ def run_wrapper(garden_dataset: Dataset, dataset: Dataset, dims: List[str]) -> N
         tab = tab.set_index(dims, append=True)
 
         dataset.add(tab)
-
-
-def get_variables_used_in_charts(old_dataset_name: str) -> Any:
-    with get_connection() as db_conn:
-        old_dataset_id = get_dataset_id(db_conn=db_conn, dataset_name=old_dataset_name)
-        old_variables = get_variables_in_dataset(db_conn=db_conn, dataset_id=old_dataset_id, only_used_in_charts=True)
-        old_variable_names = old_variables["name"].tolist()
-    return old_variable_names

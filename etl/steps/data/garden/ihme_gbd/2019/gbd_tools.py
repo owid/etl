@@ -60,13 +60,10 @@ def prepare_garden(df: pd.DataFrame) -> Table:
     log.info("prepare_garden")
     tb_garden = underscore_table(Table(df))
     tb_garden = clean_values(tb_garden)
-    # TODO: this takes ages, create units later for columns
-    # tb_garden = create_units(tb_garden)
     return tb_garden
 
 
 def _pivot_number(df: pd.DataFrame, dims: List[str]) -> Any:
-    # round 'number' rows to integer and 'percent' and 'rate' to 2dp - Feel like there is maybe a nicer way to do this?
     df_number = df[df.metric == "Number"].pivot(index=["country", "year"] + dims, columns="measure", values="value")
     df_number = df_number.round(0).astype("Int64")
     df_number = df_number.rename(columns=lambda c: c + " - Number")
