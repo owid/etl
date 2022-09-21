@@ -128,3 +128,5 @@ steps:
   #
   data://meadow/uk_beis/2022-07-28/uk_historical_electricity:
     - walden://uk_beis/2022-07-28/uk_historical_electricity
+  data://garden/uk_beis/2022-07-28/uk_historical_electricity:
+    - data://meadow/uk_beis/2022-07-28/uk_historical_electricity
