@@ -36,7 +36,6 @@ boto3 = "^1.18.54"
 awscli = "^1.20.54"
 Unidecode = "^1.3.2"
 python-dotenv = "^0.19.0"
-python-slugify = {extras = ["unidecode"], version = "^5.0.2"}
 # NOTE: the version is currently fixed, but we should update as soon as https://github.com/frictionlessdata/frictionless-py/issues/1143
 #   gets resolved
 frictionless = {version = "4.38.0", extras = ["pandas"]}
@@ -56,6 +55,7 @@ rich-click = "^1.5.1"
 tenacity = "^8.0.1"
 simplejson = "^3.17.6"
 bugsnag = "^4.2.1"
+xlrd = "^2.0.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.1.2"
