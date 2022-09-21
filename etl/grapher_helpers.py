@@ -446,7 +446,10 @@ def adapt_dataset_metadata_for_grapher(
 
     # Add the dataset description as if it was a source's description.
     if metadata.description is not None:
-        metadata.sources[0].description = metadata.description + "\n" + metadata.sources[0].description
+        if metadata.sources[0].description:
+            metadata.sources[0].description = metadata.description + "\n" + metadata.sources[0].description
+        else:
+            metadata.sources[0].description = metadata.description
 
     # Empty dataset description (otherwise it will appear in `Internal notes` in the admin UI).
     metadata.description = ""
@@ -491,7 +494,8 @@ def _ensure_source_per_variable(table: catalog.Table) -> catalog.Table:
     assert table.metadata.dataset
     dataset_meta = table.metadata.dataset
     for column in table.columns:
-        if len(table[column].metadata.sources) == 0:
+        variable_meta: catalog.VariableMeta = table[column].metadata
+        if len(variable_meta.sources) == 0:
             # Take the metadata sources from the dataset's metadata (after combining them into one).
             assert (
                 len(dataset_meta.sources) > 0
@@ -500,7 +504,10 @@ def _ensure_source_per_variable(table: catalog.Table) -> catalog.Table:
 
             # Add the dataset description as if it was a source's description.
             if dataset_meta.description is not None:
-                source.description = dataset_meta.description + "\n" + source.description
+                if source.description:
+                    source.description = dataset_meta.description + "\n" + source.description
+                else:
+                    source.description = dataset_meta.description
         else:
             sources: List[catalog.Source] = table[column].metadata.sources
 
@@ -513,7 +520,11 @@ def _ensure_source_per_variable(table: catalog.Table) -> catalog.Table:
 
             if source.description is None:
                 # Use table description if sources don't have their own
-                source.description = table.metadata.description
+                if table.metadata.description:
+                    source.description = table.metadata.description
+                # Or dataset description if sources don't have their own
+                else:
+                    source.description = dataset_meta.description
 
         table[column].metadata.sources = [source]
 

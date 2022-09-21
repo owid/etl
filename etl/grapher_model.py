@@ -473,13 +473,25 @@ class Source(SQLModel, table=True):
     datasets: Optional["Dataset"] = Relationship(back_populates="sources")
     variables: List["Variable"] = Relationship(back_populates="sources")
 
-    def upsert(self, session: Session) -> "Source":
+    @property
+    def _upsert_select(self) -> SelectOfScalar["Source"]:
         cls = self.__class__
-        q = select(cls).where(
+        # NOTE: we match on both name and additionalInfo (source's description) so that we can
+        # have sources with the same name, but different descriptions
+        conds = [
             cls.name == self.name,
             cls.datasetId == self.datasetId,
-        )
-        ds = session.exec(q).one_or_none()
+        ]
+        if self.description.get("additionalInfo"):
+            conds.append(cls.description["additionalInfo"] == self.description["additionalInfo"])
+
+        return select(cls).where(*conds)
+
+    def upsert(self, session: Session) -> "Source":
+        # NOTE: we match on both name and additionalInfo (source's description) so that we can
+        # have sources with the same name, but different descriptions
+        ds = session.exec(self._upsert_select).one_or_none()
+
         if not ds:
             ds = self
         else:
@@ -489,11 +501,7 @@ class Source(SQLModel, table=True):
         session.add(ds)
 
         # select added object to get its id
-        q = select(cls).where(
-            cls.name == self.name,
-            cls.datasetId == self.datasetId,
-        )
-        return session.exec(q).one()
+        return session.exec(self._upsert_select).one()
 
     @classmethod
     def from_catalog_source(cls, source: catalog.Source, dataset_id: int) -> "Source":
