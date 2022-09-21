@@ -3,7 +3,7 @@
 #  owid/latest/key_indicators
 #
 
-from owid.catalog import Dataset, DatasetMeta, Table
+from owid.catalog import Dataset, DatasetMeta, Source, Table
 
 from etl.steps.data.garden.owid.latest.key_indicators import (
     table_land_area,
@@ -37,6 +37,6 @@ def run(dest_dir: str) -> None:
     sources.extend([source for col in t.columns for source in t[col].metadata.sources])
 
     # Add sources from variables (ensure sources are not duplicated)
-    ds.metadata.sources = [dict(ss) for ss in set(frozenset(s.items()) for s in sources)]
+    ds.metadata.sources = [Source.from_dict(dict(ss)) for ss in set(frozenset(s.to_dict().items()) for s in sources)]
 
     ds.save()
