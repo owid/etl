@@ -264,9 +264,20 @@ class DataStep(Step):
     def __str__(self) -> str:
         return f"data://{self.path}"
 
+    def _dataset_index_mtime(self) -> Optional[float]:
+        try:
+            return os.stat(self._output_dataset._index_file).st_mtime
+        except Exception as e:
+            if str(e) == "dataset has not been created yet":
+                return None
+            else:
+                raise e
+
     def run(self) -> None:
         # make sure the enclosing folder is there
         self._dest_dir.parent.mkdir(parents=True, exist_ok=True)
+
+        ds_idex_mtime = self._dataset_index_mtime()
 
         sp = self._search_path
         if sp.with_suffix(".py").exists() or (sp / "__init__.py").exists():
@@ -277,6 +288,12 @@ class DataStep(Step):
 
         else:
             raise Exception(f"have no idea how to run step: {self.path}")
+
+        # was the index file modified? if not then `save` was not called
+        # NOTE: we se warnings.warn instead of log.warning because we want this in stderr
+        new_ds_index_mtime = self._dataset_index_mtime()
+        if new_ds_index_mtime is None or ds_idex_mtime == new_ds_index_mtime:
+            warnings.warn(f"Step {self.path} did not call .save() on its output dataset")
 
         # modify the dataset to remember what inputs were used to build it
         dataset = self._output_dataset
@@ -473,7 +490,7 @@ class GrapherStep(Step):
     data_step: DataStep
 
     def __init__(self, path: str, dependencies: List[Step]) -> None:
-        # UpsertStep should have exactly one DataStep dependency
+        # GrapherStep should have exactly one DataStep dependency
         assert len(dependencies) == 1
         assert path == dependencies[0].path
         assert isinstance(dependencies[0], DataStep)
@@ -481,7 +498,7 @@ class GrapherStep(Step):
         self.data_step = dependencies[0]
 
     def __str__(self) -> str:
-        return f"upsert://{self.path}"
+        return f"grapher://{self.path}"
 
     @property
     def dataset(self) -> catalog.Dataset:
