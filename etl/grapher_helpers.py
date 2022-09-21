@@ -7,10 +7,10 @@ from typing import Any, Dict, Iterable, List, Literal, Optional, Set, cast
 
 import numpy as np
 import pandas as pd
-import slugify
 import structlog
 import yaml
 from owid import catalog
+from owid.catalog.utils import underscore
 from pydantic import BaseModel
 
 from etl.db import get_connection, get_engine
@@ -157,13 +157,14 @@ def yield_wide_table(
             ), f"Unit for column {column} should not be None here!"
 
             # Select only one column and dimensions for performance
-            tab = table_to_yield[[column]]
+            tab = table_to_yield[[column]].copy()
+            tab.metadata = copy.deepcopy(tab.metadata)
 
             # Drop NA values
-            tab = tab.dropna() if na_action == "drop" else table_to_yield
+            tab = tab.dropna() if na_action == "drop" else tab
 
             # Create underscored name of a new column from the combination of column and dimensions
-            short_name = _slugify_column_and_dimensions(column, dims, dim_names)
+            short_name = _underscore_column_and_dimensions(column, dims, dim_names)
 
             # set new metadata with dimensions
             tab.metadata.short_name = short_name
@@ -209,17 +210,13 @@ def _title_column_and_dimensions(title: str, dims: List[str], dim_names: List[st
     return " - ".join([title] + dims)
 
 
-def _slugify_column_and_dimensions(column: str, dims: List[str], dim_names: List[str]) -> str:
+def _underscore_column_and_dimensions(column: str, dims: List[str], dim_names: List[str]) -> str:
     # add dimension names to dimensions
     dims = [f"{dim_name}_{dim}" for dim, dim_name in zip(dims, dim_names)]
 
-    # underscore everything, separate dimensions & column with double __
-    slug = "__".join([slugify.slugify(n, separator="_") for n in [column] + list(dims)])
-
-    # slugify would strip the leading underscore, put it back in that case
-    if column.startswith("_"):
-        slug = f"_{slug}"
-
+    # underscore dimensions and append them using double underscores
+    # NOTE: `column` has been already underscored in a table
+    slug = "__".join([column] + [underscore(n) for n in dims])
     return cast(str, slug)
 
 
