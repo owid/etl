@@ -50,11 +50,12 @@ def run(dest_dir: str) -> None:
     # The original excel file is poorly formatted and will be hard to parse automatically.
     fuel_input = pd.read_excel(local_file, sheet_name="Fuel input")
     supply = pd.read_excel(local_file, sheet_name="Supply, availability & consump")
+    efficiency = pd.read_excel(local_file, sheet_name="Generated and supplied")
 
     #
     # Process data.
     #
-    # Process data from the fuels input sheet.
+    # Process data from the sheet about fuels input for electricity generation.
     fuel_input = prepare_data(
         df=fuel_input,
         expected_content={
@@ -80,7 +81,7 @@ def run(dest_dir: str) -> None:
         },
     )
 
-    # Prepare data from the supply sheet.
+    # Prepare data from the sheet about electricity supply, availability and consumption.
     supply = prepare_data(
         df=supply,
         expected_content={
@@ -91,6 +92,18 @@ def run(dest_dir: str) -> None:
             0: "year",
             1: "electricity_generation",
             3: "net_imports",
+        },
+    )
+
+    # Prepare data from the sheet about electricity generated and supplied.
+    efficiency = prepare_data(
+        df=efficiency,
+        expected_content={
+            33: ["Implied", "Efficiency"],
+        },
+        columns={
+            0: "year",
+            33: "implied_efficiency",
         },
     )
 
@@ -119,6 +132,14 @@ def run(dest_dir: str) -> None:
             description=walden_ds.description,
         ),
     )
+    tb_efficiency = Table(
+        efficiency,
+        metadata=TableMeta(
+            short_name="efficiency",
+            title="Electricity generated and supplied",
+            description=walden_ds.description,
+        ),
+    )
 
     # Underscore all table columns.
     tb_fuel_input = underscore_table(tb_fuel_input)
@@ -127,6 +148,7 @@ def run(dest_dir: str) -> None:
     # Add tables to a dataset.
     ds.add(tb_fuel_input)
     ds.add(tb_supply)
+    ds.add(tb_efficiency)
 
     # Save the dataset.
     ds.save()
