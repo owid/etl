@@ -15,7 +15,7 @@ def run(dest_dir: str) -> None:
     # NOTE: this generates shortName `population_density__owid_latest`, perhaps we should keep it as `population_density`
     # and create unique constraint on (shortName, version, namespace) instead of just (shortName, namespace)
     garden_dataset = catalog.Dataset(KEY_INDICATORS_GARDEN)
-    dataset = _adapt_dataset_metadata_for_grapher_patch(dest_dir, garden_dataset)
+    dataset = catalog.Dataset.create_empty(dest_dir, gh.adapt_dataset_metadata_for_grapher(garden_dataset.metadata))
 
     # Get population table
     table = garden_dataset["population"].reset_index()
@@ -25,15 +25,15 @@ def run(dest_dir: str) -> None:
     # table["population_historical"] = deepcopy(table["population"])
     # table["population_projection"] = deepcopy(table["population"])
     # Add population table to dataset
-    table = _adapt_table_for_grapher_patch(table)
+    table = gh.adapt_table_for_grapher(table)
     dataset.add(table)
 
     # Add land area table to dataset
-    table = _adapt_table_for_grapher_patch(garden_dataset["land_area"].reset_index())
+    table = gh.adapt_table_for_grapher(garden_dataset["land_area"].reset_index())
     dataset.add(table)
 
     # Add population density table to dataset
-    table = _adapt_table_for_grapher_patch(garden_dataset["population_density"].reset_index())
+    table = gh.adapt_table_for_grapher(garden_dataset["population_density"].reset_index())
     dataset.add(table)
 
     # Save dataset
