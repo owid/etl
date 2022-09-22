@@ -1,0 +1,27 @@
+dataset:
+  sources:
+    -
+      name: Global Burden of Disease Study (2019) - Deaths and DALYs
+      published_by: Institute of Health Metrics and Evaluation
+
+tables:
+  gbd_cause:
+    variables:
+      dalys__disability_adjusted_life_years__rate:
+        title: DALYs (rate)
+        unit: DALYs per 100,000 people
+      dalys__disability_adjusted_life_years__number:
+        title: DALYs (number)
+        unit: DALYs
+      dalys__disability_adjusted_life_years__percent:
+        title: DALYs (percent)
+        unit: "%"
+      deaths__number:
+        title: Deaths (number)
+        unit: deaths
+      deaths__rate:
+        title: Deaths (rate)
+        unit: deaths per 100,000 people
+      deaths__percent:
+        title: Deaths (percent)
+        unit: "%"

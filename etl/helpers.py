@@ -98,6 +98,10 @@ class Names:
         return self.f.parent / (self.short_name + ".meta.yml")
 
     @property
+    def directory(self) -> Path:
+        return self.f.parent
+
+    @property
     def meadow_dataset(self) -> catalog.Dataset:
         return catalog.Dataset(paths.DATA_DIR / f"meadow/{self.namespace}/{self.version}/{self.short_name}")
 
