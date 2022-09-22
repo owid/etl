@@ -1,0 +1,18 @@
+dataset:
+  sources:
+    -
+      name: Global Burden of Disease Study (2019) - Prevalence and incidence  
+      published_by: Institute of Health Metrics and Evaluation
+
+tables:
+  gbd_prevalence:
+    variables:
+      measure:
+        title: Measure name
+        description: Prevalence or incidence of conditions within a population. Prevalence is total population with a condition, incidence is the number of new cases each year. 
+      cause:
+        title: Type of condition
+        description: A condition that impacts an individuals health or well-being.
+      value:
+        title: Number of individuals
+        description: The number/rate/percent of individuals within a population that are currently or newly impacted by a given condition.
