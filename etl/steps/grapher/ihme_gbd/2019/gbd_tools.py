@@ -24,7 +24,7 @@ def run_wrapper(garden_dataset: Dataset, dataset: Dataset, dims: List[str]) -> N
 
     # NOTE: it was `Global Burden of Disease Study (2019) - Deaths and DALYs` originally
     # all variables will inherit this source from dataset
-    dataset.metadata.sources = [Source(name="Global Burden of Disease Study (2019) - Deaths and DALYs")]
+    # dataset.metadata.sources = [Source(name="Global Burden of Disease Study (2019) - Deaths and DALYs")]
 
     # add tables to dataset
     tables = garden_dataset.table_names

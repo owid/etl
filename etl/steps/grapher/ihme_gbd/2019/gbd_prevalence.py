@@ -10,7 +10,7 @@ N = Names(__file__)
 
 
 def run(dest_dir: str) -> None:
-    garden_dataset = catalog.Dataset(DATA_DIR / f"garden/{N.namespace}/{N.version}/{N.short_name}")
+    garden_dataset = N.garden_dataset
     dataset = catalog.Dataset.create_empty(dest_dir, gh.adapt_dataset_metadata_for_grapher(garden_dataset.metadata))
     dataset.save()
 
