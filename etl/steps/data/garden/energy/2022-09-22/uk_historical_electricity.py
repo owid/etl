@@ -9,7 +9,7 @@ import numpy as np
 import pandas as pd
 from owid import catalog
 from owid.datautils import dataframes
-from shared import CURRENT_DIR, gather_sources_from_tables
+from shared import CURRENT_DIR
 
 from etl.paths import DATA_DIR
 
@@ -153,8 +153,6 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     ds_garden = catalog.Dataset.create_empty(dest_dir)
-    # Gather metadata sources from all tables' original dataset sources.
-    ds_garden.metadata.sources = gather_sources_from_tables(tables=[tb_elec, tb_beis])
     # Get the rest of the metadata from the yaml file.
     ds_garden.metadata.update_from_yaml(METADATA_PATH, if_source_exists="replace")
     # Create dataset.
