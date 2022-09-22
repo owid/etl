@@ -2,7 +2,6 @@ from owid import catalog
 
 from etl import grapher_helpers as gh
 from etl.helpers import Names
-from etl.paths import DATA_DIR
 
 from .gbd_tools import run_wrapper
 
