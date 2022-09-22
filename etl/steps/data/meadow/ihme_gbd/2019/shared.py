@@ -39,10 +39,12 @@ def read_and_clean_data(local_file: str) -> pd.DataFrame:
     arrow_table = feather.read_table(local_file)
 
     dfs = []
-    for metric_name in ("Percent", "Number", "Rate"):
-        dfs.append(clean_data(arrow_table.filter(pc.equal(arrow_table["metric_name"], metric_name)).to_pandas()))
-
-    return pd.concat(dfs)
+    if "metric_name" in arrow_table.column_names:
+        for metric_name in ("Percent", "Number", "Rate"):
+            dfs.append(clean_data(arrow_table.filter(pc.equal(arrow_table["metric_name"], metric_name)).to_pandas()))
+        return pd.concat(dfs)
+    else:
+        return clean_data(arrow_table.to_pandas())
 
 
 def run_wrapper(dataset: Path, metadata_path: Path, namespace: Path, version: Path, dest_dir: str) -> None:
