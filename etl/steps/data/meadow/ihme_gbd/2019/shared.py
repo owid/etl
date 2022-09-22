@@ -38,10 +38,17 @@ def read_and_clean_data(local_file: str) -> pd.DataFrame:
     is the culprit). So we read the data in chunks and clean each chunk separately."""
     arrow_table = feather.read_table(local_file)
 
-    dfs = []
     if "metric_name" in arrow_table.column_names:
-        for metric_name in ("Percent", "Number", "Rate"):
-            dfs.append(clean_data(arrow_table.filter(pc.equal(arrow_table["metric_name"], metric_name)).to_pandas()))
+        partition = "metric_name"
+    elif "metric" in arrow_table.column_names:
+        partition = "metric"
+    else:
+        partition = ""
+
+    if partition:
+        dfs = []
+        for partition_name in arrow_table[partition].unique().to_pylist():
+            dfs.append(clean_data(arrow_table.filter(pc.equal(arrow_table[partition], partition_name)).to_pandas()))
         return pd.concat(dfs)
     else:
         return clean_data(arrow_table.to_pandas())
