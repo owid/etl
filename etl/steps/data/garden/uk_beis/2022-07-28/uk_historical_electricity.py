@@ -1,7 +1,7 @@
 import pandas as pd
 from owid import catalog
-from shared import CURRENT_DIR
 from owid.datautils import dataframes
+from shared import CURRENT_DIR
 
 from etl.helpers import Names
 from etl.paths import DATA_DIR
@@ -15,7 +15,9 @@ MEADOW_PATH = DATA_DIR / f"meadow/uk_beis/2022-07-28/{DATASET_SHORT_NAME}"
 MTOE_TO_TWH = 11.63
 
 
-def combine_tables(tb_fuel_input: catalog.Table, tb_supply: catalog.Table, tb_efficiency: catalog.Table) -> catalog.Table:
+def combine_tables(
+    tb_fuel_input: catalog.Table, tb_supply: catalog.Table, tb_efficiency: catalog.Table
+) -> catalog.Table:
     tb_fuel_input = tb_fuel_input.copy()
     tb_supply = tb_supply.copy()
     tb_efficiency = tb_efficiency.copy()
