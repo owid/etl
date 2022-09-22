@@ -251,6 +251,18 @@ def grapher(
         **ctx.obj,
     )
 
+    remote_sources_df = read_sources_from_db(remote_env, namespace, version, dataset)
+    local_sources_df = read_sources_from_db(local_env, namespace, version, dataset)
+
+    print("\n[magenta]=== Comparing sources ===[/magenta]")
+    diff_print(
+        remote_sources_df,
+        local_sources_df,
+        "remote",
+        "local",
+        **ctx.obj,
+    )
+
     if data_values:
         remote_data_values_df = read_data_values_from_db(remote_env, namespace, version, dataset)
         local_data_values_df = read_data_values_from_db(local_env, namespace, version, dataset)
@@ -298,6 +310,31 @@ def read_variables_from_db(env_path: str, namespace: str, version: str, dataset:
     SELECT
         variables.*
     FROM variables
+    JOIN datasets as d ON variables.datasetId = d.id
+    WHERE d.version = %(version)s and d.namespace = %(namespace)s and d.shortName = %(dataset)s
+    """
+
+    df = pd.read_sql(
+        q,
+        engine,
+        params={"version": version, "namespace": namespace, "dataset": dataset},
+    )
+
+    # drop uninteresting columns
+    df = df.drop(["updatedAt", "createdAt"], axis=1)
+
+    return cast(pd.DataFrame, df)
+
+
+def read_sources_from_db(env_path: str, namespace: str, version: str, dataset: str) -> pd.DataFrame:
+    engine = get_engine(dotenv_values(env_path))
+
+    # compare only variables sources, we are not using dataset sources for anything
+    q = """
+    SELECT distinct
+        sources.*
+    FROM sources
+    JOIN variables ON sources.id = variables.sourceId
     JOIN datasets as d ON variables.datasetId = d.id
     WHERE d.version = %(version)s and d.namespace = %(namespace)s and d.shortName = %(dataset)s
     """
