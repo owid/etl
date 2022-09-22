@@ -41,6 +41,10 @@ IPDB_ENABLED = False
 # NOTE: this will soon be deprecated after we get rid of data_values
 GRAPHER_INSERT_WORKERS = int(env.get("GRAPHER_WORKERS", 10))
 
+# forbid any individual step from consuming more than this much memory
+# (only enforced on Linux)
+MAX_VIRTUAL_MEMORY_LINUX = 10 * 2**30  # 10 GB
+
 
 def enable_bugsnag() -> None:
     BUGSNAG_API_KEY = env.get("BUGSNAG_API_KEY")
