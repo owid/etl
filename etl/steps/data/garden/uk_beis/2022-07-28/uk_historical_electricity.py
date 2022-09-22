@@ -33,9 +33,6 @@ def combine_tables(tb_fuel_input: catalog.Table, tb_supply: catalog.Table, tb_ef
     # Convert units of fuel input data.
     for column in df_fuel_input.set_index("year").columns:
         df_fuel_input[column] *= MTOE_TO_TWH
-    
-    # Add column for the sum of electricity generation and net imports.
-    df_supply["electricity_generation_plus_net_imports"] = df_supply["electricity_generation"] + df_supply["net_imports"]
 
     # Combine dataframes.
     df_combined = dataframes.multi_merge(dfs=[df_fuel_input, df_supply, df_efficiency], how="outer", on="year")
@@ -79,9 +76,8 @@ def run(dest_dir: str) -> None:
     ds_garden = catalog.Dataset.create_empty(dest_dir)
     ds_garden.metadata = ds_meadow.metadata
     # Get metadata from yaml file.
-    ds_garden.metadata.update_from_yaml(N.metadata_path)
+    ds_garden.metadata.update_from_yaml(N.metadata_path, if_source_exists="replace")
     tb_garden.update_metadata_from_yaml(N.metadata_path, DATASET_SHORT_NAME)
 
     ds_garden.add(tb_garden)
     ds_garden.save()
-
