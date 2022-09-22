@@ -1,7 +1,7 @@
 from typing import List
 
 import pandas as pd
-from owid.catalog import Dataset, Source
+from owid.catalog import Dataset
 from structlog import get_logger
 
 from etl import grapher_helpers as gh
