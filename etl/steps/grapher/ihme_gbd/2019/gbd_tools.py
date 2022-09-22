@@ -33,13 +33,11 @@ def run_wrapper(garden_dataset: Dataset, dataset: Dataset, dims: List[str]) -> N
 
         tab.reset_index(inplace=True)
 
-        # NOTE: we no longer need `create_var_name`, variable names will be created automatically from dimensions
         tab["age"] = map_age(tab["age"])
 
-        # create entity_id from country
-        tab = gh.adapt_table_for_grapher(tab)
-
         # add more dimensions
-        tab = tab.set_index(dims, append=True)
+        tab.set_index(dims, inplace=True)
+
+        __import__("ipdb").set_trace()
 
         dataset.add(tab)
