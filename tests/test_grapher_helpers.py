@@ -148,7 +148,7 @@ def test_ensure_source_per_variable_multiple_sources():
     new_table = _ensure_source_per_variable(table)
     assert len(new_table.deaths.metadata.sources) == 1
     source = new_table.deaths.metadata.sources[0]
-    assert source.name == "s1 ; s2"
+    assert source.name == "s1; s2"
     assert source.description == "s1 description\ns2 description"
 
     # no sources
