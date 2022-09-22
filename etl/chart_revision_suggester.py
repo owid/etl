@@ -1,11 +1,19 @@
+"""
+Using the <mapping-file> JSON file mapping variable IDs from an old dataset to a new dataset, it creates a bunch of suggested chart revisions in Grapher.
+
+It connects to Grapher based on the environment file found in the project's root directory `path/to/etl/.env`.
+"""
 # The original script was originally from the owid/importers repo: https://github.com/owid/importers/blob/master/standard_importer/chart_revision_suggester.py
 
 import os
 import re
+import shutil
+import time
 import traceback
 from copy import deepcopy
 from typing import Any, Dict, Iterable, List, Literal, Optional, Tuple, Union
 
+import click
 import pandas as pd
 import simplejson as json
 import structlog
@@ -15,8 +23,76 @@ from tqdm import tqdm
 from etl.config import DEBUG, GRAPHER_USER_ID
 from etl.db import open_db
 from etl.grapher_helpers import IntRange
+from etl.paths import STEP_DIR
 
 log = structlog.get_logger()
+
+
+@click.command(help=__doc__)
+@click.option(
+    "-f",
+    "--mapping-file",
+    type=str,
+    help="Path to variable mapping json file.",
+    required=True,
+)
+@click.option(
+    "-n",
+    "--namespace",
+    type=str,
+    help="Namespace of the dataset.",
+    required=True,
+)
+@click.option(
+    "-v",
+    "--version",
+    type=str,
+    help="Version of the dataset.",
+    required=True,
+)
+@click.option(
+    "-d",
+    "--dataset-name",
+    type=str,
+    help="Name of the dataset.",
+    required=True,
+)
+def main_cli(mapping_file: str, namespace: str, version: str, dataset_name: str) -> None:
+    dataset_dir = os.path.join(STEP_DIR, "grapher", namespace, version)
+
+    handler = MappingFileHandler(dataset_dir, mapping_file)
+    handler.init()
+    try:
+        suggester = ChartRevisionSuggester(dataset_dir, version, dataset_name)
+        suggester.suggest()
+    except Exception as e:
+        print()
+        log.error(f"{e}")
+        if DEBUG:
+            traceback.print_exc()
+    finally:
+        handler.reset()
+
+
+class MappingFileHandler:
+    def __init__(self, dataset_dir: str, mapping_file: str):
+        self.mapping_file = mapping_file
+        self.config_dir = os.path.join(dataset_dir, "config")
+        self.config_mapping_file = os.path.join(self.config_dir, "variable_replacements.json")
+        self.config_mapping_file_tmp = f"{self.config_mapping_file}.{round(100 * time.time())}"
+
+    def init(self) -> None:
+        os.makedirs(self.config_dir, exist_ok=True)
+        if os.path.isfile(self.config_mapping_file):
+            os.rename(self.config_mapping_file, self.config_mapping_file_tmp)
+        shutil.copy2(self.mapping_file, self.config_mapping_file)
+
+    def reset(self) -> None:
+        if os.path.isfile(self.config_mapping_file_tmp):
+            os.remove(self.config_mapping_file)
+            os.rename(self.config_mapping_file_tmp, self.config_mapping_file)
+        else:
+            os.remove(self.config_mapping_file)
 
 
 class ChartRevisionSuggester:
@@ -210,7 +286,7 @@ class ChartRevisionSuggester:
                     # problem_chart_ids = [r[0] for r in res]
                     s = ""
                     for nm, gp in df.groupby("chart_id"):
-                        s += f"Chart ID: {nm}. Suggested chart revision IDs:" f" {gp['id'].tolist()}\n"
+                        s += f"Chart ID: {nm}. Suggested chart revision IDs: {gp['id'].tolist()}\n"
                     raise RuntimeError(
                         "For one or more of the suggested chart revisions that you are"
                         " trying to insert, a suggested chart revision already exists"
@@ -228,13 +304,13 @@ class ChartRevisionSuggester:
                 f"suggestedVersion, and isPendingOrFlagged. Error: {e}"
             )
         except Exception as e:
-            log.error("INSERT operation into `suggested_chart_revisions` cancelled." f" Error: {e}")
+            log.error(f"INSERT operation into `suggested_chart_revisions` cancelled. Error: {e}")
             raise e
         finally:
             with open_db() as db:
                 n_after = db.fetch_one("SELECT COUNT(id) FROM suggested_chart_revisions")[0]
 
-            log.info(f"{n_after - n_before} of {len(suggested_chart_revisions)} suggested" " chart revisions inserted.")
+            log.info(f"{n_after - n_before} of {len(suggested_chart_revisions)} suggested chart revisions inserted.")
 
     def _get_charts_from_old_variables(
         self,

@@ -69,13 +69,13 @@ dataset:
       date_accessed: 8th July 2022
       url: https://www.bp.com/en/global/corporate/energy-economics/statistical-review-of-world-energy.html
     -
-      name: Our World in Data based on Ember's Global Electricity Review (2022).
+      name: Our World in Data based on Ember's Global Electricity Review (2022)
       published_by: Ember
       publication_year: 2022
       date_accessed: 2022-08-01
       url: https://ember-climate.org/data/data-catalogue/yearly-electricity-data/
     -
-      name: Our World in Data based on Ember's European Electricity Review (2022).
+      name: Our World in Data based on Ember's European Electricity Review (2022)
       published_by: Ember
       publication_year: 2022
       date_accessed: 2022-08-01

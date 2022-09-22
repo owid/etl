@@ -405,13 +405,16 @@ def combine_metadata_sources(sources: List[catalog.Source]) -> catalog.Source:
             # Descriptions are usually long, so it is better so put together descriptions from different sources in
             # separate lines.
             combined_value = "\n".join(values)
-        elif attribute in ["date_accessed", "publication_year"]:
+        elif attribute in ["date_accessed", "publication_date", "publication_year"]:
             # For dates simply take the one from the first source.
             # TODO: Instead of picking the first source, choose the most recent date.
             combined_value = values[0] if values else None
+        elif attribute in ["url", "source_data_url", "owid_data_url"]:
+            # Separate urls with " ; " (ensuring there is space between the urls and the semi-colons).
+            combined_value = " ; ".join(values)
         else:
             # For any other attribute, values from different sources can be in the same line, separated by ;.
-            combined_value = " ; ".join(values)
+            combined_value = "; ".join(values)
 
         # Instead of leaving an empty string, make any empty field None.
         if combined_value == "":

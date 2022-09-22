@@ -1,0 +1,18 @@
+dataset:
+  sources:
+    -
+      name: Global Burden of Disease Study (2019) - Child mortality
+      published_by: Institute of Health Metrics and Evaluation
+
+tables:
+  gbd_mental_health:
+     variables:
+      prevalence__number:
+        title: Prevalence (number)
+        unit: cases
+      prevalence__rate:
+        title: Prevalence (rate)
+        unit: cases per 100,000 people
+      prevalence__percent:
+        title: Prevalence (percent)
+        unit: "%"
