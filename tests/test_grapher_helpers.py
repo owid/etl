@@ -5,6 +5,7 @@ from owid.catalog import DatasetMeta, Source, Table, TableMeta, VariableMeta
 
 from etl.grapher_helpers import (
     _ensure_source_per_variable,
+    combine_metadata_sources,
     contains_inf,
     yield_long_table,
     yield_wide_table,
@@ -166,3 +167,16 @@ def test_ensure_source_per_variable_multiple_sources():
     source = new_table.deaths.metadata.sources[0]
     assert source.name == "s1"
     assert source.description == "Table description"
+
+
+def test_combine_metadata_sources():
+    sources = [
+        Source(name="s1", description="s1 description"),
+        Source(name="s2", description="s2 description"),
+    ]
+    source = combine_metadata_sources(sources)
+    assert source.name == "s1; s2"
+    assert source.description == "s1 description\ns2 description"
+
+    # make sure we haven't modified original sources
+    assert sources[0].name == "s1"
