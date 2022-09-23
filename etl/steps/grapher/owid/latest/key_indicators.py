@@ -85,6 +85,8 @@ def _add_metric_new(
     if title_suffix:
         table[metric_new].metadata.title = f"{table[metric_new].metadata.title} {title_suffix}"
     if display_name_suffix:
-        table[metric_new].metadata.display["name"] = f"{table[metric_new].metadata.display['name']} {display_name_suffix}"
+        table[metric_new].metadata.display[
+            "name"
+        ] = f"{table[metric_new].metadata.display['name']} {display_name_suffix}"
     table[metric_new].metadata.description = table[metric_new].metadata.description.replace(*description_year_replace)
     return table.astype({metric_new: dtype})
