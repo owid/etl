@@ -2,7 +2,7 @@ from copy import deepcopy
 from typing import Any, List
 
 import numpy as np
-from owid import catalog, walden
+from owid import catalog
 
 from etl import grapher_helpers as gh
 from etl.paths import DATA_DIR
@@ -38,27 +38,6 @@ def run(dest_dir: str) -> None:
 
     # Save dataset
     dataset.save()
-
-
-def _adapt_dataset_metadata_for_grapher_patch(dest_dir: str, garden_dataset: walden.Dataset) -> catalog.Dataset:
-    """Fixes source separator in dataset ' ; ' -> '; '"""
-    dataset = catalog.Dataset.create_empty(dest_dir, gh.adapt_dataset_metadata_for_grapher(garden_dataset.metadata))
-    dataset.metadata.sources = _patch_source_separator_field(dataset.metadata.sources)
-    return dataset
-
-
-def _adapt_table_for_grapher_patch(table: catalog.Table) -> catalog.Table:
-    """Fixes source separator in variables ' ; ' -> '; '"""
-    table = gh.adapt_table_for_grapher(table)
-    for col in table.columns:
-        table[col].metadata.sources = _patch_source_separator_field(table[col].metadata.sources)
-    return table
-
-
-def _patch_source_separator_field(sources: List[catalog.Source]) -> List[catalog.Source]:
-    assert len(sources) == 1
-    sources[0].name = sources[0].name.replace(" ; ", "; ")
-    return sources
 
 
 def _split_in_projection_and_historical(table: catalog.Table, year_threshold: int, metric: str) -> catalog.Table:
