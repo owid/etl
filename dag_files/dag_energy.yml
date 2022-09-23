@@ -5,6 +5,7 @@ steps:
   # NOTE: This dataset is not used in grapher. It exists only to fill gaps in the 2022 version.
   data://garden/bp/2022-07-11/statistical_review:
     - backport://backport/owid/latest/dataset_5347_statistical_review_of_world_energy__bp__2021
+    - data://garden/owid/latest/key_indicators
   #
   # BP - Statistical review 2022.
   #
@@ -51,6 +52,7 @@ steps:
     - walden://eia/2022-07-27/international_energy_data
   data://garden/eia/2022-07-27/energy_consumption:
     - data://meadow/eia/2022-07-27/energy_consumption
+    - data://garden/owid/latest/key_indicators
   #
   # Energy - Primary energy consumption 2022.
   #
@@ -68,6 +70,7 @@ steps:
     - walden://ember/2022-07-25/global_electricity_review
   data://garden/ember/2022-08-01/global_electricity_review:
     - data://meadow/ember/2022-08-01/global_electricity_review
+    - data://garden/owid/latest/key_indicators
   #
   # Ember - European electricity review 2022.
   #
