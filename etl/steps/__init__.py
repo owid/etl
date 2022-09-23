@@ -517,6 +517,8 @@ class GrapherStep(Step):
         # save dataset to grapher DB
         dataset = self.dataset
 
+        dataset.metadata = gh._adapt_dataset_metadata_for_grapher(dataset.metadata)
+
         dataset_upsert_results = upsert_dataset(
             dataset,
             dataset.metadata.namespace,
@@ -531,8 +533,10 @@ class GrapherStep(Step):
         for table in dataset:
             catalog_path = f"{self.path}/{table.metadata.short_name}"
 
+            table = gh._adapt_table_for_grapher(table)
+
             # generate table with entity_id, year and value for every column
-            tables = gh.yield_wide_table(table, na_action="drop")
+            tables = gh._yield_wide_table(table, na_action="drop")
             upsert = lambda t: upsert_table(  # noqa: E731
                 t,
                 dataset_upsert_results,
@@ -557,7 +561,7 @@ class GrapherStep(Step):
         set_dataset_checksum(dataset_upsert_results.dataset_id, self.data_step.checksum_input())
 
     def checksum_output(self) -> str:
-        raise NotImplementedError("UpsertStep should not be used as an input")
+        raise NotImplementedError("GrapherStep should not be used as an input")
 
     @classmethod
     def _cleanup_ghost_resources(
