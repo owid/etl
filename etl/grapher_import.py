@@ -49,7 +49,9 @@ INT_TYPES = (
 # once we switch to catalogPath, no data will be upserted to data_values
 BLACKLIST_DATASETS_DATA_VALUES_UPSERTS = [
     "gbd_cause",
+    "gbd_risk",
     "gbd_prevalence",
+    "gbd_child_mortality",
 ]
 
 
@@ -253,8 +255,7 @@ def upsert_table(
 
     if table.metadata.dataset.short_name not in BLACKLIST_DATASETS_DATA_VALUES_UPSERTS:
         insert_to_data_values(df)
-
-    log.info("upsert_table.upserted_data_values", size=len(table))
+        log.info("upsert_table.upserted_data_values", size=len(table))
 
     return VariableUpsertResult(variable.id, source_id)
 
