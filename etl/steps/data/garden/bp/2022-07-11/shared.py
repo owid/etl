@@ -7,6 +7,8 @@ from owid import catalog
 from owid.datautils import geo
 from structlog import get_logger
 
+from etl.paths import DATA_DIR
+
 log = get_logger()
 
 CURRENT_DIR = Path(__file__).parent
@@ -141,11 +143,9 @@ def load_population() -> pd.DataFrame:
 
     """
     # Load population dataset.
-    population = (
-        catalog.find("population", namespace="owid", dataset="key_indicators")
-        .load()
-        .reset_index()[["country", "year", "population"]]
-    )
+    population = catalog.Dataset(DATA_DIR / "garden/owid/latest/key_indicators/")["population"].reset_index()[
+        ["country", "year", "population"]
+    ]
 
     # Add data for historical regions (if not in population) by adding the population of its current successors.
     countries_with_population = population["country"].unique()
