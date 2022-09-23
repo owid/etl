@@ -49,6 +49,7 @@ def _split_in_projection_and_historical(table: catalog.Table, year_threshold: in
         metric,
         mask,
         "historical",
+        "(historical estimates)",
         "",
         ["10,000 BCE to 2100", f"10,000 BCE to {year_threshold - 1}"],
     )
@@ -58,6 +59,7 @@ def _split_in_projection_and_historical(table: catalog.Table, year_threshold: in
         metric,
         -mask,
         "projection",
+        "(future projections)",
         "(future projections)",
         ["10,000 BCE to 2100", f"{year_threshold} to 2100"],
     )
@@ -70,6 +72,7 @@ def _add_metric_new(
     mask: List[Any],
     metric_suffix: str,
     title_suffix: str,
+    display_name_suffix: str,
     description_year_replace: List[str],
 ) -> catalog.Table:
     # Get dtype
@@ -81,6 +84,7 @@ def _add_metric_new(
     table[metric_new].metadata = deepcopy(table[metric].metadata)
     if title_suffix:
         table[metric_new].metadata.title = f"{table[metric_new].metadata.title} {title_suffix}"
-        table[metric_new].metadata.display["name"] = f"{table[metric_new].metadata.display['name']} {title_suffix}"
+    if display_name_suffix:
+        table[metric_new].metadata.display["name"] = f"{table[metric_new].metadata.display['name']} {display_name_suffix}"
     table[metric_new].metadata.description = table[metric_new].metadata.description.replace(*description_year_replace)
     return table.astype({metric_new: dtype})
