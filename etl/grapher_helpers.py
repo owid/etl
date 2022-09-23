@@ -483,13 +483,23 @@ def _adapt_table_for_grapher(
 
     """
     table = deepcopy(table)
-    if "entity_id" not in table.index.names and "year" not in table.index.names:
+
+    # Remember original dimensions
+    dim_names = [n for n in table.index.names if n and n not in ("year", "entity_id", country_col)]
+
+    # Reset index unless we have default index
+    if table.index.names != [None]:
+        table = table.reset_index()
+
+    assert "year" in table.columns
+
+    if "entity_id" not in table.columns:
+        assert country_col in table.columns
         # Grapher needs a column entity id, that is constructed based on the unique entity names in the database.
         table["entity_id"] = country_to_entity_id(table[country_col], create_entities=True)
         table = table.drop(columns=[country_col]).rename(columns={year_col: "year"})
-        table = table.set_index(["entity_id", "year"])
-    else:
-        assert {"entity_id", "year"} <= set(table.index.names)
+
+    table = table.set_index(["entity_id", "year"] + dim_names)
 
     # Ensure the default source of each column includes the description of the table (since that is the description that
     # will appear in grapher on the SOURCES tab).
