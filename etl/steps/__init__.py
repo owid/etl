@@ -358,10 +358,12 @@ class DataStep(Step):
 
     def _step_files(self) -> List[str]:
         "Return a list of code files defining this step."
+        # if dataset is a folder, use all its files
         if self._search_path.is_dir():
             return [p.as_posix() for p in files.walk(self._search_path)]
 
-        return glob(self._search_path.as_posix() + ".*")
+        # if a dataset is a single file, use [dataset].py and shared* files
+        return glob(self._search_path.as_posix() + ".*") + glob((self._search_path.parent / "shared*").as_posix())
 
     @property
     def _search_path(self) -> Path:
