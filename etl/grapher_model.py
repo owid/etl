@@ -702,20 +702,28 @@ class Variable(SQLModel, table=True):
         assert self.shortName
 
         cls = self.__class__
+
+        # try matching on shortName first
         q = select(cls).where(
-            # old variables don't have a shortName, but can be identified with `name`
             or_(
                 cls.shortName == self.shortName,
                 # NOTE: we used to slugify shortName which replaced double underscore by a single underscore
                 # this was a bug, we should have kept the double underscore
                 # match even those variables and correct their shortName
                 cls.shortName == self.shortName.replace("__", "_"),
-                cls.shortName.is_(None),  # type: ignore
             ),
-            cls.name == self.name,
             cls.datasetId == self.datasetId,
         )
         ds = session.exec(q).one_or_none()
+
+        # try matching on name if there was no match on shortName
+        if not ds:
+            q = select(cls).where(
+                cls.name == self.name,
+                cls.datasetId == self.datasetId,
+            )
+            ds = session.exec(q).one_or_none()
+
         if not ds:
             ds = self
         else:

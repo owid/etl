@@ -3,7 +3,6 @@ from pathlib import Path
 import structlog
 from owid.catalog import Dataset
 
-from etl import grapher_helpers as gh
 from etl.paths import DATA_DIR
 
 log = structlog.get_logger()
@@ -23,7 +22,4 @@ def run(dest_dir: str) -> None:
     assert len(table.metadata.primary_key) == 2
 
     table.reset_index(inplace=True)
-    table["entity_id"] = gh.country_to_entity_id(table["country"], create_entities=True)
-    table = table.drop(columns=["country"]).set_index(["year", "entity_id"])
-
     dataset.add(table)
