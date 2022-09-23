@@ -269,7 +269,7 @@ VNM,Vietnam,VN,VNM,582.0,DRV,816.0,VIE,VM,VNM0,VNM,VNM,http://www.wikidata.org/e
 WLF,Wallis and Futuna,WF,WLF,,,,,WF,,WLF,WLF,http://www.wikidata.org/entity/Q35555,Wallis and Futuna,255.0,785.0,,"[""Wallis & Futuna"", ""Wallis and Futuna Islands""]"
 OWID_GFR,West Germany,,,,GFR,260.0,,,,,,,,185.0,814.0,,"[""Germany, West""]"
 ESH,Western Sahara,EH,ESH,,,,,SS,,ESH,ESH,http://www.wikidata.org/entity/Q6250,Western Sahara,248.0,623.0,,
-OWID_WRL,World,,,,,,,,,,,,,355.0,559.0,"[""OWID_NAM"", ""OWID_ASI"", ""OWID_AFR"", ""OWID_EUR"", ""OWID_SAM"", ""OWID_OCE"", ""ATA""]",
+OWID_WRL,World,,,,,,,,,,,,,355.0,559.0,"[""OWID_NAM"", ""OWID_ASI"", ""OWID_AFR"", ""OWID_EUR"", ""OWID_SAM"", ""OWID_OCE"", ""ATA""]","[""Global""]"
 OWID_WRT,Wuerttemburg,,,,WRT,271.0,,,,,,,,369.0,818.0,,
 YEM,Yemen,YE,YEM,474.0,YEM,679.0,YEM,YE,YNMS,YEM,YEM,http://www.wikidata.org/entity/Q805,Yemen,61.0,787.0,,"[""Yemen, Rep.""]"
 OWID_YAR,Yemen Arab Republic,,,,YAR,678.0,,,,,,,,381.0,830.0,,
