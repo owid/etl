@@ -383,7 +383,7 @@ def combine_metadata_sources(sources: List[catalog.Source]) -> catalog.Source:
     assert len(sources) >= 1, "Dataset needs to have at least one source in metadata."
 
     # Define the 'default_source', which will be the one where all sources' attributes are combined.
-    default_source = sources[0]
+    default_source = copy.deepcopy(sources[0])
     # Attributes to combine from sources.
     attributes = [
         "name",
