@@ -13,8 +13,8 @@ VERSION = "2022-09-14"
 DATASET_NAME = "emissions_weighted_carbon_price"
 TABLE_NAME = DATASET_NAME
 # Path to country names file.
-# NOTE: This countries file contains fewer countries than the one for world_cabon_pricing (since those countries
-#  did not have any relevant data). Here we ignore all regions inside countries, but include "World" as a country.
+# NOTE: This countries file contains as many countries as the file for world_cabon_pricing, plus "World".
+#  Here we ignore all regions inside countries.
 COUNTRIES_PATH = STEP_DIR / f"data/garden/rff/{VERSION}/{DATASET_NAME}.countries.json"
 # Path to metadata file.
 METADATA_PATH = STEP_DIR / f"data/garden/rff/{VERSION}/{DATASET_NAME}.meta.yml"
@@ -25,51 +25,50 @@ MEADOW_PATH_COVERAGE = DATA_DIR / f"meadow/rff/{MEADOW_VERSION}/emissions_weight
 
 # Columns to keep from raw dataset and how to rename them.
 COLUMNS = {
-    'jurisdiction': 'country',
-    'year': 'year',
+    "jurisdiction": "country",
+    "year": "year",
     # Emissions-weighted average price on emissions covered by either a carbon tax or an ETS.
     # Weights: share of jurisdiction total CO2 emissions.
-    'ecp_all_jurco2_kusd': 'price_with_tax_or_ets_weighted_by_share_of_co2',
+    "ecp_all_jurco2_kusd": "price_with_tax_or_ets_weighted_by_share_of_co2",
     # Emissions-weighted average price on emissions covered by either a carbon tax or an ETS.
     # Weights: share of jurisdiction total GHG emissions.
-    'ecp_all_jurghg_kusd': 'price_with_tax_or_ets_weighted_by_share_of_ghg',
+    "ecp_all_jurghg_kusd": "price_with_tax_or_ets_weighted_by_share_of_ghg",
     # Emissions-weighted average price on emissions covered by an ETS.
     # Weights: share of jurisdiction total CO2 emissions.
-    'ecp_ets_jurco2_kusd': 'price_with_ets_weighted_by_share_of_co2',
+    "ecp_ets_jurco2_kusd": "price_with_ets_weighted_by_share_of_co2",
     # Emissions-weighted average price on emissions covered by an ETS.
     # Weights: share of jurisdiction total GHG emissions.
-    'ecp_ets_jurghg_kusd': 'price_with_ets_weighted_by_share_of_ghg',
+    "ecp_ets_jurghg_kusd": "price_with_ets_weighted_by_share_of_ghg",
     # Emissions-weighted average price on emissions covered by a carbon tax.
     # Weights: share of jurisdiction total CO2 emissions.
-    'ecp_tax_jurco2_kusd': 'price_with_tax_weighted_by_share_of_co2',
+    "ecp_tax_jurco2_kusd": "price_with_tax_weighted_by_share_of_co2",
     # Emissions-weighted average price on emissions covered by a carbon tax.
     # Weights: share of jurisdiction total GHG emissions.
-    'ecp_tax_jurghg_kusd': 'price_with_tax_weighted_by_share_of_ghg',
+    "ecp_tax_jurghg_kusd": "price_with_tax_weighted_by_share_of_ghg",
     # CO2 emissions covered by either a carbon tax or an ETS as a share of jurisdiction total CO2 emissions.
-    'cov_all_co2_jurco2': 'co2_with_tax_or_ets_as_share_of_co2',
+    "cov_all_co2_jurco2": "co2_with_tax_or_ets_as_share_of_co2",
     # CO2 emissions covered by either a carbon tax or an ETS as a share of jurisdiction total GHG emissions.
-    'cov_all_co2_jurghg': 'co2_with_tax_or_ets_as_share_of_ghg',
+    "cov_all_co2_jurghg": "co2_with_tax_or_ets_as_share_of_ghg",
     # CO2 emissions covered by either carbon taxes or an ETS as a share of world total CO2 emissions.
-    'cov_all_co2_wldco2': 'co2_with_tax_or_ets_as_share_of_world_co2',
+    "cov_all_co2_wldco2": "co2_with_tax_or_ets_as_share_of_world_co2",
     # CO2 emissions covered by either carbon taxes or an ETS as a share of world total GHG emissions.
-    'cov_all_co2_wldghg': 'co2_with_tax_or_ets_as_share_of_world_ghg',
+    "cov_all_co2_wldghg": "co2_with_tax_or_ets_as_share_of_world_ghg",
     # CO2 emissions covered by an ETS as a share of jurisdiction total CO2 emissions.
-    'cov_ets_co2_jurco2': 'co2_with_ets_as_share_of_co2',
+    "cov_ets_co2_jurco2": "co2_with_ets_as_share_of_co2",
     # CO2 emissions covered by an ETS as a share of jurisdiction total GHG emissions.
-    'cov_ets_co2_jurghg': 'co2_with_ets_as_share_of_ghg',
+    "cov_ets_co2_jurghg": "co2_with_ets_as_share_of_ghg",
     # CO2 emissions covered by an ETS as a share of world total CO2 emissions.
-    'cov_ets_co2_wldco2': 'co2_with_ets_as_share_of_world_co2',
+    "cov_ets_co2_wldco2": "co2_with_ets_as_share_of_world_co2",
     # CO2 emissions covered by an ETS as a share of world total GHG emissions.
-    'cov_ets_co2_wldghg': 'co2_with_ets_as_share_of_world_ghg',
+    "cov_ets_co2_wldghg": "co2_with_ets_as_share_of_world_ghg",
     # CO2 emissions covered by a carbon tax as a share of jurisdiction total CO2 emissions.
-    'cov_tax_co2_jurco2': 'co2_with_tax_as_share_of_co2',
+    "cov_tax_co2_jurco2": "co2_with_tax_as_share_of_co2",
     # CO2 emissions covered by a carbon tax as a share of jurisdiction total GHG emissions.
-    'cov_tax_co2_jurghg': 'co2_with_tax_as_share_of_ghg',
+    "cov_tax_co2_jurghg": "co2_with_tax_as_share_of_ghg",
     # CO2 emissions covered by a carbon tax as a share of world total CO2 emissions.
-    'cov_tax_co2_wldco2': 'co2_with_tax_as_share_of_world_co2',
+    "cov_tax_co2_wldco2": "co2_with_tax_as_share_of_world_co2",
     # CO2 emissions covered by a carbon tax as a share of world total GHG emissions.
-    'cov_tax_co2_wldghg': 'co2_with_tax_as_share_of_world_ghg',
-    
+    "cov_tax_co2_wldghg": "co2_with_tax_as_share_of_world_ghg",
     # # Other variables that are only relevant when considering sub-country regions (that we ignore for now):
     # # Emissions-weighted average price on emissions covered by either a carbon tax or an ETS.
     # # Weights: share of national jurisdiction total CO2 emissions.
@@ -143,7 +142,7 @@ def run(dest_dir: str) -> None:
 
     # Convert all values in coverage to percentages (instead of fractions).
     df_coverage.loc[:, [column for column in df_coverage.columns if column not in ["jurisdiction", "year"]]] *= 100
-    
+
     # Combine both dataframes.
     df_combined = pd.merge(df_economy, df_coverage, how="outer", on=["jurisdiction", "year"])
 
@@ -162,7 +161,8 @@ def run(dest_dir: str) -> None:
         countries_file=str(COUNTRIES_PATH),
         warn_on_unused_countries=False,
         warn_on_missing_countries=False,
-        make_missing_countries_nan=True)    
+        make_missing_countries_nan=True,
+    )
 
     # Remove sub-regions within a country.
     df_combined = df_combined.dropna(subset=["country"]).reset_index(drop=True)
@@ -170,7 +170,6 @@ def run(dest_dir: str) -> None:
     # Sanity checks.
     error = "There should be no columns with only nans."
     assert df_combined.columns[df_combined.isna().all()].empty, error
-
     error = f"Country named 'World' should be included in the countries file {COUNTRIES_PATH.name}."
     assert "World" in set(df_combined["country"]), error
 

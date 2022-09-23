@@ -27,9 +27,8 @@ def run(dest_dir: str) -> None:
     # Sanity check.
     error = "There should be one row per jurisdiction-year."
     assert df[df.duplicated(subset=["jurisdiction", "year"])].empty, error
-
     error = "There should not be any row that only has nan data."
-    assert df[df.drop(columns=["jurisdiction", "year"]).isnull().all(axis=1)].empty
+    assert df[df.drop(columns=["jurisdiction", "year"]).isnull().all(axis=1)].empty, error
 
     # Set an index and sort conveniently.
     df = df.set_index(["jurisdiction", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
