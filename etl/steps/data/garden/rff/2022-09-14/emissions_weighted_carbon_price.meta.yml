@@ -1,13 +1,14 @@
 dataset:
+  title: Emissions-weighted carbon price
   description: |
 
   sources:
       -
-        name: Dolphin and Xiahou (2022). World carbon pricing database.
-        published_by: "Dolphin, G., Xiahou, Q. World carbon pricing database: sources and methods. Sci Data 9, 573 (2022)."
+        name: Dolphin, Pollitt and Newbery (2020). Emissions-weighted Carbon Price.
+        published_by: "Dolphin, G., Pollitt, M. and Newbery, D. 2020. The political economy of carbon pricing: a panel analysis. Oxford Economic Papers 72(2): 472-500."
         publication_year: 2022
-        publication_date: 2022-09-14
-        url: https://github.com/g-dolphin/WorldCarbonPricingDatabase
+        publication_date: 2022-01-18
+        url: https://github.com/g-dolphin/ECP
 
 tables:
   emissions_weighted_carbon_price:
