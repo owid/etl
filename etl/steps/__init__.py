@@ -45,8 +45,6 @@ from etl.helpers import get_etag
 Graph = Dict[str, Set[str]]
 DAG = Dict[str, Any]
 
-GRAPHER_INSERT_WORKERS = int(os.environ.get("GRAPHER_INSERT_WORKERS", 10))
-
 
 def compile_steps(
     dag: DAG,
@@ -358,10 +356,12 @@ class DataStep(Step):
 
     def _step_files(self) -> List[str]:
         "Return a list of code files defining this step."
+        # if dataset is a folder, use all its files
         if self._search_path.is_dir():
             return [p.as_posix() for p in files.walk(self._search_path)]
 
-        return glob(self._search_path.as_posix() + ".*")
+        # if a dataset is a single file, use [dataset].py and shared* files
+        return glob(self._search_path.as_posix() + ".*") + glob((self._search_path.parent / "shared*").as_posix())
 
     @property
     def _search_path(self) -> Path:
@@ -543,8 +543,8 @@ class GrapherStep(Step):
             # insert data in parallel, this speeds it up considerably and is even faster than loading
             # data with LOAD DATA INFILE
             # TODO: remove threads once we get rid of inserts into data_values
-            if GRAPHER_INSERT_WORKERS > 1:
-                with concurrent.futures.ThreadPoolExecutor(max_workers=GRAPHER_INSERT_WORKERS) as executor:
+            if config.GRAPHER_INSERT_WORKERS > 1:
+                with concurrent.futures.ThreadPoolExecutor(max_workers=config.GRAPHER_INSERT_WORKERS) as executor:
                     results = executor.map(upsert, tables)
             else:
                 results = map(upsert, tables)
@@ -577,7 +577,7 @@ class GrapherStep(Step):
         cleanup_ghost_variables(
             dataset_upsert_results.dataset_id,
             upserted_variable_ids,
-            workers=GRAPHER_INSERT_WORKERS,
+            workers=config.GRAPHER_INSERT_WORKERS,
         )
         cleanup_ghost_sources(dataset_upsert_results.dataset_id, upserted_source_ids)
 
