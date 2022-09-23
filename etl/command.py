@@ -23,8 +23,6 @@ config.enable_bugsnag()
 
 WALDEN_NAMESPACE = os.environ.get("WALDEN_NAMESPACE", "backport")
 
-THREADPOOL_WORKERS = 5
-
 # if the number of open files allowed is less than this, increase it
 LIMIT_NOFILE = 5000
 
@@ -111,8 +109,14 @@ def main_cli(
         workers=workers,
     )
 
+    # propagate workers to grapher upserts
+    if workers == 1:
+        config.GRAPHER_INSERT_WORKERS = 1
+
     if ipdb:
         config.IPDB_ENABLED = True
+        config.GRAPHER_INSERT_WORKERS = 1
+        kwargs["workers"] = 1
         with launch_ipdb_on_exception():
             main(**kwargs)  # type: ignore
     else:

@@ -37,6 +37,10 @@ DB_PASS = env.get("DB_PASS", "")
 # run ETL steps with debugger on exception
 IPDB_ENABLED = False
 
+# number of workers for grapher inserts
+# NOTE: this will soon be deprecated after we get rid of data_values
+GRAPHER_INSERT_WORKERS = int(env.get("GRAPHER_WORKERS", 10))
+
 
 def enable_bugsnag() -> None:
     BUGSNAG_API_KEY = env.get("BUGSNAG_API_KEY")

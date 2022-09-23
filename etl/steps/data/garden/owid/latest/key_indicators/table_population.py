@@ -36,7 +36,7 @@ def make_table() -> Table:
         .pipe(prepare_dataset)
     )
 
-    t.update_metadata_from_yaml(DIR_PATH / "table_population.meta.yml", "population")
+    t.update_metadata_from_yaml(DIR_PATH / "key_indicators.meta.yml", "population")
 
     return t
 

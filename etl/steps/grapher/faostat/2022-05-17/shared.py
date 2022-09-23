@@ -7,7 +7,6 @@ from pathlib import Path
 import pandas as pd
 from owid import catalog
 
-from etl import grapher_helpers as gh
 from etl.paths import DATA_DIR, STEP_DIR
 
 
@@ -43,9 +42,6 @@ def get_grapher_dataset_from_file_name(file_path: str) -> catalog.Dataset:
     # Load latest garden dataset.
     dataset = catalog.Dataset(garden_data_dir)
 
-    # Adapt dataset metadata to grapher requirements.
-    dataset.metadata = gh.adapt_dataset_metadata_for_grapher(dataset.metadata)
-
     # Some datasets have " - FAO (YYYY)" at the end, and some others do not.
     # For consistency, remove that ending of the title, and add something consistent across all datasets.
     dataset.metadata.title = dataset.metadata.title.split(" - FAO (")[0] + f" (FAO, {grapher_version})"
@@ -75,5 +71,4 @@ def get_grapher_table(dataset: catalog.Dataset) -> catalog.Table:
     assert len(flat_table_names) == 1
     table = dataset[flat_table_names[0]].reset_index().drop(columns=["area_code"])
 
-    # Adapt table to grapher requirements.
-    return gh.adapt_table_for_grapher(table=table)
+    return table

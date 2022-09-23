@@ -1,0 +1,96 @@
+tables:
+  population:
+    title: Population (Gapminder, HYDE & UN)
+    description: |
+      Our World in Data builds and maintains a long-run dataset on population by country, region, and for the world, based on three key sources: HYDE, Gapminder, and the UN World Population Prospects.
+      You can find more information on these sources and how our time series is constructed on this page: <a href="https://ourworldindata.org/population-sources">What sources do we rely on for population estimates?</a>
+
+    variables:
+      population:
+        title: Population
+        description: |
+          Population by country, available from 10,000 BCE to 2100 based on Gapminder data, HYDE, and UN Population Division (2022) estimates.
+
+          10,000 BCE - 1799: Historical estimates by HYDE (v3.2).
+          1800-1949: Historical estimates by Gapminder.
+          1950-2021: Population records by the United Nations - Population Division (2022).
+          2022-2100: Projections based on Medium variant by the United Nations - Population Division (2022).
+        unit: persons
+        display:
+          name: Population
+          includeInTable: true
+        sources: &population-sources
+          - name: Gapminder (v6)
+            published_by: Gapminder (v6)
+            url: https://www.gapminder.org/data/documentation/gd003/
+            date_accessed: October 8, 2021
+          - name: UN (2022)
+            published_by: United Nations - Population Division (2022)
+            url: https://population.un.org/wpp/Download/Standard/Population/
+            date_accessed: September 10, 2022
+          - name: HYDE (v3.2)
+            published_by: HYDE (v3.2)
+            url: https://dataportaal.pbl.nl/downloads/HYDE/
+            date_accessed: October 8, 2021
+      world_pop_share:
+        title: Share of world population
+        description: |
+          Share of the world's population by country, available from 10,000 BCE to 2100 based on Gapminder data, HYDE, and UN Population Division (2022) estimates.
+
+          10,000 BCE - 1799: Historical estimates by HYDE (v3.2).
+          1800-1949: Historical estimates by Gapminder.
+          1950-2021: Population records by the United Nations - Population Division (2022).
+          2022-2100: Projections based on Medium variant by the United Nations - Population Division (2022).
+        unit: "%"
+        display:
+          name: Share of world population
+          includeInTable: true
+          conversionFactor: 100
+        sources: *population-sources
+
+  population_density:
+    title: Population density (World Bank, Gapminder, HYDE & UN)
+    description: |
+      Our World in Data builds and maintains a long-run dataset on population by country, region, and for the world, based on three key sources: HYDE, Gapminder, and the UN World Population Prospects. This combines historical population estimates with median scenario projections to 2100. You can find more information on these sources and how our time series is constructed on this page: <a href="https://ourworldindata.org/population-sources">What sources do we rely on for population estimates?</a>
+
+      We combine this population dataset with the <a href="https://ourworldindata.org/grapher/land-area-km">land area estimates published by the World Bank</a>, to produce a long-run dataset of population density.
+
+      In all sources that we rely on, population estimates and land area estimates are based on today’s geographical borders.
+    short_name: population_density
+    variables:
+      population_density:
+        title: Population density
+        description: |
+          Population density by country. Estimated by dividing a country's population by its land area.
+        unit: people per km²
+        display:
+          name: Population density
+          unit: people per km²
+          includeInTable: true
+
+  land_area:
+    title: Land Area (FAO)
+    description: |
+      Country land area.
+    short_name: land_area
+    variables:
+      land_area:
+        title: Land area (sq. km)
+        description: |
+          Land area is a country's total area, excluding area under inland water bodies, national claims to continental shelf, and exclusive economic zones. In most cases the definition of inland water bodies includes major rivers and lakes.
+
+          Limitations and exceptions: The data are collected by the Food and Agriculture Organization (FAO) of the United Nations through annual questionnaires. The FAO tries to impose standard definitions and reporting methods, but complete consistency across countries and over time is not possible.
+
+          The data collected from official national sources through the questionnaire are supplemented with information from official secondary data sources. The secondary sources cover official country data from websites of national ministries, national publications and related country data reported by various international organizations.
+
+          Statistical concept and methodology: Total land area does not include inland water bodies such as major rivers and lakes. Variations from year to year may be due to updated or revised data rather than to change in area.
+        unit: sq. km
+        short_unit: sq. km
+        display:
+          name: Population
+          includeInTable: true
+        sources:
+          - name: Food and Agriculture Organization of the United Nations
+            published_by: World Bank
+            url: http://data.worldbank.org/data-catalog/world-development-indicators
+            date_accessed: August 8, 2021

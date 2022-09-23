@@ -98,7 +98,7 @@ def annotate_table(
     return table
 
 
-def yield_wide_table(
+def _yield_wide_table(
     table: catalog.Table,
     na_action: Literal["drop", "raise"] = "raise",
     dim_titles: Optional[List[str]] = None,
@@ -236,7 +236,7 @@ def _assert_long_table(table: catalog.Table) -> None:
     ), "Values in column `meta` must be either instances of `catalog.VariableMeta` or null"
 
 
-def yield_long_table(
+def _yield_long_table(
     table: catalog.Table,
     annot: Optional[Annotation] = None,
     dim_titles: Optional[List[str]] = None,
@@ -267,7 +267,7 @@ def yield_long_table(
         if annot:
             t = annotate_table(t, annot, missing_col="ignore")
 
-        yield from yield_wide_table(cast(catalog.Table, t), dim_titles=dim_titles)
+        yield from _yield_wide_table(cast(catalog.Table, t), dim_titles=dim_titles)
 
 
 def long_to_wide_tables(
@@ -300,16 +300,16 @@ def long_to_wide_tables(
         yield cast(catalog.Table, t)
 
 
-def _get_entities_from_countries_regions() -> Dict[str, int]:
+def _get_entities_from_countries_regions(by: Literal["name", "code"] = "name") -> Dict[str, int]:
     reference_dataset = catalog.Dataset(REFERENCE_DATASET)
-    countries_regions = reference_dataset["countries_regions"]
-    return cast(Dict[str, int], countries_regions.set_index("name")["legacy_entity_id"])
+    countries_regions = reference_dataset["countries_regions"].reset_index()
+    return cast(Dict[str, int], countries_regions.set_index(by)["legacy_entity_id"])
 
 
-def _get_entities_from_db(countries: Set[str]) -> Dict[str, int]:
-    q = "select id as entity_id, name from entities where name in %(names)s"
+def _get_entities_from_db(countries: Set[str], by: Literal["name", "code"]) -> Dict[str, int]:
+    q = f"select id as entity_id, {by} from entities where {by} in %(names)s"
     df = pd.read_sql(q, get_engine(), params={"names": list(countries)})
-    return cast(Dict[str, int], df.set_index("name").entity_id.to_dict())
+    return cast(Dict[str, int], df.set_index(by).entity_id.to_dict())
 
 
 def _get_and_create_entities_in_db(countries: Set[str]) -> Dict[str, int]:
@@ -324,24 +324,32 @@ def country_to_entity_id(
     fill_from_db: bool = True,
     create_entities: bool = False,
     errors: Literal["raise", "ignore", "warn"] = "raise",
+    by: Literal["name", "code"] = "name",
 ) -> pd.Series:
     """Convert country name to grapher entity_id. Most of countries should be in countries_regions.csv,
     however some regions could be only in `entities` table in MySQL or doesn't exist at all.
     :param fill_from_db: if True, fill missing countries from `entities` table
     :param create_entities: if True, create missing countries in `entities` table
     :param errors: how to handle missing countries
+    :param by: use `name` if you use country names, `code` if you use ISO codes
     """
     # get entities from countries_regions.csv
-    entity_id = country.map(_get_entities_from_countries_regions())
+    entity_id = country.map(_get_entities_from_countries_regions(by=by))
 
     # fill entities from DB
     if entity_id.isnull().any() and fill_from_db:
         ix = entity_id.isnull()
-        entity_id[ix] = country[ix].map(_get_entities_from_db(set(country[ix])))
+        db_entities = _get_entities_from_db(set(country[ix]), by=by)
+        # NOTE: this is hotfix, check out entity_id type
+        if entity_id.isnull().all():
+            entity_id = country.map(db_entities)
+        else:
+            entity_id[ix] = country[ix].map(db_entities)
 
     # create entities in DB
     if entity_id.isnull().any() and create_entities:
         assert fill_from_db, "fill_from_db must be True to create entities"
+        assert by == "name", "create_entities works only with `by='name'`"
         ix = entity_id.isnull()
         entity_id[ix] = country[ix].map(_get_and_create_entities_in_db(set(country[ix])))
 
@@ -425,10 +433,11 @@ def combine_metadata_sources(sources: List[catalog.Source]) -> catalog.Source:
     return default_source
 
 
-def adapt_dataset_metadata_for_grapher(
+def _adapt_dataset_metadata_for_grapher(
     metadata: catalog.DatasetMeta,
 ) -> catalog.DatasetMeta:
-    """Adapt metadata of a garden dataset to be used in a grapher step.
+    """Adapt metadata of a garden dataset to be used in a grapher step. This function
+    is not meant to be run explicitly, but by default in the grapher step.
 
     Parameters
     ----------
@@ -457,10 +466,11 @@ def adapt_dataset_metadata_for_grapher(
     return metadata
 
 
-def adapt_table_for_grapher(
+def _adapt_table_for_grapher(
     table: catalog.Table, country_col: str = "country", year_col: str = "year"
 ) -> catalog.Table:
-    """Adapt table (from a garden dataset) to be used in a grapher step.
+    """Adapt table (from a garden dataset) to be used in a grapher step. This function
+    is not meant to be run explicitly, but by default in the grapher step.
 
     Parameters
     ----------
@@ -478,10 +488,23 @@ def adapt_table_for_grapher(
 
     """
     table = deepcopy(table)
-    # Grapher needs a column entity id, that is constructed based on the unique entity names in the database.
-    table["entity_id"] = country_to_entity_id(table[country_col], create_entities=True)
-    table = table.drop(columns=[country_col]).rename(columns={year_col: "year"})
-    table = table.set_index(["entity_id", "year"])
+
+    # Remember original dimensions
+    dim_names = [n for n in table.index.names if n and n not in ("year", "entity_id", country_col)]
+
+    # Reset index unless we have default index
+    if table.index.names != [None]:
+        table = table.reset_index()
+
+    assert "year" in table.columns
+
+    if "entity_id" not in table.columns:
+        assert country_col in table.columns
+        # Grapher needs a column entity id, that is constructed based on the unique entity names in the database.
+        table["entity_id"] = country_to_entity_id(table[country_col], create_entities=True)
+        table = table.drop(columns=[country_col]).rename(columns={year_col: "year"})
+
+    table = table.set_index(["entity_id", "year"] + dim_names)
 
     # Ensure the default source of each column includes the description of the table (since that is the description that
     # will appear in grapher on the SOURCES tab).

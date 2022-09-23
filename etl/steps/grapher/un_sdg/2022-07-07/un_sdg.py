@@ -28,7 +28,7 @@ NAMESPACE = Path(__file__).parent.parent.stem
 
 def run(dest_dir: str) -> None:
     garden_dataset = catalog.Dataset(DATA_DIR / f"garden/{NAMESPACE}/{VERSION}/{FNAME}")
-    dataset = catalog.Dataset.create_empty(dest_dir, gh.adapt_dataset_metadata_for_grapher(garden_dataset.metadata))
+    dataset = catalog.Dataset.create_empty(dest_dir, garden_dataset.metadata)
     dataset.save()
 
     # add tables to dataset
@@ -72,7 +72,6 @@ def clean_source_name(raw_source: pd.Series, clean_source_map: Dict[str, str]) -
 
 
 def add_metadata_and_prepare_for_grapher(df_gr: pd.DataFrame, walden_ds: WaldenDataset) -> Table:
-
     indicator = df_gr["variable_name"].iloc[0].split("-")[0].strip()
     source_url = get_metadata_link(indicator)
     log.info(
