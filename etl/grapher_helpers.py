@@ -339,7 +339,12 @@ def country_to_entity_id(
     # fill entities from DB
     if entity_id.isnull().any() and fill_from_db:
         ix = entity_id.isnull()
-        entity_id[ix] = country[ix].map(_get_entities_from_db(set(country[ix]), by=by))
+        db_entities = _get_entities_from_db(set(country[ix]), by=by)
+        # NOTE: this is hotfix, check out entity_id type
+        if entity_id.isnull().all():
+            entity_id = country.map(db_entities)
+        else:
+            entity_id[ix] = country[ix].map(db_entities)
 
     # create entities in DB
     if entity_id.isnull().any() and create_entities:

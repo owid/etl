@@ -72,7 +72,6 @@ def clean_source_name(raw_source: pd.Series, clean_source_map: Dict[str, str]) -
 
 
 def add_metadata_and_prepare_for_grapher(df_gr: pd.DataFrame, walden_ds: WaldenDataset) -> Table:
-
     indicator = df_gr["variable_name"].iloc[0].split("-")[0].strip()
     source_url = get_metadata_link(indicator)
     log.info(
