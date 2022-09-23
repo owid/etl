@@ -1,6 +1,5 @@
 from owid import catalog
 
-from etl import grapher_helpers as gh
 from etl.helpers import Names
 
 from .gbd_tools import run_wrapper

@@ -4,8 +4,6 @@ import pandas as pd
 from owid.catalog import Dataset
 from structlog import get_logger
 
-from etl import grapher_helpers as gh
-
 log = get_logger()
 
 
@@ -20,12 +18,6 @@ def map_age(age: pd.Series) -> pd.Series:
 
 
 def run_wrapper(garden_dataset: Dataset, dataset: Dataset, dims: List[str]) -> None:
-    # variables_in_charts = get_variables_used_in_charts(old_dataset_name)
-
-    # NOTE: it was `Global Burden of Disease Study (2019) - Deaths and DALYs` originally
-    # all variables will inherit this source from dataset
-    # dataset.metadata.sources = [Source(name="Global Burden of Disease Study (2019) - Deaths and DALYs")]
-
     # add tables to dataset
     tables = garden_dataset.table_names
     for table in tables:
@@ -37,7 +29,5 @@ def run_wrapper(garden_dataset: Dataset, dataset: Dataset, dims: List[str]) -> N
 
         # add more dimensions
         tab.set_index(dims, inplace=True)
-
-        __import__("ipdb").set_trace()
 
         dataset.add(tab)
