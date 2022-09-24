@@ -16,7 +16,7 @@ from etl import config
 from etl import grapher_model as gm
 from etl.backport_helpers import GrapherConfig
 from etl.db import get_engine
-from etl.files import checksum_str
+from etl.files import checksum_str, checksum_file
 
 from . import utils
 
@@ -220,6 +220,11 @@ def _walden_config_metadata(ds: gm.Dataset, short_name: str, origin_md5: str, pu
     config.name = f"Grapher metadata for {short_name}"
     config.file_extension = "json"
     config.origin_md5 = origin_md5
+
+    # use md5 as the version, thus inserting it into the Walden path; this is to avoid
+    # overwriting existing datasets and breaking past versions of the ETL
+    config.version = origin_md5
+
     return config
 
 
@@ -289,6 +294,12 @@ def _upload_values_to_walden(
 ) -> None:
     with tempfile.NamedTemporaryFile(mode="wb") as f:
         df.to_feather(f.name, compression="lz4")
+
+        # use the md5 checksum as the version in the backport, thus inserting it into the
+        # walden path; this is to avoid overwriting existing data and breaking a running ETL
+        md5 = checksum_file(f.name)
+        meta.version = md5
+
         if not dry_run:
             add_to_catalog(meta, f.name, upload, public=public)
 
