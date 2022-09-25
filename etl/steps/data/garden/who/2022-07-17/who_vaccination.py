@@ -12,6 +12,9 @@ from etl.paths import DATA_DIR
 
 log = get_logger()
 
+##
+# To Do:
+# - Add in population of target population to calculate unvaccinated population. At least for one year olds.
 # naming conventions
 N = Names(__file__)
 N = Names("/Users/fionaspooner/Documents/OWID/repos/etl/etl/steps/data/garden/who/2022-07-17/who_vaccination.py")
