@@ -11,6 +11,7 @@ log = get_logger()
 
 # naming conventions
 N = Names(__file__)
+N = Names("/Users/fionaspooner/Documents/OWID/repos/etl/etl/steps/data/meadow/who/2022-07-17/who_vaccination.py")
 
 
 def run(dest_dir: str) -> None:
@@ -43,7 +44,7 @@ def run(dest_dir: str) -> None:
 
     ds.metadata.update_from_yaml(N.metadata_path)
     tb.update_metadata_from_yaml(N.metadata_path, "who_vaccination")
-
+    tb = tb.reset_index()
     # add table to a dataset
     ds.add(tb)
 
@@ -55,4 +56,5 @@ def run(dest_dir: str) -> None:
 
 def clean_data(df: pd.DataFrame) -> pd.DataFrame:
     df = underscore_table(Table(df))
+    df = df.dropna(subset="name")
     return df.rename(columns={"name": "country"}).drop(columns=["code"])

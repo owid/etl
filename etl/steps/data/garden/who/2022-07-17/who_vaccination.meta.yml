@@ -1,0 +1,171 @@
+dataset:
+  sources:
+    -
+      name: WHO/UNICEF
+      published_by: World Health Organization (2022)
+      publisher_source: WHO/UNICEF
+
+tables:
+  who_vaccination:
+     variables:
+      country:
+        title: Country
+      year:
+        title: Year
+      coverage_bcg:
+       title: Coverage of BCG
+         short_unit: %
+         unit: %
+      coverage_diphcv4:
+       title: Coverage of diphtheria-containing vaccine, 4th dose (1st booster)
+         short_unit: %
+         unit: %
+      coverage_diphcv5:
+       title: Coverage of diphtheria-containing vaccine, 5th dose (2nd booster)
+         short_unit: %
+         unit: %
+      coverage_diphcv6:
+       title: Coverage of diphtheria-containing vaccine, 6th dose (3rd booster)
+         short_unit: %
+         unit: %
+      coverage_dtpcv1:
+       title: Coverage of DTP-containing vaccine, 1st dose
+         short_unit: %
+         unit: %
+      coverage_dtpcv1:
+       title: Coverage of DTP-containing vaccine, 3rd dose
+         short_unit: %
+         unit: %
+      coverage_hepb3:
+       title: Coverage of HepB3
+         short_unit: %
+         unit: %
+      coverage_hepb_bd:
+       title: Coverage of HepB, birth dose (given within 24 hours of birth)
+         short_unit: %
+         unit: %
+      coverage_hepb_bdall:
+       title: Coverage of HepB, birth dose total (including those given within and after 24 hours of birth)
+         short_unit: %
+         unit: %
+      coverage_hib3:
+       title: Coverage of Hib3
+         short_unit: %
+         unit: %
+      coverage_hpv_fem:
+       title: Coverage of HPV Female, final dose
+         short_unit: %
+         unit: %
+      coverage_hpv_male:
+       title: Coverage of HPV Male, final dose
+         short_unit: %
+         unit: %
+      coverage_ipv1:
+       title: Coverage of inactivated polio-containing vaccine, 1st dose
+         short_unit: %
+         unit: %
+      coverage_ipv1_frac:
+       title: Coverage of fractional IPV1
+         short_unit: %
+         unit: %
+      coverage_ipv2:
+       title: Coverage of inactivated polio-containing vaccine, 2nd dose
+         short_unit: %
+         unit: %
+      coverage_ipv2_frac:
+       title: Coverage of fractional IPV2
+         short_unit: %
+         unit: %
+      coverage_japenc:
+       title: Coverage of Japanese encephalitis vaccine
+         short_unit: %
+         unit: %
+      coverage_japenc_1:
+       title: Coverage of Japanese encephalitis vaccine, 1st dose
+         short_unit: %
+         unit: %
+      coverage_mcv1:
+       title: Coverage of measles-containing vaccine, 1st dose
+         short_unit: %
+         unit: %
+      coverage_mcv2:
+       title: Coverage of measles-containing vaccine, 2nd dose
+         short_unit: %
+         unit: %
+      coverage_men_a_conj:
+       title: Coverage of meningococcal A conjugate vaccine
+         short_unit: %
+         unit: %
+      coverage_pab:
+       title: Coverage of protection at birth (PAB) against neonatal tetanus
+         short_unit: %
+         unit: %
+      coverage_pcv1:
+       title: Coverage of pneumococcal conjugate vaccine, 1st dose
+         short_unit: %
+         unit: %
+      coverage_pcv2:
+       title: Coverage of pneumococcal conjugate vaccine, 2nd dose
+         short_unit: %
+         unit: %
+      coverage_pcv3:
+       title: Coverage of pneumococcal conjugate vaccine, 3rd dose
+         short_unit: %
+         unit: %
+      coverage_percv4:
+       title: Coverage of pertussis-containing vaccine, 4th dose (1st booster)
+         short_unit: %
+         unit: %
+      coverage_percv_pw:
+       title: Coverage of pertussis-containing vaccine, pregnant women
+         short_unit: %
+         unit: %
+      coverage_pol3:
+       title: Coverage of polio, 3rd dose
+         short_unit: %
+         unit: %
+      coverage_rcv1:
+       title: Coverage of rubella-containing vaccine, 1st dose
+         short_unit: %
+         unit: %
+      coverage_rota1:
+       title: Coverage of rotavirus, 1st dose
+         short_unit: %
+         unit: %
+      coverage_rotac:
+       title: Coverage of rotavirus, last dose
+         short_unit: %
+         unit: %
+      coverage_tt2plus:
+       title: Coverage of tetanus toxoid-containing vaccine, 2nd and subsequent doses
+         short_unit: %
+         unit: %
+      coverage_ttcv4:
+       title: Coverage of tetanus-containing vaccine, 4th dose (1st booster)
+         short_unit: %
+         unit: %
+      coverage_ttcv5:
+       title: Coverage of tetanus-containing vaccine, 5th dose (2nd booster)
+         short_unit: %
+         unit: %
+      coverage_ttcv6:
+       title: Coverage of tetanus-containing vaccine, 6th dose (3rd booster)
+         short_unit: %
+         unit: %
+      coverage_typhoid:
+       title: Coverage of typhoid vaccine
+         short_unit: %
+         unit: %
+      coverage_typhoid_conj:
+       title: Coverage of typhoid conjugate vaccine
+         short_unit: %
+         unit: %
+      coverage_vad1:
+       title: Coverage of vitamin A, 1st dose
+         short_unit: %
+         unit: %
+      coverage_yfv:
+       title: Coverage of yellow fever vaccine
+         short_unit: %
+         unit: %
+      
