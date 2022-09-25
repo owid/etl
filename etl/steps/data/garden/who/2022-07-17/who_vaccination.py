@@ -36,6 +36,7 @@ def run(dest_dir: str) -> None:
     ds_garden.metadata = ds_meadow.metadata
 
     # may need to combine japanese encephalitis and japanese encephalitis first dose
+    # We use only the official figures
     df = df[df["coverage_category"] == "OFFICIAL"]
     df = df.dropna(subset="coverage")
     df = df.drop(columns=["index", "group", "antigen", "coverage_category", "coverage_category_description"])
