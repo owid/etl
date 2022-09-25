@@ -2,7 +2,7 @@
 #  Makefile
 #
 
-.PHONY: etl docs
+.PHONY: etl docs full lab test-default publish grapher dot watch clean clobber deploy
 
 include default.mk
 
