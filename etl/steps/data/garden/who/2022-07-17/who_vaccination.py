@@ -38,18 +38,16 @@ def run(dest_dir: str) -> None:
     # may need to combine japanese encephalitis and japanese encephalitis first dose
     df = df[df["coverage_category"] == "OFFICIAL"]
     df = df.dropna(subset="coverage")
-    df = df.drop(
-        columns=["index", "group", "antigen_description", "coverage_category", "coverage_category_description"]
-    )
+    df = df.drop(columns=["index", "group", "antigen", "coverage_category", "coverage_category_description"])
     df = df.pivot_table(
         values=["coverage", "doses", "target_number"],
-        columns=["antigen"],
+        columns=["antigen_description"],
         index=[
             "country",
             "year",
         ],
     )
-    df.columns = df.columns.to_series().apply("_".join)
+    df.columns = df.columns.to_series().apply("_".join).str.replace("coverage_", "")
     df = df.reset_index()
 
     tb_garden = underscore_table(Table(df))

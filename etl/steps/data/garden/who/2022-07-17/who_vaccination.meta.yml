@@ -12,159 +12,159 @@ tables:
         title: Country
       year:
         title: Year
-      coverage_bcg:
+      bcg:
        title: Coverage of BCG
          short_unit: %
          unit: %
-      coverage_diphcv4:
+      diphtheria_containing_vaccine__4th_dose__1st_booster:
        title: Coverage of diphtheria-containing vaccine, 4th dose (1st booster)
          short_unit: %
          unit: %
-      coverage_diphcv5:
+      diphtheria_containing_vaccine__5th_dose__2nd_booster:
        title: Coverage of diphtheria-containing vaccine, 5th dose (2nd booster)
          short_unit: %
          unit: %
-      coverage_diphcv6:
+      diphtheria_containing_vaccine__6th_dose__3rd_booster:
        title: Coverage of diphtheria-containing vaccine, 6th dose (3rd booster)
          short_unit: %
          unit: %
-      coverage_dtpcv1:
+      dtp_containing_vaccine__1st_dose:
        title: Coverage of DTP-containing vaccine, 1st dose
          short_unit: %
          unit: %
-      coverage_dtpcv1:
+      dtp_containing_vaccine__3rd_dose:
        title: Coverage of DTP-containing vaccine, 3rd dose
          short_unit: %
          unit: %
-      coverage_hepb3:
+      hepb3:
        title: Coverage of HepB3
          short_unit: %
          unit: %
-      coverage_hepb_bd:
+      hepb__birth_dose__given_within_24_hours_of_birth:
        title: Coverage of HepB, birth dose (given within 24 hours of birth)
          short_unit: %
          unit: %
-      coverage_hepb_bdall:
+      hepb__birth_dose_total__including_those_given_within_and_after_24_hours_of_birth:
        title: Coverage of HepB, birth dose total (including those given within and after 24 hours of birth)
          short_unit: %
          unit: %
-      coverage_hib3:
+      hib3:
        title: Coverage of Hib3
          short_unit: %
          unit: %
-      coverage_hpv_fem:
+      hpv_female__final_dose:
        title: Coverage of HPV Female, final dose
          short_unit: %
          unit: %
-      coverage_hpv_male:
+      hpv_male__final_dose:
        title: Coverage of HPV Male, final dose
          short_unit: %
          unit: %
-      coverage_ipv1:
+      inactivated_polio_containing_vaccine__1st_dose:
        title: Coverage of inactivated polio-containing vaccine, 1st dose
          short_unit: %
          unit: %
-      coverage_ipv1_frac:
+      fractional_ipv1:
        title: Coverage of fractional IPV1
          short_unit: %
          unit: %
-      coverage_ipv2:
+      inactivated_polio_containing_vaccine__2nd_dose:
        title: Coverage of inactivated polio-containing vaccine, 2nd dose
          short_unit: %
          unit: %
-      coverage_ipv2_frac:
+      fractional_ipv2:
        title: Coverage of fractional IPV2
          short_unit: %
          unit: %
-      coverage_japenc:
+      japanese_encephalitis:
        title: Coverage of Japanese encephalitis vaccine
          short_unit: %
          unit: %
-      coverage_japenc_1:
+      japanese_encephalitis_vaccine__1st_dose:
        title: Coverage of Japanese encephalitis vaccine, 1st dose
          short_unit: %
          unit: %
-      coverage_mcv1:
+      measles_containing_vaccine__1st_dose:
        title: Coverage of measles-containing vaccine, 1st dose
          short_unit: %
          unit: %
-      coverage_mcv2:
+      measles_containing_vaccine__2nd_dose:
        title: Coverage of measles-containing vaccine, 2nd dose
          short_unit: %
          unit: %
-      coverage_men_a_conj:
+      meningococcal_a_conjugate_vaccine:
        title: Coverage of meningococcal A conjugate vaccine
          short_unit: %
          unit: %
-      coverage_pab:
+      protection_at_birth__pab__against_neonatal_tetanus:
        title: Coverage of protection at birth (PAB) against neonatal tetanus
          short_unit: %
          unit: %
-      coverage_pcv1:
+      pneumococcal_conjugate_vaccine__1st_dose:
        title: Coverage of pneumococcal conjugate vaccine, 1st dose
          short_unit: %
          unit: %
-      coverage_pcv2:
+      pneumococcal_conjugate_vaccine__2nd_dose:
        title: Coverage of pneumococcal conjugate vaccine, 2nd dose
          short_unit: %
          unit: %
-      coverage_pcv3:
+      pneumococcal_conjugate_vaccine__final_dose:
        title: Coverage of pneumococcal conjugate vaccine, 3rd dose
          short_unit: %
          unit: %
-      coverage_percv4:
+      pertussis_containing_vaccine__4th_dose__1st_booster:
        title: Coverage of pertussis-containing vaccine, 4th dose (1st booster)
          short_unit: %
          unit: %
-      coverage_percv_pw:
+      pertussis_containing_vaccine__pregnant_women:
        title: Coverage of pertussis-containing vaccine, pregnant women
          short_unit: %
          unit: %
-      coverage_pol3:
+      polio__3rd_dose:
        title: Coverage of polio, 3rd dose
          short_unit: %
          unit: %
-      coverage_rcv1:
+      rubella_containing_vaccine__1st_dose:
        title: Coverage of rubella-containing vaccine, 1st dose
          short_unit: %
          unit: %
-      coverage_rota1:
+      rotavirus__1st_dose:
        title: Coverage of rotavirus, 1st dose
          short_unit: %
          unit: %
-      coverage_rotac:
+      rotavirus__last_dose:
        title: Coverage of rotavirus, last dose
          short_unit: %
          unit: %
-      coverage_tt2plus:
+      tetanus_toxoid_containing_vaccine__2nd_and_subsequent_doses:
        title: Coverage of tetanus toxoid-containing vaccine, 2nd and subsequent doses
          short_unit: %
          unit: %
-      coverage_ttcv4:
+      tetanus_containing_vaccine__4th_dose__1st_booster:
        title: Coverage of tetanus-containing vaccine, 4th dose (1st booster)
          short_unit: %
          unit: %
-      coverage_ttcv5:
+      tetanus_containing_vaccine__5th_dose__2nd_booster:
        title: Coverage of tetanus-containing vaccine, 5th dose (2nd booster)
          short_unit: %
          unit: %
-      coverage_ttcv6:
+      tetanus_containing_vaccine__6th_dose__3rd_booster:
        title: Coverage of tetanus-containing vaccine, 6th dose (3rd booster)
          short_unit: %
          unit: %
-      coverage_typhoid:
+      typhoid:
        title: Coverage of typhoid vaccine
          short_unit: %
          unit: %
-      coverage_typhoid_conj:
+      typhoid_conjugate_vaccine:
        title: Coverage of typhoid conjugate vaccine
          short_unit: %
          unit: %
-      coverage_vad1:
+      vitamin_a__1st_dose:
        title: Coverage of vitamin A, 1st dose
          short_unit: %
          unit: %
-      coverage_yfv:
+      yellow_fever_vaccine:
        title: Coverage of yellow fever vaccine
          short_unit: %
          unit: %
