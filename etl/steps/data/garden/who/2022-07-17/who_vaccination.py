@@ -1,6 +1,6 @@
 import json
 from functools import reduce
-from typing import List, cast
+from typing import Any, List, cast
 
 import pandas as pd
 from owid import catalog
@@ -86,7 +86,7 @@ def harmonize_countries(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def get_population_one_year_olds() -> pd.DataFrame:
+def get_population_one_year_olds() -> Any:
     un_wpp_data = catalog.Dataset(UNWPP)
     pop = un_wpp_data["population"].reset_index()
     pop_one_yr = pop[
@@ -96,7 +96,7 @@ def get_population_one_year_olds() -> pd.DataFrame:
     return pop_one_yr
 
 
-def calculate_vaccinated_unvaccinated_population(table: Table, pop_one_yr: pd.DataFrame) -> pd.DataFrame:
+def calculate_vaccinated_unvaccinated_population(table: Table, pop_one_yr: pd.DataFrame) -> Any:
     # vaccines where the coverage is measured as % of one-year olds
     vax_one_year_olds = [
         "bcg",
@@ -139,7 +139,7 @@ def calculate_vaccinated_unvaccinated_population(table: Table, pop_one_yr: pd.Da
     return df_merged
 
 
-def clean_and_format_data(df: pd.DataFrame) -> pd.DataFrame:
+def clean_and_format_data(df: pd.DataFrame) -> Any:
     # may need to combine japanese encephalitis and japanese encephalitis first dose
     # We use only the WUENIC figures - those estimated by WHO and UNICEF - other estimates available are OFFICIAL and ADMIN
     df = df[df["coverage_category"] == "WUENIC"]
