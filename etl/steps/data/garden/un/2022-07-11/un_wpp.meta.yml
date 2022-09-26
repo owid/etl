@@ -90,7 +90,7 @@ tables:
       median_age:
         title: Median age
         short_unit: years
-        unit: Years
+        unit: years
         description: Age that divides the population in two parts of equal size, that is, there are as many persons with ages above the median as there are with ages below the median.
       net_migration:
         title: Net migration
