@@ -4,12 +4,10 @@ from owid.datautils import dataframes
 from shared import CURRENT_DIR
 
 from etl.helpers import Names
-from etl.paths import DATA_DIR
 
 DATASET_TITLE = "UK historical electricity"
 DATASET_SHORT_NAME = "uk_historical_electricity"
 N = Names(str(CURRENT_DIR / DATASET_SHORT_NAME))
-MEADOW_PATH = DATA_DIR / f"meadow/uk_beis/2022-07-28/{DATASET_SHORT_NAME}"
 
 # Conversion factor from million tonnes of oil equivalent to terawatt-hours.
 MTOE_TO_TWH = 11.63
@@ -77,7 +75,7 @@ def run(dest_dir: str) -> None:
     # Load data.
     #
     # Read dataset from meadow.
-    ds_meadow = catalog.Dataset(MEADOW_PATH)
+    ds_meadow = catalog.Dataset(N.meadow_dataset.path)
     # Load tables from meadow dataset.
     tb_fuel_input = ds_meadow["fuel_input"]
     tb_supply = ds_meadow["supply"]
