@@ -13,159 +13,176 @@ tables:
       year:
         title: Year
       bcg:
-        title: Coverage of BCG
+        title: BCG (% of one-year-olds immunized)
         short_unit: '%'
         unit: '%'
-      diphtheria_containing_vaccine__4th_dose__1st_booster:
-        title: Coverage of diphtheria-containing vaccine, 4th dose (1st booster)
-        short_unit: '%'
-        unit: '%'
-      diphtheria_containing_vaccine__5th_dose__2nd_booster:
-        title: Coverage of diphtheria-containing vaccine, 5th dose (2nd booster)
-        short_unit: '%'
-        unit: '%'
-      diphtheria_containing_vaccine__6th_dose__3rd_booster:
-        title: Coverage of diphtheria-containing vaccine, 6th dose (3rd booster)
-        short_unit: '%'
-        unit: '%'
+      bcg_vaccinated:
+        title: Number of one-year-olds vaccinated with BCG
+        unit: vaccinated one-year-olds
+      bcg_unvaccinated:
+        title: Number of one-year-olds not vaccinated with BCG
+        unit: unvaccinated one-year-olds
       dtp_containing_vaccine__1st_dose:
         title: Coverage of DTP-containing vaccine, 1st dose
         short_unit: '%'
         unit: '%'
+      dtp_containing_vaccine__1st_dose_vaccinated:
+        title: Number of one-year-olds vaccinated with DTP containing vaccine, 1st dose
+        unit: vaccinated one-year-olds
+      dtp_containing_vaccine__1st_dose_unvaccinated:
+        title: Number of one-year-olds not vaccinated with DTP containing vaccine, 1st dose
+        unit: unvaccinated one-year-olds
       dtp_containing_vaccine__3rd_dose:
-        title: Coverage of DTP-containing vaccine, 3rd dose
+        title: DTP3 (% of one-year-olds immunized)
         short_unit: '%'
         unit: '%'
+      dtp_containing_vaccine__3rd_dose_vaccinated:
+        title: Number of one-year-olds vaccinated with DTP containing vaccine, 3rd dose
+        unit: vaccinated one-year-olds
+      dtp_containing_vaccine__3rd_dose_unvaccinated:
+        title: Number of one-year-olds not vaccinated with DTP containing vaccine, 3rd dose
+        unit: unvaccinated one-year-olds
       hepb3:
-        title: Coverage of HepB3
+        title: HepB3 (% of one-year-olds immunized)
         short_unit: '%'
         unit: '%'
+      hepb3_vaccinated:
+        title: Number of one-year-olds vaccinated with HepB3
+        unit: vaccinated one-year-olds
+      hepb3_unvaccinated:
+        title: Number of one-year-olds unvaccinated with HepB3
+        unit: unvaccinated one-year-olds
       hepb__birth_dose__given_within_24_hours_of_birth:
         title: Coverage of HepB, birth dose (given within 24 hours of birth)
         short_unit: '%'
         unit: '%'
-      hepb__birth_dose_total__including_those_given_within_and_after_24_hours_of_birth:
-        title: Coverage of HepB, birth dose total (including those given within and after 24 hours of birth)
-        short_unit: '%'
-        unit: '%'
+      hepb__birth_dose__given_within_24_hours_of_birth_vaccinated:
+        title: Number of one-year-olds vaccinated with HepB within 24 hours of birth
+        unit: vaccinated one-year-olds
+      hepb__birth_dose__given_within_24_hours_of_birth_unvaccinated:
+        title: Number of one-year-olds not vaccinated with HepB within 24 hours of birth
+        unit: unvaccinated one-year-olds
       hib3:
-        title: Coverage of Hib3
+        title: Hib3 (% of one-year-olds immunized)
         short_unit: '%'
         unit: '%'
-      hpv_female__final_dose:
-        title: Coverage of HPV Female, final dose
-        short_unit: '%'
-        unit: '%'
-      hpv_male__final_dose:
-        title: Coverage of HPV Male, final dose
-        short_unit: '%'
-        unit: '%'
+      hib3_vaccinated:
+        title: Number of one-year-olds vaccinated with Hib3
+        unit: vaccinated one-year-olds
+      hib3_unvaccinated:
+        title: Number of one-year-olds not vaccinated with Hib3
+        unit: unvaccinated one-year-olds
       inactivated_polio_containing_vaccine__1st_dose:
-        title: Coverage of inactivated polio-containing vaccine, 1st dose
+        title: IPV1 (% of one-year-olds immunized)
         short_unit: '%'
         unit: '%'
-      fractional_ipv1:
-        title: Coverage of fractional IPV1
-        short_unit: '%'
-        unit: '%'
-      inactivated_polio_containing_vaccine__2nd_dose:
-        title: Coverage of inactivated polio-containing vaccine, 2nd dose
-        short_unit: '%'
-        unit: '%'
-      fractional_ipv2:
-        title: Coverage of fractional IPV2
-        short_unit: '%'
-        unit: '%'
-      japanese_encephalitis:
-        title: Coverage of Japanese encephalitis vaccine
-        short_unit: '%'
-        unit: '%'
-      japanese_encephalitis_vaccine__1st_dose:
-        title: Coverage of Japanese encephalitis vaccine, 1st dose
-        short_unit: '%'
-        unit: '%'
+      inactivated_polio_containing_vaccine__1st_dose_vaccinated:
+        title: Number of one-year-olds vaccinated with polio-containing vaccine, 1st dose
+        unit: vaccinated one-year-olds
+      inactivated_polio_containing_vaccine__1st_dose_unvaccinated:
+        title: Number of one-year-olds not vaccinated with polio-containing vaccine, 1st dose
+        unit: unvaccinated one-year-olds
       measles_containing_vaccine__1st_dose:
-        title: Coverage of measles-containing vaccine, 1st dose
+        title: MCV1 (% of one-year-olds immunized)
         short_unit: '%'
         unit: '%'
+      measles_containing_vaccine__1st_dose_vaccinated:
+        title: Number of one-year-olds vaccinated with measles-containing vaccine, 1st dose
+        unit: vaccinated one-year-olds
+      measles_containing_vaccine__1st_dose_unvaccinated:
+        title: Number of one-year-olds not vaccinated with measles-containing vaccine, 1st dose
+        unit: unvaccinated one-year-olds
       measles_containing_vaccine__2nd_dose:
-        title: Coverage of measles-containing vaccine, 2nd dose
+        title: MCV2 (% of one-year-olds immunized)
         short_unit: '%'
         unit: '%'
-      meningococcal_a_conjugate_vaccine:
-        title: Coverage of meningococcal A conjugate vaccine
+      measles_containing_vaccine_2nd_dose_by_2_years_of_age:
+        title: Coverage of measles-containing vaccine, 2nd dose by two years of age
         short_unit: '%'
         unit: '%'
-      protection_at_birth__pab__against_neonatal_tetanus:
-        title: Coverage of protection at birth (PAB) against neonatal tetanus
-        short_unit: '%'
-        unit: '%'
-      pneumococcal_conjugate_vaccine__1st_dose:
-        title: Coverage of pneumococcal conjugate vaccine, 1st dose
-        short_unit: '%'
-        unit: '%'
-      pneumococcal_conjugate_vaccine__2nd_dose:
-        title: Coverage of pneumococcal conjugate vaccine, 2nd dose
-        short_unit: '%'
-        unit: '%'
+      measles_containing_vaccine__2nd_dose_vaccinated:
+        title: Number of one-year-olds vaccinated with measles-containing vaccine, 2nd dose
+        unit: vaccinated one-year-olds
+      measles_containing_vaccine__2nd_dose_unvaccinated:
+        title: Number of one-year-olds not vaccinated with measles-containing vaccine, 2nd dose
+        unit: unvaccinated one-year-olds
       pneumococcal_conjugate_vaccine__final_dose:
-        title: Coverage of pneumococcal conjugate vaccine, 3rd dose
+        title: PCV3 (% of one-year-olds immunized)
         short_unit: '%'
         unit: '%'
-      pertussis_containing_vaccine__4th_dose__1st_booster:
-        title: Coverage of pertussis-containing vaccine, 4th dose (1st booster)
-        short_unit: '%'
-        unit: '%'
-      pertussis_containing_vaccine__pregnant_women:
-        title: Coverage of pertussis-containing vaccine, pregnant women
-        short_unit: '%'
-        unit: '%'
+      pneumococcal_conjugate_vaccine__final_dose_vaccinated:
+        title: Number of one-year-olds vaccinated with pneumococcal conjugate vaccine, 3rd dose
+        unit: vaccinated one-year-olds
+      pneumococcal_conjugate_vaccine__final_dose_unvaccinated:
+        title: Number of one-year-olds not vaccinated with pneumococcal conjugate vaccine, 3rd dose
+        unit: unvaccinated one-year-olds
       polio__3rd_dose:
-        title: Coverage of polio, 3rd dose
+        title: Pol3 (% of one-year-olds immunized)
         short_unit: '%'
         unit: '%'
+      polio__3rd_dose_vaccinated:
+        title: Number of one-year-olds vaccinated with polio, 3rd dose
+        unit: vaccinated one-year-olds
+      polio__3rd_dose_unvaccinated:
+        title: Number of one-year-olds not vaccinated with polio, 3rd dose
+        unit: unvaccinated one-year-olds
       rubella_containing_vaccine__1st_dose:
-        title: Coverage of rubella-containing vaccine, 1st dose
+        title: RCV1 (% of one-year-olds immunized)
         short_unit: '%'
         unit: '%'
-      rotavirus__1st_dose:
-        title: Coverage of rotavirus, 1st dose
-        short_unit: '%'
-        unit: '%'
+      rubella_containing_vaccine__1st_dose_vaccinated:
+        title: Number of one-year-olds vaccinated with rubella-containing vaccine, 1st dose
+        unit: vaccinated one-year-olds
+      rubella_containing_vaccine__1st_dose_unvaccinated:
+        title: Number of one-year-olds not vaccinated with rubella-containing vaccine, 1st dose
+        unit: unvaccinated one-year-olds
       rotavirus__last_dose:
-        title: Coverage of rotavirus, last dose
+        title: RotaC (% of one-year-olds immunized)
         short_unit: '%'
         unit: '%'
-      tetanus_toxoid_containing_vaccine__2nd_and_subsequent_doses:
-        title: Coverage of tetanus toxoid-containing vaccine, 2nd and subsequent doses
-        short_unit: '%'
-        unit: '%'
-      tetanus_containing_vaccine__4th_dose__1st_booster:
-        title: Coverage of tetanus-containing vaccine, 4th dose (1st booster)
-        short_unit: '%'
-        unit: '%'
-      tetanus_containing_vaccine__5th_dose__2nd_booster:
-        title: Coverage of tetanus-containing vaccine, 5th dose (2nd booster)
-        short_unit: '%'
-        unit: '%'
-      tetanus_containing_vaccine__6th_dose__3rd_booster:
-        title: Coverage of tetanus-containing vaccine, 6th dose (3rd booster)
-        short_unit: '%'
-        unit: '%'
-      typhoid:
-        title: Coverage of typhoid vaccine
-        short_unit: '%'
-        unit: '%'
-      typhoid_conjugate_vaccine:
-        title: Coverage of typhoid conjugate vaccine
-        short_unit: '%'
-        unit: '%'
-      vitamin_a__1st_dose:
-        title: Coverage of vitamin A, 1st dose
-        short_unit: '%'
-        unit: '%'
+      rotavirus__last_dose_vaccinated:
+        title: Number of one-year-olds vaccinated with rotavirus, last dose
+        unit: vaccinated one-year-olds
+      rotavirus__last_dose_unvaccinated:
+        title: Number of one-year-olds not vaccinated with rotavirus, last dose
+        unit: unvaccinated one-year-olds
+#      tetanus_toxoid_containing_vaccine__2nd_and_subsequent_doses:
+#        title: Coverage of tetanus toxoid-containing vaccine, 2nd and subsequent doses
+#        short_unit: '%'
+#        unit: '%'
+#      tetanus_containing_vaccine__4th_dose__1st_booster:
+#        title: Coverage of tetanus-containing vaccine, 4th dose (1st booster)
+#        short_unit: '%'
+#        unit: '%'
+#      tetanus_containing_vaccine__5th_dose__2nd_booster:
+#        title: Coverage of tetanus-containing vaccine, 5th dose (2nd booster)
+#        short_unit: '%'
+#        unit: '%'
+#      tetanus_containing_vaccine__6th_dose__3rd_booster:
+#        title: Coverage of tetanus-containing vaccine, 6th dose (3rd booster)
+#        short_unit: '%'
+#        unit: '%'
+#      typhoid:
+#        title: Coverage of typhoid vaccine
+#        short_unit: '%'
+#        unit: '%'
+#      typhoid_conjugate_vaccine:
+#        title: Coverage of typhoid conjugate vaccine
+#        short_unit: '%'
+#        unit: '%'
+#      vitamin_a__1st_dose:
+#        title: Coverage of vitamin A, 1st dose
+#        short_unit: '%'
+#        unit: '%'
       yellow_fever_vaccine:
-        title: Coverage of yellow fever vaccine
+        title: YFV (% of one-year-olds immunized)
         short_unit: '%'
         unit: '%'
+      yellow_fever_vaccine_vaccinated:
+        title: Number of one-year-olds vaccinated with yellow fever vaccine
+        unit: vaccinated one-year-olds
+      yellow_fever_vaccine_unvaccinated:
+        title: Number of one-year-olds not vaccinated with yellow fever vaccine
+        unit: unvaccinated one-year-olds
+
       

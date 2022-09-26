@@ -1,4 +1,5 @@
 import json
+from cmath import nan
 from functools import reduce
 from typing import List, cast
 
@@ -19,6 +20,7 @@ UNWPP = DATA_DIR / "garden/un/2022-07-11/un_wpp"
 log = get_logger()
 
 N = Names(__file__)
+N = Names("/Users/fionaspooner/Documents/OWID/repos/etl/etl/steps/data/garden/who/2022-07-17/who_vaccination.py")
 
 
 def run(dest_dir: str) -> None:
@@ -114,17 +116,22 @@ def calculate_vaccinated_unvaccinated_population(table: Table, pop_one_yr: pd.Da
         "rotavirus__last_dose",
         "yellow_fever_vaccine",
     ]
-    cov_pop = table[["country", "year"] + vax_one_year_olds].merge(pop_one_yr, on=["country", "year"])
-    vax_pop = cov_pop
+    vax_pop = table[["country", "year"] + vax_one_year_olds].merge(pop_one_yr, on=["country", "year"])
     vax_pop[vax_one_year_olds] = (
         vax_pop[vax_one_year_olds].multiply(0.01).multiply(vax_pop["population"], axis="index").round(0).astype("Int64")
     )
-    unvax_pop = vax_pop
+
     vax_pop = vax_pop.rename(columns={c: c + "_vaccinated" for c in vax_pop.columns if c in vax_one_year_olds})
     vax_pop = vax_pop.drop(columns=["population"])
 
+    unvax_pop = table[["country", "year"] + vax_one_year_olds].merge(pop_one_yr, on=["country", "year"])
+    unvax_pop[vax_one_year_olds] = 100 - unvax_pop[vax_one_year_olds]
     unvax_pop[vax_one_year_olds] = (
-        unvax_pop[vax_one_year_olds].sub(unvax_pop["population"], axis="index").multiply(-1).astype("Int64")
+        unvax_pop[vax_one_year_olds]
+        .multiply(0.01)
+        .multiply(unvax_pop["population"], axis="index")
+        .round(0)
+        .astype("Int64")
     )
     unvax_pop = unvax_pop.rename(columns={c: c + "_unvaccinated" for c in unvax_pop.columns if c in vax_one_year_olds})
     unvax_pop = unvax_pop.drop(columns=["population"])
@@ -136,12 +143,12 @@ def calculate_vaccinated_unvaccinated_population(table: Table, pop_one_yr: pd.Da
 
 def clean_and_format_data(df: pd.DataFrame) -> pd.DataFrame:
     # may need to combine japanese encephalitis and japanese encephalitis first dose
-    # We use only the official figures
-    df = df[df["coverage_category"] == "OFFICIAL"]
+    # We use only the WUENIC figures - those estimated by WHO and UNICEF - other estimates available are OFFICIAL and ADMIN
+    df = df[df["coverage_category"] == "WUENIC"]
     df = df.dropna(subset="coverage")
     df = df.drop(columns=["index", "group", "antigen", "coverage_category", "coverage_category_description"])
     df = df.pivot_table(
-        values=["coverage", "doses", "target_number"],
+        values=["coverage"],
         columns=["antigen_description"],
         index=[
             "country",
@@ -155,4 +162,8 @@ def clean_and_format_data(df: pd.DataFrame) -> pd.DataFrame:
     cols = tb_garden.drop(["country", "year"], axis=1).columns
 
     tb_garden.loc[:, cols] = tb_garden.loc[:, cols].astype(float).round(2)
+    # replacing values where x <= 100 is False with None
+    tb_garden.loc[:, cols] = tb_garden.loc[:, cols].where(lambda x: x.le(100), None)
+    # dropping all columns that are only NA
+    tb_garden = tb_garden.dropna(axis=1, how="all")
     return tb_garden
