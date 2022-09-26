@@ -55,7 +55,9 @@ def run(dest_dir: str) -> None:
     df = df.reset_index()
 
     tb_garden = underscore_table(Table(df))
+    cols = tb_garden.drop(["country", "year"], axis=1).columns
 
+    tb_garden.loc[:, cols] = tb_garden.loc[:, cols].astype(float).round(2)
     tb_garden.metadata = tb_meadow.metadata
     ds_garden.metadata.update_from_yaml(N.metadata_path)
     tb_garden.update_metadata_from_yaml(N.metadata_path, "who_vaccination")

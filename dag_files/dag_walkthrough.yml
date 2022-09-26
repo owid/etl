@@ -10,3 +10,5 @@ steps:
   - walden://who/2022-07-17/who_vaccination
   data://garden/who/2022-07-17/who_vaccination:
   - data://meadow/who/2022-07-17/who_vaccination
+  data://grapher/who/2022-07-17/who_vaccination:
+  - data://garden/who/2022-07-17/who_vaccination
