@@ -212,8 +212,7 @@ def iso_gm2owid(ds: Variable) -> Variable:
     reference_dataset = Dataset(REFERENCE_DATASET)
     countries_regions = reference_dataset["countries_regions"]
     # Standardize
-    mapping = {**GM_TO_OWID_ISO_CODES, **countries_regions["name"]}
-    return ds.str.upper().map(mapping)
+    return ds.str.upper().map(GM_TO_OWID_ISO_CODES).map(countries_regions["name"])
 
 
 def fast_table_clean(dataset: Dataset, table_name: str) -> Table:
@@ -241,7 +240,7 @@ def fast_table_clean(dataset: Dataset, table_name: str) -> Table:
         >>> from owid.catalog import Dataset
         >>> from etl.paths import DATA_DIR
         >>> from etl.steps.open_numbers import on_table_clean_fast
-        >>> d = Dataset(DATA_DIR / "open_numbers/open_numbers/latest/open_numbers__world_development_indicators")
+        >>> d = Dataset(DATA_DIR / "meadow/open_numbers/latest/open_numbers__world_development_indicators")
         >>> df = on_table_clean_fast(d, "it_net_user_zs")
     """
     df = dataset[table_name].reset_index()
