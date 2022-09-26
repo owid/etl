@@ -89,7 +89,7 @@ steps:
     - backport://backport/owid/latest/dataset_5676_global_health_observatory__world_health_organization__2022_08
     - backport://backport/owid/latest/dataset_5712_food_security__suite_of_food_security_indicators__fao__2022_05_17
     - backport://backport/owid/latest/dataset_5757_multidimensional_poverty_index__mpi__2021__current_estimates
-    - backport://backport/owid/latest/dataset_70_population__gapminder__hyde__and__un
+    - backport://backport/owid/latest/dataset_5774_key_indicators
     - backport://backport/owid/latest/dataset_792_investment__credit_to_agriculture__fao__2017
     - backport://backport/owid/latest/dataset_829_food_security__suite_of_food_security_indicators__fao__2017
     - backport://backport/owid/latest/dataset_943_sexual_violence__unicef__2017
