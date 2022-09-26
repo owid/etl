@@ -83,7 +83,7 @@ def add_metadata_and_prepare_for_grapher(df_gr: pd.DataFrame, walden_ds: WaldenD
     source = Source(
         name=df_gr["source"].iloc[0],
         url=walden_ds.metadata["url"],
-        source_data_url=walden_ds.metadata["source_data_url"],
+        source_data_url=walden_ds.metadata.get("source_data_url"),
         owid_data_url=walden_ds.metadata["owid_data_url"],
         date_accessed=walden_ds.metadata["date_accessed"],
         publication_date=walden_ds.metadata["publication_date"],

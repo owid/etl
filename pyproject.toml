@@ -49,7 +49,7 @@ pydantic = "^1.9.0"
 structlog = "^21.5.0"
 sqlmodel = "^0.0.6"
 rich = "^12.1.0"
-owid-datautils = {git = "https://github.com/owid/owid-datautils-py.git", rev = "v0.4.11-alpha"}
+owid-datautils = {git = "https://github.com/owid/owid-datautils-py.git", rev = "v0.4.12-alpha"}
 fuzzywuzzy = "^0.18.0"
 rich-click = "^1.5.1"
 tenacity = "^8.0.1"

@@ -5,6 +5,8 @@ import pandas as pd
 from owid import catalog
 from owid.datautils import geo
 
+from etl.paths import DATA_DIR
+
 CURRENT_DIR = Path(__file__).parent
 VERSION = CURRENT_DIR.name
 
@@ -112,11 +114,9 @@ def load_population() -> pd.DataFrame:
 
     """
     # Load population dataset.
-    population = (
-        catalog.find("population", namespace="owid", dataset="key_indicators")
-        .load()
-        .reset_index()[["country", "year", "population"]]
-    )
+    population = catalog.Dataset(DATA_DIR / "garden/owid/latest/key_indicators/")["population"].reset_index()[
+        ["country", "year", "population"]
+    ]
 
     # Add data for historical regions (if not in population) by adding the population of its current successors.
     countries_with_population = population["country"].unique()
