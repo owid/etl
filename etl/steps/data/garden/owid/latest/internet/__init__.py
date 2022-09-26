@@ -33,14 +33,13 @@ def make_users_table() -> Table:
     # Merge
     table = table_population.merge(table_internet, left_index=True, right_index=True)
     # Estimate number of internet users
-    share_internet_users = table.it_net_user_zs / 100
-    num_internet_users = (table.population * share_internet_users).round().astype(int)
+    num_internet_users = (table.population * table.it_net_user_zs / 100).round().astype(int)
     # Add to table
     var_name = "num_internet_users"
     table = table.assign(
         **{
             var_name: Variable(num_internet_users, name=var_name),
-            "share_internet_users": share_internet_users,
+            "share_internet_users": table.it_net_user_zs,
         }
     )
     # Filter columns
@@ -53,7 +52,8 @@ def make_users_table() -> Table:
         "The number of internet users is calculated by Our World in Data based on internet access figures "
         "as a share of the total population, published in the World Bank, World Development Indicators "
         "and total population figures from the UN World Population Prospects, Gapminder and HYDE.\n\n"
-    ) + table.num_internet_users.metadata.description
+        + table.num_internet_users.metadata.description
+    )
     # Metadata from YAML
     table.update_metadata_from_yaml(METADATA_PATH, "users")
     return table
