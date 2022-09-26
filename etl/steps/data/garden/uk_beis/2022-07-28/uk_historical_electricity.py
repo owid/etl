@@ -18,6 +18,24 @@ MTOE_TO_TWH = 11.63
 def combine_tables(
     tb_fuel_input: catalog.Table, tb_supply: catalog.Table, tb_efficiency: catalog.Table
 ) -> catalog.Table:
+    """Combine tables (each one originally coming from a different sheet of the BEIS data file) and prepare output table
+    with metadata.
+
+    Parameters
+    ----------
+    tb_fuel_input : catalog.Table
+        Data extracted from the "Fuel input" sheet.
+    tb_supply : catalog.Table
+        Data extracted from the "Supply, availability & consump" sheet.
+    tb_efficiency : catalog.Table
+        Data (on implied efficiency) extracted from the "Generated and supplied" sheet.
+
+    Returns
+    -------
+    tb_combined : catalog.Table
+        Combined and processed table with metadata and a verified index.
+
+    """
     tb_fuel_input = tb_fuel_input.copy()
     tb_supply = tb_supply.copy()
     tb_efficiency = tb_efficiency.copy()

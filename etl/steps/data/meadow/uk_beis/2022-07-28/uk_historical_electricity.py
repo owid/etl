@@ -13,6 +13,29 @@ N = Names(__file__)
 
 
 def prepare_data(df: pd.DataFrame, expected_content: Dict[int, List[str]], columns: Dict[int, str]) -> pd.DataFrame:
+    """Prepare raw content of a specific sheet in the the BEIS excel file (loaded with a simple pd.read_excel(...)).
+
+    It contains some sanity checks due to the poor formatting of the original file, and some basic processing (like
+    removing footnote marks from the years, e.g. "2000 (5)" -> 2000). Duplicate rows are not removed.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+    expected_content : dict
+        Words that are expected to be found in any row of specific columns in the data. The dictionary key should be the
+        column number (where the 0th column is expected to be the years variable), and the value should be a list of
+        words (for example, a column that contains data for natural gas may have the words "Natural" and "gas" spread
+        across two different rows). This is used to check that the columns are in the order we expected.
+    columns : dict
+        Columns to select from data, and how to rename them. The dictionary key should be the column number, and the
+        value should be the new name for that column.
+
+    Returns
+    -------
+    df : pd.DataFrame
+        Clean data extracted, with proper column names.
+
+    """
     df = df.copy()
 
     # Check that certain words are contained in specific columns, to ensure that they contain the data we expect.
