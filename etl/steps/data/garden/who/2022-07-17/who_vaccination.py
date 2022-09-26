@@ -143,6 +143,7 @@ def clean_and_format_data(df: pd.DataFrame) -> Any:
     # may need to combine japanese encephalitis and japanese encephalitis first dose
     # We use only the WUENIC figures - those estimated by WHO and UNICEF - other estimates available are OFFICIAL and ADMIN
     df = df[df["coverage_category"] == "WUENIC"]
+    df = df[df["antigen"] != "MCV2X2"]
     df = df.dropna(subset="coverage")
     df = df.drop(columns=["index", "group", "antigen", "coverage_category", "coverage_category_description"])
     df = df.pivot_table(

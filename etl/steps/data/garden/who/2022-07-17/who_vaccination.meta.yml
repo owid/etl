@@ -23,7 +23,7 @@ tables:
         title: Number of one-year-olds not vaccinated with BCG
         unit: unvaccinated one-year-olds
       dtp_containing_vaccine__1st_dose:
-        title: Coverage of DTP-containing vaccine, 1st dose
+        title: DTP1 (% of one-year-olds immunized)
         short_unit: '%'
         unit: '%'
       dtp_containing_vaccine__1st_dose_vaccinated:
@@ -53,7 +53,7 @@ tables:
         title: Number of one-year-olds unvaccinated with HepB3
         unit: unvaccinated one-year-olds
       hepb__birth_dose__given_within_24_hours_of_birth:
-        title: Coverage of HepB, birth dose (given within 24 hours of birth)
+        title: HepBBD (% of one-year-olds immunized within 24 hours of birth)
         short_unit: '%'
         unit: '%'
       hepb__birth_dose__given_within_24_hours_of_birth_vaccinated:
@@ -94,10 +94,6 @@ tables:
         unit: unvaccinated one-year-olds
       measles_containing_vaccine__2nd_dose:
         title: MCV2 (% of one-year-olds immunized)
-        short_unit: '%'
-        unit: '%'
-      measles_containing_vaccine_2nd_dose_by_2_years_of_age:
-        title: Coverage of measles-containing vaccine, 2nd dose by two years of age
         short_unit: '%'
         unit: '%'
       measles_containing_vaccine__2nd_dose_vaccinated:
