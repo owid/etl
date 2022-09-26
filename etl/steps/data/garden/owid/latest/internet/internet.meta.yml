@@ -1,0 +1,18 @@
+dataset:
+  namespace: owid
+  version: latest
+  title: Internet
+  description: The Internet dataset by Our World in Data contains different Internet-related metrics.
+  short_name: internet
+
+tables:
+  users:
+    title: Internet user statistics
+    description: Key user statistics related to Internet (e.g. number of individuals using the Internet).
+    variables:
+      num_internet_users:
+        title: Number of Internet users
+        short_unit: users
+        unit: users
+        display:
+          name: Number of Internet users
