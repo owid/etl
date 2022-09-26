@@ -1,5 +1,4 @@
 import json
-from cmath import nan
 from functools import reduce
 from typing import List, cast
 
