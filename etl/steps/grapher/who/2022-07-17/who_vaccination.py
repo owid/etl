@@ -3,7 +3,6 @@ from owid import catalog
 from etl.helpers import Names
 
 N = Names(__file__)
-N = Names("/Users/fionaspooner/Documents/OWID/repos/etl/etl/steps/data/grapher/who/2022-07-17/who_vaccination.py")
 
 
 def run(dest_dir: str) -> None:

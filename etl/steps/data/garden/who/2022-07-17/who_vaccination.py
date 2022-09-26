@@ -20,7 +20,6 @@ UNWPP = DATA_DIR / "garden/un/2022-07-11/un_wpp"
 log = get_logger()
 
 N = Names(__file__)
-N = Names("/Users/fionaspooner/Documents/OWID/repos/etl/etl/steps/data/garden/who/2022-07-17/who_vaccination.py")
 
 
 def run(dest_dir: str) -> None:
