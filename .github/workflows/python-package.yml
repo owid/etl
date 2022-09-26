@@ -59,3 +59,13 @@ jobs:
       - name: Unit test
         run: |
           make unittest
+
+      - name: owid-catalog-py tests
+        run: |
+          cd vendor/owid-catalog-py
+          make test
+
+      - name: walden tests
+        run: |
+          cd vendor/walden
+          make test
