@@ -250,7 +250,7 @@ def fast_table_clean(dataset: Dataset, table_name: str) -> Table:
         raise Exception(f"Table must have 3 columns (including original indices). Instead it has {ncols} columns.")
     if "geo" not in df.columns:
         if "global" in df.columns:
-            raise KeyError("This is a global dataset! Does not have column 'geo' but 'globall instead.")
+            raise KeyError("This is a global dataset! Does not have column 'geo' but 'global' instead.")
         raise KeyError(f"Table should have column named 'geo'! Found columns are {df.columns}.")
     if "time" not in df.columns:
         raise KeyError(f"Table should have column named 'time'! Found columns are {df.columns}.")
