@@ -20,10 +20,9 @@ import frictionless
 import pandas as pd
 import structlog
 from frictionless.exception import FrictionlessException
-from owid.catalog import Dataset, Table, utils
+from owid.catalog import Dataset, Table, Variable, utils
 from owid.catalog.meta import Source
 
-from etl import data_helpers
 from etl.git import GithubRepo
 from etl.paths import REFERENCE_DATASET
 
@@ -208,7 +207,7 @@ GM_TO_OWID_ISO_CODES = {
 }
 
 
-def iso_gm2owid(ds):
+def iso_gm2owid(ds: Variable) -> Variable:
     # Load reference OWID country file
     reference_dataset = Dataset(REFERENCE_DATASET)
     countries_regions = reference_dataset["countries_regions"]
