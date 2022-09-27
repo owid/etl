@@ -485,6 +485,12 @@ def _adapt_table_for_grapher(
     """
     table = deepcopy(table)
 
+    variable_titles = pd.Series([table[col].title for col in table.columns]).dropna()
+    variable_titles_counts = variable_titles.value_counts()
+    assert (
+        variable_titles_counts.empty or variable_titles_counts.max() == 1
+    ), f"Variable titles are not unique ({variable_titles_counts[variable_titles_counts > 1].index})."
+
     # Remember original dimensions
     dim_names = [n for n in table.index.names if n and n not in ("year", "entity_id", country_col)]
 
