@@ -17,6 +17,7 @@ from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Protocol, Set, Union, cast
 from urllib.parse import urlparse
 
+import structlog
 import yaml
 
 # smother deprecation warnings by papermill
@@ -45,6 +46,7 @@ from etl.helpers import get_etag
 Graph = Dict[str, Set[str]]
 DAG = Dict[str, Any]
 
+log = structlog.get_logger()
 
 def compile_steps(
     dag: DAG,
@@ -305,11 +307,19 @@ class DataStep(Step):
         ...
 
     def is_dirty(self) -> bool:
-        if not self.has_existing_data() or any(d.is_dirty() for d in self.dependencies):
+        if not self.has_existing_data():
+            log.info('DataStep.no_existing_data', step=self.path)
             return True
+
+        for d in self.dependencies:
+            if d.is_dirty():
+                log.info('DataStep.dirty_dependency', step=self.path, dep=d.path)
+                return True
 
         found_source_checksum = catalog.Dataset(self._dest_dir.as_posix()).metadata.source_checksum
         exp_source_checksum = self.checksum_input()
+
+        log.info('DataStep.checksum', step=self.path, found=found_source_checksum, expected=exp_source_checksum)
 
         if found_source_checksum != exp_source_checksum:
             return True
@@ -338,6 +348,8 @@ class DataStep(Step):
 
         for f in self._step_files():
             checksums[f] = files.checksum_file(f)
+
+        log.info('DataStep.checksum_input', step=self.path, checksums=checksums)
 
         in_order = [v for _, v in sorted(checksums.items())]
         return hashlib.md5(",".join(in_order).encode("utf8")).hexdigest()
