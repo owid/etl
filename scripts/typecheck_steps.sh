@@ -9,7 +9,7 @@ all_step_dirs() {
 
 only_dirs_with_python_files() {
     for dir in $(all_step_dirs); do
-        if find $dir -name '*.py' -print -quit | grep -q . ; then
+        if find $dir -name '*.py' -not -path "*/.ipynb_checkpoints/*" -print -quit | grep -q . ; then
             echo $dir
         fi
     done
