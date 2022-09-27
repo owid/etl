@@ -125,31 +125,31 @@ steps:
   # IHME - Global Burden of Disease.
   #
   data://meadow/ihme_gbd/2019/gbd_cause:
-  - walden://ihme_gbd/2019/gbd_cause
+    - walden://ihme_gbd/2019/gbd_cause
   data://meadow/ihme_gbd/2019/gbd_child_mortality:
-  - walden://ihme_gbd/2019/gbd_child_mortality
+    - walden://ihme_gbd/2019/gbd_child_mortality
   data://meadow/ihme_gbd/2019/gbd_mental_health:
-  - walden://ihme_gbd/2019/gbd_mental_health
+    - walden://ihme_gbd/2019/gbd_mental_health
   data://meadow/ihme_gbd/2019/gbd_risk:
-  - walden://ihme_gbd/2019/gbd_risk
+    - walden://ihme_gbd/2019/gbd_risk
   data://meadow/ihme_gbd/2019/gbd_prevalence:
-  - walden://ihme_gbd/2019/gbd_prevalence
+    - walden://ihme_gbd/2019/gbd_prevalence
   data://garden/ihme_gbd/2019/gbd_cause:
-  - data://meadow/ihme_gbd/2019/gbd_cause
+    - data://meadow/ihme_gbd/2019/gbd_cause
   data://garden/ihme_gbd/2019/gbd_risk:
-  - data://meadow/ihme_gbd/2019/gbd_risk
+    - data://meadow/ihme_gbd/2019/gbd_risk
   data://garden/ihme_gbd/2019/gbd_child_mortality:
-  - data://meadow/ihme_gbd/2019/gbd_child_mortality
+    - data://meadow/ihme_gbd/2019/gbd_child_mortality
   data://garden/ihme_gbd/2019/gbd_mental_health:
-  - data://meadow/ihme_gbd/2019/gbd_mental_health
+    - data://meadow/ihme_gbd/2019/gbd_mental_health
   data://garden/ihme_gbd/2019/gbd_prevalence:
-  - data://meadow/ihme_gbd/2019/gbd_prevalence
+    - data://meadow/ihme_gbd/2019/gbd_prevalence
   data://grapher/ihme_gbd/2019/gbd_cause:
-  - data://garden/ihme_gbd/2019/gbd_cause
+    - data://garden/ihme_gbd/2019/gbd_cause
   data://grapher/ihme_gbd/2019/gbd_prevalence:
-  - data://garden/ihme_gbd/2019/gbd_prevalence
+    - data://garden/ihme_gbd/2019/gbd_prevalence
   data://grapher/ihme_gbd/2019/gbd_child_mortality:
-  - data://garden/ihme_gbd/2019/gbd_child_mortality
+    - data://garden/ihme_gbd/2019/gbd_child_mortality
 
   #
   # UN
@@ -158,6 +158,13 @@ steps:
     - data://garden/un_sdg/2022-07-07/un_sdg
   data://grapher/un/2022-07-11/un_wpp:
     - data://garden/un/2022-07-11/un_wpp
+
+  # Internet
+  data://garden/technology/2022/internet:
+    - data://garden/worldbank_wdi/2022-05-26/wdi
+    - data://garden/owid/latest/key_indicators
+  data://grapher/technology/2022/internet:
+    - data://garden/technology/2022/internet
 
 # Sub-dags to import
 include:
