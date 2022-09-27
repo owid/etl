@@ -1,7 +1,7 @@
 dataset:
-  namespace: owid
-  version: latest
-  title: Internet
+  namespace: technology
+  version: 2022
+  title: Internet (various sources)
   description: The Internet dataset by Our World in Data contains different Internet-related metrics.
   short_name: internet
 

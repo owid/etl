@@ -2,7 +2,7 @@ from owid import catalog
 
 from etl.paths import DATA_DIR
 
-DATASET_GARDEN = DATA_DIR / "garden/owid/latest/internet"
+DATASET_GARDEN = DATA_DIR / "garden/technology/2022/internet"
 
 
 def run(dest_dir: str) -> None:
