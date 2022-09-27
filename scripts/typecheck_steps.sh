@@ -7,12 +7,8 @@ all_step_dirs() {
     echo etl/steps/*/*/*/*/
 }
 
-all_grapher_dirs() {
-    echo etl/steps/grapher/*/*/
-}
-
 only_dirs_with_python_files() {
-    for dir in $(all_step_dirs) $(all_grapher_dirs); do
+    for dir in $(all_step_dirs); do
         if find $dir -name '*.py' -print -quit | grep -q . ; then
             echo $dir
         fi
