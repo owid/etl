@@ -340,11 +340,7 @@ def country_to_entity_id(
     if entity_id.isnull().any() and fill_from_db:
         ix = entity_id.isnull()
         db_entities = _get_entities_from_db(set(country[ix]), by=by)
-        # NOTE: this is hotfix, check out entity_id type
-        if entity_id.isnull().all():
-            entity_id = country.map(db_entities)
-        else:
-            entity_id[ix] = country[ix].map(db_entities)
+        entity_id[ix] = country[ix].map(db_entities).astype(float)
 
     # create entities in DB
     if entity_id.isnull().any() and create_entities:
@@ -488,6 +484,12 @@ def _adapt_table_for_grapher(
 
     """
     table = deepcopy(table)
+
+    variable_titles = pd.Series([table[col].title for col in table.columns]).dropna()
+    variable_titles_counts = variable_titles.value_counts()
+    assert (
+        variable_titles_counts.empty or variable_titles_counts.max() == 1
+    ), f"Variable titles are not unique ({variable_titles_counts[variable_titles_counts > 1].index})."
 
     # Remember original dimensions
     dim_names = [n for n in table.index.names if n and n not in ("year", "entity_id", country_col)]

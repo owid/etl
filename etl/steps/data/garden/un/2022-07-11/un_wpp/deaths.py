@@ -65,7 +65,7 @@ def add_age_groups(df: pd.DataFrame) -> pd.DataFrame:
     # <1
     df_0 = df[df.age == "0"].copy()
     # 1-4
-    df_1_4 = df[df.age.isin(["1", "2", "3", "4"])].copy()
+    df_1_4 = df[df.age.isin(["1", "2", "3", "4"])].drop(columns="age").copy()
     df_1_4 = (
         df_1_4.groupby(
             ["location", "year", "metric", "sex", "variant"],
