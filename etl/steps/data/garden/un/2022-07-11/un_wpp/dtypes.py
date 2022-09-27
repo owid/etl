@@ -7,6 +7,7 @@ _countries = pd.read_csv(
     Path(__file__).parent / "un_wpp.country_std.csv",
     index_col="Country",
 )
+
 countries = sorted(set(_countries["Our World In Data Name"].tolist()))
 metrics = {
     "birth_rate",
