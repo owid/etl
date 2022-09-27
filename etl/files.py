@@ -32,10 +32,10 @@ def walk(folder: Path, ignore_set: Set[str] = {"__pycache__", ".ipynb_checkpoint
     paths = []
     for p in folder.iterdir():
         if p.is_dir():
-            paths.extend(walk(p))
+            if p.name not in ignore_set:
+                paths.extend(walk(p, ignore_set=ignore_set))
             continue
-
-        if p.name not in ignore_set:
+        else:
             paths.append(p)
 
     return paths
