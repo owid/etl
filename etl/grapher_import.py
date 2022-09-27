@@ -265,8 +265,16 @@ def fetch_db_checksum(dataset: catalog.Dataset) -> Optional[str]:
     Fetch the latest source checksum associated with a given dataset in the db. Can be compared
     with the current source checksum to determine whether the db is up-to-date.
     """
+    assert dataset.metadata.short_name, "Dataset must have a short_name"
+    assert dataset.metadata.version, "Dataset must have a version"
+    assert dataset.metadata.namespace, "Dataset must have a namespace"
+
     with Session(gm.get_engine()) as session:
-        q = select(gm.Dataset).where(gm.Dataset.shortName == dataset.metadata.short_name)
+        q = select(gm.Dataset).where(
+            gm.Dataset.shortName == dataset.metadata.short_name,
+            gm.Dataset.version == dataset.metadata.version,
+            gm.Dataset.namespace == dataset.metadata.namespace,
+        )
         ds = session.exec(q).one_or_none()
         return ds.sourceChecksum if ds is not None else None
 
