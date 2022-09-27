@@ -189,7 +189,7 @@ def _add_metric_population(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame
 
 def _add_age_group(df: pd.DataFrame, age_min: int, age_max: int) -> pd.DataFrame:
     ages_accepted = [str(i) for i in range(age_min, age_max + 1)]
-    dfx: pd.DataFrame = df.loc[df.age.isin(ages_accepted)].drop(columns='age').copy()
+    dfx: pd.DataFrame = df.loc[df.age.isin(ages_accepted)].drop(columns="age").copy()
     dfx = (
         dfx.groupby(
             ["location", "year", "metric", "sex", "variant"],
