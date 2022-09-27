@@ -46,7 +46,7 @@ def _load_population(tmp_dir: str) -> pd.DataFrame:
         "ParentID": "category",
         "Location": "category",
         "VarID": CategoricalDtype(categories=["2", "3", "4"]),
-        "Variant": CategoricalDtype(categories=["Medium", "High", "Low"]),
+        "Variant": CategoricalDtype(categories=["Medium", "High", "Low", "Constant fertility"]),
         "Time": "uint16",
         "MidPeriod": "uint16",
         "AgeGrp": "category",
