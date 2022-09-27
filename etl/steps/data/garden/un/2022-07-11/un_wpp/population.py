@@ -122,7 +122,7 @@ def _add_metric_sexratio(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def _add_metric_population(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
-    df_p = df[df.metric == "population"]
+    df_p = df.loc[df.metric == "population"]
     # Basic age groups
     age_map = {
         **{str(i): f"{i - i%5}-{i + 4 - i%5}" for i in range(0, 20)},
@@ -189,7 +189,7 @@ def _add_metric_population(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame
 
 def _add_age_group(df: pd.DataFrame, age_min: int, age_max: int) -> pd.DataFrame:
     ages_accepted = [str(i) for i in range(age_min, age_max + 1)]
-    dfx: pd.DataFrame = df[df.age.isin(ages_accepted)].copy()
+    dfx: pd.DataFrame = df.loc[df.age.isin(ages_accepted)].drop(columns='age').copy()
     dfx = (
         dfx.groupby(
             ["location", "year", "metric", "sex", "variant"],
