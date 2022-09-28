@@ -86,14 +86,13 @@ def harmonize_countries(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def get_population_one_year_olds() -> Any:
+def get_population_one_year_olds() -> pd.DataFrame:
     un_wpp_data = catalog.Dataset(UNWPP)
     pop = un_wpp_data["population"].reset_index()
     pop_one_yr = pop[
         (pop["age"] == "1") & (pop["variant"] == "estimates") & (pop["metric"] == "population") & (pop["sex"] == "all")
     ]
-    pop_one_yr = pd.DataFrame(pop_one_yr)
-    return pop_one_yr
+    return cast(pd.DataFrame, pop_one_yr)
 
 
 def calculate_vaccinated_unvaccinated_population(table: Table, pop_one_yr: pd.DataFrame) -> Any:
@@ -136,10 +135,10 @@ def calculate_vaccinated_unvaccinated_population(table: Table, pop_one_yr: pd.Da
     data_frames = [table, vax_pop, unvax_pop]
 
     df_merged = reduce(lambda left, right: pd.merge(left, right, on=["country", "year"], how="outer"), data_frames)
-    return df_merged
+    return cast(pd.DataFrame, df_merged)
 
 
-def clean_and_format_data(df: pd.DataFrame) -> Any:
+def clean_and_format_data(df: pd.DataFrame) -> pd.DataFrame:
     # may need to combine japanese encephalitis and japanese encephalitis first dose
     # We use only the WUENIC figures - those estimated by WHO and UNICEF - other estimates available are OFFICIAL and ADMIN
     df = df[df["coverage_category"] == "WUENIC"]
@@ -165,4 +164,4 @@ def clean_and_format_data(df: pd.DataFrame) -> Any:
     tb_garden.loc[:, cols] = tb_garden.loc[:, cols].where(lambda x: x.le(100), None)
     # dropping all columns that are only NA
     tb_garden = tb_garden.dropna(axis=1, how="all")
-    return tb_garden
+    return cast(pd.DataFrame, tb_garden)
