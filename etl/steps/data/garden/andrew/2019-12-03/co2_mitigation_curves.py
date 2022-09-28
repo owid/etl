@@ -1,10 +1,6 @@
-from typing import List, cast
-
-import pandas as pd
-from owid.catalog import Dataset, Table
+from owid.catalog import Dataset
 
 from etl.helpers import Names
-from etl.paths import DATA_DIR
 
 # naming conventions
 N = Names(__file__)
@@ -25,18 +21,26 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     # Rename columns (that will become rows at a later step).
-    tb_1p5celsius = tb_1p5celsius.rename(columns={
-        column: f"Start in {column.replace('_', '')}" for column in tb_1p5celsius.columns
-        if column not in ["year", "historical"]}).rename(columns={"historical": "Historical"})
+    tb_1p5celsius = tb_1p5celsius.rename(
+        columns={
+            column: f"Start in {column.replace('_', '')}"
+            for column in tb_1p5celsius.columns
+            if column not in ["year", "historical"]
+        }
+    ).rename(columns={"historical": "Historical"})
     # Switch to a long table.
     tb_1p5celsius = tb_1p5celsius.melt(id_vars="year", var_name="origin", value_name="emissions")
     # Set an appropriate index and sort.
     tb_1p5celsius = tb_1p5celsius.set_index(["year", "origin"], verify_integrity=True).sort_index().sort_index(axis=1)
 
     # Repeat the process for the other table.
-    tb_2celsius = tb_2celsius.rename(columns={
-        column: f"Start in {column.replace('_', '')}" for column in tb_2celsius.columns
-        if column not in ["year", "historical"]}).rename(columns={"historical": "Historical"})
+    tb_2celsius = tb_2celsius.rename(
+        columns={
+            column: f"Start in {column.replace('_', '')}"
+            for column in tb_2celsius.columns
+            if column not in ["year", "historical"]
+        }
+    ).rename(columns={"historical": "Historical"})
     # Switch to a long table.
     tb_2celsius = tb_2celsius.melt(id_vars="year", var_name="origin", value_name="emissions")
     # Set an appropriate index and sort.

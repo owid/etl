@@ -5,7 +5,6 @@ from owid.walden import Catalog as WaldenCatalog
 from structlog import get_logger
 
 from etl.helpers import Names
-from etl.paths import DATA_DIR, REFERENCE_DATASET
 from etl.steps.data.converters import convert_walden_metadata
 
 log = get_logger()
@@ -23,14 +22,16 @@ def run(dest_dir: str) -> None:
     log.info("co2_mitigation_curves.start")
 
     # Load raw dataset on mitigation curves for 2 Celsius.
-    walden_ds_2celsius = WaldenCatalog().find_one(namespace="andrew", short_name="co2_mitigation_curves_2celsius",
-        version=WALDEN_VERSION)
+    walden_ds_2celsius = WaldenCatalog().find_one(
+        namespace="andrew", short_name="co2_mitigation_curves_2celsius", version=WALDEN_VERSION
+    )
     local_file_2celsius = walden_ds_2celsius.ensure_downloaded()
     df_2celsius = pd.read_csv(local_file_2celsius)
 
     # Load raw dataset on mitigation curves for 1.5 Celsius.
-    walden_ds_1p5celsius = WaldenCatalog().find_one(namespace="andrew", short_name="co2_mitigation_curves_1p5celsius",
-        version=WALDEN_VERSION)
+    walden_ds_1p5celsius = WaldenCatalog().find_one(
+        namespace="andrew", short_name="co2_mitigation_curves_1p5celsius", version=WALDEN_VERSION
+    )
     local_file_1p5celsius = walden_ds_1p5celsius.ensure_downloaded()
     df_1p5celsius = pd.read_csv(local_file_1p5celsius)
 
@@ -58,7 +59,6 @@ def run(dest_dir: str) -> None:
     tb_1p5celsius = Table(df_1p5celsius, metadata=table_metadata_1p5celsius)
     # Underscore all table columns.
     tb_1p5celsius = underscore_table(tb_1p5celsius)
-
 
     # Add tables to the new dataset.
     ds.add(tb_2celsius)
