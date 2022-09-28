@@ -16,7 +16,10 @@ def run(dest_dir: str) -> None:
     garden_dataset.metadata.short_name = GARDEN_TABLE_NAME
     garden_dataset.metadata.title = table.metadata.title
     garden_dataset.metadata.description = table.metadata.description
-
+    # Convert units conveniently.
+    table["emissions"] *= 1e9
+    table["emissions"].metadata.unit = "tonnes"
+    table["emissions"].metadata.short_unit = "t"
     # Create a new grapher dataset.
     dataset = catalog.Dataset.create_empty(dest_dir, garden_dataset.metadata)
     # Load table from dataset and change the "origin" column to act as if it was the country name.
