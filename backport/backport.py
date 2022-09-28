@@ -16,7 +16,7 @@ from etl import config
 from etl import grapher_model as gm
 from etl.backport_helpers import GrapherConfig
 from etl.db import get_engine
-from etl.files import checksum_str, checksum_file
+from etl.files import checksum_file, checksum_str
 
 from . import utils
 
