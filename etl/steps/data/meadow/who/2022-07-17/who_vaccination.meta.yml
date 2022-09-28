@@ -1,0 +1,40 @@
+dataset:
+  sources:
+    -
+      name: WHO/UNICEF
+      published_by: World Health Organization (2022)
+      publisher_source: WHO/UNICEF
+
+tables:
+  who_vaccination:
+    variables:
+      group:
+        title: Type of entity
+      country:
+        title: Country
+        description: The name of the geographic entity
+      year:
+        title: Year
+      antigen:
+        title: Antigen
+        description: The type of immunization used
+      antigen_description:
+        title: Antigen description
+        description: A description of the immunization used
+      coverage_category:
+        title: Coverage type
+        description: Coverage estimation method
+      coverage_category_description:
+        title: Coverage type description
+        description: Description of the coverage estimation method
+      target_number:
+        title: Target number
+        description: Target number of doses to administer
+      doses:
+        title: Doses
+        description: Number of doses administered
+      coverage:
+        title: Coverage
+        description: Share of target population immunised
+      
+      
