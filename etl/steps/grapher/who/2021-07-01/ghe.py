@@ -70,40 +70,6 @@ def run(dest_dir: str) -> None:
 
 def select_subset_causes(table: pd.DataFrame) -> pd.DataFrame:
 
-    selected_causes = [
-        "Malaria",
-        "HIV/AIDS",
-        "Tuberculosis",
-        "Diarrhoeal diseases",
-        # Respiratory diseases
-        "Lower respiratory infections",
-        "Upper respiratory infections",
-        "Meningitis",
-        # Cardiovascular disease
-        "Stroke",
-        # Cancers
-        # Liver disease
-        # Digestive diseases
-        "Diabetes mellitus",
-        "Alzheimer disease and other dementias" "Parkinson disease",
-        # Chronic respiratory disease
-        "Road injury",
-        "Interpersonal violence",
-        "Self-harm",
-        "Drowning",
-        "Fire, heat and hot substances",
-        # War and conflicts (in with interpersonal violence)
-        "Natural disasters",
-        "Poisonings",
-        "Falls",
-        "Alcohol use disorders",
-        "Drug use disorders",
-        "Uncorrected refractive errors",
-    ]
-    table = table[
-        (table["ghe_cause_title"].isin(selected_causes))
-        & (table["sex_code"] == "both")
-        & (table["agegroup_code"] == "ALLAges")
-    ]
+    table = table[(table["sex_code"] == "both") & (table["agegroup_code"] == "ALLAges")]
 
     return table
