@@ -406,4 +406,3 @@ ssh owid-analytics
 cd etl-staging
 .venv/bin/etl garden explorers
 ```
-
