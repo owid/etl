@@ -31,5 +31,7 @@ steps:
     - walden://andrew/2019-12-03/co2_mitigation_curves_2celsius
   data://garden/andrew/2019-12-03/co2_mitigation_curves:
     - data://meadow/andrew/2019-12-03/co2_mitigation_curves
-  data://grapher/andrew/2019-12-03/co2_mitigation_curves:
+  data://grapher/andrew/2019-12-03/co2_mitigation_curves_1p5celsius:
+    - data://garden/andrew/2019-12-03/co2_mitigation_curves
+  data://grapher/andrew/2019-12-03/co2_mitigation_curves_2celsius:
     - data://garden/andrew/2019-12-03/co2_mitigation_curves

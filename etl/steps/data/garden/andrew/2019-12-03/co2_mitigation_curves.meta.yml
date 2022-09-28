@@ -3,6 +3,7 @@ dataset:
 
 tables:
   co2_mitigation_curves_1p5celsius:
+    title: CO2 mitigation curves for 1.5°C
     description: |
       Data denotes the range of CO2 mitigation curves for a range of 'start year scenarios': Scenarios are based on the annual emission reductions necessary to keep global temperature rise below 1.5°C if emissions mitigation was to start in a given year.
 
@@ -19,6 +20,7 @@ tables:
         description: The range of CO2 mitigation curves to have a >66% chance of keeping global average temperature rise below 1.5°C. Scenarios measure future global annual emissions necessary based on a given start year for emissions mitigation.
 
   co2_mitigation_curves_2celsius:
+    title: CO2 mitigation curves for 2°C
     description: |
       Data denotes the range of CO2 mitigation curves for a range of 'start year scenarios': Scenarios are based on the annual emission reductions necessary to keep global temperature rise below 2°C if emissions mitigation was to start in a given year.
 
