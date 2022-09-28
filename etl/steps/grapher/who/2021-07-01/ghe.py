@@ -1,4 +1,6 @@
-import click
+# To run with subset only: GHE_SUBSET_ONLY=1 etl grapher/who/2021-07-01/ghe --grapher
+import os
+
 import pandas as pd
 from owid import catalog
 
@@ -8,14 +10,7 @@ from etl.helpers import Names
 N = Names(__file__)
 
 
-@click.command()
-@click.option(
-    "--subset/--all",
-    default=True,
-    type=bool,
-    help="Upload subset of variables or full dataset",
-)
-def run(dest_dir: str, subset_only: bool) -> None:
+def run(dest_dir: str) -> None:
     dataset = catalog.Dataset.create_empty(dest_dir, N.garden_dataset.metadata)
     dataset.save()
 
@@ -51,9 +46,10 @@ def run(dest_dir: str, subset_only: bool) -> None:
         )
 
     table.reset_index(inplace=True)
-    if subset_only:
+    if "GHE_SUBSET_ONLY" in os.environ:
         table = select_subset_causes(table)
-
+    else:
+        table = table
     table["entity_id"] = gh.country_to_entity_id(table["country_code"], by="code")
     table = table.drop(["country_code"], axis=1)
     table = table.set_index(["entity_id", "year", "ghe_cause_title", "sex_code", "agegroup_code"])
@@ -104,8 +100,10 @@ def select_subset_causes(table: pd.DataFrame) -> pd.DataFrame:
         "Drug use disorders",
         "Uncorrected refractive errors",
     ]
-    # test it works
-    selected_causes = "Malaria"
-    table = table[table["ghe_cause_title"].isin(selected_causes)]
+    table = table[
+        (table["ghe_cause_title"].isin(selected_causes))
+        & (table["sex_code"] == "both")
+        & (table["agegroup_code"] == "ALLAges")
+    ]
 
     return table
