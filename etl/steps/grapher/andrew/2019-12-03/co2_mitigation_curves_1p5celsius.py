@@ -18,7 +18,7 @@ def run(dest_dir: str) -> None:
     garden_dataset.metadata.description = table.metadata.description
 
     # Create a new grapher dataset.
-    dataset = catalog.Dataset.create_empty(dest_dir,garden_dataset.metadata)
+    dataset = catalog.Dataset.create_empty(dest_dir, garden_dataset.metadata)
     # Load table from dataset and change the "origin" column to act as if it was the country name.
     # This is a workaround to be able to visualize all curves of origin together in a line chart.
     table = table.rename(columns={"origin": "country"})
