@@ -1,3 +1,5 @@
+import click
+import pandas as pd
 from owid import catalog
 
 from etl import grapher_helpers as gh
@@ -6,7 +8,14 @@ from etl.helpers import Names
 N = Names(__file__)
 
 
-def run(dest_dir: str) -> None:
+@click.command()
+@click.option(
+    "--subset/--all",
+    default=True,
+    type=bool,
+    help="Upload subset of variables or full dataset",
+)
+def run(dest_dir: str, subset_only: bool) -> None:
     dataset = catalog.Dataset.create_empty(dest_dir, N.garden_dataset.metadata)
     dataset.save()
 
@@ -42,6 +51,9 @@ def run(dest_dir: str) -> None:
         )
 
     table.reset_index(inplace=True)
+    if subset_only:
+        table = select_subset_causes(table)
+
     table["entity_id"] = gh.country_to_entity_id(table["country_code"], by="code")
     table = table.drop(["country_code"], axis=1)
     table = table.set_index(["entity_id", "year", "ghe_cause_title", "sex_code", "agegroup_code"])
@@ -58,3 +70,42 @@ def run(dest_dir: str) -> None:
     table = table.loc[:, columns_to_export]
 
     dataset.add(table)
+
+
+def select_subset_causes(table: pd.DataFrame) -> pd.DataFrame:
+
+    selected_causes = [
+        "Malaria",
+        "HIV/AIDS",
+        "Tuberculosis",
+        "Diarrhoeal diseases",
+        # Respiratory diseases
+        "Lower respiratory infections",
+        "Upper respiratory infections",
+        "Meningitis",
+        # Cardiovascular disease
+        "Stroke",
+        # Cancers
+        # Liver disease
+        # Digestive diseases
+        "Diabetes mellitus",
+        "Alzheimer disease and other dementias" "Parkinson disease",
+        # Chronic respiratory disease
+        "Road injury",
+        "Interpersonal violence",
+        "Self-harm",
+        "Drowning",
+        "Fire, heat and hot substances",
+        # War and conflicts (in with interpersonal violence)
+        "Natural disasters",
+        "Poisonings",
+        "Falls",
+        "Alcohol use disorders",
+        "Drug use disorders",
+        "Uncorrected refractive errors",
+    ]
+    # test it works
+    selected_causes = "Malaria"
+    table = table[table["ghe_cause_title"].isin(selected_causes)]
+
+    return table
