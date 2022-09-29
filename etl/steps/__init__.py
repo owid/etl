@@ -378,7 +378,9 @@ class DataStep(Step):
         # use a subprocess to isolate each step from the others, and avoid state bleeding
         # between them
         args = [
-            f"{paths.BASE_DIR}/.venv/bin/run_python_step",
+            "poetry",
+            "run",
+            "run_python_step",
             str(self),
             self._dest_dir.as_posix(),
         ]

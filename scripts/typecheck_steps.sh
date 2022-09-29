@@ -18,4 +18,4 @@ only_dirs_with_python_files() {
 echo 'Typechecking steps...'
 # run typechecks in parallel, we cannot run them all at once because mypy raises `Duplicate module named "shared"`
 # error. There is no easy way around this (pyright does not have this problem)
-only_dirs_with_python_files | xargs -n 1 -P 0 .venv/bin/mypy
+only_dirs_with_python_files | xargs -n 1 -P 0 poetry run mypy
