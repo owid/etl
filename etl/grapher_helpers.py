@@ -324,7 +324,7 @@ def country_code_to_country(country_code: pd.Series) -> pd.Series:
     """Convert country code to country name."""
     reference_dataset = catalog.Dataset(REFERENCE_DATASET)
     code_to_country = reference_dataset["countries_regions"]["name"].to_dict()
-    return dataframes.map_series(country_code, code_to_country, warn_on_missing_mappings=True)
+    return cast(pd.Series, dataframes.map_series(country_code, code_to_country, warn_on_missing_mappings=True))
 
 
 def country_to_entity_id(
