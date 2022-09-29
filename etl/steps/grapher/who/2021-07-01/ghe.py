@@ -8,7 +8,6 @@ from etl import grapher_helpers as gh
 from etl.helpers import Names
 
 N = Names(__file__)
-N = Names("/Users/fionaspooner/Documents/OWID/repos/etl/etl/steps/data/grapher/who/2021-07-01/ghe.py")
 
 
 def run(dest_dir: str) -> None:
