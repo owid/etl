@@ -230,7 +230,7 @@ def _merge_dfs(df_old: pd.DataFrame, df_new: pd.DataFrame, mapping: Dict[str, st
     return df
 
 
-def build_mapping_from_df(sql: Engine, df: pd.DataFrame) -> Dict[str, str]:
+def build_mapping_from_df(sql: Engine, df: pd.DataFrame) -> Dict[Any, Any]:
     """_summary_
 
     Parameters
@@ -249,7 +249,7 @@ def build_mapping_from_df(sql: Engine, df: pd.DataFrame) -> Dict[str, str]:
     df_new = _build_individual_df(sql, df, "name_new", "dataset_name_new")
     # Merge into single df
     df = _merge_dfs_old_new(df_old, df_new)
-    dix: Dict[str, str] = df.set_index("id_old")["id_new"].squeeze().to_dict()
+    dix: Dict[Any, Any] = df.set_index("id_old")["id_new"].to_dict()
     return dix
 
 
@@ -302,3 +302,7 @@ def _sanity_check(sql: Engine, mapping: Dict[str, str]) -> None:
 
     # successfull message
     log.info("Sanity check passed.")
+
+
+if __name__ == "__main__":
+    main_cli()
