@@ -35,3 +35,10 @@ steps:
     - data://garden/andrew/2019-12-03/co2_mitigation_curves
   data://grapher/andrew/2019-12-03/co2_mitigation_curves_2celsius:
     - data://garden/andrew/2019-12-03/co2_mitigation_curves
+  #
+  # GCP - Global Carbon Budget - additional data
+  #
+  # In the future, these steps should generate the entire GCB dataset.
+  # But for now (that the GCB is generated in importers) these steps will simply add missing variables.
+  data://meadow/gcp/2022-09-29/global_carbon_budget_additional:
+    - walden://gcp/2022-09-29/global_carbon_budget_global
