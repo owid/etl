@@ -106,8 +106,7 @@ def add_metadata_and_prepare_for_grapher(df_gr: pd.DataFrame, walden_ds: WaldenD
     df_gr = df_gr[["country", "year", "value", "variable", "meta"]].copy()
     # convert integer values to int but round float to 2 decimal places, string remain as string
     df_gr["value"] = df_gr["value"].apply(value_convert)
-    df_gr["entity_id"] = gh.country_to_entity_id(df_gr["country"], create_entities=True)
-    df_gr = df_gr.drop(columns=["country"]).set_index(["year", "entity_id"])
+    df_gr = df_gr.set_index(["year", "country"])
 
     return Table(df_gr)
 
