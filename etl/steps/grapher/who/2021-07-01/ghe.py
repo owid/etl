@@ -8,6 +8,7 @@ from etl import grapher_helpers as gh
 from etl.helpers import Names
 
 N = Names(__file__)
+N = Names("/Users/fionaspooner/Documents/OWID/repos/etl/etl/steps/data/grapher/who/2021-07-01/ghe.py")
 
 
 def run(dest_dir: str) -> None:
@@ -31,7 +32,6 @@ def run(dest_dir: str) -> None:
 
     # We want to export all columns except causegroup and level (for now)
     columns_to_export = [
-        "population",
         "deaths",
         "deaths_rate",
         "deaths_100k",
@@ -50,6 +50,12 @@ def run(dest_dir: str) -> None:
         table = select_subset_causes(table)
     else:
         table = table
+    table[columns_to_export] = (
+        table[columns_to_export]
+        .astype(float)
+        .round({"deaths": 0, "deaths_rate": 2, "deaths_100k": 2, "daly": 2, "daly_rate": 2, "daly_100k": 2})
+    )
+    table["deaths"] = table["deaths"].astype(int)
     table["entity_id"] = gh.country_to_entity_id(table["country_code"], by="code")
     table = table.drop(["country_code"], axis=1)
     table = table.set_index(["entity_id", "year", "ghe_cause_title", "sex_code", "agegroup_code"])
