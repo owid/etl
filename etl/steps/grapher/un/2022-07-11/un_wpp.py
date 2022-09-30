@@ -38,15 +38,10 @@ def run(dest_dir: str) -> None:
 def _get_shaped_table(dataset: catalog.Dataset) -> catalog.Table:
     table = dataset[TNAME].reset_index()
 
-    # grapher needs a column entity id, that is constructed based on the unique entity names in the database
-    table["entity_id"] = gh.country_to_entity_id(table["location"], create_entities=True)
-
     # use entity_id and year as indexes in grapher
-    table = table.set_index(["entity_id", "year", "sex", "age", "variant"])[["metric", "value"]].rename(
-        columns={
-            "metric": "variable",
-        }
-    )
+    table = table.rename(columns={"location": "country", "metric": "variable"}).set_index(
+        ["country", "year", "sex", "age", "variant"]
+    )[["variable", "value"]]
     return table
 
 
