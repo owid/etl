@@ -14,13 +14,13 @@ import tempfile
 import warnings
 from multiprocessing import Pool
 from pathlib import Path
-from typing import Dict, List, Tuple, cast
+from typing import Any, BinaryIO, Dict, List, Tuple, cast
 
 import frictionless
 import pandas as pd
 import structlog
 from frictionless.exception import FrictionlessException
-from owid.catalog import Dataset, Table, Variable, utils
+from owid.catalog import Dataset, Table, Variable, utils, frames
 from owid.catalog.meta import Source
 
 from etl.git import GithubRepo
@@ -99,50 +99,81 @@ def load_table(resource: frictionless.Resource) -> pd.DataFrame:
 
 
 def load_and_combine(path: Path, resources: List[frictionless.Resource]) -> pd.DataFrame:
-    first = True
+    """
+    Large datasets in open numbers are split over multiple files to save memory.
+    We prefer them in one large packed binary file (feather, parquet, etc.). This
+    method reconstructs a large binary file out of the smaller ones.
+    """
     primary_key: List[str]
-    columns: List[str]
 
     with tempfile.NamedTemporaryFile(suffix=".csv") as f:
-        for resource in resources:
-            if first:
-                # print csv header
-                primary_key = resource.schema.primary_key
-                columns = [k.name for k in resource.schema.fields]
-
-                if "global" in columns:
-                    remap = {"global": "geo"}
-                    columns = [remap.get(c, c) for c in columns]
-                    primary_key = [remap.get(c, c) for c in primary_key]
-
-                f.write(",".join(columns).encode("utf8") + b"\n")
-                first = False
-
-            with open((path / resource.path).as_posix(), "rb") as istream:
-                lines = iter(istream)
-                next(lines)  # skip the header
-                for line in lines:
-                    f.write(line)
-
-        f.flush()
+        inferred_dtypes = _write_mega_csv(path, resources, f)
 
         # ignore mixed type warnings
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", pd.errors.DtypeWarning)
-            df = pd.read_csv(f.name)
+            df = pd.read_csv(f.name, dtype=inferred_dtypes)
 
-    # fix mixed types of object columns
-    for col in df.select_dtypes(object).columns:
-        if pd.api.types.infer_dtype(df[col]).startswith("mixed"):
-            # try numeric first and fall back to string
-            try:
-                df[col] = pd.to_numeric(df[col])
-            except ValueError:
-                df[col] = df[col].astype(str)
+    # # fix mixed types of object columns
+    # for col in df.select_dtypes(object).columns:
+    #     if pd.api.types.infer_dtype(df[col]).startswith("mixed"):
+    #         # try numeric first and fall back to string
+    #         try:
+    #             df[col] = pd.to_numeric(df[col])
+    #         except ValueError:
+    #             df[col] = df[col].astype(str)
 
     df.set_index(primary_key, inplace=True)
 
     return cast(pd.DataFrame, df)
+
+
+def _write_mega_csv(
+    path: Path, resources: List[frictionless.Resource], f: BinaryIO
+) -> Tuple[List[str], Dict[str, Any]]:
+    """
+    Generate a massive CSV file of all the resources combined, so that we can then read it.
+    In order to read it in a memory efficient way, we want to infer packed dtypes at this
+    stage.
+    """
+    columns: List[str]
+
+    first = True
+    inferred_dtypes = None
+    primary_key = None
+
+    for resource in resources:
+        if first:
+            # print csv header
+            primary_key = cast(List[str], resource.schema.primary_key)
+            columns = [k.name for k in resource.schema.fields]
+
+            if "global" in columns:
+                remap = {"global": "geo"}
+                columns = [remap.get(c, c) for c in columns]
+                primary_key = [remap.get(c, c) for c in primary_key]
+
+            f.write(",".join(columns).encode("utf8") + b"\n")
+            first = False
+
+            f.flush()
+
+            df = pd.read_csv(f.name)
+            df = frames.repack_frame(df)
+            inferred_dtypes = df.dtypes.to_dict()
+
+        with open((path / resource.path).as_posix(), "rb") as istream:  # type: ignore
+            lines = iter(istream)
+            next(lines)  # skip the header
+            for line in lines:
+                f.write(line)
+
+    f.flush()
+
+    if not first:
+        raise Exception("No resources found")
+
+    return primary_key, inferred_dtypes  # type: ignore
 
 
 def remap_names(
