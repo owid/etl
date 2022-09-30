@@ -114,7 +114,7 @@ def load_and_combine(path: Path, resources: List[frictionless.Resource]) -> pd.D
     primary_key: List[str]
 
     with tempfile.NamedTemporaryFile(suffix=".csv") as f:
-        inferred_dtypes = _write_mega_csv(path, resources, f)
+        primary_key, inferred_dtypes = _write_mega_csv(path, resources, f)
 
         # ignore mixed type warnings
         with warnings.catch_warnings():
@@ -177,7 +177,7 @@ def _write_mega_csv(
 
     f.flush()
 
-    if not first:
+    if first:
         raise Exception("No resources found")
 
     return primary_key, inferred_dtypes  # type: ignore
@@ -185,7 +185,7 @@ def _write_mega_csv(
 
 def remap_names(
     resources: List[frictionless.Resource],
-) -> Dict[str, frictionless.Resource]:
+) -> Dict[str, List[frictionless.Resource]]:
     "Short names must be unique, so fix name collisions."
     rows = []
     for resource in resources:
