@@ -55,9 +55,9 @@ def run(dest_dir: str) -> None:
         .round({"deaths": 0, "deaths_rate": 2, "deaths_100k": 2, "daly": 2, "daly_rate": 2, "daly_100k": 2})
     )
     table["deaths"] = table["deaths"].astype(int)
-    table["entity_id"] = gh.country_to_entity_id(table["country_code"], by="code")
+    table["country"] = gh.country_code_to_country(table["country_code"])
     table = table.drop(["country_code"], axis=1)
-    table = table.set_index(["entity_id", "year", "ghe_cause_title", "sex_code", "agegroup_code"])
+    table = table.set_index(["country", "year", "ghe_cause_title", "sex_code", "agegroup_code"])
 
     table.update_metadata_from_yaml(N.metadata_path, "estimates")
 
