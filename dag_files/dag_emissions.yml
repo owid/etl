@@ -44,3 +44,5 @@ steps:
     - walden://gcp/2022-09-29/global_carbon_budget_global
   data://garden/gcp/2022-09-29/global_carbon_budget_additional:
     - data://meadow/gcp/2022-09-29/global_carbon_budget_additional
+  data://grapher/gcp/2022-09-29/global_carbon_budget_additional:
+    - data://garden/gcp/2022-09-29/global_carbon_budget_additional
