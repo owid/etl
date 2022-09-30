@@ -6,6 +6,8 @@ entire GCB dataset.
 
 """
 
+from typing import cast
+
 import pandas as pd
 from owid.catalog import Dataset, Table
 from owid.datautils import dataframes, geo
@@ -16,17 +18,23 @@ from etl.helpers import Names
 N = Names(__file__)
 
 
-def combine_data(production_df: pd.DataFrame, consumption_df: pd.DataFrame, historical_df: pd.DataFrame) -> pd.DataFrame:
+def combine_data(
+    production_df: pd.DataFrame, consumption_df: pd.DataFrame, historical_df: pd.DataFrame
+) -> pd.DataFrame:
     production_df = production_df.copy()
     consumption_df = consumption_df.copy()
     historical_df = historical_df.copy()
     # Add column for the sum of global fossil emissions and global land-use change emissions.
-    historical_df["global_fossil_and_land_use_change_emissions"] = historical_df["global_fossil_emissions"] + historical_df["global_land_use_change_emissions"]
+    historical_df["global_fossil_and_land_use_change_emissions"] = (
+        historical_df["global_fossil_emissions"] + historical_df["global_land_use_change_emissions"]
+    )
     # Bunker emissions should coincide for production and consumption emissions.
     # Keep both columns for now to check that this is true (and remove it after checking).
     production_df = production_df.rename(columns={"bunker_emissions": "check"})
     # Combine all dataframes.
-    combined_df = dataframes.multi_merge(dfs=[production_df, consumption_df, historical_df], how="outer", on=["country", "year"])
+    combined_df = dataframes.multi_merge(
+        dfs=[production_df, consumption_df, historical_df], how="outer", on=["country", "year"]
+    )
     # Check there are no repeated columns (if so, the merge would have produced at least one column named "*_x").
     error = "There were unexpected repeated columns between different dataframes."
     assert len([column for column in combined_df.columns if column.endswith("_x")]) == 0, error
@@ -36,7 +44,7 @@ def combine_data(production_df: pd.DataFrame, consumption_df: pd.DataFrame, hist
     # Drop that column used only as a sanity check.
     combined_df = combined_df.drop(columns="check")
 
-    return combined_df
+    return cast(pd.DataFrame, combined_df)
 
 
 def add_per_capita_variables(combined_df: pd.DataFrame) -> pd.DataFrame:
@@ -59,24 +67,43 @@ def add_share_variables(combined_df: pd.DataFrame) -> pd.DataFrame:
     assert (global_emissions["production_emissions"].fillna(0) == check["consumption_emissions"].fillna(0)).all(), error
 
     # Add global emissions as a new column of the combined dataframe.
-    combined_df = pd.merge(combined_df, global_emissions.rename(columns={"production_emissions": "global_emissions"}), how="left", on="year")
+    combined_df = pd.merge(
+        combined_df,
+        global_emissions.rename(columns={"production_emissions": "global_emissions"}),
+        how="left",
+        on="year",
+    )
     # Create variables of production and consumption emissions as a share of global emissions.
-    combined_df["production_emissions_as_share_of_global"] = combined_df["production_emissions"] / combined_df["global_emissions"] * 100
-    combined_df["consumption_emissions_as_share_of_global"] = combined_df["consumption_emissions"] / combined_df["global_emissions"] * 100
+    combined_df["production_emissions_as_share_of_global"] = (
+        combined_df["production_emissions"] / combined_df["global_emissions"] * 100
+    )
+    combined_df["consumption_emissions_as_share_of_global"] = (
+        combined_df["consumption_emissions"] / combined_df["global_emissions"] * 100
+    )
 
     # Add global population as a new column of the combined dataframe.
     global_population = combined_df[combined_df["country"] == "World"][["year", "population"]]
-    combined_df = pd.merge(combined_df, global_population.rename(columns={"population": "global_population"}), how="left", on="year")
+    combined_df = pd.merge(
+        combined_df, global_population.rename(columns={"population": "global_population"}), how="left", on="year"
+    )
     # Create variable of population as a share of global population.
     combined_df["population_as_share_of_global"] = combined_df["population"] / combined_df["global_population"] * 100
 
     # Sanity checks.
     error = "Production emissions as a share of global emissions should be 100% for 'World'."
-    assert (combined_df[combined_df["country"] == "World"]["production_emissions_as_share_of_global"].fillna(100).unique() == [100]).all(), error
+    assert combined_df[
+        (combined_df["country"] == "World")
+        & (combined_df["production_emissions_as_share_of_global"].fillna(100) != 100)
+    ].empty, error
     error = "Consumption emissions as a share of global emissions should be 100% for 'World'."
-    assert (combined_df[combined_df["country"] == "World"]["consumption_emissions_as_share_of_global"].fillna(100).unique() == [100]).all(), error
+    assert combined_df[
+        (combined_df["country"] == "World")
+        & (combined_df["consumption_emissions_as_share_of_global"].fillna(100) != 100)
+    ].empty, error
     error = "Population as a share of global population should be 100% for 'World'."
-    assert (combined_df[combined_df["country"] == "World"]["population_as_share_of_global"].fillna(100).unique() == [100]).all(), error
+    assert combined_df[
+        (combined_df["country"] == "World") & (combined_df["population_as_share_of_global"].fillna(100) != 100)
+    ].empty, error
 
     return combined_df
 

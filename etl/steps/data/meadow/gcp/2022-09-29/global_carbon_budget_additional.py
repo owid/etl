@@ -11,7 +11,6 @@ from owid.catalog import Dataset, Table, TableMeta
 from owid.catalog.utils import underscore_table
 from owid.walden import Catalog as WaldenCatalog
 
-from etl.helpers import Names
 from etl.steps.data.converters import convert_walden_metadata
 
 # Conversion factor to change from tonnes of carbon to tonnes of CO2.
@@ -31,7 +30,7 @@ def prepare_historical_budget(df: pd.DataFrame) -> pd.DataFrame:
     # Columns to select in historical budget and how to rename them.
     columns = {
         "Year": "year",
-        "fossil emissions excluding carbonation": 'global_fossil_emissions',
+        "fossil emissions excluding carbonation": "global_fossil_emissions",
         "land-use change emissions": "global_land_use_change_emissions",
     }
     df = df[list(columns)].rename(columns=columns)
@@ -55,7 +54,8 @@ def prepare_emissions(df: pd.DataFrame, column_name: str) -> pd.DataFrame:
     # Keep "Bunkers" as a separate column, but remove "Statistical Difference" (which is almost completely empty).
     df = df.drop(columns="Statistical Difference")
     df = df.melt(id_vars=["year", "Bunkers"]).rename(
-        columns={"variable": "country", "value": column_name, "Bunkers": "bunker_emissions"})
+        columns={"variable": "country", "value": column_name, "Bunkers": "bunker_emissions"}
+    )
 
     # Set an index and sort row and columns conveniently.
     df = df.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
@@ -74,16 +74,24 @@ def run(dest_dir: str) -> None:
     assert historical_budget_df.columns[0] == "Year", error
 
     # Load national data file from walden.
-    national_ds = WaldenCatalog().find_one(namespace="gcp", short_name=WALDEN_NATIONAL_DATASET_NAME, version=WALDEN_VERSION)
+    national_ds = WaldenCatalog().find_one(
+        namespace="gcp", short_name=WALDEN_NATIONAL_DATASET_NAME, version=WALDEN_VERSION
+    )
     # Load production-based emissions from the national data file.
     production_emissions_df = pd.read_excel(
-        national_ds.ensure_downloaded(), sheet_name="Territorial Emissions", skiprows=11)
-    error = "Structure of 'Territorial Emissions' sheet in national data file has changed (consider changing 'skiprows')."
+        national_ds.ensure_downloaded(), sheet_name="Territorial Emissions", skiprows=11
+    )
+    error = (
+        "Structure of 'Territorial Emissions' sheet in national data file has changed (consider changing 'skiprows')."
+    )
     assert production_emissions_df.columns[1] == "Afghanistan", error
     # Load consumption-based emissions from the national data file.
     consumption_emissions_df = pd.read_excel(
-        national_ds.ensure_downloaded(), sheet_name="Consumption Emissions", skiprows=8)
-    error = "Structure of 'Consumption Emissions' sheet in national data file has changed (consider changing 'skiprows')."
+        national_ds.ensure_downloaded(), sheet_name="Consumption Emissions", skiprows=8
+    )
+    error = (
+        "Structure of 'Consumption Emissions' sheet in national data file has changed (consider changing 'skiprows')."
+    )
     assert consumption_emissions_df.columns[1] == "Afghanistan", error
 
     #
@@ -104,12 +112,17 @@ def run(dest_dir: str) -> None:
     ds.metadata = convert_walden_metadata(global_ds)
     ds.metadata.version = MEADOW_VERSION
     # Create tables with metadata.
-    consumption_emissions_tb = Table(consumption_emissions_df, metadata=TableMeta(
-        short_name="consumption_emissions", title="Consumption-based emissions"))
-    production_emissions_tb = Table(production_emissions_df, metadata=TableMeta(
-        short_name="production_emissions", title="Production-based emissions"))
-    historical_budget_tb = Table(historical_budget_df, metadata=TableMeta(
-        short_name="historical_emissions", title="Historical emissions"))
+    consumption_emissions_tb = Table(
+        consumption_emissions_df,
+        metadata=TableMeta(short_name="consumption_emissions", title="Consumption-based emissions"),
+    )
+    production_emissions_tb = Table(
+        production_emissions_df,
+        metadata=TableMeta(short_name="production_emissions", title="Production-based emissions"),
+    )
+    historical_budget_tb = Table(
+        historical_budget_df, metadata=TableMeta(short_name="historical_emissions", title="Historical emissions")
+    )
     # Ensure all columns are lower snake case.
     consumption_emissions_tb = underscore_table(consumption_emissions_tb)
     production_emissions_tb = underscore_table(production_emissions_tb)
