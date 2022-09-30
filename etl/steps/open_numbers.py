@@ -20,9 +20,10 @@ import frictionless
 import pandas as pd
 import structlog
 from frictionless.exception import FrictionlessException
-from owid.catalog import Dataset, Table, Variable, utils, frames
+from owid.catalog import Dataset, Table, Variable, frames, utils
 from owid.catalog.meta import Source
 
+from etl import config
 from etl.git import GithubRepo
 from etl.paths import REFERENCE_DATASET
 
@@ -56,9 +57,15 @@ def run(dest_dir: str) -> None:
     resource_map = remap_names(package.resources)
 
     # copy tables one by one
-    with Pool() as pool:
-        args = [(ds, repo, short_name, resources) for short_name, resources in resource_map.items()]
-        pool.starmap(add_resource, args)
+    if not config.IPDB_ENABLED:
+        # use multiprocessing
+        with Pool() as pool:
+            args = [(ds, repo, short_name, resources) for short_name, resources in resource_map.items()]
+            pool.starmap(add_resource, args)
+    else:
+        # use ipdb
+        for short_name, resources in sorted(resource_map.items()):
+            add_resource(ds, repo, short_name, resources)
 
 
 def add_resource(
