@@ -13,8 +13,10 @@ from owid.walden import Catalog as WaldenCatalog
 
 from etl.steps.data.converters import convert_walden_metadata
 
-# Conversion factor to change from tonnes of carbon to tonnes of CO2.
-CARBON_TO_CO2 = 3.664
+# Conversion factor to change from million tonnes of carbon to million tonnes of CO2.
+MILLION_TONNES_OF_CARBON_TO_MILLION_TONNES_OF_CO2 = 3.664
+# Conversion factor to change from billion tonnes of carbon to million tonnes of CO2.
+BILLION_TONNES_OF_CARBON_TO_MILLION_TONNES_OF_CO2 = 3.664 * 1e3
 
 # Details of dataset(s) to be imported.
 WALDEN_GLOBAL_DATASET_NAME = "global_carbon_budget_global"
@@ -34,9 +36,9 @@ def prepare_historical_budget(df: pd.DataFrame) -> pd.DataFrame:
         "land-use change emissions": "global_land_use_change_emissions",
     }
     df = df[list(columns)].rename(columns=columns)
-    # Convert units from gigatonnes of carbon per year emissions to gigatonnes of CO2 per year.
+    # Convert units from gigatonnes of carbon per year emissions to megatonnes of CO2 per year.
     for column in df.drop(columns="year").columns:
-        df[column] *= CARBON_TO_CO2
+        df[column] *= BILLION_TONNES_OF_CARBON_TO_MILLION_TONNES_OF_CO2
     # Add column for country (to be able to combine this with the national data).
     df["country"] = "World"
 
@@ -48,15 +50,20 @@ def prepare_historical_budget(df: pd.DataFrame) -> pd.DataFrame:
 
 def prepare_emissions(df: pd.DataFrame, column_name: str) -> pd.DataFrame:
     df = df.copy()
+
     # The zeroth column is expected to be year.
     df = df.rename(columns={df.columns[0]: "year"})
     # Each column represents a country; then the final columns are regions, "Bunkers", and "Statistical Difference".
-    # Keep "Bunkers" as a separate column, but remove "Statistical Difference" (which is almost completely empty).
-    df = df.drop(columns="Statistical Difference")
-    df = df.melt(id_vars=["year", "Bunkers"]).rename(
-        columns={"variable": "country", "value": column_name, "Bunkers": "bunker_emissions"}
-    )
-
+    # Keep "Bunkers", but remove "Statistical Difference" (which is almost completely empty).
+    # In fact "Bunkers" is a global variable (I don't know why it is included at the national level).
+    # This will be handled at the garden step.
+    df = df.drop(columns=["Statistical Difference"])
+    # Convert from wide to long format dataframe.
+    df = df.melt(id_vars=["year"]).rename(
+        columns={"variable": "country", "value": column_name})
+    # Convert units from megatonnes of carbon per year emissions to megatonnes of CO2 per year.
+    for column in df.drop(columns=["country", "year"]).columns:
+        df[column] *= MILLION_TONNES_OF_CARBON_TO_MILLION_TONNES_OF_CO2
     # Set an index and sort row and columns conveniently.
     df = df.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
 
