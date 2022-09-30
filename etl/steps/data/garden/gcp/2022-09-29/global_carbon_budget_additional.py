@@ -6,9 +6,12 @@ entire GCB dataset.
 
 """
 
+from typing import Tuple, cast
+
 import pandas as pd
 from owid.catalog import Dataset, Table
-from owid.datautils import dataframes, geo
+from owid.datautils import geo
+
 from etl.helpers import Names
 
 # Regions and income groups to create (by aggregating), following OWID definitions.
@@ -32,7 +35,9 @@ AGGREGATES = {"production_emissions": "sum", "consumption_emissions": "sum"}
 N = Names(__file__)
 
 
-def prepare_national_and_global_data(production_df: pd.DataFrame, consumption_df: pd.DataFrame, historical_df: pd.DataFrame) -> pd.DataFrame:
+def prepare_national_and_global_data(
+    production_df: pd.DataFrame, consumption_df: pd.DataFrame, historical_df: pd.DataFrame
+) -> Tuple[pd.DataFrame, pd.DataFrame]:
     production_df = production_df.copy()
     consumption_df = consumption_df.copy()
     historical_df = historical_df.copy()
@@ -40,10 +45,18 @@ def prepare_national_and_global_data(production_df: pd.DataFrame, consumption_df
     # In the original data, Bunkers was included in the national data file, as another country.
     # But I suppose it should be considered as another kind of global emission.
     # In fact, bunker emissions should coincide for production and consumption emissions.
-    global_bunkers_emissions = production_df[production_df["country"] == "Bunkers"][["year", "production_emissions"]].reset_index(drop=True).rename(columns={"production_emissions": "global_bunker_emissions"})
+    global_bunkers_emissions = (
+        production_df[production_df["country"] == "Bunkers"][["year", "production_emissions"]]
+        .reset_index(drop=True)
+        .rename(columns={"production_emissions": "global_bunker_emissions"})
+    )
 
     # Check that we get exactly the same array of bunker emissions from the consumption emissions dataframe.
-    check = consumption_df[consumption_df["country"] == "Bunkers"][["year", "consumption_emissions"]].reset_index(drop=True).rename(columns={"consumption_emissions": "global_bunker_emissions"})
+    check = (
+        consumption_df[consumption_df["country"] == "Bunkers"][["year", "consumption_emissions"]]
+        .reset_index(drop=True)
+        .rename(columns={"consumption_emissions": "global_bunker_emissions"})
+    )
     error = "Bunker emissions were expected to coincide in production and consumption emissions dataframes."
     assert global_bunkers_emissions.equals(check), error
 
@@ -56,17 +69,31 @@ def prepare_national_and_global_data(production_df: pd.DataFrame, consumption_df
 
     # Check that, for the World, production emissions coincides with consumption emissions.
     error = "Production and consumption emissions for the world were expected to be identical."
-    assert production_df[production_df["country"]=="World"].reset_index(drop=True)["production_emissions"].equals(consumption_df[consumption_df["country"]=="World"].reset_index(drop=True)["consumption_emissions"]), error
+    assert (
+        production_df[production_df["country"] == "World"]
+        .reset_index(drop=True)["production_emissions"]
+        .equals(consumption_df[consumption_df["country"] == "World"].reset_index(drop=True)["consumption_emissions"])
+    ), error
     # Check that production emissions for the World coincide with global fossil emissions (from the historical dataframe).
-    check = pd.merge(production_df[production_df["country"]=="World"][["year", "production_emissions"]].reset_index(drop=True), historical_df[["year", "global_fossil_emissions"]], how="inner", on="year")
+    check = pd.merge(
+        production_df[production_df["country"] == "World"][["year", "production_emissions"]].reset_index(drop=True),
+        historical_df[["year", "global_fossil_emissions"]],
+        how="inner",
+        on="year",
+    )
     error = "Production emissions for the world were expected to coincide with global fossil emissions."
     assert check[check["production_emissions"] != check["global_fossil_emissions"]].empty, error
 
     # Given that, we can ignore production and consumption emissions for the world, and take it from
     # the global fossil emissions (which has data since 1750 instead of 1959).
-    complete_world_emissions = historical_df[["country", "year", "global_fossil_emissions"]].rename(columns={"global_fossil_emissions": "production_emissions"})
+    complete_world_emissions = historical_df[["country", "year", "global_fossil_emissions"]].rename(
+        columns={"global_fossil_emissions": "production_emissions"}
+    )
     complete_world_emissions["consumption_emissions"] = complete_world_emissions["production_emissions"]
-    national_df = pd.concat([national_df[national_df["country"] != "World"].reset_index(drop=True), complete_world_emissions], ignore_index=True)
+    national_df = pd.concat(
+        [national_df[national_df["country"] != "World"].reset_index(drop=True), complete_world_emissions],
+        ignore_index=True,
+    )
 
     # Add bunker emissions to the rest of global emissions.
     global_df = pd.merge(historical_df, global_bunkers_emissions, how="outer", on="year")
@@ -74,7 +101,7 @@ def prepare_national_and_global_data(production_df: pd.DataFrame, consumption_df
     # Add global population.
     global_df = geo.add_population_to_dataframe(df=global_df, population_col="global_population")
 
-    return national_df, global_df
+    return cast(pd.DataFrame, national_df), cast(pd.DataFrame, global_df)
 
 
 def add_per_capita_variables(national_df: pd.DataFrame) -> pd.DataFrame:
@@ -94,19 +121,29 @@ def add_share_variables(combined_df: pd.DataFrame) -> pd.DataFrame:
     combined_df = combined_df.copy()
 
     # Create variables of production and consumption emissions as a share of global emissions.
-    combined_df["production_emissions_as_share_of_global"] = combined_df["production_emissions"] / combined_df["global_fossil_emissions"] * 100
-    combined_df["consumption_emissions_as_share_of_global"] = combined_df["consumption_emissions"] / combined_df["global_fossil_emissions"] * 100
+    combined_df["production_emissions_as_share_of_global"] = (
+        combined_df["production_emissions"] / combined_df["global_fossil_emissions"] * 100
+    )
+    combined_df["consumption_emissions_as_share_of_global"] = (
+        combined_df["consumption_emissions"] / combined_df["global_fossil_emissions"] * 100
+    )
 
     # Create variable of population as a share of global population.
     combined_df["population_as_share_of_global"] = combined_df["population"] / combined_df["global_population"] * 100
 
     # Sanity checks.
     error = "Production emissions as a share of global emissions should be 100% for 'World'."
-    assert (combined_df[combined_df["country"] == "World"]["production_emissions_as_share_of_global"].fillna(100).unique() == [100]).all(), error
+    assert combined_df[
+        (combined_df["country"] == "World") & (combined_df["production_emissions_as_share_of_global"] != 100)
+    ].empty, error
     error = "Consumption emissions as a share of global emissions should be 100% for 'World'."
-    assert (combined_df[combined_df["country"] == "World"]["consumption_emissions_as_share_of_global"].fillna(100).unique() == [100]).all(), error
+    assert combined_df[
+        (combined_df["country"] == "World") & (combined_df["consumption_emissions_as_share_of_global"] != 100)
+    ].empty, error
     error = "Population as a share of global population should be 100% for 'World'."
-    assert (combined_df[combined_df["country"] == "World"]["population_as_share_of_global"].fillna(100).unique() == [100]).all(), error
+    assert combined_df[
+        (combined_df["country"] == "World") & (combined_df["population_as_share_of_global"].fillna(100) != 100)
+    ].empty, error
 
     return combined_df
 
@@ -130,14 +167,23 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     # Separate national data (at the country level, although it includes "World") and global data.
-    national_df, global_df = prepare_national_and_global_data(production_df=production_df, consumption_df=consumption_df, historical_df=historical_df)
+    national_df, global_df = prepare_national_and_global_data(
+        production_df=production_df, consumption_df=consumption_df, historical_df=historical_df
+    )
 
     # Harmonize country names.
     national_df = geo.harmonize_countries(df=national_df, countries_file=N.country_mapping_path)
 
     # Add contributions from regions.
     for region in REGIONS:
-        national_df = geo.add_region_aggregates(df=national_df, region=region, countries_that_must_have_data=[], num_allowed_nans_per_year=None, frac_allowed_nans_per_year=0.9, aggregations=AGGREGATES)
+        national_df = geo.add_region_aggregates(
+            df=national_df,
+            region=region,
+            countries_that_must_have_data=[],
+            num_allowed_nans_per_year=None,
+            frac_allowed_nans_per_year=0.9,
+            aggregations=AGGREGATES,
+        )
 
     # TODO: If GCP regions have identical data to created regions (for all years), remove them.
 

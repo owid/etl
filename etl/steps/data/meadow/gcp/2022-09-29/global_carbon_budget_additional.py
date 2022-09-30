@@ -59,8 +59,7 @@ def prepare_emissions(df: pd.DataFrame, column_name: str) -> pd.DataFrame:
     # This will be handled at the garden step.
     df = df.drop(columns=["Statistical Difference"])
     # Convert from wide to long format dataframe.
-    df = df.melt(id_vars=["year"]).rename(
-        columns={"variable": "country", "value": column_name})
+    df = df.melt(id_vars=["year"]).rename(columns={"variable": "country", "value": column_name})
     # Convert units from megatonnes of carbon per year emissions to megatonnes of CO2 per year.
     for column in df.drop(columns=["country", "year"]).columns:
         df[column] *= MILLION_TONNES_OF_CARBON_TO_MILLION_TONNES_OF_CO2
