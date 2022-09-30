@@ -9,6 +9,7 @@ from typing import Optional
 import click
 from ipdb import launch_ipdb_on_exception
 
+from etl import config
 from etl.paths import BASE_PACKAGE, STEP_DIR
 
 
@@ -28,6 +29,7 @@ def main(uri: str, dest_dir: str, ipdb: Optional[bool]) -> None:
 
     if ipdb:
         with launch_ipdb_on_exception():
+            config.IPDB_ENABLED = True
             _import_and_run(path, dest_dir)
     else:
         _import_and_run(path, dest_dir)
