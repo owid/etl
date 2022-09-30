@@ -381,10 +381,12 @@ class DataStep(Step):
         if config.IPDB_ENABLED:
             args.append("--ipdb")
 
-        args.extend([
-            str(self),
-            self._dest_dir.as_posix(),
-        ])
+        args.extend(
+            [
+                str(self),
+                self._dest_dir.as_posix(),
+            ]
+        )
 
         subprocess.check_call(args)
 
