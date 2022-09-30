@@ -377,15 +377,16 @@ class DataStep(Step):
         """
         # use a subprocess to isolate each step from the others, and avoid state bleeding
         # between them
-        args = [
-            "poetry",
-            "run",
-            "run_python_step",
-            str(self),
-            self._dest_dir.as_posix(),
-        ]
+        args = ["poetry", "run", "run_python_step"]
         if config.IPDB_ENABLED:
-            args[1:1] = ["--ipdb"]
+            args.append("--ipdb")
+
+        args.extend(
+            [
+                str(self),
+                self._dest_dir.as_posix(),
+            ]
+        )
 
         subprocess.check_call(args)
 
