@@ -59,6 +59,7 @@ def harmonize_countries(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def clean_data(df: pd.DataFrame) -> Table:
+    df["sex"] = df["sex"].map({"BTSX": "Both sexes", "MLE": "Male", "FMLE": "Female"})
     df = df.set_index(["country", "year", "age_group", "sex", "cause"])
     df = df.round({"daly_rate100k": 2, "daly_count": 2, "death_rate100k": 2, "death_count": 0})
     df["death_count"] = df["death_count"].astype(int)
