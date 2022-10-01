@@ -1,17 +1,17 @@
 tables:
   estimates:
     variables:
-      population:
-        title: Population
-        description: |
-          All the inhabitants of a country, territory, or geographic area, total or for a
-          given sex and/or age group, at a specific point of time. In demographic terms it
-          is the total number of inhabitants of a given sex and/or age group that actually
-          live within the border limits of the country, territory, or geographic area at a
-          specific point of time, usually mid-year. The mid-year population refers to the
-          actual population at July 1st.
-        unit: people
-        short_unit:
+      country: 
+        title: Country
+      year: 
+        title: Year
+      cause: 
+        title: Cause
+        description: Cause of loss of life or DALYs
+      sex:
+        title: Sex
+      age_group:
+        title: Age group
       death_count:
         title: Deaths
         description: Deaths
