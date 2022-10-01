@@ -1,6 +1,3 @@
-import json
-from typing import List, cast
-
 import pandas as pd
 from owid.catalog import Dataset, Table
 from owid.catalog.utils import underscore_table
@@ -14,7 +11,6 @@ log = get_logger()
 
 # naming conventions
 N = Names(__file__)
-N = Names("/Users/fionaspooner/Documents/OWID/repos/etl/etl/steps/data/garden/who/2022-09-30/ghe.py")
 
 
 def run(dest_dir: str) -> None:
