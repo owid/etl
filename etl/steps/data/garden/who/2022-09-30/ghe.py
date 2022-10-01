@@ -14,22 +14,17 @@ log = get_logger()
 
 # naming conventions
 N = Names(__file__)
+N = Names("/Users/fionaspooner/Documents/OWID/repos/etl/etl/steps/data/garden/who/2022-09-30/ghe.py")
 
 
 def run(dest_dir: str) -> None:
     log.info("ghe.start")
 
     # read dataset from meadow
-    ds_meadow = Dataset(
-        DATA_DIR
-        / "meadow/who/2022-09-30/ghe"
-    )
+    ds_meadow = Dataset(DATA_DIR / "meadow/who/2022-09-30/ghe")
     tb_meadow = ds_meadow["ghe"]
 
     df = pd.DataFrame(tb_meadow)
-
-    log.info("ghe.exclude_countries")
-    df = exclude_countries(df)
 
     log.info("ghe.harmonize_countries")
     df = harmonize_countries(df)
@@ -41,26 +36,14 @@ def run(dest_dir: str) -> None:
     tb_garden.metadata = tb_meadow.metadata
     for col in tb_garden.columns:
         tb_garden[col].metadata = tb_meadow[col].metadata
-    
+
     ds_garden.metadata.update_from_yaml(N.metadata_path)
     tb_garden.update_metadata_from_yaml(N.metadata_path, "ghe")
-    
+
     ds_garden.add(tb_garden)
     ds_garden.save()
 
     log.info("ghe.end")
-
-
-def load_excluded_countries() -> List[str]:
-    with open(N.excluded_countries_path, "r") as f:
-        data = json.load(f)
-        assert isinstance(data, list)
-    return data
-
-
-def exclude_countries(df: pd.DataFrame) -> pd.DataFrame:
-    excluded_countries = load_excluded_countries()
-    return cast(pd.DataFrame, df.loc[~df.country.isin(excluded_countries)])
 
 
 def harmonize_countries(df: pd.DataFrame) -> pd.DataFrame:
