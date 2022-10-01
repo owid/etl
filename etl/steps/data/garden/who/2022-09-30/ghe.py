@@ -32,7 +32,7 @@ def run(dest_dir: str) -> None:
     ds_garden = Dataset.create_empty(dest_dir)
     ds_garden.metadata = ds_meadow.metadata
 
-    tb_garden = underscore_table(Table(df))
+    tb_garden = clean_data(df)
     tb_garden.metadata = tb_meadow.metadata
     for col in tb_garden.columns:
         tb_garden[col].metadata = tb_meadow[col].metadata
@@ -59,4 +59,12 @@ def harmonize_countries(df: pd.DataFrame) -> pd.DataFrame:
             f"Raw country names: {missing_countries}"
         )
 
+    return df
+
+
+def clean_data(df: pd.DataFrame) -> Table:
+    df = df.set_index(["country", "year", "age_group", "sex", "cause"])
+    df = df.round({"daly_rate100k": 2, "daly_count": 2, "death_rate100k": 2, "death_count": 0})
+    df["death_count"] = df["death_count"].astype(int)
+    df = underscore_table(Table(df))
     return df
