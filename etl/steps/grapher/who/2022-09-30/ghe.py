@@ -7,6 +7,7 @@ from owid import catalog
 from etl.helpers import Names
 
 N = Names(__file__)
+N = Names("/Users/fionaspooner/Documents/OWID/repos/etl/etl/steps/data/meadow/who/2022-09-30/ghe.py")
 
 
 def run(dest_dir: str) -> None:
@@ -41,6 +42,7 @@ def run(dest_dir: str) -> None:
         table = select_subset_causes(table)
     else:
         table = table
+
     table = table.set_index(["country", "year", "cause", "sex", "age_group"])
 
     table.update_metadata_from_yaml(N.metadata_path, "ghe")

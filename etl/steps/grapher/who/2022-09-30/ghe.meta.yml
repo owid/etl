@@ -1,34 +1,19 @@
 tables:
-  estimates:
+  ghe:
     variables:
-      country: 
-        title: Country
-      year: 
-        title: Year
-      cause: 
-        title: Cause
-        description: Cause of loss of life or DALYs
-      sex:
-        title: Sex
-      age_group:
-        title: Age group
       death_count:
         title: Deaths
         description: Deaths
         unit: deaths
-        short_unit:
       death_rate100k:
         title: Deaths per 100k
         description: Deaths per 100.000 people
         unit: deaths per 100,000 people
-        short_unit: 
       daly_count:
         title: Disability adjusted life years
         description: Disability adjusted life years
         unit: DALYs
-        short_unit: 
       daly_rate100k:
         title: Disability adjusted life years per 100k
         description: Disability adjusted life years per 100k capita in one year
         unit: DALYs per 100,000 people
-        short_unit:
