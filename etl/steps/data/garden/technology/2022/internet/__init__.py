@@ -6,7 +6,6 @@ from owid.catalog import Dataset, Source, Table, Variable
 
 from etl import data_helpers
 from etl.paths import DATA_DIR
-from etl.steps.data.garden.owid.latest.key_indicators import table_population
 
 CURRENT_DIR = Path(__file__).parent
 METADATA_PATH = CURRENT_DIR / "internet.meta.yml"
@@ -32,9 +31,9 @@ def make_users_table() -> Table:
     table_population = load_key_indicators()
     # Combine sources
     table = make_combined(table_internet, table_population)
-    table = data_helpers.calculate_region_sums(table)
+    table = add_regions(table, table_population)
     # Propagate metadata
-    table = add_metadata(table, table_internet)
+    table = add_metadata(table, table_internet, table_population)
     return table
 
 
@@ -67,19 +66,22 @@ def make_combined(table_internet: Table, table_population: Table) -> Table:
 
 
 def add_regions(table: Table, table_population: Table) -> Table:
+    column_idx = ["country", "year"]
     # Estimate regions number of internet users
     table = data_helpers.calculate_region_sums(table)
     # Get population for regions
-    table = table.merge(table_population.reset_index(), on=["country", "year"], how="left")
+    table = table.merge(table_population.reset_index(), on=column_idx, how="left")
     # Estimate relative values
     msk = table.country.isin(data_helpers.REGIONS)
-    table.loc[msk, "share_internet_users"] = table.loc[msk, "num_internet_users"] / table.loc[msk, "population"]
+    table.loc[msk, "share_internet_users"] = (
+        table.loc[msk, "num_internet_users"] / table.loc[msk, "population"] * 100
+    ).round(2)
     # Filter columns
-    table = table[["num_internet_users", "share_internet_users"]]
+    table = table.set_index(column_idx)[["num_internet_users", "share_internet_users"]]
     return table
 
 
-def add_metadata(table: Table, table_internet: Table) -> Table:
+def add_metadata(table: Table, table_internet: Table, table_population: Table) -> Table:
     # Propagate metadata
     table.share_internet_users.metadata = deepcopy(table_internet.it_net_user_zs.metadata)
     table.num_internet_users.metadata = deepcopy(table_internet.it_net_user_zs.metadata)
