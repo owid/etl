@@ -13,3 +13,10 @@ steps:
   - data://garden/un/2022-07-11/un_wpp
   data://grapher/who/2022-07-17/who_vaccination:
   - data://garden/who/2022-07-17/who_vaccination
+  data://meadow/who/2022-09-30/ghe:
+  - walden://who/2022-09-30/ghe
+  data://garden/who/2022-09-30/ghe:
+  - data://meadow/who/2022-09-30/ghe
+  - data://garden/reference
+  data://grapher/who/2022-09-30/ghe:
+  - data://garden/who/2022-09-30/ghe
