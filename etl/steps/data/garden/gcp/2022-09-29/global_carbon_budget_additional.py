@@ -39,6 +39,25 @@ N = Names(str(CURRENT_DIR / "global_carbon_budget_additional"))
 def prepare_national_and_global_data(
     production_df: pd.DataFrame, consumption_df: pd.DataFrame, historical_df: pd.DataFrame
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    """Separate and prepare national and global GCB data.
+
+    Parameters
+    ----------
+    production_df : pd.DataFrame
+        Production-based emissions (from the national data file).
+    consumption_df : pd.DataFrame
+        Consumption-based emissions (from the national data file).
+    historical_df : pd.DataFrame
+        Historical budget emissions (from the global data file).
+
+    Returns
+    -------
+    national_df : pd.DataFrame
+        Prepared national emissions data.
+    globl_df : pd.DataFrame
+        Prepared global emissions data.
+
+    """
     production_df = production_df.copy()
     consumption_df = consumption_df.copy()
     historical_df = historical_df.copy()
@@ -75,6 +94,7 @@ def prepare_national_and_global_data(
         .reset_index(drop=True)["production_emissions"]
         .equals(consumption_df[consumption_df["country"] == "World"].reset_index(drop=True)["consumption_emissions"])
     ), error
+
     # Check that production emissions for the World coincide with global fossil emissions (from the historical dataframe).
     check = pd.merge(
         production_df[production_df["country"] == "World"][["year", "production_emissions"]].reset_index(drop=True),
@@ -90,6 +110,8 @@ def prepare_national_and_global_data(
     complete_world_emissions = historical_df[["country", "year", "global_fossil_emissions"]].rename(
         columns={"global_fossil_emissions": "production_emissions"}
     )
+    # Create an additional column of global consumption emissions (which, as we just checked, should be identical to
+    # production emissions).
     complete_world_emissions["consumption_emissions"] = complete_world_emissions["production_emissions"]
     national_df = pd.concat(
         [national_df[national_df["country"] != "World"].reset_index(drop=True), complete_world_emissions],
@@ -111,6 +133,19 @@ def prepare_national_and_global_data(
 
 
 def add_per_capita_variables(national_df: pd.DataFrame) -> pd.DataFrame:
+    """Add per capita variables to national emissions data.
+
+    Parameters
+    ----------
+    national_df : pd.DataFrame
+        National emissions data, after selecting variables and preparing them.
+
+    Returns
+    -------
+    national_df : pd.DataFrame
+        National emissions data, after adding per capita variables.
+
+    """
     national_df = national_df.copy()
 
     # Add population to each country and year.
@@ -124,6 +159,19 @@ def add_per_capita_variables(national_df: pd.DataFrame) -> pd.DataFrame:
 
 
 def add_share_variables(combined_df: pd.DataFrame) -> pd.DataFrame:
+    """Add "share variables" (e.g. national emissions as share of global emissions).
+
+    Parameters
+    ----------
+    combined_df : pd.DataFrame
+        Combined dataframe of production and consumption based emissions (national data).
+
+    Returns
+    -------
+    combined_df : pd.DataFrame
+        Combined dataframe after adding share variables.
+
+    """
     combined_df = combined_df.copy()
 
     # Create variables of production and consumption emissions as a share of global emissions.

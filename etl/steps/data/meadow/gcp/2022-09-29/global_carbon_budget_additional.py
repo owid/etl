@@ -29,6 +29,19 @@ MEADOW_TITLE = "Global Carbon Budget - Additional variables"
 
 
 def prepare_historical_budget(df: pd.DataFrame) -> pd.DataFrame:
+    """Select variables and prepare the historical budget sheet of GCB's raw national data file.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Historical budget sheet of GCB's raw national data file.
+
+    Returns
+    -------
+    df : pd.DataFrame
+        Historical budget after selecting variables and processing them.
+
+    """
     # Columns to select in historical budget and how to rename them.
     columns = {
         "Year": "year",
@@ -36,9 +49,11 @@ def prepare_historical_budget(df: pd.DataFrame) -> pd.DataFrame:
         "land-use change emissions": "global_land_use_change_emissions",
     }
     df = df[list(columns)].rename(columns=columns)
-    # Convert units from gigatonnes of carbon per year emissions to megatonnes of CO2 per year.
+
+    # Convert units from gigatonnes of carbon per year emissions to tonnes of CO2 per year.
     for column in df.drop(columns="year").columns:
         df[column] *= BILLION_TONNES_OF_CARBON_TO_TONNES_OF_CO2
+
     # Add column for country (to be able to combine this with the national data).
     df["country"] = "World"
 
@@ -49,20 +64,42 @@ def prepare_historical_budget(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def prepare_emissions(df: pd.DataFrame, column_name: str) -> pd.DataFrame:
+    """Select variables and prepare the territorial emissions or the consumption emissions sheet of
+    GCB's raw global data file.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Territorial emissions (or consumption emissions) sheet of GCB's raw national data file.
+    column_name : str
+        Name to assign to emissions column to be generated.
+
+    Returns
+    -------
+    df : pd.DataFrame
+        Processed territorial (or consumption) emissions sheet of GCB's raw global data file.
+
+    """
     df = df.copy()
 
     # The zeroth column is expected to be year.
     df = df.rename(columns={df.columns[0]: "year"})
+
     # Each column represents a country; then the final columns are regions, "Bunkers", and "Statistical Difference".
     # Keep "Bunkers", but remove "Statistical Difference" (which is almost completely empty).
-    # In fact "Bunkers" is a global variable (I don't know why it is included at the national level).
-    # This will be handled at the garden step.
+    # In fact "Bunkers" is a global variable (I don't know why it is included at the national level), but this will be
+    # handled at the garden step.
+
+    # Remove unnecessary column.
     df = df.drop(columns=["Statistical Difference"])
+
     # Convert from wide to long format dataframe.
     df = df.melt(id_vars=["year"]).rename(columns={"variable": "country", "value": column_name})
-    # Convert units from megatonnes of carbon per year emissions to megatonnes of CO2 per year.
+
+    # Convert units from megatonnes of carbon per year emissions to tonnes of CO2 per year.
     for column in df.drop(columns=["country", "year"]).columns:
         df[column] *= MILLION_TONNES_OF_CARBON_TO_TONNES_OF_CO2
+
     # Set an index and sort row and columns conveniently.
     df = df.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
 
@@ -76,7 +113,7 @@ def run(dest_dir: str) -> None:
     # Load historical budget data from the global data file in walden.
     global_ds = WaldenCatalog().find_one(namespace="gcp", short_name=WALDEN_GLOBAL_DATASET_NAME, version=WALDEN_VERSION)
     historical_budget_df = pd.read_excel(global_ds.ensure_downloaded(), sheet_name="Historical Budget", skiprows=15)
-    error = "Structure of 'Historical Budget' sheet in global data file has changed (consider changing 'skiprows')."
+    error = "'Historical Budget' sheet in global data file has changed (consider changing 'skiprows')."
     assert historical_budget_df.columns[0] == "Year", error
 
     # Load national data file from walden.
@@ -87,17 +124,13 @@ def run(dest_dir: str) -> None:
     production_emissions_df = pd.read_excel(
         national_ds.ensure_downloaded(), sheet_name="Territorial Emissions", skiprows=11
     )
-    error = (
-        "Structure of 'Territorial Emissions' sheet in national data file has changed (consider changing 'skiprows')."
-    )
+    error = "'Territorial Emissions' sheet in national data file has changed (consider changing 'skiprows')."
     assert production_emissions_df.columns[1] == "Afghanistan", error
     # Load consumption-based emissions from the national data file.
     consumption_emissions_df = pd.read_excel(
         national_ds.ensure_downloaded(), sheet_name="Consumption Emissions", skiprows=8
     )
-    error = (
-        "Structure of 'Consumption Emissions' sheet in national data file has changed (consider changing 'skiprows')."
-    )
+    error = "'Consumption Emissions' sheet in national data file has changed (consider changing 'skiprows')."
     assert consumption_emissions_df.columns[1] == "Afghanistan", error
 
     #
