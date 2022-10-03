@@ -11,9 +11,9 @@ from typing import Tuple, cast
 import pandas as pd
 from owid.catalog import Dataset, Table
 from owid.datautils import geo
+from shared import CURRENT_DIR
 
 from etl.helpers import Names
-from shared import CURRENT_DIR
 
 # Regions and income groups to create (by aggregating), following OWID definitions.
 REGIONS = [
@@ -33,7 +33,7 @@ REGIONS = [
 AGGREGATES = {"production_emissions": "sum", "consumption_emissions": "sum"}
 
 # Naming conventions.
-N = Names(CURRENT_DIR / "global_carbon_budget_additional")
+N = Names(str(CURRENT_DIR / "global_carbon_budget_additional"))
 
 
 def prepare_national_and_global_data(
@@ -100,9 +100,10 @@ def prepare_national_and_global_data(
     global_df = pd.merge(historical_df, global_bunkers_emissions, how="outer", on="year")
 
     # Add variable of total emissions including fossil fuels and land use change.
-    global_df["global_fossil_and_land_use_change_emissions"] = global_df["global_fossil_emissions"] +\
-        global_df["global_land_use_change_emissions"]
-    
+    global_df["global_fossil_and_land_use_change_emissions"] = (
+        global_df["global_fossil_emissions"] + global_df["global_land_use_change_emissions"]
+    )
+
     # Add global population.
     global_df = geo.add_population_to_dataframe(df=global_df, population_col="global_population")
 
@@ -210,7 +211,6 @@ def run(dest_dir: str) -> None:
     ds_garden.metadata = ds_meadow.metadata
     # Update metadata using the information in the yaml file.
     ds_garden.metadata.update_from_yaml(N.metadata_path, if_source_exists="replace")
-    
 
     # Create a table with the combined data.
     tb_garden = Table(combined_df)
