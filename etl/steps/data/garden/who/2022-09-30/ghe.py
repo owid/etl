@@ -12,23 +12,20 @@ log = get_logger()
 
 # naming conventions
 N = Names(__file__)
-N = Names("/Users/fionaspooner/Documents/OWID/repos/etl/etl/steps/data/garden/who/2022-09-30/ghe.py")
 
 
 def run(dest_dir: str) -> None:
     log.info("ghe.start")
 
     # read dataset from meadow
-    ds_meadow = Dataset(DATA_DIR / "meadow/who/2022-09-30/ghe")
+    ds_meadow = N.meadow_dataset
     tb_meadow = ds_meadow["ghe"]
 
     df = pd.DataFrame(tb_meadow)
 
-    log.info("ghe.harmonize_countries")
     df["country"] = country_code_to_country(df["country"])
 
-    ds_garden = Dataset.create_empty(dest_dir)
-    ds_garden.metadata = ds_meadow.metadata
+    ds_garden = Dataset.create_empty(dest_dir, metadata=ds_meadow.metadata)
 
     tb_garden = clean_data(df)
     tb_garden.metadata = tb_meadow.metadata

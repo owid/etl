@@ -1,3 +1,6 @@
+dataset:
+  name: Global Health Estimates - World Health Organization (2020)
+  published_by: World Health Organization (2020)
 tables:
   ghe:
     variables:
