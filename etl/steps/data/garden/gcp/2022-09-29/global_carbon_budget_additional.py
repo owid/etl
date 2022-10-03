@@ -99,6 +99,10 @@ def prepare_national_and_global_data(
     # Add bunker emissions to the rest of global emissions.
     global_df = pd.merge(historical_df, global_bunkers_emissions, how="outer", on="year")
 
+    # Add variable of total emissions including fossil fuels and land use change.
+    global_df["global_fossil_and_land_use_change_emissions"] = global_df["global_fossil_emissions"] +\
+        global_df["global_land_use_change_emissions"]
+    
     # Add global population.
     global_df = geo.add_population_to_dataframe(df=global_df, population_col="global_population")
 
@@ -206,6 +210,8 @@ def run(dest_dir: str) -> None:
     ds_garden.metadata = ds_meadow.metadata
     # Update metadata using the information in the yaml file.
     ds_garden.metadata.update_from_yaml(N.metadata_path, if_source_exists="replace")
+    
+
     # Create a table with the combined data.
     tb_garden = Table(combined_df)
     # Use metadata from yaml file.

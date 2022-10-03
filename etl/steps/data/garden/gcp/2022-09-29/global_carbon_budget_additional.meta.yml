@@ -1,4 +1,5 @@
 dataset:
+  title: Global Carbon Budget (Global Carbon Project, v2021b)
   sources:
     -
       name: Global Carbon Project (2021)
@@ -44,6 +45,11 @@ tables:
         unit: tonnes
         short_unit: t
         description: "Global CO₂ emissions from fossil fuels and industry (which includes coal, oil, gas, cement and flaring)."
+      global_fossil_and_land_use_change_emissions:
+        title: "CO₂ emissions from fossil fuels and land use change"
+        unit: tonnes
+        short_unit: t
+        description: "Global CO₂ emissions from fossil fuels and industry (which includes coal, oil, gas, cement and flaring) plus land-use change."
       global_land_use_change_emissions:
         title: "CO₂ emissions from land use change"
         unit: tonnes
