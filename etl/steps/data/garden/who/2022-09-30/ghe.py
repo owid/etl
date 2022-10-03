@@ -6,7 +6,6 @@ from structlog import get_logger
 
 from etl.grapher_helpers import country_code_to_country
 from etl.helpers import Names
-from etl.paths import DATA_DIR
 
 log = get_logger()
 
