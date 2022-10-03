@@ -7,7 +7,6 @@ from owid import catalog
 from etl.helpers import Names
 
 N = Names(__file__)
-N = Names("/Users/fionaspooner/Documents/OWID/repos/etl/etl/steps/data/meadow/who/2022-09-30/ghe.py")
 
 
 def run(dest_dir: str) -> None:
