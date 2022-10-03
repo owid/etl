@@ -9,11 +9,22 @@ dataset:
 tables:
   ghe:
     variables:
-      # gdp:
-      #   title: GDP
-      #   short_unit: $
-      #   unit: 2011 int-$
-      #   description: Gross domestic product measured in international-$ using 2011 prices to adjust for price changes over time (inflation) and price differences between countries. Calculated by multiplying GDP per capita with population.
-      #   display:
-      #     entityAnnotationsMap: "Western Offshoots: United States, Canada, Australia and New Zealand"
-      #     numDecimalPlaces: 0
+      death_count:
+        title: Deaths
+        description: Deaths
+        unit: deaths
+      death_rate100k:
+        title: Deaths per 100k
+        description: Deaths per 100.000 people
+        unit: deaths per 100,000 people
+      daly_count:
+        title: Disability adjusted life years
+        description: Disability adjusted life years
+        unit: DALYs
+      daly_rate100k:
+        title: Disability adjusted life years per 100k
+        description: Disability adjusted life years per 100k capita in one year
+        unit: DALYs per 100,000 people
+      flag_level:
+        title: Level
+        description: Hierachical level of disease/injury
