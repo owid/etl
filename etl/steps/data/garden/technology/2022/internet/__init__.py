@@ -4,7 +4,9 @@ from typing import List
 
 from owid.catalog import Dataset, Source, Table, Variable
 
+from etl import data_helpers
 from etl.paths import DATA_DIR
+from etl.steps.data.garden.owid.latest.key_indicators import table_population
 
 CURRENT_DIR = Path(__file__).parent
 METADATA_PATH = CURRENT_DIR / "internet.meta.yml"
@@ -25,11 +27,28 @@ def run(dest_dir: str) -> None:
 
 def make_users_table() -> Table:
     # Load internet data
-    d = Dataset(DATA_DIR / "garden/worldbank_wdi/2022-05-26/wdi")
-    table_internet = d["wdi"].dropna(subset=["it_net_user_zs"])[["it_net_user_zs"]]
+    table_internet = load_wdi()
     # Load population data
+    table_population = load_key_indicators()
+    # Combine sources
+    table = make_combined(table_internet, table_population)
+    table = data_helpers.calculate_region_sums(table)
+    # Propagate metadata
+    table = add_metadata(table, table_internet)
+    return table
+
+
+def load_wdi() -> Table:
+    d = Dataset(DATA_DIR / "garden/worldbank_wdi/2022-05-26/wdi")
+    return d["wdi"].dropna(subset=["it_net_user_zs"])[["it_net_user_zs"]]
+
+
+def load_key_indicators() -> Table:
     d = Dataset(DATA_DIR / "garden/owid/latest/key_indicators")
-    table_population = d["population"]
+    return d["population"]
+
+
+def make_combined(table_internet: Table, table_population: Table) -> Table:
     # Merge
     table = table_population.merge(table_internet, left_index=True, right_index=True)
     # Estimate number of internet users
@@ -44,6 +63,23 @@ def make_users_table() -> Table:
     )
     # Filter columns
     table = table[["num_internet_users", "share_internet_users"]]
+    return table.reset_index()
+
+
+def add_regions(table: Table, table_population: Table) -> Table:
+    # Estimate regions number of internet users
+    table = data_helpers.calculate_region_sums(table)
+    # Get population for regions
+    table = table.merge(table_population.reset_index(), on=["country", "year"], how="left")
+    # Estimate relative values
+    msk = table.country.isin(data_helpers.REGIONS)
+    table.loc[msk, "share_internet_users"] = table.loc[msk, "num_internet_users"] / table.loc[msk, "population"]
+    # Filter columns
+    table = table[["num_internet_users", "share_internet_users"]]
+    return table
+
+
+def add_metadata(table: Table, table_internet: Table) -> Table:
     # Propagate metadata
     table.share_internet_users.metadata = deepcopy(table_internet.it_net_user_zs.metadata)
     table.num_internet_users.metadata = deepcopy(table_internet.it_net_user_zs.metadata)
