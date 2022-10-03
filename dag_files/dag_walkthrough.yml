@@ -17,5 +17,6 @@ steps:
   - walden://who/2022-09-30/ghe
   data://garden/who/2022-09-30/ghe:
   - data://meadow/who/2022-09-30/ghe
+  - data://garden/reference/
   data://grapher/who/2022-09-30/ghe:
   - data://garden/who/2022-09-30/ghe
