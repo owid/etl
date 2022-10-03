@@ -23,11 +23,53 @@ dataset:
 tables:
   global_carbon_budget_additional:
     variables:
-      # gdp:
-      #   title: GDP
-      #   short_unit: $
-      #   unit: 2011 int-$
-      #   description: Gross domestic product measured in international-$ using 2011 prices to adjust for price changes over time (inflation) and price differences between countries. Calculated by multiplying GDP per capita with population.
-      #   display:
-      #     entityAnnotationsMap: "Western Offshoots: United States, Canada, Australia and New Zealand"
-      #     numDecimalPlaces: 0
+      consumption_emissions:
+        title: "Consumption-based CO₂ emissions"
+        unit: tonnes
+        short_unit: t
+      consumption_emissions_as_share_of_global:
+        title: "Consumption-based CO₂ emissions (% of global total)"
+        unit: "%"
+        short_unit: "%"
+      consumption_emissions_per_capita:
+        title: "Consumption-based CO₂ per capita"
+        unit: tonnes of CO₂ per capita
+        short_unit: t
+      global_bunker_emissions:
+        title: "Global bunker emissions"
+        unit: tonnes
+        short_unit: t
+      global_fossil_emissions:
+        title: "CO₂ emissions from fossil fuels and industry"
+        unit: tonnes
+        short_unit: t
+        description: "Global CO₂ emissions from fossil fuels and industry (which includes coal, oil, gas, cement and flaring)."
+      global_land_use_change_emissions:
+        title: "CO₂ emissions from land use change"
+        unit: tonnes
+        short_unit: t
+        description: "Global CO₂ emissions from land use change."
+      global_population:
+        title: "Global population"
+        unit: persons
+        short_unit: persons
+      population:
+        title: "Population"
+        unit: persons
+        short_unit: persons
+      population_as_share_of_global:
+        title: Share of global population
+        unit: "%"
+        short_unit: "%"
+      production_emissions:
+        title: "Production-based CO₂ emissions"
+        unit: tonnes
+        short_unit: t
+      production_emissions_as_share_of_global:
+        title: Production-based CO₂ emissions (% of global total)
+        unit: "%"
+        short_unit: "%"
+      production_emissions_per_capita:
+        title: "Production-based CO₂ per capita"
+        unit: tonnes of CO₂ per capita
+        short_unit: t

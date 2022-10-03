@@ -13,10 +13,10 @@ from owid.walden import Catalog as WaldenCatalog
 
 from etl.steps.data.converters import convert_walden_metadata
 
-# Conversion factor to change from million tonnes of carbon to million tonnes of CO2.
-MILLION_TONNES_OF_CARBON_TO_MILLION_TONNES_OF_CO2 = 3.664
-# Conversion factor to change from billion tonnes of carbon to million tonnes of CO2.
-BILLION_TONNES_OF_CARBON_TO_MILLION_TONNES_OF_CO2 = 3.664 * 1e3
+# Conversion factor to change from million tonnes of carbon to tonnes of CO2.
+MILLION_TONNES_OF_CARBON_TO_TONNES_OF_CO2 = 3.664 * 1e6
+# Conversion factor to change from billion tonnes of carbon to tonnes of CO2.
+BILLION_TONNES_OF_CARBON_TO_TONNES_OF_CO2 = 3.664 * 1e9
 
 # Details of dataset(s) to be imported.
 WALDEN_GLOBAL_DATASET_NAME = "global_carbon_budget_global"
@@ -38,7 +38,7 @@ def prepare_historical_budget(df: pd.DataFrame) -> pd.DataFrame:
     df = df[list(columns)].rename(columns=columns)
     # Convert units from gigatonnes of carbon per year emissions to megatonnes of CO2 per year.
     for column in df.drop(columns="year").columns:
-        df[column] *= BILLION_TONNES_OF_CARBON_TO_MILLION_TONNES_OF_CO2
+        df[column] *= BILLION_TONNES_OF_CARBON_TO_TONNES_OF_CO2
     # Add column for country (to be able to combine this with the national data).
     df["country"] = "World"
 
@@ -62,7 +62,7 @@ def prepare_emissions(df: pd.DataFrame, column_name: str) -> pd.DataFrame:
     df = df.melt(id_vars=["year"]).rename(columns={"variable": "country", "value": column_name})
     # Convert units from megatonnes of carbon per year emissions to megatonnes of CO2 per year.
     for column in df.drop(columns=["country", "year"]).columns:
-        df[column] *= MILLION_TONNES_OF_CARBON_TO_MILLION_TONNES_OF_CO2
+        df[column] *= MILLION_TONNES_OF_CARBON_TO_TONNES_OF_CO2
     # Set an index and sort row and columns conveniently.
     df = df.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
 

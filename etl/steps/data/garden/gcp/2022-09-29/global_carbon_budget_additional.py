@@ -13,6 +13,7 @@ from owid.catalog import Dataset, Table
 from owid.datautils import geo
 
 from etl.helpers import Names
+from shared import CURRENT_DIR
 
 # Regions and income groups to create (by aggregating), following OWID definitions.
 REGIONS = [
@@ -32,7 +33,7 @@ REGIONS = [
 AGGREGATES = {"production_emissions": "sum", "consumption_emissions": "sum"}
 
 # Naming conventions.
-N = Names(__file__)
+N = Names(CURRENT_DIR / "global_carbon_budget_additional")
 
 
 def prepare_national_and_global_data(
@@ -184,8 +185,6 @@ def run(dest_dir: str) -> None:
             frac_allowed_nans_per_year=0.9,
             aggregations=AGGREGATES,
         )
-
-    # TODO: If GCP regions have identical data to created regions (for all years), remove them.
 
     # Add per capita variables.
     national_df = add_per_capita_variables(national_df=national_df)
