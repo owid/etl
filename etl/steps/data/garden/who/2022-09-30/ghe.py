@@ -4,6 +4,7 @@ from owid.catalog.utils import underscore_table
 from owid.datautils import geo
 from structlog import get_logger
 
+from etl.grapher_helpers import country_code_to_country
 from etl.helpers import Names
 from etl.paths import DATA_DIR
 
@@ -11,6 +12,7 @@ log = get_logger()
 
 # naming conventions
 N = Names(__file__)
+N = Names("/Users/fionaspooner/Documents/OWID/repos/etl/etl/steps/data/garden/who/2022-09-30/ghe.py")
 
 
 def run(dest_dir: str) -> None:
@@ -23,7 +25,7 @@ def run(dest_dir: str) -> None:
     df = pd.DataFrame(tb_meadow)
 
     log.info("ghe.harmonize_countries")
-    df = harmonize_countries(df)
+    df["country"] = country_code_to_country(df["country"])
 
     ds_garden = Dataset.create_empty(dest_dir)
     ds_garden.metadata = ds_meadow.metadata
