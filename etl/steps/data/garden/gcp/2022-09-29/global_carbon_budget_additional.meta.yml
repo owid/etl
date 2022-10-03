@@ -14,7 +14,7 @@ dataset:
 
         Note that consumption-based emissions are not available for all countries; although those without complete data are a small fraction (3%) of the global total. Each country's share of world emissions are based on the share of the global total minus categories termed 'bunkers' and 'statistical differences' (which include cross-boundary emissions such as international travel and shipping.
 
-        Calculation of each country's share of the global population is calculated using national and global population figures from the UN World Population Prospects (UNWPPP, 2018). 
+        Calculation of each country's share of the global population is calculated using our population dataset, based on <a href="https://ourworldindata.org/population-sources">different sources</a>).
 
         Data on global emissions has been converted by Our World in Data from tonnes of carbon to tonnes of carbon dioxide (CO₂) using a conversion factor of 3.664.
 
