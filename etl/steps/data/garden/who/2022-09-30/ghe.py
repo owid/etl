@@ -40,22 +40,6 @@ def run(dest_dir: str) -> None:
     log.info("ghe.end")
 
 
-def harmonize_countries(df: pd.DataFrame) -> pd.DataFrame:
-    unharmonized_countries = df["country"]
-    df = geo.harmonize_countries(df=df, countries_file=str(N.country_mapping_path))
-
-    missing_countries = set(unharmonized_countries[df.country.isnull()])
-    if any(missing_countries):
-        raise RuntimeError(
-            "The following raw country names have not been harmonized. "
-            f"Please: (a) edit {N.country_mapping_path} to include these country "
-            f"names; or (b) add them to {N.excluded_countries_path}."
-            f"Raw country names: {missing_countries}"
-        )
-
-    return df
-
-
 def clean_data(df: pd.DataFrame) -> Table:
     df["sex"] = df["sex"].map({"BTSX": "Both sexes", "MLE": "Male", "FMLE": "Female"})
     df = df.set_index(["country", "year", "age_group", "sex", "cause"])
