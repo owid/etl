@@ -89,67 +89,41 @@ steps:
     - backport://backport/owid/latest/dataset_5676_global_health_observatory__world_health_organization__2022_08
     - backport://backport/owid/latest/dataset_5712_food_security__suite_of_food_security_indicators__fao__2022_05_17
     - backport://backport/owid/latest/dataset_5757_multidimensional_poverty_index__mpi__2021__current_estimates
-    - backport://backport/owid/latest/dataset_70_population__gapminder__hyde__and__un
+    - backport://backport/owid/latest/dataset_5774_key_indicators
     - backport://backport/owid/latest/dataset_792_investment__credit_to_agriculture__fao__2017
     - backport://backport/owid/latest/dataset_829_food_security__suite_of_food_security_indicators__fao__2017
     - backport://backport/owid/latest/dataset_943_sexual_violence__unicef__2017
     - data://garden/worldbank_wdi/2022-05-26/wdi
 
   #
-  # CAIT - Greenhouse gas emissions by sector (2022).
-  #
-  data://meadow/cait/2022-08-10/ghg_emissions_by_sector:
-    - walden://cait/2022-08-10/cait_ghg_emissions
-  data://garden/cait/2022-08-10/ghg_emissions_by_sector:
-    - data://meadow/cait/2022-08-10/ghg_emissions_by_sector
-  data://grapher/cait/2022-08-10/all_ghg_emissions:
-    - data://garden/cait/2022-08-10/ghg_emissions_by_sector
-  data://grapher/cait/2022-08-10/ch4_emissions:
-    - data://garden/cait/2022-08-10/ghg_emissions_by_sector
-  data://grapher/cait/2022-08-10/co2_emissions:
-    - data://garden/cait/2022-08-10/ghg_emissions_by_sector
-  data://grapher/cait/2022-08-10/n2o_emissions:
-    - data://garden/cait/2022-08-10/ghg_emissions_by_sector
-
-  #
-  # Emissions - CO2 dataset (2022).
-  #
-  data://garden/emissions/2022-08-26/owid_co2:
-    - backport://backport/owid/latest/dataset_5582_global_carbon_budget__global_carbon_project__v2021
-    - data://garden/cait/2022-08-10/ghg_emissions_by_sector
-    - data://garden/energy/2022-07-29/primary_energy_consumption
-    - data://garden/owid/latest/key_indicators
-    - data://garden/ggdc/2020-10-01/ggdc_maddison
-
-  #
   # IHME - Global Burden of Disease.
   #
   data://meadow/ihme_gbd/2019/gbd_cause:
-  - walden://ihme_gbd/2019/gbd_cause
+    - walden://ihme_gbd/2019/gbd_cause
   data://meadow/ihme_gbd/2019/gbd_child_mortality:
-  - walden://ihme_gbd/2019/gbd_child_mortality
+    - walden://ihme_gbd/2019/gbd_child_mortality
   data://meadow/ihme_gbd/2019/gbd_mental_health:
-  - walden://ihme_gbd/2019/gbd_mental_health
+    - walden://ihme_gbd/2019/gbd_mental_health
   data://meadow/ihme_gbd/2019/gbd_risk:
-  - walden://ihme_gbd/2019/gbd_risk
+    - walden://ihme_gbd/2019/gbd_risk
   data://meadow/ihme_gbd/2019/gbd_prevalence:
-  - walden://ihme_gbd/2019/gbd_prevalence
+    - walden://ihme_gbd/2019/gbd_prevalence
   data://garden/ihme_gbd/2019/gbd_cause:
-  - data://meadow/ihme_gbd/2019/gbd_cause
+    - data://meadow/ihme_gbd/2019/gbd_cause
   data://garden/ihme_gbd/2019/gbd_risk:
-  - data://meadow/ihme_gbd/2019/gbd_risk
+    - data://meadow/ihme_gbd/2019/gbd_risk
   data://garden/ihme_gbd/2019/gbd_child_mortality:
-  - data://meadow/ihme_gbd/2019/gbd_child_mortality
+    - data://meadow/ihme_gbd/2019/gbd_child_mortality
   data://garden/ihme_gbd/2019/gbd_mental_health:
-  - data://meadow/ihme_gbd/2019/gbd_mental_health
+    - data://meadow/ihme_gbd/2019/gbd_mental_health
   data://garden/ihme_gbd/2019/gbd_prevalence:
-  - data://meadow/ihme_gbd/2019/gbd_prevalence
+    - data://meadow/ihme_gbd/2019/gbd_prevalence
   data://grapher/ihme_gbd/2019/gbd_cause:
-  - data://garden/ihme_gbd/2019/gbd_cause
+    - data://garden/ihme_gbd/2019/gbd_cause
   data://grapher/ihme_gbd/2019/gbd_prevalence:
-  - data://garden/ihme_gbd/2019/gbd_prevalence
+    - data://garden/ihme_gbd/2019/gbd_prevalence
   data://grapher/ihme_gbd/2019/gbd_child_mortality:
-  - data://garden/ihme_gbd/2019/gbd_child_mortality
+    - data://garden/ihme_gbd/2019/gbd_child_mortality
 
   #
   # UN
@@ -159,25 +133,12 @@ steps:
   data://grapher/un/2022-07-11/un_wpp:
     - data://garden/un/2022-07-11/un_wpp
 
-  #
-  # RFF - World Carbon Pricing (2022).
-  #
-  data://meadow/rff/2022-09-14/world_carbon_pricing:
-    - walden://rff/2022-09-14/world_carbon_pricing
-    - walden://rff/2022-09-14/ipcc_codes
-  data://meadow/rff/2022-09-14/emissions_weighted_carbon_price__economy:
-    - walden://rff/2022-09-14/emissions_weighted_carbon_price__economy
-  data://meadow/rff/2022-09-14/emissions_weighted_carbon_price__coverage:
-    - walden://rff/2022-09-14/emissions_weighted_carbon_price__coverage
-  data://garden/rff/2022-09-14/world_carbon_pricing:
-    - data://meadow/rff/2022-09-14/world_carbon_pricing
-  data://garden/rff/2022-09-14/emissions_weighted_carbon_price:
-    - data://meadow/rff/2022-09-14/emissions_weighted_carbon_price__economy
-    - data://meadow/rff/2022-09-14/emissions_weighted_carbon_price__coverage
-  data://grapher/rff/2022-09-14/world_carbon_pricing_any_sector:
-    - data://garden/rff/2022-09-14/world_carbon_pricing
-  data://grapher/rff/2022-09-14/emissions_weighted_carbon_price:
-    - data://garden/rff/2022-09-14/emissions_weighted_carbon_price
+  # Internet
+  data://garden/technology/2022/internet:
+    - data://garden/worldbank_wdi/2022-05-26/wdi
+    - data://garden/owid/latest/key_indicators
+  data://grapher/technology/2022/internet:
+    - data://garden/technology/2022/internet
 
 # Sub-dags to import
 include:
@@ -186,3 +147,4 @@ include:
   - dag_files/dag_energy.yml
   - dag_files/dag_walkthrough.yml
   - dag_files/dag_examples.yml
+  - dag_files/dag_emissions.yml

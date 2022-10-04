@@ -5,14 +5,12 @@ from typing import Any, List
 
 import pandas as pd
 from owid import catalog
-from owid.datautils.io.s3 import S3
 from tqdm.auto import tqdm
 
 from etl.paths import DATA_DIR
 
 YEAR_SPLIT = 2022
 no_dim_keyword = "full"
-s3 = S3()
 
 
 def _load_dataset() -> catalog.Dataset:

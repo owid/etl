@@ -1,3 +1,7 @@
+# To run with subset only: GHE_SUBSET_ONLY=1 etl grapher/who/2021-07-01/ghe --grapher
+import os
+
+import pandas as pd
 from owid import catalog
 
 from etl import grapher_helpers as gh
@@ -27,7 +31,6 @@ def run(dest_dir: str) -> None:
 
     # We want to export all columns except causegroup and level (for now)
     columns_to_export = [
-        "population",
         "deaths",
         "deaths_rate",
         "deaths_100k",
@@ -42,9 +45,19 @@ def run(dest_dir: str) -> None:
         )
 
     table.reset_index(inplace=True)
-    table["entity_id"] = gh.country_to_entity_id(table["country_code"], by="code")
+    if "GHE_SUBSET_ONLY" in os.environ:
+        table = select_subset_causes(table)
+    else:
+        table = table
+    table[columns_to_export] = (
+        table[columns_to_export]
+        .astype(float)
+        .round({"deaths": 0, "deaths_rate": 2, "deaths_100k": 2, "daly": 2, "daly_rate": 2, "daly_100k": 2})
+    )
+    table["deaths"] = table["deaths"].astype(int)
+    table["country"] = gh.country_code_to_country(table["country_code"])
     table = table.drop(["country_code"], axis=1)
-    table = table.set_index(["entity_id", "year", "ghe_cause_title", "sex_code", "agegroup_code"])
+    table = table.set_index(["country", "year", "ghe_cause_title", "sex_code", "agegroup_code"])
 
     table.update_metadata_from_yaml(N.metadata_path, "estimates")
 
@@ -58,3 +71,10 @@ def run(dest_dir: str) -> None:
     table = table.loc[:, columns_to_export]
 
     dataset.add(table)
+
+
+def select_subset_causes(table: pd.DataFrame) -> pd.DataFrame:
+
+    table = table[(table["sex_code"] == "both") & (table["agegroup_code"] == "ALLAges")]
+
+    return table

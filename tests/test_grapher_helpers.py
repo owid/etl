@@ -182,7 +182,7 @@ def _sample_table() -> Table:
             {
                 "deaths": [0, 1],
                 "year": [2019, 2020],
-                "entity_id": [1, 1],
+                "country": ["France", "Poland"],
                 "sex": ["female", "male"],
             }
         )
@@ -200,22 +200,12 @@ def test_adapt_table_for_grapher_multiindex():
     assert out_table.index.names == ["entity_id", "year"]
     assert out_table.columns.tolist() == ["deaths", "sex"]
 
-    table = _sample_table().set_index(["entity_id", "year", "sex"])
+    table = _sample_table().set_index(["country", "year", "sex"])
     out_table = gh._adapt_table_for_grapher(table)
     assert out_table.index.names == ["entity_id", "year", "sex"]
     assert out_table.columns.tolist() == ["deaths"]
 
     table = _sample_table().set_index(["sex"])
-    out_table = gh._adapt_table_for_grapher(table)
-    assert out_table.index.names == ["entity_id", "year", "sex"]
-    assert out_table.columns.tolist() == ["deaths"]
-
-
-def test_adapt_table_for_grapher_multiindex_with_country():
-    table = _sample_table().set_index("sex")
-    table["country"] = ["France", "Poland"]
-    del table["entity_id"]
-
     out_table = gh._adapt_table_for_grapher(table)
     assert out_table.index.names == ["entity_id", "year", "sex"]
     assert out_table.columns.tolist() == ["deaths"]

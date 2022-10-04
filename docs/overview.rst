@@ -22,7 +22,7 @@ To a first approximation there are two kinds of data sources we ingest in our ET
     upstream[institutional data] --> etl --> catalog[catalog on disk] --> Grapher
     researchers[individual research dataset] --> admin[Grapher web admin] --> Grapher
 
--  **Institutional data** like that published by the World Bank, the World Health Organisation etc.. These are often large, complex and periodically updated data releases. This kind of data is the main focus of this repository for the time being.
+-  **Institutional data** like that published by the World Bank, the World Health Organisation etc. These are often large, complex and periodically updated data releases. This kind of data is the main focus of this repository for the time being.
 -  **Individual research dataset releases**. These are usually small datasets published as part of academic papers. They are often originally only a single CSV or Excel file. Such files have historically been uploaded directly into the MySQL database of Grapher, our visualisation system. While these kinds of data sources will be ingested as part of this repository eventually, as of Summer 2022 they exist in ETL only as backported artifacts.
 
 Terminology and organization
@@ -154,7 +154,12 @@ In general data analysis, the line between what should be interpreted as ``varia
 Harmonization tables
 --------------------
 
-For important and common index columns, notably countries/regions, there exists a dataframe that enumerates the set of commonly understood entities - for the most important countries/regions file this is the `countries_regions.csv <../data/garden/reference/countries_regions.csv>`_. In this dataframe all countries and geographic regions are listed with their unique code used at Our World In Data (in the case of country/region we use ISO Alpha 3 country codes as a base but add additional ones for entities that we need that do not have such a code assigned like some historic entities), as well as additional information like contained smaller units, additional third party identifiers, etc.
+For important and common index columns, notably countries/regions, there exists a dataframe that enumerates the set of commonly understood entities - for the most important countries/regions file this is the `countries_regions.csv <../data/garden/reference/countries_regions.csv>`_. In this dataframe all countries and geographic regions are listed with their *unique code* used at Our World In Data, as well as additional information like contained smaller units, additional third party identifiers, etc.
+
+
+.. admonition:: Unique code used at Our World In Data
+
+    At Our World in Data we use an "enriched" ISO code for ocuntries. In the case of country/region we use ISO Alpha 3 country codes as a base, but we add additional ones for entities that we need that do not have such a code assigned (e.g. historic entities, continents, subnational regions, etc.).
 
 Layout of the ETL repository
 ----------------------------

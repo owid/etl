@@ -26,14 +26,14 @@ help:
 
 
 watch-all:
-	.venv/bin/watchmedo shell-command -c 'clear; make unittest; (cd vendor/owid-catalog-py && make unittest); (cd vendor/walden && make unittest)' --recursive --drop .
+	poetry run watchmedo shell-command -c 'clear; make unittest; (cd vendor/owid-catalog-py && make unittest); (cd vendor/walden && make unittest)' --recursive --drop .
 
 test-all: test
 	cd vendor/owid-catalog-py && make test
 	cd vendor/walden && make test
 
 watch: .venv
-	.venv/bin/watchmedo shell-command -c 'clear; make check-formatting lint check-typing coverage' --recursive --drop .
+	poetry run watchmedo shell-command -c 'clear; make check-formatting lint check-typing coverage' --recursive --drop .
 
 .submodule-init:
 	@echo '==> Initialising submodules'
@@ -47,20 +47,20 @@ watch: .venv
 
 check-typing: .venv
 	@echo '==> Checking types'
-	.venv/bin/mypy --exclude='etl/steps|walkthrough/.*_cookiecutter'  $(SRC)
+	poetry run mypy --exclude='etl/steps|walkthrough/.*_cookiecutter'  $(SRC)
 	@./scripts/typecheck_steps.sh
 
 coverage: .venv
 	@echo '==> Unit testing with coverage'
-	.venv/bin/pytest --cov=etl --cov-report=term-missing tests
+	poetry run pytest --cov=etl --cov-report=term-missing tests
 
 etl: .venv
 	@echo '==> Running etl on garden'
-	.venv/bin/etl garden
+	poetry run etl garden
 
 full: .venv
 	@echo '==> Running full etl'
-	.venv/bin/etl
+	poetry run etl
 
 clean:
 	@echo '==> Cleaning data/ folder'
@@ -76,24 +76,24 @@ lab: .venv
 
 publish: etl reindex
 	@echo '==> Publishing the catalog'
-	.venv/bin/publish --private
+	poetry run publish --private
 
 reindex: .venv
 	@echo '==> Creating a catalog index'
-	.venv/bin/reindex
+	poetry run reindex
 
 prune: .venv
 	@echo '==> Prune datasets with no recipe from catalog'
-	.venv/bin/prune
+	poetry run prune
 
 grapher: .venv
 	@echo '==> Running full etl with grapher upsert'
-	.venv/bin/etl --grapher
+	poetry run etl --grapher
 
 dot: dependencies.pdf
 
 dependencies.pdf: .venv dag.yml etl/to_graphviz.py
-	.venv/bin/python etl/to_graphviz.py dependencies.dot
+	poetry run python etl/to_graphviz.py dependencies.dot
 	dot -Tpdf dependencies.dot >$@.tmp
 	mv -f $@.tmp $@
 

@@ -24,30 +24,30 @@ test-default: check-formatting lint check-typing unittest
 
 lint-default: .venv
 	@echo '==> Linting'
-	@.venv/bin/flake8 $(SRC)
+	@poetry run flake8 $(SRC)
 
 check-formatting-default: .venv
 	@echo '==> Checking formatting'
-	@.venv/bin/black --check $(SRC)
+	@poetry run black --check $(SRC)
 	@echo '==> Checking import sorting'
-	@.venv/bin/isort --check-only $(SRC)
+	@poetry run isort --check-only $(SRC)
 
 check-typing-default: .venv
 	@echo '==> Checking types'
-	.venv/bin/mypy $(SRC)
+	poetry run mypy $(SRC)
 
 unittest-default: .venv
 	@echo '==> Running unit tests'
-	.venv/bin/pytest $(SRC)
+	poetry run pytest $(SRC)
 
 format-default: .venv
 	@echo '==> Reformatting files'
-	@.venv/bin/black $(SRC)
+	@poetry run black $(SRC)
 	@echo '==> Sorting imports'
-	@.venv/bin/isort $(SRC)
+	@poetry run isort $(SRC)
 
 watch-default: .venv
-	.venv/bin/watchmedo shell-command -c 'clear; make test' --recursive --drop .
+	poetry run watchmedo shell-command -c 'clear; make test' --recursive --drop .
 
 # allow you to override a command, e.g. "watch", but if you do not, then use
 # the default

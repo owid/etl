@@ -11,6 +11,7 @@ import structlog
 import yaml
 from owid import catalog
 from owid.catalog.utils import underscore
+from owid.datautils import dataframes
 from pydantic import BaseModel
 
 from etl.db import get_connection, get_engine
@@ -319,6 +320,13 @@ def _get_and_create_entities_in_db(countries: Set[str]) -> Dict[str, int]:
     return {name: db.get_or_create_entity(name) for name in countries}
 
 
+def country_code_to_country(country_code: pd.Series) -> pd.Series:
+    """Convert country code to country name."""
+    reference_dataset = catalog.Dataset(REFERENCE_DATASET)
+    code_to_country = reference_dataset["countries_regions"]["name"].to_dict()
+    return cast(pd.Series, dataframes.map_series(country_code, code_to_country, warn_on_missing_mappings=True))
+
+
 def country_to_entity_id(
     country: pd.Series,
     fill_from_db: bool = True,
@@ -328,6 +336,10 @@ def country_to_entity_id(
 ) -> pd.Series:
     """Convert country name to grapher entity_id. Most of countries should be in countries_regions.csv,
     however some regions could be only in `entities` table in MySQL or doesn't exist at all.
+
+    This function should not be used from ETL steps, conversion to entity_id is done automatically
+    when upserting to database.
+
     :param fill_from_db: if True, fill missing countries from `entities` table
     :param create_entities: if True, create missing countries in `entities` table
     :param errors: how to handle missing countries
@@ -340,11 +352,7 @@ def country_to_entity_id(
     if entity_id.isnull().any() and fill_from_db:
         ix = entity_id.isnull()
         db_entities = _get_entities_from_db(set(country[ix]), by=by)
-        # NOTE: this is hotfix, check out entity_id type
-        if entity_id.isnull().all():
-            entity_id = country.map(db_entities)
-        else:
-            entity_id[ix] = country[ix].map(db_entities)
+        entity_id[ix] = country[ix].map(db_entities).astype(float)
 
     # create entities in DB
     if entity_id.isnull().any() and create_entities:
@@ -489,6 +497,12 @@ def _adapt_table_for_grapher(
     """
     table = deepcopy(table)
 
+    variable_titles = pd.Series([table[col].title for col in table.columns]).dropna()
+    variable_titles_counts = variable_titles.value_counts()
+    assert (
+        variable_titles_counts.empty or variable_titles_counts.max() == 1
+    ), f"Variable titles are not unique ({variable_titles_counts[variable_titles_counts > 1].index})."
+
     # Remember original dimensions
     dim_names = [n for n in table.index.names if n and n not in ("year", "entity_id", country_col)]
 
@@ -496,13 +510,12 @@ def _adapt_table_for_grapher(
     if table.index.names != [None]:
         table = table.reset_index()
 
-    assert "year" in table.columns
+    assert {"year", country_col} <= set(table.columns)
+    assert "entity_id" not in table.columns
 
-    if "entity_id" not in table.columns:
-        assert country_col in table.columns
-        # Grapher needs a column entity id, that is constructed based on the unique entity names in the database.
-        table["entity_id"] = country_to_entity_id(table[country_col], create_entities=True)
-        table = table.drop(columns=[country_col]).rename(columns={year_col: "year"})
+    # Grapher needs a column entity id, that is constructed based on the unique entity names in the database.
+    table["entity_id"] = country_to_entity_id(table[country_col], create_entities=True)
+    table = table.drop(columns=[country_col]).rename(columns={year_col: "year"})
 
     table = table.set_index(["entity_id", "year"] + dim_names)
 

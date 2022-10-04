@@ -1,0 +1,68 @@
+steps:
+  #
+  # CAIT - Greenhouse gas emissions by sector (2022).
+  #
+  data://meadow/cait/2022-08-10/ghg_emissions_by_sector:
+    - walden://cait/2022-08-10/cait_ghg_emissions
+  data://garden/cait/2022-08-10/ghg_emissions_by_sector:
+    - data://meadow/cait/2022-08-10/ghg_emissions_by_sector
+  data://grapher/cait/2022-08-10/all_ghg_emissions:
+    - data://garden/cait/2022-08-10/ghg_emissions_by_sector
+  data://grapher/cait/2022-08-10/ch4_emissions:
+    - data://garden/cait/2022-08-10/ghg_emissions_by_sector
+  data://grapher/cait/2022-08-10/co2_emissions:
+    - data://garden/cait/2022-08-10/ghg_emissions_by_sector
+  data://grapher/cait/2022-08-10/n2o_emissions:
+    - data://garden/cait/2022-08-10/ghg_emissions_by_sector
+  #
+  # Emissions - CO2 dataset (2022).
+  #
+  data://garden/emissions/2022-08-26/owid_co2:
+    - backport://backport/owid/latest/dataset_5582_global_carbon_budget__global_carbon_project__v2021
+    - data://garden/cait/2022-08-10/ghg_emissions_by_sector
+    - data://garden/energy/2022-07-29/primary_energy_consumption
+    - data://garden/owid/latest/key_indicators
+    - data://garden/ggdc/2020-10-01/ggdc_maddison
+  #
+  # Andrew - CO2 mitigation curves (2019).
+  #
+  data://meadow/andrew/2019-12-03/co2_mitigation_curves:
+    - walden://andrew/2019-12-03/co2_mitigation_curves_1p5celsius
+    - walden://andrew/2019-12-03/co2_mitigation_curves_2celsius
+  data://garden/andrew/2019-12-03/co2_mitigation_curves:
+    - data://meadow/andrew/2019-12-03/co2_mitigation_curves
+  data://grapher/andrew/2019-12-03/co2_mitigation_curves_1p5celsius:
+    - data://garden/andrew/2019-12-03/co2_mitigation_curves
+  data://grapher/andrew/2019-12-03/co2_mitigation_curves_2celsius:
+    - data://garden/andrew/2019-12-03/co2_mitigation_curves
+  #
+  # GCP - Global Carbon Budget - additional data
+  #
+  # In the future, these steps should generate the entire GCB dataset.
+  # But for now (that the GCB is generated in importers) these steps will simply add missing variables.
+  data://meadow/gcp/2022-09-29/global_carbon_budget_additional:
+    - walden://gcp/2022-09-29/global_carbon_budget_global
+  data://garden/gcp/2022-09-29/global_carbon_budget_additional:
+    - data://meadow/gcp/2022-09-29/global_carbon_budget_additional
+    - data://garden/owid/latest/key_indicators
+  data://grapher/gcp/2022-09-29/global_carbon_budget_additional:
+    - data://garden/gcp/2022-09-29/global_carbon_budget_additional
+  #
+  # RFF - World Carbon Pricing (2022).
+  #
+  data://meadow/rff/2022-09-14/world_carbon_pricing:
+    - walden://rff/2022-09-14/world_carbon_pricing
+    - walden://rff/2022-09-14/ipcc_codes
+  data://meadow/rff/2022-09-14/emissions_weighted_carbon_price__economy:
+    - walden://rff/2022-09-14/emissions_weighted_carbon_price__economy
+  data://meadow/rff/2022-09-14/emissions_weighted_carbon_price__coverage:
+    - walden://rff/2022-09-14/emissions_weighted_carbon_price__coverage
+  data://garden/rff/2022-09-14/world_carbon_pricing:
+    - data://meadow/rff/2022-09-14/world_carbon_pricing
+  data://garden/rff/2022-09-14/emissions_weighted_carbon_price:
+    - data://meadow/rff/2022-09-14/emissions_weighted_carbon_price__economy
+    - data://meadow/rff/2022-09-14/emissions_weighted_carbon_price__coverage
+  data://grapher/rff/2022-09-14/world_carbon_pricing_any_sector:
+    - data://garden/rff/2022-09-14/world_carbon_pricing
+  data://grapher/rff/2022-09-14/emissions_weighted_carbon_price:
+    - data://garden/rff/2022-09-14/emissions_weighted_carbon_price
