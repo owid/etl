@@ -75,7 +75,7 @@ def _split_in_projection_and_historical(
         title_suffix="(future projections)",
         display_name_suffix="(future projections)",
         description=(
-            f"{description_base}, available from {year_threshold} to 2100\n\n{{year_threshold}}-2100: Projections"
+            f"{description_base}, available from {year_threshold} to 2100\n\n{year_threshold}-2100: Projections"
             " based on Medium variant by the United Nations - Population Division (2022)."
         ),
     )
