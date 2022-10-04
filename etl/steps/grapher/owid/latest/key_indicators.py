@@ -19,8 +19,18 @@ def run(dest_dir: str) -> None:
     # Get population table
     table = garden_dataset["population"].reset_index()
     # Create population new metrics
-    table = _split_in_projection_and_historical(table, YEAR_THRESHOLD, "population")
-    table = _split_in_projection_and_historical(table, YEAR_THRESHOLD, "world_pop_share")
+    table = _split_in_projection_and_historical(
+        table=table,
+        year_threshold=YEAR_THRESHOLD,
+        metric="population",
+        description_base="Population by country",
+    )
+    table = _split_in_projection_and_historical(
+        table=table,
+        year_threshold=YEAR_THRESHOLD,
+        metric="world_pop_share",
+        description_base="Share of the world's population by country",
+    )
     # table["population_historical"] = deepcopy(table["population"])
     # table["population_projection"] = deepcopy(table["population"])
     # Add population table to dataset
@@ -36,28 +46,38 @@ def run(dest_dir: str) -> None:
     dataset.save()
 
 
-def _split_in_projection_and_historical(table: catalog.Table, year_threshold: int, metric: str) -> catalog.Table:
+def _split_in_projection_and_historical(
+    table: catalog.Table, year_threshold: int, metric: str, description_base: str
+) -> catalog.Table:
     # Get mask
     mask = table["year"] < year_threshold
     # Add historical metric
     table = _add_metric_new(
-        table,
-        metric,
-        mask,
-        "historical",
-        "(historical estimates)",
-        "",
-        ["10,000 BCE to 2100", f"10,000 BCE to {year_threshold - 1}"],
+        table=table,
+        metric=metric,
+        mask=mask,
+        metric_suffix="historical",
+        title_suffix="(historical estimates)",
+        display_name_suffix="",
+        description=(
+            f"{description_base}, available from 10,000 BCE to {year_threshold - 1}\n\n"
+            "10,000 BCE - 1799: Historical estimates by HYDE (v3.2).\n"
+            "1800-1949: Historical estimates by Gapminder.\n"
+            f"1950-{year_threshold}: Population records by the United Nations - Population Division (2022)."
+        ),
     )
     # Add projection metric
     table = _add_metric_new(
-        table,
-        metric,
-        -mask,
-        "projection",
-        "(future projections)",
-        "(future projections)",
-        ["10,000 BCE to 2100", f"{year_threshold} to 2100"],
+        table=table,
+        metric=metric,
+        mask=-mask,
+        metric_suffix="projection",
+        title_suffix="(future projections)",
+        display_name_suffix="(future projections)",
+        description=(
+            f"{description_base}, available from {year_threshold} to 2100\n\n{{year_threshold}}-2100: Projections"
+            " based on Medium variant by the United Nations - Population Division (2022)."
+        ),
     )
     return table
 
@@ -69,7 +89,7 @@ def _add_metric_new(
     metric_suffix: str,
     title_suffix: str,
     display_name_suffix: str,
-    description_year_replace: List[str],
+    description: str = None,
 ) -> catalog.Table:
     # Get dtype
     dtype = table[metric].dtype
@@ -84,5 +104,5 @@ def _add_metric_new(
         table[metric_new].metadata.display[
             "name"
         ] = f"{table[metric_new].metadata.display['name']} {display_name_suffix}"
-    table[metric_new].metadata.description = table[metric_new].metadata.description.replace(*description_year_replace)
+    table[metric_new].metadata.description = description
     return table.astype({metric_new: dtype})
