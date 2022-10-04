@@ -1,6 +1,7 @@
 """Combine dataset on coverage of emissions with the average prices of emissions covered by an ETS or a carbon tax.
 
 """
+
 import pandas as pd
 from owid.catalog import Dataset, Table
 from owid.catalog.utils import underscore_table
@@ -154,8 +155,6 @@ def run(dest_dir: str) -> None:
     #  * Here it would be better to have a list of excluded countries, but this is not yet implemented
     #  in harmonize_countries. For example, if a new country is included, it will be ignored here
     #  (while instead it should raise a warning).
-    #  * Also, harmonize_countries does not handle country column if it is categorical.
-    df_combined = df_combined.astype({"country": str})
     df_combined = geo.harmonize_countries(
         df=df_combined,
         countries_file=str(COUNTRIES_PATH),
