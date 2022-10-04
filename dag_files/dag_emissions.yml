@@ -6,6 +6,7 @@ steps:
     - walden://cait/2022-08-10/cait_ghg_emissions
   data://garden/cait/2022-08-10/ghg_emissions_by_sector:
     - data://meadow/cait/2022-08-10/ghg_emissions_by_sector
+    - data://garden/reference
   data://grapher/cait/2022-08-10/all_ghg_emissions:
     - data://garden/cait/2022-08-10/ghg_emissions_by_sector
   data://grapher/cait/2022-08-10/ch4_emissions:
