@@ -1,6 +1,5 @@
 from owid import catalog
 
-from etl import grapher_helpers as gh
 from etl.paths import DATA_DIR
 
 from .shared import GARDEN_DATASET_VERSION, NAMESPACE
@@ -15,7 +14,7 @@ DATASET_PATH = DATA_DIR / "garden" / NAMESPACE / GARDEN_DATASET_VERSION / "ghg_e
 
 def run(dest_dir: str) -> None:
     garden_dataset = catalog.Dataset(DATASET_PATH)
-    dataset = catalog.Dataset.create_empty(dest_dir, gh.adapt_dataset_metadata_for_grapher(garden_dataset.metadata))
+    dataset = catalog.Dataset.create_empty(dest_dir, garden_dataset.metadata)
 
     ####################################################################################################################
     # Grapher seems to be taking the name from the dataset instead of the table.
@@ -23,8 +22,6 @@ def run(dest_dir: str) -> None:
     dataset.metadata.title = GRAPHER_DATASET_TITLE
     dataset.metadata.short_name = TABLE_NAME
     ####################################################################################################################
-
-    dataset.metadata = gh.adapt_dataset_metadata_for_grapher(dataset.metadata)
 
     dataset.save()
 
@@ -38,5 +35,4 @@ def run(dest_dir: str) -> None:
             table[column].metadata.short_unit = "t"
             table[column].metadata.display["conversionFactor"] = 1e6
             table[column].metadata.description = table[column].metadata.description.replace("million tonnes", "tonnes")
-    table = gh.adapt_table_for_grapher(table)
     dataset.add(table)

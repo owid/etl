@@ -45,8 +45,6 @@ from etl.helpers import get_etag
 Graph = Dict[str, Set[str]]
 DAG = Dict[str, Any]
 
-GRAPHER_INSERT_WORKERS = int(os.environ.get("GRAPHER_INSERT_WORKERS", 10))
-
 
 def compile_steps(
     dag: DAG,
@@ -358,10 +356,12 @@ class DataStep(Step):
 
     def _step_files(self) -> List[str]:
         "Return a list of code files defining this step."
+        # if dataset is a folder, use all its files
         if self._search_path.is_dir():
             return [p.as_posix() for p in files.walk(self._search_path)]
 
-        return glob(self._search_path.as_posix() + ".*")
+        # if a dataset is a single file, use [dataset].py and shared* files
+        return glob(self._search_path.as_posix() + ".*") + glob((self._search_path.parent / "shared*").as_posix())
 
     @property
     def _search_path(self) -> Path:
@@ -377,13 +377,16 @@ class DataStep(Step):
         """
         # use a subprocess to isolate each step from the others, and avoid state bleeding
         # between them
-        args = [
-            f"{paths.BASE_DIR}/.venv/bin/run_python_step",
-            str(self),
-            self._dest_dir.as_posix(),
-        ]
+        args = ["poetry", "run", "run_python_step"]
         if config.IPDB_ENABLED:
-            args[1:1] = ["--ipdb"]
+            args.append("--ipdb")
+
+        args.extend(
+            [
+                str(self),
+                self._dest_dir.as_posix(),
+            ]
+        )
 
         subprocess.check_call(args)
 
@@ -517,6 +520,8 @@ class GrapherStep(Step):
         # save dataset to grapher DB
         dataset = self.dataset
 
+        dataset.metadata = gh._adapt_dataset_metadata_for_grapher(dataset.metadata)
+
         dataset_upsert_results = upsert_dataset(
             dataset,
             dataset.metadata.namespace,
@@ -531,8 +536,10 @@ class GrapherStep(Step):
         for table in dataset:
             catalog_path = f"{self.path}/{table.metadata.short_name}"
 
+            table = gh._adapt_table_for_grapher(table)
+
             # generate table with entity_id, year and value for every column
-            tables = gh.yield_wide_table(table, na_action="drop")
+            tables = gh._yield_wide_table(table, na_action="drop")
             upsert = lambda t: upsert_table(  # noqa: E731
                 t,
                 dataset_upsert_results,
@@ -543,8 +550,8 @@ class GrapherStep(Step):
             # insert data in parallel, this speeds it up considerably and is even faster than loading
             # data with LOAD DATA INFILE
             # TODO: remove threads once we get rid of inserts into data_values
-            if GRAPHER_INSERT_WORKERS > 1:
-                with concurrent.futures.ThreadPoolExecutor(max_workers=GRAPHER_INSERT_WORKERS) as executor:
+            if config.GRAPHER_INSERT_WORKERS > 1:
+                with concurrent.futures.ThreadPoolExecutor(max_workers=config.GRAPHER_INSERT_WORKERS) as executor:
                     results = executor.map(upsert, tables)
             else:
                 results = map(upsert, tables)
@@ -557,7 +564,7 @@ class GrapherStep(Step):
         set_dataset_checksum(dataset_upsert_results.dataset_id, self.data_step.checksum_input())
 
     def checksum_output(self) -> str:
-        raise NotImplementedError("UpsertStep should not be used as an input")
+        raise NotImplementedError("GrapherStep should not be used as an input")
 
     @classmethod
     def _cleanup_ghost_resources(
@@ -577,7 +584,7 @@ class GrapherStep(Step):
         cleanup_ghost_variables(
             dataset_upsert_results.dataset_id,
             upserted_variable_ids,
-            workers=GRAPHER_INSERT_WORKERS,
+            workers=config.GRAPHER_INSERT_WORKERS,
         )
         cleanup_ghost_sources(dataset_upsert_results.dataset_id, upserted_source_ids)
 

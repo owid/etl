@@ -3,13 +3,7 @@ import pandas as pd
 import pytest
 from owid.catalog import DatasetMeta, Source, Table, TableMeta, VariableMeta
 
-from etl.grapher_helpers import (
-    _ensure_source_per_variable,
-    combine_metadata_sources,
-    contains_inf,
-    yield_long_table,
-    yield_wide_table,
-)
+from etl import grapher_helpers as gh
 
 
 def test_yield_wide_table():
@@ -25,7 +19,7 @@ def test_yield_wide_table():
     table._1.metadata.unit = "kg"
     table.a__pct.metadata.unit = "pct"
 
-    tables = list(yield_wide_table(table))
+    tables = list(gh._yield_wide_table(table))
 
     assert tables[0].reset_index().to_dict(orient="list") == {
         "_1": [1, 2, 3],
@@ -56,7 +50,7 @@ def test_yield_wide_table_with_dimensions():
     table = Table(df.set_index(["entity_id", "year", "age"]))
     table.deaths.metadata.unit = "people"
     table.deaths.metadata.title = "Deaths"
-    grapher_tables = list(yield_wide_table(table, dim_titles=["Age group"]))
+    grapher_tables = list(gh._yield_wide_table(table, dim_titles=["Age group"]))
 
     t = grapher_tables[0]
     assert t.columns[0] == "deaths__age_10_18"
@@ -82,7 +76,7 @@ def test_yield_long_table_with_dimensions():
         }
     ).set_index(["year", "entity_id", "sex"])
     table = Table(long, metadata=TableMeta(dataset=DatasetMeta(sources=[Source()])))
-    grapher_tables = list(yield_long_table(table, dim_titles=["Sex"]))
+    grapher_tables = list(gh._yield_long_table(table, dim_titles=["Sex"]))
 
     t = grapher_tables[0]
     assert t.columns[0] == "births__sex_female"
@@ -117,15 +111,15 @@ def test_yield_long_table_with_dimensions_error():
     ).set_index(["year", "entity_id", "sex"])
     table = Table(long)  # no metadata with sources
     with pytest.raises(AssertionError):
-        _ = list(yield_long_table(table, dim_titles=["Sex"]))
+        _ = list(gh._yield_long_table(table, dim_titles=["Sex"]))
 
 
 def test_contains_inf():
-    assert contains_inf(pd.Series([1, np.inf]))
-    assert not contains_inf(pd.Series([1, 2]))
-    assert not contains_inf(pd.Series(["a", 2]))
-    assert not contains_inf(pd.Series(["a", "b"]))
-    assert not contains_inf(pd.Series(["a", "b"]).astype("category"))
+    assert gh.contains_inf(pd.Series([1, np.inf]))
+    assert not gh.contains_inf(pd.Series([1, 2]))
+    assert not gh.contains_inf(pd.Series(["a", 2]))
+    assert not gh.contains_inf(pd.Series(["a", "b"]))
+    assert not gh.contains_inf(pd.Series(["a", "b"]).astype("category"))
 
 
 def test_ensure_source_per_variable_multiple_sources():
@@ -146,7 +140,7 @@ def test_ensure_source_per_variable_multiple_sources():
         Source(name="s1", description="s1 description"),
         Source(name="s2", description="s2 description"),
     ]
-    new_table = _ensure_source_per_variable(table)
+    new_table = gh._ensure_source_per_variable(table)
     assert len(new_table.deaths.metadata.sources) == 1
     source = new_table.deaths.metadata.sources[0]
     assert source.name == "s1; s2"
@@ -154,7 +148,7 @@ def test_ensure_source_per_variable_multiple_sources():
 
     # no sources
     table.deaths.metadata.sources = []
-    new_table = _ensure_source_per_variable(table)
+    new_table = gh._ensure_source_per_variable(table)
     assert len(new_table.deaths.metadata.sources) == 1
     source = new_table.deaths.metadata.sources[0]
     assert source.name == "s3"
@@ -162,7 +156,7 @@ def test_ensure_source_per_variable_multiple_sources():
 
     # sources have no description, but table has
     table.deaths.metadata.sources = [Source(name="s1")]
-    new_table = _ensure_source_per_variable(table)
+    new_table = gh._ensure_source_per_variable(table)
     assert len(new_table.deaths.metadata.sources) == 1
     source = new_table.deaths.metadata.sources[0]
     assert source.name == "s1"
@@ -174,9 +168,44 @@ def test_combine_metadata_sources():
         Source(name="s1", description="s1 description"),
         Source(name="s2", description="s2 description"),
     ]
-    source = combine_metadata_sources(sources)
+    source = gh.combine_metadata_sources(sources)
     assert source.name == "s1; s2"
     assert source.description == "s1 description\ns2 description"
 
     # make sure we haven't modified original sources
     assert sources[0].name == "s1"
+
+
+def _sample_table() -> Table:
+    table = Table(
+        pd.DataFrame(
+            {
+                "deaths": [0, 1],
+                "year": [2019, 2020],
+                "country": ["France", "Poland"],
+                "sex": ["female", "male"],
+            }
+        )
+    )
+    table.metadata.dataset = DatasetMeta(
+        description="Dataset description", sources=[Source(name="s3", description="s3 description")]
+    )
+    table.metadata.description = "Table description"
+    return table
+
+
+def test_adapt_table_for_grapher_multiindex():
+    table = _sample_table()
+    out_table = gh._adapt_table_for_grapher(table)
+    assert out_table.index.names == ["entity_id", "year"]
+    assert out_table.columns.tolist() == ["deaths", "sex"]
+
+    table = _sample_table().set_index(["country", "year", "sex"])
+    out_table = gh._adapt_table_for_grapher(table)
+    assert out_table.index.names == ["entity_id", "year", "sex"]
+    assert out_table.columns.tolist() == ["deaths"]
+
+    table = _sample_table().set_index(["sex"])
+    out_table = gh._adapt_table_for_grapher(table)
+    assert out_table.index.names == ["entity_id", "year", "sex"]
+    assert out_table.columns.tolist() == ["deaths"]

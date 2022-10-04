@@ -70,7 +70,7 @@ def df_to_table(df: pd.DataFrame, **kwargs: Any) -> Table:
 def load_country_mapping() -> Any:
     return (
         pd.read_csv(
-            Path(__file__).parent / f"{Path(__file__).stem}.country_std.csv",
+            Path(__file__).parent / "un_wpp.country_std.csv",
             index_col="Country",
         )
         .squeeze()
@@ -132,9 +132,7 @@ def run(dest_dir: str) -> None:
             df_to_table(
                 df_c,
                 short_name=category,
-                description=(
-                    "UN WPP dataset by OWID. Contains only metrics corresponding to" f" sub-group {category}."
-                ),
+                description=f"UN WPP dataset by OWID. Contains only metrics corresponding to sub-group {category}.",
             )
         )
     tables += [table_long]

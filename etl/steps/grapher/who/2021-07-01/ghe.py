@@ -1,17 +1,17 @@
-import copy
+# To run with subset only: GHE_SUBSET_ONLY=1 etl grapher/who/2021-07-01/ghe --grapher
+import os
 
 import pandas as pd
 from owid import catalog
 
 from etl import grapher_helpers as gh
 from etl.helpers import Names
-from etl.paths import REFERENCE_DATASET
 
 N = Names(__file__)
 
 
 def run(dest_dir: str) -> None:
-    dataset = catalog.Dataset.create_empty(dest_dir, gh.adapt_dataset_metadata_for_grapher(N.garden_dataset.metadata))
+    dataset = catalog.Dataset.create_empty(dest_dir, N.garden_dataset.metadata)
     dataset.save()
 
     table = N.garden_dataset["estimates"]
@@ -31,7 +31,6 @@ def run(dest_dir: str) -> None:
 
     # We want to export all columns except causegroup and level (for now)
     columns_to_export = [
-        "population",
         "deaths",
         "deaths_rate",
         "deaths_100k",
@@ -45,33 +44,20 @@ def run(dest_dir: str) -> None:
             f"GHE table to transform to grapher did not contain the expected columns but instead had: {list(table.columns)}"
         )
 
-    # Get the legacy_entity_id from the country_code via the countries_regions dimension table
-    reference_dataset = catalog.Dataset(REFERENCE_DATASET)
-    countries_regions = reference_dataset["countries_regions"]
-
-    orig_table = copy.deepcopy(table)
-
-    # TODO: update `gh.adapt_table_for_grapher(table)` to support country codes
-    # and reuse it
-    table = orig_table.merge(
-        right=countries_regions[["legacy_entity_id"]],
-        how="left",
-        left_on="country_code",
-        right_index=True,
-        validate="m:1",
-    )
-    table.metadata = orig_table.metadata
-
-    # Add entity_id, drop country_code
     table.reset_index(inplace=True)
-    df = pd.DataFrame(table)
-    table["year"] = df["year"].astype(int)
-    table["entity_id"] = df["legacy_entity_id"].astype(int)
-    table.drop("country_code", axis="columns", inplace=True)
-    table.set_index(
-        ["entity_id", "year", "ghe_cause_title", "sex_code", "agegroup_code"],
-        inplace=True,
+    if "GHE_SUBSET_ONLY" in os.environ:
+        table = select_subset_causes(table)
+    else:
+        table = table
+    table[columns_to_export] = (
+        table[columns_to_export]
+        .astype(float)
+        .round({"deaths": 0, "deaths_rate": 2, "deaths_100k": 2, "daly": 2, "daly_rate": 2, "daly_100k": 2})
     )
+    table["deaths"] = table["deaths"].astype(int)
+    table["country"] = gh.country_code_to_country(table["country_code"])
+    table = table.drop(["country_code"], axis=1)
+    table = table.set_index(["country", "year", "ghe_cause_title", "sex_code", "agegroup_code"])
 
     table.update_metadata_from_yaml(N.metadata_path, "estimates")
 
@@ -85,3 +71,10 @@ def run(dest_dir: str) -> None:
     table = table.loc[:, columns_to_export]
 
     dataset.add(table)
+
+
+def select_subset_causes(table: pd.DataFrame) -> pd.DataFrame:
+
+    table = table[(table["sex_code"] == "both") & (table["agegroup_code"] == "ALLAges")]
+
+    return table

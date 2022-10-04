@@ -1,0 +1,48 @@
+dataset:
+  sources:
+    -
+      name: Robbie Andrews, based on the Global Carbon Project
+      published_by: Robbie Andrews
+      publisher_source: Historical emissions to 2017 from CDIAC/Global Carbon Project, projection to 2018 from Global Carbon Project (Le Quéré et al. 2018)
+      date_accessed: 2022-09-28
+      url: https://folk.universitetetioslo.no/roberan/t/global_mitigation_curves.shtml
+      description: |
+
+tables:
+  co2_mitigation_curves_1p5celsius:
+    title: CO2 mitigation curves for 1.5°C
+    description: |
+      Data denotes the range of CO2 mitigation curves for a range of 'start year scenarios': Scenarios are based on the annual emission reductions necessary to keep global temperature rise below 1.5°C if emissions mitigation was to start in a given year.
+
+      For example, 'Start in 2010' marks the necessary future emissions pathway to have a >66% chance of keeping global average temperatures below 1.5°C warming if global CO2 emissions mitigation had started in 2010, very quickly peaking then falling.
+
+      Data is sourced from Robbie Andrew, and available for download <a href="http://folk.uio.no/roberan/t/global_mitigation_curves.shtml">here</a>.
+
+      Historical emissions to 2017 are sourced from CDIAC/Global Carbon Project, projection to 2018 from Global Carbon Project (Le Quéré et al. 2018).
+
+      Global cumulative CO2 emissions budgets are from the IPCC Special Report on 1.5°C (Rogelj et al 2018): 420 GtCO2 for a 66% of 1.5°C and 1170 GtCO2 for a 66% of 2°C. Mitigation curves describe approximately exponential decay pathways such that the quota is never exceeded (see Raupach et al., 2014).
+    variables:
+      emissions:
+        title: CO2 mitigation curves to meet a 1.5C target
+        short_unit: Gt
+        unit: gigatonnes
+        description: The range of CO2 mitigation curves to have a >66% chance of keeping global average temperature rise below 1.5°C. Scenarios measure future global annual emissions necessary based on a given start year for emissions mitigation.
+
+  co2_mitigation_curves_2celsius:
+    title: CO2 mitigation curves for 2°C
+    description: |
+      Data denotes the range of CO2 mitigation curves for a range of 'start year scenarios': Scenarios are based on the annual emission reductions necessary to keep global temperature rise below 2°C if emissions mitigation was to start in a given year.
+
+      For example, 'Start in 2010' marks the necessary future emissions pathway to have a >66% chance of keeping global average temperatures below 2°C warming if global CO2 emissions mitigation had started in 2010, very quickly peaking then falling.
+
+      Data is sourced from Robbie Andrew, and available for download <a href="http://folk.uio.no/roberan/t/global_mitigation_curves.shtml">here</a>.
+
+      Historical emissions to 2017 are sourced from CDIAC/Global Carbon Project, projection to 2018 from Global Carbon Project (Le Quéré et al. 2018).
+
+      Global cumulative CO2 emissions budgets are from the IPCC Special Report on 1.5°C (Rogelj et al 2018): 420 GtCO2 for a 66% of 1.5°C and 1170 GtCO2 for a 66% of 2°C. Mitigation curves describe approximately exponential decay pathways such that the quota is never exceeded (see Raupach et al., 2014).
+    variables:
+      emissions:
+        title: CO2 mitigation curves to meet a 2C target
+        short_unit: Gt
+        unit: gigatonnes
+        description: The range of CO2 mitigation curves to have a >66% chance of keeping global average temperature rise below 2°C. Scenarios measure future global annual emissions necessary based on a given start year for emissions mitigation.

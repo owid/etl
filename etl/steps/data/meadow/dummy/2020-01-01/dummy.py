@@ -41,7 +41,7 @@ def run(dest_dir: str) -> None:
     # underscore all table columns
     tb = underscore_table(tb)
 
-    ds.metadata.update_from_yaml(N.metadata_path)
+    ds.metadata.update_from_yaml(N.metadata_path, if_source_exists="replace")
     tb.update_metadata_from_yaml(N.metadata_path, "dummy")
 
     # add table to a dataset

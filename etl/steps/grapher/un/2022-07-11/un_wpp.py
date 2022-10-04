@@ -17,7 +17,7 @@ log = structlog.get_logger()
 
 def run(dest_dir: str) -> None:
     garden_dataset = catalog.Dataset(DATA_DIR / "garden" / NAMESPACE / VERSION / FNAME)
-    dataset = catalog.Dataset.create_empty(dest_dir, gh.adapt_dataset_metadata_for_grapher(garden_dataset.metadata))
+    dataset = catalog.Dataset.create_empty(dest_dir, garden_dataset.metadata)
     dataset.save()
 
     # Get table (in appropriate format)
@@ -38,20 +38,15 @@ def run(dest_dir: str) -> None:
 def _get_shaped_table(dataset: catalog.Dataset) -> catalog.Table:
     table = dataset[TNAME].reset_index()
 
-    # grapher needs a column entity id, that is constructed based on the unique entity names in the database
-    table["entity_id"] = gh.country_to_entity_id(table["location"], create_entities=True)
-
     # use entity_id and year as indexes in grapher
-    table = table.set_index(["entity_id", "year", "sex", "age", "variant"])[["metric", "value"]].rename(
-        columns={
-            "metric": "variable",
-        }
-    )
+    table = table.rename(columns={"location": "country", "metric": "variable"}).set_index(
+        ["country", "year", "sex", "age", "variant"]
+    )[["variable", "value"]]
     return table
 
 
 def _propagate_metadata(dataset: catalog.Dataset, table: catalog.Table) -> catalog.Table:
-    with open(STEP_DIR / "data/garden/un/2022-07-11/un_wpp.meta.yml", "r") as f:
+    with open(STEP_DIR / "data/garden/un/2022-07-11/un_wpp/un_wpp.meta.yml", "r") as f:
         meta = yaml.safe_load(f)
 
     meta_map = {}

@@ -28,7 +28,7 @@ NAMESPACE = Path(__file__).parent.parent.stem
 
 def run(dest_dir: str) -> None:
     garden_dataset = catalog.Dataset(DATA_DIR / f"garden/{NAMESPACE}/{VERSION}/{FNAME}")
-    dataset = catalog.Dataset.create_empty(dest_dir, gh.adapt_dataset_metadata_for_grapher(garden_dataset.metadata))
+    dataset = catalog.Dataset.create_empty(dest_dir, garden_dataset.metadata)
     dataset.save()
 
     # add tables to dataset
@@ -72,7 +72,6 @@ def clean_source_name(raw_source: pd.Series, clean_source_map: Dict[str, str]) -
 
 
 def add_metadata_and_prepare_for_grapher(df_gr: pd.DataFrame, walden_ds: WaldenDataset) -> Table:
-
     indicator = df_gr["variable_name"].iloc[0].split("-")[0].strip()
     source_url = get_metadata_link(indicator)
     log.info(
@@ -84,7 +83,7 @@ def add_metadata_and_prepare_for_grapher(df_gr: pd.DataFrame, walden_ds: WaldenD
     source = Source(
         name=df_gr["source"].iloc[0],
         url=walden_ds.metadata["url"],
-        source_data_url=walden_ds.metadata["source_data_url"],
+        source_data_url=walden_ds.metadata.get("source_data_url"),
         owid_data_url=walden_ds.metadata["owid_data_url"],
         date_accessed=walden_ds.metadata["date_accessed"],
         publication_date=walden_ds.metadata["publication_date"],
@@ -107,8 +106,7 @@ def add_metadata_and_prepare_for_grapher(df_gr: pd.DataFrame, walden_ds: WaldenD
     df_gr = df_gr[["country", "year", "value", "variable", "meta"]].copy()
     # convert integer values to int but round float to 2 decimal places, string remain as string
     df_gr["value"] = df_gr["value"].apply(value_convert)
-    df_gr["entity_id"] = gh.country_to_entity_id(df_gr["country"], create_entities=True)
-    df_gr = df_gr.drop(columns=["country"]).set_index(["year", "entity_id"])
+    df_gr = df_gr.set_index(["year", "country"])
 
     return Table(df_gr)
 

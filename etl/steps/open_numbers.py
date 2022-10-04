@@ -18,11 +18,15 @@ from typing import Dict, List, Tuple, cast
 
 import frictionless
 import pandas as pd
+import structlog
 from frictionless.exception import FrictionlessException
-from owid.catalog import Dataset, Table, utils
+from owid.catalog import Dataset, Table, Variable, utils
 from owid.catalog.meta import Source
 
 from etl.git import GithubRepo
+from etl.paths import REFERENCE_DATASET
+
+log = structlog.get_logger()
 
 
 def run(dest_dir: str) -> None:
@@ -195,3 +199,73 @@ def parse_name(name: str) -> Tuple[str, str]:
 
 def norm_primary_key(primary_key: List[str]) -> List[str]:
     return [k if k != "global" else "geo" for k in primary_key]
+
+
+GM_TO_OWID_ISO_CODES = {
+    "KOS": "OWID_KOS",
+    "NLD_CURACAO": "CUW",
+}
+
+
+def iso_gm2owid(ds: Variable) -> Variable:
+    # Load reference OWID country file
+    reference_dataset = Dataset(REFERENCE_DATASET)
+    countries_regions = reference_dataset["countries_regions"]
+    # Standardize
+    return ds.str.upper().map(GM_TO_OWID_ISO_CODES).map(countries_regions["name"])
+
+
+def fast_table_clean(dataset: Dataset, table_name: str) -> Table:
+    """Load and clean an open number's table from a dataset.
+
+    This function resets the indices, maps Open Number's codes to OWID country names, checks columns and standardizes their names.
+
+    Parameters
+    ----------
+    ds: Dataset
+        Open number's dataset
+    table_name: str
+        Table name in `dataset`
+    Returns
+    -------
+    t: Table
+        Cleaned table.
+
+    Raises
+    ------
+        Exception: If table shape is not as expected.
+        KeyError: If columns are missing.
+
+    Usage:
+        >>> from owid.catalog import Dataset
+        >>> from etl.paths import DATA_DIR
+        >>> from etl.steps.open_numbers import on_table_clean_fast
+        >>> d = Dataset(DATA_DIR / "meadow/open_numbers/latest/open_numbers__world_development_indicators")
+        >>> df = on_table_clean_fast(d, "it_net_user_zs")
+    """
+    df = dataset[table_name].reset_index()
+    # Sanity checks
+    if (ncols := df.shape[1]) != 3:
+        raise Exception(f"Table must have 3 columns (including original indices). Instead it has {ncols} columns.")
+    if "geo" not in df.columns:
+        if "global" in df.columns:
+            raise KeyError("This is a global dataset! Does not have column 'geo' but 'global' instead.")
+        raise KeyError(f"Table should have column named 'geo'! Found columns are {df.columns}.")
+    if "time" not in df.columns:
+        raise KeyError(f"Table should have column named 'time'! Found columns are {df.columns}.")
+    if table_name not in df.columns:
+        raise KeyError(
+            f"Table should have column with the metric of interest (same name as the table): '{table_name}'! Found"
+            f" columns are {df.columns}."
+        )
+    # First clean
+    df = df.rename(
+        columns={
+            "time": "year",
+        }
+    ).assign(country=iso_gm2owid(df.geo))
+    countries_missing = df.loc[df.country.isna(), "geo"].unique().tolist()
+    log.warning(f"Countries missing (listed by Gapminder code): {', '.join(countries_missing)}")
+
+    df = df.dropna(subset=["country"]).drop(["geo"], axis=1)
+    return df[["country", "year", table_name]]

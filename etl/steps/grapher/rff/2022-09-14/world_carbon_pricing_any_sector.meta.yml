@@ -1,0 +1,15 @@
+dataset:
+  title: World carbon pricing for any source
+
+tables:
+  world_carbon_pricing_any_sector:
+    title: World carbon pricing for any sector
+    variables:
+      ets:
+        title: Covered by emissions trading system in at least one sector
+        unit: ""
+        description: A binary value indicating whether at least one sector(-fuel) is covered by at least one emissions trading system.
+      tax:
+        title: Covered by tax instrument in at least one sector
+        unit: ""
+        description: A binary value indicating whether at least one sector(-fuel) is covered by at least one tax instrument.

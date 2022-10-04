@@ -4,7 +4,6 @@ from typing import Any, List
 import numpy as np
 from owid import catalog
 
-from etl import grapher_helpers as gh
 from etl.paths import DATA_DIR
 
 KEY_INDICATORS_GARDEN = DATA_DIR / "garden/owid/latest/key_indicators"
@@ -15,7 +14,7 @@ def run(dest_dir: str) -> None:
     # NOTE: this generates shortName `population_density__owid_latest`, perhaps we should keep it as `population_density`
     # and create unique constraint on (shortName, version, namespace) instead of just (shortName, namespace)
     garden_dataset = catalog.Dataset(KEY_INDICATORS_GARDEN)
-    dataset = catalog.Dataset.create_empty(dest_dir, gh.adapt_dataset_metadata_for_grapher(garden_dataset.metadata))
+    dataset = catalog.Dataset.create_empty(dest_dir, garden_dataset.metadata)
 
     # Get population table
     table = garden_dataset["population"].reset_index()
@@ -25,16 +24,13 @@ def run(dest_dir: str) -> None:
     # table["population_historical"] = deepcopy(table["population"])
     # table["population_projection"] = deepcopy(table["population"])
     # Add population table to dataset
-    table = gh.adapt_table_for_grapher(table)
     dataset.add(table)
 
     # Add land area table to dataset
-    table = gh.adapt_table_for_grapher(garden_dataset["land_area"].reset_index())
-    dataset.add(table)
+    dataset.add(garden_dataset["land_area"].reset_index())
 
     # Add population density table to dataset
-    table = gh.adapt_table_for_grapher(garden_dataset["population_density"].reset_index())
-    dataset.add(table)
+    dataset.add(garden_dataset["population_density"].reset_index())
 
     # Save dataset
     dataset.save()
