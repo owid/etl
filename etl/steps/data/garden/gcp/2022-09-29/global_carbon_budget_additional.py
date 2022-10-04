@@ -227,7 +227,12 @@ def run(dest_dir: str) -> None:
 
     # Harmonize country names.
     national_df = (
-        geo.harmonize_countries(df=national_df, countries_file=N.country_mapping_path, warn_on_missing_countries=False)
+        geo.harmonize_countries(
+            df=national_df,
+            countries_file=N.country_mapping_path,
+            warn_on_missing_countries=False,
+            make_missing_countries_nan=True,
+        )
         .dropna(subset="country")
         .reset_index(drop=True)
     )
