@@ -183,7 +183,7 @@ NOR,Norway,NO,NOR,142.0,NOR,385.0,,NO,NRWY,NOR,NOR,http://www.wikidata.org/entit
 OMN,Oman,OM,OMN,449.0,OMA,698.0,OMA,MK,OMAN,OMN,OMN,http://www.wikidata.org/entity/Q842,Oman,217.0,719.0,,
 PAK,Pakistan,PK,PAK,564.0,PAK,770.0,PAK,PK,PKST,PAK,PAK,http://www.wikidata.org/entity/Q843,Pakistan,101.0,720.0,,
 PLW,Palau,PW,PLW,565.0,PAL,986.0,,PW,,PLW,PLW,http://www.wikidata.org/entity/Q695,Palau,224.0,724.0,,"[""Pacific Islands (Palau)""]"
-PSE,Palestine,PS,PSE,,,,PAL,,,PSE,PSE,http://www.wikidata.org/entity/Q219060,State of Palestine,140.0,731.0,,"[""Occupied Palestinian Terr."", ""Occupied Palestinian Territory"", ""Palestine, State of"", ""Palestinian Territories"", ""State of Palestine""]"
+PSE,Palestine,PS,PSE,,,,PAL,,,PSE,PSE,http://www.wikidata.org/entity/Q219060,State of Palestine,140.0,731.0,,"[""Occupied Palestinian Terr."", ""Occupied Palestinian Territory"", ""Palestine, State of"", ""Palestinian Territories"", ""State of Palestine"", ""West Bank and Gaza""]"
 PS_GZA,Gaza Strip,PS-GZA,PS-GZA,,,,,,,,,https://www.wikidata.org/wiki/Q39760,Gaza Strip,,,,
 PAN,Panama,PA,PAN,283.0,PAN,95.0,PAN,PN,PNMA,PAN,PAN,http://www.wikidata.org/entity/Q804,Panama,100.0,721.0,,
 PNG,Papua New Guinea,PG,PNG,853.0,PNG,910.0,PNG,PP,PPNG,PNG,PNG,http://www.wikidata.org/entity/Q691,Papua New Guinea,99.0,725.0,,
