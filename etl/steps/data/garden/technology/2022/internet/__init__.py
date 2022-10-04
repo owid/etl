@@ -3,8 +3,8 @@ from pathlib import Path
 from typing import List
 
 from owid.catalog import Dataset, Source, Table, Variable
+from owid.datautils import geo
 
-from etl import data_helpers
 from etl.paths import DATA_DIR
 
 CURRENT_DIR = Path(__file__).parent
@@ -39,7 +39,14 @@ def make_users_table() -> Table:
 
 def load_wdi() -> Table:
     d = Dataset(DATA_DIR / "garden/worldbank_wdi/2022-05-26/wdi")
-    return d["wdi"].dropna(subset=["it_net_user_zs"])[["it_net_user_zs"]]
+    table = d["wdi"].dropna(subset=["it_net_user_zs"])[["it_net_user_zs"]]
+    # Filter noisy years
+    column_idx = table.index.names
+    table = table.reset_index()
+    year_counts = table.year.value_counts()
+    year_threshold = year_counts.loc[year_counts < 100].index.max()
+    table = table.loc[table.year > year_threshold].set_index(column_idx)
+    return table
 
 
 def load_key_indicators() -> Table:
@@ -68,11 +75,24 @@ def make_combined(table_internet: Table, table_population: Table) -> Table:
 def add_regions(table: Table, table_population: Table) -> Table:
     column_idx = ["country", "year"]
     # Estimate regions number of internet users
-    table = data_helpers.calculate_region_sums(table)
+    regions = [
+        "Europe",
+        "Asia",
+        "North America",
+        "South America",
+        "Africa",
+        "Oceania",
+        "High-income countries",
+        "Low-income countries",
+        "Lower-middle-income countries",
+        "Upper-middle-income countries",
+    ]
+    for region in regions:
+        table = geo.add_region_aggregates(df=table, region=region, aggregations={"num_internet_users": sum})
     # Get population for regions
     table = table.merge(table_population.reset_index(), on=column_idx, how="left")
     # Estimate relative values
-    msk = table.country.isin(data_helpers.REGIONS)
+    msk = table.country.isin(regions)
     table.loc[msk, "share_internet_users"] = (
         table.loc[msk, "num_internet_users"] / table.loc[msk, "population"] * 100
     ).round(2)
