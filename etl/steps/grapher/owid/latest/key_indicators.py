@@ -89,7 +89,7 @@ def _add_metric_new(
     metric_suffix: str,
     title_suffix: str,
     display_name_suffix: str,
-    description: str = None,
+    description: str = "",
 ) -> catalog.Table:
     # Get dtype
     dtype = table[metric].dtype
