@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import List
 
 from owid.catalog import Dataset, Source, Table, Variable
+from owid.datautils import geo
 
 from etl.paths import DATA_DIR
 
@@ -25,11 +26,35 @@ def run(dest_dir: str) -> None:
 
 def make_users_table() -> Table:
     # Load internet data
-    d = Dataset(DATA_DIR / "garden/worldbank_wdi/2022-05-26/wdi")
-    table_internet = d["wdi"].dropna(subset=["it_net_user_zs"])[["it_net_user_zs"]]
+    table_internet = load_wdi()
     # Load population data
+    table_population = load_key_indicators()
+    # Combine sources
+    table = make_combined(table_internet, table_population)
+    table = add_regions(table, table_population)
+    # Propagate metadata
+    table = add_metadata(table, table_internet, table_population)
+    return table
+
+
+def load_wdi() -> Table:
+    d = Dataset(DATA_DIR / "garden/worldbank_wdi/2022-05-26/wdi")
+    table = d["wdi"].dropna(subset=["it_net_user_zs"])[["it_net_user_zs"]]
+    # Filter noisy years
+    column_idx = table.index.names
+    table = table.reset_index()
+    year_counts = table.year.value_counts()
+    year_threshold = year_counts.loc[year_counts < 100].index.max()
+    table = table.loc[table.year > year_threshold].set_index(column_idx)
+    return table
+
+
+def load_key_indicators() -> Table:
     d = Dataset(DATA_DIR / "garden/owid/latest/key_indicators")
-    table_population = d["population"]
+    return d["population"]
+
+
+def make_combined(table_internet: Table, table_population: Table) -> Table:
     # Merge
     table = table_population.merge(table_internet, left_index=True, right_index=True)
     # Estimate number of internet users
@@ -44,6 +69,49 @@ def make_users_table() -> Table:
     )
     # Filter columns
     table = table[["num_internet_users", "share_internet_users"]]
+    return table.reset_index()
+
+
+def add_regions(table: Table, table_population: Table) -> Table:
+    column_idx = ["country", "year"]
+    # Estimate regions number of internet users
+    regions = [
+        "Europe",
+        "Asia",
+        "North America",
+        "South America",
+        "Africa",
+        "Oceania",
+        "High-income countries",
+        "Low-income countries",
+        "Lower-middle-income countries",
+        "Upper-middle-income countries",
+    ]
+    regions_must_have = {
+        "Oceania": ["Australia"],
+    }
+    for region in regions:
+        table = geo.add_region_aggregates(
+            df=table,
+            region=region,
+            aggregations={"num_internet_users": sum},
+            countries_that_must_have_data=regions_must_have.get(region, []),
+            num_allowed_nans_per_year=None,
+            frac_allowed_nans_per_year=0.99,
+        )
+    # Get population for regions
+    table = table.merge(table_population.reset_index(), on=column_idx, how="left")
+    # Estimate relative values
+    msk = table.country.isin(regions)
+    table.loc[msk, "share_internet_users"] = (
+        table.loc[msk, "num_internet_users"] / table.loc[msk, "population"] * 100
+    ).round(2)
+    # Filter columns
+    table = table.set_index(column_idx)[["num_internet_users", "share_internet_users"]]
+    return table
+
+
+def add_metadata(table: Table, table_internet: Table, table_population: Table) -> Table:
     # Propagate metadata
     table.share_internet_users.metadata = deepcopy(table_internet.it_net_user_zs.metadata)
     table.num_internet_users.metadata = deepcopy(table_internet.it_net_user_zs.metadata)

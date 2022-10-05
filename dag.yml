@@ -137,6 +137,7 @@ steps:
   data://garden/technology/2022/internet:
     - data://garden/worldbank_wdi/2022-05-26/wdi
     - data://garden/owid/latest/key_indicators
+    - data://garden/reference
   data://grapher/technology/2022/internet:
     - data://garden/technology/2022/internet
 
