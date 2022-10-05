@@ -87,8 +87,18 @@ def add_regions(table: Table, table_population: Table) -> Table:
         "Lower-middle-income countries",
         "Upper-middle-income countries",
     ]
+    regions_must_have = {
+        "Oceania": ["Australia"],
+    }
     for region in regions:
-        table = geo.add_region_aggregates(df=table, region=region, aggregations={"num_internet_users": sum})
+        table = geo.add_region_aggregates(
+            df=table,
+            region=region,
+            aggregations={"num_internet_users": sum},
+            countries_that_must_have_data=regions_must_have.get(region, []),
+            num_allowed_nans_per_year=None,
+            frac_allowed_nans_per_year=0.99,
+        )
     # Get population for regions
     table = table.merge(table_population.reset_index(), on=column_idx, how="left")
     # Estimate relative values
