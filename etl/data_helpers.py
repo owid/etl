@@ -6,6 +6,8 @@ from owid.catalog import Dataset
 
 from etl.paths import REFERENCE_DATASET
 
+REGIONS = ["World", "Asia", "Africa", "North America", "South America", "Europe", "Oceania"]
+
 
 def calculate_region_sums(df: pd.DataFrame) -> pd.DataFrame:
     """
@@ -16,19 +18,7 @@ def calculate_region_sums(df: pd.DataFrame) -> pd.DataFrame:
     assert {"year", "country"} < set(df.columns)
     df = cast(
         pd.DataFrame,
-        df[
-            -df.country.isin(
-                [
-                    "North America",
-                    "South America",
-                    "Europe",
-                    "Africa",
-                    "Asia",
-                    "Oceania",
-                    "World",
-                ]
-            )
-        ],
+        df[-df.country.isin(REGIONS)],
     )
 
     countries = Dataset(REFERENCE_DATASET)["countries_regions"]
