@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 from owid import catalog
 from owid.catalog import Table
@@ -35,9 +36,11 @@ def run(dest_dir: str) -> None:
         df.reset_index()
         .groupby(["country", "year"], observed=True)
         .agg({"ets": lambda x: x.sum() > 0, "tax": lambda x: x.sum() > 0})
-        .astype(int)
         .reset_index()
     )
+    df_any_sector["ets"] = df_any_sector["ets"].replace({False: np.nan, True: "Has an emissions trading system"})
+    df_any_sector["tax"] = df_any_sector["tax"].replace({False: np.nan, True: "Has a carbon tax"})
+
     # Set an appropriate index and sort conveniently.
     df_any_sector = df_any_sector.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
     # Create table for simplified data.
