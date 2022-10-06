@@ -43,7 +43,8 @@ watch: .venv
 
 sanity-check:
 	@echo '==> Checking your Python setup'
-	@if [ "$(echo "$PYTHON_PLATFORM")" = "Windows" ]; then \
+
+	@if python -c "import sys; exit(0 if sys.platform.startswith('win32') else 1)"; then \
 		echo 'ERROR: you are using a non-WSL Python interpreter, please consult the'; \
 		echo '       docs on how to swich to WSL Python on windows'; \
 		echo '       https://github.com/owid/etl/'; \
