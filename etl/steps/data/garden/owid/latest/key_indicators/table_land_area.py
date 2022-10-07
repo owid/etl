@@ -34,6 +34,7 @@ def load_land_area() -> Table:
         .dropna(subset=["country"])
         .drop(["geo"], axis=1)
         .pipe(add_regions)
+        .pipe(add_world)
     )
 
     return table.set_index(["country", "year"])
