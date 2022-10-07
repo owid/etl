@@ -9,9 +9,9 @@ Adapted from Ed's importers script:
 https://github.com/owid/importers/blob/master/population/etl.py
 """
 
+from copy import deepcopy
 from pathlib import Path
 from typing import List, cast
-from copy import deepcopy
 
 import pandas as pd
 from owid.catalog import Dataset, Table
@@ -19,7 +19,6 @@ from pandas.api.types import CategoricalDtype
 
 from etl.paths import DATA_DIR
 from etl.steps.data.garden.owid.latest.key_indicators.utils import add_regions
-
 
 UNWPP = DATA_DIR / "garden/un/2022-07-11/un_wpp"
 GAPMINDER = DATA_DIR / "garden/gapminder/2019-12-10/population"

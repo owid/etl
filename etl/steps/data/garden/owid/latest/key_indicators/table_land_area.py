@@ -1,14 +1,12 @@
+from copy import deepcopy
 from pathlib import Path
 
+import pandas as pd
 from owid import catalog
 from owid.catalog import Dataset, Table
-import pandas as pd
-
-from copy import deepcopy
 
 from etl.paths import DATA_DIR, REFERENCE_DATASET
 from etl.steps.data.garden.owid.latest.key_indicators.utils import add_regions
-
 
 DIR_PATH = Path(__file__).parent
 
