@@ -9,7 +9,8 @@ from etl.helpers import Names
 
 DATASET_SHORT_NAME = "world_carbon_pricing"
 MEADOW_TABLE_NAME = DATASET_SHORT_NAME
-GARDEN_TABLE_NAME = MEADOW_TABLE_NAME
+GARDEN_MAIN_TABLE_NAME = MEADOW_TABLE_NAME
+GARDEN_ANY_SECTOR_TABLE_NAME = "world_carbon_pricing_any_sector"
 # Get naming convention for this dataset.
 N = Names(str(CURRENT_DIR / DATASET_SHORT_NAME))
 
@@ -84,26 +85,26 @@ def prepare_data(df: pd.DataFrame) -> pd.DataFrame:
     # Column 'product' has many nans. Convert them into empty strings.
     df["product"] = df["product"].cat.add_categories("").fillna("")
 
-    # Columns 'tax' and 'ets' are either 0 or 1, while all other columns are either nan or some value.
-    # Convert zeros in 'tax' and 'ets' to nan, and then drop all rows where all data columns are nan.
-    # This way we get rid of all unnecessary rows where there is no data.
-    df["tax"] = df["tax"].replace(0, np.nan)
-    df["ets"] = df["ets"].replace(0, np.nan)
-
-    # Remove rows where all data columns are nan (ignore index columns and sector names).
-    columns_that_must_have_data = [
-        column for column in df.columns if column not in INDEX_COLUMNS if column != "sector_name"
-    ]
-    assert set(columns_that_must_have_data) < set(df.columns)
-    df = df.dropna(subset=columns_that_must_have_data, how="all").reset_index(drop=True)
-
-    # Columns 'tax' and 'ets' were converted to float (because we introduced nans).
-    # Now that nans have been removed, make them integer again.
-    df["tax"] = df["tax"].fillna(0)
-    df["ets"] = df["ets"].fillna(0)
-    df = df.astype({"tax": int, "ets": int})
-
     return df
+
+
+def create_table_for_any_sector(tb: Table) -> Table:
+    # Create a simplified table that gives, for each country and year, whether the country has any sector(-fuel)
+    # that is covered by at least one tax instrument. And idem for ets.
+    tb_any_sector = (
+        tb.reset_index()
+        .groupby(["country", "year"], observed=True)
+        .agg({"ets": lambda x: min(x.sum(), 1), "tax": lambda x: min(x.sum(), 1)})
+        .astype(int)
+        .reset_index()
+    )
+
+    # Set an appropriate index and sort conveniently.
+    tb_any_sector = tb_any_sector.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
+    # Create table for simplified data.
+    tb_any_sector = underscore_table(tb_any_sector).reset_index()
+
+    return tb_any_sector
 
 
 def run(dest_dir: str) -> None:
@@ -135,6 +136,9 @@ def run(dest_dir: str) -> None:
     # Create main table.
     tb_garden = underscore_table(Table(df))
 
+    # Create a simplified table for "any sector".
+    tb_any_sector = create_table_for_any_sector(tb=tb_garden)
+
     #
     # Save outputs.
     #
@@ -145,8 +149,11 @@ def run(dest_dir: str) -> None:
     # Update dataset metadata using metadata yaml file.
     ds_garden.metadata.update_from_yaml(N.metadata_path, if_source_exists="replace")
     # Update main table metadata using metadata yaml file.
-    tb_garden.update_metadata_from_yaml(N.metadata_path, GARDEN_TABLE_NAME)
+    tb_garden.update_metadata_from_yaml(N.metadata_path, GARDEN_MAIN_TABLE_NAME)
+    # Update simplified table metadata using metadata yaml file.
+    tb_any_sector.update_metadata_from_yaml(N.metadata_path, GARDEN_ANY_SECTOR_TABLE_NAME)
     # Add tables to dataset.
     ds_garden.add(tb_garden)
+    ds_garden.add(tb_any_sector)
     # Save dataset.
     ds_garden.save()
