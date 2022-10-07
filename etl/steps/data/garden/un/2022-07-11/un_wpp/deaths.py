@@ -75,17 +75,22 @@ def add_age_groups(df: pd.DataFrame) -> pd.DataFrame:
         .sum()
         .assign(age="1-4")
     )
-    # Basic age groups
-    age_map = {
-        **{str(i): f"{i - i%5}-{i + 4 - i%5}" for i in range(0, 20)},
-        **{str(i): f"{i - i%10}-{i + 9 - i%10}" for i in range(20, 100)},
-    }
-    df = df.assign(age=df.age.map(age_map))
-    df = df.groupby(
+    # Basic 5-year age groups
+    age_map = {str(i): f"{i - i%5}-{i + 4 - i%5}" for i in range(0, 100)}
+    df_5 = df.assign(age=df.age.map(age_map)).copy()
+    df_5 = df_5.groupby(
+        ["location", "year", "metric", "sex", "age", "variant"],
+        as_index=False,
+        observed=True,
+    ).sum()
+    # Basic 10-year age groups
+    age_map = {str(i): f"{i - i%10}-{i + 9 - i%10}" for i in range(0, 100)}
+    df_10 = df.assign(age=df.age.map(age_map)).copy()
+    df_10 = df_10.groupby(
         ["location", "year", "metric", "sex", "age", "variant"],
         as_index=False,
         observed=True,
     ).sum()
     # Merge all age groups
-    df = pd.concat([df, df_0, df_1_4], ignore_index=True)
+    df = pd.concat([df_0, df_1_4, df_5, df_10], ignore_index=True)
     return df
