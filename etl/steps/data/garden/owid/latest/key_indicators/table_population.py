@@ -11,13 +11,15 @@ https://github.com/owid/importers/blob/master/population/etl.py
 
 from pathlib import Path
 from typing import List, cast
+from copy import deepcopy
 
 import pandas as pd
 from owid.catalog import Dataset, Table
 from pandas.api.types import CategoricalDtype
 
-from etl import data_helpers
 from etl.paths import DATA_DIR
+from etl.steps.data.garden.owid.latest.key_indicators.utils import add_regions
+
 
 UNWPP = DATA_DIR / "garden/un/2022-07-11/un_wpp"
 GAPMINDER = DATA_DIR / "garden/gapminder/2019-12-10/population"
@@ -28,13 +30,7 @@ DIR_PATH = Path(__file__).parent
 
 
 def make_table() -> Table:
-    t = (
-        make_combined()
-        .pipe(select_source)
-        .pipe(data_helpers.calculate_region_sums)
-        .pipe(add_income_groups)
-        .pipe(prepare_dataset)
-    )
+    t = make_combined().pipe(select_source).pipe(add_regions).pipe(add_world).pipe(prepare_dataset)
 
     t.update_metadata_from_yaml(DIR_PATH / "key_indicators.meta.yml", "population")
 
@@ -63,22 +59,6 @@ def select_source(df: pd.DataFrame) -> pd.DataFrame:
     return df.drop(columns=["source"])
 
 
-def add_income_groups(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Add population of income groups to the dataframe.
-    """
-    income_groups = Dataset(WB_INCOME)["wb_income_group"]
-
-    population_income_groups = (
-        df.merge(income_groups, left_on="country", right_index=True)
-        .groupby(["income_group", "year"], as_index=False)
-        .sum()
-        .rename(columns={"income_group": "country"})
-    )
-
-    return pd.concat([df, population_income_groups], ignore_index=True)
-
-
 def _assert_unique(df: pd.DataFrame, subset: List[str]) -> None:
     """Make sure dataframe have only one row per subset"""
     # NOTE: this could be moved to helpers
@@ -86,6 +66,28 @@ def _assert_unique(df: pd.DataFrame, subset: List[str]) -> None:
     if df.shape != df_deduped.shape:
         diff = df[~df.index.isin(df_deduped.index)]
         raise AssertionError(f"Duplicate rows:\n {diff}")
+
+
+def add_world(df: pd.DataFrame) -> pd.DataFrame:
+    """Add world aggregates."""
+    df_ = deepcopy(df)
+    year_threshold = df_[df_.country == "World"].year.min()
+    continents = [
+        "Europe",
+        "Asia",
+        "North America",
+        "South America",
+        "Africa",
+        "Oceania",
+    ]
+    df_ = (
+        df_[(df_.country.isin(continents)) & (df_.year < year_threshold)]
+        .groupby("year", as_index=False)
+        .population.sum()
+        .assign(country="World")
+    )
+    df = pd.concat([df, df_], ignore_index=True).sort_values(["country", "year"])
+    return df
 
 
 def prepare_dataset(df: pd.DataFrame) -> Table:
