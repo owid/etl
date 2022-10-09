@@ -4,6 +4,7 @@ from copy import deepcopy
 from typing import Any, List
 
 import pandas as pd
+import structlog
 from owid import catalog
 from tqdm.auto import tqdm
 
@@ -11,6 +12,7 @@ from etl.paths import DATA_DIR
 
 YEAR_SPLIT = 2022
 no_dim_keyword = "full"
+log = structlog.get_logger()
 
 
 def _load_dataset() -> catalog.Dataset:
@@ -21,6 +23,7 @@ def _load_dataset() -> catalog.Dataset:
 
 def _keep_relevant_rows(df: pd.DataFrame) -> pd.DataFrame:
     """Only keep relevant rows."""
+    log.info("Filtering relevant rows...")
     df = df.reset_index()
     df = df[
         df.variant.isin(["estimates", "low", "medium", "high"])
@@ -30,7 +33,7 @@ def _keep_relevant_rows(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def _organize_variants(df: pd.DataFrame) -> pd.DataFrame:
-    print("Filling all gaps (variants)")
+    log.info("Filling all gaps (variants)...")
     df = pd.concat(
         [
             df[df.year < YEAR_SPLIT].assign(variant="records").astype({"variant": "category"}),
@@ -45,7 +48,7 @@ def _organize_variants(df: pd.DataFrame) -> pd.DataFrame:
 
 def _pivot_df(df: pd.DataFrame) -> pd.DataFrame:
     # Pivot
-    print("Pivot table")
+    log.info("Pivoting table...")
 
     def _build_column_name(mcol: List[str]) -> Any:
         col = f"{mcol[0]}__{mcol[1]}__{mcol[2]}__{mcol[3]}"
