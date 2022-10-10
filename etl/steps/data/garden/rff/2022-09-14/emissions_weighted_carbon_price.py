@@ -150,6 +150,27 @@ def run(dest_dir: str) -> None:
     # Select and rename columns.
     df_combined = df_combined[list(COLUMNS)].rename(columns=COLUMNS, errors="raise")
 
+    #####################################
+
+    # Temporary patch.
+    # For some reason, "World" has empty "co2_with_ets_as_share_of_co2" and "co2_with_tax_as_share_of_co2",
+    # but not empty "co2_with_tax_or_ets_as_share_of_co2"; on the other hand, it has non-empty
+    # "co2_with_ets_as_share_of_world_co2" and "co2_with_tax_as_share_of_world_co2", and empty
+    # "co2_with_tax_or_ets_as_share_of_world_co2". This seems arbitrary, and I think none should be empty (it may
+    # be a bug in the generation of the original dataset).
+    # For now, simply ensure all "co2_with_*_as_share_of_*_co2" for "World" are not empty (i.e. treat "World" as just
+    # another country).
+    map_missing_variables_for_world = {
+        "co2_with_ets_as_share_of_co2": "co2_with_ets_as_share_of_world_co2",
+        "co2_with_tax_as_share_of_co2": "co2_with_tax_as_share_of_world_co2",
+        "co2_with_tax_or_ets_as_share_of_world_co2": "co2_with_tax_or_ets_as_share_of_co2",
+    }
+    for old_variable, new_variable in map_missing_variables_for_world.items():
+        empty_ets_for_world_mask = (df_combined["country"] == "World") & (df_combined[old_variable].isnull())
+        df_combined.loc[empty_ets_for_world_mask, old_variable] = df_combined[empty_ets_for_world_mask][new_variable]
+
+    #####################################
+
     # Harmonize country names.
     # Notes:
     #  * Here it would be better to have a list of excluded countries, but this is not yet implemented
