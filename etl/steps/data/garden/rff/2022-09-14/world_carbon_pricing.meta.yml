@@ -57,8 +57,9 @@ tables:
       ets:
         title: Covered by emissions trading system in at least one sector
         unit: ""
-        description: A binary value indicating whether at least one sector(-fuel) is covered by at least one emissions trading system.
+        description: This variable indicates whether at least one sector(-fuel) is covered by at least one emissions trading system at the national level, or only at the sub-national level, or whether no sector is covered.
       tax:
         title: Covered by tax instrument in at least one sector
         unit: ""
-        description: A binary value indicating whether at least one sector(-fuel) is covered by at least one tax instrument.
+        description: This variable indicates whether at least one sector(-fuel) is covered by at least one carbon tax at the national level, or only at the sub-national level, or whether no sector is covered.
+
