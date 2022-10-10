@@ -68,9 +68,18 @@ def _assert_unique(df: pd.DataFrame, subset: List[str]) -> None:
 
 
 def add_world(df: pd.DataFrame) -> pd.DataFrame:
-    """Add world aggregates."""
+    """Add world aggregates.
+
+    We do this by adding the values for all continents.
+
+    Note that for some years, there is data available for 'World'. This is because some of the datasets
+    contain 'World' data but others don't.
+    """
     df_ = deepcopy(df)
     year_threshold = df_[df_.country == "World"].year.min()
+    assert (
+        year_threshold == 1950  # This is the year that the UN data starts.
+    ), "Year threshold has changed! Check if HYDE or Gapminder data now contain 'World' data."
     continents = [
         "Europe",
         "Asia",
@@ -79,8 +88,9 @@ def add_world(df: pd.DataFrame) -> pd.DataFrame:
         "Africa",
         "Oceania",
     ]
+    # Estimate "World" population for years before `year_threshold` and add to original data.
     df_ = (
-        df_[(df_.country.isin(continents)) & (df_.year < year_threshold)]
+        df_[(df_["country"].isin(continents)) & (df_.year < year_threshold)]
         .groupby("year", as_index=False)
         .population.sum()
         .assign(country="World")

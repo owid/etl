@@ -39,7 +39,10 @@ def load_land_area() -> Table:
 
 
 def add_world(df: pd.DataFrame) -> pd.DataFrame:
-    """Add world aggregates."""
+    """Add world aggregates.
+
+    We do this by adding the values for all continents.
+    """
     assert "World" not in set(df.country), "World already in data!"
     df_ = deepcopy(df)
     continents = [
@@ -50,7 +53,9 @@ def add_world(df: pd.DataFrame) -> pd.DataFrame:
         "Africa",
         "Oceania",
     ]
-    df_ = df_[(df_.country.isin(continents))].groupby("year", as_index=False).population.sum().assign(country="World")
+    df_ = (
+        df_[(df_["country"].isin(continents))].groupby("year", as_index=False).population.sum().assign(country="World")
+    )
     df = pd.concat([df, df_], ignore_index=True).sort_values(["country", "year"])
     return df
 
