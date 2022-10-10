@@ -1,4 +1,4 @@
-from typing import List, cast
+from typing import cast
 
 import numpy as np
 import pandas as pd
@@ -10,14 +10,18 @@ from shared import CURRENT_DIR
 from etl.helpers import Names
 from etl.paths import DATA_DIR
 
+# Details of the input dataset.
 MEADOW_DATASET_NAME = "world_carbon_pricing"
 MEADOW_MAIN_DATASET_PATH = DATA_DIR / f"meadow/rff/2022-09-14/{MEADOW_DATASET_NAME}"
 MEADOW_SUBNATIONAL_DATASET_PATH = DATA_DIR / "meadow/rff/2022-09-14/world_carbon_pricing__subnational"
+# Details of the output tables.
 GARDEN_MAIN_TABLE_NAME = MEADOW_DATASET_NAME
 GARDEN_ANY_SECTOR_TABLE_NAME = "world_carbon_pricing_any_sector"
 # Get naming convention.
 N = Names(str(CURRENT_DIR / MEADOW_DATASET_NAME))
 
+# Labels for the variables showing whether any sector is covered by an ETS or a carbon tax at the national or only
+# sub-national level.
 LABEL_ETS_NOT_COVERED = "No ETS"
 LABEL_ETS_COVERED = "Has an ETS"
 LABEL_ETS_COVERED_ONLY_SUBNATIONAL = "Has an ETS only at a sub-national level"
@@ -44,6 +48,9 @@ INDEX_COLUMNS = ["country", "year", "ipcc_code", "product"]
 # Columns to use as index in table simplified to show whether there is coverage for any sector.
 INDEX_COLUMNS_ANY_SECTOR = ["country", "year"]
 
+# Mapping of countries and the regions of the country included in the sub-national dataset.
+# In the future, it would be good to load this mapping as additional data (however, the mapping is hardcoded in the
+# original repository, so it's not trivial to get this mapping automatically).
 country_members = {
     "Canada": [
         "Alberta",
@@ -289,7 +296,20 @@ def prepare_data(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def get_coverage_for_any_sector(df: pd.DataFrame, subnational: bool) -> pd.DataFrame:
+def get_coverage_for_any_sector(df: pd.DataFrame) -> pd.DataFrame:
+    """Create a dataframe showing whether a country has any sector covered by an ets/carbon tax.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Original national or sub-national data, disaggregated by sector.
+
+    Returns
+    -------
+    df_any_sector : pd.DataFrame
+        Coverage for any sector.
+
+    """
     # Create a simplified dataframe that gives, for each country and year, whether the country has any sector(-fuel)
     # that is covered by at least one tax instrument. And idem for ets.
     df_any_sector = (
@@ -304,6 +324,23 @@ def get_coverage_for_any_sector(df: pd.DataFrame, subnational: bool) -> pd.DataF
 
 
 def prepare_subnational_data(df_subnational: pd.DataFrame) -> pd.DataFrame:
+    """Create a dataframe showing whether a country has any sub-national jurisdiction for which any sector is covered by
+    an ets/carbon tax.
+
+    The 'country' column of this dataframe does not need to be harmonized, since we are mapping the original
+    sub-national jurisdiction names to the harmonized name of the country.
+
+    Parameters
+    ----------
+    df_subnational : pd.DataFrame
+        Sub-national data, disaggregated by sector.
+
+    Returns
+    -------
+    pd.DataFrame
+        Processed sub-national data.
+
+    """
     # Prepare subnational data.
     df_subnational = prepare_data(df_subnational)
     # Map subnational regions to their corresponding country.
@@ -317,7 +354,7 @@ def prepare_subnational_data(df_subnational: pd.DataFrame) -> pd.DataFrame:
         warn_on_unused_mappings=True,
     )
     # Get coverage of "any sector", where we only care about having at least one sector covered by carbon tax/ets.
-    df_subnational = get_coverage_for_any_sector(df=df_subnational, subnational=True)
+    df_subnational = get_coverage_for_any_sector(df=df_subnational)
 
     return df_subnational
 
@@ -325,6 +362,30 @@ def prepare_subnational_data(df_subnational: pd.DataFrame) -> pd.DataFrame:
 def combine_national_and_subnational_data(
     df_any_sector_national: pd.DataFrame, df_any_sector_subnational: pd.DataFrame
 ) -> pd.DataFrame:
+    """Combine national and sub-national data on whether countries have any sector covered by a tax instrument.
+
+    The returned dataframe will have three labels:
+    * Whether a country-year had no sector covered.
+    * Whether a country-year had at least on sector covered at the national level.
+    * Whether a country-year had at least one sector in one sub-national jurisdiction covered, but no sector covered at
+      the national level.
+
+    We disregard whether a country has coverage both at the sub-national or at the national level.
+
+    Parameters
+    ----------
+    df_any_sector_national : pd.DataFrame
+        National data on whether countries have any sector covered by a tax instrument.
+    df_any_sector_subnational : pd.DataFrame
+        Sub-national data on whether countries have any sector covered by a tax instrument.
+
+    Returns
+    -------
+    df_any_sector : pd.DataFrame
+        Combined dataframe showing whether a country has at least one sector covered by a tax instrument at a national
+        level, or only at the sub-national level, or not at all.
+
+    """
     # Now combine national and subnational data.
     # If there is both subnational and national coverage, keep the latter.
     # To do so, replace rows in national coverage dataframe by nans, then combine national an subnational data
@@ -352,14 +413,6 @@ def combine_national_and_subnational_data(
     return cast(pd.DataFrame, df_any_sector)
 
 
-def create_output_table(df: pd.DataFrame, index_columns: List[str]) -> Table:
-    tb = Table(df)
-    tb = tb.set_index(index_columns, verify_integrity=True).sort_index().sort_index(axis=1)
-    tb = underscore_table(tb)
-
-    return tb
-
-
 def run(dest_dir: str) -> None:
     #
     # Load data.
@@ -372,10 +425,13 @@ def run(dest_dir: str) -> None:
 
     # Get main table from dataset.
     tb_meadow = ds_meadow[ds_meadow.table_names[0]]
+
     # Get table for subnational data from dataset.
     tb_meadow_subnational = ds_meadow_subnational[ds_meadow_subnational.table_names[0]]
+
     # Construct a dataframe from the main table.
     df = pd.DataFrame(tb_meadow)
+
     # Construct a dataframe for subnational data.
     df_subnational = pd.DataFrame(tb_meadow_subnational)
 
@@ -384,6 +440,7 @@ def run(dest_dir: str) -> None:
     #
     # Sanity checks on raw data.
     sanity_checks(df=df)
+    sanity_checks(df=df_subnational)
 
     # Prepare data.
     df = prepare_data(df=df)
@@ -392,7 +449,7 @@ def run(dest_dir: str) -> None:
     df = geo.harmonize_countries(df=df, countries_file=str(N.country_mapping_path), warn_on_unused_countries=False)
 
     # Create a simplified table for "any sector" of national data.
-    df_any_sector_national = get_coverage_for_any_sector(df=df, subnational=False)
+    df_any_sector_national = get_coverage_for_any_sector(df=df)
 
     # Create a simplified dataframe with the coverage for "any sector" of subnational data.
     df_any_sector_subnational = prepare_subnational_data(df_subnational=df_subnational)
@@ -403,24 +460,35 @@ def run(dest_dir: str) -> None:
     )
 
     # Prepare output tables.
-    tb = create_output_table(df=df, index_columns=INDEX_COLUMNS)
-    tb_any_sector = create_output_table(df=df_any_sector, index_columns=INDEX_COLUMNS_ANY_SECTOR)
+    tb = underscore_table(Table(df)).set_index(INDEX_COLUMNS, verify_integrity=True).sort_index().sort_index(axis=1)
+    tb_any_sector = (
+        underscore_table(Table(df_any_sector))
+        .set_index(INDEX_COLUMNS_ANY_SECTOR, verify_integrity=True)
+        .sort_index()
+        .sort_index(axis=1)
+    )
 
     #
     # Save outputs.
     #
     # Create a new garden dataset.
     ds_garden = Dataset.create_empty(dest_dir)
+
     # Fetch metadata from meadow step (if any).
     ds_garden.metadata = ds_meadow.metadata
+
     # Update dataset metadata using metadata yaml file.
     ds_garden.metadata.update_from_yaml(N.metadata_path, if_source_exists="replace")
+
     # Update main table metadata using metadata yaml file.
     tb.update_metadata_from_yaml(N.metadata_path, GARDEN_MAIN_TABLE_NAME)
+
     # Update simplified table metadata using metadata yaml file.
     tb_any_sector.update_metadata_from_yaml(N.metadata_path, GARDEN_ANY_SECTOR_TABLE_NAME)
+
     # Add tables to dataset.
     ds_garden.add(tb)
     ds_garden.add(tb_any_sector)
+
     # Save dataset.
     ds_garden.save()
