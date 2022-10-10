@@ -91,8 +91,8 @@ def add_world(df: pd.DataFrame) -> pd.DataFrame:
     # Estimate "World" population for years before `year_threshold` and add to original data.
     df_ = (
         df_[(df_["country"].isin(continents)) & (df_.year < year_threshold)]
-        .groupby("year", as_index=False)
-        .population.sum()
+        .groupby("year", as_index=False)["population"]
+        .sum()
         .assign(country="World")
     )
     df = pd.concat([df, df_], ignore_index=True).sort_values(["country", "year"])
