@@ -1,8 +1,4 @@
-import numpy as np
-import pandas as pd
 from owid import catalog
-from owid.catalog import Table
-from owid.catalog.utils import underscore_table
 
 from etl.paths import DATA_DIR, STEP_DIR
 

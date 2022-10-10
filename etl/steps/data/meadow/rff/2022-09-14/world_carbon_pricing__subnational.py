@@ -22,7 +22,9 @@ def run(dest_dir: str) -> None:
     # Load data.
     #
     # Load data from walden.
-    walden_ds = WaldenCatalog().find_one(namespace="rff", short_name="world_carbon_pricing__subnational", version=WALDEN_VERSION)
+    walden_ds = WaldenCatalog().find_one(
+        namespace="rff", short_name="world_carbon_pricing__subnational", version=WALDEN_VERSION
+    )
     df = pd.read_csv(walden_ds.ensure_downloaded(), dtype=object)
     # Load IPCC codes from walden.
     walden_ipcc_ds = WaldenCatalog().find_one(namespace="rff", short_name="ipcc_codes", version=WALDEN_VERSION)
