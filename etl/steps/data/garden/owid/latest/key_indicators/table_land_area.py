@@ -1,10 +1,12 @@
+from copy import deepcopy
 from pathlib import Path
 
+import pandas as pd
 from owid import catalog
 from owid.catalog import Dataset, Table
 
-from etl import data_helpers
 from etl.paths import DATA_DIR, REFERENCE_DATASET
+from etl.steps.data.garden.owid.latest.key_indicators.utils import add_regions
 
 DIR_PATH = Path(__file__).parent
 
@@ -29,10 +31,33 @@ def load_land_area() -> Table:
         .assign(country=table.geo.str.upper().map(countries_regions["name"]))
         .dropna(subset=["country"])
         .drop(["geo"], axis=1)
-        .pipe(data_helpers.calculate_region_sums)
+        .pipe(add_regions)
+        .pipe(add_world)
     )
 
     return table.set_index(["country", "year"])
+
+
+def add_world(df: pd.DataFrame) -> pd.DataFrame:
+    """Add world aggregates.
+
+    We do this by adding the values for all continents.
+    """
+    assert "World" not in set(df.country), "World already in data!"
+    df_ = deepcopy(df)
+    continents = [
+        "Europe",
+        "Asia",
+        "North America",
+        "South America",
+        "Africa",
+        "Oceania",
+    ]
+    df_ = (
+        df_[(df_["country"].isin(continents))].groupby("year", as_index=False).population.sum().assign(country="World")
+    )
+    df = pd.concat([df, df_], ignore_index=True).sort_values(["country", "year"])
+    return df
 
 
 def make_table() -> Table:
