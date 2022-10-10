@@ -54,7 +54,10 @@ def add_world(df: pd.DataFrame) -> pd.DataFrame:
         "Oceania",
     ]
     df_ = (
-        df_[(df_["country"].isin(continents))].groupby("year", as_index=False).population.sum().assign(country="World")
+        df_[(df_["country"].isin(continents))]
+        .groupby("year", as_index=False)["land_area"]
+        .sum()
+        .assign(country="World")
     )
     df = pd.concat([df, df_], ignore_index=True).sort_values(["country", "year"])
     return df
