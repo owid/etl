@@ -63,6 +63,7 @@ steps:
     - walden://rff/2022-09-14/emissions_weighted_carbon_price__coverage
   data://garden/rff/2022-09-14/world_carbon_pricing:
     - data://meadow/rff/2022-09-14/world_carbon_pricing
+    - data://meadow/rff/2022-09-14/world_carbon_pricing__subnational
   data://garden/rff/2022-09-14/emissions_weighted_carbon_price:
     - data://meadow/rff/2022-09-14/emissions_weighted_carbon_price__economy
     - data://meadow/rff/2022-09-14/emissions_weighted_carbon_price__coverage
