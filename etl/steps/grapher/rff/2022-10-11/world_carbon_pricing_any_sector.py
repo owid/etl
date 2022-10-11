@@ -8,7 +8,7 @@ GARDEN_DATASET_NAME = "world_carbon_pricing"
 GARDEN_DATASET_PATH = DATA_DIR / "garden" / "rff" / GARDEN_VERSION / GARDEN_DATASET_NAME
 GARDEN_TABLE_NAME = "world_carbon_pricing_any_sector"
 # Details of output grapher dataset and table.
-GRAPHER_DATASET_TITLE = "World carbon pricing for any sector"
+GRAPHER_DATASET_TITLE = "World carbon pricing for any sector (2022)"
 GRAPHER_DATASET_NAME = GARDEN_TABLE_NAME
 GRAPHER_METADATA_PATH = STEP_DIR / "grapher" / "rff" / VERSION / f"{GRAPHER_DATASET_NAME}.meta.yml"
 
