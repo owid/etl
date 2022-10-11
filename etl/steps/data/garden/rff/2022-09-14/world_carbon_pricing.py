@@ -1,21 +1,23 @@
-from typing import cast
+from typing import Dict, List, cast
 
 import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
 from owid.catalog.utils import underscore_table
-from owid.datautils import dataframes, geo
+from owid.datautils import dataframes, geo, io
 from shared import CURRENT_DIR
 
 from etl.helpers import Names
-from etl.paths import DATA_DIR
+from etl.paths import DATA_DIR, STEP_DIR
 
 # Details of the input dataset.
 MEADOW_DATASET_NAME = "world_carbon_pricing"
-MEADOW_MAIN_DATASET_PATH = DATA_DIR / f"meadow/rff/2022-09-14/{MEADOW_DATASET_NAME}"
+MEADOW_VERSION = "2022-09-14"
+MEADOW_MAIN_DATASET_PATH = DATA_DIR / f"meadow/rff/{MEADOW_VERSION}/{MEADOW_DATASET_NAME}"
 MEADOW_SUBNATIONAL_DATASET_PATH = DATA_DIR / "meadow/rff/2022-09-14/world_carbon_pricing__subnational"
 # Details of the output tables.
 GARDEN_MAIN_TABLE_NAME = MEADOW_DATASET_NAME
+GARDEN_VERSION = MEADOW_VERSION
 GARDEN_ANY_SECTOR_TABLE_NAME = "world_carbon_pricing_any_sector"
 # Get naming convention.
 N = Names(str(CURRENT_DIR / MEADOW_DATASET_NAME))
@@ -51,193 +53,7 @@ INDEX_COLUMNS_ANY_SECTOR = ["country", "year"]
 # Mapping of countries and the regions of the country included in the sub-national dataset.
 # In the future, it would be good to load this mapping as additional data (however, the mapping is hardcoded in the
 # original repository, so it's not trivial to get this mapping automatically).
-country_members = {
-    "Canada": [
-        "Alberta",
-        "British Columbia",
-        "Manitoba",
-        "New Brunswick",
-        "Newfoundland and Labrador",
-        "Northwest Territories",
-        "Nova Scotia",
-        "Nunavut",
-        "Ontario",
-        "Prince Edward Island",
-        "Quebec",
-        "Saskatchewan",
-        "Yukon",
-    ],
-    "China": [
-        "Anhui Province",
-        "Beijing Municipality",
-        "Chongqing Municipality",
-        "Fujian Province",
-        "Gansu Province",
-        "Guangdong Province",
-        "Guangxi Zhuang Autonomous Region",
-        "Guizhou Province",
-        "Hainan Province",
-        "Hebei Province",
-        "Heilongjiang Province",
-        "Henan Province",
-        "Hong Kong Special Administrative Region",
-        "Hubei Province",
-        "Hunan Province",
-        "Inner Mongolia Autonomous Region",
-        "Jiangsu Province",
-        "Jiangxi Province",
-        "Jilin Province",
-        "Liaoning Province",
-        "Macau Special Administrative Region",
-        "Ningxia Hui Autonomous Region",
-        "Qinghai Province",
-        "Shaanxi Province",
-        "Shandong Province",
-        "Shanghai Municipality",
-        "Shanxi Province",
-        "Shenzhen",
-        "Sichuan Province",
-        "Tianjin Municipality",
-        "Tibet Autonomous Region",
-        "Xinjiang Uyghur Autonomous Region",
-        "Yunnan Province",
-        "Zhejiang Province",
-    ],
-    "Japan": [
-        "Aichi",
-        "Akita",
-        "Aomori",
-        "Chiba",
-        "Ehime",
-        "Fukui",
-        "Fukuoka",
-        "Fukushima",
-        "Gifu",
-        "Gunma",
-        "Hiroshima",
-        "Hokkaido",
-        "Hyogo",
-        "Ibaraki",
-        "Ishikawa",
-        "Iwate",
-        "Kagawa",
-        "Kagoshima",
-        "Kanagawa",
-        "Kochi",
-        "Kumamoto",
-        "Kyoto",
-        "Mie",
-        "Miyagi",
-        "Miyazaki",
-        "Nagano",
-        "Nagasaki",
-        "Nara",
-        "Niigata",
-        "Oita",
-        "Okayama",
-        "Okinawa",
-        "Osaka",
-        "Saga",
-        "Saitama",
-        "Shiga",
-        "Shimane",
-        "Shizuoka",
-        "Tochigi",
-        "Tokushima",
-        "Tokyo",
-        "Tottori",
-        "Toyama",
-        "Wakayama",
-        "Yamagata",
-        "Yamaguchi",
-        "Yamanashi",
-    ],
-    "United States": [
-        "Alabama",
-        "Alaska",
-        "Arizona",
-        "Arkansas",
-        "California",
-        "Colorado",
-        "Connecticut",
-        "Delaware",
-        "Florida",
-        "Georgia_US",
-        "Hawaii",
-        "Idaho",
-        "Illinois",
-        "Indiana",
-        "Iowa",
-        "Kansas",
-        "Kentucky",
-        "Louisiana",
-        "Maine",
-        "Maryland",
-        "Massachusetts",
-        "Michigan",
-        "Minnesota",
-        "Mississippi",
-        "Missouri",
-        "Montana",
-        "Nebraska",
-        "Nevada",
-        "New Hampshire",
-        "New Jersey",
-        "New Mexico",
-        "New York",
-        "North Carolina",
-        "North Dakota",
-        "Ohio",
-        "Oklahoma",
-        "Oregon",
-        "Pennsylvania",
-        "Rhode Island",
-        "South Carolina",
-        "South Dakota",
-        "Tennessee",
-        "Texas",
-        "Utah",
-        "Vermont",
-        "Virginia",
-        "Washington",
-        "West Virginia",
-        "Wisconsin",
-        "Wyoming",
-    ],
-    "Mexico": [
-        "Aguascalientes",
-        "Baja California",
-        "Baja California Sur",
-        "Campeche",
-        "Chiapas",
-        "Chihuahua",
-        "Coahuila de Zaragoza",
-        "Colima",
-        "Durango",
-        "Guanajuato",
-        "Guerrero",
-        "Hidalgo",
-        "Jalisco",
-        "Mexico State",
-        "Ciudad de Mexico",
-        "Michoacan de Ocampo",
-        "Morelos",
-        "Nayarit",
-        "Nuevo Leon",
-        "Oaxaca",
-        "Puebla",
-        "Queretaro de Arteaga",
-        "Quintana Roo",
-        "San Luis Potosi",
-        "Sinaloa",
-        "Sonora",
-        "Tabasco",
-        "Tamaulipas",
-        "Tlaxcala",
-        "Veracruz de Ignacio de la Llave",
-        "Yucatan",
-    ],
-}
+COUNTRY_MEMBERS_FILE = STEP_DIR / f"data/garden/rff/{GARDEN_VERSION}/sub_national_jurisdictions.json"
 
 
 def sanity_checks(df: pd.DataFrame) -> None:
@@ -323,7 +139,7 @@ def get_coverage_for_any_sector(df: pd.DataFrame) -> pd.DataFrame:
     return df_any_sector
 
 
-def prepare_subnational_data(df_subnational: pd.DataFrame) -> pd.DataFrame:
+def prepare_subnational_data(df_subnational: pd.DataFrame, country_members: Dict[str, List[str]]) -> pd.DataFrame:
     """Create a dataframe showing whether a country has any sub-national jurisdiction for which any sector is covered by
     an ets/carbon tax.
 
@@ -435,6 +251,9 @@ def run(dest_dir: str) -> None:
     # Construct a dataframe for subnational data.
     df_subnational = pd.DataFrame(tb_meadow_subnational)
 
+    # Load dictionary mapping sub-national jurisdictions to their countries.
+    country_members = io.local.load_json(COUNTRY_MEMBERS_FILE)
+
     #
     # Process data.
     #
@@ -452,7 +271,7 @@ def run(dest_dir: str) -> None:
     df_any_sector_national = get_coverage_for_any_sector(df=df)
 
     # Create a simplified dataframe with the coverage for "any sector" of subnational data.
-    df_any_sector_subnational = prepare_subnational_data(df_subnational=df_subnational)
+    df_any_sector_subnational = prepare_subnational_data(df_subnational=df_subnational, country_members=country_members)
 
     # Combine national and subnational data.
     df_any_sector = combine_national_and_subnational_data(
