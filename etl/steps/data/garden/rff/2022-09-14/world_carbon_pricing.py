@@ -1,6 +1,5 @@
 from typing import Dict, List, cast
 
-import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
 from owid.catalog.utils import underscore_table
@@ -30,6 +29,9 @@ LABEL_ETS_COVERED_ONLY_SUBNATIONAL = "Has an ETS only at a sub-national level"
 LABEL_TAX_NOT_COVERED = "No carbon tax"
 LABEL_TAX_COVERED = "Has a carbon tax"
 LABEL_TAX_COVERED_ONLY_SUBNATIONAL = "Has a carbon tax only at a sub-national level"
+# If a country-years has both national and subnational coverage, mention only the national and ignore subnational.
+LABEL_ETS_COVERED_NATIONAL_AND_SUBNATIONAL = "Has an ETS"
+LABEL_TAX_COVERED_NATIONAL_AND_SUBNATIONAL = "Has a carbon tax"
 
 # Columns to keep from raw dataset and how to rename them.
 COLUMNS = {
@@ -180,13 +182,13 @@ def combine_national_and_subnational_data(
 ) -> pd.DataFrame:
     """Combine national and sub-national data on whether countries have any sector covered by a tax instrument.
 
-    The returned dataframe will have three labels:
-    * Whether a country-year had no sector covered.
-    * Whether a country-year had at least on sector covered at the national level.
-    * Whether a country-year had at least one sector in one sub-national jurisdiction covered, but no sector covered at
+    The returned dataframe will have the following labels:
+    * Whether a country-year has no sector covered.
+    * Whether a country-year has at least one sector covered at the national level.
+    * Whether a country-year has at least one sector in one sub-national jurisdiction covered, but no sector covered at
       the national level.
-
-    We disregard whether a country has coverage both at the sub-national or at the national level.
+    * Whether a country-year has at least one sector in both a sub-national and the national jurisdiction covered.
+      However, for now we disregard this option, by using the same label as for only national coverage.
 
     Parameters
     ----------
@@ -202,27 +204,40 @@ def combine_national_and_subnational_data(
         level, or only at the sub-national level, or not at all.
 
     """
-    # Now combine national and subnational data.
-    # If there is both subnational and national coverage, keep the latter.
-    # To do so, replace rows in national coverage dataframe by nans, then combine national an subnational data
-    # so that, in overlapping rows, the nans from the national dataframe will be replaced by the subnational data,
-    # but if there is coverage in the national dataframe, it will be kept, ignoring subnational coverage.
-    # Create new temporary labels, so that:
-    # nan -> not covered, 1 -> national coverage, 2 -> subnational coverage.
-    _df_any_sector_national = df_any_sector_national.replace({0: np.nan})
-    _df_any_sector_subnational = df_any_sector_subnational.replace({1: 2})
-    df_any_sector = dataframes.combine_two_overlapping_dataframes(
-        df1=_df_any_sector_national,
-        df2=_df_any_sector_subnational,
-        index_columns=["country", "year"],
-        keep_column_order=True,
-    )
-    # Now replace again those nans back to zeros.
-    df_any_sector = df_any_sector.fillna(0)
+    # Combine national and subnational data.
+    df_any_sector = pd.merge(
+        df_any_sector_national,
+        df_any_sector_subnational,
+        on=["country", "year"],
+        how="left",
+        suffixes=("_national", "_subnational"),
+    ).fillna(0)
 
-    # Now replace 0, 1, and 2 by their corresponding labels.
-    ets_mapping = {0: LABEL_ETS_NOT_COVERED, 1: LABEL_ETS_COVERED, 2: LABEL_ETS_COVERED_ONLY_SUBNATIONAL}
-    tax_mapping = {0: LABEL_TAX_NOT_COVERED, 1: LABEL_TAX_COVERED, 2: LABEL_TAX_COVERED_ONLY_SUBNATIONAL}
+    # Create two new columns ets and tax, that are:
+    # * 0 if no ets/tax exists.
+    # * 1 if there is a national ets/tax and not a subnational ets/tax.
+    # * 2 if there is a subnational ets/tax and not a national ets/tax.
+    # * 3 if there are both a national and a subnational ets/tax.
+    df_any_sector = df_any_sector.assign(
+        **{
+            "ets": df_any_sector["ets_national"] + 2 * df_any_sector["ets_subnational"],
+            "tax": df_any_sector["tax_national"] + 2 * df_any_sector["tax_subnational"],
+        }
+    )[["country", "year", "ets", "tax"]]
+
+    # Now replace 0, 1, 2, and 3 by their corresponding labels.
+    ets_mapping = {
+        0: LABEL_ETS_NOT_COVERED,
+        1: LABEL_ETS_COVERED,
+        2: LABEL_ETS_COVERED_ONLY_SUBNATIONAL,
+        3: LABEL_ETS_COVERED_NATIONAL_AND_SUBNATIONAL,
+    }
+    tax_mapping = {
+        0: LABEL_TAX_NOT_COVERED,
+        1: LABEL_TAX_COVERED,
+        2: LABEL_TAX_COVERED_ONLY_SUBNATIONAL,
+        3: LABEL_TAX_COVERED_NATIONAL_AND_SUBNATIONAL,
+    }
     df_any_sector["ets"] = dataframes.map_series(series=df_any_sector["ets"], mapping=ets_mapping)
     df_any_sector["tax"] = dataframes.map_series(series=df_any_sector["tax"], mapping=tax_mapping)
 
