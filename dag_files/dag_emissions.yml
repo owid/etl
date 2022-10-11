@@ -49,7 +49,7 @@ steps:
   data://grapher/gcp/2022-09-29/global_carbon_budget_additional:
     - data://garden/gcp/2022-09-29/global_carbon_budget_additional
   #
-  # RFF - World Carbon Pricing (2022).
+  # RFF - World Carbon Pricing (2022-09-14).
   #
   data://meadow/rff/2022-09-14/world_carbon_pricing:
     - walden://rff/2022-09-14/world_carbon_pricing
@@ -71,3 +71,26 @@ steps:
     - data://garden/rff/2022-09-14/world_carbon_pricing
   data://grapher/rff/2022-09-14/emissions_weighted_carbon_price:
     - data://garden/rff/2022-09-14/emissions_weighted_carbon_price
+  #
+  # RFF - World Carbon Pricing (2022-10-11).
+  #
+  data://meadow/rff/2022-10-11/world_carbon_pricing:
+    - walden://rff/2022-10-11/world_carbon_pricing
+    - walden://rff/2022-10-11/ipcc_codes
+  data://meadow/rff/2022-10-11/world_carbon_pricing__subnational:
+    - walden://rff/2022-10-11/world_carbon_pricing__subnational
+    - walden://rff/2022-10-11/ipcc_codes
+  data://meadow/rff/2022-10-11/emissions_weighted_carbon_price__economy:
+    - walden://rff/2022-10-11/emissions_weighted_carbon_price__economy
+  data://meadow/rff/2022-10-11/emissions_weighted_carbon_price__coverage:
+    - walden://rff/2022-10-11/emissions_weighted_carbon_price__coverage
+  data://garden/rff/2022-10-11/world_carbon_pricing:
+    - data://meadow/rff/2022-10-11/world_carbon_pricing
+    - data://meadow/rff/2022-10-11/world_carbon_pricing__subnational
+  data://garden/rff/2022-10-11/emissions_weighted_carbon_price:
+    - data://meadow/rff/2022-10-11/emissions_weighted_carbon_price__economy
+    - data://meadow/rff/2022-10-11/emissions_weighted_carbon_price__coverage
+  data://grapher/rff/2022-10-11/world_carbon_pricing_any_sector:
+    - data://garden/rff/2022-10-11/world_carbon_pricing
+  data://grapher/rff/2022-10-11/emissions_weighted_carbon_price:
+    - data://garden/rff/2022-10-11/emissions_weighted_carbon_price
