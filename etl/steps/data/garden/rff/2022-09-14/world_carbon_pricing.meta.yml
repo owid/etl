@@ -51,3 +51,15 @@ tables:
         description: Net tax rate (accounting for exemption) in current LCU per ton of CO2 equivalent.
         display:
           numDecimalPlaces: 2
+  world_carbon_pricing_any_sector:
+    title: World carbon pricing for any sector
+    variables:
+      ets:
+        title: Covered by emissions trading system in at least one sector
+        unit: ""
+        description: This variable indicates whether at least one sector(-fuel) is covered by at least one emissions trading system at the national level, or only at the sub-national level, or whether no sector is covered.
+      tax:
+        title: Covered by tax instrument in at least one sector
+        unit: ""
+        description: This variable indicates whether at least one sector(-fuel) is covered by at least one carbon tax at the national level, or only at the sub-national level, or whether no sector is covered.
+
