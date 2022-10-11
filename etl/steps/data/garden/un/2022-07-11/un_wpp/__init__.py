@@ -2,6 +2,7 @@ from pathlib import Path
 from typing import Any, List
 
 import pandas as pd
+import structlog
 from owid import catalog
 from owid.catalog import Table
 from owid.catalog.meta import TableMeta
@@ -16,6 +17,8 @@ from .population import process as process_population
 
 YEAR_SPLIT = 2022
 METADATA_PATH = Path(__file__).parent / "un_wpp.meta.yml"
+
+log = structlog.get_logger()
 
 metric_categories = {
     "migration": [
@@ -100,21 +103,31 @@ def dataset_to_garden(tables: List[Table], metadata: TableMeta, dest_dir: str) -
 
 
 def run(dest_dir: str) -> None:
+    log.info("Loading meadow dataset...")
     meadow_path = base_path / "data/meadow/un/2022-07-11/un_wpp"
     ds = catalog.Dataset(meadow_path)
     # country rename
+    log.info("Loading country standardised names...")
     country_std = load_country_mapping()
     # pocess
+    log.info("Processing population variables...")
     df_population = process_population(ds["population"], country_std)
+    log.info("Processing fertility variables...")
     df_fertility = process_fertility(ds["fertility"], country_std)
+    log.info("Processing demographics variables...")
     df_demographics = process_demographics(ds["demographics"], country_std)
+    log.info("Processing dependency_ratio variables...")
     df_depratio = process_depratio(ds["dependency_ratio"], country_std)
+    log.info("Processing deaths variables...")
     df_deaths = process_deaths(ds["deaths"], country_std)
     # merge main df
+    log.info("Merging tables...")
     df = merge_dfs([df_population, df_fertility, df_demographics, df_depratio, df_deaths])
     # Remove Sint Maarten
+    log.info("Removing country due to inconsistencies...")
     df = df.loc[~df.index.get_level_values("location").isin(["SXM"])]
     # create tables
+    log.info("Transforming DataFrame into Table...")
     table_long = df_to_table(
         df,
         short_name="un_wpp",
@@ -127,6 +140,7 @@ def run(dest_dir: str) -> None:
     # generate sub-datasets
     tables = []
     for category, metrics in metric_categories.items():
+        log.info(f"Generating table for category {category}...")
         df_c = df.query(f"metric in {metrics}")
         tables.append(
             df_to_table(
@@ -137,4 +151,5 @@ def run(dest_dir: str) -> None:
         )
     tables += [table_long]
     # create dataset
+    log.info("Loading dataset to Garden...")
     dataset_to_garden(tables, ds.metadata, dest_dir)
