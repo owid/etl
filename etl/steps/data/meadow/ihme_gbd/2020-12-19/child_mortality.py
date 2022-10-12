@@ -5,7 +5,6 @@ from owid.walden import Catalog as WaldenCatalog
 from structlog import get_logger
 
 from etl.helpers import Names
-from etl.paths import DATA_DIR, REFERENCE_DATASET
 from etl.steps.data.converters import convert_walden_metadata
 
 log = get_logger()
@@ -43,7 +42,6 @@ def run(dest_dir: str) -> None:
     # underscore all table columns
     tb = underscore_table(tb)
 
-    ds.metadata.update_from_yaml(N.metadata_path)
     tb.update_metadata_from_yaml(N.metadata_path, "child_mortality")
 
     # add table to a dataset
