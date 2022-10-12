@@ -165,7 +165,7 @@ def run(dest_dir: str) -> None:
     # Remove sub-regions within a country.
     df_combined = df_combined.dropna(subset=["country"]).reset_index(drop=True)
 
-    # Given that the most recent data is incomplete, keep only data points prior to a certain year
+    # Given that the most recent data is incomplete, keep only data points prior to (or at) a certain year
     # (given by global variables LAST_INFORMED_YEAR).
     df_combined = df_combined[df_combined["year"] <= LAST_INFORMED_YEAR].reset_index(drop=True)
 

@@ -110,7 +110,7 @@ def prepare_data(df: pd.DataFrame) -> pd.DataFrame:
     # Column 'product' has many nans. Convert them into empty strings.
     df["product"] = df["product"].cat.add_categories("").fillna("")
 
-    # Given that the most recent data is incomplete, keep only data points prior to a certain year
+    # Given that the most recent data is incomplete, keep only data points prior to (or at) a certain year
     # (given by global variable LAST_INFORMED_YEAR).
     df = df[df["year"] <= LAST_INFORMED_YEAR].reset_index(drop=True)
 
