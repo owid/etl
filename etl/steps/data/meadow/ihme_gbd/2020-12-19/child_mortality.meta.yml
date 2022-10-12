@@ -1,0 +1,10 @@
+tables:
+  child_mortality:
+    variables:
+      measure_name:
+        title: Measure
+        description: Unit of the values
+      metric_name:
+        description: Unit
+      value:
+        title: Value
