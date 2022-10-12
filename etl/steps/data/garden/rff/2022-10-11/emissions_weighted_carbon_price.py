@@ -6,7 +6,7 @@ import pandas as pd
 from owid.catalog import Dataset, Table
 from owid.catalog.utils import underscore_table
 from owid.datautils import geo
-from shared import MEADOW_VERSION, VERSION
+from shared import LAST_INFORMED_YEAR, MEADOW_VERSION, VERSION
 
 from etl.paths import DATA_DIR, STEP_DIR
 
@@ -164,6 +164,10 @@ def run(dest_dir: str) -> None:
 
     # Remove sub-regions within a country.
     df_combined = df_combined.dropna(subset=["country"]).reset_index(drop=True)
+
+    # Given that the most recent data is incomplete, keep only data points prior to a certain year
+    # (given by global variables LAST_INFORMED_YEAR).
+    df_combined = df_combined[df_combined["year"] <= LAST_INFORMED_YEAR].reset_index(drop=True)
 
     # Sanity checks.
     error = "There should be no columns with only nans."
