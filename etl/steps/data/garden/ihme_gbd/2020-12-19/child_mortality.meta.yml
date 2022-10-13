@@ -1,19 +1,64 @@
 dataset:
   sources:
-  #   -
-  #     name: Maddison Project Database 2020 (Bolt and van Zanden, 2020)
-  #     published_by: Bolt, Jutta and Jan Luiten van Zanden (2020), “Maddison style estimates of the evolution of the world economy. A new 2020 update“.
-  #     publisher_source: |
-  #       The Maddison Project Database is based on the work of many researchers that have produced estimates of...
-
+    -
+      name: Global Burden of Disease Study 2019 (GBD 2019) Under-5 Mortality by Detailed Age Groups 1950-2019
+      published_by: Institute of Health Metrics and Evaluation
 tables:
   child_mortality:
     variables:
-      # gdp:
-      #   title: GDP
-      #   short_unit: $
-      #   unit: 2011 int-$
-      #   description: Gross domestic product measured in international-$ using 2011 prices to adjust for price changes over time (inflation) and price differences between countries. Calculated by multiplying GDP per capita with population.
-      #   display:
-      #     entityAnnotationsMap: "Western Offshoots: United States, Canada, Australia and New Zealand"
-      #     numDecimalPlaces: 0
+      deaths_under_5_number:
+        title: Deaths in under-fives
+        description: Deaths in children aged under-five
+        unit: deaths   
+      deaths_early_neonatal_number:
+        title: Early neonatal deaths
+        description: Deaths in children aged 0-6 days
+        unit: deaths
+      deaths_late_neonatal_number:
+        title: Late neonatal deaths
+        description: Deaths in children aged 7-27 days
+        unit: deaths
+      deaths_2_to_4_number:
+        title: Deaths 2-4 years
+        description: Deaths in children aged 2-4 years
+        unit: deaths
+      deaths_neonatal_number:
+        title: Neonatal deaths
+        description: Deaths in children aged 0-27 days
+        unit: deaths
+      deaths_12_to_23_months_number:
+        title: Deaths 12-23 months
+        description: Deaths in children aged 12-23 months
+        unit: deaths
+      deaths_1_5_months_number:
+        title: Deaths 1-5 months
+        description: Deaths in children aged 1-5 months
+        unit: deaths
+      deaths_6_11_months_number':
+        title: Deaths 6-11 months
+        description: Deaths in children aged 6-11 months
+        unit: deaths
+      deaths_under_5_probability_of_death: 
+        title: Under-five probability of death
+        description: Probability of death before the age of five
+      deaths_early_neonatal_probability_of_death:
+        title: 0-6 days probability of death
+        description: Probability of death before reaching one-week of age
+      deaths_late_neonatal_probability_of_death:
+        title: 7-27 days probability of death
+        description: Probability of death between 7-27 days
+      deaths_2_to_4_probability_of_death:
+        title: 2-4 years probability of death
+        description: Probability of death between 2-4 years
+      deaths_neonatal_probability_of_death:
+        title: 0-27 days probability of death
+        description: Probability of death between 0-27 days
+      deaths_12_to_23_months_probability_of_death:
+        title: 12-23 months probability of death
+        description: Probability of death between 12-23 months
+      deaths_1_5_months_probability_of_death:
+        title: 1-5 months probabiltiy of death
+        description: Probability of death between 1-5 months
+      deaths_6_11_months_probability_of_death:
+        title: 6-11 months probabiltiy of death
+        description: Probability of death between 6-11 months

@@ -14,6 +14,7 @@ log = get_logger()
 
 # naming conventions
 N = Names(__file__)
+N = Names("/Users/fionaspooner/Documents/OWID/repos/etl/etl/steps/data/garden/ihme_gbd/2020-12-19/child_mortality.py")
 
 
 def run(dest_dir: str) -> None:
@@ -24,20 +25,30 @@ def run(dest_dir: str) -> None:
     tb_meadow = ds_meadow["child_mortality"]
 
     df = pd.DataFrame(tb_meadow)
-
+    df = df.drop(columns="index")
     log.info("child_mortality.exclude_countries")
     df = exclude_countries(df)
 
     log.info("child_mortality.harmonize_countries")
     df = harmonize_countries(df)
+    df_p = df.pivot(
+        index=["country", "year"], columns=["measure_name", "sex", "age_group_name", "metric_name"], values="value"
+    )
+
+    df_p.columns = ["_".join(col).strip() for col in df_p.columns.values]
+
+    # Rouding number columns to integers and rate columns to 2dp.
+    num_cols = [col for col in df_p.columns if "Number" in col]
+    rate_cols = [col for col in df_p.columns if "Rate" in col]
+
+    df_p[num_cols] = df_p[num_cols].round(0).astype(int)
+    df_p[rate_cols] = df_p[rate_cols].round(2)
 
     ds_garden = Dataset.create_empty(dest_dir)
     ds_garden.metadata = ds_meadow.metadata
 
-    tb_garden = underscore_table(Table(df))
+    tb_garden = underscore_table(Table(df_p))
     tb_garden.metadata = tb_meadow.metadata
-    for col in tb_garden.columns:
-        tb_garden[col].metadata = tb_meadow[col].metadata
 
     ds_garden.metadata.update_from_yaml(N.metadata_path)
     tb_garden.update_metadata_from_yaml(N.metadata_path, "child_mortality")
