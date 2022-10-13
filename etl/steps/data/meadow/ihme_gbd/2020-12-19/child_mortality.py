@@ -11,7 +11,6 @@ log = get_logger()
 
 # naming conventions
 N = Names(__file__)
-N = Names("/Users/fionaspooner/Documents/OWID/repos/etl/etl/steps/data/meadow/ihme_gbd/2020-12-19/child_mortality.py")
 
 
 def run(dest_dir: str) -> None:
@@ -43,7 +42,7 @@ def run(dest_dir: str) -> None:
     tb = underscore_table(tb)
 
     tb.update_metadata_from_yaml(N.metadata_path, "child_mortality")
-
+    tb = tb.reset_index()
     # add table to a dataset
     ds.add(tb)
 
@@ -63,5 +62,5 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
             }
         )
         .drop(columns=["location_id", "sex_id", "age_group_id", "measure_id", "metric_id", "upper", "lower"])
-        .round({"value": 2})
+        .drop_duplicates()
     )

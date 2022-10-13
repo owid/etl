@@ -14,7 +14,6 @@ log = get_logger()
 
 # naming conventions
 N = Names(__file__)
-N = Names("/Users/fionaspooner/Documents/OWID/repos/etl/etl/steps/data/garden/ihme_gbd/2020-12-19/child_mortality.py")
 
 
 def run(dest_dir: str) -> None:
@@ -31,18 +30,20 @@ def run(dest_dir: str) -> None:
 
     log.info("child_mortality.harmonize_countries")
     df = harmonize_countries(df)
-    df_p = df.pivot(
-        index=["country", "year"], columns=["measure_name", "sex", "age_group_name", "metric_name"], values="value"
-    )
+
+    # Selecting only Both sex values for now as need this data quite quickly - Also dropping Rate metrics as it is not clear what this means.
+    df = df[(df["sex"] == "Both") & (df["metric_name"] != "Rate")]
+
+    df_p = df.pivot(index=["country", "year"], columns=["measure_name", "age_group_name"], values="value")
 
     df_p.columns = ["_".join(col).strip() for col in df_p.columns.values]
+    df_p = df_p.reset_index()
 
-    # Rouding number columns to integers and rate columns to 2dp.
-    num_cols = [col for col in df_p.columns if "Number" in col]
-    rate_cols = [col for col in df_p.columns if "Rate" in col]
-
+    # Ensuring there is appropriate rounding for the different metrics
+    num_cols = [col for col in df_p.columns if "Deaths" in col]
+    prob_cols = [col for col in df_p.columns if "Probability of death" in col]
     df_p[num_cols] = df_p[num_cols].round(0).astype(int)
-    df_p[rate_cols] = df_p[rate_cols].round(2)
+    df_p[prob_cols] = round((100 * df_p[prob_cols]), 2)
 
     ds_garden = Dataset.create_empty(dest_dir)
     ds_garden.metadata = ds_meadow.metadata
