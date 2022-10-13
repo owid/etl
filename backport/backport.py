@@ -277,7 +277,7 @@ def _upload_config_to_walden(
         f.flush()
 
         if not dry_run:
-            add_to_catalog(meta, f.name, upload, public=public)
+            add_to_catalog(meta, filename=f.name, upload=upload, public=public)
 
 
 def _upload_values_to_walden(
@@ -290,7 +290,7 @@ def _upload_values_to_walden(
     with tempfile.NamedTemporaryFile(mode="wb") as f:
         df.to_feather(f.name, compression="lz4")
         if not dry_run:
-            add_to_catalog(meta, f.name, upload, public=public)
+            add_to_catalog(meta, filename=f.name, upload=upload, public=public)
 
 
 def _walden_timestamp(short_name: str) -> dt.datetime:
