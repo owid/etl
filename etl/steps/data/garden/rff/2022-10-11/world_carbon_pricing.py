@@ -4,7 +4,7 @@ import pandas as pd
 from owid.catalog import Dataset, Table
 from owid.catalog.utils import underscore_table
 from owid.datautils import dataframes, geo, io
-from shared import CURRENT_DIR, MEADOW_VERSION, VERSION
+from shared import CURRENT_DIR, LAST_INFORMED_YEAR, MEADOW_VERSION, VERSION
 
 from etl.helpers import Names
 from etl.paths import DATA_DIR, STEP_DIR
@@ -109,6 +109,10 @@ def prepare_data(df: pd.DataFrame) -> pd.DataFrame:
 
     # Column 'product' has many nans. Convert them into empty strings.
     df["product"] = df["product"].cat.add_categories("").fillna("")
+
+    # Given that the most recent data is incomplete, keep only data points prior to (or at) a certain year
+    # (given by global variable LAST_INFORMED_YEAR).
+    df = df[df["year"] <= LAST_INFORMED_YEAR].reset_index(drop=True)
 
     return df
 
