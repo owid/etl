@@ -21,6 +21,9 @@ MEADOW_DATASET_TITLE = "Aviation statistics"
 
 
 def run(dest_dir: str) -> None:
+    #
+    # Load data.
+    #
     # Get data (statistics by period and by nature) from Walden.
     walden_ds_by_period = WaldenCatalog().find_one(
         namespace=NAMESPACE, short_name=WALDEN_DATASET_NAME_BY_PERIOD, version=WALDEN_VERSION
@@ -30,14 +33,25 @@ def run(dest_dir: str) -> None:
     )
     local_file_by_period = walden_ds_by_period.ensure_downloaded()
     local_file_by_nature = walden_ds_by_nature.ensure_downloaded()
-
     # Create dataframes from the data.
-    df_by_period = pd.read_csv(local_file_by_period)
-    df_by_nature = pd.read_csv(local_file_by_nature)
+    df_by_period = pd.read_csv(local_file_by_period).rename(columns={"Year": "year"})
+    df_by_nature = pd.read_csv(local_file_by_nature).rename(columns={"Year": "year"})
 
+    #
+    # Process data.
+    #
     # Combine both dataframes.
-    df_combined = pd.merge(df_by_period, df_by_nature, how="outer", on="Year")
+    df_combined = pd.merge(df_by_period, df_by_nature, how="outer", on="year")
 
+    # Add a country column (that only contains "World").
+    df_combined["country"] = "World"
+
+    # Set an appropriate index and sort conveniently.
+    df_combined = df_combined.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
+
+    #
+    # Save outputs.
+    #
     # Create a new dataset and reuse Walden metadata (from one of the two datasets).
     ds = Dataset.create_empty(dest_dir)
     ds.metadata = convert_walden_metadata(walden_ds_by_period)
