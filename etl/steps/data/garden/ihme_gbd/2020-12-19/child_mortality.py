@@ -43,7 +43,8 @@ def run(dest_dir: str) -> None:
     num_cols = [col for col in df_p.columns if "Deaths" in col]
     prob_cols = [col for col in df_p.columns if "Probability of death" in col]
     df_p[num_cols] = df_p[num_cols].round(0).astype(int)
-    df_p[prob_cols] = round((100 * df_p[prob_cols]), 2)
+    df_p[prob_cols] = 100 * df_p[prob_cols]
+    df_p[prob_cols] = df_p[prob_cols].round(2)
 
     ds_garden = Dataset.create_empty(dest_dir)
     ds_garden.metadata = ds_meadow.metadata
