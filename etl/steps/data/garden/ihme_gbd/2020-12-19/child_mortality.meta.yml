@@ -1,0 +1,80 @@
+dataset:
+  sources:
+    -
+      name: IHME, Global Burden of Disease (2019)
+      published_by: Institute of Health Metrics and Evaluation
+tables:
+  child_mortality:
+    variables:
+      deaths_under_5:
+        title: Deaths in under-fives
+        description: Deaths in children aged under-five
+        unit: deaths   
+      deaths_early_neonatal:
+        title: Early neonatal deaths
+        description: Deaths in children aged 0-6 days
+        unit: deaths
+      deaths_late_neonatal:
+        title: Late neonatal deaths
+        description: Deaths in children aged 7-27 days
+        unit: deaths
+      deaths_2_to_4:
+        title: Deaths 2-4 years
+        description: Deaths in children aged 2-4 years
+        unit: deaths
+      deaths_neonatal:
+        title: Neonatal deaths
+        description: Deaths in children aged 0-27 days
+        unit: deaths
+      deaths_12_to_23_months:
+        title: Deaths 12-23 months
+        description: Deaths in children aged 12-23 months
+        unit: deaths
+      deaths_1_5_months:
+        title: Deaths 1-5 months
+        description: Deaths in children aged 1-5 months
+        unit: deaths
+      deaths_6_11_months:
+        title: Deaths 6-11 months
+        description: Deaths in children aged 6-11 months
+        unit: deaths
+      probability_of_death_under_5: 
+        title: Under-five probability of death
+        description: Probability of death before the age of five
+        unit: '%'
+        short_unit: '%'
+      probability_of_death_early_neonatal:
+        title: 0-6 days probability of death
+        description: Probability of death before reaching one-week of age
+        unit: '%'
+        short_unit: '%'
+      probability_of_death_late_neonatal:
+        title: 7-27 days probability of death
+        description: Probability of death between 7-27 days
+        unit: '%'
+        short_unit: '%'
+      probability_of_death_2_to_4:
+        title: 2-4 years probability of death
+        description: Probability of death between 2-4 years
+        unit: '%'
+        short_unit: '%'
+      probability_of_death_neonatal:
+        title: 0-27 days probability of death
+        description: Probability of death between 0-27 days
+        unit: '%'
+        short_unit: '%'
+      probability_of_death_12_to_23_months:
+        title: 12-23 months probability of death
+        description: Probability of death between 12-23 months
+        unit: '%'
+        short_unit: '%'
+      probability_of_death_1_5_months:
+        title: 1-5 months probabiltiy of death
+        description: Probability of death between 1-5 months
+        unit: '%'
+        short_unit: '%'
+      probability_of_death_6_11_months:
+        title: 6-11 months probabiltiy of death
+        description: Probability of death between 6-11 months
+        unit: '%'
+        short_unit: '%'

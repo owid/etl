@@ -20,3 +20,9 @@ steps:
   - data://garden/reference
   data://grapher/who/2022-09-30/ghe:
   - data://garden/who/2022-09-30/ghe
+  data://meadow/ihme_gbd/2020-12-19/child_mortality:
+  - walden://ihme_gbd/2020-12-19/child_mortality
+  data://garden/ihme_gbd/2020-12-19/child_mortality:
+  - data://meadow/ihme_gbd/2020-12-19/child_mortality
+  data://grapher/ihme_gbd/2020-12-19/child_mortality:
+  - data://garden/ihme_gbd/2020-12-19/child_mortality
