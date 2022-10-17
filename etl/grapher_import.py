@@ -376,6 +376,10 @@ def cleanup_ghost_sources(dataset_id: int, upserted_source_ids: List[int]) -> No
 @retry(stop=stop.stop_after_attempt(3))
 def insert_to_data_values(df: pd.DataFrame) -> None:
     """Insert data into data_values table. Retry in case we get Deadlock error."""
+    # value will be converted to string in MySQL, we need to do it beforehand otherwise
+    # it's gonna assume it is float64 and mess up precision for smaller types
+    df.value = df.value.astype(str)
+
     # insert data to data_values using pandas which is both faster and doesn't raise
     # deadlocks
     df.to_sql(
