@@ -1,0 +1,25 @@
+dataset:
+  sources:
+    -
+      name: IHME, Global Burden of Disease (2019)
+      published_by: Institute of Health Metrics and Evaluation
+
+tables:
+  child_mortality:
+    variables:
+      country:
+        title: Country
+        description: Country 
+      sex:
+        title: Sex
+        description: Sex
+      age_group_name:
+        title: Age group
+        description: Age group 
+      measure_name:
+        title: Measure
+        description: Unit of the values
+      metric_name:
+        description: Unit
+      value:
+        title: Value
