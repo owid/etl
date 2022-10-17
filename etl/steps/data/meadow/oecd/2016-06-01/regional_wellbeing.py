@@ -79,7 +79,7 @@ df = df.drop(["region_name", "ind_name", "unit_name", "unit_code"], axis=1)
 
 df.head()
 
-df = df.pivot(["region_code", "year"], "ind_code", "value")
+df = df.pivot(index=["region_code", "year"], columns="ind_code", values="value")
 
 df.head()
 
