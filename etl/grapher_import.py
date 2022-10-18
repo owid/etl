@@ -234,7 +234,7 @@ def upsert_table(
 
         session.commit()
 
-    return VariableUpsertResult(variable.id, source_id)
+        return VariableUpsertResult(variable.id, source_id)
 
 
 def fetch_db_checksum(dataset: catalog.Dataset) -> Optional[str]:
