@@ -1,15 +1,10 @@
-import json
-from typing import List, cast
-
 import pandas as pd
 from owid.catalog import Dataset, Table
 from owid.catalog.utils import underscore_table
-from owid.datautils import geo
-from structlog import get_logger
+from shared import CURRENT_DIR
 
 from etl.helpers import Names
 from etl.paths import DATA_DIR
-from shared import CURRENT_DIR
 
 # Details of input datasets.
 # Even though the author of the dataset pointed out the existence of a Google spreadsheet,
@@ -48,12 +43,13 @@ WDI_COLUMNS = {
 # 'Passengers per year (World Bank)': "passengers_carried",
 # 'Number of flight departures': "departures_worldwide",
 # 'Million flights per fatal accident (ASN)': "million_flights_per_accident",
-# 'Fatal accidents from passenger-only commercial airliners (ASN)': "accidents_with_passenger_flights_including_hijacking_etc",    
+# 'Fatal accidents from passenger-only commercial airliners (ASN)': "accidents_with_passenger_flights_including_hijacking_etc",
 # 'Fatalities from passenger-only commercial airliners (ASN)': "fatalities_with_passenger_flights_including_hijacking_etc",
 # # Unused columns that could not be matched to new data.
 # 'Fatal accidents from commercial and non-commercial airliners (ASN)': "",
 # 'Fatalities from commercial and non-commercial airliners (ASN)': "",
 # -
+
 
 def run(dest_dir: str) -> None:
     #
@@ -81,7 +77,7 @@ def run(dest_dir: str) -> None:
     #
     # Select required columns from WDI data, and rename them.
     wdi_df = wdi_df[list(WDI_COLUMNS)].rename(columns=WDI_COLUMNS)
-    
+
     # Select only global data.
     wdi_df = wdi_df[wdi_df["country"] == "World"].reset_index(drop=True)
 
@@ -124,17 +120,39 @@ def run(dest_dir: str) -> None:
     df_sheet = df_sheet[list(sheet_columns)].rename(columns=sheet_columns)
 
     # Combine both dataframes.
-    df_combined = pd.merge(df_sheet, df_web, how="outer", on=["country", "year"]).sort_values("year").reset_index(drop=True)
+    df_combined = (
+        pd.merge(df_sheet, df_web, how="outer", on=["country", "year"]).sort_values("year").reset_index(drop=True)
+    )
 
     # Combine ASN with WDI data.
     df_combined = pd.merge(df_combined, wdi_df, how="left", on=["country", "year"])
 
     # Add new variables.
-    df_combined["million_passengers_per_fatality"] = df_combined["passengers_carried"] * 1e-6 / df_combined["fatalities_with_passenger_and_cargo_flights_including_hijacking_etc"]
-    df_combined["fatalities_per_million_flights"] = df_combined["fatalities_with_passenger_and_cargo_flights_including_hijacking_etc"] / df_combined["departures_worldwide"] * 1e6
-    df_combined["fatalities_per_million_passengers"] = df_combined["fatalities_with_passenger_and_cargo_flights_including_hijacking_etc"] / df_combined["passengers_carried"] * 1e6
-    df_combined["accidents_per_million_flights"] = df_combined["accidents_with_passenger_and_cargo_flights_including_hijacking_etc"] / df_combined["departures_worldwide"] * 1e6
-    df_combined["million_flights_per_accident"] = df_combined["departures_worldwide"] * 1e-6 / df_combined["accidents_with_passenger_and_cargo_flights_including_hijacking_etc"]
+    df_combined["million_passengers_per_fatality"] = (
+        df_combined["passengers_carried"]
+        * 1e-6
+        / df_combined["fatalities_with_passenger_and_cargo_flights_including_hijacking_etc"]
+    )
+    df_combined["fatalities_per_million_flights"] = (
+        df_combined["fatalities_with_passenger_and_cargo_flights_including_hijacking_etc"]
+        / df_combined["departures_worldwide"]
+        * 1e6
+    )
+    df_combined["fatalities_per_million_passengers"] = (
+        df_combined["fatalities_with_passenger_and_cargo_flights_including_hijacking_etc"]
+        / df_combined["passengers_carried"]
+        * 1e6
+    )
+    df_combined["accidents_per_million_flights"] = (
+        df_combined["accidents_with_passenger_and_cargo_flights_including_hijacking_etc"]
+        / df_combined["departures_worldwide"]
+        * 1e6
+    )
+    df_combined["million_flights_per_accident"] = (
+        df_combined["departures_worldwide"]
+        * 1e-6
+        / df_combined["accidents_with_passenger_and_cargo_flights_including_hijacking_etc"]
+    )
 
     # Set an appropriate index and sort conveniently.
     df_combined = df_combined.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
@@ -145,7 +163,7 @@ def run(dest_dir: str) -> None:
     # Create a new empty garden dataset.
     ds_garden = Dataset.create_empty(dest_dir)
     # Ensure all columns are snake, lower case.
-    tb_garden = underscore_table(Table(df_combined))    
+    tb_garden = underscore_table(Table(df_combined))
     # Get metadata from yaml file.
     ds_garden.metadata.update_from_yaml(N.metadata_path, if_source_exists="replace")
     tb_garden.update_metadata_from_yaml(N.metadata_path, "aviation_statistics")
