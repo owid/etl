@@ -3,7 +3,6 @@ from owid import catalog
 from etl.helpers import Names
 
 N = Names(__file__)
-N = Names("/Users/fionaspooner/Documents/OWID/repos/etl/etl/steps/grapher/malnutrition/2022-10-18/malnutrition.py")
 
 
 def run(dest_dir: str) -> None:
