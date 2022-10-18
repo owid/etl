@@ -26,7 +26,7 @@ def run(dest_dir: str) -> None:
     new_cols = ["number_of_stunted_children", "number_of_underweight_children", "number_of_wasted_children"]
     base_cols = ["country", "year"]
 
-    df_wdi = ds_wdi["wdi"][cols].dropna().reset_index()
+    df_wdi = ds_wdi["wdi"][cols].dropna(subset=cols, how="all").reset_index()
     df_wdi[cols] = (df_wdi[cols].astype(float).round(2)) / 100
 
     # get under-five population data
@@ -40,8 +40,8 @@ def run(dest_dir: str) -> None:
 
     # Join the two datasets
 
-    df_both = df_wdi.merge(df_wpp, left_on=["country", "year"], right_on=["location", "year"], how="inner")
-    df_both[new_cols] = df_both[cols].multiply(df_both["value"], axis="index").astype(int).round(0)
+    df_both = df_wdi.merge(df_wpp, left_on=["country", "year"], right_on=["location", "year"], how="left")
+    df_both[new_cols] = df_both[cols].multiply(df_both["value"], axis="index").round(0).astype("Int64")
     base_cols.extend(new_cols)
     df_num = df_both[base_cols]
     tb_num = catalog.Table(df_num)
@@ -52,7 +52,7 @@ def run(dest_dir: str) -> None:
 
     ds_garden = catalog.Dataset.create_empty(dest_dir)
     # Get the rest of the metadata from the yaml file.
-    ds_garden.metadata.update_from_yaml(METADATA_PATH)
+    ds_garden.metadata.update_from_yaml(METADATA_PATH, if_source_exists="replace")
     # Create dataset.
     ds_garden.save()
     ds_garden.add(tb_num)
