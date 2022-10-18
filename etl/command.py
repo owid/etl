@@ -227,7 +227,9 @@ def run_dag(
 
     if not force:
         print("Detecting which steps need rebuilding...")
+        start_time = time.time()
         steps = select_dirty_steps(steps, workers)
+        click.echo(f"{click.style('OK', fg='blue')} ({time.time() - start_time:.0f}s)")
 
     if not steps:
         print("All datasets up to date!")

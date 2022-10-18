@@ -444,7 +444,13 @@ class WaldenStep(Step):
         self._walden_dataset.ensure_downloaded(quiet=True)
 
     def is_dirty(self) -> bool:
-        return not Path(self._walden_dataset.local_path).exists()
+        if not Path(self._walden_dataset.local_path).exists():
+            return True
+
+        if files.checksum_file(self._walden_dataset.local_path) != self._walden_dataset.md5:
+            return True
+
+        return False
 
     def has_existing_data(self) -> bool:
         return True
