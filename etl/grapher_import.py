@@ -19,12 +19,10 @@ import pandas as pd
 import structlog
 from owid import catalog
 from owid.catalog import utils
-from sqlalchemy import Integer, String
-from sqlmodel import Session, delete, select, update
-from tenacity import retry, stop
+from sqlmodel import Session, select, update
 
 from etl import config
-from etl.db import get_engine, open_db
+from etl.db import open_db
 
 from . import grapher_helpers as gh
 from . import grapher_model as gm
@@ -36,23 +34,13 @@ source_table_lock = Lock()
 
 
 CURRENT_DIR = os.path.dirname(__file__)
-# CURRENT_DIR = os.path.join(os.getcwd(), 'standard_importer')
+
 
 INT_TYPES = (
     "int",
     "uint64",
     "Int64",
 )
-
-# exclude the following datasets from upserting into data_values table as they
-# are too large
-# once we switch to catalogPath, no data will be upserted to data_values
-BLACKLIST_DATASETS_DATA_VALUES_UPSERTS = [
-    "gbd_cause",
-    "gbd_risk",
-    "gbd_prevalence",
-    "gbd_child_mortality",
-]
 
 
 @dataclass
@@ -246,17 +234,6 @@ def upsert_table(
 
         session.commit()
 
-        # delete its data to refresh it later
-        q = delete(gm.DataValues).where(gm.DataValues.variableId == variable.id)
-        session.execute(q)
-        session.commit()
-
-        df = table.rename(columns={column_name: "value", "entity_id": "entityId"}).assign(variableId=variable.id)
-
-    if table.metadata.dataset.short_name not in BLACKLIST_DATASETS_DATA_VALUES_UPSERTS:
-        insert_to_data_values(df)
-        log.info("upsert_table.upserted_data_values", size=len(table))
-
     return VariableUpsertResult(variable.id, source_id)
 
 
@@ -371,26 +348,3 @@ def cleanup_ghost_sources(dataset_id: int, upserted_source_ids: List[int]) -> No
         )
         if db.cursor.rowcount > 0:
             log.warning(f"Deleted {db.cursor.rowcount} ghost sources")
-
-
-@retry(stop=stop.stop_after_attempt(3))
-def insert_to_data_values(df: pd.DataFrame) -> None:
-    """Insert data into data_values table. Retry in case we get Deadlock error."""
-    # value will be converted to string in MySQL, we need to do it beforehand otherwise
-    # it's gonna assume it is float64 and mess up precision for smaller types
-    df.value = df.value.astype(str)
-
-    # insert data to data_values using pandas which is both faster and doesn't raise
-    # deadlocks
-    df.to_sql(
-        "data_values",
-        get_engine(),
-        if_exists="append",
-        index=False,
-        dtype={
-            "value": String(255),
-            "year": Integer(),
-            "entityId": Integer(),
-            "variableId": Integer(),
-        },
-    )

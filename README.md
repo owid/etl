@@ -224,7 +224,9 @@ Example: `etag://raw.githubusercontent.com/owid/covid-19-data/master/public/data
 
 A step to load a dataset from `grapher` channel into the grapher mysql database. This step is not defined in DAG, but is generated dynamically with the `--grapher` flag. The job of this script is to make the input dataset fit the constrained grapher data model where we only have the exact dimensions of year and entity id. The latter is the numeric id of the entity (usually the country) and the former can also be the number of days since a reference date. The dataset from `grapher` channel is re-fitted for the grapher datamodel and the rest is taken care of by the ETL library.
 
-The `.metadata.namespace` field will be used to decide what namespace to upsert this data to (or whether to create this namespace if it does not exist) and the `.metadata.short_name` field will be used to decide what dataset to upsert to (again, this will be created if no dataset with this name in this namespace exists, otherwise the existing dataset will be upserted to). `.metadata.sources` will be used to upsert the entries for the sources table. Tables from the dataset will be upserted as an entry in the variables table and then the data points in the data_values table.
+The `.metadata.namespace` field will be used to decide what namespace to upsert this data to (or whether to create this namespace if it does not exist) and the `.metadata.short_name` field will be used to decide what dataset to upsert to (again, this will be created if no dataset with this name in this namespace exists, otherwise the existing dataset will be upserted to). `.metadata.sources` will be used to upsert the entries for the sources table. Tables from the dataset will be upserted as an entry in the variables table.
+
+The actual data values aren't upserted to mysql, but are loaded from respective parquet files in the grapher channel.
 
 ## Writing a new ETL step
 
@@ -406,3 +408,22 @@ ssh owid-analytics
 cd etl-staging
 .venv/bin/etl garden explorers
 ```
+
+## Local development with Admin
+
+_Internal OWID staff only_
+
+Grapher step writes metadata to mysql and stores data as parquet files in the grapher channel. Admin still uses two ways of loading data - from table `data_values` for manually uploaded datasets and now from bucket `owid-catalog` in S3 (proxied by https://owid-catalog.nyc3.digitaloceanspaces.com/) for ETL datasets.
+
+During local development your data isn't yet in S3 catalog, but is stored in your local catalog. You have to the following env variable to `owid-grapher/.env`
+
+```
+CATALOG_PATH=/path/to/etl/data
+```
+
+
+## Deployment to production
+
+_Internal OWID staff only_
+
+Running `ENV=.env.prod etl mystep --grapher` is not enough to get your dataset into production. Data values in parquet format also need to be published into S3 bucket `owid-catalog`. That happens automatically when you merge to `master` branch. Then you have to run `ENV=.env.prod etl mystep --grapher` as usual (this is gonna be automated soon). If you are only making changes to the metadata and want to test it out, you don't have to merge it and just run `ENV=.env.prod etl mystep --grapher` locally.
