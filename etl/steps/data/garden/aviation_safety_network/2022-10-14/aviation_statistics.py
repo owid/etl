@@ -142,15 +142,13 @@ def run(dest_dir: str) -> None:
     #
     # Save outputs.
     #
+    # Create a new empty garden dataset.
     ds_garden = Dataset.create_empty(dest_dir)
-    ds_garden.metadata = ds_sheet_meadow.metadata
-
+    # Ensure all columns are snake, lower case.
     tb_garden = underscore_table(Table(df_combined))    
-
-    tb_garden.metadata = tb_sheet_meadow.metadata
-
-    ds_garden.metadata.update_from_yaml(N.metadata_path)
+    # Get metadata from yaml file.
+    ds_garden.metadata.update_from_yaml(N.metadata_path, if_source_exists="replace")
     tb_garden.update_metadata_from_yaml(N.metadata_path, "aviation_statistics")
-
+    # Add table to dataset and save dataset.
     ds_garden.add(tb_garden)
     ds_garden.save()

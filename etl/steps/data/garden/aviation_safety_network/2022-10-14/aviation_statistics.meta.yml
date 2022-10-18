@@ -1,4 +1,10 @@
 dataset:
+  namespace: aviation_safety_network
+  version: 2022-10-14
+  title: Fatal aviation accidents and fatalities
+  short_name: aviation_statistics
+  publication_year: 2022
+  publication_date: 2022-10-14
   description: |
     Data on fatal accidents, hijacking incidents and numbers of fatalities are based on airliners of 14+ passengers, and do not include corporate jet and military transport accidents.
     
@@ -9,9 +15,14 @@ dataset:
       published_by: Aviation Safety Network
       publisher_source: |
         Information contained in the Aviation Safety Network database is based on information from official sources (authorities, safety boards).
+      publication_year: 2022
+      date_accessed: 2022-10-14
+      url: "https://aviation-safety.net/statistics/"
     -
-      name: World Bank's World Development Indicators
+      name: World Development Indicators, World Bank
       published_by: World Bank's World Development Indicators
+      publication_year: 2022
+      date_accessed: 2022-05-26
 
 tables:
   aviation_statistics:
