@@ -19,7 +19,7 @@ dataset:
       date_accessed: 2022-10-14
       url: "https://aviation-safety.net/statistics/"
     -
-      name: World Development Indicators, World Bank
+      name: World Bank's World Development Indicators
       published_by: World Bank's World Development Indicators
       publication_year: 2022
       date_accessed: 2022-05-26
