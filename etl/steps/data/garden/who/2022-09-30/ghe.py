@@ -42,7 +42,10 @@ def run(dest_dir: str) -> None:
 def clean_data(df: pd.DataFrame) -> Table:
     df["sex"] = df["sex"].map({"BTSX": "Both sexes", "MLE": "Male", "FMLE": "Female"})
     df = df.set_index(["country", "year", "age_group", "sex", "cause"])
-    df = df.round({"daly_rate100k": 2, "daly_count": 2, "death_rate100k": 2, "death_count": 0})
+    df[["daly_rate100k", "daly_count", "death_rate100k"]] = df[["daly_rate100k", "daly_count", "death_rate100k"]].round(
+        2
+    )
+    df["death_count"] = df["death_count"].round(0)
     df["death_count"] = df["death_count"].astype(int)
     df = underscore_table(Table(df))
     return df

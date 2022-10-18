@@ -120,7 +120,7 @@ def omm_metrics(df: pd.DataFrame) -> Any:
     ]
 
     cols = [c for c in om.columns if c not in ("value", "cause")]
-    gr = om.groupby(cols, observed=True, as_index=False).sum()
+    gr = om.groupby(cols, observed=True, as_index=False).sum(numeric_only=True)
     gr["cause"] = "All forms of violence"
     omms.append(gr)
 
@@ -133,7 +133,7 @@ def omm_metrics(df: pd.DataFrame) -> Any:
         & (df.metric == "Number")
     ]
     cols = [c for c in om.columns if c not in ("value", "cause")]
-    gr = om.groupby(cols, observed=True, as_index=False).sum()
+    gr = om.groupby(cols, observed=True, as_index=False).sum(numeric_only=True)
     gr["cause"] = "All forms of violence"
     omms.append(gr)
 

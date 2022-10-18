@@ -159,9 +159,9 @@ def clean_and_format_data(df: pd.DataFrame) -> pd.DataFrame:
     tb_garden = underscore_table(Table(df))
     cols = tb_garden.drop(["country", "year"], axis=1).columns
 
-    tb_garden.loc[:, cols] = tb_garden.loc[:, cols].astype(float).round(2)
+    tb_garden[cols] = tb_garden[cols].astype(float).round(2)
     # replacing values where x <= 100 is False with None
-    tb_garden.loc[:, cols] = tb_garden.loc[:, cols].where(lambda x: x.le(100), None)
+    tb_garden[cols] = tb_garden[cols].where(lambda x: x.le(100), None)
     # dropping all columns that are only NA
     tb_garden = tb_garden.dropna(axis=1, how="all")
     return cast(pd.DataFrame, tb_garden)
