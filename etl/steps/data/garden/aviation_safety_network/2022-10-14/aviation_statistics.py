@@ -80,10 +80,8 @@ def run(dest_dir: str) -> None:
     sheet_columns = {
         "country": "country",
         "year": "year",
-        "accidents_with_passenger_and_cargo_flights_including_hijacking_etc":
-            "accidents_with_passenger_and_cargo_flights_including_hijacking_etc",
-        "fatalities_with_passenger_and_cargo_flights_including_hijacking_etc":
-            "fatalities_with_passenger_and_cargo_flights_including_hijacking_etc",
+        "accidents_with_passenger_and_cargo_flights_including_hijacking_etc": "accidents_with_passenger_and_cargo_flights_including_hijacking_etc",
+        "fatalities_with_passenger_and_cargo_flights_including_hijacking_etc": "fatalities_with_passenger_and_cargo_flights_including_hijacking_etc",
         # Unused columns:
         # 'accidents_excluding_hijacking_etc',
         # 'accidents_including_hijacking_etc',
