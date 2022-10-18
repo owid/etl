@@ -1154,7 +1154,7 @@ xx = xx.reset_index()
 
 # %%
 # Pivot back
-fe_bulk = xx.pivot(["product", "country", "year"], "metric", "value").astype(fe_bulk.dtypes)
+fe_bulk = xx.pivot(index=["product", "country", "year"], columns="metric", values="value").astype(fe_bulk.dtypes)
 
 # %% [markdown]
 # ## 10. Export
