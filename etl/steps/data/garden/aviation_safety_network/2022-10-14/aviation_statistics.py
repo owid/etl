@@ -11,7 +11,7 @@ from etl.paths import DATA_DIR
 # it seems that its data is incomplete, so we will use both data from the spreadsheet and from their website.
 MEADOW_WEB_DATASET_PATH = DATA_DIR / "meadow/aviation_safety_network/2022-10-12/aviation_statistics"
 MEADOW_SHEET_DATASET_PATH = DATA_DIR / "meadow/aviation_safety_network/2022-10-14/aviation_statistics"
-# Details of ouput dataset.
+# Details of output dataset.
 GARDEN_DATASET_NAME = "aviation_statistics"
 # Get naming conventions.
 N = Names(str(CURRENT_DIR / "aviation_statistics"))
@@ -24,31 +24,6 @@ WDI_COLUMNS = {
     "is_air_dprt": "departures_worldwide",
     "is_air_psgr": "passengers_carried",
 }
-
-
-# +
-# # Match old (from dataset currently in grapher) to new columns.
-# # Required columns that could be well matched to new data.
-# 'Entity': "country",
-# 'Year': "year",
-# 'Fatalities from commercial airliners (ASN)': "fatalities_with_passenger_and_cargo_flights_including_hijacking_etc",
-# 'Fatalities per million passengers (ASN)': "fatalities_per_million_passengers",
-# 'Million passengers per fatality (ASN)': "million_passengers_per_fatality",
-# 'Fatal accidents per million commercial flights (ASN)': "accidents_per_million_flights",
-# 'Fatal accidents from commercial airliners (ASN)': "accidents_with_passenger_and_cargo_flights_including_hijacking_etc",
-# 'Hijacking incidents (ASN)': "hijacking_incidents",
-# 'Fatalties from hijaking incidents (ASN)': "hijacking_fatalities",
-# # Unused columns that could be well matched to new data.
-# 'Fatalities per million flights (ASN)': "fatalities_per_million_flights",
-# 'Passengers per year (World Bank)': "passengers_carried",
-# 'Number of flight departures': "departures_worldwide",
-# 'Million flights per fatal accident (ASN)': "million_flights_per_accident",
-# 'Fatal accidents from passenger-only commercial airliners (ASN)': "accidents_with_passenger_flights_including_hijacking_etc",
-# 'Fatalities from passenger-only commercial airliners (ASN)': "fatalities_with_passenger_flights_including_hijacking_etc",
-# # Unused columns that could not be matched to new data.
-# 'Fatal accidents from commercial and non-commercial airliners (ASN)': "",
-# 'Fatalities from commercial and non-commercial airliners (ASN)': "",
-# -
 
 
 def run(dest_dir: str) -> None:
@@ -88,16 +63,16 @@ def run(dest_dir: str) -> None:
         "hijackings": "hijacking_incidents",
         "hijacking_fatalities": "hijacking_fatalities",
         # Unused columns.
-        # 'airliner_accidents': "airliner_accidents",
-        # 'airliner_fatalities': "airliner_fatalities",
-        # 'cargo': "cargo",
-        # 'charter': "charter",
-        # 'corp__jet_accidents': "corp_jet_accidents",
-        # 'corp__jet_fatalities': "corp_jet_fatalities",
-        # 'domestic_scheduled_passenger': "domestic_scheduled_passenger",
-        # 'ferry__postioning': "ferry_postioning",
-        # 'intl_scheduled_passenger': "international_scheduled_passenger",
-        # 'training': "training",
+        # 'airliner_accidents',
+        # 'airliner_fatalities',
+        # 'cargo',
+        # 'charter',
+        # 'corp__jet_accidents',
+        # 'corp__jet_fatalities',
+        # 'domestic_scheduled_passenger',
+        # 'ferry__postioning',
+        # 'intl_scheduled_passenger',
+        # 'training',
     }
     df_web = df_web[list(web_columns)].rename(columns=web_columns)
 
@@ -105,8 +80,10 @@ def run(dest_dir: str) -> None:
     sheet_columns = {
         "country": "country",
         "year": "year",
-        "accidents_with_passenger_and_cargo_flights_including_hijacking_etc": "accidents_with_passenger_and_cargo_flights_including_hijacking_etc",
-        "fatalities_with_passenger_and_cargo_flights_including_hijacking_etc": "fatalities_with_passenger_and_cargo_flights_including_hijacking_etc",
+        "accidents_with_passenger_and_cargo_flights_including_hijacking_etc":
+            "accidents_with_passenger_and_cargo_flights_including_hijacking_etc",
+        "fatalities_with_passenger_and_cargo_flights_including_hijacking_etc":
+            "fatalities_with_passenger_and_cargo_flights_including_hijacking_etc",
         # Unused columns:
         # 'accidents_excluding_hijacking_etc',
         # 'accidents_including_hijacking_etc',
