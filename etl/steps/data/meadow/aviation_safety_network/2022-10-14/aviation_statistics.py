@@ -46,7 +46,9 @@ def run(dest_dir: str) -> None:
     ds.metadata.version = MEADOW_VERSION
 
     # Create a table with metadata.
-    table_metadata = TableMeta(short_name=MEADOW_DATASET_NAME, title=MEADOW_DATASET_TITLE, description=walden_ds.description)
+    table_metadata = TableMeta(
+        short_name=MEADOW_DATASET_NAME, title=MEADOW_DATASET_TITLE, description=walden_ds.description
+    )
     tb = Table(df, metadata=table_metadata)
 
     # Ensure all columns are snake-case and underscore.
