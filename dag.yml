@@ -94,7 +94,11 @@ steps:
     - backport://backport/owid/latest/dataset_829_food_security__suite_of_food_security_indicators__fao__2017
     - backport://backport/owid/latest/dataset_943_sexual_violence__unicef__2017
     - data://garden/worldbank_wdi/2022-05-26/wdi
-
+  data://grapher/malnutrition/2022-10-18/malnutrition:
+    - data://garden/malnutrition/2022-10-18/malnutrition
+  data://garden/malnutrition/2022-10-18/malnutrition:
+    - data://garden/worldbank_wdi/2022-05-26/wdi
+    - data://meadow/un/2022-07-11/un_wpp
   #
   # IHME - Global Burden of Disease.
   #
