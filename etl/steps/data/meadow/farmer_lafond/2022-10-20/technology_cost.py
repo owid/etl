@@ -16,7 +16,8 @@ N = Names(__file__)
 def run(dest_dir: str) -> None:
     # Load raw data from Walden.
     walden_ds = WaldenCatalog().find_one(
-        namespace="farmer_lafond", short_name="technology_cost", version=WALDEN_VERSION)
+        namespace="farmer_lafond", short_name="technology_cost", version=WALDEN_VERSION
+    )
     local_file = walden_ds.ensure_downloaded()
     df = pd.read_csv(local_file)
 
@@ -38,7 +39,7 @@ def run(dest_dir: str) -> None:
 
     # Underscore all table columns.
     tb = underscore_table(tb)
-    
+
     # Add table to new Meadow dataset and save dataset.
     ds.add(tb)
     ds.save()
