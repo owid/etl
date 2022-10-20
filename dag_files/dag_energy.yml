@@ -146,3 +146,8 @@ steps:
     - data://garden/energy/2022-08-03/electricity_mix
   data://grapher/energy/2022-09-22/uk_historical_electricity:
     - data://garden/energy/2022-09-22/uk_historical_electricity
+  #
+  # IRENA - Renewable power generation costs (2022).
+  #
+  data://meadow/irena/2022-10-20/renewable_power_generation_costs:
+    - walden://irena/2022-10-07/renewable_power_generation_costs
