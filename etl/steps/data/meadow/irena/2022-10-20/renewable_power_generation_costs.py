@@ -1,4 +1,4 @@
-"""Extract data from IRENA's Renewable Power Generation Costs 2021 dataset.
+"""Extract data from IRENA's Renewable Power Generation Costs 2022 dataset.
 
 For the moment, we only extract PV costs.
 
@@ -12,13 +12,14 @@ from owid.walden import Catalog as WaldenCatalog
 
 from etl.helpers import Names
 from etl.steps.data.converters import convert_walden_metadata
+from shared import CURRENT_DIR
 
 # Details of input dataset.
 WALDEN_VERSION = "2022-10-07"
 # Details of output dataset.
 VERSION = "2022-10-20"
 # Get naming conventions.
-N = Names(__file__)
+N = Names(str(CURRENT_DIR / "renewable_power_generation_costs"))
 
 # Photovoltaic technologies to choose for average monthly prices.
 PV_TECHNOLOGIES = ["Thin film a-Si/u-Si or Global Index (from Q4 2013)"]
