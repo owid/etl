@@ -1,6 +1,4 @@
-"""Extract data from IRENA's Renewable Electricity Capacity and Generation 2022 dataset.
-
-For the moment, we only extract PV capacity.
+"""Extract capacity data from IRENA's Renewable Electricity Capacity and Generation 2022 dataset.
 
 """
 
@@ -39,8 +37,18 @@ def prepare_pv_capacity_data(data_file: str) -> pd.DataFrame:
         PV capacity.
 
     """
+    
+
+
+def extract_capacity_from_sheet(excel_object: pd.ExcelFile, sheet_name: str) -> pd.DataFrame:
+    # The name of the energy source is given in the very first cell.
+    # To get that, I load the file, skipping all rows from the bottom.
+    # The first column is the content of the first cell.
+    technology = excel_object.parse(sheet_name, skipfooter=10000).columns[0]
+
     # The format of this dataset is very inconvenient, it required some adjustment that may not work on their next update.
-    df = pd.read_excel(data_file, sheet_name="12", skiprows=4)
+    # df = pd.read_excel(data_file, sheet_name=sheet_name, skiprows=4)
+    df = excel_object.parse(sheet_name, skiprows=4)
 
     # There are two tables put together: One for capacity and one for production.
     # Keep only columns for capacity.
@@ -58,10 +66,30 @@ def prepare_pv_capacity_data(data_file: str) -> pd.DataFrame:
     # Restructure dataframe.
     df = df.melt(id_vars="country", var_name="year", value_name="capacity")
 
-    # Set an appropriate index and sort conveniently.
-    df = df.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
+    # Add technology (referring to the name of the energy source) as a new column.
+    df["technology"] = technology
 
     return cast(pd.DataFrame, df)
+
+
+def extract_capacity_from_all_sheets(data_file: str) -> pd.DataFrame:
+    # Select sheets that contain data (their names are numbers).
+    excel_object = pd.ExcelFile(data_file)
+    sheet_names = [sheet for sheet in excel_object.sheet_names if sheet.isdigit()]
+    
+    # Extract data sheet by sheet.
+    all_data = pd.DataFrame()
+    for sheet_name in sheet_names:
+        data = extract_capacity_from_sheet(excel_object=excel_object, sheet_name=sheet_name)
+        all_data = pd.concat([all_data, data], ignore_index=True)
+
+    # Some rows are repeated (it seems that with identical values, at least for the case found, Uruguay on sheet 18).
+    # Therefore, drop duplicates.
+    # Set an appropriate index and sort conveniently.
+    all_data = all_data.drop_duplicates(subset=["country", "year", "technology"], keep="first").\
+        set_index(["technology", "country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
+
+    return all_data
 
 
 def run(dest_dir: str) -> None:
@@ -71,8 +99,8 @@ def run(dest_dir: str) -> None:
     )
     local_file = walden_ds.ensure_downloaded()
 
-    # Prepare solar photovoltaic capacity data.
-    df = prepare_pv_capacity_data(data_file=local_file)
+    # Extract capacity data.
+    df = extract_capacity_from_all_sheets(data_file=local_file)
 
     # Create a new Meadow dataset and reuse walden metadata.
     ds = Dataset.create_empty(dest_dir)
