@@ -1,9 +1,6 @@
-"""Create a dataset of renewable electricity capacity using IRENA's Renewable electricity capacity and generation dataset.
+"""Create a dataset of renewable electricity capacity using IRENA's Renewable Electricity Capacity and Generation.
 
 """
-
-import json
-from typing import List, cast
 
 import pandas as pd
 from owid.catalog import Dataset, Table
@@ -43,7 +40,7 @@ def run(dest_dir: str) -> None:
 
     # Set an appropriate index and sort conveniently.
     df = df.set_index(["technology", "country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
-    
+
     #
     # Save outputs.
     #

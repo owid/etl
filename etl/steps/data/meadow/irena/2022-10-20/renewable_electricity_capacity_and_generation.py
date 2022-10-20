@@ -8,10 +8,10 @@ import pandas as pd
 from owid.catalog import Dataset, Table, TableMeta
 from owid.catalog.utils import underscore_table
 from owid.walden import Catalog as WaldenCatalog
+from shared import CURRENT_DIR
 
 from etl.helpers import Names
 from etl.steps.data.converters import convert_walden_metadata
-from shared import CURRENT_DIR
 
 # Details of input dataset.
 WALDEN_VERSION = "2022-10-07"
@@ -37,18 +37,16 @@ def prepare_pv_capacity_data(data_file: str) -> pd.DataFrame:
         PV capacity.
 
     """
-    
 
 
 def extract_capacity_from_sheet(excel_object: pd.ExcelFile, sheet_name: str) -> pd.DataFrame:
     # The name of the energy source is given in the very first cell.
     # To get that, I load the file, skipping all rows from the bottom.
     # The first column is the content of the first cell.
-    technology = excel_object.parse(sheet_name, skipfooter=10000).columns[0]
+    technology = excel_object.parse(sheet_name, skipfooter=10000).columns[0]  # type: ignore
 
-    # The format of this dataset is very inconvenient, it required some adjustment that may not work on their next update.
-    # df = pd.read_excel(data_file, sheet_name=sheet_name, skiprows=4)
-    df = excel_object.parse(sheet_name, skiprows=4)
+    # The format of this dataset is inconvenient and requires some adjustment that may not work on the next update.
+    df = excel_object.parse(sheet_name, skiprows=4)  # type: ignore
 
     # There are two tables put together: One for capacity and one for production.
     # Keep only columns for capacity.
@@ -76,7 +74,7 @@ def extract_capacity_from_all_sheets(data_file: str) -> pd.DataFrame:
     # Select sheets that contain data (their names are numbers).
     excel_object = pd.ExcelFile(data_file)
     sheet_names = [sheet for sheet in excel_object.sheet_names if sheet.isdigit()]
-    
+
     # Extract data sheet by sheet.
     all_data = pd.DataFrame()
     for sheet_name in sheet_names:
@@ -86,17 +84,19 @@ def extract_capacity_from_all_sheets(data_file: str) -> pd.DataFrame:
     # Some rows are repeated (it seems that with identical values, at least for the case found, Uruguay on sheet 18).
     # Therefore, drop duplicates.
     # Set an appropriate index and sort conveniently.
-    all_data = all_data.drop_duplicates(subset=["country", "year", "technology"], keep="first").\
-        set_index(["technology", "country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
+    all_data = (
+        all_data.drop_duplicates(subset=["country", "year", "technology"], keep="first")
+        .set_index(["technology", "country", "year"], verify_integrity=True)
+        .sort_index()
+        .sort_index(axis=1)
+    )
 
     return all_data
 
 
 def run(dest_dir: str) -> None:
     # Retrieve raw data from Walden.
-    walden_ds = WaldenCatalog().find_one(
-        namespace="irena", short_name=WALDEN_DATASET_NAME, version=WALDEN_VERSION
-    )
+    walden_ds = WaldenCatalog().find_one(namespace="irena", short_name=WALDEN_DATASET_NAME, version=WALDEN_VERSION)
     local_file = walden_ds.ensure_downloaded()
 
     # Extract capacity data.

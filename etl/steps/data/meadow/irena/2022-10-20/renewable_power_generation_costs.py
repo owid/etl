@@ -9,10 +9,10 @@ import pandas as pd
 from owid.catalog import Dataset, Table, TableMeta
 from owid.catalog.utils import underscore_table
 from owid.walden import Catalog as WaldenCatalog
+from shared import CURRENT_DIR
 
 from etl.helpers import Names
 from etl.steps.data.converters import convert_walden_metadata
-from shared import CURRENT_DIR
 
 # Details of input dataset.
 WALDEN_VERSION = "2022-10-07"
