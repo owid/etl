@@ -1,7 +1,7 @@
 from pathlib import Path
 
 import structlog
-from owid.catalog import Dataset
+from owid.catalog import Dataset, Source
 
 from etl.paths import DATA_DIR
 
@@ -15,6 +15,15 @@ def run(dest_dir: str) -> None:
 
     garden_dataset = Dataset(DATA_DIR / f"garden/{namespace}/{version}/{fname}")
     dataset = Dataset.create_empty(dest_dir, garden_dataset.metadata)
+    # every variable has its own source, dataset source won't be visible anywhere in the admin
+    dataset.metadata.sources = [
+        Source(
+            name="World Bank",
+            url="https://datacatalog.worldbank.org/search/dataset/0037712/World-Development-Indicators",
+            source_data_url="http://databank.worldbank.org/data/download/WDI_csv.zip",
+        )
+    ]
+
     dataset.save()
 
     fname = Path(__file__).stem
