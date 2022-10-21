@@ -39,11 +39,15 @@ def run(dest_dir: str) -> None:
     df = geo.harmonize_countries(df=df, countries_file=COUNTRIES_PATH)
 
     # Reshape dataframe to have each technology as a separate column, and sort conveniently.
-    df = df.pivot(index=["country", "year"], columns=["technology"], values="capacity").rename_axis(None, axis=1).\
-        sort_index().sort_index(axis=1)
+    df = (
+        df.pivot(index=["country", "year"], columns=["technology"], values="capacity")
+        .rename_axis(None, axis=1)
+        .sort_index()
+        .sort_index(axis=1)
+    )
 
     # For convenience, remove parentheses from column names.
-    df = df.rename(columns={column: column.replace('(', '').replace(')', '') for column in df.columns})
+    df = df.rename(columns={column: column.replace("(", "").replace(")", "") for column in df.columns})
 
     #
     # Save outputs.

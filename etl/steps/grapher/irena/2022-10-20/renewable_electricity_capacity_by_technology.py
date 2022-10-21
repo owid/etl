@@ -1,7 +1,5 @@
 from owid import catalog
 
-from etl.helpers import Names
-
 from etl.paths import DATA_DIR
 
 # Details for output dataset.
@@ -38,6 +36,6 @@ def run(dest_dir: str) -> None:
     dataset = catalog.Dataset.create_empty(dest_dir, garden_dataset.metadata)
     dataset.metadata.title = DATASET_TITLE
     dataset.metadata.short_name = DATASET_NAME
-    
+
     dataset.add(table)
     dataset.save()
