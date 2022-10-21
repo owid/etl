@@ -1,6 +1,6 @@
 dataset:
   description: |
-    IRENA publishes detailed statistics on renewable energy capacity, power generation and renewable energy balances. This data is collected directly from members using the IRENA Renewable Energy Statistics questionnaire and is also supplemented by desk research where official statistics are not available. Renewable power-generation capacity statistics are released annually in March. Additionally, renewable power generation and renewable energy balances data sets are released in July.
+    IRENA publishes detailed statistics on renewable energy capacity, power generation and renewable energy balances. This data is collected directly from members using the IRENA Renewable Energy Statistics questionnaire and is also supplemented by desk research where official statistics are not available.
 
     Pumped storage is included under the "Hydropower" category but not in the "Total renewable energy". Generation from mixed plants is split between hydropower and pumped storage as appropriate.
 
