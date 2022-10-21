@@ -92,7 +92,7 @@ def add_world(df: pd.DataFrame) -> pd.DataFrame:
     df_ = (
         df_[(df_["country"].isin(continents)) & (df_.year < year_threshold)]
         .groupby("year", as_index=False)["population"]
-        .sum()
+        .sum(numeric_only=True)
         .assign(country="World")
     )
     df = pd.concat([df, df_], ignore_index=True).sort_values(["country", "year"])
