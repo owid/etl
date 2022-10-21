@@ -34,6 +34,7 @@ class CannotPublish(Exception):
 @click.command()
 @click.option("--dry-run", is_flag=True, default=False)
 @click.option("--private", is_flag=True, default=False)
+@click.option("--r2", is_flag=True, default=False, help="Publish to R2")
 @click.option("--bucket", type=str, help="Bucket name", default=config.S3_BUCKET)
 @click.option(
     "--channel",
@@ -43,12 +44,13 @@ class CannotPublish(Exception):
     default=CHANNEL.__args__,
     help="Publish only selected channel (subfolder of data/), push all by default",
 )
-def publish_cli(dry_run: bool, private: bool, bucket: str, channel: Iterable[CHANNEL]) -> None:
+def publish_cli(dry_run: bool, private: bool, r2: bool, bucket: str, channel: Iterable[CHANNEL]) -> None:
     """
     Publish the generated data catalog to S3.
     """
     return publish(
         dry_run=dry_run,
+        r2=r2,
         private=private,
         bucket=bucket,
         channel=channel,
@@ -57,6 +59,7 @@ def publish_cli(dry_run: bool, private: bool, bucket: str, channel: Iterable[CHA
 
 def publish(
     dry_run: bool = False,
+    r2: bool = False,
     private: bool = False,
     bucket: str = config.S3_BUCKET,
     channel: Iterable[CHANNEL] = CHANNEL.__args__,
@@ -70,7 +73,7 @@ def publish(
         sanity_checks(catalog, channel=c)
 
     for c in channel:
-        sync_catalog_to_s3(bucket, catalog, channel=c, dry_run=dry_run)
+        sync_catalog_to_s3(bucket, catalog, channel=c, dry_run=dry_run, r2=r2)
 
 
 def sanity_checks(catalog: Path, channel: CHANNEL) -> None:
@@ -83,16 +86,16 @@ def sanity_checks(catalog: Path, channel: CHANNEL) -> None:
             sys.exit(1)
 
 
-def sync_catalog_to_s3(bucket: str, catalog: Path, channel: CHANNEL, dry_run: bool = False) -> None:
-    s3 = connect_s3()
+def sync_catalog_to_s3(bucket: str, catalog: Path, channel: CHANNEL, dry_run: bool = False, r2: bool = False) -> None:
+    s3 = connect_s3(r2=r2)
     if is_catalog_up_to_date(s3, bucket, catalog, channel):
         print(f"Catalog's channel {channel} is up to date!")
         return
 
     print(f"Syncing datasets from channel {channel}")
-    sync_datasets(s3, bucket, catalog, channel, dry_run=dry_run)
+    sync_datasets(s3, bucket, catalog, channel, dry_run=dry_run, r2=r2)
     if not dry_run:
-        update_catalog(s3, bucket, catalog, channel)
+        update_catalog(s3, bucket, catalog, channel, r2=r2)
 
 
 def is_catalog_up_to_date(s3: Any, bucket: str, catalog: Path, channel: CHANNEL) -> bool:
@@ -105,7 +108,9 @@ def is_catalog_up_to_date(s3: Any, bucket: str, catalog: Path, channel: CHANNEL)
     return remote == local
 
 
-def sync_datasets(s3: Any, bucket: str, catalog: Path, channel: CHANNEL, dry_run: bool = False) -> None:
+def sync_datasets(
+    s3: Any, bucket: str, catalog: Path, channel: CHANNEL, dry_run: bool = False, r2: bool = False
+) -> None:
     "Go dataset by dataset and check if each one needs updating."
     existing = get_published_checksums(bucket, channel)
 
@@ -127,13 +132,18 @@ def sync_datasets(s3: Any, bucket: str, catalog: Path, channel: CHANNEL, dry_run
 
         print("-", path)
         if not dry_run:
-            sync_folder(s3, bucket, catalog, catalog / path, path, public=ds.metadata.is_public)
+            sync_folder(s3, bucket, catalog, catalog / path, path, public=ds.metadata.is_public, r2=r2)
 
     print("Datasets to delete:")
     for path in to_delete:
         print("-", path)
         if not dry_run:
             delete_dataset(s3, bucket, path)
+
+
+def _upload_file(s3, *args, **kwargs):
+    print(f"UPLOAD {args[0]}")
+    return s3.upload_file(*args, **kwargs)
 
 
 def sync_folder(
@@ -144,17 +154,21 @@ def sync_folder(
     dest_path: str,
     delete: bool = True,
     public: bool = True,
+    r2: bool = False,
 ) -> None:
     """
     Perform a content-based sync of a local folder with a "folder" on an S3 bucket,
     by comparing checksums and only uploading files that have changed.
     """
+    if r2 and not public:
+        raise NotImplementedError("Private datasets on R2 are not supported yet")
+
     existing = {o["Key"]: object_md5(s3, bucket, o["Key"], o) for o in walk_s3(s3, bucket, dest_path)}
 
     # some datasets like `open_numbers/open_numbers/latest/gapminder__gapminder_world`
     # have huge number of tables, upload them in parallel
     futures = []
-    with concurrent.futures.ThreadPoolExecutor() as executor:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
         for filename in files.walk(local_folder):
             checksum = files.checksum_file(filename)
             rel_filename = filename.relative_to(catalog).as_posix()
@@ -164,16 +178,27 @@ def sync_folder(
             if checksum != existing_checksum:
                 print("  PUT", rel_filename)
                 ExtraArgs: Dict[str, Any] = {"Metadata": {"md5": checksum}}
-                if public:
+
+                # R2 doesn't support public access
+                if public and not r2:
                     ExtraArgs["ACL"] = "public-read"
+
                 futures.append(
                     executor.submit(
-                        s3.upload_file,
+                        _upload_file,
+                        s3,
                         filename.as_posix(),
                         bucket,
                         rel_filename,
                         ExtraArgs=ExtraArgs,
                     )
+                    # executor.submit(
+                    #     s3.upload_file,
+                    #     filename.as_posix(),
+                    #     bucket,
+                    #     rel_filename,
+                    #     ExtraArgs=ExtraArgs,
+                    # )
                 )
 
             if rel_filename in existing:
@@ -199,11 +224,11 @@ def object_md5(s3: Any, bucket: str, key: str, obj: Dict[str, Any]) -> Optional[
 
 
 def walk_s3(s3: Any, bucket: str, path: str) -> Iterator[Dict[str, Any]]:
-    objs = s3.list_objects(Bucket=bucket, Prefix=path)
+    objs = s3.list_objects_v2(Bucket=bucket, Prefix=path)
     yield from objs.get("Contents", [])
 
     while objs["IsTruncated"]:
-        objs = s3.list_objects(Bucket=bucket, Prefix=path, Marker=objs["NextMarker"])
+        objs = s3.list_objects_v2(Bucket=bucket, Prefix=path, ContinuationToken=objs["NextContinuationToken"])
         yield from objs.get("Contents", [])
 
 
@@ -218,21 +243,27 @@ def delete_dataset(s3: Any, bucket: str, relative_path: str) -> None:
         to_delete = to_delete[1000:]
 
 
-def update_catalog(s3: Any, bucket: str, catalog: Path, channel: CHANNEL) -> None:
+def update_catalog(s3: Any, bucket: str, catalog: Path, channel: CHANNEL, r2: bool = False) -> None:
+    # r2 does not support public-read yet
+    if r2:
+        ExtraArgs = None
+    else:
+        ExtraArgs = {"ACL": "public-read"}
+
     for format in INDEX_FORMATS:
         catalog_filename = catalog / _channel_path(channel, format)
         s3.upload_file(
             catalog_filename.as_posix(),
             bucket,
             _channel_path(channel, format).as_posix(),
-            ExtraArgs={"ACL": "public-read"},
+            ExtraArgs=ExtraArgs,
         )
 
     s3.upload_file(
         (catalog / "catalog.meta.json").as_posix(),
         bucket,
         "catalog.meta.json",
-        ExtraArgs={"ACL": "public-read"},
+        ExtraArgs=ExtraArgs,
     )
 
 
@@ -262,17 +293,27 @@ def get_remote_checksum(s3: Any, bucket: str, path: str) -> Optional[str]:
     return object_md5(s3, bucket, path, obj)
 
 
-def connect_s3(s3_config: Optional[Config] = None) -> Any:
+def connect_s3(s3_config: Optional[Config] = None, r2=False) -> Any:
     # TODO: use https://github.com/owid/data-utils-py/blob/main/owid/datautils/io/s3.py
     session = boto3.Session()
-    return session.client(
-        "s3",
-        region_name=config.S3_REGION_NAME,
-        endpoint_url=config.S3_ENDPOINT_URL,
-        aws_access_key_id=config.S3_ACCESS_KEY,
-        aws_secret_access_key=config.S3_SECRET_KEY,
-        config=s3_config,
-    )
+    if r2:
+        return session.client(
+            "s3",
+            region_name=config.R2_REGION_NAME,
+            endpoint_url=config.R2_ENDPOINT_URL,
+            aws_access_key_id=config.R2_ACCESS_KEY,
+            aws_secret_access_key=config.R2_SECRET_KEY,
+            config=s3_config,
+        )
+    else:
+        return session.client(
+            "s3",
+            region_name=config.S3_REGION_NAME,
+            endpoint_url=config.S3_ENDPOINT_URL,
+            aws_access_key_id=config.S3_ACCESS_KEY,
+            aws_secret_access_key=config.S3_SECRET_KEY,
+            config=s3_config,
+        )
 
 
 @lru_cache(maxsize=None)

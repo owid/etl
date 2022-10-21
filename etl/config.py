@@ -30,6 +30,13 @@ S3_HOST = "nyc3.digitaloceanspaces.com"
 S3_ACCESS_KEY = env.get("OWID_ACCESS_KEY")
 S3_SECRET_KEY = env.get("OWID_SECRET_KEY")
 
+# publishing to R2 public data catalog
+R2_REGION_NAME = "auto"
+R2_ENDPOINT_URL = env.get("R2_ENDPOINT_URL")
+R2_HOST = "TODO"
+R2_ACCESS_KEY = env.get("R2_ACCESS_KEY")
+R2_SECRET_KEY = env.get("R2_SECRET_KEY")
+
 # publishing to grapher's MySQL db
 GRAPHER_USER_ID = env.get("GRAPHER_USER_ID")
 DB_NAME = env.get("DB_NAME", "grapher")
