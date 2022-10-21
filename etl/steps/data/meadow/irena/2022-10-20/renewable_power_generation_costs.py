@@ -1,4 +1,8 @@
-"""Extract weighted average LCOE for all energy sources from IRENA's Renewable Power Generation Costs 2022 dataset.
+"""Extract global (weighted-average) levelized cost of electricity (LCOE) for all energy sources from IRENA's Renewable
+Power Generation Costs 2022 dataset.
+
+NOTE: The original data is poorly formatted. Each energy source is given as a separate sheet, with a different
+structure. So it's likely that, on the next update, this script will not work.
 
 """
 
@@ -20,8 +24,6 @@ VERSION = "2022-10-20"
 # Get naming conventions.
 N = Names(str(CURRENT_DIR / "renewable_power_generation_costs"))
 
-
-# +
 # It's unclear if this data will be used. If so, it could be a separate table.
 # def prepare_pv_data(data_file: str) -> pd.DataFrame:
 #     """Prepare yearly data on solar photovoltaic costs.
@@ -73,53 +75,80 @@ N = Names(str(CURRENT_DIR / "renewable_power_generation_costs"))
 #     pv_prices = pv_prices.set_index(["technology", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
 
 #     return cast(pd.DataFrame, pv_prices)
-# -
+
 
 def extract_cost_for_all_sources_from_excel_file(local_file: str) -> pd.DataFrame:
+    """Extract global weighted-average LCOE of all energy sources from the excel file.
+
+    Each energy source is given in a separate sheet, in a different way, to each needs a different treatment.
+
+    Parameters
+    ----------
+    local_file : str
+        Path to excel file with raw data.
+
+    Returns
+    -------
+    df : pd.DataFrame
+        LCOE for different energy sources.
+    """
     # Load file as an excel object.
     excel_object = pd.ExcelFile(local_file)
 
-    # Extract weighted average LCOE for different sources:
+    # Extract weighted average LCOE for different sources (each one requires a slightly different processing):
 
     # Solar photovoltaic.
-    solar_pv = excel_object.parse("Fig 3.1", skiprows=22).dropna(how="all", axis=1).\
-        rename(columns={"Unnamed: 1": "temp"})
-    solar_pv = solar_pv[solar_pv["temp"] == "Weighted average"].melt(id_vars="temp", var_name="year", value_name="cost")[["year", "cost"]]
+    solar_pv = (
+        excel_object.parse("Fig 3.1", skiprows=22).dropna(how="all", axis=1).rename(columns={"Unnamed: 1": "temp"})  # type: ignore
+    )
+    solar_pv = solar_pv[solar_pv["temp"] == "Weighted average"].melt(
+        id_vars="temp", var_name="year", value_name="cost"
+    )[["year", "cost"]]
     solar_pv["technology"] = "Solar photovoltaic"
 
     # Onshore wind.
-    onshore_wind = excel_object.\
-        parse("Fig 2.12", skiprows=3, usecols=lambda column: "Unnamed" not in column).\
-        rename(columns={"Year": "year", "Weighted average": "cost"})
+    onshore_wind = excel_object.parse("Fig 2.12", skiprows=3, usecols=lambda column: "Unnamed" not in column).rename(  # type: ignore
+        columns={"Year": "year", "Weighted average": "cost"}
+    )
     onshore_wind["technology"] = "Onshore wind"
 
     # Concentrated solar power.
-    csp = excel_object.parse("Fig 5.7", skiprows=4).dropna(how="all", axis=1)
-    csp = csp[csp["2021 USD/kWh"]=="Weighted average"].melt(id_vars="2021 USD/kWh", var_name="year", value_name="cost")[["year", "cost"]].reset_index(drop=True)
+    csp = excel_object.parse("Fig 5.7", skiprows=4).dropna(how="all", axis=1)  # type: ignore
+    csp = (
+        csp[csp["2021 USD/kWh"] == "Weighted average"]
+        .melt(id_vars="2021 USD/kWh", var_name="year", value_name="cost")[["year", "cost"]]
+        .reset_index(drop=True)
+    )
     csp["technology"] = "Concentrated solar power"
 
     # Offshore wind.
-    offshore_wind = excel_object.parse("Fig 4.13", skiprows=3).\
-        rename(columns={"Year": "year", "Weighted average": "cost"})[["year", "cost"]]
+    offshore_wind = excel_object.parse("Fig 4.13", skiprows=3).rename(  # type: ignore
+        columns={"Year": "year", "Weighted average": "cost"}
+    )[["year", "cost"]]
     offshore_wind["technology"] = "Offshore wind"
 
     # Geothermal.
-    geothermal = excel_object.parse("Fig 7.4", skiprows=5).\
-        rename(columns={"Year": "year", "Weighted average": "cost"})[["year", "cost"]]
+    geothermal = excel_object.parse("Fig 7.4", skiprows=5).rename(columns={"Year": "year", "Weighted average": "cost"})[  # type: ignore
+        ["year", "cost"]
+    ]
     geothermal["technology"] = "Geothermal"
 
     # Bioenergy.
-    bioenergy = excel_object.parse("Fig 8.1", skiprows=20).dropna(axis=1, how="all").\
-        rename(columns={"Unnamed: 1": "temp"})
-    bioenergy = bioenergy[bioenergy["temp"] =="Weighted average"].\
-        melt(id_vars="temp", var_name="year", value_name="cost")[["year", "cost"]]
+    bioenergy = (
+        excel_object.parse("Fig 8.1", skiprows=20).dropna(axis=1, how="all").rename(columns={"Unnamed: 1": "temp"})  # type: ignore
+    )
+    bioenergy = bioenergy[bioenergy["temp"] == "Weighted average"].melt(
+        id_vars="temp", var_name="year", value_name="cost"
+    )[["year", "cost"]]
     bioenergy["technology"] = "Bioenergy"
 
     # Hydropower.
-    hydropower = excel_object.parse("Fig 6.1", skiprows=20).dropna(how="all", axis=1).\
-        rename(columns={"Unnamed: 1": "temp"})
-    hydropower = hydropower[hydropower["temp"] == "Weighted average"].\
-        melt(id_vars="temp", var_name="year", value_name="cost")[["year", "cost"]]
+    hydropower = (
+        excel_object.parse("Fig 6.1", skiprows=20).dropna(how="all", axis=1).rename(columns={"Unnamed: 1": "temp"})  # type: ignore
+    )
+    hydropower = hydropower[hydropower["temp"] == "Weighted average"].melt(
+        id_vars="temp", var_name="year", value_name="cost"
+    )[["year", "cost"]]
     hydropower["technology"] = "Hydropower"
 
     # Concatenate all sources into one dataframe.
@@ -128,7 +157,7 @@ def extract_cost_for_all_sources_from_excel_file(local_file: str) -> pd.DataFram
     # Set an appropriate index and sort conveniently.
     df = df.set_index(["technology", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
 
-    return df
+    return cast(pd.DataFrame, df)
 
 
 def run(dest_dir: str) -> None:
@@ -137,8 +166,8 @@ def run(dest_dir: str) -> None:
         namespace="irena", short_name="renewable_power_generation_costs", version=WALDEN_VERSION
     )
     local_file = walden_ds.ensure_downloaded()
-    
-    # Extract weighted average LCOE cost for all energy sources.
+
+    # Extract weighted-average LCOE cost for all energy sources.
     df = extract_cost_for_all_sources_from_excel_file(local_file=local_file)
 
     # Create a new Meadow dataset and reuse walden metadata.
