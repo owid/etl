@@ -188,8 +188,6 @@ def extract_country_cost_from_excel_file(local_file: str) -> pd.DataFrame:
     # Last column is the difference between the cost in the last two years. Remove that column.
     solar_pv = solar_pv.drop(columns="2020-2021")
 
-    solar_pv["technology"] = "Solar photovoltaic"
-
     # Onshore wind.
     onshore_wind = (
         excel_object.parse("Fig 2.13", skiprows=6).dropna(how="all", axis=1).rename(columns={"Country": "country"})  # type: ignore
