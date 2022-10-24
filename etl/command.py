@@ -16,8 +16,8 @@ from ipdb import launch_ipdb_on_exception
 from owid.walden import CATALOG as WALDEN_CATALOG
 from owid.walden import Catalog as WaldenCatalog
 
-from etl import config
-from etl.steps import DAG, compile_steps, load_dag, paths, select_dirty_steps
+from etl import config, paths
+from etl.steps import DAG, compile_steps, load_dag, select_dirty_steps
 
 config.enable_bugsnag()
 
