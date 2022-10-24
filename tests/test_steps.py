@@ -100,7 +100,7 @@ def test_dependency_filtering():
 @patch("etl.steps.parse_step")
 def test_selection_selects_parents(parse_step):
     "When you pick a step, it should select everything that step depends on."
-    parse_step.side_effect = lambda name, _: DummyStep(name)
+    parse_step.side_effect = lambda name, _: DummyStep(name)  # type: ignore
 
     dag = {"a": ["b"], "d": ["a"], "c": ["a"]}
 
@@ -140,7 +140,7 @@ def test_backport_step_private(mock_create_dataset):
 
 def test_select_dirty_steps():
     """select_dirty_steps should only select dirty steps, this can be tricky when using threads"""
-    steps = [DummyStep(f"{i}") for i in range(20)]
+    steps = [DummyStep(f"{i}") for i in range(20)]  # type: ignore
     for s in steps:
         if random.random() < 0.5:
             s.is_dirty = lambda: False  # type: ignore
