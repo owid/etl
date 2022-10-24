@@ -1,5 +1,5 @@
-"""Extract global (weighted-average) levelized cost of electricity (LCOE) for all energy sources from IRENA's Renewable
-Power Generation Costs 2022 dataset.
+"""Extract global (as well as at the country level for some countries) weighted-average levelized cost of electricity
+(LCOE) for all energy sources from IRENA's Renewable Power Generation Costs 2022 dataset.
 
 NOTE: The original data is poorly formatted. Each energy source is given as a separate sheet, with a different
 structure. So it's likely that, on the next update, this script will not work.
@@ -77,7 +77,7 @@ N = Names(str(CURRENT_DIR / "renewable_power_generation_costs"))
 #     return cast(pd.DataFrame, pv_prices)
 
 
-def extract_cost_for_all_sources_from_excel_file(local_file: str) -> pd.DataFrame:
+def extract_global_cost_for_all_sources_from_excel_file(local_file: str) -> pd.DataFrame:
     """Extract global weighted-average LCOE of all energy sources from the excel file.
 
     Each energy source is given in a separate sheet, in a different way, to each needs a different treatment.
@@ -154,10 +154,57 @@ def extract_cost_for_all_sources_from_excel_file(local_file: str) -> pd.DataFram
     # Concatenate all sources into one dataframe.
     df = pd.concat([solar_pv, onshore_wind, csp, offshore_wind, geothermal, bioenergy, hydropower], ignore_index=True)
 
-    # Set an appropriate index and sort conveniently.
-    df = df.set_index(["technology", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
+    # Add country column.
+    df["country"] = "World"
 
     return cast(pd.DataFrame, df)
+
+
+def extract_country_cost_from_excel_file(local_file: str) -> pd.DataFrame:
+    """Extract weighted-average LCOE of certain countries and certain energy sources from the excel file.
+
+    Only onshore wind and solar photovoltaic seem to have this data, and only for specific countries.
+
+    Parameters
+    ----------
+    local_file : str
+        Path to excel file with raw data.
+
+    Returns
+    -------
+    df : pd.DataFrame
+        LCOE for different energy sources.
+    """
+    # Extract LCOE for specific countries and technologies (those that are available in original data).
+
+    # Load file as an excel object.
+    excel_object = pd.ExcelFile(local_file)
+
+    # Solar photovoltaic.
+    solar_pv = excel_object.parse("Fig 3.8", skiprows=5).dropna(how="all", axis=1).\
+        rename(columns={"2021 USD/kWh": "country"})
+
+    # Last column is the difference between the cost in the last two years. Remove that column.
+    solar_pv = solar_pv.drop(columns="2020-2021")
+
+    solar_pv["technology"] = "Solar photovoltaic"
+
+    # Onshore wind.
+    onshore_wind = excel_object.parse("Fig 2.13", skiprows=6).dropna(how="all", axis=1).\
+        rename(columns={"Country": "country"})
+
+    # Country column is repeated. Drop it, and drop column of percentage decrease.
+    onshore_wind = onshore_wind.drop(columns=["Country.1", "% decrease "])
+
+    # Add a technology column and concatenate different technologies.
+    solar_pv["technology"] = "Solar photovoltaic"
+    onshore_wind["technology"] = "Onshore wind"
+    combined = pd.concat([solar_pv, onshore_wind], ignore_index=True)
+
+    # Rearrange dataframe to have year as a column.
+    combined = combined.melt(id_vars=["technology", "country"], var_name="year", value_name="cost")
+
+    return combined
 
 
 def run(dest_dir: str) -> None:
@@ -167,8 +214,17 @@ def run(dest_dir: str) -> None:
     )
     local_file = walden_ds.ensure_downloaded()
 
-    # Extract weighted-average LCOE cost for all energy sources.
-    df = extract_cost_for_all_sources_from_excel_file(local_file=local_file)
+    # Extract global, weighted-average LCOE cost for all energy sources.
+    costs_global = extract_global_cost_for_all_sources_from_excel_file(local_file=local_file)
+
+    # Extract national LCOE for specific countries and technologies.
+    costs_national = extract_country_cost_from_excel_file(local_file=local_file)
+
+    # Combine global and national data.
+    combined = pd.concat([costs_global, costs_national], ignore_index=True)
+
+    # Set an appropriate index and sort conveniently.
+    combined = combined.set_index(["technology", "country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
 
     # Create a new Meadow dataset and reuse walden metadata.
     ds = Dataset.create_empty(dest_dir)
@@ -181,7 +237,7 @@ def run(dest_dir: str) -> None:
         title=walden_ds.name,
         description=walden_ds.description,
     )
-    tb = Table(df, metadata=table_metadata)
+    tb = Table(combined, metadata=table_metadata)
 
     # Underscore all table columns.
     tb = underscore_table(tb)
