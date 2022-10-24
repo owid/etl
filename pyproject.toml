@@ -61,7 +61,7 @@ awscli = "^1.25.79"
 [tool.poetry.dev-dependencies]
 pytest = "^7.1.2"
 black = {version = "^22.3.0", extras = ["jupyter"]}
-mypy = "^0.910"
+mypy = "^0.982"
 flake8 = "^3.9.2"
 watchdog = "^2.1.5"
 PyYAML = "^5.4.1"
