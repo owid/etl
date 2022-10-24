@@ -181,8 +181,9 @@ def extract_country_cost_from_excel_file(local_file: str) -> pd.DataFrame:
     excel_object = pd.ExcelFile(local_file)
 
     # Solar photovoltaic.
-    solar_pv = excel_object.parse("Fig 3.8", skiprows=5).dropna(how="all", axis=1).\
-        rename(columns={"2021 USD/kWh": "country"})
+    solar_pv = (
+        excel_object.parse("Fig 3.8", skiprows=5).dropna(how="all", axis=1).rename(columns={"2021 USD/kWh": "country"})  # type: ignore
+    )
 
     # Last column is the difference between the cost in the last two years. Remove that column.
     solar_pv = solar_pv.drop(columns="2020-2021")
@@ -190,8 +191,9 @@ def extract_country_cost_from_excel_file(local_file: str) -> pd.DataFrame:
     solar_pv["technology"] = "Solar photovoltaic"
 
     # Onshore wind.
-    onshore_wind = excel_object.parse("Fig 2.13", skiprows=6).dropna(how="all", axis=1).\
-        rename(columns={"Country": "country"})
+    onshore_wind = (
+        excel_object.parse("Fig 2.13", skiprows=6).dropna(how="all", axis=1).rename(columns={"Country": "country"})  # type: ignore
+    )
 
     # Country column is repeated. Drop it, and drop column of percentage decrease.
     onshore_wind = onshore_wind.drop(columns=["Country.1", "% decrease "])
@@ -204,7 +206,7 @@ def extract_country_cost_from_excel_file(local_file: str) -> pd.DataFrame:
     # Rearrange dataframe to have year as a column.
     combined = combined.melt(id_vars=["technology", "country"], var_name="year", value_name="cost")
 
-    return combined
+    return cast(pd.DataFrame, combined)
 
 
 def run(dest_dir: str) -> None:

@@ -4,7 +4,6 @@ from owid.catalog.utils import underscore_table
 from owid.datautils import geo
 
 from etl.helpers import Names
-from etl.paths import DATA_DIR
 
 # Get naming conventions.
 N = Names(__file__)
@@ -34,7 +33,7 @@ def run(dest_dir: str) -> None:
     # Ensure all columns are snake, lower case.
     tb_garden = underscore_table(Table(df))
 
-    # Load metadata from yaml file.    
+    # Load metadata from yaml file.
     ds_garden.metadata.update_from_yaml(N.metadata_path, if_source_exists="append")
     tb_garden.update_metadata_from_yaml(N.metadata_path, ds_meadow.table_names[0])
 
