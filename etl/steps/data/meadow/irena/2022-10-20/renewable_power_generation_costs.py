@@ -221,10 +221,16 @@ def run(dest_dir: str) -> None:
     costs_national = extract_country_cost_from_excel_file(local_file=local_file)
 
     # Combine global and national data.
-    combined = pd.concat([costs_global, costs_national], ignore_index=True)
+    combined = pd.concat([costs_global, costs_national], ignore_index=True).astype({"year": int})
+
+    # Convert from long to wide format.
+    combined = combined.pivot(index=["country", "year"], columns="technology", values="cost").reset_index()
+
+    # Remove name of dummy index.
+    combined.columns.names = [None]
 
     # Set an appropriate index and sort conveniently.
-    combined = combined.set_index(["technology", "country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
+    combined = combined.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
 
     # Create a new Meadow dataset and reuse walden metadata.
     ds = Dataset.create_empty(dest_dir)
