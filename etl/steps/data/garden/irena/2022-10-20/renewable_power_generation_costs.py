@@ -32,7 +32,7 @@ def run(dest_dir: str) -> None:
     ds_garden = Dataset.create_empty(dest_dir)
 
     # Ensure all columns are snake, lower case.
-    tb_garden = underscore_table(tb_meadow)
+    tb_garden = underscore_table(Table(df))
 
     # Load metadata from yaml file.    
     ds_garden.metadata.update_from_yaml(N.metadata_path, if_source_exists="append")
