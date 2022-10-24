@@ -1,0 +1,23 @@
+dataset:
+  namespace: irena
+  name: Renewable Power Generation Costs
+  short_name: renewable_power_generation_costs
+  publication_year: 2022
+  publication_date: 2022-07-01
+  version: 2022-10-20
+  sources:
+    -
+      name: International Renewable Energy Agency (IRENA)
+      published_by: © 2022 by International Renewable Energy Agency (IRENA)
+      url: https://irena.org/publications/2022/Jul/Renewable-Power-Generation-Costs-in-2021
+
+tables:
+  renewable_power_generation_costs:
+    variables:
+      cost:
+        title: Renewable energy cost
+        short_unit: $
+        unit: 2021 $/kWh
+        description: 
+        display:
+          numDecimalPlaces: 0
