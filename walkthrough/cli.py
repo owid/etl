@@ -26,7 +26,12 @@ PHASES = Literal["walden", "meadow", "garden", "grapher"]
     is_flag=True,
     help="Prefill form with dummy data, useful for development",
 )
-def cli(phase: Iterable[PHASES], run_checks: bool, dummy_data: bool) -> None:
+@click.option(
+    "--auto-open/--no-auto-open",
+    is_flag=True,
+    help="Auto open browser on port 8082",
+)
+def cli(phase: Iterable[PHASES], run_checks: bool, dummy_data: bool, auto_open: bool) -> None:
     print("Walkthrough has been opened at http://localhost:8082/")
     if phase == "walden":
         phase_func = walden.app
@@ -43,7 +48,7 @@ def cli(phase: Iterable[PHASES], run_checks: bool, dummy_data: bool) -> None:
         lambda: phase_func(run_checks=run_checks, dummy_data=dummy_data),
         port=8082,
         debug=True,
-        auto_open_webbrowser=True,
+        auto_open_webbrowser=auto_open,
     )
 
 
