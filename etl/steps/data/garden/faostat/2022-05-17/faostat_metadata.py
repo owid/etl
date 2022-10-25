@@ -941,7 +941,7 @@ def run(dest_dir: str) -> None:
     custom_items = pd.read_csv(custom_items_file, dtype=str)
 
     # Load countries file.
-    countries_harmonization = io.local.load_json(countries_file)
+    countries_harmonization = io.load_json(countries_file)
 
     countries_df, datasets_df, elements_df, items_df = process_metadata(
         metadata=metadata,
