@@ -8,6 +8,19 @@ from etl.helpers import Names
 # Get naming conventions.
 N = Names(__file__)
 
+# Mapping of names for technologies (as well as solar sub-technologies).
+TECHNOLOGIES_RENAMING = {
+    "Bioenergy": "bioenergy",
+    "Enabling Technologies": "other",
+    "Geothermal Energy": "geothermal",
+    "Hydropower": "hydropower",
+    "Ocean Energy": "marine",
+    "PV": "solar_photovoltaic",
+    "Solar Thermal": "solar_thermal",
+    "PV - Thermal Hybrid": "solar_photovoltaic_and_thermal_hybrid",
+    "Wind Energy": "wind",
+}
+
 
 def run(dest_dir: str) -> None:
     #
@@ -25,8 +38,32 @@ def run(dest_dir: str) -> None:
     #
     df = geo.harmonize_countries(df=df, countries_file=N.country_mapping_path)
 
+    # Include solar sub-technologies as technologies.
+    solar_mask = df["technology"] == "Solar Energy"
+    df = df.astype({"technology": str})
+    df.loc[solar_mask, "technology"] = df[solar_mask]["sub_technology"]
+
+    # Simplify table to keep only number of patents for each technology (ignoring sector and sub_technology).
+    df = df.groupby(["country", "year", "technology"]).agg({"patents": "sum"}).reset_index()
+
+    # Create a dataframe of global count of patents.
+    global_patents = df.groupby(["year", "technology"]).agg({"patents": "sum"}).reset_index()
+    global_patents["country"] = "World"
+
+    # Add global count of patents to original dataframe.
+    df = pd.concat([df, global_patents], ignore_index=True)
+
+    # Change from long to wide format dataframe.
+    df = df.pivot(index=["country", "year"], columns="technology", values="patents").reset_index()
+
+    # Remove name of dummy index.
+    df.columns.names = [None]
+
+    # Rename columns conveniently.
+    df = df.rename(columns=TECHNOLOGIES_RENAMING, errors="raise")
+
     # Set an appropriate index and sort conveniently.
-    df = df.set_index(["country", "year", "sector", "technology", "sub_technology"], verify_integrity=True).sort_index()
+    df = df.set_index(["country", "year"], verify_integrity=True).sort_index()
 
     #
     # Save outputs.

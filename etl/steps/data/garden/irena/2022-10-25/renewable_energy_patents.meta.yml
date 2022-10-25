@@ -9,10 +9,48 @@ dataset:
 tables:
   renewable_energy_patents:
     variables:
-      patents:
-        title: Number of patents
+      bioenergy:
+        title: Bioenergy
         short_unit: patents
         unit: patents
-        description: Number of renewable energy patents.
-        display:
-          numDecimalPlaces: 0
+        description: Number of patents in bioenergy technology.
+      other:
+        title: Other
+        short_unit: patents
+        unit: patents
+        description: Number of patents in other technologies.
+      geothermal:
+        title: Geothermal
+        short_unit: patents
+        unit: patents
+        description: Number of patents in geothermal energy technology.
+      hydropower:
+        title: Hydropower
+        short_unit: patents
+        unit: patents
+        description: Number of patents in hydropower technology.
+      marine:
+        title: Marine
+        short_unit: patents
+        unit: patents
+        description: Number of patents in marine energy technology.
+      solar_photovoltaic:
+        title: Solar photovoltaic energy
+        short_unit: patents
+        unit: patents
+        description: Number of patents in solar photovoltaic technology.
+      solar_thermal:
+        title: Solar thermal energy
+        short_unit: patents
+        unit: patents
+        description: Number of patents in solar thermal technology.
+      solar_photovoltaic_and_thermal_hybrid:
+        title: Solar photovoltaic and thermal hybrid
+        short_unit: patents
+        unit: patents
+        description: Number of patents in solar photovoltaic and thermal hybrid technology.
+      wind:
+        title: Wind energy
+        short_unit: patents
+        unit: patents
+        description: Number of patents in wind energy technology.
