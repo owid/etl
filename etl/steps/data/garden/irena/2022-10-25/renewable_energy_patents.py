@@ -21,6 +21,14 @@ TECHNOLOGIES_RENAMING = {
     "Wind Energy": "wind",
 }
 
+# List of technologies to consider in the total of renewable technologies.
+ALL_RENEWABLE_TECHNOLOGIES = [
+    "bioenergy", "geothermal", "hydropower", "marine", "solar_photovoltaic", "solar_thermal",
+    "solar_photovoltaic_and_thermal_hybrid", "wind",
+]
+# Label to use for the combination of all renewable technologies.
+ALL_RENEWABLES_LABEL = "total_renewables_excluding_other"
+
 
 def run(dest_dir: str) -> None:
     #
@@ -43,6 +51,10 @@ def run(dest_dir: str) -> None:
     df = df.astype({"technology": str})
     df.loc[solar_mask, "technology"] = df[solar_mask]["sub_technology"]
 
+    # Rename technologies more conveniently.
+    df["technology"] = geo.map_series(
+        df["technology"], mapping=TECHNOLOGIES_RENAMING, warn_on_missing_mappings=True, warn_on_unused_mappings=True)
+
     # Simplify table to keep only number of patents for each technology (ignoring sector and sub_technology).
     df = df.groupby(["country", "year", "technology"]).agg({"patents": "sum"}).reset_index()
 
@@ -53,14 +65,22 @@ def run(dest_dir: str) -> None:
     # Add global count of patents to original dataframe.
     df = pd.concat([df, global_patents], ignore_index=True)
 
+    # Check that the list of all renewable technologies is fully included in "technology".
+    assert set(ALL_RENEWABLE_TECHNOLOGIES) <= set(df["technology"])
+
+    # Create a column for the total number of patents of all technologies.
+    total_patents = df[df["technology"].isin(ALL_RENEWABLE_TECHNOLOGIES)].\
+        groupby(["country", "year"]).agg({"patents": "sum"}).reset_index()
+    total_patents["technology"] = ALL_RENEWABLES_LABEL
+
+    # Add this new column to the combined dataframe.
+    df = pd.concat([df, total_patents], ignore_index=True)
+
     # Change from long to wide format dataframe.
     df = df.pivot(index=["country", "year"], columns="technology", values="patents").reset_index()
 
     # Remove name of dummy index.
     df.columns.names = [None]
-
-    # Rename columns conveniently.
-    df = df.rename(columns=TECHNOLOGIES_RENAMING, errors="raise")
 
     # Set an appropriate index and sort conveniently.
     df = df.set_index(["country", "year"], verify_integrity=True).sort_index()

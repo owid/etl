@@ -1,4 +1,10 @@
 dataset:
+  name: Renewable energy patents
+  description: |
+    The data reports the annual number of new patents filed under the category of each renewable technology.
+
+    Note that the numbers for the last few years may be subject to a time lag; processing times of patent applications vary and some patents submitted over this period may not yet be recorded in the statistics. These figures will be updated with time if additional patent applications are recorded.
+
   sources:
     -
       name: International Renewable Energy Agency (IRENA) (2021)
@@ -9,6 +15,11 @@ dataset:
 tables:
   renewable_energy_patents:
     variables:
+      total_renewables_excluding_other:
+        title: All renewables
+        short_unit: patents
+        unit: patents
+        description: Number of patents in all renewable energy technologies (including bioenergy, geothermal, hydropower, marine, solar photovoltaic, solar thermal, solar photovoltaic and thermal hybrid, and wind).
       bioenergy:
         title: Bioenergy
         short_unit: patents
