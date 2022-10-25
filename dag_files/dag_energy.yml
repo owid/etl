@@ -165,3 +165,8 @@ steps:
     - data://meadow/irena/2022-10-20/renewable_electricity_capacity_and_generation
   data://grapher/irena/2022-10-20/renewable_electricity_capacity_by_technology:
     - data://garden/irena/2022-10-20/renewable_electricity_capacity
+  #
+  # IRENA - Renewable energy patents (2021).
+  #
+  data://meadow/irena/2022-10-25/renewable_energy_patents:
+    - walden://irena/2022-10-25/renewable_energy_patents
