@@ -178,9 +178,16 @@ def construct_dag(dag_path: Path, backport: bool, private: bool, grapher: bool) 
     # Load our graph of steps and the things they depend on
     dag = load_dag(dag_path)
 
+    # Dynamically construct all backporting steps
+    backporting_dag = _backporting_steps(private, walden_catalog=WALDEN_CATALOG)
+
     # Add all steps for backporting datasets (there are currently >800 of them)
-    if backport:
-        dag.update(_backporting_steps(private, walden_catalog=WALDEN_CATALOG))
+    # If --backport flag is missing, remove all backported datasets that aren't used in DAG
+    if not backport:
+        all_deps = {dep for deps in dag.values() for dep in deps}
+        backporting_dag = {k: v for k, v in backporting_dag.items() if k in all_deps}
+
+    dag.update(backporting_dag)
 
     # If --grapher is set, add steps for upserting to DB
     if grapher:
