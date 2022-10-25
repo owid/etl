@@ -1,8 +1,6 @@
 import pandas as pd
 from owid.catalog import Dataset, Table, TableMeta
-from owid.catalog.utils import underscore_table
 from owid.walden import Catalog as WaldenCatalog
-from structlog import get_logger
 
 from etl.steps.data.converters import convert_walden_metadata
 
@@ -50,8 +48,7 @@ def run(dest_dir: str) -> None:
     ds.metadata.version = VERSION
 
     # Create table with metadata from dataframe
-    table_metadata = TableMeta(
-        short_name=walden_ds.short_name, title=walden_ds.name, description=walden_ds.description)
+    table_metadata = TableMeta(short_name=walden_ds.short_name, title=walden_ds.name, description=walden_ds.description)
     tb = Table(df, metadata=table_metadata)
 
     # Add table to new dataset and save dataset.
