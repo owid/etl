@@ -170,3 +170,5 @@ steps:
   #
   data://meadow/irena/2022-10-25/renewable_energy_patents:
     - walden://irena/2022-10-25/renewable_energy_patents
+  data://garden/irena/2022-10-25/renewable_energy_patents:
+    - data://meadow/irena/2022-10-25/renewable_energy_patents

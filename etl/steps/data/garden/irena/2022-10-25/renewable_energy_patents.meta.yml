@@ -1,0 +1,18 @@
+dataset:
+  sources:
+    -
+      name: International Renewable Energy Agency (IRENA) (2021)
+      published_by: International Renewable Energy Agency (IRENA) INSPIRE Platform based on EPO PATSTAT 2021 Autumn edition and on the Climate Change Mitigation Technologies (Y02) classification by EPO.
+      url: https://www.irena.org/Statistics/View-Data-by-Topic/Innovation-and-Technology/Patents-Evolution
+      date_accessed: 2022-10-25
+
+tables:
+  renewable_energy_patents:
+    variables:
+      patents:
+        title: Number of patents
+        short_unit: patents
+        unit: patents
+        description: Number of renewable energy patents.
+        display:
+          numDecimalPlaces: 0
