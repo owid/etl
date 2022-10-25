@@ -1,3 +1,4 @@
+import datetime as dt
 import os
 import shutil
 import tempfile
@@ -62,15 +63,6 @@ def app(run_checks: bool, dummy_data: bool) -> None:
         "Options",
         [
             pi.input(
-                "Short name",
-                name="short_name",
-                placeholder="ggdc_maddison",
-                required=True,
-                value=dummies.get("short_name"),
-                validate=utils.validate_short_name,
-                help_text="Underscored short name",
-            ),
-            pi.input(
                 "Namespace",
                 name="namespace",
                 placeholder="ggdc",
@@ -80,17 +72,26 @@ def app(run_checks: bool, dummy_data: bool) -> None:
             pi.input(
                 "Version",
                 name="version",
-                placeholder="2020",
+                placeholder=str(dt.date.today()),
                 required=True,
-                value=dummies.get("version"),
+                value=dummies.get("version", str(dt.date.today())),
             ),
             pi.input(
                 "Walden version",
                 name="walden_version",
-                placeholder="2020",
+                placeholder=str(dt.date.today()),
                 required=True,
-                value=dummies.get("version"),
+                value=dummies.get("version", str(dt.date.today())),
                 help_text="Usually same as Version",
+            ),
+            pi.input(
+                "Short name",
+                name="short_name",
+                placeholder="ggdc_maddison",
+                required=True,
+                value=dummies.get("short_name"),
+                validate=utils.validate_short_name,
+                help_text="Underscored short name",
             ),
             pi.checkbox(
                 "Additional Options",

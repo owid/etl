@@ -55,15 +55,6 @@ def app(run_checks: bool, dummy_data: bool) -> None:
         "Options",
         [
             pi.input(
-                "Short name",
-                name="short_name",
-                placeholder="ggdc_maddison",
-                required=True,
-                value=dummies.get("short_name"),
-                validate=utils.validate_short_name,
-                help_text="Underscored short name",
-            ),
-            pi.input(
                 "Namespace",
                 name="namespace",
                 placeholder="ggdc",
@@ -76,6 +67,15 @@ def app(run_checks: bool, dummy_data: bool) -> None:
                 placeholder="2020",
                 required=True,
                 value=dummies.get("version"),
+            ),
+            pi.input(
+                "Short name",
+                name="short_name",
+                placeholder="ggdc_maddison",
+                required=True,
+                value=dummies.get("short_name"),
+                validate=utils.validate_short_name,
+                help_text="Underscored short name",
             ),
             pi.checkbox(
                 "Additional Options",
