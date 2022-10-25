@@ -2,16 +2,15 @@
 import re
 import tempfile
 from pathlib import Path
-import structlog
 from typing import Any, List, Tuple
 
 import pandas as pd
+import structlog
 from owid import walden
 from owid.catalog import Dataset, Table, utils
 from owid.datautils.io import decompress_file
 
 from etl.steps.data.converters import convert_walden_metadata
-
 
 log = structlog.get_logger()
 
@@ -177,10 +176,7 @@ class WBGenderMeadowStep:
         # pd.set_option("display.max_colwidth", 40000)
         msk = merged["variable"] != merged["indicator_name"]
         x = merged.loc[msk, ["variable", "indicator_name"]].sort_values("variable")
-        assert x.shape == (
-            45,
-            2,
-        ), (
+        assert x.shape == (45, 2,), (
             "There are 45 expected variables to miss-match namings between data and metadata file, but a different"
             f" amount was found {x.shape}!"
         )
