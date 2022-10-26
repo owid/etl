@@ -1,33 +1,127 @@
 import pandas as pd
 from owid.catalog import Dataset, Table
 from owid.catalog.utils import underscore_table
-from owid.datautils import geo
+from owid.datautils import dataframes, geo
 
 from etl.helpers import Names
+from shared import CURRENT_DIR
 
 # Get naming conventions.
-N = Names(__file__)
+N = Names(str(CURRENT_DIR / "renewable_energy_patents"))
 
-# Mapping of names for technologies (as well as solar sub-technologies).
-TECHNOLOGIES_RENAMING = {
-    "Bioenergy": "bioenergy",
-    "Enabling Technologies": "other",
-    "Geothermal Energy": "geothermal",
-    "Hydropower": "hydropower",
-    "Ocean Energy": "marine",
-    "PV": "solar_photovoltaic",
-    "Solar Thermal": "solar_thermal",
-    "PV - Thermal Hybrid": "solar_photovoltaic_and_thermal_hybrid",
-    "Wind Energy": "wind",
+SUB_TECHNOLOGY_RENAMING = {
+    'Smart Grids': 'Smart grids',
+    'Thermal energy storage': 'Thermal energy storage',
+    'Hydrogen (storage and distribution and applications)': 'Hydrogen',
+    'Hydropower': 'Hydropower',
+    'PV': 'Solar PV',
+    'Solar Thermal': 'Solar thermal',
+    'CCUS': 'Carbon capture and storage',
+    'Cross-cutting': 'Cross-cutting energy tech',
+    'Energy Storage - General': 'Storage (general)',
+    'Biofuels': 'Bioenergy',
+    'Fuel from waste': 'Bioenergy',
+    'Batteries': 'Batteries',
+    'Fuel Cells': 'Fuel cells',
+    'Green hydrogen (water eloctrolysis)': 'Green hydrogen',
+    'Ocean Energy': 'Marine and tidal',
+    'PV - Thermal Hybrid': 'Solar PV-thermal hybrid',
+    'Wind Energy': 'Wind',
+    'Electromobility - Charging Stations': 'EV charging stations',
+    'Electromobility - Energy Storage': 'EV storage',
+    'Energy Efficiency': 'Efficiency',
+    'Others': 'Other',
+    'Ultracapacitors, supercapacitors, double-layer capacitors': 'Ultracapacitors',
+    'Mechanical energy storage, e.g. flywheels or pressurised fluids': 'Storage (excl. batteries)',
+    'Geothermal Energy': 'Geothermal',
+    'Electromobility - Electric Energy Management': 'EV management',
+    'Electromobility - Information/Communication Technologies': 'EV communication tech',
+    'Electromobility - Machine related technology ': 'EV machine tech',
+    'Heat pumps': 'Geothermal',
 }
 
-# List of technologies to consider in the total of renewable technologies.
-ALL_RENEWABLE_TECHNOLOGIES = [
-    "bioenergy", "geothermal", "hydropower", "marine", "solar_photovoltaic", "solar_thermal",
-    "solar_photovoltaic_and_thermal_hybrid", "wind",
+# List of aggregate regions to create.
+REGIONS_TO_ADD = [
+    # Continents.
+    'Africa',
+    'Asia',
+    'Europe',
+    'European Union (27)',
+    'North America',
+    'Oceania',
+    'South America',
+    # Income groups.
+    'High-income countries',
+    'Low-income countries',
+    'Lower-middle-income countries',
+    'Upper-middle-income countries',
 ]
-# Label to use for the combination of all renewable technologies.
-ALL_RENEWABLES_LABEL = "total_renewables_excluding_other"
+
+
+def regroup_sub_technologies(df: pd.DataFrame) -> pd.DataFrame:
+    # It seems that sub-technologies can belong to only one technology.
+    # As long as this is true, we can just ignore "technology" and select by "sub_technology".
+    assert set(df.groupby("sub_technology").agg({"technology": "nunique"}).reset_index()["technology"]) == {1}
+    # This does not happen with sectors.
+    # For example, sub-technology Biofuels is included in sectors "Power", "Transport", and "Industry".
+
+    # There seems to be one nan sub-technology. Add this to "Others".
+    df["sub_technology"] = df["sub_technology"].fillna("Others")
+
+    # Rename sub-technologies conveniently.
+    df["sub_technology"] = dataframes.map_series(series=df["sub_technology"], mapping=SUB_TECHNOLOGY_RENAMING,
+                                           warn_on_missing_mappings=True, warn_on_unused_mappings=True)
+
+    # After renaming, some sub-technologies have been combined (e.g. Biofuels and Fuel from waste are now both Bioenergy).
+    # Re-calculate numbers of patents with the new sub-technology groupings.
+    df = df.groupby(["country", "year", "sector", "technology", "sub_technology"], observed=True).\
+        agg({"patents": "sum"}).reset_index()
+
+    return df
+
+
+def add_region_aggregates(df: pd.DataFrame) -> pd.DataFrame:
+    # TODO: Add population and income group datasets in dag.
+
+    # Add aggregates for continents and income groups.
+    for region in REGIONS_TO_ADD:
+        if region == "World":
+            # For the world, add all countries that are not in regions (also exclude any regions given in the original
+            # data, that should be named "* (IRENA)" after harmonization, if there was any).
+            countries_in_region = [country for country in df["country"].unique() if country not in REGIONS_TO_ADD
+                                   if not country.endswith("(IRENA)")]
+        else:
+            # List countries in region.
+            countries_in_region = geo.list_countries_in_region(region=region)
+        region_data = df[df["country"].isin(countries_in_region)].\
+            groupby(["year", "sector", "technology", "sub_technology"], observed=True).\
+            agg({"patents": "sum"}).reset_index().assign(**{"country": region})
+        # Add data for new region to dataframe.
+        df = pd.concat([df, region_data], ignore_index=True)
+
+    return df
+
+
+def create_patents_by_sub_technology(df: pd.DataFrame) -> pd.DataFrame:
+    # Create a simplified table giving just number of patents by sub-technology.
+    # Re-calculate numbers of patents by sub-technology.
+    patents_by_sub_technology = df.reset_index().groupby(["country", "year", "sub_technology"], observed=True).\
+        agg({"patents": "sum"}).reset_index()
+
+    # Restructure dataframe to have a column per sub-technology.
+    patents_by_sub_technology = patents_by_sub_technology.\
+        pivot(index=["country", "year"], columns="sub_technology", values="patents").reset_index()
+    # Remove name of dummy index.
+    patents_by_sub_technology.columns.names = [None]
+
+    # Set an appropriate index to the table by sub-technology and sort conveniently.
+    patents_by_sub_technology = patents_by_sub_technology.\
+        set_index(["country", "year"], verify_integrity=True).sort_index()
+
+    # Create a column for the total number of patents of all sub-technologies.
+    patents_by_sub_technology["Total patents"] = patents_by_sub_technology.sum(axis=1)
+
+    return patents_by_sub_technology
 
 
 def run(dest_dir: str) -> None:
@@ -36,68 +130,52 @@ def run(dest_dir: str) -> None:
     #
     # Load dataset from Meadow.
     ds_meadow = N.meadow_dataset
+
     # Load main table from dataset.
     tb_meadow = ds_meadow[ds_meadow.table_names[0]]
+
     # Create a dataframe from table.
     df = pd.DataFrame(tb_meadow).reset_index()
 
     #
     # Process data.
     #
+    # Rename sub-technologies conveniently, and regroup them according to the new sub-technology names.
+    df = regroup_sub_technologies(df=df)
+
+    # Harmonize country names.
     df = geo.harmonize_countries(df=df, countries_file=N.country_mapping_path)
 
-    # Include solar sub-technologies as technologies.
-    solar_mask = df["technology"] == "Solar Energy"
-    df = df.astype({"technology": str})
-    df.loc[solar_mask, "technology"] = df[solar_mask]["sub_technology"]
+    # Add region aggregates.
+    df = add_region_aggregates(df=df)
 
-    # Rename technologies more conveniently.
-    df["technology"] = geo.map_series(
-        df["technology"], mapping=TECHNOLOGIES_RENAMING, warn_on_missing_mappings=True, warn_on_unused_mappings=True)
+    # Set an appropriate index to main table and sort conveniently.
+    df = df.set_index(["country", "year", "sector", "technology", "sub_technology"], verify_integrity=True).sort_index()
 
-    # Simplify table to keep only number of patents for each technology (ignoring sector and sub_technology).
-    df = df.groupby(["country", "year", "technology"]).agg({"patents": "sum"}).reset_index()
-
-    # Create a dataframe of global count of patents.
-    global_patents = df.groupby(["year", "technology"]).agg({"patents": "sum"}).reset_index()
-    global_patents["country"] = "World"
-
-    # Add global count of patents to original dataframe.
-    df = pd.concat([df, global_patents], ignore_index=True)
-
-    # Check that the list of all renewable technologies is fully included in "technology".
-    assert set(ALL_RENEWABLE_TECHNOLOGIES) <= set(df["technology"])
-
-    # Create a column for the total number of patents of all technologies.
-    total_patents = df[df["technology"].isin(ALL_RENEWABLE_TECHNOLOGIES)].\
-        groupby(["country", "year"]).agg({"patents": "sum"}).reset_index()
-    total_patents["technology"] = ALL_RENEWABLES_LABEL
-
-    # Add this new column to the combined dataframe.
-    df = pd.concat([df, total_patents], ignore_index=True)
-
-    # Change from long to wide format dataframe.
-    df = df.pivot(index=["country", "year"], columns="technology", values="patents").reset_index()
-
-    # Remove name of dummy index.
-    df.columns.names = [None]
-
-    # Set an appropriate index and sort conveniently.
-    df = df.set_index(["country", "year"], verify_integrity=True).sort_index()
+    # Create a new, simplified dataframe, that shows number of patents by sub-technology.
+    patents_by_sub_technology = create_patents_by_sub_technology(df=df)
 
     #
     # Save outputs.
     #
     # Initialize a new Garden dataset, using metadata from Meadow.
     ds_garden = Dataset.create_empty(dest_dir)
-    ds_garden.metadata = ds_meadow.metadata
+    ds_garden.metadata = ds_meadow.metadata    
+
     # Ensure all columns are snake, lower case.
     tb_garden = underscore_table(Table(df))
+    tb_garden_by_sub_technology = underscore_table(Table(patents_by_sub_technology))
     tb_garden.metadata = tb_meadow.metadata
+    tb_garden_by_sub_technology.metadata = tb_meadow.metadata    
+
     # Update dataset metadata using the metadata yaml file.
     ds_garden.metadata.update_from_yaml(N.metadata_path, if_source_exists="replace")
-    # Update table metadata using the metadata yaml file.
-    tb_garden.update_metadata_from_yaml(N.metadata_path, ds_meadow.table_names[0])
-    # Add table to dataset and save dataset.
+
+    # Update tables metadata using the metadata yaml file.
+    tb_garden.update_metadata_from_yaml(N.metadata_path, "renewable_energy_patents")
+    tb_garden_by_sub_technology.update_metadata_from_yaml(N.metadata_path, "renewable_energy_patents_by_technology")
+
+    # Add tables to dataset and save dataset.
     ds_garden.add(tb_garden)
+    ds_garden.add(tb_garden_by_sub_technology)
     ds_garden.save()
