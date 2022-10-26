@@ -42,6 +42,7 @@ SUB_TECHNOLOGY_RENAMING = {
 
 # List of aggregate regions to create.
 REGIONS_TO_ADD = [
+    "World",
     # Continents.
     "Africa",
     "Asia",
