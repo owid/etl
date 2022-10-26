@@ -157,9 +157,35 @@ def _update_variables_display(table: catalog.Table) -> None:
             meta.display.setdefault("unit", meta.unit)
 
 
+def upsert_grapher_table(table: catalog.Table, dataset_id: int) -> int:
+    engine = gm.get_engine()
+    with Session(engine) as session:
+        log.info(
+            "upsert_grapher_table.start",
+            short_name=table.metadata.short_name,
+        )
+        tab = gm.GrapherTable.from_table_metadata(
+            table.metadata, dataset_id, user_id=int(cast(str, config.GRAPHER_USER_ID))
+        ).upsert(session)
+
+        session.commit()
+
+        log.info(
+            "upsert_dataset.upsert_dataset.end",
+            short_name=table.metadata.short_name,
+            id=tab.id,
+        )
+
+        session.commit()
+
+        assert tab.id
+        return tab.id
+
+
 def upsert_table(
     table: catalog.Table,
     dataset_upsert_result: DatasetUpsertResult,
+    table_id: int,
     catalog_path: Optional[str] = None,
     dimensions: Optional[gm.Dimensions] = None,
 ) -> VariableUpsertResult:
@@ -238,6 +264,7 @@ def upsert_table(
             short_name=column_name,
             timespan=timespan,
             dataset_id=dataset_upsert_result.dataset_id,
+            table_id=table_id,
             source_id=source_id,
             catalog_path=catalog_path,
             dimensions=dimensions,

@@ -38,6 +38,7 @@ from etl.grapher_import import (
     fetch_db_checksum,
     set_dataset_checksum,
     upsert_dataset,
+    upsert_grapher_table,
     upsert_table,
 )
 from etl.helpers import get_etag
@@ -208,6 +209,9 @@ def parse_step(step_name: str, dag: Dict[str, Any]) -> "Step":
 
     elif step_type == "grapher":
         step = GrapherStep(path, dependencies)
+
+    elif step_type == "grapher-new":
+        step = GrapherNewStep(path, dependencies)
 
     elif step_type == "backport":
         step = BackportStep(path, dependencies)
@@ -544,12 +548,16 @@ class GrapherStep(Step):
 
             table = gh._adapt_table_for_grapher(table)
 
+            # upsert table to DB
+            table_id = upsert_grapher_table(table, dataset_id=dataset_upsert_results.dataset_id)
+
             # generate table with entity_id, year and value for every column
             tables = gh._yield_wide_table(table, na_action="drop")
             upsert = lambda t: upsert_table(  # noqa: E731
                 t,
                 dataset_upsert_results,
                 catalog_path=catalog_path,
+                table_id=table_id,
                 dimensions=(t.iloc[:, 0].metadata.additional_info or {}).get("dimensions"),
             )
 

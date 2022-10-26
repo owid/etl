@@ -374,6 +374,69 @@ class Dataset(SQLModel, table=True):
         return vars
 
 
+class GrapherTable(SQLModel, table=True):
+    __tablename__: str = "tables"  # type: ignore
+    __table_args__ = (
+        ForeignKeyConstraint(["datasetId"], ["datasets.id"], name="FK_8061417f58748b130995f5d6dc5"),
+        Index("FK_8061417f58748b130995f5d6dc5", "datasetId"),
+        Index("IDX_44e87eac2fdd00b1fb053388c9", "shortName", "datasetId", unique=True),
+    )
+
+    id: Optional[int] = Field(default=None, sa_column=Column("id", Integer, primary_key=True))
+    datasetId: int = Field(sa_column=Column("datasetId", Integer, nullable=False))
+    name: Optional[str] = Field(
+        default=None, sa_column=Column("name", String(512, "utf8mb4_0900_as_cs"), nullable=True)
+    )
+    shortName: str = Field(sa_column=Column("shortName", String(255, "utf8mb4_0900_as_cs"), nullable=False))
+    description: str = Field(sa_column=Column("description", LONGTEXT, nullable=False))
+    createdAt: datetime = Field(
+        default_factory=datetime.utcnow, sa_column=Column("createdAt", DateTime, nullable=False)
+    )
+    updatedAt: datetime = Field(
+        default_factory=datetime.utcnow, sa_column=Column("updatedAt", DateTime, nullable=False)
+    )
+    createdByUserId: int = Field(sa_column=Column("createdByUserId", Integer, nullable=False))
+    updatedByUserId: int = Field(sa_column=Column("updatedByUserId", Integer, nullable=False))
+
+    datasets: Optional["Dataset"] = Relationship(back_populates="tables")
+    variables: List["Variable"] = Relationship(back_populates="tables")
+
+    def upsert(self, session: Session) -> "GrapherTable":
+        cls = self.__class__
+        q = select(cls).where(
+            cls.datasetId == self.datasetId,
+            cls.shortName == self.shortName,
+        )
+        ds = session.exec(q).one_or_none()
+        if not ds:
+            ds = self
+        else:
+            ds.name = self.name
+            ds.description = self.description
+            ds.updatedAt = datetime.utcnow()
+            ds.updatedByUserId = self.updatedByUserId
+
+        session.add(ds)
+
+        q = select(cls).where(
+            cls.datasetId == self.datasetId,
+            cls.shortName == self.shortName,
+        )
+        return session.exec(q).one()
+
+    @classmethod
+    def from_table_metadata(cls, metadata: catalog.TableMeta, dataset_id: int, user_id: int) -> "GrapherTable":
+        assert metadata.short_name
+        return cls(
+            datasetId=dataset_id,
+            name=metadata.title,
+            shortName=metadata.short_name,
+            description=metadata.description or "",
+            createdByUserId=user_id,
+            updatedByUserId=user_id,
+        )
+
+
 class ChartSlugRedirects(SQLModel, table=True):
     __table_args__ = (
         ForeignKeyConstraint(["chart_id"], ["charts.id"], name="chart_slug_redirects_chart_id"),
@@ -659,7 +722,9 @@ class Variable(SQLModel, table=True):
     __tablename__: str = "variables"  # type: ignore
     __table_args__ = (
         ForeignKeyConstraint(["datasetId"], ["datasets.id"], name="variables_datasetId_50a98bfd_fk_datasets_id"),
+        ForeignKeyConstraint(["tableId"], ["tables.id"], name="fk_variables_tables"),
         ForeignKeyConstraint(["sourceId"], ["sources.id"], name="variables_sourceId_31fce80a_fk_sources_id"),
+        Index("fk_variables_tables", "tableId"),
         Index("unique_short_name_per_dataset", "shortName", "datasetId", unique=True),
         Index("variables_code_fk_dst_id_7bde8c2a_uniq", "code", "datasetId", unique=True),
         Index("variables_datasetId_50a98bfd_fk_datasets_id", "datasetId"),
@@ -669,6 +734,7 @@ class Variable(SQLModel, table=True):
 
     id: Optional[int] = Field(default=None, primary_key=True)
     datasetId: int = Field(sa_column=Column("datasetId", Integer, nullable=False))
+    tableId: int = Field(sa_column=Column("tableId", Integer, nullable=False))
     name: Optional[str] = Field(default=None, sa_column=Column("name", String(750, "utf8mb4_0900_as_cs")))
     shortName: Optional[str] = Field(default=None, sa_column=Column("shortName", String(255, "utf8mb4_0900_as_cs")))
     description: Optional[str] = Field(default=None, sa_column=Column("description", LONGTEXT))
@@ -694,12 +760,14 @@ class Variable(SQLModel, table=True):
     dimensions: Optional[Dimensions] = Field(sa_column=Column("dimensions", JSON, nullable=True))
 
     datasets: Optional["Dataset"] = Relationship(back_populates="variables")
+    tables: Optional["GrapherTable"] = Relationship(back_populates="variables")
     sources: Optional["Source"] = Relationship(back_populates="variables")
     chart_dimensions: List["ChartDimensions"] = Relationship(back_populates="variables")
     data_values: List["DataValues"] = Relationship(back_populates="variables")
 
     def upsert(self, session: Session) -> "Variable":
         assert self.shortName
+        assert self.tableId
 
         cls = self.__class__
 
@@ -728,6 +796,7 @@ class Variable(SQLModel, table=True):
             ds = self
         else:
             ds.shortName = self.shortName
+            ds.tableId = self.tableId
             ds.name = self.name
             ds.description = self.description
             ds.unit = self.unit
@@ -765,6 +834,7 @@ class Variable(SQLModel, table=True):
         short_name: str,
         timespan: str,
         dataset_id: int,
+        table_id: int,
         source_id: int,
         catalog_path: Optional[str],
         dimensions: Optional[Dimensions],
@@ -777,6 +847,7 @@ class Variable(SQLModel, table=True):
             name=metadata.title,
             sourceId=source_id,
             datasetId=dataset_id,
+            tableId=table_id,
             description=metadata.description,
             unit=metadata.unit,
             shortUnit=metadata.short_unit,
