@@ -2,7 +2,7 @@
 import re
 import tempfile
 from pathlib import Path
-from typing import Any, List, Tuple
+from typing import Any, Tuple
 
 import pandas as pd
 import structlog
@@ -15,43 +15,32 @@ from etl.steps.data.converters import convert_walden_metadata
 log = structlog.get_logger()
 
 
+# Renaming of column fields in data
+COLUMNS_DATA_RENAME = {
+    "Country Name": "location",
+    "Indicator Name": "variable",
+    "Indicator Code": "variable_code",
+}
+# Get list of relevant columns from data file
+COLUMNS_RELEVANT = list(COLUMNS_DATA_RENAME.keys()) + [str(i) for i in range(1960, 2022)]
+# Get list of not relevant columns from data file
+COLUMNS_NOT_RELEVANT = [
+    "Country Code",
+    "Unnamed: 66",
+]
+# Get list of known columns from data file (for sanity checks)
+COLUMNS_KNOWN = COLUMNS_RELEVANT + COLUMNS_NOT_RELEVANT
+# Get list of known columns from data file (for sanity checks)
+COLUMNS_IDX = [c for c in COLUMNS_DATA_RENAME.values() if c not in "variable_code"] + ["year"]
+
+
 class WBGenderMeadowStep:
-    columns_data_rename = {
-        "Country Name": "location",
-        "Indicator Name": "variable",
-        "Indicator Code": "variable_code",
-    }
     data_filename = "Gender_StatsData.csv"
     metadata_filename = "Gender_StatsSeries.csv"
 
     def __init__(self) -> None:
         log.info("Loading walden dataset...")
         self.walden_ds = walden.Catalog().find_one("wb", "2022", "wb_gender")
-
-    @property
-    def columns_relevant(self) -> List[str]:
-        """Get list of relevant columns from data file."""
-        return list(self.columns_data_rename.keys()) + [str(i) for i in range(1960, 2022)]
-
-    @property
-    def columns_not_relevant(self) -> List[str]:
-        """Get list of not relevant columns from data file."""
-        return [
-            "Country Code",
-            "Unnamed: 66",
-        ]
-
-    @property
-    def columns_known(self) -> List[str]:
-        """Get list of known columns from data file (for sanity checks)."""
-        return self.columns_relevant + self.columns_not_relevant
-
-    @property
-    def columns_idx(self) -> List[str]:
-        """Get list of known columns from data file (for sanity checks)."""
-        columns_idx = list(self.columns_data_rename.values())
-        columns_idx = [c for c in columns_idx if c not in "variable_code"] + ["year"]
-        return columns_idx
 
     def load_data_from_walden(self) -> Tuple[pd.DataFrame, pd.DataFrame]:
         """Load data and metadata."""
@@ -90,8 +79,8 @@ class WBGenderMeadowStep:
     def _sanity_check_columns_data(self, df: pd.DataFrame) -> None:
         """Run minimal sanity checks on data."""
         log.info("Checking columns in data are as expected...")
-        assert not df.columns.difference(self.columns_known).any()
-        assert not set(self.columns_known).difference(df.columns)
+        assert not df.columns.difference(COLUMNS_KNOWN).any()
+        assert not set(COLUMNS_KNOWN).difference(df.columns)
 
     def format_data(self, df: pd.DataFrame, metadata: pd.DataFrame) -> Any:
         """Format data.
@@ -113,7 +102,7 @@ class WBGenderMeadowStep:
         """
         # Get only necessary columns
         log.info("Reshaping dataframe: Preserving only relevant columns in data...")
-        df = df[self.columns_relevant]
+        df = df[COLUMNS_RELEVANT]
         # Reshape years
         log.info("Reshaping dataframe: Years in rows...")
         df = df.melt(["Country Name", "Indicator Name", "Indicator Code"], var_name="year").astype({"year": "category"})
@@ -122,7 +111,7 @@ class WBGenderMeadowStep:
         df = df.dropna(subset="value").reset_index(drop=True)
         # Column rename
         log.info("Reshaping dataframe: Renaming columns...")
-        df = df.rename(columns=self.columns_data_rename)
+        df = df.rename(columns=COLUMNS_DATA_RENAME)
         # Clean variable name
         log.info("Reshaping dataframe: Cleaning variable names...")
         df = df.assign(variable=df["variable"].apply(_clean_variable_name))
@@ -207,21 +196,8 @@ class WBGenderMeadowStep:
         df = df[["location", "indicator_name", "year", "value"]].rename(columns={"indicator_name": "variable"})
         # Sort dataframe and set index
         log.info("Sorting dataframe and setting index...")
-        df = df.sort_values(self.columns_idx).set_index(self.columns_idx)
+        df = df.sort_values(COLUMNS_IDX).set_index(COLUMNS_IDX)
         return df
-
-    def run(self, dest_dir: str) -> None:
-        """Run Meadow step."""
-        # Load data and metadata
-        df, metadata = self.load_data_from_walden()
-        # Format metadata
-        metadata = metadata.pipe(self.format_metadata)
-        # Format data
-        df = df.pipe(self.format_data, metadata)
-        # Initiate dataset
-        ds = init_dataset(dest_dir, self.walden_ds)
-        # Add tables to dataset
-        ds = add_tables_to_ds(ds, df, metadata)
 
 
 def _clean_variable_name(text: str) -> str:
@@ -255,4 +231,14 @@ def add_tables_to_ds(ds: Dataset, df: pd.DataFrame, metadata: pd.DataFrame) -> D
 
 def run(dest_dir: str) -> None:
     """Run pipeline."""
-    WBGenderMeadowStep().run(dest_dir)
+    meadow_step = WBGenderMeadowStep()
+    # Load data and metadata
+    df, metadata = meadow_step.load_data_from_walden()
+    # Format metadata
+    metadata = metadata.pipe(meadow_step.format_metadata)
+    # Format data
+    df = df.pipe(meadow_step.format_data, metadata)
+    # Initiate dataset
+    ds = init_dataset(dest_dir, meadow_step.walden_ds)
+    # Add tables to dataset
+    ds = add_tables_to_ds(ds, df, metadata)
