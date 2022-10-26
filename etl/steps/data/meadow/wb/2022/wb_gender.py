@@ -34,7 +34,7 @@ class WBGenderMeadowStep:
         return list(self.columns_data_rename.keys()) + [str(i) for i in range(1960, 2022)]
 
     @property
-    def coluns_not_relevant(self) -> List[str]:
+    def columns_not_relevant(self) -> List[str]:
         """Get list of not relevant columns from data file."""
         return [
             "Country Code",
@@ -44,7 +44,7 @@ class WBGenderMeadowStep:
     @property
     def columns_known(self) -> List[str]:
         """Get list of known columns from data file (for sanity checks)."""
-        return self.columns_relevant + self.coluns_not_relevant
+        return self.columns_relevant + self.columns_not_relevant
 
     @property
     def columns_idx(self) -> List[str]:
