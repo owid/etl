@@ -2,59 +2,59 @@ import pandas as pd
 from owid.catalog import Dataset, Table
 from owid.catalog.utils import underscore_table
 from owid.datautils import dataframes, geo
+from shared import CURRENT_DIR
 
 from etl.helpers import Names
-from shared import CURRENT_DIR
 
 # Get naming conventions.
 N = Names(str(CURRENT_DIR / "renewable_energy_patents"))
 
 SUB_TECHNOLOGY_RENAMING = {
-    'Smart Grids': 'Smart grids',
-    'Thermal energy storage': 'Thermal energy storage',
-    'Hydrogen (storage and distribution and applications)': 'Hydrogen',
-    'Hydropower': 'Hydropower',
-    'PV': 'Solar PV',
-    'Solar Thermal': 'Solar thermal',
-    'CCUS': 'Carbon capture and storage',
-    'Cross-cutting': 'Cross-cutting energy tech',
-    'Energy Storage - General': 'Storage (general)',
-    'Biofuels': 'Bioenergy',
-    'Fuel from waste': 'Bioenergy',
-    'Batteries': 'Batteries',
-    'Fuel Cells': 'Fuel cells',
-    'Green hydrogen (water eloctrolysis)': 'Green hydrogen',
-    'Ocean Energy': 'Marine and tidal',
-    'PV - Thermal Hybrid': 'Solar PV-thermal hybrid',
-    'Wind Energy': 'Wind',
-    'Electromobility - Charging Stations': 'EV charging stations',
-    'Electromobility - Energy Storage': 'EV storage',
-    'Energy Efficiency': 'Efficiency',
-    'Others': 'Other',
-    'Ultracapacitors, supercapacitors, double-layer capacitors': 'Ultracapacitors',
-    'Mechanical energy storage, e.g. flywheels or pressurised fluids': 'Storage (excl. batteries)',
-    'Geothermal Energy': 'Geothermal',
-    'Electromobility - Electric Energy Management': 'EV management',
-    'Electromobility - Information/Communication Technologies': 'EV communication tech',
-    'Electromobility - Machine related technology ': 'EV machine tech',
-    'Heat pumps': 'Geothermal',
+    "Smart Grids": "Smart grids",
+    "Thermal energy storage": "Thermal energy storage",
+    "Hydrogen (storage and distribution and applications)": "Hydrogen",
+    "Hydropower": "Hydropower",
+    "PV": "Solar PV",
+    "Solar Thermal": "Solar thermal",
+    "CCUS": "Carbon capture and storage",
+    "Cross-cutting": "Cross-cutting energy tech",
+    "Energy Storage - General": "Storage (general)",
+    "Biofuels": "Bioenergy",
+    "Fuel from waste": "Bioenergy",
+    "Batteries": "Batteries",
+    "Fuel Cells": "Fuel cells",
+    "Green hydrogen (water eloctrolysis)": "Green hydrogen",
+    "Ocean Energy": "Marine and tidal",
+    "PV - Thermal Hybrid": "Solar PV-thermal hybrid",
+    "Wind Energy": "Wind",
+    "Electromobility - Charging Stations": "EV charging stations",
+    "Electromobility - Energy Storage": "EV storage",
+    "Energy Efficiency": "Efficiency",
+    "Others": "Other",
+    "Ultracapacitors, supercapacitors, double-layer capacitors": "Ultracapacitors",
+    "Mechanical energy storage, e.g. flywheels or pressurised fluids": "Storage (excl. batteries)",
+    "Geothermal Energy": "Geothermal",
+    "Electromobility - Electric Energy Management": "EV management",
+    "Electromobility - Information/Communication Technologies": "EV communication tech",
+    "Electromobility - Machine related technology ": "EV machine tech",
+    "Heat pumps": "Geothermal",
 }
 
 # List of aggregate regions to create.
 REGIONS_TO_ADD = [
     # Continents.
-    'Africa',
-    'Asia',
-    'Europe',
-    'European Union (27)',
-    'North America',
-    'Oceania',
-    'South America',
+    "Africa",
+    "Asia",
+    "Europe",
+    "European Union (27)",
+    "North America",
+    "Oceania",
+    "South America",
     # Income groups.
-    'High-income countries',
-    'Low-income countries',
-    'Lower-middle-income countries',
-    'Upper-middle-income countries',
+    "High-income countries",
+    "Low-income countries",
+    "Lower-middle-income countries",
+    "Upper-middle-income countries",
 ]
 
 
@@ -69,13 +69,20 @@ def regroup_sub_technologies(df: pd.DataFrame) -> pd.DataFrame:
     df["sub_technology"] = df["sub_technology"].fillna("Others")
 
     # Rename sub-technologies conveniently.
-    df["sub_technology"] = dataframes.map_series(series=df["sub_technology"], mapping=SUB_TECHNOLOGY_RENAMING,
-                                           warn_on_missing_mappings=True, warn_on_unused_mappings=True)
+    df["sub_technology"] = dataframes.map_series(
+        series=df["sub_technology"],
+        mapping=SUB_TECHNOLOGY_RENAMING,
+        warn_on_missing_mappings=True,
+        warn_on_unused_mappings=True,
+    )
 
     # After renaming, some sub-technologies have been combined (e.g. Biofuels and Fuel from waste are now both Bioenergy).
     # Re-calculate numbers of patents with the new sub-technology groupings.
-    df = df.groupby(["country", "year", "sector", "technology", "sub_technology"], observed=True).\
-        agg({"patents": "sum"}).reset_index()
+    df = (
+        df.groupby(["country", "year", "sector", "technology", "sub_technology"], observed=True)
+        .agg({"patents": "sum"})
+        .reset_index()
+    )
 
     return df
 
@@ -88,14 +95,22 @@ def add_region_aggregates(df: pd.DataFrame) -> pd.DataFrame:
         if region == "World":
             # For the world, add all countries that are not in regions (also exclude any regions given in the original
             # data, that should be named "* (IRENA)" after harmonization, if there was any).
-            countries_in_region = [country for country in df["country"].unique() if country not in REGIONS_TO_ADD
-                                   if not country.endswith("(IRENA)")]
+            countries_in_region = [
+                country
+                for country in df["country"].unique()
+                if country not in REGIONS_TO_ADD
+                if not country.endswith("(IRENA)")
+            ]
         else:
             # List countries in region.
             countries_in_region = geo.list_countries_in_region(region=region)
-        region_data = df[df["country"].isin(countries_in_region)].\
-            groupby(["year", "sector", "technology", "sub_technology"], observed=True).\
-            agg({"patents": "sum"}).reset_index().assign(**{"country": region})
+        region_data = (
+            df[df["country"].isin(countries_in_region)]
+            .groupby(["year", "sector", "technology", "sub_technology"], observed=True)
+            .agg({"patents": "sum"})
+            .reset_index()
+            .assign(**{"country": region})
+        )
         # Add data for new region to dataframe.
         df = pd.concat([df, region_data], ignore_index=True)
 
@@ -105,18 +120,24 @@ def add_region_aggregates(df: pd.DataFrame) -> pd.DataFrame:
 def create_patents_by_sub_technology(df: pd.DataFrame) -> pd.DataFrame:
     # Create a simplified table giving just number of patents by sub-technology.
     # Re-calculate numbers of patents by sub-technology.
-    patents_by_sub_technology = df.reset_index().groupby(["country", "year", "sub_technology"], observed=True).\
-        agg({"patents": "sum"}).reset_index()
+    patents_by_sub_technology = (
+        df.reset_index()
+        .groupby(["country", "year", "sub_technology"], observed=True)
+        .agg({"patents": "sum"})
+        .reset_index()
+    )
 
     # Restructure dataframe to have a column per sub-technology.
-    patents_by_sub_technology = patents_by_sub_technology.\
-        pivot(index=["country", "year"], columns="sub_technology", values="patents").reset_index()
+    patents_by_sub_technology = patents_by_sub_technology.pivot(
+        index=["country", "year"], columns="sub_technology", values="patents"
+    ).reset_index()
     # Remove name of dummy index.
     patents_by_sub_technology.columns.names = [None]
 
     # Set an appropriate index to the table by sub-technology and sort conveniently.
-    patents_by_sub_technology = patents_by_sub_technology.\
-        set_index(["country", "year"], verify_integrity=True).sort_index()
+    patents_by_sub_technology = patents_by_sub_technology.set_index(
+        ["country", "year"], verify_integrity=True
+    ).sort_index()
 
     # Create a column for the total number of patents of all sub-technologies.
     patents_by_sub_technology["Total patents"] = patents_by_sub_technology.sum(axis=1)
@@ -160,13 +181,13 @@ def run(dest_dir: str) -> None:
     #
     # Initialize a new Garden dataset, using metadata from Meadow.
     ds_garden = Dataset.create_empty(dest_dir)
-    ds_garden.metadata = ds_meadow.metadata    
+    ds_garden.metadata = ds_meadow.metadata
 
     # Ensure all columns are snake, lower case.
     tb_garden = underscore_table(Table(df))
     tb_garden_by_sub_technology = underscore_table(Table(patents_by_sub_technology))
     tb_garden.metadata = tb_meadow.metadata
-    tb_garden_by_sub_technology.metadata = tb_meadow.metadata    
+    tb_garden_by_sub_technology.metadata = tb_meadow.metadata
 
     # Update dataset metadata using the metadata yaml file.
     ds_garden.metadata.update_from_yaml(N.metadata_path, if_source_exists="replace")
