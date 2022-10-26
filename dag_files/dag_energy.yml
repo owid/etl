@@ -175,6 +175,8 @@ steps:
   # * 'renewable_energy_patents_by_technology': Wide format, indexed by country, year.
   data://garden/irena/2022-10-25/renewable_energy_patents:
     - data://meadow/irena/2022-10-25/renewable_energy_patents
+    - data://garden/wb/2021-07-01/wb_income
+    - data://garden/reference
   # The grapher dataset uses only the wide table from the garden dataset.
   data://grapher/irena/2022-10-25/renewable_energy_patents:
     - data://garden/irena/2022-10-25/renewable_energy_patents
