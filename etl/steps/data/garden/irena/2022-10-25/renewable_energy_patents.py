@@ -60,6 +60,20 @@ REGIONS_TO_ADD = [
 
 
 def regroup_sub_technologies(df: pd.DataFrame) -> pd.DataFrame:
+    """Rename sub-technologies conveniently, ignore sector and technology, and recalculate the number of patents per
+    sub-technology.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Data with number of patents per country, year, sector, technology and sub-technology.
+
+    Returns
+    -------
+    df : pd.DataFrame
+        Data with number of patents per country, year and sub-technology.
+
+    """
     # It seems that sub-technologies can belong to only one technology.
     # As long as this is true, we can just ignore "technology" and select by "sub_technology".
     assert set(df.groupby("sub_technology").agg({"technology": "nunique"}).reset_index()["technology"]) == {1}
@@ -89,8 +103,20 @@ def regroup_sub_technologies(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def add_region_aggregates(df: pd.DataFrame) -> pd.DataFrame:
-    # TODO: Add population and income group datasets in dag.
+    """Add number of patents for regions (the world, continents and income groups) by summing the contribution of the
+    region's members.
 
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Data with a dummy index, country, year, sector, technology, sub-technology and patents.
+
+    Returns
+    -------
+    df : pd.DataFrame
+        Data after adding region aggregates.
+
+    """
     # Add aggregates for continents and income groups.
     for region in REGIONS_TO_ADD:
         if region == "World":
@@ -119,6 +145,21 @@ def add_region_aggregates(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def create_patents_by_sub_technology(df: pd.DataFrame) -> pd.DataFrame:
+    """Create a simplified wide dataframe that counts number of patents by sub-technologies.
+
+    It will also add a column for the total number of patents (the sum of patents of all sub-technologies).
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Data in long dataframe format (indexed by country, year, sector, technology and sub-technology).
+
+    Returns
+    -------
+    patents_by_sub_technology : pd.DataFrame
+        Wide dataframe of number of patents, indexed by country and year, and with a column per sub-technology.
+
+    """
     # Create a simplified table giving just number of patents by sub-technology.
     # Re-calculate numbers of patents by sub-technology.
     patents_by_sub_technology = (
