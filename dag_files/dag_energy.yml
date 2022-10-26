@@ -170,7 +170,11 @@ steps:
   #
   data://meadow/irena/2022-10-25/renewable_energy_patents:
     - walden://irena/2022-10-25/renewable_energy_patents
+  # The garden dataset will have two tables with number of patents:
+  # * 'renewable_energy_patents': Long format, indexed by country, year, sector, technology, sub-technology.
+  # * 'renewable_energy_patents_by_technology': Wide format, indexed by country, year.
   data://garden/irena/2022-10-25/renewable_energy_patents:
     - data://meadow/irena/2022-10-25/renewable_energy_patents
+  # The grapher dataset uses only the wide table from the garden dataset.
   data://grapher/irena/2022-10-25/renewable_energy_patents:
     - data://garden/irena/2022-10-25/renewable_energy_patents
