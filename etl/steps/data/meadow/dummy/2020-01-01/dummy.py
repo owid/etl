@@ -14,14 +14,11 @@ log = get_logger()
 N = Names(__file__)
 
 
-
 def run(dest_dir: str) -> None:
     log.info("dummy.start")
 
     # retrieve raw data from walden
-    walden_ds = WaldenCatalog().find_one(
-        namespace="dummy", short_name="dummy", version="2020-01-01"
-    )
+    walden_ds = WaldenCatalog().find_one(namespace="dummy", short_name="dummy", version="2020-01-01")
     local_file = walden_ds.ensure_downloaded()
 
     df = pd.read_excel(local_file, sheet_name="Full data")
@@ -44,10 +41,10 @@ def run(dest_dir: str) -> None:
 
     # underscore all table columns
     tb = underscore_table(tb)
-    
-    ds.metadata.update_from_yaml(N.metadata_path)
+
+    ds.metadata.update_from_yaml(N.metadata_path, if_source_exists="replace")
     tb.update_metadata_from_yaml(N.metadata_path, "dummy")
-    
+
     # add table to a dataset
     ds.add(tb)
 

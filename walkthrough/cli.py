@@ -29,6 +29,7 @@ PHASES = Literal["walden", "meadow", "garden", "grapher"]
 @click.option(
     "--auto-open/--no-auto-open",
     is_flag=True,
+    default=True,
     help="Auto open browser on port 8082",
 )
 def cli(phase: Iterable[PHASES], run_checks: bool, dummy_data: bool, auto_open: bool) -> None:

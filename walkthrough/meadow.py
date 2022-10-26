@@ -167,9 +167,9 @@ def app(run_checks: bool, dummy_data: bool) -> None:
     poetry run etl data://meadow/{form.namespace}/{form.version}/{form.short_name}
     ```
 
-2. Generated notebook `{notebook_path.relative_to(ETL_DIR)}` can be used to examine the dataset output interactively.
+2. (Optional) Generated notebook `{notebook_path.relative_to(ETL_DIR)}` can be used to examine the dataset output interactively.
 
-3. Loading the dataset is also possible with this snippet:
+3. (Optional) Loading the dataset is also possible with this snippet:
 
     ```python
     from owid.catalog import Dataset
@@ -181,7 +181,19 @@ def app(run_checks: bool, dummy_data: bool) -> None:
     df = ds["{form.short_name}"]
     ```
 
-4. Exit the process and run next step with `poetry run walkthrough garden`
+4. (Optional) Generate metadata file `{form.short_name}.meta.yml` from your dataset with
+
+    ```
+    poetry run etl-metadata-export data/meadow/{form.namespace}/{form.version}/{form.short_name} -o etl/steps/data/meadow/{form.namespace}/{form.version}/{form.short_name}.meta.yml
+    ```
+
+    then manual edit it and rerun the step again with
+
+    ```
+    poetry run etl data://meadow/{form.namespace}/{form.version}/{form.short_name}
+    ```
+
+5. Exit the process and run next step with `poetry run walkthrough garden`
 
 ## Generated files
 """

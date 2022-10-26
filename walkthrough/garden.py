@@ -158,9 +158,9 @@ def app(run_checks: bool, dummy_data: bool) -> None:
     poetry run etl data://garden/{form.namespace}/{form.version}/{form.short_name}
     ```
 
-2. Generated notebook `{notebook_path.relative_to(ETL_DIR)}` can be used to examine the dataset output interactively.
+2. (Optional) Generated notebook `{notebook_path.relative_to(ETL_DIR)}` can be used to examine the dataset output interactively.
 
-3. Loading the dataset is also possible with this snippet:
+3. (Optional) Loading the dataset is also possible with this snippet:
 
     ```python
     from owid.catalog import Dataset
@@ -172,9 +172,21 @@ def app(run_checks: bool, dummy_data: bool) -> None:
     df = ds["{form.short_name}"]
     ```
 
-4. Create a branch in [Walden](https://github.com/owid/walden) and [ETL](https://github.com/owid/etl) repositories, get it reviewed and merged.
+4. (Optional) Generate metadata file `{form.short_name}.meta.yml` from your dataset with
 
-5. Once your changes are merged, your steps will be run automatically by our server and published to the OWID catalog. Once that is finished, it can be found by anyone using:
+    ```
+    poetry run etl-metadata-export data/garden/{form.namespace}/{form.version}/{form.short_name} -o etl/steps/data/garden/{form.namespace}/{form.version}/{form.short_name}.meta.yml
+    ```
+
+    then manual edit it and rerun the step again with
+
+    ```
+    poetry run etl data://garden/{form.namespace}/{form.version}/{form.short_name}
+    ```
+
+5. Create a branch in [Walden](https://github.com/owid/walden) and [ETL](https://github.com/owid/etl) repositories, get it reviewed and merged.
+
+6. Once your changes are merged, your steps will be run automatically by our server and published to the OWID catalog. Once that is finished, it can be found by anyone using:
 
     ```python
     from owid.catalog import find_one
@@ -183,7 +195,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
     print(tab.head())
     ```
 
-6. If you are an internal OWID member and want to push data to our Grapher DB, continue with `poetry run walkthrough grapher`
+7. If you are an internal OWID member and want to push data to our Grapher DB, continue with `poetry run walkthrough grapher`
 
 ## Generated files
 """
