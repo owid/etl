@@ -6,10 +6,8 @@ import pandas as pd
 from owid import catalog
 
 from etl.helpers import Names
-from etl.paths import REFERENCE_DATASET
 
 N = Names(__file__)
-N = Names("/Users/fionaspooner/Documents/OWID/repos/etl/etl/steps/grapher/who/2022-09-30/ghe.py")
 
 
 def run(dest_dir: str) -> None:
@@ -40,11 +38,12 @@ def run(dest_dir: str) -> None:
 
     table.reset_index(inplace=True)
     table = table.drop(columns="flag_level")
+    # There are many diaggregations by age and sex we don't want all of them at the moment so we have this option to only load the subset
     if "GHE_SUBSET_ONLY" in os.environ:
         table = select_subset_causes(table)
     else:
         table = table
-
+    # Calculating global totals of deaths and daly's for each disease
     table = add_global_totals(table)
 
     table = table.set_index(["country", "year", "cause", "sex", "age_group"])
