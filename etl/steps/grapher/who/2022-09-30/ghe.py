@@ -1,12 +1,15 @@
 # To run with subset only: GHE_SUBSET_ONLY=1 etl grapher/who/2022-09-30/ghe --grapher
 import os
+from operator import add
 
 import pandas as pd
 from owid import catalog
 
 from etl.helpers import Names
+from etl.paths import REFERENCE_DATASET
 
 N = Names(__file__)
+N = Names("/Users/fionaspooner/Documents/OWID/repos/etl/etl/steps/grapher/who/2022-09-30/ghe.py")
 
 
 def run(dest_dir: str) -> None:
@@ -42,6 +45,8 @@ def run(dest_dir: str) -> None:
     else:
         table = table
 
+    table = add_global_totals(table)
+
     table = table.set_index(["country", "year", "cause", "sex", "age_group"])
 
     table.update_metadata_from_yaml(N.metadata_path, "ghe")
@@ -62,4 +67,13 @@ def select_subset_causes(table: pd.DataFrame) -> pd.DataFrame:
 
     table = table[(table["sex"] == "Both sexes") & (table["age_group"] == "ALLAges")]
 
+    return table
+
+
+def add_global_totals(table: pd.DataFrame) -> pd.DataFrame:
+    glob_total = table.groupby(["year", "cause"])[["daly_count", "death_count"]].sum().reset_index()
+    glob_total["country"] = "World"
+    glob_total["age_group"] = "ALLAges"
+    glob_total["sex"] = "Both sexes"
+    table = pd.concat([table, glob_total])
     return table
