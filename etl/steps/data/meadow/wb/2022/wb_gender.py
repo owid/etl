@@ -18,7 +18,7 @@ log = structlog.get_logger()
 
 # Renaming of column fields in data
 COLUMNS_DATA_RENAME = {
-    "Country Name": "location",
+    "Country Name": "country",
     "Indicator Name": "variable",
     "Indicator Code": "variable_code",
 }
@@ -87,10 +87,10 @@ def format_data(df: pd.DataFrame, metadata: pd.DataFrame) -> Any:
     """Format data.
 
     Output should be in long format, with four columns:
-        - location: Country name.
+        - country: Country name.
         - variable: Variable name.
         - year: Year (starting from 1960 til 2021).
-        - value: Value for the variable in the given location and year.
+        - value: Value for the variable in the given country and year.
 
     Also runs checks on the data to see that it is consistent with the metadata.
 
@@ -106,7 +106,7 @@ def format_data(df: pd.DataFrame, metadata: pd.DataFrame) -> Any:
     df = df[COLUMNS_RELEVANT]
     # Reshape years
     log.info("Reshaping dataframe: Years in rows...")
-    df = df.melt(["Country Name", "Indicator Name", "Indicator Code"], var_name="year").astype({"year": "category"})
+    df = df.melt(["Country Name", "Indicator Name", "Indicator Code"], var_name="year").astype({"year": int})
     # Dropna
     log.info("Reshaping dataframe: Dropping NaNs...")
     df = df.dropna(subset="value").reset_index(drop=True)
@@ -168,7 +168,10 @@ def check_consistency_data_and_metadata(df: pd.DataFrame, metadata: pd.DataFrame
     # pd.set_option("display.max_colwidth", 40000)
     msk = merged["variable"] != merged["indicator_name"]
     x = merged.loc[msk, ["variable", "indicator_name"]].sort_values("variable")
-    assert x.shape == (45, 2,), (
+    assert x.shape == (
+        45,
+        2,
+    ), (
         "There are 45 expected variables to miss-match namings between data and metadata file, but a different"
         f" amount was found {x.shape}!"
     )
@@ -197,7 +200,7 @@ def final_formatting(df: pd.DataFrame, metadata: pd.DataFrame) -> pd.DataFrame:
     df = df.merge(
         metadata[["series_code", "indicator_name"]], left_on="variable_code", right_on="series_code"
     ).reset_index(drop=True)
-    df = df[["location", "indicator_name", "year", "value"]].rename(columns={"indicator_name": "variable"})
+    df = df[["country", "indicator_name", "year", "value"]].rename(columns={"indicator_name": "variable"})
     # Sort dataframe and set index
     log.info("Sorting dataframe and setting index...")
     df = df.sort_values(COLUMNS_IDX).set_index(COLUMNS_IDX)
