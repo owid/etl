@@ -8,6 +8,7 @@ import pandas as pd
 import structlog
 from owid import walden
 from owid.catalog import Dataset, Table, utils
+from owid.catalog.utils import underscore
 from owid.datautils.io import decompress_file
 
 from etl.steps.data.converters import convert_walden_metadata
@@ -97,7 +98,7 @@ def format_data(df: pd.DataFrame, metadata: pd.DataFrame) -> Any:
     ----------
     df : pd.DataFrame
         Data dataframe
-    df : pd.DataFrame
+    metadata : pd.DataFrame
         Metadata dataframe.
     """
     # Get only necessary columns
@@ -129,7 +130,7 @@ def format_metadata(df: pd.DataFrame) -> pd.DataFrame:
     df = df.drop(columns=df.filter(regex="Unnamed").columns)
     # Rename columns
     log.info("Reshaping dataframe: Renaming columns in metadata...")
-    df.columns = [m.replace(" ", "_").lower() for m in df.columns]
+    df.columns = [underscore(m) for m in df.columns]
     # Clean variable name
     log.info("Reshaping metadata dataframe: Cleaning variable names in metadata...")
     df = df.assign(indicator_name=df["indicator_name"].apply(_clean_variable_name))
