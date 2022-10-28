@@ -1,9 +1,10 @@
 from copy import deepcopy
-from structlog import get_logger
+
 from owid import catalog
-from etl.paths import DATA_DIR
+from structlog import get_logger
 
 import etl.grapher_helpers as gh
+from etl.paths import DATA_DIR
 
 log = get_logger()
 
