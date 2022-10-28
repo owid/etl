@@ -8,7 +8,7 @@ from etl.paths import DATA_DIR
 
 log = get_logger()
 
-DATASET_GARDEN = DATA_DIR / "garden/wb/2022/wb_gender"
+DATASET_GARDEN = DATA_DIR / "garden/wb/2022-10-28/wb_gender"
 
 
 def process_table(table: catalog.Table) -> catalog.Table:

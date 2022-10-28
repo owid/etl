@@ -37,7 +37,7 @@ def load_meadow_ds() -> catalog.Dataset:
     catalog.Dataset
         Meadow dataset.
     """
-    meadow_path = base_path / "data/meadow/wb/2022/wb_gender"
+    meadow_path = base_path / "data/meadow/wb/2022-10-28/wb_gender"
     ds = catalog.Dataset(meadow_path)
     return ds
 
