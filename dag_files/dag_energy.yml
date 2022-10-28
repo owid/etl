@@ -165,3 +165,18 @@ steps:
     - data://meadow/irena/2022-10-20/renewable_electricity_capacity_and_generation
   data://grapher/irena/2022-10-20/renewable_electricity_capacity_by_technology:
     - data://garden/irena/2022-10-20/renewable_electricity_capacity
+  #
+  # IRENA - Renewable energy patents (2021).
+  #
+  data://meadow/irena/2022-10-25/renewable_energy_patents:
+    - walden://irena/2022-10-25/renewable_energy_patents
+  # The garden dataset will have two tables with number of patents:
+  # * 'renewable_energy_patents': Long format, indexed by country, year, sector, technology, sub-technology.
+  # * 'renewable_energy_patents_by_technology': Wide format, indexed by country, year.
+  data://garden/irena/2022-10-25/renewable_energy_patents:
+    - data://meadow/irena/2022-10-25/renewable_energy_patents
+    - data://garden/wb/2021-07-01/wb_income
+    - data://garden/reference
+  # The grapher dataset uses only the wide table from the garden dataset.
+  data://grapher/irena/2022-10-25/renewable_energy_patents:
+    - data://garden/irena/2022-10-25/renewable_energy_patents

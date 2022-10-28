@@ -37,10 +37,13 @@ def run(dest_dir: str) -> None:
 
     table.reset_index(inplace=True)
     table = table.drop(columns="flag_level")
+    # There are many diaggregations by age and sex we don't want all of them at the moment so we have this option to only load the subset
     if "GHE_SUBSET_ONLY" in os.environ:
         table = select_subset_causes(table)
     else:
         table = table
+    # Calculating global totals of deaths and daly's for each disease
+    table = add_global_totals(table)
 
     table = table.set_index(["country", "year", "cause", "sex", "age_group"])
 
@@ -62,4 +65,13 @@ def select_subset_causes(table: pd.DataFrame) -> pd.DataFrame:
 
     table = table[(table["sex"] == "Both sexes") & (table["age_group"] == "ALLAges")]
 
+    return table
+
+
+def add_global_totals(table: pd.DataFrame) -> pd.DataFrame:
+    glob_total = table.groupby(["year", "cause"])[["daly_count", "death_count"]].sum().reset_index()
+    glob_total["country"] = "World"
+    glob_total["age_group"] = "ALLAges"
+    glob_total["sex"] = "Both sexes"
+    table = pd.concat([table, glob_total])
     return table
