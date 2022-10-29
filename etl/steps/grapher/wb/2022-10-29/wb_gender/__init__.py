@@ -13,6 +13,7 @@ DATASET_GARDEN = DATA_DIR / "garden/wb/2022-10-29/wb_gender"
 
 
 def process_table(table: catalog.Table) -> catalog.Table:
+    log.info("Processing table...")
     # Reset index
     table = table.reset_index()
     # Harmonize country names
@@ -21,6 +22,8 @@ def process_table(table: catalog.Table) -> catalog.Table:
 
 
 def add_variable_metadata(table: catalog.Table, table_metadata: catalog.Table) -> catalog.Table:
+    log.info("Adding variable metadata...")
+
     def _build_variable_metadata_description(table_meta):
         description = f"{table_meta['long_definition']}"
         fields_additional = [
@@ -29,7 +32,7 @@ def add_variable_metadata(table: catalog.Table, table_metadata: catalog.Table) -
             ("source", "Original source"),
         ]
         for field in fields_additional:
-            if table_meta[field[0]] is not None:
+            if not pd.isnull(table_meta[field[0]]):
                 description += f"\n\n{field[1]}: {table_meta[field[0]]}"
         return description
 
@@ -60,6 +63,7 @@ def add_variable_metadata(table: catalog.Table, table_metadata: catalog.Table) -
 def add_table_to_dataset(dataset: catalog.Dataset, table: catalog.Table) -> None:
     # Add table to dataset
     # dataset.add(table)
+    log.info("Adding table to dataset...")
     for wide_table in gh.long_to_wide_tables(table):
         # table is generated for every column, use it as a table name
         wide_table.metadata.short_name = wide_table.columns[0]
