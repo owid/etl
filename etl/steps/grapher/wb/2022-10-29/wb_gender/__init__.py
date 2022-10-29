@@ -1,7 +1,7 @@
 from copy import deepcopy
 
-from owid import catalog
 import pandas as pd
+from owid import catalog
 from structlog import get_logger
 
 import etl.grapher_helpers as gh
