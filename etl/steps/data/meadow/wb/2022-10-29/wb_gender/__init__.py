@@ -41,7 +41,7 @@ METADATA_VARIABLES_FILENAME = "Gender_StatsSeries.csv"
 METADATA_COUNTRIES_FILENAME = "Gender_StatsCountry.csv"
 
 
-def load_data_from_walden(walden_ds: walden.Catalog) -> Tuple[pd.DataFrame, pd.DataFrame]:
+def load_data_from_walden(walden_ds: walden.Catalog) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """Load data and metadata."""
     # Get Walden dataset
     with tempfile.TemporaryDirectory() as f:
@@ -191,10 +191,7 @@ def check_consistency_data_and_metadata(df: pd.DataFrame, metadata_variables: pd
     # pd.set_option("display.max_colwidth", 40000)
     msk = merged["variable"] != merged["indicator_name"]
     x = merged.loc[msk, ["variable", "indicator_name"]].sort_values("variable")
-    assert x.shape == (
-        45,
-        2,
-    ), (
+    assert x.shape == (45, 2,), (
         "There are 45 expected variables to miss-match namings between data and metadata file, but a different"
         f" amount was found {x.shape}!"
     )

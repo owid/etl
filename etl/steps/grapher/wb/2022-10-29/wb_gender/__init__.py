@@ -24,7 +24,7 @@ def process_table(table: catalog.Table) -> catalog.Table:
 def add_variable_metadata(table: catalog.Table, table_metadata: catalog.Table) -> catalog.Table:
     log.info("Adding variable metadata...")
 
-    def _build_variable_metadata_description(table_meta):
+    def _build_variable_metadata_description(table_meta: catalog.Table) -> str:
         description = f"{table_meta['long_definition']}"
         fields_additional = [
             ("topic", "Topic"),
