@@ -220,5 +220,14 @@
   "High income": "High-income countries",
   "Lower middle income": "Lower-middle-income countries",
   "Low income": "Low-income countries",
-  "Upper middle income": "Upper-middle-income countries"
+  "Upper middle income": "Upper-middle-income countries",
+  "North America": "North America (WB)",
+  "Latin America & Caribbean": "Latin America and Caribbean (WB)",
+  "Europe & Central Asia": "Europe and Central Asia (WB)",
+  "East Asia & Pacific": "East Asia and Pacific (WB)",
+  "South Asia": "South Asia (WB)",
+  "Middle East & North Africa": "Middle East and North Africa (WB)",
+  "Sub-Saharan Africa": "Sub-Saharan Africa (WB)",
+  "European Union": "European Union",
+  "OECD members": "OECD members"
 }
