@@ -35,8 +35,10 @@ COLUMNS_KNOWN = COLUMNS_RELEVANT + COLUMNS_NOT_RELEVANT
 COLUMNS_IDX = [c for c in COLUMNS_DATA_RENAME.values() if c not in "variable_code"] + ["year"]
 # Name of the data file
 DATA_FILENAME = "Gender_StatsData.csv"
-# Name of the metadata file
-METADATA_FILENAME = "Gender_StatsSeries.csv"
+# Name of the metadata (variables) file
+METADATA_VARIABLES_FILENAME = "Gender_StatsSeries.csv"
+# Name of the metadata (countries) file
+METADATA_COUNTRIES_FILENAME = "Gender_StatsCountry.csv"
 
 
 def load_data_from_walden(walden_ds: walden.Catalog) -> Tuple[pd.DataFrame, pd.DataFrame]:
@@ -48,9 +50,10 @@ def load_data_from_walden(walden_ds: walden.Catalog) -> Tuple[pd.DataFrame, pd.D
         log.info("Extracting data and metadata from walden zip file...")
         decompress_file(input_file=walden_ds.local_path, output_folder=output_folder, overwrite=True)
         # Read data and metadata
-        df = _load_data(output_folder)
-        metadata = _load_metadata(output_folder)
-        return df, metadata
+        table = _load_data(output_folder)
+        metadata_variables = _load_metadata_variables(output_folder)
+        metadata_countries = _load_metadata_countries(output_folder)
+        return table, metadata_variables, metadata_countries
 
 
 def _load_data(folder_path: Path) -> pd.DataFrame:
@@ -67,12 +70,21 @@ def _load_data(folder_path: Path) -> pd.DataFrame:
     return df
 
 
-def _load_metadata(folder_path: Path) -> pd.DataFrame:
-    """Load metadata from file, as DataFrame."""
+def _load_metadata_variables(folder_path: Path) -> pd.DataFrame:
+    """Load metadata (variables) from file, as DataFrame."""
     dtypes = {
         "Indicator Name": "category",
     }
-    df = pd.read_csv(folder_path / METADATA_FILENAME, dtype=dtypes)
+    df = pd.read_csv(folder_path / METADATA_VARIABLES_FILENAME, dtype=dtypes)
+    return df
+
+
+def _load_metadata_countries(folder_path: Path) -> pd.DataFrame:
+    """Load metadata (countries) from file, as DataFrame."""
+    dtypes = {
+        "Indicator Name": "category",
+    }
+    df = pd.read_csv(folder_path / METADATA_COUNTRIES_FILENAME, dtype=dtypes)
     return df
 
 
@@ -83,7 +95,7 @@ def _sanity_check_columns_data(df: pd.DataFrame) -> None:
     assert not set(COLUMNS_KNOWN).difference(df.columns)
 
 
-def format_data(df: pd.DataFrame, metadata: pd.DataFrame) -> Any:
+def format_data(df: pd.DataFrame, metadata_variables: pd.DataFrame) -> Any:
     """Format data.
 
     Output should be in long format, with four columns:
@@ -98,8 +110,8 @@ def format_data(df: pd.DataFrame, metadata: pd.DataFrame) -> Any:
     ----------
     df : pd.DataFrame
         Data dataframe
-    metadata : pd.DataFrame
-        Metadata dataframe.
+    metadata_variables : pd.DataFrame
+        Metadata (countries) dataframe.
     """
     # Get only necessary columns
     log.info("Reshaping dataframe: Preserving only relevant columns in data...")
@@ -117,43 +129,54 @@ def format_data(df: pd.DataFrame, metadata: pd.DataFrame) -> Any:
     log.info("Reshaping dataframe: Cleaning variable names...")
     df = df.assign(variable=df["variable"].apply(_clean_variable_name))
     # Check consistency between data and metadata (primarily review variable names)
-    check_consistency_data_and_metadata(df, metadata)
+    check_consistency_data_and_metadata(df, metadata_variables)
     # Final formatting
-    df = final_formatting(df, metadata)
+    df = final_formatting(df, metadata_variables)
     return df
 
 
-def format_metadata(df: pd.DataFrame) -> pd.DataFrame:
-    """Format metadata."""
+def format_metadata_variables(df: pd.DataFrame) -> pd.DataFrame:
+    """Format metadata (variables)."""
     # Drop columns
-    log.info("Reshaping dataframe: Preserving only relevant columns in metadata...")
+    log.info("Reshaping dataframe: Preserving only relevant columns in metadata (variables)...")
     df = df.drop(columns=df.filter(regex="Unnamed").columns)
     # Rename columns
-    log.info("Reshaping dataframe: Renaming columns in metadata...")
+    log.info("Reshaping dataframe: Renaming columns in metadata (variables)...")
     df.columns = [underscore(m) for m in df.columns]
     # Clean variable name
-    log.info("Reshaping metadata dataframe: Cleaning variable names in metadata...")
+    log.info("Reshaping metadata dataframe: Cleaning variable names in metadata (variables)...")
     df = df.assign(indicator_name=df["indicator_name"].apply(_clean_variable_name))
     return df
 
 
-def check_consistency_data_and_metadata(df: pd.DataFrame, metadata: pd.DataFrame) -> None:
-    """Check that variable names in data and metadata are consistent.
+def format_metadata_countries(df: pd.DataFrame) -> pd.DataFrame:
+    """Format metadata (countries)."""
+    # Drop columns
+    log.info("Reshaping dataframe: Preserving only relevant columns in metadata (countries)...")
+    df = df.drop(columns=df.filter(regex="Unnamed").columns)
+    # Rename columns
+    log.info("Reshaping dataframe: Renaming columns in metadata...")
+    df.columns = [underscore(m) for m in df.columns]
+    return df
 
-    Some variable names may differ from the data to the metadata. This function checks that those
+
+def check_consistency_data_and_metadata(df: pd.DataFrame, metadata_variables: pd.DataFrame) -> None:
+    """Check that variable names in data and metadata (variables) are consistent.
+
+    Some variable names may differ from the data to the metadata (variables). This function checks that those
     that that differ are the ones expected.
 
     Parameters
     ----------
     df : pd.DataFrame
         Data dataframe.
-    metadata : pd.DataFrame
+    metadata_variables : pd.DataFrame
         Metadata dataframe.
     """
-    log.info("Sanity check: Check that variable names in data and metadata are consistent...")
+    log.info("Sanity check: Check that variable names in data and metadata (variables) are consistent...")
     # Get table with variable names for data and metadata
     df_var = df[["variable", "variable_code"]].drop_duplicates().astype(str)
-    metadata_var = metadata[["indicator_name", "series_code"]].astype(str)
+    metadata_var = metadata_variables[["indicator_name", "series_code"]].astype(str)
     # Combine
     merged = df_var.merge(metadata_var, left_on="variable_code", right_on="series_code", how="outer")
     # Check no code is left unmapped
@@ -168,13 +191,16 @@ def check_consistency_data_and_metadata(df: pd.DataFrame, metadata: pd.DataFrame
     # pd.set_option("display.max_colwidth", 40000)
     msk = merged["variable"] != merged["indicator_name"]
     x = merged.loc[msk, ["variable", "indicator_name"]].sort_values("variable")
-    assert x.shape == (45, 2,), (
+    assert x.shape == (
+        45,
+        2,
+    ), (
         "There are 45 expected variables to miss-match namings between data and metadata file, but a different"
         f" amount was found {x.shape}!"
     )
 
 
-def final_formatting(df: pd.DataFrame, metadata: pd.DataFrame) -> pd.DataFrame:
+def final_formatting(df: pd.DataFrame, metadata_variables: pd.DataFrame) -> pd.DataFrame:
     """Final formatting of the data.
 
     To finalise the formatting of the data, we replace the variable names with those from metadata.
@@ -183,19 +209,19 @@ def final_formatting(df: pd.DataFrame, metadata: pd.DataFrame) -> pd.DataFrame:
     Parameters
     ----------
     df : pd.DataFrame
-        _description_
-    metadata : pd.DataFrame
-        _description_
+        Data table.
+    metadata_variables : pd.DataFrame
+        Metadata (variables) table.
 
     Returns
     -------
     pd.DataFrame
-        _description_
+        Formatted data table.
     """
     # Use variable names from metadata
     log.info("Replacing variable names with those from metadata...")
     df = df.merge(
-        metadata[["series_code", "indicator_name"]], left_on="variable_code", right_on="series_code"
+        metadata_variables[["series_code", "indicator_name"]], left_on="variable_code", right_on="series_code"
     ).reset_index(drop=True)
     df = df[["country", "indicator_name", "year", "value"]].rename(columns={"indicator_name": "variable"})
     # Sort dataframe and set index
@@ -219,12 +245,15 @@ def init_dataset(dest_dir: str, walden_ds: walden.Dataset) -> Dataset:
     return ds
 
 
-def add_tables_to_ds(ds: Dataset, df: pd.DataFrame, metadata: pd.DataFrame) -> Dataset:
+def add_tables_to_ds(
+    ds: Dataset, df: pd.DataFrame, metadata_variables: pd.DataFrame, metadata_countries: pd.DataFrame
+) -> Dataset:
     """Add tables to Meadow dataset"""
     log.info("Adding tables to Meadow dataset...")
     tables = [
-        (df, "data"),
-        (metadata, "metadata"),
+        (df, "wb_gender"),
+        (metadata_variables, "metadata_variables"),
+        (metadata_variables, "metadata_countries"),
     ]
     for t in tables:
         table = Table(t[0])
@@ -236,13 +265,15 @@ def add_tables_to_ds(ds: Dataset, df: pd.DataFrame, metadata: pd.DataFrame) -> D
 def run(dest_dir: str) -> None:
     """Run pipeline."""
     # Load data and metadata
-    walden_ds = walden.Catalog().find_one("wb", "2022-10-28", "wb_gender")
-    df, metadata = load_data_from_walden(walden_ds)
-    # Format metadata
-    metadata = metadata.pipe(format_metadata)
+    walden_ds = walden.Catalog().find_one("wb", "2022-10-29", "wb_gender")
+    table, metadata_variables, metadata_countries = load_data_from_walden(walden_ds)
+    # Format metadata (variables)
+    metadata_variables = metadata_variables.pipe(format_metadata_variables)
+    # Format metadata (countries)
+    metadata_countries = metadata_countries.pipe(format_metadata_countries)
     # Format data
-    df = df.pipe(format_data, metadata)
+    table = table.pipe(format_data, metadata_variables)
     # Initiate dataset
     ds = init_dataset(dest_dir, walden_ds)
     # Add tables to dataset
-    ds = add_tables_to_ds(ds, df, metadata)
+    ds = add_tables_to_ds(ds, table, metadata_variables, metadata_countries)
