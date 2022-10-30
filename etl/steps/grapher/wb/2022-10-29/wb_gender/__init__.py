@@ -37,14 +37,15 @@ def add_variable_metadata(table: catalog.Table, table_metadata: catalog.Table) -
         return description
 
     metadata = deepcopy(table.metadata)
-    # Add variable metadata
+    # Add variable metadat
     meta = table_metadata.apply(
         lambda variable: catalog.VariableMeta(
             title=variable["indicator_name"],
             description=_build_variable_metadata_description(variable),
             sources=table.metadata.dataset.sources,
-            licenses=[catalog.License(name=variable["license_name"], url="license_url")],
-            unit=variable["unit_of_measure"],
+            licenses=[catalog.License(name=variable["license_name"], url=variable["license_url"])],
+            unit=variable["unit"],
+            short_unit=variable["short_unit"],
             display=dict(name=variable["indicator_name"]),
         ),
         axis=1,

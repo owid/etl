@@ -1,6 +1,9 @@
 """WB Gender Garden step."""
 from pathlib import Path
+from typing import Union
 
+import numpy as np
+import pandas as pd
 from owid import catalog
 from owid.datautils import geo
 from structlog import get_logger
@@ -109,12 +112,66 @@ def make_table_metadata(table: catalog.Table, table_metadata: catalog.Table) -> 
     assert license_.name == "CC BY 4.0", f"License in dataset should be 'CC BY 4.0', but is {license_.name} instead."
     # Assign generic dataset license to all variables
     # Replace NaNs in unit_of_measure for empty strings
+    units = _build_unit(table_metadata)
+    short_units = _build_short_unit(units)
     table_metadata = table_metadata.assign(
         license_name=license_.name,
         license_url=license_.url,
-        unit_of_measure=table_metadata["unit_of_measure"].astype(str).apply(lambda x: x if x != "nan" else ""),
-    ).drop(columns=["license_type"])
+        unit=units,
+        short_unit=short_units,
+    ).drop(columns=["license_type", "unit_of_measure"])
     return table_metadata
+
+
+def _build_unit(table_metadata: catalog.Table) -> pd.Series:
+    """Build unit of measure.
+
+    The unit of measure is created using the `indicator_name` field. We have come up with some rules, which
+    you can explore in the source code of the function. Some examples are:
+
+    - Any name containing string "(%...)" is assigned the unit "%..."
+    - Any name containing string "(%)" is assigned the unit "%"
+    - Any name containing string "(...$)" is assigned the unit "...$"
+    - Any name containing string "(days)" is assigned the unit "days"
+
+    Parameters
+    ----------
+    table_metadata : catalog.Table
+        Metadata table.
+
+    Returns
+    -------
+    catalog.Variable
+        Variable with units.
+    """
+    # extract units
+    unit_1 = table_metadata["indicator_name"].str.extract(r"\((% [^\)]*)\)")  # (%...)
+    unit_12 = table_metadata["indicator_name"].str.extract(r"\((%), tertiary\)")  # (%, tertiary)
+    unit_2 = table_metadata["indicator_name"].str.extract(r"\(([^\)]*\$)\)")  # (...$)
+    unit_3 = table_metadata["indicator_name"].str.extract(r"\(([^\)]*\%)\)")  # (...%)
+    unit_4 = table_metadata["indicator_name"].str.extract(r"[Ee]xpected ([Yy]ears)")  # Expected years...
+    unit_4[0] = unit_4[0].apply(lambda x: x.lower() if not pd.isnull(x) else np.nan)
+    unit_5 = table_metadata["indicator_name"].str.extract(r"\((per[^%)]*)\)")  # (per...)
+    unit_6 = table_metadata["indicator_name"].str.extract(r"\((?:calendar )?(days)\)")  # (days)
+    unit_7 = table_metadata["indicator_name"].str.extract(r"\((liters)[^\)]*\)")  # (liters...)
+    # Build units
+    units = pd.concat([unit_1, unit_12, unit_2, unit_3, unit_4, unit_5, unit_6, unit_7], axis=1)
+    # Sanity check
+    assert all((-units.isna()).sum(axis=1) <= 1), "Multiple units found!"
+    # Final formatting
+    units.columns = range(units.shape[1])
+    units_ = units[0]
+    for i in range(1, units.shape[1]):
+        units_ = units_.fillna(units[i])
+    # Replace NaNs with empty strings
+    units_ = units_.fillna("")
+    # units = catalog.Variable(units_)
+    return units_
+
+
+def _build_short_unit(units: Union[pd.Series, catalog.Variable]) -> pd.Series:
+    short_units: pd.Series = units.str.contains(r"\%").replace({True: "%", False: ""})
+    return short_units
 
 
 def run(dest_dir: str) -> None:
