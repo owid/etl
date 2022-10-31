@@ -14,10 +14,8 @@ DATASET_GARDEN = DATA_DIR / "garden/wb/2022-10-29/wb_gender"
 
 def process_table(table: catalog.Table) -> catalog.Table:
     log.info("Processing table...")
-    # Reset index
-    table = table.reset_index()
-    # Harmonize country names
-    table = table.set_index(["country", "year"])
+    # Set new index
+    table = table.reset_index().set_index(["country", "year"])
     return table
 
 

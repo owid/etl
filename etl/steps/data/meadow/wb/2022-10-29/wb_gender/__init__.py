@@ -15,6 +15,10 @@ from etl.steps.data.converters import convert_walden_metadata
 
 log = structlog.get_logger()
 
+# Dataset details
+NAMESPACE = "wb"
+VERSION = "2022-10-29"
+SHORT_NAME = "wb_gender"
 
 # Renaming of column fields in data
 COLUMNS_DATA_RENAME = {
@@ -155,7 +159,7 @@ def format_metadata_countries(df: pd.DataFrame) -> pd.DataFrame:
     log.info("Reshaping dataframe: Preserving only relevant columns in metadata (countries)...")
     df = df.drop(columns=df.filter(regex="Unnamed").columns)
     # Rename columns
-    log.info("Reshaping dataframe: Renaming columns in metadata...")
+    log.info("Reshaping dataframe: Renaming columns in metadata (countries)...")
     df.columns = [underscore(m) for m in df.columns]
     return df
 
@@ -191,7 +195,10 @@ def check_consistency_data_and_metadata(df: pd.DataFrame, metadata_variables: pd
     # pd.set_option("display.max_colwidth", 40000)
     msk = merged["variable"] != merged["indicator_name"]
     x = merged.loc[msk, ["variable", "indicator_name"]].sort_values("variable")
-    assert x.shape == (45, 2,), (
+    assert x.shape == (
+        45,
+        2,
+    ), (
         "There are 45 expected variables to miss-match namings between data and metadata file, but a different"
         f" amount was found {x.shape}!"
     )
@@ -250,7 +257,7 @@ def add_tables_to_ds(
     tables = [
         (df, "wb_gender"),
         (metadata_variables, "metadata_variables"),
-        (metadata_variables, "metadata_countries"),
+        (metadata_countries, "metadata_countries"),
     ]
     for t in tables:
         table = Table(t[0])
@@ -262,7 +269,7 @@ def add_tables_to_ds(
 def run(dest_dir: str) -> None:
     """Run pipeline."""
     # Load data and metadata
-    walden_ds = walden.Catalog().find_one("wb", "2022-10-29", "wb_gender")
+    walden_ds = walden.Catalog().find_one(NAMESPACE, VERSION, SHORT_NAME)
     table, metadata_variables, metadata_countries = load_data_from_walden(walden_ds)
     # Format metadata (variables)
     metadata_variables = metadata_variables.pipe(format_metadata_variables)

@@ -13,6 +13,10 @@ from etl.paths import BASE_DIR as base_path
 log = get_logger()
 
 
+DATASET_MEADOW = base_path / "data/meadow/wb/2022-10-29/wb_gender"
+THIS_DIRECTORY = Path(__file__).parent
+
+
 def init_garden_ds(dest_dir: str, ds_meadow: catalog.Dataset) -> catalog.Dataset:
     """Initiate garden dataset.
 
@@ -40,8 +44,7 @@ def load_meadow_ds() -> catalog.Dataset:
     catalog.Dataset
         Meadow dataset.
     """
-    meadow_path = base_path / "data/meadow/wb/2022-10-29/wb_gender"
-    ds = catalog.Dataset(meadow_path)
+    ds = catalog.Dataset(DATASET_MEADOW)
     return ds
 
 
@@ -74,7 +77,7 @@ def make_table(table: catalog.Table) -> catalog.Table:
     # Set index
     log.info("Set index...")
     column_idx = ["country", "variable", "year"]
-    table = table.sort_values(column_idx).set_index(column_idx)
+    table = table.set_index(column_idx).sort_index()
     return table
 
 
@@ -134,6 +137,8 @@ def _build_unit(table_metadata: catalog.Table) -> pd.Series:
     - Any name containing string "(...$)" is assigned the unit "...$"
     - Any name containing string "(days)" is assigned the unit "days"
 
+    The output is a pandas Series with the unit of measure for each variable.
+
     Parameters
     ----------
     table_metadata : catalog.Table
@@ -165,7 +170,13 @@ def _build_unit(table_metadata: catalog.Table) -> pd.Series:
         units_ = units_.fillna(units[i])
     # Replace NaNs with empty strings
     units_ = units_.fillna("")
-    # units = catalog.Variable(units_)
+    # Check if units_ is as expected (perhaps new units? wrong units detected?)
+    # units_.to_csv("wb_gender.units.check.csv", index=False)
+    units_check = pd.read_csv(THIS_DIRECTORY / "wb_gender.units.check.csv", usecols=["0"]).squeeze()
+    assert units_.equals(units_check.fillna("")), (
+        "Units are not as expected. Please review the output of _build_unit function. If the output looks fine, then"
+        " update auxiliary file wb_gender.units.check.csv."
+    )
     return units_
 
 
