@@ -236,7 +236,7 @@ def add_tables_to_ds(ds: Dataset, df: pd.DataFrame, metadata: pd.DataFrame) -> D
 def run(dest_dir: str) -> None:
     """Run pipeline."""
     # Load data and metadata
-    walden_ds = walden.Catalog().find_one("wb", "2022", "wb_gender")
+    walden_ds = walden.Catalog().find_one("wb", "2022-10-29", "wb_gender")
     df, metadata = load_data_from_walden(walden_ds)
     # Format metadata
     metadata = metadata.pipe(format_metadata)
