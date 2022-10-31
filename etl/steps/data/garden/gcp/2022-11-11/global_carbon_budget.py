@@ -79,11 +79,17 @@ GDP_COLUMNS = {
     "gdp": "gdp",
 }
 
+# Columns to use from primary energy consumption data and how to rename them.
+HISTORICAL_EMISSIONS_COLUMNS = {
+    "country": "country",
+    "year": "year",
+    # Global fossil emissions are used only for sanity checks.
+    "global_fossil_emissions": "global_fossil_emissions",
+    "global_land_use_change_emissions": "global_emissions_from_land_use_change",
+}
+
 # Conversion from terawatt-hours to kilowatt-hours.
 TWH_TO_KWH = 1e9
-
-# Convert from million tonnes of carbon to million tonnes of CO2.
-MILLION_TONNES_OF_CARBON_TO_MILLION_TONNES_CO2 = 3.664
 
 # Conversion from tonnes of CO2 to million tonnes of CO2.
 # NOTE: This conversion factor is needed because, in the meadow step of additional data, variables were converted
@@ -91,8 +97,9 @@ MILLION_TONNES_OF_CARBON_TO_MILLION_TONNES_CO2 = 3.664
 TONNES_OF_CO2_TO_MILLION_TONNES_OF_CO2 = 1e-6
 
 
-# TODO: Adapt make these sanity checks work.
-def sanity_checks(production_df: pd.DataFrame, consumption_df: pd.DataFrame, historical_df: pd.DataFrame) -> None:
+def sanity_checks_on_raw_data(
+    production_df: pd.DataFrame, consumption_df: pd.DataFrame, historical_df: pd.DataFrame
+) -> None:
     production_df = production_df.copy()
     consumption_df = consumption_df.copy()
     historical_df = historical_df.copy()
@@ -133,18 +140,17 @@ def sanity_checks(production_df: pd.DataFrame, consumption_df: pd.DataFrame, his
     error = "Production emissions for the world were expected to coincide with global fossil emissions."
     assert check[check["production_emissions"] != check["global_fossil_emissions"]].empty, error
 
-    # TODO: The following "combined_df" could be an input (which is the final co2_df after reset_index()).
 
-    combined_df = pd.DataFrame()
-
-    # Sanity checks.
+def sanity_checks_on_processed_data(combined_df: pd.DataFrame) -> None:
+    combined_df = combined_df.reset_index()
+    # Check that production emissions as a share of global emissions, for the world, should be 100% (within 1%).
     error = "Production emissions as a share of global emissions should be 100% for 'World'."
     assert combined_df[
-        (combined_df["country"] == "World") & (combined_df["production_emissions_as_share_of_global"] != 100)
+        (combined_df["country"] == "World") & (abs(combined_df["emissions_total_as_share_of_global"] - 100) > 2)
     ].empty, error
     error = "Consumption emissions as a share of global emissions should be 100% for 'World'."
     assert combined_df[
-        (combined_df["country"] == "World") & (combined_df["consumption_emissions_as_share_of_global"] != 100)
+        (combined_df["country"] == "World") & (abs(combined_df["consumption_emissions_as_share_of_global"] - 100) > 2)
     ].empty, error
     error = "Population as a share of global population should be 100% for 'World'."
     assert combined_df[
@@ -185,15 +191,10 @@ def extract_global_emissions(co2_df: pd.DataFrame, historical_df: pd.DataFrame) 
     # Add bunker fuels to global emissions.
     global_emissions = pd.merge(global_emissions, global_transport, on=["year"], how="outer")
 
-    # Prepare dataframe of historical emissions.
-    # For convenience, rename land-use change column and ensure it has the right units.
-    _historical_df = historical_df.rename(
-        columns={"global_land_use_change_emissions": "global_emissions_from_land_use_change"}
-    ).drop(columns="country")
-    _historical_df["global_emissions_from_land_use_change"] *= TONNES_OF_CO2_TO_MILLION_TONNES_OF_CO2
-
     # Add historical land-use change emissions to dataframe of global emissions.
-    global_emissions = pd.merge(global_emissions, _historical_df, how="left", on="year")
+    global_emissions = pd.merge(
+        global_emissions, historical_df[["year", "global_emissions_from_land_use_change"]], how="left", on="year"
+    )
 
     # Add variable of total emissions including fossil fuels and land use change.
     global_emissions["global_emissions_total_including_land_use_change_emissions"] = (
@@ -237,7 +238,9 @@ def harmonize_co2_data(co2_df: pd.DataFrame) -> pd.DataFrame:
     ).reset_index(drop=True)
 
     # Check that the only duplicated rows found are for "Palau".
-    assert co2_df[co2_df.duplicated(subset=["country", "year"])]["country"].unique().tolist() == ["Palau"]  # type: ignore
+    assert co2_df[co2_df.duplicated(subset=["country", "year"])]["country"].unique().tolist() == [  # type: ignore
+        "Palau"
+    ]
 
     # Remove duplicated rows.
     co2_df = co2_df.drop_duplicates(subset=["country", "year"], keep="last").reset_index(drop=True)
@@ -375,14 +378,25 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
+    # Run sanity checks on raw data.
+    sanity_checks_on_raw_data(production_df, consumption_df, historical_df)
+
     # Select and rename columns from primary energy data.
     primary_energy_df = primary_energy_df[list(PRIMARY_ENERGY_COLUMNS)].rename(columns=PRIMARY_ENERGY_COLUMNS)
 
     # Select and rename columns from primary energy data.
     gdp_df = gdp_df[list(GDP_COLUMNS)].rename(columns=GDP_COLUMNS)
 
+    # Select and rename columns from historical emissions data.
+    historical_df = historical_df[list(HISTORICAL_EMISSIONS_COLUMNS)].rename(columns=HISTORICAL_EMISSIONS_COLUMNS)
+
     # Select and rename columns from fossil CO2 data.
     co2_df = co2_df[list(CO2_COLUMNS)].rename(columns=CO2_COLUMNS)
+
+    # Ensure all emissions are given in tonnes of CO2 to million tonnes of CO2.
+    historical_df["global_emissions_from_land_use_change"] *= TONNES_OF_CO2_TO_MILLION_TONNES_OF_CO2
+    consumption_df["consumption_emissions"] *= TONNES_OF_CO2_TO_MILLION_TONNES_OF_CO2
+    production_df["production_emissions"] *= TONNES_OF_CO2_TO_MILLION_TONNES_OF_CO2
 
     # For some reason, "International Transport" is included as another country, that only has emissions from oil.
     # Extract that data and remove it from the rest of national emissions.
@@ -415,9 +429,6 @@ def run(dest_dir: str) -> None:
     # Harmonize fossil CO2 data.
     co2_df = harmonize_co2_data(co2_df=co2_df)
 
-    # Convert all variable units from million tonnes of carbon to million tonnes of CO2.
-    co2_df[EMISSION_SOURCES] *= MILLION_TONNES_OF_CARBON_TO_MILLION_TONNES_CO2
-
     # Add new variables to main dataframe (consumption-based emissions, emission intensity, per-capita emissions, etc.).
     combined_df = add_variables_to_co2_data(
         co2_df=co2_df,
@@ -430,6 +441,9 @@ def run(dest_dir: str) -> None:
     # Set an appropriate index, ensure there are no rows that only have nan, and sort conveniently.
     combined_df = combined_df.set_index(["country", "year"], verify_integrity=True)
     combined_df = combined_df.dropna(subset=combined_df.columns, how="all").sort_index().sort_index(axis=1)
+
+    # Run sanity checks on processed data.
+    sanity_checks_on_processed_data(combined_df)
 
     #
     # Save outputs.
