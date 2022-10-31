@@ -2,8 +2,6 @@
 
 """
 
-from typing import Tuple
-
 import numpy as np
 import pandas as pd
 from owid import catalog
@@ -32,9 +30,9 @@ CO2_COUNTRIES_FILE = STEP_DIR / "data/garden/gcp/2022-11-11/global_carbon_budget
 # Country names harmonization file for additional data.
 ADDITIONAL_COUNTRIES_FILE = STEP_DIR / "data/garden/gcp/2022-09-29/global_carbon_budget_additional.countries.json"
 # Meadow dataset on GCB fossil CO2 emissions.
-MEADOW_CO2_DATASET_PATH = DATA_DIR / f"meadow/gcp/2022-11-11/global_carbon_budget_fossil_co2_emissions"
+MEADOW_CO2_DATASET_PATH = DATA_DIR / "meadow/gcp/2022-11-11/global_carbon_budget_fossil_co2_emissions"
 # Meadow dataset on GCB additional data (consumption-based emissions, land-use change and bunker emissions).
-MEADOW_ADDITIONAL_DATASET_PATH = DATA_DIR / f"meadow/gcp/2022-09-29/global_carbon_budget_additional"
+MEADOW_ADDITIONAL_DATASET_PATH = DATA_DIR / "meadow/gcp/2022-09-29/global_carbon_budget_additional"
 # Garden dataset on primary energy consumption.
 GARDEN_PRIMARY_ENERGY_DATASET_PATH = DATA_DIR / "garden/energy/2022-07-29/primary_energy_consumption"
 # Garden dataset on GDP.
@@ -94,9 +92,7 @@ TONNES_OF_CO2_TO_MILLION_TONNES_OF_CO2 = 1e-6
 
 
 # TODO: Adapt make these sanity checks work.
-def sanity_checks(
-    production_df: pd.DataFrame, consumption_df: pd.DataFrame, historical_df: pd.DataFrame
-) -> Tuple[pd.DataFrame, pd.DataFrame]:
+def sanity_checks(production_df: pd.DataFrame, consumption_df: pd.DataFrame, historical_df: pd.DataFrame) -> None:
     production_df = production_df.copy()
     consumption_df = consumption_df.copy()
     historical_df = historical_df.copy()
@@ -138,8 +134,8 @@ def sanity_checks(
     assert check[check["production_emissions"] != check["global_fossil_emissions"]].empty, error
 
     # TODO: The following "combined_df" could be an input (which is the final co2_df after reset_index()).
-    
-    combined_df = combined_df.copy()
+
+    combined_df = pd.DataFrame()
 
     # Sanity checks.
     error = "Production emissions as a share of global emissions should be 100% for 'World'."
@@ -165,17 +161,22 @@ def extract_global_emissions(co2_df: pd.DataFrame, historical_df: pd.DataFrame) 
 
     # Check that total emissions for international transport coincide with oil emissions.
     error = "Total emissions from international transport do not coincide with oil emissions."
-    assert all((global_transport["emissions_from_oil"] -\
-                global_transport["emissions_total"]).dropna() == 0), error
+    assert all((global_transport["emissions_from_oil"] - global_transport["emissions_total"]).dropna() == 0), error
 
     # Therefore, we can keep only one column for international transport emissions.
-    global_transport = global_transport[["year", "emissions_from_oil"]].dropna().rename(columns={
-        "emissions_from_oil": "global_emissions_from_international_transport"})
+    global_transport = (
+        global_transport[["year", "emissions_from_oil"]]
+        .dropna()
+        .rename(columns={"emissions_from_oil": "global_emissions_from_international_transport"})
+    )
 
     # Create a new dataframe of global emissions.
-    global_emissions = co2_df[co2_df["country"].isin(["Global", "World"])][["year"] + EMISSION_SOURCES].\
-        rename(columns={column: f"global_{column}" for column in EMISSION_SOURCES}).sort_values("year").\
-        reset_index(drop=True)
+    global_emissions = (
+        co2_df[co2_df["country"].isin(["Global", "World"])][["year"] + EMISSION_SOURCES]
+        .rename(columns={column: f"global_{column}" for column in EMISSION_SOURCES})
+        .sort_values("year")
+        .reset_index(drop=True)
+    )
 
     # Calculate global cumulative emissions.
     for column in EMISSION_SOURCES:
@@ -186,8 +187,9 @@ def extract_global_emissions(co2_df: pd.DataFrame, historical_df: pd.DataFrame) 
 
     # Prepare dataframe of historical emissions.
     # For convenience, rename land-use change column and ensure it has the right units.
-    _historical_df = historical_df.rename(columns={
-        "global_land_use_change_emissions": "global_emissions_from_land_use_change"}).drop(columns="country")
+    _historical_df = historical_df.rename(
+        columns={"global_land_use_change_emissions": "global_emissions_from_land_use_change"}
+    ).drop(columns="country")
     _historical_df["global_emissions_from_land_use_change"] *= TONNES_OF_CO2_TO_MILLION_TONNES_OF_CO2
 
     # Add historical land-use change emissions to dataframe of global emissions.
@@ -212,26 +214,30 @@ def harmonize_co2_data(co2_df: pd.DataFrame) -> pd.DataFrame:
     # Remove "International Transport" from list of countries
     # NOTE: If we end up adding a list of excluded countries, this could be included.
     co2_df = co2_df[co2_df["country"] != INTERNATIONAL_TRANSPORT_LABEL].reset_index(drop=True)
-    co2_df = geo.harmonize_countries(df=co2_df, countries_file=CO2_COUNTRIES_FILE,
-                            warn_on_missing_countries=True, warn_on_unused_countries=True)
+    co2_df = geo.harmonize_countries(
+        df=co2_df, countries_file=CO2_COUNTRIES_FILE, warn_on_missing_countries=True, warn_on_unused_countries=True
+    )
 
     # After harmonization, "Pacific Islands (Palau)" is mapped to "Palau", and therefore there are rows with different
     # data for the same country-year.
     # However, "Pacific Islands (Palau)" have data until 1991, and "Palau" has data from 1992 onwards.
     # Check that they don't have (non-zero) data on the same years.
     error = "Countries 'Pacific Islands (Palau)' and 'Palau' should not have data in overlapping years."
-    assert set(co2_df[(co2_df["country"] == "Pacific Islands (Palau)") & (co2_df["emissions_total"] != 0)]["year"]) &\
-        set(co2_df[(co2_df["country"] == "Palau") & (co2_df["emissions_total"] != 0)]["year"]) == set()
+    assert (
+        set(co2_df[(co2_df["country"] == "Pacific Islands (Palau)") & (co2_df["emissions_total"] != 0)]["year"])
+        & set(co2_df[(co2_df["country"] == "Palau") & (co2_df["emissions_total"] != 0)]["year"])
+        == set()
+    ), error
 
     # Combine Palau data (after converting zeros into nan) with the entire dataframe, prioritising the former.
     # This way, wherever we have Palau data, we will use it, and wherever we have only nan, we will keep not-nan data.
     # For rows where both duplicates of Palau are nan we will keep any of them.
     co2_df = dataframes.combine_two_overlapping_dataframes(
-        df1=co2_df[co2_df["country"] == "Palau"].replace(0, np.nan),
-        df2=co2_df, index_columns=["country", "year"]).reset_index(drop=True)
+        df1=co2_df[co2_df["country"] == "Palau"].replace(0, np.nan), df2=co2_df, index_columns=["country", "year"]
+    ).reset_index(drop=True)
 
     # Check that the only duplicated rows found are for "Palau".
-    assert co2_df[co2_df.duplicated(subset=["country", "year"])]["country"].unique().tolist() == ["Palau"]
+    assert co2_df[co2_df.duplicated(subset=["country", "year"])]["country"].unique().tolist() == ["Palau"]  # type: ignore
 
     # Remove duplicated rows.
     co2_df = co2_df.drop_duplicates(subset=["country", "year"], keep="last").reset_index(drop=True)
@@ -239,7 +245,13 @@ def harmonize_co2_data(co2_df: pd.DataFrame) -> pd.DataFrame:
     return co2_df
 
 
-def add_variables_to_co2_data(co2_df: pd.DataFrame, consumption_df: pd.DataFrame, global_emissions_df: pd.DataFrame, gdp_df: pd.DataFrame, primary_energy_df: pd.DataFrame) -> pd.DataFrame:
+def add_variables_to_co2_data(
+    co2_df: pd.DataFrame,
+    consumption_df: pd.DataFrame,
+    global_emissions_df: pd.DataFrame,
+    gdp_df: pd.DataFrame,
+    primary_energy_df: pd.DataFrame,
+) -> pd.DataFrame:
     # Add consumption emissions to main dataframe (keep only the countries of the main dataframe).
     co2_df = pd.merge(co2_df, consumption_df, on=["country", "year"], how="left")
 
@@ -247,8 +259,12 @@ def add_variables_to_co2_data(co2_df: pd.DataFrame, consumption_df: pd.DataFrame
     aggregations = {column: "sum" for column in EMISSION_SOURCES + ["consumption_emissions"]}
     for region in REGIONS:
         co2_df = geo.add_region_aggregates(
-            df=co2_df, region=region, countries_that_must_have_data=[], frac_allowed_nans_per_year=0.999,
-            aggregations=aggregations)
+            df=co2_df,
+            region=region,
+            countries_that_must_have_data=[],
+            frac_allowed_nans_per_year=0.999,
+            aggregations=aggregations,
+        )
 
     # Add population to dataframe.
     co2_df = geo.add_population_to_dataframe(df=co2_df, warn_on_missing_countries=False)
@@ -287,12 +303,14 @@ def add_variables_to_co2_data(co2_df: pd.DataFrame, consumption_df: pd.DataFrame
         co2_df[f"{column}_as_share_of_global"] = 100 * co2_df[column] / co2_df[f"global_{column}"]
 
         # Add share of global cumulative emissions.
-        co2_df[f"cumulative_{column}_as_share_of_global"] = 100 * co2_df[f"cumulative_{column}"] /\
-            co2_df[f"global_cumulative_{column}"]
+        co2_df[f"cumulative_{column}_as_share_of_global"] = (
+            100 * co2_df[f"cumulative_{column}"] / co2_df[f"global_cumulative_{column}"]
+        )
 
     # Add total emissions per unit energy (in kg of emissions per kWh).
-    co2_df["emissions_total_per_unit_energy"] = co2_df["emissions_total"] /\
-        (co2_df["primary_energy_consumption"] * TWH_TO_KWH)
+    co2_df["emissions_total_per_unit_energy"] = co2_df["emissions_total"] / (
+        co2_df["primary_energy_consumption"] * TWH_TO_KWH
+    )
 
     # Add total emissions per unit GDP.
     co2_df["emissions_total_per_gdp"] = co2_df["emissions_total"] / co2_df["gdp"]
@@ -306,7 +324,7 @@ def add_variables_to_co2_data(co2_df: pd.DataFrame, consumption_df: pd.DataFrame
     co2_df["traded_emissions"] = co2_df["consumption_emissions"] - co2_df["emissions_total"]
     co2_df["pct_traded_emissions"] = 100 * (co2_df["traded_emissions"] / co2_df["emissions_total"])
     co2_df["traded_emissions_per_capita"] = co2_df["traded_emissions"] / co2_df["population"]
-    
+
     # Remove temporary columns.
     co2_df = co2_df.drop(columns=["global_consumption_emissions", "global_cumulative_consumption_emissions"])
 
@@ -371,14 +389,28 @@ def run(dest_dir: str) -> None:
     global_emissions_df = extract_global_emissions(co2_df=co2_df, historical_df=historical_df)
 
     # Harmonize country names in consumption-based emissions data.
-    consumption_df = geo.harmonize_countries(
-        df=consumption_df, countries_file=ADDITIONAL_COUNTRIES_FILE, warn_on_missing_countries=False,
-        make_missing_countries_nan=True).dropna(subset="country").reset_index(drop=True)
+    consumption_df = (
+        geo.harmonize_countries(
+            df=consumption_df,
+            countries_file=ADDITIONAL_COUNTRIES_FILE,
+            warn_on_missing_countries=False,
+            make_missing_countries_nan=True,
+        )
+        .dropna(subset="country")
+        .reset_index(drop=True)
+    )
 
     # Harmonize country names in production-based emissions data.
-    production_df = geo.harmonize_countries(
-        df=production_df, countries_file=ADDITIONAL_COUNTRIES_FILE, warn_on_missing_countries=False,
-        make_missing_countries_nan=True).dropna(subset="country").reset_index(drop=True)
+    production_df = (
+        geo.harmonize_countries(
+            df=production_df,
+            countries_file=ADDITIONAL_COUNTRIES_FILE,
+            warn_on_missing_countries=False,
+            make_missing_countries_nan=True,
+        )
+        .dropna(subset="country")
+        .reset_index(drop=True)
+    )
 
     # Harmonize fossil CO2 data.
     co2_df = harmonize_co2_data(co2_df=co2_df)
@@ -388,8 +420,12 @@ def run(dest_dir: str) -> None:
 
     # Add new variables to main dataframe (consumption-based emissions, emission intensity, per-capita emissions, etc.).
     combined_df = add_variables_to_co2_data(
-        co2_df=co2_df, consumption_df=consumption_df, global_emissions_df=global_emissions_df, gdp_df=gdp_df,
-        primary_energy_df=primary_energy_df)
+        co2_df=co2_df,
+        consumption_df=consumption_df,
+        global_emissions_df=global_emissions_df,
+        gdp_df=gdp_df,
+        primary_energy_df=primary_energy_df,
+    )
 
     # Set an appropriate index, ensure there are no rows that only have nan, and sort conveniently.
     combined_df = combined_df.set_index(["country", "year"], verify_integrity=True)

@@ -5,7 +5,6 @@
 import pandas as pd
 from owid.catalog import Dataset, Table, TableMeta
 from owid.catalog.utils import underscore_table
-from owid.walden import Catalog as WaldenCatalog
 
 from etl.helpers import Names
 from etl.steps.data.converters import convert_walden_metadata
@@ -21,7 +20,7 @@ def run(dest_dir: str) -> None:
     # Load fossil CO2 data from Walden.
     emissions_ds = N.walden_dataset
     # Create a dataframe with the data.
-    emissions_df = pd.read_csv(emissions_ds.ensure_downloaded())    
+    emissions_df = pd.read_csv(emissions_ds.ensure_downloaded())
 
     #
     # Process data.
