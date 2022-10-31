@@ -239,71 +239,7 @@ def harmonize_co2_data(co2_df: pd.DataFrame) -> pd.DataFrame:
     return co2_df
 
 
-# TODO: Consider refactoring into small functions to simplify the following code.
-def run(dest_dir: str) -> None:
-    #
-    # Load data.
-    #
-    # Load fossil CO2 emissions dataset from meadow.
-    co2_ds = catalog.Dataset(MEADOW_CO2_DATASET_PATH)
-    # Load main table from CO2 dataset.
-    co2_tb = co2_ds[co2_ds.table_names[0]]
-    # Create a dataframe out of the CO2 table.
-    co2_df = pd.DataFrame(co2_tb).reset_index()
-
-    # Load additional data (consumption-based emissions, global land-use change emissions, and bunker emissions).
-    additional_ds = catalog.Dataset(MEADOW_ADDITIONAL_DATASET_PATH)
-    # Load required tables with additional variables.
-    consumption_tb = additional_ds["consumption_emissions"]
-    production_tb = additional_ds["production_emissions"]
-    historical_tb = additional_ds["historical_emissions"]
-    # Create a convenient dataframe for each table.
-    production_df = pd.DataFrame(production_tb).reset_index()
-    consumption_df = pd.DataFrame(consumption_tb).reset_index()
-    historical_df = pd.DataFrame(historical_tb).reset_index()
-
-    # Load primary energy consumption from garden.
-    primary_energy_ds = catalog.Dataset(GARDEN_PRIMARY_ENERGY_DATASET_PATH)
-    # Create a  dataframe out of the main table of primary energy.
-    primary_energy_df = pd.DataFrame(primary_energy_ds[primary_energy_ds.table_names[0]]).reset_index()
-
-    # Load GDP dataset from garden.
-    gdp_ds = catalog.Dataset(GARDEN_GDP_DATASET_PATH)
-    # Create a dataframe out of the main table of GDP.
-    gdp_df = pd.DataFrame(gdp_ds[gdp_ds.table_names[0]]).reset_index()
-
-    #
-    # Process data.
-    #
-    # Select and rename columns from primary energy data.
-    primary_energy_df = primary_energy_df[list(PRIMARY_ENERGY_COLUMNS)].rename(columns=PRIMARY_ENERGY_COLUMNS)
-
-    # Select and rename columns from primary energy data.
-    gdp_df = gdp_df[list(GDP_COLUMNS)].rename(columns=GDP_COLUMNS)
-
-    # Select and rename columns from fossil CO2 data.
-    co2_df = co2_df[list(CO2_COLUMNS)].rename(columns=CO2_COLUMNS)
-
-    # For some reason, "International Transport" is included as another country, that only has emissions from oil.
-    # Extract that data and remove it from the rest of national emissions.
-    global_emissions = extract_global_emissions(co2_df=co2_df, historical_df=historical_df)
-
-    # Harmonize country names in consumption-based emissions data.
-    consumption_df = geo.harmonize_countries(
-        df=consumption_df, countries_file=ADDITIONAL_COUNTRIES_FILE, warn_on_missing_countries=False,
-        make_missing_countries_nan=True).dropna(subset="country").reset_index(drop=True)
-
-    # Harmonize country names in production-based emissions data.
-    production_df = geo.harmonize_countries(
-        df=production_df, countries_file=ADDITIONAL_COUNTRIES_FILE, warn_on_missing_countries=False,
-        make_missing_countries_nan=True).dropna(subset="country").reset_index(drop=True)
-
-    # Harmonize fossil CO2 data.
-    co2_df = harmonize_co2_data(co2_df=co2_df)
-
-    # Convert all variable units from million tonnes of carbon to million tonnes of CO2.
-    co2_df[EMISSION_SOURCES] *= MILLION_TONNES_OF_CARBON_TO_MILLION_TONNES_CO2
-
+def add_variables_to_co2_data(co2_df: pd.DataFrame, consumption_df: pd.DataFrame, global_emissions_df: pd.DataFrame, gdp_df: pd.DataFrame, primary_energy_df: pd.DataFrame) -> pd.DataFrame:
     # Add consumption emissions to main dataframe (keep only the countries of the main dataframe).
     co2_df = pd.merge(co2_df, consumption_df, on=["country", "year"], how="left")
 
@@ -324,7 +260,7 @@ def run(dest_dir: str) -> None:
     co2_df = pd.merge(co2_df, primary_energy_df, on=["country", "year"], how="left")
 
     # Add global emissions and global cumulative emissions columns to main dataframe.
-    co2_df = pd.merge(co2_df, global_emissions.drop(columns="country"), on=["year"], how="left")
+    co2_df = pd.merge(co2_df, global_emissions_df.drop(columns="country"), on=["year"], how="left")
 
     # Ensure main dataframe is sorted (so that cumulative emissions are properly calculated).
     co2_df = co2_df.sort_values(["country", "year"]).reset_index(drop=True)
@@ -383,9 +319,81 @@ def run(dest_dir: str) -> None:
     # Create variable of population as a share of global population.
     co2_df["population_as_share_of_global"] = co2_df["population"] / co2_df["global_population"] * 100
 
+    return co2_df
+
+
+def run(dest_dir: str) -> None:
+    #
+    # Load data.
+    #
+    # Load fossil CO2 emissions dataset from meadow.
+    co2_ds = catalog.Dataset(MEADOW_CO2_DATASET_PATH)
+    # Load main table from CO2 dataset.
+    co2_tb = co2_ds[co2_ds.table_names[0]]
+    # Create a dataframe out of the CO2 table.
+    co2_df = pd.DataFrame(co2_tb).reset_index()
+
+    # Load additional data (consumption-based emissions, global land-use change emissions, and bunker emissions).
+    additional_ds = catalog.Dataset(MEADOW_ADDITIONAL_DATASET_PATH)
+    # Load required tables with additional variables.
+    consumption_tb = additional_ds["consumption_emissions"]
+    production_tb = additional_ds["production_emissions"]
+    historical_tb = additional_ds["historical_emissions"]
+    # Create a convenient dataframe for each table.
+    production_df = pd.DataFrame(production_tb).reset_index()
+    consumption_df = pd.DataFrame(consumption_tb).reset_index()
+    historical_df = pd.DataFrame(historical_tb).reset_index()
+
+    # Load primary energy consumption from garden.
+    primary_energy_ds = catalog.Dataset(GARDEN_PRIMARY_ENERGY_DATASET_PATH)
+    # Create a  dataframe out of the main table of primary energy.
+    primary_energy_df = pd.DataFrame(primary_energy_ds[primary_energy_ds.table_names[0]]).reset_index()
+
+    # Load GDP dataset from garden.
+    gdp_ds = catalog.Dataset(GARDEN_GDP_DATASET_PATH)
+    # Create a dataframe out of the main table of GDP.
+    gdp_df = pd.DataFrame(gdp_ds[gdp_ds.table_names[0]]).reset_index()
+
+    #
+    # Process data.
+    #
+    # Select and rename columns from primary energy data.
+    primary_energy_df = primary_energy_df[list(PRIMARY_ENERGY_COLUMNS)].rename(columns=PRIMARY_ENERGY_COLUMNS)
+
+    # Select and rename columns from primary energy data.
+    gdp_df = gdp_df[list(GDP_COLUMNS)].rename(columns=GDP_COLUMNS)
+
+    # Select and rename columns from fossil CO2 data.
+    co2_df = co2_df[list(CO2_COLUMNS)].rename(columns=CO2_COLUMNS)
+
+    # For some reason, "International Transport" is included as another country, that only has emissions from oil.
+    # Extract that data and remove it from the rest of national emissions.
+    global_emissions_df = extract_global_emissions(co2_df=co2_df, historical_df=historical_df)
+
+    # Harmonize country names in consumption-based emissions data.
+    consumption_df = geo.harmonize_countries(
+        df=consumption_df, countries_file=ADDITIONAL_COUNTRIES_FILE, warn_on_missing_countries=False,
+        make_missing_countries_nan=True).dropna(subset="country").reset_index(drop=True)
+
+    # Harmonize country names in production-based emissions data.
+    production_df = geo.harmonize_countries(
+        df=production_df, countries_file=ADDITIONAL_COUNTRIES_FILE, warn_on_missing_countries=False,
+        make_missing_countries_nan=True).dropna(subset="country").reset_index(drop=True)
+
+    # Harmonize fossil CO2 data.
+    co2_df = harmonize_co2_data(co2_df=co2_df)
+
+    # Convert all variable units from million tonnes of carbon to million tonnes of CO2.
+    co2_df[EMISSION_SOURCES] *= MILLION_TONNES_OF_CARBON_TO_MILLION_TONNES_CO2
+
+    # Add new variables to main dataframe (consumption-based emissions, emission intensity, per-capita emissions, etc.).
+    combined_df = add_variables_to_co2_data(
+        co2_df=co2_df, consumption_df=consumption_df, global_emissions_df=global_emissions_df, gdp_df=gdp_df,
+        primary_energy_df=primary_energy_df)
+
     # Set an appropriate index, ensure there are no rows that only have nan, and sort conveniently.
-    co2_df = co2_df.set_index(["country", "year"], verify_integrity=True)
-    co2_df = co2_df.dropna(subset=co2_df.columns, how="all").sort_index().sort_index(axis=1)
+    combined_df = combined_df.set_index(["country", "year"], verify_integrity=True)
+    combined_df = combined_df.dropna(subset=combined_df.columns, how="all").sort_index().sort_index(axis=1)
 
     #
     # Save outputs.
@@ -397,7 +405,7 @@ def run(dest_dir: str) -> None:
     ds_garden.metadata.update_from_yaml(METADATA_PATH, if_source_exists="replace")
 
     # Create a table with the combined data.
-    tb_garden = catalog.Table(co2_df)
+    tb_garden = catalog.Table(combined_df)
     # Use metadata from yaml file.
     tb_garden.update_metadata_from_yaml(METADATA_PATH, DATASET_NAME)
     # Add combined table to garden dataset and save dataset.
