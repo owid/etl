@@ -75,7 +75,6 @@ steps:
     - walden://oecd/2016-06-01/regional_wellbeing
   data://garden/sdg/latest/sdg:
     - backport://backport/owid/latest/dataset_1047_world_bank_gender_statistics__gender
-    - backport://backport/owid/latest/dataset_1049_world_bank_gender_statistics__social_protection__and__labor
     - backport://backport/owid/latest/dataset_1070_statistical_capacity_indicator__sci__world_bank_data_on_statistical_capacity
     - backport://backport/owid/latest/dataset_115_countries_continents
     - backport://backport/owid/latest/dataset_1857_employment
@@ -94,8 +93,9 @@ steps:
     - backport://backport/owid/latest/dataset_5669_un_sdg__2022_07_07
     - backport://backport/owid/latest/dataset_5676_global_health_observatory__world_health_organization__2022_08
     - backport://backport/owid/latest/dataset_5712_food_security__suite_of_food_security_indicators__fao__2022_05_17
-    - backport://backport/owid/latest/dataset_5757_multidimensional_poverty_index__mpi__2021__current_estimates
     - backport://backport/owid/latest/dataset_5774_key_indicators
+    - backport://backport/owid/latest/dataset_5782_who_immunization_data__2022
+    - backport://backport/owid/latest/dataset_5821_gender_statistics__world_bank__2022_10_29
     - backport://backport/owid/latest/dataset_792_investment__credit_to_agriculture__fao__2017
     - backport://backport/owid/latest/dataset_829_food_security__suite_of_food_security_indicators__fao__2017
     - backport://backport/owid/latest/dataset_943_sexual_violence__unicef__2017

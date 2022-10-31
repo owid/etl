@@ -55,7 +55,7 @@ def run(dest_dir: str) -> None:
     # underscore all table columns
     tb = underscore_table(tb)
     {% if cookiecutter.include_metadata_yaml == "True" %}
-    ds.metadata.update_from_yaml(N.metadata_path)
+    ds.metadata.update_from_yaml(N.metadata_path, if_source_exists="replace")
     tb.update_metadata_from_yaml(N.metadata_path, "{{cookiecutter.short_name}}")
     {% endif %}
     # add table to a dataset

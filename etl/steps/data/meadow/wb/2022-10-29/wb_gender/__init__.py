@@ -195,7 +195,10 @@ def check_consistency_data_and_metadata(df: pd.DataFrame, metadata_variables: pd
     # pd.set_option("display.max_colwidth", 40000)
     msk = merged["variable"] != merged["indicator_name"]
     x = merged.loc[msk, ["variable", "indicator_name"]].sort_values("variable")
-    assert x.shape == (45, 2,), (
+    assert x.shape == (
+        45,
+        2,
+    ), (
         "There are 45 expected variables to miss-match namings between data and metadata file, but a different"
         f" amount was found {x.shape}!"
     )
@@ -266,8 +269,8 @@ def add_tables_to_ds(
 def run(dest_dir: str) -> None:
     """Run pipeline."""
     # Load data and metadata
-    walden_ds = walden.Catalog().find_one(NAMESPACE, VERSION, SHORT_NAME)
-    table, metadata_variables, metadata_countries = load_data_from_walden(walden_ds)
+    ds_walden = walden.Catalog().find_one(NAMESPACE, VERSION, SHORT_NAME)
+    table, metadata_variables, metadata_countries = load_data_from_walden(ds_walden)
     # Format metadata (variables)
     metadata_variables = metadata_variables.pipe(format_metadata_variables)
     # Format metadata (countries)
@@ -275,6 +278,6 @@ def run(dest_dir: str) -> None:
     # Format data
     table = table.pipe(format_data, metadata_variables)
     # Initiate dataset
-    ds = init_dataset(dest_dir, walden_ds)
+    ds = init_dataset(dest_dir, ds_walden)
     # Add tables to dataset
     ds = add_tables_to_ds(ds, table, metadata_variables, metadata_countries)
