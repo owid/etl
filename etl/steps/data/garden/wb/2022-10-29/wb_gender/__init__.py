@@ -172,7 +172,7 @@ def _build_unit(table_metadata: catalog.Table) -> pd.Series:
     units_ = units_.fillna("")
     # Check if units_ is as expected (perhaps new units? wrong units detected?)
     # units_.to_csv("wb_gender.units.check.csv", index=False)
-    units_check = pd.read_csv(THIS_DIRECTORY / "wb_gender.units.check.csv", usecols=["0"]).squeeze()
+    units_check = pd.read_csv(THIS_DIRECTORY / "wb_gender.units.check.csv")["0"].squeeze()
     assert units_.equals(units_check.fillna("")), (
         "Units are not as expected. Please review the output of _build_unit function. If the output looks fine, then"
         " update auxiliary file wb_gender.units.check.csv."
