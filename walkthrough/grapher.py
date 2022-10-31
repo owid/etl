@@ -113,8 +113,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
             extra_context=dict(directory_name="grapher", **form.dict()),
         )
 
-        # TODO: this will soon change to `STEP_DIR / "data" / "grapher" / form.namespace / form.version`
-        DATASET_DIR = STEP_DIR / "grapher" / form.namespace / form.version
+        DATASET_DIR = STEP_DIR / "data" / "grapher" / form.namespace / form.version
 
         shutil.copytree(
             Path(OUTPUT_DIR) / "grapher",
