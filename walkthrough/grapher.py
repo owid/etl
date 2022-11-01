@@ -53,15 +53,6 @@ def app(run_checks: bool, dummy_data: bool) -> None:
         "Options",
         [
             pi.input(
-                "Short name",
-                name="short_name",
-                placeholder="ggdc_maddison",
-                required=True,
-                value=dummies.get("short_name"),
-                validate=utils.validate_short_name,
-                help_text="Underscored short name",
-            ),
-            pi.input(
                 "Namespace",
                 name="namespace",
                 placeholder="ggdc",
@@ -74,6 +65,15 @@ def app(run_checks: bool, dummy_data: bool) -> None:
                 placeholder="2020",
                 required=True,
                 value=dummies.get("version"),
+            ),
+            pi.input(
+                "Short name",
+                name="short_name",
+                placeholder="ggdc_maddison",
+                required=True,
+                value=dummies.get("short_name"),
+                validate=utils.validate_short_name,
+                help_text="Underscored short name",
             ),
             pi.checkbox(
                 "Additional Options",
@@ -113,8 +113,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
             extra_context=dict(directory_name="grapher", **form.dict()),
         )
 
-        # TODO: this will soon change to `STEP_DIR / "data" / "grapher" / form.namespace / form.version`
-        DATASET_DIR = STEP_DIR / "grapher" / form.namespace / form.version
+        DATASET_DIR = STEP_DIR / "data" / "grapher" / form.namespace / form.version
 
         shutil.copytree(
             Path(OUTPUT_DIR) / "grapher",

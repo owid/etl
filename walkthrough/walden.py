@@ -1,3 +1,4 @@
+import datetime as dt
 import shutil
 import tempfile
 from pathlib import Path
@@ -19,8 +20,9 @@ WALDEN_INGEST_DIR = Path(walden.__file__).parent.parent.parent / "ingests"
 
 class WaldenForm(BaseModel):
 
-    short_name: str
     namespace: str
+    walden_version: str
+    short_name: str
     name: str
     source_name: str
     publication_year: Optional[str]
@@ -34,7 +36,7 @@ class WaldenForm(BaseModel):
 
     @property
     def version(self) -> str:
-        return self.publication_year or self.publication_date  # type: ignore
+        return self.walden_version or self.publication_year or self.publication_date  # type: ignore
 
 
 def app(run_checks: bool, dummy_data: bool) -> None:
@@ -53,6 +55,22 @@ def app(run_checks: bool, dummy_data: bool) -> None:
         "Dataset details",
         [
             pi.input(
+                "Namespace",
+                name="namespace",
+                placeholder="ggdc",
+                help_text="E.g. institution name",
+                required=True,
+                value=dummies.get("namespace"),
+            ),
+            pi.input(
+                "Version",
+                name="walden_version",
+                placeholder=str(dt.date.today()),
+                help_text="E.g. current date, publication date or year is used if not given",
+                required=False,
+                value=dummies.get("walden_version", str(dt.date.today())),
+            ),
+            pi.input(
                 "Short name",
                 name="short_name",
                 placeholder="ggdc_maddison",
@@ -67,14 +85,6 @@ def app(run_checks: bool, dummy_data: bool) -> None:
                 placeholder="Maddison Project Database (GGDC, 2020)",
                 required=True,
                 value=dummies.get("name"),
-            ),
-            pi.input(
-                "Namespace",
-                name="namespace",
-                placeholder="ggdc",
-                help_text="E.g. institution name",
-                required=True,
-                value=dummies.get("namespace"),
             ),
             pi.input(
                 "Source name",
@@ -148,11 +158,13 @@ def app(run_checks: bool, dummy_data: bool) -> None:
             extra_context=dict(directory_name="walden", **form.dict()),
         )
 
-        # move them into the walden ingest directory
-        shutil.copytree(Path(OUTPUT_DIR) / "walden", WALDEN_INGEST_DIR, dirs_exist_ok=True)
+        target_dir = WALDEN_INGEST_DIR / form.namespace / form.version
 
-        ingest_path = WALDEN_INGEST_DIR / (form.short_name + ".py")
-        meta_path = WALDEN_INGEST_DIR / (form.short_name + ".meta.yml")
+        # move them into the walden ingest directory
+        shutil.copytree(Path(OUTPUT_DIR) / "walden", target_dir, dirs_exist_ok=True)
+
+        ingest_path = target_dir / (form.short_name + ".py")
+        meta_path = target_dir / (form.short_name + ".meta.yml")
 
         po.put_markdown(
             f"""
@@ -162,7 +174,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
 
 2. Test your ingest script with
 ```bash
-python vendor/walden/ingests/{form.short_name}.py --skip-upload
+python vendor/walden/ingests/{form.namespace}/{form.version}/{form.short_name}.py --skip-upload
 ```
 
 3. Once you are happy with the ingest script, run it without the `--skip-upload` flag to upload files to S3. Running it again will overwrite the dataset.
