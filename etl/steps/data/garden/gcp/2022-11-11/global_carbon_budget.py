@@ -45,6 +45,9 @@ DATASET_NAME = "global_carbon_budget"
 # Path to metadata file.
 METADATA_PATH = STEP_DIR / "data/garden/gcp/2022-11-11/global_carbon_budget.meta.yml"
 
+# Expected outliers in consumption-based emissions (with negative emissions in the original data, that will be removed).
+OUTLIERS_IN_CONSUMPTION_DF = [("Panama", 2005), ("Panama", 2006)]
+
 # Label used for international transport (emissions from oil in bunker fuels), included as a country in the
 # fossil CO2 emissions dataset.
 INTERNATIONAL_TRANSPORT_LABEL = "International Transport"
@@ -98,8 +101,8 @@ MILLION_TONNES_OF_CO2_TO_TONNES_OF_CO2 = 1e6
 TONNES_OF_CO2_TO_KG_OF_CO2 = 1000
 
 
-def sanity_checks_on_raw_data(
-    production_df: pd.DataFrame, consumption_df: pd.DataFrame, historical_df: pd.DataFrame
+def sanity_checks_on_input_data(
+    production_df: pd.DataFrame, consumption_df: pd.DataFrame, historical_df: pd.DataFrame, co2_df: pd.DataFrame
 ) -> None:
     production_df = production_df.copy()
     consumption_df = consumption_df.copy()
@@ -123,6 +126,19 @@ def sanity_checks_on_raw_data(
     error = "Bunker emissions were expected to coincide in production and consumption emissions dataframes."
     assert global_bunkers_emissions.equals(check), error
 
+    # Check that all production-based emissions are positive.
+    error = "There are negative emissions in production_df (from the additional variables dataset)."
+    # assert (production_df["production_emissions"].fillna(0) >= 0).all(), error
+    assert (production_df.drop(columns=["country", "year"]).fillna(0) >= 0).all().all(), error
+
+    # Check that all production-based emissions from the fossil CO2 dataset are positive.
+    error = "There are negative emissions in co2_df (from the fossil CO2 dataset)."
+    assert (co2_df.drop(columns=["country", "year"]).fillna(0) >= 0).all().all(), error
+
+    # Check that all consumption-based emissions are positive.
+    error = "There are negative emissions in consumption_df (from the additional variables dataset)."
+    assert (consumption_df.drop(columns=["country", "year"]).fillna(0) >= 0).all().all(), error
+
     # Check that, for the World, production emissions coincides with consumption emissions.
     error = "Production and consumption emissions for the world were expected to be identical."
     assert (
@@ -142,7 +158,7 @@ def sanity_checks_on_raw_data(
     assert check[check["production_emissions"] != check["global_fossil_emissions"]].empty, error
 
 
-def sanity_checks_on_processed_data(combined_df: pd.DataFrame) -> None:
+def sanity_checks_on_output_data(combined_df: pd.DataFrame) -> None:
     combined_df = combined_df.reset_index()
     # Check that production emissions as a share of global emissions, for the world, should be 100% (within 1%).
     error = "Production emissions as a share of global emissions should be 100% for 'World'."
@@ -157,6 +173,27 @@ def sanity_checks_on_processed_data(combined_df: pd.DataFrame) -> None:
     assert combined_df[
         (combined_df["country"] == "World") & (combined_df["population_as_share_of_global"].fillna(100) != 100)
     ].empty, error
+    # Check that traded emissions for the world are close to zero (within +/- 2%).
+    world_mask = (combined_df["country"] == "World")
+    error = "Traded emissions for the World should be close to zero (within ~2%)."
+    assert (abs(100 * combined_df[world_mask]["traded_emissions"].fillna(0) /\
+        combined_df[world_mask]["emissions_total"].fillna(1)) < 2).all(), error
+
+
+def prepare_consumption_emissions(consumption_df: pd.DataFrame) -> pd.DataFrame:
+    # List indexes of rows in consumption_df corresponding to outliers (defined above in OUTLIERS_IN_CONSUMPTION_DF).
+    outlier_indexes = [
+        consumption_df[(consumption_df["country"] == outlier[0]) & (consumption_df["year"] == outlier[1])].index.item()
+            for outlier in OUTLIERS_IN_CONSUMPTION_DF]
+
+    error = "Outliers were expected to have negative consumption emissions. "\
+        "Maybe outliers have been fixed (and should be removed from the code)."
+    assert (consumption_df.loc[outlier_indexes]["consumption_emissions"] < 0).all(), error
+
+    # Remove outliers.
+    consumption_df = consumption_df.drop(outlier_indexes).reset_index(drop=True)
+
+    return consumption_df
 
 
 def extract_global_emissions(co2_df: pd.DataFrame, historical_df: pd.DataFrame) -> pd.DataFrame:
@@ -389,8 +426,8 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    # Run sanity checks on raw data.
-    sanity_checks_on_raw_data(production_df, consumption_df, historical_df)
+    # Prepare consumption-based emission data.
+    consumption_df = prepare_consumption_emissions(consumption_df=consumption_df)
 
     # Select and rename columns from primary energy data.
     primary_energy_df = primary_energy_df[list(PRIMARY_ENERGY_COLUMNS)].rename(columns=PRIMARY_ENERGY_COLUMNS)
@@ -403,6 +440,10 @@ def run(dest_dir: str) -> None:
 
     # Select and rename columns from fossil CO2 data.
     co2_df = co2_df[list(CO2_COLUMNS)].rename(columns=CO2_COLUMNS)
+
+    # Run sanity checks on raw data.
+    sanity_checks_on_input_data(
+        production_df=production_df, consumption_df=consumption_df, historical_df=historical_df, co2_df=co2_df)
 
     # Ensure all emissions are given in tonnes of CO2.
     co2_df[EMISSION_SOURCES] *= MILLION_TONNES_OF_CO2_TO_TONNES_OF_CO2
@@ -452,7 +493,7 @@ def run(dest_dir: str) -> None:
     combined_df = combined_df.dropna(subset=combined_df.columns, how="all").sort_index().sort_index(axis=1)
 
     # Run sanity checks on processed data.
-    sanity_checks_on_processed_data(combined_df)
+    sanity_checks_on_output_data(combined_df)
 
     #
     # Save outputs.
