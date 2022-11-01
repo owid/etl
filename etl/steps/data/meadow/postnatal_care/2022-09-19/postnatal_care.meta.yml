@@ -1,0 +1,29 @@
+dataset:
+  namespace: postnatal_care
+  short_name: postnatal_care
+  title: Postnatal care coverage (% mothers) - Health Nutrition and Population Statistics
+    (2022)
+  description: 'Percentage of women with a postnatal checkup in the first two days
+    after birth.'
+  licenses:
+  - name: Creative Commons BY 4.0
+    url: https://www.worldbank.org/en/about/legal/terms-of-use-for-datasets
+  version: '2022-09-19'
+  sources:
+  - name: World Bank (2022)
+    published_by: Health Nutrition and Population Statistics - World Bank (2022)
+    url: https://databank.worldbank.org/source/health-nutrition-and-population-statistics/Series/SH.STA.PNVC.ZS#
+    date_accessed: '2022-10-31'
+    publication_date: '2022-09-19'
+    publication_year: 2022
+tables:
+  postnatal_care:
+    title: Postnatal care coverage (% mothers) - Health Nutrition and Population Statistics
+      (2022)
+    description: 'Percentage of women with a postnatal checkup in the first two days
+      after birth.'
+    variables:
+      postnatal_care_coverage:
+        title: postnatal_care_coverage
+        short_unit: '%'
+        unit: '%'
