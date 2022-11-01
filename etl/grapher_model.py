@@ -514,7 +514,8 @@ class Source(SQLModel, table=True):
             description=SourceDescription(
                 link=source.url,
                 retrievedDate=source.date_accessed,
-                dataPublishedBy=source.published_by,
+                # NOTE: published_by should be non-empty as it is shown in the Sources tab in admin
+                dataPublishedBy=source.published_by or source.name,
                 dataPublisherSource=source.publisher_source,
                 # NOTE: we remap `description` to additionalInfo since that is what is shown as `Description` in
                 # the admin UI. Clean this up with the new data model
