@@ -91,10 +91,11 @@ HISTORICAL_EMISSIONS_COLUMNS = {
 # Conversion from terawatt-hours to kilowatt-hours.
 TWH_TO_KWH = 1e9
 
-# Conversion from tonnes of CO2 to million tonnes of CO2.
-# NOTE: This conversion factor is needed because, in the meadow step of additional data, variables were converted
-#  from million tonnes to tonnes. In the next update, we could omit that conversion there and here.
-TONNES_OF_CO2_TO_MILLION_TONNES_OF_CO2 = 1e-6
+# Conversion from million tonnes of CO2 to tonnes of CO2.
+MILLION_TONNES_OF_CO2_TO_TONNES_OF_CO2 = 1e6
+
+# Conversion from tonnes of CO2 to kg of CO2 (used for emissions per GDP and per unit energy).
+TONNES_OF_CO2_TO_KG_OF_CO2 = 1000
 
 
 def sanity_checks_on_raw_data(
@@ -230,17 +231,27 @@ def harmonize_co2_data(co2_df: pd.DataFrame) -> pd.DataFrame:
         == set()
     ), error
 
+    # Check that the only duplicated rows found are for "Palau".
+    error = "Expected duplicated data for Palau; Maybe this is no longer the case, and the code could be simplified."
+    assert co2_df[co2_df.duplicated(subset=["country", "year"])]["country"].unique().tolist() == [  # type: ignore
+        "Palau"
+    ], error
+
+    # Select data for Palau, sort by total emissions (ensuring nans are poisitioned before zeros), then drop duplicates
+    # keeping the last value. This way we keep the original nans, but prioritise non-zero data when there was any.
+    palau_df = co2_df[co2_df["country"] == "Palau"].sort_values("emissions_total", na_position="first").\
+        drop_duplicates(subset=["country", "year"], keep="last").reset_index(drop=True)
+
+    # Concatenate Palau data with the main dataframe, and sort conveniently.
+    co2_df = pd.concat([co2_df[co2_df["country"] != "Palau"], palau_df], ignore_index=True).\
+        sort_values(["country", "year"]).reset_index(drop=True)
+
     # Combine Palau data (after converting zeros into nan) with the entire dataframe, prioritising the former.
     # This way, wherever we have Palau data, we will use it, and wherever we have only nan, we will keep not-nan data.
     # For rows where both duplicates of Palau are nan we will keep any of them.
     co2_df = dataframes.combine_two_overlapping_dataframes(
         df1=co2_df[co2_df["country"] == "Palau"].replace(0, np.nan), df2=co2_df, index_columns=["country", "year"]
     ).reset_index(drop=True)
-
-    # Check that the only duplicated rows found are for "Palau".
-    assert co2_df[co2_df.duplicated(subset=["country", "year"])]["country"].unique().tolist() == [  # type: ignore
-        "Palau"
-    ]
 
     # Remove duplicated rows.
     co2_df = co2_df.drop_duplicates(subset=["country", "year"], keep="last").reset_index(drop=True)
@@ -311,21 +322,21 @@ def add_variables_to_co2_data(
         )
 
     # Add total emissions per unit energy (in kg of emissions per kWh).
-    co2_df["emissions_total_per_unit_energy"] = co2_df["emissions_total"] / (
+    co2_df["emissions_total_per_unit_energy"] = TONNES_OF_CO2_TO_KG_OF_CO2 * co2_df["emissions_total"] / (
         co2_df["primary_energy_consumption"] * TWH_TO_KWH
     )
 
     # Add total emissions per unit GDP.
-    co2_df["emissions_total_per_gdp"] = co2_df["emissions_total"] / co2_df["gdp"]
+    co2_df["emissions_total_per_gdp"] = TONNES_OF_CO2_TO_KG_OF_CO2 * co2_df["emissions_total"] / co2_df["gdp"]
 
     # TODO: Considering renaming "consumption_emissions" -> "consumption_emissions_total",
     #  and "emissions" -> "production_emissions".
     # Add total consumption emissions per unit GDP.
-    co2_df["consumption_emissions_per_gdp"] = co2_df["consumption_emissions"] / co2_df["gdp"]
+    co2_df["consumption_emissions_per_gdp"] = TONNES_OF_CO2_TO_KG_OF_CO2 * co2_df["consumption_emissions"] / co2_df["gdp"]
 
     # Add variable of emissions embedded in trade.
     co2_df["traded_emissions"] = co2_df["consumption_emissions"] - co2_df["emissions_total"]
-    co2_df["pct_traded_emissions"] = 100 * (co2_df["traded_emissions"] / co2_df["emissions_total"])
+    co2_df["pct_traded_emissions"] = 100 * co2_df["traded_emissions"] / co2_df["emissions_total"]
     co2_df["traded_emissions_per_capita"] = co2_df["traded_emissions"] / co2_df["population"]
 
     # Remove temporary columns.
@@ -393,10 +404,8 @@ def run(dest_dir: str) -> None:
     # Select and rename columns from fossil CO2 data.
     co2_df = co2_df[list(CO2_COLUMNS)].rename(columns=CO2_COLUMNS)
 
-    # Ensure all emissions are given in tonnes of CO2 to million tonnes of CO2.
-    historical_df["global_emissions_from_land_use_change"] *= TONNES_OF_CO2_TO_MILLION_TONNES_OF_CO2
-    consumption_df["consumption_emissions"] *= TONNES_OF_CO2_TO_MILLION_TONNES_OF_CO2
-    production_df["production_emissions"] *= TONNES_OF_CO2_TO_MILLION_TONNES_OF_CO2
+    # Ensure all emissions are given in tonnes of CO2.
+    co2_df[EMISSION_SOURCES] *= MILLION_TONNES_OF_CO2_TO_TONNES_OF_CO2
 
     # For some reason, "International Transport" is included as another country, that only has emissions from oil.
     # Extract that data and remove it from the rest of national emissions.
