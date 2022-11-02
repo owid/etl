@@ -27,9 +27,9 @@ You will need:
 OWID staff who want to add steps to the ETL will also need:
 
 - AWS CLI installed (``pip install awscli``)
-- An ``~/.aws/config`` file configured, so that you can upload to walden
+- An ``~/.aws/config`` file configured, so that you can upload to walden (ask someone to send you credentials)
 
-.. code-block:: 
+.. code-block::
 
     [default]
     aws_access_key_id = <MY ACCESS KEY>
@@ -89,9 +89,9 @@ Now let's build the dataset, by removing the ``--dry-run`` option::
 Let's confirm that the dataset was built locally::
 
     $ ls data/garden/ggdc/2020-10-01/ggdc_maddison/
-    index.json             
-    maddison_gdp.feather   
-    maddison_gdp.meta.json 
+    index.json
+    maddison_gdp.feather
+    maddison_gdp.meta.json
     maddison_gdp.parquet
 
 Several files got built for the dataset. The first is ``index.json`` which gives metadata about the whole dataset. The remaining three files all represent a single data table, which is saved in both Feather and Parquet formats.
