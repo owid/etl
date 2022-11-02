@@ -39,9 +39,17 @@ You need to install the following:
 - `poetry`, for managing dependencies, virtual envs, and packages. Installation guide [here](https://python-poetry.org/docs/#installation).
 - `make`. You likely already have this, but otherwise it can be installed using your usual package manager (e.g. on Mac, `brew install make`).
 - MYSQL client (and Python dev headers). If you don't have this already,
-  - On Ubuntu: `sudo apt install python3.9-dev mysql-client`
+  - On Ubuntu: `sudo apt install python3.9-dev mysql-client default-libmysqlclient-dev build-essential`
   - On Mac: `brew install mysql-client`
-- AWS CLI and you should have an `~/.aws/config` file configured so that you can upload to walden etc.
+- [AWS CLI](https://aws.amazon.com/cli/) (`pip install awscli`) and you should have an `~/.aws/config` file configured (ask someone for credentials) so that you can upload to walden etc.
+
+WSL users need to set up Linux executables only by including/editing the `/etc/wsl.conf` file.
+- Run `sudo vi /etc/wsl.conf`, copy this:
+``` 
+[interop]
+appendWindowsPath = false
+```
+- Press `ESC` and type `:qw` to save and exit.
 
 ### Installation
 
@@ -106,6 +114,8 @@ In case you only want to get a better intuition of the process and see what file
 ```
 poetry run walkthrough walden --dummy-data
 ```
+
+If you end up with error `Address already in use`, try to kill the process with `kill -9 $(lsof -t -i tcp:8082)` and run the command again.
 
 Alternatively, these are the steps to create a data pipeline for a dataset called `example_dataset`, from an institution called
 `example_institution`, with version `YYYY-MM-DD` (where this date tag can typically be the current date when the dataset
