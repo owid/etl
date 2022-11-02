@@ -79,6 +79,8 @@ isort = "^5.10.1"
 Sphinx = "^5.1.1"
 sphinx-rtd-theme = "^1.0.0"
 sphinxcontrib-mermaid = "^0.7.1"
+pyright = "^1.1.277"
+types-PyYAML = "^6.0.12"
 
 [tool.black]
 exclude = ".ipynb_checkpoints|walkthrough/.*_cookiecutter|.*playground.*.ipynb"
@@ -91,3 +93,12 @@ extend_skip = [".ipynb_checkpoints"]
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.pyright]
+exclude = [
+    "walkthrough/*_cookiecutter",
+    "**/node_modules",
+    "**/__pycache__",
+    ".git",
+    "**/.venv",
+]
