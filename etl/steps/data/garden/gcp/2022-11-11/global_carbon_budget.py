@@ -4,7 +4,7 @@
 
 import pandas as pd
 from owid import catalog
-from owid.datautils import geo
+from owid.datautils import dataframes, geo
 
 from etl.paths import DATA_DIR, STEP_DIR
 
@@ -159,24 +159,72 @@ def sanity_checks_on_input_data(
 
 def sanity_checks_on_output_data(combined_df: pd.DataFrame) -> None:
     combined_df = combined_df.reset_index()
+    error = "All variables (except traded emissions and growth) should be >= 0 or nan."
+    positive_variables = [col for col in combined_df.columns
+        if col != "country" if "traded" not in col if "growth" not in col]
+    assert (combined_df[positive_variables].fillna(0) >= 0).all().all(), error
+
     # Check that production emissions as a share of global emissions, for the world, should be 100% (within 1%).
     error = "Production emissions as a share of global emissions should be 100% for 'World'."
     assert combined_df[
         (combined_df["country"] == "World") & (abs(combined_df["emissions_total_as_share_of_global"] - 100) > 2)
     ].empty, error
+
     error = "Consumption emissions as a share of global emissions should be 100% for 'World'."
     assert combined_df[
         (combined_df["country"] == "World") & (abs(combined_df["consumption_emissions_as_share_of_global"] - 100) > 2)
     ].empty, error
+
     error = "Population as a share of global population should be 100% for 'World'."
     assert combined_df[
         (combined_df["country"] == "World") & (combined_df["population_as_share_of_global"].fillna(100) != 100)
     ].empty, error
+
+    error = "All share of global emissions should be smaller than 100% (or 102%, given small discrepancies)."
+    share_variables = [col for col in combined_df.columns if "share" in col]
+    assert (combined_df[share_variables].fillna(0) <= 102).all().all(), error
+
+    error = "Production emissions as a share of global production emissions for the World should always be 100% "\
+        "(or larger than 98%, given small discrepancies)."
+    # Consumption emissions as a share of global production emissions is allowed to be smaller than 100%.
+    share_variables = [col for col in combined_df.columns if "share" in col if not "consumption" in col]
+    assert (combined_df[combined_df["country"] == "World"][share_variables].fillna(100) > 98).all().all(), error
+
     # Check that traded emissions for the world are close to zero (within +/- 2%).
     world_mask = (combined_df["country"] == "World")
     error = "Traded emissions for the World should be close to zero (within ~2%)."
     assert (abs(100 * combined_df[world_mask]["traded_emissions"].fillna(0) /\
         combined_df[world_mask]["emissions_total"].fillna(1)) < 2).all(), error
+
+
+def prepare_fossil_co2_emissions(co2_df: pd.DataFrame) -> pd.DataFrame:
+    # Select and rename columns from fossil CO2 data.
+    co2_df = co2_df[list(CO2_COLUMNS)].rename(columns=CO2_COLUMNS)
+
+    # Ensure all emissions are given in tonnes of CO2.
+    co2_df[EMISSION_SOURCES] *= MILLION_TONNES_OF_CO2_TO_TONNES_OF_CO2
+
+    ####################################################################################################################
+    # NOTE: For certain years, column "emissions_from_other_industry" is not informed for "World" but it is informed
+    # for some countries (namely China and US).
+    # This causes the cumulative emissions from other industry as share of global for those countries to become larger
+    # than 100%.
+    # This temporary solution fixes the issue: We aggregate the data for China and US on those years when the world's
+    # data is missing (without touching other years or other columns).
+    # Firstly, list of years for which the world has no data for emissions_from_other_industry.
+    world_missing_years = co2_df[(co2_df["country"] == "Global") & (co2_df["emissions_from_other_industry"].isnull())]["year"].unique().tolist()
+    # Data that needs to be aggregated.
+    data_missing_in_world = co2_df[co2_df["year"].isin(world_missing_years) & (co2_df["emissions_from_other_industry"].notnull())]
+    # Check that there is indeed data to be aggregated (that is missing for the World).
+    error = "Expected emissions_from_other_industry to be null for the world but not null for certain countries (which was an issue in the original fossil CO2 data). Maybe this issue has been fixed, and the code can be simplified."
+    assert len(data_missing_in_world) > 0, error
+    # Create a dataframe of aggregate data for the World, on those years when it's missing.
+    aggregated_missing_data = data_missing_in_world.groupby("year").agg({"emissions_from_other_industry": "sum"}).reset_index().assign(**{"country": "Global"})
+    # Combine the new dataframe of aggregate data with the main dataframe.
+    co2_df = dataframes.combine_two_overlapping_dataframes(df1=co2_df, df2=aggregated_missing_data, index_columns=["country", "year"], keep_column_order=True)
+    ####################################################################################################################
+
+    return co2_df
 
 
 def prepare_consumption_emissions(consumption_df: pd.DataFrame) -> pd.DataFrame:
@@ -309,19 +357,6 @@ def add_variables_to_co2_data(
             aggregations=aggregations,
         )
 
-    ####################################################################################################################
-    # NOTE: Column "emissions_from_other_industry" is not informed for "World" but it is informed for some countries
-    # (e.g. "China" and "United States"). This causes that cumulative emissions from other industry as share of global
-    # for those countries to become larger than 100%. This temporary solution fixes the issue, by creating our own
-    # aggregate for the world's emissions from other industry.
-    # TODO: Instead of replacing all points, replace only the missing ones. And also assert that they are missing
-    #   (to be able to know if the source fixes the issue).
-    co2_df = geo.add_region_aggregates(df=co2_df, region="World", countries_in_region=
-        ["Africa", "Asia", "Europe", "North America", "Oceania", "South America"],
-        countries_that_must_have_data=[], frac_allowed_nans_per_year=0.99,
-        aggregations={"emissions_from_other_industry": "sum"})
-    ####################################################################################################################
-
     # Add population to dataframe.
     co2_df = geo.add_population_to_dataframe(df=co2_df, warn_on_missing_countries=False)
 
@@ -431,6 +466,9 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
+    # Prepare fossil CO2 emissions data.
+    co2_df = prepare_fossil_co2_emissions(co2_df=co2_df)
+
     # Prepare consumption-based emission data.
     consumption_df = prepare_consumption_emissions(consumption_df=consumption_df)
 
@@ -443,15 +481,9 @@ def run(dest_dir: str) -> None:
     # Select and rename columns from historical emissions data.
     historical_df = historical_df[list(HISTORICAL_EMISSIONS_COLUMNS)].rename(columns=HISTORICAL_EMISSIONS_COLUMNS)
 
-    # Select and rename columns from fossil CO2 data.
-    co2_df = co2_df[list(CO2_COLUMNS)].rename(columns=CO2_COLUMNS)
-
     # Run sanity checks on raw data.
     sanity_checks_on_input_data(
         production_df=production_df, consumption_df=consumption_df, historical_df=historical_df, co2_df=co2_df)
-
-    # Ensure all emissions are given in tonnes of CO2.
-    co2_df[EMISSION_SOURCES] *= MILLION_TONNES_OF_CO2_TO_TONNES_OF_CO2
 
     # For some reason, "International Transport" is included as another country, that only has emissions from oil.
     # Extract that data and remove it from the rest of national emissions.
