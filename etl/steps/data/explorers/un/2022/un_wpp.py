@@ -25,7 +25,7 @@ def _keep_relevant_rows(df: pd.DataFrame) -> pd.DataFrame:
     """Only keep relevant rows."""
     log.info("Filtering relevant rows...")
     df = df.reset_index()
-    df = df[
+    df = df.loc[
         df.variant.isin(["estimates", "low", "medium", "high"])
         & -(df.metric.isin(["net_migration", "net_migration_rate"]) & (df.location == "World"))
     ].reset_index(drop=True)
@@ -36,13 +36,15 @@ def _organize_variants(df: pd.DataFrame) -> pd.DataFrame:
     log.info("Filling all gaps (variants)...")
     df = pd.concat(
         [
-            df[df.year < YEAR_SPLIT].assign(variant="records").astype({"variant": "category"}),
-            df[df.year < YEAR_SPLIT].assign(variant="low").astype({"variant": "category"}),
-            df[df.year < YEAR_SPLIT].assign(variant="medium").astype({"variant": "category"}),
-            df[df.year < YEAR_SPLIT].assign(variant="high").astype({"variant": "category"}),
-            df[df.year >= YEAR_SPLIT],
+            df.loc[df.year < YEAR_SPLIT].assign(variant="records").astype({"variant": "category"}),
+            df.loc[df.year < YEAR_SPLIT].assign(variant="low").astype({"variant": "category"}),
+            df.loc[df.year < YEAR_SPLIT].assign(variant="medium").astype({"variant": "category"}),
+            df.loc[df.year < YEAR_SPLIT].assign(variant="high").astype({"variant": "category"}),
+            df.loc[df.year >= YEAR_SPLIT],
         ]
-    ).astype({"variant": "category"})
+    ).astype(
+        {"variant": "category"}
+    )  # type: ignore
     return df
 
 

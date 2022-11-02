@@ -483,9 +483,9 @@ class Source(SQLModel, table=True):
             cls.datasetId == self.datasetId,
         ]
         if self.description.get("additionalInfo"):
-            conds.append(cls.description["additionalInfo"] == self.description["additionalInfo"])
+            conds.append(cls.description["additionalInfo"] == self.description["additionalInfo"])  # type: ignore
 
-        return select(cls).where(*conds)
+        return select(cls).where(*conds)  # type: ignore
 
     def upsert(self, session: Session) -> "Source":
         # NOTE: we match on both name and additionalInfo (source's description) so that we can
@@ -514,7 +514,8 @@ class Source(SQLModel, table=True):
             description=SourceDescription(
                 link=source.url,
                 retrievedDate=source.date_accessed,
-                dataPublishedBy=source.published_by,
+                # NOTE: published_by should be non-empty as it is shown in the Sources tab in admin
+                dataPublishedBy=source.published_by or source.name,
                 dataPublisherSource=source.publisher_source,
                 # NOTE: we remap `description` to additionalInfo since that is what is shown as `Description` in
                 # the admin UI. Clean this up with the new data model
@@ -706,11 +707,11 @@ class Variable(SQLModel, table=True):
         # try matching on shortName first
         q = select(cls).where(
             or_(
-                cls.shortName == self.shortName,
+                cls.shortName == self.shortName,  # type: ignore
                 # NOTE: we used to slugify shortName which replaced double underscore by a single underscore
                 # this was a bug, we should have kept the double underscore
                 # match even those variables and correct their shortName
-                cls.shortName == self.shortName.replace("__", "_"),
+                cls.shortName == self.shortName.replace("__", "_"),  # type: ignore
             ),
             cls.datasetId == self.datasetId,
         )

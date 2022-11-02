@@ -11,4 +11,4 @@ def run(dest_dir: str) -> None:
 
     table = N.garden_dataset["maddison_gdp"].reset_index()
 
-    dataset.add(table[["country", "year", "gdp", "gdp_per_capita", "population"]])
+    dataset.add(table.loc[:, ["country", "year", "gdp", "gdp_per_capita", "population"]])

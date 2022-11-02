@@ -34,7 +34,7 @@ check-formatting-default: .venv
 
 check-typing-default: .venv
 	@echo '==> Checking types'
-	poetry run mypy $(SRC)
+	poetry run pyright $(SRC)
 
 unittest-default: .venv
 	@echo '==> Running unit tests'

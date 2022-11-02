@@ -111,7 +111,7 @@ def test_selection_selects_parents(parse_step):
     assert set(s.path for s in steps) == {"b", "a", "d"}
 
 
-class DummyStep(Step):
+class DummyStep(Step):  # type: ignore
     def __init__(self, name: str):
         self.path = name
 

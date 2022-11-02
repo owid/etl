@@ -24,8 +24,9 @@ with warnings.catch_warnings():
     warnings.simplefilter("ignore")
     import papermill as pm
 
-from owid import catalog, walden
+from owid import catalog
 from owid.walden import CATALOG as WALDEN_CATALOG
+from owid.walden import Dataset as WaldenDataset
 
 from etl import backport_helpers, config, files, git
 from etl import grapher_helpers as gh
@@ -141,7 +142,7 @@ def _load_dag(filename: Union[str, Path], prev_dag: Dict[str, Any]):
     Recursive helper to 1) load a dag itself, and 2) load any sub-dags
     included in the dag via 'include' statements
     """
-    dag_yml = _load_dag_yaml(filename)
+    dag_yml = _load_dag_yaml(str(filename))
     curr_dag = _parse_dag_yaml(dag_yml)
     curr_dag.update(prev_dag)
 
@@ -471,7 +472,7 @@ class WaldenStep(Step):
         return checksum
 
     @property
-    def _walden_dataset(self) -> walden.Dataset:
+    def _walden_dataset(self) -> WaldenDataset:
         if self.path.count("/") != 2:
             raise ValueError(f"malformed walden path: {self.path}")
 
@@ -528,6 +529,7 @@ class GrapherStep(Step):
 
         dataset.metadata = gh._adapt_dataset_metadata_for_grapher(dataset.metadata)
 
+        assert dataset.metadata.namespace
         dataset_upsert_results = upsert_dataset(
             dataset,
             dataset.metadata.namespace,

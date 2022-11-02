@@ -29,8 +29,7 @@ def get_grapher_dataset_from_file_name(file_path: str) -> catalog.Dataset:
     dataset_short_name = file_name.split(".")[0]
 
     # Path to file containing information of the latest versions of the relevant datasets.
-    # TODO: this will be soon moved to `STEP_DIR / "data" / "grapher" / namespace / grapher_version / "versions.csv"`
-    latest_versions_file = STEP_DIR / "grapher" / namespace / grapher_version / "versions.csv"
+    latest_versions_file = STEP_DIR / "data/grapher" / namespace / grapher_version / "versions.csv"
 
     # Load file of versions.
     latest_versions = pd.read_csv(latest_versions_file).set_index(["channel", "dataset"])

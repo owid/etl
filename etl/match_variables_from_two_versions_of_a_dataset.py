@@ -10,7 +10,7 @@ manually. This script is a CLI tool that may help in either scenario.
 
 import json
 import os
-from typing import Any, Callable
+from typing import Any, Callable, Union
 
 import click
 import pandas as pd
@@ -59,7 +59,7 @@ def get_similarity_function(similarity_name: str) -> Any:
     return similarity_function
 
 
-def save_data_to_json_file(data: list[str], json_file: str, **kwargs: Any) -> None:
+def save_data_to_json_file(data: Union[list[str], dict[Any, Any]], json_file: str, **kwargs: Any) -> None:
     """Save data to a json file.
 
     Parameters

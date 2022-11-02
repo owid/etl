@@ -58,8 +58,7 @@ sanity-check:
 
 check-typing: .venv
 	@echo '==> Checking types'
-	poetry run mypy --exclude='etl/steps|walkthrough/.*_cookiecutter'  $(SRC)
-	@./scripts/typecheck_steps.sh
+	poetry run pyright $(SRC)
 
 coverage: .venv
 	@echo '==> Unit testing with coverage'
@@ -79,7 +78,8 @@ clean:
 
 clobber: clean
 	find . -name .venv | xargs rm -rf
-	find . -name .mypy_cache | xargs rm -rf
+	find . -name .pytest_cache | xargs rm -rf
+	find . -name .cachedir | xargs rm -rf
 
 lab: .venv
 	@echo '==> Starting Jupyter server'

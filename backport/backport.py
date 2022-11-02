@@ -83,7 +83,7 @@ class PotentialBackport:
             ds = gm.Dataset.load_dataset(session, self.dataset_id)
             vars = gm.Dataset.load_variables_for_dataset(session, self.dataset_id)
 
-            self.variable_ids = [v.id for v in vars]  # type: ignore
+            self.variable_ids = [v.id for v in vars if v.id]
 
             # get sources for dataset and all variables
             sources = gm.Source.load_sources(session, dataset_id=ds.id, variable_ids=self.variable_ids)

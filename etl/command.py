@@ -24,7 +24,7 @@ config.enable_bugsnag()
 WALDEN_NAMESPACE = os.environ.get("WALDEN_NAMESPACE", "backport")
 
 # if the number of open files allowed is less than this, increase it
-LIMIT_NOFILE = 5000
+LIMIT_NOFILE = 4096
 
 
 @click.command()
@@ -311,7 +311,7 @@ def _update_open_file_limit() -> None:
     # avoid errors due to not enough allowed open files
     soft_limit, hard_limit = resource.getrlimit(resource.RLIMIT_NOFILE)
     if soft_limit < LIMIT_NOFILE:
-        resource.setrlimit(resource.RLIMIT_NOFILE, (LIMIT_NOFILE, hard_limit))
+        resource.setrlimit(resource.RLIMIT_NOFILE, (min(LIMIT_NOFILE, hard_limit), hard_limit))
 
 
 if __name__ == "__main__":
