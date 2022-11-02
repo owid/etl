@@ -55,7 +55,7 @@ def load_and_clean(original_df: pd.DataFrame) -> pd.DataFrame:
     # removing values that aren't numeric e.g. Null and N values
     original_df.dropna(subset=["Value"], inplace=True)
     original_df.dropna(subset=["TimePeriod"], how="all", inplace=True)
-    original_df = original_df[pd.to_numeric(original_df["Value"], errors="coerce").notnull()]
+    original_df = original_df.loc[pd.to_numeric(original_df["Value"], errors="coerce").notnull()]
     original_df.rename(columns={"GeoAreaName": "Country", "TimePeriod": "Year"}, inplace=True)
     original_df = original_df.rename(columns=lambda k: re.sub(r"[\[\]]", "", k))  # type: ignore
     return original_df

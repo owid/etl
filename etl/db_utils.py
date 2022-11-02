@@ -66,7 +66,7 @@ class DBUtils:
         return None
 
     def upsert_many(self, query: str, tuples: Iterable[Tuple[Any, ...]]) -> None:
-        self.cursor.executemany(query, tuples)
+        self.cursor.executemany(query, list(tuples))
 
     def execute_until_empty(self, *args: Any, **kwargs: Any) -> None:
         first = True

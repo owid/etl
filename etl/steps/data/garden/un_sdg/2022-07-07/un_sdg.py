@@ -34,7 +34,7 @@ def run(dest_dir: str, query: str = "") -> None:
     log.info("Harmonizing entity names...")
     country_mapping = load_country_mapping()
     excluded_countries = load_excluded_countries()
-    df = df[~df.country.isin(excluded_countries)]
+    df = df.loc[~df.country.isin(excluded_countries)]
     assert df["country"].notnull().all()
     countries = df["country"].map(country_mapping)
     if countries.isnull().any():
@@ -322,7 +322,8 @@ def load_excluded_countries() -> List[str]:
 
 
 def create_omms(all_tabs: List[pd.DataFrame]) -> List[pd.DataFrame]:
-    for i, table in enumerate(all_tabs):
+    new_tabs = []
+    for table in all_tabs:
         if table.index[0][5] in ("ER_BDY_ABT2NP", "SG_SCP_PROCN"):
             table = table.copy(deep=False)
             table = table.query('level_status != "No breakdown"')
@@ -333,12 +334,13 @@ def create_omms(all_tabs: List[pd.DataFrame]) -> List[pd.DataFrame]:
             regions = set(vc[vc > 1].index.get_level_values(0))
             table = table[~table.index.get_level_values("country").isin(regions)]
 
-            table.reset_index(level=["level_status"], inplace=True)
+            table.reset_index(level=["level_status"], inplace=True)  # type: ignore
             table["value"] = table["level_status"]
             table.drop(columns=["level_status"], inplace=True)
-            all_tabs[i] = table
 
-    return all_tabs
+        new_tabs.append(table)
+
+    return new_tabs
 
 
 if __name__ == "__main__":

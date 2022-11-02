@@ -11,7 +11,7 @@ import shutil
 import time
 import traceback
 from copy import deepcopy
-from typing import Any, Dict, Iterable, List, Literal, Optional, Tuple, Union
+from typing import Any, Dict, Iterable, List, Literal, Optional, Tuple, Union, cast
 
 import click
 import pandas as pd
@@ -156,10 +156,11 @@ class ChartRevisionSuggester:
         df_charts, df_chart_dims, _ = self._get_charts_from_old_variables()
         suggested_chart_revisions = []
         for row in tqdm(df_charts.itertuples(), total=df_charts.shape[0]):
+            row = cast(Any, row)
             try:
                 chart_id = row.id
                 # retrieves chart dimensions to be updated.
-                chart_dims = df_chart_dims[df_chart_dims["chartId"] == chart_id].to_dict(orient="records")
+                chart_dims = df_chart_dims.loc[df_chart_dims["chartId"] == chart_id].to_dict(orient="records")
                 chart_dims_orig = deepcopy(chart_dims)
                 chart_config = json.loads(row.config)
 
@@ -205,8 +206,8 @@ class ChartRevisionSuggester:
             dataset_name = self.dataset_name
             dataset_version = self.version
             suggested_reason = f"{dataset_name} (v{dataset_version}) bulk dataset update"
+        n_before = 0
         try:
-            n_before = 0
             with open_db() as db:
                 n_before = db.fetch_one("SELECT COUNT(id) FROM suggested_chart_revisions")[0]
 

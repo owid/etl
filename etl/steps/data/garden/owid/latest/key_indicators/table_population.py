@@ -105,7 +105,7 @@ def prepare_dataset(df: pd.DataFrame) -> Table:
     df.year = df.year.astype(int)
 
     # Add a metric "% of world population"
-    world_pop = df[df.country == "World"][["year", "population"]].rename(columns={"population": "world_pop"})
+    world_pop = df.loc[df.country == "World", ["year", "population"]].rename(columns={"population": "world_pop"})
     df = df.merge(world_pop, on="year", how="left")
     df["world_pop_share"] = (df["population"].div(df.world_pop)).round(4)
 

@@ -1,4 +1,4 @@
-from pathlib import Path
+from typing import List
 
 import pandas as pd
 import pyarrow.compute as pc
@@ -46,7 +46,7 @@ def read_and_clean_data(local_file: str) -> pd.DataFrame:
         partition = ""
 
     if partition:
-        dfs = []
+        dfs: List[pd.DataFrame] = []
         for partition_name in arrow_table[partition].unique().to_pylist():
             dfs.append(clean_data(arrow_table.filter(pc.equal(arrow_table[partition], partition_name)).to_pandas()))
         return pd.concat(dfs)
@@ -54,7 +54,7 @@ def read_and_clean_data(local_file: str) -> pd.DataFrame:
         return clean_data(arrow_table.to_pandas())
 
 
-def run_wrapper(dataset: Path, metadata_path: Path, namespace: Path, version: Path, dest_dir: str) -> None:
+def run_wrapper(dataset: str, metadata_path: str, namespace: str, version: str, dest_dir: str) -> None:
     # retrieve raw data from walden
     walden_ds = WaldenCatalog().find_one(namespace=namespace, short_name=dataset, version=version)
     local_file = walden_ds.ensure_downloaded()

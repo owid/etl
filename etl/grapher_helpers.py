@@ -569,9 +569,9 @@ def _ensure_source_per_variable(table: catalog.Table) -> catalog.Table:
 
 @dataclass
 class IntRange:
-    min: int
+    min: int  # type: ignore
     _min: int = field(init=False, repr=False)
-    max: int
+    max: int  # type: ignore
     _max: int = field(init=False, repr=False)
 
     @property  # type: ignore
