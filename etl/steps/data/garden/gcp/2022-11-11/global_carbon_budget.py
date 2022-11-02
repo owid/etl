@@ -2,10 +2,9 @@
 
 """
 
-import numpy as np
 import pandas as pd
 from owid import catalog
-from owid.datautils import dataframes, geo
+from owid.datautils import geo
 
 from etl.paths import DATA_DIR, STEP_DIR
 
@@ -274,21 +273,14 @@ def harmonize_co2_data(co2_df: pd.DataFrame) -> pd.DataFrame:
         "Palau"
     ], error
 
-    # Select data for Palau, sort by total emissions (ensuring nans are poisitioned before zeros), then drop duplicates
-    # keeping the last value. This way we keep the original nans, but prioritise non-zero data when there was any.
+    # Select data for Palau, sort by total emissions (ensuring nans are positioned before zeros), then drop duplicates
+    # keeping the last value. This way we keep the original nans, but prioritize non-zero data when there was any.
     palau_df = co2_df[co2_df["country"] == "Palau"].sort_values("emissions_total", na_position="first").\
         drop_duplicates(subset=["country", "year"], keep="last").reset_index(drop=True)
 
     # Concatenate Palau data with the main dataframe, and sort conveniently.
     co2_df = pd.concat([co2_df[co2_df["country"] != "Palau"], palau_df], ignore_index=True).\
         sort_values(["country", "year"]).reset_index(drop=True)
-
-    # Combine Palau data (after converting zeros into nan) with the entire dataframe, prioritising the former.
-    # This way, wherever we have Palau data, we will use it, and wherever we have only nan, we will keep not-nan data.
-    # For rows where both duplicates of Palau are nan we will keep any of them.
-    co2_df = dataframes.combine_two_overlapping_dataframes(
-        df1=co2_df[co2_df["country"] == "Palau"].replace(0, np.nan), df2=co2_df, index_columns=["country", "year"]
-    ).reset_index(drop=True)
 
     # Remove duplicated rows.
     co2_df = co2_df.drop_duplicates(subset=["country", "year"], keep="last").reset_index(drop=True)
@@ -316,6 +308,19 @@ def add_variables_to_co2_data(
             frac_allowed_nans_per_year=0.999,
             aggregations=aggregations,
         )
+
+    ####################################################################################################################
+    # NOTE: Column "emissions_from_other_industry" is not informed for "World" but it is informed for some countries
+    # (e.g. "China" and "United States"). This causes that cumulative emissions from other industry as share of global
+    # for those countries to become larger than 100%. This temporary solution fixes the issue, by creating our own
+    # aggregate for the world's emissions from other industry.
+    # TODO: Instead of replacing all points, replace only the missing ones. And also assert that they are missing
+    #   (to be able to know if the source fixes the issue).
+    co2_df = geo.add_region_aggregates(df=co2_df, region="World", countries_in_region=
+        ["Africa", "Asia", "Europe", "North America", "Oceania", "South America"],
+        countries_that_must_have_data=[], frac_allowed_nans_per_year=0.99,
+        aggregations={"emissions_from_other_industry": "sum"})
+    ####################################################################################################################
 
     # Add population to dataframe.
     co2_df = geo.add_population_to_dataframe(df=co2_df, warn_on_missing_countries=False)
