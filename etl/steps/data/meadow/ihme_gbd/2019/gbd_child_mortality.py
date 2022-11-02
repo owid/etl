@@ -16,5 +16,5 @@ def run(dest_dir: str) -> None:
     namespace = N.namespace
     version = N.version
     log.info(f"{dataset}.start")
-    run_wrapper(dataset, metadata_path, namespace, version, dest_dir)
+    run_wrapper(dataset, metadata_path.as_posix(), namespace, version, dest_dir)
     log.info(f"{dataset}.end")

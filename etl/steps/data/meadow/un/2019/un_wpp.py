@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# pyright: reportUnusedExpression=false
 # coding: utf-8
 # %% [markdown]
 # # UN World Population Prospects (2019)

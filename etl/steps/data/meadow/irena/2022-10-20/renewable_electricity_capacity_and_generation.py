@@ -23,7 +23,7 @@ DATASET_NAME = WALDEN_DATASET_NAME
 N = Names(str(CURRENT_DIR / DATASET_NAME))
 
 
-def prepare_pv_capacity_data(data_file: str) -> pd.DataFrame:
+def prepare_pv_capacity_data(data_file: str) -> None:
     """Prepare yearly solar photovoltaic capacity data.
 
     Parameters
@@ -37,6 +37,7 @@ def prepare_pv_capacity_data(data_file: str) -> pd.DataFrame:
         PV capacity.
 
     """
+    pass
 
 
 def extract_capacity_from_sheet(excel_object: pd.ExcelFile, sheet_name: str) -> pd.DataFrame:
