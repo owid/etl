@@ -20,7 +20,7 @@ NAMESPACE = "papers"
 SHORT_NAME = "zijdeman_et_al_2015"
 VERSION_WALDEN = "2022-11-01"
 # Meadow version
-VERSION_MEADOW = "2022-11-01"
+VERSION_MEADOW = "2022-11-03"
 
 
 def run(dest_dir: str) -> None:
