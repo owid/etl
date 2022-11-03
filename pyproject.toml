@@ -101,4 +101,5 @@ exclude = [
     "**/__pycache__",
     ".git",
     "**/.venv",
+    "**/.ipynb_checkpoints",
 ]
