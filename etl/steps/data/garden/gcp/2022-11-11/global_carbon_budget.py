@@ -184,6 +184,18 @@ def sanity_checks_on_output_data(combined_df: pd.DataFrame) -> None:
     share_variables = [col for col in combined_df.columns if "share" in col]
     assert (combined_df[share_variables].fillna(0) <= 102).all().all(), error
 
+    # Check that cumulative variables are monotonically increasing.
+    # Firstly, list columns of cumulative variables, but ignoring cumulative columns as a share of global
+    # (since they are not necessarily monotonic).
+    cumulative_cols = [col for col in combined_df.columns if "cumulative" in col if "share" not in col]
+    # Using ".is_monotonic_increasing" can fail when differences between consecutive numbers are very small.
+    # Instead, sort data backwards in time, and check that consecutive values of cumulative variables always have
+    # a percentage change that is smaller than, say, 0.1%.
+    error = "Cumulative variables (not given as a share of global) should be monotonically increasing."
+    assert combined_df.sort_values("year", ascending=False).groupby("country").agg({
+        col: lambda x: ((x.pct_change().dropna() * 100) <= 0.1).all()
+        for col in cumulative_cols}).all().all(), error
+
     error = "Production emissions as a share of global production emissions for the World should always be 100% "\
         "(or larger than 98%, given small discrepancies)."
     # Consumption emissions as a share of global production emissions is allowed to be smaller than 100%.
