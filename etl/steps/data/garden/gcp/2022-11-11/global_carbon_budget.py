@@ -31,10 +31,7 @@ REGIONS = {
         "regions_included": ["Asia"],
         "countries_excluded": ["China", "India"],
     },
-    "Europe (excl. EU-27)": {
-        "regions_included": ["Europe"],
-        "regions_excluded": ["European Union (27)"]
-    },
+    "Europe (excl. EU-27)": {"regions_included": ["Europe"], "regions_excluded": ["European Union (27)"]},
     "Europe (excl. EU-28)": {
         "regions_included": ["Europe"],
         "regions_excluded": ["European Union (27)"],
@@ -187,8 +184,9 @@ def sanity_checks_on_input_data(
 def sanity_checks_on_output_data(combined_df: pd.DataFrame) -> None:
     combined_df = combined_df.reset_index()
     error = "All variables (except traded emissions and growth) should be >= 0 or nan."
-    positive_variables = [col for col in combined_df.columns
-        if col != "country" if "traded" not in col if "growth" not in col]
+    positive_variables = [
+        col for col in combined_df.columns if col != "country" if "traded" not in col if "growth" not in col
+    ]
     assert (combined_df[positive_variables].fillna(0) >= 0).all().all(), error
 
     # Check that production emissions as a share of global emissions, for the world, should be 100% (within 1%).
@@ -219,21 +217,33 @@ def sanity_checks_on_output_data(combined_df: pd.DataFrame) -> None:
     # Instead, sort data backwards in time, and check that consecutive values of cumulative variables always have
     # a percentage change that is smaller than, say, 0.1%.
     error = "Cumulative variables (not given as a share of global) should be monotonically increasing."
-    assert combined_df.sort_values("year", ascending=False).groupby("country").agg({
-        col: lambda x: ((x.pct_change().dropna() * 100) <= 0.1).all()
-        for col in cumulative_cols}).all().all(), error
+    assert (
+        combined_df.sort_values("year", ascending=False)
+        .groupby("country")
+        .agg({col: lambda x: ((x.pct_change().dropna() * 100) <= 0.1).all() for col in cumulative_cols})
+        .all()
+        .all()
+    ), error
 
-    error = "Production emissions as a share of global production emissions for the World should always be 100% "\
+    error = (
+        "Production emissions as a share of global production emissions for the World should always be 100% "
         "(or larger than 98%, given small discrepancies)."
+    )
     # Consumption emissions as a share of global production emissions is allowed to be smaller than 100%.
-    share_variables = [col for col in combined_df.columns if "share" in col if not "consumption" in col]
+    share_variables = [col for col in combined_df.columns if "share" in col if "consumption" not in col]
     assert (combined_df[combined_df["country"] == "World"][share_variables].fillna(100) > 98).all().all(), error
 
     # Check that traded emissions for the world are close to zero (within +/- 2%).
-    world_mask = (combined_df["country"] == "World")
+    world_mask = combined_df["country"] == "World"
     error = "Traded emissions for the World should be close to zero (within ~2%)."
-    assert (abs(100 * combined_df[world_mask]["traded_emissions"].fillna(0) /\
-        combined_df[world_mask]["emissions_total"].fillna(1)) < 2).all(), error
+    assert (
+        abs(
+            100
+            * combined_df[world_mask]["traded_emissions"].fillna(0)
+            / combined_df[world_mask]["emissions_total"].fillna(1)
+        )
+        < 2
+    ).all(), error
 
 
 def prepare_fossil_co2_emissions(co2_df: pd.DataFrame) -> pd.DataFrame:
@@ -251,21 +261,32 @@ def prepare_fossil_co2_emissions(co2_df: pd.DataFrame) -> pd.DataFrame:
     # This temporary solution fixes the issue: We aggregate the data for China and US on those years when the world's
     # data is missing (without touching other years or other columns).
     # Firstly, list of years for which the world has no data for emissions_from_other_industry.
-    world_missing_years = co2_df[(co2_df["country"] == "Global") &
-        (co2_df["emissions_from_other_industry"].isnull())]["year"].unique().tolist()
+    world_missing_years = (
+        co2_df[(co2_df["country"] == "Global") & (co2_df["emissions_from_other_industry"].isnull())]["year"]
+        .unique()
+        .tolist()  # type: ignore
+    )
     # Data that needs to be aggregated.
-    data_missing_in_world = co2_df[co2_df["year"].isin(world_missing_years) &
-        (co2_df["emissions_from_other_industry"].notnull())]
+    data_missing_in_world = co2_df[
+        co2_df["year"].isin(world_missing_years) & (co2_df["emissions_from_other_industry"].notnull())
+    ]
     # Check that there is indeed data to be aggregated (that is missing for the World).
-    error = "Expected emissions_from_other_industry to be null for the world but not null for certain countries "\
+    error = (
+        "Expected emissions_from_other_industry to be null for the world but not null for certain countries "
         "(which was an issue in the original fossil CO2 data). The issue may be fixed and the code can be simplified."
+    )
     assert len(data_missing_in_world) > 0, error
     # Create a dataframe of aggregate data for the World, on those years when it's missing.
-    aggregated_missing_data = data_missing_in_world.groupby("year").agg({"emissions_from_other_industry": "sum"}).\
-        reset_index().assign(**{"country": "Global"})
+    aggregated_missing_data = (
+        data_missing_in_world.groupby("year")
+        .agg({"emissions_from_other_industry": "sum"})
+        .reset_index()
+        .assign(**{"country": "Global"})
+    )
     # Combine the new dataframe of aggregate data with the main dataframe.
     co2_df = dataframes.combine_two_overlapping_dataframes(
-        df1=co2_df, df2=aggregated_missing_data, index_columns=["country", "year"], keep_column_order=True)
+        df1=co2_df, df2=aggregated_missing_data, index_columns=["country", "year"], keep_column_order=True
+    )
     ####################################################################################################################
 
     return co2_df
@@ -275,10 +296,13 @@ def prepare_consumption_emissions(consumption_df: pd.DataFrame) -> pd.DataFrame:
     # List indexes of rows in consumption_df corresponding to outliers (defined above in OUTLIERS_IN_CONSUMPTION_DF).
     outlier_indexes = [
         consumption_df[(consumption_df["country"] == outlier[0]) & (consumption_df["year"] == outlier[1])].index.item()
-            for outlier in OUTLIERS_IN_CONSUMPTION_DF]
+        for outlier in OUTLIERS_IN_CONSUMPTION_DF
+    ]
 
-    error = "Outliers were expected to have negative consumption emissions. "\
+    error = (
+        "Outliers were expected to have negative consumption emissions. "
         "Maybe outliers have been fixed (and should be removed from the code)."
+    )
     assert (consumption_df.loc[outlier_indexes]["consumption_emissions"] < 0).all(), error
 
     # Remove outliers.
@@ -367,12 +391,19 @@ def harmonize_co2_data(co2_df: pd.DataFrame) -> pd.DataFrame:
 
     # Select data for Palau, sort by total emissions (ensuring nans are positioned before zeros), then drop duplicates
     # keeping the last value. This way we keep the original nans, but prioritize non-zero data when there was any.
-    palau_df = co2_df[co2_df["country"] == "Palau"].sort_values("emissions_total", na_position="first").\
-        drop_duplicates(subset=["country", "year"], keep="last").reset_index(drop=True)
+    palau_df = (
+        co2_df[co2_df["country"] == "Palau"]
+        .sort_values("emissions_total", na_position="first")
+        .drop_duplicates(subset=["country", "year"], keep="last")
+        .reset_index(drop=True)
+    )
 
     # Concatenate Palau data with the main dataframe, and sort conveniently.
-    co2_df = pd.concat([co2_df[co2_df["country"] != "Palau"], palau_df], ignore_index=True).\
-        sort_values(["country", "year"]).reset_index(drop=True)
+    co2_df = (
+        pd.concat([co2_df[co2_df["country"] != "Palau"], palau_df], ignore_index=True)
+        .sort_values(["country", "year"])
+        .reset_index(drop=True)
+    )
 
     # Remove duplicated rows.
     co2_df = co2_df.drop_duplicates(subset=["country", "year"], keep="last").reset_index(drop=True)
@@ -396,17 +427,19 @@ def get_countries_in_region(region, region_modifications=None):
     countries_excluded = region_modifications.get("countries_excluded", [])
 
     # List countries from the list of regions included.
-    countries_set = set(sum([geo.list_countries_in_region(region_included)
-        for region_included in regions_included], []))
+    countries_set = set(
+        sum([geo.list_countries_in_region(region_included) for region_included in regions_included], [])
+    )
 
     # Remove all countries from the list of regions excluded.
-    countries_set -= set(sum([geo.list_countries_in_region(region_excluded)
-        for region_excluded in regions_excluded], []))
+    countries_set -= set(
+        sum([geo.list_countries_in_region(region_excluded) for region_excluded in regions_excluded], [])
+    )
 
     # Add the list of individual countries to be included.
     countries_set |= set(countries_included)
 
-    # Remove the list of individual countries to be excluded.
+    # Remove the list of individual countries to be excluded.
     countries_set -= set(countries_excluded)
 
     # Convert set of countries into a sorted list.
@@ -435,7 +468,7 @@ def add_variables_to_co2_data(
     co2_df = pd.merge(co2_df, primary_energy_df, on=["country", "year"], how="left")
 
     # Add region aggregates.
-    # Aggregate not only emissions data, but also population, gdp and primary energy.
+    # Aggregate not only emissions data, but also population, gdp and primary energy.
     # This way we ensure that custom regions (e.g. "North America (excl. USA)") will have all required data.
     aggregations = {column: "sum" for column in co2_df.columns if column not in ["country", "year"]}
     for region in REGIONS:
@@ -482,16 +515,17 @@ def add_variables_to_co2_data(
         )
 
     # Add total emissions per unit energy (in kg of emissions per kWh).
-    co2_df["emissions_total_per_unit_energy"] = TONNES_OF_CO2_TO_KG_OF_CO2 * co2_df["emissions_total"] / (
-        co2_df["primary_energy_consumption"] * TWH_TO_KWH
+    co2_df["emissions_total_per_unit_energy"] = (
+        TONNES_OF_CO2_TO_KG_OF_CO2 * co2_df["emissions_total"] / (co2_df["primary_energy_consumption"] * TWH_TO_KWH)
     )
 
     # Add total emissions per unit GDP.
     co2_df["emissions_total_per_gdp"] = TONNES_OF_CO2_TO_KG_OF_CO2 * co2_df["emissions_total"] / co2_df["gdp"]
 
     # Add total consumption emissions per unit GDP.
-    co2_df["consumption_emissions_per_gdp"] =\
+    co2_df["consumption_emissions_per_gdp"] = (
         TONNES_OF_CO2_TO_KG_OF_CO2 * co2_df["consumption_emissions"] / co2_df["gdp"]
+    )
 
     # Add variable of emissions embedded in trade.
     co2_df["traded_emissions"] = co2_df["consumption_emissions"] - co2_df["emissions_total"]
@@ -565,7 +599,8 @@ def run(dest_dir: str) -> None:
 
     # Run sanity checks on raw data.
     sanity_checks_on_input_data(
-        production_df=production_df, consumption_df=consumption_df, historical_df=historical_df, co2_df=co2_df)
+        production_df=production_df, consumption_df=consumption_df, historical_df=historical_df, co2_df=co2_df
+    )
 
     # For some reason, "International Transport" is included as another country, that only has emissions from oil.
     # Extract that data and remove it from the rest of national emissions.
