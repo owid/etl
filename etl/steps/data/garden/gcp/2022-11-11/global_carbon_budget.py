@@ -8,20 +8,47 @@ from owid.datautils import dataframes, geo
 
 from etl.paths import DATA_DIR, STEP_DIR
 
-# Regions and income groups to create (by aggregating), following OWID definitions.
-REGIONS = [
-    "Africa",
-    "Asia",
-    "Europe",
-    "European Union (27)",
-    "North America",
-    "Oceania",
-    "South America",
-    "Low-income countries",
-    "Upper-middle-income countries",
-    "Lower-middle-income countries",
-    "High-income countries",
-]
+# Regions and income groups to create by aggregating contributions from member countries.
+# In the following dictionary, if nothing is stated, the region is supposed to be a default continent/income group.
+# Otherwise, the dictionary can have "regions_included", "regions_excluded", "countries_included", and
+# "countries_excluded". The aggregates will be calculated on the resulting countries.
+REGIONS = {
+    # Default continents.
+    "Africa": {},
+    "Asia": {},
+    "Europe": {},
+    "European Union (27)": {},
+    "North America": {},
+    "Oceania": {},
+    "South America": {},
+    # Income groups.
+    "Low-income countries": {},
+    "Upper-middle-income countries": {},
+    "Lower-middle-income countries": {},
+    "High-income countries": {},
+    # Additional composite regions.
+    "Asia (excl. China and India)": {
+        "regions_included": ["Asia"],
+        "countries_excluded": ["China", "India"],
+    },
+    "Europe (excl. EU-27)": {
+        "regions_included": ["Europe"],
+        "regions_excluded": ["European Union (27)"]
+    },
+    "Europe (excl. EU-28)": {
+        "regions_included": ["Europe"],
+        "regions_excluded": ["European Union (27)"],
+        "countries_excluded": ["United Kingdom"],
+    },
+    "European Union (28)": {
+        "regions_included": ["European Union (27)"],
+        "countries_included": ["United Kingdom"],
+    },
+    "North America (excl. USA)": {
+        "regions_included": ["North America"],
+        "countries_excluded": ["United States"],
+    },
+}
 
 # Define inputs.
 # Country names harmonization file for fossil CO2 emissions data.
@@ -224,16 +251,21 @@ def prepare_fossil_co2_emissions(co2_df: pd.DataFrame) -> pd.DataFrame:
     # This temporary solution fixes the issue: We aggregate the data for China and US on those years when the world's
     # data is missing (without touching other years or other columns).
     # Firstly, list of years for which the world has no data for emissions_from_other_industry.
-    world_missing_years = co2_df[(co2_df["country"] == "Global") & (co2_df["emissions_from_other_industry"].isnull())]["year"].unique().tolist()
+    world_missing_years = co2_df[(co2_df["country"] == "Global") &
+        (co2_df["emissions_from_other_industry"].isnull())]["year"].unique().tolist()
     # Data that needs to be aggregated.
-    data_missing_in_world = co2_df[co2_df["year"].isin(world_missing_years) & (co2_df["emissions_from_other_industry"].notnull())]
+    data_missing_in_world = co2_df[co2_df["year"].isin(world_missing_years) &
+        (co2_df["emissions_from_other_industry"].notnull())]
     # Check that there is indeed data to be aggregated (that is missing for the World).
-    error = "Expected emissions_from_other_industry to be null for the world but not null for certain countries (which was an issue in the original fossil CO2 data). Maybe this issue has been fixed, and the code can be simplified."
+    error = "Expected emissions_from_other_industry to be null for the world but not null for certain countries "\
+        "(which was an issue in the original fossil CO2 data). The issue may be fixed and the code can be simplified."
     assert len(data_missing_in_world) > 0, error
     # Create a dataframe of aggregate data for the World, on those years when it's missing.
-    aggregated_missing_data = data_missing_in_world.groupby("year").agg({"emissions_from_other_industry": "sum"}).reset_index().assign(**{"country": "Global"})
+    aggregated_missing_data = data_missing_in_world.groupby("year").agg({"emissions_from_other_industry": "sum"}).\
+        reset_index().assign(**{"country": "Global"})
     # Combine the new dataframe of aggregate data with the main dataframe.
-    co2_df = dataframes.combine_two_overlapping_dataframes(df1=co2_df, df2=aggregated_missing_data, index_columns=["country", "year"], keep_column_order=True)
+    co2_df = dataframes.combine_two_overlapping_dataframes(
+        df1=co2_df, df2=aggregated_missing_data, index_columns=["country", "year"], keep_column_order=True)
     ####################################################################################################################
 
     return co2_df
@@ -348,6 +380,41 @@ def harmonize_co2_data(co2_df: pd.DataFrame) -> pd.DataFrame:
     return co2_df
 
 
+def get_countries_in_region(region, region_modifications=None):
+    if region_modifications is None:
+        region_modifications = {}
+
+    # Check that the fields in the regions_modifications dictionary are well defined.
+    expected_fields = ["regions_included", "regions_excluded", "countries_included", "countries_excluded"]
+    assert all([field in expected_fields for field in region_modifications])
+
+    # Get lists of regions whose countries will be included and excluded.
+    regions_included = region_modifications.get("regions_included", [region])
+    regions_excluded = region_modifications.get("regions_excluded", [])
+    # Get lists of additional individual countries to include and exclude.
+    countries_included = region_modifications.get("countries_included", [])
+    countries_excluded = region_modifications.get("countries_excluded", [])
+
+    # List countries from the list of regions included.
+    countries_set = set(sum([geo.list_countries_in_region(region_included)
+        for region_included in regions_included], []))
+
+    # Remove all countries from the list of regions excluded.
+    countries_set -= set(sum([geo.list_countries_in_region(region_excluded)
+        for region_excluded in regions_excluded], []))
+
+    # Add the list of individual countries to be included.
+    countries_set |= set(countries_included)
+
+    # Remove the list of individual countries to be excluded.
+    countries_set -= set(countries_excluded)
+
+    # Convert set of countries into a sorted list.
+    countries = sorted(countries_set)
+
+    return countries
+
+
 def add_variables_to_co2_data(
     co2_df: pd.DataFrame,
     consumption_df: pd.DataFrame,
@@ -358,17 +425,6 @@ def add_variables_to_co2_data(
     # Add consumption emissions to main dataframe (keep only the countries of the main dataframe).
     co2_df = pd.merge(co2_df, consumption_df, on=["country", "year"], how="left")
 
-    # Add region aggregates.
-    aggregations = {column: "sum" for column in EMISSION_SOURCES + ["consumption_emissions"]}
-    for region in REGIONS:
-        co2_df = geo.add_region_aggregates(
-            df=co2_df,
-            region=region,
-            countries_that_must_have_data=[],
-            frac_allowed_nans_per_year=0.999,
-            aggregations=aggregations,
-        )
-
     # Add population to dataframe.
     co2_df = geo.add_population_to_dataframe(df=co2_df, warn_on_missing_countries=False)
 
@@ -377,6 +433,21 @@ def add_variables_to_co2_data(
 
     # Add primary energy to main dataframe.
     co2_df = pd.merge(co2_df, primary_energy_df, on=["country", "year"], how="left")
+
+    # Add region aggregates.
+    # Aggregate not only emissions data, but also population, gdp and primary energy.
+    # This way we ensure that custom regions (e.g. "North America (excl. USA)") will have all required data.
+    aggregations = {column: "sum" for column in co2_df.columns if column not in ["country", "year"]}
+    for region in REGIONS:
+        countries_in_region = get_countries_in_region(region=region, region_modifications=REGIONS[region])
+        co2_df = geo.add_region_aggregates(
+            df=co2_df,
+            region=region,
+            countries_in_region=countries_in_region,
+            countries_that_must_have_data=[],
+            frac_allowed_nans_per_year=0.999,
+            aggregations=aggregations,
+        )
 
     # Add global emissions and global cumulative emissions columns to main dataframe.
     co2_df = pd.merge(co2_df, global_emissions_df.drop(columns="country"), on=["year"], how="left")
@@ -418,10 +489,9 @@ def add_variables_to_co2_data(
     # Add total emissions per unit GDP.
     co2_df["emissions_total_per_gdp"] = TONNES_OF_CO2_TO_KG_OF_CO2 * co2_df["emissions_total"] / co2_df["gdp"]
 
-    # TODO: Considering renaming "consumption_emissions" -> "consumption_emissions_total",
-    #  and "emissions" -> "production_emissions".
     # Add total consumption emissions per unit GDP.
-    co2_df["consumption_emissions_per_gdp"] = TONNES_OF_CO2_TO_KG_OF_CO2 * co2_df["consumption_emissions"] / co2_df["gdp"]
+    co2_df["consumption_emissions_per_gdp"] =\
+        TONNES_OF_CO2_TO_KG_OF_CO2 * co2_df["consumption_emissions"] / co2_df["gdp"]
 
     # Add variable of emissions embedded in trade.
     co2_df["traded_emissions"] = co2_df["consumption_emissions"] - co2_df["emissions_total"]
