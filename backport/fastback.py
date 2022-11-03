@@ -50,7 +50,7 @@ SLEEP_BETWEEN_RUNS = 1
     help="How many datasets to process in parallel",
 )
 @click.option("--bucket", type=str, help="Bucket name", default=config.S3_BUCKET)
-def fasttrack(
+def fastback(
     dry_run: bool = False,
     force: bool = False,
     dt_start: dt.datetime = dt.datetime.utcnow(),
@@ -64,11 +64,11 @@ def fasttrack(
 
         # wait if no results
         if df.empty:
-            log.info("fasttrack.waiting", dt_start=dt_start)
+            log.info("fastback.waiting", dt_start=dt_start)
             time.sleep(SLEEP_BETWEEN_RUNS)
             continue
         else:
-            log.info("fasttrack.processing", dt_start=dt_start, datasets=len(df))
+            log.info("fastback.processing", dt_start=dt_start, datasets=len(df))
 
         # use latest timestamp of processed datasets as start for next batch
         dt_start = df.latest_timestamp.max().to_pydatetime()
@@ -77,11 +77,11 @@ def fasttrack(
         _backport_datasets_to_walden(df, dry_run=dry_run, force=force)
 
         # refresh local walden catalog manually
-        log.info("fasttrack.refresh_local_walden", dt_start=dt_start)
+        log.info("fastback.refresh_local_walden", dt_start=dt_start)
         WALDEN_CATALOG.refresh()
 
         # run ETL
-        log.info("fasttrack.etl", dt_start=dt_start)
+        log.info("fastback.etl", dt_start=dt_start)
         etl(
             steps=[f"dataset_{ds_id}" for ds_id in df.dataset_id],
             dry_run=False,
@@ -96,7 +96,7 @@ def fasttrack(
             channel=["backport"],
             include=r"|".join([f"dataset_{ds_id}_" for ds_id in df.dataset_id]),
         )
-        log.info("fasttrack.end", dt_start=dt_start)
+        log.info("fastback.end", dt_start=dt_start)
         publish(
             dry_run=dry_run,
             private=True,
@@ -144,4 +144,4 @@ def _backport_datasets_to_walden(df: pd.DataFrame, dry_run: bool, force: bool) -
 
 
 if __name__ == "__main__":
-    fasttrack()
+    fastback()

@@ -368,6 +368,12 @@ class Dataset(SQLModel, table=True):
         return session.exec(select(cls).where(cls.id == dataset_id)).one()
 
     @classmethod
+    def load_with_path(cls, session: Session, namespace: str, short_name: str, version: str) -> "Dataset":
+        return session.exec(
+            select(cls).where(cls.namespace == namespace, cls.shortName == short_name, cls.version == version)
+        ).one()
+
+    @classmethod
     def load_variables_for_dataset(cls, session: Session, dataset_id: int) -> list["Variable"]:
         vars = session.exec(select(Variable).where(Variable.datasetId == dataset_id)).all()
         assert vars

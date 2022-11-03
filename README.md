@@ -382,9 +382,9 @@ etl --backport
 
 (or `etl backport --backport`). This will transform original datasets from long format to wide format, optimize their data types, convert metadata and add them to the catalog. Then you can run `publish` to publish the datasets as usual.
 
-### Fasttrack
+### Fastback
 
-Fastrack is a service that polls grapher database for dataset updates and backports them as fast as possible. When it detects a change it will:
+Fastback is a service that polls grapher database for dataset updates and **backports** them as fast as possible. When it detects a change it will:
 
 1. Run `backport` to get the backported dataset to **local** Walden catalog (without uploading to S3)
 2. Run ETL on the backported dataset

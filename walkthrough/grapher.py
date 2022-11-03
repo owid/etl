@@ -1,17 +1,13 @@
-import shutil
-import tempfile
 from enum import Enum
 from pathlib import Path
 from typing import Any
 
-from cookiecutter.main import cookiecutter
 from pydantic import BaseModel
 from pywebio import input as pi
 from pywebio import output as po
 
 import etl
 from etl import config
-from etl.paths import STEP_DIR
 
 from . import utils
 
@@ -100,31 +96,12 @@ def app(run_checks: bool, dummy_data: bool) -> None:
     else:
         dag_content = ""
 
-    # cookiecutter on python files
-    with tempfile.TemporaryDirectory() as temp_dir:
-        OUTPUT_DIR = temp_dir
+    DATASET_DIR = utils.generate_step(CURRENT_DIR / "grapher_cookiecutter/", form.dict())
 
-        # generate ingest scripts
-        cookiecutter(
-            (CURRENT_DIR / "grapher_cookiecutter/").as_posix(),
-            no_input=True,
-            output_dir=temp_dir,
-            overwrite_if_exists=True,
-            extra_context=dict(directory_name="grapher", **form.dict()),
-        )
+    step_path = DATASET_DIR / (form.short_name + ".py")
 
-        DATASET_DIR = STEP_DIR / "data" / "grapher" / form.namespace / form.version
-
-        shutil.copytree(
-            Path(OUTPUT_DIR) / "grapher",
-            DATASET_DIR,
-            dirs_exist_ok=True,
-        )
-
-        step_path = DATASET_DIR / (form.short_name + ".py")
-
-        po.put_markdown(
-            f"""
+    po.put_markdown(
+        f"""
 ## Next steps
 
 1. Test your step against your local database. If you have your grapher DB configured locally, your `.env` file should look similar to this:
@@ -177,12 +154,12 @@ def app(run_checks: bool, dummy_data: bool) -> None:
 
 ## Generated files
 """
-        )
+    )
 
-        utils.preview_file(step_path, "python")
+    utils.preview_file(step_path, "python")
 
-        if dag_content:
-            utils.preview_dag(dag_content)
+    if dag_content:
+        utils.preview_dag(dag_content)
 
 
 def _check_env() -> None:
