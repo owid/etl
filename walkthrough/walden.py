@@ -1,12 +1,8 @@
 import datetime as dt
-import shutil
-import tempfile
 from pathlib import Path
 from typing import Optional
 
 from botocore.exceptions import ClientError
-from cookiecutter.main import cookiecutter
-from owid import walden
 from owid.catalog import s3_utils
 from pydantic import BaseModel
 from pywebio import input as pi
@@ -15,7 +11,6 @@ from pywebio import output as po
 from . import utils
 
 CURRENT_DIR = Path(__file__).parent
-WALDEN_INGEST_DIR = Path(walden.__file__).parent.parent.parent / "ingests"
 
 
 class WaldenForm(BaseModel):
@@ -146,28 +141,13 @@ def app(run_checks: bool, dummy_data: bool) -> None:
     form.description = form.description.replace("\n", "\n  ")
 
     # cookiecutter on python files
-    with tempfile.TemporaryDirectory() as temp_dir:
-        OUTPUT_DIR = temp_dir
+    WALDEN_INGEST_DIR = utils.generate_step(CURRENT_DIR / "walden_cookiecutter/", dict(**form.dict(), channel="walden"))
 
-        # generate ingest scripts
-        cookiecutter(
-            (CURRENT_DIR / "walden_cookiecutter/").as_posix(),
-            no_input=True,
-            output_dir=temp_dir,
-            overwrite_if_exists=True,
-            extra_context=dict(directory_name="walden", **form.dict()),
-        )
+    ingest_path = WALDEN_INGEST_DIR / (form.short_name + ".py")
+    meta_path = WALDEN_INGEST_DIR / (form.short_name + ".meta.yml")
 
-        target_dir = WALDEN_INGEST_DIR / form.namespace / form.version
-
-        # move them into the walden ingest directory
-        shutil.copytree(Path(OUTPUT_DIR) / "walden", target_dir, dirs_exist_ok=True)
-
-        ingest_path = target_dir / (form.short_name + ".py")
-        meta_path = target_dir / (form.short_name + ".meta.yml")
-
-        po.put_markdown(
-            f"""
+    po.put_markdown(
+        f"""
 ## Next steps
 
 1. Verify that generated files are correct and update them if necessary
@@ -197,10 +177,10 @@ df = pd.read_csv(local_file)
 
 ## Generated files
 """
-        )
+    )
 
-        utils.preview_file(meta_path, "yaml")
-        utils.preview_file(ingest_path, "python")
+    utils.preview_file(meta_path, "yaml")
+    utils.preview_file(ingest_path, "python")
 
     return
 

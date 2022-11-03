@@ -1,18 +1,15 @@
 import os
-import shutil
-import tempfile
 from enum import Enum
 from pathlib import Path
 from typing import Any
 
-from cookiecutter.main import cookiecutter
 from owid.catalog import Dataset
 from pydantic import BaseModel
 from pywebio import input as pi
 from pywebio import output as po
 
 import etl
-from etl.paths import DATA_DIR, STEP_DIR
+from etl.paths import DATA_DIR
 
 from . import utils
 
@@ -109,39 +106,20 @@ def app(run_checks: bool, dummy_data: bool) -> None:
     else:
         dag_content = ""
 
-    # cookiecutter on python files
-    with tempfile.TemporaryDirectory() as temp_dir:
-        OUTPUT_DIR = temp_dir
+    DATASET_DIR = utils.generate_step(CURRENT_DIR / "garden_cookiecutter/", form.dict())
 
-        # generate ingest scripts
-        cookiecutter(
-            (CURRENT_DIR / "garden_cookiecutter/").as_posix(),
-            no_input=True,
-            output_dir=temp_dir,
-            overwrite_if_exists=True,
-            extra_context=dict(directory_name="garden", **form.dict()),
-        )
+    step_path = DATASET_DIR / (form.short_name + ".py")
+    notebook_path = DATASET_DIR / "playground.ipynb"
+    metadata_path = DATASET_DIR / (form.short_name + ".meta.yml")
 
-        DATASET_DIR = STEP_DIR / "data" / "garden" / form.namespace / form.version
+    if not form.generate_notebook:
+        os.remove(notebook_path)
 
-        shutil.copytree(
-            Path(OUTPUT_DIR) / "garden",
-            DATASET_DIR,
-            dirs_exist_ok=True,
-        )
+    if not form.include_metadata_yaml:
+        os.remove(metadata_path)
 
-        step_path = DATASET_DIR / (form.short_name + ".py")
-        notebook_path = DATASET_DIR / "playground.ipynb"
-        metadata_path = DATASET_DIR / (form.short_name + ".meta.yml")
-
-        if not form.generate_notebook:
-            os.remove(notebook_path)
-
-        if not form.include_metadata_yaml:
-            os.remove(metadata_path)
-
-        po.put_markdown(
-            f"""
+    po.put_markdown(
+        f"""
 ## Next steps
 
 1. Harmonize country names with the following command (assuming country field is called `country`). Check out a [short demo](https://drive.google.com/file/d/1tBFMkgOgy4MmB7E7NmfMlfa4noWaiG3t/view) of the tool
@@ -199,14 +177,14 @@ def app(run_checks: bool, dummy_data: bool) -> None:
 
 ## Generated files
 """
-        )
+    )
 
-        if form.include_metadata_yaml:
-            utils.preview_file(metadata_path, "yaml")
-        utils.preview_file(step_path, "python")
+    if form.include_metadata_yaml:
+        utils.preview_file(metadata_path, "yaml")
+    utils.preview_file(step_path, "python")
 
-        if dag_content:
-            utils.preview_dag(dag_content)
+    if dag_content:
+        utils.preview_dag(dag_content)
 
 
 def _check_dataset_in_meadow(form: GardenForm) -> None:
