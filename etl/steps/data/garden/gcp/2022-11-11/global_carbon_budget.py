@@ -1,6 +1,19 @@
 """This step creates the Global Carbon Budget (GCB) dataset, by the Global Carbon Project (GCP).
 
+It combines the following datasets:
+- GCP's Fossil CO2 emissions (long-format csv).
+- GCP's official GCB global emissions (excel file) containing global bunker and land-use change emissions.
+- GCP's official GCB national emissions (excel file) containing consumption-based emissions for each country.
+  - Production-based emissions from this file are also used, but just for sanity checks.
+- GGDC's Maddison dataset on GDP, used to calculate emissions per GDP.
+- Primary Energy Consumption (mix of sources from the 'energy' namespace) to calculate emissions per unit energy.
+- Population (mix of sources from the 'owid' namespace), to calculate emissions per capita.
+- Countries-regions (mix of sources from the 'reference' namespace), to generate aggregates for different continents.
+- WorldBank's Income groups, to generate aggregates for different income groups.
+
 """
+
+from typing import Dict, List, Optional
 
 import pandas as pd
 from owid import catalog
@@ -114,6 +127,13 @@ HISTORICAL_EMISSIONS_COLUMNS = {
     "global_land_use_change_emissions": "global_emissions_from_land_use_change",
 }
 
+# Columns to use from consumption-based emissions data and how to rename them.
+CONSUMPTION_EMISSIONS_COLUMNS = {
+    "country": "country",
+    "year": "year",
+    "consumption_emissions": "consumption_emissions",
+}
+
 # Conversion from terawatt-hours to kilowatt-hours.
 TWH_TO_KWH = 1e9
 
@@ -124,9 +144,85 @@ MILLION_TONNES_OF_CO2_TO_TONNES_OF_CO2 = 1e6
 TONNES_OF_CO2_TO_KG_OF_CO2 = 1000
 
 
+def get_countries_in_region(
+    region: str, region_modifications: Optional[Dict[str, Dict[str, List[str]]]] = None
+) -> List[str]:
+    """Get countries in a region, both for known regions (e.g. "Africa") and custom ones (e.g. "Europe (excl. EU-27)").
+
+    Parameters
+    ----------
+    region : str
+        Region name (e.g. "Africa", or "Europe (excl. EU-27)").
+    region_modifications : dict or None
+        If None (or an empty dictionary), the region should be in OWID's countries-regions dataset.
+        If not None, it should be a dictionary with any (or all) of the following keys:
+        - "regions_included": List of regions whose countries will be included.
+        - "regions_excluded": List of regions whose countries will be excluded.
+        - "countries_included": List of additional individual countries to be included.
+        - "countries_excluded": List of additional individual countries to be excluded.
+        NOTE: All regions and countries defined in this dictionary should be in OWID's countries-regions dataset.
+
+    Returns
+    -------
+    countries : list
+        List of countries in the specified region.
+
+    """
+    if region_modifications is None:
+        region_modifications = {}
+
+    # Check that the fields in the regions_modifications dictionary are well defined.
+    expected_fields = ["regions_included", "regions_excluded", "countries_included", "countries_excluded"]
+    assert all([field in expected_fields for field in region_modifications])
+
+    # Get lists of regions whose countries will be included and excluded.
+    regions_included = region_modifications.get("regions_included", [region])
+    regions_excluded = region_modifications.get("regions_excluded", [])
+    # Get lists of additional individual countries to include and exclude.
+    countries_included = region_modifications.get("countries_included", [])
+    countries_excluded = region_modifications.get("countries_excluded", [])
+
+    # List countries from the list of regions included.
+    countries_set = set(
+        sum([geo.list_countries_in_region(region_included) for region_included in regions_included], [])
+    )
+
+    # Remove all countries from the list of regions excluded.
+    countries_set -= set(
+        sum([geo.list_countries_in_region(region_excluded) for region_excluded in regions_excluded], [])
+    )
+
+    # Add the list of individual countries to be included.
+    countries_set |= set(countries_included)
+
+    # Remove the list of individual countries to be excluded.
+    countries_set -= set(countries_excluded)
+
+    # Convert set of countries into a sorted list.
+    countries = sorted(countries_set)
+
+    return countries
+
+
 def sanity_checks_on_input_data(
     production_df: pd.DataFrame, consumption_df: pd.DataFrame, historical_df: pd.DataFrame, co2_df: pd.DataFrame
 ) -> None:
+    """Run sanity checks on input data files.
+
+    These checks should be used prior to country harmonization, but after basic processing of the dataframes.
+
+    Parameters
+    ----------
+    production_df : pd.DataFrame
+        Production-based emissions from GCP's official national emissions dataset (excel file).
+    consumption_df : pd.DataFrame
+        Consumption-based emissions from GCP's official national emissions dataset (excel file).
+    historical_df : pd.DataFrame
+        Historical emissions from GCP's official global emissions dataset (excel file).
+    co2_df : pd.DataFrame
+        Production-based emissions from GCP's Fossil CO2 emissions dataset (csv file).
+
+    """
     production_df = production_df.copy()
     consumption_df = consumption_df.copy()
     historical_df = historical_df.copy()
@@ -137,14 +233,14 @@ def sanity_checks_on_input_data(
     global_bunkers_emissions = (
         production_df[production_df["country"] == "Bunkers"][["year", "production_emissions"]]
         .reset_index(drop=True)
-        .rename(columns={"production_emissions": "global_bunker_emissions"})
+        .rename(columns={"production_emissions": "global_bunker_emissions"}, errors="raise")
     )
 
     # Check that we get exactly the same array of bunker emissions from the consumption emissions dataframe.
     check = (
         consumption_df[consumption_df["country"] == "Bunkers"][["year", "consumption_emissions"]]
         .reset_index(drop=True)
-        .rename(columns={"consumption_emissions": "global_bunker_emissions"})
+        .rename(columns={"consumption_emissions": "global_bunker_emissions"}, errors="raise")
     )
     error = "Bunker emissions were expected to coincide in production and consumption emissions dataframes."
     assert global_bunkers_emissions.equals(check), error
@@ -182,6 +278,16 @@ def sanity_checks_on_input_data(
 
 
 def sanity_checks_on_output_data(combined_df: pd.DataFrame) -> None:
+    """Run sanity checks on output data.
+
+    These checks should be run on the very final output dataframe (with an index) prior to storing it as a table.
+
+    Parameters
+    ----------
+    combined_df : pd.DataFrame
+        Combination of all input dataframes, after processing, harmonization, and addition of variables.
+
+    """
     combined_df = combined_df.reset_index()
     error = "All variables (except traded emissions and growth) should be >= 0 or nan."
     positive_variables = [
@@ -189,13 +295,12 @@ def sanity_checks_on_output_data(combined_df: pd.DataFrame) -> None:
     ]
     assert (combined_df[positive_variables].fillna(0) >= 0).all().all(), error
 
-    # Check that production emissions as a share of global emissions, for the world, should be 100% (within 1%).
-    error = "Production emissions as a share of global emissions should be 100% for 'World'."
+    error = "Production emissions as a share of global emissions should be 100% for 'World' (within 2% error)."
     assert combined_df[
         (combined_df["country"] == "World") & (abs(combined_df["emissions_total_as_share_of_global"] - 100) > 2)
     ].empty, error
 
-    error = "Consumption emissions as a share of global emissions should be 100% for 'World'."
+    error = "Consumption emissions as a share of global emissions should be 100% for 'World' (within 2% error)."
     assert combined_df[
         (combined_df["country"] == "World") & (abs(combined_df["consumption_emissions_as_share_of_global"] - 100) > 2)
     ].empty, error
@@ -205,7 +310,7 @@ def sanity_checks_on_output_data(combined_df: pd.DataFrame) -> None:
         (combined_df["country"] == "World") & (combined_df["population_as_share_of_global"].fillna(100) != 100)
     ].empty, error
 
-    error = "All share of global emissions should be smaller than 100% (or 102%, given small discrepancies)."
+    error = "All share of global emissions should be smaller than 100% (within 2% error)."
     share_variables = [col for col in combined_df.columns if "share" in col]
     assert (combined_df[share_variables].fillna(0) <= 102).all().all(), error
 
@@ -233,9 +338,8 @@ def sanity_checks_on_output_data(combined_df: pd.DataFrame) -> None:
     share_variables = [col for col in combined_df.columns if "share" in col if "consumption" not in col]
     assert (combined_df[combined_df["country"] == "World"][share_variables].fillna(100) > 98).all().all(), error
 
-    # Check that traded emissions for the world are close to zero (within +/- 2%).
+    error = "Traded emissions for the World should be close to zero (within 2% error)."
     world_mask = combined_df["country"] == "World"
-    error = "Traded emissions for the World should be close to zero (within ~2%)."
     assert (
         abs(
             100
@@ -247,8 +351,23 @@ def sanity_checks_on_output_data(combined_df: pd.DataFrame) -> None:
 
 
 def prepare_fossil_co2_emissions(co2_df: pd.DataFrame) -> pd.DataFrame:
+    """Prepare Fossil CO2 emissions data (basic processing).
+
+    Select and rename columns to be used, adapt units, and fix known issues.
+
+    Parameters
+    ----------
+    co2_df : pd.DataFrame
+        Production-based emissions from GCP's Fossil CO2 emissions dataset (csv file).
+
+    Returns
+    -------
+    co2_df : pd.DataFrame
+        Fossil CO2 emissions data after basic processing.
+
+    """
     # Select and rename columns from fossil CO2 data.
-    co2_df = co2_df[list(CO2_COLUMNS)].rename(columns=CO2_COLUMNS)
+    co2_df = co2_df[list(CO2_COLUMNS)].rename(columns=CO2_COLUMNS, errors="raise")
 
     # Ensure all emissions are given in tonnes of CO2.
     co2_df[EMISSION_SOURCES] *= MILLION_TONNES_OF_CO2_TO_TONNES_OF_CO2
@@ -293,6 +412,26 @@ def prepare_fossil_co2_emissions(co2_df: pd.DataFrame) -> pd.DataFrame:
 
 
 def prepare_consumption_emissions(consumption_df: pd.DataFrame) -> pd.DataFrame:
+    """Prepare consumption-based emissions data (basic processing).
+
+    Select and rename columns to be used, adapt units, and fix known issues.
+
+    Parameters
+    ----------
+    consumption_df : pd.DataFrame
+        Consumption-based emissions from GCP's official national emissions dataset (excel file).
+
+    Returns
+    -------
+    consumption_df : pd.DataFrame
+        Consumption-based emissions after basic processing.
+
+    """
+    # Select and rename columns.
+    consumption_df = consumption_df[list(CONSUMPTION_EMISSIONS_COLUMNS)].rename(
+        columns=CONSUMPTION_EMISSIONS_COLUMNS, errors="raise"
+    )
+
     # List indexes of rows in consumption_df corresponding to outliers (defined above in OUTLIERS_IN_CONSUMPTION_DF).
     outlier_indexes = [
         consumption_df[(consumption_df["country"] == outlier[0]) & (consumption_df["year"] == outlier[1])].index.item()
@@ -312,8 +451,26 @@ def prepare_consumption_emissions(consumption_df: pd.DataFrame) -> pd.DataFrame:
 
 
 def extract_global_emissions(co2_df: pd.DataFrame, historical_df: pd.DataFrame) -> pd.DataFrame:
-    # NOTE: This function has to be used after selecting and renaming columns in co2_df, but before harmonizing
-    # country names in co2_df (so that "International Transport" is still listed as a country).
+    """Extract World emissions by combining data from the Fossil CO2 emissions and the global emissions dataset.
+
+    The resulting global emissions data includes bunker and land-use change emissions.
+
+    NOTE: This function has to be used after selecting and renaming columns in co2_df, but before harmonizing country
+    names in co2_df (so that "International Transport" is still listed as a country).
+
+    Parameters
+    ----------
+    co2_df : pd.DataFrame
+        Production-based emissions from GCP's Fossil CO2 emissions dataset (csv file).
+    historical_df : pd.DataFrame
+        Historical emissions from GCP's official global emissions dataset (excel file).
+
+    Returns
+    -------
+    global_emissions : pd.DataFrame
+        World emissions.
+
+    """
     # For some reason, "International Transport" is included as another country, that only has emissions from oil.
     # We separate it as another variable (only given at the global level).
     global_transport = co2_df[co2_df["country"] == INTERNATIONAL_TRANSPORT_LABEL].reset_index(drop=True)
@@ -326,13 +483,13 @@ def extract_global_emissions(co2_df: pd.DataFrame, historical_df: pd.DataFrame) 
     global_transport = (
         global_transport[["year", "emissions_from_oil"]]
         .dropna()
-        .rename(columns={"emissions_from_oil": "global_emissions_from_international_transport"})
+        .rename(columns={"emissions_from_oil": "global_emissions_from_international_transport"}, errors="raise")
     )
 
     # Create a new dataframe of global emissions.
     global_emissions = (
         co2_df[co2_df["country"].isin(["Global", "World"])][["year"] + EMISSION_SOURCES]
-        .rename(columns={column: f"global_{column}" for column in EMISSION_SOURCES})
+        .rename(columns={column: f"global_{column}" for column in EMISSION_SOURCES}, errors="raise")
         .sort_values("year")
         .reset_index(drop=True)
     )
@@ -364,9 +521,21 @@ def extract_global_emissions(co2_df: pd.DataFrame, historical_df: pd.DataFrame) 
 
 
 def harmonize_co2_data(co2_df: pd.DataFrame) -> pd.DataFrame:
+    """Harmonize country names in Fossil CO2 data, and fix known issues with certain regions.
+
+    Parameters
+    ----------
+    co2_df : pd.DataFrame
+        Production-based emissions from GCP's Fossil CO2 emissions dataset (csv file).
+
+    Returns
+    -------
+    co2_df : pd.DataFrame
+        Fossil CO2 emissions data after harmonizing country names.
+
+    """
     # Harmonize country names in fossil CO2 data.
     # Remove "International Transport" from list of countries
-    # NOTE: If we end up adding a list of excluded countries, this could be included.
     co2_df = co2_df[co2_df["country"] != INTERNATIONAL_TRANSPORT_LABEL].reset_index(drop=True)
     co2_df = geo.harmonize_countries(
         df=co2_df, countries_file=CO2_COUNTRIES_FILE, warn_on_missing_countries=True, warn_on_unused_countries=True
@@ -411,50 +580,35 @@ def harmonize_co2_data(co2_df: pd.DataFrame) -> pd.DataFrame:
     return co2_df
 
 
-def get_countries_in_region(region, region_modifications=None):
-    if region_modifications is None:
-        region_modifications = {}
-
-    # Check that the fields in the regions_modifications dictionary are well defined.
-    expected_fields = ["regions_included", "regions_excluded", "countries_included", "countries_excluded"]
-    assert all([field in expected_fields for field in region_modifications])
-
-    # Get lists of regions whose countries will be included and excluded.
-    regions_included = region_modifications.get("regions_included", [region])
-    regions_excluded = region_modifications.get("regions_excluded", [])
-    # Get lists of additional individual countries to include and exclude.
-    countries_included = region_modifications.get("countries_included", [])
-    countries_excluded = region_modifications.get("countries_excluded", [])
-
-    # List countries from the list of regions included.
-    countries_set = set(
-        sum([geo.list_countries_in_region(region_included) for region_included in regions_included], [])
-    )
-
-    # Remove all countries from the list of regions excluded.
-    countries_set -= set(
-        sum([geo.list_countries_in_region(region_excluded) for region_excluded in regions_excluded], [])
-    )
-
-    # Add the list of individual countries to be included.
-    countries_set |= set(countries_included)
-
-    # Remove the list of individual countries to be excluded.
-    countries_set -= set(countries_excluded)
-
-    # Convert set of countries into a sorted list.
-    countries = sorted(countries_set)
-
-    return countries
-
-
-def add_variables_to_co2_data(
+def combine_data_and_add_variables(
     co2_df: pd.DataFrame,
     consumption_df: pd.DataFrame,
     global_emissions_df: pd.DataFrame,
     gdp_df: pd.DataFrame,
     primary_energy_df: pd.DataFrame,
 ) -> pd.DataFrame:
+    """Combine all relevant data into one dataframe, add region aggregates, and add custom variables (e.g. emissions per
+    capita).
+
+    Parameters
+    ----------
+    co2_df : pd.DataFrame
+        Production-based emissions from GCP's Fossil CO2 emissions dataset (csv file), after harmonization.
+    consumption_df : pd.DataFrame
+        Consumption-based emissions from GCP's official national emissions dataset (excel file), after harmonization.
+    global_emissions_df : pd.DataFrame
+        World emissions (including bunker and land-use change emissions).
+    gdp_df : pd.DataFrame
+        GDP data.
+    primary_energy_df : pd.DataFrame
+        Primary energy data.
+
+    Returns
+    -------
+    combined_df : pd.DataFrame
+        Combined data, with all additional variables and with region aggregates.
+
+    """
     # Add consumption emissions to main dataframe (keep only the countries of the main dataframe).
     co2_df = pd.merge(co2_df, consumption_df, on=["country", "year"], how="left")
 
@@ -589,15 +743,19 @@ def run(dest_dir: str) -> None:
     consumption_df = prepare_consumption_emissions(consumption_df=consumption_df)
 
     # Select and rename columns from primary energy data.
-    primary_energy_df = primary_energy_df[list(PRIMARY_ENERGY_COLUMNS)].rename(columns=PRIMARY_ENERGY_COLUMNS)
+    primary_energy_df = primary_energy_df[list(PRIMARY_ENERGY_COLUMNS)].rename(
+        columns=PRIMARY_ENERGY_COLUMNS, errors="raise"
+    )
 
     # Select and rename columns from primary energy data.
-    gdp_df = gdp_df[list(GDP_COLUMNS)].rename(columns=GDP_COLUMNS)
+    gdp_df = gdp_df[list(GDP_COLUMNS)].rename(columns=GDP_COLUMNS, errors="raise")
 
     # Select and rename columns from historical emissions data.
-    historical_df = historical_df[list(HISTORICAL_EMISSIONS_COLUMNS)].rename(columns=HISTORICAL_EMISSIONS_COLUMNS)
+    historical_df = historical_df[list(HISTORICAL_EMISSIONS_COLUMNS)].rename(
+        columns=HISTORICAL_EMISSIONS_COLUMNS, errors="raise"
+    )
 
-    # Run sanity checks on raw data.
+    # Run sanity checks on input data.
     sanity_checks_on_input_data(
         production_df=production_df, consumption_df=consumption_df, historical_df=historical_df, co2_df=co2_df
     )
@@ -634,7 +792,7 @@ def run(dest_dir: str) -> None:
     co2_df = harmonize_co2_data(co2_df=co2_df)
 
     # Add new variables to main dataframe (consumption-based emissions, emission intensity, per-capita emissions, etc.).
-    combined_df = add_variables_to_co2_data(
+    combined_df = combine_data_and_add_variables(
         co2_df=co2_df,
         consumption_df=consumption_df,
         global_emissions_df=global_emissions_df,
@@ -646,7 +804,7 @@ def run(dest_dir: str) -> None:
     combined_df = combined_df.set_index(["country", "year"], verify_integrity=True)
     combined_df = combined_df.dropna(subset=combined_df.columns, how="all").sort_index().sort_index(axis=1)
 
-    # Run sanity checks on processed data.
+    # Run sanity checks on output data.
     sanity_checks_on_output_data(combined_df)
 
     #
