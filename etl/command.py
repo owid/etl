@@ -191,7 +191,7 @@ def construct_dag(dag_path: Path, backport: bool, private: bool, grapher: bool) 
 
     # If --grapher is set, add steps for upserting to DB
     if grapher:
-        dag.update(_grapher_steps(dag))
+        dag.update(_grapher_steps(dag, private))
 
     return dag
 
@@ -260,7 +260,8 @@ def timed_run(f: Callable[[], Any]) -> float:
 def _validate_private_steps(dag: DAG) -> None:
     """Make sure there are no public steps that have private steps as dependency."""
     for step_name, step_dependencies in dag.items():
-        if _is_private_step(step_name):
+        # does not apply for private and grapher steps
+        if _is_private_step(step_name) or step_name.startswith("grapher://"):
             continue
         for dependency in step_dependencies:
             if _is_private_step(dependency):
@@ -296,12 +297,12 @@ def _backporting_steps(private: bool, walden_catalog: WaldenCatalog) -> DAG:
     return dag
 
 
-def _grapher_steps(dag: DAG) -> DAG:
+def _grapher_steps(dag: DAG, private: bool) -> DAG:
     # dynamically generate a grapher:// step for every grapher data step
     new_dag = {}
     for step in list(dag.keys()):
-        # match regex with prefix data or data-private
-        if re.match(r"^(data|data-private)://grapher/", step):
+        # match regex with prefix data or data-private (only if we run it with --private)
+        if re.match(r"^data://grapher/", step) or (private and re.match(r"^data-private://grapher/", step)):
             new_dag[re.sub(r"^(data|data-private)://", "grapher://", step)] = {step}
 
     return new_dag
