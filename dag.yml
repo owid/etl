@@ -183,6 +183,10 @@ steps:
   data://grapher/postnatal_care/2022-09-19/postnatal_care:
     - data://garden/postnatal_care/2022-09-19/postnatal_care
 
+  # HMD
+  data://meadow/hmd/2022-11-04/life_tables:
+    - walden://hmd/2022-11-04/life_tables
+
 # Sub-dags to import
 include:
   - dag_files/dag_open_numbers.yml
