@@ -4,7 +4,7 @@ Considering that:
 
 - Extracting the data from the PDF was complex. Several libraries failed to correctly
 recognize and extract the data from the table (in page 2)
-- The data contained is very little (<40 rows)
+- The data contained is very little (<60 rows)
 
 I decided to manually extract the data from the PDF and save it as a CSV and get feedback
 from authors.
