@@ -174,14 +174,18 @@ steps:
   #
   data://meadow/farmer_lafond/2022-10-20/technology_cost:
     - walden://farmer_lafond/2022-10-20/technology_cost
-  
+
   # Postnatal care coverage - World Bank (2022)
   data://meadow/postnatal_care/2022-09-19/postnatal_care:
-  - walden://postnatal_care/2022-09-19/postnatal_care
+    - walden://postnatal_care/2022-09-19/postnatal_care
   data://garden/postnatal_care/2022-09-19/postnatal_care:
-  - data://meadow/postnatal_care/2022-09-19/postnatal_care
+    - data://meadow/postnatal_care/2022-09-19/postnatal_care
   data://grapher/postnatal_care/2022-09-19/postnatal_care:
-  - data://garden/postnatal_care/2022-09-19/postnatal_care
+    - data://garden/postnatal_care/2022-09-19/postnatal_care
+
+  # HMD
+  data://meadow/hmd/2022-11-04/life_tables:
+    - walden://hmd/2022-11-04/life_tables
 
 # Sub-dags to import
 include:
@@ -191,3 +195,4 @@ include:
   - dag_files/dag_walkthrough.yml
   - dag_files/dag_examples.yml
   - dag_files/dag_emissions.yml
+  - dag_files/dag_papers.yml
