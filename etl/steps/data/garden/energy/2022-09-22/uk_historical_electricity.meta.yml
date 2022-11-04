@@ -24,7 +24,7 @@ dataset:
       published_by: Ember
       publication_year: 2022
       date_accessed: 2022-08-01
-      url: https://ember-climate.org/data/data-catalogue/yearly-electricity-data/
+      url: https://ember-climate.org/data-catalogue/yearly-electricity-data/
     -
       name: Ember's European Electricity Review
       published_by: Ember

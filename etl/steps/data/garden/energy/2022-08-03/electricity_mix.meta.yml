@@ -7,7 +7,7 @@ dataset:
   description: |
     Data is compiled by Our World in Data based on three main sources:
     – <a href="https://www.bp.com/en/global/corporate/energy-economics/statistical-review-of-world-energy.html">BP Statistical Review of World Energy</a>.
-    – <a href="https://ember-climate.org/data/data-catalogue/yearly-electricity-data/">Ember Global Electricity Review (2022)</a>.
+    – <a href="https://ember-climate.org/data-catalogue/yearly-electricity-data/">Ember Global Electricity Review (2022)</a>.
     – <a href="https://ember-climate.org/insights/research/european-electricity-review-2022/">Ember European Electricity Review (2022)</a>.
 
     Ember compile their global dataset from various sources including:
@@ -73,7 +73,7 @@ dataset:
       published_by: Ember
       publication_year: 2022
       date_accessed: 2022-08-01
-      url: https://ember-climate.org/data/data-catalogue/yearly-electricity-data/
+      url: https://ember-climate.org/data-catalogue/yearly-electricity-data/
     -
       name: Our World in Data based on Ember's European Electricity Review (2022)
       published_by: Ember
