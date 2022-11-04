@@ -43,7 +43,7 @@ GRAPHER_INSERT_WORKERS = int(env.get("GRAPHER_WORKERS", 10))
 
 # forbid any individual step from consuming more than this much memory
 # (only enforced on Linux)
-MAX_VIRTUAL_MEMORY_LINUX = 10 * 2**30  # 10 GB
+MAX_VIRTUAL_MEMORY_LINUX = 16 * 2**30  # 16 GB
 
 
 def enable_bugsnag() -> None:
