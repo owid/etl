@@ -1,9 +1,16 @@
+"""Imports Life Tables dataset to Meadow.
+
+This dataset is from Human Mortality Database.
+
+The source data provides a zip which contains 6 folders. Each folder contains a TXT file per country (not great).
+This step generates a dataset with 6 tables, one for each folder. Each table contains the data from all TXT files.
+"""
 import os
 import re
 import tempfile
 from glob import glob
 from io import StringIO
-from typing import List
+from typing import List, cast
 
 import pandas as pd
 from owid import catalog
@@ -11,6 +18,7 @@ from owid.catalog import Dataset, Table, TableMeta
 from owid.catalog.utils import underscore_table
 from owid.datautils.io import decompress_file
 from owid.walden import Catalog as WaldenCatalog
+from owid.walden.catalog import Dataset as WaldenDataset
 from structlog import get_logger
 
 from etl.helpers import Names
@@ -30,11 +38,39 @@ FILE_REGEX = (
     r" Protocol: v\d+ \(\d+\)\n\n((?s:.)*)"
 )
 # Dataset details from Walden
-NAMESPACE = "hmd"
-SHORT_NAME = "hmd_lt"
-VERSION_WALDEN = "2022-11-01"
+NAMESPACE = N.namespace
+SHORT_NAME = N.short_name
+VERSION_WALDEN = "2022-11-04"
 # Meadow version
-VERSION_MEADOW = "2022-11-01"
+VERSION_MEADOW = N.version
+# Column renaming
+COLUMNS_RENAME = {
+    "Country": "country",
+    "Year": "year",
+    "Age": "age",
+    "mx": "central_death_rate",
+    "qx": "probability_of_death",
+    "ax": "avg_survival_length",
+    "lx": "num_survivors",
+    "dx": "num_deaths",
+    "Lx": "num_person_years_lived",
+    "Tx": "num_person_years_remaining",
+    "ex": "life_expectancy",
+}
+# Column dtypes
+DTYPES = {
+    "central_death_rate": "Float64",
+    "probability_of_death": "Float64",
+    "avg_survival_length": "Float64",
+    "num_survivors": "Int64",
+    "num_deaths": "Int64",
+    "num_person_years_lived": "Int64",
+    "num_person_years_remaining": "Int64",
+    "life_expectancy": "Float64",
+    "age": "category",
+    "country": "category",
+    "year": "category",
+}
 
 
 def run(dest_dir: str) -> None:
@@ -56,7 +92,7 @@ def run(dest_dir: str) -> None:
     log.info("hmd_lt.end")
 
 
-def init_meadow_dataset(dest_dir: str, walden_ds: WaldenCatalog) -> Dataset:
+def init_meadow_dataset(dest_dir: str, walden_ds: WaldenDataset) -> Dataset:
     """Initialize meadow dataset."""
     ds = Dataset.create_empty(dest_dir)
     ds.metadata = convert_walden_metadata(walden_ds)
@@ -64,11 +100,11 @@ def init_meadow_dataset(dest_dir: str, walden_ds: WaldenCatalog) -> Dataset:
     return ds
 
 
-def create_and_add_tables_to_dataset(local_file: str, ds: Dataset, walden_ds: WaldenCatalog) -> Dataset:
+def create_and_add_tables_to_dataset(local_file: str, ds: Dataset, walden_ds: WaldenDataset) -> Dataset:
     """Create and add tables to dataset.
 
     This method creates tables for all the folders found once `local_file` is uncompressed. Then,
-    it cleans and ads them to the dataset `ds`. It uses the metadata from `walden_ds` to create the tables.
+    it cleans and adds them to the dataset `ds`. It uses the metadata from `walden_ds` to create the tables.
 
     Parameters
     ----------
@@ -76,7 +112,7 @@ def create_and_add_tables_to_dataset(local_file: str, ds: Dataset, walden_ds: Wa
         File to walden raw file.
     ds : Dataset
         Dataset where tables should be added.
-    walden_ds : WaldenCatalog
+    walden_ds : WaldenDataset
         Walden dataset.
 
     Returns
@@ -92,13 +128,11 @@ def create_and_add_tables_to_dataset(local_file: str, ds: Dataset, walden_ds: Wa
         _sanity_check_files(tmp_dir)
 
         # Load data
-        for i in [1, 5]:
-            for j in [1, 5, 10]:
-                # Create table and folder name
-                table_name = f"{i}x{j}"
+        for age in [1, 5]:
+            for year in [1, 5, 10]:
                 # Create table
-                log.info(f"Creating table '{table_name}'...")
-                table = make_table(tmp_dir, table_name, walden_ds)
+                log.info(f"Creating table for {age}-year age groups and {year}-year intervals...")
+                table = make_table(tmp_dir, age, year, walden_ds)
                 # add table to a dataset
                 log.info("Adding table to dataset...")
                 ds.add(table)
@@ -113,19 +147,21 @@ def _sanity_check_files(path: str) -> None:
     ), f"Files found are not the ones expected! Check that {FILES_EXPECTED} are actually there!"
 
 
-def make_table(input_folder: str, table_name: str, walden_ds: WaldenCatalog) -> catalog.Table:
+def make_table(input_folder: str, age: int, year: int, walden_ds: WaldenDataset) -> catalog.Table:
     """Create table.
 
     Loads data from `input_folder` and creates a table with the name `table_name`. It uses the metadata from `walden_ds`.
 
     Parameters
     ----------
-    walden_ds : WaldenCatalog
-        Walden dataset.
     input_folder : str
         Folder containing uncompressed data from Walden.
-    table_name : str
-        Name of the table.
+    age: int
+        Age group size (1 or 5).
+    year: int
+        Year interval size (1, 5 or 10).
+    walden_ds : WaldenDataset
+        Walden dataset.
 
     Returns
     -------
@@ -133,6 +169,7 @@ def make_table(input_folder: str, table_name: str, walden_ds: WaldenCatalog) -> 
         Table with data.
     """
     # Load files
+    table_name = _table_name(age, year)
     f = f"bltper_{table_name}"
     files = glob(os.path.join(input_folder, f"{f}/*.txt"))
     log.info(f"Looking for available files in {f}...")
@@ -141,10 +178,14 @@ def make_table(input_folder: str, table_name: str, walden_ds: WaldenCatalog) -> 
     # Clean df
     df = clean_df(df)
     # df to table
-    table = df_to_table(walden_ds, table_name, df)
+    table = df_to_table(walden_ds, age, year, df)
     # underscore all table columns
     table = underscore_table(table)
     return table
+
+
+def _table_name(age: int, year: int) -> str:
+    return f"{age}x{year}"
 
 
 def make_df(files: List[str], table_name: str) -> pd.DataFrame:
@@ -181,7 +222,7 @@ def make_df(files: List[str], table_name: str) -> pd.DataFrame:
         dfs.append(df_)
     # Concatenate all country dfs
     df = pd.concat(dfs, ignore_index=True)
-    return df  # type: ignore
+    return cast(pd.DataFrame, df)
 
 
 def _make_df_country(country: str, table: str) -> pd.DataFrame:
@@ -232,21 +273,7 @@ def clean_df(df: pd.DataFrame) -> pd.DataFrame:
 
 def _clean_rename_columns_df(df: pd.DataFrame) -> pd.DataFrame:
     """Rename columns."""
-    return df.rename(
-        columns={
-            "Country": "country",
-            "Year": "year",
-            "Age": "age",
-            "mx": "central_death_rate",
-            "qx": "probability_of_death",
-            "ax": "avg_survival_length",
-            "lx": "num_survivors",
-            "dx": "num_deaths",
-            "Lx": "num_person_years_lived",
-            "Tx": "num_person_years_remaining",
-            "ex": "life_expectancy",
-        }
-    )
+    return df.rename(columns=COLUMNS_RENAME)
 
 
 def _clean_correct_missing_data(df: pd.DataFrame) -> pd.DataFrame:
@@ -274,36 +301,24 @@ def _clean_correct_missing_data(df: pd.DataFrame) -> pd.DataFrame:
 
 def _clean_set_dtypes_df(df: pd.DataFrame) -> pd.DataFrame:
     """Set dtypes."""
-    # dtypes
-    dtypes = {
-        "central_death_rate": "Float64",
-        "probability_of_death": "Float64",
-        "avg_survival_length": "Float64",
-        "num_survivors": "Int64",
-        "num_deaths": "Int64",
-        "num_person_years_lived": "Int64",
-        "num_person_years_remaining": "Int64",
-        "life_expectancy": "Float64",
-        "age": "category",
-        "country": "category",
-        "year": "category",
-    }
     # Numeric
-    cols_numeric = [col_name for col_name, dtype in dtypes.items() if dtype in ["Int64", "Float64"]]
+    cols_numeric = [col_name for col_name, dtype in DTYPES.items() if dtype in ["Int64", "Float64"]]
     for col in cols_numeric:
         df[col] = pd.to_numeric(df[col])
-    return df.astype(dtypes)
+    return df.astype(DTYPES)
 
 
-def df_to_table(walden_ds: WaldenCatalog, table_name: str, df: pd.DataFrame) -> catalog.Table:
+def df_to_table(walden_ds: WaldenDataset, age: int, year: int, df: pd.DataFrame) -> catalog.Table:
     """Convert plain pandas.DataFrame into table.
 
     Parameters
     ----------
-    walden_ds : WaldenCatalog
+    walden_ds : WaldenDataset
         Raw Walden dataset.
-    table_name : str
-        Table name.
+    age: int
+        Age group size (1 or 5).
+    year: int
+        Year interval size (1, 5 or 10).
     df : pd.DataFrame
         Dataframe.
 
@@ -312,11 +327,12 @@ def df_to_table(walden_ds: WaldenCatalog, table_name: str, df: pd.DataFrame) -> 
     catalog.Table
         Table created from dataframe, walden metadata and table name.
     """
+    table_name = _table_name(age, year)
     # create table with metadata from dataframe
     table_metadata = TableMeta(
         short_name=f"agexyear_{table_name}",
         title=f"{walden_ds.name} [{table_name}]",
-        description=walden_ds.description,
+        description=f"Contains data in {age}-year age groups grouped in {year}-year intervals.",
     )
     tb = Table(df, metadata=table_metadata)
     return tb
