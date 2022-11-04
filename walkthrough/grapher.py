@@ -96,7 +96,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
     else:
         dag_content = ""
 
-    DATASET_DIR = utils.generate_step(CURRENT_DIR / "grapher_cookiecutter/", form.dict())
+    DATASET_DIR = utils.generate_step(CURRENT_DIR / "grapher_cookiecutter/", dict(**form.dict(), channel="grapher"))
 
     step_path = DATASET_DIR / (form.short_name + ".py")
 

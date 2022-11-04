@@ -219,9 +219,6 @@ def parse_step(step_name: str, dag: Dict[str, Any]) -> "Step":
     elif step_type == "walden-private":
         step = WaldenStepPrivate(path)
 
-    elif step_type == "grapher-private":
-        step = GrapherStepPrivate(path, dependencies)
-
     elif step_type == "backport-private":
         step = BackportStepPrivate(path, dependencies)
 
@@ -697,13 +694,6 @@ class WaldenStepPrivate(WaldenStep):
 
     def __str__(self) -> str:
         return f"walden-private://{self.path}"
-
-
-class GrapherStepPrivate(GrapherStep):
-    is_public = False
-
-    def __str__(self) -> str:
-        return f"grapher-private://{self.path}"
 
 
 class BackportStepPrivate(PrivateMixin, BackportStep):

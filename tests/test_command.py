@@ -27,11 +27,21 @@ def test_validate_private_steps(dag):
     cmd._validate_private_steps(dag)
 
     # public step with private dependency should raise an error
-    dag = dict(
+    new_dag = dict(
         dag,
         **{
             "data://c": {"data-private://d"},
         }
     )
     with pytest.raises(ValueError):
-        cmd._validate_private_steps(dag)
+        cmd._validate_private_steps(new_dag)
+
+    # private grapher step should not raise an error even if
+    # it is using private dependency
+    new_dag = dict(
+        dag,
+        **{
+            "grapher://c": {"data-private://a"},
+        }
+    )
+    cmd._validate_private_steps(new_dag)
