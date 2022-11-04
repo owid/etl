@@ -216,7 +216,7 @@ def make_df(files: List[str], table_name: str) -> pd.DataFrame:
         if match is not None:
             country, _, table_str = match.group(1, 2, 3)
         else:
-            raise ValueError("No match found!")
+            raise ValueError("No match found! Please revise that source files' content matches FILE_REGEX.")
         # Build country df
         df_ = _make_df_country(country, table_str)
         dfs.append(df_)
