@@ -195,3 +195,4 @@ include:
   - dag_files/dag_walkthrough.yml
   - dag_files/dag_examples.yml
   - dag_files/dag_emissions.yml
+  - dag_files/dag_papers.yml
