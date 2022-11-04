@@ -8,6 +8,7 @@ import hashlib
 import os
 import re
 import subprocess
+import sys
 import tempfile
 import warnings
 from collections import defaultdict
@@ -375,7 +376,13 @@ class DataStep(Step):
         """
         # use a subprocess to isolate each step from the others, and avoid state bleeding
         # between them
-        args = ["poetry", "run", "run_python_step"]
+        args = []
+
+        if sys.platform == "linux":
+            args.extend(["prlimit", f"--as={config.MAX_VIRTUAL_MEMORY_LINUX}"])
+
+        args.extend(["poetry", "run", "run_python_step"])
+
         if config.IPDB_ENABLED:
             args.append("--ipdb")
 
