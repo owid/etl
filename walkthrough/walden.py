@@ -141,7 +141,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
     form.description = form.description.replace("\n", "\n  ")
 
     # cookiecutter on python files
-    WALDEN_INGEST_DIR = utils.generate_step(CURRENT_DIR / "walden_cookiecutter/", dict(**form.dict(), channel="walden"))
+    WALDEN_INGEST_DIR = utils.generate_step(CURRENT_DIR / "walden_cookiecutter/", dict(**form.dict(), version=form.walden_version, channel="walden"))
 
     ingest_path = WALDEN_INGEST_DIR / (form.short_name + ".py")
     meta_path = WALDEN_INGEST_DIR / (form.short_name + ".meta.yml")
