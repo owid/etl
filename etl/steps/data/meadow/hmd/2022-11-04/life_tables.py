@@ -330,7 +330,7 @@ def df_to_table(walden_ds: WaldenDataset, age: int, year: int, df: pd.DataFrame)
     table_name = _table_name(age, year)
     # create table with metadata from dataframe
     table_metadata = TableMeta(
-        short_name=f"agexyear_{table_name}",
+        short_name=f"period_{age}x{year}",
         title=f"{walden_ds.name} [{table_name}]",
         description=f"Contains data in {age}-year age groups grouped in {year}-year intervals.",
     )
