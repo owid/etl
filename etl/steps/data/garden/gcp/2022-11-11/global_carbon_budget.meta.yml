@@ -3,7 +3,23 @@ dataset:
   short_name: global_carbon_budget
   title: Global Carbon Budget (Global Carbon Project, 2022)
   description: |
-    TODO: Complete description.
+    The Global Carbon Budget dataset is available <a href="https://globalcarbonbudget.org/archive/">here</a>.
+
+    Full reference:
+    Friedlingstein, P., O'Sullivan, M., Jones, M. W., Andrew, R. M., Gregor, L., Hauck, J., Le Quéré, C., Luijkx, I. T., Olsen, A., Peters, G. P., Peters, W., Pongratz, J., Schwingshackl, C., Sitch, S., Canadell, J. G., Ciais, P., Jackson, R. B., Alin, S. R., Alkama, R., Arneth, A., Arora, V. K., Bates, N. R., Becker, M., Bellouin, N., Bittig, H. C., Bopp, L., Chevallier, F., Chini, L. P., Cronin, M., Evans, W., Falk, S., Feely, R. A., Gasser, T., Gehlen, M., Gkritzalis, T., Gloege, L., Grassi, G., Gruber, N., Gürses, Ö., Harris, I., Hefner, M., Houghton, R. A., Hurtt, G. C., Iida, Y., Ilyina, T., Jain, A. K., Jersild, A., Kadono, K., Kato, E., Kennedy, D., Klein Goldewijk, K., Knauer, J., Korsbakken, J. I., Landschützer, P., Lefèvre, N., Lindsay, K., Liu, J., Liu, Z., Marland, G., Mayot, N., McGrath, M. J., Metzl, N., Monacci, N. M., Munro, D. R., Nakaoka, S.-I., Niwa, Y., O'Brien, K., Ono, T., Palmer, P. I., Pan, N., Pierrot, D., Pocock, K., Poulter, B., Resplandy, L., Robertson, E., Rödenbeck, C., Rodriguez, C., Rosan, T. M., Schwinger, J., Séférian, R., Shutler, J. D., Skjelvan, I., Steinhoff, T., Sun, Q., Sutton, A. J., Sweeney, C., Takao, S., Tanhua, T., Tans, P. P., Tian, X., Tian, H., Tilbrook, B., Tsujino, H., Tubiello, F., van der Werf, G. R., Walker, A. P., Wanninkhof, R., Whitehead, C., Willstrand Wranne, A., Wright, R., Yuan, W., Yue, C., Yue, X., Zaehle, S., Zeng, J., and Zheng, B.: Global Carbon Budget 2022, Earth Syst. Sci. Data, 14, 4811-4900, <a href="https://doi.org/10.5194/essd-14-4811-2022">https://doi.org/10.5194/essd-14-4811-2022</a>, 2022.
+
+    Variables include each country, region and World Bank income group's share of the global population; production-based (territorial); and consumption-based (trade-adjusted) carbon dioxide emissions. 
+
+    This was calculated by Our World in Data based on CO₂ figures produced by the Global Carbon Project. This is given as production (territorial) emissions in addition to trade-adjusted consumption-based emissions. Consumption-based emissions are national or regional emissions which have been adjusted for trade (i.e. territorial/production emissions minus emissions embedded in exports, plus emissions embedded in imports). If a country's consumption-based emissions are higher than its production emissions it is a net importer of carbon dioxide.
+
+    Note that consumption-based emissions are not available for all countries; although those without complete data are a small fraction (3%) of the global total. Each country's share of world emissions are based on the share of the global total minus categories termed 'bunkers' and 'statistical differences' (which include cross-boundary emissions such as international travel and shipping.
+
+    Calculation of each country's share of the global population is calculated using our population dataset, based on <a href="https://ourworldindata.org/population-sources">different sources</a>).
+
+    Data on global emissions has been converted by Our World in Data from tonnes of carbon to tonnes of carbon dioxide (CO₂) using a conversion factor of 3.664.
+
+    Our World in Data have renamed bunker fuels as "International transport" for improved clarity, which includes emissions from international aviation and shipping.
+    Emissions from the Kuwaiti oil fires in 1991 have been included as part of Kuwait's emissions for that year.
 
   licenses:
   - name: Creative Commons Attribution 4.0 International
@@ -11,10 +27,10 @@ dataset:
   version: '2022-11-11'
   sources:
   - name: Global Carbon Project (2022)
-    description: |
-      TODO: Complete
-    published_by: Global Carbon Budget - Global Carbon Project (2022)
+    published_by: "Friedlingstein, P., O'Sullivan, M., Jones, M. W., Andrew, R. M., Gregor, L., Hauck, J., Le Quéré, C., Luijkx, I. T., Olsen, A., Peters, G. P., Peters, W., Pongratz, J., Schwingshackl, C., Sitch, S., Canadell, J. G., Ciais, P., Jackson, R. B., Alin, S. R., Alkama, R., Arneth, A., Arora, V. K., Bates, N. R., Becker, M., Bellouin, N., Bittig, H. C., Bopp, L., Chevallier, F., Chini, L. P., Cronin, M., Evans, W., Falk, S., Feely, R. A., Gasser, T., Gehlen, M., Gkritzalis, T., Gloege, L., Grassi, G., Gruber, N., Gürses, Ö., Harris, I., Hefner, M., Houghton, R. A., Hurtt, G. C., Iida, Y., Ilyina, T., Jain, A. K., Jersild, A., Kadono, K., Kato, E., Kennedy, D., Klein Goldewijk, K., Knauer, J., Korsbakken, J. I., Landschützer, P., Lefèvre, N., Lindsay, K., Liu, J., Liu, Z., Marland, G., Mayot, N., McGrath, M. J., Metzl, N., Monacci, N. M., Munro, D. R., Nakaoka, S.-I., Niwa, Y., O'Brien, K., Ono, T., Palmer, P. I., Pan, N., Pierrot, D., Pocock, K., Poulter, B., Resplandy, L., Robertson, E., Rödenbeck, C., Rodriguez, C., Rosan, T. M., Schwinger, J., Séférian, R., Shutler, J. D., Skjelvan, I., Steinhoff, T., Sun, Q., Sutton, A. J., Sweeney, C., Takao, S., Tanhua, T., Tans, P. P., Tian, X., Tian, H., Tilbrook, B., Tsujino, H., Tubiello, F., van der Werf, G. R., Walker, A. P., Wanninkhof, R., Whitehead, C., Willstrand Wranne, A., Wright, R., Yuan, W., Yue, C., Yue, X., Zaehle, S., Zeng, J., and Zheng, B.: Global Carbon Budget 2022, Earth Syst. Sci. Data, 14, 4811-4900, https://doi.org/10.5194/essd-14-4811-2022, 2022."
     publisher_source: Global Carbon Project
+    url: https://www.globalcarbonproject.org/
+
 tables:
   global_carbon_budget:
     variables:
@@ -89,12 +105,12 @@ tables:
         short_unit: "%"
         description:
       cumulative_emissions_from_land_use_change:
-        title: "Cumulative emissions from land use change"
+        title: "Cumulative emissions from land-use change"
         unit: "tonnes"
         short_unit: "t"
         description:
       cumulative_emissions_from_land_use_change_as_share_of_global:
-        title: "Cumulative emissions from land use change as share of global"
+        title: "Cumulative emissions from land-use change as share of global"
         unit: "%"
         short_unit: "%"
         description:
@@ -129,12 +145,12 @@ tables:
         short_unit: "%"
         description:
       cumulative_emissions_total_including_land_use_change:
-        title: "Cumulative emissions including land use change"
+        title: "Cumulative emissions including land-use change"
         unit: "tonnes"
         short_unit: "t"
         description:
       cumulative_emissions_total_including_land_use_change_as_share_of_global:
-        title: "Cumulative emissions including land use change as share of global"
+        title: "Cumulative emissions including land-use change as share of global"
         unit: "%"
         short_unit: "%"
         description:
@@ -199,17 +215,17 @@ tables:
         short_unit: "t"
         description:
       emissions_from_land_use_change:
-        title: "Emissions from land use change"
+        title: "Emissions from land-use change"
         unit: "tonnes"
         short_unit: "t"
         description:
       emissions_from_land_use_change_as_share_of_global:
-        title: "Emissions from land use change as share of global"
+        title: "Emissions from land-use change as share of global"
         unit: "%"
         short_unit: "%"
         description:
       emissions_from_land_use_change_per_capita:
-        title: "Emissions from land use change per capita"
+        title: "Emissions from land-use change per capita"
         unit: "tonnes of CO₂ per capita"
         short_unit: "t"
         description:
@@ -254,27 +270,27 @@ tables:
         short_unit: "%"
         description:
       emissions_total_including_land_use_change:
-        title: "Emissions including land use change"
+        title: "Emissions including land-use change"
         unit: "tonnes"
         short_unit: "t"
         description:
       emissions_total_including_land_use_change_as_share_of_global:
-        title: "Emissions including land use change as share of global"
+        title: "Emissions including land-use change as share of global"
         unit: "%"
         short_unit: "%"
         description:
       emissions_total_including_land_use_change_per_capita:
-        title: "Emissions including land use change per capita"
+        title: "Emissions including land-use change per capita"
         unit: "tonnes of CO₂ per capita"
         short_unit: "t"
         description:
       emissions_total_including_land_use_change_per_gdp:
-        title: "Emissions including land use change per GDP"
+        title: "Emissions including land-use change per GDP"
         unit: "tonnes"
         short_unit: "t"
         description:
       emissions_total_including_land_use_change_per_unit_energy:
-        title: "Emissions including land use change per unit energy"
+        title: "Emissions including land-use change per unit energy"
         unit: "tonnes"
         short_unit: "t"
         description:
@@ -319,7 +335,7 @@ tables:
         short_unit: "t"
         description:
       global_cumulative_emissions_from_land_use_change:
-        title: "Global cumulative emissions from land use change"
+        title: "Global cumulative emissions from land-use change"
         unit: "tonnes"
         short_unit: "t"
         description:
@@ -339,7 +355,7 @@ tables:
         short_unit: "t"
         description:
       global_cumulative_emissions_total_including_land_use_change:
-        title: "Global cumulative emissions including land use change"
+        title: "Global cumulative emissions including land-use change"
         unit: "tonnes"
         short_unit: "t"
         description:
@@ -369,7 +385,7 @@ tables:
         short_unit: "t"
         description:
       global_emissions_from_land_use_change:
-        title: "Global emissions from land use change"
+        title: "Global emissions from land-use change"
         unit: "tonnes"
         short_unit: "t"
         description:
@@ -389,7 +405,7 @@ tables:
         short_unit: "t"
         description:
       global_emissions_total_including_land_use_change:
-        title: "Global emissions including land use change"
+        title: "Global emissions including land-use change"
         unit: "tonnes"
         short_unit: "t"
         description:
@@ -399,32 +415,32 @@ tables:
         short_unit: "persons"
         description:
       growth_emissions_total_including_land_use_change:
-        title: "Growth emissions including land use change"
+        title: "Growth rate of emissions including land-use change"
         unit: "tonnes"
         short_unit: "t"
         description:
       land_use_change_quality_flag:
-        title: "Land use change quality flag"
+        title: "land-use change quality flag"
         unit: "tonnes"
         short_unit: "t"
         description:
       pct_growth_emissions_total:
-        title: "Pct growth emissions"
+        title: "Growth rate of emissions (%)"
         unit: "tonnes"
         short_unit: "t"
         description:
       pct_growth_emissions_total_including_land_use_change:
-        title: "Pct growth emissions including land use change"
+        title: "Growth rate of emissions including land-use change (%)"
         unit: "tonnes"
         short_unit: "t"
         description:
       pct_traded_emissions:
-        title: "Pct traded emissions"
+        title: "Traded emissions (%)"
         unit: "tonnes"
         short_unit: "t"
         description:
       pct_traded_emissions_including_land_use_change:
-        title: "Pct traded emissions including land use change"
+        title: "Traded emissions including land-use change (%)"
         unit: "tonnes"
         short_unit: "t"
         description:
@@ -449,12 +465,12 @@ tables:
         short_unit: "t"
         description:
       traded_emissions_including_land_use_change:
-        title: "Traded emissions including land use change"
+        title: "Traded emissions including land-use change"
         unit: "tonnes"
         short_unit: "t"
         description:
       traded_emissions_including_land_use_change_per_capita:
-        title: "Traded emissions including land use change per capita"
+        title: "Traded emissions including land-use change per capita"
         unit: "tonnes of CO₂ per capita"
         short_unit: "t"
         description:

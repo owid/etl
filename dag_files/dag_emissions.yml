@@ -72,7 +72,7 @@ steps:
     - data://garden/ggdc/2020-10-01/ggdc_maddison
     - data://garden/energy/2022-07-29/primary_energy_consumption
   grapher://grapher/gcp/2022-11-11/global_carbon_budget:
-   - data-private://garden/gcp/2022-11-11/global_carbon_budget
+    - data-private://garden/gcp/2022-11-11/global_carbon_budget
   #
   # RFF - World Carbon Pricing (2022-09-14).
   #
