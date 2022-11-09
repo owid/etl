@@ -16,6 +16,7 @@ It combines the following datasets:
 
 from typing import Dict, List, Optional
 
+import numpy as np
 import pandas as pd
 from owid import catalog
 from owid.datautils import dataframes, geo
@@ -752,6 +753,10 @@ def combine_data_and_add_variables(
 
     # Create variable of population as a share of global population.
     co2_df["population_as_share_of_global"] = co2_df["population"] / co2_df["global_population"] * 100
+
+    # Replace infinity values (for example when calculating growth from zero to non-zero) in the data by nan.
+    for column in co2_df.drop(columns=["country", "year"]).columns:
+        co2_df.loc[np.isinf(co2_df[column]), column] = np.nan
 
     return co2_df
 
