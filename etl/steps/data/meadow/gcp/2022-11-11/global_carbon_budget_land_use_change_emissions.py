@@ -46,7 +46,7 @@ def prepare_land_use_emissions(land_use_df: pd.DataFrame) -> pd.DataFrame:
     # Extract quality flag from the zeroth row of the data.
     # Ignore nans (which happen when a certain country has no data).
     quality_flag = land_use_df.drop(columns=land_use_df.columns[0]).loc[0].dropna().astype(int).\
-        to_frame("quality_factor").reset_index().rename(columns={"index": "country"})
+        to_frame("quality_flag").reset_index().rename(columns={"index": "country"})
 
     # Drop the first row, which is for quality factor (which we have already extracted).
     land_use_df = land_use_df.rename(columns={land_use_df.columns[0]: "year"}).drop(0)
