@@ -54,6 +54,12 @@ steps:
   # Until the release date, ensure the data is private.
   data-private://meadow/gcp/2022-11-11/global_carbon_budget_fossil_co2_emissions:
     - walden-private://gcp/2022-11-11/global_carbon_budget_fossil_co2_emissions
+  data-private://meadow/gcp/2022-11-11/global_carbon_budget_global_emissions:
+    - walden-private://gcp/2022-11-11/global_carbon_budget_global_emissions
+  data-private://meadow/gcp/2022-11-11/global_carbon_budget_national_emissions:
+    - walden-private://gcp/2022-11-11/global_carbon_budget_national_emissions
+  data-private://meadow/gcp/2022-11-11/global_carbon_budget_land_use_change_emissions:
+    - walden-private://gcp/2022-11-11/global_carbon_budget_land_use_change_emissions
   data-private://garden/gcp/2022-11-11/global_carbon_budget:
     - data-private://meadow/gcp/2022-11-11/global_carbon_budget_fossil_co2_emissions
     # Until we have access to the latest data, we use consumption-based emissions, land-use change and bunker emissions
