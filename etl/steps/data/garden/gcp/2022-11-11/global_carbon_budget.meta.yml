@@ -36,32 +36,32 @@ tables:
   global_carbon_budget:
     variables:
       consumption_emissions:
-        title: "Consumption emissions"
+        title: "Consumption-based emissions"
         unit: "tonnes"
         short_unit: "t"
         description:
       consumption_emissions_as_share_of_global:
-        title: "Consumption emissions as share of global"
+        title: "Consumption-based emissions as share of global"
         unit: "%"
         short_unit: "%"
         description:
       consumption_emissions_per_capita:
-        title: "Consumption emissions per capita"
+        title: "Consumption-based emissions per capita"
         unit: "tonnes of CO₂ per capita"
         short_unit: "t"
         description:
       consumption_emissions_per_gdp:
-        title: "Consumption emissions per GDP"
+        title: "Consumption-based emissions per GDP"
         unit: "tonnes"
         short_unit: "t"
         description:
       cumulative_consumption_emissions:
-        title: "Cumulative consumption emissions"
+        title: "Cumulative consumption-based emissions"
         unit: "tonnes"
         short_unit: "t"
         description:
       cumulative_consumption_emissions_as_share_of_global:
-        title: "Cumulative consumption emissions as share of global"
+        title: "Cumulative consumption-based emissions as share of global"
         unit: "%"
         short_unit: "%"
         description:
@@ -414,6 +414,11 @@ tables:
         title: "Global population"
         unit: "persons"
         short_unit: "persons"
+        description:
+      growth_emissions_total:
+        title: "Growth rate of emissions"
+        unit: "tonnes"
+        short_unit: "t"
         description:
       growth_emissions_total_including_land_use_change:
         title: "Growth rate of emissions including land-use change"

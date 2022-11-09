@@ -822,6 +822,9 @@ def combine_data_and_add_variables(
     )
 
     # Add annual absolute growth of total emissions.
+    co2_df["growth_emissions_total"] = co2_df.groupby("country")["emissions_total"].diff()
+
+    # Add annual absolute growth of total emissions (including land-use change).
     co2_df["growth_emissions_total_including_land_use_change"] = co2_df.groupby("country")[
         "emissions_total_including_land_use_change"
     ].diff()
