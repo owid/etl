@@ -62,15 +62,17 @@ steps:
     - walden-private://gcp/2022-11-11/global_carbon_budget_land_use_change_emissions
   data-private://garden/gcp/2022-11-11/global_carbon_budget:
     - data-private://meadow/gcp/2022-11-11/global_carbon_budget_fossil_co2_emissions
-    # Until we have access to the latest data, we use consumption-based emissions, land-use change and bunker emissions
-    # from the previous version.
-    - data://meadow/gcp/2022-09-29/global_carbon_budget_additional
+    - data-private://meadow/gcp/2022-11-11/global_carbon_budget_global_emissions
+    - data-private://meadow/gcp/2022-11-11/global_carbon_budget_national_emissions
+    - data-private://meadow/gcp/2022-11-11/global_carbon_budget_land_use_change_emissions
     # Additionally, regions, population, income groups, GDP, and primary energy datasets are used.
     - data://garden/reference
     - data://garden/owid/latest/key_indicators
     - data://garden/wb/2021-07-01/wb_income
     - data://garden/ggdc/2020-10-01/ggdc_maddison
     - data://garden/energy/2022-07-29/primary_energy_consumption
+  grapher://grapher/gcp/2022-11-11/global_carbon_budget:
+   - data-private://garden/gcp/2022-11-11/global_carbon_budget
   #
   # RFF - World Carbon Pricing (2022-09-14).
   #
