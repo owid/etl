@@ -27,19 +27,29 @@ from etl.paths import DATA_DIR, STEP_DIR
 # Define inputs.
 MEADOW_VERSION = "2022-11-11"
 # Country names harmonization file for fossil CO2 emissions data.
-FOSSIL_CO2_EMISSIONS_COUNTRIES_FILE = STEP_DIR / f"data/garden/gcp/{MEADOW_VERSION}/global_carbon_budget_fossil_co2_emissions.countries.json"
+FOSSIL_CO2_EMISSIONS_COUNTRIES_FILE = (
+    STEP_DIR / f"data/garden/gcp/{MEADOW_VERSION}/global_carbon_budget_fossil_co2_emissions.countries.json"
+)
 # Country names harmonization file for national emissions data.
-NATIONAL_EMISSIONS_COUNTRIES_FILE = STEP_DIR / f"data/garden/gcp/{MEADOW_VERSION}/global_carbon_budget_national_emissions.countries.json"
+NATIONAL_EMISSIONS_COUNTRIES_FILE = (
+    STEP_DIR / f"data/garden/gcp/{MEADOW_VERSION}/global_carbon_budget_national_emissions.countries.json"
+)
 # Country names harmonization file for national land-use change emissions data.
-LAND_USE_EMISSIONS_COUNTRIES_FILE = STEP_DIR / f"data/garden/gcp/{MEADOW_VERSION}/global_carbon_budget_land_use_change_emissions.countries.json"
+LAND_USE_EMISSIONS_COUNTRIES_FILE = (
+    STEP_DIR / f"data/garden/gcp/{MEADOW_VERSION}/global_carbon_budget_land_use_change_emissions.countries.json"
+)
 # Meadow dataset on GCB fossil CO2 emissions.
 MEADOW_CO2_DATASET_PATH = DATA_DIR / f"meadow/gcp/{MEADOW_VERSION}/global_carbon_budget_fossil_co2_emissions"
 # Meadow dataset on global emissions.
 MEADOW_GLOBAL_EMISSIONS_DATASET_PATH = DATA_DIR / f"meadow/gcp/{MEADOW_VERSION}/global_carbon_budget_global_emissions"
 # Meadow dataset on national emissions.
-MEADOW_NATIONAL_EMISSIONS_DATASET_PATH = DATA_DIR / f"meadow/gcp/{MEADOW_VERSION}/global_carbon_budget_national_emissions"
+MEADOW_NATIONAL_EMISSIONS_DATASET_PATH = (
+    DATA_DIR / f"meadow/gcp/{MEADOW_VERSION}/global_carbon_budget_national_emissions"
+)
 # Meadow dataset on GCB national land-use change emissions.
-MEADOW_LAND_USE_EMISSIONS_DATASET_PATH = DATA_DIR / f"meadow/gcp/{MEADOW_VERSION}/global_carbon_budget_land_use_change_emissions"
+MEADOW_LAND_USE_EMISSIONS_DATASET_PATH = (
+    DATA_DIR / f"meadow/gcp/{MEADOW_VERSION}/global_carbon_budget_land_use_change_emissions"
+)
 # Garden dataset on primary energy consumption.
 GARDEN_PRIMARY_ENERGY_DATASET_PATH = DATA_DIR / "garden/energy/2022-07-29/primary_energy_consumption"
 # Garden dataset on GDP.
@@ -54,8 +64,16 @@ DATASET_NAME = "global_carbon_budget"
 METADATA_PATH = STEP_DIR / f"data/garden/gcp/{MEADOW_VERSION}/global_carbon_budget.meta.yml"
 
 # Expected outliers in consumption-based emissions (with negative emissions in the original data, that will be removed).
-OUTLIERS_IN_CONSUMPTION_DF = [("Panama", 2003), ("Panama", 2004), ("Panama", 2005), ("Panama", 2006),
-                              ("Panama", 2011), ("Panama", 2012), ("Panama", 2013), ("Venezuela", 2018)]
+OUTLIERS_IN_CONSUMPTION_DF = [
+    ("Panama", 2003),
+    ("Panama", 2004),
+    ("Panama", 2005),
+    ("Panama", 2006),
+    ("Panama", 2011),
+    ("Panama", 2012),
+    ("Panama", 2013),
+    ("Venezuela", 2018),
+]
 
 # Label used for international transport (emissions from oil in bunker fuels), included as a country in the
 # fossil CO2 emissions dataset.
@@ -251,13 +269,18 @@ def sanity_checks_on_input_data(
 
     # Check that we get exactly the same array of bunker emissions from the consumption emissions dataframe
     # (on years where there is data for bunker emissions in both datasets).
-    comparison = pd.merge(global_bunkers_emissions, consumption_df[consumption_df["country"] == "Bunkers"][["year", "consumption_emissions"]]
+    comparison = pd.merge(
+        global_bunkers_emissions,
+        consumption_df[consumption_df["country"] == "Bunkers"][["year", "consumption_emissions"]]
         .reset_index(drop=True)
-        .rename(columns={"consumption_emissions": "global_bunker_emissions"}, errors="raise"), how='inner', on='year',
-                         suffixes=("", "_check"))
+        .rename(columns={"consumption_emissions": "global_bunker_emissions"}, errors="raise"),
+        how="inner",
+        on="year",
+        suffixes=("", "_check"),
+    )
 
     error = "Bunker emissions were expected to coincide in production and consumption emissions dataframes."
-    assert (comparison['global_bunker_emissions'] == comparison['global_bunker_emissions_check']).all(), error
+    assert (comparison["global_bunker_emissions"] == comparison["global_bunker_emissions_check"]).all(), error
 
     # Check that all production-based emissions are positive.
     error = "There are negative emissions in production_df (from the additional variables dataset)."
@@ -274,10 +297,13 @@ def sanity_checks_on_input_data(
 
     # Check that, for the World, production emissions coincides with consumption emissions (on common years).
     error = "Production and consumption emissions for the world were expected to be identical."
-    comparison = pd.merge(production_df[production_df['country'] == 'World'].reset_index(drop=True),
-                          consumption_df[consumption_df['country'] == 'World'].reset_index(drop=True),
-                          how='inner', on='year')
-    assert (comparison['production_emissions'] == comparison['consumption_emissions']).all(), error    
+    comparison = pd.merge(
+        production_df[production_df["country"] == "World"].reset_index(drop=True),
+        consumption_df[consumption_df["country"] == "World"].reset_index(drop=True),
+        how="inner",
+        on="year",
+    )
+    assert (comparison["production_emissions"] == comparison["consumption_emissions"]).all(), error
 
     # Check that production emissions for the World coincide with global (historical) emissions (on common years).
     comparison = pd.merge(
@@ -287,7 +313,11 @@ def sanity_checks_on_input_data(
         on="year",
     )
     error = "Production emissions for the world were expected to coincide with global fossil emissions."
-    assert ((comparison["production_emissions"] - comparison["global_fossil_emissions"]) / (comparison["global_fossil_emissions"]) < 0.001).all(), error
+    assert (
+        (comparison["production_emissions"] - comparison["global_fossil_emissions"])
+        / (comparison["global_fossil_emissions"])
+        < 0.001
+    ).all(), error
 
 
 def sanity_checks_on_output_data(combined_df: pd.DataFrame) -> None:
@@ -304,7 +334,12 @@ def sanity_checks_on_output_data(combined_df: pd.DataFrame) -> None:
     combined_df = combined_df.reset_index()
     error = "All variables (except traded emissions, growth, and land-use change) should be >= 0 or nan."
     positive_variables = [
-        col for col in combined_df.columns if col != "country" if "traded" not in col if "growth" not in col if "land_use" not in col
+        col
+        for col in combined_df.columns
+        if col != "country"
+        if "traded" not in col
+        if "growth" not in col
+        if "land_use" not in col
     ]
     assert (combined_df[positive_variables].fillna(0) >= 0).all().all(), error
 
@@ -330,7 +365,9 @@ def sanity_checks_on_output_data(combined_df: pd.DataFrame) -> None:
     # Check that cumulative variables are monotonically increasing.
     # Firstly, list columns of cumulative variables, but ignoring cumulative columns as a share of global
     # (since they are not necessarily monotonic) and land-use change (which can be negative).
-    cumulative_cols = [col for col in combined_df.columns if "cumulative" in col if "share" not in col if "land_use" not in col]
+    cumulative_cols = [
+        col for col in combined_df.columns if "cumulative" in col if "share" not in col if "land_use" not in col
+    ]
     # Using ".is_monotonic_increasing" can fail when differences between consecutive numbers are very small.
     # Instead, sort data backwards in time, and check that consecutive values of cumulative variables always have
     # a percentage change that is smaller than, say, 0.1%.
@@ -424,12 +461,16 @@ def prepare_fossil_co2_emissions(co2_df: pd.DataFrame) -> pd.DataFrame:
     # We can then either keep or remove "Kuwaiti Oil Fires" from the data, but having these emissions as part of
     # Kuwait ensures that they will be included in region aggregates.
     error = "'Kuwaiti Oil Fires' was expected to only have not-null data for 1991."
-    assert co2_df[(co2_df["country"] == "Kuwaiti Oil Fires") & (co2_df["emissions_total"].notnull()) &
-           (co2_df["emissions_total"] != 0)]["year"].tolist() == [1991], error
+    assert co2_df[
+        (co2_df["country"] == "Kuwaiti Oil Fires")
+        & (co2_df["emissions_total"].notnull())
+        & (co2_df["emissions_total"] != 0)
+    ]["year"].tolist() == [1991], error
 
-    co2_df.loc[(co2_df["country"] == "Kuwait") & (co2_df["year"] == 1991), EMISSION_SOURCES] =\
-        co2_df[(co2_df["country"] == "Kuwaiti Oil Fires") & (co2_df["year"] == 1991)][EMISSION_SOURCES].values \
+    co2_df.loc[(co2_df["country"] == "Kuwait") & (co2_df["year"] == 1991), EMISSION_SOURCES] = (
+        co2_df[(co2_df["country"] == "Kuwaiti Oil Fires") & (co2_df["year"] == 1991)][EMISSION_SOURCES].values
         + co2_df[(co2_df["country"] == "Kuwait") & (co2_df["year"] == 1991)][EMISSION_SOURCES].values
+    )
 
     return co2_df
 
@@ -559,7 +600,10 @@ def harmonize_co2_data(co2_df: pd.DataFrame) -> pd.DataFrame:
     """
     # Harmonize country names in fossil CO2 data.
     co2_df = geo.harmonize_countries(
-        df=co2_df, countries_file=FOSSIL_CO2_EMISSIONS_COUNTRIES_FILE, warn_on_missing_countries=True, warn_on_unused_countries=True
+        df=co2_df,
+        countries_file=FOSSIL_CO2_EMISSIONS_COUNTRIES_FILE,
+        warn_on_missing_countries=True,
+        warn_on_unused_countries=True,
     )
 
     # After harmonization, "Pacific Islands (Palau)" is mapped to "Palau", and therefore there are rows with different
@@ -647,24 +691,37 @@ def combine_data_and_add_variables(
     co2_df = pd.merge(co2_df, primary_energy_df, on=["country", "year"], how="left")
 
     # For convenience, rename columns in land-use change emissions data.
-    land_use_df = land_use_df.rename(columns={"emissions": "emissions_from_land_use_change", "quality_flag": "land_use_change_quality_flag"})
+    land_use_df = land_use_df.rename(
+        columns={"emissions": "emissions_from_land_use_change", "quality_flag": "land_use_change_quality_flag"}
+    )
 
     # Land-use change data does not include data for the World. Include it by merging with the global dataset.
-    land_use_df = pd.concat([land_use_df,
-               global_emissions_df.rename(columns={"global_emissions_from_land_use_change": "emissions_from_land_use_change"})\
-                   [["year", "emissions_from_land_use_change"]].dropna().assign(**{"country": "World"})], ignore_index=True).\
-        astype({"year": int})
+    land_use_df = pd.concat(
+        [
+            land_use_df,
+            global_emissions_df.rename(
+                columns={"global_emissions_from_land_use_change": "emissions_from_land_use_change"}
+            )[["year", "emissions_from_land_use_change"]]
+            .dropna()
+            .assign(**{"country": "World"}),
+        ],
+        ignore_index=True,
+    ).astype({"year": int})
 
     # Add land-us change emissions to main dataframe.
     co2_df = pd.merge(co2_df, land_use_df, on=["country", "year"], how="left")
 
     # Add total emissions (including land-use change) for each country.
-    co2_df["emissions_total_including_land_use_change"] = co2_df["emissions_total"] + co2_df["emissions_from_land_use_change"]
+    co2_df["emissions_total_including_land_use_change"] = (
+        co2_df["emissions_total"] + co2_df["emissions_from_land_use_change"]
+    )
 
     # Add region aggregates.
     # Aggregate not only emissions data, but also population, gdp and primary energy.
     # This way we ensure that custom regions (e.g. "North America (excl. USA)") will have all required data.
-    aggregations = {column: "sum" for column in co2_df.columns if column not in ["country", "year", "land_use_change_quality_flag"]}
+    aggregations = {
+        column: "sum" for column in co2_df.columns if column not in ["country", "year", "land_use_change_quality_flag"]
+    }
     for region in REGIONS:
         countries_in_region = get_countries_in_region(region=region, region_modifications=REGIONS[region])
         co2_df = geo.add_region_aggregates(
@@ -689,7 +746,11 @@ def combine_data_and_add_variables(
     co2_df["global_cumulative_consumption_emissions"] = co2_df["global_cumulative_emissions_total"]
 
     # Add new variables for each source of emissions.
-    for column in EMISSION_SOURCES + ["consumption_emissions", "emissions_from_land_use_change", "emissions_total_including_land_use_change"]:
+    for column in EMISSION_SOURCES + [
+        "consumption_emissions",
+        "emissions_from_land_use_change",
+        "emissions_total_including_land_use_change",
+    ]:
         # Add per-capita variables.
         co2_df[f"{column}_per_capita"] = co2_df[column] / co2_df["population"]
 
@@ -715,14 +776,18 @@ def combine_data_and_add_variables(
 
     # Add total emissions (including land-use change) per unit energy (in kg of emissions per kWh).
     co2_df["emissions_total_including_land_use_change_per_unit_energy"] = (
-        TONNES_OF_CO2_TO_KG_OF_CO2 * co2_df["emissions_total_including_land_use_change"] / (co2_df["primary_energy_consumption"] * TWH_TO_KWH)
+        TONNES_OF_CO2_TO_KG_OF_CO2
+        * co2_df["emissions_total_including_land_use_change"]
+        / (co2_df["primary_energy_consumption"] * TWH_TO_KWH)
     )
 
     # Add total emissions per unit GDP.
     co2_df["emissions_total_per_gdp"] = TONNES_OF_CO2_TO_KG_OF_CO2 * co2_df["emissions_total"] / co2_df["gdp"]
 
     # Add total emissions (including land-use change) per unit GDP.
-    co2_df["emissions_total_including_land_use_change_per_gdp"] = TONNES_OF_CO2_TO_KG_OF_CO2 * co2_df["emissions_total_including_land_use_change"] / co2_df["gdp"]
+    co2_df["emissions_total_including_land_use_change_per_gdp"] = (
+        TONNES_OF_CO2_TO_KG_OF_CO2 * co2_df["emissions_total_including_land_use_change"] / co2_df["gdp"]
+    )
 
     # Add total consumption emissions per unit GDP.
     co2_df["consumption_emissions_per_gdp"] = (
@@ -735,9 +800,15 @@ def combine_data_and_add_variables(
     co2_df["traded_emissions_per_capita"] = co2_df["traded_emissions"] / co2_df["population"]
 
     # Add variable of emissions embedded in trade, including land-use change emissions.
-    co2_df["traded_emissions_including_land_use_change"] = co2_df["consumption_emissions"] - co2_df["emissions_total_including_land_use_change"]
-    co2_df["pct_traded_emissions_including_land_use_change"] = 100 * co2_df["traded_emissions_including_land_use_change"] / co2_df["emissions_total_including_land_use_change"]
-    co2_df["traded_emissions_including_land_use_change_per_capita"] = co2_df["traded_emissions_including_land_use_change"] / co2_df["population"]
+    co2_df["traded_emissions_including_land_use_change"] = (
+        co2_df["consumption_emissions"] - co2_df["emissions_total_including_land_use_change"]
+    )
+    co2_df["pct_traded_emissions_including_land_use_change"] = (
+        100 * co2_df["traded_emissions_including_land_use_change"] / co2_df["emissions_total_including_land_use_change"]
+    )
+    co2_df["traded_emissions_including_land_use_change_per_capita"] = (
+        co2_df["traded_emissions_including_land_use_change"] / co2_df["population"]
+    )
 
     # Remove temporary columns.
     co2_df = co2_df.drop(columns=["global_consumption_emissions", "global_cumulative_consumption_emissions"])
@@ -746,10 +817,14 @@ def combine_data_and_add_variables(
     co2_df["pct_growth_emissions_total"] = co2_df.groupby("country")["emissions_total"].pct_change() * 100
 
     # Add annual percentage growth of total emissions (including land-use change).
-    co2_df["pct_growth_emissions_total_including_land_use_change"] = co2_df.groupby("country")["emissions_total_including_land_use_change"].pct_change() * 100
+    co2_df["pct_growth_emissions_total_including_land_use_change"] = (
+        co2_df.groupby("country")["emissions_total_including_land_use_change"].pct_change() * 100
+    )
 
     # Add annual absolute growth of total emissions.
-    co2_df["growth_emissions_total_including_land_use_change"] = co2_df.groupby("country")["emissions_total_including_land_use_change"].diff()
+    co2_df["growth_emissions_total_including_land_use_change"] = co2_df.groupby("country")[
+        "emissions_total_including_land_use_change"
+    ].diff()
 
     # Create variable of population as a share of global population.
     co2_df["population_as_share_of_global"] = co2_df["population"] / co2_df["global_population"] * 100
@@ -858,13 +933,13 @@ def run(dest_dir: str) -> None:
     # Harmonize national land-use change emissions data.
     land_use_df = (
         geo.harmonize_countries(
-        df=land_use_df,
-        countries_file=LAND_USE_EMISSIONS_COUNTRIES_FILE,
-        warn_on_missing_countries=True,
-        make_missing_countries_nan=True,
-    )
-    .dropna(subset="country")
-    .reset_index(drop=True)
+            df=land_use_df,
+            countries_file=LAND_USE_EMISSIONS_COUNTRIES_FILE,
+            warn_on_missing_countries=True,
+            make_missing_countries_nan=True,
+        )
+        .dropna(subset="country")
+        .reset_index(drop=True)
     )
 
     # Harmonize fossil CO2 data.

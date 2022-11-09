@@ -77,16 +77,18 @@ def run(dest_dir: str) -> None:
     # Load national data file from walden.
     national_ds = WaldenCatalog().find_one(namespace="gcp", short_name=WALDEN_DATASET_NAME, version=WALDEN_VERSION)
     # Load production-based emissions from the national data file.
-    production_emissions_df = pd.read_excel(national_ds.ensure_downloaded(), sheet_name="Territorial Emissions",
-        skiprows=11)
+    production_emissions_df = pd.read_excel(
+        national_ds.ensure_downloaded(), sheet_name="Territorial Emissions", skiprows=11
+    )
 
     # Sanity check.
     error = "'Territorial Emissions' sheet in national data file has changed (consider changing 'skiprows')."
-    assert production_emissions_df.columns[1] == "Afghanistan", error    
+    assert production_emissions_df.columns[1] == "Afghanistan", error
 
     # Load consumption-based emissions from the national data file.
-    consumption_emissions_df = pd.read_excel(national_ds.ensure_downloaded(), sheet_name="Consumption Emissions",
-        skiprows=8)
+    consumption_emissions_df = pd.read_excel(
+        national_ds.ensure_downloaded(), sheet_name="Consumption Emissions", skiprows=8
+    )
 
     # Sanity check.
     error = "'Consumption Emissions' sheet in national data file has changed (consider changing 'skiprows')."
@@ -96,10 +98,10 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     # Prepare production and consumption based emissions data.
-    production_emissions_df = prepare_national_emissions(
-        df=production_emissions_df, column_name="production_emissions")
+    production_emissions_df = prepare_national_emissions(df=production_emissions_df, column_name="production_emissions")
     consumption_emissions_df = prepare_national_emissions(
-        df=consumption_emissions_df, column_name="consumption_emissions")
+        df=consumption_emissions_df, column_name="consumption_emissions"
+    )
 
     #
     # Save outputs.

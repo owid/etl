@@ -45,8 +45,15 @@ def prepare_land_use_emissions(land_use_df: pd.DataFrame) -> pd.DataFrame:
 
     # Extract quality flag from the zeroth row of the data.
     # Ignore nans (which happen when a certain country has no data).
-    quality_flag = land_use_df.drop(columns=land_use_df.columns[0]).loc[0].dropna().astype(int).\
-        to_frame("quality_flag").reset_index().rename(columns={"index": "country"})
+    quality_flag = (
+        land_use_df.drop(columns=land_use_df.columns[0])
+        .loc[0]
+        .dropna()
+        .astype(int)
+        .to_frame("quality_flag")
+        .reset_index()
+        .rename(columns={"index": "country"})
+    )
 
     # Drop the first row, which is for quality factor (which we have already extracted).
     land_use_df = land_use_df.rename(columns={land_use_df.columns[0]: "year"}).drop(0)
@@ -61,7 +68,7 @@ def prepare_land_use_emissions(land_use_df: pd.DataFrame) -> pd.DataFrame:
     assert set(land_use_df["country"]) == set(quality_flag["country"]), error
 
     # Add quality factor as an additional column.
-    land_use_df = pd.merge(land_use_df, quality_flag, how='left', on="country")
+    land_use_df = pd.merge(land_use_df, quality_flag, how="left", on="country")
 
     # Convert units from megatonnes of carbon per year emissions to tonnes of CO2 per year.
     land_use_df["emissions"] *= MILLION_TONNES_OF_CARBON_TO_TONNES_OF_CO2
@@ -77,15 +84,14 @@ def run(dest_dir: str) -> None:
     # Load data.
     #
     # Load national land-use change data file from walden.
-    land_use_ds = WaldenCatalog().find_one(
-        namespace="gcp", short_name=WALDEN_DATASET_NAME, version=WALDEN_VERSION)
+    land_use_ds = WaldenCatalog().find_one(namespace="gcp", short_name=WALDEN_DATASET_NAME, version=WALDEN_VERSION)
     # Load production-based emissions from the national data file.
     # TODO: Decide what sheet to use.
     land_use_df = pd.read_excel(land_use_ds.ensure_downloaded(), sheet_name="BLUE", skiprows=7)
 
     # Sanity check.
     error = "'BLUE' sheet in national land-use change data file has changed (consider changing 'skiprows')."
-    assert land_use_df.columns[1] == "Afghanistan", error    
+    assert land_use_df.columns[1] == "Afghanistan", error
 
     #
     # Process data.
