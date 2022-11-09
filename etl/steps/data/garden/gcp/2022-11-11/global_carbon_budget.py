@@ -418,7 +418,17 @@ def prepare_fossil_co2_emissions(co2_df: pd.DataFrame) -> pd.DataFrame:
     co2_df = dataframes.combine_two_overlapping_dataframes(
         df1=co2_df, df2=aggregated_missing_data, index_columns=["country", "year"], keep_column_order=True
     )
-    ####################################################################################################################
+
+    # Instead of having "Kuwaiti Oil Fires" as a separate country, we add these as part of the emissions of Kuwait.
+    # We can then either keep or remove "Kuwaiti Oil Fires" from the data, but having these emissions as part of
+    # Kuwait ensures that they will be included in region aggregates.
+    error = "'Kuwaiti Oil Fires' was expected to only have not-null data for 1991."
+    assert co2_df[(co2_df["country"] == "Kuwaiti Oil Fires") & (co2_df["emissions_total"].notnull()) &
+           (co2_df["emissions_total"] != 0)]["year"].tolist() == [1991], error
+
+    co2_df.loc[(co2_df["country"] == "Kuwait") & (co2_df["year"] == 1991), EMISSION_SOURCES] =\
+        co2_df[(co2_df["country"] == "Kuwaiti Oil Fires") & (co2_df["year"] == 1991)][EMISSION_SOURCES].values \
+        + co2_df[(co2_df["country"] == "Kuwait") & (co2_df["year"] == 1991)][EMISSION_SOURCES].values
 
     return co2_df
 
