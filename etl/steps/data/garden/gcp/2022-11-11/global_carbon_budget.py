@@ -14,6 +14,7 @@ It combines the following datasets:
 
 """
 
+from copy import deepcopy
 from typing import Dict, List, Optional
 
 import numpy as np
@@ -978,6 +979,38 @@ def run(dest_dir: str) -> None:
     tb_garden = catalog.Table(combined_df)
     # Use metadata from yaml file.
     tb_garden.update_metadata_from_yaml(METADATA_PATH, DATASET_NAME)
+
+    ####################################################################################################################
+    # TODO: Remove this temporary solution once dataset is public and grapher channel works as usual.
+    #   This should happen in the grapher step.
+    variables_to_fill_with_zeros = [
+        "emissions_total",
+        'emissions_from_cement',
+        'emissions_from_coal',
+        'emissions_from_flaring',
+        'emissions_from_gas',
+        'emissions_from_land_use_change',
+        'emissions_from_oil',
+        'emissions_from_other_industry',
+        'cumulative_emissions_total',
+        'cumulative_emissions_from_cement',
+        'cumulative_emissions_from_coal',
+        'cumulative_emissions_from_flaring',
+        'cumulative_emissions_from_gas',
+        'cumulative_emissions_from_land_use_change',
+        'cumulative_emissions_from_oil',
+        'cumulative_emissions_from_other_industry',
+    ]
+    # Create additional variables in the table that have nans filled with zeros (for two specific stacked area charts).
+    for variable in variables_to_fill_with_zeros:
+        new_variable_name = variable + "_zero_filled"
+        tb_garden[new_variable_name] = tb_garden[variable].fillna(0)
+        tb_garden[new_variable_name].metadata = deepcopy(tb_garden[variable].metadata)
+        tb_garden[new_variable_name].metadata.title = tb_garden[variable].metadata.title + " (zero filled)"
+        tb_garden[new_variable_name].metadata.description =\
+            tb_garden[variable].metadata.description + " Missing data has been filled by zero."
+
+    ####################################################################################################################
     # Add combined table to garden dataset and save dataset.
     ds_garden.add(tb_garden)
     ds_garden.save()
