@@ -1,10 +1,7 @@
 """Garden step that combines various datasets related to greenhouse emissions and produces the OWID CO2 dataset (2022).
 
-NOTE: This step is deprecated, given that it depends on a backported dataset, the Global Carbon Budget, that was
-generated in importers. We can keep the code, but the step has been removed from the dag.
-
 Datasets combined:
-* Global Carbon Budget (Global Carbon Project, 2021).
+* Global Carbon Budget (Global Carbon Project, 2022).
 * Greenhouse gas emissions by sector (CAIT, 2022).
 * Primary energy consumption (BP & EIA, 2022)
 
@@ -25,7 +22,9 @@ DATASET_SHORT_NAME = "owid_co2"
 DATASET_TITLE = "CO2 dataset (OWID, 2022)"
 METADATA_PATH = CURRENT_DIR / f"{DATASET_SHORT_NAME}.meta.yml"
 # Details for datasets to import.
-GCP_PATH = DATA_DIR / "backport/owid/latest/dataset_5582_global_carbon_budget__global_carbon_project__v2021/"
+# TODO: Remove.
+OLD_GCP_PATH = DATA_DIR / "backport/owid/latest/dataset_5582_global_carbon_budget__global_carbon_project__v2021/"
+GCP_PATH = DATA_DIR / "garden/gcp/2022-11-11/global_carbon_budget"
 CAIT_PATH = DATA_DIR / "garden/cait/2022-08-10/ghg_emissions_by_sector"
 PRIMARY_ENERGY_PATH = DATA_DIR / "garden/energy/2022-07-29/primary_energy_consumption"
 # Countries-regions dataset is only used to add ISO country codes.
@@ -38,8 +37,13 @@ GDP_PATH = DATA_DIR / "garden/ggdc/2020-10-01/ggdc_maddison"
 # Conversion factor from tonnes to million tonnes.
 TONNES_TO_MILLION_TONNES = 1e-6
 
-GCP_COLUMNS = {
-    "entity_name": "country",
+# +
+# TODO: Add national land-use change emissions variable.
+# -
+
+# TODO: Remove.
+OLD_GCP_COLUMNS = {
+    "country": "country",
     "year": "year",
     "annual_co2_emissions": "co2",
     "annual_co2_emissions__per_capita": "co2_per_capita",
@@ -85,6 +89,54 @@ GCP_COLUMNS = {
     "share_of_global_cumulative_co2_emissions_from_gas": "share_global_cumulative_gas_co2",
     "share_of_global_cumulative_co2_emissions_from_oil": "share_global_cumulative_oil_co2",
     "share_of_global_cumulative_co2_emissions_from_other_industry": "share_global_cumulative_other_co2",
+}
+GCP_COLUMNS = {
+    "country": "country",
+    "year": "year",
+    "emissions_total": "co2",
+    "emissions_total_per_capita": "co2_per_capita",
+    "traded_emissions": "trade_co2",
+    "emissions_from_cement": "cement_co2",
+    "emissions_from_cement_per_capita": "cement_co2_per_capita",
+    "emissions_from_coal": "coal_co2",
+    "emissions_from_coal_per_capita": "coal_co2_per_capita",
+    "emissions_from_flaring": "flaring_co2",
+    "emissions_from_flaring_per_capita": "flaring_co2_per_capita",
+    "emissions_from_gas": "gas_co2",
+    "emissions_from_gas_per_capita": "gas_co2_per_capita",
+    "emissions_from_oil": "oil_co2",
+    "emissions_from_oil_per_capita": "oil_co2_per_capita",
+    "emissions_from_other_industry": "other_industry_co2",
+    "emissions_from_other_industry_per_capita": "other_co2_per_capita",
+    "pct_growth_emissions_total": "co2_growth_prct",
+    "growth_emissions_total": "co2_growth_abs",
+    "emissions_total_per_gdp": "co2_per_gdp",
+    "emissions_total_per_unit_energy": "co2_per_unit_energy",
+    "consumption_emissions": "consumption_co2",
+    "consumption_emissions_per_capita": "consumption_co2_per_capita",
+    "consumption_emissions_per_gdp": "consumption_co2_per_gdp",
+    "cumulative_emissions_total": "cumulative_co2",
+    "cumulative_emissions_from_cement": "cumulative_cement_co2",
+    "cumulative_emissions_from_coal": "cumulative_coal_co2",
+    "cumulative_emissions_from_flaring": "cumulative_flaring_co2",
+    "cumulative_emissions_from_gas": "cumulative_gas_co2",
+    "cumulative_emissions_from_oil": "cumulative_oil_co2",
+    "cumulative_emissions_from_other_industry": "cumulative_other_co2",
+    "pct_traded_emissions": "trade_co2_share",
+    "emissions_total_as_share_of_global": "share_global_co2",
+    "emissions_from_cement_as_share_of_global": "share_global_cement_co2",
+    "emissions_from_coal_as_share_of_global": "share_global_coal_co2",
+    "emissions_from_flaring_as_share_of_global": "share_global_flaring_co2",
+    "emissions_from_gas_as_share_of_global": "share_global_gas_co2",
+    "emissions_from_oil_as_share_of_global": "share_global_oil_co2",
+    "emissions_from_other_industry_as_share_of_global": "share_global_other_co2",
+    "cumulative_emissions_total_as_share_of_global": "share_global_cumulative_co2",
+    "cumulative_emissions_from_cement_as_share_of_global": "share_global_cumulative_cement_co2",
+    "cumulative_emissions_from_coal_as_share_of_global": "share_global_cumulative_coal_co2",
+    "cumulative_emissions_from_flaring_as_share_of_global": "share_global_cumulative_flaring_co2",
+    "cumulative_emissions_from_gas_as_share_of_global": "share_global_cumulative_gas_co2",
+    "cumulative_emissions_from_oil_as_share_of_global": "share_global_cumulative_oil_co2",
+    "cumulative_emissions_from_other_industry_as_share_of_global": "share_global_cumulative_other_co2",
 }
 CAIT_GHG_COLUMNS = {
     "country": "country",
@@ -281,13 +333,13 @@ def run(dest_dir: str) -> None:
     # Load data.
     #
     # Read all required datasets.
-    # Load Global Carbon Project (GCP) dataset.
+    # Load the global carbon budget dataset from the Global Carbon Project (GCP).
     ds_gcp = catalog.Dataset(GCP_PATH)
-    # Load CAIT dataset on greenhouse gas emissions by sector.
+    # Load the greenhouse gas emissions by sector dataset by CAIT.
     ds_cait = catalog.Dataset(CAIT_PATH)
-    # Load Maddison GDP dataset.
+    # Load the GDP dataset by GGDC Maddison.
     ds_gdp = catalog.Dataset(GDP_PATH)
-    # Load primary energy consumption dataset.
+    # Load primary energy consumption dataset (by different sources in our 'energy' namespace).
     ds_energy = catalog.Dataset(PRIMARY_ENERGY_PATH)
     # Load population dataset.
     ds_population = catalog.Dataset(POPULATION_PATH)
