@@ -2,10 +2,11 @@
 
 It combines the following datasets:
 - GCP's Fossil CO2 emissions (long-format csv).
-- GCP's official GCB global emissions (excel file) containing global bunker and land-use change emissions.
+- GCP's official GCB global emissions (excel file) containing global bunker fuel and land-use change emissions.
 - GCP's official GCB national emissions (excel file) containing consumption-based emissions for each country.
   - Production-based emissions from this file are also used, but just for sanity checks.
-- GCP's official GCB national land-use change emissions (excel file) containing land-use change emissions for each country.
+- GCP's official GCB national land-use change emissions (excel file) with land-use change emissions for each country.
+And additionally:
 - GGDC's Maddison dataset on GDP, used to calculate emissions per GDP.
 - Primary Energy Consumption (mix of sources from the 'energy' namespace) to calculate emissions per unit energy.
 - Population (mix of sources from the 'owid' namespace), to calculate emissions per capita.
@@ -14,7 +15,6 @@ It combines the following datasets:
 
 """
 
-from copy import deepcopy
 from typing import Dict, List, Optional
 
 import numpy as np
@@ -24,7 +24,6 @@ from owid.datautils import dataframes, geo
 
 from etl.paths import DATA_DIR, STEP_DIR
 
-# +
 # Define inputs.
 MEADOW_VERSION = "2022-11-11"
 # Country names harmonization file for fossil CO2 emissions data.
@@ -79,7 +78,6 @@ OUTLIERS_IN_CONSUMPTION_DF = [
 # Label used for international transport (emissions from oil in bunker fuels), included as a country in the
 # fossil CO2 emissions dataset.
 INTERNATIONAL_TRANSPORT_LABEL = "International Transport"
-# -
 
 # Regions and income groups to create by aggregating contributions from member countries.
 # In the following dictionary, if nothing is stated, the region is supposed to be a default continent/income group.
@@ -372,7 +370,10 @@ def sanity_checks_on_output_data(combined_df: pd.DataFrame) -> None:
     # Using ".is_monotonic_increasing" can fail when differences between consecutive numbers are very small.
     # Instead, sort data backwards in time, and check that consecutive values of cumulative variables always have
     # a percentage change that is smaller than, say, 0.1%.
-    error = "Cumulative variables (not given as a share of global) should be monotonically increasing (except when including land-use change emissions, which can be negative)."
+    error = (
+        "Cumulative variables (not given as a share of global) should be monotonically increasing (except when "
+        "including land-use change emissions, which can be negative)."
+    )
     assert (
         combined_df.sort_values("year", ascending=False)
         .groupby("country")
@@ -457,10 +458,10 @@ def prepare_fossil_co2_emissions(co2_df: pd.DataFrame) -> pd.DataFrame:
     co2_df = dataframes.combine_two_overlapping_dataframes(
         df1=co2_df, df2=aggregated_missing_data, index_columns=["country", "year"], keep_column_order=True
     )
+    ####################################################################################################################
 
-    # Instead of having "Kuwaiti Oil Fires" as a separate country, we add these as part of the emissions of Kuwait.
-    # We can then either keep or remove "Kuwaiti Oil Fires" from the data, but having these emissions as part of
-    # Kuwait ensures that they will be included in region aggregates.
+    # We add the emissions from "Kuwaiti Oil Fires" (which is also included as a separate country) as part of the
+    # emissions of Kuwait. This ensures that they will be included in region aggregates.
     error = "'Kuwaiti Oil Fires' was expected to only have not-null data for 1991."
     assert co2_df[
         (co2_df["country"] == "Kuwaiti Oil Fires")
@@ -980,37 +981,6 @@ def run(dest_dir: str) -> None:
     # Use metadata from yaml file.
     tb_garden.update_metadata_from_yaml(METADATA_PATH, DATASET_NAME)
 
-    ####################################################################################################################
-    # TODO: Remove this temporary solution once dataset is public and grapher channel works as usual.
-    #   This should happen in the grapher step.
-    variables_to_fill_with_zeros = [
-        "emissions_total",
-        'emissions_from_cement',
-        'emissions_from_coal',
-        'emissions_from_flaring',
-        'emissions_from_gas',
-        'emissions_from_land_use_change',
-        'emissions_from_oil',
-        'emissions_from_other_industry',
-        'cumulative_emissions_total',
-        'cumulative_emissions_from_cement',
-        'cumulative_emissions_from_coal',
-        'cumulative_emissions_from_flaring',
-        'cumulative_emissions_from_gas',
-        'cumulative_emissions_from_land_use_change',
-        'cumulative_emissions_from_oil',
-        'cumulative_emissions_from_other_industry',
-    ]
-    # Create additional variables in the table that have nans filled with zeros (for two specific stacked area charts).
-    for variable in variables_to_fill_with_zeros:
-        new_variable_name = variable + "_zero_filled"
-        tb_garden[new_variable_name] = tb_garden[variable].fillna(0)
-        tb_garden[new_variable_name].metadata = deepcopy(tb_garden[variable].metadata)
-        tb_garden[new_variable_name].metadata.title = tb_garden[variable].metadata.title + " (zero filled)"
-        tb_garden[new_variable_name].metadata.description =\
-            tb_garden[variable].metadata.description + " Missing data has been filled by zero."
-
-    ####################################################################################################################
     # Add combined table to garden dataset and save dataset.
     ds_garden.add(tb_garden)
     ds_garden.save()
