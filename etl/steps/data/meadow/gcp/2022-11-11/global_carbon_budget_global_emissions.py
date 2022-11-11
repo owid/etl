@@ -1,10 +1,8 @@
-"""TODO: Update.
+"""Prepare global emissions data (from one of the official excel files) of the Global Carbon Budget.
 
-This step just loads additional variables that are currently not included in the Global Carbon Budget (GCB) dataset
-(which was created in importers).
-
-In the future (next time GCB dataset is updated and moved to ETL), a newer version of this step should gather all
-required data from walden.
+The resulting dataset will have one table of historical global emissions, where fossil and land-use change emissions are
+separate variables. Bunker fuel emissions are not included as a separate variable (but their contribution is included as
+part of fossil emissions).
 
 """
 

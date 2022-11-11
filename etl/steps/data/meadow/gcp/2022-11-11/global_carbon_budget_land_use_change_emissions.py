@@ -1,10 +1,4 @@
-"""TODO: Update
-
-This step just loads additional variables that are currently not included in the Global Carbon Budget (GCB) dataset
-(which was created in importers).
-
-In the future (next time GCB dataset is updated and moved to ETL), a newer version of this step should gather all
-required data from walden.
+"""Prepare national land-use change emissions data (from one of the official excel files) of the Global Carbon Budget.
 
 """
 
@@ -86,7 +80,6 @@ def run(dest_dir: str) -> None:
     # Load national land-use change data file from walden.
     land_use_ds = WaldenCatalog().find_one(namespace="gcp", short_name=WALDEN_DATASET_NAME, version=WALDEN_VERSION)
     # Load production-based emissions from the national data file.
-    # TODO: Decide what sheet to use.
     land_use_df = pd.read_excel(land_use_ds.ensure_downloaded(), sheet_name="BLUE", skiprows=7)
 
     # Sanity check.

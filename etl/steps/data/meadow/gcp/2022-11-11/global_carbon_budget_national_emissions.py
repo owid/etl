@@ -1,10 +1,7 @@
-"""TODO: Update
+"""Prepare national fossil emissions data (from one of the official excel files) of the Global Carbon Budget.
 
-This step just loads additional variables that are currently not included in the Global Carbon Budget (GCB) dataset
-(which was created in importers).
-
-In the future (next time GCB dataset is updated and moved to ETL), a newer version of this step should gather all
-required data from walden.
+The resulting dataset will have one table for production-based emissions, and another for consumption-based emissions.
+Bunker emissions (which should be the same in both tables) is included as a separate country (called "Bunkers").
 
 """
 
@@ -28,8 +25,8 @@ MEADOW_TITLE = "Global Carbon Budget - National emissions"
 
 
 def prepare_national_emissions(df: pd.DataFrame, column_name: str) -> pd.DataFrame:
-    """Select variables and prepare the territorial emissions or the consumption emissions sheet of
-    GCB's raw national data file.
+    """Select variables and prepare the territorial emissions (or the consumption emissions) sheet of GCB's raw national
+    data file.
 
     Parameters
     ----------
@@ -97,7 +94,7 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    # Prepare production and consumption based emissions data.
+    # Prepare production-based and consumption-based emissions data.
     production_emissions_df = prepare_national_emissions(df=production_emissions_df, column_name="production_emissions")
     consumption_emissions_df = prepare_national_emissions(
         df=consumption_emissions_df, column_name="consumption_emissions"

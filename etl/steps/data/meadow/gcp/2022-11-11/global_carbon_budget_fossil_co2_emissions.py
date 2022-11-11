@@ -1,5 +1,8 @@
 """Prepare Global Carbon Budget Fossil CO2 data.
 
+The resulting dataset will have one table of national fossil CO2 emissions (that does not include land-use change
+emissions). Bunker emissions are included as a separate country, called "International Transport".
+
 """
 
 import pandas as pd
