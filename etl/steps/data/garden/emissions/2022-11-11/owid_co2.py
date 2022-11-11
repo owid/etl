@@ -22,8 +22,6 @@ DATASET_SHORT_NAME = "owid_co2"
 DATASET_TITLE = "CO2 dataset (OWID, 2022)"
 METADATA_PATH = CURRENT_DIR / f"{DATASET_SHORT_NAME}.meta.yml"
 # Details for datasets to import.
-# TODO: Remove.
-OLD_GCP_PATH = DATA_DIR / "backport/owid/latest/dataset_5582_global_carbon_budget__global_carbon_project__v2021/"
 GCP_PATH = DATA_DIR / "garden/gcp/2022-11-11/global_carbon_budget"
 CAIT_PATH = DATA_DIR / "garden/cait/2022-08-10/ghg_emissions_by_sector"
 PRIMARY_ENERGY_PATH = DATA_DIR / "garden/energy/2022-07-29/primary_energy_consumption"
@@ -37,59 +35,7 @@ GDP_PATH = DATA_DIR / "garden/ggdc/2020-10-01/ggdc_maddison"
 # Conversion factor from tonnes to million tonnes.
 TONNES_TO_MILLION_TONNES = 1e-6
 
-# +
-# TODO: Add national land-use change emissions variable.
-# -
-
-# TODO: Remove.
-OLD_GCP_COLUMNS = {
-    "country": "country",
-    "year": "year",
-    "annual_co2_emissions": "co2",
-    "annual_co2_emissions__per_capita": "co2_per_capita",
-    "annual_co2_emissions_embedded_in_trade": "trade_co2",
-    "annual_co2_emissions_from_cement": "cement_co2",
-    "annual_co2_emissions_from_cement__per_capita": "cement_co2_per_capita",
-    "annual_co2_emissions_from_coal": "coal_co2",
-    "annual_co2_emissions_from_coal__per_capita": "coal_co2_per_capita",
-    "annual_co2_emissions_from_flaring": "flaring_co2",
-    "annual_co2_emissions_from_flaring__per_capita": "flaring_co2_per_capita",
-    "annual_co2_emissions_from_gas": "gas_co2",
-    "annual_co2_emissions_from_gas__per_capita": "gas_co2_per_capita",
-    "annual_co2_emissions_from_oil": "oil_co2",
-    "annual_co2_emissions_from_oil__per_capita": "oil_co2_per_capita",
-    "annual_co2_emissions_from_other_industry": "other_industry_co2",
-    "annual_co2_emissions_from_other_industry__per_capita": "other_co2_per_capita",
-    "annual_co2_emissions_growth__pct": "co2_growth_prct",
-    "annual_co2_emissions_growth__abs": "co2_growth_abs",
-    "annual_co2_emissions_per_gdp__kg_per_dollarppp": "co2_per_gdp",
-    "annual_co2_emissions_per_unit_energy__kg_per_kilowatt_hour": "co2_per_unit_energy",
-    "annual_consumption_based_co2_emissions": "consumption_co2",
-    "annual_consumption_based_co2_emissions__per_capita": "consumption_co2_per_capita",
-    "annual_consumption_based_co2_emissions_per_gdp__kg_per_dollarppp": "consumption_co2_per_gdp",
-    "cumulative_co2_emissions": "cumulative_co2",
-    "cumulative_co2_emissions_from_cement": "cumulative_cement_co2",
-    "cumulative_co2_emissions_from_coal": "cumulative_coal_co2",
-    "cumulative_co2_emissions_from_flaring": "cumulative_flaring_co2",
-    "cumulative_co2_emissions_from_gas": "cumulative_gas_co2",
-    "cumulative_co2_emissions_from_oil": "cumulative_oil_co2",
-    "cumulative_co2_emissions_from_other_industry": "cumulative_other_co2",
-    "share_of_annual_co2_emissions_embedded_in_trade": "trade_co2_share",
-    "share_of_global_annual_co2_emissions": "share_global_co2",
-    "share_of_global_annual_co2_emissions_from_cement": "share_global_cement_co2",
-    "share_of_global_annual_co2_emissions_from_coal": "share_global_coal_co2",
-    "share_of_global_annual_co2_emissions_from_flaring": "share_global_flaring_co2",
-    "share_of_global_annual_co2_emissions_from_gas": "share_global_gas_co2",
-    "share_of_global_annual_co2_emissions_from_oil": "share_global_oil_co2",
-    "share_of_global_annual_co2_emissions_from_other_industry": "share_global_other_co2",
-    "share_of_global_cumulative_co2_emissions": "share_global_cumulative_co2",
-    "share_of_global_cumulative_co2_emissions_from_cement": "share_global_cumulative_cement_co2",
-    "share_of_global_cumulative_co2_emissions_from_coal": "share_global_cumulative_coal_co2",
-    "share_of_global_cumulative_co2_emissions_from_flaring": "share_global_cumulative_flaring_co2",
-    "share_of_global_cumulative_co2_emissions_from_gas": "share_global_cumulative_gas_co2",
-    "share_of_global_cumulative_co2_emissions_from_oil": "share_global_cumulative_oil_co2",
-    "share_of_global_cumulative_co2_emissions_from_other_industry": "share_global_cumulative_other_co2",
-}
+# Select columns to use from each dataset, and how to rename them.
 GCP_COLUMNS = {
     "country": "country",
     "year": "year",
@@ -137,6 +83,21 @@ GCP_COLUMNS = {
     "cumulative_emissions_from_gas_as_share_of_global": "share_global_cumulative_gas_co2",
     "cumulative_emissions_from_oil_as_share_of_global": "share_global_cumulative_oil_co2",
     "cumulative_emissions_from_other_industry_as_share_of_global": "share_global_cumulative_other_co2",
+    # New variables, related to land-use change emissions.
+    'cumulative_emissions_from_land_use_change': 'cumulative_luc_co2',
+    'cumulative_emissions_from_land_use_change_as_share_of_global': 'share_global_cumulative_luc_co2',
+    'cumulative_emissions_total_including_land_use_change': 'cumulative_co2_including_luc',
+    'cumulative_emissions_total_including_land_use_change_as_share_of_global': 'share_global_cumulative_co2_including_luc',
+    'emissions_from_land_use_change': 'land_use_change_co2',
+    'emissions_from_land_use_change_as_share_of_global': 'share_global_luc_co2',
+    'emissions_from_land_use_change_per_capita': 'land_use_change_co2_per_capita',
+    'emissions_total_including_land_use_change': 'co2_including_luc',
+    'emissions_total_including_land_use_change_as_share_of_global': 'share_global_co2_including_luc',
+    'emissions_total_including_land_use_change_per_capita': 'co2_including_luc_per_capita',
+    'emissions_total_including_land_use_change_per_gdp': 'co2_including_luc_per_gdp',
+    'emissions_total_including_land_use_change_per_unit_energy': 'co2_including_luc_per_unit_energy',
+    'growth_emissions_total_including_land_use_change': 'co2_including_luc_growth_abs',
+    'pct_growth_emissions_total_including_land_use_change': 'co2_including_luc_growth_prct',
 }
 CAIT_GHG_COLUMNS = {
     "country": "country",
