@@ -23,6 +23,7 @@ class Options(Enum):
     ADD_TO_DAG = "Add steps into dag.yml file"
     INCLUDE_METADATA_YAML = "Include *.meta.yaml file with metadata"
     GENERATE_NOTEBOOK = "Generate playground notebook"
+    IS_PRIVATE = "Make dataset private"
 
 
 class GardenForm(BaseModel):
@@ -33,12 +34,14 @@ class GardenForm(BaseModel):
     add_to_dag: bool
     include_metadata_yaml: bool
     generate_notebook: bool
+    is_private: bool
 
     def __init__(self, **data: Any) -> None:
         options = data.pop("options")
         data["add_to_dag"] = Options.ADD_TO_DAG.value in options
         data["include_metadata_yaml"] = Options.INCLUDE_METADATA_YAML.value in options
         data["generate_notebook"] = Options.GENERATE_NOTEBOOK.value in options
+        data["is_private"] = Options.IS_PRIVATE.value in options
         super().__init__(**data)
 
 
@@ -80,6 +83,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
                     Options.ADD_TO_DAG.value,
                     Options.INCLUDE_METADATA_YAML.value,
                     Options.GENERATE_NOTEBOOK.value,
+                    Options.IS_PRIVATE.value,
                 ],
                 name="options",
                 value=[
@@ -95,11 +99,13 @@ def app(run_checks: bool, dummy_data: bool) -> None:
     if run_checks:
         _check_dataset_in_meadow(form)
 
+    private_suffix = "-private" if form.is_private else ""
+
     if form.add_to_dag:
         dag_content = utils.add_to_dag(
             {
-                f"data://garden/{form.namespace}/{form.version}/{form.short_name}": [
-                    f"data://meadow/{form.namespace}/{form.version}/{form.short_name}"
+                f"data{private_suffix}://garden/{form.namespace}/{form.version}/{form.short_name}": [
+                    f"data{private_suffix}://meadow/{form.namespace}/{form.version}/{form.short_name}"
                 ]
             }
         )
@@ -133,7 +139,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
 2. Run `etl` to generate the dataset
 
     ```
-    poetry run etl data://garden/{form.namespace}/{form.version}/{form.short_name}
+    poetry run etl data{private_suffix}://garden/{form.namespace}/{form.version}/{form.short_name} {"--private" if form.is_private else ""}
     ```
 
 2. (Optional) Generated notebook `{notebook_path.relative_to(ETL_DIR)}` can be used to examine the dataset output interactively.
@@ -159,7 +165,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
     then manual edit it and rerun the step again with
 
     ```
-    poetry run etl data://garden/{form.namespace}/{form.version}/{form.short_name}
+    poetry run etl data{private_suffix}://garden/{form.namespace}/{form.version}/{form.short_name} {"--private" if form.is_private else ""}
     ```
 
 5. Create a branch in [Walden](https://github.com/owid/walden) and [ETL](https://github.com/owid/etl) repositories, get it reviewed and merged.
@@ -188,8 +194,10 @@ def app(run_checks: bool, dummy_data: bool) -> None:
 
 
 def _check_dataset_in_meadow(form: GardenForm) -> None:
+    private_suffix = "-private" if form.is_private else ""
+
     po.put_markdown("""## Checking Meadow dataset...""")
-    cmd = f"etl data://meadow/{form.namespace}/{form.version}/{form.short_name}"
+    cmd = f"etl data{private_suffix}://meadow/{form.namespace}/{form.version}/{form.short_name}"
 
     try:
         ds = Dataset(DATA_DIR / "meadow" / form.namespace / form.version / form.short_name)
