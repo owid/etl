@@ -19,6 +19,7 @@ ETL_DIR = Path(etl.__file__).parent.parent
 class Options(Enum):
 
     ADD_TO_DAG = "Add steps into dag.yml file"
+    IS_PRIVATE = "Make dataset private"
 
 
 class GrapherForm(BaseModel):
@@ -27,10 +28,12 @@ class GrapherForm(BaseModel):
     namespace: str
     version: str
     add_to_dag: bool
+    is_private: bool
 
     def __init__(self, **data: Any) -> None:
         options = data.pop("options")
         data["add_to_dag"] = Options.ADD_TO_DAG.value in options
+        data["is_private"] = Options.IS_PRIVATE.value in options
         super().__init__(**data)
 
 
@@ -75,6 +78,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
                 "Additional Options",
                 options=[
                     Options.ADD_TO_DAG.value,
+                    Options.IS_PRIVATE.value,
                 ],
                 name="options",
                 value=[
@@ -85,11 +89,13 @@ def app(run_checks: bool, dummy_data: bool) -> None:
     )
     form = GrapherForm(**data)
 
+    private_suffix = "-private" if form.is_private else ""
+
     if form.add_to_dag:
         dag_content = utils.add_to_dag(
             {
-                f"data://grapher/{form.namespace}/{form.version}/{form.short_name}": [
-                    f"data://garden/{form.namespace}/{form.version}/{form.short_name}"
+                f"data{private_suffix}://grapher/{form.namespace}/{form.version}/{form.short_name}": [
+                    f"data{private_suffix}://garden/{form.namespace}/{form.version}/{form.short_name}"
                 ]
             }
         )
@@ -115,7 +121,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
 
     Then run the grapher step:
     ```
-    etl grapher/{form.namespace}/{form.version}/{form.short_name} --grapher
+    etl grapher/{form.namespace}/{form.version}/{form.short_name} --grapher {"--private" if form.is_private else ""}
     ```
 
 2. When you feel confident, use `.env.staging` for staging which looks something like this:
@@ -138,7 +144,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
     After you run
 
     ```
-    ENV=.env.staging etl grapher/{form.namespace}/{form.version}/{form.short_name} --grapher
+    ENV=.env.staging etl grapher/{form.namespace}/{form.version}/{form.short_name} --grapher {"--private" if form.is_private else ""}
     ```
 
     you should see it [in staging admin](https://staging.owid.cloud/admin/datasets).
@@ -146,7 +152,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
 3. Pushing to production grapher is **not yet automated**. After you get it reviewed and approved, you can use `.env.prod` file and run
 
     ```
-    ENV=.env.prod etl grapher/{form.namespace}/{form.version}/{form.short_name} --grapher
+    ENV=.env.prod etl grapher/{form.namespace}/{form.version}/{form.short_name} --grapher {"--private" if form.is_private else ""}
     ```
 
 4. Check your dataset in [admin](https://owid.cloud/admin/datasets).
