@@ -15,6 +15,7 @@ from owid.catalog import Dataset, Table, TableMeta
 from owid.catalog.utils import underscore_table
 from owid.walden import Catalog as WaldenCatalog
 from structlog import get_logger
+import hashlib
 
 from etl.helpers import Names
 from etl.steps.data.converters import convert_walden_metadata
@@ -33,7 +34,7 @@ VERSION_WALDEN = "2022-11-01"
 VERSION_MEADOW = "2022-11-04"
 # Data file
 DATA_FILE = N.directory / f"{SHORT_NAME}.data.csv"
-TEXT_EXPECTED = N.directory / f"{SHORT_NAME}.text_expected.txt"
+HASH_EXPECTED = "b80b1796b1a2ce683db5ea9c5dc5ac2d"
 
 
 def run(dest_dir: str) -> None:
@@ -59,7 +60,7 @@ def run(dest_dir: str) -> None:
     # finally save the dataset
     ds.save()
 
-    log.info("zijdeman_et_al_2015.end")
+    log.info(f"{SHORT_NAME}.end")
 
 
 def check_expected_data(local_file: str) -> None:
@@ -73,9 +74,8 @@ def check_expected_data(local_file: str) -> None:
         pdfReader = PyPDF2.PdfFileReader(f)
         text_pdf = pdfReader.getPage(2).extract_text()
     # Load text from PDF as expected
-    with open(TEXT_EXPECTED, "r") as f:
-        text_expected = f.read()
-    assert text_pdf == text_expected, "Text from PDF does not match expected text."
+    hash = hashlib.md5(text_pdf.encode()).hexdigest()
+    assert hash == HASH_EXPECTED, "Text from PDF does not match expected text."
 
 
 def load_data() -> pd.DataFrame:
