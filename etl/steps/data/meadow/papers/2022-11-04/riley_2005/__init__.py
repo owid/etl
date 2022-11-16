@@ -9,13 +9,14 @@ recognize and extract the data from the table (in page 2)
 I decided to manually extract the data from the PDF and save it as a CSV and get feedback
 from authors.
 """
+import hashlib
+
 import pandas as pd
 import PyPDF2
 from owid.catalog import Dataset, Table, TableMeta
 from owid.catalog.utils import underscore_table
 from owid.walden import Catalog as WaldenCatalog
 from structlog import get_logger
-import hashlib
 
 from etl.helpers import Names
 from etl.steps.data.converters import convert_walden_metadata
