@@ -48,7 +48,8 @@ def run(dest_dir: str) -> None:
         table[new_variable_name].metadata = deepcopy(table[variable].metadata)
         table[new_variable_name].metadata.title = table[variable].metadata.title + " (zero filled)"
         table[new_variable_name].metadata.description = (
-            table[variable].metadata.description + " Missing data has been filled by zero."
+            table[variable].metadata.description + " Missing data has been filled with zeros for the purposes of data "
+            "visualization."
         )
 
     # Add table to Grapher dataset and save dataset.
