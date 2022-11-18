@@ -58,6 +58,7 @@ simplejson = "^3.17.6"
 bugsnag = "^4.2.1"
 xlrd = "^2.0.1"
 awscli = "^1.25.79"
+PyPDF2 = "^2.11.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.1.2"

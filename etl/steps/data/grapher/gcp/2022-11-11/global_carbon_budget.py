@@ -3,6 +3,7 @@
 Some auxiliary variables will be added (where nans are filled with zeros, to avoid missing data in stacked area charts).
 
 """
+
 from copy import deepcopy
 
 from owid import catalog
@@ -41,6 +42,12 @@ def run(dest_dir: str) -> None:
     # Load table from Garden dataset.
     table = N.garden_dataset["global_carbon_budget"]
 
+    # Check that all countries span all years (from 1750 to the latest observation) even if many of those years
+    # are empty, so that stacked area charts will span the maximum possible range of years.
+    error = "All countries should span all years (even if some have no data)."
+    n_years = len(set(table.reset_index()["year"]))
+    assert (table.reset_index().groupby("country").agg({"year": "count"}) == n_years)["year"].all(), error
+
     # Create additional variables in the table that have nans filled with zeros (for two specific stacked area charts).
     for variable in VARIABLES_TO_FILL_WITH_ZEROS:
         new_variable_name = variable + "_zero_filled"
@@ -48,7 +55,8 @@ def run(dest_dir: str) -> None:
         table[new_variable_name].metadata = deepcopy(table[variable].metadata)
         table[new_variable_name].metadata.title = table[variable].metadata.title + " (zero filled)"
         table[new_variable_name].metadata.description = (
-            table[variable].metadata.description + " Missing data has been filled by zero."
+            table[variable].metadata.description + " Missing data has been filled with zeros for the purposes of data "
+            "visualization."
         )
 
     # Add table to Grapher dataset and save dataset.
