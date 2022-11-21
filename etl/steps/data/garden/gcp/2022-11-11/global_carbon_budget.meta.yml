@@ -287,8 +287,8 @@ tables:
         description: "Annual production-based emissions of carbon dioxide (CO₂), including land-use change, measured in tonnes per person. This is based on territorial emissions, which do not account for emissions embedded in traded goods."
       emissions_total_including_land_use_change_per_gdp:
         title: "Annual CO₂ emissions including land-use change per GDP"
-        unit: "tonnes"
-        short_unit: "t"
+        unit: "kilograms per $PPP"
+        short_unit: "kg/$"
         description: "Annual total production-based emissions of carbon dioxide (CO₂), including land-use change, measured in kilograms per dollar of GDP (2011 international-$). Production-based emissions are based on territorial emissions, which do not account for emissions embedded in traded goods."
       emissions_total_including_land_use_change_per_unit_energy:
         title: "Annual CO₂ emissions including land-use change per unit energy"
