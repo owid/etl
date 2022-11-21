@@ -233,10 +233,8 @@ def combine_tables(
     # Countries-regions dataset does not have a year column, so it has to be merged on country.
     combined = pd.merge(combined, tb_countries_regions, on="country", how="left")
 
-    # Since GCP data is backported, it does not have sources metadata.
-    # Similarly, OWID population dataset does not have sources metadata.
+    # OWID population dataset does not have sources metadata.
     # Add those sources manually.
-    tb_gcp.metadata.dataset.sources = [catalog.meta.Source(name="Our World in Data based on Global Carbon Project.")]
     tb_population.metadata.dataset = catalog.meta.DatasetMeta(
         sources=[
             catalog.meta.Source(
