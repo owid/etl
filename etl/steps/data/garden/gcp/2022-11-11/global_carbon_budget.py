@@ -177,15 +177,15 @@ TONNES_OF_CO2_TO_KG_OF_CO2 = 1000
 # In order to remove uninformative columns, keep only rows where at least one of the following columns has data.
 # All other columns are either derived variables, or global variables, or auxiliary variables from other datasets.
 COLUMNS_THAT_MUST_HAVE_DATA = [
-    'emissions_from_cement',
-    'emissions_from_coal',
-    'emissions_from_flaring',
-    'emissions_from_gas',
-    'emissions_from_oil',
-    'emissions_from_other_industry',
-    'emissions_total',
-    'consumption_emissions',
-    'emissions_from_land_use_change',
+    "emissions_from_cement",
+    "emissions_from_coal",
+    "emissions_from_flaring",
+    "emissions_from_gas",
+    "emissions_from_oil",
+    "emissions_from_other_industry",
+    "emissions_total",
+    "consumption_emissions",
+    "emissions_from_land_use_change",
     # 'land_use_change_quality_flag',
 ]
 
@@ -340,15 +340,22 @@ def sanity_checks_on_input_data(
     comparison = pd.merge(
         co2_df[["country", "year", "emissions_total"]],
         production_df.replace({"Bunkers": "International Transport", "World": "Global"}),
-        on=["country", "year"], how="inner").dropna(subset=["emissions_total", "production_emissions"], how="any")
+        on=["country", "year"],
+        how="inner",
+    ).dropna(subset=["emissions_total", "production_emissions"], how="any")
     # Since we included the emissions from the Kuwaiti oil fires in Kuwait (and they are not included in production_df),
-    # omit that row in the comparison.
-    comparison = comparison.drop(comparison[(comparison["country"] == "Kuwait") & (comparison["year"] == 1991)].index).reset_index(drop=True)
+    # omit that row in the comparison.
+    comparison = comparison.drop(
+        comparison[(comparison["country"] == "Kuwait") & (comparison["year"] == 1991)].index
+    ).reset_index(drop=True)
 
     error = "Production emissions from national file were expected to coincide with the Fossil CO2 emissions dataset."
     assert (
-        (100 * abs(comparison["production_emissions"] - comparison["emissions_total"])
-        / (comparison["emissions_total"])).fillna(0)
+        (
+            100
+            * abs(comparison["production_emissions"] - comparison["emissions_total"])
+            / (comparison["emissions_total"])
+        ).fillna(0)
         < 0.1
     ).all(), error
 
@@ -510,7 +517,14 @@ def prepare_fossil_co2_emissions(co2_df: pd.DataFrame) -> pd.DataFrame:
 
     # Check that "emissions_total" agrees with the sum of emissions from individual sources.
     error = "The sum of all emissions should add up to total emissions (within 1%)."
-    assert (abs(co2_df.drop(columns=["country", "year", "emissions_total"]).sum(axis=1) - co2_df["emissions_total"].fillna(0)) / (co2_df["emissions_total"].fillna(0) + 1e-7) < 1e-2).all(), error
+    assert (
+        abs(
+            co2_df.drop(columns=["country", "year", "emissions_total"]).sum(axis=1)
+            - co2_df["emissions_total"].fillna(0)
+        )
+        / (co2_df["emissions_total"].fillna(0) + 1e-7)
+        < 1e-2
+    ).all(), error
 
     # Many rows have zero total emissions, but actually the individual sources are nan.
     # Total emissions in those cases should be nan, instead of zero.
@@ -701,8 +715,15 @@ def combine_data_and_add_variables(
     """
     # Add region aggregates that were included in the national emissions file, but not in the Fossil CO2 emissions dataset.
     gcp_aggregates = sorted(set(production_df["country"]) - set(co2_df["country"]))
-    co2_df = pd.concat([co2_df, production_df[production_df["country"].isin(gcp_aggregates)].rename(columns={
-        "production_emissions": "emissions_total"}).astype({"year": int})], ignore_index=True).reset_index(drop=True)
+    co2_df = pd.concat(
+        [
+            co2_df,
+            production_df[production_df["country"].isin(gcp_aggregates)]
+            .rename(columns={"production_emissions": "emissions_total"})
+            .astype({"year": int}),
+        ],
+        ignore_index=True,
+    ).reset_index(drop=True)
 
     # Add consumption emissions to main dataframe (keep only the countries of the main dataframe).
     # Given that additional GCP regions (e.g. "Africa (GCP)") have already been added to co2_df

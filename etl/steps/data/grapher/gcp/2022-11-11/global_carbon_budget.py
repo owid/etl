@@ -49,7 +49,7 @@ def run(dest_dir: str) -> None:
     # range of years.
     countries = table.reset_index()["country"].unique()
     years = np.arange(table.reset_index()["year"].min(), table.reset_index()["year"].max() + 1, dtype=int)
-    table = table.reindex(pd.MultiIndex.from_product([countries, years], names=['country', 'year']))
+    table = table.reindex(pd.MultiIndex.from_product([countries, years], names=["country", "year"]))
 
     # Create additional variables in the table that have nans filled with zeros (for two specific stacked area charts).
     for variable in VARIABLES_TO_FILL_WITH_ZEROS:
