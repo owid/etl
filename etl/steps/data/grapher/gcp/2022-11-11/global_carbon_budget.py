@@ -6,6 +6,8 @@ Some auxiliary variables will be added (where nans are filled with zeros, to avo
 
 from copy import deepcopy
 
+import numpy as np
+import pandas as pd
 from owid import catalog
 
 from etl.helpers import Names
@@ -42,11 +44,12 @@ def run(dest_dir: str) -> None:
     # Load table from Garden dataset.
     table = N.garden_dataset["global_carbon_budget"]
 
-    # Check that all countries span all years (from 1750 to the latest observation) even if many of those years
-    # are empty, so that stacked area charts will span the maximum possible range of years.
-    error = "All countries should span all years (even if some have no data)."
-    n_years = len(set(table.reset_index()["year"]))
-    assert (table.reset_index().groupby("country").agg({"year": "count"}) == n_years)["year"].all(), error
+    # Ensure all countries span all years (from 1750 to the latest observation), even if many of those rows are empty.
+    # This will increase the size of the dataset, but we do this so that stacked area charts span the maximum possible
+    # range of years.
+    countries = table.reset_index()["country"].unique()
+    years = np.arange(table.reset_index()["year"].min(), table.reset_index()["year"].max() + 1, dtype=int)
+    table = table.reindex(pd.MultiIndex.from_product([countries, years], names=["country", "year"]))
 
     # Create additional variables in the table that have nans filled with zeros (for two specific stacked area charts).
     for variable in VARIABLES_TO_FILL_WITH_ZEROS:

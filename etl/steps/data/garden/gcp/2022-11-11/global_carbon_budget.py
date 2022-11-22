@@ -4,7 +4,8 @@ It combines the following datasets:
 - GCP's Fossil CO2 emissions (long-format csv).
 - GCP's official GCB global emissions (excel file) containing global bunker fuel and land-use change emissions.
 - GCP's official GCB national emissions (excel file) containing consumption-based emissions for each country.
-  - Production-based emissions from this file are also used, but just for sanity checks.
+  - Production-based emissions from this file are also used, but just to include total emissions of regions
+    according to GCP (e.g. "Africa (GCP)") and for sanity checks.
 - GCP's official GCB national land-use change emissions (excel file) with land-use change emissions for each country.
 And additionally:
 - GGDC's Maddison dataset on GDP, used to calculate emissions per GDP.
@@ -173,6 +174,21 @@ MILLION_TONNES_OF_CO2_TO_TONNES_OF_CO2 = 1e6
 # Conversion from tonnes of CO2 to kg of CO2 (used for emissions per GDP and per unit energy).
 TONNES_OF_CO2_TO_KG_OF_CO2 = 1000
 
+# In order to remove uninformative columns, keep only rows where at least one of the following columns has data.
+# All other columns are either derived variables, or global variables, or auxiliary variables from other datasets.
+COLUMNS_THAT_MUST_HAVE_DATA = [
+    "emissions_from_cement",
+    "emissions_from_coal",
+    "emissions_from_flaring",
+    "emissions_from_gas",
+    "emissions_from_oil",
+    "emissions_from_other_industry",
+    "emissions_total",
+    "consumption_emissions",
+    "emissions_from_land_use_change",
+    # 'land_use_change_quality_flag',
+]
+
 
 def get_countries_in_region(
     region: str, region_modifications: Optional[Dict[str, Dict[str, List[str]]]] = None
@@ -256,6 +272,7 @@ def sanity_checks_on_input_data(
     production_df = production_df.copy()
     consumption_df = consumption_df.copy()
     historical_df = historical_df.copy()
+    co2_df = co2_df.copy()
 
     # In the original data, Bunkers was included in the national data file, as another country.
     # But I suppose it should be considered as another kind of global emission.
@@ -283,7 +300,6 @@ def sanity_checks_on_input_data(
 
     # Check that all production-based emissions are positive.
     error = "There are negative emissions in production_df (from the additional variables dataset)."
-    # assert (production_df["production_emissions"].fillna(0) >= 0).all(), error
     assert (production_df.drop(columns=["country", "year"]).fillna(0) >= 0).all().all(), error
 
     # Check that all production-based emissions from the fossil CO2 dataset are positive.
@@ -313,9 +329,34 @@ def sanity_checks_on_input_data(
     )
     error = "Production emissions for the world were expected to coincide with global fossil emissions."
     assert (
-        (comparison["production_emissions"] - comparison["global_fossil_emissions"])
+        abs(comparison["production_emissions"] - comparison["global_fossil_emissions"])
         / (comparison["global_fossil_emissions"])
         < 0.001
+    ).all(), error
+
+    # Check that emissions in production_df (emissions from the national excel file) coincide with emissions in co2_df
+    # (from the Fossil CO2 emissions csv file).
+    # Given that country names have not yet been harmonized, rename the only countries that are present in both datasets.
+    comparison = pd.merge(
+        co2_df[["country", "year", "emissions_total"]],
+        production_df.replace({"Bunkers": "International Transport", "World": "Global"}),
+        on=["country", "year"],
+        how="inner",
+    ).dropna(subset=["emissions_total", "production_emissions"], how="any")
+    # Since we included the emissions from the Kuwaiti oil fires in Kuwait (and they are not included in production_df),
+    # omit that row in the comparison.
+    comparison = comparison.drop(
+        comparison[(comparison["country"] == "Kuwait") & (comparison["year"] == 1991)].index
+    ).reset_index(drop=True)
+
+    error = "Production emissions from national file were expected to coincide with the Fossil CO2 emissions dataset."
+    assert (
+        (
+            100
+            * abs(comparison["production_emissions"] - comparison["emissions_total"])
+            / (comparison["emissions_total"])
+        ).fillna(0)
+        < 0.1
     ).all(), error
 
 
@@ -474,6 +515,22 @@ def prepare_fossil_co2_emissions(co2_df: pd.DataFrame) -> pd.DataFrame:
         + co2_df[(co2_df["country"] == "Kuwait") & (co2_df["year"] == 1991)][EMISSION_SOURCES].values
     )
 
+    # Check that "emissions_total" agrees with the sum of emissions from individual sources.
+    error = "The sum of all emissions should add up to total emissions (within 1%)."
+    assert (
+        abs(
+            co2_df.drop(columns=["country", "year", "emissions_total"]).sum(axis=1)
+            - co2_df["emissions_total"].fillna(0)
+        )
+        / (co2_df["emissions_total"].fillna(0) + 1e-7)
+        < 1e-2
+    ).all(), error
+
+    # Many rows have zero total emissions, but actually the individual sources are nan.
+    # Total emissions in those cases should be nan, instead of zero.
+    no_individual_emissions = co2_df.drop(columns=["country", "year", "emissions_total"]).isnull().all(axis=1)
+    co2_df.loc[no_individual_emissions, "emissions_total"] = np.nan
+
     return co2_df
 
 
@@ -608,47 +665,22 @@ def harmonize_co2_data(co2_df: pd.DataFrame) -> pd.DataFrame:
         warn_on_unused_countries=True,
     )
 
+    # Check that there is only one data point for each country-year.
     # After harmonization, "Pacific Islands (Palau)" is mapped to "Palau", and therefore there are rows with different
     # data for the same country-year.
     # However, "Pacific Islands (Palau)" have data until 1991, and "Palau" has data from 1992 onwards.
-    # Check that they don't have (non-zero) data on the same years.
-    error = "Countries 'Pacific Islands (Palau)' and 'Palau' should not have data in overlapping years."
-    assert (
-        set(co2_df[(co2_df["country"] == "Pacific Islands (Palau)") & (co2_df["emissions_total"] != 0)]["year"])
-        & set(co2_df[(co2_df["country"] == "Palau") & (co2_df["emissions_total"] != 0)]["year"])
-        == set()
-    ), error
-
-    # Check that the only duplicated rows found are for "Palau".
-    error = "Expected duplicated data for Palau; Maybe this is no longer the case, and the code could be simplified."
-    assert co2_df[co2_df.duplicated(subset=["country", "year"])]["country"].unique().tolist() == [  # type: ignore
-        "Palau"
-    ], error
-
-    # Select data for Palau, sort by total emissions (ensuring nans are positioned before zeros), then drop duplicates
-    # keeping the last value. This way we keep the original nans, but prioritize non-zero data when there was any.
-    palau_df = (
-        co2_df[co2_df["country"] == "Palau"]
-        .sort_values("emissions_total", na_position="first")
-        .drop_duplicates(subset=["country", "year"], keep="last")
-        .reset_index(drop=True)
-    )
-
-    # Concatenate Palau data with the main dataframe, and sort conveniently.
-    co2_df = (
-        pd.concat([co2_df[co2_df["country"] != "Palau"], palau_df], ignore_index=True)
-        .sort_values(["country", "year"])
-        .reset_index(drop=True)
-    )
-
-    # Remove duplicated rows.
-    co2_df = co2_df.drop_duplicates(subset=["country", "year"], keep="last").reset_index(drop=True)
+    # After removing empty rows, there should be no overlap.
+    columns_that_must_have_data = co2_df.drop(columns=["country", "year"]).columns
+    check = co2_df.dropna(subset=columns_that_must_have_data, how="all").reset_index(drop=True)
+    error = "After harmonizing country names, there is more than one data point for the same country-year."
+    assert check[check.duplicated(subset=["country", "year"])].empty, error
 
     return co2_df
 
 
 def combine_data_and_add_variables(
     co2_df: pd.DataFrame,
+    production_df: pd.DataFrame,
     consumption_df: pd.DataFrame,
     global_emissions_df: pd.DataFrame,
     land_use_df: pd.DataFrame,
@@ -662,6 +694,8 @@ def combine_data_and_add_variables(
     ----------
     co2_df : pd.DataFrame
         Production-based emissions from GCP's Fossil CO2 emissions dataset (csv file), after harmonization.
+    production_df : pd.DataFrame
+        Production-based emissions from GCP's official national emissions dataset (excel file), after harmonization.
     consumption_df : pd.DataFrame
         Consumption-based emissions from GCP's official national emissions dataset (excel file), after harmonization.
     global_emissions_df : pd.DataFrame
@@ -679,9 +713,24 @@ def combine_data_and_add_variables(
         Combined data, with all additional variables and with region aggregates.
 
     """
+    # Add region aggregates that were included in the national emissions file, but not in the Fossil CO2 emissions dataset.
+    gcp_aggregates = sorted(set(production_df["country"]) - set(co2_df["country"]))
+    co2_df = pd.concat(
+        [
+            co2_df,
+            production_df[production_df["country"].isin(gcp_aggregates)]
+            .rename(columns={"production_emissions": "emissions_total"})
+            .astype({"year": int}),
+        ],
+        ignore_index=True,
+    ).reset_index(drop=True)
 
     # Add consumption emissions to main dataframe (keep only the countries of the main dataframe).
-    co2_df = pd.merge(co2_df, consumption_df, on=["country", "year"], how="left")
+    # Given that additional GCP regions (e.g. "Africa (GCP)") have already been added to co2_df
+    # (when merging with production_df), all countries from consumption_df should be included in co2_df.
+    error = "Some countries in consumption_df are not included in co2_df."
+    assert set(consumption_df["country"]) < set(co2_df["country"]), error
+    co2_df = pd.merge(co2_df, consumption_df, on=["country", "year"], how="outer")
 
     # Add population to dataframe.
     co2_df = geo.add_population_to_dataframe(df=co2_df, warn_on_missing_countries=False)
@@ -710,8 +759,8 @@ def combine_data_and_add_variables(
         ignore_index=True,
     ).astype({"year": int})
 
-    # Add land-us change emissions to main dataframe.
-    co2_df = pd.merge(co2_df, land_use_df, on=["country", "year"], how="left")
+    # Add land-use change emissions to main dataframe.
+    co2_df = pd.merge(co2_df, land_use_df, on=["country", "year"], how="outer")
 
     # Add total emissions (including land-use change) for each country.
     co2_df["emissions_total_including_land_use_change"] = (
@@ -838,6 +887,14 @@ def combine_data_and_add_variables(
     for column in co2_df.drop(columns=["country", "year"]).columns:
         co2_df.loc[np.isinf(co2_df[column]), column] = np.nan
 
+    # For special GCP countries/regions (e.g. "Africa (GCP)") we should keep only the original data.
+    # Therefore, make nan all additional variables for those countries/regions, and keep only GCP's original data.
+    added_variables = co2_df.drop(columns=["country", "year"] + COLUMNS_THAT_MUST_HAVE_DATA).columns.tolist()
+    co2_df.loc[(co2_df["country"].str.contains(" (GCP)", regex=False)), added_variables] = np.nan
+
+    # Remove uninformative rows (those that have only data for, say, gdp, but not for variables related to emissions).
+    co2_df = co2_df.dropna(subset=COLUMNS_THAT_MUST_HAVE_DATA, how="all").reset_index(drop=True)
+
     return co2_df
 
 
@@ -953,6 +1010,7 @@ def run(dest_dir: str) -> None:
     # Add new variables to main dataframe (consumption-based emissions, emission intensity, per-capita emissions, etc.).
     combined_df = combine_data_and_add_variables(
         co2_df=co2_df,
+        production_df=production_df,
         consumption_df=consumption_df,
         global_emissions_df=global_emissions_df,
         land_use_df=land_use_df,
