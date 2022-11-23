@@ -13,7 +13,7 @@ ENTITY = "Italy"
 ENTITY_SNAKE_CASE = re.sub(r"(?<!^)(?=[A-Z])", "_", ENTITY).lower()
 # Details for dataset to export.
 DATASET_SHORT_NAME = "overview"
-DATASET_TITLE = f"Country Profile Overview"
+DATASET_TITLE = "Country Profile Overview"
 METADATA_PATH = CURRENT_DIR / f"{DATASET_SHORT_NAME}.meta.yml"
 # Details for datasets to import.
 # Population
@@ -158,9 +158,6 @@ def get_backports(entity: str) -> pd.DataFrame:
             "average_total_years_of_schooling_for_adult_population__lee_lee__2016__barro_lee__2018__and_undp__2018"
         ],
         "dataset_1892_life_expectancy__riley__2005__clio_infra__2015__and_un__2019": ["life_expectancy"],
-        "dataset_2710_child_mortality_rates__selected_gapminder__v10__2017": [
-            "child_mortality__select_gapminder__v10__2017"
-        ],
         "dataset_581_daily_supply_of_calories_per_person__owid_based_on_un_fao__and__historical_sources": [
             "daily_caloric_supply__owid_based_on_un_fao__and__historical_sources"
         ],
