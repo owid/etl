@@ -53,7 +53,7 @@ sanity-check:
 
 .venv: sanity-check pyproject.toml poetry.toml poetry.lock .submodule-init
 	@echo '==> Installing packages'
-	poetry install
+	poetry install || poetry install
 	touch $@
 
 check-typing: .venv
