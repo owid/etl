@@ -5,32 +5,7 @@ dataset:
   title: Country Profile Overview
   short_name: country_profile_overview
   description: |
-    All data prior to 1985 (and prior to 1965 in the case of renewables), is sourced from <a href="https://www.gov.uk/government/statistics/electricity-chapter-5-digest-of-united-kingdom-energy-statistics-dukes">the Digest of UK Energy Statistics (DUKES), published by the UK's Department for Business, Energy & Industrial Strategy</a>.
-
-    All other data is sourced from the <a href="https://www.bp.com/en/global/corporate/energy-economics/statistical-review-of-world-energy.html">BP's Statistical Review of World Energy</a> and <a href="https://ember-climate.org/insights/research/global-electricity-review-2022/">Ember Global Electricity Review</a>. Where data from BP is available for a given year, we rely on it as the primary source. We then supplement this with data from Ember where data from BP is not available.
-  sources:
-    -
-      name: Digest of UK Energy Statistics
-      published_by: UK's Department for Business, Energy & Industrial Strategy
-      date_accessed: 21st September 2022
-      url: https://www.gov.uk/government/statistical-data-sets/historical-electricity-data
-    -
-      name: BP Statistical Review of World Energy
-      published_by: BP Statistical Review of World Energy
-      date_accessed: 8th July 2022
-      url: https://www.bp.com/en/global/corporate/energy-economics/statistical-review-of-world-energy.html
-    -
-      name: Ember's Global Electricity Review
-      published_by: Ember
-      publication_year: 2022
-      date_accessed: 2022-08-01
-      url: https://ember-climate.org/data-catalogue/yearly-electricity-data/
-    -
-      name: Ember's European Electricity Review
-      published_by: Ember
-      publication_year: 2022
-      date_accessed: 2022-08-01
-      url: https://ember-climate.org/insights/research/european-electricity-review-2022/
+    Key metrics for understanding the state of the world.
 tables:
   overview:
     variables:
@@ -134,3 +109,28 @@ tables:
         title: Daily supply of calories per person
         unit: kcal
         short_unit: kcal
+      population:
+        title: Population
+        description: |
+          Population by country, available from 10,000 BCE to 2100 based on Gapminder data, HYDE, and UN Population Division (2022) estimates.
+
+          10,000 BCE - 1799: Historical estimates by HYDE (v3.2).
+          1800-1949: Historical estimates by Gapminder.
+          1950-2021: Population records by the United Nations - Population Division (2022).
+          2022-2100: Projections based on Medium variant by the United Nations - Population Division (2022).
+        unit: persons
+        display:
+          name: Population
+        sources: &population-sources
+          - name: Gapminder (v6)
+            published_by: Gapminder (v6)
+            url: https://www.gapminder.org/data/documentation/gd003/
+            date_accessed: October 8, 2021
+          - name: UN (2022)
+            published_by: United Nations - Population Division (2022)
+            url: https://population.un.org/wpp/Download/Standard/Population/
+            date_accessed: September 10, 2022
+          - name: HYDE (v3.2)
+            published_by: HYDE (v3.2)
+            url: https://dataportaal.pbl.nl/downloads/HYDE/
+            date_accessed: October 8, 2021
