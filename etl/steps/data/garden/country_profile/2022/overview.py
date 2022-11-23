@@ -1,3 +1,4 @@
+import re
 from functools import reduce
 
 import pandas as pd
@@ -44,76 +45,74 @@ countries_list = countries[["name", "iso_alpha2"]].dropna()["name"].to_list()
 
 
 def run(dest_dir: str) -> None:
+    # Population
+    pop = get_population()
+    # emissions per capita
+    em = get_emissions()
+    # electricity mix
+    mix = get_energy_mix()
+    # WDI: share using internet; gdp per capita; share electricity access
+    wdi = get_wdi_variables()
+    # Backport: Electoral democracy; Homicide rate; Average years of schooling; Life expectancy; Child mortality; Daily calories
+    bkp = get_backports()
+
+    data_frames = [pop, em, mix, wdi, bkp]
+    df_merged = reduce(lambda left, right: pd.merge(left, right, on=["country", "year"], how="outer"), data_frames)
+    df_merged = df_merged.sort_values("year")
+
     ds_garden = catalog.Dataset.create_empty(dest_dir)
     # Get the rest of the metadata from the yaml file.
     ds_garden.metadata.update_from_yaml(METADATA_PATH, if_source_exists="replace")
-
     # Create dataset.
     ds_garden.save()
 
     for country in countries_list:
         print(country)
+        # making snake case version of country name
         country_snake_case = country.replace(" ", "_").lower()
+        # removing any punctuation e.g. cote d'ivoire
+        country_snake_case = re.sub(r"[^\w\s]", "", country_snake_case)
+        df_country = df_merged[df_merged["country"] == country]
 
-        # Population
-        pop = get_population(entity=country)
-        # emissions per capita
-        em = get_emissions(entity=country)
-        # electricity mix
-        mix = get_energy_mix(entity=country)
-        # share using internet
-        # gdp per capita
-        # share electricity access
-        wdi = get_wdi_variables(entity=country)
-        # Backport:
-        # Electoral democracy
-        # Homicide rate
-        # Average years of schooling
-        # Life expectancy
-        # Child mortality
-        # Daily calories
-        bkp = get_backports(entity=country)
+        if df_country.shape[1] > 2:
+            # Drop columns where the country doesn't have data
+            df_country = df_country.dropna(how="all")
+            # Skip countries where we don't have any data
+            if df_country.shape[1] > 2:
+                # Create a new table with combined data (and no metadata).
+                tb_combined = catalog.Table(df_country)
 
-        data_frames = [pop, em, mix, wdi, bkp]
-        df_merged = reduce(lambda left, right: pd.merge(left, right, on=["country", "year"], how="outer"), data_frames)
-        # Drop columns where the country doesn't have data
-        df_merged = df_merged.dropna(how="all", axis=1)
-        # Skip countries where we don't have any data
-        if df_merged.shape[1] > 2:
-            df_merged = df_merged.sort_values("year").reset_index()
-            # Create a new table with combined data (and no metadata).
-            tb_combined = catalog.Table(df_merged)
+                # Details for dataset to export.
+                TABLE_SHORT_NAME = f"overview_{country_snake_case}"
+                TABLE_TITLE = f"Country Profile Overview - {country}"
 
-            # Details for dataset to export.
-            TABLE_SHORT_NAME = f"overview_{country_snake_case}"
-            TABLE_TITLE = f"Country Profile Overview - {country}"
+                # Add other metadata fields to table.
+                # tb_combined.update_metadata_from_yaml(METADATA_PATH, TABLE_SHORT_NAME)
+                tb_combined.metadata.short_name = TABLE_SHORT_NAME
+                tb_combined.metadata.title = TABLE_TITLE
 
-            # Add other metadata fields to table.
-            # tb_combined.update_metadata_from_yaml(METADATA_PATH, TABLE_SHORT_NAME)
-            tb_combined.metadata.short_name = TABLE_SHORT_NAME
-            tb_combined.metadata.title = TABLE_TITLE
-
-            # Add combined tables to the new dataset.
-            ds_garden.add(tb_combined)
+                # Add combined tables to the new dataset.
+                tb_combined = tb_combined.reset_index()
+                ds_garden.add(tb_combined)
 
 
-def get_population(entity: str) -> pd.DataFrame:
+def get_population() -> pd.DataFrame:
     ds_ki = catalog.Dataset(KI_DATASET_PATH)
     pop = ds_ki["population"].reset_index()
-    pop = pop[["country", "year", "population"]][pop["country"] == entity]
+    pop = pop[["country", "year", "population"]]
     return pop
 
 
-def get_emissions(entity: str) -> pd.DataFrame:
+def get_emissions() -> pd.DataFrame:
     ds_em = catalog.Dataset(CO2_EMISSIONS_DATASET_PATH)
     df_em = ds_em["global_carbon_budget"].reset_index()
-    df_em = df_em[["country", "year", "emissions_total_per_capita"]][df_em["country"] == entity]
+    df_em = df_em[["country", "year", "emissions_total_per_capita"]]
     df_em["emissions_total_per_capita"] = df_em["emissions_total_per_capita"].round(2)
     df_em["year"] = df_em["year"].astype("int64")
     return df_em
 
 
-def get_energy_mix(entity: str) -> pd.DataFrame:
+def get_energy_mix() -> pd.DataFrame:
     ds_mix = catalog.Dataset(ENERGY_CON_DATASET_PATH)
     df_mix = ds_mix["energy_mix"].reset_index()
     cols = [
@@ -130,21 +129,23 @@ def get_energy_mix(entity: str) -> pd.DataFrame:
         "biofuels__twh",
         "fossil_fuels__twh",
     ]
-    df_mix = df_mix[df_mix["country"] == entity][cols]
+    df_mix = df_mix[cols]
+    df_mix["year"] = df_mix["year"].astype("int64")
     return df_mix
 
 
-def get_wdi_variables(entity: str) -> pd.DataFrame:
+def get_wdi_variables() -> pd.DataFrame:
     ds_wdi = catalog.Dataset(WDI_DATASET_PATH)
     df_wdi = ds_wdi["wdi"].reset_index()
     cols = ["country", "year", "it_net_user_zs", "ny_gdp_pcap_kd", "eg_elc_accs_zs"]
     new_cols = ["country", "year", "share_pop_using_internet", "gdp_per_capita", "share_electricity_access"]
-    df_wdi = df_wdi[cols][df_wdi["country"] == entity]
+    df_wdi = df_wdi[cols]
     df_wdi.columns = new_cols
+    df_wdi["year"] = df_wdi["year"].astype("int64")
     return df_wdi
 
 
-def get_backports(entity: str) -> pd.DataFrame:
+def get_backports() -> pd.DataFrame:
     base_path = DATA_DIR / "backport/owid/latest/"
 
     # list of all backports to include, map from dataset name to list of variables to include
@@ -169,7 +170,7 @@ def get_backports(entity: str) -> pd.DataFrame:
         ],
     }
     # make one mega table with all variables from all the backports
-    t_all = None
+    t_all = pd.DataFrame()
 
     for dataset, variables in backports.items():
         print(dataset)
@@ -180,13 +181,11 @@ def get_backports(entity: str) -> pd.DataFrame:
         # fix the index to be (year, entity_name)
         t = t.reset_index().drop(columns=["entity_id", "entity_code"]).set_index(["entity_name", "year"])[variables]
 
-        if t_all is None:
+        if t_all.shape == tuple([0, 0]):
             # first time around
             t_all = t
-
         else:
             t_all = t_all.join(t, how="outer")  # omg hope
     t_all = t_all.reset_index()
     t_all = t_all.rename(columns={"entity_name": "country"})
-    t_all = t_all[t_all["country"] == entity]
     return t_all
