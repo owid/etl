@@ -9,6 +9,8 @@ dataset:
 tables:
   overview:
     variables:
+      year:
+        title: Year
       emissions_total_per_capita:
         title: "Annual CO₂ emissions (per capita)"
         unit: "tonnes per capita"

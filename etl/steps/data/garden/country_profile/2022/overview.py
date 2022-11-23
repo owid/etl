@@ -4,17 +4,13 @@ from functools import reduce
 
 import pandas as pd
 from owid import catalog
+from owid.catalog import Dataset
 
-from etl.paths import DATA_DIR
+from etl.paths import DATA_DIR, REFERENCE_DATASET
 
 from .shared import CURRENT_DIR
 
-ENTITY = "Italy"
-ENTITY_SNAKE_CASE = re.sub(r"(?<!^)(?=[A-Z])", "_", ENTITY).lower()
-# Details for dataset to export.
-DATASET_SHORT_NAME = "overview"
-DATASET_TITLE = "Country Profile Overview"
-METADATA_PATH = CURRENT_DIR / f"{DATASET_SHORT_NAME}.meta.yml"
+METADATA_PATH = CURRENT_DIR / "overview.meta.yml"
 # Details for datasets to import.
 # Population
 KI_DATASET_PATH = DATA_DIR / "garden/owid/latest/key_indicators"
@@ -44,51 +40,63 @@ WDI_DATASET_PATH = DATA_DIR / "garden/worldbank_wdi/2022-05-26/wdi"
 # Daily supply of calories per person
 # https://owid.cloud/admin/datasets/581
 
+countries = Dataset(REFERENCE_DATASET)["countries_regions"]
+# Get only countries which have an ISO2 code - we don't want regions just yet
+countries_list = countries[["name", "iso_alpha2"]].dropna()["name"].to_list()
+
 
 def run(dest_dir: str) -> None:
-    # Load data.
-    # Read all required datasets.
-    # Population
-    pop = get_population(entity=ENTITY)
-    # emissions per capita
-    em = get_emissions(entity=ENTITY)
-    # electricity mix
-    mix = get_energy_mix(entity=ENTITY)
-    # share using internet
-    # gdp per capita
-    # share electricity access
-    wdi = get_wdi_variables(entity=ENTITY)
-    # Backport:
-    # Electoral democracy
-    # Homicide rate
-    # Average years of schooling
-    # Life expectancy
-    # Child mortality
-    # Daily calories
-    bkp = get_backports(entity=ENTITY)
-
-    data_frames = [pop, em, mix, wdi, bkp]
-    df_merged = reduce(lambda left, right: pd.merge(left, right, on=["country", "year"], how="outer"), data_frames)
-    df_merged = df_merged.sort_values("year").reset_index()
-    # Create a new table with combined data (and no metadata).
-    tb_combined = catalog.Table(df_merged)
-
-    #
-    # Save outputs.
-    #
     ds_garden = catalog.Dataset.create_empty(dest_dir)
     # Get the rest of the metadata from the yaml file.
     ds_garden.metadata.update_from_yaml(METADATA_PATH, if_source_exists="replace")
+
     # Create dataset.
     ds_garden.save()
 
-    # Add other metadata fields to table.
-    tb_combined.metadata.short_name = DATASET_SHORT_NAME
-    tb_combined.metadata.title = DATASET_TITLE
-    tb_combined.update_metadata_from_yaml(METADATA_PATH, DATASET_SHORT_NAME)
+    for country in countries_list:
+        print(country)
+        country_snake_case = country.replace(" ", "_").lower()
 
-    # Add combined tables to the new dataset.
-    ds_garden.add(tb_combined)
+        # Population
+        pop = get_population(entity=country)
+        # emissions per capita
+        em = get_emissions(entity=country)
+        # electricity mix
+        mix = get_energy_mix(entity=country)
+        # share using internet
+        # gdp per capita
+        # share electricity access
+        wdi = get_wdi_variables(entity=country)
+        # Backport:
+        # Electoral democracy
+        # Homicide rate
+        # Average years of schooling
+        # Life expectancy
+        # Child mortality
+        # Daily calories
+        bkp = get_backports(entity=country)
+
+        data_frames = [pop, em, mix, wdi, bkp]
+        df_merged = reduce(lambda left, right: pd.merge(left, right, on=["country", "year"], how="outer"), data_frames)
+        # Drop columns where the country doesn't have data
+        df_merged = df_merged.dropna(how="all", axis=1)
+        # Skip countries where we don't have any data
+        if df_merged.shape[1] > 2:
+            df_merged = df_merged.sort_values("year").reset_index()
+            # Create a new table with combined data (and no metadata).
+            tb_combined = catalog.Table(df_merged)
+
+            # Details for dataset to export.
+            TABLE_SHORT_NAME = f"overview_{country_snake_case}"
+            TABLE_TITLE = f"Country Profile Overview - {country}"
+
+            # Add other metadata fields to table.
+            # tb_combined.update_metadata_from_yaml(METADATA_PATH, TABLE_SHORT_NAME)
+            tb_combined.metadata.short_name = TABLE_SHORT_NAME
+            tb_combined.metadata.title = TABLE_TITLE
+
+            # Add combined tables to the new dataset.
+            ds_garden.add(tb_combined)
 
 
 def get_population(entity: str) -> pd.DataFrame:
@@ -101,7 +109,7 @@ def get_population(entity: str) -> pd.DataFrame:
 def get_emissions(entity: str) -> pd.DataFrame:
     ds_em = catalog.Dataset(CO2_EMISSIONS_DATASET_PATH)
     df_em = ds_em["global_carbon_budget"].reset_index()
-    df_em = df_em[["country", "year", "emissions_total_per_capita"]][df_em["country"] == ENTITY]
+    df_em = df_em[["country", "year", "emissions_total_per_capita"]][df_em["country"] == entity]
     df_em["emissions_total_per_capita"] = df_em["emissions_total_per_capita"].round(2)
     df_em["year"] = df_em["year"].astype("int64")
     return df_em
@@ -124,7 +132,7 @@ def get_energy_mix(entity: str) -> pd.DataFrame:
         "biofuels__twh",
         "fossil_fuels__twh",
     ]
-    df_mix = df_mix[df_mix["country"] == ENTITY][cols]
+    df_mix = df_mix[df_mix["country"] == entity][cols]
     return df_mix
 
 
@@ -133,7 +141,7 @@ def get_wdi_variables(entity: str) -> pd.DataFrame:
     df_wdi = ds_wdi["wdi"].reset_index()
     cols = ["country", "year", "it_net_user_zs", "ny_gdp_pcap_kd", "eg_elc_accs_zs"]
     new_cols = ["country", "year", "share_pop_using_internet", "gdp_per_capita", "share_electricity_access"]
-    df_wdi = df_wdi[cols][df_wdi["country"] == ENTITY]
+    df_wdi = df_wdi[cols][df_wdi["country"] == entity]
     df_wdi.columns = new_cols
     return df_wdi
 
@@ -182,5 +190,5 @@ def get_backports(entity: str) -> pd.DataFrame:
             t_all = t_all.join(t, how="outer")  # omg hope
     t_all = t_all.reset_index()
     t_all = t_all.rename(columns={"entity_name": "country"})
-    t_all = t_all[t_all["country"] == ENTITY]
+    t_all = t_all[t_all["country"] == entity]
     return t_all
