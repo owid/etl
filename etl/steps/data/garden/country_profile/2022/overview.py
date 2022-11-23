@@ -1,5 +1,3 @@
-# type: ignore
-import re
 from functools import reduce
 
 import pandas as pd
