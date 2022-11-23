@@ -45,6 +45,9 @@ countries_list = countries[["name", "iso_alpha2"]].dropna()["name"].to_list()
 
 
 def run(dest_dir: str) -> None:
+    """
+    Combine each of the datasets listed above and then split them into a table per country, saved as a csv.
+    """
     # Population
     pop = get_population()
     # emissions per capita
@@ -97,6 +100,9 @@ def run(dest_dir: str) -> None:
 
 
 def get_population() -> pd.DataFrame:
+    """
+    Get the population variable from the key indicators dataset
+    """
     ds_ki = catalog.Dataset(KI_DATASET_PATH)
     pop = ds_ki["population"].reset_index()
     pop = pop[["country", "year", "population"]]
@@ -104,6 +110,9 @@ def get_population() -> pd.DataFrame:
 
 
 def get_emissions() -> pd.DataFrame:
+    """
+    Get the emissions per capita variable from the global carbon budget dataset
+    """
     ds_em = catalog.Dataset(CO2_EMISSIONS_DATASET_PATH)
     df_em = ds_em["global_carbon_budget"].reset_index()
     df_em = df_em[["country", "year", "emissions_total_per_capita"]]
@@ -113,6 +122,9 @@ def get_emissions() -> pd.DataFrame:
 
 
 def get_energy_mix() -> pd.DataFrame:
+    """
+    Get the energy consumption variables from the BP energy mix dataset
+    """
     ds_mix = catalog.Dataset(ENERGY_CON_DATASET_PATH)
     df_mix = ds_mix["energy_mix"].reset_index()
     cols = [
@@ -135,6 +147,10 @@ def get_energy_mix() -> pd.DataFrame:
 
 
 def get_wdi_variables() -> pd.DataFrame:
+    """
+    Get the i) Share population using internet, ii) GDP per capita and iii) Share electricity access
+    from the WDI dataset.
+    """
     ds_wdi = catalog.Dataset(WDI_DATASET_PATH)
     df_wdi = ds_wdi["wdi"].reset_index()
     cols = ["country", "year", "it_net_user_zs", "ny_gdp_pcap_kd", "eg_elc_accs_zs"]
@@ -146,6 +162,11 @@ def get_wdi_variables() -> pd.DataFrame:
 
 
 def get_backports() -> pd.DataFrame:
+    """
+    Get the i) Child mortality rate, ii) Electoral democracy, iii) Homicide rate,
+    iv) Average years of schooling, v) Life expectancy and vi) Daily supply of calories per person
+    from the backported datasets.
+    """
     base_path = DATA_DIR / "backport/owid/latest/"
 
     # list of all backports to include, map from dataset name to list of variables to include
