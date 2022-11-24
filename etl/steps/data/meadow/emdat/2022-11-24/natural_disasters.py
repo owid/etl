@@ -2,8 +2,9 @@
 
 """
 
-import pandas as pd
 import warnings
+
+import pandas as pd
 from owid.catalog import Dataset, Table, TableMeta
 from owid.catalog.utils import underscore_table
 from structlog import get_logger
@@ -69,7 +70,7 @@ def run(dest_dir: str) -> None:
 
     # Ensure all tables have underscore columns.
     tb = underscore_table(tb)
-    
+
     # Add table to new dataset and save dataset.
     ds.add(tb)
     ds.save()
