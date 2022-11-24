@@ -1,12 +1,15 @@
 import datetime as dt
+import shutil
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, Literal, Optional, Union
 
+import pandas as pd
 import yaml
 from dataclasses_json import dataclass_json
 from dvc.repo import Repo
 from owid.catalog.meta import pruned_json
+from owid.datautils import dataframes
 from owid.walden import files
 
 from etl import paths
@@ -127,3 +130,32 @@ class SnapshotMeta:
     @staticmethod
     def from_dict(d: Dict[str, Any]) -> "SnapshotMeta":
         ...
+
+
+def add_snapshot(
+    uri: str,
+    filename: Optional[Union[str, Path]] = None,
+    dataframe: Optional[pd.DataFrame] = None,
+    upload: bool = False,
+) -> None:
+    """Helper function for adding snapshots with metadata, where the data is either
+    a local file, or a dataframe in memory.
+
+    Args:
+        uri (str): URI of the snapshot file, typically `namespace/version/short_name.ext`. Metadata file
+            `namespace/version/short_name.ext.dvc` must exist!
+        filename (str or None): Path to local data file (if dataframe is not given).
+        dataframe (pd.DataFrame or None): Dataframe to upload (if filename is not given).
+        upload (bool): True to upload data to Walden bucket.
+    """
+    snap = Snapshot(uri)
+
+    if (filename is not None) and (dataframe is None):
+        # copy file to correct location
+        shutil.copyfile(filename, snap.path)
+    elif (dataframe is not None) and (filename is None):
+        dataframes.to_file(dataframe, file_path=snap.path)
+    else:
+        raise ValueError("Use either 'filename' or 'dataframe' argument, but not both.")
+
+    snap.dvc_add(upload=upload)
