@@ -1,0 +1,17 @@
+meta:
+  namespace: hyde
+  short_name: general_files
+  name: Hyde 3.2 (general files)
+  source_name: PBL Netherlands Environmental Assessment Agency
+  publication_year: 2017
+  url: https://www.pbl.nl/en/image/links/hyde
+  source_data_url: https://dataportaal.pbl.nl/downloads/HYDE/HYDE3.2/general_files.zip
+  license_url: https://dataportaal.pbl.nl/downloads/HYDE/HYDE3.2/readme_release_HYDE3.2.1.txt
+  license_name: CC BY 3.0
+  file_extension: zip
+  description: |
+    Metadata for the Hyde 3.2 dataset, such as country codes.
+outs:
+- md5: 51877033a0b0e3bdf36430ed2fe62510
+  size: 3018098
+  path: general_files.zip
