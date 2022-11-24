@@ -15,7 +15,7 @@ CURRENT_DIR = pathlib.Path(__file__).parent
     help="Upload dataset to Walden",
 )
 def main(upload: bool) -> None:
-    snap = Snapshot(CURRENT_DIR / "baseline.zip")
+    snap = Snapshot(CURRENT_DIR / "general_files.zip")
     snap.download_from_source()
     snap.dvc_add(upload=upload)
 
