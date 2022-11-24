@@ -51,8 +51,8 @@ tables:
         short_unit: "t"
         description: "Annual consumption-based emissions of carbon dioxide (CO₂), measured in tonnes per person. Consumption-based emissions are national or regional emissions which have been adjusted for trade (i.e. territorial/production emissions minus emissions embedded in exports, plus emissions embedded in imports). If a country's consumption-based emissions are higher than its production emissions it is a net importer of carbon dioxide. Consumption-based CO₂ emissions have been converted by Our World in Data from tonnes of carbon to tonnes of CO₂ using a conversion factor of 3.664."
       consumption_emissions_per_gdp:
-        title: "Annual consumption-based CO₂ emissions per GDP (kg per $PPP)"
-        unit: "kilograms per $PPP"
+        title: "Annual consumption-based CO₂ emissions per GDP (kg per international-$)"
+        unit: "kilograms per international-$"
         short_unit: "kg/$"
         description: "Annual consumption-based emissions of carbon dioxide (CO₂), measured in kilograms per dollar of GDP (2011 international-$). Consumption-based emissions are national or regional emissions which have been adjusted for trade (i.e. territorial/production emissions minus emissions embedded in exports, plus emissions embedded in imports). If a country's consumption-based emissions are higher than its production emissions it is a net importer of carbon dioxide. Consumption-based CO₂ emissions have been converted by Our World in Data from tonnes of carbon to tonnes of CO₂ using a conversion factor of 3.664."
       cumulative_consumption_emissions:
@@ -287,7 +287,7 @@ tables:
         description: "Annual production-based emissions of carbon dioxide (CO₂), including land-use change, measured in tonnes per person. This is based on territorial emissions, which do not account for emissions embedded in traded goods."
       emissions_total_including_land_use_change_per_gdp:
         title: "Annual CO₂ emissions including land-use change per GDP"
-        unit: "kilograms per $PPP"
+        unit: "kilograms per international-$"
         short_unit: "kg/$"
         description: "Annual total production-based emissions of carbon dioxide (CO₂), including land-use change, measured in kilograms per dollar of GDP (2011 international-$). Production-based emissions are based on territorial emissions, which do not account for emissions embedded in traded goods."
       emissions_total_including_land_use_change_per_unit_energy:
@@ -301,8 +301,8 @@ tables:
         short_unit: "t"
         description: "Annual total production-based emissions of carbon dioxide (CO₂), excluding land-use change, measured in tonnes per person. This is based on territorial emissions, which do not account for emissions embedded in traded goods."
       emissions_total_per_gdp:
-        title: "Annual CO₂ emissions per GDP (kg per $PPP)"
-        unit: "kilograms per $PPP"
+        title: "Annual CO₂ emissions per GDP (kg per international-$)"
+        unit: "kilograms per international-$"
         short_unit: "kg/$"
         description: "Annual total production-based emissions of carbon dioxide (CO₂), excluding land-use change, measured in kilograms per dollar of GDP (2011 international-$). Production-based emissions are based on territorial emissions, which do not account for emissions embedded in traded goods."
       emissions_total_per_unit_energy:
@@ -312,7 +312,7 @@ tables:
         description: "Annual total production-based emissions of carbon dioxide (CO₂), excluding land-use change, measured in kilograms per kilowatt-hour of primary energy consumption. Production-based emissions are based on territorial emissions, which do not account for emissions embedded in traded goods."
       gdp:
         title: "GDP"
-        unit: "2011 int-$"
+        unit: "2011 international-$"
         short_unit: "$"
         description: "Gross domestic product measured in international-$ using 2011 prices to adjust for price changes over time (inflation) and price differences between countries."
       global_cumulative_emissions_from_cement:
