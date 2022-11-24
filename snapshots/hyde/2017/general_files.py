@@ -1,10 +1,6 @@
-import pathlib
-
 import click
 
 from etl.snapshot import Snapshot
-
-CURRENT_DIR = pathlib.Path(__file__).parent
 
 
 @click.command()
@@ -15,7 +11,7 @@ CURRENT_DIR = pathlib.Path(__file__).parent
     help="Upload dataset to Walden",
 )
 def main(upload: bool) -> None:
-    snap = Snapshot(CURRENT_DIR / "general_files.zip")
+    snap = Snapshot("hyde/2017/general_files.zip")
     snap.download_from_source()
     snap.dvc_add(upload=upload)
 

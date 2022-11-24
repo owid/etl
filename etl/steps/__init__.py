@@ -547,11 +547,11 @@ class SnapshotStep(Step):
 
     @property
     def _dvc_path(self) -> str:
-        return self._path + ".dvc"
+        return f"snapshots/{self.path}.dvc"
 
     @property
     def _path(self) -> str:
-        return "snapshots/" + self.path
+        return f"{paths.DATA_DIR}/snapshots/{self.path}"
 
 
 class SnapshotStepPrivate(SnapshotStep):
