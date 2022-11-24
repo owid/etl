@@ -243,25 +243,6 @@ tests = ["coverage[toml] (>=5.0.2)", "hypothesis", "pympler", "pytest (>=4.3.0)"
 tests_no_zope = ["coverage[toml] (>=5.0.2)", "hypothesis", "pympler", "pytest (>=4.3.0)", "mypy (>=0.900,!=0.940)", "pytest-mypy-plugins", "cloudpickle"]
 
 [[package]]
-<<<<<<< HEAD
-name = "awscli"
-version = "1.27.16"
-description = "Universal Command Line Environment for AWS."
-category = "main"
-optional = false
-python-versions = ">= 3.7"
-
-[package.dependencies]
-botocore = "1.29.16"
-colorama = ">=0.2.5,<0.4.5"
-docutils = ">=0.10,<0.17"
-PyYAML = ">=3.10,<5.5"
-rsa = ">=3.1.2,<4.8"
-s3transfer = ">=0.6.0,<0.7.0"
-
-[[package]]
-=======
->>>>>>> 28f0c605 (feature(snapshots): add Snapshots as an alternative to Walden)
 name = "babel"
 version = "2.11.0"
 description = "Internationalization utilities"
@@ -356,22 +337,14 @@ dev = ["build (==0.8.0)", "flake8 (==4.0.1)", "hashin (==0.17.0)", "pip-tools (=
 
 [[package]]
 name = "boto3"
-<<<<<<< HEAD
-version = "1.26.16"
-=======
 version = "1.24.59"
->>>>>>> 28f0c605 (feature(snapshots): add Snapshots as an alternative to Walden)
 description = "The AWS SDK for Python"
 category = "main"
 optional = false
 python-versions = ">= 3.7"
 
 [package.dependencies]
-<<<<<<< HEAD
-botocore = ">=1.29.16,<1.30.0"
-=======
 botocore = ">=1.27.59,<1.28.0"
->>>>>>> 28f0c605 (feature(snapshots): add Snapshots as an alternative to Walden)
 jmespath = ">=0.7.1,<2.0.0"
 s3transfer = ">=0.6.0,<0.7.0"
 
@@ -380,11 +353,7 @@ crt = ["botocore[crt] (>=1.21.0,<2.0a0)"]
 
 [[package]]
 name = "botocore"
-<<<<<<< HEAD
-version = "1.29.16"
-=======
 version = "1.27.59"
->>>>>>> 28f0c605 (feature(snapshots): add Snapshots as an alternative to Walden)
 description = "Low-level, data-driven core of boto 3."
 category = "main"
 optional = false
@@ -755,11 +724,11 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
 
 [[package]]
 name = "dpath"
-version = "2.0.7"
+version = "2.0.8"
 description = "Filesystem-like pathing and searching for dictionaries"
 category = "main"
 optional = false
-python-versions = ">=3"
+python-versions = ">=3.7"
 
 [[package]]
 name = "dulwich"
@@ -780,7 +749,7 @@ pgp = ["gpg"]
 
 [[package]]
 name = "dvc"
-version = "2.34.3"
+version = "2.35.1"
 description = "Git for data scientists - manage your code and data together"
 category = "main"
 optional = false
@@ -1222,11 +1191,11 @@ tqdm = "*"
 
 [[package]]
 name = "gitdb"
-version = "4.0.9"
+version = "4.0.10"
 description = "Git Object Database"
 category = "main"
 optional = false
-python-versions = ">=3.6"
+python-versions = ">=3.7"
 
 [package.dependencies]
 smmap = ">=3.0.1,<6"
@@ -2687,11 +2656,6 @@ dotenv = ["python-dotenv (>=0.10.4)"]
 email = ["email-validator (>=1.0.3)"]
 
 [[package]]
-<<<<<<< HEAD
-name = "pydrive2"
-version = "1.15.0"
-description = "Google Drive API made easy. Maintained fork of PyDrive."
-=======
 name = "pydot"
 version = "1.4.2"
 description = "Python interface to Graphviz's Dot"
@@ -2703,10 +2667,9 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 pyparsing = ">=2.1.4"
 
 [[package]]
-name = "pydrive"
-version = "1.3.1"
-description = "Google Drive API made easy."
->>>>>>> 28f0c605 (feature(snapshots): add Snapshots as an alternative to Walden)
+name = "pydrive2"
+version = "1.15.0"
+description = "Google Drive API made easy. Maintained fork of PyDrive."
 category = "main"
 optional = false
 python-versions = ">=3.7"
@@ -2752,7 +2715,14 @@ python-versions = ">=3.6"
 plugins = ["importlib-metadata"]
 
 [[package]]
-<<<<<<< HEAD
+name = "pygtrie"
+version = "2.5.0"
+description = "A pure Python trie data structure implementation."
+category = "main"
+optional = false
+python-versions = "*"
+
+[[package]]
 name = "pyopenssl"
 version = "22.1.0"
 description = "Python wrapper module around the OpenSSL library"
@@ -2766,14 +2736,6 @@ cryptography = ">=38.0.0,<39"
 [package.extras]
 docs = ["sphinx (!=5.2.0,!=5.2.0.post0)", "sphinx-rtd-theme"]
 test = ["flaky", "pretend", "pytest (>=3.0.1)"]
-=======
-name = "pygtrie"
-version = "2.5.0"
-description = "A pure Python trie data structure implementation."
-category = "main"
-optional = false
-python-versions = "*"
->>>>>>> 28f0c605 (feature(snapshots): add Snapshots as an alternative to Walden)
 
 [[package]]
 name = "pyparsing"
@@ -3983,11 +3945,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "flake8 
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-<<<<<<< HEAD
-content-hash = "e4d0fc271488614bb9bbcc92cb67903fa5b2273d140a17a9fb5a9de3a4a88607"
-=======
-content-hash = "eef72e15781acecf2293a60de3a28fcc236ecf0aa51607744d35d57fae6149d3"
->>>>>>> 28f0c605 (feature(snapshots): add Snapshots as an alternative to Walden)
+content-hash = "7716ffa700858420dbc826902a48d738c958aaad56d2128acffef595ee2778fc"
 
 [metadata.files]
 aiobotocore = []
@@ -4175,20 +4133,13 @@ pyasn1-modules = []
 pycodestyle = []
 pycparser = []
 pydantic = []
-<<<<<<< HEAD
-pydrive2 = []
-=======
 pydot = []
-pydrive = []
->>>>>>> 28f0c605 (feature(snapshots): add Snapshots as an alternative to Walden)
+pydrive2 = []
 pyflakes = []
 pygit2 = []
 pygments = []
-<<<<<<< HEAD
-pyopenssl = []
-=======
 pygtrie = []
->>>>>>> 28f0c605 (feature(snapshots): add Snapshots as an alternative to Walden)
+pyopenssl = []
 pyparsing = []
 pypdf2 = []
 pyright = []
