@@ -92,7 +92,7 @@ def add_world(df: pd.DataFrame) -> pd.DataFrame:
     df_ = (
         df_[(df_["country"].isin(continents)) & (df_.year < year_threshold)]
         .groupby("year", as_index=False)["population"]
-        .sum()
+        .sum(numeric_only=True)
         .assign(country="World")
     )
     df = pd.concat([df, df_], ignore_index=True).sort_values(["country", "year"])
@@ -105,7 +105,7 @@ def prepare_dataset(df: pd.DataFrame) -> Table:
     df.year = df.year.astype(int)
 
     # Add a metric "% of world population"
-    world_pop = df[df.country == "World"][["year", "population"]].rename(columns={"population": "world_pop"})
+    world_pop = df.loc[df.country == "World", ["year", "population"]].rename(columns={"population": "world_pop"})
     df = df.merge(world_pop, on="year", how="left")
     df["world_pop_share"] = (df["population"].div(df.world_pop)).round(4)
 

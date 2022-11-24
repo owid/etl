@@ -160,7 +160,7 @@ def run_wrapper(
     df_garden = prepare_garden(df_garden)
 
     omm = omm_metrics(df_garden)
-    df_garden = pd.concat([df_garden, omm], axis=0)
+    df_garden = cast(pd.DataFrame, pd.concat([df_garden, omm], axis=0))
 
     tb_garden = pivot(df_garden, dims)
 

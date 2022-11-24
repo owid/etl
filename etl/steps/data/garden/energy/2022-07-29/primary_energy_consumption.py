@@ -142,7 +142,9 @@ def combine_bp_and_eia_data(bp_table: catalog.Table, eia_table: catalog.Table) -
     # Combine EIA data (which goes further back in the past) with BP data (which is more up-to-date).
     # On coincident rows, prioritise BP data.
     index_columns = ["country", "year"]
-    combined = pd.concat([eia_table, bp_table], ignore_index=True).drop_duplicates(subset=index_columns, keep="last")
+    combined = cast(pd.DataFrame, pd.concat([eia_table, bp_table], ignore_index=True)).drop_duplicates(
+        subset=index_columns, keep="last"
+    )
 
     # Convert to conventional dataframe, and sort conveniently.
     combined = pd.DataFrame(combined).sort_values(index_columns).reset_index(drop=True)

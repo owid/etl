@@ -30,7 +30,7 @@ def convert_walden_metadata(wd: WaldenDataset) -> DatasetMeta:
                 publication_year=wd.publication_year,
             )
         ],
-        licenses=[License(name=wd.license_name, url=wd.license_url)],
+        licenses=[License(name=wd.license_name, url=wd.license_url)] if wd.license_name or wd.license_url else [],
     )
 
 

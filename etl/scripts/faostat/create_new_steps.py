@@ -412,10 +412,8 @@ def get_path_to_step_files(channel: str, namespace: str = NAMESPACE) -> Path:
         Path to folder of versions of step files.
 
     """
-    if channel in ["meadow", "garden"]:
+    if channel in ["meadow", "garden", "grapher"]:
         versions_dir = STEP_DIR / "data" / channel / namespace
-    elif channel == "grapher":
-        versions_dir = STEP_DIR / channel / namespace
     else:
         raise ValueError("channel name not understood")
 

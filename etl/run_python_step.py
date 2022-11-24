@@ -48,7 +48,7 @@ def _import_and_run(path: str, dest_dir: str) -> None:
         raise Exception(f'no run() method defined for module "{module}"')
 
     # run the step itself
-    module.run(dest_dir)  # type: ignore
+    module.run(dest_dir)
 
 
 if __name__ == "__main__":

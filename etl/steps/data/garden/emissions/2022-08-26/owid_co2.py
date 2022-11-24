@@ -1,5 +1,8 @@
 """Garden step that combines various datasets related to greenhouse emissions and produces the OWID CO2 dataset (2022).
 
+NOTE: This step is deprecated, given that it depends on a backported dataset, the Global Carbon Budget, that was
+generated in importers. We can keep the code, but the step has been removed from the dag.
+
 Datasets combined:
 * Global Carbon Budget (Global Carbon Project, 2021).
 * Greenhouse gas emissions by sector (CAIT, 2022).

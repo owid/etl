@@ -1,17 +1,13 @@
-import shutil
-import tempfile
 from enum import Enum
 from pathlib import Path
 from typing import Any
 
-from cookiecutter.main import cookiecutter
 from pydantic import BaseModel
 from pywebio import input as pi
 from pywebio import output as po
 
 import etl
 from etl import config
-from etl.paths import STEP_DIR
 
 from . import utils
 
@@ -23,6 +19,7 @@ ETL_DIR = Path(etl.__file__).parent.parent
 class Options(Enum):
 
     ADD_TO_DAG = "Add steps into dag.yml file"
+    IS_PRIVATE = "Make dataset private"
 
 
 class GrapherForm(BaseModel):
@@ -31,10 +28,12 @@ class GrapherForm(BaseModel):
     namespace: str
     version: str
     add_to_dag: bool
+    is_private: bool
 
     def __init__(self, **data: Any) -> None:
         options = data.pop("options")
         data["add_to_dag"] = Options.ADD_TO_DAG.value in options
+        data["is_private"] = Options.IS_PRIVATE.value in options
         super().__init__(**data)
 
 
@@ -53,15 +52,6 @@ def app(run_checks: bool, dummy_data: bool) -> None:
         "Options",
         [
             pi.input(
-                "Short name",
-                name="short_name",
-                placeholder="ggdc_maddison",
-                required=True,
-                value=dummies.get("short_name"),
-                validate=utils.validate_short_name,
-                help_text="Underscored short name",
-            ),
-            pi.input(
                 "Namespace",
                 name="namespace",
                 placeholder="ggdc",
@@ -75,10 +65,20 @@ def app(run_checks: bool, dummy_data: bool) -> None:
                 required=True,
                 value=dummies.get("version"),
             ),
+            pi.input(
+                "Short name",
+                name="short_name",
+                placeholder="ggdc_maddison",
+                required=True,
+                value=dummies.get("short_name"),
+                validate=utils.validate_short_name,
+                help_text="Underscored short name",
+            ),
             pi.checkbox(
                 "Additional Options",
                 options=[
                     Options.ADD_TO_DAG.value,
+                    Options.IS_PRIVATE.value,
                 ],
                 name="options",
                 value=[
@@ -89,43 +89,25 @@ def app(run_checks: bool, dummy_data: bool) -> None:
     )
     form = GrapherForm(**data)
 
+    private_suffix = "-private" if form.is_private else ""
+
     if form.add_to_dag:
         dag_content = utils.add_to_dag(
             {
-                f"data://grapher/{form.namespace}/{form.version}/{form.short_name}": [
-                    f"data://garden/{form.namespace}/{form.version}/{form.short_name}"
+                f"data{private_suffix}://grapher/{form.namespace}/{form.version}/{form.short_name}": [
+                    f"data{private_suffix}://garden/{form.namespace}/{form.version}/{form.short_name}"
                 ]
             }
         )
     else:
         dag_content = ""
 
-    # cookiecutter on python files
-    with tempfile.TemporaryDirectory() as temp_dir:
-        OUTPUT_DIR = temp_dir
+    DATASET_DIR = utils.generate_step(CURRENT_DIR / "grapher_cookiecutter/", dict(**form.dict(), channel="grapher"))
 
-        # generate ingest scripts
-        cookiecutter(
-            (CURRENT_DIR / "grapher_cookiecutter/").as_posix(),
-            no_input=True,
-            output_dir=temp_dir,
-            overwrite_if_exists=True,
-            extra_context=dict(directory_name="grapher", **form.dict()),
-        )
+    step_path = DATASET_DIR / (form.short_name + ".py")
 
-        # TODO: this will soon change to `STEP_DIR / "data" / "grapher" / form.namespace / form.version`
-        DATASET_DIR = STEP_DIR / "grapher" / form.namespace / form.version
-
-        shutil.copytree(
-            Path(OUTPUT_DIR) / "grapher",
-            DATASET_DIR,
-            dirs_exist_ok=True,
-        )
-
-        step_path = DATASET_DIR / (form.short_name + ".py")
-
-        po.put_markdown(
-            f"""
+    po.put_markdown(
+        f"""
 ## Next steps
 
 1. Test your step against your local database. If you have your grapher DB configured locally, your `.env` file should look similar to this:
@@ -139,7 +121,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
 
     Then run the grapher step:
     ```
-    etl grapher/{form.namespace}/{form.version}/{form.short_name} --grapher
+    etl grapher/{form.namespace}/{form.version}/{form.short_name} --grapher {"--private" if form.is_private else ""}
     ```
 
 2. When you feel confident, use `.env.staging` for staging which looks something like this:
@@ -162,7 +144,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
     After you run
 
     ```
-    ENV=.env.staging etl grapher/{form.namespace}/{form.version}/{form.short_name} --grapher
+    ENV=.env.staging etl grapher/{form.namespace}/{form.version}/{form.short_name} --grapher {"--private" if form.is_private else ""}
     ```
 
     you should see it [in staging admin](https://staging.owid.cloud/admin/datasets).
@@ -170,7 +152,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
 3. Pushing to production grapher is **not yet automated**. After you get it reviewed and approved, you can use `.env.prod` file and run
 
     ```
-    ENV=.env.prod etl grapher/{form.namespace}/{form.version}/{form.short_name} --grapher
+    ENV=.env.prod etl grapher/{form.namespace}/{form.version}/{form.short_name} --grapher {"--private" if form.is_private else ""}
     ```
 
 4. Check your dataset in [admin](https://owid.cloud/admin/datasets).
@@ -178,12 +160,12 @@ def app(run_checks: bool, dummy_data: bool) -> None:
 
 ## Generated files
 """
-        )
+    )
 
-        utils.preview_file(step_path, "python")
+    utils.preview_file(step_path, "python")
 
-        if dag_content:
-            utils.preview_dag(dag_content)
+    if dag_content:
+        utils.preview_dag(dag_content)
 
 
 def _check_env() -> None:

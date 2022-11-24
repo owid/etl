@@ -16,15 +16,15 @@ from ipdb import launch_ipdb_on_exception
 from owid.walden import CATALOG as WALDEN_CATALOG
 from owid.walden import Catalog as WaldenCatalog
 
-from etl import config
-from etl.steps import DAG, compile_steps, load_dag, paths, select_dirty_steps
+from etl import config, paths
+from etl.steps import DAG, compile_steps, load_dag, select_dirty_steps
 
 config.enable_bugsnag()
 
 WALDEN_NAMESPACE = os.environ.get("WALDEN_NAMESPACE", "backport")
 
 # if the number of open files allowed is less than this, increase it
-LIMIT_NOFILE = 5000
+LIMIT_NOFILE = 4096
 
 
 @click.command()
@@ -178,13 +178,20 @@ def construct_dag(dag_path: Path, backport: bool, private: bool, grapher: bool) 
     # Load our graph of steps and the things they depend on
     dag = load_dag(dag_path)
 
+    # Dynamically construct all backporting steps
+    backporting_dag = _backporting_steps(private, walden_catalog=WALDEN_CATALOG)
+
     # Add all steps for backporting datasets (there are currently >800 of them)
-    if backport:
-        dag.update(_backporting_steps(private, walden_catalog=WALDEN_CATALOG))
+    # If --backport flag is missing, remove all backported datasets that aren't used in DAG
+    if not backport:
+        all_deps = {dep for deps in dag.values() for dep in deps}
+        backporting_dag = {k: v for k, v in backporting_dag.items() if k in all_deps}
+
+    dag.update(backporting_dag)
 
     # If --grapher is set, add steps for upserting to DB
     if grapher:
-        dag.update(_grapher_steps(dag))
+        dag.update(_grapher_steps(dag, private))
 
     return dag
 
@@ -227,7 +234,9 @@ def run_dag(
 
     if not force:
         print("Detecting which steps need rebuilding...")
+        start_time = time.time()
         steps = select_dirty_steps(steps, workers)
+        click.echo(f"{click.style('OK', fg='blue')} ({time.time() - start_time:.0f}s)")
 
     if not steps:
         print("All datasets up to date!")
@@ -251,7 +260,8 @@ def timed_run(f: Callable[[], Any]) -> float:
 def _validate_private_steps(dag: DAG) -> None:
     """Make sure there are no public steps that have private steps as dependency."""
     for step_name, step_dependencies in dag.items():
-        if _is_private_step(step_name):
+        # does not apply for private and grapher steps
+        if _is_private_step(step_name) or step_name.startswith("grapher://"):
             continue
         for dependency in step_dependencies:
             if _is_private_step(dependency):
@@ -287,12 +297,12 @@ def _backporting_steps(private: bool, walden_catalog: WaldenCatalog) -> DAG:
     return dag
 
 
-def _grapher_steps(dag: DAG) -> DAG:
+def _grapher_steps(dag: DAG, private: bool) -> DAG:
     # dynamically generate a grapher:// step for every grapher data step
     new_dag = {}
     for step in list(dag.keys()):
-        # match regex with prefix data or data-private
-        if re.match(r"^(data|data-private)://grapher/", step):
+        # match regex with prefix data or data-private (only if we run it with --private)
+        if re.match(r"^data://grapher/", step) or (private and re.match(r"^data-private://grapher/", step)):
             new_dag[re.sub(r"^(data|data-private)://", "grapher://", step)] = {step}
 
     return new_dag
@@ -302,7 +312,7 @@ def _update_open_file_limit() -> None:
     # avoid errors due to not enough allowed open files
     soft_limit, hard_limit = resource.getrlimit(resource.RLIMIT_NOFILE)
     if soft_limit < LIMIT_NOFILE:
-        resource.setrlimit(resource.RLIMIT_NOFILE, (LIMIT_NOFILE, hard_limit))
+        resource.setrlimit(resource.RLIMIT_NOFILE, (min(LIMIT_NOFILE, hard_limit), hard_limit))
 
 
 if __name__ == "__main__":

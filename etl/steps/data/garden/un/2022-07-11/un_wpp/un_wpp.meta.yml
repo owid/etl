@@ -35,7 +35,7 @@ tables:
         description: Number of deaths over a given period divided by the person-years lived by the population over that period.
       deaths:
         title: Deaths
-        short_unit: deaths
+        short_unit:
         unit: deaths
         description: Number of deaths over a given period. Refers to annual civil calendar years from 1 January to 31 December.
         display:

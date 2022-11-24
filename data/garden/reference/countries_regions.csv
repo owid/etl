@@ -28,7 +28,7 @@ BEN,Benin,BJ,BEN,638.0,BEN,434.0,BEN,DM,,BEN,BEN,http://www.wikidata.org/entity/
 BMU,Bermuda,BM,BMU,319.0,,,BER,BM,,BMU,BMU,http://www.wikidata.org/entity/Q23635,Bermuda,194.0,587.0,,
 BTN,Bhutan,BT,BTN,514.0,BHU,760.0,BHU,BT,BHTN,BTN,BTN,http://www.wikidata.org/entity/Q917,Bhutan,33.0,592.0,,
 BOL,Bolivia,BO,BOL,218.0,BOL,145.0,BOL,BO,BOLV,BOL,BOL,http://www.wikidata.org/entity/Q750,Bolivia,34.0,588.0,,"[""Bolivia (Plurinational State of)"", ""Bolivia, Plurinational State Of""]"
-BES,Bonaire Sint Eustatius and Saba,BQ,BES,,,,,,,,,http://www.wikidata.org/entity/Q27561,Caribbean Netherlands,348.0,794.0,,"[""Bonaire, Saint Eustatius And Saba"", ""Bonaire, Sint Eustatius and Saba""]"
+BES,Bonaire Sint Eustatius and Saba,BQ,BES,,,,,,,,,http://www.wikidata.org/entity/Q27561,Caribbean Netherlands,348.0,794.0,,"[""BES Islands"", ""Bonaire, Saint Eustatius And Saba"", ""Bonaire, Sint Eustatius and Saba""]"
 BIH,Bosnia and Herzegovina,BA,BIH,963.0,BOS,346.0,BIH,BN,,BIH,BIH,http://www.wikidata.org/entity/Q225,Bosnia and Herzegovina,35.0,584.0,,"[""Bosnia Herzegovina"", ""Bsnia.&Hrzgvna.""]"
 BWA,Botswana,BW,BWA,616.0,BOT,571.0,BOT,BS,BTSN,BWA,BWA,http://www.wikidata.org/entity/Q963,Botswana,36.0,593.0,,
 BVT,Bouvet Island,BV,BVT,,,,,,,,,http://www.wikidata.org/entity/Q23408,Bouvet Island,349.0,796.0,,
@@ -202,7 +202,7 @@ REU,Reunion,RE,REU,696.0,,,,RE,,REU,REU,http://www.wikidata.org/entity/Q17070,R�
 ROU,Romania,RO,ROU,968.0,ROM,360.0,ROM,RM,RMNA,ROM,ROM,http://www.wikidata.org/entity/Q218,Romania,92.0,735.0,,
 RUS,Russia,RU,RUS,922.0,RUS,365.0,RUS,RU,USSR,RUS,RUS,http://www.wikidata.org/entity/Q159,Russia,12.0,736.0,,"[""Russian Fed."", ""Russian Federation"", ""Russian Federation (the)""]"
 RWA,Rwanda,RW,RWA,714.0,RWA,517.0,RWA,RW,RWND,RWA,RWA,http://www.wikidata.org/entity/Q1037,Rwanda,91.0,737.0,,
-BLM,Saint Barthelemy,BL,BLM,,,,,,,,,http://www.wikidata.org/entity/Q25362,Saint Barthélemy,60094.0,795.0,,"[""Saint Barth\u00e9lemy"", ""Saint Barthlemy""]"
+BLM,Saint Barthelemy,BL,BLM,,,,,,,,,http://www.wikidata.org/entity/Q25362,Saint Barthélemy,60094.0,795.0,,"[""Saint Barthlemy"", ""Saint Barth\u00e9lemy"", ""St Barth""]"
 SHN,Saint Helena,SH,SHN,855.0,,,STH,XJ,,SHN,SHN,http://www.wikidata.org/entity/Q192184,"Saint Helena, Ascension and Tristan da Cunha",260.0,742.0,,"[""Saint Helena, Ascension and Tristan da Cunha"", ""St. Helena""]"
 KNA,Saint Kitts and Nevis,KN,KNA,361.0,SKN,60.0,STK,XD,,KNA,KNA,http://www.wikidata.org/entity/Q763,Saint Kitts and Nevis,227.0,672.0,,"[""St. Kitts and Nevis"", ""St.Kitts & Nevis""]"
 LCA,Saint Lucia,LC,LCA,362.0,SLU,56.0,STL,XK,,LCA,LCA,http://www.wikidata.org/entity/Q760,Saint Lucia,229.0,679.0,,"[""St. Lucia""]"
@@ -237,7 +237,7 @@ SJM,Svalbard and Jan Mayen,SJ,SJM,,,,,,,,,http://www.wikidata.org/entity/Q842829
 SWE,Sweden,SE,SWE,144.0,SWD,380.0,,SW,SWDN,SWE,SWE,http://www.wikidata.org/entity/Q34,Sweden,10.0,755.0,,
 CHE,Switzerland,CH,CHE,146.0,SWZ,225.0,,SZ,SWTZ,CHE,CHE,http://www.wikidata.org/entity/Q39,Switzerland,7.0,597.0,,
 SYR,Syria,SY,SYR,463.0,SYR,652.0,SYR,SY,SYRA,SYR,SYR,http://www.wikidata.org/entity/Q858,Syria,77.0,758.0,,"[""Syrian Arab Rep."", ""Syrian Arab Republic"", ""Syrian Arab Republic (the)""]"
-TWN,Taiwan,TW,TWN,528.0,TAW,713.0,TAI,,TWAN,TWN,TWN,http://www.wikidata.org/entity/Q865,Taiwan,198.0,771.0,,"[""China, Taiwan Province of"", ""Taiwan (Province of China)"", ""Taiwan, Province Of China""]"
+TWN,Taiwan,TW,TWN,528.0,TAW,713.0,TAI,,TWAN,TWN,TWN,http://www.wikidata.org/entity/Q865,Taiwan,198.0,771.0,,"[""China, Taiwan Province of"", ""Chinese Taipei"", ""Taiwan (Province of China)"", ""Taiwan, Province Of China""]"
 TJK,Tajikistan,TJ,TJK,923.0,TAJ,702.0,TAJ,TA,,TJK,TJK,http://www.wikidata.org/entity/Q863,Tajikistan,76.0,763.0,,
 TZA,Tanzania,TZ,TZA,738.0,TAZ,510.0,URT,TZ,TNZN,TZA,TZA,http://www.wikidata.org/entity/Q924,Tanzania,64.0,772.0,,"[""Tanzania, United Republic Of"", ""Tanzania, the United Republic of"", ""U.R. Tanzania"", ""U.R. of Tanzania: Mainland"", ""United Republic of Tanzania""]"
 THA,Thailand,TH,THA,578.0,THI,800.0,THA,TH,TLND,THA,THA,http://www.wikidata.org/entity/Q869,Thailand,75.0,762.0,,
@@ -255,8 +255,8 @@ TUV,Tuvalu,TV,TUV,947.0,TUV,947.0,TUV,TV,,TUV,TUV,http://www.wikidata.org/entity
 OWID_SIC,Two Sicilies,,,,SIC,329.0,,,,,,,,375.0,824.0,,
 UGA,Uganda,UG,UGA,746.0,UGA,500.0,UGA,UG,UGND,UGA,UGA,http://www.wikidata.org/entity/Q1036,Uganda,68.0,773.0,,
 UKR,Ukraine,UA,UKR,926.0,UKR,369.0,UKR,UN,,UKR,UKR,http://www.wikidata.org/entity/Q212,Ukraine,67.0,774.0,,
-ARE,United Arab Emirates,AE,ARE,466.0,UAE,696.0,UAE,TS,UAR0,ARE,ARE,http://www.wikidata.org/entity/Q878,United Arab Emirates,72.0,568.0,,"[""U.Arab Emirates""]"
-GBR,United Kingdom,GB,GBR,112.0,UKG,200.0,,XXK,UK00,GBR,GBR,http://www.wikidata.org/entity/Q145,United Kingdom,1.0,635.0,,"[""United Kingdom of Great Britain and Northern Ireland""]"
+ARE,United Arab Emirates,AE,ARE,466.0,UAE,696.0,UAE,TS,UAR0,ARE,ARE,http://www.wikidata.org/entity/Q878,United Arab Emirates,72.0,568.0,,"[""U.Arab Emirates"", ""United Arab Em""]"
+GBR,United Kingdom,GB,GBR,112.0,UKG,200.0,,XXK,UK00,GBR,GBR,http://www.wikidata.org/entity/Q145,United Kingdom,1.0,635.0,,"[""UK"", ""United Kingdom of Great Britain and Northern Ireland""]"
 USA,United States,US,USA,111.0,USA,2.0,,XXU,USA0,USA,USA,http://www.wikidata.org/entity/Q30,United States of America,13.0,776.0,,"[""US"", ""USA"", ""United States of America""]"
 UMI,United States Minor Outlying Islands,UM,UMI,,,,,,,,,http://www.wikidata.org/entity/Q16645,United States Minor Outlying Islands,354.0,811.0,,
 VIR,United States Virgin Islands,VI,VIR,,,,,VI,,VIR,VIR,http://www.wikidata.org/entity/Q11703,United States Virgin Islands,256.0,782.0,,"[""U.S. Virgin Is."", ""U.S. Virgin Islands"", ""Virgin Islands (U.S.)"", ""Virgin Islands, U.S.""]"

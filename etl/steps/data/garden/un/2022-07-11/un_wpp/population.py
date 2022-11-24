@@ -97,8 +97,8 @@ def add_metrics(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def _add_metric_sexratio(df: pd.DataFrame) -> pd.DataFrame:
-    df_sr: pd.DataFrame = df[df.metric == "sex_ratio"]
-    df_sr = df_sr[
+    df_sr: pd.DataFrame = df.loc[df.metric == "sex_ratio"]
+    df_sr = df_sr.loc[
         df_sr.age.isin(
             [
                 "0",
@@ -241,12 +241,8 @@ def _add_metric_sexratio_all(df_p_granular: pd.DataFrame) -> Any:
     # Check
     (df_p_granular.metric.unique() == ["population"]).all()
     # Get M/F values
-    df_male = df_p_granular[(df_p_granular.age == "all") & (df_p_granular.sex == "male")].rename(
-        columns={"value": "value_male"}
-    )
-    df_female = df_p_granular[(df_p_granular.age == "all") & (df_p_granular.sex == "female")].rename(
-        columns={"value": "value_female"}
-    )
+    df_male = df_p_granular.loc[(df_p_granular.age == "all") & (df_p_granular.sex == "male")].rename(columns={"value": "value_male"})  # type: ignore
+    df_female = df_p_granular.loc[(df_p_granular.age == "all") & (df_p_granular.sex == "female")].rename(columns={"value": "value_female"})  # type: ignore
     # Check
     assert len(df_male) == len(df_female)
     # Build df

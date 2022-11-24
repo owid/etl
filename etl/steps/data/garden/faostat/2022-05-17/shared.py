@@ -382,7 +382,7 @@ def check_that_countries_are_well_defined(data: pd.DataFrame) -> None:
     # Ensure area codes and countries are well defined, and no ambiguities were introduced when mapping country names.
     n_countries_per_area_code = data.groupby("area_code")["country"].transform("nunique")
     ambiguous_area_codes = (
-        data[n_countries_per_area_code > 1][["area_code", "country"]]
+        data.loc[n_countries_per_area_code > 1][["area_code", "country"]]
         .drop_duplicates()
         .set_index("area_code")["country"]
         .to_dict()
@@ -394,7 +394,7 @@ def check_that_countries_are_well_defined(data: pd.DataFrame) -> None:
     assert len(ambiguous_area_codes) == 0, error
     n_area_codes_per_country = data.groupby("country")["area_code"].transform("nunique")
     ambiguous_countries = (
-        data[n_area_codes_per_country > 1][["area_code", "country"]]
+        data.loc[n_area_codes_per_country > 1][["area_code", "country"]]
         .drop_duplicates()
         .set_index("area_code")["country"]
         .to_dict()
@@ -1459,7 +1459,7 @@ def add_per_capita_variables(data: pd.DataFrame, elements_metadata: pd.DataFrame
         )
 
         # Remove nans (which may have been created because of missing FAO population).
-        per_capita_data = per_capita_data.dropna(subset="value").reset_index(drop=True)
+        per_capita_data = per_capita_data.dropna(subset="value").reset_index(drop=True)  # type: ignore
 
         # Add "per capita" to all units.
         per_capita_data["unit"] = per_capita_data["unit"].cat.rename_categories(lambda c: f"{c} per capita")

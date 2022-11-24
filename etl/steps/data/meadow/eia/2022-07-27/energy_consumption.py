@@ -75,7 +75,7 @@ def extract_variable_from_raw_eia_data(
     ].reset_index(drop=True)
 
     # Select and rename columns.
-    data = data[list(columns)].rename(columns=columns)
+    data = data.loc[:, list(columns)].rename(columns=columns)
 
     # Remove rows without data.
     data = data.dropna(subset=["values"])

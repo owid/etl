@@ -46,10 +46,10 @@ def prepare_data(df: pd.DataFrame, expected_content: Dict[int, List[str]], colum
             assert df[df.columns[column]].str.contains(element, regex=False).any(), error
 
     # Select columns and how to rename them.
-    df = df[df.columns[list(columns)]].rename(columns={df.columns[i]: columns[i] for i in columns})
+    df = df.loc[:, df.columns[list(columns)]].rename(columns={df.columns[i]: columns[i] for i in columns})
 
     # Remove all rows for which the year column does not start with an integer of 4 digits.
-    df = df[df["year"].astype(str).str.contains(r"^\d{4}", regex=True, na=False)].reset_index(drop=True)
+    df = df.loc[df["year"].astype(str).str.contains(r"^\d{4}", regex=True, na=False)].reset_index(drop=True)
     # Remove annotations from years (e.g. replace "1987 (5)" by 1987).
     df["year"] = df["year"].astype(str).str[0:4].astype(int)
 

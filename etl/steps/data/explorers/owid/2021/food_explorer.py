@@ -10,6 +10,7 @@
 #       format_version: '1.3'
 #       jupytext_version: 1.11.2
 # ---
+# pyright: reportUnusedExpression=false
 
 # %% [markdown]
 # # Food Explorer
@@ -696,7 +697,7 @@ for former, current in former_to_current.items():
 population = population[(population.year >= fe_bulk.year.min()) & (population.year <= fe_bulk.year.max())].astype(
     {"year": int}
 )
-population = population.loc[~msk]
+population = population.loc[~msk]  # type: ignore
 population = population.set_index(["country", "year"], verify_integrity=True)
 
 # %%
@@ -711,7 +712,7 @@ population = pd.concat([population, population_gap])
 # #### Add population column
 
 # %%
-countries_pop = set(population.index.levels[0])
+countries_pop = set(population.index.levels[0])  # type: ignore
 countries = set(fe_bulk.country)
 print(f"Missing {len(countries_missing := countries.difference(countries_pop))} countries: {countries_missing}")
 if len(countries_missing) > 17:

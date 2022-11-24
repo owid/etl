@@ -1,18 +1,15 @@
+import datetime as dt
 import os
-import shutil
-import tempfile
 from enum import Enum
 from pathlib import Path
 from typing import Any
 
-from cookiecutter.main import cookiecutter
 from owid.walden import Catalog as WaldenCatalog
 from pydantic import BaseModel
 from pywebio import input as pi
 from pywebio import output as po
 
 import etl
-from etl.paths import STEP_DIR
 
 from . import utils
 
@@ -28,6 +25,7 @@ class Options(Enum):
     GENERATE_NOTEBOOK = "Generate playground notebook"
     LOAD_COUNTRIES_REGIONS = "Load countries regions in the script"
     LOAD_POPULATION = "Load population in the script"
+    IS_PRIVATE = "Make dataset private"
 
 
 class MeadowForm(BaseModel):
@@ -41,6 +39,7 @@ class MeadowForm(BaseModel):
     load_population: bool
     generate_notebook: bool
     include_metadata_yaml: bool
+    is_private: bool
 
     def __init__(self, **data: Any) -> None:
         options = data.pop("options")
@@ -49,6 +48,7 @@ class MeadowForm(BaseModel):
         data["load_countries_regions"] = Options.LOAD_COUNTRIES_REGIONS.value in options
         data["load_population"] = Options.LOAD_POPULATION.value in options
         data["generate_notebook"] = Options.GENERATE_NOTEBOOK.value in options
+        data["is_private"] = Options.IS_PRIVATE.value in options
         super().__init__(**data)
 
 
@@ -62,15 +62,6 @@ def app(run_checks: bool, dummy_data: bool) -> None:
         "Options",
         [
             pi.input(
-                "Short name",
-                name="short_name",
-                placeholder="ggdc_maddison",
-                required=True,
-                value=dummies.get("short_name"),
-                validate=utils.validate_short_name,
-                help_text="Underscored short name",
-            ),
-            pi.input(
                 "Namespace",
                 name="namespace",
                 placeholder="ggdc",
@@ -80,17 +71,26 @@ def app(run_checks: bool, dummy_data: bool) -> None:
             pi.input(
                 "Version",
                 name="version",
-                placeholder="2020",
+                placeholder=str(dt.date.today()),
                 required=True,
-                value=dummies.get("version"),
+                value=dummies.get("version", str(dt.date.today())),
             ),
             pi.input(
                 "Walden version",
                 name="walden_version",
-                placeholder="2020",
+                placeholder=str(dt.date.today()),
                 required=True,
-                value=dummies.get("version"),
+                value=dummies.get("version", str(dt.date.today())),
                 help_text="Usually same as Version",
+            ),
+            pi.input(
+                "Short name",
+                name="short_name",
+                placeholder="ggdc_maddison",
+                required=True,
+                value=dummies.get("short_name"),
+                validate=utils.validate_short_name,
+                help_text="Underscored short name",
             ),
             pi.checkbox(
                 "Additional Options",
@@ -100,6 +100,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
                     Options.GENERATE_NOTEBOOK.value,
                     Options.LOAD_COUNTRIES_REGIONS.value,
                     Options.LOAD_POPULATION.value,
+                    Options.IS_PRIVATE.value,
                 ],
                 name="options",
                 value=[
@@ -115,60 +116,45 @@ def app(run_checks: bool, dummy_data: bool) -> None:
     if run_checks:
         _check_dataset_in_walden(form)
 
+    private_suffix = "-private" if form.is_private else ""
+
     if form.add_to_dag:
-        deps = [f"walden://{form.namespace}/{form.walden_version}/{form.short_name}"]
+        deps = [f"walden{private_suffix}://{form.namespace}/{form.walden_version}/{form.short_name}"]
         if form.load_population:
             deps.append("data://garden/owid/latest/key_indicators")
         if form.load_countries_regions:
             deps.append("data://garden/reference")
-        dag_content = utils.add_to_dag({f"data://meadow/{form.namespace}/{form.version}/{form.short_name}": deps})
+        dag_content = utils.add_to_dag(
+            {f"data{private_suffix}://meadow/{form.namespace}/{form.version}/{form.short_name}": deps}
+        )
     else:
         dag_content = ""
 
-    # cookiecutter on python files
-    with tempfile.TemporaryDirectory() as temp_dir:
-        OUTPUT_DIR = temp_dir
+    DATASET_DIR = utils.generate_step(CURRENT_DIR / "meadow_cookiecutter/", dict(**form.dict(), channel="meadow"))
 
-        # generate ingest scripts
-        cookiecutter(
-            (CURRENT_DIR / "meadow_cookiecutter/").as_posix(),
-            no_input=True,
-            output_dir=temp_dir,
-            overwrite_if_exists=True,
-            extra_context=dict(directory_name="meadow", **form.dict()),
-        )
+    step_path = DATASET_DIR / (form.short_name + ".py")
+    notebook_path = DATASET_DIR / "playground.ipynb"
+    metadata_path = DATASET_DIR / (form.short_name + ".meta.yml")
 
-        DATASET_DIR = STEP_DIR / "data" / "meadow" / form.namespace / form.version
+    if not form.generate_notebook:
+        os.remove(notebook_path)
 
-        shutil.copytree(
-            Path(OUTPUT_DIR) / "meadow",
-            DATASET_DIR,
-            dirs_exist_ok=True,
-        )
+    if not form.include_metadata_yaml:
+        os.remove(metadata_path)
 
-        step_path = DATASET_DIR / (form.short_name + ".py")
-        notebook_path = DATASET_DIR / "playground.ipynb"
-        metadata_path = DATASET_DIR / (form.short_name + ".meta.yml")
-
-        if not form.generate_notebook:
-            os.remove(notebook_path)
-
-        if not form.include_metadata_yaml:
-            os.remove(metadata_path)
-
-        po.put_markdown(
-            f"""
+    po.put_markdown(
+        f"""
 ## Next steps
 
 1. Run `etl` to generate the dataset
 
     ```
-    poetry run etl data://meadow/{form.namespace}/{form.version}/{form.short_name}
+    poetry run etl data{private_suffix}://meadow/{form.namespace}/{form.version}/{form.short_name} {"--private" if form.is_private else ""}
     ```
 
-2. Generated notebook `{notebook_path.relative_to(ETL_DIR)}` can be used to examine the dataset output interactively.
+2. (Optional) Generated notebook `{notebook_path.relative_to(ETL_DIR)}` can be used to examine the dataset output interactively.
 
-3. Loading the dataset is also possible with this snippet:
+3. (Optional) Loading the dataset is also possible with this snippet:
 
     ```python
     from owid.catalog import Dataset
@@ -180,18 +166,30 @@ def app(run_checks: bool, dummy_data: bool) -> None:
     df = ds["{form.short_name}"]
     ```
 
-4. Exit the process and run next step with `poetry run walkthrough garden`
+4. (Optional) Generate metadata file `{form.short_name}.meta.yml` from your dataset with
+
+    ```
+    poetry run etl-metadata-export data/meadow/{form.namespace}/{form.version}/{form.short_name} -o etl/steps/data/meadow/{form.namespace}/{form.version}/{form.short_name}.meta.yml
+    ```
+
+    then manual edit it and rerun the step again with
+
+    ```
+    poetry run etl data{private_suffix}://meadow/{form.namespace}/{form.version}/{form.short_name} {"--private" if form.is_private else ""}
+    ```
+
+5. Exit the process and run next step with `poetry run walkthrough garden`
 
 ## Generated files
 """
-        )
+    )
 
-        if form.include_metadata_yaml:
-            utils.preview_file(metadata_path, "yaml")
-        utils.preview_file(step_path, "python")
+    if form.include_metadata_yaml:
+        utils.preview_file(metadata_path, "yaml")
+    utils.preview_file(step_path, "python")
 
-        if dag_content:
-            utils.preview_dag(dag_content)
+    if dag_content:
+        utils.preview_dag(dag_content)
 
 
 def _check_dataset_in_walden(form: MeadowForm) -> None:

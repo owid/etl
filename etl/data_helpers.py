@@ -39,7 +39,7 @@ def calculate_region_sums(df: pd.DataFrame) -> pd.DataFrame:
     continents = (
         df.merge(continent_list, on="country")
         .groupby(["continent", "year"], as_index=False)
-        .sum()
+        .sum(numeric_only=True)
         .rename(columns={"continent": "country"})
     )
 

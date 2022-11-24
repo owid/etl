@@ -8,6 +8,7 @@ import hashlib
 import os
 import re
 import subprocess
+import sys
 import tempfile
 import warnings
 from collections import defaultdict
@@ -24,8 +25,9 @@ with warnings.catch_warnings():
     warnings.simplefilter("ignore")
     import papermill as pm
 
-from owid import catalog, walden
+from owid import catalog
 from owid.walden import CATALOG as WALDEN_CATALOG
+from owid.walden import Dataset as WaldenDataset
 
 from etl import backport_helpers, config, files, git
 from etl import grapher_helpers as gh
@@ -141,7 +143,7 @@ def _load_dag(filename: Union[str, Path], prev_dag: Dict[str, Any]):
     Recursive helper to 1) load a dag itself, and 2) load any sub-dags
     included in the dag via 'include' statements
     """
-    dag_yml = _load_dag_yaml(filename)
+    dag_yml = _load_dag_yaml(str(filename))
     curr_dag = _parse_dag_yaml(dag_yml)
     curr_dag.update(prev_dag)
 
@@ -217,9 +219,6 @@ def parse_step(step_name: str, dag: Dict[str, Any]) -> "Step":
 
     elif step_type == "walden-private":
         step = WaldenStepPrivate(path)
-
-    elif step_type == "grapher-private":
-        step = GrapherStepPrivate(path, dependencies)
 
     elif step_type == "backport-private":
         step = BackportStepPrivate(path, dependencies)
@@ -377,7 +376,13 @@ class DataStep(Step):
         """
         # use a subprocess to isolate each step from the others, and avoid state bleeding
         # between them
-        args = ["poetry", "run", "run_python_step"]
+        args = []
+
+        if sys.platform == "linux":
+            args.extend(["prlimit", f"--as={config.MAX_VIRTUAL_MEMORY_LINUX}"])
+
+        args.extend(["poetry", "run", "run_python_step"])
+
         if config.IPDB_ENABLED:
             args.append("--ipdb")
 
@@ -444,7 +449,13 @@ class WaldenStep(Step):
         self._walden_dataset.ensure_downloaded(quiet=True)
 
     def is_dirty(self) -> bool:
-        return not Path(self._walden_dataset.local_path).exists()
+        if not Path(self._walden_dataset.local_path).exists():
+            return True
+
+        if files.checksum_file(self._walden_dataset.local_path) != self._walden_dataset.md5:
+            return True
+
+        return False
 
     def has_existing_data(self) -> bool:
         return True
@@ -465,7 +476,7 @@ class WaldenStep(Step):
         return checksum
 
     @property
-    def _walden_dataset(self) -> walden.Dataset:
+    def _walden_dataset(self) -> WaldenDataset:
         if self.path.count("/") != 2:
             raise ValueError(f"malformed walden path: {self.path}")
 
@@ -522,6 +533,7 @@ class GrapherStep(Step):
 
         dataset.metadata = gh._adapt_dataset_metadata_for_grapher(dataset.metadata)
 
+        assert dataset.metadata.namespace
         dataset_upsert_results = upsert_dataset(
             dataset,
             dataset.metadata.namespace,
@@ -689,13 +701,6 @@ class WaldenStepPrivate(WaldenStep):
 
     def __str__(self) -> str:
         return f"walden-private://{self.path}"
-
-
-class GrapherStepPrivate(GrapherStep):
-    is_public = False
-
-    def __str__(self) -> str:
-        return f"grapher-private://{self.path}"
 
 
 class BackportStepPrivate(PrivateMixin, BackportStep):

@@ -1,11 +1,9 @@
-import shutil
-import tempfile
+import datetime as dt
+from enum import Enum
 from pathlib import Path
-from typing import Optional
+from typing import Any, Optional
 
 from botocore.exceptions import ClientError
-from cookiecutter.main import cookiecutter
-from owid import walden
 from owid.catalog import s3_utils
 from pydantic import BaseModel
 from pywebio import input as pi
@@ -14,13 +12,18 @@ from pywebio import output as po
 from . import utils
 
 CURRENT_DIR = Path(__file__).parent
-WALDEN_INGEST_DIR = Path(walden.__file__).parent.parent.parent / "ingests"
+
+
+class Options(Enum):
+
+    IS_PRIVATE = "Make dataset private"
 
 
 class WaldenForm(BaseModel):
 
-    short_name: str
     namespace: str
+    walden_version: str
+    short_name: str
     name: str
     source_name: str
     publication_year: Optional[str]
@@ -31,10 +34,16 @@ class WaldenForm(BaseModel):
     license_name: str
     license_url: str
     description: str
+    is_private: bool
+
+    def __init__(self, **data: Any) -> None:
+        options = data.pop("options")
+        data["is_private"] = Options.IS_PRIVATE.value in options
+        super().__init__(**data)
 
     @property
     def version(self) -> str:
-        return self.publication_year or self.publication_date  # type: ignore
+        return self.walden_version or self.publication_year or self.publication_date  # type: ignore
 
 
 def app(run_checks: bool, dummy_data: bool) -> None:
@@ -53,6 +62,22 @@ def app(run_checks: bool, dummy_data: bool) -> None:
         "Dataset details",
         [
             pi.input(
+                "Namespace",
+                name="namespace",
+                placeholder="ggdc",
+                help_text="E.g. institution name",
+                required=True,
+                value=dummies.get("namespace"),
+            ),
+            pi.input(
+                "Version",
+                name="walden_version",
+                placeholder=str(dt.date.today()),
+                help_text="E.g. current date, publication date or year is used if not given",
+                required=False,
+                value=dummies.get("walden_version", str(dt.date.today())),
+            ),
+            pi.input(
                 "Short name",
                 name="short_name",
                 placeholder="ggdc_maddison",
@@ -67,14 +92,6 @@ def app(run_checks: bool, dummy_data: bool) -> None:
                 placeholder="Maddison Project Database (GGDC, 2020)",
                 required=True,
                 value=dummies.get("name"),
-            ),
-            pi.input(
-                "Namespace",
-                name="namespace",
-                placeholder="ggdc",
-                help_text="E.g. institution name",
-                required=True,
-                value=dummies.get("namespace"),
             ),
             pi.input(
                 "Source name",
@@ -128,6 +145,13 @@ def app(run_checks: bool, dummy_data: bool) -> None:
                 placeholder="Creative Commons BY 4.0",
             ),
             pi.textarea("Description", name="description", value=dummies.get("description")),
+            pi.checkbox(
+                "Other options",
+                options=[
+                    Options.IS_PRIVATE.value,
+                ],
+                name="options",
+            ),
         ],
     )
     form = WaldenForm(**data)
@@ -136,33 +160,22 @@ def app(run_checks: bool, dummy_data: bool) -> None:
     form.description = form.description.replace("\n", "\n  ")
 
     # cookiecutter on python files
-    with tempfile.TemporaryDirectory() as temp_dir:
-        OUTPUT_DIR = temp_dir
+    WALDEN_INGEST_DIR = utils.generate_step(
+        CURRENT_DIR / "walden_cookiecutter/", dict(**form.dict(), version=form.walden_version, channel="walden")
+    )
 
-        # generate ingest scripts
-        cookiecutter(
-            (CURRENT_DIR / "walden_cookiecutter/").as_posix(),
-            no_input=True,
-            output_dir=temp_dir,
-            overwrite_if_exists=True,
-            extra_context=dict(directory_name="walden", **form.dict()),
-        )
+    ingest_path = WALDEN_INGEST_DIR / (form.short_name + ".py")
+    meta_path = WALDEN_INGEST_DIR / (form.short_name + ".meta.yml")
 
-        # move them into the walden ingest directory
-        shutil.copytree(Path(OUTPUT_DIR) / "walden", WALDEN_INGEST_DIR, dirs_exist_ok=True)
-
-        ingest_path = WALDEN_INGEST_DIR / (form.short_name + ".py")
-        meta_path = WALDEN_INGEST_DIR / (form.short_name + ".meta.yml")
-
-        po.put_markdown(
-            f"""
+    po.put_markdown(
+        f"""
 ## Next steps
 
 1. Verify that generated files are correct and update them if necessary
 
 2. Test your ingest script with
 ```bash
-python vendor/walden/ingests/{form.short_name}.py --skip-upload
+python vendor/walden/ingests/{form.namespace}/{form.version}/{form.short_name}.py --skip-upload
 ```
 
 3. Once you are happy with the ingest script, run it without the `--skip-upload` flag to upload files to S3. Running it again will overwrite the dataset.
@@ -185,10 +198,10 @@ df = pd.read_csv(local_file)
 
 ## Generated files
 """
-        )
+    )
 
-        utils.preview_file(meta_path, "yaml")
-        utils.preview_file(ingest_path, "python")
+    utils.preview_file(meta_path, "yaml")
+    utils.preview_file(ingest_path, "python")
 
     return
 

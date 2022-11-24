@@ -113,9 +113,9 @@ def combine_bp_and_shift_data(bp_table: catalog.Table, shift_table: catalog.Tabl
     for variable in data_columns:
         _shift_data = shift_table[index_columns + [variable]].dropna(subset=variable)
         _bp_data = bp_table[index_columns + [variable]].dropna(subset=variable)
-        _combined = pd.concat([_shift_data, _bp_data], ignore_index=True)
+        _combined = pd.concat([_shift_data, _bp_data], ignore_index=True)  # type: ignore
         # On rows where both datasets overlap, give priority to BP data.
-        _combined = _combined.drop_duplicates(subset=index_columns, keep="last")
+        _combined = _combined.drop_duplicates(subset=index_columns, keep="last")  # type: ignore
         # Combine data for different variables.
         combined = pd.merge(combined, _combined, on=index_columns, how="outer")
 

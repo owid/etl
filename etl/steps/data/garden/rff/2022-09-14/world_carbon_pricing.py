@@ -267,7 +267,7 @@ def run(dest_dir: str) -> None:
     df_subnational = pd.DataFrame(tb_meadow_subnational)
 
     # Load dictionary mapping sub-national jurisdictions to their countries.
-    country_members = io.local.load_json(COUNTRY_MEMBERS_FILE)
+    country_members = io.load_json(COUNTRY_MEMBERS_FILE)
 
     #
     # Process data.

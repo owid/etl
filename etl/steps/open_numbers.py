@@ -100,7 +100,7 @@ def load_table(resource: frictionless.Resource) -> pd.DataFrame:
 
 def load_and_combine(path: Path, resources: List[frictionless.Resource]) -> pd.DataFrame:
     first = True
-    primary_key: List[str]
+    primary_key: List[str] = []
     columns: List[str]
 
     with tempfile.NamedTemporaryFile(suffix=".csv") as f:

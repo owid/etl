@@ -38,7 +38,7 @@ jobs:
         with:
           path: |
             .venv
-          key: ${{ runner.os }}-python-${{ steps.setup-python.outputs.python-version }}-poetry-${{ hashFiles('poetry.lock') }}
+          key: ${{ runner.os }}-python-${{ steps.setup-python.outputs.python-version }}-poetry-${{ hashFiles('**/poetry.lock', '**/pyproject.toml') }}
 
       - name: install missing dependencies
         run: |
