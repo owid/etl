@@ -4,6 +4,7 @@
 walkthrough/
 etl/
 data/
+!data/snapshots/
 tests/
 backport/
 vendor/

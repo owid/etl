@@ -16,6 +16,7 @@ meta:
     a
     dummy
     dataset
+wdir: ../../../data/snapshots/dummy/2020-01-01
 outs:
 - md5: 0fadb25212dd37be38cd098899873a35
   size: 1764793

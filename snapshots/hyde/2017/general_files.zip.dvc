@@ -11,6 +11,7 @@ meta:
   file_extension: zip
   description: |
     Metadata for the Hyde 3.2 dataset, such as country codes.
+wdir: ../../../data/snapshots/hyde/2017
 outs:
 - md5: 51877033a0b0e3bdf36430ed2fe62510
   size: 3018098

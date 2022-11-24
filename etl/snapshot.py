@@ -17,36 +17,45 @@ dvc = Repo(paths.BASE_DIR)
 @dataclass
 class Snapshot:
 
-    path: str
+    uri: str
     metadata: "SnapshotMeta"
 
-    def __init__(self, path: Union[str, Path]) -> None:
-        # for convenience, accept Path objects directly
-        if isinstance(path, Path):
-            self.path = path.as_posix()
-        else:
-            self.path = path
+    def __init__(self, uri: str) -> None:
+        """
+        :param uri: URI of the snapshot file, typically `namespace/version/short_name.ext`
+        """
+        self.uri = uri
 
-        metadata_path = Path(self.path + ".dvc")
-        if not metadata_path.exists():
-            raise FileNotFoundError(f"Metadata file {metadata_path} not found")
+        if not self.metadata_path.exists():
+            raise FileNotFoundError(f"Metadata file {self.metadata_path} not found")
 
-        self.metadata = SnapshotMeta.load_from_yaml(metadata_path)
+        self.metadata = SnapshotMeta.load_from_yaml(self.metadata_path)
+
+    @property
+    def path(self) -> Path:
+        """Path to materialized file."""
+        return paths.DATA_DIR / "snapshots" / self.uri
+
+    @property
+    def metadata_path(self) -> Path:
+        """Path to metadata file."""
+        return Path(f"{paths.SNAPSHOTS_DIR / self.uri}.dvc")
 
     def pull(self) -> None:
         """Pull file from S3."""
-        dvc.pull(self.path, remote=self._dvc_remote)
+        dvc.pull(str(self.path), remote=self._dvc_remote)
 
     def download_from_source(self) -> None:
         """Download file from source_data_url."""
         assert self.metadata.source_data_url, "source_data_url is not set"
-        files.download(self.metadata.source_data_url, self.path)
+        self.path.parent.mkdir(exist_ok=True, parents=True)
+        files.download(self.metadata.source_data_url, str(self.path))
 
     def dvc_add(self, upload: bool) -> None:
         """Add file to DVC and upload to S3."""
-        dvc.add(self.path)
+        dvc.add(str(self.path), fname=str(self.metadata_path))
         if upload:
-            dvc.push(self.path, remote=self._dvc_remote)
+            dvc.push(str(self.path), remote=self._dvc_remote)
 
     @property
     def _dvc_remote(self):

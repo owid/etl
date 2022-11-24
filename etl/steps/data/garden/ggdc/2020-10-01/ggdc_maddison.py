@@ -205,13 +205,13 @@ def run(dest_dir: str) -> None:
     # Initialise dataset.
     ds = Dataset.create_empty(dest_dir)
 
-    snap = Snapshot(N.snapshot_dir / "ggdc_maddison.xlsx")
+    snap = Snapshot("ggdc/2020-10-01/ggdc_maddison.xlsx")
 
     # Assign the same metadata of the walden dataset to this dataset.
     ds.metadata = convert_snapshot_metadata(snap.metadata)
 
     # Load and process data.
-    df = generate_ggdc_data(data_file=snap.path)
+    df = generate_ggdc_data(data_file=str(snap.path))
 
     # Set meaningful indexes.
     df = df.set_index(["country", "year"])

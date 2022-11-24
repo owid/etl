@@ -4,7 +4,6 @@ from owid.catalog.utils import underscore_table
 from structlog import get_logger
 
 from etl.helpers import Names
-from etl.paths import SNAPSHOTS_DIR
 from etl.snapshot import Snapshot
 from etl.steps.data.converters import convert_snapshot_metadata
 
@@ -18,7 +17,7 @@ def run(dest_dir: str) -> None:
     log.info("dummy.start")
 
     # retrieve snapshot
-    snap = Snapshot(SNAPSHOTS_DIR / "dummy" / "2020-01-01" / "dummy.xlsx")
+    snap = Snapshot("dummy/2020-01-01/dummy.xlsx")
     df = pd.read_excel(snap.path, sheet_name="Full data")
 
     # clean and transform data

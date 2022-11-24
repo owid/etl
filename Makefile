@@ -6,7 +6,7 @@
 
 include default.mk
 
-SRC = etl backport walkthrough tests
+SRC = etl snapshots backport walkthrough tests
 PYTHON_PLATFORM = $(shell python -c "import sys; print(sys.platform)")
 
 help:
