@@ -7,14 +7,11 @@ import warnings
 import pandas as pd
 from owid.catalog import Dataset, Table, TableMeta
 from owid.catalog.utils import underscore_table
-from structlog import get_logger
 
 from etl.helpers import Names
-from etl.paths import DATA_DIR, REFERENCE_DATASET, SNAPSHOTS_DIR
+from etl.paths import SNAPSHOTS_DIR
 from etl.snapshot import Snapshot
 from etl.steps.data.converters import convert_snapshot_metadata
-
-log = get_logger()
 
 # Snapshot version.
 SNAPSHOT_VERSION = "2022-11-24"
