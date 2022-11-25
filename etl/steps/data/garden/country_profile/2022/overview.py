@@ -4,17 +4,22 @@ from functools import reduce
 import pandas as pd
 from owid import catalog
 from owid.catalog import Dataset
+from owid.catalog.utils import underscore
+from owid.datautils import dataframes
+from structlog import get_logger
 
 from etl.paths import DATA_DIR, REFERENCE_DATASET
 
 from .shared import CURRENT_DIR
+
+log = get_logger()
 
 METADATA_PATH = CURRENT_DIR / "overview.meta.yml"
 # Details for datasets to import.
 # Population
 KI_DATASET_PATH = DATA_DIR / "garden/owid/latest/key_indicators"
 
-# Per capita Co2 emissions
+# Per capita CO2 emissions
 CO2_EMISSIONS_DATASET_PATH = DATA_DIR / "garden/gcp/2022-11-11/global_carbon_budget"
 
 # Energy consumption by source
@@ -51,16 +56,17 @@ def run(dest_dir: str) -> None:
     # Population
     pop = get_population()
     # emissions per capita
-    em = get_emissions()
+    emissions_pc = get_emissions()
     # electricity mix
-    mix = get_energy_mix()
+    energy_mix = get_energy_mix()
     # WDI: share using internet; gdp per capita; share electricity access
     wdi = get_wdi_variables()
     # Backport: Electoral democracy; Homicide rate; Average years of schooling; Life expectancy; Child mortality; Daily calories
-    bkp = get_backports()
+    backports = get_backports()
 
-    data_frames = [pop, em, mix, wdi, bkp]
-    df_merged = reduce(lambda left, right: pd.merge(left, right, on=["country", "year"], how="outer"), data_frames)
+    data_frames = [pop, emissions_pc, energy_mix, wdi, backports]
+    # df_merged = reduce(lambda left, right: pd.merge(left, right, on=["country", "year"], how="outer"), data_frames)
+    df_merged = dataframes.multi_merge(data_frames, on=["country", "year"], how="outer")
     df_merged = df_merged.sort_values("year")
 
     ds_garden = catalog.Dataset.create_empty(dest_dir)
@@ -70,11 +76,9 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
     for country in countries_list:
-        print(country)
+        log.info(f"Saving... {country}")
         # making snake case version of country name
-        country_snake_case = country.replace(" ", "_").lower()
-        # removing any punctuation e.g. cote d'ivoire
-        country_snake_case = re.sub(r"[^\w\s]", "", country_snake_case)
+        country_snake_case = underscore(country)
         df_country = df_merged[df_merged["country"] == country]
 
         if df_country.shape[1] > 2:
@@ -86,13 +90,12 @@ def run(dest_dir: str) -> None:
                 tb_combined = catalog.Table(df_country)
 
                 # Details for dataset to export.
-                TABLE_SHORT_NAME = f"overview_{country_snake_case}"
-                TABLE_TITLE = f"Country Profile Overview - {country}"
+                table_short_name = f"overview_{country_snake_case}"
+                table_title = f"Country Profile Overview - {country}"
 
                 # Add other metadata fields to table.
-                # tb_combined.update_metadata_from_yaml(METADATA_PATH, TABLE_SHORT_NAME)
-                tb_combined.metadata.short_name = TABLE_SHORT_NAME
-                tb_combined.metadata.title = TABLE_TITLE
+                tb_combined.metadata.short_name = table_short_name
+                tb_combined.metadata.title = table_title
 
                 # Add combined tables to the new dataset.
                 tb_combined = tb_combined.reset_index()
@@ -113,20 +116,19 @@ def get_emissions() -> pd.DataFrame:
     """
     Get the emissions per capita variable from the global carbon budget dataset
     """
-    ds_em = catalog.Dataset(CO2_EMISSIONS_DATASET_PATH)
-    df_em = ds_em["global_carbon_budget"].reset_index()
-    df_em = df_em[["country", "year", "emissions_total_per_capita"]]
-    df_em["emissions_total_per_capita"] = df_em["emissions_total_per_capita"].round(2)
-    df_em["year"] = df_em["year"].astype("int64")
-    return df_em
+    ds_emissions = catalog.Dataset(CO2_EMISSIONS_DATASET_PATH)
+    df_emissions = ds_emissions["global_carbon_budget"].reset_index()
+    df_emissions = df_emissions[["country", "year", "emissions_total_per_capita"]]
+    df_emissions["year"] = df_emissions["year"].astype("int64")
+    return df_emissions
 
 
 def get_energy_mix() -> pd.DataFrame:
     """
     Get the energy consumption variables from the BP energy mix dataset
     """
-    ds_mix = catalog.Dataset(ENERGY_CON_DATASET_PATH)
-    df_mix = ds_mix["energy_mix"].reset_index()
+    ds_energy_mix = catalog.Dataset(ENERGY_CON_DATASET_PATH)
+    df_energy_mix = ds_energy_mix["energy_mix"].reset_index()
     cols = [
         "country",
         "year",
@@ -141,9 +143,9 @@ def get_energy_mix() -> pd.DataFrame:
         "biofuels__twh",
         "fossil_fuels__twh",
     ]
-    df_mix = df_mix[cols]
-    df_mix["year"] = df_mix["year"].astype("int64")
-    return df_mix
+    df_energy_mix = df_energy_mix[cols]
+    df_energy_mix["year"] = df_energy_mix["year"].astype("int64")
+    return df_energy_mix
 
 
 def get_wdi_variables() -> pd.DataFrame:
@@ -194,7 +196,7 @@ def get_backports() -> pd.DataFrame:
     t_all = pd.DataFrame()
 
     for dataset, variables in backports.items():
-        print(dataset)
+        log.info(f"Fetching the backport of... {dataset}")
         ds = catalog.Dataset(f"{base_path}/{dataset}")
         t = ds[dataset]
 
