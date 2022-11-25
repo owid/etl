@@ -16,7 +16,6 @@ from etl.snapshot import Snapshot
 )
 def main(upload: bool) -> None:
     snap = Snapshot("ggdc/2020-10-01/ggdc_maddison.xlsx")
-    __import__("ipdb").set_trace()
     snap.download_from_source()
     snap.dvc_add(upload=upload)
 
