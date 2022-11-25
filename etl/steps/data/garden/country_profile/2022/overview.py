@@ -1,6 +1,3 @@
-import re
-from functools import reduce
-
 import pandas as pd
 from owid import catalog
 from owid.catalog import Dataset
