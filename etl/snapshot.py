@@ -83,8 +83,8 @@ class SnapshotMeta:
     # how to get the data file
     file_extension: str
 
-    # today by default
-    date_accessed: str = dt.datetime.now().date().strftime("%Y-%m-%d")
+    # usually today
+    date_accessed: str
 
     # URL with file, use `download_and_create(metadata)` for uploading to walden
     source_data_url: Optional[str] = None

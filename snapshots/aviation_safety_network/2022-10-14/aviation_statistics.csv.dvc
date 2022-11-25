@@ -10,6 +10,7 @@ meta:
   file_extension: csv
   license_url: https://aviation-safety.net/about/usage33.php
   license_name: Copyright Aviation Safety Network
+  date_accessed: 2022-10-14
   description: |
 wdir: ../../../data/snapshots/aviation_safety_network/2022-10-14
 outs:

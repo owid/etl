@@ -18,6 +18,7 @@ meta:
   # License is defined in the main page of the project.
   license_url: https://www.rug.nl/ggdc/historicaldevelopment/maddison/releases/maddison-project-database-2020
   license_name: Creative Commons BY 4.0
+  date_accessed: 2022-04-12
   description: |
     Full citation:
     Maddison Project Database, version 2020. Bolt, Jutta and Jan Luiten van Zanden (2020), “Maddison style estimates of the evolution of the world economy. A new 2020 update”.
