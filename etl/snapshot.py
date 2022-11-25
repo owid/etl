@@ -42,6 +42,11 @@ class Snapshot:
     @property
     def metadata_path(self) -> Path:
         """Path to metadata file."""
+        return (paths.SNAPSHOTS_DIR / self.uri).with_suffix(".meta.yml")
+
+    @property
+    def dvc_path(self) -> Path:
+        """Path to generated DVC file."""
         return Path(f"{paths.SNAPSHOTS_DIR / self.uri}.dvc")
 
     def pull(self) -> None:
@@ -56,7 +61,7 @@ class Snapshot:
 
     def dvc_add(self, upload: bool) -> None:
         """Add file to DVC and upload to S3."""
-        dvc.add(str(self.path), fname=str(self.metadata_path))
+        dvc.add(str(self.path), fname=str(self.dvc_path))
         if upload:
             dvc.push(str(self.path), remote=self._dvc_remote)
 
@@ -120,9 +125,7 @@ class SnapshotMeta:
         """Load metadata from YAML file. Metadata must be stored under `meta` key."""
         with open(filename) as istream:
             yml = yaml.safe_load(istream)
-            if "meta" not in yml:
-                raise ValueError("Metadata YAML should be stored under `meta` key")
-            return cls.from_dict(yml["meta"])
+            return cls.from_dict(yml)
 
     def to_dict(self) -> Dict[str, Any]:
         ...
