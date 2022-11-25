@@ -84,7 +84,7 @@ class SnapshotMeta:
     file_extension: str
 
     # usually today
-    date_accessed: str
+    date_accessed: dt.date
 
     # URL with file, use `download_and_create(metadata)` for uploading to walden
     source_data_url: Optional[str] = None
