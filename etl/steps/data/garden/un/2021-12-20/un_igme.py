@@ -12,6 +12,8 @@ from etl.paths import DATA_DIR
 
 log = get_logger()
 
+# _DATASET_PATH = DATA_DIR / "garden/un/2022-07-11/un_wpp"
+
 # naming conventions
 N = Names(__file__)
 N = Names("etl/steps/data/garden/un/2021-12-20/un_igme.py")
@@ -126,7 +128,7 @@ def calculate_mortality_rate(df: pd.DataFrame) -> pd.DataFrame:
 
     for new_rate, components in rate_calculations.items():
         log.info(f"Calculating.{new_rate}")
-
+        # Only calculating for both sexes
         df_a = df[["country", "year", "value"]][(df["indicator"] == components[0]) & (df["sex"] == "Total")]
         df_a = df_a.rename(columns={"value": components[0]})
         df_b = df[["country", "year", "value"]][(df["indicator"] == components[1]) & (df["sex"] == "Total")]
