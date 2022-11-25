@@ -192,6 +192,11 @@ steps:
   #
   data://meadow/emdat/2022-11-24/natural_disasters:
     - snapshot://emdat/2022-11-24/natural_disasters.xlsx
+  data://garden/emdat/2022-11-24/natural_disasters:
+    - data://meadow/emdat/2022-11-24/natural_disasters
+    - data://garden/owid/latest/key_indicators
+    - data://garden/wb/2021-07-01/wb_income
+    - data://garden/reference
 
 # Sub-dags to import
 include:
