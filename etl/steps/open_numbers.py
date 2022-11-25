@@ -131,7 +131,7 @@ def load_and_combine(path: Path, resources: List[frictionless.Resource]) -> pd.D
         # ignore mixed type warnings
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", pd.errors.DtypeWarning)
-            df = pd.read_csv(f.name, engine="pyarrow")  # type: ignore
+            df = pd.read_csv(f.name)
 
     # fix mixed types of object columns
     for col in df.select_dtypes(object).columns:
