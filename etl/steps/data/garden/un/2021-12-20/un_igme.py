@@ -2,6 +2,7 @@ import json
 from typing import List, cast
 
 import pandas as pd
+from owid import catalog
 from owid.catalog import Dataset, Table
 from owid.catalog.utils import underscore_table
 from owid.datautils import geo
@@ -12,7 +13,9 @@ from etl.paths import DATA_DIR
 
 log = get_logger()
 
-# _DATASET_PATH = DATA_DIR / "garden/un/2022-07-11/un_wpp"
+GAPMINDER_CHILD_MORTALITY_DATASET_PATH = DATA_DIR / "open_numbers/open_numbers/latest/gapminder__child_mortality"
+GAPMINDER_INFANT_MORTALITY_DATASET_PATH = DATA_DIR / "open_numbers/open_numbers/latest/gapminder__hist_imr"
+
 
 # naming conventions
 N = Names(__file__)
@@ -21,30 +24,33 @@ N = Names("etl/steps/data/garden/un/2021-12-20/un_igme.py")
 
 def run(dest_dir: str) -> None:
     log.info("un_igme.start")
-
     # read dataset from meadow
     ds_meadow = Dataset(DATA_DIR / "meadow/un/2021-12-20/un_igme")
     tb_meadow = ds_meadow["un_igme"]
-
-    df = pd.DataFrame(tb_meadow)
+    df = pd.DataFrame(tb_meadow).drop(columns=["index"])
+    # adding source tag to all UN IGME rows prior to combination with Gapminder data
+    df["source"] = "UN IGME"
+    df_gap = get_gapminder_data()
+    df_combine = pd.concat([df, df_gap])
 
     log.info("un_igme.exclude_countries")
-    df = exclude_countries(df)
+    df_combine = exclude_countries(df_combine)
 
     log.info("un_igme.harmonize_countries")
-    df = harmonize_countries(df)
-
+    dfc = harmonize_countries(df_combine)
+    # Preferentially use UN IGME data where there is duplicate values for country-year combinations
+    dfc = combine_datasets(dfc)
     # Calculate missing age-group mortality rates
-    df = calculate_mortality_rate(df)
+    dfc = calculate_mortality_rate(dfc)
     # Making the values in the table a bit more appropriate for our use and pivoting to a wide table.
     log.info("un_igme.clean_data")
-    df = clean_and_format_data(df)
+    dfc = clean_and_format_data(dfc)
 
     ds_garden = Dataset.create_empty(dest_dir)
     ds_garden.metadata = ds_meadow.metadata
 
-    # I want to create one table per column and auto-populate the metadata
-    for df_select in df:
+    # Create one table per column and auto-populate the metadata
+    for df_select in dfc:
         print(df_select)
         # Pulling out the relevant information from the column names for the metadata
         # Metric is the central value or upper/lower bound
@@ -53,7 +59,7 @@ def run(dest_dir: str) -> None:
         age_group = df_select[2]
         unit = df_select[3]
 
-        df_t = Table(pd.DataFrame(df[df_select]).reset_index())
+        df_t = Table(pd.DataFrame(dfc[df_select]).reset_index())
         df_t.columns = ["_".join(col).strip() for col in df_t.columns.values]
         tb_garden = underscore_table(df_t)
         # Creating table and variable level metadata
@@ -70,6 +76,53 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
     log.info("un_igme.end")
+
+
+def combine_datasets(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Combine the UN IGME and the Gapminder datasets with a preference for the IGME data
+     - Split dataframe into duplicate and non-duplicate rows (duplicate on country, indicator, sex, year)
+     - Remove the Gapminder rows in the duplicated data
+     - Recombine the two datasets
+     - Check there are no longer any duplicates
+    """
+
+    no_dups_df = pd.DataFrame(df[~df.duplicated(subset=["country", "indicator", "sex", "year"], keep=False)])
+    keep_igme = pd.DataFrame(
+        df[(df.duplicated(subset=["country", "indicator", "sex", "year"], keep=False)) & (df.source == "UN IGME")]
+    )
+    df_clean = pd.concat([no_dups_df, keep_igme], ignore_index=True)
+    assert df_clean[df_clean.groupby(["country", "indicator", "sex", "year"]).transform("size") > 1].shape[0] == 0
+    return df_clean
+
+
+def get_gapminder_data() -> pd.DataFrame:
+    """
+    Get child and infant mortality data from open numbers
+    """
+    gapminder_cm_df = catalog.Dataset(GAPMINDER_CHILD_MORTALITY_DATASET_PATH)
+    gapminder_child_mort = pd.DataFrame(
+        gapminder_cm_df["child_mortality_0_5_year_olds_dying_per_1000_born"]
+    ).reset_index()
+    gapminder_child_mort["indicator"] = "Under-five mortality rate"
+    gapminder_child_mort["sex"] = "Total"
+    gapminder_child_mort["unit"] = "Deaths per 1000 live births"
+    gapminder_child_mort = gapminder_child_mort.rename(
+        columns={"geo": "country", "time": "year", "child_mortality_0_5_year_olds_dying_per_1000_born": "value"}
+    )
+    # get infant mortality from open numbers
+    gapminder_inf_m_df = catalog.Dataset(GAPMINDER_INFANT_MORTALITY_DATASET_PATH)
+    gapminder_inf_mort = pd.DataFrame(gapminder_inf_m_df["infant_mortality_rate"]).reset_index()
+    gapminder_inf_mort["indicator"] = "Infant mortality rate"
+    gapminder_inf_mort["sex"] = "Total"
+    gapminder_inf_mort["unit"] = "Deaths per 1000 live births"
+    gapminder_inf_mort = gapminder_inf_mort.rename(columns={"area": "country", "infant_mortality_rate": "value"})
+
+    df_gapminder = pd.concat([gapminder_child_mort, gapminder_inf_mort])
+    df_gapminder["source"] = "Gapminder"
+    # Removing rows with NA values
+    df_gapminder = df_gapminder.dropna(subset="value")
+    return df_gapminder
 
 
 def load_excluded_countries() -> List[str]:
@@ -102,7 +155,7 @@ def harmonize_countries(df: pd.DataFrame) -> pd.DataFrame:
 
 def clean_and_format_data(df: pd.DataFrame) -> pd.DataFrame:
     """Cleaning up the values and dropping unused columns"""
-    df = df.drop(columns=["index", "regional_group"])
+    df = df.drop(columns=["regional_group"])
     df["unit"] = df["unit"].replace(
         {"Number of deaths": "deaths", "Deaths per 1000 live births": "deaths per 1,000 live births"}
     )
