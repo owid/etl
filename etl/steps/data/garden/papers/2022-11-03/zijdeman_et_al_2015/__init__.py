@@ -14,45 +14,72 @@ log = get_logger()
 
 # naming conventions
 N = Names(__file__)
+COUNTRY_MAPPING_PATH = N.directory / "countries.json"
+EXCLUDED_COUNTRIES_PATH = N.directory / "excluded_countries.json"
+METADATA_PATH = N.directory / "meta.yml"
 
 
 def run(dest_dir: str) -> None:
     log.info("zijdeman_et_al_2015.start")
 
     # read dataset from meadow
-    ds_meadow = Dataset(
-        DATA_DIR
-        / "meadow/papers/2022-11-03/zijdeman_et_al_2015"
-    )
+    ds_meadow = Dataset(DATA_DIR / "meadow/papers/2022-11-03/zijdeman_et_al_2015")
     tb_meadow = ds_meadow["zijdeman_et_al_2015"]
 
-    df = pd.DataFrame(tb_meadow)
+    # Create table
+    tb_garden = make_table(tb_meadow)
 
-    log.info("zijdeman_et_al_2015.exclude_countries")
-    df = exclude_countries(df)
-
-    log.info("zijdeman_et_al_2015.harmonize_countries")
-    df = harmonize_countries(df)
-
+    # Initiate dataset
     ds_garden = Dataset.create_empty(dest_dir)
     ds_garden.metadata = ds_meadow.metadata
+    ds_garden.metadata.update_from_yaml(METADATA_PATH)
 
-    tb_garden = underscore_table(Table(df))
-    tb_garden.metadata = tb_meadow.metadata
-    for col in tb_garden.columns:
-        tb_garden[col].metadata = tb_meadow[col].metadata
-    
-    ds_garden.metadata.update_from_yaml(N.metadata_path)
-    tb_garden.update_metadata_from_yaml(N.metadata_path, "zijdeman_et_al_2015")
-    
+    # Add table
     ds_garden.add(tb_garden)
     ds_garden.save()
 
     log.info("zijdeman_et_al_2015.end")
 
 
+def make_table(tb_meadow: Table) -> Table:
+    df = pd.DataFrame(tb_meadow)
+
+    # Create table
+    tb_garden = underscore_table(Table(df))
+    tb_garden.metadata = tb_meadow.metadata
+    for col in tb_garden.columns:
+        tb_garden[col].metadata = tb_meadow[col].metadata
+
+    # Clean countries
+    tb_garden = format_columns(tb_garden)
+    tb_garden = clean_countries(tb_garden)
+
+    # Set index
+    tb_garden = tb_garden.set_index(["country", "year"])
+
+    # Metadata
+    tb_garden.update_metadata_from_yaml(METADATA_PATH, "zijdeman_et_al_2015")
+    return tb_garden
+
+
+def clean_countries(df: pd.DataFrame) -> pd.DataFrame:
+    df = exclude_countries(df)
+    df = harmonize_countries(df)
+    return df
+
+
+def format_columns(df: pd.DataFrame) -> pd.DataFrame:
+    columns = {
+        "country_name": "country",
+        "year": "year",
+        "value": "life_expectancy",
+    }
+    df = df[columns.keys()].rename(columns=columns)
+    return df
+
+
 def load_excluded_countries() -> List[str]:
-    with open(N.excluded_countries_path, "r") as f:
+    with open(EXCLUDED_COUNTRIES_PATH, "r") as f:
         data = json.load(f)
         assert isinstance(data, list)
     return data
@@ -65,14 +92,14 @@ def exclude_countries(df: pd.DataFrame) -> pd.DataFrame:
 
 def harmonize_countries(df: pd.DataFrame) -> pd.DataFrame:
     unharmonized_countries = df["country"]
-    df = geo.harmonize_countries(df=df, countries_file=str(N.country_mapping_path))
+    df = geo.harmonize_countries(df=df, countries_file=str(COUNTRY_MAPPING_PATH))
 
     missing_countries = set(unharmonized_countries[df.country.isnull()])
     if any(missing_countries):
         raise RuntimeError(
             "The following raw country names have not been harmonized. "
-            f"Please: (a) edit {N.country_mapping_path} to include these country "
-            f"names; or (b) add them to {N.excluded_countries_path}."
+            f"Please: (a) edit {COUNTRY_MAPPING_PATH} to include these country "
+            f"names; or (b) add them to {EXCLUDED_COUNTRIES_PATH}."
             f"Raw country names: {missing_countries}"
         )
 
