@@ -25,6 +25,7 @@ class Options(Enum):
     GENERATE_NOTEBOOK = "Generate playground notebook"
     LOAD_COUNTRIES_REGIONS = "Load countries regions in the script"
     LOAD_POPULATION = "Load population in the script"
+    IS_PRIVATE = "Make dataset private"
 
 
 class MeadowForm(BaseModel):
@@ -38,6 +39,7 @@ class MeadowForm(BaseModel):
     load_population: bool
     generate_notebook: bool
     include_metadata_yaml: bool
+    is_private: bool
 
     def __init__(self, **data: Any) -> None:
         options = data.pop("options")
@@ -46,6 +48,7 @@ class MeadowForm(BaseModel):
         data["load_countries_regions"] = Options.LOAD_COUNTRIES_REGIONS.value in options
         data["load_population"] = Options.LOAD_POPULATION.value in options
         data["generate_notebook"] = Options.GENERATE_NOTEBOOK.value in options
+        data["is_private"] = Options.IS_PRIVATE.value in options
         super().__init__(**data)
 
 
@@ -97,6 +100,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
                     Options.GENERATE_NOTEBOOK.value,
                     Options.LOAD_COUNTRIES_REGIONS.value,
                     Options.LOAD_POPULATION.value,
+                    Options.IS_PRIVATE.value,
                 ],
                 name="options",
                 value=[
@@ -112,13 +116,17 @@ def app(run_checks: bool, dummy_data: bool) -> None:
     if run_checks:
         _check_dataset_in_walden(form)
 
+    private_suffix = "-private" if form.is_private else ""
+
     if form.add_to_dag:
-        deps = [f"walden://{form.namespace}/{form.walden_version}/{form.short_name}"]
+        deps = [f"walden{private_suffix}://{form.namespace}/{form.walden_version}/{form.short_name}"]
         if form.load_population:
             deps.append("data://garden/owid/latest/key_indicators")
         if form.load_countries_regions:
             deps.append("data://garden/reference")
-        dag_content = utils.add_to_dag({f"data://meadow/{form.namespace}/{form.version}/{form.short_name}": deps})
+        dag_content = utils.add_to_dag(
+            {f"data{private_suffix}://meadow/{form.namespace}/{form.version}/{form.short_name}": deps}
+        )
     else:
         dag_content = ""
 
@@ -141,7 +149,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
 1. Run `etl` to generate the dataset
 
     ```
-    poetry run etl data://meadow/{form.namespace}/{form.version}/{form.short_name}
+    poetry run etl data{private_suffix}://meadow/{form.namespace}/{form.version}/{form.short_name} {"--private" if form.is_private else ""}
     ```
 
 2. (Optional) Generated notebook `{notebook_path.relative_to(ETL_DIR)}` can be used to examine the dataset output interactively.
@@ -167,7 +175,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
     then manual edit it and rerun the step again with
 
     ```
-    poetry run etl data://meadow/{form.namespace}/{form.version}/{form.short_name}
+    poetry run etl data{private_suffix}://meadow/{form.namespace}/{form.version}/{form.short_name} {"--private" if form.is_private else ""}
     ```
 
 5. Exit the process and run next step with `poetry run walkthrough garden`
