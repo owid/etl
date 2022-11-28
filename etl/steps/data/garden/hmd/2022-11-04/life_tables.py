@@ -21,31 +21,51 @@ def run(dest_dir: str) -> None:
 
     # read dataset from meadow
     ds_meadow = Dataset(DATA_DIR / "meadow/hmd/2022-11-04/life_tables")
-    tb_meadow = ds_meadow["life_tables"]
 
-    df = pd.DataFrame(tb_meadow)
-
-    log.info("life_tables.exclude_countries")
-    df = exclude_countries(df)
-
-    log.info("life_tables.harmonize_countries")
-    df = harmonize_countries(df)
-
+    # init dataset
     ds_garden = Dataset.create_empty(dest_dir)
     ds_garden.metadata = ds_meadow.metadata
+    ds_garden.metadata.update_from_yaml(N.metadata_path)
 
+    # build tables
+    tables_names = ds_meadow.table_names
+    for table_name in tables_names:
+        log.info(f"life_tables:{table_name}.start")
+        tb_garden = make_table(ds_meadow, table_name)
+        ds_garden.add(tb_garden)
+        ds_garden.save()
+        log.info(f"life_tables:{table_name}.end")
+
+    log.info("life_tables.end")
+
+
+def make_table(ds_meadow, table_name: str) -> Table:
+    log.info(f"Building table {table_name}...")
+    tb_meadow = ds_meadow[table_name]
+
+    # Country management
+    df = pd.DataFrame(tb_meadow)
+    df = clean_countries(df)
+
+    # Build table
     tb_garden = underscore_table(Table(df))
     tb_garden.metadata = tb_meadow.metadata
+
+    # Edit variables
     for col in tb_garden.columns:
         tb_garden[col].metadata = tb_meadow[col].metadata
 
-    ds_garden.metadata.update_from_yaml(N.metadata_path)
-    tb_garden.update_metadata_from_yaml(N.metadata_path, "life_tables")
+    # Edit table
+    # tb_garden.update_metadata_from_yaml(N.metadata_path, table_name)
+    tb_garden = tb_garden.set_index(["country", "year", "age"])
 
-    ds_garden.add(tb_garden)
-    ds_garden.save()
+    return tb_garden
 
-    log.info("life_tables.end")
+
+def clean_countries(df: pd.DataFrame) -> pd.DataFrame:
+    df = exclude_countries(df)
+    df = harmonize_countries(df)
+    return df
 
 
 def load_excluded_countries() -> List[str]:
