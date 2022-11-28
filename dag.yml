@@ -186,6 +186,21 @@ steps:
   # HMD
   data://meadow/hmd/2022-11-04/life_tables:
     - walden://hmd/2022-11-04/life_tables
+  data://garden/hmd/2022-11-04/life_tables:
+    - data://meadow/hmd/2022-11-04/life_tables
+
+  # Country profiles - overview
+  data://garden/country_profile/2022/overview:
+    - backport://backport/owid/latest/dataset_5600_democracy_and_human_rights__owid_based_on_varieties_of_democracy__v12__and_regimes_of_the_world
+    - backport://backport/owid/latest/dataset_5599_ihme__global_burden_of_disease__deaths_and_dalys__institute_for_health_metrics_and_evaluation__2022_04
+    - backport://backport/owid/latest/dataset_4129_years_of_schooling__based_on_lee_lee__2016__barro_lee__2018__and_undp__2018
+    - backport://backport/owid/latest/dataset_1892_life_expectancy__riley__2005__clio_infra__2015__and_un__2019
+    - backport://backport/owid/latest/dataset_2710_child_mortality_rates__selected_gapminder__v10__2017
+    - backport://backport/owid/latest/dataset_581_daily_supply_of_calories_per_person__owid_based_on_un_fao__and__historical_sources
+    - data://garden/owid/latest/key_indicators
+    - data://garden/gcp/2022-11-11/global_carbon_budget
+    - data://garden/bp/2022-07-14/energy_mix
+    - data://garden/worldbank_wdi/2022-05-26/wdi
 
 # Sub-dags to import
 include:
@@ -195,3 +210,4 @@ include:
   - dag_files/dag_walkthrough.yml
   - dag_files/dag_examples.yml
   - dag_files/dag_emissions.yml
+  - dag_files/dag_papers.yml
