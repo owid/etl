@@ -186,7 +186,7 @@ steps:
   # HMD
   data://meadow/hmd/2022-11-04/life_tables:
     - walden://hmd/2022-11-04/life_tables
-
+  
   # Country profiles - overview
   data://garden/country_profile/2022/overview:
     - backport://backport/owid/latest/dataset_5600_democracy_and_human_rights__owid_based_on_varieties_of_democracy__v12__and_regimes_of_the_world
