@@ -186,8 +186,6 @@ steps:
   # HMD
   data://meadow/hmd/2022-11-04/life_tables:
     - walden://hmd/2022-11-04/life_tables
-  data://garden/hmd/2022-11-04/life_tables:
-    - data://meadow/hmd/2022-11-04/life_tables
 
   # Country profiles - overview
   data://garden/country_profile/2022/overview:
