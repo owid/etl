@@ -21,6 +21,7 @@ import pandas as pd
 import structlog
 from frictionless.exception import FrictionlessException
 from owid.catalog import Dataset, Table, Variable, utils
+from owid.catalog.frames import repack_series
 from owid.catalog.meta import Source
 
 from etl.git import GithubRepo
@@ -85,7 +86,8 @@ def add_resource(
     # adapt the table name and its column names to our naming convention
     t = utils.underscore_table(t)
 
-    ds.add(t)
+    # we've already repacked the data
+    ds.add(t, repack=False)
 
 
 def load_table(resource: frictionless.Resource) -> pd.DataFrame:
@@ -94,6 +96,16 @@ def load_table(resource: frictionless.Resource) -> pd.DataFrame:
     # use smaller, more accurate column types that minimise space
     if "global" in df.columns:
         df["geo"] = df.pop("global")
+
+    primary_key = resource.schema.primary_key
+
+    df.reset_index(inplace=True)
+
+    # repack dataframe in place
+    for col in df.columns:
+        df[col] = repack_series(df[col])
+
+    df.set_index(primary_key, inplace=True)
 
     return df
 
@@ -139,6 +151,10 @@ def load_and_combine(path: Path, resources: List[frictionless.Resource]) -> pd.D
                 df[col] = pd.to_numeric(df[col])
             except ValueError:
                 df[col] = df[col].astype(str)
+
+    # repack dataframe in place
+    for col in df.columns:
+        df[col] = repack_series(df[col])
 
     df.set_index(primary_key, inplace=True)
 
