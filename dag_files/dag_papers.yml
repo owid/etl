@@ -1,3 +1,5 @@
 steps:
   data://meadow/papers/2022-11-03/zijdeman_et_al_2015:
     - walden://papers/2022-11-01/zijdeman_et_al_2015
+  data://meadow/papers/2022-11-04/riley_2005:
+    - walden://papers/2022-11-01/riley_2005

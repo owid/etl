@@ -8,6 +8,7 @@ import hashlib
 import os
 import re
 import subprocess
+import sys
 import tempfile
 import warnings
 from collections import defaultdict
@@ -219,9 +220,6 @@ def parse_step(step_name: str, dag: Dict[str, Any]) -> "Step":
     elif step_type == "walden-private":
         step = WaldenStepPrivate(path)
 
-    elif step_type == "grapher-private":
-        step = GrapherStepPrivate(path, dependencies)
-
     elif step_type == "backport-private":
         step = BackportStepPrivate(path, dependencies)
 
@@ -378,7 +376,13 @@ class DataStep(Step):
         """
         # use a subprocess to isolate each step from the others, and avoid state bleeding
         # between them
-        args = ["poetry", "run", "run_python_step"]
+        args = []
+
+        if sys.platform == "linux":
+            args.extend(["prlimit", f"--as={config.MAX_VIRTUAL_MEMORY_LINUX}"])
+
+        args.extend(["poetry", "run", "run_python_step"])
+
         if config.IPDB_ENABLED:
             args.append("--ipdb")
 
@@ -697,13 +701,6 @@ class WaldenStepPrivate(WaldenStep):
 
     def __str__(self) -> str:
         return f"walden-private://{self.path}"
-
-
-class GrapherStepPrivate(GrapherStep):
-    is_public = False
-
-    def __str__(self) -> str:
-        return f"grapher-private://{self.path}"
 
 
 class BackportStepPrivate(PrivateMixin, BackportStep):

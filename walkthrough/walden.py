@@ -1,6 +1,7 @@
 import datetime as dt
+from enum import Enum
 from pathlib import Path
-from typing import Optional
+from typing import Any, Optional
 
 from botocore.exceptions import ClientError
 from owid.catalog import s3_utils
@@ -11,6 +12,11 @@ from pywebio import output as po
 from . import utils
 
 CURRENT_DIR = Path(__file__).parent
+
+
+class Options(Enum):
+
+    IS_PRIVATE = "Make dataset private"
 
 
 class WaldenForm(BaseModel):
@@ -28,6 +34,12 @@ class WaldenForm(BaseModel):
     license_name: str
     license_url: str
     description: str
+    is_private: bool
+
+    def __init__(self, **data: Any) -> None:
+        options = data.pop("options")
+        data["is_private"] = Options.IS_PRIVATE.value in options
+        super().__init__(**data)
 
     @property
     def version(self) -> str:
@@ -133,6 +145,13 @@ def app(run_checks: bool, dummy_data: bool) -> None:
                 placeholder="Creative Commons BY 4.0",
             ),
             pi.textarea("Description", name="description", value=dummies.get("description")),
+            pi.checkbox(
+                "Other options",
+                options=[
+                    Options.IS_PRIVATE.value,
+                ],
+                name="options",
+            ),
         ],
     )
     form = WaldenForm(**data)
@@ -141,7 +160,9 @@ def app(run_checks: bool, dummy_data: bool) -> None:
     form.description = form.description.replace("\n", "\n  ")
 
     # cookiecutter on python files
-    WALDEN_INGEST_DIR = utils.generate_step(CURRENT_DIR / "walden_cookiecutter/", dict(**form.dict(), channel="walden"))
+    WALDEN_INGEST_DIR = utils.generate_step(
+        CURRENT_DIR / "walden_cookiecutter/", dict(**form.dict(), version=form.walden_version, channel="walden")
+    )
 
     ingest_path = WALDEN_INGEST_DIR / (form.short_name + ".py")
     meta_path = WALDEN_INGEST_DIR / (form.short_name + ".meta.yml")
