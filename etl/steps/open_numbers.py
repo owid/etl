@@ -97,9 +97,15 @@ def load_table(resource: frictionless.Resource) -> pd.DataFrame:
     if "global" in df.columns:
         df["geo"] = df.pop("global")
 
+    primary_key = resource.schema.primary_key
+
+    df.reset_index(inplace=True)
+
     # repack dataframe in place
     for col in df.columns:
         df[col] = repack_series(df[col])
+
+    df.set_index(primary_key, inplace=True)
 
     return df
 
