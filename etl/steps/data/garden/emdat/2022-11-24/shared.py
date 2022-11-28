@@ -96,6 +96,7 @@ HISTORIC_TO_CURRENT_REGION: Dict[str, Dict[str, Union[str, List[str]]]] = {
             "Aruba",
             "Curacao",
             "Sint Maarten (Dutch part)",
+            "Caribbean Netherlands",
         ],
     },
     "Serbia and Montenegro": {
@@ -463,3 +464,34 @@ def add_region_aggregates(
         data = pd.concat([data, region_df], ignore_index=True)
 
     return data
+
+
+def create_decade_data(df: pd.DataFrame) -> pd.DataFrame:
+    decade_df = df.copy()
+    # Convert "year" column into a datetime.
+    decade_df["year"] = pd.to_datetime(decade_df["year"], format="%Y")
+    # Group tens of years and sum.
+    decade_df = decade_df.set_index("year").groupby(['country','type']).resample('10AS').sum(numeric_only=True).\
+        reset_index()
+    # Make "year" column years instead of dates.
+    decade_df["year"] = decade_df["year"].dt.year
+
+    return decade_df
+
+
+def sanity_checks_on_output_yearly_data(df):
+    all_countries = sorted(set(df["country"]) - set(REGIONS) - set(HISTORIC_TO_CURRENT_REGION))
+
+    # Check that the aggregate of all countries and disasters leads to the same numbers we have for the world.
+    # This check would not pass when adding historical regions (since we know there are some overlaps between data from
+    # historical and successor countries). So check for a specific year.
+    year_to_check = 2022
+    all_disasters_for_world = df[(df["country"] == "World") & (df["year"] == year_to_check) & (df["type"] == "All disasters")].\
+        reset_index(drop=True)
+    all_disasters_check = df[(df["country"].isin(all_countries)) & (df["year"] == year_to_check) & (df["type"] != "All disasters")].\
+        groupby("year").sum(numeric_only=True).reset_index()
+
+    cols_to_check = ["dead", "injured", "affected", "homeless", "total_affected", "reconstructed_costs_adjusted",
+                     "insured_damages_adjusted"]
+    error = f"Aggregate for the World in {year_to_check} does not coincide with the sum of all countries."
+    assert all_disasters_for_world[cols_to_check].equals(all_disasters_check[cols_to_check]), error

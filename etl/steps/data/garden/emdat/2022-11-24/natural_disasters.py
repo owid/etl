@@ -2,14 +2,13 @@
 
 """
 
-import json
 from typing import List, cast
 
 import pandas as pd
 from owid.catalog import Dataset, Table
 from owid.catalog.utils import underscore_table
 from owid.datautils import geo
-from shared import CURRENT_DIR, add_region_aggregates, add_population
+from shared import CURRENT_DIR, add_region_aggregates, add_population, create_decade_data, sanity_checks_on_output_yearly_data
 
 from etl.helpers import Names
 from etl.paths import DATA_DIR
@@ -21,6 +20,26 @@ VERSION = MEADOW_VERSION
 
 # Get naming conventions.
 N = Names(str(CURRENT_DIR / "natural_disasters"))
+
+
+def harmonize_countries(df: pd.DataFrame) -> pd.DataFrame:
+    # Harmonize country names.
+    df = geo.harmonize_countries(df=df, countries_file=N.country_mapping_path, warn_on_missing_countries=True,
+                            warn_on_unused_countries=True)
+
+    # Add Azores Islands to Portugal (so that we can attach a population to it).
+    new_portugal_df = pd.concat([df[df["country"] == "Portugal"], df[df["country"] == "Azores Islands"]]).\
+        groupby(["year", "type"]).\
+        sum(numeric_only=True).reset_index().assign(**{"country": "Portugal"})
+    df = pd.concat([df[~df["country"].isin(["Azores Islands", "Portugal"])], new_portugal_df]).reset_index(drop=True)
+
+    # Idem for Canary Islands.
+    new_spain_df = pd.concat([df[df["country"] == "Spain"], df[df["country"] == "Canary Islands"]]).\
+        groupby(["year", "type"]).\
+        sum(numeric_only=True).reset_index().assign(**{"country": "Spain"})
+    df = pd.concat([df[~df["country"].isin(["Canary Islands", "Spain"])], new_spain_df]).reset_index(drop=True)
+
+    return df
 
 
 def run(dest_dir: str) -> None:
@@ -41,63 +60,39 @@ def run(dest_dir: str) -> None:
     error = "Expected only 'Natural' in 'group' column."
     assert df["group"].unique().tolist() == ["Natural"], error
 
-    # Harmonize country names.
-    df = geo.harmonize_countries(df=df, countries_file=N.country_mapping_path, warn_on_missing_countries=True,
-                            warn_on_unused_countries=True)
-
-    # TODO: Check that, when loading all countries from the countries file, and removing the historical regions,
-    #  that aggregation coincides with the World aggregate.
-
     # Remove spurious spaces in entities.
     df["type"] = df["type"].str.strip()
 
     # We are not interested in each individual event, but the number of events of each kind and damages.
     df = df.groupby(["country", "year", "type"]).sum(numeric_only=True).reset_index()
-
-    # Add Azores Islands to Portugal (so that we can attach a population to it).
-    new_portugal_df = pd.concat([df[df["country"] == "Portugal"], df[df["country"] == "Azores Islands"]]).\
-        groupby(["year", "type"]).\
-        sum(numeric_only=True).reset_index().assign(**{"country": "Portugal"})
-    df = pd.concat([df[~df["country"].isin(["Azores Islands", "Portugal"])], new_portugal_df]).reset_index(drop=True)
-
-    # Idem for Canary Islands.
-    new_spain_df = pd.concat([df[df["country"] == "Spain"], df[df["country"] == "Canary Islands"]]).\
-        groupby(["year", "type"]).\
-        sum(numeric_only=True).reset_index().assign(**{"country": "Spain"})
-    df = pd.concat([df[~df["country"].isin(["Canary Islands", "Spain"])], new_spain_df]).reset_index(drop=True)
+    
+    # Harmonize country names and solve some issues with regions.
+    df = harmonize_countries(df=df)
 
     # Add a new category (or "type") corresponding to the total of all natural disasters.
-    all_disasters = df.groupby(["country", "year"]).sum(numeric_only=True).reset_index().assign(**{"type": "All disasters"})
-    df = pd.concat([df, all_disasters], ignore_index=True).sort_values(["country", "year", "type"]).reset_index(drop=True)
+    all_disasters = df.groupby(["country", "year"]).sum(numeric_only=True).assign(**{"type": "All disasters"}).\
+        reset_index()
+    df = pd.concat([df, all_disasters], ignore_index=True).sort_values(["country", "year", "type"]).\
+        reset_index(drop=True)
 
-    # TODO: Complete HISTORIC_TO_CURRENT_REGION.
-    # In fact, add all possible countries, even if they are not in the data.
-
-    # TODO:
-    # * Create a table for yearly and another for decadal data.
-    # * In the grapher step, create a dataset that selects the world and treats "type" as "country",
-    #  and another dataset for national data.
-
+    # Add region aggregates.
     df = add_region_aggregates(data=df, index_columns=["country", "year", "type"])
+
+    # Create data aggregated in intervales of 10 years.
+    decade_df = create_decade_data(df=df)
+
+    # TODO: How to calculate decade data per 100k people?
 
     # Add population including historical countries.
     df = add_population(df=df, warn_on_missing_countries=True)
 
-    for column in df.drop(columns=["country", "year", "type"]).columns:
+    # Add rates per 100,000 people (in yearly data).
+    for column in df.drop(columns=["country", "year", "type", "population"]).columns:
         df[f"{column}_per_100k_people"] = df[column] * 1e5 / df["population"]
 
-    # TODO: Create a new table for decadal data. What's the best way?
-    decadal = df.copy()
-    decadal["year"] = pd.to_datetime(decadal["year"], format="%Y")
-    decadal = decadal.set_index(["country", "type", "year"]).reset_index(level=[0, 1])
-    decadal.groupby(['country','type']).resample('10A', origin="end_day").sum(numeric_only=True).reset_index()
-
-    # Alternative way:
-    decadal = df.copy()
-    decadal["year"] = pd.to_datetime(decadal["year"], format="%Y")
-    decadal = decadal.set_index(["country", "type", "year"])
-    level_values = decadal.index.get_level_values
-    decadal.groupby([level_values(i) for i in [0,1]]+[pd.Grouper(freq='10A', level=-1)]).sum(numeric_only=True)
+    # Run sanity checks on outputs.
+    # TODO: Add more sanity checks.
+    sanity_checks_on_output_yearly_data(df=df)
 
     #
     # Save outputs.
@@ -113,3 +108,6 @@ def run(dest_dir: str) -> None:
     # Add table to dataset and save dataset.
     ds_garden.add(tb_garden)
     ds_garden.save()
+
+    # TODO: In the grapher step, create a dataset that selects the world and treats "type" as "country",
+    #  and another dataset for national data.
