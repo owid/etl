@@ -14,14 +14,11 @@ log = get_logger()
 N = Names(__file__)
 
 
-
 def run(dest_dir: str) -> None:
     log.info("penn_world_table.start")
 
     # retrieve raw data from walden
-    walden_ds = WaldenCatalog().find_one(
-        namespace="ggdc", short_name="penn_world_table", version="2021-06-18"
-    )
+    walden_ds = WaldenCatalog().find_one(namespace="ggdc", short_name="penn_world_table", version="2021-06-18")
     local_file = walden_ds.ensure_downloaded()
 
     df = pd.read_excel(local_file, sheet_name="Data")
@@ -44,10 +41,10 @@ def run(dest_dir: str) -> None:
 
     # underscore all table columns
     tb = underscore_table(tb)
-    
+
     ds.metadata.update_from_yaml(N.metadata_path, if_source_exists="replace")
     tb.update_metadata_from_yaml(N.metadata_path, "penn_world_table")
-    
+
     # add table to a dataset
     ds.add(tb)
 

@@ -14,7 +14,6 @@ log = get_logger()
 N = Names(__file__)
 
 
-
 def run(dest_dir: str) -> None:
     log.info("penn_world_table_national_accounts.start")
 
@@ -44,10 +43,10 @@ def run(dest_dir: str) -> None:
 
     # underscore all table columns
     tb = underscore_table(tb)
-    
+
     ds.metadata.update_from_yaml(N.metadata_path, if_source_exists="replace")
     tb.update_metadata_from_yaml(N.metadata_path, "penn_world_table_national_accounts")
-    
+
     # add table to a dataset
     ds.add(tb)
 
