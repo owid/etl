@@ -105,7 +105,7 @@ steps:
   data://garden/malnutrition/2022-10-18/malnutrition:
     - data://garden/worldbank_wdi/2022-05-26/wdi
     - data://meadow/un/2022-07-11/un_wpp
-  # UN IGME
+  # UN IGME - Child mortality
   data://meadow/un/2021-12-20/un_igme:
   - walden://un/2021/un_igme
   data://garden/un/2021-12-20/un_igme:
