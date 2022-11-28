@@ -97,6 +97,10 @@ def load_table(resource: frictionless.Resource) -> pd.DataFrame:
     if "global" in df.columns:
         df["geo"] = df.pop("global")
 
+    # repack dataframe in place
+    for col in df.columns:
+        df[col] = repack_series(df[col])
+
     return df
 
 
