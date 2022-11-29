@@ -17,7 +17,8 @@ import pandas as pd
 from owid.catalog import Dataset, Table
 
 from etl.helpers import Names
-from etl.steps.data.converters import convert_walden_metadata
+from etl.snapshot import Snapshot
+from etl.steps.data.converters import convert_snapshot_metadata
 
 N = Names(__file__)
 
@@ -201,17 +202,16 @@ def generate_ggdc_data(data_file: str) -> pd.DataFrame:
 
 
 def run(dest_dir: str) -> None:
-    # Load dataset from walden.
-    walden_ds = N.walden_dataset
-
     # Initialise dataset.
     ds = Dataset.create_empty(dest_dir)
 
+    snap = Snapshot("ggdc/2020-10-01/ggdc_maddison.xlsx")
+
     # Assign the same metadata of the walden dataset to this dataset.
-    ds.metadata = convert_walden_metadata(walden_ds)
+    ds.metadata = convert_snapshot_metadata(snap.metadata)
 
     # Load and process data.
-    df = generate_ggdc_data(data_file=walden_ds.local_path)
+    df = generate_ggdc_data(data_file=str(snap.path))
 
     # Set meaningful indexes.
     df = df.set_index(["country", "year"])

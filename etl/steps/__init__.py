@@ -15,10 +15,13 @@ from collections import defaultdict
 from dataclasses import dataclass, field
 from glob import glob
 from pathlib import Path
+from threading import Lock
 from typing import Any, Dict, Iterable, List, Optional, Protocol, Set, Union, cast
 from urllib.parse import urlparse
 
+import structlog
 import yaml
+from dvc.repo import Repo
 
 # smother deprecation warnings by papermill
 with warnings.catch_warnings():
@@ -44,8 +47,14 @@ from etl.grapher_import import (
 )
 from etl.helpers import get_etag
 
+log = structlog.get_logger()
+
 Graph = Dict[str, Set[str]]
 DAG = Dict[str, Any]
+
+# runtime cache
+cache: Dict[str, Any] = {}
+dvc_lock = Lock()
 
 
 def compile_steps(
@@ -202,6 +211,9 @@ def parse_step(step_name: str, dag: Dict[str, Any]) -> "Step":
     elif step_type == "walden":
         step = WaldenStep(path)
 
+    elif step_type == "snapshot":
+        step = SnapshotStep(path)
+
     elif step_type == "github":
         step = GithubStep(path)
 
@@ -222,6 +234,9 @@ def parse_step(step_name: str, dag: Dict[str, Any]) -> "Step":
 
     elif step_type == "backport-private":
         step = BackportStepPrivate(path, dependencies)
+
+    elif step_type == "snapshot-private":
+        step = SnapshotStepPrivate(path)
 
     else:
         raise Exception(f"no recipe for executing step: {step_name}")
@@ -492,6 +507,61 @@ class WaldenStep(Step):
 
 
 @dataclass
+class SnapshotStep(Step):
+    path: str
+
+    def __init__(self, path: str) -> None:
+        self.path = path
+
+    def __str__(self) -> str:
+        return f"snapshot://{self.path}"
+
+    def run(self) -> None:
+        self.dvc_repo.pull(self._path, remote="public")
+
+    def is_dirty(self) -> bool:
+        # check if the snapshot has been added to DVC
+        with open(self._dvc_path) as istream:
+            yml = yaml.safe_load(istream)
+            if "outs" not in yml:
+                raise Exception(f"File {self._dvc_path} has not been added to DVC. Run snapshot script to add it.")
+
+        # run dvc status and cache it
+        cache_key = "dvc_status"
+        with dvc_lock:
+            if cache_key not in cache:
+                cache[cache_key] = self.dvc_repo.status()
+
+        # if path is in dvc status output, it's dirty
+        return self._dvc_path in cache[cache_key]
+
+    def has_existing_data(self) -> bool:
+        return True
+
+    def checksum_output(self) -> str:
+        return files.checksum_file(self._dvc_path)
+
+    @property
+    def dvc_repo(self) -> Repo:
+        return Repo(paths.BASE_DIR)
+
+    @property
+    def _dvc_path(self) -> str:
+        return f"snapshots/{self.path}.dvc"
+
+    @property
+    def _path(self) -> str:
+        return f"{paths.DATA_DIR}/snapshots/{self.path}"
+
+
+class SnapshotStepPrivate(SnapshotStep):
+    def __str__(self) -> str:
+        return f"snapshot-private://{self.path}"
+
+    def run(self) -> None:
+        self.dvc_repo.pull(self._path, remote="private")
+
+
 class GrapherStep(Step):
     """
     A step which ingests data from grapher channel into a local mysql database.
