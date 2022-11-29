@@ -1,11 +1,11 @@
 import pandas as pd
 from owid.catalog import Dataset, Table, TableMeta
 from owid.catalog.utils import underscore_table
-from owid.walden import Catalog as WaldenCatalog
 from structlog import get_logger
 
 from etl.helpers import Names
-from etl.steps.data.converters import convert_walden_metadata
+from etl.snapshot import Snapshot
+from etl.steps.data.converters import convert_snapshot_metadata
 
 log = get_logger()
 
@@ -16,25 +16,23 @@ N = Names(__file__)
 def run(dest_dir: str) -> None:
     log.info("dummy.start")
 
-    # retrieve raw data from walden
-    walden_ds = WaldenCatalog().find_one(namespace="dummy", short_name="dummy", version="2020-01-01")
-    local_file = walden_ds.ensure_downloaded()
-
-    df = pd.read_excel(local_file, sheet_name="Full data")
+    # retrieve snapshot
+    snap = Snapshot("dummy/2020-01-01/dummy.xlsx")
+    df = pd.read_excel(snap.path, sheet_name="Full data")
 
     # clean and transform data
     df = clean_data(df)
 
     # create new dataset and reuse walden metadata
     ds = Dataset.create_empty(dest_dir)
-    ds.metadata = convert_walden_metadata(walden_ds)
+    ds.metadata = convert_snapshot_metadata(snap.metadata)
     ds.metadata.version = "2020-01-01"
 
     # create table with metadata from dataframe
     table_metadata = TableMeta(
-        short_name=walden_ds.short_name,
-        title=walden_ds.name,
-        description=walden_ds.description,
+        short_name=snap.metadata.short_name,
+        title=snap.metadata.name,
+        description=snap.metadata.description,
     )
     tb = Table(df, metadata=table_metadata)
 
