@@ -36,6 +36,7 @@ def run(dest_dir: str) -> None:
     # Merge dataset and country dictionary to get the name of the country (and rename it as "country")
     df = pd.merge(df, df_countries_regions[['name', 'iso_alpha3']], left_on='countrycode', right_on='iso_alpha3', how='left')
     df = df.rename(columns={'name': 'country'})
+    df = df.drop(columns=['iso_alpha3'])
 
     # Add country names for some specific 3-letter codes
     df.loc[df['countrycode'] == "CH2", ['country']] = "China (alternative inflation series)"
