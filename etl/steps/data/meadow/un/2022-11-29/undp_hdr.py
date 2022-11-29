@@ -44,9 +44,6 @@ def run(dest_dir: str) -> None:
 
 
 def make_table(snap: Snapshot, df: pd.DataFrame) -> Table:
-    # clean and transform data
-    df = clean_data(df)
-
     # create table with metadata from dataframe
     table_metadata = TableMeta(
         short_name=snap.metadata.short_name,
@@ -61,18 +58,6 @@ def make_table(snap: Snapshot, df: pd.DataFrame) -> Table:
     # tb.update_metadata_from_yaml(N.metadata_path, SHORT_NAME)
 
     return tb
-
-
-def clean_data(df: pd.DataFrame) -> pd.DataFrame:
-    return df
-    # df.rename(
-    #     columns={
-    #         "country": "country",
-    #         "year": "year",
-    #         "pop": "population",
-    #         "gdppc": "gdp",
-    #     }
-    # ).drop(columns=["countrycode"])
 
 
 def init_dataset(dest_dir: str, snap: Snapshot) -> Dataset:
