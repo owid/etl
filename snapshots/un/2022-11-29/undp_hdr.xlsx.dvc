@@ -17,11 +17,11 @@ meta:
 
     Additional resources related to the 2021/2022 Human Development Report can be found online at http://hdr.undp.org. Resources on the website include digital versions and translations of the Report and the overview in more than 10 languages, an interactive web version of the Report, a set of background papers and think pieces commissioned for the Report, interactive data visualizations and databases of human development indicators, full explanations of the sources and methodologies used in the Report’s composite indices, country insights and other background materials, and previous global, regional and national Human Development Reports. Corrections and addenda are also available online.
 
-    Technical notes may be found at https://hdr.undp.org/sites/default/files/2021-22_HDR/hdr2021-22_technical_notes.pdf.
+    Technical notes (region definitions, reports, etc.) can be found at https://hdr.undp.org/sites/default/files/2021-22_HDR/hdr2021-22_technical_notes.pdf.
   access_notes: |
     This file contains only metadata.
 wdir: ../../../data/snapshots/un/2022-11-29
 outs:
-- md5: d81942f46f7f1f41b249835aebfebc36
-  size: 13635
-  path: undp_hdr.xlsx
+  - md5: d81942f46f7f1f41b249835aebfebc36
+    size: 13635
+    path: undp_hdr.xlsx
