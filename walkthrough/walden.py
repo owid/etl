@@ -49,6 +49,8 @@ class WaldenForm(BaseModel):
 def app(run_checks: bool, dummy_data: bool) -> None:
     dummies = utils.DUMMY_DATA if dummy_data else {}
 
+    po.put_error("Walden has been deprecated, please use `walkthrough snapshot` instead")
+
     with open(CURRENT_DIR / "walden.md", "r") as f:
         po.put_markdown(f.read())
 

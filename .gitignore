@@ -32,3 +32,6 @@ playground.ipynb
 
 docs/_build
 docs/.vscode
+
+*.xlsx
+*.zip

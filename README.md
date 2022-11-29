@@ -45,7 +45,7 @@ You need to install the following:
 
 WSL users need to set up Linux executables only by including/editing the `/etc/wsl.conf` file.
 - Run `sudo vi /etc/wsl.conf`, copy this:
-``` 
+```
 [interop]
 appendWindowsPath = false
 ```
@@ -104,7 +104,7 @@ _Note_: `poetry run` runs commands from within the virtual environment. You can 
 You can start an interactive walkthrough that will guide you through all the steps of creating a new dataset. Start it with
 
 ```
-poetry run walkthrough walden
+poetry run walkthrough snapshot
 ```
 
 and then follow the instructions (two more steps are ran subsequently with `poetry run walkthrough meadow` and `poetry run walkthrough garden`).
@@ -112,7 +112,7 @@ and then follow the instructions (two more steps are ran subsequently with `poet
 In case you only want to get a better intuition of the process and see what files get generated, run
 
 ```
-poetry run walkthrough walden --dummy-data
+poetry run walkthrough snapshot --dummy-data
 ```
 
 If you end up with error `Address already in use`, try to kill the process with `kill -9 $(lsof -t -i tcp:8082)` and run the command again.
