@@ -3,8 +3,8 @@ from typing import List, cast
 
 import pandas as pd
 from owid import catalog
-from owid.catalog import Dataset, Table
-from owid.catalog.utils import underscore_table
+from owid.catalog import Dataset, Table, Variable
+from owid.catalog.utils import underscore, underscore_table
 from owid.datautils import geo
 from structlog import get_logger
 
@@ -49,32 +49,32 @@ def run(dest_dir: str) -> None:
     ds_garden = Dataset.create_empty(dest_dir)
     ds_garden.metadata = ds_meadow.metadata
 
+    tb_garden = Table(dfc)
+    tb_garden.metadata = ds_meadow.metadata
+    tb_garden.columns = ["__".join(col).strip() for col in tb_garden.columns.values]
     # Create one table per column and auto-populate the metadata
-    for df_select in dfc:
-        print(df_select)
+    for col in tb_garden.columns:
+        print(col)
+        col_name = col.split(sep="__")
         # Pulling out the relevant information from the column names for the metadata
         # Metric is the central value or upper/lower bound
-        metric = df_select[0]
-        sex = df_select[1]
-        age_group = df_select[2]
-        unit = df_select[3]
-
-        df_t = Table(pd.DataFrame(dfc[df_select]).reset_index())
-        df_t.columns = ["_".join(col).strip() for col in df_t.columns.values]
-        tb_garden = underscore_table(df_t)
+        metric = col_name[0]
+        sex = col_name[1]
+        age_group = col_name[2]
+        unit = col_name[3]
         # Creating table and variable level metadata
-        tb_garden.metadata = tb_meadow.metadata
-        tab_name = tb_garden.columns[2]
-        tb_garden[tab_name].metadata.title = f"{age_group} - {sex} - {metric}"
-        tb_garden[tab_name].metadata.short_name = tab_name
-        tb_garden[tab_name].metadata.unit = unit
-        if tb_garden[tab_name].metadata.unit in ["deaths", "Number of stillbirths"]:
-            tb_garden[tab_name] = tb_garden[tab_name].astype("Int64").round(0)
+        tb_garden[col].metadata.title = f"{age_group} - {sex} - {metric}"
+        # tb_garden[col].metadata.short_name = underscore(tb_garden[col].metadata.title)
+        tb_garden[col].metadata.unit = unit
+        if tb_garden[col].metadata.unit in ["deaths", "Number of stillbirths"]:
+            tb_garden[col] = tb_garden[col].astype("Int64").round(0)
         else:
-            tb_garden[tab_name] = tb_garden[tab_name].astype("float").round(2)
-        ds_garden.add(tb_garden)
+            tb_garden[col] = tb_garden[col].astype("float").round(2)
+        # tb_garden[col].name = underscore(tb_garden[col].metadata.title)
+    # tb_garden = tb_garden.reset_index()
+    tb_garden = underscore_table(tb_garden)
+    ds_garden.add(tb_garden)
     ds_garden.save()
-
     log.info("un_igme.end")
 
 
