@@ -100,8 +100,8 @@ def make_table(df: pd.DataFrame, walden_ds: WaldenCatalog) -> Table:
     """Create table from dataframe and Walden metadata."""
     table_metadata = TableMeta(
         short_name=walden_ds.short_name,
-        title=walden_ds.name,
-        description=walden_ds.description,
+        title="Life expectancy at birth",
+        description="Life expectancy at birth estimates.",
     )
     tb = Table(df, metadata=table_metadata)
     tb = underscore_table(tb)
