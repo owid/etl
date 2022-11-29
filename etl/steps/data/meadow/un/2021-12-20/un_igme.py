@@ -1,5 +1,5 @@
 import pandas as pd
-from owid.catalog import Dataset, Source, Table, TableMeta
+from owid.catalog import Dataset, Table, TableMeta
 from owid.catalog.utils import underscore_table
 from owid.walden import Catalog as WaldenCatalog
 from structlog import get_logger
@@ -11,6 +11,7 @@ log = get_logger()
 
 # naming conventions
 N = Names(__file__)
+N = Names("etl/steps/data/meadow/un/2021-12-20/un_igme.py")
 
 
 def run(dest_dir: str) -> None:
