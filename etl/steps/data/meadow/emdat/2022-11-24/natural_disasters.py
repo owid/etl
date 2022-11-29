@@ -9,7 +9,6 @@ from owid.catalog import Dataset, Table, TableMeta
 from owid.catalog.utils import underscore_table
 
 from etl.helpers import Names
-from etl.paths import SNAPSHOTS_DIR
 from etl.snapshot import Snapshot
 from etl.steps.data.converters import convert_snapshot_metadata
 
@@ -45,7 +44,7 @@ COLUMNS = {
 
 def run(dest_dir: str) -> None:
     # Load snapshot.
-    snap = Snapshot(SNAPSHOTS_DIR / "emdat" / SNAPSHOT_VERSION / "natural_disasters.xlsx")
+    snap = Snapshot(f"emdat/{SNAPSHOT_VERSION}/natural_disasters.xlsx")
     with warnings.catch_warnings(record=True):
         df = pd.read_excel(snap.path, sheet_name="emdat data", skiprows=6)
 
