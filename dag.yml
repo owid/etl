@@ -112,6 +112,8 @@ steps:
   - data://meadow/un/2021-12-20/un_igme
   - data://open_numbers/open_numbers/latest/gapminder__child_mortality
   - data://open_numbers/open_numbers/latest/gapminder__hist_imr
+  data://grapher/un/2021-12-20/un_igme:
+  - data://garden/un/2021-12-20/un_igme
   #
   # IHME - Global Burden of Disease.
   #
