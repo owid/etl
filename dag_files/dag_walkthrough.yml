@@ -26,3 +26,7 @@ steps:
     - data://meadow/ihme_gbd/2020-12-19/child_mortality
   data://grapher/ihme_gbd/2020-12-19/child_mortality:
     - data://garden/ihme_gbd/2020-12-19/child_mortality
+  data://meadow/ggdc/2022-11-28/penn_world_table:
+  - walden://ggdc/2021-06-18/penn_world_table
+  data://meadow/ggdc/2022-11-28/penn_world_table_national_accounts:
+  - walden://ggdc/2021-06-18/penn_world_table_national_accounts
