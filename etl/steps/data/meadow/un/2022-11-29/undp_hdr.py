@@ -35,11 +35,11 @@ def run(dest_dir: str) -> None:
 
     # retrieve metadata snapshot
     snap = Snapshot(SNAP_METADATA)
-    _ = pd.read_excel(snap.path)
+    df_metadata = pd.read_excel(snap.path)
+    tb_metadata = make_table_metadata(snap, df_metadata)
+    ds.add(tb_metadata)
 
-    # finally save the dataset
     ds.save()
-
     log.info("undp_hdr.end")
 
 
@@ -56,7 +56,22 @@ def make_table(snap: Snapshot, df: pd.DataFrame) -> Table:
     tb = underscore_table(tb)
 
     # tb.update_metadata_from_yaml(N.metadata_path, SHORT_NAME)
+    return tb
 
+
+def make_table_metadata(snap: Snapshot, df: pd.DataFrame) -> Table:
+    # create table with metadata from dataframe
+    table_metadata = TableMeta(
+        short_name=f"{snap.metadata.short_name} (metadata)",
+        title=f"{snap.metadata.name} (metadata)",
+        description="Metadata for the UNDP Human Development.",
+    )
+    tb = Table(df, metadata=table_metadata)
+
+    # underscore all table columns
+    tb = underscore_table(tb)
+    tb = tb.astype({"time_series": "str"})
+    # tb.update_metadata_from_yaml(N.metadata_path, SHORT_NAME)
     return tb
 
 
