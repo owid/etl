@@ -42,6 +42,10 @@ def run(dest_dir: str) -> None:
     dfc = combine_datasets(dfc)
     # Calculate missing age-group mortality rates
     dfc = calculate_mortality_rate(dfc)
+
+    # Calculate the absolute number of youth deaths
+    dfc = calculate_youth_deaths(dfc)
+
     # Making the values in the table a bit more appropriate for our use and pivoting to a wide table.
     log.info("un_igme.clean_data")
     dfc = clean_and_format_data(dfc)
@@ -50,7 +54,8 @@ def run(dest_dir: str) -> None:
     ds_garden.metadata = ds_meadow.metadata
 
     tb_garden = Table(dfc)
-    tb_garden.metadata = ds_meadow.metadata
+    tb_garden.metadata = tb_meadow.metadata
+    # Flatten the indexed columns
     tb_garden.columns = ["__".join(col).strip() for col in tb_garden.columns.values]
     # Create one table per column and auto-populate the metadata
     for col in tb_garden.columns:
@@ -64,14 +69,11 @@ def run(dest_dir: str) -> None:
         unit = col_name[3]
         # Creating table and variable level metadata
         tb_garden[col].metadata.title = f"{age_group} - {sex} - {metric}"
-        # tb_garden[col].metadata.short_name = underscore(tb_garden[col].metadata.title)
         tb_garden[col].metadata.unit = unit
-        if tb_garden[col].metadata.unit in ["deaths", "Number of stillbirths"]:
+        if tb_garden[col].metadata.unit in ["deaths", "stillbirths"]:
             tb_garden[col] = tb_garden[col].astype("Int64").round(0)
         else:
             tb_garden[col] = tb_garden[col].astype("float").round(2)
-        # tb_garden[col].name = underscore(tb_garden[col].metadata.title)
-    # tb_garden = tb_garden.reset_index()
     tb_garden = underscore_table(tb_garden)
     ds_garden.add(tb_garden)
     ds_garden.save()
@@ -157,9 +159,13 @@ def clean_and_format_data(df: pd.DataFrame) -> pd.DataFrame:
     """Cleaning up the values and dropping unused columns"""
     df = df.drop(columns=["regional_group"])
     df["unit"] = df["unit"].replace(
-        {"Number of deaths": "deaths", "Deaths per 1000 live births": "deaths per 1,000 live births"}
+        {
+            "Number of deaths": "deaths",
+            "Deaths per 1000 live births": "deaths per 1,000 live births",
+            "Number of stillbirths": "stillbirths",
+        }
     )
-    df["sex"] = df["sex"].replace({"Total": "Both"})
+    df["sex"] = df["sex"].replace({"Total": "Both sexes"})
 
     df = df.pivot(
         index=["country", "year"], columns=["sex", "indicator", "unit"], values=["value", "lower_bound", "upper_bound"]
@@ -200,4 +206,25 @@ def calculate_mortality_rate(df: pd.DataFrame) -> pd.DataFrame:
     out_df = pd.DataFrame(pd.concat(output_df))
 
     df = pd.concat([df, out_df])
+    return df
+
+
+def calculate_youth_deaths(df: pd.DataFrame) -> pd.DataFrame:
+    """Calculate the number of deaths in under fifteens - summing deaths for under fives and for 5-14 year olds"""
+
+    u5_df = df[df["indicator"] == "Under-five deaths"]
+    deaths_5_14 = df[df["indicator"] == "Deaths age 5 to 14"]
+
+    u5_df = u5_df[["country", "sex", "unit", "year", "value"]].rename(columns={"value": "Under-five deaths"})
+    deaths_5_14 = deaths_5_14[["country", "sex", "unit", "year", "value"]].rename(
+        columns={"value": "Deaths age 5 to 14"}
+    )
+
+    df_both = u5_df.merge(deaths_5_14, how="inner", on=["country", "sex", "unit", "year"])
+    df_both["value"] = df_both["Under-five deaths"] + df_both["Deaths age 5 to 14"]
+    df_both["indicator"] = "Under-fifteen deaths"
+    df_both["source"] = "OWID based on IGME"
+    df_both = df_both.drop(columns=["Under-five deaths", "Deaths age 5 to 14"])
+    df = pd.concat([df, df_both])
+
     return df

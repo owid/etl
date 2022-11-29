@@ -24,7 +24,7 @@ dataset:
   - url: https://www.unicef.org/legal#terms-of-use
   version: '2021-12-20'
   sources:
-  - name: OWID based on United Nations Inter-agency Group for Child Mortality Estimation
+  - name: United Nations Inter-agency Group for Child Mortality Estimation
       (2021)
     url: https://childmortality.org/data
     source_data_url: https://childmortality.org/wp-content/uploads/2021/09/UNIGME-2021.csv
