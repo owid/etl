@@ -3,8 +3,8 @@ from typing import List, cast
 
 import pandas as pd
 from owid import catalog
-from owid.catalog import Dataset, Table, Variable
-from owid.catalog.utils import underscore, underscore_table
+from owid.catalog import Dataset, Table
+from owid.catalog.utils import underscore_table
 from owid.datautils import geo
 from structlog import get_logger
 

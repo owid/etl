@@ -1,5 +1,5 @@
 from owid import catalog
-from owid.catalog import Dataset, Source, Table, VariableMeta
+from owid.catalog import VariableMeta
 from structlog import get_logger
 
 from etl.helpers import Names
@@ -17,7 +17,8 @@ def run(dest_dir: str) -> None:
     for table in tables:
         log.info(f"Adding...{table}")
         table_df = N.garden_dataset[table]
-        VariableMeta(table_df[table])
+
+        VariableMeta(table_df[table], unit=table_df.metadata.unit)
         # log.info(f"Unit..{table_df.metadata.unit}")
         # optionally set additional dimensions
         # table_df = table_df.set_index(["country", "year"], append=True)
