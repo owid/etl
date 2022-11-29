@@ -30,3 +30,7 @@ steps:
   - walden://ggdc/2021-06-18/penn_world_table
   data://meadow/ggdc/2022-11-28/penn_world_table_national_accounts:
   - walden://ggdc/2021-06-18/penn_world_table_national_accounts
+  data://garden/ggdc/2022-11-28/penn_world_table:
+  - data://meadow/ggdc/2022-11-28/penn_world_table
+  data://garden/ggdc/2022-11-28/penn_world_table_national_accounts:
+  - data://meadow/ggdc/2022-11-28/penn_world_table_national_accounts
