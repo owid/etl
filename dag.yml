@@ -192,6 +192,7 @@ steps:
   # UNDP
   data://meadow/un/2022-11-29/undp_hdr:
     - snapshot://un/2022-11-29/undp_hdr.csv
+    - snapshot://un/2022-11-29/undp_hdr.xlsx
   data://garden/un/2022-11-29/undp_hdr:
     - data://meadow/un/2022-11-29/undp_hdr
   data://grapher/un/2022-11-29/undp_hdr:
