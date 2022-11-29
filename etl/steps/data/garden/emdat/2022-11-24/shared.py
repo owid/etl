@@ -37,33 +37,34 @@ REGIONS = {
     # Additional regions.
     "European Union (27)": {
         "regions_included": [
-            'Austria',
-            'Belgium',
-            'Bulgaria',
-            'Croatia',
-            'Cyprus',
-            'Czechia',
-            'Denmark',
-            'Estonia',
-            'Finland',
-            'France',
-            'Germany',
-            'Greece',
-            'Hungary',
-            'Ireland',
-            'Italy',
-            'Latvia',
-            'Lithuania',
-            'Luxembourg',
-            'Malta',
-            'Netherlands',
-            'Poland',
-            'Portugal',
-            'Romania',
-            'Slovakia',
-            'Slovenia',
-            'Spain',
-            'Sweden'],
+            "Austria",
+            "Belgium",
+            "Bulgaria",
+            "Croatia",
+            "Cyprus",
+            "Czechia",
+            "Denmark",
+            "Estonia",
+            "Finland",
+            "France",
+            "Germany",
+            "Greece",
+            "Hungary",
+            "Ireland",
+            "Italy",
+            "Latvia",
+            "Lithuania",
+            "Luxembourg",
+            "Malta",
+            "Netherlands",
+            "Poland",
+            "Portugal",
+            "Romania",
+            "Slovakia",
+            "Slovenia",
+            "Spain",
+            "Sweden",
+        ],
     },
 }
 
@@ -164,10 +165,10 @@ HISTORIC_TO_CURRENT_REGION: Dict[str, Dict[str, Union[str, List[str]]]] = {
 # countries for which we do not have data (like the Russian Empire).
 ACCEPTED_OVERLAPS = {
     1902: {"USSR", "Azerbaijan"},
-    1990: {'Tajikistan', 'USSR'},
-    1991: {'Georgia', 'USSR'},
-    1982: {'South Yemen', 'Yemen'},
-    1989: {'South Yemen', 'Yemen'},
+    1990: {"Tajikistan", "USSR"},
+    1991: {"Georgia", "USSR"},
+    1982: {"South Yemen", "Yemen"},
+    1989: {"South Yemen", "Yemen"},
 }
 
 
@@ -376,25 +377,32 @@ def add_population(
         years_in_data = df["year"].unique()
 
         population = population.set_index(["country", "year"]).reindex(
-            pd.MultiIndex.from_product([countries_in_data, years_in_data], names=["country", "year"]))
+            pd.MultiIndex.from_product([countries_in_data, years_in_data], names=["country", "year"])
+        )
 
-        population = population.groupby('country').transform(
-            lambda x: x.interpolate(method='linear', limit_direction='both'))
+        population = population.groupby("country").transform(
+            lambda x: x.interpolate(method="linear", limit_direction="both")
+        )
 
         error = "There should not be any missing population data."
         assert population[population["population"].isnull()].empty, error
-            
+
     # Add population to original dataframe.
     df_with_population = pd.merge(df, population, on=[country_col, year_col], how="left")
 
     return df_with_population
 
 
-def detect_overlapping_regions(df, index_columns, region_and_members, country_col="country", year_col="year", ignore_zeros=True):
+def detect_overlapping_regions(
+    df, index_columns, region_and_members, country_col="country", year_col="year", ignore_zeros=True
+):
     # TODO: Document.
     # Sum over all columns to get the total sum of each column for each country-year.
-    df_total = df.groupby([country_col, year_col]).agg(
-        {column: "sum" for column in df.columns if column not in index_columns}).reset_index()
+    df_total = (
+        df.groupby([country_col, year_col])
+        .agg({column: "sum" for column in df.columns if column not in index_columns})
+        .reset_index()
+    )
 
     if ignore_zeros:
         overlapping_values_to_ignore = [0]
@@ -407,10 +415,16 @@ def detect_overlapping_regions(df, index_columns, region_and_members, country_co
     for region in regions:
         members = [member for member in region_and_members[region]["regions_included"] if member in countries_in_data]
         for member in members:
-            region_values = df_total[df_total[country_col] == region].replace(overlapping_values_to_ignore, np.nan).\
-                dropna(subset=variables, how="all")
-            member_values = df_total[df_total[country_col] == member].replace(overlapping_values_to_ignore, np.nan).\
-                dropna(subset=variables, how="all")
+            region_values = (
+                df_total[df_total[country_col] == region]
+                .replace(overlapping_values_to_ignore, np.nan)
+                .dropna(subset=variables, how="all")
+            )
+            member_values = (
+                df_total[df_total[country_col] == member]
+                .replace(overlapping_values_to_ignore, np.nan)
+                .dropna(subset=variables, how="all")
+            )
             combined = pd.concat([region_values, member_values])
             overlaps = combined[combined.duplicated(subset=[year_col], keep=False)]
             if len(overlaps) > 0:
@@ -463,7 +477,8 @@ def add_region_aggregates(
     data = data.copy()
 
     all_overlaps = detect_overlapping_regions(
-        df=data, region_and_members=HISTORIC_TO_CURRENT_REGION, index_columns=index_columns)
+        df=data, region_and_members=HISTORIC_TO_CURRENT_REGION, index_columns=index_columns
+    )
 
     # Check whether all accepted overlaps are found in the data, and that there are no new unknown overlaps.
     error = "Either the list of accepted overlaps is not found in the data, or there are new unknown overlaps."
@@ -480,9 +495,12 @@ def add_region_aggregates(
         data_region = data[data[country_column].isin(countries_in_region)]
 
         # Add region aggregates.
-        region_df = data_region.groupby(
-            [column for column in index_columns if column != country_column]).sum(numeric_only=True).\
-            reset_index().assign(**{country_column: region})
+        region_df = (
+            data_region.groupby([column for column in index_columns if column != country_column])
+            .sum(numeric_only=True)
+            .reset_index()
+            .assign(**{country_column: region})
+        )
         data = pd.concat([data, region_df], ignore_index=True)
 
     return data
