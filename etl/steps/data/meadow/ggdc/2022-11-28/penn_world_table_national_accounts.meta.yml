@@ -16,6 +16,9 @@ dataset:
 tables:
   penn_world_table_national_accounts:
     variables:
+      country:
+        title: OWID-formatted name of country
+        unit:
       countrycode:
         title: 3-letter ISO country code
         unit:
