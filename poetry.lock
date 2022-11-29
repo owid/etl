@@ -749,7 +749,7 @@ pgp = ["gpg"]
 
 [[package]]
 name = "dvc"
-version = "2.35.1"
+version = "2.35.2"
 description = "Git for data scientists - manage your code and data together"
 category = "main"
 optional = false
@@ -3945,7 +3945,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "flake8 
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "7716ffa700858420dbc826902a48d738c958aaad56d2128acffef595ee2778fc"
+content-hash = "5e4614e924bd00ab0a7e5098861d97808b6d2a7a3bd514aa03d2452a981ffbb5"
 
 [metadata.files]
 aiobotocore = []

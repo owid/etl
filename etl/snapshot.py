@@ -1,8 +1,9 @@
 import datetime as dt
+import re
 import shutil
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, Literal, Optional, Union
+from typing import Any, Dict, List, Literal, Optional, Union
 
 import pandas as pd
 import yaml
@@ -47,6 +48,13 @@ class Snapshot:
     def pull(self) -> None:
         """Pull file from S3."""
         dvc.pull(str(self.path), remote=self._dvc_remote)
+
+    def delete_local(self) -> None:
+        """Delete local file and its metadata."""
+        if self.path.exists():
+            self.path.unlink()
+        if self.metadata_path.exists():
+            self.metadata_path.unlink()
 
     def download_from_source(self) -> None:
         """Download file from source_data_url."""
@@ -103,6 +111,8 @@ class SnapshotMeta:
     publication_year: Optional[int] = None
     publication_date: Union[Optional[dt.date], Literal["latest"]] = None
 
+    outs: Any = None
+
     def __post_init__(self) -> None:
         if self.version is None:
             if self.publication_date:
@@ -115,6 +125,20 @@ class SnapshotMeta:
             # version can be loaded as datetime.date, but it has to be string
             self.version = str(self.version)
 
+    @property
+    def path(self) -> Path:
+        """Path to metadata file."""
+        return Path(f"{paths.SNAPSHOTS_DIR / self.uri}.dvc")
+
+    def save(self) -> None:
+        self.path.parent.mkdir(exist_ok=True, parents=True)
+        with open(self.path, "w") as ostream:
+            yaml.dump({"meta": self.to_dict()}, ostream)
+
+    @property
+    def uri(self):
+        return f"{self.namespace}/{self.version}/{self.short_name}.{self.file_extension}"
+
     @classmethod
     def load_from_yaml(cls, filename: Union[str, Path]) -> "SnapshotMeta":
         """Load metadata from YAML file. Metadata must be stored under `meta` key."""
@@ -122,7 +146,14 @@ class SnapshotMeta:
             yml = yaml.safe_load(istream)
             if "meta" not in yml:
                 raise ValueError("Metadata YAML should be stored under `meta` key")
-            return cls.from_dict(yml["meta"])
+            return cls.from_dict(dict(**yml["meta"], outs=yml.get("outs", [])))
+
+    @property
+    def md5(self) -> str:
+        if not self.outs:
+            raise ValueError(f"Snapshot {self.uri} hasn't been added to DVC yet")
+        assert len(self.outs) == 1
+        return self.outs[0]["md5"]
 
     def to_dict(self) -> Dict[str, Any]:
         ...
@@ -159,3 +190,15 @@ def add_snapshot(
         raise ValueError("Use either 'filename' or 'dataframe' argument, but not both.")
 
     snap.dvc_add(upload=upload)
+
+
+def snapshot_catalog(match: str = r".*") -> List[Snapshot]:
+    """Return a catalog of all snapshots.
+    :param match: pattern to match uri
+    """
+    catalog = []
+    for path in paths.SNAPSHOTS_DIR.glob("**/*.dvc"):
+        uri = str(path.relative_to(paths.SNAPSHOTS_DIR)).replace(".dvc", "")
+        if re.match(match, uri):
+            catalog.append(Snapshot(uri))
+    return catalog
