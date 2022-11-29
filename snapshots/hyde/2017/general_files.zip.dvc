@@ -9,8 +9,15 @@ meta:
   license_url: https://dataportaal.pbl.nl/downloads/HYDE/HYDE3.2/readme_release_HYDE3.2.1.txt
   license_name: CC BY 3.0
   file_extension: zip
+<<<<<<< HEAD
   description: |
     Metadata for the Hyde 3.2 dataset, such as country codes.
+=======
+  date_accessed: 2021-10-01
+  description: |
+    Metadata for the Hyde 3.2 dataset, such as country codes.
+wdir: ../../../data/snapshots/hyde/2017
+>>>>>>> fc256ac5a0f3c030e6053ca16acfec4070e07e66
 outs:
 - md5: 51877033a0b0e3bdf36430ed2fe62510
   size: 3018098

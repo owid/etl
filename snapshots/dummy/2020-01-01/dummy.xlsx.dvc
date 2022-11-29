@@ -9,6 +9,10 @@ meta:
   file_extension: xlsx
   license_url:
   license_name:
+<<<<<<< HEAD
+=======
+  date_accessed: 2022-11-25
+>>>>>>> fc256ac5a0f3c030e6053ca16acfec4070e07e66
   is_public: true
   description: |
     This
@@ -16,6 +20,10 @@ meta:
     a
     dummy
     dataset
+<<<<<<< HEAD
+=======
+wdir: ../../../data/snapshots/dummy/2020-01-01
+>>>>>>> fc256ac5a0f3c030e6053ca16acfec4070e07e66
 outs:
 - md5: 0fadb25212dd37be38cd098899873a35
   size: 1764793

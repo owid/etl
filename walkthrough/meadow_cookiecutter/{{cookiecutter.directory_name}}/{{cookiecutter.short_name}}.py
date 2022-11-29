@@ -4,7 +4,7 @@ from owid.catalog.utils import underscore_table
 from structlog import get_logger
 
 from etl.helpers import Names
-from etl.paths import DATA_DIR, REFERENCE_DATASET, SNAPSHOTS_DIR
+from etl.paths import DATA_DIR, REFERENCE_DATASET
 from etl.snapshot import Snapshot
 from etl.steps.data.converters import convert_snapshot_metadata
 
@@ -29,7 +29,7 @@ def run(dest_dir: str) -> None:
     log.info("{{cookiecutter.short_name}}.start")
 
     # retrieve snapshot
-    snap = Snapshot(SNAPSHOTS_DIR / "{{cookiecutter.namespace}}" / "{{cookiecutter.snapshot_version}}" / "{{cookiecutter.short_name}}.{{cookiecutter.snapshot_file_extension}}")
+    snap = Snapshot("{{cookiecutter.namespace}}/{{cookiecutter.snapshot_version}}/{{cookiecutter.short_name}}.{{cookiecutter.snapshot_file_extension}}")
     df = pd.read_excel(snap.path, sheet_name="Full data")
 
     # clean and transform data

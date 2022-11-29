@@ -186,9 +186,8 @@ python snapshots/{form.namespace}/{form.version}/{form.short_name}.py --skip-upl
 
 ```python
 from etl.snapshot import Snapshot
-from etl.paths import SNAPSHOTS_DIR
 
-snap = Snapshot(SNAPSHOTS_DIR / "{form.namespace}" / "{form.version}" / "{form.short_name}.{form.file_extension}")
+snap = Snapshot("{form.namespace}/{form.version}/{form.short_name}.{form.file_extension}")
 # call snap.pull() if you don't have it locally in snapshots/
 df = pd.read_excel(snap.path)
 ```

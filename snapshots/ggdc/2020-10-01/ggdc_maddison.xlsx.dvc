@@ -18,6 +18,10 @@ meta:
   # License is defined in the main page of the project.
   license_url: https://www.rug.nl/ggdc/historicaldevelopment/maddison/releases/maddison-project-database-2020
   license_name: Creative Commons BY 4.0
+<<<<<<< HEAD
+=======
+  date_accessed: 2022-04-12
+>>>>>>> fc256ac5a0f3c030e6053ca16acfec4070e07e66
   description: |
     Full citation:
     Maddison Project Database, version 2020. Bolt, Jutta and Jan Luiten van Zanden (2020), “Maddison style estimates of the evolution of the world economy. A new 2020 update”.
@@ -236,6 +240,10 @@ meta:
 
     South Africa
     1700–1900 (Cape Colony)	Fourie, J. and Van Zanden, J.L. (2013). GDP in the Dutch Cape Colony: the Nationals Accounts of a Slave-Based Society, South African Journal of Economics, vol. 81 (4): 467 - 490
+<<<<<<< HEAD
+=======
+wdir: ../../../data/snapshots/ggdc/2020-10-01
+>>>>>>> fc256ac5a0f3c030e6053ca16acfec4070e07e66
 outs:
 - md5: 0fadb25212dd37be38cd098899873a35
   size: 1764793
