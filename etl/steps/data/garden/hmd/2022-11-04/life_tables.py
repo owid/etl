@@ -25,6 +25,7 @@ def run(dest_dir: str) -> None:
     # init dataset
     ds_garden = Dataset.create_empty(dest_dir)
     ds_garden.metadata = ds_meadow.metadata
+    print(N.metadata_path)
     ds_garden.metadata.update_from_yaml(N.metadata_path)
 
     # build tables
@@ -56,7 +57,7 @@ def make_table(ds_meadow, table_name: str) -> Table:
         tb_garden[col].metadata = tb_meadow[col].metadata
 
     # Edit table
-    # tb_garden.update_metadata_from_yaml(N.metadata_path, table_name)
+    tb_garden.update_metadata_from_yaml(N.metadata_path, table_name)
     tb_garden = tb_garden.set_index(["country", "year", "age"])
 
     return tb_garden
