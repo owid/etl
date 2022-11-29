@@ -29,7 +29,7 @@ dataset:
       publication_year: 2005
 tables:
   riley_2005:
-    title: Life expectancy at birth
+    title: Life expectancy (at birth)
     description: Life expectancy at birth estimates.
     variables:
       life_expectancy:
