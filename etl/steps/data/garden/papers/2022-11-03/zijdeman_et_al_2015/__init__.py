@@ -63,7 +63,6 @@ def make_table(tb_meadow: Table) -> Table:
 
 
 def clean_countries(df: pd.DataFrame) -> pd.DataFrame:
-    df = exclude_countries(df)
     df = harmonize_countries(df)
     return df
 
@@ -76,18 +75,6 @@ def format_columns(df: pd.DataFrame) -> pd.DataFrame:
     }
     df = df[columns.keys()].rename(columns=columns)
     return df
-
-
-def load_excluded_countries() -> List[str]:
-    with open(EXCLUDED_COUNTRIES_PATH, "r") as f:
-        data = json.load(f)
-        assert isinstance(data, list)
-    return data
-
-
-def exclude_countries(df: pd.DataFrame) -> pd.DataFrame:
-    excluded_countries = load_excluded_countries()
-    return cast(pd.DataFrame, df.loc[~df.country.isin(excluded_countries)])
 
 
 def harmonize_countries(df: pd.DataFrame) -> pd.DataFrame:
