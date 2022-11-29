@@ -1,19 +1,539 @@
 dataset:
+  namespace: un
+  short_name: undp_hdr
+  title: Human Development Report - UNDP (2021-22)
+  description: |
+    The 2021/2022 Human Development Report is the latest in the series
+    of global Human Development Reports published by the United Nations Development
+    Programme (UNDP) since 1990 as independent and analytically and empirically grounded
+    discussions of major development issues, trends and policies.
+
+
+    Additional resources related to the 2021/2022 Human Development Report can be
+    found online at http://hdr.undp.org. Resources on the website include digital
+    versions and translations of the Report and the overview in more than 10 languages,
+    an interactive web version of the Report, a set of background papers and think
+    pieces commissioned for the Report, interactive data visualizations and databases
+    of human development indicators, full explanations of the sources and methodologies
+    used in the Report's composite indices, country insights and other background
+    materials, and previous global, regional and national Human Development Reports.
+    Corrections and addenda are also available online.
+
+
+    Technical notes may be found at https://hdr.undp.org/sites/default/files/2021-22_HDR/hdr2021-22_technical_notes.pdf.
+  licenses:
+    - name: CC BY 3.0 IGO
+      url: https://hdr.undp.org/copyright-and-terms-use
+  version: "2022-11-29"
   sources:
-  #   -
-  #     name: Maddison Project Database 2020 (Bolt and van Zanden, 2020)
-  #     published_by: Bolt, Jutta and Jan Luiten van Zanden (2020), “Maddison style estimates of the evolution of the world economy. A new 2020 update“.
-  #     publisher_source: |
-  #       The Maddison Project Database is based on the work of many researchers that have produced estimates of...
+    - name: UNDP, Human Development Report (2021-22)
+      url: https://hdr.undp.org/
+      source_data_url: https://hdr.undp.org/sites/default/files/2021-22_HDR/HDR21-22_Composite_indices_complete_time_series.csv
+      date_accessed: "2022-11-29"
+      publication_date: "2022-09-08"
+      publication_year: 2022
 
 tables:
   undp_hdr:
+    title: Human Development Report - UNDP (2021-22)
+    description: |
+      Contains all HDR metrics as columns, indexed by country and year.
     variables:
-      # gdp:
-      #   title: GDP
-      #   short_unit: $
-      #   unit: 2011 int-$
-      #   description: Gross domestic product measured in international-$ using 2011 prices to adjust for price changes over time (inflation) and price differences between countries. Calculated by multiplying GDP per capita with population.
-      #   display:
-      #     entityAnnotationsMap: "Western Offshoots: United States, Canada, Australia and New Zealand"
-      #     numDecimalPlaces: 0
+      # Life expectancy
+      le:
+        title: Life Expectancy at Birth
+        short_unit: "years"
+        unit: "years"
+        description: |
+          The average number of remaining years of life expected by a hypothetical cohort of individuals who already reached age x
+          and would be subject during the remainder of their lives to the mortality rates of a given period.
+        sources:
+          - publisher_source: UNDESA (2022a)
+      le_f:
+        title: Life Expectancy at Birth, female
+        short_unit: "years"
+        unit: "years"
+        description: |
+          The average number of remaining years of life expected by a hypothetical cohort of female individuals who already reached age x
+          and would be subject during the remainder of their lives to the mortality rates of a given period.
+        sources:
+          - publisher_source: UNDESA (2022a)
+      le_m:
+        title: Life Expectancy at Birth, male
+        short_unit: "years"
+        unit: "years"
+        description: |
+          The average number of remaining years of life expected by a hypothetical cohort of male individuals who already reached age x
+          and would be subject during the remainder of their lives to the mortality rates of a given period.
+        sources:
+          - publisher_source: UNDESA (2022a)
+      # Schooling years (expected)
+      eys:
+        title: Expected Years of Schooling
+        short_unit: "years"
+        unit: "years"
+        description: |
+          Expected years of schooling is the number of years a child of school entrance age is expected to spend at school, or university, including years spent on repetition. 
+          It is the sum of the age-specific enrolment ratios for primary, secondary, post-secondary non-tertiary and tertiary education.
+
+          (definition from the World Bank)
+        sources:
+          - publisher_source: CEDLAS and World Bank (2022)
+          - publisher_source: ICF Macro Demographic and Health Surveys (various years)
+          - publisher_source: UNESCO Institute for Statistics (2022)
+          - publisher_source: UNICEF Multiple Indicator Cluster Surveys (various years)
+      eys_f:
+        title: Expected Years of Schooling, female
+        short_unit: "years"
+        unit: "years"
+        description: |
+          Expected years of schooling is the number of years a child (female) of school entrance age is expected to spend at school, or university, including years spent on repetition. 
+          It is the sum of the age-specific enrolment ratios for primary, secondary, post-secondary non-tertiary and tertiary education.
+
+          (definition from the World Bank)
+        sources:
+          - publisher_source: CEDLAS and World Bank (2022)
+          - publisher_source: ICF Macro Demographic and Health Surveys (various years)
+          - publisher_source: UNESCO Institute for Statistics (2022)
+          - publisher_source: UNICEF Multiple Indicator Cluster Surveys (various years)
+      eys_m:
+        title: Expected Years of Schooling, male
+        short_unit: "years"
+        unit: "years"
+        description: |
+          Expected years of schooling is the number of years a child (male) of school entrance age is expected to spend at school, or university, including years spent on repetition. 
+          It is the sum of the age-specific enrolment ratios for primary, secondary, post-secondary non-tertiary and tertiary education.
+
+          (definition from the World Bank)
+        sources:
+          - publisher_source: CEDLAS and World Bank (2022)
+          - publisher_source: ICF Macro Demographic and Health Surveys (various years)
+          - publisher_source: UNESCO Institute for Statistics (2022)
+          - publisher_source: UNICEF Multiple Indicator Cluster Surveys (various years)
+      # Schooling (mean)
+      mys:
+        title: Mean Years of Schooling
+        short_unit: "years"
+        unit: "years"
+        description: |
+          Average number of completed years of education of a country's population aged 25 years and older, excluding years spent repeating individual grades.
+
+          (definition from the UNESCO)
+        sources:
+          - publisher_source: Barro and Lee (2018)
+          - publisher_source: ICF Macro Demographic and Health Surveys (various years)
+          - publisher_source: OECD (2022)
+          - publisher_source: UNESCO Institute for Statistics (2022)
+          - publisher_source: UNICEF Multiple Indicator Cluster Surveys (various years)
+      mys_f:
+        title: Mean Years of Schooling, female
+        short_unit: "years"
+        unit: "years"
+        description: |
+          Average number of completed years of education of a country's population aged 25 years and older, excluding years spent repeating individual grades (female).
+
+          (definition from the UNESCO)
+        sources:
+          - publisher_source: Barro and Lee (2018)
+          - publisher_source: ICF Macro Demographic and Health Surveys (various years)
+          - publisher_source: OECD (2022)
+          - publisher_source: UNESCO Institute for Statistics (2022)
+          - publisher_source: UNICEF Multiple Indicator Cluster Surveys (various years)
+      mys_m:
+        title: Mean Years of Schooling, male
+        short_unit: "years"
+        unit: "years"
+        description: |
+          Average number of completed years of education of a country's population aged 25 years and older, excluding years spent repeating individual grades (male).
+
+          (definition from the UNESCO)
+        sources:
+          - publisher_source: Barro and Lee (2018)
+          - publisher_source: ICF Macro Demographic and Health Surveys (various years)
+          - publisher_source: OECD (2022)
+          - publisher_source: UNESCO Institute for Statistics (2022)
+          - publisher_source: UNICEF Multiple Indicator Cluster Surveys (various years)
+      # GNI PPP
+      gni_pc_f:
+        title: Gross National Income Per Capita, female
+        short_unit: ""
+        unit: "2017 PPP$"
+        description: |
+          GNI per capita (formerly GNP per capita) is the gross national income, converted to U.S. dollars using the World Bank Atlas method, 
+          divided by the midyear population. GNI is the sum of value added by all resident producers plus any product taxes (less subsidies) 
+          not included in the valuation of output plus net receipts of primary income (compensation of employees and property income) from abroad.
+          GNI, calculated in national currency, is usually converted to U.S. dollars at official exchange rates for comparisons across economies,
+          although an alternative rate is used when the official exchange rate is judged to diverge by an exceptionally large margin from the
+          rate actually applied in international transactions.
+
+          Only female population is considered.
+
+          (definition from the World Bank)
+        sources:
+          - publisher_source: IMF (2022)
+          - publisher_source: UNDESA (2022b)
+          - publisher_source: United Nations Statistics Division (2022)
+          - publisher_source: World Bank (2022)
+      gni_pc_m:
+        title: Gross National Income Per Capita, male
+        short_unit: ""
+        unit: "2017 PPP$"
+        description: |
+          GNI per capita (formerly GNP per capita) is the gross national income, converted to U.S. dollars using the World Bank Atlas method, 
+          divided by the midyear population. GNI is the sum of value added by all resident producers plus any product taxes (less subsidies) 
+          not included in the valuation of output plus net receipts of primary income (compensation of employees and property income) from abroad.
+          GNI, calculated in national currency, is usually converted to U.S. dollars at official exchange rates for comparisons across economies,
+          although an alternative rate is used when the official exchange rate is judged to diverge by an exceptionally large margin from the
+          rate actually applied in international transactions.
+
+          Only male population is considered.
+
+          (definition from the World Bank)
+        sources:
+          - publisher_source: IMF (2022)
+          - publisher_source: UNDESA (2022b)
+          - publisher_source: United Nations Statistics Division (2022)
+          - publisher_source: World Bank (2022)
+      gnipc:
+        title: Gross National Income Per Capita
+        short_unit: ""
+        unit: "2017 PPP$"
+        description: |
+          GNI per capita (formerly GNP per capita) is the gross national income, converted to U.S. dollars using the World Bank Atlas method, 
+          divided by the midyear population. GNI is the sum of value added by all resident producers plus any product taxes (less subsidies) 
+          not included in the valuation of output plus net receipts of primary income (compensation of employees and property income) from abroad.
+          GNI, calculated in national currency, is usually converted to U.S. dollars at official exchange rates for comparisons across economies,
+          although an alternative rate is used when the official exchange rate is judged to diverge by an exceptionally large margin from the
+          rate actually applied in international transactions.
+
+          (definition from the World Bank)
+        sources:
+          - publisher_source: IMF (2022)
+          - publisher_source: UNDESA (2022b)
+          - publisher_source: United Nations Statistics Division (2022)
+          - publisher_source: World Bank (2022)
+      # Maternal mortality rate
+      mmr:
+        title: Maternal Mortality Ratio
+        short_unit: ""
+        unit: "deaths per 100,000 live births"
+        description: |
+          The maternal mortality ratio (MMR) is defined as the number of maternal deaths during a given time period per 100,000 live births during
+          the same time period. It depicts the risk of maternal death relative to the number of live births and essentially captures the risk of
+          death in a single pregnancy or a single live birth. Maternal deaths: The annual number of female deaths from any cause related to or
+          aggravated by pregnancy or its management (excluding accidental or incidental causes) during pregnancy and childbirth or within 42 days of
+          termination of pregnancy, irrespective of the duration and site of the pregnancy, expressed per 100,000 live births, for a specified time period. 
+
+          Live birth: The complete expulsion or extraction from its mother of a product of conception, irrespective of the duration of the pregnancy, which, 
+          after such separation, breathes or shows any other evidence of life such as beating of the heart, pulsation of the umbilical cord, or definite 
+          movement of voluntary muscles, whether or not the umbilical cord has been cut or the placenta is attached. (ICD-10) International reporting of 
+          maternal mortality For the purpose of international reporting of maternal mortality, only those maternal deaths occurring before the end of the 
+          42-day reference period should be included in the calculation of the various ratios and rates. The recording of later deaths is encouraged to 
+          inform national, regional, and global understanding of these events.
+
+          (definition from the WHO)
+        sources:
+          - publisher_source: WHO
+          - publisher_source: UNICEF
+          - publisher_source: UNFPA
+          - publisher_source: World Bank Group
+          - publisher_source: United Nations Population Division (2019).
+      # Adolescent birth rate
+      abr:
+        title: Adolescent Birth Rate
+        short_unit: ""
+        unit: "births per 1,000 women ages 15-19"
+        description: |
+          The annual number of births to women aged 15-19 years per 1,000 women in that age group.
+          It is also referred to as the age-specific fertility rate for women aged 15-19.
+
+          (definition from the WHO)
+        sources:
+          - publisher_source: UNDESA (2022a)
+      # Secondary education
+      se_f:
+        title: Population with at least some secondary education, female
+        short_unit: ""
+        unit: "% ages 25 and older"
+        description: |
+          The percentage of population (female, age 25 and over) with at least completed lower secondary education (ISCED 2 or higher). 
+          This indicator is calculated by dividing the number of persons aged 25 years and above with completed lower secondary 
+          education by the total population of the same age group and multiplying the result by 100. The UNESCO Institute for 
+          Statistics (UIS) educational attainment dataset shows the educational composition of the population aged 25 years and 
+          above and hence the stock and quality of human capital within a country. The dataset also reflects the structure and 
+          performance of the education system and its accumulated impact on human capital formation.
+        sources:
+          - publisher_source: Barro and Lee (2018)
+          - publisher_source: ICF Macro Demographic and Health Surveys (various years)
+          - publisher_source: OECD (2022)
+          - publisher_source: UNESCO Institute for Statistics (2022)
+          - publisher_source: UNICEF Multiple Indicator Cluster Surveys (various years)
+      se_m:
+        title: Population with at least some secondary education, male
+        short_unit: ""
+        unit: "% ages 25 and older"
+        description: |
+          The percentage of population (male, age 25 and over) with at least completed lower secondary education (ISCED 2 or higher). 
+          This indicator is calculated by dividing the number of persons aged 25 years and above with completed lower secondary 
+          education by the total population of the same age group and multiplying the result by 100. The UNESCO Institute for 
+          Statistics (UIS) educational attainment dataset shows the educational composition of the population aged 25 years and 
+          above and hence the stock and quality of human capital within a country. The dataset also reflects the structure and 
+          performance of the education system and its accumulated impact on human capital formation.
+        sources:
+          - publisher_source: Barro and Lee (2018)
+          - publisher_source: ICF Macro Demographic and Health Surveys (various years)
+          - publisher_source: OECD (2022)
+          - publisher_source: UNESCO Institute for Statistics (2022)
+          - publisher_source: UNICEF Multiple Indicator Cluster Surveys (various years)
+      # Parliament
+      pr_f:
+        title: Share of seats in parliament, female
+        short_unit: ""
+        unit: "% held by women"
+        description: |
+          Share of all seats in parliaments that are held by female representatives.
+        sources:
+          - publisher_source: IPU (2022)
+      pr_m:
+        title: Share of seats in parliament, male (% held by men)
+        short_unit: ""
+        unit: ""
+        description: |
+          Share of all seats in parliaments that are held by male representatives.
+        sources:
+          - publisher_source: IPU (2022)
+      # Labour force
+      lfpr_f:
+        title: Labour force participation rate, female
+        short_unit: "%"
+        unit: "% ages 15 and older"
+        description: |
+          The labour force participation rate is a measure of the proportion of a country's working-age population that engages actively 
+          in the labour market, either by working or looking for work; it provides an indication of the size of the supply of labour 
+          available to engage in the production of goods and services, relative to the population at working age. The breakdown of 
+          the labour force (formerly known as economically active population) by sex and age group gives a profile of the distribution 
+          of the labour force within a country.
+
+          Only female population is considered.
+
+          (description from ILOSTAT)
+        sources:
+          - publisher_source: ILO (2022)
+      lfpr_m:
+        title: Labour force participation rate, male
+        short_unit: ""
+        unit: "% ages 15 and older"
+        description: |
+          The labour force participation rate is a measure of the proportion of a country's working-age population that engages actively 
+          in the labour market, either by working or looking for work; it provides an indication of the size of the supply of labour 
+          available to engage in the production of goods and services, relative to the population at working age. The breakdown of 
+          the labour force (formerly known as economically active population) by sex and age group gives a profile of the distribution 
+          of the labour force within a country.
+
+          Only male population is considered.
+
+          (description from ILOSTAT)
+        sources:
+          - publisher_source: ILO (2022)
+      # Others
+      co2_prod:
+        title: Carbon dioxide emissions per capita (production)
+        short_unit: ""
+        unit: "tonnes per capita"
+        description: |
+          Carbon dioxide emissions produced as a consequence of human activities (use of coal, oil and gas
+          for combustion and industrial processes, gas flaring and cement manufacture), divided by midyear
+          population. Values are territorial emissions, meaning that emissions are attributed to the country in
+          which they physically occur.
+        sources:
+          - publisher_source: Global Carbon Project (2022)
+      loss:
+        title: Overall loss
+        short_unit: "%"
+        unit: "%"
+        description: |
+          Percentage difference between the IHDI value and the HDI value.
+      # 1. Human Development Index
+      hdi:
+        title: Human Development Index
+        short_unit: ""
+        unit: ""
+        description: |
+          The Human Development Index (HDI) is a summary measure of achievements in three key dimensions of human development: 
+          a long and healthy life, access to knowledge and a decent standard of living. The HDI is the geometric mean of 
+          normalized indices for each of the three dimensions. This technical note describes the data sources and the 
+          steps to calculating HDI values.
+
+          For more details read the technical note 1 at https://hdr.undp.org/sites/default/files/2021-22_HDR/hdr2021-22_technical_notes.pdf.
+      hdi_f:
+        title: HDI female
+        short_unit: ""
+        unit: ""
+        description: |
+          The Human Development Index (HDI) is a summary measure of achievements in three key dimensions of human development: 
+          a long and healthy life, access to knowledge and a decent standard of living. The HDI is the geometric mean of 
+          normalized indices for each of the three dimensions. This technical note describes the data sources and the 
+          steps to calculating HDI values.
+
+          For more details read the technical note 1 at https://hdr.undp.org/sites/default/files/2021-22_HDR/hdr2021-22_technical_notes.pdf.
+
+          Only female population is considered.
+      hdi_m:
+        title: HDI male
+        short_unit: ""
+        unit: ""
+        description: |
+          The Human Development Index (HDI) is a summary measure of achievements in three key dimensions of human development: 
+          a long and healthy life, access to knowledge and a decent standard of living. The HDI is the geometric mean of 
+          normalized indices for each of the three dimensions. This technical note describes the data sources and the 
+          steps to calculating HDI values.
+
+          For more details read the technical note 1 at https://hdr.undp.org/sites/default/files/2021-22_HDR/hdr2021-22_technical_notes.pdf.
+
+          Onlu male population is considered.
+      hdi_rank:
+        title: HDI Rank
+        short_unit: ""
+        unit: ""
+        description: |
+          Country's global rank based on its HDI value.
+      # 2. Inequality-adjusted Human Development Index
+      ineq_edu:
+        title: Inequality in eduation
+        short_unit: ""
+        unit: ""
+        description: |
+          Inequality in education. This metric is needed to estimate the Inequality-adjusted Human Development Index.
+      ineq_inc:
+        title: Inequality in income
+        short_unit: ""
+        unit: ""
+        description: |
+          Inequality in income. This metric is needed to estimate the Inequality-adjusted Human Development Index.
+      ineq_le:
+        title: Inequality in life expectancy
+        short_unit: ""
+        unit: ""
+        description: |
+          Inequality in life expectancy. This metric is needed to estimate the Inequality-adjusted Human Development Index.
+      coef_ineq:
+        title: Coefficient of human inequality
+        short_unit: ""
+        unit: ""
+        description: |
+          An unweighted average of inequalities in health, education and income is denoted as the coefficient of 
+          human inequality. It averages these inequalities using the arithmetic mean:
+
+          (Inequality in health + Inequality in gender + Inequality in income) / 3
+
+          When all inequalities in dimensions are of a similar magnitude, the coefficient of human inequality and 
+          the loss in HDI value differ negligibly. When inequalities differ in magnitude, the loss in HDI value 
+          tends to be higher than the coefficient of human inequality.
+      ihdi:
+        title: Inequality-adjusted Human Development Index
+        short_unit: ""
+        unit: ""
+        description: |
+          The Inequality-adjusted Human Development Index (IHDI) adjusts the Human Development Index (HDI) for 
+          inequality in the distribution of each dimension across the population. It is based on a distribution-sensitive 
+          class of composite indices proposed by Foster, Lopez-Calva and Szekely (2005), which draws on the Atkinson 
+          (1970) family of inequality measures. It is computed as a geometric mean of inequality-adjusted dimensional 
+          indices.
+
+          The IHDI accounts for inequalities in HDI dimensions by “discounting” each dimension’s average 
+          value according to its level of inequality. The IHDI value equals the HDI value when there is no inequality 
+          across people but falls below the HDI value as inequality rises. In this sense the IHDI measures the level 
+          of human development when inequality is accounted for.
+
+          For more details read the technical note 2 at https://hdr.undp.org/sites/default/files/2021-22_HDR/hdr2021-22_technical_notes.pdf.
+      diff_hdi_phdi:
+        title: Difference from HDI value
+        short_unit: "%"
+        unit: "%"
+        description: |
+          Difference in ranks on the IHDI and the HDI is calculated only for countries for which both an IHDI value
+          and an HDI value are calculated. Due to data limitations, IHDI values are calculated for a smaller set of
+          countries.
+      rankdiff_hdi_phdi:
+        title: Difference from HDI rank
+        short_unit: ""
+        unit: ""
+        description: |
+          To calculate the IHDI rank difference from the HDI rank, HDI ranks are recalculated for the set
+          of countries for which an IHDI value is calculated.
+      # 3. Gender Development Index
+      gdi:
+        title: Gender Development Index
+        short_unit: ""
+        unit: ""
+        description: |
+          The Gender Development Index (GDI) measures gender inequalities in achievement in three basic dimensions of human
+          development: health, measured by female and male life expectancy at birth; education, measured by female and male 
+          expected years of schooling for children and female and male mean years of schooling for adults ages 25 years and 
+          older; and command over economic resources, measured by female and male estimated earned income.
+
+          For more details read the technical note at https://hdr.undp.org/sites/default/files/2021-22_HDR/hdr2021-22_technical_notes.pdf.
+      gdi_group:
+        title: GDI Group
+        short_unit: ""
+        unit: ""
+        description: |
+          The GDI groups are based on the absolute deviation of GDI from gender parity, 100 ∙ |GDI – 1|. Countries with absolute deviation 
+          from gender parity of 2.5 percent or less are considered countries with high equality in HDI achievements between women and 
+          men and are classified as group 1. Countries with absolute deviation from gender parity of 2.5–5 percent are considered 
+          countries with medium-high equality in HDI achievements between women and men and are classified as group 2. Countries with 
+          absolute deviation from gender parity of 5–7.5 percent are considered countries with medium equality in HDI achievements 
+          between women and men and are classified as group 3. Countries with absolute deviation from gender parity of 7.5–10 percent 
+          are considered countries with medium-low equality in HDI achievements between women and men and are classified as group 4. 
+          Countries with absolute deviation from gender parity of more than 10 percent are considered countries with low equality in 
+          HDI achievements between women and men and are classified as group 5.
+      # 4. Gender Inequality Index
+      gii:
+        title: Gender Inequality Index
+        short_unit: ""
+        unit: ""
+        description: |
+          The Gender Inequality Index (GII) reflects gender-based disadvantage in three dimensions— reproductive health, empowerment 
+          and the labour market—for as many countries as data of reasonable quality allow. It shows the loss in potential human development 
+          due to inequality between female and male achievements in these dimensions. It ranges from 0, where women and men fare equally, 
+          to 1, where one gender fares as poorly as possible in all measured dimensions.
+
+          GII values are computed using the association-sensitive inequality measure suggested by Seth (2009), which implies that the index 
+          is based on the general mean of general means of different orders—the first aggregation is by a geometric mean across dimensions; 
+          these means, calculated separately for women and men, are then aggregated using a harmonic mean across genders.
+
+          For more details read the technical note at https://hdr.undp.org/sites/default/files/2021-22_HDR/hdr2021-22_technical_notes.pdf.
+      gii_rank:
+        title: GII Rank
+        short_unit: ""
+        unit: ""
+        description: |
+          Country's global rank based on its GII value.
+      # 6. Planetary pressures–adjusted Human Development Index
+      phdi:
+        title: Planetary pressures–adjusted Human Development Index
+        short_unit: ""
+        unit: ""
+        description: |
+          The Planetary pressures–adjusted Human Development Index (PHDI) adjusts the Human Development Index (HDI) for planetary pressures in the
+          Anthropocene. The PHDI discounts the HDI for pressures on the planet to reflect a concern for intergenerational inequality, similar to 
+          the Inequality-adjusted HDI adjustment, which is motivated by a concern for intragenerational inequality. The
+          PHDI is computed as the product of the HDI and (1 – index of planetary pressures), where (1 – index of planetary pressures) can be seen as 
+          an adjustment factor.
+
+          The PHDI is the level of human development adjusted by carbon dioxide emissions per capita (production) and material footprint per capita 
+          to account for the excessive human pressure on the planet. It should be seen as an incentive for transformation. In an ideal scenario, 
+          with no pressures on the planet, the PHDI equals the HDI. However, as pressures increase, the PHDI falls below the HDI. In this sense the 
+          PHDI measures the level of human development when planetary pressures are considered.
+      mf:
+        title: Material footprint per capita
+        short_unit: "tonnes"
+        unit: "tonnes"
+        description: |
+          Material footprint is the attribution of global material extraction to domestic final demand of a country. 
+          Material footprint is calculated as raw material equivalent of imports plus domestic extraction minus raw 
+          material equivalents of exports. The total material footprint is the sum of the material footprint for biomass, 
+          fossil fuels, metal ores and nonmetal ores. Material footprint per capita describes the average material use 
+          for final demand.
+        sources:
+          - publisher_source: UNEP (2022)

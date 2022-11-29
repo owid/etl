@@ -52,8 +52,8 @@ def make_table(ds_meadow: Dataset):
     log.info("undp_hdr.creating_table")
     tb_garden = underscore_table(Table(df))
     tb_garden.metadata = tb_meadow.metadata
-    for col in tb_garden.columns:
-        tb_garden[col].metadata.title = df_metadata.loc[df_metadata["short_name"] == col, "full_name"].item()
+    # for col in tb_garden.columns:
+    #     tb_garden[col].metadata.title = df_metadata.loc[df_metadata["short_name"] == col, "full_name"].item()
     tb_garden.update_metadata_from_yaml(N.metadata_path, "undp_hdr")
     return tb_garden
 
