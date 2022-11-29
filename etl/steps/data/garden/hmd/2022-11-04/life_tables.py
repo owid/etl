@@ -15,12 +15,16 @@ log = get_logger()
 # naming conventions
 N = Names(__file__)
 
+SHORT_NAME = "life_tables"
+MEADOW_VERSION = "2022-11-04"
+MEADOW_DATASET = DATA_DIR / f"meadow/hmd/{MEADOW_VERSION}/{SHORT_NAME}"
+
 
 def run(dest_dir: str) -> None:
     log.info("life_tables.start")
 
     # read dataset from meadow
-    ds_meadow = Dataset(DATA_DIR / "meadow/hmd/2022-11-04/life_tables")
+    ds_meadow = Dataset(MEADOW_DATASET)
 
     # init dataset
     ds_garden = Dataset.create_empty(dest_dir)
@@ -40,7 +44,7 @@ def run(dest_dir: str) -> None:
     log.info("life_tables.end")
 
 
-def make_table(ds_meadow, table_name: str) -> Table:
+def make_table(ds_meadow: Dataset, table_name: str) -> Table:
     log.info(f"Building table {table_name}...")
     tb_meadow = ds_meadow[table_name]
 
@@ -58,7 +62,7 @@ def make_table(ds_meadow, table_name: str) -> Table:
 
     # Edit table
     tb_garden.update_metadata_from_yaml(N.metadata_path, table_name)
-    tb_garden = tb_garden.set_index(["country", "year", "age"])
+    tb_garden = tb_garden.set_index(["country", "year", "age"], verify_integrity=True)
 
     return tb_garden
 
