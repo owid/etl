@@ -3,13 +3,14 @@ import tempfile
 from pathlib import Path
 from typing import Any, Dict, Optional
 
+import ruamel.yaml
 import yaml
 from cookiecutter.main import cookiecutter
 from owid import walden
 from owid.catalog.utils import validate_underscore
 from pywebio import output as po
 
-from etl.paths import BASE_DIR, STEP_DIR
+from etl.paths import BASE_DIR, SNAPSHOTS_DIR, STEP_DIR
 from etl.steps import DAG
 
 DAG_WALKTHROUGH_PATH = BASE_DIR / "dag_files/dag_walkthrough.yml"
@@ -20,6 +21,7 @@ DUMMY_DATA = {
     "short_name": "dummy",
     "version": "2020-01-01",
     "walden_version": "2020-01-01",
+    "snapshot_version": "2020-01-01",
     "name": "Dummy dataset",
     "description": "This\nis\na\ndummy\ndataset",
     "file_extension": "xlsx",
@@ -72,35 +74,21 @@ def preview_dag(dag_content: str, dag_name: str = "dag.yml") -> None:
         {
             "open": False,
             "title": po.put_success(po.put_markdown(f"Steps in {dag_name} were successfully generated")),
-            "contents": [po.put_markdown(f"```yml\n  {dag_content}\n```")],
+            "contents": [po.put_markdown(f"```yml\n{dag_content}\n```")],
         },
     )
 
 
 def add_to_dag(dag: DAG, dag_path: Path = DAG_WALKTHROUGH_PATH) -> str:
-    # read dag as string and as dictionary
     with open(dag_path, "r") as f:
-        dag_str = f.read()
-        # replace empty dag
-        dag_str = dag_str.replace("{}", "")
-        f.seek(0)
-        dag_dict = yaml.safe_load(f)
+        doc = ruamel.yaml.load(f, Loader=ruamel.yaml.RoundTripLoader)
 
-    # exclude steps which are already there
-    dag = {k: v for k, v in dag.items() if k not in dag_dict["steps"]}
-
-    # step is already there don't add anything
-    if not dag:
-        return dag_str
-
-    steps = yaml.dump({"steps": dag}).split("\n", 1)[1]
-
-    dag_str += steps
+    doc["steps"].update(dag)
 
     with open(dag_path, "w") as f:
-        f.write(dag_str)
+        ruamel.yaml.dump(doc, f, Dumper=ruamel.yaml.RoundTripDumper)
 
-    return steps
+    return yaml.dump({"steps": dag})
 
 
 def generate_step(cookiecutter_path: Path, data: Dict[str, Any]) -> Path:
@@ -120,6 +108,8 @@ def generate_step(cookiecutter_path: Path, data: Dict[str, Any]) -> Path:
 
         if data["channel"] == "walden":
             DATASET_DIR = WALDEN_INGEST_DIR / data["namespace"] / data["version"]
+        elif data["channel"] == "snapshots":
+            DATASET_DIR = SNAPSHOTS_DIR / data["namespace"] / data["version"]
         else:
             DATASET_DIR = STEP_DIR / "data" / data["channel"] / data["namespace"] / data["version"]
 

@@ -6,6 +6,7 @@ from owid.catalog import DatasetMeta, License, Source, VariableMeta
 from owid.walden import Dataset as WaldenDataset
 
 from etl import grapher_model as gm
+from etl.snapshot import SnapshotMeta
 
 
 def convert_walden_metadata(wd: WaldenDataset) -> DatasetMeta:
@@ -31,6 +32,35 @@ def convert_walden_metadata(wd: WaldenDataset) -> DatasetMeta:
             )
         ],
         licenses=[License(name=wd.license_name, url=wd.license_url)] if wd.license_name or wd.license_url else [],
+    )
+
+
+def convert_snapshot_metadata(snap: SnapshotMeta) -> DatasetMeta:
+    """
+    Copy metadata for a dataset directly from what we have in Walden.
+    """
+    return DatasetMeta(
+        short_name=snap.short_name,
+        namespace=snap.namespace,
+        title=snap.name,
+        version=snap.version,
+        description=snap.description,
+        sources=[
+            Source(
+                name=snap.source_name,
+                # description=snap.source_description,  # XXX no such snapshot field
+                url=snap.url,
+                source_data_url=snap.source_data_url,
+                # XXX owid_data_url is not a thing for snapshots, but it could be possibly added
+                # owid_data_url=snap.owid_data_url,
+                date_accessed=snap.date_accessed,
+                publication_date=str(snap.publication_date) if snap.publication_date else None,
+                publication_year=snap.publication_year,
+            )
+        ],
+        licenses=[License(name=snap.license_name, url=snap.license_url)]
+        if snap.license_name or snap.license_url
+        else [],
     )
 
 
