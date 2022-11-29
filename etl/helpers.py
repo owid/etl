@@ -114,3 +114,7 @@ class Names:
     @property
     def walden_dataset(self) -> WaldenDataset:
         return WaldenCatalog().find_one(namespace=self.namespace, version=self.version, short_name=self.short_name)
+
+    @property
+    def snapshot_dir(self) -> Path:
+        return paths.SNAPSHOTS_DIR / self.namespace / self.version

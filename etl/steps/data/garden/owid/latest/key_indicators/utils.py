@@ -16,6 +16,7 @@ def add_regions(df: pd.DataFrame) -> pd.DataFrame:
         "Low-income countries",
         "Lower-middle-income countries",
         "Upper-middle-income countries",
+        "European Union (27)",
     ]
     for region in regions:
         df = geo.add_region_aggregates(df=df, region=region)
