@@ -2,8 +2,6 @@
 
 """
 
-from typing import List, cast
-
 import pandas as pd
 from owid.catalog import Dataset, Table
 from owid.catalog.utils import underscore_table
@@ -66,7 +64,7 @@ N = Names(str(CURRENT_DIR / "natural_disasters"))
 
 def sanity_checks_on_inputs(df: pd.DataFrame) -> None:
     error = "Expected only 'Natural' in 'group' column."
-    assert df["group"].unique().tolist() == ["Natural"], error
+    assert set(df["group"]) == set(["Natural"]), error
 
     error = "All values should be positive."
     assert (df.select_dtypes("number").fillna(0) >= 0).all().all(), error
@@ -184,21 +182,21 @@ def sanity_checks_on_outputs(df: pd.DataFrame, decade_df: pd.DataFrame) -> None:
     error = "There are unexpected nans in data."
     assert df.notnull().all(axis=1).all(), error
 
-    # List of columns whose value should not be larger than population.
-    columns_to_inspect = [
-        "total_dead",
-        "injured",
-        "affected",
-        "homeless",
-        "total_affected",
-        "population",
-        "total_dead_per_100k_people",
-        "injured_per_100k_people",
-        "affected_per_100k_people",
-        "homeless_per_100k_people",
-        "total_affected_per_100k_people",
-    ]
     # TODO: Uncomment once disaster duration is taken into account.
+    # List of columns whose value should not be larger than population.
+    # columns_to_inspect = [
+    #     "total_dead",
+    #     "injured",
+    #     "affected",
+    #     "homeless",
+    #     "total_affected",
+    #     "population",
+    #     "total_dead_per_100k_people",
+    #     "injured_per_100k_people",
+    #     "affected_per_100k_people",
+    #     "homeless_per_100k_people",
+    #     "total_affected_per_100k_people",
+    # ]
     # error = "One disaster should not be able to affect more than the entire population of a country in one year."
     # for column in columns_to_inspect:
     #    assert (df[column] <= df["population"]).all(), error

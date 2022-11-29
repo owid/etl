@@ -34,38 +34,6 @@ REGIONS = {
     "Upper-middle-income countries": {},
     "Lower-middle-income countries": {},
     "High-income countries": {},
-    # Additional regions.
-    "European Union (27)": {
-        "regions_included": [
-            "Austria",
-            "Belgium",
-            "Bulgaria",
-            "Croatia",
-            "Cyprus",
-            "Czechia",
-            "Denmark",
-            "Estonia",
-            "Finland",
-            "France",
-            "Germany",
-            "Greece",
-            "Hungary",
-            "Ireland",
-            "Italy",
-            "Latvia",
-            "Lithuania",
-            "Luxembourg",
-            "Malta",
-            "Netherlands",
-            "Poland",
-            "Portugal",
-            "Romania",
-            "Slovakia",
-            "Slovenia",
-            "Spain",
-            "Sweden",
-        ],
-    },
 }
 
 # When creating region aggregates, decide how to distribute historical regions.
@@ -426,7 +394,7 @@ def detect_overlapping_regions(
                 .dropna(subset=variables, how="all")
             )
             combined = pd.concat([region_values, member_values])
-            overlaps = combined[combined.duplicated(subset=[year_col], keep=False)]
+            overlaps = combined[combined.duplicated(subset=[year_col], keep=False)]  # type: ignore
             if len(overlaps) > 0:
                 all_overlaps.update({year: set(overlaps[country_col]) for year in overlaps[year_col].unique()})
 

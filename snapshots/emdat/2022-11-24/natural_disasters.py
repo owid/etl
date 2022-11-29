@@ -20,6 +20,7 @@ from etl.snapshot import Snapshot
 
 SNAPSHOT_VERSION = "2022-11-24"
 
+
 @click.command()
 @click.option("--path-to-file", prompt=True, type=str, help="Path to local data file.")
 @click.option(
