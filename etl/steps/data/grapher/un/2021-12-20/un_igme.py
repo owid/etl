@@ -4,7 +4,6 @@ from structlog import get_logger
 from etl.helpers import Names
 
 N = Names(__file__)
-N = Names("etl/steps/data/grapher/un/2021-12-20/un_igme.py")
 log = get_logger()
 
 

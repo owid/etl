@@ -19,7 +19,6 @@ GAPMINDER_INFANT_MORTALITY_DATASET_PATH = DATA_DIR / "open_numbers/open_numbers/
 
 # naming conventions
 N = Names(__file__)
-N = Names("etl/steps/data/garden/un/2021-12-20/un_igme.py")
 
 
 def run(dest_dir: str) -> None:
