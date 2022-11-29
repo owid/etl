@@ -28,21 +28,19 @@ def run(dest_dir: str) -> None:
     # create new dataset and reuse walden metadata
     ds = Dataset.create_empty(dest_dir)
     ds.metadata = convert_walden_metadata(walden_ds)
+    ds.metadata.update_from_yaml(N.metadata_path, "un_igme")
     ds.metadata.version = "2021-12-20"
-
     # create table with metadata from dataframe
     table_metadata = TableMeta(
-        short_name=walden_ds.short_name,
-        title=walden_ds.name,
-        description=walden_ds.description,
+        short_name=ds.metadata.short_name,
+        title=ds.metadata.title,
+        description=ds.metadata.description,
     )
     tb = Table(df, metadata=table_metadata)
 
     # underscore all table columns
     tb = underscore_table(tb)
     tb = tb.reset_index()
-    # ds.metadata.update_from_yaml(N.metadata_path, if_source_exists="replace")
-    # tb.update_metadata_from_yaml(N.metadata_path, "un_igme")
 
     # add table to a dataset
     ds.add(tb)

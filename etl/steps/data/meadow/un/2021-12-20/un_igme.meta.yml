@@ -24,8 +24,7 @@ dataset:
   - url: https://www.unicef.org/legal#terms-of-use
   version: '2021-12-20'
   sources:
-  - name: United Nations Inter-agency Group for Child Mortality Estimation
-      (2021)
+  - name: United Nations Inter-agency Group for Child Mortality Estimation (2021)
     url: https://childmortality.org/data
     source_data_url: https://childmortality.org/wp-content/uploads/2021/09/UNIGME-2021.csv
     owid_data_url: https://walden.nyc3.digitaloceanspaces.com/un/2021/un_igme.csv

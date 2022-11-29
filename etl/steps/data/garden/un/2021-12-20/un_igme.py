@@ -3,7 +3,7 @@ from typing import List, cast
 
 import pandas as pd
 from owid import catalog
-from owid.catalog import Dataset, Table
+from owid.catalog import Dataset, Source, Table
 from owid.catalog.utils import underscore_table
 from owid.datautils import geo
 from structlog import get_logger
@@ -29,7 +29,7 @@ def run(dest_dir: str) -> None:
     df = pd.DataFrame(tb_meadow).drop(columns=["index"])
     # adding source tag to all UN IGME rows prior to combination with Gapminder data
     df["source"] = "UN IGME"
-    df_gap = get_gapminder_data()
+    df_gap = get_gapminder_data(max_year=max(df["year"]))
     df_combine = pd.concat([df, df_gap])
 
     log.info("un_igme.exclude_countries")
@@ -73,6 +73,15 @@ def run(dest_dir: str) -> None:
             tb_garden[col] = tb_garden[col].astype("Int64").round(0)
         else:
             tb_garden[col] = tb_garden[col].astype("float").round(2)
+        # Altering the Source for the few variables we have combined UN IGME and Gapminder
+        if tb_garden[col].metadata.title == "Under-five mortality rate - Both sexes - value":
+            tb_garden[col].metadata.sources = [
+                Source(name="Gapminder (2020); United Nations Inter-agency Group for Child Mortality Estimation (2021)")
+            ]
+        if tb_garden[col].metadata.title == "Infant mortality rate - Both sexes - value":
+            tb_garden[col].metadata.sources = [
+                Source(name="Gapminder (2015); United Nations Inter-agency Group for Child Mortality Estimation (2021)")
+            ]
     tb_garden = underscore_table(tb_garden)
     ds_garden.add(tb_garden)
     ds_garden.save()
@@ -97,7 +106,7 @@ def combine_datasets(df: pd.DataFrame) -> pd.DataFrame:
     return df_clean
 
 
-def get_gapminder_data() -> pd.DataFrame:
+def get_gapminder_data(max_year: int) -> pd.DataFrame:
     """
     Get child and infant mortality data from open numbers
     """
@@ -111,6 +120,8 @@ def get_gapminder_data() -> pd.DataFrame:
     gapminder_child_mort = gapminder_child_mort.rename(
         columns={"geo": "country", "time": "year", "child_mortality_0_5_year_olds_dying_per_1000_born": "value"}
     )
+    gapminder_child_mort = gapminder_child_mort[gapminder_child_mort["year"] <= max_year]
+
     # get infant mortality from open numbers
     gapminder_inf_m_df = catalog.Dataset(GAPMINDER_INFANT_MORTALITY_DATASET_PATH)
     gapminder_inf_mort = pd.DataFrame(gapminder_inf_m_df["infant_mortality_rate"]).reset_index()

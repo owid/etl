@@ -1,0 +1,12 @@
+dataset:
+    namespace: un
+    short_name: un_igme
+  tables:
+    un_igme:
+      variables:
+        both__under_five_mortality_rate__deaths_per_1_000_live_births:
+          sources:
+          - name: Gapminder (v11)
+            published_by: Gapminder 
+            url: https://www.gapminder.org/data/documentation/gd005/
+  
