@@ -52,7 +52,7 @@ def make_table(tb_meadow: Table) -> Table:
     tb_garden = clean_countries(tb_garden)
 
     # Set index
-    tb_garden = tb_garden.set_index(["country", "year"])
+    tb_garden = tb_garden.set_index(["country", "year"], verify_integrity=True)
 
     # Metadata
     tb_garden.update_metadata_from_yaml(METADATA_PATH, "zijdeman_et_al_2015")
