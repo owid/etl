@@ -1,3 +1,4 @@
+from copy import deepcopy
 from pathlib import Path
 from typing import Dict, List, Optional, Union, cast
 
@@ -248,7 +249,7 @@ def load_population() -> pd.DataFrame:
     countries_with_population = population["country"].unique()
 
     # Consider regions and historical regions.
-    regions = REGIONS
+    regions = deepcopy(REGIONS)
     regions.update(HISTORIC_TO_CURRENT_REGION)
     missing_countries = [country for country in regions if country not in countries_with_population]
     for country in missing_countries:
@@ -309,6 +310,7 @@ def add_population(
     country_col: str = "country",
     year_col: str = "year",
     population_col: str = "population",
+    interpolate_missing_population: bool = False,
     warn_on_missing_countries: bool = True,
     show_full_warning: bool = True,
 ) -> pd.DataFrame:
@@ -327,6 +329,11 @@ def add_population(
         Name of year column in data.
     population_col : str
         Name for new population column in data.
+    interpolate_missing_population : bool
+        True to linearly interpolate population on years that are presented in df, but for which we do not have
+        population data; otherwise False to keep missing population data as nans.
+        For example, if interpolate_missing_population is True and df has data for all years between 1900 and 1910,
+        but population is only given for 1900 and 1910, population will be linearly interpolated between those years.
     warn_on_missing_countries : bool
         True to warn if population is not found for any of the countries in the data.
     show_full_warning : bool
@@ -362,6 +369,21 @@ def add_population(
                 show_list=show_full_warning,
             )
 
+    if interpolate_missing_population:
+        # For some countries we have population data only on certain years, e.g. 1900, 1910, etc.
+        # Optionally fill missing years linearly.
+        countries_in_data = df["country"].unique()
+        years_in_data = df["year"].unique()
+
+        population = population.set_index(["country", "year"]).reindex(
+            pd.MultiIndex.from_product([countries_in_data, years_in_data], names=["country", "year"]))
+
+        population = population.groupby('country').transform(
+            lambda x: x.interpolate(method='linear', limit_direction='both'))
+
+        error = "There should not be any missing population data."
+        assert population[population["population"].isnull()].empty, error
+            
     # Add population to original dataframe.
     df_with_population = pd.merge(df, population, on=[country_col, year_col], how="left")
 
@@ -464,34 +486,3 @@ def add_region_aggregates(
         data = pd.concat([data, region_df], ignore_index=True)
 
     return data
-
-
-def create_decade_data(df: pd.DataFrame) -> pd.DataFrame:
-    decade_df = df.copy()
-    # Convert "year" column into a datetime.
-    decade_df["year"] = pd.to_datetime(decade_df["year"], format="%Y")
-    # Group tens of years and sum.
-    decade_df = decade_df.set_index("year").groupby(['country','type']).resample('10AS').sum(numeric_only=True).\
-        reset_index()
-    # Make "year" column years instead of dates.
-    decade_df["year"] = decade_df["year"].dt.year
-
-    return decade_df
-
-
-def sanity_checks_on_output_yearly_data(df):
-    all_countries = sorted(set(df["country"]) - set(REGIONS) - set(HISTORIC_TO_CURRENT_REGION))
-
-    # Check that the aggregate of all countries and disasters leads to the same numbers we have for the world.
-    # This check would not pass when adding historical regions (since we know there are some overlaps between data from
-    # historical and successor countries). So check for a specific year.
-    year_to_check = 2022
-    all_disasters_for_world = df[(df["country"] == "World") & (df["year"] == year_to_check) & (df["type"] == "All disasters")].\
-        reset_index(drop=True)
-    all_disasters_check = df[(df["country"].isin(all_countries)) & (df["year"] == year_to_check) & (df["type"] != "All disasters")].\
-        groupby("year").sum(numeric_only=True).reset_index()
-
-    cols_to_check = ["dead", "injured", "affected", "homeless", "total_affected", "reconstructed_costs_adjusted",
-                     "insured_damages_adjusted"]
-    error = f"Aggregate for the World in {year_to_check} does not coincide with the sum of all countries."
-    assert all_disasters_for_world[cols_to_check].equals(all_disasters_check[cols_to_check]), error
