@@ -5,13 +5,9 @@ dataset:
   description: |
     Historians and demographers have gone to considerable trouble to reconstruct life expectancy in the past in individual countries.
 
-    This overview collects information from a large body of that work and links estimates for historical populations to those provided by
-    the United Nations, the World Bank, and other sources for 1950–2001. The result is a picture of regional and global life expectancy 
-    at birth for selected years from 1800 to 2001. The bibliography of more than 700 sources is published separately on the web.
+    This overview collects information from a large body of that work and links estimates for historical populations to those provided by the United Nations, the World Bank, and other sources for 1950–2001. The result is a picture of regional and global life expectancy  at birth for selected years from 1800 to 2001. The bibliography of more than 700 sources is published separately on the web.
 
-    Continents definitions may differ from OWID's definitions. The individual countries included are those that had populations in 
-    2000 of at least 400,000, plus Iceland. Smaller countries have been excluded chiefly because of the difficulty of finding estimates 
-    for life expectancy before the 1940s. For 2001 the population included in the estimates is 99.6 percent of the total midyear world population.
+    Continents definitions may differ from OWID's definitions. The individual countries included are those that had populations in 2000 of at least 400,000, plus Iceland. Smaller countries have been excluded chiefly because of the difficulty of finding estimates for life expectancy before the 1940s. For 2001 the population included in the estimates is 99.6 percent of the total midyear world population.
 
     For more details please read the 'Notes' section from the source.
   licenses:
