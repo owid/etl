@@ -25,7 +25,6 @@ def run(dest_dir: str) -> None:
 
     df = pd.DataFrame(tb_meadow)
 
-
     ds_garden = Dataset.create_empty(dest_dir)
     ds_garden.metadata = ds_meadow.metadata
 
@@ -38,6 +37,7 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
     log.info("penn_world_table.end")
+
 
 def harmonize_countries(df: pd.DataFrame) -> pd.DataFrame:
     unharmonized_countries = df["country"]
