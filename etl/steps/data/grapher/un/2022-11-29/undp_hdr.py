@@ -6,14 +6,14 @@ N = Names(__file__)
 
 
 def run(dest_dir: str) -> None:
+    # Initiate grapher dataset
     dataset = catalog.Dataset.create_empty(dest_dir, N.garden_dataset.metadata)
 
+    # get table from dataset
     table = N.garden_dataset["undp_hdr"]
 
-    # optionally set additional dimensions
-    # table = table.set_index(["sex", "income_group"], append=True)
-
-    # if you data is in long format, check gh.long_to_wide_tables
+    # add table to dataset
     dataset.add(table)
 
+    # save and exit
     dataset.save()

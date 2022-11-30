@@ -29,7 +29,7 @@ tables:
       # Life expectancy
       le:
         title: Life Expectancy at Birth
-        short_unit: ""
+        short_unit: "years"
         unit: "years"
         description: |
           The average number of remaining years of life expected by a hypothetical cohort of individuals who already reached age x and would be subject during the remainder of their lives to the mortality rates of a given period.
@@ -37,7 +37,7 @@ tables:
           Data was sourced by the UNDP from: UNDESA (2022a).
       le_f:
         title: Life Expectancy at Birth, female
-        short_unit: ""
+        short_unit: "years"
         unit: "years"
         description: |
           The average number of remaining years of life expected by a hypothetical cohort of female individuals who already reached age x and would be subject during the remainder of their lives to the mortality rates of a given period.
@@ -48,7 +48,7 @@ tables:
             Spain: Antigua and Barbuda, Argentina, Bahamas, Barbados, Belize, Bolivia, Brazil, Chile, Colombia, Costa Rica, Cuba, Dominica, Dominican Republic, Ecuador, El Salvador, Grenada, Guatemala, Guyana, Haiti, Honduras, Jamaica, Mexico, Nicaragua, Panama, Paraguay, Peru, Saint Kitts and Nevis, Saint Lucia, Saint Vincent and the Grenadines, Suriname, Trinidad and Tobago, Uruguay, Venezuela.
       le_m:
         title: Life Expectancy at Birth, male
-        short_unit: ""
+        short_unit: "years"
         unit: "years"
         description: |
           The average number of remaining years of life expected by a hypothetical cohort of male individuals who already reached age x and would be subject during the remainder of their lives to the mortality rates of a given period.
@@ -91,7 +91,7 @@ tables:
       # Schooling (mean)
       mys:
         title: Mean Years of Schooling
-        short_unit: ""
+        short_unit: "years"
         unit: "years"
         description: |
           Average number of completed years of education of a country's population aged 25 years and older, excluding years spent repeating individual grades.
@@ -101,7 +101,7 @@ tables:
           Data was soured by UNDP from: Barro and Lee (2018), ICF Macro Demographic and Health Surveys (various years), OECD (2022), UNESCO Institute for Statistics (2022), UNICEF Multiple Indicator Cluster Surveys (various years).
       mys_f:
         title: Mean Years of Schooling, female
-        short_unit: ""
+        short_unit: "years"
         unit: "years"
         description: |
           Average number of completed years of education of a country's female population aged 25 years and older, excluding years spent repeating individual grades (female).
@@ -111,7 +111,7 @@ tables:
           Data was soured by UNDP from: Barro and Lee (2018), ICF Macro Demographic and Health Surveys (various years), OECD (2022), UNESCO Institute for Statistics (2022), UNICEF Multiple Indicator Cluster Surveys (various years).
       mys_m:
         title: Mean Years of Schooling, male
-        short_unit: ""
+        short_unit: "years"
         unit: "years"
         description: |
           Average number of completed years of education of a country's male population aged 25 years and older, excluding years spent repeating individual grades (male).
@@ -161,7 +161,6 @@ tables:
       # Maternal mortality rate
       mmr:
         title: Maternal Mortality Ratio
-        short_unit: ""
         unit: "deaths per 100,000 live births"
         description: |
           The maternal mortality ratio (MMR) is defined as the number of maternal deaths during a given time period per 100,000 live births during the same time period. It depicts the risk of maternal death relative to the number of live births and essentially captures the risk of death in a single pregnancy or a single live birth. Maternal deaths: The annual number of female deaths from any cause related to or aggravated by pregnancy or its management (excluding accidental or incidental causes) during pregnancy and childbirth or within 42 days of termination of pregnancy, irrespective of the duration and site of the pregnancy, expressed per 100,000 live births, for a specified time period. 
@@ -174,7 +173,6 @@ tables:
       # Adolescent birth rate
       abr:
         title: Adolescent Birth Rate
-        short_unit: ""
         unit: "births per 1,000 women ages 15-19"
         description: |
           The annual number of births to women aged 15-19 years per 1,000 women in that age group. It is also referred to as the age-specific fertility rate for women aged 15-19.
@@ -185,7 +183,7 @@ tables:
       # Secondary education
       se_f:
         title: Population with at least some secondary education, female
-        short_unit: ""
+        short_unit: "%"
         unit: "% ages 25 and older"
         description: |
           The percentage of population (female, age 25 and over) with at least completed lower secondary education (ISCED 2 or higher). This indicator is calculated by dividing the number of persons aged 25 years and above with completed lower secondary education by the total population of the same age group and multiplying the result by 100. The UNESCO Institute for Statistics (UIS) educational attainment dataset shows the educational composition of the population aged 25 years and above and hence the stock and quality of human capital within a country. The dataset also reflects the structure and performance of the education system and its accumulated impact on human capital formation.
@@ -193,7 +191,7 @@ tables:
           Data was soured by UNDP from: Barro and Lee (2018), ICF Macro Demographic and Health Surveys (various years), OECD (2022), UNESCO Institute for Statistics (2022), UNICEF Multiple Indicator Cluster Surveys (various years).
       se_m:
         title: Population with at least some secondary education, male
-        short_unit: ""
+        short_unit: "%"
         unit: "% ages 25 and older"
         description: |
           The percentage of population (male, age 25 and over) with at least completed lower secondary education (ISCED 2 or higher). This indicator is calculated by dividing the number of persons aged 25 years and above with completed lower secondary education by the total population of the same age group and multiplying the result by 100. The UNESCO Institute for Statistics (UIS) educational attainment dataset shows the educational composition of the population aged 25 years and above and hence the stock and quality of human capital within a country. The dataset also reflects the structure and performance of the education system and its accumulated impact on human capital formation.
@@ -202,7 +200,7 @@ tables:
       # Parliament
       pr_f:
         title: Share of seats in parliament, female
-        short_unit: ""
+        short_unit: "%"
         unit: "% held by women"
         description: |
           Share of all seats in parliaments that are held by female representatives.
@@ -210,7 +208,7 @@ tables:
           Data was soured by UNDP from: IPU (2022).
       pr_m:
         title: Share of seats in parliament, male
-        short_unit: ""
+        short_unit: "%"
         unit: "% held by women"
         description: |
           Share of all seats in parliaments that are held by male representatives.
@@ -231,7 +229,7 @@ tables:
           Data was soured by UNDP from: ILO (2022).
       lfpr_m:
         title: Labour force participation rate, male
-        short_unit: ""
+        short_unit: "%"
         unit: "% ages 15 and older"
         description: |
           The labour force participation rate is a measure of the proportion of a country's working-age population that engages actively in the labour market, either by working or looking for work; it provides an indication of the size of the supply of labour available to engage in the production of goods and services, relative to the population at working age. The breakdown of the labour force (formerly known as economically active population) by sex and age group gives a profile of the distribution of the labour force within a country.
@@ -244,7 +242,6 @@ tables:
       # Others
       co2_prod:
         title: Carbon dioxide emissions per capita (production)
-        short_unit: ""
         unit: "tonnes per capita"
         description: |
           Carbon dioxide emissions produced as a consequence of human activities (use of coal, oil and gas for combustion and industrial processes, gas flaring and cement manufacture), divided by midyear population. Values are territorial emissions, meaning that emissions are attributed to the country in which they physically occur.
@@ -259,7 +256,6 @@ tables:
       # 1. Human Development Index
       hdi:
         title: Human Development Index
-        short_unit: ""
         unit: ""
         description: |
           The Human Development Index (HDI) is a summary measure of achievements in three key dimensions of human development: A long and healthy life, access to knowledge and a decent standard of living. 
@@ -275,7 +271,6 @@ tables:
           For more details read the technical note 1 at https://hdr.undp.org/sites/default/files/2021-22_HDR/hdr2021-22_technical_notes.pdf.
       hdi_f:
         title: HDI female
-        short_unit: ""
         unit: ""
         description: |
           The Human Development Index (HDI) is a summary measure of achievements in three key dimensions of human development: A long and healthy life, access to knowledge and a decent standard of living. The HDI is the geometric mean of normalized indices for each of the three dimensions. This technical note describes the data sources and the steps to calculating HDI values.
@@ -285,7 +280,6 @@ tables:
           Only female population is considered.
       hdi_m:
         title: HDI male
-        short_unit: ""
         unit: ""
         description: |
           The Human Development Index (HDI) is a summary measure of achievements in three key dimensions of human development: A long and healthy life, access to knowledge and a decent standard of living. The HDI is the geometric mean of normalized indices for each of the three dimensions. This technical note describes the data sources and the steps to calculating HDI values.
@@ -295,7 +289,6 @@ tables:
           Onlu male population is considered.
       hdi_rank:
         title: HDI Rank
-        short_unit: ""
         unit: ""
         description: |
           Country's global rank based on its Human Development Index (HDI) value.
@@ -320,7 +313,6 @@ tables:
           Inequality in life expectancy. This metric is needed to estimate the Inequality-adjusted Human Development Index.
       coef_ineq:
         title: Coefficient of human inequality
-        short_unit: ""
         unit: ""
         description: |
           An unweighted average of inequalities in health, education and income is denoted as the coefficient of human inequality. It averages these inequalities using the arithmetic mean:
@@ -330,7 +322,6 @@ tables:
           When all inequalities in dimensions are of a similar magnitude, the coefficient of human inequality and the loss in HDI value differ negligibly. When inequalities differ in magnitude, the loss in HDI value tends to be higher than the coefficient of human inequality.
       ihdi:
         title: Inequality-adjusted Human Development Index
-        short_unit: ""
         unit: ""
         description: |
           The Inequality-adjusted Human Development Index (IHDI) adjusts the Human Development Index (HDI) for inequality in the distribution of each dimension across the population. It is based on a distribution-sensitive class of composite indices proposed by Foster, Lopez-Calva and Szekely (2005), which draws on the Atkinson (1970) family of inequality measures. It is computed as a geometric mean of inequality-adjusted dimensional indices.
@@ -346,14 +337,12 @@ tables:
           Difference in ranks on the IHDI and the HDI is calculated only for countries for which both an IHDI value and an HDI value are calculated. Due to data limitations, IHDI values are calculated for a smaller set of countries.
       rankdiff_hdi_phdi:
         title: Difference from HDI rank
-        short_unit: ""
         unit: ""
         description: |
           To calculate the IHDI rank difference from the HDI rank, HDI ranks are recalculated for the set of countries for which an IHDI value is calculated.
       # 3. Gender Development Index
       gdi:
         title: Gender Development Index
-        short_unit: ""
         unit: ""
         description: |
           The Gender Development Index (GDI) measures gender inequalities in achievement in three basic dimensions of human development: health, measured by female and male life expectancy at birth; education, measured by female and male expected years of schooling for children and female and male mean years of schooling for adults ages 25 years and older; and command over economic resources, measured by female and male estimated earned income.
@@ -361,7 +350,6 @@ tables:
           For more details read the technical note at https://hdr.undp.org/sites/default/files/2021-22_HDR/hdr2021-22_technical_notes.pdf.
       gdi_group:
         title: GDI Group
-        short_unit: ""
         unit: ""
         description: |
           The GDI groups are based on the absolute deviation of GDI from gender parity, 100 ∙ |GDI – 1|.
@@ -374,7 +362,6 @@ tables:
       # 4. Gender Inequality Index
       gii:
         title: Gender Inequality Index
-        short_unit: ""
         unit: ""
         description: |
           The Gender Inequality Index (GII) reflects gender-based disadvantage in three dimensions— reproductive health, empowerment and the labour market—for as many countries as data of reasonable quality allow. It shows the loss in potential human development due to inequality between female and male achievements in these dimensions. It ranges from 0, where women and men fare equally, to 1, where one gender fares as poorly as possible in all measured dimensions.
@@ -384,14 +371,12 @@ tables:
           For more details read the technical note at https://hdr.undp.org/sites/default/files/2021-22_HDR/hdr2021-22_technical_notes.pdf.
       gii_rank:
         title: GII Rank
-        short_unit: ""
         unit: ""
         description: |
           Country's global rank based on its Gender Inequality Index (GII) value.
       # 6. Planetary pressures–adjusted Human Development Index
       phdi:
         title: Planetary pressures–adjusted Human Development Index
-        short_unit: ""
         unit: ""
         description: |
           The Planetary pressures–adjusted Human Development Index (PHDI) adjusts the Human Development Index (HDI) for planetary pressures in the Anthropocene. The PHDI discounts the HDI for pressures on the planet to reflect a concern for intergenerational inequality, similar to the Inequality-adjusted HDI adjustment, which is motivated by a concern for intragenerational inequality. The PHDI is computed as the product of the HDI and (1 – index of planetary pressures), where (1 – index of planetary pressures) can be seen as an adjustment factor.
@@ -399,7 +384,6 @@ tables:
           The PHDI is the level of human development adjusted by carbon dioxide emissions per capita (production) and material footprint per capita to account for the excessive human pressure on the planet. It should be seen as an incentive for transformation. In an ideal scenario, with no pressures on the planet, the PHDI equals the HDI. However, as pressures increase, the PHDI falls below the HDI. In this sense the PHDI measures the level of human development when planetary pressures are considered.
       mf:
         title: Material footprint per capita
-        short_unit: ""
         unit: "tonnes per capita"
         description: |
           Material footprint is the attribution of global material extraction to domestic final demand of a country. Material footprint is calculated as raw material equivalent of imports plus domestic extraction minus raw material equivalents of exports. The total material footprint is the sum of the material footprint for biomass, fossil fuels, metal ores and nonmetal ores. Material footprint per capita describes the average material use for final demand.

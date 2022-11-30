@@ -16,6 +16,7 @@ N = Names(__file__)
 SHORT_NAME = "undp_hdr"
 MEADOW_VERSION = "2022-11-29"
 MEADOW_DATASET = DATA_DIR / f"meadow/un/{MEADOW_VERSION}/{SHORT_NAME}"
+COLD_START = False
 
 
 def run(dest_dir: str) -> None:
@@ -51,10 +52,10 @@ def make_table(ds_meadow: Dataset):
     # build table
     log.info("undp_hdr.creating_table")
     tb_garden = underscore_table(Table(df))
-    tb_garden.metadata = tb_meadow.metadata
-    # for col in tb_garden.columns:
-    #     tb_garden[col].metadata.title = df_metadata.loc[df_metadata["short_name"] == col, "full_name"].item()
-    tb_garden.update_metadata_from_yaml(N.metadata_path, "undp_hdr")
+    if COLD_START:
+        tb_garden.metadata = tb_meadow.metadata
+    else:
+        tb_garden.update_metadata_from_yaml(N.metadata_path, "undp_hdr")
     return tb_garden
 
 
