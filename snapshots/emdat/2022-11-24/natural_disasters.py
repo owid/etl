@@ -30,14 +30,13 @@ SNAPSHOT_VERSION = "2022-11-24"
     help="Upload snapshot",
 )
 def main(path_to_file: str, upload: bool) -> None:
-    # Path to destination file in snapshots data folder.
-    destination_file = Path(DATA_DIR / f"snapshots/emdat/{SNAPSHOT_VERSION}/natural_disasters.xlsx")
-    # Ensure destination folder exists.
-    destination_file.parent.mkdir(exist_ok=True, parents=True)
-    # Copy local data file to snapshots data folder.
-    destination_file.write_bytes(Path(path_to_file).read_bytes())
     # Create new snapshot.
     snap = Snapshot(f"emdat/{SNAPSHOT_VERSION}/natural_disasters.xlsx")
+    # Ensure destination folder exists.
+    snap.path.parent.mkdir(exist_ok=True, parents=True)
+    # Copy local data file to snapshots data folder.
+    snap.path.write_bytes(Path(path_to_file).read_bytes())
+    # Add file to DVC and upload to S3.
     snap.dvc_add(upload=upload)
 
 
