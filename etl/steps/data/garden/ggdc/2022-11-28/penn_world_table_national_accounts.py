@@ -25,12 +25,6 @@ def run(dest_dir: str) -> None:
 
     df = pd.DataFrame(tb_meadow)
 
-    log.info("penn_world_table_national_accounts.exclude_countries")
-    df = exclude_countries(df)
-
-    log.info("penn_world_table_national_accounts.harmonize_countries")
-    df = harmonize_countries(df)
-
     ds_garden = Dataset.create_empty(dest_dir)
     ds_garden.metadata = ds_meadow.metadata
 
@@ -46,31 +40,3 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
     log.info("penn_world_table_national_accounts.end")
-
-
-def load_excluded_countries() -> List[str]:
-    with open(N.excluded_countries_path, "r") as f:
-        data = json.load(f)
-        assert isinstance(data, list)
-    return data
-
-
-def exclude_countries(df: pd.DataFrame) -> pd.DataFrame:
-    excluded_countries = load_excluded_countries()
-    return cast(pd.DataFrame, df.loc[~df.country.isin(excluded_countries)])
-
-
-def harmonize_countries(df: pd.DataFrame) -> pd.DataFrame:
-    unharmonized_countries = df["country"]
-    df = geo.harmonize_countries(df=df, countries_file=str(N.country_mapping_path))
-
-    missing_countries = set(unharmonized_countries[df.country.isnull()])
-    if any(missing_countries):
-        raise RuntimeError(
-            "The following raw country names have not been harmonized. "
-            f"Please: (a) edit {N.country_mapping_path} to include these country "
-            f"names; or (b) add them to {N.excluded_countries_path}."
-            f"Raw country names: {missing_countries}"
-        )
-
-    return df
