@@ -78,8 +78,6 @@ def app(dummy_data: bool) -> None:
 
     data, meta, sheets_url, form = _load_data_and_meta(dummies)
 
-    # TODO: add compare tool and continue button
-
     meta_ds = meta.dataset
 
     dag_content = _add_to_dag(meta_ds, form.is_private)
@@ -139,11 +137,12 @@ class FasttrackForm(BaseModel):
     existing_sheets_url: Optional[str]
     infer_metadata: bool
     is_private: bool
+    commit: bool
 
     def __init__(self, **data: Any) -> None:
         options = data.pop("options")
-        data["infer_metadata"] = Options.INFER_METADATA.value in options
         data["is_private"] = Options.IS_PRIVATE.value in options
+        data["infer_metadata"] = Options.INFER_METADATA.value in options
         super().__init__(**data)
 
 

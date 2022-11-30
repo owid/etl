@@ -14,7 +14,7 @@
 
 Examples:
 
-* [Multidimension Poverty Index](https://docs.google.com/spreadsheets/d/1gyYoi27y7oso5FwpYhEaE2Kj9L66RuuIOWmr-S7GF9E/edit?usp=sharing)
+* [Nuclear Warheads](https://docs.google.com/spreadsheets/d/1ReTohcxpo-dRvnXFzYG4N0YT-HoXh3b6AbG-qIaGTLI/edit?usp=sharing)
 
 ## Not implemented
 
