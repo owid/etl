@@ -25,6 +25,10 @@ import pandas as pd
 from owid.catalog import Dataset, Table
 from owid.catalog.utils import underscore_table
 from owid.datautils import geo
+
+from etl.helpers import Names
+from etl.paths import DATA_DIR
+
 from .shared import (
     CURRENT_DIR,
     HISTORIC_TO_CURRENT_REGION,
@@ -34,9 +38,6 @@ from .shared import (
     correct_data_points,
     get_last_day_of_month,
 )
-
-from etl.helpers import Names
-from etl.paths import DATA_DIR
 
 # Define inputs.
 MEADOW_VERSION = "2022-11-24"
@@ -84,42 +85,47 @@ COLUMNS = {
 }
 
 # Columns of values related to natural disaster impacts.
-IMPACT_COLUMNS = ['total_dead', 'injured', 'affected', 'homeless', 'total_affected', 'reconstructed_costs_adjusted',
-                  'insured_damages_adjusted']
+IMPACT_COLUMNS = [
+    "total_dead",
+    "injured",
+    "affected",
+    "homeless",
+    "total_affected",
+    "reconstructed_costs_adjusted",
+    "insured_damages_adjusted",
+]
 
 # TODO: Contact emdat about wrong data points.
 # List issues found in the data:
 # Each element is a tuple with a dictionary that fully identifies the wrong row,
 # and another dictionary that specifies the changes.
-# Note: Countries here should appear as in the raw data (i.e. not harmonized).
+# Note: Countries here should appear as in the raw data (i.e. not harmonized).
 DATA_CORRECTIONS = [
     # The end year of 1969 Morocco earthquake can't be 2019.
-    ({"country": "Morocco", "start_year": 1969, "end_year": 2019, "type": "Earthquake"},
-     {"end_year": 1969}),
+    ({"country": "Morocco", "start_year": 1969, "end_year": 2019, "type": "Earthquake"}, {"end_year": 1969}),
     # The date of the 1992 Afghanistan flood can't be September 31.
-    ({"country": "Afghanistan", "start_year": 1992, "start_month": 9, "start_day": 31},
-     {"start_day": 3, "end_day": 3}),
+    ({"country": "Afghanistan", "start_year": 1992, "start_month": 9, "start_day": 31}, {"start_day": 3, "end_day": 3}),
     # The date of the 1992 India flood can't be September 31.
     # Also, there is one entry for 1992 India flood on 1992-09-08 (500 dead) and another for 1992-09 (86 dead).
     # They will be treated as separate events (maybe the monthly one refers to other smaller floods that month?).
-    ({"country": "India", "start_year": 1992, "start_month": 9, "start_day": 8, "end_day": 31},
-     {"end_day": 8}),
+    ({"country": "India", "start_year": 1992, "start_month": 9, "start_day": 8, "end_day": 31}, {"end_day": 8}),
     # Sierra Leone epidemic outbreak in november 1996 can't end in April 31.
-    ({"country": "Sierra Leone", "start_year": 1996, "start_month": 11, "end_month": 4, "end_day": 31},
-     {"end_day": 30}),
+    (
+        {"country": "Sierra Leone", "start_year": 1996, "start_month": 11, "end_month": 4, "end_day": 31},
+        {"end_day": 30},
+    ),
     # Peru 1998 epidemic can't end in February 31.
-    ({"country": "Peru", "start_year": 1998, "start_month": 1, "end_month": 2, "end_day": 31},
-     {"end_day": 28}),
+    ({"country": "Peru", "start_year": 1998, "start_month": 1, "end_month": 2, "end_day": 31}, {"end_day": 28}),
     # India 2017 flood can't end in June 31.
-    ({"country": "India", "start_year": 2017, "start_month": 6, "end_month": 6, "end_day": 31},
-     {"end_day": 30}),
+    ({"country": "India", "start_year": 2017, "start_month": 6, "end_month": 6, "end_day": 31}, {"end_day": 30}),
     # US 2021 wildfires can't end in September 31.
-    ({"country": "United States of America (the)", "start_year": 2021, "end_month": 9, "end_day": 31},
-     {"end_day": 30}),
+    ({"country": "United States of America (the)", "start_year": 2021, "end_month": 9, "end_day": 31}, {"end_day": 30}),
     # Cameroon 2012 drought can't end before it started.
     # I will remove the month and day, since I can't pinpoint the exact dates.
-    ({"country": "Cameroon", "start_year": 2012, "start_month": 6, "end_month": 1},
-     {"start_month": np.nan, "start_day": np.nan, "end_month": np.nan, "end_day": np.nan}),
+    (
+        {"country": "Cameroon", "start_year": 2012, "start_month": 6, "end_month": 1},
+        {"start_month": np.nan, "start_day": np.nan, "end_month": np.nan, "end_day": np.nan},
+    ),
 ]
 # Other potential issues, where more people were affected than the entire population of the country:
 # country             |   year | type    |   affected |   homeless |       population |
@@ -157,7 +163,7 @@ def sanity_checks_on_inputs(df: pd.DataFrame) -> None:
     assert (df["end_year"] - df["start_year"]).max() < 10, error
 
     error = "Some of the columns that can't have nan do have one or more nans."
-    assert df[['country', 'year', 'type', 'start_year', 'end_year']].notnull().all().all(), error
+    assert df[["country", "year", "type", "start_year", "end_year"]].notnull().all().all(), error
 
     for column in ["year", "start_year", "end_year"]:
         error = f"Column '{column}' has a year prior to 1900 or posterior to current year."
@@ -214,14 +220,25 @@ def calculate_start_and_end_dates(df: pd.DataFrame) -> pd.DataFrame:
 
     # When end day is not given, assume the last day of the month.
     last_day_of_month = pd.Series(
-        [get_last_day_of_month(year=row["end_year"], month=row["end_month"]) for i, row in df.iterrows()])
+        [get_last_day_of_month(year=row["end_year"], month=row["end_month"]) for i, row in df.iterrows()]
+    )
     df["end_day"] = df["end_day"].fillna(last_day_of_month)
 
     # Create columns for start and end dates.
-    df["start_date"] = df["start_year"].astype(str) + '-' + df["start_month"].astype(str).str.zfill(2) + '-' + \
-            df["start_day"].astype(str).str.zfill(2)
-    df["end_date"] = df["end_year"].astype(str) + '-' + df["end_month"].astype(str).str.zfill(2) + '-' + \
-            df["end_day"].astype(str).str.zfill(2)
+    df["start_date"] = (
+        df["start_year"].astype(str)
+        + "-"
+        + df["start_month"].astype(str).str.zfill(2)
+        + "-"
+        + df["start_day"].astype(str).str.zfill(2)
+    )
+    df["end_date"] = (
+        df["end_year"].astype(str)
+        + "-"
+        + df["end_month"].astype(str).str.zfill(2)
+        + "-"
+        + df["end_day"].astype(str).str.zfill(2)
+    )
 
     # Convert dates into datetime objects.
     # Note: This may fail if one of the dates is wrong, e.g. September 31 (if so, check error message for row index).
@@ -274,7 +291,7 @@ def calculate_yearly_impacts(df: pd.DataFrame) -> pd.DataFrame:
                 # Fraction of days affected this year.
                 days_fraction = days_affected_in_year / days_total
                 # Impacts this years.
-                impacts = (row[IMPACT_COLUMNS] * days_fraction).astype(int)
+                impacts = (row[IMPACT_COLUMNS] * days_fraction).astype(int)  # type: ignore
                 # Start a series that counts the impacts acumulated over the years.
                 cumulative_impacts = impacts
                 # Normalize data by the number of days affected in this year.
@@ -286,9 +303,9 @@ def calculate_yearly_impacts(df: pd.DataFrame) -> pd.DataFrame:
                 # Note: Ignore leap years.
                 days_fraction = 365 / days_total
                 # Impacts this year.
-                impacts = (row[IMPACT_COLUMNS] * days_fraction).astype(int)
+                impacts = (row[IMPACT_COLUMNS] * days_fraction).astype(int)  # type: ignore
                 # Add impacts to the cumulative impacts series.
-                cumulative_impacts += impacts
+                cumulative_impacts += impacts  # type: ignore
                 # Normalize data by the number of days affected in this year.
                 new_event[IMPACT_COLUMNS] = impacts
                 # Correct dates.
@@ -296,14 +313,14 @@ def calculate_yearly_impacts(df: pd.DataFrame) -> pd.DataFrame:
                 new_event["end_date"] = pd.Timestamp(year=year, month=12, day=31)
             else:
                 # Assign all remaining impacts to the last year.
-                impacts = row[IMPACT_COLUMNS] - cumulative_impacts
+                impacts = row[IMPACT_COLUMNS] - cumulative_impacts  # type: ignore
                 new_event[IMPACT_COLUMNS] = impacts
                 # Correct dates.
                 new_event["start_date"] = pd.Timestamp(year=year, month=1, day=1)
             added_events = pd.concat([added_events, new_event], ignore_index=True)
 
     # Remove multi-year rows from main dataframe, and add those rows after separating events year by year.
-    yearly_df = pd.concat([df[~(multi_year_rows_mask)], added_events], ignore_index=True)
+    yearly_df = pd.concat([df[~(multi_year_rows_mask)], added_events], ignore_index=True)  # type: ignore
 
     # Sort conveniently.
     yearly_df = yearly_df.sort_values(["country", "year", "type"]).reset_index(drop=True)
@@ -357,8 +374,10 @@ def sanity_checks_on_outputs(df: pd.DataFrame, decade_df: pd.DataFrame) -> None:
     error = "All values should be positive."
     assert (df.select_dtypes("number").fillna(0) >= 0).all().all(), error
 
-    error = "List of expected disaster types has changed. "\
+    error = (
+        "List of expected disaster types has changed. "
         "Consider updating EXPECTED_DISASTER_TYPES (or renaming 'All disasters')."
+    )
     assert set(df["type"]) == set(EXPECTED_DISASTER_TYPES + ["All disasters"]), error
 
     error = "Column 'total_affected' should be the sum of columns 'injured', 'affected', and 'homeless'."

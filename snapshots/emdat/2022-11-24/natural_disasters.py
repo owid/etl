@@ -15,7 +15,6 @@ from pathlib import Path
 
 import click
 
-from etl.paths import DATA_DIR
 from etl.snapshot import Snapshot
 
 SNAPSHOT_VERSION = "2022-11-24"

@@ -56,7 +56,7 @@ def run(dest_dir: str) -> None:
 
     # Select and rename columns.
     df = df[list(COLUMNS)].rename(columns=COLUMNS)
-    
+
     # Sanity check.
     error = "Expected only 'Natural' in 'group' column."
     assert set(df["group"]) == set(["Natural"]), error
