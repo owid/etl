@@ -57,7 +57,7 @@ tables:
       # Schooling years (expected)
       eys:
         title: Expected Years of Schooling
-        short_unit: ""
+        short_unit: "years"
         unit: "years"
         description: |
           Expected years of schooling is the number of years a child of school entrance age is expected to spend at school, or university, including years spent on repetition. 
@@ -68,7 +68,7 @@ tables:
           Data was sourced by the UNDP from: CEDLAS and World Bank (2022), ICF Macro Demographic and Health Surveys (various years), UNESCO Institute for Statistics (2022), UNICEF Multiple Indicator Cluster Surveys (various years).
       eys_f:
         title: Expected Years of Schooling, female
-        short_unit: ""
+        short_unit: "years"
         unit: "years"
         description: |
           Expected years of schooling is the number of years a child (female) of school entrance age is expected to spend at school, or university, including years spent on repetition. 
@@ -79,7 +79,7 @@ tables:
           Data was sourced by the UNDP from: CEDLAS and World Bank (2022), ICF Macro Demographic and Health Surveys (various years), UNESCO Institute for Statistics (2022), UNICEF Multiple Indicator Cluster Surveys (various years).
       eys_m:
         title: Expected Years of Schooling, male
-        short_unit: ""
+        short_unit: "years"
         unit: "years"
         description: |
           Expected years of schooling is the number of years a child (male) of school entrance age is expected to spend at school, or university, including years spent on repetition. 
@@ -302,20 +302,20 @@ tables:
       # 2. Inequality-adjusted Human Development Index
       ineq_edu:
         title: Inequality in eduation
-        short_unit: ""
-        unit: ""
+        short_unit: "%"
+        unit: "%"
         description: |
           Inequality in education. This metric is needed to estimate the Inequality-adjusted Human Development Index.
       ineq_inc:
         title: Inequality in income
-        short_unit: ""
-        unit: ""
+        short_unit: "%"
+        unit: "%"
         description: |
           Inequality in income. This metric is needed to estimate the Inequality-adjusted Human Development Index.
       ineq_le:
         title: Inequality in life expectancy
-        short_unit: ""
-        unit: ""
+        short_unit: "%"
+        unit: "%"
         description: |
           Inequality in life expectancy. This metric is needed to estimate the Inequality-adjusted Human Development Index.
       coef_ineq:
