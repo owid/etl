@@ -39,6 +39,12 @@ COLUMNS = {
     "Total Affected": "total_affected",
     "Reconstruction Costs, Adjusted ('000 US$)": "reconstructed_costs_adjusted",
     "Insured Damages, Adjusted ('000 US$)": "insured_damages_adjusted",
+    "Start Year": "start_year",
+    "Start Month": "start_month",
+    "Start Day": "start_day",
+    "End Year": "end_year",
+    "End Month": "end_month",
+    "End Day": "end_day",
 }
 
 
@@ -50,6 +56,10 @@ def run(dest_dir: str) -> None:
 
     # Select and rename columns.
     df = df[list(COLUMNS)].rename(columns=COLUMNS)
+    
+    # Sanity check.
+    error = "Expected only 'Natural' in 'group' column."
+    assert set(df["group"]) == set(["Natural"]), error
 
     # Create a new dataset and reuse snapshot metadata.
     ds = Dataset.create_empty(dest_dir)
