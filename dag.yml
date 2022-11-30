@@ -187,6 +187,14 @@ steps:
   data://meadow/hmd/2022-11-04/life_tables:
     - walden://hmd/2022-11-04/life_tables
   
+  data://garden/hmd/2022-11-04/life_tables:
+    - data://meadow/hmd/2022-11-04/life_tables
+
+  # UNDP
+  data://meadow/un/2022-11-29/undp_hdr:
+    - snapshot://un/2022-11-29/undp_hdr.csv
+    - snapshot://un/2022-11-29/undp_hdr.xlsx
+
   #
   # EM-DAT Natural disasters (2022).
   #
