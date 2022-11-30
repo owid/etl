@@ -1,0 +1,134 @@
+dataset:
+  namespace: fasttrack
+  version: '2022-11-29'
+  short_name: ai_index
+  title: AI Index
+  description: ''
+  sources:
+  - name: Unknown
+    published_by: Unknown
+    publication_year: 2022
+    date_accessed: 2022-11-30
+tables:
+  ai_index:
+    variables:
+      share_companies_using_ai:
+        title: share_companies_using_ai
+        unit: ''
+      number_ai_bills_cumulative:
+        title: number_ai_bills_cumulative
+        unit: ''
+      growth_ai_hiring:
+        title: growth_ai_hiring
+        unit: ''
+      growth_ai_hiring_smoothed:
+        title: growth_ai_hiring_smoothed
+        unit: ''
+      ai_job_postings:
+        title: ai_job_postings
+        unit: ''
+      number_ai_publications_by_field:
+        title: number_ai_publications_by_field
+        unit: ''
+      number_ai_publications_by_country:
+        title: number_ai_publications_by_country
+        unit: ''
+      casp_median_accuracy_gdt_ts:
+        title: casp_median_accuracy_gdt_ts
+        unit: ''
+      mean_normalized_human_score:
+        title: mean_normalized_human_score
+        unit: ''
+      conference_attendance:
+        title: conference_attendance
+        unit: ''
+      total_corporate_investment_by_activity:
+        title: total_corporate_investment_by_activity
+        unit: ''
+      total_corporate_investment_by_activity_inflation_adjusted:
+        title: total_corporate_investment_by_activity_inflation_adjusted
+        unit: ''
+      new_cs_undergraduate_graduates_at_doctoral_institutions:
+        title: new_cs_undergraduate_graduates_at_doctoral_institutions
+        unit: ''
+      number_ai_phds_employed_academia:
+        title: number_ai_phds_employed_academia
+        unit: ''
+      number_ai_phds_employed_government:
+        title: number_ai_phds_employed_government
+        unit: ''
+      number_ai_phds_employed_industry:
+        title: number_ai_phds_employed_industry
+        unit: ''
+      total_number_ai_phds_employed:
+        title: total_number_ai_phds_employed
+        unit: ''
+      share_ai_phds_employed_academia:
+        title: share_ai_phds_employed_academia
+        unit: ''
+      share_ai_phds_employed_government:
+        title: share_ai_phds_employed_government
+        unit: ''
+      share_ai_phds_employed_industry:
+        title: share_ai_phds_employed_industry
+        unit: ''
+      imagenet_training_cost_usd:
+        title: imagenet_training_cost_usd
+        unit: ''
+      imagenet_extra_training_data:
+        title: imagenet_extra_training_data
+        unit: ''
+      top1_accuracy:
+        title: top1_accuracy
+        unit: ''
+      top5_accuracy:
+        title: top5_accuracy
+        unit: ''
+      number_mentions_ai_legislative_proceedings:
+        title: number_mentions_AI_legislative_proceedings
+        unit: ''
+      newly_funded_ai_companies:
+        title: newly_funded_ai_companies
+        unit: ''
+      number_patent_filings:
+        title: number_patent_filings
+        unit: ''
+      share_new_female_cs_phds:
+        title: share_new_female_cs_phds
+        unit: ''
+      share_new_female_ai_phds:
+        title: share_new_female_ai_phds
+        unit: ''
+      share_new_international_ai_phds:
+        title: share_new_international_ai_phds
+        unit: ''
+      share_new_cs_phds_by_specialty:
+        title: share_new_cs_phds_by_specialty
+        unit: ''
+      number_new_cs_phds_by_specialty:
+        title: number_new_cs_phds_by_specialty
+        unit: ''
+      total_private_investment_by_country:
+        title: total_private_investment_by_country
+        unit: ''
+      total_private_investment_by_focus_area:
+        title: total_private_investment_by_focus_area
+        unit: ''
+      total_private_investment_by_country_inflation_adjusted:
+        title: total_private_investment_by_country_inflation_adjusted
+        unit: ''
+      total_private_investment_by_focus_area_inflation_adjusted:
+        title: total_private_investment_by_focus_area_inflation_adjusted
+        unit: ''
+      share_new_international_cs_phds:
+        title: share_new_international_cs_phds
+        unit: ''
+      share_race_ethnicity_new_cs_phds:
+        title: share_race_ethnicity_new_cs_phds
+        unit: ''
+      total_corporate_investment:
+        title: total_corporate_investment
+        unit: ''
+      total_corporate_investment_inflation_adjusted:
+        title: total_corporate_investment_inflation_adjusted
+        unit: ''
