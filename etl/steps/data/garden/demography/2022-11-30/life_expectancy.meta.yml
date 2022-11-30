@@ -91,7 +91,7 @@ dataset:
       publication_date: "2005-10-21"
       publication_year: 2005
 tables:
-  life_expectancy:
+  life_expectancy: &table
     title: Life Expectancy (various sources)
     variables:
       life_expectancy_0:
@@ -148,3 +148,5 @@ tables:
             url: https://population.un.org/wpp/Download/
           - name: "Human Mortality Database"
             url: https://www.mortality.org/Data/ZippedDataFiles
+  historical: *table
+  projection: *table

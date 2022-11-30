@@ -35,7 +35,7 @@ GARDEN_RILEY_DATASET = DATA_DIR / "garden" / "papers" / "2022-11-04" / "riley_20
 COLUMNS_IDX = ["country", "year"]
 AGES_EXTRA = ["15", "65", "80"]
 YEAR_WPP_START = 1950
-YEAR_WPP_END = 2022
+YEAR_HIST_PROJ = 2022
 # Versioning
 VERSION = "2022-11-30"
 # Cold start
@@ -57,6 +57,8 @@ def run(dest_dir: str) -> None:
 
     # create table
     tb = make_table(ds_wpp, ds_hmd, ds_zij, ds_ril)
+    tb_historical = make_table(ds_wpp, ds_hmd, ds_zij, ds_ril, only_historical=True)
+    tb_projection = make_table(ds_wpp, ds_hmd, ds_zij, ds_ril, only_projections=True)
     # tb.update_metadata_from_yaml(N.metadata_path, "life_expectancy")
 
     # create dataset
@@ -66,14 +68,25 @@ def run(dest_dir: str) -> None:
     else:
         ds_garden.metadata.update_from_yaml(N.metadata_path)
 
-    # add table to dataset
+    # add tables to dataset
     ds_garden.add(tb)
+    ds_garden.save()
+    ds_garden.add(tb_historical)
+    ds_garden.save()
+    ds_garden.add(tb_projection)
     ds_garden.save()
 
     log.info("life_expectancy.end")
 
 
-def make_table(ds_wpp: Dataset, ds_hmd: Dataset, ds_zij: Dataset, ds_ril: Dataset) -> Table:
+def make_table(
+    ds_wpp: Dataset,
+    ds_hmd: Dataset,
+    ds_zij: Dataset,
+    ds_ril: Dataset,
+    only_historical: bool = False,
+    only_projections: bool = False,
+) -> Table:
     log.info("life_expectancy.make_table")
     # Build DataFrames
     df_wpp = load_wpp(ds_wpp)
@@ -82,15 +95,46 @@ def make_table(ds_wpp: Dataset, ds_hmd: Dataset, ds_zij: Dataset, ds_ril: Datase
     df_ril = load_riley(ds_ril)
     df = merge_dfs(df_wpp, df_hmd, df_zij, df_ril)
 
+    # Filter
+    assert not (only_historical and only_projections), "Both only_historical and only_projections can't be True!"
+    if only_historical:
+        df = df[df.index.get_level_values("year") <= YEAR_HIST_PROJ]
+    if only_projections:
+        df = df[df.index.get_level_values("year") > YEAR_HIST_PROJ]
+
     # Build table
     log.info("life_expectancy.make_table.build_table")
     tb = Table(df)
     tb = underscore_table(tb)
 
+    # metadata
+    tb = add_metadata_to_table(tb, only_historical, only_projections)
+    return tb
+
+
+def add_metadata_to_table(tb: Table, only_historical: bool, only_projections: bool) -> Table:
+    """Add metadata to table.
+
+    This is done from scratch or by reading the YAML file. Note that only one table is actually defined. The other two (historical and projections) are equivalent with minor changes in title and variable titles.
+    """
     if COLD_START:
-        tb.metadata = TableMeta(short_name="life_expectancy", title="Life Expectancy (various sources)")
+        if only_historical:
+            tb.metadata = TableMeta(short_name="historical", title="Life Expectancy (various sources) - Historical")
+        elif only_projections:
+            tb.metadata = TableMeta(short_name="projection", title="Life Expectancy (various sources) - Projection")
+        else:
+            tb.metadata = TableMeta(short_name="life_expectancy", title="Life Expectancy (various sources)")
     else:
-        tb.update_metadata_from_yaml(N.metadata_path, "life_expectancy")
+        if only_historical:
+            tb.update_metadata_from_yaml(N.metadata_path, "historical")
+            for col in tb.columns:
+                tb[col].metadata.title = tb[col].metadata.title + " (historical)"
+        elif only_projections:
+            tb.update_metadata_from_yaml(N.metadata_path, "projection")
+            for col in tb.columns:
+                tb[col].metadata.title = tb[col].metadata.title + " (projection)"
+        else:
+            tb.update_metadata_from_yaml(N.metadata_path, "life_expectancy")
     return tb
 
 
@@ -103,7 +147,8 @@ def make_metadata(all_ds: List[Dataset]) -> DatasetMeta:
         description += f"{ds.metadata.title}:\n\n{ds.metadata.description}\n\n------\n\n"
     description = (
         "This dataset has been created using multiple sources. We use UN WPP for data since 1950. Prior to that, other"
-        " sources are combined.\n\n" + description
+        " sources are combined.\n\n"
+        + description
     )
 
     # sources
@@ -139,7 +184,6 @@ def load_wpp(ds: Dataset) -> pd.DataFrame:
         & (df["age"].isin(["at birth"] + AGES_EXTRA))
         & (df["variant"].isin(["medium", "estimates"]))
         & (df["sex"] == "all")
-        & (df["year"] <= YEAR_WPP_END)
     ]
     # Change age group from 'at birth' to '0'
     df = df.assign(age=df["age"].replace({"at birth": "0"}))
