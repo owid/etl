@@ -1,20 +1,21 @@
 """Process and harmonize EM-DAT natural disasters dataset.
 
-Some issues in the data were detected (and will be reported to EM-DAT).
-Some of those issues could not be fixed. Namely, some disasters affect, in one year, a number of people that is larger
-than the entire population.
-For example, the number of people affected by one drought event in Botswana 1981 is 1037300 while population was 982753.
-I suppose this could be due to inaccuracies in the estimates of affected people or in the population (which may not
-include people living temporarily in the country or visitors).
-
-There are some potential issues that can't be fixed:
-* On the one hand, we may be underestimating the real impacts of events. The reason is that the original data does not
-include zeros. Therefore we can't know if the impacts of a certain event were zero, or unknown. Our only option is to
-treat missing data as zeros.
-* On the other hand, we may overestimate the real impacts on a given country-year, because events may affect the same
-people multiple times during the same year. This can't be fixed, but I suppose it's not common.
-* Additionally, it is understandable that some values are rough estimates, that some events are not recorded, and that
-there may be duplicated events.
+NOTES:
+1. We don't have population for historical regions (e.g. East Germany, or North Yemen), we are temporarily replacing them
+with the population of the successor countries.
+2. Some issues in the data were detected (and will be reported to EM-DAT). Some of those issues could not be fixed.
+   Namely, some disasters affect, in one year, a number of people that is larger than the entire population.
+   For example, the number of people affected by one drought event in Botswana 1981 is 1037300 while population
+   was 982753. I suppose this could be due to inaccuracies in the estimates of affected people or in the population
+   (which may not include people living temporarily in the country or visitors).
+3. There are some potential issues that can't be fixed:
+   * On the one hand, we may be underestimating the real impacts of events. The reason is that the original data does not
+   include zeros. Therefore we can't know if the impacts of a certain event were zero, or unknown. Our only option is to
+   treat missing data as zeros.
+   * On the other hand, we may overestimate the real impacts on a given country-year, because events may affect the same
+   people multiple times during the same year. This can't be fixed, but I suppose it's not common.
+   * Additionally, it is understandable that some values are rough estimates, that some events are not recorded, and that
+   there may be duplicated events.
 
 """
 
@@ -29,7 +30,7 @@ from owid.datautils import geo
 from etl.helpers import Names
 from etl.paths import DATA_DIR
 
-from .shared import (
+from shared import (
     CURRENT_DIR,
     HISTORIC_TO_CURRENT_REGION,
     REGIONS,
@@ -95,6 +96,7 @@ IMPACT_COLUMNS = [
     "insured_damages_adjusted",
 ]
 
+# +
 # TODO: Contact emdat about wrong data points.
 # List issues found in the data:
 # Each element is a tuple with a dictionary that fully identifies the wrong row,
@@ -142,6 +144,13 @@ DATA_CORRECTIONS = [
 # Saint Lucia         |   2010 | Storm   |     181000 |          0 | 170950           |
 # Samoa               |   1990 | Storm   |     170000 |      25000 | 168202           |
 # Tonga               |   1982 | Storm   |     100000 |      46500 |  96951           |
+
+# Finally, there are events registered on the same year for both a historical region and one of its
+# successor countries (we are ignoring this issue).
+# 1902: {'Azerbaijan', 'USSR'},
+# 1990: {'Tajikistan', 'USSR'},
+# 1991: {'Georgia', 'USSR'},
+# -
 
 # Get naming conventions.
 N = Names(str(CURRENT_DIR / "natural_disasters"))
@@ -481,7 +490,10 @@ def run(dest_dir: str) -> None:
     df = calculate_yearly_impacts(df=df)
 
     # We are not interested in each individual event, but the number of events of each kind and their impacts.
+    counts = df.reset_index().groupby(["country", "year", "type"], observed=True).\
+        agg({"index": "count"}).reset_index().rename(columns={"index": "n_events"})
     df = df.groupby(["country", "year", "type"], observed=True).sum(numeric_only=True, min_count=1).reset_index()
+    df = pd.merge(df, counts, on=["country", "year", "type"], how="left")
 
     # Fix issue with faulty dtypes (see more details in the function's documentation).
     df = fix_faulty_dtypes(df=df)
@@ -521,8 +533,8 @@ def run(dest_dir: str) -> None:
     sanity_checks_on_outputs(df=decade_df, is_decade=True)
 
     # Set an appropriate index and sort conveniently.
-    df = df.set_index(["country", "year", "type"]).sort_index()
-    decade_df = decade_df.set_index(["country", "year", "type"]).sort_index()
+    df = df.set_index(["country", "year", "type"], verify_integrity=True).sort_index().sort_index()
+    decade_df = decade_df.set_index(["country", "year", "type"], verify_integrity=True).sort_index().sort_index()
 
     #
     # Save outputs.

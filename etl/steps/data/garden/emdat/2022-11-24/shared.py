@@ -58,6 +58,14 @@ HISTORIC_TO_CURRENT_REGION: Dict[str, Dict[str, Union[str, List[str]]]] = {
             "Germany",
         ],
     },
+    "West Germany": {
+        "continent": "Europe",
+        "income_group": "",
+        "regions_included": [
+            # Europe - High-income countries.
+            "Germany",
+        ],
+    },
     "Netherlands Antilles": {
         "continent": "North America",
         "income_group": "High-income countries",
@@ -76,6 +84,14 @@ HISTORIC_TO_CURRENT_REGION: Dict[str, Dict[str, Union[str, List[str]]]] = {
             # Europe - Upper-middle-income countries.
             "Serbia",
             "Montenegro",
+        ],
+    },
+    "North Yemen": {
+        "continent": "Asia",
+        "income_group": "Low-income countries",
+        "regions_included": [
+            # Asia - Low-income countries.
+            "Yemen",
         ],
     },
     "South Yemen": {
@@ -135,8 +151,6 @@ ACCEPTED_OVERLAPS = {
     1902: {"USSR", "Azerbaijan"},
     1990: {"Tajikistan", "USSR"},
     1991: {"Georgia", "USSR"},
-    1982: {"South Yemen", "Yemen"},
-    1989: {"South Yemen", "Yemen"},
 }
 
 
