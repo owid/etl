@@ -1,17 +1,38 @@
 """Process and harmonize EM-DAT natural disasters dataset.
 
+Some issues in the data were detected (and will be reported to EM-DAT).
+Some of those issues could not be fixed. Namely, some disasters affect, in one year, a number of people that is larger
+than the entire population.
+For example, the number of people affected by one drought event in Botswana 1981 is 1037300 while population was 982753.
+I suppose this could be due to inaccuracies in the estimates of affected people or in the population (which may not
+include people living temporarily in the country or visitors).
+
+There are some potential issues that can't be fixed:
+* On the one hand, we may be underestimating the real impacts of events. The reason is that the original data does not
+include zeros. Therefore we can't know if the impacts of a certain event were zero, or unknown. Our only option is to
+treat missing data as zeros.
+* On the other hand, we may overestimate the real impacts on a given country-year, because events may affect the same
+people multiple times during the same year. This can't be fixed, but I suppose it's not common.
+* Additionally, it is understandable that some values are rough estimates, that some events are not recorded, and that
+there may be duplicated events.
+
 """
 
+import datetime
+
+import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
 from owid.catalog.utils import underscore_table
 from owid.datautils import geo
-from shared import (
+from .shared import (
     CURRENT_DIR,
     HISTORIC_TO_CURRENT_REGION,
     REGIONS,
     add_population,
     add_region_aggregates,
+    correct_data_points,
+    get_last_day_of_month,
 )
 
 from etl.helpers import Names
@@ -46,8 +67,6 @@ EXPECTED_DISASTER_TYPES = [
 COLUMNS = {
     "country": "country",
     "year": "year",
-    # Column "group" is used only for sanity checks.
-    "group": "group",
     "type": "type",
     "total_dead": "total_dead",
     "injured": "injured",
@@ -56,16 +75,73 @@ COLUMNS = {
     "total_affected": "total_affected",
     "reconstructed_costs_adjusted": "reconstructed_costs_adjusted",
     "insured_damages_adjusted": "insured_damages_adjusted",
+    "start_year": "start_year",
+    "start_month": "start_month",
+    "start_day": "start_day",
+    "end_year": "end_year",
+    "end_month": "end_month",
+    "end_day": "end_day",
 }
+
+# Columns of values related to natural disaster impacts.
+IMPACT_COLUMNS = ['total_dead', 'injured', 'affected', 'homeless', 'total_affected', 'reconstructed_costs_adjusted',
+                  'insured_damages_adjusted']
+
+# TODO: Contact emdat about wrong data points.
+# List issues found in the data:
+# Each element is a tuple with a dictionary that fully identifies the wrong row,
+# and another dictionary that specifies the changes.
+# Note: Countries here should appear as in the raw data (i.e. not harmonized).
+DATA_CORRECTIONS = [
+    # The end year of 1969 Morocco earthquake can't be 2019.
+    ({"country": "Morocco", "start_year": 1969, "end_year": 2019, "type": "Earthquake"},
+     {"end_year": 1969}),
+    # The date of the 1992 Afghanistan flood can't be September 31.
+    ({"country": "Afghanistan", "start_year": 1992, "start_month": 9, "start_day": 31},
+     {"start_day": 3, "end_day": 3}),
+    # The date of the 1992 India flood can't be September 31.
+    # Also, there is one entry for 1992 India flood on 1992-09-08 (500 dead) and another for 1992-09 (86 dead).
+    # They will be treated as separate events (maybe the monthly one refers to other smaller floods that month?).
+    ({"country": "India", "start_year": 1992, "start_month": 9, "start_day": 8, "end_day": 31},
+     {"end_day": 8}),
+    # Sierra Leone epidemic outbreak in november 1996 can't end in April 31.
+    ({"country": "Sierra Leone", "start_year": 1996, "start_month": 11, "end_month": 4, "end_day": 31},
+     {"end_day": 30}),
+    # Peru 1998 epidemic can't end in February 31.
+    ({"country": "Peru", "start_year": 1998, "start_month": 1, "end_month": 2, "end_day": 31},
+     {"end_day": 28}),
+    # India 2017 flood can't end in June 31.
+    ({"country": "India", "start_year": 2017, "start_month": 6, "end_month": 6, "end_day": 31},
+     {"end_day": 30}),
+    # US 2021 wildfires can't end in September 31.
+    ({"country": "United States of America (the)", "start_year": 2021, "end_month": 9, "end_day": 31},
+     {"end_day": 30}),
+    # Cameroon 2012 drought can't end before it started.
+    # I will remove the month and day, since I can't pinpoint the exact dates.
+    ({"country": "Cameroon", "start_year": 2012, "start_month": 6, "end_month": 1},
+     {"start_month": np.nan, "start_day": np.nan, "end_month": np.nan, "end_day": np.nan}),
+]
+# Other potential issues, where more people were affected than the entire population of the country:
+# country             |   year | type    |   affected |   homeless |       population |
+# --------------------|-------:|:--------|-----------:|-----------:|-----------------:|
+# Antigua and Barbuda |   1983 | Drought |      75000 |          0 |  65426           |
+# Botswana            |   1981 | Drought |    1037300 |          0 | 982753           |
+# Dominica            |   2017 | Storm   |      71293 |          0 |  70422           |
+# Ghana               |   1980 | Drought |   12500000 |          0 |      1.18653e+07 |
+# Laos                |   1977 | Drought |    3500000 |          0 |      3.12575e+06 |
+# Mauritania          |   1969 | Drought |    1300000 |          0 |      1.08884e+06 |
+# Mauritania          |   1976 | Drought |    1420000 |          0 |      1.34161e+06 |
+# Mauritania          |   1980 | Drought |    1600000 |          0 |      1.5067e+06  |
+# Montserrat          |   1989 | Storm   |          0 |      12000 |  10918           |
+# Saint Lucia         |   2010 | Storm   |     181000 |          0 | 170950           |
+# Samoa               |   1990 | Storm   |     170000 |      25000 | 168202           |
+# Tonga               |   1982 | Storm   |     100000 |      46500 |  96951           |
 
 # Get naming conventions.
 N = Names(str(CURRENT_DIR / "natural_disasters"))
 
 
 def sanity_checks_on_inputs(df: pd.DataFrame) -> None:
-    error = "Expected only 'Natural' in 'group' column."
-    assert set(df["group"]) == set(["Natural"]), error
-
     error = "All values should be positive."
     assert (df.select_dtypes("number").fillna(0) >= 0).all().all(), error
 
@@ -76,6 +152,19 @@ def sanity_checks_on_inputs(df: pd.DataFrame) -> None:
     assert (
         df["total_affected"].fillna(0) >= df[["injured", "affected", "homeless"]].sum(axis=1).fillna(0)
     ).all(), error
+
+    error = "Natural disasters are not expected to last more than 9 years."
+    assert (df["end_year"] - df["start_year"]).max() < 10, error
+
+    error = "Some of the columns that can't have nan do have one or more nans."
+    assert df[['country', 'year', 'type', 'start_year', 'end_year']].notnull().all().all(), error
+
+    for column in ["year", "start_year", "end_year"]:
+        error = f"Column '{column}' has a year prior to 1900 or posterior to current year."
+        assert 1900 < df[column].max() <= datetime.datetime.now().year, error
+
+    error = "Some rows have end_day specified, but not end_month."
+    assert df[(df["end_month"].isnull()) & (df["end_day"].notnull())].empty, error
 
 
 def fix_faulty_dtypes(df: pd.DataFrame) -> pd.DataFrame:
@@ -97,32 +186,129 @@ def fix_faulty_dtypes(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def harmonize_countries(df: pd.DataFrame) -> pd.DataFrame:
+    df = df.copy()
+
     # Harmonize country names.
     df = geo.harmonize_countries(
         df=df, countries_file=N.country_mapping_path, warn_on_missing_countries=True, warn_on_unused_countries=True
     )
 
     # Add Azores Islands to Portugal (so that we can attach a population to it).
-    new_portugal_df = (
-        pd.concat([df[df["country"] == "Portugal"], df[df["country"] == "Azores Islands"]])
-        .groupby(["year", "type"])
-        .sum(numeric_only=True)
-        .reset_index()
-        .assign(**{"country": "Portugal"})
-    )
-    df = pd.concat([df[~df["country"].isin(["Azores Islands", "Portugal"])], new_portugal_df]).reset_index(drop=True)
-
-    # Idem for Canary Islands.
-    new_spain_df = (
-        pd.concat([df[df["country"] == "Spain"], df[df["country"] == "Canary Islands"]])
-        .groupby(["year", "type"])
-        .sum(numeric_only=True)
-        .reset_index()
-        .assign(**{"country": "Spain"})
-    )
-    df = pd.concat([df[~df["country"].isin(["Canary Islands", "Spain"])], new_spain_df]).reset_index(drop=True)
+    df = df.replace({"Azores Islands": "Portugal"})
+    # Add Canary Islands to Spain (so that we can attach a population to it).
+    df = df.replace({"Canary Islands": "Spain"})
 
     return df
+
+
+def calculate_start_and_end_dates(df: pd.DataFrame) -> pd.DataFrame:
+    df = df.copy()
+
+    # When start month is not given, assume the beginning of the year.
+    df["start_month"] = df["start_month"].fillna(1)
+    # When start day is not given, assume the beginning of the month.
+    df["start_day"] = df["start_day"].fillna(1)
+
+    # When end month is not given, assume the end of the year.
+    df["end_month"] = df["end_month"].fillna(12)
+
+    # When end day is not given, assume the last day of the month.
+    last_day_of_month = pd.Series(
+        [get_last_day_of_month(year=row["end_year"], month=row["end_month"]) for i, row in df.iterrows()])
+    df["end_day"] = df["end_day"].fillna(last_day_of_month)
+
+    # Create columns for start and end dates.
+    df["start_date"] = df["start_year"].astype(str) + '-' + df["start_month"].astype(str).str.zfill(2) + '-' + \
+            df["start_day"].astype(str).str.zfill(2)
+    df["end_date"] = df["end_year"].astype(str) + '-' + df["end_month"].astype(str).str.zfill(2) + '-' + \
+            df["end_day"].astype(str).str.zfill(2)
+
+    # Convert dates into datetime objects.
+    # Note: This may fail if one of the dates is wrong, e.g. September 31 (if so, check error message for row index).
+    df["start_date"] = pd.to_datetime(df["start_date"])
+    df["end_date"] = pd.to_datetime(df["end_date"])
+
+    error = "Events can't have an end_date prior to start_date."
+    assert ((df["end_date"] - df["start_date"]).dt.days >= 0).all(), error
+
+    # Drop unnecessary columns.
+    df = df.drop(columns=["start_year", "start_month", "start_day", "end_year", "end_month", "end_day"])
+
+    return df
+
+
+def calculate_yearly_impacts(df: pd.DataFrame) -> pd.DataFrame:
+    # Many disasters last more than one year. Therefore, we need to spread their impact among the different years.
+    # Otherwise, if we assign the impact of a disaster to, say, the first year, we may end up with disasters that
+    # affected more people than the entire population of a country.
+    # Hence, for events that started and ended in different years, we distribute their impact equally across the
+    # time spanned by the disaster.
+
+    df = df.copy()
+
+    # There are many rows that have no data on impacts of disasters.
+    # I suppose those are known disasters for which we don't know the impact.
+    # Given that now I want to count impact of disasters, fill them with zeros
+    # (to count them as disasters that had no victims).
+    df[IMPACT_COLUMNS] = df[IMPACT_COLUMNS].fillna(0)
+
+    # Select rows of disasters that last more than one year.
+    multi_year_rows_mask = df["start_date"].dt.year != df["end_date"].dt.year
+    multi_year_rows = df[multi_year_rows_mask].reset_index(drop=True)
+
+    # Go row by row, and create a new disaster event with the impact normalized by the fraction of days it happened
+    # in a specific year.
+    added_events = pd.DataFrame()
+    for i, row in multi_year_rows.iterrows():
+        # Start dataframe for new event.
+        new_event = pd.DataFrame(row).transpose()
+        # Years spanned by the disaster.
+        years = np.arange(row["start_date"].year, row["end_date"].year + 1).tolist()
+        # Calculate the total number of days spanned by the disaster (and add 1 day to include the day of the end date).
+        days_total = (row["end_date"] + pd.DateOffset(1) - row["start_date"]).days
+
+        for year in years:
+            if year == years[0]:
+                # Get number of days.
+                days_affected_in_year = (pd.Timestamp(year=year + 1, month=1, day=1) - row["start_date"]).days
+                # Fraction of days affected this year.
+                days_fraction = days_affected_in_year / days_total
+                # Impacts this years.
+                impacts = (row[IMPACT_COLUMNS] * days_fraction).astype(int)
+                # Start a series that counts the impacts acumulated over the years.
+                cumulative_impacts = impacts
+                # Normalize data by the number of days affected in this year.
+                new_event[IMPACT_COLUMNS] = impacts
+                # Correct dates.
+                new_event["end_date"] = pd.Timestamp(year=year, month=12, day=31)
+            elif years[0] < year < years[-1]:
+                # The entire year was affected by the disaster.
+                # Note: Ignore leap years.
+                days_fraction = 365 / days_total
+                # Impacts this year.
+                impacts = (row[IMPACT_COLUMNS] * days_fraction).astype(int)
+                # Add impacts to the cumulative impacts series.
+                cumulative_impacts += impacts
+                # Normalize data by the number of days affected in this year.
+                new_event[IMPACT_COLUMNS] = impacts
+                # Correct dates.
+                new_event["start_date"] = pd.Timestamp(year=year, month=1, day=1)
+                new_event["end_date"] = pd.Timestamp(year=year, month=12, day=31)
+            else:
+                # Assign all remaining impacts to the last year.
+                impacts = row[IMPACT_COLUMNS] - cumulative_impacts
+                new_event[IMPACT_COLUMNS] = impacts
+                # Correct dates.
+                new_event["start_date"] = pd.Timestamp(year=year, month=1, day=1)
+            added_events = pd.concat([added_events, new_event], ignore_index=True)
+
+    # Remove multi-year rows from main dataframe, and add those rows after separating events year by year.
+    yearly_df = pd.concat([df[~(multi_year_rows_mask)], added_events], ignore_index=True)
+
+    # Sort conveniently.
+    yearly_df = yearly_df.sort_values(["country", "year", "type"]).reset_index(drop=True)
+
+    return yearly_df
 
 
 def create_decade_data(df: pd.DataFrame) -> pd.DataFrame:
@@ -171,7 +357,8 @@ def sanity_checks_on_outputs(df: pd.DataFrame, decade_df: pd.DataFrame) -> None:
     error = "All values should be positive."
     assert (df.select_dtypes("number").fillna(0) >= 0).all().all(), error
 
-    error = "List of expected disaster types has changed. Consider updating EXPECTED_DISASTER_TYPES (or renaming 'All disasters')."
+    error = "List of expected disaster types has changed. "\
+        "Consider updating EXPECTED_DISASTER_TYPES (or renaming 'All disasters')."
     assert set(df["type"]) == set(EXPECTED_DISASTER_TYPES + ["All disasters"]), error
 
     error = "Column 'total_affected' should be the sum of columns 'injured', 'affected', and 'homeless'."
@@ -182,27 +369,17 @@ def sanity_checks_on_outputs(df: pd.DataFrame, decade_df: pd.DataFrame) -> None:
     error = "There are unexpected nans in data."
     assert df.notnull().all(axis=1).all(), error
 
-    # TODO: Uncomment once disaster duration is taken into account.
+    # Another sanity check would be that certain disasters (e.g. an earthquake) cannot last for longer than 1 day.
+    # However, for some disasters we don't have exact day, or even exact month, just the year.
+
     # List of columns whose value should not be larger than population.
-    # columns_to_inspect = [
-    #     "total_dead",
-    #     "injured",
-    #     "affected",
-    #     "homeless",
-    #     "total_affected",
-    #     "population",
-    #     "total_dead_per_100k_people",
-    #     "injured_per_100k_people",
-    #     "affected_per_100k_people",
-    #     "homeless_per_100k_people",
-    #     "total_affected_per_100k_people",
-    # ]
-    # error = "One disaster should not be able to affect more than the entire population of a country in one year."
-    # for column in columns_to_inspect:
-    #    assert (df[column] <= df["population"]).all(), error
-    # This may be happening because the disaster lasts for several years.
-    # It can also be because of inaccuracies in the estimates of affected or population, or due to
-    # temporary population.
+    columns_to_inspect = [
+        "total_dead",
+        "total_dead_per_100k_people",
+    ]
+    error = "One disaster should not be able to cause the death of the entire population of a country in one year."
+    for column in columns_to_inspect:
+        assert (df[column] <= df["population"]).all(), error
 
 
 def run(dest_dir: str) -> None:
@@ -222,20 +399,29 @@ def run(dest_dir: str) -> None:
     # Select and rename columns.
     df = df[list(COLUMNS)].rename(columns=COLUMNS, errors="raise")
 
+    # Correct wrong data points (defined above in DATA_CORRECTIONS).
+    df = correct_data_points(df=df, corrections=DATA_CORRECTIONS)
+
     # Remove spurious spaces in entities.
     df["type"] = df["type"].str.strip()
 
     # Sanity checks.
     sanity_checks_on_inputs(df=df)
 
-    # We are not interested in each individual event, but the number of events of each kind and damages.
-    df = df.groupby(["country", "year", "type"]).sum(numeric_only=True).reset_index()
+    # Harmonize country names and solve some issues with regions.
+    df = harmonize_countries(df=df)
+
+    # Calculate start and end dates of disasters.
+    df = calculate_start_and_end_dates(df=df)
+
+    # Distribute the impacts of disasters lasting longer than a year among separate yearly events.
+    df = calculate_yearly_impacts(df=df)
+
+    # We are not interested in each individual event, but the number of events of each kind and their impacts.
+    df = df.groupby(["country", "year", "type"], observed=True).sum(numeric_only=True, min_count=1).reset_index()
 
     # Fix issue with faulty dtypes (see more details in the function's documentation).
     df = fix_faulty_dtypes(df=df)
-
-    # Harmonize country names and solve some issues with regions.
-    df = harmonize_countries(df=df)
 
     # Add a new category (or "type") corresponding to the total of all natural disasters.
     all_disasters = (

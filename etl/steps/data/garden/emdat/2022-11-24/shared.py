@@ -1,6 +1,7 @@
+import datetime
 from copy import deepcopy
 from pathlib import Path
-from typing import Dict, List, Optional, Union, cast
+from typing import Any, Dict, List, Optional, Tuple, Union, cast
 
 import numpy as np
 import pandas as pd
@@ -218,8 +219,7 @@ def load_population() -> pd.DataFrame:
     countries_with_population = population["country"].unique()
 
     # Consider regions and historical regions.
-    regions = deepcopy(REGIONS)
-    regions.update(HISTORIC_TO_CURRENT_REGION)
+    regions = dict(**REGIONS, **HISTORIC_TO_CURRENT_REGION)
     missing_countries = [country for country in regions if country not in countries_with_population]
     for country in missing_countries:
         members = regions[country]["regions_included"]
@@ -472,3 +472,32 @@ def add_region_aggregates(
         data = pd.concat([data, region_df], ignore_index=True)
 
     return data
+
+
+def get_last_day_of_month(year: int, month: int):
+    if month == 12:
+        last_day = 31
+    else:
+        last_day = (datetime.datetime.strptime(f"{year:04}-{month + 1:02}", "%Y-%m") + datetime.timedelta(days=-1)).day
+
+    return last_day
+
+
+def correct_data_points(df: pd.DataFrame, corrections: List[Tuple[Dict[Any, Any], Dict[Any, Any]]]) -> pd.DataFrame:
+    corrected_df = df.copy()
+
+    for correction in corrections:
+        wrong_row, corrected_row = correction
+
+        # Select the row in the dataframe where the wrong data point is.
+        # The 'fillna(False)' is added because otherwise rows that do not fulfil the selection will create ambiguity.
+        selection = corrected_df.loc[(corrected_df[list(wrong_row)] == pd.Series(wrong_row)).fillna(False).all(axis=1)]
+        # Sanity check.
+        error = "Either raw data has been corrected, or dictionary selecting wrong row is ambiguous."
+        assert len(selection) == 1, error
+
+        # Replace wrong fields by the corrected ones.
+        # Note: Changes to categorical fields will not work.
+        corrected_df.loc[selection.index, list(corrected_row)] = list(corrected_row.values())
+
+    return corrected_df
