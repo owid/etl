@@ -148,6 +148,14 @@ N = Names(str(CURRENT_DIR / "natural_disasters"))
 
 
 def sanity_checks_on_inputs(df: pd.DataFrame) -> None:
+    """Run sanity checks on input data.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Input data (prior to harmonization).
+
+    """
     error = "All values should be positive."
     assert (df.select_dtypes("number").fillna(0) >= 0).all().all(), error
 
@@ -174,9 +182,12 @@ def sanity_checks_on_inputs(df: pd.DataFrame) -> None:
 
 
 def fix_faulty_dtypes(df: pd.DataFrame) -> pd.DataFrame:
-    # Dividing a UInt32 by float64 results in a faulty Float64 that does not handle nans properly
-    # (which may be a bug: https://github.com/pandas-dev/pandas/issues/49818)
-    # To avoid this, convert all UInt32 into standard int.
+    """Fix an issue related to column dtypes.
+
+    Dividing a UInt32 by float64 results in a faulty Float64 that does not handle nans properly (which may be a bug:
+    https://github.com/pandas-dev/pandas/issues/49818). To avoid this, convert all UInt32 into standard int.
+
+    """
     int_columns = [
         "total_dead",
         "injured",
@@ -192,6 +203,7 @@ def fix_faulty_dtypes(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def harmonize_countries(df: pd.DataFrame) -> pd.DataFrame:
+    """Harmonize country names."""
     df = df.copy()
 
     # Harmonize country names.
@@ -208,6 +220,12 @@ def harmonize_countries(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def calculate_start_and_end_dates(df: pd.DataFrame) -> pd.DataFrame:
+    """Calculate start and end dates of disasters.
+
+    The original data had year, month and day of start and end, and some of those fields were missing. This function
+    deals with those missing fields and creates datetime columns for start and end of events.
+
+    """
     df = df.copy()
 
     # When start month is not given, assume the beginning of the year.
@@ -255,18 +273,21 @@ def calculate_start_and_end_dates(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def calculate_yearly_impacts(df: pd.DataFrame) -> pd.DataFrame:
-    # Many disasters last more than one year. Therefore, we need to spread their impact among the different years.
-    # Otherwise, if we assign the impact of a disaster to, say, the first year, we may end up with disasters that
-    # affected more people than the entire population of a country.
-    # Hence, for events that started and ended in different years, we distribute their impact equally across the
-    # time spanned by the disaster.
+    """Equally distribute the impact of disasters lasting longer than one year among the individual years, as separate
+    events.
 
+    Many disasters last more than one year. Therefore, we need to spread their impact among the different years.
+    Otherwise, if we assign the impact of a disaster to, say, the first year, we may overestimate the impacts on a
+    particular country-year.
+    Hence, for events that started and ended in different years, we distribute their impact equally across the
+    time spanned by the disaster.
+
+    """
     df = df.copy()
 
     # There are many rows that have no data on impacts of disasters.
     # I suppose those are known disasters for which we don't know the impact.
-    # Given that now I want to count impact of disasters, fill them with zeros
-    # (to count them as disasters that had no victims).
+    # Given that we want to count overall impact, fill them with zeros (to count them as disasters that had no victims).
     df[IMPACT_COLUMNS] = df[IMPACT_COLUMNS].fillna(0)
 
     # Select rows of disasters that last more than one year.
@@ -329,6 +350,7 @@ def calculate_yearly_impacts(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def create_decade_data(df: pd.DataFrame) -> pd.DataFrame:
+    """Create data of average impacts over periods of 10 years."""
     decade_df = df.copy()
 
     # Convert "year" column into a datetime.
@@ -352,6 +374,16 @@ def create_decade_data(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def sanity_checks_on_outputs(df: pd.DataFrame, is_decade: bool) -> None:
+    """Run sanity checks on output (yearly or decadal) data.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Output (yearly or decadal) data.
+    is_decade : bool
+        True if df is decadal data; False if it is yearly data.
+
+    """
     # Common sanity checks for yearly and decadal data.
     error = "All values should be positive."
     assert (df.select_dtypes("number").fillna(0) >= 0).all().all(), error
