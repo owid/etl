@@ -19,6 +19,7 @@ GAPMINDER_INFANT_MORTALITY_DATASET_PATH = DATA_DIR / "open_numbers/open_numbers/
 
 # naming conventions
 N = Names(__file__)
+N = Names("etl/steps/data/garden/un/2021-12-20/un_igme.py")
 
 
 def run(dest_dir: str) -> None:
@@ -52,22 +53,28 @@ def run(dest_dir: str) -> None:
     ds_garden = Dataset.create_empty(dest_dir)
     ds_garden.metadata = ds_meadow.metadata
 
-    tb_garden = Table(dfc)
-    tb_garden.metadata = tb_meadow.metadata
-    # Flatten the indexed columns
-    tb_garden.columns = ["__".join(col).strip() for col in tb_garden.columns.values]
-    # Create one table per column and auto-populate the metadata
-    for col in tb_garden.columns:
-        print(col)
-        col_name = col.split(sep="__")
+    tb_garden = Table(dfc, metadata=tb_meadow.metadata)
+    tb_garden.columns.names = ["metric", "sex", "indicator", "unit"]
+
+    # move sex and metric to dimensions
+    tb_garden = tb_garden.stack(level="metric").stack(level="sex")
+
+    # add units to variable metadata
+    units = tb_garden.columns.get_level_values("unit")
+    tb_garden.columns = tb_garden.columns.droplevel(level="unit")
+
+    for col, unit in zip(tb_garden.columns, units):
+        tb_garden[col].metadata.unit = unit
+        # print(col)
+        # col_name = col.split(sep="__")
         # Pulling out the relevant information from the column names for the metadata
         # Metric is the central value or upper/lower bound
-        metric = col_name[0]
-        sex = col_name[1]
-        age_group = col_name[2]
-        unit = col_name[3]
+        # metric = col_name[0]
+        # sex = col_name[1]
+        # age_group = col_name[2]
+        # unit = col_name[3]
         # Creating table and variable level metadata
-        tb_garden[col].metadata.title = f"{age_group} - {sex} - {metric}"
+        # tb_garden[col].metadata.title = f"{age_group} - {sex} - {metric}"
         tb_garden[col].metadata.unit = unit
         if tb_garden[col].metadata.unit in ["deaths", "stillbirths"]:
             tb_garden[col] = tb_garden[col].astype("Int64").round(0)
