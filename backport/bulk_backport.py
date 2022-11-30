@@ -1,3 +1,4 @@
+import concurrent.futures
 import re
 from typing import Any, cast
 
@@ -57,6 +58,12 @@ log = structlog.get_logger()
     type=bool,
     help="Backport datasets, can be skipped if you only want to prune",
 )
+@click.option(
+    "--workers",
+    type=int,
+    help="Thread workers to parallelize which steps need rebuilding (steps execution is not parallelized)",
+    default=1,
+)
 def bulk_backport(
     dataset_ids: tuple[int],
     dry_run: bool,
@@ -65,6 +72,7 @@ def bulk_backport(
     force: bool,
     prune: bool,
     backport: bool,
+    workers: int,
 ) -> None:
     engine = get_engine()
 
@@ -76,21 +84,33 @@ def bulk_backport(
 
         log.info("bulk_backport.start", n=len(df))
 
-        ds_row: Any
-        for i, ds_row in enumerate(df.itertuples()):
-            log.info(
-                "bulk_backport",
-                dataset_id=ds_row.id,
-                name=ds_row.name,
-                private=ds_row.isPrivate,
-                progress=f"{i + 1}/{len(df)}",
-            )
-            backport_step(
-                dataset_id=ds_row.id,
-                dry_run=dry_run,
-                upload=upload,
-                force=force,
-            )
+        if workers == 1:
+            ds_row: Any
+            for i, ds_row in enumerate(df.itertuples()):
+                log.info(
+                    "bulk_backport",
+                    dataset_id=ds_row.id,
+                    name=ds_row.name,
+                    private=ds_row.isPrivate,
+                    progress=f"{i + 1}/{len(df)}",
+                )
+                backport_step(
+                    dataset_id=ds_row.id,
+                    dry_run=dry_run,
+                    upload=upload,
+                    force=force,
+                )
+        else:
+            with concurrent.futures.ThreadPoolExecutor() as executor:
+                executor.map(
+                    lambda ds_row: backport_step(
+                        dataset_id=ds_row.id,
+                        dry_run=dry_run,
+                        upload=upload,
+                        force=force,
+                    ),
+                    df.itertuples(),
+                )
 
     if prune:
         _prune_snapshots(engine, dataset_ids, dry_run)
