@@ -2,6 +2,7 @@ dataset:
   namespace: un
   short_name: un_igme
   title: Youth Mortality Rates - UN IGME (2021)
+  version: '2021-12-20'
   description: 'The United Nations Inter-agency Group for Child Mortality Estimation
     (UN IGME) was formed in 2004 to share data on child mortality, improve methods
     for child mortality estimation, report on progress towards child survival goals,
@@ -23,7 +24,6 @@ dataset:
   licenses:
     - 
       url: https://www.unicef.org/legal#terms-of-use
-      version: '2021-12-20'
   sources:
     - 
       name: United Nations Inter-agency Group for Child Mortality Estimation (2021)
