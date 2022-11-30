@@ -1,5 +1,5 @@
 import pandas as pd
-from owid.catalog import Dataset, Table, TableMeta
+from owid.catalog import Dataset, Table
 from owid.catalog.utils import underscore_table
 from owid.walden import Catalog as WaldenCatalog
 from structlog import get_logger
@@ -11,7 +11,6 @@ log = get_logger()
 
 # naming conventions
 N = Names(__file__)
-N = Names("etl/steps/data/meadow/un/2021-12-20/un_igme.py")
 
 
 def run(dest_dir: str) -> None:
@@ -29,16 +28,10 @@ def run(dest_dir: str) -> None:
     # create new dataset and reuse walden metadata
     ds = Dataset.create_empty(dest_dir)
     ds.metadata = convert_walden_metadata(walden_ds)
-    ds.metadata.version = "2021-12-20"
+    ds.metadata.update_from_yaml(N.metadata_path, if_source_exists="replace")
 
-    # create table with metadata from dataframe
-    table_metadata = TableMeta(
-        short_name=ds.metadata.short_name,
-        title=ds.metadata.title,
-        description=ds.metadata.description,
-    )
-    tb = Table(df, metadata=table_metadata)
-
+    tb = Table(df)
+    tb.update_metadata_from_yaml(N.metadata_path, "un_igme")
     # underscore all table columns
     tb = underscore_table(tb)
     tb = tb.reset_index()
