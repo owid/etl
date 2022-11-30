@@ -330,47 +330,29 @@ def calculate_yearly_impacts(df: pd.DataFrame) -> pd.DataFrame:
 
 def create_decade_data(df: pd.DataFrame) -> pd.DataFrame:
     decade_df = df.copy()
+
     # Convert "year" column into a datetime.
     decade_df["year"] = pd.to_datetime(decade_df["year"], format="%Y")
     # Group tens of years and sum.
     decade_df = (
-        decade_df.set_index("year").groupby(["country", "type"]).resample("10AS").mean(numeric_only=True).reset_index()
+        decade_df.set_index("year")
+        .groupby(["country", "type"], observed=True)
+        .resample("10AS")
+        .mean(numeric_only=True)
+        .reset_index()
     )
     # Make "year" column years instead of dates.
     decade_df["year"] = decade_df["year"].dt.year
+    # Remove rows that have no data.
+    decade_df = decade_df.dropna(
+        subset=decade_df.drop(columns=["country", "year", "type"]).columns, how="all"
+    ).reset_index(drop=True)
 
     return decade_df
 
 
-def sanity_checks_on_outputs(df: pd.DataFrame, decade_df: pd.DataFrame) -> None:
-    all_countries = sorted(set(df["country"]) - set(REGIONS) - set(HISTORIC_TO_CURRENT_REGION))
-
-    # Check that the aggregate of all countries and disasters leads to the same numbers we have for the world.
-    # This check would not pass when adding historical regions (since we know there are some overlaps between data from
-    # historical and successor countries). So check for a specific year.
-    year_to_check = 2022
-    all_disasters_for_world = df[
-        (df["country"] == "World") & (df["year"] == year_to_check) & (df["type"] == "All disasters")
-    ].reset_index(drop=True)
-    all_disasters_check = (
-        df[(df["country"].isin(all_countries)) & (df["year"] == year_to_check) & (df["type"] != "All disasters")]
-        .groupby("year")
-        .sum(numeric_only=True)
-        .reset_index()
-    )
-
-    cols_to_check = [
-        "total_dead",
-        "injured",
-        "affected",
-        "homeless",
-        "total_affected",
-        "reconstructed_costs_adjusted",
-        "insured_damages_adjusted",
-    ]
-    error = f"Aggregate for the World in {year_to_check} does not coincide with the sum of all countries."
-    assert all_disasters_for_world[cols_to_check].equals(all_disasters_check[cols_to_check]), error
-
+def sanity_checks_on_outputs(df: pd.DataFrame, is_decade: bool) -> None:
+    # Common sanity checks for yearly and decadal data.
     error = "All values should be positive."
     assert (df.select_dtypes("number").fillna(0) >= 0).all().all(), error
 
@@ -380,25 +362,55 @@ def sanity_checks_on_outputs(df: pd.DataFrame, decade_df: pd.DataFrame) -> None:
     )
     assert set(df["type"]) == set(EXPECTED_DISASTER_TYPES + ["All disasters"]), error
 
-    error = "Column 'total_affected' should be the sum of columns 'injured', 'affected', and 'homeless'."
-    assert (
-        df["total_affected"].fillna(0) >= df[["injured", "affected", "homeless"]].sum(axis=1).fillna(0)
-    ).all(), error
-
     error = "There are unexpected nans in data."
     assert df.notnull().all(axis=1).all(), error
 
-    # Another sanity check would be that certain disasters (e.g. an earthquake) cannot last for longer than 1 day.
-    # However, for some disasters we don't have exact day, or even exact month, just the year.
+    # Sanity checks only for yearly data.
+    if not is_decade:
+        all_countries = sorted(set(df["country"]) - set(REGIONS) - set(HISTORIC_TO_CURRENT_REGION))
 
-    # List of columns whose value should not be larger than population.
-    columns_to_inspect = [
-        "total_dead",
-        "total_dead_per_100k_people",
-    ]
-    error = "One disaster should not be able to cause the death of the entire population of a country in one year."
-    for column in columns_to_inspect:
-        assert (df[column] <= df["population"]).all(), error
+        # Check that the aggregate of all countries and disasters leads to the same numbers we have for the world.
+        # This check would not pass when adding historical regions (since we know there are some overlaps between data from
+        # historical and successor countries). So check for a specific year.
+        year_to_check = 2022
+        all_disasters_for_world = df[
+            (df["country"] == "World") & (df["year"] == year_to_check) & (df["type"] == "All disasters")
+        ].reset_index(drop=True)
+        all_disasters_check = (
+            df[(df["country"].isin(all_countries)) & (df["year"] == year_to_check) & (df["type"] != "All disasters")]
+            .groupby("year")
+            .sum(numeric_only=True)
+            .reset_index()
+        )
+
+        cols_to_check = [
+            "total_dead",
+            "injured",
+            "affected",
+            "homeless",
+            "total_affected",
+            "reconstructed_costs_adjusted",
+            "insured_damages_adjusted",
+        ]
+        error = f"Aggregate for the World in {year_to_check} does not coincide with the sum of all countries."
+        assert all_disasters_for_world[cols_to_check].equals(all_disasters_check[cols_to_check]), error
+
+        error = "Column 'total_affected' should be the sum of columns 'injured', 'affected', and 'homeless'."
+        assert (
+            df["total_affected"].fillna(0) >= df[["injured", "affected", "homeless"]].sum(axis=1).fillna(0)
+        ).all(), error
+
+        # Another sanity check would be that certain disasters (e.g. an earthquake) cannot last for longer than 1 day.
+        # However, for some disasters we don't have exact day, or even exact month, just the year.
+
+        # List of columns whose value should not be larger than population.
+        columns_to_inspect = [
+            "total_dead",
+            "total_dead_per_100k_people",
+        ]
+        error = "One disaster should not be able to cause the death of the entire population of a country in one year."
+        for column in columns_to_inspect:
+            assert (df[column] <= df["population"]).all(), error
 
 
 def run(dest_dir: str) -> None:
@@ -444,7 +456,10 @@ def run(dest_dir: str) -> None:
 
     # Add a new category (or "type") corresponding to the total of all natural disasters.
     all_disasters = (
-        df.groupby(["country", "year"]).sum(numeric_only=True).assign(**{"type": "All disasters"}).reset_index()
+        df.groupby(["country", "year"], observed=True)
+        .sum(numeric_only=True, min_count=1)
+        .assign(**{"type": "All disasters"})
+        .reset_index()
     )
     df = (
         pd.concat([df, all_disasters], ignore_index=True)
@@ -470,7 +485,8 @@ def run(dest_dir: str) -> None:
     decade_df = create_decade_data(df=df)
 
     # Run sanity checks on outputs.
-    sanity_checks_on_outputs(df=df, decade_df=decade_df)
+    sanity_checks_on_outputs(df=df, is_decade=False)
+    sanity_checks_on_outputs(df=decade_df, is_decade=True)
 
     # Set an appropriate index and sort conveniently.
     df = df.set_index(["country", "year", "type"]).sort_index()
