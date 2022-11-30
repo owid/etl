@@ -8,7 +8,7 @@ from owid.datautils import geo
 from structlog import get_logger
 
 from etl.helpers import Names
-from etl.paths import DATA_DIR, REFERENCE_DATASET
+from etl.paths import DATA_DIR
 
 log = get_logger()
 
