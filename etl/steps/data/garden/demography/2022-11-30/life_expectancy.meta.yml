@@ -95,7 +95,7 @@ tables:
     title: Life Expectancy (various sources)
     variables:
       life_expectancy_0:
-        title: life_expectancy_0
+        title: Life expectancy at birth
         short_unit: "years"
         unit: "years"
         description: |
@@ -110,7 +110,7 @@ tables:
           - name: "Riley (2005)"
             url: https://doi.org/10.1111/j.1728-4457.2005.00083.x
       life_expectancy_15:
-        title: life_expectancy_15
+        title: Life expectancy at 15
         short_unit: "years"
         unit: "years"
         description: |
@@ -123,7 +123,7 @@ tables:
           - name: "Human Mortality Database"
             url: https://www.mortality.org/Data/ZippedDataFiles
       life_expectancy_65:
-        title: life_expectancy_65
+        title: Life expectancy at 65
         short_unit: "years"
         unit: "years"
         description: |
@@ -136,7 +136,7 @@ tables:
           - name: "Human Mortality Database"
             url: https://www.mortality.org/Data/ZippedDataFiles
       life_expectancy_80:
-        title: life_expectancy_80
+        title: Life expectancy at 80
         short_unit: "years"
         unit: "years"
         description: |
