@@ -134,24 +134,29 @@ def add_metadata_to_table(tb: Table, only_historical: bool, only_projections: bo
     This is done from scratch or by reading the YAML file. Note that only one table is actually defined.
     The other two (historical and projections) are equivalent with minor changes in title and variable titles/names.
     """
-    if only_historical:
-        short_name = "historical"
-    elif only_projections:
-        short_name = "projection"
+
+    def _get_netadata_cold_start(short_name):
+        return TableMeta(short_name=short_name, title=f"Life Expectancy (various sources) - {short_name.capitalize()}")
+
+    def _get_metadata(tb, short_name):
+        tb.columns = [f"{col}_{short_name[:4]}" for col in tb.columns]
+        tb.update_metadata_from_yaml(N.metadata_path, short_name)
+        for col in tb.columns:
+            tb[col].metadata.title = tb[col].metadata.title + f" ({short_name})"
+        return tb
 
     if COLD_START:
-        if only_projections or only_historical:
-            tb.metadata = TableMeta(
-                short_name=short_name, title=f"Life Expectancy (various sources) - {short_name.capitalize()}"
-            )
+        if only_projections:
+            tb.metadata = _get_netadata_cold_start("projection")
+        elif only_historical:
+            tb.metadata = _get_netadata_cold_start("historical")
         else:
             tb.metadata = TableMeta(short_name=SHORT_NAME, title="Life Expectancy (various sources)")
     else:
-        if only_projections or only_historical:
-            tb.columns = [f"{col}_{short_name[:4]}" for col in tb.columns]
-            tb.update_metadata_from_yaml(N.metadata_path, short_name)
-            for col in tb.columns:
-                tb[col].metadata.title = tb[col].metadata.title + f" ({short_name})"
+        if only_projections:
+            tb = _get_metadata(tb, "projection")
+        elif only_historical:
+            tb = _get_metadata(tb, "historical")
         else:
             tb.update_metadata_from_yaml(N.metadata_path, SHORT_NAME)
     return tb
