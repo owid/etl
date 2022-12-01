@@ -26,15 +26,20 @@ log = get_logger()
 # naming conventions
 N = Names(__file__)
 
-# Dataset
+# short name of new dataset
+SHORT_NAME = N.short_name
+# dataset paths
 GARDEN_WPP_DATASET = DATA_DIR / "garden" / "un" / "2022-07-11" / "un_wpp"
 GARDEN_HMD_DATASET = DATA_DIR / "garden" / "hmd" / "2022-11-04" / "life_tables"
 GARDEN_ZIJDEMAN_DATASET = DATA_DIR / "garden" / "papers" / "2022-11-03" / "zijdeman_et_al_2015"
 GARDEN_RILEY_DATASET = DATA_DIR / "garden" / "papers" / "2022-11-04" / "riley_2005"
-# Other constants
+# index column names: this is used when setting indices in dataframes
 COLUMNS_IDX = ["country", "year"]
+# age groups considered besides at 0 (at birth)
 AGES_EXTRA = ["15", "65", "80"]
+# year when UN WPP data starts
 YEAR_WPP_START = 1950
+# year separating historical and projection data in UN WPP dataset.
 YEAR_HIST_PROJ = 2022
 # Versioning
 VERSION = "2022-11-30"
@@ -53,16 +58,16 @@ def run(dest_dir: str) -> None:
     ds_hmd = Dataset(GARDEN_HMD_DATASET)
     ds_zij = Dataset(GARDEN_ZIJDEMAN_DATASET)
     ds_ril = Dataset(GARDEN_RILEY_DATASET)
+    # group datasets into single list
     all_ds = [ds_wpp, ds_hmd, ds_zij, ds_ril]
 
-    # create table
-    log.info("life_expectancy.tb")
+    # create tables (all-years, historical and projections)
+    log.info("life_expectancy: create table with all-years data")
     tb = make_table(ds_wpp, ds_hmd, ds_zij, ds_ril)
-    log.info("life_expectancy.tb_historical")
+    log.info("life_expectancy: create table with historical data")
     tb_historical = make_table(ds_wpp, ds_hmd, ds_zij, ds_ril, only_historical=True)
-    log.info("life_expectancy.tb_projection")
+    log.info("life_expectancy: create table with projection data")
     tb_projection = make_table(ds_wpp, ds_hmd, ds_zij, ds_ril, only_projections=True)
-    # tb.update_metadata_from_yaml(N.metadata_path, "life_expectancy")
 
     # create dataset
     ds_garden = Dataset.create_empty(dest_dir)
@@ -72,6 +77,7 @@ def run(dest_dir: str) -> None:
         ds_garden.metadata.update_from_yaml(N.metadata_path)
 
     # add tables to dataset
+    log.info("life_expectancy: add tables to dataset")
     ds_garden.add(tb)
     ds_garden.save()
     ds_garden.add(tb_historical)
@@ -128,32 +134,32 @@ def add_metadata_to_table(tb: Table, only_historical: bool, only_projections: bo
     This is done from scratch or by reading the YAML file. Note that only one table is actually defined.
     The other two (historical and projections) are equivalent with minor changes in title and variable titles/names.
     """
+    if only_historical:
+        short_name = "historical"
+    elif only_projections:
+        short_name = "projection"
+
     if COLD_START:
-        if only_historical:
-            tb.metadata = TableMeta(short_name="historical", title="Life Expectancy (various sources) - Historical")
-        elif only_projections:
-            tb.metadata = TableMeta(short_name="projection", title="Life Expectancy (various sources) - Projection")
+        if only_projections or only_historical:
+            tb.metadata = TableMeta(
+                short_name=short_name, title=f"Life Expectancy (various sources) - {short_name.capitalize()}"
+            )
         else:
-            tb.metadata = TableMeta(short_name="life_expectancy", title="Life Expectancy (various sources)")
+            tb.metadata = TableMeta(short_name=SHORT_NAME, title="Life Expectancy (various sources)")
     else:
-        if only_historical:
-            tb.columns = [f"{col}_hist" for col in tb.columns]
-            tb.update_metadata_from_yaml(N.metadata_path, "historical")
+        if only_projections or only_historical:
+            tb.columns = [f"{col}_{short_name[:4]}" for col in tb.columns]
+            tb.update_metadata_from_yaml(N.metadata_path, short_name)
             for col in tb.columns:
-                tb[col].metadata.title = tb[col].metadata.title + " (historical)"
-        elif only_projections:
-            tb.columns = [f"{col}_proj" for col in tb.columns]
-            tb.update_metadata_from_yaml(N.metadata_path, "projection")
-            for col in tb.columns:
-                tb[col].metadata.title = tb[col].metadata.title + " (projection)"
+                tb[col].metadata.title = tb[col].metadata.title + f" ({short_name})"
         else:
-            tb.update_metadata_from_yaml(N.metadata_path, "life_expectancy")
+            tb.update_metadata_from_yaml(N.metadata_path, SHORT_NAME)
     return tb
 
 
 def make_metadata(all_ds: List[Dataset]) -> DatasetMeta:
     """Create metadata for the dataset."""
-    log.info("life_expectancy.make_metadata")
+    log.info("life_expectancy: creating metadata")
     # description
     description = "------\n\n"
     for ds in all_ds:
@@ -184,9 +190,11 @@ def make_metadata(all_ds: List[Dataset]) -> DatasetMeta:
 def load_wpp(ds: Dataset) -> pd.DataFrame:
     """Load data from WPP 2022 dataset.
 
+    It loads medium variant for future projections.
+
     Output has the following columns: country, year, life_expectancy_0, life_expectancy_15, life_expectancy_65, life_expectancy_80.
     """
-    log.info("life_expectancy.load_wpp")
+    log.info("life_expectancy: loading wpp data")
     # Load table
     df = ds["un_wpp"]
     df = df.reset_index()
@@ -212,7 +220,7 @@ def load_hmd(ds: Dataset) -> pd.DataFrame:
 
     Output has the following columns: country, year, life_expectancy_15, life_expectancy_65, life_expectancy_80.
     """
-    log.info("life_expectancy.load_hmd")
+    log.info("life_expectancy: loading hmd data")
     df = ds["period_1x1"]
     df = df.reset_index()
     # Filter
@@ -238,7 +246,7 @@ def load_zijdeman(ds: Dataset) -> pd.DataFrame:
 
     Output has the following columns: country, year, life_expectancy_0.
     """
-    log.info("life_expectancy.load_zijdeman")
+    log.info("life_expectancy: loading zijdeman 2015 data")
     df = ds["zijdeman_et_al_2015"].reset_index()
     # Filter
     df = df[df["year"] < YEAR_WPP_START]
@@ -257,7 +265,7 @@ def load_riley(ds: Dataset) -> pd.DataFrame:
 
     Output has the following columns: country, year, life_expectancy_0.
     """
-    log.info("life_expectancy.load_riley")
+    log.info("life_expectancy: loading riley 2005 data")
     df = ds["riley_2005"].reset_index()
     # Filter
     df = df[df["year"] < YEAR_WPP_START]
@@ -277,7 +285,7 @@ def merge_dfs(df_wpp: pd.DataFrame, df_hmd: pd.DataFrame, df_zij: pd.DataFrame, 
     - Life expectancy at birth is taken from UN WPP, Zijdeman et al. (2015) and Riley (2005) datasets.
     - Life expectancy at X is taken from UN WPP and HMD datasets.
     """
-    log.info("life_expectancy.merge_dfs")
+    log.info("life_expectancy: merging dataframes")
     # Merge with HMD
     df = pd.concat([df_wpp, df_hmd], ignore_index=True)
     # # Merge with Zijdeman et al. (2015)
