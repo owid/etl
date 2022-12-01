@@ -90,6 +90,13 @@ def make_table(
     only_historical: bool = False,
     only_projections: bool = False,
 ) -> Table:
+    """Create table.
+
+    Joins all different sources into a single dataframe.
+
+    By default, it creates a table with all years. Use `only_historical` and `only_projections` to create tables with
+    only historical data or only projections, respectively.
+    """
     log.info("life_expectancy.make_table")
     # Build DataFrames
     df_wpp = load_wpp(ds_wpp)
@@ -118,7 +125,8 @@ def make_table(
 def add_metadata_to_table(tb: Table, only_historical: bool, only_projections: bool) -> Table:
     """Add metadata to table.
 
-    This is done from scratch or by reading the YAML file. Note that only one table is actually defined. The other two (historical and projections) are equivalent with minor changes in title and variable titles/names.
+    This is done from scratch or by reading the YAML file. Note that only one table is actually defined.
+    The other two (historical and projections) are equivalent with minor changes in title and variable titles/names.
     """
     if COLD_START:
         if only_historical:
@@ -279,7 +287,7 @@ def merge_dfs(df_wpp: pd.DataFrame, df_hmd: pd.DataFrame, df_zij: pd.DataFrame, 
     df = df.merge(df_zij, how="outer", on=COLUMNS_IDX, suffixes=("", suffix))
     df = df.assign(life_expectancy_0=df[column_og].fillna(df[column_extra])).drop(columns=[column_extra])
 
-    # # Merge with Riley (2005)
+    # Merge with Riley (2005)
     assert not set(df.loc[df["year"] <= df_ril["year"].max(), "country"]).intersection(
         set(df_ril["country"])
     ), "There is some overlap between the dataset and Riley (2005) dataset"
@@ -291,7 +299,10 @@ def merge_dfs(df_wpp: pd.DataFrame, df_hmd: pd.DataFrame, df_zij: pd.DataFrame, 
     df = df.dropna(how="all", axis=0)
 
     # Rounding resolution
+    # We round to 2 decimals
     rounding = 1e2
     df = ((df * rounding).round().fillna(-1).astype(int) / rounding).astype("float")
-    df[df.life_expectancy_15 < 0] = pd.NA
+    for col in df.columns:
+        if col not in COLUMNS_IDX:
+            df.loc[df[col] < 0, col] = pd.NA
     return df
