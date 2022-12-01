@@ -75,8 +75,9 @@ COLUMNS = {
     "affected": "affected",
     "homeless": "homeless",
     "total_affected": "total_affected",
-    "reconstructed_costs_adjusted": "reconstructed_costs_adjusted",
+    "reconstruction_costs_adjusted": "reconstruction_costs_adjusted",
     "insured_damages_adjusted": "insured_damages_adjusted",
+    "total_damages_adjusted": "total_damages_adjusted",
     "start_year": "start_year",
     "start_month": "start_month",
     "start_day": "start_day",
@@ -92,8 +93,9 @@ IMPACT_COLUMNS = [
     "affected",
     "homeless",
     "total_affected",
-    "reconstructed_costs_adjusted",
+    "reconstruction_costs_adjusted",
     "insured_damages_adjusted",
+    "total_damages_adjusted",
 ]
 
 # List issues found in the data:
@@ -199,8 +201,9 @@ def fix_faulty_dtypes(df: pd.DataFrame) -> pd.DataFrame:
         "affected",
         "homeless",
         "total_affected",
-        "reconstructed_costs_adjusted",
+        "reconstruction_costs_adjusted",
         "insured_damages_adjusted",
+        "total_damages_adjusted",
     ]
     df = df.astype({column: int for column in int_columns})
 
@@ -441,8 +444,9 @@ def sanity_checks_on_outputs(df: pd.DataFrame, is_decade: bool) -> None:
         "affected",
         "homeless",
         "total_affected",
-        "reconstructed_costs_adjusted",
+        "reconstruction_costs_adjusted",
         "insured_damages_adjusted",
+        "total_damages_adjusted",
         "n_events",
     ]
     error = "There are unexpected nans in data."
@@ -477,8 +481,9 @@ def sanity_checks_on_outputs(df: pd.DataFrame, is_decade: bool) -> None:
             "affected",
             "homeless",
             "total_affected",
-            "reconstructed_costs_adjusted",
+            "reconstruction_costs_adjusted",
             "insured_damages_adjusted",
+            "total_damages_adjusted",
         ]
         error = f"Aggregate for the World in {year_to_check} does not coincide with the sum of all countries."
         assert all_disasters_for_world[cols_to_check].equals(all_disasters_check[cols_to_check]), error
@@ -503,6 +508,7 @@ def sanity_checks_on_outputs(df: pd.DataFrame, is_decade: bool) -> None:
 
 
 def run(dest_dir: str) -> None:
+
     #
     # Load data.
     #
@@ -587,16 +593,21 @@ def run(dest_dir: str) -> None:
     df = df.set_index(["country", "year", "type"], verify_integrity=True).sort_index().sort_index()
     decade_df = decade_df.set_index(["country", "year", "type"], verify_integrity=True).sort_index().sort_index()
 
+    # # Create wide tables.
+    # table_wide = table.reset_index().pivot(index=["country", "year"], columns="type")
+    # [column[0] + '_' + column[1] for column in table_wide.columns.tolist()]
+
     #
     # Save outputs.
     #
     # Create new Garden dataset.
     ds_garden = Dataset.create_empty(dest_dir)
+    ds_garden.metadata = ds_meadow.metadata
     # Ensure all column names are snake, lower case.
     tb_garden = underscore_table(Table(df))
     decade_tb_garden = underscore_table(Table(decade_df))
     # Get dataset metadata from yaml file.
-    ds_garden.metadata.update_from_yaml(N.metadata_path)
+    ds_garden.metadata.update_from_yaml(N.metadata_path, if_source_exists="replace")
     # Get tables metadata from yaml file.
     tb_garden.update_metadata_from_yaml(N.metadata_path, "natural_disasters_yearly")
     decade_tb_garden.update_metadata_from_yaml(N.metadata_path, "natural_disasters_decadal")
