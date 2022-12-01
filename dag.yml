@@ -205,6 +205,7 @@ steps:
     - data://garden/owid/latest/key_indicators
     - data://garden/wb/2021-07-01/wb_income
     - data://garden/reference
+    - data://garden/worldbank_wdi/2022-05-26/wdi
 
   # Country profiles - overview
   data://garden/country_profile/2022/overview:

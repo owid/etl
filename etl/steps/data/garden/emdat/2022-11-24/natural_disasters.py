@@ -42,6 +42,7 @@ from etl.paths import DATA_DIR
 
 # Define inputs.
 MEADOW_VERSION = "2022-11-24"
+WDI_DATASET_PATH = DATA_DIR / "garden/worldbank_wdi/2022-05-26/wdi"
 # Define outputs.
 VERSION = MEADOW_VERSION
 
@@ -75,9 +76,9 @@ COLUMNS = {
     "affected": "affected",
     "homeless": "homeless",
     "total_affected": "total_affected",
-    "reconstruction_costs_adjusted": "reconstruction_costs_adjusted",
-    "insured_damages_adjusted": "insured_damages_adjusted",
-    "total_damages_adjusted": "total_damages_adjusted",
+    "reconstruction_costs": "reconstruction_costs",
+    "insured_damages": "insured_damages",
+    "total_damages": "total_damages",
     "start_year": "start_year",
     "start_month": "start_month",
     "start_day": "start_day",
@@ -93,10 +94,13 @@ IMPACT_COLUMNS = [
     "affected",
     "homeless",
     "total_affected",
-    "reconstruction_costs_adjusted",
-    "insured_damages_adjusted",
-    "total_damages_adjusted",
+    "reconstruction_costs",
+    "insured_damages",
+    "total_damages",
 ]
+
+# Variables related to costs, measured in thousand current US$ (not adjusted for inflation or PPP).
+COST_VARIABLES = ["reconstruction_costs", "insured_damages", "total_damages"]
 
 # List issues found in the data:
 # Each element is a tuple with a dictionary that fully identifies the wrong row,
@@ -192,20 +196,16 @@ def fix_faulty_dtypes(df: pd.DataFrame) -> pd.DataFrame:
     """Fix an issue related to column dtypes.
 
     Dividing a UInt32 by float64 results in a faulty Float64 that does not handle nans properly (which may be a bug:
-    https://github.com/pandas-dev/pandas/issues/49818). To avoid this, convert all UInt32 into standard int.
+    https://github.com/pandas-dev/pandas/issues/49818).
+    To avoid this, there are various options:
+    1. Convert all UInt32 into standard int before dividing by a float. But, if there are nans, int dtype is not valid.
+    2. Convert all floats into Float64 before dividing.
+    3. Convert all Float64 into float, after dividing.
+
+    We adopt option 3.
 
     """
-    int_columns = [
-        "total_dead",
-        "injured",
-        "affected",
-        "homeless",
-        "total_affected",
-        "reconstruction_costs_adjusted",
-        "insured_damages_adjusted",
-        "total_damages_adjusted",
-    ]
-    df = df.astype({column: int for column in int_columns})
+    df = df.astype({column: float for column in df[df.columns[df.dtypes == "Float64"]]})
 
     return df
 
@@ -444,9 +444,9 @@ def sanity_checks_on_outputs(df: pd.DataFrame, is_decade: bool) -> None:
         "affected",
         "homeless",
         "total_affected",
-        "reconstruction_costs_adjusted",
-        "insured_damages_adjusted",
-        "total_damages_adjusted",
+        "reconstruction_costs",
+        "insured_damages",
+        "total_damages",
         "n_events",
     ]
     error = "There are unexpected nans in data."
@@ -481,9 +481,9 @@ def sanity_checks_on_outputs(df: pd.DataFrame, is_decade: bool) -> None:
             "affected",
             "homeless",
             "total_affected",
-            "reconstruction_costs_adjusted",
-            "insured_damages_adjusted",
-            "total_damages_adjusted",
+            "reconstruction_costs",
+            "insured_damages",
+            "total_damages",
         ]
         error = f"Aggregate for the World in {year_to_check} does not coincide with the sum of all countries."
         assert all_disasters_for_world[cols_to_check].equals(all_disasters_check[cols_to_check]), error
@@ -508,16 +508,22 @@ def sanity_checks_on_outputs(df: pd.DataFrame, is_decade: bool) -> None:
 
 
 def run(dest_dir: str) -> None:
-
     #
     # Load data.
     #
-    # Load dataset from meadow.
+    # Load natural disasters dataset from meadow.
     ds_meadow = Dataset(DATA_DIR / f"meadow/emdat/{MEADOW_VERSION}/natural_disasters")
     # Get table from dataset.
     tb_meadow = ds_meadow["natural_disasters"]
     # Create a dataframe from the table.
     df = pd.DataFrame(tb_meadow)
+
+    # Load GDP from WorldBank WDI dataset.
+    ds_gdp = Dataset(WDI_DATASET_PATH)
+    # Load main table from WDI dataset, and select variable corresponding to GDP (in current US$).
+    tb_gdp = ds_gdp["wdi"][["ny_gdp_mktp_cd"]]
+    # Create a dataframe with GDP.
+    df_gdp = pd.DataFrame(tb_gdp).reset_index()
 
     #
     # Process data.
@@ -537,6 +543,18 @@ def run(dest_dir: str) -> None:
     # Harmonize country names.
     df = harmonize_countries(df=df)
 
+    # Combine natural disasters with GDP data.
+    df = pd.merge(df, df_gdp.rename(columns={"ny_gdp_mktp_cd": "gdp"}), on=["country", "year"], how="left")
+    # Prepare cost variables.
+    for variable in COST_VARIABLES:
+        # Convert costs (given in '000 US$, aka thousand current US$) into current US$.
+        df[variable] *= 1000
+        # Create variables of costs (in current US$) per GDP (in current US$).
+        df[f"{variable}_per_gdp"] = df[variable] / df["gdp"]
+
+    # Fix issue with faulty dtypes (see more details in the function's documentation).
+    df = fix_faulty_dtypes(df=df)
+
     # Calculate start and end dates of disasters.
     df = calculate_start_and_end_dates(df=df)
 
@@ -553,9 +571,6 @@ def run(dest_dir: str) -> None:
     )
     df = df.groupby(["country", "year", "type"], observed=True).sum(numeric_only=True, min_count=1).reset_index()
     df = pd.merge(df, counts, on=["country", "year", "type"], how="left")
-
-    # Fix issue with faulty dtypes (see more details in the function's documentation).
-    df = fix_faulty_dtypes(df=df)
 
     # Add a new category (or "type") corresponding to the total of all natural disasters.
     all_disasters = (
@@ -577,8 +592,17 @@ def run(dest_dir: str) -> None:
     df = add_population_including_historical_regions(df=df)
 
     # Add rates per 100,000 people.
-    for column in df.drop(columns=["country", "year", "type", "population"]).columns:
+    variables_for_100k_rate = [
+        column
+        for column in df.columns
+        if "gdp" not in column
+        if column not in ["country", "year", "type", "population", "gdp"]
+    ]
+    for column in variables_for_100k_rate:
         df[f"{column}_per_100k_people"] = df[column] * 1e5 / df["population"]
+
+    # Fix issue with faulty dtypes (see more details in the function's documentation).
+    df = fix_faulty_dtypes(df=df)
 
     # Create data aggregated (using a simple mean) in intervales of 10 years.
     # For example (as explained in the footer of the natural disasters explorer), the value for 1900 of any column
