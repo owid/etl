@@ -18,20 +18,20 @@ tables:
     variables:
       rgdpe:
         title: Expenditure-side real GDP at chained PPPs
-        unit: Million international-$ at 2017 prices
-        short_unit: Million $
+        unit: million international-$ at 2017 prices
+        short_unit: million $
         display:
            name: Total energy consumption
       rgdpo:
         title: Output-side real GDP at chained PPPs
-        unit: Million international-$ at 2017 prices
-        short_unit: Million $
+        unit: million international-$ at 2017 prices
+        short_unit: million $
       pop:
         title: Population
-        unit: Million people
+        unit: million people
       emp:
         title: Number of persons engaged
-        unit: Million people
+        unit: million people
       avh:
         title: Average annual hours worked by persons engaged
         unit: Hours per worker
@@ -40,24 +40,24 @@ tables:
         unit: 
       ccon:
         title: Real consumption of households and government, at current PPPs
-        unit: Million international-$ at 2017 prices
-        short_unit: Million $
+        unit: million international-$ at 2017 prices
+        short_unit: million $
       cda:
         title: Real domestic absorption, (real consumption plus investment), at current PPPs
-        unit: Million international-$ at 2017 prices
-        short_unit: Million $
+        unit: million international-$ at 2017 prices
+        short_unit: million $
       cgdpe:
         title: Expenditure-side real GDP at current PPPs
-        unit: Million international-$ at 2017 prices
-        short_unit: Million $
+        unit: million international-$ at 2017 prices
+        short_unit: million $
       cgdpo:
         title: Output-side real GDP at current PPPs
-        unit: Million international-$ at 2017 prices
-        short_unit: Million $
+        unit: million international-$ at 2017 prices
+        short_unit: million $
       cn:
         title: Capital stock at current PPPs
-        unit: Million international-$ at 2017 prices
-        short_unit: Million $
+        unit: million international-$ at 2017 prices
+        short_unit: million $
       ck:
         title: Capital services levels at current PPPs (USA=1)
         unit:   
@@ -69,20 +69,20 @@ tables:
         unit:    
       rgdpna:
         title: Real GDP at constant 2017 national prices
-        unit: Million international-$ at 2017 prices
-        short_unit: Million $
+        unit: million international-$ at 2017 prices
+        short_unit: million $
       rconna:
         title: Real consumption at constant 2017 national prices
-        unit: Million international-$ at 2017 prices
-        short_unit: Million $
+        unit: million international-$ at 2017 prices
+        short_unit: million $
       rdana:
         title: Real domestic absorption at constant 2017 national prices
-        unit: Million international-$ at 2017 prices
-        short_unit: Million $
+        unit: million international-$ at 2017 prices
+        short_unit: million $
       rnna:
         title: Capital stock at constant 2017 national prices
-        unit: Million international-$ at 2017 prices
-        short_unit: Million $
+        unit: million international-$ at 2017 prices
+        short_unit: million $
       rkna:
         title: Capital services at constant 2017 national prices (2017=1)
         unit:    
