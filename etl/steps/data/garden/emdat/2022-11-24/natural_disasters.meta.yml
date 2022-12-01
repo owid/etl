@@ -3,7 +3,13 @@ dataset:
   short_name: natural_disasters
   title: Natural disasters
   description: |
-    The data presented here includes all categories classified as "natural disasters" (distinguished from technological disasters, such as oil spills and industrial accidents). This includes those from animal accidents, droughts, earthquakes, epidemics, extreme temperatures, floods, fogs, glacial lake outbursts, impacts, insect infestations, landslide, dry mass movements, storms, volcanic activity, and wildfires. EM-DAT defines the following variables as:
+    The data presented here includes all categories classified as "natural disasters" (distinguished from technological disasters, such as oil spills and industrial accidents). This includes those from animal accidents, droughts, earthquakes, epidemics, extreme temperatures, floods, fogs, glacial lake outbursts, impacts, insect infestations, landslide, dry mass movements, storms, volcanic activity, and wildfires.
+    
+    Disaster-related deaths from EM-DAT have been normalized by Our World in Data to global population size based on <a href="https://ourworldindata.org/population-sources">different sources</a>. This provides data in terms of cases per 100,000 people.
+
+    Our World in Data has also calculated economic damage metrics adjusted for gross domestic product (GDP), using GDP data from <a href="http://data.worldbank.org/data-catalog/world-development-indicators">the World Bank's World Development Indicators</a>.
+
+    EM-DAT defines the following variables as:
     
     Affected: People requiring immediate assistance during a period of emergency, i.e. requiring basic survival needs such as food, water, shelter, sanitation and immediate medical assistance.
     
