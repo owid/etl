@@ -56,8 +56,11 @@ def run(dest_dir: str) -> None:
     all_ds = [ds_wpp, ds_hmd, ds_zij, ds_ril]
 
     # create table
+    log.info("life_expectancy.tb")
     tb = make_table(ds_wpp, ds_hmd, ds_zij, ds_ril)
+    log.info("life_expectancy.tb_historical")
     tb_historical = make_table(ds_wpp, ds_hmd, ds_zij, ds_ril, only_historical=True)
+    log.info("life_expectancy.tb_projection")
     tb_projection = make_table(ds_wpp, ds_hmd, ds_zij, ds_ril, only_projections=True)
     # tb.update_metadata_from_yaml(N.metadata_path, "life_expectancy")
 
@@ -115,7 +118,7 @@ def make_table(
 def add_metadata_to_table(tb: Table, only_historical: bool, only_projections: bool) -> Table:
     """Add metadata to table.
 
-    This is done from scratch or by reading the YAML file. Note that only one table is actually defined. The other two (historical and projections) are equivalent with minor changes in title and variable titles.
+    This is done from scratch or by reading the YAML file. Note that only one table is actually defined. The other two (historical and projections) are equivalent with minor changes in title and variable titles/names.
     """
     if COLD_START:
         if only_historical:
@@ -126,10 +129,12 @@ def add_metadata_to_table(tb: Table, only_historical: bool, only_projections: bo
             tb.metadata = TableMeta(short_name="life_expectancy", title="Life Expectancy (various sources)")
     else:
         if only_historical:
+            tb.columns = [f"{col}_hist" for col in tb.columns]
             tb.update_metadata_from_yaml(N.metadata_path, "historical")
             for col in tb.columns:
                 tb[col].metadata.title = tb[col].metadata.title + " (historical)"
         elif only_projections:
+            tb.columns = [f"{col}_proj" for col in tb.columns]
             tb.update_metadata_from_yaml(N.metadata_path, "projection")
             for col in tb.columns:
                 tb[col].metadata.title = tb[col].metadata.title + " (projection)"
@@ -146,8 +151,8 @@ def make_metadata(all_ds: List[Dataset]) -> DatasetMeta:
     for ds in all_ds:
         description += f"{ds.metadata.title}:\n\n{ds.metadata.description}\n\n------\n\n"
     description = (
-        "This dataset has been created using multiple sources. We use UN WPP for data since 1950. Prior to that, other"
-        " sources are combined.\n\n"
+        "This dataset has been created using multiple sources. We use UN WPP for data since 1950 (estimates and medium"
+        " variant). Prior to that, other sources are combined.\n\n"
         + description
     )
 
@@ -290,5 +295,4 @@ def merge_dfs(df_wpp: pd.DataFrame, df_hmd: pd.DataFrame, df_zij: pd.DataFrame, 
     rounding = 1e2
     df = ((df * rounding).round().fillna(-1).astype(int) / rounding).astype("float")
     df[df.life_expectancy_15 < 0] = pd.NA
-
     return df

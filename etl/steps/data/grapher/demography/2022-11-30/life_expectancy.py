@@ -9,11 +9,15 @@ def run(dest_dir: str) -> None:
     # get dataset
     dataset = catalog.Dataset.create_empty(dest_dir, N.garden_dataset.metadata)
 
-    # get table
-    table = N.garden_dataset["life_expectancy"]
+    # get tables
+    tb = N.garden_dataset["life_expectancy"]
+    tb_historical = N.garden_dataset["historical"]
+    tb_projection = N.garden_dataset["projection"]
 
-    # add table
-    dataset.add(table)
+    # add tables
+    dataset.add(tb)
+    dataset.add(tb_historical)
+    dataset.add(tb_projection)
 
     # save table
     dataset.save()

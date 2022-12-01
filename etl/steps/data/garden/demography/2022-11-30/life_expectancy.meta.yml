@@ -4,7 +4,7 @@ dataset:
   title: Life Expectancy (various sources)
   description:
     "This dataset has been created using multiple sources. We use UN WPP\
-    \ for data since 1950. Prior to that, other sources are combined.\n\n------\n\n\
+    \ for data since 1950 (estimates and medium variant). Prior to that, other sources are combined.\n\n------\n\n\
     World Population Prospects - UN (2022):\n\nWorld Population Prospects 2022 is\
     \ the 27th edition of the official estimates and projections of the global population\
     \ that have been published by the United Nations since 1951. The estimates are\
@@ -91,10 +91,10 @@ dataset:
       publication_date: "2005-10-21"
       publication_year: 2005
 tables:
-  life_expectancy: &table
+  life_expectancy:
     title: Life Expectancy (various sources)
     variables:
-      life_expectancy_0:
+      life_expectancy_0: &l0
         title: Life expectancy at birth
         short_unit: "years"
         unit: "years"
@@ -109,7 +109,7 @@ tables:
             url: https://clio-infra.eu/Indicators/LifeExpectancyatBirthTotal.html
           - name: "Riley (2005)"
             url: https://doi.org/10.1111/j.1728-4457.2005.00083.x
-      life_expectancy_15:
+      life_expectancy_15: &l15
         title: Life expectancy at 15
         short_unit: "years"
         unit: "years"
@@ -122,7 +122,7 @@ tables:
             url: https://population.un.org/wpp/Download/
           - name: "Human Mortality Database"
             url: https://www.mortality.org/Data/ZippedDataFiles
-      life_expectancy_65:
+      life_expectancy_65: &l65
         title: Life expectancy at 65
         short_unit: "years"
         unit: "years"
@@ -135,7 +135,7 @@ tables:
             url: https://population.un.org/wpp/Download/
           - name: "Human Mortality Database"
             url: https://www.mortality.org/Data/ZippedDataFiles
-      life_expectancy_80:
+      life_expectancy_80: &l80
         title: Life expectancy at 80
         short_unit: "years"
         unit: "years"
@@ -148,5 +148,17 @@ tables:
             url: https://population.un.org/wpp/Download/
           - name: "Human Mortality Database"
             url: https://www.mortality.org/Data/ZippedDataFiles
-  historical: *table
-  projection: *table
+  historical:
+    title: Life Expectancy (various sources) - Historical
+    variables:
+      life_expectancy_0_hist: *l0
+      life_expectancy_15_hist: *l15
+      life_expectancy_65_hist: *l65
+      life_expectancy_80_hist: *l80
+  projection:
+    title: Life Expectancy (various sources) - Projection
+    variables:
+      life_expectancy_0_proj: *l0
+      life_expectancy_15_proj: *l15
+      life_expectancy_65_proj: *l65
+      life_expectancy_80_proj: *l80
