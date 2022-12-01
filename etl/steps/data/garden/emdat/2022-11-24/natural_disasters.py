@@ -1,21 +1,20 @@
 """Process and harmonize EM-DAT natural disasters dataset.
 
 NOTES:
-1. We don't have population for historical regions (e.g. East Germany, or North Yemen), we are temporarily replacing them
-with the population of the successor countries.
+1. We don't have population for historical regions (e.g. East Germany, or North Yemen).
 2. Some issues in the data were detected (and will be reported to EM-DAT). Some of those issues could not be fixed.
    Namely, some disasters affect, in one year, a number of people that is larger than the entire population.
    For example, the number of people affected by one drought event in Botswana 1981 is 1037300 while population
    was 982753. I suppose this could be due to inaccuracies in the estimates of affected people or in the population
    (which may not include people living temporarily in the country or visitors).
 3. There are some potential issues that can't be fixed:
-   * On the one hand, we may be underestimating the real impacts of events. The reason is that the original data does not
-   include zeros. Therefore we can't know if the impacts of a certain event were zero, or unknown. Our only option is to
-   treat missing data as zeros.
+   * On the one hand, we may be underestimating the real impacts of events. The reason is that the original data does
+   not include zeros. Therefore we can't know if the impacts of a certain event were zero, or unknown. Our only option
+   is to treat missing data as zeros.
    * On the other hand, we may overestimate the real impacts on a given country-year, because events may affect the same
    people multiple times during the same year. This can't be fixed, but I suppose it's not common.
-   * Additionally, it is understandable that some values are rough estimates, that some events are not recorded, and that
-   there may be duplicated events.
+   * Additionally, it is understandable that some values are rough estimates, that some events are not recorded, and
+   that there may be duplicated events.
 
 """
 
@@ -26,12 +25,10 @@ import pandas as pd
 from owid.catalog import Dataset, Table
 from owid.catalog.utils import underscore_table
 from owid.datautils import geo
-
-from etl.helpers import Names
-from etl.paths import DATA_DIR
-
 from shared import (
+    BUILD_POPULATION_FOR_HISTORICAL_COUNTRIES,
     CURRENT_DIR,
+    EXPECTED_COUNTRIES_WITHOUT_POPULATION,
     HISTORIC_TO_CURRENT_REGION,
     REGIONS,
     add_population,
@@ -39,6 +36,9 @@ from shared import (
     correct_data_points,
     get_last_day_of_month,
 )
+
+from etl.helpers import Names
+from etl.paths import DATA_DIR
 
 # Define inputs.
 MEADOW_VERSION = "2022-11-24"
@@ -96,8 +96,6 @@ IMPACT_COLUMNS = [
     "insured_damages_adjusted",
 ]
 
-# +
-# TODO: Contact emdat about wrong data points.
 # List issues found in the data:
 # Each element is a tuple with a dictionary that fully identifies the wrong row,
 # and another dictionary that specifies the changes.
@@ -144,13 +142,11 @@ DATA_CORRECTIONS = [
 # Saint Lucia         |   2010 | Storm   |     181000 |          0 | 170950           |
 # Samoa               |   1990 | Storm   |     170000 |      25000 | 168202           |
 # Tonga               |   1982 | Storm   |     100000 |      46500 |  96951           |
-
 # Finally, there are events registered on the same year for both a historical region and one of its
 # successor countries (we are ignoring this issue).
 # 1902: {'Azerbaijan', 'USSR'},
 # 1990: {'Tajikistan', 'USSR'},
 # 1991: {'Georgia', 'USSR'},
-# -
 
 # Get naming conventions.
 N = Names(str(CURRENT_DIR / "natural_disasters"))
@@ -358,6 +354,39 @@ def calculate_yearly_impacts(df: pd.DataFrame) -> pd.DataFrame:
     return yearly_df
 
 
+def add_population_including_historical_regions(df: pd.DataFrame) -> pd.DataFrame:
+    """Add population to the main dataframe, including the population of historical regions.
+
+    For historical regions for which we do not have population data, we construct their population by adding the
+    population of their successor countries. This is done for countries in BUILD_POPULATION_FOR_HISTORICAL_COUNTRIES,
+    using the definition of regions in HISTORIC_TO_CURRENT_REGION.
+    For certain countries we have population data only for certain years (e.g. 1900, 1910, but not the years in
+    between). In those cases we interpolate population data.
+
+    """
+    df = df.copy()
+
+    # Historical regions whose population we want to include.
+    historical_regions = {
+        region: HISTORIC_TO_CURRENT_REGION[region]
+        for region in HISTORIC_TO_CURRENT_REGION
+        if region in BUILD_POPULATION_FOR_HISTORICAL_COUNTRIES
+    }
+    # All regions whose population we want to include (i.e. continents and historical countries).
+    regions = dict(**REGIONS, **historical_regions)
+
+    # Add population to main dataframe.
+    df = add_population(
+        df=df,
+        interpolate_missing_population=True,
+        warn_on_missing_countries=False,
+        regions=regions,
+        expected_countries_without_population=EXPECTED_COUNTRIES_WITHOUT_POPULATION,
+    )
+
+    return df
+
+
 def create_decade_data(df: pd.DataFrame) -> pd.DataFrame:
     """Create data of average impacts over periods of 10 years."""
     decade_df = df.copy()
@@ -403,8 +432,26 @@ def sanity_checks_on_outputs(df: pd.DataFrame, is_decade: bool) -> None:
     )
     assert set(df["type"]) == set(EXPECTED_DISASTER_TYPES + ["All disasters"]), error
 
+    columns_that_should_not_have_nans = [
+        "country",
+        "year",
+        "type",
+        "total_dead",
+        "injured",
+        "affected",
+        "homeless",
+        "total_affected",
+        "reconstructed_costs_adjusted",
+        "insured_damages_adjusted",
+        "n_events",
+    ]
     error = "There are unexpected nans in data."
-    assert df.notnull().all(axis=1).all(), error
+    assert df[columns_that_should_not_have_nans].notnull().all(axis=1).all(), error
+    # The following columns may have nans on countries for which we expect to have no population data.
+    columns_that_may_have_nans = [column for column in df.columns if column not in columns_that_should_not_have_nans]
+    assert set(df[df[columns_that_may_have_nans].isnull().any(axis=1)]["country"]) == set(
+        EXPECTED_COUNTRIES_WITHOUT_POPULATION
+    )
 
     # Sanity checks only for yearly data.
     if not is_decade:
@@ -451,7 +498,8 @@ def sanity_checks_on_outputs(df: pd.DataFrame, is_decade: bool) -> None:
         ]
         error = "One disaster should not be able to cause the death of the entire population of a country in one year."
         for column in columns_to_inspect:
-            assert (df[column] <= df["population"]).all(), error
+            informed_rows = df[column].notnull() & df["population"].notnull()
+            assert (df[informed_rows][column] <= df[informed_rows]["population"]).all(), error
 
 
 def run(dest_dir: str) -> None:
@@ -480,7 +528,7 @@ def run(dest_dir: str) -> None:
     # Sanity checks.
     sanity_checks_on_inputs(df=df)
 
-    # Harmonize country names and solve some issues with regions.
+    # Harmonize country names.
     df = harmonize_countries(df=df)
 
     # Calculate start and end dates of disasters.
@@ -490,8 +538,13 @@ def run(dest_dir: str) -> None:
     df = calculate_yearly_impacts(df=df)
 
     # We are not interested in each individual event, but the number of events of each kind and their impacts.
-    counts = df.reset_index().groupby(["country", "year", "type"], observed=True).\
-        agg({"index": "count"}).reset_index().rename(columns={"index": "n_events"})
+    counts = (
+        df.reset_index()
+        .groupby(["country", "year", "type"], observed=True)
+        .agg({"index": "count"})
+        .reset_index()
+        .rename(columns={"index": "n_events"})
+    )
     df = df.groupby(["country", "year", "type"], observed=True).sum(numeric_only=True, min_count=1).reset_index()
     df = pd.merge(df, counts, on=["country", "year", "type"], how="left")
 
@@ -514,10 +567,8 @@ def run(dest_dir: str) -> None:
     # Add region aggregates.
     df = add_region_aggregates(data=df, index_columns=["country", "year", "type"])
 
-    # Add population including historical countries.
-    # For certain countries we have population data only for certain years (e.g. 1900, 1910, but not the years in
-    # between). In those cases we interpolate population data.
-    df = add_population(df=df, interpolate_missing_population=True, warn_on_missing_countries=True)
+    # Add population including historical regions.
+    df = add_population_including_historical_regions(df=df)
 
     # Add rates per 100,000 people.
     for column in df.drop(columns=["country", "year", "type", "population"]).columns:

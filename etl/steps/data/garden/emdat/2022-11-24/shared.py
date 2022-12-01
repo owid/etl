@@ -144,6 +144,27 @@ HISTORIC_TO_CURRENT_REGION: Dict[str, Dict[str, Union[str, List[str]]]] = {
     },
 }
 
+# Historical countries whose population can be built by adding up the population of their successor countries.
+# Those historical countries not listed here will have no population data.
+BUILD_POPULATION_FOR_HISTORICAL_COUNTRIES = [
+    # The following regions split into smaller ones, and can be estimated by the population of the successors.
+    "Czechoslovakia",
+    "Netherlands Antilles",
+    "Serbia and Montenegro",
+    "USSR",
+    "Yugoslavia",
+    # The following countries cannot be replaced by the successor countries.
+    # 'East Germany',
+    # 'West Germany',
+    # 'North Yemen',
+    # 'South Yemen',
+]
+
+# Historical countries for which we don't have population, and can't be built from successor countries.
+EXPECTED_COUNTRIES_WITHOUT_POPULATION = list(
+    set(HISTORIC_TO_CURRENT_REGION) - set(BUILD_POPULATION_FOR_HISTORICAL_COUNTRIES)
+)
+
 # Overlaps found between historical regions and successor countries, that we accept in the data.
 # We accept them either because they happened close to the transition, or to avoid needing to introduce new
 # countries for which we do not have data (like the Russian Empire).
@@ -214,7 +235,7 @@ def get_countries_in_region(
     return countries
 
 
-def load_population() -> pd.DataFrame:
+def load_population(regions: Optional[Dict[Any, Any]] = None) -> pd.DataFrame:
     """Load OWID population dataset, and add historical regions to it.
 
     Returns
@@ -231,8 +252,9 @@ def load_population() -> pd.DataFrame:
     # Add data for historical regions (if not in population) by adding the population of its current successors.
     countries_with_population = population["country"].unique()
 
-    # Consider regions and historical regions.
-    regions = dict(**REGIONS, **HISTORIC_TO_CURRENT_REGION)
+    # Consider additional regions (e.g. historical regions).
+    if regions is None:
+        regions = {}
     missing_countries = [country for country in regions if country not in countries_with_population]
     for country in missing_countries:
         members = regions[country]["regions_included"]
@@ -295,6 +317,8 @@ def add_population(
     interpolate_missing_population: bool = False,
     warn_on_missing_countries: bool = True,
     show_full_warning: bool = True,
+    regions: Optional[Dict[Any, Any]] = None,
+    expected_countries_without_population: List[str] = [],
 ) -> pd.DataFrame:
     """Add a column of OWID population to the countries in the data, including population of historical regions.
 
@@ -329,7 +353,7 @@ def add_population(
     """
 
     # Load population dataset.
-    population = load_population().rename(
+    population = load_population(regions=regions).rename(
         columns={
             "country": country_col,
             "year": year_col,
@@ -354,19 +378,21 @@ def add_population(
     if interpolate_missing_population:
         # For some countries we have population data only on certain years, e.g. 1900, 1910, etc.
         # Optionally fill missing years linearly.
-        countries_in_data = df["country"].unique()
-        years_in_data = df["year"].unique()
+        countries_in_data = df[country_col].unique()
+        years_in_data = df[year_col].unique()
 
-        population = population.set_index(["country", "year"]).reindex(
-            pd.MultiIndex.from_product([countries_in_data, years_in_data], names=["country", "year"])
+        population = population.set_index([country_col, year_col]).reindex(
+            pd.MultiIndex.from_product([countries_in_data, years_in_data], names=[country_col, year_col])
         )
 
-        population = population.groupby("country").transform(
+        population = population.groupby(country_col).transform(
             lambda x: x.interpolate(method="linear", limit_direction="both")
         )
 
-        error = "There should not be any missing population data."
-        assert population[population["population"].isnull()].empty, error
+        error = "Countries without population data differs from list of expected countries without population data."
+        assert set(population[population[population_col].isnull()].reset_index()[country_col]) == set(
+            expected_countries_without_population
+        ), error
 
     # Add population to original dataframe.
     df_with_population = pd.merge(df, population, on=[country_col, year_col], how="left")
