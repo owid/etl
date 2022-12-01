@@ -22,7 +22,7 @@ import datetime
 
 import numpy as np
 import pandas as pd
-from owid.catalog import Dataset, Table
+from owid import catalog
 from owid.catalog.utils import underscore_table
 from owid.datautils import geo
 from shared import (
@@ -101,6 +101,12 @@ IMPACT_COLUMNS = [
 
 # Variables related to costs, measured in thousand current US$ (not adjusted for inflation or PPP).
 COST_VARIABLES = ["reconstruction_costs", "insured_damages", "total_damages"]
+
+# Variables to calculate per 100,000 people.
+VARIABLES_PER_100K_PEOPLE = [column for column in IMPACT_COLUMNS if column not in COST_VARIABLES] + ["n_events"]
+
+# New natural disaster type corresponding to the sum of all disasters.
+ALL_DISASTERS_TYPE = "all_disasters"
 
 # List issues found in the data:
 # Each element is a tuple with a dictionary that fully identifies the wrong row,
@@ -431,9 +437,10 @@ def sanity_checks_on_outputs(df: pd.DataFrame, is_decade: bool) -> None:
 
     error = (
         "List of expected disaster types has changed. "
-        "Consider updating EXPECTED_DISASTER_TYPES (or renaming 'All disasters')."
+        "Consider updating EXPECTED_DISASTER_TYPES (or renaming ALL_DISASTERS_TYPE)."
     )
-    assert set(df["type"]) == set(EXPECTED_DISASTER_TYPES + ["All disasters"]), error
+    expected_disaster_types = [ALL_DISASTERS_TYPE] + [catalog.utils.underscore(disaster) for disaster in EXPECTED_DISASTER_TYPES]
+    assert set(df["type"]) == set(expected_disaster_types), error
 
     columns_that_should_not_have_nans = [
         "country",
@@ -466,10 +473,10 @@ def sanity_checks_on_outputs(df: pd.DataFrame, is_decade: bool) -> None:
         # historical and successor countries). So check for a specific year.
         year_to_check = 2022
         all_disasters_for_world = df[
-            (df["country"] == "World") & (df["year"] == year_to_check) & (df["type"] == "All disasters")
+            (df["country"] == "World") & (df["year"] == year_to_check) & (df["type"] == ALL_DISASTERS_TYPE)
         ].reset_index(drop=True)
         all_disasters_check = (
-            df[(df["country"].isin(all_countries)) & (df["year"] == year_to_check) & (df["type"] != "All disasters")]
+            df[(df["country"].isin(all_countries)) & (df["year"] == year_to_check) & (df["type"] != ALL_DISASTERS_TYPE)]
             .groupby("year")
             .sum(numeric_only=True)
             .reset_index()
@@ -512,14 +519,14 @@ def run(dest_dir: str) -> None:
     # Load data.
     #
     # Load natural disasters dataset from meadow.
-    ds_meadow = Dataset(DATA_DIR / f"meadow/emdat/{MEADOW_VERSION}/natural_disasters")
+    ds_meadow = catalog.Dataset(DATA_DIR / f"meadow/emdat/{MEADOW_VERSION}/natural_disasters")
     # Get table from dataset.
     tb_meadow = ds_meadow["natural_disasters"]
     # Create a dataframe from the table.
     df = pd.DataFrame(tb_meadow)
 
     # Load GDP from WorldBank WDI dataset.
-    ds_gdp = Dataset(WDI_DATASET_PATH)
+    ds_gdp = catalog.Dataset(WDI_DATASET_PATH)
     # Load main table from WDI dataset, and select variable corresponding to GDP (in current US$).
     tb_gdp = ds_gdp["wdi"][["ny_gdp_mktp_cd"]]
     # Create a dataframe with GDP.
@@ -576,7 +583,7 @@ def run(dest_dir: str) -> None:
     all_disasters = (
         df.groupby(["country", "year"], observed=True)
         .sum(numeric_only=True, min_count=1)
-        .assign(**{"type": "All disasters"})
+        .assign(**{"type": ALL_DISASTERS_TYPE})
         .reset_index()
     )
     df = (
@@ -592,17 +599,14 @@ def run(dest_dir: str) -> None:
     df = add_population_including_historical_regions(df=df)
 
     # Add rates per 100,000 people.
-    variables_for_100k_rate = [
-        column
-        for column in df.columns
-        if "gdp" not in column
-        if column not in ["country", "year", "type", "population", "gdp"]
-    ]
-    for column in variables_for_100k_rate:
+    for column in VARIABLES_PER_100K_PEOPLE:
         df[f"{column}_per_100k_people"] = df[column] * 1e5 / df["population"]
 
     # Fix issue with faulty dtypes (see more details in the function's documentation).
     df = fix_faulty_dtypes(df=df)
+
+    # Change disaster types to snake, lower case.
+    df["type"] = [catalog.utils.underscore(value) for value in df["type"]]
 
     # Create data aggregated (using a simple mean) in intervales of 10 years.
     # For example (as explained in the footer of the natural disasters explorer), the value for 1900 of any column
@@ -617,19 +621,15 @@ def run(dest_dir: str) -> None:
     df = df.set_index(["country", "year", "type"], verify_integrity=True).sort_index().sort_index()
     decade_df = decade_df.set_index(["country", "year", "type"], verify_integrity=True).sort_index().sort_index()
 
-    # # Create wide tables.
-    # table_wide = table.reset_index().pivot(index=["country", "year"], columns="type")
-    # [column[0] + '_' + column[1] for column in table_wide.columns.tolist()]
-
     #
     # Save outputs.
     #
     # Create new Garden dataset.
-    ds_garden = Dataset.create_empty(dest_dir)
+    ds_garden = catalog.Dataset.create_empty(dest_dir)
     ds_garden.metadata = ds_meadow.metadata
     # Ensure all column names are snake, lower case.
-    tb_garden = underscore_table(Table(df))
-    decade_tb_garden = underscore_table(Table(decade_df))
+    tb_garden = catalog.utils.underscore_table(catalog.Table(df))
+    decade_tb_garden = catalog.utils.underscore_table(catalog.Table(decade_df))
     # Get dataset metadata from yaml file.
     ds_garden.metadata.update_from_yaml(N.metadata_path, if_source_exists="replace")
     # Get tables metadata from yaml file.

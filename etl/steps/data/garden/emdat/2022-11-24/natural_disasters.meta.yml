@@ -91,12 +91,6 @@ tables:
       total_affected_per_100k_people:
         title: Total number of affected persons per 100,000 people
         unit: 'cases per 100k people'
-      reconstruction_costs_per_100k_people:
-        title: Reconstruction costs per 100,000 people
-        unit: 'cases per 100k people'
-      insured_damages_per_100k_people:
-        title: Insured damages per 100,000 people
-        unit: 'cases per 100k people'
       n_events_per_100k_people:
         title: Number of events per 100,000 people
         unit: 'events per 100k people'
