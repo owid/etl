@@ -25,6 +25,7 @@ DISASTER_TYPE_RENAMING = {
     "wildfire": "Wildfire",
 }
 
+
 def create_wide_tables(table: catalog.Table, is_decade: bool) -> catalog.Table:
     # Create wide dataframes.
     table_wide = table.reset_index().pivot(index=["country", "year"], columns="type")
@@ -56,9 +57,9 @@ def create_wide_tables(table: catalog.Table, is_decade: bool) -> catalog.Table:
 
 
 def run(dest_dir: str) -> None:
-    # Load garden tables.
-    table_yearly = N.garden_dataset["natural_disasters_yearly"]
-    table_decade = N.garden_dataset["natural_disasters_decadal"]
+    # Load garden tables and remove unnecessary columns.
+    table_yearly = N.garden_dataset["natural_disasters_yearly"].drop(columns=["population", "gdp"])
+    table_decade = N.garden_dataset["natural_disasters_decadal"].drop(columns=["population", "gdp"])
 
     # Create wide tables.
     table_yearly_wide = create_wide_tables(table=table_yearly, is_decade=False)
