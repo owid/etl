@@ -459,11 +459,11 @@ def sanity_checks_on_outputs(df: pd.DataFrame, is_decade: bool) -> None:
     ]
     error = "There are unexpected nans in data."
     assert df[columns_that_should_not_have_nans].notnull().all(axis=1).all(), error
-    # The following columns may have nans on countries for which we expect to have no population data.
-    columns_that_may_have_nans = [column for column in df.columns if column not in columns_that_should_not_have_nans]
-    assert set(df[df[columns_that_may_have_nans].isnull().any(axis=1)]["country"]) == set(
-        EXPECTED_COUNTRIES_WITHOUT_POPULATION
-    )
+    # # The following columns may have nans on countries for which we expect to have no population data.
+    # columns_that_may_have_nans = [column for column in df.columns if column not in columns_that_should_not_have_nans]
+    # assert set(df[df[columns_that_may_have_nans].isnull().any(axis=1)]["country"]) == set(
+    #     EXPECTED_COUNTRIES_WITHOUT_POPULATION
+    # )
 
     # Sanity checks only for yearly data.
     if not is_decade:
@@ -551,18 +551,6 @@ def run(dest_dir: str) -> None:
     # Harmonize country names.
     df = harmonize_countries(df=df)
 
-    # Combine natural disasters with GDP data.
-    df = pd.merge(df, df_gdp.rename(columns={"ny_gdp_mktp_cd": "gdp"}), on=["country", "year"], how="left")
-    # Prepare cost variables.
-    for variable in COST_VARIABLES:
-        # Convert costs (given in '000 US$, aka thousand current US$) into current US$.
-        df[variable] *= 1000
-        # Create variables of costs (in current US$) per GDP (in current US$).
-        df[f"{variable}_per_gdp"] = df[variable] / df["gdp"]
-
-    # Fix issue with faulty dtypes (see more details in the function's documentation).
-    df = fix_faulty_dtypes(df=df)
-
     # Calculate start and end dates of disasters.
     df = calculate_start_and_end_dates(df=df)
 
@@ -599,6 +587,15 @@ def run(dest_dir: str) -> None:
     # Add population including historical regions.
     df = add_population_including_historical_regions(df=df)
 
+    # Combine natural disasters with GDP data.
+    df = pd.merge(df, df_gdp.rename(columns={"ny_gdp_mktp_cd": "gdp"}), on=["country", "year"], how="left")
+    # Prepare cost variables.
+    for variable in COST_VARIABLES:
+        # Convert costs (given in '000 US$, aka thousand current US$) into current US$.
+        df[variable] *= 1000
+        # Create variables of costs (in current US$) as a share of GDP (in current US$).
+        df[f"{variable}_per_gdp"] = df[variable] / df["gdp"] * 100
+
     # Add rates per 100,000 people.
     for column in VARIABLES_PER_100K_PEOPLE:
         df[f"{column}_per_100k_people"] = df[column] * 1e5 / df["population"]
@@ -628,11 +625,13 @@ def run(dest_dir: str) -> None:
     # Create new Garden dataset.
     ds_garden = catalog.Dataset.create_empty(dest_dir)
     ds_garden.metadata = ds_meadow.metadata
+
     # Ensure all column names are snake, lower case.
     tb_garden = catalog.utils.underscore_table(catalog.Table(df))
     decade_tb_garden = catalog.utils.underscore_table(catalog.Table(decade_df))
     # Get dataset metadata from yaml file.
     ds_garden.metadata.update_from_yaml(N.metadata_path, if_source_exists="replace")
+
     # Get tables metadata from yaml file.
     tb_garden.update_metadata_from_yaml(N.metadata_path, "natural_disasters_yearly")
     decade_tb_garden.update_metadata_from_yaml(N.metadata_path, "natural_disasters_decadal")
