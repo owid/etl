@@ -80,9 +80,9 @@ def run(dest_dir: str) -> None:
 
         if df_country.shape[1] > 2:
             # Drop columns where the country doesn't have data
-            df_country = df_country.dropna(how="all")
+            df_country = df_country.dropna(axis=1, how="all")
             # Skip countries where we don't have any data
-            if df_country.shape[1] > 2:
+            if df_country.shape[1] > 3:
                 # Create a new table with combined data (and no metadata).
                 tb_combined = catalog.Table(df_country)
 
