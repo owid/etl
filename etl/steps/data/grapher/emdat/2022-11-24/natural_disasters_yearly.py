@@ -12,22 +12,22 @@ GARDEN_TABLE_NAME = "natural_disasters_yearly"
 GRAPHER_DATASET_NAME = GARDEN_TABLE_NAME
 
 DISASTER_TYPE_RENAMING = {
-    'all_disasters': 'All disasters',
-    'animal_accident': 'Animal accident',
-    'drought': 'Drought',
-    'earthquake': 'Earthquake',
-    'epidemic': 'Epidemic',
-    'extreme_temperature': 'Extreme temperature',
-    'flood': 'Flood',
-    'fog': 'Fog',
-    'glacial_lake_outburst': 'Glacial lake outburst',
-    'impact': 'Impact',
-    'insect_infestation': 'Insect infestation',
-    'landslide': 'Landslide',
-    'mass_movement__dry': 'Dry mass movement',
-    'storm': 'Storm',
-    'volcanic_activity': 'Volcanic activity',
-    'wildfire': 'Wildfire',
+    "all_disasters": "All disasters",
+    "animal_accident": "Animal accident",
+    "drought": "Drought",
+    "earthquake": "Earthquake",
+    "epidemic": "Epidemic",
+    "extreme_temperature": "Extreme temperature",
+    "flood": "Flood",
+    "fog": "Fog",
+    "glacial_lake_outburst": "Glacial lake outburst",
+    "impact": "Impact",
+    "insect_infestation": "Insect infestation",
+    "landslide": "Landslide",
+    "mass_movement__dry": "Dry mass movement",
+    "storm": "Storm",
+    "volcanic_activity": "Volcanic activity",
+    "wildfire": "Wildfire",
 }
 
 

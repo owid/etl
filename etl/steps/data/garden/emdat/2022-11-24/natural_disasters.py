@@ -23,7 +23,6 @@ import datetime
 import numpy as np
 import pandas as pd
 from owid import catalog
-from owid.catalog.utils import underscore_table
 from owid.datautils import geo
 from shared import (
     BUILD_POPULATION_FOR_HISTORICAL_COUNTRIES,
@@ -439,7 +438,9 @@ def sanity_checks_on_outputs(df: pd.DataFrame, is_decade: bool) -> None:
         "List of expected disaster types has changed. "
         "Consider updating EXPECTED_DISASTER_TYPES (or renaming ALL_DISASTERS_TYPE)."
     )
-    expected_disaster_types = [ALL_DISASTERS_TYPE] + [catalog.utils.underscore(disaster) for disaster in EXPECTED_DISASTER_TYPES]
+    expected_disaster_types = [ALL_DISASTERS_TYPE] + [
+        catalog.utils.underscore(disaster) for disaster in EXPECTED_DISASTER_TYPES
+    ]
     assert set(df["type"]) == set(expected_disaster_types), error
 
     columns_that_should_not_have_nans = [
