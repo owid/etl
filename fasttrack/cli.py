@@ -137,7 +137,6 @@ class FasttrackForm(BaseModel):
     existing_sheets_url: Optional[str]
     infer_metadata: bool
     is_private: bool
-    commit: bool
 
     def __init__(self, **data: Any) -> None:
         options = data.pop("options")
