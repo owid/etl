@@ -105,15 +105,6 @@ steps:
   data://garden/malnutrition/2022-10-18/malnutrition:
     - data://garden/worldbank_wdi/2022-05-26/wdi
     - data://meadow/un/2022-07-11/un_wpp
-  # UN IGME - Child mortality
-  data://meadow/un/2021-12-20/un_igme:
-  - walden://un/2021/un_igme
-  data://garden/un/2021-12-20/un_igme:
-  - data://meadow/un/2021-12-20/un_igme
-  - data://open_numbers/open_numbers/latest/gapminder__child_mortality
-  - data://open_numbers/open_numbers/latest/gapminder__hist_imr
-  data://grapher/un/2021-12-20/un_igme:
-  - data://garden/un/2021-12-20/un_igme
   #
   # IHME - Global Burden of Disease.
   #
