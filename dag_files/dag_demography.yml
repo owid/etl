@@ -3,6 +3,7 @@ steps:
     - data://garden/papers/2022-11-03/zijdeman_et_al_2015
     - data://garden/papers/2022-11-04/riley_2005
     - data://garden/un/2022-07-11/un_wpp
+    - data://garden/hmd/2022-11-04/life_tables
 
   data://grapher/demography/2022-11-30/life_expectancy:
     - data://garden/demography/2022-11-30/life_expectancy

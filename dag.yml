@@ -105,6 +105,15 @@ steps:
   data://garden/malnutrition/2022-10-18/malnutrition:
     - data://garden/worldbank_wdi/2022-05-26/wdi
     - data://meadow/un/2022-07-11/un_wpp
+  # UN IGME - Child mortality
+  data://meadow/un/2021-12-20/un_igme:
+  - walden://un/2021/un_igme
+  data://garden/un/2021-12-20/un_igme:
+  - data://meadow/un/2021-12-20/un_igme
+  - data://open_numbers/open_numbers/latest/gapminder__child_mortality
+  - data://open_numbers/open_numbers/latest/gapminder__hist_imr
+  data://grapher/un/2021-12-20/un_igme:
+  - data://garden/un/2021-12-20/un_igme
   #
   # IHME - Global Burden of Disease.
   #
@@ -193,19 +202,15 @@ steps:
   data://meadow/un/2022-11-29/undp_hdr:
     - snapshot://un/2022-11-29/undp_hdr.csv
     - snapshot://un/2022-11-29/undp_hdr.xlsx
-  data://garden/un/2022-11-29/undp_hdr:
-    - data://meadow/un/2022-11-29/undp_hdr
-  data://grapher/un/2022-11-29/undp_hdr:
-    - data://garden/un/2022-11-29/undp_hdr
 
   # Country profiles - overview
   data://garden/country_profile/2022/overview:
     - backport://backport/owid/latest/dataset_5600_democracy_and_human_rights__owid_based_on_varieties_of_democracy__v12__and_regimes_of_the_world
     - backport://backport/owid/latest/dataset_5599_ihme__global_burden_of_disease__deaths_and_dalys__institute_for_health_metrics_and_evaluation__2022_04
     - backport://backport/owid/latest/dataset_4129_years_of_schooling__based_on_lee_lee__2016__barro_lee__2018__and_undp__2018
-    - backport://backport/owid/latest/dataset_1892_life_expectancy__riley__2005__clio_infra__2015__and_un__2019
     - backport://backport/owid/latest/dataset_2710_child_mortality_rates__selected_gapminder__v10__2017
     - backport://backport/owid/latest/dataset_581_daily_supply_of_calories_per_person__owid_based_on_un_fao__and__historical_sources
+    - data://garden/demography/2022-11-30/life_expectancy
     - data://garden/owid/latest/key_indicators
     - data://garden/gcp/2022-11-11/global_carbon_budget
     - data://garden/bp/2022-07-14/energy_mix
@@ -220,4 +225,3 @@ include:
   - dag_files/dag_examples.yml
   - dag_files/dag_emissions.yml
   - dag_files/dag_papers.yml
-  - dag_files/dag_demography.yml

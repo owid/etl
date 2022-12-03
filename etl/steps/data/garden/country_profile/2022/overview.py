@@ -22,6 +22,8 @@ CO2_EMISSIONS_DATASET_PATH = DATA_DIR / "garden/gcp/2022-11-11/global_carbon_bud
 # Energy consumption by source
 ENERGY_CON_DATASET_PATH = DATA_DIR / "garden/bp/2022-07-14/energy_mix"
 
+# Life expectancy dataset
+LIFE_EXPECTANCY_DATASET_PATH = DATA_DIR / "garden/demography/2022-11-30/life_expectancy"
 # Share of population using the internet
 # GDP per capita
 # Electricity access
@@ -34,8 +36,6 @@ WDI_DATASET_PATH = DATA_DIR / "garden/worldbank_wdi/2022-05-26/wdi"
 # https://owid.cloud/admin/datasets/5599
 # Average years of schooling
 # https://owid.cloud/admin/datasets/4129
-# Life expectancy
-# https://owid.cloud/admin/datasets/1892
 # Child mortality
 # https://owid.cloud/admin/datasets/2710
 # Daily supply of calories per person
@@ -58,11 +58,12 @@ def run(dest_dir: str) -> None:
     energy_mix = get_energy_mix()
     # WDI: share using internet; gdp per capita; share electricity access
     wdi = get_wdi_variables()
+    # Life expectancy OMM
+    life_exp = get_life_expectancy()
     # Backport: Electoral democracy; Homicide rate; Average years of schooling; Life expectancy; Child mortality; Daily calories
     backports = get_backports()
 
-    data_frames = [pop, emissions_pc, energy_mix, wdi, backports]
-    # df_merged = reduce(lambda left, right: pd.merge(left, right, on=["country", "year"], how="outer"), data_frames)
+    data_frames = [pop, emissions_pc, energy_mix, wdi, life_exp, backports]
     df_merged = dataframes.multi_merge(data_frames, on=["country", "year"], how="outer")
     df_merged = df_merged.sort_values("year")
 
@@ -73,7 +74,7 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
     for country in countries_list:
-        log.info(f"Saving... {country}")
+
         # making snake case version of country name
         country_snake_case = underscore(country)
         df_country = df_merged[df_merged["country"] == country]
@@ -83,6 +84,7 @@ def run(dest_dir: str) -> None:
             df_country = df_country.dropna(axis=1, how="all")
             # Skip countries where we don't have any data
             if df_country.shape[1] > 3:
+                log.info(f"Saving... {country}")
                 # Create a new table with combined data (and no metadata).
                 tb_combined = catalog.Table(df_country)
 
@@ -106,6 +108,7 @@ def get_population() -> pd.DataFrame:
     ds_ki = catalog.Dataset(KI_DATASET_PATH)
     pop = ds_ki["population"].reset_index()
     pop = pop[["country", "year", "population"]]
+    pop["population"] = pop["population"].astype("int64")
     return pop
 
 
@@ -160,6 +163,20 @@ def get_wdi_variables() -> pd.DataFrame:
     return df_wdi
 
 
+def get_life_expectancy() -> pd.DataFrame:
+    """
+    Get the long-run life-expectancy dataset - an OMM
+    """
+    ds_life_expectancy = catalog.Dataset(LIFE_EXPECTANCY_DATASET_PATH)
+    df_life_expectancy = ds_life_expectancy["life_expectancy"].reset_index()
+    cols = ["country", "year", "life_expectancy_0"]
+    new_cols = ["country", "year", "life_expectancy_at_birth"]
+    df_life_expectancy = df_life_expectancy[cols]
+    df_life_expectancy.columns = new_cols
+    df_life_expectancy["year"] = df_life_expectancy["year"].astype("int64")
+    return df_life_expectancy
+
+
 def get_backports() -> pd.DataFrame:
     """
     Get the i) Child mortality rate, ii) Electoral democracy, iii) Homicide rate,
@@ -183,10 +200,6 @@ def get_backports() -> pd.DataFrame:
         ],
         "dataset_4129_years_of_schooling__based_on_lee_lee__2016__barro_lee__2018__and_undp__2018": [
             "average_total_years_of_schooling_for_adult_population__lee_lee__2016__barro_lee__2018__and_undp__2018"
-        ],
-        "dataset_1892_life_expectancy__riley__2005__clio_infra__2015__and_un__2019": ["life_expectancy"],
-        "dataset_581_daily_supply_of_calories_per_person__owid_based_on_un_fao__and__historical_sources": [
-            "daily_caloric_supply__owid_based_on_un_fao__and__historical_sources"
         ],
     }
     # make one mega table with all variables from all the backports
