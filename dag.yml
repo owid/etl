@@ -193,6 +193,10 @@ steps:
   data://meadow/un/2022-11-29/undp_hdr:
     - snapshot://un/2022-11-29/undp_hdr.csv
     - snapshot://un/2022-11-29/undp_hdr.xlsx
+  data://garden/un/2022-11-29/undp_hdr:
+    - data://meadow/un/2022-11-29/undp_hdr
+  data://grapher/un/2022-11-29/undp_hdr:
+    - data://garden/un/2022-11-29/undp_hdr
 
   # Country profiles - overview
   data://garden/country_profile/2022/overview:
@@ -216,3 +220,4 @@ include:
   - dag_files/dag_examples.yml
   - dag_files/dag_emissions.yml
   - dag_files/dag_papers.yml
+  - dag_files/dag_demography.yml

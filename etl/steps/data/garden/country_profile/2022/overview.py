@@ -201,6 +201,9 @@ def get_backports() -> pd.DataFrame:
         "dataset_4129_years_of_schooling__based_on_lee_lee__2016__barro_lee__2018__and_undp__2018": [
             "average_total_years_of_schooling_for_adult_population__lee_lee__2016__barro_lee__2018__and_undp__2018"
         ],
+        "dataset_581_daily_supply_of_calories_per_person__owid_based_on_un_fao__and__historical_sources": [
+            "daily_caloric_supply__owid_based_on_un_fao__and__historical_sources"
+        ],
     }
     # make one mega table with all variables from all the backports
     t_all = pd.DataFrame()
