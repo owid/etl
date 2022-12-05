@@ -399,6 +399,24 @@ def create_decade_data(df: pd.DataFrame) -> pd.DataFrame:
     """Create data of average impacts over periods of 10 years."""
     decade_df = df.copy()
 
+    # Ensure each country has data for all years (and fill empty rows with zeros).
+    # Otherwise, the average would only be performed only across years for which we have data.
+    # For example, if we have data only for 1931 (and no other year in the 1930s) we want that data point to be averaged
+    # over all years in the decade (assuming they are all zero).
+    # Note that, for the current decade, since it's not complete, we want to average over the number of current years
+    # (not the entire decade).
+
+    # List all countries, years and types in the data.
+    countries = sorted(set(decade_df["country"]))
+    years = np.arange(decade_df["year"].min(), decade_df["year"].max() + 1).tolist()
+    types = sorted(set(decade_df["type"]))
+
+    # Create a new index covering all combinations of countries, years and types.
+    new_indexes = pd.MultiIndex.from_product([countries, years, types], names=["country", "year", "type"])
+
+    # Reindex data so that all countries and types have data for each year (filling with zeros when there's no data).
+    decade_df = decade_df.set_index(["country", "year", "type"]).reindex(new_indexes, fill_value=0).reset_index()
+
     # For each year, calculate the corresponding decade (e.g. 1951 -> 1950, 1929 -> 1920).
     decade_df["decade"] = (decade_df["year"] // 10) * 10
 
