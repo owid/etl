@@ -1,72 +1,68 @@
-sources: &sources-emdat
-- name: EM-DAT, CRED / UCLouvain, Brussels, Belgium
-  url: https://emdat.be/
-  date_accessed: '2022-11-27'
-  publication_date: '2022-11-24'
-  publication_year: 2022
+all_sources:
+  - emdat:  &sources-emdat
+    - name: EM-DAT, CRED / UCLouvain, Brussels, Belgium
+      url: https://emdat.be/
+      date_accessed: '2022-11-27'
+      publication_date: '2022-11-24'
+      publication_year: 2022
+  - wdi: &sources-wdi
+    - name: World Development Indicators - World Bank
+      url: https://datacatalog.worldbank.org/search/dataset/0037712/World-Development-Indicators
+      date_accessed: '2022-05-26'
+      publication_year: 2022
+  - population: &sources-population
+    - name: Population (Gapminder, HYDE & UN)
+      description: |
+        Population by country, available from 10,000 BCE to 2100 based on Gapminder data, HYDE, and UN Population Division (2022) estimates.
 
-sources: &sources-wdi
-- name: World Development Indicators - World Bank
-  url: https://datacatalog.worldbank.org/search/dataset/0037712/World-Development-Indicators
-  date_accessed: '2022-05-26'
-  publication_year: 2022
+        10,000 BCE - 1799: Historical estimates by <a href="https://dataportaal.pbl.nl/downloads/HYDE/">HYDE (v3.2)</a>.
+        1800-1949: Historical estimates by <a href="https://www.gapminder.org/data/documentation/gd003/">Gapminder (v6)</a>.
+        1950-2021: Population records by <a href="https://population.un.org/wpp/Download/Standard/Population/">the United Nations - Population Division (2022)</a>.
+        2022-2100: Projections based on Medium variant by <a href="https://population.un.org/wpp/Download/Standard/Population/">the United Nations - Population Division (2022)</a>.
+  # TODO: It would be good if sources could be combined in a less redundant way,
+  # For example, in a variable with two sources, we could specify "sources: *sources-emdat * sources-wdi". Is there a way?
+  - emdat-wdi: &sources-emdat-wdi
+    - name: EM-DAT, CRED / UCLouvain, Brussels, Belgium
+      url: https://emdat.be/
+      date_accessed: '2022-11-27'
+      publication_date: '2022-11-24'
+      publication_year: 2022
+    - name: World Development Indicators - World Bank
+      url: https://datacatalog.worldbank.org/search/dataset/0037712/World-Development-Indicators
+      date_accessed: '2022-05-26'
+      publication_year: 2022
+  - emdat-population: &sources-emdat-population
+    - name: EM-DAT, CRED / UCLouvain, Brussels, Belgium
+      url: https://emdat.be/
+      date_accessed: '2022-11-27'
+      publication_date: '2022-11-24'
+      publication_year: 2022
+    - name: Population (Gapminder, HYDE & UN)
+      description: |
+        Population by country, available from 10,000 BCE to 2100 based on Gapminder data, HYDE, and UN Population Division (2022) estimates.
 
-sources: &sources-population
-- name: Population (Gapminder, HYDE & UN)
-  description: |
-    Population by country, available from 10,000 BCE to 2100 based on Gapminder data, HYDE, and UN Population Division (2022) estimates.
+        10,000 BCE - 1799: Historical estimates by <a href="https://dataportaal.pbl.nl/downloads/HYDE/">HYDE (v3.2)</a>.
+        1800-1949: Historical estimates by <a href="https://www.gapminder.org/data/documentation/gd003/">Gapminder (v6)</a>.
+        1950-2021: Population records by <a href="https://population.un.org/wpp/Download/Standard/Population/">the United Nations - Population Division (2022)</a>.
+        2022-2100: Projections based on Medium variant by <a href="https://population.un.org/wpp/Download/Standard/Population/">the United Nations - Population Division (2022)</a>.
+  - emdat-wdi-population: &sources-emdat-wdi-population
+    - name: EM-DAT, CRED / UCLouvain, Brussels, Belgium
+      url: https://emdat.be/
+      date_accessed: '2022-11-27'
+      publication_date: '2022-11-24'
+      publication_year: 2022
+    - name: World Development Indicators - World Bank
+      url: https://datacatalog.worldbank.org/search/dataset/0037712/World-Development-Indicators
+      date_accessed: '2022-05-26'
+      publication_year: 2022
+    - name: Population (Gapminder, HYDE & UN)
+      description: |
+        Population by country, available from 10,000 BCE to 2100 based on Gapminder data, HYDE, and UN Population Division (2022) estimates.
 
-    10,000 BCE - 1799: Historical estimates by <a href="https://dataportaal.pbl.nl/downloads/HYDE/">HYDE (v3.2)</a>.
-    1800-1949: Historical estimates by <a href="https://www.gapminder.org/data/documentation/gd003/">Gapminder (v6)</a>.
-    1950-2021: Population records by <a href="https://population.un.org/wpp/Download/Standard/Population/">the United Nations - Population Division (2022)</a>.
-    2022-2100: Projections based on Medium variant by <a href="https://population.un.org/wpp/Download/Standard/Population/">the United Nations - Population Division (2022)</a>.
-
-# TODO: It would be good if sources could be combined in a less redundant way,
-# For example, in a variable with two sources, we could specify "sources: *sources-emdat * sources-wdi". Is there a way?
-sources: &sources-emdat-wdi
-- name: EM-DAT, CRED / UCLouvain, Brussels, Belgium
-  url: https://emdat.be/
-  date_accessed: '2022-11-27'
-  publication_date: '2022-11-24'
-  publication_year: 2022
-- name: World Development Indicators - World Bank
-  url: https://datacatalog.worldbank.org/search/dataset/0037712/World-Development-Indicators
-  date_accessed: '2022-05-26'
-  publication_year: 2022
-
-sources: &sources-emdat-population
-- name: EM-DAT, CRED / UCLouvain, Brussels, Belgium
-  url: https://emdat.be/
-  date_accessed: '2022-11-27'
-  publication_date: '2022-11-24'
-  publication_year: 2022
-- name: Population (Gapminder, HYDE & UN)
-  description: |
-    Population by country, available from 10,000 BCE to 2100 based on Gapminder data, HYDE, and UN Population Division (2022) estimates.
-
-    10,000 BCE - 1799: Historical estimates by <a href="https://dataportaal.pbl.nl/downloads/HYDE/">HYDE (v3.2)</a>.
-    1800-1949: Historical estimates by <a href="https://www.gapminder.org/data/documentation/gd003/">Gapminder (v6)</a>.
-    1950-2021: Population records by <a href="https://population.un.org/wpp/Download/Standard/Population/">the United Nations - Population Division (2022)</a>.
-    2022-2100: Projections based on Medium variant by <a href="https://population.un.org/wpp/Download/Standard/Population/">the United Nations - Population Division (2022)</a>.
-
-sources: &sources-emdat-wdi-population
-- name: EM-DAT, CRED / UCLouvain, Brussels, Belgium
-  url: https://emdat.be/
-  date_accessed: '2022-11-27'
-  publication_date: '2022-11-24'
-  publication_year: 2022
-- name: World Development Indicators - World Bank
-  url: https://datacatalog.worldbank.org/search/dataset/0037712/World-Development-Indicators
-  date_accessed: '2022-05-26'
-  publication_year: 2022
-- name: Population (Gapminder, HYDE & UN)
-  description: |
-    Population by country, available from 10,000 BCE to 2100 based on Gapminder data, HYDE, and UN Population Division (2022) estimates.
-
-    10,000 BCE - 1799: Historical estimates by <a href="https://dataportaal.pbl.nl/downloads/HYDE/">HYDE (v3.2)</a>.
-    1800-1949: Historical estimates by <a href="https://www.gapminder.org/data/documentation/gd003/">Gapminder (v6)</a>.
-    1950-2021: Population records by <a href="https://population.un.org/wpp/Download/Standard/Population/">the United Nations - Population Division (2022)</a>.
-    2022-2100: Projections based on Medium variant by <a href="https://population.un.org/wpp/Download/Standard/Population/">the United Nations - Population Division (2022)</a>.
+        10,000 BCE - 1799: Historical estimates by <a href="https://dataportaal.pbl.nl/downloads/HYDE/">HYDE (v3.2)</a>.
+        1800-1949: Historical estimates by <a href="https://www.gapminder.org/data/documentation/gd003/">Gapminder (v6)</a>.
+        1950-2021: Population records by <a href="https://population.un.org/wpp/Download/Standard/Population/">the United Nations - Population Division (2022)</a>.
+        2022-2100: Projections based on Medium variant by <a href="https://population.un.org/wpp/Download/Standard/Population/">the United Nations - Population Division (2022)</a>.
 
 dataset:
   namespace: emdat
