@@ -1,8 +1,8 @@
 """Process and harmonize EM-DAT natural disasters dataset.
 
 NOTES:
-1. We don't have population for historical regions (e.g. East Germany, or North Yemen).
-2. Some issues in the data were detected (and will be reported to EM-DAT). Some of those issues could not be fixed.
+1. We don't have population for some historical regions (e.g. East Germany, or North Yemen).
+2. Some issues in the data were detected (see below, we may report them to EM-DAT). Some of them could not be fixed.
    Namely, some disasters affect, in one year, a number of people that is larger than the entire population.
    For example, the number of people affected by one drought event in Botswana 1981 is 1037300 while population
    was 982753. I suppose this could be due to inaccuracies in the estimates of affected people or in the population
@@ -163,15 +163,22 @@ DATA_CORRECTIONS = [
 N = Names(str(CURRENT_DIR / "natural_disasters"))
 
 
+def prepare_input_data(df: pd.DataFrame) -> pd.DataFrame:
+    """Prepare input data, and fix some known issues."""
+    # Select and rename columns.
+    df = df[list(COLUMNS)].rename(columns=COLUMNS, errors="raise")
+
+    # Correct wrong data points (defined above in DATA_CORRECTIONS).
+    df = correct_data_points(df=df, corrections=DATA_CORRECTIONS)
+
+    # Remove spurious spaces in entities.
+    df["type"] = df["type"].str.strip()
+
+    return df
+
+
 def sanity_checks_on_inputs(df: pd.DataFrame) -> None:
-    """Run sanity checks on input data.
-
-    Parameters
-    ----------
-    df : pd.DataFrame
-        Input data (prior to harmonization).
-
-    """
+    """Run sanity checks on input data."""
     error = "All values should be positive."
     assert (df.select_dtypes("number").fillna(0) >= 0).all().all(), error
 
@@ -326,7 +333,7 @@ def calculate_yearly_impacts(df: pd.DataFrame) -> pd.DataFrame:
                 days_fraction = days_affected_in_year / days_total
                 # Impacts this years.
                 impacts = (row[IMPACT_COLUMNS] * days_fraction).astype(int)  # type: ignore
-                # Start a series that counts the impacts acumulated over the years.
+                # Start a series that counts the impacts accumulated over the years.
                 cumulative_impacts = impacts
                 # Normalize data by the number of days affected in this year.
                 new_event[IMPACT_COLUMNS] = impacts
@@ -362,6 +369,43 @@ def calculate_yearly_impacts(df: pd.DataFrame) -> pd.DataFrame:
     return yearly_df
 
 
+def get_total_count_of_yearly_impacts(df: pd.DataFrame) -> pd.DataFrame:
+    """Get the total count of impacts in the year, ignoring the individual events.
+
+    We are not interested in each individual event, but the number of events of each kind and their impacts.
+    This function will produce the total count of impacts per country, year and type of disaster.
+
+    """
+    counts = (
+        df.reset_index()
+        .groupby(["country", "year", "type"], observed=True)
+        .agg({"index": "count"})
+        .reset_index()
+        .rename(columns={"index": "n_events"})
+    )
+    df = df.groupby(["country", "year", "type"], observed=True).sum(numeric_only=True, min_count=1).reset_index()
+    df = pd.merge(df, counts, on=["country", "year", "type"], how="left")
+
+    return df
+
+
+def create_a_new_type_for_all_disasters_combined(df: pd.DataFrame) -> pd.DataFrame:
+    """Add a new disaster type that has the impact of all other disasters combined."""
+    all_disasters = (
+        df.groupby(["country", "year"], observed=True)
+        .sum(numeric_only=True, min_count=1)
+        .assign(**{"type": ALL_DISASTERS_TYPE})
+        .reset_index()
+    )
+    df = (
+        pd.concat([df, all_disasters], ignore_index=True)
+        .sort_values(["country", "year", "type"])
+        .reset_index(drop=True)
+    )
+
+    return df
+
+
 def add_population_including_historical_regions(df: pd.DataFrame) -> pd.DataFrame:
     """Add population to the main dataframe, including the population of historical regions.
 
@@ -395,8 +439,34 @@ def add_population_including_historical_regions(df: pd.DataFrame) -> pd.DataFram
     return df
 
 
+def create_additional_variables(df: pd.DataFrame, df_gdp: pd.DataFrame) -> pd.DataFrame:
+    """Create additional variables, namely damages per GDP, and impacts per 100,000 people."""
+    # Combine natural disasters with GDP data.
+    df = pd.merge(df, df_gdp.rename(columns={"ny_gdp_mktp_cd": "gdp"}), on=["country", "year"], how="left")
+    # Prepare cost variables.
+    for variable in COST_VARIABLES:
+        # Convert costs (given in '000 US$, aka thousand current US$) into current US$.
+        df[variable] *= 1000
+        # Create variables of costs (in current US$) as a share of GDP (in current US$).
+        df[f"{variable}_per_gdp"] = df[variable] / df["gdp"] * 100
+
+    # Add rates per 100,000 people.
+    for column in VARIABLES_PER_100K_PEOPLE:
+        df[f"{column}_per_100k_people"] = df[column] * 1e5 / df["population"]
+
+    # Fix issue with faulty dtypes (see more details in the function's documentation).
+    df = fix_faulty_dtypes(df=df)
+
+    return df
+
+
 def create_decade_data(df: pd.DataFrame) -> pd.DataFrame:
-    """Create data of average impacts over periods of 10 years."""
+    """Create data of average impacts over periods of 10 years.
+
+    For example (as explained in the footer of the natural disasters explorer), the value for 1900 of any column should
+    represent the average of that column between 1900 and 1909.
+
+    """
     decade_df = df.copy()
 
     # Ensure each country has data for all years (and fill empty rows with zeros).
@@ -472,19 +542,14 @@ def sanity_checks_on_outputs(df: pd.DataFrame, is_decade: bool) -> None:
     ]
     error = "There are unexpected nans in data."
     assert df[columns_that_should_not_have_nans].notnull().all(axis=1).all(), error
-    # # The following columns may have nans on countries for which we expect to have no population data.
-    # columns_that_may_have_nans = [column for column in df.columns if column not in columns_that_should_not_have_nans]
-    # assert set(df[df[columns_that_may_have_nans].isnull().any(axis=1)]["country"]) == set(
-    #     EXPECTED_COUNTRIES_WITHOUT_POPULATION
-    # )
 
     # Sanity checks only for yearly data.
     if not is_decade:
         all_countries = sorted(set(df["country"]) - set(REGIONS) - set(HISTORIC_TO_CURRENT_REGION))
 
         # Check that the aggregate of all countries and disasters leads to the same numbers we have for the world.
-        # This check would not pass when adding historical regions (since we know there are some overlaps between data from
-        # historical and successor countries). So check for a specific year.
+        # This check would not pass when adding historical regions (since we know there are some overlaps between data
+        # from historical and successor countries). So check for a specific year.
         year_to_check = 2022
         all_disasters_for_world = df[
             (df["country"] == "World") & (df["year"] == year_to_check) & (df["type"] == ALL_DISASTERS_TYPE)
@@ -549,14 +614,8 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    # Select and rename columns.
-    df = df[list(COLUMNS)].rename(columns=COLUMNS, errors="raise")
-
-    # Correct wrong data points (defined above in DATA_CORRECTIONS).
-    df = correct_data_points(df=df, corrections=DATA_CORRECTIONS)
-
-    # Remove spurious spaces in entities.
-    df["type"] = df["type"].str.strip()
+    # Prepare input data (and fix some known issues).
+    df = prepare_input_data(df=df)
 
     # Sanity checks.
     sanity_checks_on_inputs(df=df)
@@ -570,29 +629,11 @@ def run(dest_dir: str) -> None:
     # Distribute the impacts of disasters lasting longer than a year among separate yearly events.
     df = calculate_yearly_impacts(df=df)
 
-    # We are not interested in each individual event, but the number of events of each kind and their impacts.
-    counts = (
-        df.reset_index()
-        .groupby(["country", "year", "type"], observed=True)
-        .agg({"index": "count"})
-        .reset_index()
-        .rename(columns={"index": "n_events"})
-    )
-    df = df.groupby(["country", "year", "type"], observed=True).sum(numeric_only=True, min_count=1).reset_index()
-    df = pd.merge(df, counts, on=["country", "year", "type"], how="left")
+    # Get total count of impacts per year (regardless of the specific individual events during the year).
+    df = get_total_count_of_yearly_impacts(df=df)
 
     # Add a new category (or "type") corresponding to the total of all natural disasters.
-    all_disasters = (
-        df.groupby(["country", "year"], observed=True)
-        .sum(numeric_only=True, min_count=1)
-        .assign(**{"type": ALL_DISASTERS_TYPE})
-        .reset_index()
-    )
-    df = (
-        pd.concat([df, all_disasters], ignore_index=True)
-        .sort_values(["country", "year", "type"])
-        .reset_index(drop=True)
-    )
+    df = create_a_new_type_for_all_disasters_combined(df=df)
 
     # Add region aggregates.
     df = add_region_aggregates(data=df, index_columns=["country", "year", "type"])
@@ -600,36 +641,25 @@ def run(dest_dir: str) -> None:
     # Add population including historical regions.
     df = add_population_including_historical_regions(df=df)
 
-    # Combine natural disasters with GDP data.
-    df = pd.merge(df, df_gdp.rename(columns={"ny_gdp_mktp_cd": "gdp"}), on=["country", "year"], how="left")
-    # Prepare cost variables.
-    for variable in COST_VARIABLES:
-        # Convert costs (given in '000 US$, aka thousand current US$) into current US$.
-        df[variable] *= 1000
-        # Create variables of costs (in current US$) as a share of GDP (in current US$).
-        df[f"{variable}_per_gdp"] = df[variable] / df["gdp"] * 100
-
-    # Add rates per 100,000 people.
-    for column in VARIABLES_PER_100K_PEOPLE:
-        df[f"{column}_per_100k_people"] = df[column] * 1e5 / df["population"]
-
-    # Fix issue with faulty dtypes (see more details in the function's documentation).
-    df = fix_faulty_dtypes(df=df)
+    # Add damages per GDP, and rates per 100,000 people.
+    df = create_additional_variables(df=df, df_gdp=df_gdp)
 
     # Change disaster types to snake, lower case.
     df["type"] = [catalog.utils.underscore(value) for value in df["type"]]
 
-    # Create data aggregated (using a simple mean) in intervales of 10 years.
-    # For example (as explained in the footer of the natural disasters explorer), the value for 1900 of any column
-    # should represent the average of that column between 1900 and 1909.
+    # Create data aggregated (using a simple mean) in intervals of 10 years.
     decade_df = create_decade_data(df=df)
 
-    # Run sanity checks on outputs.
+    # Run sanity checks on output yearly data.
     sanity_checks_on_outputs(df=df, is_decade=False)
+
+    # Run sanity checks on output decadal data.
     sanity_checks_on_outputs(df=decade_df, is_decade=True)
 
-    # Set an appropriate index and sort conveniently.
+    # Set an appropriate index to yearly data and sort conveniently.
     df = df.set_index(["country", "year", "type"], verify_integrity=True).sort_index().sort_index()
+
+    # Set an appropriate index to decadal data and sort conveniently.
     decade_df = decade_df.set_index(["country", "year", "type"], verify_integrity=True).sort_index().sort_index()
 
     #
@@ -642,12 +672,14 @@ def run(dest_dir: str) -> None:
     # Ensure all column names are snake, lower case.
     tb_garden = catalog.utils.underscore_table(catalog.Table(df))
     decade_tb_garden = catalog.utils.underscore_table(catalog.Table(decade_df))
+
     # Get dataset metadata from yaml file.
     ds_garden.metadata.update_from_yaml(N.metadata_path, if_source_exists="replace")
 
     # Get tables metadata from yaml file.
     tb_garden.update_metadata_from_yaml(N.metadata_path, "natural_disasters_yearly")
     decade_tb_garden.update_metadata_from_yaml(N.metadata_path, "natural_disasters_decadal")
+
     # Add tables to dataset and save dataset.
     ds_garden.add(tb_garden)
     ds_garden.add(decade_tb_garden)
