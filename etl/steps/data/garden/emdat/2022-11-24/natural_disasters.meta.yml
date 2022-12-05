@@ -31,6 +31,9 @@ dataset:
 
     Our World in Data has also calculated economic damage metrics adjusted for gross domestic product (GDP), using GDP data from <a href="http://data.worldbank.org/data-catalog/world-development-indicators">the World Bank's World Development Indicators</a>.
 
+    Latest update: 2022-12-06.
+    This dataset is updated regularly. On Our World in Data, given that we only show yearly (or decadal) data, we will update this dataset on a yearly basis. At the link above you can directly access the source page and see the latest available data.
+
     EM-DAT defines the following variables as:
     
     Affected: People requiring immediate assistance during a period of emergency, i.e. requiring basic survival needs such as food, water, shelter, sanitation and immediate medical assistance.
