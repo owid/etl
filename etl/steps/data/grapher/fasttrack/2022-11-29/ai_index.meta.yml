@@ -8,13 +8,14 @@ dataset:
   - name: Unknown
     published_by: Unknown
     publication_year: 2022
-    date_accessed: 2022-11-30
+    date_accessed: 2022-12-02
 tables:
   ai_index:
     variables:
       share_companies_using_ai:
-        title: share_companies_using_ai
-        unit: ''
+        title: Share of companies using AI
+        unit: '%'
+        description: Lorem ipsum...
       number_ai_bills_cumulative:
         title: number_ai_bills_cumulative
         unit: ''
@@ -85,7 +86,7 @@ tables:
         title: top5_accuracy
         unit: ''
       number_mentions_ai_legislative_proceedings:
-        title: number_mentions_AI_legislative_proceedings
+        title: number_mentions_ai_legislative_proceedings
         unit: ''
       newly_funded_ai_companies:
         title: newly_funded_ai_companies

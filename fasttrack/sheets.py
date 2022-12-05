@@ -4,6 +4,8 @@ from typing import Any, Dict, List, cast
 
 import pandas as pd
 
+from etl.grapher_import import INT_TYPES
+
 from .yaml_meta import YAMLMeta
 
 
@@ -37,6 +39,10 @@ def import_google_sheets(url: str) -> Dict[str, Any]:
 
 
 def parse_data_from_sheets(data_df: pd.DataFrame) -> pd.DataFrame:
+    # lowercase columns names
+    for col in ("entity", "year", "country"):
+        if col in data_df:
+            data_df.rename(columns={col: col.lower()}, inplace=True)
 
     if "entity" in data_df.columns:
         data_df = data_df.rename(columns={"entity": "country"})
@@ -46,6 +52,10 @@ def parse_data_from_sheets(data_df: pd.DataFrame) -> pd.DataFrame:
 
     if "country" not in data_df.columns:
         raise ValidationError("Missing column 'country' in data (is it lowercase?)")
+
+    # check types
+    if not data_df.year.dtype in INT_TYPES:
+        raise ValidationError("Column 'year' should be integer")
 
     return data_df.set_index(["country", "year"])
 
