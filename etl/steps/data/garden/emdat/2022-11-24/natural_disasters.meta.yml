@@ -1,17 +1,17 @@
 all_sources:
   - emdat:  &source-emdat
-    - name: EM-DAT, CRED / UCLouvain, Brussels, Belgium
+      name: EM-DAT, CRED / UCLouvain, Brussels, Belgium
       url: https://emdat.be/
       date_accessed: '2022-11-27'
       publication_date: '2022-11-24'
       publication_year: 2022
   - wdi: &source-wdi
-    - name: World Development Indicators - World Bank
+      name: World Development Indicators - World Bank
       url: https://datacatalog.worldbank.org/search/dataset/0037712/World-Development-Indicators
       date_accessed: '2022-05-26'
       publication_year: 2022
   - population: &source-population
-    - name: Population (Gapminder, HYDE & UN)
+      name: Population (Gapminder, HYDE & UN)
       description: |
         Population by country, available from 10,000 BCE to 2100 based on Gapminder data, HYDE, and UN Population Division (2022) estimates.
 
@@ -49,9 +49,9 @@ dataset:
     url: https://public.emdat.be/about
   version: '2022-11-24'
   sources:
-    - <<: *source-emdat
-    - <<: *source-wdi
-    - <<: *source-population
+    - *source-emdat
+    - *source-wdi
+    - *source-population
 
 tables:
   natural_disasters_decadal:
@@ -60,118 +60,129 @@ tables:
         title: Total deaths
         unit: 'people'
         description: "Total number of deaths as a result of a natural disaster. In EM-DAT, it is the sum of deaths and missing."
-        sources: *source-emdat
+        sources:
+          - *source-emdat
       injured:
         title: Injured
         unit: 'people'
         description: "People suffering from physical injuries, trauma or an illness requiring immediate medical assistance as a direct result of a disaster."
-        sources: *source-emdat
+        sources:
+          - *source-emdat
       affected:
         title: Affected
         unit: 'people'
         description: "Number of people requiring immediate assistance during a period of emergency, i.e. requiring basic survival needs such as food, water, shelter, sanitation and immediate medical assistance."
-        sources: *source-emdat
+        sources:
+          - *source-emdat
       homeless:
         title: Homeless
         unit: 'people'
         description: "Number of people whose house is destroyed or heavily damaged and therefore need shelter after an event."
-        sources: *source-emdat
+        sources:
+          - *source-emdat
       total_affected:
         title: Total affected
         unit: 'people'
         description: "Total number of people affected by a natural disaster. In EM-DAT, it is the sum of the injured, affected and left homeless after a disaster."
-        sources: *source-emdat
+        sources:
+          - *source-emdat
       reconstruction_costs:
         title: Reconstruction costs
         short_unit: '$'
         unit: 'current US$'
         description: "Reconstruction costs."
-        sources: *source-emdat
+        sources:
+          - *source-emdat
       insured_damages:
         title: Insured damages
         short_unit: "$"
         unit: "current US$"
         description: "Insured losses are those which are covered by the insurance sector and paid directly to the owner of the damaged or destroyed property or crops and livestock or the primary insurance company (in case of reinsurance)."
-        sources: *source-emdat
+        sources:
+          - *source-emdat
       total_damages:
         title: "Total economic damage from natural disasters"
         short_unit: '$'
         unit: 'current US$'
         description: "The amount of damage to property, crops, and livestock. In EM-DAT estimated damage are given in US$. For each disaster, the registered figure corresponds to the damage value at the moment of the event, i.e. the figures are shown true to the year of the event."
-        sources: *source-emdat
+        sources:
+          - *source-emdat
       n_events:
         title: Number of reported natural disasters
         unit: 'events'
         description: "Number of reported natural disasters."
-        sources: *source-emdat
+        sources:
+          - *source-emdat
       population:
         title: Population
         unit: 'people'
-        sources: *source-population
+        sources:
+          - *source-population
       total_dead_per_100k_people:
         title: Total number of deaths per 100,000 people
         unit: 'cases per 100k people'
         sources:
-          - <<: *source-emdat
-          - <<: *source-population
+          - *source-emdat
+          - *source-population
       injured_per_100k_people:
         title: Number of injured persons per 100,000 people
         unit: 'cases per 100k people'
         sources:
-          - <<: *source-emdat
-          - <<: *source-population
+          - *source-emdat
+          - *source-population
       affected_per_100k_people:
         title: Number of affected persons per 100,000 people
         unit: 'cases per 100k people'
         sources:
-          - <<: *source-emdat
-          - <<: *source-population
+          - *source-emdat
+          - *source-population
       homeless_per_100k_people:
         title: Number of homeless persons per 100,000 people
         unit: 'cases per 100k people'
         sources:
-          - <<: *source-emdat
-          - <<: *source-population
+          - *source-emdat
+          - *source-population
       total_affected_per_100k_people:
         title: Total number of affected persons per 100,000 people
         unit: 'cases per 100k people'
         sources:
-          - <<: *source-emdat
-          - <<: *source-population
+          - *source-emdat
+          - *source-population
       n_events_per_100k_people:
         title: Number of events per 100,000 people
         unit: 'events per 100k people'
         sources:
-          - <<: *source-emdat
-          - <<: *source-population
+          - *source-emdat
+          - *source-population
       gdp:
         title: "GDP"
         unit: "current US$"
         short_unit: "$"
-        sources: *source-wdi
+        sources:
+          - *source-wdi
       reconstruction_costs_per_gdp:
         title: "Reconstruction costs from natural disasters as a share of GDP"
         unit: "%"
         short_unit: "%"
         description: "Reconstruction costs from natural disasters as a share of GDP."
         sources:
-          - <<: *source-emdat
-          - <<: *source-wdi
+          - *source-emdat
+          - *source-wdi
       insured_damages_per_gdp:
         title: "Insured damages from natural disasters as a share of GDP"
         unit: "%"
         short_unit: "%"
         description: "Insured damages from natural disasters as a share of GDP."
         sources:
-          - <<: *source-emdat
-          - <<: *source-wdi
+          - *source-emdat
+          - *source-wdi
       total_damages_per_gdp:
         title: "Total economic damages from natural disasters as a share of GDP"
         unit: "%"
         short_unit: "%"
         description: "Total economic damages from natural disasters as a share of GDP."
         sources:
-          - <<: *source-emdat
-          - <<: *source-wdi
+          - *source-emdat
+          - *source-wdi
   natural_disasters_yearly:
     variables: *variables-default
