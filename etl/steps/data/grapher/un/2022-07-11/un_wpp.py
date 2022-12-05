@@ -33,6 +33,7 @@ def run(dest_dir: str) -> None:
         # table is generated for every column, use it as a table name
         wide_table.metadata.short_name = wide_table.columns[0]
         dataset.add(wide_table)
+    dataset.save()
 
 
 def _get_shaped_table(dataset: catalog.Dataset) -> catalog.Table:
