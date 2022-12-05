@@ -350,7 +350,7 @@ def add_region_aggregates(frame: pd.DataFrame) -> pd.DataFrame:
         # "Oceania (UN)",
         "South America",
     ]
-    frame = frame[-frame["country"].isin(regions_ignore)]
+    frame = frame.loc[-frame["country"].isin(regions_ignore)]
     # add population
     df = geo.add_population_to_dataframe(frame.copy())
 
