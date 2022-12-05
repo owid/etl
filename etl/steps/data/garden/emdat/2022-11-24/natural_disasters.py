@@ -399,22 +399,17 @@ def create_decade_data(df: pd.DataFrame) -> pd.DataFrame:
     """Create data of average impacts over periods of 10 years."""
     decade_df = df.copy()
 
-    # Convert "year" column into a datetime.
-    decade_df["year"] = pd.to_datetime(decade_df["year"], format="%Y")
-    # Group tens of years and sum.
+    # For each year, calculate the corresponding decade (e.g. 1951 -> 1950, 1929 -> 1920).
+    decade_df["decade"] = (decade_df["year"] // 10) * 10
+
+    # Group by that country-decade-type and get the mean for each column.
     decade_df = (
-        decade_df.set_index("year")
-        .groupby(["country", "type"], observed=True)
-        .resample("10AS")
+        decade_df.drop(columns=["year"])
+        .groupby(["country", "decade", "type"], observed=True)
         .mean(numeric_only=True)
         .reset_index()
+        .rename(columns={"decade": "year"})
     )
-    # Make "year" column years instead of dates.
-    decade_df["year"] = decade_df["year"].dt.year
-    # Remove rows that have no data.
-    decade_df = decade_df.dropna(
-        subset=decade_df.drop(columns=["country", "year", "type"]).columns, how="all"
-    ).reset_index(drop=True)
 
     return decade_df
 
