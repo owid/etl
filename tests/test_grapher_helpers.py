@@ -78,12 +78,14 @@ def test_long_to_wide_tables():
     grapher_tables = list(gh.long_to_wide_tables(table))
 
     t = grapher_tables[0]
+    assert t.index.names == ['year', 'entity_id', 'sex']
     assert t.columns[0] == "births"
-    assert t[t.columns[0]].metadata.title == "Births - Sex: female"
+    assert t[t.columns[0]].metadata.title == "Births"
 
     t = grapher_tables[1]
+    assert t.index.names == ['year', 'entity_id', 'sex']
     assert t.columns[0] == "deaths"
-    assert t[t.columns[0]].metadata.title == "Deaths - Sex: male"
+    assert t[t.columns[0]].metadata.title == "Deaths"
 
 
 def test_contains_inf():
