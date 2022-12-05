@@ -16,6 +16,7 @@ from typing import List
 import pandas as pd
 from owid.catalog import Dataset, DatasetMeta, Table, TableMeta
 from owid.catalog.utils import underscore_table
+from owid.datautils import geo
 from structlog import get_logger
 
 from etl.helpers import Names
@@ -60,14 +61,19 @@ def run(dest_dir: str) -> None:
     ds_ril = Dataset(GARDEN_RILEY_DATASET)
     # group datasets into single list
     all_ds = [ds_wpp, ds_hmd, ds_zij, ds_ril]
+    # load dataframes
+    df_wpp = load_wpp(ds_wpp)
+    df_hmd = load_hmd(ds_hmd)
+    df_zij = load_zijdeman(ds_zij)
+    df_ril = load_riley(ds_ril)
 
     # create tables (all-years, historical and projections)
     log.info("life_expectancy: create table with all-years data")
-    tb = make_table(ds_wpp, ds_hmd, ds_zij, ds_ril)
+    tb = make_table(df_wpp, df_hmd, df_zij, df_ril)
     log.info("life_expectancy: create table with historical data")
-    tb_historical = make_table(ds_wpp, ds_hmd, ds_zij, ds_ril, only_historical=True)
+    tb_historical = make_table(df_wpp, df_hmd, df_zij, df_ril, only_historical=True)
     log.info("life_expectancy: create table with projection data")
-    tb_projection = make_table(ds_wpp, ds_hmd, ds_zij, ds_ril, only_projections=True)
+    tb_projection = make_table(df_wpp, df_hmd, df_zij, df_ril, only_projections=True)
 
     # create dataset
     ds_garden = Dataset.create_empty(dest_dir)
@@ -89,10 +95,10 @@ def run(dest_dir: str) -> None:
 
 
 def make_table(
-    ds_wpp: Dataset,
-    ds_hmd: Dataset,
-    ds_zij: Dataset,
-    ds_ril: Dataset,
+    df_wpp: pd.DataFrame,
+    df_hmd: pd.DataFrame,
+    df_zij: pd.DataFrame,
+    df_ril: pd.DataFrame,
     only_historical: bool = False,
     only_projections: bool = False,
 ) -> Table:
@@ -104,11 +110,6 @@ def make_table(
     only historical data or only projections, respectively.
     """
     log.info("life_expectancy.make_table")
-    # Build DataFrames
-    df_wpp = load_wpp(ds_wpp)
-    df_hmd = load_hmd(ds_hmd)
-    df_zij = load_zijdeman(ds_zij)
-    df_ril = load_riley(ds_ril)
     df = merge_dfs(df_wpp, df_hmd, df_zij, df_ril)
 
     # Filter
@@ -304,6 +305,9 @@ def merge_dfs(df_wpp: pd.DataFrame, df_hmd: pd.DataFrame, df_zij: pd.DataFrame, 
     ), "There is some overlap between the dataset and Riley (2005) dataset"
     df = pd.concat([df, df_ril], ignore_index=True)
 
+    # add region aggregates
+    df = add_region_aggregates(df)
+
     # Dtypes, row sorting
     df = df.astype({"year": int})
     df = df.set_index(COLUMNS_IDX).sort_index()
@@ -316,4 +320,56 @@ def merge_dfs(df_wpp: pd.DataFrame, df_hmd: pd.DataFrame, df_zij: pd.DataFrame, 
     for col in df.columns:
         if col not in COLUMNS_IDX:
             df.loc[df[col] < 0, col] = pd.NA
+    return df
+
+
+def add_region_aggregates(frame: pd.DataFrame) -> pd.DataFrame:
+    """Add life expectancy for continents/"""
+    log.info("life_expectancy: adding region aggregates")
+    # new regions
+    regions_new = [
+        "Europe",
+        "Oceania",
+        "Asia",
+        "Africa",
+        "North America",
+        "South America",
+    ]
+    # remove regions
+    regions_ignore = [
+        "Africa",
+        # "Africa (UN)",
+        "Asia",
+        # "Asia (UN)",
+        "Europe",
+        # "Europe (UN)",
+        # "Latin America and the Caribbean (UN)",
+        "North America",
+        # "Northern America (UN)",
+        "Oceania",
+        # "Oceania (UN)",
+        "South America",
+    ]
+    frame = frame[-frame["country"].isin(regions_ignore)]
+    # add population
+    df = geo.add_population_to_dataframe(frame.copy())
+
+    # estimate values for regions
+    # y(country) = weight(country) * metric(country)
+    df["life_expectancy_0"] *= df.population
+    df["life_expectancy_15"] *= df.population
+    df["life_expectancy_65"] *= df.population
+    df["life_expectancy_80"] *= df.population
+    # z(region) = sum{ y(country) } for country in region
+    for region in regions_new:
+        df = geo.add_region_aggregates(df, region=region)
+    df = df[df["country"].isin(regions_new)]
+    # z(region) /  sum{ population(country) } for country in region
+    df["life_expectancy_0"] /= df.population
+    df["life_expectancy_15"] /= df.population
+    df["life_expectancy_65"] /= df.population
+    df["life_expectancy_80"] /= df.population
+
+    # concatenate
+    df = pd.concat([frame, df]).sort_values(["country", "year"], ignore_index=True).drop(columns="population")
     return df
