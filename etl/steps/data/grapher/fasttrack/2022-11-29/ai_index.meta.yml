@@ -13,7 +13,7 @@ tables:
       share_companies_using_ai:
         title: Share of companies using AI
         unit: '%'
-        description: Lorem ipsum...
+        description: lorem ipsum
         sources:
         - name: AI Index report
           published_by: Stanford University

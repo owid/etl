@@ -63,8 +63,6 @@ def parse_data_from_sheets(data_df: pd.DataFrame) -> pd.DataFrame:
 def parse_metadata_from_sheets(
     dataset_meta_df: pd.DataFrame, variables_meta_df: pd.DataFrame, sources_meta_df: pd.DataFrame
 ) -> YAMLMeta:
-    __import__('ipdb').set_trace()
-
     sources_dict = cast(Dict[str, Any], sources_meta_df.set_index("short_name").to_dict())
     sources_dict = {k: _prune_empty(v) for k, v in sources_dict.items()}
 
