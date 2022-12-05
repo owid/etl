@@ -1,29 +1,11 @@
 from copy import deepcopy
 
 from owid import catalog
+from shared import CURRENT_DIR, DISASTER_TYPE_RENAMING
 
 from etl.helpers import Names
 
-N = Names(__file__)
-
-DISASTER_TYPE_RENAMING = {
-    "all_disasters": "All disasters",
-    "animal_accident": "Animal accident",
-    "drought": "Drought",
-    "earthquake": "Earthquake",
-    "epidemic": "Epidemic",
-    "extreme_temperature": "Extreme temperature",
-    "flood": "Flood",
-    "fog": "Fog",
-    "glacial_lake_outburst": "Glacial lake outburst",
-    "impact": "Impact",
-    "insect_infestation": "Insect infestation",
-    "landslide": "Landslide",
-    "mass_movement__dry": "Dry mass movement",
-    "storm": "Storm",
-    "volcanic_activity": "Volcanic activity",
-    "wildfire": "Wildfire",
-}
+N = Names(str(CURRENT_DIR / "natural_disasters"))
 
 
 def create_wide_tables(table: catalog.Table, is_decade: bool) -> catalog.Table:

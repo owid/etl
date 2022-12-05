@@ -204,13 +204,18 @@ steps:
   #
   data://meadow/emdat/2022-11-24/natural_disasters:
     - snapshot://emdat/2022-11-24/natural_disasters.xlsx
+  # The following dataset has a table for yearly data and another for decadal data.
   data://garden/emdat/2022-11-24/natural_disasters:
     - data://meadow/emdat/2022-11-24/natural_disasters
     - data://garden/owid/latest/key_indicators
     - data://garden/wb/2021-07-01/wb_income
     - data://garden/reference
     - data://garden/worldbank_wdi/2022-05-26/wdi
+  # The following dataset has all (yearly and decadal) variables together.
   data://grapher/emdat/2022-11-24/natural_disasters:
+    - data://garden/emdat/2022-11-24/natural_disasters
+  # The following dataset has only global data, and entity corresponds to the type of disaster.
+  data://grapher/emdat/2022-11-24/natural_disasters_global_by_type:
     - data://garden/emdat/2022-11-24/natural_disasters
 
   # Country profiles - overview
