@@ -344,6 +344,10 @@ def add_population(
         True to warn if population is not found for any of the countries in the data.
     show_full_warning : bool
         True to show affected countries if the previous warning is raised.
+    regions : dict
+        Definitions of regions whose population also needs to be included.
+    expected_countries_without_population : list
+        Countries that are expected to not have population (that should be ignored if warnings are activated).
 
     Returns
     -------
@@ -403,41 +407,73 @@ def add_population(
 def detect_overlapping_regions(
     df, index_columns, region_and_members, country_col="country", year_col="year", ignore_zeros=True
 ):
-    # TODO: Document.
+    """Detect years on which the data for two regions overlap, e.g. a historical region and one of its successors.
+
+    Parameters
+    ----------
+    df : _type_
+        Data (with a dummy index).
+    index_columns : _type_
+        Names of index columns.
+    region_and_members : _type_
+        Regions to check for overlaps. Each region must have a dictionary "regions_included", listing the subregions
+        contained. If the region is historical, "regions_included" would be the list of successor countries.
+    country_col : str, optional
+        Name of country column (usually "country").
+    year_col : str, optional
+        Name of year column (usually "year").
+    ignore_zeros : bool, optional
+        True to ignore overlaps of zeros.
+
+    Returns
+    -------
+    all_overlaps : dict
+        All overlaps found.
+
+    """
     # Sum over all columns to get the total sum of each column for each country-year.
     df_total = (
         df.groupby([country_col, year_col])
         .agg({column: "sum" for column in df.columns if column not in index_columns})
         .reset_index()
     )
-
+    # Create a list of values that will be ignored in overlaps (usually zero or nothing).
     if ignore_zeros:
         overlapping_values_to_ignore = [0]
     else:
         overlapping_values_to_ignore = []
+    # List all variables in data (ignoring index columns).
     variables = [column for column in df.columns if column not in index_columns]
+    # List all country names found in data.
     countries_in_data = df[country_col].unique().tolist()
+    # List all regions found in data.
     regions = [country for country in list(region_and_members) if country in countries_in_data]
+    # Initialize a dictionary that will store all overlaps found.
     all_overlaps = {}
     for region in regions:
+        # List members of current region.
         members = [member for member in region_and_members[region]["regions_included"] if member in countries_in_data]
         for member in members:
+            # Select data for current region.
             region_values = (
                 df_total[df_total[country_col] == region]
                 .replace(overlapping_values_to_ignore, np.nan)
                 .dropna(subset=variables, how="all")
             )
+            # Select data for current member.
             member_values = (
                 df_total[df_total[country_col] == member]
                 .replace(overlapping_values_to_ignore, np.nan)
                 .dropna(subset=variables, how="all")
             )
+            # Concatenate both selections of data, and select duplicated rows.
             combined = pd.concat([region_values, member_values])
             overlaps = combined[combined.duplicated(subset=[year_col], keep=False)]  # type: ignore
             if len(overlaps) > 0:
+                # Add the overlap found to the dictionary of all overlaps.
                 all_overlaps.update({year: set(overlaps[country_col]) for year in overlaps[year_col].unique()})
 
-    # Sort overlaps by year.
+    # Sort overlaps conveniently.
     all_overlaps = {year: all_overlaps[year] for year in sorted(list(all_overlaps))}
 
     return all_overlaps
@@ -463,17 +499,6 @@ def add_region_aggregates(
         Name of year column.
     aggregates : dict or None
         Dictionary of type of aggregation to use for each variable. If None, variables will be aggregated by summing.
-    known_overlaps : list or None
-        List of known overlaps between regions and their member countries.
-    region_codes : list or None
-        List of country codes for each new region. It must have the same number of elements, and in the same order, as
-        the 'regions' argument.
-    country_code_column : str
-        Name of country codes column (only relevant of region_codes is not None).
-    keep_original_region_with_suffix : str or None
-        If None, original data for region will be replaced by aggregate data constructed by this function. If not None,
-        original data for region will be kept, with the same name, but having suffix keep_original_region_with_suffix
-        added to its name.
 
     Returns
     -------
@@ -514,6 +539,21 @@ def add_region_aggregates(
 
 
 def get_last_day_of_month(year: int, month: int):
+    """Get the number of days in a specific month of a specific year.
+
+    Parameters
+    ----------
+    year : int
+        Year.
+    month : int
+        Month.
+
+    Returns
+    -------
+    last_day
+        Number of days in month.
+
+    """
     if month == 12:
         last_day = 31
     else:
@@ -523,6 +563,21 @@ def get_last_day_of_month(year: int, month: int):
 
 
 def correct_data_points(df: pd.DataFrame, corrections: List[Tuple[Dict[Any, Any], Dict[Any, Any]]]) -> pd.DataFrame:
+    """Make individual corrections to data points in a dataframe.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Data to be corrected.
+    corrections : List[Tuple[Dict[Any, Any], Dict[Any, Any]]]
+        Corrections.
+
+    Returns
+    -------
+    corrected_df : pd.DataFrame
+        Corrected data.
+
+    """
     corrected_df = df.copy()
 
     for correction in corrections:
