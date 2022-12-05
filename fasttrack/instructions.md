@@ -2,6 +2,8 @@
 
 2. Click on `File -> Share -> Publish to Web` and share the entire document as csv. Copy the link to the form below. Next time you successfully import it, it'll be available in `Existing Google Sheets` dropdown.
 
+    _Do not "restrict access to your organization" even if your data is private. It is unlikely anyone would access the link by chance._
+
 3. Make sure to check `Make dataset private`, this will let you explore your dataset in Admin without publishing it.
 
 4. Submit the form and resolve all validation errors.

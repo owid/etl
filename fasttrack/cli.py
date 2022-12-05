@@ -146,7 +146,9 @@ class FasttrackForm(BaseModel):
 
 
 def _load_data_and_meta(dummies: dict[str, str]) -> Tuple[pd.DataFrame, YAMLMeta, str, FasttrackForm]:
-    existing_sheets = _load_existing_sheets_from_snapshots()
+    existing_sheets = [
+        {"label": "Choose previously uploaded dataset", "value": "unselected"}
+    ] + _load_existing_sheets_from_snapshots()
 
     sheets_url = None
     selected_sheet = None
@@ -163,10 +165,10 @@ def _load_data_and_meta(dummies: dict[str, str]) -> Tuple[pd.DataFrame, YAMLMeta
                         "New Google Sheets URL",
                         value=sheets_url if selected_sheet is None else "",
                         name="new_sheets_url",
-                        help_text="Click on `File -> Share -> Publish to Web` and share the entire document as csv. Copy the link above",
+                        help_text="Click on `File -> Share -> Publish to Web` and share the entire document as csv. Copy the link above.",
                     ),
                     pi.select(
-                        "Existing Google Sheets",
+                        "OR Existing Google Sheets",
                         existing_sheets,
                         value=selected_sheet,
                         name="existing_sheets_url",
@@ -184,12 +186,18 @@ def _load_data_and_meta(dummies: dict[str, str]) -> Tuple[pd.DataFrame, YAMLMeta
 
         form = FasttrackForm(**form_dict)
 
-        sheets_url = form.new_sheets_url
-
         # use selected sheet if URL is not available
-        if not sheets_url:
-            selected_sheet = form.existing_sheets_url
-            sheets_url = form.new_sheets_url or selected_sheet
+        if not form.new_sheets_url:
+            if form.existing_sheets_url == "unselected":
+                _bail([sheets.ValidationError("Please either set URL or pick from existing Google Sheets")])
+                continue
+        else:
+            if form.existing_sheets_url != "unselected":
+                _bail([sheets.ValidationError("You cannot set both URL and pick from existing Google Sheets")])
+                continue
+
+        selected_sheet = form.existing_sheets_url
+        sheets_url = form.new_sheets_url or selected_sheet
 
         assert sheets_url
 

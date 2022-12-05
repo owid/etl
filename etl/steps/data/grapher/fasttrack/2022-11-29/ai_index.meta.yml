@@ -5,10 +5,8 @@ dataset:
   title: AI Index
   description: ''
   sources:
-  - name: Unknown
-    published_by: Unknown
-    publication_year: 2022
-    date_accessed: 2022-12-02
+  - name: AI Index report
+    published_by: Stanford University
 tables:
   ai_index:
     variables:
@@ -16,6 +14,9 @@ tables:
         title: Share of companies using AI
         unit: '%'
         description: Lorem ipsum...
+        sources:
+        - name: AI Index report
+          published_by: Stanford University
       number_ai_bills_cumulative:
         title: number_ai_bills_cumulative
         unit: ''
