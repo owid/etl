@@ -18,9 +18,14 @@ def run(dest_dir: str) -> None:
     # Treat column for disaster type as the new entity (so they can be selected in grapher as if they were countries).
     table_global = table_global.rename(columns={"type": "country"}).replace(DISASTER_TYPE_RENAMING)
 
-    # Create new grapher dataset, add table, and save dataset.
+    # Set an appropriate index.
+    table_global = table_global.set_index(["country", "year"]).sort_index()
+
+    # Create new grapher dataset, update metadata, add table, and save dataset.
     dataset = catalog.Dataset.create_empty(dest_dir, garden_dataset.metadata)
     dataset.metadata.title = GRAPHER_DATASET_TITLE
     dataset.metadata.short_name = GRAPHER_DATASET_SHORT_NAME
+    table_global.metadata.title = GRAPHER_DATASET_TITLE
+    table_global.metadata.short_name = GRAPHER_DATASET_SHORT_NAME
     dataset.add(table_global)
     dataset.save()
