@@ -186,7 +186,8 @@ def make_metadata(all_ds: List[Dataset]) -> DatasetMeta:
         description += f"{ds.metadata.title}:\n\n{ds.metadata.description}\n\n------\n\n"
     description = (
         "This dataset has been created using multiple sources. We use UN WPP for data since 1950 (estimates and medium"
-        " variant). Prior to that, other sources are combined.\n\n" + description
+        " variant). Prior to that, other sources are combined.\n\n"
+        + description
     )
 
     # sources
@@ -343,7 +344,10 @@ def merge_dfs(df_wpp: pd.DataFrame, df_hmd: pd.DataFrame, df_zij: pd.DataFrame, 
 
 
 def add_region_aggregates(frame: pd.DataFrame) -> pd.DataFrame:
-    """Add life expectancy for continents/"""
+    """Add life expectancy for continents.
+
+    This function is currently not in use, but might be useful in the future.
+    """
     log.info("life_expectancy: adding region aggregates")
     # new regions
     regions_new = [
