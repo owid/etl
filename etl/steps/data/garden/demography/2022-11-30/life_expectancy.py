@@ -50,6 +50,22 @@ VERSION = "2022-11-30"
 # From then, we use the metadata in that YAML file, which might have some manual edits.
 COLD_START = False
 
+# Region mapping
+# We will be using continent names without (Entity) suffix. This way charts show continuity between lines from different datasets (e.g. riley and UN)
+REGION_MAPPING = {
+    "Africa (Riley 2005)": "Africa",
+    "Americas (Riley 2005)": "Americas",
+    "Asia (Riley 2005)": "Asia",
+    "Europe (Riley 2005)": "Europe",
+    "Oceania (Riley 2005)": "Oceania",
+    "Africa (UN)": "Africa",
+    "Northern America (UN)": "Northern America",
+    "Latin America and the Caribbean (UN)": "Latin America and the Caribbean",
+    "Asia (UN)": "Asia",
+    "Europe (UN)": "Europe",
+    "Oceania (UN)": "Oceania",
+}
+
 
 def run(dest_dir: str) -> None:
     log.info("life_expectancy.start")
@@ -170,7 +186,8 @@ def make_metadata(all_ds: List[Dataset]) -> DatasetMeta:
         description += f"{ds.metadata.title}:\n\n{ds.metadata.description}\n\n------\n\n"
     description = (
         "This dataset has been created using multiple sources. We use UN WPP for data since 1950 (estimates and medium"
-        " variant). Prior to that, other sources are combined.\n\n" + description
+        " variant). Prior to that, other sources are combined.\n\n"
+        + description
     )
 
     # sources
@@ -306,7 +323,10 @@ def merge_dfs(df_wpp: pd.DataFrame, df_hmd: pd.DataFrame, df_zij: pd.DataFrame, 
     df = pd.concat([df, df_ril], ignore_index=True)
 
     # add region aggregates
-    df = add_region_aggregates(df)
+    # df = add_region_aggregates(df)
+
+    # Rename regions
+    df["country"] = df["country"].replace(REGION_MAPPING)
 
     # Dtypes, row sorting
     df = df.astype({"year": int})

@@ -5,7 +5,8 @@ dataset:
   description:
     "This dataset has been created using multiple sources. We use UN WPP\
     \ for data since 1950 (estimates and medium variant). Prior to that, other sources\
-    \ are combined.\n\n------\n\nWorld Population Prospects - UN (2022):\n\nWorld\
+    \ are combined.\n\n For continents, we use UN's definition for values after 1950 and\
+    \ Riley (2005) definition for values prior to 1950.\n\n------\n\nWorld Population Prospects - UN (2022):\n\nWorld\
     \ Population Prospects 2022 is the 27th edition of the official estimates and\
     \ projections of the global population that have been published by the United\
     \ Nations since 1951. The estimates are based on all available sources of data\
