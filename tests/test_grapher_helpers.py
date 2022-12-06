@@ -1,6 +1,5 @@
 import numpy as np
 import pandas as pd
-import pytest
 from owid.catalog import DatasetMeta, Source, Table, TableMeta, VariableMeta
 
 from etl import grapher_helpers as gh
@@ -61,7 +60,7 @@ def test_yield_wide_table_with_dimensions():
     assert t[t.columns[0]].metadata.title == "Deaths - Age group: 19-25"
 
 
-def test_yield_long_table_with_dimensions():
+def test_long_to_wide_tables():
     deaths_meta = VariableMeta(title="Deaths", unit="people")
     births_meta = VariableMeta(title="Births", unit="people")
 
@@ -76,42 +75,17 @@ def test_yield_long_table_with_dimensions():
         }
     ).set_index(["year", "entity_id", "sex"])
     table = Table(long, metadata=TableMeta(dataset=DatasetMeta(sources=[Source()])))
-    grapher_tables = list(gh._yield_long_table(table, dim_titles=["Sex"]))
+    grapher_tables = list(gh.long_to_wide_tables(table))
 
     t = grapher_tables[0]
-    assert t.columns[0] == "births__sex_female"
-    assert t[t.columns[0]].metadata.title == "Births - Sex: female"
+    assert t.index.names == ["year", "entity_id", "sex"]
+    assert t.columns[0] == "births"
+    assert t[t.columns[0]].metadata.title == "Births"
 
     t = grapher_tables[1]
-    assert t.columns[0] == "births__sex_male"
-    assert t[t.columns[0]].metadata.title == "Births - Sex: male"
-
-    t = grapher_tables[2]
-    assert t.columns[0] == "deaths__sex_female"
-    assert t[t.columns[0]].metadata.title == "Deaths - Sex: female"
-
-    t = grapher_tables[3]
-    assert t.columns[0] == "deaths__sex_male"
-    assert t[t.columns[0]].metadata.title == "Deaths - Sex: male"
-
-
-def test_yield_long_table_with_dimensions_error():
-    deaths_meta = VariableMeta(title="Deaths", unit="people")
-    births_meta = VariableMeta(title="Births", unit="people")
-
-    long = pd.DataFrame(
-        {
-            "year": [2019, 2019, 2019, 2019],
-            "entity_id": [1, 1, 1, 1],
-            "variable": ["deaths", "deaths", "births", "births"],
-            "meta": [deaths_meta, deaths_meta, births_meta, births_meta],
-            "value": [1, 2, 3, 4],
-            "sex": ["male", "female", "male", "female"],
-        }
-    ).set_index(["year", "entity_id", "sex"])
-    table = Table(long)  # no metadata with sources
-    with pytest.raises(AssertionError):
-        _ = list(gh._yield_long_table(table, dim_titles=["Sex"]))
+    assert t.index.names == ["year", "entity_id", "sex"]
+    assert t.columns[0] == "deaths"
+    assert t[t.columns[0]].metadata.title == "Deaths"
 
 
 def test_contains_inf():
