@@ -14,19 +14,15 @@ GARDEN_DATASET_PATH = DATA_DIR / f"garden/emdat/{GARDEN_VERSION}/natural_disaste
 
 DISASTER_TYPE_RENAMING = {
     "all_disasters": "All disasters",
-    "animal_accident": "Animal accident",
     "drought": "Drought",
     "earthquake": "Earthquake",
-    "epidemic": "Epidemic",
     "extreme_temperature": "Extreme temperature",
     "flood": "Flood",
     "fog": "Fog",
     "glacial_lake_outburst": "Glacial lake outburst",
-    "impact": "Impact",
-    "insect_infestation": "Insect infestation",
     "landslide": "Landslide",
-    "mass_movement__dry": "Dry mass movement",
-    "storm": "Storm",
+    "dry_mass_movement": "Dry mass movement",
+    "extreme_weather": "Extreme weather",
     "volcanic_activity": "Volcanic activity",
     "wildfire": "Wildfire",
 }

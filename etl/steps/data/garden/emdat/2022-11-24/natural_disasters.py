@@ -45,25 +45,28 @@ WDI_DATASET_PATH = DATA_DIR / "garden/worldbank_wdi/2022-05-26/wdi"
 # Define outputs.
 VERSION = MEADOW_VERSION
 
-# List of expected disaster types in the raw data.
-# If new ones are included, simply add them here.
-EXPECTED_DISASTER_TYPES = [
-    "Animal accident",
-    "Drought",
-    "Earthquake",
-    "Epidemic",
-    "Extreme temperature",
-    "Flood",
-    "Fog",
-    "Glacial lake outburst",
-    "Impact",
-    "Insect infestation",
-    "Landslide",
-    "Mass movement (dry)",
-    "Storm",
-    "Volcanic activity",
-    "Wildfire",
-]
+# List of expected disaster types in the raw data to consider, and how to rename them.
+# We consider only natural disasters of subgroups Geophysical, Meteorological, Hydrological and Climatological.
+# We therefore ignore Extra-terrestrial (of which there is just one meteorite impact event) and Biological subgroups.
+# For completeness, add all existing types here, and rename them as np.nan if they should not be used.
+# If new types are included on a data update, simply add them here.
+EXPECTED_DISASTER_TYPES = {
+    "Animal accident": np.nan,
+    "Drought": "Drought",
+    "Earthquake": "Earthquake",
+    "Epidemic": np.nan,
+    "Extreme temperature": "Extreme temperature",
+    "Flood": "Flood",
+    "Fog": "Fog",
+    "Glacial lake outburst": "Glacial lake outburst",
+    "Impact": np.nan,
+    "Insect infestation": np.nan,
+    "Landslide": "Landslide",
+    "Mass movement (dry)": "Dry mass movement",
+    "Storm": "Extreme weather",
+    "Volcanic activity": "Volcanic activity",
+    "Wildfire": "Wildfire",
+}
 
 # List of columns to select from raw data, and how to rename them.
 COLUMNS = {
@@ -174,6 +177,16 @@ def prepare_input_data(df: pd.DataFrame) -> pd.DataFrame:
     # Remove spurious spaces in entities.
     df["type"] = df["type"].str.strip()
 
+    # Sanity check
+    error = "List of expected disaster types has changed. Consider updating EXPECTED_DISASTER_TYPES."
+    assert set(df["type"]) == set(EXPECTED_DISASTER_TYPES), error
+
+    # Rename disaster types conveniently.
+    df["type"] = df["type"].replace(EXPECTED_DISASTER_TYPES)
+
+    # Drop rows for disaster types that are not relevant.
+    df = df.dropna(subset="type").reset_index(drop=True)
+
     return df
 
 
@@ -181,9 +194,6 @@ def sanity_checks_on_inputs(df: pd.DataFrame) -> None:
     """Run sanity checks on input data."""
     error = "All values should be positive."
     assert (df.select_dtypes("number").fillna(0) >= 0).all().all(), error
-
-    error = "List of expected disaster types has changed. Consider updating EXPECTED_DISASTER_TYPES."
-    assert set(df["type"]) == set(EXPECTED_DISASTER_TYPES), error
 
     error = "Column 'total_affected' should be the sum of columns 'injured', 'affected', and 'homeless'."
     assert (
@@ -522,7 +532,9 @@ def sanity_checks_on_outputs(df: pd.DataFrame, is_decade: bool) -> None:
         "Consider updating EXPECTED_DISASTER_TYPES (or renaming ALL_DISASTERS_TYPE)."
     )
     expected_disaster_types = [ALL_DISASTERS_TYPE] + [
-        catalog.utils.underscore(disaster) for disaster in EXPECTED_DISASTER_TYPES
+        catalog.utils.underscore(EXPECTED_DISASTER_TYPES[disaster])
+        for disaster in EXPECTED_DISASTER_TYPES
+        if not pd.isna(EXPECTED_DISASTER_TYPES[disaster])
     ]
     assert set(df["type"]) == set(expected_disaster_types), error
 

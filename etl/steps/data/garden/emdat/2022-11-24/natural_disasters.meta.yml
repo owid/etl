@@ -6,7 +6,7 @@ all_sources:
       publication_date: '2022-11-24'
       publication_year: 2022
       description: &description-emdat |
-        EM-DAT data includes all categories classified as "natural disasters" (distinguished from technological disasters, such as oil spills and industrial accidents). This includes those from animal accidents, droughts, earthquakes, epidemics, extreme temperatures, floods, fogs, glacial lake outbursts, impacts, insect infestations, landslide, dry mass movements, storms, volcanic activity, and wildfires.
+        EM-DAT data includes all categories classified as "natural disasters" (distinguished from technological disasters, such as oil spills and industrial accidents). This includes those from drought, earthquakes, extreme temperatures, extreme weather, floods, fogs, glacial lake outbursts, landslide, dry mass movements, volcanic activity, and wildfires.
 
         Disaster-related deaths from EM-DAT have been normalized by Our World in Data to global population size based on <a href="https://ourworldindata.org/population-sources">different sources</a>. This provides data in terms of cases per 100,000 people.
 
@@ -31,13 +31,9 @@ all_sources:
 
         EM-DAT defines the following types of disasters as:
 
-        + Animal accident: Human encounters with dangerous or exotic animals in both urban and rural developments.
-
         + Drought: An extended period of unusually low precipitation that produces a shortage of water for people, animals and plants. Drought is different from most other hazards in that it develops slowly, sometimes even over years, and its onset is generally difficult to detect. Drought is not solely a physical phenomenon because its impacts can be exacerbated by human activities and water supply demands. Drought is therefore often defined both conceptually and operationally. Operational definitions of drought, meaning the degree of precipitation reduction that constitutes a drought, vary by locality, climate and environmental sector.
 
         + Earthquake: Sudden movement of a block of the Earth's crust along a geological fault and associated ground shaking.
-
-        + Epidemic: Either an unusual increase in the number of cases of an infectious disease, which already exists in the region or population concerned; or the appearance of an infection previously absent from a region.
 
         + Extreme temperature: Extreme temperature.
 
@@ -47,15 +43,11 @@ all_sources:
 
         + Glacial lake outburst: A flood that occurs when water dammed by a glacier or moraine is suddenly released. Glacial lakes can be at the front of the glacier (marginal lake) or below the ice sheet (sub-glacial lake).
 
-        + Impact: A type of extraterrestrial hazard caused by the collision of the Earth with a meteoroid, asteroid or comet.
-
-        + Insect infestation: Pervasive influx and development of insects or parasites affecting humans, animals, crops and materials.
-
         + Landslide: Any kind of moderate to rapid soil movement incl. lahar, mudslide, debris flow. A landslide is the movement of soil or rock controlled by gravity and the speed of the movement usually ranges between slow and rapid, but not very slow. It can be superficial or deep, but the materials have to make up a mass that is a portion of the slope or the slope itself. The movement has to be downward and outward with a free face.
 
         + Mass movement: Any type of downslope movement of earth materials.
 
-        + Storm: Storm.
+        + Extreme weather: Storm.
 
         + Volcanic activity: A type of volcanic event near an opening/vent in the Earth's surface including volcanic eruptions of lava, ash, hot vapour, gas, and pyroclastic material.
 
