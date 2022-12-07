@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 15:38:43.269165
+  description: ''
+  file_extension: feather
+  is_public: false
+  name: Firm bribery incidence (World Bank – Enterprise Survey) (split)
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_2987_firm_bribery_incidence__world_bank__enterprise_survey__split_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/2987
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 155332a3c7a69676036ead26abe14cbf
+  size: 10906
+  path: dataset_2987_firm_bribery_incidence__world_bank__enterprise_survey__split_values.feather

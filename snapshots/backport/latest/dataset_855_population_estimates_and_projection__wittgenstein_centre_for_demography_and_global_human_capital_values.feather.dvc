@@ -1,0 +1,18 @@
+meta:
+  date_accessed: 2022-12-07 15:39:56.648471
+  description: Medium SSP2, by world region and age
+  file_extension: feather
+  is_public: true
+  name: Population Estimates and Projection - Wittgenstein Centre for Demography and
+    Global Human Capital
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_855_population_estimates_and_projection__wittgenstein_centre_for_demography_and_global_human_capital_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/855
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 8b9d372b8186d8dc2de1a363af84c475
+  size: 13586
+  path: dataset_855_population_estimates_and_projection__wittgenstein_centre_for_demography_and_global_human_capital_values.feather
