@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 16:53:19.085060
+  description: This dataset combines historical data with recent series from OECD.stats
+  file_extension: json
+  is_public: true
+  name: Grapher metadata for dataset_656_female_labor_force_participation_rate__owid__2017
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_656_female_labor_force_participation_rate__owid__2017_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/656
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: c6d2a10cc59590c513f91b44c8e9bcc2
+  size: 2972
+  path: dataset_656_female_labor_force_participation_rate__owid__2017_config.json

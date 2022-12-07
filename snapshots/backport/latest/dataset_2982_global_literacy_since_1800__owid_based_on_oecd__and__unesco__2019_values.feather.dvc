@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 17:05:21.095176
+  description: ''
+  file_extension: feather
+  is_public: true
+  name: Global literacy since 1800 (OWID based on OECD & UNESCO (2019))
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_2982_global_literacy_since_1800__owid_based_on_oecd__and__unesco__2019_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/2982
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: a6ad12e33ae75f0f2f92aa21654a95e2
+  size: 6298
+  path: dataset_2982_global_literacy_since_1800__owid_based_on_oecd__and__unesco__2019_values.feather

@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 16:54:33.983011
+  description: Dataset in progress – do not use or share
+  file_extension: json
+  is_public: false
+  name: Grapher metadata for dataset_5808_biofuel__petrol_and_ev_environmental_comparisons
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_5808_biofuel__petrol_and_ev_environmental_comparisons_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/5808
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 86f14cbce25b165602100b6bce0385c7
+  size: 4503
+  path: dataset_5808_biofuel__petrol_and_ev_environmental_comparisons_config.json

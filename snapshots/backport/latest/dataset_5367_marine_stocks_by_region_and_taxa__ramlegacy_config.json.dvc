@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 17:03:03.614129
+  description: ''
+  file_extension: json
+  is_public: true
+  name: Grapher metadata for dataset_5367_marine_stocks_by_region_and_taxa__ramlegacy
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_5367_marine_stocks_by_region_and_taxa__ramlegacy_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/5367
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 6ed807fe7c276440687e299d904def4f
+  size: 9241
+  path: dataset_5367_marine_stocks_by_region_and_taxa__ramlegacy_config.json

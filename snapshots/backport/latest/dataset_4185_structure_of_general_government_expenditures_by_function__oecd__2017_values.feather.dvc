@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 16:59:07.420585
+  description: ''
+  file_extension: feather
+  is_public: false
+  name: Structure of general government expenditures by function - OECD (2017)
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_4185_structure_of_general_government_expenditures_by_function__oecd__2017_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/4185
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 57857daa37d41dcd137d1da08288ce19
+  size: 19490
+  path: dataset_4185_structure_of_general_government_expenditures_by_function__oecd__2017_values.feather

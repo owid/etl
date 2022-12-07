@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 16:53:26.473824
+  description: ''
+  file_extension: json
+  is_public: true
+  name: Grapher metadata for dataset_2959_extreme_temperatures_in_us__noaa
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_2959_extreme_temperatures_in_us__noaa_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/2959
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 62e06ad42a05ddfb6876fa92d4bd4b56
+  size: 6222
+  path: dataset_2959_extreme_temperatures_in_us__noaa_config.json

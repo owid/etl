@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 16:51:45.623364
+  description: This is a dataset imported by the automated fetcher
+  file_extension: feather
+  is_public: true
+  name: Clio-Infra - Biological Standards of Living - Baten and Blum (2015)
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_871_clio_infra__biological_standards_of_living__baten_and_blum__2015_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/871
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 056e69a3bf3062cd076cf0d48d5d4539
+  size: 26754
+  path: dataset_871_clio_infra__biological_standards_of_living__baten_and_blum__2015_values.feather

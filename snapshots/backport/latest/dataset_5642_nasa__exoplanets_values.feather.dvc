@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 17:06:32.127847
+  description: https://github.com/owid/notebooks/tree/main/EdouardMathieu/exoplanets
+  file_extension: feather
+  is_public: false
+  name: NASA - Exoplanets
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_5642_nasa__exoplanets_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/5642
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 68e3f44103afde64532e0cafbbc6e875
+  size: 6362
+  path: dataset_5642_nasa__exoplanets_values.feather

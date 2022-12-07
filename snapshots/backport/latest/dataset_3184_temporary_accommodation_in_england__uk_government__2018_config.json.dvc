@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 16:52:45.658610
+  description: ''
+  file_extension: json
+  is_public: true
+  name: Grapher metadata for dataset_3184_temporary_accommodation_in_england__uk_government__2018
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_3184_temporary_accommodation_in_england__uk_government__2018_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/3184
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 5bfd2a57dc2cd05afb9aa6eb25a9ad92
+  size: 3763
+  path: dataset_3184_temporary_accommodation_in_england__uk_government__2018_config.json

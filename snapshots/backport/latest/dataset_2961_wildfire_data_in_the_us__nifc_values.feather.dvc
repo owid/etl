@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 16:53:04.348109
+  description: ''
+  file_extension: feather
+  is_public: false
+  name: Wildfire data in the US (NIFC)
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_2961_wildfire_data_in_the_us__nifc_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/2961
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 6b794871136067957606d8379464dcdf
+  size: 7962
+  path: dataset_2961_wildfire_data_in_the_us__nifc_values.feather
