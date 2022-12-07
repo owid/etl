@@ -86,7 +86,7 @@ def combine_sex_tables(ds_meadow: Dataset, table_names: List[str]) -> pd.DataFra
             raise ValueError(f"Unknown sex for table {table_name}!")
         dfs.append(df)
     df = pd.concat(dfs, ignore_index=True)
-    return df
+    return df  # type: ignore
 
 
 def clean_countries(df: pd.DataFrame) -> pd.DataFrame:

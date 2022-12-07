@@ -33,7 +33,8 @@ import re
 import tempfile
 from glob import glob
 from io import StringIO
-from typing import List, cast
+from pathlib import Path
+from typing import List, Tuple, cast
 
 import pandas as pd
 from owid import catalog
@@ -119,7 +120,6 @@ DTYPES = {
     "country": "category",
     "year": "category",
 }
-["lt_both", "lt_female", "lt_male"]
 
 
 def run(dest_dir: str) -> None:
@@ -151,7 +151,7 @@ def init_dataset(dest_dir: str, snap: Snapshot) -> Dataset:
     return ds
 
 
-def create_and_add_tables_to_dataset(local_file: str, ds: Dataset) -> Dataset:
+def create_and_add_tables_to_dataset(local_file: Path, ds: Dataset) -> Dataset:
     """Create and add tables to dataset.
 
     This method creates tables for all the folders found once `local_file` is uncompressed. Then,
@@ -243,7 +243,7 @@ def make_table(input_folder: str, folder: dict) -> catalog.Table:
     return table
 
 
-def _age_year(input_folder: str) -> str:
+def _age_year(input_folder: str) -> Tuple[str, str]:
     ageyear = input_folder.split("_")[-1]
     age, year = ageyear.split("x")
     return age, year
@@ -368,7 +368,7 @@ def _clean_set_dtypes_df(df: pd.DataFrame) -> pd.DataFrame:
     return df.astype(DTYPES)
 
 
-def df_to_table(df: pd.DataFrame, age: int, year: int, sex: str) -> catalog.Table:
+def df_to_table(df: pd.DataFrame, age: str, year: str, sex: str) -> catalog.Table:
     """Convert plain pandas.DataFrame into table.
 
     Parameters
