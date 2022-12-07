@@ -331,7 +331,13 @@ def cleanup_ghost_variables(dataset_id: int, upserted_variable_ids: List[int], w
         with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as executor:
             list(executor.map(_delete_variable_from_data_values, variable_ids_to_delete))
 
-        # then variables themselves
+        # then variables themselves with related data in other tables
+        db.cursor.execute(
+            """
+            DELETE FROM country_latest_data WHERE variable_id IN %(variable_ids)s
+        """,
+            {"variable_ids": variable_ids_to_delete},
+        )
         db.cursor.execute(
             """
             DELETE FROM variables WHERE datasetId=%(dataset_id)s AND id IN %(variable_ids)s
