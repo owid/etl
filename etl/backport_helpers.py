@@ -1,4 +1,3 @@
-import concurrent.futures
 from typing import cast
 
 import numpy as np
@@ -6,10 +5,10 @@ import pandas as pd
 import structlog
 from owid.catalog import Dataset, Table
 from owid.catalog.utils import underscore_table
-from owid.walden import CATALOG as WALDEN_CATALOG
 from pydantic import BaseModel
 
 from etl import grapher_model as gm
+from etl.snapshot import Snapshot
 from etl.steps.data.converters import convert_grapher_dataset, convert_grapher_variable
 
 SPARSE_DATASET_VARIABLES_CHUNKSIZE = 1000
@@ -23,17 +22,31 @@ class GrapherConfig(BaseModel):
     # NOTE: sources can belong to dataset or variable
     sources: list[gm.Source]
 
+    def to_json(self) -> str:
+        return self.json(sort_keys=True, indent=0)
+
+    @classmethod
+    def from_grapher_objects(
+        cls,
+        ds: gm.Dataset,
+        vars: list[gm.Variable],
+        sources: list[gm.Source],
+    ) -> "GrapherConfig":
+        return cls(
+            dataset=ds,
+            variables=vars,
+            sources=sources,
+        )
+
 
 def load_values(short_name: str) -> pd.DataFrame:
-    walden_ds = WALDEN_CATALOG.find_one(short_name=f"{short_name}_values")
-    local_path = walden_ds.ensure_downloaded()
-    return cast(pd.DataFrame, pd.read_feather(local_path))
+    snap = Snapshot(f"backport/latest/{short_name}_values.feather")
+    return cast(pd.DataFrame, pd.read_feather(snap.path))
 
 
 def load_config(short_name: str) -> GrapherConfig:
-    walden_ds = WALDEN_CATALOG.find_one(short_name=f"{short_name}_config")
-    local_path = walden_ds.ensure_downloaded()
-    return GrapherConfig.parse_file(local_path)
+    snap = Snapshot(f"backport/latest/{short_name}_config.json")
+    return GrapherConfig.parse_file(snap.path)
 
 
 def create_wide_table(values: pd.DataFrame, short_name: str, config: GrapherConfig) -> Table:
@@ -81,12 +94,8 @@ def create_wide_table(values: pd.DataFrame, short_name: str, config: GrapherConf
 def create_dataset(dest_dir: str, short_name: str) -> Dataset:
     """Create Dataset from backported dataset in walden. Convert
     it into wide format and add metadata."""
-    with concurrent.futures.ThreadPoolExecutor() as executor:
-        values_future = executor.submit(load_values, short_name)
-        config_future = executor.submit(load_config, short_name)
-
-    values = values_future.result()
-    config = config_future.result()
+    values = load_values(short_name)
+    config = load_config(short_name)
 
     # put sources belonging to a dataset but not to a variable into dataset metadata
     variable_source_ids = {v.sourceId for v in config.variables}

@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-11-29 16:27:12.740132
+  description: This is a dataset imported by the automated fetcher
+  file_extension: json
+  is_public: true
+  name: Grapher metadata for dataset_1857_employment
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_1857_employment_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/1857
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 4c7b94d3b9bbd4a9460b46baa4d65ce7
+  size: 46547
+  path: dataset_1857_employment_config.json

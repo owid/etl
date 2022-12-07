@@ -3,7 +3,6 @@
 #  etl.py
 #
 
-import os
 import re
 import resource
 import sys
@@ -13,15 +12,12 @@ from typing import Any, Callable, List, Optional
 
 import click
 from ipdb import launch_ipdb_on_exception
-from owid.walden import CATALOG as WALDEN_CATALOG
-from owid.walden import Catalog as WaldenCatalog
 
 from etl import config, paths
+from etl.snapshot import snapshot_catalog
 from etl.steps import DAG, compile_steps, load_dag, select_dirty_steps
 
 config.enable_bugsnag()
-
-WALDEN_NAMESPACE = os.environ.get("WALDEN_NAMESPACE", "backport")
 
 # if the number of open files allowed is less than this, increase it
 LIMIT_NOFILE = 4096
@@ -179,7 +175,7 @@ def construct_dag(dag_path: Path, backport: bool, private: bool, grapher: bool) 
     dag = load_dag(dag_path)
 
     # Dynamically construct all backporting steps
-    backporting_dag = _backporting_steps(private, walden_catalog=WALDEN_CATALOG)
+    backporting_dag = _backporting_steps(private)
 
     # Add all steps for backporting datasets (there are currently >800 of them)
     # If --backport flag is missing, remove all backported datasets that aren't used in DAG
@@ -272,26 +268,26 @@ def _is_private_step(step_name: str) -> bool:
     return bool(re.findall(r".*?-private://", step_name))
 
 
-def _backporting_steps(private: bool, walden_catalog: WaldenCatalog) -> DAG:
+def _backporting_steps(private: bool) -> DAG:
     """Return a DAG of steps for backporting datasets."""
     dag: DAG = {}
 
-    # load all backported datasets from walden
-    for ds in walden_catalog.find(namespace=WALDEN_NAMESPACE):
+    # load all backported snapshots
+    for snap in snapshot_catalog("backport/.*"):
 
         # skip private backported steps
-        if not private and not ds.is_public:
+        if not private and not snap.metadata.is_public:
             continue
 
         # two files are generated for each dataset, skip one
-        if ds.short_name.endswith("_values"):
-            short_name = ds.short_name.removesuffix("_values")
+        if snap.metadata.short_name.endswith("_values"):
+            short_name = snap.metadata.short_name.removesuffix("_values")
 
-            private_suffix = "" if ds.is_public else "-private"
+            private_suffix = "" if snap.metadata.is_public else "-private"
 
             dag[f"backport{private_suffix}://backport/owid/latest/{short_name}"] = {
-                f"walden{private_suffix}://{ds.namespace}/latest/{short_name}_values",
-                f"walden{private_suffix}://{ds.namespace}/latest/{short_name}_config",
+                f"snapshot{private_suffix}://backport/latest/{short_name}_values.feather",
+                f"snapshot{private_suffix}://backport/latest/{short_name}_config.json",
             }
 
     return dag

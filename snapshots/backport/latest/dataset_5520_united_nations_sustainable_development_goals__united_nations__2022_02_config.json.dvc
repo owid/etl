@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-11-29 16:19:19.367184
+  description: This is a dataset imported by the automated fetcher
+  file_extension: json
+  is_public: true
+  name: Grapher metadata for dataset_5520_united_nations_sustainable_development_goals__united_nations__2022_02
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_5520_united_nations_sustainable_development_goals__united_nations__2022_02_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/5520
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: cc72121739db8152a73e90ae208864e3
+  size: 4540753
+  path: dataset_5520_united_nations_sustainable_development_goals__united_nations__2022_02_config.json
