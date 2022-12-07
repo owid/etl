@@ -39,6 +39,9 @@ DISASTER_TYPE_RENAMING = {
 
 
 def create_wide_tables(table: catalog.Table) -> catalog.Table:
+    """Convert input table from long to wide format, and adjust column names to adjust to the old names in the files
+    used by the explorer.
+    """
     # Adapt disaster type names to match those in the old explorer files.
     table = table.reset_index()
     table["type"] = table["type"].replace(DISASTER_TYPE_RENAMING)
