@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 17:06:27.850860
+  description: https://github.com/owid/notebooks/tree/main/EdouardMathieu/exoplanets
+  file_extension: json
+  is_public: false
+  name: Grapher metadata for dataset_5642_nasa__exoplanets
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_5642_nasa__exoplanets_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/5642
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 0c3562bd29e7c5088c55b7547e20f31a
+  size: 2858
+  path: dataset_5642_nasa__exoplanets_config.json

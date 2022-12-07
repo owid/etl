@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 17:29:01.797625
+  description: core-econ.org
+  file_extension: json
+  is_public: false
+  name: Grapher metadata for dataset_3161_te_1_11
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_3161_te_1_11_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/3161
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: af8a5545296d3acca3940cd86668e1cc
+  size: 1864
+  path: dataset_3161_te_1_11_config.json

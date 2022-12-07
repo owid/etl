@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 15:54:03.299587
+  description: core-econ.org
+  file_extension: feather
+  is_public: false
+  name: Figure 4.9a
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_2966_figure_4_9a_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/2966
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 790872e2544e40ebfb593419b476465f
+  size: 6722
+  path: dataset_2966_figure_4_9a_values.feather

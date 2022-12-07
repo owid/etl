@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 15:54:19.777453
+  description: ''
+  file_extension: feather
+  is_public: true
+  name: Forest Transition Phase (Pendrill et al. 2019)
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_5206_forest_transition_phase__pendrill_et_al__2019_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/5206
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 90691699e811ef84a2d3b5c7ad2c928e
+  size: 12034
+  path: dataset_5206_forest_transition_phase__pendrill_et_al__2019_values.feather

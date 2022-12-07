@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 15:54:05.884244
+  description: ''
+  file_extension: json
+  is_public: false
+  name: Grapher metadata for dataset_2975_total_population_estimates__1970_2100__iiasa__2015__split
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_2975_total_population_estimates__1970_2100__iiasa__2015__split_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/2975
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 27c542b8bb5dabd26b247e3fabd6832b
+  size: 1603
+  path: dataset_2975_total_population_estimates__1970_2100__iiasa__2015__split_config.json

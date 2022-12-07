@@ -1,0 +1,12 @@
+meta:
+  date_accessed: 2022-12-07 17:08:24.412136
+  description: ''
+  file_extension: json
+  is_public: false
+  name: Grapher metadata for dataset_5281_share_of_fish_stocks_within_biologically_sustainable_levels__fao__2020
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_5281_share_of_fish_stocks_within_biologically_sustainable_levels__fao__2020_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/5281
+  version: latest

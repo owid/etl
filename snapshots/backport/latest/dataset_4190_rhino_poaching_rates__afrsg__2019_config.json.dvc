@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 17:09:33.262991
+  description: ''
+  file_extension: json
+  is_public: true
+  name: Grapher metadata for dataset_4190_rhino_poaching_rates__afrsg__2019
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_4190_rhino_poaching_rates__afrsg__2019_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/4190
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 6664a5fb86707f518425aec2f0405725
+  size: 4095
+  path: dataset_4190_rhino_poaching_rates__afrsg__2019_config.json

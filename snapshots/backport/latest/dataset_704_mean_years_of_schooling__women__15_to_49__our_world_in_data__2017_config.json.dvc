@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 15:54:46.282846
+  description: ''
+  file_extension: json
+  is_public: true
+  name: Grapher metadata for dataset_704_mean_years_of_schooling__women__15_to_49__our_world_in_data__2017
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_704_mean_years_of_schooling__women__15_to_49__our_world_in_data__2017_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/704
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 04b748d430f529a2e8e2a16176a61088
+  size: 1653
+  path: dataset_704_mean_years_of_schooling__women__15_to_49__our_world_in_data__2017_config.json

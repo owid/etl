@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 16:32:21.307655
+  description: ''
+  file_extension: json
+  is_public: true
+  name: Grapher metadata for dataset_302_tax_composition__todaro_and_smith__2014
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_302_tax_composition__todaro_and_smith__2014_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/302
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 206d0f404fb10b6397a4d7519962bf8b
+  size: 3707
+  path: dataset_302_tax_composition__todaro_and_smith__2014_config.json

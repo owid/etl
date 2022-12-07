@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 15:53:55.646421
+  description: core-econ.org
+  file_extension: json
+  is_public: false
+  name: Grapher metadata for dataset_3237_te_13_19b_2_consumption
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_3237_te_13_19b_2_consumption_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/3237
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 5da305539ac1600ac753dd6ec945849d
+  size: 1229
+  path: dataset_3237_te_13_19b_2_consumption_config.json

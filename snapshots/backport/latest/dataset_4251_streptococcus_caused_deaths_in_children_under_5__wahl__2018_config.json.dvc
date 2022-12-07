@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 15:55:45.927122
+  description: ''
+  file_extension: json
+  is_public: false
+  name: Grapher metadata for dataset_4251_streptococcus_caused_deaths_in_children_under_5__wahl__2018
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_4251_streptococcus_caused_deaths_in_children_under_5__wahl__2018_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/4251
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 788c3afd445e6624da9d0a4ffac61158
+  size: 4254
+  path: dataset_4251_streptococcus_caused_deaths_in_children_under_5__wahl__2018_config.json

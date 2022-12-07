@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 16:30:16.157084
+  description: .
+  file_extension: json
+  is_public: false
+  name: Grapher metadata for dataset_3079_peak_child__owid_based_on_un_population_division
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_3079_peak_child__owid_based_on_un_population_division_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/3079
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 66d1533cfa502094f9a6d299b38a4551
+  size: 2501
+  path: dataset_3079_peak_child__owid_based_on_un_population_division_config.json

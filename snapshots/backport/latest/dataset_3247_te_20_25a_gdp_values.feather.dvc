@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 15:56:50.116101
+  description: core-econ.org
+  file_extension: feather
+  is_public: false
+  name: TE-20.25a_GDP
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_3247_te_20_25a_gdp_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/3247
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 7e47daef0417cae0fb2f61063484c8db
+  size: 11442
+  path: dataset_3247_te_20_25a_gdp_values.feather

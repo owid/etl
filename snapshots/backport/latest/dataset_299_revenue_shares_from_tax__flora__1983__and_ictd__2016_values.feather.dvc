@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 15:38:40.178107
+  description: Europe
+  file_extension: feather
+  is_public: true
+  name: Revenue shares from tax – Flora (1983) and ICTD (2016)
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_299_revenue_shares_from_tax__flora__1983__and_ictd__2016_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/299
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 4929c67c407fcf5c1c8953f502d42090
+  size: 10682
+  path: dataset_299_revenue_shares_from_tax__flora__1983__and_ictd__2016_values.feather

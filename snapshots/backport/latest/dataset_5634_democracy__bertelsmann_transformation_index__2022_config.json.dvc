@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 15:55:21.522910
+  description: ''
+  file_extension: json
+  is_public: true
+  name: Grapher metadata for dataset_5634_democracy__bertelsmann_transformation_index__2022
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_5634_democracy__bertelsmann_transformation_index__2022_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/5634
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: a98402275d44d30de6564aaf9807cd35
+  size: 24590
+  path: dataset_5634_democracy__bertelsmann_transformation_index__2022_config.json

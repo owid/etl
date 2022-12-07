@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 16:59:59.061179
+  description: ''
+  file_extension: feather
+  is_public: true
+  name: Meat consumption in the USA (USDA, 2018)
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_3190_meat_consumption_in_the_usa__usda__2018_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/3190
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 997011b6b5a55b433e8f16de0ce461ef
+  size: 7410
+  path: dataset_3190_meat_consumption_in_the_usa__usda__2018_values.feather

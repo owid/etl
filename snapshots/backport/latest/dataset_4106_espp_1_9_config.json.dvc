@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 17:19:25.560785
+  description: core-econ.org
+  file_extension: json
+  is_public: false
+  name: Grapher metadata for dataset_4106_espp_1_9
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_4106_espp_1_9_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/4106
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 9fe11abe057ebcf8e25ad4dd0475a661
+  size: 1298
+  path: dataset_4106_espp_1_9_config.json

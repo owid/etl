@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-11-29 16:51:53.801251
+  description: ''
+  file_extension: feather
+  is_public: false
+  name: Years of Schooling - based on Lee-Lee (2016), Barro-Lee (2018); and UNDP (2018)
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_4129_years_of_schooling__based_on_lee_lee__2016__barro_lee__2018__and_undp__2018_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/4129
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 11ecc3cbfcc373b27d51f366d2aa31e4
+  size: 35650
+  path: dataset_4129_years_of_schooling__based_on_lee_lee__2016__barro_lee__2018__and_undp__2018_values.feather

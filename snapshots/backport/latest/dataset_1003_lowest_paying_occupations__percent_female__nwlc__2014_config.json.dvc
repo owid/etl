@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 17:13:12.712147
+  description: ''
+  file_extension: json
+  is_public: true
+  name: Grapher metadata for dataset_1003_lowest_paying_occupations__percent_female__nwlc__2014
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_1003_lowest_paying_occupations__percent_female__nwlc__2014_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/1003
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: a010627cead83195c63d07c1aaec1fbe
+  size: 1623
+  path: dataset_1003_lowest_paying_occupations__percent_female__nwlc__2014_config.json

@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 17:27:21.763307
+  description: ''
+  file_extension: feather
+  is_public: false
+  name: Pollinator dependency of agriculture (Aizen et al. 2019)
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_5334_pollinator_dependency_of_agriculture__aizen_et_al__2019_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/5334
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: dba433803097f0a02cd44b71a0eb15ea
+  size: 15650
+  path: dataset_5334_pollinator_dependency_of_agriculture__aizen_et_al__2019_values.feather

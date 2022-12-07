@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-11-29 16:48:54.946599
+  description: This is a dataset imported by the automated fetcher
+  file_extension: json
+  is_public: true
+  name: Grapher metadata for dataset_5347_statistical_review_of_world_energy__bp__2021
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_5347_statistical_review_of_world_energy__bp__2021_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/5347
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: b0ab04fa5a19f80314178ef4e8c81c73
+  size: 64441
+  path: dataset_5347_statistical_review_of_world_energy__bp__2021_config.json

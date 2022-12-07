@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 15:59:21.613991
+  description: core-econ.org
+  file_extension: json
+  is_public: false
+  name: Grapher metadata for dataset_5127_te_13_3_unemployment
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_5127_te_13_3_unemployment_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/5127
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: de53c0277d330d1125fb05212b59d552
+  size: 1709
+  path: dataset_5127_te_13_3_unemployment_config.json

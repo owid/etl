@@ -1,0 +1,12 @@
+meta:
+  date_accessed: 2022-12-07 17:45:39.413951
+  description: ''
+  file_extension: json
+  is_public: true
+  name: Grapher metadata for dataset_464_historical_employment_and_output_by_sector__owid__2017
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_464_historical_employment_and_output_by_sector__owid__2017_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/464
+  version: latest

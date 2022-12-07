@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-11-29 16:25:13.346213
+  description: ''
+  file_extension: json
+  is_public: true
+  name: Grapher metadata for dataset_5757_multidimensional_poverty_index__mpi__2022__current_estimates
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_5757_multidimensional_poverty_index__mpi__2022__current_estimates_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/5757
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 9fefc3cd910669c9004c5d5c266cfeec
+  size: 43627
+  path: dataset_5757_multidimensional_poverty_index__mpi__2022__current_estimates_config.json

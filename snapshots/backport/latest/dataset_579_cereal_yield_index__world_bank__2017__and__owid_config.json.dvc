@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 15:48:50.035558
+  description: ''
+  file_extension: json
+  is_public: true
+  name: Grapher metadata for dataset_579_cereal_yield_index__world_bank__2017__and__owid
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_579_cereal_yield_index__world_bank__2017__and__owid_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/579
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 63695fa08834b3eac64335a79f34ff5a
+  size: 2744
+  path: dataset_579_cereal_yield_index__world_bank__2017__and__owid_config.json

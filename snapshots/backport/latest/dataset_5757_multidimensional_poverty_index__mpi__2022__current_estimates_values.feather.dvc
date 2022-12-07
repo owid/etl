@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-11-29 16:25:15.442990
+  description: ''
+  file_extension: feather
+  is_public: true
+  name: Multidimensional Poverty Index (MPI) 2022 – Current estimates
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_5757_multidimensional_poverty_index__mpi__2022__current_estimates_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/5757
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 31b4de5cb86c39b783b6857dd64cba35
+  size: 19650
+  path: dataset_5757_multidimensional_poverty_index__mpi__2022__current_estimates_values.feather

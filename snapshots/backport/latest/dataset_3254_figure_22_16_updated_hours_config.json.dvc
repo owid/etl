@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 15:49:35.563177
+  description: core-econ.org
+  file_extension: json
+  is_public: false
+  name: Grapher metadata for dataset_3254_figure_22_16_updated_hours
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_3254_figure_22_16_updated_hours_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/3254
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 9472121542aace18d5f00ee20395942c
+  size: 1246
+  path: dataset_3254_figure_22_16_updated_hours_config.json

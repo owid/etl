@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 16:29:30.137771
+  description: ''
+  file_extension: feather
+  is_public: false
+  name: Consumption-based energy (Kulionis, 2021)
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_5403_consumption_based_energy__kulionis__2021_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/5403
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 15adb8ac788aebed2f58d05b8e187a51
+  size: 115226
+  path: dataset_5403_consumption_based_energy__kulionis__2021_values.feather

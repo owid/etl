@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 15:56:54.825889
+  description: https://github.com/owid/notebooks/tree/main/EdouardMathieu/pew_gay_marriage
+  file_extension: json
+  is_public: false
+  name: Grapher metadata for dataset_5795_same_sex_marriage_around_the_world__pew_research_center
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_5795_same_sex_marriage_around_the_world__pew_research_center_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/5795
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: e8a53c5a458dd8162711366b6173d5b3
+  size: 2796
+  path: dataset_5795_same_sex_marriage_around_the_world__pew_research_center_config.json

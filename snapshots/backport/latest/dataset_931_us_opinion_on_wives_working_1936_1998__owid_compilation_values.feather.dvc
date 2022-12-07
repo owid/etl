@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 16:32:50.777771
+  description: ''
+  file_extension: feather
+  is_public: true
+  name: US Opinion on wives working 1936-1998 - OWID compilation
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_931_us_opinion_on_wives_working_1936_1998__owid_compilation_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/931
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 4fd04da4431e23f607d7d20870396bca
+  size: 6066
+  path: dataset_931_us_opinion_on_wives_working_1936_1998__owid_compilation_values.feather

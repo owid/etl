@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 15:57:12.696093
+  description: ''
+  file_extension: json
+  is_public: true
+  name: Grapher metadata for dataset_2782_median_un_population_projections__global_vs_africa__owid_based_on_un
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_2782_median_un_population_projections__global_vs_africa__owid_based_on_un_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/2782
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 66aed648d1b67d99246977cf944a14f8
+  size: 3573
+  path: dataset_2782_median_un_population_projections__global_vs_africa__owid_based_on_un_config.json

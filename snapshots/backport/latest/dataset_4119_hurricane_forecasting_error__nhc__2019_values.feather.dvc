@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 17:19:09.724158
+  description: Extracted from PDFs using Tabula
+  file_extension: feather
+  is_public: true
+  name: Hurricane Forecasting Error, NHC (2019)
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_4119_hurricane_forecasting_error__nhc__2019_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/4119
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: ce2b6027003cd02dc80be34d6fb33915
+  size: 11202
+  path: dataset_4119_hurricane_forecasting_error__nhc__2019_values.feather

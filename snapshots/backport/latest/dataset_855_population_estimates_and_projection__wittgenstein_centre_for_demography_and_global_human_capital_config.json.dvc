@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 15:39:55.023983
+  description: Medium SSP2, by world region and age
+  file_extension: json
+  is_public: true
+  name: Grapher metadata for dataset_855_population_estimates_and_projection__wittgenstein_centre_for_demography_and_global_human_capital
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_855_population_estimates_and_projection__wittgenstein_centre_for_demography_and_global_human_capital_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/855
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 9259920261d85a5aae435bdc19adb338
+  size: 5284
+  path: dataset_855_population_estimates_and_projection__wittgenstein_centre_for_demography_and_global_human_capital_config.json

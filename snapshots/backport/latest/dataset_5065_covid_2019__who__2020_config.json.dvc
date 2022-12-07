@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 16:00:59.610056
+  description: ''
+  file_extension: json
+  is_public: false
+  name: Grapher metadata for dataset_5065_covid_2019__who__2020
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_5065_covid_2019__who__2020_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/5065
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 70d69c045930514931d1f8f88dde483b
+  size: 5727
+  path: dataset_5065_covid_2019__who__2020_config.json

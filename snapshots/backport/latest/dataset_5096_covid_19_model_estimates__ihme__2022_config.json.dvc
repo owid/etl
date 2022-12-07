@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 16:55:28.099999
+  description: ''
+  file_extension: json
+  is_public: false
+  name: Grapher metadata for dataset_5096_covid_19_model_estimates__ihme__2022
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_5096_covid_19_model_estimates__ihme__2022_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/5096
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 851accd730a0ee22c15db253e6e1da9a
+  size: 3055
+  path: dataset_5096_covid_19_model_estimates__ihme__2022_config.json

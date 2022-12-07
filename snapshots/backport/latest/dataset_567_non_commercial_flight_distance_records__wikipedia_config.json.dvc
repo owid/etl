@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 17:15:37.205024
+  description: ''
+  file_extension: json
+  is_public: true
+  name: Grapher metadata for dataset_567_non_commercial_flight_distance_records__wikipedia
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_567_non_commercial_flight_distance_records__wikipedia_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/567
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 6822dd3aed4f7957e7f85a22819401f5
+  size: 1836
+  path: dataset_567_non_commercial_flight_distance_records__wikipedia_config.json

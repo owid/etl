@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 17:20:50.674732
+  description: ''
+  file_extension: json
+  is_public: true
+  name: Grapher metadata for dataset_2465_smoking_cigarette_sales__international_smoking_statistics__2017
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_2465_smoking_cigarette_sales__international_smoking_statistics__2017_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/2465
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 682d2d06fe92fa4e7e40b12fc0784e0d
+  size: 3858
+  path: dataset_2465_smoking_cigarette_sales__international_smoking_statistics__2017_config.json

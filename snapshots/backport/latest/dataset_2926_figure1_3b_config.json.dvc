@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 17:10:31.556635
+  description: core-econ.org
+  file_extension: json
+  is_public: false
+  name: Grapher metadata for dataset_2926_figure1_3b
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_2926_figure1_3b_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/2926
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 0a359bcedc0b4b82aec9b281c7f510e8
+  size: 1474
+  path: dataset_2926_figure1_3b_config.json

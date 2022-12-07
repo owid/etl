@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 17:41:51.665711
+  description: ''
+  file_extension: feather
+  is_public: false
+  name: Average farm size (Lowder et al. 2016)
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_5325_average_farm_size__lowder_et_al__2016_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/5325
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 34a7ec957d0a6944b7af3bbd5e278e4b
+  size: 15938
+  path: dataset_5325_average_farm_size__lowder_et_al__2016_values.feather

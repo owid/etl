@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 16:54:06.287880
+  description: Generated with https://github.com/owid/notebooks/tree/main/EdouardMathieu/us_public_trust_government_pew_research_center
+  file_extension: json
+  is_public: true
+  name: Grapher metadata for dataset_271_us__public_trust_in_government__pew_research_center
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_271_us__public_trust_in_government__pew_research_center_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/271
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: c040e822dbc3144278181b5ed1dbeb58
+  size: 1802
+  path: dataset_271_us__public_trust_in_government__pew_research_center_config.json

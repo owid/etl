@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 17:33:18.931422
+  description: ''
+  file_extension: json
+  is_public: false
+  name: Grapher metadata for dataset_5442_covid_19__decoupling_of_metrics
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_5442_covid_19__decoupling_of_metrics_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/5442
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 74e87ea9c0d9965e2d4b07270c7c62a4
+  size: 5701
+  path: dataset_5442_covid_19__decoupling_of_metrics_config.json
