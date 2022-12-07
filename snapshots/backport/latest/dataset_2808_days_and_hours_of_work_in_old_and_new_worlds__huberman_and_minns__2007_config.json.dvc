@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 17:38:46.261887
+  description: ''
+  file_extension: json
+  is_public: true
+  name: Grapher metadata for dataset_2808_days_and_hours_of_work_in_old_and_new_worlds__huberman_and_minns__2007
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_2808_days_and_hours_of_work_in_old_and_new_worlds__huberman_and_minns__2007_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/2808
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: ed157904531a67c0444260274abfdd52
+  size: 4658
+  path: dataset_2808_days_and_hours_of_work_in_old_and_new_worlds__huberman_and_minns__2007_config.json

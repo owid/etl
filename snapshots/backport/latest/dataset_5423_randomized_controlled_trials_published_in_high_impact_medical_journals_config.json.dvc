@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 17:21:57.198780
+  description: ''
+  file_extension: json
+  is_public: false
+  name: Grapher metadata for dataset_5423_randomized_controlled_trials_published_in_high_impact_medical_journals
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_5423_randomized_controlled_trials_published_in_high_impact_medical_journals_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/5423
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: b518bdce23107f9d3c9f692c3a15cd83
+  size: 2432
+  path: dataset_5423_randomized_controlled_trials_published_in_high_impact_medical_journals_config.json

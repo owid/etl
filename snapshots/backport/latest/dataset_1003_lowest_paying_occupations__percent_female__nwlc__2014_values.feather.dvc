@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 17:13:17.402531
+  description: ''
+  file_extension: feather
+  is_public: true
+  name: Lowest paying occupations, percent female – NWLC (2014)
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_1003_lowest_paying_occupations__percent_female__nwlc__2014_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/1003
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 28bb0ccc8358397ddbaf1620700920fc
+  size: 6050
+  path: dataset_1003_lowest_paying_occupations__percent_female__nwlc__2014_values.feather

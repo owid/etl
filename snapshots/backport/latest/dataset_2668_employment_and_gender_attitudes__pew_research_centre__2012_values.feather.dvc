@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 17:16:02.851020
+  description: ''
+  file_extension: feather
+  is_public: true
+  name: Employment and Gender attitudes - Pew Research Centre (2012)
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_2668_employment_and_gender_attitudes__pew_research_centre__2012_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/2668
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: dec4b4e81c1a426a81967f5ebb271c5d
+  size: 6650
+  path: dataset_2668_employment_and_gender_attitudes__pew_research_centre__2012_values.feather

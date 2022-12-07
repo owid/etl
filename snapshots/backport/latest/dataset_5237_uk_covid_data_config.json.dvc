@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 17:30:49.261308
+  description: ''
+  file_extension: json
+  is_public: false
+  name: Grapher metadata for dataset_5237_uk_covid_data
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_5237_uk_covid_data_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/5237
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: a6dd7f3122d4c004d8cffa95c52ebef4
+  size: 12818
+  path: dataset_5237_uk_covid_data_config.json

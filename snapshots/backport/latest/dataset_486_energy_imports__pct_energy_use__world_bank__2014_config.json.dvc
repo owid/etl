@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 17:26:18.626918
+  description: ''
+  file_extension: json
+  is_public: true
+  name: Grapher metadata for dataset_486_energy_imports__pct_energy_use__world_bank__2014
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_486_energy_imports__pct_energy_use__world_bank__2014_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/486
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: b98512d2acf7f34aba5e4177cb44aeb3
+  size: 1908
+  path: dataset_486_energy_imports__pct_energy_use__world_bank__2014_config.json

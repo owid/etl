@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 17:41:07.101539
+  description: ''
+  file_extension: json
+  is_public: true
+  name: Grapher metadata for dataset_4202_children_that_survived_past_5_years_of_age_per_woman__gapminder__2017
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_4202_children_that_survived_past_5_years_of_age_per_woman__gapminder__2017_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/4202
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 21aaf9860d79adf16fa0d77237c5b6b8
+  size: 2302
+  path: dataset_4202_children_that_survived_past_5_years_of_age_per_woman__gapminder__2017_config.json

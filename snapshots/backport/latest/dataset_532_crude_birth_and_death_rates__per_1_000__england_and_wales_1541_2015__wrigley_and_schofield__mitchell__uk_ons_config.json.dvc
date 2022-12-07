@@ -1,0 +1,19 @@
+meta:
+  date_accessed: 2022-12-07 17:43:55.611023
+  description: 'For 1541-1861 series: Wrigley and Schofield (1981); for 1862-2003
+    series: International Historical Statistics, Brian Mitchell (2010); for 2004-2015
+    series: UK Office for National Statistics (2016)'
+  file_extension: json
+  is_public: true
+  name: Grapher metadata for dataset_532_crude_birth_and_death_rates__per_1_000__england_and_wales_1541_2015__wrigley_and_schofield__mitchell__uk_ons
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_532_crude_birth_and_death_rates__per_1_000__england_and_wales_1541_2015__wrigley_and_schofield__mitchell__uk_ons_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/532
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 9c8839aa71dc66275409b334a62db4d7
+  size: 2856
+  path: dataset_532_crude_birth_and_death_rates__per_1_000__england_and_wales_1541_2015__wrigley_and_schofield__mitchell__uk_ons_config.json

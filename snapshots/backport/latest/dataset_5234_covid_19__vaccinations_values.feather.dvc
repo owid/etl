@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 17:43:05.296502
+  description: ''
+  file_extension: feather
+  is_public: false
+  name: COVID-19 - Vaccinations
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_5234_covid_19__vaccinations_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/5234
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 557ad202f8bbdbdbf1f09e4de664dced
+  size: 5182458
+  path: dataset_5234_covid_19__vaccinations_values.feather

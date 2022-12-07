@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 17:17:04.505527
+  description: ''
+  file_extension: feather
+  is_public: true
+  name: "Tax composition – \tArroyo Abad  and P. Lindert (2016)"
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_300_tax_composition__arroyo_abad__and_p__lindert__2016_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/300
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: d00393b486219dfecf32568f9b89dc1e
+  size: 8754
+  path: dataset_300_tax_composition__arroyo_abad__and_p__lindert__2016_values.feather

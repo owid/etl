@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 17:22:02.602396
+  description: ''
+  file_extension: feather
+  is_public: false
+  name: Randomized controlled trials published in high-impact medical journals
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_5423_randomized_controlled_trials_published_in_high_impact_medical_journals_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/5423
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 8a4c18c879b531a465ee931080453001
+  size: 10850
+  path: dataset_5423_randomized_controlled_trials_published_in_high_impact_medical_journals_values.feather

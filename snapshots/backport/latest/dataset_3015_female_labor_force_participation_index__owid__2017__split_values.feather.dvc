@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 17:13:49.199693
+  description: ''
+  file_extension: feather
+  is_public: false
+  name: Female Labor Force Participation Index (OWID (2017)) (split)
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_3015_female_labor_force_participation_index__owid__2017__split_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/3015
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 2c610085b764e50ddd1ba3ebb04ed496
+  size: 6058
+  path: dataset_3015_female_labor_force_participation_index__owid__2017__split_values.feather

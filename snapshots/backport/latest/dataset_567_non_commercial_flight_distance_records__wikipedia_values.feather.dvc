@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 17:15:43.214526
+  description: ''
+  file_extension: feather
+  is_public: true
+  name: Non-commercial flight distance records - Wikipedia
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_567_non_commercial_flight_distance_records__wikipedia_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/567
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 9157a450aebda14250d72b01c6555e82
+  size: 5962
+  path: dataset_567_non_commercial_flight_distance_records__wikipedia_values.feather
