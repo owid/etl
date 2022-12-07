@@ -74,7 +74,7 @@ HISTORIC_TO_CURRENT_REGION: Dict[str, Dict[str, Union[str, List[str]]]] = {
             "Aruba",
             "Curacao",
             "Sint Maarten (Dutch part)",
-            "Caribbean Netherlands",
+            "Bonaire Sint Eustatius and Saba",
         ],
     },
     "Serbia and Montenegro": {
