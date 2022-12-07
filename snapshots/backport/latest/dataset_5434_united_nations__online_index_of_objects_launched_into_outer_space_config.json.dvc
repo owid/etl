@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 15:59:02.502846
+  description: 'Code & data here: https://github.com/owid/notebooks/tree/main/EdouardMathieu/2021_12_outer_space_objects'
+  file_extension: json
+  is_public: false
+  name: Grapher metadata for dataset_5434_united_nations__online_index_of_objects_launched_into_outer_space
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_5434_united_nations__online_index_of_objects_launched_into_outer_space_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/5434
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 0568ce56851868dfc59376b93ac2258d
+  size: 3273
+  path: dataset_5434_united_nations__online_index_of_objects_launched_into_outer_space_config.json

@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 15:54:16.420096
+  description: ''
+  file_extension: json
+  is_public: true
+  name: Grapher metadata for dataset_5206_forest_transition_phase__pendrill_et_al__2019
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_5206_forest_transition_phase__pendrill_et_al__2019_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/5206
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 6cf282bb0da5ea2afc015d0a8f39396e
+  size: 3425
+  path: dataset_5206_forest_transition_phase__pendrill_et_al__2019_config.json

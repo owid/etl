@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 16:00:16.087455
+  description: ''
+  file_extension: json
+  is_public: false
+  name: Grapher metadata for dataset_5254_israel_covid_vaccination_impact
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_5254_israel_covid_vaccination_impact_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/5254
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 4917f2ac9f3ce9c3e0b4e20e0471547b
+  size: 8895
+  path: dataset_5254_israel_covid_vaccination_impact_config.json

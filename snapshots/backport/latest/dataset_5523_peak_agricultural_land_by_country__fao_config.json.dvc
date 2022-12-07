@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 15:55:32.360256
+  description: ''
+  file_extension: json
+  is_public: false
+  name: Grapher metadata for dataset_5523_peak_agricultural_land_by_country__fao
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_5523_peak_agricultural_land_by_country__fao_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/5523
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 5b165b57c8b7ae8d8381a970e2e61271
+  size: 4122
+  path: dataset_5523_peak_agricultural_land_by_country__fao_config.json

@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 15:50:46.072779
+  description: ''
+  file_extension: json
+  is_public: true
+  name: Grapher metadata for dataset_1855_watts_per_mips__kurzweil
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_1855_watts_per_mips__kurzweil_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/1855
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 6c24ed6b3ca14f23d7207ee0c3173c20
+  size: 1538
+  path: dataset_1855_watts_per_mips__kurzweil_config.json

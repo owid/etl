@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 15:57:25.942838
+  description: Incidence of child labor in US - Economic History Association
+  file_extension: json
+  is_public: true
+  name: Grapher metadata for dataset_471_child_labor_in_us__economic_history_association__2017
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_471_child_labor_in_us__economic_history_association__2017_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/471
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 2f5c34d0f15a67f6b0485cc6d902a8c3
+  size: 3469
+  path: dataset_471_child_labor_in_us__economic_history_association__2017_config.json

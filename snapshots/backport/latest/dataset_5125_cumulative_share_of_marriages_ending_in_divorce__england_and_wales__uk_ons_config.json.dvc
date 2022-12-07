@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 16:00:22.034910
+  description: ''
+  file_extension: json
+  is_public: true
+  name: Grapher metadata for dataset_5125_cumulative_share_of_marriages_ending_in_divorce__england_and_wales__uk_ons
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_5125_cumulative_share_of_marriages_ending_in_divorce__england_and_wales__uk_ons_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/5125
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 8259015bbd11aba16b813087c0776e3a
+  size: 2713
+  path: dataset_5125_cumulative_share_of_marriages_ending_in_divorce__england_and_wales__uk_ons_config.json
