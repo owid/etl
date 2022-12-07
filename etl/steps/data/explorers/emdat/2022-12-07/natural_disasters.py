@@ -3,6 +3,16 @@
 Loads the latest EM-DAT natural_disasters data from garden and stores a table (as a csv file) for yearly data, and
 another for decadal data.
 
+NOTES:
+* Some of the columns in the output files are not used by the explorer (but they appear in the "Sort by" dropdown menu),
+  consider removing them. For now, we'll ensure all of the old columns are present, to avoid any possible issues.
+* Most charts in the explorer are generated from the data in the files, but 3 of them are directly linked to grapher
+  charts, namely:
+  "All disasters (by type) - Deaths - Decadal average - false"
+  "All disasters (by type) - Deaths - Decadal average - true"
+  "All disasters (by type) - Economic damages (% GDP) - Decadal average - false"
+  At some point it would be good to let the explorer take all the data from files.
+
 """
 
 from copy import deepcopy
@@ -11,8 +21,7 @@ from owid import catalog
 
 from etl.paths import DATA_DIR
 
-# NOTE: Some of the columns in the output files are not used by the explorer, consider removing them.
-# For now, we'll ensure all of the old columns are present, to avoid any possible issues.
+# Mapping of old to new disaster type names.
 DISASTER_TYPE_RENAMING = {
     "all_disasters": "all_disasters",
     "drought": "drought",
