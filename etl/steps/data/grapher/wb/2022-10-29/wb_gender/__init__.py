@@ -63,10 +63,9 @@ def add_table_to_dataset(dataset: catalog.Dataset, table: catalog.Table) -> None
     # Add table to dataset
     # dataset.add(table)
     log.info("Adding table to dataset...")
+    table["variable"] = table["variable"].map(catalog.utils.underscore)
     for wide_table in gh.long_to_wide_tables(table):
-        # table is generated for every column, use it as a table name
-        wide_table.metadata.short_name = wide_table.columns[0]
-        dataset.add(catalog.utils.underscore_table(wide_table))
+        dataset.add(wide_table)
 
 
 def run(dest_dir: str) -> None:
