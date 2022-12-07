@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 16:30:36.332162
+  description: https://github.com/owid/notebooks/tree/main/FionaSpooner/oecd_flu_vaccination
+  file_extension: json
+  is_public: false
+  name: Grapher metadata for dataset_5777_influenza_vaccination_rates_in_over_65s__oecd
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_5777_influenza_vaccination_rates_in_over_65s__oecd_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/5777
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: c0cffe26cb3199ef1c8148b0e2a643ef
+  size: 1922
+  path: dataset_5777_influenza_vaccination_rates_in_over_65s__oecd_config.json

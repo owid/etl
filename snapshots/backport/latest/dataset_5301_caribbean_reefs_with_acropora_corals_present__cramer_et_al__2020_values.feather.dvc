@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 16:33:53.150744
+  description: ''
+  file_extension: feather
+  is_public: false
+  name: Caribbean reefs with acropora corals present (Cramer et al. 2020)
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_5301_caribbean_reefs_with_acropora_corals_present__cramer_et_al__2020_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/5301
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: f47c2e9f685c0c4d33573ecb3948e619
+  size: 5954
+  path: dataset_5301_caribbean_reefs_with_acropora_corals_present__cramer_et_al__2020_values.feather

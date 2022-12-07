@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 16:30:53.613649
+  description: ''
+  file_extension: feather
+  is_public: true
+  name: Rhino populations (AfRSG & other sources, 2022)
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_4188_rhino_populations__afrsg__and__other_sources__2022_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/4188
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: bd42a67ea486acd0199cdf5567652bf1
+  size: 9682
+  path: dataset_4188_rhino_populations__afrsg__and__other_sources__2022_values.feather
