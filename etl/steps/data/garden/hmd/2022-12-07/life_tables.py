@@ -12,13 +12,15 @@ from etl.paths import DATA_DIR
 
 log = get_logger()
 
-# naming conventions
+# namings
 N = Names(__file__)
-
 SHORT_NAME = "life_tables"
 VERSION_MEADOW = "2022-12-07"
 DATASET_MEADOW = DATA_DIR / f"meadow/hmd/{VERSION_MEADOW}/{SHORT_NAME}"
 
+# We combine tables from meadow into single tables in garden.
+# In particular, in Meadow we have tables per sex. In Garden we combine these tables and
+# insert "sex" as a column in the index.
 TABLE_MAPPING = {
     "period_1x1": ["both_1x1", "female_1x1", "male_1x1"],
     "period_1x5": ["both_1x5", "female_1x5", "male_1x5"],
@@ -52,6 +54,12 @@ def run(dest_dir: str) -> None:
 
 
 def make_table(ds_meadow: Dataset, tables_old_names: List[str], table_new_name: str) -> Table:
+    """Create a Garden table from multiple Meadow tables.
+
+    In Meadow, we have a table per agexyear and sex. In Garden, brin the sex dimension in the table as
+    a column in the index. That is, tables "both_1x1", "female_1x1", "male_1x1" are combined into one table
+    called "period_1x1".
+    """
     log.info(f"life_tables: building table {table_new_name} from {tables_old_names}...")
     # Combine multiple tables (broken down by sex) into single one (insert sex in index)
     df = combine_sex_tables(ds_meadow, tables_old_names)
@@ -70,6 +78,7 @@ def make_table(ds_meadow: Dataset, tables_old_names: List[str], table_new_name: 
 
 
 def combine_sex_tables(ds_meadow: Dataset, table_names: List[str]) -> pd.DataFrame:
+    """Combine meadow tables."""
     dfs = []
     for table_name in table_names:
         tb_meadow = ds_meadow[table_name]
@@ -90,12 +99,14 @@ def combine_sex_tables(ds_meadow: Dataset, table_names: List[str]) -> pd.DataFra
 
 
 def clean_countries(df: pd.DataFrame) -> pd.DataFrame:
+    """Clean country names, and discard those countries not used."""
     df = exclude_countries(df)
     df = harmonize_countries(df)
     return df
 
 
 def load_excluded_countries() -> List[str]:
+    """Load list of excluded countries from JSON file."""
     with open(N.excluded_countries_path, "r") as f:
         data = json.load(f)
         assert isinstance(data, list)
@@ -103,11 +114,13 @@ def load_excluded_countries() -> List[str]:
 
 
 def exclude_countries(df: pd.DataFrame) -> pd.DataFrame:
+    """Exclude countries."""
     excluded_countries = load_excluded_countries()
     return cast(pd.DataFrame, df.loc[~df.country.isin(excluded_countries)])
 
 
 def harmonize_countries(df: pd.DataFrame) -> pd.DataFrame:
+    """Country harmonization."""
     unharmonized_countries = df["country"]
     df = geo.harmonize_countries(df=df, countries_file=str(N.country_mapping_path))
 
