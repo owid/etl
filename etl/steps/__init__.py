@@ -21,6 +21,7 @@ from urllib.parse import urlparse
 
 import structlog
 import yaml
+from dvc.dvcfile import Dvcfile
 from dvc.repo import Repo
 
 # smother deprecation warnings by papermill
@@ -55,6 +56,8 @@ DAG = Dict[str, Any]
 # runtime cache
 cache: Dict[str, Any] = {}
 dvc_lock = Lock()
+
+DVC_REPO = Repo(paths.BASE_DIR)
 
 
 def compile_steps(
@@ -517,33 +520,25 @@ class SnapshotStep(Step):
         return f"snapshot://{self.path}"
 
     def run(self) -> None:
-        self.dvc_repo.pull(self._path, remote="public")
+        DVC_REPO.pull(self._path, remote="public")
 
     def is_dirty(self) -> bool:
         # check if the snapshot has been added to DVC
         with open(self._dvc_path) as istream:
-            yml = yaml.safe_load(istream)
-            if "outs" not in yml:
+            if "outs:\n" not in istream.read():
                 raise Exception(f"File {self._dvc_path} has not been added to DVC. Run snapshot script to add it.")
 
-        # run dvc status and cache it
-        cache_key = "dvc_status"
         with dvc_lock:
-            if cache_key not in cache:
-                cache[cache_key] = self.dvc_repo.status()
-
-        # if path is in dvc status output, it's dirty
-        return self._dvc_path in cache[cache_key]
+            dvc_file = Dvcfile(DVC_REPO, self._dvc_path)
+            with DVC_REPO.lock:
+                # DVC returns empty dictionary if file is up to date
+                return dvc_file.stage.status() != {}
 
     def has_existing_data(self) -> bool:
         return True
 
     def checksum_output(self) -> str:
         return files.checksum_file(self._dvc_path)
-
-    @property
-    def dvc_repo(self) -> Repo:
-        return Repo(paths.BASE_DIR)
 
     @property
     def _dvc_path(self) -> str:
@@ -559,7 +554,7 @@ class SnapshotStepPrivate(SnapshotStep):
         return f"snapshot-private://{self.path}"
 
     def run(self) -> None:
-        self.dvc_repo.pull(self._path, remote="private")
+        DVC_REPO.pull(self._path, remote="private")
 
 
 class GrapherStep(Step):
