@@ -1,0 +1,18 @@
+meta:
+  date_accessed: 2022-12-07 15:54:39.236047
+  description: 'Provides data on agricultural production (both food and livestock)
+    in England from 1270 to 1870. '
+  file_extension: feather
+  is_public: true
+  name: 'Agriculture in England 1270-1870 - Bank of England (2017) '
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_698_agriculture_in_england_1270_1870__bank_of_england__2017_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/698
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: c943ccf23d5ff6dfa176f5725f0a9d32
+  size: 103978
+  path: dataset_698_agriculture_in_england_1270_1870__bank_of_england__2017_values.feather

@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-08 00:24:20.905412
+  description: ''
+  file_extension: feather
+  is_public: false
+  name: COVID-19 - Sequencing
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_5433_covid_19__sequencing_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/5433
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: c270f84a6b9c9145452e957cf2e2f9cd
+  size: 277002
+  path: dataset_5433_covid_19__sequencing_values.feather

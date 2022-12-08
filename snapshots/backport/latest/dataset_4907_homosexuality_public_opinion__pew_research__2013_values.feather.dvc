@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-08 01:33:36.943008
+  description: ''
+  file_extension: feather
+  is_public: true
+  name: Homosexuality public opinion – Pew Research (2013)
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_4907_homosexuality_public_opinion__pew_research__2013_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/4907
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: de66d25f0688e7bdfe1746719231f260
+  size: 8266
+  path: dataset_4907_homosexuality_public_opinion__pew_research__2013_values.feather

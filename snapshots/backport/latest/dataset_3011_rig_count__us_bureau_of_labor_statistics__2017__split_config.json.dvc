@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-08 01:02:58.781513
+  description: ''
+  file_extension: json
+  is_public: false
+  name: Grapher metadata for dataset_3011_rig_count__us_bureau_of_labor_statistics__2017__split
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_3011_rig_count__us_bureau_of_labor_statistics__2017__split_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/3011
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: f8aeb764f5df706142a41a851bd7be16
+  size: 1553
+  path: dataset_3011_rig_count__us_bureau_of_labor_statistics__2017__split_config.json

@@ -1,0 +1,18 @@
+meta:
+  date_accessed: 2022-12-07 18:56:07.926844
+  description: ''
+  file_extension: feather
+  is_public: true
+  name: Share of Top 1% in net personal wealth – World Wealth and Income Database
+    (2018)
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_2513_share_of_top_1pct_in_net_personal_wealth__world_wealth_and_income_database__2018_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/2513
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: e14878950c797ffa63e6a624e528a685
+  size: 9618
+  path: dataset_2513_share_of_top_1pct_in_net_personal_wealth__world_wealth_and_income_database__2018_values.feather

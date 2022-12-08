@@ -1,0 +1,18 @@
+meta:
+  date_accessed: 2022-12-07 18:22:59.450068
+  description: ''
+  file_extension: feather
+  is_public: true
+  name: Trade share by type of trade (OWID calculations based on NBER- United Nations
+    Trade Data 1962-2000)
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_1930_trade_share_by_type_of_trade__owid_calculations_based_on_nber__united_nations_trade_data_1962_2000_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/1930
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: da3baf3dd5845e59f9f708af1d411376
+  size: 148642
+  path: dataset_1930_trade_share_by_type_of_trade__owid_calculations_based_on_nber__united_nations_trade_data_1962_2000_values.feather

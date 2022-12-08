@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 15:52:49.353442
+  description: ''
+  file_extension: feather
+  is_public: false
+  name: Extreme Poverty 2030 Projections by SSP - Crespo et al. (2018)
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_2951_extreme_poverty_2030_projections_by_ssp__crespo_et_al__2018_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/2951
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 6e807ec66a8bb53f72fb6660bdf8c261
+  size: 114578
+  path: dataset_2951_extreme_poverty_2030_projections_by_ssp__crespo_et_al__2018_values.feather

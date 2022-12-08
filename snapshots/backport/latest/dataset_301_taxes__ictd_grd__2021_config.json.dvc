@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 16:51:33.059865
+  description: ''
+  file_extension: json
+  is_public: true
+  name: Grapher metadata for dataset_301_taxes__ictd_grd__2021
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_301_taxes__ictd_grd__2021_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/301
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 4600fe23583d6088a3f22af5287ea41b
+  size: 5386
+  path: dataset_301_taxes__ictd_grd__2021_config.json

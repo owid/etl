@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 17:29:42.953982
+  description: ''
+  file_extension: feather
+  is_public: true
+  name: Happiness predictors – World Happiness Report (2017)
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_458_happiness_predictors__world_happiness_report__2017_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/458
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 5dce126ff9856c92b8ae39c005b9dbc5
+  size: 6346
+  path: dataset_458_happiness_predictors__world_happiness_report__2017_values.feather

@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 18:51:49.088364
+  description: https://github.com/owid/notebooks/tree/main/EdouardMathieu/aerospace_csis_datasets
+  file_extension: feather
+  is_public: false
+  name: CSIS - NASA budget history
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_5640_csis__nasa_budget_history_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/5640
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: b05816d2702eeee7e0c375f61d334b50
+  size: 6594
+  path: dataset_5640_csis__nasa_budget_history_values.feather

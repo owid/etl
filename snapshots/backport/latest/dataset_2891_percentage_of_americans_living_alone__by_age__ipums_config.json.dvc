@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 18:27:57.268257
+  description: ''
+  file_extension: json
+  is_public: true
+  name: Grapher metadata for dataset_2891_percentage_of_americans_living_alone__by_age__ipums
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_2891_percentage_of_americans_living_alone__by_age__ipums_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/2891
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 9b778f78b6b3e3d081e7b42c9018fb40
+  size: 4774
+  path: dataset_2891_percentage_of_americans_living_alone__by_age__ipums_config.json

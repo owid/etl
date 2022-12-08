@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 18:53:17.101878
+  description: ''
+  file_extension: feather
+  is_public: true
+  name: Cereal allocation to food, feed, fuel (OWID based on FAO)
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_5062_cereal_allocation_to_food__feed__fuel__owid_based_on_fao_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/5062
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: f3a3710e541f4043e1718624a686ba12
+  size: 334066
+  path: dataset_5062_cereal_allocation_to_food__feed__fuel__owid_based_on_fao_values.feather

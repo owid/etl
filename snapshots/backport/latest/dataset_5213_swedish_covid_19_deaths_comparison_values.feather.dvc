@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 15:51:48.714423
+  description: ''
+  file_extension: feather
+  is_public: false
+  name: Swedish COVID-19 deaths comparison
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_5213_swedish_covid_19_deaths_comparison_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/5213
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 7e26b4d5ccf617af0838114ef9c824a5
+  size: 5930
+  path: dataset_5213_swedish_covid_19_deaths_comparison_values.feather

@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-08 00:46:44.836632
+  description: ''
+  file_extension: json
+  is_public: true
+  name: Grapher metadata for dataset_1847_clark__fleche__and__senik__happiness_inequality
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_1847_clark__fleche__and__senik__happiness_inequality_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/1847
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: e01f9b894504a0be497eaba19a99ea9b
+  size: 1517
+  path: dataset_1847_clark__fleche__and__senik__happiness_inequality_config.json

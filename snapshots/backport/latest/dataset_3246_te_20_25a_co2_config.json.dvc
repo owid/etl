@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 17:16:48.953919
+  description: core-econ.org
+  file_extension: json
+  is_public: false
+  name: Grapher metadata for dataset_3246_te_20_25a_co2
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_3246_te_20_25a_co2_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/3246
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 04ca88fcdc36fb33797e01e383f411f5
+  size: 1280
+  path: dataset_3246_te_20_25a_co2_config.json

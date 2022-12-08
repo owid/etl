@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 15:39:40.057855
+  description: ''
+  file_extension: feather
+  is_public: true
+  name: Daily fat supply- FAO (2017)
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_583_daily_fat_supply__fao__2017_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/583
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 207d75b6be9ae30a760c2c67eed80718
+  size: 52762
+  path: dataset_583_daily_fat_supply__fao__2017_values.feather

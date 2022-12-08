@@ -1,0 +1,20 @@
+meta:
+  date_accessed: 2022-12-07 17:44:01.369586
+  description: 'For 1541-1861 series: Wrigley and Schofield (1981); for 1862-2003
+    series: International Historical Statistics, Brian Mitchell (2010); for 2004-2015
+    series: UK Office for National Statistics (2016)'
+  file_extension: feather
+  is_public: true
+  name: Crude Birth and Death Rates (per 1,000), England and Wales 1541-2015 - Wrigley
+    and Schofield, Mitchell, UK ONS
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_532_crude_birth_and_death_rates__per_1_000__england_and_wales_1541_2015__wrigley_and_schofield__mitchell__uk_ons_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/532
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 49757a4a2aecd0431994fb1efd237881
+  size: 8530
+  path: dataset_532_crude_birth_and_death_rates__per_1_000__england_and_wales_1541_2015__wrigley_and_schofield__mitchell__uk_ons_values.feather

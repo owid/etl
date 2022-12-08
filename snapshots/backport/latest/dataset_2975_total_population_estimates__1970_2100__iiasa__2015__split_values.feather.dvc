@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 15:54:10.281194
+  description: ''
+  file_extension: feather
+  is_public: false
+  name: Total population estimates, 1970-2100 (IIASA (2015)) (split)
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_2975_total_population_estimates__1970_2100__iiasa__2015__split_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/2975
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: b0e965dd8d421720f0b9517497758cae
+  size: 42842
+  path: dataset_2975_total_population_estimates__1970_2100__iiasa__2015__split_values.feather

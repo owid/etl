@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 18:20:45.261554
+  description: ''
+  file_extension: json
+  is_public: true
+  name: Grapher metadata for dataset_675_forestry_area__fao__2017
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_675_forestry_area__fao__2017_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/675
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: f2d87a3e34126e3605f2394a68b4ce7b
+  size: 1844
+  path: dataset_675_forestry_area__fao__2017_config.json

@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 17:33:42.333843
+  description: ''
+  file_extension: json
+  is_public: true
+  name: Grapher metadata for dataset_5755_vegetable_oil_yields__fao
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_5755_vegetable_oil_yields__fao_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/5755
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 70cf1d94307dd111c34c3f2b7764d2da
+  size: 12606
+  path: dataset_5755_vegetable_oil_yields__fao_config.json

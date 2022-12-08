@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-08 00:39:06.628422
+  description: ''
+  file_extension: json
+  is_public: true
+  name: Grapher metadata for dataset_5078_covid_government_response__oxbsg
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_5078_covid_government_response__oxbsg_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/5078
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: a666858b5ea3819f57878856847999a6
+  size: 19506
+  path: dataset_5078_covid_government_response__oxbsg_config.json

@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-08 01:14:30.208040
+  description: ''
+  file_extension: json
+  is_public: true
+  name: Grapher metadata for dataset_2482_gini_coefficient__equivalized_income_after_tax_and_transfers__chartbook_of_economic_inequality__2017
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_2482_gini_coefficient__equivalized_income_after_tax_and_transfers__chartbook_of_economic_inequality__2017_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/2482
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 25063b7fd3a4dd54b514e064194f6b66
+  size: 1626
+  path: dataset_2482_gini_coefficient__equivalized_income_after_tax_and_transfers__chartbook_of_economic_inequality__2017_config.json

@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 17:30:08.137083
+  description: ''
+  file_extension: feather
+  is_public: true
+  name: Fertility Rate (Selected Gapminder, v12) (2017)
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_4132_fertility_rate__selected_gapminder__v12__2017_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/4132
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 1faabfddcb9acef8cb57304c517ac256
+  size: 121010
+  path: dataset_4132_fertility_rate__selected_gapminder__v12__2017_values.feather

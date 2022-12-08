@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 17:34:37.636609
+  description: ''
+  file_extension: json
+  is_public: true
+  name: Grapher metadata for dataset_295_tax_revenue__piketty__2014
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_295_tax_revenue__piketty__2014_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/295
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: a3eea0f0994ebb3d0f8f6f566b1eaacf
+  size: 1619
+  path: dataset_295_tax_revenue__piketty__2014_config.json

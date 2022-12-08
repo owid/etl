@@ -1,0 +1,18 @@
+meta:
+  date_accessed: 2022-12-08 00:21:21.082436
+  description: ''
+  file_extension: feather
+  is_public: false
+  name: World trade - upper bound (% of GDP) (Estevadeordal, Frantz, and Taylor (2003))
+    (split)
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_3033_world_trade__upper_bound__pct_of_gdp__estevadeordal__frantz__and_taylor__2003__split_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/3033
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: c417056058c0ea6a1f2831247578b7e8
+  size: 5938
+  path: dataset_3033_world_trade__upper_bound__pct_of_gdp__estevadeordal__frantz__and_taylor__2003__split_values.feather

@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 15:53:04.895563
+  description: https://github.com/owid/notebooks/tree/main/EdouardMathieu/wellcome_global_monitor_trust
+  file_extension: feather
+  is_public: true
+  name: Wellcome Global Monitor - Trust
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_4154_wellcome_global_monitor__trust_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/4154
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: c4f1585208a1a1ab0593a5556b008e3f
+  size: 13770
+  path: dataset_4154_wellcome_global_monitor__trust_values.feather

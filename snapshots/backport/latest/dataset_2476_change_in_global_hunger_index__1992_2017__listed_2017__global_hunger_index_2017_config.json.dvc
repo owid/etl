@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-08 01:33:03.011356
+  description: ''
+  file_extension: json
+  is_public: true
+  name: Grapher metadata for dataset_2476_change_in_global_hunger_index__1992_2017__listed_2017__global_hunger_index_2017
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_2476_change_in_global_hunger_index__1992_2017__listed_2017__global_hunger_index_2017_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/2476
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 59bf31d491608b55af4dd0e73dd34855
+  size: 1617
+  path: dataset_2476_change_in_global_hunger_index__1992_2017__listed_2017__global_hunger_index_2017_config.json

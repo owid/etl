@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 17:00:41.782271
+  description: core-econ.org
+  file_extension: json
+  is_public: false
+  name: Grapher metadata for dataset_4100_figure_17_19_updated
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_4100_figure_17_19_updated_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/4100
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: dd45c7969c2252d55c9e3803776b9fcc
+  size: 1584
+  path: dataset_4100_figure_17_19_updated_config.json

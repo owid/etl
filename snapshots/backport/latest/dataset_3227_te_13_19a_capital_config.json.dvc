@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 18:35:35.621377
+  description: core-econ.org
+  file_extension: json
+  is_public: false
+  name: Grapher metadata for dataset_3227_te_13_19a_capital
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_3227_te_13_19a_capital_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/3227
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 612c744bb1eca1820b672f2207dbf2a7
+  size: 1215
+  path: dataset_3227_te_13_19a_capital_config.json

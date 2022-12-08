@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-08 00:42:32.107239
+  description: ''
+  file_extension: feather
+  is_public: true
+  name: Aviation accidents and fatalities by flight phase (ASN, 2019)
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_3177_aviation_accidents_and_fatalities_by_flight_phase__asn__2019_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/3177
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 433526631fd7584c8ca252a83f98229b
+  size: 8938
+  path: dataset_3177_aviation_accidents_and_fatalities_by_flight_phase__asn__2019_values.feather

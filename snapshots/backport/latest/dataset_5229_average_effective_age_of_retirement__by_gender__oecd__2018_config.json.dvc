@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-08 01:19:08.259313
+  description: ''
+  file_extension: json
+  is_public: false
+  name: Grapher metadata for dataset_5229_average_effective_age_of_retirement__by_gender__oecd__2018
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_5229_average_effective_age_of_retirement__by_gender__oecd__2018_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/5229
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 8c14795e425227a6ba0d3f3269526e4f
+  size: 3297
+  path: dataset_5229_average_effective_age_of_retirement__by_gender__oecd__2018_config.json

@@ -1,0 +1,19 @@
+meta:
+  date_accessed: 2022-12-08 01:35:41.364843
+  description: "Manual update of spreadsheet for cases. Certification data is scraped\
+    \ from here https://apps.who.int/dracunculiasis/dradata/html/report_Countries_t0.html\
+    \ \n\nCode and data available here: https://github.com/owid/notebooks/tree/main/FionaSpooner/guinea_worm"
+  file_extension: feather
+  is_public: true
+  name: Reported guinea worm cases - WHO (2021)
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_5496_reported_guinea_worm_cases__who__2021_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/5496
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: e50d112c997bd554038e53bd39926028
+  size: 71170
+  path: dataset_5496_reported_guinea_worm_cases__who__2021_values.feather

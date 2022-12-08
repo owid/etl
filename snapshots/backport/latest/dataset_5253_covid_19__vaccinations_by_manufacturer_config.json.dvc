@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-08 08:37:16.626882
+  description: ''
+  file_extension: json
+  is_public: false
+  name: Grapher metadata for dataset_5253_covid_19__vaccinations_by_manufacturer
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_5253_covid_19__vaccinations_by_manufacturer_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/5253
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: d28b4af10fa18bc09f67c22549126fa9
+  size: 6973
+  path: dataset_5253_covid_19__vaccinations_by_manufacturer_config.json

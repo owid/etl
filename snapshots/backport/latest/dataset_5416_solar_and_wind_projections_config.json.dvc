@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 17:34:09.362363
+  description: ''
+  file_extension: json
+  is_public: false
+  name: Grapher metadata for dataset_5416_solar_and_wind_projections
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_5416_solar_and_wind_projections_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/5416
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 5fea2c04cd39acc9847e77b58c0f3856
+  size: 6267
+  path: dataset_5416_solar_and_wind_projections_config.json

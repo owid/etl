@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-08 01:37:38.204356
+  description: ''
+  file_extension: json
+  is_public: true
+  name: Grapher metadata for dataset_327_oecd__consumption_tax_trends_2016
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_327_oecd__consumption_tax_trends_2016_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/327
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 75913df2fa085692b82d4ea23ca250a7
+  size: 2347
+  path: dataset_327_oecd__consumption_tax_trends_2016_config.json

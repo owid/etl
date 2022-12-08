@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 15:57:09.923451
+  description: ''
+  file_extension: feather
+  is_public: false
+  name: Working Hours – BoE (2016)
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_5197_working_hours__boe__2016_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/5197
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 79bc963182fd126496f33a7f24d33594
+  size: 20442
+  path: dataset_5197_working_hours__boe__2016_values.feather

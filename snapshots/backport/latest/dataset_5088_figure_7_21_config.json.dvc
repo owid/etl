@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-08 01:21:51.120192
+  description: core-econ.org
+  file_extension: json
+  is_public: false
+  name: Grapher metadata for dataset_5088_figure_7_21
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_5088_figure_7_21_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/5088
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: d4477a7fa27d2030dd20991990b251d7
+  size: 1788
+  path: dataset_5088_figure_7_21_config.json

@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 17:52:55.693194
+  description: This is a dataset imported by the automated fetcher
+  file_extension: feather
+  is_public: true
+  name: Autistic spectrum disorders
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_2404_autistic_spectrum_disorders_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/2404
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 1f102957f84458e0dfdfa2b5e3a675e7
+  size: 5088802
+  path: dataset_2404_autistic_spectrum_disorders_values.feather

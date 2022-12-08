@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 16:53:47.236873
+  description: ''
+  file_extension: json
+  is_public: false
+  name: Grapher metadata for dataset_2965_prevalence_of_undernourishment_since_2000__faostats__2018
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_2965_prevalence_of_undernourishment_since_2000__faostats__2018_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/2965
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 55f85fe7b03906bb5e3f1a9b93a107c6
+  size: 3044
+  path: dataset_2965_prevalence_of_undernourishment_since_2000__faostats__2018_config.json

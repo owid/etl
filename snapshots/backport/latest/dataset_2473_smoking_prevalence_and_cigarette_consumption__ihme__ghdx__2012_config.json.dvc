@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-08 00:07:36.283088
+  description: ''
+  file_extension: json
+  is_public: true
+  name: Grapher metadata for dataset_2473_smoking_prevalence_and_cigarette_consumption__ihme__ghdx__2012
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_2473_smoking_prevalence_and_cigarette_consumption__ihme__ghdx__2012_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/2473
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 08748d2b3f7a21e6356a073624ebac8e
+  size: 10654
+  path: dataset_2473_smoking_prevalence_and_cigarette_consumption__ihme__ghdx__2012_config.json

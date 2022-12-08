@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 17:34:47.169542
+  description: ''
+  file_extension: feather
+  is_public: true
+  name: Tax Revenue – Piketty (2014)
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_295_tax_revenue__piketty__2014_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/295
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: c2075ae67b2e91289d1b2bc8b61577cd
+  size: 8218
+  path: dataset_295_tax_revenue__piketty__2014_values.feather

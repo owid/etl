@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-08 01:38:40.205172
+  description: ''
+  file_extension: feather
+  is_public: true
+  name: Unadjusted female-male hourly wage ratios by percentile – Blau, Kahn (2017)
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_998_unadjusted_female_male_hourly_wage_ratios_by_percentile__blau__kahn__2017_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/998
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 280682f1e348356f070bc1aa93c229e1
+  size: 6010
+  path: dataset_998_unadjusted_female_male_hourly_wage_ratios_by_percentile__blau__kahn__2017_values.feather

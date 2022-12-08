@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 15:56:47.642002
+  description: core-econ.org
+  file_extension: json
+  is_public: false
+  name: Grapher metadata for dataset_3247_te_20_25a_gdp
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_3247_te_20_25a_gdp_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/3247
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: c91d9b53a2c9d09dd062e55252bdfff8
+  size: 1524
+  path: dataset_3247_te_20_25a_gdp_config.json

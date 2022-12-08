@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 18:53:08.008426
+  description: ''
+  file_extension: json
+  is_public: true
+  name: Grapher metadata for dataset_5062_cereal_allocation_to_food__feed__fuel__owid_based_on_fao
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_5062_cereal_allocation_to_food__feed__fuel__owid_based_on_fao_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/5062
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 733179d18a230e3de3347fcb51b4e248
+  size: 6005
+  path: dataset_5062_cereal_allocation_to_food__feed__fuel__owid_based_on_fao_config.json

@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 17:23:01.436785
+  description: ''
+  file_extension: feather
+  is_public: true
+  name: Ozone and chlorine projections to 2100 (Scientific Assessment 2014)
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_2812_ozone_and_chlorine_projections_to_2100__scientific_assessment_2014_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/2812
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 921c8d5773f7c40a1a4e684b1e2f8357
+  size: 6850
+  path: dataset_2812_ozone_and_chlorine_projections_to_2100__scientific_assessment_2014_values.feather

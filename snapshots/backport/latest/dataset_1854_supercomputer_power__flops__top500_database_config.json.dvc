@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 17:12:50.286929
+  description: ''
+  file_extension: json
+  is_public: true
+  name: Grapher metadata for dataset_1854_supercomputer_power__flops__top500_database
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_1854_supercomputer_power__flops__top500_database_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/1854
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 7a966260b3321d3aa426a3cf72f07c0a
+  size: 1819
+  path: dataset_1854_supercomputer_power__flops__top500_database_config.json

@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-08 01:15:51.725305
+  description: ''
+  file_extension: feather
+  is_public: true
+  name: Real GDP per capita, London and Delhi - OWID
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_520_real_gdp_per_capita__london_and_delhi__owid_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/520
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 30e48ac9489d53d888d37008d03ada14
+  size: 8050
+  path: dataset_520_real_gdp_per_capita__london_and_delhi__owid_values.feather

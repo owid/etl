@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 18:10:55.613128
+  description: ''
+  file_extension: feather
+  is_public: false
+  name: National Net-Zero Targets (Net Zero Tracker)
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_5376_national_net_zero_targets__net_zero_tracker_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/5376
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: b0b844e708168023db083ea9c3a33a8a
+  size: 12066
+  path: dataset_5376_national_net_zero_targets__net_zero_tracker_values.feather

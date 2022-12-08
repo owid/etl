@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 16:00:51.515512
+  description: ''
+  file_extension: json
+  is_public: true
+  name: Grapher metadata for dataset_3225_public_and_private_education_expenditure__unesco__2019
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_3225_public_and_private_education_expenditure__unesco__2019_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/3225
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 53b5e1e328021947a662f6ca14a27099
+  size: 2965
+  path: dataset_3225_public_and_private_education_expenditure__unesco__2019_config.json

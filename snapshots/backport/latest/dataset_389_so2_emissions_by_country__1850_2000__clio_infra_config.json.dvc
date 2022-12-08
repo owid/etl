@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 16:30:07.202878
+  description: SO2 emissions (million tonnes) by country (1850-2000).
+  file_extension: json
+  is_public: true
+  name: Grapher metadata for dataset_389_so2_emissions_by_country__1850_2000__clio_infra
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_389_so2_emissions_by_country__1850_2000__clio_infra_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/389
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 1c29dbc0d095b947b6b10ea9a376964a
+  size: 1440
+  path: dataset_389_so2_emissions_by_country__1850_2000__clio_infra_config.json

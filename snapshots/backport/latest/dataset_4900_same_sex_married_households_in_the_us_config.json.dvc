@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 18:53:44.404915
+  description: ''
+  file_extension: json
+  is_public: true
+  name: Grapher metadata for dataset_4900_same_sex_married_households_in_the_us
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_4900_same_sex_married_households_in_the_us_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/4900
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 25e766d9e56132633d60be499c655a56
+  size: 2517
+  path: dataset_4900_same_sex_married_households_in_the_us_config.json

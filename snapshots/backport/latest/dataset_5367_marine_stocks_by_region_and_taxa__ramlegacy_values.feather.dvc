@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 17:03:09.977329
+  description: ''
+  file_extension: feather
+  is_public: true
+  name: Marine stocks by region and taxa (ramlegacy)
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_5367_marine_stocks_by_region_and_taxa__ramlegacy_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/5367
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 6544ed315b37eba4c7a4d5e9972bee17
+  size: 112778
+  path: dataset_5367_marine_stocks_by_region_and_taxa__ramlegacy_values.feather

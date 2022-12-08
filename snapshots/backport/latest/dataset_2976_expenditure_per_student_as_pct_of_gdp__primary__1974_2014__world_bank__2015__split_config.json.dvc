@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 17:59:21.462046
+  description: ''
+  file_extension: json
+  is_public: false
+  name: Grapher metadata for dataset_2976_expenditure_per_student_as_pct_of_gdp__primary__1974_2014__world_bank__2015__split
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_2976_expenditure_per_student_as_pct_of_gdp__primary__1974_2014__world_bank__2015__split_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/2976
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 1ef77ff6d75ef83cc9a1ce9731067849
+  size: 2842
+  path: dataset_2976_expenditure_per_student_as_pct_of_gdp__primary__1974_2014__world_bank__2015__split_config.json

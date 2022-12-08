@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-08 01:36:13.609215
+  description: This is a dataset imported by the automated fetcher
+  file_extension: feather
+  is_public: true
+  name: Other mental and substance use disorders
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_2403_other_mental_and_substance_use_disorders_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/2403
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: b2330d9158b4e1d42f9e4b507ab775c4
+  size: 4531130
+  path: dataset_2403_other_mental_and_substance_use_disorders_values.feather

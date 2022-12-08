@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 17:51:42.263972
+  description: ''
+  file_extension: feather
+  is_public: false
+  name: Live births in England and Wales under 22 weeks (ONS, 2018)
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_3104_live_births_in_england_and_wales_under_22_weeks__ons__2018_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/3104
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 989db655c57da72a4329eee736f8bb61
+  size: 5794
+  path: dataset_3104_live_births_in_england_and_wales_under_22_weeks__ons__2018_values.feather

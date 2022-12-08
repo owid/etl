@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 17:31:24.807064
+  description: core-econ.org
+  file_extension: feather
+  is_public: false
+  name: 16.14-2
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_3100__16_14_2_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/3100
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: cb6d5393f9b0f824d5766a8616563a8c
+  size: 7074
+  path: dataset_3100__16_14_2_values.feather

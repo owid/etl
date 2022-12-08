@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-11-29 16:25:10.830860
+  description: This is a dataset imported by the automated fetcher
+  file_extension: feather
+  is_public: true
+  name: 'Food Security: Suite of Food Security Indicators - FAO (2017)'
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_829_food_security__suite_of_food_security_indicators__fao__2017_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/829
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 7743ef00f1d2589d76ea4f0508bf9f37
+  size: 232810
+  path: dataset_829_food_security__suite_of_food_security_indicators__fao__2017_values.feather

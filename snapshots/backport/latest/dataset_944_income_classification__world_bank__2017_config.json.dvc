@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-08 00:05:15.835061
+  description: ''
+  file_extension: json
+  is_public: true
+  name: Grapher metadata for dataset_944_income_classification__world_bank__2017
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_944_income_classification__world_bank__2017_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/944
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 4c77ccd3dd77a5b9bac24692c8fa96db
+  size: 2805
+  path: dataset_944_income_classification__world_bank__2017_config.json

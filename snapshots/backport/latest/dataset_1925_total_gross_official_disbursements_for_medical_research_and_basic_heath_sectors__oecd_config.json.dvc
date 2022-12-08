@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 17:59:06.196949
+  description: ''
+  file_extension: json
+  is_public: true
+  name: Grapher metadata for dataset_1925_total_gross_official_disbursements_for_medical_research_and_basic_heath_sectors__oecd
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_1925_total_gross_official_disbursements_for_medical_research_and_basic_heath_sectors__oecd_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/1925
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 0fedfd8b2754c22230e19b0c5507e042
+  size: 2390
+  path: dataset_1925_total_gross_official_disbursements_for_medical_research_and_basic_heath_sectors__oecd_config.json

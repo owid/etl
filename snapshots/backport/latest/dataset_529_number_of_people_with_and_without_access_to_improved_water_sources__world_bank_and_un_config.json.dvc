@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 16:51:08.207271
+  description: ''
+  file_extension: json
+  is_public: true
+  name: Grapher metadata for dataset_529_number_of_people_with_and_without_access_to_improved_water_sources__world_bank_and_un
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_529_number_of_people_with_and_without_access_to_improved_water_sources__world_bank_and_un_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/529
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: d464ee9dac0a9d615aa45f2c435de42d
+  size: 3071
+  path: dataset_529_number_of_people_with_and_without_access_to_improved_water_sources__world_bank_and_un_config.json

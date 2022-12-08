@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 17:22:20.458374
+  description: ''
+  file_extension: json
+  is_public: true
+  name: Grapher metadata for dataset_1929_uk_cholera_death_over_the_long_term__ons
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_1929_uk_cholera_death_over_the_long_term__ons_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/1929
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: d912f4d6cc4357c15628649b490e5009
+  size: 3045
+  path: dataset_1929_uk_cholera_death_over_the_long_term__ons_config.json

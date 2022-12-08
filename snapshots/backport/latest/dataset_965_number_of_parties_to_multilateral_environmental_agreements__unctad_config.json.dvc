@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 17:28:27.196017
+  description: ''
+  file_extension: json
+  is_public: true
+  name: Grapher metadata for dataset_965_number_of_parties_to_multilateral_environmental_agreements__unctad
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_965_number_of_parties_to_multilateral_environmental_agreements__unctad_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/965
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 31c9e90f80a2c39ddb8f0b51280ae9b5
+  size: 7862
+  path: dataset_965_number_of_parties_to_multilateral_environmental_agreements__unctad_config.json

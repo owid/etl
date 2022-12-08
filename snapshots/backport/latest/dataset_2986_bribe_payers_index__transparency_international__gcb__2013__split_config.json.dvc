@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-08 00:32:44.863937
+  description: ''
+  file_extension: json
+  is_public: false
+  name: Grapher metadata for dataset_2986_bribe_payers_index__transparency_international__gcb__2013__split
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_2986_bribe_payers_index__transparency_international__gcb__2013__split_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/2986
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: d65e7867b414ad29c87953cf815d669b
+  size: 2722
+  path: dataset_2986_bribe_payers_index__transparency_international__gcb__2013__split_config.json

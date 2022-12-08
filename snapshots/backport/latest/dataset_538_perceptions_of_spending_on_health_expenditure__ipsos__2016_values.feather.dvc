@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 16:56:30.172004
+  description: ''
+  file_extension: feather
+  is_public: true
+  name: Perceptions of spending on health expenditure - IPSOS (2016)
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_538_perceptions_of_spending_on_health_expenditure__ipsos__2016_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/538
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: cd6da8c8d5f39439c7e1103d0fc92064
+  size: 7202
+  path: dataset_538_perceptions_of_spending_on_health_expenditure__ipsos__2016_values.feather

@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 17:59:36.086795
+  description: This is a dataset imported by the automated fetcher
+  file_extension: json
+  is_public: true
+  name: Grapher metadata for dataset_2593_labour__lfs_by_sex_and_age__indicators
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_2593_labour__lfs_by_sex_and_age__indicators_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/2593
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 65b50040bb01bef78721e51afef339d6
+  size: 119725
+  path: dataset_2593_labour__lfs_by_sex_and_age__indicators_config.json

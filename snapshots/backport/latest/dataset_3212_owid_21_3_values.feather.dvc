@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 17:07:50.379639
+  description: core-econ.org
+  file_extension: feather
+  is_public: false
+  name: OWID_21.3
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_3212_owid_21_3_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/3212
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: a0e56b5b7ab7613835e4968b196845d9
+  size: 13450
+  path: dataset_3212_owid_21_3_values.feather

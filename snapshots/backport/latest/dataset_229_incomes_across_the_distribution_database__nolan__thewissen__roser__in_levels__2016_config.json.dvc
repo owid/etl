@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 16:33:11.520454
+  description: ''
+  file_extension: json
+  is_public: true
+  name: Grapher metadata for dataset_229_incomes_across_the_distribution_database__nolan__thewissen__roser__in_levels__2016
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_229_incomes_across_the_distribution_database__nolan__thewissen__roser__in_levels__2016_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/229
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: e5d8f5aa65c66097de6b35c77e644b20
+  size: 9392
+  path: dataset_229_incomes_across_the_distribution_database__nolan__thewissen__roser__in_levels__2016_config.json

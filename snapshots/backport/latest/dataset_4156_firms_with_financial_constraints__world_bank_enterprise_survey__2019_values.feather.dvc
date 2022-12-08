@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 15:53:34.070782
+  description: ''
+  file_extension: feather
+  is_public: true
+  name: Firms with financial constraints - World Bank Enterprise Survey (2019)
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_4156_firms_with_financial_constraints__world_bank_enterprise_survey__2019_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/4156
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 24615f7ef1a3512832290147427c5d5e
+  size: 7258
+  path: dataset_4156_firms_with_financial_constraints__world_bank_enterprise_survey__2019_values.feather

@@ -1,0 +1,18 @@
+meta:
+  date_accessed: 2022-12-07 15:49:53.483071
+  description: ''
+  file_extension: feather
+  is_public: false
+  name: Proportion of unemployed using specific search methods - Bachmann and Baumgarten
+    (2013)
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_4243_proportion_of_unemployed_using_specific_search_methods__bachmann_and_baumgarten__2013_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/4243
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 969e80d5980e999bd2dba3839f7072af
+  size: 7554
+  path: dataset_4243_proportion_of_unemployed_using_specific_search_methods__bachmann_and_baumgarten__2013_values.feather

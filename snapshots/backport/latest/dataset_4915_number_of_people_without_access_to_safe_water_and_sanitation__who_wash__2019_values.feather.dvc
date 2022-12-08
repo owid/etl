@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 17:22:37.318218
+  description: ''
+  file_extension: feather
+  is_public: true
+  name: Number of people without access to safe water and sanitation (WHO Wash, 2019)
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_4915_number_of_people_without_access_to_safe_water_and_sanitation__who_wash__2019_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/4915
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: f591f6a34e2dda77444f7ff742d59ae5
+  size: 33746
+  path: dataset_4915_number_of_people_without_access_to_safe_water_and_sanitation__who_wash__2019_values.feather

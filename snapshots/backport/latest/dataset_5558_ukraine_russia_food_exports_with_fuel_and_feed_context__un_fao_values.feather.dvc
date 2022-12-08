@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 17:37:49.094242
+  description: ''
+  file_extension: feather
+  is_public: false
+  name: Ukraine-Russia food exports with fuel and feed context (UN FAO)
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_5558_ukraine_russia_food_exports_with_fuel_and_feed_context__un_fao_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/5558
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 164f0278f916259670736614d0507de4
+  size: 6114
+  path: dataset_5558_ukraine_russia_food_exports_with_fuel_and_feed_context__un_fao_values.feather
