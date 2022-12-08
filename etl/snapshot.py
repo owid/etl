@@ -193,12 +193,13 @@ def add_snapshot(
 
 
 def snapshot_catalog(match: str = r".*") -> List[Snapshot]:
-    """Return a catalog of all snapshots.
+    """Return a catalog of all snapshots. It can take more than 10s to load the entire catalog,
+    so it's recommended to use `match` to filter the snapshots.
     :param match: pattern to match uri
     """
     catalog = []
     for path in paths.SNAPSHOTS_DIR.glob("**/*.dvc"):
         uri = str(path.relative_to(paths.SNAPSHOTS_DIR)).replace(".dvc", "")
-        if re.match(match, uri):
+        if re.search(match, uri):
             catalog.append(Snapshot(uri))
     return catalog
