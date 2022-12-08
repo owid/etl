@@ -520,7 +520,7 @@ class SnapshotStep(Step):
         return f"snapshot://{self.path}"
 
     def run(self) -> None:
-        DVC_REPO.pull(self._path, remote="public")
+        DVC_REPO.pull(self._path, remote="public", force=True)
 
     def is_dirty(self) -> bool:
         # check if the snapshot has been added to DVC
@@ -554,7 +554,7 @@ class SnapshotStepPrivate(SnapshotStep):
         return f"snapshot-private://{self.path}"
 
     def run(self) -> None:
-        DVC_REPO.pull(self._path, remote="private")
+        DVC_REPO.pull(self._path, remote="private", force=True)
 
 
 class GrapherStep(Step):
