@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 18:22:43.789669
+  description: https://github.com/owid/importers/tree/master/sipri
+  file_extension: feather
+  is_public: true
+  name: SIPRI Military Expenditure Database
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_5535_sipri_military_expenditure_database_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/5535
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: daa84a71047eedf567976f2bcdd0469a
+  size: 126122
+  path: dataset_5535_sipri_military_expenditure_database_values.feather

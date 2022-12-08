@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 18:10:17.204468
+  description: ''
+  file_extension: json
+  is_public: true
+  name: Grapher metadata for dataset_3078_human_capital_index__world_bank__2018
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_3078_human_capital_index__world_bank__2018_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/3078
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 0ebaa01d77af79f799f4eea7938a4ee8
+  size: 3299
+  path: dataset_3078_human_capital_index__world_bank__2018_config.json

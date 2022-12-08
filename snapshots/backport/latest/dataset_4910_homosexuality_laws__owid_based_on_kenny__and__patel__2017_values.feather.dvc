@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 18:45:54.001163
+  description: ''
+  file_extension: feather
+  is_public: true
+  name: Homosexuality Laws – OWID based on Kenny & Patel (2017)
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_4910_homosexuality_laws__owid_based_on_kenny__and__patel__2017_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/4910
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 745b9b9fc926d4fba2f9ad5726eb88d6
+  size: 12242
+  path: dataset_4910_homosexuality_laws__owid_based_on_kenny__and__patel__2017_values.feather

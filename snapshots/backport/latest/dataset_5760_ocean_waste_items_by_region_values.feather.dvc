@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-08 01:22:26.720570
+  description: ''
+  file_extension: feather
+  is_public: true
+  name: ocean_waste_items_by_region
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_5760_ocean_waste_items_by_region_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/5760
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 168ca8d449a7b1befe28de025f8e8e53
+  size: 6698
+  path: dataset_5760_ocean_waste_items_by_region_values.feather

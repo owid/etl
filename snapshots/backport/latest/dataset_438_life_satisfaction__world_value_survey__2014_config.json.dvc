@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-08 01:28:04.329640
+  description: ''
+  file_extension: json
+  is_public: true
+  name: Grapher metadata for dataset_438_life_satisfaction__world_value_survey__2014
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_438_life_satisfaction__world_value_survey__2014_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/438
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: df47f7f1829c7dd499d9eb525b751e6c
+  size: 3080
+  path: dataset_438_life_satisfaction__world_value_survey__2014_config.json

@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 18:29:46.288853
+  description: ''
+  file_extension: feather
+  is_public: false
+  name: Time spent, participation time, and participation rates - Eurostat
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_2826_time_spent__participation_time__and_participation_rates__eurostat_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/2826
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 452f991d4f3e3184207f591f658738eb
+  size: 11106
+  path: dataset_2826_time_spent__participation_time__and_participation_rates__eurostat_values.feather

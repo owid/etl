@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 18:11:59.927830
+  description: This data produces output figures of key industries in England (1270-1870).
+  file_extension: feather
+  is_public: true
+  name: Output of key industries in England - using Bank of England (2017)
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_705_output_of_key_industries_in_england__using_bank_of_england__2017_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/705
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 8031bbe6d6d6513ed621f9ad497b9c0b
+  size: 26474
+  path: dataset_705_output_of_key_industries_in_england__using_bank_of_england__2017_values.feather

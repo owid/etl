@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 17:49:37.331155
+  description: ''
+  file_extension: json
+  is_public: true
+  name: Grapher metadata for dataset_2765_depression_prevalence_by_education__oecd
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_2765_depression_prevalence_by_education__oecd_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/2765
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: b2317a823a9f2959a6fc216032336a27
+  size: 6322
+  path: dataset_2765_depression_prevalence_by_education__oecd_config.json

@@ -1,5 +1,5 @@
 meta:
-  date_accessed: 2022-12-07 17:05:42.393392
+  date_accessed: 2022-12-07 18:21:46.444300
   description: ''
   file_extension: json
   is_public: true
@@ -12,6 +12,6 @@ meta:
   version: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 55db0a5565ad02424813ac6ca630b50f
+- md5: 097f7a7c6b0c67726c6c9ecc52a53349
   size: 6612
   path: dataset_5205_covid_2019__hospital__and__icu_config.json

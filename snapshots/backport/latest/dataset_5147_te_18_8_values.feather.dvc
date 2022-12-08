@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-08 01:32:07.339634
+  description: core-econ.org
+  file_extension: feather
+  is_public: false
+  name: TE-18.8
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_5147_te_18_8_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/5147
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 25e7e44bdad64682e76c8af1a2734cb1
+  size: 6242
+  path: dataset_5147_te_18_8_values.feather

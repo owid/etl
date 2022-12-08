@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-08 01:45:38.623687
+  description: ''
+  file_extension: feather
+  is_public: true
+  name: Child Labor UK (historic) - Cunningham, H. and Viazzo, P.P. (1996)
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_168_child_labor_uk__historic__cunningham__h__and_viazzo__p_p__1996_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/168
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 3871fa45704a0755d3332d6b6b0bf6fb
+  size: 6042
+  path: dataset_168_child_labor_uk__historic__cunningham__h__and_viazzo__p_p__1996_values.feather

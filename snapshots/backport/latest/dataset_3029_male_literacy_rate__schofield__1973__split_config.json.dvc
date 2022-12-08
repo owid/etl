@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 17:59:52.233901
+  description: Literacy figures are nationally representative.
+  file_extension: json
+  is_public: false
+  name: Grapher metadata for dataset_3029_male_literacy_rate__schofield__1973__split
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_3029_male_literacy_rate__schofield__1973__split_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/3029
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: d2b798eca4171dec085ffa5cabddb4cb
+  size: 2780
+  path: dataset_3029_male_literacy_rate__schofield__1973__split_config.json

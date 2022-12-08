@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 18:07:39.010953
+  description: ''
+  file_extension: json
+  is_public: true
+  name: Grapher metadata for dataset_2780_historical_index_of_human_development__prados_de_la_escosura
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_2780_historical_index_of_human_development__prados_de_la_escosura_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/2780
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 56763caf0659c3a26610bf49504c3b1e
+  size: 1862
+  path: dataset_2780_historical_index_of_human_development__prados_de_la_escosura_config.json

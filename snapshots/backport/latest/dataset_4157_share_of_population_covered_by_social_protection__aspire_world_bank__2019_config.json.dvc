@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-08 01:39:40.477564
+  description: ''
+  file_extension: json
+  is_public: true
+  name: Grapher metadata for dataset_4157_share_of_population_covered_by_social_protection__aspire_world_bank__2019
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_4157_share_of_population_covered_by_social_protection__aspire_world_bank__2019_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/4157
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 7b6d8325a05a67164c2ddf5ad6430bd9
+  size: 1492
+  path: dataset_4157_share_of_population_covered_by_social_protection__aspire_world_bank__2019_config.json

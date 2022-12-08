@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 18:00:08.662039
+  description: ''
+  file_extension: json
+  is_public: false
+  name: Grapher metadata for dataset_5380_world_regions_according_to_the_united_nations
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_5380_world_regions_according_to_the_united_nations_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/5380
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 680899f8408abbcd5b0ee6739533321e
+  size: 1186
+  path: dataset_5380_world_regions_according_to_the_united_nations_config.json

@@ -1,0 +1,18 @@
+meta:
+  date_accessed: 2022-12-07 18:48:19.743813
+  description: The difference between male and female median wages divided by the
+    male median wages.
+  file_extension: feather
+  is_public: true
+  name: Gender Wage Gap – OECD (2017)
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_989_gender_wage_gap__oecd__2017_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/989
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: bac6bbdc452b353c9fe1d6e587c2414a
+  size: 10074
+  path: dataset_989_gender_wage_gap__oecd__2017_values.feather

@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 18:36:19.710681
+  description: ''
+  file_extension: feather
+  is_public: true
+  name: Trust – Eurostat
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_276_trust__eurostat_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/276
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 7fdc227042bf653eb2e52784c69c6a6f
+  size: 6898
+  path: dataset_276_trust__eurostat_values.feather

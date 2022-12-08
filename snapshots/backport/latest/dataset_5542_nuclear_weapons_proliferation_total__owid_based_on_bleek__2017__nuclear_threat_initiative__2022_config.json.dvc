@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-08 00:40:59.143044
+  description: ''
+  file_extension: json
+  is_public: true
+  name: Grapher metadata for dataset_5542_nuclear_weapons_proliferation_total__owid_based_on_bleek__2017__nuclear_threat_initiative__2022
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_5542_nuclear_weapons_proliferation_total__owid_based_on_bleek__2017__nuclear_threat_initiative__2022_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/5542
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 7697718a9001864d7bb9ed8eadeb3e9e
+  size: 3570
+  path: dataset_5542_nuclear_weapons_proliferation_total__owid_based_on_bleek__2017__nuclear_threat_initiative__2022_config.json

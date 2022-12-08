@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 18:09:33.252943
+  description: ''
+  file_extension: json
+  is_public: true
+  name: Grapher metadata for dataset_2733_ozone_depletion_impacts_on_skin_cancer_incidence__slaper_et_al
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_2733_ozone_depletion_impacts_on_skin_cancer_incidence__slaper_et_al_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/2733
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: fee6099f48841d95fa3fa4d36e4ab409
+  size: 3146
+  path: dataset_2733_ozone_depletion_impacts_on_skin_cancer_incidence__slaper_et_al_config.json

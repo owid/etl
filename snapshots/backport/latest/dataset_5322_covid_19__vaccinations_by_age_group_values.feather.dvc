@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-08 00:12:56.701906
+  description: ''
+  file_extension: feather
+  is_public: false
+  name: COVID-19 - Vaccinations by age group
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_5322_covid_19__vaccinations_by_age_group_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/5322
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 3e5957a6486357c7390d84b51acc2ba4
+  size: 678282
+  path: dataset_5322_covid_19__vaccinations_by_age_group_values.feather

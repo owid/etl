@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 18:53:26.151011
+  description: ''
+  file_extension: json
+  is_public: false
+  name: Grapher metadata for dataset_5098_covid_19_model_estimates__lshtm__2020
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_5098_covid_19_model_estimates__lshtm__2020_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/5098
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 840ce781c5c5304b4c5a19bac04a01d9
+  size: 3403
+  path: dataset_5098_covid_19_model_estimates__lshtm__2020_config.json

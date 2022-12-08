@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-08 01:15:29.278081
+  description: ''
+  file_extension: feather
+  is_public: true
+  name: Death rate by age group in England and Wales - ONS
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_1934_death_rate_by_age_group_in_england_and_wales__ons_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/1934
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 71284548a080f71be2307a67b2d162e8
+  size: 7010
+  path: dataset_1934_death_rate_by_age_group_in_england_and_wales__ons_values.feather

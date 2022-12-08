@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 18:57:03.633306
+  description: https://github.com/owid/notebooks/tree/main/EdouardMathieu/aerospace_csis_datasets
+  file_extension: feather
+  is_public: false
+  name: CSIS - Astronauts launched by year
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_5636_csis__astronauts_launched_by_year_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/5636
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 4ba8242e0abd99eec89236ffdaff30f5
+  size: 10506
+  path: dataset_5636_csis__astronauts_launched_by_year_values.feather

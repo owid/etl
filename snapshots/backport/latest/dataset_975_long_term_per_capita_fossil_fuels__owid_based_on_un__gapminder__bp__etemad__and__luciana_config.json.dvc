@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-08 01:17:54.850027
+  description: ''
+  file_extension: json
+  is_public: true
+  name: Grapher metadata for dataset_975_long_term_per_capita_fossil_fuels__owid_based_on_un__gapminder__bp__etemad__and__luciana
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_975_long_term_per_capita_fossil_fuels__owid_based_on_un__gapminder__bp__etemad__and__luciana_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/975
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 3fb5cdcd0aa98cd5ef5ff119ded6b043
+  size: 3915
+  path: dataset_975_long_term_per_capita_fossil_fuels__owid_based_on_un__gapminder__bp__etemad__and__luciana_config.json

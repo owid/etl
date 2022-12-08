@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 18:59:27.647774
+  description: ''
+  file_extension: json
+  is_public: true
+  name: Grapher metadata for dataset_2666_economic_impacts_2vs1_5c__pretis_et_al
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_2666_economic_impacts_2vs1_5c__pretis_et_al_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/2666
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 1ccdbc6db928ad8d57f78979aa572431
+  size: 3133
+  path: dataset_2666_economic_impacts_2vs1_5c__pretis_et_al_config.json

@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-08 01:43:45.856316
+  description: ''
+  file_extension: json
+  is_public: true
+  name: Grapher metadata for dataset_2861_projected_change_in_under_5_population_by_country_2015__2050__2100__owid_based_on_un_population__2017
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_2861_projected_change_in_under_5_population_by_country_2015__2050__2100__owid_based_on_un_population__2017_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/2861
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 695d7b0295130a0eb4ca2d7707466360
+  size: 2044
+  path: dataset_2861_projected_change_in_under_5_population_by_country_2015__2050__2100__owid_based_on_un_population__2017_config.json

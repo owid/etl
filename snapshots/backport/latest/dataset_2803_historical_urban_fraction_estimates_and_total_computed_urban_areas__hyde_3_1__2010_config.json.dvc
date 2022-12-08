@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-08 00:43:42.383929
+  description: ''
+  file_extension: json
+  is_public: true
+  name: Grapher metadata for dataset_2803_historical_urban_fraction_estimates_and_total_computed_urban_areas__hyde_3_1__2010
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_2803_historical_urban_fraction_estimates_and_total_computed_urban_areas__hyde_3_1__2010_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/2803
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 5674cf5dd407cf8c5aea9dd7a178e108
+  size: 4090
+  path: dataset_2803_historical_urban_fraction_estimates_and_total_computed_urban_areas__hyde_3_1__2010_config.json

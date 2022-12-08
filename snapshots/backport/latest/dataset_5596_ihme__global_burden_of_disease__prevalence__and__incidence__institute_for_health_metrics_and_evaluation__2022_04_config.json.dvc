@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-08 01:16:03.514619
+  description: This is a dataset imported by the automated fetcher
+  file_extension: json
+  is_public: true
+  name: Grapher metadata for dataset_5596_ihme__global_burden_of_disease__prevalence__and__incidence__institute_for_health_metrics_and_evaluation__2022_04
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_5596_ihme__global_burden_of_disease__prevalence__and__incidence__institute_for_health_metrics_and_evaluation__2022_04_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/5596
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 2e310e7c6d38e58efcc3b0b24b055acf
+  size: 54738
+  path: dataset_5596_ihme__global_burden_of_disease__prevalence__and__incidence__institute_for_health_metrics_and_evaluation__2022_04_config.json

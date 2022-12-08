@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-08 01:49:52.821086
+  description: ''
+  file_extension: json
+  is_public: true
+  name: Grapher metadata for dataset_665_global_agricultural_land_by_crop__fao__2017
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_665_global_agricultural_land_by_crop__fao__2017_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/665
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 00430cd69dbd022921383d9124c0cf0a
+  size: 1503
+  path: dataset_665_global_agricultural_land_by_crop__fao__2017_config.json

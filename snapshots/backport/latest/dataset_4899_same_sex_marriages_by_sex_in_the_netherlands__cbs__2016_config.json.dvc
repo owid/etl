@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 18:00:53.255291
+  description: ''
+  file_extension: json
+  is_public: true
+  name: Grapher metadata for dataset_4899_same_sex_marriages_by_sex_in_the_netherlands__cbs__2016
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_4899_same_sex_marriages_by_sex_in_the_netherlands__cbs__2016_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/4899
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: d2a3dddfcbbf1b00dd8aa4fec297c742
+  size: 2053
+  path: dataset_4899_same_sex_marriages_by_sex_in_the_netherlands__cbs__2016_config.json

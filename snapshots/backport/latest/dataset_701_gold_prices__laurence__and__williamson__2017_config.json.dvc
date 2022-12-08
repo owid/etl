@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 18:16:13.368028
+  description: ''
+  file_extension: json
+  is_public: true
+  name: Grapher metadata for dataset_701_gold_prices__laurence__and__williamson__2017
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_701_gold_prices__laurence__and__williamson__2017_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/701
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 9cac3adf2805345c47e3b26effb6c4e2
+  size: 1599
+  path: dataset_701_gold_prices__laurence__and__williamson__2017_config.json

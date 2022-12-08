@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 18:33:15.986074
+  description: ''
+  file_extension: feather
+  is_public: false
+  name: Completeness of Death Reporting – Karlinsky (2021)
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_5519_completeness_of_death_reporting__karlinsky__2021_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/5519
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: a053c1e35dc3d1b6a24e0b3f5a729e2d
+  size: 15354
+  path: dataset_5519_completeness_of_death_reporting__karlinsky__2021_values.feather

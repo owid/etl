@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 18:52:24.019718
+  description: core-econ.org
+  file_extension: feather
+  is_public: false
+  name: Figure_17.28_interest_rate
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_5144_figure_17_28_interest_rate_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/5144
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: e906cc05965c94f3ca5b994d8c1f6a5c
+  size: 6954
+  path: dataset_5144_figure_17_28_interest_rate_values.feather

@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 17:52:16.694386
+  description: ''
+  file_extension: json
+  is_public: false
+  name: Grapher metadata for dataset_5283_number_of_extinctions_since_1500__iucn_red_list
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_5283_number_of_extinctions_since_1500__iucn_red_list_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/5283
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 12346088e8b0e9a89ce8255b17c38a73
+  size: 2290
+  path: dataset_5283_number_of_extinctions_since_1500__iucn_red_list_config.json

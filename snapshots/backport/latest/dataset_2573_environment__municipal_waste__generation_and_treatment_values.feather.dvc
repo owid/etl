@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-08 00:56:23.241620
+  description: This is a dataset imported by the automated fetcher
+  file_extension: feather
+  is_public: true
+  name: Environment - Municipal waste, Generation and Treatment
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_2573_environment__municipal_waste__generation_and_treatment_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/2573
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: d23ac6ff0a85344a286874354db656a0
+  size: 87634
+  path: dataset_2573_environment__municipal_waste__generation_and_treatment_values.feather

@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 18:37:56.731387
+  description: ''
+  file_extension: json
+  is_public: true
+  name: Grapher metadata for dataset_2761_alcohol_consumption_in_usa_since_1850__niaaa
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_2761_alcohol_consumption_in_usa_since_1850__niaaa_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/2761
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 95ec445172ba9a66594e2296a11116ff
+  size: 3181
+  path: dataset_2761_alcohol_consumption_in_usa_since_1850__niaaa_config.json

@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 17:52:23.027379
+  description: ''
+  file_extension: feather
+  is_public: false
+  name: Number of extinctions since 1500 (IUCN Red List)
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_5283_number_of_extinctions_since_1500__iucn_red_list_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/5283
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 57f8c0320a6514d8174d76918255ba2b
+  size: 6202
+  path: dataset_5283_number_of_extinctions_since_1500__iucn_red_list_values.feather

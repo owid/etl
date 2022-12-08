@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 18:05:40.106155
+  description: ''
+  file_extension: json
+  is_public: true
+  name: Grapher metadata for dataset_2794_literacy_rate__pct_of_total_respondents__dhs_surveys
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_2794_literacy_rate__pct_of_total_respondents__dhs_surveys_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/2794
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 3913fdebdee6fce756e75bfef5f72fec
+  size: 7076
+  path: dataset_2794_literacy_rate__pct_of_total_respondents__dhs_surveys_config.json

@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 18:07:23.920752
+  description: ''
+  file_extension: json
+  is_public: true
+  name: Grapher metadata for dataset_4248_arable_land_per_crop_output__pin__fao__2019
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_4248_arable_land_per_crop_output__pin__fao__2019_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/4248
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 29c32b374ae979ab4a9b8ac42f8cf2f0
+  size: 2321
+  path: dataset_4248_arable_land_per_crop_output__pin__fao__2019_config.json

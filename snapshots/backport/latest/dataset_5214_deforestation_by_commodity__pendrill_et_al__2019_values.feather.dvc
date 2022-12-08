@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-08 00:30:14.409512
+  description: ''
+  file_extension: feather
+  is_public: true
+  name: Deforestation by commodity (Pendrill et al. (2019))
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_5214_deforestation_by_commodity__pendrill_et_al__2019_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/5214
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 0bb80f793e86c31c98658c7857689711
+  size: 6650
+  path: dataset_5214_deforestation_by_commodity__pendrill_et_al__2019_values.feather

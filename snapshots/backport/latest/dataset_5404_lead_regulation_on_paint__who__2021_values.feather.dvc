@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-08 00:08:07.947952
+  description: ''
+  file_extension: feather
+  is_public: false
+  name: Lead regulation on paint (WHO, 2021)
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_5404_lead_regulation_on_paint__who__2021_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/5404
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 0dd3ca54691b74dd25fd40db3321852b
+  size: 8282
+  path: dataset_5404_lead_regulation_on_paint__who__2021_values.feather

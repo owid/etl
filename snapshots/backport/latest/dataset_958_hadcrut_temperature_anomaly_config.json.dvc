@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-08 00:18:26.678289
+  description: ''
+  file_extension: json
+  is_public: true
+  name: Grapher metadata for dataset_958_hadcrut_temperature_anomaly
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_958_hadcrut_temperature_anomaly_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/958
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 75916ec6eb8569b3ea1eac1776699ab7
+  size: 3186
+  path: dataset_958_hadcrut_temperature_anomaly_config.json
