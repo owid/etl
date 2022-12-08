@@ -54,7 +54,7 @@ def parse_data_from_sheets(data_df: pd.DataFrame) -> pd.DataFrame:
         raise ValidationError("Missing column 'country' in data (is it lowercase?)")
 
     # check types
-    if not data_df.year.dtype in INT_TYPES:
+    if data_df.year.dtype not in INT_TYPES:
         raise ValidationError("Column 'year' should be integer")
 
     return data_df.set_index(["country", "year"])
