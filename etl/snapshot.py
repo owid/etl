@@ -3,6 +3,7 @@ import re
 import shutil
 from dataclasses import dataclass
 from pathlib import Path
+from threading import Lock
 from typing import Any, Dict, List, Literal, Optional, Union
 
 import pandas as pd
@@ -16,6 +17,9 @@ from owid.walden import files
 from etl import paths
 
 dvc = Repo(paths.BASE_DIR)
+
+# DVC is not thread-safe, so we need to lock it
+dvc_lock = Lock()
 
 
 @dataclass
@@ -64,9 +68,10 @@ class Snapshot:
 
     def dvc_add(self, upload: bool) -> None:
         """Add file to DVC and upload to S3."""
-        dvc.add(str(self.path), fname=str(self.metadata_path))
-        if upload:
-            dvc.push(str(self.path), remote=self._dvc_remote)
+        with dvc_lock:
+            dvc.add(str(self.path), fname=str(self.metadata_path))
+            if upload:
+                dvc.push(str(self.path), remote=self._dvc_remote)
 
     @property
     def _dvc_remote(self):
