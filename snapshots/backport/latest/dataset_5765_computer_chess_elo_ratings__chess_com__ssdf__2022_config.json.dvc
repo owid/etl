@@ -1,5 +1,5 @@
 meta:
-  date_accessed: 2022-12-08 01:01:25.474769
+  date_accessed: 2022-12-08 12:04:49.654998
   description: ''
   file_extension: json
   is_public: false
@@ -12,6 +12,6 @@ meta:
   version: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: df6e9198aa91a4fa7e2baed796cd57f9
-  size: 1992
+- md5: 87c6ed26e5ed5bf4b0d56fd6babc9c11
+  size: 2209
   path: dataset_5765_computer_chess_elo_ratings__chess_com__ssdf__2022_config.json
