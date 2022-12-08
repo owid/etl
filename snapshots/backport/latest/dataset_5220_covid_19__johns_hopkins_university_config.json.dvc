@@ -1,5 +1,5 @@
 meta:
-  date_accessed: 2022-12-08 12:03:25.294241
+  date_accessed: 2022-12-08 18:01:59.288756
   description: ''
   file_extension: json
   is_public: false
@@ -12,6 +12,6 @@ meta:
   version: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: b2ce8bbde5f394410ae3ae7910142ed3
+- md5: 8ac6743a18a5ada3ddfccec7bc417f2d
   size: 19802
   path: dataset_5220_covid_19__johns_hopkins_university_config.json
