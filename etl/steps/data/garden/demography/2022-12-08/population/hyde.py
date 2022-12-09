@@ -6,7 +6,7 @@ DATASET_HYDE = DATA_DIR / "garden" / "hyde" / "2017" / "baseline"
 SOURCE_NAME = "hyde"
 
 
-def load_gapminder():
+def load_hyde():
     tb = Dataset(DATASET_HYDE)["population"]
     tb["source"] = SOURCE_NAME
     tb = tb.reset_index()

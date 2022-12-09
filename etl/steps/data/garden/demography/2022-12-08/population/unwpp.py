@@ -1,16 +1,17 @@
 import pandas as pd
 from owid.catalog import Dataset
 from pandas.api.types import CategoricalDtype
-from utils import N, exclude_countries
 
 from etl.paths import DATA_DIR
+
+from .utils import N, exclude_countries
 
 DATASET_UNWPP = DATA_DIR / "garden" / "un" / "2022-07-11" / "un_wpp"
 EXCLUDE_COUNTRIES_UNWPP = N.directory / "excluded_countries.unwpp.json"
 SOURCE_NAME = "unwpp"
 
 
-def load_wpp() -> pd.DataFrame:
+def load_unwpp() -> pd.DataFrame:
     # load wpp data
     ds = Dataset(DATASET_UNWPP)
     df = ds["population"]
