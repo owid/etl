@@ -34,6 +34,8 @@ GARDEN_WPP_DATASET = DATA_DIR / "garden" / "un" / "2022-07-11" / "un_wpp"
 GARDEN_HMD_DATASET = DATA_DIR / "garden" / "hmd" / "2022-11-04" / "life_tables"
 GARDEN_ZIJDEMAN_DATASET = DATA_DIR / "garden" / "papers" / "2022-11-03" / "zijdeman_et_al_2015"
 GARDEN_RILEY_DATASET = DATA_DIR / "garden" / "papers" / "2022-11-04" / "riley_2005"
+# auxiliary datasets
+GARDEN_POPULATION_WPP = DATA_DIR / "garden" / "un" / "2022-07-11" / "un_wpp"
 # index column names: this is used when setting indices in dataframes
 COLUMNS_IDX = ["country", "year"]
 # age groups considered besides at 0 (at birth)
@@ -186,7 +188,8 @@ def make_metadata(all_ds: List[Dataset]) -> DatasetMeta:
         description += f"{ds.metadata.title}:\n\n{ds.metadata.description}\n\n------\n\n"
     description = (
         "This dataset has been created using multiple sources. We use UN WPP for data since 1950 (estimates and medium"
-        " variant). Prior to that, other sources are combined.\n\n" + description
+        " variant). Prior to that, other sources are combined.\n\n"
+        + description
     )
 
     # sources
@@ -327,6 +330,9 @@ def merge_dfs(df_wpp: pd.DataFrame, df_hmd: pd.DataFrame, df_zij: pd.DataFrame, 
     # Rename regions
     df["country"] = df["country"].replace(REGION_MAPPING)
 
+    # add americas for >1950 using UN WPP data
+    df = add_americas(df)
+
     # Dtypes, row sorting
     df = df.astype({"year": int})
     df = df.set_index(COLUMNS_IDX).sort_index()
@@ -339,6 +345,34 @@ def merge_dfs(df_wpp: pd.DataFrame, df_hmd: pd.DataFrame, df_zij: pd.DataFrame, 
     for col in df.columns:
         if col not in COLUMNS_IDX:
             df.loc[df[col] < 0, col] = pd.NA
+    return df
+
+
+def add_americas(frame: pd.DataFrame) -> pd.DataFrame:
+    """Estimate value for the Americas using North America and LATAM/Caribbean."""
+    # filter only member countries of the region
+    region_members = ["Northern America", "Latin America and the Caribbean"]
+    df = frame.loc[frame["country"].isin(region_members)].copy()
+    # add population
+    df = add_population_americas(df)
+    # estimate values for regions
+    # y(country) = weight(country) * metric(country)
+    df["life_expectancy_0"] *= df.population
+    df["life_expectancy_15"] *= df.population
+    df["life_expectancy_65"] *= df.population
+    df["life_expectancy_80"] *= df.population
+    # z(region) = sum{ y(country) } for country in region
+    df = df.groupby("year", as_index=False).sum(numeric_only=True)
+    # z(region) /  sum{ population(country) } for country in region
+    df["life_expectancy_0"] /= df.population
+    df["life_expectancy_15"] /= df.population
+    df["life_expectancy_65"] /= df.population
+    df["life_expectancy_80"] /= df.population
+
+    # assign region name
+    df = df.assign(country="Americas")
+    # concatenate
+    df = pd.concat([frame, df]).sort_values(["country", "year"], ignore_index=True).drop(columns="population")
     return df
 
 
@@ -394,4 +428,35 @@ def add_region_aggregates(frame: pd.DataFrame) -> pd.DataFrame:
 
     # concatenate
     df = pd.concat([frame, df]).sort_values(["country", "year"], ignore_index=True).drop(columns="population")
+    return df
+
+
+def add_population_americas(df: pd.DataFrame):
+    pop = load_america_population_from_unwpp()
+    df = df.merge(pop, on=["country", "year"])
+    return df
+
+
+def load_america_population_from_unwpp():
+    """Load population data from UN WPP for Northern America and Latin America and the Caribbean.
+
+    We use this dataset instead of the long-run because we want the entities as defined by the UN.
+    """
+    # load population from WPP
+    locations = ["Latin America and the Caribbean (UN)", "Northern America (UN)"]
+    ds = Dataset(GARDEN_POPULATION_WPP)
+    df = ds["population"].reset_index()
+    df = df.loc[
+        (df["location"].isin(locations))
+        & (df["metric"] == "population")
+        & (df["sex"] == "all")
+        & (df["age"] == "all")
+        & (df["variant"].isin(["estimates", "medium"])),
+        ["location", "year", "value"],
+    ]
+    assert len(set(df["location"])) == 2, f"Check that all of {locations} are in df"
+    df["location"] = df["location"].replace(REGION_MAPPING)
+
+    # rename columns
+    df = df.rename(columns={"location": "country", "value": "population"})
     return df
