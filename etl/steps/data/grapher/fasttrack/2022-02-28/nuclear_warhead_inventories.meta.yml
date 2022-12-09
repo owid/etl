@@ -2,7 +2,7 @@ dataset:
   namespace: fasttrack
   version: '2022-02-28'
   short_name: nuclear_warhead_inventories
-  title: Nuclear warhead inventories – Federation of American Scientists
+  title: DRAFT Nuclear warhead inventories – Federation of American Scientists
   description: 'This dataset provides information on the nuclear warhead inventories
     by the nuclear powers, using data from the Federation of American Scientists,
     prepared by Hans M. Kristensen, Matt Korda, and Robert Norris.
