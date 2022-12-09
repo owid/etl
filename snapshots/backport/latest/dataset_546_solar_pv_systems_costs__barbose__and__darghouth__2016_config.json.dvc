@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 18:11:36.144809
+  description: ''
+  file_extension: json
+  is_public: true
+  name: Grapher metadata for dataset_546_solar_pv_systems_costs__barbose__and__darghouth__2016
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_546_solar_pv_systems_costs__barbose__and__darghouth__2016_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/546
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 5e65e7a704e545a8adfa41593a2cbec4
+  size: 3107
+  path: dataset_546_solar_pv_systems_costs__barbose__and__darghouth__2016_config.json

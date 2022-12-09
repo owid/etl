@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-08 00:57:16.384623
+  description: ''
+  file_extension: json
+  is_public: true
+  name: Grapher metadata for dataset_1933_cancer_death_rates_in_the_us_over_the_long_term__american_cancer_society
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_1933_cancer_death_rates_in_the_us_over_the_long_term__american_cancer_society_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/1933
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 1498f26a343f08f90f812401fc5f42d5
+  size: 7236
+  path: dataset_1933_cancer_death_rates_in_the_us_over_the_long_term__american_cancer_society_config.json

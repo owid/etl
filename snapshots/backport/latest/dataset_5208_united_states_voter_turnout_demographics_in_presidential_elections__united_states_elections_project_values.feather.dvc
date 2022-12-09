@@ -1,0 +1,18 @@
+meta:
+  date_accessed: 2022-12-07 17:49:17.435601
+  description: ''
+  file_extension: feather
+  is_public: false
+  name: United States Voter Turnout Demographics in Presidential Elections - United
+    States Elections Project
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_5208_united_states_voter_turnout_demographics_in_presidential_elections__united_states_elections_project_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/5208
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: dc4e5acec90c8d48e3281d5e53f4df4c
+  size: 6658
+  path: dataset_5208_united_states_voter_turnout_demographics_in_presidential_elections__united_states_elections_project_values.feather

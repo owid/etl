@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-08 00:18:48.501445
+  description: ''
+  file_extension: json
+  is_public: true
+  name: Grapher metadata for dataset_2956_extreme_precipitation_in_us__noaa
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_2956_extreme_precipitation_in_us__noaa_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/2956
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 324553bac8ceb38ab97bc7ea42343b2d
+  size: 4073
+  path: dataset_2956_extreme_precipitation_in_us__noaa_config.json

@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 17:48:19.861185
+  description: ''
+  file_extension: json
+  is_public: true
+  name: Grapher metadata for dataset_679_long_term_wheat_yields__fao__2017__and__bayliss_smith__1984
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_679_long_term_wheat_yields__fao__2017__and__bayliss_smith__1984_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/679
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: c9c20141dfbca3c8933f71121b1837cb
+  size: 2022
+  path: dataset_679_long_term_wheat_yields__fao__2017__and__bayliss_smith__1984_config.json

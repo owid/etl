@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 18:56:16.966181
+  description: core-econ.org
+  file_extension: json
+  is_public: false
+  name: Grapher metadata for dataset_3164_figure_17_19_2
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_3164_figure_17_19_2_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/3164
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 52090aed1673ed0f4b939ddb722c13de
+  size: 1638
+  path: dataset_3164_figure_17_19_2_config.json

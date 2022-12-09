@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 18:34:47.709707
+  description: ''
+  file_extension: feather
+  is_public: false
+  name: Time use in Finland - Statistics Finland
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_2911_time_use_in_finland__statistics_finland_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/2911
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: a66d1bde008ed66134239002fb10999b
+  size: 6506
+  path: dataset_2911_time_use_in_finland__statistics_finland_values.feather

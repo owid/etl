@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-08 00:37:57.116905
+  description: ''
+  file_extension: feather
+  is_public: true
+  name: Homosexuality opinions – WVS (1981-2016)
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_4909_homosexuality_opinions__wvs__1981_2016_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/4909
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: d732b8347caf74708fb26178ffd90f88
+  size: 13666
+  path: dataset_4909_homosexuality_opinions__wvs__1981_2016_values.feather

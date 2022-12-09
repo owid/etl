@@ -14,6 +14,7 @@ backport = 'backport.backport:backport_cli'
 bulk_backport = 'backport.bulk_backport:bulk_backport'
 fastback = 'backport.fastback:fastback'
 walkthrough = 'walkthrough.cli:cli'
+fasttrack = 'fasttrack.cli:cli'
 run_python_step = 'etl.run_python_step:main'
 compare = 'etl.compare:cli'
 generate_graph = 'etl.to_graphviz:to_graphviz'
@@ -57,7 +58,7 @@ simplejson = "^3.17.6"
 bugsnag = "^4.2.1"
 xlrd = "^2.0.1"
 PyPDF2 = "^2.11.1"
-dvc = {extras = ["s3"], version = "^2.33.0"}
+dvc = {extras = ["s3"], version = "^2.36.0"}
 "ruamel.yaml" = "^0.17.21"
 # pinned pathspec is necessary for DVC until this issue gets resolved https://github.com/iterative/dvc/issues/8217
 pathspec = "0.9.0"

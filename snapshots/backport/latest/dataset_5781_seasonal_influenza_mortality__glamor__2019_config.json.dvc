@@ -1,0 +1,18 @@
+meta:
+  date_accessed: 2022-12-07 18:19:05.357112
+  description: This dataset has higher estimates for seasonal influenza mortality
+    for Eastern European countries than the CDC dataset.
+  file_extension: json
+  is_public: false
+  name: Grapher metadata for dataset_5781_seasonal_influenza_mortality__glamor__2019
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_5781_seasonal_influenza_mortality__glamor__2019_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/5781
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 69abfcd38951e990dd582503659d7e80
+  size: 6366
+  path: dataset_5781_seasonal_influenza_mortality__glamor__2019_config.json

@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-08 01:26:22.882566
+  description: ''
+  file_extension: feather
+  is_public: true
+  name: International Historical Statistics (Deaths per 1,000) - Brian Mitchell (2013)
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_270_international_historical_statistics__deaths_per_1_000__brian_mitchell__2013_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/270
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 522e324b1b4b2d9264ff7cb2f94ca6a3
+  size: 63226
+  path: dataset_270_international_historical_statistics__deaths_per_1_000__brian_mitchell__2013_values.feather

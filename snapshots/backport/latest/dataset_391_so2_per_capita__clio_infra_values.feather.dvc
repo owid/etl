@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-08 00:00:32.184910
+  description: SO2 emissions per capita (tonnes per year).
+  file_extension: feather
+  is_public: true
+  name: SO2 per capita - Clio Infra
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_391_so2_per_capita__clio_infra_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/391
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: f8088bb85b3e485f5ae07d435036dc02
+  size: 26682
+  path: dataset_391_so2_per_capita__clio_infra_values.feather

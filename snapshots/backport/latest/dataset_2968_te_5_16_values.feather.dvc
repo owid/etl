@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 18:04:09.094612
+  description: core-econ.org
+  file_extension: feather
+  is_public: false
+  name: TE-5.16
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_2968_te_5_16_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/2968
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 6577103b4462cde44da28c814d8d6fee
+  size: 7642
+  path: dataset_2968_te_5_16_values.feather

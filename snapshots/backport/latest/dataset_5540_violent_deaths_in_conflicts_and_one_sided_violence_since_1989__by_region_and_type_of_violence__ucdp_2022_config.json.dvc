@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 18:06:25.364488
+  description: ''
+  file_extension: json
+  is_public: true
+  name: Grapher metadata for dataset_5540_violent_deaths_in_conflicts_and_one_sided_violence_since_1989__by_region_and_type_of_violence__ucdp_2022
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_5540_violent_deaths_in_conflicts_and_one_sided_violence_since_1989__by_region_and_type_of_violence__ucdp_2022_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/5540
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 1bfec1ef15075038fd5f84ae960bceeb
+  size: 5079
+  path: dataset_5540_violent_deaths_in_conflicts_and_one_sided_violence_since_1989__by_region_and_type_of_violence__ucdp_2022_config.json

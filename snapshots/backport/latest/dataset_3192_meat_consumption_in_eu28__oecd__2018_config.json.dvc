@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-08 00:19:09.674012
+  description: ''
+  file_extension: json
+  is_public: true
+  name: Grapher metadata for dataset_3192_meat_consumption_in_eu28__oecd__2018
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_3192_meat_consumption_in_eu28__oecd__2018_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/3192
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 9859dd1827085af1f0924dec37c96126
+  size: 4614
+  path: dataset_3192_meat_consumption_in_eu28__oecd__2018_config.json

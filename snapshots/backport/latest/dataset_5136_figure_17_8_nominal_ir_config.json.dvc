@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-08 00:58:21.704730
+  description: core-econ.org
+  file_extension: json
+  is_public: false
+  name: Grapher metadata for dataset_5136_figure_17_8_nominal_ir
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_5136_figure_17_8_nominal_ir_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/5136
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: c64cf3259ce69c903661256d716bc776
+  size: 3509
+  path: dataset_5136_figure_17_8_nominal_ir_config.json

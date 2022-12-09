@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 18:03:17.163017
+  description: ''
+  file_extension: json
+  is_public: true
+  name: Grapher metadata for dataset_924_fertilizer_use_per_hectare_of_land__fao__and__federico
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_924_fertilizer_use_per_hectare_of_land__fao__and__federico_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/924
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: df89e47fe83283676a7072322de5dab2
+  size: 2370
+  path: dataset_924_fertilizer_use_per_hectare_of_land__fao__and__federico_config.json

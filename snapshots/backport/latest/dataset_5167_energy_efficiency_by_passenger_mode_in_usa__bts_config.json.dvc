@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 18:15:07.511463
+  description: ''
+  file_extension: json
+  is_public: true
+  name: Grapher metadata for dataset_5167_energy_efficiency_by_passenger_mode_in_usa__bts
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_5167_energy_efficiency_by_passenger_mode_in_usa__bts_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/5167
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: e99a3bdf5872219e854d17d63da00c67
+  size: 2644
+  path: dataset_5167_energy_efficiency_by_passenger_mode_in_usa__bts_config.json

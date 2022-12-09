@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-08 01:07:32.296254
+  description: core-econ.org
+  file_extension: json
+  is_public: false
+  name: Grapher metadata for dataset_4105_te_21_4_productivity
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_4105_te_21_4_productivity_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/4105
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 8bcdf67b665185698311cca5c3d53608
+  size: 1491
+  path: dataset_4105_te_21_4_productivity_config.json

@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-08 00:40:39.537947
+  description: ''
+  file_extension: json
+  is_public: true
+  name: Grapher metadata for dataset_244_government_education_expenditure_1960_2010__szirmai__2015
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_244_government_education_expenditure_1960_2010__szirmai__2015_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/244
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: ac9b859017187f87971be94902750f3c
+  size: 1547
+  path: dataset_244_government_education_expenditure_1960_2010__szirmai__2015_config.json

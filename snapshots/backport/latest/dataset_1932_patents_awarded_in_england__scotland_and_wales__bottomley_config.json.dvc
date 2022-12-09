@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-08 01:17:32.090565
+  description: ''
+  file_extension: json
+  is_public: true
+  name: Grapher metadata for dataset_1932_patents_awarded_in_england__scotland_and_wales__bottomley
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_1932_patents_awarded_in_england__scotland_and_wales__bottomley_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/1932
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 283d822e11162a4da4979725010a8d3f
+  size: 1666
+  path: dataset_1932_patents_awarded_in_england__scotland_and_wales__bottomley_config.json

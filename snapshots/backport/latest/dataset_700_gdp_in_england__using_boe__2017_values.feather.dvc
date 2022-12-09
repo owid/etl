@@ -1,0 +1,18 @@
+meta:
+  date_accessed: 2022-12-08 01:00:24.983595
+  description: 'This data uses A1. Headline Series sheet of BoE dataset to get Real
+    GDP and Population figures for England. '
+  file_extension: feather
+  is_public: true
+  name: GDP in England (using BoE, 2017)
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_700_gdp_in_england__using_boe__2017_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/700
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: f3d98905d41fa680022bd8b5d6650303
+  size: 25762
+  path: dataset_700_gdp_in_england__using_boe__2017_values.feather

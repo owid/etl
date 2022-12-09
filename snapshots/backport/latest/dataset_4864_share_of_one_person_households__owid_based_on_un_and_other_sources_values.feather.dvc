@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-08 01:14:18.785020
+  description: ''
+  file_extension: feather
+  is_public: false
+  name: Share of one person households - OWID based on UN and other sources
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_4864_share_of_one_person_households__owid_based_on_un_and_other_sources_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/4864
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 644bb559c855a330aaca1f07024ec647
+  size: 18650
+  path: dataset_4864_share_of_one_person_households__owid_based_on_un_and_other_sources_values.feather

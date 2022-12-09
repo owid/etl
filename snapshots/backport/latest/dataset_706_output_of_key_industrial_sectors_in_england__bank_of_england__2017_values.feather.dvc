@@ -1,0 +1,18 @@
+meta:
+  date_accessed: 2022-12-07 17:55:22.677391
+  description: This data consists the measures of output in key industrial sectors
+    in England (1270-1870).
+  file_extension: feather
+  is_public: true
+  name: Output of key industrial sectors in England - Bank of England (2017)
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_706_output_of_key_industrial_sectors_in_england__bank_of_england__2017_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/706
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 2b325d597e442a1ff502607679876e4b
+  size: 27354
+  path: dataset_706_output_of_key_industrial_sectors_in_england__bank_of_england__2017_values.feather

@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-08 00:15:11.879567
+  description: ''
+  file_extension: json
+  is_public: true
+  name: Grapher metadata for dataset_305_corruption_perception_index__transparency_international__2018
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_305_corruption_perception_index__transparency_international__2018_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/305
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 7a7a16d92bb578e4b566642ecfe90b47
+  size: 2397
+  path: dataset_305_corruption_perception_index__transparency_international__2018_config.json

@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-08 00:57:48.681362
+  description: ''
+  file_extension: feather
+  is_public: true
+  name: YouGov-Imperial COVID-19 Behavior Tracker
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_5202_yougov_imperial_covid_19_behavior_tracker_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/5202
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 2c002d263239ca638cca769449ce0c9a
+  size: 101314
+  path: dataset_5202_yougov_imperial_covid_19_behavior_tracker_values.feather

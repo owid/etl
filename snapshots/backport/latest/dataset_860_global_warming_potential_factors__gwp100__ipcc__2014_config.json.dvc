@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 18:07:09.722873
+  description: ''
+  file_extension: json
+  is_public: true
+  name: Grapher metadata for dataset_860_global_warming_potential_factors__gwp100__ipcc__2014
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_860_global_warming_potential_factors__gwp100__ipcc__2014_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/860
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 689a8c44d2b77647a2aca4e260d83b3b
+  size: 5016
+  path: dataset_860_global_warming_potential_factors__gwp100__ipcc__2014_config.json

@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-08 01:45:50.711234
+  description: ''
+  file_extension: json
+  is_public: true
+  name: Grapher metadata for dataset_655_child_labor_in_us__long__1958
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_655_child_labor_in_us__long__1958_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/655
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 2b72a28b53a18d18473bbb64f12cd464
+  size: 2123
+  path: dataset_655_child_labor_in_us__long__1958_config.json

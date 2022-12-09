@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-08 15:51:50.861898
+  description: ''
+  file_extension: feather
+  is_public: false
+  name: COVID-19 - United States vaccinations
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_5241_covid_19__united_states_vaccinations_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/5241
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: d4dcaf71263268cc4e30bb7b1acc1521
+  size: 1862466
+  path: dataset_5241_covid_19__united_states_vaccinations_values.feather

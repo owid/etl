@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 17:54:47.765316
+  description: ''
+  file_extension: json
+  is_public: true
+  name: Grapher metadata for dataset_2872_unemployment_rate__ages_25_54__by_education__ilostat__2017
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_2872_unemployment_rate__ages_25_54__by_education__ilostat__2017_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/2872
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 2f4040611c53831343e3e317ff71f24d
+  size: 4921
+  path: dataset_2872_unemployment_rate__ages_25_54__by_education__ilostat__2017_config.json

@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-08 01:41:27.893648
+  description: core-econ.org
+  file_extension: feather
+  is_public: false
+  name: Figure 15.20_Inflation
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_3241_figure_15_20_inflation_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/3241
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 18ca04270bce99e92ba7937c01a0eb0e
+  size: 6346
+  path: dataset_3241_figure_15_20_inflation_values.feather

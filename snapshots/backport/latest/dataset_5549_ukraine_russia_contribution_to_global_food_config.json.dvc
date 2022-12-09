@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-08 00:43:02.212681
+  description: ''
+  file_extension: json
+  is_public: true
+  name: Grapher metadata for dataset_5549_ukraine_russia_contribution_to_global_food
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_5549_ukraine_russia_contribution_to_global_food_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/5549
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: e59c94b215baa5a620e88b4db7677533
+  size: 4728
+  path: dataset_5549_ukraine_russia_contribution_to_global_food_config.json

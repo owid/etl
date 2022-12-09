@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-08 00:49:35.726960
+  description: https://github.com/owid/notebooks/tree/main/EdouardMathieu/oecd_trust_government
+  file_extension: feather
+  is_public: true
+  name: OECD - Trust in government
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_283_oecd__trust_in_government_values
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/283
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 0456530ddc01e9c6e522386441d3e090
+  size: 5858
+  path: dataset_283_oecd__trust_in_government_values.feather

@@ -1,0 +1,17 @@
+meta:
+  date_accessed: 2022-12-07 18:46:04.424961
+  description: This is a dataset imported by the automated fetcher
+  file_extension: json
+  is_public: true
+  name: Grapher metadata for dataset_805_agri_environmental_indicators__energy__fao__2017
+  namespace: backport
+  publication_date: latest
+  short_name: dataset_805_agri_environmental_indicators__energy__fao__2017_config
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/805
+  version: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: e1f58656a7011d2a3530a52dde39b27f
+  size: 6501
+  path: dataset_805_agri_environmental_indicators__energy__fao__2017_config.json
