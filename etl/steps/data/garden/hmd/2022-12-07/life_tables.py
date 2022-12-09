@@ -56,7 +56,7 @@ def run(dest_dir: str) -> None:
 def make_table(ds_meadow: Dataset, tables_old_names: List[str], table_new_name: str) -> Table:
     """Create a Garden table from multiple Meadow tables.
 
-    In Meadow, we have a table per agexyear and sex. In Garden, brin the sex dimension in the table as
+    In Meadow, we have a table per age-year and sex. In Garden, bring the sex dimension in the table as
     a column in the index. That is, tables "both_1x1", "female_1x1", "male_1x1" are combined into one table
     called "period_1x1".
     """
@@ -82,9 +82,8 @@ def combine_sex_tables(ds_meadow: Dataset, table_names: List[str]) -> pd.DataFra
     dfs = []
     for table_name in table_names:
         tb_meadow = ds_meadow[table_name]
-        # Country management
         df = pd.DataFrame(tb_meadow)
-        # Sex
+        # assign sex
         if table_name.startswith("both_"):
             df = df.assign(sex="all")
         elif table_name.startswith("female_"):
@@ -95,7 +94,7 @@ def combine_sex_tables(ds_meadow: Dataset, table_names: List[str]) -> pd.DataFra
             raise ValueError(f"Unknown sex for table {table_name}!")
         dfs.append(df)
     df = pd.concat(dfs, ignore_index=True)
-    return df  # type: ignore
+    return cast(pd.DataFrame, df)
 
 
 def clean_countries(df: pd.DataFrame) -> pd.DataFrame:

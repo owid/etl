@@ -13,7 +13,6 @@ import click
 
 from etl.snapshot import Snapshot
 
-CURRENT_DIR = Path(__file__).parent
 SNAPSHOT_VERSION = "2022-12-07"
 
 
@@ -37,5 +36,4 @@ def main(path_to_file: str, upload: bool) -> None:
 
 
 if __name__ == "__main__":
-    print(CURRENT_DIR)
     main()

@@ -36,6 +36,7 @@ from io import StringIO
 from pathlib import Path
 from typing import List, Tuple, cast
 
+import numpy as np
 import pandas as pd
 from owid import catalog
 from owid.catalog import Dataset, Table, TableMeta
@@ -108,17 +109,39 @@ COLUMNS_RENAME = {
 }
 # Column dtypes
 DTYPES = {
-    "central_death_rate": "Float64",
-    "probability_of_death": "Float64",
-    "avg_survival_length": "Float64",
-    "num_survivors": "Int64",
-    "num_deaths": "Int64",
-    "num_person_years_lived": "Int64",
-    "num_person_years_remaining": "Int64",
-    "life_expectancy": "Float64",
+    "central_death_rate": "float64",
+    "probability_of_death": "float64",
+    "avg_survival_length": "float64",
+    "num_survivors": "float64",
+    "num_deaths": "float64",
+    "num_person_years_lived": "float64",
+    "num_person_years_remaining": "float64",
+    "life_expectancy": "float64",
     "age": "category",
     "country": "category",
     "year": "category",
+}
+# missing data: this are the countries where data is missing for a specific table.
+# these checks are done in function _clean_correct_missing_data.
+MISSING_DATA_COUNTRIES = {
+    "bltper_1x1": ["Belgium"],
+    "bltper_1x5": ["Belgium"],
+    "bltper_1x10": [],
+    "bltper_5x1": ["Belgium"],
+    "bltper_5x5": ["Belgium"],
+    "bltper_5x10": [],
+    "fltper_1x1": ["Belgium"],
+    "fltper_1x5": ["Belgium"],
+    "fltper_1x10": [],
+    "fltper_5x1": ["Belgium"],
+    "fltper_5x5": ["Belgium"],
+    "fltper_5x10": [],
+    "mltper_1x1": ["Belgium"],
+    "mltper_1x5": ["Belgium"],
+    "mltper_1x10": [],
+    "mltper_5x1": ["Belgium"],
+    "mltper_5x5": ["Belgium"],
+    "mltper_5x10": [],
 }
 
 
@@ -230,15 +253,15 @@ def make_table(input_folder: str, folder: dict) -> catalog.Table:
     # List all files (each file corresponds to a country roughly)
     files = glob(os.path.join(input_folder, "*.txt"))
     log.info(f"hmd_lt: looking for available files in {input_folder}: {len(files)} found.")
-    # # Create df
+    # create df
     age, year = _age_year(input_folder)
     regex_header = folder["regex"].format(table=f"{age}x{year}")
     df = make_df(files, regex_header)
     # Clean df
-    df = clean_df(df)
+    df = clean_df(df, input_folder)
     # df to table
     table = df_to_table(df, age, year, folder["sex"])
-    # # underscore all table columns
+    # underscore all table columns
     table = underscore_table(table)
     return table
 
@@ -246,6 +269,7 @@ def make_table(input_folder: str, folder: dict) -> catalog.Table:
 def _age_year(input_folder: str) -> Tuple[str, str]:
     ageyear = input_folder.split("_")[-1]
     age, year = ageyear.split("x")
+    assert age.isdecimal() and year.isdecimal(), f"Age and year should be integers! Check {age} and {year} is not!"
     return age, year
 
 
@@ -297,12 +321,10 @@ def _make_df_country(country: str, table: str) -> pd.DataFrame:
     df = pd.read_csv(StringIO(table), sep="\t")
     # Assign country
     df = df.assign(Country=country)
-    # # Filter columns
-    # df = df[["Country", "Year", "ex"]].rename(columns={"ex": "life_expectancy"})
     return df
 
 
-def clean_df(df: pd.DataFrame) -> pd.DataFrame:
+def clean_df(df: pd.DataFrame, folder_path: str) -> pd.DataFrame:
     """Clean dataframe.
 
     Orders columns, renames columns, checks for missing values and sets dtypes.
@@ -311,6 +333,8 @@ def clean_df(df: pd.DataFrame) -> pd.DataFrame:
     ----------
     df : pd.DataFrame
         Initial dataframe.
+    folder_path: str
+        Path to the folder from which the dataframe was created.
 
     Returns
     -------
@@ -325,7 +349,7 @@ def clean_df(df: pd.DataFrame) -> pd.DataFrame:
     # Rename columns
     df = _clean_rename_columns_df(df)
     # Correct missing data
-    df = _clean_correct_missing_data(df)
+    df = _clean_correct_missing_data(df, folder_path)
     # Set dtypes
     df = _clean_set_dtypes_df(df)
     return df
@@ -333,36 +357,36 @@ def clean_df(df: pd.DataFrame) -> pd.DataFrame:
 
 def _clean_rename_columns_df(df: pd.DataFrame) -> pd.DataFrame:
     """Rename columns."""
-    return df.rename(columns=COLUMNS_RENAME)
+    return df.rename(columns=COLUMNS_RENAME, errors="raise")
 
 
-def _clean_correct_missing_data(df: pd.DataFrame) -> pd.DataFrame:
+def _clean_correct_missing_data(df: pd.DataFrame, folder_path: str) -> pd.DataFrame:
     """Checks on missing data."""
-    # Expected missing data
-    num_rows_missing_expected = 0.01
-    countries_missing_data_expected = 1
+    # Number of rows expected to be missing at most (percentage )
+    perc_rows_missing_expected = 0.01
     # Find missing data
     rows_missing = df[df.central_death_rate == "."]
-    num_rows_missing = len(rows_missing) / len(df)
-    countries_missing_data = rows_missing.country.unique()
+    perc_rows_missing = len(rows_missing) / len(df)
+    countries_missing_data = sorted(set(rows_missing.country))
     # Run checks
-    assert num_rows_missing < num_rows_missing_expected, (
-        f"More missing data than expected was found! {round(num_rows_missing*100, 2)} rows missing, but"
-        f" {round(num_rows_missing_expected*100,2)} were expected."
+    assert perc_rows_missing < perc_rows_missing_expected, (
+        f"More missing data than expected was found! {round(perc_rows_missing*100, 2)} rows missing, but"
+        f" {round(perc_rows_missing_expected*100,2)} were expected."
     )
-    assert len(countries_missing_data) <= countries_missing_data_expected, (
+    fname = folder_path.split("/")[-1]
+    assert countries_missing_data == MISSING_DATA_COUNTRIES[fname], (
         f"More missing data than expected was found! Found {len(countries_missing_data)} countries, expected is"
-        f" {countries_missing_data_expected}. Check {countries_missing_data}!"
+        f" {MISSING_DATA_COUNTRIES[fname]}. Check {countries_missing_data}!"
     )
     # Correct
-    df = df.replace(".", pd.NA)
+    df = df.replace(".", np.nan)
     return df
 
 
 def _clean_set_dtypes_df(df: pd.DataFrame) -> pd.DataFrame:
     """Set dtypes."""
     # Numeric
-    cols_numeric = [col_name for col_name, dtype in DTYPES.items() if dtype in ["Int64", "Float64"]]
+    cols_numeric = [col_name for col_name, dtype in DTYPES.items() if dtype in ["int64", "float64"]]
     for col in cols_numeric:
         df[col] = pd.to_numeric(df[col])
     return df.astype(DTYPES)
