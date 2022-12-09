@@ -1,5 +1,5 @@
 meta:
-  date_accessed: 2022-12-07 18:47:34.114933
+  date_accessed: 2022-12-09 12:00:26.101321
   description: ''
   file_extension: json
   is_public: false
@@ -12,6 +12,6 @@ meta:
   version: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 131674bc8708ab7d5b32de84f659d288
+- md5: b12c9c01ff2f1ebefb1e065ce074e590
   size: 2211
   path: dataset_5248_covid_19__swedish_public_health_agency_config.json
