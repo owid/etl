@@ -1,5 +1,5 @@
 meta:
-  date_accessed: 2022-12-09 09:02:39.215130
+  date_accessed: 2022-12-09 18:01:57.429852
   description: ''
   file_extension: feather
   is_public: false
@@ -12,6 +12,6 @@ meta:
   version: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: d54ca85c7dbc9f060912b65e9297767c
-  size: 19482818
+- md5: 4215ebe3ec7e83786fbd03fd7cb58e18
+  size: 19490842
   path: dataset_5220_covid_19__johns_hopkins_university_values.feather
