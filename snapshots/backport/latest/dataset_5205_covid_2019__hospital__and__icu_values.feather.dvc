@@ -1,5 +1,5 @@
 meta:
-  date_accessed: 2022-12-10 06:01:18.017690
+  date_accessed: 2022-12-10 18:01:22.131158
   description: ''
   file_extension: feather
   is_public: true
@@ -12,6 +12,6 @@ meta:
   version: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: d68091a714692b1fe607be6d0359489d
-  size: 821330
+- md5: d1dabc20d3781a3eab0616109409af68
+  size: 820658
   path: dataset_5205_covid_2019__hospital__and__icu_values.feather
