@@ -1,5 +1,5 @@
 meta:
-  date_accessed: 2022-12-09 11:20:51.599701
+  date_accessed: 2022-12-10 12:00:48.466939
   description: ''
   file_extension: json
   is_public: false
@@ -12,6 +12,6 @@ meta:
   version: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 836b7f309e0a882cc088678502131d04
-  size: 9641
+- md5: c6a360a1a50137d212ea03ec8b7c2589
+  size: 9642
   path: dataset_5234_covid_19__vaccinations_config.json
