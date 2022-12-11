@@ -1,5 +1,5 @@
 meta:
-  date_accessed: 2022-12-10 12:01:43.261818
+  date_accessed: 2022-12-11 12:01:28.428866
   description: ''
   file_extension: feather
   is_public: false
@@ -12,6 +12,6 @@ meta:
   version: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 6d9cc3cca3eff17b86f08fac5bf64f90
-  size: 5197610
+- md5: 026a36b76750568246ff0dd1d0cab715
+  size: 5196050
   path: dataset_5234_covid_19__vaccinations_values.feather
