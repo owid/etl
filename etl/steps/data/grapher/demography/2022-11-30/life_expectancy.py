@@ -72,7 +72,8 @@ def build_anomalies_text():
     anomalies_all = yaml.safe_load(tb.loc[0, "anomalies"])
     # build anomalies text
     anomalies_text = (
-        "<b>ANOMALIES</b>\nFind below a list of events by country and year that likely affected the life expectancy.\n"
+        "<b>DATA ANOMALIES</b>\nFind below a list of events by country and year that likely affected the life"
+        " expectancy, and thus creating data anomalies.\n"
     )
     for country, anomalies in anomalies_all.items():
         anomalies_text += f"\n<b>{country}</b>\n"
