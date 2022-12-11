@@ -1,7 +1,7 @@
 import shutil
 import tempfile
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
 
 import ruamel.yaml
 import yaml
@@ -54,28 +54,32 @@ WIDGET_TEMPLATE = """
 """
 
 
-def preview_file(path: Path, language: str) -> None:
-    with open(path) as f:
-        t = f.read()
-
+def put_widget(title: Any, contents: List[Any]) -> None:
+    """Widget that allows markdown in title."""
     po.put_widget(
         WIDGET_TEMPLATE,
         {
             "open": False,
-            "title": po.put_success(po.put_markdown(f"File `{path}` was successfully generated")),
-            "contents": [po.put_markdown(f"```{language}\n{t}```")],
+            "title": title,
+            "contents": contents,
         },
     )
 
 
+def preview_file(path: Path, language: str) -> None:
+    with open(path) as f:
+        t = f.read()
+
+    put_widget(
+        title=po.put_success(po.put_markdown(f"File `{path}` was successfully generated")),
+        contents=[po.put_markdown(f"```{language}\n{t}```")],
+    )
+
+
 def preview_dag(dag_content: str, dag_name: str = "dag.yml") -> None:
-    po.put_widget(
-        WIDGET_TEMPLATE,
-        {
-            "open": False,
-            "title": po.put_success(po.put_markdown(f"Steps in {dag_name} were successfully generated")),
-            "contents": [po.put_markdown(f"```yml\n{dag_content}\n```")],
-        },
+    put_widget(
+        title=po.put_success(po.put_markdown(f"Steps in {dag_name} were successfully generated")),
+        contents=[po.put_markdown(f"```yml\n{dag_content}\n```")],
     )
 
 
@@ -89,6 +93,16 @@ def add_to_dag(dag: DAG, dag_path: Path = DAG_WALKTHROUGH_PATH) -> str:
         ruamel.yaml.dump(doc, f, Dumper=ruamel.yaml.RoundTripDumper)
 
     return yaml.dump({"steps": dag})
+
+
+def remove_from_dag(step: str, dag_path: Path = DAG_WALKTHROUGH_PATH) -> None:
+    with open(dag_path, "r") as f:
+        doc = ruamel.yaml.load(f, Loader=ruamel.yaml.RoundTripLoader)
+
+    doc["steps"].pop(step, None)
+
+    with open(dag_path, "w") as f:
+        ruamel.yaml.dump(doc, f, Dumper=ruamel.yaml.RoundTripDumper)
 
 
 def generate_step(cookiecutter_path: Path, data: Dict[str, Any]) -> Path:

@@ -8,7 +8,7 @@ import resource
 import sys
 import time
 from pathlib import Path
-from typing import Any, Callable, List, Optional
+from typing import Any, Callable, List, Optional, Set
 
 import click
 from ipdb import launch_ipdb_on_exception
@@ -174,14 +174,14 @@ def construct_dag(dag_path: Path, backport: bool, private: bool, grapher: bool) 
     # Load our graph of steps and the things they depend on
     dag = load_dag(dag_path)
 
-    # Dynamically construct all backporting steps
-    backporting_dag = _backporting_steps(private)
+    # If backport is set, add all backport steps. Otherwise add only those used in DAG
+    if backport:
+        filter_steps = None
+    else:
+        # Get all backported datasets that are used in the DAG
+        filter_steps = {dep for deps in dag.values() for dep in deps if dep.startswith("backport://")}
 
-    # Add all steps for backporting datasets (there are currently >800 of them)
-    # If --backport flag is missing, remove all backported datasets that aren't used in DAG
-    if not backport:
-        all_deps = {dep for deps in dag.values() for dep in deps}
-        backporting_dag = {k: v for k, v in backporting_dag.items() if k in all_deps}
+    backporting_dag = _backporting_steps(private, filter_steps=filter_steps)
 
     dag.update(backporting_dag)
 
@@ -268,12 +268,18 @@ def _is_private_step(step_name: str) -> bool:
     return bool(re.findall(r".*?-private://", step_name))
 
 
-def _backporting_steps(private: bool) -> DAG:
+def _backporting_steps(private: bool, filter_steps: Optional[Set[str]] = None) -> DAG:
     """Return a DAG of steps for backporting datasets."""
     dag: DAG = {}
 
+    # get all backports, this takes a long time
+    if filter_steps is None:
+        match = "backport/.*"
+    else:
+        match = "|".join([step.split("/")[-1] for step in filter_steps])
+
     # load all backported snapshots
-    for snap in snapshot_catalog("backport/.*"):
+    for snap in snapshot_catalog(match):
 
         # skip private backported steps
         if not private and not snap.metadata.is_public:

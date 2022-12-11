@@ -1,0 +1,16 @@
+meta:
+  date_accessed: 2022-12-05
+  description: ''
+  file_extension: csv
+  is_public: false
+  name: AI Index
+  namespace: fasttrack
+  short_name: ai_index
+  source_name: Google Sheet
+  url: https://docs.google.com/spreadsheets/d/e/2PACX-1vTv9kIf1STQgJkLO4DL-kdePFOGnzRF6GHGbWMmDmLGO8nWsvgfg0s2cNUOJ8siis1MVSjtwF-kByKv/pub?output=csv
+  version: '2022-11-29'
+wdir: ../../../data/snapshots/fasttrack/2022-11-29
+outs:
+- md5: f9eec66a29f9c4d60a34d520e04acba0
+  size: 199651
+  path: ai_index.csv

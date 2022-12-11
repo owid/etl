@@ -1,0 +1,27 @@
+meta:
+  namespace: hmd
+  short_name: hmd
+  name: Human Mortality Database
+  source_name: Human Mortality Database
+  publication_year: 2022
+  publication_date: 2022-11-29
+  url: https://www.mortality.org/Data/ZippedDataFiles
+  source_data_url:
+  file_extension: zip
+  license_url: https://www.mortality.org/Data/UserAgreement
+  license_name: CC BY 4.0
+  date_accessed: 2022-12-07
+  is_public: true
+  description: |
+    The database has been organized into zipped data files to facilitate rapid downloads. Two series of files are intended for different purposes and different users. 
+
+    For users who want to obtain all available data for an individual country or all countries, the zipped data files labelled "By country" are recommended. The file organization follows internal practices and is not particularly user-friendly, but all publicly-available HMD data are included in this set. 
+
+    For users who only want the information of a given kind for all countries, the files "By statistic" are recommended. In this case, the file organization is simpler, but only certain parts of the database (i.e., items labelled "Complete Data Series" on country pages) are available in this format.
+
+    More details can be found at https://www.mortality.org/Data/ExplanatoryNotes.
+wdir: ../../../data/snapshots/hmd/2022-12-07
+outs:
+- md5: e0c5173fc74f41ee5aced311f2702aae
+  size: 167194885
+  path: hmd.zip

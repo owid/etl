@@ -1,5 +1,5 @@
 meta:
-  date_accessed: 2022-12-07 18:59:54.812008
+  date_accessed: 2022-12-09 12:34:03.150716
   description: core-econ.org
   file_extension: feather
   is_public: false
@@ -12,6 +12,6 @@ meta:
   version: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 56b2705dfdb9827e93416004668bf1cd
+- md5: 5c268e096e722d9a18e27f2bbf54b3f7
   size: 7506
   path: dataset_2904_figure1_10_values.feather

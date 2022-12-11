@@ -332,6 +332,7 @@ class Dataset(SQLModel, table=True):
             ds.metadataEditedByUserId = self.metadataEditedByUserId
             ds.dataEditedByUserId = self.dataEditedByUserId
             ds.createdByUserId = self.createdByUserId
+            ds.isPrivate = self.isPrivate
             ds.updatedAt = datetime.utcnow()
             ds.metadataEditedAt = datetime.utcnow()
             ds.dataEditedAt = datetime.utcnow()
@@ -361,6 +362,7 @@ class Dataset(SQLModel, table=True):
             dataEditedByUserId=user_id,
             createdByUserId=user_id,
             description=metadata.description or "",
+            isPrivate=not metadata.is_public,
         )
 
     @classmethod
