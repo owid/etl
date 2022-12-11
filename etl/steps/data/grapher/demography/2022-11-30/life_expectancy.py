@@ -75,8 +75,8 @@ def build_anomalies_text():
         "<b>ANOMALIES</b>\nFind below a list of events by country and year that likely affected the life expectancy.\n"
     )
     for country, anomalies in anomalies_all.items():
-        anomalies_text += f"\n<b>{country}</b>"
+        anomalies_text += f"\n<b>{country}</b>\n"
         anomalies_list = [f"- <a href='{anomaly['link']}'>{anomaly['name']}</a>" for anomaly in anomalies]
-        anomalies_list = f"<ul>{''.join(anomalies_list)}</ul>"
+        anomalies_list = "\n".join(anomalies_list) + "\n"
         anomalies_text += anomalies_list
     return anomalies_text
