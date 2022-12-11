@@ -1,5 +1,5 @@
 meta:
-  date_accessed: 2022-12-10 00:00:37.512920
+  date_accessed: 2022-12-11 00:00:26.818438
   description: ''
   file_extension: json
   is_public: false
@@ -12,6 +12,6 @@ meta:
   version: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 43cdc2cc76653ef36981c0ba7a994453
-  size: 4155
+- md5: dbda01e36c28d45c6aaec32206ab5ce1
+  size: 4156
   path: dataset_5433_covid_19__sequencing_config.json
