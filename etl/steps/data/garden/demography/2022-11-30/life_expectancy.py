@@ -14,6 +14,7 @@ To do this, we use different sources, depending on the year and metric:
 from typing import List
 
 import pandas as pd
+import yaml
 from owid.catalog import Dataset, DatasetMeta, Table, TableMeta
 from owid.catalog.utils import underscore_table
 from owid.datautils import geo
@@ -67,6 +68,8 @@ REGION_MAPPING = {
     "Europe (UN)": "Europe",
     "Oceania (UN)": "Oceania",
 }
+# Path to anomalies file
+PATH_ANOMALIES = N.directory / "life_expectancy.anomalies.yml"
 
 
 def run(dest_dir: str) -> None:
@@ -107,6 +110,10 @@ def run(dest_dir: str) -> None:
     ds_garden.add(tb_historical)
     ds_garden.save()
     ds_garden.add(tb_projection)
+    ds_garden.save()
+
+    # add anomalies table
+    ds_garden.add(make_anomaly_table())
     ds_garden.save()
 
     log.info("life_expectancy.end")
@@ -459,3 +466,19 @@ def load_america_population_from_unwpp():
     # rename columns
     df = df.rename(columns={"location": "country", "value": "population"})
     return df
+
+
+def make_anomaly_table() -> Table:
+    log.info("life_expectancy: making anomaly table")
+    # Load anomaly yaml file
+    with open(PATH_ANOMALIES) as f:
+        anomalies = yaml.safe_load(f)
+    # store all yaml's content as a string in a cell in the table
+    df = pd.DataFrame({"anomalies": [str(anomalies)]})
+    tb = Table(df)
+    # add metadata
+    tb.metadata = TableMeta(
+        short_name="_anomalies",
+        description="this table contains the anomalies for the life expectancy data in YAML format.",
+    )
+    return tb
