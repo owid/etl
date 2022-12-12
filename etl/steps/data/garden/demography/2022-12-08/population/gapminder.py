@@ -40,11 +40,11 @@ FORMER_COUNTRIES = {
         "end": 1991,
     },
     "yem_north": {
-        "name": "North Yemen (former)",
+        "name": "Yemen Arab Republic",
         "end": 1990,
     },
     "yem_south": {
-        "name": "South Yemen (former)",
+        "name": "Yemen People's Republic",
         "end": 1990,
     },
     "yug": {
@@ -68,7 +68,7 @@ def load_gapminder_sys_glob():
     tb = tb.reset_index()
 
     # add source
-    tb["source"] = SOURCE_NAME
+    tb["source"] = f"{SOURCE_NAME}_sys_glob"
 
     # filter countries
     msk = tb["geo"].isin(FORMER_COUNTRIES)
