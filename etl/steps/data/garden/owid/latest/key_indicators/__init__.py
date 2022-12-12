@@ -2,9 +2,8 @@
 #  __init__.py
 #  owid/latest/key_indicators
 #
-from structlog import get_logger
-
 from owid.catalog import Dataset, DatasetMeta, Source, Table
+from structlog import get_logger
 
 from etl.steps.data.garden.owid.latest.key_indicators import (
     table_land_area,
