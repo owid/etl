@@ -2,7 +2,6 @@ from typing import Dict, List, cast
 
 import pandas as pd
 from owid.catalog import Dataset, Table
-from owid.catalog.utils import underscore_table
 from owid.datautils import dataframes, geo, io
 from shared import CURRENT_DIR
 
@@ -294,9 +293,14 @@ def run(dest_dir: str) -> None:
     )
 
     # Prepare output tables.
-    tb = underscore_table(Table(df)).set_index(INDEX_COLUMNS, verify_integrity=True).sort_index().sort_index(axis=1)
+    tb = (
+        Table(df, short_name=GARDEN_MAIN_TABLE_NAME, underscore=True)
+        .set_index(INDEX_COLUMNS, verify_integrity=True)
+        .sort_index()
+        .sort_index(axis=1)
+    )
     tb_any_sector = (
-        underscore_table(Table(df_any_sector))
+        Table(df_any_sector, short_name=GARDEN_ANY_SECTOR_TABLE_NAME, underscore=True)
         .set_index(INDEX_COLUMNS_ANY_SECTOR, verify_integrity=True)
         .sort_index()
         .sort_index(axis=1)
@@ -306,23 +310,11 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset.
-    ds_garden = Dataset.create_empty(dest_dir)
+    ds_garden = Dataset.create_empty(dest_dir, metadata=ds_meadow.metadata)
 
-    # Fetch metadata from meadow step (if any).
-    ds_garden.metadata = ds_meadow.metadata
-
-    # Update dataset metadata using metadata yaml file.
-    ds_garden.metadata.update_from_yaml(N.metadata_path, if_source_exists="replace")
-
-    # Update main table metadata using metadata yaml file.
-    tb.update_metadata_from_yaml(N.metadata_path, GARDEN_MAIN_TABLE_NAME)
-
-    # Update simplified table metadata using metadata yaml file.
-    tb_any_sector.update_metadata_from_yaml(N.metadata_path, GARDEN_ANY_SECTOR_TABLE_NAME)
-
-    # Add tables to dataset.
     ds_garden.add(tb)
     ds_garden.add(tb_any_sector)
+    ds_garden.update_metadata(N.metadata_path)
 
     # Save dataset.
     ds_garden.save()

@@ -678,21 +678,18 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create new Garden dataset.
-    ds_garden = catalog.Dataset.create_empty(dest_dir)
-    ds_garden.metadata = ds_meadow.metadata
+    ds_garden = catalog.Dataset.create_empty(dest_dir, metadata=ds_meadow.metadata)
 
     # Ensure all column names are snake, lower case.
-    tb_garden = catalog.utils.underscore_table(catalog.Table(df))
-    decade_tb_garden = catalog.utils.underscore_table(catalog.Table(decade_df))
+    tb_garden = catalog.Table(df, short_name="natural_disasters_yearly", underscore=True)
+    decade_tb_garden = catalog.Table(df, short_name="natural_disasters_decadal", underscore=True)
 
-    # Get dataset metadata from yaml file.
-    ds_garden.metadata.update_from_yaml(N.metadata_path, if_source_exists="replace")
-
-    # Get tables metadata from yaml file.
-    tb_garden.update_metadata_from_yaml(N.metadata_path, "natural_disasters_yearly")
-    decade_tb_garden.update_metadata_from_yaml(N.metadata_path, "natural_disasters_decadal")
-
-    # Add tables to dataset and save dataset.
+    # Add tables to dataset
     ds_garden.add(tb_garden)
     ds_garden.add(decade_tb_garden)
+
+    # Add metadata from yaml file.
+    ds_garden.update_metadata(N.metadata_path)
+
+    # Save dataset
     ds_garden.save()

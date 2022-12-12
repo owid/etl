@@ -8,8 +8,6 @@ from owid.catalog import Dataset, Table, TableMeta
 from owid.catalog.utils import underscore_table
 from owid.walden import Catalog as WaldenCatalog
 
-from etl.steps.data.converters import convert_walden_metadata
-
 NAMESPACE = "aviation_safety_network"
 # Details for input datasets.
 WALDEN_DATASET_NAME = "aviation_statistics"
@@ -42,18 +40,15 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new dataset and reuse Walden metadata.
-    ds = Dataset.create_empty(dest_dir)
-    ds.metadata = convert_walden_metadata(walden_ds)
+    ds = Dataset.create_empty(dest_dir, metadata=convert_walden_metadata(walden_ds))
     ds.metadata.version = MEADOW_VERSION
 
     # Create a table with metadata.
     table_metadata = TableMeta(
         short_name=MEADOW_DATASET_NAME, title=MEADOW_DATASET_TITLE, description=walden_ds.description
     )
-    tb = Table(df, metadata=table_metadata)
-
     # Ensure all columns are snake-case and underscore.
-    tb = underscore_table(tb)
+    tb = Table(df, metadata=table_metadata, underscore=True)
 
     # Add table to new Meadow dataset.
     ds.add(tb)

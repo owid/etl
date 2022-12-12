@@ -4,7 +4,6 @@ Safety Network.
 """
 import pandas as pd
 from owid.catalog import Dataset, Table, TableMeta
-from owid.catalog.utils import underscore_table
 from owid.walden import Catalog as WaldenCatalog
 
 from etl.steps.data.converters import convert_walden_metadata
@@ -52,24 +51,20 @@ def run(dest_dir: str) -> None:
     #
     # Save outputs.
     #
-    # Create a new dataset and reuse Walden metadata (from one of the two datasets).
-    ds = Dataset.create_empty(dest_dir)
-    ds.metadata = convert_walden_metadata(walden_ds_by_period)
+    ds = Dataset.create_empty(dest_dir, metadata=convert_walden_metadata(walden_ds_by_period))
     ds.metadata.version = MEADOW_VERSION
 
-    # Create a table with metadata with the combined dataframe.
     table_metadata = TableMeta(
         short_name=MEADOW_DATASET_NAME,
         title=MEADOW_DATASET_TITLE,
         description=walden_ds_by_period.description,
     )
-    tb = Table(df_combined, metadata=table_metadata)
-
-    # Ensure all columns are snake-case and underscore.
-    tb = underscore_table(tb)
-
-    # Add table to new Meadow dataset.
-    ds.add(tb)
+    tab = Table(
+        df_combined,
+        metadata=table_metadata,
+        underscore=True,
+    )
+    ds.add(tab)
 
     # Save the new Meadow dataset.
     ds.save()

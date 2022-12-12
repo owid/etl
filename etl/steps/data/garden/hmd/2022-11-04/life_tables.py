@@ -3,7 +3,6 @@ from typing import List, cast
 
 import pandas as pd
 from owid.catalog import Dataset, Table
-from owid.catalog.utils import underscore_table
 from owid.datautils import geo
 from structlog import get_logger
 
@@ -27,10 +26,7 @@ def run(dest_dir: str) -> None:
     ds_meadow = Dataset(MEADOW_DATASET)
 
     # init dataset
-    ds_garden = Dataset.create_empty(dest_dir)
-    ds_garden.metadata = ds_meadow.metadata
-    print(N.metadata_path)
-    ds_garden.metadata.update_from_yaml(N.metadata_path)
+    ds_garden = Dataset.create_empty(dest_dir, metadata=ds_meadow.metadata)
 
     # build tables
     tables_names = ds_meadow.table_names
@@ -38,30 +34,20 @@ def run(dest_dir: str) -> None:
         log.info(f"life_tables:{table_name}.start")
         tb_garden = make_table(ds_meadow, table_name)
         ds_garden.add(tb_garden)
-        ds_garden.save()
         log.info(f"life_tables:{table_name}.end")
+
+    ds_garden.update_metadata(N.metadata_path)
+    ds_garden.save()
 
     log.info("life_tables.end")
 
 
 def make_table(ds_meadow: Dataset, table_name: str) -> Table:
     log.info(f"Building table {table_name}...")
-    tb_meadow = ds_meadow[table_name]
 
     # Country management
-    df = pd.DataFrame(tb_meadow)
-    df = clean_countries(df)
-
-    # Build table
-    tb_garden = underscore_table(Table(df))
-    tb_garden.metadata = tb_meadow.metadata
-
-    # Edit variables
-    for col in tb_garden.columns:
-        tb_garden[col].metadata = tb_meadow[col].metadata
-
-    # Edit table
-    tb_garden.update_metadata_from_yaml(N.metadata_path, table_name)
+    tb_garden = ds_meadow[table_name].reset_index()
+    tb_garden = clean_countries(tb_garden)
     tb_garden = tb_garden.set_index(["country", "year", "age"], verify_integrity=True)
 
     return tb_garden

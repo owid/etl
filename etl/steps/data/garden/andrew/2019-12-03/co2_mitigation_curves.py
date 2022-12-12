@@ -50,14 +50,9 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new dataset.
-    ds_garden = Dataset.create_empty(dest_dir)
-    # Use data from meadow, but update it using the metadata yaml file.
-    ds_garden.metadata = ds_meadow.metadata
-    ds_garden.metadata.update_from_yaml(N.metadata_path, if_source_exists="replace")
-    # Add metadata to tables.
-    tb_1p5celsius.update_metadata_from_yaml(N.metadata_path, "co2_mitigation_curves_1p5celsius")
-    tb_2celsius.update_metadata_from_yaml(N.metadata_path, "co2_mitigation_curves_2celsius")
-    # Add tables to dataset and save dataset.
+    ds_garden = Dataset.create_empty(dest_dir, metadata=ds_meadow.metadata)
     ds_garden.add(tb_1p5celsius)
     ds_garden.add(tb_2celsius)
+    ds_garden.update_metadata(N.metadata_path)
+
     ds_garden.save()

@@ -207,27 +207,18 @@ def run(dest_dir: str) -> None:
 
     snap = Snapshot("ggdc/2020-10-01/ggdc_maddison.xlsx")
 
-    # Assign the same metadata of the walden dataset to this dataset.
-    ds.metadata = convert_snapshot_metadata(snap.metadata)
-
     # Load and process data.
     df = generate_ggdc_data(data_file=str(snap.path))
 
     # Set meaningful indexes.
     df = df.set_index(["country", "year"])
 
-    # Create a new table with the processed data.
-    t = Table(df)
+    # Create a new dataset.
+    ds = Dataset.create_empty(dest_dir, metadata=convert_snapshot_metadata(snap.metadata))
+    ds.add(Table(df, short_name="maddison_gdp"))
+    ds.update_metadata(N.metadata_path)
 
-    # Update metadata
-    ds.metadata.update_from_yaml(N.metadata_path)
-    t.update_metadata_from_yaml(N.metadata_path, "maddison_gdp")
-    ds.metadata.description = ADDITIONAL_DESCRIPTION + ds.metadata.description
-
-    assert len(ds.metadata.sources) == 1
-
-    # Add table to current dataset.
-    ds.add(t)
+    ds.metadata.description = ADDITIONAL_DESCRIPTION + ds.metadata.description  # type: ignore
 
     # Save dataset to garden.
     ds.save()
