@@ -3,6 +3,7 @@ import re
 import shutil
 from dataclasses import dataclass
 from pathlib import Path
+from threading import Lock
 from typing import Any, Dict, List, Literal, Optional, Union
 
 import pandas as pd
@@ -16,6 +17,9 @@ from owid.walden import files
 from etl import paths
 
 dvc = Repo(paths.BASE_DIR)
+
+# DVC is not thread-safe, so we need to lock it
+dvc_lock = Lock()
 
 
 @dataclass
@@ -64,9 +68,10 @@ class Snapshot:
 
     def dvc_add(self, upload: bool) -> None:
         """Add file to DVC and upload to S3."""
-        dvc.add(str(self.path), fname=str(self.metadata_path))
-        if upload:
-            dvc.push(str(self.path), remote=self._dvc_remote)
+        with dvc_lock:
+            dvc.add(str(self.path), fname=str(self.metadata_path))
+            if upload:
+                dvc.push(str(self.path), remote=self._dvc_remote)
 
     @property
     def _dvc_remote(self):
@@ -193,12 +198,13 @@ def add_snapshot(
 
 
 def snapshot_catalog(match: str = r".*") -> List[Snapshot]:
-    """Return a catalog of all snapshots.
+    """Return a catalog of all snapshots. It can take more than 10s to load the entire catalog,
+    so it's recommended to use `match` to filter the snapshots.
     :param match: pattern to match uri
     """
     catalog = []
     for path in paths.SNAPSHOTS_DIR.glob("**/*.dvc"):
         uri = str(path.relative_to(paths.SNAPSHOTS_DIR)).replace(".dvc", "")
-        if re.match(match, uri):
+        if re.search(match, uri):
             catalog.append(Snapshot(uri))
     return catalog

@@ -186,9 +186,12 @@ steps:
   # HMD
   data://meadow/hmd/2022-11-04/life_tables:
     - walden://hmd/2022-11-04/life_tables
-
   data://garden/hmd/2022-11-04/life_tables:
     - data://meadow/hmd/2022-11-04/life_tables
+  data://meadow/hmd/2022-12-07/life_tables:
+    - snapshot://hmd/2022-12-07/hmd.zip
+  data://garden/hmd/2022-12-07/life_tables:
+    - data://meadow/hmd/2022-12-07/life_tables
 
   # UNDP
   data://meadow/un/2022-11-29/undp_hdr:
@@ -234,12 +237,14 @@ steps:
     - data://garden/bp/2022-07-14/energy_mix
     - data://garden/worldbank_wdi/2022-05-26/wdi
 
+
 # Sub-dags to import
 include:
   - dag_files/dag_open_numbers.yml
   - dag_files/dag_faostat.yml
   - dag_files/dag_energy.yml
   - dag_files/dag_walkthrough.yml
+  - dag_files/dag_fasttrack.yml
   - dag_files/dag_examples.yml
   - dag_files/dag_emissions.yml
   - dag_files/dag_papers.yml
