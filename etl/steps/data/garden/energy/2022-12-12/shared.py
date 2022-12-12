@@ -148,6 +148,7 @@ ACCEPTED_OVERLAPS = {
     # 1991: {"Georgia", "USSR"},
 }
 
+
 def gather_sources_from_tables(
     tables: List[catalog.Table],
 ) -> List[catalog.meta.Source]:
