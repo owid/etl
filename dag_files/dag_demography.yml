@@ -12,4 +12,4 @@ steps:
     - data://garden/hyde/2017/baseline
     - data://garden/gapminder/2019-12-10/population
     - data://garden/un/2022-07-11/un_wpp
-    - data://open_numbers/latest/ddf--gapminder--systema_globalis
+    - data://open_numbers/open_numbers/latest/ddf--gapminder--systema_globalis
