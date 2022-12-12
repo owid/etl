@@ -1,6 +1,9 @@
 Afghanistan:
   - name: Soviet-Afghan War (1979 - 1989)
     link: https://en.wikipedia.org/wiki/Soviet%E2%80%93Afghan_War
+American Samoa:
+  - name: Samoa earthquake and tsunami (2009)
+    link: https://en.wikipedia.org/wiki/2009_Samoa_earthquake_and_tsunami
 Armenia:
   - name: First Nagorno-Karabakh War (1988 - 1994)
     link: https://en.wikipedia.org/wiki/First_Nagorno-Karabakh_War
@@ -195,8 +198,8 @@ Rwanda:
   - name: Rwandan genocide (1994)
     link: https://en.wikipedia.org/wiki/Rwandan_genocide
 Samoa:
-  - name: Samoa switches to driving on the left (2009)
-    link: https://web.archive.org/web/20201108170757/http://www.theguardian.com/world/2009/sep/08/samoa-drivers-switch-left
+  - name: Samoa earthquake and tsunami (2009)
+    link: https://en.wikipedia.org/wiki/2009_Samoa_earthquake_and_tsunami
 Sierra Leone:
   - name: Sierra Leone Civil War (1991 - 2002)
     link: https://en.wikipedia.org/wiki/Sierra_Leone_Civil_War
@@ -205,6 +208,9 @@ Somalia:
     link: https://en.wikipedia.org/wiki/Isaaq_genocide
   - name: Somali Civil War (1991 - present)
     link: https://en.wikipedia.org/wiki/Somali_Civil_War
+South Korea:
+  - name: Korean War (1950 - 1953 de facto)
+    link: https://en.wikipedia.org/wiki/Korean_War
 South Sudan:
   - name: Second Sudanese Civil War (1983 - 2005)
     link: https://en.wikipedia.org/wiki/Second_Sudanese_Civil_War
