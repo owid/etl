@@ -112,11 +112,13 @@ def app(run_checks: bool, dummy_data: bool) -> None:
 
 1. Test your step against your local database. If you have your grapher DB configured locally, your `.env` file should look similar to this:
 
-    ```
+    ```bash
     GRAPHER_USER_ID=59
     DB_USER=root
     DB_NAME=owid
     DB_HOST=127.0.0.1
+    DB_PORT=3306
+    DB_PASS=
     ```
 
     Then run the grapher step:
