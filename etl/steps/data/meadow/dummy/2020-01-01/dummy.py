@@ -1,6 +1,5 @@
 import pandas as pd
-from owid.catalog import Dataset, Table, TableMeta
-from owid.catalog.utils import underscore_table
+from owid.catalog import Dataset, Table
 from structlog import get_logger
 
 from etl.helpers import Names
@@ -24,26 +23,17 @@ def run(dest_dir: str) -> None:
     df = clean_data(df)
 
     # create new dataset and reuse walden metadata
-    ds = Dataset.create_empty(dest_dir)
-    ds.metadata = convert_snapshot_metadata(snap.metadata)
+    ds = Dataset.create_empty(dest_dir, metadata=convert_snapshot_metadata(snap.metadata))
     ds.metadata.version = "2020-01-01"
 
-    # create table with metadata from dataframe
-    table_metadata = TableMeta(
-        short_name=snap.metadata.short_name,
-        title=snap.metadata.name,
-        description=snap.metadata.description,
-    )
-    tb = Table(df, metadata=table_metadata)
-
-    # underscore all table columns
-    tb = underscore_table(tb)
-
-    ds.metadata.update_from_yaml(N.metadata_path, if_source_exists="replace")
-    tb.update_metadata_from_yaml(N.metadata_path, "dummy")
+    # # create table with metadata from dataframe and underscore all columns
+    tb = Table(df, short_name=snap.metadata.short_name, underscore=True)
 
     # add table to a dataset
     ds.add(tb)
+
+    # update metadata
+    ds.update_metadata(N.metadata_path)
 
     # finally save the dataset
     ds.save()

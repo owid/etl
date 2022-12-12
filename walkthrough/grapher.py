@@ -121,7 +121,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
 
     Then run the grapher step:
     ```
-    etl grapher/{form.namespace}/{form.version}/{form.short_name} --grapher {"--private" if form.is_private else ""}
+    poetry run etl grapher/{form.namespace}/{form.version}/{form.short_name} --grapher {"--private" if form.is_private else ""}
     ```
 
 2. When you feel confident, use `.env.staging` for staging which looks something like this:
@@ -144,7 +144,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
     After you run
 
     ```
-    ENV=.env.staging etl grapher/{form.namespace}/{form.version}/{form.short_name} --grapher {"--private" if form.is_private else ""}
+    ENV=.env.staging poetry run etl grapher/{form.namespace}/{form.version}/{form.short_name} --grapher {"--private" if form.is_private else ""}
     ```
 
     you should see it [in staging admin](https://staging.owid.cloud/admin/datasets).
@@ -152,7 +152,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
 3. Pushing to production grapher is **not yet automated**. After you get it reviewed and approved, you can use `.env.prod` file and run
 
     ```
-    ENV=.env.prod etl grapher/{form.namespace}/{form.version}/{form.short_name} --grapher {"--private" if form.is_private else ""}
+    ENV=.env.prod poetry run etl grapher/{form.namespace}/{form.version}/{form.short_name} --grapher {"--private" if form.is_private else ""}
     ```
 
 4. Check your dataset in [admin](https://owid.cloud/admin/datasets).

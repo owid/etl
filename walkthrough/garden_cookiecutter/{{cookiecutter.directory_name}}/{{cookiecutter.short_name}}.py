@@ -3,7 +3,6 @@ from typing import List, cast
 
 import pandas as pd
 from owid.catalog import Dataset, Table
-from owid.catalog.utils import underscore_table
 from owid.datautils import geo
 from structlog import get_logger
 
@@ -20,10 +19,7 @@ def run(dest_dir: str) -> None:
     log.info("{{cookiecutter.short_name}}.start")
 
     # read dataset from meadow
-    ds_meadow = Dataset(
-        DATA_DIR
-        / "meadow/{{cookiecutter.namespace}}/{{cookiecutter.version}}/{{cookiecutter.short_name}}"
-    )
+    ds_meadow = Dataset(DATA_DIR / "meadow/{{cookiecutter.namespace}}/{{cookiecutter.version}}/{{cookiecutter.short_name}}")
     tb_meadow = ds_meadow["{{cookiecutter.short_name}}"]
 
     df = pd.DataFrame(tb_meadow)
@@ -34,18 +30,16 @@ def run(dest_dir: str) -> None:
     log.info("{{cookiecutter.short_name}}.harmonize_countries")
     df = harmonize_countries(df)
 
-    ds_garden = Dataset.create_empty(dest_dir)
-    ds_garden.metadata = ds_meadow.metadata
+    # create new dataset with the same metadata as meadow
+    ds_garden = Dataset.create_empty(dest_dir, metadata=ds_meadow.metadata)
 
-    tb_garden = underscore_table(Table(df))
-    tb_garden.metadata = tb_meadow.metadata
-    for col in tb_garden.columns:
-        tb_garden[col].metadata = tb_meadow[col].metadata
-    {% if cookiecutter.include_metadata_yaml == "True" %}
-    ds_garden.metadata.update_from_yaml(N.metadata_path)
-    tb_garden.update_metadata_from_yaml(N.metadata_path, "{{cookiecutter.short_name}}")
-    {% endif %}
+    # create new table with the same metadata as meadow and add it to dataset
+    tb_garden = Table(df, like=tb_meadow)
     ds_garden.add(tb_garden)
+    {% if cookiecutter.include_metadata_yaml == "True" %}
+    # update metadata from yaml file
+    ds_garden.update_metadata(N.metadata_path)
+    {% endif %}
     ds_garden.save()
 
     log.info("{{cookiecutter.short_name}}.end")
