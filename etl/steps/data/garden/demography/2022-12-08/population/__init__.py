@@ -1,3 +1,7 @@
+"""OMM population dataset.
+
+This dataset contains population data from various sources. It also includes former counties.
+"""
 import os
 from copy import deepcopy
 from typing import List, cast
