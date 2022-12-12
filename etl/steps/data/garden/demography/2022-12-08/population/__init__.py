@@ -50,6 +50,7 @@ def make_table() -> Table:
         .pipe(select_source)
         .pipe(add_regions)
         .pipe(add_world)
+        .pipe(add_historical_regions)
         .pipe(filter_rows)
         .pipe(set_dtypes)
         .pipe(add_world_population_share)
@@ -65,11 +66,9 @@ def load_data() -> pd.DataFrame:
     unwpp = load_unwpp()
     log.info("population: loading data (Gapminder)")
     gapminder = load_gapminder()
-    log.info("population: loading data (Gapminder Systema Globalis)")
-    gapminder_sg = load_gapminder_sys_glob()
     log.info("population: loading data (Hyde)")
     hyde = load_hyde()
-    tb = pd.DataFrame(pd.concat([gapminder, gapminder_sg, hyde, unwpp], ignore_index=True))
+    tb = pd.DataFrame(pd.concat([gapminder, hyde, unwpp], ignore_index=True))
     return tb
 
 
@@ -122,7 +121,9 @@ def add_regions(df: pd.DataFrame) -> pd.DataFrame:
         "Upper-middle-income countries",
         "European Union (27)",
     ]
+    # make sure to exclude regions if already present
     df = df.loc[-df.country.isin(regions)]
+    # re-estimate regions
     for region in regions:
         df = geo.add_region_aggregates(df=df, region=region)
     return df
@@ -158,6 +159,18 @@ def add_world(df: pd.DataFrame) -> pd.DataFrame:
         .assign(country="World")
     )
     df = pd.concat([df, df_], ignore_index=True).sort_values(["country", "year"])
+    return df
+
+
+def add_historical_regions(df: pd.DataFrame) -> pd.DataFrame:
+    """Add historical regions.
+
+    Systema Globalis from Gapminder contains historical regions. We add them to the data. These include
+    Yugoslavia, USSR, etc.
+    """
+    log.info("population: loading data (Gapminder Systema Globalis)")
+    gapminder_sg = load_gapminder_sys_glob()
+    df = pd.DataFrame(pd.concat([df, gapminder_sg], ignore_index=True)).drop(columns=["source"])
     return df
 
 
