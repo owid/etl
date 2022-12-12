@@ -23,7 +23,10 @@ dataset:
       published_by: HYDE (v3.2)
       url: https://dataportaal.pbl.nl/downloads/HYDE/
       date_accessed: October 8, 2021
-
+    - name: Gapminder (Systema Globalis)
+      published_by: Gapminder (Systema Globalis)
+      url: https://github.com/open-numbers/ddf--gapminder--systema_globalis
+      date_accessed: December 12, 2022
 tables:
   population:
     title: Population (various sources)
