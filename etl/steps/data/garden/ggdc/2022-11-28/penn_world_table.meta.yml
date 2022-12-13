@@ -270,6 +270,7 @@ tables:
       csh_r:
         title: Share of residual trade and GDP statistical discrepancy in GDP
         unit: "%"
+        short_unit: "%"
         description: Share of residual trade and GDP statistical discrepancy in GDP (output, single price benchmark)
       pl_c:
         title: Price level of household consumption,  price level of USA GDPo in 2017=1
