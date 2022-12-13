@@ -37,10 +37,16 @@ def make_table() -> Table:
     ds = Dataset(OMM_POPULATION)
     tb = ds["population"]
 
-    # Remove former countries (this is to ensure that the current key_indicators 'population' table is not changed)
-    msk = tb.index.get_level_values("country").isin(EXCLUDE_COUNTRIES)
-    tb = tb.loc[~msk]
+    # reset index
+    tb = tb.reset_index()
 
+    # Remove former countries (this is to ensure that the current key_indicators 'population' table is not changed)
+    msk = tb["country"].isin(EXCLUDE_COUNTRIES)
+    tb = tb.loc[~msk]
+    # ensure categories not in use are removed
+    tb["country"] = tb["country"].cat.remove_unused_categories()
+
+    tb = tb.set_index(["country", "year"])
     return tb
 
 
