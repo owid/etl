@@ -19,7 +19,8 @@ from etl.paths import BASE_PACKAGE, STEP_DIR
 def main(uri: str, dest_dir: str, ipdb: Optional[bool]) -> None:
     """
     Import and run a specific step of the ETL. Meant to be ran as
-    a subprocess by the main `etl` command.
+    a subprocess by the main `etl` command. There's a quite big
+    overhead (~3s) from importing all packages again in the new subprocess.
     """
     if not uri.startswith("data://") and not uri.startswith("data-private://"):
         raise ValueError("Only data:// or data-private:// URIs are supported")

@@ -6,7 +6,6 @@ import warnings
 
 import pandas as pd
 from owid.catalog import Dataset, Table, TableMeta
-from owid.catalog.utils import underscore_table
 
 from etl.helpers import Names
 from etl.snapshot import Snapshot
@@ -73,10 +72,7 @@ def run(dest_dir: str) -> None:
         title=snap.metadata.name,
         description=snap.metadata.description,
     )
-    tb = Table(df, metadata=table_metadata)
-
-    # Ensure all tables have underscore columns.
-    tb = underscore_table(tb)
+    tb = Table(df, metadata=table_metadata, underscore=True)
 
     # Add table to new dataset and save dataset.
     ds.add(tb)
