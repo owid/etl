@@ -1,6 +1,17 @@
 """OMM population dataset.
 
-This dataset contains population data from various sources. It also includes former counties.
+This dataset contains population data from various sources. It also includes former countries.
+
+Four sources are used overall:
+
+- After 1950:
+    - UN WPP (2022)
+- Before 1950:
+    - Gapminder (v6): This is prioritised over HYDE.
+    - HYDE (v3.2)
+    - Gapminder (Systema Globalis):
+        Provides data on former countries, and complements other sources with data on missing years for some countries.
+        More on this dataset please refer to module gapminder_sg.
 """
 import os
 from copy import deepcopy
@@ -14,7 +25,11 @@ from structlog import get_logger
 
 from etl.helpers import Names
 
-from .gapminder import load_gapminder, load_gapminder_sys_glob
+from .gapminder import load_gapminder
+from .gapminder_sg import (
+    load_gapminder_sys_glob_complement,
+    load_gapminder_sys_glob_former,
+)
 from .hyde import load_hyde
 from .unwpp import load_unwpp
 
@@ -68,8 +83,10 @@ def load_data() -> pd.DataFrame:
     log.info("population: loading data...")
     log.info("population: loading data (WPP)")
     unwpp = load_unwpp()
-    log.info("population: loading data (Gapminder)")
+    log.info("population: loading data (Gapminder v6)")
     gapminder = load_gapminder()
+    log.info("population: loading data (Gapminder - Systema Globalis)")
+    gapminder = load_gapminder_sys_glob_complement()
     log.info("population: loading data (Hyde)")
     hyde = load_hyde()
     tb = pd.DataFrame(pd.concat([gapminder, hyde, unwpp], ignore_index=True))
@@ -101,7 +118,7 @@ def select_source(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def _assert_unique(df: pd.DataFrame, subset: List[str]) -> None:
-    """Ensure that dataframe has only one row per subset"""
+    """Ensure that dataframe has only one row per columns in subset"""
     # NOTE: this could be moved to helpers
     df_deduped = df.drop_duplicates(subset=subset)
     if df.shape != df_deduped.shape:
@@ -171,9 +188,11 @@ def add_historical_regions(df: pd.DataFrame) -> pd.DataFrame:
 
     Systema Globalis from Gapminder contains historical regions. We add them to the data. These include
     Yugoslavia, USSR, etc.
+
+    Note that this is added after regions and world regions have been obtained, to avoid double counting.
     """
     log.info("population: loading data (Gapminder Systema Globalis)")
-    gapminder_sg = load_gapminder_sys_glob()
+    gapminder_sg = load_gapminder_sys_glob_former()
     df = pd.DataFrame(pd.concat([df, gapminder_sg], ignore_index=True)).drop(columns=["source"])
     return df
 
