@@ -9,6 +9,7 @@ from etl.paths import DATA_DIR
 
 # Path to garden dataset to be loaded.
 DATASET_PATH = DATA_DIR / "garden" / "energy" / "2022-12-12" / "electricity_mix"
+TABLE_NAME = "electricity_mix"
 
 
 def run(dest_dir: str) -> None:
@@ -16,7 +17,7 @@ def run(dest_dir: str) -> None:
     dataset = catalog.Dataset.create_empty(dest_dir, garden_dataset.metadata)
 
     # There is only one table in the dataset, with the same name as the dataset.
-    table = garden_dataset[garden_dataset.table_names[0]].reset_index().drop(columns=["population"])
+    table = garden_dataset[TABLE_NAME].reset_index().drop(columns=["population"])
 
     # Add zero-filled variables (where missing points are filled with zeros) to avoid stacked area charts
     # showing incomplete data.

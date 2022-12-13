@@ -74,14 +74,12 @@ def process_bp_data(table_bp: catalog.Table) -> pd.DataFrame:
         ],
     }
 
+    # Create a dataframe with a dummy index.
+    df_bp = pd.DataFrame(table_bp).reset_index()
+
     # Create new columns, by adding up other columns (and allowing for only one nan in each sum).
     for new_column in aggregates:
-        table_bp[new_column] = pd.DataFrame(table_bp)[aggregates[new_column]].sum(
-            axis=1, min_count=len(aggregates[new_column]) - 1
-        )
-
-    # Prepare data in a dataframe with a dummy index.
-    df_bp = pd.DataFrame(table_bp).reset_index()
+        df_bp[new_column] = df_bp[aggregates[new_column]].sum(axis=1, min_count=len(aggregates[new_column]) - 1)
 
     return df_bp
 
@@ -122,16 +120,15 @@ def process_ember_data(table_ember: catalog.Table) -> pd.DataFrame:
     }
     table_ember = table_ember[list(columns)].rename(columns=columns, errors="raise")
 
+    # Create a dataframe with a dummy index.
+    df_ember = pd.DataFrame(table_ember).reset_index()
+
     # In BP data, there is a variable "Geo Biomass Other", which combines all other renewables.
     # In Ember data, "other rewenables" excludes bioenergy.
     # To be able to combine both datasets, create a new variable for generation of other renewables including bioenergy.
-    table_ember["other_renewables_including_bioenergy_generation__twh"] = (
-        pd.DataFrame(table_ember)["other_renewables_excluding_bioenergy_generation__twh"]
-        + table_ember["bioenergy_generation__twh"]
+    df_ember["other_renewables_including_bioenergy_generation__twh"] = (
+        df_ember["other_renewables_excluding_bioenergy_generation__twh"] + df_ember["bioenergy_generation__twh"]
     )
-
-    # Prepare data in a dataframe with a dummy index.
-    df_ember = pd.DataFrame(table_ember).reset_index()
 
     return df_ember
 
@@ -260,9 +257,8 @@ def prepare_output_table(combined: pd.DataFrame) -> catalog.Table:
         Original data in a table format with metadata.
 
     """
-    # Sort rows and columns conveniently and set an index.
-    combined = combined[sorted(combined.columns)]
-    combined = combined.set_index(["country", "year"], verify_integrity=True).sort_index()
+    # Set an appropriate index and sort rows and columns conveniently.
+    combined = combined.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
 
     # Convert dataframe into a table (with no metadata).
     table = catalog.Table(combined)
@@ -277,13 +273,17 @@ def run(dest_dir: str) -> None:
     #
     # Load data.
     #
-    # Read BP's statistical review.
+    # Load BP's statistical review dataset.
     ds_bp = catalog.Dataset(BP_DATASET_PATH)
+    # Select main table.
     table_bp = ds_bp["statistical_review"]
+    # Create a convenient dataframe.
+    df_bp = pd.DataFrame(table_bp)
 
-    # Read Ember's combined (global & european) electricity review.
+    # Idem for Ember's combined (global & european) electricity review.
     ds_ember = catalog.Dataset(EMBER_DATASET_PATH)
     table_ember = ds_ember["combined_electricity_review"]
+    df_ember = pd.DataFrame(table_ember)
 
     #
     # Process data.

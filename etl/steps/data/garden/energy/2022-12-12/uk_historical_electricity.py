@@ -19,7 +19,9 @@ DATASET_TITLE = "UK historical electricity"
 METADATA_PATH = CURRENT_DIR / f"{DATASET_SHORT_NAME}.meta.yml"
 # Details for datasets to import.
 ELECTRICITY_MIX_DATASET_PATH = DATA_DIR / "garden/energy/2022-12-12/electricity_mix"
+ELECTRICITY_MIX_TABLE_NAME = "electricity_mix"
 UK_BEIS_DATASET_PATH = DATA_DIR / "garden/uk_beis/2022-07-28/uk_historical_electricity"
+UK_BEIS_TABLE_NAME = "uk_historical_electricity"
 
 
 def prepare_electricity_mix_data(df_elec: pd.DataFrame) -> pd.DataFrame:
@@ -173,8 +175,8 @@ def run(dest_dir: str) -> None:
     ds_elec = catalog.Dataset(ELECTRICITY_MIX_DATASET_PATH)
 
     # Gather all required tables from all datasets.
-    tb_beis = ds_beis[ds_beis.table_names[0]]
-    tb_elec = ds_elec[ds_elec.table_names[0]]
+    tb_beis = ds_beis[UK_BEIS_TABLE_NAME]
+    tb_elec = ds_elec[ELECTRICITY_MIX_TABLE_NAME]
 
     # Create convenient dataframes.
     df_beis = pd.DataFrame(tb_beis).reset_index()

@@ -31,9 +31,13 @@ DATASET_TITLE = "Energy dataset (OWID, 2022)"
 METADATA_PATH = CURRENT_DIR / f"{DATASET_SHORT_NAME}.meta.yml"
 # Details for datasets to import.
 ENERGY_MIX_DATASET_PATH = DATA_DIR / "garden/bp/2022-07-14/energy_mix"
+ENERGY_MIX_TABLE_NAME = "energy_mix"
 FOSSIL_FUEL_PRODUCTION_DATASET_PATH = DATA_DIR / "garden/energy/2022-07-20/fossil_fuel_production"
+FOSSIL_FUEL_PRODUCTION_TABLE_NAME = "fossil_fuel_production"
 PRIMARY_ENERGY_CONSUMPTION_DATASET_PATH = DATA_DIR / "garden/energy/2022-07-29/primary_energy_consumption"
+PRIMARY_ENERGY_CONSUMPTION_TABLE_NAME = "primary_energy_consumption"
 ELECTRICITY_MIX_DATASET_PATH = DATA_DIR / "garden/energy/2022-12-12/electricity_mix"
+ELECTRICITY_MIX_TABLE_NAME = "electricity_mix"
 COUNTRIES_REGIONS_DATASET_PATH = DATA_DIR / "garden/reference/"
 # Population and GDP are only used to add the population and gdp columns (and no other derived variables).
 POPULATION_DATASET_PATH = DATA_DIR / "garden/owid/latest/key_indicators/"
@@ -149,10 +153,10 @@ def run(dest_dir: str) -> None:
     ds_electricity_mix = catalog.Dataset(ELECTRICITY_MIX_DATASET_PATH)
 
     # Gather all required tables from all datasets.
-    tb_energy_mix = ds_energy_mix[ds_energy_mix.table_names[0]].reset_index()
-    tb_fossil_fuels = ds_fossil_fuels[ds_fossil_fuels.table_names[0]].reset_index()
-    tb_primary_energy = ds_primary_energy[ds_primary_energy.table_names[0]].reset_index()
-    tb_electricity_mix = ds_electricity_mix[ds_electricity_mix.table_names[0]].reset_index()
+    tb_energy_mix = ds_energy_mix[ENERGY_MIX_TABLE_NAME].reset_index()
+    tb_fossil_fuels = ds_fossil_fuels[FOSSIL_FUEL_PRODUCTION_TABLE_NAME].reset_index()
+    tb_primary_energy = ds_primary_energy[PRIMARY_ENERGY_CONSUMPTION_TABLE_NAME].reset_index()
+    tb_electricity_mix = ds_electricity_mix[ELECTRICITY_MIX_TABLE_NAME].reset_index()
 
     # Load countries-regions dataset (required to get ISO codes).
     countries_regions = catalog.Dataset(COUNTRIES_REGIONS_DATASET_PATH)["countries_regions"].reset_index()[
