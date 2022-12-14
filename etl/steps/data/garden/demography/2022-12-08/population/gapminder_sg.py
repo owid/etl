@@ -90,15 +90,8 @@ COMPLEMENT_COUNTRIES = {
 }
 
 
-def load_gapminder_sys_glob(former=True):
-    if former:
-        tb = load_gapminder_sys_glob_former()
-    else:
-        tb = load_gapminder_sys_glob_complement()
-    return tb
-
-
 def load_gapminder_sys_glob_former():
+    """load gapminder dataset's table only with former countries."""
     tb = Dataset(DATASET_GAPMINDER_SYSTEMA_GLOBALIS)["total_population_with_projections"]
 
     # reset index
@@ -132,6 +125,7 @@ def load_gapminder_sys_glob_former():
 
 
 def load_gapminder_sys_glob_complement():
+    """load gapminder dataset's table only with non-former countries needed to complement the rest of sources."""
     tb = Dataset(DATASET_GAPMINDER_SYSTEMA_GLOBALIS)["total_population_with_projections"]
 
     # reset index
