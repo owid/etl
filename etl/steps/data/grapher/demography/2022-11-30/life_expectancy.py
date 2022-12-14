@@ -39,7 +39,7 @@ def add_anomalies_text(ds: catalog.Dataset):
 def build_anomalies_text():
     """Build anomaly text.
 
-    Expected input is a table called '_anomalies', which just has one cell with a YAML file raw content as a string.
+    Expected input is a table called '_hist_events', which just has one cell with a YAML file raw content as a string.
 
     Expected YAML format:
 
@@ -67,10 +67,10 @@ def build_anomalies_text():
         </ul>
         ...
     """
-    tb = N.garden_dataset["_anomalies"]
-    # load anomalies as YAML
-    anomalies_all = yaml.safe_load(tb.loc[0, "anomalies"])
-    # build anomalies text
+    tb = N.garden_dataset["_hist_events"]
+    # load historical events as YAML
+    anomalies_all = yaml.safe_load(tb.loc[0, "hist_events"])
+    # build historical events text
     anomalies_text = (
         "<b>DATA ANOMALIES</b>\nFind below a list of events by country and year that likely affected the life"
         " expectancy, and thus created data anomalies.\n"

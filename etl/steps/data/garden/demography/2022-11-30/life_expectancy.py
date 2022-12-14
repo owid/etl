@@ -68,8 +68,10 @@ REGION_MAPPING = {
     "Europe (UN)": "Europe",
     "Oceania (UN)": "Oceania",
 }
-# Path to anomalies file
-PATH_ANOMALIES = N.directory / "life_expectancy.anomalies.yml"
+# Path to historical events file
+# this file contains a list of historical events that likely caused data anomalies in the dataset.
+# note that proving that these anomalies are caused by those events would require some complicated causal inference.
+PATH_HIST_EVENTS = N.directory / "life_expectancy.historical_events.yml"
 
 
 def run(dest_dir: str) -> None:
@@ -112,8 +114,8 @@ def run(dest_dir: str) -> None:
     ds_garden.add(tb_projection)
     ds_garden.save()
 
-    # add anomalies table
-    ds_garden.add(make_anomaly_table())
+    # add historical events table
+    ds_garden.add(make_hist_events_table())
     ds_garden.save()
 
     log.info("life_expectancy.end")
@@ -195,7 +197,8 @@ def make_metadata(all_ds: List[Dataset]) -> DatasetMeta:
         description += f"{ds.metadata.title}:\n\n{ds.metadata.description}\n\n------\n\n"
     description = (
         "This dataset has been created using multiple sources. We use UN WPP for data since 1950 (estimates and medium"
-        " variant). Prior to that, other sources are combined.\n\n" + description
+        " variant). Prior to that, other sources are combined.\n\n"
+        + description
     )
 
     # sources
@@ -341,7 +344,7 @@ def merge_dfs(df_wpp: pd.DataFrame, df_hmd: pd.DataFrame, df_zij: pd.DataFrame, 
 
     # Dtypes, row sorting
     df = df.astype({"year": int})
-    df = df.set_index(COLUMNS_IDX).sort_index()
+    df = df.set_index(COLUMNS_IDX, verify_integrity=True).sort_index()
     df = df.dropna(how="all", axis=0)
 
     # Rounding resolution
@@ -359,21 +362,24 @@ def add_americas(frame: pd.DataFrame) -> pd.DataFrame:
     # filter only member countries of the region
     region_members = ["Northern America", "Latin America and the Caribbean"]
     df = frame.loc[frame["country"].isin(region_members)].copy()
-    # add population
-    df = add_population_americas(df)
+    # add population for LATAM and Northern America (from WPP, hence since 1950)
+    assert df["year"].min() == YEAR_WPP_START
+    df = add_population_americas_from_wpp(df)
+    # sanity check: ensure there are NO missing values. This way, we can safely do the groupby
+    assert (df.isna().sum() == 0).all()
     # estimate values for regions
     # y(country) = weight(country) * metric(country)
-    df["life_expectancy_0"] *= df.population
-    df["life_expectancy_15"] *= df.population
-    df["life_expectancy_65"] *= df.population
-    df["life_expectancy_80"] *= df.population
+    df["life_expectancy_0"] *= df["population"]
+    df["life_expectancy_15"] *= df["population"]
+    df["life_expectancy_65"] *= df["population"]
+    df["life_expectancy_80"] *= df["population"]
     # z(region) = sum{ y(country) } for country in region
     df = df.groupby("year", as_index=False).sum(numeric_only=True)
     # z(region) /  sum{ population(country) } for country in region
-    df["life_expectancy_0"] /= df.population
-    df["life_expectancy_15"] /= df.population
-    df["life_expectancy_65"] /= df.population
-    df["life_expectancy_80"] /= df.population
+    df["life_expectancy_0"] /= df["population"]
+    df["life_expectancy_15"] /= df["population"]
+    df["life_expectancy_65"] /= df["population"]
+    df["life_expectancy_80"] /= df["population"]
 
     # assign region name
     df = df.assign(country="Americas")
@@ -418,26 +424,30 @@ def add_region_aggregates(frame: pd.DataFrame) -> pd.DataFrame:
 
     # estimate values for regions
     # y(country) = weight(country) * metric(country)
-    df["life_expectancy_0"] *= df.population
-    df["life_expectancy_15"] *= df.population
-    df["life_expectancy_65"] *= df.population
-    df["life_expectancy_80"] *= df.population
+    df["life_expectancy_0"] *= df["population"]
+    df["life_expectancy_15"] *= df["population"]
+    df["life_expectancy_65"] *= df["population"]
+    df["life_expectancy_80"] *= df["population"]
     # z(region) = sum{ y(country) } for country in region
     for region in regions_new:
         df = geo.add_region_aggregates(df, region=region)
     df = df[df["country"].isin(regions_new)]
     # z(region) /  sum{ population(country) } for country in region
-    df["life_expectancy_0"] /= df.population
-    df["life_expectancy_15"] /= df.population
-    df["life_expectancy_65"] /= df.population
-    df["life_expectancy_80"] /= df.population
+    df["life_expectancy_0"] /= df["population"]
+    df["life_expectancy_15"] /= df["population"]
+    df["life_expectancy_65"] /= df["population"]
+    df["life_expectancy_80"] /= df["population"]
 
     # concatenate
     df = pd.concat([frame, df]).sort_values(["country", "year"], ignore_index=True).drop(columns="population")
     return df
 
 
-def add_population_americas(df: pd.DataFrame):
+def add_population_americas_from_wpp(df: pd.DataFrame):
+    """Add population values for LATAM and Northern America.
+
+    Data is sourced from UN WPP, hence only available since 1950.
+    """
     pop = load_america_population_from_unwpp()
     df = df.merge(pop, on=["country", "year"])
     return df
@@ -468,17 +478,20 @@ def load_america_population_from_unwpp():
     return df
 
 
-def make_anomaly_table() -> Table:
-    log.info("life_expectancy: making anomaly table")
-    # Load anomaly yaml file
-    with open(PATH_ANOMALIES) as f:
-        anomalies = yaml.safe_load(f)
+def make_hist_events_table() -> Table:
+    log.info("life_expectancy: making 'historical events' table")
+    # Load historical events yaml file
+    with open(PATH_HIST_EVENTS) as f:
+        hist_events = yaml.safe_load(f)
     # store all yaml's content as a string in a cell in the table
-    df = pd.DataFrame({"anomalies": [str(anomalies)]})
+    df = pd.DataFrame({"hist_events": [str(hist_events)]})
     tb = Table(df)
     # add metadata
     tb.metadata = TableMeta(
-        short_name="_anomalies",
-        description="this table contains the anomalies for the life expectancy data in YAML format.",
+        short_name="_hist_events",
+        description=(
+            "this table contains a list of historical events that likely caused data anomalies for the life expectancy"
+            " data in YAML format."
+        ),
     )
     return tb
