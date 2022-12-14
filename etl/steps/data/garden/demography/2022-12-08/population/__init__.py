@@ -103,12 +103,12 @@ def select_source(df: pd.DataFrame) -> pd.DataFrame:
 
     # If a country has UN data, then remove all non-UN data after 1949
     has_un_data = set(df.loc[df.source == "unwpp", "country"])
-    df = df.loc[-((df.country.isin(has_un_data)) & (df.year >= 1950) & (df.source != "unwpp"))]
+    df = df.loc[~((df.country.isin(has_un_data)) & (df.year >= 1950) & (df.source != "unwpp"))]
 
     # If a country has Gapminder data, then remove all non-Gapminder data between 1800 and 1949
     has_gapminder_data = set(df.loc[df.source == "gapminder", "country"])
     df = df.loc[
-        -((df.country.isin(has_gapminder_data)) & (df.year >= 1800) & (df.year <= 1949) & (df.source != "gapminder"))
+        ~((df.country.isin(has_gapminder_data)) & (df.year >= 1800) & (df.year <= 1949) & (df.source != "gapminder"))
     ]
 
     # Test if all countries have only one row per year
@@ -143,7 +143,7 @@ def add_regions(df: pd.DataFrame) -> pd.DataFrame:
         "European Union (27)",
     ]
     # make sure to exclude regions if already present
-    df = df.loc[-df.country.isin(regions)]
+    df = df.loc[~df.country.isin(regions)]
     # re-estimate regions
     for region in regions:
         df = geo.add_region_aggregates(df=df, region=region)
@@ -223,7 +223,7 @@ def add_world_population_share(df: pd.DataFrame) -> pd.DataFrame:
     # Add a metric "% of world population"
     world_pop = df.loc[df.country == "World", ["year", "population"]].rename(columns={"population": "world_pop"})
     df = df.merge(world_pop, on="year", how="left")
-    df["world_pop_share"] = (df["population"].div(df.world_pop)).round(4)
+    df["world_pop_share"] = (100 * df["population"].div(df.world_pop)).round(2)
     df = df.drop(columns="world_pop")
     return df
 

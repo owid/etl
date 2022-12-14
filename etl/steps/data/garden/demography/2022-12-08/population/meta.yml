@@ -68,5 +68,4 @@ tables:
         display:
           name: Share of world population
           includeInTable: true
-          conversionFactor: 100
         sources: *population-sources
