@@ -19,7 +19,10 @@ def load_unwpp() -> pd.DataFrame:
     # Filter
     df = df.reset_index()
     df = df[
-        (df.metric == "population") & (df.age == "all") & (df.sex == "all") & (df.variant.isin(["estimates", "medium"]))
+        (df["metric"] == "population")
+        & (df["age"] == "all")
+        & (df["sex"] == "all")
+        & (df["variant"].isin(["estimates", "medium"]))
     ]
 
     # Sanity checks
@@ -50,9 +53,9 @@ def load_unwpp() -> pd.DataFrame:
 
 def _pre_sanity_checks(df: pd.DataFrame) -> None:
     # check years
-    assert df[df.variant == "medium"].year.min() == 2022
-    assert df[df.variant == "estimates"].year.max() == 2021
+    assert df.loc[df["variant"] == "medium", "year"].min() == 2022
+    assert df.loc[df["variant"] == "estimates", "year"].max() == 2021
 
 
 def _post_sanity_checks(df: pd.DataFrame) -> None:
-    assert df.groupby(["country", "year"]).population.count().max() == 1
+    assert df.groupby(["country", "year"])["population"].count().max() == 1
