@@ -508,7 +508,7 @@ def detect_overlapping_regions(
 
 def add_region_aggregates(
     data: pd.DataFrame,
-    regions: List[str],
+    regions: Dict[Any, Any],
     index_columns: List[str],
     country_column: str = "country",
     aggregates: Optional[Dict[str, str]] = None,

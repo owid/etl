@@ -102,7 +102,13 @@ steps:
     - data://garden/owid/latest/key_indicators
   data://grapher/energy/2022-12-12/electricity_mix:
     - data://garden/energy/2022-12-12/electricity_mix
-
+  # Newer version (TODO: remove the previous from the dag after the following is working well).
+  data://garden/energy/2022-12-13/electricity_mix:
+    - data://garden/bp/2022-07-14/statistical_review
+    - data://garden/ember/2022-12-13/combined_electricity
+    - data://garden/owid/latest/key_indicators
+  data://grapher/energy/2022-12-13/electricity_mix:
+    - data://garden/energy/2022-12-13/electricity_mix
   #
   # Energy - OWID Energy dataset (2022).
   #
@@ -150,6 +156,12 @@ steps:
     - data://garden/energy/2022-12-12/electricity_mix
   data://grapher/energy/2022-12-12/uk_historical_electricity:
     - data://garden/energy/2022-12-12/uk_historical_electricity
+  # TODO: Remove the previous from the dag.
+  data://garden/energy/2022-12-13/uk_historical_electricity:
+    - data://garden/uk_beis/2022-07-28/uk_historical_electricity
+    - data://garden/energy/2022-12-13/electricity_mix
+  data://grapher/energy/2022-12-13/uk_historical_electricity:
+    - data://garden/energy/2022-12-13/uk_historical_electricity
   #
   # IRENA - Renewable power generation costs (2022).
   #
