@@ -78,6 +78,10 @@ steps:
     - data://garden/reference
   data://meadow/ember/2022-12-13/yearly_electricity:
     - snapshot://ember/2022-12-13/yearly_electricity.csv
+  data://garden/ember/2022-12-13/yearly_electricity:
+    - data://meadow/ember/2022-12-13/yearly_electricity
+    - data://garden/owid/latest/key_indicators
+    - data://garden/reference
   #
   # Ember - European electricity review 2022.
   #
