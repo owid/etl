@@ -29,6 +29,7 @@ EXCLUDE_COUNTRIES = [
     "Yemen Arab Republic",
     "Yemen People's Republic",
     "Yugoslavia",
+    "Akrotiri and Dhekelia",
 ]
 
 
