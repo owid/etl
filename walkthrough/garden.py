@@ -168,7 +168,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
     poetry run etl data{private_suffix}://garden/{form.namespace}/{form.version}/{form.short_name} {"--private" if form.is_private else ""}
     ```
 
-5. Create a branch in [Walden](https://github.com/owid/walden) and [ETL](https://github.com/owid/etl) repositories, get it reviewed and merged.
+5. Create a branch in [ETL](https://github.com/owid/etl), get it reviewed and merged.
 
 6. Once your changes are merged, your steps will be run automatically by our server and published to the OWID catalog. Once that is finished, it can be found by anyone using:
 

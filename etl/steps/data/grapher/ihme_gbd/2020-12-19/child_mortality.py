@@ -13,7 +13,7 @@ def run(dest_dir: str) -> None:
     # optionally set additional dimensions
     # table = table.set_index(["sex", "income_group"], append=True)
 
-    # if you data is in long format, check gh.long_to_wide_tables
+    # if your data is in long format, check gh.long_to_wide_tables
     dataset.add(table)
 
     dataset.save()
