@@ -14,6 +14,7 @@ To do this, we use different sources, depending on the year and metric:
 from typing import List
 
 import pandas as pd
+import yaml
 from owid.catalog import Dataset, DatasetMeta, Table, TableMeta
 from owid.catalog.utils import underscore_table
 from owid.datautils import geo
@@ -34,6 +35,8 @@ GARDEN_WPP_DATASET = DATA_DIR / "garden" / "un" / "2022-07-11" / "un_wpp"
 GARDEN_HMD_DATASET = DATA_DIR / "garden" / "hmd" / "2022-11-04" / "life_tables"
 GARDEN_ZIJDEMAN_DATASET = DATA_DIR / "garden" / "papers" / "2022-11-03" / "zijdeman_et_al_2015"
 GARDEN_RILEY_DATASET = DATA_DIR / "garden" / "papers" / "2022-11-04" / "riley_2005"
+# auxiliary datasets
+GARDEN_POPULATION_WPP = DATA_DIR / "garden" / "un" / "2022-07-11" / "un_wpp"
 # index column names: this is used when setting indices in dataframes
 COLUMNS_IDX = ["country", "year"]
 # age groups considered besides at 0 (at birth)
@@ -65,6 +68,10 @@ REGION_MAPPING = {
     "Europe (UN)": "Europe",
     "Oceania (UN)": "Oceania",
 }
+# Path to historical events file
+# this file contains a list of historical events that likely caused data anomalies in the dataset.
+# note that proving that these anomalies are caused by those events would require some complicated causal inference.
+PATH_HIST_EVENTS = N.directory / "life_expectancy.historical_events.yml"
 
 
 def run(dest_dir: str) -> None:
@@ -105,6 +112,10 @@ def run(dest_dir: str) -> None:
     ds_garden.add(tb_historical)
     ds_garden.save()
     ds_garden.add(tb_projection)
+    ds_garden.save()
+
+    # add historical events table
+    ds_garden.add(make_hist_events_table())
     ds_garden.save()
 
     log.info("life_expectancy.end")
@@ -327,9 +338,12 @@ def merge_dfs(df_wpp: pd.DataFrame, df_hmd: pd.DataFrame, df_zij: pd.DataFrame, 
     # Rename regions
     df["country"] = df["country"].replace(REGION_MAPPING)
 
+    # add americas for >1950 using UN WPP data
+    df = add_americas(df)
+
     # Dtypes, row sorting
     df = df.astype({"year": int})
-    df = df.set_index(COLUMNS_IDX).sort_index()
+    df = df.set_index(COLUMNS_IDX, verify_integrity=True).sort_index()
     df = df.dropna(how="all", axis=0)
 
     # Rounding resolution
@@ -339,6 +353,37 @@ def merge_dfs(df_wpp: pd.DataFrame, df_hmd: pd.DataFrame, df_zij: pd.DataFrame, 
     for col in df.columns:
         if col not in COLUMNS_IDX:
             df.loc[df[col] < 0, col] = pd.NA
+    return df
+
+
+def add_americas(frame: pd.DataFrame) -> pd.DataFrame:
+    """Estimate value for the Americas using North America and LATAM/Caribbean."""
+    # filter only member countries of the region
+    region_members = ["Northern America", "Latin America and the Caribbean"]
+    df = frame.loc[frame["country"].isin(region_members)].copy()
+    # add population for LATAM and Northern America (from WPP, hence since 1950)
+    assert df["year"].min() == YEAR_WPP_START
+    df = add_population_americas_from_wpp(df)
+    # sanity check: ensure there are NO missing values. This way, we can safely do the groupby
+    assert (df.isna().sum() == 0).all()
+    # estimate values for regions
+    # y(country) = weight(country) * metric(country)
+    df["life_expectancy_0"] *= df["population"]
+    df["life_expectancy_15"] *= df["population"]
+    df["life_expectancy_65"] *= df["population"]
+    df["life_expectancy_80"] *= df["population"]
+    # z(region) = sum{ y(country) } for country in region
+    df = df.groupby("year", as_index=False).sum(numeric_only=True)
+    # z(region) /  sum{ population(country) } for country in region
+    df["life_expectancy_0"] /= df["population"]
+    df["life_expectancy_15"] /= df["population"]
+    df["life_expectancy_65"] /= df["population"]
+    df["life_expectancy_80"] /= df["population"]
+
+    # assign region name
+    df = df.assign(country="Americas")
+    # concatenate
+    df = pd.concat([frame, df]).sort_values(["country", "year"], ignore_index=True).drop(columns="population")
     return df
 
 
@@ -378,20 +423,74 @@ def add_region_aggregates(frame: pd.DataFrame) -> pd.DataFrame:
 
     # estimate values for regions
     # y(country) = weight(country) * metric(country)
-    df["life_expectancy_0"] *= df.population
-    df["life_expectancy_15"] *= df.population
-    df["life_expectancy_65"] *= df.population
-    df["life_expectancy_80"] *= df.population
+    df["life_expectancy_0"] *= df["population"]
+    df["life_expectancy_15"] *= df["population"]
+    df["life_expectancy_65"] *= df["population"]
+    df["life_expectancy_80"] *= df["population"]
     # z(region) = sum{ y(country) } for country in region
     for region in regions_new:
         df = geo.add_region_aggregates(df, region=region)
     df = df[df["country"].isin(regions_new)]
     # z(region) /  sum{ population(country) } for country in region
-    df["life_expectancy_0"] /= df.population
-    df["life_expectancy_15"] /= df.population
-    df["life_expectancy_65"] /= df.population
-    df["life_expectancy_80"] /= df.population
+    df["life_expectancy_0"] /= df["population"]
+    df["life_expectancy_15"] /= df["population"]
+    df["life_expectancy_65"] /= df["population"]
+    df["life_expectancy_80"] /= df["population"]
 
     # concatenate
     df = pd.concat([frame, df]).sort_values(["country", "year"], ignore_index=True).drop(columns="population")
     return df
+
+
+def add_population_americas_from_wpp(df: pd.DataFrame):
+    """Add population values for LATAM and Northern America.
+
+    Data is sourced from UN WPP, hence only available since 1950.
+    """
+    pop = load_america_population_from_unwpp()
+    df = df.merge(pop, on=["country", "year"])
+    return df
+
+
+def load_america_population_from_unwpp():
+    """Load population data from UN WPP for Northern America and Latin America and the Caribbean.
+
+    We use this dataset instead of the long-run because we want the entities as defined by the UN.
+    """
+    # load population from WPP
+    locations = ["Latin America and the Caribbean (UN)", "Northern America (UN)"]
+    ds = Dataset(GARDEN_POPULATION_WPP)
+    df = ds["population"].reset_index()
+    df = df.loc[
+        (df["location"].isin(locations))
+        & (df["metric"] == "population")
+        & (df["sex"] == "all")
+        & (df["age"] == "all")
+        & (df["variant"].isin(["estimates", "medium"])),
+        ["location", "year", "value"],
+    ]
+    assert len(set(df["location"])) == 2, f"Check that all of {locations} are in df"
+    df["location"] = df["location"].replace(REGION_MAPPING)
+
+    # rename columns
+    df = df.rename(columns={"location": "country", "value": "population"})
+    return df
+
+
+def make_hist_events_table() -> Table:
+    log.info("life_expectancy: making 'historical events' table")
+    # Load historical events yaml file
+    with open(PATH_HIST_EVENTS) as f:
+        hist_events = yaml.safe_load(f)
+    # store all yaml's content as a string in a cell in the table
+    df = pd.DataFrame({"hist_events": [str(hist_events)]})
+    tb = Table(df)
+    # add metadata
+    tb.metadata = TableMeta(
+        short_name="_hist_events",
+        description=(
+            "this table contains a list of historical events that likely caused data anomalies for the life expectancy"
+            " data in YAML format."
+        ),
+    )
+    return tb
