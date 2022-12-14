@@ -78,7 +78,7 @@ COMPLEMENT_COUNTRIES = {
     "gbm": "Isle of Man",
     "jey": "Jersey",
     "kos": "Kosovo",
-    "mac": "Macau",
+    "mac": "Macao",
     "mnp": "Northern Mariana Islands",
     "stbar": "Saint Barthelemy",
     "shn": "Saint Helena",
