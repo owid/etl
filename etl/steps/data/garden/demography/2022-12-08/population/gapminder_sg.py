@@ -65,6 +65,7 @@ FORMER_COUNTRIES = {
 # Gapminder Systema Globalis contains data on the following countries which can
 # complement the other sources. That is, contains older data which other sources don't have.
 COMPLEMENT_COUNTRIES = {
+    "akr_a_dhe": "Akrotiri and Dhekelia",
     "bmu": "Bermuda",
     "vgb": "British Virgin Islands",
     "cym": "Cayman Islands",
