@@ -38,6 +38,9 @@ def make_table() -> Table:
     ds = Dataset(OMM_POPULATION)
     tb = ds["population"]
 
+    # drop unneded columns
+    tb = tb.drop(columns=["source"])
+
     # reset index
     tb = tb.reset_index()
 

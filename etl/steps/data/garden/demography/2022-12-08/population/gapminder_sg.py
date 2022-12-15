@@ -17,7 +17,7 @@ DATASET_GAPMINDER = DATA_DIR / "garden" / "gapminder" / "2019-12-10" / "populati
 DATASET_GAPMINDER_SYSTEMA_GLOBALIS = (
     DATA_DIR / "open_numbers" / "open_numbers" / "latest" / "gapminder__systema_globalis"
 )
-SOURCE_NAME = "gapminder"
+SOURCE_NAME = "gapminder_sg"
 
 # former countries
 # to translate code to name:
@@ -98,7 +98,7 @@ def load_gapminder_sys_glob_former():
     tb = tb.reset_index()
 
     # add source
-    tb["source"] = f"{SOURCE_NAME}_sys_glob"
+    tb["source"] = SOURCE_NAME
 
     # filter countries
     msk = tb["geo"].isin(FORMER_COUNTRIES)
@@ -132,7 +132,7 @@ def load_gapminder_sys_glob_complement():
     tb = tb.reset_index()
 
     # add source
-    tb["source"] = f"{SOURCE_NAME}_sys_glob"
+    tb["source"] = SOURCE_NAME
 
     # filter countries
     msk = tb["geo"].isin(COMPLEMENT_COUNTRIES)

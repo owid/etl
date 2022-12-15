@@ -6,7 +6,7 @@ DATASET_GAPMINDER = DATA_DIR / "garden" / "gapminder" / "2019-12-10" / "populati
 DATASET_GAPMINDER_SYSTEMA_GLOBALIS = (
     DATA_DIR / "open_numbers" / "open_numbers" / "latest" / "gapminder__systema_globalis"
 )
-SOURCE_NAME = "gapminder"
+SOURCE_NAME = "gapminder_v6"
 
 
 def load_gapminder():

@@ -39,6 +39,15 @@ log = get_logger()
 N = Names(__file__)
 METADATA_PATH = os.path.join(N.directory, "meta.yml")
 
+# sources names
+# this dictionary maps source short names to complete source names
+SOURCES_NAMES = {
+    "unwpp": "United Nations - Population Division 2022 (https://population.un.org/wpp/Download/Standard/Population/)",
+    "gapminder_v6": "Gapminder v6 (https://www.gapminder.org/data/documentation/gd003/)",
+    "gapminder_sg": "Gapminder - Systema Globalis (https://github.com/open-numbers/ddf--gapminder--systema_globalis)",
+    "hyde": "HYDE v3.2 (https://dataportaal.pbl.nl/downloads/HYDE/)",
+}
+
 
 def run(dest_dir: str) -> None:
     log.info("population.start")
@@ -97,7 +106,7 @@ def load_data() -> pd.DataFrame:
 def select_source(df: pd.DataFrame) -> pd.DataFrame:
     """Select adequate source for each country-year.
 
-    Rows are selected based on the following relevance scale: "unwpp" > "gapminder" > "hyde"
+    Rows are selected based on the following relevance scale: "unwpp" > "gapminder_v6" > "hyde"
     """
     log.info("population: selecting source...")
     df = df.loc[df["population"] > 0]
@@ -107,20 +116,22 @@ def select_source(df: pd.DataFrame) -> pd.DataFrame:
     df = df.loc[~((df["country"].isin(has_un_data)) & (df["year"] >= 1950) & (df["source"] != "unwpp"))]
 
     # If a country has Gapminder data, then remove all non-Gapminder data between 1800 and 1949
-    has_gapminder_data = set(df.loc[df["source"] == "gapminder", "country"])
+    has_gapminder_data = set(df.loc[df["source"] == "gapminder_v6", "country"])
     df = df.loc[
         ~(
             (df["country"].isin(has_gapminder_data))
             & (df["year"] >= 1800)
             & (df["year"] <= 1949)
-            & (df["source"] != "gapminder")
+            & (df["source"] != "gapminder_v6")
         )
     ]
 
     # Test if all countries have only one row per year
     _assert_unique(df, subset=["country", "year"])
 
-    return df.drop(columns=["source"])
+    # map to source full names
+    df["source"] = df["source"].map(SOURCES_NAMES)
+    return df
 
 
 def _assert_unique(df: pd.DataFrame, subset: List[str]) -> None:
@@ -150,9 +161,27 @@ def add_regions(df: pd.DataFrame) -> pd.DataFrame:
     ]
     # make sure to exclude regions if already present
     df = df.loc[~df["country"].isin(regions)]
-    # re-estimate regions
+
+    # keep sources per countries, remove from df
+    # remove from df: otherwsie geo.add_region_aggregates will add this column too
+    sources = df[["country", "year", "source"]].copy()
+    df = df.drop(columns=["source"])
+
+    # re-estimate region aggregates
     for region in regions:
         df = geo.add_region_aggregates(df=df, region=region)
+
+    # add sources back
+    # these are only added to countries, not aggregates
+    df = df.merge(sources, on=["country", "year"], how="left")
+
+    # add sources for region aggregates
+    # this is done by taking the union of all sources for countries in the region
+    for region in regions:
+        members = geo.list_countries_in_region(region)
+        s = df.loc[df["country"].isin(members), "source"].unique()
+        sources_region = sorted(s)
+        df.loc[df["country"] == region, "source"] = "; ".join(sources_region)
     return df
 
 
@@ -186,6 +215,9 @@ def add_world(df: pd.DataFrame) -> pd.DataFrame:
         .assign(country="World")
     )
     df = pd.concat([df, df_], ignore_index=True).sort_values(["country", "year"])
+
+    # add sources for world
+    df.loc[df["country"] == "World", "source"] = "; ".join(sorted(SOURCES_NAMES.values()))
     return df
 
 
@@ -199,7 +231,10 @@ def add_historical_regions(df: pd.DataFrame) -> pd.DataFrame:
     """
     log.info("population: loading data (Gapminder Systema Globalis)")
     gapminder_sg = load_gapminder_sys_glob_former()
-    df = pd.DataFrame(pd.concat([df, gapminder_sg], ignore_index=True)).drop(columns=["source"])
+    # map source name
+    gapminder_sg["source"] = SOURCES_NAMES["gapminder_sg"]
+
+    df = pd.DataFrame(pd.concat([df, gapminder_sg], ignore_index=True))
     return df
 
 
@@ -220,6 +255,7 @@ def set_dtypes(df: pd.DataFrame) -> pd.DataFrame:
     # correct dtypes
     df["population"] = df["population"].astype("int64")
     df["year"] = df["year"].astype(int)
+    df["source"] = df["source"].astype("category")
     return df
 
 
@@ -237,13 +273,14 @@ def add_world_population_share(df: pd.DataFrame) -> pd.DataFrame:
 def df_to_table(df: pd.DataFrame) -> Table:
     """Create table from dataframe."""
     log.info("population: converting df to table...")
-    # fine tune df
-    df = df.set_index(["country", "year"]).sort_index()
+    # fine tune df (sort rows, columns, set index)
+    df = df.set_index(["country", "year"]).sort_index()[["population", "world_pop_share", "source"]]
     # create table, sort rows
     tb = Table(df, short_name="population")
     # add metadata to columns
     tb["population"].title = "Total population (Gapminder, HYDE & UN)"
     tb["world_pop_share"].title = "Share of World Population"
+    tb["source"].title = "Source"
     # underscore
     tb = underscore_table(tb)
     return tb
