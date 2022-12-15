@@ -1,3 +1,8 @@
+"""
+This module contains old functions to estimate region aggregates.
+
+Some of its logic should be moved to etl.data_helpers.geo.
+"""
 import json
 from typing import cast
 
