@@ -7,3 +7,9 @@ steps:
 
   data://grapher/demography/2022-11-30/life_expectancy:
     - data://garden/demography/2022-11-30/life_expectancy
+
+  data://garden/demography/2022-12-08/population:
+    - data://garden/hyde/2017/baseline
+    - data://garden/gapminder/2019-12-10/population
+    - data://garden/un/2022-07-11/un_wpp
+    - data://open_numbers/open_numbers/latest/gapminder__systema_globalis

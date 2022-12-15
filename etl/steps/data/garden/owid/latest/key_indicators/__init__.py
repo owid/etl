@@ -2,8 +2,8 @@
 #  __init__.py
 #  owid/latest/key_indicators
 #
-
 from owid.catalog import Dataset, DatasetMeta, Source, Table
+from structlog import get_logger
 
 from etl.steps.data.garden.owid.latest.key_indicators import (
     table_land_area,
@@ -11,8 +11,13 @@ from etl.steps.data.garden.owid.latest.key_indicators import (
     table_population_density,
 )
 
+# logger
+log = get_logger()
+
 
 def run(dest_dir: str) -> None:
+    log.info("key_indicators: start")
+    log.info("key_indicators: create dataset")
     ds = Dataset.create_empty(dest_dir)
     ds.metadata = DatasetMeta(
         namespace="owid",
@@ -23,6 +28,7 @@ def run(dest_dir: str) -> None:
     )
 
     # Add main tables
+    log.info("key_indicators: add tables")
     sources = []
     table_modules = [table_land_area, table_population]
     for module in table_modules:
