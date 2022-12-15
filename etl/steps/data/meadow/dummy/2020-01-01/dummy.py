@@ -11,7 +11,6 @@ log = get_logger()
 # naming conventions
 N = Names(__file__)
 
-
 def run(dest_dir: str) -> None:
     log.info("dummy.start")
 
@@ -31,10 +30,10 @@ def run(dest_dir: str) -> None:
 
     # add table to a dataset
     ds.add(tb)
-
+    
     # update metadata
     ds.update_metadata(N.metadata_path)
-
+    
     # finally save the dataset
     ds.save()
 

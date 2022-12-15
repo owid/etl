@@ -17,12 +17,11 @@ from owid import catalog
 from owid.catalog import Dataset, Table, TableMeta
 from owid.catalog.utils import underscore_table
 from owid.datautils.io import decompress_file
-from owid.walden import Catalog as WaldenCatalog
-from owid.walden.catalog import Dataset as WaldenDataset
 from structlog import get_logger
 
 from etl.helpers import Names
-from etl.steps.data.converters import convert_walden_metadata
+from etl.snapshot import Snapshot
+from etl.steps.data.converters import convert_snapshot_metadata
 
 log = get_logger()
 
@@ -78,33 +77,33 @@ def run(dest_dir: str) -> None:
     log.info("hmd_lt.start")
 
     # Retrieve raw data from walden
-    walden_ds = WaldenCatalog().find_one(namespace=NAMESPACE, short_name=SHORT_NAME, version=VERSION_WALDEN)
-    local_file = walden_ds.ensure_downloaded()
+    snap = Snapshot(f"{NAMESPACE}/{VERSION_WALDEN}/{SHORT_NAME}.zip")
+    local_file = str(snap.path)
 
     # Create new dataset and reuse walden metadata
-    ds = init_meadow_dataset(dest_dir, walden_ds)
+    ds = init_meadow_dataset(dest_dir, snap)
 
     # Create and add tables to dataset
-    ds = create_and_add_tables_to_dataset(local_file, ds, walden_ds)
+    ds = create_and_add_tables_to_dataset(local_file, ds, snap)
 
     # Save the dataset
     ds.save()
     log.info("hmd_lt.end")
 
 
-def init_meadow_dataset(dest_dir: str, walden_ds: WaldenDataset) -> Dataset:
+def init_meadow_dataset(dest_dir: str, snap: Snapshot) -> Dataset:
     """Initialize meadow dataset."""
     ds = Dataset.create_empty(dest_dir)
-    ds.metadata = convert_walden_metadata(walden_ds)
+    ds.metadata = convert_snapshot_metadata(snap.metadata)
     ds.metadata.version = VERSION_MEADOW
     return ds
 
 
-def create_and_add_tables_to_dataset(local_file: str, ds: Dataset, walden_ds: WaldenDataset) -> Dataset:
+def create_and_add_tables_to_dataset(local_file: str, ds: Dataset, snap: Snapshot) -> Dataset:
     """Create and add tables to dataset.
 
     This method creates tables for all the folders found once `local_file` is uncompressed. Then,
-    it cleans and adds them to the dataset `ds`. It uses the metadata from `walden_ds` to create the tables.
+    it cleans and adds them to the dataset `ds`. It uses the metadata from `snap` to create the tables.
 
     Parameters
     ----------
@@ -112,8 +111,8 @@ def create_and_add_tables_to_dataset(local_file: str, ds: Dataset, walden_ds: Wa
         File to walden raw file.
     ds : Dataset
         Dataset where tables should be added.
-    walden_ds : WaldenDataset
-        Walden dataset.
+    snap : Snapshot
+        Snapshot.
 
     Returns
     -------
@@ -132,7 +131,7 @@ def create_and_add_tables_to_dataset(local_file: str, ds: Dataset, walden_ds: Wa
             for year in [1, 5, 10]:
                 # Create table
                 log.info(f"Creating table for {age}-year age groups and {year}-year intervals...")
-                table = make_table(tmp_dir, age, year, walden_ds)
+                table = make_table(tmp_dir, age, year, snap)
                 # add table to a dataset
                 log.info("Adding table to dataset...")
                 ds.add(table)
@@ -147,10 +146,10 @@ def _sanity_check_files(path: str) -> None:
     ), f"Files found are not the ones expected! Check that {FILES_EXPECTED} are actually there!"
 
 
-def make_table(input_folder: str, age: int, year: int, walden_ds: WaldenDataset) -> catalog.Table:
+def make_table(input_folder: str, age: int, year: int, snap: Snapshot) -> catalog.Table:
     """Create table.
 
-    Loads data from `input_folder` and creates a table with the name `table_name`. It uses the metadata from `walden_ds`.
+    Loads data from `input_folder` and creates a table with the name `table_name`. It uses the metadata from `snap`.
 
     Parameters
     ----------
@@ -160,7 +159,7 @@ def make_table(input_folder: str, age: int, year: int, walden_ds: WaldenDataset)
         Age group size (1 or 5).
     year: int
         Year interval size (1, 5 or 10).
-    walden_ds : WaldenDataset
+    snap : Snapshot
         Walden dataset.
 
     Returns
@@ -178,7 +177,7 @@ def make_table(input_folder: str, age: int, year: int, walden_ds: WaldenDataset)
     # Clean df
     df = clean_df(df)
     # df to table
-    table = df_to_table(walden_ds, age, year, df)
+    table = df_to_table(snap, age, year, df)
     # underscore all table columns
     table = underscore_table(table)
     return table
@@ -308,12 +307,12 @@ def _clean_set_dtypes_df(df: pd.DataFrame) -> pd.DataFrame:
     return df.astype(DTYPES)
 
 
-def df_to_table(walden_ds: WaldenDataset, age: int, year: int, df: pd.DataFrame) -> catalog.Table:
+def df_to_table(snap: Snapshot, age: int, year: int, df: pd.DataFrame) -> catalog.Table:
     """Convert plain pandas.DataFrame into table.
 
     Parameters
     ----------
-    walden_ds : WaldenDataset
+    snap : Snapshot
         Raw Walden dataset.
     age: int
         Age group size (1 or 5).
@@ -331,7 +330,7 @@ def df_to_table(walden_ds: WaldenDataset, age: int, year: int, df: pd.DataFrame)
     # create table with metadata from dataframe
     table_metadata = TableMeta(
         short_name=f"period_{age}x{year}",
-        title=f"{walden_ds.name} [{table_name}]",
+        title=f"{snap.metadata.name} [{table_name}]",
         description=f"Contains data in {age}-year age groups grouped in {year}-year intervals.",
     )
     tb = Table(df, metadata=table_metadata)

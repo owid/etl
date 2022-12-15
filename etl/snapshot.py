@@ -7,14 +7,13 @@ from threading import Lock
 from typing import Any, Dict, List, Literal, Optional, Union
 
 import pandas as pd
-import yaml
 from dataclasses_json import dataclass_json
 from dvc.repo import Repo
 from owid.catalog.meta import pruned_json
 from owid.datautils import dataframes
 from owid.walden import files
 
-from etl import paths
+from etl import paths, yaml
 
 dvc = Repo(paths.BASE_DIR)
 
@@ -137,8 +136,16 @@ class SnapshotMeta:
 
     def save(self) -> None:
         self.path.parent.mkdir(exist_ok=True, parents=True)
+
+        meta = self.to_dict()
+
+        # strip lines, otherwise YAML won't output strings in literal format
+        for k, v in meta.items():
+            if isinstance(v, str):
+                meta[k] = _strip_lines(v)
+
         with open(self.path, "w") as ostream:
-            yaml.dump({"meta": self.to_dict()}, ostream)
+            yaml.dump({"meta": meta}, ostream, sort_keys=False, allow_unicode=True)
 
     @property
     def uri(self):
@@ -208,3 +215,8 @@ def snapshot_catalog(match: str = r".*") -> List[Snapshot]:
         if re.search(match, uri):
             catalog.append(Snapshot(uri))
     return catalog
+
+
+def _strip_lines(s: str) -> str:
+    s = "\n".join([line.strip() for line in s.split("\n")])
+    return s.strip()
