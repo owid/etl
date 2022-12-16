@@ -63,11 +63,10 @@ def run(dest_dir: str) -> None:
     df = df.pivot_table(index=["country", "year"], columns=["flav", "measure", "area_lab"], values="b").reset_index()
 
     # collapse multi-level index into single column names
-    df.columns = [" ".join(col).strip() for col in df.columns.values]
+    df.columns = [" ".join(col).strip().replace(" ", "_") for col in df.columns.values]
 
-    # Format column names, replacing spaces with "_" and making it all lowercase
-    df.columns = df.columns.str.replace(" ", "_")
-    df.columns = df.columns.str.lower()
+    # Format column names, making it all lowercase
+    df.columns = df.columns.str.lower()  # type: ignore
 
     log.info("multidimensional_poverty_index.harmonize_countries")
     df = harmonize_countries(df)
