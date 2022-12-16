@@ -33,8 +33,7 @@ def run(dest_dir: str) -> None:
     ds = Dataset.create_empty(dest_dir, metadata=convert_snapshot_metadata(snap.metadata))
     ds.metadata.version = MEADOW_VERSION
 
-    # # create table with metadata from dataframe and underscore all columns
-    # tb = Table(df, short_name=snap.metadata.short_name, underscore=True)
+    # # create table with metadata from dataframe
 
     table_metadata = TableMeta(
         short_name=snap.metadata.short_name,
@@ -47,7 +46,6 @@ def run(dest_dir: str) -> None:
     ds.add(tb)
 
     # update metadata
-    # ds.update_metadata(N.metadata_path)
 
     ds.metadata.update_from_yaml(N.metadata_path, if_source_exists="replace")
     tb.update_metadata_from_yaml(N.metadata_path, "multidimensional_poverty_index")

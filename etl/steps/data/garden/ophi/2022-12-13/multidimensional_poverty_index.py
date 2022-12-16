@@ -72,18 +72,11 @@ def run(dest_dir: str) -> None:
     df = harmonize_countries(df)
 
     # create new dataset with the same metadata as meadow
-    # ds_garden = Dataset.create_empty(dest_dir, metadata=ds_meadow.metadata)
     ds_garden = Dataset.create_empty(dest_dir)
 
-    # create new table with the same metadata as meadow and add it to dataset
-    # tb_garden = Table(df, like=tb_meadow)
     tb_garden = Table(df)
 
     # update metadata from yaml file
-    # ds_garden.update_metadata(N.metadata_path)
-
-    # The previous code fails: AttributeError: 'Dataset' object has no attribute 'update_metadata'
-    # so I use older functions
     ds_garden.metadata.update_from_yaml(N.metadata_path)
     tb_garden.update_metadata_from_yaml(N.metadata_path, "multidimensional_poverty_index")
 
