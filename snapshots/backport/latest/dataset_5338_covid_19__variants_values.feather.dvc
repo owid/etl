@@ -1,5 +1,5 @@
 meta:
-  date_accessed: 2022-12-15 00:01:52.717989
+  date_accessed: 2022-12-16 00:01:21.565912
   description: ''
   file_extension: feather
   is_public: false
@@ -12,6 +12,6 @@ meta:
   version: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 7e94944b78b86f8b38387ac87453f76e
-  size: 229706
+- md5: 9e8b7399a9daab04024350d68c073da4
+  size: 229834
   path: dataset_5338_covid_19__variants_values.feather
