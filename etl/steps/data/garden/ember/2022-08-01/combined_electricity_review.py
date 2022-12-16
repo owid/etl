@@ -5,6 +5,7 @@
 import pandas as pd
 from owid import catalog
 from owid.datautils import dataframes
+from etl.steps.typed_dag import TypedDag
 from shared import CURRENT_DIR
 
 from etl.paths import DATA_DIR
@@ -313,13 +314,23 @@ def create_net_flows_table(ds_european: catalog.Dataset) -> catalog.Table:
     return net_flows
 
 
-def run(dest_dir: str) -> None:
+# This function demonstrates how to use the typed dag to load datsets. You need to spell out the path
+# of the step this function is in once (the first line in the function) to get the dependencies for this stop.
+# From there, you now get autocomplete on the keys of the TypedDict that is returned. The loader function is
+# then called imemdiately to load teh dataset and operate on it.
+# If you would try to load a dataset that is not specified in the dag as a dependency, you would get a type
+# error here.
+def run(dest_dir: str, deps: TypedDag) -> None:
+    # from the big typed dict, get the dependencies for the current step
+    upstream_dataset_loaders = deps['garden/ember/2022-08-01/combined_electricity_review']
+
     #
     # Load data.
     #
     # Read global and european electricity datasets from garden.
-    ds_global = catalog.Dataset(GLOBAL_DATASET_PATH)
-    ds_european = catalog.Dataset(EUROPEAN_DATASET_PATH)
+    # Note the autocomplete after you type [
+    ds_global = upstream_dataset_loaders['garden/ember/2022-08-01/global_electricity_review']()
+    ds_european = upstream_dataset_loaders['garden/ember/2022-08-01/european_electricity_review']()
 
     #
     # Process data.
