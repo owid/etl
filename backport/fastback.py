@@ -9,7 +9,6 @@ from typing import cast
 import click
 import pandas as pd
 import structlog
-from owid.walden import CATALOG as WALDEN_CATALOG
 from sqlalchemy.engine import Engine
 
 from etl import config
@@ -17,6 +16,7 @@ from etl.command import main as etl
 from etl.db import get_engine
 from etl.publish import publish
 from etl.reindex import reindex
+from etl.snapshot import Snapshot
 
 from .backport import backport
 
@@ -76,12 +76,8 @@ def fastback(
         # use latest timestamp of processed datasets as start for next batch
         dt_start = df.latest_timestamp.max().to_pydatetime()
 
-        # run backport to walden
-        _backport_datasets_to_walden(df, dry_run=dry_run, force=force)
-
-        # refresh local walden catalog manually
-        log.info("fastback.refresh_local_walden", dt_start=dt_start)
-        WALDEN_CATALOG.refresh()
+        # run backport to snapshot
+        _backport_datasets_to_snapshot(df, dry_run=dry_run, force=force)
 
         # run ETL
         log.info("fastback.etl", dt_start=dt_start)
@@ -126,13 +122,11 @@ def _updated_datasets(engine: Engine, start: dt.datetime, batch_size: int) -> pd
     )
 
 
-def _backport_datasets_to_walden(df: pd.DataFrame, dry_run: bool, force: bool) -> None:
-    """Add datasets to local walden if missing or checksums are out of date; on prod, a cron job will commit."""
-    # NOTE: we are not commiting changes to walden repo, this could be problematic
-    # if the other processes are trying to rebase the repo
-    # NOTE: we are not uploading files to walden S3 bucket and hence leaving owid_data_url attribute empty, these
+def _backport_datasets_to_snapshot(df: pd.DataFrame, dry_run: bool, force: bool) -> None:
+    """Add datasets to local snapshot if missing or checksums are out of date; on prod, a cron job will commit."""
+    # NOTE: we are not uploading files to snapshot S3 bucket and hence leaving owid_data_url attribute empty, these
     # files will be uploaded during periodic backport run
-    log.info("backport_dataset_to_walden.start")
+    log.info("backport_dataset_to_snapshot.start")
     with concurrent.futures.ThreadPoolExecutor() as executor:
         executor.map(
             lambda r: backport(
@@ -143,7 +137,7 @@ def _backport_datasets_to_walden(df: pd.DataFrame, dry_run: bool, force: bool) -
             ),
             df.itertuples(),
         )
-    log.info("backport_dataset_to_walden.end")
+    log.info("backport_dataset_to_snapshot.end")
 
 
 if __name__ == "__main__":

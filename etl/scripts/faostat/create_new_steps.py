@@ -16,10 +16,10 @@ from typing import Dict, List, Optional, Set, Tuple, cast
 
 import pandas as pd
 import structlog
-from owid.walden import Catalog
 
 from etl.files import checksum_file
 from etl.paths import BASE_DIR, STEP_DIR
+from etl.snapshot import Snapshot, snapshot_catalog
 from etl.steps import load_dag
 
 # Initialise log.
@@ -81,8 +81,8 @@ def get_channel_from_dag_line(dag_line: str) -> str:
         channel = "garden"
     elif dag_line.startswith("data://meadow/"):
         channel = "meadow"
-    elif dag_line.startswith("walden://"):
-        channel = "walden"
+    elif dag_line.startswith("snapshot://"):
+        channel = "snapshot"
     elif dag_line.startswith("grapher://"):
         channel = "grapher"
     else:
@@ -137,7 +137,7 @@ def create_dag_line_name(channel: str, step_name: str, namespace: str = NAMESPAC
     """
     if channel in ["meadow", "garden"]:
         dag_line = f"data://{channel}/{namespace}/{version}/{step_name}"
-    elif channel in ["walden", "grapher"]:
+    elif channel in ["snapshot", "grapher"]:
         dag_line = f"{channel}://{namespace}/{version}/{step_name}"
     else:
         raise ValueError("wrong channel name")
@@ -211,17 +211,16 @@ def list_updated_steps(channel: str, namespace: str = NAMESPACE) -> List[str]:
 
     """
     # Find latest walden folder.
-    all_walden_datasets = Catalog().find(namespace=namespace)
-    latest_walden_version = sorted([walden_ds.version for walden_ds in all_walden_datasets])[-1]
+
+    all_snapshots = snapshot_catalog(namespace)
+    latest_snapshot_version = sorted([snap.metadata.version for snap in all_snapshots])[-1]
 
     # Find latest version in current channel for the considered namespace.
     latest_version_in_channel = find_latest_version_for_namespace_in_channel(channel=channel)
 
-    if latest_walden_version > latest_version_in_channel:
+    if latest_snapshot_version > latest_version_in_channel:
         # Now find what steps have the latest version in walden.
-        step_names = [
-            walden_ds.short_name for walden_ds in all_walden_datasets if walden_ds.version == latest_walden_version
-        ]
+        step_names = [snap.metadata.short_name for snap in all_snapshots if snap.version == latest_snapshot_version]
     else:
         # There is already a version for this namespace and channel that is posterior to the latest additions to walden.
         step_names = []
@@ -242,9 +241,9 @@ def list_all_steps() -> List[str]:
 
     """
     # Load walden dataset.
-    walden_ds = Catalog().find_latest(namespace=NAMESPACE, short_name=ADDITIONAL_METADATA_FILE_NAME)
+    snap = Catalog().find_latest(namespace=NAMESPACE, short_name=ADDITIONAL_METADATA_FILE_NAME)
     # List all domains.
-    domains = pd.read_json(walden_ds.ensure_downloaded()).columns.tolist()
+    domains = pd.read_json(snap.path).columns.tolist()
     step_names = [f"{NAMESPACE}_{domain}" for domain in domains]
     # Add metadata step to the list.
     step_names += [ADDITIONAL_METADATA_FILE_NAME]

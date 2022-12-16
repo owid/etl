@@ -191,10 +191,10 @@ python vendor/walden/ingests/{form.namespace}/{form.version}/{form.short_name}.p
 If you have uploaded your dataset to Walden, you can get it from Walden catalog with the following snippet (to be used in meadow phase).
 
 ```python
-from owid.walden import Catalog as WaldenCatalog
+from etl.snapshot import Snapshot
 
-walden_ds = WaldenCatalog().find_one(namespace="{form.namespace}", short_name="{form.short_name}", version="{form.version}")
-local_file = walden_ds.ensure_downloaded()
+snap = Snapshot(f"{}/{}/{}.csv")="{form.namespace}", short_name="{form.short_name}", version="{form.version}")
+local_file = str(snap.path)
 df = pd.read_csv(local_file)
 ```
 

@@ -4,10 +4,10 @@ import pandas as pd
 import pyarrow.compute as pc
 from owid.catalog import Dataset, Table, TableMeta
 from owid.catalog.utils import underscore_table
-from owid.walden import Catalog as WaldenCatalog
 from pyarrow import feather
 
-from etl.steps.data.converters import convert_walden_metadata
+from etl.snapshot import Snapshot
+from etl.steps.data.converters import convert_snapshot_metadata
 
 
 def clean_data(df: pd.DataFrame) -> pd.DataFrame:
@@ -56,14 +56,14 @@ def read_and_clean_data(local_file: str) -> pd.DataFrame:
 
 def run_wrapper(dataset: str, metadata_path: str, namespace: str, version: str, dest_dir: str) -> None:
     # retrieve raw data from walden
-    walden_ds = WaldenCatalog().find_one(namespace=namespace, short_name=dataset, version=version)
-    local_file = walden_ds.ensure_downloaded()
+    snap = Snapshot(f"{NAMESPACE}/{version}/{dataset}.csv")
+    local_file = str(snap.path)
 
-    df = read_and_clean_data(local_file)
+    df = read_and_clean_data(str(local_file))
 
     # create new dataset and reuse walden metadata
     ds = Dataset.create_empty(dest_dir)
-    ds.metadata = convert_walden_metadata(walden_ds)
+    ds.metadata = convert_snapshot_metadata(snap.metadata)
     ds.metadata.version = "2019"
     ds.metadata.title = ds.metadata.title + " - " + ds.metadata.description
 
@@ -71,7 +71,7 @@ def run_wrapper(dataset: str, metadata_path: str, namespace: str, version: str, 
     table_metadata = TableMeta(
         short_name=ds.metadata.short_name,
         title=ds.metadata.title,
-        description=walden_ds.description,
+        description=snap.metadata.description,
     )
     tb = Table(df, metadata=table_metadata)
 

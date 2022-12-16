@@ -8,9 +8,9 @@ Bunker emissions (which should be the same in both tables) is included as a sepa
 import pandas as pd
 from owid.catalog import Dataset, Table, TableMeta
 from owid.catalog.utils import underscore_table
-from owid.walden import Catalog as WaldenCatalog
 
-from etl.steps.data.converters import convert_walden_metadata
+from etl.snapshot import Snapshot
+from etl.steps.data.converters import convert_snapshot_metadata
 
 # Conversion factor to change from million tonnes of carbon to tonnes of CO2.
 MILLION_TONNES_OF_CARBON_TO_TONNES_OF_CO2 = 3.664 * 1e6
@@ -72,20 +72,16 @@ def run(dest_dir: str) -> None:
     # Load data.
     #
     # Load national data file from walden.
-    national_ds = WaldenCatalog().find_one(namespace="gcp", short_name=WALDEN_DATASET_NAME, version=WALDEN_VERSION)
+    national_ds = Snapshot(f"gcp/{WALDEN_VERSION}/{WALDEN_DATASET_NAME}.csv")
     # Load production-based emissions from the national data file.
-    production_emissions_df = pd.read_excel(
-        national_ds.ensure_downloaded(), sheet_name="Territorial Emissions", skiprows=11
-    )
+    production_emissions_df = pd.read_excel(national_ds.path, sheet_name="Territorial Emissions", skiprows=11)
 
     # Sanity check.
     error = "'Territorial Emissions' sheet in national data file has changed (consider changing 'skiprows')."
     assert production_emissions_df.columns[1] == "Afghanistan", error
 
     # Load consumption-based emissions from the national data file.
-    consumption_emissions_df = pd.read_excel(
-        national_ds.ensure_downloaded(), sheet_name="Consumption Emissions", skiprows=8
-    )
+    consumption_emissions_df = pd.read_excel(national_ds.path, sheet_name="Consumption Emissions", skiprows=8)
 
     # Sanity check.
     error = "'Consumption Emissions' sheet in national data file has changed (consider changing 'skiprows')."
@@ -105,7 +101,7 @@ def run(dest_dir: str) -> None:
     #
     # Create new dataset and reuse walden metadata (from any of the raw files).
     ds = Dataset.create_empty(dest_dir)
-    ds.metadata = convert_walden_metadata(national_ds)
+    ds.metadata = convert_snapshot_metadata(national_ds.metadata)
     ds.metadata.version = MEADOW_VERSION
     # Create tables with metadata.
     consumption_emissions_tb = Table(

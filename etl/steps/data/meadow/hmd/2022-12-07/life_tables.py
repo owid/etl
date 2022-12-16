@@ -178,7 +178,7 @@ def create_and_add_tables_to_dataset(local_file: Path, ds: Dataset) -> Dataset:
     """Create and add tables to dataset.
 
     This method creates tables for all the folders found once `local_file` is uncompressed. Then,
-    it cleans and adds them to the dataset `ds`. It uses the metadata from `walden_ds` to create the tables.
+    it cleans and adds them to the dataset `ds`. It uses the metadata from `snap` to create the tables.
 
     Parameters
     ----------
@@ -236,7 +236,7 @@ def _sanity_check_files(path: str, files_expected: List[str]) -> None:
 def make_table(input_folder: str, folder: dict) -> catalog.Table:
     """Create table.
 
-    Loads data from `input_folder` and creates a table with the name `table_name`. It uses the metadata from `walden_ds`.
+    Loads data from `input_folder` and creates a table with the name `table_name`. It uses the metadata from `snap`.
 
     Parameters
     ----------

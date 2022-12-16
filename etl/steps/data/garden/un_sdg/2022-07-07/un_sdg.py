@@ -6,10 +6,10 @@ import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
 from owid.catalog.utils import underscore
-from owid.walden import Catalog
 from structlog import get_logger
 
 from etl.paths import DATA_DIR
+from etl.snapshot import Snapshot
 
 COUNTRY_MAPPING_PATH = Path(__file__).parent / "un_sdg.country_mapping.json"
 
@@ -289,16 +289,16 @@ def manual_clean_data(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def get_attributes_description() -> Any:
-    walden_ds = Catalog().find_one(namespace=NAMESPACE, short_name="unit", version=VERSION)
-    local_file = walden_ds.ensure_downloaded()
+    snap = Snapshot(f"{NAMESPACE}/{VERSION}/unit.json")
+    local_file = str(snap.path)
     with open(local_file) as json_file:
         units = json.load(json_file)
     return units
 
 
 def get_dimension_description() -> dict[str, str]:
-    walden_ds = Catalog().find_one(namespace=NAMESPACE, short_name="dimension", version=VERSION)
-    local_file = walden_ds.ensure_downloaded()
+    snap = Snapshot(f"{NAMESPACE}/{VERSION}/dimension.json")
+    local_file = str(snap.path)
     with open(local_file) as json_file:
         dims: dict[str, str] = json.load(json_file)
     # underscore to match the df column names

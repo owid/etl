@@ -3,16 +3,16 @@
 # +
 import pandas as pd
 from owid.catalog import Dataset, Table
-from owid.walden import Catalog as WaldenCatalog
 
-from etl.steps.data.converters import convert_walden_metadata
+from etl.snapshot import Snapshot
+from etl.steps.data.converters import convert_snapshot_metadata
 
 # -
 
 # ## Load the data
 
-walden_ds = WaldenCatalog().find_one("oecd", "2016-06-01", "regional_wellbeing")
-df = pd.read_csv(walden_ds.local_path)
+snap = Snapshot("oecd", "2016-06-01", "regional_wellbeing")
+df = pd.read_csv(snap.local_path)
 
 # ## Drop useless columns
 
@@ -117,7 +117,7 @@ for col in t.columns:
 
 
 def run(dest_dir: str) -> None:
-    ds_meta = convert_walden_metadata(walden_ds)
+    ds_meta = convert_snapshot_metadata(snap.metadata)
     ds = Dataset.create_empty(dest_dir, ds_meta)
     ds.add(t)
     ds.add(regions)

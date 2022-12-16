@@ -1,0 +1,24 @@
+meta:
+  namespace: cait
+  short_name: cait_ghg_emissions
+  name: Greenhouse gas emissions by country and sector (CAIT, 2021)
+  description: Total greenhouse gas emissions are measured in tonnes of carbon dioxide
+    equivalents (CO₂e), based on 100-year global warming potential factors for non-CO₂
+    gases. This data is published by country and sector from the CAIT Climate Data
+    Explorer, and downloaded from the Climate Watch Portal.
+  source_name: Climate Analysis Indicators Tool
+  url: https://www.climatewatchdata.org/api/v1/data/historical_emissions/
+  file_extension: json.gz
+  date_accessed: '2022-02-24'
+  license_url: https://www.climatewatchdata.org/about/permissions
+  license_name: Creative Commons CC BY 4.0
+  access_notes: Fetched via API using https://github.com/owid/walden/blob/master/ingests/cait_ghg_emissions.py
+  is_public: true
+  version: '2021-03-11'
+  publication_year: 2021
+  publication_date: '2021-03-11'
+wdir: ../../../data/snapshots/cait/2021-03-11
+outs:
+- md5: 373b73785928e87b092be704ce5972ee
+  size: 3550830
+  path: cait_ghg_emissions.json.gz

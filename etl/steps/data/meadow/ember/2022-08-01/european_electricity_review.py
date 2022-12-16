@@ -9,10 +9,11 @@ from zipfile import ZipFile
 
 import pandas as pd
 from owid import catalog
-from owid.walden import Catalog as WaldenCatalog
 from shared import VERSION, log
 
-from etl.steps.data.converters import convert_walden_metadata
+from etl.snapshot import Snapshot
+from etl.snapshot import Snapshot
+from etl.steps.data.converters import convert_snapshot_metadata
 
 # Details of dataset to export.
 NAMESPACE = "ember"
@@ -72,8 +73,8 @@ def run(dest_dir: str) -> None:
     log.info(f"{DATASET_SHORT_NAME}.start")
 
     # Retrieve raw data from walden.
-    walden_ds = WaldenCatalog().find_one(namespace=NAMESPACE, short_name=DATASET_SHORT_NAME, version=WALDEN_VERSION)
-    local_file = walden_ds.ensure_downloaded()
+    snap = Snapshot(f"{NAMESPACE}/{}/{}"), short_name=DATASET_SHORT_NAME, version=WALDEN_VERSION)
+    local_file = str(snap.path)
 
     # Original zip file contains various csv files.
     # Create a dictionary that contains all dataframes.
@@ -84,7 +85,7 @@ def run(dest_dir: str) -> None:
 
     # Create new dataset, reuse walden metadata, and update metadata.
     ds = catalog.Dataset.create_empty(dest_dir)
-    ds.metadata = convert_walden_metadata(walden_ds)
+    ds.metadata = convert_snapshot_metadata(snap.metadata)
     ds.metadata.version = VERSION
     ds.save()
 
@@ -93,7 +94,7 @@ def run(dest_dir: str) -> None:
         table = tables[table_name]
         table.metadata.short_name = catalog.utils.underscore(table_name)
         table.metadata.title = table_name
-        table.metadata.description = walden_ds.description
+        table.metadata.description = snap.metadata.description
         # Underscore all table columns.
         table = catalog.utils.underscore_table(table)
         # Add table to dataset.

@@ -14,10 +14,10 @@ This project is the spiritual successor to [importers](https://github.com/owid/i
 ```mermaid
 graph TB
 
-upstream[Upstream data providers] -->|snapshot| walden[Walden snapshot]
+upstream[Upstream data providers] -->|snapshot| Snapshot
 upstream -->|publish| github
 github[Datasets on Github] --> etl:::focus
-walden --> etl(ETL steps)
+Snapshot --> etl(ETL steps)
 etl -->|generate| catalog[Data catalog]
 catalog -->|ingested| mysql
 catalog -->|renders| explorers
@@ -41,7 +41,7 @@ You need to install the following:
 - MYSQL client (and Python dev headers). If you don't have this already,
   - On Ubuntu: `sudo apt install python3.9-dev mysql-client default-libmysqlclient-dev build-essential`
   - On Mac: `brew install mysql-client`
-- [AWS CLI](https://aws.amazon.com/cli/) (`pip install awscli`) and you should have an `~/.aws/config` file configured (ask someone for credentials) so that you can upload to walden etc.
+- [AWS CLI](https://aws.amazon.com/cli/) (`pip install awscli`) and you should have an `~/.aws/config` file configured (ask someone for credentials) so that you can upload snapshots to S3 etc.
 
 WSL users need to set up Linux executables only by including/editing the `/etc/wsl.conf` file.
 - Run `sudo vi /etc/wsl.conf`, copy this:

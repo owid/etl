@@ -4,10 +4,10 @@ from pathlib import Path
 import pandas as pd
 from owid.catalog import Dataset, Table, TableMeta
 from owid.catalog.utils import underscore
-from owid.walden import Catalog
 from structlog import get_logger
 
-from etl.steps.data.converters import convert_walden_metadata
+from etl.snapshot import Snapshot
+from etl.steps.data.converters import convert_snapshot_metadata
 
 BASE_URL = "https://unstats.un.org/sdgapi"
 log = get_logger()
@@ -19,10 +19,10 @@ def run(dest_dir: str, query: str = "") -> None:
     fname = Path(__file__).stem
     namespace = Path(__file__).parent.parent.stem
 
-    walden_ds = Catalog().find_one(namespace=namespace, short_name=fname, version=version)
+    snap = Snapshot(f"{namespace}/{fname}/{version}")
 
     log.info("un_sdg.start")
-    local_file = walden_ds.ensure_downloaded()
+    local_file = str(snap.path)
     df = pd.read_feather(local_file)
 
     if query:
@@ -35,12 +35,12 @@ def run(dest_dir: str, query: str = "") -> None:
     df = df.reset_index()
     ds = Dataset.create_empty(dest_dir)
 
-    ds.metadata = convert_walden_metadata(walden_ds)
+    ds.metadata = convert_snapshot_metadata(snap.metadata)
     tb = Table(df)
     tb.metadata = TableMeta(
         short_name=Path(__file__).stem,
-        title=walden_ds.name,
-        description=walden_ds.description,
+        title=snap.metadata.name,
+        description=snap.metadata.description,
     )
     ds.add(tb)
     ds.save()

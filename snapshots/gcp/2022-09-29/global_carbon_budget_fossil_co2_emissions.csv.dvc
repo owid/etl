@@ -1,0 +1,22 @@
+meta:
+  namespace: gcp
+  short_name: global_carbon_budget_fossil_co2_emissions
+  name: Global Carbon Budget - Fossil CO2 emissions dataset
+  description: Fossil CO2 emissions dataset (long csv file), containing global and
+    national data on fossil fuel CO2 emissions from 1750 until today.
+  source_name: Global Carbon Project
+  url: https://www.globalcarbonproject.org/carbonbudget/index.htm
+  file_extension: csv
+  date_accessed: '2022-09-29'
+  source_data_url: https://zenodo.org/record/5569235/files/GCB2021v34_MtCO2_flat.csv
+  license_url: https://www.icos-cp.eu/data-services/about-data-portal/data-license
+  license_name: CC BY 4.0
+  is_public: true
+  version: '2022-09-29'
+  publication_year: 2022
+  publication_date: '2022-04-26'
+wdir: ../../../data/snapshots/gcp/2022-09-29
+outs:
+- md5: d09d913402633d3c6cd2163d7c74b7ae
+  size: 2937345
+  path: global_carbon_budget_fossil_co2_emissions.csv

@@ -10,8 +10,6 @@ from typing import Any, Iterator, List, cast
 
 import requests
 from owid import catalog
-from owid.walden import Catalog as WaldenCatalog
-from owid.walden import Dataset as WaldenDataset
 
 from etl import paths
 
@@ -110,10 +108,6 @@ class Names:
     @property
     def garden_dataset(self) -> catalog.Dataset:
         return catalog.Dataset(paths.DATA_DIR / f"garden/{self.namespace}/{self.version}/{self.short_name}")
-
-    @property
-    def walden_dataset(self) -> WaldenDataset:
-        return WaldenCatalog().find_one(namespace=self.namespace, version=self.version, short_name=self.short_name)
 
     @property
     def snapshot_dir(self) -> Path:

@@ -15,11 +15,12 @@ import pandas as pd
 import PyPDF2
 from owid.catalog import Dataset, Table, TableMeta
 from owid.catalog.utils import underscore_table
-from owid.walden import Catalog as WaldenCatalog
 from structlog import get_logger
 
 from etl.helpers import Names
-from etl.steps.data.converters import convert_walden_metadata
+from etl.snapshot import Snapshot
+from etl.snapshot import Snapshot
+from etl.steps.data.converters import convert_snapshot_metadata
 
 log = get_logger()
 
@@ -42,8 +43,8 @@ def run(dest_dir: str) -> None:
     log.info(f"{SHORT_NAME}.start")
 
     # retrieve raw data from walden
-    walden_ds = WaldenCatalog().find_one(namespace=NAMESPACE, short_name=SHORT_NAME, version=VERSION_WALDEN)
-    local_file = walden_ds.ensure_downloaded()
+    snap = Snapshot(f"{NAMESPACE}/{}/{}"), short_name=SHORT_NAME, version=VERSION_WALDEN)
+    local_file = str(snap.path)
 
     # Load data
     check_expected_data(local_file)
@@ -52,10 +53,10 @@ def run(dest_dir: str) -> None:
     df = load_data()
 
     # Create table
-    tb = make_table(df, walden_ds)
+    tb = make_table(df, snap)
 
     # initialize meadow dataset
-    ds = init_meadow_dataset(dest_dir, walden_ds)
+    ds = init_meadow_dataset(dest_dir, snap)
     # add table to a dataset
     ds.add(tb)
     # finally save the dataset
@@ -88,18 +89,18 @@ def load_data() -> pd.DataFrame:
     return df
 
 
-def init_meadow_dataset(dest_dir: str, walden_ds: WaldenCatalog) -> Dataset:
+def init_meadow_dataset(dest_dir: str, snap: Snapshot) -> Dataset:
     """Initialize meadow dataset."""
     ds = Dataset.create_empty(dest_dir)
-    ds.metadata = convert_walden_metadata(walden_ds)
+    ds.metadata = convert_snapshot_metadata(snap.metadata)
     ds.metadata.version = VERSION_MEADOW
     return ds
 
 
-def make_table(df: pd.DataFrame, walden_ds: WaldenCatalog) -> Table:
+def make_table(df: pd.DataFrame, snap: Snapshot) -> Table:
     """Create table from dataframe and Walden metadata."""
     table_metadata = TableMeta(
-        short_name=walden_ds.short_name,
+        short_name=snap.metadata.short_name,
         title="Life expectancy at birth",
         description="Life expectancy at birth estimates.",
     )

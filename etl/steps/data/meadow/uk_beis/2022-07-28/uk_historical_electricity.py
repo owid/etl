@@ -3,10 +3,10 @@ from typing import Dict, List
 import pandas as pd
 from owid.catalog import Dataset, Table, TableMeta
 from owid.catalog.utils import underscore_table
-from owid.walden import Catalog as WaldenCatalog
 
 from etl.helpers import Names
-from etl.steps.data.converters import convert_walden_metadata
+from etl.snapshot import Snapshot
+from etl.steps.data.converters import convert_snapshot_metadata
 
 # Naming conventions.
 N = Names(__file__)
@@ -64,10 +64,8 @@ def run(dest_dir: str) -> None:
     # Load data.
     #
     # Retrieve raw data from walden.
-    walden_ds = WaldenCatalog().find_one(
-        namespace="uk_beis", short_name="uk_historical_electricity", version="2022-07-28"
-    )
-    local_file = walden_ds.ensure_downloaded()
+    snap = Snapshot(f"uk_beis/2022-07-28/uk_historical_electricity.csv")
+    local_file = str(snap.path)
 
     # Load data from the two relevant sheets of the excel file.
     # The original excel file is poorly formatted and will be hard to parse automatically.
@@ -135,7 +133,7 @@ def run(dest_dir: str) -> None:
     #
     # Create new dataset and reuse walden metadata.
     ds = Dataset.create_empty(dest_dir)
-    ds.metadata = convert_walden_metadata(walden_ds)
+    ds.metadata = convert_snapshot_metadata(snap.metadata)
     ds.metadata.version = "2022-07-28"
 
     # Create tables using metadata from walden.
@@ -144,7 +142,7 @@ def run(dest_dir: str) -> None:
         metadata=TableMeta(
             short_name="fuel_input",
             title="Fuel input for electricity generation",
-            description=walden_ds.description,
+            description=snap.metadata.description,
         ),
     )
     tb_supply = Table(
@@ -152,7 +150,7 @@ def run(dest_dir: str) -> None:
         metadata=TableMeta(
             short_name="supply",
             title="Electricity supply, availability and consumption",
-            description=walden_ds.description,
+            description=snap.metadata.description,
         ),
     )
     tb_efficiency = Table(
@@ -160,7 +158,7 @@ def run(dest_dir: str) -> None:
         metadata=TableMeta(
             short_name="efficiency",
             title="Electricity generated and supplied",
-            description=walden_ds.description,
+            description=snap.metadata.description,
         ),
     )
 

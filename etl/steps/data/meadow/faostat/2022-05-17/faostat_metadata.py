@@ -12,10 +12,10 @@ from typing import Any, Dict
 
 import pandas as pd
 from owid.catalog import Dataset, Table, utils
-from owid.walden import Catalog
 from shared import LATEST_VERSIONS_FILE, NAMESPACE
 
-from etl.steps.data.converters import convert_walden_metadata
+from etl.snapshot import Snapshot
+from etl.steps.data.converters import convert_snapshot_metadata
 
 # Name for new meadow dataset.
 DATASET_SHORT_NAME = f"{NAMESPACE}_metadata"
@@ -113,14 +113,8 @@ def run(dest_dir: str) -> None:
 
     # Load FAOSTAT (additional) metadata dataset from walden.
     walden_latest_version = latest_versions.loc["walden", DATASET_SHORT_NAME].item()
-    walden_ds = Catalog().find_one(
-        namespace=NAMESPACE,
-        version=walden_latest_version,
-        short_name=DATASET_SHORT_NAME,
-    )
-
-    local_file = walden_ds.ensure_downloaded()
-    with open(local_file) as _local_file:
+    snap = Snapshot(f"{NAMESPACE}/{walden_latest_version}/{DATASET_SHORT_NAME}.json")
+    with open(snap.path) as _local_file:
         additional_metadata = json.load(_local_file)
 
     # Check that metadata content is consistent with category_structure (defined above).
@@ -128,7 +122,7 @@ def run(dest_dir: str) -> None:
 
     # Create new meadow dataset, importing its metadata from walden.
     ds = Dataset.create_empty(dest_dir)
-    ds.metadata = convert_walden_metadata(walden_ds)
+    ds.metadata = convert_snapshot_metadata(snap.metadata)
     ds.metadata.short_name = DATASET_SHORT_NAME
     ds.save()
     # Create a new table within the dataset for each domain-record (e.g. 'faostat_qcl_item').

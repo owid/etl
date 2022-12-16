@@ -10,10 +10,10 @@ from pathlib import Path
 import pandas as pd
 import structlog
 from owid.catalog import Dataset, Table, utils
-from owid.walden import Catalog
 
 from etl.paths import STEP_DIR
-from etl.steps.data.converters import convert_walden_metadata
+from etl.snapshot import Snapshot
+from etl.steps.data.converters import convert_snapshot_metadata
 
 # Initialise log.
 log = structlog.get_logger()
@@ -145,10 +145,10 @@ def run(dest_dir: str) -> None:
 
     # Fetch latest walden dataset.
     walden_version = latest_versions.loc["walden", dataset_short_name].item()
-    walden_ds = Catalog().find_one(namespace=NAMESPACE, version=walden_version, short_name=dataset_short_name)
+    snap = Snapshot(f"{NAMESPACE}/{walden_version}/{dataset_short_name}.zip")
 
     # Load and prepare data.
-    data = load_data(walden_ds.local_path)
+    data = load_data(str(snap.path))
 
     # Run sanity checks.
     run_sanity_checks(data=data)
@@ -162,7 +162,7 @@ def run(dest_dir: str) -> None:
 
     # Initialise meadow dataset.
     ds = Dataset.create_empty(dest_dir)
-    ds.metadata = convert_walden_metadata(walden_ds)
+    ds.metadata = convert_snapshot_metadata(snap.metadata)
     ds.metadata.short_name = dataset_short_name
     ds.save()
 

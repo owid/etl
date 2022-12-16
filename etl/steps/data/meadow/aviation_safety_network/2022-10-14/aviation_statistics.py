@@ -5,9 +5,9 @@ Network.
 
 import pandas as pd
 from owid.catalog import Dataset, Table, TableMeta
-from owid.walden import Catalog as WaldenCatalog
 
-from etl.steps.data.converters import convert_walden_metadata
+from etl.snapshot import Snapshot
+from etl.steps.data.converters import convert_snapshot_metadata
 
 NAMESPACE = "aviation_safety_network"
 # Details for input datasets.
@@ -24,9 +24,8 @@ def run(dest_dir: str) -> None:
     # Load data.
     #
     # Get data (statistics by period and by nature) from Walden.
-    walden_ds = WaldenCatalog().find_one(namespace=NAMESPACE, short_name=WALDEN_DATASET_NAME, version=WALDEN_VERSION)
-    local_file = walden_ds.ensure_downloaded()
-    df = pd.read_csv(local_file).rename(columns={"year": "year"})
+    snap = Snapshot(f"{NAMESPACE}/{WALDEN_VERSION}/{WALDEN_DATASET_NAME}.csv")
+    df = pd.read_csv(snap.path).rename(columns={"year": "year"})
 
     #
     # Process data.
@@ -41,12 +40,12 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new dataset and reuse Walden metadata.
-    ds = Dataset.create_empty(dest_dir, metadata=convert_walden_metadata(walden_ds))
+    ds = Dataset.create_empty(dest_dir, metadata=convert_snapshot_metadata(snap.metadata))
     ds.metadata.version = MEADOW_VERSION
 
     # Create a table with metadata.
     table_metadata = TableMeta(
-        short_name=MEADOW_DATASET_NAME, title=MEADOW_DATASET_TITLE, description=walden_ds.description
+        short_name=MEADOW_DATASET_NAME, title=MEADOW_DATASET_TITLE, description=snap.metadata.description
     )
     # Ensure all columns are snake-case and underscore.
     tb = Table(df, metadata=table_metadata, underscore=True)

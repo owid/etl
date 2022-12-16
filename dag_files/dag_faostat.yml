@@ -3,13 +3,13 @@ steps:
   # FAOSTAT meadow steps for previous versions
   #
   data://meadow/faostat/2022-02-10/faostat_metadata:
-    - walden://faostat/2022-02-10/faostat_metadata
+    - snapshot://faostat/2022-02-10/faostat_metadata.zip
   data://meadow/faostat/2017-12-11/faostat_fbsh:
-    - walden://faostat/2017-12-11/faostat_FBSH
+    - snapshot://faostat/2017-12-11/faostat_FBSH.zip
   data://meadow/faostat/2021-03-18/faostat_qcl:
-    - walden://faostat/2021-03-18/faostat_QCL
+    - snapshot://faostat/2021-03-18/faostat_QCL.zip
   data://meadow/faostat/2021-04-09/faostat_fbs:
-    - walden://faostat/2021-04-09/faostat_FBS
+    - snapshot://faostat/2021-04-09/faostat_FBS.zip
   #
   # FAOSTAT garden steps for previous versions
   #
@@ -29,58 +29,58 @@ steps:
   # FAOSTAT meadow steps for version 2022-05-17
   #
   data://meadow/faostat/2022-05-17/faostat_ef:
-    - walden://faostat/2022-05-17/faostat_ef
+    - snapshot://faostat/2022-05-17/faostat_ef.zip
   data://meadow/faostat/2022-05-17/faostat_ei:
-    - walden://faostat/2022-05-17/faostat_ei
+    - snapshot://faostat/2022-05-17/faostat_ei.zip
   data://meadow/faostat/2022-05-17/faostat_ek:
-    - walden://faostat/2022-05-17/faostat_ek
+    - snapshot://faostat/2022-05-17/faostat_ek.zip
   data://meadow/faostat/2022-05-17/faostat_el:
-    - walden://faostat/2022-05-17/faostat_el
+    - snapshot://faostat/2022-05-17/faostat_el.zip
   data://meadow/faostat/2022-05-17/faostat_emn:
-    - walden://faostat/2022-05-17/faostat_emn
+    - snapshot://faostat/2022-05-17/faostat_emn.zip
   data://meadow/faostat/2022-05-17/faostat_ep:
-    - walden://faostat/2022-05-17/faostat_ep
+    - snapshot://faostat/2022-05-17/faostat_ep.zip
   data://meadow/faostat/2022-05-17/faostat_esb:
-    - walden://faostat/2022-05-17/faostat_esb
+    - snapshot://faostat/2022-05-17/faostat_esb.zip
   data://meadow/faostat/2022-05-17/faostat_fa:
-    - walden://faostat/2022-05-17/faostat_fa
+    - snapshot://faostat/2022-05-17/faostat_fa.zip
   data://meadow/faostat/2022-05-17/faostat_fbs:
-    - walden://faostat/2022-05-17/faostat_fbs
+    - snapshot://faostat/2022-05-17/faostat_fbs.zip
   data://meadow/faostat/2022-05-17/faostat_fbsh:
-    - walden://faostat/2022-05-17/faostat_fbsh
+    - snapshot://faostat/2022-05-17/faostat_fbsh.zip
   data://meadow/faostat/2022-05-17/faostat_fo:
-    - walden://faostat/2022-05-17/faostat_fo
+    - snapshot://faostat/2022-05-17/faostat_fo.zip
   data://meadow/faostat/2022-05-17/faostat_fs:
-    - walden://faostat/2022-05-17/faostat_fs
+    - snapshot://faostat/2022-05-17/faostat_fs.zip
   data://meadow/faostat/2022-05-17/faostat_lc:
-    - walden://faostat/2022-05-17/faostat_lc
+    - snapshot://faostat/2022-05-17/faostat_lc.zip
   data://meadow/faostat/2022-05-17/faostat_metadata:
-    - walden://faostat/2022-05-17/faostat_metadata
+    - snapshot://faostat/2022-05-17/faostat_metadata.zip
   data://meadow/faostat/2022-05-17/faostat_qcl:
-    - walden://faostat/2022-05-17/faostat_qcl
+    - snapshot://faostat/2022-05-17/faostat_qcl.zip
   data://meadow/faostat/2022-05-17/faostat_qi:
-    - walden://faostat/2022-05-17/faostat_qi
+    - snapshot://faostat/2022-05-17/faostat_qi.zip
   data://meadow/faostat/2022-05-17/faostat_qv:
-    - walden://faostat/2022-05-17/faostat_qv
+    - snapshot://faostat/2022-05-17/faostat_qv.zip
   data://meadow/faostat/2022-05-17/faostat_rfb:
-    - walden://faostat/2022-05-17/faostat_rfb
+    - snapshot://faostat/2022-05-17/faostat_rfb.zip
   data://meadow/faostat/2022-05-17/faostat_rfn:
-    - walden://faostat/2022-05-17/faostat_rfn
+    - snapshot://faostat/2022-05-17/faostat_rfn.zip
   data://meadow/faostat/2022-05-17/faostat_rl:
-    - walden://faostat/2022-05-17/faostat_rl
+    - snapshot://faostat/2022-05-17/faostat_rl.zip
   data://meadow/faostat/2022-05-17/faostat_rp:
-    - walden://faostat/2022-05-17/faostat_rp
+    - snapshot://faostat/2022-05-17/faostat_rp.zip
   data://meadow/faostat/2022-05-17/faostat_rt:
-    - walden://faostat/2022-05-17/faostat_rt
+    - snapshot://faostat/2022-05-17/faostat_rt.zip
   data://meadow/faostat/2022-05-17/faostat_scl:
     - data://meadow/faostat/2022-05-17/faostat_metadata
-    - walden://faostat/2022-05-17/faostat_scl
+    - snapshot://faostat/2022-05-17/faostat_scl.zip
   data://meadow/faostat/2022-05-17/faostat_sdgb:
-    - walden://faostat/2022-05-17/faostat_sdgb
+    - snapshot://faostat/2022-05-17/faostat_sdgb.zip
   data://meadow/faostat/2022-05-17/faostat_tcl:
-    - walden://faostat/2022-05-17/faostat_tcl
+    - snapshot://faostat/2022-05-17/faostat_tcl.zip
   data://meadow/faostat/2022-05-17/faostat_ti:
-    - walden://faostat/2022-05-17/faostat_ti
+    - snapshot://faostat/2022-05-17/faostat_ti.zip
   #
   # FAOSTAT garden steps for version 2022-05-17
   #

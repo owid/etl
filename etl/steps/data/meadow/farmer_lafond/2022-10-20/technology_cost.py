@@ -1,10 +1,10 @@
 import pandas as pd
 from owid.catalog import Dataset, Table, TableMeta
 from owid.catalog.utils import underscore_table
-from owid.walden import Catalog as WaldenCatalog
 
 from etl.helpers import Names
-from etl.steps.data.converters import convert_walden_metadata
+from etl.snapshot import Snapshot
+from etl.steps.data.converters import convert_snapshot_metadata
 
 # Walden dataset version.
 WALDEN_VERSION = "2022-10-20"
@@ -15,10 +15,8 @@ N = Names(__file__)
 
 def run(dest_dir: str) -> None:
     # Load raw data from Walden.
-    walden_ds = WaldenCatalog().find_one(
-        namespace="farmer_lafond", short_name="technology_cost", version=WALDEN_VERSION
-    )
-    local_file = walden_ds.ensure_downloaded()
+    snap = Snapshot(f"farmer_lafond/{WALDEN_VERSION}/technology_cost.csv")
+    local_file = str(snap.path)
     df = pd.read_csv(local_file)
 
     # Set an appropriate index and sort conveniently.
@@ -26,14 +24,14 @@ def run(dest_dir: str) -> None:
 
     # Create new dataset and reuse Walden metadata.
     ds = Dataset.create_empty(dest_dir)
-    ds.metadata = convert_walden_metadata(walden_ds)
+    ds.metadata = convert_snapshot_metadata(snap.metadata)
     ds.metadata.version = VERSION
 
     # Create new table with metadata from dataframe.
     table_metadata = TableMeta(
-        short_name=walden_ds.short_name,
-        title=walden_ds.name,
-        description=walden_ds.description,
+        short_name=snap.metadata.short_name,
+        title=snap.metadata.name,
+        description=snap.metadata.description,
     )
     tb = Table(df, metadata=table_metadata)
 

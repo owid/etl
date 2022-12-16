@@ -64,8 +64,3 @@ jobs:
         run: |
           cd vendor/owid-catalog-py
           make test
-
-      - name: walden tests
-        run: |
-          cd vendor/walden
-          make test

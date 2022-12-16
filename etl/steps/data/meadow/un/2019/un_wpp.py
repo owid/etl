@@ -18,8 +18,8 @@ from etl.steps.data import converters
 # ## Find walden file
 
 # %%
-walden_ds = walden.Catalog().find_one("wpp", "2019", "standard_projections")
-walden_ds
+snap = walden.Snapshot("wpp", "2019", "standard_projections")
+snap
 
 
 # %% [markdown]
@@ -28,7 +28,7 @@ walden_ds
 # %%
 temp_dir = tempfile.mkdtemp()
 
-zipfile.ZipFile(walden_ds.local_path).extractall(temp_dir)
+zipfile.ZipFile(snap.local_path).extractall(temp_dir)
 
 # %%
 # !ls {temp_dir}/WPP2019
@@ -193,7 +193,7 @@ t5.metadata.short_name = "population_by_age_sex"
 # %%
 def run(dest_dir: str) -> None:
     ds = Dataset.create_empty(dest_dir)
-    ds.metadata = converters.convert_walden_metadata(walden_ds)
+    ds.metadata = converters.convert_snapshot_metadata(snap.metadata)
     ds.add(t1)
     ds.add(t2)
     ds.add(t3)

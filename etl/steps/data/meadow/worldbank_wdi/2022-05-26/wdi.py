@@ -4,8 +4,9 @@ from pathlib import Path
 import pandas as pd
 from owid.catalog import Dataset, DatasetMeta, Table, TableMeta
 from owid.catalog.utils import underscore
-from owid.walden import Catalog
 from pandas.api.types import is_numeric_dtype  # type: ignore
+
+from etl.snapshot import Snapshot
 
 
 def run(dest_dir: str) -> None:
@@ -13,8 +14,8 @@ def run(dest_dir: str) -> None:
     version = Path(__file__).parent.stem
     fname = Path(__file__).stem
     namespace = Path(__file__).parent.parent.stem
-    walden_ds = Catalog().find_one(namespace=namespace, short_name=fname, version=version)
-    local_file = walden_ds.ensure_downloaded()
+    snap = Snapshot(f"{namespace}/{fname}/{version}")
+    local_file = str(snap.path)
     zf = zipfile.ZipFile(local_file)
     df = pd.read_csv(zf.open("WDIData.csv"))
 
@@ -58,17 +59,17 @@ def run(dest_dir: str) -> None:
     # creates the dataset and adds a table
     ds = Dataset.create_empty(dest_dir)
     ds.metadata = DatasetMeta(
-        short_name=walden_ds.short_name,
-        title=walden_ds.name,
-        namespace=walden_ds.namespace,
-        description=walden_ds.description,
-        version=walden_ds.version,
+        short_name=snap.metadata.short_name,
+        title=snap.metadata.name,
+        namespace=snap.metadata.namespace,
+        description=snap.metadata.description,
+        version=snap.version,
     )
     tb = Table(df_reshaped)
     tb.metadata = TableMeta(
         short_name=Path(__file__).stem,
-        title=walden_ds.name,
-        description=walden_ds.description,
+        title=snap.metadata.name,
+        description=snap.metadata.description,
         primary_key=list(df_reshaped.index.names),
     )
     ds.add(tb)

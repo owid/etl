@@ -10,7 +10,8 @@ from owid.catalog import Dataset, Table, TableMeta
 from owid.catalog.utils import underscore_table
 
 from etl.helpers import Names
-from etl.steps.data.converters import convert_walden_metadata
+from etl.snapshot import Snapshot
+from etl.steps.data.converters import convert_snapshot_metadata
 
 # Get naming conventions.
 N = Names(__file__)
@@ -21,9 +22,9 @@ def run(dest_dir: str) -> None:
     # Load data.
     #
     # Load fossil CO2 data from Walden.
-    emissions_ds = N.walden_dataset
+    emissions_ds = Snapshot("gcp/2022-11-11/global_carbon_budget_fossil_co2_emissions.csv")
     # Create a dataframe with the data.
-    emissions_df = pd.read_csv(emissions_ds.ensure_downloaded())
+    emissions_df = pd.read_csv(emissions_ds.path)
 
     #
     # Process data.
@@ -36,7 +37,7 @@ def run(dest_dir: str) -> None:
     #
     # Create new dataset and reuse walden metadata (from any of the raw files).
     ds = Dataset.create_empty(dest_dir)
-    ds.metadata = convert_walden_metadata(emissions_ds)
+    ds.metadata = convert_snapshot_metadata(emissions_ds)
 
     # Create a new table with metadata.
     emissions_tb = Table(emissions_df, metadata=TableMeta(short_name=N.short_name))

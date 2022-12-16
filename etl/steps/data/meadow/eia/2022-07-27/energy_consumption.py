@@ -8,10 +8,10 @@ import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table, TableMeta
 from owid.catalog.utils import underscore_table
-from owid.walden import Catalog as WaldenCatalog
 from structlog import get_logger
 
-from etl.steps.data.converters import convert_walden_metadata
+from etl.snapshot import Snapshot
+from etl.steps.data.converters import convert_snapshot_metadata
 
 log = get_logger()
 
@@ -109,13 +109,8 @@ def run(dest_dir: str) -> None:
     # Load data.
     #
     # Load ingested raw data from walden.
-    walden_ds = WaldenCatalog().find_one(
-        namespace=NAMESPACE,
-        short_name=WALDEN_DATASET_SHORT_NAME,
-        version=WALDEN_VERSION,
-    )
-    local_file = walden_ds.ensure_downloaded()
-    raw_data = pd.read_json(local_file, lines=True)
+    snap = Snapshot(f"{NAMESPACE}/{WALDEN_DATASET_SHORT_NAME}/{WALDEN_VERSION}.csv")
+    raw_data = pd.read_json(snap.path, lines=True)
 
     #
     # Process data.
@@ -128,7 +123,7 @@ def run(dest_dir: str) -> None:
     #
     # Create new dataset using metadata from walden.
     ds = Dataset.create_empty(dest_dir)
-    ds.metadata = convert_walden_metadata(walden_ds)
+    ds.metadata = convert_snapshot_metadata(snap.metadata)
     # Update metadata appropriately.
     ds.metadata.short_name = DATASET_SHORT_NAME
     ds.metadata.title = DATASET_TITLE

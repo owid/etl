@@ -1,0 +1,22 @@
+meta:
+  namespace: gcp
+  short_name: global_carbon_budget_global
+  name: Global Carbon Budget - Global data
+  description: Global data (official spreadsheet), containing world data from 1959
+    until today.
+  source_name: Global Carbon Project
+  url: https://www.globalcarbonproject.org/carbonbudget/index.htm
+  file_extension: xlsx
+  date_accessed: '2022-09-29'
+  source_data_url: https://data.icos-cp.eu/licence_accept?ids=%5B%22Ayyw1HeihXdTUoO000dGcxrP%22%5D
+  license_url: https://www.icos-cp.eu/data-services/about-data-portal/data-license
+  license_name: CC BY 4.0
+  is_public: true
+  version: '2022-09-29'
+  publication_year: 2022
+  publication_date: '2022-04-26'
+wdir: ../../../data/snapshots/gcp/2022-09-29
+outs:
+- md5: 042dd1358ebcf36f3363650451969b91
+  size: 192966
+  path: global_carbon_budget_global.xlsx

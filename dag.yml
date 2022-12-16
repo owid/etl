@@ -19,13 +19,13 @@ steps:
   data://garden/gapminder/2019-12-10/population:
     - data://meadow/gapminder/2019-12-10/population
   data://meadow/un/2022-07-11/un_wpp:
-    - walden://un/2022-07-11/un_wpp
+    - walden://un/2022-07-11/un_wpp.zip
   data://garden/un/2022-07-11/un_wpp:
     - data://meadow/un/2022-07-11/un_wpp
   data://explorers/un/2022/un_wpp:
     - data://garden/un/2022-07-11/un_wpp
   data://meadow/gapminder/2019-12-10/population:
-    - walden://gapminder/2019-12-10/population
+    - walden://gapminder/2019-12-10/population.xlsx
   data://meadow/hyde/2017/baseline:
     - snapshot://hyde/2017/baseline.zip
     - data://meadow/hyde/2017/general_files
@@ -34,21 +34,21 @@ steps:
   data://garden/hyde/2017/baseline:
     - data://meadow/hyde/2017/baseline
   data://meadow/who/2021-07-01/ghe:
-    - walden://who/2021-07-01/ghe
+    - walden://who/2021-07-01/ghe.zip
   data://meadow/who/2021-07-01/gho:
-    - walden://who/2021-07-01/gho
+    - walden://who/2021-07-01/gho.zip
   data://meadow/un/2019/un_wpp:
-    - walden://wpp/2019/standard_projections
+    - walden://wpp/2019/standard_projections.zip
   data://grapher/who/2021-07-01/ghe:
     - data://garden/who/2021-07-01/ghe
   data://meadow/living_planet/2020-09-10/lpd:
-    - walden://living_planet/2020-09-10/lpd
+    - walden://living_planet/2020-09-10/lpd.zip
   data://garden/living_planet/2020-09-10/lpd:
     - data://meadow/living_planet/2020-09-10/lpd
   data://meadow/wb/2021-07-01/wb_income:
-    - walden://wb/2021-07-01/wb_income
+    - walden://wb/2021-07-01/wb_income.xlsx
   data://meadow/wb/2022-10-29/wb_gender:
-    - walden://wb/2022-10-29/wb_gender
+    - walden://wb/2022-10-29/wb_gender.zip
   data://garden/wb/2021-07-01/wb_income:
     - data://meadow/wb/2021-07-01/wb_income
   data://garden/wb/2022-10-29/wb_gender:
@@ -60,19 +60,19 @@ steps:
   data://grapher/ggdc/2020-10-01/ggdc_maddison:
     - data://garden/ggdc/2020-10-01/ggdc_maddison
   data://meadow/worldbank_wdi/2022-05-26/wdi:
-    - walden://worldbank_wdi/2022-05-26/wdi
+    - walden://worldbank_wdi/2022-05-26/wdi.zip
   data://garden/worldbank_wdi/2022-05-26/wdi:
     - data://meadow/worldbank_wdi/2022-05-26/wdi
   data://grapher/worldbank_wdi/2022-05-26/wdi:
     - data://garden/worldbank_wdi/2022-05-26/wdi
   data://meadow/un_sdg/2022-07-07/un_sdg:
-    - walden://un_sdg/2022-07-07/un_sdg
+    - walden://un_sdg/2022-07-07/un_sdg.feather
   data://garden/un_sdg/2022-07-07/un_sdg:
     - data://meadow/un_sdg/2022-07-07/un_sdg
   data://grapher/owid/latest/key_indicators:
     - data://garden/owid/latest/key_indicators
   data://meadow/oecd/2016-06-01/regional_wellbeing:
-    - walden://oecd/2016-06-01/regional_wellbeing
+    - snapshot://oecd/2016-06-01/regional_wellbeing.zip
   data://garden/sdg/latest/sdg:
     - backport://backport/owid/latest/dataset_1047_world_bank_gender_statistics__gender
     - backport://backport/owid/latest/dataset_1070_statistical_capacity_indicator__sci__world_bank_data_on_statistical_capacity

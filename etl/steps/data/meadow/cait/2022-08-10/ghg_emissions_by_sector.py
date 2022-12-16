@@ -4,10 +4,10 @@ import json
 import pandas as pd
 from owid.catalog import Dataset, Table, TableMeta
 from owid.catalog.utils import underscore_table
-from owid.walden import Catalog as WaldenCatalog
 from shared import NAMESPACE, VERSION
 
-from etl.steps.data.converters import convert_walden_metadata
+from etl.snapshot import Snapshot
+from etl.steps.data.converters import convert_snapshot_metadata
 
 DATASET_SHORT_NAME = "ghg_emissions_by_sector"
 DATASET_TITLE = "Greenhouse gas emissions by sector"
@@ -68,11 +68,11 @@ def run(dest_dir: str) -> None:
     # Load data.
     #
     # Retrieve raw data from walden.
-    walden_ds = WaldenCatalog().find_one(namespace=NAMESPACE, short_name=WALDEN_SHORT_NAME, version=WALDEN_VERSION)
-    local_file = walden_ds.ensure_downloaded()
+    snap = Snapshot(f"{NAMESPACE}/{WALDEN_VERSION}/{WALDEN_SHORT_NAME}.csv")
+    local_file = str(snap.path)
 
     # Create a dataframe from compressed file.
-    df = load_data(local_file=local_file)
+    df = load_data(local_file=str(local_file))
 
     #
     # Process data.
@@ -85,7 +85,7 @@ def run(dest_dir: str) -> None:
     #
     # Create new dataset, reuse walden metadata, and update metadata.
     ds = Dataset.create_empty(dest_dir)
-    ds.metadata = convert_walden_metadata(walden_ds)
+    ds.metadata = convert_snapshot_metadata(snap.metadata)
     ds.metadata.short_name = DATASET_SHORT_NAME
     ds.metadata.title = DATASET_TITLE
     ds.metadata.version = VERSION
@@ -95,7 +95,7 @@ def run(dest_dir: str) -> None:
     tb_metadata = TableMeta(
         short_name=DATASET_SHORT_NAME,
         title=DATASET_TITLE,
-        description=walden_ds.description,
+        description=snap.metadata.description,
     )
     tb = Table(df, metadata=tb_metadata)
     # Underscore all table columns.

@@ -30,8 +30,6 @@ with warnings.catch_warnings():
     import papermill as pm
 
 from owid import catalog
-from owid.walden import CATALOG as WALDEN_CATALOG
-from owid.walden import Dataset as WaldenDataset
 
 from etl import backport_helpers, config, files, git
 from etl import grapher_helpers as gh
@@ -47,6 +45,7 @@ from etl.grapher_import import (
     upsert_table,
 )
 from etl.helpers import get_etag
+from etl.snapshot import Snapshot
 
 log = structlog.get_logger()
 
@@ -211,9 +210,6 @@ def parse_step(step_name: str, dag: Dict[str, Any]) -> "Step":
         else:
             step = DataStep(path, dependencies)
 
-    elif step_type == "walden":
-        step = WaldenStep(path)
-
     elif step_type == "snapshot":
         step = SnapshotStep(path)
 
@@ -231,9 +227,6 @@ def parse_step(step_name: str, dag: Dict[str, Any]) -> "Step":
 
     elif step_type == "data-private":
         step = DataStepPrivate(path, dependencies)
-
-    elif step_type == "walden-private":
-        step = WaldenStepPrivate(path)
 
     elif step_type == "backport-private":
         step = BackportStepPrivate(path, dependencies)
@@ -450,63 +443,6 @@ class ReferenceStep(DataStep):
 
     def run(self) -> None:
         return
-
-
-@dataclass
-class WaldenStep(Step):
-    path: str
-
-    def __init__(self, path: str) -> None:
-        self.path = path
-
-    def __str__(self) -> str:
-        return f"walden://{self.path}"
-
-    def run(self) -> None:
-        "Ensure the dataset we're looking for is there."
-        self._walden_dataset.ensure_downloaded(quiet=True)
-
-    def is_dirty(self) -> bool:
-        if not Path(self._walden_dataset.local_path).exists():
-            return True
-
-        if files.checksum_file(self._walden_dataset.local_path) != self._walden_dataset.md5:
-            return True
-
-        return False
-
-    def has_existing_data(self) -> bool:
-        return True
-
-    def checksum_output(self) -> str:
-        if not self._walden_dataset.md5:
-            raise Exception(f"walden dataset is missing checksum: {self}")
-
-        inputs = [
-            # the contents of the dataset
-            self._walden_dataset.md5,
-            # the metadata describing the dataset
-            files.checksum_file(self._walden_dataset.index_path),
-        ]
-
-        checksum = hashlib.md5(",".join(inputs).encode("utf8")).hexdigest()
-
-        return checksum
-
-    @property
-    def _walden_dataset(self) -> WaldenDataset:
-        if self.path.count("/") != 2:
-            raise ValueError(f"malformed walden path: {self.path}")
-
-        namespace, version, short_name = self.path.split("/")
-
-        # normally version is a year or date, but we also accept "latest"
-        if version == "latest":
-            dataset = WALDEN_CATALOG.find_latest(namespace=namespace, short_name=short_name)
-        else:
-            dataset = WALDEN_CATALOG.find_one(namespace=namespace, version=version, short_name=short_name)
-
-        return dataset
 
 
 @dataclass
@@ -759,13 +695,6 @@ class DataStepPrivate(PrivateMixin, DataStep):
 
     def __str__(self) -> str:
         return f"data-private://{self.path}"
-
-
-class WaldenStepPrivate(WaldenStep):
-    is_public = False
-
-    def __str__(self) -> str:
-        return f"walden-private://{self.path}"
 
 
 class BackportStepPrivate(PrivateMixin, BackportStep):

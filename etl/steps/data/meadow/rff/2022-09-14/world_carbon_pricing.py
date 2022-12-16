@@ -1,9 +1,9 @@
 import pandas as pd
 from owid.catalog import Dataset, Table, TableMeta
 from owid.catalog.utils import underscore_table
-from owid.walden import Catalog as WaldenCatalog
 
-from etl.steps.data.converters import convert_walden_metadata
+from etl.snapshot import Snapshot
+from etl.steps.data.converters import convert_snapshot_metadata
 
 # Version for dataset to be created.
 VERSION = "2022-09-14"
@@ -22,11 +22,11 @@ def run(dest_dir: str) -> None:
     # Load data.
     #
     # Load data from walden.
-    walden_ds = WaldenCatalog().find_one(namespace="rff", short_name="world_carbon_pricing", version=WALDEN_VERSION)
-    df = pd.read_csv(walden_ds.ensure_downloaded(), dtype=object)
+    snap = Snapshot(f"rff/{WALDEN_VERSION}/world_carbon_pricing.csv")
+    df = pd.read_csv(snap.path, dtype=object)
     # Load IPCC codes from walden.
-    walden_ipcc_ds = WaldenCatalog().find_one(namespace="rff", short_name="ipcc_codes", version=WALDEN_VERSION)
-    ipcc_codes = pd.read_csv(walden_ipcc_ds.ensure_downloaded(), dtype=object)
+    walden_ipcc_ds = Snapshot(f"rff/{WALDEN_VERSION}/ipcc_codes.csv")
+    ipcc_codes = pd.read_csv(walden_ipcc_ds.path, dtype=object)
 
     #
     # Process data.
@@ -44,10 +44,12 @@ def run(dest_dir: str) -> None:
     #
     # Create new dataset with metadata from walden.
     ds = Dataset.create_empty(dest_dir)
-    ds.metadata = convert_walden_metadata(walden_ds)
+    ds.metadata = convert_snapshot_metadata(snap.metadata)
     ds.metadata.version = VERSION
     # Create new table with metadata.
-    table_metadata = TableMeta(short_name=walden_ds.short_name, title=walden_ds.name, description=walden_ds.description)
+    table_metadata = TableMeta(
+        short_name=snap.metadata.short_name, title=snap.metadata.name, description=snap.metadata.description
+    )
     tb = Table(df, metadata=table_metadata)
     # Prepare table and add it to the dataset.
     tb = underscore_table(tb)

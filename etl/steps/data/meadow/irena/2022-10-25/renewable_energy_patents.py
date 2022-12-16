@@ -1,8 +1,8 @@
 import pandas as pd
 from owid.catalog import Dataset, Table, TableMeta
-from owid.walden import Catalog as WaldenCatalog
 
-from etl.steps.data.converters import convert_walden_metadata
+from etl.snapshot import Snapshot
+from etl.steps.data.converters import convert_snapshot_metadata
 
 # Details for input datasets.
 WALDEN_VERSION = "2022-10-25"
@@ -26,8 +26,8 @@ def run(dest_dir: str) -> None:
     # Load data.
     #
     # Load raw data from Walden.
-    walden_ds = WaldenCatalog().find_one(namespace="irena", short_name=WALDEN_DATASET_NAME, version=WALDEN_VERSION)
-    local_file = walden_ds.ensure_downloaded()
+    snap = Snapshot(f"irena/{WALDEN_VERSION}/{WALDEN_DATASET_NAME}.csv")
+    local_file = str(snap.path)
     df = pd.read_csv(local_file)
 
     #
@@ -44,11 +44,13 @@ def run(dest_dir: str) -> None:
     #
     # Create new dataset and reuse metadata form Walden.
     ds = Dataset.create_empty(dest_dir)
-    ds.metadata = convert_walden_metadata(walden_ds)
+    ds.metadata = convert_snapshot_metadata(snap.metadata)
     ds.metadata.version = VERSION
 
     # Create table with metadata from dataframe
-    table_metadata = TableMeta(short_name=walden_ds.short_name, title=walden_ds.name, description=walden_ds.description)
+    table_metadata = TableMeta(
+        short_name=snap.metadata.short_name, title=snap.metadata.name, description=snap.metadata.description
+    )
     tb = Table(df, metadata=table_metadata)
 
     # Add table to new dataset and save dataset.

@@ -14,7 +14,6 @@ from pathlib import Path
 
 import pandas as pd
 from owid.catalog import Dataset, Table, utils
-from owid.walden import Catalog
 from shared import (
     LATEST_VERSIONS_FILE,
     NAMESPACE,
@@ -24,7 +23,8 @@ from shared import (
 )
 
 from etl.paths import DATA_DIR
-from etl.steps.data.converters import convert_walden_metadata
+from etl.snapshot import Snapshot
+from etl.steps.data.converters import convert_snapshot_metadata
 
 
 def fix_items(data: pd.DataFrame, metadata: Dataset) -> pd.DataFrame:
@@ -79,10 +79,10 @@ def run(dest_dir: str) -> None:
 
     # Fetch latest walden dataset.
     walden_version = latest_versions.loc["walden", dataset_short_name].item()
-    walden_ds = Catalog().find_one(namespace=NAMESPACE, version=walden_version, short_name=dataset_short_name)
+    snap = Snapshot(f"{NAMESPACE}/{walden_version}/{dataset_short_name}.csv")
 
     # Load data.
-    data = load_data(walden_ds.local_path)
+    data = load_data(str(snap.path))
 
     # Load metadata.
     metadata_version = latest_versions.loc["meadow", f"{NAMESPACE}_metadata"].item()
@@ -107,7 +107,7 @@ def run(dest_dir: str) -> None:
 
     # Initialise meadow dataset.
     ds = Dataset.create_empty(dest_dir)
-    ds.metadata = convert_walden_metadata(walden_ds)
+    ds.metadata = convert_snapshot_metadata(snap.metadata)
     ds.metadata.short_name = dataset_short_name
     ds.save()
 

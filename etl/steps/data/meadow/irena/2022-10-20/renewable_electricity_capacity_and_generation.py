@@ -7,11 +7,11 @@ from typing import cast
 import pandas as pd
 from owid.catalog import Dataset, Table, TableMeta
 from owid.catalog.utils import underscore_table
-from owid.walden import Catalog as WaldenCatalog
 from shared import CURRENT_DIR
 
 from etl.helpers import Names
-from etl.steps.data.converters import convert_walden_metadata
+from etl.snapshot import Snapshot
+from etl.steps.data.converters import convert_snapshot_metadata
 
 # Details of input dataset.
 WALDEN_VERSION = "2022-10-07"
@@ -97,22 +97,22 @@ def extract_capacity_from_all_sheets(data_file: str) -> pd.DataFrame:
 
 def run(dest_dir: str) -> None:
     # Retrieve raw data from Walden.
-    walden_ds = WaldenCatalog().find_one(namespace="irena", short_name=WALDEN_DATASET_NAME, version=WALDEN_VERSION)
-    local_file = walden_ds.ensure_downloaded()
+    snap = Snapshot(f"irena/{WALDEN_VERSION}/{WALDEN_DATASET_NAME}.xlsx")
+    local_file = str(snap.path)
 
     # Extract capacity data.
     df = extract_capacity_from_all_sheets(data_file=local_file)
 
     # Create a new Meadow dataset and reuse walden metadata.
     ds = Dataset.create_empty(dest_dir)
-    ds.metadata = convert_walden_metadata(walden_ds)
+    ds.metadata = convert_snapshot_metadata(snap.metadata)
     ds.metadata.version = VERSION
 
     # Create a new table with metadata from Walden.
     table_metadata = TableMeta(
-        short_name=walden_ds.short_name,
-        title=walden_ds.name,
-        description=walden_ds.description,
+        short_name=snap.metadata.short_name,
+        title=snap.metadata.name,
+        description=snap.metadata.description,
     )
     tb = Table(df, metadata=table_metadata)
 

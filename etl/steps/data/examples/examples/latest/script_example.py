@@ -2,15 +2,15 @@ from typing import cast
 
 import pandas as pd
 from owid.catalog import Dataset, Table
-from owid.walden import Catalog as WaldenCatalog
 
 from etl.paths import DATA_DIR, REFERENCE_DATASET
+from etl.snapshot import Snapshot
 
 
 def load_wb_income() -> pd.DataFrame:
     """Load WB income groups dataset from walden."""
-    walden_ds = WaldenCatalog().find_one("wb", "2021-07-01", "wb_income")
-    local_path = walden_ds.ensure_downloaded()
+    snap = Snapshot("wb/2021-07-01/wb_income.xlsx")
+    local_path = snap.path
     return cast(pd.DataFrame, pd.read_excel(local_path))
 
 

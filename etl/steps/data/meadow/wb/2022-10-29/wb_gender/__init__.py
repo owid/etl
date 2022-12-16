@@ -6,12 +6,12 @@ from typing import Any, Tuple
 
 import pandas as pd
 import structlog
-from owid import walden
 from owid.catalog import Dataset, Table, utils
 from owid.catalog.utils import underscore
 from owid.datautils.io import decompress_file
 
-from etl.steps.data.converters import convert_walden_metadata
+from etl.snapshot import Snapshot
+from etl.steps.data.converters import convert_snapshot_metadata
 
 log = structlog.get_logger()
 
@@ -45,14 +45,14 @@ METADATA_VARIABLES_FILENAME = "Gender_StatsSeries.csv"
 METADATA_COUNTRIES_FILENAME = "Gender_StatsCountry.csv"
 
 
-def load_data_from_walden(walden_ds: walden.Catalog) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+def load_data_from_walden(snap: Snapshot) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """Load data and metadata."""
     # Get Walden dataset
     with tempfile.TemporaryDirectory() as f:
         output_folder = Path(f)
         # Uncompress
         log.info("Extracting data and metadata from walden zip file...")
-        decompress_file(input_file=walden_ds.local_path, output_folder=output_folder, overwrite=True)
+        decompress_file(input_file=snap.path, output_folder=output_folder, overwrite=True)
         # Read data and metadata
         table = _load_data(output_folder)
         metadata_variables = _load_metadata_variables(output_folder)
@@ -236,11 +236,11 @@ def _clean_variable_name(text: str) -> str:
     return re.sub(r"\s+", " ", text).replace(" 00", " 0")
 
 
-def init_dataset(dest_dir: str, walden_ds: walden.Dataset) -> Dataset:
+def init_dataset(dest_dir: str, snap: Snapshot) -> Dataset:
     "Initialise Meadow dataset."
     log.info("Initialising Meadow dataset...")
     ds = Dataset.create_empty(dest_dir)
-    ds.metadata = convert_walden_metadata(walden_ds)
+    ds.metadata = convert_snapshot_metadata(snap.metadata)
     ds.metadata.short_name = "wb_gender"
     ds.save()
     return ds
@@ -266,8 +266,8 @@ def add_tables_to_ds(
 def run(dest_dir: str) -> None:
     """Run pipeline."""
     # Load data and metadata
-    ds_walden = walden.Catalog().find_one(NAMESPACE, VERSION, SHORT_NAME)
-    table, metadata_variables, metadata_countries = load_data_from_walden(ds_walden)
+    snap = Snapshot(f"{NAMESPACE}/{VERSION}/{SHORT_NAME}.csv")
+    table, metadata_variables, metadata_countries = load_data_from_walden(snap)
     # Format metadata (variables)
     metadata_variables = metadata_variables.pipe(format_metadata_variables)
     # Format metadata (countries)
@@ -275,6 +275,6 @@ def run(dest_dir: str) -> None:
     # Format data
     table = table.pipe(format_data, metadata_variables)
     # Initiate dataset
-    ds = init_dataset(dest_dir, ds_walden)
+    ds = init_dataset(dest_dir, snap)
     # Add tables to dataset
     ds = add_tables_to_ds(ds, table, metadata_variables, metadata_countries)

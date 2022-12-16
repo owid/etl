@@ -5,20 +5,20 @@
 
 import pandas as pd
 from owid.catalog import Dataset, Table
-from owid.walden import Catalog
 
-from etl.steps.data.converters import convert_walden_metadata
+from etl.snapshot import Snapshot
+from etl.steps.data.converters import convert_snapshot_metadata
 
 
 def run(dest_dir: str) -> None:
-    walden_ds = Catalog().find_one("gapminder", "2019-12-10", "population")
+    snap = Snapshot("gapminder", "2019-12-10", "population")
 
     ds = Dataset.create_empty(dest_dir)
-    ds.metadata = convert_walden_metadata(walden_ds)
+    ds.metadata = convert_snapshot_metadata(snap.metadata)
     ds.save()
 
     df = pd.read_excel(
-        walden_ds.local_path,
+        snap.local_path,
         sheet_name="data-for-countries-etc-by-year",
         usecols=["name", "time", "Population"],
     ).rename(columns={"name": "country", "time": "year", "Population": "population"})

@@ -5,10 +5,10 @@
 import pandas as pd
 from owid.catalog import Dataset, Table, TableMeta
 from owid.catalog.utils import underscore_table
-from owid.walden import Catalog as WaldenCatalog
 from shared import VERSION, log
 
-from etl.steps.data.converters import convert_walden_metadata
+from etl.snapshot import Snapshot
+from etl.steps.data.converters import convert_snapshot_metadata
 
 # Details of dataset to export.
 NAMESPACE = "ember"
@@ -21,21 +21,20 @@ def run(dest_dir: str) -> None:
     log.info(f"{DATASET_SHORT_NAME}.start")
 
     # Retrieve raw data from walden.
-    walden_ds = WaldenCatalog().find_one(namespace=NAMESPACE, short_name=DATASET_SHORT_NAME, version=WALDEN_VERSION)
-    local_file = walden_ds.ensure_downloaded()
-    df = pd.read_csv(local_file)
+    snap = Snapshot(f"{NAMESPACE}/{WALDEN_VERSION}/{DATASET_SHORT_NAME}.csv")
+    df = pd.read_csv(snap.path)
 
     # Create new dataset, reuse walden metadata, and update metadata.
     ds = Dataset.create_empty(dest_dir)
-    ds.metadata = convert_walden_metadata(walden_ds)
+    ds.metadata = convert_snapshot_metadata(snap.metadata)
     ds.metadata.version = VERSION
     ds.save()
 
     # Create table with metadata from walden.
     table_metadata = TableMeta(
-        short_name=walden_ds.short_name,
-        title=walden_ds.name,
-        description=walden_ds.description,
+        short_name=snap.metadata.short_name,
+        title=snap.metadata.name,
+        description=snap.metadata.description,
     )
     tb = Table(df, metadata=table_metadata)
 

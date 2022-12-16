@@ -1,0 +1,21 @@
+meta:
+  namespace: smil
+  short_name: global_primary_energy
+  name: Global Primary Energy (Smil, 2017)
+  description: ''
+  source_name: 'Energy Transitions: Global and National Perspectives, 2nd edition,
+    Appendix A (Vaclav Smil, 2017)'
+  url: https://vaclavsmil.com/2016/12/14/energy-transitions-global-and-national-perspectives-second-expanded-and-updated-edition/
+  file_extension: csv
+  date_accessed: '2022-09-09'
+  license_url: https://vaclavsmil.com/2016/12/14/energy-transitions-global-and-national-perspectives-second-expanded-and-updated-edition/
+  license_name: CC BY
+  is_public: true
+  version: '2017-01-01'
+  publication_year: 2017
+  publication_date: '2017-01-01'
+wdir: ../../../data/snapshots/smil/2017-01-01
+outs:
+- md5: b0b7aff72e3ec643fd7fbd02f26317f5
+  size: 2355
+  path: global_primary_energy.csv

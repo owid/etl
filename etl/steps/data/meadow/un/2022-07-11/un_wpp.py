@@ -8,16 +8,17 @@ import pandas as pd
 from owid.catalog import Dataset, Table, utils
 from pandas.api.types import CategoricalDtype
 
-from etl.steps.data.converters import convert_walden_metadata
+from etl.snapshot import Snapshot
+from etl.steps.data.converters import convert_snapshot_metadata
 
 
-def load_walden_ds() -> walden.catalog.Dataset:
-    walden_ds = walden.Catalog().find_one("un", "2022-07-11", "un_wpp")
-    return walden_ds
+def load_snap() -> walden.catalog.Dataset:
+    snap = walden.Snapshot("un", "2022-07-11", "un_wpp")
+    return snap
 
 
-def extract_data(walden_ds: walden.catalog.Dataset, output_dir: str) -> None:
-    z = zipfile.ZipFile(walden_ds.local_path)
+def extract_data(snap: walden.catalog.Dataset, output_dir: str) -> None:
+    z = zipfile.ZipFile(snap.local_path)
     z.extractall(output_dir)
 
 
@@ -360,9 +361,9 @@ def _sanity_checks(
     return df
 
 
-def init_dataset(dest_dir: str, walden_ds: walden.Dataset) -> Dataset:
+def init_dataset(dest_dir: str, snap: walden.Dataset) -> Dataset:
     ds = Dataset.create_empty(dest_dir)
-    ds.metadata = convert_walden_metadata(walden_ds)
+    ds.metadata = convert_snapshot_metadata(snap.metadata)
     ds.metadata.short_name = "un_wpp"
     ds.save()
     return ds
@@ -393,9 +394,9 @@ def add_tables_to_ds(
 
 def run(dest_dir: str) -> None:
     # Load
-    walden_ds = load_walden_ds()
+    snap = load_snap()
     with tempfile.TemporaryDirectory() as tmp_dir:
-        extract_data(walden_ds, tmp_dir)
+        extract_data(snap, tmp_dir)
         (
             df_population,
             df_fertility,
@@ -408,6 +409,6 @@ def run(dest_dir: str) -> None:
         df_population, df_fertility, df_demographics, df_depratio, df_deaths
     )
     # Initiate dataset
-    ds = init_dataset(dest_dir, walden_ds)
+    ds = init_dataset(dest_dir, snap)
     # Add tables to dataset
     ds = add_tables_to_ds(ds, df_population, df_fertility, df_demographics, df_depratio, df_deaths)

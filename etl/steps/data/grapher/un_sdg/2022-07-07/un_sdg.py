@@ -9,12 +9,11 @@ import requests
 from owid import catalog
 from owid.catalog import Dataset, Source, Table, VariableMeta
 from owid.catalog.utils import underscore
-from owid.walden import Catalog
-from owid.walden import Dataset as WaldenDataset
 from structlog import get_logger
 
 from etl import grapher_helpers as gh
 from etl.paths import DATA_DIR
+from etl.snapshot import Snapshot
 
 log = get_logger()
 
@@ -33,7 +32,7 @@ def run(dest_dir: str) -> None:
 
     # add tables to dataset
     clean_source_map = load_clean_source_mapping()
-    walden_ds = Catalog().find_one(namespace=NAMESPACE, short_name=FNAME, version=VERSION)
+    snap = Snapshot(f"{NAMESPACE}/{VERSION}/{FNAME}")
     ds_garden = Dataset((DATA_DIR / f"garden/{NAMESPACE}/{VERSION}/{FNAME}").as_posix())
     sdg_tables = ds_garden.table_names
     for var in sdg_tables:
@@ -43,7 +42,7 @@ def run(dest_dir: str) -> None:
         var_gr = var_df.groupby("variable_name")
 
         for var_name, df_var in var_gr:
-            df_tab = add_metadata_and_prepare_for_grapher(df_var, walden_ds)
+            df_tab = add_metadata_and_prepare_for_grapher(df_var, snap)
             df_tab.metadata.dataset = dataset.metadata
 
             # NOTE: long format is quite inefficient, we're creating a table for every variable
@@ -71,7 +70,7 @@ def clean_source_name(raw_source: pd.Series, clean_source_map: Dict[str, str]) -
     return clean_source
 
 
-def add_metadata_and_prepare_for_grapher(df_gr: pd.DataFrame, walden_ds: WaldenDataset) -> Table:
+def add_metadata_and_prepare_for_grapher(df_gr: pd.DataFrame, snap: Snapshot) -> Table:
     indicator = df_gr["variable_name"].iloc[0].split("-")[0].strip()
     source_url = get_metadata_link(indicator)
     log.info(
@@ -82,13 +81,12 @@ def add_metadata_and_prepare_for_grapher(df_gr: pd.DataFrame, walden_ds: WaldenD
     )
     source = Source(
         name=df_gr["source"].iloc[0],
-        url=walden_ds.metadata["url"],
-        source_data_url=walden_ds.metadata.get("source_data_url"),
-        owid_data_url=walden_ds.metadata["owid_data_url"],
-        date_accessed=walden_ds.metadata["date_accessed"],
-        publication_date=walden_ds.metadata["publication_date"],
-        publication_year=walden_ds.metadata["publication_year"],
-        published_by=walden_ds.metadata["name"],
+        url=snap.metadata.url,
+        source_data_url=getattr(snap.metadata, "source_data_url"),
+        date_accessed=snap.metadata.date_accessed,
+        publication_date=snap.metadata.publication_date,
+        publication_year=snap.metadata.publication_year,
+        published_by=snap.metadata.name,
         publisher_source=df_gr["source"].iloc[0],
     )
 

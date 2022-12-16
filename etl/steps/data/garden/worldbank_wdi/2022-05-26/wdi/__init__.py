@@ -16,9 +16,9 @@ import pandas as pd
 import structlog
 from owid.catalog import Dataset, Source, Table, VariableMeta
 from owid.catalog.utils import underscore
-from owid.walden import Catalog
 
 from etl.paths import DATA_DIR
+from etl.snapshot import Snapshot
 
 from .variable_matcher import VariableMatcher
 
@@ -352,8 +352,8 @@ def add_variable_metadata(table: Table) -> Table:
     version = Path(__file__).parent.parent.stem
     fname = Path(__file__).parent.stem
     namespace = Path(__file__).parent.parent.parent.stem
-    walden_ds = Catalog().find_one(namespace=namespace, short_name=fname, version=version)
-    local_file = walden_ds.ensure_downloaded()
+    snap = Snapshot(f"{namespace}/{fname}/{version}")
+    local_file = str(snap.path)
     zf = zipfile.ZipFile(local_file)
     df_vars = pd.read_csv(zf.open("WDISeries.csv"))
     df_vars.dropna(how="all", axis=1, inplace=True)
@@ -417,13 +417,13 @@ def add_variable_metadata(table: Table) -> Table:
         source = Source(
             name=clean_source["name"],
             description=None,
-            url=walden_ds.metadata["url"],
-            source_data_url=walden_ds.metadata["source_data_url"],
-            owid_data_url=walden_ds.metadata["owid_data_url"],
-            date_accessed=walden_ds.metadata["date_accessed"],
-            publication_date=walden_ds.metadata["publication_date"],
-            publication_year=walden_ds.metadata["publication_year"],
-            published_by=walden_ds.metadata["name"],
+            url=snap.metadata["url"],
+            source_data_url=snap.metadata["source_data_url"],
+            owid_data_url=snap.metadata["owid_data_url"],
+            date_accessed=snap.metadata["date_accessed"],
+            publication_date=snap.metadata["publication_date"],
+            publication_year=snap.metadata["publication_year"],
+            published_by=snap.metadata["name"],
             publisher_source=clean_source["dataPublisherSource"],
         )
 
