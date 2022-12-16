@@ -9,19 +9,23 @@ import numpy as np
 import pandas as pd
 from owid import catalog
 from owid.datautils import dataframes
-from shared import CURRENT_DIR
 
-from etl.paths import DATA_DIR
+from etl.helpers import PathFinder
 
-# Details for dataset to export.
+# Initialise relevant paths for current file.
+paths = PathFinder(__file__)
+
+# Define outputs.
 DATASET_SHORT_NAME = "uk_historical_electricity"
 DATASET_TITLE = "UK historical electricity"
-METADATA_PATH = CURRENT_DIR / f"{DATASET_SHORT_NAME}.meta.yml"
-# Details for datasets to import.
-ELECTRICITY_MIX_DATASET_PATH = DATA_DIR / "garden/energy/2022-12-13/electricity_mix"
+# Define inputs.
+ELECTRICITY_MIX_DATASET_PATH = paths.get_dataset_path(channel="garden", short_name="electricity_mix")
 ELECTRICITY_MIX_TABLE_NAME = "electricity_mix"
-UK_BEIS_DATASET_PATH = DATA_DIR / "garden/uk_beis/2022-07-28/uk_historical_electricity"
+UK_BEIS_DATASET_PATH = paths.get_dataset_path(
+    channel="garden", namespace="uk_beis", short_name="uk_historical_electricity"
+)
 UK_BEIS_TABLE_NAME = "uk_historical_electricity"
+METADATA_PATH = paths.metadata_path
 
 
 def prepare_electricity_mix_data(df_elec: pd.DataFrame) -> pd.DataFrame:
