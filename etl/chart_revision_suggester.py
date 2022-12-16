@@ -1,14 +1,12 @@
 """
-Using the <mapping-file> JSON file mapping variable IDs from an old dataset to a new dataset, it creates a bunch of suggested chart revisions in Grapher.
+Generate chart revisions in Grapher using MAPPING_FILE JSON file. MAPPING_FILE is a JSON file with old_variable_id -> new_variable_id pairs. E.g. {2032: 147395, 2033: 147396, ...}.
 
-It connects to Grapher based on the environment file found in the project's root directory `path/to/etl/.env`.
+Make sure that you are connected to the database. By default, it connects to Grapher based on the environment file found in the project's root directory `path/to/etl/.env`.
 """
 # The original script was originally from the owid/importers repo: https://github.com/owid/importers/blob/master/standard_importer/chart_revision_suggester.py
 
 import os
 import re
-import shutil
-import time
 import traceback
 from copy import deepcopy
 from typing import Any, Dict, Iterable, List, Literal, Optional, Tuple, Union, cast
@@ -23,76 +21,23 @@ from tqdm import tqdm
 from etl.config import DEBUG, GRAPHER_USER_ID
 from etl.db import open_db
 from etl.grapher_helpers import IntRange
-from etl.paths import STEP_DIR
 
 log = structlog.get_logger()
 
 
 @click.command(help=__doc__)
-@click.option(
-    "-f",
-    "--mapping-file",
+@click.argument(
+    "mapping-file",
     type=str,
-    help="Path to variable mapping json file.",
-    required=True,
 )
-@click.option(
-    "-n",
-    "--namespace",
-    type=str,
-    help="Namespace of the dataset.",
-    required=True,
-)
-@click.option(
-    "-v",
-    "--version",
-    type=str,
-    help="Version of the dataset.",
-    required=True,
-)
-@click.option(
-    "-d",
-    "--dataset-name",
-    type=str,
-    help="Name of the dataset.",
-    required=True,
-)
-def main_cli(mapping_file: str, namespace: str, version: str, dataset_name: str) -> None:
-    dataset_dir = os.path.join(STEP_DIR, "grapher", namespace, version)
-
-    handler = MappingFileHandler(dataset_dir, mapping_file)
-    handler.init()
+def main_cli(mapping_file: str) -> None:
     try:
-        suggester = ChartRevisionSuggester(dataset_dir, version, dataset_name)
+        suggester = ChartRevisionSuggester.from_dict(mapping_file)
         suggester.suggest()
     except Exception as e:
-        print()
-        log.error(f"{e}")
+        log.error(e)
         if DEBUG:
             traceback.print_exc()
-    finally:
-        handler.reset()
-
-
-class MappingFileHandler:
-    def __init__(self, dataset_dir: str, mapping_file: str):
-        self.mapping_file = mapping_file
-        self.config_dir = os.path.join(dataset_dir, "config")
-        self.config_mapping_file = os.path.join(self.config_dir, "variable_replacements.json")
-        self.config_mapping_file_tmp = f"{self.config_mapping_file}.{round(100 * time.time())}"
-
-    def init(self) -> None:
-        os.makedirs(self.config_dir, exist_ok=True)
-        if os.path.isfile(self.config_mapping_file):
-            os.rename(self.config_mapping_file, self.config_mapping_file_tmp)
-        shutil.copy2(self.mapping_file, self.config_mapping_file)
-
-    def reset(self) -> None:
-        if os.path.isfile(self.config_mapping_file_tmp):
-            os.remove(self.config_mapping_file)
-            os.rename(self.config_mapping_file_tmp, self.config_mapping_file)
-        else:
-            os.remove(self.config_mapping_file)
 
 
 class ChartRevisionSuggester:
@@ -104,29 +49,48 @@ class ChartRevisionSuggester:
     OWID charts to display the newly available data in place of the old data.
 
     Attributes:
-        dataset_dir: str. Name of dataset directory. Example: "worldbank_wdi".
-            There *must* be a `variable_replacements.json` file located in
-            either `{dataset_dir}/config/` or `{dataset_dir}/output/`. The
-            `variable_replacements.json` file contains a dictionary of
-            old_variable_id->new_variable_id key-value pairs. Example:
-
-                {"2032": 147395, "2033": 147396, ...}
+        variable_mapping: Dict[int, int]. Dictionary with mappings of old variable IDs to new variable IDs.
+        Example: {2032: 147395, 2033: 147396, ...}
 
     Usage:
         >>> from etl.chart_revision_suggester import ChartRevisionSuggester
-        >>> dataset_dir = "worldbank_wdi"
-        >>> version = "2022-05-26"
-        >>> new_dataset_name = "wdi__2022_05_26"
-        >>> suggester = ChartRevisionSuggester(dataset_dir, version, new_dataset_name)
+        >>> mapping_filepath = "file/to/variable_mapping.json"
+        >>> suggester = ChartRevisionSuggester.from_dict(mapping_filepath)
         >>> suggester.suggest()
     """
 
-    def __init__(self, dataset_dir: str, version: str, dataset_name: str):
+    def __init__(self, variable_mapping: Dict[int, int]):
         self.var_id2year_range: Dict[int, List[int]] = {}
-        self.dataset_dir = dataset_dir
-        self.version = version
-        self.dataset_name = dataset_name
-        self.old_var_id2new_var_id = self.load_variable_replacements()
+        self._sanity_check_mapping_dict(variable_mapping)
+        self.old_var_id2new_var_id = variable_mapping
+
+    def _sanity_check_mapping_dict(self, variable_mapping: Any) -> None:
+        """Sanity check the mapping dictionary."""
+        if not isinstance(variable_mapping, dict):
+            raise TypeError(
+                f"The variable mapping dictionary must be a dictionary. Found type '{type(variable_mapping)}'!"
+            )
+        for k, v in variable_mapping.items():
+            if not isinstance(k, int):
+                raise TypeError(f"The keys of the variable mapping dictionary must be integers. Found key '{k}'!")
+            if not isinstance(v, int):
+                raise TypeError(f"The values of the variable mapping dictionary must be integers. Found value '{v}'!")
+
+    @classmethod
+    def from_dict(cls, filepath: str) -> "ChartRevisionSuggester":
+        """Load a ChartRevisionSuggester instance from a JSON file.
+
+        Parameters
+        ----------
+        filepath : str
+            Mapping file old_variable_id -> new_variable_id pairs. E.g. {2032: 147395, 2033: 147396, ...}.
+        """
+        try:
+            with open(os.path.join(filepath), "r") as f:
+                variable_mapping = {int(k): int(v) for k, v in json.load(f).items()}
+        except FileNotFoundError:
+            raise FileNotFoundError(f"Variable mapping file was not found at {filepath}.")
+        return cls(variable_mapping=variable_mapping)
 
     @property
     def status(self) -> str:
@@ -134,21 +98,14 @@ class ChartRevisionSuggester:
 
     def suggest(self, *args: Any, **kwargs: Any) -> None:
         kwargs["suggested_chart_revisions"] = self.prepare()
-        self.insert(self.dataset_name, *args, **kwargs)
+        self.insert(*args, **kwargs)
 
-    def load_variable_replacements(self) -> Dict[int, int]:
+    def load_variable_replacements(self, filepath: str) -> Dict[int, int]:
         try:
-            with open(
-                os.path.join(self.dataset_dir, "config", "variable_replacements.json"),
-                "r",
-            ) as f:
+            with open(os.path.join(filepath), "r") as f:
                 data = {int(k): int(v) for k, v in json.load(f).items()}
         except FileNotFoundError:
-            with open(
-                os.path.join(self.dataset_dir, "output", "variable_replacements.json"),
-                "r",
-            ) as f:
-                data = {int(k): int(v) for k, v in json.load(f).items()}
+            raise FileNotFoundError(f"Variable mapping file was not found at {filepath}.")
         return data
 
     def prepare(self) -> List[dict[str, Any]]:
@@ -163,6 +120,12 @@ class ChartRevisionSuggester:
                 chart_dims = df_chart_dims.loc[df_chart_dims["chartId"] == chart_id].to_dict(orient="records")
                 chart_dims_orig = deepcopy(chart_dims)
                 chart_config = json.loads(row.config)
+
+                # get list with new variables
+                try:
+                    new_variables = [self.old_var_id2new_var_id[c["variableId"]] for c in chart_dims]
+                except KeyError:
+                    raise KeyError("Problem found in self.old_var_id2new_var_id! some IDs are not in the mapping dict.")
 
                 self._modify_chart_config_map(chart_config)
                 self._modify_chart_config_time(chart_id, chart_config)
@@ -187,6 +150,7 @@ class ChartRevisionSuggester:
                             "chartId": chart_id,
                             "originalConfig": row.config,
                             "suggestedConfig": chart_config_str,
+                            "suggested_reason": self._get_chart_update_reason(new_variables),
                         }
                     )
 
@@ -196,16 +160,39 @@ class ChartRevisionSuggester:
                     traceback.print_exc()
         return suggested_chart_revisions
 
-    def insert(
-        self,
-        dataset_name: str,
-        suggested_chart_revisions: List[dict[str, Any]],
-        suggested_reason: Optional[str] = None,
-    ) -> None:
-        if suggested_reason is None:
-            dataset_name = self.dataset_name
-            dataset_version = self.version
-            suggested_reason = f"{dataset_name} (v{dataset_version}) bulk dataset update"
+    def _get_chart_update_reason(self, variable_ids: List[int]) -> str:
+        """Get the reason for the chart update.
+
+        Accesses DB and finds out the name of the recently added dataset with the new variables."""
+        try:
+            with open_db() as db:
+                if len(variable_ids) == 1:
+                    results = db.fetch_many(
+                        f"""
+                        SELECT variables.name, datasets.name, datasets.version FROM datasets
+                            JOIN variables ON datasets.id = variables.datasetId
+                            WHERE variables.id IN ({variable_ids[0]})
+                        """
+                    )
+                else:
+                    results = db.fetch_many(
+                        f"""
+                        SELECT variables.name, datasets.name, datasets.version FROM datasets
+                            JOIN variables ON datasets.id = variables.datasetId
+                            WHERE variables.id IN {*variable_ids,}
+                        """
+                    )
+        except Exception:
+            log.error(
+                "Problem found when accessing the DB trying to get details on the newly added variables"
+                f" {variable_ids}. Therefore, no reason for suggested chart revision could be stablished!"
+            )
+            reason = "No reason could be found for this suggested chart revision! Please check with the devs/data team!"
+        else:
+            reason = [f"'{result[1]}' dataset update (variable '{result[0]}')" for result in results]
+        return "; ".join(reason)
+
+    def insert(self, suggested_chart_revisions: List[dict[str, Any]]) -> None:
         n_before = 0
         try:
             with open_db() as db:
@@ -238,7 +225,7 @@ class ChartRevisionSuggester:
                         int(rev["chartId"]),
                         rev["suggestedConfig"],
                         rev["originalConfig"],
-                        suggested_reason,
+                        rev["suggested_reason"],
                         self.status,
                         GRAPHER_USER_ID,
                     )
