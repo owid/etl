@@ -138,8 +138,8 @@ SUM_AGGREGATES = [
 ]
 
 
-def load_yearly_electricity_data(tb_meadow: catalog.Table) -> pd.DataFrame:
-    """Load yearly electricity data from meadow table.
+def prepare_yearly_electricity_data(tb_meadow: catalog.Table) -> pd.DataFrame:
+    """Prepare yearly electricity data using the raw table from meadow.
 
     Parameters
     ----------
@@ -341,7 +341,7 @@ def run(dest_dir: str) -> None:
     # Get table from dataset.
     tb_meadow = ds_meadow[DATASET_SHORT_NAME]
     # Make a dataframe out of the data in the table, with the required columns.
-    df = load_yearly_electricity_data(tb_meadow)
+    df = prepare_yearly_electricity_data(tb_meadow)
 
     #
     # Process data.
