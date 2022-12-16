@@ -1,5 +1,5 @@
 meta:
-  date_accessed: 2022-12-15 12:01:46.221719
+  date_accessed: 2022-12-16 09:33:34.885800
   description: ''
   file_extension: feather
   is_public: false
@@ -12,6 +12,6 @@ meta:
   version: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 1b0717cb49db7a087280a2867731f91d
-  size: 340778
+- md5: 18713b054aaae246c43ee8458b27c958
+  size: 341530
   path: dataset_5253_covid_19__vaccinations_by_manufacturer_values.feather

@@ -1,5 +1,5 @@
 meta:
-  date_accessed: 2022-12-15 12:00:47.051381
+  date_accessed: 2022-12-16 09:32:43.026907
   description: ''
   file_extension: json
   is_public: false
@@ -12,6 +12,6 @@ meta:
   version: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 401f8c1944f8751fb76fed7713becaef
+- md5: d1f7e93cb4b7dee281816cda5b927f8f
   size: 6973
   path: dataset_5253_covid_19__vaccinations_by_manufacturer_config.json
