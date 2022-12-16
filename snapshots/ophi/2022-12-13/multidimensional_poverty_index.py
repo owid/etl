@@ -1,4 +1,4 @@
-"""Ingest OPHI raw data: Multidimensional POverty Index.
+"""Ingest OPHI raw data: Multidimensional Poverty Index.
 The file is not yet available in the website, so for now the data is uploaded manually
 The file is currently obtained from an email by the OPHI team, but they said they would upload this very same file
 """
