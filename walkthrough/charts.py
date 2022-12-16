@@ -1,6 +1,6 @@
 from enum import Enum
 from pathlib import Path
-from typing import Any
+from typing import Any, Dict
 
 from pydantic import BaseModel
 from pywebio import input as pi
@@ -118,18 +118,20 @@ def app(run_checks: bool, dummy_data: bool) -> None:
     )
 
     # get suggestions
-    run_variable_mapping_selection(data)
+    var_ids_mapping = run_variable_mapping_selection(data)
 
     # submit suggestions
     submit = pi.actions(label="Confirm to submit variable mapping to Grapher?", buttons=["Yes"])
 
     if submit == "Yes":
-        submit_suggestions()
+        submit_suggestions(var_ids_mapping)
 
 
-def submit_suggestions():
+def submit_suggestions(variable_mapping: Dict[int, int]):
     with po.put_loading():
-        print("Submitting suggestions to Grapher...")
+        suggester = ChartRevisionSuggester(variable_mapping)
+        suggester.suggest()
+    po.put_success("Chart revisions have been submitted to Grapher.")
 
 
 def run_variable_mapping_selection(data):
@@ -161,6 +163,8 @@ def run_variable_mapping_selection(data):
     # show results
     tdata = [["Old variable", "New variable"]] + [[old, new] for old, new in mapping_names.items()]
     po.put_table(tdata)
+
+    return mapping
 
 
 def _get_suggestions(old_dataset_name, new_dataset_name, similarity_name, omit_identical):
