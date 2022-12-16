@@ -129,7 +129,7 @@ def combine_beis_and_electricity_mix_data(df_beis: pd.DataFrame, df_elec: pd.Dat
     assert df_beis[df_beis["year"] < solar_or_wind_first_year]["wind_and_solar_generation"].fillna(0).max() == 0
     # Therefore, since wind and solar is always zero (prior to the beginning of the electricity mix data)
     # we can ignore this column from the BEIS dataset.
-    df_beis = df_beis.drop(columns="wind_and_solar_generation")
+    df_beis = df_beis.drop(columns=["wind_and_solar_generation"])
     # And create two columns of zeros for wind and solar.
     df_beis["solar_generation"] = 0
     df_beis["wind_generation"] = 0
@@ -153,7 +153,7 @@ def combine_beis_and_electricity_mix_data(df_beis: pd.DataFrame, df_elec: pd.Dat
         df_beis[f"{source}_generation"] *= df_beis["implied_efficiency"]
 
     # Drop other unnecessary columns.
-    df_beis = df_beis.drop(columns="implied_efficiency")
+    df_beis = df_beis.drop(columns=["implied_efficiency"])
 
     # Combine BEIS and electricity mix data.
     df_combined = dataframes.combine_two_overlapping_dataframes(

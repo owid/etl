@@ -173,7 +173,7 @@ def prepare_yearly_electricity_data(tb_meadow: catalog.Table) -> pd.DataFrame:
     return df
 
 
-def prepare_wide_table(df: pd.DataFrame, category: str) -> catalog.Table:
+def make_wide_table(df: pd.DataFrame, category: str) -> catalog.Table:
     """Convert data from long to wide format for a specific category.
 
     This is a common processing for all categories in the data.
@@ -198,14 +198,15 @@ def prepare_wide_table(df: pd.DataFrame, category: str) -> catalog.Table:
     table = catalog.Table(_df.pivot(index=["country", "year"], columns=["variable", "unit"], values="value"))
 
     # Get variable names, units, and variable-units (a name that combines both) for each column.
-    variables = table.columns.get_level_values(0).tolist()
-    units = table.columns.get_level_values(1).tolist()
     variable_units = [f"{variable} ({unit})" for variable, unit in table.columns]
 
+    # Sanity check.
+    variables = table.columns.get_level_values(0).tolist()
+    units = table.columns.get_level_values(1).tolist()
     assert len(variable_units) == len(units) == len(variables)
 
     # Collapse the two column levels into one, with the naming "variable (unit)" (except for country and year, that
-    # have no units).
+    # have no units and are the indexes of the table).
     table.columns = variable_units
 
     # Add region aggregates.
@@ -221,7 +222,7 @@ def prepare_wide_table(df: pd.DataFrame, category: str) -> catalog.Table:
     return table
 
 
-def process_electricity_generation(df: pd.DataFrame) -> catalog.Table:
+def make_table_electricity_generation(df: pd.DataFrame) -> catalog.Table:
     """Create table with processed data of category "Electricity generation".
 
     Parameters
@@ -236,7 +237,7 @@ def process_electricity_generation(df: pd.DataFrame) -> catalog.Table:
 
     """
     # Prepare wide table.
-    table = prepare_wide_table(df=df, category="Electricity generation")
+    table = make_wide_table(df=df, category="Electricity generation")
 
     # Recalculate the share of electricity generates for region aggregates.
     for column in table.columns:
@@ -252,7 +253,7 @@ def process_electricity_generation(df: pd.DataFrame) -> catalog.Table:
     return table
 
 
-def process_electricity_demand(df: pd.DataFrame) -> catalog.Table:
+def make_table_electricity_demand(df: pd.DataFrame) -> catalog.Table:
     """Create table with processed data of category "Electricity demand".
 
     Parameters
@@ -267,7 +268,7 @@ def process_electricity_demand(df: pd.DataFrame) -> catalog.Table:
 
     """
     # Prepare wide table.
-    table = prepare_wide_table(df=df, category="Electricity demand")
+    table = make_wide_table(df=df, category="Electricity demand")
 
     # Add population to data
     table = add_population(df=table, warn_on_missing_countries=False)
@@ -280,12 +281,12 @@ def process_electricity_demand(df: pd.DataFrame) -> catalog.Table:
     )
 
     # Delete the original demand per capita column.
-    table = table.drop(columns="Demand per capita (MWh)")
+    table = table.drop(columns=["Demand per capita (MWh)"])
 
     return table
 
 
-def process_power_sector_emissions(df: pd.DataFrame) -> catalog.Table:
+def make_table_power_sector_emissions(df: pd.DataFrame) -> catalog.Table:
     """Create table with processed data of category "Power sector emissions".
 
     Parameters
@@ -300,13 +301,13 @@ def process_power_sector_emissions(df: pd.DataFrame) -> catalog.Table:
 
     """
     # Prepare wide table of emissions data.
-    table = prepare_wide_table(df=df, category="Power sector emissions")
+    table = make_wide_table(df=df, category="Power sector emissions")
 
     # Add carbon intensity.
     # In principle this only needs to be done for region aggregates, but we do it for all countries and check that
     # the results are consistent with the original data.
     # Prepare wide table also for electricity generation (required to calculate carbon intensity).
-    electricity = prepare_wide_table(df=df, category="Electricity generation")[
+    electricity = make_wide_table(df=df, category="Electricity generation")[
         ["country", "year", "Total Generation (TWh)"]
     ]
     # Add total electricity generation to emissions table.
@@ -319,13 +320,13 @@ def process_power_sector_emissions(df: pd.DataFrame) -> catalog.Table:
         pd.DataFrame(table)["Total emissions (mtCO2)"] * MT_TO_G / (table["Total Generation (TWh)"] * TWH_TO_KWH)
     )
 
-    # Check that the new carbon intensities agree (within 1 % of mean average percentage error) with the original
-    # ones (where carbon intensity was given, namely for countries, not aggregate regions).
+    # Check that the new carbon intensities agree (within 1 % of mean average percentage error, aka mape) with the
+    # original ones (where carbon intensity was given, namely for countries, not aggregate regions).
     mape = 100 * abs(table.dropna(subset="check")[intensity_col] - table["check"].dropna()) / table["check"].dropna()
     assert mape.max() < 1, "Calculated carbon intensities differ from original ones by more than 1 percent."
 
     # Remove temporary column.
-    table = table.drop(columns="check")
+    table = table.drop(columns=["check"])
 
     return table
 
@@ -353,11 +354,11 @@ def run(dest_dir: str) -> None:
     # Split data into different tables, one per category, and process each one individually.
     log.info(f"{DATASET_SHORT_NAME}.prepare_wide_tables")
     tables = {
-        "Capacity": prepare_wide_table(df=df, category="Capacity"),
-        "Electricity demand": process_electricity_demand(df=df),
-        "Electricity generation": process_electricity_generation(df=df),
-        "Electricity imports": prepare_wide_table(df=df, category="Electricity imports"),
-        "Power sector emissions": process_power_sector_emissions(df=df),
+        "Capacity": make_wide_table(df=df, category="Capacity"),
+        "Electricity demand": make_table_electricity_demand(df=df),
+        "Electricity generation": make_table_electricity_generation(df=df),
+        "Electricity imports": make_wide_table(df=df, category="Electricity imports"),
+        "Power sector emissions": make_table_power_sector_emissions(df=df),
     }
 
     #
@@ -367,8 +368,7 @@ def run(dest_dir: str) -> None:
     ds_garden = catalog.Dataset.create_empty(dest_dir, metadata=ds_meadow.metadata)
 
     # Add all tables to dataset.
-    for table_name in list(tables):
-        table = tables[table_name]
+    for table_name, table in tables.items():
         # Set index and sort conveniently.
         table = table.set_index(["country", "year"], verify_integrity=True).sort_index()
         # Make column names snake lower case.
