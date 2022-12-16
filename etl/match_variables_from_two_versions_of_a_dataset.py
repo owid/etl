@@ -10,7 +10,7 @@ manually. This script is a CLI tool that may help in either scenario.
 
 import json
 import os
-from typing import Any, Callable, Union
+from typing import Any, Callable, Dict, List, Tuple, Union, cast
 
 import click
 import pandas as pd
@@ -79,31 +79,188 @@ def save_data_to_json_file(data: Union[list[str], dict[Any, Any]], json_file: st
         json.dump(data, _json_file, **kwargs)
 
 
+def preliminary_mapping(
+    old_variables: pd.DataFrame, new_variables: pd.DataFrame, omit_identical: bool
+) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    """Find initial mapping between old and new variables.
+
+    Builds a table with initial mapping, and two other dataframes with the remaining variables to be matched.
+    Initial mapping is done by identical string comparison if `omit_identical` is True.
+
+    Parameters
+    ----------
+    old_variables : pd.DataFrame
+        Dataframe of old variables.
+    new_variables : pd.DataFrame
+        Dataframe of new variables.
+    omit_identical : bool
+        True to skip variables that are identical in old and new datasets, when running comparison.
+
+    Returns
+    -------
+    Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]
+        Dataframes of old variables, new variables, and mapping between old and new variables.
+    """
+    # Prepare dataframes of old and new variables.
+    old_variables = old_variables[["id", "name"]].rename(columns={"id": "id_old", "name": "name_old"})
+    new_variables = new_variables[["id", "name"]].rename(columns={"id": "id_new", "name": "name_new"})
+    # Find variables with identical names in old and new dataset (optionally).
+    if omit_identical:
+        mapping = pd.merge(
+            old_variables,
+            new_variables,
+            left_on="name_old",
+            right_on="name_new",
+            how="inner",
+        )
+        names_to_omit = mapping["name_old"].tolist()
+    else:
+        mapping = pd.DataFrame()
+        names_to_omit = []
+
+    # Prepare dataframe of variables to sweep through in old and new datasets.
+    missing_old = old_variables[~old_variables["name_old"].isin(names_to_omit)].reset_index(drop=True)
+    missing_new = new_variables[~new_variables["name_new"].isin(names_to_omit)].reset_index(drop=True)
+
+    return mapping, missing_old, missing_new
+
+
+def find_mapping_suggestions(
+    missing_old: pd.DataFrame,
+    missing_new: pd.DataFrame,
+    matching_function: Callable[[str, str], int] = fuzz.partial_ratio,
+) -> List[Dict[str, Union[pd.DataFrame, pd.Series]]]:
+    """Find suggestions for mapping old variables to new variables.
+
+    Creates a list with new variable suggestions for each old variable. The list is therefore the same
+    size as len(old_variables). Each item is a dictionary with two keys:
+
+    - "old": pandas.Series with old variable name and ID.
+    - "new": pandas.DataFrame with new variable names, IDs, sorted by similarity to old variable name (according to matching_function).
+
+    Parameters
+    ----------
+    missing_old : pandas.DataFrame
+        Dataframe with old variables.
+    missing_new : pandas.DataFrame
+        Dataframe with new variables.
+    matching_function : function, optional
+        Function to compute similarity between two strings. The default is fuzz.partial_ratio.
+
+    Returns
+    -------
+    list
+        List of suggestions for mapping old variables to new variables.
+    """
+    # Iterate over old variables, and find the right match among new variables.
+    suggestions = []
+    for _, row in missing_old.iterrows():
+        # Old variable name
+        old_name = row["name_old"]
+
+        # Sort new variables from most to least similar to current variable.
+        missing_new["similarity"] = [matching_function(old_name, new_name) for new_name in missing_new["name_new"]]
+        missing_new = missing_new.sort_values("similarity", ascending=False)
+
+        # Add results to suggestions list.
+        suggestions.append(
+            {
+                "old": row.to_dict(),
+                "new": missing_new,
+            }
+        )
+    return suggestions
+
+
+def consolidate_mapping_suggestions_with_user(
+    mapping: pd.DataFrame, suggestions: List[Dict[str, Union[pd.Series, pd.DataFrame]]], max_suggestions: int
+):
+    """Consolidate mapping suggestions with user input.
+
+    Given an initial mapping and a list of suggestions, this function prompts the user with options and consolidates the mapping
+    based on their input."""
+    count = 0
+    ids_new_ignore = mapping["id_new"].tolist()
+    mappings = [mapping]
+    while len(suggestions) > 0:
+        # always access last suggestion
+        suggestion = suggestions[-1]
+        count += 1
+
+        # get relevant variables
+        name_old = suggestion["old"]["name_old"]
+        id_old = suggestion["old"]["id_old"]
+        missing_new = suggestion["new"]
+        missing_new = missing_new[~missing_new["id_new"].isin(ids_new_ignore)]
+        new_indexes = missing_new.index.tolist()
+
+        # display comparison to user
+        click.secho(f"\nVARIABLE {count}/{len(suggestions)}", bold=True, bg="white", fg="black")
+        _display_compared_variables(
+            old_name=cast(str, name_old),
+            missing_new=missing_new,
+            n_max_suggestions=max_suggestions,
+        )
+        # get chosen option from manual input
+        chosen_id = _input_manual_decision(new_indexes)
+
+        # update mapping list
+        if chosen_id is not None:
+            # index not to be ignored
+            if chosen_id != -1:
+                # add mapping
+                id_new = missing_new.loc[chosen_id]["id_new"]
+                name_new = missing_new.loc[chosen_id]["name_new"]
+                mappings.append(
+                    pd.DataFrame(
+                        {
+                            "id_old": [id_old],
+                            "name_old": [name_old],
+                            "id_new": [id_new],
+                            "name_new": [name_new],
+                        }
+                    )
+                )
+                # ignore the selected variable in the next suggestions
+                ids_new_ignore.append(id_new)
+
+            # forget suggestion once mapped or if user chose to ignore (chosen_id=-1)
+            _ = suggestions.pop()
+
+        mapping = pd.concat(mappings, ignore_index=True)
+
+    return mapping
+
+
 def _display_compared_variables(
     old_name: str,
-    new_name: str,
     missing_new: pd.DataFrame,
     n_max_suggestions: int = N_MAX_SUGGESTIONS,
 ) -> None:
+    new_name = missing_new.iloc[0]["name_new"]
     click.secho(f"\nOld variable: {old_name}", fg="red", bold=True, blink=True)
     click.secho(f"New variable: {new_name}", fg="green", bold=True)
     click.secho("\n\tOther options:", italic=True)
     for i, row in missing_new.iloc[1 : 1 + n_max_suggestions].iterrows():
         click.secho(
-            f"\t{i:5} - {row['name_new']} (id={row['id_new']}," f" similarity={row['similarity']:.0f})",
+            f"\t{i:5} - {row['name_new']} (id={row['id_new']}, similarity={row['similarity']:.0f})",
             fg="bright_green",
         )
     click.echo("\n")
 
 
 def _input_manual_decision(new_indexes: list[Any]) -> Any:
-    decision = input("> Press enter to accept this option, or type chosen index. To ignore this" " variable, type i.")
+    decision = input("> Press enter to accept this option, or type chosen index. To ignore this variable, type i.")
+    # select first (default) option
     if decision == "":
         chosen_index = new_indexes[0]
+    # ignore variable
     elif decision.lower() == "i":
         chosen_index = -1
+    # not valid input
     elif not decision.isdigit():
         chosen_index = None
+    # select other item in list
     elif int(decision) in new_indexes:
         chosen_index = int(decision)
     else:
@@ -142,79 +299,12 @@ def map_old_and_new_variables(
         Mapping table from old variable name and id to new variable name and id.
 
     """
-    # Prepare dataframes of old and new variables.
-    old_variables = old_variables[["id", "name"]].rename(columns={"id": "id_old", "name": "name_old"})
-    new_variables = new_variables[["id", "name"]].rename(columns={"id": "id_new", "name": "name_new"})
-    # Find variables with identical names in old and new dataset (optionally).
-    if omit_identical:
-        mapping = pd.merge(
-            old_variables,
-            new_variables,
-            left_on="name_old",
-            right_on="name_new",
-            how="inner",
-        )
-        names_to_omit = mapping["name_old"].tolist()
-    else:
-        mapping = pd.DataFrame()
-        names_to_omit = []
-
-    # Prepare dataframe of variables to sweep through in old and new datasets.
-    missing_old = old_variables[~old_variables["name_old"].isin(names_to_omit)].reset_index(drop=True)
-    missing_new = new_variables[~new_variables["name_new"].isin(names_to_omit)].reset_index(drop=True)
-
-    # Iterate over old variables, and find the right match among new variables.
-    num_variables = len(missing_old)
-    count = 0
-    while len(missing_old) > 0:
-        count += 1
-        # Indexes of the old dataframe.
-        old_indexes = missing_old.index.tolist()
-        # Choose variable on the first row of the old dataframe.
-        current_old_index = old_indexes[0]
-        old_name = missing_old.loc[current_old_index]["name_old"]
-        old_index = missing_old.loc[current_old_index]["id_old"]
-
-        # Sort new variables from most to least similar to current variable.
-        missing_new["similarity"] = [matching_function(old_name, new_name) for new_name in missing_new["name_new"]]
-        missing_new = missing_new.sort_values("similarity", ascending=False)
-
-        # Indexes of the new dataframe.
-        new_indexes = missing_new.index.tolist()
-        # By default, choose the variable with the highest similarity to the old one.
-        suggested_index = new_indexes[0]
-        new_name = missing_new.loc[suggested_index]["name_new"]
-
-        # Display comparison.
-        click.secho(f"\nVARIABLE {count}/{num_variables}", bold=True, bg="white", fg="black")
-        _display_compared_variables(
-            old_name=old_name,
-            new_name=new_name,
-            missing_new=missing_new,
-            n_max_suggestions=max_suggestions,
-        )
-
-        # Get chosen option from manual input.
-        chosen_index = _input_manual_decision(new_indexes)
-
-        if chosen_index is not None:
-            if chosen_index == -1:
-                missing_old = missing_old.drop(current_old_index)
-            else:
-                new_name = missing_new.loc[chosen_index]["name_new"]
-                new_index = missing_new.loc[chosen_index]["id_new"]
-                missing_old = missing_old.drop(current_old_index)
-                missing_new = missing_new.drop(chosen_index)
-                mapping_added = pd.DataFrame(
-                    {
-                        "id_old": [old_index],
-                        "name_old": [old_name],
-                        "id_new": [new_index],
-                        "name_new": [new_name],
-                    }
-                )
-                mapping = pd.concat([mapping, mapping_added], ignore_index=True)
-
+    # get initial mapping
+    mapping, missing_old, missing_new = preliminary_mapping(old_variables, new_variables, omit_identical)
+    # get suggestions for mapping
+    suggestions = find_mapping_suggestions(missing_old, missing_new, matching_function)
+    # iterate over suggestions and get user feedback
+    mapping = consolidate_mapping_suggestions_with_user(mapping, suggestions, max_suggestions)
     return mapping
 
 

@@ -5,9 +5,9 @@ import click
 from pywebio import start_server
 from rich import print
 
-from . import garden, grapher, meadow, snapshot, walden
+from . import garden, grapher, meadow, snapshot, walden, charts
 
-PHASES = Literal["walden", "snapshot", "meadow", "garden", "grapher"]
+PHASES = Literal["walden", "snapshot", "meadow", "garden", "grapher", "charts"]
 
 
 @click.command()
@@ -44,6 +44,8 @@ def cli(phase: Iterable[PHASES], run_checks: bool, dummy_data: bool, auto_open: 
         phase_func = garden.app
     elif phase == "grapher":
         phase_func = grapher.app
+    elif phase == "charts":
+        phase_func = charts.app
     else:
         raise NotImplementedError(f"{phase} is not implemented yet.")
 
