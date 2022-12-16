@@ -160,7 +160,7 @@ def combine_european_electricity_review_data(
     generation = ds_european["generation"].copy()
     emissions = ds_european["emissions"].copy()
 
-    # Create aggregates (defined in AGGREGATES) that are in global review but not in european review.
+    # Create aggregates (defined in AGGREGATES) that are in yearly electricity but not in the european review.
     for aggregate in AGGREGATES:
         generation[aggregate] = pd.DataFrame(generation)[AGGREGATES[aggregate]].sum(axis=1)
 
@@ -237,7 +237,7 @@ def combine_european_electricity_review_data(
     return combined_european
 
 
-def combine_global_and_european_electricity_review_data(
+def combine_yearly_electricity_data_and_european_electricity_review(
     combined_global: catalog.Table, combined_european: catalog.Table
 ) -> catalog.Table:
     """Combine the combined table of the Yearly Electricity Data with the combined table of the European Electricity
@@ -259,7 +259,7 @@ def combine_global_and_european_electricity_review_data(
     # Concatenate variables one by one, so that, if one of the two sources does not have data, we can take the
     # source that is complete.
     # When both sources are complete (for european countries), prioritise the european review (since it has more data,
-    # and it possibly is more up-to-date than the global review).
+    # and it possibly is more up-to-date than the yearly electricity data).
     combined_global = combined_global.reset_index()
     combined_european = combined_european.reset_index()
 
@@ -282,7 +282,7 @@ def combine_global_and_european_electricity_review_data(
         _combined = _combined.drop_duplicates(subset=index_columns, keep="last")
         # Combine data for different variables.
         combined = pd.merge(combined, _combined, on=index_columns, how="outer")
-    error = "There are repeated columns when combining global and european review tables."
+    error = "There are repeated columns when combining yearly electricity data and european electricity review tables."
     assert len([column for column in combined.columns if column.endswith("_x")]) == 0, error
 
     # Create a table (with no metadata) and sort data appropriately.
@@ -299,7 +299,7 @@ def combine_global_and_european_electricity_review_data(
 
 def create_net_flows_table(ds_european: catalog.Dataset) -> catalog.Table:
     """Create a table for the net flows of the European Electricity Review, since it has a different structure and
-    cannot be combined with the rest of tables in the Global or European Electricity Reviews.
+    cannot be combined with the rest of tables in the Yearly Electricity Data or European Electricity Review.
 
     Parameters
     ----------
@@ -312,7 +312,7 @@ def create_net_flows_table(ds_european: catalog.Dataset) -> catalog.Table:
         Table of net flows.
 
     """
-    # Keep the net flows table as in the original european review (this table was not present in the global review).
+    # Keep the net flows table as in the original european review (this table was not present in yearly electricity).
     net_flows = ds_european["net_flows"].copy()
     # Import metadata from metadata yaml file.
     net_flows.update_metadata_from_yaml(METADATA_PATH, "net_flows")
@@ -324,7 +324,7 @@ def run(dest_dir: str) -> None:
     #
     # Load data.
     #
-    # Read global and european electricity datasets from garden.
+    # Read yearly electricity data and european electricity review datasets from garden.
     ds_global = catalog.Dataset(GLOBAL_DATASET_PATH)
     ds_european = catalog.Dataset(EUROPEAN_DATASET_PATH)
 
@@ -337,8 +337,8 @@ def run(dest_dir: str) -> None:
     # Combine all tables of the european electricity review into one.
     combined_european = combine_european_electricity_review_data(ds_european=ds_european)
 
-    # Combine global and european reviews.
-    combined = combine_global_and_european_electricity_review_data(
+    # Combine yearly electricity and european reviews.
+    combined = combine_yearly_electricity_data_and_european_electricity_review(
         combined_global=combined_global, combined_european=combined_european
     )
 

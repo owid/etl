@@ -138,18 +138,18 @@ SUM_AGGREGATES = [
 ]
 
 
-def load_global_electricity_review(tb_meadow: catalog.Table) -> pd.DataFrame:
-    """Load global electricity data from meadow table.
+def load_yearly_electricity_data(tb_meadow: catalog.Table) -> pd.DataFrame:
+    """Load yearly electricity data from meadow table.
 
     Parameters
     ----------
     tb_meadow : catalog.Table
-        Table from the global electricity review dataset in meadow.
+        Table from the yearly electricity dataset in meadow.
 
     Returns
     -------
     df : pd.DataFrame
-        Global electricity data, in a dataframe format, with a dummy index, and only required columns.
+        Yearly electricity data, in a dataframe format, with a dummy index, and only required columns.
 
     """
     # Make a dataframe out of the data in the table.
@@ -341,7 +341,7 @@ def run(dest_dir: str) -> None:
     # Get table from dataset.
     tb_meadow = ds_meadow[DATASET_SHORT_NAME]
     # Make a dataframe out of the data in the table, with the required columns.
-    df = load_global_electricity_review(tb_meadow)
+    df = load_yearly_electricity_data(tb_meadow)
 
     #
     # Process data.

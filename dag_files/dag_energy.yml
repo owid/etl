@@ -85,11 +85,8 @@ steps:
     - data://meadow/ember/2022-08-01/european_electricity_review
     - data://garden/reference
   #
-  # Ember - Combined electricity review 2022.
+  # Ember - Combined electricity 2022.
   #
-  data://garden/ember/2022-08-01/combined_electricity_review:
-    - data://garden/ember/2022-08-01/european_electricity_review
-    - data://garden/ember/2022-08-01/global_electricity_review
   data://garden/ember/2022-12-13/combined_electricity:
     - data://garden/ember/2022-08-01/european_electricity_review
     - data://garden/ember/2022-12-13/yearly_electricity
