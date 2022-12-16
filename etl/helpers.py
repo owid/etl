@@ -3,17 +3,23 @@
 #  etl
 #
 
+import re
 import tempfile
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Any, Iterator, List, cast
+from typing import Any, Iterator, List, Optional, Union, cast
 
 import requests
 from owid import catalog
+from owid.datautils.common import ExceptionFromDocstring
 from owid.walden import Catalog as WaldenCatalog
 from owid.walden import Dataset as WaldenDataset
 
 from etl import paths
+from etl.steps import load_dag
+
+# Load ETL dag.
+DAG = load_dag()
 
 
 @contextmanager
@@ -29,12 +35,6 @@ def downloaded(url: str) -> Iterator[str]:
                 tmp.write(chunk)
 
         yield tmp.name
-
-
-def get_etag(url: str) -> str:
-    resp = requests.head(url)
-    resp.raise_for_status()
-    return cast(str, resp.headers["ETag"])
 
 
 def get_latest_github_sha(org: str, repo: str, branch: str) -> str:
@@ -58,18 +58,42 @@ def _get_github_branches(org: str, repo: str) -> List[Any]:
     return branches
 
 
-class Names:
+class CurrentFileMustBeAStep(ExceptionFromDocstring):
+    """Current file must be an ETL step."""
+
+
+class CurrentStepMustBeInDag(ExceptionFromDocstring):
+    """Current step must be listed in the dag."""
+
+
+class NoMatchingStepAmongDependencies(ExceptionFromDocstring):
+    """No step found among dependencies of current ETL step, that matches the given specifications."""
+
+
+class UnknownChannel(ExceptionFromDocstring):
+    """Unknown channel name. Valid channels are 'walden', 'snapshot', 'meadow', 'garden', or 'grapher'."""
+
+
+class PathFinder:
     """Helper object with naming conventions. It uses your module path (__file__) and
     extracts from it commonly used attributes like channel / namespace / version / short_name or
     paths to datasets from different channels.
 
     Usage:
-        N = Names(__file__)
-        ds_garden = N.garden_dataset
+        paths = PathFinder(__file__)
+        ds_garden = paths.garden_dataset
     """
 
     def __init__(self, __file__: str):
         self.f = Path(__file__)
+
+        # Current file should be a data step.
+        if not self.f.as_posix().startswith(paths.STEP_DIR.as_posix()):
+            raise CurrentFileMustBeAStep
+
+        # Current step should be in the dag.
+        if self.step not in DAG:
+            raise CurrentStepMustBeInDag
 
     @property
     def channel(self) -> str:
@@ -118,3 +142,49 @@ class Names:
     @property
     def snapshot_dir(self) -> Path:
         return paths.SNAPSHOTS_DIR / self.namespace / self.version
+
+    @staticmethod
+    def _create_step_name(channel, namespace, version, short_name):
+        if channel in ["meadow", "garden", "grapher"]:
+            step_name = f"data://{channel}/{namespace}/{version}/{short_name}"
+        elif channel in ["walden", "snapshot"]:
+            step_name = f"{channel}://{namespace}/{version}/{short_name}"
+        else:
+            raise UnknownChannel
+
+        return step_name
+
+    @property
+    def step(self) -> str:
+        return self._create_step_name(
+            channel=self.channel, namespace=self.namespace, version=self.version, short_name=self.short_name
+        )
+
+    @property
+    def dependencies(self) -> List[str]:
+        return DAG[self.step]
+
+    def get_dataset_path(
+        self, channel: str, short_name: str, namespace: Optional[str] = None, version: Optional[Union[str, int]] = None
+    ):
+        if namespace is None:
+            namespace = self.namespace
+
+        if version is None:
+            # If version is not specified, write a regular expression to catch any version, which could be either a
+            # year, a date, or "latest".
+            version = r"[\d-]{10}|[\d]{4}|latest"
+
+        pattern = self._create_step_name(channel=channel, namespace=namespace, version=version, short_name=short_name)
+        matches = [dependency for dependency in self.dependencies if bool(re.match(pattern, dependency))]
+
+        if len(matches) != 1:
+            raise NoMatchingStepAmongDependencies
+
+        dataset_path = paths.DATA_DIR / matches[0].split("://")[1]
+
+        return dataset_path
+
+
+# For backwards compatibility.
+Names = PathFinder
