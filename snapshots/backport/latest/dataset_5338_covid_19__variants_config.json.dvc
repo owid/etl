@@ -1,5 +1,5 @@
 meta:
-  date_accessed: 2022-12-16 00:00:25.942439
+  date_accessed: 2022-12-17 00:00:41.821035
   description: ''
   file_extension: json
   is_public: false
@@ -12,6 +12,6 @@ meta:
   version: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 7ca5a790c7abccb84e28b51d9fd4eb3d
+- md5: f0b99e76f8869c5583a8c4155ef8ac9a
   size: 33937
   path: dataset_5338_covid_19__variants_config.json
