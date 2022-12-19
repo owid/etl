@@ -158,7 +158,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
 
 4. Check your dataset in [admin](https://owid.cloud/admin/datasets).
 
-
+5. If you are an internal OWID member and, because of this dataset update, you want to update charts in our Grapher DB, continue with `poetry run walkthrough charts`
 ## Generated files
 """
     )
