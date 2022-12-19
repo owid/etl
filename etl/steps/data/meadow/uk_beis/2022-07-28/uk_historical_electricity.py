@@ -64,7 +64,7 @@ def run(dest_dir: str) -> None:
     # Load data.
     #
     # Retrieve raw data from walden.
-    walden_ds = paths.load_dependency("uk_historical_electricity")
+    walden_ds: WaldenCatalog = paths.load_dependency("uk_historical_electricity")
     local_file = walden_ds.ensure_downloaded()
 
     # Load data from the two relevant sheets of the excel file.

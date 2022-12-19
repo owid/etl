@@ -153,8 +153,12 @@ class PathFinder:
         return paths.SNAPSHOTS_DIR / self.namespace / self.version
 
     @staticmethod
-    def _create_step_name(short_name: str, channel: Optional[str] = None, namespace: Optional[str] = None,
-        version: Optional[str] = None) -> str:
+    def _create_step_name(
+        short_name: str,
+        channel: Optional[str] = None,
+        namespace: Optional[str] = None,
+        version: Optional[Union[int, str]] = None,
+    ) -> str:
         """Create the step name (as it appears in the dag) given its attributes.
 
         If attributes are not specified, return a regular expression that should be able to find the specified step.
@@ -179,9 +183,8 @@ class PathFinder:
         return step_name
 
     @staticmethod
-    def _get_attributes_from_step_name(step_name: str) -> Dict[str,str]:
-        """Get attributes (channel, namespace, version and short name) from the step name (as it appears in the dag).
-        """
+    def _get_attributes_from_step_name(step_name: str) -> Dict[str, str]:
+        """Get attributes (channel, namespace, version and short name) from the step name (as it appears in the dag)."""
         channel_type, path = step_name.split("://")
         if channel_type in ["walden", "snapshot"]:
             channel = channel_type
@@ -206,11 +209,13 @@ class PathFinder:
         return DAG[self.step]
 
     def get_dependency_step_name(
-        self, short_name: str, channel: Optional[str] = None, namespace: Optional[str] = None,
-        version: Optional[Union[str, int]] = None
+        self,
+        short_name: str,
+        channel: Optional[str] = None,
+        namespace: Optional[str] = None,
+        version: Optional[Union[str, int]] = None,
     ) -> str:
-        """Get dependency step name (as it appears in the dag) given its attributes (at least its short name).
-        """
+        """Get dependency step name (as it appears in the dag) given its attributes (at least its short name)."""
         pattern = self._create_step_name(channel=channel, namespace=namespace, version=version, short_name=short_name)
         matches = [dependency for dependency in self.dependencies if bool(re.match(pattern, dependency))]
 
@@ -223,21 +228,29 @@ class PathFinder:
 
         return dependency
 
-    def load_dependency(self, short_name: str, channel: Optional[str] = None, namespace: Optional[str] = None,
-            version: Optional[Union[str, int]] = None) -> Union[catalog.Dataset, Snapshot, WaldenCatalog]:
-        """Load a dataset dependency, given its attributes (at least its short name).
-        """
+    def load_dependency(
+        self,
+        short_name: str,
+        channel: Optional[str] = None,
+        namespace: Optional[str] = None,
+        version: Optional[Union[str, int]] = None,
+    ) -> Union[catalog.Dataset, Snapshot, WaldenCatalog]:
+        """Load a dataset dependency, given its attributes (at least its short name)."""
         dependency_step_name = self.get_dependency_step_name(
-            short_name=short_name, channel=channel, namespace=namespace, version=version)
+            short_name=short_name, channel=channel, namespace=namespace, version=version
+        )
         dependency = self._get_attributes_from_step_name(step_name=dependency_step_name)
         if dependency["channel"] == "walden":
             dataset = WaldenCatalog().find_one(
-                namespace=dependency["namespace"], version=dependency["version"], short_name=dependency["short_name"])
+                namespace=dependency["namespace"], version=dependency["version"], short_name=dependency["short_name"]
+            )
         elif dependency["channel"] == "snapshot":
             dataset = Snapshot(f"{dependency['namespace']}/{dependency['version']}/{dependency['short_name']}")
         else:
-            dataset_path = paths.DATA_DIR /\
-                f"{dependency['channel']}/{dependency['namespace']}/{dependency['version']}/{dependency['short_name']}"
+            dataset_path = (
+                paths.DATA_DIR
+                / f"{dependency['channel']}/{dependency['namespace']}/{dependency['version']}/{dependency['short_name']}"
+            )
             dataset = catalog.Dataset(dataset_path)
 
         return dataset

@@ -5,7 +5,6 @@ import pandas as pd
 from owid.catalog import Dataset, Table
 
 from etl.helpers import PathFinder
-from etl.snapshot import Snapshot
 from etl.steps.data.converters import convert_snapshot_metadata
 
 # Get naming conventions.

@@ -274,14 +274,14 @@ def run(dest_dir: str) -> None:
     # Load data.
     #
     # Load BP's statistical review dataset.
-    ds_bp = paths.load_dependency("statistical_review")
+    ds_bp: catalog.Dataset = paths.load_dependency("statistical_review")
     # Select main table.
     table_bp = ds_bp["statistical_review"]
     # Create a convenient dataframe.
     df_bp = pd.DataFrame(table_bp)
 
     # Idem for Ember's combined electricity.
-    ds_ember = paths.load_dependency("combined_electricity")
+    ds_ember: catalog.Dataset = paths.load_dependency("combined_electricity")
     table_ember = ds_ember["combined_electricity"]
     df_ember = pd.DataFrame(table_ember)
 

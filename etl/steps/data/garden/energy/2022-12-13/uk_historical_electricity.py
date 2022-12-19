@@ -163,8 +163,8 @@ def run(dest_dir: str) -> None:
     # Load data.
     #
     # Read all required datasets.
-    ds_beis = paths.load_dependency("uk_historical_electricity")
-    ds_elec = paths.load_dependency("electricity_mix")
+    ds_beis: catalog.Dataset = paths.load_dependency("uk_historical_electricity")
+    ds_elec: catalog.Dataset = paths.load_dependency("electricity_mix")
 
     # Gather all required tables from all datasets.
     tb_beis = ds_beis["uk_historical_electricity"]
