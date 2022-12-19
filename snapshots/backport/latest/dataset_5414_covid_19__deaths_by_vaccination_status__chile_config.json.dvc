@@ -1,5 +1,5 @@
 meta:
-  date_accessed: 2022-12-12 12:00:36.532782
+  date_accessed: 2022-12-19 09:55:24.528186
   description: ''
   file_extension: json
   is_public: false
@@ -12,6 +12,6 @@ meta:
   version: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 21cc8b80eb294210693be1604f4cd0c8
+- md5: 2f84f194240bf75d16e451ddd5834ba8
   size: 3858
   path: dataset_5414_covid_19__deaths_by_vaccination_status__chile_config.json

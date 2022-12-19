@@ -1,5 +1,5 @@
 meta:
-  date_accessed: 2022-12-16 18:03:03.526775
+  date_accessed: 2022-12-18 18:01:31.020951
   description: ''
   file_extension: feather
   is_public: false
@@ -12,6 +12,6 @@ meta:
   version: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 255ec3a0ecaf4a45489e7f94f733bb62
-  size: 8215138
+- md5: b0abe90142d0129d5a8abea0cdfbc4be
+  size: 8202442
   path: dataset_5237_uk_covid_data_values.feather
