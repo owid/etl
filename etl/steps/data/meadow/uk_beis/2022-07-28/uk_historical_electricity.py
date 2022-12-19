@@ -5,11 +5,11 @@ from owid.catalog import Dataset, Table, TableMeta
 from owid.catalog.utils import underscore_table
 from owid.walden import Catalog as WaldenCatalog
 
-from etl.helpers import Names
+from etl.helpers import PathFinder
 from etl.steps.data.converters import convert_walden_metadata
 
-# Naming conventions.
-N = Names(__file__)
+# Get relevant paths for current file.
+paths = PathFinder(__file__)
 
 
 def prepare_data(df: pd.DataFrame, expected_content: Dict[int, List[str]], columns: Dict[int, str]) -> pd.DataFrame:
@@ -64,9 +64,7 @@ def run(dest_dir: str) -> None:
     # Load data.
     #
     # Retrieve raw data from walden.
-    walden_ds = WaldenCatalog().find_one(
-        namespace="uk_beis", short_name="uk_historical_electricity", version="2022-07-28"
-    )
+    walden_ds = paths.load_dependency("uk_historical_electricity")
     local_file = walden_ds.ensure_downloaded()
 
     # Load data from the two relevant sheets of the excel file.
