@@ -3,9 +3,13 @@
 #
 
 import hashlib
+from collections import OrderedDict
 from pathlib import Path
 from threading import Lock
-from typing import Dict, List, Set, Union
+from typing import Any, Dict, List, Optional, Set, TextIO, Union
+
+import yaml
+from yaml.dumper import Dumper
 
 # runtime cache, we need locks because we usually run it in threads
 cache_md5: Dict[str, str] = {}
@@ -55,3 +59,48 @@ def walk(folder: Path, ignore_set: Set[str] = {"__pycache__", ".ipynb_checkpoint
             paths.append(p)
 
     return paths
+
+
+class _MyDumper(Dumper):
+    pass
+
+
+def _str_presenter(dumper: Any, data: Any) -> Any:
+    if len(data.splitlines()) > 1:  # check for multiline string
+        return dumper.represent_scalar("tag:yaml.org,2002:str", data, style="|")
+    return dumper.represent_scalar("tag:yaml.org,2002:str", data)
+
+
+# dump multi-line strings correctly in YAML and add support for OrderedDict
+_MyDumper.add_representer(str, _str_presenter)
+_MyDumper.add_representer(
+    OrderedDict,
+    lambda dumper, data: dumper.represent_mapping("tag:yaml.org,2002:map", data.items()),
+)
+
+
+def yaml_dump(d: Dict[str, Any], stream: Optional[TextIO] = None, strip_lines: bool = True) -> Optional[str]:
+    """Alternative to yaml.dump which produces good looking multi-line strings and perserves ordering
+    of keys."""
+    # strip lines, otherwise YAML won't output strings in literal format
+    if strip_lines:
+        d = _strip_lines_in_dict(d)
+    return yaml.dump(d, stream=stream, sort_keys=False, allow_unicode=True, Dumper=_MyDumper)
+
+
+def _strip_lines(s: str) -> str:
+    """Strip all lines in a string."""
+    s = "\n".join([line.strip() for line in s.split("\n")])
+    return s.strip()
+
+
+def _strip_lines_in_dict(d: Any) -> Any:
+    """Recursively go through dictionary and strip lines of all encountered strings."""
+    if isinstance(d, str):
+        return _strip_lines(d)
+    elif isinstance(d, list):
+        return [_strip_lines_in_dict(e) for e in d]
+    elif isinstance(d, dict):
+        return {k: _strip_lines_in_dict(v) for k, v in d.items()}
+    else:
+        return d
