@@ -2,7 +2,7 @@ import traceback
 import warnings
 from collections.abc import Generator
 from contextlib import contextmanager
-from typing import Any
+from typing import Any, List, Union
 from urllib.parse import quote
 
 import MySQLdb
@@ -127,3 +127,23 @@ def get_variables_in_dataset(db_conn: MySQLdb.Connection, dataset_id: int, only_
         warnings.simplefilter("ignore", UserWarning)
         variables_data = pd.read_sql(query, con=db_conn)
     return variables_data
+
+
+def get_all_datasets_names(db_conn: Union[MySQLdb.Connection, None] = None) -> List[str]:
+    """Get all dataset names in the database.
+
+    Parameters
+    ----------
+    db_conn : pymysql.connections.Connection
+        Connection to database. If None, default one is used (see `get_connection`).
+    """
+
+    def _get_all_dataset_names(db_conn):
+        query = " SELECT * FROM datasets"
+        datasets = pd.read_sql(query, con=db_conn)
+        return datasets["name"].sort_values().tolist()
+
+    if db_conn is None:
+        with get_connection() as db_conn:
+            return _get_all_dataset_names(db_conn)
+    return _get_all_dataset_names(db_conn)
