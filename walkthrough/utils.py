@@ -235,5 +235,8 @@ class OWIDEnv:
     def chart_approval_tool_url(self):
         return f"{self.admin_url}/suggested-chart-revisions/review"
 
-    def variable_admin_link(self, variable_id: int):
+    def dataset_admin_url(self, dataset_id: int):
+        return f"{self.admin_url}/datasets/{dataset_id}/"
+
+    def variable_admin_url(self, variable_id: int):
         return f"{self.admin_url}/variables/{variable_id}/"
