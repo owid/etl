@@ -5,7 +5,7 @@ import click
 from pywebio import start_server
 from rich import print
 
-from . import garden, grapher, meadow, snapshot, walden, charts
+from . import charts, garden, grapher, meadow, snapshot, walden
 
 PHASES = Literal["walden", "snapshot", "meadow", "garden", "grapher", "charts"]
 
