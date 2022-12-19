@@ -6,20 +6,16 @@
 4. If they confirm, then revisions are submitted to Grapher DB.
 """
 from pathlib import Path
-from typing import Any, Callable, List, Union
+from typing import Any, Callable, List, Union, cast
 
 import pandas as pd
+import structlog
 from pywebio import input as pi
 from pywebio import output as po
 
 import etl
 from etl.chart_revision_suggester import ChartRevisionSuggester
-from etl.db import (
-    get_all_datasets_names,
-    get_connection,
-    get_dataset_id,
-    get_variables_in_dataset,
-)
+from etl.db import get_all_datasets, get_connection, get_variables_in_dataset
 from etl.match_variables_from_two_versions_of_a_dataset import (
     SIMILARITY_NAME,
     SIMILARITY_NAMES,
@@ -32,6 +28,8 @@ from .utils import OWIDEnv, _check_env, _show_environment
 CURRENT_DIR = Path(__file__).parent
 
 ETL_DIR = Path(etl.__file__).parent.parent
+
+log = structlog.get_logger()
 
 
 def app(run_checks: bool, dummy_data: bool) -> None:
@@ -76,20 +74,9 @@ class Navigation:
     def __init__(self, run_checks) -> None:
         self.run_checks = run_checks
 
-    def init_app(self):
-        # show instructions
-        self.show_instructions()
-        # show and check environment
-        self.check_environment()
-        # get main parameters (old and new dataset names, etc.)
-        self.get_input_params()
-        # show params
-        self.show_input_params()
-        # get mapping suggestions
-        self.get_suggestions()
-
     def show_instructions(self) -> None:
         """Show initial step description."""
+        log.info("1. Showing instructions")
         with open(CURRENT_DIR / "charts.md", "r") as f:
             po.put_markdown(f.read())
 
@@ -98,6 +85,7 @@ class Navigation:
 
         Check if .env is there, show environment variables.
         """
+        log.info("2. Checking environment")
         if self.run_checks:
             _check_env()
         _show_environment()
@@ -107,23 +95,67 @@ class Navigation:
 
         Collects necessary parameters from the user, including old and new dataset names, similarity function, and whether to pair identical variables.
         """
+        log.info("3. Getting input parameters")
         # ask user for dataset names
-        datasets_available = get_all_datasets_names()
+        datasets_available = get_all_datasets(archived=False)
+        names_available = sorted(set(datasets_available["name"]))
+
+        def get_available_ids_for_name(name: str):
+            ids = cast(pd.Series, datasets_available[datasets_available["name"] == name]["id"])
+            ids = sorted(ids.tolist())
+            if len(ids) == 1:
+                return [{"label": i, "value": i, "disabled": True, "selected": True} for i in ids]
+            return [i for i in ids]
+
+        # default selected datasets
+        name_old_default = names_available[10]
+        ids_old_default = get_available_ids_for_name(name_old_default)
+        name_new_default = names_available[11]
+        ids_new_default = get_available_ids_for_name(name_new_default)
+
         params = pi.input_group(
             "Options",
             [
                 pi.select(
                     "Old dataset name",
-                    name="old_dataset",
-                    value="Life expectancy - Riley (2005), Clio Infra (2015), and UN (2019)",
-                    options=datasets_available,
+                    name="dataset_old_name",
+                    options=names_available,
+                    value=name_old_default,
+                    onchange=lambda n: pi.input_update(
+                        "dataset_old_id",
+                        options=get_available_ids_for_name(n),
+                    ),
+                    required=True,
+                ),
+                pi.select(
+                    "Old dataset id",
+                    name="dataset_old_id",
+                    options=ids_old_default,
+                    help_text=(
+                        "Sometimes there can be multiple datasets with the same name. In that case, you need to specify"
+                        " the dataset id."
+                    ),
                     required=True,
                 ),
                 pi.select(
                     "New dataset name",
-                    name="new_dataset",
-                    value="Life Expectancy (various sources)",
-                    options=datasets_available,
+                    name="dataset_new_name",
+                    value=name_new_default,
+                    options=names_available,
+                    onchange=lambda n: pi.input_update(
+                        "dataset_new_id",
+                        options=get_available_ids_for_name(n),
+                    ),
+                    required=True,
+                ),
+                pi.select(
+                    "New dataset id",
+                    name="dataset_new_id",
+                    options=ids_new_default,
+                    help_text=(
+                        "Sometimes there can be multiple datasets with the same name. In that case, you need to specify"
+                        " the dataset id."
+                    ),
                     required=True,
                 ),
                 pi.select(
@@ -146,18 +178,40 @@ class Navigation:
                 ),
             ],
         )
+
+        # check if ids are none, which means that there is only one dataset
+        if params["dataset_old_id"] is None:
+            params["dataset_old_id"] = get_available_ids_for_name(params["dataset_old_name"])[0]["value"]
+        if params["dataset_new_id"] is None:
+            params["dataset_new_id"] = get_available_ids_for_name(params["dataset_new_name"])[0]["value"]
+
         self.params = params
-        print(params)
 
     def show_input_params(self) -> None:
         """Shows user the input parameters."""
+        log.info("4. Showing input parameters")
+        link_old = self.owid_env.dataset_admin_url(self.params["dataset_old_id"])
+        # dataset_admin_url
+        link_new = self.owid_env.dataset_admin_url(self.params["dataset_new_id"])
         po.put_info(
-            po.put_markdown(
+            po.put_html(
                 f"""
-            * **Old dataset**: *{self.params['old_dataset']}*
-            * **New dataset**: *{self.params['new_dataset']}*
-            * **Similarity matching function**: {self.params['similarity_function']}
-            * Pairing identically named variables is **{'enabled' if self.params['pair_identical'] else 'disabled'}**
+            <ul>
+                <li><b><a href='{link_old}'>Old dataset ↗</a></b>
+                    <ul>
+                        <li><b>Name</b>: {self.params['dataset_old_name']}</li>
+                        <li><b>ID</b>: {self.params['dataset_old_id']}</li>
+                    </ul>
+                </li>
+                <li><b><a href='{link_new}'>New dataset ↗</a></b>
+                    <ul>
+                        <li><b>Name</b>: {self.params['dataset_new_name']}</li>
+                        <li><b>ID</b>: {self.params['dataset_new_id']}</li>
+                    </ul>
+                </li>
+                <li><b>Similarity matching function</b>: {self.params['similarity_function']}</li>
+                <li>Pairing identically named variables is <b>{'enabled' if self.params['pair_identical'] else 'disabled'}</b></li>
+            </ul>
             """
             )
         )
@@ -170,23 +224,18 @@ class Navigation:
         - "old": Dictionary with old variable name and ID.
         - "new": pandas.DataFrame with new variable names, IDs, sorted by similarity to old variable name (according to matching_function).
         """
-        old_dataset_name = self.params["old_dataset"]
-        new_dataset_name = self.params["new_dataset"]
+        log.info("5. Getting variable mapping suggestions")
         similarity_name = self.params["similarity_function"]
         omit_identical = self.params["pair_identical"]
 
         with get_connection() as db_conn:
-            # Get old and new dataset ids.
-            old_dataset_id = get_dataset_id(db_conn=db_conn, dataset_name=old_dataset_name)
-            new_dataset_id = get_dataset_id(db_conn=db_conn, dataset_name=new_dataset_name)
-
             # Get variables from old dataset that have been used in at least one chart.
             old_variables = get_variables_in_dataset(
-                db_conn=db_conn, dataset_id=old_dataset_id, only_used_in_charts=True
+                db_conn=db_conn, dataset_id=self.params["dataset_old_id"], only_used_in_charts=True
             )
             # Get all variables from new dataset.
             new_variables = get_variables_in_dataset(
-                db_conn=db_conn, dataset_id=new_dataset_id, only_used_in_charts=False
+                db_conn=db_conn, dataset_id=self.params["dataset_new_id"], only_used_in_charts=False
             )
 
         # get initial mapping
@@ -215,6 +264,7 @@ class Navigation:
         These should have been assigned a value before calling this function. This function checks
         that the value assigned makes sense in terms of typing and key-values.
         """
+        log.info("6. Sanity checks")
         assert isinstance(self.suggestions, list), "Suggestions must be a list!"
         for i, s in enumerate(self.suggestions):
             assert all(k in s for k in ("new", "old")), f"Keys 'new' and 'old' missing in suggestin number {i}!."
@@ -223,14 +273,23 @@ class Navigation:
             ), f"Suggestion number {i} has a 'new' value that is not a DataFrame. Instead {type(s['new'])} was found."
             assert isinstance(
                 s["old"], dict
-            ), f"Suggestion number {i} has a 'old' value that is not a Series. Instead {type(s['old'])} was found."
+            ), f"Suggestion number {i} has an 'old' value that is not a Series. Instead {type(s['old'])} was found."
         assert isinstance(self.params, dict), "Params must be a dictionary!"
         assert all(
-            k in self.params for k in ("old_dataset", "new_dataset", "similarity_function", "pair_identical")
+            k in self.params
+            for k in (
+                "dataset_old_name",
+                "dataset_new_name",
+                "dataset_old_id",
+                "dataset_new_id",
+                "similarity_function",
+                "pair_identical",
+            )
         ), "Check all expected keys are in params!"
 
     def get_variable_mapping_ids(self) -> None:
         """Show user a form to select new variable names for old variables."""
+        log.info("7. Getting variable mapping ids")
         selects = []
         for suggestion in self.suggestions:
             old_varname = suggestion["old"]["name_old"]
@@ -266,6 +325,8 @@ class Navigation:
     def confirm_variable_mapping(self, next_step: Callable) -> None:
         """Confirm variable mapping by means of a popup."""
 
+        log.info("8. Confirming variable mapping with user with popup")
+
         # close popup and go to next step
         def _next_step():
             po.close_popup()
@@ -295,6 +356,7 @@ class Navigation:
         - submit suggestions to Grapher DB.
         - show next steps.
         """
+        log.info("9. Final steps")
         # show variable mapping
         self.show_variable_mapping_table()
         # clean variable mapping (ignore -1)
@@ -332,12 +394,12 @@ class Navigation:
             [
                 po.put_link(
                     f"{variable_id_to_names.get(old_id)} ({old_id})",
-                    self.owid_env.variable_admin_link(old_id),
+                    self.owid_env.variable_admin_url(old_id),
                     new_window=True,
                 ),
                 po.put_link(
                     f"{variable_id_to_names.get(new_id)} ({new_id})",
-                    self.owid_env.variable_admin_link(new_id),
+                    self.owid_env.variable_admin_url(new_id),
                     new_window=True,
                 )
                 if new_id != -1
