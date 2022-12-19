@@ -48,10 +48,10 @@ def run(dest_dir: str) -> None:
     # - `MPI`: the product of `Headcount ratio` and `Intensity`.
     #
     # These are multi-dimensional poverty measures – a weighted aggregation across many individual indicators.
-    # Here I prepare this data as I would for uploading to OWID grapher and visualize it – separating the `hot` from the `cme` data.
+    # Here I prepare this data as I would for uploading to OWID grapher and visualize it – including both `hot` and `cme` data in the same file.
 
     # %%
-    # Prep data for OWID
+    # Prep data for garden
 
     # Modify variable names
     df = df.replace({"M0": "mpi", "H": "share", "A": "intensity"})
