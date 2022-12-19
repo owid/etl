@@ -7,7 +7,7 @@ import re
 import tempfile
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Any, Iterator, List, Optional, Union, cast
+from typing import Any, Dict, Iterator, List, Optional, Union, cast
 
 import requests
 from owid import catalog
@@ -16,6 +16,7 @@ from owid.walden import Catalog as WaldenCatalog
 from owid.walden import Dataset as WaldenDataset
 
 from etl import paths
+from etl.snapshot import Snapshot
 from etl.steps import load_dag
 
 # Load ETL dag.
@@ -66,12 +67,20 @@ class CurrentStepMustBeInDag(ExceptionFromDocstring):
     """Current step must be listed in the dag."""
 
 
-class NoMatchingStepAmongDependencies(ExceptionFromDocstring):
-    """No step found among dependencies of current ETL step, that matches the given specifications."""
+class NoMatchingStepsAmongDependencies(ExceptionFromDocstring):
+    """No steps found among dependencies of current ETL step, that match the given specifications."""
+
+
+class MultipleMatchingStepsAmongDependencies(ExceptionFromDocstring):
+    """Multiple steps found among dependencies of current ETL step, that match the given specifications."""
 
 
 class UnknownChannel(ExceptionFromDocstring):
     """Unknown channel name. Valid channels are 'walden', 'snapshot', 'meadow', 'garden', or 'grapher'."""
+
+
+class WrongStepName(ExceptionFromDocstring):
+    """Wrong step name. If this step was in the dag, it should be corrected."""
 
 
 class PathFinder:
@@ -144,15 +153,47 @@ class PathFinder:
         return paths.SNAPSHOTS_DIR / self.namespace / self.version
 
     @staticmethod
-    def _create_step_name(channel, namespace, version, short_name):
+    def _create_step_name(short_name: str, channel: Optional[str] = None, namespace: Optional[str] = None,
+        version: Optional[str] = None) -> str:
+        """Create the step name (as it appears in the dag) given its attributes.
+
+        If attributes are not specified, return a regular expression that should be able to find the specified step.
+        """
+        if namespace is None:
+            # If namespace is not specified, catch any name that does not contain "/".
+            namespace = r"[^/]+"
+
+        if version is None:
+            # If version is not specified, catch any version, which could be either a date, a year, or "latest".
+            version = r"(?:\d{4}\-\d{2}\-\d{2}|\d{4}|latest)"
+
         if channel in ["meadow", "garden", "grapher"]:
             step_name = f"data://{channel}/{namespace}/{version}/{short_name}"
-        elif channel in ["walden", "snapshot"]:
+        elif channel in ["snapshot", "walden"]:
             step_name = f"{channel}://{namespace}/{version}/{short_name}"
+        elif channel is None:
+            step_name = rf"(?:snapshot:/|walden:/|data://meadow|data://garden|data://grapher)/{namespace}/{version}/{short_name}"
         else:
             raise UnknownChannel
 
         return step_name
+
+    @staticmethod
+    def _get_attributes_from_step_name(step_name: str) -> Dict[str,str]:
+        """Get attributes (channel, namespace, version and short name) from the step name (as it appears in the dag).
+        """
+        channel_type, path = step_name.split("://")
+        if channel_type in ["walden", "snapshot"]:
+            channel = channel_type
+            namespace, version, short_name = path.split("/")
+        elif channel_type in ["data"]:
+            channel, namespace, version, short_name = path.split("/")
+        else:
+            raise WrongStepName
+
+        attributes = {"channel": channel, "namespace": namespace, "version": version, "short_name": short_name}
+
+        return attributes
 
     @property
     def step(self) -> str:
@@ -164,26 +205,42 @@ class PathFinder:
     def dependencies(self) -> List[str]:
         return DAG[self.step]
 
-    def get_dataset_path(
-        self, channel: str, short_name: str, namespace: Optional[str] = None, version: Optional[Union[str, int]] = None
-    ):
-        if namespace is None:
-            namespace = self.namespace
-
-        if version is None:
-            # If version is not specified, write a regular expression to catch any version, which could be either a
-            # year, a date, or "latest".
-            version = r"[\d-]{10}|[\d]{4}|latest"
-
+    def get_dependency_step_name(
+        self, short_name: str, channel: Optional[str] = None, namespace: Optional[str] = None,
+        version: Optional[Union[str, int]] = None
+    ) -> str:
+        """Get dependency step name (as it appears in the dag) given its attributes (at least its short name).
+        """
         pattern = self._create_step_name(channel=channel, namespace=namespace, version=version, short_name=short_name)
         matches = [dependency for dependency in self.dependencies if bool(re.match(pattern, dependency))]
 
-        if len(matches) != 1:
-            raise NoMatchingStepAmongDependencies
+        if len(matches) == 0:
+            raise NoMatchingStepsAmongDependencies
+        elif len(matches) > 1:
+            raise MultipleMatchingStepsAmongDependencies
 
-        dataset_path = paths.DATA_DIR / matches[0].split("://")[1]
+        dependency = matches[0]
 
-        return dataset_path
+        return dependency
+
+    def load_dependency(self, short_name: str, channel: Optional[str] = None, namespace: Optional[str] = None,
+            version: Optional[Union[str, int]] = None) -> Union[catalog.Dataset, Snapshot, WaldenCatalog]:
+        """Load a dataset dependency, given its attributes (at least its short name).
+        """
+        dependency_step_name = self.get_dependency_step_name(
+            short_name=short_name, channel=channel, namespace=namespace, version=version)
+        dependency = self._get_attributes_from_step_name(step_name=dependency_step_name)
+        if dependency["channel"] == "walden":
+            dataset = WaldenCatalog().find_one(
+                namespace=dependency["namespace"], version=dependency["version"], short_name=dependency["short_name"])
+        elif dependency["channel"] == "snapshot":
+            dataset = Snapshot(f"{dependency['namespace']}/{dependency['version']}/{dependency['short_name']}")
+        else:
+            dataset_path = paths.DATA_DIR /\
+                f"{dependency['channel']}/{dependency['namespace']}/{dependency['version']}/{dependency['short_name']}"
+            dataset = catalog.Dataset(dataset_path)
+
+        return dataset
 
 
 # For backwards compatibility.
