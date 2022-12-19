@@ -32,7 +32,7 @@ log = structlog.get_logger()
 )
 def main_cli(mapping_file: str) -> None:
     try:
-        suggester = ChartRevisionSuggester.from_dict(mapping_file)
+        suggester = ChartRevisionSuggester.from_json(mapping_file)
         suggester.suggest()
     except Exception as e:
         log.error(e)
@@ -55,7 +55,7 @@ class ChartRevisionSuggester:
     Usage:
         >>> from etl.chart_revision_suggester import ChartRevisionSuggester
         >>> mapping_filepath = "file/to/variable_mapping.json"
-        >>> suggester = ChartRevisionSuggester.from_dict(mapping_filepath)
+        >>> suggester = ChartRevisionSuggester.from_json(mapping_filepath)
         >>> suggester.suggest()
     """
 
@@ -77,7 +77,7 @@ class ChartRevisionSuggester:
                 raise TypeError(f"The values of the variable mapping dictionary must be integers. Found value '{v}'!")
 
     @classmethod
-    def from_dict(cls, filepath: str) -> "ChartRevisionSuggester":
+    def from_json(cls, filepath: str) -> "ChartRevisionSuggester":
         """Load a ChartRevisionSuggester instance from a JSON file.
 
         Parameters
@@ -284,13 +284,14 @@ class ChartRevisionSuggester:
                         f" created. Affected charts:\n{s}"
                     )
         except IntegrityError as e:
-            log.error(
+            e = (
                 "INSERT operation into `suggested_chart_revisions` cancelled. "
                 "Failed to insert suggested chart revisions because one or "
                 "more of the suggested revisions that you are trying to insert "
                 "already exists with an equivalent chartId, originalVersion, "
                 f"suggestedVersion, and isPendingOrFlagged. Error: {e}"
             )
+            raise IntegrityError(e)
         except Exception as e:
             log.error(f"INSERT operation into `suggested_chart_revisions` cancelled. Error: {e}")
             raise e
