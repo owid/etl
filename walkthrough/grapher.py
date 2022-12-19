@@ -7,7 +7,6 @@ from pywebio import input as pi
 from pywebio import output as po
 
 import etl
-from etl import config
 
 from . import utils
 
@@ -44,9 +43,9 @@ def app(run_checks: bool, dummy_data: bool) -> None:
         po.put_markdown(f.read())
 
     if run_checks:
-        _check_env()
+        utils._check_env()
 
-    _show_environment()
+    utils._show_environment()
 
     data = pi.input_group(
         "Options",
@@ -168,32 +167,3 @@ def app(run_checks: bool, dummy_data: bool) -> None:
 
     if dag_content:
         utils.preview_dag(dag_content)
-
-
-def _check_env() -> None:
-    po.put_markdown("""## Checking `.env` file...""")
-
-    ok = True
-    for env_name in ("GRAPHER_USER_ID", "DB_USER", "DB_NAME", "DB_HOST"):
-        if getattr(config, env_name) is None:
-            ok = False
-            po.put_warning(
-                po.put_markdown(f"Environment variable `{env_name}` not found, do you have it in your `.env` file?")
-            )
-
-    if ok:
-        po.put_success(po.put_markdown("`.env` configured correctly"))
-
-
-def _show_environment() -> None:
-    po.put_markdown("## Environment")
-    po.put_info(
-        po.put_markdown(
-            f"""
-    * **GRAPHER_USER_ID**: `{config.GRAPHER_USER_ID}`
-    * **DB_USER**: `{config.DB_USER}`
-    * **DB_NAME**: `{config.DB_NAME}`
-    * **DB_HOST**: `{config.DB_HOST}`
-    """
-        )
-    )
