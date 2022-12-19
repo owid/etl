@@ -15,6 +15,7 @@ from owid.datautils import dataframes
 from owid.walden import files
 
 from etl import paths
+from etl.files import yaml_dump
 
 dvc = Repo(paths.BASE_DIR)
 
@@ -138,7 +139,7 @@ class SnapshotMeta:
     def save(self) -> None:
         self.path.parent.mkdir(exist_ok=True, parents=True)
         with open(self.path, "w") as ostream:
-            yaml.dump({"meta": self.to_dict()}, ostream)
+            yaml_dump({"meta": self.to_dict()}, ostream)
 
     @property
     def uri(self):

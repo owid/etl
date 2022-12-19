@@ -10,3 +10,23 @@ def test_walk_ignore_set(tmp_path):
 
     outfiles = files.walk(tmp_path)
     assert [f.name for f in outfiles] == ["test.py"]
+
+
+def test_yaml_dump():
+    d = {"a": "Multi-line\nstring\n with whitespaces!", "b": "One-liner", "c": {"nested": {"d": ["\nline  \n"]}}}
+
+    out = files.yaml_dump(d)
+    print(out)
+    assert (
+        out
+        == """a: |-
+  Multi-line
+  string
+  with whitespaces!
+b: One-liner
+c:
+  nested:
+    d:
+    - line
+"""
+    )
