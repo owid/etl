@@ -10,7 +10,7 @@ manually. This script is a CLI tool that may help in either scenario.
 
 import json
 import os
-from typing import Any, Callable, Dict, List, Tuple, Union, cast
+from typing import Any, Dict, List, Tuple, Union, cast
 
 import click
 import pandas as pd
@@ -128,14 +128,14 @@ def preliminary_mapping(
 def find_mapping_suggestions(
     missing_old: pd.DataFrame,
     missing_new: pd.DataFrame,
-    matching_function: Callable[[str, str], int] = fuzz.partial_ratio,
+    similarity_name: str = "partial_ratio",
 ) -> List[Dict[str, Union[pd.DataFrame, pd.Series]]]:
     """Find suggestions for mapping old variables to new variables.
 
     Creates a list with new variable suggestions for each old variable. The list is therefore the same
     size as len(old_variables). Each item is a dictionary with two keys:
 
-    - "old": pandas.Series with old variable name and ID.
+    - "old": Dictionary with old variable name and ID.
     - "new": pandas.DataFrame with new variable names, IDs, sorted by similarity to old variable name (according to matching_function).
 
     Parameters
@@ -144,14 +144,16 @@ def find_mapping_suggestions(
         Dataframe with old variables.
     missing_new : pandas.DataFrame
         Dataframe with new variables.
-    matching_function : function, optional
-        Function to compute similarity between two strings. The default is fuzz.partial_ratio.
+    similarity_name : function, optional
+        Similarity function name. The default is 'partial_ratio'. Must be in `SIMILARITY_NAMES`.
 
     Returns
     -------
     list
         List of suggestions for mapping old variables to new variables.
     """
+    # get similarity function
+    matching_function = get_similarity_function(similarity_name)
     # Iterate over old variables, and find the right match among new variables.
     suggestions = []
     for _, row in missing_old.iterrows():
@@ -166,7 +168,7 @@ def find_mapping_suggestions(
         suggestions.append(
             {
                 "old": row.to_dict(),
-                "new": missing_new,
+                "new": missing_new.copy(),
             }
         )
     return suggestions
@@ -277,7 +279,7 @@ def map_old_and_new_variables(
     new_variables: pd.DataFrame,
     max_suggestions: int,
     omit_identical: bool = True,
-    matching_function: Callable[[str, str], int] = fuzz.partial_ratio,
+    similarity_name: str = "partial_ratio",
 ) -> pd.DataFrame:
     """Map old variables to new variables, either automatically (when they match perfectly) or manually.
 
@@ -290,8 +292,8 @@ def map_old_and_new_variables(
     omit_identical : bool
         True to automatically match variables that have identical names in both datasets. False to include them in the
         manual comparison.
-    matching_function : function
-        Method to calculate the similarity between two terms.
+    similarity_name: str
+        Similarity function name. Must be in `SIMILARITY_NAMES`.
 
     Returns
     -------
@@ -302,7 +304,7 @@ def map_old_and_new_variables(
     # get initial mapping
     mapping, missing_old, missing_new = preliminary_mapping(old_variables, new_variables, omit_identical)
     # get suggestions for mapping
-    suggestions = find_mapping_suggestions(missing_old, missing_new, matching_function)
+    suggestions = find_mapping_suggestions(missing_old, missing_new, similarity_name)
     # iterate over suggestions and get user feedback
     mapping = consolidate_mapping_suggestions_with_user(mapping, suggestions, max_suggestions)
     return mapping
@@ -379,15 +381,12 @@ def main(
         # Get all variables from new dataset.
         new_variables = get_variables_in_dataset(db_conn=db_conn, dataset_id=new_dataset_id, only_used_in_charts=False)
 
-    # Select similarity function.
-    similarity_function = get_similarity_function(similarity_name)
-
     # Manually map old variable names to new variable names.
     mapping = map_old_and_new_variables(
         old_variables=old_variables,
         new_variables=new_variables,
         omit_identical=omit_identical,
-        matching_function=similarity_function,
+        similarity_name=similarity_name,
         max_suggestions=max_suggestions,
     )
 
