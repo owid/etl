@@ -1,5 +1,5 @@
 meta:
-  date_accessed: 2022-12-12 12:01:36.759132
+  date_accessed: 2022-12-19 09:56:43.716531
   description: ''
   file_extension: feather
   is_public: false
@@ -12,6 +12,6 @@ meta:
   version: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: cbc7d3bb5a1c5e7f996f394d9601f823
-  size: 18298
+- md5: aae7f46a8ad9969ea1d0368105aec480
+  size: 18698
   path: dataset_5414_covid_19__deaths_by_vaccination_status__chile_values.feather
