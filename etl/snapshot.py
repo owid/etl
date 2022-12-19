@@ -75,7 +75,7 @@ class Snapshot:
 
     @property
     def _dvc_remote(self):
-        return "public" if self.metadata.is_public else "private"
+        return "public-read" if self.metadata.is_public else "private"
 
 
 @pruned_json
