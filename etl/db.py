@@ -61,7 +61,7 @@ def open_db() -> Generator[DBUtils, None, None]:
             connection.close()
 
 
-def get_dataset_id(db_conn: MySQLdb.Connection, dataset_name: str) -> Any:
+def get_dataset_id(db_conn: Union[MySQLdb.Connection, None], dataset_name: str) -> Any:
     """Get the dataset ID of a specific dataset name from database.
 
     If more than one dataset is found for the same name, or if no dataset is found, an error is raised.
@@ -79,19 +79,25 @@ def get_dataset_id(db_conn: MySQLdb.Connection, dataset_name: str) -> Any:
         Dataset ID.
 
     """
-    query = f"""
-        SELECT id
-        FROM datasets
-        WHERE name = '{dataset_name}'
-    """
-    with db_conn.cursor() as cursor:
-        cursor.execute(query)
-        result = cursor.fetchall()
 
-    assert len(result) == 1, f"Ambiguous or unknown dataset name '{dataset_name}'"
-    dataset_id = result[0][0]
+    def _get_dataset_id(db_conn, dataset_name):
+        query = f"""
+            SELECT id
+            FROM datasets
+            WHERE name = '{dataset_name}'
+        """
+        with db_conn.cursor() as cursor:
+            cursor.execute(query)
+            result = cursor.fetchall()
 
-    return dataset_id
+        assert len(result) == 1, f"Ambiguous or unknown dataset name '{dataset_name}'"
+        dataset_id = result[0][0]
+        return dataset_id
+
+    if db_conn is None:
+        with get_connection() as db_conn:
+            return _get_dataset_id(db_conn, dataset_name)
+    return _get_dataset_id(db_conn, dataset_name)
 
 
 def get_variables_in_dataset(db_conn: MySQLdb.Connection, dataset_id: int, only_used_in_charts: bool = False) -> Any:
