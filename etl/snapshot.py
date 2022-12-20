@@ -52,7 +52,7 @@ class Snapshot:
 
     def pull(self) -> None:
         """Pull file from S3."""
-        dvc.pull(str(self.path), remote=self._dvc_remote)
+        dvc.pull(str(self.path), remote="public-read" if self.metadata.is_public else "private")
 
     def delete_local(self) -> None:
         """Delete local file and its metadata."""
@@ -72,11 +72,7 @@ class Snapshot:
         with dvc_lock:
             dvc.add(str(self.path), fname=str(self.metadata_path))
             if upload:
-                dvc.push(str(self.path), remote=self._dvc_remote)
-
-    @property
-    def _dvc_remote(self):
-        return "public-read" if self.metadata.is_public else "private"
+                dvc.push(str(self.path), remote="public" if self.metadata.is_public else "private")
 
 
 @pruned_json
