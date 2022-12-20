@@ -6,12 +6,12 @@ meta:
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5237
   file_extension: json
-  date_accessed: 2022-12-19 17:25:18.738294
+  date_accessed: 2022-12-20 18:00:26.726848
   is_public: false
   version: latest
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: df8477f6aecdd79954b9f855cbbdc7cc
+- md5: 1635e0b833d164534fc039764022fe29
   size: 12819
   path: dataset_5237_uk_covid_data_config.json
