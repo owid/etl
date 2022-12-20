@@ -102,7 +102,7 @@ def bulk_backport(
                 )
         else:
             with concurrent.futures.ThreadPoolExecutor() as executor:
-                executor.map(
+                results = executor.map(
                     lambda ds_row: backport_step(
                         dataset_id=ds_row.id,
                         dry_run=dry_run,
@@ -111,6 +111,9 @@ def bulk_backport(
                     ),
                     df.itertuples(),
                 )
+
+                # raise errors from futures, otherwise they'd fail silently
+                list(results)
 
     if prune:
         _prune_snapshots(engine, dataset_ids, dry_run)
