@@ -600,14 +600,22 @@ def _bail(errors: Sequence[Exception]) -> None:
     po.put_info("Please fix these errors and try again.")
 
 
+def _get_secret_key() -> Optional[Fernet]:
+    secret_key = os.environ.get("FASTTRACK_SECRET_KEY")
+    if not secret_key:
+        log.warning("FASTTRACK_SECRET_KEY not found in environment variables. Not using encryption.")
+        return None
+    return Fernet(secret_key)
+
+
 def _encrypt(s: str) -> str:
-    fernet = Fernet(os.environ["FASTTRACK_SECRET_KEY"])
-    return fernet.encrypt(s.encode()).decode()
+    fernet = _get_secret_key()
+    return fernet.encrypt(s.encode()).decode() if fernet else s
 
 
 def _decrypt(s: str) -> str:
-    fernet = Fernet(os.environ["FASTTRACK_SECRET_KEY"])
-    return fernet.decrypt(s.encode()).decode()
+    fernet = _get_secret_key()
+    return fernet.decrypt(s.encode()).decode() if fernet else s
 
 
 if __name__ == "__main__":
