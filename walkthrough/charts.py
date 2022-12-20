@@ -16,7 +16,7 @@ from pywebio import output as po
 import etl
 from etl.chart_revision_suggester import ChartRevisionSuggester
 from etl.db import get_all_datasets, get_connection, get_variables_in_dataset
-from etl.match_variables_from_two_versions_of_a_dataset import (
+from etl.match_variables import (
     SIMILARITY_NAME,
     SIMILARITY_NAMES,
     find_mapping_suggestions,

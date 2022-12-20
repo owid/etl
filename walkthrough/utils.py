@@ -1,8 +1,7 @@
 import shutil
 import tempfile
-from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, List, Literal, Optional, Union
+from typing import Any, Dict, List, Literal, Optional
 
 import ruamel.yaml
 import yaml
@@ -167,7 +166,7 @@ def _show_environment() -> None:
     """
         )
     )
-    if OWIDEnv().env_type_id == OWIDEnvType.LIVE:
+    if OWIDEnv().env_type_id == "live":
         po.put_warning(
             po.put_markdown(
                 "You are currently connected to the **live** database! If you are not sure what this means, please"
@@ -176,58 +175,40 @@ def _show_environment() -> None:
         )
 
 
-class OWIDEnvType(Enum):
-    LIVE = 1
-    STAGING = 2
-    LOCAL = 3
-    UNKNOWN = -1
+OWIDEnvType = Literal["live", "staging", "local", "unknown"]
 
 
 class OWIDEnv:
-    env_type_id: Literal[OWIDEnvType.LIVE, OWIDEnvType.STAGING, OWIDEnvType.LOCAL, OWIDEnvType.UNKNOWN]
+    env_type_id: OWIDEnvType
 
     def __init__(
         self,
-        env_type_id: Union[
-            Literal[OWIDEnvType.LIVE, OWIDEnvType.STAGING, OWIDEnvType.LOCAL, OWIDEnvType.UNKNOWN], None
-        ] = None,
+        env_type_id: Optional[OWIDEnvType] = None,
     ):
         if env_type_id is None:
-            self.env_type_id = self.get_env_type_id_from_config()
+            self.env_type_id = self.detect_env_type()
         else:
             self.env_type_id = env_type_id
 
-    def get_env_type_id_from_config(
-        self,
-    ) -> Literal[OWIDEnvType.LIVE, OWIDEnvType.STAGING, OWIDEnvType.LOCAL, OWIDEnvType.UNKNOWN]:
+    def detect_env_type(self) -> OWIDEnvType:
         # live
         if config.DB_NAME == "live_grapher" and config.DB_USER == "etl_grapher":
-            return OWIDEnvType.LIVE
+            return "live"
         # staging
         elif config.DB_NAME == "staging_grapher" and config.DB_USER == "staging_grapher":
-            return OWIDEnvType.STAGING
+            return "staging"
         # local
         elif config.DB_NAME == "grapher" and config.DB_USER == "grapher":
-            return OWIDEnvType.LOCAL
-        return OWIDEnvType.UNKNOWN
-
-    @property
-    def env_type_label(self) -> str:
-        if self.env_type_id == OWIDEnvType.LIVE:
-            return "live"
-        elif self.env_type_id == OWIDEnvType.STAGING:
-            return "staging"
-        elif self.env_type_id == OWIDEnvType.LOCAL:
             return "local"
         return "unknown"
 
     @property
     def admin_url(self):
-        if self.env_type_id == OWIDEnvType.LIVE:
+        if self.env_type_id == "live":
             return "https://owid.cloud/admin"
-        elif self.env_type_id == OWIDEnvType.STAGING:
+        elif self.env_type_id == "staging":
             return "https://staging.owid.cloud/admin"
-        elif self.env_type_id == OWIDEnvType.LOCAL:
+        elif self.env_type_id == "local":
             return "http://localhost:3030/admin"
         return None
 

@@ -2,7 +2,7 @@ import traceback
 import warnings
 from collections.abc import Generator
 from contextlib import contextmanager
-from typing import Any, Union
+from typing import Any, Optional
 from urllib.parse import quote
 
 import MySQLdb
@@ -61,17 +61,17 @@ def open_db() -> Generator[DBUtils, None, None]:
             connection.close()
 
 
-def get_dataset_id(db_conn: Union[MySQLdb.Connection, None], dataset_name: str) -> Any:
+def get_dataset_id(dataset_name: str, db_conn: Optional[MySQLdb.Connection] = None) -> Any:
     """Get the dataset ID of a specific dataset name from database.
 
     If more than one dataset is found for the same name, or if no dataset is found, an error is raised.
 
     Parameters
     ----------
-    db_conn : MySQLdb.Connection
-        Connection to database.
     dataset_name : str
         Dataset name.
+    db_conn : MySQLdb.Connection
+        Connection to database. Defaults to None, in which case a default connection is created (uses etl.config).
 
     Returns
     -------
@@ -79,37 +79,36 @@ def get_dataset_id(db_conn: Union[MySQLdb.Connection, None], dataset_name: str) 
         Dataset ID.
 
     """
-
-    def _get_dataset_id(db_conn, dataset_name):
-        query = f"""
-            SELECT id
-            FROM datasets
-            WHERE name = '{dataset_name}'
-        """
-        with db_conn.cursor() as cursor:
-            cursor.execute(query)
-            result = cursor.fetchall()
-
-        assert len(result) == 1, f"Ambiguous or unknown dataset name '{dataset_name}'"
-        dataset_id = result[0][0]
-        return dataset_id
-
     if db_conn is None:
-        with get_connection() as db_conn:
-            return _get_dataset_id(db_conn, dataset_name)
-    return _get_dataset_id(db_conn, dataset_name)
+        db_conn = get_connection()
+
+    query = f"""
+        SELECT id
+        FROM datasets
+        WHERE name = '{dataset_name}'
+    """
+    with db_conn.cursor() as cursor:
+        cursor.execute(query)
+        result = cursor.fetchall()
+
+    assert len(result) == 1, f"Ambiguous or unknown dataset name '{dataset_name}'"
+    dataset_id = result[0][0]
+    return dataset_id
 
 
-def get_variables_in_dataset(db_conn: MySQLdb.Connection, dataset_id: int, only_used_in_charts: bool = False) -> Any:
+def get_variables_in_dataset(
+    dataset_id: int, only_used_in_charts: bool = False, db_conn: Optional[MySQLdb.Connection] = None
+) -> Any:
     """Get all variables data for a specific dataset ID from database.
 
     Parameters
     ----------
-    db_conn : pymysql.connections.Connection
     dataset_id : int
         Dataset ID.
     only_used_in_charts : bool
         True to select variables only if they have been used in at least one chart. False to select all variables.
+    db_conn : MySQLdb.Connection
+        Connection to database. Defaults to None, in which case a default connection is created (uses etl.config).
 
     Returns
     -------
@@ -117,6 +116,9 @@ def get_variables_in_dataset(db_conn: MySQLdb.Connection, dataset_id: int, only_
         Variables data for considered dataset.
 
     """
+    if db_conn is None:
+        db_conn = get_connection()
+
     query = f"""
         SELECT *
         FROM variables
@@ -135,28 +137,24 @@ def get_variables_in_dataset(db_conn: MySQLdb.Connection, dataset_id: int, only_
     return variables_data
 
 
-def get_all_datasets(db_conn: Union[MySQLdb.Connection, None] = None, archived: bool = True) -> pd.DataFrame:
+def get_all_datasets(archived: bool = True, db_conn: Optional[MySQLdb.Connection] = None) -> pd.DataFrame:
     """Get all datasets in database.
 
     Parameters
     ----------
     db_conn : pymysql.connections.Connection
-        Connection to database. If None, default one is used (see `get_connection`).
+        Connection to database. Defaults to None, in which case a default connection is created (uses etl.config).
 
     Returns
     -------
     datasets : pd.DataFrame
         All datasets in database. Table with three columns: dataset ID, dataset name, dataset namespace.
     """
-
-    def _get_all_dataset(db_conn):
-        query = " SELECT namespace, name, id FROM datasets"
-        if not archived:
-            query += " WHERE isArchived = 0"
-        datasets = pd.read_sql(query, con=db_conn)
-        return datasets.sort_values(["name", "namespace"])
-
     if db_conn is None:
-        with get_connection() as db_conn:
-            return _get_all_dataset(db_conn)
-    return _get_all_dataset(db_conn)
+        db_conn = get_connection()
+
+    query = " SELECT namespace, name, id FROM datasets"
+    if not archived:
+        query += " WHERE isArchived = 0"
+    datasets = pd.read_sql(query, con=db_conn)
+    return datasets.sort_values(["name", "namespace"])
