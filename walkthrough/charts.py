@@ -13,7 +13,7 @@ import structlog
 from pywebio import input as pi
 from pywebio import output as po
 
-import etl
+from etl import paths
 from etl.chart_revision_suggester import ChartRevisionSuggester
 from etl.db import get_all_datasets, get_connection, get_variables_in_dataset
 from etl.match_variables import (
@@ -27,7 +27,7 @@ from .utils import OWIDEnv, _check_env, _show_environment
 
 CURRENT_DIR = Path(__file__).parent
 
-ETL_DIR = Path(etl.__file__).parent.parent
+ETL_DIR = paths.BASE_DIR
 
 log = structlog.get_logger()
 
