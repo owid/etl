@@ -3,7 +3,7 @@
 #
 
 from pathlib import Path
-from typing import Any, Dict, cast
+from typing import Any, Dict, Optional, Union, cast
 from urllib.parse import quote
 
 import click
@@ -116,6 +116,7 @@ def diff_print(
 @click.argument("namespace")
 @click.argument("dataset")
 @click.argument("table")
+@click.option("--version", default=None, help="Version of catalog dataset to compare with.")
 @click.option("--debug", is_flag=True, help="Print debug information.")
 @click.pass_context
 def etl_catalog(
@@ -124,20 +125,26 @@ def etl_catalog(
     namespace: str,
     dataset: str,
     table: str,
+    version: Optional[Union[str, int]],
     debug: bool,
 ) -> None:
     """
     Compare a table in the local catalog with the one in the remote catalog.
 
-    It compares the columns, index columns and index values (row indices) as
-    sets between the two dataframes and outputs the differences. Finally it compares the values of the overlapping
-    columns and rows with the given threshold values for absolute and relative tolerance.
+    It compares the columns, index columns and index values (row indices) as sets between the two dataframes and outputs
+    the differences. Finally it compares the values of the overlapping columns and rows with the given threshold values
+    for absolute and relative tolerance.
+    Note that this function will try to load a table given its channel, namespace, dataset name and table name. But, if
+    there is more than one table with those specifications, this function will fail. In those cases, specify the version
+    (e.g. --version "2022-01-01").
 
     The exit code is 0 if the dataframes are equal, 1 if there is an error loading the dataframes, 2 if the dataframes
     are structurally equal but are otherwise different, 3 if the dataframes have different structure and/or different values.
     """
     try:
-        remote_df = catalog.find_one(table=table, namespace=namespace, dataset=dataset, channels=[channel])
+        remote_df = catalog.find_one(
+            table=table, namespace=namespace, dataset=dataset, channels=[channel], version=version
+        )
     except Exception as e:
         if debug:
             raise e
@@ -152,6 +159,7 @@ def etl_catalog(
                 namespace=namespace,
                 dataset=dataset,
                 channel=cast(catalog.CHANNEL, channel),
+                version=version,
             )
         except ValueError as e:
             # try again after reindexing
@@ -162,6 +170,7 @@ def etl_catalog(
                     namespace=namespace,
                     dataset=dataset,
                     channel=cast(catalog.CHANNEL, channel),
+                    version=version,
                 )
             else:
                 raise e
