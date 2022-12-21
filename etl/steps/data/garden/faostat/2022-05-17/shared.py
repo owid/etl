@@ -1455,7 +1455,7 @@ def add_per_capita_variables(data: pd.DataFrame, elements_metadata: pd.DataFrame
 
         # Add per capita values to all other regions that are not FAO regions.
         per_capita_data.loc[owid_regions_mask, "value"] = (
-            per_capita_data[owid_regions_mask]["value"] / per_capita_data[owid_regions_mask]["population_with_data"]
+            per_capita_data[owid_regions_mask]["value"] / per_capita_data[owid_regions_mask]["population_with_data"]  # type: ignore
         )
 
         # Remove nans (which may have been created because of missing FAO population).

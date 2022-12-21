@@ -58,10 +58,8 @@ simplejson = "^3.17.6"
 bugsnag = "^4.2.1"
 xlrd = "^2.0.1"
 PyPDF2 = "^2.11.1"
-dvc = {extras = ["s3"], version = "^2.36.0"}
+dvc = {extras = ["s3"], version = "^2.38.1"}
 "ruamel.yaml" = "^0.17.21"
-# pinned pathspec is necessary for DVC until this issue gets resolved https://github.com/iterative/dvc/issues/8217
-pathspec = "0.9.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.1.2"
