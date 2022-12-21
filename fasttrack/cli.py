@@ -535,6 +535,8 @@ def _data_diff(fast_import: FasttrackImport, data: pd.DataFrame) -> bool:
     console = Console(record=True)
 
     # load data from snapshot
+    if not fast_import.snapshot.path.exists():
+        fast_import.snapshot.pull()
     existing_data = pd.read_csv(fast_import.snapshot.path)
 
     exit_code = diff_print(
