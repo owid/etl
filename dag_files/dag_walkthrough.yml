@@ -42,3 +42,6 @@ steps:
   - data://meadow/ophi/2022-12-13/multidimensional_poverty_index
   data://grapher/ophi/2022-12-13/multidimensional_poverty_index:
   - data://garden/ophi/2022-12-13/multidimensional_poverty_index
+  data://garden/owid/2022-12-19/gdp_last_2000_years:
+  - data://garden/ggdc/2020-10-01/ggdc_maddison
+  - data://garden/worldbank_wdi/2022-05-26/wdi
