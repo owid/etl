@@ -8,6 +8,7 @@ from urllib.parse import quote
 
 import click
 import pandas as pd
+import rich
 from dotenv import dotenv_values
 from owid import catalog
 from owid.repack import repack_frame
@@ -79,6 +80,7 @@ def diff_print(
     show_values: bool,
     show_shared: bool,
     truncate_lists_at: int,
+    print: Any = rich.print,
 ) -> int:
     """Runs the comparison and prints the differences, then return exit code."""
     diff = tempcompare.HighLevelDiff(df1, df2, absolute_tolerance, relative_tolerance)

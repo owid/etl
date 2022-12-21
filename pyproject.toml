@@ -22,6 +22,7 @@ etl-match-variables = 'etl.match_variables:main_cli'
 etl-translate-varmap = 'etl.variable_mapping_translate:main_cli'
 etl-chart-suggester = 'etl.chart_revision_suggester:main_cli'
 etl-metadata-export = 'etl.metadata_export:cli'
+etl-datadiff = 'etl.datadiff:cli'
 
 [tool.poetry.dependencies]
 python = "^3.9"
@@ -61,6 +62,7 @@ PyPDF2 = "^2.11.1"
 dvc = {extras = ["s3"], version = "^2.38.1"}
 "ruamel.yaml" = "^0.17.21"
 owid-repack = "^0.1.1"
+deepdiff = "^6.2.2"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.1.2"
