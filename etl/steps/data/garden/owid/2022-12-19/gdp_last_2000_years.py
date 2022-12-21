@@ -7,7 +7,6 @@ GDP growth from Maddison data.
 import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
-from owid.datautils import geo
 from structlog import get_logger
 
 from etl.helpers import Names
