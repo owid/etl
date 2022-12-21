@@ -1,0 +1,17 @@
+meta:
+  namespace: backport
+  short_name: dataset_5836_homicide_output__test_config
+  name: Grapher metadata for dataset_5836_homicide_output__test
+  description: Dataset for temporary use - will delete
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/5836
+  file_extension: json
+  date_accessed: 2022-12-21 15:20:20.349036
+  is_public: false
+  version: latest
+  publication_date: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 1389d7ba457a5a0527b8bb2de9005551
+  size: 2260
+  path: dataset_5836_homicide_output__test_config.json
