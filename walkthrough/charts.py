@@ -167,14 +167,17 @@ class Navigation:
                         else {"label": f_name, "value": f_name, "selected": False}
                         for f_name in SIMILARITY_NAMES
                     ],
-                    help_text="Select the prefered function for matching variables",
-                ),
+                    help_text="Select the prefered function for matching variables. https://google.com",
+                ),  # 
                 pi.checkbox(
                     "",
                     options=["Pair identical variables"],
                     value=["Pair identical variables"],
-                    name="pair_identical",
-                    help_text="Assume that identically named variables in both old and new datasets should be paired.",
+                    name="match_identical",
+                    help_text=(
+                        "Assume that identically named variables in both old and new datasets should be paired. Uncheck"
+                        " if you want to manually map them."
+                    ),
                 ),
             ],
         )
@@ -210,7 +213,7 @@ class Navigation:
                     </ul>
                 </li>
                 <li><b>Similarity matching function</b>: {self.params['similarity_function']}</li>
-                <li>Pairing identically named variables is <b>{'enabled' if self.params['pair_identical'] else 'disabled'}</b></li>
+                <li>Pairing identically named variables is <b>{'enabled' if self.params['match_identical'] else 'disabled'}</b></li>
             </ul>
             """
             )
@@ -226,7 +229,7 @@ class Navigation:
         """
         log.info("5. Getting variable mapping suggestions")
         similarity_name = self.params["similarity_function"]
-        omit_identical = self.params["pair_identical"]
+        match_identical = self.params["match_identical"]
 
         with get_connection() as db_conn:
             # Get variables from old dataset that have been used in at least one chart.
@@ -239,7 +242,7 @@ class Navigation:
             )
 
         # get initial mapping
-        _, missing_old, missing_new = preliminary_mapping(old_variables, new_variables, omit_identical)
+        _, missing_old, missing_new = preliminary_mapping(old_variables, new_variables, match_identical)
         # get suggestions for mapping
         self.suggestions = find_mapping_suggestions(missing_old, missing_new, similarity_name)
 
@@ -283,7 +286,7 @@ class Navigation:
                 "dataset_old_id",
                 "dataset_new_id",
                 "similarity_function",
-                "pair_identical",
+                "match_identical",
             )
         ), "Check all expected keys are in params!"
 

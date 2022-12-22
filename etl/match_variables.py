@@ -18,10 +18,9 @@ from fuzzywuzzy import fuzz
 
 from etl import db
 
-# True to skip variables that are identical in old and new datasets, when running comparison.
-# If so, identical variables will be matched automatically.
-# False to include variables with identical names in comparison.
-OMIT_IDENTICAL = True
+# If True, identical variables will be matched automatically (by string comparison).
+# If False, variables with identical names will appear in comparison.
+MATCH_IDENTICAL = True
 # Maximum number of suggested variables to display when fuzzy matching an old variable.
 N_MAX_SUGGESTIONS = 10
 # Name of default similarity function to use to match old and new variables.
@@ -74,7 +73,7 @@ SIMILARITY_NAMES = {
     "-a",
     "--add-identical-pairs",
     is_flag=True,
-    default=False,
+    default=False,  # TODO: we may want to change default behaviour to True
     help=(
         "If given, add variables with identical names in both datasets to the"
         " comparison. If not given, omit such variables and assume they should be"
@@ -102,7 +101,7 @@ def main_cli(
     main(
         old_dataset_name=old_dataset_name,
         new_dataset_name=new_dataset_name,
-        omit_identical=not add_identical_pairs,
+        match_identical=not add_identical_pairs,
         similarity_name=similarity_name,
         output_file=output_file,
         max_suggestions=int(max_suggestions),
@@ -113,7 +112,7 @@ def main(
     old_dataset_name: str,
     new_dataset_name: str,
     output_file: str,
-    omit_identical: bool = OMIT_IDENTICAL,
+    match_identical: bool = MATCH_IDENTICAL,
     similarity_name: str = SIMILARITY_NAME,
     max_suggestions: int = N_MAX_SUGGESTIONS,
 ) -> None:
@@ -135,7 +134,7 @@ def main(
     mapping = map_old_and_new_variables(
         old_variables=old_variables,
         new_variables=new_variables,
-        omit_identical=omit_identical,
+        match_identical=match_identical,
         similarity_name=similarity_name,
         max_suggestions=max_suggestions,
     )
@@ -151,7 +150,7 @@ def map_old_and_new_variables(
     old_variables: pd.DataFrame,
     new_variables: pd.DataFrame,
     max_suggestions: int,
-    omit_identical: bool = True,
+    match_identical: bool = True,
     similarity_name: str = "partial_ratio",
 ) -> pd.DataFrame:
     """Map old variables to new variables, either automatically (when they match perfectly) or manually.
@@ -162,7 +161,7 @@ def map_old_and_new_variables(
         Table of old variable names (column 'name') and ids (column 'id').
     new_variables : pd.DataFrame
         Table of new variable names (column 'name') and ids (column 'id').
-    omit_identical : bool
+    match_identical : bool
         True to automatically match variables that have identical names in both datasets. False to include them in the
         manual comparison.
     similarity_name: str
@@ -175,7 +174,7 @@ def map_old_and_new_variables(
 
     """
     # get initial mapping
-    mapping, missing_old, missing_new = preliminary_mapping(old_variables, new_variables, omit_identical)
+    mapping, missing_old, missing_new = preliminary_mapping(old_variables, new_variables, match_identical)
     # get suggestions for mapping
     suggestions = find_mapping_suggestions(missing_old, missing_new, similarity_name)
     # iterate over suggestions and get user feedback
@@ -237,12 +236,13 @@ def save_variable_replacements_file(mapping: pd.DataFrame, output_file: str) -> 
 
 
 def preliminary_mapping(
-    old_variables: pd.DataFrame, new_variables: pd.DataFrame, omit_identical: bool
+    old_variables: pd.DataFrame, new_variables: pd.DataFrame, match_identical: bool
 ) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """Find initial mapping between old and new variables.
 
     Builds a table with initial mapping, and two other dataframes with the remaining variables to be matched.
-    Initial mapping is done by identical string comparison if `omit_identical` is True.
+    Initial mapping is done by identical string comparison if `match_identical` is True. Otherwise it will be
+    an empty dataframe.
 
     Parameters
     ----------
@@ -250,7 +250,7 @@ def preliminary_mapping(
         Dataframe of old variables.
     new_variables : pd.DataFrame
         Dataframe of new variables.
-    omit_identical : bool
+    match_identical : bool
         True to skip variables that are identical in old and new datasets, when running comparison.
 
     Returns
@@ -261,8 +261,9 @@ def preliminary_mapping(
     # Prepare dataframes of old and new variables.
     old_variables = old_variables[["id", "name"]].rename(columns={"id": "id_old", "name": "name_old"})
     new_variables = new_variables[["id", "name"]].rename(columns={"id": "id_new", "name": "name_new"})
-    # Find variables with identical names in old and new dataset (optionally).
-    if omit_identical:
+
+    # Find variables with identical names in old and new dataset.
+    if match_identical:
         mapping = pd.merge(
             old_variables,
             new_variables,
@@ -271,13 +272,11 @@ def preliminary_mapping(
             how="inner",
         )
         names_to_omit = mapping["name_old"].tolist()
+        # Remove identically named variables from dataframes of variables to sweep through in old and new datasets.
+        missing_old = old_variables[~old_variables["name_old"].isin(names_to_omit)].reset_index(drop=True)
+        missing_new = new_variables[~new_variables["name_new"].isin(names_to_omit)].reset_index(drop=True)
     else:
         mapping = pd.DataFrame()
-        names_to_omit = []
-
-    # Prepare dataframe of variables to sweep through in old and new datasets.
-    missing_old = old_variables[~old_variables["name_old"].isin(names_to_omit)].reset_index(drop=True)
-    missing_new = new_variables[~new_variables["name_new"].isin(names_to_omit)].reset_index(drop=True)
 
     return mapping, missing_old, missing_new
 
