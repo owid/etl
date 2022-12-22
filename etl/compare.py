@@ -129,20 +129,21 @@ def etl_catalog(
     debug: bool,
 ) -> None:
     """
-    Compare a table in the local catalog with the one in the remote catalog.
+    Compare a table in the local catalog with the analogous one in the remote catalog.
+
+    If "version" is not specified, the latest local version of the dataset is compared with the latest remote version of
+    the same dataset. To impose a specific version of both the local and remote datasets, use use the "version"
+    optional argument, e.g. --version "2022-01-01".
 
     It compares the columns, index columns and index values (row indices) as sets between the two dataframes and outputs
     the differences. Finally it compares the values of the overlapping columns and rows with the given threshold values
     for absolute and relative tolerance.
-    Note that this function will try to load a table given its channel, namespace, dataset name and table name. But, if
-    there is more than one table with those specifications, this function will fail. In those cases, specify the version
-    (e.g. --version "2022-01-01").
 
     The exit code is 0 if the dataframes are equal, 1 if there is an error loading the dataframes, 2 if the dataframes
     are structurally equal but are otherwise different, 3 if the dataframes have different structure and/or different values.
     """
     try:
-        remote_df = catalog.find_one(
+        remote_df = catalog.find_latest(
             table=table, namespace=namespace, dataset=dataset, channels=[channel], version=version
         )
     except Exception as e:
@@ -154,7 +155,7 @@ def etl_catalog(
     try:
         local_catalog = catalog.LocalCatalog("data")
         try:
-            local_df = local_catalog.find_one(
+            local_df = local_catalog.find_latest(
                 table=table,
                 namespace=namespace,
                 dataset=dataset,
@@ -165,7 +166,7 @@ def etl_catalog(
             # try again after reindexing
             if str(e) == "no tables found":
                 local_catalog.reindex(include=f"{channel}/{namespace}")
-                local_df = local_catalog.find_one(
+                local_df = local_catalog.find_latest(
                     table=table,
                     namespace=namespace,
                     dataset=dataset,
