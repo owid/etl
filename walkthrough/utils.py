@@ -1,7 +1,7 @@
 import shutil
 import tempfile
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Literal, Optional
 
 import ruamel.yaml
 import yaml
@@ -10,6 +10,7 @@ from owid import walden
 from owid.catalog.utils import validate_underscore
 from pywebio import output as po
 
+from etl import config
 from etl.paths import BASE_DIR, SNAPSHOTS_DIR, STEP_DIR
 from etl.steps import DAG
 
@@ -134,3 +135,90 @@ def generate_step(cookiecutter_path: Path, data: Dict[str, Any]) -> Path:
         )
 
     return DATASET_DIR
+
+
+def _check_env() -> bool:
+    """Check if environment variables are set correctly."""
+    po.put_markdown("""## Checking `.env` file...""")
+
+    ok = True
+    for env_name in ("GRAPHER_USER_ID", "DB_USER", "DB_NAME", "DB_HOST"):
+        if getattr(config, env_name) is None:
+            ok = False
+            po.put_warning(
+                po.put_markdown(f"Environment variable `{env_name}` not found, do you have it in your `.env` file?")
+            )
+
+    if ok:
+        po.put_success(po.put_markdown("`.env` configured correctly"))
+    return ok
+
+
+def _show_environment() -> None:
+    """Show environment variables."""
+    po.put_markdown("## Environment")
+    po.put_info(
+        po.put_markdown(
+            f"""
+    * **GRAPHER_USER_ID**: `{config.GRAPHER_USER_ID}`
+    * **DB_USER**: `{config.DB_USER}`
+    * **DB_NAME**: `{config.DB_NAME}`
+    * **DB_HOST**: `{config.DB_HOST}`
+    """
+        )
+    )
+    if OWIDEnv().env_type_id == "live":
+        po.put_warning(
+            po.put_markdown(
+                "You are currently connected to the **live** database! If you are not sure what this means, please"
+                " consult the with ETL team."
+            )
+        )
+
+
+OWIDEnvType = Literal["live", "staging", "local", "unknown"]
+
+
+class OWIDEnv:
+    env_type_id: OWIDEnvType
+
+    def __init__(
+        self,
+        env_type_id: Optional[OWIDEnvType] = None,
+    ):
+        if env_type_id is None:
+            self.env_type_id = self.detect_env_type()
+        else:
+            self.env_type_id = env_type_id
+
+    def detect_env_type(self) -> OWIDEnvType:
+        # live
+        if config.DB_NAME == "live_grapher" and config.DB_USER == "etl_grapher":
+            return "live"
+        # staging
+        elif config.DB_NAME == "staging_grapher" and config.DB_USER == "staging_grapher":
+            return "staging"
+        # local
+        elif config.DB_NAME == "grapher" and config.DB_USER == "grapher":
+            return "local"
+        return "unknown"
+
+    @property
+    def admin_url(self):
+        if self.env_type_id == "live":
+            return "https://owid.cloud/admin"
+        elif self.env_type_id == "staging":
+            return "https://staging.owid.cloud/admin"
+        elif self.env_type_id == "local":
+            return "http://localhost:3030/admin"
+        return None
+
+    @property
+    def chart_approval_tool_url(self):
+        return f"{self.admin_url}/suggested-chart-revisions/review"
+
+    def dataset_admin_url(self, dataset_id: int):
+        return f"{self.admin_url}/datasets/{dataset_id}/"
+
+    def variable_admin_url(self, variable_id: int):
+        return f"{self.admin_url}/variables/{variable_id}/"
