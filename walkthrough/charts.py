@@ -104,8 +104,11 @@ class Navigation:
                     " ssh-tunel into it using the appropriate ports and then try again."
                 )
                 ok = False
-            po.put_success("Connection to the database was successfull!")
-            ok = True
+            except Exception as e:
+                raise e
+            else:
+                po.put_success("Connection to the database was successfull!")
+                ok = True
         return ok
 
     def get_input_params(self) -> None:
