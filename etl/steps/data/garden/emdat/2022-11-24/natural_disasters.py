@@ -682,7 +682,7 @@ def run(dest_dir: str) -> None:
 
     # Ensure all column names are snake, lower case.
     tb_garden = catalog.Table(df, short_name="natural_disasters_yearly", underscore=True)
-    decade_tb_garden = catalog.Table(df, short_name="natural_disasters_decadal", underscore=True)
+    decade_tb_garden = catalog.Table(decade_df, short_name="natural_disasters_decadal", underscore=True)
 
     # Add tables to dataset
     ds_garden.add(tb_garden)
