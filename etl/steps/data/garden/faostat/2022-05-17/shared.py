@@ -21,7 +21,7 @@ from typing import Dict, List, Union, cast
 import numpy as np
 import pandas as pd
 import structlog
-from owid import catalog
+from owid import catalog, repack  # type: ignore
 from owid.datautils import dataframes, geo
 from tqdm.auto import tqdm
 
@@ -1455,7 +1455,7 @@ def add_per_capita_variables(data: pd.DataFrame, elements_metadata: pd.DataFrame
 
         # Add per capita values to all other regions that are not FAO regions.
         per_capita_data.loc[owid_regions_mask, "value"] = (
-            per_capita_data[owid_regions_mask]["value"] / per_capita_data[owid_regions_mask]["population_with_data"]
+            per_capita_data[owid_regions_mask]["value"] / per_capita_data[owid_regions_mask]["population_with_data"]  # type: ignore
         )
 
         # Remove nans (which may have been created because of missing FAO population).
@@ -1624,7 +1624,7 @@ def optimize_table_dtypes(table: catalog.Table) -> catalog.Table:
     # Store variables metadata before optimizing table dtypes (otherwise they will be lost).
     variables_metadata = {variable: table[variable].metadata for variable in table.columns}
 
-    optimized_table = catalog.frames.repack_frame(table, dtypes=dtypes)
+    optimized_table = repack.repack_frame(table, dtypes=dtypes)
 
     # Recover variable metadata (that was lost when optimizing table dtypes).
     for variable in variables_metadata:

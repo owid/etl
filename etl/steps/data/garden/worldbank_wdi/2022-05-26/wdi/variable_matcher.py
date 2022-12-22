@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, cast
 
 import pandas as pd
-from owid.catalog.frames import repack_frame
+from owid.repack import repack_frame
 
 from etl.db import get_connection
 

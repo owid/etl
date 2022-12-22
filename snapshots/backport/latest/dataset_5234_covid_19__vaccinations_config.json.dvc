@@ -1,17 +1,17 @@
 meta:
-  date_accessed: 2022-12-19 09:55:22.636408
-  description: ''
-  file_extension: json
-  is_public: false
-  name: Grapher metadata for dataset_5234_covid_19__vaccinations
   namespace: backport
-  publication_date: latest
   short_name: dataset_5234_covid_19__vaccinations_config
+  name: Grapher metadata for dataset_5234_covid_19__vaccinations
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5234
+  file_extension: json
+  date_accessed: 2022-12-22 12:00:48.784311
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 4bc80cb7a5fb951b3a19e196be875ea8
+- md5: 87ddc25e0d4d73a0d6b2fb2846056f32
   size: 9642
   path: dataset_5234_covid_19__vaccinations_config.json

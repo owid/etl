@@ -1,17 +1,17 @@
 meta:
-  date_accessed: 2022-12-07 17:19:43.857479
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Excess Mortality Data – OWID (2022)
   namespace: backport
-  publication_date: latest
   short_name: dataset_5148_excess_mortality_data__owid__2022_values
+  name: Excess Mortality Data – OWID (2022)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5148
+  file_extension: feather
+  date_accessed: 2022-12-21 00:01:07.184084
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 810907a45a7ed639cebc7a7fcb5edb40
-  size: 1809146
+- md5: de28f6adf0630509066b703aa385bfce
+  size: 1827514
   path: dataset_5148_excess_mortality_data__owid__2022_values.feather
