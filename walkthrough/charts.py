@@ -168,7 +168,7 @@ class Navigation:
                         for f_name in SIMILARITY_NAMES
                     ],
                     help_text="Select the prefered function for matching variables. https://google.com",
-                ),  # 
+                ),  #
                 pi.checkbox(
                     "",
                     options=["Pair identical variables"],
