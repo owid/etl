@@ -23,6 +23,7 @@ import pandas as pd
 import structlog
 from owid import catalog
 from owid.datautils import dataframes, geo
+from owid import repack
 from tqdm.auto import tqdm
 
 from etl.paths import DATA_DIR, STEP_DIR
@@ -1624,7 +1625,7 @@ def optimize_table_dtypes(table: catalog.Table) -> catalog.Table:
     # Store variables metadata before optimizing table dtypes (otherwise they will be lost).
     variables_metadata = {variable: table[variable].metadata for variable in table.columns}
 
-    optimized_table = catalog.frames.repack_frame(table, dtypes=dtypes)
+    optimized_table = repack.repack_frame(table, dtypes=dtypes)
 
     # Recover variable metadata (that was lost when optimizing table dtypes).
     for variable in variables_metadata:

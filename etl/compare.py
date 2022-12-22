@@ -10,7 +10,7 @@ import click
 import pandas as pd
 from dotenv import dotenv_values
 from owid import catalog
-from owid.catalog.frames import repack_frame
+from owid.repack import repack_frame
 from rich import print
 from rich_click.rich_command import RichCommand
 from rich_click.rich_group import RichGroup

@@ -21,7 +21,7 @@ import pandas as pd
 import structlog
 from frictionless.exception import FrictionlessException
 from owid.catalog import Dataset, Table, Variable, utils
-from owid.catalog.frames import repack_series
+from owid.repack import repack_series
 from owid.catalog.meta import Source
 
 from etl.git import GithubRepo
