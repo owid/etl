@@ -16,7 +16,12 @@ log = structlog.get_logger()
 
 
 class DatasetDiff:
+    """Compare two datasets and print a summary of the differences."""
+
     def __init__(self, ds_a: Optional[Dataset], ds_b: Optional[Dataset], print: Callable = rich.print):
+        """
+        :param print: Function to print the diff summary. Defaults to rich.print.
+        """
         assert ds_a or ds_b, "At least one Dataset must be provided"
         self.ds_a = ds_a
         self.ds_b = ds_b
@@ -31,6 +36,7 @@ class DatasetDiff:
             diff = DeepDiff(_dataset_metadata_dict(ds_a), _dataset_metadata_dict(ds_b))
             if diff:
                 self.p(f"[yellow]~ Dataset [b]{dataset_uri(ds_a)}[/b]")
+                # TODO: add in verbose mode
                 # self.p(diff)
             else:
                 self.p(f"[white]= Dataset [b]{dataset_uri(ds_a)}[/b]")
@@ -56,6 +62,7 @@ class DatasetDiff:
             diff = DeepDiff(_table_metadata_dict(table_a), _table_metadata_dict(table_b))
             if diff:
                 self.p(f"\t[yellow]~ Table [b]{table_name}[/b]")
+                # TODO: add in verbose mode
                 # self.p(diff)
             else:
                 self.p(f"\t[white]= Table [b]{table_name}[/b]")
@@ -89,11 +96,33 @@ class DatasetDiff:
                         pass
 
     def summary(self):
+        """Print a summary of the differences between the two datasets."""
         self._diff_datasets(self.ds_a, self.ds_b)
 
         if self.ds_a and self.ds_b:
             for table_name in set(self.ds_a.table_names) | set(self.ds_b.table_names):
                 self._diff_tables(self.ds_a, self.ds_b, table_name)
+
+
+class RemoteDataset:
+    """Dataset from remote catalog with the same interface as Dataset."""
+
+    def __init__(self, dataset_meta: DatasetMeta, table_names: List[str]):
+        self.metadata = dataset_meta
+        self.table_names = table_names
+
+    def __getitem__(self, name: str) -> Table:
+        tables = find(
+            table=name,
+            namespace=self.metadata.namespace,
+            version=self.metadata.version,
+            dataset=self.metadata.short_name,
+            channels=[self.metadata.channel],  # type: ignore
+        )
+
+        tables = tables[tables.channel == self.metadata.channel]  # type: ignore
+
+        return tables.load()
 
 
 @click.command(help=__doc__)
@@ -131,16 +160,25 @@ def cli(
     include: Optional[str],
     exclude: Optional[str],
 ) -> None:
-    """TODO
+    """Compare all datasets from two catalogs (`a` and `b`) and print out summary of their differences. This is
+    different from `compare` tool which compares two specific datasets and prints out more detailed output. This
+    tool is useful as a quick way to see what has changed in the catalog and whether our updates don't have any
+    unexpected side effects.
+
+    It uses **source checksums** to find candidates for comparison. Source checksum includes all files used to
+    generate the dataset and should be sufficient to find changed datasets, just note that we're not using
+    checksum of the files themselves. So if you change core ETL code or some of the dependencies, e.g. change in
+    owid-datautils-py, core ETL code or updating library version, the change won't be detected. In cases like
+    these you should increment ETL version which is added to all source checksums (not implemented yet).
 
     Usage:
-        etl-datadiff data/ other/ -c garden --include maddison
+        # compare local catalog with remote catalog
+        etl-datadiff data/ REMOTE --include maddison
+
+        # compare two local catalogs
+        etl-datadiff data/ other-data/ --include maddison
     """
     console = Console(tab_size=2)
-
-    console.print(
-        "[b]Legend[/b]: [green]+New[/green]  [yellow]~Modified[/yellow]  [red]-Removed[/red]  [white]=Identical[/white]\n"
-    )
 
     path_to_ds_a = _local_catalog_datasets(path_a, channels=channel, include=include, exclude=exclude)
 
@@ -171,10 +209,26 @@ def cli(
         if any("~" in line for line in lines):
             any_diff = True
 
+    console.print()
+    if any_diff:
+        console.print("[red]❌ Found differences[/red]")
+    else:
+        console.print("[green]✅ No differences found[/green]")
+
+    console.print(
+        "[b]Legend[/b]: [green]+New[/green]  [yellow]~Modified[/yellow]  [red]-Removed[/red]  [white]=Identical[/white]"
+    )
+    console.print(
+        "[b]Hint[/b]: Run this locally with [cyan][b]etl-datadiff data/ REMOTE --include yourdataset[/b][/cyan]"
+    )
+    console.print(
+        "[b]Hint[/b]: Get detailed comparison with [cyan][b]compare --show-values channel namespace version short_name --data-values[/b][/cyan]"
+    )
     exit(1 if any_diff else 0)
 
 
 def _table_metadata_dict(tab: Table) -> Dict[str, Any]:
+    """Extract metadata from Table object, prune and and return it as a dictionary"""
     d = tab.metadata.to_dict()
 
     # add columns
@@ -187,6 +241,7 @@ def _table_metadata_dict(tab: Table) -> Dict[str, Any]:
 
 
 def _dataset_metadata_dict(ds: Dataset) -> Dict[str, Any]:
+    """Extract metadata from Dataset object, prune and and return it as a dictionary"""
     d = ds.metadata.to_dict()
     del d["source_checksum"]
     return d
@@ -195,7 +250,7 @@ def _dataset_metadata_dict(ds: Dataset) -> Dict[str, Any]:
 def _local_catalog_datasets(
     catalog_path: str, channels: Iterable[CHANNEL], include: Optional[str], exclude: Optional[str]
 ) -> Dict[str, Dataset]:
-    """Return a mapping from dataset path to Dataset object"""
+    """Return a mapping from dataset path to Dataset object of local catalog."""
     lc_a = LocalCatalog(catalog_path, channels=channels)
     datasets = []
     for chan in lc_a.channels:
@@ -214,29 +269,8 @@ def _local_catalog_datasets(
     return mapping
 
 
-class RemoteDataset:
-    """Dataset from remote catalog with the same interface as Dataset."""
-
-    def __init__(self, dataset_meta: DatasetMeta, table_names: List[str]):
-        self.metadata = dataset_meta
-        self.table_names = table_names
-
-    def __getitem__(self, name: str) -> Table:
-        tables = find(
-            table=name,
-            namespace=self.metadata.namespace,
-            version=self.metadata.version,
-            dataset=self.metadata.short_name,
-            channels=[self.metadata.channel],  # type: ignore
-        )
-
-        tables = tables[tables.channel == self.metadata.channel]  # type: ignore
-
-        return tables.load()
-
-
 def _remote_catalog_datasets(channels: Iterable[CHANNEL], include: str, exclude: Optional[str]) -> Dict[str, Dataset]:
-    """Return a mapping from dataset path to Dataset object"""
+    """Return a mapping from dataset path to Dataset object of remote catalog."""
     rc = RemoteCatalog(channels=channels)
     frame = rc.frame
 
@@ -267,6 +301,7 @@ def _remote_catalog_datasets(channels: Iterable[CHANNEL], include: str, exclude:
 
 
 def dataset_uri(ds: Dataset) -> str:
+    # TODO: coule be method in DatasetMeta (after we add channel)
     assert hasattr(ds.metadata, "channel"), "Dataset metadata should have channel attribute"
     return f"{ds.metadata.channel}/{ds.metadata.namespace}/{ds.metadata.version}/{ds.metadata.short_name}"  # type: ignore
 
