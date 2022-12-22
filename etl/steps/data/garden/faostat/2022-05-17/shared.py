@@ -21,9 +21,8 @@ from typing import Dict, List, Union, cast
 import numpy as np
 import pandas as pd
 import structlog
-from owid import catalog
+from owid import catalog, repack
 from owid.datautils import dataframes, geo
-from owid import repack
 from tqdm.auto import tqdm
 
 from etl.paths import DATA_DIR, STEP_DIR
