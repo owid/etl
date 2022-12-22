@@ -159,13 +159,13 @@ def app(dummy_data: bool) -> None:
     # diff with existing dataset
     if fast_import.snapshot_exists() and fast_import.metadata_path.exists():
         po.put_markdown("""## Data differences from existing dataset...""")
-        data_is_different = _data_diff(fast_import, data)
+        _data_diff(fast_import, data)
 
         po.put_markdown("""## Metadata differences from existing dataset...""")
-        metadata_is_different = _metadata_diff(fast_import, meta)
+        _metadata_diff(fast_import, meta)
 
-        if data_is_different or metadata_is_different:
-            _ask_to_continue()
+        # if data_is_different or metadata_is_different:
+        _ask_to_continue()
 
     # add dataset to dag
     dag_content = _add_to_dag(meta.dataset, form.is_private)
@@ -588,7 +588,7 @@ def _ask_to_continue() -> None:
                 "color": "danger",
             },
         ],
-        help_text="Do you want to continue and create the dataset in GrapherDB?",
+        help_text="Do you want to continue and add the dataset to GrapherDB?",
     )
 
     # start saving the dataset after we click continue
