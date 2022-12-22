@@ -137,7 +137,7 @@ def generate_step(cookiecutter_path: Path, data: Dict[str, Any]) -> Path:
     return DATASET_DIR
 
 
-def _check_env() -> None:
+def _check_env() -> bool:
     """Check if environment variables are set correctly."""
     po.put_markdown("""## Checking `.env` file...""")
 
@@ -151,6 +151,7 @@ def _check_env() -> None:
 
     if ok:
         po.put_success(po.put_markdown("`.env` configured correctly"))
+    return ok
 
 
 def _show_environment() -> None:

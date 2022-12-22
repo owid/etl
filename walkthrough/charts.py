@@ -10,6 +10,7 @@ from typing import Any, Callable, List, Union, cast
 
 import pandas as pd
 import structlog
+from MySQLdb import OperationalError
 from pywebio import input as pi
 from pywebio import output as po
 
@@ -34,31 +35,37 @@ log = structlog.get_logger()
 
 def app(run_checks: bool, dummy_data: bool) -> None:
 
-    nav = Navigation(run_checks)
+    nav = Navigation()
 
     # show instructions
     nav.show_instructions()
     # show and check environment
-    nav.check_environment()
-    # get main parameters (old and new dataset names, etc.)
-    nav.get_input_params()
-    # show params
-    nav.show_input_params()
-    # get mapping suggestions
-    nav.get_suggestions()
-
-    if nav.suggestions:
-        # run interactive part of the app
-        po.put_markdown(
-            "## Map variables\nFor each old variable, map it to a new variable from the drop down menu. Note that you"
-            " can select option 'ignore' too."
-        )
-        nav.run_app()
+    if run_checks:
+        ok = nav.check_environment()
     else:
-        po.put_error(
-            "No variable mapping suggestions found. Please check your input parameters. This is probably due to no"
-            " variable in the old dataset being used in any chart."
-        )
+        ok = True
+
+    # if checks were succesfull, proceed
+    if ok:
+        # get main parameters (old and new dataset names, etc.)
+        nav.get_input_params()
+        # show params
+        nav.show_input_params()
+        # get mapping suggestions
+        nav.get_suggestions()
+
+        if nav.suggestions:
+            # run interactive part of the app
+            po.put_markdown(
+                "## Map variables\nFor each old variable, map it to a new variable from the drop down menu. Note that"
+                " you can select option 'ignore' too."
+            )
+            nav.run_app()
+        else:
+            po.put_error(
+                "No variable mapping suggestions found. Please check your input parameters. This is probably due to no"
+                " variable in the old dataset being used in any chart."
+            )
 
 
 class Navigation:
@@ -71,24 +78,35 @@ class Navigation:
     # OWID Env
     owid_env = OWIDEnv()
 
-    def __init__(self, run_checks) -> None:
-        self.run_checks = run_checks
-
     def show_instructions(self) -> None:
         """Show initial step description."""
         log.info("1. Showing instructions")
         with open(CURRENT_DIR / "charts.md", "r") as f:
             po.put_markdown(f.read())
 
-    def check_environment(self) -> None:
+    def check_environment(self) -> bool:
         """Check environment.
 
         Check if .env is there, show environment variables.
         """
         log.info("2. Checking environment")
-        if self.run_checks:
-            _check_env()
-        _show_environment()
+        # Check that .env is there
+        ok = _check_env()
+        # display .env content if it is there
+        if ok:
+            _show_environment()
+            # check that you can connect to DB
+            try:
+                _ = get_connection()
+            except OperationalError as e:
+                po.put_error(
+                    f"We could not connect to the database: {e}. If connecting to a remote database, remember to"
+                    " ssh-tunel into it using the appropriate ports and then try again."
+                )
+                ok = False
+            po.put_success("Connection to the database was successfull!")
+            ok = True
+        return ok
 
     def get_input_params(self) -> None:
         """Ask user for input parameters.
