@@ -21,7 +21,7 @@ from typing import Dict, List, Union, cast
 import numpy as np
 import pandas as pd
 import structlog
-from owid import catalog, repack
+from owid import catalog, repack  # type: ignore
 from owid.datautils import dataframes, geo
 from tqdm.auto import tqdm
 
