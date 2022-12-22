@@ -273,12 +273,15 @@ def preliminary_mapping(
         )
         names_to_omit = mapping["name_old"].tolist()
         # Remove identically named variables from dataframes of variables to sweep through in old and new datasets.
-        missing_old = old_variables[~old_variables["name_old"].isin(names_to_omit)].reset_index(drop=True)
-        missing_new = new_variables[~new_variables["name_new"].isin(names_to_omit)].reset_index(drop=True)
+        old_variables = old_variables[~old_variables["name_old"].isin(names_to_omit)]
+        new_variables = new_variables[~new_variables["name_new"].isin(names_to_omit)]
     else:
         mapping = pd.DataFrame()
 
-    return mapping, missing_old, missing_new
+    old_variables = old_variables.reset_index(drop=True)
+    new_variables = new_variables.reset_index(drop=True)
+
+    return mapping, old_variables, new_variables
 
 
 def find_mapping_suggestions(
