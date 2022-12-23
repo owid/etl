@@ -6,7 +6,7 @@
 4. If they confirm, then revisions are submitted to Grapher DB.
 """
 from pathlib import Path
-from typing import Any, Callable, List, Union, cast
+from typing import Any, Callable, Dict, List, Optional, Union, cast
 
 import pandas as pd
 import structlog
@@ -52,14 +52,26 @@ def app(run_checks: bool, dummy_data: bool) -> None:
         # show params
         nav.show_input_params()
         # get mapping suggestions
-        nav.get_suggestions()
+        nav.get_suggestions_and_mapping()
 
-        if nav.suggestions:
-            # run interactive part of the app
-            po.put_markdown(
-                "## Map variables\nFor each old variable, map it to a new variable from the drop down menu. Note that"
-                " you can select option 'ignore' too."
-            )
+        if nav.anything_to_map:
+            po.put_markdown("## Map variables")
+            # no automated mapping, just suggestions (need user input)
+            if not nav.automatically_mapped and nav.has_suggestions:
+                po.put_markdown(
+                    "For each old variable, map it to a new variable from the drop down menu. Note that you can"
+                    " select option 'ignore' too."
+                )
+            # some variables were mapped automaticall, some were not
+            elif nav.automatically_mapped and nav.has_suggestions:
+                po.put_markdown("Some variables were automatically mapped. Please check them and change if necessary.")
+                po.put_markdown(
+                    "For each old variable, map it to a new variable from the drop down menu. Note that you can"
+                    " select option 'ignore' too."
+                )
+            # all variables were mapped automatically
+            elif nav.automatically_mapped and not nav.has_suggestions:
+                po.put_markdown("All variables were automatically mapped! No need for user input.")
             nav.run_app()
         else:
             po.put_error(
@@ -77,6 +89,27 @@ class Navigation:
     variable_mapping: dict = dict()
     # OWID Env
     owid_env = OWIDEnv()
+    # True if any variable was automatically mapped
+    automatically_mapped: bool = False
+    # IDs to names
+    __variable_id_to_names: Optional[Dict[int, str]] = None
+
+    @property
+    def anything_to_map(self) -> bool:
+        """Check if there is anything to map."""
+        return (len(self.suggestions) > 0) or self.variable_mapping != {}
+
+    @property
+    def has_suggestions(self) -> bool:
+        """Check if there are suggestions."""
+        return len(self.suggestions) > 0
+
+    @property
+    def variable_id_to_names(self) -> Dict[int, str]:
+        """Get variable ID to name mapping."""
+        if self.__variable_id_to_names is None:
+            self.__variable_id_to_names = self._varid_to_varname()
+        return self.__variable_id_to_names
 
     def show_instructions(self) -> None:
         """Show initial step description."""
@@ -129,9 +162,9 @@ class Navigation:
             return [i for i in ids]
 
         # default selected datasets
-        name_old_default = names_available[10]
+        name_old_default = "Penn World Table version 10.0"  # names_available[10]
         ids_old_default = get_available_ids_for_name(name_old_default)
-        name_new_default = names_available[11]
+        name_new_default = "Penn World Table 10.0"  # names_available[11]
         ids_new_default = get_available_ids_for_name(name_new_default)
 
         params = pi.input_group(
@@ -240,7 +273,7 @@ class Navigation:
             )
         )
 
-    def get_suggestions(self) -> None:
+    def get_suggestions_and_mapping(self) -> None:
         """Get suggestions for each variable in old dataset.
 
         Creates a list with new variable suggestions for each old variable. Each item is a dictionary with two keys:
@@ -263,7 +296,10 @@ class Navigation:
             )
 
         # get initial mapping
-        _, missing_old, missing_new = preliminary_mapping(old_variables, new_variables, match_identical)
+        mapping, missing_old, missing_new = preliminary_mapping(old_variables, new_variables, match_identical)
+        if not mapping.empty:
+            self.variable_mapping = mapping.set_index("id_old")["id_new"].to_dict()
+            self.automatically_mapped = True
         # get suggestions for mapping
         self.suggestions = find_mapping_suggestions(missing_old, missing_new, similarity_name)
 
@@ -278,9 +314,12 @@ class Navigation:
         self._sanity_checks()
 
         # show user variable form, collect their input
-        self.get_variable_mapping_ids()
-
-        self.confirm_variable_mapping(next_step=self.final_steps)
+        if self.has_suggestions:
+            self.get_variable_mapping_ids()
+            self.confirm_variable_mapping(next_step=self.final_steps)
+        else:
+            log.info("No suggestions available. Skipping input form and confirmation step.")
+            self.final_steps()
 
     def _sanity_checks(self) -> None:
         """Sanity checks on class attributes `params` and `suggestions`.
@@ -290,14 +329,18 @@ class Navigation:
         """
         log.info("6. Sanity checks")
         assert isinstance(self.suggestions, list), "Suggestions must be a list!"
-        for i, s in enumerate(self.suggestions):
-            assert all(k in s for k in ("new", "old")), f"Keys 'new' and 'old' missing in suggestin number {i}!."
-            assert isinstance(
-                s["new"], pd.DataFrame
-            ), f"Suggestion number {i} has a 'new' value that is not a DataFrame. Instead {type(s['new'])} was found."
-            assert isinstance(
-                s["old"], dict
-            ), f"Suggestion number {i} has an 'old' value that is not a Series. Instead {type(s['old'])} was found."
+        if (len(self.suggestions) == 0) and not self.variable_mapping:
+            log.info("No value was assigned to neither `self.suggestions` nor `self.mapping`.")
+        if len(self.suggestions) > 0:
+            for i, s in enumerate(self.suggestions):
+                assert all(k in s for k in ("new", "old")), f"Keys 'new' and 'old' missing in suggestin number {i}!."
+                assert isinstance(s["new"], pd.DataFrame), (
+                    f"Suggestion number {i} has a 'new' value that is not a DataFrame. Instead {type(s['new'])} was"
+                    " found."
+                )
+                assert isinstance(
+                    s["old"], dict
+                ), f"Suggestion number {i} has an 'old' value that is not a Series. Instead {type(s['old'])} was found."
         assert isinstance(self.params, dict), "Params must be a dictionary!"
         assert all(
             k in self.params
@@ -345,6 +388,7 @@ class Navigation:
         mapping = {int(k): int(v) for k, v in mapping.items()}
 
         self.variable_mapping = mapping
+        log.info(f"Variable mapping: {self.variable_mapping}")
 
     def confirm_variable_mapping(self, next_step: Callable) -> None:
         """Confirm variable mapping by means of a popup."""
@@ -413,44 +457,41 @@ class Navigation:
         Build table with variable mapping (old -> new names). Cell items in table are clickable,
         directing the user to the variable grapher UI page.
         """
-        variable_id_to_names = self._varid_to_varname()
         tdata = [
             [
                 po.put_link(
-                    f"{variable_id_to_names.get(old_id)} ({old_id})",
+                    f"{self.variable_id_to_names.get(old_id)} ({old_id})",
                     self.owid_env.variable_admin_url(old_id),
                     new_window=True,
                 ),
                 po.put_link(
-                    f"{variable_id_to_names.get(new_id)} ({new_id})",
+                    f"{self.variable_id_to_names.get(new_id)} ({new_id})",
                     self.owid_env.variable_admin_url(new_id),
                     new_window=True,
                 )
                 if new_id != -1
-                else variable_id_to_names.get(new_id),
+                else self.variable_id_to_names.get(new_id),
             ]
             for old_id, new_id in self.variable_mapping.items()
         ]
         po.put_table(tdata, header=["Old variable", "New variable"])
 
-    def _varid_to_varname(self) -> pd.DataFrame:
+    def _varid_to_varname(self) -> Dict[int, str]:
         """Build mapping from variable ID to variable NAME."""
-        mappings = [pd.DataFrame({"id": [-1], "name": ["(Ignore)"]})]
-        for suggestion in self.suggestions:
-            old_id = suggestion["old"]["id_old"]
-            old_varname = suggestion["old"]["name_old"]
-            mapping_old = pd.DataFrame({"id": [old_id], "name": [old_varname]})
-            mapping_new = suggestion["new"][["id_new", "name_new"]].rename(columns={"id_new": "id", "name_new": "name"})
-            mappings.append(
-                pd.concat(
-                    [
-                        mapping_old,
-                        mapping_new,
-                    ],
-                    ignore_index=True,
-                )
-            )
-        return pd.concat(mappings, ignore_index=True).drop_duplicates().set_index("id").squeeze().to_dict()
+        log.info(f"Mapping IDs to names: {self.variable_mapping}")
+        # get mapping from db
+        with get_connection() as db_conn:
+            var_ids = list(self.variable_mapping.keys()) + list(self.variable_mapping.values())
+            var_ids = str(tuple(set(var_ids)))
+            query = f"""
+                SELECT *
+                FROM variables
+                WHERE id in {var_ids}
+            """
+            df = pd.read_sql(query, db_conn)
+            mapping = df[["id", "name"]].set_index("id").squeeze().to_dict()
+        log.info(f"Found mapping: {mapping}")
+        return mapping
 
     def show_submission_details(self, suggester: ChartRevisionSuggester) -> Union[List[dict[str, Any]], None]:
         """Show submission details.
@@ -465,15 +506,16 @@ class Navigation:
             po.put_markdown("### Variable ID mapping to be submitted")
             po.put_code(self.variable_mapping, "json")
             po.put_markdown("### Charts affected")
-            try:
-                suggested_chart_revisions = suggester.prepare()
-            except Exception as e:
-                po.put_error(f"Error: {e}")
-                return
-            else:
-                po.put_markdown(
-                    f"There are **{len(suggested_chart_revisions)} charts** that will be affected by the mapping."
-                )
+            with po.put_loading():
+                try:
+                    suggested_chart_revisions = suggester.prepare()
+                except Exception as e:
+                    po.put_error(f"Error: {e}")
+                    return
+                else:
+                    po.put_markdown(
+                        f"There are **{len(suggested_chart_revisions)} charts** that will be affected by the mapping."
+                    )
             return suggested_chart_revisions
 
     def submit_suggestions(
@@ -494,8 +536,8 @@ class Navigation:
                 po.put_error(e)
                 approval_chart_link = self.owid_env.chart_approval_tool_url
                 po.put_markdown(
-                    f"You might want to go to the [Chart approval tool]({approval_chart_link}) and review! Then, re-run"
-                    " `walkthrough charts` again."
+                    f"Check on the [Chart approval tool]({approval_chart_link})! You might need to delete old chart"
+                    " revisions. Then, run `walkthrough charts` step again."
                 )
                 return -1
             else:
