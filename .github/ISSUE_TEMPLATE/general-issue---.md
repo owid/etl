@@ -1,5 +1,5 @@
 ---
-name: "blank issue"
+name: "General issue"
 about: General issue.
 
 ---
