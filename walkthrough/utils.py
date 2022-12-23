@@ -1,7 +1,7 @@
 import shutil
 import tempfile
 from pathlib import Path
-from typing import Any, Dict, List, Literal, Optional
+from typing import Any, Dict, List, Literal, Optional, Union
 
 import ruamel.yaml
 import yaml
@@ -139,8 +139,6 @@ def generate_step(cookiecutter_path: Path, data: Dict[str, Any]) -> Path:
 
 def _check_env() -> bool:
     """Check if environment variables are set correctly."""
-    po.put_markdown("""## Checking `.env` file...""")
-
     ok = True
     for env_name in ("GRAPHER_USER_ID", "DB_USER", "DB_NAME", "DB_HOST"):
         if getattr(config, env_name) is None:
@@ -156,7 +154,6 @@ def _check_env() -> bool:
 
 def _show_environment() -> None:
     """Show environment variables."""
-    po.put_markdown("## Environment")
     po.put_info(
         po.put_markdown(
             f"""
@@ -167,13 +164,6 @@ def _show_environment() -> None:
     """
         )
     )
-    if OWIDEnv().env_type_id == "live":
-        po.put_warning(
-            po.put_markdown(
-                "You are currently connected to the **live** database! If you are not sure what this means, please"
-                " consult the with ETL team."
-            )
-        )
 
 
 OWIDEnvType = Literal["live", "staging", "local", "unknown"]
@@ -217,8 +207,11 @@ class OWIDEnv:
     def chart_approval_tool_url(self):
         return f"{self.admin_url}/suggested-chart-revisions/review"
 
-    def dataset_admin_url(self, dataset_id: int):
+    def dataset_admin_url(self, dataset_id: Union[str, int]):
         return f"{self.admin_url}/datasets/{dataset_id}/"
 
-    def variable_admin_url(self, variable_id: int):
+    def variable_admin_url(self, variable_id: Union[str, int]):
         return f"{self.admin_url}/variables/{variable_id}/"
+
+    def chart_admin_url(self, chart_id: Union[str, int]):
+        return f"{self.admin_url}/charts/{chart_id}/edit"

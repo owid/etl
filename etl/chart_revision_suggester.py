@@ -23,6 +23,7 @@ from etl.db import open_db
 from etl.grapher_helpers import IntRange
 
 log = structlog.get_logger()
+MSGTypes = Literal["error", "warning", "info", "success"]
 
 
 @click.command(help=__doc__)
@@ -51,6 +52,7 @@ class ChartRevisionSuggester:
     Attributes:
         variable_mapping: Dict[int, int]. Dictionary with mappings of old variable IDs to new variable IDs.
         Example: {2032: 147395, 2033: 147396, ...}
+        logs: List[Dict[str, str]]. List of messages to be reported to the user.
 
     Usage:
         >>> from etl.chart_revision_suggester import ChartRevisionSuggester
@@ -63,6 +65,7 @@ class ChartRevisionSuggester:
         self.var_id2year_range: Dict[int, List[int]] = {}
         self._sanity_check_mapping_dict(variable_mapping)
         self.old_var_id2new_var_id = variable_mapping
+        self.logs: List[Dict[str, str]] = []
 
     def _sanity_check_mapping_dict(self, variable_mapping: Any) -> None:
         """Sanity check the mapping dictionary."""
@@ -155,7 +158,7 @@ class ChartRevisionSuggester:
                     )
 
             except Exception as e:
-                log.error(f"Error encountered for chart {row.id}: {e}")
+                self.report_error(f"Error encountered for chart {row.id}: {e}")
                 if DEBUG:
                     traceback.print_exc()
         return suggested_chart_revisions
@@ -183,7 +186,7 @@ class ChartRevisionSuggester:
                         """
                     )
         except Exception:
-            log.error(
+            self.report_error(
                 "Problem found when accessing the DB trying to get details on the newly added variables"
                 f" {variable_ids}. Therefore, no reason for suggested chart revision could be stablished!"
             )
@@ -293,13 +296,15 @@ class ChartRevisionSuggester:
             )
             raise IntegrityError(e)
         except Exception as e:
-            log.error(f"INSERT operation into `suggested_chart_revisions` cancelled. Error: {e}")
+            self.report_error(f"INSERT operation into `suggested_chart_revisions` cancelled. Error: {e}")
             raise e
         finally:
             with open_db() as db:
                 n_after = db.fetch_one("SELECT COUNT(id) FROM suggested_chart_revisions")[0]
 
-            log.info(f"{n_after - n_before} of {len(suggested_chart_revisions)} suggested chart revisions inserted.")
+            self.report_info(
+                f"{n_after - n_before} of {len(suggested_chart_revisions)} suggested chart revisions inserted."
+            )
 
     def _get_charts_from_old_variables(
         self,
@@ -430,7 +435,7 @@ class ChartRevisionSuggester:
             subtitle = chart_config.get("subtitle")
             min_time = chart_config.get("minTime")
             max_time = chart_config.get("maxTime")
-            log.warning(
+            self.report_warning(
                 f"Chart {chart_id} title or subtitle may contain a hard-coded "
                 "year, so the minTime and maxTime fields will not be changed."
                 f"\nTitle: {title}"
@@ -466,7 +471,7 @@ class ChartRevisionSuggester:
                 )
                 if replace_min_time:
                     if pd.notnull(old_range.min) and (new_range.min > old_range.min):
-                        log.warning(
+                        self.report_warning(
                             f"For chart {chart_id}, min year of new variable(s) > "
                             "min year of old variable(s). New variable(s): "
                             f"{new_variable_ids}"
@@ -477,7 +482,7 @@ class ChartRevisionSuggester:
                 )
                 if replace_max_time:
                     if pd.notnull(old_range.max) and (new_range.max < old_range.max):
-                        log.warning(
+                        self.report_warning(
                             f"For chart {chart_id}, max year of new variable(s) < "
                             "max year of old variable(s). New variable(s): "
                             f"{new_variable_ids}"
@@ -490,22 +495,22 @@ class ChartRevisionSuggester:
         update/check text fields: slug, note, title, subtitle, sourceDesc.
         """
         if "title" in chart_config and re.search(r"\b\d{4}\b", chart_config["title"]):
-            log.warning(
+            self.report_warning(
                 f"Chart {chart_id} title may have a hard-coded year in it that "
                 f'will not be updated: "{chart_config["title"]}"'
             )
         if "subtitle" in chart_config and re.search(r"\b\d{4}\b", chart_config["subtitle"]):
-            log.warning(
+            self.report_warning(
                 f"Chart {chart_id} subtitle may have a hard-coded year in it "
                 f'that will not be updated: "{chart_config["subtitle"]}"'
             )
         if "note" in chart_config and re.search(r"\b\d{4}\b", chart_config["note"]):
-            log.warning(
+            self.report_warning(
                 f"Chart {chart_id} note may have a hard-coded year in it that "
                 f'will not be updated: "{chart_config["note"]}"'
             )
         if re.search(r"\b\d{4}\b", chart_config["slug"]):
-            log.warning(
+            self.report_warning(
                 f"Chart {chart_id} slug may have a hard-coded year in it that "
                 f'will not be updated: "{chart_config["slug"]}"'
             )
@@ -569,3 +574,28 @@ class ChartRevisionSuggester:
             )
         )
         return times_are_eq
+
+    def report_error(self, msg: str):
+        self.report_msg(msg, "error")
+
+    def report_warning(self, msg: str):
+        self.report_msg(msg, "warning")
+
+    def report_info(self, msg: str):
+        self.report_msg(msg, "info")
+
+    def report_success(self, msg: str):
+        self.report_msg(msg, "success")
+
+    def report_msg(self, msg: str, type: MSGTypes):
+        if type == "error":
+            log.error(msg)
+        elif type == "warning":
+            log.warning(msg)
+        elif type == "info":
+            log.info(msg)
+        elif type == "success":
+            log.info(msg)
+        else:
+            raise ValueError(f"Invalid type: {type}")
+        self.logs.append({"message": msg, "type": type})

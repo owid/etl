@@ -43,8 +43,10 @@ def app(run_checks: bool, dummy_data: bool) -> None:
         po.put_markdown(f.read())
 
     if run_checks:
+        po.put_markdown("""## Checking `.env` file...""")
         utils._check_env()
 
+    po.put_markdown("## Environment")
     utils._show_environment()
 
     data = pi.input_group(

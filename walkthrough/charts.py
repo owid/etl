@@ -5,8 +5,9 @@
 3. If user is satisfied with the mapping, the chart revisions are created and submission details are shown to the user.
 4. If they confirm, then revisions are submitted to Grapher DB.
 """
+import re
 from pathlib import Path
-from typing import Any, Callable, List, Union, cast
+from typing import Any, Callable, Dict, List, Optional, Union, cast
 
 import pandas as pd
 import structlog
@@ -14,7 +15,6 @@ from MySQLdb import OperationalError
 from pywebio import input as pi
 from pywebio import output as po
 
-from etl import paths
 from etl.chart_revision_suggester import ChartRevisionSuggester
 from etl.db import get_all_datasets, get_connection, get_variables_in_dataset
 from etl.match_variables import (
@@ -26,17 +26,19 @@ from etl.match_variables import (
 
 from .utils import OWIDEnv, _check_env, _show_environment
 
+# Paths
 CURRENT_DIR = Path(__file__).parent
-
-ETL_DIR = paths.BASE_DIR
-
+# logs
 log = structlog.get_logger()
+# OWID Env
+OWID_ENV = OWIDEnv()
 
 
 def app(run_checks: bool, dummy_data: bool) -> None:
 
     nav = Navigation()
-
+    # show live banner alert
+    nav.show_live_banner()
     # show instructions
     nav.show_instructions()
     # show and check environment
@@ -47,25 +49,43 @@ def app(run_checks: bool, dummy_data: bool) -> None:
 
     # if checks were succesfull, proceed
     if ok:
+        po.put_markdown("## Dataset update")
         # get main parameters (old and new dataset names, etc.)
         nav.get_input_params()
-        # show params
-        nav.show_input_params()
-        # get mapping suggestions
-        nav.get_suggestions()
 
-        if nav.suggestions:
-            # run interactive part of the app
-            po.put_markdown(
-                "## Map variables\nFor each old variable, map it to a new variable from the drop down menu. Note that"
-                " you can select option 'ignore' too."
-            )
-            nav.run_app()
-        else:
-            po.put_error(
-                "No variable mapping suggestions found. Please check your input parameters. This is probably due to no"
-                " variable in the old dataset being used in any chart."
-            )
+        if nav.params_is_valid():
+            # show params
+            nav.show_input_params()
+            # get mapping suggestions
+            nav.get_suggestions_and_mapping()
+
+            if nav.anything_to_map:
+                po.toast("Dataset details submitted succesfully!", color="success")
+                po.put_markdown("## Map variables")
+                # no automated mapping, just suggestions (need user input)
+                if not nav.automatically_mapped and nav.has_suggestions:
+                    po.put_markdown(
+                        "For each old variable, map it to a new variable from the drop down menu. Note that you can"
+                        " select option 'ignore' too."
+                    )
+                # some variables were mapped automaticall, some were not
+                elif nav.automatically_mapped and nav.has_suggestions:
+                    po.put_markdown(
+                        "Some variables were automatically mapped. Please check them and change if necessary."
+                    )
+                    po.put_markdown(
+                        "For the rest of the variables, map each old variable to a new variable from the selection"
+                        " menus. Note that you can select option 'ignore' too."
+                    )
+                # all variables were mapped automatically
+                elif nav.automatically_mapped and not nav.has_suggestions:
+                    po.put_markdown("All variables were automatically mapped! No need for user input.")
+                nav.run_app()
+            else:
+                po.put_error(
+                    "No variable mapping suggestions found. Please check your input parameters. This is probably due to"
+                    " no variable in the old dataset being used in any chart."
+                )
 
 
 class Navigation:
@@ -74,9 +94,51 @@ class Navigation:
     # List of suggested variable mappings
     suggestions: list = list()
     # mapping from old to new variables IDs (after user interaction)
-    variable_mapping: dict = dict()
-    # OWID Env
-    owid_env = OWIDEnv()
+    variable_mapping_auto: dict = dict()
+    variable_mapping_manual: dict = dict()
+    # IDs to names
+    __variable_id_to_names: Optional[Dict[int, str]] = None
+
+    @property
+    def variable_mapping(self) -> Dict[int, int]:
+        """Get variable mapping."""
+        return self.variable_mapping_auto | self.variable_mapping_manual
+
+    @property
+    def automatically_mapped(self):
+        """Check if any variable was automatically mapped."""
+        # True if any variable was automatically mapped
+        return bool(self.variable_mapping_auto)
+
+    @property
+    def anything_to_map(self) -> bool:
+        """Check if there is anything to map.
+
+        There is something to map if there are either suggestions (user manual input required) or a preliminary mapping.
+        """
+        return (len(self.suggestions) > 0) or self.variable_mapping != {}
+
+    @property
+    def has_suggestions(self) -> bool:
+        """Check if there are suggestions."""
+        return len(self.suggestions) > 0
+
+    @property
+    def variable_id_to_names(self) -> Dict[int, str]:
+        """Get variable ID to name mapping."""
+        if self.__variable_id_to_names is None:
+            self.__variable_id_to_names = self._varid_to_varname()
+        return self.__variable_id_to_names
+
+    def show_live_banner(self) -> None:
+        if OWIDEnv().env_type_id == "live":
+            po.put_warning(
+                po.put_markdown(
+                    "You are trying to connect to the **live** database! Working with live should only be done after"
+                    " prototyping and testing on staging. If you are not sure what this means, please"
+                    " consult the with ETL team."
+                )
+            )
 
     def show_instructions(self) -> None:
         """Show initial step description."""
@@ -90,25 +152,30 @@ class Navigation:
         Check if .env is there, show environment variables.
         """
         log.info("2. Checking environment")
+        po.put_markdown("""## Environment""")
         # Check that .env is there
+        po.put_markdown("""### Checking...""")
         ok = _check_env()
-        # display .env content if it is there
         if ok:
-            _show_environment()
             # check that you can connect to DB
             try:
                 _ = get_connection()
             except OperationalError as e:
                 po.put_error(
-                    f"We could not connect to the database: {e}. If connecting to a remote database, remember to"
-                    " ssh-tunel into it using the appropriate ports and then try again."
+                    "We could not connect to the database. If connecting to a remote database, remember to"
+                    f" ssh-tunel into it using the appropriate ports and then try again.\n\nError:\n{e}"
                 )
                 ok = False
             except Exception as e:
                 raise e
             else:
-                po.put_success("Connection to the database was successfull!")
+                msg = "Connection to the Grapher database was successfull!"
+                po.put_success(msg)
+                po.toast(msg, color="success")
                 ok = True
+                # show variables (from .env)
+                po.put_markdown("""### Variables""")
+                _show_environment()
         return ok
 
     def get_input_params(self) -> None:
@@ -211,12 +278,20 @@ class Navigation:
 
         self.params = params
 
+    def params_is_valid(self):
+        if self.params["dataset_old_id"] == self.params["dataset_new_id"]:
+            msg = "Old and new datasets cannot be the same!"
+            po.toast(msg, color="error")
+            po.put_error(msg)
+            return False
+        return True
+
     def show_input_params(self) -> None:
         """Shows user the input parameters."""
         log.info("4. Showing input parameters")
-        link_old = self.owid_env.dataset_admin_url(self.params["dataset_old_id"])
+        link_old = OWID_ENV.dataset_admin_url(self.params["dataset_old_id"])
         # dataset_admin_url
-        link_new = self.owid_env.dataset_admin_url(self.params["dataset_new_id"])
+        link_new = OWID_ENV.dataset_admin_url(self.params["dataset_new_id"])
         po.put_info(
             po.put_html(
                 f"""
@@ -240,7 +315,7 @@ class Navigation:
             )
         )
 
-    def get_suggestions(self) -> None:
+    def get_suggestions_and_mapping(self) -> None:
         """Get suggestions for each variable in old dataset.
 
         Creates a list with new variable suggestions for each old variable. Each item is a dictionary with two keys:
@@ -263,7 +338,9 @@ class Navigation:
             )
 
         # get initial mapping
-        _, missing_old, missing_new = preliminary_mapping(old_variables, new_variables, match_identical)
+        mapping, missing_old, missing_new = preliminary_mapping(old_variables, new_variables, match_identical)
+        if not mapping.empty:
+            self.variable_mapping_auto = mapping.set_index("id_old")["id_new"].to_dict()
         # get suggestions for mapping
         self.suggestions = find_mapping_suggestions(missing_old, missing_new, similarity_name)
 
@@ -278,9 +355,12 @@ class Navigation:
         self._sanity_checks()
 
         # show user variable form, collect their input
-        self.get_variable_mapping_ids()
-
-        self.confirm_variable_mapping(next_step=self.final_steps)
+        if self.has_suggestions:
+            self.get_variable_mapping_ids()
+            self.confirm_variable_mapping(next_step=self.final_steps)
+        else:
+            log.info("No suggestions available. Skipping input form and confirmation step.")
+            self.final_steps()
 
     def _sanity_checks(self) -> None:
         """Sanity checks on class attributes `params` and `suggestions`.
@@ -290,14 +370,18 @@ class Navigation:
         """
         log.info("6. Sanity checks")
         assert isinstance(self.suggestions, list), "Suggestions must be a list!"
-        for i, s in enumerate(self.suggestions):
-            assert all(k in s for k in ("new", "old")), f"Keys 'new' and 'old' missing in suggestin number {i}!."
-            assert isinstance(
-                s["new"], pd.DataFrame
-            ), f"Suggestion number {i} has a 'new' value that is not a DataFrame. Instead {type(s['new'])} was found."
-            assert isinstance(
-                s["old"], dict
-            ), f"Suggestion number {i} has an 'old' value that is not a Series. Instead {type(s['old'])} was found."
+        if (len(self.suggestions) == 0) and not self.variable_mapping:
+            log.info("No value was assigned to neither `self.suggestions` nor `self.variable_mapping`.")
+        if len(self.suggestions) > 0:
+            for i, s in enumerate(self.suggestions):
+                assert all(k in s for k in ("new", "old")), f"Keys 'new' and 'old' missing in suggestin number {i}!."
+                assert isinstance(s["new"], pd.DataFrame), (
+                    f"Suggestion number {i} has a 'new' value that is not a DataFrame. Instead {type(s['new'])} was"
+                    " found."
+                )
+                assert isinstance(
+                    s["old"], dict
+                ), f"Suggestion number {i} has an 'old' value that is not a Series. Instead {type(s['old'])} was found."
         assert isinstance(self.params, dict), "Params must be a dictionary!"
         assert all(
             k in self.params
@@ -344,7 +428,8 @@ class Navigation:
         # clean and sanity checks on mapping
         mapping = {int(k): int(v) for k, v in mapping.items()}
 
-        self.variable_mapping = mapping
+        self.variable_mapping_manual = mapping
+        log.info(f"Variable mapping (manual): {mapping}")
 
     def confirm_variable_mapping(self, next_step: Callable) -> None:
         """Confirm variable mapping by means of a popup."""
@@ -362,7 +447,7 @@ class Navigation:
             self.run_app()
 
         with po.popup("This is your current variable mapping", closable=False, implicit_close=False, size="large"):
-            self.show_variable_mapping_table()
+            self.show_variable_mapping_table(separate=True)
             if len(set(self.variable_mapping.values())) != len(self.variable_mapping):
                 po.put_warning("Warning: Multiple old variables are mapped to the same new variable!")
             po.put_buttons(
@@ -382,9 +467,9 @@ class Navigation:
         """
         log.info("9. Final steps")
         # show variable mapping
-        self.show_variable_mapping_table()
+        self.show_variable_mapping_table(separate=True)
         # clean variable mapping (ignore -1)
-        self.variable_mapping = {k: v for k, v in self.variable_mapping.items() if v != -1}
+        self._clean_variable_mapping()
         # build suggester
         suggester = ChartRevisionSuggester(self.variable_mapping)
         # show charts to be updated (and therefore get revisions)
@@ -398,59 +483,76 @@ class Navigation:
                 exit_code = self.submit_suggestions(suggester, revisions)
                 # show next steps
                 if exit_code == 0:
-                    approval_chart_link = self.owid_env.chart_approval_tool_url
                     po.put_markdown(
                         f"""
                     ## Next steps
 
-                    Go to the [Chart approval tool]({approval_chart_link}) and approve, flag or reject the suggested chart revisions.
+                    Go to the [Chart approval tool]({OWID_ENV.chart_approval_tool_url}) and approve, flag or reject the suggested chart revisions.
                     """
                     )
 
-    def show_variable_mapping_table(self):
+    def show_variable_mapping_table(self, separate: bool = False):
         """Show variable mapping table.
 
         Build table with variable mapping (old -> new names). Cell items in table are clickable,
         directing the user to the variable grapher UI page.
-        """
-        variable_id_to_names = self._varid_to_varname()
-        tdata = [
-            [
-                po.put_link(
-                    f"{variable_id_to_names.get(old_id)} ({old_id})",
-                    self.owid_env.variable_admin_url(old_id),
-                    new_window=True,
-                ),
-                po.put_link(
-                    f"{variable_id_to_names.get(new_id)} ({new_id})",
-                    self.owid_env.variable_admin_url(new_id),
-                    new_window=True,
-                )
-                if new_id != -1
-                else variable_id_to_names.get(new_id),
-            ]
-            for old_id, new_id in self.variable_mapping.items()
-        ]
-        po.put_table(tdata, header=["Old variable", "New variable"])
 
-    def _varid_to_varname(self) -> pd.DataFrame:
-        """Build mapping from variable ID to variable NAME."""
-        mappings = [pd.DataFrame({"id": [-1], "name": ["(Ignore)"]})]
-        for suggestion in self.suggestions:
-            old_id = suggestion["old"]["id_old"]
-            old_varname = suggestion["old"]["name_old"]
-            mapping_old = pd.DataFrame({"id": [old_id], "name": [old_varname]})
-            mapping_new = suggestion["new"][["id_new", "name_new"]].rename(columns={"id_new": "id", "name_new": "name"})
-            mappings.append(
-                pd.concat(
-                    [
-                        mapping_old,
-                        mapping_new,
-                    ],
-                    ignore_index=True,
+        Parameters
+        ----------
+        separate : bool, optional
+            If True, table is shown separated by those mappings that were created manually vs. automatically.
+        """
+
+        def _show_table(mapping: Dict[int, int]):
+            tdata = [
+                [
+                    po.put_link(
+                        f"{self.variable_id_to_names.get(old_id)} ({old_id})",
+                        OWID_ENV.variable_admin_url(old_id),
+                        new_window=True,
+                    ),
+                    po.put_link(
+                        f"{self.variable_id_to_names.get(new_id)} ({new_id})",
+                        OWID_ENV.variable_admin_url(new_id),
+                        new_window=True,
+                    )
+                    if new_id != -1
+                    else self.variable_id_to_names.get(new_id),
+                ]
+                for old_id, new_id in mapping.items()
+            ]
+            po.put_table(tdata, header=["Old variable", "New variable"])
+
+        if separate:
+            if self.variable_mapping_manual:
+                po.put_markdown("### Manually mapped:")
+                _show_table(self.variable_mapping_manual)
+            if self.variable_mapping_auto:
+                po.put_markdown(
+                    "### Automatically mapped:\nThese are variables that were automatically mapped by the tool because"
+                    " their names were identical. To disable this, re-run this step and uncheck 'Pair identical"
+                    " variables' option."
                 )
-            )
-        return pd.concat(mappings, ignore_index=True).drop_duplicates().set_index("id").squeeze().to_dict()
+                _show_table(self.variable_mapping_auto)
+        else:
+            _show_table(self.variable_mapping)
+
+    def _varid_to_varname(self) -> Dict[int, str]:
+        """Build mapping from variable ID to variable NAME."""
+        log.info(f"Mapping IDs to names: {self.variable_mapping}")
+        # get mapping from db
+        with get_connection() as db_conn:
+            var_ids = list(self.variable_mapping.keys()) + list(self.variable_mapping.values())
+            var_ids = str(tuple(set(var_ids)))
+            query = f"""
+                SELECT *
+                FROM variables
+                WHERE id in {var_ids}
+            """
+            df = pd.read_sql(query, db_conn)
+            mapping = df[["id", "name"]].set_index("id").squeeze().to_dict()
+        log.info(f"Found mapping: {mapping}")
+        return mapping
 
     def show_submission_details(self, suggester: ChartRevisionSuggester) -> Union[List[dict[str, Any]], None]:
         """Show submission details.
@@ -458,6 +560,7 @@ class Navigation:
         This includes the variable id mapping, but also the charts that will be affected by the mapping.
         """
         # get ID mapping without ignore ones (-1)
+        po.toast("Getting submission details...")
         po.put_markdown("## Submission details")
         if not self.variable_mapping:
             po.put_error("Mapping is empty!")
@@ -465,15 +568,17 @@ class Navigation:
             po.put_markdown("### Variable ID mapping to be submitted")
             po.put_code(self.variable_mapping, "json")
             po.put_markdown("### Charts affected")
-            try:
-                suggested_chart_revisions = suggester.prepare()
-            except Exception as e:
-                po.put_error(f"Error: {e}")
-                return
-            else:
-                po.put_markdown(
-                    f"There are **{len(suggested_chart_revisions)} charts** that will be affected by the mapping."
-                )
+            with po.put_loading():
+                try:
+                    suggested_chart_revisions = suggester.prepare()
+                except Exception as e:
+                    po.put_error(f"Error: {e}")
+                    return
+                else:
+                    po.put_markdown(
+                        f"There are **{len(suggested_chart_revisions)} charts** that will be affected by the mapping."
+                    )
+                    _show_logs_from_suggester(suggester)
             return suggested_chart_revisions
 
     def submit_suggestions(
@@ -492,12 +597,49 @@ class Navigation:
                 suggester.insert(suggested_chart_revisions=suggested_chart_revisions)
             except Exception as e:
                 po.put_error(e)
-                approval_chart_link = self.owid_env.chart_approval_tool_url
+                po.toast("Something went wrong when submitting suggestions to Grapher!", color="error")
+                approval_chart_link = OWID_ENV.chart_approval_tool_url
                 po.put_markdown(
-                    f"You might want to go to the [Chart approval tool]({approval_chart_link}) and review! Then, re-run"
-                    " `walkthrough charts` again."
+                    f"Check on the [Chart approval tool]({approval_chart_link})! You might need to delete old chart"
+                    " revisions. Then, run `walkthrough charts` step again."
                 )
                 return -1
             else:
-                po.put_success("Chart revisions have been submitted to Grapher!")
+                msg = "Chart revisions have been submitted to Grapher!"
+                po.toast(msg, color="success")
+                po.put_success(msg)
         return 0
+
+    def _clean_variable_mapping(self):
+        self.variable_mapping_manual = {k: v for k, v in self.variable_mapping_manual.items() if v != -1}
+
+
+def _show_logs_from_suggester(suggester):
+    log.info(f"Showing logs: {suggester.logs}")
+    try:
+        po.put_scrollable(po.put_scope("scrollable"))
+        for msg in suggester.logs:
+            text = msg["message"]
+            match = re.search(r"([Cc]hart (\d+)).*", text)
+            if match:
+                text_repl = match.group(1)
+                chart_id = match.group(2)
+                text = text.replace(text_repl, f"<a href='{OWID_ENV.chart_admin_url(chart_id)}'>{text_repl}</a>")
+            html = po.put_html(text)
+            if msg["type"] == "error":
+                po.put_error(html, scope="scrollable")
+            elif msg["type"] == "warning":
+                po.put_warning(html, scope="scrollable")
+            elif msg["type"] == "info":
+                po.put_info(html, scope="scrollable")
+            elif msg["type"] == "success":
+                po.put_success(html, scope="scrollable")
+    except Exception as e:
+        po.put_error(
+            po.put_html(
+                "There was an error while retrieving the logs. Please report <a"
+                f" href='https://github.com/owid/etl/issues/new'>here</a>! Complete error trace: {e}"
+            )
+        )
+    else:
+        po.toast("Submission details available!", color="success")
