@@ -6,12 +6,12 @@ meta:
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5205
   file_extension: json
-  date_accessed: 2022-12-25 18:00:43.802718
+  date_accessed: 2022-12-26 12:00:25.355535
   is_public: true
   version: latest
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 616e4c29fe206d919b79475bca44f0f8
+- md5: 788c20f58eff1efb76b7a0825628c383
   size: 6613
   path: dataset_5205_covid_2019__hospital__and__icu_config.json

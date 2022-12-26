@@ -6,12 +6,12 @@ meta:
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5220
   file_extension: feather
-  date_accessed: 2022-12-25 18:01:41.883722
+  date_accessed: 2022-12-26 12:02:59.366521
   is_public: false
   version: latest
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: efd9d96647348be96e405769bb22bd5b
-  size: 19741938
+- md5: e49b41b1616b70fed062d17c052c748f
+  size: 19752802
   path: dataset_5220_covid_19__johns_hopkins_university_values.feather
