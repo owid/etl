@@ -6,12 +6,12 @@ meta:
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5237
   file_extension: feather
-  date_accessed: 2022-12-25 18:02:16.644436
+  date_accessed: 2022-12-26 18:02:32.570801
   is_public: false
   version: latest
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 3a7e6cdcd3f857f7301077937603b9ba
-  size: 8266042
+- md5: adaa26c567604f0f57233d9bcdc75624
+  size: 8268242
   path: dataset_5237_uk_covid_data_values.feather
