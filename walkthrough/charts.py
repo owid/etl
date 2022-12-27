@@ -616,30 +616,31 @@ class Navigation:
 
 def _show_logs_from_suggester(suggester):
     log.info(f"Showing logs: {suggester.logs}")
-    try:
-        po.put_scrollable(po.put_scope("scrollable"))
-        for msg in suggester.logs:
-            text = msg["message"]
-            match = re.search(r"([Cc]hart (\d+)).*", text)
-            if match:
-                text_repl = match.group(1)
-                chart_id = match.group(2)
-                text = text.replace(text_repl, f"<a href='{OWID_ENV.chart_admin_url(chart_id)}'>{text_repl}</a>")
-            html = po.put_html(text)
-            if msg["type"] == "error":
-                po.put_error(html, scope="scrollable")
-            elif msg["type"] == "warning":
-                po.put_warning(html, scope="scrollable")
-            elif msg["type"] == "info":
-                po.put_info(html, scope="scrollable")
-            elif msg["type"] == "success":
-                po.put_success(html, scope="scrollable")
-    except Exception as e:
-        po.put_error(
-            po.put_html(
-                "There was an error while retrieving the logs. Please report <a"
-                f" href='https://github.com/owid/etl/issues/new'>here</a>! Complete error trace: {e}"
+    if suggester.logs:
+        try:
+            po.put_scrollable(po.put_scope("scrollable"))
+            for msg in suggester.logs:
+                text = msg["message"]
+                match = re.search(r"([Cc]hart (\d+)).*", text)
+                if match:
+                    text_repl = match.group(1)
+                    chart_id = match.group(2)
+                    text = text.replace(text_repl, f"<a href='{OWID_ENV.chart_admin_url(chart_id)}'>{text_repl}</a>")
+                html = po.put_html(text)
+                if msg["type"] == "error":
+                    po.put_error(html, scope="scrollable")
+                elif msg["type"] == "warning":
+                    po.put_warning(html, scope="scrollable")
+                elif msg["type"] == "info":
+                    po.put_info(html, scope="scrollable")
+                elif msg["type"] == "success":
+                    po.put_success(html, scope="scrollable")
+        except Exception as e:
+            po.put_error(
+                po.put_html(
+                    "There was an error while retrieving the logs. Please report <a"
+                    f" href='https://github.com/owid/etl/issues/new'>here</a>! Complete error trace: {e}"
+                )
             )
-        )
-    else:
-        po.toast("Submission details available!", color="success")
+        else:
+            po.toast("Submission details available!", color="success")
