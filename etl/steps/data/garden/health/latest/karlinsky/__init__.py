@@ -53,7 +53,7 @@ def run(dest_dir: str) -> None:
 def load_dataframe() -> pd.DataFrame:
     # read data from source
     with downloaded(PATH_DATASET) as filename:
-        df = pd.read_csv(filename)
+        df = pd.read_csv(filename, sep=",")
     # drop and rename columns
     df = df.drop(columns=["continent", "source"])
     df = df.rename(columns={"country_name": "country"})
