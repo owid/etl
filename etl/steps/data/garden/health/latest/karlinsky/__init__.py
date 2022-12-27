@@ -9,13 +9,12 @@ import datetime as dt
 import os
 
 import pandas as pd
-from structlog import get_logger
 from owid.catalog import Dataset, Table
 from owid.datautils import geo
+from structlog import get_logger
 
-from etl.helpers import downloaded
 from etl.helpers import Names as N
-
+from etl.helpers import downloaded
 
 CURRENT_DIR = os.path.dirname(__file__)
 PATH_DATASET = "https://raw.githubusercontent.com/akarlinsky/death_registration/main/death_reg_final.csv"
