@@ -1,0 +1,75 @@
+dataset:
+  namespace: health
+  short_name: karlinsky
+  title: International Completeness of Death Registration 2015-2019 – Karlinsky (2021)
+  description: >
+    The International Completeness of Death Registration 2015–2019 database (ICDR), produced by Ariel Karlinsky, represents the most comprehensive and up-to-date database on the completeness of death reporting globally.
+
+
+    All of the work and sources are documented in detail on GitHub: https://github.com/akarlinsky/death_registration.
+
+
+    You can read a detailed description of the ICDR in the medRxiv preprint "Karlinsky, A. (2021). International Completeness of Death Registration 2015–2019.": https://www.medrxiv.org/content/10.1101/2021.08.12.21261978v1.
+
+
+    As of 18 February 2022, the available data on completeness of death reporting from international organizations such as the UN Statistics Division is not as up to date and contains less precise estimates than the ICDR. 
+    For example in the most recent UN data, published in February 2021, the estimate for Bolivia is from the year 2000 and is listed as "less than 90%." In contrast, the ICDR has a precise estimate for Bolivia in each year 
+    from 2015–2019, which in 2019 is 65%. The UN data is here: https://unstats.un.org/unsd/demographic-social/crvs/.
+
+
+    Ariel Karlinsky is also co-producer of the World Mortality Dataset (WMD), which collects data on all-cause mortality from 2015–2022 for currently 117 countries and territories. The WMD is one of the primary sources 
+    for data on excess mortality during the COVID-19 pandemic. You can find the WMD on GitHub here: https://github.com/akarlinsky/world_mortality.
+
+  licenses:
+    - name: CC BY 4.0
+      url: https://creativecommons.org/licenses/by/4.0/
+  version: "latest"
+  sources:
+    - name: Karlinsky, International Completeness of Death Registration 2015-2019 (2021)
+      url: https://doi.org/10.1101/2021.08.12.21261978
+      source_data_url: https://raw.githubusercontent.com/akarlinsky/death_registration/main/death_reg_final.csv
+      publication_date: "2021-08-14"
+      publication_year: 2021
+
+tables:
+  death_registration:
+    title: International Completeness of Death Registration 2015-2019 – Karlinsky (2021)
+    description: >
+      Contains all metrics used in the International Completeness of Death Registration 2015-2019 paper.
+    variables:
+      # Life expectancy
+      reg_deaths:
+        title: Registered deaths
+        unit: "deaths"
+        description: >
+          The number of deaths registered in the vital registration system for the country-year. NA denotes no registerd deaths data was obtained.
+      expected_wpp:
+        title: Expected number of deaths (WPP 2019)
+        unit: deaths
+        description: >
+          The number of deaths expected to occur for the country-year from World Population Prospects 2019.
+
+      expected_gbd:
+        title: Expected number of deaths (GBD 2019)
+        unit: deaths
+        description: >
+          The number of deaths expected to occur for the country-year from Global Burden of Disease 2019.
+
+      expected_ghe:
+        title: Expected number of deaths (GHE 2019)
+        unit: deaths
+        description: >
+          The number of deaths expected to occur for the country-year from Global Health Estimates 2019.
+
+      expected_deaths:
+        title: Expected number of deaths
+        unit: deaths
+        description: >
+          The mean of expected_wpp, expected_gbd and expected_ghe.
+
+      death_comp:
+        title: Estimated completeness of death reporting
+        short_unit: "%"
+        unit: "%"
+        description: >
+          The estimated completness rate, ranges from 0 to 100. Derived as reg_deaths divided by expected_deaths. See paper (https://www.medrxiv.org/content/10.1101/2021.08.12.21261978v1) for details.
