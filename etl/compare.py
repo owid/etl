@@ -60,15 +60,8 @@ def cli(
     show_shared: bool,
     truncate_lists_at: int,
 ) -> None:
-    """Compare two dataframes, both structurally and the values.
+    """Compare two dataframes/tables/datasets in terms of their structure, values and metadata.
 
-    This tool loads two dataframes, either from the local ETL and the remote catalog
-    or just from two different files. It compares the columns, index columns and index values (row indices) as
-    sets between the two dataframes and outputs the differences. Finally it compares the values of the overlapping
-    columns and rows with the given threshold values for absolute and relative tolerance.
-
-    The exit code is 0 if the dataframes are equal, 1 if there is an error loading the dataframes, 2 if the dataframes
-    are structurally equal but are otherwise different, 3 if the dataframes have different structure and/or different values.
     """
     ctx.ensure_object(dict)
     ctx.obj["absolute_tolerance"] = absolute_tolerance
