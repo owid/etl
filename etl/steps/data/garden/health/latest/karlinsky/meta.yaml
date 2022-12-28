@@ -42,7 +42,7 @@ tables:
         title: Registered deaths
         unit: "deaths"
         description: >
-          The number of deaths registered in the vital registration system for the country-year. NA denotes no registerd deaths data was obtained.
+          The number of deaths registered in the vital registration system for the country-year. NA denotes no registered deaths data was obtained.
       expected_wpp:
         title: Expected number of deaths (WPP 2019)
         unit: deaths
