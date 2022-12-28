@@ -6,13 +6,15 @@ tables:
     title: International Completeness of Death Registration 2015-2019 – Karlinsky (2021)
     description: >
       Contains all metrics used in the International Completeness of Death Registration 2015-2019 paper.
+
+      Note that there is missing data for some country-years.
     variables:
       # Life expectancy
       reg_deaths:
         title: Registered deaths
         unit: "deaths"
         description: >
-          The number of deaths registered in the vital registration system for the country-year. NA denotes no registered deaths data was obtained.
+          The number of deaths registered in the vital registration system for the country-year.
       expected_wpp:
         title: Expected number of deaths (WPP 2019)
         unit: deaths
