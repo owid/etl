@@ -60,9 +60,7 @@ def cli(
     show_shared: bool,
     truncate_lists_at: int,
 ) -> None:
-    """Compare two dataframes/tables/datasets in terms of their structure, values and metadata.
-
-    """
+    """Compare two dataframes/tables/datasets in terms of their structure, values and metadata."""
     ctx.ensure_object(dict)
     ctx.obj["absolute_tolerance"] = absolute_tolerance
     ctx.obj["relative_tolerance"] = relative_tolerance
