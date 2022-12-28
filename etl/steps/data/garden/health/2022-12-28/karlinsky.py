@@ -1,63 +1,55 @@
-"""Get data on completeness of death registration based on Karlinsky (2021) paper.
-
-Data is hosted on GitHub's repo: https://github.com/akarlinsky/death_registration and is updated regularly.
-Due to the update frequency, we have decided to (i) directly source the data from the repository instead of
-going through snapshot and meadow steps and (ii) use 'latest' version in garden instead of specific snapshots.
-"""
-
-import datetime as dt
-import os
+import json
+from typing import List, cast
 
 import pandas as pd
 from owid.catalog import Dataset, Table
+from owid.datautils import geo
 from structlog import get_logger
 
-from etl.data_helpers import geo
-from etl.helpers import Names as N
-from etl.helpers import downloaded
+from etl.helpers import Names
+from etl.paths import DATA_DIR
 
-CURRENT_DIR = os.path.dirname(__file__)
-PATH_DATASET = "https://raw.githubusercontent.com/akarlinsky/death_registration/main/death_reg_final.csv"
-PATH_METADATA = os.path.join(CURRENT_DIR, "meta.yaml")
-PATH_COUNTRIES = os.path.join(CURRENT_DIR, "countries.json")
 log = get_logger()
+
+# naming conventions
+N = Names(__file__)
+MEADOW_DATASET = "meadow/health/2022-12-28/karlinsky"
+TABLE_NAME = "deaths_karlinsky"
+# PATH_DATASET = "https://raw.githubusercontent.com/akarlinsky/death_registration/main/death_reg_final.csv"
 
 
 def run(dest_dir: str) -> None:
-    # load dataframe
-    log.info("karlinsky: loading dataframe...")
-    df = load_dataframe()
+    # read dataset from meadow
+    log.info("karlinsky: loading meadow table...")
+    ds_meadow = Dataset(DATA_DIR / MEADOW_DATASET)
+    tb_meadow = ds_meadow["deaths_karlinsky"]
+
+    # clean dataframe
+    log.info("karlinsky: cleaning dataframe...")
+    df = clean_dataframe(tb_meadow)
 
     # sanity checks
     log.info("karlinsky: sanity checking...")
     sanity_check(df)
 
-    # build table
-    log.info("karlinsky: converting dataframe to table...")
-    tb = Table(df, short_name="death_registration")
+    # create new dataset with the same metadata as meadow
+    ds_garden = Dataset.create_empty(dest_dir, metadata=ds_meadow.metadata)
 
-    # build dataset
-    log.info("karlinsky: creating dataset...")
-    ds = Dataset.create_empty(dest_dir)
+    # create new table with the same metadata as meadow and add it to dataset
+    tb_garden = Table(df, short_name=TABLE_NAME)
+    ds_garden.add(tb_garden)
 
-    # add table
-    log.info("karlinsky: adding table to dataset...")
-    ds.add(tb)
+    # update metadata from yaml file
+    ds_garden.update_metadata(N.metadata_path)
 
-    # update metadata
-    log.info("karlinsky: adding metadata...")
-    ds.update_metadata(PATH_METADATA)
-    ds.metadata.date_accessed = dt.date.today().strftime("%Y-%m-%d")
+    ds_garden.save()
 
-    # save
-    log.info("karlinsky: saving dataset...")
-    ds.save()
+    log.info("karlinsky.end")
 
 
-def load_dataframe() -> pd.DataFrame:
-    # read data from source
-    with downloaded(PATH_DATASET) as filename:
-        df = pd.read_csv(filename, sep=",")
+def clean_dataframe(tb: Table) -> pd.DataFrame:
+    # convert table to dataframe
+    df = pd.DataFrame(tb)
     # drop and rename columns
     df = df.drop(columns=["continent", "source"])
     df = df.rename(columns={"country_name": "country"})
@@ -72,7 +64,7 @@ def harmonize_countries(df: pd.DataFrame) -> pd.DataFrame:
     unharmonized_countries = df["country"]
     df = geo.harmonize_countries(
         df=df,
-        countries_file=str(PATH_COUNTRIES),
+        countries_file=str(N.country_mapping_path),
         warn_on_missing_countries=True,
         make_missing_countries_nan=True,
     )
