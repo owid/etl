@@ -1,6 +1,3 @@
-import json
-from typing import List, cast
-
 import pandas as pd
 from owid.catalog import Dataset, Table
 from owid.datautils import geo
