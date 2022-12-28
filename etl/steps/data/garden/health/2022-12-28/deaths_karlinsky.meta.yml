@@ -1,13 +1,8 @@
 dataset:
   sources:
-  #   -
-  #     name: Maddison Project Database 2020 (Bolt and van Zanden, 2020)
-  #     published_by: Bolt, Jutta and Jan Luiten van Zanden (2020), “Maddison style estimates of the evolution of the world economy. A new 2020 update“.
-  #     publisher_source: |
-  #       The Maddison Project Database is based on the work of many researchers that have produced estimates of...
 
 tables:
-  deaths_karlinsky:
+  deaths:
     title: International Completeness of Death Registration 2015-2019 – Karlinsky (2021)
     description: >
       Contains all metrics used in the International Completeness of Death Registration 2015-2019 paper.
@@ -40,11 +35,11 @@ tables:
         title: Expected number of deaths
         unit: deaths
         description: >
-          The mean of expected_wpp, expected_gbd and expected_ghe.
+          The mean of "Expected number of deaths (WPP 2019)", "Expected number of deaths (GBD 2019)" and "Expected number of deaths (GHE 2019)".
 
       death_comp:
         title: Estimated completeness of death reporting
         short_unit: "%"
         unit: "%"
         description: >
-          The estimated completness rate, ranges from 0 to 100. Derived as reg_deaths divided by expected_deaths. See paper (https://www.medrxiv.org/content/10.1101/2021.08.12.21261978v1) for details.
+          It ranges from 0 to 100. Derived as "Registered deaths" divided by "Expected number of deaths". See paper (https://www.medrxiv.org/content/10.1101/2021.08.12.21261978v1) for details.

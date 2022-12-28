@@ -10,16 +10,15 @@ log = get_logger()
 
 # naming conventions
 N = Names(__file__)
-MEADOW_DATASET = "meadow/health/2022-12-28/karlinsky"
-TABLE_NAME = "deaths_karlinsky"
-# PATH_DATASET = "https://raw.githubusercontent.com/akarlinsky/death_registration/main/death_reg_final.csv"
+MEADOW_DATASET = "meadow/health/2022-12-28/deaths_karlinsky"
+TABLE_NAME = "deaths"
 
 
 def run(dest_dir: str) -> None:
     # read dataset from meadow
-    log.info("karlinsky: loading meadow table...")
+    log.info("deaths_karlinsky: loading meadow table...")
     ds_meadow = Dataset(DATA_DIR / MEADOW_DATASET)
-    tb_meadow = ds_meadow["deaths_karlinsky"]
+    tb_meadow = ds_meadow[TABLE_NAME]
 
     # clean dataframe
     log.info("karlinsky: cleaning dataframe...")
@@ -41,7 +40,7 @@ def run(dest_dir: str) -> None:
 
     ds_garden.save()
 
-    log.info("karlinsky.end")
+    log.info("deaths_karlinsky.end")
 
 
 def clean_dataframe(tb: Table) -> pd.DataFrame:
@@ -106,4 +105,4 @@ def sanity_check(df: pd.DataFrame) -> None:
         x = df_.dropna(subset=[col])
         assert all(
             x[col] < 0.2 * x["population"]
-        ), f"{col} contains values that might be too large (comapred to population values)!"
+        ), f"{col} contains values that might be too large (compared to population values)!"

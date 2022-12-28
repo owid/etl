@@ -236,12 +236,12 @@ steps:
     - data://garden/worldbank_wdi/2022-05-26/wdi
 
   # Death completion
-  data://meadow/health/2022-12-28/karlinsky:
-    - snapshot://health/2022-12-28/karlinsky.csv
-  data://garden/health/2022-12-28/karlinsky:
-    - data://meadow/health/2022-12-28/karlinsky
-  data://grapher/health/2022-12-28/karlinsky:
-    - data://garden/health/2022-12-28/karlinsky
+  data://meadow/health/2022-12-28/deaths_karlinsky:
+    - snapshot://health/2022-12-28/deaths_karlinsky.csv
+  data://garden/health/2022-12-28/deaths_karlinsky:
+    - data://meadow/health/2022-12-28/deaths_karlinsky
+  data://grapher/health/2022-12-28/deaths_karlinsky:
+    - data://garden/health/2022-12-28/deaths_karlinsky
 
 # Sub-dags to import
 include:

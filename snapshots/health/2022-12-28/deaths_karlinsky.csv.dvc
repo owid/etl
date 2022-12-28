@@ -33,4 +33,4 @@ wdir: ../../../data/snapshots/health/2022-12-28
 outs:
 - md5: b02bc5a042e2bf7a629fd5063a39bbca
   size: 80071
-  path: karlinsky.csv
+  path: deaths_karlinsky.csv
