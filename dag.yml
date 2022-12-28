@@ -235,11 +235,13 @@ steps:
     - data://garden/bp/2022-07-14/energy_mix
     - data://garden/worldbank_wdi/2022-05-26/wdi
 
-  # Death
-  data://garden/health/latest/karlinsky:
-    - etag://raw.githubusercontent.com/akarlinsky/death_registration/main/death_reg_final.csv
-  data://grapher/health/latest/karlinsky:
-    - data://garden/health/latest/karlinsky
+  # Death completion
+  data://meadow/health/2022-12-28/karlinsky:
+    - snapshot://health/2022-12-28/karlinsky.csv
+  data://garden/health/2022-12-28/karlinsky:
+    - data://meadow/health/2022-12-28/karlinsky
+  data://grapher/health/2022-12-28/karlinsky:
+    - data://garden/health/2022-12-28/karlinsky
 
 # Sub-dags to import
 include:
