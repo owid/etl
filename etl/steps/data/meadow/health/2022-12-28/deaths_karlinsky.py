@@ -1,5 +1,3 @@
-import datetime as dt
-
 import pandas as pd
 from owid.catalog import Dataset, Table
 from structlog import get_logger
