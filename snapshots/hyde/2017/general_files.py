@@ -8,7 +8,7 @@ from etl.snapshot import Snapshot
     "--upload/--skip-upload",
     default=True,
     type=bool,
-    help="Upload dataset to Walden",
+    help="Upload dataset to Snapshot",
 )
 def main(upload: bool) -> None:
     snap = Snapshot("hyde/2017/general_files.zip")
