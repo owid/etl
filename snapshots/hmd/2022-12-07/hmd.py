@@ -22,7 +22,7 @@ SNAPSHOT_VERSION = "2022-12-07"
     "--upload/--skip-upload",
     default=True,
     type=bool,
-    help="Upload dataset to Walden",
+    help="Upload dataset to Snapshot",
 )
 def main(path_to_file: str, upload: bool) -> None:
     # Create new snapshot.
