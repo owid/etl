@@ -140,10 +140,10 @@ steps:
   #
   # BP - Fossil fuel reserves/production ratio (2022).
   #
-  data://garden/bp/2022-09-19/fossil_fuel_reserves_production_ratio:
-    - data://garden/bp/2022-07-14/statistical_review
-  data://grapher/bp/2022-09-19/fossil_fuel_reserves_production_ratio:
-    - data://garden/bp/2022-09-19/fossil_fuel_reserves_production_ratio
+  data://garden/bp/2022-12-28/fossil_fuel_reserves_production_ratio:
+    - data://garden/bp/2022-12-28/statistical_review
+  data://grapher/bp/2022-12-28/fossil_fuel_reserves_production_ratio:
+    - data://garden/bp/2022-12-28/fossil_fuel_reserves_production_ratio
   #
   # UK BEIS - UK historical electricity (2022).
   #
