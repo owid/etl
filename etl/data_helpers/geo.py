@@ -43,6 +43,7 @@ TNAME_REFERENCE = "countries_regions"
 @functools.lru_cache
 def _load_population() -> pd.DataFrame:
     population = Dataset(DATASET_KEY_INDICATORS)[TNAME_KEY_INDICATORS]
+    population = population.reset_index()
     return cast(pd.DataFrame, population)
 
 

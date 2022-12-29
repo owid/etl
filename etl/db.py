@@ -2,7 +2,7 @@ import traceback
 import warnings
 from collections.abc import Generator
 from contextlib import contextmanager
-from typing import Any
+from typing import Any, Optional
 from urllib.parse import quote
 
 import MySQLdb
@@ -61,17 +61,17 @@ def open_db() -> Generator[DBUtils, None, None]:
             connection.close()
 
 
-def get_dataset_id(db_conn: MySQLdb.Connection, dataset_name: str) -> Any:
+def get_dataset_id(dataset_name: str, db_conn: Optional[MySQLdb.Connection] = None) -> Any:
     """Get the dataset ID of a specific dataset name from database.
 
     If more than one dataset is found for the same name, or if no dataset is found, an error is raised.
 
     Parameters
     ----------
-    db_conn : MySQLdb.Connection
-        Connection to database.
     dataset_name : str
         Dataset name.
+    db_conn : MySQLdb.Connection
+        Connection to database. Defaults to None, in which case a default connection is created (uses etl.config).
 
     Returns
     -------
@@ -79,6 +79,9 @@ def get_dataset_id(db_conn: MySQLdb.Connection, dataset_name: str) -> Any:
         Dataset ID.
 
     """
+    if db_conn is None:
+        db_conn = get_connection()
+
     query = f"""
         SELECT id
         FROM datasets
@@ -90,20 +93,22 @@ def get_dataset_id(db_conn: MySQLdb.Connection, dataset_name: str) -> Any:
 
     assert len(result) == 1, f"Ambiguous or unknown dataset name '{dataset_name}'"
     dataset_id = result[0][0]
-
     return dataset_id
 
 
-def get_variables_in_dataset(db_conn: MySQLdb.Connection, dataset_id: int, only_used_in_charts: bool = False) -> Any:
+def get_variables_in_dataset(
+    dataset_id: int, only_used_in_charts: bool = False, db_conn: Optional[MySQLdb.Connection] = None
+) -> Any:
     """Get all variables data for a specific dataset ID from database.
 
     Parameters
     ----------
-    db_conn : pymysql.connections.Connection
     dataset_id : int
         Dataset ID.
     only_used_in_charts : bool
         True to select variables only if they have been used in at least one chart. False to select all variables.
+    db_conn : MySQLdb.Connection
+        Connection to database. Defaults to None, in which case a default connection is created (uses etl.config).
 
     Returns
     -------
@@ -111,6 +116,9 @@ def get_variables_in_dataset(db_conn: MySQLdb.Connection, dataset_id: int, only_
         Variables data for considered dataset.
 
     """
+    if db_conn is None:
+        db_conn = get_connection()
+
     query = f"""
         SELECT *
         FROM variables
@@ -127,3 +135,26 @@ def get_variables_in_dataset(db_conn: MySQLdb.Connection, dataset_id: int, only_
         warnings.simplefilter("ignore", UserWarning)
         variables_data = pd.read_sql(query, con=db_conn)
     return variables_data
+
+
+def get_all_datasets(archived: bool = True, db_conn: Optional[MySQLdb.Connection] = None) -> pd.DataFrame:
+    """Get all datasets in database.
+
+    Parameters
+    ----------
+    db_conn : pymysql.connections.Connection
+        Connection to database. Defaults to None, in which case a default connection is created (uses etl.config).
+
+    Returns
+    -------
+    datasets : pd.DataFrame
+        All datasets in database. Table with three columns: dataset ID, dataset name, dataset namespace.
+    """
+    if db_conn is None:
+        db_conn = get_connection()
+
+    query = " SELECT namespace, name, id FROM datasets"
+    if not archived:
+        query += " WHERE isArchived = 0"
+    datasets = pd.read_sql(query, con=db_conn)
+    return datasets.sort_values(["name", "namespace"])
