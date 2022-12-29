@@ -8,7 +8,6 @@ from typing import cast
 import numpy as np
 import pandas as pd
 from owid import catalog
-from owid.catalog.utils import underscore_table
 from shared import CURRENT_DIR, HISTORIC_TO_CURRENT_REGION, add_population
 from structlog import get_logger
 

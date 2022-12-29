@@ -58,7 +58,9 @@ def prepare_bp_data(tb_bp: catalog.Table) -> catalog.Table:
     df_bp["gas_left"] = df_bp["gas_reserves"] / df_bp["gas_production"]
 
     # Set index, drop rows that only have nans, and sort conveniently.
-    df_bp = df_bp.set_index(["country", "year"], verify_integrity=True).dropna(how="all").sort_index().sort_index(axis=1)
+    df_bp = (
+        df_bp.set_index(["country", "year"], verify_integrity=True).dropna(how="all").sort_index().sort_index(axis=1)
+    )
 
     # Create a new table.
     tb = catalog.Table(df_bp, underscore=True)

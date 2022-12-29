@@ -6,10 +6,7 @@ import numpy as np
 import pandas as pd
 from owid import catalog
 from owid.datautils.dataframes import combine_two_overlapping_dataframes
-from shared import (
-    CURRENT_DIR,
-    gather_sources_from_tables,
-)
+from shared import CURRENT_DIR, gather_sources_from_tables
 
 from etl.paths import DATA_DIR
 
