@@ -210,6 +210,7 @@ def run(dest_dir: str) -> None:
     #
     # Save outputs.
     #
+    # Create a new garden dataset.
     ds_garden = catalog.Dataset.create_empty(dest_dir)
 
     # Gather metadata sources from all tables' original dataset sources.
