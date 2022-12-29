@@ -132,11 +132,11 @@ steps:
   #
   # Energy - Global primary energy (2022).
   #
-  data://garden/energy/2022-09-09/global_primary_energy:
+  data://garden/energy/2022-12-28/global_primary_energy:
     - data://garden/smil/2017-01-01/global_primary_energy
-    - data://garden/bp/2022-07-14/statistical_review
-  data://grapher/energy/2022-09-09/global_primary_energy:
-    - data://garden/energy/2022-09-09/global_primary_energy
+    - data://garden/bp/2022-12-28/statistical_review
+  data://grapher/energy/2022-12-28/global_primary_energy:
+    - data://garden/energy/2022-12-28/global_primary_energy
   #
   # BP - Fossil fuel reserves/production ratio (2022).
   #
