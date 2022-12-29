@@ -6,12 +6,12 @@ meta:
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5220
   file_extension: json
-  date_accessed: 2022-12-29 12:00:33.028524
+  date_accessed: 2022-12-29 17:10:29.671404
   is_public: false
   version: latest
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 62031cf70e73e35460cd5dc6d33d0063
+- md5: f9272dbd7f833570b6a3a2c28338656b
   size: 19802
   path: dataset_5220_covid_19__johns_hopkins_university_config.json
