@@ -1,5 +1,4 @@
-"""
-Generate chart revisions in Grapher using MAPPING_FILE JSON file. 
+"""Generate chart revisions in Grapher using MAPPING_FILE JSON file.
 
 MAPPING_FILE is a JSON file with old_variable_id -> new_variable_id pairs. E.g. {2032: 147395, 2033: 147396, ...}.
 
@@ -72,7 +71,7 @@ class ChartRevisionSuggester:
         >>> suggester.suggest()
     """
 
-    def __init__(self, variable_mapping: Dict[int, int], revision_reason: str = None):
+    def __init__(self, variable_mapping: Dict[int, int], revision_reason: Optional[str] = None):
         """
 
         Parameters
@@ -88,8 +87,8 @@ class ChartRevisionSuggester:
         self.revision_reason = revision_reason
 
         # Initiate some variables
-        # self.var_id2year_range = self._get_variable_year_ranges()
-        # self.df_charts, self.df_chart_dims, _ = self._get_charts_from_old_variables()
+        self.var_id2year_range = self._get_variable_year_ranges()
+        self.df_charts, self.df_chart_dims, _ = self._get_charts_from_old_variables()
 
     def _sanity_check_mapping_dict(self, variable_mapping: Any) -> None:
         """Sanity check the mapping dictionary."""
@@ -104,7 +103,7 @@ class ChartRevisionSuggester:
                 raise TypeError(f"The values of the variable mapping dictionary must be integers. Found value '{v}'!")
 
     @classmethod
-    def from_json(cls, filepath: str, revision_reason: str = None) -> "ChartRevisionSuggester":
+    def from_json(cls, filepath: str, revision_reason: Optional[str] = None) -> "ChartRevisionSuggester":
         """Load a ChartRevisionSuggester instance from a JSON file.
 
         Parameters
@@ -137,56 +136,58 @@ class ChartRevisionSuggester:
         return data
 
     def prepare_charts(self) -> List[dict[str, Any]]:
-        self.var_id2year_range = self._get_variable_year_ranges()
-        df_charts, df_chart_dims, _ = self._get_charts_from_old_variables()
         suggested_chart_revisions = []
-        for row in tqdm(df_charts.itertuples(), total=df_charts.shape[0]):
-            row = cast(Any, row)
-            try:
-                chart_id = row.id
-                # retrieves chart dimensions to be updated.
-                chart_dims = df_chart_dims.loc[df_chart_dims["chartId"] == chart_id].to_dict(orient="records")
-                chart_dims_orig = deepcopy(chart_dims)
-                chart_config = json.loads(row.config)
-
-                # get list with new variables
-                try:
-                    new_variables = [self.old_var_id2new_var_id[c["variableId"]] for c in chart_dims]
-                except KeyError:
-                    raise KeyError("Problem found in self.old_var_id2new_var_id! some IDs are not in the mapping dict.")
-
-                self._modify_chart_config_map(chart_config)
-                self._modify_chart_config_time(chart_id, chart_config)
-                self._check_chart_config_fastt(chart_id, chart_config)
-
-                self._modify_chart_dimensions(chart_dims, chart_config)
-
-                config_has_changed = json.dumps(chart_config, ignore_nan=True) != row.config
-                dims_have_changed = any([dim != chart_dims_orig[i] for i, dim in enumerate(chart_dims)])
-                assert config_has_changed == dims_have_changed, (
-                    f"Chart {chart_id}: Chart config and chart dimensions must "
-                    "have either BOTH changed or NEITHER changed, but only "
-                    "one has changed. Something went wrong."
-                )
-                if config_has_changed:
-                    # update version
-                    # if 'version' in chart_config and isinstance(chart_config['version'], int):
-                    chart_config["version"] += 1
-                    chart_config_str = json.dumps(chart_config, ignore_nan=True)
-                    suggested_chart_revisions.append(
-                        {
-                            "chartId": chart_id,
-                            "originalConfig": row.config,
-                            "suggestedConfig": chart_config_str,
-                            "suggested_reason": self._get_chart_update_reason(new_variables),
-                        }
-                    )
-
-            except Exception as e:
-                self.report_error(f"Error encountered for chart {row.id}: {e}")
-                if DEBUG:
-                    traceback.print_exc()
+        for row in tqdm(self.df_charts.itertuples(), total=self.df_charts.shape[0]):
+            revision = self.prepare_chart_single(row)
+            if revision:
+                suggested_chart_revisions.append(revision)
         return suggested_chart_revisions
+
+    def prepare_chart_single(self, row) -> Union[Dict[str, Union[int, str]], None]:
+        row = cast(Any, row)
+        try:
+            chart_id = row.id
+            # retrieves chart dimensions to be updated.
+            chart_dims = self.df_chart_dims.loc[self.df_chart_dims["chartId"] == chart_id].to_dict(orient="records")
+            chart_dims_orig = deepcopy(chart_dims)
+            chart_config = json.loads(row.config)
+
+            # get list with new variables
+            try:
+                new_variables = [self.old_var_id2new_var_id[c["variableId"]] for c in chart_dims]
+            except KeyError:
+                raise KeyError("Problem found in self.old_var_id2new_var_id! some IDs are not in the mapping dict.")
+
+            self._modify_chart_config_map(chart_config)
+            self._modify_chart_config_time(chart_id, chart_config)
+            self._check_chart_config_fastt(chart_id, chart_config)
+
+            self._modify_chart_dimensions(chart_dims, chart_config)
+
+            config_has_changed = json.dumps(chart_config, ignore_nan=True) != row.config
+            dims_have_changed = any([dim != chart_dims_orig[i] for i, dim in enumerate(chart_dims)])
+            assert config_has_changed == dims_have_changed, (
+                f"Chart {chart_id}: Chart config and chart dimensions must "
+                "have either BOTH changed or NEITHER changed, but only "
+                "one has changed. Something went wrong."
+            )
+            if config_has_changed:
+                # update version
+                # if 'version' in chart_config and isinstance(chart_config['version'], int):
+                chart_config["version"] += 1
+                chart_config_str = json.dumps(chart_config, ignore_nan=True)
+                suggested_chart_revision = {
+                    "chartId": chart_id,
+                    "originalConfig": row.config,
+                    "suggestedConfig": chart_config_str,
+                    "suggested_reason": self._get_chart_update_reason(new_variables),
+                }
+                return suggested_chart_revision
+
+        except Exception as e:
+            self.report_error(f"Error encountered for chart {row.id}: {e}")
+            if DEBUG:
+                traceback.print_exc()
 
     def _get_chart_update_reason(self, variable_ids: List[int]) -> str:
         """Get the reason for the chart update.
@@ -419,8 +420,6 @@ class ChartRevisionSuggester:
             var_id2year_range = {}
             for variable_id, min_year, max_year in rows:
                 var_id2year_range[variable_id] = [min_year, max_year]
-        print(2)
-        print(var_id2year_range)
         return var_id2year_range
 
     def _modify_chart_config_map(self, chart_config: dict[Any, Any]) -> None:
@@ -566,7 +565,6 @@ class ChartRevisionSuggester:
         for _id in _ids:
             if _id in self.var_id2year_range:
                 years += self.var_id2year_range[_id]
-        print(3, _ids, years)
         return IntRange.from_values(years)
 
     def _is_min_year_hardcoded(self, chart_config: dict[Any, Any]) -> bool:
