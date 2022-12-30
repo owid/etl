@@ -21,6 +21,7 @@ steps:
   data://garden/emissions/2022-11-11/owid_co2:
     - data://garden/gcp/2022-11-11/global_carbon_budget
     - data://garden/cait/2022-08-10/ghg_emissions_by_sector
+    # The following step is not the latest version available.
     - data://garden/energy/2022-07-29/primary_energy_consumption
     - data://garden/owid/latest/key_indicators
     - data://garden/ggdc/2020-10-01/ggdc_maddison
@@ -69,6 +70,7 @@ steps:
     - data://garden/owid/latest/key_indicators
     - data://garden/wb/2021-07-01/wb_income
     - data://garden/ggdc/2020-10-01/ggdc_maddison
+    # The following step is not the latest version available.
     - data://garden/energy/2022-07-29/primary_energy_consumption
   data://grapher/gcp/2022-11-11/global_carbon_budget:
     - data://garden/gcp/2022-11-11/global_carbon_budget
