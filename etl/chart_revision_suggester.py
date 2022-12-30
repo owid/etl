@@ -1,5 +1,7 @@
 """
-Generate chart revisions in Grapher using MAPPING_FILE JSON file. MAPPING_FILE is a JSON file with old_variable_id -> new_variable_id pairs. E.g. {2032: 147395, 2033: 147396, ...}.
+Generate chart revisions in Grapher using MAPPING_FILE JSON file. 
+
+MAPPING_FILE is a JSON file with old_variable_id -> new_variable_id pairs. E.g. {2032: 147395, 2033: 147396, ...}.
 
 Make sure that you are connected to the database. By default, it connects to Grapher based on the environment file found in the project's root directory `path/to/etl/.env`.
 """
@@ -16,6 +18,7 @@ import pandas as pd
 import simplejson as json
 import structlog
 from MySQLdb import IntegrityError
+from rich_click.rich_command import RichCommand
 from tqdm import tqdm
 
 from etl.config import DEBUG, GRAPHER_USER_ID
@@ -25,15 +28,19 @@ from etl.grapher_helpers import IntRange
 log = structlog.get_logger()
 MSGTypes = Literal["error", "warning", "info", "success"]
 
+# The maximum length of the suggested revision reason can't exceed the maximum length specified by the datatype "suggestedReason" in grapher.suggested_chart_revisions table.
+SUGGESTED_REASON_MAX_LENGTH = 512
 
-@click.command(help=__doc__)
+
+@click.command(cls=RichCommand, help=__doc__)
 @click.argument(
     "mapping-file",
     type=str,
 )
-def main_cli(mapping_file: str) -> None:
+@click.option("--revision-reason", default=None, help="Assign a reason for the suggested chart revision.")
+def main_cli(mapping_file: str, revision_reason: str) -> None:
     try:
-        suggester = ChartRevisionSuggester.from_json(mapping_file)
+        suggester = ChartRevisionSuggester.from_json(mapping_file, revision_reason)
         suggester.suggest()
     except Exception as e:
         log.error(e)
@@ -50,9 +57,13 @@ class ChartRevisionSuggester:
     OWID charts to display the newly available data in place of the old data.
 
     Attributes:
-        variable_mapping: Dict[int, int]. Dictionary with mappings of old variable IDs to new variable IDs.
-        Example: {2032: 147395, 2033: 147396, ...}
+        old_var_id2new_var_id: Dict[int, int]: Dictionary with mappings of old variable IDs to new variable IDs.
+                                Example: {2032: 147395, 2033: 147396, ...}
         logs: List[Dict[str, str]]. List of messages to be reported to the user.
+        revision_reason: str. Reason for the suggested chart revisions. If none is provided, an automated reason is generated (recommended).
+        var_id2year_range: Dict[int, List[int]]: TODO
+        df_charts: pd.DataFrame: TODO
+        df_chart_dims: pd.DataFrame: TODO
 
     Usage:
         >>> from etl.chart_revision_suggester import ChartRevisionSuggester
@@ -61,11 +72,24 @@ class ChartRevisionSuggester:
         >>> suggester.suggest()
     """
 
-    def __init__(self, variable_mapping: Dict[int, int]):
-        self.var_id2year_range: Dict[int, List[int]] = {}
+    def __init__(self, variable_mapping: Dict[int, int], revision_reason: str = None):
+        """
+
+        Parameters
+        ----------
+        variable_mapping : Dict[int, int]
+            Dictionary with mappings of old variable IDs to new variable IDs. Example: {2032: 147395, 2033: 147396, ...}
+        revision_reason : str, optional
+            Reason for the suggested chart revisions. If none is provided, an automated reason is generated (recommended). by default None
+        """
         self._sanity_check_mapping_dict(variable_mapping)
         self.old_var_id2new_var_id = variable_mapping
         self.logs: List[Dict[str, str]] = []
+        self.revision_reason = revision_reason
+
+        # Initiate some variables
+        # self.var_id2year_range = self._get_variable_year_ranges()
+        # self.df_charts, self.df_chart_dims, _ = self._get_charts_from_old_variables()
 
     def _sanity_check_mapping_dict(self, variable_mapping: Any) -> None:
         """Sanity check the mapping dictionary."""
@@ -80,7 +104,7 @@ class ChartRevisionSuggester:
                 raise TypeError(f"The values of the variable mapping dictionary must be integers. Found value '{v}'!")
 
     @classmethod
-    def from_json(cls, filepath: str) -> "ChartRevisionSuggester":
+    def from_json(cls, filepath: str, revision_reason: str = None) -> "ChartRevisionSuggester":
         """Load a ChartRevisionSuggester instance from a JSON file.
 
         Parameters
@@ -93,14 +117,15 @@ class ChartRevisionSuggester:
                 variable_mapping = {int(k): int(v) for k, v in json.load(f).items()}
         except FileNotFoundError:
             raise FileNotFoundError(f"Variable mapping file was not found at {filepath}.")
-        return cls(variable_mapping=variable_mapping)
+        return cls(variable_mapping=variable_mapping, revision_reason=revision_reason)
 
     @property
     def status(self) -> str:
         return "pending"
 
     def suggest(self, *args: Any, **kwargs: Any) -> None:
-        kwargs["suggested_chart_revisions"] = self.prepare()
+        """Prepare suggestions and submit them to Grapher for the Approval tool."""
+        kwargs["suggested_chart_revisions"] = self.prepare_charts()
         self.insert(*args, **kwargs)
 
     def load_variable_replacements(self, filepath: str) -> Dict[int, int]:
@@ -111,7 +136,7 @@ class ChartRevisionSuggester:
             raise FileNotFoundError(f"Variable mapping file was not found at {filepath}.")
         return data
 
-    def prepare(self) -> List[dict[str, Any]]:
+    def prepare_charts(self) -> List[dict[str, Any]]:
         self.var_id2year_range = self._get_variable_year_ranges()
         df_charts, df_chart_dims, _ = self._get_charts_from_old_variables()
         suggested_chart_revisions = []
@@ -192,8 +217,19 @@ class ChartRevisionSuggester:
             )
             reason = "No reason could be found for this suggested chart revision! Please check with the devs/data team!"
         else:
-            reason = [f"'{result[1]}' dataset update (variable '{result[0]}')" for result in results]
-        return "; ".join(reason)
+            datasets = sorted(set(result[1] for result in results))
+            # extended reason (might overflow `suggestedReason` datatype length limitation)
+            # reason = [f"'{result[1]}' dataset update (variable '{result[0]}')" for result in results]
+            if len(datasets) == 1:
+                reason = f"Bulk update: {datasets[0]}"
+            else:
+                reason = "Bulk updates:" + "; ".join(datasets)
+
+        # check length
+        if len(reason) > SUGGESTED_REASON_MAX_LENGTH:
+            reason = reason[:SUGGESTED_REASON_MAX_LENGTH]
+
+        return reason
 
     def insert(self, suggested_chart_revisions: List[dict[str, Any]]) -> None:
         n_before = 0
@@ -383,6 +419,8 @@ class ChartRevisionSuggester:
             var_id2year_range = {}
             for variable_id, min_year, max_year in rows:
                 var_id2year_range[variable_id] = [min_year, max_year]
+        print(2)
+        print(var_id2year_range)
         return var_id2year_range
 
     def _modify_chart_config_map(self, chart_config: dict[Any, Any]) -> None:
@@ -528,6 +566,7 @@ class ChartRevisionSuggester:
         for _id in _ids:
             if _id in self.var_id2year_range:
                 years += self.var_id2year_range[_id]
+        print(3, _ids, years)
         return IntRange.from_values(years)
 
     def _is_min_year_hardcoded(self, chart_config: dict[Any, Any]) -> bool:

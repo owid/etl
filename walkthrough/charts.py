@@ -196,9 +196,11 @@ class Navigation:
             return [i for i in ids]
 
         # default selected datasets
-        name_old_default = names_available[10]
+        name_old_default = "Key Indicators"  # names_available[10]
         ids_old_default = get_available_ids_for_name(name_old_default)
-        name_new_default = names_available[11]
+        name_new_default = (  # names_available[11]
+            "Population (Clio-infra (2016)), with Island of Ireland (Rep. + Northern)"
+        )
         ids_new_default = get_available_ids_for_name(name_new_default)
 
         params = pi.input_group(
@@ -568,17 +570,23 @@ class Navigation:
             po.put_markdown("### Variable ID mapping to be submitted")
             po.put_code(self.variable_mapping, "json")
             po.put_markdown("### Charts affected")
-            with po.put_loading():
-                try:
-                    suggested_chart_revisions = suggester.prepare()
-                except Exception as e:
-                    po.put_error(f"Error: {e}")
-                    return
-                else:
-                    po.put_markdown(
-                        f"There are **{len(suggested_chart_revisions)} charts** that will be affected by the mapping."
-                    )
-                    _show_logs_from_suggester(suggester)
+            po.put_processbar("bar_submitting_charts")
+            # try:
+            suggested_chart_revisions = suggester.prepare_charts()
+            # suggested_chart_revisions = []
+            # num_charts = len(suggester.df_charts)
+            # for i, row in enumerate(suggester.df_charts.itertuples()):
+            #     print(1)
+            #     suggested_chart_revisions.append(suggester.prepare_single_chart(row.id, row.config))
+            #     po.set_processbar("bar_submitting_charts", i / num_charts)
+            # except Exception as e:
+            #     po.put_error(f"Error: {e}")
+            #     return
+            # else:
+            po.put_markdown(
+                f"There are **{len(suggested_chart_revisions)} charts** that will be affected by the mapping."
+            )
+            _show_logs_from_suggester(suggester)
             return suggested_chart_revisions
 
     def submit_suggestions(
@@ -615,7 +623,7 @@ class Navigation:
 
 
 def _show_logs_from_suggester(suggester):
-    log.info(f"Showing logs: {suggester.logs}")
+    log.info("Showing logs...")
     if suggester.logs:
         try:
             po.put_scrollable(po.put_scope("scrollable"))
