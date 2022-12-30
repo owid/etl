@@ -568,17 +568,23 @@ class Navigation:
             po.put_markdown("### Variable ID mapping to be submitted")
             po.put_code(self.variable_mapping, "json")
             po.put_markdown("### Charts affected")
-            with po.put_loading():
-                try:
-                    suggested_chart_revisions = suggester.prepare()
-                except Exception as e:
-                    po.put_error(f"Error: {e}")
-                    return
-                else:
-                    po.put_markdown(
-                        f"There are **{len(suggested_chart_revisions)} charts** that will be affected by the mapping."
-                    )
-                    _show_logs_from_suggester(suggester)
+            po.put_processbar("bar_submitting_charts")
+            try:
+                suggested_chart_revisions = []
+                num_charts = len(suggester.df_charts)
+                for i, row in enumerate(suggester.df_charts.itertuples()):
+                    revision = suggester.prepare_chart_single(row)
+                    if revision:
+                        suggested_chart_revisions.append(revision)
+                    po.set_processbar("bar_submitting_charts", i / num_charts)
+            except Exception as e:
+                po.put_error(f"Error: {e}")
+                return
+            else:
+                po.put_markdown(
+                    f"There are **{len(suggested_chart_revisions)} charts** that will be affected by the mapping."
+                )
+                _show_logs_from_suggester(suggester)
             return suggested_chart_revisions
 
     def submit_suggestions(
@@ -615,7 +621,7 @@ class Navigation:
 
 
 def _show_logs_from_suggester(suggester):
-    log.info(f"Showing logs: {suggester.logs}")
+    log.info("Showing logs...")
     if suggester.logs:
         try:
             po.put_scrollable(po.put_scope("scrollable"))
