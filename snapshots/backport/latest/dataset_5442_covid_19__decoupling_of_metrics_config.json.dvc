@@ -6,12 +6,12 @@ meta:
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5442
   file_extension: json
-  date_accessed: 2022-12-30 06:00:47.054414
+  date_accessed: 2022-12-31 06:00:28.074121
   is_public: false
   version: latest
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 86cc8d6b9f49df692a1761f0774192c0
+- md5: 259a42b7bde2ed02f61dec525f0265a6
   size: 5701
   path: dataset_5442_covid_19__decoupling_of_metrics_config.json
