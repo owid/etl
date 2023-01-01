@@ -6,7 +6,7 @@ meta:
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5433
   file_extension: feather
-  date_accessed: 2022-12-31 00:01:03.970052
+  date_accessed: 2023-01-01 00:01:36.715658
   is_public: false
   version: latest
   publication_date: latest
