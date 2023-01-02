@@ -264,7 +264,7 @@ def _dict_diff(dict_a: Dict[str, Any], dict_b: Dict[str, Any], tabs) -> str:
     lines = [line for line in lines if not line.startswith("  ")]
 
     # add color
-    lines = ["[violet]" + line for line in lines if not l.startswith("  ")]
+    lines = ["[violet]" + line for line in lines]
 
     # add tabs
     return "\t" * tabs + "".join(lines).replace("\n", "\n" + "\t" * tabs).rstrip()

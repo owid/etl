@@ -29,9 +29,9 @@ def test_DatasetDiff_summary(tmp_path):
     differ = DatasetDiff(ds_a, ds_b, print=lambda x: out.append(x))
     differ.summary()
 
-    assert set(out) == {
+    assert out == [
         "[white]= Dataset [b]garden/n/v/ds[/b]",
-        "\t[yellow]~ Table [b]tab[/b]",
+        "\t[yellow]~ Table [b]tab[/b] (changed [u]metadata[/u])",
         "\t\t[yellow]~ Column [b]a[/b] (changed [u]data & metadata[/u])",
         "\t\t[green]+ Column [b]b[/b]",
-    }
+    ]
