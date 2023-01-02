@@ -43,9 +43,7 @@ log = structlog.get_logger()
 DEFAULT_FASTTRACK_PORT = int(os.environ.get("FASTTRACK_PORT", 8082))
 CURRENT_DIR = Path(__file__).parent
 DAG_FASTTRACK_PATH = BASE_DIR / "dag_files/dag_fasttrack.yml"
-DUMMY_DATA = {
-    "sheet_url": "https://docs.google.com/spreadsheets/d/e/2PACX-1vS3kx1WYuCWfWVQYuu3H0J0E2epv3jX9-odkzvhuHj-XenGGFvTCKIOngNpbkxkmw8iv4ZS5eNF4hS0/pub?output=csv",
-}
+DUMMY_DATA = {}
 
 with open("fasttrack/styles.css", "r") as f:
     pywebio.config(css_style=f.read())
@@ -340,6 +338,8 @@ def _load_data_and_meta(dummies: dict[str, str]) -> Tuple[pd.DataFrame, YAMLMeta
             continue
 
         # NOTE: harmonization is not done in ETL, but here in fast-track for technical reasons
+        # It's not yet clear what will authors prefer and how should we handle preprocessing from
+        # raw data to data saved as snapshot
         data, unknown_countries = _harmonize_countries(data)
         if unknown_countries:
             po.put_error("Unknown countries:\n\t" + "\n\t".join(unknown_countries))
