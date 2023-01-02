@@ -11,7 +11,10 @@ N = Names(__file__)
 
 def run(dest_dir: str) -> None:
     # Load table from garden dataset.
-    table = N.garden_dataset["near_surface_temperature"]
+    table = N.garden_dataset["near_surface_temperature"].reset_index()
+
+    # For compatibility with grapher, change the name of "region" column to "country".
+    table = table.rename(columns={"region": "country"})
 
     # Create new grapher dataset.
     dataset = catalog.Dataset.create_empty(dest_dir, N.garden_dataset.metadata)
