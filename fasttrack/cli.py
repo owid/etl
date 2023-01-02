@@ -29,7 +29,7 @@ from etl import grapher_model as gm
 from etl.command import main as etl_main
 from etl.compare import diff_print
 from etl.db import get_engine
-from etl.paths import BASE_DIR, REFERENCE_DATASET, SNAPSHOTS_DIR, STEP_DIR
+from etl.paths import DAG_DIR, REFERENCE_DATASET, SNAPSHOTS_DIR, STEP_DIR
 from etl.snapshot import Snapshot, SnapshotMeta
 from walkthrough import utils as walkthrough_utils
 
@@ -42,7 +42,7 @@ log = structlog.get_logger()
 
 DEFAULT_FASTTRACK_PORT = int(os.environ.get("FASTTRACK_PORT", 8082))
 CURRENT_DIR = Path(__file__).parent
-DAG_FASTTRACK_PATH = BASE_DIR / "dag_files/dag_fasttrack.yml"
+DAG_FASTTRACK_PATH = DAG_DIR / "fasttrack.yml"
 DUMMY_DATA = {}
 
 with open("fasttrack/styles.css", "r") as f:
@@ -212,7 +212,7 @@ def app(dummy_data: bool) -> None:
     walkthrough_utils.preview_file(fast_import.metadata_path, language="yaml")
     walkthrough_utils.preview_file(fast_import.step_path, language="python")
     walkthrough_utils.preview_file(snapshot_path, language="yaml")
-    walkthrough_utils.preview_dag(dag_content, dag_name="dag_fasttrack.yml")
+    walkthrough_utils.preview_dag(dag_content, dag_name="dag/fasttrack.yml")
 
 
 class Options(Enum):
