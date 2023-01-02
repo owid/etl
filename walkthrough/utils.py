@@ -77,7 +77,7 @@ def preview_file(path: Path, language: str) -> None:
     )
 
 
-def preview_dag(dag_content: str, dag_name: str = "dag/dag.yml") -> None:
+def preview_dag(dag_content: str, dag_name: str = "dag/main.yml") -> None:
     put_widget(
         title=po.put_success(po.put_markdown(f"Steps in {dag_name} were successfully generated")),
         contents=[po.put_markdown(f"```yml\n{dag_content}\n```")],
