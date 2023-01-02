@@ -6,12 +6,12 @@ meta:
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5442
   file_extension: feather
-  date_accessed: 2023-01-01 06:01:46.552968
+  date_accessed: 2023-01-02 06:01:08.569821
   is_public: false
   version: latest
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: cbfed609ddac7eb50329d47d9afc7897
+- md5: 6261ce3f5ce68fe6942ba0d4ffd38898
   size: 39298
   path: dataset_5442_covid_19__decoupling_of_metrics_values.feather
