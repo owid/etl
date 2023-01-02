@@ -114,7 +114,7 @@ class DatasetDiff:
 
                     if changed:
                         self.p(f"\t\t[yellow]~ Column [b]{col}[/b] (changed [u]{' & '.join(changed)}[/u])")
-                        if self.verbose:
+                        if self.verbose and meta_diff:
                             self.p(_dict_diff(col_a_meta, col_b_meta, tabs=4))
                     else:
                         # do not print identical columns
@@ -285,7 +285,12 @@ def _match_dataset(path_to_ds: Dict[str, Any], path: str) -> Optional[Dataset]:
                 candidates.append(k)
 
         if candidates:
-            return path_to_ds[max(candidates)]
+            latest_version = max(candidates)
+            # make sure we don't compare to newer version
+            if latest_version < path:
+                return path_to_ds[latest_version]
+            else:
+                return None
         else:
             return None
 
