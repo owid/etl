@@ -22,9 +22,7 @@ SNAPSHOT_VERSION = "2023-01-02"
     help="Upload dataset to Snapshot",
 )
 def main(upload: bool) -> None:
-    snap = Snapshot(
-        f"met_office_hadley_centre/{SNAPSHOT_VERSION}/near_surface_temperature.csv"
-    )
+    snap = Snapshot(f"met_office_hadley_centre/{SNAPSHOT_VERSION}/near_surface_temperature.csv")
     snap.download_from_source()
     snap.dvc_add(upload=upload)
 
