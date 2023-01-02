@@ -244,6 +244,12 @@ steps:
   data://grapher/health/2022-12-28/deaths_karlinsky:
     - data://garden/health/2022-12-28/deaths_karlinsky
 
+  #
+  # Met Office Hadley Centre - Near surface temperature anomaly.
+  #
+  data://meadow/met_office_hadley_centre/2023-01-02/near_surface_temperature:
+    - snapshot://met_office_hadley_centre/2023-01-02/near_surface_temperature.csv
+
 # Sub-dags to import
 include:
   - dag/open_numbers.yml
