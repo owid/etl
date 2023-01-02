@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 
 BASE_DIR = Path(os.environ.get("BASE_DIR", Path(__file__).parent.parent))
-DAG_FILE = BASE_DIR / "dag_files" / "dag.yml"
+DAG_FILE = BASE_DIR / "dag" / "dag.yml"
 DATA_DIR = BASE_DIR / "data"
 SNAPSHOTS_DIR = BASE_DIR / "snapshots"
 STEP_DIR = BASE_DIR / "etl" / "steps"
