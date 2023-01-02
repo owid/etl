@@ -253,6 +253,8 @@ steps:
     - snapshot://met_office_hadley_centre/2023-01-02/near_surface_temperature_southern_hemisphere.csv
   data://garden/met_office_hadley_centre/2023-01-02/near_surface_temperature:
     - data://meadow/met_office_hadley_centre/2023-01-02/near_surface_temperature
+  data://grapher/met_office_hadley_centre/2023-01-02/near_surface_temperature:
+    - data://garden/met_office_hadley_centre/2023-01-02/near_surface_temperature
 
 # Sub-dags to import
 include:
