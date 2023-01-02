@@ -1,8 +1,10 @@
+import difflib
 import os
 import re
 from pathlib import Path
 from typing import Any, Callable, Dict, Iterable, List, Optional
 
+import pandas as pd
 import requests
 import rich
 import rich_click as click
@@ -12,13 +14,17 @@ from owid.catalog import Dataset, DatasetMeta, LocalCatalog, RemoteCatalog, Tabl
 from owid.catalog.catalogs import CHANNEL, OWID_CATALOG_URI
 from rich.console import Console
 
+from etl.files import yaml_dump
+
 log = structlog.get_logger()
 
 
 class DatasetDiff:
     """Compare two datasets and print a summary of the differences."""
 
-    def __init__(self, ds_a: Optional[Dataset], ds_b: Optional[Dataset], print: Callable = rich.print):
+    def __init__(
+        self, ds_a: Optional[Dataset], ds_b: Optional[Dataset], verbose: bool = False, print: Callable = rich.print
+    ):
         """
         :param print: Function to print the diff summary. Defaults to rich.print.
         """
@@ -26,20 +32,23 @@ class DatasetDiff:
         self.ds_a = ds_a
         self.ds_b = ds_b
         self.p = print
+        self.verbose = verbose
 
     def _diff_datasets(self, ds_a: Optional[Dataset], ds_b: Optional[Dataset]):
         if ds_a and ds_b:
             ds_short_name = ds_a.metadata.short_name
             assert ds_short_name
 
+            new_version = " (new version)" if ds_a.metadata.version != ds_b.metadata.version else ""
+
             # compare dataset metadata
             diff = DeepDiff(_dataset_metadata_dict(ds_a), _dataset_metadata_dict(ds_b))
             if diff:
-                self.p(f"[yellow]~ Dataset [b]{dataset_uri(ds_a)}[/b]")
-                # TODO: add in verbose mode
-                # self.p(diff)
+                self.p(f"[yellow]~ Dataset [b]{dataset_uri(ds_b)}[/b]{new_version}")
+                if self.verbose:
+                    self.p(_dict_diff(_dataset_metadata_dict(ds_a), _dataset_metadata_dict(ds_b), tabs=2))
             else:
-                self.p(f"[white]= Dataset [b]{dataset_uri(ds_a)}[/b]")
+                self.p(f"[white]= Dataset [b]{dataset_uri(ds_b)}{new_version}[/b]")
         elif ds_a:
             self.p(f"[red]- Dataset [b]{dataset_uri(ds_a)}[/b]")
         elif ds_b:
@@ -61,9 +70,10 @@ class DatasetDiff:
             # compare table metadata
             diff = DeepDiff(_table_metadata_dict(table_a), _table_metadata_dict(table_b))
             if diff:
-                self.p(f"\t[yellow]~ Table [b]{table_name}[/b]")
-                # TODO: add in verbose mode
-                # self.p(diff)
+                self.p(f"\t[yellow]~ Table [b]{table_name}[/b] (changed [u]metadata[/u])")
+
+                if self.verbose:
+                    self.p(_dict_diff(_table_metadata_dict(table_a), _table_metadata_dict(table_b), tabs=3))
             else:
                 self.p(f"\t[white]= Table [b]{table_name}[/b]")
 
@@ -78,10 +88,23 @@ class DatasetDiff:
                     col_b = table_b[col]
                     shape_diff = col_a.shape != col_b.shape
                     if not shape_diff:
-                        data_diff = not col_a.equals(col_b)
+                        if col_a.dtype == "category":
+                            col_a = col_a.astype("string")
+                        if col_b.dtype == "category":
+                            col_b = col_b.astype("string")
+
+                        try:
+                            pd.testing.assert_series_equal(col_a, col_b, check_dtype=False)
+                            data_diff = False
+                        except AssertionError:
+                            data_diff = True
                     else:
                         data_diff = False
-                    meta_diff = DeepDiff(col_a.metadata.to_dict(), col_b.metadata.to_dict())
+
+                    col_a_meta = col_a.metadata.to_dict()
+                    col_b_meta = col_b.metadata.to_dict()
+
+                    meta_diff = DeepDiff(col_a_meta, col_b_meta)
 
                     changed = (
                         (["data"] if data_diff else [])
@@ -91,6 +114,8 @@ class DatasetDiff:
 
                     if changed:
                         self.p(f"\t\t[yellow]~ Column [b]{col}[/b] (changed [u]{' & '.join(changed)}[/u])")
+                        if self.verbose:
+                            self.p(_dict_diff(col_a_meta, col_b_meta, tabs=4))
                     else:
                         # do not print identical columns
                         pass
@@ -153,12 +178,18 @@ class RemoteDataset:
     type=str,
     help="Exclude datasets matching pattern",
 )
+@click.option(
+    "--verbose",
+    is_flag=True,
+    help="Print detailed differences",
+)
 def cli(
     path_a: str,
     path_b: str,
     channel: Iterable[CHANNEL],
     include: Optional[str],
     exclude: Optional[str],
+    verbose: bool,
 ) -> None:
     """Compare all datasets from two catalogs (`a` and `b`) and print out summary of their differences. This is
     different from `compare` tool which compares two specific datasets and prints out more detailed output. This
@@ -173,26 +204,21 @@ def cli(
 
     Usage:
         # compare local catalog with remote catalog
-        etl-datadiff data/ REMOTE --include maddison
+        etl-datadiff REMOTE data/ --include maddison
 
         # compare two local catalogs
-        etl-datadiff data/ other-data/ --include maddison
+        etl-datadiff other-data/ data/ --include maddison
     """
     console = Console(tab_size=2)
 
-    path_to_ds_a = _local_catalog_datasets(path_a, channels=channel, include=include, exclude=exclude)
-
-    if path_b == "REMOTE":
-        assert include, "You have to filter with --include when comparing with remote catalog"
-        path_to_ds_b = _remote_catalog_datasets(channels=channel, include=include, exclude=exclude)
-    else:
-        path_to_ds_b = _local_catalog_datasets(path_b, channels=channel, include=include, exclude=exclude)
+    path_to_ds_a = _load_catalog_datasets(path_a, channel, include, exclude)
+    path_to_ds_b = _load_catalog_datasets(path_b, channel, include, exclude)
 
     any_diff = False
 
-    for path in set(path_to_ds_a.keys()) | set(path_to_ds_b.keys()):
-        ds_a = path_to_ds_a.get(path)
-        ds_b = path_to_ds_b.get(path)
+    for path in sorted(set(path_to_ds_a.keys()) | set(path_to_ds_b.keys())):
+        ds_a = _match_dataset(path_to_ds_a, path)
+        ds_b = _match_dataset(path_to_ds_b, path)
 
         if ds_a and ds_b and ds_a.metadata.source_checksum == ds_b.metadata.source_checksum:
             # skip if they have the same source checksum, note that we're not comparing checksum of actual data
@@ -200,7 +226,7 @@ def cli(
             continue
 
         lines = []
-        differ = DatasetDiff(ds_a, ds_b, print=lambda x: lines.append(x))
+        differ = DatasetDiff(ds_a, ds_b, print=lambda x: lines.append(x), verbose=verbose)
         differ.summary()
 
         for line in lines:
@@ -214,12 +240,13 @@ def cli(
         console.print("[red]❌ Found differences[/red]")
     else:
         console.print("[green]✅ No differences found[/green]")
+    console.print()
 
     console.print(
-        "[b]Legend[/b]: [green]+New[/green]  [yellow]~Modified[/yellow]  [red]-Removed[/red]  [white]=Identical[/white]"
+        "[b]Legend[/b]: [green]+New[/green]  [yellow]~Modified[/yellow]  [red]-Removed[/red]  [white]=Identical[/white]  [violet]Details[/violet]"
     )
     console.print(
-        "[b]Hint[/b]: Run this locally with [cyan][b]etl-datadiff data/ REMOTE --include yourdataset[/b][/cyan]"
+        "[b]Hint[/b]: Run this locally with [cyan][b]etl-datadiff REMOTE data/ --include yourdataset --verbose[/b][/cyan]"
     )
     console.print(
         "[b]Hint[/b]: Get detailed comparison with [cyan][b]compare --show-values channel namespace version short_name --data-values[/b][/cyan]"
@@ -227,14 +254,60 @@ def cli(
     exit(1 if any_diff else 0)
 
 
+def _dict_diff(dict_a: Dict[str, Any], dict_b: Dict[str, Any], tabs) -> str:
+    """Convert dictionaries into YAML and compare them using difflib. Return colored diff as a string."""
+    meta_a = yaml_dump(dict_a).splitlines(keepends=True)  # type: ignore
+    meta_b = yaml_dump(dict_b).splitlines(keepends=True)  # type: ignore
+
+    lines = difflib.ndiff(meta_a, meta_b)
+    # do not print lines that are identical
+    lines = [line for line in lines if not line.startswith("  ")]
+
+    # add color
+    lines = ["[violet]" + l for l in lines if not l.startswith("  ")]
+
+    # add tabs
+    return "\t" * tabs + "".join(lines).replace("\n", "\n" + "\t" * tabs).rstrip()
+
+
+def _match_dataset(path_to_ds: Dict[str, Any], path: str) -> Optional[Dataset]:
+    """Get dataset from dictionary {path -> dataset}. Return dataset with the same version if available,
+    otherwise return older version or None if there is no such dataset."""
+    if path in path_to_ds:
+        return path_to_ds[path]
+    else:
+        # find latest matching version
+        channel, namespace, version, short_name = path.split("/")
+
+        candidates = []
+        for k in path_to_ds.keys():
+            if re.match(f"{channel}/{namespace}/.*?/{short_name}", k):
+                candidates.append(k)
+
+        if candidates:
+            return path_to_ds[max(candidates)]
+        else:
+            return None
+
+
+def _load_catalog_datasets(
+    catalog_path: str, channels: Iterable[CHANNEL], include: Optional[str], exclude: Optional[str]
+) -> Dict[str, Any]:
+    if catalog_path == "REMOTE":
+        assert include, "You have to filter with --include when comparing with remote catalog"
+        return _remote_catalog_datasets(channels=channels, include=include, exclude=exclude)
+    else:
+        return _local_catalog_datasets(catalog_path, channels=channels, include=include, exclude=exclude)
+
+
 def _table_metadata_dict(tab: Table) -> Dict[str, Any]:
     """Extract metadata from Table object, prune and and return it as a dictionary"""
     d = tab.metadata.to_dict()
 
     # add columns
-    d["columns"] = {}
-    for col in tab.columns:
-        d["columns"][col] = tab[col].metadata.to_dict()
+    # d["columns"] = {}
+    # for col in tab.columns:
+    #     d["columns"][col] = tab[col].metadata.to_dict()
 
     del d["dataset"]
     return d
@@ -254,10 +327,12 @@ def _local_catalog_datasets(
     lc_a = LocalCatalog(catalog_path, channels=channels)
     datasets = []
     for chan in lc_a.channels:
-        datasets += list(lc_a.iter_datasets(chan, include=include))
+        channel_datasets = list(lc_a.iter_datasets(chan, include=include))
         # TODO: channel should be in DatasetMeta by default
-        for ds in datasets:
-            ds.metadata.channel = chan
+        for ds in channel_datasets:
+            ds.metadata.channel = chan  # type: ignore
+
+        datasets += channel_datasets
 
     # keep only relative path of dataset
     mapping = {str(Path(ds.path).relative_to(catalog_path)): ds for ds in datasets}
