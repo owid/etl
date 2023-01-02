@@ -1,5 +1,5 @@
 meta:
-  date_accessed: 2022-11-30
+  date_accessed: 2022-12-14
   description: "This dataset provides information on the nuclear warhead inventories\
     \ by the nuclear powers, using data from the Federation of American Scientists,\
     \ prepared by Hans M. Kristensen, Matt Korda, and Robert Norris.\n\nYou can download\
@@ -7,11 +7,11 @@ meta:
     \ https://github.com/owid/notebooks/tree/main/BastianHerre/nuclear_weapons"
   file_extension: csv
   is_public: false
-  name: Nuclear warhead inventories – Federation of American Scientists
+  name: DRAFT Nuclear warhead inventories – Federation of American Scientists
   namespace: fasttrack
   short_name: nuclear_warhead_inventories
   source_name: Google Sheet
-  url: https://docs.google.com/spreadsheets/d/e/2PACX-1vToarz6cfQAZdsaOEQY5rPEjFtfFxz_j7IovDcDrxKrDo29ADw166GUZDjow8AxGIDTkC1vOQSibz42/pub?output=csv
+  url: gAAAAABjmcOrGumTaNHaQ2bxkz4emKZBhf1HpdGKRcHkv-ID6mcAVPAhNBcVeDAa3e-q_cbGbl41qRIrHU4XXSO5wotniVFS7FEGZHiVXHrbINiQamjTVX0hm7bbop0Qvkj3vosl5UnXsCXs8AgMol-qK7MPdDCFmMAI6Rob1yxicjbfWX43VItSox_W7n97lJ25e_vanXn24XIXIBoG9kJeOSrEcD-NUlGijsgMqR9vYISDt8YxJBsBB5lkoibKmGTi4eBtFxC4
   version: '2022-02-28'
 wdir: ../../../data/snapshots/fasttrack/2022-02-28
 outs:
