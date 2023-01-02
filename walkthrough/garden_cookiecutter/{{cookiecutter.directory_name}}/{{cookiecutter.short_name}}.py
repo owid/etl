@@ -3,9 +3,9 @@ from typing import List, cast
 
 import pandas as pd
 from owid.catalog import Dataset, Table
-from owid.datautils import geo
 from structlog import get_logger
 
+from etl.data_helpers import geo
 from etl.helpers import Names
 from etl.paths import DATA_DIR
 

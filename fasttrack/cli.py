@@ -1,4 +1,5 @@
 import datetime as dt
+import difflib
 import json
 import os
 from enum import Enum
@@ -8,7 +9,9 @@ from typing import Any, Dict, List, Optional, Sequence, Tuple
 import click
 import numpy as np
 import pandas as pd
+import pywebio
 import structlog
+from cryptography.fernet import Fernet
 from owid.catalog import Dataset
 from owid.catalog.utils import underscore, validate_underscore
 from owid.datautils import dataframes
@@ -16,14 +19,17 @@ from pydantic import BaseModel
 from pywebio import input as pi
 from pywebio import output as po
 from pywebio import start_server
+from pywebio.session import run_js
 from rich import print
+from rich.console import Console
 from sqlmodel import Session
 
 from etl import config
 from etl import grapher_model as gm
 from etl.command import main as etl_main
+from etl.compare import diff_print
 from etl.db import get_engine
-from etl.paths import BASE_DIR, REFERENCE_DATASET, SNAPSHOTS_DIR
+from etl.paths import BASE_DIR, REFERENCE_DATASET, SNAPSHOTS_DIR, STEP_DIR
 from etl.snapshot import Snapshot, SnapshotMeta
 from walkthrough import utils as walkthrough_utils
 
@@ -34,11 +40,13 @@ config.enable_bugsnag()
 
 log = structlog.get_logger()
 
+DEFAULT_FASTTRACK_PORT = int(os.environ.get("FASTTRACK_PORT", 8082))
 CURRENT_DIR = Path(__file__).parent
 DAG_FASTTRACK_PATH = BASE_DIR / "dag_files/dag_fasttrack.yml"
-DUMMY_DATA = {
-    "sheet_url": "https://docs.google.com/spreadsheets/d/e/2PACX-1vS3kx1WYuCWfWVQYuu3H0J0E2epv3jX9-odkzvhuHj-XenGGFvTCKIOngNpbkxkmw8iv4ZS5eNF4hS0/pub?output=csv",
-}
+DUMMY_DATA = {}
+
+with open("fasttrack/styles.css", "r") as f:
+    pywebio.config(css_style=f.read())
 
 
 @click.command()
@@ -53,15 +61,79 @@ DUMMY_DATA = {
     default=True,
     help="Open browser automatically",
 )
-def cli(dummy_data: bool, auto_open: bool) -> None:
-    print("Fasttrack has been opened at http://localhost:8082/")
+@click.option(
+    "--port",
+    default=DEFAULT_FASTTRACK_PORT,
+    help="Port to run the server on",
+)
+def cli(dummy_data: bool, auto_open: bool, port: int) -> None:
+    print(f"Fasttrack has been opened at http://localhost:{port}/")
 
     start_server(
         lambda: app(dummy_data=dummy_data),
-        port=8082,
+        port=port,
         debug=True,
         auto_open_webbrowser=auto_open,
     )
+
+
+class FasttrackImport:
+    def __init__(self, data: pd.DataFrame, meta: YAMLMeta, sheets_url: str, is_private: bool):
+        self.data = data
+        self.meta = meta
+        self.sheets_url = sheets_url
+        self.is_private = is_private
+
+    @property
+    def dataset_dir(self) -> Path:
+        return STEP_DIR / "data" / "grapher" / self.meta.dataset.namespace / str(self.meta.dataset.version)
+
+    @property
+    def step_path(self) -> Path:
+        return self.dataset_dir / (self.meta.dataset.short_name + ".py")
+
+    @property
+    def metadata_path(self) -> Path:
+        return self.dataset_dir / (self.meta.dataset.short_name + ".meta.yml")
+
+    @property
+    def snapshot(self) -> Snapshot:
+        return Snapshot(f"{self.meta.dataset.namespace}/{self.meta.dataset.version}/{self.meta.dataset.short_name}.csv")
+
+    def snapshot_exists(self) -> bool:
+        try:
+            self.snapshot
+            return True
+        except FileNotFoundError:
+            return False
+
+    def save_metadata(self) -> None:
+        with open(self.metadata_path, "w") as f:
+            f.write(self.meta.to_yaml())
+
+    def upload_snapshot(self) -> Path:
+        # since sheets url is accessible with link, we have to encrypt it when storing in metadata
+        sheets_url = _encrypt(self.sheets_url) if self.is_private else self.sheets_url
+
+        snap_meta = SnapshotMeta(
+            namespace=self.meta.dataset.namespace,
+            short_name=self.meta.dataset.short_name,
+            name=self.meta.dataset.title,
+            version=str(self.meta.dataset.version),
+            file_extension="csv",
+            description=self.meta.dataset.description,
+            source_name="Google Sheet",
+            url=sheets_url,
+            is_public=not self.is_private,
+            date_accessed=dt.date.today(),
+        )
+        snap_meta.save()
+
+        snap = Snapshot(snap_meta.uri)
+        dataframes.to_file(self.data, file_path=snap.path)
+        snap.dvc_add(upload=True)
+
+        return snap.metadata_path
 
 
 def app(dummy_data: bool) -> None:
@@ -69,6 +141,8 @@ def app(dummy_data: bool) -> None:
 
     with open(CURRENT_DIR / "intro.md", "r") as f:
         po.put_markdown(f.read())
+
+    po.put_warning("This tool is still in beta. Please report any issues to @Mojmir")
 
     with open(CURRENT_DIR / "instructions.md", "r") as f:
         walkthrough_utils.put_widget(
@@ -78,38 +152,54 @@ def app(dummy_data: bool) -> None:
 
     data, meta, sheets_url, form = _load_data_and_meta(dummies)
 
-    meta_ds = meta.dataset
+    fast_import = FasttrackImport(data, meta, sheets_url, form.is_private)
 
-    dag_content = _add_to_dag(meta_ds, form.is_private)
+    # diff with existing dataset
+    if fast_import.snapshot_exists() and fast_import.metadata_path.exists():
+        po.put_markdown("""## Data differences from existing dataset...""")
+        _data_diff(fast_import, data)
 
-    step_path, metadata_path = _generate_etl_files(meta)
+        po.put_markdown("""## Metadata differences from existing dataset...""")
+        _metadata_diff(fast_import, meta)
+
+        # if data_is_different or metadata_is_different:
+        _ask_to_continue()
+
+    # add dataset to dag
+    dag_content = _add_to_dag(meta.dataset, form.is_private)
+
+    # create step and metadata file
+    walkthrough_utils.generate_step(
+        CURRENT_DIR / "grapher_cookiecutter/", dict(**meta.dataset.dict(), channel="grapher")
+    )
+    fast_import.save_metadata()
 
     po.put_markdown("""## Uploading Snapshot...""")
-    snapshot_path = _upload_snapshot(data, meta, sheets_url, form.is_private)
+    snapshot_path = fast_import.upload_snapshot()
     po.put_success("Upload successful!")
 
-    po.put_markdown("""## Running ETL and importing to MySQL...""")
     try:
-        step = f"grapher/{meta_ds.path}"
+        po.put_markdown("""## Running ETL and upserting to GrapherDB...""")
+        step = f"grapher/{meta.dataset.path}"
         log.info("fasttrack.etl", step=step)
         etl_main(
+            dag_path=DAG_FASTTRACK_PATH,
             steps=[step],
             grapher=True,
             private=form.is_private,
-            force=True,
             workers=1,
         )
     except Exception as e:
         _bail([e])
         return
 
+    # TODO: add link to commit in ETL
     po.put_success(
         po.put_markdown(
             f"""
     Import to MySQL successful!
 
-    [Link]({os.environ.get("ADMIN_HOST", "")}/admin/datasets/{_dataset_id(meta_ds)}) to dataset in admin
-    ~[Link](TODO) to commit in ETL~
+    [Link]({os.environ.get("ADMIN_HOST", "")}/admin/datasets/{_dataset_id(meta.dataset)}) to dataset in admin
     """
         )
     )
@@ -119,8 +209,8 @@ def app(dummy_data: bool) -> None:
 ## Generated files
         """
     )
-    walkthrough_utils.preview_file(metadata_path, language="yaml")
-    walkthrough_utils.preview_file(step_path, language="python")
+    walkthrough_utils.preview_file(fast_import.metadata_path, language="yaml")
+    walkthrough_utils.preview_file(fast_import.step_path, language="python")
     walkthrough_utils.preview_file(snapshot_path, language="yaml")
     walkthrough_utils.preview_dag(dag_content, dag_name="dag_fasttrack.yml")
 
@@ -128,7 +218,7 @@ def app(dummy_data: bool) -> None:
 class Options(Enum):
 
     INFER_METADATA = "Infer missing metadata (instead of raising an error)"
-    IS_PRIVATE = "Make dataset private"
+    IS_PRIVATE = "Make dataset private (your metadata will be still public!)"
 
 
 class FasttrackForm(BaseModel):
@@ -247,6 +337,9 @@ def _load_data_and_meta(dummies: dict[str, str]) -> Tuple[pd.DataFrame, YAMLMeta
         if not success:
             continue
 
+        # NOTE: harmonization is not done in ETL, but here in fast-track for technical reasons
+        # It's not yet clear what will authors prefer and how should we handle preprocessing from
+        # raw data to data saved as snapshot
         data, unknown_countries = _harmonize_countries(data)
         if unknown_countries:
             po.put_error("Unknown countries:\n\t" + "\n\t".join(unknown_countries))
@@ -285,18 +378,6 @@ def _dataset_id(meta_ds: YAMLDatasetMeta) -> int:
         return ds.id
 
 
-def _generate_etl_files(meta: YAMLMeta) -> Tuple[Path, Path]:
-    DATASET_DIR = walkthrough_utils.generate_step(
-        CURRENT_DIR / "grapher_cookiecutter/", dict(**meta.dataset.dict(), channel="grapher")
-    )
-    step_path = DATASET_DIR / (meta.dataset.short_name + ".py")
-    metadata_path = DATASET_DIR / (meta.dataset.short_name + ".meta.yml")
-    with open(metadata_path, "w") as f:
-        f.write(meta.to_yaml())
-
-    return step_path, metadata_path
-
-
 def _last_updated_before_minutes(dataset_meta: pd.DataFrame) -> int:
     td = pd.Timestamp.utcnow() - pd.to_datetime(dataset_meta.set_index(0)[1].loc["updated"], dayfirst=True, utc=True)
     return int(td.total_seconds() / 60)
@@ -309,8 +390,13 @@ def _load_existing_sheets_from_snapshots() -> List[Dict[str, str]]:
     # sort them by date accessed
     metas.sort(key=lambda meta: meta.date_accessed, reverse=True)
 
+    # decrypt URLs if private
+    for meta in metas:
+        if not meta.is_public:
+            meta.url = _decrypt(meta.url)
+
     # extract their name and url
-    return [{"label": meta.name, "value": meta.url} for meta in metas]
+    return [{"label": f"{meta.name} / {meta.version}", "value": meta.url} for meta in metas]
 
 
 def _infer_metadata(
@@ -445,32 +531,93 @@ def _add_to_dag(ds_meta: YAMLDatasetMeta, is_private: bool) -> str:
     )
 
 
-def _upload_snapshot(data: pd.DataFrame, meta: YAMLMeta, sheets_url: str, is_private: bool) -> Path:
-    snap_meta = SnapshotMeta(
-        namespace=meta.dataset.namespace,
-        short_name=meta.dataset.short_name,
-        name=meta.dataset.title,
-        version=str(meta.dataset.version),
-        file_extension="csv",
-        description=meta.dataset.description,
-        source_name="Google Sheet",
-        url=sheets_url,
-        is_public=not is_private,
-        date_accessed=dt.date.today(),
+def _data_diff(fast_import: FasttrackImport, data: pd.DataFrame) -> bool:
+    console = Console(record=True)
+
+    # load data from snapshot
+    if not fast_import.snapshot.path.exists():
+        fast_import.snapshot.pull()
+    existing_data = pd.read_csv(fast_import.snapshot.path)
+
+    exit_code = diff_print(
+        df1=existing_data,
+        df2=data.reset_index(),
+        df1_label="existing",
+        df2_label="imported",
+        absolute_tolerance=0.00000001,
+        relative_tolerance=0.05,
+        show_values=True,
+        show_shared=True,
+        truncate_lists_at=20,
+        print=console.print,
     )
-    snap_meta.save()
 
-    snap = Snapshot(snap_meta.uri)
-    dataframes.to_file(data, file_path=snap.path)
-    snap.dvc_add(upload=True)
+    html = console.export_html(inline_styles=True, code_format="<pre>{code}</pre>")
 
-    return snap.metadata_path
+    po.put_html(html)
+
+    return exit_code != 0
+
+
+def _metadata_diff(fast_import: FasttrackImport, meta: YAMLMeta) -> bool:
+    # load existing metadata file
+    with open(fast_import.metadata_path, "r") as f:
+        existing_meta = f.read()
+
+    diff = difflib.HtmlDiff()
+    html_diff = diff.make_table(existing_meta.split("\n"), meta.to_yaml().split("\n"), context=True)
+    if "No Differences Found" in html_diff:
+        po.put_success("No metadata differences found.")
+        return False
+    else:
+        po.put_html(html_diff)
+        return True
+
+
+def _ask_to_continue() -> None:
+    answer = pi.actions(
+        buttons=[
+            {
+                "label": "Continue",
+                "value": "Continue",
+                "color": "primary",
+            },
+            {
+                "label": "Cancel",
+                "value": "Cancel",
+                "color": "danger",
+            },
+        ],
+        help_text="Do you want to continue and add the dataset to GrapherDB?",
+    )
+
+    # start saving the dataset after we click continue
+    if answer == "Cancel":
+        run_js("window.location.reload()")
 
 
 def _bail(errors: Sequence[Exception]) -> None:
     for e in errors:
         po.put_error(str(e))
     po.put_info("Please fix these errors and try again.")
+
+
+def _get_secret_key() -> Optional[Fernet]:
+    secret_key = os.environ.get("FASTTRACK_SECRET_KEY")
+    if not secret_key:
+        log.warning("FASTTRACK_SECRET_KEY not found in environment variables. Not using encryption.")
+        return None
+    return Fernet(secret_key)
+
+
+def _encrypt(s: str) -> str:
+    fernet = _get_secret_key()
+    return fernet.encrypt(s.encode()).decode() if fernet else s
+
+
+def _decrypt(s: str) -> str:
+    fernet = _get_secret_key()
+    return fernet.decrypt(s.encode()).decode() if fernet else s
 
 
 if __name__ == "__main__":

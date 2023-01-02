@@ -12,7 +12,7 @@ from etl.snapshot import Snapshot
     "--upload/--skip-upload",
     default=True,
     type=bool,
-    help="Upload dataset to Walden",
+    help="Upload dataset to Snapshot",
 )
 def main(upload: bool) -> None:
     snap = Snapshot("ggdc/2020-10-01/ggdc_maddison.xlsx")

@@ -232,8 +232,17 @@ steps:
     - data://garden/demography/2022-11-30/life_expectancy
     - data://garden/owid/latest/key_indicators
     - data://garden/gcp/2022-11-11/global_carbon_budget
+    # The following step is not the latest version available.
     - data://garden/bp/2022-07-14/energy_mix
     - data://garden/worldbank_wdi/2022-05-26/wdi
+
+  # Death completion
+  data://meadow/health/2022-12-28/deaths_karlinsky:
+    - snapshot://health/2022-12-28/deaths_karlinsky.csv
+  data://garden/health/2022-12-28/deaths_karlinsky:
+    - data://meadow/health/2022-12-28/deaths_karlinsky
+  data://grapher/health/2022-12-28/deaths_karlinsky:
+    - data://garden/health/2022-12-28/deaths_karlinsky
 
 # Sub-dags to import
 include:
@@ -241,7 +250,6 @@ include:
   - dag_files/dag_faostat.yml
   - dag_files/dag_energy.yml
   - dag_files/dag_walkthrough.yml
-  - dag_files/dag_fasttrack.yml
   - dag_files/dag_examples.yml
   - dag_files/dag_emissions.yml
   - dag_files/dag_papers.yml

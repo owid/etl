@@ -8,6 +8,7 @@ from urllib.parse import quote
 
 import click
 import pandas as pd
+import rich
 from dotenv import dotenv_values
 from owid import catalog
 from owid.repack import repack_frame
@@ -60,16 +61,7 @@ def cli(
     show_shared: bool,
     truncate_lists_at: int,
 ) -> None:
-    """Compare two dataframes, both structurally and the values.
-
-    This tool loads two dataframes, either from the local ETL and the remote catalog
-    or just from two different files. It compares the columns, index columns and index values (row indices) as
-    sets between the two dataframes and outputs the differences. Finally it compares the values of the overlapping
-    columns and rows with the given threshold values for absolute and relative tolerance.
-
-    The exit code is 0 if the dataframes are equal, 1 if there is an error loading the dataframes, 2 if the dataframes
-    are structurally equal but are otherwise different, 3 if the dataframes have different structure and/or different values.
-    """
+    """Compare two dataframes/tables/datasets in terms of their structure, values and metadata."""
     ctx.ensure_object(dict)
     ctx.obj["absolute_tolerance"] = absolute_tolerance
     ctx.obj["relative_tolerance"] = relative_tolerance
@@ -88,6 +80,7 @@ def diff_print(
     show_values: bool,
     show_shared: bool,
     truncate_lists_at: int,
+    print: Any = rich.print,
 ) -> int:
     """Runs the comparison and prints the differences, then return exit code."""
     diff = tempcompare.HighLevelDiff(df1, df2, absolute_tolerance, relative_tolerance)
@@ -129,20 +122,21 @@ def etl_catalog(
     debug: bool,
 ) -> None:
     """
-    Compare a table in the local catalog with the one in the remote catalog.
+    Compare a table in the local catalog with the analogous one in the remote catalog.
+
+    If "version" is not specified, the latest local version of the dataset is compared with the latest remote version of
+    the same dataset. To impose a specific version of both the local and remote datasets, use use the "version"
+    optional argument, e.g. --version "2022-01-01".
 
     It compares the columns, index columns and index values (row indices) as sets between the two dataframes and outputs
     the differences. Finally it compares the values of the overlapping columns and rows with the given threshold values
     for absolute and relative tolerance.
-    Note that this function will try to load a table given its channel, namespace, dataset name and table name. But, if
-    there is more than one table with those specifications, this function will fail. In those cases, specify the version
-    (e.g. --version "2022-01-01").
 
     The exit code is 0 if the dataframes are equal, 1 if there is an error loading the dataframes, 2 if the dataframes
     are structurally equal but are otherwise different, 3 if the dataframes have different structure and/or different values.
     """
     try:
-        remote_df = catalog.find_one(
+        remote_df = catalog.find_latest(
             table=table, namespace=namespace, dataset=dataset, channels=[channel], version=version
         )
     except Exception as e:
@@ -154,7 +148,7 @@ def etl_catalog(
     try:
         local_catalog = catalog.LocalCatalog("data")
         try:
-            local_df = local_catalog.find_one(
+            local_df = local_catalog.find_latest(
                 table=table,
                 namespace=namespace,
                 dataset=dataset,
@@ -165,7 +159,7 @@ def etl_catalog(
             # try again after reindexing
             if str(e) == "no tables found":
                 local_catalog.reindex(include=f"{channel}/{namespace}")
-                local_df = local_catalog.find_one(
+                local_df = local_catalog.find_latest(
                     table=table,
                     namespace=namespace,
                     dataset=dataset,
