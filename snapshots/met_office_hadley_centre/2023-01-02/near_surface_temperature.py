@@ -18,6 +18,7 @@ FILE_NAMES = [
     "near_surface_temperature_southern_hemisphere.csv",
 ]
 
+
 @click.command()
 @click.option(
     "--upload/--skip-upload",

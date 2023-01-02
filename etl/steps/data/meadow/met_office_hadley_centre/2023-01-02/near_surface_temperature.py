@@ -36,15 +36,20 @@ REGION_FILE_NAMES = {
     "Southern hemisphere": "near_surface_temperature_southern_hemisphere.csv",
 }
 
+
 def run(dest_dir: str) -> None:
     #
     # Load data.
     #
     # Load snapshots.
-    snapshots = {region: Snapshot(f"met_office_hadley_centre/{SNAPSHOT_VERSION}/{file_name}")
-                 for region, file_name in REGION_FILE_NAMES.items()}
-    df = pd.concat([pd.read_csv(snapshot.path).assign(**{"region": region})
-                    for region, snapshot in snapshots.items()], ignore_index=True)
+    snapshots = {
+        region: Snapshot(f"met_office_hadley_centre/{SNAPSHOT_VERSION}/{file_name}")
+        for region, file_name in REGION_FILE_NAMES.items()
+    }
+    df = pd.concat(
+        [pd.read_csv(snapshot.path).assign(**{"region": region}) for region, snapshot in snapshots.items()],
+        ignore_index=True,
+    )
 
     #
     # Prepare data.
