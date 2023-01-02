@@ -11,10 +11,10 @@ from owid.catalog.utils import validate_underscore
 from pywebio import output as po
 
 from etl import config
-from etl.paths import BASE_DIR, SNAPSHOTS_DIR, STEP_DIR
+from etl.paths import DAG_DIR, SNAPSHOTS_DIR, STEP_DIR
 from etl.steps import DAG
 
-DAG_WALKTHROUGH_PATH = BASE_DIR / "dag_files/dag_walkthrough.yml"
+DAG_WALKTHROUGH_PATH = DAG_DIR / "walkthrough.yml"
 WALDEN_INGEST_DIR = Path(walden.__file__).parent.parent.parent / "ingests"
 
 DUMMY_DATA = {
@@ -77,7 +77,7 @@ def preview_file(path: Path, language: str) -> None:
     )
 
 
-def preview_dag(dag_content: str, dag_name: str = "dag.yml") -> None:
+def preview_dag(dag_content: str, dag_name: str = "dag/dag.yml") -> None:
     put_widget(
         title=po.put_success(po.put_markdown(f"Steps in {dag_name} were successfully generated")),
         contents=[po.put_markdown(f"```yml\n{dag_content}\n```")],
