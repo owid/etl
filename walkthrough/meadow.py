@@ -19,7 +19,7 @@ ETL_DIR = Path(etl.__file__).parent.parent
 
 class Options(Enum):
 
-    ADD_TO_DAG = "Add steps into dag_walkthrough.yaml file"
+    ADD_TO_DAG = "Add steps into dag/walkthrough.yaml file"
     INCLUDE_METADATA_YAML = "Include *.meta.yaml file with metadata"
     GENERATE_NOTEBOOK = "Generate playground notebook"
     LOAD_COUNTRIES_REGIONS = "Load countries regions in the script"

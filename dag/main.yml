@@ -246,11 +246,11 @@ steps:
 
 # Sub-dags to import
 include:
-  - dag_files/dag_open_numbers.yml
-  - dag_files/dag_faostat.yml
-  - dag_files/dag_energy.yml
-  - dag_files/dag_walkthrough.yml
-  - dag_files/dag_examples.yml
-  - dag_files/dag_emissions.yml
-  - dag_files/dag_papers.yml
-  - dag_files/dag_demography.yml
+  - dag/open_numbers.yml
+  - dag/faostat.yml
+  - dag/energy.yml
+  - dag/walkthrough.yml
+  - dag/examples.yml
+  - dag/emissions.yml
+  - dag/papers.yml
+  - dag/demography.yml
