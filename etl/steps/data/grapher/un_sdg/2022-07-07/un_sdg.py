@@ -130,7 +130,7 @@ def create_dataframe_with_variable_name(dataset: Dataset, tab: str) -> pd.DataFr
     cols_meta = ["indicator", "seriesdescription", "seriescode"]
     cols = ["indicator", "seriescode"]
     if tab_df.shape[1] > 11:
-        col_list = tab_df.columns.to_list()
+        col_list = sorted(tab_df.columns.to_list())
         drop_cols = [
             "country",
             "year",
