@@ -1,6 +1,6 @@
 meta:
   namespace: met_office_hadley_centre
-  short_name: near_surface_temperature
+  short_name: near_surface_temperature_global
   name: HadCRUT5 near surface temperature
   source_name: Met Office Hadley Centre
   publication_year: 2022
@@ -18,4 +18,4 @@ wdir: ../../../data/snapshots/met_office_hadley_centre/2023-01-02
 outs:
 - md5: 8635d1c4aeddd72326f9723ad367838c
   size: 6907
-  path: near_surface_temperature.csv
+  path: near_surface_temperature_global.csv
