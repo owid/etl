@@ -256,8 +256,8 @@ def cli(
 
 def _dict_diff(dict_a: Dict[str, Any], dict_b: Dict[str, Any], tabs) -> str:
     """Convert dictionaries into YAML and compare them using difflib. Return colored diff as a string."""
-    meta_a = yaml_dump(dict_a).splitlines(keepends=True)  # type: ignore
-    meta_b = yaml_dump(dict_b).splitlines(keepends=True)  # type: ignore
+    meta_a = yaml_dump(dict_a).replace("–", "-").splitlines(keepends=True)  # type: ignore
+    meta_b = yaml_dump(dict_b).replace("–", "-").splitlines(keepends=True)  # type: ignore
 
     lines = difflib.ndiff(meta_a, meta_b)
     # do not print lines that are identical
