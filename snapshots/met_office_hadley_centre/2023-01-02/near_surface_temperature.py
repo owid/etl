@@ -1,4 +1,4 @@
-"""Snapshot of the HadCRUT5 near surface temperature dataset (temperature anomaly).
+"""Ingest snapshot of the HadCRUT5 near surface temperature dataset (temperature anomaly) by Met Office Hadley Centre.
 
 The HadCRUT5 near surface temperature data set is produced by blending data from the CRUTEM5 surface air temperature
 dataset and the HadSST4 sea-surface temperature dataset.
