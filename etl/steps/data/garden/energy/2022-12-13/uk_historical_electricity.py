@@ -9,19 +9,11 @@ import numpy as np
 import pandas as pd
 from owid import catalog
 from owid.datautils import dataframes
-from shared import CURRENT_DIR
 
-from etl.paths import DATA_DIR
+from etl.helpers import PathFinder
 
-# Details for dataset to export.
-DATASET_SHORT_NAME = "uk_historical_electricity"
-DATASET_TITLE = "UK historical electricity"
-METADATA_PATH = CURRENT_DIR / f"{DATASET_SHORT_NAME}.meta.yml"
-# Details for datasets to import.
-ELECTRICITY_MIX_DATASET_PATH = DATA_DIR / "garden/energy/2022-12-13/electricity_mix"
-ELECTRICITY_MIX_TABLE_NAME = "electricity_mix"
-UK_BEIS_DATASET_PATH = DATA_DIR / "garden/uk_beis/2022-07-28/uk_historical_electricity"
-UK_BEIS_TABLE_NAME = "uk_historical_electricity"
+# Get relevant paths for current file.
+paths = PathFinder(__file__)
 
 
 def prepare_electricity_mix_data(df_elec: pd.DataFrame) -> pd.DataFrame:
@@ -171,16 +163,17 @@ def run(dest_dir: str) -> None:
     # Load data.
     #
     # Read all required datasets.
-    ds_beis = catalog.Dataset(UK_BEIS_DATASET_PATH)
-    ds_elec = catalog.Dataset(ELECTRICITY_MIX_DATASET_PATH)
+    ds_beis: catalog.Dataset = paths.load_dependency("uk_historical_electricity")
+    ds_elec: catalog.Dataset = paths.load_dependency("electricity_mix")
 
     # Gather all required tables from all datasets.
-    tb_beis = ds_beis[UK_BEIS_TABLE_NAME]
-    tb_elec = ds_elec[ELECTRICITY_MIX_TABLE_NAME]
+    tb_beis = ds_beis["uk_historical_electricity"]
+    tb_elec = ds_elec["electricity_mix"]
 
     # Create convenient dataframes.
     df_beis = pd.DataFrame(tb_beis).reset_index()
     df_elec = pd.DataFrame(tb_elec).reset_index()
+
     #
     # Process data.
     #
@@ -198,16 +191,15 @@ def run(dest_dir: str) -> None:
     #
     # Save outputs.
     #
+    # Create new garden dataset.
     ds_garden = catalog.Dataset.create_empty(dest_dir)
-    # Get the rest of the metadata from the yaml file.
-    ds_garden.metadata.update_from_yaml(METADATA_PATH, if_source_exists="replace")
-    # Create dataset.
-    ds_garden.save()
 
-    # Add other metadata fields to table.
-    tb_combined.metadata.short_name = DATASET_SHORT_NAME
-    tb_combined.metadata.title = DATASET_TITLE
-    tb_combined.update_metadata_from_yaml(METADATA_PATH, DATASET_SHORT_NAME)
-
-    # Add combined tables to the new dataset.
+    # Add combined table to the new dataset.
+    tb_combined.metadata.short_name = "uk_historical_electricity"
     ds_garden.add(tb_combined)
+
+    # Update the rest of the metadata from the yaml file.
+    ds_garden.update_metadata(paths.metadata_path, if_source_exists="replace")
+
+    # Save dataset.
+    ds_garden.save()
