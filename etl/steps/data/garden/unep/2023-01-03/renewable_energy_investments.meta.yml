@@ -2,7 +2,7 @@ dataset:
   channel: garden
   namespace: unep
   short_name: renewable_energy_investments
-  title: Renewable energy investments (UNEP, 2019)
+  title: Investment in renewable energy by technology (UNEP, 2019)
   description: |
     Renewable energy investments, extracted from Fig. 21 of the Global Trends in Renewable Energy Investment 2019 report, by UN Environment, Frankfurt School-UNEP Centre, BNEF.
 
@@ -24,30 +24,37 @@ tables:
   renewable_energy_investments:
     variables:
       wind:
-        title: Investment in wind energy technology.
+        title: Wind energy
+        description: Investment in wind energy technology.
         short_unit: 'billion $'
         unit: 'billion US dollars'
       solar:
-        title: Investment in solar energy technology.
+        title: Solar energy
+        description: Investment in solar energy technology.
         short_unit: 'billion $'
         unit: 'billion US dollars'
       biofuels:
-        title: Investment in biofuels technology.
+        title: Biofuels
+        description: Investment in biofuels technology.
         short_unit: 'billion $'
         unit: 'billion US dollars'
       biomass_and_waste:
-        title: Investment in biomass and waste-to-energy technology.
+        title: Biomass and waste-to-energy
+        description: Investment in biomass and waste-to-energy technology.
         short_unit: 'billion $'
         unit: 'billion US dollars'
       small_hydro:
-        title: Investment in small hydropower technology.
+        title: Small hydropower
+        description: Investment in small hydropower technology.
         short_unit: 'billion $'
         unit: 'billion US dollars'
       geothermal:
-        title: Investment in geothermal energy technology.
+        title: Geothermal energy
+        description: Investment in geothermal energy technology.
         short_unit: 'billion $'
         unit: 'billion US dollars'
       marine:
-        title: Investment in marine energy technology.
+        title: Marine energy
+        description: Investment in marine energy technology.
         short_unit: 'billion $'
         unit: 'billion US dollars'

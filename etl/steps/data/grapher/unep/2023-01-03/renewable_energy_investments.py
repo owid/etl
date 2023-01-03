@@ -6,8 +6,6 @@ from owid import catalog
 
 from etl.helpers import PathFinder
 
-__file__ = '/Users/prosado/Documents/owid/repos/etl/etl/steps/data/grapher/unep/2023-01-03/renewable_energy_investments'
-
 # Convert billion dollars to dollars.
 BILLION_DOLLARS_TO_DOLLARS = 1e9
 
