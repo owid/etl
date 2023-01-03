@@ -188,6 +188,8 @@ steps:
     - snapshot://unep/2023-01-03/global_trends_in_renewable_energy_investment.pdf
   data://garden/unep/2023-01-03/renewable_energy_investments:
     - data://meadow/unep/2023-01-03/renewable_energy_investments
+  data://grapher/unep/2023-01-03/renewable_energy_investments:
+    - data://garden/unep/2023-01-03/renewable_energy_investments
 
   ######################################################################################################################
   #
