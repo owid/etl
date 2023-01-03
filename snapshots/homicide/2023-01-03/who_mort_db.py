@@ -7,7 +7,7 @@ import pathlib
 import click
 import pandas as pd
 
-from etl.snapshot import Snapshot, add_snapshot
+from etl.snapshot import add_snapshot
 
 CURRENT_DIR = pathlib.Path(__file__).parent
 LOCAL_FILE = "/Users/fionaspooner/Downloads/WHOMortalityDatabase_Deaths_sex_age_a_country_area_year-Violence_22nd December 2022 14_53.csv"
