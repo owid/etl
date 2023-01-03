@@ -1,7 +1,7 @@
 import os
 from typing import Any, Dict
 
-import click
+import rich_click as click
 from owid.catalog import Dataset
 
 from etl.files import yaml_dump
