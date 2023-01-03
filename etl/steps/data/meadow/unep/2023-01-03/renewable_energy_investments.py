@@ -43,9 +43,10 @@ def run(dest_dir: str) -> None:
     # Create a new meadow dataset and reuse snapshot metadata.
     ds = Dataset.create_empty(dest_dir, metadata=convert_snapshot_metadata(snap.metadata))
     ds.metadata.version = paths.version
+    ds.metadata.short_name = paths.short_name
 
     # Create a new table with metadata and underscore all columns.
-    tb = Table(df, short_name=snap.metadata.short_name, underscore=True)
+    tb = Table(df, short_name=paths.short_name, underscore=True)
 
     # Add table to dataset and save dataset.
     ds.add(tb)
