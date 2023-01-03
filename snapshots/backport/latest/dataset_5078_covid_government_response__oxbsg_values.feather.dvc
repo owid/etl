@@ -6,12 +6,12 @@ meta:
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5078
   file_extension: feather
-  date_accessed: 2023-01-02 00:02:05.933661
+  date_accessed: 2023-01-03 00:01:38.314052
   is_public: true
   version: latest
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: e2f6de5163b4cce1831295be8c2312ce
-  size: 20065658
+- md5: e9ad17e9eacb4342b0ec0606f20681cb
+  size: 20139874
   path: dataset_5078_covid_government_response__oxbsg_values.feather
