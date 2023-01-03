@@ -1,0 +1,21 @@
+meta:
+  namespace: met_office_hadley_centre
+  short_name: near_surface_temperature_southern_hemisphere
+  name: HadCRUT5 near surface temperature
+  source_name: Met Office Hadley Centre
+  publication_year: 2022
+  publication_date:
+  url: https://www.metoffice.gov.uk/hadobs/hadcrut5/
+  source_data_url: https://www.metoffice.gov.uk/hadobs/hadcrut5/data/current/analysis/diagnostics/HadCRUT.5.0.1.0.analysis.summary_series.southern_hemisphere.annual.csv
+  file_extension: csv
+  license_url: https://www.metoffice.gov.uk/hadobs/hadcrut5/terms_and_conditions.html
+  license_name: Open Government License v3
+  date_accessed: 2023-01-02
+  is_public: true
+  description: |
+    The HadCRUT5 near surface temperature data set is produced by blending data from the CRUTEM5 surface air temperature dataset and the HadSST4 sea-surface temperature dataset.
+wdir: ../../../data/snapshots/met_office_hadley_centre/2023-01-02
+outs:
+- md5: 172c41ea18a9c2c80e09390ed92cd70d
+  size: 6889
+  path: near_surface_temperature_southern_hemisphere.csv
