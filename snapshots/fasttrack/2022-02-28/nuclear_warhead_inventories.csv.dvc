@@ -10,8 +10,9 @@ meta:
   name: DRAFT Nuclear warhead inventories – Federation of American Scientists
   namespace: fasttrack
   short_name: nuclear_warhead_inventories
+  url: https://github.com/owid/notebooks/tree/main/BastianHerre/nuclear_weapons
   source_name: Google Sheet
-  url: gAAAAABjmcOrGumTaNHaQ2bxkz4emKZBhf1HpdGKRcHkv-ID6mcAVPAhNBcVeDAa3e-q_cbGbl41qRIrHU4XXSO5wotniVFS7FEGZHiVXHrbINiQamjTVX0hm7bbop0Qvkj3vosl5UnXsCXs8AgMol-qK7MPdDCFmMAI6Rob1yxicjbfWX43VItSox_W7n97lJ25e_vanXn24XIXIBoG9kJeOSrEcD-NUlGijsgMqR9vYISDt8YxJBsBB5lkoibKmGTi4eBtFxC4
+  source_data_url: gAAAAABjmcOrGumTaNHaQ2bxkz4emKZBhf1HpdGKRcHkv-ID6mcAVPAhNBcVeDAa3e-q_cbGbl41qRIrHU4XXSO5wotniVFS7FEGZHiVXHrbINiQamjTVX0hm7bbop0Qvkj3vosl5UnXsCXs8AgMol-qK7MPdDCFmMAI6Rob1yxicjbfWX43VItSox_W7n97lJ25e_vanXn24XIXIBoG9kJeOSrEcD-NUlGijsgMqR9vYISDt8YxJBsBB5lkoibKmGTi4eBtFxC4
   version: '2022-02-28'
 wdir: ../../../data/snapshots/fasttrack/2022-02-28
 outs:

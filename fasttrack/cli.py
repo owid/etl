@@ -78,11 +78,19 @@ def cli(dummy_data: bool, auto_open: bool, port: int) -> None:
 
 
 class FasttrackImport:
-    def __init__(self, data: pd.DataFrame, meta: YAMLMeta, sheets_url: str, is_private: bool):
+    def __init__(
+        self,
+        data: pd.DataFrame,
+        meta: YAMLMeta,
+        sheets_url: str,
+        is_private: bool,
+        partial_snapshot_meta: sheets.PartialSnapshotMeta,
+    ):
         self.data = data
         self.meta = meta
         self.sheets_url = sheets_url
         self.is_private = is_private
+        self.partial_snapshot_meta = partial_snapshot_meta
 
     @property
     def dataset_dir(self) -> Path:
@@ -122,10 +130,14 @@ class FasttrackImport:
             version=str(self.meta.dataset.version),
             file_extension="csv",
             description=self.meta.dataset.description,
+            url=self.partial_snapshot_meta.url,
             source_name="Google Sheet",
-            url=sheets_url,
+            source_data_url=sheets_url,
             is_public=not self.is_private,
             date_accessed=dt.date.today(),
+            publication_year=self.partial_snapshot_meta.publication_year,
+            license_url=self.partial_snapshot_meta.license_url,
+            license_name=self.partial_snapshot_meta.license_name,
         )
         snap_meta.save()
 
@@ -150,9 +162,9 @@ def app(dummy_data: bool) -> None:
             contents=[po.put_markdown(f.read())],
         )
 
-    data, meta, sheets_url, form = _load_data_and_meta(dummies)
+    data, meta, sheets_url, form, snapshot_dict = _load_data_and_meta(dummies)
 
-    fast_import = FasttrackImport(data, meta, sheets_url, form.is_private)
+    fast_import = FasttrackImport(data, meta, sheets_url, form.is_private, snapshot_dict)
 
     # diff with existing dataset
     if fast_import.snapshot_exists() and fast_import.metadata_path.exists():
@@ -163,7 +175,9 @@ def app(dummy_data: bool) -> None:
         _metadata_diff(fast_import, meta)
 
         # if data_is_different or metadata_is_different:
-        _ask_to_continue()
+        do_continue = _ask_to_continue()
+        if not do_continue:
+            return
 
     # add dataset to dag
     dag_content = _add_to_dag(meta.dataset, form.is_private)
@@ -235,7 +249,9 @@ class FasttrackForm(BaseModel):
         super().__init__(**data)
 
 
-def _load_data_and_meta(dummies: dict[str, str]) -> Tuple[pd.DataFrame, YAMLMeta, str, FasttrackForm]:
+def _load_data_and_meta(
+    dummies: dict[str, str]
+) -> Tuple[pd.DataFrame, YAMLMeta, str, FasttrackForm, sheets.PartialSnapshotMeta]:
     existing_sheets = [
         {"label": "Choose previously uploaded dataset", "value": "unselected"}
     ] + _load_existing_sheets_from_snapshots()
@@ -307,7 +323,7 @@ def _load_data_and_meta(dummies: dict[str, str]) -> Tuple[pd.DataFrame, YAMLMeta
             po.put_success(
                 f"Data imported (sheet refreshed {_last_updated_before_minutes(google_sheets['dataset_meta'])} minutes ago)"
             )
-            meta = sheets.parse_metadata_from_sheets(
+            meta, partial_snapshot_meta = sheets.parse_metadata_from_sheets(
                 google_sheets["dataset_meta"], google_sheets["variables_meta"], google_sheets["sources_meta"]
             )
             data = sheets.parse_data_from_sheets(google_sheets["data"])
@@ -366,7 +382,7 @@ def _load_data_and_meta(dummies: dict[str, str]) -> Tuple[pd.DataFrame, YAMLMeta
 
         break
 
-    return data, meta, sheets_url, form
+    return data, meta, sheets_url, form, partial_snapshot_meta
 
 
 def _dataset_id(meta_ds: YAMLDatasetMeta) -> int:
@@ -393,10 +409,11 @@ def _load_existing_sheets_from_snapshots() -> List[Dict[str, str]]:
     # decrypt URLs if private
     for meta in metas:
         if not meta.is_public:
-            meta.url = _decrypt(meta.url)
+            assert meta.source_data_url
+            meta.source_data_url = _decrypt(meta.source_data_url)
 
     # extract their name and url
-    return [{"label": f"{meta.name} / {meta.version}", "value": meta.url} for meta in metas]
+    return [{"label": f"{meta.name} / {meta.version}", "value": meta.source_data_url} for meta in metas]  # type: ignore
 
 
 def _infer_metadata(
@@ -574,7 +591,7 @@ def _metadata_diff(fast_import: FasttrackImport, meta: YAMLMeta) -> bool:
         return True
 
 
-def _ask_to_continue() -> None:
+def _ask_to_continue() -> bool:
     answer = pi.actions(
         buttons=[
             {
@@ -594,6 +611,9 @@ def _ask_to_continue() -> None:
     # start saving the dataset after we click continue
     if answer == "Cancel":
         run_js("window.location.reload()")
+        return False
+    else:
+        return True
 
 
 def _bail(errors: Sequence[Exception]) -> None:

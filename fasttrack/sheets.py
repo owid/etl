@@ -1,8 +1,9 @@
 import concurrent.futures
 from collections.abc import Iterable
-from typing import Any, Dict, List, cast
+from typing import Any, Dict, List, Optional, Tuple, cast
 
 import pandas as pd
+from pydantic import BaseModel
 
 from etl.grapher_import import INT_TYPES
 
@@ -11,6 +12,14 @@ from .yaml_meta import YAMLMeta
 
 class ValidationError(Exception):
     pass
+
+
+class PartialSnapshotMeta(BaseModel):
+
+    url: str
+    publication_year: Optional[int]
+    license_url: Optional[str]
+    license_name: Optional[str]
 
 
 def import_google_sheets(url: str) -> Dict[str, Any]:
@@ -62,7 +71,7 @@ def parse_data_from_sheets(data_df: pd.DataFrame) -> pd.DataFrame:
 
 def parse_metadata_from_sheets(
     dataset_meta_df: pd.DataFrame, variables_meta_df: pd.DataFrame, sources_meta_df: pd.DataFrame
-) -> YAMLMeta:
+) -> Tuple[YAMLMeta, PartialSnapshotMeta]:
     sources_dict = cast(Dict[str, Any], sources_meta_df.set_index("short_name").to_dict())
     sources_dict = {k: _prune_empty(v) for k, v in sources_dict.items()}
 
@@ -98,9 +107,22 @@ def parse_metadata_from_sheets(
 
     variables_dict = {v.pop("short_name"): v for v in variables_list}
 
+    # extract fields for snapshot
+    partial_snapshot_meta = _prune_empty(
+        {
+            "publication_year": dataset_dict.pop("publication_year", None),
+            "license_url": dataset_dict.pop("license_url", None),
+            "license_name": dataset_dict.pop("license_name", None),
+        }
+    )
+    partial_snapshot_meta["url"] = dataset_dict.pop("url", "")
+
     _move_keys_to_the_end(dataset_dict, ["description", "sources"])
 
-    return YAMLMeta(**{"dataset": dataset_dict, "tables": {dataset_dict["short_name"]: {"variables": variables_dict}}})
+    return (
+        YAMLMeta(**{"dataset": dataset_dict, "tables": {dataset_dict["short_name"]: {"variables": variables_dict}}}),
+        PartialSnapshotMeta(**partial_snapshot_meta),
+    )
 
 
 def _expand_sources(sources_name: str, sources_dict: Dict[str, Any]) -> Iterable[str]:
