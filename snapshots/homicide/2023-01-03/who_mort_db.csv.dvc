@@ -7,7 +7,7 @@ meta:
   publication_date: 2022-09-01
   url: https://platform.who.int/mortality/themes/theme-details/topics/indicator-groups/indicator-group-details/MDB/violence
   source_data_url:
-  file_extension:
+  file_extension: csv
   license_url: https://www.who.int/about/policies/publishing/copyright
   license_name: CC BY-NC-SA 3.0 IGO
   date_accessed: 2023-01-03
