@@ -520,7 +520,7 @@ class SnapshotStep(Step):
         return f"snapshot://{self.path}"
 
     def run(self) -> None:
-        DVC_REPO.pull(self._path, remote="public", force=True)
+        DVC_REPO.pull(self._path, remote="public-read", force=True)
 
     def is_dirty(self) -> bool:
         # check if the snapshot has been added to DVC

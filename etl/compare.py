@@ -3,14 +3,15 @@
 #
 
 from pathlib import Path
-from typing import Any, Dict, cast
+from typing import Any, Dict, Optional, Union, cast
 from urllib.parse import quote
 
 import click
 import pandas as pd
+import rich
 from dotenv import dotenv_values
 from owid import catalog
-from owid.catalog.frames import repack_frame
+from owid.repack import repack_frame
 from rich import print
 from rich_click.rich_command import RichCommand
 from rich_click.rich_group import RichGroup
@@ -60,16 +61,7 @@ def cli(
     show_shared: bool,
     truncate_lists_at: int,
 ) -> None:
-    """Compare two dataframes, both structurally and the values.
-
-    This tool loads two dataframes, either from the local ETL and the remote catalog
-    or just from two different files. It compares the columns, index columns and index values (row indices) as
-    sets between the two dataframes and outputs the differences. Finally it compares the values of the overlapping
-    columns and rows with the given threshold values for absolute and relative tolerance.
-
-    The exit code is 0 if the dataframes are equal, 1 if there is an error loading the dataframes, 2 if the dataframes
-    are structurally equal but are otherwise different, 3 if the dataframes have different structure and/or different values.
-    """
+    """Compare two dataframes/tables/datasets in terms of their structure, values and metadata."""
     ctx.ensure_object(dict)
     ctx.obj["absolute_tolerance"] = absolute_tolerance
     ctx.obj["relative_tolerance"] = relative_tolerance
@@ -88,6 +80,7 @@ def diff_print(
     show_values: bool,
     show_shared: bool,
     truncate_lists_at: int,
+    print: Any = rich.print,
 ) -> int:
     """Runs the comparison and prints the differences, then return exit code."""
     diff = tempcompare.HighLevelDiff(df1, df2, absolute_tolerance, relative_tolerance)
@@ -116,6 +109,7 @@ def diff_print(
 @click.argument("namespace")
 @click.argument("dataset")
 @click.argument("table")
+@click.option("--version", default=None, help="Version of catalog dataset to compare with.")
 @click.option("--debug", is_flag=True, help="Print debug information.")
 @click.pass_context
 def etl_catalog(
@@ -124,20 +118,27 @@ def etl_catalog(
     namespace: str,
     dataset: str,
     table: str,
+    version: Optional[Union[str, int]],
     debug: bool,
 ) -> None:
     """
-    Compare a table in the local catalog with the one in the remote catalog.
+    Compare a table in the local catalog with the analogous one in the remote catalog.
 
-    It compares the columns, index columns and index values (row indices) as
-    sets between the two dataframes and outputs the differences. Finally it compares the values of the overlapping
-    columns and rows with the given threshold values for absolute and relative tolerance.
+    If "version" is not specified, the latest local version of the dataset is compared with the latest remote version of
+    the same dataset. To impose a specific version of both the local and remote datasets, use use the "version"
+    optional argument, e.g. --version "2022-01-01".
+
+    It compares the columns, index columns and index values (row indices) as sets between the two dataframes and outputs
+    the differences. Finally it compares the values of the overlapping columns and rows with the given threshold values
+    for absolute and relative tolerance.
 
     The exit code is 0 if the dataframes are equal, 1 if there is an error loading the dataframes, 2 if the dataframes
     are structurally equal but are otherwise different, 3 if the dataframes have different structure and/or different values.
     """
     try:
-        remote_df = catalog.find_one(table=table, namespace=namespace, dataset=dataset, channels=[channel])
+        remote_df = catalog.find_latest(
+            table=table, namespace=namespace, dataset=dataset, channels=[channel], version=version
+        )
     except Exception as e:
         if debug:
             raise e
@@ -147,21 +148,23 @@ def etl_catalog(
     try:
         local_catalog = catalog.LocalCatalog("data")
         try:
-            local_df = local_catalog.find_one(
+            local_df = local_catalog.find_latest(
                 table=table,
                 namespace=namespace,
                 dataset=dataset,
                 channel=cast(catalog.CHANNEL, channel),
+                version=version,
             )
         except ValueError as e:
             # try again after reindexing
             if str(e) == "no tables found":
                 local_catalog.reindex(include=f"{channel}/{namespace}")
-                local_df = local_catalog.find_one(
+                local_df = local_catalog.find_latest(
                     table=table,
                     namespace=namespace,
                     dataset=dataset,
                     channel=cast(catalog.CHANNEL, channel),
+                    version=version,
                 )
             else:
                 raise e

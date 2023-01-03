@@ -1,8 +1,9 @@
 import datetime as dt
 from typing import Any, List, Optional, Union
 
-import yaml
 from pydantic import BaseModel, Extra, Field
+
+from etl.files import yaml_dump
 
 
 class YAMLSourceMeta(BaseModel):
@@ -61,5 +62,5 @@ class YAMLMeta(BaseModel):
     dataset: YAMLDatasetMeta
     tables: dict[str, YAMLTableMeta]
 
-    def to_yaml(self):
-        return yaml.dump(self.dict(exclude_none=True, exclude_unset=True), sort_keys=False, allow_unicode=True)
+    def to_yaml(self) -> str:
+        return yaml_dump(self.dict(exclude_none=True, exclude_unset=True))  # type: ignore

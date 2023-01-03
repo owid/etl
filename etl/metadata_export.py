@@ -1,9 +1,10 @@
 import os
-from typing import Any, Dict, cast
+from typing import Any, Dict
 
 import click
-import yaml
 from owid.catalog import Dataset
+
+from etl.files import yaml_dump
 
 
 @click.command(help=__doc__)
@@ -90,7 +91,7 @@ def metadata_export(
         "tables": tb_meta,
     }
 
-    return cast(str, yaml.dump(final, sort_keys=False, allow_unicode=True))
+    return yaml_dump(final)  # type: ignore
 
 
 def _prune_empty(d: Dict[str, Any]) -> None:

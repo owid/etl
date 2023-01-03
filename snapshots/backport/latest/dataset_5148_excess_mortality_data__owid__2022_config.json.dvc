@@ -1,17 +1,17 @@
 meta:
-  date_accessed: 2022-12-07 17:19:36.787105
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_5148_excess_mortality_data__owid__2022
   namespace: backport
-  publication_date: latest
   short_name: dataset_5148_excess_mortality_data__owid__2022_config
+  name: Grapher metadata for dataset_5148_excess_mortality_data__owid__2022
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5148
+  file_extension: json
+  date_accessed: 2022-12-21 00:00:19.990710
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 33b4432b39277a6f0f614edb25b1d565
+- md5: 5f3c1c1177fb274a336cc9f64a4d9f22
   size: 23529
   path: dataset_5148_excess_mortality_data__owid__2022_config.json

@@ -14,7 +14,7 @@ CURRENT_DIR = pathlib.Path(__file__).parent
     "--upload/--skip-upload",
     default=True,
     type=bool,
-    help="Upload dataset to Walden",
+    help="Upload dataset to Snapshot",
 )
 def main(upload: bool) -> None:
     snap = Snapshot("dummy/2020-01-01/dummy.xlsx")

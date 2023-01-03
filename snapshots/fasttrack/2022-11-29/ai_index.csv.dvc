@@ -1,13 +1,13 @@
 meta:
-  date_accessed: 2022-12-05
+  date_accessed: 2022-12-14
   description: ''
   file_extension: csv
   is_public: false
-  name: AI Index
+  name: DRAFT AI Index
   namespace: fasttrack
   short_name: ai_index
   source_name: Google Sheet
-  url: https://docs.google.com/spreadsheets/d/e/2PACX-1vTv9kIf1STQgJkLO4DL-kdePFOGnzRF6GHGbWMmDmLGO8nWsvgfg0s2cNUOJ8siis1MVSjtwF-kByKv/pub?output=csv
+  url: gAAAAABjmcJkiXgBsXGbVw57kOHDJ-SzXznDLJEmuZ8mS1ozeo6hP_VsX9T6anUA8kevJmmvvkzLgRNT2fYh48Q_b9umN94kbtBZirhUA30r2DCCcQPOzqIK2kEj4akp5LURPn9QYMZkhlIhkq3dvxPVyJR4gL0jpE0MF_srafRnCEz2lfb0-66NGGy--6U0Q7-pWkpdtuynK1BfZqA4mpE9OYVGatCsyhhpC00aPAI5y5ACGJAJd07my9r8H4TTi2XYsHcRKdNS
   version: '2022-11-29'
 wdir: ../../../data/snapshots/fasttrack/2022-11-29
 outs:

@@ -38,7 +38,7 @@ COLUMNS = {
     "--upload/--skip-upload",
     default=True,
     type=bool,
-    help="Upload dataset to Walden",
+    help="Upload dataset to Snapshot",
 )
 def main(upload: bool) -> None:
     # Load raw data from a specific sheet.

@@ -1,17 +1,17 @@
 meta:
-  date_accessed: 2022-12-07 18:37:03.071528
-  description: https://github.com/owid/importers/tree/master/imf_weo
-  file_extension: json
-  is_public: false
-  name: Grapher metadata for dataset_5392_international_monetary_fund__world_economic_outlook
   namespace: backport
-  publication_date: latest
   short_name: dataset_5392_international_monetary_fund__world_economic_outlook_config
+  name: Grapher metadata for dataset_5392_international_monetary_fund__world_economic_outlook
+  description: https://github.com/owid/importers/tree/master/imf_weo
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5392
+  file_extension: json
+  date_accessed: 2022-12-24 18:00:46.142186
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: a6d48217a2b1128af6b6caac29925c95
+- md5: 556f3ca6f703b7e75c5e917201d58a0e
   size: 2937
   path: dataset_5392_international_monetary_fund__world_economic_outlook_config.json

@@ -1,0 +1,271 @@
+steps:
+  #
+  # BP - Statistical review 2021.
+  #
+  # NOTE: This dataset is not used in grapher. It exists only to fill gaps in the 2022 version.
+  data://garden/bp/2022-07-11/statistical_review:
+    - backport://backport/owid/latest/dataset_5347_statistical_review_of_world_energy__bp__2021
+    - data://garden/owid/latest/key_indicators
+    - data://garden/reference
+  #
+  # BP - Statistical review 2022.
+  #
+  # NOTE: For the moment this is not the full processing (which is still done in importers).
+  #  This garden step loads the dataset and adds region aggregates properly, plus some other minor improvements.
+  #  Here, we also remove some regions that had misleading data (BP regions like "Other *").
+  data://garden/bp/2022-12-28/statistical_review:
+    # The backported 2022 release is the main source of data of this step.
+    - backport://backport/owid/latest/dataset_5650_statistical_review_of_world_energy__bp__2022
+    # The 2021 release is loaded just to fill missing data in the current version (and to get a missing column).
+    - data://garden/bp/2022-07-11/statistical_review
+    - data://garden/owid/latest/key_indicators
+    - data://garden/wb/2021-07-01/wb_income
+    - data://garden/reference
+  data://grapher/bp/2022-12-28/statistical_review:
+    - data://garden/bp/2022-12-28/statistical_review  
+  #
+  # BP - Energy mix 2022.
+  #
+  data://garden/bp/2022-12-28/energy_mix:
+    - data://garden/bp/2022-12-28/statistical_review
+    - data://garden/owid/latest/key_indicators
+    - data://garden/wb/2021-07-01/wb_income
+  data://grapher/bp/2022-12-28/energy_mix:
+    - data://garden/bp/2022-12-28/energy_mix
+  #
+  # Shift - Fossil fuel production 2022.
+  #
+  data://meadow/shift/2022-07-18/fossil_fuel_production:
+    - walden://shift/2022-07-18/fossil_fuel_production
+  data://garden/shift/2022-07-18/fossil_fuel_production:
+    - data://meadow/shift/2022-07-18/fossil_fuel_production
+    - data://garden/reference
+  #
+  # Energy - Fossil Fuel Production 2022.
+  #
+  data://garden/energy/2022-12-28/fossil_fuel_production:
+    - data://garden/bp/2022-12-28/statistical_review
+    - data://garden/shift/2022-07-18/fossil_fuel_production
+    - data://garden/owid/latest/key_indicators
+  data://grapher/energy/2022-12-28/fossil_fuel_production:
+    - data://garden/energy/2022-12-28/fossil_fuel_production
+  #
+  # EIA - Energy consumption 2022.
+  #
+  data://meadow/eia/2022-07-27/energy_consumption:
+    - walden://eia/2022-07-27/international_energy_data
+  data://garden/eia/2022-07-27/energy_consumption:
+    - data://meadow/eia/2022-07-27/energy_consumption
+    - data://garden/owid/latest/key_indicators
+    - data://garden/reference
+  #
+  # Energy - Primary energy consumption 2022.
+  #
+  data://garden/energy/2022-12-28/primary_energy_consumption:
+    - data://garden/bp/2022-12-28/statistical_review
+    - data://garden/eia/2022-07-27/energy_consumption
+    - data://garden/ggdc/2020-10-01/ggdc_maddison
+    - data://garden/owid/latest/key_indicators
+  data://grapher/energy/2022-12-28/primary_energy_consumption:
+    - data://garden/energy/2022-12-28/primary_energy_consumption
+  #
+  # Ember - Global electricity review 2022.
+  #
+  data://meadow/ember/2022-12-13/yearly_electricity:
+    - snapshot://ember/2022-12-13/yearly_electricity.csv
+  data://garden/ember/2022-12-13/yearly_electricity:
+    - data://meadow/ember/2022-12-13/yearly_electricity
+    - data://garden/owid/latest/key_indicators
+    - data://garden/reference
+  #
+  # Ember - European electricity review 2022.
+  #
+  data://meadow/ember/2022-08-01/european_electricity_review:
+    - walden://ember/2022-02-01/european_electricity_review
+  data://garden/ember/2022-08-01/european_electricity_review:
+    - data://meadow/ember/2022-08-01/european_electricity_review
+    - data://garden/reference
+  #
+  # Ember - Combined electricity 2022.
+  #
+  data://garden/ember/2022-12-13/combined_electricity:
+    - data://garden/ember/2022-08-01/european_electricity_review
+    - data://garden/ember/2022-12-13/yearly_electricity
+  #
+  # Energy - Electricity mix (BP & Ember, 2022).
+  #
+  data://garden/energy/2022-12-28/electricity_mix:
+    - data://garden/bp/2022-12-28/statistical_review
+    - data://garden/ember/2022-12-13/combined_electricity
+    - data://garden/owid/latest/key_indicators
+  data://grapher/energy/2022-12-28/electricity_mix:
+    - data://garden/energy/2022-12-28/electricity_mix
+  #
+  # Energy - OWID Energy dataset (2022).
+  #
+  data://garden/energy/2022-12-28/owid_energy:
+    - data://garden/bp/2022-12-28/energy_mix
+    - data://garden/energy/2022-12-28/fossil_fuel_production
+    - data://garden/energy/2022-12-28/primary_energy_consumption
+    - data://garden/energy/2022-12-28/electricity_mix
+    - data://garden/owid/latest/key_indicators
+    - data://garden/reference
+  #
+  # Smil - Global primary energy (2017).
+  #
+  data://meadow/smil/2017-01-01/global_primary_energy:
+    - walden://smil/2017-01-01/global_primary_energy
+  data://garden/smil/2017-01-01/global_primary_energy:
+    - data://meadow/smil/2017-01-01/global_primary_energy
+  #
+  # Energy - Global primary energy (2022).
+  #
+  data://garden/energy/2022-12-28/global_primary_energy:
+    - data://garden/smil/2017-01-01/global_primary_energy
+    - data://garden/bp/2022-12-28/statistical_review
+  data://grapher/energy/2022-12-28/global_primary_energy:
+    - data://garden/energy/2022-12-28/global_primary_energy
+  #
+  # BP - Fossil fuel reserves/production ratio (2022).
+  #
+  data://garden/bp/2022-12-28/fossil_fuel_reserves_production_ratio:
+    - data://garden/bp/2022-12-28/statistical_review
+  data://grapher/bp/2022-12-28/fossil_fuel_reserves_production_ratio:
+    - data://garden/bp/2022-12-28/fossil_fuel_reserves_production_ratio
+  #
+  # UK BEIS - UK historical electricity (2022).
+  #
+  data://meadow/uk_beis/2022-07-28/uk_historical_electricity:
+    - walden://uk_beis/2022-07-28/uk_historical_electricity
+  data://garden/uk_beis/2022-07-28/uk_historical_electricity:
+    - data://meadow/uk_beis/2022-07-28/uk_historical_electricity
+  #
+  # Energy - UK historical electricity (2022).
+  #
+  data://garden/energy/2022-12-28/uk_historical_electricity:
+    - data://garden/uk_beis/2022-07-28/uk_historical_electricity
+    - data://garden/energy/2022-12-28/electricity_mix
+  data://grapher/energy/2022-12-28/uk_historical_electricity:
+    - data://garden/energy/2022-12-28/uk_historical_electricity
+  #
+  # IRENA - Renewable power generation costs (2022).
+  #
+  data://meadow/irena/2022-10-20/renewable_power_generation_costs:
+    - walden://irena/2022-10-07/renewable_power_generation_costs
+  data://garden/irena/2022-10-20/renewable_power_generation_costs:
+    - data://meadow/irena/2022-10-20/renewable_power_generation_costs
+  data://grapher/irena/2022-10-20/renewable_power_generation_costs:
+    - data://garden/irena/2022-10-20/renewable_power_generation_costs
+  #
+  # IRENA - Renewable electricity capacity (and generation, although the generation part is ignored for now, 2022).
+  #
+  data://meadow/irena/2022-10-20/renewable_electricity_capacity_and_generation:
+    - walden://irena/2022-10-07/renewable_electricity_capacity_and_generation
+  # The following dataset only contains capacity.
+  data://garden/irena/2022-10-20/renewable_electricity_capacity:
+    - data://meadow/irena/2022-10-20/renewable_electricity_capacity_and_generation
+  data://grapher/irena/2022-10-20/renewable_electricity_capacity_by_technology:
+    - data://garden/irena/2022-10-20/renewable_electricity_capacity
+  #
+  # IRENA - Renewable energy patents (2021).
+  #
+  data://meadow/irena/2022-10-25/renewable_energy_patents:
+    - walden://irena/2022-10-25/renewable_energy_patents
+  # The garden dataset will have two tables with number of patents:
+  # * 'renewable_energy_patents': Long format, indexed by country, year, sector, technology, sub-technology.
+  # * 'renewable_energy_patents_by_technology': Wide format, indexed by country, year.
+  data://garden/irena/2022-10-25/renewable_energy_patents:
+    - data://meadow/irena/2022-10-25/renewable_energy_patents
+    - data://garden/wb/2021-07-01/wb_income
+    - data://garden/reference
+  # The grapher dataset uses only the wide table from the garden dataset.
+  data://grapher/irena/2022-10-25/renewable_energy_patents:
+    - data://garden/irena/2022-10-25/renewable_energy_patents
+
+  ######################################################################################################################
+  #
+  # Older steps to be eventually archived (but currently some of them are used by other datasets).
+  #
+  #
+  # BP - Statistical review 2022.
+  #
+  data://garden/bp/2022-07-14/statistical_review:
+    - backport://backport/owid/latest/dataset_5650_statistical_review_of_world_energy__bp__2022
+    - data://garden/bp/2022-07-11/statistical_review
+    - data://garden/owid/latest/key_indicators
+    - data://garden/wb/2021-07-01/wb_income
+    - data://garden/reference
+  data://grapher/bp/2022-07-14/statistical_review:
+    - data://garden/bp/2022-07-14/statistical_review
+  #
+  # BP - Energy mix 2022.
+  #
+  data://garden/bp/2022-07-14/energy_mix:
+    - data://garden/bp/2022-07-14/statistical_review
+    - data://garden/owid/latest/key_indicators
+    - data://garden/wb/2021-07-01/wb_income
+  data://grapher/bp/2022-07-14/energy_mix:
+    - data://garden/bp/2022-07-14/energy_mix
+  #
+  # Energy - Fossil Fuel Production 2022.
+  #
+  data://garden/energy/2022-07-20/fossil_fuel_production:
+    - data://garden/bp/2022-07-14/statistical_review
+    - data://garden/shift/2022-07-18/fossil_fuel_production
+    - data://garden/owid/latest/key_indicators
+  data://grapher/energy/2022-07-20/fossil_fuel_production:
+    - data://garden/energy/2022-07-20/fossil_fuel_production
+  #
+  # Energy - Primary energy consumption 2022.
+  #
+  data://garden/energy/2022-07-29/primary_energy_consumption:
+    - data://garden/bp/2022-07-14/statistical_review
+    - data://garden/eia/2022-07-27/energy_consumption
+    - data://garden/ggdc/2020-10-01/ggdc_maddison
+    - data://garden/owid/latest/key_indicators
+  data://grapher/energy/2022-07-29/primary_energy_consumption:
+    - data://garden/energy/2022-07-29/primary_energy_consumption
+  #
+  # Energy - Electricity mix (BP & Ember, 2022).
+  #
+  data://garden/energy/2022-12-13/electricity_mix:
+    - data://garden/bp/2022-07-14/statistical_review
+    - data://garden/ember/2022-12-13/combined_electricity
+    - data://garden/owid/latest/key_indicators
+  data://grapher/energy/2022-12-13/electricity_mix:
+    - data://garden/energy/2022-12-13/electricity_mix
+  #
+  # Energy - OWID Energy dataset (2022).
+  #
+  data://garden/energy/2022-12-13/owid_energy:
+    - data://garden/bp/2022-07-14/energy_mix
+    - data://garden/energy/2022-07-20/fossil_fuel_production
+    - data://garden/energy/2022-07-29/primary_energy_consumption
+    - data://garden/energy/2022-12-13/electricity_mix
+    - data://garden/owid/latest/key_indicators
+    - data://garden/reference
+  #
+  # Energy - Global primary energy (2022).
+  #
+  data://garden/energy/2022-09-09/global_primary_energy:
+    - data://garden/smil/2017-01-01/global_primary_energy
+    - data://garden/bp/2022-07-14/statistical_review
+  data://grapher/energy/2022-09-09/global_primary_energy:
+    - data://garden/energy/2022-09-09/global_primary_energy
+  #
+  # BP - Fossil fuel reserves/production ratio (2022).
+  #
+  data://garden/bp/2022-09-19/fossil_fuel_reserves_production_ratio:
+    - data://garden/bp/2022-07-14/statistical_review
+  data://grapher/bp/2022-09-19/fossil_fuel_reserves_production_ratio:
+    - data://garden/bp/2022-09-19/fossil_fuel_reserves_production_ratio
+  #
+  # Energy - UK historical electricity (2022).
+  #
+  data://garden/energy/2022-12-13/uk_historical_electricity:
+    - data://garden/uk_beis/2022-07-28/uk_historical_electricity
+    - data://garden/energy/2022-12-13/electricity_mix
+  data://grapher/energy/2022-12-13/uk_historical_electricity:
+    - data://garden/energy/2022-12-13/uk_historical_electricity
+
+######################################################################################################################

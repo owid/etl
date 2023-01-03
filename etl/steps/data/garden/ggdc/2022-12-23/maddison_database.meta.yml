@@ -1,0 +1,22 @@
+dataset:
+  namespace: ggdc
+  short_name: maddison_database
+  title: Maddison Database (GGDC, 2009)
+  description: The final database version provided by Angus Maddison, covering world
+    population, GDP and per capita GDP from 1-2008 AD. This version of the dataset only includes global estimates.
+  version: '2022-12-23'
+
+tables:
+  maddison_database:
+    variables:
+      gdp:
+        title: GDP
+        unit: international-$ in 1990 prices
+        short_unit: $
+      gdp_per_capita:
+        title: GDP per capita
+        unit: international-$ in 1990 prices
+        short_unit: $
+      population:
+        title: Population
+
