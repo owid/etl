@@ -11,6 +11,7 @@ from typing import Any, Dict, Iterator, List, Optional, Union, cast
 
 import requests
 from owid import catalog
+from owid.catalog import CHANNEL
 from owid.datautils.common import ExceptionFromDocstring
 from owid.walden import Catalog as WaldenCatalog
 from owid.walden import Dataset as WaldenDataset
@@ -155,7 +156,7 @@ class PathFinder:
     @staticmethod
     def _create_step_name(
         short_name: str,
-        channel: Optional[str] = None,
+        channel: Optional[CHANNEL] = None,
         namespace: Optional[str] = None,
         version: Optional[Union[int, str]] = None,
     ) -> str:
