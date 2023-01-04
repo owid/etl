@@ -7,3 +7,9 @@ steps:
     - walden://papers/2022-11-01/riley_2005
   data://garden/papers/2022-11-04/riley_2005:
     - data://meadow/papers/2022-11-04/riley_2005
+
+  #
+  # Farmer & Lafond (2016).
+  #
+  data://meadow/papers/2023-01-04/farmer_lafond_2016:
+    - snapshot://papers/2023-01-04/farmer_lafond_2016.csv
