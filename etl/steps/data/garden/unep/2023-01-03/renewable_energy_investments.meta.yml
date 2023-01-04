@@ -6,9 +6,7 @@ dataset:
   description: |
     Renewable energy investments, extracted from Fig. 21 of the Global Trends in Renewable Energy Investment 2019 report, by UN Environment, Frankfurt School-UNEP Centre, BNEF.
 
-    Renewable investment figures are measured in billion USD per year. Investment adjusts for re-invested equity, and includes estimates for undisclosed deals.
-
-    Figures excludes investments in large hydropower schemes.
+    Investment adjusts for re-invested equity, and includes estimates for undisclosed deals. Figures excludes investments in large hydropower schemes.
   licenses:
   - name: Copyright © Frankfurt School of Finance & Management gGmbH 2019
     url: https://wedocs.unep.org/bitstream/handle/20.500.11822/29752/GTR2019.pdf
@@ -20,6 +18,8 @@ dataset:
     date_accessed: '2023-01-03'
     publication_date: '2019-09-11'
     publication_year: 2019
+    published_by: |
+      UN Environment, Frankfurt School-UNEP Centre, BNEF. Copyright © Frankfurt School of Finance & Management gGmbH 2019
 tables:
   renewable_energy_investments:
     variables:
