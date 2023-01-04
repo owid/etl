@@ -28,9 +28,12 @@ dataset:
 
     
     For recording purposes, all killings that meet the criteria listed above are to be considered intentional homicides, irrespective of definitions provided by national legislations or practices.  Killings as a result of terrorist activities are also to be classified as a form of intentional homicide.
-    
 
-    In order to compile consistent time series of total homicides back to 1990, in several cases data from multiple sources were combined to expand the number of available years within a country’s time series. Time series adjustments were performed when a country had two sources coveringdifferent year-ranges, which had very similar trends in an overlapping time period, but where these trends were at different levels. The countries for which adjusted series for total homicide counts prior to the year 2000 have been produced were the following: Belgium, Brazil, China, Ecuador, Germany, Netherlands, New Zealand, Portugal, South Korea, Spain, Thailand, and United Kingdom.
+
+    In order to compile consistent time series of total homicides back to 1990, in several cases data from multiple sources were combined to expand the number of available years within a country’s time series. Time series adjustments were performed when a country had two sources coveringdifferent year-ranges, which had very similar trends in an overlapping time period, but where these trends were at different levels. 
+    
+    
+    The countries for which adjusted series for total homicide counts prior to the year 2000 have been produced were the following: Belgium, Brazil, China, Ecuador, Germany, Netherlands, New Zealand, Portugal, South Korea, Spain, Thailand, and United Kingdom.
 
   licenses:
   - url: https://www.un.org/en/about-us/terms-of-use
