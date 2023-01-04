@@ -19,6 +19,7 @@ from threading import Lock
 from typing import Any, Dict, Iterable, List, Optional, Protocol, Set, Union, cast
 from urllib.parse import urlparse
 
+import requests
 import structlog
 import yaml
 from dvc.dvcfile import Dvcfile
@@ -46,7 +47,6 @@ from etl.grapher_import import (
     upsert_dataset,
     upsert_table,
 )
-from etl.helpers import get_etag
 
 log = structlog.get_logger()
 
@@ -699,6 +699,12 @@ class GithubStep(Step):
 
     def checksum_output(self) -> str:
         return self.gh_repo.latest_sha
+
+
+def get_etag(url: str) -> str:
+    resp = requests.head(url)
+    resp.raise_for_status()
+    return cast(str, resp.headers["ETag"])
 
 
 class ETagStep(Step):

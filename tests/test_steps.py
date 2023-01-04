@@ -23,6 +23,7 @@ from etl.steps import (
     Step,
     compile_steps,
     filter_to_subgraph,
+    get_etag,
     select_dirty_steps,
     to_dependency_order,
 )
@@ -147,3 +148,8 @@ def test_select_dirty_steps():
         else:
             s.is_dirty = lambda: True  # type: ignore
     assert all([s.is_dirty() for s in select_dirty_steps(steps, 10)])  # type: ignore
+
+
+def test_get_etag():
+    etag = get_etag("https://raw.githubusercontent.com/owid/owid-grapher/master/README.md")
+    assert etag

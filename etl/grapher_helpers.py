@@ -259,7 +259,8 @@ def country_to_entity_id(
         assert fill_from_db, "fill_from_db must be True to create entities"
         assert by == "name", "create_entities works only with `by='name'`"
         ix = entity_id.isnull()
-        entity_id[ix] = country[ix].map(_get_and_create_entities_in_db(set(country[ix])))
+        # cast to float to fix issues with categories
+        entity_id[ix] = country[ix].map(_get_and_create_entities_in_db(set(country[ix]))).astype(float)
 
     if entity_id.isnull().any():
         msg = f"Some countries have not been mapped: {set(country[entity_id.isnull()])}"
