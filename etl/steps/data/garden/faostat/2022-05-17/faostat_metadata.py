@@ -255,7 +255,7 @@ def create_items_dataframe_for_domain(
         .reset_index(drop=True)
     )
     _items_df = harmonize_items(df=_items_df, dataset_short_name=dataset_short_name, item_col="fao_item")
-    _items_df["fao_item_description"] = _items_df["fao_item_description"].astype(str)
+    _items_df["fao_item_description"] = _items_df["fao_item_description"].astype("string")
 
     # Add descriptions (from metadata) to items (from data).
     items_from_data = (
@@ -433,7 +433,7 @@ def create_elements_dataframe_for_domain(
         .reset_index(drop=True)
     )
     _elements_df = harmonize_elements(df=_elements_df, element_col="fao_element")
-    _elements_df["fao_element_description"] = _elements_df["fao_element_description"].astype(str)
+    _elements_df["fao_element_description"] = _elements_df["fao_element_description"].astype("string")
 
     # Load units metadata.
     units_columns = {
@@ -448,7 +448,7 @@ def create_elements_dataframe_for_domain(
         .sort_values(list(units_columns.values()))
         .reset_index(drop=True)
     )
-    _units_df["fao_unit"] = _units_df["fao_unit"].astype(str)
+    _units_df["fao_unit"] = _units_df["fao_unit"].astype("string")
 
     # Add element descriptions (from metadata).
     elements_from_data = (
