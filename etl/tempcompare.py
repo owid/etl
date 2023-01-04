@@ -1,9 +1,12 @@
 import random
+import warnings
 from typing import Any, Callable, Generator, Iterable, List, Optional, cast
 
 import numpy as np
 import pandas as pd
-from pandas.api.types import is_datetime64_any_dtype, union_categoricals  # type: ignore
+from pandas.api.types import is_datetime64_any_dtype  # type: ignore
+from pandas.api.types import is_numeric_dtype  # type: ignore
+from pandas.api.types import union_categoricals
 
 # ######## Note - this file will be moved to owid-catalog-py before the branch is merged ##############
 
@@ -110,37 +113,23 @@ def df_equals(
     # for columns that are numeric. this could probably be sped up with a check on any on
     # the column first but would have to be benchmarked
     for col in diffs.columns:
-        if (df1[col].dtype in (object, "category")) or (df2[col].dtype in (object, "category")):
+        if is_numeric_dtype(df1[col]):
+            # For numeric data, consider them equal within certain absolute and relative tolerances.
+            diffs[col] = np.isclose(
+                df1[col].astype(float).values,
+                df2[col].astype(float).values,
+                atol=absolute_tolerance,
+                rtol=relative_tolerance,
+                equal_nan=True,
+            )
+        elif (df1[col].dtype in (object, "category", "string")) or (df2[col].dtype in (object, "category", "string")):
             # Apply a direct comparison for strings or categories
             pass
         elif is_datetime64_any_dtype(df1[col]):
             # Apply a direct comparison for datetimes
             pass
         else:
-            # Comparison does not work for certain types
-            for df in [df1, df2]:
-                if df[col].dtype in (
-                    "Int64",
-                    "UInt64",
-                    "Float32",
-                    "Float16",
-                    "Int32",
-                    "UInt32",
-                    "Int16",
-                    "UInt16",
-                    "Int8",
-                    "UInt8",
-                ):
-                    df[col] = df[col].astype(float)
-
-            # For numeric data, consider them equal within certain absolute and relative tolerances.
-            diffs[col] = np.isclose(
-                df1[col].values,
-                df2[col].values,
-                atol=absolute_tolerance,
-                rtol=relative_tolerance,
-                equal_nan=True,
-            )
+            warnings.warn(f"Unsupported dtype {df1[col].dtype}")
 
     return diffs
 
