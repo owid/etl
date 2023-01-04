@@ -14,3 +14,8 @@ meta:
   is_public: true
   description: |
     Energy Policy 37(3): 825-835. by Nemet, G. F (2009). Obtained via the Performance Curve Database by http://pcdb.santafe.edu.
+wdir: ../../../data/snapshots/papers/2023-01-04
+outs:
+- md5: 3ad0ba878a3f06addac0d6bc75c92b74
+  size: 915
+  path: nemet_2009.csv
