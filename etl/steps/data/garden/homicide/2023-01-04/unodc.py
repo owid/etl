@@ -3,6 +3,7 @@ from typing import List, cast
 
 import pandas as pd
 from owid.catalog import Dataset, Table
+from owid.catalog.utils import underscore_table
 from structlog import get_logger
 
 from etl.data_helpers import geo
@@ -31,13 +32,11 @@ def run(dest_dir: str) -> None:
     df = harmonize_countries(df)
 
     df = clean_data(df)
-
-    df = df.reset_index()
     # create new dataset with the same metadata as meadow
     ds_garden = Dataset.create_empty(dest_dir, metadata=ds_meadow.metadata)
 
     # create new table with the same metadata as meadow and add it to dataset
-    tb_garden = Table(df, like=tb_meadow)
+    tb_garden = underscore_table(Table(df, short_name=tb_meadow.metadata.short_name))
     ds_garden.add(tb_garden)
 
     # update metadata from yaml file
@@ -80,8 +79,10 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
 
     df = df[["country", "year", "unit_of_measurement", "value"]]
 
-    df = df.pivot(index=["country", "year"], columns="unit_of_measurement", values="value").reset_index(
-        drop="unit_of_measurement"
+    df = (
+        df.pivot(index=["country", "year"], columns="unit_of_measurement", values="value")
+        .reset_index()
+        .rename_axis(None, axis=1)
     )
 
     return df
