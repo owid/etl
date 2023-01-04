@@ -339,7 +339,8 @@ def _dataset_metadata_dict(ds: Dataset) -> Dict[str, Any]:
     d = ds.metadata.to_dict()
 
     # sort sources by name
-    d["sources"] = sorted(d["sources"], key=lambda x: x["name"])
+    if "sources" in d:
+        d["sources"] = sorted(d["sources"], key=lambda x: x["name"])
 
     del d["source_checksum"]
     return d
