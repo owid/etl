@@ -13,7 +13,7 @@ from etl.steps.data.converters import convert_snapshot_metadata
 # naming conventions
 paths = PathFinder(__file__)
 
-EXTRACTED_DATA_FILE = paths.directory / "extracted_data.csv"
+EXTRACTED_DATA_FILE = paths.directory / "renewable_energy_investments.data.csv"
 
 
 def run(dest_dir: str) -> None:
