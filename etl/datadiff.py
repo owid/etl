@@ -2,7 +2,7 @@ import difflib
 import os
 import re
 from pathlib import Path
-from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple
+from typing import Any, Callable, Dict, Iterable, List, Optional
 
 import pandas as pd
 import requests
