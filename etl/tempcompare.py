@@ -83,6 +83,58 @@ def sample_from_dataframe(df: pd.DataFrame, **kwargs: Any) -> pd.DataFrame:
     return cast(pd.DataFrame, df.sample(**kwargs).sort_index())
 
 
+def df_diff(
+    df1,
+    df2,
+    absolute_tolerance: float = 1e-08,
+    relative_tolerance: float = 1e-05,
+) -> pd.DataFrame:
+    """Compare two dataframes and return a dataframe with the differences."""
+    assert all(df1.columns == df2.columns), "Columns must be the same"
+    assert all(df1.index == df2.index), "Indices must be the same"
+
+    columns = df1.columns
+
+    # Union categories of categorical columns to enable comparison
+    for col in columns:
+        if df1[col].dtype == "category":
+            uc = union_categoricals([df1[col], df2[col]])
+            for df in [df1, df2]:
+                df[col] = pd.Categorical(df[col].values, categories=uc.categories)
+
+    # We don't use the compare function here from above because it builds a new
+    # dataframe and we want to leave indices intact so we can know which rows and columns
+    # were different once we drop the ones with no differences
+    diffs = df1.eq(df2) | (df1.isnull() & df2.isnull())
+
+    # Eq above does not take tolerance into account so compare again with tolerance
+    # for columns that are numeric. this could probably be sped up with a check on any on
+    # the column first but would have to be benchmarked
+    for col in diffs.columns:
+        if (df1[col].dtype in (object, "category")) or (df2[col].dtype in (object, "category")):
+            # Apply a direct comparison for strings or categories
+            pass
+        elif is_datetime64_any_dtype(df1[col]):
+            # Apply a direct comparison for datetimes
+            pass
+        else:
+            # Comparison does not work for Int64
+            for df in [df1, df2]:
+                if df[col].dtype in ("Int64", "UInt64", "Int32", "UInt32", "Int16", "UInt16", "Int8", "UInt8"):
+                    df[col] = df[col].astype(float)
+
+            # For numeric data, consider them equal within certain absolute and relative tolerances.
+            diffs[col] = np.isclose(
+                df1[col].values,
+                df2[col].values,
+                atol=absolute_tolerance,
+                rtol=relative_tolerance,
+                equal_nan=True,
+            )
+
+    return diffs
+
+
 class HighLevelDiff:
     """Class for comparing two dataframes.
 
@@ -198,44 +250,12 @@ class HighLevelDiff:
             df1_intersected = self.df1.loc[self.index_values_shared, list(self.columns_shared)]
             df2_intersected = self.df2.loc[self.index_values_shared, list(self.columns_shared)]
 
-            # Union categories of categorical columns to enable comparison
-            for col in self.columns_shared:
-                if df1_intersected[col].dtype == "category":
-                    uc = union_categoricals([df1_intersected[col], df2_intersected[col]])
-                    for df in [df1_intersected, df2_intersected]:
-                        df[col] = pd.Categorical(df[col].values, categories=uc.categories)
-
-            # We don't use the compare function here from above because it builds a new
-            # dataframe and we want to leave indices intact so we can know which rows and columns
-            # were different once we drop the ones with no differences
-            diffs = df1_intersected.eq(df2_intersected) | (df1_intersected.isnull() & df2_intersected.isnull())
-
-            # Eq above does not take tolerance into account so compare again with tolerance
-            # for columns that are numeric. this could probably be sped up with a check on any on
-            # the column first but would have to be benchmarked
-            for col in diffs.columns:
-                if (df1_intersected[col].dtype in (object, "category")) or (
-                    df2_intersected[col].dtype in (object, "category")
-                ):
-                    # Apply a direct comparison for strings or categories
-                    pass
-                elif is_datetime64_any_dtype(df1_intersected[col]):
-                    # Apply a direct comparison for datetimes
-                    pass
-                else:
-                    # Comparison does not work for Int64
-                    for df in [df1_intersected, df2_intersected]:
-                        if df[col].dtype in ("Int64", "UInt64", "Int32", "UInt32", "Int16", "UInt16", "Int8", "UInt8"):
-                            df[col] = df[col].astype(float)
-
-                    # For numeric data, consider them equal within certain absolute and relative tolerances.
-                    diffs[col] = np.isclose(
-                        df1_intersected[col].values,
-                        df2_intersected[col].values,
-                        atol=self.absolute_tolerance,
-                        rtol=self.relative_tolerance,
-                        equal_nan=True,
-                    )
+            diffs = df_diff(
+                df1_intersected,
+                df2_intersected,
+                absolute_tolerance=self.absolute_tolerance,
+                relative_tolerance=self.relative_tolerance,
+            )
 
             # We now have a dataframe with the same shape and indices as df1 and df2, filled with
             # True where the values are the same. We want to use true for different values, so invert

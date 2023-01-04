@@ -2,7 +2,7 @@ import difflib
 import os
 import re
 from pathlib import Path
-from typing import Any, Callable, Dict, Iterable, List, Optional
+from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple
 
 import pandas as pd
 import requests
@@ -15,6 +15,7 @@ from owid.catalog.catalogs import CHANNEL, OWID_CATALOG_URI
 from rich.console import Console
 
 from etl.files import yaml_dump
+from etl.tempcompare import df_diff
 
 log = structlog.get_logger()
 
@@ -78,7 +79,19 @@ class DatasetDiff:
                 self.p(f"\t[white]= Table [b]{table_name}[/b]")
 
             # compare columns
-            for col in sorted(set(table_a.columns) | set(table_b.columns)):
+            all_cols = sorted(set(table_a.columns) | set(table_b.columns))
+            shared_cols = sorted(set(table_a.columns) & set(table_b.columns))
+
+            if table_a[shared_cols].shape == table_b[shared_cols].shape:
+                # align dataframes by their primary key and compare
+                is_diff = df_diff(
+                    *_align_dataframes(table_a[shared_cols], table_b[shared_cols], sort_by=table_a.metadata.primary_key)
+                )
+                data_differs = (~is_diff).any().to_dict()
+            else:
+                data_differs = {col: False for col in shared_cols}
+
+            for col in all_cols:
                 if col not in table_a.columns:
                     self.p(f"\t\t[green]+ Column [b]{col}[/b]")
                 elif col not in table_b.columns:
@@ -87,19 +100,7 @@ class DatasetDiff:
                     col_a = table_a[col]
                     col_b = table_b[col]
                     shape_diff = col_a.shape != col_b.shape
-                    if not shape_diff:
-                        if col_a.dtype == "category":
-                            col_a = col_a.astype("string")
-                        if col_b.dtype == "category":
-                            col_b = col_b.astype("string")
-
-                        try:
-                            pd.testing.assert_series_equal(col_a, col_b, check_dtype=False)
-                            data_diff = False
-                        except AssertionError:
-                            data_diff = True
-                    else:
-                        data_diff = False
+                    data_diff = data_differs.get(col)
 
                     col_a_meta = col_a.metadata.to_dict()
                     col_b_meta = col_b.metadata.to_dict()
@@ -268,6 +269,20 @@ def _dict_diff(dict_a: Dict[str, Any], dict_b: Dict[str, Any], tabs) -> str:
 
     # add tabs
     return "\t" * tabs + "".join(lines).replace("\n", "\n" + "\t" * tabs).rstrip()
+
+
+def _align_dataframes(a: pd.DataFrame, b: pd.DataFrame, sort_by: List[str]) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    """Align two dataframes by sorting them in the same way and reordering categories to match."""
+    # reorder categories to match
+    for cat_col in a.select_dtypes("category").columns:
+        a[cat_col] = a[cat_col].cat.reorder_categories(sorted(a[cat_col].cat.categories))
+        b[cat_col] = b[cat_col].cat.reorder_categories(sorted(b[cat_col].cat.categories))
+
+    # sort both dataframes in the same way
+    a.sort_values(sort_by, inplace=True, ignore_index=True)
+    b.sort_values(sort_by, inplace=True, ignore_index=True)
+
+    return a, b
 
 
 def _match_dataset(path_to_ds: Dict[str, Any], path: str) -> Optional[Dataset]:
