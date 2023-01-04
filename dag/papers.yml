@@ -23,3 +23,5 @@ steps:
   #
   data://meadow/papers/2023-01-04/nemet_2009:
    - snapshot://papers/2023-01-04/nemet_2009.csv
+  data://garden/papers/2023-01-04/nemet_2009:
+    - data://meadow/papers/2023-01-04/nemet_2009
