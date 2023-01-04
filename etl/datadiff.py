@@ -150,6 +150,9 @@ class RemoteDataset:
 
         tables = tables[tables.channel == self.metadata.channel]  # type: ignore
 
+        # find matches substrings, we have to further filter it
+        tables = tables[tables.table == name]
+
         return tables.load()
 
 
