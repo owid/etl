@@ -139,7 +139,7 @@ class RemoteDataset:
         tables = find(
             table=name,
             namespace=self.metadata.namespace,
-            version=self.metadata.version,
+            version=str(self.metadata.version),
             dataset=self.metadata.short_name,
             channels=[self.metadata.channel],  # type: ignore
         )
@@ -337,6 +337,10 @@ def _table_metadata_dict(tab: Table) -> Dict[str, Any]:
 def _dataset_metadata_dict(ds: Dataset) -> Dict[str, Any]:
     """Extract metadata from Dataset object, prune and and return it as a dictionary"""
     d = ds.metadata.to_dict()
+
+    # sort sources by name
+    d["sources"] = sorted(d["sources"], key=lambda x: x["name"])
+
     del d["source_checksum"]
     return d
 
