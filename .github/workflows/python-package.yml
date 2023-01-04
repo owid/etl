@@ -65,7 +65,8 @@ jobs:
           cd vendor/owid-catalog-py
           make test
 
-      - name: walden tests
-        run: |
-          cd vendor/walden
-          make test
+      # walden was replaced by snapshots and is not actively developed
+      # - name: walden tests
+      #   run: |
+      #     cd vendor/walden
+      #     make test
