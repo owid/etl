@@ -26,3 +26,7 @@ steps:
   - data://meadow/ihme_gbd/2020-12-19/child_mortality
   data://grapher/ihme_gbd/2020-12-19/child_mortality:
   - data://garden/ihme_gbd/2020-12-19/child_mortality
+  data://meadow/homicide/2023-01-04/unodc:
+  - snapshot://homicide/2023-01-04/unodc.xlsx
+  data://garden/homicide/2023-01-04/unodc:
+  - data://meadow/homicide/2023-01-04/unodc

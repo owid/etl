@@ -103,6 +103,14 @@ steps:
   data://garden/malnutrition/2022-10-18/malnutrition:
     - data://garden/worldbank_wdi/2022-05-26/wdi
     - data://meadow/un/2022-07-11/un_wpp
+  
+  data://meadow/homicide/2023-01-03/who_mort_db:
+  - snapshot://homicide/2023-01-03/who_mort_db.csv
+  data://garden/homicide/2023-01-03/who_mort_db:
+  - data://meadow/homicide/2023-01-03/who_mort_db
+  data://grapher/homicide/2023-01-03/who_mort_db:
+  - data://garden/homicide/2023-01-03/who_mort_db
+  
   #
   # IHME - Global Burden of Disease.
   #
@@ -275,18 +283,6 @@ steps:
     - data://meadow/ggdc/2022-11-28/penn_world_table_national_accounts
   data://grapher/ggdc/2022-11-28/penn_world_table:
     - data://garden/ggdc/2022-11-28/penn_world_table
-
-  #
-  # Met Office Hadley Centre - Near surface temperature anomaly.
-  #
-  data://meadow/met_office_hadley_centre/2023-01-02/near_surface_temperature:
-    - snapshot://met_office_hadley_centre/2023-01-02/near_surface_temperature_global.csv
-    - snapshot://met_office_hadley_centre/2023-01-02/near_surface_temperature_northern_hemisphere.csv
-    - snapshot://met_office_hadley_centre/2023-01-02/near_surface_temperature_southern_hemisphere.csv
-  data://garden/met_office_hadley_centre/2023-01-02/near_surface_temperature:
-    - data://meadow/met_office_hadley_centre/2023-01-02/near_surface_temperature
-  data://grapher/met_office_hadley_centre/2023-01-02/near_surface_temperature:
-    - data://garden/met_office_hadley_centre/2023-01-02/near_surface_temperature
 
 # Sub-dags to import
 include:

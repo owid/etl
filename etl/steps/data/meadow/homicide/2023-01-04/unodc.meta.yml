@@ -16,43 +16,47 @@ dataset:
 tables:
   unodc:
     variables:
+      index:
+        title: index
+        short_unit: ''
+        unit: ''
       region:
         title: Region
-        short_unit: ''
         unit: ''
+        short_unit: ''
       subregion:
         title: Subregion
-        short_unit: ''
         unit: ''
+        short_unit: ''
       indicator:
         title: Indicator
-        short_unit: ''
         unit: ''
+        short_unit: ''
       dimension:
         title: Dimension
-        short_unit: ''
         unit: ''
+        short_unit: ''
       category:
         title: Category
-        short_unit: ''
         unit: ''
+        short_unit: ''
       sex:
         title: Sex
-        short_unit: ''
         unit: ''
+        short_unit: ''
       age:
         title: Age
-        short_unit: ''
         unit: ''
+        short_unit: ''
       unit_of_measurement:
         title: Unit of measurement
-        short_unit: ''
         unit: ''
+        short_unit: ''
       value:
         title: VALUE
-        short_unit: ''
         unit: ''
+        short_unit: ''
       source:
         title: Source
-        short_unit: ''
         unit: ''
+        short_unit: ''
