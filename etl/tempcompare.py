@@ -94,10 +94,8 @@ def df_equals(
     assert all(df1.columns == df2.columns), "Columns must be the same"
     assert all(df1.index == df2.index), "Indices must be the same"
 
-    columns = df1.columns
-
     # Union categories of categorical columns to enable comparison
-    for col in columns:
+    for col in df1.columns:
         if df1[col].dtype == "category":
             uc = union_categoricals([df1[col], df2[col]])
             for df in [df1, df2]:
@@ -119,9 +117,20 @@ def df_equals(
             # Apply a direct comparison for datetimes
             pass
         else:
-            # Comparison does not work for Int64
+            # Comparison does not work for certain types
             for df in [df1, df2]:
-                if df[col].dtype in ("Int64", "UInt64", "Int32", "UInt32", "Int16", "UInt16", "Int8", "UInt8"):
+                if df[col].dtype in (
+                    "Int64",
+                    "UInt64",
+                    "Float32",
+                    "Float16",
+                    "Int32",
+                    "UInt32",
+                    "Int16",
+                    "UInt16",
+                    "Int8",
+                    "UInt8",
+                ):
                     df[col] = df[col].astype(float)
 
             # For numeric data, consider them equal within certain absolute and relative tolerances.

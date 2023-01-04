@@ -54,6 +54,10 @@ class DatasetDiff:
             self.p(f"[red]- Dataset [b]{dataset_uri(ds_a)}[/b]")
         elif ds_b:
             self.p(f"[green]+ Dataset [b]{dataset_uri(ds_b)}[/b]")
+            for table_name in ds_b.table_names:
+                self.p(f"\t[green]+ Table [b]{table_name}[/b]")
+                for col in ds_b[table_name].columns:
+                    self.p(f"\t\t[green]+ Column [b]{col}[/b]")
 
     def _diff_tables(self, ds_a: Dataset, ds_b: Dataset, table_name: str):
         if table_name not in ds_b.table_names:
