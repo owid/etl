@@ -7,7 +7,7 @@ import click
 from etl.snapshot import Snapshot
 
 CURRENT_DIR = pathlib.Path(__file__).parent
-SNAPSHOT_VERSION = CURRENT_DIR.parent
+SNAPSHOT_VERSION = CURRENT_DIR.name
 
 
 @click.command()
