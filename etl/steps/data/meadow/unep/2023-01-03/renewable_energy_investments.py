@@ -32,7 +32,7 @@ def run(dest_dir: str) -> None:
     # Transpose data to have a column per energy source.
     df = df.set_index("sector").transpose().rename_axis("year").reset_index()
     # Add column for region.
-    df = df.assign(**{"country": "world"})
+    df = df.assign(**{"country": "World"})
 
     # Set an appropriate index and sort conveniently.
     df = df.set_index(["country", "year"], verify_integrity=True).sort_index()
