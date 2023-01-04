@@ -101,6 +101,10 @@ class PathFinder:
         if not self.f.as_posix().startswith(paths.STEP_DIR.as_posix()):
             raise CurrentFileMustBeAStep
 
+        # It could be either called from a module with short_name.py or __init__.py inside short_name/ dir.
+        if len(self.f.relative_to(paths.STEP_DIR).parts) == 6:
+            self.f = self.f.parent
+
         # Current step should be in the dag.
         if self.step not in DAG:
             raise CurrentStepMustBeInDag
@@ -123,19 +127,23 @@ class PathFinder:
 
     @property
     def country_mapping_path(self) -> Path:
-        return self.f.parent / (self.short_name + ".countries.json")
+        return self.directory / (self.short_name + ".countries.json")
 
     @property
     def excluded_countries_path(self) -> Path:
-        return self.f.parent / (self.short_name + ".excluded_countries.json")
+        return self.directory / (self.short_name + ".excluded_countries.json")
 
     @property
     def metadata_path(self) -> Path:
-        return self.f.parent / (self.short_name + ".meta.yml")
+        return self.directory / (self.short_name + ".meta.yml")
 
     @property
     def directory(self) -> Path:
-        return self.f.parent
+        # If the current file is a directory, it's a step with multiple files.
+        if self.f.is_dir():
+            return self.f
+        else:
+            return self.f.parent
 
     @property
     def meadow_dataset(self) -> catalog.Dataset:
