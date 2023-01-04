@@ -1,0 +1,11 @@
+dataset:
+  channel: garden
+  namespace: energy
+  short_name: photovoltaic_cost_and_capacity
+  title: Cost and capacity of photovoltaic technology
+  description: 
+  version: '2023-01-04'
+  sources:
+tables:
+  photovoltaic_cost_and_capacity:
+    variables:
