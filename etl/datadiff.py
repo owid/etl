@@ -15,7 +15,7 @@ from owid.catalog.catalogs import CHANNEL, OWID_CATALOG_URI
 from rich.console import Console
 
 from etl.files import yaml_dump
-from etl.tempcompare import df_diff
+from etl.tempcompare import df_equals
 
 log = structlog.get_logger()
 
@@ -65,8 +65,8 @@ class DatasetDiff:
             for col in ds_b[table_name].columns:
                 self.p(f"\t\t[green]+ Column [b]{col}[/b]")
         else:
-            table_a = ds_a[table_name].reset_index()
-            table_b = ds_b[table_name].reset_index()
+            table_a = _sort_index(ds_a[table_name]).reset_index()
+            table_b = _sort_index(ds_b[table_name]).reset_index()
 
             # compare table metadata
             diff = DeepDiff(_table_metadata_dict(table_a), _table_metadata_dict(table_b))
@@ -84,10 +84,8 @@ class DatasetDiff:
 
             if table_a[shared_cols].shape == table_b[shared_cols].shape:
                 # align dataframes by their primary key and compare
-                is_diff = df_diff(
-                    *_align_dataframes(table_a[shared_cols], table_b[shared_cols], sort_by=table_a.metadata.primary_key)
-                )
-                data_differs = (~is_diff).any().to_dict()
+                eq = df_equals(table_a[shared_cols], table_b[shared_cols])
+                data_differs = (~eq).any().to_dict()
             else:
                 data_differs = {col: False for col in shared_cols}
 
@@ -227,11 +225,13 @@ def cli(
             continue
 
         lines = []
-        differ = DatasetDiff(ds_a, ds_b, print=lambda x: lines.append(x), verbose=verbose)
-        differ.summary()
 
-        for line in lines:
-            console.print(line)
+        def _append_and_print(x):
+            lines.append(x)
+            console.print(x)
+
+        differ = DatasetDiff(ds_a, ds_b, print=_append_and_print, verbose=verbose)
+        differ.summary()
 
         if any("~" in line for line in lines):
             any_diff = True
@@ -271,18 +271,19 @@ def _dict_diff(dict_a: Dict[str, Any], dict_b: Dict[str, Any], tabs) -> str:
     return "\t" * tabs + "".join(lines).replace("\n", "\n" + "\t" * tabs).rstrip()
 
 
-def _align_dataframes(a: pd.DataFrame, b: pd.DataFrame, sort_by: List[str]) -> Tuple[pd.DataFrame, pd.DataFrame]:
-    """Align two dataframes by sorting them in the same way and reordering categories to match."""
-    # reorder categories to match
-    for cat_col in a.select_dtypes("category").columns:
-        a[cat_col] = a[cat_col].cat.reorder_categories(sorted(a[cat_col].cat.categories))
-        b[cat_col] = b[cat_col].cat.reorder_categories(sorted(b[cat_col].cat.categories))
+def _sort_index(df: Table) -> Table:
+    """Sort dataframe by its index and make sure categories are sorted by their
+    names and not codes. Modifies the dataframe in place and also returns it."""
+    new_levels = []
+    for level_name in df.index.names:
+        level = df.index.get_level_values(level_name)
+        if level.dtype == "category":
+            level = level.reorder_categories(sorted(level.categories))
+        new_levels.append(level)
 
-    # sort both dataframes in the same way
-    a.sort_values(sort_by, inplace=True, ignore_index=True)
-    b.sort_values(sort_by, inplace=True, ignore_index=True)
-
-    return a, b
+    df.index = pd.MultiIndex.from_arrays(new_levels)
+    df.sort_index(inplace=True)
+    return df
 
 
 def _match_dataset(path_to_ds: Dict[str, Any], path: str) -> Optional[Dataset]:

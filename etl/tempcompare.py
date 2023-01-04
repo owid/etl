@@ -83,13 +83,14 @@ def sample_from_dataframe(df: pd.DataFrame, **kwargs: Any) -> pd.DataFrame:
     return cast(pd.DataFrame, df.sample(**kwargs).sort_index())
 
 
-def df_diff(
+def df_equals(
     df1,
     df2,
     absolute_tolerance: float = 1e-08,
     relative_tolerance: float = 1e-05,
 ) -> pd.DataFrame:
-    """Compare two dataframes and return a dataframe with the differences."""
+    """Compare two dataframes and return a boolean dataframe with True
+    if values are the same or within tolerance."""
     assert all(df1.columns == df2.columns), "Columns must be the same"
     assert all(df1.index == df2.index), "Indices must be the same"
 
@@ -250,7 +251,7 @@ class HighLevelDiff:
             df1_intersected = self.df1.loc[self.index_values_shared, list(self.columns_shared)]
             df2_intersected = self.df2.loc[self.index_values_shared, list(self.columns_shared)]
 
-            diffs = df_diff(
+            diffs = df_equals(
                 df1_intersected,
                 df2_intersected,
                 absolute_tolerance=self.absolute_tolerance,
