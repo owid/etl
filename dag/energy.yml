@@ -181,6 +181,15 @@ steps:
   # The grapher dataset uses only the wide table from the garden dataset.
   data://grapher/irena/2022-10-25/renewable_energy_patents:
     - data://garden/irena/2022-10-25/renewable_energy_patents
+  #
+  # UNEP - Global trends in renewable energy investment (2019).
+  #
+  data://meadow/unep/2023-01-03/renewable_energy_investments:
+    - snapshot://unep/2023-01-03/global_trends_in_renewable_energy_investment.pdf
+  data://garden/unep/2023-01-03/renewable_energy_investments:
+    - data://meadow/unep/2023-01-03/renewable_energy_investments
+  data://grapher/unep/2023-01-03/renewable_energy_investments:
+    - data://garden/unep/2023-01-03/renewable_energy_investments
 
   ######################################################################################################################
   #
