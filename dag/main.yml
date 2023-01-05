@@ -124,6 +124,8 @@ steps:
   - data://grapher/fasttrack/2023-01-03/long_term_homicide_rates_in_europe
   - data://garden/homicide/2023-01-03/who_mort_db
   - data://garden/homicide/2023-01-04/unodc
+  data://grapher/homicide/2023-01-03/homicide_long_run_omm:
+  - data://garden/homicide/2023-01-03/homicide_long_run_omm
 
   # IHME - Global Burden of Disease.
   #
