@@ -1,13 +1,14 @@
 meta:
-  date_accessed: 2022-12-14
-  description: ''
-  file_extension: csv
-  is_public: false
-  name: DRAFT AI Index
   namespace: fasttrack
   short_name: ai_index
+  name: DRAFT AI Index
+  description: ''
   source_name: Google Sheet
-  url: gAAAAABjmcJkiXgBsXGbVw57kOHDJ-SzXznDLJEmuZ8mS1ozeo6hP_VsX9T6anUA8kevJmmvvkzLgRNT2fYh48Q_b9umN94kbtBZirhUA30r2DCCcQPOzqIK2kEj4akp5LURPn9QYMZkhlIhkq3dvxPVyJR4gL0jpE0MF_srafRnCEz2lfb0-66NGGy--6U0Q7-pWkpdtuynK1BfZqA4mpE9OYVGatCsyhhpC00aPAI5y5ACGJAJd07my9r8H4TTi2XYsHcRKdNS
+  url: ''
+  file_extension: csv
+  date_accessed: 2023-01-03
+  source_data_url: gAAAAABjtCoJsvAcFP0HlzzttugJ22k9uQxG_zI1RI2xwVQh0c5vMHtMqsOGl4K6uOZ_QCCXpzMOVGqBB-LWO1MggkfHb5gNl-CGzfe_SEK9Vt_qcAoGmQR4CVPG-7UUwQh04c_OHt9dIXZAePjkhnh39sF89K-1ugUX39JcKEWfOpf1sCEeCeHylAna-OYnbri77pNLSjiQKM2wSHWRrPbDXXYJhZCPGoLqEmuQcaHTX8ydP5EE3ou6hugAN7a845ixWU_U9DqM
+  is_public: false
   version: '2022-11-29'
 wdir: ../../../data/snapshots/fasttrack/2022-11-29
 outs:

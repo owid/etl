@@ -1,0 +1,23 @@
+meta:
+  namespace: fasttrack
+  short_name: long_term_homicide_rates_in_europe
+  name: DRAFT Long-term homicide rates in Europe - Eisner (2014)
+  description: |-
+    The homicide rate data shown here is taken from Table 4 on pages 80-81 in Eisner (2015). In the table homicide rate estimates are given for a range of years, we present data for the mid-point year here. For example, if data is given for 1200-1299 we show this as 1250.
+
+    Dataset notes:
+
+    * For 1775 and 1862 the data for Switzerland are for the canton of Zurich only.
+    * From 1825 onwards the estimates for Corsica and Sardinia are for Sardinia only.
+  source_name: Google Sheet
+  url: https://www.hoplofobia.info/wp-content/uploads/2015/08/From-Swords-to-Words_Eisner2014.pdf
+  file_extension: csv
+  date_accessed: 2023-01-05
+  source_data_url: gAAAAABjtpLN5fm3o7YQ1I_cMs9mXGHiQuIrisl9pVnShbAGB6WPTZ9z_rhsHjLUxYQ3Wk6wMv1XLGvplni_I3TkJD9XL2pjbXaHj-V0rHaPfBOLM_u-JVn1Z9MssaSD-Ioe4H4H9keV65EtlTmI0peu41am5dWAX5Q8PeyPapUN63RoAEeoIlxoj_53u_N1QyFR0drWgymOMpQOgWCIu7yyvGllbY4OXgXv3Mdpo8UgwjgnsX4KA3s1vymKZX6NPHQ5Qjpwhplp
+  is_public: false
+  version: '2023-01-03'
+wdir: ../../../data/snapshots/fasttrack/2023-01-03
+outs:
+- md5: 878c6031c03234033459e3b11dc18658
+  size: 3225
+  path: long_term_homicide_rates_in_europe.csv
