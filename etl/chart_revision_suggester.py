@@ -566,6 +566,8 @@ class ChartRevisionSuggester:
         for _id in _ids:
             if _id in self.var_id2year_range:
                 years += self.var_id2year_range[_id]
+        if not years:
+            raise ValueError(f"No year range was found because of variables {_ids}")
         return IntRange.from_values(years)
 
     def _is_min_year_hardcoded(self, chart_config: dict[Any, Any]) -> bool:
