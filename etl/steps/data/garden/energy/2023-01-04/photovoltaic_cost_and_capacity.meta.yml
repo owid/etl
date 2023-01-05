@@ -3,9 +3,26 @@ dataset:
   namespace: energy
   short_name: photovoltaic_cost_and_capacity
   title: Cost and capacity of photovoltaic technology
-  description: 
+  description: |
+    Prices from Nemet (2009) and from Farmer & LaFond (2016) have been
+    converted to 2021 US$ using the US GDP deflator: https://www.multpl.com/gdp-deflator/table/by-year
   version: '2023-01-04'
   sources:
+  - name: TODO
 tables:
   photovoltaic_cost_and_capacity:
     variables:
+      cost:
+        short_unit: ''
+        unit: ''
+        description:
+      cost_source:
+        unit: ''
+        description: Source for each value of cost data.
+      cumulative_capacity:
+        short_unit: ''
+        unit: ''
+        description:
+      cumulative_capacity_source:
+        unit: ''
+        description: Source for each value of cumulative capacity data.
