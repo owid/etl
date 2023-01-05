@@ -302,3 +302,4 @@ include:
   - dag/emissions.yml
   - dag/papers.yml
   - dag/demography.yml
+  - dag/fasttrack.yml
