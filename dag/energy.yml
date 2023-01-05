@@ -150,15 +150,6 @@ steps:
   #
   # IRENA - Renewable power generation costs (2022).
   #
-  # TODO: Remove the following step, which is outdated.
-  data://meadow/irena/2022-10-20/renewable_power_generation_costs:
-    - walden://irena/2022-10-07/renewable_power_generation_costs
-  # TODO: Remove the following step, which is outdated.
-  data://garden/irena/2022-10-20/renewable_power_generation_costs:
-    - data://meadow/irena/2022-10-20/renewable_power_generation_costs
-  # TODO: Remove the following step, which is outdated.
-  data://grapher/irena/2022-10-20/renewable_power_generation_costs:
-    - data://garden/irena/2022-10-20/renewable_power_generation_costs
   data://meadow/irena/2023-01-04/renewable_power_generation_costs:
     - walden://irena/2022-10-07/renewable_power_generation_costs
   data://garden/irena/2023-01-04/renewable_power_generation_costs:
@@ -168,16 +159,6 @@ steps:
   #
   # IRENA - Renewable electricity capacity (and generation, although the generation part is ignored for now, 2022).
   #
-  # TODO: Remove the following step, which is outdated.
-  data://meadow/irena/2022-10-20/renewable_electricity_capacity_and_generation:
-    - walden://irena/2022-10-07/renewable_electricity_capacity_and_generation
-  # TODO: Remove the following step, which is outdated.
-  # The following dataset only contains capacity.
-  data://garden/irena/2022-10-20/renewable_electricity_capacity:
-    - data://meadow/irena/2022-10-20/renewable_electricity_capacity_and_generation
-  # TODO: Remove the following step, which is outdated.
-  data://grapher/irena/2022-10-20/renewable_electricity_capacity_by_technology:
-    - data://garden/irena/2022-10-20/renewable_electricity_capacity
   data://meadow/irena/2023-01-04/renewable_electricity_capacity_and_generation:
     - walden://irena/2022-10-07/renewable_electricity_capacity_and_generation
   data://garden/irena/2023-01-04/renewable_electricity_capacity:
@@ -305,5 +286,23 @@ steps:
     - data://garden/energy/2022-12-13/electricity_mix
   data://grapher/energy/2022-12-13/uk_historical_electricity:
     - data://garden/energy/2022-12-13/uk_historical_electricity
+  #
+  # IRENA - Renewable electricity capacity (and generation, although the generation part is ignored for now, 2022).
+  #
+  data://meadow/irena/2022-10-20/renewable_electricity_capacity_and_generation:
+    - walden://irena/2022-10-07/renewable_electricity_capacity_and_generation
+  data://garden/irena/2022-10-20/renewable_electricity_capacity:
+    - data://meadow/irena/2022-10-20/renewable_electricity_capacity_and_generation
+  data://grapher/irena/2022-10-20/renewable_electricity_capacity_by_technology:
+    - data://garden/irena/2022-10-20/renewable_electricity_capacity
+  #
+  # IRENA - Renewable power generation costs (2022).
+  #
+  data://meadow/irena/2022-10-20/renewable_power_generation_costs:
+    - walden://irena/2022-10-07/renewable_power_generation_costs
+  data://garden/irena/2022-10-20/renewable_power_generation_costs:
+    - data://meadow/irena/2022-10-20/renewable_power_generation_costs
+  data://grapher/irena/2022-10-20/renewable_power_generation_costs:
+    - data://garden/irena/2022-10-20/renewable_power_generation_costs
 
 ######################################################################################################################
