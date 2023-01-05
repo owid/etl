@@ -1,20 +1,17 @@
 import pandas as pd
 from owid import catalog
-from owid.catalog import Dataset
-from owid.catalog.utils import underscore
-from owid.datautils import dataframes
 from structlog import get_logger
 
-from etl.paths import DATA_DIR, REFERENCE_DATASET
+from etl.helpers import PathFinder
+from etl.paths import DATA_DIR
 
 log = get_logger()
 
-from .shared import CURRENT_DIR
-
-METADATA_PATH = CURRENT_DIR / "overview.meta.yml"
-
 
 WHO_MORTALITY_DB = DATA_DIR / "garden/homicide/2023-01-03/who_mort_db"
+paths = PathFinder(__file__)
+
+ds_eisner: catalog.Dataset = paths.load_dependency("long_term_homicide_rates_in_europe")
 
 
 def get_who_mortality_db() -> pd.DataFrame:
