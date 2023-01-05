@@ -17,9 +17,7 @@ CURRENT_DIR = pathlib.Path(__file__).parent
     help="Upload dataset to Snapshot",
 )
 def main(upload: bool) -> None:
-    snap = Snapshot(
-        "homicide/2023-01-04/unodc.xlsx"
-    )
+    snap = Snapshot("homicide/2023-01-04/unodc.xlsx")
     snap.download_from_source()
     snap.dvc_add(upload=upload)
 
