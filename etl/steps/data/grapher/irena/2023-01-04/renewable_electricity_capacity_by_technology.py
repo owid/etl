@@ -6,7 +6,7 @@ from etl.helpers import PathFinder
 paths = PathFinder(__file__)
 
 # Details for output dataset.
-DATASET_TITLE = "Renewable electricity capacity by technology"
+DATASET_TITLE = "Renewable electricity capacity by technology (IRENA, 2023)"
 
 
 def run(dest_dir: str) -> None:
