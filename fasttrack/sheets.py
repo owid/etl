@@ -1,5 +1,4 @@
 import concurrent.futures
-from collections.abc import Iterable
 from typing import Any, Dict, List, Optional, Tuple, cast
 
 import pandas as pd
@@ -49,18 +48,18 @@ def import_google_sheets(url: str) -> Dict[str, Any]:
 
 def parse_data_from_sheets(data_df: pd.DataFrame) -> pd.DataFrame:
     # lowercase columns names
-    for col in ("entity", "year", "country"):
-        if col in data_df:
+    for col in data_df.columns:
+        if col.lower() in ("entity", "year", "country"):
             data_df.rename(columns={col: col.lower()}, inplace=True)
 
     if "entity" in data_df.columns:
         data_df = data_df.rename(columns={"entity": "country"})
 
     if "year" not in data_df.columns:
-        raise ValidationError("Missing column 'year' in data (is it lowercase?)")
+        raise ValidationError("Missing column 'year' in data")
 
     if "country" not in data_df.columns:
-        raise ValidationError("Missing column 'country' in data (is it lowercase?)")
+        raise ValidationError("Missing column 'country' in data")
 
     # check types
     if data_df.year.dtype not in INT_TYPES:
@@ -108,14 +107,22 @@ def parse_metadata_from_sheets(
     variables_dict = {v.pop("short_name"): v for v in variables_list}
 
     # extract fields for snapshot
+    # NOTE: we used to have special fields in dataset_meta for `url` and `publication_year`, but these
+    # are the same fields as in source so we use these instead
+    if len(dataset_dict.get("sources", [])) > 0:
+        dataset_source = dataset_dict["sources"][0]
+    else:
+        dataset_source = {}
+
     partial_snapshot_meta = _prune_empty(
         {
-            "publication_year": dataset_dict.pop("publication_year", None),
+            # "publication_year": dataset_dict.pop("publication_year", None),
+            "publication_year": dataset_source.get("publication_year", None),
             "license_url": dataset_dict.pop("license_url", None),
             "license_name": dataset_dict.pop("license_name", None),
         }
     )
-    partial_snapshot_meta["url"] = dataset_dict.pop("url", "")
+    partial_snapshot_meta["url"] = dataset_source.get("url", "")
 
     _move_keys_to_the_end(dataset_dict, ["description", "sources"])
 
@@ -125,7 +132,7 @@ def parse_metadata_from_sheets(
     )
 
 
-def _expand_sources(sources_name: str, sources_dict: Dict[str, Any]) -> Iterable[str]:
+def _expand_sources(sources_name: str, sources_dict: Dict[str, Any]) -> List[Dict[str, Any]]:
     return [sources_dict[source_short_name] for source_short_name in map(lambda s: s.strip(), sources_name.split(","))]
 
 

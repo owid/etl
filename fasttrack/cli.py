@@ -257,7 +257,7 @@ def _load_data_and_meta(
     ] + _load_existing_sheets_from_snapshots()
 
     sheets_url = None
-    selected_sheet = None
+    selected_sheet = "unselected"
 
     # endless loop that breaks if everything passed validatin
     while True:
@@ -269,7 +269,7 @@ def _load_data_and_meta(
                 [
                     pi.input(
                         "New Google Sheets URL",
-                        value=sheets_url if selected_sheet is None else "",
+                        value=sheets_url if selected_sheet == "unselected" else "",
                         name="new_sheets_url",
                         help_text="Click on `File -> Share -> Publish to Web` and share the entire document as csv. Copy the link above.",
                     ),
@@ -365,7 +365,7 @@ def _load_data_and_meta(
             else:
                 unknown_countries_select = pi.select(
                     "Unknown countries found, what do you want to do?",
-                    ["restart import", "drop unknown countries", "keep unknown countries"],
+                    ["keep unknown countries", "drop unknown countries", "restart import"],
                     help_text="You can fix those countries in the spreadsheet and restart import",
                 )
 
