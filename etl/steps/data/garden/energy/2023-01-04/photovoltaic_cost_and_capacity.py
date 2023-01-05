@@ -5,15 +5,14 @@ Data content:
 * Nemet (2009) provides cost data between 1975 and 2003.
 * IRENA provides cumulative capacity data betwen 2000 and 2021.
 * IRENA provides cost data betwen 2010 and 2021.
-* Farmer & Lafond (2016) provide cost data between 19980 and 2013.
+* Farmer & Lafond (2016) provide cost data between 1980 and 2013.
 
-For each informed year, we need to combine these sources with the followint two constraints:
+For each informed year, we need to combine these sources with the following two constraints:
 * Having data from the most recent source.
 * Avoid (as much as possible) having cost and capacity data on a given year from different sources.
 
 Therefore, for capacity data, we use Nemet (2009) between 1975 and 2003, and IRENA between 2004 and 2021.
-For cost data, we use Nemet (2009) between 1975 and 2003, Farmer & Lafond (2016) between 2004 and 2009,
-and IRENA between 2010 and 2021.
+For cost data, we use Nemet (2009) between 1975 and 2003, Farmer & Lafond (2016) between 2004 and 2009, and IRENA between 2010 and 2021.
 
 """
 

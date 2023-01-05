@@ -15,6 +15,9 @@ def run(dest_dir: str) -> None:
     ds_garden: catalog.Dataset = paths.load_dependency("photovoltaic_cost_and_capacity")
     tb_garden = ds_garden["photovoltaic_cost_and_capacity"]
 
+    # Remove unnecessary columns.
+    tb_garden = tb_garden.drop(columns=["cost_source", "cumulative_capacity_source"])
+
     # Create a new grapher dataset.
     dataset = catalog.Dataset.create_empty(dest_dir, ds_garden.metadata)
 
