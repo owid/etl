@@ -23,7 +23,6 @@ from etl.match_variables import (
     find_mapping_suggestions,
     preliminary_mapping,
 )
-
 from .utils import OWIDEnv, _check_env, _show_environment
 
 # Paths
@@ -143,6 +142,8 @@ class Navigation:
     def show_instructions(self) -> None:
         """Show initial step description."""
         log.info("1. Showing instructions")
+        po.put_markdown("# Walkthrough - Charts")
+        po.put_info(po.put_markdown("`charts` step can be only executed by OWID staff!"))
         with open(CURRENT_DIR / "charts.md", "r") as f:
             po.put_markdown(f.read())
 
@@ -255,7 +256,10 @@ class Navigation:
                         else {"label": f_name, "value": f_name, "selected": False}
                         for f_name in SIMILARITY_NAMES
                     ],
-                    help_text="Select the prefered function for matching variables. https://google.com",
+                    help_text=(
+                        "Select the prefered function for matching variables. Find more details at"
+                        " https://www.analyticsvidhya.com/blog/2021/07/fuzzy-string-matching-a-hands-on-guide/"
+                    ),
                 ),  #
                 pi.checkbox(
                     "",
