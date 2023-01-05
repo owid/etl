@@ -181,6 +181,7 @@ class ChartRevisionSuggester:
                     "originalConfig": row.config,
                     "suggestedConfig": chart_config_str,
                     "suggested_reason": self._get_chart_update_reason(new_variables),
+                    "chartSlug": json.loads(row.config).get("slug"),
                 }
                 return suggested_chart_revision
 
