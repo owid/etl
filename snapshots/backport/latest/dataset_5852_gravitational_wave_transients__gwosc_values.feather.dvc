@@ -1,0 +1,17 @@
+meta:
+  namespace: backport
+  short_name: dataset_5852_gravitational_wave_transients__gwosc_values
+  name: Gravitational wave transients (GWOSC)
+  description: https://github.com/owid/notebooks/tree/main/EdouardMathieu/gravitational_waves
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/5852
+  file_extension: feather
+  date_accessed: 2023-01-05 12:01:04.449795
+  is_public: false
+  version: latest
+  publication_date: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 7f4a4db6277e350f51f2d0fd2dd8cf53
+  size: 6194
+  path: dataset_5852_gravitational_wave_transients__gwosc_values.feather
