@@ -105,10 +105,6 @@ class PathFinder:
         if len(self.f.relative_to(paths.STEP_DIR).parts) == 6:
             self.f = self.f.parent
 
-        # Current step should be in the dag.
-        if self.step not in DAG:
-            raise CurrentStepMustBeInDag
-
     @property
     def channel(self) -> str:
         return self.f.parent.parent.parent.name
@@ -215,6 +211,10 @@ class PathFinder:
 
     @property
     def dependencies(self) -> List[str]:
+        # Current step should be in the dag.
+        if self.step not in DAG:
+            raise CurrentStepMustBeInDag
+
         return DAG[self.step]
 
     def get_dependency_step_name(

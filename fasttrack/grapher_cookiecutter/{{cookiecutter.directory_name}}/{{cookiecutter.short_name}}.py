@@ -15,12 +15,9 @@ def run(dest_dir: str) -> None:
 
     # create empty dataframe and table
     ds = catalog.Dataset.create_empty(dest_dir)
-    tb = catalog.Table(data)
+    tb = catalog.Table(data, short_name=N.short_name)
 
-    # update metadata from *.meta.yml
-    ds.metadata.update_from_yaml(N.metadata_path)
-    tb.update_metadata_from_yaml(N.metadata_path, N.short_name)
-
-    # add table to dataset and save
+    # add table, update metadata from *.meta.yml and save
     ds.add(tb)
+    ds.update_metadata(N.metadata_path)
     ds.save()
