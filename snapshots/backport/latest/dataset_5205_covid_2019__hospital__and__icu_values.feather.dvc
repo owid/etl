@@ -6,12 +6,12 @@ meta:
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5205
   file_extension: feather
-  date_accessed: 2023-01-05 06:01:48.524184
+  date_accessed: 2023-01-05 23:41:36.981273
   is_public: true
   version: latest
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: fcf7082ddd4406db7fbdb60897c8e411
-  size: 832394
+- md5: c9474b30b8499ca014aa26f356f4a480
+  size: 833234
   path: dataset_5205_covid_2019__hospital__and__icu_values.feather
