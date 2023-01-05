@@ -38,9 +38,10 @@ def prepare_capacity_data(tb_nemet: catalog.Table, tb_irena_capacity: catalog.Ta
     # As they explain in the paper, "Following Epple et al. (1991), cumulative capacity is lagged one year to account
     # for the time it takes to incorporate new techniques obtained as a result of learning from experience."
     tb_nemet_capacity = tb_nemet[["year", "cost", "previous_capacity"]].rename(
-        columns={"previous_capacity": "cumulative_capacity"}, errors="raise")[['year', 'cumulative_capacity']]
+        columns={"previous_capacity": "cumulative_capacity"}, errors="raise"
+    )[["year", "cumulative_capacity"]]
     # Add column of origin of the data.
-    tb_nemet_capacity['cumulative_capacity_source'] = 'Nemet (2009)'
+    tb_nemet_capacity["cumulative_capacity_source"] = "Nemet (2009)"
 
     # I haven't found a precise definition of the variables in IRENA's dataset, but I expect this to be
     # cumulative capacity.
@@ -49,22 +50,27 @@ def prepare_capacity_data(tb_nemet: catalog.Table, tb_irena_capacity: catalog.Ta
         .rename(columns={"solar_photovoltaic": "cumulative_capacity"}, errors="raise")
         .reset_index(drop=True)
     )
-    tb_irena_capacity['cumulative_capacity_source'] = 'IRENA'
+    tb_irena_capacity["cumulative_capacity_source"] = "IRENA"
 
     # Combine cumulative capacity from Nemet (2009) and IRENA, prioritising the former on ovelapping years.
-    cumulative_capacity = combine_two_overlapping_dataframes(
-        df1=tb_nemet_capacity, df2=tb_irena_capacity, index_columns=['year']).\
-        astype({'year': int}).sort_values('year').reset_index(drop=True)
+    cumulative_capacity = (
+        combine_two_overlapping_dataframes(df1=tb_nemet_capacity, df2=tb_irena_capacity, index_columns=["year"])
+        .astype({"year": int})
+        .sort_values("year")
+        .reset_index(drop=True)
+    )
 
     return cumulative_capacity
 
 
-def prepare_cost_data(tb_nemet: catalog.Table, tb_irena_cost: catalog.Table, tb_farmer_lafond: catalog.Table) -> catalog.Table:
+def prepare_cost_data(
+    tb_nemet: catalog.Table, tb_irena_cost: catalog.Table, tb_farmer_lafond: catalog.Table
+) -> catalog.Table:
     # Prepare solar photovoltaic cost data from Nemet (2009).
-    tb_nemet_cost = tb_nemet[['year', 'cost']].copy()
-    tb_nemet_cost['cost_source'] = 'Nemet (2009)'
+    tb_nemet_cost = tb_nemet[["year", "cost"]].copy()
+    tb_nemet_cost["cost_source"] = "Nemet (2009)"
     # Costs are given in "2004 USD/Watt", so we need to convert them to 2021 USD.
-    tb_nemet_cost['cost'] *= USD2004_TO_USD2021
+    tb_nemet_cost["cost"] *= USD2004_TO_USD2021
 
     # Prepare solar photovoltaic cost data from Farmer & Lafond (2016).
     tb_farmer_lafond = (
@@ -73,9 +79,9 @@ def prepare_cost_data(tb_nemet: catalog.Table, tb_irena_cost: catalog.Table, tb_
         .reset_index(drop=True)
         .rename(columns={"photovoltaics": "cost"}, errors="raise")
     )
-    tb_farmer_lafond['cost_source'] = 'Farmer & Lafond (2016)'
+    tb_farmer_lafond["cost_source"] = "Farmer & Lafond (2016)"
     # Costs are given in "2013 USD/Wp", so we need to convert them to 2021 USD.
-    tb_farmer_lafond['cost'] *= USD2013_TO_USD2021
+    tb_farmer_lafond["cost"] *= USD2013_TO_USD2021
 
     # Prepare solar photovoltaic cost data from IRENA.
     tb_irena_cost = (
@@ -84,14 +90,14 @@ def prepare_cost_data(tb_nemet: catalog.Table, tb_irena_cost: catalog.Table, tb_
         .dropna()
         .reset_index(drop=True)
     )
-    tb_irena_cost['cost_source'] = 'IRENA'
+    tb_irena_cost["cost_source"] = "IRENA"
     # Costs are given in "2021 USD/W", so we do not need to correct them.
 
     # Combine Nemet (2009) and Farmer & Lafond (2016), prioritizing the former.
-    combined = combine_two_overlapping_dataframes(df1=tb_nemet_cost, df2=tb_farmer_lafond, index_columns='year')
+    combined = combine_two_overlapping_dataframes(df1=tb_nemet_cost, df2=tb_farmer_lafond, index_columns="year")
 
     # Combine the previous with IRENA, prioritizing the latter.
-    combined = combine_two_overlapping_dataframes(df1=tb_irena_cost, df2=combined, index_columns='year')
+    combined = combine_two_overlapping_dataframes(df1=tb_irena_cost, df2=combined, index_columns="year")
 
     return combined
 
@@ -126,7 +132,7 @@ def run(dest_dir: str) -> None:
     cost = prepare_cost_data(tb_nemet=tb_nemet, tb_irena_cost=tb_irena_cost, tb_farmer_lafond=tb_farmer_lafond)
 
     # Combine capacity and cost data.
-    tb_combined = pd.merge(cost, cumulative_capacity, on="year", how='outer')
+    tb_combined = pd.merge(cost, cumulative_capacity, on="year", how="outer")
 
     # Add column for region.
     tb_combined = tb_combined.assign(**{"country": "World"})
