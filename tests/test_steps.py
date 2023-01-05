@@ -13,6 +13,7 @@ from contextlib import contextmanager
 from typing import Iterator
 from unittest.mock import patch
 
+import pandas as pd
 from owid.catalog import Dataset
 
 from etl import paths
@@ -50,6 +51,23 @@ def test_data_step():
         _create_mock_py_file(step_name)
         DataStep(step_name, []).run()
         Dataset((paths.DATA_DIR / step_name).as_posix())
+
+
+def test_data_step_becomes_dirty_when_pandas_version_changes():
+    pandas_version = pd.__version__
+    try:
+        with temporary_step() as step_name:
+            _create_mock_py_file(step_name)
+            d = DataStep(step_name, [])
+            assert d.is_dirty()
+            d.run()
+            assert not d.is_dirty()
+
+            pd.__version__ += ".test"  # type: ignore
+            assert d.is_dirty()
+
+    finally:
+        pd.__version__ = pandas_version  # type: ignore
 
 
 @contextmanager
