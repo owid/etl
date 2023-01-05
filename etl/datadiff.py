@@ -15,6 +15,7 @@ from owid.catalog.catalogs import CHANNEL, OWID_CATALOG_URI
 from rich.console import Console
 
 from etl.files import yaml_dump
+from etl.tempcompare import df_equals
 
 log = structlog.get_logger()
 
@@ -53,6 +54,10 @@ class DatasetDiff:
             self.p(f"[red]- Dataset [b]{dataset_uri(ds_a)}[/b]")
         elif ds_b:
             self.p(f"[green]+ Dataset [b]{dataset_uri(ds_b)}[/b]")
+            for table_name in ds_b.table_names:
+                self.p(f"\t[green]+ Table [b]{table_name}[/b]")
+                for col in ds_b[table_name].columns:
+                    self.p(f"\t\t[green]+ Column [b]{col}[/b]")
 
     def _diff_tables(self, ds_a: Dataset, ds_b: Dataset, table_name: str):
         if table_name not in ds_b.table_names:
@@ -64,8 +69,8 @@ class DatasetDiff:
             for col in ds_b[table_name].columns:
                 self.p(f"\t\t[green]+ Column [b]{col}[/b]")
         else:
-            table_a = ds_a[table_name].reset_index()
-            table_b = ds_b[table_name].reset_index()
+            table_a = _sort_index(ds_a[table_name]).reset_index()
+            table_b = _sort_index(ds_b[table_name]).reset_index()
 
             # compare table metadata
             diff = DeepDiff(_table_metadata_dict(table_a), _table_metadata_dict(table_b))
@@ -78,7 +83,17 @@ class DatasetDiff:
                 self.p(f"\t[white]= Table [b]{table_name}[/b]")
 
             # compare columns
-            for col in sorted(set(table_a.columns) | set(table_b.columns)):
+            all_cols = sorted(set(table_a.columns) | set(table_b.columns))
+            shared_cols = sorted(set(table_a.columns) & set(table_b.columns))
+
+            if table_a[shared_cols].shape == table_b[shared_cols].shape:
+                # align dataframes by their primary key and compare
+                eq = df_equals(table_a[shared_cols], table_b[shared_cols])
+                data_differs = (~eq).any().to_dict()
+            else:
+                data_differs = {col: False for col in shared_cols}
+
+            for col in all_cols:
                 if col not in table_a.columns:
                     self.p(f"\t\t[green]+ Column [b]{col}[/b]")
                 elif col not in table_b.columns:
@@ -87,19 +102,7 @@ class DatasetDiff:
                     col_a = table_a[col]
                     col_b = table_b[col]
                     shape_diff = col_a.shape != col_b.shape
-                    if not shape_diff:
-                        if col_a.dtype == "category":
-                            col_a = col_a.astype("string")
-                        if col_b.dtype == "category":
-                            col_b = col_b.astype("string")
-
-                        try:
-                            pd.testing.assert_series_equal(col_a, col_b, check_dtype=False)
-                            data_diff = False
-                        except AssertionError:
-                            data_diff = True
-                    else:
-                        data_diff = False
+                    data_diff = data_differs.get(col)
 
                     col_a_meta = col_a.metadata.to_dict()
                     col_b_meta = col_b.metadata.to_dict()
@@ -140,12 +143,15 @@ class RemoteDataset:
         tables = find(
             table=name,
             namespace=self.metadata.namespace,
-            version=self.metadata.version,
+            version=str(self.metadata.version),
             dataset=self.metadata.short_name,
             channels=[self.metadata.channel],  # type: ignore
         )
 
         tables = tables[tables.channel == self.metadata.channel]  # type: ignore
+
+        # find matches substrings, we have to further filter it
+        tables = tables[tables.table == name]
 
         return tables.load()
 
@@ -226,11 +232,13 @@ def cli(
             continue
 
         lines = []
-        differ = DatasetDiff(ds_a, ds_b, print=lambda x: lines.append(x), verbose=verbose)
-        differ.summary()
 
-        for line in lines:
-            console.print(line)
+        def _append_and_print(x):
+            lines.append(x)
+            console.print(x)
+
+        differ = DatasetDiff(ds_a, ds_b, print=_append_and_print, verbose=verbose)
+        differ.summary()
 
         if any("~" in line for line in lines):
             any_diff = True
@@ -268,6 +276,21 @@ def _dict_diff(dict_a: Dict[str, Any], dict_b: Dict[str, Any], tabs) -> str:
 
     # add tabs
     return "\t" * tabs + "".join(lines).replace("\n", "\n" + "\t" * tabs).rstrip()
+
+
+def _sort_index(df: Table) -> Table:
+    """Sort dataframe by its index and make sure categories are sorted by their
+    names and not codes. Modifies the dataframe in place and also returns it."""
+    new_levels = []
+    for level_name in df.index.names:
+        level = df.index.get_level_values(level_name)
+        if level.dtype == "category":
+            level = level.reorder_categories(sorted(level.categories))
+        new_levels.append(level)
+
+    df.index = pd.MultiIndex.from_arrays(new_levels)
+    df.sort_index(inplace=True)
+    return df
 
 
 def _match_dataset(path_to_ds: Dict[str, Any], path: str) -> Optional[Dataset]:
@@ -321,6 +344,11 @@ def _table_metadata_dict(tab: Table) -> Dict[str, Any]:
 def _dataset_metadata_dict(ds: Dataset) -> Dict[str, Any]:
     """Extract metadata from Dataset object, prune and and return it as a dictionary"""
     d = ds.metadata.to_dict()
+
+    # sort sources by name
+    if "sources" in d:
+        d["sources"] = sorted(d["sources"], key=lambda x: x["name"])
+
     del d["source_checksum"]
     return d
 

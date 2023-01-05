@@ -17,7 +17,7 @@ steps:
   data://garden/gapminder/2019-12-10/population:
     - data://meadow/gapminder/2019-12-10/population
   data://meadow/un/2022-07-11/un_wpp:
-    - walden://un/2022-07-11/un_wpp
+    - snapshot://un/2022-07-11/un_wpp.zip
   data://garden/un/2022-07-11/un_wpp:
     - data://meadow/un/2022-07-11/un_wpp
   data://explorers/un/2022/un_wpp:
@@ -296,6 +296,22 @@ steps:
     - data://meadow/ggdc/2022-11-28/penn_world_table_national_accounts
   data://grapher/ggdc/2022-11-28/penn_world_table:
     - data://garden/ggdc/2022-11-28/penn_world_table
+
+  #
+  # Met Office Hadley Centre - Near surface temperature anomaly.
+  #
+  data://meadow/met_office_hadley_centre/2023-01-02/near_surface_temperature:
+    - snapshot://met_office_hadley_centre/2023-01-02/near_surface_temperature_global.csv
+    - snapshot://met_office_hadley_centre/2023-01-02/near_surface_temperature_northern_hemisphere.csv
+    - snapshot://met_office_hadley_centre/2023-01-02/near_surface_temperature_southern_hemisphere.csv
+  data://garden/met_office_hadley_centre/2023-01-02/near_surface_temperature:
+    - data://meadow/met_office_hadley_centre/2023-01-02/near_surface_temperature
+  data://grapher/met_office_hadley_centre/2023-01-02/near_surface_temperature:
+    - data://garden/met_office_hadley_centre/2023-01-02/near_surface_temperature
+
+  # Long-term homicide rates in Europe - Eisner (2014)
+  data://grapher/fasttrack/2023-01-03/long_term_homicide_rates_in_europe:
+    - snapshot://fasttrack/2023-01-03/long_term_homicide_rates_in_europe.csv
 
 # Sub-dags to import
 include:
