@@ -6,6 +6,7 @@ from typing import cast
 
 import pandas as pd
 from owid import catalog
+from owid.walden import catalog as WaldenCatalog
 
 from etl.helpers import PathFinder
 from etl.steps.data.converters import convert_walden_metadata
@@ -74,7 +75,7 @@ def run(dest_dir: str) -> None:
     # Load data.
     #
     # Retrieve raw data from Walden.
-    ds_walden = paths.load_dependency("renewable_electricity_capacity_and_generation")
+    ds_walden: WaldenCatalog.Dataset = paths.load_dependency("renewable_electricity_capacity_and_generation")
     local_file = ds_walden.ensure_downloaded()
 
     #

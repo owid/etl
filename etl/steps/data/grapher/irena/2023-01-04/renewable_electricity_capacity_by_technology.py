@@ -11,7 +11,7 @@ DATASET_TITLE = "Renewable electricity capacity by technology"
 
 def run(dest_dir: str) -> None:
     # Load dataset from Garden.
-    ds_garden = paths.load_dependency("renewable_electricity_capacity")
+    ds_garden: catalog.Dataset = paths.load_dependency("renewable_electricity_capacity")
     # Load main table from dataset.
     table = ds_garden["renewable_electricity_capacity"]
 

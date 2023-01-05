@@ -8,7 +8,7 @@ paths = PathFinder(__file__)
 
 def run(dest_dir: str) -> None:
     # Load Garden dataset.
-    ds_garden = paths.load_dependency("renewable_power_generation_costs")
+    ds_garden: catalog.Dataset = paths.load_dependency("renewable_power_generation_costs")
     # Get main table from Garden dataset.
     table = ds_garden["renewable_power_generation_costs"]
 

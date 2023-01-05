@@ -1,5 +1,5 @@
 import pandas as pd
-from owid.catalog import Dataset, Table
+from owid import catalog
 from owid.datautils import geo
 
 from etl.helpers import PathFinder
@@ -13,7 +13,7 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load dataset from Meadow.
-    ds_meadow = paths.load_dependency("renewable_power_generation_costs")
+    ds_meadow: catalog.Dataset = paths.load_dependency("renewable_power_generation_costs")
     # Load main table from dataset.
     tb_meadow = ds_meadow["renewable_power_generation_costs"]
     # Load table on solar photovoltaic module prices.
@@ -30,14 +30,14 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new Garden dataset.
-    ds_garden = Dataset.create_empty(dest_dir)
+    ds_garden = catalog.Dataset.create_empty(dest_dir)
 
     # Create a new table of LCOE and add it to the dataset.
-    tb_garden = Table(df, underscore=True, short_name=paths.short_name)
+    tb_garden = catalog.Table(df, underscore=True, short_name=paths.short_name)
     ds_garden.add(tb_garden)
 
     # Create a new table of solar PV module prices and add it to the dataset.
-    tb_garden_pv = Table(df_pv, underscore=True, short_name="solar_photovoltaic_module_prices")
+    tb_garden_pv = catalog.Table(df_pv, underscore=True, short_name="solar_photovoltaic_module_prices")
     ds_garden.add(tb_garden_pv)
 
     # Update metadata and save dataset.

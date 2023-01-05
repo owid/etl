@@ -3,7 +3,7 @@
 """
 
 import pandas as pd
-from owid.catalog import Dataset, Table
+from owid import catalog
 from owid.datautils import geo
 
 from etl.helpers import PathFinder
@@ -17,7 +17,7 @@ def run(dest_dir: str) -> None:
     # Load data.
     #
     # Load dataset from Meadow.
-    ds_meadow = paths.load_dependency("renewable_electricity_capacity_and_generation")
+    ds_meadow: catalog.Dataset = paths.load_dependency("renewable_electricity_capacity_and_generation")
     # Load main table from dataset.
     tb_meadow = ds_meadow["renewable_electricity_capacity_and_generation"]
     # Create a dataframe out of the main table.
@@ -44,11 +44,11 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset.
-    ds_garden = Dataset.create_empty(dest_dir, metadata=ds_meadow.metadata)
+    ds_garden = catalog.Dataset.create_empty(dest_dir, metadata=ds_meadow.metadata)
     ds_garden.metadata.version = paths.version
 
     # Create a new table.
-    tb_garden = Table(df, underscore=True, short_name=paths.short_name)
+    tb_garden = catalog.Table(df, underscore=True, short_name=paths.short_name)
 
     # Add table to dataset.
     ds_garden.add(tb_garden)

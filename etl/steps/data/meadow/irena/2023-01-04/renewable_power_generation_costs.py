@@ -11,9 +11,8 @@ structure. So it's likely that, on the next update, this script will not work.
 from typing import cast
 
 import pandas as pd
-from owid.catalog import Dataset, Table, TableMeta
-from owid.catalog.utils import underscore_table
-from owid.walden import Catalog as WaldenCatalog
+from owid import catalog
+from owid.walden import catalog as WaldenCatalog
 
 from etl.helpers import PathFinder
 from etl.steps.data.converters import convert_walden_metadata
@@ -64,7 +63,7 @@ def prepare_solar_pv_module_prices(data_file: str) -> pd.DataFrame:
         .rename(columns={"year": "n_months"})
         .reset_index()
     )
-    
+
     # Remove unnecessary column and add column for region.
     pv_prices = pv_prices.drop(columns="technology").assign(**{"country": "World"})
 
@@ -209,7 +208,7 @@ def extract_country_cost_from_excel_file(local_file: str) -> pd.DataFrame:
 
 def run(dest_dir: str) -> None:
     # Retrieve raw data from Walden.
-    ds_walden = paths.load_dependency("renewable_power_generation_costs")
+    ds_walden: WaldenCatalog.Dataset = paths.load_dependency("renewable_power_generation_costs")
     local_file = ds_walden.ensure_downloaded()
 
     # Extract global, weighted-average LCOE cost for all energy sources.
@@ -237,19 +236,19 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new Meadow dataset and reuse walden metadata.
-    ds = Dataset.create_empty(dest_dir, metadata=convert_walden_metadata(ds_walden))
+    ds = catalog.Dataset.create_empty(dest_dir, metadata=convert_walden_metadata(ds_walden))
     ds.metadata.version = paths.version
 
     # Create a new table of LCOE with metadata from Walden.
-    table_metadata = TableMeta(
+    table_metadata = catalog.TableMeta(
         short_name=ds_walden.short_name,
         title=ds_walden.name,
         description=ds_walden.description,
     )
-    tb = Table(combined, metadata=table_metadata, underscore=True, short_name=paths.short_name)
+    tb = catalog.Table(combined, metadata=table_metadata, underscore=True, short_name=paths.short_name)
 
     # Create an additional table of solar photovoltaic module prices.
-    tb_solar_pv_prices = Table(solar_pv_prices, underscore=True, short_name="solar_photovoltaic_module_prices")
+    tb_solar_pv_prices = catalog.Table(solar_pv_prices, underscore=True, short_name="solar_photovoltaic_module_prices")
 
     # Add tables to the dataset and save dataset.
     ds.add(tb)
