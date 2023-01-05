@@ -199,6 +199,8 @@ steps:
     - data://garden/papers/2023-01-04/farmer_lafond_2016
     - data://garden/irena/2022-10-20/renewable_electricity_capacity
     - data://garden/irena/2022-10-20/renewable_power_generation_costs
+  data://grapher/energy/2023-01-04/photovoltaic_cost_and_capacity:
+    - data://garden/energy/2023-01-04/photovoltaic_cost_and_capacity
 
   ######################################################################################################################
   #
