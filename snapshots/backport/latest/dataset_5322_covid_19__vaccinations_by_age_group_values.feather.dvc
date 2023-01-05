@@ -12,6 +12,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: dd85adee5a8e541d76686680d5b5eceb
-  size: 692194
+- md5: 613bf8340ced8e36290a5b1215e99210
+  size: 689914
   path: dataset_5322_covid_19__vaccinations_by_age_group_values.feather
