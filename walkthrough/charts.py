@@ -23,6 +23,7 @@ from etl.match_variables import (
     find_mapping_suggestions,
     preliminary_mapping,
 )
+
 from .utils import OWIDEnv, _check_env, _show_environment
 
 # Paths
@@ -572,7 +573,7 @@ class Navigation:
             po.put_markdown("### Variable ID mapping to be submitted")
             po.put_code(self.variable_mapping, "json")
             po.put_markdown("### Charts affected")
-            po.put_processbar("bar_submitting_charts")
+            po.put_processbar("bar_submitting_charts", auto_close=True)
             try:
                 suggested_chart_revisions = []
                 num_charts = len(suggester.df_charts)
@@ -581,14 +582,20 @@ class Navigation:
                     if revision:
                         suggested_chart_revisions.append(revision)
                     po.set_processbar("bar_submitting_charts", i / num_charts)
+                po.set_processbar("bar_submitting_charts", 1)
             except Exception as e:
                 po.put_error(f"Error: {e}")
                 return
             else:
+                # short summary
                 po.put_markdown(
-                    f"There are **{len(suggested_chart_revisions)} charts** that will be affected by the mapping."
+                    f"There are **{len(suggested_chart_revisions)} charts** that will be affected by the mapping:"
                 )
-                _show_logs_from_suggester(suggester)
+                # chart details
+                _show_chart_details(suggested_chart_revisions)
+                # logs
+                if suggester.logs:
+                    _show_logs_from_suggester(suggester)
             return suggested_chart_revisions
 
     def submit_suggestions(
@@ -624,33 +631,47 @@ class Navigation:
         self.variable_mapping_manual = {k: v for k, v in self.variable_mapping_manual.items() if v != -1}
 
 
+def _show_chart_details(revisions):
+    iframe = """
+    <iframe
+        src="https://ourworldindata.org/grapher/{}"
+        loading="lazy"
+        style="width: 100%; height: 600px; border: 0px none;"
+    ></iframe>
+    """
+    for revision in revisions:
+        slug = revision["chartSlug"]
+        title = slug.replace("-", " ").title()
+        po.put_collapse(title=title, content=[po.put_html(iframe.format(slug))])
+
+
 def _show_logs_from_suggester(suggester):
     log.info("Showing logs...")
-    if suggester.logs:
-        try:
-            po.put_scrollable(po.put_scope("scrollable"))
-            for msg in suggester.logs:
-                text = msg["message"]
-                match = re.search(r"([Cc]hart (\d+)).*", text)
-                if match:
-                    text_repl = match.group(1)
-                    chart_id = match.group(2)
-                    text = text.replace(text_repl, f"<a href='{OWID_ENV.chart_admin_url(chart_id)}'>{text_repl}</a>")
-                html = po.put_html(text)
-                if msg["type"] == "error":
-                    po.put_error(html, scope="scrollable")
-                elif msg["type"] == "warning":
-                    po.put_warning(html, scope="scrollable")
-                elif msg["type"] == "info":
-                    po.put_info(html, scope="scrollable")
-                elif msg["type"] == "success":
-                    po.put_success(html, scope="scrollable")
-        except Exception as e:
-            po.put_error(
-                po.put_html(
-                    "There was an error while retrieving the logs. Please report <a"
-                    f" href='https://github.com/owid/etl/issues/new'>here</a>! Complete error trace: {e}"
-                )
+    try:
+        po.put_markdown("#### Logs")
+        po.put_scrollable(po.put_scope("scrollable"))
+        for msg in suggester.logs:
+            text = msg["message"]
+            match = re.search(r"([Cc]hart (\d+)).*", text)
+            if match:
+                text_repl = match.group(1)
+                chart_id = match.group(2)
+                text = text.replace(text_repl, f"<a href='{OWID_ENV.chart_admin_url(chart_id)}'>{text_repl}</a>")
+            html = po.put_html(text)
+            if msg["type"] == "error":
+                po.put_error(html, scope="scrollable")
+            elif msg["type"] == "warning":
+                po.put_warning(html, scope="scrollable")
+            elif msg["type"] == "info":
+                po.put_info(html, scope="scrollable")
+            elif msg["type"] == "success":
+                po.put_success(html, scope="scrollable")
+    except Exception as e:
+        po.put_error(
+            po.put_html(
+                "There was an error while retrieving the logs. Please report <a"
+                f" href='https://github.com/owid/etl/issues/new'>here</a>! Complete error trace: {e}"
             )
-        else:
-            po.toast("Submission details available!", color="success")
+        )
+    else:
+        po.toast("Submission details available!", color="success")
