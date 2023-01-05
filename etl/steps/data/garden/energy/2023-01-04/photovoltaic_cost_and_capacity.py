@@ -83,12 +83,8 @@ def prepare_cost_data(
     tb_farmer_lafond["cost"] *= USD2013_TO_USD2021
 
     # Prepare solar photovoltaic cost data from IRENA.
-    tb_irena_cost = (
-        tb_irena_cost[tb_irena_cost["country"] == "World"][["year", "solar_photovoltaic"]]
-        .rename(columns={"solar_photovoltaic": "cost"}, errors="raise")
-        .dropna()
-        .reset_index(drop=True)
-    )
+    tb_irena_cost = tb_irena_cost.drop(columns="country")
+
     tb_irena_cost["cost_source"] = "IRENA"
     # Costs are given in "2021 USD/W", so we do not need to correct them.
 
@@ -119,7 +115,7 @@ def run(dest_dir: str) -> None:
 
     # Load IRENA dataset on cost from Garden.
     ds_irena_cost: catalog.Dataset = paths.load_dependency("renewable_power_generation_costs")
-    tb_irena_cost = ds_irena_cost["renewable_power_generation_costs"].reset_index()
+    tb_irena_cost = ds_irena_cost["solar_photovoltaic_module_prices"]
 
     #
     # Process data.
