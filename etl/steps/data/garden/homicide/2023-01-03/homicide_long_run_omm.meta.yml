@@ -10,8 +10,12 @@ tables:
       death_rate_per_100_000_population_eisner:
         title: Homicide rate per 100,000 population - Eisner
         description: >
-          Homicide rate estimates taken from: From Swords to Words: Does Macro-Level Change in Self-Control Predict Long-Term Variation in Levels of Homicide? - Eisner (2014).
+          Homicide rate estimates taken from: Eisner, M. 2014. “From Swords to Words: Does Macro-Level Change in Self-Control Predict Long-Term Variation in Levels of Homicide?” In Why Crime Rates Fall and Why They Don’t, edited by Michael Tonry. Vol. 43 of Crime and Justice: A Review of Research, edited by Michael Tonry. Chicago: University of Chicago Press. Available at: https://www.researchgate.net/profile/Manuel-Eisner/publication/264402032_From_Swords_to_Words_Does_Macro-Level_Change_in_Self-Control_Predict_Long-Term_Variation_in_Levels_of_Homicide/links/53db8c3d0cf216e4210bf644/From-Swords-to-Words-Does-Macro-Level-Change-in-Self-Control-Predict-Long-Term-Variation-in-Levels-of-Homicide.pdf
           
+
+          The homicide rates are given for a range of years - we allocate the homicide rate at the midpoint of the given period.
+
+
 
           Historical estimates of homicide rates are derived from national vital statistics and judicial archives. The older data is often fragmented and subject to a number of biases including: geographic bias, incomplete records, changing age structure, wound treatment, and the lethality of weapons.
         short_unit: ''

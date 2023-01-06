@@ -9,8 +9,6 @@ def run(dest_dir: str) -> None:
     dataset = catalog.Dataset.create_empty(dest_dir, N.garden_dataset.metadata)
 
     table = N.garden_dataset["who_mort_db"]
-    table = table.drop("index", axis=1)
-
     # optionally set additional dimensions
     # table = table.set_index(["sex", "income_group"], append=True)
 
