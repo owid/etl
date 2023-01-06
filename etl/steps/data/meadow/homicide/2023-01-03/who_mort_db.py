@@ -25,7 +25,7 @@ def run(dest_dir: str) -> None:
     # create new dataset and reuse walden metadata
     ds = Dataset.create_empty(dest_dir, metadata=convert_snapshot_metadata(snap.metadata))
     ds.metadata.version = "2023-01-03"
-    df = df.reset_index()
+    df = df.reset_index().drop(columns="index")
     # # create table with metadata from dataframe and underscore all columns
     tb = Table(df, short_name=snap.metadata.short_name, underscore=True)
 

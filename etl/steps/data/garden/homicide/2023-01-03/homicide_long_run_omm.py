@@ -31,7 +31,7 @@ def run(dest_dir: str) -> None:
 
     df_combined = pd.merge(df_who_long, df_unodc_long, how="outer")
     # Create Table and add short_name
-    df_combined = catalog.Table(df_combined.reset_index())
+    df_combined = catalog.Table(df_combined.reset_index().drop(columns="index"))
     df_combined.metadata.short_name = "homicide_long_run_omm"
 
     # Save outputs

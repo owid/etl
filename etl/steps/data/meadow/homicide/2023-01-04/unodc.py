@@ -23,7 +23,7 @@ def run(dest_dir: str) -> None:
     df = clean_data(df)
 
     # reset index so the data can be saved in feather format
-    df = df.reset_index()
+    df = df.reset_index().drop(columns="index")
 
     # create new dataset and reuse walden metadata
     ds = Dataset.create_empty(dest_dir, metadata=convert_snapshot_metadata(snap.metadata))
