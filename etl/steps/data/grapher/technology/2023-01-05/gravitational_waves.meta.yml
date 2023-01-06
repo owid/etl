@@ -1,0 +1,8 @@
+dataset: {}
+
+tables:
+  gravitational_waves:
+    variables:
+      cumulative_gwt:
+        title: Cumulative gravitational wave transients
+        unit: Gravitational wave transients

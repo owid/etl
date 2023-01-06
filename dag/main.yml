@@ -292,6 +292,10 @@ steps:
   data://grapher/fasttrack/2023-01-03/long_term_homicide_rates_in_europe:
     - snapshot://fasttrack/2023-01-03/long_term_homicide_rates_in_europe.csv
 
+  # Gravitational waves
+  data://grapher/technology/2023-01-05/gravitational_waves:
+    - snapshot://technology/2023-01-05/gravitational_waves.csv
+
 # Sub-dags to import
 include:
   - dag/open_numbers.yml

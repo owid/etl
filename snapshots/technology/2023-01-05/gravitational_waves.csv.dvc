@@ -1,0 +1,23 @@
+meta:
+  namespace: technology
+  short_name: gravitational_waves
+  name: Gravitational wave transients (GWOSC)
+  description: |
+    The Gravitational Wave Open Science Center (GWOSC) provides public access to gravitational-wave data. This data is collected by LIGO, Virgo, GEO600, and KAGRA, which are all large-scale physics experiments designed and constructed to observe gravitational waves.
+
+    The GWTC (Gravitational Wave Transient Catalog) is a cumulative set of gravitational wave transients maintained by GWOSC. It contains confidently-detected gravitational wave observations.
+
+    The sources notes that this catalog is only updated periodically, and may not contain recently-published events.
+  source_name: Gravitational Wave Open Science Center (2023)
+  url: https://www.gw-openscience.org/eventapi/html/GWTC/
+  source_data_url: https://www.gw-openscience.org/eventapi/html/GWTC/
+  file_extension: csv
+  date_accessed: '2023-01-05'
+  is_public: true
+  version: '2023-01-05'
+  publication_year: 2023
+wdir: ../../../data/snapshots/technology/2023-01-05
+outs:
+- md5: 3393a66f008daeff96db5be2c6f81f4e
+  size: 501472
+  path: gravitational_waves.csv
