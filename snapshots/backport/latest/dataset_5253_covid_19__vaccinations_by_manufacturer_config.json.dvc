@@ -6,12 +6,12 @@ meta:
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5253
   file_extension: json
-  date_accessed: 2023-01-05 08:46:03.691854
+  date_accessed: 2023-01-06 08:01:25.026586
   is_public: false
   version: latest
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: c349c6b4f76e894031f0c8d9e27a386d
+- md5: a954df9289b70d18b3030d9561d75e52
   size: 7407
   path: dataset_5253_covid_19__vaccinations_by_manufacturer_config.json
