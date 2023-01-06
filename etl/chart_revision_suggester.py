@@ -181,6 +181,7 @@ class ChartRevisionSuggester:
                     "originalConfig": row.config,
                     "suggestedConfig": chart_config_str,
                     "suggested_reason": self._get_chart_update_reason(new_variables),
+                    "chartSlug": json.loads(row.config).get("slug"),
                 }
                 return suggested_chart_revision
 
@@ -565,6 +566,8 @@ class ChartRevisionSuggester:
         for _id in _ids:
             if _id in self.var_id2year_range:
                 years += self.var_id2year_range[_id]
+        if not years:
+            raise ValueError(f"No year range was found because of variables {_ids}")
         return IntRange.from_values(years)
 
     def _is_min_year_hardcoded(self, chart_config: dict[Any, Any]) -> bool:
