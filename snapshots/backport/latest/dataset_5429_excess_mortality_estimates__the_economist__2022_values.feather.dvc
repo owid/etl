@@ -6,12 +6,12 @@ meta:
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5429
   file_extension: feather
-  date_accessed: 2022-12-20 18:04:11.660309
+  date_accessed: 2023-01-06 09:51:04.808508
   is_public: false
   version: latest
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 47b1c0eb6fdda6b22bb174bea411e2cd
-  size: 3283138
+- md5: 84ba592e63ad764e722555888cd72d00
+  size: 3324402
   path: dataset_5429_excess_mortality_estimates__the_economist__2022_values.feather
