@@ -8,4 +8,11 @@ tests/
 vendor/
 .cachedir/
 .venv/
+.github
+__pycache__/
+
 !data/snapshots/
+
+# temporary for static step
+!etl/steps/data/**/*.csv
+!etl/steps/data/**/*.csv.dvc

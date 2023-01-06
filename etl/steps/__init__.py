@@ -25,6 +25,7 @@ import structlog
 import yaml
 from dvc.dvcfile import Dvcfile
 from dvc.repo import Repo
+from owid.catalog import Dataset, Table
 
 # smother deprecation warnings by papermill
 with warnings.catch_warnings():
@@ -229,6 +230,9 @@ def parse_step(step_name: str, dag: Dict[str, Any]) -> "Step":
 
     elif step_type == "backport":
         step = BackportStep(path, dependencies)
+
+    elif step_type == "static":
+        step = StaticStep(path)
 
     elif step_type == "data-private":
         step = DataStepPrivate(path, dependencies)
@@ -750,6 +754,84 @@ class BackportStep(DataStep):
 
     def can_execute(self) -> bool:
         return True
+
+    @property
+    def _dest_dir(self) -> Path:
+        return paths.DATA_DIR / self.path.lstrip("/")
+
+
+@dataclass
+class StaticStep(Step):
+    path: str
+
+    def __init__(self, path: str) -> None:
+        self.path = path
+
+    def __str__(self) -> str:
+        return f"static://{self.path}"
+
+    def run(self) -> None:
+        # materialize the file from DVC if needed
+        DVC_REPO.pull(self._dvc_path, remote="public-read")
+
+        df = pd.read_csv(self._path)
+
+        # Initialise dataset.
+        self._dest_dir.parent.mkdir(parents=True, exist_ok=True)
+        ds = Dataset.create_empty(self._dest_dir)
+
+        # Add table and save dataset
+        namespace, version, short_name = self._path.split("/")[-3:]
+        short_name = short_name.split(".")[0]
+
+        ds.metadata.short_name = short_name
+        ds.metadata.version = version
+        ds.metadata.namespace = namespace
+
+        ds.add(Table(df, short_name=short_name))
+        ds.update_metadata(self._path.replace(".csv", ".meta.yml"))
+        ds.save()
+
+    def is_dirty(self) -> bool:
+        # check if the snapshot has been added to DVC
+        with open(self._dvc_path) as istream:
+            if "outs:\n" not in istream.read():
+                raise Exception(f"File {self._path} has not been added to DVC, run `dvc add {self._path}` to add it.")
+
+        if not self.has_existing_data():
+            return True
+
+        with dvc_lock:
+            dvc_file = Dvcfile(DVC_REPO, self._dvc_path)
+            with DVC_REPO.lock:
+                # DVC returns empty dictionary if file is up to date
+                if dvc_file.stage.status() != {}:
+                    return True
+
+        return False
+
+    @property
+    def _output_dataset(self) -> catalog.Dataset:
+        "If this step is completed, return the MD5 of the output."
+        if not self._dest_dir.is_dir():
+            raise Exception("dataset has not been created yet")
+
+        return catalog.Dataset(self._dest_dir.as_posix())
+
+    def checksum_output(self) -> str:
+        # This cast from str to str is IMHO unnecessary but MyPy complains about this without it...
+        return cast(str, self._output_dataset.checksum())
+
+    def has_existing_data(self) -> bool:
+        return self._dest_dir.is_dir()
+
+    @property
+    def _dvc_path(self) -> str:
+        return self._path + ".dvc"
+
+    @property
+    def _path(self) -> str:
+        return f"{paths.STEP_DIR}/data/{self.path}"
 
     @property
     def _dest_dir(self) -> Path:
