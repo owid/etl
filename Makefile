@@ -23,8 +23,11 @@ help:
 	@echo '  make clean     Delete all non-reference data in the data/ folder'
 	@echo '  make clobber   Delete non-reference data and .venv'
 	@echo '  make deploy    Re-run the full ETL on production'
+	@echo '  make docs      Serve documentation locally'
 	@echo
 
+docs: .venv
+	poetry run mkdocs serve
 
 watch-all:
 	poetry run watchmedo shell-command -c 'clear; make unittest; (cd vendor/owid-catalog-py && make unittest); (cd vendor/walden && make unittest)' --recursive --drop .
@@ -111,7 +114,3 @@ dependencies.pdf: .venv dag.yml etl/to_graphviz.py
 deploy:
 	@echo '==> Rebuilding the production ETL from origin/master'
 	ssh -t owid@analytics.owid.io /home/owid/analytics/ops/scripts/etl-prod.sh
-
-docs:
-	@echo '==> Building docs'
-	cd docs && make html
