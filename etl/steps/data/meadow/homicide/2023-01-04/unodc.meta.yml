@@ -16,10 +16,6 @@ dataset:
 tables:
   unodc:
     variables:
-      index:
-        title: index
-        short_unit: ''
-        unit: ''
       region:
         title: Region
         unit: ''
