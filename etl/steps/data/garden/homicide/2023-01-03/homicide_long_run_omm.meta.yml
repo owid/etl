@@ -7,6 +7,19 @@ dataset:
 tables:
   homicide_long_run_omm:
     variables:
+      death_rate_per_100_000_population_eisner:
+        title: Homicide rate per 100,000 population - Eisner
+        description: >
+          Homicide rate estimates taken from: From Swords to Words: Does Macro-Level Change in Self-Control Predict Long-Term Variation in Levels of Homicide? - Eisner (2014).
+          
+
+          Historical estimates of homicide rates are derived from national vital statistics and judicial archives. The older data is often fragmented and subject to a number of biases including: geographic bias, incomplete records, changing age structure, wound treatment, and the lethality of weapons.
+        short_unit: ''
+        unit: 'homicides per 100,000 people'
+        sources:
+        - name: Eisner (2014)
+        display:
+          numDecimalPlaces: 2
       death_rate_per_100_000_population_eisner_who:
         title: Homicide rate per 100,000 population - Eisner and WHO Mortality Database
         description: >

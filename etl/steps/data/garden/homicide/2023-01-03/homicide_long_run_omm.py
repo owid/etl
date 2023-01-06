@@ -1,6 +1,7 @@
 import pandas as pd
 from owid import catalog
 from owid.catalog.utils import underscore
+from owid.datautils import dataframes
 from structlog import get_logger
 
 from etl.helpers import PathFinder
@@ -29,7 +30,10 @@ def run(dest_dir: str) -> None:
     df_who_long = combine_datasets(df_eisner, df_who)
     df_unodc_long = combine_datasets(df_eisner, df_unodc)
 
-    df_combined = pd.merge(df_who_long, df_unodc_long, how="outer")
+    df_eisner = df_eisner.rename(
+        columns={"death_rate_per_100_000_population": "death_rate_per_100_000_population_eisner"}
+    ).drop(columns="source")
+    df_combined = dataframes.multi_merge([df_eisner, df_who_long, df_unodc_long], on=["country", "year"], how="outer")
     # Create Table and add short_name
     df_combined = catalog.Table(df_combined.reset_index().drop(columns="index"))
     df_combined.metadata.short_name = "homicide_long_run_omm"
