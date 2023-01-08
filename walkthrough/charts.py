@@ -470,7 +470,8 @@ class Navigation:
 
         with po.popup("This is your current variable mapping", closable=False, implicit_close=False, size="large"):
             self.show_variable_mapping_table(separate=True)
-            if len(set(self.variable_mapping.values())) != len(self.variable_mapping):
+            var_map = {old: new for old, new in self.variable_mapping.items() if new != -1}
+            if len(set(var_map.values())) != len(var_map):
                 po.put_warning("Warning: Multiple old variables are mapped to the same new variable!")
             po.put_buttons(
                 [
@@ -560,30 +561,35 @@ class Navigation:
             """
             rows = []
             for old_id, new_id in mapping.items():
+                # Old variable
                 summary = self._build_variable_description(old_id)
                 if summary:
                     cell_old = cell_template.format(
                         link=OWID_ENV.variable_admin_url(old_id),
                         title=f"{self.variable_id_to_name.get(old_id)} ({old_id})",
-                        summary=self._build_variable_description(old_id),
+                        summary=summary,
                     )
                 else:
                     cell_old = link_template.format(
                         link=OWID_ENV.variable_admin_url(old_id),
                         title=f"{self.variable_id_to_name.get(old_id)} ({old_id})",
                     )
-                summary = self._build_variable_description(new_id)
-                if summary:
-                    cell_new = cell_template.format(
-                        link=OWID_ENV.variable_admin_url(new_id),
-                        title=f"{self.variable_id_to_name.get(new_id)} ({new_id})",
-                        summary=self._build_variable_description(new_id),
-                    )
+                # New variable
+                if new_id == -1:
+                    cell_new = "Ignore"
                 else:
-                    cell_new = link_template.format(
-                        link=OWID_ENV.variable_admin_url(new_id),
-                        title=f"{self.variable_id_to_name.get(new_id)} ({new_id})",
-                    )
+                    summary = self._build_variable_description(new_id)
+                    if summary:
+                        cell_new = cell_template.format(
+                            link=OWID_ENV.variable_admin_url(new_id),
+                            title=f"{self.variable_id_to_name.get(new_id)} ({new_id})",
+                            summary=summary,
+                        )
+                    else:
+                        cell_new = link_template.format(
+                            link=OWID_ENV.variable_admin_url(new_id),
+                            title=f"{self.variable_id_to_name.get(new_id)} ({new_id})",
+                        )
                 row = row_template.format(cell_old=cell_old, cell_new=cell_new)
                 rows.append(row)
             rows = "".join(rows)
@@ -608,6 +614,8 @@ class Navigation:
 
         This html code comes with each variable, typically shown as a dropdown.
         """
+        if id_ == -1:
+            return None
         items = []
         timespan = self.variable_id_to_all[id_].get("timespan")
         if timespan:
@@ -754,7 +762,7 @@ def _show_chart_details(revisions):
     ></iframe>
     """
     po.put_scrollable(po.put_scope("scroll-charts"), height=800)
-    revisions = sorted(revisions, key=lambda x: x["chartSlug"])
+    revisions = sorted(revisions, key=lambda x: x["chartSlug"].lower())
     for revision in revisions:
         slug = revision["chartSlug"]
         title = slug.replace("-", " ").capitalize()
