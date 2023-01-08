@@ -6,12 +6,12 @@ meta:
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5338
   file_extension: json
-  date_accessed: 2023-01-07 00:00:21.491350
+  date_accessed: 2023-01-08 00:00:51.257918
   is_public: false
   version: latest
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 6be5a052ebb833b11cf48b03d72ac3f3
+- md5: 791c57a0f7e0513b96ca2f06b36cfecc
   size: 33935
   path: dataset_5338_covid_19__variants_config.json
