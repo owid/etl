@@ -14,7 +14,7 @@ from typing import Any, Dict, List, Tuple, Union, cast
 
 import click
 import pandas as pd
-from fuzzywuzzy import fuzz
+from thefuzz import fuzz
 
 from etl import db
 
@@ -320,6 +320,9 @@ def find_mapping_suggestions(
         old_name = row["name_old"]
 
         # Sort new variables from most to least similar to current variable.
+        for new_name in missing_new["name_new"]:
+            print(matching_function, old_name, new_name)
+            _ = matching_function(old_name, new_name)
         missing_new["similarity"] = [matching_function(old_name, new_name) for new_name in missing_new["name_new"]]
         missing_new = missing_new.sort_values("similarity", ascending=False)
 
