@@ -10,7 +10,13 @@ nav:
       - Overview: "architecture/index.md"
       - Common format: "architecture/common-format.md"
       - Harmonization: "architecture/harmonization.md"
-  - Adding data: "adding-data/index.md"
+      - Internal structure: "architecture/structure.md"
+      - Workflow: "architecture/workflow.md"
+  - Adding data:
+      - Guide: "adding-data/index.md"
+      - Fast track: "adding-data/fast-track.md"
+      - Walkthrough: "adding-data/walkthrough.md"
+      - Manually add: "adding-data/manual.md"
   - API: "api/index.ipynb"
   - Contributing: "contributing/index.md"
 
@@ -24,11 +30,15 @@ theme:
     - navigation.indexes
 
 markdown_extensions:
+  - admonition
+  - pymdownx.details
   - pymdownx.superfences:
       custom_fences:
         - name: mermaid
           class: mermaid
           format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
 
 plugins:
   - mkdocs-jupyter:

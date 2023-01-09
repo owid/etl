@@ -9,9 +9,8 @@ build:
     - git submodule update
     - pip install -U poetry
     - poetry install
-    - . .venv/bin/activate && cd docs && make html
-    - mkdir _readthedocs
-    - cp -r docs/_build/html/ _readthedocs/
+    - poetry run mkdocs build
+    - cp -r site/ _readthedocs/
 
 submodules:
   include: all
