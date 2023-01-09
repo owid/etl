@@ -527,7 +527,7 @@ def add_region_aggregates(
             .reset_index()
             .assign(**{country_column: region})
         )
-        data = pd.concat([data, region_df], ignore_index=True)
+        data = pd.concat([data, region_df], ignore_index=True)  # type: ignore
 
     return data
 
