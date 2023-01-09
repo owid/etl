@@ -11,7 +11,7 @@ nav:
       - Common format: "architecture/common-format.md"
       - Harmonization: "architecture/harmonization.md"
   - Adding data: "adding-data/index.md"
-  - API: "api/index.md"
+  - API: "api/index.ipynb"
   - Contributing: "contributing/index.md"
 
 theme:
@@ -29,6 +29,10 @@ markdown_extensions:
         - name: mermaid
           class: mermaid
           format: !!python/name:pymdownx.superfences.fence_code_format
+
+plugins:
+  - mkdocs-jupyter:
+      ignore_h1_titles: True
 
 extra_css:
   - css/extra.css
