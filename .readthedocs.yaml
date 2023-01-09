@@ -10,7 +10,8 @@ build:
     - pip install -U poetry
     - poetry install
     - poetry run mkdocs build
-    - cp -r site/ _readthedocs/
+    - mkdir -p _readthedocs
+    - cp -r site/ _readthedocs/html/
 
 submodules:
   include: all
