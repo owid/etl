@@ -72,8 +72,8 @@ def check_expected_data(local_file: str) -> None:
     """
     # Extract text from PDF (Walden)
     with open(local_file, "rb") as f:
-        pdfReader = PyPDF2.PdfFileReader(f)
-        text_pdf = pdfReader.getPage(2).extract_text()
+        pdfReader = PyPDF2.PdfReader(f)
+        text_pdf = pdfReader.pages[2].extract_text()
     # Load text from PDF as expected
     hash = hashlib.md5(text_pdf.encode()).hexdigest()
     assert hash == HASH_EXPECTED, "Text from PDF does not match expected text."
