@@ -35,8 +35,7 @@ def run(dest_dir: str) -> None:
     ).drop(columns="source")
     df_combined = dataframes.multi_merge([df_eisner, df_who_long, df_unodc_long], on=["country", "year"], how="outer")
     # Create Table and add short_name
-    df_combined = catalog.Table(df_combined.reset_index().drop(columns="index"))
-    df_combined.metadata.short_name = "homicide_long_run_omm"
+    df_combined = catalog.Table(df_combined.reset_index(drop=True), short_name="homicide_long_run_omm")
 
     # Save outputs
     ds_garden = catalog.Dataset.create_empty(dest_dir)
