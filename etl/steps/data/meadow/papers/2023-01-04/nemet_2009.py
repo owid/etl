@@ -8,7 +8,6 @@ from owid import catalog
 from etl.helpers import PathFinder
 from etl.steps.data.converters import convert_snapshot_metadata
 
-
 # Get paths and naming conventions for current data step.
 paths = PathFinder(__file__)
 
