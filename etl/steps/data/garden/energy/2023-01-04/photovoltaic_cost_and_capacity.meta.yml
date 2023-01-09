@@ -35,7 +35,7 @@ all_sources:
       description: |
         Photovoltaic capacity data between 2004 and 2021 has been taken from IRENA.
   - irena_costs: &source-irena_costs
-      name: International Renewable Energy Agency (IRENA) (2022)
+      name: International Renewable Energy Agency (IRENA)
       published_by: International Renewable Energy Agency (IRENA) © 2022 by IRENA
       url: https://irena.org/publications/2022/Jul/Renewable-Power-Generation-Costs-in-2021
       date_accessed: '2022-10-20'
@@ -65,7 +65,10 @@ tables:
         title: Solar photovoltaic module price
         short_unit: '$/W'
         unit: '2021 US$ per Watt'
-        description: Global average price of solar photovoltaic modules
+        description: |
+          Global average price of solar photovoltaic modules.
+
+          IRENA presents solar PV module price series for a number of different module technologies. Here we have adopted the series for thin film a-Si/u-Si or Global Index (from Q4 2013).
         sources:
           - *source-nemet_2009
           - *source-farmer_lafond_2016
@@ -76,9 +79,10 @@ tables:
         description: Source for each value of cost data.
       cumulative_capacity:
         title: Solar photovoltaic cumulative capacity
-        description: Global cumulative capacity of solar photovoltaics
+        description: |
+          Global cumulative capacity of solar photovoltaics.
         short_unit: 'MW'
-        unit: 'Megawatts'
+        unit: 'megawatts'
         description:
         sources:
           - *source-nemet_2009
