@@ -1,6 +1,7 @@
 import datetime as dt
 import re
 import shutil
+from contextlib import contextmanager
 from dataclasses import dataclass
 from pathlib import Path
 from threading import Lock
@@ -21,6 +22,7 @@ dvc = Repo(paths.BASE_DIR)
 
 # DVC is not thread-safe, so we need to lock it
 dvc_lock = Lock()
+unignore_backports_lock = Lock()
 
 
 @dataclass
@@ -52,7 +54,8 @@ class Snapshot:
 
     def pull(self) -> None:
         """Pull file from S3."""
-        dvc.pull(str(self.path), remote="public-read" if self.metadata.is_public else "private")
+        with _unignore_backports(self.path):
+            dvc.pull(str(self.path), remote="public-read" if self.metadata.is_public else "private")
 
     def delete_local(self) -> None:
         """Delete local file and its metadata."""
@@ -69,7 +72,18 @@ class Snapshot:
 
     def dvc_add(self, upload: bool) -> None:
         """Add file to DVC and upload to S3."""
-        with dvc_lock:
+        # from dvc.dvcfile import Dvcfile
+
+        # repo = Repo(paths.BASE_DIR)
+        # with repo.lock:
+        #     dvc_file = Dvcfile(repo, str(self.metadata_path))
+        #     stage = dvc_file.stage
+
+        #     stage.save(merge_versioned=True)
+        #     stage.commit()
+        #     stage.dump()
+
+        with dvc_lock, _unignore_backports(self.path):
             dvc.add(str(self.path), fname=str(self.metadata_path))
             if upload:
                 dvc.push(str(self.path), remote="public" if self.metadata.is_public else "private")
@@ -205,3 +219,28 @@ def snapshot_catalog(match: str = r".*") -> List[Snapshot]:
         if re.search(match, uri):
             catalog.append(Snapshot(uri))
     return catalog
+
+
+@contextmanager
+def _unignore_backports(path: Path):
+    """Folder snapshots/backports contains thousands of .dvc files which adds significant overhead
+    to running DVC commands (+8s overhead). That is why we ignore this folder in .dvcignore. This
+    context manager checks if the path is in snapshots/backports and if so, temporarily removes
+    this folder from .dvcignore.
+    This makes non-backport DVC operations run under 1s and backport DVC operations at ~8s.
+    Changing .dvcignore in-place is not great, but no other way was working (tried monkey-patching
+    DVC and subrepos).
+    """
+    if "backport/" in str(path):
+        with unignore_backports_lock:
+            with open(".dvcignore") as f:
+                s = f.read()
+            try:
+                with open(".dvcignore", "w") as f:
+                    f.write(s.replace("snapshots/backport/", "# snapshots/backport/"))
+                yield
+            finally:
+                with open(".dvcignore", "w") as f:
+                    f.write(s)
+    else:
+        yield
