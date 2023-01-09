@@ -9,8 +9,8 @@ dataset:
     Levelized cost of energy (LCOE) estimates the average cost per unit of energy generated across the lifetime of a new power plant. It is measured in 2021 US$ per kilowatt-hour.
   sources:
     -
-      name: International Renewable Energy Agency (IRENA) (2022)
-      published_by: © 2022 by International Renewable Energy Agency (IRENA)
+      name: International Renewable Energy Agency (IRENA)
+      published_by: International Renewable Energy Agency © IRENA 2022
       url: https://irena.org/publications/2022/Jul/Renewable-Power-Generation-Costs-in-2021
       date_accessed: 2022-10-20
 

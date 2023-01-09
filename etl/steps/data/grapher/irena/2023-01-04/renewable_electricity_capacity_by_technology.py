@@ -28,7 +28,7 @@ def run(dest_dir: str) -> None:
 
     # Set appropriate metadata.
     table["capacity"].metadata.title = "Capacity"
-    table["capacity"].metadata.unit = "Megawatts"
+    table["capacity"].metadata.unit = "megawatts"
     table["capacity"].metadata.short_unit = "MW"
     table["capacity"].metadata.display = {"numDecimalPlaces": 0}
 

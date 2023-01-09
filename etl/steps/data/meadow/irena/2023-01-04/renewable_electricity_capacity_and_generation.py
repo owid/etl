@@ -49,7 +49,7 @@ def extract_capacity_from_sheet(excel_object: pd.ExcelFile, sheet_name: str) -> 
 def extract_capacity_from_all_sheets(data_file: str) -> pd.DataFrame:
     # Select sheets that contain data (their names are numbers).
     excel_object = pd.ExcelFile(data_file)
-    sheet_names = [sheet for sheet in excel_object.sheet_names if sheet.isdigit()]
+    sheet_names = [sheet for sheet in excel_object.sheet_names if sheet.strip().isdigit()]
 
     # Extract data sheet by sheet.
     all_data = pd.DataFrame()
