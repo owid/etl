@@ -1,5 +1,4 @@
 dataset:
-  channel: garden
   namespace: papers
   short_name: farmer_lafond_2016
   title: Cost of different technologies
