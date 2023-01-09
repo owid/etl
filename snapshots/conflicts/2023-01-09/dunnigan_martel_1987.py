@@ -1,7 +1,9 @@
-"""Get our manually curated dataset.
+"""Get our manually curated dataset into Snapshot.
 
-This dataset was obtained by examining the data provided by the source, and transcribing it into a Google Spreadsheet. It can be found
-at https://docs.google.com/spreadsheets/d/13XJbTXryll5VqhtmbutMLCbb3pgjEtofk3o2dJG29Aw/edit?usp=sharing."""
+We maintain a manually curated transcription of the data from Dunnigan and Martel (1987) in a Google Spreadsheet.
+Then, port this file to Snapshot. To obtain this file, download it as a CSV from
+https://docs.google.com/spreadsheets/d/13XJbTXryll5VqhtmbutMLCbb3pgjEtofk3o2dJG29Aw/edit?usp=sharing and use
+it with the `--path-to-file` argument."""
 
 from pathlib import Path
 
