@@ -22,6 +22,7 @@ def run(dest_dir: str) -> None:
     )
     df_eisner["source"] = "Eisner"
 
+    eisner_entities = df_eisner["country"].drop_duplicates()
     # Get both the WHO and UNODC datasets from garden
     df_who = get_who_mortality_db()
     df_unodc = get_unodc()
@@ -34,6 +35,11 @@ def run(dest_dir: str) -> None:
         columns={"death_rate_per_100_000_population": "death_rate_per_100_000_population_eisner"}
     ).drop(columns="source")
     df_combined = dataframes.multi_merge([df_eisner, df_who_long, df_unodc_long], on=["country", "year"], how="outer")
+
+    # We only want entities for which long-run data is available in grapher - so let's drop all the others
+
+    df_combined = df_combined[df_combined["country"].isin(eisner_entities)]
+
     # Create Table and add short_name
     df_combined = catalog.Table(df_combined.reset_index(drop=True), short_name="homicide_long_run_omm")
 
