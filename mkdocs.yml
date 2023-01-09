@@ -11,6 +11,7 @@ nav:
       - Common format: "architecture/common-format.md"
       - Harmonization: "architecture/harmonization.md"
       - Internal structure: "architecture/structure.md"
+      - Metadata: "architecture/metadata.md"
       - Workflow: "architecture/workflow.md"
   - Adding data:
       - Guide: "adding-data/index.md"
