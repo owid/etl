@@ -19,6 +19,7 @@ from threading import Lock
 from typing import Any, Dict, Iterable, List, Optional, Protocol, Set, Union, cast
 from urllib.parse import urlparse
 
+import pandas as pd
 import requests
 import structlog
 import yaml
@@ -349,7 +350,10 @@ class DataStep(Step):
 
     def checksum_input(self) -> str:
         "Return the MD5 of all ingredients for making this step."
-        checksums = {}
+        checksums = {
+            # the pandas library is so important to the output that we include it in the checksum
+            "__pandas__": pd.__version__,
+        }
         for d in self.dependencies:
             checksums[d.path] = d.checksum_output()
 
@@ -411,7 +415,13 @@ class DataStep(Step):
             ]
         )
 
-        subprocess.check_call(args)
+        try:
+            subprocess.check_call(args)
+        except subprocess.CalledProcessError:
+            # swallow this exception and just exit -- the important stack trace
+            # will already have been printed to stderr
+            print(f'\nCOMMAND: {" ".join(args)}', file=sys.stderr)
+            sys.exit(1)
 
     def _run_notebook(self) -> None:
         "Run a parameterised Jupyter notebook."

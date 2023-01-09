@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Union, cast
 
 import pandas as pd
+import pywebio
 import structlog
 from MySQLdb import OperationalError
 from pywebio import input as pi
@@ -32,6 +33,9 @@ CURRENT_DIR = Path(__file__).parent
 log = structlog.get_logger()
 # OWID Env
 OWID_ENV = OWIDEnv()
+# set style
+with open(CURRENT_DIR / "charts.styles.css", "r") as f:
+    pywebio.config(css_style=f.read())
 
 
 def app(run_checks: bool, dummy_data: bool) -> None:
@@ -97,7 +101,8 @@ class Navigation:
     variable_mapping_auto: dict = dict()
     variable_mapping_manual: dict = dict()
     # IDs to names
-    __variable_id_to_names: Optional[Dict[int, str]] = None
+    # __variable_id_to_names: Optional[Dict[int, str]] = None
+    __variable_id_to_all: Optional[Dict[int, Dict[str, Any]]] = None
 
     @property
     def variable_mapping(self) -> Dict[int, int]:
@@ -124,11 +129,19 @@ class Navigation:
         return len(self.suggestions) > 0
 
     @property
-    def variable_id_to_names(self) -> Dict[int, str]:
+    def variable_id_to_all(self) -> Dict[int, Dict[str, Any]]:
         """Get variable ID to name mapping."""
-        if self.__variable_id_to_names is None:
-            self.__variable_id_to_names = self._varid_to_varname()
-        return self.__variable_id_to_names
+        # get id to all fields
+        if self.__variable_id_to_all is None:
+            self.__variable_id_to_all = self._varid_to_all()
+        return self.__variable_id_to_all
+
+    @property
+    def variable_id_to_name(self) -> Dict[int, str]:
+        """Get variable ID to name mapping."""
+        # get id to name
+        mapping = {i: k["name"] for i, k in self.variable_id_to_all.items()}
+        return mapping
 
     def show_live_banner(self) -> None:
         if OWIDEnv().env_type_id == "live":
@@ -143,6 +156,8 @@ class Navigation:
     def show_instructions(self) -> None:
         """Show initial step description."""
         log.info("1. Showing instructions")
+        po.put_markdown("# Walkthrough - Charts")
+        po.put_info(po.put_markdown("`charts` step can be only executed by OWID staff!"))
         with open(CURRENT_DIR / "charts.md", "r") as f:
             po.put_markdown(f.read())
 
@@ -255,7 +270,10 @@ class Navigation:
                         else {"label": f_name, "value": f_name, "selected": False}
                         for f_name in SIMILARITY_NAMES
                     ],
-                    help_text="Select the prefered function for matching variables. https://google.com",
+                    help_text=(
+                        "Select the prefered function for matching variables. Find more details at"
+                        " https://www.analyticsvidhya.com/blog/2021/07/fuzzy-string-matching-a-hands-on-guide/"
+                    ),
                 ),  #
                 pi.checkbox(
                     "",
@@ -279,6 +297,10 @@ class Navigation:
         self.params = params
 
     def params_is_valid(self):
+        """Check if parameters are valid.
+
+        Parameters corresponds to the configuration given at the beginning by the user.
+        """
         if self.params["dataset_old_id"] == self.params["dataset_new_id"]:
             msg = "Old and new datasets cannot be the same!"
             po.toast(msg, color="error")
@@ -504,24 +526,68 @@ class Navigation:
         """
 
         def _show_table(mapping: Dict[int, int]):
-            tdata = [
-                [
-                    po.put_link(
-                        f"{self.variable_id_to_names.get(old_id)} ({old_id})",
-                        OWID_ENV.variable_admin_url(old_id),
-                        new_window=True,
-                    ),
-                    po.put_link(
-                        f"{self.variable_id_to_names.get(new_id)} ({new_id})",
-                        OWID_ENV.variable_admin_url(new_id),
-                        new_window=True,
+            table = """
+            <div style="overflow: auto;">
+                <table style>
+                    <tbody>
+                        <tr>
+                            <th><span style="white-space: pre-wrap;">Old variable</span></th>
+                            <th><span style="white-space: pre-wrap;">New variable</span></th>
+                        </tr>
+                        {rows}
+                    </tbody>
+                </table>
+            </div>
+            """
+            row_template = """
+            <tr>
+                <td>
+                    {cell_old}
+                </td>
+                <td>
+                    {cell_new}
+                </td>
+            </tr>
+            """
+            link_template = """
+            <a href="{link}" target="_blank">{title}</a>
+            """
+            cell_template = f"""
+            <details>
+                <summary>{link_template}</summary>
+                {{summary}}
+            </details>
+            """
+            rows = []
+            for old_id, new_id in mapping.items():
+                summary = self._build_variable_description(old_id)
+                if summary:
+                    cell_old = cell_template.format(
+                        link=OWID_ENV.variable_admin_url(old_id),
+                        title=f"{self.variable_id_to_name.get(old_id)} ({old_id})",
+                        summary=self._build_variable_description(old_id),
                     )
-                    if new_id != -1
-                    else self.variable_id_to_names.get(new_id),
-                ]
-                for old_id, new_id in mapping.items()
-            ]
-            po.put_table(tdata, header=["Old variable", "New variable"])
+                else:
+                    cell_old = link_template.format(
+                        link=OWID_ENV.variable_admin_url(old_id),
+                        title=f"{self.variable_id_to_name.get(old_id)} ({old_id})",
+                    )
+                summary = self._build_variable_description(new_id)
+                if summary:
+                    cell_new = cell_template.format(
+                        link=OWID_ENV.variable_admin_url(new_id),
+                        title=f"{self.variable_id_to_name.get(new_id)} ({new_id})",
+                        summary=self._build_variable_description(new_id),
+                    )
+                else:
+                    cell_new = link_template.format(
+                        link=OWID_ENV.variable_admin_url(new_id),
+                        title=f"{self.variable_id_to_name.get(new_id)} ({new_id})",
+                    )
+                row = row_template.format(cell_old=cell_old, cell_new=cell_new)
+                rows.append(row)
+            rows = "".join(rows)
+            po.put_html(table.format(rows=rows))
 
         if separate:
             if self.variable_mapping_manual:
@@ -537,8 +603,54 @@ class Navigation:
         else:
             _show_table(self.variable_mapping)
 
-    def _varid_to_varname(self) -> Dict[int, str]:
-        """Build mapping from variable ID to variable NAME."""
+    def _build_variable_description(self, id_: int):
+        """Create html code that describes variables.
+
+        This html code comes with each variable, typically shown as a dropdown.
+        """
+        items = []
+        timespan = self.variable_id_to_all[id_].get("timespan")
+        if timespan:
+            items.append(
+                f"""
+            <div><b>Timespan:</b> {timespan}</div>
+            """
+            )
+        unit = self.variable_id_to_all[id_].get("unit")
+        if unit:
+            items.append(
+                f"""
+            <div><b>Unit: </b>{unit}</div>
+            """
+            )
+        coverage = self.variable_id_to_all[id_].get("coverage")
+        if coverage:
+            items.append(
+                f"""
+            <div><b>Coverage:</b> {coverage}</div>
+            """
+            )
+        description = self.variable_id_to_all[id_].get("description")
+        if description:
+            items.append(
+                f"""
+            <div><b>Description:</b> {description}</div>
+            """
+            )
+        # Create text description
+        if items:
+            items = "".join(items)
+            text = f"""
+            <div class=table-variable-container>
+                {items}
+            </div>
+            """
+            return text
+        else:
+            return None
+
+    def _varid_to_all(self) -> Dict[int, Dict[str, Any]]:
+        """Build mapping from variable ID to all variable's fields."""
         log.info(f"Mapping IDs to names: {self.variable_mapping}")
         # get mapping from db
         with get_connection() as db_conn:
@@ -550,8 +662,8 @@ class Navigation:
                 WHERE id in {var_ids}
             """
             df = pd.read_sql(query, db_conn)
-            mapping = df[["id", "name"]].set_index("id").squeeze().to_dict()
-        log.info(f"Found mapping: {mapping}")
+            mapping = df.set_index("id").to_dict(orient="index")
+        log.info("Found mapping!")  #: {mapping}")
         return mapping
 
     def show_submission_details(self, suggester: ChartRevisionSuggester) -> Union[List[dict[str, Any]], None]:
@@ -559,6 +671,7 @@ class Navigation:
 
         This includes the variable id mapping, but also the charts that will be affected by the mapping.
         """
+        log.info("Showing submission details...")
         # get ID mapping without ignore ones (-1)
         po.toast("Getting submission details...")
         po.put_markdown("## Submission details")
@@ -568,7 +681,7 @@ class Navigation:
             po.put_markdown("### Variable ID mapping to be submitted")
             po.put_code(self.variable_mapping, "json")
             po.put_markdown("### Charts affected")
-            po.put_processbar("bar_submitting_charts")
+            po.put_processbar("bar_submitting_charts", auto_close=True)
             try:
                 suggested_chart_revisions = []
                 num_charts = len(suggester.df_charts)
@@ -577,14 +690,23 @@ class Navigation:
                     if revision:
                         suggested_chart_revisions.append(revision)
                     po.set_processbar("bar_submitting_charts", i / num_charts)
+                po.set_processbar("bar_submitting_charts", 1)
             except Exception as e:
                 po.put_error(f"Error: {e}")
                 return
             else:
-                po.put_markdown(
-                    f"There are **{len(suggested_chart_revisions)} charts** that will be affected by the mapping."
-                )
-                _show_logs_from_suggester(suggester)
+                # short summary
+                if len(suggested_chart_revisions) == 0:
+                    po.put_markdown("No charts affected by this variable mapping!")
+                else:
+                    po.put_markdown(
+                        f"There are **{len(suggested_chart_revisions)} charts** that will be affected by the mapping:"
+                    )
+                    # chart details
+                    _show_chart_details(suggested_chart_revisions)
+                # logs
+                if suggester.logs:
+                    _show_logs_from_suggester(suggester)
             return suggested_chart_revisions
 
     def submit_suggestions(
@@ -594,6 +716,7 @@ class Navigation:
 
         If successfull, a green box with success message is shown. Otherwise, red box with error message is shown.
         """
+        log.info("Submitting suggestions to Grapher...")
         po.put_markdown("## Submission to Grapher")
         po.put_markdown("### Grapher response")
 
@@ -617,36 +740,54 @@ class Navigation:
         return 0
 
     def _clean_variable_mapping(self):
+        log.info("Cleaning variable mapping...")
         self.variable_mapping_manual = {k: v for k, v in self.variable_mapping_manual.items() if v != -1}
+
+
+def _show_chart_details(revisions):
+    log.info("Showing chart details...")
+    iframe = """
+    <iframe
+        src="https://ourworldindata.org/grapher/{}"
+        loading="lazy"
+        style="width: 100%; height: 600px; border: 0px none;"
+    ></iframe>
+    """
+    po.put_scrollable(po.put_scope("scroll-charts"), height=800)
+    revisions = sorted(revisions, key=lambda x: x["chartSlug"])
+    for revision in revisions:
+        slug = revision["chartSlug"]
+        title = slug.replace("-", " ").capitalize()
+        po.put_collapse(title=title, content=[po.put_html(iframe.format(slug))], scope="scroll-charts")
 
 
 def _show_logs_from_suggester(suggester):
     log.info("Showing logs...")
-    if suggester.logs:
-        try:
-            po.put_scrollable(po.put_scope("scrollable"))
-            for msg in suggester.logs:
-                text = msg["message"]
-                match = re.search(r"([Cc]hart (\d+)).*", text)
-                if match:
-                    text_repl = match.group(1)
-                    chart_id = match.group(2)
-                    text = text.replace(text_repl, f"<a href='{OWID_ENV.chart_admin_url(chart_id)}'>{text_repl}</a>")
-                html = po.put_html(text)
-                if msg["type"] == "error":
-                    po.put_error(html, scope="scrollable")
-                elif msg["type"] == "warning":
-                    po.put_warning(html, scope="scrollable")
-                elif msg["type"] == "info":
-                    po.put_info(html, scope="scrollable")
-                elif msg["type"] == "success":
-                    po.put_success(html, scope="scrollable")
-        except Exception as e:
-            po.put_error(
-                po.put_html(
-                    "There was an error while retrieving the logs. Please report <a"
-                    f" href='https://github.com/owid/etl/issues/new'>here</a>! Complete error trace: {e}"
-                )
+    try:
+        po.put_markdown("#### Logs")
+        po.put_scrollable(po.put_scope("scroll-logs"))
+        for msg in suggester.logs:
+            text = msg["message"]
+            match = re.search(r"([Cc]hart (\d+)).*", text)
+            if match:
+                text_repl = match.group(1)
+                chart_id = match.group(2)
+                text = text.replace(text_repl, f"<a href='{OWID_ENV.chart_admin_url(chart_id)}'>{text_repl}</a>")
+            html = po.put_html(text)
+            if msg["type"] == "error":
+                po.put_error(html, scope="scroll-logs")
+            elif msg["type"] == "warning":
+                po.put_warning(html, scope="scroll-logs")
+            elif msg["type"] == "info":
+                po.put_info(html, scope="scroll-logs")
+            elif msg["type"] == "success":
+                po.put_success(html, scope="scroll-logs")
+    except Exception as e:
+        po.put_error(
+            po.put_html(
+                "There was an error while retrieving the logs. Please report <a"
+                f" href='https://github.com/owid/etl/issues/new'>here</a>! Complete error trace: {e}"
             )
-        else:
-            po.toast("Submission details available!", color="success")
+        )
+    else:
+        po.toast("Submission details available!", color="success")
