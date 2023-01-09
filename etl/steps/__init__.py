@@ -50,6 +50,7 @@ from etl.grapher_import import (
     upsert_dataset,
     upsert_table,
 )
+from etl.snapshot import _unignore_backports
 
 log = structlog.get_logger()
 
@@ -57,8 +58,6 @@ Graph = Dict[str, Set[str]]
 DAG = Dict[str, Any]
 
 dvc_lock = Lock()
-
-DVC_REPO = Repo(paths.BASE_DIR)
 
 
 def compile_steps(
@@ -617,7 +616,8 @@ class SnapshotStep(Step):
         return f"snapshot://{self.path}"
 
     def run(self) -> None:
-        DVC_REPO.pull(self._path, remote="public-read", force=True)
+        with _unignore_backports(Path(self._path)):
+            Repo(paths.BASE_DIR).pull(self._path, remote="public-read", force=True)
 
     def is_dirty(self) -> bool:
         # check if the snapshot has been added to DVC
@@ -625,9 +625,10 @@ class SnapshotStep(Step):
             if "outs:\n" not in istream.read():
                 raise Exception(f"File {self._dvc_path} has not been added to DVC. Run snapshot script to add it.")
 
-        with dvc_lock:
-            dvc_file = load_file(DVC_REPO, self._dvc_path)
-            with DVC_REPO.lock:
+        with _unignore_backports(Path(self._dvc_path)), dvc_lock:
+            repo = Repo(paths.BASE_DIR)
+            dvc_file = load_file(repo, self._dvc_path)
+            with repo.lock:
                 # DVC returns empty dictionary if file is up to date
                 return dvc_file.stage.status() != {}
 
@@ -651,7 +652,8 @@ class SnapshotStepPrivate(SnapshotStep):
         return f"snapshot-private://{self.path}"
 
     def run(self) -> None:
-        DVC_REPO.pull(self._path, remote="private", force=True)
+        with _unignore_backports(Path(self._path)):
+            Repo(paths.BASE_DIR).pull(self._path, remote="private", force=True)
 
 
 class GrapherStep(Step):
