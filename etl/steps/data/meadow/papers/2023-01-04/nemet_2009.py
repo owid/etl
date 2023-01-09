@@ -8,8 +8,6 @@ from owid import catalog
 from etl.helpers import PathFinder
 from etl.steps.data.converters import convert_snapshot_metadata
 
-__file__ = "/Users/prosado/Documents/owid/repos/etl/etl/steps/data/meadow/papers/2023-01-04/nemet_2009"
-
 
 # Get paths and naming conventions for current data step.
 paths = PathFinder(__file__)
