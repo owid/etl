@@ -30,8 +30,14 @@ tables:
           This variable is a combination of homicide rate estimates from Eisner (2014) and the WHO Mortality Database (2022). For the following countries we use Eisner (2014) before the given date and the WHO Mortality Database for all later datapoints:
 
           * 1950: France, Ireland, Netherlands
+
+
           * 1951: Italy, Spain, Sweden, Switzerland
+
+
           * 1954: Belgium
+
+          
           * 1990: Germany
         
           
