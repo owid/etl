@@ -17,6 +17,7 @@ CURRENT_DIR = Path(__file__).parent
 class Options(Enum):
 
     IS_PRIVATE = "Make dataset private"
+    DATASET_MANUAL_IMPORT = "Import dataset from local file"
 
 
 class SnapshotForm(BaseModel):
@@ -35,10 +36,12 @@ class SnapshotForm(BaseModel):
     license_url: str
     description: str
     is_private: bool
+    dataset_manual_import: bool
 
     def __init__(self, **data: Any) -> None:
         options = data.pop("options")
         data["is_private"] = Options.IS_PRIVATE.value in options
+        data["dataset_manual_import"] = Options.DATASET_MANUAL_IMPORT.value in options
         super().__init__(**data)
 
     @property
@@ -117,7 +120,9 @@ def app(run_checks: bool, dummy_data: bool) -> None:
             pi.input(
                 "Dataset webpage URL",
                 name="url",
-                placeholder="https://www.rug.nl/ggdc/historicaldevelopment/maddison/releases/maddison-project-database-2020",
+                placeholder=(
+                    "https://www.rug.nl/ggdc/historicaldevelopment/maddison/releases/maddison-project-database-2020"
+                ),
                 help_text="Url to the main page of the project",
                 required=True,
                 value=dummies.get("url"),
@@ -137,7 +142,9 @@ def app(run_checks: bool, dummy_data: bool) -> None:
             pi.input(
                 "License URL",
                 name="license_url",
-                placeholder="https://www.rug.nl/ggdc/historicaldevelopment/maddison/releases/maddison-project-database-2020",
+                placeholder=(
+                    "https://www.rug.nl/ggdc/historicaldevelopment/maddison/releases/maddison-project-database-2020"
+                ),
             ),
             pi.input(
                 "License name",
@@ -149,6 +156,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
                 "Other options",
                 options=[
                     Options.IS_PRIVATE.value,
+                    Options.DATASET_MANUAL_IMPORT.value,
                 ],
                 name="options",
             ),
