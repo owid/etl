@@ -14,7 +14,7 @@ from typing import Any, Dict, List, Tuple, Union, cast
 
 import click
 import pandas as pd
-from fuzzywuzzy import fuzz
+from thefuzz import fuzz
 
 from etl import db
 
