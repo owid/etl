@@ -6,12 +6,12 @@ meta:
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5234
   file_extension: feather
-  date_accessed: 2023-01-09 12:02:42.128601
+  date_accessed: 2023-01-10 12:02:24.459398
   is_public: false
   version: latest
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 5f67edad30c62665373fec4cfe0c00c6
-  size: 5318594
+- md5: 0940453c7168d59fa64008c24fe0f1d9
+  size: 5322322
   path: dataset_5234_covid_19__vaccinations_values.feather
