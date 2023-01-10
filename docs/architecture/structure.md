@@ -28,10 +28,12 @@ Datasets are nodes in the compute graph, the main units of work in the ETL. They
 Dataset URIs use the convention:
 
 ```
-data://<channel>/<provider>/<version>/<dataset>
+data://<channel>/<namespace>/<version>/<dataset>
 ```
 
-If the dataset is part of a large topic that involves many providers, the name of the topic can be used instead of a provider name.
+The channel is used as the highest level of grouping, and typically represents a stage of data curation.
+
+Typically the namespace is a data provider, like `un`, but it in cases where there are many data providers, it can describe the topic area instead (e.g. `energy`).
 
 The dataset URI is used to identify the code that builds the dataset, and also to identify the output file on disk.
 
@@ -52,7 +54,8 @@ The Grapher codebase can only except datasets that are in a particulare shape:
 However, datasets in the ETL are often in a different shape. For example, they may be broken down by gender, disease type, fish stock, or some other dimension.
 
 All data charted on our site is built from simplified grapher views, stored in MySQL. 
-Grapher steps are responsible for reshaping a dataset on disk into a grapher view, and then uploading it to MySQL. A single variable may fan out into a large number of grapher views.
+
+Grapher steps are responsible for reshaping a dataset on disk into a grapher view. A single variable may fan out into a large number of grapher views.
 
 Grapher views use the following convention:
 
@@ -60,7 +63,15 @@ Grapher views use the following convention:
 data://grapher/<provider>/<version>/<dataset>
 ```
 
-??? How do automatic grapher steps get created from here?
+Grapher views are still normal datasets, but they adapt the data to the way it must look when being inserted to MySQL.
+
+For each grapher view, there is a corresponding matching `grapher://` step automatically generated which does the actual insert to MySQL, if MySQL credentials have been configured.
+
+The automatically generated step adapts the data for grapher, including:
+
+- Generating a grapher variable for every combination of values of dimensions (e.g. `Death rate (sex=male, age group=60-70)`)
+- Converting countries to `entity_id` values that match the `entities` table in MySQL
+- If the dataset has multiple sources, merging them into a single combined source to fit Grapher's data model for sources 
 
 ## Features and constraints
 
