@@ -44,7 +44,7 @@ watch: .venv
 	git submodule update --init
 	touch $@
 
-sanity-check:
+.sanity-check:
 	@echo '==> Checking your Python setup'
 
 	@if python -c "import sys; exit(0 if sys.platform.startswith('win32') else 1)"; then \
@@ -53,8 +53,9 @@ sanity-check:
 		echo '       https://github.com/owid/etl/'; \
 		exit 1; \
 	fi
+	touch .sanity-check
 
-.venv: sanity-check pyproject.toml poetry.toml poetry.lock .submodule-init
+.venv: .sanity-check pyproject.toml poetry.toml poetry.lock .submodule-init
 	@echo '==> Installing packages'
 	poetry install || poetry install
 	touch $@

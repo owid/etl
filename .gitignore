@@ -38,3 +38,5 @@ docs/.vscode
 
 # mkdocs
 site/
+
+.sanity-check
