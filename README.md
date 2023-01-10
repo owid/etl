@@ -10,5 +10,5 @@ _A compute graph for loading and transforming data for OWID._
 
 ## Documentation
 
-See: https://docs.owid.io/projects/etl/en/master/
+See: https://docs.owid.io/projects/etl/en/latest/
 
