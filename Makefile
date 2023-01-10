@@ -23,8 +23,11 @@ help:
 	@echo '  make clean     Delete all non-reference data in the data/ folder'
 	@echo '  make clobber   Delete non-reference data and .venv'
 	@echo '  make deploy    Re-run the full ETL on production'
+	@echo '  make docs      Serve documentation locally'
 	@echo
 
+docs: .venv
+	poetry run mkdocs serve
 
 watch-all:
 	poetry run watchmedo shell-command -c 'clear; make unittest; (cd vendor/owid-catalog-py && make unittest); (cd vendor/walden && make unittest)' --recursive --drop .
@@ -41,7 +44,7 @@ watch: .venv
 	git submodule update --init
 	touch $@
 
-sanity-check:
+.sanity-check:
 	@echo '==> Checking your Python setup'
 
 	@if python -c "import sys; exit(0 if sys.platform.startswith('win32') else 1)"; then \
@@ -50,8 +53,9 @@ sanity-check:
 		echo '       https://github.com/owid/etl/'; \
 		exit 1; \
 	fi
+	touch .sanity-check
 
-.venv: sanity-check pyproject.toml poetry.toml poetry.lock .submodule-init
+.venv: .sanity-check pyproject.toml poetry.toml poetry.lock .submodule-init
 	@echo '==> Installing packages'
 	poetry install || poetry install
 	touch $@
@@ -111,7 +115,3 @@ dependencies.pdf: .venv dag.yml etl/to_graphviz.py
 deploy:
 	@echo '==> Rebuilding the production ETL from origin/master'
 	ssh -t owid@analytics.owid.io /home/owid/analytics/ops/scripts/etl-prod.sh
-
-docs:
-	@echo '==> Building docs'
-	cd docs && make html

@@ -35,3 +35,8 @@ docs/.vscode
 
 *.xlsx
 *.zip
+
+# mkdocs
+site/
+
+.sanity-check
