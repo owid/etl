@@ -1,24 +1,38 @@
+all_sources:
+  - source_testing: &source-testing
+      name: Testing Short Citation
+      published_by: Testing Full Citation
+      url: https://url_of_testing_source.com/
+      date_accessed: YYYY-MM-DD
+      publication_date: YYYY-MM-DD
+      publication_year: YYYY
+      description: &description-testing |
+        This description can be very long. Avoid using line breaks like "\n", which will not work well in grapher. Use "Word Wrap" to better visualize this text.
+
+        New line.
+
 dataset:
+  title: Testing Dataset Name (Institution, 2023)
+  namespace: testing_namespace
+  short_name: testing_dataset_name
+  version: YYYY-MM-DD
+  description: *description-testing
+  licenses:
+    - name: Testing License Name
+      url: https://url_testing_license.com/about
   sources:
-    -
-      name: Maddison Project Database 2020 (Bolt and van Zanden, 2020)
-      published_by: Bolt, Jutta and Jan Luiten van Zanden (2020), “Maddison style estimates of the evolution of the world economy. A new 2020 update“.
-      publisher_source: |
-        The Maddison Project Database is based on the work of many researchers that have produced estimates of...
+    - *source-testing
 
 tables:
   {{cookiecutter.short_name}}:
     variables:
-      population:
-        title: Population
-        unit: people
+      testing_variable:
+        title: Testing variable title
+        unit: arbitrary units
+        short_unit: au
+        description: Full description of testing variable.
+        sources:
+          - *source_testing
         display:
-          entityAnnotationsMap: "Western Offshoots: United States, Canada, Australia and New Zealand"
-      gdp:
-        title: GDP
-        short_unit: $
-        unit: 2011 int-$
-        description: Gross domestic product measured in international-$ using 2011 prices to adjust for price changes over time (inflation) and price differences between countries. Calculated by multiplying GDP per capita with population.
-        display:
-          entityAnnotationsMap: "Western Offshoots: United States, Canada, Australia and New Zealand"
+          entityAnnotationsMap: Test annotation
           numDecimalPlaces: 0
