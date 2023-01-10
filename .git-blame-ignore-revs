@@ -3,3 +3,6 @@ ab772adce9a987639cb1cde15b9a62a349568582
 
 # ignore moving grapher steps
 748da94b2abd9ba669f6214577e01588560da91b
+
+# load geo from etl.data_helpers instead of owid.datautils
+4143dfe6ca9d66d6129fa67a43ca13444f7b2dbd
