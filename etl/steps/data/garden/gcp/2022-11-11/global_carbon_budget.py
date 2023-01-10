@@ -21,8 +21,9 @@ from typing import Dict, List, Optional
 import numpy as np
 import pandas as pd
 from owid import catalog
-from owid.datautils import dataframes, geo
+from owid.datautils import dataframes
 
+from etl.data_helpers import geo
 from etl.paths import DATA_DIR, STEP_DIR
 
 # Define inputs.

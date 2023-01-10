@@ -17,9 +17,9 @@ import pandas as pd
 import yaml
 from owid.catalog import Dataset, DatasetMeta, Table, TableMeta
 from owid.catalog.utils import underscore_table
-from owid.datautils import geo
 from structlog import get_logger
 
+from etl.data_helpers import geo
 from etl.helpers import Names
 from etl.paths import DATA_DIR
 
