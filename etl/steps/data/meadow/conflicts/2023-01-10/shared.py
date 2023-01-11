@@ -30,7 +30,7 @@ COLUMN_RENAME = {
     "Explicit Deaths->Explicit Civ->I/D-Not Explicit": "deaths_civilian_unclear",
     "D/W-Not Explicit->Explicit Mil->Explicit Direct": "casualties_military_direct",
     "D/W-Not Explicit->Explicit Mil->Explicit Indirect": "casualties_military_indirect",
-    "D/W-Not Explicit->Explicit Mil->I/D-Not Explicit": "casualties_military_unclearh",
+    "D/W-Not Explicit->Explicit Mil->I/D-Not Explicit": "casualties_military_unclear",
     "D/W-Not Explicit->Mil/Civ-Not Explicit->Explicit Direct": "casualties_unclear_direct",
     "D/W-Not Explicit->Mil/Civ-Not Explicit->Explicit Indirect": "casualties_unclear_indirect",
     "D/W-Not Explicit->Mil/Civ-Not Explicit->I/D-Not Explicit": "casualties_unclear_unclear",
@@ -56,7 +56,7 @@ def clean_data(df: pd.DataFrame, column_rename: Optional[Dict[str, str]]) -> pd.
         raise ValueError(f"Unexpected columns found! {columns_unexpected}")
 
     # rename columns
-    df = df.rename(columns=column_rename)
+    df = df.rename(columns=column_rename, errors="raise")
 
     # table might contain some columns with only NaNs. These should be dropped, as they don't contain any data
     df = df.dropna(how="all", axis=1)
@@ -64,7 +64,7 @@ def clean_data(df: pd.DataFrame, column_rename: Optional[Dict[str, str]]) -> pd.
     return df
 
 
-def run_conflicts(dest_dir: str, paths: PathFinder, column_rename: Optional[Dict[str, str]] = None):
+def run_pipeline(dest_dir: str, paths: PathFinder, column_rename: Optional[Dict[str, str]] = None):
     log.info(f"{paths.short_name}.start")
     # read snapshot dataset
     snap = paths.load_dependency(paths.short_name)
@@ -73,7 +73,7 @@ def run_conflicts(dest_dir: str, paths: PathFinder, column_rename: Optional[Dict
     # clean and transform data
     df = clean_data(df, column_rename)
 
-    # create new dataset and reuse walden metadata
+    # create new dataset and reuse snapshot metadata
     ds = Dataset.create_empty(dest_dir, metadata=convert_snapshot_metadata(snap.metadata))
     ds.metadata.version = paths.version
 

@@ -1,4 +1,4 @@
-from shared import run_conflicts
+from shared import run_pipeline
 
 from etl.helpers import PathFinder
 
@@ -7,4 +7,4 @@ paths = PathFinder(__file__)
 
 
 def run(dest_dir: str) -> None:
-    run_conflicts(dest_dir, paths)
+    run_pipeline(dest_dir, paths)

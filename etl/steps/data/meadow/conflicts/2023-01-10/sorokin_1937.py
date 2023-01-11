@@ -1,4 +1,4 @@
-from shared import run_conflicts
+from shared import run_pipeline
 
 from etl.helpers import PathFinder
 
@@ -25,7 +25,7 @@ COLUMN_RENAME = {
     "Explicit Deaths->Explicit Civ->I/D-Not Explicit": "deaths_civilian_unclear",
     "D/W-Not explicit->Explicit Mil->Explicit Direct": "casualties_military_direct",  # difference with default
     "D/W-Not explicit>Explicit Mil->Explicit Indirect": "casualties_military_indirect",  # difference with default
-    "D/W-Not explicit->Explicit Mil->I/D-Not Explicit": "casualties_military_unclearh",  # difference with default
+    "D/W-Not explicit->Explicit Mil->I/D-Not Explicit": "casualties_military_unclear",  # difference with default
     "D/W-Not explicit->Mil/Civ-Not Explicit->Explicit Direct": "casualties_unclear_direct",  # difference with default
     "D/W-Not explicit->Mil/Civ-Not Explicit->Explicit Indirect": "casualties_unclear_indirect",  # difference with default
     "D/W-Not explicit->Mil/Civ-Not Explicit->I/D Not Explicit": "casualties_unclear_unclear",  # difference with default
@@ -41,4 +41,4 @@ COLUMN_RENAME = {
 
 
 def run(dest_dir: str) -> None:
-    run_conflicts(dest_dir, paths, COLUMN_RENAME)
+    run_pipeline(dest_dir, paths, COLUMN_RENAME)
