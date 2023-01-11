@@ -9,9 +9,7 @@ N = Names(__file__)
 
 def run(dest_dir: str) -> None:
     # load snapshot
-    data = pd.read_csv(
-        Snapshot("fasttrack/2023-01-03/long_term_homicide_rates_in_europe.csv").path
-    )
+    data = pd.read_csv(Snapshot("fasttrack/2023-01-03/long_term_homicide_rates_in_europe.csv").path)
 
     # create empty dataframe and table
     ds = catalog.Dataset.create_empty(dest_dir)
