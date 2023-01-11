@@ -9,9 +9,9 @@ import numpy as np
 import pandas as pd
 from owid import catalog
 from owid.catalog.utils import underscore_table
-from owid.datautils import geo
 from structlog import get_logger
 
+from etl.data_helpers import geo
 from etl.paths import DATA_DIR
 
 log = get_logger()

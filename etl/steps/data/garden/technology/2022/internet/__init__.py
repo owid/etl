@@ -3,8 +3,8 @@ from pathlib import Path
 from typing import List
 
 from owid.catalog import Dataset, Source, Table, Variable
-from owid.datautils import geo
 
+from etl.data_helpers import geo
 from etl.paths import DATA_DIR
 
 CURRENT_DIR = Path(__file__).parent

@@ -22,9 +22,10 @@ import numpy as np
 import pandas as pd
 import structlog
 from owid import catalog, repack  # type: ignore
-from owid.datautils import dataframes, geo
+from owid.datautils import dataframes
 from tqdm.auto import tqdm
 
+from etl.data_helpers import geo
 from etl.paths import DATA_DIR, STEP_DIR
 
 # Initialise log.
