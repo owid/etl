@@ -95,7 +95,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
                 placeholder="Testing Dataset Name (Institution, 2023)",
                 required=True,
                 value=dummies.get("name"),
-                help_text="Human-readable dataset name, followed by (Institution, Year of version). Example: Natural disasters (EMDAT, 2022)"
+                help_text="Human-readable dataset name, followed by (Institution, Year of version). Example: Natural disasters (EMDAT, 2022)",
             ),
             pi.input(
                 "Source short citation",
@@ -103,7 +103,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
                 placeholder="Testing Short Citation",
                 required=True,
                 value=dummies.get("source_name"),
-                help_text="Short source citation (to show in charts). Example: EM-DAT"
+                help_text="Short source citation (to show in charts). Example: EM-DAT",
             ),
             # TODO: Include this field in snapshot meta.
             pi.input(
@@ -112,7 +112,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
                 placeholder="Testing Full Citation",
                 required=True,
                 value=dummies.get("published_by"),
-                help_text="Testing Full Citation, as recommended by the source. Example: EM-DAT, CRED / UCLouvain, Brussels, Belgium"
+                help_text="Testing Full Citation, as recommended by the source. Example: EM-DAT, CRED / UCLouvain, Brussels, Belgium",
             ),
             pi.input(
                 "Publication date",
@@ -162,7 +162,9 @@ def app(run_checks: bool, dummy_data: bool) -> None:
                 placeholder="Creative Commons BY 4.0",
                 help_text="Name of the dataset license. Example: 'Creative Commons BY 4.0'",
             ),
-            pi.textarea("Description", name="description", value=dummies.get("description"), help_text="Dataset description."),
+            pi.textarea(
+                "Description", name="description", value=dummies.get("description"), help_text="Dataset description."
+            ),
             pi.checkbox(
                 "Other options",
                 options=[
