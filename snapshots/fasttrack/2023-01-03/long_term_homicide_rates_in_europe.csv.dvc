@@ -12,9 +12,9 @@ meta:
   source_name: Google Sheet
   url: https://www.hoplofobia.info/wp-content/uploads/2015/08/From-Swords-to-Words_Eisner2014.pdf
   file_extension: csv
-  date_accessed: 2023-01-05
-  source_data_url: gAAAAABjtpLN5fm3o7YQ1I_cMs9mXGHiQuIrisl9pVnShbAGB6WPTZ9z_rhsHjLUxYQ3Wk6wMv1XLGvplni_I3TkJD9XL2pjbXaHj-V0rHaPfBOLM_u-JVn1Z9MssaSD-Ioe4H4H9keV65EtlTmI0peu41am5dWAX5Q8PeyPapUN63RoAEeoIlxoj_53u_N1QyFR0drWgymOMpQOgWCIu7yyvGllbY4OXgXv3Mdpo8UgwjgnsX4KA3s1vymKZX6NPHQ5Qjpwhplp
-  is_public: false
+  date_accessed: 2023-01-11
+  source_data_url: https://docs.google.com/spreadsheets/d/e/2PACX-1vSqMi2AJyqA9BgjU-t149eZSOp6MIqN77JZOB2HRK_oQiqgLR7hfpk-gWx9YerWcYLTGww7DmqRU_Ho/pub?output=csv
+  is_public: true
   version: '2023-01-03'
 wdir: ../../../data/snapshots/fasttrack/2023-01-03
 outs:
