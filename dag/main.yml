@@ -103,7 +103,7 @@ steps:
   data://garden/malnutrition/2022-10-18/malnutrition:
     - data://garden/worldbank_wdi/2022-05-26/wdi
     - data://meadow/un/2022-07-11/un_wpp
-  
+
   # Homicide - WHO
   data://meadow/homicide/2023-01-03/who_mort_db:
   - snapshot://homicide/2023-01-03/who_mort_db.csv
@@ -111,7 +111,7 @@ steps:
   - data://meadow/homicide/2023-01-03/who_mort_db
   data://grapher/homicide/2023-01-03/who_mort_db:
   - data://garden/homicide/2023-01-03/who_mort_db
-  
+
   # Homicide - UNODC
   data://meadow/homicide/2023-01-04/unodc:
   - snapshot://homicide/2023-01-04/unodc.xlsx
@@ -319,3 +319,5 @@ include:
   - dag/emissions.yml
   - dag/papers.yml
   - dag/demography.yml
+  - dag/conflicts.yml
+  - dag/fasttrack.yml

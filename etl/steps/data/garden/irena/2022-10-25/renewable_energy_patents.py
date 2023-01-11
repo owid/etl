@@ -1,9 +1,10 @@
 import pandas as pd
 from owid.catalog import Dataset, Table
 from owid.catalog.utils import underscore_table
-from owid.datautils import dataframes, geo
+from owid.datautils import dataframes
 from shared import CURRENT_DIR
 
+from etl.data_helpers import geo
 from etl.helpers import Names
 
 # Get naming conventions.

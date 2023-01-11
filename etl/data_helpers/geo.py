@@ -3,6 +3,7 @@
 import functools
 import json
 import warnings
+from pathlib import Path
 from typing import Any, Dict, List, Optional, Union, cast
 
 import numpy as np
@@ -90,7 +91,7 @@ def list_countries_in_region(
 
     # TODO: Remove lines related to income_groups once they are included in countries-regions dataset.
     if income_groups is None:
-        income_groups = _load_income_groups()
+        income_groups = _load_income_groups().reset_index()
     income_groups_names = income_groups["income_group"].dropna().unique().tolist()  # type: ignore
 
     # TODO: Once countries-regions has additional columns 'is_historic' and 'is_country', select only countries, and not
@@ -165,7 +166,7 @@ def list_countries_in_region_that_must_have_data(
         population = _load_population()
 
     if income_groups is None:
-        income_groups = _load_income_groups()
+        income_groups = _load_income_groups().reset_index()
 
     # List all countries in the selected region.
     members = list_countries_in_region(region, countries_regions=countries_regions, income_groups=income_groups)
@@ -341,7 +342,7 @@ def add_region_aggregates(
 
 def harmonize_countries(
     df: pd.DataFrame,
-    countries_file: str,
+    countries_file: Union[Path, str],
     country_col: str = "country",
     warn_on_missing_countries: bool = True,
     make_missing_countries_nan: bool = False,

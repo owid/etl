@@ -63,6 +63,7 @@ dvc = {extras = ["s3"], version = ">=2.38.1"}
 owid-repack = ">=0.1.1"
 deepdiff = "^6.2.2"
 mkdocs-jupyter = "^0.22.0"
+gitpython = "^3.1.30"
 
 [tool.poetry.dev-dependencies]
 pytest = ">=7.1.2"

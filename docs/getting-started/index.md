@@ -72,21 +72,25 @@ You will need Python 3.9+, basic build tools, and MySQL client libraries:
 
     Please ask someone in the `#data-architecture` Slack channel to help you get set up.
 
-## Running tests
+## Check your environment
 
-You can get started by using ``make`` to see available commands.
+You can get started by using ``make`` to see available commands. The best way to check if your environment is healthy is to run:
 
-Run ``make test`` to check that your setup is working. It will clone two submodules in the ``vendor/`` folder, run ``poetry install``, and then run all CI checks.
+```bash
+make test
+```
+
+It will clone two submodules in the ``vendor/`` folder, run ``poetry install``, and then run all CI checks.
 
 If ``make test`` succeeds, then you should be able to build any dataset you like, including the entire catalog. If it fails, feel free to raise a `Github issue <https://github.com/owid/etl/issues>`_, or OWID staff can also ask using the ``#tech-issues`` Slack channel.
+
+## Building datasets
 
 Before continuing, activate your Python virtual environment by running:
 
 ```bash
 $ source .venv/bin/activate
 ```
-
-## Building datasets
 
 ### Dry-runs
 
