@@ -117,16 +117,16 @@ def app(run_checks: bool, dummy_data: bool) -> None:
             pi.input(
                 "Publication date",
                 name="publication_date",
-                placeholder=str(dt.date.today()),
+                placeholder="",
                 value=dummies.get("publication_date"),
-                help_text="Date when the dataset was published by the source.",
+                help_text="Date when the dataset was published by the source. Example: 2023-01-01",
             ),
             pi.input(
                 "Publication year",
                 name="publication_year",
                 type=pi.NUMBER,
-                placeholder=str(dt.date.today().year),
-                help_text="Only if the exact publication date is unknown, year when the dataset was published by the source.",
+                placeholder="",
+                help_text="Only if the exact publication date is unknown, year when the dataset was published by the source. Example: 2023",
             ),
             pi.input(
                 "Dataset webpage URL",

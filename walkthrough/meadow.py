@@ -97,7 +97,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
             pi.input(
                 "Snapshot file extension",
                 name="snapshot_file_extension",
-                placeholder="xlsx",
+                placeholder="csv",
                 value=dummies.get("file_extension"),
                 help_text="File extension (without the '.') of the snapshot data file. Example: csv",
             ),
