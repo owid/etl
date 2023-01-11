@@ -1,4 +1,4 @@
-"""Load snapshot for dataset "{{cookiecutter.name}}" and create a meadow dataset."""
+"""Load snapshot for dataset '{{cookiecutter.name}}' and create a meadow dataset."""
 import pandas as pd
 from owid.catalog import Dataset, Table
 from structlog import get_logger

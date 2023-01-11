@@ -19,7 +19,7 @@ dataset:
   description: *description-testing
   licenses:
     - name: Testing License Name
-      url: https://url_testing_license.com/about
+      url: https://url_of_testing_source.com/license
   sources:
     - *source-testing
 
