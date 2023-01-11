@@ -4,3 +4,5 @@ steps:
   - snapshot-private://fasttrack/2022-11-29/ai_index.csv
   data-private://grapher/fasttrack/2022-02-28/nuclear_warhead_inventories:
   - snapshot-private://fasttrack/2022-02-28/nuclear_warhead_inventories.csv
+  data://grapher/fasttrack/2023-01-03/long_term_homicide_rates_in_europe:
+  - snapshot://fasttrack/2023-01-03/long_term_homicide_rates_in_europe.csv
