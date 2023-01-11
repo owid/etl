@@ -3,6 +3,7 @@ import tempfile
 from pathlib import Path
 from typing import Any, Dict, List, Literal, Optional, Union
 
+import black
 import ruamel.yaml
 import yaml
 from cookiecutter.main import cookiecutter
@@ -133,6 +134,13 @@ def generate_step(cookiecutter_path: Path, data: Dict[str, Any]) -> Path:
             DATASET_DIR,
             dirs_exist_ok=True,
         )
+
+    # Parse black formatter configuration from pyproject.toml file.
+    black_config = black.parse_pyproject_toml(black.find_pyproject_toml("."))
+    black_mode = black.Mode(**{key: value for key, value in black_config.items() if key not in ["exclude"]})
+    # Apply black formatter to generated step files.
+    for file_path in DATASET_DIR.glob("*.py"):
+        black.format_file_in_place(src=file_path, fast=True, mode=black_mode, write_back=black.WriteBack.YES)
 
     return DATASET_DIR
 
