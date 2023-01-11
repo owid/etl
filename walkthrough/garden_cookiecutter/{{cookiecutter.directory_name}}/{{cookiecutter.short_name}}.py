@@ -63,7 +63,6 @@ def run(dest_dir: str) -> None:
     log.info("{{cookiecutter.short_name}}.end")
 
 
-# TODO: These functions should be removed once harmonize_countries is improved.
 def load_excluded_countries() -> List[str]:
     with open(paths.excluded_countries_path, "r") as f:
         data = json.load(f)

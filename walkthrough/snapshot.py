@@ -78,10 +78,10 @@ def app(run_checks: bool, dummy_data: bool) -> None:
                 placeholder=str(dt.date.today()),
                 required=True,
                 value=dummies.get("snapshot_version", str(dt.date.today())),
-                help_text="Snapshot version (by default, the current date, or exceptionally the publication date).",
+                help_text="Version of the snapshot dataset (by default, the current date, or exceptionally the publication date).",
             ),
             pi.input(
-                "Dataset short name",
+                "Snapshot dataset short name",
                 name="short_name",
                 placeholder="testing_dataset_name",
                 required=True,
