@@ -34,9 +34,7 @@ def main(path_to_file: str, upload: bool) -> None:
 {% else %}
 def main(upload: bool) -> None:
     # Create a new snapshot.
-    snap = Snapshot(
-        "{{cookiecutter.namespace}}/SNAPSHOT_VERSION/{{cookiecutter.short_name}}.{{cookiecutter.file_extension}}"
-    )
+    snap = Snapshot(f"{{cookiecutter.namespace}}/{SNAPSHOT_VERSION}/{{cookiecutter.short_name}}.{{cookiecutter.file_extension}}")
 
     # Download data from source.
     snap.download_from_source()
