@@ -99,15 +99,17 @@ def bulk_backport(
                     dry_run=dry_run,
                     upload=upload,
                     force=force,
+                    engine=engine,
                 )
         else:
-            with concurrent.futures.ThreadPoolExecutor() as executor:
+            with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as executor:
                 results = executor.map(
                     lambda ds_row: backport_step(
                         dataset_id=ds_row.id,
                         dry_run=dry_run,
                         upload=upload,
                         force=force,
+                        engine=engine,
                     ),
                     df.itertuples(),
                 )
