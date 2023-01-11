@@ -415,7 +415,13 @@ class DataStep(Step):
             ]
         )
 
-        subprocess.check_call(args)
+        try:
+            subprocess.check_call(args)
+        except subprocess.CalledProcessError:
+            # swallow this exception and just exit -- the important stack trace
+            # will already have been printed to stderr
+            print(f'\nCOMMAND: {" ".join(args)}', file=sys.stderr)
+            sys.exit(1)
 
     def _run_notebook(self) -> None:
         "Run a parameterised Jupyter notebook."

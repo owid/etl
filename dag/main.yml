@@ -103,7 +103,30 @@ steps:
   data://garden/malnutrition/2022-10-18/malnutrition:
     - data://garden/worldbank_wdi/2022-05-26/wdi
     - data://meadow/un/2022-07-11/un_wpp
-  #
+  
+  # Homicide - WHO
+  data://meadow/homicide/2023-01-03/who_mort_db:
+  - snapshot://homicide/2023-01-03/who_mort_db.csv
+  data://garden/homicide/2023-01-03/who_mort_db:
+  - data://meadow/homicide/2023-01-03/who_mort_db
+  data://grapher/homicide/2023-01-03/who_mort_db:
+  - data://garden/homicide/2023-01-03/who_mort_db
+  
+  # Homicide - UNODC
+  data://meadow/homicide/2023-01-04/unodc:
+  - snapshot://homicide/2023-01-04/unodc.xlsx
+  data://garden/homicide/2023-01-04/unodc:
+  - data://meadow/homicide/2023-01-04/unodc
+  data://grapher/homicide/2023-01-04/unodc:
+  - data://garden/homicide/2023-01-04/unodc
+  # Homicide - OMM
+  data://garden/homicide/2023-01-03/homicide_long_run_omm:
+  - data://grapher/fasttrack/2023-01-03/long_term_homicide_rates_in_europe
+  - data://garden/homicide/2023-01-03/who_mort_db
+  - data://garden/homicide/2023-01-04/unodc
+  data://grapher/homicide/2023-01-03/homicide_long_run_omm:
+  - data://garden/homicide/2023-01-03/homicide_long_run_omm
+
   # IHME - Global Burden of Disease.
   #
   data://meadow/ihme_gbd/2019/gbd_cause:
@@ -166,12 +189,6 @@ steps:
     - data://garden/worldbank_wdi/2022-05-26/wdi
   data://grapher/aviation_safety_network/2022-10-14/aviation_statistics:
     - data://garden/aviation_safety_network/2022-10-14/aviation_statistics
-
-  #
-  # Farmer and Lafond - Technology cost (2016).
-  #
-  data://meadow/farmer_lafond/2022-10-20/technology_cost:
-    - walden://farmer_lafond/2022-10-20/technology_cost
 
   # Postnatal care coverage - World Bank (2022)
   data://meadow/postnatal_care/2022-09-19/postnatal_care:
