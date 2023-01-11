@@ -1,4 +1,5 @@
-"""Load garden dataset '{{cookiecutter.name}}' and create a grapher dataset."""
+"""Load a garden dataset and create a grapher dataset."""
+
 from owid import catalog
 
 from etl.helpers import PathFinder

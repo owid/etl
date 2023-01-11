@@ -1,4 +1,5 @@
 """Script to create a snapshot of dataset '{{cookiecutter.name}}'."""
+
 from pathlib import Path
 
 import click

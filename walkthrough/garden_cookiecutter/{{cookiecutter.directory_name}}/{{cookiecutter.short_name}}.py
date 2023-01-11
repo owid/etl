@@ -1,4 +1,5 @@
-"""Load meadow dataset '{{cookiecutter.name}}' and create a garden dataset."""
+"""Load a meadow dataset and create a garden dataset."""
+
 import json
 from typing import List, cast
 

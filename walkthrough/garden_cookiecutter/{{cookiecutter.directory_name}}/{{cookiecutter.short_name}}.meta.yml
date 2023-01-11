@@ -1,38 +1,35 @@
 all_sources:
   - source_testing: &source-testing
-      name: Testing Short Citation
-      published_by: Testing Full Citation
-      url: https://url_of_testing_source.com/
-      date_accessed: YYYY-MM-DD
-      publication_date: YYYY-MM-DD
-      publication_year: YYYY
-      description: &description-testing |
-        This description can be very long. Avoid using line breaks like "\n", which will not work well in grapher. Use "Word Wrap" to better visualize this text.
-
-        New line.
+      name: # TO BE FILLED. Example: Testing Short Citation
+      published_by: # TO BE FILLED (if different to short citation). Example: Testing Full Citation
+      url: # TO BE FILLED. Example: https://url_of_testing_source.com/
+      date_accessed: # TO BE FILLED. Example: 2023-01-01
+      publication_date: # TO BE FILLED. Example: 2023-01-01
+      publication_year: # TO BE FILLED (if publication_date is not given). Example: 2023
+      # description: Source description.
 
 dataset:
-  title: Testing Dataset Name (Institution, 2023)
-  namespace: testing_namespace
-  short_name: testing_dataset_name
-  version: YYYY-MM-DD
-  description: *description-testing
+  title: # TO BE FILLED. Example: Testing Dataset Name (Institution, 2023)
+  namespace: {{cookiecutter.namespace}}
+  short_name: {{cookiecutter.short_name}}
+  version: {{cookiecutter.version}}
+  # description: Dataset description.
   licenses:
-    - name: Testing License Name
-      url: https://url_of_testing_source.com/license
+    - name: # TO BE FILLED. Example: Testing License Name
+      url: # TO BE FILLED. Example: https://url_of_testing_source.com/license
   sources:
     - *source-testing
 
 tables:
   {{cookiecutter.short_name}}:
     variables:
-      testing_variable:
-        title: Testing variable title
-        unit: arbitrary units
-        short_unit: au
-        description: Full description of testing variable.
-        sources:
-          - *source_testing
-        display:
-          entityAnnotationsMap: Test annotation
-          numDecimalPlaces: 0
+      # testing_variable:
+      #   title: Testing variable title
+      #   unit: arbitrary units
+      #   short_unit: au
+      #   description: Full description of testing variable.
+      #   sources:
+      #     - *source-testing
+      #   display:
+      #     entityAnnotationsMap: Test annotation
+      #     numDecimalPlaces: 0
