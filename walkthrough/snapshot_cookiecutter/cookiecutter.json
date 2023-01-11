@@ -13,5 +13,6 @@
     "license_name": "",
     "license_url": "",
     "description": "",
-    "is_private": ""
+    "is_private": "",
+    "dataset_manual_import": ""
 }
