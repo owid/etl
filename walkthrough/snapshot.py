@@ -76,7 +76,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
                 "Snapshot version",
                 name="snapshot_version",
                 placeholder=str(dt.date.today()),
-                required=False,
+                required=True,
                 value=dummies.get("snapshot_version", str(dt.date.today())),
                 help_text="Snapshot version (by default, the current date, or exceptionally the publication date).",
             ),

@@ -18,7 +18,7 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
 @click.option("--path-to-file", prompt=True, type=str, help="Path to local data file.")
 def main(path_to_file: str, upload: bool) -> None:
     # Create a new snapshot.
-    snap = Snapshot("{{cookiecutter.namespace}}/SNAPSHOT_VERSION/{{cookiecutter.short_name}}.{{cookiecutter.file_extension}}")
+    snap = Snapshot(f"{{cookiecutter.namespace}}/{SNAPSHOT_VERSION}/{{cookiecutter.short_name}}.{{cookiecutter.file_extension}}")
 
     # Ensure destination folder exists.
     snap.path.parent.mkdir(exist_ok=True, parents=True)

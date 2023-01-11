@@ -2,9 +2,10 @@ meta:
   namespace: {{cookiecutter.namespace}}
   short_name: {{cookiecutter.short_name}}
   name: {{cookiecutter.name}}
-  source_name: {{cookiecutter.source_name}}{% if cookiecutter.publication_year %}
-  publication_year: {{cookiecutter.publication_year}}{% endif %}
-  publication_date: {{cookiecutter.publication_date}}
+  source_name: {{cookiecutter.source_name}}
+  version: {{cookiecutter.snapshot_version}}{% if cookiecutter.publication_year %}
+  publication_year: {{cookiecutter.publication_year}}{% endif %}{% if cookiecutter.publication_date %}
+  publication_date: {{cookiecutter.publication_date}}{% endif %}
   url: {{cookiecutter.url}}
   source_data_url: {{cookiecutter.source_data_url}}
   file_extension: {{cookiecutter.file_extension}}
