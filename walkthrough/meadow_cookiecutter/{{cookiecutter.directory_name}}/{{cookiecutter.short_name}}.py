@@ -50,7 +50,7 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     # Create a new table and ensure all columns are snake-case.
-    tb = Table(df, short_name=paths.version, underscore=True)
+    tb = Table(df, short_name=paths.short_name, underscore=True)
 
     #
     # Save outputs.
