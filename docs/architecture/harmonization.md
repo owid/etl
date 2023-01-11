@@ -47,6 +47,11 @@ Options:
 
 ### Using the Grapher admin
 
-The [owid-grapher](https://github.com/owid/owid-grapher) codebase contains a interactive country harmonization tool that can be accessed at http://localhost:3030/admin/standardize when running the dev server.
+The [owid-grapher](https://github.com/owid/owid-grapher) codebase contains a interactive country harmonization tool that can be accessed at [http://localhost:3030/admin/standardize](http://localhost:3030/admin/standardize) when running the dev server.
 
 To use the tool, you upload a CSV file containing a column called `Country`, and indicate the encoding of country names.
+
+??? Tip "For staff"
+
+    The interactive harmonization tool for staff is available at [https://owid.cloud/admin/standardize](https://owid.cloud/admin/standardize).
+
