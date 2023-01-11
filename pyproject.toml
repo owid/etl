@@ -62,11 +62,8 @@ dvc = {extras = ["s3"], version = ">=2.38.1"}
 "ruamel.yaml" = ">=0.17.21"
 owid-repack = ">=0.1.1"
 deepdiff = "^6.2.2"
-<<<<<<< HEAD
-gitpython = "^3.1.30"
-=======
 mkdocs-jupyter = "^0.22.0"
->>>>>>> master
+gitpython = "^3.1.30"
 
 [tool.poetry.dev-dependencies]
 pytest = ">=7.1.2"

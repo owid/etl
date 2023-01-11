@@ -1,5 +1,5 @@
 import datetime as dt
-from typing import List
+from typing import List, Optional
 
 import click
 import pandas as pd
@@ -19,8 +19,6 @@ from . import utils
 config.enable_bugsnag()
 
 log = structlog.get_logger()
-
-engine = get_engine()
 
 
 @click.command()
@@ -109,7 +107,7 @@ class PotentialBackport:
         except ValueError:
             return True
 
-    def upload(self, upload: bool, dry_run: bool) -> None:
+    def upload(self, upload: bool, dry_run: bool, engine: Engine) -> None:
         config_metadata = _snapshot_config_metadata(self.ds, self.short_name, self.public)
         config_metadata.save()
         _upload_config_to_snapshot(
@@ -132,12 +130,11 @@ class PotentialBackport:
 
 
 def backport(
-    dataset_id: int,
-    force: bool = False,
-    dry_run: bool = False,
-    upload: bool = True,
+    dataset_id: int, force: bool = False, dry_run: bool = False, upload: bool = True, engine: Optional[Engine] = None
 ) -> None:
     lg = log.bind(dataset_id=dataset_id)
+
+    engine = engine or get_engine()
 
     dataset = PotentialBackport(dataset_id)
     lg.info("backport.loading_dataset")
@@ -154,7 +151,7 @@ def backport(
             lg.info("backport.finished")
             return
 
-    dataset.upload(upload, dry_run)
+    dataset.upload(upload, dry_run, engine)
 
     lg.info(
         "backport.upload",
