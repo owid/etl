@@ -56,7 +56,7 @@ def run(dest_dir: str) -> None:
     ds_garden.update_metadata(paths.metadata_path)
     {% endif %}
 
-    # Save new dataset.
+    # Save changes in the new garden dataset.
     ds_garden.save()
 
     log.info("{{cookiecutter.short_name}}.end")

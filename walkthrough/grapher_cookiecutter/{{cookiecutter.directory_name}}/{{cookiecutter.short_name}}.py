@@ -1,20 +1,34 @@
+"""Load garden dataset '{{cookiecutter.name}}' and create a grapher dataset."""
 from owid import catalog
 
-from etl.helpers import Names
+from etl.helpers import PathFinder
 
-N = Names(__file__)
+# Get paths and naming conventions for current step.
+paths = PathFinder(__file__)
 
 
 def run(dest_dir: str) -> None:
-    dataset = catalog.Dataset.create_empty(dest_dir, N.garden_dataset.metadata)
+    #
+    # Load inputs.
+    #
+    # Load garden dataset.
+    ds_garden = paths.load_dependency("{{cookiecutter.short_name}}")
 
-    table = N.garden_dataset["{{cookiecutter.short_name}}"]
+    # Read table from garden dataset.
+    tb_garden = ds_garden["{{cookiecutter.short_name}}"]
 
-    # optionally set additional dimensions
-    # table = table.set_index(["sex", "income_group"], append=True)
+    #
+    # Process data.
+    #
 
-    # if your data is in long format, you can use `grapher_helpers.long_to_wide_tables`
-    # to get into wide format
-    dataset.add(table)
+    #
+    # Save outputs.
+    #
+    # Create a new grapher dataset with the same metadata as the garden dataset.
+    ds_grapher = catalog.Dataset.create_empty(dest_dir, ds_garden.metadata)
 
-    dataset.save()
+    # Add table of processed data to the new dataset.
+    ds_grapher.add(tb_garden)
+
+    # Save changes in the new grapher dataset.
+    ds_grapher.save()

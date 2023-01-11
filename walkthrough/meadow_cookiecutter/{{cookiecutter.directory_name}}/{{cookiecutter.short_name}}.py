@@ -69,7 +69,7 @@ def run(dest_dir: str) -> None:
     ds_meadow.update_metadata(paths.metadata_path)
     {% endif %}
 
-    # Save the meadow dataset.
+    # Save changes in the new garden dataset.
     ds_meadow.save()
 
     log.info("{{cookiecutter.short_name}}.end")
