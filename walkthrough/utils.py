@@ -12,7 +12,7 @@ from owid.catalog.utils import validate_underscore
 from pywebio import output as po
 
 from etl import config
-from etl.paths import DAG_DIR, SNAPSHOTS_DIR, STEP_DIR
+from etl.paths import BASE_DIR, DAG_DIR, SNAPSHOTS_DIR, STEP_DIR
 from etl.steps import DAG
 
 DAG_WALKTHROUGH_PATH = DAG_DIR / "walkthrough.yml"
@@ -136,8 +136,8 @@ def generate_step(cookiecutter_path: Path, data: Dict[str, Any]) -> Path:
         )
 
     # Parse black formatter configuration from pyproject.toml file.
-    black_config = black.parse_pyproject_toml(black.find_pyproject_toml("."))
-    black_mode = black.Mode(**{key: value for key, value in black_config.items() if key not in ["exclude"]})
+    black_config = black.parse_pyproject_toml(BASE_DIR / "pyproject.toml")  # type: ignore
+    black_mode = black.Mode(**{key: value for key, value in black_config.items() if key not in ["exclude"]})  # type: ignore
     # Apply black formatter to generated step files.
     for file_path in DATASET_DIR.glob("*.py"):
         black.format_file_in_place(src=file_path, fast=True, mode=black_mode, write_back=black.WriteBack.YES)
