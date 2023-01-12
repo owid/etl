@@ -30,6 +30,7 @@ DUMMY_DATA = {
     "source_data_url": "https://www.rug.nl/ggdc/historicaldevelopment/maddison/data/mpd2020.xlsx",
     "publication_date": "2020-01-01",
     "source_name": "dummy source",
+    "source_published_by": "dummy full citation",
     "url": "https://www.dummy.com/",
 }
 
