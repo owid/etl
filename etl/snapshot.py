@@ -84,18 +84,18 @@ class SnapshotMeta:
     namespace: str  # a short source name (usually institution name)
     short_name: str  # a slug, ideally unique, snake_case, no spaces
 
-    # fields that are meant to be shown to humans
-    name: str
-    description: str
-    source_name: str  # Short source citation.
-    source_published_by: str  # Full source citation.
-    url: str
-
     # how to get the data file
     file_extension: str
 
     # usually today
     date_accessed: dt.date
+
+    # fields that are meant to be shown to humans
+    name: str
+    description: str
+    source_name: str  # Short source citation.
+    url: str
+    source_published_by: Optional[str] = None  # Full source citation.
 
     # URL with file, use `download_and_create(metadata)` for uploading to walden
     source_data_url: Optional[str] = None
