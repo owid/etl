@@ -87,7 +87,8 @@ class SnapshotMeta:
     # fields that are meant to be shown to humans
     name: str
     description: str
-    source_name: str
+    source_name: str  # Short source citation.
+    source_published_by: str  # Full source citation.
     url: str
 
     # how to get the data file

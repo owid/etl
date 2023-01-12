@@ -105,13 +105,12 @@ def app(run_checks: bool, dummy_data: bool) -> None:
                 value=dummies.get("source_name"),
                 help_text="Short source citation (to show in charts). Example: EM-DAT",
             ),
-            # TODO: Include this field in snapshot meta.
             pi.input(
                 "Source full citation",
-                name="published_by",
+                name="source_published_by",
                 placeholder="Testing Full Citation",
                 required=True,
-                value=dummies.get("published_by"),
+                value=dummies.get("source_published_by"),
                 help_text="Testing Full Citation, as recommended by the source. Example: EM-DAT, CRED / UCLouvain, Brussels, Belgium",
             ),
             pi.input(
