@@ -27,6 +27,7 @@ class SnapshotForm(BaseModel):
     short_name: str
     name: str
     source_name: str
+    source_published_by: str
     publication_year: Optional[str]
     publication_date: Optional[str]
     url: str
