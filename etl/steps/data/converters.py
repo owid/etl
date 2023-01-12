@@ -47,8 +47,9 @@ def convert_snapshot_metadata(snap: SnapshotMeta) -> DatasetMeta:
         description=snap.description,
         sources=[
             Source(
-                name=snap.source_name,
-                # description=snap.source_description,  # XXX no such snapshot field
+                name=snap.source_name,  # Short source citation.
+                published_by=snap.source_published_by,  # Full source citation.
+                description=snap.description,
                 url=snap.url,
                 source_data_url=snap.source_data_url,
                 # XXX owid_data_url is not a thing for snapshots, but it could be possibly added
