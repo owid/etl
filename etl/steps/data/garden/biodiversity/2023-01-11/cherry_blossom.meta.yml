@@ -1,0 +1,30 @@
+dataset:
+  channel: meadow
+  namespace: biodiversity
+  short_name: cherry_blossom
+  title: Peak Cherry Tree Blossom at Kyoto City (2022)
+  description: ''
+  licenses:
+  - url: http://atmenv.envi.osakafu-u.ac.jp/aono/kyophenotemp4/
+  version: '2023-01-11'
+  sources:
+  - name: Multiple sources compiled by Aono (2021)
+    publisher_source: |-
+      Taguchi (1939); Sekiguchi (1969); Aono and Omoto (1994); Aono and Kazui (2008); Aono and Saito (2010); Six (2011); Six (2012)
+      Data is available here - http://atmenv.envi.osakafu-u.ac.jp/aono/kyophenotemp4/
+      Value for 2022 gathered from the Met Office (2022) - https://www.metoffice.gov.uk/about-us/press-office/news/weather-and-climate/2022/kyoto-cherry-blossom-dates-shifted-by-human-influence#:~:text=Last%20year%20was%20the%20earliest,declared%20on%201%20April%202022.
+tables:
+  cherry_blossom:
+    variables:
+      full_flowering_date:
+        title: Day of the year with peak cherry blossom
+        unit: day of the year
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
+      average_20_years:
+        title: Twenty-year average day of the year with peak cherry blossom
+        unit: day of the year
+        short_unit: ''
+        display:
+          numDecimalPlaces: 2

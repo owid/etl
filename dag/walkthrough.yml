@@ -28,3 +28,9 @@ steps:
   - data://garden/ihme_gbd/2020-12-19/child_mortality
   data://meadow/biodiversity/2023-01-11/cherry_blossom:
   - snapshot://biodiversity/2023-01-11/cherry_blossom.csv
+  data://garden/biodiversity/2023-11-01/cherry_blossom:
+  - data://meadow/biodiversity/2023-11-01/cherry_blossom
+  data://garden/biodiversity/2023-01-11/cherry_blossom:
+  - data://meadow/biodiversity/2023-01-11/cherry_blossom
+  data://grapher/biodiversity/2023-01-11/cherry_blossom:
+  - data://garden/biodiversity/2023-01-11/cherry_blossom
