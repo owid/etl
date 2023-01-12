@@ -23,7 +23,6 @@ import datetime
 import numpy as np
 import pandas as pd
 from owid import catalog
-from owid.datautils import geo
 from shared import (
     BUILD_POPULATION_FOR_HISTORICAL_COUNTRIES,
     CURRENT_DIR,
@@ -36,6 +35,7 @@ from shared import (
     get_last_day_of_month,
 )
 
+from etl.data_helpers import geo
 from etl.helpers import Names
 from etl.paths import DATA_DIR
 

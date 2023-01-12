@@ -20,9 +20,9 @@ from typing import List, cast
 import pandas as pd
 from owid.catalog import Dataset, Table
 from owid.catalog.utils import underscore_table
-from owid.datautils import geo
 from structlog import get_logger
 
+from etl.data_helpers import geo
 from etl.helpers import Names
 
 from .gapminder import load_gapminder

@@ -5,9 +5,9 @@ from typing import Union
 import numpy as np
 import pandas as pd
 from owid import catalog
-from owid.datautils import geo
 from structlog import get_logger
 
+from etl.data_helpers import geo
 from etl.paths import BASE_DIR as base_path
 
 log = get_logger()

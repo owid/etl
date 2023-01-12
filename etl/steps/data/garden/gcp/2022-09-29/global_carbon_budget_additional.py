@@ -10,9 +10,9 @@ from typing import Tuple, cast
 
 import pandas as pd
 from owid.catalog import Dataset, Table
-from owid.datautils import geo
 from shared import CURRENT_DIR
 
+from etl.data_helpers import geo
 from etl.helpers import Names
 
 # Regions and income groups to create (by aggregating), following OWID definitions.

@@ -4,7 +4,6 @@
 
 import pandas as pd
 from owid import catalog
-from owid.datautils import geo
 from shared import (
     CURRENT_DIR,
     OVERLAPPING_DATA_TO_REMOVE_IN_AGGREGATES,
@@ -14,6 +13,7 @@ from shared import (
     log,
 )
 
+from etl.data_helpers import geo
 from etl.paths import DATA_DIR
 
 # Details for dataset to export.

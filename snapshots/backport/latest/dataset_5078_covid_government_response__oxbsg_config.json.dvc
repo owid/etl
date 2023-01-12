@@ -6,12 +6,12 @@ meta:
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5078
   file_extension: json
-  date_accessed: 2023-01-11 00:55:44.916656
+  date_accessed: 2023-01-12 06:01:02.242645
   is_public: true
   version: latest
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 353f2cdfbc365ee86362368eae7163d8
+- md5: 095c1819474a20fe2921286d36f7d2b9
   size: 19506
   path: dataset_5078_covid_government_response__oxbsg_config.json
