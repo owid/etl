@@ -26,12 +26,12 @@ DUMMY_DATA = {
     "snapshot_version": "2020-01-01",
     "name": "Dummy dataset",
     "description": "This\nis\na\ndummy\ndataset",
-    "file_extension": "xlsx",
-    "source_data_url": "https://www.rug.nl/ggdc/historicaldevelopment/maddison/data/mpd2020.xlsx",
+    "file_extension": "csv",
+    "source_data_url": "https://raw.githubusercontent.com/owid/etl/master/walkthrough/dummy_data.csv",
     "publication_date": "2020-01-01",
-    "source_name": "dummy source",
-    "source_published_by": "dummy full citation",
-    "url": "https://www.dummy.com/",
+    "source_name": "Dummy short source citation",
+    "source_published_by": "Dummy full source citation",
+    "url": "https://www.url-dummy.com/",
 }
 
 
