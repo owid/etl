@@ -1,5 +1,4 @@
 dataset:
-  channel: meadow
   namespace: biodiversity
   short_name: cherry_blossom
   title: Peak Cherry Tree Blossom at Kyoto City (2022)
@@ -28,3 +27,28 @@ tables:
         short_unit: ''
         display:
           numDecimalPlaces: 2
+      average_40_years:
+        title: Forty-year average day of the year with peak cherry blossom
+        unit: day of the year
+        short_unit: ''
+        display:
+          numDecimalPlaces: 2
+      average_50_years:
+        title: Fifty-year average day of the year with peak cherry blossom
+        unit: day of the year
+        short_unit: ''
+        display:
+          numDecimalPlaces: 2
+      average_100_years:
+        title: Hundred-year average day of the year with peak cherry blossom
+        unit: day of the year
+        short_unit: ''
+        display:
+          numDecimalPlaces: 2
+      uni_spline:
+        title: Spline average day of the year with peak cherry blossom
+        unit: day of the year
+        short_unit: ''
+        display:
+          numDecimalPlaces: 2
+
