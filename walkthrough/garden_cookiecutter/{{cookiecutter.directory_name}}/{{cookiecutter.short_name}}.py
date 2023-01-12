@@ -23,7 +23,7 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load meadow dataset.
-    ds_meadow = paths.load_dependency("{{cookiecutter.short_name}}")
+    ds_meadow: Dataset = paths.load_dependency("{{cookiecutter.short_name}}")
 
     # Read table from meadow dataset.
     tb_meadow = ds_meadow["{{cookiecutter.short_name}}"]

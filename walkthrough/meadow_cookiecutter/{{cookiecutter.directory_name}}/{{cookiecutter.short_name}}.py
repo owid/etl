@@ -5,6 +5,7 @@ from owid.catalog import Dataset, Table
 from structlog import get_logger
 
 from etl.helpers import PathFinder
+from etl.snapshot import Snapshot
 from etl.steps.data.converters import convert_snapshot_metadata
 
 # Initialize logger.
@@ -41,7 +42,7 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap = paths.load_dependency("{{cookiecutter.short_name}}.{{cookiecutter.snapshot_file_extension}}")
+    snap: Snapshot = paths.load_dependency("{{cookiecutter.short_name}}.{{cookiecutter.snapshot_file_extension}}")
 
     # Load data from snapshot.
     df = pd.read_csv(snap.path)
