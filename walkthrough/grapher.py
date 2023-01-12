@@ -66,7 +66,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
                 name="version",
                 placeholder=str(dt.date.today()),
                 required=True,
-                value=dummies.get("version"),
+                value=dummies.get("version", str(dt.date.today())),
                 help_text="Version of the grapher dataset (by default, the current date, or exceptionally the publication date).",
             ),
             pi.input(
