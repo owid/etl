@@ -109,7 +109,7 @@ def _strip_lines_in_dict(d: Any) -> Any:
         return d
 
 
-def apply_black_formatter_to_files(file_paths: List[Union[str, Path]]):
+def apply_black_formatter_to_files(file_paths: List[Union[str, Path]]) -> None:
     """Load project configuration for black formatter, and apply formatter to a list of files.
 
     Parameters
@@ -123,4 +123,4 @@ def apply_black_formatter_to_files(file_paths: List[Union[str, Path]]):
     black_mode = black.Mode(**{key: value for key, value in black_config.items() if key not in ["exclude"]})  # type: ignore
     # Apply black formatter to generated step files.
     for file_path in file_paths:
-        black.format_file_in_place(src=file_path, fast=True, mode=black_mode, write_back=black.WriteBack.YES)
+        black.format_file_in_place(src=file_path, fast=True, mode=black_mode, write_back=black.WriteBack.YES)  # type: ignore

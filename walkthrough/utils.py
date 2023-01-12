@@ -3,7 +3,6 @@ import tempfile
 from pathlib import Path
 from typing import Any, Dict, List, Literal, Optional, Union
 
-import black
 import ruamel.yaml
 import yaml
 from cookiecutter.main import cookiecutter
@@ -13,7 +12,7 @@ from pywebio import output as po
 
 from etl import config
 from etl.files import apply_black_formatter_to_files
-from etl.paths import BASE_DIR, DAG_DIR, SNAPSHOTS_DIR, STEP_DIR
+from etl.paths import DAG_DIR, SNAPSHOTS_DIR, STEP_DIR
 from etl.steps import DAG
 
 DAG_WALKTHROUGH_PATH = DAG_DIR / "walkthrough.yml"
