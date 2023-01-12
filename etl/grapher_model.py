@@ -700,6 +700,7 @@ class Variable(SQLModel, table=True):
     originalMetadata: Optional[Dict[Any, Any]] = Field(default=None, sa_column=Column("originalMetadata", JSON))
     grapherConfig: Optional[Dict[Any, Any]] = Field(default=None, sa_column=Column("grapherConfig", JSON))
     catalogPath: Optional[str] = Field(default=None, sa_column=Column("catalogPath", LONGTEXT))
+    dataPath: Optional[str] = Field(default=None, sa_column=Column("dataPath", LONGTEXT))
     dimensions: Optional[Dimensions] = Field(sa_column=Column("dimensions", JSON, nullable=True))
 
     datasets: Optional["Dataset"] = Relationship(back_populates="variables")
@@ -746,6 +747,7 @@ class Variable(SQLModel, table=True):
             ds.coverage = self.coverage
             ds.display = self.display
             ds.catalogPath = self.catalogPath
+            ds.dataPath = self.dataPath
             ds.dimensions = self.dimensions
             ds.updatedAt = datetime.utcnow()
             # do not update these fields unless they're specified
