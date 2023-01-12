@@ -11,6 +11,7 @@ from owid.catalog.utils import validate_underscore
 from pywebio import output as po
 
 from etl import config
+from etl.files import apply_black_formatter_to_files
 from etl.paths import DAG_DIR, SNAPSHOTS_DIR, STEP_DIR
 from etl.steps import DAG
 
@@ -133,6 +134,9 @@ def generate_step(cookiecutter_path: Path, data: Dict[str, Any]) -> Path:
             DATASET_DIR,
             dirs_exist_ok=True,
         )
+
+    # Apply black formatter to generated step files.
+    apply_black_formatter_to_files(file_paths=DATASET_DIR.glob("*.py"))
 
     return DATASET_DIR
 
