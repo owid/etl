@@ -48,15 +48,220 @@ dataset:
 tables:
   unodc:
     variables:
-      counts:
-        title: Homicides
+      firearms_homicide_count:
+        title: Total homicides by firearm
         short_unit: ''
         unit: homicides
         display:
           numDecimalPlaces: 0
-      rate_per_100_000_population:
-        title: Homicides per 100,000 population
+      sharp_object_homicide_count:
+        title: Total homicides by sharp object
+        short_unit: ''
+        unit: homicides
+        display:
+          numDecimalPlaces: 0
+      unspecified_means_homicide_count:
+        title: Total homicides by unspecified means
+        short_unit: ''
+        unit: homicides
+        display:
+          numDecimalPlaces: 0
+      without_a_weapon__other_mechanism_homicide_count:
+        title: Total homicides without a weapon
+        short_unit: ''
+        unit: homicides
+        display:
+          numDecimalPlaces: 0
+      firearms_or_explosives_homicide_count:
+        title: Total homicides by firearms or explosives
+        short_unit: ''
+        unit: homicides
+        display:
+          numDecimalPlaces: 0
+      another_weapon_homicide_count:
+        title: Total homicides by any object used as weapon, including sharp and blunt objects and motor vehicles
+        short_unit: ''
+        unit: homicides
+        display:
+          numDecimalPlaces: 0
+      firearms_homicide_per_100_000_population:
+        title: Homicides by firearm per 100,000 population
         short_unit: ''
         unit: homicides per 100,000 people
         display:
           numDecimalPlaces: 2
+      sharp_object_homicide_per_100_000_population:
+        title: Homicides by sharp object per 100,000 population
+        short_unit: ''
+        unit: homicides per 100,000 people
+        display:
+          numDecimalPlaces: 2
+      unspecified_means_homicide_per_100_000_population:
+        title: Homicides by unspecified means per 100,000 population
+        short_unit: ''
+        unit: homicides per 100,000 people
+        display:
+          numDecimalPlaces: 2
+      without_a_weapon__other_mechanism_homicide_per_100_000_population:
+        title: Homicides by without a weapon per 100,000 population
+        short_unit: ''
+        unit: homicides per 100,000 people
+        display:
+          numDecimalPlaces: 2
+      firearms_or_explosives_homicide_per_100_000_population:
+        title: Homicides by firearms or explosives per 100,000 population
+        short_unit: ''
+        unit: homicides per 100,000 people
+        display:
+          numDecimalPlaces: 2
+      another_weapon_homicide_per_100_000_population:
+        title: Homicides by sharp or blunt objects, including motor vehicles, per 100,000 population
+        short_unit: ''
+        unit: homicides per 100,000 people
+        display:
+          numDecimalPlaces: 2
+      both_sexes_all_ages_homicide_count:
+        title: Total homicides 
+        short_unit: ''
+        unit: homicides
+        display:
+          numDecimalPlaces: 0
+      female_all_ages_homicide_count:
+        title: Total homicides where the victim was female
+        short_unit: ''
+        unit: homicides
+        display:
+          numDecimalPlaces: 0
+      female_30_44_homicide_count:
+        title: Total homicides where the victim was female and aged 30-44
+        short_unit: ''
+        unit: homicides
+        display:
+          numDecimalPlaces: 0
+      female_45_59_homicide_count:
+        title: Total homicides where the victim was female and aged 45-59
+        short_unit: ''
+        unit: homicides
+        display:
+          numDecimalPlaces: 0
+      female_60_and_older_homicide_count:
+        title: Total homicides where the victim was female and aged 60+
+        short_unit: ''
+        unit: homicides
+        display:
+          numDecimalPlaces: 0
+      female_0_9_homicide_count:
+        title: Total homicides where the victim was female and aged 0-9
+        short_unit: ''
+        unit: homicides
+        display:
+          numDecimalPlaces: 0
+      female_10__14_homicide_count:
+        title: Total homicides where the victim was female and aged 10-14
+        short_unit: ''
+        unit: homicides
+        display:
+          numDecimalPlaces: 0
+      female_15__17_homicide_count:
+        title: Total homicides where the victim was female and aged 15-17
+        short_unit: ''
+        unit: homicides
+        display:
+          numDecimalPlaces: 0
+      female_18_19_homicide_count:
+        title: Total homicides where the victim was female and aged 18-19
+        short_unit: ''
+        unit: homicides
+        display:
+          numDecimalPlaces: 0
+      female_20_24_homicide_count:
+        title: Total homicides where the victim was female and aged 20-24
+        short_unit: ''
+        unit: homicides
+        display:
+          numDecimalPlaces: 0
+      female_25_29_homicide_count:
+        title: Total homicides where the victim was female and aged 25-29
+        short_unit: ''
+        unit: homicides
+        display:
+          numDecimalPlaces: 0
+      male_all_ages_homicide_count:
+        title: Total homicides where the victim was male
+        short_unit: ''
+        unit: homicides
+        display:
+          numDecimalPlaces: 0
+      male_30_44_homicide_count:
+        title: Total homicides where the victim was male and aged 30-44
+        short_unit: ''
+        unit: homicides
+        display:
+          numDecimalPlaces: 0
+      male_45_59_homicide_count:
+        title: Total homicides where the victim was male and aged 45-59
+        short_unit: ''
+        unit: homicides
+        display:
+          numDecimalPlaces: 0
+      male_60_and_older_homicide_count:
+        title: Total homicides where the victim was male and aged 60+
+        short_unit: ''
+        unit: homicides
+        display:
+          numDecimalPlaces: 0
+      male_0_9_homicide_count:
+        title: Total homicides where the victim was male and aged 0-9
+        short_unit: ''
+        unit: homicides
+        display:
+          numDecimalPlaces: 0
+      male_10__14_homicide_count:
+        title: Total homicides where the victim was male and aged 10-14
+        short_unit: ''
+        unit: homicides
+        display:
+          numDecimalPlaces: 0
+      male_15__17_homicide_count:
+        title: Total homicides where the victim was male and aged 15-17
+        short_unit: ''
+        unit: homicides
+        display:
+          numDecimalPlaces: 0
+      male_18_19_homicide_count:
+        title: Total homicides where the victim was male and aged 18-19
+        short_unit: ''
+        unit: homicides
+        display:
+          numDecimalPlaces: 0
+      male_20_24_homicide_count:
+        title: Total homicides where the victim was male and aged 20-24
+        short_unit: ''
+        unit: homicides
+        display:
+          numDecimalPlaces: 0
+      male_25_29_homicide_count:
+        title: Total homicides where the victim was male and aged 25-29
+        short_unit: ''
+        unit: homicides
+        display:
+          numDecimalPlaces: 0
+      both_sexes_all_ages_homicides_per_100_000_population:
+        title: Total homicides per 100,000 population
+        short_unit: ''
+        unit: homicides per 100,000 people
+        display:
+          numDecimalPlaces: 2
+      female_sexes_all_ages_homicides_per_100_000_population:
+        title: Total homicides where the victim was female per 100,000 population
+        short_unit: ''
+        unit: homicides per 100,000 people
+        display:
+          numDecimalPlaces: 2
+      male_sexes_all_ages_homicides_per_100_000_population:
+        title: Total homicides where the victim was male per 100,000 population
+        short_unit: ''
+        unit: homicides per 100,000 people
+        display:
+          numDecimalPlaces: 2
+      
