@@ -137,6 +137,7 @@ class FasttrackImport:
             description=self.meta.dataset.description,
             url=self.partial_snapshot_meta.url,
             source_name="Google Sheet",
+            source_published_by="Google Sheet",
             source_data_url=sheets_url,
             is_public=not self.is_private,
             date_accessed=dt.date.today(),

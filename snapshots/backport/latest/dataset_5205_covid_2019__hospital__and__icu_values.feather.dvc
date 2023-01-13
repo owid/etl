@@ -1,17 +1,18 @@
 meta:
   namespace: backport
   short_name: dataset_5205_covid_2019__hospital__and__icu_values
+  file_extension: feather
+  date_accessed: 2023-01-13 06:00:59.523097
   name: COVID-2019 - Hospital & ICU
   description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5205
-  file_extension: feather
-  date_accessed: 2023-01-12 06:02:13.678020
+  source_published_by: Our World in Data catalog backport
   is_public: true
   version: latest
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: ef284487479093bf7b9d7ef95991f333
-  size: 839674
+- md5: f302489a0ddbee65dceded930bd37e9a
+  size: 848362
   path: dataset_5205_covid_2019__hospital__and__icu_values.feather

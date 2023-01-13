@@ -1,70 +1,76 @@
+"""Load a snapshot and create a meadow dataset."""
+
 import pandas as pd
 from owid.catalog import Dataset, Table
 from structlog import get_logger
 
-from etl.helpers import Names
-{% if cookiecutter.load_population == "True" %}
-from etl.paths import DATA_DIR
-{% endif -%}
-{% if cookiecutter.load_countries_regions == "True" %}
-from etl.paths import REFERENCE_DATASET
-{% endif -%}
+from etl.helpers import PathFinder
 from etl.snapshot import Snapshot
 from etl.steps.data.converters import convert_snapshot_metadata
 
+# Initialize logger.
 log = get_logger()
 
-# naming conventions
-N = Names(__file__)
-
+# Get paths and naming conventions for current step.
+paths = PathFinder(__file__)
 {% if cookiecutter.load_countries_regions == "True" %}
+
+
 def load_countries_regions() -> Table:
-    # load countries regions (e.g. to map from iso codes to country names)
-    reference_dataset = Dataset(REFERENCE_DATASET)
-    return reference_dataset["countries_regions"]
+    # Load countries-regions table from reference dataset (e.g. to map from iso codes to country names).
+    ds_reference = paths.load_dependency("reference")
+    tb_countries_regions = ds_reference["countries_regions"]
+
+    return tb_countries_regions
 {% endif -%}
 {% if cookiecutter.load_population == "True" %}
+
+
 def load_population() -> Table:
-    # load countries regions (e.g. to map from iso codes to country names)
-    indicators = Dataset(DATA_DIR / "garden/owid/latest/key_indicators")
-    return indicators["population"]
+    # Load population table from key_indicators dataset.
+    ds_indicators = paths.load_dependency("key_indicators")
+    tb_population = ds_indicators["population"]
+
+    return tb_population
 {% endif -%}
+
 
 def run(dest_dir: str) -> None:
     log.info("{{cookiecutter.short_name}}.start")
 
-    # retrieve snapshot
-    snap = Snapshot("{{cookiecutter.namespace}}/{{cookiecutter.snapshot_version}}/{{cookiecutter.short_name}}.{{cookiecutter.snapshot_file_extension}}")
-    df = pd.read_excel(snap.path, sheet_name="Full data")
+    #
+    # Load inputs.
+    #
+    # Retrieve snapshot.
+    snap: Snapshot = paths.load_dependency("{{cookiecutter.short_name}}.{{cookiecutter.snapshot_file_extension}}")
 
-    # clean and transform data
-    df = clean_data(df)
+    # Load data from snapshot.
+    df = pd.read_csv(snap.path)
 
-    # create new dataset and reuse walden metadata
-    ds = Dataset.create_empty(dest_dir, metadata=convert_snapshot_metadata(snap.metadata))
-    ds.metadata.version = "{{cookiecutter.version}}"
+    #
+    # Process data.
+    #
+    # Create a new table and ensure all columns are snake-case.
+    tb = Table(df, short_name=paths.short_name, underscore=True)
 
-    # # create table with metadata from dataframe and underscore all columns
-    tb = Table(df, short_name=snap.metadata.short_name, underscore=True)
+    #
+    # Save outputs.
+    #
+    # Create a new meadow dataset with the same metadata as the snapshot.
+    ds_meadow = Dataset.create_empty(dest_dir, metadata=convert_snapshot_metadata(snap.metadata))
 
-    # add table to a dataset
-    ds.add(tb)
+    # Ensure the version of the new dataset corresponds to the version of current step.
+    ds_meadow.metadata.version = paths.version
+
+    # Add the new table to the meadow dataset.
+    ds_meadow.add(tb)
     {% if cookiecutter.include_metadata_yaml == "True" %}
-    # update metadata
-    ds.update_metadata(N.metadata_path)
+
+    # Update dataset and table metadata using adjacent yaml file.
+    ds_meadow.update_metadata(paths.metadata_path)
     {% endif %}
-    # finally save the dataset
-    ds.save()
+
+    # Save changes in the new garden dataset.
+    ds_meadow.save()
 
     log.info("{{cookiecutter.short_name}}.end")
-
-
-def clean_data(df: pd.DataFrame) -> pd.DataFrame:
-    return df.rename(
-        columns={
-            "country": "country",
-            "year": "year",
-            "pop": "population",
-            "gdppc": "gdp",
-        }
-    ).drop(columns=["countrycode"])

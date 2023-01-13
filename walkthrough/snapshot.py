@@ -27,6 +27,7 @@ class SnapshotForm(BaseModel):
     short_name: str
     name: str
     source_name: str
+    source_published_by: str
     publication_year: Optional[str]
     publication_date: Optional[str]
     url: str
@@ -67,91 +68,103 @@ def app(run_checks: bool, dummy_data: bool) -> None:
             pi.input(
                 "Namespace",
                 name="namespace",
-                placeholder="ggdc",
-                help_text="E.g. institution name",
+                placeholder="institution",
                 required=True,
                 value=dummies.get("namespace"),
+                help_text="Institution name. Example: emdat",
             ),
             pi.input(
-                "Version",
+                "Snapshot version",
                 name="snapshot_version",
                 placeholder=str(dt.date.today()),
-                help_text="E.g. current date, publication date or year is used if not given",
-                required=False,
+                required=True,
                 value=dummies.get("snapshot_version", str(dt.date.today())),
+                help_text="Version of the snapshot dataset (by default, the current date, or exceptionally the publication date).",
             ),
             pi.input(
-                "Short name",
+                "Snapshot dataset short name",
                 name="short_name",
-                placeholder="ggdc_maddison",
+                placeholder="testing_dataset_name",
                 required=True,
                 value=dummies.get("short_name"),
                 validate=utils.validate_short_name,
-                help_text="Underscored short name",
+                help_text="Underscored dataset short name. Example: natural_disasters",
             ),
             pi.input(
-                "Full name",
+                "Dataset full name",
                 name="name",
-                placeholder="Maddison Project Database (GGDC, 2020)",
+                placeholder="Testing Dataset Name (Institution, 2023)",
                 required=True,
                 value=dummies.get("name"),
+                help_text="Human-readable dataset name, followed by (Institution, Year of version). Example: Natural disasters (EMDAT, 2022)",
             ),
             pi.input(
-                "Source name",
+                "Source short citation",
                 name="source_name",
-                placeholder="Maddison Project Database 2020 (Bolt and van Zanden, 2020)",
+                placeholder="Testing Short Citation",
                 required=True,
                 value=dummies.get("source_name"),
+                help_text="Short source citation (to show in charts). Example: EM-DAT",
+            ),
+            pi.input(
+                "Source full citation",
+                name="source_published_by",
+                placeholder="Testing Full Citation",
+                required=True,
+                value=dummies.get("source_published_by"),
+                help_text="Testing Full Citation, as recommended by the source. Example: EM-DAT, CRED / UCLouvain, Brussels, Belgium",
+            ),
+            pi.input(
+                "Publication date",
+                name="publication_date",
+                placeholder="",
+                value=dummies.get("publication_date"),
+                help_text="Date when the dataset was published by the source. Example: 2023-01-01",
             ),
             pi.input(
                 "Publication year",
                 name="publication_year",
                 type=pi.NUMBER,
-                placeholder="2020",
-                help_text="Fill either publication year or publication date",
-            ),
-            pi.input(
-                "Publication date",
-                name="publication_date",
-                placeholder="2020-10-01",
-                help_text="Fill either publication year or publication date",
-                value=dummies.get("publication_date"),
+                placeholder="",
+                help_text="Only if the exact publication date is unknown, year when the dataset was published by the source. Example: 2023",
             ),
             pi.input(
                 "Dataset webpage URL",
                 name="url",
-                placeholder=(
-                    "https://www.rug.nl/ggdc/historicaldevelopment/maddison/releases/maddison-project-database-2020"
-                ),
-                help_text="Url to the main page of the project",
+                placeholder=("https://url_of_testing_source.com/"),
                 required=True,
                 value=dummies.get("url"),
+                help_text="URL to the main page of the project.",
             ),
             pi.input(
                 "Dataset download URL",
                 name="source_data_url",
-                placeholder="https://www.rug.nl/ggdc/historicaldevelopment/maddison/data/mpd2020.xlsx",
+                placeholder="https://url_of_testing_source.com/data.csv",
                 value=dummies.get("source_data_url"),
+                help_text="URL to download the data file.",
             ),
             pi.input(
                 "File extension",
                 name="file_extension",
-                placeholder="xlsx",
+                placeholder="csv",
                 value=dummies.get("file_extension"),
+                help_text="File extension (without the '.') of the file to be downloaded. Example: csv",
             ),
             pi.input(
                 "License URL",
                 name="license_url",
-                placeholder=(
-                    "https://www.rug.nl/ggdc/historicaldevelopment/maddison/releases/maddison-project-database-2020"
-                ),
+                placeholder=("https://url_of_testing_source.com/license"),
+                help_text="URL to the page where the source specifies the license of the dataset.",
             ),
             pi.input(
                 "License name",
                 name="license_name",
                 placeholder="Creative Commons BY 4.0",
+                help_text="Name of the dataset license. Example: 'Creative Commons BY 4.0'",
             ),
-            pi.textarea("Description", name="description", value=dummies.get("description")),
+            pi.textarea(
+                "Description", name="description", value=dummies.get("description"), help_text="Dataset description."
+            ),
             pi.checkbox(
                 "Other options",
                 options=[

@@ -176,6 +176,7 @@ def _snapshot_values_metadata(ds: gm.Dataset, short_name: str, public: bool) -> 
         date_accessed=dt.datetime.utcnow(),
         description=ds.description,
         source_name="Our World in Data catalog backport",
+        source_published_by="Our World in Data catalog backport",
         url=f"https://owid.cloud/admin/datasets/{ds.id}",
         publication_date="latest",
         file_extension="feather",

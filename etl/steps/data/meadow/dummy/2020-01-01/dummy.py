@@ -1,52 +1,54 @@
+"""Load a snapshot and create a meadow dataset."""
+
 import pandas as pd
 from owid.catalog import Dataset, Table
 from structlog import get_logger
 
-from etl.helpers import Names
+from etl.helpers import PathFinder
 from etl.snapshot import Snapshot
 from etl.steps.data.converters import convert_snapshot_metadata
 
+# Initialize logger.
 log = get_logger()
 
-# naming conventions
-N = Names(__file__)
+# Get paths and naming conventions for current step.
+paths = PathFinder(__file__)
 
 
 def run(dest_dir: str) -> None:
     log.info("dummy.start")
 
-    # retrieve snapshot
-    snap = Snapshot("dummy/2020-01-01/dummy.xlsx")
-    df = pd.read_excel(snap.path, sheet_name="Full data")
+    #
+    # Load inputs.
+    #
+    # Retrieve snapshot.
+    snap: Snapshot = paths.load_dependency("dummy.csv")
 
-    # clean and transform data
-    df = clean_data(df)
+    # Load data from snapshot.
+    df = pd.read_csv(snap.path)
 
-    # create new dataset and reuse walden metadata
-    ds = Dataset.create_empty(dest_dir, metadata=convert_snapshot_metadata(snap.metadata))
-    ds.metadata.version = "2020-01-01"
+    #
+    # Process data.
+    #
+    # Create a new table and ensure all columns are snake-case.
+    tb = Table(df, short_name=paths.short_name, underscore=True)
 
-    # # create table with metadata from dataframe and underscore all columns
-    tb = Table(df, short_name=snap.metadata.short_name, underscore=True)
+    #
+    # Save outputs.
+    #
+    # Create a new meadow dataset with the same metadata as the snapshot.
+    ds_meadow = Dataset.create_empty(dest_dir, metadata=convert_snapshot_metadata(snap.metadata))
 
-    # add table to a dataset
-    ds.add(tb)
+    # Ensure the version of the new dataset corresponds to the version of current step.
+    ds_meadow.metadata.version = paths.version
 
-    # update metadata
-    ds.update_metadata(N.metadata_path)
+    # Add the new table to the meadow dataset.
+    ds_meadow.add(tb)
 
-    # finally save the dataset
-    ds.save()
+    # Update dataset and table metadata using adjacent yaml file.
+    ds_meadow.update_metadata(paths.metadata_path)
+
+    # Save changes in the new garden dataset.
+    ds_meadow.save()
 
     log.info("dummy.end")
-
-
-def clean_data(df: pd.DataFrame) -> pd.DataFrame:
-    return df.rename(
-        columns={
-            "country": "country",
-            "year": "year",
-            "pop": "population",
-            "gdppc": "gdp",
-        }
-    ).drop(columns=["countrycode"])

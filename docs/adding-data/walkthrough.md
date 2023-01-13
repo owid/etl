@@ -14,7 +14,7 @@ The ETL uses a naming convention to identify datasets. To add a dataset, you wil
 
 You will also need to choose a short name for the dataset itself (e.g. `population`), which will be used to identify the dataset in the ETL.
 
-!!! tip "What's a short name?"
+??? tip "What's a short name?"
 
     Short names must be unique within a namespace. They must be in lowercase and separated only with underscores. They must not contain any special characters, and should not be too long.
 
