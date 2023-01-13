@@ -84,37 +84,37 @@ tables:
         unit: homicides
         display:
           numDecimalPlaces: 0
-      firearms_homicide_per_100_000_population:
+      firearms_homicides_per_100_000_population:
         title: Homicides by firearm per 100,000 population
         short_unit: ''
         unit: homicides per 100,000 people
         display:
           numDecimalPlaces: 2
-      sharp_object_homicide_per_100_000_population:
+      sharp_object_homicides_per_100_000_population:
         title: Homicides by sharp object per 100,000 population
         short_unit: ''
         unit: homicides per 100,000 people
         display:
           numDecimalPlaces: 2
-      unspecified_means_homicide_per_100_000_population:
+      unspecified_means_homicides_per_100_000_population:
         title: Homicides by unspecified means per 100,000 population
         short_unit: ''
         unit: homicides per 100,000 people
         display:
           numDecimalPlaces: 2
-      without_a_weapon__other_mechanism_homicide_per_100_000_population:
+      without_a_weapon__other_mechanism_homicides_per_100_000_population:
         title: Homicides by without a weapon per 100,000 population
         short_unit: ''
         unit: homicides per 100,000 people
         display:
           numDecimalPlaces: 2
-      firearms_or_explosives_homicide_per_100_000_population:
+      firearms_or_explosives_homicides_per_100_000_population:
         title: Homicides by firearms or explosives per 100,000 population
         short_unit: ''
         unit: homicides per 100,000 people
         display:
           numDecimalPlaces: 2
-      another_weapon_homicide_per_100_000_population:
+      another_weapon_homicides_per_100_000_population:
         title: Homicides by sharp or blunt objects, including motor vehicles, per 100,000 population
         short_unit: ''
         unit: homicides per 100,000 people
@@ -252,13 +252,13 @@ tables:
         unit: homicides per 100,000 people
         display:
           numDecimalPlaces: 2
-      female_sexes_all_ages_homicides_per_100_000_population:
+      female_all_ages_homicides_per_100_000_population:
         title: Total homicides where the victim was female per 100,000 population
         short_unit: ''
         unit: homicides per 100,000 people
         display:
           numDecimalPlaces: 2
-      male_sexes_all_ages_homicides_per_100_000_population:
+      male_all_ages_homicides_per_100_000_population:
         title: Total homicides where the victim was male per 100,000 population
         short_unit: ''
         unit: homicides per 100,000 people

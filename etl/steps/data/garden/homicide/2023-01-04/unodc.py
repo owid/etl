@@ -14,7 +14,6 @@ log = get_logger()
 
 # naming conventions
 paths = PathFinder(__file__)
-paths = PathFinder("/Users/fionaspooner/Documents/OWID/repos/etl/etl/steps/data/garden/homicide/2023-01-04/unodc.py")
 
 
 def run(dest_dir: str) -> None:
