@@ -1,17 +1,18 @@
 meta:
   namespace: backport
   short_name: dataset_5220_covid_19__johns_hopkins_university_values
+  file_extension: feather
+  date_accessed: 2023-01-13 06:02:57.837170
   name: COVID-19 - Johns Hopkins University
   description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5220
-  file_extension: feather
-  date_accessed: 2023-01-12 12:02:09.777072
+  source_published_by: Our World in Data catalog backport
   is_public: false
   version: latest
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: c1dbbce2bb0ca5486cf9942b601b955b
-  size: 20037114
+- md5: 16321a962064c9177f2e60b9c38d2755
+  size: 20000794
   path: dataset_5220_covid_19__johns_hopkins_university_values.feather

@@ -1,3 +1,4 @@
+import datetime as dt
 from enum import Enum
 from pathlib import Path
 from typing import Any
@@ -55,25 +56,27 @@ def app(run_checks: bool, dummy_data: bool) -> None:
             pi.input(
                 "Namespace",
                 name="namespace",
-                placeholder="ggdc",
+                placeholder="institution",
                 required=True,
                 value=dummies.get("namespace"),
+                help_text="Institution name. Example: emdat",
             ),
             pi.input(
-                "Version",
+                "Grapher dataset version",
                 name="version",
-                placeholder="2020",
+                placeholder=str(dt.date.today()),
                 required=True,
-                value=dummies.get("version"),
+                value=dummies.get("version", str(dt.date.today())),
+                help_text="Version of the grapher dataset (by default, the current date, or exceptionally the publication date).",
             ),
             pi.input(
-                "Short name",
+                "Grapher dataset short name",
                 name="short_name",
-                placeholder="ggdc_maddison",
+                placeholder="testing_dataset_name",
                 required=True,
                 value=dummies.get("short_name"),
                 validate=utils.validate_short_name,
-                help_text="Underscored short name",
+                help_text="Underscored dataset short name. Example: natural_disasters",
             ),
             pi.checkbox(
                 "Additional Options",
