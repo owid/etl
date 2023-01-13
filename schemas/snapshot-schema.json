@@ -1,0 +1,105 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "meta": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "namespace": {
+            "type": "string"
+          },
+          "short_name": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          },
+          "source_name": {
+            "type": "string"
+          },
+          "publication_year": {
+            "type": "integer"
+          },
+          "publication_date": {
+            "type": ["string", "null"]
+          },
+          "url": {
+            "type": "string"
+          },
+          "source_data_url": {
+            "type": ["string", "null"]
+          },
+          "source_published_by": {
+            "type": "string"
+          },
+          "file_extension": {
+            "type": "string"
+          },
+          "license_url": {
+            "type": ["string", "null"]
+          },
+          "license_name": {
+            "type": ["string", "null"]
+          },
+          "date_accessed": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "access_notes": {
+            "type": "string"
+          },
+          "is_public": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "namespace",
+          "short_name",
+          "name",
+          "source_name",
+          "url",
+          "file_extension",
+          "date_accessed",
+          "description"
+        ]
+      },
+      "wdir": {
+        "type": "string"
+      },
+      "outs": {
+        "type": "array",
+        "items": [
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "md5": {
+                "type": "string"
+              },
+              "size": {
+                "type": "integer"
+              },
+              "path": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "md5",
+              "size",
+              "path"
+            ]
+          }
+        ]
+      }
+    },
+    "required": [
+      "meta"
+    ]
+  }
