@@ -1,7 +1,6 @@
 dataset:
   namespace: energy
   version: 2022-09-22
-  publication_year: 2022
   title: UK historical electricity
   short_name: uk_historical_electricity
   description: |

@@ -1,7 +1,6 @@
 dataset:
   namespace: emissions
   version: 2022-08-26
-  publication_year: 2022
   title: OWID CO2 dataset (2022)
   short_name: owid_co2
   description: |

@@ -181,8 +181,12 @@
                 }
               }
             }
-          }
+          },
+          "required": ["variables"]
         }
       }
-    }
+    },
+    "required": [
+      "dataset"
+    ]
   }

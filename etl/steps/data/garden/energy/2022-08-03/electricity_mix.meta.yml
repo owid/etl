@@ -1,7 +1,6 @@
 dataset:
   namespace: energy
   version: 2022-08-03
-  publication_year: 2022
   title: Electricity mix (BP & Ember, 2022)
   short_name: electricity_mix
   description: |

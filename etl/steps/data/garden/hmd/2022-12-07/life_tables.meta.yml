@@ -1,6 +1,4 @@
-dataset:
-  sources:
-
+dataset: {}
 tables:
   period_1x1:
     title: Life tables (by age and year)

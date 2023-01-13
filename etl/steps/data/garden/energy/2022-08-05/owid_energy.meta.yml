@@ -1,7 +1,6 @@
 dataset:
   namespace: energy
   version: 2022-08-05
-  publication_year: 2022
   title: OWID Energy dataset (2022)
   short_name: owid_energy
   description: |

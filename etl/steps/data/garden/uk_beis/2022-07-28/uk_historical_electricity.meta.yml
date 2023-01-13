@@ -1,8 +1,6 @@
 dataset:
   namespace: uk_beis
   version: 2022-07-28
-  publication_date: 2022-07-28
-  publication_year: 2022
   title: UK historical electricity
   short_name: uk_historical_electricity
   description: |

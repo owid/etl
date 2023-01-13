@@ -1,7 +1,6 @@
 dataset:
   namespace: energy
   version: 2022-12-12
-  publication_year: 2022
   title: UK historical electricity (DUKES, 2022)
   short_name: uk_historical_electricity
   description: |

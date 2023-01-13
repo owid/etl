@@ -1,7 +1,6 @@
 dataset:
   namespace: bp
   version: 2022-12-28
-  publication_year: 2022
   title: Fossil fuel reserves/production ratio (BP, 2022)
   short_name: fossil_fuel_reserves_production_ratio
   description: |

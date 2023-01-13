@@ -1,7 +1,6 @@
 dataset:
   namespace: country_profile
-  version: 2022
-  publication_year: 2022
+  version: "2022"
   title: Country Profile Overview
   short_name: country_profile_overview
   description: |

@@ -1,17 +1,4 @@
-dataset:
-  namespace: growth
-  version: 2022-12-19
-  title: Global GDP in the last millennia (2022)
-  publication_year: 2022
-  short_name: gdp_historical
-  description: |
-    This dataset combines the Maddison Project Database, Maddison Database and World Bank's World Development Indicators current estimations to present the most up-to-date evolution of GDP and GDP per capita in the last millennia. As the global aggregation from the World Bank only starts from 1990, the global GDP data is separated into three parts:
-    <ul>
-      <li>From 1990 onward it is exactly the same value estimated by the World Bank (international-$ in 2017 prices).</li>
-      <li>Between 1820 and 1990 the World Bank data from 1990 is retroactively adjusted using the global aggregations by Maddison Project Database.</li>
-      <li>Between 1 and 1820 the 1820 estimation is retroactively adjusted using growth coming from the Maddison Database 2010</li>
-    </ul>
-  all_sources:
+all_sources:
    - maddison_project: &source_maddison_project
       name: Bolt and van Zanden (2020)
       published_by: Bolt, J. and van Zanden, J.L. (2020). "Maddison style estimates of the evolution of the world economy. A new 2020 update."
@@ -36,6 +23,19 @@ dataset:
       date_accessed: 2022-06-02
       publication_date:
       url: https://datacatalog.worldbank.org/search/dataset/0037712/World-Development-Indicators
+
+dataset:
+  namespace: growth
+  version: 2022-12-19
+  title: Global GDP in the last millennia (2022)
+  short_name: gdp_historical
+  description: |
+    This dataset combines the Maddison Project Database, Maddison Database and World Bank's World Development Indicators current estimations to present the most up-to-date evolution of GDP and GDP per capita in the last millennia. As the global aggregation from the World Bank only starts from 1990, the global GDP data is separated into three parts:
+    <ul>
+      <li>From 1990 onward it is exactly the same value estimated by the World Bank (international-$ in 2017 prices).</li>
+      <li>Between 1820 and 1990 the World Bank data from 1990 is retroactively adjusted using the global aggregations by Maddison Project Database.</li>
+      <li>Between 1 and 1820 the 1820 estimation is retroactively adjusted using growth coming from the Maddison Database 2010</li>
+    </ul>
   sources:
     - *source_maddison_project
     - *source_maddison_database

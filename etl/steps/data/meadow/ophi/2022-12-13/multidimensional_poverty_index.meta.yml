@@ -2,7 +2,6 @@ dataset:
   namespace: ophi
   version: 2022-12-13
   title: Multidimensional Poverty Index (MPI) (OPHI, 2022)
-  publication_year: 2022
   short_name: multidimensional_poverty_index
   description: |
     The global Multidimensional Poverty Index (MPI) is an international measure of acute multidimensional poverty covering over 100 developing countries. It complements traditional monetary poverty measures by capturing the acute deprivations in health, education, and living standards that a person faces simultaneously.
