@@ -12,7 +12,7 @@ from typing import DefaultDict, Dict, List, Optional, Set, cast
 import click
 import pandas as pd
 from owid.catalog import Dataset
-from thefuzz import process
+from rapidfuzz import process
 
 from etl.paths import REFERENCE_DATASET
 
