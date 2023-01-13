@@ -50,17 +50,6 @@ def calculate_multiple_year_average(df: pd.DataFrame) -> pd.DataFrame:
 
     df_comb = df_comb.sort_values("year")
 
-    df_comb["average_20_years"] = df_comb["full_flowering_date"].rolling(20, min_periods=1).mean()
-
-    df_comb["average_40_years"] = df_comb["full_flowering_date"].rolling(40, min_periods=1).mean()
-
-    df_comb["average_50_years"] = df_comb["full_flowering_date"].rolling(50, min_periods=1).mean()
-
-    df_comb["average_100_years"] = df_comb["full_flowering_date"].rolling(100, min_periods=1).mean()
-
-    # experimenting with splines
-    # df_nona = df_comb.dropna(subset="full_flowering_date")
-    # spl = UnivariateSpline(x=df_nona["year"], y=df_nona["full_flowering_date"], s=200, k=1)
-    # df_comb["uni_spline"] = spl(df_comb["year"])
+    df_comb["average_20_years"] = df_comb["full_flowering_date"].rolling(20, min_periods=5).mean()
 
     return df_comb
