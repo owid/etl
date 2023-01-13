@@ -162,9 +162,9 @@ class CountryRegionMapper:
         # some of these aliases will actually be for the same country/region,
         # just take the best score for each match
         best: DefaultDict[str, int] = defaultdict(int)
-        for match, score in results:
+        for match, score, _ in results:
             key = self.aliases[match]
-            best[key] = max(best[key], score)
+            best[key] = max(best[key], int(score))
 
         # return them in descending order
         pairs = sorted([(s, m) for m, s in best.items()], reverse=True)
