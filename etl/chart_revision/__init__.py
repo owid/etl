@@ -1,4 +1,4 @@
-from etl.chart_revision.reviewer import ChartReviewer
+from etl.chart_revision.revision import ChartVariableUpdateRevision
 
 
-__all__ = ["ChartReviewer"]
+__all__ = ["ChartVariableUpdateRevision"]

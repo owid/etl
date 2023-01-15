@@ -1,15 +1,26 @@
 from dataclasses import dataclass
-from typing import List, Any, Dict, Union
-from etl.db import get_connection
+from typing import Dict, List, Union
+
 import pandas as pd
+
+from etl.db import get_connection
 
 
 @dataclass
-class Variables:
-    # Variable ID mapping (old to new)
+class VariablesUpdate:
+    """Contains the details on the variable updates."""
+
     mapping: Dict[int, int]
-    # Metadata for each variable (by variable ID)
-    _metadata: Dict[Any, Any] = None
+    # Variables metadata for each variable (by variable ID)
+    metadata: List["VariableMetadata"]
+    _metadata_dix: Dict[int, "VariableMetadata"] = None
+
+    def __init__(self, mapping: Dict[int, int], metadata: List["VariableMetadata"] = None):
+        self.mapping = mapping
+        if metadata:
+            self.metadata = metadata
+        else:
+            self.metadata = self._get_metadata_from_db()
 
     @property
     def ids_old(self) -> List[int]:
@@ -24,22 +35,55 @@ class Variables:
         return list(set(self.ids_old) | set(self.ids_new))
 
     @property
-    def metadata(self):
-        if self._metadata is None:
-            # build query
-            query = """
-                SELECT variableId, MIN(year) AS minYear, MAX(year) AS maxYear
-                FROM data_values
-                WHERE variableId IN %(variable_ids)s
-                GROUP BY variableId
-            """
-            # get data
-            with get_connection() as db_conn:
-                df_var_years = pd.read_sql(query, db_conn, params={"variable_ids": self.ids_all})
+    def metadata_dix(self) -> List[int]:
+        if not self._metadata_dix:
+            self._metadata_dix = {m.id: m for m in self.metadata}
+        return self._metadata_dix
 
-            # build variables metadata
-            self._metadata = df_var_years.set_index("variableId").to_dict("index")
-        return self._metadata
+    def get_metadata(self, variable_id: int):
+        if variable_id not in self.metadata_dix:
+            raise ValueError(f"Variable ID {variable_id} is not a variable to be updated!")
+        return self.metadata_dix[variable_id]
+
+    def map(self, old_id: int):
+        if old_id not in self.mapping:
+            raise ValueError(f"Variable ID {old_id} is not a variable to be updated!")
+        return self.mapping[old_id]
+
+    def _get_metadata_from_db(self) -> List["VariableMetadata"]:
+        """Get metadata for all variables in the update."""
+        # build query
+        query = """
+            SELECT variableId, MIN(year) AS minYear, MAX(year) AS maxYear
+            FROM data_values
+            WHERE variableId IN %(variable_ids)s
+            GROUP BY variableId
+        """
+        # get data
+        with get_connection() as db_conn:
+            df_var_years = pd.read_sql(query, db_conn, params={"variable_ids": self.ids_all})
+
+        # build list of variable metadata
+        metadata_raw = df_var_years.set_index("variableId").to_dict("index")
+        metadata = []
+        for k, v in metadata_raw.items():
+            metadata.append(
+                VariableMetadata(
+                    id=k,
+                    min_year=v["minYear"],
+                    max_year=v["maxYear"],
+                )
+            )
+        return metadata
+
+    def slice(self, variable_ids: List[int]) -> "VariablesUpdate":
+        """Slice with only variable updates specified by `variable_ids` (currently used variables)."""
+        mapping = {k: v for k, v in self.mapping.items() if k in variable_ids}
+        all_ids = list(set(variable_ids) | set(mapping.values()))
+        return VariablesUpdate(
+            mapping=mapping,
+            metadata=[m for m in self.metadata if m.id in all_ids],
+        )
 
     def get_year_range(self, variable_id_or_ids: Union[int, List[int]]):
         """Get year range for variable(s).
@@ -49,11 +93,28 @@ class Variables:
         of all variables in the list.
         """
         if isinstance(variable_id_or_ids, int):
-            return [self.metadata[variable_id_or_ids]["minYear"], self.metadata[variable_id_or_ids]["maxYear"]]
+            # print(1)
+            if variable_id_or_ids not in self.metadata_dix:
+                raise ValueError(f"Variable ID {variable_id_or_ids} is not a variable to be updated!")
+            var_meta = self.get_metadata(variable_id_or_ids)
+            return [var_meta.min_year, var_meta.max_year]
         elif isinstance(variable_id_or_ids, list):
+            # print(2)
+            if not all([v in self.metadata_dix for v in variable_id_or_ids]):
+                raise ValueError(f"Some (or all) variable IDs in {variable_id_or_ids} are not variables to be updated!")
             year_min = 3000
             year_max = -1
             for var_id in variable_id_or_ids:
-                year_min = min(year_min, self.metadata[var_id]["minYear"])
-                year_max = max(year_max, self.metadata[var_id]["maxYear"])
+                var_meta = self.get_metadata(var_id)
+                year_min = min(year_min, var_meta.min_year)
+                year_max = max(year_max, var_meta.max_year)
             return [year_min, year_max]
+
+
+@dataclass
+class VariableMetadata:
+    """Wrapper around variable metadata."""
+
+    id: int
+    min_year: int
+    max_year: int
