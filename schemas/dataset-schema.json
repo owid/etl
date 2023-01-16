@@ -60,7 +60,8 @@
                     "type": "string"
                   },
                   "date_accessed": {
-                    "type": "string"
+                    "type": "string",
+                    "format": "date"
                   },
                   "description": {
                     "type": "string"
@@ -69,7 +70,8 @@
                     "type": "integer"
                   },
                   "publication_date": {
-                    "type": "string"
+                    "type": "string",
+                    "format": "date"
                   },
                   "published_by": {
                     "type": "string"
@@ -136,7 +138,8 @@
                             "type": "string"
                           },
                           "date_accessed": {
-                            "type": "string"
+                            "type": "string",
+                            "format": "date"
                           },
                           "description": {
                             "type": "string"
@@ -145,7 +148,8 @@
                             "type": "integer"
                           },
                           "publication_date": {
-                            "type": "string"
+                            "type": "string",
+                            "format": "date"
                           },
                           "published_by": {
                             "type": "string"

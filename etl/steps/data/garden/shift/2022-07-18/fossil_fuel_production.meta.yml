@@ -9,7 +9,7 @@ dataset:
     -
       name: Our World in Data based on The Shift Dataportal (2022)
       published_by: The Shift Dataportal
-      date_accessed: 18th July 2022
+      date_accessed: 2022-07-18
       url: https://www.theshiftdataportal.org/energy
 tables:
   fossil_fuel_production:

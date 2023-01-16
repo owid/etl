@@ -26,7 +26,8 @@
             "type": "integer"
           },
           "publication_date": {
-            "type": ["string", "null"]
+            "type": ["string", "null"],
+            "format": "date"
           },
           "url": {
             "type": "string"
@@ -47,7 +48,8 @@
             "type": ["string", "null"]
           },
           "date_accessed": {
-            "type": "string"
+            "type": "string",
+            "format": "date"
           },
           "description": {
             "type": "string"

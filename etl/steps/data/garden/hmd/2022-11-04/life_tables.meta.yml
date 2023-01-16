@@ -1,5 +1,4 @@
-dataset:
-  sources: []
+dataset: {}
 
 tables:
   period_1x1:

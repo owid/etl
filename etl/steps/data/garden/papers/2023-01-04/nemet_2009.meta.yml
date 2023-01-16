@@ -16,4 +16,4 @@ dataset:
     publication_year: 2009
 tables:
   nemet_2009:
-    variables:
+    variables: {}

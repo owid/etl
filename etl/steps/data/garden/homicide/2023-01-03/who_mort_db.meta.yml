@@ -6,9 +6,9 @@ dataset:
     The WHO Mortality Database hosts recorded cause-of-death data for each of the WHO member states. The share of deaths that are recorded varies between countries, from 90% of deaths recorded in some countries with fewer than 10% recorded in others.
 
 
-    Causes of death are recorded according to the 10th version of the International Classification of Diseases (ICD10). 
+    Causes of death are recorded according to the 10th version of the International Classification of Diseases (ICD10).
 
-    
+
     Deaths coded with ICD10 codes X85-Y09 (injuries inflicted by another person with intent to injure or kill), and ICD code Y87.1 (sequelae of assault), generally correspond to the definition of intentional homicide.
   licenses:
   - name: CC BY-NC-SA 3.0 IGO
