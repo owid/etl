@@ -2,13 +2,13 @@ import pandas as pd
 from owid.catalog import Dataset, Table
 from structlog import get_logger
 
-from etl.helpers import Names
+from etl.helpers import PathFinder
 from etl.paths import DATA_DIR
 
 log = get_logger()
 
 # naming conventions
-N = Names(__file__)
+paths = PathFinder(__file__)
 
 
 def run(dest_dir: str) -> None:
@@ -32,7 +32,7 @@ def run(dest_dir: str) -> None:
     ds_garden.add(tb_garden)
 
     # update metadata from yaml file
-    ds_garden.update_metadata(N.metadata_path)
+    ds_garden.update_metadata(paths.metadata_path)
 
     ds_garden.save()
 
