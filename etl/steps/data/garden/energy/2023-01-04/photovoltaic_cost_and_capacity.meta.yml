@@ -44,7 +44,6 @@ all_sources:
         Photovoltaic cost data between 2010 and 2021 has been taken from IRENA.
 
 dataset:
-  channel: garden
   namespace: energy
   short_name: photovoltaic_cost_and_capacity
   title: Solar photovoltaic cost and capacity (Energy, 2023)
@@ -83,7 +82,6 @@ tables:
           Global cumulative capacity of solar photovoltaics.
         short_unit: 'MW'
         unit: 'megawatts'
-        description:
         sources:
           - *source-nemet_2009
           - *source-irena_capacity
