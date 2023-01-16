@@ -2,7 +2,6 @@ dataset:
   namespace: papers
   short_name: nemet_2009
   title: Cost and capacity of photovoltaic technology
-  description:
   licenses:
   - name: Creative Commons Attribution 3.0 Unported License
     url: https://pcdb.santafe.edu/graph.php?curve=158
@@ -17,4 +16,4 @@ dataset:
     publication_year: 2009
 tables:
   nemet_2009:
-    variables:
+    variables: {}

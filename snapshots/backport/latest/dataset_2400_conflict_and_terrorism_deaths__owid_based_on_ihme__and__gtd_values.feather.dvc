@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 16:29:44.940371
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Conflict and Terrorism deaths - OWID based on IHME & GTD
   namespace: backport
-  publication_date: latest
   short_name: dataset_2400_conflict_and_terrorism_deaths__owid_based_on_ihme__and__gtd_values
+  file_extension: feather
+  date_accessed: 2023-01-13 12:00:51.961599
+  name: Conflict and Terrorism deaths - OWID based on IHME & GTD
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2400
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: b32d898cc46255bb5b7b851959682e2f
-  size: 61594
+- md5: 2b2c04efb34a66ba3829601d1c8b8734
+  size: 57050
   path: dataset_2400_conflict_and_terrorism_deaths__owid_based_on_ihme__and__gtd_values.feather

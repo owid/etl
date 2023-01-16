@@ -1,17 +1,18 @@
 meta:
   namespace: backport
   short_name: dataset_5253_covid_19__vaccinations_by_manufacturer_values
+  file_extension: feather
+  date_accessed: 2023-01-15 12:02:06.070491
   name: COVID-19 - Vaccinations by manufacturer
   description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5253
-  file_extension: feather
-  date_accessed: 2023-01-12 12:03:36.186181
+  source_published_by: Our World in Data catalog backport
   is_public: false
   version: latest
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 8f65b6e0aa249d0fd2ba2f1f68830aab
-  size: 361018
+- md5: b4e1115c2e27de63e7e0668087cff76c
+  size: 360794
   path: dataset_5253_covid_19__vaccinations_by_manufacturer_values.feather

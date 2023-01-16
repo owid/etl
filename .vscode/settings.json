@@ -1,3 +1,11 @@
 {
-    "esbonio.sphinx.confDir": ""
+    "esbonio.sphinx.confDir": "",
+    "files.associations": {
+        "*.dvc": "yaml"
+    },
+    "files.trimTrailingWhitespace": true,
+    "yaml.schemas": {
+        "schemas/snapshot-schema.json": "**/*.dvc",
+        "schemas/dataset-schema.json": "**/*.meta.yml"
+    }
 }
