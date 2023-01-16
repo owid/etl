@@ -33,7 +33,7 @@ steps:
 
   #WHO - Global Health Observatory (Incomplete; waiting for WHO API update)
   data://meadow/who/2021-07-01/gho:
-  - walden://who/2021-07-01/gho
+    - walden://who/2021-07-01/gho
   # IHME Global Burden of Disease
   data://meadow/ihme_gbd/2020-12-19/child_mortality:
     - walden://ihme_gbd/2020-12-19/child_mortality
