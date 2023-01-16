@@ -133,7 +133,13 @@ def parse_metadata_from_sheets(
 
 
 def _expand_sources(sources_name: str, sources_dict: Dict[str, Any]) -> List[Dict[str, Any]]:
-    return [sources_dict[source_short_name] for source_short_name in map(lambda s: s.strip(), sources_name.split(","))]
+    sources = []
+    for source_short_name in map(lambda s: s.strip(), sources_name.split(",")):
+        try:
+            sources.append(sources_dict[source_short_name])
+        except KeyError as e:
+            raise ValidationError(f"Source with short_name `{source_short_name}` not found in `sources_meta` sheet")
+    return sources
 
 
 def _move_keys_to_the_end(d: Dict[str, Any], keys: List[str]) -> None:
