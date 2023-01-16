@@ -16,6 +16,11 @@ from MySQLdb import OperationalError
 from pywebio import input as pi
 from pywebio import output as po
 
+from etl.chart_revision.revision import (
+    ChartVariableUpdateRevision,
+    get_charts_to_update,
+    submit_revisions_to_grapher,
+)
 from etl.chart_revision_suggester import ChartRevisionSuggester
 from etl.db import get_all_datasets, get_connection, get_variables_in_dataset
 from etl.match_variables import (
@@ -285,6 +290,13 @@ class Navigation:
                         " if you want to manually map them."
                     ),
                 ),
+                pi.checkbox(
+                    "",
+                    options=["Experimental"],
+                    value=[],
+                    name="experimental",
+                    help_text="🧪 Use experimental chart reviewer. Help Lucas test it!",
+                ),
             ],
         )
 
@@ -493,26 +505,48 @@ class Navigation:
         self.show_variable_mapping_table(separate=True)
         # clean variable mapping (ignore -1)
         self._clean_variable_mapping()
-        # build suggester
-        suggester = ChartRevisionSuggester(self.variable_mapping)
-        # show charts to be updated (and therefore get revisions)
-        revisions = self.show_submission_details(suggester)
-        # check revisions is not emptu/None
-        if revisions:
-            # ask user to confirm submission
-            action = pi.actions("Confirm submission", [{"label": "Confirm", "value": 1, "color": "success"}])
-            if action == 1:
-                # submit suggestions to DB
-                exit_code = self.submit_suggestions(suggester, revisions)
-                # show next steps
-                if exit_code == 0:
-                    po.put_markdown(
-                        f"""
-                    ## Next steps
+        # TODO: this is a hack to allow for experimental version
+        if self.params["experimental"]:
+            # Get revisions to be made
+            charts = get_charts_to_update(self.variable_mapping)
+            # show charts to be updated (and therefore get revisions)
+            revisions = self.show_submission_details_exp(charts)
+            if revisions:
+                # ask user to confirm submission
+                action = pi.actions("Confirm submission", [{"label": "Confirm", "value": 1, "color": "success"}])
+                if action == 1:
+                    # submit suggestions to DB
+                    exit_code = self.submit_suggestions_exp(revisions)
+                    # show next steps
+                    if exit_code == 0:
+                        po.put_markdown(
+                            f"""
+                        ## Next steps
 
-                    Go to the [Chart approval tool]({OWID_ENV.chart_approval_tool_url}) and approve, flag or reject the suggested chart revisions.
-                    """
-                    )
+                        Go to the [Chart approval tool]({OWID_ENV.chart_approval_tool_url}) and approve, flag or reject the suggested chart revisions.
+                        """
+                        )
+        else:
+            # build suggester
+            suggester = ChartRevisionSuggester(self.variable_mapping)
+            # show charts to be updated (and therefore get revisions)
+            revisions = self.show_submission_details(suggester)
+            # check revisions is not emptu/None
+            if revisions:
+                # ask user to confirm submission
+                action = pi.actions("Confirm submission", [{"label": "Confirm", "value": 1, "color": "success"}])
+                if action == 1:
+                    # submit suggestions to DB
+                    exit_code = self.submit_suggestions(suggester, revisions)
+                    # show next steps
+                    if exit_code == 0:
+                        po.put_markdown(
+                            f"""
+                        ## Next steps
+
+                        Go to the [Chart approval tool]({OWID_ENV.chart_approval_tool_url}) and approve, flag or reject the suggested chart revisions.
+                        """
+                        )
 
     def show_variable_mapping_table(self, separate: bool = False):
         """Show variable mapping table.
@@ -714,8 +748,57 @@ class Navigation:
                     _show_chart_details(suggested_chart_revisions)
                 # logs
                 if suggester.logs:
-                    _show_logs_from_suggester(suggester)
+                    _show_logs_from_suggester(suggester.logs)
             return suggested_chart_revisions
+
+    def show_submission_details_exp(
+        self, revisions: List[ChartVariableUpdateRevision]
+    ) -> Optional[List[ChartVariableUpdateRevision]]:
+        """Show submission details.
+
+        This includes the variable id mapping, but also the charts that will be affected by the mapping.
+        """
+        log.info("Showing submission details...")
+        # get ID mapping without ignore ones (-1)
+        po.toast("Getting submission details...")
+        po.put_markdown("## Submission details")
+        if not self.variable_mapping:
+            po.put_error("Mapping is empty!")
+        else:
+            po.put_markdown("### Variable ID mapping to be submitted")
+            po.put_code(self.variable_mapping, "json")
+            po.put_markdown("### Charts affected")
+            po.put_processbar("bar_submitting_charts", auto_close=True)
+            try:
+                revisions_to_submit = []
+                num_revisions = len(revisions)
+                for i, revision in enumerate(revisions):
+                    revision_ = revision.bake()
+                    # If config has actually changed, then add to list to submit
+                    if revision_.config_has_changed:
+                        revisions_to_submit.append(revision_)
+                    po.set_processbar("bar_submitting_charts", i / num_revisions)
+                po.set_processbar("bar_submitting_charts", 1)
+            except Exception as e:
+                po.put_error(f"Error: {e}")
+                return
+            else:
+                # short summary
+                if len(revisions_to_submit) == 0:
+                    po.put_markdown("No charts affected by this variable mapping!")
+                else:
+                    po.put_markdown(
+                        f"There are **{len(revisions_to_submit)} charts** that will be affected by the mapping:"
+                    )
+                    # chart details
+                    _show_chart_details(revisions_to_submit)
+                    # logs
+                    logs = []
+                    for revision in revisions_to_submit:
+                        logs += revision._logs
+                    if logs:
+                        _show_logs_from_suggester(logs)
+            return revisions_to_submit
 
     def submit_suggestions(
         self, suggester: ChartRevisionSuggester, suggested_chart_revisions: List[dict[str, Any]]
@@ -732,6 +815,34 @@ class Navigation:
             po.put_text("Submitting to Grapher...")
             try:
                 suggester.insert(suggested_chart_revisions=suggested_chart_revisions)
+            except Exception as e:
+                po.put_error(e)
+                po.toast("Something went wrong when submitting suggestions to Grapher!", color="error")
+                approval_chart_link = OWID_ENV.chart_approval_tool_url
+                po.put_markdown(
+                    f"Check on the [Chart approval tool]({approval_chart_link})! You might need to delete old chart"
+                    " revisions. Then, run `walkthrough charts` step again."
+                )
+                return -1
+            else:
+                msg = "Chart revisions have been submitted to Grapher!"
+                po.toast(msg, color="success")
+                po.put_success(msg)
+        return 0
+
+    def submit_suggestions_exp(self, revisions: List[ChartVariableUpdateRevision]) -> int:
+        """Submit suggestinos to Grapher.
+
+        If successfull, a green box with success message is shown. Otherwise, red box with error message is shown.
+        """
+        log.info("Submitting suggestions to Grapher...")
+        po.put_markdown("## Submission to Grapher")
+        po.put_markdown("### Grapher response")
+
+        with po.put_loading():
+            po.put_text("Submitting to Grapher...")
+            try:
+                submit_revisions_to_grapher(revisions)
             except Exception as e:
                 po.put_error(e)
                 po.toast("Something went wrong when submitting suggestions to Grapher!", color="error")
@@ -769,12 +880,12 @@ def _show_chart_details(revisions):
         po.put_collapse(title=title, content=[po.put_html(iframe.format(slug))], scope="scroll-charts")
 
 
-def _show_logs_from_suggester(suggester):
+def _show_logs_from_suggester(logs):
     log.info("Showing logs...")
     try:
         po.put_markdown("#### Logs")
         po.put_scrollable(po.put_scope("scroll-logs"))
-        for msg in suggester.logs:
+        for msg in logs:
             text = msg["message"]
             match = re.search(r"([Cc]hart (\d+)).*", text)
             if match:
