@@ -55,9 +55,12 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
 
 def convert_date(df: pd.DataFrame) -> pd.DataFrame:
     """
-    The full flowering date is formated like MDD, we should change this to day of the year for better biological meaning
-     - Zero pad the year so it is 4 digits long
+    The full flowering date is formated like MDD, we should change this to day of the year for better biological meaning. For example the 4th April is shown as 404.
+    In this function we:
+     - Zero pad the year so it is 4 digits long - the data starts in 812
      - Zero pad the full-flowering date so it is 4 digits long
+     - Combine these year and the full-flowering date so 1st April 812 would look like 08120401
+     - Convert this into a date format and extract the Julian day (day of the year)
     """
 
     df["year"] = df["year"].str.zfill(4)
