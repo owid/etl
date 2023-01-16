@@ -1,5 +1,4 @@
 dataset:
-  channel: garden
   namespace: unep
   short_name: renewable_energy_investments
   title: Investment in renewable energy by technology (UNEP, 2019)

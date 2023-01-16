@@ -1,8 +1,6 @@
 dataset:
   namespace: uk_beis
   version: 2022-07-28
-  publication_date: 2022-07-28
-  publication_year: 2022
   title: UK historical electricity
   short_name: uk_historical_electricity
   description: |
@@ -13,7 +11,7 @@ dataset:
     -
       name: Digest of UK Energy Statistics (DUKES)
       published_by: UK's Department for Business, Energy & Industrial Strategy
-      date_accessed: 21st September 2022
+      date_accessed: 2022-09-21
       url: https://www.gov.uk/government/statistical-data-sets/historical-electricity-data
 
 tables:

@@ -3,7 +3,6 @@ dataset:
   version: 2022-11-28
   title: Penn World Table 10.0 - National Accounts
   short_name: penn_world_table_national_accounts
-  publication_year: 2021
   description: National Accounts data in current and constant national prices and exchange rate and population data for Penn World Table.
   sources:
     -
@@ -79,6 +78,6 @@ tables:
       emp:
         title: Number of persons engaged
         unit:
-      emp:
+      avh:
         title: Average annual hours worked by persons engaged
         unit:

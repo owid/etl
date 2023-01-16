@@ -169,7 +169,7 @@ def add_regions(df: pd.DataFrame) -> pd.DataFrame:
 
     # re-estimate region aggregates
     for region in regions:
-        df = geo.add_region_aggregates(df=df, region=region)
+        df = geo.add_region_aggregates(df=df, region=region, population=df)
 
     # add sources back
     # these are only added to countries, not aggregates

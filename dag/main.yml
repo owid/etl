@@ -258,6 +258,7 @@ steps:
     - snapshot://health/2022-12-28/deaths_karlinsky.csv
   data://garden/health/2022-12-28/deaths_karlinsky:
     - data://meadow/health/2022-12-28/deaths_karlinsky
+    - data://garden/owid/latest/key_indicators
   data://grapher/health/2022-12-28/deaths_karlinsky:
     - data://garden/health/2022-12-28/deaths_karlinsky
 
@@ -321,3 +322,4 @@ include:
   - dag/demography.yml
   - dag/conflicts.yml
   - dag/fasttrack.yml
+  - dag/biodiversity.yml

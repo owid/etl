@@ -1,0 +1,196 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "type": "object",
+    "properties": {
+      "dataset": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "namespace": {
+            "type": "string"
+          },
+          "short_name": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          },
+          "licenses": {
+            "type": "array",
+            "items": [
+              {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "url": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "url"
+                ]
+              }
+            ]
+          },
+          "sources": {
+            "type": "array",
+            "items": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "url": {
+                    "type": "string"
+                  },
+                  "owid_data_url": {
+                    "type": "string"
+                  },
+                  "source_data_url": {
+                    "type": "string"
+                  },
+                  "date_accessed": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "publication_year": {
+                    "type": "integer"
+                  },
+                  "publication_date": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "published_by": {
+                    "type": "string"
+                  },
+                  "publisher_source": {
+                    "type": ["string", "null"]
+                  }
+                },
+                "required": [
+                  "name"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "tables": {
+        "type": "object",
+        "additionalProperties": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "title": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "variables": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "title": {
+                    "type": "string"
+                  },
+                  "unit": {
+                    "type": ["string", "null"]
+                  },
+                  "short_unit": {
+                    "type": ["string", "null"]
+                  },
+                  "description": {
+                    "type": ["string", "null"]
+                  },
+                  "sources": {
+                    "type": "array",
+                    "items": [
+                      {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": {
+                          "name": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "owid_data_url": {
+                            "type": "string"
+                          },
+                          "source_data_url": {
+                            "type": "string"
+                          },
+                          "date_accessed": {
+                            "type": "string",
+                            "format": "date"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "publication_year": {
+                            "type": "integer"
+                          },
+                          "publication_date": {
+                            "type": "string",
+                            "format": "date"
+                          },
+                          "published_by": {
+                            "type": "string"
+                          },
+                          "publisher_source": {
+                            "type": ["string", "null"]
+                          }
+                        },
+                        "required": [
+                          "name"
+                        ]
+                      }
+                    ]
+                  },
+                  "display": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "entityAnnotationsMap": {
+                        "type": "string"
+                      },
+                      "numDecimalPlaces": {
+                        "type": "integer"
+                      },
+                      "conversionFactor": {
+                        "type": "number"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "required": ["variables"]
+        }
+      }
+    },
+    "required": [
+      "dataset"
+    ]
+  }

@@ -2,8 +2,6 @@ dataset:
   namespace: irena
   title: Renewable power generation costs (IRENA, 2023)
   short_name: renewable_power_generation_costs
-  publication_year: 2022
-  publication_date: 2022-07-01
   version: 2023-01-04
   description: |
     Levelized cost of energy (LCOE) estimates the average cost per unit of energy generated across the lifetime of a new power plant. It is measured in 2021 US$ per kilowatt-hour.

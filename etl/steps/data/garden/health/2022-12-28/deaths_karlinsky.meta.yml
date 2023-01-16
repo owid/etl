@@ -1,5 +1,4 @@
-dataset:
-  sources:
+dataset: {}
 
 tables:
   deaths:

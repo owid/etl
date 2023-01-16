@@ -1,7 +1,6 @@
 dataset:
   namespace: country_profile
-  version: 2022
-  publication_year: 2022
+  version: "2022"
   title: Country Profile Overview
   short_name: country_profile_overview
   description: |
@@ -127,12 +126,12 @@ tables:
           - name: Gapminder (v6)
             published_by: Gapminder (v6)
             url: https://www.gapminder.org/data/documentation/gd003/
-            date_accessed: October 8, 2021
+            date_accessed: 2021-10-08
           - name: UN (2022)
             published_by: United Nations - Population Division (2022)
             url: https://population.un.org/wpp/Download/Standard/Population/
-            date_accessed: September 10, 2022
+            date_accessed: 2022-09-10
           - name: HYDE (v3.2)
             published_by: HYDE (v3.2)
             url: https://dataportaal.pbl.nl/downloads/HYDE/
-            date_accessed: October 8, 2021
+            date_accessed: 2021-10-08

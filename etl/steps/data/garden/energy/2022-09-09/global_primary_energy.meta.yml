@@ -1,7 +1,6 @@
 dataset:
   namespace: energy
   version: 2022-09-09
-  publication_year: 2022
   title: Global Primary Energy (Smil & BP, 2022)
   short_name: global_primary_energy
   description: |

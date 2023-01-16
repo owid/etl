@@ -3,8 +3,6 @@ dataset:
   version: 2022-08-01
   title: European Electricity Review (Ember, 2022)
   short_name: european_electricity_review
-  publication_year: 2022
-  publication_date: 2022-02-01
   sources:
     -
       name: Our World in Data based on Ember's European Electricity Review (2022).

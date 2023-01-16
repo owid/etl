@@ -1,7 +1,6 @@
 dataset:
   namespace: energy
   version: 2022-09-22
-  publication_year: 2022
   title: UK historical electricity
   short_name: uk_historical_electricity
   description: |
@@ -12,12 +11,12 @@ dataset:
     -
       name: Digest of UK Energy Statistics
       published_by: UK's Department for Business, Energy & Industrial Strategy
-      date_accessed: 21st September 2022
+      date_accessed: 2022-09-21
       url: https://www.gov.uk/government/statistical-data-sets/historical-electricity-data
     -
       name: BP Statistical Review of World Energy
       published_by: BP Statistical Review of World Energy
-      date_accessed: 8th July 2022
+      date_accessed: 2022-07-08
       url: https://www.bp.com/en/global/corporate/energy-economics/statistical-review-of-world-energy.html
     -
       name: Ember's Global Electricity Review
