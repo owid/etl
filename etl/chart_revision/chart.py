@@ -103,32 +103,22 @@ class Chart:
         )
         return use_min_year
 
-    def check_fastt(self) -> List[str]:
+    def check_fastt(self) -> Optional[str]:
         """Checks FASTT in chart.
 
         update/check text fields: slug, note, title, subtitle, sourceDesc.
         """
-        report = []
-        if "title" in self.config and re.search(r"\b\d{4}\b", self.config["title"]):
-            log.info(
-                f"Chart {self.id} title may have a hard-coded year in it that "
-                f'will not be updated: "{self.config["title"]}"'
+        hardcoded_fields = []
+        fields = ["title", "subtitle", "note", "slug"]
+        for field in fields:
+            if field in self.config and re.search(r"\b\d{4}\b", self.config[field]):
+                hardcoded_fields.append(f"`{field}`")
+        if hardcoded_fields:
+            text = (
+                f"Chart {self.id} may have fields with hard-coded year in it. Please check field(s)"
+                f" {', '.join(hardcoded_fields)}."
             )
-        if "subtitle" in self.config and re.search(r"\b\d{4}\b", self.config["subtitle"]):
-            log.info(
-                f"Chart {self.id} subtitle may have a hard-coded year in it "
-                f'that will not be updated: "{self.config["subtitle"]}"'
-            )
-        if "note" in self.config and re.search(r"\b\d{4}\b", self.config["note"]):
-            log.info(
-                f"Chart {self.id} note may have a hard-coded year in it that "
-                f'will not be updated: "{self.config["note"]}"'
-            )
-        if re.search(r"\b\d{4}\b", self.config["slug"]):
-            log.info(
-                f"Chart {self.id} slug may have a hard-coded year in it that "
-                f'will not be updated: "{self.config["slug"]}"'
-            )
+            return text
 
 
 def _is_field_hardcoded_in_title(config: Dict[str, Any], field: str) -> bool:

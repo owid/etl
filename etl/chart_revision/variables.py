@@ -1,9 +1,9 @@
 from dataclasses import dataclass
-from typing import Dict, List, Union
+from typing import Dict, List, Optional, Union
 
 import pandas as pd
 
-from etl.db import get_connection
+from etl.db import get_engine
 
 
 @dataclass
@@ -13,9 +13,9 @@ class VariablesUpdate:
     mapping: Dict[int, int]
     # Variables metadata for each variable (by variable ID)
     metadata: List["VariableMetadata"]
-    _metadata_dix: Dict[int, "VariableMetadata"] = None
+    _metadata_dix: Optional[Dict[int, "VariableMetadata"]] = None
 
-    def __init__(self, mapping: Dict[int, int], metadata: List["VariableMetadata"] = None):
+    def __init__(self, mapping: Dict[int, int], metadata: Optional[List["VariableMetadata"]] = None):
         self.mapping = mapping
         if metadata:
             self.metadata = metadata
@@ -35,12 +35,12 @@ class VariablesUpdate:
         return list(set(self.ids_old) | set(self.ids_new))
 
     @property
-    def metadata_dix(self) -> List[int]:
+    def metadata_dix(self) -> Dict[int, "VariableMetadata"]:
         if not self._metadata_dix:
             self._metadata_dix = {m.id: m for m in self.metadata}
         return self._metadata_dix
 
-    def get_metadata(self, variable_id: int):
+    def get_metadata(self, variable_id: int) -> "VariableMetadata":
         if variable_id not in self.metadata_dix:
             raise ValueError(f"Variable ID {variable_id} is not a variable to be updated!")
         return self.metadata_dix[variable_id]
@@ -60,8 +60,7 @@ class VariablesUpdate:
             GROUP BY variableId
         """
         # get data
-        with get_connection() as db_conn:
-            df_var_years = pd.read_sql(query, db_conn, params={"variable_ids": self.ids_all})
+        df_var_years = pd.read_sql(query, get_engine(), params={"variable_ids": self.ids_all})
 
         # build list of variable metadata
         metadata_raw = df_var_years.set_index("variableId").to_dict("index")

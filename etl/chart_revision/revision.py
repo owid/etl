@@ -5,7 +5,7 @@
     - HOWEVER, based on bobbie's code, seems like only year ranges for variables to be updated are actually needed!
 """
 from copy import deepcopy
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Literal, Optional, cast
 
 import pandas as pd
 import simplejson as json
@@ -15,12 +15,15 @@ from structlog import get_logger
 from etl.chart_revision.chart import Chart
 from etl.chart_revision.variables import VariablesUpdate
 from etl.config import GRAPHER_USER_ID
-from etl.db import get_connection, open_db
+from etl.db import get_engine, open_db
 
 log = get_logger()
+# The maximum length of the suggested revision reason can't exceed the maximum length specified by the datatype "suggestedReason" in grapher.suggested_chart_revisions table.
+SUGGESTED_REASON_MAX_LENGTH = 512
+MSGTypes = Literal["error", "warning", "info", "success"]
 
 
-def get_charts_to_update(variable_mapping: Dict[int, int]) -> List[int]:
+def get_charts_to_update(variable_mapping: Dict[int, int]) -> List["ChartVariableUpdateRevision"]:
     # variables update
     variables_update = VariablesUpdate(variable_mapping)
     # get details on dimensions and chart IDs affected by the variable update
@@ -32,13 +35,13 @@ def get_charts_to_update(variable_mapping: Dict[int, int]) -> List[int]:
     charts = []
     for chart_raw in charts_raw:
         # create chart instance
-        chart = ChartVariableUpdateRevision(
-            id=chart_raw["id"],
-            config=json.loads(chart_raw["config"]),
-            variables_update=variables_update,
+        charts.append(
+            ChartVariableUpdateRevision(
+                id=chart_raw["id"],
+                config=json.loads(chart_raw["config"]),
+                variables_update=variables_update,
+            )
         )
-        # add chart to list
-        charts.append(chart)
     return charts
 
 
@@ -46,18 +49,27 @@ class ChartVariableUpdateRevision:
     # ID of the chart to be updated
     id: int
     # Chart as it actual is at the moment (without update)
-    chart: "Chart"
+    chart_init: "Chart"
     # Mapping of old variable IDs to new variable IDs
     variables_update: "VariablesUpdate"
-    # Chart as it should be after the update
-    chart_new: "Chart" = None
+    # Chart as it should be after the update (by default it is the same as chart_init)
+    chart: Optional["Chart"] = None
     # Revision
-    _revision: Dict[str, Any] = None
+    _revision: Optional[Dict[str, Any]] = None
+    # Revision reason: optionally, the user may hardcode the reason for the revision
+    _revision_reason: Optional[str] = None
+    # logs
+    _logs: List[Dict[str, str]] = []
 
     def __init__(self, id: str, config: Dict[str, Any], variables_update: "VariablesUpdate"):
         self.id = int(id)
+        self.chart_init = Chart(id, config)
         self.chart = Chart(id, config)
         self.variables_update = self._get_relevant_variable_updates(variables_update)
+        self._logs = []
+        self._revision = None
+        # Revision reason: optionally, the user may hardcode the reason for the revision
+        self._revision_reason = None
 
     def __getitem__(self, item):
         if self.revision:
@@ -75,49 +87,64 @@ class ChartVariableUpdateRevision:
         return variables_update.slice(variable_ids=self.variables_used_in_old_chart)
 
     @property
-    def variables_used_in_old_chart(self):
+    def variables_used_in_old_chart(self) -> List[int]:
         """Get list of variable IDs used in old chart (all dimensions)."""
-        variables_used = set(d["variableId"] for d in self.chart.config["dimensions"])
-        if "map" in self.chart.config and "variableId" in self.chart.config["map"]:
-            variables_used |= {self.chart.config["map"]["variableId"]}
-        return variables_used
+        variables_used = set(d["variableId"] for d in self.chart_init.config["dimensions"])
+        if "map" in self.chart_init.config and "variableId" in self.chart_init.config["map"]:
+            variables_used |= {self.chart_init.config["map"]["variableId"]}
+        return list(variables_used)
 
     @property
-    def revision(self) -> Dict[str, Any]:
+    def revision(self) -> Optional[Dict[str, Any]]:
         if self._revision is None:
             if self.config_has_changed:
-                self.chart_new.increase_version()
+                cast(Chart, self.chart).increase_version()
                 self._revision = {
                     "chartId": self.id,
-                    "originalConfig": self.chart.config_as_str,
-                    "suggestedConfig": self.chart_new.config_as_str,
-                    "suggested_reason": "Reason TBD",
-                    "chartSlug": self.chart.config.get("slug"),
+                    "originalConfig": self.chart_init.config_as_str,
+                    "suggestedConfig": cast(Chart, self.chart).config_as_str,
+                    "suggested_reason": (
+                        self._revision_reason
+                        if self._revision_reason
+                        else _get_chart_update_reason(self.variables_update.ids_new)
+                    ),
+                    "chartSlug": self.chart_init.config.get("slug"),
                 }
         return self._revision
 
     @property
     def config_has_changed(self) -> bool:
-        assert isinstance(self.chart_new, Chart), "Chart has not been updated yet! Run"
-        return self.chart.config_as_str != self.chart_new.config_as_str
+        assert isinstance(self.chart, Chart), "Chart has not been updated yet! Run method `build` first."
+        return self.chart_init.config_as_str != self.chart.config_as_str
 
-    def run(self) -> "Chart":
+    def bake(self, revision_reason: Optional[str] = None) -> "ChartVariableUpdateRevision":
         """Get new chart config and set it to `chart_new` attribute."""
-        self.chart_new = self.get_new_chart(deepcopy(self.chart))
+        self._revision_reason = revision_reason
+        self.chart = self.get_new_chart(self.chart_init)
+        return deepcopy(self)
 
     def get_new_chart(self, chart: Chart) -> Chart:
-        chart = deepcopy(self.chart)
+        chart = deepcopy(chart)
+        chart = self._add_default_values(chart)
         chart = self._update_config_map(chart)
         chart = self._update_config_time(chart)
         chart = self._update_chart_dimensions(chart)
         chart = self._update_available_entities(chart)
-        chart.check_fastt()
+        self._check_fastt(chart)
+        return chart
+
+    def _add_default_values(self, chart: "Chart") -> "Chart":
+        """Some field have some hidden default values.
+
+        This function makes some of these explicit (only those relevant for the update)."""
+        if "maxTime" not in chart.config:
+            chart.config["maxTime"] = "latest"
         return chart
 
     def _update_config_map(self, chart: "Chart") -> "Chart":
         """Update map parameters in chart."""
         # get old variable id
-        old_var_id = self.chart.variable_id_map
+        old_var_id = self.chart_init.variable_id_map
         # update variable usage if it is needed
         if old_var_id is not None and old_var_id in self.variables_update.mapping:
             log.info(f"Chart {self.id}: Updating map")
@@ -147,9 +174,9 @@ class ChartVariableUpdateRevision:
 
         At least, we should aim at simplifying its logic. It is too complex and very hard to understand.
         """
-        # get *all* variable IDs used in chart (even those that will not be updated)
+        # get current IDs of variables in chart to be updated (old variables)
         old_variable_ids = self.variables_update.ids_old
-        # get updated IDs of variables in chart to be updated
+        # get updated IDs of variables in chart to be updated (new variables)
         new_variable_ids = self.variables_update.ids_new
 
         # get year range for old and new variables
@@ -159,7 +186,7 @@ class ChartVariableUpdateRevision:
         # Is the min year hard-coded in the chart's title or subtitle?
         # If so, no update is done on this
         if chart.is_min_year_hardcoded or chart.is_max_year_hardcoded:
-            log.info(
+            self.report_warning(
                 f"Chart {chart.id} title or subtitle may contain a hard-coded "
                 "year, so the minTime and maxTime fields will not be changed."
                 f"\nTitle: {chart.config.get('title')}"
@@ -188,7 +215,7 @@ class ChartVariableUpdateRevision:
                 )
                 if replace_min_time:
                     if pd.notnull(min(old_range)) and (min(new_range) > min(old_range)):
-                        log.info(
+                        self.report_warning(
                             f"For chart {chart.id}, min year of new variable(s) > "
                             "min year of old variable(s). New variable(s): "
                             f"{new_variable_ids}"
@@ -200,7 +227,7 @@ class ChartVariableUpdateRevision:
                 )
                 if replace_max_time:
                     if pd.notnull(max(old_range)) and (max(new_range) < max(old_range)):
-                        log.info(
+                        self.report_warning(
                             f"For chart {chart.id}, max year of new variable(s) < "
                             "max year of old variable(s). New variable(s): "
                             f"{new_variable_ids}"
@@ -216,8 +243,39 @@ class ChartVariableUpdateRevision:
         return chart
 
     def _update_available_entities(self, chart: "Chart") -> "Chart":
-        chart.config["data"]["availableEntities"] = ["Spain"]
+        # chart.config["data"]["availableEntities"] = ["Spain"]
         return chart
+
+    def _check_fastt(self, chart: "Chart") -> None:
+        """Checks if chart is a fastt chart and if so, updates it."""
+        log = chart.check_fastt()
+        if log:
+            self.report_warning(log)
+
+    def report_error(self, msg: str):
+        self.report_msg(msg, "error")
+
+    def report_warning(self, msg: str):
+        self.report_msg(msg, "warning")
+
+    def report_info(self, msg: str):
+        self.report_msg(msg, "info")
+
+    def report_success(self, msg: str):
+        self.report_msg(msg, "success")
+
+    def report_msg(self, msg: str, type: MSGTypes):
+        if type == "error":
+            log.error(msg)
+        elif type == "warning":
+            log.warning(msg)
+        elif type == "info":
+            log.info(msg)
+        elif type == "success":
+            log.info(msg)
+        else:
+            raise ValueError(f"Invalid type: {type}")
+        self._logs.append({"message": msg, "type": type})
 
 
 def _get_charts_from_db(chart_ids: List[int]) -> List[Dict[str, Any]]:
@@ -237,8 +295,7 @@ def _get_charts_from_db(chart_ids: List[int]) -> List[Dict[str, Any]]:
         WHERE id IN %(ids)s
     """
     # get data from db
-    with get_connection() as db_conn:
-        df = pd.read_sql(query, db_conn, params={"ids": chart_ids})
+    df = pd.read_sql(query, get_engine(), params={"ids": chart_ids})
     return df.to_dict(orient="records")
 
 
@@ -252,8 +309,7 @@ def _get_chart_dimensions_from_db(variable_ids: List[int]) -> List[Dict[str, Any
         WHERE variableId IN %(variables)s
     """
     # get data from table
-    with get_connection() as db_conn:
-        df = pd.read_sql(query, db_conn, params={"variables": variable_ids})
+    df = pd.read_sql(query, get_engine(), params={"variables": variable_ids})
     return df.to_dict(orient="records")
 
 
@@ -364,3 +420,47 @@ def submit_revisions_to_grapher(revisions: List[ChartVariableUpdateRevision]):
             n_after = db.fetch_one("SELECT COUNT(id) FROM suggested_chart_revisions")[0]
 
         log.info(f"{n_after - n_before} of {len(revisions)} suggested chart revisions inserted.")
+
+
+def _get_chart_update_reason(variable_ids: List[int]) -> str:
+    """Get the reason for the chart update.
+
+    Accesses DB and finds out the name of the recently added dataset with the new variables."""
+    try:
+        with open_db() as db:
+            if len(variable_ids) == 1:
+                results = db.fetch_many(
+                    f"""
+                        SELECT variables.name, datasets.name, datasets.version FROM datasets
+                            JOIN variables ON datasets.id = variables.datasetId
+                            WHERE variables.id IN ({variable_ids[0]})
+                        """
+                )
+            else:
+                results = db.fetch_many(
+                    f"""
+                        SELECT variables.name, datasets.name, datasets.version FROM datasets
+                            JOIN variables ON datasets.id = variables.datasetId
+                            WHERE variables.id IN {*variable_ids,}
+                        """
+                )
+    except Exception:
+        log.error(
+            "Problem found when accessing the DB trying to get details on the newly added variables"
+            f" {variable_ids}. Therefore, no reason for suggested chart revision could be stablished!"
+        )
+        reason = "No reason could be found for this suggested chart revision! Please check with the devs/data team!"
+    else:
+        datasets = sorted(set(result[1] for result in results))
+        # extended reason (might overflow `suggestedReason` datatype length limitation)
+        # reason = [f"'{result[1]}' dataset update (variable '{result[0]}')" for result in results]
+        if len(datasets) == 1:
+            reason = f"Bulk update: {datasets[0]}"
+        else:
+            reason = "Bulk updates:" + "; ".join(datasets)
+
+    # check length
+    if len(reason) > SUGGESTED_REASON_MAX_LENGTH:
+        reason = reason[:SUGGESTED_REASON_MAX_LENGTH]
+
+    return reason
