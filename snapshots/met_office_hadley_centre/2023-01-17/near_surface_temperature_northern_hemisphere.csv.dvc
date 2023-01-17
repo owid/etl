@@ -8,7 +8,7 @@ meta:
   publication_year: 2022
   publication_date:
   url: https://www.metoffice.gov.uk/hadobs/hadcrut5/
-  source_data_url: https://www.metoffice.gov.uk/hadobs/hadcrut5/data/current/analysis/diagnostics/HadCRUT.5.0.1.0.analysis.summary_series.global.annual.csv
+  source_data_url: https://www.metoffice.gov.uk/hadobs/hadcrut5/data/current/analysis/diagnostics/HadCRUT.5.0.1.0.analysis.summary_series.northern_hemisphere.annual.csv
   file_extension: csv
   license_url: https://www.metoffice.gov.uk/hadobs/hadcrut5/terms_and_conditions.html
   license_name: Open Government License v3
@@ -22,6 +22,6 @@ meta:
     These are available for the Northern Hemisphere and the Southern Hemisphere. The global mean has been calculated by averaging anomalies for northern and southern hemispheres.
 wdir: ../../../data/snapshots/met_office_hadley_centre/2023-01-17
 outs:
-- md5: 5213f73d541be3d45e6d9fc9c4d8c664
-  size: 6910
+- md5: 633a7e29c17cf96a669c5561da9172eb
+  size: 6892
   path: near_surface_temperature_northern_hemisphere.csv
