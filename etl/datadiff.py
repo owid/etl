@@ -9,7 +9,6 @@ import requests
 import rich
 import rich_click as click
 import structlog
-from deepdiff import DeepDiff
 from owid.catalog import Dataset, DatasetMeta, LocalCatalog, RemoteCatalog, Table, find
 from owid.catalog.catalogs import CHANNEL, OWID_CATALOG_URI
 from rich.console import Console
@@ -43,11 +42,11 @@ class DatasetDiff:
             new_version = " (new version)" if ds_a.metadata.version != ds_b.metadata.version else ""
 
             # compare dataset metadata
-            diff = DeepDiff(_dataset_metadata_dict(ds_a), _dataset_metadata_dict(ds_b))
+            diff = _dict_diff(_dataset_metadata_dict(ds_a), _dataset_metadata_dict(ds_b), tabs=2)
             if diff:
                 self.p(f"[yellow]~ Dataset [b]{dataset_uri(ds_b)}[/b]{new_version}")
                 if self.verbose:
-                    self.p(_dict_diff(_dataset_metadata_dict(ds_a), _dataset_metadata_dict(ds_b), tabs=2))
+                    self.p(diff)
             else:
                 self.p(f"[white]= Dataset [b]{dataset_uri(ds_b)}{new_version}[/b]")
         elif ds_a:
@@ -73,12 +72,12 @@ class DatasetDiff:
             table_b = _sort_index(ds_b[table_name]).reset_index()
 
             # compare table metadata
-            diff = DeepDiff(_table_metadata_dict(table_a), _table_metadata_dict(table_b))
+            diff = _dict_diff(_table_metadata_dict(table_a), _table_metadata_dict(table_b), tabs=3)
             if diff:
                 self.p(f"\t[yellow]~ Table [b]{table_name}[/b] (changed [u]metadata[/u])")
 
                 if self.verbose:
-                    self.p(_dict_diff(_table_metadata_dict(table_a), _table_metadata_dict(table_b), tabs=3))
+                    self.p(diff)
             else:
                 self.p(f"\t[white]= Table [b]{table_name}[/b]")
 
@@ -107,7 +106,7 @@ class DatasetDiff:
                     col_a_meta = col_a.metadata.to_dict()
                     col_b_meta = col_b.metadata.to_dict()
 
-                    meta_diff = DeepDiff(col_a_meta, col_b_meta)
+                    meta_diff = _dict_diff(col_a_meta, col_b_meta, tabs=4)
 
                     changed = (
                         (["data"] if data_diff else [])
@@ -274,8 +273,11 @@ def _dict_diff(dict_a: Dict[str, Any], dict_b: Dict[str, Any], tabs) -> str:
     # add color
     lines = ["[violet]" + line for line in lines]
 
-    # add tabs
-    return "\t" * tabs + "".join(lines).replace("\n", "\n" + "\t" * tabs).rstrip()
+    if not lines:
+        return ""
+    else:
+        # add tabs
+        return "\t" * tabs + "".join(lines).replace("\n", "\n" + "\t" * tabs).rstrip()
 
 
 def _sort_index(df: Table) -> Table:
