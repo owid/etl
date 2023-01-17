@@ -65,7 +65,8 @@ def run(dest_dir: str) -> None:
     # Create a new meadow dataset with the same metadata as the snapshot.
     ds_meadow = Dataset.create_empty(dest_dir, metadata=convert_snapshot_metadata(snapshots["Global"].metadata))
 
-    # Ensure the version of the new dataset corresponds to the version of current step.
+    # Ensure the short name and version of the new dataset correspond to the ones of the current step.
+    ds_meadow.metadata.short_name = paths.short_name
     ds_meadow.metadata.version = paths.version
 
     # Add the new table to the meadow dataset.
