@@ -40,10 +40,7 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Retrieve snapshots.
-    snapshots = {
-        region: paths.load_dependency(file_name)
-        for region, file_name in REGION_FILE_NAMES.items()
-    }
+    snapshots = {region: paths.load_dependency(file_name) for region, file_name in REGION_FILE_NAMES.items()}
 
     # Load data from snapshots.
     df = pd.concat(
