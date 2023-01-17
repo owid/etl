@@ -1,5 +1,6 @@
 dataset:
-  title: Near-surface temperature anomaly (Met Office Hadley Centre, 2022)
+  title: Near-surface temperature anomaly (Met Office Hadley Centre, 2022b)
+  description: ""
 
 tables:
   near_surface_temperature:
