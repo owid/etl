@@ -20,6 +20,7 @@ from MySQLdb import IntegrityError
 from rich_click.rich_command import RichCommand
 from tqdm import tqdm
 
+from etl.chart_revision.cli import main as main_exp
 from etl.config import DEBUG, GRAPHER_USER_ID
 from etl.db import open_db
 from etl.grapher_helpers import IntRange
@@ -37,10 +38,14 @@ SUGGESTED_REASON_MAX_LENGTH = 512
     type=str,
 )
 @click.option("--revision-reason", default=None, help="Assign a reason for the suggested chart revision.")
-def main_cli(mapping_file: str, revision_reason: str) -> None:
+@click.option("-e", "--experimental", is_flag=True, help="Enable experimental mode.")
+def main_cli(mapping_file: str, revision_reason: str, experimental: bool) -> None:
     try:
-        suggester = ChartRevisionSuggester.from_json(mapping_file, revision_reason)
-        suggester.suggest()
+        if experimental:
+            main_exp(mapping_file, revision_reason)
+        else:
+            suggester = ChartRevisionSuggester.from_json(mapping_file, revision_reason)
+            suggester.suggest()
     except Exception as e:
         log.error(e)
         if DEBUG:
