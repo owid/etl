@@ -137,7 +137,7 @@ def _expand_sources(sources_name: str, sources_dict: Dict[str, Any]) -> List[Dic
     for source_short_name in map(lambda s: s.strip(), sources_name.split(",")):
         try:
             sources.append(sources_dict[source_short_name])
-        except KeyError as e:
+        except KeyError:
             raise ValidationError(f"Source with short_name `{source_short_name}` not found in `sources_meta` sheet")
     return sources
 
