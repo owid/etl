@@ -1,0 +1,18 @@
+meta:
+  namespace: backport
+  short_name: dataset_5855_united_nations_office_on_drugs_and_crime__intentional_homicides_values
+  file_extension: feather
+  date_accessed: 2023-01-18 12:31:39.972442
+  name: United Nations Office on Drugs and Crime - Intentional Homicides
+  description: ''
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/5855
+  source_published_by: Our World in Data catalog backport
+  is_public: true
+  version: latest
+  publication_date: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 540a25bcc0029a0d6f110610ffbb4886
+  size: 264538
+  path: dataset_5855_united_nations_office_on_drugs_and_crime__intentional_homicides_values.feather
