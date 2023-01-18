@@ -1,7 +1,6 @@
 dataset:
   namespace: energy
   version: 2022-12-13
-  publication_year: 2022
   title: Electricity mix (BP & Ember, 2022c)
   short_name: electricity_mix
   description: |
@@ -66,7 +65,7 @@ dataset:
     -
       name: Our World in Data based on BP Statistical Review of World Energy (2022)
       published_by: BP Statistical Review of World Energy
-      date_accessed: 8th July 2022
+      date_accessed: 2022-07-08
       url: https://www.bp.com/en/global/corporate/energy-economics/statistical-review-of-world-energy.html
     -
       name: Our World in Data based on Ember's Yearly Electricity Data (2022)

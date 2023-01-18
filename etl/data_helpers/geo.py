@@ -221,6 +221,7 @@ def add_region_aggregates(
     year_col: str = "year",
     aggregations: Optional[Dict[str, Any]] = None,
     keep_original_region_with_suffix: Optional[str] = None,
+    population: Optional[pd.DataFrame] = None,
 ) -> pd.DataFrame:
     """Add data for regions (e.g. income groups or continents) to a dataset.
 
@@ -272,6 +273,8 @@ def add_region_aggregates(
         If None, original data for region will be replaced by aggregate data constructed by this function. If not None,
         original data for region will be kept, with the same name, but having suffix keep_original_region_with_suffix
         added to its name.
+    population : pd.DataFrame or None
+        Population dataset, or None, to load it from owid catalog.
 
     Returns
     -------
@@ -289,6 +292,7 @@ def add_region_aggregates(
         # List countries that should present in the data (since they are expected to contribute the most).
         countries_that_must_have_data = list_countries_in_region_that_must_have_data(
             region=region,
+            population=population,
         )
 
     # If aggregations are not defined for each variable, assume 'sum'.

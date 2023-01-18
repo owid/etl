@@ -3,7 +3,6 @@ dataset:
   version: 2022-07-27
   title: Total energy consumption (EIA, 2022)
   short_name: energy_consumption
-  publication_year: 2022
   description: |
    Total energy consumption, extracted from EIA's international energy data from the EIA, downloaded using their <a href="https://www.eia.gov/opendata/bulkfiles.php">Bulk Download Facility</a>.
 

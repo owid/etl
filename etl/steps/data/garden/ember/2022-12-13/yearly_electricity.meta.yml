@@ -3,8 +3,6 @@ dataset:
   version: 2022-08-01
   title: Yearly Electricity Data (Ember, 2022)
   short_name: yearly_electricity
-  publication_year: 2022
-  publication_date: 2022-12-04
   description: |
     <a href="https://ember-climate.org/countries-and-regions/">Ember's region definitions</a>, denoted with "(Ember)", are:
     * "G20 (Ember)" - Group of Twenty: Argentina, Australia, Brazil, Canada, China, France, Germany, India, Indonesia, Italy, Japan, Mexico, Russia, Saudi Arabia, South Africa, South Korea, Turkey, United Kingdom, United States and the 27 members of the European Union.
@@ -124,8 +122,6 @@ tables:
         title: Population
         short_unit: people
         unit: people
-        display:
-          name:
       demand_per_capita__kwh:
         title: Demand per capita (kWh)
         short_unit: kWh
