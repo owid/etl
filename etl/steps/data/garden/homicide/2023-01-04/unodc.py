@@ -76,13 +76,112 @@ def harmonize_countries(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def clean_data(df: pd.DataFrame) -> pd.DataFrame:
+    df = df.copy(deep=True)
+    # Making the units more obvious
+    df["unit_of_measurement"] = (
+        df["unit_of_measurement"]
+        .map(
+            {"Counts": "Homicide count", "Rate per 100,000 population": "Homicides per 100,000 population"},
+            na_action="ignore",
+        )
+        .fillna(df["unit_of_measurement"])
+    )
 
-    df = df[["country", "year", "unit_of_measurement", "value"]]
+    # Splitting the data into that which has the totals and that which is disaggregated by mechanism
+    df_mech = df[df["dimension"] == "by mechanisms"]
 
-    df = (
-        df.pivot(index=["country", "year"], columns="unit_of_measurement", values="value")
-        .reset_index()
-        .rename_axis(None, axis=1)
+    df_mech = create_mechanism_df(df_mech)
+
+    df_tot = df[df["dimension"] == "Total"]
+
+    df_tot = create_total_df(df_tot)
+
+    df = pd.merge(df_mech, df_tot, how="outer", on=["country", "year"])
+
+    return df
+
+
+def pivot_and_format_df(df, drop_columns, pivot_index, pivot_values, pivot_columns):
+    """
+    - Dropping a selection of columns
+    - Pivoting by the desired disaggregations e.g. category, unit of measurement
+    - Tidying the column names
+    """
+    df = df.drop(columns=drop_columns)
+    df = df.pivot(index=pivot_index, values=pivot_values, columns=pivot_columns)
+    # Make the columns nice
+    df.columns = df.columns.droplevel(0)
+    df.columns = df.columns.map("_".join)
+    df = df.reset_index()
+    return df
+
+
+def create_total_df(df_tot: pd.DataFrame) -> pd.DataFrame:
+    """
+    Create the total homicides dataframe where we will have total homicides/homicide rate
+    disaggregated by age and sex
+    """
+    # To escape the dataframe slice warnings
+    df_tot = df_tot.copy(deep=True)
+    # There are some duplicates when sex is unknown so let's remove those rows
+    df_tot = df_tot[df_tot["sex"] != "Unknown"]
+
+    # Make it more obvious what total age and total sex means
+
+    df_tot["age"] = df_tot["age"].map({"Total": "All ages"}, na_action="ignore").fillna(df_tot["age"])
+    df_tot["sex"] = df_tot["sex"].map({"Total": "Both sexes"}, na_action="ignore").fillna(df_tot["sex"])
+
+    df_tot = pivot_and_format_df(
+        df_tot,
+        drop_columns=["region", "subregion", "indicator", "dimension", "category", "source"],
+        pivot_index=["country", "year"],
+        pivot_values=["value"],
+        pivot_columns=["sex", "age", "unit_of_measurement"],
+    )
+    return df_tot
+
+
+def create_mechanism_df(df_mech: pd.DataFrame) -> pd.DataFrame:
+    """
+    Create the homicides by mechanism dataframe where we will have  homicides/homicide rate
+    disaggregated by mechanism (e.g. weapon)
+    """
+    # df_mech = df_mech.drop(columns=["region", "subregion", "indicator", "dimension", "source", "sex", "age"])
+    df_mech = df_mech.copy(deep=True)
+    df_mech["category"] = (
+        df_mech["category"]
+        .map({"Firearms or explosives - firearms": "Firearms", "Another weapon - sharp object": "Sharp object"})
+        .fillna(df_mech["category"])
+    )
+
+    # Make the table wider so we have a column for each mechanism
+    df_mech = pivot_and_format_df(
+        df_mech,
+        drop_columns=["region", "subregion", "indicator", "dimension", "source", "sex", "age"],
+        pivot_index=["country", "year"],
+        pivot_values=["value"],
+        pivot_columns=["category", "unit_of_measurement"],
+    )
+    df_mech = calculate_explosives_and_blunt_objects(df_mech)
+
+    return df_mech
+
+
+def calculate_explosives_and_blunt_objects(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Separate out the firearms and explosives variable to exclude firearms - so we can potentially show the full breakdowns on a stacked chart.
+    Same for sharp object and another weapon (which includes, sharp, blunt weapons and vehicles)
+    """
+
+    df["Explosives_Homicide count"] = df["Firearms or explosives_Homicide count"] - df["Firearms_Homicide count"]
+    df["Explosives_Homicides per 100,000 population"] = (
+        df["Firearms or explosives_Homicides per 100,000 population"] - df["Firearms_Homicides per 100,000 population"]
+    )
+    df["Another weapon_excl_sharp_Homicide count"] = (
+        df["Another weapon_Homicide count"] - df["Sharp object_Homicide count"]
+    )
+    df["Another weapon_excl_sharp_Homicides per 100,000 population"] = (
+        df["Another weapon_Homicides per 100,000 population"] - df["Sharp object_Homicides per 100,000 population"]
     )
 
     return df
