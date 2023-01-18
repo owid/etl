@@ -162,5 +162,26 @@ def create_mechanism_df(df_mech: pd.DataFrame) -> pd.DataFrame:
         pivot_values=["value"],
         pivot_columns=["category", "unit_of_measurement"],
     )
+    df_mech = calculate_explosives_and_blunt_objects(df_mech)
 
     return df_mech
+
+
+def calculate_explosives_and_blunt_objects(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Separate out the firearms and explosives variable to exclude firearms - so we can potentially show the full breakdowns on a stacked chart.
+    Same for sharp object and another weapon (which includes, sharp, blunt weapons and vehicles)
+    """
+
+    df["Explosives_Homicide count"] = df["Firearms or explosives_Homicide count"] - df["Firearms_Homicide count"]
+    df["Explosives_Homicides per 100,000 population"] = (
+        df["Firearms or explosives_Homicides per 100,000 population"] - df["Firearms_Homicides per 100,000 population"]
+    )
+    df["Another weapon_excl_sharp_Homicide count"] = (
+        df["Another weapon_Homicide count"] - df["Sharp object_Homicide count"]
+    )
+    df["Another weapon_excl_sharp_Homicides per 100,000 population"] = (
+        df["Another weapon_Homicides per 100,000 population"] - df["Sharp object_Homicides per 100,000 population"]
+    )
+
+    return df

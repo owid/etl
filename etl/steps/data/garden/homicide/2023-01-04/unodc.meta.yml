@@ -73,8 +73,18 @@ tables:
         unit: homicides
         display:
           numDecimalPlaces: 0
+      explosives_homicide_count:
+        title: Total homicides by explosives
+        unit: homicides
+        display:
+          numDecimalPlaces: 0
       another_weapon_homicide_count:
         title: Total homicides by any object used as weapon, including sharp and blunt objects and motor vehicles
+        unit: homicides
+        display:
+          numDecimalPlaces: 0
+      another_weapon_excl_sharp_homicide_count:
+        title: Total homicides by blunt objects and motor vehicles
         unit: homicides
         display:
           numDecimalPlaces: 0
@@ -83,8 +93,18 @@ tables:
         unit: homicides per 100,000 people
         display:
           numDecimalPlaces: 2
+      explosives_homicides_per_100_000_population:
+        title: Homicides by explosives per 100,000 population
+        unit: homicides per 100,000 people
+        display:
+          numDecimalPlaces: 2
       sharp_object_homicides_per_100_000_population:
         title: Homicides by sharp object per 100,000 population
+        unit: homicides per 100,000 people
+        display:
+          numDecimalPlaces: 2
+      another_weapon_excl_sharp_homicides_per_100_000_population:
+        title: Homicides by blunt objects and motor vehicles per 100,000 population
         unit: homicides per 100,000 people
         display:
           numDecimalPlaces: 2
