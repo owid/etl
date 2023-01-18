@@ -3,6 +3,40 @@
 #  etl
 #
 
+"""JS script for giving Cloudflare R2 bucket CORS
+const AWS = require("aws-sdk")
+
+const s3 = new AWS.S3({
+    accessKeyId: "xxx",
+    secretAccessKey: "xxx",
+    region: "auto",
+    endpoint: `https://078fcdfed9955087315dd86792e71a7e.r2.cloudflarestorage.com`,
+})
+
+s3.putBucketCors(
+    {
+        Bucket: "owid-catalog-staging",
+        CORSConfiguration: {
+            CORSRules: new Array({
+                AllowedHeaders: ["*"],
+                AllowedMethods: ["GET", "PUT", "POST", "HEAD"],
+                AllowedOrigins: ["*"],
+                ExposeHeaders: [],
+                MaxAgeSeconds: 3000,
+            }),
+        },
+    },
+    (err, data) => {
+        if (err) {
+            console.log(err)
+        } else {
+            console.log(data)
+        }
+    }
+)
+"""
+
+
 import concurrent.futures
 import re
 import sys
