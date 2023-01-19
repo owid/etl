@@ -19,6 +19,8 @@ steps:
   # Garden
   data://garden/conflicts/2023-01-18/bouthoul_carrere_1978:
     - data://meadow/conflicts/2023-01-10/bouthoul_carrere_1978
+  data://garden/conflicts/2023-01-18/clodfelter_2017:
+    - data://meadow/conflicts/2023-01-10/clodfelter_2017
   data://garden/conflicts/2023-01-18/dunnigan_martel_1987:
     - data://meadow/conflicts/2023-01-10/dunnigan_martel_1987
   data://garden/conflicts/2023-01-18/eckhardt_1991:

@@ -57,9 +57,20 @@ def run(dest_dir: str) -> None:
 
 
 def clean_df(tb: Table) -> pd.DataFrame:
+    # Remove outliers
+    tb = _remove_outliers(tb)
     # Standardize names of conflict participants
-    entities_with_comma = [
-        "Great Colombia independence campaigners (in Venezuela, Colombia and Ecuador)",
-    ]
-    df = table_to_clean_df(tb, entities_with_comma=entities_with_comma)
+    df = table_to_clean_df(tb)
     return df
+
+
+def _remove_outliers(tb: Table) -> Table:
+    # List of conflicts with no participants
+    conflict_names = [
+        "Salem Witch Trials sidenote",
+        "Irish War",
+    ]
+    msk = tb["conflict_name"].isin(conflict_names) & tb["conflict_participants"].isna()
+    assert msk.sum() == 2, "Unexpected number of conflicts with no participants"
+    tb = tb.loc[~msk, :]
+    return tb
