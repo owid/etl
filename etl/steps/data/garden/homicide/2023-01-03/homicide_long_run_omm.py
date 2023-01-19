@@ -73,9 +73,11 @@ def get_unodc() -> pd.DataFrame:
 
     ds_unodc: catalog.Dataset = paths.load_dependency("unodc")
     df_unodc = ds_unodc["unodc"]
-    df_unodc = pd.DataFrame(df_unodc[["country", "year", "rate_per_100_000_population"]])
-    df_unodc = df_unodc.dropna(subset="rate_per_100_000_population")
-    df_unodc = df_unodc.rename(columns={"rate_per_100_000_population": "death_rate_per_100_000_population"})
+    df_unodc = pd.DataFrame(df_unodc[["country", "year", "both_sexes_all_ages_homicides_per_100_000_population"]])
+    df_unodc = df_unodc.dropna(subset="both_sexes_all_ages_homicides_per_100_000_population")
+    df_unodc = df_unodc.rename(
+        columns={"both_sexes_all_ages_homicides_per_100_000_population": "death_rate_per_100_000_population"}
+    )
     df_unodc["source"] = "UNODC"
     return df_unodc
 
