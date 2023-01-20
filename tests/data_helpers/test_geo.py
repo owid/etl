@@ -8,8 +8,10 @@ from unittest.mock import mock_open, patch
 
 import numpy as np
 import pandas as pd
-from owid.datautils import dataframes, geo
+from owid.datautils import dataframes
 from pytest import warns
+
+from etl.data_helpers import geo
 
 mock_countries = {
     "country_02": "Country 2",
@@ -44,7 +46,7 @@ def mock_population_load(*args, **kwargs):
     return mock_population
 
 
-@patch.object(geo.catalog.catalogs.CatalogMixin, "__getitem__", mock_population_load)
+@patch.object(geo, "_load_population", mock_population_load)
 class TestAddPopulationToDataframe:
     def test_all_countries_and_years_in_population(self):
         df_in = pd.DataFrame({"country": ["Country 2", "Country 1"], "year": [2019, 2021]})
