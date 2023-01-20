@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:06:55.078374
-  description: ''
-  file_extension: json
-  is_public: false
-  name: Grapher metadata for dataset_5303_childhood_vaccination_policies__vanderslott_et_al__2021
   namespace: backport
-  publication_date: latest
   short_name: dataset_5303_childhood_vaccination_policies__vanderslott_et_al__2021_config
+  file_extension: json
+  date_accessed: 2023-01-20 11:10:47.355195
+  name: Grapher metadata for dataset_5303_childhood_vaccination_policies__vanderslott_et_al__2021
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5303
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 7156e5fe3e9c99ac9a1c7c390c6e0a17
-  size: 4232
+- md5: 0417481456ae7cbe94e7d440430ed974
+  size: 4225
   path: dataset_5303_childhood_vaccination_policies__vanderslott_et_al__2021_config.json
