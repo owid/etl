@@ -1,0 +1,18 @@
+meta:
+  namespace: fasttrack
+  short_name: food_expenditures_by_country
+  file_extension: csv
+  date_accessed: 2023-01-20
+  name: Food expenditures by country (USDA, 2023)
+  description: ''
+  source_name: Google Sheet
+  url: https://www.ers.usda.gov/topics/international-markets-u-s-trade/international-consumer-and-food-industry-trends/#data
+  source_published_by: Google Sheet
+  source_data_url: gAAAAABjyoIXcZhrrY4oOnHOyLS8RohUA72-X3Z1ZHFU7A_Vmg60iZNiXhYuAi99P34Qs5wXDznB_BK-KyzpkEgsV9mGZ5miuZGV0RPrTrIrHdqBDozjzbbYdUE5N_yzDQFtHTcsD_2cIiqrqby4ZJrM2xRnegMQ5kQvMD8tdajOp9438_qAgKpz5ejRVYabGGuL88EXxtOds8UsvHhaPqwMb9_xe7GXVdEGRNIsEzzSJqZHFkCkj_R-Vzg2lHP1tgSLVeULyb2i
+  is_public: false
+  version: '2023-01-19'
+wdir: ../../../data/snapshots/fasttrack/2023-01-19
+outs:
+- md5: b03947c40e7c56fa98f08b06fea563e4
+  size: 6497
+  path: food_expenditures_by_country.csv
