@@ -1,0 +1,18 @@
+meta:
+  namespace: fasttrack
+  short_name: lighting_efficiency_uk
+  file_extension: csv
+  date_accessed: 2023-01-20
+  name: Lighting effiency and shares in the UK
+  description: ''
+  source_name: Google Sheet
+  url: https://www.jstor.org/stable/23296980
+  source_published_by: Google Sheet
+  source_data_url: gAAAAABjykepDM9qSPmcia30Y6XfRfCAr-IVVU4MKQ-5uronVcInRAbQENcbYoFR7vrbbSMRsNqulOO1uRMVdAZ3lQIdTl_fQNWcRFmxC1V8nujs-6pa5aXPNDAmm4mOtKD_d--xITDJEdrwIFi-xCKtZmx7oLm8b-sbG2b1WEvUHKbJAIARIgw1PEA_7KQEhiKmbnpU-SjalCi-9PAeMKUDtsQhxAYSBtkOUwXt7_HCq5UBYPvqA_N8fUw5pb7MDILs0bScwGzY
+  is_public: false
+  version: '2022-11-01'
+wdir: ../../../data/snapshots/fasttrack/2022-11-01
+outs:
+- md5: 7e2d4e77b9c23946c89c518df591a009
+  size: 747
+  path: lighting_efficiency_uk.csv

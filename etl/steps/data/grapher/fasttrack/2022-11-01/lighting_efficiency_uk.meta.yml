@@ -1,0 +1,40 @@
+dataset:
+  namespace: fasttrack
+  version: '2022-11-01'
+  short_name: lighting_efficiency_uk
+  title: Lighting effiency and shares in the UK
+  description: ''
+  sources:
+  - name: 'Fouquet & Pearson (2006). Seven centuries of energy services: The price
+      and use of light in the United Kingdom (1300-2000).'
+    published_by: 'Fouquet, R., & Pearson, P. J. (2006). Seven centuries of energy
+      services: The price and use of light in the United Kingdom (1300-2000). The
+      energy journal, 27(1).'
+    url: https://www.jstor.org/stable/23296980
+tables:
+  lighting_efficiency_uk:
+    variables:
+      share_of_lighting_uk:
+        title: share_of_lighting_uk
+        short_unit: '%'
+        unit: '%'
+        description: The share of lighting in the UK that was provided by each source.
+        sources:
+        - name: 'Fouquet & Pearson (2006). Seven centuries of energy services: The
+            price and use of light in the United Kingdom (1300-2000).'
+          published_by: 'Fouquet, R., & Pearson, P. J. (2006). Seven centuries of
+            energy services: The price and use of light in the United Kingdom (1300-2000).
+            The energy journal, 27(1).'
+          url: https://www.jstor.org/stable/23296980
+      efficiency_lighting_uk:
+        title: efficiency_lighting_uk
+        unit: lumen-hours per kWh
+        description: The efficiency of lighting measures the output of light per unit
+          of energy. It's measured in lumen-hours per kilowatt-hour (kWh).
+        sources:
+        - name: 'Fouquet & Pearson (2006). Seven centuries of energy services: The
+            price and use of light in the United Kingdom (1300-2000).'
+          published_by: 'Fouquet, R., & Pearson, P. J. (2006). Seven centuries of
+            energy services: The price and use of light in the United Kingdom (1300-2000).
+            The energy journal, 27(1).'
+          url: https://www.jstor.org/stable/23296980
