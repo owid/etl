@@ -32,8 +32,14 @@ PHASES = Literal["walden", "snapshot", "meadow", "garden", "grapher", "charts"]
     default=True,
     help="Auto open browser on port 8082",
 )
-def cli(phase: Iterable[PHASES], run_checks: bool, dummy_data: bool, auto_open: bool) -> None:
-    print("Walkthrough has been opened at http://localhost:8082/")
+@click.option(
+    "--port",
+    default=8082,
+    type=int,
+    help="Application port",
+)
+def cli(phase: Iterable[PHASES], run_checks: bool, dummy_data: bool, auto_open: bool, port: int) -> None:
+    print(f"Walkthrough has been opened at http://localhost:{port}/")
     if phase == "walden":
         phase_func = walden.app
     elif phase == "snapshot":
@@ -51,7 +57,7 @@ def cli(phase: Iterable[PHASES], run_checks: bool, dummy_data: bool, auto_open: 
 
     start_server(
         lambda: phase_func(run_checks=run_checks, dummy_data=dummy_data),
-        port=8082,
+        port=port,
         debug=True,
         auto_open_webbrowser=auto_open,
     )
