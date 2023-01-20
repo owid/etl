@@ -1,4 +1,5 @@
 import concurrent.futures
+import datetime as dt
 from typing import Any, Dict, List, Optional, Tuple, cast
 
 import pandas as pd
@@ -78,6 +79,11 @@ def parse_metadata_from_sheets(
     dataset_dict["namespace"] = "fasttrack"  # or should it be owid? or institution specific?
     dataset_dict.pop("updated")
     dataset_dict.setdefault("description", "")
+
+    try:
+        dt.datetime.strptime(dataset_dict["version"], "%Y-%m-%d")
+    except ValueError:
+        raise ValidationError(f"Version `{dataset_dict['version']}` is not in YYYY-MM-DD format")
 
     # manadatory dataset fields
     for key in ("title", "short_name", "version"):
