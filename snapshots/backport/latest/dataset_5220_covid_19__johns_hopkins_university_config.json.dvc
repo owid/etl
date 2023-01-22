@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5220_covid_19__johns_hopkins_university_config
   file_extension: json
-  date_accessed: 2023-01-21 18:06:42.373005
+  date_accessed: 2023-01-22 06:16:48.515915
   name: Grapher metadata for dataset_5220_covid_19__johns_hopkins_university
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: d2ecff8743d42cfe108b6dffc56325b7
+- md5: a9ba932ee74f04037be95ffd331e601a
   size: 19802
   path: dataset_5220_covid_19__johns_hopkins_university_config.json
