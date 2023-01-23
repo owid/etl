@@ -18,7 +18,6 @@ from owid.catalog import Dataset
 
 from etl import paths
 from etl.steps import (
-    CACHE_IS_DIRTY,
     BackportStepPrivate,
     DataStep,
     DataStepPrivate,
@@ -62,11 +61,9 @@ def test_data_step_becomes_dirty_when_pandas_version_changes():
             d = DataStep(step_name, [])
             assert d.is_dirty()
             d.run()
-            CACHE_IS_DIRTY.clear()
             assert not d.is_dirty()
 
             pd.__version__ += ".test"  # type: ignore
-            CACHE_IS_DIRTY.clear()
             assert d.is_dirty()
 
     finally:

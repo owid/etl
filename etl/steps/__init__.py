@@ -13,7 +13,6 @@ import tempfile
 import warnings
 from collections import defaultdict
 from dataclasses import dataclass, field
-from functools import wraps
 from glob import glob
 from pathlib import Path
 from threading import Lock
@@ -58,24 +57,6 @@ DAG = Dict[str, Any]
 dvc_lock = Lock()
 
 DVC_REPO = Repo(paths.BASE_DIR)
-
-CACHE_IS_DIRTY = files.RuntimeCache()
-
-
-def cache(cache: files.RuntimeCache):
-    """Cache the result of a method in runtime cache."""
-
-    def func(method):
-        @wraps(method)
-        def wrapped(self):
-            key = str(self)
-            if key not in cache:
-                cache.add(key, method(self))
-            return cache[key]
-
-        return wrapped
-
-    return func
 
 
 def compile_steps(
@@ -339,7 +320,6 @@ class DataStep(Step):
         """Optional post-hook, needs to resave the dataset again."""
         ...
 
-    @cache(CACHE_IS_DIRTY)
     def is_dirty(self) -> bool:
         if not self.has_existing_data() or any(d.is_dirty() for d in self.dependencies):
             return True
@@ -493,7 +473,6 @@ class WaldenStep(Step):
         "Ensure the dataset we're looking for is there."
         self._walden_dataset.ensure_downloaded(quiet=True)
 
-    @cache(CACHE_IS_DIRTY)
     def is_dirty(self) -> bool:
         if not Path(self._walden_dataset.local_path).exists():
             return True
@@ -550,7 +529,6 @@ class SnapshotStep(Step):
     def run(self) -> None:
         DVC_REPO.pull(self._path, remote="public-read", force=True)
 
-    @cache(CACHE_IS_DIRTY)
     def is_dirty(self) -> bool:
         # check if the snapshot has been added to DVC
         with open(self._dvc_path) as istream:
@@ -613,7 +591,6 @@ class GrapherStep(Step):
         """Grapher dataset we are upserting."""
         return self.data_step._output_dataset
 
-    @cache(CACHE_IS_DIRTY)
     def is_dirty(self) -> bool:
         if self.data_step.is_dirty():
             return True
@@ -719,7 +696,6 @@ class GithubStep(Step):
     def __str__(self) -> str:
         return f"github://{self.path}"
 
-    @cache(CACHE_IS_DIRTY)
     def is_dirty(self) -> bool:
         # always poll the git repo
         return not self.gh_repo.is_up_to_date()
@@ -814,8 +790,32 @@ class BackportStepPrivate(PrivateMixin, BackportStep):
 
 def select_dirty_steps(steps: List[Step], max_workers: int) -> List[Step]:
     """Select dirty steps using threadpool."""
+    # dynamically add cached version of `is_dirty` to all steps to avoid re-computing
+    # this is a bit hacky, but it's the easiest way to only cache it here without
+    # affecting the rest
+    cache_is_dirty = files.RuntimeCache()
+    for s in steps:
+        _add_is_dirty_cached(s, cache_is_dirty)
+
     with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
         steps_dirty = executor.map(lambda s: s.is_dirty(), steps)  # type: ignore
         steps = [s for s, is_dirty in zip(steps, steps_dirty) if is_dirty]
-    CACHE_IS_DIRTY.clear()
+
+    cache_is_dirty.clear()
+
     return steps
+
+
+def _cached_is_dirty(self: Step, cache: files.RuntimeCache) -> bool:
+    key = str(self)
+    if key not in cache:
+        cache.add(key, self._is_dirty())  # type: ignore
+    return cache[key]  # type: ignore
+
+
+def _add_is_dirty_cached(s: Step, cache: files.RuntimeCache) -> None:
+    """Save copy of a method to _is_dirty and replace it with a cached version."""
+    s._is_dirty = s.is_dirty  # type: ignore
+    s.is_dirty = lambda s=s: _cached_is_dirty(s, cache)  # type: ignore
+    for dep in getattr(s, "dependencies", []):
+        _add_is_dirty_cached(dep, cache)
