@@ -271,10 +271,14 @@ def cli(
 
 def _index_equals(table_a: pd.DataFrame, table_b: pd.DataFrame, sample: int = 1000) -> bool:
     """Check if two tables have the same index. Sample both tables to speed up the check."""
-    return (
-        table_a.sample(min(len(table_a), sample), random_state=0).index
-        == table_b.sample(min(len(table_b), sample), random_state=0).index
-    ).all()  # type: ignore
+    if len(table_a) < sample and len(table_b) < sample:
+        index_a = table_a.index
+        index_b = table_b.index
+    else:
+        index_a = table_a.sample(sample, random_state=0).index
+        index_b = table_b.sample(sample, random_state=0).index
+
+    return (index_a == index_b).all()  # type: ignore
 
 
 def _dict_diff(dict_a: Dict[str, Any], dict_b: Dict[str, Any], tabs) -> str:
