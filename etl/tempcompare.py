@@ -97,6 +97,8 @@ def df_equals(
     assert all(df1.columns == df2.columns), "Columns must be the same"
     assert all(df1.index == df2.index), "Indices must be the same"
 
+    df1, df2 = df1.copy(deep=False), df2.copy(deep=False)
+
     # Union categories of categorical columns to enable comparison
     for col in df1.columns:
         if df1[col].dtype == "category":

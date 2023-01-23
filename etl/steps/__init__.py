@@ -54,8 +54,6 @@ log = structlog.get_logger()
 Graph = Dict[str, Set[str]]
 DAG = Dict[str, Any]
 
-# runtime cache
-cache: Dict[str, Any] = {}
 dvc_lock = Lock()
 
 DVC_REPO = Repo(paths.BASE_DIR)
@@ -372,8 +370,7 @@ class DataStep(Step):
         return catalog.Dataset(self._dest_dir.as_posix())
 
     def checksum_output(self) -> str:
-        # This cast from str to str is IMHO unnecessary but MyPy complains about this without it...
-        return cast(str, self._output_dataset.checksum())
+        return self._output_dataset.checksum()
 
     def _step_files(self) -> List[str]:
         "Return a list of code files defining this step."
@@ -793,7 +790,32 @@ class BackportStepPrivate(PrivateMixin, BackportStep):
 
 def select_dirty_steps(steps: List[Step], max_workers: int) -> List[Step]:
     """Select dirty steps using threadpool."""
+    # dynamically add cached version of `is_dirty` to all steps to avoid re-computing
+    # this is a bit hacky, but it's the easiest way to only cache it here without
+    # affecting the rest
+    cache_is_dirty = files.RuntimeCache()
+    for s in steps:
+        _add_is_dirty_cached(s, cache_is_dirty)
+
     with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
         steps_dirty = executor.map(lambda s: s.is_dirty(), steps)  # type: ignore
         steps = [s for s, is_dirty in zip(steps, steps_dirty) if is_dirty]
+
+    cache_is_dirty.clear()
+
     return steps
+
+
+def _cached_is_dirty(self: Step, cache: files.RuntimeCache) -> bool:
+    key = str(self)
+    if key not in cache:
+        cache.add(key, self._is_dirty())  # type: ignore
+    return cache[key]  # type: ignore
+
+
+def _add_is_dirty_cached(s: Step, cache: files.RuntimeCache) -> None:
+    """Save copy of a method to _is_dirty and replace it with a cached version."""
+    s._is_dirty = s.is_dirty  # type: ignore
+    s.is_dirty = lambda s=s: _cached_is_dirty(s, cache)  # type: ignore
+    for dep in getattr(s, "dependencies", []):
+        _add_is_dirty_cached(dep, cache)

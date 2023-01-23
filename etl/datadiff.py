@@ -68,8 +68,16 @@ class DatasetDiff:
             for col in ds_b[table_name].columns:
                 self.p(f"\t\t[green]+ Column [b]{col}[/b]")
         else:
-            table_a = _sort_index(ds_a[table_name]).reset_index()
-            table_b = _sort_index(ds_b[table_name]).reset_index()
+            table_a = ds_a[table_name]
+            table_b = ds_b[table_name]
+
+            # only sort index if different to avoid unnecessary sorting for huge datasets such as ghe
+            if not _index_equals(table_a, table_b):
+                table_a = _sort_index(table_a)
+                table_b = _sort_index(table_b)
+
+            table_a = table_a.reset_index()
+            table_b = table_b.reset_index()
 
             # compare table metadata
             diff = _dict_diff(_table_metadata_dict(table_a), _table_metadata_dict(table_b), tabs=3)
@@ -259,6 +267,18 @@ def cli(
         "[b]Hint[/b]: Get detailed comparison with [cyan][b]compare --show-values channel namespace version short_name --data-values[/b][/cyan]"
     )
     exit(1 if any_diff else 0)
+
+
+def _index_equals(table_a: pd.DataFrame, table_b: pd.DataFrame, sample: int = 1000) -> bool:
+    """Check if two tables have the same index. Sample both tables to speed up the check."""
+    if len(table_a) < sample and len(table_b) < sample:
+        index_a = table_a.index
+        index_b = table_b.index
+    else:
+        index_a = table_a.sample(sample, random_state=0).index
+        index_b = table_b.sample(sample, random_state=0).index
+
+    return (index_a == index_b).all()  # type: ignore
 
 
 def _dict_diff(dict_a: Dict[str, Any], dict_b: Dict[str, Any], tabs) -> str:

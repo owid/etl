@@ -23,6 +23,7 @@ tables:
         display:
           entityAnnotationsMap: "Western Offshoots: United States, Canada, Australia and New Zealand"
           numDecimalPlaces: 0
+
       gdp_per_capita:
         title: GDP per capita
         short_unit: $

@@ -98,7 +98,8 @@ def run(dest_dir: str) -> None:
 
                 # Add combined tables to the new dataset.
                 tb_combined = tb_combined.reset_index()
-                ds_garden.add(tb_combined, formats=["csv"])
+                # Save also as a csv format for the website
+                ds_garden.add(tb_combined, formats=["csv", "feather", "parquet"])
 
 
 def get_population() -> pd.DataFrame:
