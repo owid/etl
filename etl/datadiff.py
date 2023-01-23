@@ -351,7 +351,7 @@ def _dataset_metadata_dict(ds: Dataset) -> Dict[str, Any]:
     if "sources" in d:
         d["sources"] = sorted(d["sources"], key=lambda x: x["name"])
 
-    del d["source_checksum"]
+    d.pop("source_checksum", None)
     return d
 
 
@@ -385,6 +385,10 @@ def _remote_catalog_datasets(channels: Iterable[CHANNEL], include: str, exclude:
     frame = rc.frame
 
     frame["ds_paths"] = frame["path"].map(os.path.dirname)
+
+    # only compare public datasets
+    frame = frame[frame.is_public]
+
     ds_paths = frame["ds_paths"]
 
     if include:

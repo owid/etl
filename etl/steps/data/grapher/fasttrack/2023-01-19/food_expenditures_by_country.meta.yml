@@ -1,0 +1,59 @@
+dataset:
+  namespace: fasttrack
+  version: '2023-01-19'
+  short_name: food_expenditures_by_country
+  title: Food expenditures by country (USDA, 2023)
+  description: ''
+  sources:
+  - name: USDA, Economic Research Service
+    published_by: United States Department of Agriculture (USDA) Economic Research
+      Service
+    url: https://www.ers.usda.gov/topics/international-markets-u-s-trade/international-consumer-and-food-industry-trends/#data
+tables:
+  food_expenditures_by_country:
+    variables:
+      share_expenditure_food:
+        title: share_expenditure_food
+        short_unit: '%'
+        unit: '%'
+        description: The share of consumer expenditures that are spent on food. This
+          only includes food eaten at-home, and does not include alcoholic beverages
+          and tobacco.
+        sources:
+        - name: USDA, Economic Research Service
+          published_by: United States Department of Agriculture (USDA) Economic Research
+            Service
+          url: https://www.ers.usda.gov/topics/international-markets-u-s-trade/international-consumer-and-food-industry-trends/#data
+      share_alcohol_tobacco:
+        title: share_alcohol_tobacco
+        short_unit: '%'
+        unit: '%'
+        description: The share of consumer expenditures that are spent on alcohol
+          and tobacco.
+        sources:
+        - name: USDA, Economic Research Service
+          published_by: United States Department of Agriculture (USDA) Economic Research
+            Service
+          url: https://www.ers.usda.gov/topics/international-markets-u-s-trade/international-consumer-and-food-industry-trends/#data
+      consumer_expenditure:
+        title: consumer_expenditure
+        short_unit: $
+        unit: $
+        description: Total consumer expenditure on goods and services per year.
+        sources:
+        - name: USDA, Economic Research Service
+          published_by: United States Department of Agriculture (USDA) Economic Research
+            Service
+          url: https://www.ers.usda.gov/topics/international-markets-u-s-trade/international-consumer-and-food-industry-trends/#data
+      expenditure_food_dollars:
+        title: expenditure_food_dollars
+        short_unit: $
+        unit: $
+        description: The amount of money spend on food in a given year. This only
+          includes food eaten at-home, and does not include alcoholic beverages and
+          tobacco.
+        sources:
+        - name: USDA, Economic Research Service
+          published_by: United States Department of Agriculture (USDA) Economic Research
+            Service
+          url: https://www.ers.usda.gov/topics/international-markets-u-s-trade/international-consumer-and-food-industry-trends/#data

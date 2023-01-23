@@ -1,8 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-import json
-from typing import List, cast
-
 import pandas as pd
 from owid.catalog import Dataset, Table
 from structlog import get_logger
@@ -34,11 +31,10 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    log.info("dummy.exclude_countries")
-    df = exclude_countries(df)
-
     log.info("dummy.harmonize_countries")
-    df = harmonize_countries(df)
+    df = geo.harmonize_countries(
+        df=df, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
+    )
 
     # Create a new table with the processed data.
     tb_garden = Table(df, like=tb_meadow)
@@ -59,31 +55,3 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
     log.info("dummy.end")
-
-
-def load_excluded_countries() -> List[str]:
-    with open(paths.excluded_countries_path, "r") as f:
-        data = json.load(f)
-        assert isinstance(data, list)
-    return data
-
-
-def exclude_countries(df: pd.DataFrame) -> pd.DataFrame:
-    excluded_countries = load_excluded_countries()
-    return cast(pd.DataFrame, df.loc[~df.country.isin(excluded_countries)])
-
-
-def harmonize_countries(df: pd.DataFrame) -> pd.DataFrame:
-    unharmonized_countries = df["country"]
-    df = geo.harmonize_countries(df=df, countries_file=str(paths.country_mapping_path))
-
-    missing_countries = set(unharmonized_countries[df.country.isnull()])
-    if any(missing_countries):
-        raise RuntimeError(
-            "The following raw country names have not been harmonized. "
-            f"Please: (a) edit {paths.country_mapping_path} to include these country "
-            f"names; or (b) add them to {paths.excluded_countries_path}."
-            f"Raw country names: {missing_countries}"
-        )
-
-    return df

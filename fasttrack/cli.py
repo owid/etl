@@ -14,7 +14,6 @@ import numpy as np
 import pandas as pd
 import pywebio
 import structlog
-from black import FileMode, WriteBack, format_file_in_place
 from cryptography.fernet import Fernet
 from git.repo import Repo
 from owid.catalog import Dataset
@@ -34,6 +33,7 @@ from etl import grapher_model as gm
 from etl.command import main as etl_main
 from etl.compare import diff_print
 from etl.db import get_engine
+from etl.files import apply_black_formatter_to_files
 from etl.paths import BASE_DIR, DAG_DIR, REFERENCE_DATASET, SNAPSHOTS_DIR, STEP_DIR
 from etl.snapshot import Snapshot, SnapshotMeta
 from walkthrough import utils as walkthrough_utils
@@ -655,7 +655,7 @@ def _metadata_diff(fast_import: FasttrackImport, meta: YAMLMeta) -> bool:
 
 def _commit_and_push(fast_import: FasttrackImport, snapshot_path: Path) -> str:
     """Format generated files, commit them and push to GitHub."""
-    _black_file_in_place(fast_import.step_path)
+    apply_black_formatter_to_files([fast_import.step_path])
 
     repo = Repo(BASE_DIR)
     repo.index.add(
@@ -721,11 +721,6 @@ def _encrypt(s: str) -> str:
 def _decrypt(s: str) -> str:
     fernet = _get_secret_key()
     return fernet.decrypt(s.encode()).decode() if fernet else s
-
-
-def _black_file_in_place(path: Path) -> None:
-    """Apply black on a file in place."""
-    format_file_in_place(path, mode=FileMode(), fast=False, write_back=WriteBack.YES)
 
 
 if __name__ == "__main__":
