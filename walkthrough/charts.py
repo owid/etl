@@ -16,12 +16,12 @@ from MySQLdb import OperationalError
 from pywebio import input as pi
 from pywebio import output as po
 
+from etl.chart_revision.deprecated import ChartRevisionSuggester
 from etl.chart_revision.revision import (
     ChartVariableUpdateRevision,
     get_charts_to_update,
     submit_revisions_to_grapher,
 )
-from etl.chart_revision_suggester import ChartRevisionSuggester
 from etl.db import get_all_datasets, get_connection, get_variables_in_dataset
 from etl.match_variables import (
     SIMILARITY_NAME,
@@ -292,10 +292,10 @@ class Navigation:
                 ),
                 pi.checkbox(
                     "",
-                    options=["Experimental"],
+                    options=["Use old version"],
                     value=[],
-                    name="experimental",
-                    help_text="🧪 Use experimental chart reviewer. Help Lucas test it!",
+                    name="old_version",
+                    help_text="Currently using latest version. Check to use old version!",
                 ),
             ],
         )
@@ -505,28 +505,8 @@ class Navigation:
         self.show_variable_mapping_table(separate=True)
         # clean variable mapping (ignore -1)
         self._clean_variable_mapping()
-        # TODO: this is a hack to allow for experimental version
-        if self.params["experimental"]:
-            # Get revisions to be made
-            charts = get_charts_to_update(self.variable_mapping)
-            # show charts to be updated (and therefore get revisions)
-            revisions = self.show_submission_details_exp(charts)
-            if revisions:
-                # ask user to confirm submission
-                action = pi.actions("Confirm submission", [{"label": "Confirm", "value": 1, "color": "success"}])
-                if action == 1:
-                    # submit suggestions to DB
-                    exit_code = self.submit_suggestions_exp(revisions)
-                    # show next steps
-                    if exit_code == 0:
-                        po.put_markdown(
-                            f"""
-                        ## Next steps
-
-                        Go to the [Chart approval tool]({OWID_ENV.chart_approval_tool_url}) and approve, flag or reject the suggested chart revisions.
-                        """
-                        )
-        else:
+        # TODO: this is a hack to allow for legacy version
+        if self.params["old_version"]:
             # build suggester
             suggester = ChartRevisionSuggester(self.variable_mapping)
             # show charts to be updated (and therefore get revisions)
@@ -538,6 +518,26 @@ class Navigation:
                 if action == 1:
                     # submit suggestions to DB
                     exit_code = self.submit_suggestions(suggester, revisions)
+                    # show next steps
+                    if exit_code == 0:
+                        po.put_markdown(
+                            f"""
+                        ## Next steps
+
+                        Go to the [Chart approval tool]({OWID_ENV.chart_approval_tool_url}) and approve, flag or reject the suggested chart revisions.
+                        """
+                        )
+        else:
+            # Get revisions to be made
+            charts = get_charts_to_update(self.variable_mapping)
+            # show charts to be updated (and therefore get revisions)
+            revisions = self.show_submission_details_exp(charts)
+            if revisions:
+                # ask user to confirm submission
+                action = pi.actions("Confirm submission", [{"label": "Confirm", "value": 1, "color": "success"}])
+                if action == 1:
+                    # submit suggestions to DB
+                    exit_code = self.submit_suggestions_exp(revisions)
                     # show next steps
                     if exit_code == 0:
                         po.put_markdown(
