@@ -31,7 +31,7 @@ class RuntimeCache:
     def __getitem__(self, key: str) -> str:
         return self._cache[key]
 
-    def add(self, key: str, value: str) -> None:
+    def add(self, key: str, value: Any) -> None:
         if key not in self._locks:
             self._locks[key] = Lock()
 
