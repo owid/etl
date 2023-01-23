@@ -54,11 +54,11 @@ log = structlog.get_logger()
 Graph = Dict[str, Set[str]]
 DAG = Dict[str, Any]
 
-# runtime cache
-cache: Dict[str, Any] = {}
 dvc_lock = Lock()
 
 DVC_REPO = Repo(paths.BASE_DIR)
+
+CACHE_CHECKSUM_OUTPUT = files.RuntimeCache()
 
 
 def compile_steps(
@@ -372,8 +372,13 @@ class DataStep(Step):
         return catalog.Dataset(self._dest_dir.as_posix())
 
     def checksum_output(self) -> str:
-        # This cast from str to str is IMHO unnecessary but MyPy complains about this without it...
-        return cast(str, self._output_dataset.checksum())
+        # cache the output checksum to avoid unnecessarily re-computing checksums
+        # for the same datasets
+        key = str(self)
+        if key not in CACHE_CHECKSUM_OUTPUT:
+            CACHE_CHECKSUM_OUTPUT.add(key, self._output_dataset.checksum())
+
+        return CACHE_CHECKSUM_OUTPUT[key]
 
     def _step_files(self) -> List[str]:
         "Return a list of code files defining this step."
@@ -796,4 +801,5 @@ def select_dirty_steps(steps: List[Step], max_workers: int) -> List[Step]:
     with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
         steps_dirty = executor.map(lambda s: s.is_dirty(), steps)  # type: ignore
         steps = [s for s, is_dirty in zip(steps, steps_dirty) if is_dirty]
+    CACHE_CHECKSUM_OUTPUT.clear()
     return steps
