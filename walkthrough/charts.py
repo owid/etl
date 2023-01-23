@@ -295,7 +295,7 @@ class Navigation:
                     options=["Use old version"],
                     value=[],
                     name="old_version",
-                    help_text="Currently using latest version. Check to use old version!",
+                    help_text="Currently using latest backend version. Check to use old version!",
                 ),
             ],
         )
