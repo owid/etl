@@ -108,7 +108,7 @@ tables:
         unit: homicides per 100,000 people
         display:
           numDecimalPlaces: 2
-      both_sexes_all_ages_homicide_count:
+      counts:
         title: Total homicides
         unit: homicides
         display:
@@ -213,7 +213,7 @@ tables:
         unit: homicides
         display:
           numDecimalPlaces: 0
-      both_sexes_all_ages_homicides_per_100_000_population:
+      rate_per_100_000_population:
         title: Total homicides per 100,000 population
         unit: homicides per 100,000 people
         display:
