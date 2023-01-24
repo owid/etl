@@ -109,7 +109,7 @@ tables:
         display:
           numDecimalPlaces: 2
       counts:
-        title: Total homicides
+        title: Homicides
         unit: homicides
         display:
           numDecimalPlaces: 0
@@ -214,7 +214,7 @@ tables:
         display:
           numDecimalPlaces: 0
       rate_per_100_000_population:
-        title: Total homicides per 100,000 population
+        title: Homicides per 100,000 population
         unit: homicides per 100,000 people
         display:
           numDecimalPlaces: 2
