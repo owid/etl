@@ -40,6 +40,7 @@ def run(dest_dir: str) -> None:
     # init dataset
     ds_garden = Dataset.create_empty(dest_dir)
     ds_garden.metadata = ds_meadow.metadata
+    ds_garden.metadata.short_name = SHORT_NAME
     ds_garden.metadata.update_from_yaml(N.metadata_path)
 
     # build tables

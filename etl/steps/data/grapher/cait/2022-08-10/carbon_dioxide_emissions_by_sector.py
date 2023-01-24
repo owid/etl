@@ -1,17 +1,15 @@
 from owid import catalog
 
-from etl.helpers import Names
 from etl.paths import DATA_DIR
 
 from .shared import GARDEN_DATASET_VERSION, NAMESPACE
 
 # Name of table to load from garden dataset to convert into a grapher dataset.
-TABLE_NAME = "nitrous_oxide_emissions_by_sector"
+TABLE_NAME = "carbon_dioxide_emissions_by_sector"
 # Name of output grapher dataset.
-GRAPHER_DATASET_TITLE = "Nitrous oxide emissions by sector (CAIT, 2022)"
+GRAPHER_DATASET_TITLE = "Carbon dioxide emissions by sector (CAIT, 2022)"
 # Path to garden dataset to be loaded.
 DATASET_PATH = DATA_DIR / "garden" / NAMESPACE / GARDEN_DATASET_VERSION / "ghg_emissions_by_sector"
-N = Names(__file__)
 
 
 def run(dest_dir: str) -> None:
@@ -22,7 +20,7 @@ def run(dest_dir: str) -> None:
     # Grapher seems to be taking the name from the dataset instead of the table.
     # Given that there are different tables in the same dataset, use the table title as the dataset title.
     dataset.metadata.title = GRAPHER_DATASET_TITLE
-    dataset.metadata.short_name = N.short_name
+    dataset.metadata.short_name = TABLE_NAME
     ####################################################################################################################
 
     dataset.save()

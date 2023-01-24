@@ -161,6 +161,8 @@ def run(dest_dir: str) -> None:
     log.info("hmd_lt: creating and adding new table...")
     ds = create_and_add_tables_to_dataset(snap.path, ds)
 
+    ds.metadata.short_name = "life_tables"
+
     # Save the dataset
     ds.save()
     log.info("hmd_lt.end")
