@@ -12,6 +12,8 @@ import click
 from rich_click.rich_command import RichCommand
 from structlog import get_logger
 
+# TBD
+from etl.chart_revision.deprecated import ChartRevisionSuggester
 from etl.chart_revision.revision import (
     get_charts_to_update,
     submit_revisions_to_grapher,
@@ -27,9 +29,15 @@ log = get_logger()
     type=str,
 )
 @click.option("--revision-reason", default=None, help="Assign a reason for the suggested chart revision.")
-def main_cli(mapping_file: str, revision_reason: str) -> None:
+@click.option("-o", "--old-version", is_flag=True, help="Use old backend version.")
+def main_cli(mapping_file: str, revision_reason: str, old_version: str) -> None:
     try:
-        main(mapping_file, revision_reason)
+        if old_version:
+            suggester = ChartRevisionSuggester.from_json(mapping_file, revision_reason)
+            suggester.suggest()
+        else:
+            main(mapping_file, revision_reason)
+
     except Exception as e:
         log.error(e)
         if DEBUG:

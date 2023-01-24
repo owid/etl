@@ -1,4 +1,6 @@
-"""Generate chart revisions in Grapher using MAPPING_FILE JSON file.
+"""[This submodule will be deprecated, replaced by etl.chart_revision.cli]
+
+Generate chart revisions in Grapher using MAPPING_FILE JSON file.
 
 MAPPING_FILE is a JSON file with old_variable_id -> new_variable_id pairs. E.g. {2032: 147395, 2033: 147396, ...}.
 
@@ -12,15 +14,12 @@ import traceback
 from copy import deepcopy
 from typing import Any, Dict, Iterable, List, Literal, Optional, Tuple, Union, cast
 
-import click
 import pandas as pd
 import simplejson as json
 import structlog
 from MySQLdb import IntegrityError
-from rich_click.rich_command import RichCommand
 from tqdm import tqdm
 
-from etl.chart_revision.cli import main as main_exp
 from etl.config import DEBUG, GRAPHER_USER_ID
 from etl.db import open_db
 from etl.grapher_helpers import IntRange
@@ -30,26 +29,6 @@ MSGTypes = Literal["error", "warning", "info", "success"]
 
 # The maximum length of the suggested revision reason can't exceed the maximum length specified by the datatype "suggestedReason" in grapher.suggested_chart_revisions table.
 SUGGESTED_REASON_MAX_LENGTH = 512
-
-
-@click.command(cls=RichCommand, help=__doc__)
-@click.argument(
-    "mapping-file",
-    type=str,
-)
-@click.option("--revision-reason", default=None, help="Assign a reason for the suggested chart revision.")
-@click.option("-e", "--experimental", is_flag=True, help="Enable experimental mode.")
-def main_cli(mapping_file: str, revision_reason: str, experimental: bool) -> None:
-    try:
-        if experimental:
-            main_exp(mapping_file, revision_reason)
-        else:
-            suggester = ChartRevisionSuggester.from_json(mapping_file, revision_reason)
-            suggester.suggest()
-    except Exception as e:
-        log.error(e)
-        if DEBUG:
-            traceback.print_exc()
 
 
 class ChartRevisionSuggester:
