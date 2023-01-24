@@ -77,15 +77,6 @@ def harmonize_countries(df: pd.DataFrame) -> pd.DataFrame:
 
 def clean_data(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy(deep=True)
-    # Making the units more obvious
-    df["unit_of_measurement"] = (
-        df["unit_of_measurement"]
-        .map(
-            {"Counts": "Homicide count", "Rate per 100,000 population": "Homicides per 100,000 population"},
-            na_action="ignore",
-        )
-        .fillna(df["unit_of_measurement"])
-    )
 
     # Splitting the data into that which has the totals and that which is disaggregated by mechanism
     df_mech = df[df["dimension"] == "by mechanisms"]
@@ -97,6 +88,15 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
     df_tot = create_total_df(df_tot)
 
     df = pd.merge(df_mech, df_tot, how="outer", on=["country", "year"])
+
+    # Reconciling the variable names with previous aggregated version
+
+    df = df.rename(
+        columns={
+            "Both sexes_All ages_Rate per 100,000 population": "Rate per 100,000 population",
+            "Both sexes_All ages_Counts": "Counts",
+        }
+    )
 
     return df
 
