@@ -114,7 +114,7 @@ def load_income_groups() -> pd.DataFrame:
 
     """
     # Load the WorldBank dataset for income grups.
-    income_groups = catalog.Dataset(DATA_DIR / 'garden/wb/2021-07-01/wb_income')["wb_income_group"].reset_index()
+    income_groups = catalog.Dataset(DATA_DIR / "garden/wb/2021-07-01/wb_income")["wb_income_group"].reset_index()
 
     # Add historical regions to income groups.
     for historic_region in HISTORIC_TO_CURRENT_REGION:
