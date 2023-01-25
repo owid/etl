@@ -26,7 +26,7 @@ from owid.datautils import dataframes
 from tqdm.auto import tqdm
 
 from etl.data_helpers import geo
-from etl.paths import DATA_DIR, STEP_DIR
+from etl.paths import DATA_DIR, REFERENCE_DATASET, STEP_DIR
 
 # Initialise log.
 log = structlog.get_logger()
@@ -895,7 +895,7 @@ def load_countries_regions() -> pd.DataFrame:
 
     """
     # Load dataset of countries and regions.
-    countries_regions = catalog.find("countries_regions", dataset="reference", namespace="owid").load()
+    countries_regions = catalog.Dataset(REFERENCE_DATASET)["countries_regions"]
 
     countries_regions = remove_regions_from_countries_regions_members(
         countries_regions, regions_to_remove=REGIONS_TO_IGNORE_IN_AGGREGATES
@@ -913,16 +913,10 @@ def load_income_groups() -> pd.DataFrame:
         Income groups data.
 
     """
-    income_groups = (
-        catalog.find(
-            table="wb_income_group",
-            dataset="wb_income",
-            namespace="wb",
-            channels=["garden"],
-        )
-        .load()
-        .reset_index()
-    )
+    # Load the latest version of the WorldBank dataset for income grups.
+    latest_wb_dataset_path = sorted((DATA_DIR / "garden/wb/").glob("*/wb_income"))[-1]
+    income_groups = catalog.Dataset(latest_wb_dataset_path)["wb_income_group"].reset_index()
+
     # Add historical regions to income groups.
     for historic_region in HISTORIC_TO_CURRENT_REGION:
         historic_region_income_group = HISTORIC_TO_CURRENT_REGION[historic_region]["income_group"]
