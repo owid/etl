@@ -12,8 +12,6 @@ from etl.data_helpers import geo
 from etl.helpers import PathFinder
 from etl.paths import DATA_DIR
 
-N = PathFinder(__file__)
-
 UNWPP = DATA_DIR / "garden/un/2022-07-11/un_wpp"
 
 log = get_logger()

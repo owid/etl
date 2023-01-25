@@ -33,7 +33,7 @@ NAMESPACE = "bp"
 METADATA_FILE_PATH = CURRENT_DIR / "statistical_review.meta.yml"
 # Original BP's Statistical Review dataset name in the OWID catalog (without the institution and year).
 BP_CATALOG_NAME = "statistical_review_of_world_energy"
-BP_BACKPORTED_DATASET_NAME = "dataset_5347_statistical_review_of_world_energy__bp__2021"
+BP_BACKPORTED_DATASET_NAME = "dataset_5650_statistical_review_of_world_energy__bp__2022"
 BP_NAMESPACE_IN_CATALOG = "bp_statreview"
 BP_VERSION = 2022
 # Path to previous (processed) Statistical Review dataset.
