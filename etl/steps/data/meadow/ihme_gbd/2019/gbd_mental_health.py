@@ -1,13 +1,13 @@
 from structlog import get_logger
 
-from etl.helpers import Names
+from etl.helpers import PathFinder
 
 from .shared import run_wrapper
 
 log = get_logger()
 
 # naming conventions
-N = Names(__file__)
+N = PathFinder(__file__)
 
 
 def run(dest_dir: str) -> None:

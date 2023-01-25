@@ -4,10 +4,10 @@ from typing import List, cast
 
 import pandas as pd
 
-from etl.helpers import Names
+from etl.helpers import PathFinder
 
 # naming conventions
-N = Names(__file__)
+N = PathFinder(__file__)
 
 
 def load_excluded_countries(excluded_countries_path: Path) -> List[str]:

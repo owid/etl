@@ -20,13 +20,13 @@ from owid.catalog.utils import underscore_table
 from structlog import get_logger
 
 from etl.data_helpers import geo
-from etl.helpers import Names
+from etl.helpers import PathFinder
 from etl.paths import DATA_DIR
 
 log = get_logger()
 
 # naming conventions
-N = Names(__file__)
+N = PathFinder(__file__)
 
 # short name of new dataset
 SHORT_NAME = N.short_name

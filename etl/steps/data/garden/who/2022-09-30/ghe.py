@@ -4,12 +4,12 @@ from owid.catalog.utils import underscore_table
 from structlog import get_logger
 
 from etl.grapher_helpers import country_code_to_country
-from etl.helpers import Names
+from etl.helpers import PathFinder
 
 log = get_logger()
 
 # naming conventions
-N = Names(__file__)
+N = PathFinder(__file__)
 
 
 def run(dest_dir: str) -> None:

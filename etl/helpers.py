@@ -263,7 +263,3 @@ class PathFinder:
             dataset = catalog.Dataset(dataset_path)
 
         return dataset
-
-
-# For backwards compatibility.
-Names = PathFinder

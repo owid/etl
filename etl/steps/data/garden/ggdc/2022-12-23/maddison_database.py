@@ -6,7 +6,7 @@ import pandas as pd
 from owid.catalog import Dataset, Table
 from structlog import get_logger
 
-from etl.helpers import Names
+from etl.helpers import PathFinder
 from etl.paths import DATA_DIR
 
 MEADOW_VERSION = "2022-12-23"
@@ -15,7 +15,7 @@ MEADOW_VERSION = "2022-12-23"
 log = get_logger()
 
 # naming conventions
-N = Names(__file__)
+N = PathFinder(__file__)
 
 
 def run(dest_dir: str) -> None:
