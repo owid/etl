@@ -261,6 +261,8 @@ def make_table(input_folder: str, folder: dict) -> catalog.Table:
     df = make_df(files, regex_header)
     # Clean df
     df = clean_df(df, input_folder)
+    # Set index
+    df = df.set_index(["country", "year", "age"], verify_integrity=True).sort_index()
     # df to table
     table = df_to_table(df, age, year, folder["sex"])
     # underscore all table columns

@@ -82,7 +82,7 @@ def combine_sex_tables(ds_meadow: Dataset, table_names: List[str]) -> pd.DataFra
     """Combine meadow tables."""
     dfs = []
     for table_name in table_names:
-        tb_meadow = ds_meadow[table_name]
+        tb_meadow = ds_meadow[table_name].reset_index()
         df = pd.DataFrame(tb_meadow)
         # assign sex
         if table_name.startswith("both_"):
