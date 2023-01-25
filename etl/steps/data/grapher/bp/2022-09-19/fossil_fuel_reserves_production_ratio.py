@@ -1,10 +1,10 @@
 from owid import catalog
 from shared import CURRENT_DIR
 
-from etl.helpers import Names
+from etl.helpers import PathFinder
 
 DATASET_SHORT_NAME = "fossil_fuel_reserves_production_ratio"
-N = Names(str(CURRENT_DIR / DATASET_SHORT_NAME))
+N = PathFinder(str(CURRENT_DIR / DATASET_SHORT_NAME))
 
 
 def run(dest_dir: str) -> None:

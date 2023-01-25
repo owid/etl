@@ -1,10 +1,10 @@
 from gbd_tools import run_wrapper
 from structlog import get_logger
 
-from etl.helpers import Names
+from etl.helpers import PathFinder
 
 # naming conventions
-N = Names(__file__)
+N = PathFinder(__file__)
 log = get_logger()
 
 

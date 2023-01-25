@@ -7,13 +7,13 @@ from owid.catalog.utils import underscore_table
 from structlog import get_logger
 
 from etl.data_helpers import geo
-from etl.helpers import Names
+from etl.helpers import PathFinder
 from etl.paths import DATA_DIR
 
 log = get_logger()
 
 # namings
-N = Names(__file__)
+N = PathFinder(__file__)
 SHORT_NAME = "life_tables"
 VERSION_MEADOW = "2022-12-07"
 DATASET_MEADOW = DATA_DIR / f"meadow/hmd/{VERSION_MEADOW}/{SHORT_NAME}"

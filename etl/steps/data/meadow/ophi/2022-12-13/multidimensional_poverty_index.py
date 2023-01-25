@@ -5,7 +5,7 @@ import pandas as pd
 from owid.catalog import Dataset, Table, TableMeta
 from structlog import get_logger
 
-from etl.helpers import Names
+from etl.helpers import PathFinder
 from etl.snapshot import Snapshot
 from etl.steps.data.converters import convert_snapshot_metadata
 
@@ -17,7 +17,7 @@ SNAPSHOT_VERSION = "2022-12-13"
 MEADOW_VERSION = SNAPSHOT_VERSION
 
 # naming conventions
-N = Names(__file__)
+N = PathFinder(__file__)
 
 
 def run(dest_dir: str) -> None:

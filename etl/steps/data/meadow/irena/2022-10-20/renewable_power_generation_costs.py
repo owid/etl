@@ -14,7 +14,7 @@ from owid.catalog.utils import underscore_table
 from owid.walden import Catalog as WaldenCatalog
 from shared import CURRENT_DIR
 
-from etl.helpers import Names
+from etl.helpers import PathFinder
 from etl.steps.data.converters import convert_walden_metadata
 
 # Details of input dataset.
@@ -22,7 +22,7 @@ WALDEN_VERSION = "2022-10-07"
 # Details of output dataset.
 VERSION = "2022-10-20"
 # Get naming conventions.
-N = Names(str(CURRENT_DIR / "renewable_power_generation_costs"))
+N = PathFinder(str(CURRENT_DIR / "renewable_power_generation_costs"))
 
 # It's unclear if this data will be used. If so, it could be a separate table.
 # def prepare_pv_data(data_file: str) -> pd.DataFrame:

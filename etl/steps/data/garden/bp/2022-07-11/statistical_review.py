@@ -14,12 +14,17 @@ import pandas as pd
 from owid import catalog
 from shared import CURRENT_DIR, REGIONS_TO_ADD, add_region_aggregates
 
+from etl.helpers import PathFinder
+
+P = PathFinder(__file__)
+
 # Namespace and short name for output dataset.
 NAMESPACE = "bp"
 # Path to metadata file for current dataset.
 METADATA_FILE_PATH = CURRENT_DIR / "statistical_review.meta.yml"
 # Original BP's Statistical Review dataset name in the OWID catalog (without the institution and year).
 BP_CATALOG_NAME = "statistical_review_of_world_energy"
+BP_BACKPORTED_DATASET_NAME = "dataset_5347_statistical_review_of_world_energy__bp__2021"
 BP_NAMESPACE_IN_CATALOG = "bp_statreview"
 BP_VERSION = 2021
 
@@ -211,11 +216,8 @@ def run(dest_dir: str) -> None:
     # Load data.
     #
     # Load table from latest BP dataset.
-    bp_table = catalog.find_one(
-        BP_CATALOG_NAME,
-        channels=["backport"],
-        namespace=f"{BP_NAMESPACE_IN_CATALOG}@{BP_VERSION}",
-    )
+    bp_ds: catalog.Dataset = P.load_dependency(BP_BACKPORTED_DATASET_NAME)
+    bp_table = bp_ds[BP_BACKPORTED_DATASET_NAME]
 
     #
     # Process data.

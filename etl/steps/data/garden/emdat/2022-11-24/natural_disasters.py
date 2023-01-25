@@ -36,7 +36,7 @@ from shared import (
 )
 
 from etl.data_helpers import geo
-from etl.helpers import Names
+from etl.helpers import PathFinder
 from etl.paths import DATA_DIR
 
 # Define inputs.
@@ -163,7 +163,7 @@ DATA_CORRECTIONS = [
 # 1991: {'Georgia', 'USSR'},
 
 # Get naming conventions.
-N = Names(str(CURRENT_DIR / "natural_disasters"))
+N = PathFinder(str(CURRENT_DIR / "natural_disasters"))
 
 
 def prepare_input_data(df: pd.DataFrame) -> pd.DataFrame:

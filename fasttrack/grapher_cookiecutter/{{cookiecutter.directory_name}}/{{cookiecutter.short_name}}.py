@@ -1,10 +1,10 @@
 import pandas as pd
 from owid import catalog
 
-from etl.helpers import Names
+from etl.helpers import PathFinder
 from etl.snapshot import Snapshot
 
-N = Names(__file__)
+P = PathFinder(__file__)
 
 
 def run(dest_dir: str) -> None:
@@ -15,9 +15,9 @@ def run(dest_dir: str) -> None:
 
     # create empty dataframe and table
     ds = catalog.Dataset.create_empty(dest_dir)
-    tb = catalog.Table(data, short_name=N.short_name)
+    tb = catalog.Table(data, short_name=P.short_name)
 
     # add table, update metadata from *.meta.yml and save
     ds.add(tb)
-    ds.update_metadata(N.metadata_path)
+    ds.update_metadata(P.metadata_path)
     ds.save()

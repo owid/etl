@@ -4,14 +4,14 @@ from owid.catalog.utils import underscore_table
 from owid.walden import Catalog as WaldenCatalog
 from structlog import get_logger
 
-from etl.helpers import Names
+from etl.helpers import PathFinder
 from etl.paths import REFERENCE_DATASET
 from etl.steps.data.converters import convert_walden_metadata
 
 log = get_logger()
 
 # naming conventions
-N = Names(__file__)
+N = PathFinder(__file__)
 
 
 def run(dest_dir: str) -> None:

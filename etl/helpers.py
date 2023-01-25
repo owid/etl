@@ -181,7 +181,7 @@ class PathFinder:
         elif channel in ["snapshot", "walden"]:
             step_name = f"{channel}://{namespace}/{version}/{short_name}"
         elif channel is None:
-            step_name = rf"(?:snapshot:/|walden:/|data://meadow|data://garden|data://grapher)/{namespace}/{version}/{short_name}"
+            step_name = rf"(?:snapshot:/|walden:/|data://meadow|data://garden|data://grapher|backport://backport)/{namespace}/{version}/{short_name}"
         else:
             raise UnknownChannel
 
@@ -194,7 +194,7 @@ class PathFinder:
         if channel_type in ["walden", "snapshot"]:
             channel = channel_type
             namespace, version, short_name = path.split("/")
-        elif channel_type in ["data"]:
+        elif channel_type in ["data", "backport"]:
             channel, namespace, version, short_name = path.split("/")
         else:
             raise WrongStepName
@@ -263,7 +263,3 @@ class PathFinder:
             dataset = catalog.Dataset(dataset_path)
 
         return dataset
-
-
-# For backwards compatibility.
-Names = PathFinder

@@ -9,16 +9,14 @@ from owid.catalog.utils import underscore_table
 from structlog import get_logger
 
 from etl.data_helpers import geo
-from etl.helpers import Names
+from etl.helpers import PathFinder
 from etl.paths import DATA_DIR
-
-N = Names(__file__)
 
 UNWPP = DATA_DIR / "garden/un/2022-07-11/un_wpp"
 
 log = get_logger()
 
-N = Names(__file__)
+N = PathFinder(__file__)
 
 
 def run(dest_dir: str) -> None:

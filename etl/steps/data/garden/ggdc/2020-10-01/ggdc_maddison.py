@@ -16,11 +16,11 @@ import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
 
-from etl.helpers import Names
+from etl.helpers import PathFinder
 from etl.snapshot import Snapshot
 from etl.steps.data.converters import convert_snapshot_metadata
 
-N = Names(__file__)
+N = PathFinder(__file__)
 
 # Column name for GDP in output dataset.
 GDP_COLUMN = "gdp"

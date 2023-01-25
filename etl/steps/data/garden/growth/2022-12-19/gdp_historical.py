@@ -10,7 +10,7 @@ import pandas as pd
 from owid.catalog import Dataset, Table
 from structlog import get_logger
 
-from etl.helpers import Names
+from etl.helpers import PathFinder
 from etl.paths import DATA_DIR
 
 VERSION_MADDISON = "2020-10-01"
@@ -20,7 +20,7 @@ VERSION_MADDISON2010 = "2022-12-23"
 log = get_logger()
 
 # naming conventions
-N = Names(__file__)
+N = PathFinder(__file__)
 
 
 def create_estimations_from_growth(

@@ -10,7 +10,7 @@ from owid.catalog.utils import underscore_table
 from owid.walden import Catalog as WaldenCatalog
 from shared import CURRENT_DIR
 
-from etl.helpers import Names
+from etl.helpers import PathFinder
 from etl.steps.data.converters import convert_walden_metadata
 
 # Details of input dataset.
@@ -20,7 +20,7 @@ WALDEN_DATASET_NAME = "renewable_electricity_capacity_and_generation"
 VERSION = "2022-10-20"
 DATASET_NAME = WALDEN_DATASET_NAME
 # Get naming conventions.
-N = Names(str(CURRENT_DIR / DATASET_NAME))
+N = PathFinder(str(CURRENT_DIR / DATASET_NAME))
 
 
 def prepare_pv_capacity_data(data_file: str) -> None:
