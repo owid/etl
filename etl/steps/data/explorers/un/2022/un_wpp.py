@@ -8,10 +8,10 @@ import structlog
 from owid import catalog
 from tqdm.auto import tqdm
 
-from etl.helpers import Names
+from etl.helpers import PathFinder
 from etl.paths import DATA_DIR
 
-N = Names(__file__)
+N = PathFinder(__file__)
 YEAR_SPLIT = 2022
 no_dim_keyword = "full"
 log = structlog.get_logger()

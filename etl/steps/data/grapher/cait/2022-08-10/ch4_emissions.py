@@ -1,6 +1,6 @@
 from owid import catalog
 
-from etl.helpers import Names
+from etl.helpers import PathFinder
 from etl.paths import DATA_DIR
 
 from .shared import GARDEN_DATASET_VERSION, NAMESPACE
@@ -11,7 +11,7 @@ TABLE_NAME = "methane_emissions_by_sector"
 GRAPHER_DATASET_TITLE = "Methane emissions by sector (CAIT, 2022)"
 # Path to garden dataset to be loaded.
 DATASET_PATH = DATA_DIR / "garden" / NAMESPACE / GARDEN_DATASET_VERSION / "ghg_emissions_by_sector"
-N = Names(__file__)
+N = PathFinder(__file__)
 
 
 def run(dest_dir: str) -> None:

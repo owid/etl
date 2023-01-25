@@ -1,9 +1,9 @@
 from owid import catalog
 
-from etl.helpers import Names
+from etl.helpers import PathFinder
 from etl.paths import DATA_DIR, STEP_DIR
 
-N = Names(__file__)
+N = PathFinder(__file__)
 
 # Details of input garden dataset and table.
 GARDEN_DATASET_NAME = "world_carbon_pricing"

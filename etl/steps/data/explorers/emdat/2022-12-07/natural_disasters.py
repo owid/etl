@@ -19,10 +19,10 @@ from copy import deepcopy
 
 from owid import catalog
 
-from etl.helpers import Names
+from etl.helpers import PathFinder
 from etl.paths import DATA_DIR
 
-N = Names(__file__)
+N = PathFinder(__file__)
 
 # Mapping of old to new disaster type names.
 DISASTER_TYPE_RENAMING = {
