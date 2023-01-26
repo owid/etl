@@ -7,10 +7,11 @@ import re
 import tempfile
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Any, Dict, Iterator, List, Optional, Union, cast
+from typing import Any, Dict, Iterator, List, Optional, Set, Tuple, Union, cast
 
-import requests
 import pandas as pd
+import requests
+import structlog
 from owid import catalog
 from owid.catalog import CHANNEL
 from owid.datautils.common import ExceptionFromDocstring
@@ -20,6 +21,8 @@ from owid.walden import Dataset as WaldenDataset
 from etl import paths
 from etl.snapshot import Snapshot
 from etl.steps import load_dag, reverse_graph
+
+log = structlog.get_logger()
 
 
 @contextmanager
@@ -270,16 +273,16 @@ class PathFinder:
 Names = PathFinder
 
 
-def extract_step_attributes(step):
+def extract_step_attributes(step: str) -> Tuple[str, str, str, str, str, str, str]:
     # Extract the prefix (whatever is on the left of the '://') and the root of the step name.
     prefix, root = step.split("://")
-    
+
     # Field 'kind' informs whether the dataset is public or private.
     if "private" in prefix:
         kind = "private"
     else:
         kind = "public"
-    
+
     # From now on we remove the 'public' or 'private' from the prefix.
     prefix = prefix.split("-")[0]
 
@@ -293,7 +296,7 @@ def extract_step_attributes(step):
     elif prefix in ["snapshot", "walden"]:
         # Ingestion steps.
         channel = prefix
-        
+
         # Extract attributes from root of the step.
         namespace, version, name = root.split("/")
 
@@ -301,7 +304,7 @@ def extract_step_attributes(step):
         identifier = f"{channel}/{namespace}/{name}"
     elif root == "garden/reference":
         # This is a special step that does not have a namespace or a version.
-        # We should probably get rid of this special step soon. But for now, define its properties manually.
+        # We should probably get rid of this special step soon. But for now, define its properties manually.
         channel = "garden"
         namespace = "owid"
         version = "latest"
@@ -311,35 +314,37 @@ def extract_step_attributes(step):
         identifier = f"{channel}/{namespace}/{name}"
     else:
         # Regular data steps.
-        
+
         # Extract attributes from root of the step.
         channel, namespace, version, name = root.split("/")
 
         # Define an identifier for this step, that is identical for all versions.
         identifier = f"{channel}/{namespace}/{name}"
-    
+
     return step, kind, channel, namespace, version, name, identifier
 
 
-def list_all_steps_in_dag(dag):
+def list_all_steps_in_dag(dag: Dict[str, Any]) -> List[str]:
     all_steps = sorted(set([step for step in dag] + sum([list(dag[step]) for step in dag], [])))
 
     return all_steps
 
 
-def get_direct_downstream_dependencies_for_step_in_dag(dag, step):
+def get_direct_downstream_dependencies_for_step_in_dag(dag: Dict[str, Any], step: str) -> Set[str]:
     dependencies = dag[step]
 
     return dependencies
 
 
-def get_direct_upstream_dependencies_for_step_in_dag(dag, step):
+def get_direct_upstream_dependencies_for_step_in_dag(dag: Dict[str, Any], step: str) -> Set[str]:
     used_by = set([_step for _step in dag if step in dag[_step]])
 
     return used_by
 
 
-def _recursive_get_all_downstream_dependencies_for_step_in_dag(dag, step, dependencies=set()):
+def _recursive_get_all_downstream_dependencies_for_step_in_dag(
+    dag: Dict[str, Any], step: str, dependencies: Set[str] = set()
+) -> Set[str]:
     if step in dag:
         # If step is in the dag, gather all its substeps.
         substeps = dag[step]
@@ -347,7 +352,9 @@ def _recursive_get_all_downstream_dependencies_for_step_in_dag(dag, step, depend
         dependencies = dependencies | set(substeps)
         for substep in substeps:
             # For each of the substeps, repeat the process.
-            dependencies = dependencies | _recursive_get_all_downstream_dependencies_for_step_in_dag(dag, step=substep, dependencies=dependencies)
+            dependencies = dependencies | _recursive_get_all_downstream_dependencies_for_step_in_dag(
+                dag, step=substep, dependencies=dependencies
+            )
     else:
         # If step is not in the dag, return the default dependencies (which is an empty set).
         pass
@@ -355,13 +362,13 @@ def _recursive_get_all_downstream_dependencies_for_step_in_dag(dag, step, depend
     return dependencies
 
 
-def get_all_downstream_dependencies_for_step_in_dag(dag, step):
+def get_all_downstream_dependencies_for_step_in_dag(dag: Dict[str, Any], step: str) -> Set[str]:
     dependencies = _recursive_get_all_downstream_dependencies_for_step_in_dag(dag=dag, step=step)
 
     return dependencies
 
 
-def get_all_upstream_dependencies_for_step_in_dag(dag, step):
+def get_all_upstream_dependencies_for_step_in_dag(dag: Dict[str, Any], step: str) -> Set[str]:
     reverse_dag = reverse_graph(graph=dag)
     dependencies = get_all_downstream_dependencies_for_step_in_dag(dag=reverse_dag, step=step)
 
@@ -370,11 +377,15 @@ def get_all_upstream_dependencies_for_step_in_dag(dag, step):
 
 class ArchiveStepUsedByActiveStep(ExceptionFromDocstring):
     """Archived steps have been found as dependencies of active steps.
-    
+
     The solution is either:
     * To archive those active steps.
     * To un-archive those archive steps.
     """
+
+
+class LatestVersionOfStepShouldBeActive(ExceptionFromDocstring):
+    """The latest version of each data step should be in the dag as a main step (maybe it was accidentally removed)."""
 
 
 class VersionTracker:
@@ -394,7 +405,7 @@ class VersionTracker:
         self.step_attributes_df = self._create_step_attributes_df()
         # Create dataframe of steps.
         self.steps_df = self._create_steps_df()
-        
+
         # Apply sanity check.
         self.check_that_archive_steps_are_not_dependencies_of_active_steps()
         self.check_latest_version_of_steps_are_active()
@@ -402,27 +413,27 @@ class VersionTracker:
 
         # TODO: Another useful method would be to find in which dag file each step is (by yaml opening each file).
 
-    def get_direct_downstream_dependencies_for_step(self, step):
+    def get_direct_downstream_dependencies_for_step(self, step: str) -> Set[str]:
         dependencies = get_direct_downstream_dependencies_for_step_in_dag(dag=self.dag_all, step=step)
 
         return dependencies
 
-    def get_direct_upstream_dependencies_for_step(self, step):
+    def get_direct_upstream_dependencies_for_step(self, step: str) -> Set[str]:
         dependencies = get_direct_upstream_dependencies_for_step_in_dag(dag=self.dag_all, step=step)
 
         return dependencies
 
-    def get_all_downstream_dependencies_for_step(self, step):
+    def get_all_downstream_dependencies_for_step(self, step: str) -> Set[str]:
         dependencies = get_all_downstream_dependencies_for_step_in_dag(dag=self.dag_all, step=step)
 
         return dependencies
 
-    def get_all_upstream_dependencies_for_step(self, step):
+    def get_all_upstream_dependencies_for_step(self, step: str) -> Set[str]:
         dependencies = get_all_upstream_dependencies_for_step_in_dag(dag=self.dag_all, step=step)
 
         return dependencies
 
-    def get_all_dependencies_of_active_steps(self):
+    def get_all_dependencies_of_active_steps(self) -> Set[str]:
         # Gather all dependencies of active steps in the dag.
         active_dependencies = set()
         for step in self.dag_active:
@@ -430,17 +441,21 @@ class VersionTracker:
 
         return active_dependencies
 
-    def _create_step_attributes_df(self):
+    def _create_step_attributes_df(self) -> pd.DataFrame:
         # Extract all attributes of each unique active/archive/dependency step.
         step_attributes = pd.DataFrame(
             [extract_step_attributes(step) for step in self.all_steps],
-            columns=["step", "kind", "channel", "namespace", "version", "name", "identifier"])
+            columns=["step", "kind", "channel", "namespace", "version", "name", "identifier"],
+        )
 
         # Create custom features that will let us prioritize which datasets to update.
 
         # Add list of all existing versions for each step.
-        versions = step_attributes.groupby("identifier", as_index=False).agg({"version": lambda x: sorted(list(x))}).\
-            rename(columns={"version": "versions"})
+        versions = (
+            step_attributes.groupby("identifier", as_index=False)
+            .agg({"version": lambda x: sorted(list(x))})
+            .rename(columns={"version": "versions"})
+        )
         step_attributes = pd.merge(step_attributes, versions, on="identifier", how="left")
 
         # Count number of versions for each step.
@@ -450,11 +465,14 @@ class VersionTracker:
         step_attributes["latest_version"] = step_attributes["versions"].apply(lambda x: x[-1])
 
         # Find how many newer versions exist for each step.
-        step_attributes["n_newer_versions"] = [row["n_versions"] - row["versions"].index(row["version"]) - 1 for i, row in step_attributes[["n_versions", "versions", "version"]].iterrows()]
+        step_attributes["n_newer_versions"] = [
+            row["n_versions"] - row["versions"].index(row["version"]) - 1
+            for i, row in step_attributes[["n_versions", "versions", "version"]].iterrows()
+        ]
 
         return step_attributes
 
-    def _create_steps_df(self):
+    def _create_steps_df(self) -> pd.DataFrame:
         steps = []
         # Gather active steps and their dependencies.
         for step in self.dag_active:
@@ -478,13 +496,13 @@ class VersionTracker:
         # b       a
         # c       a
         steps = pd.DataFrame.from_records(steps, columns=["step", "used_by", "status"])
-        
+
         # Add attributes to steps.
         steps = pd.merge(steps, self.step_attributes_df, on="step", how="left")
 
         return steps
 
-    def check_that_archive_steps_are_not_dependencies_of_active_steps(self):
+    def check_that_archive_steps_are_not_dependencies_of_active_steps(self) -> None:
         # Find any archive steps that are dependencies of active steps, and should therefore not be archive steps.
         missing_steps = set(self.dag_archive) & set(self.all_active_dependencies)
 
@@ -494,24 +512,32 @@ class VersionTracker:
                 print(f"Archive step {missing_step} is used by active steps: {direct_usages}")
             raise ArchiveStepUsedByActiveStep
 
-    def check_latest_version_of_steps_are_active(self):
+    def check_latest_version_of_steps_are_active(self) -> None:
         # Check that the latest version of each main data step is in the dag.
         # If not, it could be because it has been deleted by accident.
-        latest_data_steps = set(self.step_attributes_df[(self.step_attributes_df["n_newer_versions"] == 0) &
-                        (self.step_attributes_df["channel"].isin(["meadow", "garden"]))]["step"])
+        latest_data_steps = set(
+            self.step_attributes_df[
+                (self.step_attributes_df["n_newer_versions"] == 0)
+                & (self.step_attributes_df["channel"].isin(["meadow", "garden"]))
+            ]["step"]
+        )
         # The only main data step that is not explicitly in the DAG is the reference dataset (which should be removed soon).
-        error = "The latest version of each data step should be in the dag as a main step (if not, maybe it was removed by accident)."
-        assert latest_data_steps <= set(list(self.dag_active) + ["data://garden/reference"]), error
-    
-    def check_all_active_steps_are_necessary(self):
+        if not (latest_data_steps <= set(list(self.dag_active) + ["data://garden/reference"])):
+            raise LatestVersionOfStepShouldBeActive
+
+    def check_all_active_steps_are_necessary(self) -> None:
         # TODO: This function may need to become recurrent, because once an unused step is taken out, another step
         #  may also become unnecessary (e.g. the meadow step of an unused garden step will be detected only after the
         #  garden step has been removed).
-        outdated_data_steps = set(self.steps_df[(self.steps_df["n_newer_versions"] > 0) & (self.steps_df["status"] == "active") &
-                        (self.steps_df["channel"].isin(["meadow", "garden"]))]["step"])
+        outdated_data_steps = set(
+            self.steps_df[
+                (self.steps_df["n_newer_versions"] > 0)
+                & (self.steps_df["status"] == "active")
+                & (self.steps_df["channel"].isin(["meadow", "garden"]))
+            ]["step"]
+        )
 
         unused_data_steps = outdated_data_steps - set(self.all_active_dependencies)
-        
+
         if len(unused_data_steps) > 0:
-            # TODO: Make a proper warning.
-            print(f"WARNING: Some data steps can be safely archived: {unused_data_steps}")
+            log.warning(f"WARNING: Some data steps can be safely archived: {unused_data_steps}")
