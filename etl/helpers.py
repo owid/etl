@@ -274,6 +274,31 @@ Names = PathFinder
 
 
 def extract_step_attributes(step: str) -> Tuple[str, str, str, str, str, str, str]:
+    """Extract attributes of a step from its name in the dag.
+
+    Parameters
+    ----------
+    step : str
+        Step (as it appears in the dag).
+
+    Returns
+    -------
+    step : str
+        Step (as it appears in the dag).
+    kind : str
+        Kind of step (namely, 'public' or 'private').
+    channel: str
+        Channel (e.g. 'meadow').
+    namespace: str
+        Namespace (e.g. 'energy').
+    version: str
+        Version (e.g. '2023-01-26').
+    name: str
+        Short name of the dataset (e.g. 'primary_energy').
+    identifier : str
+        Identifier of the step that is independent of the kind and of the version of the step.
+
+    """
     # Extract the prefix (whatever is on the left of the '://') and the root of the step name.
     prefix, root = step.split("://")
 
@@ -325,24 +350,72 @@ def extract_step_attributes(step: str) -> Tuple[str, str, str, str, str, str, st
 
 
 def list_all_steps_in_dag(dag: Dict[str, Any]) -> List[str]:
+    """List all steps in a dag.
+
+    Parameters
+    ----------
+    dag : Dict[str, Any]
+        Dag.
+
+    Returns
+    -------
+    all_steps : List[str]
+        List of steps in dag.
+
+    """
     all_steps = sorted(set([step for step in dag] + sum([list(dag[step]) for step in dag], [])))
 
     return all_steps
 
 
-def get_direct_downstream_dependencies_for_step_in_dag(dag: Dict[str, Any], step: str) -> Set[str]:
+def get_direct_dependencies_for_step_in_dag(dag: Dict[str, Any], step: str) -> Set[str]:
+    """Get direct dependencies of a given step in a dag.
+
+    Direct dependencies of a step are those datasets that are listed in the dag as the step's dependencies.
+
+    Parameters
+    ----------
+    dag : Dict[str, Any]
+        Dag.
+    step : str
+        Step (as it appears in the dag).
+
+    Returns
+    -------
+    dependencies : Set[str]
+        Direct dependencies of a step in a dag.
+
+    """
     dependencies = dag[step]
 
     return dependencies
 
 
-def get_direct_upstream_dependencies_for_step_in_dag(dag: Dict[str, Any], step: str) -> Set[str]:
+def get_direct_usages_for_step_in_dag(dag: Dict[str, Any], step: str) -> Set[str]:
+    """Get direct usages of a given step in a dag.
+
+    Direct usages of a step are those datasets that have the current step listed in the dag as one of the dependencies.
+
+    Parameters
+    ----------
+    dag : Dict[str, Any]
+        Dag.
+    step : str
+        Step (as it appears in the dag).
+
+    Returns
+    -------
+    dependencies : Set[str]
+        Direct usages of a step in a dag.
+
+    """
+
     used_by = set([_step for _step in dag if step in dag[_step]])
 
     return used_by
 
 
-def _recursive_get_all_downstream_dependencies_for_step_in_dag(
+def _recursive_get_all_dependencies_for_step_in_dag(
     dag: Dict[str, Any], step: str, dependencies: Set[str] = set()
 ) -> Set[str]:
     if step in dag:
@@ -352,7 +425,7 @@ def _recursive_get_all_downstream_dependencies_for_step_in_dag(
         dependencies = dependencies | set(substeps)
         for substep in substeps:
             # For each of the substeps, repeat the process.
-            dependencies = dependencies | _recursive_get_all_downstream_dependencies_for_step_in_dag(
+            dependencies = dependencies | _recursive_get_all_dependencies_for_step_in_dag(
                 dag, step=substep, dependencies=dependencies
             )
     else:
@@ -362,15 +435,53 @@ def _recursive_get_all_downstream_dependencies_for_step_in_dag(
     return dependencies
 
 
-def get_all_downstream_dependencies_for_step_in_dag(dag: Dict[str, Any], step: str) -> Set[str]:
-    dependencies = _recursive_get_all_downstream_dependencies_for_step_in_dag(dag=dag, step=step)
+def get_all_dependencies_for_step_in_dag(dag: Dict[str, Any], step: str) -> Set[str]:
+    """Get all dependencies for a given step in a dag.
+
+    This function returns all dependencies of a step, as well as their direct dependencies, and so on. In the end, the
+    result contains all datasets that the given step depends on, directly or indirectly.
+
+    Parameters
+    ----------
+    dag : Dict[str, Any]
+        Dag.
+    step : str
+        Step (as it appears in the dag).
+
+    Returns
+    -------
+    dependencies : Set[str]
+        All dependencies of a given step in a dag.
+    """
+    dependencies = _recursive_get_all_dependencies_for_step_in_dag(dag=dag, step=step)
 
     return dependencies
 
 
-def get_all_upstream_dependencies_for_step_in_dag(dag: Dict[str, Any], step: str) -> Set[str]:
+def get_all_usages_for_step_in_dag(dag: Dict[str, Any], step: str) -> Set[str]:
+    """Get all dependencies for a given step in a dag.
+
+    This function returns all datasets for which a given step is a dependency, as well as those datasets for which they
+    are also dependencies, and so on. In the end, the result contains all datasets that use, directly or indirectly, the
+    given step.
+
+    Parameters
+    ----------
+    dag : Dict[str, Any]
+        Dag.
+    step : str
+        Step (as it appears in the dag).
+
+    Returns
+    -------
+    dependencies : Set[str]
+        All usages of a given step in a dag.
+
+    """
+    # A simple solution is to simply reverse the graph, and apply the already existing function that finds all
+    # dependencies.
     reverse_dag = reverse_graph(graph=dag)
-    dependencies = get_all_downstream_dependencies_for_step_in_dag(dag=reverse_dag, step=step)
+    dependencies = get_all_dependencies_for_step_in_dag(dag=reverse_dag, step=step)
 
     return dependencies
 
@@ -389,6 +500,10 @@ class LatestVersionOfStepShouldBeActive(ExceptionFromDocstring):
 
 
 class VersionTracker:
+    """Helper object that loads the dag, provides useful functions to check for versions and dataset dependencies, and
+    checks for inconsistencies.
+    """
+
     def __init__(self):
         # Load dag of active and archive steps.
         self.dag_all = load_dag(include_archive=True)
@@ -413,23 +528,23 @@ class VersionTracker:
 
         # TODO: Another useful method would be to find in which dag file each step is (by yaml opening each file).
 
-    def get_direct_downstream_dependencies_for_step(self, step: str) -> Set[str]:
-        dependencies = get_direct_downstream_dependencies_for_step_in_dag(dag=self.dag_all, step=step)
+    def get_direct_dependencies_for_step(self, step: str) -> Set[str]:
+        dependencies = get_direct_dependencies_for_step_in_dag(dag=self.dag_all, step=step)
 
         return dependencies
 
-    def get_direct_upstream_dependencies_for_step(self, step: str) -> Set[str]:
-        dependencies = get_direct_upstream_dependencies_for_step_in_dag(dag=self.dag_all, step=step)
+    def get_direct_usages_for_step(self, step: str) -> Set[str]:
+        dependencies = get_direct_usages_for_step_in_dag(dag=self.dag_all, step=step)
 
         return dependencies
 
-    def get_all_downstream_dependencies_for_step(self, step: str) -> Set[str]:
-        dependencies = get_all_downstream_dependencies_for_step_in_dag(dag=self.dag_all, step=step)
+    def get_all_dependencies_for_step(self, step: str) -> Set[str]:
+        dependencies = get_all_dependencies_for_step_in_dag(dag=self.dag_all, step=step)
 
         return dependencies
 
-    def get_all_upstream_dependencies_for_step(self, step: str) -> Set[str]:
-        dependencies = get_all_upstream_dependencies_for_step_in_dag(dag=self.dag_all, step=step)
+    def get_all_usages_for_step(self, step: str) -> Set[str]:
+        dependencies = get_all_usages_for_step_in_dag(dag=self.dag_all, step=step)
 
         return dependencies
 
@@ -437,7 +552,7 @@ class VersionTracker:
         # Gather all dependencies of active steps in the dag.
         active_dependencies = set()
         for step in self.dag_active:
-            active_dependencies = active_dependencies | self.get_all_downstream_dependencies_for_step(step=step)
+            active_dependencies = active_dependencies | self.get_all_dependencies_for_step(step=step)
 
         return active_dependencies
 
@@ -508,7 +623,7 @@ class VersionTracker:
 
         if len(missing_steps) > 0:
             for missing_step in missing_steps:
-                direct_usages = self.get_direct_upstream_dependencies_for_step(step=missing_step)
+                direct_usages = self.get_direct_usages_for_step(step=missing_step)
                 print(f"Archive step {missing_step} is used by active steps: {direct_usages}")
             raise ArchiveStepUsedByActiveStep
 
@@ -540,4 +655,4 @@ class VersionTracker:
         unused_data_steps = outdated_data_steps - set(self.all_active_dependencies)
 
         if len(unused_data_steps) > 0:
-            log.warning(f"WARNING: Some data steps can be safely archived: {unused_data_steps}")
+            log.warning(f"Some data steps can be safely archived: {unused_data_steps}")
