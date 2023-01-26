@@ -20,9 +20,6 @@ from etl import paths
 from etl.snapshot import Snapshot
 from etl.steps import load_dag
 
-# Load ETL dag.
-DAG = load_dag()
-
 
 @contextmanager
 def downloaded(url: str) -> Iterator[str]:
@@ -96,6 +93,9 @@ class PathFinder:
 
     def __init__(self, __file__: str):
         self.f = Path(__file__)
+
+        # Load dag.
+        self.dag = load_dag()
 
         # Current file should be a data step.
         if not self.f.as_posix().startswith(paths.STEP_DIR.as_posix()):
@@ -212,10 +212,10 @@ class PathFinder:
     @property
     def dependencies(self) -> List[str]:
         # Current step should be in the dag.
-        if self.step not in DAG:
+        if self.step not in self.dag:
             raise CurrentStepMustBeInDag
 
-        return DAG[self.step]
+        return self.dag[self.step]
 
     def get_dependency_step_name(
         self,
