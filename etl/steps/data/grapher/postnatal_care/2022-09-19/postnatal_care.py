@@ -1,8 +1,8 @@
 from owid import catalog
 
-from etl.helpers import Names
+from etl.helpers import PathFinder
 
-N = Names(__file__)
+N = PathFinder(__file__)
 
 
 def run(dest_dir: str) -> None:

@@ -113,16 +113,9 @@ def load_income_groups() -> pd.DataFrame:
         Income groups data.
 
     """
-    income_groups = (
-        catalog.find(
-            table="wb_income_group",
-            dataset="wb_income",
-            namespace="wb",
-            channels=["garden"],
-        )
-        .load()
-        .reset_index()
-    )
+    # Load the WorldBank dataset for income grups.
+    income_groups = catalog.Dataset(DATA_DIR / "garden/wb/2021-07-01/wb_income")["wb_income_group"].reset_index()
+
     # Add historical regions to income groups.
     for historic_region in HISTORIC_TO_CURRENT_REGION:
         historic_region_income_group = HISTORIC_TO_CURRENT_REGION[historic_region]["income_group"]

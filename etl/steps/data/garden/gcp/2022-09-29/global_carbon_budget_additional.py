@@ -13,7 +13,7 @@ from owid.catalog import Dataset, Table
 from shared import CURRENT_DIR
 
 from etl.data_helpers import geo
-from etl.helpers import Names
+from etl.helpers import PathFinder
 
 # Regions and income groups to create (by aggregating), following OWID definitions.
 REGIONS = [
@@ -33,7 +33,7 @@ REGIONS = [
 AGGREGATES = {"production_emissions": "sum", "consumption_emissions": "sum"}
 
 # Naming conventions.
-N = Names(str(CURRENT_DIR / "global_carbon_budget_additional"))
+N = PathFinder(str(CURRENT_DIR / "global_carbon_budget_additional"))
 
 
 def prepare_national_and_global_data(

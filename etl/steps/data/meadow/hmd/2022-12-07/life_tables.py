@@ -44,14 +44,14 @@ from owid.catalog.utils import underscore_table
 from owid.datautils.io import decompress_file
 from structlog import get_logger
 
-from etl.helpers import Names
+from etl.helpers import PathFinder
 from etl.snapshot import Snapshot
 from etl.steps.data.converters import convert_snapshot_metadata
 
 log = get_logger()
 
 # naming conventions
-N = Names(__file__)
+N = PathFinder(__file__)
 NAMESPACE = "hmd"
 SHORT_NAME = "hmd"
 VERSION_SNAPSHOT = "2022-12-07"

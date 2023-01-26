@@ -3,11 +3,11 @@ from owid import catalog
 from owid.datautils import dataframes
 from shared import CURRENT_DIR
 
-from etl.helpers import Names
+from etl.helpers import PathFinder
 
 DATASET_TITLE = "UK historical electricity"
 DATASET_SHORT_NAME = "uk_historical_electricity"
-N = Names(str(CURRENT_DIR / DATASET_SHORT_NAME))
+N = PathFinder(str(CURRENT_DIR / DATASET_SHORT_NAME))
 
 # Conversion factor from million tonnes of oil equivalent to terawatt-hours.
 MTOE_TO_TWH = 11.63

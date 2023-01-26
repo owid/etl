@@ -1,11 +1,11 @@
 from owid import catalog
 from shared import CURRENT_DIR
 
-from etl.helpers import Names
+from etl.helpers import PathFinder
 
 GARDEN_DATASET_NAME = "emissions_weighted_carbon_price"
 GRAPHER_DATASET_TITLE = "Emissions-weighted carbon price (2022)"
-N = Names(str(CURRENT_DIR / GARDEN_DATASET_NAME))
+N = PathFinder(str(CURRENT_DIR / GARDEN_DATASET_NAME))
 
 
 def run(dest_dir: str) -> None:
