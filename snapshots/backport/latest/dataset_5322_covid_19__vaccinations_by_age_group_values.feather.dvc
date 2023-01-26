@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5322_covid_19__vaccinations_by_age_group_values
   file_extension: feather
-  date_accessed: 2023-01-25 12:13:46.300310
+  date_accessed: 2023-01-26 12:09:50.639280
   name: COVID-19 - Vaccinations by age group
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 184e0f8567dfc801caaf4ef637e0b8d3
-  size: 711570
+- md5: 3a6c3ad040214d363cec07bada7d191f
+  size: 706418
   path: dataset_5322_covid_19__vaccinations_by_age_group_values.feather
