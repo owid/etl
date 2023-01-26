@@ -58,6 +58,9 @@ dvc_lock = Lock()
 
 DVC_REPO = Repo(paths.BASE_DIR)
 
+# Default option when loading the dag. If true, all steps (active and archive) will be loaded; otherwise only active.
+INCLUDE_ARCHIVE = True
+
 
 def compile_steps(
     dag: DAG,
@@ -145,21 +148,21 @@ def traverse(graph: Graph, nodes: Set[str]) -> Graph:
     return dict(reachable)
 
 
-def load_dag(filename: Union[str, Path] = paths.DAG_FILE) -> Dict[str, Any]:
-    return _load_dag(filename, {})
+def load_dag(filename: Union[str, Path] = paths.DAG_FILE, include_archive: bool = INCLUDE_ARCHIVE) -> Dict[str, Any]:
+    return _load_dag(filename, {}, include_archive=include_archive)
 
 
-def _load_dag(filename: Union[str, Path], prev_dag: Dict[str, Any]):
+def _load_dag(filename: Union[str, Path], prev_dag: Dict[str, Any], include_archive: bool = INCLUDE_ARCHIVE):
     """
     Recursive helper to 1) load a dag itself, and 2) load any sub-dags
     included in the dag via 'include' statements
     """
     dag_yml = _load_dag_yaml(str(filename))
-    curr_dag = _parse_dag_yaml(dag_yml)
+    curr_dag = _parse_dag_yaml(dag_yml, include_archive=include_archive)
     curr_dag.update(prev_dag)
 
     for sub_dag_filename in dag_yml.get("include", []):
-        sub_dag = _load_dag(paths.BASE_DIR / sub_dag_filename, curr_dag)
+        sub_dag = _load_dag(paths.BASE_DIR / sub_dag_filename, curr_dag, include_archive=include_archive)
         curr_dag.update(sub_dag)
 
     return curr_dag
@@ -170,8 +173,12 @@ def _load_dag_yaml(filename: str) -> Dict[str, Any]:
         return yaml.safe_load(istream)
 
 
-def _parse_dag_yaml(dag: Dict[str, Any]) -> Dict[str, Any]:
-    return {node: set(deps) if deps else set() for node, deps in (dag["steps"] or {}).items()}
+def _parse_dag_yaml(dag: Dict[str, Any], include_archive: bool = INCLUDE_ARCHIVE) -> Dict[str, Any]:
+    steps = dag["steps"] or {}
+    if include_archive and ("archive" in dag):
+        archive_steps = dag["archive"] or {}
+        steps.update(archive_steps)
+    return {node: set(deps) if deps else set() for node, deps in steps.items()}
 
 
 def reverse_graph(graph: Graph) -> Graph:
