@@ -53,6 +53,7 @@ def run(dest_dir: str) -> None:
     #
     ds = Dataset.create_empty(dest_dir, metadata=convert_walden_metadata(walden_ds_by_period))
     ds.metadata.version = MEADOW_VERSION
+    ds.metadata.short_name = MEADOW_DATASET_NAME
 
     table_metadata = TableMeta(
         short_name=MEADOW_DATASET_NAME,

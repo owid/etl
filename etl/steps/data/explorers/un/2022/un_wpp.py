@@ -8,8 +8,10 @@ import structlog
 from owid import catalog
 from tqdm.auto import tqdm
 
+from etl.helpers import PathFinder
 from etl.paths import DATA_DIR
 
+N = PathFinder(__file__)
 YEAR_SPLIT = 2022
 no_dim_keyword = "full"
 log = structlog.get_logger()
@@ -93,6 +95,7 @@ def _init_dataset_explorer(dataset_garden: catalog.Dataset, dest_dir: str) -> ca
     dataset = catalog.Dataset.create_empty(dest_dir)
     # Add dataset metadata.
     dataset.metadata = deepcopy(dataset_garden.metadata)
+    dataset.metadata.version = N.version
     dataset.save()
     return dataset
 

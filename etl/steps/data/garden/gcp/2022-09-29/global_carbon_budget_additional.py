@@ -266,6 +266,7 @@ def run(dest_dir: str) -> None:
     # Create a new garden dataset and use metadata from meadow dataset.
     ds_garden = Dataset.create_empty(dest_dir)
     ds_garden.metadata = ds_meadow.metadata
+    ds_garden.metadata.short_name = N.short_name
     # Update metadata using the information in the yaml file.
     ds_garden.metadata.update_from_yaml(N.metadata_path, if_source_exists="replace")
 
