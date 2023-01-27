@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5869_metaculus__forecasting_owid_values
   file_extension: feather
-  date_accessed: 2023-01-18 18:05:25.712975
+  date_accessed: 2023-01-27 10:24:34.028591
   name: Metaculus - Forecasting OWID
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 66dcaa33e76169b858210fbd1c1df379
-  size: 6386
+- md5: 4f05ac3df9a16446b3e173cc07167da1
+  size: 9634
   path: dataset_5869_metaculus__forecasting_owid_values.feather
