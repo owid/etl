@@ -58,9 +58,6 @@ dvc_lock = Lock()
 
 DVC_REPO = Repo(paths.BASE_DIR)
 
-# Default option when loading the dag. If true, all steps (active and archive) will be loaded; otherwise only active.
-INCLUDE_ARCHIVE = True
-
 
 def compile_steps(
     dag: DAG,
