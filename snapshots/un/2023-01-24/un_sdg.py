@@ -1,4 +1,7 @@
-"""Script to create a snapshot of dataset 'United Nations Sustainable Development Goals (2023)'."""
+"""Script to create a snapshot of dataset 'United Nations Sustainable Development Goals (2023)'.
+    As well as a snapshot of the data we collect a snapshot of the dimensions and attributes of the data.
+    These often change as the dataset contains many different variables with many different dimensions and values/attributes.
+"""
 import datetime as dt
 import json
 import os
@@ -14,12 +17,10 @@ import pandas as pd
 import requests
 import yaml
 from owid.walden import add_to_catalog
-from owid.walden.catalog import Dataset
 from structlog import get_logger
 
-from etl.snapshot import Snapshot
+from etl.snapshot import Snapshot, SnapshotMeta, add_snapshot
 
-BASE_URL = "https://unstats.un.org/sdgapi"
 log = get_logger()
 
 
@@ -41,64 +42,45 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
 )
 def main(upload: bool) -> None:
     # Create a new snapshot.
-    snap = Snapshot(f"un/{SNAPSHOT_VERSION}/un_sdg.")
+    snap = Snapshot(f"un/{SNAPSHOT_VERSION}/un_sdg.feather")
 
     # Download data from source.
-    # snap.download_from_source()
 
     log.info("Creating metadata...")
-    metadata = create_metadata()
+    metadata = create_metadata(snap)
     with tempfile.TemporaryDirectory() as temp_dir:
         # fetch the file locally
         assert metadata.source_data_url is not None
         log.info("Downloading data...")
-        all_data = download_data()
-        log.info("Saving data...")
-        data_file = os.path.join(temp_dir, f"data.{metadata.file_extension}")
-        all_data.to_feather(data_file)
+        all_data = download_data(snap)
         log.info("Adding data to catalog...")
-        add_to_catalog(metadata, data_file, upload=True)  # type: ignore
+        add_snapshot("un/2023-01-24/un_sdg.feather", dataframe=all_data, upload=upload)
 
         log.info("Downloading unit descriptions...")
-        unit_desc = attributes_description()
-        metadata_unit = metadata
-        metadata_unit.description = "A description of the units the data is measured in."
-        metadata_unit.short_name = "unit"
-        metadata_unit.file_extension = "json"
-        log.info("Saving unit descriptions...")
-        unit_file = os.path.join(temp_dir, f"data.{metadata_unit.file_extension}")
-        with open(unit_file, "w") as fp:
-            json.dump(unit_desc, fp)
-
+        unit_desc = attributes_description(snap)
+        unit_desc = pd.DataFrame(unit_desc.items(), columns=["AttCode", "AttValue"])
         log.info("Adding unit descriptions to catalog...")
-        add_to_catalog(metadata_unit, unit_file, upload=True)  # type: ignore
+        add_snapshot("un/2023-01-24/un_sdg_unit.csv", dataframe=unit_desc, upload=upload)
 
         log.info("Downloading dimension descriptions...")
-        dim_desc = dimensions_description()
-        metadata_dim = metadata
-        metadata_dim.description = "A description of the dimensions of the data."
-        metadata_dim.short_name = "dimension"
-        metadata_dim.file_extension = "json"
-        log.info("Saving dimension descriptions...")
-        dim_file = os.path.join(temp_dir, f"data.{metadata_dim.file_extension}")
+        dim_desc = dimensions_description(snap)
+        dim_file = os.path.join(temp_dir, "data.json")
         with open(dim_file, "w") as fp:
             json.dump(dim_desc, fp)
 
         log.info("Adding dimension descriptions to catalog...")
-        add_to_catalog(metadata_dim, dim_file, upload=True)  # type: ignore
-
-    # Add file to DVC and upload to S3.
-    snap.dvc_add(upload=upload)
+        add_to_catalog("un/2023-01-24/un_sdg_dimension.json", filename=dim_file, upload=upload)  # type: ignore
 
 
-def create_metadata():
-    meta = load_yaml_metadata()
-    meta.update(load_external_metadata())
-
-    return Dataset(
-        **meta,
-        date_accessed=dt.datetime.now().date(),
-    )
+def create_metadata(snap: Snapshot) -> SnapshotMeta:
+    """Updating metadata in so it matches the UN SDG update log"""
+    meta = snap.metadata
+    meta_update = load_external_metadata()
+    meta.name = meta_update["name"]
+    meta.publication_year = meta_update["publication_year"]
+    meta.publication_date = meta_update["publication_date"]
+    meta.date_accessed = dt.datetime.now().date()
+    return meta
 
 
 def load_yaml_metadata() -> dict:
@@ -121,10 +103,10 @@ def load_external_metadata() -> dict:
     return meta
 
 
-def download_data() -> pd.DataFrame:
+def download_data(snap: Snapshot) -> pd.DataFrame:
     # retrieves all goal codes
     print("Retrieving SDG goal codes...")
-    url = f"{BASE_URL}/v1/sdg/Goal/List"
+    url = f"{snap.metadata.source_data_url}/v1/sdg/Goal/List"
     res = requests.get(url)
     assert res.ok
 
@@ -133,14 +115,14 @@ def download_data() -> pd.DataFrame:
 
     # retrieves all area codes
     print("Retrieving area codes...")
-    url = f"{BASE_URL}/v1/sdg/GeoArea/List"
+    url = f"{snap.metadata.source_data_url}/v1/sdg/GeoArea/List"
     res = requests.get(url)
     assert res.ok
     areas = res.json()
     area_codes = [str(area["geoAreaCode"]) for area in areas]
     # retrieves csv with data for all codes and areas
     print("Retrieving data...")
-    url = f"{BASE_URL}/v1/sdg/Goal/DataCSV"
+    url = f"{snap.metadata.source_data_url}/v1/sdg/Goal/DataCSV"
     all_data = []
     for goal in goal_codes:
         content = download_file(url=url, goal=goal, area_codes=area_codes, max_retries=MAX_RETRIES)
@@ -151,18 +133,19 @@ def download_data() -> pd.DataFrame:
     cols = all_df.columns
     # Converting all columns to string dtype as feather doesn't like object dtype
     all_df[cols] = all_df[cols].astype("str")
+    all_df = pd.DataFrame(all_df)
 
     return all_df
 
 
-def download_file(url: str, goal: int, area_codes: list, max_retries: int, bytes_read: int = 0) -> bytes:
+def download_file(url: str, goal: str, area_codes: list, max_retries: int, bytes_read: int = 0) -> bytes:
     """Downloads a file from a url.
 
     Retries download up to {max_retries} times following a ChunkedEncodingError
     exception.
     """
     log.info(
-        f"Downloading data...",
+        "Downloading data...",
         url=url,
         bytes_read=bytes_read,
         remaining_retries=max_retries,
@@ -203,11 +186,12 @@ def download_file(url: str, goal: int, area_codes: list, max_retries: int, bytes
     return content
 
 
-def attributes_description() -> Dict[Any, Any]:
+def attributes_description(snap: Snapshot) -> Dict[Any, Any]:
+    """Gathers each of the unit codes and their more descriptive counterparts."""
     goal_codes = get_goal_codes()
     a = []
     for goal in goal_codes:
-        url = f"{BASE_URL}/v1/sdg/Goal/{goal}/Attributes"
+        url = f"{snap.metadata.source_data_url}/v1/sdg/Goal/{goal}/Attributes"
         res = requests.get(url)
         assert res.ok
         attr = res.json()
@@ -224,11 +208,12 @@ def attributes_description() -> Dict[Any, Any]:
     return att_dict
 
 
-def dimensions_description() -> dict:
+def dimensions_description(snap: Snapshot) -> dict:
+    """Gathers each of the dimension codes and their more descriptive versions. This updates regularly so is important to snapshot"""
     goal_codes = get_goal_codes()
     d = []
     for goal in goal_codes:
-        url = f"{BASE_URL}/v1/sdg/Goal/{goal}/Dimensions"
+        url = f"{snap.metadata.source_data_url}/v1/sdg/Goal/{goal}/Dimensions"
         res = requests.get(url)
         assert res.ok
         dims = res.json()
@@ -248,10 +233,10 @@ def dimensions_description() -> dict:
     return dim_dict
 
 
-def get_goal_codes() -> List[int]:
+def get_goal_codes(snap) -> List[int]:
 
     # retrieves all goal codes
-    url = f"{BASE_URL}/v1/sdg/Goal/List"
+    url = f"{snap.metadata.source_data_url}/v1/sdg/Goal/List"
     res = requests.get(url)
     assert res.ok
     goals = res.json()
