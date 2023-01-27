@@ -426,13 +426,15 @@ class VersionTracker:
 
     def __init__(self):
         # Load dag of active and archive steps.
-        self.dag_all = load_dag(include_archive=True)
+        self.dag_all = load_dag(paths.DAG_ARCHIVE_FILE)
         # Load dag of active steps.
-        self.dag_active = load_dag(include_archive=False)
+        self.dag_active = load_dag(paths.DAG_FILE)
         # Generate the dag of only archive steps.
         self.dag_archive = {step: self.dag_all[step] for step in self.dag_all if step not in self.dag_active}
         # List all unique steps that exist in the dag.
         self.all_steps = list_all_steps_in_dag(self.dag_all)
+        # List all unique active steps.
+        self.all_active_steps = list_all_steps_in_dag(self.dag_active)
         # List all steps that are dependencies of active steps.
         self.all_active_dependencies = self.get_all_dependencies_of_active_steps()
 

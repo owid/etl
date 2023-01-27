@@ -4,7 +4,6 @@ from unittest.mock import patch
 import etl.helpers
 from etl import paths
 from etl.helpers import PathFinder, VersionTracker
-from etl.steps import INCLUDE_ARCHIVE
 
 # Dag of active steps.
 mock_dag = {
@@ -61,11 +60,11 @@ def rename_steps_in_dag(dag, prefix):
     return renamed_dag
 
 
-def create_mock_version_tracker(dag, include_archive=INCLUDE_ARCHIVE):
-    def mock_load_dag(filename=paths.DAG_FILE, include_archive=include_archive):
+def create_mock_version_tracker(dag):
+    def mock_load_dag(filename=paths.DAG_FILE):
         # This function mimics load_dag, but using a custom dag.
         _dag = dag["steps"].copy()
-        if include_archive:
+        if filename == paths.DAG_ARCHIVE_FILE:
             _dag.update(dag["archive"])
         return rename_steps_in_dag(dag=_dag, prefix=MOCK_STEP_PREFIX)
 
@@ -136,14 +135,14 @@ def test_list_all_steps_in_dag():
 
 class TestVersionTracker(unittest.TestCase):
     def test_get_all_dependencies(self):
-        versions = create_mock_version_tracker(dag=mock_dag, include_archive=True)
+        versions = create_mock_version_tracker(dag=mock_dag)
         expected_dependencies = rename_steps_in_dag(dag=mock_expected_dependencies, prefix=MOCK_STEP_PREFIX)
         for step in rename_steps_in_dag(dag=mock_dag["steps"], prefix=MOCK_STEP_PREFIX):
             dependencies = versions.get_all_dependencies_for_step(step=step)
             assert sorted(dependencies) == sorted(expected_dependencies[step])
 
     def test_get_all_usages(self):
-        versions = create_mock_version_tracker(dag=mock_dag, include_archive=True)
+        versions = create_mock_version_tracker(dag=mock_dag)
         expected_usages = rename_steps_in_dag(dag=mock_expected_usages, prefix=MOCK_STEP_PREFIX)
         for step in rename_steps_in_dag(dag=mock_dag["steps"], prefix=MOCK_STEP_PREFIX):
             dependencies = versions.get_all_usages_for_step(step=step)
