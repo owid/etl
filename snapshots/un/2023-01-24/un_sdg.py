@@ -188,7 +188,7 @@ def download_file(url: str, goal: str, area_codes: list, max_retries: int, bytes
 
 def attributes_description(snap: Snapshot) -> Dict[Any, Any]:
     """Gathers each of the unit codes and their more descriptive counterparts."""
-    goal_codes = get_goal_codes()
+    goal_codes = get_goal_codes(snap)
     a = []
     for goal in goal_codes:
         url = f"{snap.metadata.source_data_url}/v1/sdg/Goal/{goal}/Attributes"
@@ -210,7 +210,7 @@ def attributes_description(snap: Snapshot) -> Dict[Any, Any]:
 
 def dimensions_description(snap: Snapshot) -> dict:
     """Gathers each of the dimension codes and their more descriptive versions. This updates regularly so is important to snapshot"""
-    goal_codes = get_goal_codes()
+    goal_codes = get_goal_codes(snap)
     d = []
     for goal in goal_codes:
         url = f"{snap.metadata.source_data_url}/v1/sdg/Goal/{goal}/Dimensions"
@@ -233,7 +233,7 @@ def dimensions_description(snap: Snapshot) -> dict:
     return dim_dict
 
 
-def get_goal_codes(snap) -> List[int]:
+def get_goal_codes(snap: Snapshot) -> List[int]:
 
     # retrieves all goal codes
     url = f"{snap.metadata.source_data_url}/v1/sdg/Goal/List"
