@@ -516,15 +516,12 @@ class VersionTracker:
         # List all steps that are dependencies of active steps.
         self.all_active_dependencies = self.get_all_dependencies_of_active_steps()
 
-        # Create dataframe of step attributes.
-        self.step_attributes_df = self._create_step_attributes_df()
-        # Create dataframe of steps.
-        self.steps_df = self._create_steps_df()
-
-        # Apply sanity check.
-        self.check_that_archive_steps_are_not_dependencies_of_active_steps()
-        self.check_latest_version_of_steps_are_active()
-        self.check_all_active_steps_are_necessary()
+        # Dataframe of step attributes will only be initialized once it's called.
+        # This dataframe will have one row per existing step.
+        self._step_attributes_df = None
+        # Dataframe of steps will only be initialized once it's called.
+        # This dataframe will have as many rows as entries in the dag.
+        self._steps_df = None
 
         # TODO: Another useful method would be to find in which dag file each step is (by yaml opening each file).
 
@@ -556,7 +553,7 @@ class VersionTracker:
 
         return active_dependencies
 
-    def _create_step_attributes_df(self) -> pd.DataFrame:
+    def _create_step_attributes(self) -> pd.DataFrame:
         # Extract all attributes of each unique active/archive/dependency step.
         step_attributes = pd.DataFrame(
             [extract_step_attributes(step) for step in self.all_steps],
@@ -604,18 +601,26 @@ class VersionTracker:
         # Column "used_by" includes:
         # * For a dependency step, the main step that is using it.
         # * For a main step, the main step itself.
-        # For example, given a dag {"a": ["b", "c"]}, the steps dataframe will be:
-        # step    used_by
-        # ------  ---------
-        # a       a
-        # b       a
-        # c       a
         steps = pd.DataFrame.from_records(steps, columns=["step", "used_by", "status"])
 
         # Add attributes to steps.
         steps = pd.merge(steps, self.step_attributes_df, on="step", how="left")
 
         return steps
+
+    @property
+    def step_attributes_df(self) -> pd.DataFrame:
+        if self._step_attributes_df is None:
+            self._step_attributes_df = self._create_step_attributes()
+
+        return self._step_attributes_df
+
+    @property
+    def steps_df(self) -> pd.DataFrame:
+        if self._steps_df is None:
+            self._steps_df = self._create_steps_df()
+
+        return self._steps_df
 
     def check_that_archive_steps_are_not_dependencies_of_active_steps(self) -> None:
         # Find any archive steps that are dependencies of active steps, and should therefore not be archive steps.
@@ -627,7 +632,7 @@ class VersionTracker:
                 print(f"Archive step {missing_step} is used by active steps: {direct_usages}")
             raise ArchiveStepUsedByActiveStep
 
-    def check_latest_version_of_steps_are_active(self) -> None:
+    def check_that_latest_version_of_steps_are_active(self) -> None:
         # Check that the latest version of each main data step is in the dag.
         # If not, it could be because it has been deleted by accident.
         latest_data_steps = set(
@@ -643,7 +648,7 @@ class VersionTracker:
                 print(f"Step {missing_step} is the latest version of a step and hence should be in the dag.")
             raise LatestVersionOfStepShouldBeActive
 
-    def check_all_active_steps_are_necessary(self) -> None:
+    def check_that_all_active_steps_are_necessary(self) -> None:
         # TODO: This function may need to become recurrent, because once an unused step is taken out, another step
         #  may also become unnecessary (e.g. the meadow step of an unused garden step will be detected only after the
         #  garden step has been removed).
@@ -659,3 +664,8 @@ class VersionTracker:
 
         if len(unused_data_steps) > 0:
             log.warning(f"Some data steps can be safely archived: {unused_data_steps}")
+
+    def apply_sanity_checks(self) -> None:
+        self.check_that_archive_steps_are_not_dependencies_of_active_steps()
+        self.check_that_latest_version_of_steps_are_active()
+        self.check_that_all_active_steps_are_necessary()
