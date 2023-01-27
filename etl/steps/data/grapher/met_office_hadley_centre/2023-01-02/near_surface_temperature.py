@@ -18,6 +18,7 @@ def run(dest_dir: str) -> None:
 
     # Create new grapher dataset.
     dataset = catalog.Dataset.create_empty(dest_dir, N.garden_dataset.metadata)
+    dataset.metadata.short_name = N.short_name
     # Add table to dataset and save dataset.
     dataset.add(table)
     dataset.save()

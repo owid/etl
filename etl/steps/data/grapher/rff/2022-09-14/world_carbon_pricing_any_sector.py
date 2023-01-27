@@ -1,6 +1,9 @@
 from owid import catalog
 
+from etl.helpers import PathFinder
 from etl.paths import DATA_DIR, STEP_DIR
+
+N = PathFinder(__file__)
 
 # Details of input garden dataset and table.
 GARDEN_DATASET_NAME = "world_carbon_pricing"
@@ -18,6 +21,7 @@ def run(dest_dir: str) -> None:
     #
     # Read dataset from meadow.
     ds_garden = catalog.Dataset(GARDEN_DATASET_PATH)
+    ds_garden.metadata.short_name = N.short_name
     # Get table from dataset.
     tb_garden = ds_garden[GARDEN_TABLE_NAME]
 

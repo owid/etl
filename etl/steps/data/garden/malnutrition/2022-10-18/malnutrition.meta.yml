@@ -1,5 +1,5 @@
 dataset:
-  namespace: malnutrion
+  namespace: malnutrition
   version: 2022-10-18
   title: Number of stunted, wasted and underweight children
   short_name: malnutrition

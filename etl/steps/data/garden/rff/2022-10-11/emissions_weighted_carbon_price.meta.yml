@@ -1,4 +1,5 @@
 dataset:
+  short_name: emissions_weighted_carbon_price
   title: Emissions-weighted carbon price
   description: |
     The World Carbon Pricing Database covers national and subnational economic mechanisms relating to carbon emissions from 1990 onwards. It was developed from several key sources: most notably, policy documents from countries and regions themselves. Secondly, from other sources such as the International Carbon Action Partnership.

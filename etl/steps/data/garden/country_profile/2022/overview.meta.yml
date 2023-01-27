@@ -2,7 +2,7 @@ dataset:
   namespace: country_profile
   version: "2022"
   title: Country Profile Overview
-  short_name: country_profile_overview
+  short_name: overview
   description: |
     Key metrics for understanding the state of the world.
 tables:

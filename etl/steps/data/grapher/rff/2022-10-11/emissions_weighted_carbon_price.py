@@ -11,7 +11,8 @@ N = PathFinder(str(CURRENT_DIR / GARDEN_DATASET_NAME))
 def run(dest_dir: str) -> None:
     # Create new grapher dataset with the metadata from the garden dataset.
     dataset = catalog.Dataset.create_empty(dest_dir, N.garden_dataset.metadata)
-    dataset.title = GRAPHER_DATASET_TITLE
+    dataset.metadata.title = GRAPHER_DATASET_TITLE
+    dataset.metadata.short_name = GARDEN_DATASET_NAME
 
     # Load table from garden dataset.
     table = N.garden_dataset[GARDEN_DATASET_NAME].reset_index()
