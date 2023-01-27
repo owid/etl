@@ -4,3 +4,6 @@ steps:
     - snapshot://excess_mortality/2023-01-27/hmd_stmf.csv
   data://meadow/excess_mortality/2023-01-27/wmd:
     - snapshot://excess_mortality/2023-01-27/wmd.csv
+  data://meadow/excess_mortality/2023-01-27/xm_karlinsky_kobak:
+    - snapshot://excess_mortality/2023-01-27/xm_karlinsky_kobak.csv
+    - snapshot://excess_mortality/2023-01-27/xm_karlinsky_kobak.ages.csv
