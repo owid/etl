@@ -39,6 +39,15 @@ mock_expected_usages = {
     "e": set(["d", "b", "a"]),
     "f": set(["d", "b", "a", "g"]),
 }
+# Expected set of direct usages for each active step.
+mock_expected_direct_usages = {
+    "a": set(),
+    "b": set(["a"]),
+    "c": set(["a"]),
+    "d": set(["b"]),
+    "e": set(["d", "b"]),
+    "f": set(["d", "g"]),
+}
 # For the previous mock dag to work, we have to structure the steps as data://channel/namespace/version/dataset.
 # So I will assign an arbitrary prefix to all steps in the mock dag.
 MOCK_STEP_PREFIX = "data://garden/institution_1/2023-01-27/dataset_"
@@ -89,6 +98,40 @@ def test_PathFinder_paths():
     pf = PathFinder(str(paths.STEP_DIR / "data/meadow/papers/2022-11-03/zijdeman_et_al_2015.py"))
     _assert(pf)
     assert pf.directory == paths.STEP_DIR / "data/meadow/papers/2022-11-03"
+
+
+def test_get_direct_dependencies_for_step_in_dag():
+    for step in mock_dag["steps"]:
+        dependencies = etl.helpers.get_direct_dependencies_for_step_in_dag(dag=mock_dag["steps"], step=step)
+        expected_dependencies = mock_dag["steps"][step]
+        assert sorted(dependencies) == sorted(expected_dependencies)
+
+
+def test_get_direct_usages_for_step_in_dag():
+    mock_dag_all = mock_dag["steps"].copy()
+    mock_dag_all.update(mock_dag["archive"])
+    for step in mock_dag["steps"]:
+        usages = etl.helpers.get_direct_usages_for_step_in_dag(dag=mock_dag_all, step=step)
+        assert sorted(usages) == sorted(mock_expected_direct_usages[step])
+
+
+def test_get_all_dependencies_for_step_in_dag():
+    for step in mock_dag["steps"]:
+        dependencies = etl.helpers.get_all_dependencies_for_step_in_dag(dag=mock_dag["steps"], step=step)
+        assert sorted(dependencies) == sorted(mock_expected_dependencies[step])
+
+
+def test_get_all_usages_for_step_in_dag():
+    mock_dag_all = mock_dag["steps"].copy()
+    mock_dag_all.update(mock_dag["archive"])
+    for step in mock_dag["steps"]:
+        usages = etl.helpers.get_all_usages_for_step_in_dag(dag=mock_dag_all, step=step)
+        assert sorted(usages) == sorted(mock_expected_usages[step])
+
+
+def test_list_all_steps_in_dag():
+    all_steps = etl.helpers.list_all_steps_in_dag(dag=mock_dag["steps"])
+    assert sorted(all_steps) == sorted(mock_dag["steps"])
 
 
 class TestVersionTracker(unittest.TestCase):
