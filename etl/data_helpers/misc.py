@@ -11,6 +11,7 @@ should probably be moved to owid-datautils. However this can be time consuming a
 
 """
 import pandas as pd
+from typing import Set
 
 
 def check_known_columns(df: pd.DataFrame, known_cols: list) -> None:
@@ -22,3 +23,22 @@ def check_known_columns(df: pd.DataFrame, known_cols: list) -> None:
     missing_cols = set(known_cols).difference(set(df.columns))
     if len(missing_cols) > 0:
         raise Exception(f"Previous column(s) missing: {missing_cols}")
+
+
+def check_values_in_column(df: pd.DataFrame, column_name: str, values_expected: Set[str]):
+    """Check values in a column are as expected.
+
+    It checks both ways:
+        - That there are no new and unexpected values (compared to `values_expected`).
+        - That all expected values are present in the column (all in `values_expected`).
+    """
+    if not isinstance(values_expected, set):
+        values_expected = set(values_expected)
+    ds = df[column_name]
+    values_obtained = set(ds)
+    if values_unknown := values_obtained.difference(values_expected):
+        raise ValueError(f"Values {values_unknown} in column `{column_name}` are new, unsure how to map. Review!")
+    if values_missing := values_expected.difference(values_obtained):
+        raise ValueError(
+            f"Values {values_missing} in column `{column_name}` missing, check if they were removed from source!"
+        )
