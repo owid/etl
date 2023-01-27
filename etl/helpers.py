@@ -7,7 +7,7 @@ import re
 import tempfile
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Any, Dict, Iterator, List, Optional, Set, Tuple, Union, cast
+from typing import Any, Dict, Iterator, List, Optional, Set, Union, cast
 
 import pandas as pd
 import requests
@@ -20,7 +20,7 @@ from owid.walden import Dataset as WaldenDataset
 
 from etl import paths
 from etl.snapshot import Snapshot
-from etl.steps import load_dag, reverse_graph
+from etl.steps import extract_step_attributes, load_dag, reverse_graph
 
 log = structlog.get_logger()
 
@@ -269,82 +269,6 @@ class PathFinder:
         return dataset
 
 
-def extract_step_attributes(step: str) -> Tuple[str, str, str, str, str, str, str]:
-    """Extract attributes of a step from its name in the dag.
-
-    Parameters
-    ----------
-    step : str
-        Step (as it appears in the dag).
-
-    Returns
-    -------
-    step : str
-        Step (as it appears in the dag).
-    kind : str
-        Kind of step (namely, 'public' or 'private').
-    channel: str
-        Channel (e.g. 'meadow').
-    namespace: str
-        Namespace (e.g. 'energy').
-    version: str
-        Version (e.g. '2023-01-26').
-    name: str
-        Short name of the dataset (e.g. 'primary_energy').
-    identifier : str
-        Identifier of the step that is independent of the kind and of the version of the step.
-
-    """
-    # Extract the prefix (whatever is on the left of the '://') and the root of the step name.
-    prefix, root = step.split("://")
-
-    # Field 'kind' informs whether the dataset is public or private.
-    if "private" in prefix:
-        kind = "private"
-    else:
-        kind = "public"
-
-    # From now on we remove the 'public' or 'private' from the prefix.
-    prefix = prefix.split("-")[0]
-
-    if prefix in ["etag", "github"]:
-        # Special kinds of steps.
-        channel = "etag"
-        namespace = "etag"
-        version = "latest"
-        name = root
-        identifier = root
-    elif prefix in ["snapshot", "walden"]:
-        # Ingestion steps.
-        channel = prefix
-
-        # Extract attributes from root of the step.
-        namespace, version, name = root.split("/")
-
-        # Define an identifier for this step, that is identical for all versions.
-        identifier = f"{channel}/{namespace}/{name}"
-    elif root == "garden/reference":
-        # This is a special step that does not have a namespace or a version.
-        # We should probably get rid of this special step soon. But for now, define its properties manually.
-        channel = "garden"
-        namespace = "owid"
-        version = "latest"
-        name = "reference"
-
-        # Define an identifier for this step, that is identical for all versions.
-        identifier = f"{channel}/{namespace}/{name}"
-    else:
-        # Regular data steps.
-
-        # Extract attributes from root of the step.
-        channel, namespace, version, name = root.split("/")
-
-        # Define an identifier for this step, that is identical for all versions.
-        identifier = f"{channel}/{namespace}/{name}"
-
-    return step, kind, channel, namespace, version, name, identifier
-
-
 def list_all_steps_in_dag(dag: Dict[str, Any]) -> List[str]:
     """List all steps in a dag.
 
@@ -552,7 +476,7 @@ class VersionTracker:
     def _create_step_attributes(self) -> pd.DataFrame:
         # Extract all attributes of each unique active/archive/dependency step.
         step_attributes = pd.DataFrame(
-            [extract_step_attributes(step) for step in self.all_steps],
+            [extract_step_attributes(step).values() for step in self.all_steps],
             columns=["step", "kind", "channel", "namespace", "version", "name", "identifier"],
         )
 
