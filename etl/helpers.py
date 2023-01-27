@@ -269,10 +269,6 @@ class PathFinder:
         return dataset
 
 
-# For backwards compatibility.
-Names = PathFinder
-
-
 def extract_step_attributes(step: str) -> Tuple[str, str, str, str, str, str, str]:
     """Extract attributes of a step from its name in the dag.
 
