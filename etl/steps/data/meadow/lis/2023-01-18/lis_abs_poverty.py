@@ -79,9 +79,6 @@ def run(dest_dir: str) -> None:
     # Add the new table to the meadow dataset.
     ds_meadow.add(tb)
 
-    # Update dataset and table metadata using adjacent yaml file.
-    ds_meadow.update_metadata(paths.metadata_path)
-
     # Save changes in the new garden dataset.
     ds_meadow.save()
 
