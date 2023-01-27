@@ -1,0 +1,18 @@
+meta:
+  namespace: un
+  short_name: un_sdg
+  name: United Nations Sustainable Development Goals (2023)
+  version: 2023-01-24
+  publication_year: 2023
+  publication_date: 2023-01-24
+  source_name: United Nations (2023)
+  source_published_by: SDG Indicators Database, United Nations, Department of Economic and Social Affairs (2023)
+  url: https://unstats.un.org/sdgs/dataportal/database
+  source_data_url: 
+  file_extension: 
+  license_url: https://www.un.org/en/about-us/terms-of-use
+  license_name: 
+  date_accessed: 2023-01-26
+  is_public: true
+  description: |
+    
