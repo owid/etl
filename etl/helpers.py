@@ -637,7 +637,10 @@ class VersionTracker:
             ]["step"]
         )
         # The only main data step that is not explicitly in the DAG is the reference dataset (which should be removed soon).
-        if not (latest_data_steps <= set(list(self.dag_active) + ["data://garden/reference"])):
+        missing_steps = latest_data_steps - set(list(self.dag_active) + ["data://garden/reference"])
+        if len(missing_steps) > 0:
+            for missing_step in missing_steps:
+                print(f"Step {missing_step} is the latest version of a step and hence should be in the dag.")
             raise LatestVersionOfStepShouldBeActive
 
     def check_all_active_steps_are_necessary(self) -> None:
