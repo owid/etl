@@ -1,0 +1,4 @@
+# Excess Mortality data
+steps:
+  data://meadow/excess_mortality/2023-01-27/hmd_stmf:
+    - snapshot://excess_mortality/2023-01-27/hmd_stmf.csv
