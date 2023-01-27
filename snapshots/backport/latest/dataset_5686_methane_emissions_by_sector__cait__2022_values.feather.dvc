@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:11:50.681746
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Methane emissions by sector (CAIT, 2022)
   namespace: backport
-  publication_date: latest
   short_name: dataset_5686_methane_emissions_by_sector__cait__2022_values
+  file_extension: feather
+  date_accessed: 2023-01-27 10:09:18.388252
+  name: Methane emissions by sector (CAIT, 2022)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5686
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: e74432f980b750820f5323d33a44b1bd
-  size: 552426
+- md5: 7f7a1cc6d96f6bd21dab3cd5b2dc4c76
+  size: 552802
   path: dataset_5686_methane_emissions_by_sector__cait__2022_values.feather
