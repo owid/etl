@@ -9,14 +9,17 @@ from etl.steps.data.converters import convert_snapshot_metadata
 log = get_logger()
 
 # naming conventions
-N = PathFinder(__file__)
+paths = PathFinder(__file__)
 
 
 def run(dest_dir: str) -> None:
     log.info("unodc.start")
+    paths
 
     # retrieve snapshot
-    snap = Snapshot("homicide/2023-01-04/unodc.xlsx")
+    snap = paths.load_dependency("unodc")
+
+    # Snapshot("homicide/2023-01-04/unodc.xlsx")
     df = pd.read_excel(snap.path, skiprows=2)
 
     # clean and transform data
@@ -27,7 +30,7 @@ def run(dest_dir: str) -> None:
 
     # create new dataset and reuse walden metadata
     ds = Dataset.create_empty(dest_dir, metadata=convert_snapshot_metadata(snap.metadata))
-    ds.metadata.version = "2023-01-04"
+    ds.metadata.version = paths.version
 
     # # create table with metadata from dataframe and underscore all columns
     tb = Table(df, short_name=snap.metadata.short_name, underscore=True)
@@ -36,7 +39,7 @@ def run(dest_dir: str) -> None:
     ds.add(tb)
 
     # update metadata
-    ds.update_metadata(N.metadata_path)
+    ds.update_metadata(paths.metadata_path)
 
     # finally save the dataset
     ds.save()

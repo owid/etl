@@ -20,7 +20,7 @@ def run(dest_dir: str) -> None:
     log.info("unodc.start")
 
     # read dataset from meadow
-    ds_meadow = Dataset(DATA_DIR / "meadow/homicide/2023-01-04/unodc")
+    ds_meadow = paths.meadow_dataset
     tb_meadow = ds_meadow["unodc"]
 
     df = pd.DataFrame(tb_meadow)
