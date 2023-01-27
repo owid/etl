@@ -51,6 +51,8 @@ def run(dest_dir: str) -> None:
     #
     # Create a new dataset.
     ds_garden = Dataset.create_empty(dest_dir, metadata=ds_meadow.metadata)
+    ds_garden.metadata.short_name = N.short_name
+
     ds_garden.add(tb_1p5celsius)
     ds_garden.add(tb_2celsius)
     ds_garden.update_metadata(N.metadata_path)

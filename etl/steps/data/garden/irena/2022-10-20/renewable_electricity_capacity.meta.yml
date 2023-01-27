@@ -1,4 +1,5 @@
 dataset:
+  short_name: renewable_electricity_capacity
   description: |
     IRENA publishes detailed statistics on renewable energy capacity, power generation and renewable energy balances. This data is collected directly from members using the IRENA Renewable Energy Statistics questionnaire and is also supplemented by desk research where official statistics are not available.
 

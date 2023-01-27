@@ -1,4 +1,5 @@
 dataset:
+  short_name: near_surface_temperature
   title: Near-surface temperature anomaly (Met Office Hadley Centre, 2022)
   description: |
     Temperature anomalies are based on the HadCRUT5 near-surface temperature dataset as published by the Met Office Hadley Centre. Temperature anomalies are given in degrees celsius relative to the average temperature over the period 1961-1990.

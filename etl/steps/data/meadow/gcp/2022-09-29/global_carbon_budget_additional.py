@@ -150,6 +150,7 @@ def run(dest_dir: str) -> None:
     ds = Dataset.create_empty(dest_dir)
     ds.metadata = convert_walden_metadata(global_ds)
     ds.metadata.version = MEADOW_VERSION
+    ds.metadata.short_name = MEADOW_DATASET_NAME
     # Create tables with metadata.
     consumption_emissions_tb = Table(
         consumption_emissions_df,
