@@ -1,10 +1,10 @@
 """Load a snapshot and create a meadow dataset."""
 
+from typing import List
+
 import pandas as pd
 from owid.catalog import Dataset, Table
 from structlog import get_logger
-from typing import List
-
 
 from etl.helpers import PathFinder
 from etl.snapshot import Snapshot

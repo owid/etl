@@ -10,8 +10,9 @@ should probably be moved to owid-datautils. However this can be time consuming a
 - Prior to moving them to owid-datautils, we can test and discuss them.
 
 """
-import pandas as pd
 from typing import Set
+
+import pandas as pd
 
 
 def check_known_columns(df: pd.DataFrame, known_cols: list) -> None:
