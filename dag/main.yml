@@ -261,12 +261,6 @@ steps:
   data://grapher/fasttrack/2023-01-03/long_term_homicide_rates_in_europe:
     - snapshot://fasttrack/2023-01-03/long_term_homicide_rates_in_europe.csv
 
-archive:
-  data://meadow/un/2019/un_wpp:
-    - walden://wpp/2019/standard_projections
-  data://garden/un/2019/un_wpp:
-    - data://meadow/un/2019/un_wpp
-
 # Sub-dags to import
 include:
   - dag/open_numbers.yml
