@@ -1,6 +1,7 @@
 """Load a snapshot and create a meadow dataset."""
 
-from typing import List
+from pathlib import Path
+from typing import List, Union
 
 import pandas as pd
 from owid.catalog import Dataset, Table
@@ -72,7 +73,7 @@ def run(dest_dir: str) -> None:
     log.info("xm_karlinsky_kobak.end")
 
 
-def load_dataframe(path: str, column_names: List[str]) -> pd.DataFrame:
+def load_dataframe(path: Union[Path, str], column_names: List[str]) -> pd.DataFrame:
     """Load the data from the latest version of the dataset."""
     df = pd.read_csv(path, names=column_names)
     # Check columns

@@ -10,7 +10,7 @@ should probably be moved to owid-datautils. However this can be time consuming a
 - Prior to moving them to owid-datautils, we can test and discuss them.
 
 """
-from typing import Set
+from typing import Any, List, Set, Union
 
 import pandas as pd
 
@@ -26,7 +26,7 @@ def check_known_columns(df: pd.DataFrame, known_cols: list) -> None:
         raise Exception(f"Previous column(s) missing: {missing_cols}")
 
 
-def check_values_in_column(df: pd.DataFrame, column_name: str, values_expected: Set[str]):
+def check_values_in_column(df: pd.DataFrame, column_name: str, values_expected: Union[Set[Any], List[Any]]):
     """Check values in a column are as expected.
 
     It checks both ways:
