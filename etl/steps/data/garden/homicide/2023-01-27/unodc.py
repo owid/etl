@@ -8,7 +8,6 @@ from structlog import get_logger
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder
-from etl.paths import DATA_DIR
 
 log = get_logger()
 
