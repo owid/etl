@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5220_covid_19__johns_hopkins_university_values
   file_extension: feather
-  date_accessed: 2023-01-29 12:08:46.034937
+  date_accessed: 2023-01-29 18:05:07.012848
   name: COVID-19 - Johns Hopkins University
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 5a209c9a7e5a168d7023d6db3c01fed4
-  size: 20271706
+- md5: 6b7bdd29837888d87a069bf29e6420bc
+  size: 20273466
   path: dataset_5220_covid_19__johns_hopkins_university_values.feather
