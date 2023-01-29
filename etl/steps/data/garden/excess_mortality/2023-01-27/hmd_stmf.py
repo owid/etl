@@ -138,8 +138,8 @@ def add_uk(df: pd.DataFrame):
 
 
 def format_age(df: pd.DataFrame) -> pd.DataFrame:
-    """Remove 'D' from age strings."""
-    df["age"] = df["age"].str.replace("D", "")
+    """Remove 'd' from age strings."""
+    df["age"] = df["age"].str.replace("d", "")
     return df
 
 
