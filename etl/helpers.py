@@ -595,3 +595,7 @@ class VersionTracker:
         self.check_that_archive_steps_are_not_dependencies_of_active_steps()
         self.check_that_latest_version_of_steps_are_active()
         self.check_that_all_active_steps_are_necessary()
+
+
+def run_version_tracker_checks():
+    VersionTracker().apply_sanity_checks()
