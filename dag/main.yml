@@ -133,6 +133,8 @@ steps:
     - data://meadow/un/2023-01-24/un_sdg
     - snapshot://un/2023-01-24/un_sdg_unit.csv
     - snapshot://un/2023-01-24/un_sdg_dimension.json
+  data://grapher/un/2023-01-24/un_sdg:
+    - data://garden/un/2023-01-24/un_sdg
 
 
   # Internet
