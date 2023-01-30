@@ -5,14 +5,14 @@ TODO:
     - Review output
     - Imporve values in column checks
 """
-import json
-from typing import List
+from typing import Any, Dict, List
 
 import pandas as pd
 from owid.catalog import Dataset, Table
+from owid.catalog.utils import underscore
+from shared import harmonize_countries
 from structlog import get_logger
 
-from etl.data_helpers import geo
 from etl.data_helpers.misc import check_values_in_column
 from etl.helpers import PathFinder
 
@@ -20,6 +20,9 @@ log = get_logger()
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+# Year range to be used (rest is filtered out)
+YEAR_MIN = 2020
+YEAR_MAX = 2022  # (kobak_ages does not have data for 2023)
 
 
 def run(dest_dir: str) -> None:
@@ -42,8 +45,9 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    log.info("xm_karlinsky_kobak.harmonize_countries")
+    log.info("xm_karlinsky_kobak.main: processing data")
     df = process(df)
+    log.info("xm_karlinsky_kobak.ages: processing data")
     df_age = process_age(df_age)
 
     # Create a new table with the processed data.
@@ -66,57 +70,71 @@ def run(dest_dir: str) -> None:
     # Save changes in the new garden dataset.
     ds_garden.save()
 
-    log.info("xm_karlinsky_kobak.end")
+    log.info("xm_karlinsky_kobak: end")
 
 
 #
 # Main table (`xm_karlinsky_kobak`) ########################################################
 #
+# Minimum and maximum years expected in data
+YEAR_MIN_EXPECTED = 2020
+YEAR_MAX_EXPECTED = 2023
 
 
 def process(df: pd.DataFrame) -> pd.DataFrame:
-    df = harmonize_countries(df, paths.country_mapping_path)
+    # Check dataframe fields and values
+    log.info("\txm_karlinsky_kobak.main: initial dataframe API check")
+    df_api_check(df)
+    # Harmonize country names
+    log.info("\txm_karlinsky_kobak.main: harmonising country names")
+    df = harmonize_countries(df, "country", paths.country_mapping_path)
+    # Filter some rows
+    log.info("\txm_karlinsky_kobak.main: filtering entries")
     df = filter_entries(df)
+    # Estimate time unit and add column
+    log.info("\txm_karlinsky_kobak.main: estimating time_unit")
     df = estimate_time_unit(df, ["entity", "time", "year"])
-    # TODO: check year entries
+    # Reshape dataframe
+    log.info("\txm_karlinsky_kobak.main: reshaping dataframe")
     df = reshape_df(df)
+    # Rename column names
+    log.info("\txm_karlinsky_kobak.main: renaming columns in dataframe")
     df = rename_columns(df)
-    check_column_values(df)
+    # Format age
+    log.info("\txm_karlinsky_kobak.main: assign age value")
+    df = format_age(df)
+    # Check dataframe fields and values
+    log.info("\txm_karlinsky_kobak.main: final formatting")
+    df = format_columns(df)
     return df
 
 
-def harmonize_countries(df: pd.DataFrame, countries_file: str) -> pd.DataFrame:
-    country_column = "country"
-    with open(countries_file) as f:
-        country_mapping = json.load(f)
-    check_values_in_column(df, country_column, list(country_mapping.keys()))
-    df = geo.harmonize_countries(
-        df=df,
-        countries_file=countries_file,
-        country_col=country_column,
-        warn_on_missing_countries=True,
-        warn_on_unused_countries=True,
-    ).rename(columns={country_column: "entity"})
-    return df
+def df_api_check(df: pd.DataFrame) -> None:
+    # Check years
+    check_values_in_column(df, "year", list(range(YEAR_MIN_EXPECTED, YEAR_MAX_EXPECTED + 1)))
+    # # Check time and time_unit
+    check_values_in_column(df, "time", list(range(1, 54)))
 
 
 def filter_entries(df: pd.DataFrame) -> pd.DataFrame:
     """Filter some rows."""
     # Filter 2023 while kobak_age has no data for this year
-    df = df[(df["year"] != 2023)].reset_index(drop=True)
+    df = df[(df["year"] >= YEAR_MIN) & (df["year"] <= YEAR_MAX)].reset_index(drop=True)
     return df
 
 
 def estimate_time_unit(df: pd.DataFrame, column_idx: List[str]) -> pd.DataFrame:
     """Deduce time unit from time column."""
-    # Ensure that for each entity, we don't have the same time value repeated
+    # Ensure that for each entity and year, we don't have the same time value repeated
     assert df[column_idx].value_counts().max() == 1, "There are duplicate year-entitiy-time pairs."
-    # Deduce time unit
+    # Estimate time unit based on the number of different times.
     ds = df.groupby("entity")["time"].nunique().sort_values(ascending=False)
     ds = ds.map({12: "monthly", 53: "weekly"})
     ds.name = "time_unit"
-    assert ds.isna().sum() == 0
-    # Add column to df
+    assert (
+        ds.isna().sum() == 0
+    ), "Some entities have neither 12 nor 53 time values. Therefore `time_unit` cannot be estimated!"
+    # Add `time_unit` column to df
     shape_0 = df.shape
     df = df.merge(ds, on="entity")
     assert shape_0[0] == df.shape[0], "Something went wrong in merging! Some rows went missing"
@@ -127,9 +145,8 @@ def reshape_df(df: pd.DataFrame) -> pd.DataFrame:
     """Pivot/unpivot to get data in the right format."""
     # Make wide [...l -> [[index], [years]]
     df = (
-        df.assign(age="Total")
-        .pivot(
-            index=["entity", "time", "time_unit", "age"],
+        df.pivot(
+            index=["entity", "time", "time_unit"],
             columns="year",
             values="deaths",
         )
@@ -141,66 +158,106 @@ def reshape_df(df: pd.DataFrame) -> pd.DataFrame:
 
 def rename_columns(df: pd.DataFrame) -> pd.DataFrame:
     """Rename columns."""
-    df = df.rename(
-        columns={
-            2020: "baseline_proj",
-            2021: "baseline_proj_21",
-            2022: "baseline_proj_22",
-            # 2023: "baseline_proj_23",
-        }
-    )
+    # Rename columns
+    column_renaming = _get_column_renaming(df)
+    df = df.rename(columns=column_renaming)
     return df
 
 
-def check_column_values(df: pd.DataFrame) -> pd.DataFrame:
-    check_values_in_column(df, "age", ["Total"])
-    check_values_in_column(df, "time", list(range(1, 54)))
+def _get_column_renaming(df: pd.DataFrame) -> Dict[Any, str]:
+    """Build column renaming dictionary."""
+    # Build column rename dictionary
+    template = "baseline_proj"
+    # Special naming for 2020
+    column_renaming = {
+        2020: template,
+    }
+    for year in range(YEAR_MIN + 1, YEAR_MAX + 1):
+        year_yy = str(year)[-2:]
+        column_renaming[year] = f"{template}_{year_yy}"
+    return column_renaming
+
+
+def format_age(df: pd.DataFrame) -> pd.DataFrame:
+    """Remove 'd' from age strings."""
+    df["age"] = "all_ages"
+    return df
+
+
+def format_columns(df: pd.DataFrame) -> pd.DataFrame:
+    """Adapt dataframe column names to WMD-like format."""
+    cols_first = ["entity", "time", "time_unit", "age"]
+    column_metrics = list(_get_column_renaming(df).values())
+    # Sort columns
+    df = df[cols_first + sorted(column_metrics)]
+    # String columns
+    df.columns = [underscore(str(col)) for col in df.columns]
+    return df
 
 
 #
 # By age table (`xm_karlinsky_kobak`) ########################################################
 #
+# Minimum and maximum years expected in data
+YEAR_MIN_EXPECTED_AGE = 2020
+YEAR_MAX_EXPECTED_AGE = 2022
 
 
 def process_age(df: pd.DataFrame) -> pd.DataFrame:
-    path = paths.directory / (paths.short_name + ".age.countries.json")
-    df = harmonize_countries(df, path)
-    check_column_values_age(df)
-    df = filter_entries_age(df)
+    # Check dataframe fields and values
+    df_api_check_by_age(df)
+    # Harmonize country names
+    log.info("\txm_karlinsky_kobak.ages: harmonising country names")
+    country_mapping_path = paths.directory / (paths.short_name + ".age.countries.json")
+    df = harmonize_countries(df, "country", country_mapping_path)
+    # Filter entries
+    log.info("\txm_karlinsky_kobak.ages: filtering entries")
+    df = filter_entries_by_age(df)
+    # Estimate `time_unit`
+    log.info("\txm_karlinsky_kobak.ages: estimating `time_unit`")
     df = estimate_time_unit(df, ["entity", "time", "year", "age"])
-    df = format_age(df)
-    df = add_uk_age(df)
-    df = reshape_df_age(df)
-    df = rename_columns_age(df)
+    # Format age
+    log.info("\txm_karlinsky_kobak.ages: add UK values")
+    df = add_uk_by_age(df)
+    # Reshaping dataframe
+    log.info("\txm_karlinsky_kobak.ages: reshaping dataframe")
+    df = reshape_df_by_age(df)
+    # Renaming columns
+    log.info("\txm_karlinsky_kobak.ages: rename dataframe columns")
+    df = rename_columns(df)
+    # Format age
+    log.info("\txm_karlinsky_kobak.ages: format age")
+    df = format_age_by_age(df)
+    # Final formatting
+    log.info("\txm_karlinsky_kobak.ages: final formatting")
+    df = format_columns_by_age(df)
     return df
 
 
-def check_column_values_age(df: pd.DataFrame):
-    check_values_in_column(df, "age", {" D0_14", " D15_64", " D65_74", " D75_84", " D85p", " DTotal"})
-    check_values_in_column(df, "sex", {" m", " f", " b"})
-    check_values_in_column(df, "year", {2020, 2021, 2022})
+def df_api_check_by_age(df: pd.DataFrame) -> None:
+    # Check years
+    check_values_in_column(df, "year", list(range(YEAR_MIN_EXPECTED_AGE, YEAR_MAX_EXPECTED_AGE + 1)))
+    # Check time and time_unit
     check_values_in_column(df, "time", list(range(1, 54)))
+    # Check time and time_unit
+    check_values_in_column(df, "sex", {" m", " f", " b"})
+    # Check time and time_unit
+    check_values_in_column(df, "age", {" D0_14", " D15_64", " D65_74", " D75_84", " D85p", " DTotal"})
 
 
-def filter_entries_age(df: pd.DataFrame):
+def filter_entries_by_age(df: pd.DataFrame):
     # Only keep both sexes
     df = df[df["sex"] == " b"].drop(columns=["sex"])
     # Don't include Australia by-age data, bc it's not from WMD
     df = df[df["entity"] != "Australia"]
     df["entity"] = df["entity"].cat.remove_unused_categories()
     # Don't include Total, that is included in kobak (all ages)
-    df = df[df["age"] != " dtotal"]
+    df = df[df["age"] != " DTotal"]
     df["age"] = df["age"].cat.remove_unused_categories()
     return df
 
 
-def format_age(df: pd.DataFrame):
-    # Remove 'D' from age
-    df["age"] = df["age"].str.replace(" d", "")
-    return df
-
-
-def add_uk_age(df: pd.DataFrame):
+def add_uk_by_age(df: pd.DataFrame):
     # Get UK Nations data
     df_uk = df[df["entity"].isin(["England & Wales", "Scotland", "Northern Ireland"])].copy()
     # Check time_unit
@@ -216,8 +273,8 @@ def add_uk_age(df: pd.DataFrame):
     return df
 
 
-def reshape_df_age(df: pd.DataFrame):
-    # Make wide [...l -> [[index], [years]]
+def reshape_df_by_age(df: pd.DataFrame):
+    # Make wide [...] -> [[index], [years]]
     df = (
         df.pivot(
             index=["entity", "time", "time_unit", "age"],
@@ -230,13 +287,18 @@ def reshape_df_age(df: pd.DataFrame):
     return df
 
 
-def rename_columns_age(df: pd.DataFrame):
-    """Rename columns."""
-    df = df.rename(
-        columns={
-            2020: "baseline_proj",
-            2021: "baseline_proj_21",
-            2022: "baseline_proj_22",
-        }
-    )
+def format_age_by_age(df: pd.DataFrame):
+    # Remove 'D' from age
+    df["age"] = df["age"].str.replace(" D", "")
+    return df
+
+
+def format_columns_by_age(df: pd.DataFrame) -> pd.DataFrame:
+    """Adapt dataframe column names to WMD-like format."""
+    cols_first = ["entity", "time", "time_unit", "age"]
+    column_metrics = list(_get_column_renaming(df).values())
+    # # Sort columns
+    df = df[cols_first + sorted(column_metrics)]
+    # # String columns
+    df.columns = [underscore(str(col)) for col in df.columns]
     return df

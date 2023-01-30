@@ -4,9 +4,9 @@ from datetime import date
 import pandas as pd
 from owid.catalog import Dataset, Table
 from owid.catalog.utils import underscore
+from shared import harmonize_countries
 from structlog import get_logger
 
-from etl.data_helpers import geo
 from etl.data_helpers.misc import check_values_in_column
 from etl.helpers import PathFinder
 
@@ -16,10 +16,16 @@ log = get_logger()
 paths = PathFinder(__file__)
 # This year
 THIS_YEAR = date.today().year
+# Minimum and maximum years expected in data
+YEAR_MIN_EXPECTED = 1990
+YEAR_MAX_EXPECTED = 2023
+# Year range to be used (rest is filtered out)
+YEAR_MIN = 2010
+YEAR_MAX = 3000  # (No actual limit)
 
 
 def run(dest_dir: str) -> None:
-    log.info("hmd_stmf.start")
+    log.info("hmd_stmf: start")
 
     #
     # Load inputs.
@@ -57,32 +63,44 @@ def run(dest_dir: str) -> None:
     # Save changes in the new garden dataset.
     ds_garden.save()
 
-    log.info("hmd_stmf.end")
+    log.info("hmd_stmf: end")
 
 
 def process(df: pd.DataFrame) -> pd.DataFrame:
-    country_column = "countrycode"
-    df = geo.harmonize_countries(
-        df=df,
-        countries_file=paths.country_mapping_path,
-        excluded_countries_file=paths.excluded_countries_path,
-        country_col=country_column,
-        warn_on_missing_countries=True,
-        warn_on_unused_countries=True,
-    ).rename(columns={country_column: "entity"})
+    # Check dataframe fields and values
+    log.info("\thmd_stmf: initial dataframe API check")
+    df_api_check(df)
+    # Harmonize country names
+    log.info("\thmd_stmf: harmonizing country names")
+    df = harmonize_countries(df, "countrycode", paths.country_mapping_path, paths.excluded_countries_path)
+    # Filter some rows
+    log.info("\thmd_stmf: filtering entries")
     df = filter_entries(df)
+    # Reshape dataframe
+    log.info("\thmd_stmf: reshaping dataframe")
     df = reshape_df(df)
-    check_column_values(df)
+    # Add UK entries (sum nations)
+    log.info("\thmd_stmf: adding UK entries")
     df = add_uk(df)
+    # Clean age display names
+    log.info("\thmd_stmf: clean age display names")
     df = format_age(df)
-    df = format_like_wmd(df)
+    # Final touches on dataframe format
+    log.info("\thmd_stmf: format columns in dataframe")
+    df = format_columns(df)
     return df
+
+
+def df_api_check(df: pd.DataFrame) -> None:
+    check_values_in_column(df, "year", list(range(YEAR_MIN_EXPECTED, YEAR_MAX_EXPECTED + 1)))
+    check_values_in_column(df, "week", list(range(1, 54)))
+    check_values_in_column(df, "sex", ["m", "f", "b"])
 
 
 def filter_entries(df: pd.DataFrame) -> pd.DataFrame:
     """Filter some rows."""
-    # Select only years 2010-2019 (for baseline) and 2020-now
-    df = df[(df["year"] >= 2010)]
+    # Select only years YEAR_MIN - YEAR_MAX (2010-2019 (for baseline) and 2020-now)
+    df = df[(df["year"] >= YEAR_MIN) & (df["year"] <= YEAR_MAX)]
     # Keep only both sex data
     df = df[df["sex"] == "b"].drop(columns=["sex"])
     return df
@@ -105,13 +123,6 @@ def reshape_df(df: pd.DataFrame) -> pd.DataFrame:
     ).reset_index()
 
     # Rename columns
-    return df
-
-
-def check_column_values(df: pd.DataFrame):
-    """Check values in columns `age` and `week` are as expected."""
-    check_values_in_column(df, "age", ["d0_14", "d15_64", "d65_74", "d75_84", "d85p", "dtotal"])
-    check_values_in_column(df, "week", list(range(1, 54)))
     return df
 
 
@@ -140,16 +151,14 @@ def add_uk(df: pd.DataFrame):
 def format_age(df: pd.DataFrame) -> pd.DataFrame:
     """Remove 'd' from age strings."""
     df["age"] = df["age"].str.replace("d", "")
+    df.loc[df["age"] == "total", "age"] = "all_ages"
     return df
 
 
-def format_like_wmd(df: pd.DataFrame) -> pd.DataFrame:
+def format_columns(df: pd.DataFrame) -> pd.DataFrame:
     """Adapt dataframe column names to WMD-like format."""
-    # Rename columns to make match WMD
-    df = df.rename(columns={"week": "time"})
-    df["time_unit"] = "weekly"
     # Sort columns
-    cols_first = ["entity", "time", "time_unit", "age"]
+    cols_first = ["entity", "week", "age"]
     df = df[cols_first + sorted(col for col in df.columns if col not in cols_first)]
     # String columns
     df.columns = [underscore(str(col)) for col in df.columns]
