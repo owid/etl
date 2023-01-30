@@ -17,3 +17,8 @@ meta:
   is_public: true
   description: |
     "The dimensions of the data.
+wdir: ../../../data/snapshots/un/2023-01-24
+outs:
+- md5: 634495f31d19820c45937a102cecec4d
+  size: 48214
+  path: un_sdg_dimension.json

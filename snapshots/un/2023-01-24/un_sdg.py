@@ -7,7 +7,7 @@ import json
 import os
 import tempfile
 from collections import defaultdict
-from io import BytesIO
+from io import BytesIO, StringIO
 from pathlib import Path
 from typing import Any, Dict, List
 
@@ -49,13 +49,6 @@ def main(upload: bool) -> None:
     log.info("Creating metadata...")
     metadata = create_metadata(snap)
     with tempfile.TemporaryDirectory() as temp_dir:
-        # fetch the file locally
-        assert metadata.source_data_url is not None
-        log.info("Downloading data...")
-        all_data = download_data(snap)
-        log.info("Adding data to catalog...")
-        add_snapshot("un/2023-01-24/un_sdg.feather", dataframe=all_data, upload=upload)
-
         log.info("Downloading unit descriptions...")
         unit_desc = attributes_description(snap)
         unit_desc = pd.DataFrame(unit_desc.items(), columns=["AttCode", "AttValue"])
@@ -69,7 +62,14 @@ def main(upload: bool) -> None:
             json.dump(dim_desc, fp)
 
         log.info("Adding dimension descriptions to catalog...")
-        add_to_catalog("un/2023-01-24/un_sdg_dimension.json", filename=dim_file, upload=upload)  # type: ignore
+        add_snapshot("un/2023-01-24/un_sdg_dimension.json", filename=dim_file, upload=upload)  # type: ignore
+
+        # fetch the file locally
+        assert metadata.source_data_url is not None
+        log.info("Downloading data...")
+        all_data = download_data(snap)
+        log.info("Adding data to catalog...")
+        add_snapshot("un/2023-01-24/un_sdg.feather", dataframe=all_data, upload=upload)
 
 
 def create_metadata(snap: Snapshot) -> SnapshotMeta:
@@ -126,7 +126,10 @@ def download_data(snap: Snapshot) -> pd.DataFrame:
     all_data = []
     for goal in goal_codes:
         content = download_file(url=url, goal=goal, area_codes=area_codes, max_retries=MAX_RETRIES)
-        df = pd.read_csv(BytesIO(content), low_memory=False)
+        s = str(content, "utf-8")
+        data = StringIO(s)
+        df = pd.read_csv(data, low_memory=False)
+        # df = pd.read_csv(BytesIO(content), engine="python")
         all_data.append(df)
     all_df = pd.concat(all_data)
     all_df = all_df.reset_index()
