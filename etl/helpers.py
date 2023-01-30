@@ -422,6 +422,10 @@ class LatestVersionOfStepShouldBeActive(ExceptionFromDocstring):
 class VersionTracker:
     """Helper object that loads the dag, provides useful functions to check for versions and dataset dependencies, and
     checks for inconsistencies.
+
+    ####################################################################################################################
+    WARNING: This class may be refactored substantially, so it would be better to not use it for now in the code.
+    ####################################################################################################################
     """
 
     def __init__(self):
