@@ -22,6 +22,11 @@ config.enable_bugsnag()
 # if the number of open files allowed is less than this, increase it
 LIMIT_NOFILE = 4096
 
+# DAG file to use by default.
+# Use paths.DAG_ARCHIVE_FILE to load the complete dag, with active and archive steps.
+# Otherwise use paths.DAG_FILE to load only active steps, ignoring archive ones.
+DEFAULT_DAG_FILE = paths.DAG_ARCHIVE_FILE
+
 
 @click.command()
 @click.option("--dry-run", is_flag=True, help="Only print the steps that would be run")
@@ -61,7 +66,7 @@ LIMIT_NOFILE = 4096
     "--dag-path",
     type=click.Path(exists=True),
     help="Path to DAG yaml file",
-    default=paths.DAG_FILE,
+    default=DEFAULT_DAG_FILE,
 )
 @click.option(
     "--workers",
@@ -82,7 +87,7 @@ def main_cli(
     downstream: bool = False,
     only: bool = False,
     exclude: Optional[str] = None,
-    dag_path: Path = paths.DAG_FILE,
+    dag_path: Path = DEFAULT_DAG_FILE,
     workers: int = 5,
 ) -> None:
     _update_open_file_limit()
@@ -130,11 +135,11 @@ def main(
     downstream: bool = False,
     only: bool = False,
     exclude: Optional[str] = None,
-    dag_path: Path = paths.DAG_FILE,
+    dag_path: Path = DEFAULT_DAG_FILE,
     workers: int = 5,
 ) -> None:
     """
-    Execute all ETL steps listed in dag.yaml
+    Execute all ETL steps listed in dag file.
     """
     if grapher:
         sanity_check_db_settings()

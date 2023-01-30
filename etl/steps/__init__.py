@@ -171,7 +171,9 @@ def _load_dag_yaml(filename: str) -> Dict[str, Any]:
 
 
 def _parse_dag_yaml(dag: Dict[str, Any]) -> Dict[str, Any]:
-    return {node: set(deps) if deps else set() for node, deps in (dag["steps"] or {}).items()}
+    steps = dag["steps"] or {}
+
+    return {node: set(deps) if deps else set() for node, deps in steps.items()}
 
 
 def reverse_graph(graph: Graph) -> Graph:
@@ -244,6 +246,92 @@ def parse_step(step_name: str, dag: Dict[str, Any]) -> "Step":
         raise Exception(f"no recipe for executing step: {step_name}")
 
     return step
+
+
+def extract_step_attributes(step: str) -> Dict[str, str]:
+    """Extract attributes of a step from its name in the dag.
+
+    Parameters
+    ----------
+    step : str
+        Step (as it appears in the dag).
+
+    Returns
+    -------
+    step : str
+        Step (as it appears in the dag).
+    kind : str
+        Kind of step (namely, 'public' or 'private').
+    channel: str
+        Channel (e.g. 'meadow').
+    namespace: str
+        Namespace (e.g. 'energy').
+    version: str
+        Version (e.g. '2023-01-26').
+    name: str
+        Short name of the dataset (e.g. 'primary_energy').
+    identifier : str
+        Identifier of the step that is independent of the kind and of the version of the step.
+
+    """
+    # Extract the prefix (whatever is on the left of the '://') and the root of the step name.
+    prefix, root = step.split("://")
+
+    # Field 'kind' informs whether the dataset is public or private.
+    if "private" in prefix:
+        kind = "private"
+    else:
+        kind = "public"
+
+    # From now on we remove the 'public' or 'private' from the prefix.
+    prefix = prefix.split("-")[0]
+
+    if prefix in ["etag", "github"]:
+        # Special kinds of steps.
+        channel = "etag"
+        namespace = "etag"
+        version = "latest"
+        name = root
+        identifier = root
+    elif prefix in ["snapshot", "walden"]:
+        # Ingestion steps.
+        channel = prefix
+
+        # Extract attributes from root of the step.
+        namespace, version, name = root.split("/")
+
+        # Define an identifier for this step, that is identical for all versions.
+        identifier = f"{channel}/{namespace}/{name}"
+    elif root == "garden/reference":
+        # This is a special step that does not have a namespace or a version.
+        # We should probably get rid of this special step soon. But for now, define its properties manually.
+        channel = "garden"
+        namespace = "owid"
+        version = "latest"
+        name = "reference"
+
+        # Define an identifier for this step, that is identical for all versions.
+        identifier = f"{channel}/{namespace}/{name}"
+    else:
+        # Regular data steps.
+
+        # Extract attributes from root of the step.
+        channel, namespace, version, name = root.split("/")
+
+        # Define an identifier for this step, that is identical for all versions.
+        identifier = f"{channel}/{namespace}/{name}"
+
+    attributes = {
+        "step": step,
+        "kind": kind,
+        "channel": channel,
+        "namespace": namespace,
+        "version": version,
+        "name": name,
+        "identifier": identifier,
+    }
+
+    return attributes
 
 
 class Step(Protocol):

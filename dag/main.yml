@@ -7,8 +7,6 @@ steps:
     - data://open_numbers/open_numbers/latest/open_numbers__world_development_indicators
     - data://garden/wb/2021-07-01/wb_income
     - data://garden/reference
-  data://garden/un/2019/un_wpp:
-    - data://meadow/un/2019/un_wpp
   data://garden/gapminder/2019-12-10/population:
     - data://meadow/gapminder/2019-12-10/population
   data://meadow/un/2022-07-11/un_wpp:
@@ -26,8 +24,6 @@ steps:
     - snapshot://hyde/2017/general_files.zip
   data://garden/hyde/2017/baseline:
     - data://meadow/hyde/2017/baseline
-  data://meadow/un/2019/un_wpp:
-    - walden://wpp/2019/standard_projections
   data://grapher/who/2021-07-01/ghe:
     - data://garden/who/2021-07-01/ghe
   data://meadow/living_planet/2020-09-10/lpd:
