@@ -116,6 +116,6 @@ deploy:
 	@echo '==> Rebuilding the production ETL from origin/master'
 	ssh -t owid@analytics.owid.io /home/owid/analytics/ops/scripts/etl-prod.sh
 
-version-tracker:
+version-tracker: .venv
 	@echo '==> Check that no archive dataset is used by an active dataset, and that all active datasets are used'
 	poetry run version_tracker
