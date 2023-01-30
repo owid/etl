@@ -61,7 +61,7 @@ def rename_steps_in_dag(dag, prefix):
 
 
 def create_mock_version_tracker(dag):
-    def mock_load_dag(filename=paths.DAG_FILE):
+    def mock_load_dag(filename=paths.DEFAULT_DAG_FILE):
         # This function mimics load_dag, but using a custom dag.
         _dag = dag["steps"].copy()
         if filename == paths.DAG_ARCHIVE_FILE:
