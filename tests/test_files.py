@@ -13,7 +13,11 @@ def test_walk_ignore_set(tmp_path):
 
 
 def test_yaml_dump():
-    d = {"a": "Multi-line\nstring\n with whitespaces!", "b": "One-liner", "c": {"nested": {"d": ["\nline  \n"]}}}
+    d = {
+        "a": "Multi-line\nstring\n with whitespaces and \ttab!",
+        "b": "One-liner",
+        "c": {"nested": {"d": ["\nline  \n"]}},
+    }
 
     out = files.yaml_dump(d)
     print(out)
@@ -22,7 +26,7 @@ def test_yaml_dump():
         == """a: |-
   Multi-line
   string
-  with whitespaces!
+  with whitespaces and   tab!
 b: One-liner
 c:
   nested:
