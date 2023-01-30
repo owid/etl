@@ -127,10 +127,10 @@ steps:
     - data://garden/un/2022-07-11/un_wpp
 
  # UN SDG - current
-  data://meadow/un/2023-01-30/un_sdg:
+  data://meadow/un/2023-01-24/un_sdg:
     - snapshot://un/2023-01-24/un_sdg.feather
-  data://garden/un/2023-01-30/un_sdg:
-    - data://meadow/un/2023-01-30/un_sdg
+  data://garden/un/2023-01-24/un_sdg:
+    - data://meadow/un/2023-01-24/un_sdg
     - snapshot://un/2023-01-24/un_sdg_unit.csv
     - snapshot://un/2023-01-24/un_sdg_dimension.json
 

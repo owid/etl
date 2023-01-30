@@ -7,7 +7,7 @@ import json
 import os
 import tempfile
 from collections import defaultdict
-from io import BytesIO, StringIO
+from io import StringIO
 from pathlib import Path
 from typing import Any, Dict, List
 
@@ -16,7 +16,6 @@ import numpy as np
 import pandas as pd
 import requests
 import yaml
-from owid.walden import add_to_catalog
 from structlog import get_logger
 
 from etl.snapshot import Snapshot, SnapshotMeta, add_snapshot
