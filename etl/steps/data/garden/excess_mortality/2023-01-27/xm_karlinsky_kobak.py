@@ -1,10 +1,4 @@
-"""Load a meadow dataset and create a garden dataset.
-
-TODO:
-    - Detect year range (changes in pivoting might be needed)
-    - Review output
-    - Imporve values in column checks
-"""
+"""Load a meadow dataset and create a garden dataset."""
 from typing import Any, Dict, List
 
 import pandas as pd

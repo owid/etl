@@ -40,7 +40,7 @@ def run(dest_dir: str) -> None:
     df = process(df)
 
     # Create a new table with the processed data.
-    tb_garden = Table(df, short_name=paths.short_name)
+    tb_garden = Table(df, short_name=tb_meadow.metadata.short_name)
 
     #
     # Save outputs.
