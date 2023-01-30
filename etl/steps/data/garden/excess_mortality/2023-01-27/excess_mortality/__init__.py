@@ -35,9 +35,7 @@ def run(dest_dir: str) -> None:
     #
     log.info("excess_mortality: processing data")
     df = process_df(df)
-
     # Create a new table with the processed data.
-    print(paths.short_name)
     tb_garden = Table(df, short_name=paths.short_name)
 
     #

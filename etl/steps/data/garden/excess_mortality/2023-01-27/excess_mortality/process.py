@@ -35,6 +35,9 @@ def process_df(df: pd.DataFrame) -> pd.DataFrame:
     # Add canada
     log.info("\texcess_mortality: correct data for Canada")
     df = correct_canada(df)
+    # Final formatting
+    log.info("\texcess_mortality: final formatting of dataframe")
+    df = final_formatting(df)
     return df
 
 
@@ -69,9 +72,13 @@ def add_xm_and_p_score(df: pd.DataFrame) -> pd.DataFrame:
         return df.assign(
             **{
                 f"excess_avg{suffix}": df[year] - df["baseline_avg"],
-                f"p_avg{suffix}": 100 * (df[year] - df["baseline_avg"]) / df["baseline_avg"],
+                f"p_avg{suffix}": (100 * (df[year] - df["baseline_avg"]) / df["baseline_avg"]).replace(
+                    [np.inf, -np.inf], np.nan
+                ),
                 f"excess_proj{suffix}": df[year] - df["baseline_proj"],
-                f"p_proj{suffix}": 100 * (df[year] - df["baseline_proj"]) / df["baseline_proj"],
+                f"p_proj{suffix}": (100 * (df[year] - df["baseline_proj"]) / df["baseline_proj"]).replace(
+                    [np.inf, -np.inf], np.nan
+                ),
             }
         )
         return df
@@ -184,6 +191,8 @@ def make_df_long(df: pd.DataFrame) -> pd.DataFrame:
     df["deaths_2020_2022_all_ages"] = df["deaths_2020_all_ages"]
     # Merge
     df = pd.concat([df, df_2021, df_2022], ignore_index=True)
+    # Format date
+    df["date"] = pd.to_datetime(df["date"])
     return df
 
 
@@ -278,7 +287,7 @@ def add_cum_metrics(df: pd.DataFrame) -> pd.DataFrame:
 
 def add_population(df: pd.DataFrame) -> pd.DataFrame:
     # Load population data
-    df["year"] = df["date"].apply(lambda x: int(x.split("-")[0]))
+    df["year"] = df["date"].dt.year
     df = geo.add_population_to_dataframe(df, "entity", "year")
     df = df.drop(columns=["year"])
     # Get per million metrics
@@ -304,4 +313,17 @@ def correct_canada(df: pd.DataFrame) -> pd.DataFrame:
     ]
 
     df.loc[df["entity"].isin(["Canada"]), cols] = np.nan
+    return df
+
+
+def final_formatting(df: pd.DataFrame) -> pd.DataFrame:
+    df = df.drop(
+        columns=[
+            "deaths_2010_all_ages",
+            "deaths_2011_all_ages",
+            "deaths_2012_all_ages",
+            "deaths_2013_all_ages",
+            "deaths_2014_all_ages",
+        ]
+    )
     return df
