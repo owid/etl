@@ -1,5 +1,4 @@
 """Load a garden dataset and create a grapher dataset."""
-from datetime import date
 
 import pandas as pd
 from owid.catalog import Dataset, Table
@@ -40,7 +39,7 @@ def run(dest_dir: str) -> None:
 
 def make_grapher_friendly(df: Table) -> Table:
     # year
-    reference_date = pd.Timestamp(date(2020, 1, 1))
+    reference_date = pd.Timestamp(2020, 1, 1)
     df["year"] = pd.to_datetime(df["date"])
     df["year"] = (df["year"] - reference_date).dt.days
     # country
