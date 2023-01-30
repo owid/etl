@@ -108,7 +108,8 @@ _MyDumper.add_representer(
 
 def yaml_dump(d: Dict[str, Any], stream: Optional[TextIO] = None, strip_lines: bool = True) -> Optional[str]:
     """Alternative to yaml.dump which produces good looking multi-line strings and perserves ordering
-    of keys."""
+    of keys. If strip_lines is True, all lines in the string will be stripped and all tabs will be
+    replaced by two spaces."""
     # strip lines, otherwise YAML won't output strings in literal format
     if strip_lines:
         d = _strip_lines_in_dict(d)
@@ -118,7 +119,10 @@ def yaml_dump(d: Dict[str, Any], stream: Optional[TextIO] = None, strip_lines: b
 def _strip_lines(s: str) -> str:
     """Strip all lines in a string."""
     s = "\n".join([line.strip() for line in s.split("\n")])
-    return s.strip()
+    s = s.strip()
+
+    # replace tabs by spaces, otherwise YAML won't output strings in literal format
+    return s.replace("\t", "  ")
 
 
 def _strip_lines_in_dict(d: Any) -> Any:
