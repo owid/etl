@@ -3,7 +3,11 @@ steps:
     - walden://wpp/2019/standard_projections
   data://garden/un/2019/un_wpp:
     - data://meadow/un/2019/un_wpp
-
+    # Homicide - UNODC - to archive
+  data://meadow/homicide/2023-01-04/unodc:
+    - snapshot://homicide/2023-01-04/unodc.xlsx
+  data://garden/homicide/2023-01-04/unodc:
+    - data://meadow/homicide/2023-01-04/unodc
 # Include all active steps plus all archive steps.
 include:
   - dag/main.yml
@@ -19,4 +23,3 @@ include:
   # - dag/archive/fasttrack.yml
   # - dag/archive/biodiversity.yml
   # - dag/archive/health.yml
-  
