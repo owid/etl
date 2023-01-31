@@ -100,19 +100,29 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def pivot_and_format_df(df, drop_columns, pivot_index, pivot_values, pivot_columns):
+def create_mechanism_df(df_mech: pd.DataFrame) -> pd.DataFrame:
     """
-    - Dropping a selection of columns
-    - Pivoting by the desired disaggregations e.g. category, unit of measurement
-    - Tidying the column names
+    Create the homicides by mechanism dataframe where we will have  homicides/homicide rate
+    disaggregated by mechanism (e.g. weapon)
     """
-    df = df.drop(columns=drop_columns)
-    df = df.pivot(index=pivot_index, values=pivot_values, columns=pivot_columns)
-    # Make the columns nice
-    df.columns = df.columns.droplevel(0)
-    df.columns = df.columns.map("_".join)
-    df = df.reset_index()
-    return df
+    # df_mech = df_mech.drop(columns=["region", "subregion", "indicator", "dimension", "source", "sex", "age"])
+    df_mech = df_mech.copy(deep=True)
+    df_mech["category"] = (
+        df_mech["category"]
+        .map({"Firearms or explosives - firearms": "Firearms", "Another weapon - sharp object": "Sharp object"})
+        .fillna(df_mech["category"])
+    )
+
+    # Make the table wider so we have a column for each mechanism
+    df_mech = pivot_and_format_df(
+        df_mech,
+        drop_columns=["region", "subregion", "indicator", "dimension", "source", "sex", "age"],
+        pivot_index=["country", "year"],
+        pivot_values=["value"],
+        pivot_columns=["category", "unit_of_measurement"],
+    )
+
+    return df_mech
 
 
 def create_total_df(df_tot: pd.DataFrame) -> pd.DataFrame:
@@ -140,26 +150,16 @@ def create_total_df(df_tot: pd.DataFrame) -> pd.DataFrame:
     return df_tot
 
 
-def create_mechanism_df(df_mech: pd.DataFrame) -> pd.DataFrame:
+def pivot_and_format_df(df, drop_columns, pivot_index, pivot_values, pivot_columns):
     """
-    Create the homicides by mechanism dataframe where we will have  homicides/homicide rate
-    disaggregated by mechanism (e.g. weapon)
+    - Dropping a selection of columns
+    - Pivoting by the desired disaggregations e.g. category, unit of measurement
+    - Tidying the column names
     """
-    # df_mech = df_mech.drop(columns=["region", "subregion", "indicator", "dimension", "source", "sex", "age"])
-    df_mech = df_mech.copy(deep=True)
-    df_mech["category"] = (
-        df_mech["category"]
-        .map({"Firearms or explosives - firearms": "Firearms", "Another weapon - sharp object": "Sharp object"})
-        .fillna(df_mech["category"])
-    )
-
-    # Make the table wider so we have a column for each mechanism
-    df_mech = pivot_and_format_df(
-        df_mech,
-        drop_columns=["region", "subregion", "indicator", "dimension", "source", "sex", "age"],
-        pivot_index=["country", "year"],
-        pivot_values=["value"],
-        pivot_columns=["category", "unit_of_measurement"],
-    )
-
-    return df_mech
+    df = df.drop(columns=drop_columns)
+    df = df.pivot(index=pivot_index, values=pivot_values, columns=pivot_columns)
+    # Make the columns nice
+    df.columns = df.columns.droplevel(0)
+    df.columns = df.columns.map("_".join)
+    df = df.reset_index()
+    return df
