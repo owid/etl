@@ -185,7 +185,6 @@ def run(dest_dir: str) -> None:
     df_distribution.columns = [" ".join(col).strip().replace(" ", "_") for col in df_distribution.columns.values]
 
     # Calculate Palma ratio and other average/share ratios
-    # Replace np.inf with np.nan (division by 0)
     df_distribution["palma_ratio"] = df_distribution["share_p100"] / (
         df_distribution["share_p10"]
         + df_distribution["share_p20"]

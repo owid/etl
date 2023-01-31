@@ -264,16 +264,22 @@ steps:
     - snapshot://fasttrack/2023-01-03/long_term_homicide_rates_in_europe.csv
 
   #Luxembourg Income Study
-  data://meadow/lis/2023-01-18/lis_keyvars:
+  # data://meadow/lis/2023-01-18/lis_keyvars:
+  #   - snapshot://lis/2023-01-18/lis_keyvars.csv
+  # data://meadow/lis/2023-01-18/lis_abs_poverty:
+  #   - snapshot://lis/2023-01-18/lis_abs_poverty.csv
+  # data://meadow/lis/2023-01-18/lis_distribution:
+  #   - snapshot://lis/2023-01-18/lis_distribution.csv
+  data://meadow/lis/2023-01-18/luxembourg_income_study:
     - snapshot://lis/2023-01-18/lis_keyvars.csv
-  data://meadow/lis/2023-01-18/lis_abs_poverty:
     - snapshot://lis/2023-01-18/lis_abs_poverty.csv
-  data://meadow/lis/2023-01-18/lis_distribution:
     - snapshot://lis/2023-01-18/lis_distribution.csv
   data://garden/lis/2023-01-18/luxembourg_income_study:
-    - data://meadow/lis/2023-01-18/lis_keyvars
-    - data://meadow/lis/2023-01-18/lis_abs_poverty
-    - data://meadow/lis/2023-01-18/lis_distribution
+    - data://meadow/lis/2023-01-18/luxembourg_income_study
+  # data://garden/lis/2023-01-18/luxembourg_income_study:
+  #   - data://meadow/lis/2023-01-18/lis_keyvars
+  #   - data://meadow/lis/2023-01-18/lis_abs_poverty
+  #   - data://meadow/lis/2023-01-18/lis_distribution
   data://grapher/lis/2023-01-18/luxembourg_income_study:
     - data://garden/lis/2023-01-18/luxembourg_income_study
 
