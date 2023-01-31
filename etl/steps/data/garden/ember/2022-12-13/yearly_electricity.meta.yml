@@ -1,6 +1,6 @@
 dataset:
   namespace: ember
-  version: 2022-08-01
+  version: 2022-12-13
   title: Yearly Electricity Data (Ember, 2022)
   short_name: yearly_electricity
   description: |

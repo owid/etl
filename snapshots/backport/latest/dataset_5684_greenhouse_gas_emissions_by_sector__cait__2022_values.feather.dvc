@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:57:25.048971
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Greenhouse gas emissions by sector (CAIT, 2022)
   namespace: backport
-  publication_date: latest
   short_name: dataset_5684_greenhouse_gas_emissions_by_sector__cait__2022_values
+  file_extension: feather
+  date_accessed: 2023-01-27 10:10:19.254831
+  name: Greenhouse gas emissions by sector (CAIT, 2022)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5684
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 48b2721b905e23cb2f3e241e68a21919
-  size: 818642
+- md5: 1bd442f96b2241bf3b9ee89c7e7fccee
+  size: 819018
   path: dataset_5684_greenhouse_gas_emissions_by_sector__cait__2022_values.feather

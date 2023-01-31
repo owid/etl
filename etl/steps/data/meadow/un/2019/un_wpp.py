@@ -194,6 +194,8 @@ t5.metadata.short_name = "population_by_age_sex"
 def run(dest_dir: str) -> None:
     ds = Dataset.create_empty(dest_dir)
     ds.metadata = converters.convert_walden_metadata(walden_ds)
+    ds.metadata.namespace = "un"
+    ds.metadata.short_name = "un_wpp"
     ds.add(t1)
     ds.add(t2)
     ds.add(t3)

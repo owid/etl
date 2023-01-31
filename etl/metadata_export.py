@@ -53,6 +53,8 @@ def metadata_export(
 
     ds_meta.pop("is_public")
     ds_meta.pop("source_checksum")
+    # channel is unnecessary in the YAML file
+    ds_meta.pop("channel", None)
     # move sources at the end
     ds_meta["sources"] = ds_meta.pop("sources")
 

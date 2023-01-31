@@ -1,4 +1,5 @@
 dataset:
+    version: "2023-01-03"
     namespace: homicide
     short_name: homicide_long_run_omm
     title: Long run homicide rates (1250-2020; Eisner, WHO, UNODC)

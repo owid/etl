@@ -39,6 +39,7 @@ def run(dest_dir: str) -> None:
     ds = Dataset.create_empty(dest_dir)
     ds.metadata = convert_walden_metadata(walden_ds_2celsius)
     ds.metadata.version = VERSION
+    ds.metadata.short_name = DATASET_NAME
 
     # Create tables with metadata from dataframe for 2 Celsius.
     table_metadata_2celsius = TableMeta(

@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 00:29:14.536998
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Nitrous oxide emissions by sector (CAIT, 2022)
   namespace: backport
-  publication_date: latest
   short_name: dataset_5687_nitrous_oxide_emissions_by_sector__cait__2022_values
+  file_extension: feather
+  date_accessed: 2023-01-27 10:08:25.730042
+  name: Nitrous oxide emissions by sector (CAIT, 2022)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5687
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 771a502a2d4c9b7015ed0e5ec2ba1837
-  size: 515354
+- md5: a6834f858c171413ba174216ef04cd69
+  size: 515730
   path: dataset_5687_nitrous_oxide_emissions_by_sector__cait__2022_values.feather
