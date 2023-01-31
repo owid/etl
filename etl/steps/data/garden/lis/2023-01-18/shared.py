@@ -3,7 +3,7 @@ This function creates the metadata for each variable in the LIS dataset, from th
 and the lists coming from the dataset
 """
 
-from owid.catalog import Table
+from owid.catalog import Table, VariableMeta
 
 
 def add_metadata_vars(
@@ -330,3 +330,18 @@ def add_metadata_vars(
                         }
 
     return tb_garden
+
+
+# Testing metadata function
+def var_metadata_income_and_equivalence_scale(slug, inc_cons, equivalence_scales) -> VariableMeta:
+    meta = VariableMeta(
+        title=f"{slug['title']} ({inc_cons['name']}, {equivalence_scales['name']})",
+        description=f"{slug['description']}{new_line}{inc_cons_dict['description']}{new_line}{equivalence_scales['description']}",
+        unit=slug["unit"],
+        short_unit=slug["short_unit"],
+    )
+    meta.display = {
+        "name": meta.title,
+        "numDecimalPlaces": slug["numDecimalPlaces"],
+    }
+    return meta
