@@ -46,7 +46,7 @@ def run(dest_dir: str) -> None:
     ######################################################
 
     # Load meadow dataset. Read table from meadow dataset. Create a dataframe with data from the table.
-    ds_meadow: Dataset = paths.load_dependency("lis_keyvars")
+    ds_meadow: Dataset = paths.load_dependency("luxembourg_income_study")
     tb_meadow = ds_meadow["lis_keyvars"]
     df_keyvars = pd.DataFrame(tb_meadow)
 
@@ -120,7 +120,7 @@ def run(dest_dir: str) -> None:
     # Absolute poverty
     ######################################################
 
-    ds_meadow: Dataset = paths.load_dependency("lis_abs_poverty")
+    ds_meadow: Dataset = paths.load_dependency("luxembourg_income_study")
     tb_meadow = ds_meadow["lis_abs_poverty"]
     df_abs_poverty = pd.DataFrame(tb_meadow)
 
@@ -168,7 +168,7 @@ def run(dest_dir: str) -> None:
     # Distributional data
     ######################################################
 
-    ds_meadow: Dataset = paths.load_dependency("lis_distribution")
+    ds_meadow: Dataset = paths.load_dependency("luxembourg_income_study")
     tb_meadow = ds_meadow["lis_distribution"]
     df_distribution = pd.DataFrame(tb_meadow)
 
@@ -202,7 +202,7 @@ def run(dest_dir: str) -> None:
     # Add mean data to dataframe
 
     # Load keyvars again
-    ds_meadow: Dataset = paths.load_dependency("lis_keyvars")
+    ds_meadow: Dataset = paths.load_dependency("luxembourg_income_study")
     tb_meadow = ds_meadow["lis_keyvars"]
     df_mean = pd.DataFrame(tb_meadow)
     df_mean = df_mean[["country", "year", "variable", "eq", "mean"]]

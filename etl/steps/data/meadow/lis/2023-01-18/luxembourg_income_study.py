@@ -36,10 +36,15 @@ def run(dest_dir: str) -> None:
     ds_reference = Dataset(REFERENCE_DATASET)
     df_countries_regions = pd.DataFrame(ds_reference["countries_regions"]).reset_index()
 
+    # Create a new meadow dataset with the same metadata as the snapshot.
+    snap = paths.load_dependency("lis_keyvars.csv")
+    ds_meadow = Dataset.create_empty(dest_dir, metadata=convert_snapshot_metadata(snap.metadata))
+
+    # Ensure the version of the new dataset corresponds to the version of current step.
+    ds_meadow.metadata.version = paths.version
+    ds_meadow.metadata.short_name = "luxembourg_income_study"
+
     for ds_name, ds_ids in snapshots_dict.items():
-
-        print(ds_name)
-
         # Retrieve snapshot.
         snap: Snapshot = paths.load_dependency(f"{ds_name}.csv")
 
@@ -77,19 +82,10 @@ def run(dest_dir: str) -> None:
         # Create a new table and ensure all columns are snake-case.
         tb = Table(df, short_name=ds_name, underscore=True)
 
-        #
-        # Save outputs.
-        #
-        # Create a new meadow dataset with the same metadata as the snapshot.
-        ds_meadow = Dataset.create_empty(dest_dir, metadata=convert_snapshot_metadata(snap.metadata))
-
-        # Ensure the version of the new dataset corresponds to the version of current step.
-        ds_meadow.metadata.version = paths.version
-
         # Add the new table to the meadow dataset.
         ds_meadow.add(tb)
 
-        # Save changes in the new garden dataset.
-        ds_meadow.save()
+    # Save changes in the new garden dataset.
+    ds_meadow.save()
 
     log.info("luxembourg_income_study.end")
