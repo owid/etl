@@ -13,7 +13,7 @@ tables:
           All homicide rate estimates from before 1950 are taken from: Table 4 in Eisner, M. (2014) “From Swords to Words: Does Macro-Level Change in Self-Control Predict Long-Term Variation in Levels of Homicide?” In Why Crime Rates Fall and Why They Don’t, edited by Michael Tonry. Vol. 43 of Crime and Justice: A Review of Research, edited by Michael Tonry. Chicago: University of Chicago Press.
 
 
-          In Eisner (2014) homicide rates are given for a range of years - we allocate the homicide rate at the midpoint of the given period.
+          In Eisner (2014) homicide rates are given for a range of years - we allocate the homicide rate at the midpoint of the given period. Our data-management and -visualization system can currently only observations that happen in a particular year (or day), therefore we can't store the time-information as presented by the original source and instead allocate the observation the midpoint of the given period.
 
 
           Historical estimates of homicide rates are derived from national vital statistics and judicial archives. The older data is often fragmented and subject to a number of biases including: geographic bias, incomplete records, changing age structure, wound treatment, and the lethality of weapons.
@@ -29,7 +29,7 @@ tables:
           All homicide rate estimates from before 1950 are taken from: Table 4 in Eisner, M. (2014) “From Swords to Words: Does Macro-Level Change in Self-Control Predict Long-Term Variation in Levels of Homicide?” In Why Crime Rates Fall and Why They Don’t, edited by Michael Tonry. Vol. 43 of Crime and Justice: A Review of Research, edited by Michael Tonry. Chicago: University of Chicago Press.
 
 
-          In Eisner (2014) homicide rates are given for a range of years - we allocate the homicide rate at the midpoint of the given period.
+          In Eisner (2014) homicide rates are given for a range of years - we allocate the homicide rate at the midpoint of the given period. Our data-management and -visualization system can currently only observations that happen in a particular year (or day), therefore we can't store the time-information as presented by the original source and instead allocate the observation the midpoint of the given period.
 
 
           Historical estimates of homicide rates are derived from national vital statistics and judicial archives. The older data is often fragmented and subject to a number of biases including: geographic bias, incomplete records, changing age structure, wound treatment, and the lethality of weapons.
@@ -69,7 +69,7 @@ tables:
           All homicide rate estimates from before 1950 are taken from: Table 4 in Eisner, M. (2014) “From Swords to Words: Does Macro-Level Change in Self-Control Predict Long-Term Variation in Levels of Homicide?” In Why Crime Rates Fall and Why They Don’t, edited by Michael Tonry. Vol. 43 of Crime and Justice: A Review of Research, edited by Michael Tonry. Chicago: University of Chicago Press.
 
 
-          In Eisner (2014) homicide rates are given for a range of years - we allocate the homicide rate at the midpoint of the given period.
+          In Eisner (2014) homicide rates are given for a range of years - we allocate the homicide rate at the midpoint of the given period. Our data-management and -visualization system can currently only observations that happen in a particular year (or day), therefore we can't store the time-information as presented by the original source and instead allocate the observation the midpoint of the given period.
 
 
           Historical estimates of homicide rates are derived from national vital statistics and judicial archives. The older data is often fragmented and subject to a number of biases including: geographic bias, incomplete records, changing age structure, wound treatment, and the lethality of weapons.
