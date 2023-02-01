@@ -30,6 +30,7 @@ def run(dest_dir: str) -> None:
     # create new table with the same metadata as meadow and add it to dataset
     tb_garden = Table(df, like=tb_meadow)
 
-    create_dataset(dest_dir, tables=[tb_garden], default_metadata=ds_meadow.metadata)
+    ds_garden = create_dataset(dest_dir, tables=[tb_garden], default_metadata=ds_meadow.metadata)
+    ds_garden.save()
 
     log.info("maddison_database.end")
