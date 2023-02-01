@@ -172,6 +172,31 @@ tables:
           numDecimalPlaces: 0
 
       # deaths_*_all_ages
+      deaths_2010_all_ages:
+        title: deaths_2010_all_ages
+        # title: Number of deaths (weekly or monthly, 2015)
+        unit: ""
+        description: The reported number of weekly or monthly deaths from all causes for all ages in 2010.
+      deaths_2011_all_ages:
+        title: deaths_2011_all_ages
+        # title: Number of deaths (weekly or monthly, 2015)
+        unit: ""
+        description: The reported number of weekly or monthly deaths from all causes for all ages in 2011.
+      deaths_2012_all_ages:
+        title: deaths_2012_all_ages
+        # title: Number of deaths (weekly or monthly, 2015)
+        unit: ""
+        description: The reported number of weekly or monthly deaths from all causes for all ages in 2012.
+      deaths_2013_all_ages:
+        title: deaths_2013_all_ages
+        # title: Number of deaths (weekly or monthly, 2015)
+        unit: ""
+        description: The reported number of weekly or monthly deaths from all causes for all ages in 2013.
+      deaths_2014_all_ages:
+        title: deaths_2014_all_ages
+        # title: Number of deaths (weekly or monthly, 2015)
+        unit: ""
+        description: The reported number of weekly or monthly deaths from all causes for all ages in 2014.
       deaths_2015_all_ages:
         title: deaths_2015_all_ages
         # title: Number of deaths (weekly or monthly, 2015)
