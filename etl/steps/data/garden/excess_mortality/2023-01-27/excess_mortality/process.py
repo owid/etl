@@ -76,8 +76,8 @@ def add_xm_and_p_score(df: pd.DataFrame) -> pd.DataFrame:
                 f"p_avg{suffix}": (100 * (df[year] - df["baseline_avg"]) / df["baseline_avg"]).replace(
                     [np.inf, -np.inf], np.nan
                 ),
-                f"excess_proj{suffix}": df[year] - df["baseline_proj"],
-                f"p_proj{suffix}": (100 * (df[year] - df["baseline_proj"]) / df["baseline_proj"]).replace(
+                f"excess_proj{suffix}": df[year] - df[f"baseline_proj{suffix}"],
+                f"p_proj{suffix}": (100 * (df[year] - df[f"baseline_proj{suffix}"]) / df[f"baseline_proj{suffix}"]).replace(
                     [np.inf, -np.inf], np.nan
                 ),
             }
