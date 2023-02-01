@@ -48,11 +48,12 @@ def add_baseline_avg(df: pd.DataFrame) -> pd.DataFrame:
     df[column_new_metric] = df[["2015", "2016", "2017", "2018", "2019"]].mean(axis=1)
     # because there's only one Week 53 in the past 5 years, use the baseline average from Week 52 instead. ONS does this.
     cols_link = ["entity", "time_unit", "age"]
+    # Get rows with time == 53
     df_53 = df[df["time"] == 53].copy().drop(columns=[column_new_metric])
     df_52 = df[df["time"] == 52].copy()[cols_link + [column_new_metric]]
     df_53 = df_53.merge(df_52, on=cols_link)
     df = df[df.time != 53]
-    # df = pd.concat([df, df_53], ignore_index=True)
+    df = pd.concat([df, df_53], ignore_index=True)
     return df
 
 
@@ -175,7 +176,8 @@ def make_df_long(df: pd.DataFrame) -> pd.DataFrame:
             else:
                 date = datetime(year, time + 1, 1) - timedelta(days=1)
         elif time_unit == "weekly":
-            date = datetime.strptime(f"{year}-{time}-0", "%Y-%U-%w")
+            # Use ISO 8601 week (use last sunday)
+            date = datetime.strptime(f"{year}-{time}-0", "%G-%V-%w")
         else:
             raise ValueError(f"Unknown time unit {time_unit}")
         return date.strftime("%Y-%m-%d")
@@ -317,13 +319,14 @@ def correct_canada(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def final_formatting(df: pd.DataFrame) -> pd.DataFrame:
-    df = df.drop(
-        columns=[
-            "deaths_2010_all_ages",
-            "deaths_2011_all_ages",
-            "deaths_2012_all_ages",
-            "deaths_2013_all_ages",
-            "deaths_2014_all_ages",
-        ]
-    )
+    # Keep columns just in case they were in use on github.com/owid/owid-datasets
+    # df = df.drop(
+    #     columns=[
+    #         "deaths_2010_all_ages",
+    #         "deaths_2011_all_ages",
+    #         "deaths_2012_all_ages",
+    #         "deaths_2013_all_ages",
+    #         "deaths_2014_all_ages",
+    #     ]
+    # )
     return df
