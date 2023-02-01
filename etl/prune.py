@@ -23,7 +23,7 @@ EXCLUDE_STEP_TYPES = ("grapher", "walden", "walden-private", "github")
     "--dag-path",
     type=click.Path(exists=True),
     help="Path to DAG yaml file",
-    default=paths.DAG_FILE,
+    default=paths.DEFAULT_DAG_FILE,
 )
 @click.option(
     "--data-dir",
@@ -42,7 +42,7 @@ def prune_cli(
 
 
 def prune(
-    dag_path: Path = paths.DAG_FILE,
+    dag_path: Path = paths.DEFAULT_DAG_FILE,
     data_dir: Path = paths.DATA_DIR,
     dry_run: bool = False,
 ) -> None:

@@ -1,0 +1,53 @@
+dataset:
+  channel: meadow
+  namespace: homicide
+  short_name: unodc
+  description: ''
+  licenses:
+  - {}
+  version: '2023-01-27'
+  sources:
+  - {}
+tables:
+  unodc:
+    variables:
+      region:
+        title: Region
+        short_unit: ''
+        unit: ''
+      subregion:
+        title: Subregion
+        short_unit: ''
+        unit: ''
+      indicator:
+        title: Indicator
+        short_unit: ''
+        unit: ''
+      dimension:
+        title: Dimension
+        short_unit: ''
+        unit: ''
+      category:
+        title: Category
+        short_unit: ''
+        unit: ''
+      sex:
+        title: Sex
+        short_unit: ''
+        unit: ''
+      age:
+        title: Age
+        short_unit: ''
+        unit: ''
+      unit_of_measurement:
+        title: Unit of measurement
+        short_unit: ''
+        unit: ''
+      value:
+        title: VALUE
+        short_unit: ''
+        unit: ''
+      source:
+        title: Source
+        short_unit: ''
+        unit: ''

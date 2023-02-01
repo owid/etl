@@ -61,7 +61,7 @@ LIMIT_NOFILE = 4096
     "--dag-path",
     type=click.Path(exists=True),
     help="Path to DAG yaml file",
-    default=paths.DAG_FILE,
+    default=paths.DEFAULT_DAG_FILE,
 )
 @click.option(
     "--workers",
@@ -82,7 +82,7 @@ def main_cli(
     downstream: bool = False,
     only: bool = False,
     exclude: Optional[str] = None,
-    dag_path: Path = paths.DAG_FILE,
+    dag_path: Path = paths.DEFAULT_DAG_FILE,
     workers: int = 5,
 ) -> None:
     _update_open_file_limit()
@@ -130,11 +130,11 @@ def main(
     downstream: bool = False,
     only: bool = False,
     exclude: Optional[str] = None,
-    dag_path: Path = paths.DAG_FILE,
+    dag_path: Path = paths.DEFAULT_DAG_FILE,
     workers: int = 5,
 ) -> None:
     """
-    Execute all ETL steps listed in dag.yaml
+    Execute all ETL steps listed in dag file.
     """
     if grapher:
         sanity_check_db_settings()

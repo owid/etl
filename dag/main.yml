@@ -7,8 +7,6 @@ steps:
     - data://open_numbers/open_numbers/latest/open_numbers__world_development_indicators
     - data://garden/wb/2021-07-01/wb_income
     - data://garden/reference
-  data://garden/un/2019/un_wpp:
-    - data://meadow/un/2019/un_wpp
   data://garden/gapminder/2019-12-10/population:
     - data://meadow/gapminder/2019-12-10/population
   data://meadow/un/2022-07-11/un_wpp:
@@ -26,8 +24,6 @@ steps:
     - snapshot://hyde/2017/general_files.zip
   data://garden/hyde/2017/baseline:
     - data://meadow/hyde/2017/baseline
-  data://meadow/un/2019/un_wpp:
-    - walden://wpp/2019/standard_projections
   data://grapher/who/2021-07-01/ghe:
     - data://garden/who/2021-07-01/ghe
   data://meadow/living_planet/2020-09-10/lpd:
@@ -103,18 +99,25 @@ steps:
   data://grapher/homicide/2023-01-03/who_mort_db:
     - data://garden/homicide/2023-01-03/who_mort_db
 
-  # Homicide - UNODC
+  # Homicide - UNODC - to archive
   data://meadow/homicide/2023-01-04/unodc:
     - snapshot://homicide/2023-01-04/unodc.xlsx
   data://garden/homicide/2023-01-04/unodc:
     - data://meadow/homicide/2023-01-04/unodc
-  data://grapher/homicide/2023-01-04/unodc:
-    - data://garden/homicide/2023-01-04/unodc
+
+  # Homicide - UNODC - current
+  data://meadow/homicide/2023-01-27/unodc:
+  - snapshot://homicide/2023-01-27/unodc.xlsx
+  data://garden/homicide/2023-01-27/unodc:
+  - data://meadow/homicide/2023-01-27/unodc
+  data://grapher/homicide/2023-01-27/unodc:
+  - data://garden/homicide/2023-01-27/unodc
+
   # Homicide - OMM
   data://garden/homicide/2023-01-03/homicide_long_run_omm:
     - data://grapher/fasttrack/2023-01-03/long_term_homicide_rates_in_europe
     - data://garden/homicide/2023-01-03/who_mort_db
-    - data://garden/homicide/2023-01-04/unodc
+    - data://garden/homicide/2023-01-27/unodc
   data://grapher/homicide/2023-01-03/homicide_long_run_omm:
     - data://garden/homicide/2023-01-03/homicide_long_run_omm
 
