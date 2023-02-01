@@ -20,7 +20,7 @@ compare = 'etl.compare:cli'
 generate_graph = 'etl.to_graphviz:to_graphviz'
 etl-match-variables = 'etl.match_variables:main_cli'
 etl-translate-varmap = 'etl.variable_mapping_translate:main_cli'
-etl-chart-suggester = 'etl.chart_revision_suggester:main_cli'
+etl-chart-suggester = 'etl.chart_revision.cli:main_cli'
 etl-metadata-export = 'etl.metadata_export:cli'
 etl-datadiff = 'etl.datadiff:cli'
 
