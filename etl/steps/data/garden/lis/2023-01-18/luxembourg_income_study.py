@@ -15,8 +15,6 @@ paths = PathFinder(__file__)
 
 # Set relative and absolute poverty lines
 relative_povlines = [40, 50, 60]
-# Set equivalence scales
-equivalence_scales = ["eq", "pc"]
 
 # This function makes the table wide and modifies some columns before that
 # It is applied to the three LIS datasets
@@ -49,9 +47,6 @@ def run(dest_dir: str) -> None:
     ds_meadow: Dataset = paths.load_dependency("luxembourg_income_study")
     tb_meadow = ds_meadow["lis_keyvars"]
     df_keyvars = pd.DataFrame(tb_meadow)
-
-    # Get list of variables to use latter in metadata
-    inc_cons_vars = list(df_keyvars["variable"].unique())
 
     # Get DHI median (the one relative poverty is calculated from for any income/consumption) and merge
     df_median_dhi = df_keyvars[["country", "year", "median", "eq"]][df_keyvars["variable"] == "dhi"].reset_index(
@@ -124,9 +119,6 @@ def run(dest_dir: str) -> None:
     tb_meadow = ds_meadow["lis_abs_poverty"]
     df_abs_poverty = pd.DataFrame(tb_meadow)
 
-    # Get absolute poverty lines for use in metadata
-    absolute_povlines = list(df_abs_poverty["povline"].unique())
-
     # Add population variable from keyvars
     df_abs_poverty = pd.merge(
         df_abs_poverty, df_keyvars[["country", "year", "pop"]], on=["country", "year"], how="left"
@@ -171,9 +163,6 @@ def run(dest_dir: str) -> None:
     ds_meadow: Dataset = paths.load_dependency("luxembourg_income_study")
     tb_meadow = ds_meadow["lis_distribution"]
     df_distribution = pd.DataFrame(tb_meadow)
-
-    # Get percentile list for metadata
-    percentiles = list(df_distribution["percentile"].unique())
 
     # Transform percentile variable to `pxx`
     df_distribution["percentile"] = "p" + df_distribution["percentile"].astype(str)
@@ -237,14 +226,7 @@ def run(dest_dir: str) -> None:
     tb_garden = Table(df, short_name="luxembourg_income_study")
 
     # Add metadata by code
-    tb_garden = add_metadata_vars(
-        tb_garden,
-        inc_cons_vars,
-        equivalence_scales,
-        relative_povlines,
-        absolute_povlines,
-        percentiles,
-    )
+    tb_garden = add_metadata_vars(tb_garden)
 
     #
     # Save outputs.
