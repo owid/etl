@@ -16,8 +16,10 @@ import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
 
-from etl.helpers import create_dataset
+from etl.helpers import PathFinder, create_dataset
 from etl.snapshot import Snapshot
+
+N = PathFinder(__file__)
 
 # Column name for GDP in output dataset.
 GDP_COLUMN = "gdp"

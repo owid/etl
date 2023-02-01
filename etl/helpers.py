@@ -7,7 +7,7 @@ import re
 import tempfile
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Any, Dict, Iterable, Iterator, List, Optional, Union, cast
+from typing import Any, Dict, Iterable, Iterator, List, Optional, Set, Union, cast
 
 import pandas as pd
 import requests
@@ -66,6 +66,7 @@ def create_dataset(
     dest_dir: Union[str, Path],
     tables: Iterable[catalog.Table],
     default_metadata: Optional[Union[SnapshotMeta, catalog.DatasetMeta]] = None,
+    underscore_table: bool = True,
 ) -> catalog.Dataset:
     """Create a dataset and add a list of tables. The dataset metadata is inferred from
     default_metadata and the dest_dir (which is in the form `channel/namespace/version/short_name`).
@@ -74,6 +75,11 @@ def create_dataset(
 
     One of the benefits of using this function is that it you don't have to set any of the
     channel/namespace/version/short_name manually.
+
+    :param dest_dir: The destination directory for the dataset, usually argument of `run` function.
+    :param tables: A list of tables to add to the dataset.
+    :param default_metadata: The default metadata to use for the dataset, could be either SnapshotMeta or DatasetMeta.
+    :param underscore_table: Whether to underscore the table name before adding it to the dataset.
 
     Usage:
         ds = create_dataset(dest_dir, [table_a, table_b], default_metadata=snap.metadata)
@@ -88,6 +94,8 @@ def create_dataset(
 
     # add tables to dataset
     for table in tables:
+        if underscore_table:
+            table = catalog.utils.underscore_table(table)
         ds.add(table)
 
     # set metadata from dest_dir
@@ -111,7 +119,7 @@ def create_dataset(
         setattr(ds.metadata, k, v)
 
     # update metadata from yaml file
-    N = PathFinder(str(paths.STEP_DIR / "data" / Path(dest_dir).relative_to(paths.DATA_DIR)))
+    N = PathFinder(str(paths.STEP_DIR / "data" / Path(dest_dir).relative_to(Path(dest_dir).parents[3])))
     if N.metadata_path.exists():
         ds.update_metadata(N.metadata_path)
 
