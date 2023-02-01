@@ -16,11 +16,8 @@ import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
 
-from etl.helpers import PathFinder
+from etl.helpers import create_dataset
 from etl.snapshot import Snapshot
-from etl.steps.data.converters import convert_snapshot_metadata
-
-N = PathFinder(__file__)
 
 # Column name for GDP in output dataset.
 GDP_COLUMN = "gdp"
@@ -214,10 +211,7 @@ def run(dest_dir: str) -> None:
     df = df.set_index(["country", "year"])
 
     # Create a new dataset.
-    ds = Dataset.create_empty(dest_dir, metadata=convert_snapshot_metadata(snap.metadata))
-    ds.add(Table(df, short_name="maddison_gdp"))
-    ds.update_metadata(N.metadata_path)
-
+    ds = create_dataset(dest_dir, tables=[Table(df, short_name="maddison_gdp")], default_metadata=snap.metadata)
     ds.metadata.description = ADDITIONAL_DESCRIPTION + ds.metadata.description  # type: ignore
 
     # Save dataset to garden.
