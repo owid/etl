@@ -1,12 +1,13 @@
 meta:
   namespace: backport
   short_name: dataset_5661_researcher_affiliation_notable_ai_systems_data__sevilla_et_al__2022_values
+  file_extension: feather
+  date_accessed: 2023-02-01 18:16:31.760642
   name: Researcher Affiliation Notable AI Systems Data – Sevilla et al. (2022)
   description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5661
-  file_extension: feather
-  date_accessed: 2023-01-06 08:01:33.703964
+  source_published_by: Our World in Data catalog backport
   is_public: false
   version: latest
   publication_date: latest
