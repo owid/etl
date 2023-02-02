@@ -1,4 +1,4 @@
-# Variables are defined by code, because they are 800+, with different definitions
+# Metadata for variables is defined by code, because they are 800+, with different definitions
 
 dataset:
   namespace: lis
@@ -18,10 +18,16 @@ dataset:
       <li><b>Total consumption</b>, including that stemming from goods and services that have been purchased by the household, and goods ans services that have not been purchased, but either given to the household from somebody else, or self-produced (available as `hcexp` in the LIS dataset).</li>
     </ul>
 
-    For each of these types of income or consumption, equivalized and per capita measures are available. 'Equivalized' means that household income or consumption is divided by the LIS equivalence scale (squared root of the number of household members) to address for economies of scale in the household. 'Per capita' means that income or consumption is divided by the total number of household members.
+    All households where any of these income/consumption variables is missing are excluded, except when data is not available in the entire survey (this happens for example with total consumption in several countries).
+
+    For each of these types of income or consumption, equivalized and per capita measures are available. 'Equivalized' means that household income or consumption is divided by the LIS equivalence scale (squared root of the number of household members) to address for economies of scale in the household. 'Per capita' means that income or consumption is divided by the total number of household members. In both cases all members of a given household have the same equivalent income, regardless of age, gender, or relationship to the household head.
+
+    Data is also top and bottom-coded. Before equivalization, top and bottom coding is applied by setting boundaries for extreme values of log transformed income or consumption variable: at the top Q3 plus 3 times the interquartile range (Q3-Q1), and at the bottom Q1 minus 3 times the interquartile range.
+
+    Person-level adjusted weights are used when generating income indicators for the total population. This means that survey data is adjusted to the population by multiplying the household weight by the number of household members (HWGT*NHHMEM).
   version: "2023-01-18"
   sources:
-    - name: Luxembourg Income Study (LIS)
+    - name: Luxembourg Income Study (LIS) (2022)
       url: https://www.lisdatacenter.org/our-data/lis-database/
       date_accessed: "2023-01-18"
       publication_date: "2022-12-15"

@@ -1,6 +1,6 @@
 """
-This function creates the metadata for each variable in the LIS dataset, from the dictionaries defined below
-If new variables are included in the dataset the dictionaries have to be updated (if not an error will show up)
+This file includes functions to get variables metadata in the `luxembourg_income_study` garden step
+If new variables are included in the dataset (from LISSY) the dictionaries feeding metadata functions have to be updated (if not an error will show up)
 """
 
 from owid.catalog import Table, VariableMeta
@@ -23,7 +23,7 @@ var_dict = {
     },
     "thr": {
         "title": "Threshold",
-        "description": "This is the level of income or consumption per day below which {str(pct)}% of the population falls.",
+        "description": "This is the level of income or consumption per year below which {str(pct)}% of the population falls.",
         "unit": "international-$ in 2017 prices",
         "short_unit": "$",
         "numDecimalPlaces": 1,
@@ -193,7 +193,7 @@ pct_dict = {
 # To avoid breaking f-strings, I need to add a line break like this
 new_line = "\n\n"
 
-
+# This function creates the metadata for each variable in the LIS dataset, from the dictionaries defined above
 def add_metadata_vars(tb_garden: Table):
 
     # Get a list of all the variables available
