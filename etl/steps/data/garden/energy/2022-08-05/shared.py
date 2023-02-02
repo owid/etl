@@ -3,7 +3,8 @@ from typing import List, Optional, cast
 
 import pandas as pd
 from owid import catalog
-from owid.datautils import geo
+
+from etl.data_helpers import geo
 
 CURRENT_DIR = Path(__file__).parent
 VERSION = CURRENT_DIR.name

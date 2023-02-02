@@ -6,12 +6,12 @@ Centre and create a single table.
 import pandas as pd
 from owid.catalog import Dataset, Table
 
-from etl.helpers import Names
+from etl.helpers import PathFinder
 from etl.snapshot import Snapshot
 from etl.steps.data.converters import convert_snapshot_metadata
 
 # Get naming conventions.
-N = Names(__file__)
+N = PathFinder(__file__)
 
 # Snapshot and Meadow dataset versions.
 SNAPSHOT_VERSION = "2023-01-02"
@@ -66,6 +66,7 @@ def run(dest_dir: str) -> None:
     # Create new meadow dataset, using metadata from one of the snapshots.
     ds = Dataset.create_empty(dest_dir, metadata=convert_snapshot_metadata(snapshots["Global"].metadata))
     ds.metadata.version = MEADOW_VERSION
+    ds.metadata.short_name = MEADOW_SHORT_NAME
 
     # Create new table with metadata and underscore all columns.
     tb = Table(df, short_name=MEADOW_SHORT_NAME, underscore=True)

@@ -2,14 +2,14 @@ import pandas as pd
 from owid.catalog import Dataset, Table
 from structlog import get_logger
 
-from etl.helpers import Names
+from etl.helpers import PathFinder
 from etl.snapshot import Snapshot
 from etl.steps.data.converters import convert_snapshot_metadata
 
 log = get_logger()
 
 # naming conventions
-N = Names(__file__)
+N = PathFinder(__file__)
 
 
 def run(dest_dir: str) -> None:
@@ -47,10 +47,7 @@ def run(dest_dir: str) -> None:
 def clean_data(df: pd.DataFrame) -> pd.DataFrame:
 
     df = df[
-        (df["Dimension"] == "Total")
-        & (df["Category"] == "Total")
-        & (df["Sex"] == "Total")
-        & (df["Age"] == "Total")
+        (df["Dimension"].isin(["Total", "by mechanisms"]))
         & (
             df["Indicator"].isin(
                 ["Victims of intentional homicide", "Victims of Intentional Homicide - Regional Estimate"]

@@ -1,17 +1,18 @@
 meta:
   namespace: backport
   short_name: dataset_5433_covid_19__sequencing_config
+  file_extension: json
+  date_accessed: 2023-02-02 00:13:08.058747
   name: Grapher metadata for dataset_5433_covid_19__sequencing
   description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5433
-  file_extension: json
-  date_accessed: 2023-01-09 19:55:29.639079
+  source_published_by: Our World in Data catalog backport
   is_public: false
   version: latest
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 498eeb27f27dd8c3aa9274ba05550f19
-  size: 4154
+- md5: d8aee4b8d6ae7c7ac3c527c31dece833
+  size: 4155
   path: dataset_5433_covid_19__sequencing_config.json

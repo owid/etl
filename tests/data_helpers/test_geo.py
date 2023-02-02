@@ -4,17 +4,25 @@
 
 import json
 import unittest
+import warnings
 from unittest.mock import mock_open, patch
 
 import numpy as np
 import pandas as pd
-from owid.datautils import dataframes, geo
+from owid.datautils import dataframes
 from pytest import warns
+
+from etl.data_helpers import geo
 
 mock_countries = {
     "country_02": "Country 2",
     "country_03": "Country 3",
 }
+
+mock_excluded_countries = [
+    "country_05",
+    "country_06",
+]
 
 mock_population = pd.DataFrame(
     {
@@ -40,11 +48,26 @@ mock_income_groups = pd.DataFrame(
 )
 
 
+def mock_opens(filename, _):
+    # This function mocks opening a file with path given by filename, and returns custom content for that file.
+    mock_files_content = {
+        "MOCK_COUNTRIES_FILE": mock_countries,
+        "MOCK_EXCLUDED_COUNTRIES_FILE": mock_excluded_countries,
+    }
+    if filename in mock_files_content:
+        content = mock_files_content[filename]
+    else:
+        raise FileNotFoundError(filename)
+    file_object = mock_open(read_data=json.dumps(content)).return_value
+
+    return file_object
+
+
 def mock_population_load(*args, **kwargs):
     return mock_population
 
 
-@patch.object(geo.catalog.catalogs.CatalogMixin, "__getitem__", mock_population_load)
+@patch.object(geo, "_load_population", mock_population_load)
 class TestAddPopulationToDataframe:
     def test_all_countries_and_years_in_population(self):
         df_in = pd.DataFrame({"country": ["Country 2", "Country 1"], "year": [2019, 2021]})
@@ -136,14 +159,14 @@ class TestAddPopulationToDataframe:
             geo.add_population_to_dataframe(df=df_in, warn_on_missing_countries=True).equals(df_out)
 
 
-@patch("builtins.open", new_callable=mock_open, read_data=json.dumps(mock_countries))
+@patch("builtins.open", new=mock_opens)
 class TestHarmonizeCountries:
-    def test_one_country_unchanged_and_another_changed(self, _):
+    def test_one_country_unchanged_and_another_changed(self):
         df_in = pd.DataFrame({"country": ["Country 1", "country_02"], "some_variable": [1, 2]})
         df_out = pd.DataFrame({"country": ["Country 1", "Country 2"], "some_variable": [1, 2]})
         assert geo.harmonize_countries(
             df=df_in,
-            countries_file="IGNORED",
+            countries_file="MOCK_COUNTRIES_FILE",
             warn_on_unused_countries=False,
             warn_on_missing_countries=False,
         ).equals(df_out)
@@ -151,17 +174,17 @@ class TestHarmonizeCountries:
         # input dataframe is unchanged
         assert df_in.country.tolist() == ["Country 1", "country_02"]
 
-    def test_one_country_unchanged_and_another_unknown(self, _):
+    def test_one_country_unchanged_and_another_unknown(self):
         df_in = pd.DataFrame({"country": ["Country 1", "country_04"], "some_variable": [1, 2]})
         df_out = pd.DataFrame({"country": ["Country 1", "country_04"], "some_variable": [1, 2]})
         assert geo.harmonize_countries(
             df=df_in,
-            countries_file="IGNORED",
+            countries_file="MOCK_COUNTRIES_FILE",
             warn_on_unused_countries=False,
             warn_on_missing_countries=False,
         ).equals(df_out)
 
-    def test_two_unknown_countries_made_nan(self, _):
+    def test_two_unknown_countries_made_nan(self):
         df_in = pd.DataFrame({"country": ["Country 1", "country_04"], "some_variable": [1, 2]})
         df_out = pd.DataFrame({"country": [np.nan, np.nan], "some_variable": [1, 2]})
         df_out["country"] = df_out["country"].astype(object)
@@ -169,60 +192,60 @@ class TestHarmonizeCountries:
             df1=df_out,
             df2=geo.harmonize_countries(
                 df=df_in,
-                countries_file="IGNORED",
+                countries_file="MOCK_COUNTRIES_FILE",
                 make_missing_countries_nan=True,
                 warn_on_unused_countries=False,
                 warn_on_missing_countries=False,
             ),
         )[0]
 
-    def test_one_unknown_country_made_nan_and_a_known_country_changed(self, _):
+    def test_one_unknown_country_made_nan_and_a_known_country_changed(self):
         df_in = pd.DataFrame({"country": ["Country 1", "country_02"], "some_variable": [1, 2]})
         df_out = pd.DataFrame({"country": [np.nan, "Country 2"], "some_variable": [1, 2]})
         assert dataframes.are_equal(
             df1=df_out,
             df2=geo.harmonize_countries(
                 df=df_in,
-                countries_file="IGNORED",
+                countries_file="MOCK_COUNTRIES_FILE",
                 make_missing_countries_nan=True,
                 warn_on_unused_countries=False,
                 warn_on_missing_countries=False,
             ),
         )[0]
 
-    def test_on_dataframe_with_no_countries(self, _):
+    def test_on_dataframe_with_no_countries(self):
         df_in = pd.DataFrame({"country": []})
         df_out = pd.DataFrame({"country": []})
         df_out["country"] = df_out["country"].astype(object)
         assert dataframes.are_equal(
             df1=df_out,
-            df2=geo.harmonize_countries(df=df_in, countries_file="IGNORED", warn_on_unused_countries=False),
+            df2=geo.harmonize_countries(df=df_in, countries_file="MOCK_COUNTRIES_FILE", warn_on_unused_countries=False),
         )[0]
 
-    def test_change_country_column_name(self, _):
+    def test_change_country_column_name(self):
         df_in = pd.DataFrame({"Country": ["country_02"]})
         df_out = pd.DataFrame({"Country": ["Country 2"]})
         assert dataframes.are_equal(
             df1=df_out,
             df2=geo.harmonize_countries(
                 df=df_in,
-                countries_file="IGNORED",
+                countries_file="MOCK_COUNTRIES_FILE",
                 country_col="Country",
                 warn_on_unused_countries=False,
             ),
         )[0]
 
-    def test_warn_on_unused_mappings(self, _):
+    def test_warn_on_unused_mappings(self):
         df_in = pd.DataFrame({"country": ["country_02"], "some_variable": [1]})
         with warns(UserWarning, match="unused"):
             geo.harmonize_countries(
                 df=df_in,
-                countries_file="IGNORED",
+                countries_file="MOCK_COUNTRIES_FILE",
                 warn_on_unused_countries=True,
                 warn_on_missing_countries=True,
             )
 
-    def test_warn_on_countries_missing_in_mapping(self, _):
+    def test_warn_on_countries_missing_in_mapping(self):
         df_in = pd.DataFrame(
             {
                 "country": ["country_02", "country_03", "country_04"],
@@ -232,7 +255,71 @@ class TestHarmonizeCountries:
         with warns(UserWarning, match="missing"):
             geo.harmonize_countries(
                 df=df_in,
-                countries_file="IGNORED",
+                countries_file="MOCK_COUNTRIES_FILE",
+                warn_on_unused_countries=True,
+                warn_on_missing_countries=True,
+            )
+
+    def test_all_countries_excluded(self):
+        df_in = pd.DataFrame({"country": ["country_05", "country_06"], "some_variable": [1, 2]})
+        df_out = pd.DataFrame({"country": [], "some_variable": []}).astype({"country": str, "some_variable": int})
+        assert geo.harmonize_countries(
+            df=df_in,
+            countries_file="MOCK_COUNTRIES_FILE",
+            excluded_countries_file="MOCK_EXCLUDED_COUNTRIES_FILE",
+            warn_on_unused_countries=False,
+            warn_on_missing_countries=False,
+        ).equals(df_out)
+
+    def test_one_country_harmonized_and_one_excluded(self):
+        df_in = pd.DataFrame({"country": ["country_02", "country_05"], "some_variable": [1, 2]})
+        df_out = pd.DataFrame({"country": ["Country 2"], "some_variable": [1]})
+        assert geo.harmonize_countries(
+            df=df_in,
+            countries_file="MOCK_COUNTRIES_FILE",
+            excluded_countries_file="MOCK_EXCLUDED_COUNTRIES_FILE",
+            warn_on_unused_countries=False,
+            warn_on_missing_countries=False,
+        ).equals(df_out)
+
+    def test_one_country_left_equal_one_harmonized_and_one_excluded(self):
+        df_in = pd.DataFrame({"country": ["country_01", "country_02", "country_05"], "some_variable": [1, 2, 3]})
+        df_out = pd.DataFrame({"country": ["country_01", "Country 2"], "some_variable": [1, 2]})
+        assert geo.harmonize_countries(
+            df=df_in,
+            countries_file="MOCK_COUNTRIES_FILE",
+            excluded_countries_file="MOCK_EXCLUDED_COUNTRIES_FILE",
+            warn_on_unused_countries=False,
+            warn_on_missing_countries=False,
+        ).equals(df_out)
+
+    def test_warn_on_unknown_excluded_countries(self):
+        # Since excluded countries contains "country_05" and "country_06", which are not contained in df_in, a warning
+        # should be raised.
+        df_in = pd.DataFrame({"country": ["country_02", "country_03"], "some_variable": [1, 2]})
+        with warns(UserWarning, match="Unknown"):
+            geo.harmonize_countries(
+                df=df_in,
+                countries_file="MOCK_COUNTRIES_FILE",
+                excluded_countries_file="MOCK_EXCLUDED_COUNTRIES_FILE",
+                warn_on_unused_countries=False,
+                warn_on_missing_countries=False,
+            )
+
+    def test_no_warning_after_excluding_country(self):
+        # Ensure no warning is raised because:
+        # * All countries in excluded countries are included in data.
+        # * All countries in data are included in countries mapping.
+        # * All countries in countries mapping are used.
+        df_in = pd.DataFrame(
+            {"country": ["country_02", "country_03", "country_05", "country_06"], "some_variable": [1, 2, 3, 4]}
+        )
+        with warnings.catch_warnings():
+            warnings.simplefilter("error")
+            geo.harmonize_countries(
+                df=df_in,
+                countries_file="MOCK_COUNTRIES_FILE",
+                excluded_countries_file="MOCK_EXCLUDED_COUNTRIES_FILE",
                 warn_on_unused_countries=True,
                 warn_on_missing_countries=True,
             )

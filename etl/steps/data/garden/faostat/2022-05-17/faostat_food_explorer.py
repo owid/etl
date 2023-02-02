@@ -14,9 +14,10 @@ from typing import cast
 import pandas as pd
 from owid import catalog
 from owid.catalog.meta import DatasetMeta
-from owid.datautils import dataframes, geo
+from owid.datautils import dataframes
 from shared import LATEST_VERSIONS_FILE, NAMESPACE, VERSION
 
+from etl.data_helpers import geo
 from etl.paths import DATA_DIR
 
 # Dataset name and title.

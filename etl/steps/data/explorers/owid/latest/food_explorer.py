@@ -60,6 +60,7 @@ def run(dest_dir: str) -> None:
     dataset.metadata = deepcopy(dataset_garden.metadata)
     dataset.metadata.namespace = "owid"
     dataset.metadata.short_name = "food_explorer"
+    dataset.metadata.version = "latest"
     # Create new dataset in garden.
     dataset.save()
 

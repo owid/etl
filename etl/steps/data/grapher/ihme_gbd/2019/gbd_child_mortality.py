@@ -1,10 +1,10 @@
 from owid import catalog
 
-from etl.helpers import Names
+from etl.helpers import PathFinder
 
 from .gbd_tools import run_wrapper
 
-N = Names(__file__)
+N = PathFinder(__file__)
 
 
 def run(dest_dir: str) -> None:

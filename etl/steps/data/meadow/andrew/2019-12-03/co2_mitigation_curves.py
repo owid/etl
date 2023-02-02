@@ -4,7 +4,7 @@ from owid.catalog.utils import underscore_table
 from owid.walden import Catalog as WaldenCatalog
 from structlog import get_logger
 
-from etl.helpers import Names
+from etl.helpers import PathFinder
 from etl.steps.data.converters import convert_walden_metadata
 
 log = get_logger()
@@ -15,7 +15,7 @@ DATASET_NAME = "co2_mitigation_curves"
 # Details of dataset(s) to be imported.
 WALDEN_VERSION = "2019-12-03"
 # Load naming conventions.
-N = Names(__file__)
+N = PathFinder(__file__)
 
 
 def run(dest_dir: str) -> None:
@@ -39,6 +39,7 @@ def run(dest_dir: str) -> None:
     ds = Dataset.create_empty(dest_dir)
     ds.metadata = convert_walden_metadata(walden_ds_2celsius)
     ds.metadata.version = VERSION
+    ds.metadata.short_name = DATASET_NAME
 
     # Create tables with metadata from dataframe for 2 Celsius.
     table_metadata_2celsius = TableMeta(

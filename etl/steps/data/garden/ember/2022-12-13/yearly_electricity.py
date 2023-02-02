@@ -4,9 +4,9 @@
 
 import pandas as pd
 from owid import catalog
-from owid.datautils import geo
 from shared import CURRENT_DIR, add_population, add_region_aggregates, log
 
+from etl.data_helpers import geo
 from etl.paths import DATA_DIR
 
 # Details for dataset to export.

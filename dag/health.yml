@@ -1,0 +1,81 @@
+steps:
+  # Health
+  data://garden/owid/latest/covid:
+    - etag://raw.githubusercontent.com/owid/covid-19-data/master/public/data/owid-covid-data.csv
+  # Death completion (Karlinsky,2021)
+  data://meadow/health/2022-12-28/deaths_karlinsky:
+    - snapshot://health/2022-12-28/deaths_karlinsky.csv
+  data://garden/health/2022-12-28/deaths_karlinsky:
+    - data://meadow/health/2022-12-28/deaths_karlinsky
+    - data://garden/owid/latest/key_indicators
+  data://grapher/health/2022-12-28/deaths_karlinsky:
+    - data://garden/health/2022-12-28/deaths_karlinsky
+
+  # WHO Vaccination data
+  data://meadow/who/2022-07-17/who_vaccination:
+    - walden://who/2022-07-17/who_vaccination
+  data://garden/who/2022-07-17/who_vaccination:
+    - data://meadow/who/2022-07-17/who_vaccination
+    - data://garden/un/2022-07-11/un_wpp
+  data://grapher/who/2022-07-17/who_vaccination:
+    - data://garden/who/2022-07-17/who_vaccination
+
+  # WHO Global Health Estimates
+  data://meadow/who/2021-07-01/ghe:
+    - walden://who/2021-07-01/ghe
+  data://meadow/who/2022-09-30/ghe:
+    - walden://who/2022-09-30/ghe
+  data://garden/who/2021-07-01/ghe:
+    - data://meadow/who/2021-07-01/ghe
+    - data://garden/reference
+  data://garden/who/2022-09-30/ghe:
+    - data://meadow/who/2022-09-30/ghe
+    - data://garden/reference
+  data://grapher/who/2022-09-30/ghe:
+    - data://garden/who/2022-09-30/ghe
+
+  #WHO - Global Health Observatory (Incomplete; waiting for WHO API update)
+  data://meadow/who/2021-07-01/gho:
+    - walden://who/2021-07-01/gho
+  # IHME Global Burden of Disease
+  data://meadow/ihme_gbd/2020-12-19/child_mortality:
+    - walden://ihme_gbd/2020-12-19/child_mortality
+  data://garden/ihme_gbd/2020-12-19/child_mortality:
+    - data://meadow/ihme_gbd/2020-12-19/child_mortality
+  data://grapher/ihme_gbd/2020-12-19/child_mortality:
+    - data://garden/ihme_gbd/2020-12-19/child_mortality
+  data://meadow/ihme_gbd/2019/gbd_cause:
+    - walden://ihme_gbd/2019/gbd_cause
+  data://meadow/ihme_gbd/2019/gbd_child_mortality:
+    - walden://ihme_gbd/2019/gbd_child_mortality
+  data://meadow/ihme_gbd/2019/gbd_mental_health:
+    - walden://ihme_gbd/2019/gbd_mental_health
+  data://meadow/ihme_gbd/2019/gbd_risk:
+    - walden://ihme_gbd/2019/gbd_risk
+  data://meadow/ihme_gbd/2019/gbd_prevalence:
+    - walden://ihme_gbd/2019/gbd_prevalence
+  data://garden/ihme_gbd/2019/gbd_cause:
+    - data://meadow/ihme_gbd/2019/gbd_cause
+  data://garden/ihme_gbd/2019/gbd_risk:
+    - data://meadow/ihme_gbd/2019/gbd_risk
+  data://garden/ihme_gbd/2019/gbd_child_mortality:
+    - data://meadow/ihme_gbd/2019/gbd_child_mortality
+  data://garden/ihme_gbd/2019/gbd_mental_health:
+    - data://meadow/ihme_gbd/2019/gbd_mental_health
+  data://garden/ihme_gbd/2019/gbd_prevalence:
+    - data://meadow/ihme_gbd/2019/gbd_prevalence
+  data://grapher/ihme_gbd/2019/gbd_cause:
+    - data://garden/ihme_gbd/2019/gbd_cause
+  data://grapher/ihme_gbd/2019/gbd_prevalence:
+    - data://garden/ihme_gbd/2019/gbd_prevalence
+  data://grapher/ihme_gbd/2019/gbd_child_mortality:
+    - data://garden/ihme_gbd/2019/gbd_child_mortality
+
+
+  # Postnatal care coverage - World Bank (2022)
+  data://meadow/postnatal_care/2022-09-19/postnatal_care:
+    - walden://postnatal_care/2022-09-19/postnatal_care
+  data://garden/postnatal_care/2022-09-19/postnatal_care:
+    - data://meadow/postnatal_care/2022-09-19/postnatal_care
+  data://grapher/postnatal_care/2022-09-19/postnatal_care:
+    - data://garden/postnatal_care/2022-09-19/postnatal_care

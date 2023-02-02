@@ -1,12 +1,13 @@
 from owid import catalog
 
-from etl.helpers import Names
+from etl.helpers import PathFinder
 
-N = Names(__file__)
+N = PathFinder(__file__)
 
 
 def run(dest_dir: str) -> None:
     dataset = catalog.Dataset.create_empty(dest_dir, N.garden_dataset.metadata)
+    dataset.metadata.namespace = "malnutrition"
 
     table = N.garden_dataset["malnutrition"]
     # optionally set additional dimensions

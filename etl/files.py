@@ -8,12 +8,42 @@ from pathlib import Path
 from threading import Lock
 from typing import Any, Dict, List, Optional, Set, TextIO, Union
 
+import black
 import yaml
 from yaml.dumper import Dumper
 
-# runtime cache, we need locks because we usually run it in threads
-cache_md5: Dict[str, str] = {}
-cache_md5_locks: Dict[str, Lock] = {}
+from etl.paths import BASE_DIR
+
+
+class RuntimeCache:
+    """Runtime cache, we need locks because we usually run it in threads."""
+
+    _cache: Dict[str, str]
+    _locks: Dict[str, Lock]
+
+    def __init__(self):
+        self._cache = {}
+        self._locks = {}
+
+    def __contains__(self, key):
+        return key in self._cache
+
+    def __getitem__(self, key: str) -> str:
+        return self._cache[key]
+
+    def add(self, key: str, value: Any) -> None:
+        if key not in self._locks:
+            self._locks[key] = Lock()
+
+        with self._locks[key]:
+            self._cache[key] = value
+
+    def clear(self) -> None:
+        self._cache = {}
+        self._locks = {}
+
+
+CACHE_CHECKSUM_FILE = RuntimeCache()
 
 
 def checksum_file_nocache(filename: Union[str, Path]) -> str:
@@ -34,13 +64,10 @@ def checksum_file(filename: Union[str, Path]) -> str:
     if isinstance(filename, Path):
         filename = filename.as_posix()
 
-    if filename not in cache_md5:
-        cache_md5_locks[filename] = Lock()
+    if filename not in CACHE_CHECKSUM_FILE:
+        CACHE_CHECKSUM_FILE.add(filename, checksum_file_nocache(filename))
 
-        with cache_md5_locks[filename]:
-            cache_md5[filename] = checksum_file_nocache(filename)
-
-    return cache_md5[filename]
+    return CACHE_CHECKSUM_FILE[filename]
 
 
 def checksum_str(s: str) -> str:
@@ -81,7 +108,8 @@ _MyDumper.add_representer(
 
 def yaml_dump(d: Dict[str, Any], stream: Optional[TextIO] = None, strip_lines: bool = True) -> Optional[str]:
     """Alternative to yaml.dump which produces good looking multi-line strings and perserves ordering
-    of keys."""
+    of keys. If strip_lines is True, all lines in the string will be stripped and all tabs will be
+    replaced by two spaces."""
     # strip lines, otherwise YAML won't output strings in literal format
     if strip_lines:
         d = _strip_lines_in_dict(d)
@@ -91,7 +119,10 @@ def yaml_dump(d: Dict[str, Any], stream: Optional[TextIO] = None, strip_lines: b
 def _strip_lines(s: str) -> str:
     """Strip all lines in a string."""
     s = "\n".join([line.strip() for line in s.split("\n")])
-    return s.strip()
+    s = s.strip()
+
+    # replace tabs by spaces, otherwise YAML won't output strings in literal format
+    return s.replace("\t", "  ")
 
 
 def _strip_lines_in_dict(d: Any) -> Any:
@@ -104,3 +135,20 @@ def _strip_lines_in_dict(d: Any) -> Any:
         return {k: _strip_lines_in_dict(v) for k, v in d.items()}
     else:
         return d
+
+
+def apply_black_formatter_to_files(file_paths: List[Union[str, Path]]) -> None:
+    """Load project configuration for black formatter, and apply formatter to a list of files.
+
+    Parameters
+    ----------
+    file_paths : List[Union[str, Path]]
+        Files to be reformatted using black.
+
+    """
+    # Parse black formatter configuration from pyproject.toml file.
+    black_config = black.parse_pyproject_toml(BASE_DIR / "pyproject.toml")  # type: ignore
+    black_mode = black.Mode(**{key: value for key, value in black_config.items() if key not in ["exclude"]})  # type: ignore
+    # Apply black formatter to generated step files.
+    for file_path in file_paths:
+        black.format_file_in_place(src=file_path, fast=True, mode=black_mode, write_back=black.WriteBack.YES)  # type: ignore

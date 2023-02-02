@@ -4,16 +4,16 @@ from typing import List, cast
 import pandas as pd
 from owid.catalog import Dataset, Table
 from owid.catalog.utils import underscore_table
-from owid.datautils import geo
 from structlog import get_logger
 
-from etl.helpers import Names
+from etl.data_helpers import geo
+from etl.helpers import PathFinder
 from etl.paths import DATA_DIR
 
 log = get_logger()
 
 # namings
-N = Names(__file__)
+N = PathFinder(__file__)
 SHORT_NAME = "life_tables"
 VERSION_MEADOW = "2022-12-07"
 DATASET_MEADOW = DATA_DIR / f"meadow/hmd/{VERSION_MEADOW}/{SHORT_NAME}"
@@ -40,6 +40,7 @@ def run(dest_dir: str) -> None:
     # init dataset
     ds_garden = Dataset.create_empty(dest_dir)
     ds_garden.metadata = ds_meadow.metadata
+    ds_garden.metadata.short_name = SHORT_NAME
     ds_garden.metadata.update_from_yaml(N.metadata_path)
 
     # build tables
@@ -81,7 +82,7 @@ def combine_sex_tables(ds_meadow: Dataset, table_names: List[str]) -> pd.DataFra
     """Combine meadow tables."""
     dfs = []
     for table_name in table_names:
-        tb_meadow = ds_meadow[table_name]
+        tb_meadow = ds_meadow[table_name].reset_index()
         df = pd.DataFrame(tb_meadow)
         # assign sex
         if table_name.startswith("both_"):

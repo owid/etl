@@ -3,16 +3,16 @@ from typing import List, cast
 
 import pandas as pd
 from owid.catalog import Dataset, Table
-from owid.datautils import geo
 from structlog import get_logger
 
-from etl.helpers import Names
+from etl.data_helpers import geo
+from etl.helpers import PathFinder
 from etl.paths import DATA_DIR
 
 log = get_logger()
 
 # naming conventions
-N = Names(__file__)
+N = PathFinder(__file__)
 
 SHORT_NAME = "life_tables"
 MEADOW_VERSION = "2022-11-04"
@@ -46,7 +46,7 @@ def make_table(ds_meadow: Dataset, table_name: str) -> Table:
     log.info(f"Building table {table_name}...")
 
     # Country management
-    tb_garden = ds_meadow[table_name].reset_index()
+    tb_garden = ds_meadow[table_name].reset_index(drop=True)
     tb_garden = clean_countries(tb_garden)
     tb_garden = tb_garden.set_index(["country", "year", "age"], verify_integrity=True)
 

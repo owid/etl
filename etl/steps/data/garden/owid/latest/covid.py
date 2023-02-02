@@ -34,7 +34,8 @@ def run(dest_dir: str) -> None:
 
 def create_dataset(dest_dir: str) -> Dataset:
     d = Dataset.create_empty(dest_dir)
-    d.metadata.short_name = "covid19"
+    d.metadata.version = "latest"
+    d.metadata.short_name = "covid"
     d.metadata.namespace = "owid"
     d.metadata.sources = [
         Source(
@@ -55,5 +56,4 @@ def create_dataset(dest_dir: str) -> Dataset:
         )
     ]
     d.save()
-
     return d

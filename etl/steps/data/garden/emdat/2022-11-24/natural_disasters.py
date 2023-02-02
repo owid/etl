@@ -23,7 +23,6 @@ import datetime
 import numpy as np
 import pandas as pd
 from owid import catalog
-from owid.datautils import geo
 from shared import (
     BUILD_POPULATION_FOR_HISTORICAL_COUNTRIES,
     CURRENT_DIR,
@@ -36,7 +35,8 @@ from shared import (
     get_last_day_of_month,
 )
 
-from etl.helpers import Names
+from etl.data_helpers import geo
+from etl.helpers import PathFinder
 from etl.paths import DATA_DIR
 
 # Define inputs.
@@ -163,7 +163,7 @@ DATA_CORRECTIONS = [
 # 1991: {'Georgia', 'USSR'},
 
 # Get naming conventions.
-N = Names(str(CURRENT_DIR / "natural_disasters"))
+N = PathFinder(str(CURRENT_DIR / "natural_disasters"))
 
 
 def prepare_input_data(df: pd.DataFrame) -> pd.DataFrame:

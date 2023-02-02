@@ -5,9 +5,9 @@ from typing import Any, Dict, List, Optional, Tuple, Union, cast
 import numpy as np
 import pandas as pd
 from owid import catalog
-from owid.datautils import geo
 from structlog import get_logger
 
+from etl.data_helpers import geo
 from etl.paths import DATA_DIR
 
 CURRENT_DIR = Path(__file__).parent
@@ -284,9 +284,8 @@ def load_income_groups() -> pd.DataFrame:
         Income groups data.
 
     """
-    # Load the latest version of the WorldBank dataset for income grups.
-    latest_wb_dataset_path = sorted((DATA_DIR / "garden/wb/").glob("*/wb_income"))[-1]
-    income_groups = catalog.Dataset(latest_wb_dataset_path)["wb_income_group"].reset_index()
+    # Load the WorldBank dataset for income grups.
+    income_groups = catalog.Dataset(DATA_DIR / "garden/wb/2021-07-01/wb_income")["wb_income_group"].reset_index()
 
     # Add historical regions to income groups.
     for historic_region in HISTORIC_TO_CURRENT_REGION:

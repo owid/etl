@@ -3,7 +3,7 @@ from owid.catalog import Dataset, Table
 from owid.catalog.utils import underscore_table
 from shared import CURRENT_DIR
 
-from etl.helpers import Names
+from etl.helpers import PathFinder
 from etl.paths import DATA_DIR
 
 # Details of input datasets.
@@ -14,7 +14,7 @@ MEADOW_SHEET_DATASET_PATH = DATA_DIR / "meadow/aviation_safety_network/2022-10-1
 # Details of output dataset.
 GARDEN_DATASET_NAME = "aviation_statistics"
 # Get naming conventions.
-N = Names(str(CURRENT_DIR / "aviation_statistics"))
+N = PathFinder(str(CURRENT_DIR / "aviation_statistics"))
 WDI_DATASET_PATH = DATA_DIR / "garden/worldbank_wdi/2022-05-26/wdi"
 
 # Select columns from WDI table, and how to rename them.

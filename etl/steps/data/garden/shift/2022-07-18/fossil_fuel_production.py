@@ -9,9 +9,9 @@ import numpy as np
 import pandas as pd
 from owid import catalog
 from owid.catalog.utils import underscore_table
-from owid.datautils import geo
 from structlog import get_logger
 
+from etl.data_helpers import geo
 from etl.paths import DATA_DIR
 
 log = get_logger()
@@ -113,16 +113,9 @@ def load_income_groups() -> pd.DataFrame:
         Income groups data.
 
     """
-    income_groups = (
-        catalog.find(
-            table="wb_income_group",
-            dataset="wb_income",
-            namespace="wb",
-            channels=["garden"],
-        )
-        .load()
-        .reset_index()
-    )
+    # Load the WorldBank dataset for income grups.
+    income_groups = catalog.Dataset(DATA_DIR / "garden/wb/2021-07-01/wb_income")["wb_income_group"].reset_index()
+
     # Add historical regions to income groups.
     for historic_region in HISTORIC_TO_CURRENT_REGION:
         historic_region_income_group = HISTORIC_TO_CURRENT_REGION[historic_region]["income_group"]

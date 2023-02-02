@@ -5,10 +5,10 @@ current margin estimates for the variables MPI, share of MPI poor and intensity 
 
 import pandas as pd
 from owid.catalog import Dataset, Table
-from owid.datautils import geo
 from structlog import get_logger
 
-from etl.helpers import Names
+from etl.data_helpers import geo
+from etl.helpers import PathFinder
 from etl.paths import DATA_DIR
 
 MEADOW_VERSION = "2022-12-13"
@@ -16,7 +16,7 @@ MEADOW_VERSION = "2022-12-13"
 log = get_logger()
 
 # naming conventions
-N = Names(__file__)
+N = PathFinder(__file__)
 
 
 def run(dest_dir: str) -> None:

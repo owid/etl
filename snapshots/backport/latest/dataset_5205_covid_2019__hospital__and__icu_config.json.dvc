@@ -1,17 +1,18 @@
 meta:
   namespace: backport
   short_name: dataset_5205_covid_2019__hospital__and__icu_config
+  file_extension: json
+  date_accessed: 2023-02-02 06:05:10.978885
   name: Grapher metadata for dataset_5205_covid_2019__hospital__and__icu
   description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5205
-  file_extension: json
-  date_accessed: 2023-01-10 12:00:45.411423
+  source_published_by: Our World in Data catalog backport
   is_public: true
   version: latest
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: f4b513bd3f6a4abcd556211f11b5ccc5
+- md5: 391da1b1871bb61bb68826262be30ad4
   size: 6612
   path: dataset_5205_covid_2019__hospital__and__icu_config.json

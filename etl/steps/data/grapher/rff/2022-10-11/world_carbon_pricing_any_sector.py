@@ -1,7 +1,10 @@
 from owid import catalog
 from shared import GARDEN_VERSION, VERSION
 
+from etl.helpers import PathFinder
 from etl.paths import DATA_DIR, STEP_DIR
+
+N = PathFinder(__file__)
 
 # Details of input garden dataset and table.
 GARDEN_DATASET_NAME = "world_carbon_pricing"
@@ -30,6 +33,7 @@ def run(dest_dir: str) -> None:
     grapher_metadata.title = GRAPHER_DATASET_TITLE
     # Create new grapher dataset.
     ds_grapher = catalog.Dataset.create_empty(dest_dir, grapher_metadata)
+    ds_grapher.metadata.short_name = N.short_name
     # Add table to new dataset.
     ds_grapher.add(tb_garden)
     # Save dataset.

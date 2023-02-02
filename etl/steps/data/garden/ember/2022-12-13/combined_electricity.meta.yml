@@ -1,10 +1,8 @@
 dataset:
   namespace: ember
-  version: 2022-08-01
+  version: 2022-12-13
   title: Combined Electricity Data (Ember, 2022)
   short_name: combined_electricity
-  publication_year: 2022
-  publication_date: 2022-12-13
   sources:
     -
       name: Our World in Data based on Ember's Yearly Electricity Data (2022).

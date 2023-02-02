@@ -20,10 +20,10 @@ from typing import List, cast
 import pandas as pd
 from owid.catalog import Dataset, Table
 from owid.catalog.utils import underscore_table
-from owid.datautils import geo
 from structlog import get_logger
 
-from etl.helpers import Names
+from etl.data_helpers import geo
+from etl.helpers import PathFinder
 
 from .gapminder import load_gapminder
 from .gapminder_sg import (
@@ -36,7 +36,7 @@ from .unwpp import load_unwpp
 log = get_logger()
 
 # naming conventions
-N = Names(__file__)
+N = PathFinder(__file__)
 METADATA_PATH = os.path.join(N.directory, "meta.yml")
 
 # sources names
@@ -169,7 +169,7 @@ def add_regions(df: pd.DataFrame) -> pd.DataFrame:
 
     # re-estimate region aggregates
     for region in regions:
-        df = geo.add_region_aggregates(df=df, region=region)
+        df = geo.add_region_aggregates(df=df, region=region, population=df)
 
     # add sources back
     # these are only added to countries, not aggregates

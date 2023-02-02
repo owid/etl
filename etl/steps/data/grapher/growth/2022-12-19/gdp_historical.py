@@ -3,9 +3,9 @@ Just upload GDP and GDP per capita estimations the way they are from Garden
 """
 from owid import catalog
 
-from etl.helpers import Names
+from etl.helpers import PathFinder
 
-N = Names(__file__)
+N = PathFinder(__file__)
 
 
 def run(dest_dir: str) -> None:

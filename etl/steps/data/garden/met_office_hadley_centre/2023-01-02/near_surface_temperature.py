@@ -5,11 +5,11 @@
 import pandas as pd
 from owid.catalog import Dataset, Table
 
-from etl.helpers import Names
+from etl.helpers import PathFinder
 from etl.paths import DATA_DIR
 
 # Get naming conventions.
-N = Names(__file__)
+N = PathFinder(__file__)
 
 # Meadow and garden dataset versions.
 MEADOW_VERSION = "2023-01-02"

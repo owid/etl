@@ -22,10 +22,11 @@ import numpy as np
 import pandas as pd
 import structlog
 from owid import catalog, repack  # type: ignore
-from owid.datautils import dataframes, geo
+from owid.datautils import dataframes
 from tqdm.auto import tqdm
 
-from etl.paths import DATA_DIR, STEP_DIR
+from etl.data_helpers import geo
+from etl.paths import DATA_DIR, REFERENCE_DATASET, STEP_DIR
 
 # Initialise log.
 log = structlog.get_logger()
@@ -894,7 +895,7 @@ def load_countries_regions() -> pd.DataFrame:
 
     """
     # Load dataset of countries and regions.
-    countries_regions = catalog.find("countries_regions", dataset="reference", namespace="owid").load()
+    countries_regions = catalog.Dataset(REFERENCE_DATASET)["countries_regions"]
 
     countries_regions = remove_regions_from_countries_regions_members(
         countries_regions, regions_to_remove=REGIONS_TO_IGNORE_IN_AGGREGATES
@@ -912,16 +913,9 @@ def load_income_groups() -> pd.DataFrame:
         Income groups data.
 
     """
-    income_groups = (
-        catalog.find(
-            table="wb_income_group",
-            dataset="wb_income",
-            namespace="wb",
-            channels=["garden"],
-        )
-        .load()
-        .reset_index()
-    )
+    # Load the WorldBank dataset for income grups.
+    income_groups = catalog.Dataset(DATA_DIR / "garden/wb/2021-07-01/wb_income")["wb_income_group"].reset_index()
+
     # Add historical regions to income groups.
     for historic_region in HISTORIC_TO_CURRENT_REGION:
         historic_region_income_group = HISTORIC_TO_CURRENT_REGION[historic_region]["income_group"]

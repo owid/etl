@@ -54,8 +54,6 @@ log = structlog.get_logger()
 Graph = Dict[str, Set[str]]
 DAG = Dict[str, Any]
 
-# runtime cache
-cache: Dict[str, Any] = {}
 dvc_lock = Lock()
 
 DVC_REPO = Repo(paths.BASE_DIR)
@@ -147,7 +145,7 @@ def traverse(graph: Graph, nodes: Set[str]) -> Graph:
     return dict(reachable)
 
 
-def load_dag(filename: Union[str, Path] = paths.DAG_FILE) -> Dict[str, Any]:
+def load_dag(filename: Union[str, Path] = paths.DEFAULT_DAG_FILE) -> Dict[str, Any]:
     return _load_dag(filename, {})
 
 
@@ -173,7 +171,9 @@ def _load_dag_yaml(filename: str) -> Dict[str, Any]:
 
 
 def _parse_dag_yaml(dag: Dict[str, Any]) -> Dict[str, Any]:
-    return {node: set(deps) if deps else set() for node, deps in (dag["steps"] or {}).items()}
+    steps = dag["steps"] or {}
+
+    return {node: set(deps) if deps else set() for node, deps in steps.items()}
 
 
 def reverse_graph(graph: Graph) -> Graph:
@@ -246,6 +246,92 @@ def parse_step(step_name: str, dag: Dict[str, Any]) -> "Step":
         raise Exception(f"no recipe for executing step: {step_name}")
 
     return step
+
+
+def extract_step_attributes(step: str) -> Dict[str, str]:
+    """Extract attributes of a step from its name in the dag.
+
+    Parameters
+    ----------
+    step : str
+        Step (as it appears in the dag).
+
+    Returns
+    -------
+    step : str
+        Step (as it appears in the dag).
+    kind : str
+        Kind of step (namely, 'public' or 'private').
+    channel: str
+        Channel (e.g. 'meadow').
+    namespace: str
+        Namespace (e.g. 'energy').
+    version: str
+        Version (e.g. '2023-01-26').
+    name: str
+        Short name of the dataset (e.g. 'primary_energy').
+    identifier : str
+        Identifier of the step that is independent of the kind and of the version of the step.
+
+    """
+    # Extract the prefix (whatever is on the left of the '://') and the root of the step name.
+    prefix, root = step.split("://")
+
+    # Field 'kind' informs whether the dataset is public or private.
+    if "private" in prefix:
+        kind = "private"
+    else:
+        kind = "public"
+
+    # From now on we remove the 'public' or 'private' from the prefix.
+    prefix = prefix.split("-")[0]
+
+    if prefix in ["etag", "github"]:
+        # Special kinds of steps.
+        channel = "etag"
+        namespace = "etag"
+        version = "latest"
+        name = root
+        identifier = root
+    elif prefix in ["snapshot", "walden"]:
+        # Ingestion steps.
+        channel = prefix
+
+        # Extract attributes from root of the step.
+        namespace, version, name = root.split("/")
+
+        # Define an identifier for this step, that is identical for all versions.
+        identifier = f"{channel}/{namespace}/{name}"
+    elif root == "garden/reference":
+        # This is a special step that does not have a namespace or a version.
+        # We should probably get rid of this special step soon. But for now, define its properties manually.
+        channel = "garden"
+        namespace = "owid"
+        version = "latest"
+        name = "reference"
+
+        # Define an identifier for this step, that is identical for all versions.
+        identifier = f"{channel}/{namespace}/{name}"
+    else:
+        # Regular data steps.
+
+        # Extract attributes from root of the step.
+        channel, namespace, version, name = root.split("/")
+
+        # Define an identifier for this step, that is identical for all versions.
+        identifier = f"{channel}/{namespace}/{name}"
+
+    attributes = {
+        "step": step,
+        "kind": kind,
+        "channel": channel,
+        "namespace": namespace,
+        "version": version,
+        "name": name,
+        "identifier": identifier,
+    }
+
+    return attributes
 
 
 class Step(Protocol):
@@ -372,8 +458,7 @@ class DataStep(Step):
         return catalog.Dataset(self._dest_dir.as_posix())
 
     def checksum_output(self) -> str:
-        # This cast from str to str is IMHO unnecessary but MyPy complains about this without it...
-        return cast(str, self._output_dataset.checksum())
+        return self._output_dataset.checksum()
 
     def _step_files(self) -> List[str]:
         "Return a list of code files defining this step."
@@ -793,7 +878,32 @@ class BackportStepPrivate(PrivateMixin, BackportStep):
 
 def select_dirty_steps(steps: List[Step], max_workers: int) -> List[Step]:
     """Select dirty steps using threadpool."""
+    # dynamically add cached version of `is_dirty` to all steps to avoid re-computing
+    # this is a bit hacky, but it's the easiest way to only cache it here without
+    # affecting the rest
+    cache_is_dirty = files.RuntimeCache()
+    for s in steps:
+        _add_is_dirty_cached(s, cache_is_dirty)
+
     with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
         steps_dirty = executor.map(lambda s: s.is_dirty(), steps)  # type: ignore
         steps = [s for s, is_dirty in zip(steps, steps_dirty) if is_dirty]
+
+    cache_is_dirty.clear()
+
     return steps
+
+
+def _cached_is_dirty(self: Step, cache: files.RuntimeCache) -> bool:
+    key = str(self)
+    if key not in cache:
+        cache.add(key, self._is_dirty())  # type: ignore
+    return cache[key]  # type: ignore
+
+
+def _add_is_dirty_cached(s: Step, cache: files.RuntimeCache) -> None:
+    """Save copy of a method to _is_dirty and replace it with a cached version."""
+    s._is_dirty = s.is_dirty  # type: ignore
+    s.is_dirty = lambda s=s: _cached_is_dirty(s, cache)  # type: ignore
+    for dep in getattr(s, "dependencies", []):
+        _add_is_dirty_cached(dep, cache)

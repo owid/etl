@@ -17,16 +17,16 @@ import pandas as pd
 import yaml
 from owid.catalog import Dataset, DatasetMeta, Table, TableMeta
 from owid.catalog.utils import underscore_table
-from owid.datautils import geo
 from structlog import get_logger
 
-from etl.helpers import Names
+from etl.data_helpers import geo
+from etl.helpers import PathFinder
 from etl.paths import DATA_DIR
 
 log = get_logger()
 
 # naming conventions
-N = Names(__file__)
+N = PathFinder(__file__)
 
 # short name of new dataset
 SHORT_NAME = N.short_name

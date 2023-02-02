@@ -19,7 +19,10 @@ from shared import (
     add_region_aggregates,
 )
 
+from etl.helpers import PathFinder
 from etl.paths import DATA_DIR
+
+P = PathFinder(__file__)
 
 # Namespace and short name for output dataset.
 NAMESPACE = "bp"
@@ -27,6 +30,7 @@ NAMESPACE = "bp"
 METADATA_FILE_PATH = CURRENT_DIR / "statistical_review.meta.yml"
 # Original BP's Statistical Review dataset name in the OWID catalog (without the institution and year).
 BP_CATALOG_NAME = "statistical_review_of_world_energy"
+BP_BACKPORTED_DATASET_NAME = "dataset_5650_statistical_review_of_world_energy__bp__2022"
 BP_NAMESPACE_IN_CATALOG = "bp_statreview"
 BP_VERSION = 2022
 # Path to previous (processed) Statistical Review dataset.
@@ -303,11 +307,8 @@ def run(dest_dir: str) -> None:
     # Load data.
     #
     # Load table from latest BP dataset.
-    bp_table = catalog.find_one(
-        BP_CATALOG_NAME,
-        channels=["backport"],
-        namespace=f"{BP_NAMESPACE_IN_CATALOG}@{BP_VERSION}",
-    )
+    bp_ds: catalog.Dataset = P.load_dependency(BP_BACKPORTED_DATASET_NAME)
+    bp_table = bp_ds[BP_BACKPORTED_DATASET_NAME]
 
     # Load previous version of the BP energy mix dataset, that will be used at the end to fill missing values in the
     # current dataset.

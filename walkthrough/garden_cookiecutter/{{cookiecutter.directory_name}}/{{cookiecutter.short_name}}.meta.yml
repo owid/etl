@@ -1,19 +1,35 @@
+all_sources:
+  - source_testing: &source-testing
+      name: # TO BE FILLED. Example: Testing Short Citation
+      published_by: # TO BE FILLED (if different to short citation). Example: Testing Full Citation
+      url: # TO BE FILLED. Example: https://url_of_testing_source.com/
+      date_accessed: # TO BE FILLED. Example: 2023-01-01
+      publication_date: # TO BE FILLED. Example: 2023-01-01
+      publication_year: # TO BE FILLED (if publication_date is not given). Example: 2023
+      # description: Source description.
+
 dataset:
+  title: # TO BE FILLED. Example: Testing Dataset Name (Institution, 2023)
+  namespace: {{cookiecutter.namespace}}
+  short_name: {{cookiecutter.short_name}}
+  version: {{cookiecutter.version}}
+  # description: Dataset description.
+  licenses:
+    - name: # TO BE FILLED. Example: Testing License Name
+      url: # TO BE FILLED. Example: https://url_of_testing_source.com/license
   sources:
-  #   -
-  #     name: Maddison Project Database 2020 (Bolt and van Zanden, 2020)
-  #     published_by: Bolt, Jutta and Jan Luiten van Zanden (2020), “Maddison style estimates of the evolution of the world economy. A new 2020 update“.
-  #     publisher_source: |
-  #       The Maddison Project Database is based on the work of many researchers that have produced estimates of...
+    - *source-testing
 
 tables:
   {{cookiecutter.short_name}}:
     variables:
-      # gdp:
-      #   title: GDP
-      #   short_unit: $
-      #   unit: 2011 int-$
-      #   description: Gross domestic product measured in international-$ using 2011 prices to adjust for price changes over time (inflation) and price differences between countries. Calculated by multiplying GDP per capita with population.
+      # testing_variable:
+      #   title: Testing variable title
+      #   unit: arbitrary units
+      #   short_unit: au
+      #   description: Full description of testing variable.
+      #   sources:
+      #     - *source-testing
       #   display:
-      #     entityAnnotationsMap: "Western Offshoots: United States, Canada, Australia and New Zealand"
+      #     entityAnnotationsMap: Test annotation
       #     numDecimalPlaces: 0

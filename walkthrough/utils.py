@@ -11,6 +11,7 @@ from owid.catalog.utils import validate_underscore
 from pywebio import output as po
 
 from etl import config
+from etl.files import apply_black_formatter_to_files
 from etl.paths import DAG_DIR, SNAPSHOTS_DIR, STEP_DIR
 from etl.steps import DAG
 
@@ -25,11 +26,12 @@ DUMMY_DATA = {
     "snapshot_version": "2020-01-01",
     "name": "Dummy dataset",
     "description": "This\nis\na\ndummy\ndataset",
-    "file_extension": "xlsx",
-    "source_data_url": "https://www.rug.nl/ggdc/historicaldevelopment/maddison/data/mpd2020.xlsx",
+    "file_extension": "csv",
+    "source_data_url": "https://raw.githubusercontent.com/owid/etl/master/walkthrough/dummy_data.csv",
     "publication_date": "2020-01-01",
-    "source_name": "dummy source",
-    "url": "https://www.dummy.com/",
+    "source_name": "Dummy short source citation",
+    "source_published_by": "Dummy full source citation",
+    "url": "https://www.url-dummy.com/",
 }
 
 
@@ -133,6 +135,9 @@ def generate_step(cookiecutter_path: Path, data: Dict[str, Any]) -> Path:
             DATASET_DIR,
             dirs_exist_ok=True,
         )
+
+    # Apply black formatter to generated step files.
+    apply_black_formatter_to_files(file_paths=DATASET_DIR.glob("*.py"))
 
     return DATASET_DIR
 

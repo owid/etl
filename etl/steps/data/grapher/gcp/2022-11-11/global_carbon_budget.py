@@ -10,7 +10,7 @@ import numpy as np
 import pandas as pd
 from owid import catalog
 
-from etl.helpers import Names
+from etl.helpers import PathFinder
 
 # For two stacked area charts (namely "CO₂ emissions by fuel type" and "Cumulative CO₂ emissions by source") having
 # nans in the data causes the chart to show only years where all sources have data.
@@ -34,7 +34,7 @@ VARIABLES_TO_FILL_WITH_ZEROS = [
     "cumulative_emissions_from_other_industry",
 ]
 
-N = Names(__file__)
+N = PathFinder(__file__)
 
 
 def run(dest_dir: str) -> None:

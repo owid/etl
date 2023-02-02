@@ -1,15 +1,15 @@
 import pandas as pd
 from owid.catalog import Dataset, Table
-from owid.datautils import geo
 from structlog import get_logger
 
-from etl.helpers import Names
+from etl.data_helpers import geo
+from etl.helpers import PathFinder
 from etl.paths import DATA_DIR
 
 log = get_logger()
 
 # naming conventions
-N = Names(__file__)
+N = PathFinder(__file__)
 MEADOW_DATASET = "meadow/health/2022-12-28/deaths_karlinsky"
 TABLE_NAME = "deaths"
 

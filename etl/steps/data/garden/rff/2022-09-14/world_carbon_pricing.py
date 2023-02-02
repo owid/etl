@@ -2,10 +2,11 @@ from typing import Dict, List, cast
 
 import pandas as pd
 from owid.catalog import Dataset, Table
-from owid.datautils import dataframes, geo, io
+from owid.datautils import dataframes, io
 from shared import CURRENT_DIR
 
-from etl.helpers import Names
+from etl.data_helpers import geo
+from etl.helpers import PathFinder
 from etl.paths import DATA_DIR, STEP_DIR
 
 # Details of the input dataset.
@@ -18,7 +19,7 @@ GARDEN_MAIN_TABLE_NAME = MEADOW_DATASET_NAME
 GARDEN_VERSION = MEADOW_VERSION
 GARDEN_ANY_SECTOR_TABLE_NAME = "world_carbon_pricing_any_sector"
 # Get naming convention.
-N = Names(str(CURRENT_DIR / MEADOW_DATASET_NAME))
+N = PathFinder(str(CURRENT_DIR / MEADOW_DATASET_NAME))
 
 # Labels for the variables showing whether any sector is covered by an ETS or a carbon tax at the national or only
 # sub-national level.

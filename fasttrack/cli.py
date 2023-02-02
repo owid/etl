@@ -1,17 +1,21 @@
 import datetime as dt
 import difflib
+import functools
 import json
 import os
+import urllib.error
 from enum import Enum
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 
+import bugsnag
 import click
 import numpy as np
 import pandas as pd
 import pywebio
 import structlog
 from cryptography.fernet import Fernet
+from git.repo import Repo
 from owid.catalog import Dataset
 from owid.catalog.utils import underscore, validate_underscore
 from owid.datautils import dataframes
@@ -29,7 +33,8 @@ from etl import grapher_model as gm
 from etl.command import main as etl_main
 from etl.compare import diff_print
 from etl.db import get_engine
-from etl.paths import DAG_DIR, REFERENCE_DATASET, SNAPSHOTS_DIR, STEP_DIR
+from etl.files import apply_black_formatter_to_files
+from etl.paths import BASE_DIR, DAG_DIR, REFERENCE_DATASET, SNAPSHOTS_DIR, STEP_DIR
 from etl.snapshot import Snapshot, SnapshotMeta
 from walkthrough import utils as walkthrough_utils
 
@@ -51,6 +56,11 @@ with open("fasttrack/styles.css", "r") as f:
 
 @click.command()
 @click.option(
+    "--commit",
+    is_flag=True,
+    help="Commit changes to git repository",
+)
+@click.option(
     "--dummy-data",
     is_flag=True,
     help="Prefill form with dummy data, useful for development",
@@ -66,11 +76,11 @@ with open("fasttrack/styles.css", "r") as f:
     default=DEFAULT_FASTTRACK_PORT,
     help="Port to run the server on",
 )
-def cli(dummy_data: bool, auto_open: bool, port: int) -> None:
+def cli(commit: bool, dummy_data: bool, auto_open: bool, port: int) -> None:
     print(f"Fasttrack has been opened at http://localhost:{port}/")
 
     start_server(
-        lambda: app(dummy_data=dummy_data),
+        lambda: app(dummy_data=dummy_data, commit=commit),
         port=port,
         debug=True,
         auto_open_webbrowser=auto_open,
@@ -132,6 +142,7 @@ class FasttrackImport:
             description=self.meta.dataset.description,
             url=self.partial_snapshot_meta.url,
             source_name="Google Sheet",
+            source_published_by="Google Sheet",
             source_data_url=sheets_url,
             is_public=not self.is_private,
             date_accessed=dt.date.today(),
@@ -148,7 +159,22 @@ class FasttrackImport:
         return snap.metadata_path
 
 
-def app(dummy_data: bool) -> None:
+def catch_exceptions(func):
+    """Send exceptions to bugsnag and re-raise them."""
+
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except Exception as e:
+            bugsnag.notify(e)
+            raise e
+
+    return wrapper
+
+
+@catch_exceptions
+def app(dummy_data: bool, commit: bool) -> None:
     dummies = DUMMY_DATA if dummy_data else {}
 
     with open(CURRENT_DIR / "intro.md", "r") as f:
@@ -188,34 +214,43 @@ def app(dummy_data: bool) -> None:
     )
     fast_import.save_metadata()
 
-    po.put_markdown("""## Uploading Snapshot...""")
+    po.put_markdown(
+        """
+    ## Uploading Snapshot...
+
+    This may take up to a minute, please be patient. Performance fix is in the works.
+
+    """
+    )
     snapshot_path = fast_import.upload_snapshot()
     po.put_success("Upload successful!")
 
-    try:
-        po.put_markdown("""## Running ETL and upserting to GrapherDB...""")
-        step = f"grapher/{meta.dataset.path}"
-        log.info("fasttrack.etl", step=step)
-        etl_main(
-            dag_path=DAG_FASTTRACK_PATH,
-            steps=[step],
-            grapher=True,
-            private=form.is_private,
-            workers=1,
-        )
-    except Exception as e:
-        _bail([e])
-        return
+    po.put_markdown("""## Running ETL and upserting to GrapherDB...""")
+    step = f"grapher/{meta.dataset.path}"
+    log.info("fasttrack.etl", step=step)
+    etl_main(
+        dag_path=DAG_FASTTRACK_PATH,
+        steps=[step],
+        grapher=True,
+        private=form.is_private,
+        workers=1,
+    )
+    po.put_success("Import to MySQL successful!")
+
+    if commit:
+        po.put_markdown("""## Commiting and pushing to Github...""")
+        github_link = _commit_and_push(fast_import, snapshot_path)
+        po.put_success("Changes commited and pushed successfully!")
+    else:
+        github_link = ""
 
     # TODO: add link to commit in ETL
-    po.put_success(
-        po.put_markdown(
-            f"""
-    Import to MySQL successful!
-
-    [Link]({os.environ.get("ADMIN_HOST", "")}/admin/datasets/{_dataset_id(meta.dataset)}) to dataset in admin
+    po.put_markdown("""## Links""")
+    po.put_markdown(
+        f"""
+    * [Dataset in admin]({os.environ.get("ADMIN_HOST", "")}/admin/datasets/{_dataset_id(meta.dataset)})
+    * [Commit in ETL]({github_link})
     """
-        )
     )
 
     po.put_markdown(
@@ -263,6 +298,20 @@ def _load_data_and_meta(
     while True:
         sheets_url = sheets_url or dummies.get("sheet_url", "")
 
+        def _onchange_existing_sheets_url(c: str) -> None:
+            """If user selects existing sheet, update its public/private to be consistent with the sheet."""
+            if c == "unselected":
+                # new sheet, use private by default
+                pi.input_update("options", value=[Options.INFER_METADATA.value, Options.IS_PRIVATE.value])
+            else:
+                # existing sheet, loads its public/private
+                is_public = [e["is_public"] for e in existing_sheets if e["value"] == c][0]
+                if is_public:
+                    value = [Options.INFER_METADATA.value]
+                else:
+                    value = [Options.INFER_METADATA.value, Options.IS_PRIVATE.value]
+                pi.input_update("options", value=value)
+
         form_dict = dict(
             pi.input_group(
                 "Import from Google Sheets",
@@ -279,6 +328,7 @@ def _load_data_and_meta(
                         value=selected_sheet,
                         name="existing_sheets_url",
                         help_text="Selected sheet will be used if you don't specify Google Sheets URL",
+                        onchange=_onchange_existing_sheets_url,
                     ),
                     pi.checkbox(
                         "Additional Options",
@@ -291,6 +341,8 @@ def _load_data_and_meta(
         )
 
         form = FasttrackForm(**form_dict)
+
+        log.info("fasttrack.form", form=form_dict)
 
         # use selected sheet if URL is not available
         if not form.new_sheets_url:
@@ -327,6 +379,16 @@ def _load_data_and_meta(
                 google_sheets["dataset_meta"], google_sheets["variables_meta"], google_sheets["sources_meta"]
             )
             data = sheets.parse_data_from_sheets(google_sheets["data"])
+        except urllib.error.HTTPError:
+            _bail(
+                [
+                    sheets.ValidationError(
+                        "Sheet not found, have you copied the template? Creating new Google Sheets document or new "
+                        "sheets with the same name in the existing document does not work."
+                    )
+                ]
+            )
+            continue
         except sheets.ValidationError as e:
             _bail([e])
             continue
@@ -413,7 +475,7 @@ def _load_existing_sheets_from_snapshots() -> List[Dict[str, str]]:
             meta.source_data_url = _decrypt(meta.source_data_url)
 
     # extract their name and url
-    return [{"label": f"{meta.name} / {meta.version}", "value": meta.source_data_url} for meta in metas]  # type: ignore
+    return [{"label": f"{meta.name} / {meta.version}", "value": meta.source_data_url, "is_public": meta.is_public} for meta in metas]  # type: ignore
 
 
 def _infer_metadata(
@@ -589,6 +651,27 @@ def _metadata_diff(fast_import: FasttrackImport, meta: YAMLMeta) -> bool:
     else:
         po.put_html(html_diff)
         return True
+
+
+def _commit_and_push(fast_import: FasttrackImport, snapshot_path: Path) -> str:
+    """Format generated files, commit them and push to GitHub."""
+    apply_black_formatter_to_files([fast_import.step_path])
+
+    repo = Repo(BASE_DIR)
+    repo.index.add(
+        [
+            str(snapshot_path),
+            str(fast_import.metadata_path),
+            str(fast_import.step_path),
+            str(DAG_FASTTRACK_PATH),
+        ]
+    )
+    commit = repo.index.commit(f"fasttrack: {fast_import.snapshot.uri}")
+    origin = repo.remote(name="origin")
+    origin.push()
+
+    github_link = f"https://github.com/owid/etl/commit/{commit.hexsha}"
+    return github_link
 
 
 def _ask_to_continue() -> bool:

@@ -1,3 +1,4 @@
+import datetime as dt
 import os
 from enum import Enum
 from pathlib import Path
@@ -31,6 +32,7 @@ class GardenForm(BaseModel):
     short_name: str
     namespace: str
     version: str
+    meadow_version: str
     add_to_dag: bool
     include_metadata_yaml: bool
     generate_notebook: bool
@@ -57,25 +59,35 @@ def app(run_checks: bool, dummy_data: bool) -> None:
             pi.input(
                 "Namespace",
                 name="namespace",
-                placeholder="ggdc",
+                placeholder="institution",
                 required=True,
                 value=dummies.get("namespace"),
+                help_text="Institution name. Example: emdat",
             ),
             pi.input(
-                "Version",
+                "Garden dataset version",
                 name="version",
-                placeholder="2020",
+                placeholder=str(dt.date.today()),
                 required=True,
-                value=dummies.get("version"),
+                value=dummies.get("version", str(dt.date.today())),
+                help_text="Version of the garden dataset (by default, the current date, or exceptionally the publication date).",
             ),
             pi.input(
-                "Short name",
+                "Garden dataset short name",
                 name="short_name",
-                placeholder="ggdc_maddison",
+                placeholder="testing_dataset_name",
                 required=True,
                 value=dummies.get("short_name"),
                 validate=utils.validate_short_name,
-                help_text="Underscored short name",
+                help_text="Underscored dataset short name. Example: natural_disasters",
+            ),
+            pi.input(
+                "Meadow dataset version",
+                name="meadow_version",
+                placeholder=str(dt.date.today()),
+                required=True,
+                value=dummies.get("version", str(dt.date.today())),
+                help_text="Version of the meadow dataset (by default, the current date, or exceptionally the publication date).",
             ),
             pi.checkbox(
                 "Additional Options",
@@ -105,7 +117,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
         dag_content = utils.add_to_dag(
             {
                 f"data{private_suffix}://garden/{form.namespace}/{form.version}/{form.short_name}": [
-                    f"data{private_suffix}://meadow/{form.namespace}/{form.version}/{form.short_name}"
+                    f"data{private_suffix}://meadow/{form.namespace}/{form.meadow_version}/{form.short_name}"
                 ]
             }
         )
@@ -131,7 +143,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
 1. Harmonize country names with the following command (assuming country field is called `country`). Check out a [short demo](https://drive.google.com/file/d/1tBFMkgOgy4MmB7E7NmfMlfa4noWaiG3t/view) of the tool
 
     ```
-    poetry run harmonize data/meadow/{form.namespace}/{form.version}/{form.short_name}/{form.short_name}.feather country etl/steps/data/garden/{form.namespace}/{form.version}/{form.short_name}.countries.json
+    poetry run harmonize data/meadow/{form.namespace}/{form.meadow_version}/{form.short_name}/{form.short_name}.feather country etl/steps/data/garden/{form.namespace}/{form.version}/{form.short_name}.countries.json
     ```
 
     you can also add more countries manually there or to `{form.short_name}.country_excluded.json` file.
@@ -197,10 +209,10 @@ def _check_dataset_in_meadow(form: GardenForm) -> None:
     private_suffix = "-private" if form.is_private else ""
 
     po.put_markdown("""## Checking Meadow dataset...""")
-    cmd = f"etl data{private_suffix}://meadow/{form.namespace}/{form.version}/{form.short_name}"
+    cmd = f"etl data{private_suffix}://meadow/{form.namespace}/{form.meadow_version}/{form.short_name}"
 
     try:
-        ds = Dataset(DATA_DIR / "meadow" / form.namespace / form.version / form.short_name)
+        ds = Dataset(DATA_DIR / "meadow" / form.namespace / form.meadow_version / form.short_name)
         if form.short_name not in ds.table_names:
             po.put_warning(
                 po.put_markdown(f"Table `{form.short_name}` not found in Meadow dataset, have you run ```\n{cmd}\n```?")

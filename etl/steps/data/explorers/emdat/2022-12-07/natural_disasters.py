@@ -19,7 +19,10 @@ from copy import deepcopy
 
 from owid import catalog
 
+from etl.helpers import PathFinder
 from etl.paths import DATA_DIR
+
+N = PathFinder(__file__)
 
 # Mapping of old to new disaster type names.
 DISASTER_TYPE_RENAMING = {
@@ -96,6 +99,7 @@ def run(dest_dir: str) -> None:
     # Initialize a new grapher dataset and add dataset metadata.
     dataset = catalog.Dataset.create_empty(dest_dir)
     dataset.metadata = deepcopy(dataset_garden.metadata)
+    dataset.metadata.version = N.version
     dataset.save()
 
     # Add tables to dataset. Force publication in csv.

@@ -5,7 +5,6 @@
 import pandas as pd
 from owid import catalog
 from owid.catalog.utils import underscore_table
-from owid.datautils import geo
 from shared import (
     CURRENT_DIR,
     NAMESPACE,
@@ -16,6 +15,7 @@ from shared import (
     log,
 )
 
+from etl.data_helpers import geo
 from etl.paths import DATA_DIR
 
 DATASET_SHORT_NAME = "energy_consumption"

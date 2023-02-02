@@ -2,17 +2,10 @@ steps:
   #
   #  OWID curated datasets
   #
-  data://garden/owid/latest/covid:
-    - etag://raw.githubusercontent.com/owid/covid-19-data/master/public/data/owid-covid-data.csv
   data://garden/owid/latest/key_indicators:
     - data://garden/demography/2022-12-08/population
     - data://open_numbers/open_numbers/latest/open_numbers__world_development_indicators
     - data://garden/wb/2021-07-01/wb_income
-    - data://garden/reference
-  data://garden/un/2019/un_wpp:
-    - data://meadow/un/2019/un_wpp
-  data://garden/who/2021-07-01/ghe:
-    - data://meadow/who/2021-07-01/ghe
     - data://garden/reference
   data://garden/gapminder/2019-12-10/population:
     - data://meadow/gapminder/2019-12-10/population
@@ -31,12 +24,6 @@ steps:
     - snapshot://hyde/2017/general_files.zip
   data://garden/hyde/2017/baseline:
     - data://meadow/hyde/2017/baseline
-  data://meadow/who/2021-07-01/ghe:
-    - walden://who/2021-07-01/ghe
-  data://meadow/who/2021-07-01/gho:
-    - walden://who/2021-07-01/gho
-  data://meadow/un/2019/un_wpp:
-    - walden://wpp/2019/standard_projections
   data://grapher/who/2021-07-01/ghe:
     - data://garden/who/2021-07-01/ghe
   data://meadow/living_planet/2020-09-10/lpd:
@@ -103,58 +90,30 @@ steps:
   data://garden/malnutrition/2022-10-18/malnutrition:
     - data://garden/worldbank_wdi/2022-05-26/wdi
     - data://meadow/un/2022-07-11/un_wpp
-  
+
   # Homicide - WHO
   data://meadow/homicide/2023-01-03/who_mort_db:
-  - snapshot://homicide/2023-01-03/who_mort_db.csv
+    - snapshot://homicide/2023-01-03/who_mort_db.csv
   data://garden/homicide/2023-01-03/who_mort_db:
-  - data://meadow/homicide/2023-01-03/who_mort_db
+    - data://meadow/homicide/2023-01-03/who_mort_db
   data://grapher/homicide/2023-01-03/who_mort_db:
-  - data://garden/homicide/2023-01-03/who_mort_db
-  
-  # Homicide - UNODC
-  data://meadow/homicide/2023-01-04/unodc:
-  - snapshot://homicide/2023-01-04/unodc.xlsx
-  data://garden/homicide/2023-01-04/unodc:
-  - data://meadow/homicide/2023-01-04/unodc
-  data://grapher/homicide/2023-01-04/unodc:
-  - data://garden/homicide/2023-01-04/unodc
+    - data://garden/homicide/2023-01-03/who_mort_db
+
+  # Homicide - UNODC - current
+  data://meadow/homicide/2023-01-27/unodc:
+  - snapshot://homicide/2023-01-27/unodc.xlsx
+  data://garden/homicide/2023-01-27/unodc:
+  - data://meadow/homicide/2023-01-27/unodc
+  data://grapher/homicide/2023-01-27/unodc:
+  - data://garden/homicide/2023-01-27/unodc
+
   # Homicide - OMM
   data://garden/homicide/2023-01-03/homicide_long_run_omm:
-  - data://grapher/fasttrack/2023-01-03/long_term_homicide_rates_in_europe
-  - data://garden/homicide/2023-01-03/who_mort_db
-  - data://garden/homicide/2023-01-04/unodc
+    - data://grapher/fasttrack/2023-01-03/long_term_homicide_rates_in_europe
+    - data://garden/homicide/2023-01-03/who_mort_db
+    - data://garden/homicide/2023-01-27/unodc
   data://grapher/homicide/2023-01-03/homicide_long_run_omm:
-  - data://garden/homicide/2023-01-03/homicide_long_run_omm
-
-  # IHME - Global Burden of Disease.
-  #
-  data://meadow/ihme_gbd/2019/gbd_cause:
-    - walden://ihme_gbd/2019/gbd_cause
-  data://meadow/ihme_gbd/2019/gbd_child_mortality:
-    - walden://ihme_gbd/2019/gbd_child_mortality
-  data://meadow/ihme_gbd/2019/gbd_mental_health:
-    - walden://ihme_gbd/2019/gbd_mental_health
-  data://meadow/ihme_gbd/2019/gbd_risk:
-    - walden://ihme_gbd/2019/gbd_risk
-  data://meadow/ihme_gbd/2019/gbd_prevalence:
-    - walden://ihme_gbd/2019/gbd_prevalence
-  data://garden/ihme_gbd/2019/gbd_cause:
-    - data://meadow/ihme_gbd/2019/gbd_cause
-  data://garden/ihme_gbd/2019/gbd_risk:
-    - data://meadow/ihme_gbd/2019/gbd_risk
-  data://garden/ihme_gbd/2019/gbd_child_mortality:
-    - data://meadow/ihme_gbd/2019/gbd_child_mortality
-  data://garden/ihme_gbd/2019/gbd_mental_health:
-    - data://meadow/ihme_gbd/2019/gbd_mental_health
-  data://garden/ihme_gbd/2019/gbd_prevalence:
-    - data://meadow/ihme_gbd/2019/gbd_prevalence
-  data://grapher/ihme_gbd/2019/gbd_cause:
-    - data://garden/ihme_gbd/2019/gbd_cause
-  data://grapher/ihme_gbd/2019/gbd_prevalence:
-    - data://garden/ihme_gbd/2019/gbd_prevalence
-  data://grapher/ihme_gbd/2019/gbd_child_mortality:
-    - data://garden/ihme_gbd/2019/gbd_child_mortality
+    - data://garden/homicide/2023-01-03/homicide_long_run_omm
 
   #
   # UN
@@ -189,14 +148,6 @@ steps:
     - data://garden/worldbank_wdi/2022-05-26/wdi
   data://grapher/aviation_safety_network/2022-10-14/aviation_statistics:
     - data://garden/aviation_safety_network/2022-10-14/aviation_statistics
-
-  # Postnatal care coverage - World Bank (2022)
-  data://meadow/postnatal_care/2022-09-19/postnatal_care:
-    - walden://postnatal_care/2022-09-19/postnatal_care
-  data://garden/postnatal_care/2022-09-19/postnatal_care:
-    - data://meadow/postnatal_care/2022-09-19/postnatal_care
-  data://grapher/postnatal_care/2022-09-19/postnatal_care:
-    - data://garden/postnatal_care/2022-09-19/postnatal_care
 
   # HMD
   data://meadow/hmd/2022-11-04/life_tables:
@@ -253,14 +204,6 @@ steps:
     - data://garden/bp/2022-07-14/energy_mix
     - data://garden/worldbank_wdi/2022-05-26/wdi
 
-  # Death completion
-  data://meadow/health/2022-12-28/deaths_karlinsky:
-    - snapshot://health/2022-12-28/deaths_karlinsky.csv
-  data://garden/health/2022-12-28/deaths_karlinsky:
-    - data://meadow/health/2022-12-28/deaths_karlinsky
-  data://grapher/health/2022-12-28/deaths_karlinsky:
-    - data://garden/health/2022-12-28/deaths_karlinsky
-
   # Global GDP in the long run
   data://garden/growth/2022-12-19/gdp_historical:
     - data://garden/ggdc/2020-10-01/ggdc_maddison
@@ -300,14 +243,32 @@ steps:
     - snapshot://met_office_hadley_centre/2023-01-02/near_surface_temperature_global.csv
     - snapshot://met_office_hadley_centre/2023-01-02/near_surface_temperature_northern_hemisphere.csv
     - snapshot://met_office_hadley_centre/2023-01-02/near_surface_temperature_southern_hemisphere.csv
+  data://meadow/met_office_hadley_centre/2023-01-17/near_surface_temperature:
+    - snapshot://met_office_hadley_centre/2023-01-17/near_surface_temperature_global.csv
+    - snapshot://met_office_hadley_centre/2023-01-17/near_surface_temperature_northern_hemisphere.csv
+    - snapshot://met_office_hadley_centre/2023-01-17/near_surface_temperature_southern_hemisphere.csv
   data://garden/met_office_hadley_centre/2023-01-02/near_surface_temperature:
     - data://meadow/met_office_hadley_centre/2023-01-02/near_surface_temperature
+  data://garden/met_office_hadley_centre/2023-01-17/near_surface_temperature:
+    - data://meadow/met_office_hadley_centre/2023-01-17/near_surface_temperature
   data://grapher/met_office_hadley_centre/2023-01-02/near_surface_temperature:
     - data://garden/met_office_hadley_centre/2023-01-02/near_surface_temperature
+  data://grapher/met_office_hadley_centre/2023-01-17/near_surface_temperature:
+    - data://garden/met_office_hadley_centre/2023-01-17/near_surface_temperature
 
   # Long-term homicide rates in Europe - Eisner (2014)
   data://grapher/fasttrack/2023-01-03/long_term_homicide_rates_in_europe:
     - snapshot://fasttrack/2023-01-03/long_term_homicide_rates_in_europe.csv
+
+  #Luxembourg Income Study
+  data://meadow/lis/2023-01-18/luxembourg_income_study:
+    - snapshot://lis/2023-01-18/lis_keyvars.csv
+    - snapshot://lis/2023-01-18/lis_abs_poverty.csv
+    - snapshot://lis/2023-01-18/lis_distribution.csv
+  data://garden/lis/2023-01-18/luxembourg_income_study:
+    - data://meadow/lis/2023-01-18/luxembourg_income_study
+  data://grapher/lis/2023-01-18/luxembourg_income_study:
+    - data://garden/lis/2023-01-18/luxembourg_income_study
 
 # Sub-dags to import
 include:
@@ -320,3 +281,6 @@ include:
   - dag/papers.yml
   - dag/demography.yml
   - dag/conflicts.yml
+  - dag/fasttrack.yml
+  - dag/biodiversity.yml
+  - dag/health.yml

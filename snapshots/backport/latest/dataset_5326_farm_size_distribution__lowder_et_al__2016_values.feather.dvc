@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 15:53:51.130811
-  description: ''
-  file_extension: feather
-  is_public: false
-  name: Farm size distribution (Lowder et al. 2016)
   namespace: backport
-  publication_date: latest
   short_name: dataset_5326_farm_size_distribution__lowder_et_al__2016_values
+  file_extension: feather
+  date_accessed: 2023-01-20 11:10:54.453468
+  name: Farm size distribution (Lowder et al. 2016)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5326
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 389ad724f2b78e34d6b716b47478c564
-  size: 25018
+- md5: 58cc67263c408bcd3c12a25098e4ec87
+  size: 25394
   path: dataset_5326_farm_size_distribution__lowder_et_al__2016_values.feather

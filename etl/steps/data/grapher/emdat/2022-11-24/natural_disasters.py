@@ -3,9 +3,9 @@ from copy import deepcopy
 from owid import catalog
 from shared import CURRENT_DIR, DISASTER_TYPE_RENAMING
 
-from etl.helpers import Names
+from etl.helpers import PathFinder
 
-N = Names(str(CURRENT_DIR / "natural_disasters"))
+N = PathFinder(str(CURRENT_DIR / "natural_disasters"))
 
 
 def create_wide_tables(table: catalog.Table, is_decade: bool) -> catalog.Table:
