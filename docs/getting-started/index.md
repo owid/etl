@@ -25,8 +25,20 @@ You will need Python 3.9+, basic build tools, and MySQL client libraries:
     ```
     brew install python mysql-client poetry
     ```
-
-    Check that you have the correct version of Python as your default:
+    
+    You then need to inform Python where to find MySQL by adding some lines to your `~/.zshrc` file. Run `brew info mysql-client` to see what's needed.
+    
+    For example, on an M1/M2 Mac where Homebrew installs to `/opt/homebrew`, you add:
+    
+    ```
+    export PATH="/opt/homebrew/opt/mysql-client/bin:$PATH"
+    export LDFLAGS="-L/opt/homebrew/opt/mysql-client/lib"
+    export CPPFLAGS="-I/opt/homebrew/opt/mysql-client/include"
+    ```
+    
+    On an Intel Mac, the paths will be slightly different.
+    
+    Finally, check that you have the correct version of Python as your default:
 
     ```bash
     which python3
