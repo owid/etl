@@ -1,6 +1,7 @@
 # Steps for conflict data
 # https://github.com/owid/owid-issues/issues/449
 steps:
+  # Meadow
   data://meadow/conflicts/2023-01-10/bouthoul_carrere_1978:
     - snapshot://conflicts/2023-01-09/bouthoul_carrere_1978.csv
   data://meadow/conflicts/2023-01-10/clodfelter_2017:
@@ -15,3 +16,18 @@ steps:
     - snapshot://conflicts/2023-01-09/sorokin_1937.csv
   data://meadow/conflicts/2023-01-10/sutton_1971:
     - snapshot://conflicts/2023-01-09/sutton_1971.csv
+  # Garden
+  data://garden/conflicts/2023-01-18/bouthoul_carrere_1978:
+    - data://meadow/conflicts/2023-01-10/bouthoul_carrere_1978
+  data://garden/conflicts/2023-01-18/clodfelter_2017:
+    - data://meadow/conflicts/2023-01-10/clodfelter_2017
+  data://garden/conflicts/2023-01-18/dunnigan_martel_1987:
+    - data://meadow/conflicts/2023-01-10/dunnigan_martel_1987
+  data://garden/conflicts/2023-01-18/eckhardt_1991:
+    - data://meadow/conflicts/2023-01-10/eckhardt_1991
+  data://garden/conflicts/2023-01-18/orae_1985:
+    - data://meadow/conflicts/2023-01-10/orae_1985
+  data://garden/conflicts/2023-01-18/sorokin_1937:
+    - data://meadow/conflicts/2023-01-10/sorokin_1937
+  data://garden/conflicts/2023-01-18/sutton_1971:
+    - data://meadow/conflicts/2023-01-10/sutton_1971
