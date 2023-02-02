@@ -2,12 +2,11 @@ import json
 from typing import List, cast
 
 import pandas as pd
-from owid.catalog import Dataset, Table
-from owid.catalog.utils import underscore_table
+from owid.catalog import Table
 from structlog import get_logger
 
 from etl.data_helpers import geo
-from etl.helpers import PathFinder
+from etl.helpers import PathFinder, create_dataset
 
 log = get_logger()
 
@@ -31,16 +30,11 @@ def run(dest_dir: str) -> None:
     df = harmonize_countries(df)
 
     df = clean_data(df)
+
     # create new dataset with the same metadata as meadow
-    ds_garden = Dataset.create_empty(dest_dir, metadata=ds_meadow.metadata)
-
-    # create new table with the same metadata as meadow and add it to dataset
-    tb_garden = underscore_table(Table(df, short_name=tb_meadow.metadata.short_name))
-    ds_garden.add(tb_garden)
-
-    # update metadata from yaml file
-    ds_garden.update_metadata(paths.metadata_path)
-
+    ds_garden = create_dataset(
+        dest_dir, tables=[Table(df, short_name=tb_meadow.metadata.short_name)], default_metadata=ds_meadow.metadata
+    )
     ds_garden.save()
 
     log.info("unodc.end")
