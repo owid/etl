@@ -10,8 +10,8 @@ all_sources:
 
 dataset:
   title: # TO BE FILLED. Example: Testing Dataset Name (Institution, 2023)
-  namespace: conflicts
-  short_name: sutton_1971
+  namespace: war
+  short_name: eckhardt_1991
   version: 2023-01-18
   # description: Dataset description.
   licenses:
@@ -21,7 +21,7 @@ dataset:
     - *source-testing
 
 tables:
-  sutton_1971:
+  eckhardt_1991:
     variables:
       # testing_variable:
       #   title: Testing variable title

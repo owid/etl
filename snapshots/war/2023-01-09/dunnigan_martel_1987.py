@@ -1,8 +1,8 @@
 """Get our manually curated dataset into Snapshot.
 
-We maintain a manually curated transcription of the data from Bouthoul and Carrere (1978) in a Google Spreadsheet.
+We maintain a manually curated transcription of the data from Dunnigan and Martel (1987) in a Google Spreadsheet.
 Then, port this file to Snapshot. To obtain this file, download it as a CSV from
-https://docs.google.com/spreadsheets/d/1JXkz05kb_gkGXuvdnI21B6lhHIVZJD5BaiEOZi8mqRk/edit?usp=sharing and use
+https://docs.google.com/spreadsheets/d/13XJbTXryll5VqhtmbutMLCbb3pgjEtofk3o2dJG29Aw/edit?usp=sharing and use
 it with the `--path-to-file` argument."""
 
 from pathlib import Path
@@ -24,7 +24,7 @@ SNAPSHOT_VERSION = "2023-01-09"
 )
 def main(path_to_file: str, upload: bool) -> None:
     # Create new snapshot.
-    snap = Snapshot(f"conflicts/{SNAPSHOT_VERSION}/bouthoul_carrere_1978.csv")
+    snap = Snapshot(f"war/{SNAPSHOT_VERSION}/dunnigan_martel_1987.csv")
     # Ensure destination folder exists.
     snap.path.parent.mkdir(exist_ok=True, parents=True)
     # Copy local data file to snapshots data folder.

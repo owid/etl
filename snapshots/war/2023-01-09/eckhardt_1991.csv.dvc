@@ -1,5 +1,5 @@
 meta:
-  namespace: conflicts
+  namespace: war
   short_name: eckhardt_1991
   name: Wars and War-Related Deaths, 1500-1990 - Eckhardt (1991)
   source_name: Eckhardt (1991)
@@ -20,11 +20,11 @@ meta:
     one state.
 
       - Threshold for a war: "War—any armed conflict involving one or more governments
-    and causing the death of 1,000 or more people per year" 
+    and causing the death of 1,000 or more people per year"
       (Eckhardt 1991: 25).
 
       - "Location refer to country which was principal battleground, except for two
-    World Wars for which location refers to participating country" 
+    World Wars for which location refers to participating country"
       (Eckhardt 1991: 25).
 
       - Also included: "Intervention—overt military action by foreign forces, at the
@@ -36,16 +36,16 @@ meta:
 
     Which deaths and casualties are covered? Deaths; total, military, or civilian;
 
-      
+
       - "War-Related Deaths" (Eckhardt 1991: 22).
-      
+
       - "Civilian [—] Military [—] Total" (Eckhardt 1991: 22).
-      
+
       - "Incomplete; breakdown of civilian and military deaths not available in all
     cases" (Eckhardt 1991: 25).
-      
+
       - "World War area-wide deaths are in addition to those which could be located
-    by country, and are shown under the country of origin" 
+    by country, and are shown under the country of origin"
       (Eckhardt 1991: 25).
 
 
@@ -54,9 +54,9 @@ meta:
       - We extracted conflicts as well as deaths and casualties from the list in this
     book.
       - There seems to be an affordable used edition available in the UK that we could
-    buy if we wanted more information; alternatively, 
+    buy if we wanted more information; alternatively,
       this book by Eckhardt may have more details in chapter 9.
-wdir: ../../../data/snapshots/conflicts/2023-01-09
+wdir: ../../../data/snapshots/war/2023-01-09
 outs:
 - md5: ef6af27bf85a82675f41a9e4423b6120
   size: 103932

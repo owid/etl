@@ -10,7 +10,7 @@ all_sources:
 
 dataset:
   title: # TO BE FILLED. Example: Testing Dataset Name (Institution, 2023)
-  namespace: conflicts
+  namespace: war
   short_name: sorokin_1937
   version: 2023-01-18
   # description: Dataset description.

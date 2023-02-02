@@ -280,7 +280,7 @@ include:
   - dag/emissions.yml
   - dag/papers.yml
   - dag/demography.yml
-  - dag/conflicts.yml
+  - dag/war.yml
   - dag/fasttrack.yml
   - dag/biodiversity.yml
   - dag/health.yml
