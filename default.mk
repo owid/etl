@@ -14,7 +14,7 @@ help-default:
 	@echo
 
 # check formatting before lint, since an autoformat might fix linting issues
-test-default: check-formatting lint check-typing unittest
+test-default: check-formatting lint check-typing unittest version-tracker
 
 .venv-default:
 	@echo '==> Installing packages'

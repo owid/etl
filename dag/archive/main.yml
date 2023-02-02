@@ -1,0 +1,22 @@
+steps:
+  data://meadow/un/2019/un_wpp:
+    - walden://wpp/2019/standard_projections
+  data://garden/un/2019/un_wpp:
+    - data://meadow/un/2019/un_wpp
+
+# Include all active steps plus all archive steps.
+include:
+  - dag/main.yml
+  # - dag/archive/open_numbers.yml
+  # - dag/archive/faostat.yml
+  - dag/archive/energy.yml
+  # - dag/archive/walkthrough.yml
+  # - dag/archive/examples.yml
+  # - dag/archive/emissions.yml
+  # - dag/archive/papers.yml
+  # - dag/archive/demography.yml
+  # - dag/archive/conflicts.yml
+  # - dag/archive/fasttrack.yml
+  # - dag/archive/biodiversity.yml
+  # - dag/archive/health.yml
+  
