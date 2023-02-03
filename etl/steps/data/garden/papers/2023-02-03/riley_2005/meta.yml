@@ -1,0 +1,33 @@
+dataset:
+  namespace: papers
+  short_name: riley_2005
+  title: Estimates of Regional and Global Life Expectancy, 1800-2001 - Riley (2005)
+  description: |
+    Historians and demographers have gone to considerable trouble to reconstruct life expectancy in the past in individual countries.
+
+    This overview collects information from a large body of that work and links estimates for historical populations to those provided by the United Nations, the World Bank, and other sources for 1950–2001. The result is a picture of regional and global life expectancy  at birth for selected years from 1800 to 2001. The bibliography of more than 700 sources is published separately on the web.
+
+    Continents definitions may differ from OWID's definitions. The individual countries included are those that had populations in 2000 of at least 400,000, plus Iceland. Smaller countries have been excluded chiefly because of the difficulty of finding estimates for life expectancy before the 1940s. For 2001 the population included in the estimates is 99.6 percent of the total midyear world population.
+
+    For more details please read the 'Notes' section from the source.
+  licenses:
+    - name: JSTOR
+      url: https://about.jstor.org/terms/
+  version: "2022-11-04"
+  sources:
+    - name: Riley (2005)
+      url: https://doi.org/10.1111/j.1728-4457.2005.00083.x
+      source_data_url: https://u.demog.berkeley.edu/~jrw/Biblio/Eprints/%20P-S/riley.2005_estimates.global.e0.pdf
+      owid_data_url: https://walden.nyc3.digitaloceanspaces.com/papers/2022-11-01/riley_2005.pdf
+      date_accessed: "2022-11-01"
+      publication_date: "2005-10-21"
+      publication_year: 2005
+tables:
+  riley_2005:
+    title: Life expectancy (at birth)
+    description: Life expectancy at birth estimates.
+    variables:
+      life_expectancy:
+        title: life_expectancy
+        short_unit: "years"
+        unit: "years"
