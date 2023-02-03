@@ -198,8 +198,7 @@ def make_metadata(all_ds: List[Dataset]) -> DatasetMeta:
         description += f"{ds.metadata.title}:\n\n{ds.metadata.description}\n\n------\n\n"
     description = (
         "This dataset has been created using multiple sources. We use UN WPP for data since 1950 (estimates and medium"
-        " variant). Prior to that, other sources are combined.\n\n"
-        + description
+        " variant). Prior to that, other sources are combined.\n\n" + description
     )
 
     # sources

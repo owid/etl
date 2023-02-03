@@ -1,3 +1,4 @@
+"""Grapher step for our Life Expectancy OMM."""
 import yaml
 from owid import catalog
 
@@ -8,7 +9,7 @@ paths = PathFinder(__file__)
 
 def run(dest_dir: str) -> None:
     # Load garden dataset
-    ds_garden = paths.load_dependency("life_expectancy", "garden")
+    ds_garden: catalog.Dataset = paths.load_dependency("life_expectancy", "garden")
     # get dataset
     dataset = catalog.Dataset.create_empty(dest_dir, ds_garden.metadata)
 
