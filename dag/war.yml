@@ -16,6 +16,10 @@ steps:
     - snapshot://war/2023-01-09/sorokin_1937.csv
   data://meadow/war/2023-01-10/sutton_1971:
     - snapshot://war/2023-01-09/sutton_1971.csv
+  data://meadow/war/2023-02-03/war_brecke:
+    - snapshot://war/2023-02-03/war_brecke.xlsx
+  data://meadow/war/2023-02-03/prio_v31:
+    - snapshot://war/2023-02-02/prio_v31.xls
   # Garden
   data://garden/war/2023-01-18/bouthoul_carrere_1978:
     - data://meadow/war/2023-01-10/bouthoul_carrere_1978
