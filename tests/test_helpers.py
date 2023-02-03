@@ -1,9 +1,11 @@
 import unittest
 from unittest.mock import patch
 
+from owid import catalog
+
 import etl.helpers
 from etl import paths
-from etl.helpers import PathFinder, VersionTracker
+from etl.helpers import PathFinder, VersionTracker, create_dataset
 
 # Dag of active steps.
 mock_dag = {
@@ -163,3 +165,33 @@ class TestVersionTracker(unittest.TestCase):
         versions = create_mock_version_tracker(dag=_mock_dag)
         with self.assertRaises(etl.helpers.ArchiveStepUsedByActiveStep):
             versions.check_that_archive_steps_are_not_dependencies_of_active_steps()
+
+
+def test_create_dataset(tmp_path):
+    meta = catalog.DatasetMeta(title="Test title")
+
+    dest_dir = tmp_path / "data/garden/flowers/2020-01-01/rose"
+    dest_dir.parent.mkdir(parents=True)
+
+    # create metadata YAML file
+    step_dir = tmp_path / "etl/steps"
+    meta_yml = step_dir / "data/garden/flowers/2020-01-01/rose.meta.yml"
+    meta_yml.parent.mkdir(parents=True)
+    meta_yml.write_text(
+        """
+dataset:
+    description: Test description
+tables: {}""".strip()
+    )
+
+    # create dataset
+    with patch("etl.paths.STEP_DIR", step_dir):
+        ds = create_dataset(dest_dir, tables=[], default_metadata=meta)
+
+    # check metadata
+    assert ds.metadata.channel == "garden"
+    assert ds.metadata.namespace == "flowers"
+    assert ds.metadata.version == "2020-01-01"
+    assert ds.metadata.short_name == "rose"
+    assert ds.metadata.description == "Test description"
+    assert ds.metadata.title == "Test title"

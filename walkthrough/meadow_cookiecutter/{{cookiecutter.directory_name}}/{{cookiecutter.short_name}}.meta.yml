@@ -10,9 +10,6 @@ all_sources:
 
 dataset:
   title: # TO BE FILLED. Example: Testing Dataset Name (Institution, 2023)
-  namespace: {{cookiecutter.namespace}}
-  short_name: {{cookiecutter.short_name}}
-  version: {{cookiecutter.version}}
   # description: Dataset description.
   licenses:
     - name: # TO BE FILLED. Example: Testing License Name

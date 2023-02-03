@@ -6,7 +6,7 @@ import pandas as pd
 from owid.catalog import Dataset, Table
 from structlog import get_logger
 
-from etl.helpers import PathFinder
+from etl.helpers import PathFinder, create_dataset
 from etl.paths import DATA_DIR
 
 MEADOW_VERSION = "2022-12-23"
@@ -27,16 +27,10 @@ def run(dest_dir: str) -> None:
 
     df = pd.DataFrame(tb_meadow)
 
-    # create new dataset with the same metadata as meadow
-    ds_garden = Dataset.create_empty(dest_dir, metadata=ds_meadow.metadata)
-
     # create new table with the same metadata as meadow and add it to dataset
     tb_garden = Table(df, like=tb_meadow)
-    ds_garden.add(tb_garden)
 
-    # update metadata from yaml file
-    ds_garden.update_metadata(N.metadata_path)
-
+    ds_garden = create_dataset(dest_dir, tables=[tb_garden], default_metadata=ds_meadow.metadata)
     ds_garden.save()
 
     log.info("maddison_database.end")
