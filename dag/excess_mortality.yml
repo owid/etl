@@ -19,6 +19,7 @@ steps:
     - data://garden/excess_mortality/2023-01-27/xm_karlinsky_kobak
     - data://garden/excess_mortality/2023-01-27/wmd
     - data://garden/excess_mortality/2023-01-27/hmd_stmf
+    - data://garden/owid/latest/key_indicators
   # Grapher
-  data://grapher/excess_mortality/2023-01-27/excess_mortality:
+  data://grapher/excess_mortality/latest/excess_mortality:
     - data://garden/excess_mortality/2023-01-27/excess_mortality
