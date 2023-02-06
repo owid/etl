@@ -32,9 +32,6 @@ def process_df(df: pd.DataFrame) -> pd.DataFrame:
     # Add population
     log.info("\texcess_mortality: add population")
     df = add_population(df)
-    # Add canada
-    log.info("\texcess_mortality: correct data for Canada")
-    df = correct_canada(df)
     # Final formatting
     log.info("\texcess_mortality: final formatting of dataframe")
     df = final_formatting(df)
@@ -166,7 +163,7 @@ def make_df_long(df: pd.DataFrame) -> pd.DataFrame:
             df_ = df_[df_["time"] != 53]
         # drop the "_yy" part of the column names and rename a column so I can bind them together with the p_score dataframe
         df_.columns = df_.columns.str.replace(f"_{year_end}", "")
-        df_ = df_.rename(columns={f"deaths_{year}_all_ages": "deaths_2020_2022_all_ages"})
+        df_ = df_.rename(columns={f"deaths_{year}_all_ages": "deaths_since_2020_all_ages"})
         return df_
 
     def _get_date(year, time, time_unit):
@@ -182,17 +179,21 @@ def make_df_long(df: pd.DataFrame) -> pd.DataFrame:
             raise ValueError(f"Unknown time unit {time_unit}")
         return date.strftime("%Y-%m-%d")
 
-    # Unpivot by year (only relevant columns)
-    df_2021 = _build_yearly_data(df, 2021, True)
-    df_2022 = _build_yearly_data(df, 2022, True)
+    # Get yearly data
+    dfs = []
+    for year in [year for year in range(2021, YEAR_MAX + 1)]:
+        # Unpivot by year (only relevant columns)
+        df_ = _build_yearly_data(df, year, True)
+        # Add date
+        df_["date"] = df_.apply(lambda x: _get_date(year, x["time"], x["time_unit"]), axis=1)
+        dfs.append(df_)
+
     # Add date
     df["date"] = df.apply(lambda x: _get_date(2020, x["time"], x["time_unit"]), axis=1)
-    df_2021["date"] = df_2021.apply(lambda x: _get_date(2021, x["time"], x["time_unit"]), axis=1)
-    df_2022["date"] = df_2022.apply(lambda x: _get_date(2022, x["time"], x["time_unit"]), axis=1)
     # Rename column
-    df["deaths_2020_2022_all_ages"] = df["deaths_2020_all_ages"]
+    df["deaths_since_2020_all_ages"] = df["deaths_2020_all_ages"]
     # Merge
-    df = pd.concat([df, df_2021, df_2022], ignore_index=True)
+    df = pd.concat([df] + dfs, ignore_index=True)
     # Format date
     df["date"] = pd.to_datetime(df["date"])
     return df
@@ -201,43 +202,30 @@ def make_df_long(df: pd.DataFrame) -> pd.DataFrame:
 def minor_tweaks(df: pd.DataFrame) -> pd.DataFrame:
     """Minor df changes"""
     # create a new dataframe and get rid of columns I don't need
-    df = df[
-        [
-            "entity",
-            "date",
-            "time",
-            "time_unit",
-            "baseline_avg_all_ages",
-            "p_avg_0_14",
-            "p_avg_15_64",
-            "p_avg_65_74",
-            "p_avg_75_84",
-            "p_avg_85p",
-            "p_avg_all_ages",
-            "baseline_proj_all_ages",
-            "p_proj_0_14",
-            "p_proj_15_64",
-            "p_proj_65_74",
-            "p_proj_75_84",
-            "p_proj_85p",
-            "p_proj_all_ages",
-            "excess_proj_all_ages",
-            "deaths_2010_all_ages",
-            "deaths_2011_all_ages",
-            "deaths_2012_all_ages",
-            "deaths_2013_all_ages",
-            "deaths_2014_all_ages",
-            "deaths_2015_all_ages",
-            "deaths_2016_all_ages",
-            "deaths_2017_all_ages",
-            "deaths_2018_all_ages",
-            "deaths_2019_all_ages",
-            "deaths_2020_all_ages",
-            "deaths_2021_all_ages",
-            "deaths_2022_all_ages",
-            "deaths_2020_2022_all_ages",
-        ]
+    columns = [
+        "entity",
+        "date",
+        "time",
+        "time_unit",
+        "baseline_avg_all_ages",
+        "p_avg_0_14",
+        "p_avg_15_64",
+        "p_avg_65_74",
+        "p_avg_75_84",
+        "p_avg_85p",
+        "p_avg_all_ages",
+        "baseline_proj_all_ages",
+        "p_proj_0_14",
+        "p_proj_15_64",
+        "p_proj_65_74",
+        "p_proj_75_84",
+        "p_proj_85p",
+        "p_proj_all_ages",
+        "excess_proj_all_ages",
+        "deaths_since_2020_all_ages",
     ]
+    cols_deaths = [f"deaths_{year}_all_ages" for year in range(2010, YEAR_MAX + 1)]
+    df = df[columns + cols_deaths]
 
     # Question:
     # Some columns will have NaNs for 2021 and 2022 bc we did not propagate these there.
@@ -246,7 +234,7 @@ def minor_tweaks(df: pd.DataFrame) -> pd.DataFrame:
     df = df.rename(
         columns={
             "baseline_avg_all_ages": "average_deaths_2015_2019_all_ages",  # plenty of NaNs for >2020
-            "baseline_proj_all_ages": "projected_deaths_2020_2022_all_ages",
+            "baseline_proj_all_ages": "projected_deaths_since_2020_all_ages",
         },
     )
 
@@ -272,7 +260,7 @@ def add_cum_metrics(df: pd.DataFrame) -> pd.DataFrame:
         .apply(
             lambda x: x.assign(
                 cum_excess_proj_all_ages=x["excess_proj_all_ages"].cumsum(),
-                cum_proj_deaths_all_ages=x["projected_deaths_2020_2022_all_ages"].cumsum(),
+                cum_proj_deaths_all_ages=x["projected_deaths_since_2020_all_ages"].cumsum(),
             )
         )
         .reset_index(drop=True)
@@ -297,24 +285,6 @@ def add_population(df: pd.DataFrame) -> pd.DataFrame:
     df["cum_excess_per_million_proj_all_ages"] = df["cum_excess_proj_all_ages"] / (df["population"] / 1e6)
     # Drop column population
     df = df.drop(columns=["population"])
-    return df
-
-
-def correct_canada(df: pd.DataFrame) -> pd.DataFrame:
-    cols = [
-        "p_avg_0_14",
-        "p_avg_15_64",
-        "p_avg_65_74",
-        "p_avg_75_84",
-        "p_avg_85p",
-        "p_proj_0_14",
-        "p_proj_15_64",
-        "p_proj_65_74",
-        "p_proj_75_84",
-        "p_proj_85p",
-    ]
-
-    df.loc[df["entity"].isin(["Canada"]), cols] = np.nan
     return df
 
 
