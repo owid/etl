@@ -1,4 +1,11 @@
-"""Load a meadow dataset and create a garden dataset."""
+"""Load a meadow dataset and create a garden dataset.
+
+This code builds the consolidated Excess Mortality dataset by Our World in Data. To this end, we two datasets: Human Mortality Database (HMD) Short-term Mortality Fluctuations project and the World Mortality Dataset (WMD).
+Both sources are updated weekly.
+
+This step merges the two datasets into one single dataset, combining metrics from both sources to obtain excess mortality metrics.
+
+"""
 from owid.catalog import Dataset, Table
 from structlog import get_logger
 
@@ -11,9 +18,6 @@ log = get_logger()
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
-# Year range to be used (rest is filtered out)
-YEAR_MIN = 2020
-YEAR_MAX = 2022  # (kobak_ages does not have data for 2023)
 
 
 def run(dest_dir: str) -> None:
