@@ -243,7 +243,7 @@ def filter_entries_by_age(df: pd.DataFrame):
     # Only keep both sexes
     df = df[df["sex"] == " b"].drop(columns=["sex"])
     # Don't include Australia by-age data, bc it's not from WMD
-    df = df[df["entity"] != "Australia"]
+    df = df[~df["entity"].isin(["Australia", "Canada"])]
     df["entity"] = df["entity"].cat.remove_unused_categories()
     # Don't include Total, that is included in kobak (all ages)
     df = df[df["age"] != " DTotal"]
