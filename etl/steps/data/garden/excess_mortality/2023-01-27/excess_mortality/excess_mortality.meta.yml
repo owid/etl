@@ -92,7 +92,7 @@ tables:
           - *license-hmd
           - *license-wmd
         sources:
-          - *license-hmd
+          - *source-hmd
           - *source-wmd
       p_avg_0_14:
         title: p_avg_0_14
@@ -110,7 +110,7 @@ tables:
           - *license-hmd
           - *license-wmd
         sources:
-          - *license-hmd
+          - *source-hmd
           - *source-wmd
       p_avg_15_64:
         title: p_avg_15_64
@@ -129,7 +129,7 @@ tables:
           - *license-wmd
         sources:
           - *source-hmd
-          - *license-wmd
+          - *source-wmd
       p_avg_65_74:
         title: p_avg_65_74
         # title: Excess mortality P-scores (5-year average baseline, 65–74)
@@ -317,7 +317,7 @@ tables:
           - *license-hmd
           - *license-wmd
         sources:
-          - *license-hmd
+          - *source-hmd
           - *source-wmd
       deaths_2011_all_ages:
         title: deaths_2011_all_ages
@@ -328,8 +328,8 @@ tables:
           - *license-hmd
           - *license-wmd
         sources:
-          - *license-hmd
-          - *license-wmd
+          - *source-hmd
+          - *source-wmd
       deaths_2012_all_ages:
         title: deaths_2012_all_ages
         # title: Number of deaths (weekly or monthly, 2015)
@@ -437,6 +437,12 @@ tables:
           yearIsDay: true
           zeroDay: 2020-01-01
           numDecimalPlaces: 0
+        licenses:
+          - *license-hmd
+          - *license-wmd
+        sources:
+          - *source-hmd
+          - *source-wmd
       deaths_2020_all_ages:
         title: deaths_2020_all_ages
         # title: Number of deaths (weekly or monthly, 2020)
@@ -578,12 +584,12 @@ tables:
           yearIsDay: true
           zeroDay: 2020-01-01
         licenses:
-          - *license-wmd
           - *license-hmd
+          - *license-wmd
           - *license-xm_kk
         sources:
-          - *source-wmd
           - *source-hmd
+          - *source-wmd
           - *source-xm_kk
       cum_proj_deaths_all_ages:
         title: cum_proj_deaths_all_ages
@@ -611,9 +617,11 @@ tables:
           yearIsDay: true
           zeroDay: 2020-01-01
         licenses:
+          - *license-hmd
           - *license-wmd
           - *license-xm_kk
         sources:
+          - *source-hmd
           - *source-wmd
           - *source-xm_kk
       cum_excess_per_million_proj_all_ages:
