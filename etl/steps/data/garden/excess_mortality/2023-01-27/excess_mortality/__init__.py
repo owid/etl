@@ -48,7 +48,6 @@ def run(dest_dir: str) -> None:
     ds_garden.add(tb_garden)
 
     # Update dataset and table metadata using the adjacent yaml file.
-    print(paths.metadata_path)
     ds_garden.update_metadata(paths.metadata_path)
 
     # Save changes in the new garden dataset.
