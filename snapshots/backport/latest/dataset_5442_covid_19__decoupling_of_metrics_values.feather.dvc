@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5442_covid_19__decoupling_of_metrics_values
   file_extension: feather
-  date_accessed: 2023-02-05 06:03:09.877434
+  date_accessed: 2023-02-06 06:07:52.529658
   name: COVID-19 - Decoupling of metrics
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 20927b88899c0ce3ed0215438f8cee10
-  size: 40394
+- md5: ec6ec400d1dca54f486363a2feb58ad0
+  size: 40418
   path: dataset_5442_covid_19__decoupling_of_metrics_values.feather
