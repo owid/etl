@@ -99,12 +99,6 @@ steps:
   data://grapher/homicide/2023-01-03/who_mort_db:
     - data://garden/homicide/2023-01-03/who_mort_db
 
-  # Homicide - UNODC - to archive
-  data://meadow/homicide/2023-01-04/unodc:
-    - snapshot://homicide/2023-01-04/unodc.xlsx
-  data://garden/homicide/2023-01-04/unodc:
-    - data://meadow/homicide/2023-01-04/unodc
-
   # Homicide - UNODC - current
   data://meadow/homicide/2023-01-27/unodc:
   - snapshot://homicide/2023-01-27/unodc.xlsx
@@ -154,8 +148,6 @@ steps:
     - data://garden/worldbank_wdi/2022-05-26/wdi
   data://grapher/aviation_safety_network/2022-10-14/aviation_statistics:
     - data://garden/aviation_safety_network/2022-10-14/aviation_statistics
-
-
 
   # HMD
   data://meadow/hmd/2022-11-04/life_tables:
@@ -267,6 +259,16 @@ steps:
   # Long-term homicide rates in Europe - Eisner (2014)
   data://grapher/fasttrack/2023-01-03/long_term_homicide_rates_in_europe:
     - snapshot://fasttrack/2023-01-03/long_term_homicide_rates_in_europe.csv
+
+  #Luxembourg Income Study
+  data://meadow/lis/2023-01-18/luxembourg_income_study:
+    - snapshot://lis/2023-01-18/lis_keyvars.csv
+    - snapshot://lis/2023-01-18/lis_abs_poverty.csv
+    - snapshot://lis/2023-01-18/lis_distribution.csv
+  data://garden/lis/2023-01-18/luxembourg_income_study:
+    - data://meadow/lis/2023-01-18/luxembourg_income_study
+  data://grapher/lis/2023-01-18/luxembourg_income_study:
+    - data://garden/lis/2023-01-18/luxembourg_income_study
 
 # Sub-dags to import
 include:

@@ -7,7 +7,7 @@ import re
 import tempfile
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Any, Dict, Iterator, List, Optional, Set, Union, cast
+from typing import Any, Dict, Iterable, Iterator, List, Optional, Set, Union, cast
 
 import pandas as pd
 import requests
@@ -19,8 +19,9 @@ from owid.walden import Catalog as WaldenCatalog
 from owid.walden import Dataset as WaldenDataset
 
 from etl import paths
-from etl.snapshot import Snapshot
+from etl.snapshot import Snapshot, SnapshotMeta
 from etl.steps import extract_step_attributes, load_dag, reverse_graph
+from etl.steps.data.converters import convert_snapshot_metadata
 
 log = structlog.get_logger()
 
@@ -59,6 +60,74 @@ def _get_github_branches(org: str, repo: str) -> List[Any]:
         raise Exception("reached single page limit, should paginate request")
 
     return branches
+
+
+def create_dataset(
+    dest_dir: Union[str, Path],
+    tables: Iterable[catalog.Table],
+    default_metadata: Optional[Union[SnapshotMeta, catalog.DatasetMeta]] = None,
+    underscore_table: bool = True,
+) -> catalog.Dataset:
+    """Create a dataset and add a list of tables. The dataset metadata is inferred from
+    default_metadata and the dest_dir (which is in the form `channel/namespace/version/short_name`).
+    If there's an accompanying metadata file (i.e. `[short_name].meta.yml`), it will be used to
+    update the existing metadata.
+
+    One of the benefits of using this function is that it you don't have to set any of the
+    channel/namespace/version/short_name manually.
+
+    :param dest_dir: The destination directory for the dataset, usually argument of `run` function.
+    :param tables: A list of tables to add to the dataset.
+    :param default_metadata: The default metadata to use for the dataset, could be either SnapshotMeta or DatasetMeta.
+    :param underscore_table: Whether to underscore the table name before adding it to the dataset.
+
+    Usage:
+        ds = create_dataset(dest_dir, [table_a, table_b], default_metadata=snap.metadata)
+        ds.save()
+    """
+    # convert snapshot SnapshotMeta to DatasetMeta
+    if isinstance(default_metadata, SnapshotMeta):
+        default_metadata = convert_snapshot_metadata(default_metadata)
+
+    # create new dataset with new metadata
+    ds = catalog.Dataset.create_empty(dest_dir, metadata=default_metadata)
+
+    # add tables to dataset
+    for table in tables:
+        if underscore_table:
+            table = catalog.utils.underscore_table(table)
+        ds.add(table)
+
+    # set metadata from dest_dir
+    pattern = (
+        r"\/"
+        + r"\/".join(
+            [
+                f"(?P<channel>{'|'.join(CHANNEL.__args__)})",
+                "(?P<namespace>.*?)",
+                r"(?P<version>\d{4}\-\d{2}\-\d{2}|\d{4}|latest)",
+                "(?P<short_name>.*?)",
+            ]
+        )
+        + "$"
+    )
+
+    match = re.search(pattern, str(dest_dir))
+    assert match, f"Could not parse path {str(dest_dir)}"
+
+    for k, v in match.groupdict().items():
+        setattr(ds.metadata, k, v)
+
+    # update metadata from yaml file
+    N = PathFinder(str(paths.STEP_DIR / "data" / Path(dest_dir).relative_to(Path(dest_dir).parents[3])))
+    if N.metadata_path.exists():
+        ds.update_metadata(N.metadata_path)
+
+        # check that we are not using metadata inconsistent with path
+        for k, v in match.groupdict().items():
+            assert str(getattr(ds.metadata, k)) == v, f"Metadata {k} is inconsistent with path {dest_dir}"
+
+    return ds
 
 
 class CurrentFileMustBeAStep(ExceptionFromDocstring):
