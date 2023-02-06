@@ -1,35 +1,63 @@
 all_sources:
-  - source_testing: &source-testing
-      name: # TO BE FILLED. Example: Testing Short Citation
-      published_by: # TO BE FILLED (if different to short citation). Example: Testing Full Citation
-      url: # TO BE FILLED. Example: https://url_of_testing_source.com/
-      date_accessed: # TO BE FILLED. Example: 2023-01-01
-      publication_date: # TO BE FILLED. Example: 2023-01-01
-      publication_year: # TO BE FILLED (if publication_date is not given). Example: 2023
-      # description: Source description.
+  - source_xm_kk: &source-xm_kk
+      name: Karlinsky and Kobak (2021)
+      url: https://github.com/dkobak/excess-mortality
+      date_accessed: "2023-01-27"
+      publication_date: "2021-06-30"
+      publication_year: 2021
+      published_by:
+        Karlinsky & Kobak, 2021, Tracking excess mortality across countries
+        during the COVID-19 pandemic with the World Mortality Dataset. eLife 10:e69336.
+        https://elifesciences.org/articles/69336
+all_licenses:
+  - license_xm_kk: &license-xm_kk
+      name: GPL-3.0
+      url: https://github.com/dkobak/excess-mortality/blob/main/LICENSE
 
 dataset:
-  title: # TO BE FILLED. Example: Testing Dataset Name (Institution, 2023)
   namespace: excess_mortality
   short_name: xm_karlinsky_kobak
+  title: Excess mortality during the COVID-19 pandemic
+  description: |-
+    The data are sourced from the World Mortality Dataset (https://github.com/akarlinsky/world_mortality). Excess mortality is computed relative to the baseline obtained using linear extrapolation of the 2015–19 trend (different baselines for 2020, 2021, and 2022). In each subplot in the figure below, gray lines are 2015–19, black line is baseline for 2020, red line is 2020, blue line is 2021, orange line is 2022. Countries are sorted by the total excess mortality as % of the 2020 baseline.
+
+    For more details, refer to https://github.com/dkobak/excess-mortality#excess-mortality-during-the-covid-19-pandemic.
   version: 2023-01-27
-  # description: Dataset description.
   licenses:
-    - name: # TO BE FILLED. Example: Testing License Name
-      url: # TO BE FILLED. Example: https://url_of_testing_source.com/license
+    - *license-xm_kk
   sources:
-    - *source-testing
+    - *source-xm_kk
 
 tables:
   xm_karlinsky_kobak:
     variables:
-      # testing_variable:
-      #   title: Testing variable title
-      #   unit: arbitrary units
-      #   short_unit: au
-      #   description: Full description of testing variable.
-      #   sources:
-      #     - *source-testing
-      #   display:
-      #     entityAnnotationsMap: Test annotation
-      #     numDecimalPlaces: 0
+      entity:
+        description: "Country, nation or region name."
+      time:
+        description: "Number of the month or week."
+      time_unit:
+        description: "Time unit can be either 'monthly' or 'weekly', depending on the country."
+      age:
+        description: "Age group. This is always 'all_ages' for this dataset."
+      baseline_proj:
+        description: "Projected number of weekly or monthly deaths from all causes for all ages for 2020."
+      baseline_proj_21:
+        description: "Projected number of weekly or monthly deaths from all causes for all ages for 2021."
+      baseline_proj_22:
+        description: "Projected number of weekly or monthly deaths from all causes for all ages for 2022."
+  xm_karlinsky_kobak_by_age:
+    variables:
+      entity:
+        description: "Country, nation or region name."
+      time:
+        description: "Number of the month or week."
+      time_unit:
+        description: "Time unit can be either 'monthly' or 'weekly', depending on the country."
+      age:
+        description: "Age group."
+      baseline_proj:
+        description: "Projected number of weekly or monthly deaths from all causes for all ages for 2020."
+      baseline_proj_21:
+        description: "Projected number of weekly or monthly deaths from all causes for all ages for 2021."
+      baseline_proj_22:
+        description: "Projected number of weekly or monthly deaths from all causes for all ages for 2022."
