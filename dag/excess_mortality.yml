@@ -1,0 +1,25 @@
+# Excess Mortality data
+steps:
+  # Meadow
+  data://meadow/excess_mortality/2023-01-27/hmd_stmf:
+    - snapshot://excess_mortality/2023-01-27/hmd_stmf.csv
+  data://meadow/excess_mortality/2023-01-27/wmd:
+    - snapshot://excess_mortality/2023-01-27/wmd.csv
+  data://meadow/excess_mortality/2023-01-27/xm_karlinsky_kobak:
+    - snapshot://excess_mortality/2023-01-27/xm_karlinsky_kobak.csv
+    - snapshot://excess_mortality/2023-01-27/xm_karlinsky_kobak.ages.csv
+  # Garden
+  data://garden/excess_mortality/2023-01-27/hmd_stmf:
+    - data://meadow/excess_mortality/2023-01-27/hmd_stmf
+  data://garden/excess_mortality/2023-01-27/wmd:
+    - data://meadow/excess_mortality/2023-01-27/wmd
+  data://garden/excess_mortality/2023-01-27/xm_karlinsky_kobak:
+    - data://meadow/excess_mortality/2023-01-27/xm_karlinsky_kobak
+  data://garden/excess_mortality/2023-01-27/excess_mortality:
+    - data://garden/excess_mortality/2023-01-27/xm_karlinsky_kobak
+    - data://garden/excess_mortality/2023-01-27/wmd
+    - data://garden/excess_mortality/2023-01-27/hmd_stmf
+    - data://garden/owid/latest/key_indicators
+  # Grapher
+  data://grapher/excess_mortality/latest/excess_mortality:
+    - data://garden/excess_mortality/2023-01-27/excess_mortality

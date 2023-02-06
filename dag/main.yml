@@ -284,3 +284,4 @@ include:
   - dag/fasttrack.yml
   - dag/biodiversity.yml
   - dag/health.yml
+  - dag/excess_mortality.yml

@@ -1,0 +1,29 @@
+meta:
+  namespace: excess_mortality
+  short_name: xm_karlinsky_kobak
+  name: Excess mortality during the COVID-19 pandemic
+  version: 2023-01-27
+  publication_year: 2021
+  publication_date: 2021-06-30
+  source_name: Karlinsky and Kobak (2021)
+  source_published_by: Karlinsky & Kobak, 2021, Tracking excess mortality across countries
+    during the COVID-19 pandemic with the World Mortality Dataset. eLife 10:e69336.
+    https://elifesciences.org/articles/69336
+  url: https://github.com/dkobak/excess-mortality
+  source_data_url: https://raw.githubusercontent.com/dkobak/excess-mortality/main/baselines-stmf.csv
+  file_extension: csv
+  license_url: https://github.com/dkobak/excess-mortality/blob/main/LICENSE
+  license_name: GPL-3.0
+  date_accessed: 2023-01-27
+  is_public: true
+  description: |
+    The data are sourced from the World Mortality Dataset (https://github.com/akarlinsky/world_mortality). Excess mortality is computed relative to the baseline obtained using linear extrapolation of the 2015–19 trend (different baselines for 2020, 2021, and 2022). In each subplot in the figure below, gray lines are 2015–19, black line is baseline for 2020, red line is 2020, blue line is 2021, orange line is 2022. Countries are sorted by the total excess mortality as % of the 2020 baseline.
+
+    For more details, refer to https://github.com/dkobak/excess-mortality#excess-mortality-during-the-covid-19-pandemic.
+  access_notes: >
+    Contains data by age.
+wdir: ../../../data/snapshots/excess_mortality/2023-01-27
+outs:
+- md5: 7f727e37936a38f447a1fe3fc0ed8e73
+  size: 3404352
+  path: xm_karlinsky_kobak.ages.csv

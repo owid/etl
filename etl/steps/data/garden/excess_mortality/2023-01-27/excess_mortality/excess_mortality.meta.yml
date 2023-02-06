@@ -1,0 +1,665 @@
+all_sources:
+  - source_hmd: &source-hmd
+      name: Human Mortality Database (2023)
+      published_by:
+        HMD. Human Mortality Database. Max Planck Institute for Demographic
+        Research (Germany), University of California, Berkeley (USA), and French Institute
+        for Demographic Studies (France). Available at www.mortality.org.
+      url: https://www.mortality.org/Data/STMF
+      date_accessed: "2023-01-27"
+      publication_date: "2023-01-23"
+      publication_year: 2023
+      source_data_url: https://www.mortality.org/File/GetDocument/Public/STMF/Outputs/stmf.csv
+  - source_wmd: &source-wmd
+      name: World Mortality Dataset (2023)
+      published_by:
+        Karlinsky & Kobak 2021, Tracking excess mortality across countries
+        during the COVID-19 pandemic with the World Mortality Dataset, eLife https://doi.org/10.7554/eLife.69336
+      url: https://github.com/akarlinsky/world_mortality/
+      source_data_url: https://raw.githubusercontent.com/akarlinsky/world_mortality/main/world_mortality.csv
+      date_accessed: "2023-01-27"
+      publication_date: "2021-06-30"
+      publication_year: 2021
+  - source_xm_kk: &source-xm_kk
+      name: World Mortality Dataset (2023)
+      published_by:
+        Karlinsky & Kobak, 2021, Tracking excess mortality across countries
+        during the COVID-19 pandemic with the World Mortality Dataset. eLife 10:e69336.
+        https://elifesciences.org/articles/69336
+      url: https://github.com/dkobak/excess-mortality
+      date_accessed: "2023-01-27"
+      publication_date: "2021-06-30"
+      publication_year: 2021
+
+all_licenses:
+  - license_hmd: &license-hmd
+      name: Creative Commons BY 4.0
+      url: https://www.mortality.org/Data/UserAgreement
+  - license_wmd: &license-wmd
+      name: MIT License
+      url: https://github.com/akarlinsky/world_mortality/blob/main/LICENSE
+  - license_xm_kk: &license-xm_kk
+      name: GPL-3.0
+      url: https://github.com/dkobak/excess-mortality/blob/main/LICENSE
+
+dataset:
+  namespace: excess_mortality
+  short_name: excess_mortality
+  title: Excess Mortality (various sources)
+  description: |-
+    All-cause mortality data is from the Human Mortality Database (HMD) Short-term Mortality Fluctuations project and the World Mortality Dataset (WMD). Both sources are updated weekly.
+
+    We do not use the data from some countries in WMD because they fail to meet the following data quality criteria: 1) at least three years of historical data; and 2) data published either weekly or monthly. The full list of excluded countries and reasons for exclusion can be found in this spreadsheet: https://docs.google.com/spreadsheets/d/1JPMtzsx-smO3_K4ReK_HMeuVLEzVZ71qHghSuAfG788/edit?usp=sharing.
+
+    For a full list of source information (i.e., HMD or WMD) country by country, see: https://ourworldindata.org/excess-mortality-covid#source-information-country-by-country.
+
+    We calculate P-scores using the reported deaths data from HMD and WMD and the projected deaths for 2020–2022 from WMD (which we use for all countries and regions, including for deaths broken down by age group). The P-score is the percentage difference between the reported number of weekly or monthly deaths in 2020–2022 and the projected number of deaths for the same period based on previous years.
+
+    We calculate the number of weekly deaths for the United Kingdom by summing the weekly deaths from England & Wales, Scotland, and Northern Ireland.
+
+    For important issues and caveats to understand when interpreting excess mortality data, see our excess mortality page at https://ourworldindata.org/excess-mortality-covid.
+
+    For a more detailed description of the HMD data, including week date definitions, the coverage (of individuals, locations, and time), whether dates are for death occurrence or registration, the original national source information, and important caveats, see the HMD metadata file at https://www.mortality.org/Public/STMF_DOC/STMFmetadata.pdf.
+
+    For a more detailed description of the WMD data, including original source information, see their GitHub page at https://github.com/akarlinsky/world_mortality.
+  version: 2023-01-27
+  licenses:
+    - *license-hmd
+    - *license-wmd
+    - *license-xm_kk
+  sources:
+    - *source-hmd
+    - *source-wmd
+    - *source-xm_kk
+
+tables:
+  excess_mortality:
+    variables:
+      # p_avg_*
+      p_avg_all_ages:
+        title: p_avg_all_ages
+        # title: Excess mortality P-scores (5-year average baseline, all ages)
+        unit: "%"
+        short_unit: "%"
+        description: P-scores using 5-year average baseline for all ages.
+        display:
+          name: Excess mortality P-scores, 5-year average baseline, all ages
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: 2020-01-01
+          numDecimalPlaces: 0
+        licenses:
+          - *license-hmd
+          - *license-wmd
+        sources:
+          - *license-hmd
+          - *source-wmd
+      p_avg_0_14:
+        title: p_avg_0_14
+        # title: Excess mortality P-scores (5-year average baseline, 0–14)
+        unit: "%"
+        short_unit: "%"
+        description: P-scores using projected baseline for ages 0–14.
+        display:
+          name: Ages 0–14
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: 2020-01-01
+          numDecimalPlaces: 0
+        licenses:
+          - *license-hmd
+          - *license-wmd
+        sources:
+          - *license-hmd
+          - *source-wmd
+      p_avg_15_64:
+        title: p_avg_15_64
+        # title: Excess mortality P-scores (5-year average baseline, 15–64)
+        unit: "%"
+        short_unit: "%"
+        description: P-scores using projected baseline for ages 15–64
+        display:
+          name: Ages 15–64
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: 2020-01-01
+          numDecimalPlaces: 0
+        licenses:
+          - *license-hmd
+          - *license-wmd
+        sources:
+          - *source-hmd
+          - *license-wmd
+      p_avg_65_74:
+        title: p_avg_65_74
+        # title: Excess mortality P-scores (5-year average baseline, 65–74)
+        unit: "%"
+        short_unit: "%"
+        description: P-scores using projected baseline for ages 65–74.
+        display:
+          name: Ages 65–74
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: 2020-01-01
+          numDecimalPlaces: 0
+        licenses:
+          - *license-hmd
+          - *license-wmd
+        sources:
+          - *source-hmd
+          - *source-wmd
+      p_avg_75_84:
+        title: p_avg_75_84
+        # title: Excess mortality P-scores (5-year average baseline, 75–84)
+        unit: "%"
+        short_unit: "%"
+        description: P-scores using projected baseline for ages 75–84.
+        display:
+          name: Ages 75–84
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: 2020-01-01
+          numDecimalPlaces: 0
+        licenses:
+          - *license-hmd
+          - *license-wmd
+        sources:
+          - *source-hmd
+          - *source-wmd
+      p_avg_85p:
+        title: p_avg_85p
+        # title: Excess mortality P-scores (5-year average baseline, 85+)
+        unit: "%"
+        short_unit: "%"
+        description: P-scores using projected baseline for ages 85 and above.
+        display:
+          name: Ages 85+
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: 2020-01-01
+          numDecimalPlaces: 0
+        licenses:
+          - *license-hmd
+          - *license-wmd
+        sources:
+          - *source-hmd
+          - *source-wmd
+
+      # p_proj_*
+      p_proj_all_ages:
+        title: p_proj_all_ages
+        # title: Excess mortality P-scores (projected baseline, all ages)
+        unit: "%"
+        short_unit: "%"
+        description: P-scores using projected baseline for all ages
+        display:
+          name: Excess mortality P-scores, projected baseline, all ages.
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: 2020-01-01
+          numDecimalPlaces: 0
+        licenses:
+          - *license-hmd
+          - *license-wmd
+          - *license-xm_kk
+        sources:
+          - *source-hmd
+          - *source-wmd
+          - *source-xm_kk
+      p_proj_0_14:
+        title: p_proj_0_14
+        # title: Excess mortality P-scores (projected baseline, 0–14)
+        unit: "%"
+        short_unit: "%"
+        description: P-scores using projected baseline for ages 0–14.
+        display:
+          name: Ages 0–14
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: 2020-01-01
+          numDecimalPlaces: 0
+        licenses:
+          - *license-hmd
+          - *license-wmd
+          - *license-xm_kk
+        sources:
+          - *source-hmd
+          - *source-wmd
+          - *source-xm_kk
+      p_proj_15_64:
+        title: p_proj_15_64
+        # title: Excess mortality P-scores (projected baseline, 15–64)
+        unit: "%"
+        short_unit: "%"
+        description: P-scores using projected baseline for ages 15–64.
+        display:
+          name: Ages 15–64
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: 2020-01-01
+          numDecimalPlaces: 0
+        licenses:
+          - *license-hmd
+          - *license-wmd
+          - *license-xm_kk
+        sources:
+          - *source-hmd
+          - *source-wmd
+          - *source-xm_kk
+      p_proj_65_74:
+        title: p_proj_65_74
+        # title: Excess mortality P-scores (projected baseline, 65–74)
+        unit: "%"
+        short_unit: "%"
+        description: P-scores using projected baseline for ages 65–74.
+        display:
+          name: Ages 65–74
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: 2020-01-01
+          numDecimalPlaces: 0
+        licenses:
+          - *license-hmd
+          - *license-wmd
+          - *license-xm_kk
+        sources:
+          - *source-hmd
+          - *source-wmd
+          - *source-xm_kk
+      p_proj_75_84:
+        title: p_proj_75_84
+        # title: Excess mortality P-scores (projected baseline, 75–84)
+        unit: "%"
+        short_unit: "%"
+        description: P-scores using projected baseline for ages 75–84.
+        display:
+          name: Ages 75–84
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: 2020-01-01
+          numDecimalPlaces: 0
+        licenses:
+          - *license-hmd
+          - *license-wmd
+          - *license-xm_kk
+        sources:
+          - *source-hmd
+          - *source-wmd
+          - *source-xm_kk
+      p_proj_85p:
+        title: p_proj_85p
+        # title: Excess mortality P-scores (projected baseline, 85+)
+        unit: "%"
+        short_unit: "%"
+        description: P-scores using projected baseline for ages 85 and above.
+        display:
+          name: Ages 85+
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: 2020-01-01
+          numDecimalPlaces: 0
+        licenses:
+          - *license-hmd
+          - *license-wmd
+          - *license-xm_kk
+        sources:
+          - *source-hmd
+          - *source-wmd
+          - *source-xm_kk
+
+      # deaths_*_all_ages
+      deaths_2010_all_ages:
+        title: deaths_2010_all_ages
+        # title: Number of deaths (weekly or monthly, 2015)
+        unit: ""
+        description: The reported number of weekly or monthly deaths from all causes for all ages in 2010.
+        licenses:
+          - *license-hmd
+          - *license-wmd
+        sources:
+          - *license-hmd
+          - *source-wmd
+      deaths_2011_all_ages:
+        title: deaths_2011_all_ages
+        # title: Number of deaths (weekly or monthly, 2015)
+        unit: ""
+        description: The reported number of weekly or monthly deaths from all causes for all ages in 2011.
+        licenses:
+          - *license-hmd
+          - *license-wmd
+        sources:
+          - *license-hmd
+          - *license-wmd
+      deaths_2012_all_ages:
+        title: deaths_2012_all_ages
+        # title: Number of deaths (weekly or monthly, 2015)
+        unit: ""
+        description: The reported number of weekly or monthly deaths from all causes for all ages in 2012.
+        licenses:
+          - *license-hmd
+          - *license-wmd
+        sources:
+          - *source-hmd
+          - *source-wmd
+      deaths_2013_all_ages:
+        title: deaths_2013_all_ages
+        # title: Number of deaths (weekly or monthly, 2015)
+        unit: ""
+        description: The reported number of weekly or monthly deaths from all causes for all ages in 2013.
+        licenses:
+          - *license-hmd
+          - *license-wmd
+        sources:
+          - *source-hmd
+          - *source-wmd
+      deaths_2014_all_ages:
+        title: deaths_2014_all_ages
+        # title: Number of deaths (weekly or monthly, 2015)
+        unit: ""
+        description: The reported number of weekly or monthly deaths from all causes for all ages in 2014.
+        licenses:
+          - *license-hmd
+          - *license-wmd
+        sources:
+          - *source-wmd
+          - *source-hmd
+      deaths_2015_all_ages:
+        title: deaths_2015_all_ages
+        # title: Number of deaths (weekly or monthly, 2015)
+        unit: ""
+        description: The reported number of weekly or monthly deaths from all causes for all ages in 2015.
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: 2020-01-01
+          numDecimalPlaces: 0
+        licenses:
+          - *license-hmd
+          - *license-wmd
+        sources:
+          - *source-hmd
+          - *source-wmd
+      deaths_2016_all_ages:
+        title: deaths_2016_all_ages
+        # title: Number of deaths (weekly or monthly, 2016)
+        unit: ""
+        description: The reported number of weekly or monthly deaths from all causes for all ages in 2016.
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: 2020-01-01
+          numDecimalPlaces: 0
+        licenses:
+          - *license-hmd
+          - *license-wmd
+        sources:
+          - *source-hmd
+          - *source-wmd
+      deaths_2017_all_ages:
+        title: deaths_2017_all_ages
+        # title: Number of deaths (weekly or monthly, 2017)
+        unit: ""
+        description: The reported number of weekly or monthly deaths from all causes for all ages in 2017.
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: 2020-01-01
+          numDecimalPlaces: 0
+        licenses:
+          - *license-hmd
+          - *license-wmd
+        sources:
+          - *source-hmd
+          - *source-wmd
+      deaths_2018_all_ages:
+        title: deaths_2018_all_ages
+        # title: Number of deaths (weekly or monthly, 2018)
+        unit: ""
+        description: The reported number of weekly or monthly deaths from all causes for all ages in 2018.
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: 2020-01-01
+          numDecimalPlaces: 0
+        licenses:
+          - *license-hmd
+          - *license-wmd
+        sources:
+          - *source-hmd
+          - *source-wmd
+      deaths_2019_all_ages:
+        title: deaths_2019_all_ages
+        # title: Number of deaths (weekly or monthly, 2019)
+        unit: ""
+        description: The reported number of weekly or monthly deaths from all causes for all ages in 2019.
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: 2020-01-01
+          numDecimalPlaces: 0
+      deaths_2020_all_ages:
+        title: deaths_2020_all_ages
+        # title: Number of deaths (weekly or monthly, 2020)
+        unit: ""
+        description: The reported number of weekly or monthly deaths from all causes for all ages in 2020.
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: 2020-01-01
+          numDecimalPlaces: 0
+        licenses:
+          - *license-hmd
+          - *license-wmd
+        sources:
+          - *source-hmd
+          - *source-wmd
+      deaths_2021_all_ages:
+        title: deaths_2021_all_ages
+        # title: Number of deaths (weekly or monthly, 2021)
+        unit: ""
+        description: The reported number of weekly or monthly deaths from all causes for all ages in 2021.
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: 2020-01-01
+          numDecimalPlaces: 0
+        licenses:
+          - *license-hmd
+          - *license-wmd
+        sources:
+          - *source-hmd
+          - *source-wmd
+      deaths_2022_all_ages:
+        title: deaths_2022_all_ages
+        # title: Number of deaths (weekly or monthly, 2022)
+        unit: ""
+        description: The reported number of weekly or monthly deaths from all causes for all ages in 2022.
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: 2020-01-01
+          numDecimalPlaces: 0
+        licenses:
+          - *license-hmd
+          - *license-wmd
+        sources:
+          - *source-hmd
+          - *source-wmd
+      deaths_since_2020_all_ages:
+        title: deaths_since_2020_all_ages
+        # title: Number of deaths (weekly or monthly, 2020–2022)
+        unit: ""
+        description: Reported number of weekly or monthly deaths from all causes for all ages for 2020–2022.
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: 2020-01-01
+          numDecimalPlaces: 0
+        licenses:
+          - *license-hmd
+          - *license-wmd
+        sources:
+          - *source-hmd
+          - *source-wmd
+
+      # other metrics
+      excess_proj_all_ages:
+        title: excess_proj_all_ages
+        # title: Excess deaths (projected, all ages)
+        unit: ""
+        description: The number of excess deaths; calculated as reported deaths minus projected deaths.
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: 2020-01-01
+        licenses:
+          - *license-hmd
+          - *license-wmd
+          - *license-xm_kk
+        sources:
+          - *source-hmd
+          - *source-wmd
+          - *source-xm_kk
+      excess_per_million_proj_all_ages:
+        title: excess_per_million_proj_all_ages
+        # title: Excess deaths per million people (projected, all ages)
+        unit: ""
+        description: The number of excess deaths per million people in the population; calculated as reported deaths minus projected deaths
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: 2020-01-01
+        licenses:
+          - *license-hmd
+          - *license-wmd
+          - *license-xm_kk
+        sources:
+          - *source-hmd
+          - *source-wmd
+          - *source-xm_kk
+      average_deaths_2015_2019_all_ages:
+        title: average_deaths_2015_2019_all_ages
+        # title: Average number of deaths (2015–2019, all ages)
+        unit: ""
+        description: The average number of weekly or monthly deaths from all causes for all ages over the years 2015–2019.
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: 2020-01-01
+        licenses:
+          - *license-hmd
+          - *license-wmd
+        sources:
+          - *source-hmd
+          - *source-wmd
+      projected_deaths_since_2020_all_ages:
+        title: projected_deaths_since_2020_all_ages
+        # title: Projected number of deaths (2020–2022, all ages)
+        unit: ""
+        description: Projected number of weekly or monthly deaths from all causes for all ages for since 2020.
+        display:
+          name: Projected, 2020
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: 2020-01-01
+          numDecimalPlaces: 0
+        licenses:
+          - *license-xm_kk
+        sources:
+          - *source-xm_kk
+      cum_excess_proj_all_ages:
+        title: cum_excess_proj_all_ages
+        # title: Cumulative excess of deaths (projected, all ages)
+        unit: ""
+        description: The cumulative number of excess deaths; cumulated starting 1 January 2020
+        display:
+          numDecimalPlaces: 0
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: 2020-01-01
+        licenses:
+          - *license-wmd
+          - *license-hmd
+          - *license-xm_kk
+        sources:
+          - *source-wmd
+          - *source-hmd
+          - *source-xm_kk
+      cum_proj_deaths_all_ages:
+        title: cum_proj_deaths_all_ages
+        # title: Cumulative number of deaths (projected, all ages)
+        unit: ""
+        description: The cumulative number of projected deaths; cumulated starting 1 January 2020
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: 2020-01-01
+        licenses:
+          - *license-xm_kk
+        sources:
+          - *source-xm_kk
+      cum_p_proj_all_ages:
+        title: cum_p_proj_all_ages
+        # title: Cumulative p-score (projected, all ages)
+        unit: "%"
+        short_unit: "%"
+        description: Cumulative P-scores using projected baseline for all ages
+        display:
+          name: Excess mortality cumulative P-scores, projected baseline, all ages
+          numDecimalPlaces: 0
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: 2020-01-01
+        licenses:
+          - *license-wmd
+          - *license-xm_kk
+        sources:
+          - *source-wmd
+          - *source-xm_kk
+      cum_excess_per_million_proj_all_ages:
+        title: cum_excess_per_million_proj_all_ages
+        # title: Cumulative excess deaths per million people (projected, all ages)
+        unit: ""
+        description: The cumulative number of excess deaths per million people in the population; cumulated starting 1 January 2020
+        display:
+          numDecimalPlaces: 0
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: 2020-01-01
+        licenses:
+          - *license-hmd
+          - *license-wmd
+          - *license-xm_kk
+        sources:
+          - *source-hmd
+          - *source-wmd
+          - *source-xm_kk
+      # auxiliary columns
+      time:
+        title: Time
+        unit: ""
+        description: The week or month number in the year
+        display:
+          includeInTable: true
+        licenses:
+          - *license-hmd
+          - *license-wmd
+          - *license-xm_kk
+        sources:
+          - *source-hmd
+          - *source-wmd
+          - *source-xm_kk
+      time_unit:
+        title: Time unit
+        unit: ""
+        description: Denotes whether the “time” column values are weekly or monthly
+        display:
+          includeInTable: true
+        licenses:
+          - *license-hmd
+          - *license-wmd
+          - *license-xm_kk
+        sources:
+          - *source-hmd
+          - *source-wmd
+          - *source-xm_kk
