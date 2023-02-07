@@ -1,0 +1,66 @@
+all_sources:
+  - source_wmd: &source-wmd
+      name: Karlinsky and Kobak (2021)
+      published_by:
+        Karlinsky & Kobak 2021, Tracking excess mortality across countries
+        during the COVID-19 pandemic with the World Mortality Dataset, eLife https://doi.org/10.7554/eLife.69336
+      url: https://github.com/akarlinsky/world_mortality/
+      source_data_url: https://raw.githubusercontent.com/akarlinsky/world_mortality/main/world_mortality.csv
+      date_accessed: "2023-01-27"
+      publication_date: "2021-06-30"
+      publication_year: 2021
+
+all_licenses:
+  - license_wmd: &license-wmd
+      name: MIT License
+      url: https://github.com/akarlinsky/world_mortality/blob/main/LICENSE
+
+dataset:
+  namespace: excess_mortality
+  short_name: wmd
+  title: World Mortality Dataset
+  description: |-
+    World Mortality Dataset: international data on all-cause mortality.
+
+    This dataset contains country-level data on all-cause mortality in 2015–2022 collected from various sources. They are currently providing data for 122 countries and territories.
+
+    For a complete and up-to-date list of notes on the dataset, please refer to their GitHub page at https://github.com/akarlinsky/world_mortality/.
+
+    For the list of sources that they use, please go to https://github.com/akarlinsky/world_mortality/#sou rces.
+
+    Published paper available at https://elifesciences.org/articles/69336.
+  version: "2023-01-27"
+  licenses:
+    - *license-wmd
+  sources:
+    - *source-wmd
+
+tables:
+  wmd:
+    variables:
+      entity:
+        description: "Country, nation or region name."
+      time:
+        description: "Number of the month or week."
+      time_unit:
+        description: "Time unit can be either 'monthly' or 'weekly', depending on the country."
+      age:
+        description: "Age group. This is always 'all_ages' for this dataset."
+      _2015:
+        description: "The reported number of weekly deaths from all causes for all ages in 2015."
+      _2016:
+        description: "The reported number of weekly deaths from all causes for all ages in 2016."
+      _2017:
+        description: "The reported number of weekly deaths from all causes for all ages in 2017."
+      _2018:
+        description: "The reported number of weekly deaths from all causes for all ages in 2018."
+      _2019:
+        description: "The reported number of weekly deaths from all causes for all ages in 2019."
+      _2020:
+        description: "The reported number of weekly deaths from all causes for all ages in 2020."
+      _2021:
+        description: "The reported number of weekly deaths from all causes for all ages in 2021."
+      _2022:
+        description: "The reported number of weekly deaths from all causes for all ages in 2022."
+      _2023:
+        description: "The reported number of weekly deaths from all causes for all ages in 2023."
