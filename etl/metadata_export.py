@@ -51,6 +51,12 @@ def metadata_export(
     for license in ds_meta.get("licenses", []):
         _prune_empty(license)
 
+    # don't export metadata that is inferred from path
+    ds_meta.pop("namespace")
+    ds_meta.pop("short_name")
+    ds_meta.pop("version")
+    ds_meta.pop("channel", None)
+
     ds_meta.pop("is_public")
     ds_meta.pop("source_checksum")
     # move sources at the end

@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:57:13.605062
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_5684_greenhouse_gas_emissions_by_sector__cait__2022
   namespace: backport
-  publication_date: latest
   short_name: dataset_5684_greenhouse_gas_emissions_by_sector__cait__2022_config
+  file_extension: json
+  date_accessed: 2023-01-27 10:10:07.242358
+  name: Grapher metadata for dataset_5684_greenhouse_gas_emissions_by_sector__cait__2022
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5684
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 690626dd93eb06402b4e3d15fadad02d
-  size: 19227
+- md5: 3a85a8fbf005fd37432f171cf9de19e8
+  size: 19210
   path: dataset_5684_greenhouse_gas_emissions_by_sector__cait__2022_config.json

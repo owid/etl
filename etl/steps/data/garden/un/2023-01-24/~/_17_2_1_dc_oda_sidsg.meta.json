@@ -1,0 +1,55 @@
+{
+  "short_name": "_17_2_1_dc_oda_sidsg",
+  "dataset": {
+    "channel": "meadow",
+    "namespace": "un",
+    "short_name": "un_sdg",
+    "title": "United Nations Sustainable Development Goals (2023)",
+    "description": "",
+    "sources": [
+      {
+        "name": null,
+        "description": null,
+        "url": null,
+        "source_data_url": null,
+        "owid_data_url": null,
+        "date_accessed": null,
+        "publication_date": null,
+        "publication_year": null,
+        "published_by": null,
+        "publisher_source": null
+      }
+    ],
+    "licenses": [
+      {
+        "name": null,
+        "url": null
+      }
+    ],
+    "is_public": true,
+    "additional_info": null,
+    "version": "2023-01-30",
+    "source_checksum": "2c10778237673fe3b75e0d8a295e0c72"
+  },
+  "primary_key": [
+    "country",
+    "year",
+    "goal",
+    "target",
+    "indicator",
+    "seriescode"
+  ],
+  "fields": {
+    "country": {},
+    "year": {},
+    "goal": {},
+    "target": {},
+    "indicator": {},
+    "seriescode": {},
+    "seriesdescription": {},
+    "value": {},
+    "long_unit": {},
+    "short_unit": {},
+    "source": {}
+  }
+}

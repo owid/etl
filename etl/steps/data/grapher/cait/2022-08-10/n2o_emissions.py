@@ -1,5 +1,6 @@
 from owid import catalog
 
+from etl.helpers import PathFinder
 from etl.paths import DATA_DIR
 
 from .shared import GARDEN_DATASET_VERSION, NAMESPACE
@@ -10,6 +11,7 @@ TABLE_NAME = "nitrous_oxide_emissions_by_sector"
 GRAPHER_DATASET_TITLE = "Nitrous oxide emissions by sector (CAIT, 2022)"
 # Path to garden dataset to be loaded.
 DATASET_PATH = DATA_DIR / "garden" / NAMESPACE / GARDEN_DATASET_VERSION / "ghg_emissions_by_sector"
+N = PathFinder(__file__)
 
 
 def run(dest_dir: str) -> None:
@@ -20,7 +22,7 @@ def run(dest_dir: str) -> None:
     # Grapher seems to be taking the name from the dataset instead of the table.
     # Given that there are different tables in the same dataset, use the table title as the dataset title.
     dataset.metadata.title = GRAPHER_DATASET_TITLE
-    dataset.metadata.short_name = TABLE_NAME
+    dataset.metadata.short_name = N.short_name
     ####################################################################################################################
 
     dataset.save()

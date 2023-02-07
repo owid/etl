@@ -52,6 +52,7 @@ def run(dest_dir: str) -> None:
     #
     # Create a new meadow dataset and reuse snapshot metadata.
     ds = catalog.Dataset.create_empty(dest_dir, metadata=convert_snapshot_metadata(snap.metadata))
+    ds.metadata.version = "2023-01-04"
 
     # Add table to dataset and save dataset.
     ds.add(tb)

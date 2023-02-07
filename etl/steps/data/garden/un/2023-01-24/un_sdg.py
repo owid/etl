@@ -18,12 +18,10 @@ log = get_logger()
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
-paths.snapshot_dir
 
 
 def run(dest_dir: str) -> None:
     log.info("un_sdg.start")
-
     #
     # Load inputs.
     #
@@ -58,7 +56,6 @@ def run(dest_dir: str) -> None:
 
     ds_garden = Dataset.create_empty(dest_dir)
     ds_garden.metadata = ds_meadow.metadata
-
     for table in all_tables:
         log.info(
             "un_sdg.create_garden_table",
@@ -66,7 +63,7 @@ def run(dest_dir: str) -> None:
             series_code=table.index[0][5],
         )
 
-        tb_garden = Table(table)
+        tb_garden = Table(table, short_name=paths.short_name)
         tb_garden.metadata = tb_meadow.metadata
         short_name = tb_garden.index[0][4] + "_" + tb_garden.index[0][5]
         tb_garden.metadata.short_name = underscore(short_name)

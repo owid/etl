@@ -7,6 +7,7 @@ N = PathFinder(__file__)
 
 def run(dest_dir: str) -> None:
     dataset = catalog.Dataset.create_empty(dest_dir, N.garden_dataset.metadata)
+    dataset.metadata.namespace = "malnutrition"
 
     table = N.garden_dataset["malnutrition"]
     # optionally set additional dimensions
