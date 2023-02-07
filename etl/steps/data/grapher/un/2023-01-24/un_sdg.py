@@ -33,6 +33,7 @@ def run(dest_dir: str) -> None:
     clean_source_map = load_clean_source_mapping()
     for var in ds_garden.table_names:
         var_df = create_dataframe_with_variable_name(ds_garden, var)
+        var_df["source"] = clean_source_name(var_df["source"], clean_source_map)
         var_gr = var_df.groupby("variable_name")
         source_desc = load_source_description()
         for var_name, df_var in var_gr:
@@ -127,7 +128,7 @@ def add_metadata_and_prepare_for_grapher(df_gr: pd.DataFrame, ds_garden: Dataset
         title=df_gr["variable_name_meta"].iloc[0],
         description=source_desc_out,
         sources=[source],
-        unit=df_gr["long_unit"].iloc[0],
+        unit=df_gr["long_unit"].iloc[0].lower(),
         short_unit=df_gr["short_unit"].iloc[0],
         additional_info=None,
     )
