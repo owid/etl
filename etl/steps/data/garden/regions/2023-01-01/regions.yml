@@ -1,0 +1,2148 @@
+- code: "AFG"
+  name: "Afghanistan"
+  short_name: "Afghanistan"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "ALA"
+  name: "Aland Islands"
+  short_name: "Aland Islands"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  aliases: ['Ã\x81EEland Islands', 'Åland Islands']
+
+- code: "ALB"
+  name: "Albania"
+  short_name: "Albania"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "DZA"
+  name: "Algeria"
+  short_name: "Algeria"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "ASM"
+  name: "American Samoa"
+  short_name: "American Samoa"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "AND"
+  name: "Andorra"
+  short_name: "Andorra"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "AGO"
+  name: "Angola"
+  short_name: "Angola"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "AIA"
+  name: "Anguilla"
+  short_name: "Anguilla"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "ATG"
+  name: "Antigua and Barbuda"
+  short_name: "Antigua and Barbuda"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  aliases: ['Antigua & Barb.']
+
+- code: "ARG"
+  name: "Argentina"
+  short_name: "Argentina"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "ARM"
+  name: "Armenia"
+  short_name: "Armenia"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "ABW"
+  name: "Aruba"
+  short_name: "Aruba"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "AUS"
+  name: "Australia"
+  short_name: "Australia"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  aliases: ['Autralia']
+  members: ['CXR', 'HMD', 'NFK']
+
+- code: "AUT"
+  name: "Austria"
+  short_name: "Austria"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "OWID_AUH"
+  name: "Austria-Hungary"
+  short_name: "Austria-Hungary"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: True
+  end_year: 1918
+  successors: ['AUT', 'CHN', 'HUN', 'ITA', 'OWID_CZS', 'OWID_YGS', 'POL', 'ROU', 'UKR']
+
+- code: "AZE"
+  name: "Azerbaijan"
+  short_name: "Azerbaijan"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  members: ['OWID_NAG']
+
+- code: "BHS"
+  name: "Bahamas"
+  short_name: "Bahamas"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  aliases: ['Bahamas (the)', 'Bahamas, The', 'The Bahamas']
+
+- code: "BHR"
+  name: "Bahrain"
+  short_name: "Bahrain"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "BGD"
+  name: "Bangladesh"
+  short_name: "Bangladesh"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "BRB"
+  name: "Barbados"
+  short_name: "Barbados"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "BLR"
+  name: "Belarus"
+  short_name: "Belarus"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "BEL"
+  name: "Belgium"
+  short_name: "Belgium"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "BLZ"
+  name: "Belize"
+  short_name: "Belize"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "BEN"
+  name: "Benin"
+  short_name: "Benin"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "BMU"
+  name: "Bermuda"
+  short_name: "Bermuda"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "BTN"
+  name: "Bhutan"
+  short_name: "Bhutan"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "BOL"
+  name: "Bolivia"
+  short_name: "Bolivia"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  aliases: ['Bolivia (Plurinational State of)', 'Bolivia, Plurinational State Of']
+
+- code: "BES"
+  name: "Bonaire Sint Eustatius and Saba"
+  short_name: "Bonaire Sint Eustatius and Saba"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  aliases: ['BES Islands', 'Bonaire, Saint Eustatius And Saba', 'Bonaire, Sint Eustatius and Saba']
+
+- code: "BIH"
+  name: "Bosnia and Herzegovina"
+  short_name: "Bosnia and Herzegovina"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  aliases: ['Bosnia Herzegovina', 'Bsnia.&Hrzgvna.']
+
+- code: "BWA"
+  name: "Botswana"
+  short_name: "Botswana"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "BVT"
+  name: "Bouvet Island"
+  short_name: "Bouvet Island"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "BRA"
+  name: "Brazil"
+  short_name: "Brazil"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "IOT"
+  name: "British Indian Ocean Territory"
+  short_name: "British Indian Ocean Territory"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "VGB"
+  name: "British Virgin Islands"
+  short_name: "British Virgin Islands"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  aliases: ['Br.Virgin Is.', 'Virgin Islands (British)', 'Virgin Islands, British']
+
+- code: "BRN"
+  name: "Brunei"
+  short_name: "Brunei"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  aliases: ['Brunei Darussalam']
+
+- code: "BGR"
+  name: "Bulgaria"
+  short_name: "Bulgaria"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "BFA"
+  name: "Burkina Faso"
+  short_name: "Burkina Faso"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "BDI"
+  name: "Burundi"
+  short_name: "Burundi"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "KHM"
+  name: "Cambodia"
+  short_name: "Cambodia"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "CMR"
+  name: "Cameroon"
+  short_name: "Cameroon"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "CAN"
+  name: "Canada"
+  short_name: "Canada"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "CPV"
+  name: "Cape Verde"
+  short_name: "Cape Verde"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  aliases: ['Cabo Verde']
+
+- code: "OWID_NLC"
+  name: "Caribbean Netherlands"
+  short_name: "Caribbean Netherlands"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "CYM"
+  name: "Cayman Islands"
+  short_name: "Cayman Islands"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  aliases: ['Cayman Islands (the)']
+
+- code: "CAF"
+  name: "Central African Republic"
+  short_name: "Central African Republic"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  aliases: ['Central African Rep.', 'Central African Republic (the)']
+
+- code: "TCD"
+  name: "Chad"
+  short_name: "Chad"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "OWID_CIS"
+  name: "Channel Islands"
+  short_name: "Channel Islands"
+  region_type: "aggregate"
+  defined_by: "owid"
+  is_historical: False
+  members: ['GGY', 'JEY']
+
+- code: "CHL"
+  name: "Chile"
+  short_name: "Chile"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "CHN"
+  name: "China"
+  short_name: "China"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  aliases: ['China, mainland']
+  members: ['HKG', 'MAC']
+
+- code: "CXR"
+  name: "Christmas Island"
+  short_name: "Christmas Island"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  aliases: ['Christmas Isl.']
+
+- code: "CCK"
+  name: "Cocos Islands"
+  short_name: "Cocos Islands"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  aliases: ['Cocos (Keeling) Isl.', 'Cocos (Keeling) Islands']
+
+- code: "COL"
+  name: "Colombia"
+  short_name: "Colombia"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "COM"
+  name: "Comoros"
+  short_name: "Comoros"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  aliases: ['Comoros (the)']
+
+- code: "COG"
+  name: "Congo"
+  short_name: "Congo"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  aliases: ['Congo (the)', 'Congo, Rep.', 'Congo-Brazzaville', 'Republic of Congo']
+
+- code: "COK"
+  name: "Cook Islands"
+  short_name: "Cook Islands"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  aliases: ['Cook Islands (the)']
+
+- code: "CRI"
+  name: "Costa Rica"
+  short_name: "Costa Rica"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "CIV"
+  name: "Cote d'Ivoire"
+  short_name: "Cote d'Ivoire"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  aliases: ["CÃ´te D'Ivoire", "Côte d'Ivoire", 'Côte d’Ivoire', 'Ivory Coast']
+
+- code: "HRV"
+  name: "Croatia"
+  short_name: "Croatia"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "CUB"
+  name: "Cuba"
+  short_name: "Cuba"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "CUW"
+  name: "Curacao"
+  short_name: "Curacao"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  aliases: ['CuraÃ§ao', 'Curaçao']
+
+- code: "CYP"
+  name: "Cyprus"
+  short_name: "Cyprus"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  members: ['OWID_CYN']
+
+- code: "CZE"
+  name: "Czechia"
+  short_name: "Czechia"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  aliases: ['Czech Rep.', 'Czech Republic']
+
+- code: "OWID_CZS"
+  name: "Czechoslovakia"
+  short_name: "Czechoslovakia"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: True
+  aliases: ['Former Czechoslovakia']
+  end_year: 1992
+  successors: ['CZE', 'SVK']
+
+- code: "COD"
+  name: "Democratic Republic of Congo"
+  short_name: "DR Congo"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  aliases: ['Congo (the Democratic Republic of the)', 'Congo, Dem. Rep.', 'Congo, The Democratic Republic Of The', 'Congo-Kinshasa', 'D.R. of the Congo', 'Democratic Republic of the Congo', 'Zaire/ Congo , Dem. Rep.']
+
+- code: "DNK"
+  name: "Denmark"
+  short_name: "Denmark"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  members: ['FRO']
+
+- code: "DJI"
+  name: "Djibouti"
+  short_name: "Djibouti"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "DMA"
+  name: "Dominica"
+  short_name: "Dominica"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "DOM"
+  name: "Dominican Republic"
+  short_name: "Dominican Republic"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  aliases: ['Dominican Rep.', 'Dominican Republic (the)']
+
+- code: "OWID_GDR"
+  name: "East Germany"
+  short_name: "East Germany"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: True
+  aliases: ['Germany, East']
+  end_year: 1990
+  successors: ['DEU']
+
+- code: "ECU"
+  name: "Ecuador"
+  short_name: "Ecuador"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "EGY"
+  name: "Egypt"
+  short_name: "Egypt"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  aliases: ['Egypt, Arab Rep.']
+
+- code: "SLV"
+  name: "El Salvador"
+  short_name: "El Salvador"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "GNQ"
+  name: "Equatorial Guinea"
+  short_name: "Equatorial Guinea"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  aliases: ['Eq. Guinea']
+
+- code: "ERI"
+  name: "Eritrea"
+  short_name: "Eritrea"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "EST"
+  name: "Estonia"
+  short_name: "Estonia"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "SWZ"
+  name: "Eswatini"
+  short_name: "Eswatini"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  aliases: ['Swaziland']
+
+- code: "ETH"
+  name: "Ethiopia"
+  short_name: "Ethiopia"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "FRO"
+  name: "Faeroe Islands"
+  short_name: "Faeroe Islands"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  aliases: ['Faroe Islands', 'Faroe Islands (the)']
+
+- code: "FLK"
+  name: "Falkland Islands"
+  short_name: "Falkland Islands"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  aliases: ['Falkland Is.', 'Falkland Islands (Malvinas)', 'Falkland Islands (the) [Malvinas]']
+
+- code: "FJI"
+  name: "Fiji"
+  short_name: "Fiji"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "FIN"
+  name: "Finland"
+  short_name: "Finland"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  members: ['ALA']
+
+- code: "FRA"
+  name: "France"
+  short_name: "France"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  members: ['ATF', 'BLM', 'GLP', 'GUF', 'MAF', 'MTQ', 'MYT', 'NCL', 'PYF', 'REU', 'SPM', 'WLF']
+
+- code: "GUF"
+  name: "French Guiana"
+  short_name: "French Guiana"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  aliases: ['French Guyana']
+
+- code: "PYF"
+  name: "French Polynesia"
+  short_name: "French Polynesia"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "ATF"
+  name: "French Southern Territories"
+  short_name: "French Southern Territories"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "GAB"
+  name: "Gabon"
+  short_name: "Gabon"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "GMB"
+  name: "Gambia"
+  short_name: "Gambia"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  aliases: ['Gambia (the)', 'Gambia, The']
+
+- code: "GEO"
+  name: "Georgia"
+  short_name: "Georgia"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  members: ['OWID_ABK', 'OWID_SOS']
+
+- code: "DEU"
+  name: "Germany"
+  short_name: "Germany"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "GHA"
+  name: "Ghana"
+  short_name: "Ghana"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "GIB"
+  name: "Gibraltar"
+  short_name: "Gibraltar"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "GRC"
+  name: "Greece"
+  short_name: "Greece"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "GRL"
+  name: "Greenland"
+  short_name: "Greenland"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "GRD"
+  name: "Grenada"
+  short_name: "Grenada"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "GLP"
+  name: "Guadeloupe"
+  short_name: "Guadeloupe"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  aliases: ['Guadaloupe']
+
+- code: "GUM"
+  name: "Guam"
+  short_name: "Guam"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "GTM"
+  name: "Guatemala"
+  short_name: "Guatemala"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "GGY"
+  name: "Guernsey"
+  short_name: "Guernsey"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "GIN"
+  name: "Guinea"
+  short_name: "Guinea"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "GNB"
+  name: "Guinea-Bissau"
+  short_name: "Guinea-Bissau"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "GUY"
+  name: "Guyana"
+  short_name: "Guyana"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "HTI"
+  name: "Haiti"
+  short_name: "Haiti"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "HMD"
+  name: "Heard Island and McDonald Islands"
+  short_name: "Heard Island and McDonald Islands"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  aliases: ['Heard and McDonald Isl.', 'Heard and McDonald Islands']
+
+- code: "HND"
+  name: "Honduras"
+  short_name: "Honduras"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "HKG"
+  name: "Hong Kong"
+  short_name: "Hong Kong"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  aliases: ['China Hong Kong SAR', 'China, Hong Kong SAR', 'Hong Kong SAR, China', 'Hong Kong Special Administrative Region (China)', 'Hong Kong, China', 'Hong Kong SAR']
+
+- code: "HUN"
+  name: "Hungary"
+  short_name: "Hungary"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "ISL"
+  name: "Iceland"
+  short_name: "Iceland"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "IND"
+  name: "India"
+  short_name: "India"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "IDN"
+  name: "Indonesia"
+  short_name: "Indonesia"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "IRN"
+  name: "Iran"
+  short_name: "Iran"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  aliases: ['Iran (Islamic Republic of)', 'Iran, Isl.Rep.of', 'Iran, Islamic Rep.', 'Iran, Islamic Republic Of']
+
+- code: "IRQ"
+  name: "Iraq"
+  short_name: "Iraq"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "IRL"
+  name: "Ireland"
+  short_name: "Ireland"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "IMN"
+  name: "Isle of Man"
+  short_name: "Isle of Man"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "ISR"
+  name: "Israel"
+  short_name: "Israel"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "ITA"
+  name: "Italy"
+  short_name: "Italy"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "JAM"
+  name: "Jamaica"
+  short_name: "Jamaica"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "JPN"
+  name: "Japan"
+  short_name: "Japan"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "JEY"
+  name: "Jersey"
+  short_name: "Jersey"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "JOR"
+  name: "Jordan"
+  short_name: "Jordan"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "KAZ"
+  name: "Kazakhstan"
+  short_name: "Kazakhstan"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "KEN"
+  name: "Kenya"
+  short_name: "Kenya"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "KIR"
+  name: "Kiribati"
+  short_name: "Kiribati"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "OWID_KOS"
+  name: "Kosovo"
+  short_name: "Kosovo"
+  region_type: "contested"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "KWT"
+  name: "Kuwait"
+  short_name: "Kuwait"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "KGZ"
+  name: "Kyrgyzstan"
+  short_name: "Kyrgyzstan"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  aliases: ['Kyrgyz Republic']
+
+- code: "LAO"
+  name: "Laos"
+  short_name: "Laos"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  aliases: ['Lao', 'Lao PDR', "Lao People's DR", "Lao People's Democratic Republic", "Lao People's Democratic Republic (the)"]
+
+- code: "LVA"
+  name: "Latvia"
+  short_name: "Latvia"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "LBN"
+  name: "Lebanon"
+  short_name: "Lebanon"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "LSO"
+  name: "Lesotho"
+  short_name: "Lesotho"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "LBR"
+  name: "Liberia"
+  short_name: "Liberia"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "LBY"
+  name: "Libya"
+  short_name: "Libya"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  aliases: ['Libyan A.J.']
+
+- code: "LIE"
+  name: "Liechtenstein"
+  short_name: "Liechtenstein"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "LTU"
+  name: "Lithuania"
+  short_name: "Lithuania"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "LUX"
+  name: "Luxembourg"
+  short_name: "Luxembourg"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "MAC"
+  name: "Macao"
+  short_name: "Macao"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  aliases: ['China, Macao SAR', 'Macao SAR, China', 'Macao Special Administrative Region (China)', 'Macau']
+
+- code: "MDG"
+  name: "Madagascar"
+  short_name: "Madagascar"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "MWI"
+  name: "Malawi"
+  short_name: "Malawi"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "MYS"
+  name: "Malaysia"
+  short_name: "Malaysia"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "MDV"
+  name: "Maldives"
+  short_name: "Maldives"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "MLI"
+  name: "Mali"
+  short_name: "Mali"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "MLT"
+  name: "Malta"
+  short_name: "Malta"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "MHL"
+  name: "Marshall Islands"
+  short_name: "Marshall Islands"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "MTQ"
+  name: "Martinique"
+  short_name: "Martinique"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "MRT"
+  name: "Mauritania"
+  short_name: "Mauritania"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "MUS"
+  name: "Mauritius"
+  short_name: "Mauritius"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "MYT"
+  name: "Mayotte"
+  short_name: "Mayotte"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "OWID_MNS"
+  name: "Melanesia"
+  short_name: "Melanesia"
+  region_type: "aggregate"
+  defined_by: "owid"
+  is_historical: False
+  members: ['FJI', 'PNG', 'SLB', 'VUT']
+
+- code: "MEX"
+  name: "Mexico"
+  short_name: "Mexico"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "FSM"
+  name: "Micronesia (country)"
+  short_name: "Micronesia (country)"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  aliases: ['Micronesia', 'Micronesia (Fed. States of)', 'Micronesia (Federated States of)', 'Micronesia, Fed. Sts.']
+
+- code: "MDA"
+  name: "Moldova"
+  short_name: "Moldova"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  aliases: ['Rep. of Moldova', 'Republic of Moldova']
+  members: ['OWID_TRS']
+
+- code: "MCO"
+  name: "Monaco"
+  short_name: "Monaco"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "MNG"
+  name: "Mongolia"
+  short_name: "Mongolia"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "MNE"
+  name: "Montenegro"
+  short_name: "Montenegro"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "MSR"
+  name: "Montserrat"
+  short_name: "Montserrat"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "MAR"
+  name: "Morocco"
+  short_name: "Morocco"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  members: ['ESH']
+
+- code: "MOZ"
+  name: "Mozambique"
+  short_name: "Mozambique"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "MMR"
+  name: "Myanmar"
+  short_name: "Myanmar"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  aliases: ['Burma']
+
+- code: "NAM"
+  name: "Namibia"
+  short_name: "Namibia"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "NRU"
+  name: "Nauru"
+  short_name: "Nauru"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "NPL"
+  name: "Nepal"
+  short_name: "Nepal"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "NLD"
+  name: "Netherlands"
+  short_name: "Netherlands"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  members: ['ABW', 'CUW', 'SXM']
+
+- code: "ANT"
+  name: "Netherlands Antilles"
+  short_name: "Netherlands Antilles"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: True
+  aliases: ['Neth.Antilles', 'Netherlands Antilles (former)']
+  end_year: 2010
+  successors: ['ABW', 'BES', 'CUW', 'SXM']
+
+- code: "NCL"
+  name: "New Caledonia"
+  short_name: "New Caledonia"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "NZL"
+  name: "New Zealand"
+  short_name: "New Zealand"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  members: ['TKL']
+
+- code: "NIC"
+  name: "Nicaragua"
+  short_name: "Nicaragua"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "NER"
+  name: "Niger"
+  short_name: "Niger"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  aliases: ['Niger (the)']
+
+- code: "NGA"
+  name: "Nigeria"
+  short_name: "Nigeria"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "NIU"
+  name: "Niue"
+  short_name: "Niue"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "NFK"
+  name: "Norfolk Island"
+  short_name: "Norfolk Island"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  aliases: ['Norfolk Isl.']
+
+- code: "PRK"
+  name: "North Korea"
+  short_name: "North Korea"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  aliases: ['D.P.R. of Korea', 'Dem.Rep.,Korea', "Democratic People's Republic of Korea", "Korea (the Democratic People's Republic of)", "Korea, Dem. People's Rep."]
+
+- code: "MKD"
+  name: "North Macedonia"
+  short_name: "North Macedonia"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  aliases: ['Macedonia', 'Macedonia, FYR', 'Macedonia, The Former Yugoslav Republic Of', 'TFYR Macedonia', 'TFYR of Macedonia']
+
+- code: "OWID_CYN"
+  name: "Northern Cyprus"
+  short_name: "Northern Cyprus"
+  region_type: "contested"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "MNP"
+  name: "Northern Mariana Islands"
+  short_name: "Northern Mariana Islands"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  aliases: ['Northern Mariana']
+
+- code: "NOR"
+  name: "Norway"
+  short_name: "Norway"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  members: ['BVT', 'SJM']
+
+- code: "OMN"
+  name: "Oman"
+  short_name: "Oman"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "PAK"
+  name: "Pakistan"
+  short_name: "Pakistan"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "PLW"
+  name: "Palau"
+  short_name: "Palau"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  aliases: ['Pacific Islands (Palau)']
+
+- code: "PSE"
+  name: "Palestine"
+  short_name: "Palestine"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  aliases: ['Occupied Palestinian Terr.', 'Occupied Palestinian Territory', 'Palestine, State of', 'Palestinian Territories', 'State of Palestine', 'West Bank and Gaza']
+  members: ['PS_GZA']
+
+- code: "PS_GZA"
+  name: "Gaza Strip"
+  short_name: "Gaza Strip"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "PAN"
+  name: "Panama"
+  short_name: "Panama"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "PNG"
+  name: "Papua New Guinea"
+  short_name: "Papua New Guinea"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "PRY"
+  name: "Paraguay"
+  short_name: "Paraguay"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "PER"
+  name: "Peru"
+  short_name: "Peru"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "PHL"
+  name: "Philippines"
+  short_name: "Philippines"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  aliases: ['Philippines (the)']
+
+- code: "PCN"
+  name: "Pitcairn"
+  short_name: "Pitcairn"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "POL"
+  name: "Poland"
+  short_name: "Poland"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "OWID_PYA"
+  name: "Polynesia"
+  short_name: "Polynesia"
+  region_type: "aggregate"
+  defined_by: "owid"
+  is_historical: False
+  members: ['ASM', 'COK', 'NFK', 'NIU', 'NZL', 'PCN', 'PYF', 'TKL', 'TON', 'TUV', 'WLF', 'WSM']
+
+- code: "PRT"
+  name: "Portugal"
+  short_name: "Portugal"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "PRI"
+  name: "Puerto Rico"
+  short_name: "Puerto Rico"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "QAT"
+  name: "Qatar"
+  short_name: "Qatar"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "OWID_RVN"
+  name: "Republic of Vietnam"
+  short_name: "Republic of Vietnam"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: True
+  end_year: 1975
+  successors: ['VNM']
+
+- code: "REU"
+  name: "Reunion"
+  short_name: "Reunion"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  aliases: ['Réunion']
+
+- code: "ROU"
+  name: "Romania"
+  short_name: "Romania"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "RUS"
+  name: "Russia"
+  short_name: "Russia"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  aliases: ['Russian Fed.', 'Russian Federation', 'Russian Federation (the)']
+
+- code: "RWA"
+  name: "Rwanda"
+  short_name: "Rwanda"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "BLM"
+  name: "Saint Barthelemy"
+  short_name: "Saint Barthelemy"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  aliases: ['Saint Barthlemy', 'Saint Barthélemy', 'St Barth']
+
+- code: "SHN"
+  name: "Saint Helena"
+  short_name: "Saint Helena"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  aliases: ['Saint Helena, Ascension and Tristan da Cunha', 'St. Helena']
+
+- code: "KNA"
+  name: "Saint Kitts and Nevis"
+  short_name: "Saint Kitts and Nevis"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  aliases: ['St. Kitts and Nevis', 'St.Kitts & Nevis']
+
+- code: "LCA"
+  name: "Saint Lucia"
+  short_name: "Saint Lucia"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  aliases: ['St. Lucia']
+
+- code: "MAF"
+  name: "Saint Martin (French part)"
+  short_name: "Saint Martin (French part)"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  aliases: ['Saint-Martin (French part)', 'St. Martin (French part)']
+
+- code: "SPM"
+  name: "Saint Pierre and Miquelon"
+  short_name: "Saint Pierre and Miquelon"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  aliases: ['St.Pierre & Miq.']
+
+- code: "VCT"
+  name: "Saint Vincent and the Grenadines"
+  short_name: "Saint Vincent and the Grenadines"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  aliases: ['Saint Vincent/Grenadines', 'St. Vincent and the Grenadines', 'St.Vin. & Gren.']
+
+- code: "WSM"
+  name: "Samoa"
+  short_name: "Samoa"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "SMR"
+  name: "San Marino"
+  short_name: "San Marino"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "STP"
+  name: "Sao Tome and Principe"
+  short_name: "Sao Tome and Principe"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  aliases: ['Sao Tome & Pr.']
+
+- code: "SAU"
+  name: "Saudi Arabia"
+  short_name: "Saudi Arabia"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "SEN"
+  name: "Senegal"
+  short_name: "Senegal"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "SRB"
+  name: "Serbia"
+  short_name: "Serbia"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "SYC"
+  name: "Seychelles"
+  short_name: "Seychelles"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "SLE"
+  name: "Sierra Leone"
+  short_name: "Sierra Leone"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "SGP"
+  name: "Singapore"
+  short_name: "Singapore"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "SXM"
+  name: "Sint Maarten (Dutch part)"
+  short_name: "Sint Maarten (Dutch part)"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "SVK"
+  name: "Slovakia"
+  short_name: "Slovakia"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  aliases: ['Slovak Republic']
+
+- code: "SVN"
+  name: "Slovenia"
+  short_name: "Slovenia"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "SLB"
+  name: "Solomon Islands"
+  short_name: "Solomon Islands"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "SOM"
+  name: "Somalia"
+  short_name: "Somalia"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  members: ['OWID_SML']
+
+- code: "ZAF"
+  name: "South Africa"
+  short_name: "South Africa"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "SGS"
+  name: "South Georgia and the South Sandwich Islands"
+  short_name: "South Georgia and the South Sandwich Islands"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "KOR"
+  name: "South Korea"
+  short_name: "South Korea"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  aliases: ['Korea, Rep.', 'Korea, Republic Of', 'Republic of Korea']
+
+- code: "SSD"
+  name: "South Sudan"
+  short_name: "South Sudan"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "ESP"
+  name: "Spain"
+  short_name: "Spain"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "LKA"
+  name: "Sri Lanka"
+  short_name: "Sri Lanka"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "SDN"
+  name: "Sudan"
+  short_name: "Sudan"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  aliases: ['Sudan (the)']
+
+- code: "OWID_SDN"
+  name: "Sudan (former)"
+  short_name: "Sudan (former)"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: True
+  end_year: 2011
+  successors: ['SDN', 'SSD']
+
+- code: "SUR"
+  name: "Suriname"
+  short_name: "Suriname"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "SJM"
+  name: "Svalbard and Jan Mayen"
+  short_name: "Svalbard and Jan Mayen"
+  region_type: "aggregate"
+  defined_by: "owid"
+  is_historical: False
+  aliases: ['Svalbard & Jan Mayen Isl.', 'Svalbard and Jan Mayen Islands']
+
+- code: "SWE"
+  name: "Sweden"
+  short_name: "Sweden"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "CHE"
+  name: "Switzerland"
+  short_name: "Switzerland"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "SYR"
+  name: "Syria"
+  short_name: "Syria"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  aliases: ['Syrian Arab Rep.', 'Syrian Arab Republic', 'Syrian Arab Republic (the)']
+
+- code: "TWN"
+  name: "Taiwan"
+  short_name: "Taiwan"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  aliases: ['China, Taiwan Province of', 'Chinese Taipei', 'Taiwan (Province of China)', 'Taiwan, Province Of China']
+
+- code: "TJK"
+  name: "Tajikistan"
+  short_name: "Tajikistan"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "TZA"
+  name: "Tanzania"
+  short_name: "Tanzania"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  aliases: ['Tanzania, United Republic Of', 'Tanzania, the United Republic of', 'U.R. Tanzania', 'U.R. of Tanzania: Mainland', 'United Republic of Tanzania']
+  members: ['OWID_ZAN']
+
+- code: "THA"
+  name: "Thailand"
+  short_name: "Thailand"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "TLS"
+  name: "East Timor"
+  short_name: "East Timor"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  aliases: ['East Timor', 'Timor-Leste']
+
+- code: "TGO"
+  name: "Togo"
+  short_name: "Togo"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "TKL"
+  name: "Tokelau"
+  short_name: "Tokelau"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "TON"
+  name: "Tonga"
+  short_name: "Tonga"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "TTO"
+  name: "Trinidad and Tobago"
+  short_name: "Trinidad and Tobago"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  aliases: ['Trin. & Tobago', 'Trinidad & Tobago']
+
+- code: "TUN"
+  name: "Tunisia"
+  short_name: "Tunisia"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "TUR"
+  name: "Turkey"
+  short_name: "Turkey"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "TKM"
+  name: "Turkmenistan"
+  short_name: "Turkmenistan"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "TCA"
+  name: "Turks and Caicos Islands"
+  short_name: "Turks and Caicos Islands"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  aliases: ['Turks & Caicos', 'Turks and Caicos Islands (the)']
+
+- code: "TUV"
+  name: "Tuvalu"
+  short_name: "Tuvalu"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "UGA"
+  name: "Uganda"
+  short_name: "Uganda"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "UKR"
+  name: "Ukraine"
+  short_name: "Ukraine"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "ARE"
+  name: "United Arab Emirates"
+  short_name: "United Arab Emirates"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  aliases: ['U.Arab Emirates', 'United Arab Em']
+
+- code: "GBR"
+  name: "United Kingdom"
+  short_name: "United Kingdom"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  aliases: ['UK', 'United Kingdom of Great Britain and Northern Ireland']
+  members: ['AIA', 'BMU', 'CYM', 'FLK', 'GGY', 'GIB', 'IMN', 'IOT', 'JEY', 'MSR', 'OWID_AKD', 'PCN', 'SGS', 'SHN', 'TCA', 'VGB']
+
+- code: "USA"
+  name: "United States"
+  short_name: "United States"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  aliases: ['US', 'USA', 'United States of America']
+  members: ['ASM', 'GUM', 'MNP', 'PRI', 'UMI', 'VIR']
+
+- code: "UMI"
+  name: "United States Minor Outlying Islands"
+  short_name: "United States Minor Outlying Islands"
+  region_type: "aggregate"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "VIR"
+  name: "United States Virgin Islands"
+  short_name: "United States Virgin Islands"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  aliases: ['U.S. Virgin Is.', 'U.S. Virgin Islands', 'Virgin Islands (U.S.)', 'Virgin Islands, U.S.']
+
+- code: "URY"
+  name: "Uruguay"
+  short_name: "Uruguay"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "UZB"
+  name: "Uzbekistan"
+  short_name: "Uzbekistan"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "VUT"
+  name: "Vanuatu"
+  short_name: "Vanuatu"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "VAT"
+  name: "Vatican"
+  short_name: "Vatican"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  aliases: ['Holy See']
+
+- code: "VEN"
+  name: "Venezuela"
+  short_name: "Venezuela"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  aliases: ['Venezuela (Bolivarian Republic of)', 'Venezuela, Bolivarian Republic Of', 'Venezuela, RB']
+
+- code: "VNM"
+  name: "Vietnam"
+  short_name: "Vietnam"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  aliases: ['Viet Nam']
+
+- code: "WLF"
+  name: "Wallis and Futuna"
+  short_name: "Wallis and Futuna"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  aliases: ['Wallis & Futuna', 'Wallis and Futuna Islands']
+
+- code: "OWID_GFR"
+  name: "West Germany"
+  short_name: "West Germany"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: True
+  aliases: ['Germany, West']
+  end_year: 1990
+  successors: ['DEU']
+
+- code: "ESH"
+  name: "Western Sahara"
+  short_name: "Western Sahara"
+  region_type: "contested"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "OWID_WRL"
+  name: "World"
+  short_name: "World"
+  region_type: "aggregate"
+  defined_by: "owid"
+  is_historical: False
+  aliases: ['Global']
+  members: ['OWID_NAM', 'OWID_ASI', 'OWID_AFR', 'OWID_EUR', 'OWID_SAM', 'OWID_OCE', 'ATA']
+
+- code: "YEM"
+  name: "Yemen"
+  short_name: "Yemen"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+  aliases: ['Yemen, Rep.']
+
+- code: "OWID_YAR"
+  name: "Yemen Arab Republic"
+  short_name: "Yemen Arab Republic"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: True
+  end_year: 1990
+  successors: ['YEM']
+
+- code: "OWID_YPR"
+  name: "Yemen People's Republic"
+  short_name: "Yemen People's Republic"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: True
+  end_year: 1990
+  successors: ['YEM']
+
+- code: "ZMB"
+  name: "Zambia"
+  short_name: "Zambia"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "OWID_ZAN"
+  name: "Zanzibar"
+  short_name: "Zanzibar"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "ZWE"
+  name: "Zimbabwe"
+  short_name: "Zimbabwe"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "OWID_ABK"
+  name: "Abkhazia"
+  short_name: "Abkhazia"
+  region_type: "contested"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "OWID_AKD"
+  name: "Akrotiri and Dhekelia"
+  short_name: "Akrotiri and Dhekelia"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "OWID_ERE"
+  name: "Eritrea and Ethiopia"
+  short_name: "Eritrea and Ethiopia"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: True
+  aliases: ['Ethiopia PDR']
+  end_year: 1993
+  successors: ['ERI', 'ETH']
+
+- code: "OWID_NAG"
+  name: "Nagorno-Karabakh"
+  short_name: "Nagorno-Karabakh"
+  region_type: "contested"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "OWID_SRM"
+  name: "Serbia and Montenegro"
+  short_name: "Serbia and Montenegro"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: True
+  aliases: ['Former Serbia and Montenegro']
+  end_year: 2006
+  successors: ['MNE', 'SRB']
+
+- code: "OWID_SEK"
+  name: "Serbia excluding Kosovo"
+  short_name: "Serbia excluding Kosovo"
+  region_type: "aggregate"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "OWID_SML"
+  name: "Somaliland"
+  short_name: "Somaliland"
+  region_type: "contested"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "OWID_SOS"
+  name: "South Ossetia"
+  short_name: "South Ossetia"
+  region_type: "contested"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "OWID_TRS"
+  name: "Transnistria"
+  short_name: "Transnistria"
+  region_type: "contested"
+  defined_by: "owid"
+  is_historical: False
+
+- code: "OWID_USS"
+  name: "USSR"
+  short_name: "USSR"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: True
+  aliases: ['Former U.S.S.R.', 'Former USSR', 'Soviet Union']
+  end_year: 1991
+  successors: ['ARM', 'AZE', 'BLR', 'EST', 'GEO', 'KAZ', 'KGZ', 'LTU', 'LVA', 'MDA', 'RUS', 'TJK', 'TKM', 'UKR', 'UZB']
+
+- code: "OWID_KRU"
+  name: "United Korea"
+  short_name: "United Korea"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: True
+  end_year: 1948
+  successors: ['KOR', 'PRK']
+
+- code: "OWID_YGS"
+  name: "Yugoslavia"
+  short_name: "Yugoslavia"
+  region_type: "country"
+  defined_by: "owid"
+  is_historical: True
+  aliases: ['Former Yugoslavia', 'Yugoslav SFR']
+  end_year: 1992
+  successors: ['BIH', 'HRV', 'MKD', 'MNE', 'OWID_KOS', 'SRB', 'SVN']
+
+- code: "OWID_AFR"
+  name: "Africa"
+  short_name: "Africa"
+  region_type: "continent"
+  defined_by: "owid"
+  is_historical: False
+  members: ['DZA', 'AGO', 'BEN', 'BWA', 'BFA', 'BDI', 'CMR', 'CPV', 'CAF', 'TCD', 'COM', 'COG', 'CIV', 'COD', 'DJI', 'EGY', 'GNQ', 'ERI', 'SWZ', 'ETH', 'GAB', 'GMB', 'GHA', 'GIN', 'GNB', 'KEN', 'LSO', 'LBR', 'LBY', 'MDG', 'MWI', 'MLI', 'MRT', 'MUS', 'MYT', 'MAR', 'MOZ', 'NAM', 'NER', 'NGA', 'REU', 'RWA', 'SHN', 'STP', 'SEN', 'SYC', 'SLE', 'SOM', 'ZAF', 'SSD', 'SDN', 'TZA', 'TGO', 'TUN', 'UGA', 'ESH', 'ZMB', 'OWID_ZAN', 'ZWE', 'OWID_ERE', 'OWID_SML']
+
+- code: "OWID_ASI"
+  name: "Asia"
+  short_name: "Asia"
+  region_type: "continent"
+  defined_by: "owid"
+  is_historical: False
+  members: ['AFG', 'ARM', 'AZE', 'BHR', 'BGD', 'BTN', 'IOT', 'BRN', 'KHM', 'CHN', 'CXR', 'CCK', 'GEO', 'HKG', 'IND', 'IDN', 'IRN', 'IRQ', 'ISR', 'JPN', 'JOR', 'KAZ', 'KWT', 'KGZ', 'LAO', 'LBN', 'MAC', 'MYS', 'MDV', 'MNG', 'MMR', 'NPL', 'PRK', 'OMN', 'PAK', 'PSE', 'PHL', 'QAT', 'OWID_RVN', 'SAU', 'SGP', 'KOR', 'LKA', 'SYR', 'TWN', 'TJK', 'THA', 'TLS', 'TKM', 'ARE', 'UZB', 'VNM', 'YEM', 'OWID_YAR', 'OWID_YPR', 'TUR', 'OWID_CYN', 'OWID_KRU', 'OWID_NAG', 'OWID_AKD', 'OWID_CYN', 'OWID_SOS', 'OWID_ABK']
+
+- code: "OWID_EUR"
+  name: "Europe"
+  short_name: "Europe"
+  region_type: "continent"
+  defined_by: "owid"
+  is_historical: False
+  members: ['ALA', 'ALB', 'AND', 'AUT', 'OWID_AUH', 'OWID_BAD', 'OWID_BAV', 'BLR', 'BEL', 'BIH', 'BGR', 'OWID_CIS', 'HRV', 'CZE', 'OWID_CZS', 'DNK', 'OWID_GDR', 'EST', 'FRO', 'FIN', 'FRA', 'DEU', 'GIB', 'GRC', 'GGY', 'OWID_HAN', 'OWID_HSE', 'OWID_HSG', 'HUN', 'ISL', 'IRL', 'IMN', 'ITA', 'JEY', 'OWID_KOS', 'LVA', 'LIE', 'LTU', 'LUX', 'MLT', 'OWID_MEC', 'OWID_MOD', 'MDA', 'MCO', 'MNE', 'NLD', 'MKD', 'NOR', 'OWID_PMA', 'POL', 'PRT', 'ROU', 'RUS', 'SMR', 'OWID_SAX', 'SRB', 'SVK', 'SVN', 'ESP', 'SJM', 'SWE', 'CHE', 'OWID_TUS', 'OWID_SIC', 'UKR', 'GBR', 'VAT', 'OWID_GFR', 'OWID_WRT', 'CYP', 'OWID_USS', 'OWID_SRM', 'OWID_TRS', 'OWID_YGS', 'OWID_SEK']
+
+- code: "OWID_SAM"
+  name: "South America"
+  short_name: "South America"
+  region_type: "continent"
+  defined_by: "owid"
+  is_historical: False
+  members: ['ARG', 'BOL', 'BRA', 'CHL', 'COL', 'ECU', 'FLK', 'GUF', 'GUY', 'PRY', 'PER', 'SUR', 'SGS', 'URY', 'VEN']
+
+- code: "OWID_NAM"
+  name: "North America"
+  short_name: "North America"
+  region_type: "continent"
+  defined_by: "owid"
+  is_historical: False
+  members: ['AIA', 'ATG', 'ABW', 'BHS', 'BRB', 'BLZ', 'BMU', 'BES', 'VGB', 'CAN', 'CYM', 'CRI', 'CUB', 'CUW', 'DMA', 'DOM', 'SLV', 'GRL', 'GRD', 'GLP', 'GTM', 'HTI', 'HND', 'JAM', 'MTQ', 'MEX', 'MSR', 'ANT', 'NIC', 'PAN', 'PRI', 'BLM', 'KNA', 'LCA', 'MAF', 'SPM', 'VCT', 'SXM', 'TTO', 'TCA', 'USA', 'VIR']
+
+- code: "OWID_OCE"
+  name: "Oceania"
+  short_name: "Oceania"
+  region_type: "continent"
+  defined_by: "owid"
+  is_historical: False
+  members: ['ASM', 'AUS', 'COK', 'FJI', 'PYF', 'GUM', 'KIR', 'MHL', 'FSM', 'NRU', 'NCL', 'NZL', 'NIU', 'NFK', 'MNP', 'PLW', 'PNG', 'PCN', 'WSM', 'SLB', 'TKL', 'TON', 'TUV', 'UMI', 'VUT', 'WLF']
+
+- code: "ATA"
+  name: "Antarctica"
+  short_name: "Antarctica"
+  region_type: "continent"
+  defined_by: "owid"
+  is_historical: False
+  members: ['BVT', 'ATF', 'HMD', 'ATA']
+
+- code: "OWID_EU27"
+  name: "European Union (27)"
+  short_name: "European Union (27)"
+  region_type: "aggregate"
+  defined_by: "owid"
+  is_historical: False
+  aliases: ['EU', 'EU-27', 'EU27']
+  members: ['AUT', 'BEL', 'BGR', 'HRV', 'CYP', 'CZE', 'DNK', 'EST', 'FIN', 'FRA', 'DEU', 'GRC', 'HUN', 'IRL', 'ITA', 'LVA', 'LTU', 'LUX', 'MLT', 'NLD', 'POL', 'PRT', 'ROU', 'SVK', 'SVN', 'ESP', 'SWE']
+

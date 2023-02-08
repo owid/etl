@@ -270,6 +270,11 @@ steps:
   data://grapher/lis/2023-01-18/luxembourg_income_study:
     - data://garden/lis/2023-01-18/luxembourg_income_study
 
+  #
+  # Regions - Regions (2023).
+  #
+  data://garden/regions/2023-01-01/regions:
+
 # Sub-dags to import
 include:
   - dag/open_numbers.yml
