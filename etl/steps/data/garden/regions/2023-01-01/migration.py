@@ -1,11 +1,13 @@
 """Migrate countries-regions data from the garden/reference dataset to a new dataset.
 
-This script needs to be used only once, to generate:
+This script needs to be used only once before creating the regions dataset for the first time.
+It will generate:
 * A yaml file of region definitions.
 * A csv file of additional region codes.
 
 Once those files exist, subsequent versions of the dataset should simply duplicate those yaml and csv files, and make
-manual modifications and additions.
+manual modifications and additions to those files.
+
 """
 
 import json
@@ -285,7 +287,7 @@ related_territories = {
 # Manually define additional possible overlaps between regions and members.
 # The status of some of these regions are unclear or contested, and by defining these dependencies we are not
 # making any political statement.
-# We simply define possible overlaps between geographical regions that can be found in datatsets, to ensure we never
+# We simply define possible overlaps between geographical regions that can be found in datasets, to ensure we never
 # double-count the contribution from those regions when creating aggregate data.
 region_members_contested = {
     "Azerbaijan": [
@@ -340,6 +342,30 @@ geographical_regions = {
         "Wallis and Futuna",
     ],
 }
+
+
+def _create_yaml_content_from_df(df_main: pd.DataFrame) -> str:
+    # Transform the rows in the dataframe into a good-looking yaml file (yaml_dump doesn't do a good enough job).
+    text = ""
+    for region in df_main.to_dict(orient="records"):
+        field = "code"
+        text += f'- code: "{region[field]}"\n'
+        for field in ["name", "short_name", "region_type", "defined_by"]:
+            text += f'  {field}: "{region[field]}"\n'
+        text += f"  is_historical: {region['is_historical']}\n"
+        if len(region["aliases"]) > 0:
+            text += f"  aliases: {region['aliases']}\n"
+        if len(region["members"]) > 0:
+            text += f"  members: {region['members']}\n"
+        if region["is_historical"] or len(region["successors"]) > 0:
+            assert region["is_historical"]
+            assert len(region["successors"]) > 0
+            assert region["end_year"]
+            text += f"  end_year: {region['end_year']}\n"
+            text += f"  successors: {region['successors']}\n"
+        text += "\n"
+
+    return text
 
 
 def main():
@@ -446,15 +472,12 @@ def main():
         {code: pd.Int64Dtype() for code in ["cow_code", "imf_code", "legacy_country_id", "legacy_entity_id"]}
     )
 
-    # I checked that all wikidata URIs start with http://www.wikidata.org/entity/ (except one,
-    # https://www.wikidata.org/wiki/Q39760, but https://www.wikidata.org/entity/Q39760 leads to the same page).
-    # Therefore, we can simply store the wikidata code.
-
+    # All wikidata URIs start with http://www.wikidata.org/entity/ (except one, https://www.wikidata.org/wiki/Q39760,
+    # but https://www.wikidata.org/entity/Q39760 leads to the same page). Therefore, we can simply store the code.
     df_codes["wikidata_code"] = df_codes["wikidata_uri"].str.split("/").str[-1]
-
     df_codes = df_codes.drop(columns=["wikidata_uri"])
 
-    # Select the main columns to keep for the dataset.
+    # Select the main columns to keep for the main definitions dataset.
     df_main = df[
         [
             "code",
@@ -468,29 +491,10 @@ def main():
             "successors",
             "defined_by",
         ]
-    ].to_dict(orient="records")
-
-    # Transform the rows in the dataframe into a good-looking yaml file (yaml_dump doesn't do a good enough job).
-    text = ""
-    for region in df_main:
-        field = "code"
-        text += f'- code: "{region[field]}"\n'
-        for field in ["name", "short_name", "region_type", "defined_by"]:
-            text += f'  {field}: "{region[field]}"\n'
-        text += f"  is_historical: {region['is_historical']}\n"
-        if len(region["aliases"]) > 0:
-            text += f"  aliases: {region['aliases']}\n"
-        if len(region["members"]) > 0:
-            text += f"  members: {region['members']}\n"
-        if region["is_historical"] or len(region["successors"]) > 0:
-            assert region["is_historical"]
-            assert len(region["successors"]) > 0
-            assert region["end_year"]
-            text += f"  end_year: {region['end_year']}\n"
-            text += f"  successors: {region['successors']}\n"
-        text += "\n"
+    ]
 
     # Create output file of region definitions.
+    text = _create_yaml_content_from_df(df_main=df_main)
     with open(REGION_DEFINITIONS_OUTPUT_FILE, "w") as _output_file:
         _output_file.write(text)
 

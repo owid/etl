@@ -1,4 +1,11 @@
-"""Load the adjacent files of region definitions and codes, and create a garden dataset with different tables.
+"""Region definitions, aliases, members, historical transitions and codes.
+
+This step will load the adjacent files of region definitions and codes, and create a garden dataset with tables:
+* "definitions": Region definitions (name, country type, etc.).
+* "aliases": Region aliases (i.e. variants of the region name).
+* "members": Members of a region (in a broad sense, which could include sub-country regions, overseas territories, etc.).
+* "transitions": Historical transitions between regions.
+* "legacy_codes": Legacy codes (e.g. wikidata code).
 
 """
 

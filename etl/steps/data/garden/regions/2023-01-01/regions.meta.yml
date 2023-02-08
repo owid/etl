@@ -1,6 +1,7 @@
 dataset:
   title: Regions data (OWID, 2023)
-  description: ""
+  description: |
+    Region definitions and other useful data like alternative region names, historical region successors, and sub-region members.
 
 tables:
   definitions:
@@ -31,7 +32,7 @@ tables:
       alias:
         title: "Alias"
         description: |
-          Alias of a region. For example, "U.S" is a common alias of region "United States".
+          Alternative name for a region. For example, "U.S" is a common alias of region "United States".
 
   members:
     variables:
