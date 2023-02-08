@@ -65,18 +65,18 @@ contested_regions = [
 regions_to_remove = [
     # Is there any reason to keep these historical regions?
     # Some of then correspond now to German and Italian sub-country regions.
-    'Baden',
-    'Bavaria',
-    'Hanover',
-    'Hesse Electoral',
-    'Hesse Grand Ducal',
-    'Mecklenburg Schwerin',
-    'Saxony',
-    'Wuerttemburg',
-    'Modena',
-    'Tuscany',
-    'Two Sicilies',
-    'Parma',
+    "Baden",
+    "Bavaria",
+    "Hanover",
+    "Hesse Electoral",
+    "Hesse Grand Ducal",
+    "Mecklenburg Schwerin",
+    "Saxony",
+    "Wuerttemburg",
+    "Modena",
+    "Tuscany",
+    "Two Sicilies",
+    "Parma",
 ]
 
 # Manually define historical regions, their end year, and successors.
@@ -154,21 +154,21 @@ historical_regions = {
     "USSR": {
         "end_year": 1991,
         "successors": [
-            'Lithuania',
-            'Georgia',
-            'Estonia',
-            'Latvia',
-            'Ukraine',
-            'Moldova',
-            'Kyrgyzstan',
-            'Uzbekistan',
-            'Tajikistan',
-            'Armenia',
-            'Azerbaijan',
-            'Turkmenistan',
-            'Belarus',
-            'Russia',
-            'Kazakhstan',
+            "Lithuania",
+            "Georgia",
+            "Estonia",
+            "Latvia",
+            "Ukraine",
+            "Moldova",
+            "Kyrgyzstan",
+            "Uzbekistan",
+            "Tajikistan",
+            "Armenia",
+            "Azerbaijan",
+            "Turkmenistan",
+            "Belarus",
+            "Russia",
+            "Kazakhstan",
         ],
     },
     "West Germany": {
@@ -417,30 +417,34 @@ def main():
         df.loc[df["name"] == region, "members"] = json.dumps(member_codes)
 
     # Convert the columns of strings into columns of lists of strings.
-    df["aliases"] = df["aliases"].fillna('[]').apply(eval)
-    df["members"] = df["members"].fillna('[]').apply(eval)
-    df["successors"] = df["successors"].fillna('[]').apply(eval)
+    df["aliases"] = df["aliases"].fillna("[]").apply(eval)
+    df["members"] = df["members"].fillna("[]").apply(eval)
+    df["successors"] = df["successors"].fillna("[]").apply(eval)
 
     # Define an additional dataset of codes.
-    df_codes = df[[
-        "code",
-        'cow_code',
-        'cow_letter',
-        'imf_code',
-        'iso_alpha2',
-        'iso_alpha3',
-        'kansas_code',
-        'legacy_country_id',
-        'legacy_entity_id',
-        'marc_code',
-        'ncd_code',
-        'penn_code',
-        'unctad_code',
-        'wikidata_uri',
-    ]].reset_index(drop=True)
+    df_codes = df[
+        [
+            "code",
+            "cow_code",
+            "cow_letter",
+            "imf_code",
+            "iso_alpha2",
+            "iso_alpha3",
+            "kansas_code",
+            "legacy_country_id",
+            "legacy_entity_id",
+            "marc_code",
+            "ncd_code",
+            "penn_code",
+            "unctad_code",
+            "wikidata_uri",
+        ]
+    ].reset_index(drop=True)
 
     # Ensure numeric codes are integer.
-    df_codes = df_codes.astype({code: pd.Int64Dtype() for code in ["cow_code", "imf_code", "legacy_country_id", "legacy_entity_id"]})
+    df_codes = df_codes.astype(
+        {code: pd.Int64Dtype() for code in ["cow_code", "imf_code", "legacy_country_id", "legacy_entity_id"]}
+    )
 
     # I checked that all wikidata URIs start with http://www.wikidata.org/entity/ (except one,
     # https://www.wikidata.org/wiki/Q39760, but https://www.wikidata.org/entity/Q39760 leads to the same page).
@@ -451,8 +455,20 @@ def main():
     df_codes = df_codes.drop(columns=["wikidata_uri"])
 
     # Select the main columns to keep for the dataset.
-    df_main = df[["code", "name", "short_name", "aliases", "members", "region_type", "is_historical", "end_year",
-                  "successors", "defined_by"]].to_dict(orient="records")
+    df_main = df[
+        [
+            "code",
+            "name",
+            "short_name",
+            "aliases",
+            "members",
+            "region_type",
+            "is_historical",
+            "end_year",
+            "successors",
+            "defined_by",
+        ]
+    ].to_dict(orient="records")
 
     # Transform the rows in the dataframe into a good-looking yaml file (yaml_dump doesn't do a good enough job).
     text = ""
@@ -482,5 +498,5 @@ def main():
     pd.DataFrame(df_codes).to_csv(str(REGION_CODES_OUTPUT_FILE), index=False)
 
 
-if __name__=="__main__":
+if __name__ == "__main__":
     main()
