@@ -25,42 +25,401 @@ CURRENT_DIR = Path(__file__).parent
 REGION_DEFINITIONS_OUTPUT_FILE = CURRENT_DIR / "regions.yml"
 REGION_CODES_OUTPUT_FILE = CURRENT_DIR / "regions.codes.csv"
 
-# Manually define the list of continents.
-continents = [
-    "Africa",
-    "Antarctica",
-    "Asia",
-    "Europe",
-    "North America",
-    "Oceania",
-    "South America",
-]
+# Possible region types considered.
+REGION_TYPES = ["country", "continent", "aggregate", "other"]
 
-# Manually define the list of other special regions and aggregates.
-aggregates = [
-    # Important aggregates.
-    "European Union (27)",
-    "World",
-    # Geographical aggregates.
-    "Channel Islands",
-    "Melanesia",
-    "Polynesia",
-    # Other special regions.
-    "Serbia excluding Kosovo",
-    "Svalbard and Jan Mayen",
-    "United States Minor Outlying Islands",
-]
+# Manually list all inhabited continents and their member countries.
+# This is not a trivial task, since there are many regions that are unclear whether they are independent or whether
+# they should already be counted within another country.
+# This list is mainlly used to create aggregates (i.e. to add up data from different countries to obtain data for
+# continents).
+continent_members = {
+    "Africa": [
+        "Algeria",
+        "Angola",
+        "Benin",
+        "Botswana",
+        "Burkina Faso",
+        "Burundi",
+        "Cameroon",
+        "Cape Verde",
+        "Central African Republic",
+        "Chad",
+        "Comoros",
+        "Congo",
+        "Cote d'Ivoire",
+        "Democratic Republic of Congo",
+        "Djibouti",
+        "Egypt",
+        "Equatorial Guinea",
+        "Eritrea",
+        "Eritrea and Ethiopia",
+        "Eswatini",
+        "Ethiopia",
+        "Gabon",
+        "Gambia",
+        "Ghana",
+        "Guinea",
+        "Guinea-Bissau",
+        "Kenya",
+        "Lesotho",
+        "Liberia",
+        "Libya",
+        "Madagascar",
+        "Malawi",
+        "Mali",
+        "Mauritania",
+        "Mauritius",
+        "Mayotte",
+        "Morocco",
+        "Mozambique",
+        "Namibia",
+        "Niger",
+        "Nigeria",
+        "Reunion",
+        "Rwanda",
+        "Saint Helena",
+        "Sao Tome and Principe",
+        "Senegal",
+        "Seychelles",
+        "Sierra Leone",
+        "Somalia",
+        # 'Somaliland',
+        "South Africa",
+        "South Sudan",
+        "Sudan",
+        "Tanzania",
+        "Togo",
+        "Tunisia",
+        "Uganda",
+        "Western Sahara",
+        "Zambia",
+        # 'Zanzibar',
+        "Zimbabwe",
+    ],
+    "Asia": [
+        # 'Abkhazia',
+        "Afghanistan",
+        # 'Akrotiri and Dhekelia',
+        "Armenia",
+        "Azerbaijan",
+        "Bahrain",
+        "Bangladesh",
+        "Bhutan",
+        "British Indian Ocean Territory",
+        "Brunei",
+        "Cambodia",
+        "China",
+        "Christmas Island",
+        "Cocos Islands",
+        "East Timor",
+        "Georgia",
+        "Hong Kong",
+        "India",
+        "Indonesia",
+        "Iran",
+        "Iraq",
+        "Israel",
+        "Japan",
+        "Jordan",
+        "Kazakhstan",
+        "Kuwait",
+        "Kyrgyzstan",
+        "Laos",
+        "Lebanon",
+        "Macao",
+        "Malaysia",
+        "Maldives",
+        "Mongolia",
+        "Myanmar",
+        # 'Nagorno-Karabakh',
+        "Nepal",
+        "North Korea",
+        # 'Northern Cyprus',
+        "Oman",
+        "Pakistan",
+        "Palestine",
+        "Philippines",
+        "Qatar",
+        "Republic of Vietnam",
+        "Saudi Arabia",
+        "Singapore",
+        "South Korea",
+        # 'South Ossetia',
+        "Sri Lanka",
+        "Syria",
+        "Taiwan",
+        "Tajikistan",
+        "Thailand",
+        # 'Timor',
+        "Turkey",
+        "Turkmenistan",
+        "United Arab Emirates",
+        "United Korea",
+        "Uzbekistan",
+        "Vietnam",
+        "Yemen",
+        "Yemen Arab Republic",
+        "Yemen People's Republic",
+    ],
+    "Europe": [
+        "Aland Islands",
+        "Albania",
+        "Andorra",
+        "Austria",
+        "Austria-Hungary",
+        # 'Baden',
+        # 'Bavaria',
+        "Belarus",
+        "Belgium",
+        "Bosnia and Herzegovina",
+        "Bulgaria",
+        # 'Channel Islands',
+        "Croatia",
+        "Czechia",
+        "Czechoslovakia",
+        "Denmark",
+        "East Germany",
+        "Estonia",
+        "Faeroe Islands",
+        "Finland",
+        "France",
+        "Germany",
+        "Gibraltar",
+        "Greece",
+        "Guernsey",
+        # 'Hanover',
+        # 'Hesse Electoral',
+        # 'Hesse Grand Ducal',
+        "Hungary",
+        "Iceland",
+        "Ireland",
+        "Isle of Man",
+        "Italy",
+        "Jersey",
+        "Kosovo",
+        "Latvia",
+        "Liechtenstein",
+        "Lithuania",
+        "Luxembourg",
+        "Malta",
+        # 'Mecklenburg Schwerin',
+        # 'Modena',
+        "Moldova",
+        "Monaco",
+        "Montenegro",
+        "Netherlands",
+        "North Macedonia",
+        "Norway",
+        # 'Parma',
+        "Poland",
+        "Portugal",
+        "Romania",
+        "Russia",
+        "San Marino",
+        # 'Saxony',
+        "Serbia",
+        "Slovakia",
+        "Slovenia",
+        "Spain",
+        # 'Svalbard and Jan Mayen',
+        "Sweden",
+        "Switzerland",
+        # 'Tuscany',
+        # 'Two Sicilies',
+        "Ukraine",
+        "United Kingdom",
+        "Vatican",
+        "West Germany",
+        # 'Wuerttemburg',
+        "Cyprus",
+        "USSR",
+        "Serbia and Montenegro",
+        # 'Transnistria',
+        "Yugoslavia",
+        "Serbia excluding Kosovo",
+    ],
+    "North America": [
+        "Anguilla",
+        "Antigua and Barbuda",
+        "Aruba",
+        "Bahamas",
+        "Barbados",
+        "Belize",
+        "Bermuda",
+        "Bonaire Sint Eustatius and Saba",
+        "British Virgin Islands",
+        "Canada",
+        "Cayman Islands",
+        "Costa Rica",
+        "Cuba",
+        "Curacao",
+        "Dominica",
+        "Dominican Republic",
+        "El Salvador",
+        "Greenland",
+        "Grenada",
+        "Guadeloupe",
+        "Guatemala",
+        "Haiti",
+        "Honduras",
+        "Jamaica",
+        "Martinique",
+        "Mexico",
+        "Montserrat",
+        "Netherlands Antilles",
+        "Nicaragua",
+        "Panama",
+        "Puerto Rico",
+        "Saint Barthelemy",
+        "Saint Kitts and Nevis",
+        "Saint Lucia",
+        "Saint Martin (French part)",
+        "Saint Pierre and Miquelon",
+        "Saint Vincent and the Grenadines",
+        "Sint Maarten (Dutch part)",
+        "Trinidad and Tobago",
+        "Turks and Caicos Islands",
+        "United States",
+        "United States Virgin Islands",
+    ],
+    "Oceania": [
+        "American Samoa",
+        "Australia",
+        "Cook Islands",
+        "Fiji",
+        "French Polynesia",
+        "Guam",
+        "Kiribati",
+        "Marshall Islands",
+        "Micronesia (country)",
+        "Nauru",
+        "New Caledonia",
+        "New Zealand",
+        "Niue",
+        "Norfolk Island",
+        "Northern Mariana Islands",
+        "Palau",
+        "Papua New Guinea",
+        "Pitcairn",
+        "Samoa",
+        "Solomon Islands",
+        "Tokelau",
+        "Tonga",
+        "Tuvalu",
+        "United States Minor Outlying Islands",
+        "Vanuatu",
+        "Wallis and Futuna",
+    ],
+    "South America": [
+        "Argentina",
+        "Bolivia",
+        "Brazil",
+        "Chile",
+        "Colombia",
+        "Ecuador",
+        "Falkland Islands",
+        "French Guiana",
+        "Guyana",
+        "Paraguay",
+        "Peru",
+        "South Georgia and the South Sandwich Islands",
+        "Suriname",
+        "Uruguay",
+        "Venezuela",
+    ],
+}
 
-# Manually list regions whose status is contested or are not considered official countries.
-contested_regions = [
+# Define the list of continents.
+# These regions will be assigned the region type "continent".
+continents = sorted(continent_members)
+
+# +
+# Manually define other aggregate regions.
+# -
+
+aggregate_regions = {
+    "Channel Islands": [
+        "Guernsey",
+        "Jersey",
+    ],
+    "European Union (27)": [
+        "Austria",
+        "Belgium",
+        "Bulgaria",
+        "Croatia",
+        "Cyprus",
+        "Czechia",
+        "Denmark",
+        "Estonia",
+        "Finland",
+        "France",
+        "Germany",
+        "Greece",
+        "Hungary",
+        "Ireland",
+        "Italy",
+        "Latvia",
+        "Lithuania",
+        "Luxembourg",
+        "Malta",
+        "Netherlands",
+        "Poland",
+        "Portugal",
+        "Romania",
+        "Slovakia",
+        "Slovenia",
+        "Spain",
+        "Sweden",
+    ],
+    "Melanesia": [
+        "Fiji",
+        "Papua New Guinea",
+        "Solomon Islands",
+        "Vanuatu",
+    ],
+    "Polynesia": [
+        "American Samoa",
+        "Cook Islands",
+        "French Polynesia",
+        "New Zealand",
+        "Niue",
+        "Norfolk Island",
+        "Pitcairn",
+        "Samoa",
+        "Tokelau",
+        "Tonga",
+        "Tuvalu",
+        "Wallis and Futuna",
+    ],
+    "World": [
+        "Africa",
+        # 'Antarctica',
+        "Asia",
+        "Europe",
+        "North America",
+        "Oceania",
+        "South America",
+    ],
+}
+
+# Define the list of continents.
+# These regions will be assigned the region type "aggregate".
+aggregates = sorted(aggregate_regions)
+
+# Manually list regions whose official definition is unclear.
+# They will be assigned the region type "other".
+other_regions = [
+    "Abkhazia",
+    "Akrotiri and Dhekelia",
     "Nagorno-Karabakh",
     "Northern Cyprus",
-    "Abkhazia",
-    "South Ossetia",
-    "Transnistria",
-    "Western Sahara",
+    "Serbia excluding Kosovo",
     "Somaliland",
-    "Kosovo",
+    "South Ossetia",
+    "Svalbard and Jan Mayen",
+    "Transnistria",
+    "United States Minor Outlying Islands",
 ]
 
 # Manually list regions to remove.
@@ -205,18 +564,28 @@ historical_regions = {
     },
 }
 
-# Manually define related territories, which includes all dependent and overseas territories.
-# For more specific definitions, see: https://en.wikipedia.org/wiki/Dependent_territory
-# The related territories will be considered countries unless stated otherwise later.
+# Manually define "related member" territories, which includes all dependent and overseas territories.
+# Here, the definition of member is vague.
+# The status of some of these regions are unclear or contested, and by defining these dependencies we are not
+# making any political statement.
+# This list will only be used to raise warnings on potential overlaps in the data.
+# For example, if there is data for both China and Hong Kong, it would be good to raise the warning that we may
+# be double-counting Hong Kong's data (as some data providers include Hong-Kong as part of China).
 related_territories = {
     "Australia": [
         "Christmas Island",
         "Heard Island and McDonald Islands",
         "Norfolk Island",
     ],
+    "Azerbaijan": [
+        "Nagorno-Karabakh",
+    ],
     "China": [
         "Hong Kong",
         "Macao",
+    ],
+    "Cyprus": [
+        "Northern Cyprus",
     ],
     "Denmark": [
         "Faeroe Islands",
@@ -238,6 +607,16 @@ related_territories = {
         "Saint Pierre and Miquelon",
         "Wallis and Futuna",
     ],
+    "Georgia": [
+        "Abkhazia",
+        "South Ossetia",
+    ],
+    "Moldova": [
+        "Transnistria",
+    ],
+    "Morocco": [
+        "Western Sahara",
+    ],
     "Netherlands": [
         "Aruba",
         "Curacao",
@@ -252,6 +631,13 @@ related_territories = {
     ],
     "Palestine": [
         "Gaza Strip",
+    ],
+    "Servia": [
+        "Kosovo",
+        "Serbia excluding Kosovo",
+    ],
+    "Somalia": [
+        "Somaliland",
     ],
     "Tanzania": [
         "Zanzibar",
@@ -284,85 +670,65 @@ related_territories = {
     ],
 }
 
-# Manually define additional possible overlaps between regions and members.
-# The status of some of these regions are unclear or contested, and by defining these dependencies we are not
-# making any political statement.
-# We simply define possible overlaps between geographical regions that can be found in datasets, to ensure we never
-# double-count the contribution from those regions when creating aggregate data.
-region_members_contested = {
-    "Azerbaijan": [
-        "Nagorno-Karabakh",
-    ],
-    "Cyprus": [
-        "Northern Cyprus",
-    ],
-    "Georgia": [
-        "Abkhazia",
-        "South Ossetia",
-    ],
-    "Moldova": [
-        "Transnistria",
-    ],
-    "Morocco": [
-        "Western Sahara",
-    ],
-    "Somalia": [
-        "Somaliland",
-    ],
-    "Servia": [
-        "Kosovo",
-        "Serbia excluding Kosovo",
-    ],
-}
-
-# Manually define other geographical regions.
-geographical_regions = {
-    "Channel Islands": [
-        "Guernsey",
-        "Jersey",
-    ],
-    "Melanesia": [
-        "Fiji",
-        "Papua New Guinea",
-        "Solomon Islands",
-        "Vanuatu",
-    ],
-    "Polynesia": [
-        "American Samoa",
-        "Cook Islands",
-        "French Polynesia",
-        "New Zealand",
-        "Niue",
-        "Norfolk Island",
-        "Pitcairn",
-        "Samoa",
-        "Tokelau",
-        "Tonga",
-        "Tuvalu",
-        "Wallis and Futuna",
-    ],
-}
-
 
 def _create_yaml_content_from_df(df_main: pd.DataFrame) -> str:
     # Transform the rows in the dataframe into a good-looking yaml file (yaml_dump doesn't do a good enough job).
-    text = ""
-    for region in df_main.to_dict(orient="records"):
-        field = "code"
-        text += f'- code: "{region[field]}"\n'
-        for field in ["name", "short_name", "region_type", "defined_by"]:
-            text += f'  {field}: "{region[field]}"\n'
-        text += f"  is_historical: {region['is_historical']}\n"
+    text = f"""\
+# Region definitions (see more details in the description of the 'regions' garden step).
+# Each region must contain the following fields:
+# code: Region code (unique for each region).
+# name: Region name.
+#
+# Additionally, each region can contain the following fields:
+# short_name: Short version of the region name. If not given, 'name' will be used.
+# region_type: Region type ({', '.join(REGION_TYPES)}). If not given, 'country' will be used.
+# defined_by: Institution that used the region in a dataset. If not given, 'owid' will be used.
+# is_historical: True if region does not exist anymore. If not given, False will be used.
+# end_year: Last year when a historical region existed. If not given, pd.NA will be used.
+# successors: List of successors of a historical region. If not given, an empty list will be used.
+# members: List of members of the region. If not given, an empty list will be used.
+# aliases: List of alternative names for the region. If not given, an empty list will be used.
+# related: List of related members of the region. If not given, an empty list will be used.\n"""
+    for region in df_main.sort_values("name").to_dict(orient="records"):
+        # Fill in mandatory fields.
+        text += f'- code: "{region["code"]}"\n'
+        text += f'  name: "{region["name"]}"\n'
+
+        # Add short name only if different from name.
+        if region["name"] != region["short_name"]:
+            text += f'  short_name: "{region["short_name"]}"\n'
+
+        # Add region_type only if different from the most commont one (country).
+        if region["region_type"] != "country":
+            text += f'  region_type: "{region["region_type"]}"\n'
+
+        # Add defined_by only if different from the most commont one (owid).
+        if region["defined_by"] != "owid":
+            text += f'  defined_by: "{region["defined_by"]}"\n'
+
+        # Add is_historical only if it's True.
+        if region["is_historical"]:
+            text += f"  is_historical: {region['is_historical']}\n"
+
+        # Add aliases only if there is any.
         if len(region["aliases"]) > 0:
             text += f"  aliases: {region['aliases']}\n"
+
+        # Add members only if there is any.
         if len(region["members"]) > 0:
             text += f"  members: {region['members']}\n"
+
+        # Add successors only if there is any.
         if region["is_historical"] or len(region["successors"]) > 0:
             assert region["is_historical"]
             assert len(region["successors"]) > 0
             assert region["end_year"]
             text += f"  end_year: {region['end_year']}\n"
             text += f"  successors: {region['successors']}\n"
+
+        # Add related members only if there is any.
+        if len(region["related"]) > 0:
+            text += f"  related: {region['related']}\n"
         text += "\n"
 
     return text
@@ -393,6 +759,12 @@ def main():
     # New column "successors" will not be empty for historical regions, and will give the list of regions that occupied
     # the same geographical land after the region stoppted existing.
     df["successors"] = pd.NA
+    # New column "related" will not be empty if there are related member regions that, for some datasets, could lead
+    # to double-counting. For example, "China" has the related member "Hong-Kong", since some data providers include
+    # Hong-Kong's data in China, and also provide data for Hong-Kong.
+    df["related"] = pd.NA
+    # Empty the existing column for members.
+    df["members"] = pd.NA
 
     # Apply some minor corrections to existing data.
 
@@ -418,9 +790,9 @@ def main():
     for region in aggregates:
         df.loc[df["name"] == region, "region_type"] = "aggregate"
 
-    # Edit region type of contested regions.
-    for region in contested_regions:
-        df.loc[df["name"] == region, "region_type"] = "contested"
+    # Edit region type of other regions.
+    for region in other_regions:
+        df.loc[df["name"] == region, "region_type"] = "other"
 
     # Remove unnecessary regions.
     df = df[~df["name"].isin(regions_to_remove)].reset_index(drop=True)
@@ -435,16 +807,24 @@ def main():
         df.loc[region_sel, "successors"] = json.dumps(successor_codes)
         df.loc[region_sel, "is_historical"] = True
 
-    # Add members, meaning any related territories, geographical members and contested regions.
-    all_members = {**related_territories, **region_members_contested, **geographical_regions}
+    # Add members to continents and geographical regions.
+    all_members = {**continent_members, **aggregate_regions}
     for region in all_members:
         members = all_members[region]
         member_codes = sorted([df[df["name"] == member]["code"].item() for member in members])
         df.loc[df["name"] == region, "members"] = json.dumps(member_codes)
 
+    # Add any related territories.
+    all_members = {**related_territories}
+    for region in all_members:
+        members = all_members[region]
+        member_codes = sorted([df[df["name"] == member]["code"].item() for member in members])
+        df.loc[df["name"] == region, "related"] = json.dumps(member_codes)
+
     # Convert the columns of strings into columns of lists of strings.
     df["aliases"] = df["aliases"].fillna("[]").apply(eval)
     df["members"] = df["members"].fillna("[]").apply(eval)
+    df["related"] = df["related"].fillna("[]").apply(eval)
     df["successors"] = df["successors"].fillna("[]").apply(eval)
 
     # Define an additional dataset of codes.
@@ -489,6 +869,7 @@ def main():
             "is_historical",
             "end_year",
             "successors",
+            "related",
             "defined_by",
         ]
     ]
