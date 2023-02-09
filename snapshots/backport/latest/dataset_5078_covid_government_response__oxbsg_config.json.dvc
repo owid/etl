@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5078_covid_government_response__oxbsg_config
   file_extension: json
-  date_accessed: 2023-02-08 00:10:48.427685
+  date_accessed: 2023-02-09 00:03:40.614785
   name: Grapher metadata for dataset_5078_covid_government_response__oxbsg
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 02017aa2c7d8669c152b72d8e3438965
+- md5: ef5bfd6be8bfdfd863b4359323e01974
   size: 19506
   path: dataset_5078_covid_government_response__oxbsg_config.json
