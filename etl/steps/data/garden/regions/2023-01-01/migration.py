@@ -334,10 +334,7 @@ continent_members = {
 # These regions will be assigned the region type "continent".
 continents = sorted(continent_members)
 
-# +
 # Manually define other aggregate regions.
-# -
-
 aggregate_regions = {
     "Channel Islands": [
         "Guernsey",

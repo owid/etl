@@ -39,16 +39,23 @@ tables:
       member:
         title: "Member"
         description: |
-          Member of a region. Here, membership is defined rather vaguely: A member can be a sub-region of a country, an overseas territory, a country inside a continent, etc.
+          Member of a region.
+
+  related:
+    variables:
+      member:
+        title: "Possible member"
+        description: |
+          Possible member of a region. Here, membership is defined rather vaguely: A member can be a sub-region of a country, an overseas territory, a country inside a continent, etc.
           
-          The status of many regions is unclear or contested, and by defining these dependencies we are not making any political statement. We simply define possible overlaps between geographical regions that can be found in datatsets, to ensure we never double-count the contribution from those regions when creating aggregate data.
+          The status of many regions is unclear or contested, and by defining these dependencies we are not making any political statement. We simply define possible overlaps between geographical regions that can be found in datasets, to ensure we never double-count the contribution from those regions when creating aggregate data.
 
   transitions:
     variables:
       end_year:
         title: "End year"
         description: |
-          Final year a region existed
+          Final year a region existed.
       successor:
         title: "Successor"
         description: |

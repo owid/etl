@@ -3,7 +3,9 @@
 This step will load the adjacent files of region definitions and codes, and create a garden dataset with tables:
 * "definitions": Region definitions (name, country type, etc.).
 * "aliases": Region aliases (i.e. variants of the region name).
-* "members": Members of a region (in a broad sense, which could include sub-country regions, overseas territories, etc.).
+* "members": Region members (roughly, sub-regions that would need to be added up when aggregating data for the region).
+* "related": Other possible region members to be aware of (e.g. regions with an unclear official status that may be
+  members of the region according to some data providers).
 * "transitions": Historical transitions between regions.
 * "legacy_codes": Legacy codes (e.g. wikidata code).
 
@@ -112,6 +114,11 @@ def run(dest_dir: str) -> None:
         df.rename(columns={"members": "member"}).explode("member")[["member"]].dropna(how="all"), short_name="members"
     )
 
+    # Create table for other possible related members.
+    tb_related = Table(
+        df.rename(columns={"related": "member"}).explode("member")[["member"]].dropna(how="all"), short_name="related"
+    )
+
     # Create table of historical transitions.
     tb_transitions = Table(
         df[["end_year", "successors"]]
@@ -135,7 +142,7 @@ def run(dest_dir: str) -> None:
     #
     # Create a new garden dataset.
     ds_garden = create_dataset(
-        dest_dir=dest_dir, tables=[tb_definitions, tb_aliases, tb_members, tb_transitions, tb_legacy_codes]
+        dest_dir=dest_dir, tables=[tb_definitions, tb_aliases, tb_members, tb_related, tb_transitions, tb_legacy_codes]
     )
 
     # Save changes in the new garden dataset.
