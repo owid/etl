@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5205_covid_2019__hospital__and__icu_values
   file_extension: feather
-  date_accessed: 2023-02-11 06:02:39.558298
+  date_accessed: 2023-02-11 18:02:58.675382
   name: COVID-2019 - Hospital & ICU
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: b62ee90f613b8e61216631bce9fa9159
-  size: 869458
+- md5: eae870740473b74255435e7a322fb0fa
+  size: 870010
   path: dataset_5205_covid_2019__hospital__and__icu_values.feather
