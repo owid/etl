@@ -251,12 +251,12 @@ class PathFinder:
             # If version is not specified, catch any version, which could be either a date, a year, or "latest".
             version = r"(?:\d{4}\-\d{2}\-\d{2}|\d{4}|latest)"
 
-        if channel in ["meadow", "garden", "grapher"]:
+        if channel in ["meadow", "garden", "grapher", "explorers"]:
             step_name = f"data://{channel}/{namespace}/{version}/{short_name}"
         elif channel in ["snapshot", "walden"]:
             step_name = f"{channel}://{namespace}/{version}/{short_name}"
         elif channel is None:
-            step_name = rf"(?:snapshot:/|walden:/|data://meadow|data://garden|data://grapher|backport://backport)/{namespace}/{version}/{short_name}"
+            step_name = rf"(?:snapshot:/|walden:/|data://meadow|data://garden|data://grapher|data://explorers|backport://backport)/{namespace}/{version}/{short_name}"
         else:
             raise UnknownChannel
 
