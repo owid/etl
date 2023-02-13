@@ -270,6 +270,16 @@ steps:
   data://grapher/lis/2023-01-18/luxembourg_income_study:
     - data://garden/lis/2023-01-18/luxembourg_income_study
 
+  # World Inequality Database
+  data://meadow/wid/2023-01-27/world_inequality_database:
+    - snapshot://wid/2023-01-27/world_inequality_database.csv
+  data://garden/wid/2023-01-27/world_inequality_database:
+    - data://meadow/wid/2023-01-27/world_inequality_database
+  data://grapher/wid/2023-01-27/world_inequality_database:
+    - data://garden/wid/2023-01-27/world_inequality_database
+  data://explorers/wid/2023-01-27/world_inequality_database:
+    - data://garden/wid/2023-01-27/world_inequality_database
+
 # Sub-dags to import
 include:
   - dag/open_numbers.yml
