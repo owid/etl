@@ -9,11 +9,12 @@ all_sources:
       # description: Source description.
 
 dataset:
-  title: # TO BE FILLED. Example: Testing Dataset Name (Institution, 2023)
+  title: Title # TO BE FILLED. Example: Testing Dataset Name (Institution, 2023)
   namespace: war
   short_name: sutton_1971
   version: 2023-01-18
-  # description: Dataset description.
+  description: |
+    Some description
   licenses:
     - name: # TO BE FILLED. Example: Testing License Name
       url: # TO BE FILLED. Example: https://url_of_testing_source.com/license
