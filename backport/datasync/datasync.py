@@ -25,6 +25,8 @@ from etl import grapher_model as gm
 from etl.db import get_engine
 from etl.publish import connect_s3
 
+from .data_metadata import variable_data, variable_data_df, variable_metadata
+
 log = structlog.get_logger()
 
 config.enable_bugsnag()
@@ -93,7 +95,7 @@ def cli(
     To fill `dataPath` column for all datasets from live_grapher DB run the following SQL:
 
     ```sql
-    update variables set dataPath = CONCAT('https://catalog.ourworldindata.org/baked-variables/live_grapher/', id, '.json.gz')
+    update variables set dataPath = CONCAT('https://catalog.ourworldindata.org/baked-variables/live_grapher/data/', id, '.json')
     where datasetId in (
     select id from (
         select
@@ -157,7 +159,7 @@ def cli(
 
         with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as executor:
             results = executor.map(
-                lambda variable_id: _sync_variable(
+                lambda variable_id: _sync_variable_data_metadata(
                     variable_id=variable_id,
                     engine=engine,
                     dry_run=dry_run,
@@ -177,49 +179,50 @@ def cli(
         log.info("datasync.end", dataset_id=ds.id)
 
 
-def _sync_variable(engine: Engine, variable_id: int, dry_run: bool, private: bool, update_data_path: bool) -> None:
+def _sync_variable_data_metadata(
+    engine: Engine, variable_id: int, dry_run: bool, private: bool, update_data_path: bool
+) -> None:
     t = time.time()
-    q = """
-    select
-        entityId as entities,
-        year as years,
-        value as `values`
-    from data_values where variableId = %(variable_id)s
-    """
-    data = pd.read_sql(q, engine, params={"variable_id": variable_id})
-
-    # convert it to numerical type if possible
-    data["values"] = _convert_to_numeric(data["values"])
-
-    js = json.dumps(data.to_dict(orient="list"))
-    gzip_object = gzip.compress(js.encode())  # type: ignore
 
     if not dry_run:
-        for attempt in Retrying(
-            wait=wait_exponential(min=5, max=100),
-            stop=stop_after_attempt(7),
-            retry=retry_if_exception_type(EndpointConnectionError),
-        ):
-            with attempt:
-                client = connect_s3()
-                client.put_object(
-                    Bucket=S3_BUCKET,
-                    Body=gzip_object,
-                    Key=_variable_s3_key(variable_id),
-                    ContentEncoding="gzip",
-                    ContentType="application/json",
-                    ACL="private" if private else "public-read",
-                )
+        variable_df = variable_data_df(engine, variable_id)
 
-        # update dataPath of a variable
+        # upload data and metadata to S3
+        _upload_gzip_dict(variable_data(variable_df), _variable_data_s3_key(variable_id), private)
+        _upload_gzip_dict(
+            variable_metadata(engine, variable_id, variable_df), _variable_metadata_s3_key(variable_id), private
+        )
+
+        # update dataPath and metadataPath of a variable
         if update_data_path:
             with Session(engine) as session:
                 variable = gm.Variable.load_variable(session, variable_id)
                 variable.dataPath = _variable_dataPath(variable_id)
+                variable.metadataPath = _variable_metadataPath(variable_id)
                 session.add(variable)
                 session.commit()
 
     log.info("datasync.upload", t=f"{time.time() - t:.2f}s", variable_id=variable_id)
+
+
+def _upload_gzip_dict(d: Dict[str, Any], key: str, private: bool) -> None:
+    body_gzip = gzip.compress(json.dumps(d, default=str).encode())  # type: ignore
+
+    for attempt in Retrying(
+        wait=wait_exponential(min=5, max=100),
+        stop=stop_after_attempt(7),
+        retry=retry_if_exception_type(EndpointConnectionError),
+    ):
+        with attempt:
+            client = connect_s3()
+            client.put_object(
+                Bucket=S3_BUCKET,
+                Body=body_gzip,
+                Key=key,
+                ContentEncoding="gzip",
+                ContentType="application/json",
+                ACL="private" if private else "public-read",
+            )
 
 
 @dataclass_json
@@ -250,14 +253,14 @@ class DatasetSync:
         client.put_object(
             Bucket=S3_BUCKET,
             Body=pd.Series(self.to_dict()).to_json(),
-            Key=f"{S3_PREFIX}/_success_dataset_{self.id}",
+            Key=f"{S3_PREFIX}/success/_success_dataset_{self.id}",
             ContentType="application/json",
             ACL="public-read",
         )
 
     def matches(self, ds: "DatasetSync") -> bool:
         # compare timestamps of the latest update (we don't have sourceChecksum for all datasets)
-        if self.dataEditedAt == ds.dataEditedAt:
+        if self.dataEditedAt == ds.dataEditedAt and self.metadataEditedAt == ds.metadataEditedAt:
             # checksums should match if dataEditedAt match
             assert self.sourceChecksum is None or ds.sourceChecksum is None or self.sourceChecksum == ds.sourceChecksum
             return True
@@ -265,24 +268,20 @@ class DatasetSync:
             return False
 
 
-def _convert_to_numeric(values: pd.Series) -> pd.Series:
-    try:
-        return values.map(int)
-    except ValueError:
-        pass
-    try:
-        return values.map(float)
-    except ValueError:
-        pass
-    return values
+def _variable_data_s3_key(variable_id: int) -> str:
+    return f"{S3_PREFIX}/data/{variable_id}.json"
 
 
-def _variable_s3_key(variable_id: int) -> str:
-    return f"{S3_PREFIX}/{variable_id}.json.gz"
+def _variable_metadata_s3_key(variable_id: int) -> str:
+    return f"{S3_PREFIX}/metadata/{variable_id}.json"
 
 
 def _variable_dataPath(variable_id: int) -> str:
-    return os.path.join(S3_ENDPOINT, _variable_s3_key(variable_id))
+    return os.path.join(S3_ENDPOINT, _variable_data_s3_key(variable_id))
+
+
+def _variable_metadataPath(variable_id: int) -> str:
+    return os.path.join(S3_ENDPOINT, _variable_metadata_s3_key(variable_id))
 
 
 def _variable_ids_without_dataPath(engine: Engine, dataset_id: int) -> List[int]:
@@ -303,7 +302,7 @@ def _load_datasets(engine: Engine, dataset_ids: tuple[int], dt_start: Optional[d
     if dataset_ids:
         where = "id in %(dataset_ids)s"
     elif dt_start:
-        where = "dataEditedAt > %(dt_start)s"
+        where = "dataEditedAt > %(dt_start)s or metadataEditedAt > %(dt_start)s"
     else:
         # load datasets with at least one chart
         where = """
