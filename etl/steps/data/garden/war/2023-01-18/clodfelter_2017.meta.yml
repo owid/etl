@@ -1,7 +1,7 @@
 all_sources:
   - source_testing: &source-testing
-      name: # TO BE FILLED. Example: Testing Short Citation
-      published_by: # TO BE FILLED (if different to short citation). Example: Testing Full Citation
+      name: Clodfelter (2017)
+      published_by: Clodfelter, Micheal. 2017. Warfare and Armed Conflicts: A Statistical Encyclopedia of Casualty and other Figures, 1492-2015. Fourth edition. McFarland & Company.
       url: # TO BE FILLED. Example: https://url_of_testing_source.com/
       date_accessed: # TO BE FILLED. Example: 2023-01-01
       publication_date: # TO BE FILLED. Example: 2023-01-01
@@ -9,11 +9,12 @@ all_sources:
       # description: Source description.
 
 dataset:
-  title: # TO BE FILLED. Example: Testing Dataset Name (Institution, 2023)
+  title: Wars, deaths, and casualties – Clodfelter
   namespace: war
   short_name: clodfelter_2017
   version: 2023-01-18
-  # description: Dataset description.
+  description: |
+    This dataset provides information on direct and indirect military and civilian deaths and casualties from wars, drawn from the book by Clodfelter (2017).
   licenses:
     - name: # TO BE FILLED. Example: Testing License Name
       url: # TO BE FILLED. Example: https://url_of_testing_source.com/license
