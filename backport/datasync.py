@@ -256,11 +256,7 @@ class DatasetSync:
         )
 
     def matches(self, ds: "DatasetSync") -> bool:
-        # if someone changed isPrivate, we have to reupload all variables
-        if self.isPrivate != ds.isPrivate:
-            return False
-
-        # otherwise compare timestamps of the latest update (we don't have sourceChecksum for all datasets)
+        # compare timestamps of the latest update (we don't have sourceChecksum for all datasets)
         if self.dataEditedAt == ds.dataEditedAt:
             # checksums should match if dataEditedAt match
             assert self.sourceChecksum is None or ds.sourceChecksum is None or self.sourceChecksum == ds.sourceChecksum
@@ -318,9 +314,8 @@ def _load_datasets(engine: Engine, dataset_ids: tuple[int], dt_start: Optional[d
                 join variables as v on cd.variableId = v.id
             )
         )
-        -- dataset 88 is archived, but still used in a chart, so we
-        -- cannot exclude it
-        -- and not isArchived
+        -- we would like to exclude archived datasets, but we cannot do it
+        -- because some charts still use them (e.g. dataset 88)
         """
 
     q = f"""
@@ -328,8 +323,7 @@ def _load_datasets(engine: Engine, dataset_ids: tuple[int], dt_start: Optional[d
         id,
         dataEditedAt,
         metadataEditedAt,
-        -- we save all variables as public for now to have them available in grapher,
-        -- this is safe since metadata is still private
+        -- we save all variables as public for now to have them available in grapher
         false as isPrivate,
         sourceChecksum
     from datasets
