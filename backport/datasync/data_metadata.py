@@ -104,27 +104,7 @@ def variable_metadata(engine: Engine, variable_id: int, variable_data: pd.DataFr
         columns={"year": "years", "entityId": "entities", "value": "values"}
     )
 
-    # improve type detection
-    variableData["values"] = pd.to_numeric(variableData["values"])
-
-    inferred_type = pd.api.types.infer_dtype(variableData["values"])
-    if inferred_type == "floating":
-        variableMetadata["type"] = "float"
-    elif inferred_type == "integer":
-        variableMetadata["type"] = "int"
-    else:
-        raise NotImplementedError()
-
-    # TODO: missing string type in metadata, find variable with string type and test it on it
-
-    # if encounteredFloatDataValues and encounteredStringDataValues:
-    #     variableMetadata["type"] = "mixed"
-    # elif encounteredFloatDataValues:
-    #     variableMetadata["type"] = "float"
-    # elif encounteredIntDataValues:
-    #     variableMetadata["type"] = "int"
-    # elif encounteredStringDataValues:
-    #     variableMetadata["type"] = "string"
+    variableMetadata["type"] = _infer_variable_type(variableData["values"])
 
     variableMetadata["dimensions"] = {
         "years": {"values": yearArray},
@@ -137,6 +117,23 @@ def variable_metadata(engine: Engine, variable_id: int, variable_data: pd.DataFr
         variableMetadata[col] = variableMetadata[col].strftime(time_format)  # type: ignore
 
     return variableMetadata
+
+
+def _infer_variable_type(values: pd.Series) -> str:
+    try:
+        values = pd.to_numeric(values)
+        inferred_type = pd.api.types.infer_dtype(values)
+        if inferred_type == "floating":
+            return "float"
+        elif inferred_type == "integer":
+            return "int"
+        else:
+            raise NotImplementedError()
+    except ValueError:
+        if values.map(lambda s: isinstance(s, str)).all():
+            return "string"
+        else:
+            return "mixed"
 
 
 def _convert_to_numeric(values: pd.Series) -> pd.Series:

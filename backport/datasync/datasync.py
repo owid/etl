@@ -62,12 +62,6 @@ else:
     help="Force overwrite even if checksums match",
 )
 @click.option(
-    "--update-data-path/--no-update-data-path",
-    default=False,
-    type=bool,
-    help="Update variables.dataPath column",
-)
-@click.option(
     "--workers",
     type=int,
     help="Thread workers to parallelize which steps need rebuilding (steps execution is not parallelized)",
@@ -78,7 +72,6 @@ def cli(
     dt_start: dt.datetime,
     dry_run: bool,
     force: bool,
-    update_data_path: bool,
     workers: int,
 ) -> None:
     """TBD
@@ -135,19 +128,6 @@ def cli(
             ds_s3 = DatasetSync.load_from_s3(client, ds.id)
             # datasets match, we don't have to sync to S3
             if not force and ds.matches(ds_s3):
-                # make sure to update dataPath column of variables
-                if update_data_path:
-                    variable_ids = _variable_ids_without_dataPath(engine, ds.id)
-                    if variable_ids:
-                        log.info("datasync.update_variables_dataPath", dataset_id=ds.id)
-                        with Session(engine) as session:
-                            for variable_id in variable_ids:
-                                variable = gm.Variable.load_variable(session, variable_id)
-                                variable.dataPath = _variable_dataPath(variable_id)
-                                session.add(variable)
-                            session.commit()
-                        continue
-
                 log.info("datasync.skip", dataset_id=ds.id, progress=progress)
                 continue
         except client.exceptions.NoSuchKey:
@@ -164,7 +144,6 @@ def cli(
                     engine=engine,
                     dry_run=dry_run,
                     private=ds.isPrivate,
-                    update_data_path=update_data_path,
                 ),
                 variable_ids,
             )
@@ -179,28 +158,24 @@ def cli(
         log.info("datasync.end", dataset_id=ds.id)
 
 
-def _sync_variable_data_metadata(
-    engine: Engine, variable_id: int, dry_run: bool, private: bool, update_data_path: bool
-) -> None:
+def _sync_variable_data_metadata(engine: Engine, variable_id: int, dry_run: bool, private: bool) -> None:
     t = time.time()
+    variable_df = variable_data_df(engine, variable_id)
+    var_data = variable_data(variable_df)
+    var_metadata = variable_metadata(engine, variable_id, variable_df)
 
     if not dry_run:
-        variable_df = variable_data_df(engine, variable_id)
-
         # upload data and metadata to S3
-        _upload_gzip_dict(variable_data(variable_df), _variable_data_s3_key(variable_id), private)
-        _upload_gzip_dict(
-            variable_metadata(engine, variable_id, variable_df), _variable_metadata_s3_key(variable_id), private
-        )
+        _upload_gzip_dict(var_data, _variable_data_s3_key(variable_id), private)
+        _upload_gzip_dict(var_metadata, _variable_metadata_s3_key(variable_id), private)
 
         # update dataPath and metadataPath of a variable
-        if update_data_path:
-            with Session(engine) as session:
-                variable = gm.Variable.load_variable(session, variable_id)
-                variable.dataPath = _variable_dataPath(variable_id)
-                variable.metadataPath = _variable_metadataPath(variable_id)
-                session.add(variable)
-                session.commit()
+        with Session(engine) as session:
+            variable = gm.Variable.load_variable(session, variable_id)
+            variable.dataPath = _variable_dataPath(variable_id)
+            variable.metadataPath = _variable_metadataPath(variable_id)
+            session.add(variable)
+            session.commit()
 
     log.info("datasync.upload", t=f"{time.time() - t:.2f}s", variable_id=variable_id)
 
@@ -282,13 +257,6 @@ def _variable_dataPath(variable_id: int) -> str:
 
 def _variable_metadataPath(variable_id: int) -> str:
     return os.path.join(S3_ENDPOINT, _variable_metadata_s3_key(variable_id))
-
-
-def _variable_ids_without_dataPath(engine: Engine, dataset_id: int) -> List[int]:
-    q = """
-    select id from variables where datasetId = %(dataset_id)s and dataPath is null
-    """
-    return list(pd.read_sql(q, engine, params={"dataset_id": dataset_id})["id"])
 
 
 def _load_variable_ids(engine: Engine, dataset_id: int) -> List[int]:

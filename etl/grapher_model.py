@@ -701,6 +701,7 @@ class Variable(SQLModel, table=True):
     grapherConfig: Optional[Dict[Any, Any]] = Field(default=None, sa_column=Column("grapherConfig", JSON))
     catalogPath: Optional[str] = Field(default=None, sa_column=Column("catalogPath", LONGTEXT))
     dataPath: Optional[str] = Field(default=None, sa_column=Column("dataPath", LONGTEXT))
+    metadataPath: Optional[str] = Field(default=None, sa_column=Column("metadataPath", LONGTEXT))
     dimensions: Optional[Dimensions] = Field(sa_column=Column("dimensions", JSON, nullable=True))
 
     datasets: Optional["Dataset"] = Relationship(back_populates="variables")
