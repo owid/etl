@@ -1,11 +1,13 @@
 import json
 from typing import Any, Dict
+from urllib.error import HTTPError
 
+import numpy as np
 import pandas as pd
 from sqlalchemy.engine import Engine
 
 
-def variable_data_df(engine: Engine, variable_id: int) -> pd.DataFrame:
+def variable_data_df_from_mysql(engine: Engine, variable_id: int) -> pd.DataFrame:
     q = """
     SELECT
         value,
@@ -21,8 +23,40 @@ def variable_data_df(engine: Engine, variable_id: int) -> pd.DataFrame:
     """
     df = pd.read_sql(q, engine, params={"variable_id": variable_id})
 
-    # convert it to numerical type if possible
+    # convert from string to numerical type if possible
     df["value"] = _convert_to_numeric(df["value"])
+
+    return df
+
+
+def variable_data_df_from_s3(engine: Engine, data_path: str) -> pd.DataFrame:
+    empty_df = pd.DataFrame(columns=["entityId", "entityName", "entityCode", "year", "value"])
+    try:
+        df = pd.read_json(data_path).rename(
+            columns={
+                "entities": "entityId",
+                "values": "value",
+                "years": "year",
+            }
+        )
+    # no data on S3 in dataPath
+    except HTTPError:
+        return empty_df
+
+    if df.empty:
+        return empty_df
+
+    # add entities from DB
+    q = """
+    SELECT
+        id AS entityId,
+        name AS entityName,
+        code AS entityCode
+    FROM entities
+    WHERE id in %(entity_ids)s
+    """
+    entities = pd.read_sql(q, engine, params={"entity_ids": df["entityId"].tolist()})
+    df = df.merge(entities, on="entityId")
 
     return df
 
@@ -137,14 +171,18 @@ def _infer_variable_type(values: pd.Series) -> str:
 
 
 def _convert_to_numeric(values: pd.Series) -> pd.Series:
+    values = values.astype(str).replace("nan", np.nan)
+    # raises ValueError if any value is not numeric or float
     try:
         return values.map(int)
     except ValueError:
         pass
+    # perhaps they're all floats
     try:
         return values.map(float)
     except ValueError:
         pass
+    # otherwise return them as strings
     return values
 
 

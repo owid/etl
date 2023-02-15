@@ -10,6 +10,7 @@ Usage:
 """
 
 import concurrent.futures
+import datetime
 import os
 from dataclasses import dataclass
 from threading import Lock
@@ -242,22 +243,33 @@ def upsert_table(
             catalog_path=catalog_path,
             dimensions=dimensions,
         ).upsert(session)
-        assert variable.id
+        variable_id = variable.id
+        assert variable_id
 
         session.commit()
 
         # delete its data to refresh it later
-        q = delete(gm.DataValues).where(gm.DataValues.variableId == variable.id)
+        q = delete(gm.DataValues).where(gm.DataValues.variableId == variable_id)
         session.execute(q)
         session.commit()
 
-        df = table.rename(columns={column_name: "value", "entity_id": "entityId"}).assign(variableId=variable.id)
+        df = table.rename(columns={column_name: "value", "entity_id": "entityId"}).assign(variableId=variable_id)
 
         if table.metadata.dataset.short_name not in BLACKLIST_DATASETS_DATA_VALUES_UPSERTS:
             insert_to_data_values(df)
             log.info("upsert_table.upserted_data_values", size=len(table))
 
-        return VariableUpsertResult(variable.id, source_id)
+        # data_values changed, make dataPath and metadataPath null again
+        # NOTE: in the future we want to skip writing to data_values and fill dataPath and metadataPath from
+        # here. For that we need to make sure all updates to data_values are made by ETL, then we can deprecate
+        # datasync and write to S3 directly
+        variable = gm.Variable.load_variable(session, variable_id)
+        variable.dataPath = None
+        variable.metadataPath = None
+        session.add(variable)
+        session.commit()
+
+        return VariableUpsertResult(variable_id, source_id)  # type: ignore
 
 
 def fetch_db_checksum(dataset: catalog.Dataset) -> Optional[str]:
@@ -279,9 +291,17 @@ def fetch_db_checksum(dataset: catalog.Dataset) -> Optional[str]:
         return ds.sourceChecksum if ds is not None else None
 
 
-def set_dataset_checksum(dataset_id: int, checksum: str) -> None:
+def set_dataset_checksum_and_editedAt(dataset_id: int, checksum: str) -> None:
     with Session(gm.get_engine()) as session:
-        q = update(gm.Dataset).where(gm.Dataset.id == dataset_id).values(sourceChecksum=checksum)
+        q = (
+            update(gm.Dataset)
+            .where(gm.Dataset.id == dataset_id)
+            .values(
+                sourceChecksum=checksum,
+                dataEditedAt=datetime.datetime.utcnow(),
+                metadataEditedAt=datetime.datetime.utcnow(),
+            )
+        )
         session.execute(q)
         session.commit()
 

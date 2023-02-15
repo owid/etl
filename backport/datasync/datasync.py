@@ -25,7 +25,12 @@ from etl import grapher_model as gm
 from etl.db import get_engine
 from etl.publish import connect_s3
 
-from .data_metadata import variable_data, variable_data_df, variable_metadata
+from .data_metadata import (
+    variable_data,
+    variable_data_df_from_mysql,
+    variable_data_df_from_s3,
+    variable_metadata,
+)
 
 log = structlog.get_logger()
 
@@ -160,7 +165,14 @@ def cli(
 
 def _sync_variable_data_metadata(engine: Engine, variable_id: int, dry_run: bool, private: bool) -> None:
     t = time.time()
-    variable_df = variable_data_df(engine, variable_id)
+    variable_df = variable_data_df_from_mysql(engine, variable_id)
+
+    # if data_values is empty, try loading data from S3 to use it for dimensions
+    # NOTE: if metadata changes, we still reupload even data to S3, this is quite inefficient, but
+    #   this entire script is a temporary solution until everything is uploaded directly from ETL
+    if variable_df.empty:
+        variable_df = variable_data_df_from_s3(engine, _variable_dataPath(variable_id))
+
     var_data = variable_data(variable_df)
     var_metadata = variable_metadata(engine, variable_id, variable_df)
 
@@ -216,7 +228,7 @@ class DatasetSync:
     def load_from_s3(cls, client, dataset_id):
         a = client.get_object(
             Bucket=S3_BUCKET,
-            Key=f"{S3_PREFIX}/_success_dataset_{dataset_id}",
+            Key=_dataset_success_s3_key(dataset_id),
         )
         d = json.loads(a["Body"].read().decode())
         d["dataEditedAt"] = dt.datetime.utcfromtimestamp(d["dataEditedAt"] / 1000)
@@ -228,7 +240,7 @@ class DatasetSync:
         client.put_object(
             Bucket=S3_BUCKET,
             Body=pd.Series(self.to_dict()).to_json(),
-            Key=f"{S3_PREFIX}/success/_success_dataset_{self.id}",
+            Key=_dataset_success_s3_key(self.id),
             ContentType="application/json",
             ACL="public-read",
         )
@@ -249,6 +261,10 @@ def _variable_data_s3_key(variable_id: int) -> str:
 
 def _variable_metadata_s3_key(variable_id: int) -> str:
     return f"{S3_PREFIX}/metadata/{variable_id}.json"
+
+
+def _dataset_success_s3_key(dataset_id: int) -> str:
+    return f"{S3_PREFIX}/success/_success_dataset_{dataset_id}"
 
 
 def _variable_dataPath(variable_id: int) -> str:
