@@ -804,6 +804,10 @@ def main():
     # Remove unnecessary regions.
     df = df[~df["name"].isin(regions_to_remove)].reset_index(drop=True)
 
+    # Sanity check.
+    error = "There are multiple regions with the same name (which is possible, but at least for now it shouldn't be)."
+    assert df[df["name"].duplicated()].empty, error
+
     # Edit the rows corresponding to historical regions.
     for historical_region in historical_regions:
         end_year = historical_regions[historical_region]["end_year"]
