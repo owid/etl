@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:24:29.135401
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_966_food_waste_in_the_supply_chain__t__wrap__2015__and__europa__2015
   namespace: backport
-  publication_date: latest
   short_name: dataset_966_food_waste_in_the_supply_chain__t__wrap__2015__and__europa__2015_config
+  file_extension: json
+  date_accessed: 2023-02-13 14:14:00.236575
+  name: Grapher metadata for dataset_966_food_waste_in_the_supply_chain__t__wrap__2015__and__europa__2015
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/966
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 130cefd69bb53701473d738e1d0d816d
+- md5: 782ac380bd9fb65afc00c3ab49faf8ad
   size: 4043
   path: dataset_966_food_waste_in_the_supply_chain__t__wrap__2015__and__europa__2015_config.json

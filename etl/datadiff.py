@@ -251,7 +251,9 @@ def cli(
             any_diff = True
 
     console.print()
-    if any_diff:
+    if not path_to_ds_a and not path_to_ds_b:
+        console.print("[yellow]❓ No datasets found[/yellow]")
+    elif any_diff:
         console.print("[red]❌ Found differences[/red]")
     else:
         console.print("[green]✅ No differences found[/green]")
