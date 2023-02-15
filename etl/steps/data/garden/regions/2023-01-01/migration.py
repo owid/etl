@@ -668,6 +668,14 @@ related_territories = {
 }
 
 
+def _explode_region_list(region, column):
+    text = f"  {column}:\n"
+    for member in sorted(region[column]):
+        text += f"    - {json.dumps(member)}\n"
+
+    return text
+
+
 def _create_yaml_content_from_df(df_main: pd.DataFrame) -> str:
     # Transform the rows in the dataframe into a good-looking yaml file (yaml_dump doesn't do a good enough job).
     text = f"""\
@@ -709,11 +717,11 @@ def _create_yaml_content_from_df(df_main: pd.DataFrame) -> str:
 
         # Add aliases only if there is any.
         if len(region["aliases"]) > 0:
-            text += f"  aliases: {region['aliases']}\n"
+            text += _explode_region_list(region, "aliases")
 
         # Add members only if there is any.
         if len(region["members"]) > 0:
-            text += f"  members: {region['members']}\n"
+            text += _explode_region_list(region, "members")
 
         # Add successors only if there is any.
         if region["is_historical"] or len(region["successors"]) > 0:
@@ -721,11 +729,12 @@ def _create_yaml_content_from_df(df_main: pd.DataFrame) -> str:
             assert len(region["successors"]) > 0
             assert region["end_year"]
             text += f"  end_year: {region['end_year']}\n"
-            text += f"  successors: {region['successors']}\n"
+            text += _explode_region_list(region, "successors")
 
         # Add related members only if there is any.
         if len(region["related"]) > 0:
-            text += f"  related: {region['related']}\n"
+            text += _explode_region_list(region, "related")
+
         text += "\n"
 
     return text
@@ -764,13 +773,6 @@ def main():
     df["members"] = pd.NA
 
     # Apply some minor corrections to existing data.
-
-    # Add a short name for DRC.
-    df.loc[df["code"] == "COD", "short_name"] = "DR Congo"
-
-    # Assign TLS the right name and short name, which is East Timor.
-    df.loc[df["code"] == "TLS", "name"] = "East Timor"
-    df.loc[df["code"] == "TLS", "short_name"] = "East Timor"
 
     # Add a short name for DRC.
     df.loc[df["code"] == "COD", "short_name"] = "DR Congo"
