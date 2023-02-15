@@ -781,6 +781,14 @@ def main():
     df.loc[df["code"] == "TLS", "name"] = "East Timor"
     df.loc[df["code"] == "TLS", "short_name"] = "East Timor"
 
+    # Add "Caribbean Netherlands" to the list of existing aliases of the BES islands.
+    df.loc[df["code"] == "BES", "aliases"] = json.dumps(
+        json.loads(df.loc[df["code"] == "BES", "aliases"].item()) + ["Caribbean Netherlands"]
+    )
+
+    # Remove entry for "Caribbean Netherlands".
+    df = df[df["code"] != "OWID_NLC"].reset_index(drop=True)
+
     # Edit region type of continents.
     for continent in continents:
         df.loc[df["name"] == continent, "region_type"] = "continent"

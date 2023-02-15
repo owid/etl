@@ -269,6 +269,7 @@
     - "BES Islands"
     - "Bonaire, Saint Eustatius And Saba"
     - "Bonaire, Sint Eustatius and Saba"
+    - "Caribbean Netherlands"
 
 - code: "BIH"
   name: "Bosnia and Herzegovina"
@@ -322,9 +323,6 @@
   name: "Cape Verde"
   aliases:
     - "Cabo Verde"
-
-- code: "OWID_NLC"
-  name: "Caribbean Netherlands"
 
 - code: "CYM"
   name: "Cayman Islands"
