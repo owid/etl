@@ -18,7 +18,7 @@ include:
   # - dag/archive/examples.yml
   # - dag/archive/emissions.yml
   # - dag/archive/papers.yml
-  # - dag/archive/demography.yml
+  - dag/archive/demography.yml
   # - dag/archive/conflicts.yml
   # - dag/archive/fasttrack.yml
   # - dag/archive/biodiversity.yml
