@@ -282,6 +282,11 @@ steps:
   data://explorers/wid/2023-01-27/world_inequality_database:
     - data://garden/wid/2023-01-27/world_inequality_database
 
+  #
+  # Regions - Regions (2023).
+  #
+  data://garden/regions/2023-01-01/regions:
+
 # Sub-dags to import
 include:
   - dag/open_numbers.yml
