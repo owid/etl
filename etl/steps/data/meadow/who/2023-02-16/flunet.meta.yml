@@ -21,7 +21,7 @@ tables:
       country_code:
         title: country_code
         description: ISO3 country codes
-      country_area_territory:
+      country:
         title: Country name
         description: Country, area or territory name
       iso_weekstartdate:

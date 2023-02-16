@@ -33,6 +33,7 @@ def run(dest_dir: str) -> None:
     tb = Table(df, short_name=paths.short_name, underscore=True)
     # Dropping out these columns as they are awkward types and we don't need to use them
     tb = tb.drop(columns=["comments", "geospread_comments"])
+    tb = tb.rename(columns={"country_area_territory": "country"})
 
     #
     # Save outputs.

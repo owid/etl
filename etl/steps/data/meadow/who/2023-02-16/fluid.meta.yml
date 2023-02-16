@@ -25,7 +25,7 @@ tables:
       country_code:
         title: country_code
         description: ISO3 country codes
-      country_area_territory:
+      country:
         title: Country name
         description: Country, area or territory name
       iso_weekstartdate:
@@ -99,13 +99,17 @@ tables:
       inf_risk:
         title: INF_RISK
       geospread:
-        title: GEOSPREAD
+        title: Geographic Spread
+        description: Geographic spread (1=No activity; 2=Localized; 3=Regional; 4=Widespread; 0=No information available)
       impact:
-        title: IMPACT
+        title: Impact
+        description: Impact (1=low; 2=moderate; 3=severe; 0=no information available)
       intensity:
-        title: INTENSITY
+        title: Intensity
+        description: Intensity (1=low or moderate; 2=high; 3=very high; 0=no information available)
       trend:
-        title: TREND
+        title: Trend
+        description: Trend (1=decreasing; 2=unchanged; 3=increasing; 0=no information available)
       nb_sites:
         title: Number of surveillance sites
       mortality_all:
