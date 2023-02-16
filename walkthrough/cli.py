@@ -5,9 +5,9 @@ import click
 from pywebio import start_server
 from rich import print
 
-from . import charts, garden, grapher, meadow, snapshot, walden
+from . import charts, explorers, garden, grapher, meadow, snapshot, walden
 
-PHASES = Literal["walden", "snapshot", "meadow", "garden", "grapher", "charts"]
+PHASES = Literal["walden", "snapshot", "meadow", "garden", "grapher", "explorers", "charts"]
 
 
 @click.command()
@@ -50,6 +50,8 @@ def cli(phase: Iterable[PHASES], run_checks: bool, dummy_data: bool, auto_open: 
         phase_func = garden.app
     elif phase == "grapher":
         phase_func = grapher.app
+    elif phase == "explorers":
+        phase_func = explorers.app
     elif phase == "charts":
         phase_func = charts.app
     else:
