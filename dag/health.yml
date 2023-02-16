@@ -79,3 +79,8 @@ steps:
     - data://meadow/postnatal_care/2022-09-19/postnatal_care
   data://grapher/postnatal_care/2022-09-19/postnatal_care:
     - data://garden/postnatal_care/2022-09-19/postnatal_care
+
+
+  # FluNet and FluID
+  data://meadow/who/2023-02-16/flunet:
+  - snapshot://who/2023-02-16/flunet.csv

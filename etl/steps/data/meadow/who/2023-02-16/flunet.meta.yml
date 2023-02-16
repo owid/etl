@@ -1,0 +1,183 @@
+dataset:
+  description: |-
+    "FluNet is a global web-based tool for influenza virological surveillance first launched in 1997. The virological data entered into FluNet, e.g. number of influenza viruses detected by subtype, are critical for tracking the movement of viruses globally and interpreting the epidemiological data. The data at country level are publically available and updated weekly. The results are presented in various formats including tables, maps and graphs.
+
+    The data are provided remotely by National Influenza Centres (NICs) of the Global Influenza Surveillance and Response System (GISRS) and other national influenza reference laboratories collaborating actively with GISRS, or are uploaded from WHO regional databases."
+tables:
+  flunet:
+    variables:
+      whoregion:
+        title: WHO Region
+        description: WHO regions (AFR, AMR, EMR, EUR, SEAR, WPR)
+      fluseason:
+        title: Flu season
+        description: Reporting season (NH=northern hemisphere, SH=southern hemisphere, YR=year-round reporting)
+      hemisphere:
+        title: Hemisphere
+        description: Hemisphere (NH=northern hemisphere, SH=southern hemisphere)
+      itz:
+        title: Influenza Transmission Zone
+        description: https://cdn.who.int/media/docs/default-source/influenza/influenza-transmission-zones20180914.pdf
+      country_code:
+        title: country_code
+        description: ISO3 country codes
+      country_area_territory:
+        title: Country name
+        description: Country, area or territory name
+        short_unit: ''
+        unit: ''
+      iso_weekstartdate:
+        title: ISO week start date
+        short_unit: ''
+        unit: ''
+      iso_year:
+        title: Year
+        short_unit: ''
+        unit: ''
+      iso_week:
+        title: Week
+        short_unit: ''
+        unit: ''
+      mmwr_weekstartdate:
+        title: Morbidity and Mortality Weekly Report start date
+        short_unit: ''
+        unit: ''
+      mmwr_year:
+        title: Morbidity and Mortality Weekly Report year
+        short_unit: ''
+        unit: ''
+      mmwr_week:
+        title: Morbidity and Mortality Weekly Report week
+        short_unit: ''
+        unit: ''
+      origin_source:
+        title: Source
+        description: Surveillance site type (NONSENTINEL/SENTINEL/NOTDEFINED)
+        short_unit: ''
+        unit: ''
+      spec_processed_nb:
+        title: Number of specimens processed for influenza
+        description: Number of specimens processed for influenza with any kind of method
+        short_unit: ''
+        unit: ''
+      spec_received_nb:
+        title: Number of specimens received for influenza
+        description: Number of specimens received at the laboratory in the reporting week (can be different from the week in which the sample has been taken)
+        short_unit: ''
+        unit: ''
+      ah1n12009:
+        title: Number of A(H1N1)pdm09 detections
+        short_unit: ''
+        unit: ''
+      ah1:
+        title: Number of A(H1) detections (other than A(H1N1)pdm09)
+        short_unit: ''
+        unit: ''
+      ah3:
+        title: Number of A(H3) detections
+        short_unit: ''
+        unit: ''
+      ah5:
+        title: Number of A(H5) detections
+        short_unit: ''
+        unit: ''
+      ah7n9:
+        title: Number of A(H7N9) detections
+        short_unit: ''
+        unit: ''
+      anotsubtyped:
+        title: Number of not subtyped influenza A detections
+        short_unit: ''
+        unit: ''
+      anotsubtypable:
+        title: Number of unsubtypable influenza A detections
+        short_unit: ''
+        unit: ''
+      aother_subtype:
+        title: Number of other influenza A subtype detections
+        short_unit: ''
+        unit: ''
+      aother_subtype_details:
+        title: Name for A other subtype(s) detected cases
+        short_unit: ''
+        unit: ''
+      inf_a:
+        title: Number of influenza A detections (all subtypes)
+        short_unit: ''
+        unit: ''
+      bvic_2del:
+        title: Number of B (Victoria lineage) 2-deletion detections
+        short_unit: ''
+        unit: ''
+      bvic_3del:
+        title: Number of B (Victoria lineage) 3-deletion detections
+        short_unit: ''
+        unit: ''
+      bvic_nodel:
+        title: Number of B (Victoria lineage) detections (deletions not specified)
+        short_unit: ''
+        unit: ''
+      bvic_delunk:
+        title: Number of B (Victoria lineage) detections (deletions unknown)
+        short_unit: ''
+        unit: ''
+      byam:
+        title: Number of B (Yamagata lineage) detections
+        short_unit: ''
+        unit: ''
+      bnotdetermined:
+        title: Number of influenza B detections (lineage not determined)
+        short_unit: ''
+        unit: ''
+      inf_b:
+        title: Number of influenza B detections (all subtypes)
+        short_unit: ''
+        unit: ''
+      inf_all:
+        title: Number of influenza detections (all types)
+        short_unit: ''
+        unit: ''
+      inf_negative:
+        title: Number of influenza negatives
+        short_unit: ''
+        unit: ''
+      ili_activity:
+        title: "ILI activity (1 - No report / 2 - No activity /3 - Sporadic acitivity / 4 - Local activity / 5 -  Regional activity / 6 - Widespread activity)"
+        short_unit: ''
+        unit: ''
+      adeno:
+        title: Number of Adeno virus detections
+        short_unit: ''
+        unit: ''
+      boca:
+        title: Number of Boca virus detections
+        short_unit: ''
+        unit: ''
+      human_corona:
+        title: Number of human corona virus detections (not SARS-CoV-2)
+        short_unit: ''
+        unit: ''
+      metapneumo:
+        title: Number of Metapneumo virus detections
+        short_unit: ''
+        unit: ''
+      parainfluenza:
+        title: Number of Parainfluenza virus detections
+      rhino:
+        title: Number of Rhino virus detections
+      rsv:
+        title: Number of Respiratory Syncytial Virus (RSV) detections
+      otherrespvirus:
+        title: Number of other respiratory virus detections
+      other_respvirus_details:
+        title: List of other respiratory viruses detected (if any)
+      lab_result_comment:
+        title: Laboratory result comments
+      wcr_comment:
+        title: Weekly country report (WCR)
+      iso2:
+        title: ISO2 country code
+      isoyw:
+        title: Year and week (ISO8601)
+      mmwryw:
+        title: Year and week (MMWR)
