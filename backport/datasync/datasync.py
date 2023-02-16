@@ -85,10 +85,16 @@ def cli(
         etl-datasync ...
 
         # sync data since some date
-        ENV=.env.prod backport-datasync --dt-start "2023-01-01 00:00:00" --workers 10
+        ENV=.env.staging backport-datasync --dt-start "2023-01-01 00:00:00" --workers 10
 
         # real-time sync in a forever loop
-        while true; do ENV=.env.prod backport-datasync --workers 10; sleep 1; done;
+        last_dt="2023-01-01 00:00:00"
+        while true; do
+            new_dt=$(date +"%Y-%m-%d %H:%M:%S")
+            ENV=.env.staging backport-datasync --workers 10 --dt-start "$last_dt"
+            last_dt=$new_dt
+            sleep 5
+        done;
 
     To fill `dataPath` column for all datasets from live_grapher DB run the following SQL:
 
@@ -247,6 +253,8 @@ class DatasetSync:
 
     def matches(self, ds: "DatasetSync") -> bool:
         # compare timestamps of the latest update (we don't have sourceChecksum for all datasets)
+        # NOTE: we rebake both data and metadata even if only one has changed. This is a bit inefficient, but should
+        # not matter much since dataset updates are rare.
         if self.dataEditedAt == ds.dataEditedAt and self.metadataEditedAt == ds.metadataEditedAt:
             # checksums should match if dataEditedAt match
             assert self.sourceChecksum is None or ds.sourceChecksum is None or self.sourceChecksum == ds.sourceChecksum
