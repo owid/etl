@@ -81,6 +81,8 @@ steps:
     - data://garden/postnatal_care/2022-09-19/postnatal_care
 
 
-  # FluNet and FluID
+  # FluNet and FluID - WHO Flu Databases
   data://meadow/who/2023-02-16/flunet:
   - snapshot://who/2023-02-16/flunet.csv
+  data://meadow/who/2023-02-16/fluid:
+  - snapshot://who/2023-02-16/fluid.csv
