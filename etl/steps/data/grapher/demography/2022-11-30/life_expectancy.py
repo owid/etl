@@ -1,19 +1,22 @@
+"""Grapher step for our Life Expectancy OMM."""
 import yaml
 from owid import catalog
 
 from etl.helpers import PathFinder
 
-N = PathFinder(__file__)
+paths = PathFinder(__file__)
 
 
 def run(dest_dir: str) -> None:
+    # Load garden dataset
+    ds_garden: catalog.Dataset = paths.load_dependency("life_expectancy", "garden")
     # get dataset
-    dataset = catalog.Dataset.create_empty(dest_dir, N.garden_dataset.metadata)
+    dataset = catalog.Dataset.create_empty(dest_dir, ds_garden.metadata)
 
     # get tables
-    tb = N.garden_dataset["life_expectancy"]
-    tb_historical = N.garden_dataset["historical"]
-    tb_projection = N.garden_dataset["projection"]
+    tb = ds_garden["life_expectancy"]
+    tb_historical = ds_garden["historical"]
+    tb_projection = ds_garden["projection"]
 
     # add tables
     dataset.add(tb)
@@ -21,22 +24,21 @@ def run(dest_dir: str) -> None:
     dataset.add(tb_projection)
 
     # add anomalies text
-    dataset = add_anomalies_text(dataset)
-
+    dataset = add_anomalies_text(dataset, ds_garden)
     # save table
     dataset.save()
 
 
-def add_anomalies_text(ds: catalog.Dataset):
+def add_anomalies_text(ds: catalog.Dataset, ds_garden: catalog.Dataset):
     """Add anomalies text to dataset description.
 
     This is added to the end of dataset's description."""
-    anomalies_text = build_anomalies_text()
+    anomalies_text = build_anomalies_text(ds_garden)
     ds.metadata.description = ds.metadata.description + "\n" + anomalies_text
     return ds
 
 
-def build_anomalies_text():
+def build_anomalies_text(ds_garden: catalog.Dataset) -> str:
     """Build anomaly text.
 
     Expected input is a table called '_hist_events', which just has one cell with a YAML file raw content as a string.
@@ -67,7 +69,7 @@ def build_anomalies_text():
         </ul>
         ...
     """
-    tb = N.garden_dataset["_hist_events"]
+    tb = ds_garden["_hist_events"]
     # load historical events as YAML
     anomalies_all = yaml.safe_load(tb.loc[0, "hist_events"])
     # build historical events text

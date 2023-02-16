@@ -14,6 +14,7 @@ import requests
 import structlog
 from owid import catalog
 from owid.catalog import CHANNEL
+from owid.catalog.datasets import DEFAULT_FORMATS, FileFormat
 from owid.datautils.common import ExceptionFromDocstring
 from owid.walden import Catalog as WaldenCatalog
 from owid.walden import Dataset as WaldenDataset
@@ -67,6 +68,7 @@ def create_dataset(
     tables: Iterable[catalog.Table],
     default_metadata: Optional[Union[SnapshotMeta, catalog.DatasetMeta]] = None,
     underscore_table: bool = True,
+    formats: List[FileFormat] = DEFAULT_FORMATS,
 ) -> catalog.Dataset:
     """Create a dataset and add a list of tables. The dataset metadata is inferred from
     default_metadata and the dest_dir (which is in the form `channel/namespace/version/short_name`).
@@ -96,7 +98,7 @@ def create_dataset(
     for table in tables:
         if underscore_table:
             table = catalog.utils.underscore_table(table)
-        ds.add(table)
+        ds.add(table, formats=formats)
 
     # set metadata from dest_dir
     pattern = (
@@ -249,12 +251,12 @@ class PathFinder:
             # If version is not specified, catch any version, which could be either a date, a year, or "latest".
             version = r"(?:\d{4}\-\d{2}\-\d{2}|\d{4}|latest)"
 
-        if channel in ["meadow", "garden", "grapher"]:
+        if channel in ["meadow", "garden", "grapher", "explorers"]:
             step_name = f"data://{channel}/{namespace}/{version}/{short_name}"
         elif channel in ["snapshot", "walden"]:
             step_name = f"{channel}://{namespace}/{version}/{short_name}"
         elif channel is None:
-            step_name = rf"(?:snapshot:/|walden:/|data://meadow|data://garden|data://grapher|backport://backport)/{namespace}/{version}/{short_name}"
+            step_name = rf"(?:snapshot:/|walden:/|data://meadow|data://garden|data://grapher|data://explorers|backport://backport)/{namespace}/{version}/{short_name}"
         else:
             raise UnknownChannel
 
