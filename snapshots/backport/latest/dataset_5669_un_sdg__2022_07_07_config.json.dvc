@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5669_un_sdg__2022_07_07_config
   file_extension: json
-  date_accessed: 2023-02-17 16:53:40.732729
+  date_accessed: 2023-02-17 17:02:59.768103
   name: Grapher metadata for dataset_5669_un_sdg__2022_07_07
   description: The United Nations Sustainable Development Goal (SDG) dataset is the
     primary collection of data tracking progress towards the SDG indicators, compiled
@@ -15,6 +15,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 2fce68f4bdfad731527da50382069975
+- md5: 40333ba00a005c5de6c7a6c9c0be70e5
   size: 8556149
   path: dataset_5669_un_sdg__2022_07_07_config.json
