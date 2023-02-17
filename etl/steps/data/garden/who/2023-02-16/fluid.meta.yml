@@ -1,32 +1,18 @@
-all_sources:
-  - source_testing: &source-testing
-      name: # TO BE FILLED. Example: Testing Short Citation
-      published_by: # TO BE FILLED (if different to short citation). Example: Testing Full Citation
-      url: # TO BE FILLED. Example: https://url_of_testing_source.com/
-      date_accessed: # TO BE FILLED. Example: 2023-01-01
-      publication_date: # TO BE FILLED. Example: 2023-01-01
-      publication_year: # TO BE FILLED (if publication_date is not given). Example: 2023
-      # description: Source description.
-
 dataset:
-  title: # TO BE FILLED. Example: Testing Dataset Name (Institution, 2023)
-  # description: Dataset description.
-  licenses:
-    - name: # TO BE FILLED. Example: Testing License Name
-      url: # TO BE FILLED. Example: https://url_of_testing_source.com/license
-  sources:
-    - *source-testing
+  description: |-
+    FluID is a global platform for data sharing that links regional influenza epidemiological data into a single global database. The platform provides connections between existing databases and can also be used to directly enter data by the national focal points through a web-based interface. It complements the existing virological data collection tool FluNet.
 
+    The platform accommodates both qualitative and quantitative data which facilitates the tracking of global trends, spread, intensity, and impact of influenza. These data are made freely available to health policy makers in order to assist them in making informed decisions regarding the management of influenza.
+  licenses:
+  - {}
+  sources:
+  - {}
 tables:
   fluid:
     variables:
-      # testing_variable:
-      #   title: Testing variable title
-      #   unit: arbitrary units
-      #   short_unit: au
-      #   description: Full description of testing variable.
-      #   sources:
-      #     - *source-testing
-      #   display:
-      #     entityAnnotationsMap: Test annotation
-      #     numDecimalPlaces: 0
+      case_info:
+        title: case_info
+      reported_cases:
+        title: reported_cases
+      date:
+        title: date

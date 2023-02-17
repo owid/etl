@@ -1,32 +1,61 @@
-all_sources:
-  - source_testing: &source-testing
-      name: # TO BE FILLED. Example: Testing Short Citation
-      published_by: # TO BE FILLED (if different to short citation). Example: Testing Full Citation
-      url: # TO BE FILLED. Example: https://url_of_testing_source.com/
-      date_accessed: # TO BE FILLED. Example: 2023-01-01
-      publication_date: # TO BE FILLED. Example: 2023-01-01
-      publication_year: # TO BE FILLED (if publication_date is not given). Example: 2023
-      # description: Source description.
-
 dataset:
-  title: # TO BE FILLED. Example: Testing Dataset Name (Institution, 2023)
-  # description: Dataset description.
-  licenses:
-    - name: # TO BE FILLED. Example: Testing License Name
-      url: # TO BE FILLED. Example: https://url_of_testing_source.com/license
-  sources:
-    - *source-testing
+  description: |-
+    "FluNet is a global web-based tool for influenza virological surveillance first launched in 1997. The virological data entered into FluNet, e.g. number of influenza viruses detected by subtype, are critical for tracking the movement of viruses globally and interpreting the epidemiological data. The data at country level are publically available and updated weekly. The results are presented in various formats including tables, maps and graphs.
 
+    The data are provided remotely by National Influenza Centres (NICs) of the Global Influenza Surveillance and Response System (GISRS) and other national influenza reference laboratories collaborating actively with GISRS, or are uploaded from WHO regional databases."
+  licenses:
+  - {}
+  sources:
+  - {}
 tables:
   flunet:
     variables:
-      # testing_variable:
-      #   title: Testing variable title
-      #   unit: arbitrary units
-      #   short_unit: au
-      #   description: Full description of testing variable.
-      #   sources:
-      #     - *source-testing
-      #   display:
-      #     entityAnnotationsMap: Test annotation
-      #     numDecimalPlaces: 0
+      hemisphere:
+        title: Hemisphere
+        description: Hemisphere (NH=northern hemisphere, SH=southern hemisphere)
+      date:
+        title: date
+      ah1n12009:
+        title: Number of A(H1N1)2009 detections
+      ah1:
+        title: Number of A(H1) detections (other than A(H1N1)pdm09)
+      ah3:
+        title: Number of A(H3) detections
+      ah5:
+        title: Number of A(H5) detections
+      ah7n9:
+        title: Number of A(H7N9) detections
+      anotsubtyped:
+        title: Number of not subtyped influenza A detections
+      anotsubtypable:
+        title: Number of unsubtypable influenza A detections
+      aother_subtype:
+        title: Number of other influenza A subtype detections
+      inf_a:
+        title: Number of influenza A detections (all subtypes)
+      bvic_2del:
+        title: Number of B (Victoria lineage) 2-deletion detections
+      bvic_3del:
+        title: Number of B (Victoria lineage) 3-deletion detections
+      bvic_nodel:
+        title: Number of B (Victoria lineage) detections (deletions not specified)
+      bvic_delunk:
+        title: Number of B (Victoria lineage) detections (deletions unknown)
+      byam:
+        title: Number of B (Yamagata lineage) detections
+      bnotdetermined:
+        title: Number of influenza B detections (lineage not determined)
+      inf_b:
+        title: Number of influenza B detections (all subtypes)
+      inf_all:
+        title: Number of influenza detections (all types)
+      inf_negative:
+        title: Number of influenza negatives
+      ili_activity:
+        title: "ILI activity (1 - No report / 2 - No activity /3 - Sporadic acitivity / 4 - Local activity / 5 -  Regional activity / 6 - Widespread activity)"
+      spec_processed_nb:
+        title: Number of specimens processed for influenza
+        description: Number of specimens processed for influenza with any kind of method
+      spec_received_nb:
+        title: Number of specimens received for influenza
+        description: Number of specimens received at the laboratory in the reporting week (can be different from the week in which the sample has been taken)
