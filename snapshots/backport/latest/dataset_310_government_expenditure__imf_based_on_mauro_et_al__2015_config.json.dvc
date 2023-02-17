@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:55:57.342091
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_310_government_expenditure__imf_based_on_mauro_et_al__2015
   namespace: backport
-  publication_date: latest
   short_name: dataset_310_government_expenditure__imf_based_on_mauro_et_al__2015_config
+  file_extension: json
+  date_accessed: 2023-02-17 13:01:13.594194
+  name: Grapher metadata for dataset_310_government_expenditure__imf_based_on_mauro_et_al__2015
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/310
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 4932978c71ff521c398244c3d5177ec7
+- md5: 2c89b498035ff86b3e437bf4f8213955
   size: 2951
   path: dataset_310_government_expenditure__imf_based_on_mauro_et_al__2015_config.json

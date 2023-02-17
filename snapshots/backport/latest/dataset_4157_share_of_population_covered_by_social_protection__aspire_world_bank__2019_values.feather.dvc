@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 01:39:52.191163
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Share of population covered by social protection - ASPIRE World Bank (2019)
   namespace: backport
-  publication_date: latest
   short_name: dataset_4157_share_of_population_covered_by_social_protection__aspire_world_bank__2019_values
+  file_extension: feather
+  date_accessed: 2023-02-17 12:42:23.559904
+  name: Share of population covered by social protection - ASPIRE World Bank (2019)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/4157
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 6aedc36432821492a5ead614d7d99d58
-  size: 7098
+- md5: 2fa587dbcba5d08105ce0a2cf42e2493
+  size: 7466
   path: dataset_4157_share_of_population_covered_by_social_protection__aspire_world_bank__2019_values.feather

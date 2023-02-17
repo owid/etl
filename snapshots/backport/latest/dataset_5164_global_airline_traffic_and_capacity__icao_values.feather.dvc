@@ -1,12 +1,13 @@
 meta:
   namespace: backport
   short_name: dataset_5164_global_airline_traffic_and_capacity__icao_values
+  file_extension: feather
+  date_accessed: 2023-02-17 14:13:05.950690
   name: Global airline traffic and capacity (ICAO)
   description: https://github.com/owid/notebooks/tree/main/EdouardMathieu/icao_world_airlines_traffic_capacity
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5164
-  file_extension: feather
-  date_accessed: 2022-12-22 12:01:18.778623
+  source_published_by: Our World in Data catalog backport
   is_public: true
   version: latest
   publication_date: latest

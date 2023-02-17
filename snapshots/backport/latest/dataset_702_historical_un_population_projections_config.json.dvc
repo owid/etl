@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:16:29.708982
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_702_historical_un_population_projections
   namespace: backport
-  publication_date: latest
   short_name: dataset_702_historical_un_population_projections_config
+  file_extension: json
+  date_accessed: 2023-02-17 12:52:56.242874
+  name: Grapher metadata for dataset_702_historical_un_population_projections
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/702
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: f807aa33f142611b9ee37482acfc1603
+- md5: 89e7f2cb124c7475b7acf85f89b5f95b
   size: 6725
   path: dataset_702_historical_un_population_projections_config.json

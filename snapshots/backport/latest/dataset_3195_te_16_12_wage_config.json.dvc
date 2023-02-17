@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:10:02.188188
-  description: core-econ.org
-  file_extension: json
-  is_public: false
-  name: Grapher metadata for dataset_3195_te_16_12_wage
   namespace: backport
-  publication_date: latest
   short_name: dataset_3195_te_16_12_wage_config
+  file_extension: json
+  date_accessed: 2023-02-17 13:35:25.975766
+  name: Grapher metadata for dataset_3195_te_16_12_wage
+  description: core-econ.org
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/3195
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 2391e0b4170cda9517c0707a01cfaba6
+- md5: 3cfa1cd90742bbe22ff79ecb593cdef2
   size: 1615
   path: dataset_3195_te_16_12_wage_config.json

@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 01:04:16.352246
-  description: ''
-  file_extension: feather
-  is_public: false
-  name: Land spared from gains in cereal crop yields (FAO 2021)
   namespace: backport
-  publication_date: latest
   short_name: dataset_5341_land_spared_from_gains_in_cereal_crop_yields__fao_2021_values
+  file_extension: feather
+  date_accessed: 2023-02-17 12:53:10.268460
+  name: Land spared from gains in cereal crop yields (FAO 2021)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5341
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 3cd0b33bd968b7033b9dd7689b9a9a9e
-  size: 8330
+- md5: 1b0831b8abd3fc2887bddc33d089169c
+  size: 8706
   path: dataset_5341_land_spared_from_gains_in_cereal_crop_yields__fao_2021_values.feather

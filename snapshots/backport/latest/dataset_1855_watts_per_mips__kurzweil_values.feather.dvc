@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 15:50:48.194673
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Watts per MIPS- Kurzweil
   namespace: backport
-  publication_date: latest
   short_name: dataset_1855_watts_per_mips__kurzweil_values
+  file_extension: feather
+  date_accessed: 2023-02-17 13:27:50.578300
+  name: Watts per MIPS- Kurzweil
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/1855
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 71fbbeede6198dcc7f78497864764e0e
-  size: 6074
+- md5: 9ac121dbdbdd3ecf21d8fd181bad2930
+  size: 6442
   path: dataset_1855_watts_per_mips__kurzweil_values.feather

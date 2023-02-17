@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:54:40.304784
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_971_oil_production__etemad__and__luciana
   namespace: backport
-  publication_date: latest
   short_name: dataset_971_oil_production__etemad__and__luciana_config
+  file_extension: json
+  date_accessed: 2023-02-17 12:25:41.966739
+  name: Grapher metadata for dataset_971_oil_production__etemad__and__luciana
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/971
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 917f8f45d4679c63544e17b970c6cebd
+- md5: c47bfa0eb9e4d5c23836cba32a7f1fdf
   size: 1566
   path: dataset_971_oil_production__etemad__and__luciana_config.json

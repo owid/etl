@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_4913_share_of_food_lost_by_food_type_and_region__fao__2019_config
   file_extension: json
-  date_accessed: 2023-02-13 14:12:44.482097
+  date_accessed: 2023-02-17 12:59:06.286300
   name: Grapher metadata for dataset_4913_share_of_food_lost_by_food_type_and_region__fao__2019
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 84a052911528ba1e049af255eb18cee0
+- md5: 0d737e438718f61d6bb511c565db035f
   size: 3941
   path: dataset_4913_share_of_food_lost_by_food_type_and_region__fao__2019_config.json

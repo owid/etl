@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:34:13.768685
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_2452_price_of_nails_since_1695__daniel_sichels__2017
   namespace: backport
-  publication_date: latest
   short_name: dataset_2452_price_of_nails_since_1695__daniel_sichels__2017_config
+  file_extension: json
+  date_accessed: 2023-02-17 14:18:04.474189
+  name: Grapher metadata for dataset_2452_price_of_nails_since_1695__daniel_sichels__2017
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2452
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: c5c037ffd1417837c8094e7ef996c723
+- md5: 2349ba95d8da12cf05404d3ec8f740fe
   size: 11626
   path: dataset_2452_price_of_nails_since_1695__daniel_sichels__2017_config.json

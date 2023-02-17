@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:32:53.689130
-  description: core-econ.org
-  file_extension: json
-  is_public: false
-  name: Grapher metadata for dataset_3239_te_15_1_rulingparty
   namespace: backport
-  publication_date: latest
   short_name: dataset_3239_te_15_1_rulingparty_config
+  file_extension: json
+  date_accessed: 2023-02-17 12:04:57.464907
+  name: Grapher metadata for dataset_3239_te_15_1_rulingparty
+  description: core-econ.org
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/3239
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 33f1b546cfae84e4518c3a4c932df25b
+- md5: c59dbe7c26d92f05b8de822c5f4c0021
   size: 1316
   path: dataset_3239_te_15_1_rulingparty_config.json
