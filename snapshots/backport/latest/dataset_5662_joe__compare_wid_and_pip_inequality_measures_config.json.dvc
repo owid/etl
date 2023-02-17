@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5662_joe__compare_wid_and_pip_inequality_measures_config
   file_extension: json
-  date_accessed: 2023-02-17 16:06:12.537109
+  date_accessed: 2023-02-17 16:35:26.036750
   name: Grapher metadata for dataset_5662_joe__compare_wid_and_pip_inequality_measures
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: e064e32a859819cca67999f225d16c41
+- md5: 9a877a4282be2ac403b6d10e49a8a2f9
   size: 35022
   path: dataset_5662_joe__compare_wid_and_pip_inequality_measures_config.json
