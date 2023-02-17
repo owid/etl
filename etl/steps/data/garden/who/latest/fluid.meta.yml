@@ -10,9 +10,13 @@ dataset:
 tables:
   fluid:
     variables:
-      case_info:
-        title: case_info
-      reported_cases:
-        title: reported_cases
-      date:
-        title: date
+      reported_ari_cases:
+        title: Reported acute respiratory infections
+      reported_sari_cases:
+        title: Reported severe acute respiratory infections
+      reported_ili_cases:
+        title: Reported influenza-like illnesses
+      reported_sari_deaths:
+        title: Reported severe acute respiratory deaths
+      reported_sari_icu:
+        title: Reported severe acute respiratory ICU hospitalizations

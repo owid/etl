@@ -10,9 +10,6 @@ dataset:
 tables:
   flunet:
     variables:
-      hemisphere:
-        title: Hemisphere
-        description: Hemisphere (NH=northern hemisphere, SH=southern hemisphere)
       date:
         title: date
       ah1n12009:
@@ -25,34 +22,22 @@ tables:
         title: Number of A(H5) detections
       ah7n9:
         title: Number of A(H7N9) detections
-      anotsubtyped:
-        title: Number of not subtyped influenza A detections
-      anotsubtypable:
-        title: Number of unsubtypable influenza A detections
-      aother_subtype:
-        title: Number of other influenza A subtype detections
+      a_no_subtype:
+        title: Number of A (no subtype) detections
       inf_a:
         title: Number of influenza A detections (all subtypes)
-      bvic_2del:
-        title: Number of B (Victoria lineage) 2-deletion detections
-      bvic_3del:
-        title: Number of B (Victoria lineage) 3-deletion detections
-      bvic_nodel:
-        title: Number of B (Victoria lineage) detections (deletions not specified)
-      bvic_delunk:
-        title: Number of B (Victoria lineage) detections (deletions unknown)
       byam:
         title: Number of B (Yamagata lineage) detections
       bnotdetermined:
         title: Number of influenza B detections (lineage not determined)
+      bvic:
+        title: Number of B (Victoria lineage) detections
       inf_b:
         title: Number of influenza B detections (all subtypes)
       inf_all:
         title: Number of influenza detections (all types)
       inf_negative:
         title: Number of influenza negatives
-      ili_activity:
-        title: "ILI activity (1 - No report / 2 - No activity /3 - Sporadic acitivity / 4 - Local activity / 5 -  Regional activity / 6 - Widespread activity)"
       spec_processed_nb:
         title: Number of specimens processed for influenza
         description: Number of specimens processed for influenza with any kind of method

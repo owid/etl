@@ -54,54 +54,6 @@ def run(dest_dir: str) -> None:
     log.info("flunet.end")
 
 
-def clean_and_format_data(df: pd.DataFrame) -> pd.DataFrame:
-    df["date"] = df["iso_weekstartdate"]
-    return df
-
-
-def create_date_from_iso_week(date_iso: pd.Series) -> pd.Series:
-    date = pd.to_datetime(date_iso, format="%Y-%m-%d", utc=True).dt.date.astype(str)
-    return date
-
-
-def aggregate_surveillance_type(combined_df: pd.DataFrame) -> pd.DataFrame:
-    sel_cols = [
-        "country",
-        "hemisphere",
-        "date",
-        "origin_source",
-        "ah1n12009",
-        "ah1",
-        "ah3",
-        "ah5",
-        "ah7n9",
-        "anotsubtyped",
-        "anotsubtypable",
-        "aother_subtype",
-        "aother_subtype_details",
-        "inf_a",
-        "bvic_2del",
-        "bvic_3del",
-        "bvic_nodel",
-        "bvic_delunk",
-        "byam",
-        "bnotdetermined",
-        "inf_b",
-        "inf_all",
-        "inf_negative",
-        "ili_activity",
-        "spec_processed_nb",
-        "spec_received_nb",
-    ]
-    df = combined_df[sel_cols]
-    df = df.copy(deep=True)
-    # Summing all cases by country, hemisphere and date
-    df_agg = df.groupby(["country", "hemisphere", "date"]).sum().reset_index()
-    # Check we haven't lost any cases along the way
-    assert combined_df["inf_all"].sum() == df_agg["inf_all"].sum()
-    return df_agg
-
-
 def combine_columns(df: pd.DataFrame) -> pd.DataFrame:
     """
     Combine columns of:
@@ -114,54 +66,80 @@ def combine_columns(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def combine_columns_calc_percent(df: pd.DataFrame) -> pd.DataFrame:
+def create_date_from_iso_week(date_iso: pd.Series) -> pd.Series:
+    """
+    Convert iso week to date format
+    """
+    date = pd.to_datetime(date_iso, format="%Y-%m-%d", utc=True).dt.date.astype(str)
+    return date
 
-    df["INF_NEGATIVE"] = df["INF_NEGATIVE"].replace(r"^\s*$", np.nan, regex=True)
-    df["denom"] = df[["INF_NEGATIVE", "SPEC_PROCESSED_NB"]].replace(0, np.nan).bfill(axis=1).iloc[:, 0].fillna(0)
-    df["denominator"] = df[["denom", "SPEC_RECEIVED_NB"]].replace(0, np.nan).bfill(axis=1).iloc[:, 0].fillna(0)
-    df["pcnt_pos_neg"] = (df["INF_ALL"] / (df["INF_ALL"] + df["INF_NEGATIVE"])) * 100
-    df["pcnt_pos_denom"] = (df["INF_ALL"] / df["denominator"]) * 100
 
-    df_den = df[(df["INF_NEGATIVE"] == 0) & (df["denominator"] != 0)]
-    df_neg = df[df["INF_NEGATIVE"] == df["denominator"]]
+def clean_and_format_data(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Clean data by:
+    * Converting date to date format
+    * Combining subtype columns together
+    * Drop unused columns
+    """
 
-    assert df_neg.shape[0] + df_den.shape[0] == df.shape[0], "Some rows are missing from one of the dataframes"
+    df["date"] = create_date_from_iso_week(df["iso_weekstartdate"])
+    df = combine_columns(df)
+    columns_to_drop = [
+        "hemisphere",
+        "anotsubtyped",
+        "anotsubtypable",
+        "aother_subtype",
+        "bvic_2del",
+        "bvic_3del",
+        "bvic_nodel",
+        "bvic_delunk",
+        "ili_activity",
+    ]
+    df = df.drop(columns=columns_to_drop)
+    return df
 
-    df_neg = df_neg.drop(["denom", "denominator", "pcnt_pos_denom"], axis=1).rename(
-        columns={"pcnt_pos_neg": "pcnt_pos"}
-    )
-    df_den = df_den.drop(["denom", "denominator", "pcnt_pos_neg"], axis=1).rename(
-        columns={"pcnt_pos_denom": "pcnt_pos"}
-    )
 
-    df_com = pd.concat([df_neg, df_den])
-    assert df_com.shape[0] == df.shape[0]
+def aggregate_surveillance_type(combined_df: pd.DataFrame) -> pd.DataFrame:
+    sel_cols = [
+        "country",
+        "date",
+        "origin_source",
+        "ah1n12009",
+        "ah1",
+        "ah3",
+        "ah5",
+        "ah7n9",
+        "a_no_subtype",
+        "inf_a",
+        "byam",
+        "bnotdetermined",
+        "bvic",
+        "inf_b",
+        "inf_all",
+        "inf_negative",
+        "spec_processed_nb",
+        "spec_received_nb",
+    ]
+    df = combined_df[sel_cols]
+    df = df.copy(deep=True)
+    # Summing all cases by country, hemisphere and date
+    df_agg = df.groupby(["country", "date"]).sum().reset_index()
+    # Check we haven't lost any cases along the way
+    assert combined_df["inf_all"].sum() == df_agg["inf_all"].sum()
+    return df_agg
 
-    df_com["pcnt_pos"] = df_com["pcnt_pos"].round(2)
-    over_100_pcnt = df_com[df_com["pcnt_pos"] > 100].shape[0]
-    log.info(f"{over_100_pcnt} rows with a percentage positive over 100. We'll set these to NA.")
-    df_com.loc[df_com["pcnt_pos"] > 100, "pcnt_pos"] = np.nan
 
-    # Rows where the percentage positive is 100 but all possible denominators are 0
-    df_com.loc[
-        (df_com["pcnt_pos"] == 100)
-        & (df_com["INF_NEGATIVE"] == 0)
-        & (df_com["SPEC_PROCESSED_NB"] == 0)
-        & (df_com["SPEC_RECEIVED_NB"] == 0),
-        "pcnt_pos",
-    ] = np.nan
+def calculate_percent_positive(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Because the data is patchy in some places the WHO recommends three methods for calclating the share of influenza tests that are positive.
+    In order of preference
+    1. Postive tests divided by positive and negative tests summmed: inf_all/(inf_all + inf_neg)
+    2. Positive tests divided by specimens processed: inf_all/spec_processed_nb
+    3. Positive tests divided by specimens received: inf_all/spec_received_nb
+    """
 
-    df_com = df_com.drop(
-        [
-            "ANOTSUBTYPABLE",
-            "AOTHER_SUBTYPE",
-            "BVIC_2DEL",
-            "BVIC_3DEL",
-            "BVIC_NODEL",
-            "BVIC_DELUNK",
-        ],
-        axis=1,
-    )
-    df_com.rename(columns={"COUNTRY_AREA_TERRITORY": "Country"}, inplace=True)
+    df["pcnt_pos_1"] = (df["inf_all"] / (df["inf_all"] + df["inf_negative"])) * 100
+    df["pcnt_pos_2"] = (df["inf_all"] / df["spec_processed_nb"]) * 100
+    df["pcnt_pos_3"] = (df["inf_all"] / df["spec_received_nb"]) * 100
 
-    return df_com
+    return df

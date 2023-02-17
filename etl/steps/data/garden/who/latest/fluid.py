@@ -38,6 +38,7 @@ def run(dest_dir: str) -> None:
 
     # Subset the data
     df = subset_and_clean_data(df)
+    df = pivot_fluid(df)
     df = df.reset_index(drop=True)
     # Create a new table with the processed data.
     tb_garden = Table(df, short_name=paths.short_name)
@@ -148,11 +149,13 @@ def pivot_fluid(df: pd.DataFrame) -> pd.DataFrame:
     df_piv = df_piv.rename(
         columns={
             "reported_casesSARI": "reported_sari_cases",
-            "reported_casesARI": "ari_cases",
-            "reported_casesILI": "ili_cases",
+            "reported_casesARI": "reported_ari_cases",
+            "reported_casesILI": "reported_ili_cases",
             "reported_casesSARI_DEATHS": "reported_sari_deaths",
             "reported_casesSARI_ICU": "reported_sari_icu",
         }
     )
+
+    df_piv = df_piv.dropna(axis=0, how="all")
 
     return df_piv
