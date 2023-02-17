@@ -28,6 +28,7 @@ COLUMNS_EXPECTED = [
     "baseline_proj",
     "baseline_proj_21",
     "baseline_proj_22",
+    "baseline_proj_23",
 ] + COLUMNS_YEAR_EXPECTED
 # Index columns
 COLUMNS_IDX = [
