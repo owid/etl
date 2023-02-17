@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5676_global_health_observatory__world_health_organization__2022_08_values
   file_extension: feather
-  date_accessed: 2023-02-17 17:24:45.283144
+  date_accessed: 2023-02-17 17:33:56.427313
   name: Global Health Observatory - World Health Organization (2022.08)
   description: This is a dataset imported by the automated fetcher
   source_name: Our World in Data catalog backport
