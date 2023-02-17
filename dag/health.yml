@@ -82,11 +82,11 @@ steps:
 
 
   # FluNet and FluID - WHO Flu Databases
-  data://meadow/who/2023-02-16/flunet:
-  - snapshot://who/2023-02-16/flunet.csv
-  data://garden/who/2023-02-16/flunet:
-  - data://meadow/who/2023-02-16/flunet
-  data://meadow/who/2023-02-16/fluid:
-  - snapshot://who/2023-02-16/fluid.csv
-  data://garden/who/2023-02-16/fluid:
-  - data://meadow/who/2023-02-16/fluid
+  data://meadow/who/latest/flunet:
+  - snapshot://who/latest/flunet.csv
+  data://garden/who/latest/flunet:
+  - data://meadow/who/latest/flunet
+  data://meadow/who/latest/fluid:
+  - snapshot://who/latest/fluid.csv
+  data://garden/who/latest/fluid:
+  - data://meadow/who/latest/fluid

@@ -1,5 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
 from structlog import get_logger
@@ -99,3 +100,68 @@ def aggregate_surveillance_type(combined_df: pd.DataFrame) -> pd.DataFrame:
     # Check we haven't lost any cases along the way
     assert combined_df["inf_all"].sum() == df_agg["inf_all"].sum()
     return df_agg
+
+
+def combine_columns(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Combine columns of:
+    * Influenza A with no subtype
+    * Influenza B Victoria substrains
+    """
+    df["a_no_subtype"] = df["anotsubtyped"] + df["anotsubtypable"] + df["aother_subtype"]
+    df["bvic"] = df["bvic_2del"] + df["bvic_3del"] + df["bvic_nodel"] + df["bvic_delunk"]
+
+    return df
+
+
+def combine_columns_calc_percent(df: pd.DataFrame) -> pd.DataFrame:
+
+    df["INF_NEGATIVE"] = df["INF_NEGATIVE"].replace(r"^\s*$", np.nan, regex=True)
+    df["denom"] = df[["INF_NEGATIVE", "SPEC_PROCESSED_NB"]].replace(0, np.nan).bfill(axis=1).iloc[:, 0].fillna(0)
+    df["denominator"] = df[["denom", "SPEC_RECEIVED_NB"]].replace(0, np.nan).bfill(axis=1).iloc[:, 0].fillna(0)
+    df["pcnt_pos_neg"] = (df["INF_ALL"] / (df["INF_ALL"] + df["INF_NEGATIVE"])) * 100
+    df["pcnt_pos_denom"] = (df["INF_ALL"] / df["denominator"]) * 100
+
+    df_den = df[(df["INF_NEGATIVE"] == 0) & (df["denominator"] != 0)]
+    df_neg = df[df["INF_NEGATIVE"] == df["denominator"]]
+
+    assert df_neg.shape[0] + df_den.shape[0] == df.shape[0], "Some rows are missing from one of the dataframes"
+
+    df_neg = df_neg.drop(["denom", "denominator", "pcnt_pos_denom"], axis=1).rename(
+        columns={"pcnt_pos_neg": "pcnt_pos"}
+    )
+    df_den = df_den.drop(["denom", "denominator", "pcnt_pos_neg"], axis=1).rename(
+        columns={"pcnt_pos_denom": "pcnt_pos"}
+    )
+
+    df_com = pd.concat([df_neg, df_den])
+    assert df_com.shape[0] == df.shape[0]
+
+    df_com["pcnt_pos"] = df_com["pcnt_pos"].round(2)
+    over_100_pcnt = df_com[df_com["pcnt_pos"] > 100].shape[0]
+    log.info(f"{over_100_pcnt} rows with a percentage positive over 100. We'll set these to NA.")
+    df_com.loc[df_com["pcnt_pos"] > 100, "pcnt_pos"] = np.nan
+
+    # Rows where the percentage positive is 100 but all possible denominators are 0
+    df_com.loc[
+        (df_com["pcnt_pos"] == 100)
+        & (df_com["INF_NEGATIVE"] == 0)
+        & (df_com["SPEC_PROCESSED_NB"] == 0)
+        & (df_com["SPEC_RECEIVED_NB"] == 0),
+        "pcnt_pos",
+    ] = np.nan
+
+    df_com = df_com.drop(
+        [
+            "ANOTSUBTYPABLE",
+            "AOTHER_SUBTYPE",
+            "BVIC_2DEL",
+            "BVIC_3DEL",
+            "BVIC_NODEL",
+            "BVIC_DELUNK",
+        ],
+        axis=1,
+    )
+    df_com.rename(columns={"COUNTRY_AREA_TERRITORY": "Country"}, inplace=True)
+
+    return df_com
