@@ -16,7 +16,7 @@ log = get_logger()
 paths = PathFinder(__file__)
 # Year range to be used (rest is filtered out)
 YEAR_MIN = 2020
-YEAR_MAX = 2022  # (kobak_ages does not have data for 2023)
+YEAR_MAX = 2023
 
 
 def run(dest_dir: str) -> None:
@@ -194,7 +194,7 @@ def format_columns(df: pd.DataFrame) -> pd.DataFrame:
 #
 # Minimum and maximum years expected in data
 YEAR_MIN_EXPECTED_AGE = 2020
-YEAR_MAX_EXPECTED_AGE = 2022
+YEAR_MAX_EXPECTED_AGE = 2023
 
 
 def process_age(df: pd.DataFrame) -> pd.DataFrame:

@@ -6,8 +6,8 @@ all_sources:
         Research (Germany), University of California, Berkeley (USA), and French Institute
         for Demographic Studies (France). Available at www.mortality.org.
       url: https://www.mortality.org/Data/STMF
-      date_accessed: "2023-01-27"
-      publication_date: "2023-01-23"
+      date_accessed: "2023-02-17"
+      publication_date: "2023-02-06"
       publication_year: 2023
       source_data_url: https://www.mortality.org/File/GetDocument/Public/STMF/Outputs/stmf.csv
 
@@ -30,7 +30,7 @@ dataset:
     For citing STMF data, please follow the HMD data citation guidelines (https://www.mortality.org/Research/CitationGuidelines).
 
     HMD provides an online STMF visualization toolkit (https://mpidr.shinyapps.io/stmortality).
-  version: "2023-01-27"
+  version: "latest"
   licenses:
     - *license-hmd
   sources:

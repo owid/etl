@@ -9,7 +9,7 @@ from etl.data_helpers import geo
 
 log = get_logger()
 # Maximum year
-YEAR_MAX = 2022
+YEAR_MAX = 2023
 
 
 def process_df(df: pd.DataFrame) -> pd.DataFrame:
