@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5661_researcher_affiliation_notable_ai_systems_data__sevilla_et_al__2022_config
   file_extension: json
-  date_accessed: 2023-02-01 18:16:16.935236
+  date_accessed: 2023-02-17 16:07:33.691609
   name: Grapher metadata for dataset_5661_researcher_affiliation_notable_ai_systems_data__sevilla_et_al__2022
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 77641c442c1cd2bbb86887d07c787013
+- md5: 6807e14c937e6f21e4e1a4ed74dc7d13
   size: 8441
   path: dataset_5661_researcher_affiliation_notable_ai_systems_data__sevilla_et_al__2022_config.json
