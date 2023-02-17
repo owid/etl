@@ -69,7 +69,7 @@ def variable_data(data_df: pd.DataFrame) -> Dict[str, Any]:
             "year": "years",
         }
     )
-    return data_df[["values", "years", "entities"]].to_dict(orient="list")
+    return data_df[["values", "years", "entities"]].to_dict(orient="list")  # type: ignore
 
 
 def variable_metadata(engine: Engine, variable_id: int, variable_data: pd.DataFrame) -> Dict[str, Any]:

@@ -749,6 +749,7 @@ class Variable(SQLModel, table=True):
             ds.display = self.display
             ds.catalogPath = self.catalogPath
             ds.dataPath = self.dataPath
+            ds.metadataPath = self.metadataPath
             ds.dimensions = self.dimensions
             ds.updatedAt = datetime.utcnow()
             # do not update these fields unless they're specified

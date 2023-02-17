@@ -20,17 +20,16 @@ from tenacity.retry import retry_if_exception_type
 from tenacity.stop import stop_after_attempt
 from tenacity.wait import wait_exponential
 
-from etl import config
-from etl import grapher_model as gm
-from etl.db import get_engine
-from etl.publish import connect_s3
-
-from .data_metadata import (
+from backport.datasync.data_metadata import (
     variable_data,
     variable_data_df_from_mysql,
     variable_data_df_from_s3,
     variable_metadata,
 )
+from etl import config
+from etl import grapher_model as gm
+from etl.db import get_engine
+from etl.publish import connect_s3
 
 log = structlog.get_logger()
 
@@ -79,13 +78,26 @@ def cli(
     force: bool,
     workers: int,
 ) -> None:
-    """TBD
+    """
+    Sync data_values and metadata from MySQL to s3://owid-catalog/baked-variables/[db_name]/data/[variable_id].json files
+    with structure that can be consumed by the grapher.
+
+    Once variable is replicated, we point its dataPath column in MySQL to the file.
+
+    This is intended to run as continuous service at the moment, but in the long run we should be creating those JSON files
+    when running etl --grapher.
 
     Usage:
         etl-datasync ...
 
-        # sync data since some date
+        # sync dataset
+        ENV=.env.staging backport-datasync -d 2405
+
+        # sync all datasets since some date
         ENV=.env.staging backport-datasync --dt-start "2023-01-01 00:00:00" --workers 10
+
+        # sync datasets with at least one chart
+        ENV=.env.staging backport-datasync --workers 10
 
         # real-time sync in a forever loop
         last_dt="2023-01-01 00:00:00"
@@ -95,25 +107,6 @@ def cli(
             last_dt=$new_dt
             sleep 5
         done;
-
-    To fill `dataPath` column for all datasets from live_grapher DB run the following SQL:
-
-    ```sql
-    update variables set dataPath = CONCAT('https://catalog.ourworldindata.org/baked-variables/live_grapher/data/', id, '.json')
-    where datasetId in (
-    select id from (
-        select
-        id
-        from datasets
-        where (
-                -- must be used in at least one chart
-                id in (
-                    select distinct v.datasetId from chart_dimensions as cd
-                    join variables as v on cd.variableId = v.id
-                )
-            ) and not isArchived
-    ) as t
-    );
     ```
     """
     engine = get_engine()
@@ -336,3 +329,7 @@ def _load_datasets(engine: Engine, dataset_ids: tuple[int], dt_start: Optional[d
         ds["metadataEditedAt"] = ds["metadataEditedAt"].to_pydatetime()
 
     return [DatasetSync(**d) for d in ds_dicts]
+
+
+if __name__ == "__main__":
+    cli()
