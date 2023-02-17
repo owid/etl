@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5669_un_sdg__2022_07_07_values
   file_extension: feather
-  date_accessed: 2023-02-17 16:46:07.548566
+  date_accessed: 2023-02-17 16:54:16.757079
   name: un_sdg__2022_07_07
   description: The United Nations Sustainable Development Goal (SDG) dataset is the
     primary collection of data tracking progress towards the SDG indicators, compiled
