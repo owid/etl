@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-11-30 12:28:10.909534
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: WHO Immunization Data (2022)
   namespace: backport
-  publication_date: latest
   short_name: dataset_5782_who_immunization_data__2022_values
+  file_extension: feather
+  date_accessed: 2023-02-18 00:05:51.504082
+  name: WHO Immunization Data (2022)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5782
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 2de2c9aa3df9e3e6e949fd16e6c92e80
-  size: 784466
+- md5: 88781f2ccc3e6b8fede4507a65daf04d
+  size: 784842
   path: dataset_5782_who_immunization_data__2022_values.feather
