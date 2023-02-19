@@ -182,6 +182,6 @@ def calculate_patient_rates(df: pd.DataFrame) -> pd.DataFrame:
 
     df[df["ili_cases_per_thousand_outpatients"] > 1000] = np.nan
     df[df["ari_cases_per_thousand_outpatients"] > 1000] = np.nan
-    df[df["sari_cases_per_hundred_inpatients"] > 1000] = np.nan
+    df[df["sari_cases_per_hundred_inpatients"] > 100] = np.nan
 
     return df
