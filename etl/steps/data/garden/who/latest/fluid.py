@@ -162,6 +162,9 @@ def calculate_patient_rates(df: pd.DataFrame) -> pd.DataFrame:
     """
     Calculating the rates of reported cases per outpatients/inpatients as also used by WHO
     """
+    # Fill NAs with numpy NAs so the divisions below don't fail
+    df = df.fillna(np.nan)
+
     df["ili_cases_per_thousand_outpatients"] = (df["reported_ili_cases"] / df["outpatients"]) * 1000
     df["ari_cases_per_thousand_outpatients"] = (df["reported_ari_cases"] / df["outpatients"]) * 1000
     df["sari_cases_per_hundred_inpatients"] = (df["reported_sari_cases"] / df["inpatients"]) * 100
