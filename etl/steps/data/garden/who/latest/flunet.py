@@ -146,6 +146,7 @@ def calculate_percent_positive(df: pd.DataFrame) -> pd.DataFrame:
     df["pcnt_pos_2"] = (df["inf_all"] / df["spec_processed_nb"]) * 100
     df["pcnt_pos_3"] = (df["inf_all"] / df["spec_received_nb"]) * 100
 
+    # hierachically fill the 'pcnt_pos' column with values from the columns described above in order of preference: 1->2->3
     df["pcnt_pos"] = df["pcnt_pos_1"]
     df["pcnt_pos"] = df["pcnt_pos"].fillna(df["pcnt_pos_2"])
     df["pcnt_pos"] = df["pcnt_pos"].fillna(df["pcnt_pos_3"])

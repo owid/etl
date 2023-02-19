@@ -1,5 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
 from structlog import get_logger
@@ -39,6 +40,7 @@ def run(dest_dir: str) -> None:
     # Subset the data
     df = subset_and_clean_data(df)
     df = pivot_fluid(df)
+    df = calculate_patient_rates(df)
     df = df.reset_index(drop=True)
     # Create a new table with the processed data.
     tb_garden = Table(df, short_name=paths.short_name)
@@ -84,8 +86,6 @@ def subset_and_clean_data(df: pd.DataFrame) -> pd.DataFrame:
             "mmwr_year",
             "mmwr_week",
             "agegroup_code",
-            "outpatients",
-            "inpatients",
             "pop_cov",
             "inf_tested",
             "inf_pos",
@@ -132,10 +132,7 @@ def subset_and_clean_data(df: pd.DataFrame) -> pd.DataFrame:
 def pivot_fluid(df: pd.DataFrame) -> pd.DataFrame:
 
     df_piv = df.pivot(
-        index=[
-            "country",
-            "date",
-        ],
+        index=["country", "date", "outpatients", "inpatients"],
         columns="case_info",
         values=[
             "reported_cases",
@@ -159,3 +156,26 @@ def pivot_fluid(df: pd.DataFrame) -> pd.DataFrame:
     df_piv = df_piv.dropna(axis=0, how="all")
 
     return df_piv
+
+
+def calculate_patient_rates(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Calculating the rates of reported cases per outpatients/inpatients as also used by WHO
+    """
+    df["ili_cases_per_thousand_outpatients"] = (df["reported_ili_cases"] / df["outpatients"]) * 1000
+    df["ari_cases_per_thousand_outpatients"] = (df["reported_ari_cases"] / df["outpatients"]) * 1000
+    df["sari_cases_per_hundred_inpatients"] = (df["reported_sari_cases"] / df["inpatients"]) * 100
+
+    over_1000_ili = df[df["ili_cases_per_thousand_outpatients"] > 1000].shape[0]
+    over_1000_ari = df[df["ari_cases_per_thousand_outpatients"] > 1000].shape[0]
+    over_100_sari = df[df["sari_cases_per_hundred_inpatients"] > 100].shape[0]
+
+    log.info(f"{over_1000_ili} rows with ili_cases_per_thousand_outpatients over 1000. We'll set these to NA.")
+    log.info(f"{over_1000_ari} rows with ari_cases_per_thousand_outpatients over 1000. We'll set these to NA.")
+    log.info(f"{over_100_sari} rows with sari_cases_per_hundred_inpatients over 100. We'll set these to NA.")
+
+    df[df["ili_cases_per_thousand_outpatients"] > 1000] = np.nan
+    df[df["ari_cases_per_thousand_outpatients"] > 1000] = np.nan
+    df[df["sari_cases_per_hundred_inpatients"] > 1000] = np.nan
+
+    return df
