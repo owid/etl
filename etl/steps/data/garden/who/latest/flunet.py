@@ -1,5 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
 from structlog import get_logger
@@ -38,6 +39,7 @@ def run(dest_dir: str) -> None:
 
     df = clean_and_format_data(df)
     df = aggregate_surveillance_type(df)
+    df = calculate_percent_positive(df)
     # Create a new table with the processed data.
     # tb_garden = Table(df, like=tb_meadow)
     tb_garden = Table(df, short_name=paths.short_name)
@@ -135,10 +137,30 @@ def calculate_percent_positive(df: pd.DataFrame) -> pd.DataFrame:
     1. Postive tests divided by positive and negative tests summmed: inf_all/(inf_all + inf_neg)
     2. Positive tests divided by specimens processed: inf_all/spec_processed_nb
     3. Positive tests divided by specimens received: inf_all/spec_received_nb
+
+    Remove rows where the percent is > 100
+    Remove rows where the percent = 100 but all available denominators are 0.
     """
 
     df["pcnt_pos_1"] = (df["inf_all"] / (df["inf_all"] + df["inf_negative"])) * 100
     df["pcnt_pos_2"] = (df["inf_all"] / df["spec_processed_nb"]) * 100
     df["pcnt_pos_3"] = (df["inf_all"] / df["spec_received_nb"]) * 100
 
+    df["pcnt_pos"] = df["pcnt_pos_1"]
+    df["pcnt_pos"] = df["pcnt_pos"].fillna(df["pcnt_pos_2"])
+    df["pcnt_pos"] = df["pcnt_pos"].fillna(df["pcnt_pos_3"])
+
+    df = df.drop(columns=["pcnt_pos_1", "pcnt_pos_2", "pcnt_pos_3"])
+
+    # Drop rows where pcnt_pos is >100
+    df.loc[df["pcnt_pos"] > 100, "pcnt_pos"] = np.nan
+
+    # Rows where the percentage positive is 100 but all possible denominators are 0
+    df.loc[
+        (df["pcnt_pos"] == 100)
+        & (df["inf_negative"] == 0)
+        & (df["spec_processed_nb"] == 0)
+        & (df["spec_received_nb"] == 0),
+        "pcnt_pos",
+    ] = np.nan
     return df
