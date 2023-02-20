@@ -1,7 +1,7 @@
 """Load a garden dataset and create an explorers dataset."""
 
 import pandas as pd
-from owid.catalog import Dataset
+from owid.catalog import Dataset, Table
 
 from etl.helpers import PathFinder, create_dataset
 
@@ -22,6 +22,7 @@ def run(dest_dir: str) -> None:
     tb_fluid = fluid_garden["fluid"]
 
     tb_flu = pd.merge(tb_fluid, tb_flunet, on=["country", "date"], how="outer")
+    tb_flu = Table(tb_flu, short_name="flu")
 
     # Create explorer dataset, with garden table and metadata in csv format
     ds_explorer = create_dataset(dest_dir, tables=[tb_flu], default_metadata=flunet_garden.metadata, formats=["csv"])
