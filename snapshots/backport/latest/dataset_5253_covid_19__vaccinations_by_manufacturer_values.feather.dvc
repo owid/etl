@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5253_covid_19__vaccinations_by_manufacturer_values
   file_extension: feather
-  date_accessed: 2023-02-19 12:06:03.418626
+  date_accessed: 2023-02-20 10:19:55.886892
   name: COVID-19 - Vaccinations by manufacturer
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 005711bb743ec710c63a412ff8999e62
-  size: 374954
+- md5: 735d4f1426ab2a3352bf72358933c5d2
+  size: 375298
   path: dataset_5253_covid_19__vaccinations_by_manufacturer_values.feather

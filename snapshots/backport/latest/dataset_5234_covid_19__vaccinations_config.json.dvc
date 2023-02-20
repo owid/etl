@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5234_covid_19__vaccinations_config
   file_extension: json
-  date_accessed: 2023-02-19 12:05:53.124657
+  date_accessed: 2023-02-20 10:21:18.195153
   name: Grapher metadata for dataset_5234_covid_19__vaccinations
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: ccbf09a33e35515239779bd9136ff717
+- md5: b3dbe6f63d1a5819d4b769d6f898ea84
   size: 9642
   path: dataset_5234_covid_19__vaccinations_config.json
