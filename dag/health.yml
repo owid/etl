@@ -90,3 +90,6 @@ steps:
   - snapshot://who/latest/fluid.csv
   data://garden/who/latest/fluid:
   - data://meadow/who/latest/fluid
+  data://explorers/who/latest/flu:
+  - data://garden/who/latest/fluid
+  - data://garden/who/latest/flunet
