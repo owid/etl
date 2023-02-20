@@ -1,35 +1,21 @@
 all_sources:
-  - source_testing: &source-testing
-      name: # TO BE FILLED. Example: Testing Short Citation
-      published_by: # TO BE FILLED (if different to short citation). Example: Testing Full Citation
-      url: # TO BE FILLED. Example: https://url_of_testing_source.com/
-      date_accessed: # TO BE FILLED. Example: 2023-01-01
-      publication_date: # TO BE FILLED. Example: 2023-01-01
-      publication_year: # TO BE FILLED (if publication_date is not given). Example: 2023
-      # description: Source description.
-
+- source_testing: &source-testing
+    name: Dummy source
+    published_by:
+    url:
+    date_accessed:
+    publication_date:
+    publication_year:
 dataset:
-  title: # TO BE FILLED. Example: Testing Dataset Name (Institution, 2023)
-  namespace: dummy
-  short_name: dummy
-  version: 2020-01-01
-  # description: Dataset description.
+  title: Dummy dataset
   licenses:
-    - name: # TO BE FILLED. Example: Testing License Name
-      url: # TO BE FILLED. Example: https://url_of_testing_source.com/license
+  - name:
+    url:
   sources:
-    - *source-testing
+  - *source-testing
 
 tables:
   dummy:
     variables:
-      # testing_variable:
-      #   title: Testing variable title
-      #   unit: arbitrary units
-      #   short_unit: au
-      #   description: Full description of testing variable.
-      #   sources:
-      #     - *source-testing
-      #   display:
-      #     entityAnnotationsMap: Test annotation
-      #     numDecimalPlaces: 0
+      dummy_variable:
+        unit: dummy unit
