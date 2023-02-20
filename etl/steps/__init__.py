@@ -26,6 +26,8 @@ import yaml
 from dvc.dvcfile import Dvcfile
 from dvc.repo import Repo
 
+from etl.db import get_engine
+
 # smother deprecation warnings by papermill
 with warnings.catch_warnings():
     warnings.simplefilter("ignore")
@@ -693,8 +695,11 @@ class GrapherStep(Step):
 
         dataset.metadata = gh._adapt_dataset_metadata_for_grapher(dataset.metadata)
 
+        engine = get_engine()
+
         assert dataset.metadata.namespace
         dataset_upsert_results = upsert_dataset(
+            engine,
             dataset,
             dataset.metadata.namespace,
             dataset.metadata.sources,
@@ -713,6 +718,7 @@ class GrapherStep(Step):
             # generate table with entity_id, year and value for every column
             tables = gh._yield_wide_table(table, na_action="drop")
             upsert = lambda t: upsert_table(  # noqa: E731
+                engine,
                 t,
                 dataset_upsert_results,
                 catalog_path=catalog_path,

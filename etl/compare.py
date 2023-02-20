@@ -324,7 +324,7 @@ def read_variables_from_db(env_path: str, namespace: str, version: str, dataset:
     )
 
     # drop uninteresting columns
-    df = df.drop(["updatedAt", "createdAt"], axis=1)
+    df = df.drop(["updatedAt", "createdAt", "dataPath", "metadataPath", "catalogPath"], axis=1)
 
     return cast(pd.DataFrame, df)
 
