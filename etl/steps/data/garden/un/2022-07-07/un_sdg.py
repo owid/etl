@@ -16,7 +16,7 @@ COUNTRY_MAPPING_PATH = Path(__file__).parent / "un_sdg.country_mapping.json"
 BASE_URL = "https://unstats.un.org/sdgapi"
 VERSION = Path(__file__).parent.stem
 FNAME = Path(__file__).stem
-NAMESPACE = Path(__file__).parent.parent.stem
+NAMESPACE = "un_sdg"
 
 log = get_logger()
 

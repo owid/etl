@@ -3,12 +3,11 @@
 import re
 
 import pandas as pd
-from owid.catalog import Dataset, Table
+from owid.catalog import Table
 from structlog import get_logger
 
-from etl.helpers import PathFinder
+from etl.helpers import PathFinder, create_dataset
 from etl.snapshot import Snapshot
-from etl.steps.data.converters import convert_snapshot_metadata
 
 # Initialize logger.
 log = get_logger()
@@ -34,10 +33,10 @@ def run(dest_dir: str) -> None:
     log.info("Size of dataframe", rows=df.shape[0], colums=df.shape[1])
     df = df.reset_index(drop=True).drop(columns="index")
     tb = Table(df, short_name=paths.short_name, underscore=True)
-    ds = Dataset.create_empty(dest_dir, metadata=convert_snapshot_metadata(snap.metadata))
-    ds.metadata.version = paths.version
-    ds.add(tb)
-    ds.update_metadata(paths.metadata_path)
+    ds = create_dataset(dest_dir, tables=[tb], default_metadata=snap.metadata)
+    # ds.metadata.version = paths.version
+    # ds.add(tb)
+    # ds.update_metadata(paths.metadata_path)
     ds.save()
     log.info("un_sdg.end")
 
