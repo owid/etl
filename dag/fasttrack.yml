@@ -20,3 +20,5 @@ steps:
   - snapshot-private://fasttrack/latest/literate_population.csv
   data-private://grapher/fasttrack/latest/test_co2_emissions:
   - snapshot-private://fasttrack/latest/test_co2_emissions.csv
+  data-private://grapher/fasttrack/latest/test_electricity_projections:
+  - snapshot-private://fasttrack/latest/test_electricity_projections.csv
