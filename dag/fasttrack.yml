@@ -14,3 +14,5 @@ steps:
   - snapshot-private://fasttrack/latest/metaculus__complementary_data.csv
   data-private://grapher/fasttrack/latest/global_extreme_poverty_future_scenario:
   - snapshot-private://fasttrack/latest/global_extreme_poverty_future_scenario.csv
+  data-private://grapher/fasttrack/latest/child_mortality_future_projections:
+  - snapshot-private://fasttrack/latest/child_mortality_future_projections.csv
