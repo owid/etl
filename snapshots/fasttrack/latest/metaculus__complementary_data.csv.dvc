@@ -2,13 +2,13 @@ meta:
   namespace: fasttrack
   short_name: metaculus__complementary_data
   file_extension: csv
-  date_accessed: 2023-02-16
+  date_accessed: 2023-02-21
   name: DRAFT Metaculus - Complementary data
   description: ''
   source_name: Local CSV
   url: ''
   source_published_by: Local CSV
-  source_data_url: gAAAAABj7h0uTGxePf9Wuh3Qnqh7lFT8rpO-xZFQf_IjGuZYsjE2d7OY7Idq-nP2R6kU2aJMNRbovCPeHFetDTW17i-rywD6lg==
+  source_data_url: gAAAAABj9IiXfvyE_APjYwmrW_S2b_vveAqQ-yK_6k9YtvZj0cttz7eZ1ag9JyBJqMSeTRVNKGaEpgoMfMJ5sutmGe6Hw7lspQ==
   is_public: false
   version: latest
 wdir: ../../../data/snapshots/fasttrack/latest
