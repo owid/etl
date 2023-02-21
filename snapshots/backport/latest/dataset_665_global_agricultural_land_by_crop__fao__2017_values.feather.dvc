@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 01:50:05.831977
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Global agricultural land by crop - FAO (2017)
   namespace: backport
-  publication_date: latest
   short_name: dataset_665_global_agricultural_land_by_crop__fao__2017_values
+  file_extension: feather
+  date_accessed: 2023-02-17 15:21:17.633214
+  name: Global agricultural land by crop - FAO (2017)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/665
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 2e18e149f2c9f01d681c9293a2cbc346
-  size: 9514
+- md5: 6c9a156ae22d3a31efe21461cabfcc70
+  size: 9890
   path: dataset_665_global_agricultural_land_by_crop__fao__2017_values.feather

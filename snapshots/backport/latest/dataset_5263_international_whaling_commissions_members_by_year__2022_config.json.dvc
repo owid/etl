@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:12:18.263474
-  description: ''
-  file_extension: json
-  is_public: false
-  name: Grapher metadata for dataset_5263_international_whaling_commissions_members_by_year__2022
   namespace: backport
-  publication_date: latest
   short_name: dataset_5263_international_whaling_commissions_members_by_year__2022_config
+  file_extension: json
+  date_accessed: 2023-02-17 12:04:57.442421
+  name: Grapher metadata for dataset_5263_international_whaling_commissions_members_by_year__2022
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5263
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 5e6f6d31219bedc7dd5c58f3d110c8fc
+- md5: bc1637c9863d5687bbe028058a3772a6
   size: 1542
   path: dataset_5263_international_whaling_commissions_members_by_year__2022_config.json

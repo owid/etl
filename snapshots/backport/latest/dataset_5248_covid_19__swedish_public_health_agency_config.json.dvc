@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5248_covid_19__swedish_public_health_agency_config
   file_extension: json
-  date_accessed: 2023-02-10 18:04:11.014793
+  date_accessed: 2023-02-17 15:16:48.856345
   name: Grapher metadata for dataset_5248_covid_19__swedish_public_health_agency
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 9f3752d6d93a366393f9d1c57171d33b
+- md5: c1dd3c64b53ae402ca1f89d1ee47db06
   size: 2212
   path: dataset_5248_covid_19__swedish_public_health_agency_config.json

@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 00:54:32.270363
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Global population trends - US Census Bureau (2017)
   namespace: backport
-  publication_date: latest
   short_name: dataset_928_global_population_trends__us_census_bureau__2017_values
+  file_extension: feather
+  date_accessed: 2023-02-17 14:21:39.884446
+  name: Global population trends - US Census Bureau (2017)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/928
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: e51445009ac48bacc3ca6d365afd316d
-  size: 9474
+- md5: 7f4703e3c4f6689773df202eccdb3ff9
+  size: 9850
   path: dataset_928_global_population_trends__us_census_bureau__2017_values.feather

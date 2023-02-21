@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:14:33.014150
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_658_diet_compositions_by_commodity_categories__fao__2017
   namespace: backport
-  publication_date: latest
   short_name: dataset_658_diet_compositions_by_commodity_categories__fao__2017_config
+  file_extension: json
+  date_accessed: 2023-02-17 13:23:33.630535
+  name: Grapher metadata for dataset_658_diet_compositions_by_commodity_categories__fao__2017
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/658
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 5299e33049c09b32b4b38c4a814d6bb4
+- md5: b5f8bb262aced8a2f130b2e7118c3dbc
   size: 6703
   path: dataset_658_diet_compositions_by_commodity_categories__fao__2017_config.json

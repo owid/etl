@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5324_global_agricultural_production_by_farm_size__riccardi_et_al__2018_config
   file_extension: json
-  date_accessed: 2023-01-20 11:09:46.350389
+  date_accessed: 2023-02-17 15:51:50.214179
   name: Grapher metadata for dataset_5324_global_agricultural_production_by_farm_size__riccardi_et_al__2018
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: cdea3612cd74d9fda7c70d99ad614828
+- md5: dd593e2f4e4593920284fcf03739f24b
   size: 6528
   path: dataset_5324_global_agricultural_production_by_farm_size__riccardi_et_al__2018_config.json

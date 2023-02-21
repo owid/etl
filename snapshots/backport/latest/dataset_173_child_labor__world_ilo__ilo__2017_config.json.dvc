@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 15:53:13.567303
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_173_child_labor__world_ilo__ilo__2017
   namespace: backport
-  publication_date: latest
   short_name: dataset_173_child_labor__world_ilo__ilo__2017_config
+  file_extension: json
+  date_accessed: 2023-02-17 14:44:06.484635
+  name: Grapher metadata for dataset_173_child_labor__world_ilo__ilo__2017
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/173
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: e6d1582c3ea00790666b5a59314898a4
+- md5: e8dc525d884768b8eee526301aaee435
   size: 4078
   path: dataset_173_child_labor__world_ilo__ilo__2017_config.json

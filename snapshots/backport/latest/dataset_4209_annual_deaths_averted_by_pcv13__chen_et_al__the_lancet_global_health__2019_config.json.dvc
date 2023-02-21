@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:07:04.830203
-  description: ''
-  file_extension: json
-  is_public: false
-  name: Grapher metadata for dataset_4209_annual_deaths_averted_by_pcv13__chen_et_al__the_lancet_global_health__2019
   namespace: backport
-  publication_date: latest
   short_name: dataset_4209_annual_deaths_averted_by_pcv13__chen_et_al__the_lancet_global_health__2019_config
+  file_extension: json
+  date_accessed: 2023-02-17 13:31:39.010015
+  name: Grapher metadata for dataset_4209_annual_deaths_averted_by_pcv13__chen_et_al__the_lancet_global_health__2019
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/4209
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 5812faf81537df9778944bd843e2c615
+- md5: b06f9514a2fe688ca9119da8a871c54f
   size: 1512
   path: dataset_4209_annual_deaths_averted_by_pcv13__chen_et_al__the_lancet_global_health__2019_config.json

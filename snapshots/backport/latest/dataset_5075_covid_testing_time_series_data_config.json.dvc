@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 15:50:50.148036
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_5075_covid_testing_time_series_data
   namespace: backport
-  publication_date: latest
   short_name: dataset_5075_covid_testing_time_series_data_config
+  file_extension: json
+  date_accessed: 2023-02-17 12:12:09.287587
+  name: Grapher metadata for dataset_5075_covid_testing_time_series_data
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5075
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 36e59a9ad99a4babfccaf7fbd4570bae
+- md5: 83ca36d6b854ea21fbb751a200a72ae2
   size: 33399
   path: dataset_5075_covid_testing_time_series_data_config.json

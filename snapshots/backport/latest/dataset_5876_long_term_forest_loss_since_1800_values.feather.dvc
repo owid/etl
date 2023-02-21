@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5876_long_term_forest_loss_since_1800_values
   file_extension: feather
-  date_accessed: 2023-02-05 06:02:48.061408
+  date_accessed: 2023-02-18 00:07:21.633055
   name: Long-term forest loss since 1800
   description: ''
   source_name: Our World in Data catalog backport

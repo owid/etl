@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:31:48.594398
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Share of arable land which is organic - OWID based on FAO
   namespace: backport
-  publication_date: latest
   short_name: dataset_1914_share_of_arable_land_which_is_organic__owid_based_on_fao_values
+  file_extension: feather
+  date_accessed: 2023-02-17 14:21:33.024939
+  name: Share of arable land which is organic - OWID based on FAO
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/1914
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 737333b7f83c157a3c4ce95fc0a701d2
-  size: 8474
+- md5: a6ad260e131ebd2ed3ff8a650b763d17
+  size: 8842
   path: dataset_1914_share_of_arable_land_which_is_organic__owid_based_on_fao_values.feather

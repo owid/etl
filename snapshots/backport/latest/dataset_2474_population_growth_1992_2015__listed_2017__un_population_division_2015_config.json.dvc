@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:29:14.690846
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_2474_population_growth_1992_2015__listed_2017__un_population_division_2015
   namespace: backport
-  publication_date: latest
   short_name: dataset_2474_population_growth_1992_2015__listed_2017__un_population_division_2015_config
+  file_extension: json
+  date_accessed: 2023-02-17 14:56:21.231008
+  name: Grapher metadata for dataset_2474_population_growth_1992_2015__listed_2017__un_population_division_2015
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2474
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 469c71d493e360b82c0b84d9703b147c
+- md5: bceea1b8fcdfe0b2116936c635c28549
   size: 1349
   path: dataset_2474_population_growth_1992_2015__listed_2017__un_population_division_2015_config.json

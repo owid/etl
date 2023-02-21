@@ -1,17 +1,18 @@
 meta:
   namespace: backport
   short_name: dataset_5437_near_earth_asteroids_discovered_over_time_config
+  file_extension: json
+  date_accessed: 2023-02-17 12:25:56.578996
   name: Grapher metadata for dataset_5437_near_earth_asteroids_discovered_over_time
   description: https://github.com/owid/notebooks/tree/main/EdouardMathieu/2021_12_near_earth_asteroids
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5437
-  file_extension: json
-  date_accessed: 2023-01-03 18:00:34.179570
+  source_published_by: Our World in Data catalog backport
   is_public: false
   version: latest
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: ec08a7d495a4365d186b11c6a659c82f
+- md5: c2ba6644e54505c3e09897a5cf6118b8
   size: 2697
   path: dataset_5437_near_earth_asteroids_discovered_over_time_config.json

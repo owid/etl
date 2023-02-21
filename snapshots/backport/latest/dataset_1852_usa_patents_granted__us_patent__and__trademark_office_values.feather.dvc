@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 01:18:32.967942
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: USA patents granted - US Patent & Trademark Office
   namespace: backport
-  publication_date: latest
   short_name: dataset_1852_usa_patents_granted__us_patent__and__trademark_office_values
+  file_extension: feather
+  date_accessed: 2023-02-17 13:00:21.690463
+  name: USA patents granted - US Patent & Trademark Office
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/1852
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 10f74bd49bfdc6014d76705d34aa7e67
-  size: 12530
+- md5: 65ce2d1d792bd47fb5e3aefe1cbaa45a
+  size: 12906
   path: dataset_1852_usa_patents_granted__us_patent__and__trademark_office_values.feather
