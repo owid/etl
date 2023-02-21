@@ -1,0 +1,20 @@
+dataset:
+  namespace: fasttrack
+  version: latest
+  short_name: global_extreme_poverty_future_scenario
+  title: DRAFT Global extreme poverty future scenario
+  description: ''
+  sources:
+  - name: Unknown
+    published_by: Unknown
+    publication_year: 2023
+    date_accessed: 2023-02-21
+tables:
+  global_extreme_poverty_future_scenario:
+    variables:
+      not_in_extreme_poverty:
+        title: Not in extreme poverty
+        unit: ''
+      in_extreme_poverty:
+        title: In extreme poverty
+        unit: ''

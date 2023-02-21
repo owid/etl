@@ -1,0 +1,18 @@
+meta:
+  namespace: fasttrack
+  short_name: child_mortality_future_projections
+  file_extension: csv
+  date_accessed: 2023-02-21
+  name: DRAFT Child mortality future projections
+  description: ''
+  source_name: Local CSV
+  url: ''
+  source_published_by: Local CSV
+  source_data_url: gAAAAABj9NfisqM_1V5ekl9oIuIZ87JXTV2XbBhYUhfc5RtW6xgpQZo-u1-SuSfxwnJ7fLVsaeWNOAjJ-hfGY2SKj9k9ELJagA==
+  is_public: false
+  version: latest
+wdir: ../../../data/snapshots/fasttrack/latest
+outs:
+- md5: 6dfae7e750a05eeb4a2e7b3f9839b380
+  size: 1575
+  path: child_mortality_future_projections.csv
