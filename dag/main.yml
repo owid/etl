@@ -114,7 +114,7 @@ steps:
   #
   # UN
   data://meadow/un/2022-07-07/un_sdg:
-    - walden://un/2022-07-07/un_sdg
+    - walden://un_sdg/2022-07-07/un_sdg
   data://garden/un/2022-07-07/un_sdg:
     - data://meadow/un/2022-07-07/un_sdg
   data://grapher/un/2022-07-07/un_sdg:
