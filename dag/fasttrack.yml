@@ -18,3 +18,5 @@ steps:
   - snapshot-private://fasttrack/latest/child_mortality_future_projections.csv
   data-private://grapher/fasttrack/latest/literate_population:
   - snapshot-private://fasttrack/latest/literate_population.csv
+  data-private://grapher/fasttrack/latest/test_co2_emissions:
+  - snapshot-private://fasttrack/latest/test_co2_emissions.csv
