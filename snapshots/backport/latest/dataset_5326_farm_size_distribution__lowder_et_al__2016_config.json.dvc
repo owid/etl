@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5326_farm_size_distribution__lowder_et_al__2016_config
   file_extension: json
-  date_accessed: 2023-01-20 11:10:41.686188
+  date_accessed: 2023-02-17 15:12:48.261760
   name: Grapher metadata for dataset_5326_farm_size_distribution__lowder_et_al__2016
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 11d5cc08af6f72adc1c224c61d92768d
+- md5: 6e6587174da272d4a42dab11cfbd2272
   size: 11841
   path: dataset_5326_farm_size_distribution__lowder_et_al__2016_config.json

@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5765_computer_chess_elo_ratings__chess_com__ssdf__2022_values
   file_extension: feather
-  date_accessed: 2023-02-01 12:07:20.688534
+  date_accessed: 2023-02-18 00:11:49.887891
   name: Computer Chess Elo Ratings – Chess.com, SSDF (2022)
   description: ''
   source_name: Our World in Data catalog backport

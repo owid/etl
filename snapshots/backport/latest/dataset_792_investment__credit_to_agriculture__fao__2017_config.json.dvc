@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-11-29 16:19:08.533946
-  description: This is a dataset imported by the automated fetcher
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_792_investment__credit_to_agriculture__fao__2017
   namespace: backport
-  publication_date: latest
   short_name: dataset_792_investment__credit_to_agriculture__fao__2017_config
+  file_extension: json
+  date_accessed: 2023-02-17 14:41:03.363421
+  name: Grapher metadata for dataset_792_investment__credit_to_agriculture__fao__2017
+  description: This is a dataset imported by the automated fetcher
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/792
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 9f6883d16a456d3b2e062203028864d4
+- md5: d6f6ed382015af2d38f4476225f9e01b
   size: 4346
   path: dataset_792_investment__credit_to_agriculture__fao__2017_config.json

@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:12:54.390525
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Natural disasters (EM-DAT, 2022)
   namespace: backport
-  publication_date: latest
   short_name: dataset_5827_natural_disasters__em_dat__2022_values
+  file_extension: feather
+  date_accessed: 2023-02-18 00:11:33.101979
+  name: Natural disasters (EM-DAT, 2022)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5827
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 77c116ddf67a4fd77660d728549377d8
-  size: 2368986
+- md5: b13761a3611ad4bc2f441de59afe89f0
+  size: 2369362
   path: dataset_5827_natural_disasters__em_dat__2022_values.feather

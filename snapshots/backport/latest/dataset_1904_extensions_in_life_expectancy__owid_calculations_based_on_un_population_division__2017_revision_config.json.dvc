@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 00:48:46.598095
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_1904_extensions_in_life_expectancy__owid_calculations_based_on_un_population_division__2017_revision
   namespace: backport
-  publication_date: latest
   short_name: dataset_1904_extensions_in_life_expectancy__owid_calculations_based_on_un_population_division__2017_revision_config
+  file_extension: json
+  date_accessed: 2023-02-17 14:33:21.276106
+  name: Grapher metadata for dataset_1904_extensions_in_life_expectancy__owid_calculations_based_on_un_population_division__2017_revision
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/1904
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 9ce373ba8a5c3d2c66cd0d79845a90ef
+- md5: d58dd2985fe23e618b5ccf58c9dac46b
   size: 3541
   path: dataset_1904_extensions_in_life_expectancy__owid_calculations_based_on_un_population_division__2017_revision_config.json

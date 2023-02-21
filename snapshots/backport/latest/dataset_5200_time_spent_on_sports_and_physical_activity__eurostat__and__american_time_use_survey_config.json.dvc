@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:29:48.607859
-  description: ''
-  file_extension: json
-  is_public: false
-  name: Grapher metadata for dataset_5200_time_spent_on_sports_and_physical_activity__eurostat__and__american_time_use_survey
   namespace: backport
-  publication_date: latest
   short_name: dataset_5200_time_spent_on_sports_and_physical_activity__eurostat__and__american_time_use_survey_config
+  file_extension: json
+  date_accessed: 2023-02-17 14:28:29.223338
+  name: Grapher metadata for dataset_5200_time_spent_on_sports_and_physical_activity__eurostat__and__american_time_use_survey
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5200
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 795e7fcd3ee7255c8763be4a42307f32
+- md5: a4cfb51ddacf2d8a31c4745a2db0cdf8
   size: 5216
   path: dataset_5200_time_spent_on_sports_and_physical_activity__eurostat__and__american_time_use_survey_config.json

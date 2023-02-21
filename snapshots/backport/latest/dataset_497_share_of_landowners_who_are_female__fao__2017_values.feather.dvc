@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 16:29:16.106244
-  description: Share of agricultural landowners who are female (%).
-  file_extension: feather
-  is_public: true
-  name: Share of landowners who are female - FAO (2017)
   namespace: backport
-  publication_date: latest
   short_name: dataset_497_share_of_landowners_who_are_female__fao__2017_values
+  file_extension: feather
+  date_accessed: 2023-02-17 13:52:33.823226
+  name: Share of landowners who are female - FAO (2017)
+  description: Share of agricultural landowners who are female (%).
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/497
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 314b03b088dd951e4f42b231f790ce5b
-  size: 9242
+- md5: 8dfeec8b9be5c70cf38c61d093d8d232
+  size: 9618
   path: dataset_497_share_of_landowners_who_are_female__fao__2017_values.feather

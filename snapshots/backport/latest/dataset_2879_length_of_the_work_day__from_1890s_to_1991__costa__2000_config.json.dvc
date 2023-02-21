@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 16:27:39.295450
-  description: ''
-  file_extension: json
-  is_public: false
-  name: Grapher metadata for dataset_2879_length_of_the_work_day__from_1890s_to_1991__costa__2000
   namespace: backport
-  publication_date: latest
   short_name: dataset_2879_length_of_the_work_day__from_1890s_to_1991__costa__2000_config
+  file_extension: json
+  date_accessed: 2023-02-17 13:16:59.657814
+  name: Grapher metadata for dataset_2879_length_of_the_work_day__from_1890s_to_1991__costa__2000
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2879
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 0e27444071632f7800a8399f339beccd
+- md5: f38f28c6de3a5033c637cb213e722c12
   size: 3033
   path: dataset_2879_length_of_the_work_day__from_1890s_to_1991__costa__2000_config.json

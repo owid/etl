@@ -1,0 +1,14 @@
+steps:
+  # Life expectancy OMM
+  ## Meadow
+  data://meadow/papers/2022-11-04/riley_2005:
+    - walden://papers/2022-11-01/riley_2005
+  ## Garden
+  data://garden/papers/2022-11-04/riley_2005:
+    - data://meadow/papers/2022-11-04/riley_2005
+  data://garden/demography/2022-11-30/life_expectancy:
+    - data://garden/papers/2022-11-03/zijdeman_et_al_2015
+    - data://garden/papers/2022-11-04/riley_2005
+    - data://garden/un/2022-07-11/un_wpp
+    - data://garden/hmd/2022-11-04/life_tables
+    - data://garden/owid/latest/key_indicators

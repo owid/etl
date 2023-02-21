@@ -207,7 +207,7 @@ steps:
     - backport://backport/owid/latest/dataset_4129_years_of_schooling__based_on_lee_lee__2016__barro_lee__2018__and_undp__2018
     - backport://backport/owid/latest/dataset_2710_child_mortality_rates__selected_gapminder__v10__2017
     - backport://backport/owid/latest/dataset_581_daily_supply_of_calories_per_person__owid_based_on_un_fao__and__historical_sources
-    - data://garden/demography/2022-11-30/life_expectancy
+    - data://garden/demography/2023-02-03/life_expectancy
     - data://garden/owid/latest/key_indicators
     - data://garden/gcp/2022-11-11/global_carbon_budget
     # The following step is not the latest version available.
@@ -279,6 +279,23 @@ steps:
     - data://meadow/lis/2023-01-18/luxembourg_income_study
   data://grapher/lis/2023-01-18/luxembourg_income_study:
     - data://garden/lis/2023-01-18/luxembourg_income_study
+  data://explorers/lis/2023-01-18/luxembourg_income_study:
+    - data://garden/lis/2023-01-18/luxembourg_income_study
+
+  # World Inequality Database
+  data://meadow/wid/2023-01-27/world_inequality_database:
+    - snapshot://wid/2023-01-27/world_inequality_database.csv
+  data://garden/wid/2023-01-27/world_inequality_database:
+    - data://meadow/wid/2023-01-27/world_inequality_database
+  data://grapher/wid/2023-01-27/world_inequality_database:
+    - data://garden/wid/2023-01-27/world_inequality_database
+  data://explorers/wid/2023-01-27/world_inequality_database:
+    - data://garden/wid/2023-01-27/world_inequality_database
+
+  #
+  # Regions - Regions (2023).
+  #
+  data://garden/regions/2023-01-01/regions:
 
 # Sub-dags to import
 include:

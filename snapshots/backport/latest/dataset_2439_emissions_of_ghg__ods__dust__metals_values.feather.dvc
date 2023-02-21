@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 01:05:26.131693
-  description: This is a dataset imported by the automated fetcher
-  file_extension: feather
-  is_public: true
-  name: Emissions of GHG, ODS, Dust, Metals
   namespace: backport
-  publication_date: latest
   short_name: dataset_2439_emissions_of_ghg__ods__dust__metals_values
+  file_extension: feather
+  date_accessed: 2023-02-17 15:46:08.349699
+  name: Emissions of GHG, ODS, Dust, Metals
+  description: This is a dataset imported by the automated fetcher
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2439
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: df17b0416c0567d6d39fb0d86e94d75e
-  size: 217482
+- md5: 802dd02e167899b03fbdc79d7ee30460
+  size: 217858
   path: dataset_2439_emissions_of_ghg__ods__dust__metals_values.feather

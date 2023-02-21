@@ -1,18 +1,19 @@
 meta:
-  date_accessed: 2022-12-07 15:49:01.857981
+  namespace: backport
+  short_name: dataset_1906_number_of_deaths_due_to_tetanus_config
+  file_extension: json
+  date_accessed: 2023-02-17 14:03:06.359271
+  name: Grapher metadata for dataset_1906_number_of_deaths_due_to_tetanus
   description: This is the GBD 2016 dataset with world regions added to the dataset
     as entities.
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_1906_number_of_deaths_due_to_tetanus
-  namespace: backport
-  publication_date: latest
-  short_name: dataset_1906_number_of_deaths_due_to_tetanus_config
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/1906
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 59ed87617288f52f43ac64e702dfed09
+- md5: c3bc3eca5dc4e05a740594d622cd1b53
   size: 1585
   path: dataset_1906_number_of_deaths_due_to_tetanus_config.json

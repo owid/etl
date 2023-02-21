@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:04:16.864551
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_5652_air_pollution_emissions__ceds__2022
   namespace: backport
-  publication_date: latest
   short_name: dataset_5652_air_pollution_emissions__ceds__2022_config
+  file_extension: json
+  date_accessed: 2023-02-17 16:09:40.397986
+  name: Grapher metadata for dataset_5652_air_pollution_emissions__ceds__2022
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5652
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 003ff1536f38947859f3c7620211fa68
+- md5: e73ede0153deeabd45f5e26f90cc21a5
   size: 6473
   path: dataset_5652_air_pollution_emissions__ceds__2022_config.json

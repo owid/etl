@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 00:13:27.425378
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_2701_life_expectancy_projections__uk_ons
   namespace: backport
-  publication_date: latest
   short_name: dataset_2701_life_expectancy_projections__uk_ons_config
+  file_extension: json
+  date_accessed: 2023-02-17 15:50:54.979179
+  name: Grapher metadata for dataset_2701_life_expectancy_projections__uk_ons
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2701
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 4f080ad485f2554c0de42a56ce66a5dd
+- md5: 5e64d720fc6325dbffe44619b365c16d
   size: 3130
   path: dataset_2701_life_expectancy_projections__uk_ons_config.json

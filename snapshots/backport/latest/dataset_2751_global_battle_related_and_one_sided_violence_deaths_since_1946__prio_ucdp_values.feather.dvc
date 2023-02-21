@@ -1,19 +1,20 @@
 meta:
-  date_accessed: 2022-12-07 16:27:30.599385
+  namespace: backport
+  short_name: dataset_2751_global_battle_related_and_one_sided_violence_deaths_since_1946__prio_ucdp_values
+  file_extension: feather
+  date_accessed: 2023-02-17 15:19:03.539761
+  name: Global battle-related and 'one-sided violence' deaths since 1946 – PRIO/UCDP
   description: Conjunction of PRIO Battle Deaths Dataset 3.1, and UCDP Battle-Related
     Deaths Dataset, UCDP Non-State Conflict Dataset, UCDP One-sided Violence Dataset
     (all v17.2)
-  file_extension: feather
-  is_public: true
-  name: Global battle-related and 'one-sided violence' deaths since 1946 – PRIO/UCDP
-  namespace: backport
-  publication_date: latest
-  short_name: dataset_2751_global_battle_related_and_one_sided_violence_deaths_since_1946__prio_ucdp_values
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2751
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 4aeee30171c23623b05ce41df0ee7834
-  size: 11994
+- md5: 2072c63cebad4e6e0b083e85bd1e2a6f
+  size: 12370
   path: dataset_2751_global_battle_related_and_one_sided_violence_deaths_since_1946__prio_ucdp_values.feather

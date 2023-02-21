@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 01:10:55.904249
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_2479_labor_productivity_per_hour__hill__thomas__dimsdale__2016__bank_of_england
   namespace: backport
-  publication_date: latest
   short_name: dataset_2479_labor_productivity_per_hour__hill__thomas__dimsdale__2016__bank_of_england_config
+  file_extension: json
+  date_accessed: 2023-02-17 14:06:50.054486
+  name: Grapher metadata for dataset_2479_labor_productivity_per_hour__hill__thomas__dimsdale__2016__bank_of_england
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2479
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: a81d1d949b3844e6f315ae2b1b33e1cb
+- md5: e27cddef51df117353ec14bca561a0d2
   size: 1601
   path: dataset_2479_labor_productivity_per_hour__hill__thomas__dimsdale__2016__bank_of_england_config.json

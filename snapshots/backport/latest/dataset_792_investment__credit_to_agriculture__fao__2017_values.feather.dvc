@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-11-29 16:19:14.640351
-  description: This is a dataset imported by the automated fetcher
-  file_extension: feather
-  is_public: true
-  name: 'Investment: Credit to Agriculture - FAO (2017)'
   namespace: backport
-  publication_date: latest
   short_name: dataset_792_investment__credit_to_agriculture__fao__2017_values
+  file_extension: feather
+  date_accessed: 2023-02-17 14:41:31.476150
+  name: 'Investment: Credit to Agriculture - FAO (2017)'
+  description: This is a dataset imported by the automated fetcher
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/792
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: ae7a287af9ad558ad9abceacf1b99fd3
-  size: 85162
+- md5: 3233bfc3fd14458b8444a754220d19d9
+  size: 85546
   path: dataset_792_investment__credit_to_agriculture__fao__2017_values.feather
