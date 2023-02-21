@@ -19,7 +19,7 @@ def run(dest_dir: str, query: str = "") -> None:
     fname = Path(__file__).stem
     namespace = Path(__file__).parent.parent.stem
 
-    walden_ds = Catalog().find_one(namespace=namespace, short_name=fname, version=version)
+    walden_ds = Catalog().find_one(namespace="un_sdg", short_name=fname, version=version)
 
     log.info("un_sdg.start")
     local_file = walden_ds.ensure_downloaded()
