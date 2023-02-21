@@ -8,11 +8,11 @@ meta:
   source_name: Local CSV
   url: ''
   source_published_by: Local CSV
-  source_data_url: gAAAAABj9N_GjNTitLVoZcXgLLv40BLSXT-bvxxhi450ZtA_S7Zqvv2gTA8AmFsYw9Ifx14EbVHsNVK3weHduzNySSKPOwqiSQ==
+  source_data_url: gAAAAABj9OAdW1wDcOpAhumjfExX-hVFwJfpmhfS4Xpnny123d8lEGnKjr3X1qzqGJbLNUOiqAgONTlhOhq_nvgUSsttktbHdw==
   is_public: false
   version: latest
 wdir: ../../../data/snapshots/fasttrack/latest
 outs:
-- md5: d2c84de9290058cbc8ecaf2f3c474c70
-  size: 4330
+- md5: b0c1e7561a1b819571eeaa0990630ae4
+  size: 4331
   path: test_electricity_projections.csv
