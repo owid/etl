@@ -105,7 +105,7 @@ def run(dest_dir: str) -> None:
 
     # Transform long dataframe into a wide dataframe.
     df_wide = (
-        df.pivot(index=["area", "year", "country_code"], columns="variable_units", values="value")
+        df.pivot(index=["area", "year"], columns="variable_units", values="value")
         .reset_index()
         .rename_axis(None, axis=1)
     )
@@ -115,6 +115,9 @@ def run(dest_dir: str) -> None:
 
     # Harmonize country names.
     df_wide = geo.harmonize_countries(df=df_wide, countries_file=paths.country_mapping_path)
+
+    # Set an appropriate index and sort conveniently.
+    df_wide = df_wide.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
 
     # Create a new table with the processed data.
     tb_garden = Table(df_wide, short_name="european_electricity_review")
