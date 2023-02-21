@@ -12,3 +12,5 @@ steps:
   - snapshot-private://fasttrack/2023-01-19/food_expenditures_by_country.csv
   data-private://grapher/fasttrack/latest/metaculus__complementary_data:
   - snapshot-private://fasttrack/latest/metaculus__complementary_data.csv
+  data-private://grapher/fasttrack/latest/global_extreme_poverty_future_scenario:
+  - snapshot-private://fasttrack/latest/global_extreme_poverty_future_scenario.csv
