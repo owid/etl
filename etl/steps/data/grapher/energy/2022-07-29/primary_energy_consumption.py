@@ -13,6 +13,9 @@ def run(dest_dir: str) -> None:
     garden_dataset = catalog.Dataset(DATASET_PATH)
     dataset = catalog.Dataset.create_empty(dest_dir, garden_dataset.metadata)
 
+    # Backward compatibility
+    dataset.metadata.title = "Primary energy consumption (BP & EIA, 2022 archive)"
+
     # There is only one table in the dataset, with the same name as the dataset.
     table = garden_dataset[garden_dataset.table_names[0]].reset_index().drop(columns=["gdp", "population", "source"])
     dataset.add(table)
