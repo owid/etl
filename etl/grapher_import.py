@@ -20,11 +20,12 @@ import structlog
 from owid import catalog
 from owid.catalog import utils
 from sqlalchemy import Integer, String
+from sqlalchemy.engine.base import Engine
 from sqlmodel import Session, delete, select, update
 from tenacity import retry, stop
 
 from etl import config
-from etl.db import get_engine, open_db
+from etl.db import open_db
 
 from . import grapher_helpers as gh
 from . import grapher_model as gm
@@ -67,7 +68,9 @@ class VariableUpsertResult:
     source_id: int
 
 
-def upsert_dataset(dataset: catalog.Dataset, namespace: str, sources: List[catalog.meta.Source]) -> DatasetUpsertResult:
+def upsert_dataset(
+    engine: Engine, dataset: catalog.Dataset, namespace: str, sources: List[catalog.meta.Source]
+) -> DatasetUpsertResult:
     assert dataset.metadata.short_name, "Dataset must have a short_name"
     assert dataset.metadata.version, "Dataset must have a version"
     assert dataset.metadata.title, "Dataset must have a title"
@@ -80,8 +83,6 @@ def upsert_dataset(dataset: catalog.Dataset, namespace: str, sources: List[catal
             " `combine_metadata_sources` or `adapt_dataset_metadata_for_grapher` to"
             " join multiple sources"
         )
-
-    engine = gm.get_engine()
 
     short_name = dataset.metadata.short_name
 
@@ -158,6 +159,7 @@ def _update_variables_display(table: catalog.Table) -> None:
 
 
 def upsert_table(
+    engine: Engine,
     table: catalog.Table,
     dataset_upsert_result: DatasetUpsertResult,
     catalog_path: Optional[str] = None,
@@ -200,7 +202,7 @@ def upsert_table(
 
     _update_variables_display(table)
 
-    with Session(gm.get_engine()) as session:
+    with Session(engine) as session:
         log.info("upsert_table.upsert_variable", variable=table.columns[0])
 
         # For easy retrieveal of the value series we store the name
@@ -254,7 +256,7 @@ def upsert_table(
         df = table.rename(columns={column_name: "value", "entity_id": "entityId"}).assign(variableId=variable.id)
 
         if table.metadata.dataset.short_name not in BLACKLIST_DATASETS_DATA_VALUES_UPSERTS:
-            insert_to_data_values(df)
+            insert_to_data_values(engine, df)
             log.info("upsert_table.upserted_data_values", size=len(table))
 
         return VariableUpsertResult(variable.id, source_id)
@@ -380,7 +382,7 @@ def cleanup_ghost_sources(dataset_id: int, upserted_source_ids: List[int]) -> No
 
 
 @retry(stop=stop.stop_after_attempt(3))
-def insert_to_data_values(df: pd.DataFrame) -> None:
+def insert_to_data_values(engine: Engine, df: pd.DataFrame) -> None:
     """Insert data into data_values table. Retry in case we get Deadlock error."""
     # value will be converted to string in MySQL, we need to do it beforehand otherwise
     # it's gonna assume it is float64 and mess up precision for smaller types
@@ -390,7 +392,7 @@ def insert_to_data_values(df: pd.DataFrame) -> None:
     # deadlocks
     df.to_sql(
         "data_values",
-        get_engine(),
+        engine,
         if_exists="append",
         index=False,
         dtype={
