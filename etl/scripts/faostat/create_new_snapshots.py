@@ -33,12 +33,10 @@ from typing import Any, Dict, List, cast
 import requests
 import ruamel.yaml
 from dateutil import parser
-from owid.walden.catalog import INDEX_DIR
-from owid.walden.files import iter_docs
 from structlog import get_logger
 
 from etl.paths import SNAPSHOTS_DIR
-from etl.snapshot import Snapshot, add_snapshot
+from etl.snapshot import Snapshot, add_snapshot, snapshot_catalog
 
 # Initialize logger.
 log = get_logger()
@@ -81,6 +79,10 @@ INCLUDED_DATASETS_CODES = [
     "fo",
     # Food Security and Nutrition: Suite of Food Security Indicators.
     "fs",
+    # Energy use.
+    "gn",
+    # Credit to Agriculture.
+    "ic",
     # Land, Inputs and Sustainability: Land Cover.
     "lc",
     # Production: Crops and livestock products.
@@ -107,6 +109,8 @@ INCLUDED_DATASETS_CODES = [
     "tcl",
     # Trade: Trade Indices.
     "ti",
+    # World Census of Agriculture.
+    "wcad",
 ]
 # URL for dataset codes in FAOSTAT catalog.
 # This is the URL used to get the remote location of the actual data files to be downloaded, and the date of their
@@ -230,11 +234,13 @@ def load_faostat_catalog() -> List[Dict[str, Any]]:
     return datasets
 
 
-def is_dataset_already_up_to_date(source_data_url: str, source_modification_date: dt.date) -> bool:
-    """Check if a dataset is already up-to-date in the walden index.
+def is_dataset_already_up_to_date(
+    existing_snapshots: List[Snapshot], source_data_url: str, source_modification_date: dt.date
+) -> bool:
+    """Check if our latest snapshot for a particular domain dataset is already up-to-date.
 
-    Iterate over all files in walden index and check if:
-    * The URL of the source data coincides with the one of the current dataset.
+    Iterate over all snapshots in the catalog and check if:
+    * The URL of the source data coincides with the one of the current domain dataset.
     * The last time the source data was accessed was more recently than the source's last modification date.
 
     If those conditions are fulfilled, we consider that the current dataset does not need to be updated.
@@ -243,12 +249,11 @@ def is_dataset_already_up_to_date(source_data_url: str, source_modification_date
         source_data_url (str): URL of the source data.
         source_modification_date (date): Last modification date of the source dataset.
     """
-    index_dir = Path(INDEX_DIR) / NAMESPACE
     dataset_up_to_date = False
-    for filename, index_file in iter_docs(index_dir):
-        index_file_source_data_url = index_file.get("source_data_url")
-        index_file_date_accessed = dt.datetime.strptime(index_file.get("date_accessed"), "%Y-%m-%d").date()
-        if (index_file_source_data_url == source_data_url) and (index_file_date_accessed > source_modification_date):
+    for snapshot in existing_snapshots:
+        snapshot_source_data_url = snapshot.metadata.source_data_url
+        snapshot_date_accessed = parser.parse(str(snapshot.metadata.date_accessed)).date()
+        if (snapshot_source_data_url == source_data_url) and (snapshot_date_accessed > source_modification_date):
             dataset_up_to_date = True
 
     return dataset_up_to_date
@@ -322,6 +327,9 @@ class FAOAdditionalMetadata:
 
 
 def main(read_only: bool = False) -> None:
+    # Load list of existing snapshots related to current NAMESPACE.
+    existing_snapshots = snapshot_catalog(match=NAMESPACE)
+
     # Initialise a flag that will become true if any dataset needs to be updated.
     any_dataset_was_updated = False
     # Fetch dataset codes from FAOSTAT catalog.
@@ -332,6 +340,7 @@ def main(read_only: bool = False) -> None:
         if dataset_code in INCLUDED_DATASETS_CODES:
             faostat_dataset = FAODataset(description)
             if is_dataset_already_up_to_date(
+                existing_snapshots=existing_snapshots,
                 source_data_url=faostat_dataset.source_data_url,
                 source_modification_date=faostat_dataset.modification_date,
             ):
