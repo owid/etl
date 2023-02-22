@@ -46,7 +46,7 @@ from etl.grapher_import import (
     cleanup_ghost_sources,
     cleanup_ghost_variables,
     fetch_db_checksum,
-    set_dataset_checksum,
+    set_dataset_checksum_and_editedAt,
     upsert_dataset,
     upsert_table,
 )
@@ -738,8 +738,8 @@ class GrapherStep(Step):
 
         self._cleanup_ghost_resources(dataset_upsert_results, variable_upsert_results)
 
-        # set checksum after all data got inserted
-        set_dataset_checksum(dataset_upsert_results.dataset_id, self.data_step.checksum_input())
+        # set checksum and updatedAt timestamps after all data got inserted
+        set_dataset_checksum_and_editedAt(dataset_upsert_results.dataset_id, self.data_step.checksum_input())
 
     def checksum_output(self) -> str:
         raise NotImplementedError("GrapherStep should not be used as an input")
