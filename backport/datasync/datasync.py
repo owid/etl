@@ -96,9 +96,6 @@ def cli(
         # sync all datasets since some date
         ENV=.env.staging backport-datasync --dt-start "2023-01-01 00:00:00" --workers 10
 
-        # sync datasets with at least one chart
-        ENV=.env.staging backport-datasync --workers 10
-
         # real-time sync in a forever loop
         last_dt="2023-01-01 00:00:00"
         while true; do
@@ -289,18 +286,7 @@ def _load_datasets(engine: Engine, dataset_ids: tuple[int], dt_start: Optional[d
     elif dt_start:
         where = "dataEditedAt > %(dt_start)s or metadataEditedAt > %(dt_start)s"
     else:
-        # load datasets with at least one chart
-        where = """
-        (
-            -- must be used in at least one chart
-            id in (
-                select distinct v.datasetId from chart_dimensions as cd
-                join variables as v on cd.variableId = v.id
-            )
-        )
-        -- we would like to exclude archived datasets, but we cannot do it
-        -- because some charts still use them (e.g. dataset 88)
-        """
+        raise ValueError("Either dataset_ids or dt_start must be specified")
 
     q = f"""
     select

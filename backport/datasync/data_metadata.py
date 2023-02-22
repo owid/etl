@@ -24,7 +24,7 @@ def variable_data_df_from_mysql(engine: Engine, variable_id: int) -> pd.DataFram
     df = pd.read_sql(q, engine, params={"variable_id": variable_id})
 
     # convert from string to numerical type if possible
-    df["value"] = _convert_to_numeric(df["value"])
+    df["value"] = _convert_strings_to_numeric(df["value"])
 
     return df
 
@@ -154,6 +154,8 @@ def variable_metadata(engine: Engine, variable_id: int, variable_data: pd.DataFr
 
 
 def _infer_variable_type(values: pd.Series) -> str:
+    # data_values does not contain null values
+    assert values.notnull().all(), "values must not contain nulls"
     try:
         values = pd.to_numeric(values)
         inferred_type = pd.api.types.infer_dtype(values)
@@ -170,8 +172,12 @@ def _infer_variable_type(values: pd.Series) -> str:
             return "mixed"
 
 
-def _convert_to_numeric(values: pd.Series) -> pd.Series:
-    values = values.astype(str).replace("nan", np.nan)
+def _convert_strings_to_numeric(values: pd.Series) -> pd.Series:
+    assert values.map(lambda s: isinstance(s, str)).all(), "values must be strings"
+    assert values.notnull().all(), "values must not contain nulls"
+
+    values = values.replace("nan", np.nan)
+
     # raises ValueError if any value is not numeric or float
     try:
         return values.map(int)

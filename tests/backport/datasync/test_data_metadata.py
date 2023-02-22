@@ -2,7 +2,11 @@ from unittest import mock
 
 import pandas as pd
 
-from backport.datasync.data_metadata import variable_metadata
+from backport.datasync.data_metadata import (
+    _convert_strings_to_numeric,
+    _infer_variable_type,
+    variable_metadata,
+)
 from etl.db import get_engine
 
 
@@ -98,3 +102,21 @@ def test_variable_metadata():
             },
         },
     }
+
+
+def test_infer_variable_type():
+    assert _infer_variable_type(pd.Series([1, 2])) == "int"
+    assert _infer_variable_type(pd.Series([1, 2.5])) == "float"
+    assert _infer_variable_type(pd.Series([1, 2.5, "c"])) == "mixed"
+    assert _infer_variable_type(pd.Series(["a", "b", "c"])) == "string"
+
+    assert _infer_variable_type(pd.Series(["1", "2"])) == "int"
+    assert _infer_variable_type(pd.Series(["1", 2])) == "int"
+    assert _infer_variable_type(pd.Series(["1", 2, "3.5"])) == "float"
+    assert _infer_variable_type(pd.Series(["1", 2, "3.5", "a"])) == "mixed"
+
+
+def test_convert_strings_to_numeric():
+    assert _convert_strings_to_numeric(pd.Series(["1", "2.1", "UK"])).to_list() == ["1", "2.1", "UK"]
+    assert _convert_strings_to_numeric(pd.Series(["1", "2"])).to_list() == [1, 2]
+    assert _convert_strings_to_numeric(pd.Series(["1", "2.5"])).to_list() == [1, 2.5]
