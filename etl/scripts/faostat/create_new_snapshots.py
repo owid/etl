@@ -199,7 +199,7 @@ class FAODataset:
             "publication_date": str(self.publication_date),
             "date_accessed": VERSION,
             "version": VERSION,
-            "url": FAO_DATA_URL,
+            "url": f"{FAO_DATA_URL}/{self._dataset_metadata['DatasetCode']}",
             "source_data_url": self.source_data_url,
             "file_extension": "zip",
             "license_url": LICENSE_URL,
