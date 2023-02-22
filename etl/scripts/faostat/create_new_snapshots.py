@@ -28,17 +28,17 @@ import datetime as dt
 import json
 import tempfile
 from pathlib import Path
-from typing import cast
+from typing import Any, Dict, List, cast
 
 import requests
 import ruamel.yaml
 from dateutil import parser
+from owid.walden.catalog import INDEX_DIR
+from owid.walden.files import iter_docs
 from structlog import get_logger
 
 from etl.paths import SNAPSHOTS_DIR
 from etl.snapshot import Snapshot, add_snapshot
-from owid.walden.catalog import INDEX_DIR
-from owid.walden.files import iter_docs
 
 # Initialize logger.
 log = get_logger()
@@ -119,9 +119,7 @@ GIT_URL_TO_WALDEN = "https://github.com/owid/walden/"
 GIT_URL_TO_THIS_FILE = f"{GIT_URL_TO_WALDEN}blob/master/ingests/faostat.py"
 
 
-def create_snapshot_metadata_file(metadata):
-    # URI of snapshot to be created.
-    snapshot_uri = f"{metadata['namespace']}/{metadata['version']}/{metadata['short_name']}.{metadata['file_extension']}"
+def create_snapshot_metadata_file(metadata: Dict[str, Any]) -> None:
     # Path to new snapshot folder.
     snapshot_dir_path = Path(SNAPSHOTS_DIR / metadata["namespace"] / metadata["version"])
     # Path to new snapshot metadata file.
@@ -138,7 +136,7 @@ def create_snapshot_metadata_file(metadata):
 class FAODataset:
     namespace: str = NAMESPACE
 
-    def __init__(self, dataset_metadata: dict):
+    def __init__(self, dataset_metadata: Dict[str, Any]):
         """[summary]
 
         Args:
@@ -178,7 +176,7 @@ class FAODataset:
 
     @property
     def metadata(self):
-        f"""
+        """
         Snapshot-compatible view of this dataset's metadata.
 
         """
@@ -224,12 +222,12 @@ class FAODataset:
         snap.download_from_source()
 
 
-def load_faostat_catalog():
+def load_faostat_catalog() -> List[Dict[str, Any]]:
     datasets = requests.get(FAO_CATALOG_URL).json()["Datasets"]["Dataset"]
     return datasets
 
 
-def is_dataset_already_up_to_date(source_data_url, source_modification_date):
+def is_dataset_already_up_to_date(source_data_url: str, source_modification_date: dt.date) -> bool:
     """Check if a dataset is already up-to-date in the walden index.
 
     Iterate over all files in walden index and check if:
@@ -258,7 +256,7 @@ class FAOAdditionalMetadata:
         # Assign current date to additional metadata.
         self.publication_date = dt.datetime.today().date()
         self.publication_year = self.publication_date.year
-        
+
         # Initialise the combined metadata to be downloaded from FAOSTAT.
         self.faostat_metadata = None
 
@@ -284,7 +282,7 @@ class FAOAdditionalMetadata:
         }
 
     @staticmethod
-    def _fetch_additional_metadata_and_save(output_filename):
+    def _fetch_additional_metadata_and_save(output_filename: str) -> None:
         faostat_metadata = {}
         # Fetch additional metadata for each domain and category using API.
         for domain in INCLUDED_DATASETS_CODES:
@@ -305,7 +303,7 @@ class FAOAdditionalMetadata:
         with open(output_filename, "w") as _output_filename:
             json.dump(faostat_metadata, _output_filename, indent=2, sort_keys=True)
 
-    def to_snapshot(self):
+    def to_snapshot(self) -> None:
         # Create metadata file for current domain dataset.
         create_snapshot_metadata_file(self.metadata)
 
@@ -320,7 +318,7 @@ class FAOAdditionalMetadata:
             add_snapshot(uri=snapshot_uri, filename=f.name, upload=True)
 
 
-def main(read_only=False):
+def main(read_only: bool = False) -> None:
     # Initialise a flag that will become true if any dataset needs to be updated.
     any_dataset_was_updated = False
     # Fetch dataset codes from FAOSTAT catalog.
@@ -352,6 +350,7 @@ def main(read_only=False):
             additional_metadata.to_snapshot()
     else:
         log.info("No need to fetch additional metadata, since all datasets are up-to-date.")
+
 
 if __name__ == "__main__":
     argument_parser = argparse.ArgumentParser(description=__doc__)
