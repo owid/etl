@@ -221,6 +221,9 @@ class FAODataset:
         # Download data from source.
         snap.download_from_source()
 
+        # Add file to DVC and upload to S3.
+        snap.dvc_add(upload=True)
+
 
 def load_faostat_catalog() -> List[Dict[str, Any]]:
     datasets = requests.get(FAO_CATALOG_URL).json()["Datasets"]["Dataset"]
