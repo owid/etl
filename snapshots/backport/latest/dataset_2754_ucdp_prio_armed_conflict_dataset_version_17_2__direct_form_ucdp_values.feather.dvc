@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2754_ucdp_prio_armed_conflict_dataset_version_17_2__direct_form_ucdp_values
   file_extension: feather
-  date_accessed: 2023-02-17 12:57:59.925450
+  date_accessed: 2023-02-23 17:20:58.874075
   name: UCDP/PRIO Armed Conflict Dataset version 17.2 (direct form UCDP)
   description: This is downloaded directly from UCDP, rather than being merged with
     PRIO 3.1 (as we've done for battle deaths)

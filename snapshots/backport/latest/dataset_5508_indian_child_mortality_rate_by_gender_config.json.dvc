@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5508_indian_child_mortality_rate_by_gender_config
   file_extension: json
-  date_accessed: 2023-02-17 14:04:16.953893
+  date_accessed: 2023-02-23 18:48:10.074534
   name: Grapher metadata for dataset_5508_indian_child_mortality_rate_by_gender
   description: |-
     Permalink: http://ghdx.healthdata.org/gbd-results-tool?params=gbd-api-2019-permalink/4f9d6dd65a1127c3a0d4c6a7868346b6
@@ -23,6 +23,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 39f263e88c72e5416555a0efb10513ce
-  size: 3570
+- md5: 00774ede5032940c6e9f87a314574791
+  size: 3970
   path: dataset_5508_indian_child_mortality_rate_by_gender_config.json

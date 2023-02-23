@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5455_long_term_corn_production_and_yield_in_the_us__us_census_bureau__usda_values
   file_extension: feather
-  date_accessed: 2023-02-17 15:06:48.174727
+  date_accessed: 2023-02-23 17:48:03.146880
   name: Long-term corn production and yield in the US (US Census Bureau; USDA)
   description: ''
   source_name: Our World in Data catalog backport

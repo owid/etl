@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_962_land_use_map_by_area__owid_based_on_fao_values
   file_extension: feather
-  date_accessed: 2023-02-17 13:30:29.461396
+  date_accessed: 2023-02-23 17:22:12.717330
   name: Land Use Map by Area - OWID based on FAO
   description: ''
   source_name: Our World in Data catalog backport

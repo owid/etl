@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2911_time_use_in_finland__statistics_finland_config
   file_extension: json
-  date_accessed: 2023-02-17 14:53:28.964261
+  date_accessed: 2023-02-23 17:36:17.329294
   name: Grapher metadata for dataset_2911_time_use_in_finland__statistics_finland
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 004011bb4ba99cc072e1938cb9a577bc
-  size: 3150
+- md5: 5f8a751941c18a5c9d5bbc1680f236e2
+  size: 3744
   path: dataset_2911_time_use_in_finland__statistics_finland_config.json

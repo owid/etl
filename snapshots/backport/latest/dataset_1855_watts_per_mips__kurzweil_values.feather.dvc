@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_1855_watts_per_mips__kurzweil_values
   file_extension: feather
-  date_accessed: 2023-02-17 13:27:50.578300
+  date_accessed: 2023-02-23 17:36:24.274499
   name: Watts per MIPS- Kurzweil
   description: ''
   source_name: Our World in Data catalog backport

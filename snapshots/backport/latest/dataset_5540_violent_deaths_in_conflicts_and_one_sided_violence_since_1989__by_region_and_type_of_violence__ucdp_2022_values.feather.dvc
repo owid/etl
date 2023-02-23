@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5540_violent_deaths_in_conflicts_and_one_sided_violence_since_1989__by_region_and_type_of_violence__ucdp_2022_values
   file_extension: feather
-  date_accessed: 2023-02-17 12:59:47.654164
+  date_accessed: 2023-02-23 17:23:11.636731
   name: Violent deaths in conflicts and one-sided violence since 1989, by region and
     type of violence (UCDP 2022)
   description: ''

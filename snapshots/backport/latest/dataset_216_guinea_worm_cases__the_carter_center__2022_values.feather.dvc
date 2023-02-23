@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_216_guinea_worm_cases__the_carter_center__2022_values
   file_extension: feather
-  date_accessed: 2023-02-17 15:35:36.246968
+  date_accessed: 2023-02-23 17:35:52.651913
   name: Guinea Worm Cases - The Carter Center (2022)
   description: Manual update of spreadsheet
   source_name: Our World in Data catalog backport

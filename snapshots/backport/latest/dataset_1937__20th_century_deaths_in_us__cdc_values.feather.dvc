@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_1937__20th_century_deaths_in_us__cdc_values
   file_extension: feather
-  date_accessed: 2023-02-17 13:24:50.230399
+  date_accessed: 2023-02-23 16:59:07.524132
   name: 20th century deaths in US - CDC
   description: ''
   source_name: Our World in Data catalog backport

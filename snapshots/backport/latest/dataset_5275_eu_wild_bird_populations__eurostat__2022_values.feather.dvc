@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5275_eu_wild_bird_populations__eurostat__2022_values
   file_extension: feather
-  date_accessed: 2023-02-17 12:13:03.290095
+  date_accessed: 2023-02-23 17:10:32.876891
   name: EU Wild Bird Populations (Eurostat, 2022)
   description: ''
   source_name: Our World in Data catalog backport

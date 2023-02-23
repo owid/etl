@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_296_government_revenue__wallis__2000_values
   file_extension: feather
-  date_accessed: 2023-02-17 13:29:27.310851
+  date_accessed: 2023-02-23 18:16:49.010580
   name: Government Revenue – Wallis (2000)
   description: US 20th Century
   source_name: Our World in Data catalog backport

@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_4159_self_reported_loneliness_in_older_adults__owid__2018_values
   file_extension: feather
-  date_accessed: 2023-02-17 12:28:17.445849
+  date_accessed: 2023-02-23 17:36:31.274158
   name: Self-reported loneliness in older adults - OWID (2018)
   description: ''
   source_name: Our World in Data catalog backport

@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_4903_marriage_equality__global_comparisons__council_on_foreign_relations_config
   file_extension: json
-  date_accessed: 2023-02-17 12:39:05.426092
+  date_accessed: 2023-02-23 19:37:44.470883
   name: Grapher metadata for dataset_4903_marriage_equality__global_comparisons__council_on_foreign_relations
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 2f95e1f55bac4052aad1cb27a485a405
-  size: 1938
+- md5: 94d836bb65e3db43c650740b8d472a02
+  size: 2338
   path: dataset_4903_marriage_equality__global_comparisons__council_on_foreign_relations_config.json

@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_240_educational_attainment__barro_lee_education_dataset__2010_values
   file_extension: feather
-  date_accessed: 2023-02-17 12:11:03.277760
+  date_accessed: 2023-02-23 17:07:56.314196
   name: Educational Attainment - Barro Lee Education Dataset (2010)
   description: ''
   source_name: Our World in Data catalog backport

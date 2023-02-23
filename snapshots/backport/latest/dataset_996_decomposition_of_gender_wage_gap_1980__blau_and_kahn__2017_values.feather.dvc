@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_996_decomposition_of_gender_wage_gap_1980__blau_and_kahn__2017_values
   file_extension: feather
-  date_accessed: 2023-02-17 14:54:19.065865
+  date_accessed: 2023-02-23 17:16:37.207715
   name: Decomposition of Gender Wage Gap 1980 - Blau and Kahn (2017)
   description: ''
   source_name: Our World in Data catalog backport

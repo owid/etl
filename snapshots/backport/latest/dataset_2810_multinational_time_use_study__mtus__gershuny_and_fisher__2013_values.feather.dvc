@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2810_multinational_time_use_study__mtus__gershuny_and_fisher__2013_values
   file_extension: feather
-  date_accessed: 2023-02-17 14:22:15.170102
+  date_accessed: 2023-02-23 17:35:38.899160
   name: Multinational Time Use Study (MTUS) - Gershuny and Fisher (2013)
   description: ''
   source_name: Our World in Data catalog backport

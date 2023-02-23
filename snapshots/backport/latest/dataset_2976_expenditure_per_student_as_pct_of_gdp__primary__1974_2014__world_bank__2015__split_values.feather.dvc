@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2976_expenditure_per_student_as_pct_of_gdp__primary__1974_2014__world_bank__2015__split_values
   file_extension: feather
-  date_accessed: 2023-02-17 14:06:43.200602
+  date_accessed: 2023-02-23 18:04:27.694121
   name: Expenditure per student as % of GDP (primary), 1974-2014 (World Bank (2015))
     (split)
   description: ''

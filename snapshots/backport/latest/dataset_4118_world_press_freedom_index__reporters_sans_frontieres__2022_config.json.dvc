@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_4118_world_press_freedom_index__reporters_sans_frontieres__2022_config
   file_extension: json
-  date_accessed: 2023-02-17 13:18:43.071096
+  date_accessed: 2023-02-23 17:40:37.869643
   name: Grapher metadata for dataset_4118_world_press_freedom_index__reporters_sans_frontieres__2022
   description: We received the combined file for years 2014-2021 via email from the
     head of the World Press Freedom Index, Nalini Chella-Lepetit.
@@ -14,6 +14,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 223e6d3f30ec5b799facf0acb37c7f96
-  size: 2573
+- md5: 83729c934302dec372f4ccc3d1762523
+  size: 2973
   path: dataset_4118_world_press_freedom_index__reporters_sans_frontieres__2022_config.json

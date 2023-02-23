@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_3019_total_merchandise_trade_as_share_of_gdp__nber_united_nations_1962_2000__split_values
   file_extension: feather
-  date_accessed: 2023-02-17 13:37:37.022015
+  date_accessed: 2023-02-23 18:02:40.014996
   name: Total merchandise trade as share of GDP (NBER-United Nations 1962-2000) (split)
   description: ''
   source_name: Our World in Data catalog backport

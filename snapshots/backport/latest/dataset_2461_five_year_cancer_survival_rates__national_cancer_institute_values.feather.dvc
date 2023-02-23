@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2461_five_year_cancer_survival_rates__national_cancer_institute_values
   file_extension: feather
-  date_accessed: 2023-02-17 15:29:24.436878
+  date_accessed: 2023-02-23 18:33:35.326531
   name: Five-year cancer survival rates - National Cancer Institute
   description: ''
   source_name: Our World in Data catalog backport

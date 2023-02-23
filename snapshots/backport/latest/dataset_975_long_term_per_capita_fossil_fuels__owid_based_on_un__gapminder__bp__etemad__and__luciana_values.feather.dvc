@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_975_long_term_per_capita_fossil_fuels__owid_based_on_un__gapminder__bp__etemad__and__luciana_values
   file_extension: feather
-  date_accessed: 2023-02-17 13:57:13.145727
+  date_accessed: 2023-02-23 15:04:21.236034
   name: Long-term per capita fossil fuels - OWID based on UN, Gapminder, BP, Etemad
     & Luciana
   description: ''

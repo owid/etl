@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2732_military_expenditure_as_a_share_of_gdp__owid_based_on_cow__and__sipri__2017_values
   file_extension: feather
-  date_accessed: 2023-02-17 13:43:36.442688
+  date_accessed: 2023-02-23 15:15:01.643683
   name: Military expenditure as a share of GDP - OWID based on COW & SIPRI (2017)
   description: ''
   source_name: Our World in Data catalog backport

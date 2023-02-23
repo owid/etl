@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5814_inequality_among_world_citizens__bourguignon_and_morrisson__2002_config
   file_extension: json
-  date_accessed: 2023-02-18 00:07:17.002001
+  date_accessed: 2023-02-23 19:38:30.934514
   name: Grapher metadata for dataset_5814_inequality_among_world_citizens__bourguignon_and_morrisson__2002
   description: Backported
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 7a99293f9ae148da4cd79fe6caeb9590
-  size: 3204
+- md5: 504b16567a057bbb6aedbc3080d96369
+  size: 3804
   path: dataset_5814_inequality_among_world_citizens__bourguignon_and_morrisson__2002_config.json

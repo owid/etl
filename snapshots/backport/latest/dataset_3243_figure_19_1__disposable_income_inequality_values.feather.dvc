@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_3243_figure_19_1__disposable_income_inequality_values
   file_extension: feather
-  date_accessed: 2023-02-17 14:24:06.829779
+  date_accessed: 2023-02-23 16:31:08.152685
   name: Figure 19.1_ Disposable_income_inequality
   description: core-econ.org
   source_name: Our World in Data catalog backport

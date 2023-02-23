@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5629_global_health_observatory__world_health_organization__2022_05_config
   file_extension: json
-  date_accessed: 2023-02-17 16:06:24.449962
+  date_accessed: 2023-02-23 17:51:04.453144
   name: Grapher metadata for dataset_5629_global_health_observatory__world_health_organization__2022_05
   description: This is a dataset imported by the automated fetcher
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 2a30bae37a12239f93ebad2b8935900e
-  size: 10162724
+- md5: fef3f395540c848858d5375f8763ce14
+  size: 11359924
   path: dataset_5629_global_health_observatory__world_health_organization__2022_05_config.json

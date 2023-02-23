@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5249_agricultural_land_use_per_capita__fao__2021_config
   file_extension: json
-  date_accessed: 2023-02-17 12:23:03.049000
+  date_accessed: 2023-02-23 16:35:11.406692
   name: Grapher metadata for dataset_5249_agricultural_land_use_per_capita__fao__2021
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: e9756c8b4be9308763946bebd6d86905
-  size: 8016
+- md5: dd132e4dd1fc32603ff363d228d90ea5
+  size: 9216
   path: dataset_5249_agricultural_land_use_per_capita__fao__2021_config.json

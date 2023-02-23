@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_3004_social_expenditure_pctgdp__oecd__socx__split_values
   file_extension: feather
-  date_accessed: 2023-02-17 13:49:46.523908
+  date_accessed: 2023-02-23 17:49:50.259941
   name: Social Expenditure %GDP - OECD (SOCX) (split)
   description: Data-set put together by Marco Molteni under the guidance of Esteban.
     OECD (SOCX) on social spending are used as reference series and data are extrapolated

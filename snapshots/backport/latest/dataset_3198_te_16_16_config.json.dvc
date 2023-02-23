@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_3198_te_16_16_config
   file_extension: json
-  date_accessed: 2023-02-17 13:33:36.751559
+  date_accessed: 2023-02-23 17:57:53.083085
   name: Grapher metadata for dataset_3198_te_16_16
   description: core-econ.org
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 0add7c22397ff025fefae983cf3696b9
-  size: 1611
+- md5: e6ec5f7422b1e72bcc27c35b98c1efd6
+  size: 2007
   path: dataset_3198_te_16_16_config.json

@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2724_time_use_across_activities__oecd_gender_data__2020_values
   file_extension: feather
-  date_accessed: 2023-02-17 14:15:03.234154
+  date_accessed: 2023-02-23 17:01:08.847816
   name: Time use across activities - OECD Gender data (2020)
   description: ''
   source_name: Our World in Data catalog backport

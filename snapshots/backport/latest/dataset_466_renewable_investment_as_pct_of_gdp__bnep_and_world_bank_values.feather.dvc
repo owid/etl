@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_466_renewable_investment_as_pct_of_gdp__bnep_and_world_bank_values
   file_extension: feather
-  date_accessed: 2023-02-17 12:58:52.099021
+  date_accessed: 2023-02-23 19:38:43.950708
   name: Renewable Investment as % of GDP - BNEP and World Bank
   description: Renewable Investment as % of GDP in 2015 - BNEP and World Bank
   source_name: Our World in Data catalog backport

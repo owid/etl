@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2801_the_allocation_of_time_over_five_decades__aguiar_and_hurst__2006_values
   file_extension: feather
-  date_accessed: 2023-02-17 15:16:26.749825
+  date_accessed: 2023-02-23 17:55:21.023030
   name: The allocation of time over five decades - Aguiar and Hurst (2006)
   description: ''
   source_name: Our World in Data catalog backport

@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2659_food_expenditure_in_the_usa__usda_values
   file_extension: feather
-  date_accessed: 2023-02-17 15:38:40.542523
+  date_accessed: 2023-02-23 15:11:44.044569
   name: Food expenditure in the USA - USDA
   description: ''
   source_name: Our World in Data catalog backport

@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_3032_world_trade_based_on_own_estimates__pct_of_gdp__klasing_and_milionis__2014__split_values
   file_extension: feather
-  date_accessed: 2023-02-17 14:01:46.684768
+  date_accessed: 2023-02-23 18:07:27.460854
   name: World trade based on own estimates (% of GDP) (Klasing and Milionis (2014))  (split)
   description: ''
   source_name: Our World in Data catalog backport

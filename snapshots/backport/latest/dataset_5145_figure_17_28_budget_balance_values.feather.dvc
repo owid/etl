@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5145_figure_17_28_budget_balance_values
   file_extension: feather
-  date_accessed: 2023-02-17 15:34:19.562266
+  date_accessed: 2023-02-23 17:56:33.782198
   name: Figure_17.28_budget_balance
   description: core-econ.org
   source_name: Our World in Data catalog backport

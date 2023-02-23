@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_271_us__public_trust_in_government__pew_research_center_values
   file_extension: feather
-  date_accessed: 2023-02-17 12:18:50.785263
+  date_accessed: 2023-02-23 19:07:57.202574
   name: US - Public Trust in Government - Pew Research Center
   description: Generated with https://github.com/owid/notebooks/tree/main/EdouardMathieu/us_public_trust_government_pew_research_center
   source_name: Our World in Data catalog backport

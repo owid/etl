@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5382_european_vehicle_passenger_sales__icct__2021_config
   file_extension: json
-  date_accessed: 2023-02-17 15:04:28.835962
+  date_accessed: 2023-02-23 19:19:57.882630
   name: Grapher metadata for dataset_5382_european_vehicle_passenger_sales__icct__2021
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: a834d8307d018b2807e7e8cdb70f6888
-  size: 12823
+- md5: 632c3c697a9b5e8a1b4743d396b23118
+  size: 18223
   path: dataset_5382_european_vehicle_passenger_sales__icct__2021_config.json

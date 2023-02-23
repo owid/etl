@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2955_drought_severity_index_in_us__noaa_values
   file_extension: feather
-  date_accessed: 2023-02-17 12:36:59.616766
+  date_accessed: 2023-02-23 19:14:57.529442
   name: Drought Severity Index in US (NOAA)
   description: ''
   source_name: Our World in Data catalog backport

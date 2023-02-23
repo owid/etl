@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2720_postage_rates__united_states_postal_service__2018_values
   file_extension: feather
-  date_accessed: 2023-02-17 13:05:09.226466
+  date_accessed: 2023-02-23 16:33:00.533512
   name: Postage rates - United States Postal Service (2018)
   description: ''
   source_name: Our World in Data catalog backport

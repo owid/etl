@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_426_weather_fatality_rates_in_the_us__owid_based_on_noaa_and_lopez_holle_and_population_data_values
   file_extension: feather
-  date_accessed: 2023-02-17 13:40:25.568938
+  date_accessed: 2023-02-23 16:45:57.269416
   name: Weather fatality rates in the US – OWID based on NOAA and Lopez Holle and
     population data
   description: ''

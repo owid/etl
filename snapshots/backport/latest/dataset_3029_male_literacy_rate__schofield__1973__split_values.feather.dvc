@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_3029_male_literacy_rate__schofield__1973__split_values
   file_extension: feather
-  date_accessed: 2023-02-17 14:44:27.024647
+  date_accessed: 2023-02-23 18:03:41.445294
   name: Male literacy rate (Schofield (1973)) (split)
   description: Literacy figures are nationally representative.
   source_name: Our World in Data catalog backport

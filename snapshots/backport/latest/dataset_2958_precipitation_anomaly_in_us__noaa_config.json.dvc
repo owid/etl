@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2958_precipitation_anomaly_in_us__noaa_config
   file_extension: json
-  date_accessed: 2023-02-17 13:51:59.546655
+  date_accessed: 2023-02-23 19:03:46.335293
   name: Grapher metadata for dataset_2958_precipitation_anomaly_in_us__noaa
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 87bfcd881a1f1a5aafb26ce4a87e4560
-  size: 2161
+- md5: c6f159197afd1b3ece85d8eca4e92505
+  size: 2359
   path: dataset_2958_precipitation_anomaly_in_us__noaa_config.json

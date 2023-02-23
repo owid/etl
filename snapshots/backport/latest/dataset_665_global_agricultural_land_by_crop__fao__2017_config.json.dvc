@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_665_global_agricultural_land_by_crop__fao__2017_config
   file_extension: json
-  date_accessed: 2023-02-17 15:20:50.057322
+  date_accessed: 2023-02-23 15:15:33.958506
   name: Grapher metadata for dataset_665_global_agricultural_land_by_crop__fao__2017
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 99b19294901f208e1d31ecb9c9d7c8d0
-  size: 1503
+- md5: 2d319d2cf416f667d4479cd91ee66e43
+  size: 1699
   path: dataset_665_global_agricultural_land_by_crop__fao__2017_config.json

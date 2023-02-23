@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_520_real_gdp_per_capita__london_and_delhi__owid_values
   file_extension: feather
-  date_accessed: 2023-02-17 13:25:04.106592
+  date_accessed: 2023-02-23 17:42:43.652848
   name: Real GDP per capita, London and Delhi - OWID
   description: ''
   source_name: Our World in Data catalog backport

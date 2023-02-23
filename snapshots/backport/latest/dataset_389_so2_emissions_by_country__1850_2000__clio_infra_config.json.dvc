@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_389_so2_emissions_by_country__1850_2000__clio_infra_config
   file_extension: json
-  date_accessed: 2023-02-17 12:51:25.840690
+  date_accessed: 2023-02-23 18:18:09.389406
   name: Grapher metadata for dataset_389_so2_emissions_by_country__1850_2000__clio_infra
   description: SO2 emissions (million tonnes) by country (1850-2000).
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 0d6d7379fabe54e8ae56c1e3cbf42e38
-  size: 1440
+- md5: 5e46e98f60ac5421615e2b5c7829e1ce
+  size: 1636
   path: dataset_389_so2_emissions_by_country__1850_2000__clio_infra_config.json

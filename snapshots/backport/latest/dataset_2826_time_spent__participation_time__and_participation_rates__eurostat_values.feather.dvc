@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2826_time_spent__participation_time__and_participation_rates__eurostat_values
   file_extension: feather
-  date_accessed: 2023-02-17 13:30:36.575868
+  date_accessed: 2023-02-23 16:56:56.737188
   name: Time spent, participation time, and participation rates - Eurostat
   description: ''
   source_name: Our World in Data catalog backport

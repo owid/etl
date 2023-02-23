@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_3221_alcohol_consumption_by_type_since_1890__alexander__and__holmes__2017_values
   file_extension: feather
-  date_accessed: 2023-02-17 15:45:11.629096
+  date_accessed: 2023-02-23 17:38:31.812614
   name: Alcohol consumption by type since 1890 (Alexander & Holmes, 2017)
   description: ''
   source_name: Our World in Data catalog backport

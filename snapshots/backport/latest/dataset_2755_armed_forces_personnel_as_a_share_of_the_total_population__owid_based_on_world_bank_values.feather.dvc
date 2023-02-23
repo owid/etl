@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2755_armed_forces_personnel_as_a_share_of_the_total_population__owid_based_on_world_bank_values
   file_extension: feather
-  date_accessed: 2023-02-17 15:28:55.117955
+  date_accessed: 2023-02-23 18:37:55.588780
   name: Armed forces personnel as a share of the total population (OWID based on World
     Bank)
   description: ''

@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5491_agricultural_total_factor_productivity__usda_config
   file_extension: json
-  date_accessed: 2023-02-17 12:06:06.418810
+  date_accessed: 2023-02-23 17:12:23.833212
   name: Grapher metadata for dataset_5491_agricultural_total_factor_productivity__usda
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: d28a64bb253c8519abf4901b1210e9c5
-  size: 14258
+- md5: e9e7e0af6565df010330165b4207946e
+  size: 19458
   path: dataset_5491_agricultural_total_factor_productivity__usda_config.json

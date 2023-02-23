@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_4868_suicides_from_pesticides__mew_et_al__2017_values
   file_extension: feather
-  date_accessed: 2023-02-17 13:55:29.403423
+  date_accessed: 2023-02-23 16:47:50.046928
   name: Suicides from pesticides (Mew et al., 2017)
   description: ''
   source_name: Our World in Data catalog backport

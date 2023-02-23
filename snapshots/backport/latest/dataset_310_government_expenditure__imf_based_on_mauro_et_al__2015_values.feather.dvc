@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_310_government_expenditure__imf_based_on_mauro_et_al__2015_values
   file_extension: feather
-  date_accessed: 2023-02-17 13:01:41.206080
+  date_accessed: 2023-02-23 18:12:31.469063
   name: Government Expenditure – IMF based on Mauro et al. (2015)
   description: ''
   source_name: Our World in Data catalog backport

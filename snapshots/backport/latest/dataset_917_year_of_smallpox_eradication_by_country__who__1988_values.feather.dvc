@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_917_year_of_smallpox_eradication_by_country__who__1988_values
   file_extension: feather
-  date_accessed: 2023-02-17 12:34:14.879855
+  date_accessed: 2023-02-23 18:12:11.393378
   name: Year of smallpox eradication by country - WHO (1988)
   description: ''
   source_name: Our World in Data catalog backport

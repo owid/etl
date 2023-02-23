@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2890_co2_emissions_by_city__c40_cities__2018_values
   file_extension: feather
-  date_accessed: 2023-02-17 12:26:32.006643
+  date_accessed: 2023-02-23 18:27:32.180474
   name: CO2 emissions by city - C40 Cities (2018)
   description: ''
   source_name: Our World in Data catalog backport

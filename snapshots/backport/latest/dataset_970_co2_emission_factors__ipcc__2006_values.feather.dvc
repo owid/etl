@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_970_co2_emission_factors__ipcc__2006_values
   file_extension: feather
-  date_accessed: 2023-02-17 14:22:29.494373
+  date_accessed: 2023-02-23 17:42:57.737317
   name: CO2 emission factors - IPCC (2006)
   description: ''
   source_name: Our World in Data catalog backport

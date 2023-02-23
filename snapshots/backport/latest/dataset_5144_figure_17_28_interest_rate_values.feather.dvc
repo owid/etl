@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5144_figure_17_28_interest_rate_values
   file_extension: feather
-  date_accessed: 2023-02-17 13:45:15.473015
+  date_accessed: 2023-02-23 18:10:59.505119
   name: Figure_17.28_interest_rate
   description: core-econ.org
   source_name: Our World in Data catalog backport

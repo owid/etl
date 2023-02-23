@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2911_time_use_in_finland__statistics_finland_values
   file_extension: feather
-  date_accessed: 2023-02-17 14:53:57.542118
+  date_accessed: 2023-02-23 17:36:45.552066
   name: Time use in Finland - Statistics Finland
   description: ''
   source_name: Our World in Data catalog backport

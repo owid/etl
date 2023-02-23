@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2668_employment_and_gender_attitudes__pew_research_centre__2012_values
   file_extension: feather
-  date_accessed: 2023-02-17 12:30:20.414444
+  date_accessed: 2023-02-23 18:36:08.990486
   name: Employment and Gender attitudes - Pew Research Centre (2012)
   description: ''
   source_name: Our World in Data catalog backport

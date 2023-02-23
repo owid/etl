@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2794_literacy_rate__pct_of_total_respondents__dhs_surveys_config
   file_extension: json
-  date_accessed: 2023-02-17 15:28:04.316514
+  date_accessed: 2023-02-23 19:22:35.799534
   name: Grapher metadata for dataset_2794_literacy_rate__pct_of_total_respondents__dhs_surveys
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: c78ae87c46ae682a3e5b820603dcb9dc
-  size: 7076
+- md5: c59ab65ca7012bf2c91a6c5bbabe83db
+  size: 7670
   path: dataset_2794_literacy_rate__pct_of_total_respondents__dhs_surveys_config.json

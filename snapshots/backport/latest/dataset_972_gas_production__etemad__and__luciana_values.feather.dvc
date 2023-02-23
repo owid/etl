@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_972_gas_production__etemad__and__luciana_values
   file_extension: feather
-  date_accessed: 2023-02-17 14:07:32.281165
+  date_accessed: 2023-02-23 19:10:18.614841
   name: Gas production - Etemad & Luciana
   description: ''
   source_name: Our World in Data catalog backport

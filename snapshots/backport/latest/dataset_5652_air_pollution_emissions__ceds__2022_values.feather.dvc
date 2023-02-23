@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5652_air_pollution_emissions__ceds__2022_values
   file_extension: feather
-  date_accessed: 2023-02-17 16:10:10.044065
+  date_accessed: 2023-02-23 19:35:30.724332
   name: Air pollution emissions (CEDS, 2022)
   description: ''
   source_name: Our World in Data catalog backport

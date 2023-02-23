@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5634_democracy__bertelsmann_transformation_index__2022_values
   file_extension: feather
-  date_accessed: 2023-02-17 16:05:47.582570
+  date_accessed: 2023-02-23 17:30:28.508238
   name: Democracy - Bertelsmann Transformation Index (2022)
   description: ''
   source_name: Our World in Data catalog backport

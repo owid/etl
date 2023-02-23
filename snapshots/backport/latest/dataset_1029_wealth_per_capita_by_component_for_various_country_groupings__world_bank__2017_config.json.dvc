@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_1029_wealth_per_capita_by_component_for_various_country_groupings__world_bank__2017_config
   file_extension: json
-  date_accessed: 2023-02-17 14:20:51.503570
+  date_accessed: 2023-02-23 19:40:09.944070
   name: Grapher metadata for dataset_1029_wealth_per_capita_by_component_for_various_country_groupings__world_bank__2017
   description: Wealth is the value of an economy's capital stocks. GDP is seen as
     the return on wealth. The World Bank calculates wealth as the sum of produced
@@ -15,6 +15,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 4ad6737a6d11f364509cccbb82921bec
-  size: 11981
+- md5: c7503e958b40d29ea135df1dfc23abee
+  size: 14753
   path: dataset_1029_wealth_per_capita_by_component_for_various_country_groupings__world_bank__2017_config.json

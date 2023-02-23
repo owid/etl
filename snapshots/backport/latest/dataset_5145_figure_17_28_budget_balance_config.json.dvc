@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5145_figure_17_28_budget_balance_config
   file_extension: json
-  date_accessed: 2023-02-17 15:33:52.952255
+  date_accessed: 2023-02-23 17:56:06.790698
   name: Grapher metadata for dataset_5145_figure_17_28_budget_balance
   description: core-econ.org
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 7da11333acfe4629bbfa7b3b5a03aea6
-  size: 3335
+- md5: ae4729c766fb0cca624b743a299481e6
+  size: 4535
   path: dataset_5145_figure_17_28_budget_balance_config.json

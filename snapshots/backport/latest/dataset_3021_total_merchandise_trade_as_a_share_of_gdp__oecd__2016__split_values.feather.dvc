@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_3021_total_merchandise_trade_as_a_share_of_gdp__oecd__2016__split_values
   file_extension: feather
-  date_accessed: 2023-02-17 13:07:57.800036
+  date_accessed: 2023-02-23 15:07:07.864082
   name: Total merchandise trade as a share of GDP (OECD (2016)) (split)
   description: ''
   source_name: Our World in Data catalog backport

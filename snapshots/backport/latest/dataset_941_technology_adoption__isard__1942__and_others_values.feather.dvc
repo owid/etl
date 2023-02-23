@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_941_technology_adoption__isard__1942__and_others_values
   file_extension: feather
-  date_accessed: 2023-02-17 14:45:23.572897
+  date_accessed: 2023-02-23 19:22:55.389318
   name: Technology Adoption - Isard (1942) and others
   description: Describes the diffusion of technologies across the US.
   source_name: Our World in Data catalog backport

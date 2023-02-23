@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5532_correlates_of_war__cow__national_material_capabilities_values
   file_extension: feather
-  date_accessed: 2023-02-17 12:23:24.696383
+  date_accessed: 2023-02-23 17:34:46.515287
   name: Correlates of War (CoW) - National Material Capabilities
   description: https://github.com/owid/importers/tree/master/cow
   source_name: Our World in Data catalog backport

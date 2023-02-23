@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5325_average_farm_size__lowder_et_al__2016_values
   file_extension: feather
-  date_accessed: 2023-02-17 15:46:21.440667
+  date_accessed: 2023-02-23 15:18:23.741193
   name: Average farm size (Lowder et al. 2016)
   description: ''
   source_name: Our World in Data catalog backport

@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5442_covid_19__decoupling_of_metrics_config
   file_extension: json
-  date_accessed: 2023-02-21 06:07:57.068547
+  date_accessed: 2023-02-23 18:16:09.852099
   name: Grapher metadata for dataset_5442_covid_19__decoupling_of_metrics
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 235e0a4994c11db4744168a9021296a4
-  size: 5701
+- md5: a247609087c6a01216ab53a0edf8d396
+  size: 6901
   path: dataset_5442_covid_19__decoupling_of_metrics_config.json

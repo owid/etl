@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_677_projections_of_peak_agricultural_land__fao__2006__oecd__2012__mea__2005_values
   file_extension: feather
-  date_accessed: 2023-02-17 12:55:22.022234
+  date_accessed: 2023-02-23 17:33:53.091373
   name: Projections of peak agricultural land - FAO (2006), OECD (2012), MEA (2005)
   description: ''
   source_name: Our World in Data catalog backport

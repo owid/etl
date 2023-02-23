@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5539_state_based_conflict_deaths_since_1946__by_region_and_conflict_type__prio__ucdp_2022_values
   file_extension: feather
-  date_accessed: 2023-02-17 14:11:07.514898
+  date_accessed: 2023-02-23 17:24:56.424636
   name: State-based conflict deaths since 1946, by region and conflict type (PRIO;
     UCDP 2022)
   description: ''

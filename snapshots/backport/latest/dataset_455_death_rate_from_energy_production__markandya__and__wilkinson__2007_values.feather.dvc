@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_455_death_rate_from_energy_production__markandya__and__wilkinson__2007_values
   file_extension: feather
-  date_accessed: 2023-02-17 15:53:27.829141
+  date_accessed: 2023-02-23 17:26:35.360060
   name: Death rate from energy production - Markandya & Wilkinson (2007)
   description: ''
   source_name: Our World in Data catalog backport

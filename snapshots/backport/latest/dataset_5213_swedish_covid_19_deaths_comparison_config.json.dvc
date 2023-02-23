@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5213_swedish_covid_19_deaths_comparison_config
   file_extension: json
-  date_accessed: 2023-02-17 12:23:46.257068
+  date_accessed: 2023-02-23 19:48:20.223527
   name: Grapher metadata for dataset_5213_swedish_covid_19_deaths_comparison
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: e3ff045539c2dc606b1d6c28a1b41737
-  size: 1170
+- md5: 403e88aa1cbb440c83b6aa3545584a10
+  size: 1370
   path: dataset_5213_swedish_covid_19_deaths_comparison_config.json

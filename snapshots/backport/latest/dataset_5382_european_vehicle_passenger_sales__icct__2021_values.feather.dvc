@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5382_european_vehicle_passenger_sales__icct__2021_values
   file_extension: feather
-  date_accessed: 2023-02-17 15:04:58.030600
+  date_accessed: 2023-02-23 19:20:24.345608
   name: European vehicle passenger sales (ICCT, 2021)
   description: ''
   source_name: Our World in Data catalog backport

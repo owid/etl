@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2791_smallpox_cases_by_country_1920_1977_values
   file_extension: feather
-  date_accessed: 2023-02-17 14:31:57.489168
+  date_accessed: 2023-02-23 19:03:33.682377
   name: Smallpox cases by country 1920-1977
   description: ''
   source_name: Our World in Data catalog backport

@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5639_csis__cost_of_space_launches_config
   file_extension: json
-  date_accessed: 2023-02-17 16:05:50.181496
+  date_accessed: 2023-02-23 17:03:18.711911
   name: Grapher metadata for dataset_5639_csis__cost_of_space_launches
   description: https://github.com/owid/notebooks/tree/main/EdouardMathieu/aerospace_csis_datasets
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: db3c80ce3d7941f6cff5bc71a7554ab5
-  size: 3578
+- md5: ec8b613f16cc5593cb1f0499499f17ce
+  size: 3978
   path: dataset_5639_csis__cost_of_space_launches_config.json

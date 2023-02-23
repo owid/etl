@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_303_top_marginal_income_tax_rate__reynolds__2008_values
   file_extension: feather
-  date_accessed: 2023-02-17 13:57:55.475101
+  date_accessed: 2023-02-23 19:01:44.740655
   name: Top marginal income tax rate – Reynolds (2008)
   description: ''
   source_name: Our World in Data catalog backport

@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_189_government_transparency_index__hollyer_et_al__2014_values
   file_extension: feather
-  date_accessed: 2023-02-17 13:17:13.646131
+  date_accessed: 2023-02-23 18:40:46.423229
   name: Government Transparency index - Hollyer et al. (2014)
   description: ''
   source_name: Our World in Data catalog backport

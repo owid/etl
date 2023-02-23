@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2965_prevalence_of_undernourishment_since_2000__faostats__2018_values
   file_extension: feather
-  date_accessed: 2023-02-17 13:55:22.646618
+  date_accessed: 2023-02-23 15:09:00.560828
   name: Prevalence of undernourishment since 2000 (FAOstats, 2018)
   description: ''
   source_name: Our World in Data catalog backport

@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_391_so2_per_capita__clio_infra_values
   file_extension: feather
-  date_accessed: 2023-02-17 15:25:29.981607
+  date_accessed: 2023-02-23 18:31:34.969245
   name: SO2 per capita - Clio Infra
   description: SO2 emissions per capita (tonnes per year).
   source_name: Our World in Data catalog backport

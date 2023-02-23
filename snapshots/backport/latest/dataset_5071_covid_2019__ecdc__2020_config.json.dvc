@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5071_covid_2019__ecdc__2020_config
   file_extension: json
-  date_accessed: 2023-02-17 13:44:04.947921
+  date_accessed: 2023-02-23 17:58:21.712967
   name: Grapher metadata for dataset_5071_covid_2019__ecdc__2020
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: dd8e84eb741a9e101fab953065b8c7a5
-  size: 31319
+- md5: 5e06f92063d3f9687a3a8ab8adc1816d
+  size: 41519
   path: dataset_5071_covid_2019__ecdc__2020_config.json

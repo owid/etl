@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_522_maternal_mortality_ratio__gapminder__2010__who__2019__and_oecd__2022_values
   file_extension: feather
-  date_accessed: 2023-02-17 14:01:04.916362
+  date_accessed: 2023-02-23 18:23:21.935428
   name: Maternal Mortality Ratio (Gapminder (2010), WHO (2019) and OECD (2022))
   description: https://github.com/owid/notebooks/blob/main/BetterDataDocs/FionaSpooner/maternal_mortality/maternal_mortality.qmd
   source_name: Our World in Data catalog backport

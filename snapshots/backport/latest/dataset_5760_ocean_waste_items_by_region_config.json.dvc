@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5760_ocean_waste_items_by_region_config
   file_extension: json
-  date_accessed: 2023-02-18 00:10:45.016979
+  date_accessed: 2023-02-23 17:12:04.720844
   name: Grapher metadata for dataset_5760_ocean_waste_items_by_region
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 662e1cc4d89ea42c787ceba7e21d6add
-  size: 4887
+- md5: e4411fd1458358f0b460368b013933a1
+  size: 6287
   path: dataset_5760_ocean_waste_items_by_region_config.json

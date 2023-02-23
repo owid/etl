@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2873_relative_earnings_of_adults__by_educational_attainment__education_at_a_glance_2017__oecd_indicators__2017_values
   file_extension: feather
-  date_accessed: 2023-02-17 15:42:24.018764
+  date_accessed: 2023-02-23 17:50:49.990428
   name: 'Relative earnings of adults, by educational attainment - Education at a Glance
     2017: OECD Indicators (2017)'
   description: ''

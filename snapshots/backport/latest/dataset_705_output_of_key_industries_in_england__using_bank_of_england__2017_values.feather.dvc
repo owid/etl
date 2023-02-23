@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_705_output_of_key_industries_in_england__using_bank_of_england__2017_values
   file_extension: feather
-  date_accessed: 2023-02-17 14:47:03.951920
+  date_accessed: 2023-02-23 15:13:16.942171
   name: Output of key industries in England - using Bank of England (2017)
   description: This data produces output figures of key industries in England (1270-1870).
   source_name: Our World in Data catalog backport

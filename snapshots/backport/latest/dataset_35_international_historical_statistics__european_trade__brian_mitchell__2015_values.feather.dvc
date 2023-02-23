@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_35_international_historical_statistics__european_trade__brian_mitchell__2015_values
   file_extension: feather
-  date_accessed: 2023-02-17 12:44:02.573506
+  date_accessed: 2023-02-23 19:30:08.350981
   name: 'International Historical Statistics: European trade - Brian Mitchell (2015)'
   description: |-
     Ratio of exports and imports to GDP in current values for the seven largest European economies. Data is from International Historical Statistics by Brian Mitchell.

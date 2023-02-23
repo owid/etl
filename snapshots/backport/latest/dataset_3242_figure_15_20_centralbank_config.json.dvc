@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_3242_figure_15_20_centralbank_config
   file_extension: json
-  date_accessed: 2023-02-17 13:35:19.107916
+  date_accessed: 2023-02-23 17:45:49.544895
   name: Grapher metadata for dataset_3242_figure_15_20_centralbank
   description: core-econ.org
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 140e919bb4e03bd1d4999186a1a74d8b
-  size: 1589
+- md5: c4be84167bde40e78f1ba19548df35ee
+  size: 1787
   path: dataset_3242_figure_15_20_centralbank_config.json

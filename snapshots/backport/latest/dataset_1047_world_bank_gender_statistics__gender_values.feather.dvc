@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_1047_world_bank_gender_statistics__gender_values
   file_extension: feather
-  date_accessed: 2023-02-17 15:31:34.009276
+  date_accessed: 2023-02-23 19:41:22.987049
   name: World Bank Gender Statistics - Gender
   description: This is a dataset imported by the automated fetcher
   source_name: Our World in Data catalog backport

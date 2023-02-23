@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5405_commitment_to_zero_emissions_vehicles__cop26_values
   file_extension: feather
-  date_accessed: 2023-02-17 12:37:06.616093
+  date_accessed: 2023-02-23 17:53:35.687141
   name: Commitment to zero emissions vehicles (COP26)
   description: ''
   source_name: Our World in Data catalog backport

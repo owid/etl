@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_292_trade__giovanni_and_tena_junguito__2016_values
   file_extension: feather
-  date_accessed: 2023-02-17 12:41:13.560368
+  date_accessed: 2023-02-23 15:13:30.626180
   name: Trade – Giovanni and Tena-Junguito (2016)
   description: ''
   source_name: Our World in Data catalog backport

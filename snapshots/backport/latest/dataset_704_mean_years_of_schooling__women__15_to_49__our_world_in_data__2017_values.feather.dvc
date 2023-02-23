@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_704_mean_years_of_schooling__women__15_to_49__our_world_in_data__2017_values
   file_extension: feather
-  date_accessed: 2023-02-17 13:07:50.791220
+  date_accessed: 2023-02-23 15:16:39.032749
   name: Mean years of schooling, women (15 to 49) – Our World In Data (2017)
   description: ''
   source_name: Our World in Data catalog backport

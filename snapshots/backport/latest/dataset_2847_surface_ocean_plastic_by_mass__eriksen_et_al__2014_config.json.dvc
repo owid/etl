@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2847_surface_ocean_plastic_by_mass__eriksen_et_al__2014_config
   file_extension: json
-  date_accessed: 2023-02-17 13:58:30.078139
+  date_accessed: 2023-02-23 17:12:43.781439
   name: Grapher metadata for dataset_2847_surface_ocean_plastic_by_mass__eriksen_et_al__2014
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 3d48a8c8467822dd63706f24ad671a85
-  size: 3888
+- md5: 25e3162977bf9b40f4b117f3a510263c
+  size: 4878
   path: dataset_2847_surface_ocean_plastic_by_mass__eriksen_et_al__2014_config.json

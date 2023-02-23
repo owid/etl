@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2718_delivery_points_in_the_us__united_states_postal_service__2018_values
   file_extension: feather
-  date_accessed: 2023-02-17 13:23:19.538930
+  date_accessed: 2023-02-23 16:50:29.630335
   name: Delivery points in the US - United States Postal Service (2018)
   description: ''
   source_name: Our World in Data catalog backport

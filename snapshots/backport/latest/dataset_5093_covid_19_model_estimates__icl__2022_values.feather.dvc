@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5093_covid_19_model_estimates__icl__2022_values
   file_extension: feather
-  date_accessed: 2023-02-17 14:30:07.234908
+  date_accessed: 2023-02-23 18:21:25.462601
   name: COVID-19 Model Estimates – ICL (2022)
   description: ''
   source_name: Our World in Data catalog backport

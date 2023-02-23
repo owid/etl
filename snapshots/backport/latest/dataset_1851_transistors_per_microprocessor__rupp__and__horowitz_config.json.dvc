@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_1851_transistors_per_microprocessor__rupp__and__horowitz_config
   file_extension: json
-  date_accessed: 2023-02-17 13:33:42.858949
+  date_accessed: 2023-02-23 18:37:35.370475
   name: Grapher metadata for dataset_1851_transistors_per_microprocessor__rupp__and__horowitz
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: da6a06ba5ad293376c33d3e4f6d722e4
-  size: 2257
+- md5: a772b36f88d1b964313153e12af4e51a
+  size: 2455
   path: dataset_1851_transistors_per_microprocessor__rupp__and__horowitz_config.json

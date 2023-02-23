@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_3040_te_9_22_config
   file_extension: json
-  date_accessed: 2023-02-17 15:54:38.291739
+  date_accessed: 2023-02-23 19:15:43.086374
   name: Grapher metadata for dataset_3040_te_9_22
   description: core-econ.org
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 9d4701900afc49312f63e5caad17d23c
-  size: 2414
+- md5: f10ab7ef4ebbd8508a53d8a7131fc31c
+  size: 3008
   path: dataset_3040_te_9_22_config.json

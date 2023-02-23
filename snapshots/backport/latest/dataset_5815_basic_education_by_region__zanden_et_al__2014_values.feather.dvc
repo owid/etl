@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5815_basic_education_by_region__zanden_et_al__2014_values
   file_extension: feather
-  date_accessed: 2023-02-18 00:12:18.464016
+  date_accessed: 2023-02-23 15:11:30.258841
   name: Basic education by region - Zanden et al. (2014)
   description: Backported
   source_name: Our World in Data catalog backport

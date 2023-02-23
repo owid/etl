@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5572_polio_vaccine_costs_in_low_income_countries_config
   file_extension: json
-  date_accessed: 2023-02-17 15:22:33.855063
+  date_accessed: 2023-02-23 19:29:28.825175
   name: Grapher metadata for dataset_5572_polio_vaccine_costs_in_low_income_countries
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 2a396debe9ee5e455cb2aa9fdff1a6aa
-  size: 3629
+- md5: ab8faa90d012523ac10b9f02919c7a9e
+  size: 4429
   path: dataset_5572_polio_vaccine_costs_in_low_income_countries_config.json

@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2405_autism_config
   file_extension: json
-  date_accessed: 2023-02-17 15:38:54.696909
+  date_accessed: 2023-02-23 17:15:28.972821
   name: Grapher metadata for dataset_2405_autism
   description: This is a dataset imported by the automated fetcher
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: e306998c6fc12608acc9d73e7e86ddfd
-  size: 48467
+- md5: cb222003189186c5786c7357643ecb16
+  size: 69257
   path: dataset_2405_autism_config.json

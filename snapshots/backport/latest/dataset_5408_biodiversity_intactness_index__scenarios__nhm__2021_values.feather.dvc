@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5408_biodiversity_intactness_index__scenarios__nhm__2021_values
   file_extension: feather
-  date_accessed: 2023-02-17 15:26:46.888876
+  date_accessed: 2023-02-23 17:03:25.728829
   name: Biodiversity Intactness Index - Scenarios - NHM (2021)
   description: ''
   source_name: Our World in Data catalog backport

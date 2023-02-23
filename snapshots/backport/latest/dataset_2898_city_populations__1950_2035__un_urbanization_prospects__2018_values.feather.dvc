@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2898_city_populations__1950_2035__un_urbanization_prospects__2018_values
   file_extension: feather
-  date_accessed: 2023-02-17 15:14:11.510522
+  date_accessed: 2023-02-23 19:25:41.442781
   name: City populations (1950-2035) - UN Urbanization Prospects (2018)
   description: ''
   source_name: Our World in Data catalog backport

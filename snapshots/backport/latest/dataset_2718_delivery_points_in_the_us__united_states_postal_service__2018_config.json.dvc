@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2718_delivery_points_in_the_us__united_states_postal_service__2018_config
   file_extension: json
-  date_accessed: 2023-02-17 13:22:52.205291
+  date_accessed: 2023-02-23 16:50:02.527601
   name: Grapher metadata for dataset_2718_delivery_points_in_the_us__united_states_postal_service__2018
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 58b2f869e3e0a25a9a5445b8f829aec0
-  size: 4161
+- md5: 88f35c40170348f3e7452c4ce643f260
+  size: 5151
   path: dataset_2718_delivery_points_in_the_us__united_states_postal_service__2018_config.json

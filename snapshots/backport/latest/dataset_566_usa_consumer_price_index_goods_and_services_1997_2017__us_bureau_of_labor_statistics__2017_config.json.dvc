@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_566_usa_consumer_price_index_goods_and_services_1997_2017__us_bureau_of_labor_statistics__2017_config
   file_extension: json
-  date_accessed: 2023-02-17 14:31:43.298821
+  date_accessed: 2023-02-23 18:02:18.270701
   name: Grapher metadata for dataset_566_usa_consumer_price_index_goods_and_services_1997_2017__us_bureau_of_labor_statistics__2017
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: f5ebd800bc3d801e6fea1ced9d2d1ac0
-  size: 9635
+- md5: 2e3f3b25da13f863a3155c0c8b17a7fa
+  size: 12575
   path: dataset_566_usa_consumer_price_index_goods_and_services_1997_2017__us_bureau_of_labor_statistics__2017_config.json

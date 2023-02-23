@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_981_violent_victimization__us_bureau_of_justice_statistics__2017_values
   file_extension: feather
-  date_accessed: 2023-02-17 14:35:02.714982
+  date_accessed: 2023-02-23 16:34:32.691132
   name: Violent Victimization - US Bureau of Justice Statistics (2017)
   description: ''
   source_name: Our World in Data catalog backport

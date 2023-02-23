@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_4159_self_reported_loneliness_in_older_adults__owid__2018_config
   file_extension: json
-  date_accessed: 2023-02-17 12:27:49.161836
+  date_accessed: 2023-02-23 17:36:04.980105
   name: Grapher metadata for dataset_4159_self_reported_loneliness_in_older_adults__owid__2018
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 0adaac9a09fa0cf5e2578c7f31b61245
-  size: 3586
+- md5: 62973c7847b2d0eac54ae7b1ff9bee46
+  size: 3786
   path: dataset_4159_self_reported_loneliness_in_older_adults__owid__2018_config.json

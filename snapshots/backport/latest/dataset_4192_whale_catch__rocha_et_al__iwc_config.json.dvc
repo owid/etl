@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_4192_whale_catch__rocha_et_al__iwc_config
   file_extension: json
-  date_accessed: 2023-02-17 14:48:37.433788
+  date_accessed: 2023-02-23 17:10:26.069047
   name: Grapher metadata for dataset_4192_whale_catch__rocha_et_al__iwc
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 4d081d0ee40db6383aba2538dda2fc2f
-  size: 7983
+- md5: 32918cfc41a5af90d1ca940674a7d943
+  size: 10383
   path: dataset_4192_whale_catch__rocha_et_al__iwc_config.json

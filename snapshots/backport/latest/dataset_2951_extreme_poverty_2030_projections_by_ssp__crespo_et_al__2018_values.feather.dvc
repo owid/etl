@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2951_extreme_poverty_2030_projections_by_ssp__crespo_et_al__2018_values
   file_extension: feather
-  date_accessed: 2023-02-17 15:50:17.538141
+  date_accessed: 2023-02-23 17:15:02.917867
   name: Extreme Poverty 2030 Projections by SSP - Crespo et al. (2018)
   description: ''
   source_name: Our World in Data catalog backport

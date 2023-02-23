@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_225_global_projection__medium_ssp2__iiasa__2016_values
   file_extension: feather
-  date_accessed: 2023-02-17 14:10:24.753252
+  date_accessed: 2023-02-23 19:39:36.651791
   name: Global Projection, Medium SSP2 - IIASA (2016)
   description: ''
   source_name: Our World in Data catalog backport

@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_829_food_security__suite_of_food_security_indicators__fao__2017_values
   file_extension: feather
-  date_accessed: 2023-02-17 13:57:20.721441
+  date_accessed: 2023-02-23 15:06:29.188629
   name: 'Food Security: Suite of Food Security Indicators - FAO (2017)'
   description: This is a dataset imported by the automated fetcher
   source_name: Our World in Data catalog backport

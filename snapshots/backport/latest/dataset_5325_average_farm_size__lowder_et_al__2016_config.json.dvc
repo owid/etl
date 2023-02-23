@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5325_average_farm_size__lowder_et_al__2016_config
   file_extension: json
-  date_accessed: 2023-02-17 15:45:53.893219
+  date_accessed: 2023-02-23 15:17:58.642406
   name: Grapher metadata for dataset_5325_average_farm_size__lowder_et_al__2016
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 5d99a0fc31aa28b625d76ed378f93ed4
-  size: 2857
+- md5: 6901f5d26c14841ecbad34052991e76f
+  size: 3257
   path: dataset_5325_average_farm_size__lowder_et_al__2016_config.json

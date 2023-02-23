@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_267_life_expectancy__james_riley_for_data_1990_and_earlier__who_and_world_bank_for_later_data__by_max_roser_values
   file_extension: feather
-  date_accessed: 2023-02-17 13:01:20.071977
+  date_accessed: 2023-02-23 16:35:46.375283
   name: Life expectancy – James Riley for data 1990 and earlier; WHO and World Bank
     for later data (by Max Roser)
   description: ''

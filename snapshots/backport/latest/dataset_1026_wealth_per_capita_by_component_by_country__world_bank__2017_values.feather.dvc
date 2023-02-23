@@ -2,9 +2,9 @@ meta:
   namespace: backport
   short_name: dataset_1026_wealth_per_capita_by_component_by_country__world_bank__2017_values
   file_extension: feather
-  date_accessed: 2023-02-17 13:45:58.005859
+  date_accessed: 2023-02-23 17:02:53.512053
   name: Wealth per capita by component by country - World Bank (2017)
-  description: This data is currently private
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/1026
   source_published_by: Our World in Data catalog backport

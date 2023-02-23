@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_1070_statistical_capacity_indicator__sci__world_bank_data_on_statistical_capacity_values
   file_extension: feather
-  date_accessed: 2023-02-17 13:13:39.551507
+  date_accessed: 2023-02-23 17:24:49.802048
   name: Statistical Capacity Indicator (SCI) - World Bank Data on Statistical Capacity
   description: This is a dataset imported by the automated fetcher
   source_name: Our World in Data catalog backport

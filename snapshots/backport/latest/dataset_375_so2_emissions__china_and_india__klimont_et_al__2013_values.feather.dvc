@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_375_so2_emissions__china_and_india__klimont_et_al__2013_values
   file_extension: feather
-  date_accessed: 2023-02-17 12:52:14.080703
+  date_accessed: 2023-02-23 16:36:24.858392
   name: SO2 emissions, China and India - Klimont et al. (2013)
   description: SO2 emissions (2000-2011) in China and India
   source_name: Our World in Data catalog backport

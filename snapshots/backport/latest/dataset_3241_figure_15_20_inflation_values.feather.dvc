@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_3241_figure_15_20_inflation_values
   file_extension: feather
-  date_accessed: 2023-02-17 13:48:51.122492
+  date_accessed: 2023-02-23 19:50:12.277212
   name: Figure 15.20_Inflation
   description: core-econ.org
   source_name: Our World in Data catalog backport

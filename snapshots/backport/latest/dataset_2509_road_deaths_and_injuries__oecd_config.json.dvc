@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2509_road_deaths_and_injuries__oecd_config
   file_extension: json
-  date_accessed: 2023-02-17 13:17:48.235569
+  date_accessed: 2023-02-23 19:32:07.923009
   name: Grapher metadata for dataset_2509_road_deaths_and_injuries__oecd
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: b2b6a9977d5ecbd4e803553b557c15b3
-  size: 3892
+- md5: 508376ba00a127dd93e109751709b558
+  size: 4882
   path: dataset_2509_road_deaths_and_injuries__oecd_config.json

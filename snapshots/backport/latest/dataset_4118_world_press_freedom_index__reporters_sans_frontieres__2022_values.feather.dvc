@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_4118_world_press_freedom_index__reporters_sans_frontieres__2022_values
   file_extension: feather
-  date_accessed: 2023-02-17 13:19:09.865905
+  date_accessed: 2023-02-23 17:41:05.101350
   name: World Press Freedom Index - Reporters sans Frontieres (2022)
   description: We received the combined file for years 2014-2021 via email from the
     head of the World Press Freedom Index, Nalini Chella-Lepetit.

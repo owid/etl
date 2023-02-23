@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_3177_aviation_accidents_and_fatalities_by_flight_phase__asn__2019_values
   file_extension: feather
-  date_accessed: 2023-02-17 14:46:13.894690
+  date_accessed: 2023-02-23 19:29:08.766245
   name: Aviation accidents and fatalities by flight phase (ASN, 2019)
   description: ''
   source_name: Our World in Data catalog backport

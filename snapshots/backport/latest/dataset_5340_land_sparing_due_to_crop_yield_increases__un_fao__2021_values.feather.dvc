@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5340_land_sparing_due_to_crop_yield_increases__un_fao__2021_values
   file_extension: feather
-  date_accessed: 2023-02-17 15:05:41.951473
+  date_accessed: 2023-02-23 17:43:29.474472
   name: Land sparing due to crop yield increases (UN FAO, 2021)
   description: ''
   source_name: Our World in Data catalog backport

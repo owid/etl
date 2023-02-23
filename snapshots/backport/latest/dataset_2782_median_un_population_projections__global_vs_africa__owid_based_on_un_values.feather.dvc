@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2782_median_un_population_projections__global_vs_africa__owid_based_on_un_values
   file_extension: feather
-  date_accessed: 2023-02-17 14:07:26.030992
+  date_accessed: 2023-02-23 18:34:21.974016
   name: Median UN Population Projections - Global vs Africa (OWID based on UN)
   description: ''
   source_name: Our World in Data catalog backport

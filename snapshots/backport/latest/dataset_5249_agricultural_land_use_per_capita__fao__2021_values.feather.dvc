@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5249_agricultural_land_use_per_capita__fao__2021_values
   file_extension: feather
-  date_accessed: 2023-02-17 12:23:32.260924
+  date_accessed: 2023-02-23 16:35:39.621115
   name: Agricultural land use per capita (FAO, 2021)
   description: ''
   source_name: Our World in Data catalog backport

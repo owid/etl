@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_389_so2_emissions_by_country__1850_2000__clio_infra_values
   file_extension: feather
-  date_accessed: 2023-02-17 12:51:53.491899
+  date_accessed: 2023-02-23 18:18:35.764275
   name: SO2 emissions by country (1850-2000) - Clio Infra
   description: SO2 emissions (million tonnes) by country (1850-2000).
   source_name: Our World in Data catalog backport

@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_3011_rig_count__us_bureau_of_labor_statistics__2017__split_values
   file_extension: feather
-  date_accessed: 2023-02-17 13:05:22.912176
+  date_accessed: 2023-02-23 16:49:49.869153
   name: Rig Count (US Bureau of Labor Statistics (2017)) (split)
   description: ''
   source_name: Our World in Data catalog backport

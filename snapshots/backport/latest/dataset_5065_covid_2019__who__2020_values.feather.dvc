@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5065_covid_2019__who__2020_values
   file_extension: feather
-  date_accessed: 2023-02-17 15:39:39.096570
+  date_accessed: 2023-02-23 16:16:34.776892
   name: COVID-2019 - WHO (2020)
   description: ''
   source_name: Our World in Data catalog backport
@@ -11,8 +11,3 @@ meta:
   is_public: false
   version: latest
   publication_date: latest
-wdir: ../../../data/snapshots/backport/latest
-outs:
-- md5: 28d7d645f23f99e7ffed20bc9b053460
-  size: 64090
-  path: dataset_5065_covid_2019__who__2020_values.feather

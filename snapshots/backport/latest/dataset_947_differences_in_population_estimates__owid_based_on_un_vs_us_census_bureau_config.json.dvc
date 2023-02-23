@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_947_differences_in_population_estimates__owid_based_on_un_vs_us_census_bureau_config
   file_extension: json
-  date_accessed: 2023-02-17 15:34:26.492996
+  date_accessed: 2023-02-23 18:41:18.150126
   name: Grapher metadata for dataset_947_differences_in_population_estimates__owid_based_on_un_vs_us_census_bureau
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 9af4fcef428c2c0e199ce31e5f415ed2
-  size: 3655
+- md5: e9333fd091c91c4de76e633596b7d10f
+  size: 4051
   path: dataset_947_differences_in_population_estimates__owid_based_on_un_vs_us_census_bureau_config.json

@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_4129_years_of_schooling__based_on_lee_lee__2016__barro_lee__2018__and_undp__2018_values
   file_extension: feather
-  date_accessed: 2023-02-17 12:35:06.329893
+  date_accessed: 2023-02-23 17:10:13.756945
   name: Years of Schooling - based on Lee-Lee (2016), Barro-Lee (2018); and UNDP (2018)
   description: ''
   source_name: Our World in Data catalog backport

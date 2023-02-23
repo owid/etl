@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_310_government_expenditure__imf_based_on_mauro_et_al__2015_config
   file_extension: json
-  date_accessed: 2023-02-17 13:01:13.594194
+  date_accessed: 2023-02-23 18:12:04.519149
   name: Grapher metadata for dataset_310_government_expenditure__imf_based_on_mauro_et_al__2015
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 2c89b498035ff86b3e437bf4f8213955
-  size: 2951
+- md5: c265f59a88fdbdd2463ce9a100234f5a
+  size: 3147
   path: dataset_310_government_expenditure__imf_based_on_mauro_et_al__2015_config.json

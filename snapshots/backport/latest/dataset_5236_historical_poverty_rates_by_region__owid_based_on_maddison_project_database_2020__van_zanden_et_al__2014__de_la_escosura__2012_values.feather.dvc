@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5236_historical_poverty_rates_by_region__owid_based_on_maddison_project_database_2020__van_zanden_et_al__2014__de_la_escosura__2012_values
   file_extension: feather
-  date_accessed: 2023-02-17 14:35:39.797162
+  date_accessed: 2023-02-23 18:01:12.251993
   name: Historical poverty rates by region (OWID based on Maddison Project Database
     2020, van Zanden et al. (2014), de la Escosura (2012))
   description: ''

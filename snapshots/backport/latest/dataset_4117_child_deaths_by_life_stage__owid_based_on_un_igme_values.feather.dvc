@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_4117_child_deaths_by_life_stage__owid_based_on_un_igme_values
   file_extension: feather
-  date_accessed: 2023-02-17 12:29:22.150246
+  date_accessed: 2023-02-23 17:09:08.673185
   name: Child deaths by life stage (OWID based on UN IGME)
   description: ''
   source_name: Our World in Data catalog backport

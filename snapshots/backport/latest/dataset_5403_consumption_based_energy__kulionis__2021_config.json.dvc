@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5403_consumption_based_energy__kulionis__2021_config
   file_extension: json
-  date_accessed: 2023-02-17 12:20:09.079795
+  date_accessed: 2023-02-23 18:19:08.485829
   name: Grapher metadata for dataset_5403_consumption_based_energy__kulionis__2021
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: cd36225f5aaaa3f66323177f8260a5b9
-  size: 12676
+- md5: d996c98e51d060b2cb5fae23869f4852
+  size: 15276
   path: dataset_5403_consumption_based_energy__kulionis__2021_config.json

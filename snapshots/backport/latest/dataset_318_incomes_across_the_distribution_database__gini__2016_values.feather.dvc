@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_318_incomes_across_the_distribution_database__gini__2016_values
   file_extension: feather
-  date_accessed: 2023-02-17 15:42:44.866063
+  date_accessed: 2023-02-23 18:14:16.460697
   name: Incomes across the Distribution Database, Gini (2016)
   description: ''
   source_name: Our World in Data catalog backport

@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_3022_total_goods_trade_as_a_share_of_gdp__eurostat__2016__split_values
   file_extension: feather
-  date_accessed: 2023-02-17 12:42:44.784010
+  date_accessed: 2023-02-23 17:54:15.188794
   name: Total goods trade as a share of GDP (Eurostat (2016)) (split)
   description: ''
   source_name: Our World in Data catalog backport

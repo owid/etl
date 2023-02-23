@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5192_global_health_indicators__number_of_people__2020_values
   file_extension: feather
-  date_accessed: 2023-02-17 12:17:52.147068
+  date_accessed: 2023-02-23 19:13:19.162431
   name: Global Health Indicators – Number of People (2020)
   description: ''
   source_name: Our World in Data catalog backport

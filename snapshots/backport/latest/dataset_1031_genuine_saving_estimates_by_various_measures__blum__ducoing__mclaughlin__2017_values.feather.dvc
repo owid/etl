@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_1031_genuine_saving_estimates_by_various_measures__blum__ducoing__mclaughlin__2017_values
   file_extension: feather
-  date_accessed: 2023-02-17 14:50:52.596332
+  date_accessed: 2023-02-23 16:48:42.822500
   name: Genuine saving estimates by various measures - Blum, Ducoing, McLaughlin (2017)
   description: ''
   source_name: Our World in Data catalog backport

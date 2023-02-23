@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5528_estimated_malaria_deaths_values
   file_extension: feather
-  date_accessed: 2023-02-17 15:31:54.790654
+  date_accessed: 2023-02-23 19:52:11.333063
   name: Estimated Malaria Deaths
   description: There is some rounding of the figures for each of the regions, so that
     the sum doesn't quite add up to the values in the global estimates, which is also

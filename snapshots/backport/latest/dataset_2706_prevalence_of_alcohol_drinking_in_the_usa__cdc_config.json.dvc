@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2706_prevalence_of_alcohol_drinking_in_the_usa__cdc_config
   file_extension: json
-  date_accessed: 2023-02-17 14:24:00.194098
+  date_accessed: 2023-02-23 17:46:38.330486
   name: Grapher metadata for dataset_2706_prevalence_of_alcohol_drinking_in_the_usa__cdc
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 1aeb74388dbb51ef5b57fe6230f59e1a
-  size: 2655
+- md5: da81942dad7eb7abe37abacf9de70212
+  size: 3249
   path: dataset_2706_prevalence_of_alcohol_drinking_in_the_usa__cdc_config.json

@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5173_annual_working_hours__owid__2020_values
   file_extension: feather
-  date_accessed: 2023-02-17 13:23:12.787102
+  date_accessed: 2023-02-23 18:50:34.503656
   name: Annual Working Hours – OWID (2020)
   description: ''
   source_name: Our World in Data catalog backport

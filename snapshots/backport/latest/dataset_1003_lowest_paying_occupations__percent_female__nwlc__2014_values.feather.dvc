@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_1003_lowest_paying_occupations__percent_female__nwlc__2014_values
   file_extension: feather
-  date_accessed: 2023-02-17 14:27:09.617498
+  date_accessed: 2023-02-23 19:42:37.052254
   name: Lowest paying occupations, percent female – NWLC (2014)
   description: ''
   source_name: Our World in Data catalog backport

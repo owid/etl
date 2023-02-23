@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2970_percentage_of_persons_without_health_insurance__council_of_economic_advisers_and_national_center_for_health_statistics_values
   file_extension: feather
-  date_accessed: 2023-02-17 15:48:04.694331
+  date_accessed: 2023-02-23 18:02:26.472191
   name: Percentage of persons without health insurance - Council of Economic Advisers
     and National Center for Health Statistics
   description: Split from https://owid.cloud/admin/datasets/204 - Jaiden

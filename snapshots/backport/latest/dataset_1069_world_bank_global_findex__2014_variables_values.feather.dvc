@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_1069_world_bank_global_findex__2014_variables_values
   file_extension: feather
-  date_accessed: 2023-02-17 12:33:13.869786
+  date_accessed: 2023-02-23 17:26:51.812477
   name: World Bank Global Findex - 2014 Variables
   description: This is a dataset imported by the automated fetcher
   source_name: Our World in Data catalog backport

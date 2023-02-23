@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5266_global_wildlife_trade__harfoot_et_al__2018_values
   file_extension: feather
-  date_accessed: 2023-02-17 13:02:23.432464
+  date_accessed: 2023-02-23 18:53:30.392002
   name: Global wildlife trade (Harfoot et al. 2018)
   description: ''
   source_name: Our World in Data catalog backport

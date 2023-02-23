@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5318_global_agricultural_productivity_values
   file_extension: feather
-  date_accessed: 2023-02-17 12:29:58.644159
+  date_accessed: 2023-02-23 19:33:32.708462
   name: global_agricultural_productivity
   description: ''
   source_name: Our World in Data catalog backport

@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_933_usa_polio_cases_and_deaths_1910_2010__owid_based_on_us_public_health_service__1910_1951__us_center_for_disease_control__1960_2010__and_who__2011_values
   file_extension: feather
-  date_accessed: 2023-02-17 15:08:49.624491
+  date_accessed: 2023-02-23 17:47:17.417972
   name: USA Polio cases and deaths 1910-2010 - OWID based on US Public Health Service
     (1910-1951); US Center for Disease Control (1960-2010); and WHO (2011-)
   description: This dataset includes the total number of cases and deaths due to polio

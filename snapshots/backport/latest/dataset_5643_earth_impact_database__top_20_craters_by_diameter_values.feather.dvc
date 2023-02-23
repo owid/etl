@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5643_earth_impact_database__top_20_craters_by_diameter_values
   file_extension: feather
-  date_accessed: 2023-02-17 16:07:43.238330
+  date_accessed: 2023-02-23 18:00:07.591822
   name: Earth Impact Database - Top 20 craters by diameter
   description: https://github.com/owid/notebooks/tree/main/EdouardMathieu/earth_impact_database
   source_name: Our World in Data catalog backport

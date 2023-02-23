@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5251_covid_19__israel__confirmed_cases_by_age_values
   file_extension: feather
-  date_accessed: 2023-02-17 15:18:56.368353
+  date_accessed: 2023-02-23 18:19:15.288375
   name: 'COVID-19 - Israel: confirmed cases by age'
   description: ''
   source_name: Our World in Data catalog backport

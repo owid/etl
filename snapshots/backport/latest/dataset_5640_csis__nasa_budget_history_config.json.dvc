@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5640_csis__nasa_budget_history_config
   file_extension: json
-  date_accessed: 2023-02-17 16:05:32.167615
+  date_accessed: 2023-02-23 16:47:17.955210
   name: Grapher metadata for dataset_5640_csis__nasa_budget_history
   description: https://github.com/owid/notebooks/tree/main/EdouardMathieu/aerospace_csis_datasets
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: ca5fe14e50cc1fc8a21e88bc1cf3dd9e
-  size: 1842
+- md5: 657ce5bbd9837bfbce1284e8a2b54747
+  size: 2042
   path: dataset_5640_csis__nasa_budget_history_config.json

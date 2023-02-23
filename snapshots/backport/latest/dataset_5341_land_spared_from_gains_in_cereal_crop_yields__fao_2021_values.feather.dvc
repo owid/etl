@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5341_land_spared_from_gains_in_cereal_crop_yields__fao_2021_values
   file_extension: feather
-  date_accessed: 2023-02-17 12:53:10.268460
+  date_accessed: 2023-02-23 18:48:42.300648
   name: Land spared from gains in cereal crop yields (FAO 2021)
   description: ''
   source_name: Our World in Data catalog backport

@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_1014_water_withdrawals_and_consumption__aquastat_values
   file_extension: feather
-  date_accessed: 2023-02-17 12:20:30.497245
+  date_accessed: 2023-02-23 17:09:40.628258
   name: Water withdrawals and consumption - Aquastat
   description: ''
   source_name: Our World in Data catalog backport

@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_3258_te_3_2_gdp_values
   file_extension: feather
-  date_accessed: 2023-02-17 15:17:59.944549
+  date_accessed: 2023-02-23 15:01:42.014930
   name: TE-3.2_GDP
   description: core-econ.org
   source_name: Our World in Data catalog backport

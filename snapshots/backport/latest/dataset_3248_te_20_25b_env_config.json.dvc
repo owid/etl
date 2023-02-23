@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_3248_te_20_25b_env_config
   file_extension: json
-  date_accessed: 2023-02-17 15:50:46.690974
+  date_accessed: 2023-02-23 16:37:43.742363
   name: Grapher metadata for dataset_3248_te_20_25b_env
   description: core-econ.org
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 2cdcf71cd36cf0df40744f33de9628ea
-  size: 1413
+- md5: 125196964ffe2f74cbed7f504f5d3962
+  size: 1611
   path: dataset_3248_te_20_25b_env_config.json

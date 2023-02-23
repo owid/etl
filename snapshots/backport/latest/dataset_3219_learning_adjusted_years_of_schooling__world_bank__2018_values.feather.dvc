@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_3219_learning_adjusted_years_of_schooling__world_bank__2018_values
   file_extension: feather
-  date_accessed: 2023-02-17 15:19:10.326401
+  date_accessed: 2023-02-23 18:23:55.200999
   name: Learning-Adjusted Years of Schooling - World Bank (2018)
   description: ''
   source_name: Our World in Data catalog backport

@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_3179_number_of_people_with_and_without_energy_access__owid_based_on_world_bank__2021_values
   file_extension: feather
-  date_accessed: 2023-02-17 13:03:53.847966
+  date_accessed: 2023-02-23 16:30:22.579798
   name: Number of people with and without energy access (OWID based on World Bank,
     2021)
   description: ''

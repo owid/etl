@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5782_who_immunization_data__2022_config
   file_extension: json
-  date_accessed: 2023-02-18 00:05:25.173271
+  date_accessed: 2023-02-23 19:08:23.150006
   name: Grapher metadata for dataset_5782_who_immunization_data__2022
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 681e5d4c2fee84be2668afdf4df65761
-  size: 25966
+- md5: f1d8c2e4ecf5bc07b9b0c77607837edf
+  size: 34366
   path: dataset_5782_who_immunization_data__2022_config.json

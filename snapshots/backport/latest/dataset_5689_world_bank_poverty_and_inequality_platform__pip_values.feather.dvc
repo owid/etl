@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5689_world_bank_poverty_and_inequality_platform__pip_values
   file_extension: feather
-  date_accessed: 2023-02-17 17:50:46.415749
+  date_accessed: 2023-02-23 18:39:52.293185
   name: World Bank Poverty and Inequality Platform (PIP)
   description: Version 20220909_2017_01_02_PROD
   source_name: Our World in Data catalog backport

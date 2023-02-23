@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_471_child_labor_in_us__economic_history_association__2017_values
   file_extension: feather
-  date_accessed: 2023-02-17 12:47:45.272657
+  date_accessed: 2023-02-23 18:43:19.170466
   name: Child Labor in US - Economic History Association (2017)
   description: Incidence of child labor in US - Economic History Association
   source_name: Our World in Data catalog backport

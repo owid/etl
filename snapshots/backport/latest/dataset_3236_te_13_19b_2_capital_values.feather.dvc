@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_3236_te_13_19b_2_capital_values
   file_extension: feather
-  date_accessed: 2023-02-17 15:46:28.263640
+  date_accessed: 2023-02-23 15:17:31.735263
   name: TE-13.19b_2_capital
   description: core-econ.org
   source_name: Our World in Data catalog backport

@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5085_google_mobility_trends__2020_values
   file_extension: feather
-  date_accessed: 2023-02-17 13:07:05.807701
+  date_accessed: 2023-02-23 19:02:28.016131
   name: Google Mobility Trends (2020)
   description: ''
   source_name: Our World in Data catalog backport

@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5305_yougov_imperial_covid_19_behavior_tracker__composite_variables_values
   file_extension: feather
-  date_accessed: 2023-02-17 13:22:13.268289
+  date_accessed: 2023-02-23 17:17:42.709431
   name: YouGov-Imperial COVID-19 Behavior Tracker, composite variables
   description: ''
   source_name: Our World in Data catalog backport

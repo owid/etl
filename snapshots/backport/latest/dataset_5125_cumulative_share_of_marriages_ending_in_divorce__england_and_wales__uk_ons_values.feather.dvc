@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5125_cumulative_share_of_marriages_ending_in_divorce__england_and_wales__uk_ons_values
   file_extension: feather
-  date_accessed: 2023-02-17 12:11:39.860466
+  date_accessed: 2023-02-23 17:49:57.233411
   name: Cumulative share of marriages ending in divorce (England and Wales, UK ONS)
   description: ''
   source_name: Our World in Data catalog backport

@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2430_waste_production_and_management_values
   file_extension: feather
-  date_accessed: 2023-02-17 15:00:58.196957
+  date_accessed: 2023-02-23 17:17:49.720380
   name: Waste Production and Management
   description: This is a dataset imported by the automated fetcher
   source_name: Our World in Data catalog backport

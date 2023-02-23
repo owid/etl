@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_697_us_female_labor_force_participation_1890_2005__olivetti__2013_values
   file_extension: feather
-  date_accessed: 2023-02-17 12:21:43.671457
+  date_accessed: 2023-02-23 16:45:04.803787
   name: US Female Labor Force Participation 1890-2005 - Olivetti (2013)
   description: ''
   source_name: Our World in Data catalog backport

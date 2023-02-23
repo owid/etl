@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5281_share_of_fish_stocks_within_biologically_sustainable_levels__fao__2020_values
   file_extension: feather
-  date_accessed: 2023-02-17 15:18:07.125143
+  date_accessed: 2023-02-23 16:54:09.688573
   name: Share of fish stocks within biologically sustainable levels (FAO, 2020)
   description: ''
   source_name: Our World in Data catalog backport

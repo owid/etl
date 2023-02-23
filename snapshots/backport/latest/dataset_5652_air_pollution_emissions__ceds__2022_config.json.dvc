@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5652_air_pollution_emissions__ceds__2022_config
   file_extension: json
-  date_accessed: 2023-02-17 16:09:40.397986
+  date_accessed: 2023-02-23 19:34:58.544604
   name: Grapher metadata for dataset_5652_air_pollution_emissions__ceds__2022
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: e73ede0153deeabd45f5e26f90cc21a5
-  size: 6473
+- md5: 4dd4b652a52038ebc4d8011760c33741
+  size: 9273
   path: dataset_5652_air_pollution_emissions__ceds__2022_config.json

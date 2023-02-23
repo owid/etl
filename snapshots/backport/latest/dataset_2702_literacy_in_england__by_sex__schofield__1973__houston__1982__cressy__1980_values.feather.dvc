@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2702_literacy_in_england__by_sex__schofield__1973__houston__1982__cressy__1980_values
   file_extension: feather
-  date_accessed: 2023-02-17 14:58:45.815761
+  date_accessed: 2023-02-23 19:46:55.301652
   name: Literacy in England, by sex - Schofield (1973), Houston (1982), Cressy (1980)
   description: Literacy figures are nationally representative.
   source_name: Our World in Data catalog backport

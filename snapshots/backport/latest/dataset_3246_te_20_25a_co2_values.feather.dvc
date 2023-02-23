@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_3246_te_20_25a_co2_values
   file_extension: feather
-  date_accessed: 2023-02-17 12:09:53.768843
+  date_accessed: 2023-02-23 18:29:03.708997
   name: TE-20.25a_CO2
   description: core-econ.org
   source_name: Our World in Data catalog backport

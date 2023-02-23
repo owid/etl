@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_323_global_child_mortality__since_1800__based_on_gapminder_and_world_bank__2019_values
   file_extension: feather
-  date_accessed: 2023-02-17 13:24:15.493966
+  date_accessed: 2023-02-23 18:36:23.298877
   name: Global child mortality (since 1800) - based on Gapminder and World Bank (2019)
   description: ''
   source_name: Our World in Data catalog backport

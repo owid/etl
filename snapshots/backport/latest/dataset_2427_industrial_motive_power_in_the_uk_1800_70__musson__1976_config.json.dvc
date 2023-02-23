@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2427_industrial_motive_power_in_the_uk_1800_70__musson__1976_config
   file_extension: json
-  date_accessed: 2023-02-17 13:11:05.289367
+  date_accessed: 2023-02-23 18:14:02.779291
   name: Grapher metadata for dataset_2427_industrial_motive_power_in_the_uk_1800_70__musson__1976
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 46f99ac88177fa62539d15962aeb64c8
-  size: 3244
+- md5: d22c9bcd043bc3df3fe9dc50d7f657a3
+  size: 4234
   path: dataset_2427_industrial_motive_power_in_the_uk_1800_70__musson__1976_config.json

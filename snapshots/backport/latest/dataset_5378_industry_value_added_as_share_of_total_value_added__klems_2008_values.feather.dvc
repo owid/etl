@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5378_industry_value_added_as_share_of_total_value_added__klems_2008_values
   file_extension: feather
-  date_accessed: 2023-02-17 14:06:36.269214
+  date_accessed: 2023-02-23 19:16:56.150637
   name: Industry value added as share of total value added (KLEMS 2008)
   description: ''
   source_name: Our World in Data catalog backport

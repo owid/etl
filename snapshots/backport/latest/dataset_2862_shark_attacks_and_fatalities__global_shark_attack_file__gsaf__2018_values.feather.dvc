@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2862_shark_attacks_and_fatalities__global_shark_attack_file__gsaf__2018_values
   file_extension: feather
-  date_accessed: 2023-02-17 14:48:08.924315
+  date_accessed: 2023-02-23 17:33:07.634503
   name: Shark attacks and fatalities - Global Shark Attack File (GSAF) (2018)
   description: ''
   source_name: Our World in Data catalog backport

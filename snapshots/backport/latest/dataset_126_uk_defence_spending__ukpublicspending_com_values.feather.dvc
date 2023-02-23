@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_126_uk_defence_spending__ukpublicspending_com_values
   file_extension: feather
-  date_accessed: 2023-02-17 15:31:47.707313
+  date_accessed: 2023-02-23 18:20:27.962994
   name: UK Defence Spending - ukpublicspending.com
   description: ''
   source_name: Our World in Data catalog backport

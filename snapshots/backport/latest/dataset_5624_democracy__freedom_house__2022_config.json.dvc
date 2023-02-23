@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5624_democracy__freedom_house__2022_config
   file_extension: json
-  date_accessed: 2023-02-17 15:37:03.188850
+  date_accessed: 2023-02-23 16:24:39.452339
   name: Grapher metadata for dataset_5624_democracy__freedom_house__2022
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 765d535d9f25a0595d17fb8a64609bf1
-  size: 13864
+- md5: 5c9f758d3f3a47ca42c859afdd24ecbf
+  size: 18064
   path: dataset_5624_democracy__freedom_house__2022_config.json

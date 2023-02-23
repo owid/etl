@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5232_reconstruction_of_historical_poverty_trends_by_country__1820_2017__owid_based_on_maddison_project_database_2020_and_van_zanden_et_al__2014_values
   file_extension: feather
-  date_accessed: 2023-02-17 12:09:35.078467
+  date_accessed: 2023-02-23 15:03:42.525861
   name: Reconstruction of historical poverty trends by country, 1820-2017 (OWID based
     on Maddison Project Database 2020 and van Zanden et al. (2014))
   description: ''

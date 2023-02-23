@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_3226_average_harmonised_learning_outcome_score__2005_2015__altinok__angrist__and_patrinos__2018_values
   file_extension: feather
-  date_accessed: 2023-02-17 13:09:28.125065
+  date_accessed: 2023-02-23 15:13:23.701476
   name: Average harmonised learning outcome score (2005-2015) - Altinok, Angrist,
     and Patrinos (2018)
   description: 'Learning outcomes scores (using the 2018 data vintage) have been discontinued

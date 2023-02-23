@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5256_reconstruction_of_historical_global_extreme_poverty_rates__1820_2017__roser_and_hasell__2021__and_world_bank__2020_values
   file_extension: feather
-  date_accessed: 2023-02-17 13:42:32.124822
+  date_accessed: 2023-02-23 18:45:53.773713
   name: Reconstruction of historical global extreme poverty rates, 1820-2017 (Roser
     and Hasell (2021) and World Bank(2020))
   description: ''

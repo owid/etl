@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5496_reported_guinea_worm_cases__who__2021_config
   file_extension: json
-  date_accessed: 2023-02-17 12:55:08.329288
+  date_accessed: 2023-02-23 18:22:21.279072
   name: Grapher metadata for dataset_5496_reported_guinea_worm_cases__who__2021
   description: |-
     Manual update of spreadsheet for cases. Certification data is scraped from here https://apps.who.int/dracunculiasis/dradata/html/report_Countries_t0.html
@@ -16,6 +16,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 34fb4e99a4115ffa0eac8cf65006bf11
-  size: 6352
+- md5: 93f5e5372618d79e417072c0cfb6a5a3
+  size: 6952
   path: dataset_5496_reported_guinea_worm_cases__who__2021_config.json

@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_1852_usa_patents_granted__us_patent__and__trademark_office_values
   file_extension: feather
-  date_accessed: 2023-02-17 13:00:21.690463
+  date_accessed: 2023-02-23 15:15:08.401063
   name: USA patents granted - US Patent & Trademark Office
   description: ''
   source_name: Our World in Data catalog backport

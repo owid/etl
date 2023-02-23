@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_3093_economic_losses_from_disasters_as_a_share_of_gdp__pielke__2018_values
   file_extension: feather
-  date_accessed: 2023-02-17 13:08:32.418295
+  date_accessed: 2023-02-23 17:29:29.254543
   name: Economic losses from disasters as a share of GDP (Pielke, 2018)
   description: ''
   source_name: Our World in Data catalog backport

@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5639_csis__cost_of_space_launches_values
   file_extension: feather
-  date_accessed: 2023-02-17 16:06:11.635991
+  date_accessed: 2023-02-23 17:03:45.204344
   name: CSIS - Cost of space launches
   description: https://github.com/owid/notebooks/tree/main/EdouardMathieu/aerospace_csis_datasets
   source_name: Our World in Data catalog backport

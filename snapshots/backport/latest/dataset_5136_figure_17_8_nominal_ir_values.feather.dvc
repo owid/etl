@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5136_figure_17_8_nominal_ir_values
   file_extension: feather
-  date_accessed: 2023-02-17 14:19:33.815378
+  date_accessed: 2023-02-23 15:01:48.937021
   name: Figure_17.8_nominal_ir
   description: core-econ.org
   source_name: Our World in Data catalog backport

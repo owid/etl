@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_438_life_satisfaction__world_value_survey__2014_values
   file_extension: feather
-  date_accessed: 2023-02-17 14:59:44.134898
+  date_accessed: 2023-02-23 18:03:01.030081
   name: Life satisfaction – World Value Survey (2014)
   description: ''
   source_name: Our World in Data catalog backport

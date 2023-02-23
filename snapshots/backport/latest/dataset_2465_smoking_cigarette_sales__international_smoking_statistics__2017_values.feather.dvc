@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2465_smoking_cigarette_sales__international_smoking_statistics__2017_values
   file_extension: feather
-  date_accessed: 2023-02-17 13:49:32.834572
+  date_accessed: 2023-02-23 19:15:04.658943
   name: Smoking cigarette sales (International Smoking Statistics (2017))
   description: ''
   source_name: Our World in Data catalog backport

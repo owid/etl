@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5200_time_spent_on_sports_and_physical_activity__eurostat__and__american_time_use_survey_values
   file_extension: feather
-  date_accessed: 2023-02-17 14:29:04.219746
+  date_accessed: 2023-02-23 16:33:34.212578
   name: Time spent on sports and physical activity - Eurostat & American Time Use
     Survey
   description: ''

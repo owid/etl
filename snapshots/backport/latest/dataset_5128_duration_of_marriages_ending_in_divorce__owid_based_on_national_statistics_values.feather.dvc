@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5128_duration_of_marriages_ending_in_divorce__owid_based_on_national_statistics_values
   file_extension: feather
-  date_accessed: 2023-02-17 14:20:44.257406
+  date_accessed: 2023-02-23 17:25:28.522655
   name: Duration of marriages ending in divorce (OWID based on national statistics)
   description: ''
   source_name: Our World in Data catalog backport

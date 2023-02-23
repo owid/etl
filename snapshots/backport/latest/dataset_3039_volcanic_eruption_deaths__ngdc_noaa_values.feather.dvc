@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_3039_volcanic_eruption_deaths__ngdc_noaa_values
   file_extension: feather
-  date_accessed: 2023-02-17 15:54:02.929450
+  date_accessed: 2023-02-23 16:42:33.191363
   name: Volcanic eruption deaths (NGDC/NOAA)
   description: ''
   source_name: Our World in Data catalog backport
