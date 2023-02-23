@@ -1,7 +1,7 @@
 """Create a new version of FAOSTAT steps in a channel (meadow or garden) and update the dag accordingly.
 
 When running this script for a given channel (e.g. 'meadow'), it will:
-* If any dataset was updated in the latest walden ingest, create a new folder in the channel (named after today's date).
+* Create a new folder in the channel (named after today's date), if any dataset was updated in the latest snapshot ingestion.
 * For every dataset that was updated, copy their latest step files onto the new folder.
   * Optionally (with the -a argument), this will be done for all datasets, not just the ones that were updated.
 * Add the new steps in the channel to the dag (as well as their corresponding dependencies).
@@ -20,6 +20,8 @@ from owid.walden import Catalog
 
 from etl.files import checksum_file
 from etl.paths import DAG_DIR, STEP_DIR
+from etl.scripts.faostat.create_new_snapshots import INCLUDED_DATASETS_CODES
+from etl.snapshot import snapshot_catalog
 from etl.steps import load_dag
 
 # Initialise log.
@@ -81,12 +83,16 @@ def get_channel_from_dag_line(dag_line: str) -> str:
         channel = "garden"
     elif dag_line.startswith("data://meadow/"):
         channel = "meadow"
+    elif dag_line.startswith("data://explorers/"):
+        channel = "explorers"
+    elif dag_line.startswith("snapshot://"):
+        channel = "snapshot"
     elif dag_line.startswith("walden://"):
         channel = "walden"
-    elif dag_line.startswith("grapher://"):
+    elif dag_line.startswith("data://grapher"):
         channel = "grapher"
     else:
-        raise ValueError("dag line not understood")
+        channel = "other"
 
     return channel
 
@@ -137,7 +143,7 @@ def create_dag_line_name(channel: str, step_name: str, namespace: str = NAMESPAC
     """
     if channel in ["meadow", "garden"]:
         dag_line = f"data://{channel}/{namespace}/{version}/{step_name}"
-    elif channel in ["walden", "grapher"]:
+    elif channel in ["snapshot", "grapher"]:
         dag_line = f"{channel}://{namespace}/{version}/{step_name}"
     else:
         raise ValueError("wrong channel name")
@@ -195,7 +201,7 @@ def get_dataset_name_from_dag_line(dag_line: str) -> str:
 
 
 def list_updated_steps(channel: str, namespace: str = NAMESPACE) -> List[str]:
-    """List all datasets in a namespace that were updated in the latest walden ingest.
+    """List all datasets in a namespace that were updated in the latest snapshot ingestion.
 
     Parameters
     ----------
@@ -210,28 +216,34 @@ def list_updated_steps(channel: str, namespace: str = NAMESPACE) -> List[str]:
         Names of datasets that were updated.
 
     """
-    # Find latest walden folder.
-    all_walden_datasets = Catalog().find(namespace=namespace)
-    latest_walden_version = sorted([walden_ds.version for walden_ds in all_walden_datasets])[-1]
+    # List all relevant snapshots.
+    snapshots = [snapshot for snapshot in snapshot_catalog(match=NAMESPACE) if snapshot.metadata.namespace == NAMESPACE]
+
+    snapshots_latest_version = sorted([snapshot.metadata.version for snapshot in snapshots])[-1]  # type: ignore
 
     # Find latest version in current channel for the considered namespace.
     latest_version_in_channel = find_latest_version_for_namespace_in_channel(channel=channel)
 
-    if latest_walden_version > latest_version_in_channel:
-        # Now find what steps have the latest version in walden.
+    if snapshots_latest_version > latest_version_in_channel:
+        # Now find what steps have the latest snapshot version.
         step_names = [
-            walden_ds.short_name for walden_ds in all_walden_datasets if walden_ds.version == latest_walden_version
+            snapshot.metadata.short_name
+            for snapshot in snapshots
+            if snapshot.metadata.version == snapshots_latest_version
         ]
     else:
-        # There is already a version for this namespace and channel that is posterior to the latest additions to walden.
+        # There is already a version for this namespace and channel that is posterior to the latest snapshot.
         step_names = []
-        log.info(f"There were no additions to walden since the latest {channel} version, {latest_version_in_channel}.")
+        log.info(f"There were no new snapshots since the latest {channel} version, {latest_version_in_channel}.")
+
+    # Sort all steps conveniently.
+    step_names = sorted(step_names)
 
     return step_names
 
 
 def list_all_steps() -> List[str]:
-    """List all datasets (e.g. 'faostat_qcl') that are considered in the walden ingest (even if they were not updated).
+    """List all datasets (e.g. 'faostat_qcl') that are considered in the snapshot ingestion (even if they were not updated).
 
     Note: The 'faostat_metadata' step is always added as a step.
 
@@ -241,11 +253,8 @@ def list_all_steps() -> List[str]:
         Names of steps.
 
     """
-    # Load walden dataset.
-    walden_ds = Catalog().find_latest(namespace=NAMESPACE, short_name=ADDITIONAL_METADATA_FILE_NAME)
     # List all domains.
-    domains = pd.read_json(walden_ds.ensure_downloaded()).columns.tolist()
-    step_names = [f"{NAMESPACE}_{domain}" for domain in domains]
+    step_names = [f"{NAMESPACE}_{domain}" for domain in INCLUDED_DATASETS_CODES]
     # Add metadata step to the list.
     step_names += [ADDITIONAL_METADATA_FILE_NAME]
     step_names = sorted(step_names)
@@ -310,6 +319,17 @@ def find_latest_version_for_step(channel: str, step_name: str, namespace: str = 
             latest_version = Catalog().find_latest(namespace=namespace, short_name=step_name).version
         except ValueError:
             log.warning(warning_message)
+    elif channel == "snapshot":
+        try:
+            # Find all snapshots for current step.
+            snapshots = [
+                snapshot for snapshot in snapshot_catalog(match=step_name) if snapshot.metadata.namespace == namespace
+            ]
+            # Find latest version for current step.
+            latest_version = sorted([snapshot.metadata.version for snapshot in snapshots])[-1]  # type: ignore
+        except IndexError:
+            log.warning(warning_message)
+
     elif channel in ["meadow", "garden", "grapher"]:
         versions_dir = get_path_to_step_files(channel=channel, namespace=namespace)
         dataset_versions = sorted(
@@ -480,7 +500,7 @@ def create_dag_line_for_latest_natural_dependency(
     """
     # Define the channel of the natural dependency.
     if channel == "meadow":
-        dependency_channel = "walden"
+        dependency_channel = "snapshot"
     elif channel == "garden":
         dependency_channel = "meadow"
     elif channel == "grapher":
@@ -542,6 +562,7 @@ def create_updated_dependency_graph(
     # Initialise the additional part of the graph that will have to be added to the dag (in another function).
     new_steps = {}
     for step_name in step_names:
+        print(step_name)
         # Find all occurrences in the dag of this dataset for the considered channel.
         candidates = {
             step: dag[step]
@@ -824,6 +845,7 @@ def main(channel: str, include_all_datasets: bool = False) -> None:
         # Update dag file with new dependencies.
         header_line = f"# FAOSTAT {channel} steps for version {NEW_VERSION}"
         write_steps_to_dag_file(dag_steps=dag_steps, header_line=header_line)
+
     else:
         log.info("Nothing to update.")
 
