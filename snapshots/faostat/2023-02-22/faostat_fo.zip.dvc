@@ -1,0 +1,32 @@
+meta:
+  namespace: faostat
+  short_name: faostat_fo
+  name: 'Forestry: Forestry Production and Trade - FAO (2023)'
+  description: 'The database contains data on the production and trade in roundwood
+    and in primary wood and paper products for all countries and territories in the
+    world.The main types of primary forest products included in this database are
+    roundwood, sawnwood, wood-based panels, pulp, and paper and paperboard. These
+    products are detailed further and defined in the Joint Forest Sector Questionnaire
+    (JFSQ) (http://www.fao.org/forestry/statistics/80572/en/). The database contains
+    details of the following topics: - Roundwood removals (production) by coniferous
+    and non-coniferous wood, - production and trade in industrial Roundwood, sawnwood,
+    wood-based panels, wood charcoal, pulp, paper  paperboard, and other products.
+    More detailed information on wood products, including definitions, can be found
+    at http://www.fao.org/forestry/statistics/80572/en/'
+  source_name: Food and Agriculture Organization of the United Nations
+  source_published_by: Food and Agriculture Organization of the United Nations
+  publication_year: 2023
+  publication_date: '2023-01-18'
+  date_accessed: '2023-02-22'
+  version: '2023-02-22'
+  url: http://www.fao.org/faostat/en/#data/FO
+  source_data_url: https://fenixservices.fao.org/faostat/static/bulkdownloads/Forestry_E_All_Data_(Normalized).zip
+  file_extension: zip
+  license_url: http://www.fao.org/contact-us/terms/db-terms-of-use/en
+  license_name: CC BY-NC-SA 3.0 IGO
+  is_public: true
+wdir: ../../../data/snapshots/faostat/2023-02-22
+outs:
+- md5: bbf064871c8b14bdf03ca12a979b8858
+  size: 15661588
+  path: faostat_fo.zip

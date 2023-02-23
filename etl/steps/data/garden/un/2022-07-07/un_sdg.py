@@ -86,6 +86,7 @@ def create_tables(original_df: pd.DataFrame) -> List[pd.DataFrame]:
     dim_description = get_dimension_description()
     init_dimensions = list(dim_description.keys())
     init_dimensions = list(set(init_dimensions).intersection(list(original_df.columns)))
+    init_dimensions = sorted(init_dimensions)
     init_non_dimensions = list([c for c in original_df.columns if c not in set(init_dimensions)])
 
     all_series = original_df.groupby(["indicator", "seriescode"])
@@ -282,7 +283,7 @@ def manual_clean_data(df: pd.DataFrame) -> pd.DataFrame:
         ],
     )
     # Dropping average marine acidity as we don't have a way to visualise it
-    df = df[~df["seriescode"].isin(["ER_OAW_MNACD", "EN_REF_WASCOL"])]
+    df = df[~df["seriescode"].isin(["ER_OAW_MNACD"])]
     df = df.drop(["level_0", "index"], axis=1, errors="ignore")
 
     return df

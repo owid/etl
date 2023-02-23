@@ -26,6 +26,8 @@ import yaml
 from dvc.dvcfile import Dvcfile
 from dvc.repo import Repo
 
+from etl.db import get_engine
+
 # smother deprecation warnings by papermill
 with warnings.catch_warnings():
     warnings.simplefilter("ignore")
@@ -44,7 +46,7 @@ from etl.grapher_import import (
     cleanup_ghost_sources,
     cleanup_ghost_variables,
     fetch_db_checksum,
-    set_dataset_checksum,
+    set_dataset_checksum_and_editedAt,
     upsert_dataset,
     upsert_table,
 )
@@ -693,8 +695,11 @@ class GrapherStep(Step):
 
         dataset.metadata = gh._adapt_dataset_metadata_for_grapher(dataset.metadata)
 
+        engine = get_engine()
+
         assert dataset.metadata.namespace
         dataset_upsert_results = upsert_dataset(
+            engine,
             dataset,
             dataset.metadata.namespace,
             dataset.metadata.sources,
@@ -713,6 +718,7 @@ class GrapherStep(Step):
             # generate table with entity_id, year and value for every column
             tables = gh._yield_wide_table(table, na_action="drop")
             upsert = lambda t: upsert_table(  # noqa: E731
+                engine,
                 t,
                 dataset_upsert_results,
                 catalog_path=catalog_path,
@@ -732,8 +738,8 @@ class GrapherStep(Step):
 
         self._cleanup_ghost_resources(dataset_upsert_results, variable_upsert_results)
 
-        # set checksum after all data got inserted
-        set_dataset_checksum(dataset_upsert_results.dataset_id, self.data_step.checksum_input())
+        # set checksum and updatedAt timestamps after all data got inserted
+        set_dataset_checksum_and_editedAt(dataset_upsert_results.dataset_id, self.data_step.checksum_input())
 
     def checksum_output(self) -> str:
         raise NotImplementedError("GrapherStep should not be used as an input")

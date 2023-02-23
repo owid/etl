@@ -11,6 +11,7 @@ year,entity,life_expectancy
 1990,Europe,74.2
 2001,Europe,76.8
 1770,Asia,27.5
+1885,Asia,27.5
 1900,Asia,28
 1913,Asia,28.1
 1950,Asia,41.6
@@ -18,11 +19,13 @@ year,entity,life_expectancy
 1990,Asia,64.5
 2001,Asia,67.1
 1770,Africa,26.4
+1925,Africa,26.4
 1950,Africa,35.6
 1973,Africa,46.9
 1990,Africa,52.9
 2001,Africa,50.5
 1770,Americas,34.8
+1830,Americas,34.8
 1850,Americas,35.1
 1870,Americas,35.1
 1900,Americas,41
@@ -44,6 +47,7 @@ year,entity,life_expectancy
 1973,Oceania,68.2
 1990,Oceania,72.8
 2001,Oceania,74.6
+1770,World,28.5
 1800,World,28.5
 1820,World,29
 1850,World,29.3
