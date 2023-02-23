@@ -1,5 +1,9 @@
 """Shared definitions in FAOSTAT meadow steps.
 
+Some basic processing is required to create tables from the raw data.
+For example, column "Note" (present in some datasets) is skipped to avoid parsing errors.
+Other minor changes can be found in the code.
+
 """
 
 import os
@@ -12,7 +16,6 @@ import structlog
 from owid.catalog import Table
 
 from etl.helpers import PathFinder, create_dataset
-from etl.paths import STEP_DIR
 
 # Initialise log.
 log = structlog.get_logger()
@@ -21,9 +24,6 @@ log = structlog.get_logger()
 CURRENT_DIR = Path(__file__).parent
 NAMESPACE = CURRENT_DIR.parent.name
 VERSION = CURRENT_DIR.name
-
-# Path to file containing information of the latest versions of the relevant datasets.
-LATEST_VERSIONS_FILE = STEP_DIR / "data" / "meadow" / NAMESPACE / VERSION / "versions.csv"
 
 
 def load_data(local_path: Path) -> pd.DataFrame:
@@ -47,7 +47,16 @@ def load_data(local_path: Path) -> pd.DataFrame:
         (filename,) = list(filter(lambda x: "(Normalized)" in x, os.listdir(temp_dir)))
 
         # Load data from main file.
-        data = pd.read_csv(os.path.join(temp_dir, filename), encoding="latin-1")
+        try:
+            data = pd.read_csv(os.path.join(temp_dir, filename), encoding="latin-1")
+        except pd.errors.ParserError:
+            # Some files are impossible to parse (e.g. faostat_wcad) because column "Note" is poorly formatted.
+            # Instead of skipping problematic rows, load the file skipping that problematic column.
+            columns = pd.read_csv(
+                os.path.join(temp_dir, filename), encoding="latin-1", on_bad_lines="skip", nrows=0
+            ).columns
+            columns = columns.drop("Note")
+            data = pd.read_csv(os.path.join(temp_dir, filename), encoding="latin-1", usecols=columns)
 
     return data
 
@@ -65,7 +74,10 @@ def run_sanity_checks(data: pd.DataFrame) -> None:
 
     # Check that column "Year Code" is identical to "Year", and can therefore be dropped.
     error = "Column 'Year Code' does not coincide with column 'Year'."
-    if df["Year"].dtype == int:
+    if "Year" not in data.columns:
+        pass
+        # Column 'Year' is not in data (this happens at least in faostat_wcad, which requires further processing).
+    elif df["Year"].dtype == int:
         # In most cases, columns "Year Code" and "Year" are simply the year.
         assert (df["Year Code"] == df["Year"]).all(), error
     else:
@@ -96,7 +108,9 @@ def prepare_output_data(data: pd.DataFrame) -> pd.DataFrame:
     # Select columns to keep.
     # Note:
     # * Ignore column "Year Code" (which is almost identical to "Year", and does not add information).
-    # * Ignore column "Note" (which is included only in faostat_fa, faostat_fs, and faostat_sdgb datasets).
+    # * Ignore column "Note" (which is included only in faostat_fa, faostat_fs, faostat_sdgb and faostat_wcad datasets).
+    #   This column may contain double-quoted text within double-quoted text, which becomes impossible to parse.
+    #   E.g. faostat_wcad line 105.
     # * Add "Recipient Country Code" and "Recipient Code", which are the names for "Area Code" and "Area", respectively,
     #   for dataset faostat_fa.
     columns_to_keep = [
@@ -112,6 +126,9 @@ def prepare_output_data(data: pd.DataFrame) -> pd.DataFrame:
         "Flag",
         "Recipient Country Code",
         "Recipient Country",
+        # Additional columns for faostat_wcad.
+        "WCA Round",
+        "Census Year",
     ]
     # Select only columns that are found in the dataframe.
     columns_to_keep = list(set(columns_to_keep) & set(df.columns))
@@ -119,7 +136,11 @@ def prepare_output_data(data: pd.DataFrame) -> pd.DataFrame:
 
     # Set index columns depending on what columns are available in the dataframe.
     # Note: "Recipient Country Code" appears only in faostat_fa, and seems to replace "Area Code".
-    index_columns = list({"Area Code", "Recipient Country Code", "Year", "Item Code", "Element Code"} & set(df.columns))
+    # Note: "WCA Round" and "Census Year" appear only in faostat_wcad.
+    index_columns = list(
+        {"Area Code", "Recipient Country Code", "Year", "Item Code", "Element Code", "WCA Round", "Census Year"}
+        & set(df.columns)
+    )
     if df.duplicated(subset=index_columns).any():
         log.warning("Index has duplicated keys.")
     df = df.set_index(index_columns)
