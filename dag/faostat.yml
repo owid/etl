@@ -320,7 +320,6 @@ steps:
   data://meadow/faostat/2023-02-22/faostat_rt:
     - snapshot://faostat/2023-02-22/faostat_rt.zip
   data://meadow/faostat/2023-02-22/faostat_scl:
-    - data://meadow/faostat/2023-02-22/faostat_metadata
     - snapshot://faostat/2023-02-22/faostat_scl.zip
   data://meadow/faostat/2023-02-22/faostat_sdgb:
     - snapshot://faostat/2023-02-22/faostat_sdgb.zip
