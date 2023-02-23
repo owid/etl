@@ -124,7 +124,20 @@ def check_that_category_structure_is_well_defined(md: Dict[str, Any]) -> None:
 
 
 def create_tables_for_all_domain_records(additional_metadata: Dict[str, Any]) -> List[Table]:
-    # Create a new table for each domain-record (e.g. 'faostat_qcl_item').
+    """Create a table for each of the domain-categories (e.g. 'faostat_qcl_item').
+
+    Parameters
+    ----------
+    additional_metadata : Dict[str, Any]
+        FAOSTAT additional metadata.
+
+    Returns
+    -------
+    tables: List[Table]
+        List of tables, each one corresponding to a specific domain-category.
+
+    """
+    # Create a new table for each domain-category (e.g. 'faostat_qcl_item').
     tables = []
     for domain in additional_metadata:
         for category in list(additional_metadata[domain]):
@@ -154,7 +167,7 @@ def run(dest_dir: str) -> None:
     current_step_file = (CURRENT_DIR / dataset_short_name).with_suffix(".py")
 
     # Get paths and naming conventions for current data step.
-    paths = PathFinder(current_step_file)
+    paths = PathFinder(current_step_file.as_posix())
 
     # Load snapshot.
     snapshot = paths.load_dependency(short_name=dataset_short_name, channel="snapshot")

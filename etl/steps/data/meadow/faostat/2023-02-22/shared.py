@@ -138,7 +138,7 @@ def run(dest_dir: str) -> None:
     current_step_file = (CURRENT_DIR / dataset_short_name).with_suffix(".py")
 
     # Get paths and naming conventions for current data step.
-    paths = PathFinder(current_step_file)
+    paths = PathFinder(current_step_file.as_posix())
 
     # Load snapshot.
     snapshot = paths.load_dependency(short_name=dataset_short_name, channel="snapshot")
