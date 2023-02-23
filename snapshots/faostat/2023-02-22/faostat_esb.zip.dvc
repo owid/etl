@@ -1,0 +1,30 @@
+meta:
+  namespace: faostat
+  short_name: faostat_esb
+  name: 'Land, Inputs and Sustainability: Cropland Nutrient Budget - FAO (2022)'
+  description: 2022 Cropland nutrient budget analytical briefThe Cropland Nutrient
+    Budget domain contains information on the flows of nitrogen, phosphorus, and potassium
+    from synthetic fertilizer, manure applied to soils, atmospheric deposition, crop
+    removal, and biological fixation over cropland and per unit area of cropland.
+    The flows are aggregated to total inputs and total outputs, from which the overall
+    nutrient budget and nutrient use efficiency on cropland are calculated. Statistics
+    are disseminated in units of tonnes and in kg/ha, as appropriate. Nutrient use
+    efficiency is expressed as a fraction (%). Data are available by country, with
+    global coverage relative to the period 1961-2020, with annual updates.
+  source_name: Food and Agriculture Organization of the United Nations
+  source_published_by: Food and Agriculture Organization of the United Nations
+  publication_year: 2022
+  publication_date: '2022-11-09'
+  date_accessed: '2023-02-22'
+  version: '2023-02-22'
+  url: http://www.fao.org/faostat/en/#data/ESB
+  source_data_url: https://fenixservices.fao.org/faostat/static/bulkdownloads/Environment_Cropland_nutrient_budget_E_All_Data_(Normalized).zip
+  file_extension: zip
+  license_url: http://www.fao.org/contact-us/terms/db-terms-of-use/en
+  license_name: CC BY-NC-SA 3.0 IGO
+  is_public: true
+wdir: ../../../data/snapshots/faostat/2023-02-22
+outs:
+- md5: 6934fc6dc4931da903bd88099e55347d
+  size: 5511517
+  path: faostat_esb.zip

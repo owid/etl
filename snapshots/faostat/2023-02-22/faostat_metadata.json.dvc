@@ -1,0 +1,22 @@
+meta:
+  namespace: faostat
+  short_name: faostat_metadata
+  name: Metadata and identifiers - FAO (2023)
+  description: Metadata and identifiers used in FAO datasets
+  source_name: Food and Agriculture Organization of the United Nations
+  source_published_by: Food and Agriculture Organization of the United Nations
+  publication_year: 2023
+  publication_date: '2023-02-22'
+  date_accessed: '2023-02-22'
+  version: '2023-02-22'
+  url: http://www.fao.org/faostat/en/#data
+  source_data_url:
+  file_extension: json
+  license_url: http://www.fao.org/contact-us/terms/db-terms-of-use/en
+  license_name: CC BY-NC-SA 3.0 IGO
+  is_public: true
+wdir: ../../../data/snapshots/faostat/2023-02-22
+outs:
+- md5: d70441df692a83d3a1a2cff22a420a7f
+  size: 13974423
+  path: faostat_metadata.json

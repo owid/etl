@@ -1,0 +1,25 @@
+meta:
+  namespace: faostat
+  short_name: faostat_rl
+  name: 'Land, Inputs and Sustainability: Land Use - FAO (2022)'
+  description: The FAOSTAT Land Use domain contains data on forty-four categories
+    of land use, irrigation and agricultural practices, relevant to monitor agriculture,
+    forestry and fisheries activities at national, regional and global level. Data
+    are available by country and year, with global coverage and annual updates.
+  source_name: Food and Agriculture Organization of the United Nations
+  source_published_by: Food and Agriculture Organization of the United Nations
+  publication_year: 2022
+  publication_date: '2022-11-03'
+  date_accessed: '2023-02-22'
+  version: '2023-02-22'
+  url: http://www.fao.org/faostat/en/#data/RL
+  source_data_url: https://fenixservices.fao.org/faostat/static/bulkdownloads/Inputs_LandUse_E_All_Data_(Normalized).zip
+  file_extension: zip
+  license_url: http://www.fao.org/contact-us/terms/db-terms-of-use/en
+  license_name: CC BY-NC-SA 3.0 IGO
+  is_public: true
+wdir: ../../../data/snapshots/faostat/2023-02-22
+outs:
+- md5: bc39a6bb15a0efce1be32166fb3726b4
+  size: 1483256
+  path: faostat_rl.zip
