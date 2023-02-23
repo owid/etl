@@ -50,10 +50,6 @@ steps:
     - data://meadow/worldbank_wdi/2022-05-26/wdi
   data://grapher/worldbank_wdi/2022-05-26/wdi:
     - data://garden/worldbank_wdi/2022-05-26/wdi
-  data://meadow/un_sdg/2022-07-07/un_sdg:
-    - walden://un_sdg/2022-07-07/un_sdg
-  data://garden/un_sdg/2022-07-07/un_sdg:
-    - data://meadow/un_sdg/2022-07-07/un_sdg
   data://grapher/owid/latest/key_indicators:
     - data://garden/owid/latest/key_indicators
   data://meadow/oecd/2016-06-01/regional_wellbeing:
@@ -117,11 +113,19 @@ steps:
 
   #
   # UN
-  #
-  data://grapher/un_sdg/2022-07-07/un_sdg:
-    - data://garden/un_sdg/2022-07-07/un_sdg
   data://grapher/un/2022-07-11/un_wpp:
     - data://garden/un/2022-07-11/un_wpp
+
+ # UN SDG - current
+  data://meadow/un/2023-01-24/un_sdg:
+    - snapshot://un/2023-01-24/un_sdg.feather
+  data://garden/un/2023-01-24/un_sdg:
+    - data://meadow/un/2023-01-24/un_sdg
+    - snapshot://un/2023-01-24/un_sdg_unit.csv
+    - snapshot://un/2023-01-24/un_sdg_dimension.json
+  data://grapher/un/2023-01-24/un_sdg:
+    - data://garden/un/2023-01-24/un_sdg
+
 
   # Internet
   data://garden/technology/2022/internet:

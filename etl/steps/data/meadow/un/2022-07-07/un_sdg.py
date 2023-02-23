@@ -17,7 +17,7 @@ def run(dest_dir: str, query: str = "") -> None:
     # retrieves raw data from walden
     version = Path(__file__).parent.stem
     fname = Path(__file__).stem
-    namespace = Path(__file__).parent.parent.stem
+    namespace = "un_sdg"
 
     walden_ds = Catalog().find_one(namespace=namespace, short_name=fname, version=version)
 
