@@ -36,7 +36,7 @@ from dateutil import parser
 from structlog import get_logger
 
 from etl.paths import SNAPSHOTS_DIR
-from etl.snapshot import Snapshot, add_snapshot, snapshot_catalog
+from etl.snapshot import Snapshot, SnapshotMeta, add_snapshot, snapshot_catalog
 
 # Initialize logger.
 log = get_logger()
@@ -207,6 +207,10 @@ class FAODataset:
             "is_public": True,
         }
 
+    @property
+    def snapshot_metadata(self) -> SnapshotMeta:
+        return SnapshotMeta(**self.metadata)
+
     def to_snapshot(self) -> None:
         """
         Create a snapshot.
@@ -216,11 +220,8 @@ class FAODataset:
         # Create metadata file for current domain dataset.
         create_snapshot_metadata_file(self.metadata)
 
-        # URI of snapshot to be created.
-        snapshot_uri = f"{self.metadata['namespace']}/{self.metadata['version']}/{self.metadata['short_name']}.{self.metadata['file_extension']}"
-
         # Create a new snapshot.
-        snap = Snapshot(snapshot_uri)
+        snap = Snapshot(self.snapshot_metadata.uri)
 
         # Download data from source.
         snap.download_from_source()
@@ -289,6 +290,10 @@ class FAOAdditionalMetadata:
             "is_public": True,
         }
 
+    @property
+    def snapshot_metadata(self) -> SnapshotMeta:
+        return SnapshotMeta(**self.metadata)
+
     @staticmethod
     def _fetch_additional_metadata_and_save(output_filename: str) -> None:
         faostat_metadata = {}
@@ -315,15 +320,12 @@ class FAOAdditionalMetadata:
         # Create metadata file for current domain dataset.
         create_snapshot_metadata_file(self.metadata)
 
-        # URI of snapshot to be created.
-        snapshot_uri = f"{self.metadata['namespace']}/{self.metadata['version']}/{self.metadata['short_name']}.{self.metadata['file_extension']}"
-
         with tempfile.NamedTemporaryFile() as f:
             # Download data into a temporary file.
             self._fetch_additional_metadata_and_save(f.name)
 
             # Create snapshot.
-            add_snapshot(uri=snapshot_uri, filename=f.name, upload=True)
+            add_snapshot(uri=self.snapshot_metadata.uri, filename=f.name, upload=True)
 
 
 def main(read_only: bool = False) -> None:
