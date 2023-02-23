@@ -140,7 +140,7 @@ def create_snapshot_metadata_file(metadata: Dict[str, Any]) -> None:
 class FAODataset:
     namespace: str = NAMESPACE
 
-    def __init__(self, dataset_metadata: Dict[str, Any]):
+    def __init__(self, dataset_metadata: Dict[str, Any]) -> None:
         """[summary]
 
         Args:
@@ -149,7 +149,7 @@ class FAODataset:
         self._dataset_metadata = dataset_metadata
         self._dataset_server_metadata = self._load_dataset_server_metadata()
 
-    def _load_dataset_server_metadata(self) -> dict:
+    def _load_dataset_server_metadata(self) -> Dict[str, Any]:
         # Fetch only header of the dataset file on the server, which contains additional metadata, like last
         # modification date.
         head_request = requests.head(self.source_data_url)
@@ -157,7 +157,7 @@ class FAODataset:
         return cast(dict, dataset_header)
 
     @property
-    def publication_year(self):
+    def publication_year(self) -> int:
         return self.publication_date.year
 
     @property
@@ -171,15 +171,15 @@ class FAODataset:
         return last_update_date
 
     @property
-    def short_name(self):
+    def short_name(self) -> str:
         return f"{self.namespace}_{self._dataset_metadata['DatasetCode'].lower()}"
 
     @property
-    def source_data_url(self):
+    def source_data_url(self) -> str:
         return self._dataset_metadata["FileLocation"]
 
     @property
-    def metadata(self):
+    def metadata(self) -> Dict[str, Any]:
         """
         Snapshot-compatible view of this dataset's metadata.
 
@@ -207,7 +207,7 @@ class FAODataset:
             "is_public": True,
         }
 
-    def to_snapshot(self):
+    def to_snapshot(self) -> None:
         """
         Create a snapshot.
 
@@ -260,7 +260,7 @@ def is_dataset_already_up_to_date(
 
 
 class FAOAdditionalMetadata:
-    def __init__(self):
+    def __init__(self) -> None:
         # Assign current date to additional metadata.
         self.publication_date = dt.datetime.today().date()
         self.publication_year = self.publication_date.year
@@ -269,7 +269,7 @@ class FAOAdditionalMetadata:
         self.faostat_metadata = None
 
     @property
-    def metadata(self):
+    def metadata(self) -> Dict[str, Any]:
         return {
             "namespace": NAMESPACE,
             "short_name": f"{NAMESPACE}_metadata",
