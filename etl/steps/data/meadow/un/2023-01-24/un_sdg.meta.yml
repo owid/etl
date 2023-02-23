@@ -1,11 +1,9 @@
 dataset:
-  channel: meadow
   namespace: un
   short_name: un_sdg
   description: 'The United Nations Sustainable Development Goal (SDG) dataset is the primary collection of data tracking progress towards the SDG indicators, compiled from officially-recognized international sources.'
   licenses:
   - {}
-  version: '2023-01-30'
   sources:
   - name: United Nations
   - url: https://sdgs.un.org/goals

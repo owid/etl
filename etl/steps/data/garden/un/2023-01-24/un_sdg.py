@@ -171,8 +171,9 @@ def create_tables(original_df: pd.DataFrame) -> List[pd.DataFrame]:
     dim_description = get_dimension_description()
     init_dimensions = list(dim_description.keys())
     init_dimensions = list(set(init_dimensions).intersection(list(original_df.columns)))
+    init_dimensions = init_dimensions.sort()
     init_non_dimensions = list([c for c in original_df.columns if c not in set(init_dimensions)])
-
+    init_non_dimensions = init_non_dimensions.sort()
     all_series = original_df.groupby(["indicator", "seriescode"])
 
     output_tables = []
