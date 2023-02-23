@@ -114,7 +114,7 @@ class FAODataset:
         if self._dataset_metadata["DatasetDescription"] is None:
             # Description is sometimes missing (e.g. in faostat_esb), but a description is required in index.
             self._dataset_metadata["DatasetDescription"] = ""
-            print(f"WARNING: Description for dataset {self.short_name} is missing. Type one manually.")
+            log.warning(f"Description for dataset {self.short_name} is missing. Type one manually.")
         return {
             "namespace": self.namespace,
             "short_name": self.short_name,
@@ -144,6 +144,8 @@ class FAODataset:
 
         Download the dataset from the source, create the corresponding metadata file and create the snapshot.
         """
+        log.info(f"Creating snapshot for step {self.metadata['short_name']}.")
+
         # Create metadata file for current domain dataset.
         create_snapshot_metadata_file(self.metadata)
 
@@ -244,6 +246,8 @@ class FAOAdditionalMetadata:
             json.dump(faostat_metadata, _output_filename, indent=2, sort_keys=True)
 
     def to_snapshot(self) -> None:
+        log.info(f"Creating snapshot for step {self.metadata['short_name']}.")
+
         # Create metadata file for current domain dataset.
         create_snapshot_metadata_file(self.metadata)
 
@@ -276,7 +280,7 @@ def main(read_only: bool = False) -> None:
                 # Skip dataset if it already is up-to-date in index.
                 log.info(f"Dataset {dataset_code} is already up-to-date.")
             else:
-                log.info(f"Dataset {dataset_code} needs to be updated.")
+                log.warning(f"Dataset {dataset_code} needs to be updated.")
                 if not read_only:
                     # Download dataset, upload file to walden bucket and add metadata file to walden index.
                     faostat_dataset.to_snapshot()
@@ -284,7 +288,7 @@ def main(read_only: bool = False) -> None:
 
     # Fetch additional metadata only if at least one dataset was updated.
     if any_dataset_was_updated:
-        log.info("Additional metadata needs to be fetched.")
+        log.warning("Additional metadata needs to be fetched.")
         if not read_only:
             additional_metadata = FAOAdditionalMetadata()
             # Fetch additional metadata from FAO API, upload file to S3 and add metadata file to walden index.
