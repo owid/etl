@@ -128,13 +128,13 @@ steps:
   data://garden/smil/2017-01-01/global_primary_energy:
     - data://meadow/smil/2017-01-01/global_primary_energy
   #
-  # Energy - Global primary energy (2022).
+  # Energy - Global primary energy (2023).
   #
-  data://garden/energy/2022-12-28/global_primary_energy:
+  data://garden/energy/2023-02-20/global_primary_energy:
     - data://garden/smil/2017-01-01/global_primary_energy
     - data://garden/bp/2022-12-28/statistical_review
-  data://grapher/energy/2022-12-28/global_primary_energy:
-    - data://garden/energy/2022-12-28/global_primary_energy
+  data://grapher/energy/2023-02-20/global_primary_energy:
+    - data://garden/energy/2023-02-20/global_primary_energy
   #
   # BP - Fossil fuel reserves/production ratio (2022).
   #
@@ -266,4 +266,10 @@ steps:
     - data://garden/energy/2022-12-28/electricity_mix
   data://grapher/energy/2022-12-28/uk_historical_electricity:
     - data://garden/energy/2022-12-28/uk_historical_electricity
+  # Energy - Global primary energy (2022).
+  data://garden/energy/2022-12-28/global_primary_energy:
+    - data://garden/smil/2017-01-01/global_primary_energy
+    - data://garden/bp/2022-12-28/statistical_review
+  data://grapher/energy/2022-12-28/global_primary_energy:
+    - data://garden/energy/2022-12-28/global_primary_energy
   ######################################################################################################################
