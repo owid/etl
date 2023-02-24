@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_3172_te_19_5_values
   file_extension: feather
-  date_accessed: 2023-02-23 15:20:29.558417
+  date_accessed: 2023-02-24 08:07:57.399554
   name: TE-19.5
   description: core-econ.org
   source_name: Our World in Data catalog backport
@@ -11,3 +11,8 @@ meta:
   is_public: false
   version: latest
   publication_date: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 6a29722d22fe0581c08f3c0b32e9e78f
+  size: 6994
+  path: dataset_3172_te_19_5_values.feather
