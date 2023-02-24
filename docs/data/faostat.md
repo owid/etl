@@ -236,6 +236,10 @@ etl faostat/YYYY-MM-DD --grapher
 ```
 8. Use OWID's internal approval tool to visually inspect changes between the old and new versions of updated charts, and
 accept or reject changes.
+9. Create a new explorers step. For the moment, this has to be done manually:
+* Duplicate the latest step in `etl/etl/steps/data/explorers/faostat/` and use the current date as the new version.
+* Duplicate entry of explorers step in the dag, and replace versions (of the step itself and its dependencies) by the
+corresponding latest versions.
 
 ## Workflow to make changes to a dataset
 
@@ -249,7 +253,7 @@ Therefore, the garden step of the dataset with the outlier has to be forced (usi
 ### Adding or removing a domain
 
 To add or remove a new domain, in principle it should be enough to add or remove its dataset code from the
-`INCLUDED_DATASETS_CODES` list in the `etl/scripts/faostat/create_new_snapshots.py` script.
+`INCLUDED_DATASETS_CODES` list in `etl/scripts/faostat/shared.py`.
 With this change, the next time that script is executed, it will only search for updates for the new list of datasets.
 And then, the `create_new_steps.py` should only create steps for datasets (among those in the new lists) that have been
 updated.
