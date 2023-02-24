@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:40:09.882542
-  description: ''
-  file_extension: feather
-  is_public: false
-  name: Total merchandise trade as share of GDP (NBER-United Nations 1962-2000) (split)
   namespace: backport
-  publication_date: latest
   short_name: dataset_3019_total_merchandise_trade_as_share_of_gdp__nber_united_nations_1962_2000__split_values
+  file_extension: feather
+  date_accessed: 2023-02-23 18:02:40.014996
+  name: Total merchandise trade as share of GDP (NBER-United Nations 1962-2000) (split)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/3019
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: bb9fd4503db94b711ae618f2be1e11c5
-  size: 50498
+- md5: a70bff75a6283d8b2a6efb318deb0092
+  size: 50874
   path: dataset_3019_total_merchandise_trade_as_share_of_gdp__nber_united_nations_1962_2000__split_values.feather

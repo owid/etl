@@ -1,22 +1,27 @@
 meta:
-  date_accessed: 2022-12-08 00:25:16.916311
-  description: "Extracted from the GSS Data Explorer\nVariable \"trust\" (https://gssdataexplorer.norc.org/variables/441/vshow)\n\
-    -> Tabulate\nColumn: Trust (Can people be trusted)\nRow: Year (GSS year for this\
-    \ respondent)\nWeight var: WTSSCOMP\nSample design: Simple Random Sample\nExclude\
-    \ missing: Yes\nNote: as of 7 Mar 2022 there is a typo in the values on the GSS\
-    \ website - we think that \"Can't trust\" actually mean \"Can trust\" and is the\
-    \ positive response, while \"Can't be too careful\" is the negative response."
-  file_extension: feather
-  is_public: true
-  name: Interpersonal Trust - General Social Survey (GSS)
   namespace: backport
-  publication_date: latest
   short_name: dataset_2971_interpersonal_trust__general_social_survey__gss_values
+  file_extension: feather
+  date_accessed: 2023-02-23 18:06:13.900824
+  name: Interpersonal Trust - General Social Survey (GSS)
+  description: |-
+    Extracted from the GSS Data Explorer
+    Variable "trust" (https://gssdataexplorer.norc.org/variables/441/vshow)
+    -> Tabulate
+    Column: Trust (Can people be trusted)
+    Row: Year (GSS year for this respondent)
+    Weight var: WTSSCOMP
+    Sample design: Simple Random Sample
+    Exclude missing: Yes
+    Note: as of 7 Mar 2022 there is a typo in the values on the GSS website - we think that "Can't trust" actually mean "Can trust" and is the positive response, while "Can't be too careful" is the negative response.
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2971
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 8bb4c47dca7f3738c8f0956da08f8d11
-  size: 6146
+- md5: d7c6e0abe339b8c4500fe3adb4d18c08
+  size: 6514
   path: dataset_2971_interpersonal_trust__general_social_survey__gss_values.feather

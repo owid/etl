@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:25:40.143626
-  description: ''
-  file_extension: json
-  is_public: false
-  name: Grapher metadata for dataset_5566_mammal_body_size_downgrading__dembitzer_et_al__2022
   namespace: backport
-  publication_date: latest
   short_name: dataset_5566_mammal_body_size_downgrading__dembitzer_et_al__2022_config
+  file_extension: json
+  date_accessed: 2023-02-23 16:39:29.198934
+  name: Grapher metadata for dataset_5566_mammal_body_size_downgrading__dembitzer_et_al__2022
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5566
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: cf0db0b3108c735dd41877aba788b31a
-  size: 2283
+- md5: 65ef28d11cbe558a5d8e80107df86fe1
+  size: 2883
   path: dataset_5566_mammal_body_size_downgrading__dembitzer_et_al__2022_config.json

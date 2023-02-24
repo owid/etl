@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:20:59.279614
-  description: ''
-  file_extension: json
-  is_public: false
-  name: Grapher metadata for dataset_5305_yougov_imperial_covid_19_behavior_tracker__composite_variables
   namespace: backport
-  publication_date: latest
   short_name: dataset_5305_yougov_imperial_covid_19_behavior_tracker__composite_variables_config
+  file_extension: json
+  date_accessed: 2023-02-23 17:17:16.665940
+  name: Grapher metadata for dataset_5305_yougov_imperial_covid_19_behavior_tracker__composite_variables
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5305
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 55a37f770490e06685854401a01ffdfa
-  size: 9388
+- md5: b34b710e823458bdd1d54d98656adbad
+  size: 10188
   path: dataset_5305_yougov_imperial_covid_19_behavior_tracker__composite_variables_config.json

@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 01:29:22.988569
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Water resources by continent - FAO AQUASTAT
   namespace: backport
-  publication_date: latest
   short_name: dataset_1837_water_resources_by_continent__fao_aquastat_values
+  file_extension: feather
+  date_accessed: 2023-02-23 15:14:15.873473
+  name: Water resources by continent - FAO AQUASTAT
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/1837
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: f18f474e0e99660465fd184101bfa5c4
-  size: 6554
+- md5: c7d8318d534883b4e940f1a4ca002406
+  size: 6930
   path: dataset_1837_water_resources_by_continent__fao_aquastat_values.feather

@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 00:21:11.998060
-  description: ''
-  file_extension: json
-  is_public: false
-  name: Grapher metadata for dataset_3033_world_trade__upper_bound__pct_of_gdp__estevadeordal__frantz__and_taylor__2003__split
   namespace: backport
-  publication_date: latest
   short_name: dataset_3033_world_trade__upper_bound__pct_of_gdp__estevadeordal__frantz__and_taylor__2003__split_config
+  file_extension: json
+  date_accessed: 2023-02-23 16:47:30.337253
+  name: Grapher metadata for dataset_3033_world_trade__upper_bound__pct_of_gdp__estevadeordal__frantz__and_taylor__2003__split
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/3033
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 31300a87b248097e647169ecb703cfda
-  size: 2895
+- md5: 752acafe0eefdf8c7b8c267952cac9d5
+  size: 3291
   path: dataset_3033_world_trade__upper_bound__pct_of_gdp__estevadeordal__frantz__and_taylor__2003__split_config.json

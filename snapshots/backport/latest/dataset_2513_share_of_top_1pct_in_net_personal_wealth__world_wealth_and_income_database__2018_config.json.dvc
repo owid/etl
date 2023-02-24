@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:55:58.318640
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_2513_share_of_top_1pct_in_net_personal_wealth__world_wealth_and_income_database__2018
   namespace: backport
-  publication_date: latest
   short_name: dataset_2513_share_of_top_1pct_in_net_personal_wealth__world_wealth_and_income_database__2018_config
+  file_extension: json
+  date_accessed: 2023-02-23 18:17:56.087714
+  name: Grapher metadata for dataset_2513_share_of_top_1pct_in_net_personal_wealth__world_wealth_and_income_database__2018
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2513
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: af811b037acf734fac1b58260242241e
-  size: 1280
+- md5: 1f17d07596478f65e77e3abd2d24647b
+  size: 1478
   path: dataset_2513_share_of_top_1pct_in_net_personal_wealth__world_wealth_and_income_database__2018_config.json

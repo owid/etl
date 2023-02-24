@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 00:09:01.386293
-  description: 'Code and data are available in this GitHub repo: https://github.com/owid/notebooks/tree/main/FionaSpooner/lung_cancer_deaths'
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_5628_lung_cancer_mortality_rates__per_100_000__2022
   namespace: backport
-  publication_date: latest
   short_name: dataset_5628_lung_cancer_mortality_rates__per_100_000__2022_config
+  file_extension: json
+  date_accessed: 2023-02-23 18:34:42.387529
+  name: Grapher metadata for dataset_5628_lung_cancer_mortality_rates__per_100_000__2022
+  description: 'Code and data are available in this GitHub repo: https://github.com/owid/notebooks/tree/main/FionaSpooner/lung_cancer_deaths'
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5628
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 6ac1cab7f61e4c803c749fcf9eb6493a
-  size: 4341
+- md5: 20573dd44187e64a96fe8b1f113b7226
+  size: 5541
   path: dataset_5628_lung_cancer_mortality_rates__per_100_000__2022_config.json

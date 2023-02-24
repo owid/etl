@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:10:07.526528
-  description: core-econ.org
-  file_extension: feather
-  is_public: false
-  name: TE-16.12_Wage
   namespace: backport
-  publication_date: latest
   short_name: dataset_3195_te_16_12_wage_values
+  file_extension: feather
+  date_accessed: 2023-02-23 18:20:20.937292
+  name: TE-16.12_Wage
+  description: core-econ.org
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/3195
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 9c583bbc55edf033c6835acfd5b760ad
-  size: 6482
+- md5: 4e616d97491c8e30ae83b1f4fb3d80f9
+  size: 6850
   path: dataset_3195_te_16_12_wage_values.feather

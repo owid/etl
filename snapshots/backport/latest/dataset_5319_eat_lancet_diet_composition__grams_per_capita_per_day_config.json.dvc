@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:55:29.848530
-  description: ''
-  file_extension: json
-  is_public: false
-  name: Grapher metadata for dataset_5319_eat_lancet_diet_composition__grams_per_capita_per_day
   namespace: backport
-  publication_date: latest
   short_name: dataset_5319_eat_lancet_diet_composition__grams_per_capita_per_day_config
+  file_extension: json
+  date_accessed: 2023-02-23 18:43:52.355685
+  name: Grapher metadata for dataset_5319_eat_lancet_diet_composition__grams_per_capita_per_day
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5319
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: ef32b3883f013a91978ef9befd64d1fc
-  size: 9215
+- md5: d2f26474d6f819b9039594ab0d59b76c
+  size: 12815
   path: dataset_5319_eat_lancet_diet_composition__grams_per_capita_per_day_config.json

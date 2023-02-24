@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:25:09.832013
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Births outside of marriage
   namespace: backport
-  publication_date: latest
   short_name: dataset_4890_births_outside_of_marriage_values
+  file_extension: feather
+  date_accessed: 2023-02-23 19:37:51.571656
+  name: Births outside of marriage
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/4890
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: f6db34a4e6db69b003a27b7ab652cee1
-  size: 14498
+- md5: cdd6b3ffc92806e94a66268a9a5e3495
+  size: 14874
   path: dataset_4890_births_outside_of_marriage_values.feather

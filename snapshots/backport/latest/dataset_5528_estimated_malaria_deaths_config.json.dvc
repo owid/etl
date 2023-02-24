@@ -1,20 +1,21 @@
 meta:
-  date_accessed: 2022-12-08 00:26:06.237776
+  namespace: backport
+  short_name: dataset_5528_estimated_malaria_deaths_config
+  file_extension: json
+  date_accessed: 2023-02-23 19:51:44.387445
+  name: Grapher metadata for dataset_5528_estimated_malaria_deaths
   description: There is some rounding of the figures for each of the regions, so that
     the sum doesn't quite add up to the values in the global estimates, which is also
     rounded. For example their estimate of global malaria deaths is 627000, but the
     regions sum to 626909.
-  file_extension: json
-  is_public: false
-  name: Grapher metadata for dataset_5528_estimated_malaria_deaths
-  namespace: backport
-  publication_date: latest
-  short_name: dataset_5528_estimated_malaria_deaths_config
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5528
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: b8aeff8b24835bb9ea3522908472e8d2
-  size: 1935
+- md5: aa2f213c6c031c638a4241aedc6110b7
+  size: 2135
   path: dataset_5528_estimated_malaria_deaths_config.json

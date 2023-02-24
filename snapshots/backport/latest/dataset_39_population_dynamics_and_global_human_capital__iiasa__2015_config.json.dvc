@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 16:27:14.809490
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_39_population_dynamics_and_global_human_capital__iiasa__2015
   namespace: backport
-  publication_date: latest
   short_name: dataset_39_population_dynamics_and_global_human_capital__iiasa__2015_config
+  file_extension: json
+  date_accessed: 2023-02-23 19:27:49.770479
+  name: Grapher metadata for dataset_39_population_dynamics_and_global_human_capital__iiasa__2015
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/39
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 17cc263465179e2a6f4bc19c3e8ae0a2
-  size: 9132
+- md5: 519f1016e3706bf3e9bb3bf1d98a9de8
+  size: 10680
   path: dataset_39_population_dynamics_and_global_human_capital__iiasa__2015_config.json

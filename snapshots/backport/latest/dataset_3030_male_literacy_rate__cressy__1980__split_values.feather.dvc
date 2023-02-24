@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:06:06.479117
-  description: Literacy figures are nationally representative.
-  file_extension: feather
-  is_public: false
-  name: Male literacy rate (Cressy (1980)) (split)
   namespace: backport
-  publication_date: latest
   short_name: dataset_3030_male_literacy_rate__cressy__1980__split_values
+  file_extension: feather
+  date_accessed: 2023-02-23 19:07:50.266425
+  name: Male literacy rate (Cressy (1980)) (split)
+  description: Literacy figures are nationally representative.
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/3030
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: aff89de0ad39c077677a7fa94b91f690
-  size: 6034
+- md5: da2d746336d5e53c439689add896dec0
+  size: 6402
   path: dataset_3030_male_literacy_rate__cressy__1980__split_values.feather

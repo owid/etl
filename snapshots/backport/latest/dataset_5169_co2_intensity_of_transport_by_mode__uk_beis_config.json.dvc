@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:10:42.384229
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_5169_co2_intensity_of_transport_by_mode__uk_beis
   namespace: backport
-  publication_date: latest
   short_name: dataset_5169_co2_intensity_of_transport_by_mode__uk_beis_config
+  file_extension: json
+  date_accessed: 2023-02-23 18:24:08.600436
+  name: Grapher metadata for dataset_5169_co2_intensity_of_transport_by_mode__uk_beis
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5169
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: eda453a1b0826bd36a29621215d3ef53
-  size: 2642
+- md5: 21e0c07cd26f9433d9728771f95cd6dc
+  size: 3242
   path: dataset_5169_co2_intensity_of_transport_by_mode__uk_beis_config.json

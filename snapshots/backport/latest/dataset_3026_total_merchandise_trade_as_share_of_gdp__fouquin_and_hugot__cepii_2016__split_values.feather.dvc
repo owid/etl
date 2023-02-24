@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 15:51:38.680391
-  description: ''
-  file_extension: feather
-  is_public: false
-  name: Total merchandise trade as share of GDP (Fouquin and Hugot (CEPII 2016)) (split)
   namespace: backport
-  publication_date: latest
   short_name: dataset_3026_total_merchandise_trade_as_share_of_gdp__fouquin_and_hugot__cepii_2016__split_values
+  file_extension: feather
+  date_accessed: 2023-02-23 19:27:30.340289
+  name: Total merchandise trade as share of GDP (Fouquin and Hugot (CEPII 2016)) (split)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/3026
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: fce664e3dc64419923cd94c045d5a4e7
-  size: 111242
+- md5: 4fa4a8ebe32d84ebc1f15ddd10a5fda2
+  size: 111618
   path: dataset_3026_total_merchandise_trade_as_share_of_gdp__fouquin_and_hugot__cepii_2016__split_values.feather

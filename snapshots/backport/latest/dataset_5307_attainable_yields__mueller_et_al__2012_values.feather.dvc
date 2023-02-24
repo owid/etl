@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 16:32:10.246862
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Attainable yields (Mueller et al. 2012)
   namespace: backport
-  publication_date: latest
   short_name: dataset_5307_attainable_yields__mueller_et_al__2012_values
+  file_extension: feather
+  date_accessed: 2023-02-23 19:31:48.456528
+  name: Attainable yields (Mueller et al. 2012)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5307
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: bef6024f293f90c3fa3d3dddabc10a9f
-  size: 317450
+- md5: 5ea4097f119d1f0c991f220983139bdc
+  size: 317826
   path: dataset_5307_attainable_yields__mueller_et_al__2012_values.feather

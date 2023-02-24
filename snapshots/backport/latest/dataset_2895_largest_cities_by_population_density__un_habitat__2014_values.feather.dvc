@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 00:33:55.350837
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Largest cities by population density - UN Habitat (2014)
   namespace: backport
-  publication_date: latest
   short_name: dataset_2895_largest_cities_by_population_density__un_habitat__2014_values
+  file_extension: feather
+  date_accessed: 2023-02-23 18:59:49.041767
+  name: Largest cities by population density - UN Habitat (2014)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2895
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 1a6a6d646224694ac71a8f5cb84fec44
-  size: 8074
+- md5: c87f3df1789417eceae1bac0c6357416
+  size: 8450
   path: dataset_2895_largest_cities_by_population_density__un_habitat__2014_values.feather

@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 01:36:51.426981
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_2674_womens_economic_opportunity_2012__economist_intelligence_unit__2012
   namespace: backport
-  publication_date: latest
   short_name: dataset_2674_womens_economic_opportunity_2012__economist_intelligence_unit__2012_config
+  file_extension: json
+  date_accessed: 2023-02-23 17:00:22.507464
+  name: Grapher metadata for dataset_2674_womens_economic_opportunity_2012__economist_intelligence_unit__2012
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2674
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 65c94c741468a044af7d86483b86152c
-  size: 4518
+- md5: a741a83faedfd4bdb4bd61dc4ce9c0e5
+  size: 4716
   path: dataset_2674_womens_economic_opportunity_2012__economist_intelligence_unit__2012_config.json

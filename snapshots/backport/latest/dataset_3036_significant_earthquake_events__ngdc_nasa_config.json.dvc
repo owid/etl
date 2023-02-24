@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:15:15.957919
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_3036_significant_earthquake_events__ngdc_nasa
   namespace: backport
-  publication_date: latest
   short_name: dataset_3036_significant_earthquake_events__ngdc_nasa_config
+  file_extension: json
+  date_accessed: 2023-02-23 16:51:02.671282
+  name: Grapher metadata for dataset_3036_significant_earthquake_events__ngdc_nasa
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/3036
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 99d2da27b0a0fe5d1be4bfeb52e91411
-  size: 2642
+- md5: 6848318fdf1897d828752e75eaea71f5
+  size: 2840
   path: dataset_3036_significant_earthquake_events__ngdc_nasa_config.json

@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:10:51.676343
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_575_public_support_and_opposition_to_nuclear_energy__ipsos_mori__2011
   namespace: backport
-  publication_date: latest
   short_name: dataset_575_public_support_and_opposition_to_nuclear_energy__ipsos_mori__2011_config
+  file_extension: json
+  date_accessed: 2023-02-23 16:29:43.260082
+  name: Grapher metadata for dataset_575_public_support_and_opposition_to_nuclear_energy__ipsos_mori__2011
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/575
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 572cc5cbc2a173cca6f5c325a32a45dc
-  size: 2698
+- md5: 8219f1f84d86233733320b09a211d9e5
+  size: 3090
   path: dataset_575_public_support_and_opposition_to_nuclear_energy__ipsos_mori__2011_config.json

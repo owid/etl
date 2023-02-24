@@ -1,18 +1,19 @@
 meta:
-  date_accessed: 2022-12-07 17:58:27.519063
-  description: ''
+  namespace: backport
+  short_name: dataset_2520_number_and_percentage_of_current_smokers__by_sex__american_lung_association__2011_values
   file_extension: feather
-  is_public: true
+  date_accessed: 2023-02-23 15:06:21.715417
   name: Number and percentage of current smokers, by sex (American Lung Association
     (2011))
-  namespace: backport
-  publication_date: latest
-  short_name: dataset_2520_number_and_percentage_of_current_smokers__by_sex__american_lung_association__2011_values
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2520
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: f6940d4bd4c2264a2459eeecfeea0fe3
-  size: 6434
+- md5: 8ff36131ca16dd1d1499e3e95767f08b
+  size: 6802
   path: dataset_2520_number_and_percentage_of_current_smokers__by_sex__american_lung_association__2011_values.feather

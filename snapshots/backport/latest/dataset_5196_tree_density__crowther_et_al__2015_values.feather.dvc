@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:32:48.128136
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Tree density (Crowther et al. 2015)
   namespace: backport
-  publication_date: latest
   short_name: dataset_5196_tree_density__crowther_et_al__2015_values
+  file_extension: feather
+  date_accessed: 2023-02-23 17:05:24.668290
+  name: Tree density (Crowther et al. 2015)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5196
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: b6b4f6105dd3259dad4602cf712656c1
-  size: 18450
+- md5: e9bbecb8c545344e9ec8efb161921f50
+  size: 18826
   path: dataset_5196_tree_density__crowther_et_al__2015_values.feather

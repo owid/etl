@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 00:40:49.118716
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Government Education Expenditure 1960-2010 - Szirmai (2015)
   namespace: backport
-  publication_date: latest
   short_name: dataset_244_government_education_expenditure_1960_2010__szirmai__2015_values
+  file_extension: feather
+  date_accessed: 2023-02-23 17:07:13.950685
+  name: Government Education Expenditure 1960-2010 - Szirmai (2015)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/244
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 1b7bf7bedbf03fb9cb88c02d9bde765f
-  size: 8634
+- md5: 1c9492158afeffba7d1b2ce5f68f37e3
+  size: 9010
   path: dataset_244_government_education_expenditure_1960_2010__szirmai__2015_values.feather

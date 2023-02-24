@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-11-29 16:51:56.217884
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_2710_child_mortality_rates__selected_gapminder__v10__2017
   namespace: backport
-  publication_date: latest
   short_name: dataset_2710_child_mortality_rates__selected_gapminder__v10__2017_config
+  file_extension: json
+  date_accessed: 2023-02-23 19:18:59.387951
+  name: Grapher metadata for dataset_2710_child_mortality_rates__selected_gapminder__v10__2017
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2710
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: fd4ac3df404a08c17890b7fcff86e917
-  size: 3568
+- md5: 6edef18679265a6ac45556565032738f
+  size: 3766
   path: dataset_2710_child_mortality_rates__selected_gapminder__v10__2017_config.json

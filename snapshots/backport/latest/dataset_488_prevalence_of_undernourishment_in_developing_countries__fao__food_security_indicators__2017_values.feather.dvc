@@ -1,18 +1,19 @@
 meta:
-  date_accessed: 2022-12-08 01:15:04.579421
-  description: ''
+  namespace: backport
+  short_name: dataset_488_prevalence_of_undernourishment_in_developing_countries__fao__food_security_indicators__2017_values
   file_extension: feather
-  is_public: true
+  date_accessed: 2023-02-23 18:27:11.115056
   name: Prevalence of Undernourishment in Developing Countries - FAO (Food Security
     Indicators) (2017)
-  namespace: backport
-  publication_date: latest
-  short_name: dataset_488_prevalence_of_undernourishment_in_developing_countries__fao__food_security_indicators__2017_values
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/488
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 1a63755c47f817e420621faa71e7889d
-  size: 6066
+- md5: da32c62ba0819dbf4399b6066780b780
+  size: 6434
   path: dataset_488_prevalence_of_undernourishment_in_developing_countries__fao__food_security_indicators__2017_values.feather

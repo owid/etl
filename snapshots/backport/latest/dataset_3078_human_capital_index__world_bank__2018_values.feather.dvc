@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:10:25.123671
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Human Capital Index (World Bank, 2018)
   namespace: backport
-  publication_date: latest
   short_name: dataset_3078_human_capital_index__world_bank__2018_values
+  file_extension: feather
+  date_accessed: 2023-02-23 18:40:31.855012
+  name: Human Capital Index (World Bank, 2018)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/3078
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 83b53491e2d23292e7b88ea6b4b80d55
-  size: 12106
+- md5: cdfa6ecf300c5a0d5a512acc527b6187
+  size: 12482
   path: dataset_3078_human_capital_index__world_bank__2018_values.feather

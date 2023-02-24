@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 00:17:56.785735
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: World GDP in 2011 int $ – OWID based on World Bank + Maddison (2017)
   namespace: backport
-  publication_date: latest
   short_name: dataset_393_world_gdp_in_2011_int_dollar__owid_based_on_world_bank_plus_maddison__2017_values
+  file_extension: feather
+  date_accessed: 2023-02-23 17:41:11.964750
+  name: World GDP in 2011 int $ – OWID based on World Bank + Maddison (2017)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/393
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 8be8c701a23603967e157aa4c328eec7
-  size: 6802
+- md5: 48df5187481996883495c0593cc0b905
+  size: 7170
   path: dataset_393_world_gdp_in_2011_int_dollar__owid_based_on_world_bank_plus_maddison__2017_values.feather

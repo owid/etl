@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:00:56.379439
-  description: ''
-  file_extension: feather
-  is_public: false
-  name: Young people opinions climate change (Hickman et al. 2021)
   namespace: backport
-  publication_date: latest
   short_name: dataset_5682_young_people_opinions_climate_change__hickman_et_al__2021_values
+  file_extension: feather
+  date_accessed: 2023-02-23 15:18:30.574550
+  name: Young people opinions climate change (Hickman et al. 2021)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5682
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: b0a5388b50623dd8a97879a1086cc09f
-  size: 6602
+- md5: aa83a063799b307d0ef15f7ef9a7b352
+  size: 6970
   path: dataset_5682_young_people_opinions_climate_change__hickman_et_al__2021_values.feather

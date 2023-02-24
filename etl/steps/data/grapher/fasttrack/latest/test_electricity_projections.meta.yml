@@ -1,0 +1,23 @@
+dataset:
+  namespace: fasttrack
+  version: latest
+  short_name: test_electricity_projections
+  title: DRAFT test electricity projections
+  description: ''
+  sources:
+  - name: Unknown
+    published_by: Unknown
+    publication_year: 2023
+    date_accessed: 2023-02-21
+tables:
+  test_electricity_projections:
+    variables:
+      gas:
+        title: Gas
+        unit: ''
+      coal:
+        title: Coal
+        unit: ''
+      electricity:
+        title: Electricity
+        unit: ''

@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 15:49:11.961644
-  description: core-econ.org
-  file_extension: json
-  is_public: false
-  name: Grapher metadata for dataset_3255_figure_22_17_democracy
   namespace: backport
-  publication_date: latest
   short_name: dataset_3255_figure_22_17_democracy_config
+  file_extension: json
+  date_accessed: 2023-02-23 19:46:22.169411
+  name: Grapher metadata for dataset_3255_figure_22_17_democracy
+  description: core-econ.org
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/3255
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: a4e4952786278d31c708f5e3e5899cf8
-  size: 1384
+- md5: 391012cd2717467db47708444a251fea
+  size: 1582
   path: dataset_3255_figure_22_17_democracy_config.json

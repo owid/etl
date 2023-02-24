@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:59:44.902280
-  description: This is a dataset imported by the automated fetcher
-  file_extension: feather
-  is_public: true
-  name: Labour - LFS by sex and age - indicators
   namespace: backport
-  publication_date: latest
   short_name: dataset_2593_labour__lfs_by_sex_and_age__indicators_values
+  file_extension: feather
+  date_accessed: 2023-02-23 17:33:01.762112
+  name: Labour - LFS by sex and age - indicators
+  description: This is a dataset imported by the automated fetcher
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2593
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 9a3249549cf76dc47a078847fce49bf6
-  size: 1190818
+- md5: 26b7114bf485ecddf783fd89228a5802
+  size: 1191202
   path: dataset_2593_labour__lfs_by_sex_and_age__indicators_values.feather

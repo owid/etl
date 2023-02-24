@@ -1,18 +1,19 @@
 meta:
-  date_accessed: 2022-12-07 17:06:41.250835
-  description: ''
+  namespace: backport
+  short_name: dataset_5256_reconstruction_of_historical_global_extreme_poverty_rates__1820_2017__roser_and_hasell__2021__and_world_bank__2020_values
   file_extension: feather
-  is_public: false
+  date_accessed: 2023-02-23 18:45:53.773713
   name: Reconstruction of historical global extreme poverty rates, 1820-2017 (Roser
     and Hasell (2021) and World Bank(2020))
-  namespace: backport
-  publication_date: latest
-  short_name: dataset_5256_reconstruction_of_historical_global_extreme_poverty_rates__1820_2017__roser_and_hasell__2021__and_world_bank__2020_values
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5256
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: d8a117ba29e8a8fa24dd643469731d94
-  size: 7266
+- md5: 3e65e1638a38788ed9b3e4d0d4a90eb0
+  size: 7642
   path: dataset_5256_reconstruction_of_historical_global_extreme_poverty_rates__1820_2017__roser_and_hasell__2021__and_world_bank__2020_values.feather

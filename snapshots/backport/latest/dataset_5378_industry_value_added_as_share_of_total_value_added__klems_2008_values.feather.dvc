@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 01:35:16.370240
-  description: ''
-  file_extension: feather
-  is_public: false
-  name: Industry value added as share of total value added (KLEMS 2008)
   namespace: backport
-  publication_date: latest
   short_name: dataset_5378_industry_value_added_as_share_of_total_value_added__klems_2008_values
+  file_extension: feather
+  date_accessed: 2023-02-23 19:16:56.150637
+  name: Industry value added as share of total value added (KLEMS 2008)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5378
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: ec119f057eeb2a24bb419aa7e3b36735
-  size: 120882
+- md5: 12306f88383dcd256a6c3cee92f1c344
+  size: 121258
   path: dataset_5378_industry_value_added_as_share_of_total_value_added__klems_2008_values.feather

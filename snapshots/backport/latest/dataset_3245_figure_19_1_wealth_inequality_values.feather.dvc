@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:14:28.707118
-  description: core-econ.org
-  file_extension: feather
-  is_public: false
-  name: Figure 19.1_Wealth inequality
   namespace: backport
-  publication_date: latest
   short_name: dataset_3245_figure_19_1_wealth_inequality_values
+  file_extension: feather
+  date_accessed: 2023-02-23 18:46:15.936877
+  name: Figure 19.1_Wealth inequality
+  description: core-econ.org
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/3245
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: a66f00b917c768b15464f09c4b72390f
-  size: 5890
+- md5: 0c18457d7158106008345b7063641645
+  size: 6258
   path: dataset_3245_figure_19_1_wealth_inequality_values.feather

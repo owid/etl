@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 16:54:30.386563
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Precipitation anomaly in US (NOAA)
   namespace: backport
-  publication_date: latest
   short_name: dataset_2958_precipitation_anomaly_in_us__noaa_values
+  file_extension: feather
+  date_accessed: 2023-02-23 19:04:12.901881
+  name: Precipitation anomaly in US (NOAA)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2958
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 4d4127529934525528f8907595159944
-  size: 6890
+- md5: fa789fab0349161cd03b033c1231bc9f
+  size: 7266
   path: dataset_2958_precipitation_anomaly_in_us__noaa_values.feather

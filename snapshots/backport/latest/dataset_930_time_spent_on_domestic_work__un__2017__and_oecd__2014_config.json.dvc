@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 15:59:47.304086
-  description: Average number of hours spent on paid and unpaid domestic work by sex.
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_930_time_spent_on_domestic_work__un__2017__and_oecd__2014
   namespace: backport
-  publication_date: latest
   short_name: dataset_930_time_spent_on_domestic_work__un__2017__and_oecd__2014_config
+  file_extension: json
+  date_accessed: 2023-02-23 17:52:20.506276
+  name: Grapher metadata for dataset_930_time_spent_on_domestic_work__un__2017__and_oecd__2014
+  description: Average number of hours spent on paid and unpaid domestic work by sex.
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/930
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: c2d3c8faa82917cfad99853082b340d4
-  size: 3927
+- md5: c0071f60680914f0282071fed5494c28
+  size: 4125
   path: dataset_930_time_spent_on_domestic_work__un__2017__and_oecd__2014_config.json

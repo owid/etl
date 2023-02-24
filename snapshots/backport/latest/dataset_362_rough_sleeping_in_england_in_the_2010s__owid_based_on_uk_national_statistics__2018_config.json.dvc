@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:56:24.911429
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_362_rough_sleeping_in_england_in_the_2010s__owid_based_on_uk_national_statistics__2018
   namespace: backport
-  publication_date: latest
   short_name: dataset_362_rough_sleeping_in_england_in_the_2010s__owid_based_on_uk_national_statistics__2018_config
+  file_extension: json
+  date_accessed: 2023-02-23 19:10:58.181905
+  name: Grapher metadata for dataset_362_rough_sleeping_in_england_in_the_2010s__owid_based_on_uk_national_statistics__2018
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/362
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: e2ddc605301b767eff9980a090062493
-  size: 2982
+- md5: 4dbf0a24b658392fec3cabc48e2b4f8f
+  size: 3374
   path: dataset_362_rough_sleeping_in_england_in_the_2010s__owid_based_on_uk_national_statistics__2018_config.json

@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:59:37.136518
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Economic impacts 2vs1.5C - Pretis et al.
   namespace: backport
-  publication_date: latest
   short_name: dataset_2666_economic_impacts_2vs1_5c__pretis_et_al_values
+  file_extension: feather
+  date_accessed: 2023-02-23 19:19:45.424840
+  name: Economic impacts 2vs1.5C - Pretis et al.
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2666
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 288ebc015cce0d06bfface6e02268d84
-  size: 16226
+- md5: f7c549aa06be5c3fe118a4692fd1120f
+  size: 16602
   path: dataset_2666_economic_impacts_2vs1_5c__pretis_et_al_values.feather

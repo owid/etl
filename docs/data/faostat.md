@@ -15,7 +15,7 @@ The location of each file and the date of their latest update is found by queryi
 Further (additional) metadata for each domain is downloaded using
 [an API](https://fenixservices.fao.org/faostat/api/v1/en/definitions/domain).
 The process to ingest data and metadata is carried out by
-[this walden script](https://github.com/owid/walden/blob/master/ingests/faostat.py).
+[this script](https://github.com/owid/etl/blob/master/etl/scripts/faostat/create_new_snapshots.py).
 
 Each FAO dataset is typically given as a long table with the following columns:
 * `Area Code`: Identifier code of the country/region.
@@ -96,7 +96,7 @@ Exceptionally, one dataset has different column names:
   `recipient_country` instead of `area`.
 
 There is an additional dataset:
-* `faostat_metadata`: FAOSTAT (additional) metadata dataset (originally ingested in walden using the FAOSTAT API).
+* `faostat_metadata`: FAOSTAT (additional) metadata dataset (originally ingested using the FAOSTAT API).
   This dataset contains as many tables as domain-categories (e.g. 'faostat_qcl_area', 'faostat_fbs_item', ...).
   All categories are defined in `category_structure` in the meadow `faostat_metadata.py` step file.
 
@@ -203,12 +203,12 @@ which there is new data (let us call the new dataset version to be created `YYYY
 ```bash
   poetry shell
 ```
-1. Execute the walden ingest script, to fetch data for any dataset that may have been updated in FAOSTAT.
+1. Execute the ingestion script, to fetch data for any dataset that may have been updated in FAOSTAT.
 If no dataset requires an update, the workflow stops here.
 
     Note: This can be executed with the `-r` flag to simply check for updates without writing anything.
 ```bash
-python vendor/walden/ingests/faostat.py
+python etl/scripts/faostat/create_new_snapshots.py
 ```
 2. Create new meadow steps.
 ```bash
@@ -249,7 +249,7 @@ Therefore, the garden step of the dataset with the outlier has to be forced (usi
 ### Adding or removing a domain
 
 To add or remove a new domain, in principle it should be enough to add or remove its dataset code from the
-`INCLUDED_DATASETS_CODES` list in walden's `ingests/faostat.py` script.
+`INCLUDED_DATASETS_CODES` list in the `etl/scripts/faostat/create_new_snapshots.py` script.
 With this change, the next time that script is executed, it will only search for updates for the new list of datasets.
 And then, the `create_new_steps.py` should only create steps for datasets (among those in the new lists) that have been
 updated.

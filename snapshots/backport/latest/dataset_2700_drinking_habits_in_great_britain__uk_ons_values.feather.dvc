@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 15:40:07.705593
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Drinking habits in Great Britain - UK ONS
   namespace: backport
-  publication_date: latest
   short_name: dataset_2700_drinking_habits_in_great_britain__uk_ons_values
+  file_extension: feather
+  date_accessed: 2023-02-23 18:31:03.277053
+  name: Drinking habits in Great Britain - UK ONS
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2700
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: d410c06f9d10e642e8ba20504d28ff62
-  size: 9642
+- md5: fe93ade4abc120a5f07f0c047cf18afc
+  size: 10018
   path: dataset_2700_drinking_habits_in_great_britain__uk_ons_values.feather

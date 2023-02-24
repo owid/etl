@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 00:17:10.861841
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_5819_nuclear_warhead_inventories__federation_of_american_scientists
   namespace: backport
-  publication_date: latest
   short_name: dataset_5819_nuclear_warhead_inventories__federation_of_american_scientists_config
+  file_extension: json
+  date_accessed: 2023-02-23 18:51:50.102014
+  name: Grapher metadata for dataset_5819_nuclear_warhead_inventories__federation_of_american_scientists
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5819
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: f1d3629c8269a99e19d9157a94ff94ce
-  size: 4362
+- md5: 852c62f28c082508efddeb1ccd9849c9
+  size: 5362
   path: dataset_5819_nuclear_warhead_inventories__federation_of_american_scientists_config.json

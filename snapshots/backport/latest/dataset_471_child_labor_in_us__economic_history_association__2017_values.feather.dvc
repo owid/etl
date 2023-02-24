@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 15:57:28.575227
-  description: Incidence of child labor in US - Economic History Association
-  file_extension: feather
-  is_public: true
-  name: Child Labor in US - Economic History Association (2017)
   namespace: backport
-  publication_date: latest
   short_name: dataset_471_child_labor_in_us__economic_history_association__2017_values
+  file_extension: feather
+  date_accessed: 2023-02-23 18:43:19.170466
+  name: Child Labor in US - Economic History Association (2017)
+  description: Incidence of child labor in US - Economic History Association
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/471
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 334be4451f269d05a47294c1a39a1dae
-  size: 5970
+- md5: ba7c7c09f47b0f7366cf499fd9ac0976
+  size: 6338
   path: dataset_471_child_labor_in_us__economic_history_association__2017_values.feather

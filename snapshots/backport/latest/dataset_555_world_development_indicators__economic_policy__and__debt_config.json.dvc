@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:50:19.414236
-  description: This is a dataset imported by the automated fetcher
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_555_world_development_indicators__economic_policy__and__debt
   namespace: backport
-  publication_date: latest
   short_name: dataset_555_world_development_indicators__economic_policy__and__debt_config
+  file_extension: json
+  date_accessed: 2023-02-23 17:25:55.277039
+  name: Grapher metadata for dataset_555_world_development_indicators__economic_policy__and__debt
+  description: This is a dataset imported by the automated fetcher
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/555
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 7668228268d857a65c850fb3f4ed51d7
-  size: 1078909
+- md5: 77b6d1e351f93d36ea93f1fc262b41f7
+  size: 1178911
   path: dataset_555_world_development_indicators__economic_policy__and__debt_config.json

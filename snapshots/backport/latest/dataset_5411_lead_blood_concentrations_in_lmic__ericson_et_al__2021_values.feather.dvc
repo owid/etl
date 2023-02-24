@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 00:00:53.674863
-  description: ''
-  file_extension: feather
-  is_public: false
-  name: Lead blood concentrations in LMIC (Ericson et al. 2021)
   namespace: backport
-  publication_date: latest
   short_name: dataset_5411_lead_blood_concentrations_in_lmic__ericson_et_al__2021_values
+  file_extension: feather
+  date_accessed: 2023-02-23 19:37:12.533916
+  name: Lead blood concentrations in LMIC (Ericson et al. 2021)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5411
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 33d10b411da100c20c68deb8ee1e5bc6
-  size: 8002
+- md5: b5e834cd643476d5df67278f7bfc849c
+  size: 8370
   path: dataset_5411_lead_blood_concentrations_in_lmic__ericson_et_al__2021_values.feather

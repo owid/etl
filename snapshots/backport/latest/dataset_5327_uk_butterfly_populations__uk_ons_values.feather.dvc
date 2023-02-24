@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-15 12:01:02.745419
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: UK Butterfly Populations (UK ONS)
   namespace: backport
-  publication_date: latest
   short_name: dataset_5327_uk_butterfly_populations__uk_ons_values
+  file_extension: feather
+  date_accessed: 2023-02-23 16:51:23.445605
+  name: UK Butterfly Populations (UK ONS)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5327
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 46cf3760267b1a136f6936d87afd473a
-  size: 8410
+- md5: d8a455151fc1a06d3507a8e77ead6a25
+  size: 8786
   path: dataset_5327_uk_butterfly_populations__uk_ons_values.feather

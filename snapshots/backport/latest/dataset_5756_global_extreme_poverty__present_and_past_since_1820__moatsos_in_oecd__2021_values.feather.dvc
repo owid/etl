@@ -1,18 +1,19 @@
 meta:
-  date_accessed: 2022-12-08 00:37:16.211350
+  namespace: backport
+  short_name: dataset_5756_global_extreme_poverty__present_and_past_since_1820__moatsos_in_oecd__2021_values
+  file_extension: feather
+  date_accessed: 2023-02-23 18:15:10.629650
+  name: 'Global extreme poverty: Present and past since 1820 (Moatsos in OECD, 2021)'
   description: Soon to be uploaded to Utrecht University open repository. Plans to
     update to 2017 PPP are not clear yet.
-  file_extension: feather
-  is_public: true
-  name: 'Global extreme poverty: Present and past since 1820 (Moatsos in OECD, 2021)'
-  namespace: backport
-  publication_date: latest
-  short_name: dataset_5756_global_extreme_poverty__present_and_past_since_1820__moatsos_in_oecd__2021_values
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5756
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 70f317ad269fac1638ba25ae1b4036dd
-  size: 343562
+- md5: 83e58a28dfd484c4af56277880ba9a81
+  size: 343938
   path: dataset_5756_global_extreme_poverty__present_and_past_since_1820__moatsos_in_oecd__2021_values.feather

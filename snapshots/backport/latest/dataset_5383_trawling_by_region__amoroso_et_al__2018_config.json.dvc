@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 16:59:20.409999
-  description: ''
-  file_extension: json
-  is_public: false
-  name: Grapher metadata for dataset_5383_trawling_by_region__amoroso_et_al__2018
   namespace: backport
-  publication_date: latest
   short_name: dataset_5383_trawling_by_region__amoroso_et_al__2018_config
+  file_extension: json
+  date_accessed: 2023-02-23 16:37:37.515900
+  name: Grapher metadata for dataset_5383_trawling_by_region__amoroso_et_al__2018
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5383
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 104624e935e6a1cd62a3718d6bd0954f
-  size: 1896
+- md5: b08b8aa2163cff161f8b0f9544c1de1b
+  size: 2096
   path: dataset_5383_trawling_by_region__amoroso_et_al__2018_config.json

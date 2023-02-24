@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 00:36:04.896289
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_2722_current_gdp__british_pounds__fouquin_and_hugot__cepii_2016
   namespace: backport
-  publication_date: latest
   short_name: dataset_2722_current_gdp__british_pounds__fouquin_and_hugot__cepii_2016_config
+  file_extension: json
+  date_accessed: 2023-02-23 17:36:11.235078
+  name: Grapher metadata for dataset_2722_current_gdp__british_pounds__fouquin_and_hugot__cepii_2016
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2722
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 89c70e152cfaf21fe2df59f1c7b74c6b
-  size: 2766
+- md5: d6e7029f38dfc341ce821423e8937d38
+  size: 2964
   path: dataset_2722_current_gdp__british_pounds__fouquin_and_hugot__cepii_2016_config.json

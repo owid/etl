@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 01:31:44.025835
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Lighting efficiency in UK - OWID based on Fouquet & Pearson (2007)
   namespace: backport
-  publication_date: latest
   short_name: dataset_949_lighting_efficiency_in_uk__owid_based_on_fouquet__and__pearson__2007_values
+  file_extension: feather
+  date_accessed: 2023-02-23 18:12:24.446946
+  name: Lighting efficiency in UK - OWID based on Fouquet & Pearson (2007)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/949
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: f00df95b0d7f3f1432cb68b070ab8793
-  size: 5930
+- md5: fc23619bb44dbad548097a5bb3c55450
+  size: 6298
   path: dataset_949_lighting_efficiency_in_uk__owid_based_on_fouquet__and__pearson__2007_values.feather

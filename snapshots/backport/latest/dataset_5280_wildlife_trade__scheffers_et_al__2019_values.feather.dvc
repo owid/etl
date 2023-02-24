@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:38:43.162676
-  description: ''
-  file_extension: feather
-  is_public: false
-  name: Wildlife trade (Scheffers et al. 2019)
   namespace: backport
-  publication_date: latest
   short_name: dataset_5280_wildlife_trade__scheffers_et_al__2019_values
+  file_extension: feather
+  date_accessed: 2023-02-23 17:24:03.977188
+  name: Wildlife trade (Scheffers et al. 2019)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5280
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 613bd83532f296d7e844056efbbe2f47
-  size: 6242
+- md5: 4935b3eab27101b354bd99f63786728e
+  size: 6610
   path: dataset_5280_wildlife_trade__scheffers_et_al__2019_values.feather

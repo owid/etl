@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:42:17.546395
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: A Century of Work and Leisure - Ramey and Francis (2009)
   namespace: backport
-  publication_date: latest
   short_name: dataset_2800_a_century_of_work_and_leisure__ramey_and_francis__2009_values
+  file_extension: feather
+  date_accessed: 2023-02-23 17:03:58.089162
+  name: A Century of Work and Leisure - Ramey and Francis (2009)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2800
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: b8ad6deeb40142aa9308b9016abc9d80
-  size: 9082
+- md5: 8abd811bf9ed18a6915a56975c54472c
+  size: 9458
   path: dataset_2800_a_century_of_work_and_leisure__ramey_and_francis__2009_values.feather

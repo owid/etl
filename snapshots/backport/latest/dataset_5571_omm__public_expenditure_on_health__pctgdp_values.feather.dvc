@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:32:12.388341
-  description: ''
-  file_extension: feather
-  is_public: false
-  name: OMM - Public expenditure on health (%GDP)
   namespace: backport
-  publication_date: latest
   short_name: dataset_5571_omm__public_expenditure_on_health__pctgdp_values
+  file_extension: feather
+  date_accessed: 2023-02-23 17:08:16.251485
+  name: OMM - Public expenditure on health (%GDP)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5571
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 73cc55b3f36f073a2a979b63dfc2b053
-  size: 19258
+- md5: ead4279e1d471b5a1d58d5a44e4e7571
+  size: 19634
   path: dataset_5571_omm__public_expenditure_on_health__pctgdp_values.feather

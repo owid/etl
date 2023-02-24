@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:31:59.777316
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: State of Vaccine Confidence - Larson et al (2016)
   namespace: backport
-  publication_date: latest
   short_name: dataset_371_state_of_vaccine_confidence__larson_et_al__2016_values
+  file_extension: feather
+  date_accessed: 2023-02-23 15:02:55.972757
+  name: State of Vaccine Confidence - Larson et al (2016)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/371
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 7eb35d05ab7508211d6b85cb2a75ba55
-  size: 8746
+- md5: bf67ba484443989bb696df2f51f034be
+  size: 9114
   path: dataset_371_state_of_vaccine_confidence__larson_et_al__2016_values.feather

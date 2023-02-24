@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:17:13.963081
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_2863_male_and_female_life_expectancy_by_age_in_the_long_run__human_mortality_database__2018__and_others
   namespace: backport
-  publication_date: latest
   short_name: dataset_2863_male_and_female_life_expectancy_by_age_in_the_long_run__human_mortality_database__2018__and_others_config
+  file_extension: json
+  date_accessed: 2023-02-23 17:23:31.428742
+  name: Grapher metadata for dataset_2863_male_and_female_life_expectancy_by_age_in_the_long_run__human_mortality_database__2018__and_others
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2863
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 385f19064d2591b6e3a575b5871a6f9d
-  size: 8425
+- md5: e4846aae93976fb1a88557c6b29b088e
+  size: 10801
   path: dataset_2863_male_and_female_life_expectancy_by_age_in_the_long_run__human_mortality_database__2018__and_others_config.json

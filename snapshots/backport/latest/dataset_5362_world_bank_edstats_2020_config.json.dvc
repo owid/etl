@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-11-29 16:29:23.911925
-  description: This is a dataset imported by the automated fetcher
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_5362_world_bank_edstats_2020
   namespace: backport
-  publication_date: latest
   short_name: dataset_5362_world_bank_edstats_2020_config
+  file_extension: json
+  date_accessed: 2023-02-23 16:32:39.930352
+  name: Grapher metadata for dataset_5362_world_bank_edstats_2020
+  description: This is a dataset imported by the automated fetcher
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5362
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 878b03e2857038680c828f5854257b88
-  size: 3672418
+- md5: c7a2ed13ba5e17c8fa8416c0c79362f9
+  size: 4405418
   path: dataset_5362_world_bank_edstats_2020_config.json

@@ -1,18 +1,19 @@
 meta:
-  date_accessed: 2022-12-08 00:53:09.583726
-  description: ''
+  namespace: backport
+  short_name: dataset_5302_harmonized_learning_outcomes__hlo__angrist__djankov__goldberg__and_patrinos__2021_values
   file_extension: feather
-  is_public: false
+  date_accessed: 2023-02-23 15:12:15.771112
   name: Harmonized Learning Outcomes (HLO) - Angrist, Djankov, Goldberg, and Patrinos
     (2021)
-  namespace: backport
-  publication_date: latest
-  short_name: dataset_5302_harmonized_learning_outcomes__hlo__angrist__djankov__goldberg__and_patrinos__2021_values
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5302
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 1b51d1cd11aeb4d0ed467ecf3292b0c7
-  size: 84722
+- md5: 75ae1deb29d0e42235f1b2b463e999b9
+  size: 85098
   path: dataset_5302_harmonized_learning_outcomes__hlo__angrist__djankov__goldberg__and_patrinos__2021_values.feather

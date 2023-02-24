@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:56:05.137693
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Government Expenditure – IMF based on Mauro et al. (2015)
   namespace: backport
-  publication_date: latest
   short_name: dataset_310_government_expenditure__imf_based_on_mauro_et_al__2015_values
+  file_extension: feather
+  date_accessed: 2023-02-23 18:12:31.469063
+  name: Government Expenditure – IMF based on Mauro et al. (2015)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/310
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: dbb48a509124ae913d307bae5f032e8e
-  size: 66882
+- md5: e139fdc09fd7b972cdbbb0e782846c6b
+  size: 67258
   path: dataset_310_government_expenditure__imf_based_on_mauro_et_al__2015_values.feather

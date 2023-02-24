@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:13:44.412962
-  description: ''
-  file_extension: json
-  is_public: false
-  name: Grapher metadata for dataset_3015_female_labor_force_participation_index__owid__2017__split
   namespace: backport
-  publication_date: latest
   short_name: dataset_3015_female_labor_force_participation_index__owid__2017__split_config
+  file_extension: json
+  date_accessed: 2023-02-23 19:50:58.015329
+  name: Grapher metadata for dataset_3015_female_labor_force_participation_index__owid__2017__split
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/3015
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: e213782379ffb3b4d75badb5154a012b
-  size: 1985
+- md5: 5d6acac14c9953b0527781f417b53c67
+  size: 2183
   path: dataset_3015_female_labor_force_participation_index__owid__2017__split_config.json

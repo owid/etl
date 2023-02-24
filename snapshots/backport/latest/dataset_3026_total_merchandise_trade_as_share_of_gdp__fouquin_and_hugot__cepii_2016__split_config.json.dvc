@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 15:51:35.607764
-  description: ''
-  file_extension: json
-  is_public: false
-  name: Grapher metadata for dataset_3026_total_merchandise_trade_as_share_of_gdp__fouquin_and_hugot__cepii_2016__split
   namespace: backport
-  publication_date: latest
   short_name: dataset_3026_total_merchandise_trade_as_share_of_gdp__fouquin_and_hugot__cepii_2016__split_config
+  file_extension: json
+  date_accessed: 2023-02-23 19:27:00.089287
+  name: Grapher metadata for dataset_3026_total_merchandise_trade_as_share_of_gdp__fouquin_and_hugot__cepii_2016__split
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/3026
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 322d6c33f7622fff59df0cc21104d587
-  size: 2332
+- md5: 66d47f3eb4718273a7ad3b8b513cc98f
+  size: 2530
   path: dataset_3026_total_merchandise_trade_as_share_of_gdp__fouquin_and_hugot__cepii_2016__split_config.json

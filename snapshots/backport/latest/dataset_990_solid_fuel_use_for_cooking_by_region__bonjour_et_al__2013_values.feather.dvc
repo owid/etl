@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 00:29:33.797403
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Solid fuel use for cooking by region - Bonjour et al. (2013)
   namespace: backport
-  publication_date: latest
   short_name: dataset_990_solid_fuel_use_for_cooking_by_region__bonjour_et_al__2013_values
+  file_extension: feather
+  date_accessed: 2023-02-23 18:42:40.678525
+  name: Solid fuel use for cooking by region - Bonjour et al. (2013)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/990
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 61b1aec764cc28b1ef9535c94879355e
-  size: 6258
+- md5: ddf28179747d9030e1bce0d4584a8d81
+  size: 6626
   path: dataset_990_solid_fuel_use_for_cooking_by_region__bonjour_et_al__2013_values.feather

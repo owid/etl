@@ -1,18 +1,19 @@
 meta:
-  date_accessed: 2022-12-07 17:05:29.365095
-  description: ''
+  namespace: backport
+  short_name: dataset_361_share_of_people_experiencing_homelessness_in_the_usa_2007_2016__per_100_000__hud__2016__and_u_s__census_bureau__2010_values
   file_extension: feather
-  is_public: true
+  date_accessed: 2023-02-23 19:30:01.261420
   name: Share of people experiencing homelessness in the USA 2007-2016 (per 100,000)
     - HUD (2016) and U.S. Census Bureau (2010)
-  namespace: backport
-  publication_date: latest
-  short_name: dataset_361_share_of_people_experiencing_homelessness_in_the_usa_2007_2016__per_100_000__hud__2016__and_u_s__census_bureau__2010_values
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/361
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: b145b912c06455a930dbb4fc636c9a2d
-  size: 6106
+- md5: bc5fed6a5dddc918183092cf2cf17e85
+  size: 6474
   path: dataset_361_share_of_people_experiencing_homelessness_in_the_usa_2007_2016__per_100_000__hud__2016__and_u_s__census_bureau__2010_values.feather

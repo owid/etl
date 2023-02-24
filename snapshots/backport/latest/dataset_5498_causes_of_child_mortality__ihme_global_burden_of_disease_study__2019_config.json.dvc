@@ -1,21 +1,29 @@
 meta:
-  date_accessed: 2022-12-07 18:08:42.225335
-  description: "The permalink to download data: http://ghdx.healthdata.org/gbd-results-tool?params=gbd-api-2019-permalink/7a483ad2f2e1b646bc258b7fd4cf3492\n\
-    \nThe following selection was made and downloaded:\nLocation: Global\nYears: 1990\
-    \ & most recent year\nContext: Cause\nAge: Under 5\nMetric: Number\nMeasure: Deaths\n\
-    Sex: Both\nCause: 'Select only most detailed causes' but remove causes where the\
-    \ estimates are 0."
-  file_extension: json
-  is_public: false
-  name: Grapher metadata for dataset_5498_causes_of_child_mortality__ihme_global_burden_of_disease_study__2019
   namespace: backport
-  publication_date: latest
   short_name: dataset_5498_causes_of_child_mortality__ihme_global_burden_of_disease_study__2019_config
+  file_extension: json
+  date_accessed: 2023-02-23 17:19:07.547718
+  name: Grapher metadata for dataset_5498_causes_of_child_mortality__ihme_global_burden_of_disease_study__2019
+  description: |-
+    The permalink to download data: http://ghdx.healthdata.org/gbd-results-tool?params=gbd-api-2019-permalink/7a483ad2f2e1b646bc258b7fd4cf3492
+
+    The following selection was made and downloaded:
+    Location: Global
+    Years: 1990 & most recent year
+    Context: Cause
+    Age: Under 5
+    Metric: Number
+    Measure: Deaths
+    Sex: Both
+    Cause: 'Select only most detailed causes' but remove causes where the estimates are 0.
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5498
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 35d15aad5e7020fa060d81c2c07895f8
-  size: 1877
+- md5: 543ee1f0433dfe98fe17540cfe0059ec
+  size: 2077
   path: dataset_5498_causes_of_child_mortality__ihme_global_burden_of_disease_study__2019_config.json

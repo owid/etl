@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 00:42:11.145317
-  description: ''
-  file_extension: feather
-  is_public: false
-  name: Top marginal income tax rate - World Inequality Report (2018)
   namespace: backport
-  publication_date: latest
   short_name: dataset_5246_top_marginal_income_tax_rate__world_inequality_report__2018_values
+  file_extension: feather
+  date_accessed: 2023-02-23 17:47:56.059545
+  name: Top marginal income tax rate - World Inequality Report (2018)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5246
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: f1f2ae0e9fd69ca15ff79216dfeb22b9
-  size: 7394
+- md5: d48eeba8783aa36b7f80ca525d5d84e8
+  size: 7770
   path: dataset_5246_top_marginal_income_tax_rate__world_inequality_report__2018_values.feather

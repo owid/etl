@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:44:52.327769
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Gini Coefficients – OECD (2016)
   namespace: backport
-  publication_date: latest
   short_name: dataset_312_gini_coefficients__oecd__2016_values
+  file_extension: feather
+  date_accessed: 2023-02-23 16:41:54.427514
+  name: Gini Coefficients – OECD (2016)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/312
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: d07a5b5a61a25962ea4f38b9ef9026ce
-  size: 9682
+- md5: c85689edbadc68e9d651ad326567df1f
+  size: 10050
   path: dataset_312_gini_coefficients__oecd__2016_values.feather

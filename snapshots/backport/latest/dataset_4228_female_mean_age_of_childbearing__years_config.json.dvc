@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 01:44:34.965102
-  description: ''
-  file_extension: json
-  is_public: false
-  name: Grapher metadata for dataset_4228_female_mean_age_of_childbearing__years
   namespace: backport
-  publication_date: latest
   short_name: dataset_4228_female_mean_age_of_childbearing__years_config
+  file_extension: json
+  date_accessed: 2023-02-23 17:09:27.724444
+  name: Grapher metadata for dataset_4228_female_mean_age_of_childbearing__years
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/4228
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: be7420e5415279189c596998df0b2267
-  size: 1844
+- md5: 850532aecd3ae7ab8a23397f7bbec3e1
+  size: 2044
   path: dataset_4228_female_mean_age_of_childbearing__years_config.json

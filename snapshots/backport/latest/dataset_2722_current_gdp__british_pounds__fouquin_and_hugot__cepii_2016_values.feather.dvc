@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 00:36:14.462721
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Current GDP (British pounds) - Fouquin and Hugot (CEPII 2016)
   namespace: backport
-  publication_date: latest
   short_name: dataset_2722_current_gdp__british_pounds__fouquin_and_hugot__cepii_2016_values
+  file_extension: feather
+  date_accessed: 2023-02-23 17:36:38.262260
+  name: Current GDP (British pounds) - Fouquin and Hugot (CEPII 2016)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2722
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 08b539dfb46ef29d07e57deb69173042
-  size: 99322
+- md5: 9ac152128d7e5439d68e2e9f481ecfa6
+  size: 99698
   path: dataset_2722_current_gdp__british_pounds__fouquin_and_hugot__cepii_2016_values.feather

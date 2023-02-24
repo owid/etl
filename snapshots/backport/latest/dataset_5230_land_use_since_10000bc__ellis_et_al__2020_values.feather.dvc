@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:04:16.508565
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Land use since 10000BC (Ellis et al. (2020))
   namespace: backport
-  publication_date: latest
   short_name: dataset_5230_land_use_since_10000bc__ellis_et_al__2020_values
+  file_extension: feather
+  date_accessed: 2023-02-23 19:21:23.811368
+  name: Land use since 10000BC (Ellis et al. (2020))
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5230
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: baaa8697ce56911f7e64ed7d43392ebe
-  size: 19562
+- md5: fa0c847f2be7b8b390dd9c4522bc1637
+  size: 19938
   path: dataset_5230_land_use_since_10000bc__ellis_et_al__2020_values.feather

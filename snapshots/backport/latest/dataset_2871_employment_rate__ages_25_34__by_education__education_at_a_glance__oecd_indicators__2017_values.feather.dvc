@@ -1,18 +1,19 @@
 meta:
-  date_accessed: 2022-12-08 01:30:35.894700
-  description: ''
+  namespace: backport
+  short_name: dataset_2871_employment_rate__ages_25_34__by_education__education_at_a_glance__oecd_indicators__2017_values
   file_extension: feather
-  is_public: true
+  date_accessed: 2023-02-23 18:58:47.230120
   name: 'Employment rate, ages 25-34, by education - Education at a Glance: OECD Indicators
     (2017)'
-  namespace: backport
-  publication_date: latest
-  short_name: dataset_2871_employment_rate__ages_25_34__by_education__education_at_a_glance__oecd_indicators__2017_values
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2871
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 0a1387735988ee3fd3703513078608fb
-  size: 8698
+- md5: 51cb8f224543299fb501a740471e60da
+  size: 9066
   path: dataset_2871_employment_rate__ages_25_34__by_education__education_at_a_glance__oecd_indicators__2017_values.feather

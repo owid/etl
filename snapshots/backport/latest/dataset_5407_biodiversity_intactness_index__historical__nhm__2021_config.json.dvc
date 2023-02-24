@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:37:38.907568
-  description: ''
-  file_extension: json
-  is_public: false
-  name: Grapher metadata for dataset_5407_biodiversity_intactness_index__historical__nhm__2021
   namespace: backport
-  publication_date: latest
   short_name: dataset_5407_biodiversity_intactness_index__historical__nhm__2021_config
+  file_extension: json
+  date_accessed: 2023-02-23 19:32:20.401219
+  name: Grapher metadata for dataset_5407_biodiversity_intactness_index__historical__nhm__2021
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5407
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 8b35b766b45cf15211b915debe283653
-  size: 2546
+- md5: f75b475a924c785e8df1ba9a980d08bd
+  size: 2746
   path: dataset_5407_biodiversity_intactness_index__historical__nhm__2021_config.json

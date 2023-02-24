@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:01:47.116053
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Year of last Rinderpest case - OIE (2018)
   namespace: backport
-  publication_date: latest
   short_name: dataset_3075_year_of_last_rinderpest_case__oie__2018_values
+  file_extension: feather
+  date_accessed: 2023-02-23 15:01:56.113195
+  name: Year of last Rinderpest case - OIE (2018)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/3075
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 67536000bc77b06c958cf723d1192ca3
-  size: 11842
+- md5: 050df5a2e08ed9719adc819c93d2036a
+  size: 12218
   path: dataset_3075_year_of_last_rinderpest_case__oie__2018_values.feather

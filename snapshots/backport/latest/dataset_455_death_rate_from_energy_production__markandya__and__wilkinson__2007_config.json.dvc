@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 01:38:51.978372
-  description: ''
-  file_extension: json
-  is_public: false
-  name: Grapher metadata for dataset_455_death_rate_from_energy_production__markandya__and__wilkinson__2007
   namespace: backport
-  publication_date: latest
   short_name: dataset_455_death_rate_from_energy_production__markandya__and__wilkinson__2007_config
+  file_extension: json
+  date_accessed: 2023-02-23 17:26:08.279110
+  name: Grapher metadata for dataset_455_death_rate_from_energy_production__markandya__and__wilkinson__2007
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/455
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: ef1c157b2bca79f831ff531e055aa150
-  size: 3794
+- md5: 17583a5489a16184d3324e3a4bd774f0
+  size: 4382
   path: dataset_455_death_rate_from_energy_production__markandya__and__wilkinson__2007_config.json

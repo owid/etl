@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 15:54:34.678823
-  description: ''
-  file_extension: feather
-  is_public: false
-  name: Gini Index around 1990 and 2015 – Povcal (2018) and Chartbook (2017)
   namespace: backport
-  publication_date: latest
   short_name: dataset_3084_gini_index_around_1990_and_2015__povcal__2018__and_chartbook__2017_values
+  file_extension: feather
+  date_accessed: 2023-02-23 19:04:05.884692
+  name: Gini Index around 1990 and 2015 – Povcal (2018) and Chartbook (2017)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/3084
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 03cc0a9edb7c85feb25cc769c139c979
-  size: 10410
+- md5: b77fbab6180db2fb34cb5134f1849d60
+  size: 10786
   path: dataset_3084_gini_index_around_1990_and_2015__povcal__2018__and_chartbook__2017_values.feather

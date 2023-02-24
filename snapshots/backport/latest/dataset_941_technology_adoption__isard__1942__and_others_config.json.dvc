@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 01:33:48.750840
-  description: 'Describes the diffusion of technologies across the US. '
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_941_technology_adoption__isard__1942__and_others
   namespace: backport
-  publication_date: latest
   short_name: dataset_941_technology_adoption__isard__1942__and_others_config
+  file_extension: json
+  date_accessed: 2023-02-23 19:22:29.558465
+  name: Grapher metadata for dataset_941_technology_adoption__isard__1942__and_others
+  description: Describes the diffusion of technologies across the US.
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/941
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 9ccf42554bb352ceae44cee1d89dd4c6
-  size: 12281
+- md5: f4d98763d3ea4362b35857b3a4373606
+  size: 16043
   path: dataset_941_technology_adoption__isard__1942__and_others_config.json

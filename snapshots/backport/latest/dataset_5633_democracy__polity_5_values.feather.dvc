@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:32:09.154890
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Democracy - Polity 5
   namespace: backport
-  publication_date: latest
   short_name: dataset_5633_democracy__polity_5_values
+  file_extension: feather
+  date_accessed: 2023-02-23 19:08:44.577311
+  name: Democracy - Polity 5
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5633
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 5c93af931dc63622d1577420652c2788
-  size: 1141610
+- md5: 6007fe7b599d0fa08866446f168d75e9
+  size: 1141994
   path: dataset_5633_democracy__polity_5_values.feather

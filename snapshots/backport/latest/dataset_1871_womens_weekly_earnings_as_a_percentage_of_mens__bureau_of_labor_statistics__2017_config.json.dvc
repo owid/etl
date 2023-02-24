@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 16:58:44.492454
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_1871_womens_weekly_earnings_as_a_percentage_of_mens__bureau_of_labor_statistics__2017
   namespace: backport
-  publication_date: latest
   short_name: dataset_1871_womens_weekly_earnings_as_a_percentage_of_mens__bureau_of_labor_statistics__2017_config
+  file_extension: json
+  date_accessed: 2023-02-23 17:04:23.457275
+  name: Grapher metadata for dataset_1871_womens_weekly_earnings_as_a_percentage_of_mens__bureau_of_labor_statistics__2017
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/1871
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: fa2faaefbc9359496cf3ef669d0c299e
-  size: 1868
+- md5: e0de72f4f4a2ca11198600212764fccf
+  size: 2066
   path: dataset_1871_womens_weekly_earnings_as_a_percentage_of_mens__bureau_of_labor_statistics__2017_config.json

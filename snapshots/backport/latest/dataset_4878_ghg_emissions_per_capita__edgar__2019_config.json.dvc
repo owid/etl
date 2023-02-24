@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 15:57:50.146073
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_4878_ghg_emissions_per_capita__edgar__2019
   namespace: backport
-  publication_date: latest
   short_name: dataset_4878_ghg_emissions_per_capita__edgar__2019_config
+  file_extension: json
+  date_accessed: 2023-02-23 19:11:50.983388
+  name: Grapher metadata for dataset_4878_ghg_emissions_per_capita__edgar__2019
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/4878
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 6fe6bd69ebeb96fcbd9df5e97bd5b9ac
-  size: 4803
+- md5: ca67d2ca51698b568bd117ba232d1c36
+  size: 5203
   path: dataset_4878_ghg_emissions_per_capita__edgar__2019_config.json

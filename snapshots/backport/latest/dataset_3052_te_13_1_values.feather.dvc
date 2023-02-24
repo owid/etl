@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:28:55.111713
-  description: core-econ.org
-  file_extension: feather
-  is_public: false
-  name: TE-13.1
   namespace: backport
-  publication_date: latest
   short_name: dataset_3052_te_13_1_values
+  file_extension: feather
+  date_accessed: 2023-02-23 19:26:26.966586
+  name: TE-13.1
+  description: core-econ.org
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/3052
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 5a892a05327b129073024cbed854349e
-  size: 7338
+- md5: b1d4f15f8ff0f389dc8419b8f4ef5fcc
+  size: 7714
   path: dataset_3052_te_13_1_values.feather

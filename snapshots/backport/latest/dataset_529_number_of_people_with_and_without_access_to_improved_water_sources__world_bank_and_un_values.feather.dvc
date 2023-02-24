@@ -1,18 +1,19 @@
 meta:
-  date_accessed: 2022-12-07 16:51:13.746810
-  description: ''
+  namespace: backport
+  short_name: dataset_529_number_of_people_with_and_without_access_to_improved_water_sources__world_bank_and_un_values
   file_extension: feather
-  is_public: true
+  date_accessed: 2023-02-23 19:47:02.277971
   name: Number of people with and without access to improved water sources - World
     Bank and UN
-  namespace: backport
-  publication_date: latest
-  short_name: dataset_529_number_of_people_with_and_without_access_to_improved_water_sources__world_bank_and_un_values
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/529
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: c77ed2dd8f556e9c6644134e391abaab
-  size: 6410
+- md5: b9809af22a27d5ac212a5712a061bd14
+  size: 6778
   path: dataset_529_number_of_people_with_and_without_access_to_improved_water_sources__world_bank_and_un_values.feather

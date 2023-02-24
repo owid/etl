@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 00:01:15.450853
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Inequality in Latin America - SEDLAC (CEDLAS and the World Bank)
   namespace: backport
-  publication_date: latest
   short_name: dataset_2852_inequality_in_latin_america__sedlac__cedlas_and_the_world_bank_values
+  file_extension: feather
+  date_accessed: 2023-02-23 16:45:11.697497
+  name: Inequality in Latin America - SEDLAC (CEDLAS and the World Bank)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2852
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 5b4848a4f2c6baffa94dfa690b0a0f49
-  size: 9722
+- md5: b80ef34459e92635ae054ddb7e8c5097
+  size: 10090
   path: dataset_2852_inequality_in_latin_america__sedlac__cedlas_and_the_world_bank_values.feather

@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 00:35:24.424116
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_2890_co2_emissions_by_city__c40_cities__2018
   namespace: backport
-  publication_date: latest
   short_name: dataset_2890_co2_emissions_by_city__c40_cities__2018_config
+  file_extension: json
+  date_accessed: 2023-02-23 18:27:04.398763
+  name: Grapher metadata for dataset_2890_co2_emissions_by_city__c40_cities__2018
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2890
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 945b6cc70b4bec51365c71de30bc3cb4
-  size: 2646
+- md5: f5a4547a50a33364792226ed49430002
+  size: 3438
   path: dataset_2890_co2_emissions_by_city__c40_cities__2018_config.json

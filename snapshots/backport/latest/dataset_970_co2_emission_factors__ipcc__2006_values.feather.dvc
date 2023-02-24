@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 01:13:11.497254
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: CO2 emission factors - IPCC (2006)
   namespace: backport
-  publication_date: latest
   short_name: dataset_970_co2_emission_factors__ipcc__2006_values
+  file_extension: feather
+  date_accessed: 2023-02-23 17:42:57.737317
+  name: CO2 emission factors - IPCC (2006)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/970
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: f130d566858d7a82f8d3e61b663a302c
-  size: 6162
+- md5: 77c773a1637e20423509fa5e0bdd9892
+  size: 6538
   path: dataset_970_co2_emission_factors__ipcc__2006_values.feather

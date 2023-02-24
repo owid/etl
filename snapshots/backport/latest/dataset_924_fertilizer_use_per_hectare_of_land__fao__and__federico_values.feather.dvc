@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:03:24.568945
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Fertilizer use per hectare of land -FAO & Federico
   namespace: backport
-  publication_date: latest
   short_name: dataset_924_fertilizer_use_per_hectare_of_land__fao__and__federico_values
+  file_extension: feather
+  date_accessed: 2023-02-23 18:10:25.976991
+  name: Fertilizer use per hectare of land -FAO & Federico
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/924
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 65618868ebc06e404e75edbb2be0513c
-  size: 34026
+- md5: e1e9b189016dc7b75888e63ef0f59b63
+  size: 34402
   path: dataset_924_fertilizer_use_per_hectare_of_land__fao__and__federico_values.feather

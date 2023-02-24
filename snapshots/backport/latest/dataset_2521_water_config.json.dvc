@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 00:10:42.797102
-  description: This is a dataset imported by the automated fetcher
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_2521_water
   namespace: backport
-  publication_date: latest
   short_name: dataset_2521_water_config
+  file_extension: json
+  date_accessed: 2023-02-23 19:41:03.022747
+  name: Grapher metadata for dataset_2521_water
+  description: This is a dataset imported by the automated fetcher
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2521
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 45cf814321bfa3e620d4f01c21fd8011
-  size: 32008
+- md5: b3f267014643f1e3a3cea016fdde0000
+  size: 45076
   path: dataset_2521_water_config.json

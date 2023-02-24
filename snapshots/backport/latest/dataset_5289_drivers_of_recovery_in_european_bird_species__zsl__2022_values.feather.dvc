@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-12 18:01:15.373015
-  description: ''
-  file_extension: feather
-  is_public: false
-  name: Drivers of recovery in European bird species (ZSL, 2022)
   namespace: backport
-  publication_date: latest
   short_name: dataset_5289_drivers_of_recovery_in_european_bird_species__zsl__2022_values
+  file_extension: feather
+  date_accessed: 2023-02-23 17:35:45.707997
+  name: Drivers of recovery in European bird species (ZSL, 2022)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5289
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 2e377d5665bd5c6b1516973666f08258
-  size: 6218
+- md5: 1e74fc945f0bad3326a76481cef7c76c
+  size: 6594
   path: dataset_5289_drivers_of_recovery_in_european_bird_species__zsl__2022_values.feather

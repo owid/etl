@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:23:07.270455
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_1834_global_smallpox_cases
   namespace: backport
-  publication_date: latest
   short_name: dataset_1834_global_smallpox_cases_config
+  file_extension: json
+  date_accessed: 2023-02-23 16:57:23.465822
+  name: Grapher metadata for dataset_1834_global_smallpox_cases
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/1834
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 784b412c180e3df0953cb26c53834862
-  size: 1416
+- md5: 3707b56840289f405943b1655b9e3999
+  size: 1614
   path: dataset_1834_global_smallpox_cases_config.json

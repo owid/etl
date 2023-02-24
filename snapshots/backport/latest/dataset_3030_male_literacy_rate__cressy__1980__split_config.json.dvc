@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:06:01.522814
-  description: Literacy figures are nationally representative.
-  file_extension: json
-  is_public: false
-  name: Grapher metadata for dataset_3030_male_literacy_rate__cressy__1980__split
   namespace: backport
-  publication_date: latest
   short_name: dataset_3030_male_literacy_rate__cressy__1980__split_config
+  file_extension: json
+  date_accessed: 2023-02-23 19:07:24.279911
+  name: Grapher metadata for dataset_3030_male_literacy_rate__cressy__1980__split
+  description: Literacy figures are nationally representative.
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/3030
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: b9bc1d41118ccb120e00a51b98cf6593
-  size: 2695
+- md5: 66aba37868c219545ea9b48d413aa48d
+  size: 3091
   path: dataset_3030_male_literacy_rate__cressy__1980__split_config.json

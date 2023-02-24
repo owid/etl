@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 01:24:48.546584
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Number of deaths in England and Wales by age - ONS
   namespace: backport
-  publication_date: latest
   short_name: dataset_1935_number_of_deaths_in_england_and_wales_by_age__ons_values
+  file_extension: feather
+  date_accessed: 2023-02-23 18:24:54.354473
+  name: Number of deaths in England and Wales by age - ONS
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/1935
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 104a893a9f913aaf783741b78e08078e
-  size: 9082
+- md5: 82020faa34cdd5a5d4a2ba0ebec54121
+  size: 9458
   path: dataset_1935_number_of_deaths_in_england_and_wales_by_age__ons_values.feather

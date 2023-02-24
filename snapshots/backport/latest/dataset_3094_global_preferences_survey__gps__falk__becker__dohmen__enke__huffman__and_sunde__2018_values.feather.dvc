@@ -1,18 +1,19 @@
 meta:
-  date_accessed: 2022-12-07 16:33:07.800649
-  description: ''
+  namespace: backport
+  short_name: dataset_3094_global_preferences_survey__gps__falk__becker__dohmen__enke__huffman__and_sunde__2018_values
   file_extension: feather
-  is_public: false
+  date_accessed: 2023-02-23 18:39:03.377542
   name: Global Preferences Survey (GPS) - Falk, Becker, Dohmen, Enke, Huffman, and
     Sunde (2018)
-  namespace: backport
-  publication_date: latest
-  short_name: dataset_3094_global_preferences_survey__gps__falk__becker__dohmen__enke__huffman__and_sunde__2018_values
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/3094
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: f04c0238fae3a2dae75aa81c3322dc2a
-  size: 11634
+- md5: fc607756fa6cb6d72bbf75f78bb57b53
+  size: 12002
   path: dataset_3094_global_preferences_survey__gps__falk__becker__dohmen__enke__huffman__and_sunde__2018_values.feather

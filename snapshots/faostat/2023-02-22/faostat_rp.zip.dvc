@@ -1,0 +1,25 @@
+meta:
+  namespace: faostat
+  short_name: faostat_rp
+  name: 'Land, Inputs and Sustainability: Pesticides Use - FAO (2022)'
+  description: The Pesticides Use database includes data on the use of major pesticide
+    groups (Insecticides, Herbicides, Fungicides, Plant growth regulators and Rodenticides)
+    and of relevant chemical families. Data report the quantities (in tonnes of active
+    ingredients)
+  source_name: Food and Agriculture Organization of the United Nations
+  source_published_by: Food and Agriculture Organization of the United Nations
+  publication_year: 2022
+  publication_date: '2022-06-17'
+  date_accessed: '2023-02-22'
+  version: '2023-02-22'
+  url: http://www.fao.org/faostat/en/#data/RP
+  source_data_url: https://fenixservices.fao.org/faostat/static/bulkdownloads/Inputs_Pesticides_Use_E_All_Data_(Normalized).zip
+  file_extension: zip
+  license_url: http://www.fao.org/contact-us/terms/db-terms-of-use/en
+  license_name: CC BY-NC-SA 3.0 IGO
+  is_public: true
+wdir: ../../../data/snapshots/faostat/2023-02-22
+outs:
+- md5: 8e3d2a5362e859d166dbaa0a45209e61
+  size: 594091
+  path: faostat_rp.zip

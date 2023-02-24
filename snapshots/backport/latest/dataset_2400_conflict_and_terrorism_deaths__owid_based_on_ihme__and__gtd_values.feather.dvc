@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2400_conflict_and_terrorism_deaths__owid_based_on_ihme__and__gtd_values
   file_extension: feather
-  date_accessed: 2023-01-13 12:00:51.961599
+  date_accessed: 2023-02-23 15:09:59.562019
   name: Conflict and Terrorism deaths - OWID based on IHME & GTD
   description: ''
   source_name: Our World in Data catalog backport

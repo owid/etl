@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:19:43.438980
-  description: This is a dataset imported by the automated fetcher
-  file_extension: feather
-  is_public: true
-  name: 'World Bank Poverty and Equity database - Poverty: Poverty rates'
   namespace: backport
-  publication_date: latest
   short_name: dataset_1072_world_bank_poverty_and_equity_database__poverty__poverty_rates_values
+  file_extension: feather
+  date_accessed: 2023-02-23 18:28:04.259544
+  name: 'World Bank Poverty and Equity database - Poverty: Poverty rates'
+  description: This is a dataset imported by the automated fetcher
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/1072
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: fec63c2bd54d8d9611f1a4ff88ce252e
-  size: 93994
+- md5: f3edd0a7d63d86999d9cefc44ad257e7
+  size: 94370
   path: dataset_1072_world_bank_poverty_and_equity_database__poverty__poverty_rates_values.feather

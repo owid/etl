@@ -1,18 +1,19 @@
 meta:
-  date_accessed: 2022-12-07 18:33:49.086032
-  description: ''
+  namespace: backport
+  short_name: dataset_4911_share_of_countries_where_homosexuality_is_legal__owid_based_on_kenny__and__patel__2017_values
   file_extension: feather
-  is_public: true
+  date_accessed: 2023-02-23 18:49:48.962993
   name: Share of countries where homosexuality is legal – OWID based on Kenny & Patel
     (2017)
-  namespace: backport
-  publication_date: latest
-  short_name: dataset_4911_share_of_countries_where_homosexuality_is_legal__owid_based_on_kenny__and__patel__2017_values
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/4911
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: b8748eda9b56ccc8718c9c9668042fc5
-  size: 7626
+- md5: ae3c431669d5c13b10cc8aff5775e7c6
+  size: 8002
   path: dataset_4911_share_of_countries_where_homosexuality_is_legal__owid_based_on_kenny__and__patel__2017_values.feather

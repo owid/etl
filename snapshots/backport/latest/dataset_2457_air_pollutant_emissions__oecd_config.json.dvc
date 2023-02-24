@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 15:38:16.981092
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_2457_air_pollutant_emissions__oecd
   namespace: backport
-  publication_date: latest
   short_name: dataset_2457_air_pollutant_emissions__oecd_config
+  file_extension: json
+  date_accessed: 2023-02-23 19:28:02.136808
+  name: Grapher metadata for dataset_2457_air_pollutant_emissions__oecd
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2457
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 173bba34c757c8b807fe0d849c948577
-  size: 3328
+- md5: 1af59df53e7f9a8ad6d87d09f269a3bc
+  size: 4318
   path: dataset_2457_air_pollutant_emissions__oecd_config.json

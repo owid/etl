@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 01:42:15.744129
-  description: ''
-  file_extension: feather
-  is_public: false
-  name: Minimum and average caloric requirements (UN FAO)
   namespace: backport
-  publication_date: latest
   short_name: dataset_5494_minimum_and_average_caloric_requirements__un_fao_values
+  file_extension: feather
+  date_accessed: 2023-02-23 19:25:02.360541
+  name: Minimum and average caloric requirements (UN FAO)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5494
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: a57fec68ab321ad7b41e5c51efef35b4
-  size: 36778
+- md5: f68ea25f5459a38ac2f1e38fd0f8e0b7
+  size: 37154
   path: dataset_5494_minimum_and_average_caloric_requirements__un_fao_values.feather

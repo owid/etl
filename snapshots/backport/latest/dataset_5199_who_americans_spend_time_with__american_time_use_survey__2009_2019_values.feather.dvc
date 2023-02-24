@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:09:25.910243
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Who Americans spend time with - American Time Use Survey (2009-2019)
   namespace: backport
-  publication_date: latest
   short_name: dataset_5199_who_americans_spend_time_with__american_time_use_survey__2009_2019_values
+  file_extension: feather
+  date_accessed: 2023-02-23 16:28:24.198991
+  name: Who Americans spend time with - American Time Use Survey (2009-2019)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5199
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 8aa1867a495f62e0fee67f7b16fc16db
-  size: 10666
+- md5: fdf7df444f972ae06142a64ea1b52dd5
+  size: 11042
   path: dataset_5199_who_americans_spend_time_with__american_time_use_survey__2009_2019_values.feather

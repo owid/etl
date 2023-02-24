@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 00:15:00.429202
-  description: Backported
-  file_extension: feather
-  is_public: false
-  name: Inequality Among World Citizens - Bourguignon and Morrisson (2002)
   namespace: backport
-  publication_date: latest
   short_name: dataset_5814_inequality_among_world_citizens__bourguignon_and_morrisson__2002_values
+  file_extension: feather
+  date_accessed: 2023-02-23 19:38:57.811470
+  name: Inequality Among World Citizens - Bourguignon and Morrisson (2002)
+  description: Backported
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5814
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: bdc72086d15d58a13c0db18f488322fe
-  size: 6210
+- md5: a22ffb871d17b94b40ba8d587538834c
+  size: 6578
   path: dataset_5814_inequality_among_world_citizens__bourguignon_and_morrisson__2002_values.feather

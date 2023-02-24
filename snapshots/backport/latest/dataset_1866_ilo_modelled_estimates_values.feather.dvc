@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:20:44.452494
-  description: This is a dataset imported by the automated fetcher
-  file_extension: feather
-  is_public: true
-  name: ILO modelled estimates
   namespace: backport
-  publication_date: latest
   short_name: dataset_1866_ilo_modelled_estimates_values
+  file_extension: feather
+  date_accessed: 2023-02-23 17:58:28.212978
+  name: ILO modelled estimates
+  description: This is a dataset imported by the automated fetcher
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/1866
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 5e9acedcc02ada8f4a44dbce73af3a2e
-  size: 15264154
+- md5: c55e861ff62d0cb49786c39cd9c9df93
+  size: 15264530
   path: dataset_1866_ilo_modelled_estimates_values.feather

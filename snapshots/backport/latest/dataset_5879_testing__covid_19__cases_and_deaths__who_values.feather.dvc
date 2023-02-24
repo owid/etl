@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5879_testing__covid_19__cases_and_deaths__who_values
   file_extension: feather
-  date_accessed: 2023-02-14 18:05:02.121051
+  date_accessed: 2023-02-23 17:14:19.666051
   name: '[TESTING] COVID-19 - Cases and deaths (WHO)'
   description: ''
   source_name: Our World in Data catalog backport

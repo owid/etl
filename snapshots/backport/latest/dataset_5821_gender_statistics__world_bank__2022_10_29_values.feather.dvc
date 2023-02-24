@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-11-30 12:31:30.886546
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Gender Statistics - World Bank (2022-10-29)
   namespace: backport
-  publication_date: latest
   short_name: dataset_5821_gender_statistics__world_bank__2022_10_29_values
+  file_extension: feather
+  date_accessed: 2023-02-23 16:26:06.537393
+  name: Gender Statistics - World Bank (2022-10-29)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5821
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: dcf34d401463a4473c9dac1b20d0b937
-  size: 14253346
+- md5: 274546de143c383c9b30baac9c56c330
+  size: 14252986
   path: dataset_5821_gender_statistics__world_bank__2022_10_29_values.feather

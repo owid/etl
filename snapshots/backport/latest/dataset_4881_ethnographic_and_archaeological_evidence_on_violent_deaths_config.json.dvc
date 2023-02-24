@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 00:06:18.096492
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_4881_ethnographic_and_archaeological_evidence_on_violent_deaths
   namespace: backport
-  publication_date: latest
   short_name: dataset_4881_ethnographic_and_archaeological_evidence_on_violent_deaths_config
+  file_extension: json
+  date_accessed: 2023-02-23 17:30:47.017734
+  name: Grapher metadata for dataset_4881_ethnographic_and_archaeological_evidence_on_violent_deaths
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/4881
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: dd3a9ae4ecfe2e049af01d4aaa371160
-  size: 5161
+- md5: a95c6a0b447eb26566110e641af7874b
+  size: 6161
   path: dataset_4881_ethnographic_and_archaeological_evidence_on_violent_deaths_config.json

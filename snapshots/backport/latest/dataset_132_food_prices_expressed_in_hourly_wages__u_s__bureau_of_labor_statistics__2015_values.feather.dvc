@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:13:24.205916
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Food Prices expressed in hourly wages - U.S. Bureau of Labor Statistics (2015)
   namespace: backport
-  publication_date: latest
   short_name: dataset_132_food_prices_expressed_in_hourly_wages__u_s__bureau_of_labor_statistics__2015_values
+  file_extension: feather
+  date_accessed: 2023-02-24 07:54:31.285995
+  name: Food Prices expressed in hourly wages - U.S. Bureau of Labor Statistics (2015)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/132
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 74b4b8acb531a39a7b2fda1ffc36290c
-  size: 6474
+- md5: 128d2ec2bb523f5b7f23683e66a0fb2c
+  size: 6842
   path: dataset_132_food_prices_expressed_in_hourly_wages__u_s__bureau_of_labor_statistics__2015_values.feather

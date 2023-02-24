@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:41:13.211508
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Children that survived past 5 years of age per woman - Gapminder (2017)
   namespace: backport
-  publication_date: latest
   short_name: dataset_4202_children_that_survived_past_5_years_of_age_per_woman__gapminder__2017_values
+  file_extension: feather
+  date_accessed: 2023-02-23 19:45:01.866027
+  name: Children that survived past 5 years of age per woman - Gapminder (2017)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/4202
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 35ca51fbcc4097c91d8773ba172993e8
-  size: 117562
+- md5: f64e715e9b3b1939f1647922d0b5a0b9
+  size: 117938
   path: dataset_4202_children_that_survived_past_5_years_of_age_per_woman__gapminder__2017_values.feather

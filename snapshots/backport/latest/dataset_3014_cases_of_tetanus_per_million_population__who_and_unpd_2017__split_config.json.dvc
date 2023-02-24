@@ -1,19 +1,20 @@
 meta:
-  date_accessed: 2022-12-07 17:15:48.096887
-  description: 'WHO dataset on the number of cases for different diseases, and the
-    coverage of different vaccines against these disease. For TB, instead of the number
-    of cases, we have number of deaths. '
-  file_extension: json
-  is_public: false
-  name: Grapher metadata for dataset_3014_cases_of_tetanus_per_million_population__who_and_unpd_2017__split
   namespace: backport
-  publication_date: latest
   short_name: dataset_3014_cases_of_tetanus_per_million_population__who_and_unpd_2017__split_config
+  file_extension: json
+  date_accessed: 2023-02-23 16:38:42.528637
+  name: Grapher metadata for dataset_3014_cases_of_tetanus_per_million_population__who_and_unpd_2017__split
+  description: WHO dataset on the number of cases for different diseases, and the
+    coverage of different vaccines against these disease. For TB, instead of the number
+    of cases, we have number of deaths.
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/3014
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 4f91cea89f8aa64f60d992e8236ad102
-  size: 6426
+- md5: 4fb371651c4633be9d97065cad3c825c
+  size: 7406
   path: dataset_3014_cases_of_tetanus_per_million_population__who_and_unpd_2017__split_config.json

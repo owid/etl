@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 00:50:28.321020
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_2821_how_europeans_spend_their_time__european_commission__2004
   namespace: backport
-  publication_date: latest
   short_name: dataset_2821_how_europeans_spend_their_time__european_commission__2004_config
+  file_extension: json
+  date_accessed: 2023-02-23 17:34:33.154601
+  name: Grapher metadata for dataset_2821_how_europeans_spend_their_time__european_commission__2004
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2821
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 300dffd9bf37bc3a00077736bcbe865d
-  size: 8669
+- md5: e1b781ea07baf1ea80f8df02783d2edf
+  size: 11045
   path: dataset_2821_how_europeans_spend_their_time__european_commission__2004_config.json

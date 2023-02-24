@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 16:00:03.158665
-  description: ''
-  file_extension: json
-  is_public: false
-  name: Grapher metadata for dataset_5389_fish_catch_in_the_uk__thurstan_et_al__2009
   namespace: backport
-  publication_date: latest
   short_name: dataset_5389_fish_catch_in_the_uk__thurstan_et_al__2009_config
+  file_extension: json
+  date_accessed: 2023-02-23 18:18:28.892767
+  name: Grapher metadata for dataset_5389_fish_catch_in_the_uk__thurstan_et_al__2009
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5389
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 1bf07937562ca9db41c1625921c61e8a
-  size: 5718
+- md5: 4c8302e04691a0f952b685c5e5548cc6
+  size: 7118
   path: dataset_5389_fish_catch_in_the_uk__thurstan_et_al__2009_config.json

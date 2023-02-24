@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:21:46.892731
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_4161_number_of_tourist_departures_per_1000__world_bank__and__un__2019
   namespace: backport
-  publication_date: latest
   short_name: dataset_4161_number_of_tourist_departures_per_1000__world_bank__and__un__2019_config
+  file_extension: json
+  date_accessed: 2023-02-23 16:47:36.496681
+  name: Grapher metadata for dataset_4161_number_of_tourist_departures_per_1000__world_bank__and__un__2019
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/4161
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 20c04a0a54445405f8afb14604829bac
-  size: 2913
+- md5: 654b16b6274a2c4815d4593bfbcd32da
+  size: 3113
   path: dataset_4161_number_of_tourist_departures_per_1000__world_bank__and__un__2019_config.json

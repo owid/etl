@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 15:56:39.526968
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Prevalence of weight categories in males - NCDRisC (2017)
   namespace: backport
-  publication_date: latest
   short_name: dataset_587_prevalence_of_weight_categories_in_males__ncdrisc__2017_values
+  file_extension: feather
+  date_accessed: 2023-02-23 15:15:15.532237
+  name: Prevalence of weight categories in males - NCDRisC (2017)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/587
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: d08294bb4ab135232f250164a72cacca
-  size: 102778
+- md5: a60a9e4888380ed4a423600e05e777b3
+  size: 103154
   path: dataset_587_prevalence_of_weight_categories_in_males__ncdrisc__2017_values.feather

@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 00:50:38.371892
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: How Europeans spend their time - European Commission (2004)
   namespace: backport
-  publication_date: latest
   short_name: dataset_2821_how_europeans_spend_their_time__european_commission__2004_values
+  file_extension: feather
+  date_accessed: 2023-02-23 17:35:00.216384
+  name: How Europeans spend their time - European Commission (2004)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2821
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 49be1e7630adacc6b3465095af5d560d
-  size: 7146
+- md5: d403cb2050de0ad130132e4b4b607de5
+  size: 7522
   path: dataset_2821_how_europeans_spend_their_time__european_commission__2004_values.feather

@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 01:41:16.961376
-  description: core-econ.org
-  file_extension: json
-  is_public: false
-  name: Grapher metadata for dataset_3241_figure_15_20_inflation
   namespace: backport
-  publication_date: latest
   short_name: dataset_3241_figure_15_20_inflation_config
+  file_extension: json
+  date_accessed: 2023-02-23 19:49:46.777462
+  name: Grapher metadata for dataset_3241_figure_15_20_inflation
+  description: core-econ.org
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/3241
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 49fa2a73bfb408908f7b21f599477d5a
-  size: 1162
+- md5: 67b7bb967973ec0aa6ed3630649f592c
+  size: 1360
   path: dataset_3241_figure_15_20_inflation_config.json

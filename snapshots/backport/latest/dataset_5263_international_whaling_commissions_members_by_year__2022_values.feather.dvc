@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:12:22.996952
-  description: ''
-  file_extension: feather
-  is_public: false
-  name: International Whaling Commissions Members by Year (2022)
   namespace: backport
-  publication_date: latest
   short_name: dataset_5263_international_whaling_commissions_members_by_year__2022_values
+  file_extension: feather
+  date_accessed: 2023-02-23 17:49:10.517743
+  name: International Whaling Commissions Members by Year (2022)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5263
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 499c44834881be0ed7abb2fe639e4fdc
-  size: 22874
+- md5: d8ca321fac84ba2cff550844d3f95655
+  size: 23250
   path: dataset_5263_international_whaling_commissions_members_by_year__2022_values.feather

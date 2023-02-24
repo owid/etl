@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:56:11.992667
-  description: ''
-  file_extension: json
-  is_public: false
-  name: Grapher metadata for dataset_5421_clinical_trials_results_reporting__eu_ctr__dal_re__2021
   namespace: backport
-  publication_date: latest
   short_name: dataset_5421_clinical_trials_results_reporting__eu_ctr__dal_re__2021_config
+  file_extension: json
+  date_accessed: 2023-02-23 16:46:25.623005
+  name: Grapher metadata for dataset_5421_clinical_trials_results_reporting__eu_ctr__dal_re__2021
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5421
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 5e313ac3078246e27b3fb9b82f562943
-  size: 2531
+- md5: 34adc2456b5d6f9c2e4fd73dde72ff0c
+  size: 2731
   path: dataset_5421_clinical_trials_results_reporting__eu_ctr__dal_re__2021_config.json

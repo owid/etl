@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 15:50:31.480419
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_425_labor_force_participation_rates_of_men_age_65_and_over_in_the_us__owid_based_on_short__2002__and_oecd
   namespace: backport
-  publication_date: latest
   short_name: dataset_425_labor_force_participation_rates_of_men_age_65_and_over_in_the_us__owid_based_on_short__2002__and_oecd_config
+  file_extension: json
+  date_accessed: 2023-02-23 17:33:33.082727
+  name: Grapher metadata for dataset_425_labor_force_participation_rates_of_men_age_65_and_over_in_the_us__owid_based_on_short__2002__and_oecd
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/425
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: f120f287ebf208441ac4089130dd8e06
-  size: 2650
+- md5: 03c0dc09c5fd910695d6ccd937a1df3d
+  size: 2846
   path: dataset_425_labor_force_participation_rates_of_men_age_65_and_over_in_the_us__owid_based_on_short__2002__and_oecd_config.json

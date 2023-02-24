@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:57:29.834342
-  description: ''
-  file_extension: feather
-  is_public: false
-  name: Crude divorce rate (OWID based on UN, OECD, Eurostat and other sources)
   namespace: backport
-  publication_date: latest
   short_name: dataset_4908_crude_divorce_rate__owid_based_on_un__oecd__eurostat_and_other_sources_values
+  file_extension: feather
+  date_accessed: 2023-02-23 18:14:09.515109
+  name: Crude divorce rate (OWID based on UN, OECD, Eurostat and other sources)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/4908
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 09bd83634a31df274450fd78f5a9b379
-  size: 20810
+- md5: 4087fc0096831fd77d7ce9e573d00981
+  size: 21186
   path: dataset_4908_crude_divorce_rate__owid_based_on_un__oecd__eurostat_and_other_sources_values.feather

@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:33:57.295751
-  description: Fertility rate by world region and education scenario.
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_920_fertility_rate__wc_iiasa__2017
   namespace: backport
-  publication_date: latest
   short_name: dataset_920_fertility_rate__wc_iiasa__2017_config
+  file_extension: json
+  date_accessed: 2023-02-23 17:27:17.350643
+  name: Grapher metadata for dataset_920_fertility_rate__wc_iiasa__2017
+  description: Fertility rate by world region and education scenario.
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/920
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 6bf1ad0bd030936bc00d3720701c8c27
-  size: 2561
+- md5: 3a9d230f801153e0c3ef1013fe68cdbe
+  size: 3155
   path: dataset_920_fertility_rate__wc_iiasa__2017_config.json

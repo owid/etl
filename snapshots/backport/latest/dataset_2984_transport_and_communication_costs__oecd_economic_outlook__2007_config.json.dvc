@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 00:16:49.125534
-  description: ''
-  file_extension: json
-  is_public: false
-  name: Grapher metadata for dataset_2984_transport_and_communication_costs__oecd_economic_outlook__2007
   namespace: backport
-  publication_date: latest
   short_name: dataset_2984_transport_and_communication_costs__oecd_economic_outlook__2007_config
+  file_extension: json
+  date_accessed: 2023-02-23 18:20:47.602861
+  name: Grapher metadata for dataset_2984_transport_and_communication_costs__oecd_economic_outlook__2007
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2984
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 986bfaa6def3a916f267ee2801689091
-  size: 2840
+- md5: 4bf20d3a5127ff3899795f3412720523
+  size: 3428
   path: dataset_2984_transport_and_communication_costs__oecd_economic_outlook__2007_config.json

@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:17:45.422177
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_1941_deaths_from_smallpox_per_million_population__edwardes__1902
   namespace: backport
-  publication_date: latest
   short_name: dataset_1941_deaths_from_smallpox_per_million_population__edwardes__1902_config
+  file_extension: json
+  date_accessed: 2023-02-23 17:41:37.112093
+  name: Grapher metadata for dataset_1941_deaths_from_smallpox_per_million_population__edwardes__1902
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/1941
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 2658e88d4ae90c2fa7992f626473d311
-  size: 1399
+- md5: 3a30f3ef568b0f6e03cfa15f408e4cdf
+  size: 1597
   path: dataset_1941_deaths_from_smallpox_per_million_population__edwardes__1902_config.json

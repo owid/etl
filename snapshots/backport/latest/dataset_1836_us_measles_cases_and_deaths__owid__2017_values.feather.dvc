@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:25:56.213289
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: US Measles Cases and Deaths (OWID, 2017)
   namespace: backport
-  publication_date: latest
   short_name: dataset_1836_us_measles_cases_and_deaths__owid__2017_values
+  file_extension: feather
+  date_accessed: 2023-02-23 19:00:34.710378
+  name: US Measles Cases and Deaths (OWID, 2017)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/1836
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 1202cc3d23cabf64428f3d6897041178
-  size: 8386
+- md5: 114c6ee63827f62950971726fca725f5
+  size: 8762
   path: dataset_1836_us_measles_cases_and_deaths__owid__2017_values.feather

@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:15:30.109977
-  description: ''
-  file_extension: feather
-  is_public: false
-  name: Global agricultural land use - HYDE3.2 (2022)
   namespace: backport
-  publication_date: latest
   short_name: dataset_5565_global_agricultural_land_use__hyde3_2__2022_values
+  file_extension: feather
+  date_accessed: 2023-02-23 18:53:23.215545
+  name: Global agricultural land use - HYDE3.2 (2022)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5565
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 783477340922d1d60aefd83b19885e82
-  size: 7890
+- md5: 008b8aafb53003638289fb5c370e2e16
+  size: 8266
   path: dataset_5565_global_agricultural_land_use__hyde3_2__2022_values.feather

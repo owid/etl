@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-11-30 12:30:09.352580
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_5821_gender_statistics__world_bank__2022_10_29
   namespace: backport
-  publication_date: latest
   short_name: dataset_5821_gender_statistics__world_bank__2022_10_29_config
+  file_extension: json
+  date_accessed: 2023-02-23 16:25:19.948029
+  name: Grapher metadata for dataset_5821_gender_statistics__world_bank__2022_10_29
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5821
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: d4828c91303555a6fa915386ddbc0a16
-  size: 1182114
+- md5: 4e960e4ac574295088121a3e204be4e8
+  size: 1380370
   path: dataset_5821_gender_statistics__world_bank__2022_10_29_config.json

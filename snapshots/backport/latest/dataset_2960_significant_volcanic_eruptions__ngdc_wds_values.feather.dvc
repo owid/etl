@@ -1,17 +1,20 @@
 meta:
-  date_accessed: 2022-12-07 16:53:15.171235
-  description: "Code to fill missing data with 0s is here: \nhttps://github.com/owid/notebooks/tree/main/FionaSpooner/significant_volcanic_eruptions"
-  file_extension: feather
-  is_public: true
-  name: Significant volcanic eruptions (NGDC-WDS)
   namespace: backport
-  publication_date: latest
   short_name: dataset_2960_significant_volcanic_eruptions__ngdc_wds_values
+  file_extension: feather
+  date_accessed: 2023-02-23 17:32:14.805138
+  name: Significant volcanic eruptions (NGDC-WDS)
+  description: |-
+    Code to fill missing data with 0s is here:
+    https://github.com/owid/notebooks/tree/main/FionaSpooner/significant_volcanic_eruptions
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2960
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 86518067bd1759c137378b9a94b2c555
-  size: 209466
+- md5: 7c27edb3eef52acc3d77ffbf9a2eb1f8
+  size: 209842
   path: dataset_2960_significant_volcanic_eruptions__ngdc_wds_values.feather

@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 00:52:27.186745
-  description: ''
-  file_extension: feather
-  is_public: false
-  name: Health Insurance Coverage (Tanzi & Schuknecht (2000)) (split)
   namespace: backport
-  publication_date: latest
   short_name: dataset_2981_health_insurance_coverage__tanzi__and__schuknecht__2000__split_values
+  file_extension: feather
+  date_accessed: 2023-02-23 17:15:09.389882
+  name: Health Insurance Coverage (Tanzi & Schuknecht (2000)) (split)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2981
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 889a5cd2e424540a0f646fe9f6fb8fe3
-  size: 6322
+- md5: 4a9beba3309642523770bbbd0dee713a
+  size: 6690
   path: dataset_2981_health_insurance_coverage__tanzi__and__schuknecht__2000__split_values.feather

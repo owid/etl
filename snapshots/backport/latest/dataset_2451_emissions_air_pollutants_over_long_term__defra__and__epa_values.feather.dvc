@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 00:34:54.709847
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Emissions air pollutants over long-term (DEFRA & EPA)
   namespace: backport
-  publication_date: latest
   short_name: dataset_2451_emissions_air_pollutants_over_long_term__defra__and__epa_values
+  file_extension: feather
+  date_accessed: 2023-02-23 19:07:43.386342
+  name: Emissions air pollutants over long-term (DEFRA & EPA)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2451
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 5990a74d9f7bc98732555e8d8721b4f8
-  size: 10706
+- md5: f9d2ecb99880cf0a484c79187f231d8e
+  size: 11082
   path: dataset_2451_emissions_air_pollutants_over_long_term__defra__and__epa_values.feather

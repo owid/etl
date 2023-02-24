@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 15:55:04.968946
-  description: ''
-  file_extension: json
-  is_public: false
-  name: Grapher metadata for dataset_5251_covid_19__israel__confirmed_cases_by_age
   namespace: backport
-  publication_date: latest
   short_name: dataset_5251_covid_19__israel__confirmed_cases_by_age_config
+  file_extension: json
+  date_accessed: 2023-02-23 18:18:49.020104
+  name: Grapher metadata for dataset_5251_covid_19__israel__confirmed_cases_by_age
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5251
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: c66c85b9f92fbaee02be23c6a835801b
-  size: 1569
+- md5: b6acbbef88a4b4a8bcb6ad0bd0710cdc
+  size: 1769
   path: dataset_5251_covid_19__israel__confirmed_cases_by_age_config.json

@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:53:53.278621
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Same-sex married households in the US
   namespace: backport
-  publication_date: latest
   short_name: dataset_4900_same_sex_married_households_in_the_us_values
+  file_extension: feather
+  date_accessed: 2023-02-23 17:56:52.999218
+  name: Same-sex married households in the US
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/4900
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 31c044e3a1c4d010ba513cfea822f805
-  size: 6114
+- md5: 422f5c2a9956ae81c3edcc88894d6ed7
+  size: 6482
   path: dataset_4900_same_sex_married_households_in_the_us_values.feather

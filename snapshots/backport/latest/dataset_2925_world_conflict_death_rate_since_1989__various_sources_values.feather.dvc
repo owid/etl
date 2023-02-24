@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:38:38.679018
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: World conflict death rate since 1989 (various sources)
   namespace: backport
-  publication_date: latest
   short_name: dataset_2925_world_conflict_death_rate_since_1989__various_sources_values
+  file_extension: feather
+  date_accessed: 2023-02-23 16:44:33.153308
+  name: World conflict death rate since 1989 (various sources)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2925
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: ef498702405238d14e1be534de41569c
-  size: 6970
+- md5: 4dc28b5930295ec2ca882e1349fa5e0c
+  size: 7346
   path: dataset_2925_world_conflict_death_rate_since_1989__various_sources_values.feather

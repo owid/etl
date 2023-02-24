@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:58:20.279961
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_2520_number_and_percentage_of_current_smokers__by_sex__american_lung_association__2011
   namespace: backport
-  publication_date: latest
   short_name: dataset_2520_number_and_percentage_of_current_smokers__by_sex__american_lung_association__2011_config
+  file_extension: json
+  date_accessed: 2023-02-23 15:05:48.299247
+  name: Grapher metadata for dataset_2520_number_and_percentage_of_current_smokers__by_sex__american_lung_association__2011
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2520
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 19e7e43052842b7076255ed58751d16e
-  size: 3126
+- md5: 2e17d026404605792db200d504f469db
+  size: 3918
   path: dataset_2520_number_and_percentage_of_current_smokers__by_sex__american_lung_association__2011_config.json

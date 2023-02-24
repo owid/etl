@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 15:57:53.166837
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: GHG emissions per capita (EDGAR, 2019)
   namespace: backport
-  publication_date: latest
   short_name: dataset_4878_ghg_emissions_per_capita__edgar__2019_values
+  file_extension: feather
+  date_accessed: 2023-02-23 19:12:17.567970
+  name: GHG emissions per capita (EDGAR, 2019)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/4878
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 31ee8c5a312b2327f61c600c403d285e
-  size: 97978
+- md5: 45b62076b8b9bb266680050d50070750
+  size: 98354
   path: dataset_4878_ghg_emissions_per_capita__edgar__2019_values.feather

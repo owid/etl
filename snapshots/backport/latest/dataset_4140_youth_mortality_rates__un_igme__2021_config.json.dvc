@@ -1,20 +1,21 @@
 meta:
-  date_accessed: 2022-12-07 17:18:50.558913
-  description: "Relevant notebook is here: https://github.com/owid/notebooks/blob/main/FionaSpooner/un_igme_youth_mortality/un_igme_youth_mortality.ipynb\n\
-    \nFor the under-fifteen mortality rate there are three variables available, from\
-    \ two vintages (2018, 2021) and a merged version. The 2021 vintage no longer has\
-    \ historical data beyond 1990."
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_4140_youth_mortality_rates__un_igme__2021
   namespace: backport
-  publication_date: latest
   short_name: dataset_4140_youth_mortality_rates__un_igme__2021_config
+  file_extension: json
+  date_accessed: 2023-02-23 17:39:50.158121
+  name: Grapher metadata for dataset_4140_youth_mortality_rates__un_igme__2021
+  description: |-
+    Relevant notebook is here: https://github.com/owid/notebooks/blob/main/FionaSpooner/un_igme_youth_mortality/un_igme_youth_mortality.ipynb
+
+    For the under-fifteen mortality rate there are three variables available, from two vintages (2018, 2021) and a merged version. The 2021 vintage no longer has historical data beyond 1990.
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/4140
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: e95408dea62d8619e697b28d0503ed02
-  size: 17577
+- md5: f5e8a314a592230b51da467c52688a2b
+  size: 24777
   path: dataset_4140_youth_mortality_rates__un_igme__2021_config.json

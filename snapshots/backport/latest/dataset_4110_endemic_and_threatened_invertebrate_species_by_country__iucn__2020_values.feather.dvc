@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 00:59:17.443550
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Endemic and threatened invertebrate species by country (IUCN, 2020)
   namespace: backport
-  publication_date: latest
   short_name: dataset_4110_endemic_and_threatened_invertebrate_species_by_country__iucn__2020_values
+  file_extension: feather
+  date_accessed: 2023-02-23 18:25:40.166307
+  name: Endemic and threatened invertebrate species by country (IUCN, 2020)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/4110
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 417940386e4085e705ab7ff83602bcbd
-  size: 14858
+- md5: 3c8dd01cd82b3fb4543a61ae24130586
+  size: 15234
   path: dataset_4110_endemic_and_threatened_invertebrate_species_by_country__iucn__2020_values.feather

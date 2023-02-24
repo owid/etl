@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:56:47.168276
-  description: Backported
-  file_extension: feather
-  is_public: false
-  name: World Income Distribution - van Zanden et al. (eds.) (2-14), OECD
   namespace: backport
-  publication_date: latest
   short_name: dataset_5817_world_income_distribution__van_zanden_et_al__eds__2_14__oecd_values
+  file_extension: feather
+  date_accessed: 2023-02-23 19:24:42.116587
+  name: World Income Distribution - van Zanden et al. (eds.) (2-14), OECD
+  description: Backported
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5817
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: c87851ed21ad26e23c0a81951353994e
-  size: 7802
+- md5: 44de933725c40fae8898250444d62ec7
+  size: 8178
   path: dataset_5817_world_income_distribution__van_zanden_et_al__eds__2_14__oecd_values.feather

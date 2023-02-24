@@ -1,20 +1,21 @@
 meta:
-  date_accessed: 2022-12-07 18:18:41.322564
+  namespace: backport
+  short_name: dataset_1029_wealth_per_capita_by_component_for_various_country_groupings__world_bank__2017_values
+  file_extension: feather
+  date_accessed: 2023-02-23 19:40:36.495781
+  name: Wealth per capita by component for various country groupings - World Bank
+    (2017)
   description: Wealth is the value of an economy's capital stocks. GDP is seen as
     the return on wealth. The World Bank calculates wealth as the sum of produced
     capital, natural capital, human capital, net foreign assets.
-  file_extension: feather
-  is_public: true
-  name: Wealth per capita by component for various country groupings - World Bank
-    (2017)
-  namespace: backport
-  publication_date: latest
-  short_name: dataset_1029_wealth_per_capita_by_component_for_various_country_groupings__world_bank__2017_values
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/1029
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: f59240c289dec724745ddc41ce256587
-  size: 13922
+- md5: 826711a51e31c283d794e8bd92280573
+  size: 14298
   path: dataset_1029_wealth_per_capita_by_component_for_various_country_groupings__world_bank__2017_values.feather

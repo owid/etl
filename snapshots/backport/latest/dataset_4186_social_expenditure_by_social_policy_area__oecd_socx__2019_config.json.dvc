@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:58:06.034981
-  description: ''
-  file_extension: json
-  is_public: false
-  name: Grapher metadata for dataset_4186_social_expenditure_by_social_policy_area__oecd_socx__2019
   namespace: backport
-  publication_date: latest
   short_name: dataset_4186_social_expenditure_by_social_policy_area__oecd_socx__2019_config
+  file_extension: json
+  date_accessed: 2023-02-23 16:36:51.197902
+  name: Grapher metadata for dataset_4186_social_expenditure_by_social_policy_area__oecd_socx__2019
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/4186
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: cee3dbf875c187e063a91bcb1cfa84eb
-  size: 7255
+- md5: 41abc973b3a11ceb0c4bc0b435273f22
+  size: 9055
   path: dataset_4186_social_expenditure_by_social_policy_area__oecd_socx__2019_config.json

@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:24:00.514750
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Decomposition times of marine debris
   namespace: backport
-  publication_date: latest
   short_name: dataset_2854_decomposition_times_of_marine_debris_values
+  file_extension: feather
+  date_accessed: 2023-02-23 16:26:46.575711
+  name: Decomposition times of marine debris
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2854
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 2f12a9690507c2ca7c1e0bceaf10454a
-  size: 6154
+- md5: 531bd1213b8cbaf6dec352f41f18e7fb
+  size: 6530
   path: dataset_2854_decomposition_times_of_marine_debris_values.feather

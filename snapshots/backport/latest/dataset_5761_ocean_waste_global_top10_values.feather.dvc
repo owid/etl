@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:18:25.214798
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: ocean_waste_global_top10
   namespace: backport
-  publication_date: latest
   short_name: dataset_5761_ocean_waste_global_top10_values
+  file_extension: feather
+  date_accessed: 2023-02-23 19:32:40.381863
+  name: ocean_waste_global_top10
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5761
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 9d9a3edb6bc3aeb637ca9235b16ae0df
-  size: 6026
+- md5: f56e029bd69e8bba8e59fc7d18801039
+  size: 6402
   path: dataset_5761_ocean_waste_global_top10_values.feather

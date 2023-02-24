@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:18:17.999932
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_5761_ocean_waste_global_top10
   namespace: backport
-  publication_date: latest
   short_name: dataset_5761_ocean_waste_global_top10_config
+  file_extension: json
+  date_accessed: 2023-02-23 19:32:14.261924
+  name: Grapher metadata for dataset_5761_ocean_waste_global_top10
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5761
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 4e35515147ccdb525e47cfd100631526
-  size: 2375
+- md5: 88c9469c673d584e442799a43b49b543
+  size: 2575
   path: dataset_5761_ocean_waste_global_top10_config.json

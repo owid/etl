@@ -7,8 +7,12 @@ Find more details in the README in `docs/data/regions.md`.
 import pandas as pd
 import yaml
 from owid.catalog import Table
+from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
+
+# Initialize logger.
+log = get_logger()
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -20,6 +24,12 @@ REGION_CODES_FILE = paths.directory / "regions.codes.csv"
 
 # Expected region types.
 REGION_TYPES = ["country", "continent", "aggregate", "other"]
+
+# Define list of expected duplicated aliases.
+# This could happen, for example, if a historical region changes definition on a particular year.
+# We could have different codes for, e.g. OWID_USS_1990 and OWID_USS_1991, but with the same alias, "USSR".
+# If an alias that is not in this list is found multiple times in the data, an error is raised.
+DUPLICATED_ALIASES = []
 
 
 def parse_raw_definitions(df: pd.DataFrame) -> pd.DataFrame:
@@ -63,6 +73,19 @@ def run_sanity_checks(df: pd.DataFrame) -> None:
     # Check that data contains only expected region types.
     unknown_region_types = set(df["region_type"]) - set(REGION_TYPES)
     assert unknown_region_types == set(), f"Unexpected region types: {unknown_region_types}"
+
+    # Ensure that there are no unknown duplicated aliases.
+    # Create a dataframe where each row corresponds to an individual alias.
+    aliases_all = df[["aliases"]].dropna().explode("aliases")
+    # Create a list of unknown duplicated aliases.
+    aliases_duplicated = aliases_all[
+        aliases_all["aliases"].duplicated() & (~aliases_all["aliases"].isin(DUPLICATED_ALIASES))
+    ]["aliases"].tolist()
+    error = (
+        f"Unknown duplicated aliases: {aliases_duplicated}. "
+        "If this duplicate was intended, add it to DUPLICATED_ALIASES at the beginning of the regions.py garden step."
+    )
+    assert len(aliases_duplicated) == 0, error
 
 
 def run(dest_dir: str) -> None:

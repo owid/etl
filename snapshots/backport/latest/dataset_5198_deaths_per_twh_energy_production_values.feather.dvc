@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5198_deaths_per_twh_energy_production_values
   file_extension: feather
-  date_accessed: 2023-01-30 10:19:15.546930
+  date_accessed: 2023-02-23 18:42:26.630146
   name: Deaths per TWh energy production
   description: ''
   source_name: Our World in Data catalog backport

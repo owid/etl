@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 16:58:29.294585
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Historical Index of Human Development (without GDP) - Prados de la Escosura
   namespace: backport
-  publication_date: latest
   short_name: dataset_2781_historical_index_of_human_development__without_gdp__prados_de_la_escosura_values
+  file_extension: feather
+  date_accessed: 2023-02-23 18:29:17.741484
+  name: Historical Index of Human Development (without GDP) - Prados de la Escosura
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2781
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 87611e50c4e5c4e16d8fb429393ac52d
-  size: 20802
+- md5: b7a2d9af4827d064353863fb09d93615
+  size: 21178
   path: dataset_2781_historical_index_of_human_development__without_gdp__prados_de_la_escosura_values.feather

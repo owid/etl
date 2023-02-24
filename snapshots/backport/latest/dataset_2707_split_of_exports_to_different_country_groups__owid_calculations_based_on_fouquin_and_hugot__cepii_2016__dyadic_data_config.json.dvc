@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:54:23.045474
-  description: This dataset uses CEPII dyadic trade data.
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_2707_split_of_exports_to_different_country_groups__owid_calculations_based_on_fouquin_and_hugot__cepii_2016__dyadic_data
   namespace: backport
-  publication_date: latest
   short_name: dataset_2707_split_of_exports_to_different_country_groups__owid_calculations_based_on_fouquin_and_hugot__cepii_2016__dyadic_data_config
+  file_extension: json
+  date_accessed: 2023-02-23 18:55:54.521443
+  name: Grapher metadata for dataset_2707_split_of_exports_to_different_country_groups__owid_calculations_based_on_fouquin_and_hugot__cepii_2016__dyadic_data
+  description: This dataset uses CEPII dyadic trade data.
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2707
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: b45e48365b59b9a88735603b9eaf457a
-  size: 11012
+- md5: b4e2022ebb704e6bb5b8a01773600d89
+  size: 13586
   path: dataset_2707_split_of_exports_to_different_country_groups__owid_calculations_based_on_fouquin_and_hugot__cepii_2016__dyadic_data_config.json

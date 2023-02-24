@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 00:32:55.108715
-  description: ''
-  file_extension: feather
-  is_public: false
-  name: Bribe payers index (Transparency International - GCB (2013)) (split)
   namespace: backport
-  publication_date: latest
   short_name: dataset_2986_bribe_payers_index__transparency_international__gcb__2013__split_values
+  file_extension: feather
+  date_accessed: 2023-02-23 17:53:55.920867
+  name: Bribe payers index (Transparency International - GCB (2013)) (split)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2986
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 8aec717ec9dc1944b6c7a161192d1296
-  size: 6650
+- md5: 24f883c4712f33922eb9fa1cba4520e2
+  size: 7018
   path: dataset_2986_bribe_payers_index__transparency_international__gcb__2013__split_values.feather

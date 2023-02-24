@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 01:27:41.814302
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_2497_german_road_deaths_and_accidents__destatis
   namespace: backport
-  publication_date: latest
   short_name: dataset_2497_german_road_deaths_and_accidents__destatis_config
+  file_extension: json
+  date_accessed: 2023-02-23 18:43:05.499895
+  name: Grapher metadata for dataset_2497_german_road_deaths_and_accidents__destatis
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2497
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 45a7e42255c709e4d8fe15c829902f85
-  size: 1781
+- md5: cbf024e7eac3cacbefce889a5b8ae565
+  size: 2177
   path: dataset_2497_german_road_deaths_and_accidents__destatis_config.json

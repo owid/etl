@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 15:50:44.149698
-  description: ''
-  file_extension: feather
-  is_public: false
-  name: Deforestation emissions embedded in trade (Pendrill et al. 2019)
   namespace: backport
-  publication_date: latest
   short_name: dataset_5216_deforestation_emissions_embedded_in_trade__pendrill_et_al__2019_values
+  file_extension: feather
+  date_accessed: 2023-02-23 17:13:24.057277
+  name: Deforestation emissions embedded in trade (Pendrill et al. 2019)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5216
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 816215966bed8df1fc2b53b198913bbc
-  size: 11866
+- md5: c024bf58f99c057d262222cf54c03255
+  size: 12242
   path: dataset_5216_deforestation_emissions_embedded_in_trade__pendrill_et_al__2019_values.feather

@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:37:47.548651
-  description: ''
-  file_extension: feather
-  is_public: false
-  name: Biodiversity Intactness Index - Historical - NHM (2021)
   namespace: backport
-  publication_date: latest
   short_name: dataset_5407_biodiversity_intactness_index__historical__nhm__2021_values
+  file_extension: feather
+  date_accessed: 2023-02-23 19:32:47.465239
+  name: Biodiversity Intactness Index - Historical - NHM (2021)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5407
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: e59442a198366bcb08c09f78890cb41c
-  size: 38186
+- md5: b7f3ed3bc18820fb29f545f3c365b78f
+  size: 38562
   path: dataset_5407_biodiversity_intactness_index__historical__nhm__2021_values.feather

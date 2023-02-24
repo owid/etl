@@ -1,19 +1,20 @@
 meta:
-  date_accessed: 2022-12-07 18:05:10.441598
-  description: 'Data-set put together by Marco Molteni under the guidance of Esteban.
-    OECD (SOCX) on social spending are used as reference series and data are extrapolated
-    backwards using OECD 1985. '
-  file_extension: json
-  is_public: false
-  name: Grapher metadata for dataset_3004_social_expenditure_pctgdp__oecd__socx__split
   namespace: backport
-  publication_date: latest
   short_name: dataset_3004_social_expenditure_pctgdp__oecd__socx__split_config
+  file_extension: json
+  date_accessed: 2023-02-23 17:49:24.226584
+  name: Grapher metadata for dataset_3004_social_expenditure_pctgdp__oecd__socx__split
+  description: Data-set put together by Marco Molteni under the guidance of Esteban.
+    OECD (SOCX) on social spending are used as reference series and data are extrapolated
+    backwards using OECD 1985.
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/3004
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 8392083127a9d9a40ca04ef72aaec2a7
-  size: 2353
+- md5: 441296cca4879f29531340f431680335
+  size: 2549
   path: dataset_3004_social_expenditure_pctgdp__oecd__socx__split_config.json

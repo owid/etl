@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 00:58:32.098972
-  description: core-econ.org
-  file_extension: feather
-  is_public: false
-  name: Figure_17.8_nominal_ir
   namespace: backport
-  publication_date: latest
   short_name: dataset_5136_figure_17_8_nominal_ir_values
+  file_extension: feather
+  date_accessed: 2023-02-23 15:01:48.937021
+  name: Figure_17.8_nominal_ir
+  description: core-econ.org
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5136
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 952c38a8cb88993eb5cfc37076b32977
-  size: 6850
+- md5: 44dcdcef8dca8cea71e102928845a8c4
+  size: 7226
   path: dataset_5136_figure_17_8_nominal_ir_values.feather

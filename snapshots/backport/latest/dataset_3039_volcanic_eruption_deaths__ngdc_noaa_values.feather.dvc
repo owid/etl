@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 00:42:52.517063
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Volcanic eruption deaths (NGDC/NOAA)
   namespace: backport
-  publication_date: latest
   short_name: dataset_3039_volcanic_eruption_deaths__ngdc_noaa_values
+  file_extension: feather
+  date_accessed: 2023-02-23 16:42:33.191363
+  name: Volcanic eruption deaths (NGDC/NOAA)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/3039
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: c8f9615377b2545d8243f71d0cf61b94
-  size: 11234
+- md5: 876e99fd2d17ef86a1015ae83f545da1
+  size: 11610
   path: dataset_3039_volcanic_eruption_deaths__ngdc_noaa_values.feather

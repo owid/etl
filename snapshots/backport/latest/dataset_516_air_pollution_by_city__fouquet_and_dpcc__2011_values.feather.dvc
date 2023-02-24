@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:47:24.361311
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Air pollution by city - Fouquet and DPCC (2011)
   namespace: backport
-  publication_date: latest
   short_name: dataset_516_air_pollution_by_city__fouquet_and_dpcc__2011_values
+  file_extension: feather
+  date_accessed: 2023-02-23 15:09:07.285650
+  name: Air pollution by city - Fouquet and DPCC (2011)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/516
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 4f91537405dbb6b3816e9f9dc8e7f29b
-  size: 9226
+- md5: 530b0e269aae5ad883b6fab3833f9276
+  size: 9602
   path: dataset_516_air_pollution_by_city__fouquet_and_dpcc__2011_values.feather

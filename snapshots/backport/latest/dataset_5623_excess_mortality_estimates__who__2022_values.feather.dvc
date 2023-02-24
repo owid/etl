@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:01:34.206787
-  description: ''
-  file_extension: feather
-  is_public: false
-  name: Excess Mortality Estimates – WHO (2022)
   namespace: backport
-  publication_date: latest
   short_name: dataset_5623_excess_mortality_estimates__who__2022_values
+  file_extension: feather
+  date_accessed: 2023-02-23 18:46:09.221911
+  name: Excess Mortality Estimates – WHO (2022)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5623
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: adf696de595e352634c7d35e9e49fafe
-  size: 252178
+- md5: 185155079ff34cc5a4df5823e35a3591
+  size: 252554
   path: dataset_5623_excess_mortality_estimates__who__2022_values.feather

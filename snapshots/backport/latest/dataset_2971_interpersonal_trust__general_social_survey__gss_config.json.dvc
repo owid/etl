@@ -1,22 +1,27 @@
 meta:
-  date_accessed: 2022-12-08 00:25:07.707524
-  description: "Extracted from the GSS Data Explorer\nVariable \"trust\" (https://gssdataexplorer.norc.org/variables/441/vshow)\n\
-    -> Tabulate\nColumn: Trust (Can people be trusted)\nRow: Year (GSS year for this\
-    \ respondent)\nWeight var: WTSSCOMP\nSample design: Simple Random Sample\nExclude\
-    \ missing: Yes\nNote: as of 7 Mar 2022 there is a typo in the values on the GSS\
-    \ website - we think that \"Can't trust\" actually mean \"Can trust\" and is the\
-    \ positive response, while \"Can't be too careful\" is the negative response."
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_2971_interpersonal_trust__general_social_survey__gss
   namespace: backport
-  publication_date: latest
   short_name: dataset_2971_interpersonal_trust__general_social_survey__gss_config
+  file_extension: json
+  date_accessed: 2023-02-23 18:05:47.123980
+  name: Grapher metadata for dataset_2971_interpersonal_trust__general_social_survey__gss
+  description: |-
+    Extracted from the GSS Data Explorer
+    Variable "trust" (https://gssdataexplorer.norc.org/variables/441/vshow)
+    -> Tabulate
+    Column: Trust (Can people be trusted)
+    Row: Year (GSS year for this respondent)
+    Weight var: WTSSCOMP
+    Sample design: Simple Random Sample
+    Exclude missing: Yes
+    Note: as of 7 Mar 2022 there is a typo in the values on the GSS website - we think that "Can't trust" actually mean "Can trust" and is the positive response, while "Can't be too careful" is the negative response.
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2971
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 61a227f1fd00e0aaff4ebc1ad57ec1e1
-  size: 2835
+- md5: a64fd803a86ce3a7d95884196414b3f4
+  size: 3033
   path: dataset_2971_interpersonal_trust__general_social_survey__gss_config.json

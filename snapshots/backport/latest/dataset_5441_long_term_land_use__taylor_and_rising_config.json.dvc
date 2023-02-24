@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 00:07:14.082051
-  description: ''
-  file_extension: json
-  is_public: false
-  name: Grapher metadata for dataset_5441_long_term_land_use__taylor_and_rising
   namespace: backport
-  publication_date: latest
   short_name: dataset_5441_long_term_land_use__taylor_and_rising_config
+  file_extension: json
+  date_accessed: 2023-02-23 19:13:03.406315
+  name: Grapher metadata for dataset_5441_long_term_land_use__taylor_and_rising
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5441
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: b663c3fdb56f21efaf978e02cb815e40
-  size: 14583
+- md5: f509af27d14e40eac44af15056feed5f
+  size: 21383
   path: dataset_5441_long_term_land_use__taylor_and_rising_config.json

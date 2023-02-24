@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 15:59:34.395363
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_2851_plastic_imports_by_china__and__impact_of_ban__brooks_et_al__2018
   namespace: backport
-  publication_date: latest
   short_name: dataset_2851_plastic_imports_by_china__and__impact_of_ban__brooks_et_al__2018_config
+  file_extension: json
+  date_accessed: 2023-02-23 17:00:55.276095
+  name: Grapher metadata for dataset_2851_plastic_imports_by_china__and__impact_of_ban__brooks_et_al__2018
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2851
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: c4dac7898526a9eedf51a28618bbdb11
-  size: 4049
+- md5: 81a1169fcb0a163fc0d13ecd1140bf77
+  size: 5237
   path: dataset_2851_plastic_imports_by_china__and__impact_of_ban__brooks_et_al__2018_config.json

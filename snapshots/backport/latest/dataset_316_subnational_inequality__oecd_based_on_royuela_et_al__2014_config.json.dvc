@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:39:47.754133
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_316_subnational_inequality__oecd_based_on_royuela_et_al__2014
   namespace: backport
-  publication_date: latest
   short_name: dataset_316_subnational_inequality__oecd_based_on_royuela_et_al__2014_config
+  file_extension: json
+  date_accessed: 2023-02-23 19:21:03.075632
+  name: Grapher metadata for dataset_316_subnational_inequality__oecd_based_on_royuela_et_al__2014
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/316
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: b40acf35515506a996e3df2b9f8a5eb9
-  size: 2257
+- md5: 4fe7250d1e39b531baf8b764a738b847
+  size: 2649
   path: dataset_316_subnational_inequality__oecd_based_on_royuela_et_al__2014_config.json

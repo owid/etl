@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 15:56:16.699354
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_189_government_transparency_index__hollyer_et_al__2014
   namespace: backport
-  publication_date: latest
   short_name: dataset_189_government_transparency_index__hollyer_et_al__2014_config
+  file_extension: json
+  date_accessed: 2023-02-23 18:40:18.827393
+  name: Grapher metadata for dataset_189_government_transparency_index__hollyer_et_al__2014
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/189
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: a7ddcf5b4abc425342cf90b53b1205d1
-  size: 2854
+- md5: a760c942f4c450b19dc8ce35867fc0fd
+  size: 3454
   path: dataset_189_government_transparency_index__hollyer_et_al__2014_config.json

@@ -1,0 +1,17 @@
+dataset:
+  namespace: fasttrack
+  version: latest
+  short_name: test_co2_emissions
+  title: DRAFT test co2 emissions
+  description: ''
+  sources:
+  - name: Unknown
+    published_by: Unknown
+    publication_year: 2023
+    date_accessed: 2023-02-21
+tables:
+  test_co2_emissions:
+    variables:
+      co2_emissions:
+        title: co2 emissions
+        unit: ''

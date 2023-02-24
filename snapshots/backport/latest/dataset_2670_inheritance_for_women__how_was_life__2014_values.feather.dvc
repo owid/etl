@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 16:00:12.784023
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Inheritance for women - How Was Life? (2014)
   namespace: backport
-  publication_date: latest
   short_name: dataset_2670_inheritance_for_women__how_was_life__2014_values
+  file_extension: feather
+  date_accessed: 2023-02-23 18:35:30.258241
+  name: Inheritance for women - How Was Life? (2014)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2670
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 34545b5579c00a2fea8887eae04d82c7
-  size: 11778
+- md5: c4c806a74a680f4074dc6605f9da4fd8
+  size: 12154
   path: dataset_2670_inheritance_for_women__how_was_life__2014_values.feather

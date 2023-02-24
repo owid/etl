@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 00:18:37.185389
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: HadCRUT Temperature Anomaly
   namespace: backport
-  publication_date: latest
   short_name: dataset_958_hadcrut_temperature_anomaly_values
+  file_extension: feather
+  date_accessed: 2023-02-23 18:32:49.610218
+  name: HadCRUT Temperature Anomaly
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/958
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 9f71c689939d980e3b1cf20f827af3fd
-  size: 332258
+- md5: e06cb5eea9fccc1b9f0b3f4dfd25d7ec
+  size: 332634
   path: dataset_958_hadcrut_temperature_anomaly_values.feather

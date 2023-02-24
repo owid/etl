@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:38:59.662455
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Mental health as risk factor for substance use - Swendsen et al. (2010)
   namespace: backport
-  publication_date: latest
   short_name: dataset_2763_mental_health_as_risk_factor_for_substance_use__swendsen_et_al__2010_values
+  file_extension: feather
+  date_accessed: 2023-02-23 18:31:42.133157
+  name: Mental health as risk factor for substance use - Swendsen et al. (2010)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2763
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: d909ada1b67006894a82d950a9c26fc2
-  size: 6562
+- md5: 9f86aae466b1438eee7e07bc7eef9fa5
+  size: 6938
   path: dataset_2763_mental_health_as_risk_factor_for_substance_use__swendsen_et_al__2010_values.feather

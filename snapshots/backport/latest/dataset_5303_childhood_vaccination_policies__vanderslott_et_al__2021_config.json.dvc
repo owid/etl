@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5303_childhood_vaccination_policies__vanderslott_et_al__2021_config
   file_extension: json
-  date_accessed: 2023-01-20 11:10:47.355195
+  date_accessed: 2023-02-23 18:08:13.527676
   name: Grapher metadata for dataset_5303_childhood_vaccination_policies__vanderslott_et_al__2021
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 0417481456ae7cbe94e7d440430ed974
-  size: 4225
+- md5: 0909f9a28781ae61e1ec5e586b2c80de
+  size: 5425
   path: dataset_5303_childhood_vaccination_policies__vanderslott_et_al__2021_config.json

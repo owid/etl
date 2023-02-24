@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:32:35.996920
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Oil&Gas Employment and Rig Count - US Bureau of Labor Statistics (2017)
   namespace: backport
-  publication_date: latest
   short_name: dataset_569_oil_and_gas_employment_and_rig_count__us_bureau_of_labor_statistics__2017_values
+  file_extension: feather
+  date_accessed: 2023-02-23 19:30:15.272436
+  name: Oil&Gas Employment and Rig Count - US Bureau of Labor Statistics (2017)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/569
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: cec4cae28965a9d2100d424703eb26c8
-  size: 6330
+- md5: 8b5033f819d04c80599f1e3e9bf5f731
+  size: 6698
   path: dataset_569_oil_and_gas_employment_and_rig_count__us_bureau_of_labor_statistics__2017_values.feather

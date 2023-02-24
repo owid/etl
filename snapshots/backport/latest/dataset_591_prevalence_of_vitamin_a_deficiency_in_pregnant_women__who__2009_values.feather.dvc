@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:10:26.846189
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Prevalence of vitamin-A deficiency in pregnant women - WHO (2009)
   namespace: backport
-  publication_date: latest
   short_name: dataset_591_prevalence_of_vitamin_a_deficiency_in_pregnant_women__who__2009_values
+  file_extension: feather
+  date_accessed: 2023-02-23 19:22:09.083458
+  name: Prevalence of vitamin-A deficiency in pregnant women - WHO (2009)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/591
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 9512467d8868f6b70e1139407299c6e3
-  size: 11874
+- md5: 76de17116a509250fabd9b492ddd254e
+  size: 12250
   path: dataset_591_prevalence_of_vitamin_a_deficiency_in_pregnant_women__who__2009_values.feather

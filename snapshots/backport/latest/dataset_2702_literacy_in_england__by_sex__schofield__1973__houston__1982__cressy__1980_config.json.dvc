@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:28:38.125002
-  description: Literacy figures are nationally representative.
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_2702_literacy_in_england__by_sex__schofield__1973__houston__1982__cressy__1980
   namespace: backport
-  publication_date: latest
   short_name: dataset_2702_literacy_in_england__by_sex__schofield__1973__houston__1982__cressy__1980_config
+  file_extension: json
+  date_accessed: 2023-02-23 19:46:28.322928
+  name: Grapher metadata for dataset_2702_literacy_in_england__by_sex__schofield__1973__houston__1982__cressy__1980
+  description: Literacy figures are nationally representative.
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2702
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 257e1ccb16461ddf3d61a10a589cb9f3
-  size: 2742
+- md5: fc433ecd19083a0f6bb56de395578be3
+  size: 3138
   path: dataset_2702_literacy_in_england__by_sex__schofield__1973__houston__1982__cressy__1980_config.json

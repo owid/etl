@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 01:22:15.546172
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_5760_ocean_waste_items_by_region
   namespace: backport
-  publication_date: latest
   short_name: dataset_5760_ocean_waste_items_by_region_config
+  file_extension: json
+  date_accessed: 2023-02-23 17:12:04.720844
+  name: Grapher metadata for dataset_5760_ocean_waste_items_by_region
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5760
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 78cc91d842b60f2f18f6eb33291bdafc
-  size: 4887
+- md5: e4411fd1458358f0b460368b013933a1
+  size: 6287
   path: dataset_5760_ocean_waste_items_by_region_config.json

@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 15:49:32.104126
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_390_weekly_home_production_hours_in_the_usa__ramey__2009__and__ramey_francis__2009
   namespace: backport
-  publication_date: latest
   short_name: dataset_390_weekly_home_production_hours_in_the_usa__ramey__2009__and__ramey_francis__2009_config
+  file_extension: json
+  date_accessed: 2023-02-23 16:15:13.528945
+  name: Grapher metadata for dataset_390_weekly_home_production_hours_in_the_usa__ramey__2009__and__ramey_francis__2009
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/390
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 3f45f025466c5b1dc3ad1b1b82078e36
-  size: 2649
+- md5: 4cf731145652f6a78c1c115aa1a0c62e
+  size: 2845
   path: dataset_390_weekly_home_production_hours_in_the_usa__ramey__2009__and__ramey_francis__2009_config.json

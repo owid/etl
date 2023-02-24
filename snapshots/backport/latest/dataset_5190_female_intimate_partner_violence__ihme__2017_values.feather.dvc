@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:30:31.462814
-  description: ''
-  file_extension: feather
-  is_public: false
-  name: Female intimate partner violence (IHME, 2017)
   namespace: backport
-  publication_date: latest
   short_name: dataset_5190_female_intimate_partner_violence__ihme__2017_values
+  file_extension: feather
+  date_accessed: 2023-02-23 15:14:54.647527
+  name: Female intimate partner violence (IHME, 2017)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5190
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 2cf2761755bb21bb2ce811cb744de611
-  size: 38706
+- md5: c7ad2d29211ba8bb0af33102b43dfbae
+  size: 39082
   path: dataset_5190_female_intimate_partner_violence__ihme__2017_values.feather

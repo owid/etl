@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 16:52:13.850895
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Long run time use in Norway, by sex - Norway Statistics
   namespace: backport
-  publication_date: latest
   short_name: dataset_2893_long_run_time_use_in_norway__by_sex__norway_statistics_values
+  file_extension: feather
+  date_accessed: 2023-02-23 18:06:34.479412
+  name: Long run time use in Norway, by sex - Norway Statistics
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2893
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 2da4ad500f4288a2a25b05e4c6496a26
-  size: 6882
+- md5: 86e92bdea439d5eaea7eedb990720736
+  size: 7258
   path: dataset_2893_long_run_time_use_in_norway__by_sex__norway_statistics_values.feather

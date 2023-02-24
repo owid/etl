@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 16:33:25.787337
-  description: https://github.com/owid/notebooks/blob/main/BetterDataDocs/FionaSpooner/maternal_mortality/maternal_mortality.qmd
-  file_extension: feather
-  is_public: true
-  name: Maternal Mortality Ratio (Gapminder (2010), WHO (2019) and OECD (2022))
   namespace: backport
-  publication_date: latest
   short_name: dataset_522_maternal_mortality_ratio__gapminder__2010__who__2019__and_oecd__2022_values
+  file_extension: feather
+  date_accessed: 2023-02-23 18:23:21.935428
+  name: Maternal Mortality Ratio (Gapminder (2010), WHO (2019) and OECD (2022))
+  description: https://github.com/owid/notebooks/blob/main/BetterDataDocs/FionaSpooner/maternal_mortality/maternal_mortality.qmd
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/522
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 2657245810e8ab3afdfce10bcbb63846
-  size: 57122
+- md5: 65cbd61d541cfc3b8095ab8d1af3346a
+  size: 57498
   path: dataset_522_maternal_mortality_ratio__gapminder__2010__who__2019__and_oecd__2022_values.feather

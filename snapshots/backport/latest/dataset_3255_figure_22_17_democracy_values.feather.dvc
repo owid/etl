@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 15:49:13.696409
-  description: core-econ.org
-  file_extension: feather
-  is_public: false
-  name: Figure 22.17_democracy
   namespace: backport
-  publication_date: latest
   short_name: dataset_3255_figure_22_17_democracy_values
+  file_extension: feather
+  date_accessed: 2023-02-23 19:46:48.317550
+  name: Figure 22.17_democracy
+  description: core-econ.org
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/3255
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: eb82b4c07da28dccfa98f087c13a696b
-  size: 6474
+- md5: 44abb87fe5ce189d61b6463fe8d22f22
+  size: 6842
   path: dataset_3255_figure_22_17_democracy_values.feather

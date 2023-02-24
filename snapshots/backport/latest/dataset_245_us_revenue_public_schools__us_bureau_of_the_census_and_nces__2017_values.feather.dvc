@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:02:52.911250
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: US Revenue Public Schools - US Bureau of the Census and NCES (2017)
   namespace: backport
-  publication_date: latest
   short_name: dataset_245_us_revenue_public_schools__us_bureau_of_the_census_and_nces__2017_values
+  file_extension: feather
+  date_accessed: 2023-02-23 17:41:50.844523
+  name: US Revenue Public Schools - US Bureau of the Census and NCES (2017)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/245
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: a138f59ec27e84380aea3bd6bae751ab
-  size: 8690
+- md5: 6061645bdd221b073599244e02f8991d
+  size: 9066
   path: dataset_245_us_revenue_public_schools__us_bureau_of_the_census_and_nces__2017_values.feather

@@ -1,18 +1,19 @@
 meta:
-  date_accessed: 2022-12-07 18:40:28.221183
-  description: ''
+  namespace: backport
+  short_name: dataset_5538_nuclear_weapons_proliferation__owid_based_on_bleek__2017__nuclear_threat_initiative__2022_values
   file_extension: feather
-  is_public: true
+  date_accessed: 2023-02-23 15:14:23.213538
   name: Nuclear weapons proliferation – OWID based on Bleek (2017), Nuclear Threat
     Initiative (2022)
-  namespace: backport
-  publication_date: latest
-  short_name: dataset_5538_nuclear_weapons_proliferation__owid_based_on_bleek__2017__nuclear_threat_initiative__2022_values
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5538
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 7eeb0298b7ae32bd47d5e50ba65ba10f
-  size: 23826
+- md5: 631cfc42d208671c0d2bbcf56743a704
+  size: 24202
   path: dataset_5538_nuclear_weapons_proliferation__owid_based_on_bleek__2017__nuclear_threat_initiative__2022_values.feather

@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 15:56:11.126858
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_4241_raised_blood_pressure_prevalence__ncd_risc__2017
   namespace: backport
-  publication_date: latest
   short_name: dataset_4241_raised_blood_pressure_prevalence__ncd_risc__2017_config
+  file_extension: json
+  date_accessed: 2023-02-23 17:33:20.690238
+  name: Grapher metadata for dataset_4241_raised_blood_pressure_prevalence__ncd_risc__2017
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/4241
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 72c370c9a0528aed7e5c9b3850ed722f
-  size: 4599
+- md5: adfb1edc675c5ac532e1efc424e19423
+  size: 5399
   path: dataset_4241_raised_blood_pressure_prevalence__ncd_risc__2017_config.json

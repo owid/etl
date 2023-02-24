@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-11-29 16:38:36.571421
-  description: Continents each country belongs to. Good one.
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_115_countries_continents
   namespace: backport
-  publication_date: latest
   short_name: dataset_115_countries_continents_config
+  file_extension: json
+  date_accessed: 2023-02-23 19:21:49.223643
+  name: Grapher metadata for dataset_115_countries_continents
+  description: Continents each country belongs to. Good one.
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/115
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 22020e9c2c83a860f82c9485626615f0
-  size: 1266
+- md5: 7294a1166d46ef725f09fe05f25e274c
+  size: 1460
   path: dataset_115_countries_continents_config.json

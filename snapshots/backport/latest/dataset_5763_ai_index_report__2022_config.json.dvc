@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 16:52:38.324048
-  description: ''
-  file_extension: json
-  is_public: false
-  name: Grapher metadata for dataset_5763_ai_index_report__2022
   namespace: backport
-  publication_date: latest
   short_name: dataset_5763_ai_index_report__2022_config
+  file_extension: json
+  date_accessed: 2023-02-23 19:02:03.740483
+  name: Grapher metadata for dataset_5763_ai_index_report__2022
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5763
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: e7c4ff2a4e5476547c7c7b3d18d8ecc6
-  size: 47986
+- md5: d13f8c6a893526bf1e640207c5f066b2
+  size: 55986
   path: dataset_5763_ai_index_report__2022_config.json

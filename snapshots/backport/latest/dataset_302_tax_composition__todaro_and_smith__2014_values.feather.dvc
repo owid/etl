@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 16:32:26.673176
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Tax composition – Todaro and Smith (2014)
   namespace: backport
-  publication_date: latest
   short_name: dataset_302_tax_composition__todaro_and_smith__2014_values
+  file_extension: feather
+  date_accessed: 2023-02-23 18:03:33.693339
+  name: Tax composition – Todaro and Smith (2014)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/302
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: cdd95654d700b26fb581e1b538a18e4d
-  size: 6562
+- md5: 982a241deac61353536857f0f863d788
+  size: 6938
   path: dataset_302_tax_composition__todaro_and_smith__2014_values.feather

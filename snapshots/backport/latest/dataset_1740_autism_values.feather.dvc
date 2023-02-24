@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:32:24.010521
-  description: This is a dataset imported by the automated fetcher
-  file_extension: feather
-  is_public: true
-  name: Autism
   namespace: backport
-  publication_date: latest
   short_name: dataset_1740_autism_values
+  file_extension: feather
+  date_accessed: 2023-02-23 18:47:02.949366
+  name: Autism
+  description: This is a dataset imported by the automated fetcher
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/1740
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 3ad22cdd24319601bfd2059f75071c8a
-  size: 962922
+- md5: 5bba333559fbc4ff7d76fae3861fc079
+  size: 963298
   path: dataset_1740_autism_values.feather

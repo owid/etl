@@ -1,18 +1,19 @@
 meta:
-  date_accessed: 2022-12-08 01:00:13.955443
-  description: 'This data uses A1. Headline Series sheet of BoE dataset to get Real
-    GDP and Population figures for England. '
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_700_gdp_in_england__using_boe__2017
   namespace: backport
-  publication_date: latest
   short_name: dataset_700_gdp_in_england__using_boe__2017_config
+  file_extension: json
+  date_accessed: 2023-02-23 18:32:14.833702
+  name: Grapher metadata for dataset_700_gdp_in_england__using_boe__2017
+  description: This data uses A1. Headline Series sheet of BoE dataset to get Real
+    GDP and Population figures for England.
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/700
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 2f79f929e9aaf6a25744637bd66003b3
-  size: 2993
+- md5: d027fb63adf273f04006f6efd48fe97c
+  size: 3581
   path: dataset_700_gdp_in_england__using_boe__2017_config.json

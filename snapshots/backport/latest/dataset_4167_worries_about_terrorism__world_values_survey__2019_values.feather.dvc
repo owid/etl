@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 01:13:54.976681
-  description: ''
-  file_extension: feather
-  is_public: false
-  name: Worries about Terrorism - World Values Survey (2019)
   namespace: backport
-  publication_date: latest
   short_name: dataset_4167_worries_about_terrorism__world_values_survey__2019_values
+  file_extension: feather
+  date_accessed: 2023-02-23 16:32:46.621428
+  name: Worries about Terrorism - World Values Survey (2019)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/4167
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 1e343cff1d732c2dc81ee7e1cec04649
-  size: 9114
+- md5: 5a40b0abcabedf06b9f75223540629e8
+  size: 9482
   path: dataset_4167_worries_about_terrorism__world_values_survey__2019_values.feather
