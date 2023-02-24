@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
 from owid.datautils import dataframes
-from shared import HISTORIC_TO_CURRENT_REGION, add_population
+from shared import add_population
 
 from etl.helpers import PathFinder, create_dataset
 
@@ -48,7 +48,7 @@ def prepare_bp_data(tb_bp: Table) -> Table:
 
 
 def prepare_shift_data(tb_shift: Table) -> Table:
-    """Load Shift data from the local catalog, and rename columns conveniently.
+    """Prepare Shift data.
 
     Parameters
     ----------

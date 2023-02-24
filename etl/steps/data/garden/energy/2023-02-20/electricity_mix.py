@@ -8,7 +8,7 @@ from typing import Dict, List
 import pandas as pd
 from owid import catalog
 from owid.datautils.dataframes import combine_two_overlapping_dataframes
-from shared import CURRENT_DIR, add_population
+from shared import add_population
 
 from etl.helpers import PathFinder, create_dataset
 
