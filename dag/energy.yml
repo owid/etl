@@ -199,7 +199,6 @@ steps:
     - data://meadow/unep/2023-01-03/renewable_energy_investments
   data://grapher/unep/2023-01-03/renewable_energy_investments:
     - data://garden/unep/2023-01-03/renewable_energy_investments
-
   #
   # Energy - Photovoltaic cost and capacity.
   #
@@ -261,9 +260,10 @@ steps:
     - data://garden/owid/latest/key_indicators
   data://grapher/energy/2022-12-28/primary_energy_consumption:
     - data://garden/energy/2022-12-28/primary_energy_consumption
-  # UK BEIS - UK historical electricity (2022).
-  data://meadow/uk_beis/2022-07-28/uk_historical_electricity:
-    - walden://uk_beis/2022-07-28/uk_historical_electricity
-  data://garden/uk_beis/2022-07-28/uk_historical_electricity:
-    - data://meadow/uk_beis/2022-07-28/uk_historical_electricity
+  # Energy - UK historical electricity (2022).
+  data://garden/energy/2022-12-28/uk_historical_electricity:
+    - data://garden/uk_beis/2022-07-28/uk_historical_electricity
+    - data://garden/energy/2022-12-28/electricity_mix
+  data://grapher/energy/2022-12-28/uk_historical_electricity:
+    - data://garden/energy/2022-12-28/uk_historical_electricity
   ######################################################################################################################
