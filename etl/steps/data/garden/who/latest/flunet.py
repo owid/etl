@@ -62,11 +62,11 @@ def split_by_surveillance_type(df: pd.DataFrame) -> pd.DataFrame:
     flu_cols = df.columns.drop(["country", "date", "origin_source"])
     df_piv = df.pivot(index=["country", "date"], columns="origin_source").reset_index()
 
-    df_piv.columns = list(map("_".join, df_piv.columns))
-    sentinel_list = ["_SENTINEL", "_NONSENTINEL", "_NOTDEFINED"]
+    df_piv.columns = list(map("".join, df_piv.columns))
+    sentinel_list = ["SENTINEL", "NONSENTINEL", "NOTDEFINED"]
     for col in flu_cols:
         sum_cols = [col + s for s in sentinel_list]
-        df_piv[col + "_combined"] = df_piv[sum_cols].sum(axis=1, min_count=1)
+        df_piv[col + "COMBINED"] = df_piv[sum_cols].sum(axis=1, min_count=1)
     return df_piv
 
 
@@ -135,7 +135,7 @@ def calculate_percent_positive(df: pd.DataFrame) -> pd.DataFrame:
     Remove rows where the percent is > 100
     Remove rows where the percent = 100 but all available denominators are 0.
     """
-    surveillance_cols = ["_SENTINEL", "_NONSENTINEL", "_NOTDEFINED", "_combined"]
+    surveillance_cols = ["SENTINEL", "NONSENTINEL", "NOTDEFINED", "COMBINED"]
 
     for col in surveillance_cols:
         df["pcnt_pos_1" + col] = (df["inf_all" + col] / (df["inf_all" + col] + df["inf_negative" + col])) * 100
