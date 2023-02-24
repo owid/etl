@@ -22,3 +22,5 @@ steps:
   - snapshot-private://fasttrack/latest/test_co2_emissions.csv
   data-private://grapher/fasttrack/latest/test_electricity_projections:
   - snapshot-private://fasttrack/latest/test_electricity_projections.csv
+  data-private://grapher/fasttrack/latest/battery_costs_per_kwh__ziegler_et_al__and_bnef:
+  - snapshot-private://fasttrack/latest/battery_costs_per_kwh__ziegler_et_al__and_bnef.csv
