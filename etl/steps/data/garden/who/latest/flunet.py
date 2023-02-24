@@ -124,16 +124,6 @@ def clean_and_format_data(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def aggregate_surveillance_type(combined_df: pd.DataFrame) -> pd.DataFrame:
-
-    df = df.copy(deep=True)
-    # Summing all cases by country, hemisphere and date
-    df_agg = df.groupby(["country", "date"]).sum().reset_index()
-    # Check we haven't lost any cases along the way
-    assert combined_df["inf_all"].sum() == df_agg["inf_all"].sum()
-    return df_agg
-
-
 def calculate_percent_positive(df: pd.DataFrame) -> pd.DataFrame:
     """
     Because the data is patchy in some places the WHO recommends three methods for calclating the share of influenza tests that are positive.
