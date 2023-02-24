@@ -1,4 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
+import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
 from structlog import get_logger
@@ -46,7 +47,7 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb_garden], default_metadata=paths.metadata)
+    ds_garden = create_dataset(dest_dir, tables=[tb_garden], default_metadata=ds_meadow.metadata)
     # Save changes in the new garden dataset.
     ds_garden.save()
 
@@ -150,7 +151,7 @@ def calculate_percent_positive(df: pd.DataFrame) -> pd.DataFrame:
         df = df.drop(columns=["pcnt_pos_1" + col, "pcnt_pos_2" + col, "pcnt_pos_3" + col])
 
         # Drop rows where pcnt_pos is >100
-        df.loc[df["pcnt_pos" + col] > 100, "pcnt_pos" + col] = pd.NA
+        df.loc[df["pcnt_pos" + col] > 100, "pcnt_pos" + col] = np.nan
 
         # Rows where the percentage positive is 100 but all possible denominators are 0
         df.loc[
@@ -159,7 +160,7 @@ def calculate_percent_positive(df: pd.DataFrame) -> pd.DataFrame:
             & (df["spec_processed_nb" + col] == 0)
             & (df["spec_received_nb" + col] == 0),
             "pcnt_pos" + col,
-        ] = pd.NA
+        ] = np.nan
         df = df.dropna(axis=1, how="all")
 
     return df
