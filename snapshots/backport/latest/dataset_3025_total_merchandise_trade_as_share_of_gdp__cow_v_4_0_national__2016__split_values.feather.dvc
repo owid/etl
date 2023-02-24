@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_3025_total_merchandise_trade_as_share_of_gdp__cow_v_4_0_national__2016__split_values
   file_extension: feather
-  date_accessed: 2023-02-17 13:44:11.688769
+  date_accessed: 2023-02-23 19:46:41.609061
   name: Total merchandise trade as share of GDP (COW v 4.0 National (2016)) (split)
   description: ''
   source_name: Our World in Data catalog backport

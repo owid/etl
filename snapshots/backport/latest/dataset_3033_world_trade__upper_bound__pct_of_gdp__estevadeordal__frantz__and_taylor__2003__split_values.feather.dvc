@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_3033_world_trade__upper_bound__pct_of_gdp__estevadeordal__frantz__and_taylor__2003__split_values
   file_extension: feather
-  date_accessed: 2023-02-17 15:06:55.222463
+  date_accessed: 2023-02-23 16:47:56.969538
   name: World trade - upper bound (% of GDP) (Estevadeordal, Frantz, and Taylor (2003))
     (split)
   description: ''

@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5340_land_sparing_due_to_crop_yield_increases__un_fao__2021_config
   file_extension: json
-  date_accessed: 2023-02-17 15:05:12.977096
+  date_accessed: 2023-02-23 17:43:04.062792
   name: Grapher metadata for dataset_5340_land_sparing_due_to_crop_yield_increases__un_fao__2021
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 4d09cd4999112ea465d4a6496d2b89bc
-  size: 4366
+- md5: 74abb62b2fb2b8da07fe7de04280612f
+  size: 5166
   path: dataset_5340_land_sparing_due_to_crop_yield_increases__un_fao__2021_config.json

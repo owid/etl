@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2510_top_1pct_wealth_shares__chartbook_of_economic_inequality__2017_values
   file_extension: feather
-  date_accessed: 2023-02-17 12:14:01.264889
+  date_accessed: 2023-02-23 19:44:01.656415
   name: Top 1% wealth shares - Chartbook of Economic Inequality (2017)
   description: ''
   source_name: Our World in Data catalog backport

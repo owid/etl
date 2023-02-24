@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_3056__13_1b_config
   file_extension: json
-  date_accessed: 2023-02-17 12:10:02.693924
+  date_accessed: 2023-02-23 19:26:06.958681
   name: Grapher metadata for dataset_3056__13_1b
   description: core-econ.org
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: a6322917e36c71deef2e067fa467b9a6
-  size: 1708
+- md5: aa8343037c1b96b5c15fac9f3971f22b
+  size: 2104
   path: dataset_3056__13_1b_config.json

@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2852_inequality_in_latin_america__sedlac__cedlas_and_the_world_bank_values
   file_extension: feather
-  date_accessed: 2023-02-17 13:50:28.184771
+  date_accessed: 2023-02-23 16:45:11.697497
   name: Inequality in Latin America - SEDLAC (CEDLAS and the World Bank)
   description: ''
   source_name: Our World in Data catalog backport

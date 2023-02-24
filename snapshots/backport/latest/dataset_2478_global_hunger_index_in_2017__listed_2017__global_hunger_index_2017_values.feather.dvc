@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2478_global_hunger_index_in_2017__listed_2017__global_hunger_index_2017_values
   file_extension: feather
-  date_accessed: 2023-02-17 15:53:07.150183
+  date_accessed: 2023-02-23 19:36:19.843667
   name: Global Hunger Index in 2017 (listed 2017) (Global Hunger Index 2017)
   description: ''
   source_name: Our World in Data catalog backport

@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_460_hypothetical_global_co2_emissions__cdiac__2014_values
   file_extension: feather
-  date_accessed: 2023-02-17 14:14:48.950377
+  date_accessed: 2023-02-23 19:05:59.343265
   name: Hypothetical global CO2 emissions - CDIAC (2014)
   description: Hypothetical global CO2 emissions if everyone had the average per capita
     footprint of a given country in 2014

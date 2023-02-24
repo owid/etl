@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_663_long_term_energy_transitions__energy_history__harvard__2016_config
   file_extension: json
-  date_accessed: 2023-02-17 14:39:12.053233
+  date_accessed: 2023-02-23 18:27:56.896251
   name: Grapher metadata for dataset_663_long_term_energy_transitions__energy_history__harvard__2016
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 1b20e2b27b66f8f507dfcf258a554888
-  size: 6855
+- md5: 24776ff0d3541bb9e3843d98cea8d316
+  size: 8423
   path: dataset_663_long_term_energy_transitions__energy_history__harvard__2016_config.json

@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_1029_wealth_per_capita_by_component_for_various_country_groupings__world_bank__2017_values
   file_extension: feather
-  date_accessed: 2023-02-17 14:21:19.166219
+  date_accessed: 2023-02-23 19:40:36.495781
   name: Wealth per capita by component for various country groupings - World Bank
     (2017)
   description: Wealth is the value of an economy's capital stocks. GDP is seen as

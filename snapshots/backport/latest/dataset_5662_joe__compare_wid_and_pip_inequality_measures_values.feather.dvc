@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5662_joe__compare_wid_and_pip_inequality_measures_values
   file_extension: feather
-  date_accessed: 2023-02-17 16:36:02.666892
+  date_accessed: 2023-02-23 17:22:23.632745
   name: JOE – compare WID and PIP inequality measures
   description: ''
   source_name: Our World in Data catalog backport

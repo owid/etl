@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_3026_total_merchandise_trade_as_share_of_gdp__fouquin_and_hugot__cepii_2016__split_config
   file_extension: json
-  date_accessed: 2023-02-17 12:48:48.466914
+  date_accessed: 2023-02-23 19:27:00.089287
   name: Grapher metadata for dataset_3026_total_merchandise_trade_as_share_of_gdp__fouquin_and_hugot__cepii_2016__split
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 737d5f9587ba2f7cb6b4fbeea56ba756
-  size: 2332
+- md5: 66d47f3eb4718273a7ad3b8b513cc98f
+  size: 2530
   path: dataset_3026_total_merchandise_trade_as_share_of_gdp__fouquin_and_hugot__cepii_2016__split_config.json

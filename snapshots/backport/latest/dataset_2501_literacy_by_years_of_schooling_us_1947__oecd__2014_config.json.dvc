@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2501_literacy_by_years_of_schooling_us_1947__oecd__2014_config
   file_extension: json
-  date_accessed: 2023-02-17 15:20:43.854818
+  date_accessed: 2023-02-23 16:56:35.603385
   name: Grapher metadata for dataset_2501_literacy_by_years_of_schooling_us_1947__oecd__2014
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 5d5132b2c304b0dac6e710e3df9b235c
-  size: 1561
+- md5: 6c193c1975eb96a04b9918a5427c4afb
+  size: 1759
   path: dataset_2501_literacy_by_years_of_schooling_us_1947__oecd__2014_config.json

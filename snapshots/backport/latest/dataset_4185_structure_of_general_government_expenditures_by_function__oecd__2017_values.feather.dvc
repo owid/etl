@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_4185_structure_of_general_government_expenditures_by_function__oecd__2017_values
   file_extension: feather
-  date_accessed: 2023-02-17 15:24:53.273776
+  date_accessed: 2023-02-23 18:26:25.648610
   name: Structure of general government expenditures by function - OECD (2017)
   description: ''
   source_name: Our World in Data catalog backport

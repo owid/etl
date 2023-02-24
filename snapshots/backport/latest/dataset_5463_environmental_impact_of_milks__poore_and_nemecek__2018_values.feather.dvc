@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5463_environmental_impact_of_milks__poore_and_nemecek__2018_values
   file_extension: feather
-  date_accessed: 2023-02-17 15:01:05.485631
+  date_accessed: 2023-02-23 18:01:45.619452
   name: Environmental impact of milks (Poore and Nemecek, 2018)
   description: ''
   source_name: Our World in Data catalog backport

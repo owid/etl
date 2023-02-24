@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_3209_figure_20_22_values
   file_extension: feather
-  date_accessed: 2023-02-17 14:23:10.967611
+  date_accessed: 2023-02-23 18:09:33.208378
   name: Figure 20.22
   description: core-econ.org
   source_name: Our World in Data catalog backport

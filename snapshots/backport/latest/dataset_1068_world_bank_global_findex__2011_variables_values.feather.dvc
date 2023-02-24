@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_1068_world_bank_global_findex__2011_variables_values
   file_extension: feather
-  date_accessed: 2023-02-17 14:59:01.302338
+  date_accessed: 2023-02-23 17:53:02.834098
   name: World Bank Global Findex - 2011 Variables
   description: This is a dataset imported by the automated fetcher
   source_name: Our World in Data catalog backport

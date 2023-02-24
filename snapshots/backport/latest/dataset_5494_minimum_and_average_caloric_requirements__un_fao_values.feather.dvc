@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5494_minimum_and_average_caloric_requirements__un_fao_values
   file_extension: feather
-  date_accessed: 2023-02-17 14:28:55.868138
+  date_accessed: 2023-02-23 19:25:02.360541
   name: Minimum and average caloric requirements (UN FAO)
   description: ''
   source_name: Our World in Data catalog backport

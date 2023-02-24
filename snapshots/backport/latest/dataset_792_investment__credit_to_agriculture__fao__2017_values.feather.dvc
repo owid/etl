@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_792_investment__credit_to_agriculture__fao__2017_values
   file_extension: feather
-  date_accessed: 2023-02-17 14:41:31.476150
+  date_accessed: 2023-02-23 19:29:02.024445
   name: 'Investment: Credit to Agriculture - FAO (2017)'
   description: This is a dataset imported by the automated fetcher
   source_name: Our World in Data catalog backport

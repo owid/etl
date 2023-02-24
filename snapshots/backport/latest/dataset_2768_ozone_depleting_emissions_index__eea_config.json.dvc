@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2768_ozone_depleting_emissions_index__eea_config
   file_extension: json
-  date_accessed: 2023-02-17 15:37:17.229207
+  date_accessed: 2023-02-23 19:01:51.298960
   name: Grapher metadata for dataset_2768_ozone_depleting_emissions_index__eea
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: a8998f7735c785d319aff99cf867de8e
-  size: 1567
+- md5: 67a0db6ca7a80338c474bd2bfe2f2a2e
+  size: 1765
   path: dataset_2768_ozone_depleting_emissions_index__eea_config.json

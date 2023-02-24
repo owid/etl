@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_3122_gini_index_in_1980__1990__and__2015__gcip__2018_values
   file_extension: feather
-  date_accessed: 2023-02-17 15:36:56.209947
+  date_accessed: 2023-02-23 17:11:38.540151
   name: Gini index in 1980, 1990 & 2015 – GCIP (2018)
   description: ''
   source_name: Our World in Data catalog backport

@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5137_owid_17_8_rir_values
   file_extension: feather
-  date_accessed: 2023-02-17 12:22:41.583079
+  date_accessed: 2023-02-23 15:00:48.356658
   name: OWID_17.8_rir
   description: core-econ.org
   source_name: Our World in Data catalog backport

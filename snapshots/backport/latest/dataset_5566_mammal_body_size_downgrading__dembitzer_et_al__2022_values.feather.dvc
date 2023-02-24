@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5566_mammal_body_size_downgrading__dembitzer_et_al__2022_values
   file_extension: feather
-  date_accessed: 2023-02-17 14:17:57.489115
+  date_accessed: 2023-02-23 16:39:55.447835
   name: Mammal body size downgrading (Dembitzer et al. 2022)
   description: ''
   source_name: Our World in Data catalog backport

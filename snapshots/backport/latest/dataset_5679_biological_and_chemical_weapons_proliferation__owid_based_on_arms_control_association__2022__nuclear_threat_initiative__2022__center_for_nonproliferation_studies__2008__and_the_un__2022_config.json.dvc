@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5679_biological_and_chemical_weapons_proliferation__owid_based_on_arms_control_association__2022__nuclear_threat_initiative__2022__center_for_nonproliferation_studies__2008__and_the_un__2022_config
   file_extension: json
-  date_accessed: 2023-02-17 17:50:13.607307
+  date_accessed: 2023-02-23 19:02:09.970225
   name: Grapher metadata for dataset_5679_biological_and_chemical_weapons_proliferation__owid_based_on_arms_control_association__2022__nuclear_threat_initiative__2022__center_for_nonproliferation_studies__2008__and_the_un__2022
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: e9c32d3b53c97c9d03267332db5eb258
-  size: 24970
+- md5: 9aec43a6ed6b7f35a894e235d82f50f0
+  size: 31170
   path: dataset_5679_biological_and_chemical_weapons_proliferation__owid_based_on_arms_control_association__2022__nuclear_threat_initiative__2022__center_for_nonproliferation_studies__2008__and_the_un__2022_config.json

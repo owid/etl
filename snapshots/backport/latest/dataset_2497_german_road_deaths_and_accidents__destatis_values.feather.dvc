@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2497_german_road_deaths_and_accidents__destatis_values
   file_extension: feather
-  date_accessed: 2023-02-17 15:21:52.086625
+  date_accessed: 2023-02-23 18:43:33.627473
   name: German road deaths and accidents - destatis
   description: ''
   source_name: Our World in Data catalog backport

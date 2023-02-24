@@ -1,0 +1,18 @@
+meta:
+  namespace: backport
+  short_name: dataset_5743_world_population_prospects__un__2022_values
+  file_extension: feather
+  date_accessed: 2023-02-23 17:00:24.912046
+  name: World Population Prospects - UN (2022)
+  description: ''
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/5743
+  source_published_by: Our World in Data catalog backport
+  is_public: true
+  version: latest
+  publication_date: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 8f1e7f5fd88ecd0b1feee98d92001ab3
+  size: 114105226
+  path: dataset_5743_world_population_prospects__un__2022_values.feather

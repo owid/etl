@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2671_historical_gender_equality_index__how_was_life__2014_values
   file_extension: feather
-  date_accessed: 2023-02-17 13:12:42.762364
+  date_accessed: 2023-02-23 18:41:24.853353
   name: Historical gender equality index - How Was Life? (2014)
   description: ''
   source_name: Our World in Data catalog backport

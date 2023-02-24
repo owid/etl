@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2518_poverty_rate__lt_50pct_of_median__lis_key_figures__2018_values
   file_extension: feather
-  date_accessed: 2023-02-17 14:46:28.173567
+  date_accessed: 2023-02-23 15:05:14.185685
   name: Poverty rate (<50% of median) (LIS Key Figures, 2018)
   description: ''
   source_name: Our World in Data catalog backport

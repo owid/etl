@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_672_heights_of_early_europeans__based_on_hermanussen__2003__and_the_ncd_risc__2017_config
   file_extension: json
-  date_accessed: 2023-02-17 13:16:52.470144
+  date_accessed: 2023-02-23 18:11:11.920109
   name: Grapher metadata for dataset_672_heights_of_early_europeans__based_on_hermanussen__2003__and_the_ncd_risc__2017
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 571af6608d4b9b913bd3390e21713d78
-  size: 2933
+- md5: 903b2c5e7f6406d9495c073c271fc5e3
+  size: 3325
   path: dataset_672_heights_of_early_europeans__based_on_hermanussen__2003__and_the_ncd_risc__2017_config.json

@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5070_covid_2019__johns_hopkins__2020_values
   file_extension: feather
-  date_accessed: 2023-02-17 12:15:34.499225
+  date_accessed: 2023-02-23 18:45:15.544178
   name: COVID-2019 - Johns Hopkins (2020)
   description: ''
   source_name: Our World in Data catalog backport

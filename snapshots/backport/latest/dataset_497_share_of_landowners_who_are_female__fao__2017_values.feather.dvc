@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_497_share_of_landowners_who_are_female__fao__2017_values
   file_extension: feather
-  date_accessed: 2023-02-17 13:52:33.823226
+  date_accessed: 2023-02-23 18:53:09.210097
   name: Share of landowners who are female - FAO (2017)
   description: Share of agricultural landowners who are female (%).
   source_name: Our World in Data catalog backport

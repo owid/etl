@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_316_subnational_inequality__oecd_based_on_royuela_et_al__2014_values
   file_extension: feather
-  date_accessed: 2023-02-17 14:05:40.580099
+  date_accessed: 2023-02-23 19:21:30.721584
   name: Subnational inequality - OECD based on Royuela et al. (2014))
   description: ''
   source_name: Our World in Data catalog backport

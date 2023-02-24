@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_659_owid_country_to_who_regions_config
   file_extension: json
-  date_accessed: 2023-02-17 13:16:10.504959
+  date_accessed: 2023-02-23 15:18:50.758098
   name: Grapher metadata for dataset_659_owid_country_to_who_regions
   description: WHO groups countries in different regions, and provides information
     on various variables according to this classification. This dataset changes country
@@ -15,6 +15,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 9a6e3e25e92f5117c31541d64d7f9bb3
-  size: 1524
+- md5: aec692abf19f508c6d8363687b8dff2b
+  size: 1720
   path: dataset_659_owid_country_to_who_regions_config.json

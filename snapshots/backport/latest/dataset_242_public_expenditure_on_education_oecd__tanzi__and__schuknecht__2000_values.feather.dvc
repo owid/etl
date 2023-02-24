@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_242_public_expenditure_on_education_oecd__tanzi__and__schuknecht__2000_values
   file_extension: feather
-  date_accessed: 2023-02-17 15:19:59.068035
+  date_accessed: 2023-02-23 15:02:42.045959
   name: Public Expenditure on Education OECD - Tanzi & Schuknecht (2000)
   description: ''
   source_name: Our World in Data catalog backport

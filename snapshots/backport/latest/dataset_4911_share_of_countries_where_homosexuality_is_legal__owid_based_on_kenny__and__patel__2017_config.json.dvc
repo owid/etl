@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_4911_share_of_countries_where_homosexuality_is_legal__owid_based_on_kenny__and__patel__2017_config
   file_extension: json
-  date_accessed: 2023-02-17 15:13:57.889090
+  date_accessed: 2023-02-23 18:49:21.301905
   name: Grapher metadata for dataset_4911_share_of_countries_where_homosexuality_is_legal__owid_based_on_kenny__and__patel__2017
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 8331250df83220d24e230f8e14376235
-  size: 2894
+- md5: 3b129b015f9166080d94e93c87c5342f
+  size: 3294
   path: dataset_4911_share_of_countries_where_homosexuality_is_legal__owid_based_on_kenny__and__patel__2017_config.json

@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_448_social_expenditure_in_the_long_run__lindert_2004__oecd_1985__oecd__socx_values
   file_extension: feather
-  date_accessed: 2023-02-17 14:35:46.959250
+  date_accessed: 2023-02-23 16:41:33.481615
   name: Social Expenditure in the long run - Lindert 2004; OECD 1985; OECD (SOCX).
   description: Data-set put together by Marco Molteni under the guidance of Esteban.
     OECD (SOCX) on social spending are used as reference series and data are extrapolated

@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_1092_patent_and_publication_rates__owid_based_on_world_bank__and__un_values
   file_extension: feather
-  date_accessed: 2023-02-17 15:44:37.556045
+  date_accessed: 2023-02-23 18:45:22.506691
   name: Patent and publication rates  - OWID based on World Bank & UN
   description: ''
   source_name: Our World in Data catalog backport

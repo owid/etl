@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2761_alcohol_consumption_in_usa_since_1850__niaaa_values
   file_extension: feather
-  date_accessed: 2023-02-17 12:19:40.137713
+  date_accessed: 2023-02-23 16:30:15.434825
   name: Alcohol consumption in USA since 1850 — NIAAA
   description: ''
   source_name: Our World in Data catalog backport

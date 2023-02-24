@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2959_extreme_temperatures_in_us__noaa_config
   file_extension: json
-  date_accessed: 2023-02-17 13:02:30.257539
+  date_accessed: 2023-02-23 17:29:42.400554
   name: Grapher metadata for dataset_2959_extreme_temperatures_in_us__noaa
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 51d6a7f15962f9f86ec90e1813918230
-  size: 6222
+- md5: 0132edfe7127d498f71e0eb0cb44118d
+  size: 8004
   path: dataset_2959_extreme_temperatures_in_us__noaa_config.json

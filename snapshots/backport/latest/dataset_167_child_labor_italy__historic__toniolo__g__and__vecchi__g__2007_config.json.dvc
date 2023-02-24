@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_167_child_labor_italy__historic__toniolo__g__and__vecchi__g__2007_config
   file_extension: json
-  date_accessed: 2023-02-17 15:53:49.127143
+  date_accessed: 2023-02-23 17:27:23.151201
   name: Grapher metadata for dataset_167_child_labor_italy__historic__toniolo__g__and__vecchi__g__2007
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 9ff1aee5d18208913ba6117f71d307e7
-  size: 2762
+- md5: 73d61aa2892df1dacde2bd4c8debd0d4
+  size: 3344
   path: dataset_167_child_labor_italy__historic__toniolo__g__and__vecchi__g__2007_config.json

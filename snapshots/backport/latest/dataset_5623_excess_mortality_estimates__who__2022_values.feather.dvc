@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5623_excess_mortality_estimates__who__2022_values
   file_extension: feather
-  date_accessed: 2023-02-17 13:41:42.926983
+  date_accessed: 2023-02-23 18:46:09.221911
   name: Excess Mortality Estimates – WHO (2022)
   description: ''
   source_name: Our World in Data catalog backport

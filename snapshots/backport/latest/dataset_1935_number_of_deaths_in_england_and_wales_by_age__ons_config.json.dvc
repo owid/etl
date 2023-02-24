@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_1935_number_of_deaths_in_england_and_wales_by_age__ons_config
   file_extension: json
-  date_accessed: 2023-02-17 12:56:45.326847
+  date_accessed: 2023-02-23 18:24:29.058680
   name: Grapher metadata for dataset_1935_number_of_deaths_in_england_and_wales_by_age__ons
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: c73edae7d708d4e865bb42540e75b6c8
-  size: 2354
+- md5: cb1919557787db604460693a9c4ed88c
+  size: 2948
   path: dataset_1935_number_of_deaths_in_england_and_wales_by_age__ons_config.json

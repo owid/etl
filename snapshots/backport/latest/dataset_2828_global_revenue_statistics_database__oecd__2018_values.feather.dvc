@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2828_global_revenue_statistics_database__oecd__2018_values
   file_extension: feather
-  date_accessed: 2023-02-17 15:45:18.617997
+  date_accessed: 2023-02-23 19:49:19.767059
   name: Global Revenue Statistics Database - OECD (2018)
   description: '2021 vintage (22-04-21) available at: https://stats.oecd.org/Index.aspx?DataSetCode=REV#'
   source_name: Our World in Data catalog backport

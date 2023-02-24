@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2855_life_expectation_by_sex_at_ages_0__15__and_45__owid_based_on_hacker__2010__and_the_us_social_security_administration__2017_values
   file_extension: feather
-  date_accessed: 2023-02-17 12:07:41.489669
+  date_accessed: 2023-02-23 18:46:02.042954
   name: Life expectation by sex at ages 0, 15, and 45 - OWID based on Hacker (2010)
     and the US Social Security Administration (2017)
   description: ''

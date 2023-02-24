@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5264_international_whaling_commission_status__iwc__2022_values
   file_extension: feather
-  date_accessed: 2023-02-17 12:18:43.530360
+  date_accessed: 2023-02-23 17:45:22.400061
   name: International Whaling Commission Status (IWC, 2022)
   description: ''
   source_name: Our World in Data catalog backport

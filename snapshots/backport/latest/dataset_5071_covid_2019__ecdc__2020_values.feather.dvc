@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5071_covid_2019__ecdc__2020_values
   file_extension: feather
-  date_accessed: 2023-02-17 13:44:55.372509
+  date_accessed: 2023-02-23 17:59:11.792847
   name: COVID-2019 - ECDC (2020)
   description: ''
   source_name: Our World in Data catalog backport

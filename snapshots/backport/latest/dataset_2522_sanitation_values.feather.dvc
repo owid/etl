@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2522_sanitation_values
   file_extension: feather
-  date_accessed: 2023-02-17 13:42:19.449924
+  date_accessed: 2023-02-23 19:16:26.065193
   name: Sanitation
   description: This is a dataset imported by the automated fetcher
   source_name: Our World in Data catalog backport

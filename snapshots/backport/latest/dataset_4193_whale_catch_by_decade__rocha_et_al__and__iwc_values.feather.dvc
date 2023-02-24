@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_4193_whale_catch_by_decade__rocha_et_al__and__iwc_values
   file_extension: feather
-  date_accessed: 2023-02-17 14:12:24.060358
+  date_accessed: 2023-02-23 16:32:53.417994
   name: Whale catch by decade (Rocha et al. & IWC)
   description: ''
   source_name: Our World in Data catalog backport

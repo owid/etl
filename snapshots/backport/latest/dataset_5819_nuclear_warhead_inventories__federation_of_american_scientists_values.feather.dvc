@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5819_nuclear_warhead_inventories__federation_of_american_scientists_values
   file_extension: feather
-  date_accessed: 2023-02-18 00:12:25.352472
+  date_accessed: 2023-02-23 18:52:14.746292
   name: Nuclear warhead inventories – Federation of American Scientists
   description: ''
   source_name: Our World in Data catalog backport

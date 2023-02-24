@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_1933_cancer_death_rates_in_the_us_over_the_long_term__american_cancer_society_config
   file_extension: json
-  date_accessed: 2023-02-17 12:32:29.064989
+  date_accessed: 2023-02-23 18:37:41.618929
   name: Grapher metadata for dataset_1933_cancer_death_rates_in_the_us_over_the_long_term__american_cancer_society
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: a0b47e42e467834e26c30f7f98421697
-  size: 7236
+- md5: 9617f85825a37215d5ac09f0e4e20719
+  size: 10008
   path: dataset_1933_cancer_death_rates_in_the_us_over_the_long_term__american_cancer_society_config.json

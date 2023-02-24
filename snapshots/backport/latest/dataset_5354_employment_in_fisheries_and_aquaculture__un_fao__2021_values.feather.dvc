@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5354_employment_in_fisheries_and_aquaculture__un_fao__2021_values
   file_extension: feather
-  date_accessed: 2023-02-17 14:10:09.030657
+  date_accessed: 2023-02-23 16:40:48.132001
   name: Employment in fisheries and aquaculture (UN FAO, 2021)
   description: ''
   source_name: Our World in Data catalog backport

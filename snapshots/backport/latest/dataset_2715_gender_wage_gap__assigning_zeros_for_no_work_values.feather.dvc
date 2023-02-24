@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2715_gender_wage_gap__assigning_zeros_for_no_work_values
   file_extension: feather
-  date_accessed: 2023-02-17 13:27:36.780968
+  date_accessed: 2023-02-23 18:29:56.285591
   name: Gender wage gap (assigning zeros for no work)
   description: ''
   source_name: Our World in Data catalog backport

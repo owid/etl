@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_4157_share_of_population_covered_by_social_protection__aspire_world_bank__2019_config
   file_extension: json
-  date_accessed: 2023-02-17 12:41:55.041104
+  date_accessed: 2023-02-23 18:16:29.033672
   name: Grapher metadata for dataset_4157_share_of_population_covered_by_social_protection__aspire_world_bank__2019
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 36dcd40523a284e79d73afc689c6159f
-  size: 1492
+- md5: 5e42fa431457a1e58abddd6679540d60
+  size: 1692
   path: dataset_4157_share_of_population_covered_by_social_protection__aspire_world_bank__2019_config.json

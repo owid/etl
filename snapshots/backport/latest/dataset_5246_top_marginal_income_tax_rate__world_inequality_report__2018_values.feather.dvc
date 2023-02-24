@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5246_top_marginal_income_tax_rate__world_inequality_report__2018_values
   file_extension: feather
-  date_accessed: 2023-02-17 12:37:48.075113
+  date_accessed: 2023-02-23 17:47:56.059545
   name: Top marginal income tax rate - World Inequality Report (2018)
   description: ''
   source_name: Our World in Data catalog backport

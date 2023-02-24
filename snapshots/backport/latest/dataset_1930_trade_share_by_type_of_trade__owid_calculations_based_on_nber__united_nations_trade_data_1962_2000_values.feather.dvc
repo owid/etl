@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_1930_trade_share_by_type_of_trade__owid_calculations_based_on_nber__united_nations_trade_data_1962_2000_values
   file_extension: feather
-  date_accessed: 2023-02-17 15:26:39.935824
+  date_accessed: 2023-02-23 19:52:18.728805
   name: Trade share by type of trade (OWID calculations based on NBER- United Nations
     Trade Data 1962-2000)
   description: ''

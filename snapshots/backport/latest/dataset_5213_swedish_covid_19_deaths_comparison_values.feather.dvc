@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5213_swedish_covid_19_deaths_comparison_values
   file_extension: feather
-  date_accessed: 2023-02-17 12:24:15.341470
+  date_accessed: 2023-02-23 19:48:47.929070
   name: Swedish COVID-19 deaths comparison
   description: ''
   source_name: Our World in Data catalog backport

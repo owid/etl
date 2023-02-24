@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5740_who_vaccination_schedule__2021_values
   file_extension: feather
-  date_accessed: 2023-02-18 00:10:48.054440
+  date_accessed: 2023-02-23 18:34:36.424227
   name: WHO Vaccination Schedule (2021)
   description: https://github.com/owid/notebooks/tree/main/FionaSpooner/who_vaccination_schedule
   source_name: Our World in Data catalog backport

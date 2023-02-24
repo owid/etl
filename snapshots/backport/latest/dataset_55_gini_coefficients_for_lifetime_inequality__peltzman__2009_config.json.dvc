@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_55_gini_coefficients_for_lifetime_inequality__peltzman__2009_config
   file_extension: json
-  date_accessed: 2023-02-17 14:40:20.266579
+  date_accessed: 2023-02-23 16:37:03.584990
   name: Grapher metadata for dataset_55_gini_coefficients_for_lifetime_inequality__peltzman__2009
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 56dc91a0c8a0579800bec69eb050a52f
-  size: 2115
+- md5: 338a16e6b6840d80fe2e2347fd281eb4
+  size: 2307
   path: dataset_55_gini_coefficients_for_lifetime_inequality__peltzman__2009_config.json

@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_870_clio_infra__demography_config
   file_extension: json
-  date_accessed: 2023-02-17 13:16:02.642277
+  date_accessed: 2023-02-23 15:04:07.909278
   name: Grapher metadata for dataset_870_clio_infra__demography
   description: This is a dataset imported by the automated fetcher
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: f22385a6b55da2edfc5cbba2a85c3943
-  size: 10548
+- md5: e7730564b605c474c5a7dc345b033051
+  size: 11934
   path: dataset_870_clio_infra__demography_config.json

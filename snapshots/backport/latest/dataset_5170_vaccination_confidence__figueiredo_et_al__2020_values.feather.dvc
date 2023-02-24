@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5170_vaccination_confidence__figueiredo_et_al__2020_values
   file_extension: feather
-  date_accessed: 2023-02-17 13:51:31.299676
+  date_accessed: 2023-02-23 15:05:35.723190
   name: Vaccination confidence (Figueiredo et al. 2020)
   description: ''
   source_name: Our World in Data catalog backport

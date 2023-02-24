@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_299_revenue_shares_from_tax__flora__1983__and_ictd__2016_values
   file_extension: feather
-  date_accessed: 2023-02-17 15:51:35.670290
+  date_accessed: 2023-02-23 16:39:16.643084
   name: Revenue shares from tax – Flora (1983) and ICTD (2016)
   description: Europe
   source_name: Our World in Data catalog backport

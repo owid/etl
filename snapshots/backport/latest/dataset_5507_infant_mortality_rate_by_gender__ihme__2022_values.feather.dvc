@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5507_infant_mortality_rate_by_gender__ihme__2022_values
   file_extension: feather
-  date_accessed: 2023-02-17 12:51:39.660924
+  date_accessed: 2023-02-23 18:51:13.148855
   name: Infant mortality rate by gender (IHME, 2022)
   description: |-
     Permalink to the selected variables: http://ghdx.healthdata.org/gbd-results-tool?params=gbd-api-2019-permalink/2444532e39485afe61a9c1743ce0ca43

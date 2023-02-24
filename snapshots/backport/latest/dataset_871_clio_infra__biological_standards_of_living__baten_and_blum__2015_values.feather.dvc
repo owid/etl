@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_871_clio_infra__biological_standards_of_living__baten_and_blum__2015_values
   file_extension: feather
-  date_accessed: 2023-02-17 14:12:03.143616
+  date_accessed: 2023-02-23 16:24:53.204818
   name: Clio-Infra - Biological Standards of Living - Baten and Blum (2015)
   description: This is a dataset imported by the automated fetcher
   source_name: Our World in Data catalog backport

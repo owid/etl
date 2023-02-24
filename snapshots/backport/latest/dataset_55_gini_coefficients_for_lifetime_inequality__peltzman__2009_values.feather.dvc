@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_55_gini_coefficients_for_lifetime_inequality__peltzman__2009_values
   file_extension: feather
-  date_accessed: 2023-02-17 14:40:48.447146
+  date_accessed: 2023-02-23 16:37:31.217334
   name: Gini coefficients for lifetime inequality - Peltzman (2009)
   description: ''
   source_name: Our World in Data catalog backport

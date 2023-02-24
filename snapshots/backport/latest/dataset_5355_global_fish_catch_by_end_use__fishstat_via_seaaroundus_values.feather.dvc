@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5355_global_fish_catch_by_end_use__fishstat_via_seaaroundus_values
   file_extension: feather
-  date_accessed: 2023-02-17 13:39:36.742344
+  date_accessed: 2023-02-23 18:00:58.778871
   name: Global fish catch by end use (FishStat via SeaAroundUs)
   description: ''
   source_name: Our World in Data catalog backport

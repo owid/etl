@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5537_global_hunger_index__2021_values
   file_extension: feather
-  date_accessed: 2023-02-17 12:14:50.813782
+  date_accessed: 2023-02-23 16:54:02.884588
   name: Global Hunger Index (2021)
   description: ''
   source_name: Our World in Data catalog backport

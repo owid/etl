@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_1941_deaths_from_smallpox_per_million_population__edwardes__1902_values
   file_extension: feather
-  date_accessed: 2023-02-17 15:41:42.576720
+  date_accessed: 2023-02-23 17:42:04.791193
   name: Deaths from smallpox per million population (Edwardes, 1902)
   description: ''
   source_name: Our World in Data catalog backport

@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5171_working_hours__bick_et_al__2019_values
   file_extension: feather
-  date_accessed: 2023-02-17 15:50:28.013710
+  date_accessed: 2023-02-23 18:22:28.434644
   name: Working Hours – Bick et al (2019)
   description: ''
   source_name: Our World in Data catalog backport

@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_134_rand_database_of_worldwide_terrorism_incidents_values
   file_extension: feather
-  date_accessed: 2023-02-17 13:56:17.645814
+  date_accessed: 2023-02-23 18:39:43.167481
   name: RAND Database of Worldwide Terrorism Incidents
   description: ''
   source_name: Our World in Data catalog backport

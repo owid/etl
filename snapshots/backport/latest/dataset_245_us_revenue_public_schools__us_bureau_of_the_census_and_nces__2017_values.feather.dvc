@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_245_us_revenue_public_schools__us_bureau_of_the_census_and_nces__2017_values
   file_extension: feather
-  date_accessed: 2023-02-17 14:05:47.397511
+  date_accessed: 2023-02-23 17:41:50.844523
   name: US Revenue Public Schools - US Bureau of the Census and NCES (2017)
   description: ''
   source_name: Our World in Data catalog backport

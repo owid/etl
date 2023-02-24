@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5815_basic_education_by_region__zanden_et_al__2014_config
   file_extension: json
-  date_accessed: 2023-02-18 00:11:57.432459
+  date_accessed: 2023-02-23 15:11:04.214698
   name: Grapher metadata for dataset_5815_basic_education_by_region__zanden_et_al__2014
   description: Backported
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 08035d3c49c3c5d1f6d1f61229af7147
-  size: 3216
+- md5: f14df38b97be91e85e7115f81f43d593
+  size: 3416
   path: dataset_5815_basic_education_by_region__zanden_et_al__2014_config.json

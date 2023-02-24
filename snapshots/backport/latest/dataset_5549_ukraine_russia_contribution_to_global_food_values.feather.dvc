@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5549_ukraine_russia_contribution_to_global_food_values
   file_extension: feather
-  date_accessed: 2023-02-17 13:47:55.565333
+  date_accessed: 2023-02-23 19:40:50.358969
   name: Ukraine-Russia contribution to global food
   description: ''
   source_name: Our World in Data catalog backport

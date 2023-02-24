@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5596_ihme__global_burden_of_disease__prevalence__and__incidence__institute_for_health_metrics_and_evaluation__2022_04_values
   file_extension: feather
-  date_accessed: 2023-02-17 12:49:48.218844
+  date_accessed: 2023-02-23 17:02:01.715798
   name: IHME - Global Burden of Disease - Prevalence & Incidence - Institute for Health
     Metrics and Evaluation  (2022-04)
   description: This is a dataset imported by the automated fetcher

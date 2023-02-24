@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5687_nitrous_oxide_emissions_by_sector__cait__2022_values
   file_extension: feather
-  date_accessed: 2023-02-17 17:52:14.949524
+  date_accessed: 2023-02-23 17:32:53.890729
   name: Nitrous oxide emissions by sector (CAIT, 2022)
   description: ''
   source_name: Our World in Data catalog backport

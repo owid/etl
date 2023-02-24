@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2701_life_expectancy_projections__uk_ons_values
   file_extension: feather
-  date_accessed: 2023-02-17 15:51:28.178589
+  date_accessed: 2023-02-23 18:21:54.673928
   name: Life expectancy projections - UK ONS
   description: ''
   source_name: Our World in Data catalog backport

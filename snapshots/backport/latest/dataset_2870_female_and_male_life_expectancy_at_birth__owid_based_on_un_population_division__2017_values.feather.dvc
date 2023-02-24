@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2870_female_and_male_life_expectancy_at_birth__owid_based_on_un_population_division__2017_values
   file_extension: feather
-  date_accessed: 2023-02-17 13:20:27.138076
+  date_accessed: 2023-02-23 18:13:24.224356
   name: Female and male life expectancy at birth - OWID based on UN Population Division
     (2017)
   description: ''

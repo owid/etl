@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5169_co2_intensity_of_transport_by_mode__uk_beis_config
   file_extension: json
-  date_accessed: 2023-02-17 13:47:34.946838
+  date_accessed: 2023-02-23 18:24:08.600436
   name: Grapher metadata for dataset_5169_co2_intensity_of_transport_by_mode__uk_beis
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: de8047825c5ee088f21278d884249ffd
-  size: 2642
+- md5: 21e0c07cd26f9433d9728771f95cd6dc
+  size: 3242
   path: dataset_5169_co2_intensity_of_transport_by_mode__uk_beis_config.json

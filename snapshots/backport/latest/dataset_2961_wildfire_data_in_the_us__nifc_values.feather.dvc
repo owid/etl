@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2961_wildfire_data_in_the_us__nifc_values
   file_extension: feather
-  date_accessed: 2023-02-17 13:34:16.869489
+  date_accessed: 2023-02-23 18:49:41.994047
   name: Wildfire data in the US (NIFC)
   description: ''
   source_name: Our World in Data catalog backport

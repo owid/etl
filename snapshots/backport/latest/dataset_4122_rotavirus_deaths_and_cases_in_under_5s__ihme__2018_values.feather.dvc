@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_4122_rotavirus_deaths_and_cases_in_under_5s__ihme__2018_values
   file_extension: feather
-  date_accessed: 2023-02-17 14:34:48.661048
+  date_accessed: 2023-02-23 19:03:12.129154
   name: Rotavirus deaths and cases in under-5s (IHME, 2018)
   description: ''
   source_name: Our World in Data catalog backport

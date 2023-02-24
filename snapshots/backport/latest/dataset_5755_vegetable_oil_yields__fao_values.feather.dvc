@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5755_vegetable_oil_yields__fao_values
   file_extension: feather
-  date_accessed: 2023-02-18 00:09:57.368909
+  date_accessed: 2023-02-23 15:08:08.549866
   name: Vegetable oil yields (FAO)
   description: ''
   source_name: Our World in Data catalog backport

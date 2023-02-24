@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5307_attainable_yields__mueller_et_al__2012_values
   file_extension: feather
-  date_accessed: 2023-02-17 12:32:52.238085
+  date_accessed: 2023-02-23 19:31:48.456528
   name: Attainable yields (Mueller et al. 2012)
   description: ''
   source_name: Our World in Data catalog backport

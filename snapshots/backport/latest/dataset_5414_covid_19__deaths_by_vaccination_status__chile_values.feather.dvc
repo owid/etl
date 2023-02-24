@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5414_covid_19__deaths_by_vaccination_status__chile_values
   file_extension: feather
-  date_accessed: 2023-02-17 15:20:06.185757
+  date_accessed: 2023-02-23 19:10:51.969841
   name: COVID-19 - Deaths by vaccination status - Chile
   description: ''
   source_name: Our World in Data catalog backport

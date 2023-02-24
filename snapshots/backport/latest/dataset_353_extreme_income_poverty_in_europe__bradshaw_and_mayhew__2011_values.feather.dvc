@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_353_extreme_income_poverty_in_europe__bradshaw_and_mayhew__2011_values
   file_extension: feather
-  date_accessed: 2023-02-17 14:23:31.917239
+  date_accessed: 2023-02-23 19:43:22.854300
   name: Extreme income poverty in Europe - Bradshaw and Mayhew (2011)
   description: |-
     The authors use EU-SILC 2008 data to estimate "World Bank type extreme poverty rates".

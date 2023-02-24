@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_852_drug_overdose_deaths_in_the_us__cdc_wonder_config
   file_extension: json
-  date_accessed: 2023-02-17 12:24:01.388973
+  date_accessed: 2023-02-23 17:41:18.438728
   name: Grapher metadata for dataset_852_drug_overdose_deaths_in_the_us__cdc_wonder
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 606f370514ecadc7a9cc562b57cd3ce7
-  size: 5662
+- md5: b0351b6eeea222f08408610ad598cfb2
+  size: 7448
   path: dataset_852_drug_overdose_deaths_in_the_us__cdc_wonder_config.json

@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5274_ghg_emissions_from_food_by_life_cycle_stage__crippa_et_al__2021_values
   file_extension: feather
-  date_accessed: 2023-02-17 14:30:18.535074
+  date_accessed: 2023-02-23 16:47:04.781911
   name: GHG emissions from food by life-cycle stage (Crippa et al. 2021)
   description: ''
   source_name: Our World in Data catalog backport

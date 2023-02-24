@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_4251_streptococcus_caused_deaths_in_children_under_5__wahl__2018_values
   file_extension: feather
-  date_accessed: 2023-02-17 12:45:13.431266
+  date_accessed: 2023-02-23 17:45:15.643962
   name: Streptococcus-caused deaths in children under-5, Wahl (2018)
   description: ''
   source_name: Our World in Data catalog backport

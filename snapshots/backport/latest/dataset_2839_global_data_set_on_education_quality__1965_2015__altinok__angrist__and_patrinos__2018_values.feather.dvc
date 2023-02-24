@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2839_global_data_set_on_education_quality__1965_2015__altinok__angrist__and_patrinos__2018_values
   file_extension: feather
-  date_accessed: 2023-02-17 12:37:41.319749
+  date_accessed: 2023-02-23 19:51:57.442752
   name: Global Data Set on Education Quality (1965-2015) - Altinok, Angrist, and Patrinos
     (2018)
   description: 'Learning outcomes scores (using the 2018 data vintage) have been discontinued

@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_3014_cases_of_tetanus_per_million_population__who_and_unpd_2017__split_config
   file_extension: json
-  date_accessed: 2023-02-17 14:26:48.577798
+  date_accessed: 2023-02-23 16:38:42.528637
   name: Grapher metadata for dataset_3014_cases_of_tetanus_per_million_population__who_and_unpd_2017__split
   description: WHO dataset on the number of cases for different diseases, and the
     coverage of different vaccines against these disease. For TB, instead of the number
@@ -15,6 +15,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: b61fb430b0728e76366b4e5c2e845827
-  size: 6426
+- md5: 4fb371651c4633be9d97065cad3c825c
+  size: 7406
   path: dataset_3014_cases_of_tetanus_per_million_population__who_and_unpd_2017__split_config.json

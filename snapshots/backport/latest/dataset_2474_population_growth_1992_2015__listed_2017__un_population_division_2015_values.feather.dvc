@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2474_population_growth_1992_2015__listed_2017__un_population_division_2015_values
   file_extension: feather
-  date_accessed: 2023-02-17 14:56:49.835928
+  date_accessed: 2023-02-23 18:28:56.783235
   name: Population growth 1992-2015 (listed 2017) (UN Population Division 2015)
   description: ''
   source_name: Our World in Data catalog backport

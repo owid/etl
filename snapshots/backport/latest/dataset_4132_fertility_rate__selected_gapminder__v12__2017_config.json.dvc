@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_4132_fertility_rate__selected_gapminder__v12__2017_config
   file_extension: json
-  date_accessed: 2023-02-17 14:08:08.148044
+  date_accessed: 2023-02-23 15:03:08.479867
   name: Grapher metadata for dataset_4132_fertility_rate__selected_gapminder__v12__2017
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 46aa5e40490dd2fa33b17e7d003eb907
-  size: 3581
+- md5: 5f3a1ee05ea8394ac1a064c572250f10
+  size: 3781
   path: dataset_4132_fertility_rate__selected_gapminder__v12__2017_config.json

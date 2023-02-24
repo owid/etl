@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_4889_crude_marriage_rate__owid_based_on_un__oecd__eurostat_and_other_sources_values
   file_extension: feather
-  date_accessed: 2023-02-17 14:37:54.770880
+  date_accessed: 2023-02-23 16:46:12.460148
   name: Crude marriage rate (OWID based on UN, OECD, Eurostat and other sources)
   description: ''
   source_name: Our World in Data catalog backport

@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_1872_child_violence__ending_violence_in_childhood_report__2017_config
   file_extension: json
-  date_accessed: 2023-02-17 14:24:43.031187
+  date_accessed: 2023-02-23 18:42:59.388942
   name: Grapher metadata for dataset_1872_child_violence__ending_violence_in_childhood_report__2017
   description: Key indicators of inter-personal violence in childhood (2015), from
     Know Violence in Childhood. 2017. Ending Violence in Childhood. Global Report
@@ -15,6 +15,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: fe89a612800b3a8bb3620bc17751d927
-  size: 5866
+- md5: c3b9923459c18fc391098d7154253407
+  size: 7252
   path: dataset_1872_child_violence__ending_violence_in_childhood_report__2017_config.json

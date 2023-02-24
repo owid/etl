@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2941_prisoners_per_100_000_from_world_prison_brief__downloaded_september_2018__country_standardized_config
   file_extension: json
-  date_accessed: 2023-02-17 13:07:09.444197
+  date_accessed: 2023-02-23 17:26:28.551460
   name: Grapher metadata for dataset_2941_prisoners_per_100_000_from_world_prison_brief__downloaded_september_2018__country_standardized
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 845c0438188556520272e698e00fb573
-  size: 1503
+- md5: 06453f02b66b437b622c8357c12c3e16
+  size: 1701
   path: dataset_2941_prisoners_per_100_000_from_world_prison_brief__downloaded_september_2018__country_standardized_config.json

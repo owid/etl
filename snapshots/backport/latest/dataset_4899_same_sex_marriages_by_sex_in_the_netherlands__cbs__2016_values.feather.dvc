@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_4899_same_sex_marriages_by_sex_in_the_netherlands__cbs__2016_values
   file_extension: feather
-  date_accessed: 2023-02-17 14:16:05.599989
+  date_accessed: 2023-02-23 18:06:00.593580
   name: Same-sex marriages by sex in the Netherlands – CBS (2016)
   description: ''
   source_name: Our World in Data catalog backport

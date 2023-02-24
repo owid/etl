@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5169_co2_intensity_of_transport_by_mode__uk_beis_values
   file_extension: feather
-  date_accessed: 2023-02-17 13:48:02.443787
+  date_accessed: 2023-02-23 18:24:40.708187
   name: CO2 intensity of transport by mode (UK BEIS)
   description: ''
   source_name: Our World in Data catalog backport

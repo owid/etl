@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5421_clinical_trials_results_reporting__eu_ctr__dal_re__2021_values
   file_extension: feather
-  date_accessed: 2023-02-17 12:19:25.773302
+  date_accessed: 2023-02-23 16:46:50.828076
   name: Clinical trials results reporting – EU-CTR (Dal-Ré, 2021)
   description: ''
   source_name: Our World in Data catalog backport

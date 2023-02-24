@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2897_capital_city_population__un_urbanization_prospects__2018_values
   file_extension: feather
-  date_accessed: 2023-02-17 15:07:52.535360
+  date_accessed: 2023-02-23 16:15:34.425887
   name: Capital city population - UN Urbanization Prospects (2018)
   description: ''
   source_name: Our World in Data catalog backport

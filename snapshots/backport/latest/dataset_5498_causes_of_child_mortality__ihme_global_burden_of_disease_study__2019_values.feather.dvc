@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5498_causes_of_child_mortality__ihme_global_burden_of_disease_study__2019_values
   file_extension: feather
-  date_accessed: 2023-02-17 12:45:33.919947
+  date_accessed: 2023-02-23 17:19:34.403832
   name: Causes of child mortality – IHME Global Burden of Disease study (2019)
   description: |-
     The permalink to download data: http://ghdx.healthdata.org/gbd-results-tool?params=gbd-api-2019-permalink/7a483ad2f2e1b646bc258b7fd4cf3492

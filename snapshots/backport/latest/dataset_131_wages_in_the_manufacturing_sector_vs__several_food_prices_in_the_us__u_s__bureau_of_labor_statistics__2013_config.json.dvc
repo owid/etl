@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_131_wages_in_the_manufacturing_sector_vs__several_food_prices_in_the_us__u_s__bureau_of_labor_statistics__2013_config
   file_extension: json
-  date_accessed: 2023-02-17 14:37:12.794626
+  date_accessed: 2023-02-23 18:17:35.684905
   name: Grapher metadata for dataset_131_wages_in_the_manufacturing_sector_vs__several_food_prices_in_the_us__u_s__bureau_of_labor_statistics__2013
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: e4511a6d462c58c9a168aabc529f9e58
-  size: 1615
+- md5: b03291905d6d645566bde04238a6588b
+  size: 1809
   path: dataset_131_wages_in_the_manufacturing_sector_vs__several_food_prices_in_the_us__u_s__bureau_of_labor_statistics__2013_config.json

@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5164_global_airline_traffic_and_capacity__icao_config
   file_extension: json
-  date_accessed: 2023-02-17 14:12:38.309233
+  date_accessed: 2023-02-23 18:07:53.203105
   name: Grapher metadata for dataset_5164_global_airline_traffic_and_capacity__icao
   description: https://github.com/owid/notebooks/tree/main/EdouardMathieu/icao_world_airlines_traffic_capacity
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 3c1c80e556f7d516d79ef83b9121638a
-  size: 6134
+- md5: 459f4424d4c1227a42d8a128ef0b7200
+  size: 7734
   path: dataset_5164_global_airline_traffic_and_capacity__icao_config.json

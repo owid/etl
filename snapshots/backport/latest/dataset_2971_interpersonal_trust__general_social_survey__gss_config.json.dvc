@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2971_interpersonal_trust__general_social_survey__gss_config
   file_extension: json
-  date_accessed: 2023-02-17 14:36:29.625804
+  date_accessed: 2023-02-23 18:05:47.123980
   name: Grapher metadata for dataset_2971_interpersonal_trust__general_social_survey__gss
   description: |-
     Extracted from the GSS Data Explorer
@@ -22,6 +22,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 0f39edf81ed167a85a28ac2de9d43b29
-  size: 2835
+- md5: a64fd803a86ce3a7d95884196414b3f4
+  size: 3033
   path: dataset_2971_interpersonal_trust__general_social_survey__gss_config.json

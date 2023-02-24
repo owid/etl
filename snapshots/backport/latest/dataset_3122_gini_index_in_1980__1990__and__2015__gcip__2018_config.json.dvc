@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_3122_gini_index_in_1980__1990__and__2015__gcip__2018_config
   file_extension: json
-  date_accessed: 2023-02-17 15:36:28.507984
+  date_accessed: 2023-02-23 17:11:12.419813
   name: Grapher metadata for dataset_3122_gini_index_in_1980__1990__and__2015__gcip__2018
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 2985991a1ef237e076b0bf017647957a
-  size: 5967
+- md5: fb2f46973b9adbb805783798b5a7e45c
+  size: 8145
   path: dataset_3122_gini_index_in_1980__1990__and__2015__gcip__2018_config.json

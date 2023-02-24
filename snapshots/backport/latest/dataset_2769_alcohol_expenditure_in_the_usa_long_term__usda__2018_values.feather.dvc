@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2769_alcohol_expenditure_in_the_usa_long_term__usda__2018_values
   file_extension: feather
-  date_accessed: 2023-02-17 15:27:42.683295
+  date_accessed: 2023-02-23 19:14:10.317991
   name: Alcohol expenditure in the USA long-term (USDA, 2018)
   description: ''
   source_name: Our World in Data catalog backport

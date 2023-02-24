@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2879_length_of_the_work_day__from_1890s_to_1991__costa__2000_values
   file_extension: feather
-  date_accessed: 2023-02-17 13:17:27.208049
+  date_accessed: 2023-02-23 18:56:01.190180
   name: 'Length of the work day: from 1890s to 1991 - Costa (2000)'
   description: ''
   source_name: Our World in Data catalog backport

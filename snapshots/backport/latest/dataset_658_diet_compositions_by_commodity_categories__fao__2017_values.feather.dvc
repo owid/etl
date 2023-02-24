@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_658_diet_compositions_by_commodity_categories__fao__2017_values
   file_extension: feather
-  date_accessed: 2023-02-17 13:24:02.551765
+  date_accessed: 2023-02-23 18:33:21.808964
   name: Diet compositions by commodity categories - FAO (2017)
   description: ''
   source_name: Our World in Data catalog backport

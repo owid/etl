@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2821_how_europeans_spend_their_time__european_commission__2004_values
   file_extension: feather
-  date_accessed: 2023-02-17 12:07:27.203751
+  date_accessed: 2023-02-23 17:35:00.216384
   name: How Europeans spend their time - European Commission (2004)
   description: ''
   source_name: Our World in Data catalog backport

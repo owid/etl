@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2426_labor_productivity_in_cotton_spinning__chapman__1972_values
   file_extension: feather
-  date_accessed: 2023-02-17 15:33:24.708588
+  date_accessed: 2023-02-23 19:12:37.519464
   name: Labor productivity in cotton spinning (Chapman (1972))
   description: ''
   source_name: Our World in Data catalog backport

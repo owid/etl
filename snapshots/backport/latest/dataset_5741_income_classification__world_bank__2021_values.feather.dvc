@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5741_income_classification__world_bank__2021_values
   file_extension: feather
-  date_accessed: 2023-02-18 00:10:26.441834
+  date_accessed: 2023-02-23 15:14:09.151875
   name: Income Classification - World Bank (2021)
   description: Updated version of the 2017 classification dataset
   source_name: Our World in Data catalog backport

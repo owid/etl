@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_289_human_capital_in_long_run__lee_lee__2016_values
   file_extension: feather
-  date_accessed: 2023-02-17 15:42:31.355068
+  date_accessed: 2023-02-23 16:42:40.452427
   name: Human Capital in Long-Run - Lee-Lee (2016)
   description: ''
   source_name: Our World in Data catalog backport

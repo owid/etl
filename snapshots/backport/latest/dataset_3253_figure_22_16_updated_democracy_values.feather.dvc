@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_3253_figure_22_16_updated_democracy_values
   file_extension: feather
-  date_accessed: 2023-02-17 14:48:58.667098
+  date_accessed: 2023-02-23 18:45:08.152436
   name: Figure 22.16_updated_democracy
   description: core-econ.org
   source_name: Our World in Data catalog backport

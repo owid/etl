@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5347_statistical_review_of_world_energy__bp__2021_values
   file_extension: feather
-  date_accessed: 2023-02-17 12:42:11.255467
+  date_accessed: 2023-02-23 17:38:26.105028
   name: Statistical Review of World Energy - BP (2021)
   description: This is a dataset imported by the automated fetcher
   source_name: Our World in Data catalog backport

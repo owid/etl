@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5774_key_indicators_config
   file_extension: json
-  date_accessed: 2023-02-18 00:10:43.878220
+  date_accessed: 2023-02-23 17:48:23.357993
   name: Grapher metadata for dataset_5774_key_indicators
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: f200c603e2db8aa788359d3a53ba862c
-  size: 12130
+- md5: de39e2a3ff5fa51249675fe9d9233082
+  size: 14008
   path: dataset_5774_key_indicators_config.json

@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_438_life_satisfaction__world_value_survey__2014_config
   file_extension: json
-  date_accessed: 2023-02-17 14:59:15.180538
+  date_accessed: 2023-02-23 18:02:33.033779
   name: Grapher metadata for dataset_438_life_satisfaction__world_value_survey__2014
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 6965b9e7029b1115e420ae08baed0c5e
-  size: 3080
+- md5: 1042adcbc3514f52500b2cf76c9c4387
+  size: 3472
   path: dataset_438_life_satisfaction__world_value_survey__2014_config.json

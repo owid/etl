@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2891_percentage_of_americans_living_alone__by_age__ipums_values
   file_extension: feather
-  date_accessed: 2023-02-17 14:35:57.076850
+  date_accessed: 2023-02-23 17:21:32.292302
   name: Percentage of Americans living alone, by age - IPUMS
   description: ''
   source_name: Our World in Data catalog backport

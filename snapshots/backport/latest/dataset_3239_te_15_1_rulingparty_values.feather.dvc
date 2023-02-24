@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_3239_te_15_1_rulingparty_values
   file_extension: feather
-  date_accessed: 2023-02-17 12:05:17.605021
+  date_accessed: 2023-02-23 17:04:17.133976
   name: TE-15.1_RulingParty
   description: core-econ.org
   source_name: Our World in Data catalog backport

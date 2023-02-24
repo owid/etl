@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2762_cross_country_literacy_rates__world_bank__cia_world_factbook__and_other_sources_values
   file_extension: feather
-  date_accessed: 2023-02-17 12:17:37.389898
+  date_accessed: 2023-02-23 19:39:04.978121
   name: Cross-country literacy rates - World Bank, CIA World Factbook, and other sources
   description: ''
   source_name: Our World in Data catalog backport

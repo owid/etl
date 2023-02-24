@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_3224_government_expenditure_and_learning_outcomes_values
   file_extension: feather
-  date_accessed: 2023-02-17 13:03:18.396033
+  date_accessed: 2023-02-23 18:57:54.511653
   name: Government expenditure and learning outcomes
   description: 'Learning outcomes data has been discontinued as Angrist et al favour
     the HLO database maintained at the World Bank, can be found at: https://datacatalog.worldbank.org/dataset/harmonized-learning-outcomes-hlo-database'

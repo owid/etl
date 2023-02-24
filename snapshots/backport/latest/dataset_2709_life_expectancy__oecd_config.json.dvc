@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2709_life_expectancy__oecd_config
   file_extension: json
-  date_accessed: 2023-02-17 15:20:37.381163
+  date_accessed: 2023-02-23 15:16:32.209953
   name: Grapher metadata for dataset_2709_life_expectancy__oecd
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: ffdbcf597b50945b03a1a304ebba5b44
-  size: 1286
+- md5: cf90b97449aa47d459563d6775f32557
+  size: 1484
   path: dataset_2709_life_expectancy__oecd_config.json

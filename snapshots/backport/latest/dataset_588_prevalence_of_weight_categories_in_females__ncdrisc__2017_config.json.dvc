@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_588_prevalence_of_weight_categories_in_females__ncdrisc__2017_config
   file_extension: json
-  date_accessed: 2023-02-17 15:49:22.764749
+  date_accessed: 2023-02-23 19:23:42.622384
   name: Grapher metadata for dataset_588_prevalence_of_weight_categories_in_females__ncdrisc__2017
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 484b8d1f3f950a24e70f5efe5e6d855a
-  size: 3839
+- md5: 02d2401895996e9b754f409502448046
+  size: 4623
   path: dataset_588_prevalence_of_weight_categories_in_females__ncdrisc__2017_config.json

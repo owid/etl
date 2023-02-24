@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_4882_gavi_country_eligibility__2019_config
   file_extension: json
-  date_accessed: 2023-02-17 14:33:42.411550
+  date_accessed: 2023-02-23 17:08:02.622130
   name: Grapher metadata for dataset_4882_gavi_country_eligibility__2019
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 88fff85d1ca4b54c5f6d2c6b8b0f62d7
-  size: 1115
+- md5: 891f64d972b2401e7df2ca2919ba5781
+  size: 1315
   path: dataset_4882_gavi_country_eligibility__2019_config.json

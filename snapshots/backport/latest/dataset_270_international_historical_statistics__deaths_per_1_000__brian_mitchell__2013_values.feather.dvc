@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_270_international_historical_statistics__deaths_per_1_000__brian_mitchell__2013_values
   file_extension: feather
-  date_accessed: 2023-02-17 14:56:06.990252
+  date_accessed: 2023-02-23 18:47:54.692431
   name: International Historical Statistics (Deaths per 1,000) - Brian Mitchell (2013)
   description: ''
   source_name: Our World in Data catalog backport

@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_283_oecd__trust_in_government_values
   file_extension: feather
-  date_accessed: 2023-02-17 15:16:19.851643
+  date_accessed: 2023-02-23 17:18:55.141960
   name: OECD - Trust in government
   description: https://github.com/owid/notebooks/tree/main/EdouardMathieu/oecd_trust_government
   source_name: Our World in Data catalog backport

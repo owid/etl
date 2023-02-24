@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2752_hypothetical_meat_consumption__owid_based_on_fao__and__un_values
   file_extension: feather
-  date_accessed: 2023-02-17 14:57:11.550076
+  date_accessed: 2023-02-23 17:16:18.248109
   name: Hypothetical meat consumption - OWID based on FAO & UN
   description: ''
   source_name: Our World in Data catalog backport

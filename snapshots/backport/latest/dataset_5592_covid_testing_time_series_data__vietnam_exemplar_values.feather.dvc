@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5592_covid_testing_time_series_data__vietnam_exemplar_values
   file_extension: feather
-  date_accessed: 2023-02-17 12:25:13.252023
+  date_accessed: 2023-02-23 18:49:35.144945
   name: COVID testing time series data (Vietnam exemplar)
   description: ''
   source_name: Our World in Data catalog backport

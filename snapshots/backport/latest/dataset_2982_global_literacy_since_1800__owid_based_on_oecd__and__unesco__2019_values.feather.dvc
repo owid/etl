@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2982_global_literacy_since_1800__owid_based_on_oecd__and__unesco__2019_values
   file_extension: feather
-  date_accessed: 2023-02-17 15:41:35.681661
+  date_accessed: 2023-02-23 19:26:13.820629
   name: Global literacy since 1800 (OWID based on OECD & UNESCO (2019))
   description: ''
   source_name: Our World in Data catalog backport

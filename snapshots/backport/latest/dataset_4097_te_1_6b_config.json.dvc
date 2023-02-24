@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_4097_te_1_6b_config
   file_extension: json
-  date_accessed: 2023-02-17 12:40:00.216516
+  date_accessed: 2023-02-23 17:38:57.432683
   name: Grapher metadata for dataset_4097_te_1_6b
   description: core-econ.org
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 88c3206555d105db55df10551279f369
-  size: 2020
+- md5: 7202761eefb852690fb14c805e4722ac
+  size: 2220
   path: dataset_4097_te_1_6b_config.json

@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5571_omm__public_expenditure_on_health__pctgdp_values
   file_extension: feather
-  date_accessed: 2023-02-17 14:12:17.203352
+  date_accessed: 2023-02-23 17:08:16.251485
   name: OMM - Public expenditure on health (%GDP)
   description: ''
   source_name: Our World in Data catalog backport

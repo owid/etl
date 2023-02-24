@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_1087_world_bank_se4all_database__energy_efficiency_values
   file_extension: feather
-  date_accessed: 2023-02-17 15:27:57.213779
+  date_accessed: 2023-02-23 16:43:34.012270
   name: World Bank SE4ALL database - Energy efficiency
   description: This is a dataset imported by the automated fetcher
   source_name: Our World in Data catalog backport

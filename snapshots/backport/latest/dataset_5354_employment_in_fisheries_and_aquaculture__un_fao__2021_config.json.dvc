@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5354_employment_in_fisheries_and_aquaculture__un_fao__2021_config
   file_extension: json
-  date_accessed: 2023-02-17 14:09:40.379116
+  date_accessed: 2023-02-23 16:40:22.005867
   name: Grapher metadata for dataset_5354_employment_in_fisheries_and_aquaculture__un_fao__2021
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 358d2fcea2f861e17ea653ad59b5e4e4
-  size: 2848
+- md5: 1023f39e06e566cfa0ec5c786504642e
+  size: 3448
   path: dataset_5354_employment_in_fisheries_and_aquaculture__un_fao__2021_config.json

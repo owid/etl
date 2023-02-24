@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_3024_total_merchandise_trade_as_share_of_gdp__dots__2017__split_config
   file_extension: json
-  date_accessed: 2023-02-17 15:52:53.040788
+  date_accessed: 2023-02-23 18:36:41.979572
   name: Grapher metadata for dataset_3024_total_merchandise_trade_as_share_of_gdp__dots__2017__split
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 31e0c5529f421b1269ad98605e38b9d6
-  size: 1931
+- md5: 39a6941fdcf055e0f006984522b09f54
+  size: 2129
   path: dataset_3024_total_merchandise_trade_as_share_of_gdp__dots__2017__split_config.json

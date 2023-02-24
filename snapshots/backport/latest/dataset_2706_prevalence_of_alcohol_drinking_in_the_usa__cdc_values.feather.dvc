@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2706_prevalence_of_alcohol_drinking_in_the_usa__cdc_values
   file_extension: feather
-  date_accessed: 2023-02-17 14:24:28.377217
+  date_accessed: 2023-02-23 17:47:03.389910
   name: Prevalence of alcohol drinking in the USA - CDC
   description: ''
   source_name: Our World in Data catalog backport

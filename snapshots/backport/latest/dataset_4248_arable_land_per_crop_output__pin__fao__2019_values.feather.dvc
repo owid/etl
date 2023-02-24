@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_4248_arable_land_per_crop_output__pin__fao__2019_values
   file_extension: feather
-  date_accessed: 2023-02-17 13:28:39.239236
+  date_accessed: 2023-02-23 16:57:11.052530
   name: Arable land per crop output (PIN) (FAO, 2019)
   description: ''
   source_name: Our World in Data catalog backport

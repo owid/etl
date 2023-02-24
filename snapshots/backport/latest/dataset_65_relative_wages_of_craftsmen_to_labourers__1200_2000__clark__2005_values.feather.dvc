@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_65_relative_wages_of_craftsmen_to_labourers__1200_2000__clark__2005_values
   file_extension: feather
-  date_accessed: 2023-02-17 15:22:55.610660
+  date_accessed: 2023-02-23 17:42:50.746117
   name: Relative wages of craftsmen to labourers, 1200-2000 - Clark (2005)
   description: |-
     Unmatched data taken from Table A2.

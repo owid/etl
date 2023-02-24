@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2822_urban_and_rural_populations_in_the_united_states__us_census_bureau__2010_values
   file_extension: feather
-  date_accessed: 2023-02-17 13:48:58.086097
+  date_accessed: 2023-02-23 16:31:53.581972
   name: Urban and rural populations in the United States - US Census Bureau (2010)
   description: ''
   source_name: Our World in Data catalog backport

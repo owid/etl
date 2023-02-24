@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_371_state_of_vaccine_confidence__larson_et_al__2016_config
   file_extension: json
-  date_accessed: 2023-02-17 12:38:43.749151
+  date_accessed: 2023-02-23 15:02:28.210018
   name: Grapher metadata for dataset_371_state_of_vaccine_confidence__larson_et_al__2016
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 8272807da0c1ee14ea1ec7b4137251bb
-  size: 4082
+- md5: da6fae8780af74325225bc81fe03a523
+  size: 4866
   path: dataset_371_state_of_vaccine_confidence__larson_et_al__2016_config.json

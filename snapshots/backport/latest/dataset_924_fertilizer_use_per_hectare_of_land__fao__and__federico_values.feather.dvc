@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_924_fertilizer_use_per_hectare_of_land__fao__and__federico_values
   file_extension: feather
-  date_accessed: 2023-02-17 14:14:14.276605
+  date_accessed: 2023-02-23 18:10:25.976991
   name: Fertilizer use per hectare of land -FAO & Federico
   description: ''
   source_name: Our World in Data catalog backport

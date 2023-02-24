@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2986_bribe_payers_index__transparency_international__gcb__2013__split_values
   file_extension: feather
-  date_accessed: 2023-02-17 13:48:43.987444
+  date_accessed: 2023-02-23 17:53:55.920867
   name: Bribe payers index (Transparency International - GCB (2013)) (split)
   description: ''
   source_name: Our World in Data catalog backport

@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2842_levels_of_urbanization_and_per_capita_gnp_in_various_regions__bairoch__1988_values
   file_extension: feather
-  date_accessed: 2023-02-17 12:50:21.684522
+  date_accessed: 2023-02-23 17:23:44.039925
   name: Levels of Urbanization and per capita GNP in Various Regions - Bairoch (1988)
   description: ''
   source_name: Our World in Data catalog backport

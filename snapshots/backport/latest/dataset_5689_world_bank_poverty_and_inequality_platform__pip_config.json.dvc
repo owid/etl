@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5689_world_bank_poverty_and_inequality_platform__pip_config
   file_extension: json
-  date_accessed: 2023-02-17 17:50:34.554119
+  date_accessed: 2023-02-23 18:39:22.120284
   name: Grapher metadata for dataset_5689_world_bank_poverty_and_inequality_platform__pip
   description: Version 20220909_2017_01_02_PROD
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 8534631135ad4332df9aae4267da3011
-  size: 61785
+- md5: e7c254c691230133b4b95b0a658c5164
+  size: 79585
   path: dataset_5689_world_bank_poverty_and_inequality_platform__pip_config.json

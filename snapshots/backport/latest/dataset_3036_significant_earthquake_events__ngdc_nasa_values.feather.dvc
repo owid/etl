@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_3036_significant_earthquake_events__ngdc_nasa_values
   file_extension: feather
-  date_accessed: 2023-02-17 13:36:42.994948
+  date_accessed: 2023-02-23 16:51:33.278812
   name: Significant earthquake events (NGDC-NASA)
   description: ''
   source_name: Our World in Data catalog backport

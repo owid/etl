@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_324_global_education__oecd_plus_iiasa__2016_values
   file_extension: feather
-  date_accessed: 2023-02-17 15:46:14.603093
+  date_accessed: 2023-02-23 15:01:02.723616
   name: Global education (OECD + IIASA (2016))
   description: ''
   source_name: Our World in Data catalog backport

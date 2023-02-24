@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_4246_job_search_methods_us__pew_research_center__2015_values
   file_extension: feather
-  date_accessed: 2023-02-17 15:32:50.255341
+  date_accessed: 2023-02-23 18:09:46.384528
   name: Job search methods US - Pew Research Center (2015)
   description: ''
   source_name: Our World in Data catalog backport

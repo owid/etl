@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2887_urbanization_in_the_long_run__owid_based_on_the_un_world_urbanization_prospects_2018_and_others_values
   file_extension: feather
-  date_accessed: 2023-02-17 12:44:19.108069
+  date_accessed: 2023-02-23 18:36:56.763286
   name: Urbanization in the long run - OWID based on the UN World Urbanization Prospects
     2018 and others
   description: ''

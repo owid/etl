@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2660_value_of_global_merchandise_imports_and_exports__fouquin_and_hugot__cepii_2016__national_data_values
   file_extension: feather
-  date_accessed: 2023-02-17 12:29:07.050625
+  date_accessed: 2023-02-23 18:54:15.882187
   name: Value of global merchandise imports and exports - (Fouquin and Hugot (CEPII
     2016) National data)
   description: This dataset uses Fouquin and Hugot (CEPII 2016) national trade data.

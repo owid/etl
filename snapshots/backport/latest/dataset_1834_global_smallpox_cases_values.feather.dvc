@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_1834_global_smallpox_cases_values
   file_extension: feather
-  date_accessed: 2023-02-17 13:19:23.622580
+  date_accessed: 2023-02-23 16:57:43.795584
   name: Global Smallpox Cases
   description: ''
   source_name: Our World in Data catalog backport

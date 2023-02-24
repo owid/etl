@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2076_male_to_female_ratio_high_school_courses_in_usa__goldin_et_al_values
   file_extension: feather
-  date_accessed: 2023-02-17 14:16:55.131926
+  date_accessed: 2023-02-23 17:31:52.127318
   name: Male-to-female ratio high school courses in USA - Goldin et al.
   description: ''
   source_name: Our World in Data catalog backport

@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_3030_male_literacy_rate__cressy__1980__split_values
   file_extension: feather
-  date_accessed: 2023-02-17 15:40:33.012709
+  date_accessed: 2023-02-23 19:07:50.266425
   name: Male literacy rate (Cressy (1980)) (split)
   description: Literacy figures are nationally representative.
   source_name: Our World in Data catalog backport

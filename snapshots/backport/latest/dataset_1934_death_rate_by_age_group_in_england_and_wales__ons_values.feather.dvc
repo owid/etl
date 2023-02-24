@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_1934_death_rate_by_age_group_in_england_and_wales__ons_values
   file_extension: feather
-  date_accessed: 2023-02-17 14:01:39.725181
+  date_accessed: 2023-02-23 15:13:09.814862
   name: Death rate by age group in England and Wales - ONS
   description: ''
   source_name: Our World in Data catalog backport

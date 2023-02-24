@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_996_decomposition_of_gender_wage_gap_1980__blau_and_kahn__2017_config
   file_extension: json
-  date_accessed: 2023-02-17 14:53:50.481518
+  date_accessed: 2023-02-23 17:16:11.299601
   name: Grapher metadata for dataset_996_decomposition_of_gender_wage_gap_1980__blau_and_kahn__2017
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 1ec7fcb6292f62b8f93a09689495c710
-  size: 2679
+- md5: dc22b047ec8ab26cf6bf8e9410aa6e87
+  size: 3075
   path: dataset_996_decomposition_of_gender_wage_gap_1980__blau_and_kahn__2017_config.json

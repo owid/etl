@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_3245_figure_19_1_wealth_inequality_values
   file_extension: feather
-  date_accessed: 2023-02-17 15:00:05.820322
+  date_accessed: 2023-02-23 18:46:15.936877
   name: Figure 19.1_Wealth inequality
   description: core-econ.org
   source_name: Our World in Data catalog backport

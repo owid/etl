@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5142_te_17_16_cpi_values
   file_extension: feather
-  date_accessed: 2023-02-17 13:51:24.282139
+  date_accessed: 2023-02-23 16:28:31.100391
   name: TE-17.16_CPI
   description: core-econ.org
   source_name: Our World in Data catalog backport

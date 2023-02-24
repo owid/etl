@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5548_who__global_health_estimates__malaria_deaths_by_age_values
   file_extension: feather
-  date_accessed: 2023-02-17 15:07:45.592897
+  date_accessed: 2023-02-23 19:05:06.034592
   name: WHO - Global Health Estimates - Malaria Deaths by Age
   description: 'Code and data available in this repo: https://github.com/owid/notebooks/tree/main/FionaSpooner/who_malaria_deaths_by_age'
   source_name: Our World in Data catalog backport

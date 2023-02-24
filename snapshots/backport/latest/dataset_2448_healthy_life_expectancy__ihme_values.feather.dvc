@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2448_healthy_life_expectancy__ihme_values
   file_extension: feather
-  date_accessed: 2023-02-17 13:46:46.358100
+  date_accessed: 2023-02-23 16:27:45.932280
   name: Healthy Life Expectancy - IHME
   description: ''
   source_name: Our World in Data catalog backport

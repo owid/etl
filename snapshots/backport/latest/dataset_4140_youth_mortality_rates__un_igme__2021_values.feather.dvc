@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_4140_youth_mortality_rates__un_igme__2021_values
   file_extension: feather
-  date_accessed: 2023-02-17 12:08:33.514397
+  date_accessed: 2023-02-23 17:40:20.194884
   name: Youth Mortality Rates - UN IGME (2021)
   description: |-
     Relevant notebook is here: https://github.com/owid/notebooks/blob/main/FionaSpooner/un_igme_youth_mortality/un_igme_youth_mortality.ipynb

@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2751_global_battle_related_and_one_sided_violence_deaths_since_1946__prio_ucdp_values
   file_extension: feather
-  date_accessed: 2023-02-17 15:19:03.539761
+  date_accessed: 2023-02-23 15:03:27.731360
   name: Global battle-related and 'one-sided violence' deaths since 1946 – PRIO/UCDP
   description: Conjunction of PRIO Battle Deaths Dataset 3.1, and UCDP Battle-Related
     Deaths Dataset, UCDP Non-State Conflict Dataset, UCDP One-sided Violence Dataset

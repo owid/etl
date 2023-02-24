@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_1015_mobile_bank_accounts_by_region__gsma__2019_config
   file_extension: json
-  date_accessed: 2023-02-17 13:28:04.528194
+  date_accessed: 2023-02-23 17:19:53.665749
   name: Grapher metadata for dataset_1015_mobile_bank_accounts_by_region__gsma__2019
   description: GSMA Mobile Money Metrics is an interactive tool that provides a comprehensive
     set of global metrics for the industry by combining unique data sources that the
@@ -18,6 +18,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: ce84d1bbbdb2ef06b1faeba5aa6e9414
-  size: 3009
+- md5: 62d825c5fa49d93294f1ce38485a7c97
+  size: 3207
   path: dataset_1015_mobile_bank_accounts_by_region__gsma__2019_config.json

@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_3026_total_merchandise_trade_as_share_of_gdp__fouquin_and_hugot__cepii_2016__split_values
   file_extension: feather
-  date_accessed: 2023-02-17 12:49:16.929469
+  date_accessed: 2023-02-23 19:27:30.340289
   name: Total merchandise trade as share of GDP (Fouquin and Hugot (CEPII 2016)) (split)
   description: ''
   source_name: Our World in Data catalog backport

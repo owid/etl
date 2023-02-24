@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_282_world_population_by_political_regime_they_live_in__owid__2016_values
   file_extension: feather
-  date_accessed: 2023-02-17 14:55:16.635996
+  date_accessed: 2023-02-23 19:04:27.021799
   name: World Population by Political Regime they live in - OWID (2016)
   description: ''
   source_name: Our World in Data catalog backport

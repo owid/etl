@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5163_aviation_passenger_kilometres_and_co2_emissions__icct_values
   file_extension: feather
-  date_accessed: 2023-02-17 14:49:20.232333
+  date_accessed: 2023-02-23 18:39:35.221674
   name: Aviation passenger kilometres and CO2 emissions (ICCT)
   description: ''
   source_name: Our World in Data catalog backport

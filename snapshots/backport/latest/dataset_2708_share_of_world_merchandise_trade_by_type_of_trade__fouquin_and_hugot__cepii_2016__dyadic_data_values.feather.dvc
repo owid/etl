@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2708_share_of_world_merchandise_trade_by_type_of_trade__fouquin_and_hugot__cepii_2016__dyadic_data_values
   file_extension: feather
-  date_accessed: 2023-02-17 12:46:08.778559
+  date_accessed: 2023-02-23 18:07:07.292370
   name: Share of world merchandise trade by type of trade - Fouquin and Hugot (CEPII
     2016, Dyadic data)
   description: This dataset uses Fouquin and Hugot (CEPII 2016) dyadic trade data.

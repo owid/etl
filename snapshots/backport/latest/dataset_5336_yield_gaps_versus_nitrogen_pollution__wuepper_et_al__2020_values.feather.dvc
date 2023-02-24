@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5336_yield_gaps_versus_nitrogen_pollution__wuepper_et_al__2020_values
   file_extension: feather
-  date_accessed: 2023-02-17 12:59:26.941238
+  date_accessed: 2023-02-23 17:05:08.729748
   name: Yield gaps versus nitrogen pollution (Wuepper et al. 2020)
   description: ''
   source_name: Our World in Data catalog backport

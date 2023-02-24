@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2892_urbanization_share__european_commission__atlas_of_the_human_planet_values
   file_extension: feather
-  date_accessed: 2023-02-17 12:31:10.829955
+  date_accessed: 2023-02-23 18:41:38.841987
   name: Urbanization share (European Commission, Atlas of the Human Planet)
   description: ''
   source_name: Our World in Data catalog backport

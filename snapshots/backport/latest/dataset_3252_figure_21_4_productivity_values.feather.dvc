@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_3252_figure_21_4_productivity_values
   file_extension: feather
-  date_accessed: 2023-02-17 15:15:22.702505
+  date_accessed: 2023-02-23 18:16:16.564577
   name: Figure 21.4_productivity
   description: core-econ.org
   source_name: Our World in Data catalog backport

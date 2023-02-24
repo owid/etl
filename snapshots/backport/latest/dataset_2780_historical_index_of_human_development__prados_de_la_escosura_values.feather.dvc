@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2780_historical_index_of_human_development__prados_de_la_escosura_values
   file_extension: feather
-  date_accessed: 2023-02-17 14:36:44.678915
+  date_accessed: 2023-02-23 19:12:57.116084
   name: Historical Index of Human Development - Prados de la Escosura
   description: ''
   source_name: Our World in Data catalog backport

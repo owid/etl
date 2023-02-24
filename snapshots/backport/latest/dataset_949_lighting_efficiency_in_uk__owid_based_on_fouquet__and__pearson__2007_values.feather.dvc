@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_949_lighting_efficiency_in_uk__owid_based_on_fouquet__and__pearson__2007_values
   file_extension: feather
-  date_accessed: 2023-02-17 13:26:54.835208
+  date_accessed: 2023-02-23 18:12:24.446946
   name: Lighting efficiency in UK - OWID based on Fouquet & Pearson (2007)
   description: ''
   source_name: Our World in Data catalog backport

@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2765_depression_prevalence_by_education__oecd_values
   file_extension: feather
-  date_accessed: 2023-02-17 12:56:52.004385
+  date_accessed: 2023-02-23 17:28:43.800477
   name: Depression prevalence by education - OECD
   description: ''
   source_name: Our World in Data catalog backport

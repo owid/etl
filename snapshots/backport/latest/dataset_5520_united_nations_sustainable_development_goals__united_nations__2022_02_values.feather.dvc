@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5520_united_nations_sustainable_development_goals__united_nations__2022_02_values
   file_extension: feather
-  date_accessed: 2023-02-17 12:39:22.642962
+  date_accessed: 2023-02-23 18:24:35.536131
   name: United Nations Sustainable Development Goals - United Nations (2022-02)
   description: This is a dataset imported by the automated fetcher
   source_name: Our World in Data catalog backport

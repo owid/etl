@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_1889_violent_discipline_in_the_us__us_general_social_survey__2017_values
   file_extension: feather
-  date_accessed: 2023-02-17 14:47:25.490513
+  date_accessed: 2023-02-23 15:04:42.212772
   name: Violent discipline in the US (US General Social Survey (2017))
   description: ''
   source_name: Our World in Data catalog backport

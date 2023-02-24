@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5622_yougov__dietary_choices_of_brits_values
   file_extension: feather
-  date_accessed: 2023-02-17 14:50:17.378841
+  date_accessed: 2023-02-23 18:04:47.790487
   name: YouGov - Dietary choices of Brits
   description: https://github.com/owid/notebooks/tree/main/EdouardMathieu/yougov_dietary_choices
   source_name: Our World in Data catalog backport

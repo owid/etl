@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2452_price_of_nails_since_1695__daniel_sichels__2017_values
   file_extension: feather
-  date_accessed: 2023-02-17 14:18:31.322369
+  date_accessed: 2023-02-23 18:36:16.264292
   name: Price of nails since 1695 (Daniel Sichels (2017))
   description: ''
   source_name: Our World in Data catalog backport

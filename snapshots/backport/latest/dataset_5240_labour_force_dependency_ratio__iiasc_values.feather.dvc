@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5240_labour_force_dependency_ratio__iiasc_values
   file_extension: feather
-  date_accessed: 2023-02-17 13:35:12.000654
+  date_accessed: 2023-02-23 17:54:28.276202
   name: Labour Force Dependency Ratio (IIASC)
   description: ''
   source_name: Our World in Data catalog backport

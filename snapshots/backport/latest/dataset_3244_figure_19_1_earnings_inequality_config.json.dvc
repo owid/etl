@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_3244_figure_19_1_earnings_inequality_config
   file_extension: json
-  date_accessed: 2023-02-17 15:40:26.420640
+  date_accessed: 2023-02-23 19:43:54.878276
   name: Grapher metadata for dataset_3244_figure_19_1_earnings_inequality
   description: core-econ.org
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: e274ac6b2d8d7716459c8e1a87d32fb8
-  size: 1682
+- md5: 6a55350f2ccebae396b46f55363f8132
+  size: 1880
   path: dataset_3244_figure_19_1_earnings_inequality_config.json

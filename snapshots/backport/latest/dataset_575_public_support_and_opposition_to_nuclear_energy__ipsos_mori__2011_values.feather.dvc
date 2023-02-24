@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_575_public_support_and_opposition_to_nuclear_energy__ipsos_mori__2011_values
   file_extension: feather
-  date_accessed: 2023-02-17 14:10:31.618260
+  date_accessed: 2023-02-23 16:30:08.557952
   name: Public support and opposition to nuclear energy- Ipsos MORI (2011)
   description: ''
   source_name: Our World in Data catalog backport

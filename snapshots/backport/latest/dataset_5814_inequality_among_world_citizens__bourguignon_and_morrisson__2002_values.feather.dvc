@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5814_inequality_among_world_citizens__bourguignon_and_morrisson__2002_values
   file_extension: feather
-  date_accessed: 2023-02-18 00:07:46.310856
+  date_accessed: 2023-02-23 19:38:57.811470
   name: Inequality Among World Citizens - Bourguignon and Morrisson (2002)
   description: Backported
   source_name: Our World in Data catalog backport

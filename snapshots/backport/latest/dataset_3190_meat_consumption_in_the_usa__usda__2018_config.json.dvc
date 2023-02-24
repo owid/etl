@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_3190_meat_consumption_in_the_usa__usda__2018_config
   file_extension: json
-  date_accessed: 2023-02-17 13:32:55.179005
+  date_accessed: 2023-02-23 18:27:44.931844
   name: Grapher metadata for dataset_3190_meat_consumption_in_the_usa__usda__2018
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 36d4d3944d32311603477bf2b35fadba
-  size: 4286
+- md5: 057af1c906508cdd2c0e8fa7ee049b07
+  size: 5276
   path: dataset_3190_meat_consumption_in_the_usa__usda__2018_config.json

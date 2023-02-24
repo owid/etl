@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_4103_figure_19_1__version2_config
   file_extension: json
-  date_accessed: 2023-02-17 12:52:00.581960
+  date_accessed: 2023-02-23 17:20:52.138284
   name: Grapher metadata for dataset_4103_figure_19_1__version2
   description: core-econ.org
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: a4f2adfe08f6ab4a67b55a86ce74ab49
-  size: 2166
+- md5: f0fb7080aa6aa0f16a675f5bc70a9585
+  size: 2366
   path: dataset_4103_figure_19_1__version2_config.json

@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5434_united_nations__online_index_of_objects_launched_into_outer_space_values
   file_extension: feather
-  date_accessed: 2023-02-17 15:03:46.372704
+  date_accessed: 2023-02-23 17:08:48.424891
   name: United Nations - Online Index of Objects Launched into Outer Space
   description: 'Code & data here: https://github.com/owid/notebooks/tree/main/EdouardMathieu/2021_12_outer_space_objects'
   source_name: Our World in Data catalog backport

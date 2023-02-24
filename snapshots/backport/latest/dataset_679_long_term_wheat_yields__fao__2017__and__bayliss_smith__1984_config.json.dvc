@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_679_long_term_wheat_yields__fao__2017__and__bayliss_smith__1984_config
   file_extension: json
-  date_accessed: 2023-02-17 13:43:00.758006
+  date_accessed: 2023-02-23 19:20:10.319185
   name: Grapher metadata for dataset_679_long_term_wheat_yields__fao__2017__and__bayliss_smith__1984
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 44ff6ea3ff6f3fce85378bcba12abffc
-  size: 2022
+- md5: b06c42747e6f6d1081c0ed9c7a6d8d71
+  size: 2218
   path: dataset_679_long_term_wheat_yields__fao__2017__and__bayliss_smith__1984_config.json

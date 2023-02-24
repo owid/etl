@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5392_international_monetary_fund__world_economic_outlook_values
   file_extension: feather
-  date_accessed: 2023-02-17 14:17:43.468926
+  date_accessed: 2023-02-23 19:33:25.952833
   name: International Monetary Fund - World Economic Outlook
   description: https://github.com/owid/importers/tree/master/imf_weo
   source_name: Our World in Data catalog backport

@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_267_life_expectancy__james_riley_for_data_1990_and_earlier__who_and_world_bank_for_later_data__by_max_roser_config
   file_extension: json
-  date_accessed: 2023-02-17 13:00:52.231771
+  date_accessed: 2023-02-23 16:35:17.423626
   name: Grapher metadata for dataset_267_life_expectancy__james_riley_for_data_1990_and_earlier__who_and_world_bank_for_later_data__by_max_roser
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 70b9dd33b8b9f87925ae8d2edbe16207
-  size: 3491
+- md5: 409bf190339bdea6ab900cc619067394
+  size: 3687
   path: dataset_267_life_expectancy__james_riley_for_data_1990_and_earlier__who_and_world_bank_for_later_data__by_max_roser_config.json

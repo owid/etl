@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_3037_earthquake_deaths__ngdc_noaa_values
   file_extension: feather
-  date_accessed: 2023-02-17 14:26:13.781727
+  date_accessed: 2023-02-23 17:28:22.373859
   name: Earthquake deaths (NGDC-NOAA)
   description: ''
   source_name: Our World in Data catalog backport

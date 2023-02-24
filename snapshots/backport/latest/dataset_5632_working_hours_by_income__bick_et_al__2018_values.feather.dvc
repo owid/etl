@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5632_working_hours_by_income__bick_et_al__2018_values
   file_extension: feather
-  date_accessed: 2023-02-17 16:08:28.195325
+  date_accessed: 2023-02-23 17:06:40.701901
   name: Working Hours by Income – Bick et al (2018)
   description: ''
   source_name: Our World in Data catalog backport

@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5508_indian_child_mortality_rate_by_gender_values
   file_extension: feather
-  date_accessed: 2023-02-17 14:04:44.905918
+  date_accessed: 2023-02-23 18:48:35.379318
   name: Indian child mortality rate by gender
   description: |-
     Permalink: http://ghdx.healthdata.org/gbd-results-tool?params=gbd-api-2019-permalink/4f9d6dd65a1127c3a0d4c6a7868346b6

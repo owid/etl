@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2425_labor_productivity_in_cotton_spinning_and_weaving__ellison__1886_values
   file_extension: feather
-  date_accessed: 2023-02-17 13:35:05.149524
+  date_accessed: 2023-02-23 19:18:39.053422
   name: Labor productivity in cotton spinning and weaving (Ellison (1886))
   description: ''
   source_name: Our World in Data catalog backport

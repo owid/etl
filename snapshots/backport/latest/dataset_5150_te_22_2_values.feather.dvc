@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5150_te_22_2_values
   file_extension: feather
-  date_accessed: 2023-02-17 15:01:57.488584
+  date_accessed: 2023-02-23 15:19:29.572414
   name: TE-22.2
   description: core-econ.org
   source_name: Our World in Data catalog backport

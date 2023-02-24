@@ -1,0 +1,19 @@
+meta:
+  namespace: backport
+  short_name: dataset_5314_gallup_world_poll__someone_to_help_you_values
+  file_extension: feather
+  date_accessed: 2023-02-23 19:38:05.571546
+  name: Gallup World Poll - Someone to help you
+  description: (Max, 22 Feb 2023) This cannot be shared publicly! It is not publicly
+    licensed. But I want to keep it internally.
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/5314
+  source_published_by: Our World in Data catalog backport
+  is_public: false
+  version: latest
+  publication_date: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 34affc1a10984656a456ab397b20e3df
+  size: 32066
+  path: dataset_5314_gallup_world_poll__someone_to_help_you_values.feather

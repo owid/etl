@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5516_shares_and_numbers_employed_by_sector__world_bank_and_historical_sources_values
   file_extension: feather
-  date_accessed: 2023-02-17 12:25:27.717368
+  date_accessed: 2023-02-23 19:07:10.226749
   name: Shares and numbers employed by sector (World Bank and historical sources)
   description: ''
   source_name: Our World in Data catalog backport

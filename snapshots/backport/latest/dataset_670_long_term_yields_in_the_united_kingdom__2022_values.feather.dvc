@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_670_long_term_yields_in_the_united_kingdom__2022_values
   file_extension: feather
-  date_accessed: 2023-02-17 14:04:51.975295
+  date_accessed: 2023-02-23 19:43:30.016950
   name: Long-term yields in the United Kingdom (2022)
   description: ''
   source_name: Our World in Data catalog backport

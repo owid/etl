@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2893_long_run_time_use_in_norway__by_sex__norway_statistics_values
   file_extension: feather
-  date_accessed: 2023-02-17 14:02:01.458129
+  date_accessed: 2023-02-23 18:06:34.479412
   name: Long run time use in Norway, by sex - Norway Statistics
   description: ''
   source_name: Our World in Data catalog backport

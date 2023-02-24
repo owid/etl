@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_700_gdp_in_england__using_boe__2017_config
   file_extension: json
-  date_accessed: 2023-02-17 15:42:58.996950
+  date_accessed: 2023-02-23 18:32:14.833702
   name: Grapher metadata for dataset_700_gdp_in_england__using_boe__2017
   description: This data uses A1. Headline Series sheet of BoE dataset to get Real
     GDP and Population figures for England.
@@ -14,6 +14,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: f0fbbfed58359e0af33ade0893509cf6
-  size: 2993
+- md5: d027fb63adf273f04006f6efd48fe97c
+  size: 3581
   path: dataset_700_gdp_in_england__using_boe__2017_config.json

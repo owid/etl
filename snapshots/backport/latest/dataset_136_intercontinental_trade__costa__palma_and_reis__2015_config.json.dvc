@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_136_intercontinental_trade__costa__palma_and_reis__2015_config
   file_extension: json
-  date_accessed: 2023-02-17 13:19:44.485335
+  date_accessed: 2023-02-23 16:52:43.762975
   name: Grapher metadata for dataset_136_intercontinental_trade__costa__palma_and_reis__2015
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: f951a4018784823e5ad0e953214666ab
-  size: 1650
+- md5: 8f62ba06c92e20c9a2e02911446f51f7
+  size: 1844
   path: dataset_136_intercontinental_trade__costa__palma_and_reis__2015_config.json

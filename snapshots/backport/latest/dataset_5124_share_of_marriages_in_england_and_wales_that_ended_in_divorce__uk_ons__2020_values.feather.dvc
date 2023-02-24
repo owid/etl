@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5124_share_of_marriages_in_england_and_wales_that_ended_in_divorce__uk_ons__2020_values
   file_extension: feather
-  date_accessed: 2023-02-17 13:32:13.619805
+  date_accessed: 2023-02-23 17:13:30.923598
   name: Share of marriages in England and Wales that ended in divorce (UK ONS, 2020)
   description: ''
   source_name: Our World in Data catalog backport

@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2908_annual_world_population_growth_rate__owid_values
   file_extension: feather
-  date_accessed: 2023-02-17 12:53:31.342668
+  date_accessed: 2023-02-23 17:39:56.813702
   name: Annual world population growth rate - OWID
   description: ''
   source_name: Our World in Data catalog backport

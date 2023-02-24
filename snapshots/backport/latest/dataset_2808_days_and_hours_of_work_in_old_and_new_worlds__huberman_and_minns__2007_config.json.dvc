@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2808_days_and_hours_of_work_in_old_and_new_worlds__huberman_and_minns__2007_config
   file_extension: json
-  date_accessed: 2023-02-17 12:21:06.967978
+  date_accessed: 2023-02-23 17:57:39.273449
   name: Grapher metadata for dataset_2808_days_and_hours_of_work_in_old_and_new_worlds__huberman_and_minns__2007
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: c508539b281c3bb0b30cb90e3863aa55
-  size: 4658
+- md5: e731b6c093ac565ba923703b147b892a
+  size: 5450
   path: dataset_2808_days_and_hours_of_work_in_old_and_new_worlds__huberman_and_minns__2007_config.json

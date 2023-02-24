@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_3255_figure_22_17_democracy_config
   file_extension: json
-  date_accessed: 2023-02-17 13:31:52.821535
+  date_accessed: 2023-02-23 19:46:22.169411
   name: Grapher metadata for dataset_3255_figure_22_17_democracy
   description: core-econ.org
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: c94e28b71ff194831c8e2984472d6a7a
-  size: 1384
+- md5: 391012cd2717467db47708444a251fea
+  size: 1582
   path: dataset_3255_figure_22_17_democracy_config.json

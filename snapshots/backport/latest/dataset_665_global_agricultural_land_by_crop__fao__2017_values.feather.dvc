@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_665_global_agricultural_land_by_crop__fao__2017_values
   file_extension: feather
-  date_accessed: 2023-02-17 15:21:17.633214
+  date_accessed: 2023-02-23 15:16:00.711510
   name: Global agricultural land by crop - FAO (2017)
   description: ''
   source_name: Our World in Data catalog backport

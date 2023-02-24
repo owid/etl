@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_581_daily_supply_of_calories_per_person__owid_based_on_un_fao__and__historical_sources_values
   file_extension: feather
-  date_accessed: 2023-02-17 12:41:27.162300
+  date_accessed: 2023-02-23 18:42:19.860002
   name: Daily supply of calories per person (OWID based on UN FAO & historical sources)
   description: ''
   source_name: Our World in Data catalog backport

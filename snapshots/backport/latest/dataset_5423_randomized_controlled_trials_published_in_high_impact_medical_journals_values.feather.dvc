@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5423_randomized_controlled_trials_published_in_high_impact_medical_journals_values
   file_extension: feather
-  date_accessed: 2023-02-17 12:08:23.978081
+  date_accessed: 2023-02-23 16:26:39.659156
   name: Randomized controlled trials published in high-impact medical journals
   description: ''
   source_name: Our World in Data catalog backport

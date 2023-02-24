@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2792_smallpox_cases_reported_and_revised__fenner_et_al__1988_config
   file_extension: json
-  date_accessed: 2023-02-17 12:44:24.569990
+  date_accessed: 2023-02-23 16:30:54.785780
   name: Grapher metadata for dataset_2792_smallpox_cases_reported_and_revised__fenner_et_al__1988
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 209b0dabb7e03540e2e343363690b6bb
-  size: 1887
+- md5: 9153ca5883a2e4ab3e79816c8b53761a
+  size: 2283
   path: dataset_2792_smallpox_cases_reported_and_revised__fenner_et_al__1988_config.json

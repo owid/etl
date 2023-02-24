@@ -1,0 +1,280 @@
+dataset:
+  namespace: un
+  short_name: un_sdg
+  description: 'The United Nations Sustainable Development Goal (SDG) dataset is the primary collection of data tracking progress towards the SDG indicators, compiled from officially-recognized international sources.'
+  licenses:
+  - {}
+  sources:
+  - name: United Nations
+  - url: https://sdgs.un.org/goals
+tables:
+  un_sdg:
+    variables:
+      goal:
+        title: Goal
+        short_unit: ''
+        unit: ''
+      target:
+        title: Target
+        short_unit: ''
+        unit: ''
+      indicator:
+        title: Indicator
+        short_unit: ''
+        unit: ''
+      seriescode:
+        title: SeriesCode
+        short_unit: ''
+        unit: ''
+      seriesdescription:
+        title: SeriesDescription
+        short_unit: ''
+        unit: ''
+      geoareacode:
+        title: GeoAreaCode
+        short_unit: ''
+        unit: ''
+      value:
+        title: Value
+        short_unit: ''
+        unit: ''
+      time_detail:
+        title: Time_Detail
+        short_unit: ''
+        unit: ''
+      timecoverage:
+        title: TimeCoverage
+        short_unit: ''
+        unit: ''
+      upperbound:
+        title: UpperBound
+        short_unit: ''
+        unit: ''
+      lowerbound:
+        title: LowerBound
+        short_unit: ''
+        unit: ''
+      baseperiod:
+        title: BasePeriod
+        short_unit: ''
+        unit: ''
+      source:
+        title: Source
+        short_unit: ''
+        unit: ''
+      geoinfourl:
+        title: GeoInfoUrl
+        short_unit: ''
+        unit: ''
+      footnote:
+        title: FootNote
+        short_unit: ''
+        unit: ''
+      age:
+        title: Age
+        short_unit: ''
+        unit: ''
+      hazard_type:
+        title: Hazard type
+        short_unit: ''
+        unit: ''
+      location:
+        title: Location
+        short_unit: ''
+        unit: ''
+      nature:
+        title: Nature
+        short_unit: ''
+        unit: ''
+      observation_status:
+        title: Observation Status
+        short_unit: ''
+        unit: ''
+      quantile:
+        title: Quantile
+        short_unit: ''
+        unit: ''
+      reporting_type:
+        title: Reporting Type
+        short_unit: ''
+        unit: ''
+      sex:
+        title: Sex
+        short_unit: ''
+        unit: ''
+      units:
+        title: Units
+        short_unit: ''
+        unit: ''
+      freq:
+        title: Freq
+        short_unit: ''
+        unit: ''
+      severity_of_price_levels:
+        title: Severity of price levels
+        short_unit: ''
+        unit: ''
+      type_of_product:
+        title: Type of product
+        short_unit: ''
+        unit: ''
+      ihr_capacity:
+        title: IHR Capacity
+        short_unit: ''
+        unit: ''
+      name_of_non_communicable_disease:
+        title: Name of non-communicable disease
+        short_unit: ''
+        unit: ''
+      substance_use_disorders:
+        title: Substance use disorders
+        short_unit: ''
+        unit: ''
+      type_of_occupation:
+        title: Type of occupation
+        short_unit: ''
+        unit: ''
+      education_level:
+        title: Education level
+        short_unit: ''
+        unit: ''
+      type_of_skill:
+        title: Type of skill
+        short_unit: ''
+        unit: ''
+      activity:
+        title: Activity
+        short_unit: ''
+        unit: ''
+      deviation_level:
+        title: Deviation Level
+        short_unit: ''
+        unit: ''
+      level_status:
+        title: Level/Status
+        short_unit: ''
+        unit: ''
+      type_of_renewable_technology:
+        title: Type of renewable technology
+        short_unit: ''
+        unit: ''
+      disability_status:
+        title: Disability status
+        short_unit: ''
+        unit: ''
+      migratory_status:
+        title: Migratory status
+        short_unit: ''
+        unit: ''
+      mode_of_transportation:
+        title: Mode of transportation
+        short_unit: ''
+        unit: ''
+      type_of_mobile_technology:
+        title: Type of mobile technology
+        short_unit: ''
+        unit: ''
+      counterpart:
+        title: Counterpart
+        short_unit: ''
+        unit: ''
+      fiscal_intervention_stage:
+        title: Fiscal intervention stage
+        short_unit: ''
+        unit: ''
+      grounds_of_discrimination:
+        title: Grounds of discrimination
+        short_unit: ''
+        unit: ''
+      name_of_international_institution:
+        title: Name of international institution
+        short_unit: ''
+        unit: ''
+      policy_domains:
+        title: Policy Domains
+        short_unit: ''
+        unit: ''
+      cities:
+        title: Cities
+        short_unit: ''
+        unit: ''
+      custom_breakdown:
+        title: Custom Breakdown
+        short_unit: ''
+        unit: ''
+      level_of_government:
+        title: Level_of_government
+        short_unit: ''
+        unit: ''
+      type_of_facilities:
+        title: Type of facilities
+        short_unit: ''
+        unit: ''
+      food_waste_sector:
+        title: Food Waste Sector
+        short_unit: ''
+        unit: ''
+      government_name:
+        title: Government_Name
+        short_unit: ''
+        unit: ''
+      level_of_requirement:
+        title: Level of requirement
+        short_unit: ''
+        unit: ''
+      name_of_international_agreement:
+        title: Name of international agreement
+        short_unit: ''
+        unit: ''
+      policy_instruments:
+        title: Policy instruments
+        short_unit: ''
+        unit: ''
+      type_of_waste_treatment:
+        title: Type of waste treatment
+        short_unit: ''
+        unit: ''
+      report_ordinal:
+        title: Report Ordinal
+        short_unit: ''
+        unit: ''
+      type_of_support:
+        title: Type of support
+        short_unit: ''
+        unit: ''
+      frequency_of_chlorophyll_a_concentration:
+        title: Frequency of Chlorophyll-a concentration
+        short_unit: ''
+        unit: ''
+      sampling_stations:
+        title: Sampling Stations
+        short_unit: ''
+        unit: ''
+      mountain_elevation:
+        title: Mountain Elevation
+        short_unit: ''
+        unit: ''
+      cause_of_death:
+        title: Cause of death
+        short_unit: ''
+        unit: ''
+      parliamentary_committees:
+        title: Parliamentary committees
+        short_unit: ''
+        unit: ''
+      population_group:
+        title: Population Group
+        short_unit: ''
+        unit: ''
+      service_attribute:
+        title: Service Attribute
+        short_unit: ''
+        unit: ''
+      tariff_regime__status:
+        title: Tariff regime (status)
+        short_unit: ''
+        unit: ''
+      type_of_speed:
+        title: Type of speed
+        short_unit: ''
+        unit: ''

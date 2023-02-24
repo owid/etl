@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_458_happiness_predictors__world_happiness_report__2017_config
   file_extension: json
-  date_accessed: 2023-02-17 15:36:06.572758
+  date_accessed: 2023-02-23 15:18:10.857023
   name: Grapher metadata for dataset_458_happiness_predictors__world_happiness_report__2017
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 5da66e366285824c815bb1e242846a30
-  size: 6231
+- md5: e92e78680e794813a404f4bcd8a3572b
+  size: 7603
   path: dataset_458_happiness_predictors__world_happiness_report__2017_config.json

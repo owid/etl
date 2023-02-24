@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_679_long_term_wheat_yields__fao__2017__and__bayliss_smith__1984_values
   file_extension: feather
-  date_accessed: 2023-02-17 13:43:29.254215
+  date_accessed: 2023-02-23 19:20:38.244529
   name: Long-term wheat yields - FAO (2017) & Bayliss-Smith (1984)
   description: ''
   source_name: Our World in Data catalog backport

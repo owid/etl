@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2483_five_year_cancer_survival_rates__allemani_et_al_values
   file_extension: feather
-  date_accessed: 2023-02-17 12:52:49.261422
+  date_accessed: 2023-02-23 16:14:48.659420
   name: Five year cancer survival rates - Allemani et al.
   description: ''
   source_name: Our World in Data catalog backport

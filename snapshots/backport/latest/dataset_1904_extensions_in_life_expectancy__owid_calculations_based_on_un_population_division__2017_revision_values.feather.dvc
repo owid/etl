@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_1904_extensions_in_life_expectancy__owid_calculations_based_on_un_population_division__2017_revision_values
   file_extension: feather
-  date_accessed: 2023-02-17 14:33:49.299806
+  date_accessed: 2023-02-23 19:05:20.135568
   name: Extensions in life expectancy (OWID calculations based on UN Population Division
     (2017 Revision))
   description: ''

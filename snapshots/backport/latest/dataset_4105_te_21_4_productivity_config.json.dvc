@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_4105_te_21_4_productivity_config
   file_extension: json
-  date_accessed: 2023-02-17 15:41:21.867076
+  date_accessed: 2023-02-23 18:13:09.978883
   name: Grapher metadata for dataset_4105_te_21_4_productivity
   description: core-econ.org
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 89b27a48ea21ebad5a92377242bf82c7
-  size: 1491
+- md5: 532c558a6c37bc9818f2bf0e234f4d19
+  size: 1691
   path: dataset_4105_te_21_4_productivity_config.json
