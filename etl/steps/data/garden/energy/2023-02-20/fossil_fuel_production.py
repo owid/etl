@@ -100,6 +100,9 @@ def combine_bp_and_shift_data(tb_bp: Table, tb_shift: Table) -> pd.DataFrame:
     index_columns = ["country", "year"]
     combined = dataframes.combine_two_overlapping_dataframes(df1=tb_bp, df2=tb_shift, index_columns=index_columns)
 
+    # Remove rows that only have nan.
+    combined = combined.dropna(subset=combined.drop(columns=["country", "year"]).columns, how="all")
+
     # Sort data appropriately.
     combined = pd.DataFrame(combined).sort_values(index_columns).reset_index(drop=True)
 
@@ -153,6 +156,11 @@ def add_per_capita_variables(df: pd.DataFrame, population: pd.DataFrame) -> pd.D
     """
     df = df.copy()
 
+    # List countries for which we expect to have no population.
+    # These are countries and regions defined by BP and Shift.
+    expected_countries_without_population = [
+        country for country in df["country"].unique() if (("(BP)" in country) or ("(Shift)" in country))
+    ]
     # Add population to data.
     combined = add_population(
         df=df,
@@ -161,6 +169,8 @@ def add_per_capita_variables(df: pd.DataFrame, population: pd.DataFrame) -> pd.D
         year_col="year",
         population_col="population",
         warn_on_missing_countries=False,
+        interpolate_missing_population=True,
+        expected_countries_without_population=expected_countries_without_population,
     )
 
     # Calculate production per capita.
@@ -189,11 +199,11 @@ def remove_spurious_values(df: pd.DataFrame) -> pd.DataFrame:
         Corrected data.
 
     """
-    for column in df.columns:
-        issues_mask = df[column] == np.inf
-        issues = df[issues_mask]
-        if len(issues) > 0:
-            df.loc[issues_mask, column] = np.nan
+    # Replace any infinity value by nan.
+    df = df.replace([np.inf, -np.inf], np.nan)
+
+    # Remove rows that only have nan.
+    df = df.dropna(subset=df.drop(columns=["country", "year"]).columns, how="all").reset_index(drop=True)
 
     return df
 
@@ -237,7 +247,7 @@ def run(dest_dir: str) -> None:
     # Add per-capita variables.
     df = add_per_capita_variables(df=df, population=df_population)
 
-    # Remove spurious values.
+    # Remove spurious values and rows that only have nans.
     df = remove_spurious_values(df=df)
 
     # Create an appropriate index and sort conveniently.
