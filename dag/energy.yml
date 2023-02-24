@@ -42,14 +42,14 @@ steps:
     - data://meadow/shift/2022-07-18/fossil_fuel_production
     - data://garden/reference
   #
-  # Energy - Fossil Fuel Production 2022.
+  # Energy - Fossil Fuel Production 2023.
   #
-  data://garden/energy/2022-12-28/fossil_fuel_production:
+  data://garden/energy/2023-02-20/fossil_fuel_production:
     - data://garden/bp/2022-12-28/statistical_review
     - data://garden/shift/2022-07-18/fossil_fuel_production
-    - data://garden/owid/latest/key_indicators
-  data://grapher/energy/2022-12-28/fossil_fuel_production:
-    - data://garden/energy/2022-12-28/fossil_fuel_production
+    - data://garden/demography/2022-12-08/population
+  data://grapher/energy/2023-02-20/fossil_fuel_production:
+    - data://garden/energy/2023-02-20/fossil_fuel_production
   #
   # EIA - Energy consumption 2022.
   #
@@ -246,4 +246,11 @@ steps:
     - data://garden/owid/latest/key_indicators
   data://grapher/energy/2022-12-28/electricity_mix:
     - data://garden/energy/2022-12-28/electricity_mix
+  # Energy - Fossil Fuel Production 2022.
+  data://garden/energy/2022-12-28/fossil_fuel_production:
+    - data://garden/bp/2022-12-28/statistical_review
+    - data://garden/shift/2022-07-18/fossil_fuel_production
+    - data://garden/owid/latest/key_indicators
+  data://grapher/energy/2022-12-28/fossil_fuel_production:
+    - data://garden/energy/2022-12-28/fossil_fuel_production
   ######################################################################################################################
