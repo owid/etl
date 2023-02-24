@@ -623,6 +623,7 @@ class SnapshotStep(Step):
         # check if the snapshot has been added to DVC
         with open(self._dvc_path) as istream:
             if "outs:\n" not in istream.read():
+                __import__("ipdb").set_trace()
                 raise Exception(f"File {self._dvc_path} has not been added to DVC. Run snapshot script to add it.")
 
         with dvc_lock:
