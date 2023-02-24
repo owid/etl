@@ -1,17 +1,22 @@
-"""Garden step that combines Ember's European Electricity Review (EER) and Ember's Yearly Electricity Data (YED).
+"""Garden step that combines Ember's European Electricity Review (EER) 2022 and the latest Ember's Yearly Electricity
+Data (YED).
 
-The YED dataset contains data for all countries in EER. However, YED starts in 2000, while EER starts in 1990.
+The YED dataset contains data for all countries in EER 2022.
+However, YED starts in 2000, while EER 2022 starts in 1990.
 
-Therefore, to gather as much data as possible, we combine both datasets.
+Therefore, to gather as much data as possible, we combine both datasets, prioritizing YED.
 
-NOTE: This step used to combine Ember's Global Electricity Review and the EER, but now we have replaced the former by
-the YED. However, there may be instances in the code where "global" refers to the YED.
+This way, we'll have data from 1990-1999 from EER 2022, and data from 2000-2022 from YED.
+
+NOTES:
+* This step used to combine Ember's Global Electricity Review and the EER, but now we have replaced the former by
+  the YED. However, there may be instances in the code where "global" refers to the YED.
+* We don't use the latest EER 2023 because it does not contain data prior to 2000.
 
 """
 
 import pandas as pd
-from owid import catalog
-from owid.catalog import Dataset, Table
+from owid.catalog import Dataset, Table, utils
 from owid.datautils import dataframes
 
 from etl.helpers import PathFinder, create_dataset
@@ -86,7 +91,7 @@ def combine_yearly_electricity_data(ds_global: Dataset) -> Table:
         table = ds_global[category].copy()
         table = table.rename(
             columns={
-                column: catalog.utils.underscore(category_renaming[category] + column)
+                column: utils.underscore(category_renaming[category] + column)
                 for column in table.columns
                 if column not in index_columns
             }
@@ -213,7 +218,7 @@ def combine_european_electricity_review_data(ds_european: Dataset) -> Table:
     # Remove any possible rows with no data.
     combined_european = combined_european.dropna(how="all")
 
-    # Set an appropriate index and sort rows and columns conveniently.
+    # Ensure that the index is well constructed.
     combined_european = (
         combined_european.set_index(index_columns, verify_integrity=True).sort_index().sort_index(axis=1)
     )
@@ -240,37 +245,19 @@ def combine_yearly_electricity_data_and_european_electricity_review(
         Combined data.
 
     """
-    # Concatenate variables one by one, so that, if one of the two sources does not have data, we can take the
-    # source that is complete.
-    # When both sources are complete (for european countries), prioritise the european review (since it has more data,
-    # and it possibly is more up-to-date than the yearly electricity data).
-    combined_global = combined_global.reset_index()
-    combined_european = combined_european.reset_index()
-
+    # Combine (global) yearly electricity data with European data, prioritizing the former.
     index_columns = ["country", "year"]
-    data_columns = sorted(
-        [col for col in (set(combined_global.columns) | set(combined_european.columns)) if col not in index_columns]
+    combined = dataframes.combine_two_overlapping_dataframes(
+        df1=combined_global.reset_index(), df2=combined_european.reset_index(), index_columns=index_columns
     )
-    # We should not concatenate bp and shift data directly, since there are nans in different places.
-    # Instead, go column by column, concatenate, remove nans, and then keep the BP version on duplicated rows.
-    combined = pd.DataFrame({column: [] for column in index_columns})
-    for variable in data_columns:
-        _global_data = pd.DataFrame()
-        _european_data = pd.DataFrame()
-        if variable in combined_global.columns:
-            _global_data = combined_global[index_columns + [variable]].dropna(subset=variable)
-        if variable in combined_european.columns:
-            _european_data = combined_european[index_columns + [variable]].dropna(subset=variable)
-        _combined = pd.concat([_global_data, _european_data], ignore_index=True)
-        # On rows where both datasets overlap, give priority to european review data.
-        _combined = _combined.drop_duplicates(subset=index_columns, keep="last")
-        # Combine data for different variables.
-        combined = pd.merge(combined, _combined, on=index_columns, how="outer")
-    error = "There are repeated columns when combining yearly electricity data and european electricity review tables."
-    assert len([column for column in combined.columns if column.endswith("_x")]) == 0, error
 
     # Create a table (with no metadata) and sort data appropriately.
-    combined = Table(combined, short_name="combined_electricity").set_index(index_columns).sort_index()
+    combined = (
+        Table(combined, short_name="combined_electricity")
+        .set_index(index_columns, verify_integrity=True)
+        .sort_index()
+        .sort_index(axis=1)
+    )
 
     return combined
 
