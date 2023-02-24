@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_706_output_of_key_industrial_sectors_in_england__bank_of_england__2017_config
   file_extension: json
-  date_accessed: 2023-02-23 15:19:55.136103
+  date_accessed: 2023-02-24 15:57:52.895572
   name: Grapher metadata for dataset_706_output_of_key_industrial_sectors_in_england__bank_of_england__2017
   description: This data consists the measures of output in key industrial sectors
     in England (1270-1870).
