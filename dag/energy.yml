@@ -102,14 +102,14 @@ steps:
     - data://garden/ember/2022-08-01/european_electricity_review
     - data://garden/ember/2023-02-20/yearly_electricity
   #
-  # Energy - Electricity mix (BP & Ember, 2022).
+  # Energy - Electricity mix (BP & Ember, 2023).
   #
-  data://garden/energy/2022-12-28/electricity_mix:
+  data://garden/energy/2023-02-20/electricity_mix:
     - data://garden/bp/2022-12-28/statistical_review
-    - data://garden/ember/2022-12-13/combined_electricity
-    - data://garden/owid/latest/key_indicators
-  data://grapher/energy/2022-12-28/electricity_mix:
-    - data://garden/energy/2022-12-28/electricity_mix
+    - data://garden/ember/2023-02-20/combined_electricity
+    - data://garden/demography/2022-12-08/population
+  data://grapher/energy/2023-02-20/electricity_mix:
+    - data://garden/energy/2023-02-20/electricity_mix
   #
   # Energy - OWID Energy dataset (2022).
   #
@@ -239,5 +239,11 @@ steps:
   data://garden/ember/2022-12-13/combined_electricity:
   - data://garden/ember/2022-08-01/european_electricity_review
   - data://garden/ember/2022-12-13/yearly_electricity
-
+  # Energy - Electricity mix (BP & Ember, 2022).
+  data://garden/energy/2022-12-28/electricity_mix:
+    - data://garden/bp/2022-12-28/statistical_review
+    - data://garden/ember/2022-12-13/combined_electricity
+    - data://garden/owid/latest/key_indicators
+  data://grapher/energy/2022-12-28/electricity_mix:
+    - data://garden/energy/2022-12-28/electricity_mix
   ######################################################################################################################

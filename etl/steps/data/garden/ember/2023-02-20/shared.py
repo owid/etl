@@ -261,13 +261,12 @@ def add_population(
 ) -> pd.DataFrame:
     """Add a column of OWID population to the countries in the data, including population of historical regions.
 
-    This function has been adapted from datautils.geo, because population currently does not include historic regions.
-    We include them in this function.
-
     Parameters
     ----------
     df : pd.DataFrame
         Data without a column for population (after harmonizing elements, items and country names).
+    population : pd.DataFrame
+        Population data.
     country_col : str
         Name of country column in data.
     year_col : str
@@ -295,7 +294,7 @@ def add_population(
 
     """
 
-    # Load population dataset.
+    # Prepare population dataset.
     population = population.reset_index().rename(
         columns={
             "country": country_col,
