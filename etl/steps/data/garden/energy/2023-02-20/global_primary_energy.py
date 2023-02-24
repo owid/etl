@@ -6,6 +6,7 @@ import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
 from owid.datautils.dataframes import combine_two_overlapping_dataframes
+from shared import gather_sources_from_tables
 
 from etl.helpers import PathFinder, create_dataset
 
@@ -204,6 +205,10 @@ def run(dest_dir: str) -> None:
     #
     # Save outputs.
     #
-    # Create a new garden dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb_combined])
+    # Create a new empty garden dataset to gather metadata sources from all tables' original dataset sources.
+    ds_garden = Dataset.create_empty(dest_dir)
+    ds_garden.metadata.sources = gather_sources_from_tables(tables=[tb_bp, tb_smil])
+
+    # Save garden dataset.
+    ds_garden = create_dataset(dest_dir, tables=[tb_combined], default_metadata=ds_garden.metadata)
     ds_garden.save()
