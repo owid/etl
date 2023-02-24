@@ -1,6 +1,4 @@
 """Load a meadow dataset and create a garden dataset."""
-
-import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
 from structlog import get_logger
@@ -38,7 +36,7 @@ def run(dest_dir: str) -> None:
     )
 
     df = clean_and_format_data(df)
-    df = aggregate_surveillance_type(df)
+    df = split_by_surveillance_type(df)
     df = calculate_percent_positive(df)
     # Create a new table with the processed data.
     # tb_garden = Table(df, like=tb_meadow)
@@ -53,6 +51,23 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
     log.info("flunet.end")
+
+
+def split_by_surveillance_type(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Pivoting the table so there is a column per variable and per surveillance type
+
+    Summing each column and skipping NAs so there is a column of combined values
+    """
+    flu_cols = df.columns.drop(["country", "date", "origin_source"])
+    df_piv = df.pivot(index=["country", "date"], columns="origin_source").reset_index()
+
+    df_piv.columns = list(map("_".join, df_piv.columns))
+    sentinel_list = ["_SENTINEL", "_NONSENTINEL", "_NOTDEFINED"]
+    for col in flu_cols:
+        sum_cols = [col + s for s in sentinel_list]
+        df_piv[col + "_combined"] = df_piv[sum_cols].sum(axis=1, min_count=1)
+    return df_piv
 
 
 def combine_columns(df: pd.DataFrame) -> pd.DataFrame:
@@ -85,22 +100,6 @@ def clean_and_format_data(df: pd.DataFrame) -> pd.DataFrame:
 
     df["date"] = create_date_from_iso_week(df["iso_weekstartdate"])
     df = combine_columns(df)
-    columns_to_drop = [
-        "hemisphere",
-        "anotsubtyped",
-        "anotsubtypable",
-        "aother_subtype",
-        "bvic_2del",
-        "bvic_3del",
-        "bvic_nodel",
-        "bvic_delunk",
-        "ili_activity",
-    ]
-    df = df.drop(columns=columns_to_drop)
-    return df
-
-
-def aggregate_surveillance_type(combined_df: pd.DataFrame) -> pd.DataFrame:
     sel_cols = [
         "country",
         "date",
@@ -121,7 +120,12 @@ def aggregate_surveillance_type(combined_df: pd.DataFrame) -> pd.DataFrame:
         "spec_processed_nb",
         "spec_received_nb",
     ]
-    df = combined_df[sel_cols]
+    df = df[sel_cols]
+    return df
+
+
+def aggregate_surveillance_type(combined_df: pd.DataFrame) -> pd.DataFrame:
+
     df = df.copy(deep=True)
     # Summing all cases by country, hemisphere and date
     df_agg = df.groupby(["country", "date"]).sum().reset_index()
@@ -141,27 +145,31 @@ def calculate_percent_positive(df: pd.DataFrame) -> pd.DataFrame:
     Remove rows where the percent is > 100
     Remove rows where the percent = 100 but all available denominators are 0.
     """
+    surveillance_cols = ["_SENTINEL", "_NONSENTINEL", "_NOTDEFINED", "_combined"]
 
-    df["pcnt_pos_1"] = (df["inf_all"] / (df["inf_all"] + df["inf_negative"])) * 100
-    df["pcnt_pos_2"] = (df["inf_all"] / df["spec_processed_nb"]) * 100
-    df["pcnt_pos_3"] = (df["inf_all"] / df["spec_received_nb"]) * 100
+    for col in surveillance_cols:
+        df["pcnt_pos_1" + col] = (df["inf_all" + col] / (df["inf_all" + col] + df["inf_negative" + col])) * 100
+        df["pcnt_pos_2" + col] = (df["inf_all" + col] / df["spec_processed_nb" + col]) * 100
+        df["pcnt_pos_3" + col] = (df["inf_all" + col] / df["spec_received_nb" + col]) * 100
 
-    # hierachically fill the 'pcnt_pos' column with values from the columns described above in order of preference: 1->2->3
-    df["pcnt_pos"] = df["pcnt_pos_1"]
-    df["pcnt_pos"] = df["pcnt_pos"].fillna(df["pcnt_pos_2"])
-    df["pcnt_pos"] = df["pcnt_pos"].fillna(df["pcnt_pos_3"])
+        # hierachically fill the 'pcnt_pos' column with values from the columns described above in order of preference: 1->2->3
+        df["pcnt_pos" + col] = df["pcnt_pos_1" + col]
+        df["pcnt_pos" + col] = df["pcnt_pos" + col].fillna(df["pcnt_pos_2" + col])
+        df["pcnt_pos" + col] = df["pcnt_pos" + col].fillna(df["pcnt_pos_3" + col])
 
-    df = df.drop(columns=["pcnt_pos_1", "pcnt_pos_2", "pcnt_pos_3"])
+        df = df.drop(columns=["pcnt_pos_1" + col, "pcnt_pos_2" + col, "pcnt_pos_3" + col])
 
-    # Drop rows where pcnt_pos is >100
-    df.loc[df["pcnt_pos"] > 100, "pcnt_pos"] = np.nan
+        # Drop rows where pcnt_pos is >100
+        df.loc[df["pcnt_pos" + col] > 100, "pcnt_pos" + col] = pd.NA
 
-    # Rows where the percentage positive is 100 but all possible denominators are 0
-    df.loc[
-        (df["pcnt_pos"] == 100)
-        & (df["inf_negative"] == 0)
-        & (df["spec_processed_nb"] == 0)
-        & (df["spec_received_nb"] == 0),
-        "pcnt_pos",
-    ] = np.nan
+        # Rows where the percentage positive is 100 but all possible denominators are 0
+        df.loc[
+            (df["pcnt_pos" + col] == 100)
+            & (df["inf_negative" + col] == 0)
+            & (df["spec_processed_nb" + col] == 0)
+            & (df["spec_received_nb" + col] == 0),
+            "pcnt_pos" + col,
+        ] = pd.NA
+        df = df.dropna(axis=1, how="all")
+
     return df
