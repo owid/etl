@@ -52,9 +52,7 @@ tables:
         title: Number of A(H7n9) detections - Sentinel surveillance
       ah7n9COMBINED:
         title: Number of A(H7n9) detections - Combined surveillance
-      a_no_subtypeNONSENTINEL:
-        title: Number of A (no subtype) detections - Non-sentinel surveillance
-      a_no_subtype9NOTDEFINED:
+      a_no_subtypeNOTDEFINED:
         title: Number of A (no subtype) detections - Surveillance not defined
       a_no_subtypeSENTINEL:
         title: Number of A (no subtype) detections - Sentinel surveillance
@@ -62,7 +60,7 @@ tables:
         title: Number of A (no subtype) detections - Combined surveillance
       inf_aNONSENTINEL:
         title: Number of influenza A detections (all subtypes) - Non-sentinel surveillance
-      inf_a9NOTDEFINED:
+      inf_aNOTDEFINED:
         title: Number of influenza A detections (all subtypes) - Surveillance not defined
       inf_aSENTINEL:
         title: Number of influenza A detections (all subtypes) - Sentinel surveillance
@@ -70,7 +68,7 @@ tables:
         title: Number of influenza A detections (all subtypes) - Combined surveillance
       byamNONSENTINEL:
         title: Number of B (Yamagata lineage) detections - Non-sentinel surveillance
-      byam9NOTDEFINED:
+      byamNOTDEFINED:
         title: Number of B (Yamagata lineage) detections - Surveillance not defined
       byamSENTINEL:
         title: Number of B (Yamagata lineage) detections - Sentinel surveillance
@@ -78,7 +76,7 @@ tables:
         title: Number of B (Yamagata lineage) detections - Combined surveillance
       bnotdeterminedNONSENTINEL:
         title: Number of influenza B detections (lineage not determined) - Non-sentinel surveillance
-      bnotdetermined9NOTDEFINED:
+      bnotdeterminedNOTDEFINED:
         title: Number of influenza B detections (lineage not determined) - Surveillance not defined
       bnotdeterminedSENTINEL:
         title: Number of influenza B detections (lineage not determined) - Sentinel surveillance
@@ -86,7 +84,7 @@ tables:
         title: Number of influenza B detections (lineage not determined) - Combined surveillance
       bvicNONSENTINEL:
         title: Number of B (Victoria lineage) detections - Non-sentinel surveillance
-      bvic9NOTDEFINED:
+      bvicNOTDEFINED:
         title: Number of B (Victoria lineage) detections - Surveillance not defined
       bvicSENTINEL:
         title: Number of B (Victoria lineage) detections - Sentinel surveillance
@@ -94,7 +92,7 @@ tables:
         title: Number of B (Victoria lineage) detections - Combined surveillance
       inf_bNONSENTINEL:
         title: Number of influenza B detections (all subtypes) - Non-sentinel surveillance
-      inf_b9NOTDEFINED:
+      inf_bNOTDEFINED:
         title: Number of influenza B detections (all subtypes) - Surveillance not defined
       inf_bSENTINEL:
         title: Number of influenza B detections (all subtypes) - Sentinel surveillance
@@ -102,7 +100,7 @@ tables:
         title: Number of influenza B detections (all subtypes) - Combined surveillance
       inf_allNONSENTINEL:
         title: Number of influenza detections (all types) - Non-sentinel surveillance
-      inf_all9NOTDEFINED:
+      inf_allNOTDEFINED:
         title: Number of influenza detections (all types) - Surveillance not defined
       inf_allSENTINEL:
         title: Number of influenza detections (all types) - Sentinel surveillance
@@ -110,7 +108,7 @@ tables:
         title: Number of influenza detections (all types) - Combined surveillance
       inf_negativeNONSENTINEL:
         title: Number of influenza detections (all types) - Non-sentinel surveillance
-      inf_negative9NOTDEFINED:
+      inf_negativeNOTDEFINED:
         title: Number of influenza detections (all types) - Surveillance not defined
       inf_negativeSENTINEL:
         title: Number of influenza detections (all types) - Sentinel surveillance
@@ -118,7 +116,7 @@ tables:
         title: Number of influenza detections (all types) - Combined surveillance
       spec_processed_nbNONSENTINEL:
         title: Number of specimens processed for influenza - Non-sentinel surveillance
-      spec_processed_nb9NOTDEFINED:
+      spec_processed_nbNOTDEFINED:
         title: Number of specimens processed for influenza - Surveillance not defined
       spec_processed_nbSENTINEL:
         title: Number of specimens processed for influenza - Sentinel surveillance
@@ -126,7 +124,7 @@ tables:
         title: Number of specimens processed for influenza - Combined surveillance
       spec_received_nbNONSENTINEL:
         title: Number of specimens received for influenza - Non-sentinel surveillance
-      spec_received_nb9NOTDEFINED:
+      spec_received_nbNOTDEFINED:
         title: Number of specimens received for influenza - Surveillance not defined
       spec_received_nbSENTINEL:
         title: Number of specimens received for influenza - Sentinel surveillance
