@@ -33,94 +33,21 @@ from typing import Any, Dict, List, cast
 import requests
 import ruamel.yaml
 from dateutil import parser
-from structlog import get_logger
 
 from etl.paths import SNAPSHOTS_DIR
+from etl.scripts.faostat.shared import (
+    API_BASE_URL,
+    FAO_CATALOG_URL,
+    FAO_DATA_URL,
+    INCLUDED_DATASETS_CODES,
+    LICENSE_NAME,
+    LICENSE_URL,
+    NAMESPACE,
+    SOURCE_NAME,
+    VERSION,
+    log,
+)
 from etl.snapshot import Snapshot, SnapshotMeta, add_snapshot, snapshot_catalog
-
-# Initialize logger.
-log = get_logger()
-
-# Version tag to assign to new walden folders (both in S3 bucket and in index).
-VERSION = str(dt.date.today())
-# Global namespace for datasets.
-NAMESPACE = "faostat"
-# URL where FAOSTAT can be manually accessed (used in metadata, but not to actually retrieve the data).
-FAO_DATA_URL = "http://www.fao.org/faostat/en/#data"
-# Metadata source name.
-SOURCE_NAME = "Food and Agriculture Organization of the United Nations"
-# Metadata related to license.
-LICENSE_URL = "http://www.fao.org/contact-us/terms/db-terms-of-use/en"
-LICENSE_NAME = "CC BY-NC-SA 3.0 IGO"
-# Codes of FAOSTAT domains to download from FAO and upload to walden bucket.
-# This is the list that will determine the datasets (faostat_*) to be created in all further etl data steps.
-INCLUDED_DATASETS_CODES = [
-    # Land, Inputs and Sustainability: Fertilizers indicators.
-    "ef",
-    # Climate Change: Emissions intensities.
-    "ei",
-    # Land, Inputs and Sustainability: Livestock Patterns.
-    "ek",
-    # Land, Inputs and Sustainability: Land use indicators.
-    "el",
-    # Land, Inputs and Sustainability: Livestock Manure.
-    "emn",
-    # Land, Inputs and Sustainability: Pesticides indicators.
-    "ep",
-    # Land, Inputs and Sustainability: Soil nutrient budget.
-    "esb",
-    # Discontinued archives and data series: Food Aid Shipments (WFP).
-    "fa",
-    # Food Balances: Food Balances (2010-).
-    "fbs",
-    # Food Balances: Food Balances (-2013, old methodology and population).
-    "fbsh",
-    # Forestry: Forestry Production and Trade.
-    "fo",
-    # Food Security and Nutrition: Suite of Food Security Indicators.
-    "fs",
-    # Energy use.
-    "gn",
-    # Credit to Agriculture.
-    "ic",
-    # Land, Inputs and Sustainability: Land Cover.
-    "lc",
-    # Production: Crops and livestock products.
-    "qcl",
-    # Production: Production Indices.
-    "qi",
-    # Production: Value of Agricultural Production.
-    "qv",
-    # Land, Inputs and Sustainability: Fertilizers by Product.
-    "rfb",
-    # Land, Inputs and Sustainability: Fertilizers by Nutrient.
-    "rfn",
-    # Land, Inputs and Sustainability: Land Use.
-    "rl",
-    # Land, Inputs and Sustainability: Pesticides Use.
-    "rp",
-    # Land, Inputs and Sustainability: Pesticides Trade.
-    "rt",
-    # Food Balances: Supply Utilization Accounts.
-    "scl",
-    # SDG Indicators: SDG Indicators.
-    "sdgb",
-    # Trade: Crops and livestock products.
-    "tcl",
-    # Trade: Trade Indices.
-    "ti",
-    # World Census of Agriculture.
-    "wcad",
-]
-# URL for dataset codes in FAOSTAT catalog.
-# This is the URL used to get the remote location of the actual data files to be downloaded, and the date of their
-# latest update.
-FAO_CATALOG_URL = "http://fenixservices.fao.org/faostat/static/bulkdownloads/datasets_E.json"
-# Base URL of API, used to download metadata (about countries, elements, items, etc.).
-API_BASE_URL = "https://fenixservices.fao.org/faostat/api/v1/en/definitions/domain"
-# URL of walden repos and of this script (just to be included to walden index files as a reference).
-GIT_URL_TO_WALDEN = "https://github.com/owid/walden/"
-GIT_URL_TO_THIS_FILE = f"{GIT_URL_TO_WALDEN}blob/master/ingests/faostat.py"
 
 
 def create_snapshot_metadata_file(metadata: Dict[str, Any]) -> None:
@@ -187,7 +114,7 @@ class FAODataset:
         if self._dataset_metadata["DatasetDescription"] is None:
             # Description is sometimes missing (e.g. in faostat_esb), but a description is required in index.
             self._dataset_metadata["DatasetDescription"] = ""
-            print(f"WARNING: Description for dataset {self.short_name} is missing. Type one manually.")
+            log.warning(f"Description for dataset {self.short_name} is missing. Type one manually.")
         return {
             "namespace": self.namespace,
             "short_name": self.short_name,
@@ -217,6 +144,8 @@ class FAODataset:
 
         Download the dataset from the source, create the corresponding metadata file and create the snapshot.
         """
+        log.info(f"Creating snapshot for step {self.metadata['short_name']}.")
+
         # Create metadata file for current domain dataset.
         create_snapshot_metadata_file(self.metadata)
 
@@ -317,6 +246,8 @@ class FAOAdditionalMetadata:
             json.dump(faostat_metadata, _output_filename, indent=2, sort_keys=True)
 
     def to_snapshot(self) -> None:
+        log.info(f"Creating snapshot for step {self.metadata['short_name']}.")
+
         # Create metadata file for current domain dataset.
         create_snapshot_metadata_file(self.metadata)
 
@@ -349,7 +280,7 @@ def main(read_only: bool = False) -> None:
                 # Skip dataset if it already is up-to-date in index.
                 log.info(f"Dataset {dataset_code} is already up-to-date.")
             else:
-                log.info(f"Dataset {dataset_code} needs to be updated.")
+                log.warning(f"Dataset {dataset_code} needs to be updated.")
                 if not read_only:
                     # Download dataset, upload file to walden bucket and add metadata file to walden index.
                     faostat_dataset.to_snapshot()
@@ -357,7 +288,7 @@ def main(read_only: bool = False) -> None:
 
     # Fetch additional metadata only if at least one dataset was updated.
     if any_dataset_was_updated:
-        log.info("Additional metadata needs to be fetched.")
+        log.warning("Additional metadata needs to be fetched.")
         if not read_only:
             additional_metadata = FAOAdditionalMetadata()
             # Fetch additional metadata from FAO API, upload file to S3 and add metadata file to walden index.
