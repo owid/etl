@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5237_uk_covid_data_config
   file_extension: json
-  date_accessed: 2023-02-23 19:21:55.436632
+  date_accessed: 2023-02-25 16:06:28.851111
   name: Grapher metadata for dataset_5237_uk_covid_data
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: d13316631cc61bf4a0c35bdc98b25bd1
+- md5: ba9bd5551f590dd3856c7905f77bc055
   size: 17419
   path: dataset_5237_uk_covid_data_config.json
