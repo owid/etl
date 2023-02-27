@@ -39,6 +39,7 @@ def run(dest_dir: str) -> None:
     df = clean_and_format_data(df)
     df = split_by_surveillance_type(df)
     df = calculate_percent_positive(df)
+    df = create_zero_filled_strain_columns(df)
     # Create a new table with the processed data.
     # tb_garden = Table(df, like=tb_meadow)
     tb_garden = Table(df, short_name=paths.short_name)
@@ -162,4 +163,59 @@ def calculate_percent_positive(df: pd.DataFrame) -> pd.DataFrame:
         ] = np.nan
         df = df.dropna(axis=1, how="all")
 
+    return df
+
+
+def create_zero_filled_strain_columns(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    For the stacked bar charts in the grapher to work I think I need to fill the NAs with zeros. I'll keep the original columns too as I think adding 0s into line charts would look weird and be misleading
+    """
+    strain_columns = [
+        "ah1n12009NONSENTINEL",
+        "ah1n12009NOTDEFINED",
+        "ah1n12009SENTINEL",
+        "ah1NONSENTINEL",
+        "ah1NOTDEFINED",
+        "ah1SENTINEL",
+        "ah3NONSENTINEL",
+        "ah3NOTDEFINED",
+        "ah3SENTINEL",
+        "ah5NONSENTINEL",
+        "ah5NOTDEFINED",
+        "ah5SENTINEL",
+        "ah7n9NONSENTINEL",
+        "ah7n9NOTDEFINED",
+        "ah7n9SENTINEL",
+        "a_no_subtypeNOTDEFINED",
+        "a_no_subtypeSENTINEL",
+        "inf_aNONSENTINEL",
+        "inf_aNOTDEFINED",
+        "inf_aSENTINEL",
+        "byamNONSENTINEL",
+        "byamNOTDEFINED",
+        "byamSENTINEL",
+        "bnotdeterminedNONSENTINEL",
+        "bnotdeterminedNOTDEFINED",
+        "bnotdeterminedSENTINEL",
+        "bvicNONSENTINEL",
+        "bvicNOTDEFINED",
+        "bvicSENTINEL",
+        "inf_bNONSENTINEL",
+        "inf_bNOTDEFINED",
+        "inf_bSENTINEL",
+        "ah1n12009COMBINED",
+        "ah1COMBINED",
+        "ah3COMBINED",
+        "ah5COMBINED",
+        "ah7n9COMBINED",
+        "a_no_subtypeCOMBINED",
+        "inf_aCOMBINED",
+        "byamCOMBINED",
+        "bnotdeterminedCOMBINED",
+        "bvicCOMBINED",
+        "inf_bCOMBINED",
+    ]
+
+    strain_columns_zfilled = [s + "_zfilled" for s in strain_columns]
+    df[strain_columns_zfilled] = df[strain_columns].fillna(0)
     return df

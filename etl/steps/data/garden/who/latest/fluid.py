@@ -40,6 +40,7 @@ def run(dest_dir: str) -> None:
     # Subset the data
     df = subset_and_clean_data(df)
     df = pivot_fluid(df)
+    df = remove_strings_of_zeros(df)
     df = calculate_patient_rates(df)
     df = df.reset_index(drop=True)
     # Create a new table with the processed data.
