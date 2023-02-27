@@ -10,6 +10,10 @@ paths = PathFinder(__file__)
 
 
 def run(dest_dir: str) -> None:
+    """
+    Load in both the fluid and flunet datasets and merge them on country and date
+    - Check that all dates match (they should)
+    """
     #
     # Load inputs.
     #
@@ -22,6 +26,7 @@ def run(dest_dir: str) -> None:
     tb_fluid = fluid_garden["fluid"]
 
     tb_flu = pd.merge(tb_fluid, tb_flunet, on=["country", "date"], how="outer")
+    assert tb_flu[["country", "date"]].duplicated().sum() == 0
     tb_flu = Table(tb_flu, short_name="flu")
 
     # Create explorer dataset, with garden table and metadata in csv format

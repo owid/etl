@@ -42,7 +42,7 @@ def run(dest_dir: str) -> None:
     # Create a new table with the processed data.
     # tb_garden = Table(df, like=tb_meadow)
     tb_garden = Table(df, short_name=paths.short_name)
-    tb_garden.update_metadata_from_yaml(paths.metadata_path, paths.short_name)
+    # tb_garden.update_metadata_from_yaml(paths.metadata_path, paths.short_name)
     #
     # Save outputs.
     #

@@ -44,7 +44,6 @@ def run(dest_dir: str) -> None:
     df = df.reset_index(drop=True)
     # Create a new table with the processed data.
     tb_garden = Table(df, short_name=paths.short_name)
-    tb_garden.update_metadata_from_yaml(paths.metadata_path, paths.short_name)
     #
     # Save outputs.
     #
@@ -132,16 +131,12 @@ def subset_and_clean_data(df: pd.DataFrame) -> pd.DataFrame:
 def pivot_fluid(df: pd.DataFrame) -> pd.DataFrame:
 
     df_piv = df.pivot(
-        index=["country", "date", "outpatients", "inpatients"],
-        columns="case_info",
-        values=[
-            "reported_cases",
-        ],
+        index=["country", "date"], columns=["case_info"], values=["reported_cases", "outpatients", "inpatients"]
     ).reset_index()
 
     df_piv.columns = list(map("".join, df_piv.columns))
 
-    df_piv = df_piv.dropna(axis=1, how="all")
+    # df_piv = df_piv.dropna(axis=1, how="all")
 
     df_piv = df_piv.rename(
         columns={
@@ -150,10 +145,12 @@ def pivot_fluid(df: pd.DataFrame) -> pd.DataFrame:
             "reported_casesILI": "reported_ili_cases",
             "reported_casesSARI_DEATHS": "reported_sari_deaths",
             "reported_casesSARI_ICU": "reported_sari_icu",
+            "outpatientsARI": "outpatients_ari",
+            "outpatientsILI": "outpatients_ili",
+            "inpatientsSARI": "inpatients_sari",
+            "inpatientsSARI_ICU": "inpatients_sari_icu",
         }
     )
-
-    df_piv = df_piv.dropna(axis=0, how="all")
 
     return df_piv
 
@@ -168,9 +165,16 @@ def calculate_patient_rates(df: pd.DataFrame) -> pd.DataFrame:
     df[["reported_ili_cases", "reported_ari_cases", "reported_sari_cases"]] = df[
         ["reported_ili_cases", "reported_ari_cases", "reported_sari_cases"]
     ].astype(float)
-    df["ili_cases_per_thousand_outpatients"] = (df["reported_ili_cases"] / df["outpatients"]) * 1000
-    df["ari_cases_per_thousand_outpatients"] = (df["reported_ari_cases"] / df["outpatients"]) * 1000
-    df["sari_cases_per_hundred_inpatients"] = (df["reported_sari_cases"] / df["inpatients"]) * 100
+
+    df[["outpatients_ari", "outpatients_ili", "inpatients_sari", "inpatients_sari_icu"]] = (
+        df[["outpatients_ari", "outpatients_ili", "inpatients_sari", "inpatients_sari_icu"]]
+        .replace(pd.NA, np.nan)
+        .replace(0, np.nan)
+    )
+
+    df["ili_cases_per_thousand_outpatients"] = (df["reported_ili_cases"] / df["outpatients_ili"]) * 1000
+    df["ari_cases_per_thousand_outpatients"] = (df["reported_ari_cases"] / df["outpatients_ari"]) * 1000
+    df["sari_cases_per_hundred_inpatients"] = (df["reported_sari_cases"] / df["inpatients_sari"]) * 100
 
     over_1000_ili = df[df["ili_cases_per_thousand_outpatients"] > 1000].shape[0]
     over_1000_ari = df[df["ari_cases_per_thousand_outpatients"] > 1000].shape[0]
@@ -180,8 +184,8 @@ def calculate_patient_rates(df: pd.DataFrame) -> pd.DataFrame:
     log.info(f"{over_1000_ari} rows with ari_cases_per_thousand_outpatients over 1000. We'll set these to NA.")
     log.info(f"{over_100_sari} rows with sari_cases_per_hundred_inpatients over 100. We'll set these to NA.")
 
-    df[df["ili_cases_per_thousand_outpatients"] > 1000] = np.nan
-    df[df["ari_cases_per_thousand_outpatients"] > 1000] = np.nan
-    df[df["sari_cases_per_hundred_inpatients"] > 100] = np.nan
+    df["ili_cases_per_thousand_outpatients"][df["ili_cases_per_thousand_outpatients"] > 1000] = np.nan
+    df["ari_cases_per_thousand_outpatients"][df["ari_cases_per_thousand_outpatients"] > 1000] = np.nan
+    df["sari_cases_per_hundred_inpatients"][df["sari_cases_per_hundred_inpatients"] > 100] = np.nan
 
     return df
