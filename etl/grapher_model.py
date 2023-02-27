@@ -55,7 +55,8 @@ JSON = _JSON(none_as_null=True)
 
 def get_engine() -> _FutureEngine:
     return create_engine(
-        f"mysql://{config.DB_USER}:{quote(config.DB_PASS)}@{config.DB_HOST}:{config.DB_PORT}/{config.DB_NAME}"
+        f"mysql://{config.DB_USER}:{quote(config.DB_PASS)}@{config.DB_HOST}:{config.DB_PORT}/{config.DB_NAME}",
+        future=False,
     )
 
 
@@ -803,6 +804,16 @@ class Variable(SQLModel, table=True):
     @classmethod
     def load_variable(cls, session: Session, variable_id: int) -> "Variable":
         return session.exec(select(cls).where(cls.id == variable_id)).one()
+
+    def s3_data_path(self) -> str:
+        """Path to S3 with data in JSON format for Grapher. Typically
+        s3://owid-catalog/baked-variables/live_grapher/data/123.json."""
+        return f"{config.BAKED_VARIABLES_PATH}/data/{self.id}.json"
+
+    def s3_metadata_path(self) -> str:
+        """Path to S3 with metadata in JSON format for Grapher. Typically
+        s3://owid-catalog/baked-variables/live_grapher/metadata/123.json."""
+        return f"{config.BAKED_VARIABLES_PATH}/metadata/{self.id}.json"
 
 
 class ChartDimensions(SQLModel, table=True):
