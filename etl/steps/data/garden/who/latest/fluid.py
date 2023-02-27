@@ -56,6 +56,19 @@ def run(dest_dir: str) -> None:
     log.info("fluid.end")
 
 
+def clean_sari_inpatient(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Removing rows where the number of SARI cases is below the number of inpatients, I don't think this should be possible.
+    """
+    remove_inpatients = df["inpatients"][(df["case_info"] == "SARI") & (df["reported_cases"] > df["inpatients"])].shape[
+        0
+    ]
+    log.info(f"Removing {remove_inpatients} rows where the number of inpatients is below the number of SARI cases...")
+    df["inpatients"][(df["case_info"] == "SARI") & (df["reported_cases"] > df["inpatients"])] = np.NaN
+
+    return df
+
+
 def subset_and_clean_data(df: pd.DataFrame) -> pd.DataFrame:
     """
     * Select out the 'All' age groups
@@ -125,6 +138,7 @@ def subset_and_clean_data(df: pd.DataFrame) -> pd.DataFrame:
     )
 
     df = df.dropna(subset=["reported_cases"])
+    df = clean_sari_inpatient(df)
     return df
 
 
@@ -168,8 +182,8 @@ def calculate_patient_rates(df: pd.DataFrame) -> pd.DataFrame:
 
     df[["outpatients_ari", "outpatients_ili", "inpatients_sari", "inpatients_sari_icu"]] = (
         df[["outpatients_ari", "outpatients_ili", "inpatients_sari", "inpatients_sari_icu"]]
-        .replace(pd.NA, np.nan)
-        .replace(0, np.nan)
+        .replace(pd.NA, np.NaN)
+        .replace(0, np.NaN)
     )
 
     df["ili_cases_per_thousand_outpatients"] = (df["reported_ili_cases"] / df["outpatients_ili"]) * 1000
@@ -184,8 +198,24 @@ def calculate_patient_rates(df: pd.DataFrame) -> pd.DataFrame:
     log.info(f"{over_1000_ari} rows with ari_cases_per_thousand_outpatients over 1000. We'll set these to NA.")
     log.info(f"{over_100_sari} rows with sari_cases_per_hundred_inpatients over 100. We'll set these to NA.")
 
-    df["ili_cases_per_thousand_outpatients"][df["ili_cases_per_thousand_outpatients"] > 1000] = np.nan
-    df["ari_cases_per_thousand_outpatients"][df["ari_cases_per_thousand_outpatients"] > 1000] = np.nan
-    df["sari_cases_per_hundred_inpatients"][df["sari_cases_per_hundred_inpatients"] > 100] = np.nan
+    df["ili_cases_per_thousand_outpatients"][df["ili_cases_per_thousand_outpatients"] > 1000] = np.NaN
+    df["ari_cases_per_thousand_outpatients"][df["ari_cases_per_thousand_outpatients"] > 1000] = np.NaN
+    df["sari_cases_per_hundred_inpatients"][df["sari_cases_per_hundred_inpatients"] > 100] = np.NaN
+
+    return df
+
+
+def remove_strings_of_zeros(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    For each country go through each column, if the sum = 0 then change all the values to NA. This is to
+    prevent long strings of 0s showing up in the grapher.
+    """
+    cols = df.columns.drop(["country", "date"])
+    countries = df["country"].drop_duplicates()
+
+    for country in countries:
+        for col in cols:
+            if df.loc[(df["country"] == country), col].sum() == 0:
+                df.loc[(df["country"] == country), col] = np.NaN
 
     return df
