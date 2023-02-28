@@ -1,17 +1,30 @@
-from owid import catalog
+"""Grapher step for the global primary energy dataset.
+"""
+from owid.catalog import Dataset
 
-from etl.paths import DATA_DIR
+from etl.helpers import PathFinder, create_dataset
 
-# Path to garden dataset to be loaded.
-DATASET_PATH = DATA_DIR / "garden" / "energy" / "2022-12-28" / "global_primary_energy"
-
+# Get paths and naming conventions for current step.
+paths = PathFinder(__file__)
 
 def run(dest_dir: str) -> None:
-    garden_dataset = catalog.Dataset(DATASET_PATH)
-    dataset = catalog.Dataset.create_empty(dest_dir, garden_dataset.metadata)
+    #
+    # Load data.
+    #
+    # Load garden dataset.
+    ds_garden: Dataset = paths.load_dependency("global_primary_energy")
 
-    # There is only one table in the dataset, with the same name as the dataset.
-    table = garden_dataset[garden_dataset.table_names[0]].reset_index().drop(columns=["data_source"])
+    # Read main table from dataset.
+    tb_garden = ds_garden["global_primary_energy"]
 
-    dataset.add(table)
-    dataset.save()
+    #
+    # Process data.
+    #
+    # Drop unnecessary columns from table.
+    tb_garden = tb_garden.reset_index().drop(columns=["data_source"])
+
+    #
+    # Save outputs.
+    #
+    ds_grapher = create_dataset(dest_dir=dest_dir, tables=[tb_garden], default_metadata=ds_garden.metadata)
+    ds_grapher.save()
