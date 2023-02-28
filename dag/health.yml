@@ -79,3 +79,17 @@ steps:
     - data://meadow/postnatal_care/2022-09-19/postnatal_care
   data://grapher/postnatal_care/2022-09-19/postnatal_care:
     - data://garden/postnatal_care/2022-09-19/postnatal_care
+
+
+  # FluNet and FluID - WHO Flu Databases
+  data://meadow/who/latest/flunet:
+  - snapshot://who/latest/flunet.csv
+  data://garden/who/latest/flunet:
+  - data://meadow/who/latest/flunet
+  data://meadow/who/latest/fluid:
+  - snapshot://who/latest/fluid.csv
+  data://garden/who/latest/fluid:
+  - data://meadow/who/latest/fluid
+  data://explorers/who/latest/flu:
+  - data://garden/who/latest/fluid
+  - data://garden/who/latest/flunet
