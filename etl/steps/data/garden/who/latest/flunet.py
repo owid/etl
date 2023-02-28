@@ -183,9 +183,6 @@ def create_zero_filled_strain_columns(df: pd.DataFrame) -> pd.DataFrame:
         "bvicCOMBINED",
         "inf_aCOMBINED",
         "inf_bCOMBINED",
-    ]
-    # Add these columns if we need to, for now stick to the above for file size reasons
-    extended_columns = [
         "ah1n12009SENTINEL",
         "ah1SENTINEL",
         "ah3SENTINEL",
@@ -215,6 +212,7 @@ def create_zero_filled_strain_columns(df: pd.DataFrame) -> pd.DataFrame:
         "bvicNONSENTINEL",
         "bvicNOTDEFINED",
     ]
+    # Add these columns if we need to, for now stick to the above for file size reasons
 
     strain_columns_zfilled = [s + "_zfilled" for s in strain_columns]
     df[strain_columns_zfilled] = df[strain_columns].fillna(0)
