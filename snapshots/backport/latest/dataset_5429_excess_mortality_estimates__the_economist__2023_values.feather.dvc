@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5429_excess_mortality_estimates__the_economist__2023_values
   file_extension: feather
-  date_accessed: 2023-02-23 18:40:02.434504
+  date_accessed: 2023-02-28 11:35:12.229807
   name: Excess Mortality Estimates – The Economist (2023)
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: d0a055f92726d9d4ffe719131bcf076f
-  size: 7811914
+- md5: 904dd5296f12159a49278127e4f84a98
+  size: 3482690
   path: dataset_5429_excess_mortality_estimates__the_economist__2023_values.feather
