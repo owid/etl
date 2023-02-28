@@ -1,0 +1,27 @@
+meta:
+  namespace: faostat
+  short_name: faostat_rfn
+  name: 'Land, Inputs and Sustainability: Fertilizers by Nutrient - FAO (2022)'
+  description: 'The Fertilizers by Nutrient dataset contains information on the totals
+    in nutrients for Production, Trade and Agriculture Use of inorganic (chemical
+    or mineral) fertilizers, over the time series 1961-present. The data are provided
+    for the three primary plant nutrients: nitrogen (N), phosphorus (expressed as
+    P2O5) and potassium (expressed as K2O). Both straight and compound fertilizers
+    are included. There is information on the methodology available at: http://fenixservices.fao.org/faostat/static/documents/RFN/RFN_EN_README.pdf'
+  source_name: Food and Agriculture Organization of the United Nations
+  source_published_by: Food and Agriculture Organization of the United Nations
+  publication_year: 2022
+  publication_date: '2022-06-10'
+  date_accessed: '2023-02-22'
+  version: '2023-02-22'
+  url: http://www.fao.org/faostat/en/#data/RFN
+  source_data_url: https://fenixservices.fao.org/faostat/static/bulkdownloads/Inputs_FertilizersNutrient_E_All_Data_(Normalized).zip
+  file_extension: zip
+  license_url: http://www.fao.org/contact-us/terms/db-terms-of-use/en
+  license_name: CC BY-NC-SA 3.0 IGO
+  is_public: true
+wdir: ../../../data/snapshots/faostat/2023-02-22
+outs:
+- md5: 7222680d34ad5128ed3aaa15b696200e
+  size: 778411
+  path: faostat_rfn.zip

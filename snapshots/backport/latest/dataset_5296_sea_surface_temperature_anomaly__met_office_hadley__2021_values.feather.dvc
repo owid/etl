@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 00:18:16.556834
-  description: ''
-  file_extension: feather
-  is_public: false
-  name: Sea surface temperature anomaly (Met Office Hadley, 2021)
   namespace: backport
-  publication_date: latest
   short_name: dataset_5296_sea_surface_temperature_anomaly__met_office_hadley__2021_values
+  file_extension: feather
+  date_accessed: 2023-02-23 15:00:55.606877
+  name: Sea surface temperature anomaly (Met Office Hadley, 2021)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5296
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: c994cab802f8bf4950b84ce185cc1d26
-  size: 20306
+- md5: 407322d8feb4f72177c28965689c0b73
+  size: 20682
   path: dataset_5296_sea_surface_temperature_anomaly__met_office_hadley__2021_values.feather

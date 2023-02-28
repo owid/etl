@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 01:50:19.459708
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_2498_fishery_catch_breakdown__pauly_and_zeller__2016
   namespace: backport
-  publication_date: latest
   short_name: dataset_2498_fishery_catch_breakdown__pauly_and_zeller__2016_config
+  file_extension: json
+  date_accessed: 2023-02-23 18:27:50.756686
+  name: Grapher metadata for dataset_2498_fishery_catch_breakdown__pauly_and_zeller__2016
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2498
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 95fbf55f6fce04fc12bfd5af84e2d2c9
-  size: 3361
+- md5: ea1d31da19dbabc1ba04ced6a60c63c6
+  size: 4351
   path: dataset_2498_fishery_catch_breakdown__pauly_and_zeller__2016_config.json

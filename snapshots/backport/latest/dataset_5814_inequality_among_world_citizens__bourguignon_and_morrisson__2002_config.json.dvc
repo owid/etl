@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 00:14:49.803537
-  description: Backported
-  file_extension: json
-  is_public: false
-  name: Grapher metadata for dataset_5814_inequality_among_world_citizens__bourguignon_and_morrisson__2002
   namespace: backport
-  publication_date: latest
   short_name: dataset_5814_inequality_among_world_citizens__bourguignon_and_morrisson__2002_config
+  file_extension: json
+  date_accessed: 2023-02-23 19:38:30.934514
+  name: Grapher metadata for dataset_5814_inequality_among_world_citizens__bourguignon_and_morrisson__2002
+  description: Backported
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5814
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: dcee2dcb90dac003e299f44abe6b8fac
-  size: 3204
+- md5: 504b16567a057bbb6aedbc3080d96369
+  size: 3804
   path: dataset_5814_inequality_among_world_citizens__bourguignon_and_morrisson__2002_config.json

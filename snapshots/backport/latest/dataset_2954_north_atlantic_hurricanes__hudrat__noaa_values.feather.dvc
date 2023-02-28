@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:49:30.584751
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: North Atlantic Hurricanes (HUDRAT, NOAA)
   namespace: backport
-  publication_date: latest
   short_name: dataset_2954_north_atlantic_hurricanes__hudrat__noaa_values
+  file_extension: feather
+  date_accessed: 2023-02-23 18:09:14.001091
+  name: North Atlantic Hurricanes (HUDRAT, NOAA)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2954
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 0632d203d81c8f11b503a20966a6ef37
-  size: 9394
+- md5: 0baa0f7ce15c3dc542326881e51aae97
+  size: 9770
   path: dataset_2954_north_atlantic_hurricanes__hudrat__noaa_values.feather

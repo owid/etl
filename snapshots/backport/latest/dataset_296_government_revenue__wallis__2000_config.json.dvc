@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:00:23.886567
-  description: US 20th Century
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_296_government_revenue__wallis__2000
   namespace: backport
-  publication_date: latest
   short_name: dataset_296_government_revenue__wallis__2000_config
+  file_extension: json
+  date_accessed: 2023-02-23 18:16:22.914075
+  name: Grapher metadata for dataset_296_government_revenue__wallis__2000
+  description: US 20th Century
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/296
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 2bf0836fef5a40c726c55548f66cb24d
-  size: 2619
+- md5: ea150d499a35c178aa93170c26ed784f
+  size: 3207
   path: dataset_296_government_revenue__wallis__2000_config.json

@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 00:27:37.418195
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Livestock counts - HYDE & FAO (2017)
   namespace: backport
-  publication_date: latest
   short_name: dataset_964_livestock_counts__hyde__and__fao__2017_values
+  file_extension: feather
+  date_accessed: 2023-02-23 16:54:16.635230
+  name: Livestock counts - HYDE & FAO (2017)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/964
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 57e149fa04e9e9f432610ac7bab39278
-  size: 37746
+- md5: 8d16ec8023ef50d8db1fc0178058d9ec
+  size: 38122
   path: dataset_964_livestock_counts__hyde__and__fao__2017_values.feather

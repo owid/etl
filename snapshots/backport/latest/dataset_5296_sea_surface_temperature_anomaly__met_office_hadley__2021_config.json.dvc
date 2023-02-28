@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 00:18:07.090099
-  description: ''
-  file_extension: json
-  is_public: false
-  name: Grapher metadata for dataset_5296_sea_surface_temperature_anomaly__met_office_hadley__2021
   namespace: backport
-  publication_date: latest
   short_name: dataset_5296_sea_surface_temperature_anomaly__met_office_hadley__2021_config
+  file_extension: json
+  date_accessed: 2023-02-23 15:00:41.031649
+  name: Grapher metadata for dataset_5296_sea_surface_temperature_anomaly__met_office_hadley__2021
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5296
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: cacce0735c9bcc30d7a75961dcb7e1db
-  size: 2725
+- md5: 30cc1802e59cdba3dc3e2520b01b79fa
+  size: 3325
   path: dataset_5296_sea_surface_temperature_anomaly__met_office_hadley__2021_config.json

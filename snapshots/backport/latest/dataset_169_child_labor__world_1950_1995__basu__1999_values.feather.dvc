@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 01:48:27.540702
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Child Labor (World 1950-1995) - Basu (1999)
   namespace: backport
-  publication_date: latest
   short_name: dataset_169_child_labor__world_1950_1995__basu__1999_values
+  file_extension: feather
+  date_accessed: 2023-02-23 19:23:49.453690
+  name: Child Labor (World 1950-1995) - Basu (1999)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/169
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: c4d34e84e766247ccb1179cb2a44e346
-  size: 5882
+- md5: e1387062d90b71dd5bca4d4946bdf752
+  size: 6250
   path: dataset_169_child_labor__world_1950_1995__basu__1999_values.feather

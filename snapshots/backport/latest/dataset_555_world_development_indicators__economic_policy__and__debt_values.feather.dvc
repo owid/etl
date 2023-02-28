@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:50:50.054501
-  description: This is a dataset imported by the automated fetcher
-  file_extension: feather
-  is_public: true
-  name: World Development Indicators - Economic Policy & Debt
   namespace: backport
-  publication_date: latest
   short_name: dataset_555_world_development_indicators__economic_policy__and__debt_values
+  file_extension: feather
+  date_accessed: 2023-02-23 17:26:47.356395
+  name: World Development Indicators - Economic Policy & Debt
+  description: This is a dataset imported by the automated fetcher
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/555
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 2f7627e9df835f6c63468892c5bc9b96
-  size: 21401378
+- md5: dc34f7334084c4072cd98600bb4eecfa
+  size: 21401754
   path: dataset_555_world_development_indicators__economic_policy__and__debt_values.feather

@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 00:20:58.849612
-  description: This is a dataset imported by the automated fetcher
-  file_extension: feather
-  is_public: true
-  name: Sanitation
   namespace: backport
-  publication_date: latest
   short_name: dataset_2522_sanitation_values
+  file_extension: feather
+  date_accessed: 2023-02-23 19:16:26.065193
+  name: Sanitation
+  description: This is a dataset imported by the automated fetcher
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2522
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: c41ad3f0928555152039527e82b8657e
-  size: 1171146
+- md5: 5cf0170cb7fff90ae0fb6c11fba8090b
+  size: 1171522
   path: dataset_2522_sanitation_values.feather

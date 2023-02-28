@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:27:49.127830
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Food affordability (World Bank; FAO, 2022)
   namespace: backport
-  publication_date: latest
   short_name: dataset_5651_food_affordability__world_bank__fao__2022_values
+  file_extension: feather
+  date_accessed: 2023-02-23 15:19:36.610458
+  name: Food affordability (World Bank; FAO, 2022)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5651
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 5d28064223543c35885dd78a82b40eff
-  size: 39122
+- md5: 7e79110e95b4cc88104caf6f84ccf2c1
+  size: 39498
   path: dataset_5651_food_affordability__world_bank__fao__2022_values.feather

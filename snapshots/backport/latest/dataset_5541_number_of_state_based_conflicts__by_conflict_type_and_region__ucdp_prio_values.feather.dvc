@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:24:11.886970
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Number of state-based conflicts, by conflict type and region (UCDP-PRIO)
   namespace: backport
-  publication_date: latest
   short_name: dataset_5541_number_of_state_based_conflicts__by_conflict_type_and_region__ucdp_prio_values
+  file_extension: feather
+  date_accessed: 2023-02-23 18:26:32.782856
+  name: Number of state-based conflicts, by conflict type and region (UCDP-PRIO)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5541
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: b9ac74481f7d1a63bb05f41b4a8b1025
-  size: 10122
+- md5: 210896d12ca44c3f59d56caf6d1a9103
+  size: 10498
   path: dataset_5541_number_of_state_based_conflicts__by_conflict_type_and_region__ucdp_prio_values.feather

@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 01:13:44.701847
-  description: ''
-  file_extension: json
-  is_public: false
-  name: Grapher metadata for dataset_4167_worries_about_terrorism__world_values_survey__2019
   namespace: backport
-  publication_date: latest
   short_name: dataset_4167_worries_about_terrorism__world_values_survey__2019_config
+  file_extension: json
+  date_accessed: 2023-02-23 16:32:20.798275
+  name: Grapher metadata for dataset_4167_worries_about_terrorism__world_values_survey__2019
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/4167
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 058db396474b975fbfddaaf54a449480
-  size: 4345
+- md5: c10457d9a10f5849221cba511a1cca29
+  size: 5545
   path: dataset_4167_worries_about_terrorism__world_values_survey__2019_config.json

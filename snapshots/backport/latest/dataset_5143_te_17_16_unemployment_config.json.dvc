@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:06:53.742262
-  description: core-econ.org
-  file_extension: json
-  is_public: false
-  name: Grapher metadata for dataset_5143_te_17_16_unemployment
   namespace: backport
-  publication_date: latest
   short_name: dataset_5143_te_17_16_unemployment_config
+  file_extension: json
+  date_accessed: 2023-02-23 18:50:13.871045
+  name: Grapher metadata for dataset_5143_te_17_16_unemployment
+  description: core-econ.org
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5143
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: df845dd5d5c952db1f504341894d5962
-  size: 1653
+- md5: 1234c86057a134ce75fd41aa2006b922
+  size: 2053
   path: dataset_5143_te_17_16_unemployment_config.json

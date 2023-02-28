@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 15:51:28.819274
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Long-term yields in the United Kingdom (2022)
   namespace: backport
-  publication_date: latest
   short_name: dataset_670_long_term_yields_in_the_united_kingdom__2022_values
+  file_extension: feather
+  date_accessed: 2023-02-23 19:43:30.016950
+  name: Long-term yields in the United Kingdom (2022)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/670
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: ad277b3e6644c4683979058a75026d2a
-  size: 33466
+- md5: ff62fe96ff9b6c81f1f9948241123aa8
+  size: 33842
   path: dataset_670_long_term_yields_in_the_united_kingdom__2022_values.feather

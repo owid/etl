@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 16:00:35.505037
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_396_uk_nominal_wage_data__price_data__and_real_wage__bank_of_england__three_centuries_of_macroeconomic_data__2017
   namespace: backport
-  publication_date: latest
   short_name: dataset_396_uk_nominal_wage_data__price_data__and_real_wage__bank_of_england__three_centuries_of_macroeconomic_data__2017_config
+  file_extension: json
+  date_accessed: 2023-02-23 19:24:56.022278
+  name: Grapher metadata for dataset_396_uk_nominal_wage_data__price_data__and_real_wage__bank_of_england__three_centuries_of_macroeconomic_data__2017
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/396
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: bce9714eab77237bb7e0d1d6c9a00026
-  size: 3749
+- md5: ec6b4f718ac7335a63fddd8adf6b3304
+  size: 4337
   path: dataset_396_uk_nominal_wage_data__price_data__and_real_wage__bank_of_england__three_centuries_of_macroeconomic_data__2017_config.json

@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 00:15:50.253393
-  description: ''
-  file_extension: json
-  is_public: false
-  name: Grapher metadata for dataset_3270_share_of_women_in_top_income_groups__atkinson__casarico__and__voitchovsky__2018
   namespace: backport
-  publication_date: latest
   short_name: dataset_3270_share_of_women_in_top_income_groups__atkinson__casarico__and__voitchovsky__2018_config
+  file_extension: json
+  date_accessed: 2023-02-23 17:01:34.057528
+  name: Grapher metadata for dataset_3270_share_of_women_in_top_income_groups__atkinson__casarico__and__voitchovsky__2018
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/3270
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 46cb100b356508080c28e25a20a0503b
-  size: 3639
+- md5: b6504c9f297d29518a373c904e58da4d
+  size: 4827
   path: dataset_3270_share_of_women_in_top_income_groups__atkinson__casarico__and__voitchovsky__2018_config.json

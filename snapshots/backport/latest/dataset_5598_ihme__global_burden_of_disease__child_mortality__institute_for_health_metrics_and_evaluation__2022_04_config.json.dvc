@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:40:36.673170
-  description: This is a dataset imported by the automated fetcher
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_5598_ihme__global_burden_of_disease__child_mortality__institute_for_health_metrics_and_evaluation__2022_04
   namespace: backport
-  publication_date: latest
   short_name: dataset_5598_ihme__global_burden_of_disease__child_mortality__institute_for_health_metrics_and_evaluation__2022_04_config
+  file_extension: json
+  date_accessed: 2023-02-23 17:31:39.239336
+  name: Grapher metadata for dataset_5598_ihme__global_burden_of_disease__child_mortality__institute_for_health_metrics_and_evaluation__2022_04
+  description: This is a dataset imported by the automated fetcher
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5598
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 1890fc27c46e166ac4493dc505dbd66c
-  size: 111967
+- md5: 9b73a379be27d7939d59117e099d4aee
+  size: 157567
   path: dataset_5598_ihme__global_burden_of_disease__child_mortality__institute_for_health_metrics_and_evaluation__2022_04_config.json

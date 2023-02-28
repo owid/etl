@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 01:24:00.677915
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Prevalence of weight categories in females - NCDRisC (2017)
   namespace: backport
-  publication_date: latest
   short_name: dataset_588_prevalence_of_weight_categories_in_females__ncdrisc__2017_values
+  file_extension: feather
+  date_accessed: 2023-02-23 19:24:09.974526
+  name: Prevalence of weight categories in females - NCDRisC (2017)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/588
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: d297f9f4488a8021b876852db299980e
-  size: 105538
+- md5: 6c07e7a0199d3afb9364b2a9a1af6a69
+  size: 105914
   path: dataset_588_prevalence_of_weight_categories_in_females__ncdrisc__2017_values.feather

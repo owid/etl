@@ -1,21 +1,22 @@
 meta:
-  date_accessed: 2022-12-07 15:57:43.941371
+  namespace: backport
+  short_name: dataset_926_family_benefits_public_spending__oecd__2016_config
+  file_extension: json
+  date_accessed: 2023-02-23 16:14:20.751166
+  name: Grapher metadata for dataset_926_family_benefits_public_spending__oecd__2016
   description: Family benefits spending refer to public spending on family benefits,
     including financial support that is exclusively for families and children. Spending
     recorded in other social policy areas, such as health and housing, also assist
     families, but not exclusively, and it is not included in this indicator. This
     indicator is measured in percentage of GDP.
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_926_family_benefits_public_spending__oecd__2016
-  namespace: backport
-  publication_date: latest
-  short_name: dataset_926_family_benefits_public_spending__oecd__2016_config
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/926
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 6d3e06b04f11753d9c314e0d225d38a0
-  size: 2200
+- md5: 6398cb91103c2943086c9b89fb08c3ab
+  size: 2398
   path: dataset_926_family_benefits_public_spending__oecd__2016_config.json

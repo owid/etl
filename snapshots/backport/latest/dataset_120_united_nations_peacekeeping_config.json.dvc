@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:02:26.603230
-  description: Number of missions was constructed with https://github.com/owid/notebooks/tree/main/EdouardMathieu/un_peacekeeping_missions
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_120_united_nations_peacekeeping
   namespace: backport
-  publication_date: latest
   short_name: dataset_120_united_nations_peacekeeping_config
+  file_extension: json
+  date_accessed: 2023-02-23 17:51:10.313950
+  name: Grapher metadata for dataset_120_united_nations_peacekeeping
+  description: Number of missions was constructed with https://github.com/owid/notebooks/tree/main/EdouardMathieu/un_peacekeeping_missions
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/120
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 6d9f5aaa2c1bb194b4e5920626e3c73f
-  size: 4181
+- md5: 2f93398983644f618cf7d166d957d063
+  size: 5151
   path: dataset_120_united_nations_peacekeeping_config.json

@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:21:18.551209
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Top 1% wealth shares - Chartbook of Economic Inequality (2017)
   namespace: backport
-  publication_date: latest
   short_name: dataset_2510_top_1pct_wealth_shares__chartbook_of_economic_inequality__2017_values
+  file_extension: feather
+  date_accessed: 2023-02-23 19:44:01.656415
+  name: Top 1% wealth shares - Chartbook of Economic Inequality (2017)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2510
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 0bc834e0afd0420e7efb17d33aad3650
-  size: 9554
+- md5: 98e55d59e289434f45fa6f45585360ad
+  size: 9922
   path: dataset_2510_top_1pct_wealth_shares__chartbook_of_economic_inequality__2017_values.feather

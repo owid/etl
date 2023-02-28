@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 15:57:07.290083
-  description: ''
-  file_extension: json
-  is_public: false
-  name: Grapher metadata for dataset_5197_working_hours__boe__2016
   namespace: backport
-  publication_date: latest
   short_name: dataset_5197_working_hours__boe__2016_config
+  file_extension: json
+  date_accessed: 2023-02-23 17:59:28.416912
+  name: Grapher metadata for dataset_5197_working_hours__boe__2016
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5197
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 87c822630f77061c0731a653ac02adba
-  size: 3363
+- md5: d84f486133130f235faa4805f2649c28
+  size: 4363
   path: dataset_5197_working_hours__boe__2016_config.json

@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:25:16.524255
-  description: This is a dataset imported by the automated fetcher
-  file_extension: feather
-  is_public: true
-  name: Productivity - Level of GDP per capita and productivity
   namespace: backport
-  publication_date: latest
   short_name: dataset_2553_productivity__level_of_gdp_per_capita_and_productivity_values
+  file_extension: feather
+  date_accessed: 2023-02-23 17:23:25.079105
+  name: Productivity - Level of GDP per capita and productivity
+  description: This is a dataset imported by the automated fetcher
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2553
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: d6b9996489ddac4630b3767ee92f03b3
-  size: 168650
+- md5: 1c5782e6d398dc6c20c47e82a8fa991c
+  size: 169026
   path: dataset_2553_productivity__level_of_gdp_per_capita_and_productivity_values.feather

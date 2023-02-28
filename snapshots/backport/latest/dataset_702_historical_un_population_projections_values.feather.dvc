@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:16:34.641001
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Historical UN Population Projections
   namespace: backport
-  publication_date: latest
   short_name: dataset_702_historical_un_population_projections_values
+  file_extension: feather
+  date_accessed: 2023-02-23 16:34:46.162239
+  name: Historical UN Population Projections
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/702
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: ea93e4308eb4ac050eb219da39304ccd
-  size: 6874
+- md5: df1e2cfd2d1cf1cffd59bd418fdd8980
+  size: 7250
   path: dataset_702_historical_un_population_projections_values.feather

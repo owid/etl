@@ -1,0 +1,18 @@
+meta:
+  namespace: fasttrack
+  short_name: test_electricity_projections
+  file_extension: csv
+  date_accessed: 2023-02-21
+  name: DRAFT test electricity projections
+  description: ''
+  source_name: Local CSV
+  url: ''
+  source_published_by: Local CSV
+  source_data_url: gAAAAABj9OAdW1wDcOpAhumjfExX-hVFwJfpmhfS4Xpnny123d8lEGnKjr3X1qzqGJbLNUOiqAgONTlhOhq_nvgUSsttktbHdw==
+  is_public: false
+  version: latest
+wdir: ../../../data/snapshots/fasttrack/latest
+outs:
+- md5: b0c1e7561a1b819571eeaa0990630ae4
+  size: 4331
+  path: test_electricity_projections.csv

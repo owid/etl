@@ -1,18 +1,19 @@
 meta:
-  date_accessed: 2022-12-07 16:58:48.370948
-  description: ''
+  namespace: backport
+  short_name: dataset_1871_womens_weekly_earnings_as_a_percentage_of_mens__bureau_of_labor_statistics__2017_values
   file_extension: feather
-  is_public: true
+  date_accessed: 2023-02-23 17:04:49.758493
   name: Women's weekly earnings as a percentage of men's - Bureau of Labor Statistics
     (2017)
-  namespace: backport
-  publication_date: latest
-  short_name: dataset_1871_womens_weekly_earnings_as_a_percentage_of_mens__bureau_of_labor_statistics__2017_values
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/1871
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 4e2445b49b5c1ee5716cf6e677ac90e0
-  size: 6506
+- md5: 0c24b7e192f9415c5b5d77d1bc337562
+  size: 6882
   path: dataset_1871_womens_weekly_earnings_as_a_percentage_of_mens__bureau_of_labor_statistics__2017_values.feather

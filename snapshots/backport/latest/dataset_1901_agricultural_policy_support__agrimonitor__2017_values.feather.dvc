@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:57:44.123282
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Agricultural policy support - (Agrimonitor, 2017)
   namespace: backport
-  publication_date: latest
   short_name: dataset_1901_agricultural_policy_support__agrimonitor__2017_values
+  file_extension: feather
+  date_accessed: 2023-02-23 17:43:43.476650
+  name: Agricultural policy support - (Agrimonitor, 2017)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/1901
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: a1727689e9eba8ebf69b5fae72ddc1cc
-  size: 7842
+- md5: 0c0b8cc7c00250baf123d67f1037c962
+  size: 8210
   path: dataset_1901_agricultural_policy_support__agrimonitor__2017_values.feather

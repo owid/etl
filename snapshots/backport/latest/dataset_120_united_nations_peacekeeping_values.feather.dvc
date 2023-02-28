@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:02:31.362499
-  description: Number of missions was constructed with https://github.com/owid/notebooks/tree/main/EdouardMathieu/un_peacekeeping_missions
-  file_extension: feather
-  is_public: true
-  name: United Nations Peacekeeping
   namespace: backport
-  publication_date: latest
   short_name: dataset_120_united_nations_peacekeeping_values
+  file_extension: feather
+  date_accessed: 2023-02-23 17:51:37.641655
+  name: United Nations Peacekeeping
+  description: Number of missions was constructed with https://github.com/owid/notebooks/tree/main/EdouardMathieu/un_peacekeeping_missions
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/120
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 3c3ae02d082fa637ceadde9642a001de
-  size: 7282
+- md5: 161897f4344cb614eb08ac4c4c0a4a46
+  size: 7658
   path: dataset_120_united_nations_peacekeeping_values.feather

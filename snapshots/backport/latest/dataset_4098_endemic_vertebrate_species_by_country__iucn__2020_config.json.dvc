@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:19:51.776650
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_4098_endemic_vertebrate_species_by_country__iucn__2020
   namespace: backport
-  publication_date: latest
   short_name: dataset_4098_endemic_vertebrate_species_by_country__iucn__2020_config
+  file_extension: json
+  date_accessed: 2023-02-23 16:41:14.440997
+  name: Grapher metadata for dataset_4098_endemic_vertebrate_species_by_country__iucn__2020
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/4098
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: be1ab69f7a2c475f75bd60ad629c00a8
-  size: 16680
+- md5: 90966224ee8d90fe0dbd6c7cbac51ddf
+  size: 21080
   path: dataset_4098_endemic_vertebrate_species_by_country__iucn__2020_config.json

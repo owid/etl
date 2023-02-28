@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 16:01:23.246714
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: 'OECD: Education Statistics (2017)'
   namespace: backport
-  publication_date: latest
   short_name: dataset_246_oecd__education_statistics__2017_values
+  file_extension: feather
+  date_accessed: 2023-02-23 17:11:25.458373
+  name: 'OECD: Education Statistics (2017)'
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/246
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 9a839be627f1f97a256723d96d9130f1
-  size: 9066
+- md5: 1eb573288cd4ca83bff4d4d9af005178
+  size: 9442
   path: dataset_246_oecd__education_statistics__2017_values.feather

@@ -1,0 +1,18 @@
+meta:
+  namespace: fasttrack
+  short_name: battery_costs_per_kwh__ziegler_et_al__and_bnef
+  file_extension: csv
+  date_accessed: 2023-02-24
+  name: DRAFT Battery costs per kWh (Ziegler et al. and BNEF)
+  description: ''
+  source_name: Local CSV
+  url: ''
+  source_published_by: Local CSV
+  source_data_url: gAAAAABj-Juv7PXNXZR6hpKuJdJY3xmFXZILH2Bv1_5fmkol4zNI3m7HfLuup5Wb_j2lB1FIun-Jb_Jyo0uQFw0d6CVWxRVRmg==
+  is_public: false
+  version: latest
+wdir: ../../../data/snapshots/fasttrack/latest
+outs:
+- md5: b73a3cc09a4c237e6aded1e9fb1ff272
+  size: 542
+  path: battery_costs_per_kwh__ziegler_et_al__and_bnef.csv

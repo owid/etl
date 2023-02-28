@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 15:59:31.666102
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Duration of marriages ending in divorce (OWID based on national statistics)
   namespace: backport
-  publication_date: latest
   short_name: dataset_5128_duration_of_marriages_ending_in_divorce__owid_based_on_national_statistics_values
+  file_extension: feather
+  date_accessed: 2023-02-23 17:25:28.522655
+  name: Duration of marriages ending in divorce (OWID based on national statistics)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5128
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: eb10b3fedefcfcd619cb766a7e19ffe2
-  size: 7986
+- md5: e46d80ac44080de8d54f18ba2556c19f
+  size: 8362
   path: dataset_5128_duration_of_marriages_ending_in_divorce__owid_based_on_national_statistics_values.feather

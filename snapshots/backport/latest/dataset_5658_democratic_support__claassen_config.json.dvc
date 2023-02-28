@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:01:09.298371
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_5658_democratic_support__claassen
   namespace: backport
-  publication_date: latest
   short_name: dataset_5658_democratic_support__claassen_config
+  file_extension: json
+  date_accessed: 2023-02-23 16:57:17.287829
+  name: Grapher metadata for dataset_5658_democratic_support__claassen
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5658
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 2591fc2d881a6c077b2761a5631076f1
-  size: 7931
+- md5: fd8256652c49461649fb700005f551a0
+  size: 8531
   path: dataset_5658_democratic_support__claassen_config.json

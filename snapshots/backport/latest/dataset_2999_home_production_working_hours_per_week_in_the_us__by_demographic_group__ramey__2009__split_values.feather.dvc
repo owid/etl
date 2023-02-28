@@ -1,18 +1,19 @@
 meta:
-  date_accessed: 2022-12-07 17:18:22.344619
-  description: ''
+  namespace: backport
+  short_name: dataset_2999_home_production_working_hours_per_week_in_the_us__by_demographic_group__ramey__2009__split_values
   file_extension: feather
-  is_public: false
+  date_accessed: 2023-02-23 15:06:14.905627
   name: Home production working hours per week in the US, by demographic group (Ramey
     (2009)) (split)
-  namespace: backport
-  publication_date: latest
-  short_name: dataset_2999_home_production_working_hours_per_week_in_the_us__by_demographic_group__ramey__2009__split_values
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2999
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: ba0e70ff72e0f35a7c610bb16c0db12d
-  size: 6946
+- md5: 6eb0a8ca17c7b516c0e7973c8cd6e0d9
+  size: 7322
   path: dataset_2999_home_production_working_hours_per_week_in_the_us__by_demographic_group__ramey__2009__split_values.feather

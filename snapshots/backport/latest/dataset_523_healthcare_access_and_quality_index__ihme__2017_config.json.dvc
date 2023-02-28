@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:48:58.059127
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_523_healthcare_access_and_quality_index__ihme__2017
   namespace: backport
-  publication_date: latest
   short_name: dataset_523_healthcare_access_and_quality_index__ihme__2017_config
+  file_extension: json
+  date_accessed: 2023-02-23 19:00:14.716315
+  name: Grapher metadata for dataset_523_healthcare_access_and_quality_index__ihme__2017
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/523
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 1de8e12a16f2541855d43f2731ebde96
-  size: 2219
+- md5: 4396e80790bd2edbb8992ef375bede1f
+  size: 2415
   path: dataset_523_healthcare_access_and_quality_index__ihme__2017_config.json

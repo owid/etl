@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 01:00:35.931662
-  description: This is a dataset imported by the automated fetcher
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_2252_brain_and_nervous_system_cancer
   namespace: backport
-  publication_date: latest
   short_name: dataset_2252_brain_and_nervous_system_cancer_config
+  file_extension: json
+  date_accessed: 2023-02-23 16:42:19.383252
+  name: Grapher metadata for dataset_2252_brain_and_nervous_system_cancer
+  description: This is a dataset imported by the automated fetcher
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2252
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 8dad78170dd5d06bd0751bb1212478a0
-  size: 20140
+- md5: 9a4dc0f491f08731dd5d855355332d0d
+  size: 28060
   path: dataset_2252_brain_and_nervous_system_cancer_config.json

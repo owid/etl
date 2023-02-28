@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 01:42:38.011297
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Global education (OECD + IIASA (2016))
   namespace: backport
-  publication_date: latest
   short_name: dataset_324_global_education__oecd_plus_iiasa__2016_values
+  file_extension: feather
+  date_accessed: 2023-02-23 15:01:02.723616
+  name: Global education (OECD + IIASA (2016))
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/324
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 778843cae20fcedaabe9a99e9becc2d0
-  size: 6226
+- md5: 64ea1c87bd006218db6dc6d95d9784e0
+  size: 6594
   path: dataset_324_global_education__oecd_plus_iiasa__2016_values.feather

@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 15:57:41.499977
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Chartbook of Economic Inequality, Gini (2016)
   namespace: backport
-  publication_date: latest
   short_name: dataset_317_chartbook_of_economic_inequality__gini__2016_values
+  file_extension: feather
+  date_accessed: 2023-02-23 16:29:37.039934
+  name: Chartbook of Economic Inequality, Gini (2016)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/317
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 52430dd46d9d5c9bb0905bd96ce3d54b
-  size: 10234
+- md5: 7d7fe8c64030ba5c38df9f15e9d95a32
+  size: 10602
   path: dataset_317_chartbook_of_economic_inequality__gini__2016_values.feather

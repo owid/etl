@@ -1,25 +1,32 @@
 meta:
-  date_accessed: 2022-12-08 00:11:15.858148
-  description: "Permalink: \n\nLocation: Global\nYear: Most recent\nContext: Risk\n\
-    Risk: All risk factors\nAge: All Ages\nMetric: Percent\nMeasure: Deaths\nSex:\
-    \ Both\nCause: Bladder cancer, Breast cancer, Cervical cancer, Colon and rectum\
-    \ cancer, Esophageal cancer, Gallbladder and biliary tract cancer, Kidney cancer,\
-    \ Larynx cancer, Leukemia, Lip and oral cavity cancer, Liver cancer, Mesothelioma,\
-    \ Multiple myeloma, Nasopharynx cancer, Non-Hodgkin lymphoma, Ovarian cancer,\
-    \ Pancreatic cancer, Prostate cancer, Stomach cancer, Thyroid cancer, Tracheal,\
-    \ bronchus and lung cancer, Uterine cancer. \n\n\nThere are four cancers that\
-    \ were previously on the chart (all with 0%) that no longer return any values"
-  file_extension: feather
-  is_public: false
-  name: Share of cancer deaths attributed to risk factors
   namespace: backport
-  publication_date: latest
   short_name: dataset_5511_share_of_cancer_deaths_attributed_to_risk_factors_values
+  file_extension: feather
+  date_accessed: 2023-02-23 17:41:57.759521
+  name: Share of cancer deaths attributed to risk factors
+  description: |-
+    Permalink:
+
+    Location: Global
+    Year: Most recent
+    Context: Risk
+    Risk: All risk factors
+    Age: All Ages
+    Metric: Percent
+    Measure: Deaths
+    Sex: Both
+    Cause: Bladder cancer, Breast cancer, Cervical cancer, Colon and rectum cancer, Esophageal cancer, Gallbladder and biliary tract cancer, Kidney cancer, Larynx cancer, Leukemia, Lip and oral cavity cancer, Liver cancer, Mesothelioma, Multiple myeloma, Nasopharynx cancer, Non-Hodgkin lymphoma, Ovarian cancer, Pancreatic cancer, Prostate cancer, Stomach cancer, Thyroid cancer, Tracheal, bronchus and lung cancer, Uterine cancer.
+
+
+    There are four cancers that were previously on the chart (all with 0%) that no longer return any values
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5511
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 25d5cf8dbde3681f855f3238366992f2
-  size: 6426
+- md5: 134757f30bb084eb34d0b0978abf69ce
+  size: 6802
   path: dataset_5511_share_of_cancer_deaths_attributed_to_risk_factors_values.feather

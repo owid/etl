@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 15:58:54.291371
-  description: ''
-  file_extension: feather
-  is_public: false
-  name: COVID-19 - Deaths by vaccination status - England
   namespace: backport
-  publication_date: latest
   short_name: dataset_5415_covid_19__deaths_by_vaccination_status__england_values
+  file_extension: feather
+  date_accessed: 2023-02-23 19:27:22.178353
+  name: COVID-19 - Deaths by vaccination status - England
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5415
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: dcb35eca8e5e84e8c88cc7d95a1262e0
-  size: 6546
+- md5: c18391a832ee9caadbb08ed7d2b47a5f
+  size: 6922
   path: dataset_5415_covid_19__deaths_by_vaccination_status__england_values.feather

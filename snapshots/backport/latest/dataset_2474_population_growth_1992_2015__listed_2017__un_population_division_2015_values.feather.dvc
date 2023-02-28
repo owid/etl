@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:29:20.143923
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Population growth 1992-2015 (listed 2017) (UN Population Division 2015)
   namespace: backport
-  publication_date: latest
   short_name: dataset_2474_population_growth_1992_2015__listed_2017__un_population_division_2015_values
+  file_extension: feather
+  date_accessed: 2023-02-23 18:28:56.783235
+  name: Population growth 1992-2015 (listed 2017) (UN Population Division 2015)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2474
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: c32983e847628ba826abdd29f59e2708
-  size: 14490
+- md5: f32acc528823584c20f8ebd8bbde6abd
+  size: 14866
   path: dataset_2474_population_growth_1992_2015__listed_2017__un_population_division_2015_values.feather

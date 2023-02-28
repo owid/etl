@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:31:34.703571
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: RAND Database of Worldwide Terrorism Incidents
   namespace: backport
-  publication_date: latest
   short_name: dataset_134_rand_database_of_worldwide_terrorism_incidents_values
+  file_extension: feather
+  date_accessed: 2023-02-23 18:39:43.167481
+  name: RAND Database of Worldwide Terrorism Incidents
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/134
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 8f27ffe872aacd36ab2395da73c1b65e
-  size: 38658
+- md5: 695dc66de9bdaab326e4f827cf322461
+  size: 39034
   path: dataset_134_rand_database_of_worldwide_terrorism_incidents_values.feather

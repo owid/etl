@@ -1,24 +1,27 @@
 meta:
-  date_accessed: 2022-12-08 00:13:48.277731
-  description: "Permalink to the selected variables: http://ghdx.healthdata.org/gbd-results-tool?params=gbd-api-2019-permalink/2444532e39485afe61a9c1743ce0ca43\n\
-    \nLocation: Global\nYear: Most recent\nAge: <1 year\nMetric: Rate\nMeasure: Deaths\n\
-    Sex: Male, Female\nCause: Syphilis, Acute hepatitis, Congenital birth defects,\
-    \ Malaria, Neonatal encephalopathy due to birth asphyxia and trauma, Nutritional\
-    \ deficiencies, Digestive diseases, Measles, Tuberculosis, HIV/AIDS, Diarrheal\
-    \ diseases, Lower respiratory infections, Meningitis, Encephalitis, Whooping cough,\
-    \ Tetanus, Congenital heart anomalies, Congenital digestive anomalies, Sudden\
-    \ infant death syndrome, Diabetes and kidney diseases, Neonatal preterm birth."
-  file_extension: json
-  is_public: false
-  name: Grapher metadata for dataset_5507_infant_mortality_rate_by_gender__ihme__2022
   namespace: backport
-  publication_date: latest
   short_name: dataset_5507_infant_mortality_rate_by_gender__ihme__2022_config
+  file_extension: json
+  date_accessed: 2023-02-23 18:50:47.716929
+  name: Grapher metadata for dataset_5507_infant_mortality_rate_by_gender__ihme__2022
+  description: |-
+    Permalink to the selected variables: http://ghdx.healthdata.org/gbd-results-tool?params=gbd-api-2019-permalink/2444532e39485afe61a9c1743ce0ca43
+
+    Location: Global
+    Year: Most recent
+    Age: <1 year
+    Metric: Rate
+    Measure: Deaths
+    Sex: Male, Female
+    Cause: Syphilis, Acute hepatitis, Congenital birth defects, Malaria, Neonatal encephalopathy due to birth asphyxia and trauma, Nutritional deficiencies, Digestive diseases, Measles, Tuberculosis, HIV/AIDS, Diarrheal diseases, Lower respiratory infections, Meningitis, Encephalitis, Whooping cough, Tetanus, Congenital heart anomalies, Congenital digestive anomalies, Sudden infant death syndrome, Diabetes and kidney diseases, Neonatal preterm birth.
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5507
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 1ec4be0af0ce355fb0d8fad29590a5fe
-  size: 3749
+- md5: 3e65fe62a6e0163ca726babfd576f8f6
+  size: 4149
   path: dataset_5507_infant_mortality_rate_by_gender__ihme__2022_config.json

@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 16:30:10.336325
-  description: SO2 emissions (million tonnes) by country (1850-2000).
-  file_extension: feather
-  is_public: true
-  name: SO2 emissions by country (1850-2000) - Clio Infra
   namespace: backport
-  publication_date: latest
   short_name: dataset_389_so2_emissions_by_country__1850_2000__clio_infra_values
+  file_extension: feather
+  date_accessed: 2023-02-23 18:18:35.764275
+  name: SO2 emissions by country (1850-2000) - Clio Infra
+  description: SO2 emissions (million tonnes) by country (1850-2000).
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/389
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 7460572a4917ded27bd9748f8ca0cdd9
-  size: 27450
+- md5: ef3910be4b90b16d8c61b8de3afcbc24
+  size: 27826
   path: dataset_389_so2_emissions_by_country__1850_2000__clio_infra_values.feather

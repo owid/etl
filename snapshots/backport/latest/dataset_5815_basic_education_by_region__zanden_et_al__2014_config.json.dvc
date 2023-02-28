@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 00:28:05.553690
-  description: Backported
-  file_extension: json
-  is_public: false
-  name: Grapher metadata for dataset_5815_basic_education_by_region__zanden_et_al__2014
   namespace: backport
-  publication_date: latest
   short_name: dataset_5815_basic_education_by_region__zanden_et_al__2014_config
+  file_extension: json
+  date_accessed: 2023-02-23 15:11:04.214698
+  name: Grapher metadata for dataset_5815_basic_education_by_region__zanden_et_al__2014
+  description: Backported
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5815
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 938fb10729990ed0c35b8cec5b4f9e62
-  size: 3216
+- md5: f14df38b97be91e85e7115f81f43d593
+  size: 3416
   path: dataset_5815_basic_education_by_region__zanden_et_al__2014_config.json

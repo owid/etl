@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:31:27.425648
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_134_rand_database_of_worldwide_terrorism_incidents
   namespace: backport
-  publication_date: latest
   short_name: dataset_134_rand_database_of_worldwide_terrorism_incidents_config
+  file_extension: json
+  date_accessed: 2023-02-23 18:39:15.821575
+  name: Grapher metadata for dataset_134_rand_database_of_worldwide_terrorism_incidents
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/134
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 0e3c0530a159f82caa9e8309aa833d75
-  size: 2681
+- md5: fd1b234d706b4720ba0b26f5d7a7c069
+  size: 3263
   path: dataset_134_rand_database_of_worldwide_terrorism_incidents_config.json

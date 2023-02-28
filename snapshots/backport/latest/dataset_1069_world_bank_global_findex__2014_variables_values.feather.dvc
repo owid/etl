@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:35:11.256011
-  description: This is a dataset imported by the automated fetcher
-  file_extension: feather
-  is_public: true
-  name: World Bank Global Findex - 2014 Variables
   namespace: backport
-  publication_date: latest
   short_name: dataset_1069_world_bank_global_findex__2014_variables_values
+  file_extension: feather
+  date_accessed: 2023-02-23 17:26:51.812477
+  name: World Bank Global Findex - 2014 Variables
+  description: This is a dataset imported by the automated fetcher
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/1069
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 5cce6b019fe0c5f2942454c36745e749
-  size: 537322
+- md5: 01277e5554cdad93b8e900967db0c58f
+  size: 537698
   path: dataset_1069_world_bank_global_findex__2014_variables_values.feather

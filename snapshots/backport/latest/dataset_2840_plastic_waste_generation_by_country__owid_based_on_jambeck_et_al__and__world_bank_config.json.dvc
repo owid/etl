@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:55:20.299767
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_2840_plastic_waste_generation_by_country__owid_based_on_jambeck_et_al__and__world_bank
   namespace: backport
-  publication_date: latest
   short_name: dataset_2840_plastic_waste_generation_by_country__owid_based_on_jambeck_et_al__and__world_bank_config
+  file_extension: json
+  date_accessed: 2023-02-23 17:58:40.445868
+  name: Grapher metadata for dataset_2840_plastic_waste_generation_by_country__owid_based_on_jambeck_et_al__and__world_bank
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2840
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 5cb46ed13e47dc55f9237869bd95a5aa
-  size: 2248
+- md5: 55373b611676b7a133b0ac6f4377eebc
+  size: 2446
   path: dataset_2840_plastic_waste_generation_by_country__owid_based_on_jambeck_et_al__and__world_bank_config.json

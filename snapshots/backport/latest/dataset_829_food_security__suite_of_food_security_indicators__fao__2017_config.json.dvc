@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-11-29 16:25:06.178910
-  description: This is a dataset imported by the automated fetcher
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_829_food_security__suite_of_food_security_indicators__fao__2017
   namespace: backport
-  publication_date: latest
   short_name: dataset_829_food_security__suite_of_food_security_indicators__fao__2017_config
+  file_extension: json
+  date_accessed: 2023-02-23 15:05:54.560194
+  name: Grapher metadata for dataset_829_food_security__suite_of_food_security_indicators__fao__2017
+  description: This is a dataset imported by the automated fetcher
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/829
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 6f800ead5b45be8a4dade2371ac078e1
-  size: 47062
+- md5: 97b58d4597b7699e83a93cb14b2b90a6
+  size: 51022
   path: dataset_829_food_security__suite_of_food_security_indicators__fao__2017_config.json

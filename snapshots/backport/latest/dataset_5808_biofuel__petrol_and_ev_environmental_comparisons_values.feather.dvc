@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 16:54:39.654128
-  description: Dataset in progress – do not use or share
-  file_extension: feather
-  is_public: false
-  name: Biofuel, petrol and EV environmental comparisons
   namespace: backport
-  publication_date: latest
   short_name: dataset_5808_biofuel__petrol_and_ev_environmental_comparisons_values
+  file_extension: feather
+  date_accessed: 2023-02-23 17:18:41.911955
+  name: Biofuel, petrol and EV environmental comparisons
+  description: Dataset in progress – do not use or share
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5808
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 1d2e23ea1c0df0402f2df2874df65a2c
-  size: 7106
+- md5: 5880561012fdfce6e3a4e6e4aa635502
+  size: 7482
   path: dataset_5808_biofuel__petrol_and_ev_environmental_comparisons_values.feather

@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:15:15.094162
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Energy efficiency by passenger mode in USA (BTS)
   namespace: backport
-  publication_date: latest
   short_name: dataset_5167_energy_efficiency_by_passenger_mode_in_usa__bts_values
+  file_extension: feather
+  date_accessed: 2023-02-23 16:28:38.037153
+  name: Energy efficiency by passenger mode in USA (BTS)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5167
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 0eeeee0fcf3e8ff6d535a81a36c29670
-  size: 8426
+- md5: 20d1868a4d8f0264e9df8e45fcff8ea0
+  size: 8802
   path: dataset_5167_energy_efficiency_by_passenger_mode_in_usa__bts_values.feather

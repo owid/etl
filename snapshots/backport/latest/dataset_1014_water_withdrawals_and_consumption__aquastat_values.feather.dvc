@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 16:55:13.901949
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Water withdrawals and consumption - Aquastat
   namespace: backport
-  publication_date: latest
   short_name: dataset_1014_water_withdrawals_and_consumption__aquastat_values
+  file_extension: feather
+  date_accessed: 2023-02-23 17:09:40.628258
+  name: Water withdrawals and consumption - Aquastat
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/1014
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: eaac79845559e707cd82bed2b53c4ab2
-  size: 31058
+- md5: 7f2937725b5a4e1a0e1ac47091cd1bc6
+  size: 31434
   path: dataset_1014_water_withdrawals_and_consumption__aquastat_values.feather

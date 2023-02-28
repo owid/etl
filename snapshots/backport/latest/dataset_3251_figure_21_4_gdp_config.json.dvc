@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 00:43:22.359571
-  description: core-econ.org
-  file_extension: json
-  is_public: false
-  name: Grapher metadata for dataset_3251_figure_21_4_gdp
   namespace: backport
-  publication_date: latest
   short_name: dataset_3251_figure_21_4_gdp_config
+  file_extension: json
+  date_accessed: 2023-02-23 16:28:51.224868
+  name: Grapher metadata for dataset_3251_figure_21_4_gdp
+  description: core-econ.org
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/3251
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: f74af99df42ba05d8fee9b65fc54cc29
-  size: 1354
+- md5: 91ec6d874d409d0d74177793793d7599
+  size: 1552
   path: dataset_3251_figure_21_4_gdp_config.json

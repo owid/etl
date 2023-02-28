@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:07:16.759398
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Global warming potential factors (GWP100) - IPCC (2014)
   namespace: backport
-  publication_date: latest
   short_name: dataset_860_global_warming_potential_factors__gwp100__ipcc__2014_values
+  file_extension: feather
+  date_accessed: 2023-02-23 17:18:35.003611
+  name: Global warming potential factors (GWP100) - IPCC (2014)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/860
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 12d9e2dba0e5a9350521176553673de3
-  size: 5954
+- md5: 916d0b611f550ad5a371f3b3d0081463
+  size: 6322
   path: dataset_860_global_warming_potential_factors__gwp100__ipcc__2014_values.feather

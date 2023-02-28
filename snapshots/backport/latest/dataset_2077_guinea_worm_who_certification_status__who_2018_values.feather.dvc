@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:18:33.623946
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Guinea worm WHO certification status - WHO 2018
   namespace: backport
-  publication_date: latest
   short_name: dataset_2077_guinea_worm_who_certification_status__who_2018_values
+  file_extension: feather
+  date_accessed: 2023-02-23 18:17:42.556285
+  name: Guinea worm WHO certification status - WHO 2018
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2077
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: ec456eeebc88a58c4ebc008e720ea43e
-  size: 33602
+- md5: dc8a14a41ce24552b5a4ac18bb097b79
+  size: 33978
   path: dataset_2077_guinea_worm_who_certification_status__who_2018_values.feather

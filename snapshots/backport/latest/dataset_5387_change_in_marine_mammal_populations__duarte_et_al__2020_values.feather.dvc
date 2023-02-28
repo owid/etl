@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 00:59:37.781426
-  description: ''
-  file_extension: feather
-  is_public: false
-  name: Change in marine mammal populations (Duarte et al. 2020)
   namespace: backport
-  publication_date: latest
   short_name: dataset_5387_change_in_marine_mammal_populations__duarte_et_al__2020_values
+  file_extension: feather
+  date_accessed: 2023-02-23 18:58:08.404404
+  name: Change in marine mammal populations (Duarte et al. 2020)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5387
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 49e7ef8ce93aacf65c8df95b0adec522
-  size: 6074
+- md5: 83a816be336419adb6eee9575a6c1df0
+  size: 6442
   path: dataset_5387_change_in_marine_mammal_populations__duarte_et_al__2020_values.feather

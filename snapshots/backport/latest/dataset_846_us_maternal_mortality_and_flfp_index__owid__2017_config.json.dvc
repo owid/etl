@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 00:34:25.137838
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_846_us_maternal_mortality_and_flfp_index__owid__2017
   namespace: backport
-  publication_date: latest
   short_name: dataset_846_us_maternal_mortality_and_flfp_index__owid__2017_config
+  file_extension: json
+  date_accessed: 2023-02-23 16:50:08.548394
+  name: Grapher metadata for dataset_846_us_maternal_mortality_and_flfp_index__owid__2017
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/846
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 0166b6eeb83af1e9037ff10464efea51
-  size: 2044
+- md5: 6040ab288cbd35b10ab6f5210536c870
+  size: 2242
   path: dataset_846_us_maternal_mortality_and_flfp_index__owid__2017_config.json

@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:28:43.477932
-  description: Literacy figures are nationally representative.
-  file_extension: feather
-  is_public: true
-  name: 'Literacy in England, by sex - Schofield (1973), Houston (1982), Cressy (1980) '
   namespace: backport
-  publication_date: latest
   short_name: dataset_2702_literacy_in_england__by_sex__schofield__1973__houston__1982__cressy__1980_values
+  file_extension: feather
+  date_accessed: 2023-02-23 19:46:55.301652
+  name: Literacy in England, by sex - Schofield (1973), Houston (1982), Cressy (1980)
+  description: Literacy figures are nationally representative.
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2702
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 0c000028ca7e33132d4669b766cd676d
-  size: 6002
+- md5: cd9644eb86c5fd45e22d6433568656d6
+  size: 6370
   path: dataset_2702_literacy_in_england__by_sex__schofield__1973__houston__1982__cressy__1980_values.feather

@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-11-29 16:31:38.217929
-  description: This is a dataset imported by the automated fetcher
-  file_extension: feather
-  is_public: true
-  name: World Bank EdStats 2020
   namespace: backport
-  publication_date: latest
   short_name: dataset_5362_world_bank_edstats_2020_values
+  file_extension: feather
+  date_accessed: 2023-02-23 16:33:59.646030
+  name: World Bank EdStats 2020
+  description: This is a dataset imported by the automated fetcher
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5362
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 73ef7f90786a384eec78401b9adba5f3
-  size: 27762802
+- md5: e21f192df9fc6ce6508f2b5f1e7f4ac5
+  size: 27763186
   path: dataset_5362_world_bank_edstats_2020_values.feather

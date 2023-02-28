@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 01:28:15.242024
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Life satisfaction – World Value Survey (2014)
   namespace: backport
-  publication_date: latest
   short_name: dataset_438_life_satisfaction__world_value_survey__2014_values
+  file_extension: feather
+  date_accessed: 2023-02-23 18:03:01.030081
+  name: Life satisfaction – World Value Survey (2014)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/438
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 3fef7f6193ba7157b2cda98d64c3279f
-  size: 12522
+- md5: 637439549677de483d10e6934edc1828
+  size: 12890
   path: dataset_438_life_satisfaction__world_value_survey__2014_values.feather

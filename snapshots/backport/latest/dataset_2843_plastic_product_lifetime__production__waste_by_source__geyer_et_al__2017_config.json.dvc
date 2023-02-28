@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 01:38:01.622117
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_2843_plastic_product_lifetime__production__waste_by_source__geyer_et_al__2017
   namespace: backport
-  publication_date: latest
   short_name: dataset_2843_plastic_product_lifetime__production__waste_by_source__geyer_et_al__2017_config
+  file_extension: json
+  date_accessed: 2023-02-23 16:55:41.988383
+  name: Grapher metadata for dataset_2843_plastic_product_lifetime__production__waste_by_source__geyer_et_al__2017
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2843
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 27b4a596c57e0ea25cc402f9ad8f672b
-  size: 2918
+- md5: 11bb9e91e98cf634072c2b667b202e5f
+  size: 3512
   path: dataset_2843_plastic_product_lifetime__production__waste_by_source__geyer_et_al__2017_config.json

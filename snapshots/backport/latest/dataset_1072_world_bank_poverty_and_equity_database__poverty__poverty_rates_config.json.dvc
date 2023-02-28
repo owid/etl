@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:19:35.684139
-  description: This is a dataset imported by the automated fetcher
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_1072_world_bank_poverty_and_equity_database__poverty__poverty_rates
   namespace: backport
-  publication_date: latest
   short_name: dataset_1072_world_bank_poverty_and_equity_database__poverty__poverty_rates_config
+  file_extension: json
+  date_accessed: 2023-02-23 18:27:38.513856
+  name: Grapher metadata for dataset_1072_world_bank_poverty_and_equity_database__poverty__poverty_rates
+  description: This is a dataset imported by the automated fetcher
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/1072
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 15dd0e95d102a0cd17e59be812fa5853
-  size: 126021
+- md5: 769700c5f460f6edfbbb835ac503ec66
+  size: 131367
   path: dataset_1072_world_bank_poverty_and_equity_database__poverty__poverty_rates_config.json

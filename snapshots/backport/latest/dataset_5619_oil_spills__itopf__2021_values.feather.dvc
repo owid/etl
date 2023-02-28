@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:25:31.948098
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Oil Spills (ITOPF, 2021)
   namespace: backport
-  publication_date: latest
   short_name: dataset_5619_oil_spills__itopf__2021_values
+  file_extension: feather
+  date_accessed: 2023-02-23 15:08:46.607409
+  name: Oil Spills (ITOPF, 2021)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5619
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: aa7dd5a4317872afb9d0385b53a98035
-  size: 7042
+- md5: 7d1370a3e7008de0198d5177838aa5c7
+  size: 7418
   path: dataset_5619_oil_spills__itopf__2021_values.feather

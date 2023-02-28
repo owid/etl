@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 16:55:50.592551
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_4896_share_of_single_parent_families__un_population_division_2018
   namespace: backport
-  publication_date: latest
   short_name: dataset_4896_share_of_single_parent_families__un_population_division_2018_config
+  file_extension: json
+  date_accessed: 2023-02-23 17:20:12.965768
+  name: Grapher metadata for dataset_4896_share_of_single_parent_families__un_population_division_2018
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/4896
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 8388001168a575da40ef15f6e04bb88c
-  size: 2751
+- md5: b5d029f8aaaba75e22640c2f7028c676
+  size: 2951
   path: dataset_4896_share_of_single_parent_families__un_population_division_2018_config.json

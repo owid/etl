@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 16:29:13.055993
-  description: Share of agricultural landowners who are female (%).
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_497_share_of_landowners_who_are_female__fao__2017
   namespace: backport
-  publication_date: latest
   short_name: dataset_497_share_of_landowners_who_are_female__fao__2017_config
+  file_extension: json
+  date_accessed: 2023-02-23 18:52:43.779892
+  name: Grapher metadata for dataset_497_share_of_landowners_who_are_female__fao__2017
+  description: Share of agricultural landowners who are female (%).
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/497
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: cf4f532e28cb7aab6c5cf310510db628
-  size: 3834
+- md5: 49612fa09865cd79dbd9ff0189dc270d
+  size: 4030
   path: dataset_497_share_of_landowners_who_are_female__fao__2017_config.json

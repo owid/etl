@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 00:03:08.174400
-  description: ''
-  file_extension: json
-  is_public: false
-  name: Grapher metadata for dataset_3010_share_of_industry_in_gdp_at_constant_2005_prices__ggdc__split
   namespace: backport
-  publication_date: latest
   short_name: dataset_3010_share_of_industry_in_gdp_at_constant_2005_prices__ggdc__split_config
+  file_extension: json
+  date_accessed: 2023-02-23 17:01:46.903975
+  name: Grapher metadata for dataset_3010_share_of_industry_in_gdp_at_constant_2005_prices__ggdc__split
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/3010
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 5f370ab477b4eb7b07d6149df5e5128c
-  size: 1947
+- md5: 0a5fd0b100f70be7256f0a39426915e3
+  size: 2145
   path: dataset_3010_share_of_industry_in_gdp_at_constant_2005_prices__ggdc__split_config.json

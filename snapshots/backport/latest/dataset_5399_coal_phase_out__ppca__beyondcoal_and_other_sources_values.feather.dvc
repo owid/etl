@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:28:21.395238
-  description: ''
-  file_extension: feather
-  is_public: false
-  name: Coal Phase Out (PPCA, BeyondCoal and other sources)
   namespace: backport
-  publication_date: latest
   short_name: dataset_5399_coal_phase_out__ppca__beyondcoal_and_other_sources_values
+  file_extension: feather
+  date_accessed: 2023-02-23 17:39:10.708877
+  name: Coal Phase Out (PPCA, BeyondCoal and other sources)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5399
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: da123c0de79dc2962b32a3969cae67cd
-  size: 9594
+- md5: 6bdff1adbc18140948aa3bb6d43847f4
+  size: 9970
   path: dataset_5399_coal_phase_out__ppca__beyondcoal_and_other_sources_values.feather

@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:36:55.488750
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Food expenditure in the USA - USDA
   namespace: backport
-  publication_date: latest
   short_name: dataset_2659_food_expenditure_in_the_usa__usda_values
+  file_extension: feather
+  date_accessed: 2023-02-23 15:11:44.044569
+  name: Food expenditure in the USA - USDA
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2659
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: c0a09b4c734f3eacffe120250315a8eb
-  size: 10242
+- md5: 78d64f53c7626dd62d5265f7b768727a
+  size: 10618
   path: dataset_2659_food_expenditure_in_the_usa__usda_values.feather

@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 16:00:06.626270
-  description: ''
-  file_extension: feather
-  is_public: false
-  name: Fish catch in the UK (Thurstan et al. 2009)
   namespace: backport
-  publication_date: latest
   short_name: dataset_5389_fish_catch_in_the_uk__thurstan_et_al__2009_values
+  file_extension: feather
+  date_accessed: 2023-02-23 18:18:55.859453
+  name: Fish catch in the UK (Thurstan et al. 2009)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5389
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: ab6fd6e85f668df827531aab9502e5aa
-  size: 12530
+- md5: d0721f8503f2f5c9bbd1c0576011c842
+  size: 12906
   path: dataset_5389_fish_catch_in_the_uk__thurstan_et_al__2009_values.feather

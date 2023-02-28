@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 15:53:46.426447
-  description: Backported
-  file_extension: feather
-  is_public: false
-  name: Income inequality (Gini coefficient) in the US - Luxembourg Income Study
   namespace: backport
-  publication_date: latest
   short_name: dataset_5816_income_inequality__gini_coefficient__in_the_us__luxembourg_income_study_values
+  file_extension: feather
+  date_accessed: 2023-02-23 18:05:20.419724
+  name: Income inequality (Gini coefficient) in the US - Luxembourg Income Study
+  description: Backported
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5816
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: e8621f680bdff5669e756c509d65de54
-  size: 6618
+- md5: 9f493a0a418617ca4f77a7734af6abed
+  size: 6994
   path: dataset_5816_income_inequality__gini_coefficient__in_the_us__luxembourg_income_study_values.feather

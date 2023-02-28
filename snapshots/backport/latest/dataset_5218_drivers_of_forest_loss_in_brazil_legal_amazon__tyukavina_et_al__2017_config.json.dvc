@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 01:27:19.615981
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_5218_drivers_of_forest_loss_in_brazil_legal_amazon__tyukavina_et_al__2017
   namespace: backport
-  publication_date: latest
   short_name: dataset_5218_drivers_of_forest_loss_in_brazil_legal_amazon__tyukavina_et_al__2017_config
+  file_extension: json
+  date_accessed: 2023-02-23 18:51:55.906499
+  name: Grapher metadata for dataset_5218_drivers_of_forest_loss_in_brazil_legal_amazon__tyukavina_et_al__2017
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5218
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: a7ec5142ff99570a2306996fcdfe34ca
-  size: 7929
+- md5: e13568b63c9c1f51da14c007d57f3729
+  size: 10329
   path: dataset_5218_drivers_of_forest_loss_in_brazil_legal_amazon__tyukavina_et_al__2017_config.json

@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5573_polio_reported_and_estimated_cases_config
   file_extension: json
-  date_accessed: 2023-01-19 18:10:56.392611
+  date_accessed: 2023-02-23 19:01:08.857963
   name: Grapher metadata for dataset_5573_polio_reported_and_estimated_cases
   description: https://github.com/owid/notebooks/blob/main/FionaSpooner/polio_cases/combine_polio_data.ipynb
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 8cf14d70ba4f95f92c77c560a466d920
-  size: 46559
+- md5: 3cec278af1d41d6b08ca333907bc9504
+  size: 50559
   path: dataset_5573_polio_reported_and_estimated_cases_config.json

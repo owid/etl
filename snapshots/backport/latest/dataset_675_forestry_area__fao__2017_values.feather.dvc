@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:20:51.921090
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Forestry area - FAO (2017)
   namespace: backport
-  publication_date: latest
   short_name: dataset_675_forestry_area__fao__2017_values
+  file_extension: feather
+  date_accessed: 2023-02-23 19:48:27.068791
+  name: Forestry area - FAO (2017)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/675
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 76d436d7818a981793661eaac0bf9bf4
-  size: 6122
+- md5: ed185563dcbc18c9cc2758be86347343
+  size: 6490
   path: dataset_675_forestry_area__fao__2017_values.feather

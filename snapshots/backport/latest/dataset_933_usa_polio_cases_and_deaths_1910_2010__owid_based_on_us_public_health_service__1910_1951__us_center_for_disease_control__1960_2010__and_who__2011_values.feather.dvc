@@ -1,19 +1,20 @@
 meta:
-  date_accessed: 2022-12-07 17:01:05.061834
-  description: This dataset includes the total number of cases and deaths due to polio
-    as well as the case and death rates (per 100,000 population).
+  namespace: backport
+  short_name: dataset_933_usa_polio_cases_and_deaths_1910_2010__owid_based_on_us_public_health_service__1910_1951__us_center_for_disease_control__1960_2010__and_who__2011_values
   file_extension: feather
-  is_public: true
+  date_accessed: 2023-02-23 17:47:17.417972
   name: USA Polio cases and deaths 1910-2010 - OWID based on US Public Health Service
     (1910-1951); US Center for Disease Control (1960-2010); and WHO (2011-)
-  namespace: backport
-  publication_date: latest
-  short_name: dataset_933_usa_polio_cases_and_deaths_1910_2010__owid_based_on_us_public_health_service__1910_1951__us_center_for_disease_control__1960_2010__and_who__2011_values
+  description: This dataset includes the total number of cases and deaths due to polio
+    as well as the case and death rates (per 100,000 population).
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/933
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 5dbf65979f7fbf85a79aa9554cc11648
-  size: 8554
+- md5: 45c73707cd748400a76901ca2a5a6893
+  size: 8930
   path: dataset_933_usa_polio_cases_and_deaths_1910_2010__owid_based_on_us_public_health_service__1910_1951__us_center_for_disease_control__1960_2010__and_who__2011_values.feather

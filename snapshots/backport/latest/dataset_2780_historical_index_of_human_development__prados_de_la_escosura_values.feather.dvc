@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:07:46.537857
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Historical Index of Human Development - Prados de la Escosura
   namespace: backport
-  publication_date: latest
   short_name: dataset_2780_historical_index_of_human_development__prados_de_la_escosura_values
+  file_extension: feather
+  date_accessed: 2023-02-23 19:12:57.116084
+  name: Historical Index of Human Development - Prados de la Escosura
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2780
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: e2eb1cf5c6d32bd494b8fa5df27006bc
-  size: 21146
+- md5: 7d8da0ec2b6cd2ae75b6f313403dc93f
+  size: 21522
   path: dataset_2780_historical_index_of_human_development__prados_de_la_escosura_values.feather

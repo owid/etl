@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 16:55:53.843210
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Share of single parent families (UN Population Division 2018)
   namespace: backport
-  publication_date: latest
   short_name: dataset_4896_share_of_single_parent_families__un_population_division_2018_values
+  file_extension: feather
+  date_accessed: 2023-02-23 17:20:39.602788
+  name: Share of single parent families (UN Population Division 2018)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/4896
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: dc91002b41b3b07b1882a448cb97f074
-  size: 13346
+- md5: 1371b8e17327144b2f2563ed7891e0f6
+  size: 13722
   path: dataset_4896_share_of_single_parent_families__un_population_division_2018_values.feather

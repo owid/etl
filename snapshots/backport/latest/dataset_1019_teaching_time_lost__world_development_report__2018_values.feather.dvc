@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 00:12:35.139273
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Teaching time lost - World Development Report (2018)
   namespace: backport
-  publication_date: latest
   short_name: dataset_1019_teaching_time_lost__world_development_report__2018_values
+  file_extension: feather
+  date_accessed: 2023-02-23 18:58:40.181146
+  name: Teaching time lost - World Development Report (2018)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/1019
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 57a87efdebb510bbd2447f284d74554f
-  size: 6634
+- md5: afb05ec67e2cffd68faf9185f4d6740c
+  size: 7002
   path: dataset_1019_teaching_time_lost__world_development_report__2018_values.feather

@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 15:38:09.122487
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Global meat projections to 2050 - FAO
   namespace: backport
-  publication_date: latest
   short_name: dataset_2515_global_meat_projections_to_2050__fao_values
+  file_extension: feather
+  date_accessed: 2023-02-23 18:10:46.156795
+  name: Global meat projections to 2050 - FAO
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2515
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: cd13481cd7161fa4caea208992e04059
-  size: 7826
+- md5: 523145a09436974bda431cf417417adb
+  size: 8202
   path: dataset_2515_global_meat_projections_to_2050__fao_values.feather

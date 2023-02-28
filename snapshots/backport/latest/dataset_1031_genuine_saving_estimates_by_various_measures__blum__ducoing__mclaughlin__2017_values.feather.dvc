@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:52:36.634960
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Genuine saving estimates by various measures - Blum, Ducoing, McLaughlin (2017)
   namespace: backport
-  publication_date: latest
   short_name: dataset_1031_genuine_saving_estimates_by_various_measures__blum__ducoing__mclaughlin__2017_values
+  file_extension: feather
+  date_accessed: 2023-02-23 16:48:42.822500
+  name: Genuine saving estimates by various measures - Blum, Ducoing, McLaughlin (2017)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/1031
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 8c1621609733b003e5f74ecaa8e42d5f
-  size: 37442
+- md5: 47fd438ffb083f65d400e07a7f698561
+  size: 37818
   path: dataset_1031_genuine_saving_estimates_by_various_measures__blum__ducoing__mclaughlin__2017_values.feather

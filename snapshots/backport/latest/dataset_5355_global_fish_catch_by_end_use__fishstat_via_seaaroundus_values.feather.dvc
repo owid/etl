@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 15:56:08.095821
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Global fish catch by end use (FishStat via SeaAroundUs)
   namespace: backport
-  publication_date: latest
   short_name: dataset_5355_global_fish_catch_by_end_use__fishstat_via_seaaroundus_values
+  file_extension: feather
+  date_accessed: 2023-02-23 18:00:58.778871
+  name: Global fish catch by end use (FishStat via SeaAroundUs)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5355
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 835c9144d164b537b1447db7e46b276c
-  size: 1489922
+- md5: f567c84947b2945bc7453d5b1268d83e
+  size: 1490298
   path: dataset_5355_global_fish_catch_by_end_use__fishstat_via_seaaroundus_values.feather

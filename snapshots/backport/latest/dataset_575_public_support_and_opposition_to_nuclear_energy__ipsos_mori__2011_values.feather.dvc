@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:10:56.538269
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Public support and opposition to nuclear energy- Ipsos MORI (2011)
   namespace: backport
-  publication_date: latest
   short_name: dataset_575_public_support_and_opposition_to_nuclear_energy__ipsos_mori__2011_values
+  file_extension: feather
+  date_accessed: 2023-02-23 16:30:08.557952
+  name: Public support and opposition to nuclear energy- Ipsos MORI (2011)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/575
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 2bdced30d4e7b5c15c78040519b2b602
-  size: 6738
+- md5: edf15dfe50dcf9af6e02728e7af62495
+  size: 7106
   path: dataset_575_public_support_and_opposition_to_nuclear_energy__ipsos_mori__2011_values.feather

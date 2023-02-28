@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 15:57:02.121012
-  description: ''
-  file_extension: json
-  is_public: false
-  name: Grapher metadata for dataset_3103_infant_mortality_rates_in_uk__ons__2018
   namespace: backport
-  publication_date: latest
   short_name: dataset_3103_infant_mortality_rates_in_uk__ons__2018_config
+  file_extension: json
+  date_accessed: 2023-02-23 17:06:00.252436
+  name: Grapher metadata for dataset_3103_infant_mortality_rates_in_uk__ons__2018
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/3103
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: c882f33f0abe3b18f2effeef7fd2a88c
-  size: 3790
+- md5: b7775bfb5c8ab45bdbf64f1683ff4bc0
+  size: 4582
   path: dataset_3103_infant_mortality_rates_in_uk__ons__2018_config.json

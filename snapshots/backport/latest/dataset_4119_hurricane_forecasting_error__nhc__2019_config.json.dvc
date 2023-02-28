@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:19:04.533575
-  description: Extracted from PDFs using Tabula
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_4119_hurricane_forecasting_error__nhc__2019
   namespace: backport
-  publication_date: latest
   short_name: dataset_4119_hurricane_forecasting_error__nhc__2019_config
+  file_extension: json
+  date_accessed: 2023-02-23 17:02:20.812486
+  name: Grapher metadata for dataset_4119_hurricane_forecasting_error__nhc__2019
+  description: Extracted from PDFs using Tabula
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/4119
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 63fb756a3d613a1a81f15402b64acfbc
-  size: 7629
+- md5: 375014db861a4cbca8d740300ecc3dbf
+  size: 10829
   path: dataset_4119_hurricane_forecasting_error__nhc__2019_config.json

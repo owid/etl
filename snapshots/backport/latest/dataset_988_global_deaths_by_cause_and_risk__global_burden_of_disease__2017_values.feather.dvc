@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 01:01:13.653150
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Global deaths by cause and risk - Global Burden of Disease (2017)
   namespace: backport
-  publication_date: latest
   short_name: dataset_988_global_deaths_by_cause_and_risk__global_burden_of_disease__2017_values
+  file_extension: feather
+  date_accessed: 2023-02-23 15:01:10.551167
+  name: Global deaths by cause and risk - Global Burden of Disease (2017)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/988
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 3be594ed76f954a7b9dec4659bfdf0a0
-  size: 341074
+- md5: a588a9ef3cea9044468a172ea0c7c0a4
+  size: 341450
   path: dataset_988_global_deaths_by_cause_and_risk__global_burden_of_disease__2017_values.feather

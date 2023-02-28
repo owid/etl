@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 15:58:59.551641
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Plastic discarded, recycled, incinerated - Geyer et al. (2017)
   namespace: backport
-  publication_date: latest
   short_name: dataset_2844_plastic_discarded__recycled__incinerated__geyer_et_al__2017_values
+  file_extension: feather
+  date_accessed: 2023-02-23 19:44:15.824377
+  name: Plastic discarded, recycled, incinerated - Geyer et al. (2017)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2844
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 09ccc093669d9637af32311d23899ee4
-  size: 7106
+- md5: ad5bb68df24996202f803090060b6acd
+  size: 7482
   path: dataset_2844_plastic_discarded__recycled__incinerated__geyer_et_al__2017_values.feather

@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 16:55:02.825480
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_580_land_under_cereal_production_index__world_bank__2017
   namespace: backport
-  publication_date: latest
   short_name: dataset_580_land_under_cereal_production_index__world_bank__2017_config
+  file_extension: json
+  date_accessed: 2023-02-23 19:30:21.760000
+  name: Grapher metadata for dataset_580_land_under_cereal_production_index__world_bank__2017
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/580
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 0c3c9cccabd17ebdb0573d7525ebff58
-  size: 3043
+- md5: ac61ce791663028ae6a54c21db30157c
+  size: 3239
   path: dataset_580_land_under_cereal_production_index__world_bank__2017_config.json

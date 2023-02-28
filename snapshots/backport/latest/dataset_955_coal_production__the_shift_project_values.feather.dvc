@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:42:43.483085
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Coal production - The SHIFT Project
   namespace: backport
-  publication_date: latest
   short_name: dataset_955_coal_production__the_shift_project_values
+  file_extension: feather
+  date_accessed: 2023-02-23 16:14:28.003557
+  name: Coal production - The SHIFT Project
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/955
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: b10c3c0b5c22ac86078e46847e4422a9
-  size: 56714
+- md5: 3f5dce76832b1dcd9bffbe24a2930297
+  size: 57090
   path: dataset_955_coal_production__the_shift_project_values.feather

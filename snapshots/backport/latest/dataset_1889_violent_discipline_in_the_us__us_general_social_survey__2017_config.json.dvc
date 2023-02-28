@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:01:59.776465
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_1889_violent_discipline_in_the_us__us_general_social_survey__2017
   namespace: backport
-  publication_date: latest
   short_name: dataset_1889_violent_discipline_in_the_us__us_general_social_survey__2017_config
+  file_extension: json
+  date_accessed: 2023-02-23 15:04:14.183362
+  name: Grapher metadata for dataset_1889_violent_discipline_in_the_us__us_general_social_survey__2017
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/1889
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 16a08d869e2b7da5be850d97c62acc9b
-  size: 6229
+- md5: 2e23ede618dfd1dfc1bbd8ce137b65bc
+  size: 7615
   path: dataset_1889_violent_discipline_in_the_us__us_general_social_survey__2017_config.json

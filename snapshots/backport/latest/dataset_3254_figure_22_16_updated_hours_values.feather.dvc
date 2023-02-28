@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 15:49:37.444465
-  description: core-econ.org
-  file_extension: feather
-  is_public: false
-  name: Figure 22.16_updated_hours
   namespace: backport
-  publication_date: latest
   short_name: dataset_3254_figure_22_16_updated_hours_values
+  file_extension: feather
+  date_accessed: 2023-02-23 19:11:44.717340
+  name: Figure 22.16_updated_hours
+  description: core-econ.org
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/3254
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: e540517ec33932a73b5cbb3a48ee33fb
-  size: 6434
+- md5: 3077b5489b171e6e03d041e95676aada
+  size: 6802
   path: dataset_3254_figure_22_16_updated_hours_values.feather

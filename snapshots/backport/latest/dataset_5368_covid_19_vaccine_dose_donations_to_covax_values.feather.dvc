@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:14:15.807816
-  description: ''
-  file_extension: feather
-  is_public: false
-  name: COVID-19 vaccine dose donations to COVAX
   namespace: backport
-  publication_date: latest
   short_name: dataset_5368_covid_19_vaccine_dose_donations_to_covax_values
+  file_extension: feather
+  date_accessed: 2023-02-23 18:44:28.881204
+  name: COVID-19 vaccine dose donations to COVAX
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5368
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: f4e61bd301a24649ed596daf873a7846
-  size: 8706
+- md5: 767da371d71164dd3bf900b4f6b62dfc
+  size: 9082
   path: dataset_5368_covid_19_vaccine_dose_donations_to_covax_values.feather

@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:57:43.605112
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Price for Light – Fouquet
   namespace: backport
-  publication_date: latest
   short_name: dataset_187_price_for_light__fouquet_values
+  file_extension: feather
+  date_accessed: 2023-02-23 17:59:01.070828
+  name: Price for Light – Fouquet
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/187
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 35348132f132a86a05ded8495e6fb869
-  size: 12506
+- md5: c0cc8a7e5d5860bdc49a7e910b36fd80
+  size: 12882
   path: dataset_187_price_for_light__fouquet_values.feather

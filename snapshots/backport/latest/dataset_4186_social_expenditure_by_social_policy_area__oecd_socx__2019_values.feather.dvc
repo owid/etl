@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:58:12.910728
-  description: ''
-  file_extension: feather
-  is_public: false
-  name: Social expenditure by social policy area - OECD SOCX (2019)
   namespace: backport
-  publication_date: latest
   short_name: dataset_4186_social_expenditure_by_social_policy_area__oecd_socx__2019_values
+  file_extension: feather
+  date_accessed: 2023-02-23 16:37:17.497116
+  name: Social expenditure by social policy area - OECD SOCX (2019)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/4186
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: b40ea10108332d74ff38758b1a449ce6
-  size: 20666
+- md5: 322c481bd9fe4d02025dc21a52c0d95d
+  size: 21042
   path: dataset_4186_social_expenditure_by_social_policy_area__oecd_socx__2019_values.feather

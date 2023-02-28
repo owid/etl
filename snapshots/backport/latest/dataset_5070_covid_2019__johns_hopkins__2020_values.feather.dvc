@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 00:30:33.729582
-  description: ''
-  file_extension: feather
-  is_public: false
-  name: COVID-2019 - Johns Hopkins (2020)
   namespace: backport
-  publication_date: latest
   short_name: dataset_5070_covid_2019__johns_hopkins__2020_values
+  file_extension: feather
+  date_accessed: 2023-02-23 18:45:15.544178
+  name: COVID-2019 - Johns Hopkins (2020)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5070
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 3dc9eaa5e1c67059a61c6d8ff09092dd
-  size: 44522
+- md5: 2df3ef16869fea909ee7688ca1ccc10a
+  size: 44898
   path: dataset_5070_covid_2019__johns_hopkins__2020_values.feather

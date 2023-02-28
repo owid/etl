@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:19:30.371005
-  description: core-econ.org
-  file_extension: feather
-  is_public: false
-  name: ESPP_1.9
   namespace: backport
-  publication_date: latest
   short_name: dataset_4106_espp_1_9_values
+  file_extension: feather
+  date_accessed: 2023-02-23 17:11:58.462033
+  name: ESPP_1.9
+  description: core-econ.org
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/4106
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 79ef381858a7c0bbedf858dc8b9fa685
-  size: 6002
+- md5: c24a8eb118c6428cf57b97968aa240ea
+  size: 6370
   path: dataset_4106_espp_1_9_values.feather

@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:45:19.321291
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Year of smallpox eradication by country - WHO (1988)
   namespace: backport
-  publication_date: latest
   short_name: dataset_917_year_of_smallpox_eradication_by_country__who__1988_values
+  file_extension: feather
+  date_accessed: 2023-02-23 18:12:11.393378
+  name: Year of smallpox eradication by country - WHO (1988)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/917
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 06f124f6d5834f1da1dd3c1d4ed815ee
-  size: 10498
+- md5: 9aad2e24f9755fba416423e0f610fe5d
+  size: 10874
   path: dataset_917_year_of_smallpox_eradication_by_country__who__1988_values.feather

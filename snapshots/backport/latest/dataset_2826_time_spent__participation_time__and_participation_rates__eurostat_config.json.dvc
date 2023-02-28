@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:29:38.687760
-  description: ''
-  file_extension: json
-  is_public: false
-  name: Grapher metadata for dataset_2826_time_spent__participation_time__and_participation_rates__eurostat
   namespace: backport
-  publication_date: latest
   short_name: dataset_2826_time_spent__participation_time__and_participation_rates__eurostat_config
+  file_extension: json
+  date_accessed: 2023-02-23 16:56:29.308777
+  name: Grapher metadata for dataset_2826_time_spent__participation_time__and_participation_rates__eurostat
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2826
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 95a4f1e060b5a3e768e652c490141f6a
-  size: 14881
+- md5: ee46b9e5eae66be5014d7fe8a3026ea5
+  size: 18445
   path: dataset_2826_time_spent__participation_time__and_participation_rates__eurostat_config.json

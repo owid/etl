@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 00:44:32.577165
-  description: core-econ.org
-  file_extension: feather
-  is_public: false
-  name: Figure_17.1c-2
   namespace: backport
-  publication_date: latest
   short_name: dataset_5106_figure_17_1c_2_values
+  file_extension: feather
+  date_accessed: 2023-02-23 19:31:54.300630
+  name: Figure_17.1c-2
+  description: core-econ.org
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5106
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: ea70a192bd6c20c1713176e20c9508df
-  size: 5834
+- md5: c52cf7d67ae5fbd0ae99da8cc51647df
+  size: 6202
   path: dataset_5106_figure_17_1c_2_values.feather

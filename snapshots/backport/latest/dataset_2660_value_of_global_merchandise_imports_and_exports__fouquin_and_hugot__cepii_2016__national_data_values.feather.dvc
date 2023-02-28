@@ -1,18 +1,19 @@
 meta:
-  date_accessed: 2022-12-07 15:40:03.766603
-  description: This dataset uses Fouquin and Hugot (CEPII 2016) national trade data.
+  namespace: backport
+  short_name: dataset_2660_value_of_global_merchandise_imports_and_exports__fouquin_and_hugot__cepii_2016__national_data_values
   file_extension: feather
-  is_public: true
+  date_accessed: 2023-02-23 18:54:15.882187
   name: Value of global merchandise imports and exports - (Fouquin and Hugot (CEPII
     2016) National data)
-  namespace: backport
-  publication_date: latest
-  short_name: dataset_2660_value_of_global_merchandise_imports_and_exports__fouquin_and_hugot__cepii_2016__national_data_values
+  description: This dataset uses Fouquin and Hugot (CEPII 2016) national trade data.
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2660
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 43b976c9c0e5822bd1a158875f307605
-  size: 225402
+- md5: 88a1e24b9d625edb1f92688e980fd587
+  size: 225778
   path: dataset_2660_value_of_global_merchandise_imports_and_exports__fouquin_and_hugot__cepii_2016__national_data_values.feather

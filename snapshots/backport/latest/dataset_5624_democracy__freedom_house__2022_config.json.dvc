@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:48:49.039323
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_5624_democracy__freedom_house__2022
   namespace: backport
-  publication_date: latest
   short_name: dataset_5624_democracy__freedom_house__2022_config
+  file_extension: json
+  date_accessed: 2023-02-23 16:24:39.452339
+  name: Grapher metadata for dataset_5624_democracy__freedom_house__2022
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5624
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 519ba5d4b411be5d05bf5e1879bd2510
-  size: 13864
+- md5: 5c9f758d3f3a47ca42c859afdd24ecbf
+  size: 18064
   path: dataset_5624_democracy__freedom_house__2022_config.json

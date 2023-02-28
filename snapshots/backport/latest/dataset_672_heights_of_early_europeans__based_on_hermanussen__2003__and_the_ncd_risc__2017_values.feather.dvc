@@ -1,18 +1,19 @@
 meta:
-  date_accessed: 2022-12-07 17:41:37.563207
-  description: ''
+  namespace: backport
+  short_name: dataset_672_heights_of_early_europeans__based_on_hermanussen__2003__and_the_ncd_risc__2017_values
   file_extension: feather
-  is_public: true
+  date_accessed: 2023-02-23 18:11:38.727262
   name: Heights of Early Europeans - based on Hermanussen (2003) and the NCD RisC
     (2017)
-  namespace: backport
-  publication_date: latest
-  short_name: dataset_672_heights_of_early_europeans__based_on_hermanussen__2003__and_the_ncd_risc__2017_values
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/672
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 85ac1bb3e4a633352bc3b7cb4d907089
-  size: 7930
+- md5: 935feca9389f55ad06bf054a1871a9ea
+  size: 8306
   path: dataset_672_heights_of_early_europeans__based_on_hermanussen__2003__and_the_ncd_risc__2017_values.feather

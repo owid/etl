@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 16:30:29.608331
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_5193_air_travel_trips_per_capita__airbus__2019
   namespace: backport
-  publication_date: latest
   short_name: dataset_5193_air_travel_trips_per_capita__airbus__2019_config
+  file_extension: json
+  date_accessed: 2023-02-23 19:36:52.139280
+  name: Grapher metadata for dataset_5193_air_travel_trips_per_capita__airbus__2019
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5193
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: e2ddfbd7c545c9c9225b0dc1d6a83142
-  size: 1470
+- md5: 714e8e67ac39bc20be5fc4cee40e2301
+  size: 1670
   path: dataset_5193_air_travel_trips_per_capita__airbus__2019_config.json

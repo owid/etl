@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:24:45.700870
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Levels of Urbanization and per capita GNP in Various Regions - Bairoch (1988)
   namespace: backport
-  publication_date: latest
   short_name: dataset_2842_levels_of_urbanization_and_per_capita_gnp_in_various_regions__bairoch__1988_values
+  file_extension: feather
+  date_accessed: 2023-02-23 17:23:44.039925
+  name: Levels of Urbanization and per capita GNP in Various Regions - Bairoch (1988)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2842
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: bd6eea91c38f4492bf098e621c3c817e
-  size: 6674
+- md5: 557db5d661e8ee4009d36b0471a8fed4
+  size: 7050
   path: dataset_2842_levels_of_urbanization_and_per_capita_gnp_in_various_regions__bairoch__1988_values.feather

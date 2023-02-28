@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 16:29:06.782011
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_2784_health_provider_absence_rates__chaudhury__hammer__kremer__muralidharan__and_rogers__2006
   namespace: backport
-  publication_date: latest
   short_name: dataset_2784_health_provider_absence_rates__chaudhury__hammer__kremer__muralidharan__and_rogers__2006_config
+  file_extension: json
+  date_accessed: 2023-02-23 19:25:08.751112
+  name: Grapher metadata for dataset_2784_health_provider_absence_rates__chaudhury__hammer__kremer__muralidharan__and_rogers__2006
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2784
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 6d07ce24260e58d3fb361b6848707f82
-  size: 2268
+- md5: e83563d49387f258f99aa9f1696924be
+  size: 2466
   path: dataset_2784_health_provider_absence_rates__chaudhury__hammer__kremer__muralidharan__and_rogers__2006_config.json

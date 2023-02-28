@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 15:52:20.650536
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: National poverty lines (Jolliffe et al., 2022)
   namespace: backport
-  publication_date: latest
   short_name: dataset_5800_national_poverty_lines__jolliffe_et_al__2022_values
+  file_extension: feather
+  date_accessed: 2023-02-23 18:05:27.458121
+  name: National poverty lines (Jolliffe et al., 2022)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5800
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 1cd6f96b5b77a07228bddc9e5234c7f3
-  size: 15138
+- md5: 50e0714e5306c7f1b669610a5bb2e957
+  size: 15514
   path: dataset_5800_national_poverty_lines__jolliffe_et_al__2022_values.feather

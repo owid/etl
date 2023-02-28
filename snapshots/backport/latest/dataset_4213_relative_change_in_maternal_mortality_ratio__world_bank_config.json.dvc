@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:52:49.913703
-  description: ''
-  file_extension: json
-  is_public: false
-  name: Grapher metadata for dataset_4213_relative_change_in_maternal_mortality_ratio__world_bank
   namespace: backport
-  publication_date: latest
   short_name: dataset_4213_relative_change_in_maternal_mortality_ratio__world_bank_config
+  file_extension: json
+  date_accessed: 2023-02-23 18:12:37.912756
+  name: Grapher metadata for dataset_4213_relative_change_in_maternal_mortality_ratio__world_bank
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/4213
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: b189c71119108250c7a9ac315a9af715
-  size: 1598
+- md5: eda41806b86da93da209726815bc21a4
+  size: 1798
   path: dataset_4213_relative_change_in_maternal_mortality_ratio__world_bank_config.json

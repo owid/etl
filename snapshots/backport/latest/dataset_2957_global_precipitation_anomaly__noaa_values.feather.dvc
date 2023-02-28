@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 15:58:03.926900
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Global precipitation anomaly (NOAA)
   namespace: backport
-  publication_date: latest
   short_name: dataset_2957_global_precipitation_anomaly__noaa_values
+  file_extension: feather
+  date_accessed: 2023-02-23 18:10:06.634192
+  name: Global precipitation anomaly (NOAA)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2957
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 8f0b1cda9e8dcf2da27473831445f0fc
-  size: 7274
+- md5: be5f5afd8b86e3945cb12d2438bc1efe
+  size: 7650
   path: dataset_2957_global_precipitation_anomaly__noaa_values.feather

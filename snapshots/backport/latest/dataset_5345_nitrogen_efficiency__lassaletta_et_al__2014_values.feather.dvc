@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:44:26.781857
-  description: ''
-  file_extension: feather
-  is_public: false
-  name: Nitrogen efficiency (Lassaletta et al. 2014)
   namespace: backport
-  publication_date: latest
   short_name: dataset_5345_nitrogen_efficiency__lassaletta_et_al__2014_values
+  file_extension: feather
+  date_accessed: 2023-02-23 19:04:20.155241
+  name: Nitrogen efficiency (Lassaletta et al. 2014)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5345
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: a5593e964bfce95adb85d8a5108c83b5
-  size: 251730
+- md5: c409e6fc0d2cf0b5c48db45cb4650c35
+  size: 252106
   path: dataset_5345_nitrogen_efficiency__lassaletta_et_al__2014_values.feather

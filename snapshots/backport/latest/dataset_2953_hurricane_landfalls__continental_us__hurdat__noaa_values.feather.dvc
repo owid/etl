@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:36:53.180205
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Hurricane Landfalls, Continental US (HURDAT, NOAA)
   namespace: backport
-  publication_date: latest
   short_name: dataset_2953_hurricane_landfalls__continental_us__hurdat__noaa_values
+  file_extension: feather
+  date_accessed: 2023-02-23 15:09:38.823502
+  name: Hurricane Landfalls, Continental US (HURDAT, NOAA)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2953
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 1a41f5298b5d21d5f1b8e11ec3fe4f8c
-  size: 7554
+- md5: 8d02080c6684b39144cba72e91a5fe8f
+  size: 7930
   path: dataset_2953_hurricane_landfalls__continental_us__hurdat__noaa_values.feather

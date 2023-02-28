@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:19:20.548107
-  description: Manual update of spreadsheet
-  file_extension: feather
-  is_public: true
-  name: Guinea Worm Cases - The Carter Center (2022)
   namespace: backport
-  publication_date: latest
   short_name: dataset_216_guinea_worm_cases__the_carter_center__2022_values
+  file_extension: feather
+  date_accessed: 2023-02-23 17:35:52.651913
+  name: Guinea Worm Cases - The Carter Center (2022)
+  description: Manual update of spreadsheet
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/216
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 32ea9ac3e2cb88b52bc92c7332fc5642
-  size: 6178
+- md5: 55a78d4734775fa461da7c0f5c660f99
+  size: 6546
   path: dataset_216_guinea_worm_cases__the_carter_center__2022_values.feather

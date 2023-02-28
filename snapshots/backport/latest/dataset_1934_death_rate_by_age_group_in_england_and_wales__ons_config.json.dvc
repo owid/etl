@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 01:15:16.792664
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_1934_death_rate_by_age_group_in_england_and_wales__ons
   namespace: backport
-  publication_date: latest
   short_name: dataset_1934_death_rate_by_age_group_in_england_and_wales__ons_config
+  file_extension: json
+  date_accessed: 2023-02-23 15:12:44.932203
+  name: Grapher metadata for dataset_1934_death_rate_by_age_group_in_england_and_wales__ons
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/1934
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: d98f048e560393bbb57bb1b704cbf629
-  size: 8856
+- md5: 31877de14c4360563c6a39de61201dfa
+  size: 12420
   path: dataset_1934_death_rate_by_age_group_in_england_and_wales__ons_config.json

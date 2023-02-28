@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:17:41.612051
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_3271_sex_ratio_at_birth__chao_et_al__2019
   namespace: backport
-  publication_date: latest
   short_name: dataset_3271_sex_ratio_at_birth__chao_et_al__2019_config
+  file_extension: json
+  date_accessed: 2023-02-23 17:14:55.841896
+  name: Grapher metadata for dataset_3271_sex_ratio_at_birth__chao_et_al__2019
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/3271
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: f0f7cb5798fcb6d335bd237727037166
-  size: 2081
+- md5: 7fa5e71673eb59909d4284000307ad15
+  size: 2279
   path: dataset_3271_sex_ratio_at_birth__chao_et_al__2019_config.json

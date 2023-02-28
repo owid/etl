@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:09:18.709126
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_5199_who_americans_spend_time_with__american_time_use_survey__2009_2019
   namespace: backport
-  publication_date: latest
   short_name: dataset_5199_who_americans_spend_time_with__american_time_use_survey__2009_2019_config
+  file_extension: json
+  date_accessed: 2023-02-23 16:27:58.962383
+  name: Grapher metadata for dataset_5199_who_americans_spend_time_with__american_time_use_survey__2009_2019
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5199
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 3803601501ec81b55fce9597ca5e42db
-  size: 6637
+- md5: 4ad5d8ad34cc33bccf5377e077bec089
+  size: 8237
   path: dataset_5199_who_americans_spend_time_with__american_time_use_survey__2009_2019_config.json

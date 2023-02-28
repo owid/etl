@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 00:21:41.972080
-  description: core-econ.org
-  file_extension: feather
-  is_public: false
-  name: Figure 19.1_ Disposable_income_inequality
   namespace: backport
-  publication_date: latest
   short_name: dataset_3243_figure_19_1__disposable_income_inequality_values
+  file_extension: feather
+  date_accessed: 2023-02-23 16:31:08.152685
+  name: Figure 19.1_ Disposable_income_inequality
+  description: core-econ.org
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/3243
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 37ec91465a66ac239c1340c4f887a177
-  size: 5898
+- md5: 1466e02b336e8e2284ad786455a1bdd7
+  size: 6266
   path: dataset_3243_figure_19_1__disposable_income_inequality_values.feather

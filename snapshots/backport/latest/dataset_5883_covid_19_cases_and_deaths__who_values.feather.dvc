@@ -1,0 +1,18 @@
+meta:
+  namespace: backport
+  short_name: dataset_5883_covid_19_cases_and_deaths__who_values
+  file_extension: feather
+  date_accessed: 2023-02-28 06:11:16.452663
+  name: COVID-19 Cases and deaths - WHO
+  description: WORK IN PROGRESS
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/5883
+  source_published_by: Our World in Data catalog backport
+  is_public: false
+  version: latest
+  publication_date: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: e13584ca213cca02c1469d767408a116
+  size: 22042234
+  path: dataset_5883_covid_19_cases_and_deaths__who_values.feather

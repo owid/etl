@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:53:35.569489
-  description: ''
-  file_extension: feather
-  is_public: false
-  name: COVID-19 Model Estimates – LSHTM (2020)
   namespace: backport
-  publication_date: latest
   short_name: dataset_5098_covid_19_model_estimates__lshtm__2020_values
+  file_extension: feather
+  date_accessed: 2023-02-23 19:41:45.101103
+  name: COVID-19 Model Estimates – LSHTM (2020)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5098
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 1046722d744a62295d9324eed8cef979
-  size: 486522
+- md5: ec791026f547e11fc70f2aa19c99351c
+  size: 486898
   path: dataset_5098_covid_19_model_estimates__lshtm__2020_values.feather

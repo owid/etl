@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:08:27.702783
-  description: ''
-  file_extension: json
-  is_public: false
-  name: Grapher metadata for dataset_5239_soil_lifespans__evans_et_al__2020
   namespace: backport
-  publication_date: latest
   short_name: dataset_5239_soil_lifespans__evans_et_al__2020_config
+  file_extension: json
+  date_accessed: 2023-02-23 19:11:57.182686
+  name: Grapher metadata for dataset_5239_soil_lifespans__evans_et_al__2020
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5239
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 1e450197774ce5c988442659905cc669
-  size: 1932
+- md5: f18bfb35777b730dce5a4fbba7630e03
+  size: 2332
   path: dataset_5239_soil_lifespans__evans_et_al__2020_config.json

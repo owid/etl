@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 16:57:33.180772
-  description: This is a dataset imported by the automated fetcher
-  file_extension: feather
-  is_public: true
-  name: Unemployment and labour underutilization
   namespace: backport
-  publication_date: latest
   short_name: dataset_1862_unemployment_and_labour_underutilization_values
+  file_extension: feather
+  date_accessed: 2023-02-23 18:45:01.343689
+  name: Unemployment and labour underutilization
+  description: This is a dataset imported by the automated fetcher
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/1862
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: bb7f42ccc65acab2687e2afca94c4495
-  size: 245330
+- md5: df995dab293e702e2748bfa4fc2dc1ab
+  size: 245706
   path: dataset_1862_unemployment_and_labour_underutilization_values.feather

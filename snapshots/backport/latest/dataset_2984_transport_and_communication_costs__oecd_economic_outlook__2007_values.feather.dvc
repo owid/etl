@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 00:17:00.047275
-  description: ''
-  file_extension: feather
-  is_public: false
-  name: Transport and communication costs, OECD Economic Outlook (2007)
   namespace: backport
-  publication_date: latest
   short_name: dataset_2984_transport_and_communication_costs__oecd_economic_outlook__2007_values
+  file_extension: feather
+  date_accessed: 2023-02-23 18:21:13.785828
+  name: Transport and communication costs, OECD Economic Outlook (2007)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2984
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 575ff31ab1f7d430c8fd47b1949a2217
-  size: 7418
+- md5: 6473b2f0298c6e109f970bcf952d9fbc
+  size: 7794
   path: dataset_2984_transport_and_communication_costs__oecd_economic_outlook__2007_values.feather

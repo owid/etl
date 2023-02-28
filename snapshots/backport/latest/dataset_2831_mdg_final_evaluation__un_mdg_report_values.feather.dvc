@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 15:53:41.774384
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: MDG Final Evaluation (UN MDG Report)
   namespace: backport
-  publication_date: latest
   short_name: dataset_2831_mdg_final_evaluation__un_mdg_report_values
+  file_extension: feather
+  date_accessed: 2023-02-23 16:56:03.367195
+  name: MDG Final Evaluation (UN MDG Report)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2831
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 13dd7d392e84f0464e0138d4a70623c7
-  size: 6722
+- md5: 512ca41b5e247c201644b60c42eb14d6
+  size: 7090
   path: dataset_2831_mdg_final_evaluation__un_mdg_report_values.feather

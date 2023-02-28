@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 01:24:13.155074
-  description: ''
-  file_extension: json
-  is_public: false
-  name: Grapher metadata for dataset_5232_reconstruction_of_historical_poverty_trends_by_country__1820_2017__owid_based_on_maddison_project_database_2020_and_van_zanden_et_al__2014
   namespace: backport
-  publication_date: latest
   short_name: dataset_5232_reconstruction_of_historical_poverty_trends_by_country__1820_2017__owid_based_on_maddison_project_database_2020_and_van_zanden_et_al__2014_config
+  file_extension: json
+  date_accessed: 2023-02-23 15:03:14.719603
+  name: Grapher metadata for dataset_5232_reconstruction_of_historical_poverty_trends_by_country__1820_2017__owid_based_on_maddison_project_database_2020_and_van_zanden_et_al__2014
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5232
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 3b0dc71db1e4226ba2c33c1f28d5388a
-  size: 9073
+- md5: 52a174a4282124934bf7f9982185dab4
+  size: 12473
   path: dataset_5232_reconstruction_of_historical_poverty_trends_by_country__1820_2017__owid_based_on_maddison_project_database_2020_and_van_zanden_et_al__2014_config.json

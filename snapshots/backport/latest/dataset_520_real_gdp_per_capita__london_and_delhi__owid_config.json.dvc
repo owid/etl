@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 01:15:40.538653
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_520_real_gdp_per_capita__london_and_delhi__owid
   namespace: backport
-  publication_date: latest
   short_name: dataset_520_real_gdp_per_capita__london_and_delhi__owid_config
+  file_extension: json
+  date_accessed: 2023-02-23 17:42:17.455776
+  name: Grapher metadata for dataset_520_real_gdp_per_capita__london_and_delhi__owid
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/520
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 56cab271195a40e7990c0640da35cf86
-  size: 1885
+- md5: 3886b4e651392c94fb08016a1f450d82
+  size: 2081
   path: dataset_520_real_gdp_per_capita__london_and_delhi__owid_config.json

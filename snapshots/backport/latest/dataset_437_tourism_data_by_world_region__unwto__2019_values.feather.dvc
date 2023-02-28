@@ -1,12 +1,13 @@
 meta:
   namespace: backport
   short_name: dataset_437_tourism_data_by_world_region__unwto__2019_values
+  file_extension: feather
+  date_accessed: 2023-02-23 18:20:41.111018
   name: Tourism data by World Region - UNWTO (2019)
   description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/437
-  file_extension: feather
-  date_accessed: 2023-01-05 23:42:38.951016
+  source_published_by: Our World in Data catalog backport
   is_public: true
   version: latest
   publication_date: latest

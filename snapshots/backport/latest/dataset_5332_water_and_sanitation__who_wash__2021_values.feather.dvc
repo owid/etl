@@ -1,19 +1,21 @@
 meta:
-  date_accessed: 2022-11-29 16:38:32.959988
-  description: "Data cleaned using this script: https://github.com/owid/notebooks/blob/main/FionaSpooner/WASH/cleaning_who_wash_data.Rmd\n\
-    \nScript removes erroneous negative values and rounds data to appropriate number\
-    \ of decimal places, 0 for integer, 2 otherwise. "
-  file_extension: feather
-  is_public: true
-  name: Water and Sanitation (WHO WASH, 2021)
   namespace: backport
-  publication_date: latest
   short_name: dataset_5332_water_and_sanitation__who_wash__2021_values
+  file_extension: feather
+  date_accessed: 2023-02-23 16:46:06.716731
+  name: Water and Sanitation (WHO WASH, 2021)
+  description: |-
+    Data cleaned using this script: https://github.com/owid/notebooks/blob/main/FionaSpooner/WASH/cleaning_who_wash_data.Rmd
+
+    Script removes erroneous negative values and rounds data to appropriate number of decimal places, 0 for integer, 2 otherwise.
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5332
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: e030d3d1128f676f787921dec495a3b4
-  size: 1618266
+- md5: fb0eb7dc71668b4fb33093a6032e1ca4
+  size: 1618650
   path: dataset_5332_water_and_sanitation__who_wash__2021_values.feather

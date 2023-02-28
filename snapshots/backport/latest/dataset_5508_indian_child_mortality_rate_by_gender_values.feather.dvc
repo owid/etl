@@ -1,24 +1,28 @@
 meta:
-  date_accessed: 2022-12-08 00:09:53.119615
-  description: "Permalink: http://ghdx.healthdata.org/gbd-results-tool?params=gbd-api-2019-permalink/4f9d6dd65a1127c3a0d4c6a7868346b6\n\
-    \nLocation: India\nYear: Most recent\nContext: Cause\nAge: 1 to 4\nMetric: Rate\n\
-    Measure: Deaths\nSex: Male, Female\nCause: Acute hepatitis, Congenital birth defects,\
-    \ Diarrheal diseases, Digestive diseases, Encephalitis, Enteric infections, Congenital\
-    \ heart anomalies, Kidney diseases, Liver diseases, Lower respiratory infections,\
-    \ Malaria, Measles, Nutritional deficiencies, Protein-energy malnutrition, Syphilis,\
-    \ Tetanus, Tuberculosis, Typhoid fever, Upper respiratory infections, Whooping\
-    \ cough. \n\n\n"
-  file_extension: feather
-  is_public: false
-  name: Indian child mortality rate by gender
   namespace: backport
-  publication_date: latest
   short_name: dataset_5508_indian_child_mortality_rate_by_gender_values
+  file_extension: feather
+  date_accessed: 2023-02-23 18:48:35.379318
+  name: Indian child mortality rate by gender
+  description: |-
+    Permalink: http://ghdx.healthdata.org/gbd-results-tool?params=gbd-api-2019-permalink/4f9d6dd65a1127c3a0d4c6a7868346b6
+
+    Location: India
+    Year: Most recent
+    Context: Cause
+    Age: 1 to 4
+    Metric: Rate
+    Measure: Deaths
+    Sex: Male, Female
+    Cause: Acute hepatitis, Congenital birth defects, Diarrheal diseases, Digestive diseases, Encephalitis, Enteric infections, Congenital heart anomalies, Kidney diseases, Liver diseases, Lower respiratory infections, Malaria, Measles, Nutritional deficiencies, Protein-energy malnutrition, Syphilis, Tetanus, Tuberculosis, Typhoid fever, Upper respiratory infections, Whooping cough.
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5508
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 2fa057457a1cb664fb4ec460349dfdb4
-  size: 6586
+- md5: 21f470fa2111d2671819ecf03da599fc
+  size: 6962
   path: dataset_5508_indian_child_mortality_rate_by_gender_values.feather

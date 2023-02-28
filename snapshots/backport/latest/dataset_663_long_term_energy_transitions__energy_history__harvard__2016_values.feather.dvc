@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 16:32:34.316775
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Long-term energy transitions - Energy History, Harvard (2016)
   namespace: backport
-  publication_date: latest
   short_name: dataset_663_long_term_energy_transitions__energy_history__harvard__2016_values
+  file_extension: feather
+  date_accessed: 2023-02-23 18:28:25.184654
+  name: Long-term energy transitions - Energy History, Harvard (2016)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/663
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 9c388ac63d3799294e09a8d632b7110f
-  size: 48850
+- md5: 667ab7f4658bc39c9f620eeb8399f7b4
+  size: 49234
   path: dataset_663_long_term_energy_transitions__energy_history__harvard__2016_values.feather

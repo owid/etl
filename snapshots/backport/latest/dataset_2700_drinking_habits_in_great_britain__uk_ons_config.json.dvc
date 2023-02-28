@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 15:40:06.035510
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_2700_drinking_habits_in_great_britain__uk_ons
   namespace: backport
-  publication_date: latest
   short_name: dataset_2700_drinking_habits_in_great_britain__uk_ons_config
+  file_extension: json
+  date_accessed: 2023-02-23 18:30:35.399567
+  name: Grapher metadata for dataset_2700_drinking_habits_in_great_britain__uk_ons
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2700
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 232a5b7272c08b25d1c2050a66425d7a
-  size: 2843
+- md5: 96c6b3c6849d24fa8baac1a42a6d22df
+  size: 3635
   path: dataset_2700_drinking_habits_in_great_britain__uk_ons_config.json

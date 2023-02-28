@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:20:16.366795
-  description: This is a dataset imported by the automated fetcher
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_1866_ilo_modelled_estimates
   namespace: backport
-  publication_date: latest
   short_name: dataset_1866_ilo_modelled_estimates_config
+  file_extension: json
+  date_accessed: 2023-02-23 17:57:19.709319
+  name: Grapher metadata for dataset_1866_ilo_modelled_estimates
+  description: This is a dataset imported by the automated fetcher
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/1866
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: f1befa6629675524ff23c073fa2737c3
-  size: 352585
+- md5: db46bf84e502526eaea1a26eae166291
+  size: 403471
   path: dataset_1866_ilo_modelled_estimates_config.json

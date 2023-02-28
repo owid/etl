@@ -1,19 +1,20 @@
 meta:
-  date_accessed: 2022-12-08 01:25:26.656802
+  namespace: backport
+  short_name: dataset_2985_global_corruption_barometer__transparancy_international__2017_config
+  file_extension: json
+  date_accessed: 2023-02-23 17:08:35.570864
+  name: Grapher metadata for dataset_2985_global_corruption_barometer__transparancy_international__2017
   description: The surveys are spread across years, and the metrics are not constant
     over time, which makes this a tricky dataset. It's necessary to allow tolerance
     when using it to make graphs.
-  file_extension: json
-  is_public: false
-  name: Grapher metadata for dataset_2985_global_corruption_barometer__transparancy_international__2017
-  namespace: backport
-  publication_date: latest
-  short_name: dataset_2985_global_corruption_barometer__transparancy_international__2017_config
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2985
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: bb95f0dda22c7852a8638644f475d718
-  size: 11055
+- md5: 245b21dc761fe1da984b3daed1c44271
+  size: 14795
   path: dataset_2985_global_corruption_barometer__transparancy_international__2017_config.json

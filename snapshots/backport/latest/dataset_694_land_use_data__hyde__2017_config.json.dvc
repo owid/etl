@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:50:04.236913
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_694_land_use_data__hyde__2017
   namespace: backport
-  publication_date: latest
   short_name: dataset_694_land_use_data__hyde__2017_config
+  file_extension: json
+  date_accessed: 2023-02-23 19:42:43.374187
+  name: Grapher metadata for dataset_694_land_use_data__hyde__2017
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/694
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: d79f5db1ea0d4fdb463bb708400c8fec
-  size: 10615
+- md5: 74644e033494ff1e5bd9ce5556ebfae6
+  size: 14143
   path: dataset_694_land_use_data__hyde__2017_config.json

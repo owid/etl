@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 16:58:00.072755
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Global child mortality (since 1800) - based on Gapminder and World Bank (2019)
   namespace: backport
-  publication_date: latest
   short_name: dataset_323_global_child_mortality__since_1800__based_on_gapminder_and_world_bank__2019_values
+  file_extension: feather
+  date_accessed: 2023-02-23 18:36:23.298877
+  name: Global child mortality (since 1800) - based on Gapminder and World Bank (2019)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/323
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 4af4707d2f7837cb9efb4f98e6f527ce
-  size: 6866
+- md5: 1617127aee4c74675bf9d2ceb12f2ff3
+  size: 7242
   path: dataset_323_global_child_mortality__since_1800__based_on_gapminder_and_world_bank__2019_values.feather

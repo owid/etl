@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:13:54.483647
-  description: ''
-  file_extension: json
-  is_public: false
-  name: Grapher metadata for dataset_5662_joe__compare_wid_and_pip_inequality_measures
   namespace: backport
-  publication_date: latest
   short_name: dataset_5662_joe__compare_wid_and_pip_inequality_measures_config
+  file_extension: json
+  date_accessed: 2023-02-23 17:21:58.922696
+  name: Grapher metadata for dataset_5662_joe__compare_wid_and_pip_inequality_measures
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5662
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 4614d950e485de9ce75a81ae95a3223e
-  size: 35022
+- md5: a03f2082dc682e7f1540efa5ca8f41ca
+  size: 52222
   path: dataset_5662_joe__compare_wid_and_pip_inequality_measures_config.json

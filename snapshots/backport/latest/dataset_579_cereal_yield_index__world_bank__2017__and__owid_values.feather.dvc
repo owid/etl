@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 15:48:51.737148
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Cereal yield index - (World Bank (2017) & OWID)
   namespace: backport
-  publication_date: latest
   short_name: dataset_579_cereal_yield_index__world_bank__2017__and__owid_values
+  file_extension: feather
+  date_accessed: 2023-02-23 17:13:44.071511
+  name: Cereal yield index - (World Bank (2017) & OWID)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/579
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 5f43480fa968a57f3eba853db1276491
-  size: 44170
+- md5: c4a5e852e758d584adba4cf65aa9aa11
+  size: 44546
   path: dataset_579_cereal_yield_index__world_bank__2017__and__owid_values.feather

@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:05:47.570049
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Literacy rate (% of total respondents) - DHS Surveys
   namespace: backport
-  publication_date: latest
   short_name: dataset_2794_literacy_rate__pct_of_total_respondents__dhs_surveys_values
+  file_extension: feather
+  date_accessed: 2023-02-23 19:23:02.217708
+  name: Literacy rate (% of total respondents) - DHS Surveys
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2794
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 1846817ee29abc82216740688dc592b8
-  size: 11162
+- md5: dc74264fc32e7e106b3c42f4ed2eb3f5
+  size: 11530
   path: dataset_2794_literacy_rate__pct_of_total_respondents__dhs_surveys_values.feather

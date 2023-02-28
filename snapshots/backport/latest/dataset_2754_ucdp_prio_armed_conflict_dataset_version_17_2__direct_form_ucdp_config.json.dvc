@@ -1,18 +1,19 @@
 meta:
-  date_accessed: 2022-12-07 16:57:03.193635
+  namespace: backport
+  short_name: dataset_2754_ucdp_prio_armed_conflict_dataset_version_17_2__direct_form_ucdp_config
+  file_extension: json
+  date_accessed: 2023-02-23 17:20:32.851405
+  name: Grapher metadata for dataset_2754_ucdp_prio_armed_conflict_dataset_version_17_2__direct_form_ucdp
   description: This is downloaded directly from UCDP, rather than being merged with
     PRIO 3.1 (as we've done for battle deaths)
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_2754_ucdp_prio_armed_conflict_dataset_version_17_2__direct_form_ucdp
-  namespace: backport
-  publication_date: latest
-  short_name: dataset_2754_ucdp_prio_armed_conflict_dataset_version_17_2__direct_form_ucdp_config
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2754
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: d093e119834886600756a805c2cc9fad
-  size: 1478
+- md5: 84dd8101e2bca50e352954d60739570a
+  size: 1676
   path: dataset_2754_ucdp_prio_armed_conflict_dataset_version_17_2__direct_form_ucdp_config.json

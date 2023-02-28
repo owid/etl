@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:33:30.476094
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_921_female_weekly_hours_worked__oecd__2017
   namespace: backport
-  publication_date: latest
   short_name: dataset_921_female_weekly_hours_worked__oecd__2017_config
+  file_extension: json
+  date_accessed: 2023-02-23 19:31:14.418897
+  name: Grapher metadata for dataset_921_female_weekly_hours_worked__oecd__2017
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/921
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 4fed075f7fdea3c6c7518a84a9a7c35d
-  size: 1981
+- md5: 6659b1a16f87166c1cb97bb694726b41
+  size: 2179
   path: dataset_921_female_weekly_hours_worked__oecd__2017_config.json

@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 01:36:39.372610
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Gender preference for boss - Gallup (2017)
   namespace: backport
-  publication_date: latest
   short_name: dataset_2669_gender_preference_for_boss__gallup__2017_values
+  file_extension: feather
+  date_accessed: 2023-02-23 18:11:18.790248
+  name: Gender preference for boss - Gallup (2017)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2669
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 31fc27aed6ff8015653e8ab6760dc188
-  size: 6402
+- md5: df88b1312127d0abbdbd1d3daec83d90
+  size: 6770
   path: dataset_2669_gender_preference_for_boss__gallup__2017_values.feather

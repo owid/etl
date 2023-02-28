@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:02:07.889699
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_223_historical_world_population__comparison_of_different_sources
   namespace: backport
-  publication_date: latest
   short_name: dataset_223_historical_world_population__comparison_of_different_sources_config
+  file_extension: json
+  date_accessed: 2023-02-23 19:50:39.558394
+  name: Grapher metadata for dataset_223_historical_world_population__comparison_of_different_sources
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/223
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: fa9861b6e5129bba991d142537b1bd3d
-  size: 2629
+- md5: 272dbb96b61dbebd5b3e810df239e317
+  size: 2823
   path: dataset_223_historical_world_population__comparison_of_different_sources_config.json

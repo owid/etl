@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 16:29:33.400085
-  description: ''
-  file_extension: json
-  is_public: false
-  name: Grapher metadata for dataset_3009_share_of_agriculture_in_gdp_at_current_prices__herrendorf_et_al__and_ggdc_10_data__split
   namespace: backport
-  publication_date: latest
   short_name: dataset_3009_share_of_agriculture_in_gdp_at_current_prices__herrendorf_et_al__and_ggdc_10_data__split_config
+  file_extension: json
+  date_accessed: 2023-02-23 19:42:49.626823
+  name: Grapher metadata for dataset_3009_share_of_agriculture_in_gdp_at_current_prices__herrendorf_et_al__and_ggdc_10_data__split
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/3009
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: b40deaca2d59d09a1143f8b4adfeef29
-  size: 6033
+- md5: ce60a3b1cb77db613b8365b08507add8
+  size: 7209
   path: dataset_3009_share_of_agriculture_in_gdp_at_current_prices__herrendorf_et_al__and_ggdc_10_data__split_config.json

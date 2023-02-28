@@ -1,20 +1,25 @@
 meta:
-  date_accessed: 2022-12-07 16:31:11.038331
-  description: "Code and data available at: https://github.com/owid/notebooks/tree/main/FionaSpooner/world_happiness_report\n\
-    \n2022 data available at: https://happiness-report.s3.amazonaws.com/2022/Appendix_2_Data_for_Figure_2.1.xls\n\
-    \n2021 data available at: https://happiness-report.s3.amazonaws.com/2021/DataForFigure2.1WHR2021C2.xls\n\
-    \nPrevious data available at: https://happiness-report.s3.amazonaws.com/2021/DataPanelWHR2021C2.xls"
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_235_world_happiness_report__2022
   namespace: backport
-  publication_date: latest
   short_name: dataset_235_world_happiness_report__2022_config
+  file_extension: json
+  date_accessed: 2023-02-23 17:54:08.692798
+  name: Grapher metadata for dataset_235_world_happiness_report__2022
+  description: |-
+    Code and data available at: https://github.com/owid/notebooks/tree/main/FionaSpooner/world_happiness_report
+
+    2022 data available at: https://happiness-report.s3.amazonaws.com/2022/Appendix_2_Data_for_Figure_2.1.xls
+
+    2021 data available at: https://happiness-report.s3.amazonaws.com/2021/DataForFigure2.1WHR2021C2.xls
+
+    Previous data available at: https://happiness-report.s3.amazonaws.com/2021/DataPanelWHR2021C2.xls
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/235
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: ba4fef88edef742bbc248189d645cdb9
-  size: 2877
+- md5: f0ca505658bbbcdbc258122de20a52b7
+  size: 3071
   path: dataset_235_world_happiness_report__2022_config.json

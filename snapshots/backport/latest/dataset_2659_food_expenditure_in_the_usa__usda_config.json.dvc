@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:36:49.764916
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_2659_food_expenditure_in_the_usa__usda
   namespace: backport
-  publication_date: latest
   short_name: dataset_2659_food_expenditure_in_the_usa__usda_config
+  file_extension: json
+  date_accessed: 2023-02-23 15:11:16.493358
+  name: Grapher metadata for dataset_2659_food_expenditure_in_the_usa__usda
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2659
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 1f6f844f7d3c07998f11bd3415d5fdea
-  size: 6472
+- md5: b009d61cf717dd14d4e100c360b1d52e
+  size: 8848
   path: dataset_2659_food_expenditure_in_the_usa__usda_config.json

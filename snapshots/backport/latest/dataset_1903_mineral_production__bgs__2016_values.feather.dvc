@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 15:49:43.104364
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Mineral production (BGS (2016))
   namespace: backport
-  publication_date: latest
   short_name: dataset_1903_mineral_production__bgs__2016_values
+  file_extension: feather
+  date_accessed: 2023-02-23 17:43:50.565203
+  name: Mineral production (BGS (2016))
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/1903
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 5c9f08ef70bbe29b468c278f9ec01923
-  size: 40906
+- md5: ad9f447b40a69bf96353fc796660da8a
+  size: 41282
   path: dataset_1903_mineral_production__bgs__2016_values.feather

@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 15:38:15.085710
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Metal production - Clio Infra & USGS
   namespace: backport
-  publication_date: latest
   short_name: dataset_919_metal_production__clio_infra__and__usgs_values
+  file_extension: feather
+  date_accessed: 2023-02-23 18:23:09.629885
+  name: Metal production - Clio Infra & USGS
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/919
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 18f0d209b2f6cd164d13cf9af028be01
-  size: 173258
+- md5: 29875e8c5d860d8a0a6ab2e934e9c481
+  size: 173634
   path: dataset_919_metal_production__clio_infra__and__usgs_values.feather

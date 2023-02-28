@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 15:56:19.478634
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Government Transparency index - Hollyer et al. (2014)
   namespace: backport
-  publication_date: latest
   short_name: dataset_189_government_transparency_index__hollyer_et_al__2014_values
+  file_extension: feather
+  date_accessed: 2023-02-23 18:40:46.423229
+  name: Government Transparency index - Hollyer et al. (2014)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/189
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 86c3999f72163283816aaea103354a32
-  size: 106098
+- md5: 75c0af6f639f14893352793478df1500
+  size: 106482
   path: dataset_189_government_transparency_index__hollyer_et_al__2014_values.feather

@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 16:29:22.779615
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Smallpox cases by country 1920-1977
   namespace: backport
-  publication_date: latest
   short_name: dataset_2791_smallpox_cases_by_country_1920_1977_values
+  file_extension: feather
+  date_accessed: 2023-02-23 19:03:33.682377
+  name: Smallpox cases by country 1920-1977
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2791
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: c86c93fdcba4197f8977415db63a648c
-  size: 23082
+- md5: 8a8a956d9b9e90a82d9e2a9f8bfcfa2f
+  size: 23458
   path: dataset_2791_smallpox_cases_by_country_1920_1977_values.feather

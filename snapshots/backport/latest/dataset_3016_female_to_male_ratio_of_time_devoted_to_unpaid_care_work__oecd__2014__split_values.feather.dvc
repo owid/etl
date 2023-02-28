@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:16:24.553324
-  description: Average number of hours spent on paid and unpaid domestic work by sex.
-  file_extension: feather
-  is_public: false
-  name: Female to male ratio of time devoted to unpaid care work (OECD (2014)) (split)
   namespace: backport
-  publication_date: latest
   short_name: dataset_3016_female_to_male_ratio_of_time_devoted_to_unpaid_care_work__oecd__2014__split_values
+  file_extension: feather
+  date_accessed: 2023-02-23 18:58:01.383249
+  name: Female to male ratio of time devoted to unpaid care work (OECD (2014)) (split)
+  description: Average number of hours spent on paid and unpaid domestic work by sex.
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/3016
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 7e0600af9d042201eb8e8e90eab9c4eb
-  size: 7986
+- md5: e5ad80200b514bcca0e0a26d22c3bd9d
+  size: 8354
   path: dataset_3016_female_to_male_ratio_of_time_devoted_to_unpaid_care_work__oecd__2014__split_values.feather

@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 00:03:39.560270
-  description: ''
-  file_extension: feather
-  is_public: false
-  name: Polio vaccine costs in low-income countries
   namespace: backport
-  publication_date: latest
   short_name: dataset_5572_polio_vaccine_costs_in_low_income_countries_values
+  file_extension: feather
+  date_accessed: 2023-02-23 19:29:54.312790
+  name: Polio vaccine costs in low-income countries
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5572
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: ad40d25038e8f084ad328c10818e8bf3
-  size: 6586
+- md5: f0a2ea9bfe0d92e1f976fd7c81754091
+  size: 6962
   path: dataset_5572_polio_vaccine_costs_in_low_income_countries_values.feather

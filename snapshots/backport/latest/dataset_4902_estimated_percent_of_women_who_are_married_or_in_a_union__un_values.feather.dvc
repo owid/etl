@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 00:25:55.116302
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Estimated percent of women who are married or in a union (UN)
   namespace: backport
-  publication_date: latest
   short_name: dataset_4902_estimated_percent_of_women_who_are_married_or_in_a_union__un_values
+  file_extension: feather
+  date_accessed: 2023-02-23 17:55:07.815593
+  name: Estimated percent of women who are married or in a union (UN)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/4902
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 09a92f53d8ad23e082ffe2fda5ae22ca
-  size: 7178
+- md5: daaca4d022fce444bbd087479f5b1371
+  size: 7554
   path: dataset_4902_estimated_percent_of_women_who_are_married_or_in_a_union__un_values.feather

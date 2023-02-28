@@ -1,18 +1,19 @@
 meta:
-  date_accessed: 2022-12-07 15:54:57.377448
-  description: ''
+  namespace: backport
+  short_name: dataset_426_weather_fatality_rates_in_the_us__owid_based_on_noaa_and_lopez_holle_and_population_data_values
   file_extension: feather
-  is_public: true
+  date_accessed: 2023-02-23 16:45:57.269416
   name: Weather fatality rates in the US – OWID based on NOAA and Lopez Holle and
     population data
-  namespace: backport
-  publication_date: latest
-  short_name: dataset_426_weather_fatality_rates_in_the_us__owid_based_on_noaa_and_lopez_holle_and_population_data_values
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/426
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 2dd37c7d51f995cc47214eeb48a3313d
-  size: 9858
+- md5: 1d740b0bbed5e5ef5f6048129e9ae67f
+  size: 10234
   path: dataset_426_weather_fatality_rates_in_the_us__owid_based_on_noaa_and_lopez_holle_and_population_data_values.feather

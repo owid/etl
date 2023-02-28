@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:05:25.456620
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_361_share_of_people_experiencing_homelessness_in_the_usa_2007_2016__per_100_000__hud__2016__and_u_s__census_bureau__2010
   namespace: backport
-  publication_date: latest
   short_name: dataset_361_share_of_people_experiencing_homelessness_in_the_usa_2007_2016__per_100_000__hud__2016__and_u_s__census_bureau__2010_config
+  file_extension: json
+  date_accessed: 2023-02-23 19:29:35.093547
+  name: Grapher metadata for dataset_361_share_of_people_experiencing_homelessness_in_the_usa_2007_2016__per_100_000__hud__2016__and_u_s__census_bureau__2010
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/361
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 843fd355bae28b5a54f2c0df1e7dd554
-  size: 3913
+- md5: 3ab02e23c9774b5b21a4d89965acc0ac
+  size: 4305
   path: dataset_361_share_of_people_experiencing_homelessness_in_the_usa_2007_2016__per_100_000__hud__2016__and_u_s__census_bureau__2010_config.json

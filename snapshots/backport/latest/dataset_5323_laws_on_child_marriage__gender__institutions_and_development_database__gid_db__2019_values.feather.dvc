@@ -1,18 +1,19 @@
 meta:
-  date_accessed: 2022-12-07 17:02:39.019324
-  description: ''
+  namespace: backport
+  short_name: dataset_5323_laws_on_child_marriage__gender__institutions_and_development_database__gid_db__2019_values
   file_extension: feather
-  is_public: false
+  date_accessed: 2023-02-23 18:30:49.132826
   name: Laws on child marriage - Gender, Institutions and Development Database (GID-DB,
     2019)
-  namespace: backport
-  publication_date: latest
-  short_name: dataset_5323_laws_on_child_marriage__gender__institutions_and_development_database__gid_db__2019_values
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5323
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 373f07126dbc05e0da03d7ddd974bfe3
-  size: 11306
+- md5: 5052f694deb0808942a3d5d343c4bfc7
+  size: 11682
   path: dataset_5323_laws_on_child_marriage__gender__institutions_and_development_database__gid_db__2019_values.feather

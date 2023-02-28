@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:53:46.199765
-  description: core-econ.org
-  file_extension: json
-  is_public: false
-  name: Grapher metadata for dataset_5138_owid_17_8_cpi
   namespace: backport
-  publication_date: latest
   short_name: dataset_5138_owid_17_8_cpi_config
+  file_extension: json
+  date_accessed: 2023-02-23 17:07:07.116509
+  name: Grapher metadata for dataset_5138_owid_17_8_cpi
+  description: core-econ.org
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5138
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: c9d5519b6874e955771c2b68f5a02775
-  size: 2883
+- md5: 88a0f18396b310febd8a73da67472682
+  size: 3883
   path: dataset_5138_owid_17_8_cpi_config.json

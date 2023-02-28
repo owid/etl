@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 01:20:17.500891
-  description: ''
-  file_extension: json
-  is_public: false
-  name: Grapher metadata for dataset_2810_multinational_time_use_study__mtus__gershuny_and_fisher__2013
   namespace: backport
-  publication_date: latest
   short_name: dataset_2810_multinational_time_use_study__mtus__gershuny_and_fisher__2013_config
+  file_extension: json
+  date_accessed: 2023-02-23 17:35:12.791629
+  name: Grapher metadata for dataset_2810_multinational_time_use_study__mtus__gershuny_and_fisher__2013
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2810
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 16b62cc29321b35d69d0df215027169d
-  size: 18808
+- md5: ee359cf1f369517115c77c8eabf640be
+  size: 23560
   path: dataset_2810_multinational_time_use_study__mtus__gershuny_and_fisher__2013_config.json

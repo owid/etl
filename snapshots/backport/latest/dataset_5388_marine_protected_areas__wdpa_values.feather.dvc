@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 01:48:03.461826
-  description: ''
-  file_extension: feather
-  is_public: false
-  name: Marine protected areas (WDPA)
   namespace: backport
-  publication_date: latest
   short_name: dataset_5388_marine_protected_areas__wdpa_values
+  file_extension: feather
+  date_accessed: 2023-02-23 17:37:24.089402
+  name: Marine protected areas (WDPA)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5388
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 737d7e73dc864e6f577c25ba34ca8e65
-  size: 5994
+- md5: b6e89e8dddf92a8ffbf0eb42b353c922
+  size: 6362
   path: dataset_5388_marine_protected_areas__wdpa_values.feather

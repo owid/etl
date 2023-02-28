@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 15:52:51.795162
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_2878_plastic_bag_substitute_comparisons__danish_epa__2018
   namespace: backport
-  publication_date: latest
   short_name: dataset_2878_plastic_bag_substitute_comparisons__danish_epa__2018_config
+  file_extension: json
+  date_accessed: 2023-02-23 17:43:57.051282
+  name: Grapher metadata for dataset_2878_plastic_bag_substitute_comparisons__danish_epa__2018
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2878
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 48b4f2b2f261d277dcfa802c58f03bc8
-  size: 6151
+- md5: d1a67c8c32c275e1eaf00cc0372990e6
+  size: 8147
   path: dataset_2878_plastic_bag_substitute_comparisons__danish_epa__2018_config.json

@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:42:42.007409
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_4117_child_deaths_by_life_stage__owid_based_on_un_igme
   namespace: backport
-  publication_date: latest
   short_name: dataset_4117_child_deaths_by_life_stage__owid_based_on_un_igme_config
+  file_extension: json
+  date_accessed: 2023-02-23 17:08:41.753031
+  name: Grapher metadata for dataset_4117_child_deaths_by_life_stage__owid_based_on_un_igme
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/4117
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 752a23b6a791bef9112b5120c429626d
-  size: 3358
+- md5: c23d9fed40bb18eb1063ef2c1781556e
+  size: 3958
   path: dataset_4117_child_deaths_by_life_stage__owid_based_on_un_igme_config.json

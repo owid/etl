@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 16:53:33.852776
-  description: ''
-  file_extension: json
-  is_public: false
-  name: Grapher metadata for dataset_5309_iea_energy_coverage
   namespace: backport
-  publication_date: latest
   short_name: dataset_5309_iea_energy_coverage_config
+  file_extension: json
+  date_accessed: 2023-02-23 18:36:48.146473
+  name: Grapher metadata for dataset_5309_iea_energy_coverage
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5309
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 5f88d81a86420539eedffeebcf5f20ec
-  size: 1657
+- md5: cefa1b397e6d886c9f845a192cdcfef0
+  size: 2057
   path: dataset_5309_iea_energy_coverage_config.json

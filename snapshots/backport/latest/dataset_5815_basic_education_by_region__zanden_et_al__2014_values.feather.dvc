@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 00:28:14.593950
-  description: Backported
-  file_extension: feather
-  is_public: false
-  name: Basic education by region - Zanden et al. (2014)
   namespace: backport
-  publication_date: latest
   short_name: dataset_5815_basic_education_by_region__zanden_et_al__2014_values
+  file_extension: feather
+  date_accessed: 2023-02-23 15:11:30.258841
+  name: Basic education by region - Zanden et al. (2014)
+  description: Backported
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5815
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 3270d3743d5e9f51d4ade8a8e28adc5c
-  size: 6898
+- md5: dc10b09d217803d739d74de549c96b90
+  size: 7274
   path: dataset_5815_basic_education_by_region__zanden_et_al__2014_values.feather

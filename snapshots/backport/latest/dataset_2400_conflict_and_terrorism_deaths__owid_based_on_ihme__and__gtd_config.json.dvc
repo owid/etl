@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_2400_conflict_and_terrorism_deaths__owid_based_on_ihme__and__gtd_config
   file_extension: json
-  date_accessed: 2023-01-13 12:00:18.869699
+  date_accessed: 2023-02-23 15:09:31.965067
   name: Grapher metadata for dataset_2400_conflict_and_terrorism_deaths__owid_based_on_ihme__and__gtd
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 67ffa5ff5e9a7ba2aedf7fd888ab5d03
-  size: 3762
+- md5: 129a401a8653890cec6b49ef7d714932
+  size: 4554
   path: dataset_2400_conflict_and_terrorism_deaths__owid_based_on_ihme__and__gtd_config.json

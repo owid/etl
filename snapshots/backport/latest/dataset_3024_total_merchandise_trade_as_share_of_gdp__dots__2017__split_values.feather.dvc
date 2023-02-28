@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 00:20:38.618961
-  description: ''
-  file_extension: feather
-  is_public: false
-  name: Total merchandise trade as share of GDP (DOTS (2017)) (split)
   namespace: backport
-  publication_date: latest
   short_name: dataset_3024_total_merchandise_trade_as_share_of_gdp__dots__2017__split_values
+  file_extension: feather
+  date_accessed: 2023-02-23 18:37:09.992450
+  name: Total merchandise trade as share of GDP (DOTS (2017)) (split)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/3024
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 17e859a00d34d9cf4327949ac28ef3ec
-  size: 69506
+- md5: 99272a987d15812b938bc0073e028397
+  size: 69882
   path: dataset_3024_total_merchandise_trade_as_share_of_gdp__dots__2017__split_values.feather

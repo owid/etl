@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-14 18:00:28.898738
-  description: ''
-  file_extension: json
-  is_public: false
-  name: Grapher metadata for dataset_5301_caribbean_reefs_with_acropora_corals_present__cramer_et_al__2020
   namespace: backport
-  publication_date: latest
   short_name: dataset_5301_caribbean_reefs_with_acropora_corals_present__cramer_et_al__2020_config
+  file_extension: json
+  date_accessed: 2023-02-23 15:11:56.527398
+  name: Grapher metadata for dataset_5301_caribbean_reefs_with_acropora_corals_present__cramer_et_al__2020
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5301
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: d728d4b6287186f1962e0130d46ad04f
-  size: 2782
+- md5: d615cbc39e3defaf9870b9ba81fb0462
+  size: 3182
   path: dataset_5301_caribbean_reefs_with_acropora_corals_present__cramer_et_al__2020_config.json

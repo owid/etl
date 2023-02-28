@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5543_nuclear_warhead_stockpiles__federation_of_american_scientists_values
   file_extension: feather
-  date_accessed: 2023-01-27 12:05:17.547742
+  date_accessed: 2023-02-23 18:13:16.910877
   name: Nuclear warhead stockpiles – Federation of American Scientists
   description: ''
   source_name: Our World in Data catalog backport

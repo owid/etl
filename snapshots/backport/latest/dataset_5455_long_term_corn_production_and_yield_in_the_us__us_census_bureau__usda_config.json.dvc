@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 15:40:42.227923
-  description: ''
-  file_extension: json
-  is_public: false
-  name: Grapher metadata for dataset_5455_long_term_corn_production_and_yield_in_the_us__us_census_bureau__usda
   namespace: backport
-  publication_date: latest
   short_name: dataset_5455_long_term_corn_production_and_yield_in_the_us__us_census_bureau__usda_config
+  file_extension: json
+  date_accessed: 2023-02-23 17:47:36.841102
+  name: Grapher metadata for dataset_5455_long_term_corn_production_and_yield_in_the_us__us_census_bureau__usda
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5455
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: d3d6333a5ee9e5304e4e2735cb4098c9
-  size: 3060
+- md5: 236b6081ea3ac6bd2f5ae53b7e919ad7
+  size: 3660
   path: dataset_5455_long_term_corn_production_and_yield_in_the_us__us_census_bureau__usda_config.json

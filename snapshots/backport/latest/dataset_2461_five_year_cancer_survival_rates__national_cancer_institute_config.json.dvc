@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:58:50.187686
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_2461_five_year_cancer_survival_rates__national_cancer_institute
   namespace: backport
-  publication_date: latest
   short_name: dataset_2461_five_year_cancer_survival_rates__national_cancer_institute_config
+  file_extension: json
+  date_accessed: 2023-02-23 18:33:07.999224
+  name: Grapher metadata for dataset_2461_five_year_cancer_survival_rates__national_cancer_institute
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2461
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 5ba25036b3cd6fc831f58e743194a915
-  size: 8114
+- md5: dfb6cc22bc3366e2428cdf8c7d5ff367
+  size: 11480
   path: dataset_2461_five_year_cancer_survival_rates__national_cancer_institute_config.json

@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:25:47.966980
-  description: ''
-  file_extension: feather
-  is_public: false
-  name: Mammal body size downgrading (Dembitzer et al. 2022)
   namespace: backport
-  publication_date: latest
   short_name: dataset_5566_mammal_body_size_downgrading__dembitzer_et_al__2022_values
+  file_extension: feather
+  date_accessed: 2023-02-23 16:39:55.447835
+  name: Mammal body size downgrading (Dembitzer et al. 2022)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5566
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: ea8abc33bbe5198ee9394182eb75c764
-  size: 11370
+- md5: 1d6fb6d598770960658bd720b1ba0aa3
+  size: 11746
   path: dataset_5566_mammal_body_size_downgrading__dembitzer_et_al__2022_values.feather

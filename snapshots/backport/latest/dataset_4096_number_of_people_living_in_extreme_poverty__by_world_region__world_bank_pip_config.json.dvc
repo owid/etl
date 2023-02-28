@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:54:34.536436
-  description: Version 20220909_2017_01_02_PROD
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_4096_number_of_people_living_in_extreme_poverty__by_world_region__world_bank_pip
   namespace: backport
-  publication_date: latest
   short_name: dataset_4096_number_of_people_living_in_extreme_poverty__by_world_region__world_bank_pip_config
+  file_extension: json
+  date_accessed: 2023-02-23 19:35:40.239421
+  name: Grapher metadata for dataset_4096_number_of_people_living_in_extreme_poverty__by_world_region__world_bank_pip
+  description: Version 20220909_2017_01_02_PROD
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/4096
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 95ab99556de56d0e44491a90fdd509c7
-  size: 2285
+- md5: a2a431318edcd75a31de19406f116bdf
+  size: 2485
   path: dataset_4096_number_of_people_living_in_extreme_poverty__by_world_region__world_bank_pip_config.json

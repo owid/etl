@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:52:30.042222
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_1031_genuine_saving_estimates_by_various_measures__blum__ducoing__mclaughlin__2017
   namespace: backport
-  publication_date: latest
   short_name: dataset_1031_genuine_saving_estimates_by_various_measures__blum__ducoing__mclaughlin__2017_config
+  file_extension: json
+  date_accessed: 2023-02-23 16:48:16.487234
+  name: Grapher metadata for dataset_1031_genuine_saving_estimates_by_various_measures__blum__ducoing__mclaughlin__2017
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/1031
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: c99d48834f5eb75179e5e3503e2248dc
-  size: 4081
+- md5: 612226d9b8266f895e8516e6f1857c10
+  size: 5269
   path: dataset_1031_genuine_saving_estimates_by_various_measures__blum__ducoing__mclaughlin__2017_config.json

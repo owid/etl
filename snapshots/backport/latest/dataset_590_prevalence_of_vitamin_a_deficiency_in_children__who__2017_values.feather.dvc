@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:34:28.409859
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Prevalence of Vitamin A deficiency in children - WHO (2017)
   namespace: backport
-  publication_date: latest
   short_name: dataset_590_prevalence_of_vitamin_a_deficiency_in_children__who__2017_values
+  file_extension: feather
+  date_accessed: 2023-02-23 18:04:34.674892
+  name: Prevalence of Vitamin A deficiency in children - WHO (2017)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/590
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: c4192a61ed2dfa521627b94c18032a9f
-  size: 11914
+- md5: 7ac405251b864b82c6bc5ad04da8e2f2
+  size: 12290
   path: dataset_590_prevalence_of_vitamin_a_deficiency_in_children__who__2017_values.feather

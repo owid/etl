@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:18:01.466376
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_5537_global_hunger_index__2021
   namespace: backport
-  publication_date: latest
   short_name: dataset_5537_global_hunger_index__2021_config
+  file_extension: json
+  date_accessed: 2023-02-23 16:53:37.746410
+  name: Grapher metadata for dataset_5537_global_hunger_index__2021
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5537
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 36fe3cbc81b51cbaebdd654348f36997
-  size: 5093
+- md5: 9a0e75102fcecd4acc81274d034922ad
+  size: 5293
   path: dataset_5537_global_hunger_index__2021_config.json

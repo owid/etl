@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 16:57:15.827025
-  description: core-econ.org
-  file_extension: feather
-  is_public: false
-  name: TE-17.16_CPI
   namespace: backport
-  publication_date: latest
   short_name: dataset_5142_te_17_16_cpi_values
+  file_extension: feather
+  date_accessed: 2023-02-23 16:28:31.100391
+  name: TE-17.16_CPI
+  description: core-econ.org
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5142
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 034f1604920ccfc486fe071089fdbed0
-  size: 6962
+- md5: 8310b73d1d234b51dcd39c74e408a5d9
+  size: 7338
   path: dataset_5142_te_17_16_cpi_values.feather

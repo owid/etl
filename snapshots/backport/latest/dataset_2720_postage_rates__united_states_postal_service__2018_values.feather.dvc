@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 16:57:49.970943
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Postage rates - United States Postal Service (2018)
   namespace: backport
-  publication_date: latest
   short_name: dataset_2720_postage_rates__united_states_postal_service__2018_values
+  file_extension: feather
+  date_accessed: 2023-02-23 16:33:00.533512
+  name: Postage rates - United States Postal Service (2018)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2720
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: bfc2be5ce2e40bced71978dc9aa09900
-  size: 6858
+- md5: 11b8ec55ff167b555a61f344d9979c47
+  size: 7234
   path: dataset_2720_postage_rates__united_states_postal_service__2018_values.feather

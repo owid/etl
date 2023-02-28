@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 15:52:05.328476
-  description: ''
-  file_extension: json
-  is_public: false
-  name: Grapher metadata for dataset_2988_diplomatic_parking_violations__fisman_and_miguel__2007__split
   namespace: backport
-  publication_date: latest
   short_name: dataset_2988_diplomatic_parking_violations__fisman_and_miguel__2007__split_config
+  file_extension: json
+  date_accessed: 2023-02-23 16:55:13.727243
+  name: Grapher metadata for dataset_2988_diplomatic_parking_violations__fisman_and_miguel__2007__split
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2988
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 81afebb4728c04a28e7a2ae6080f0302
-  size: 1684
+- md5: 5e840cbd2d9a5779fdb7bf626eb15a31
+  size: 1880
   path: dataset_2988_diplomatic_parking_violations__fisman_and_miguel__2007__split_config.json

@@ -1,18 +1,19 @@
 meta:
-  date_accessed: 2022-12-07 17:59:28.740529
-  description: ''
+  namespace: backport
+  short_name: dataset_2976_expenditure_per_student_as_pct_of_gdp__primary__1974_2014__world_bank__2015__split_values
   file_extension: feather
-  is_public: false
+  date_accessed: 2023-02-23 18:04:27.694121
   name: Expenditure per student as % of GDP (primary), 1974-2014 (World Bank (2015))
     (split)
-  namespace: backport
-  publication_date: latest
-  short_name: dataset_2976_expenditure_per_student_as_pct_of_gdp__primary__1974_2014__world_bank__2015__split_values
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2976
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 403af3deeaacb9d056f0e9c98d3e9d8e
-  size: 43538
+- md5: 7d05582df1e40f6ce5c0960a6df2e5e4
+  size: 43914
   path: dataset_2976_expenditure_per_student_as_pct_of_gdp__primary__1974_2014__world_bank__2015__split_values.feather

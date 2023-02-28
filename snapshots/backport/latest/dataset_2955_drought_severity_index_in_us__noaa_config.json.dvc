@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 01:28:48.819355
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_2955_drought_severity_index_in_us__noaa
   namespace: backport
-  publication_date: latest
   short_name: dataset_2955_drought_severity_index_in_us__noaa_config
+  file_extension: json
+  date_accessed: 2023-02-23 19:14:31.408219
+  name: Grapher metadata for dataset_2955_drought_severity_index_in_us__noaa
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2955
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 69b5af62473645211f3373fb5488d8e4
-  size: 2684
+- md5: eff388d1994e3b0e3ff3b10e207bf0a8
+  size: 3080
   path: dataset_2955_drought_severity_index_in_us__noaa_config.json

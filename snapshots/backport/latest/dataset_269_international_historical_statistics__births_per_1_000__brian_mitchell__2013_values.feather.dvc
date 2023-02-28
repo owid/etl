@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 00:37:37.382534
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: International Historical Statistics (Births per 1,000) - Brian Mitchell (2013)
   namespace: backport
-  publication_date: latest
   short_name: dataset_269_international_historical_statistics__births_per_1_000__brian_mitchell__2013_values
+  file_extension: feather
+  date_accessed: 2023-02-23 18:22:14.994224
+  name: International Historical Statistics (Births per 1,000) - Brian Mitchell (2013)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/269
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: c34a0411bee4bd6ea5298554342c250a
-  size: 65650
+- md5: 5cb87e2720c195cef0a17caea6623cfa
+  size: 66026
   path: dataset_269_international_historical_statistics__births_per_1_000__brian_mitchell__2013_values.feather

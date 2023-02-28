@@ -1,18 +1,19 @@
 meta:
-  date_accessed: 2022-12-08 00:52:37.539016
+  namespace: backport
+  short_name: dataset_385_health_coverage__ilo__2014_config
+  file_extension: json
+  date_accessed: 2023-02-23 17:05:18.021253
+  name: Grapher metadata for dataset_385_health_coverage__ilo__2014
   description: 'WARNING: Variable "Total health care coverage (ILO and OECD selected
     years)" is only meaningful in one specific chart'
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_385_health_coverage__ilo__2014
-  namespace: backport
-  publication_date: latest
-  short_name: dataset_385_health_coverage__ilo__2014_config
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/385
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 571da376f963ebeccfa46f39766a5a20
-  size: 3224
+- md5: 1986afbe09d5135291e2ee96a943da0f
+  size: 3420
   path: dataset_385_health_coverage__ilo__2014_config.json
