@@ -333,13 +333,14 @@ def combine_metadata_sources(sources: List[catalog.Source]) -> catalog.Source:
             # For any other attribute, values from different sources can be in the same line, separated by ;.
             combined_value = "; ".join(values)
 
-        # Ensure combined source names (short and long versions) end in a period.
-        if ((attribute == "name") or (attribute == "published_by")) and not combined_value.endswith("."):
-            combined_value += "."
-
         # Instead of leaving an empty string, make any empty field None.
         if combined_value == "":
             combined_value = None  # type: ignore
+
+        # Ensure combined source names (short and long versions) end in a period.
+        if ((attribute == "name") or (attribute == "published_by")) and (combined_value is not None):
+            if not combined_value.endswith("."):
+                combined_value += "."
 
         setattr(default_source, attribute, combined_value)
 
