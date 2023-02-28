@@ -10,6 +10,7 @@ from shared import add_population, add_region_aggregates, correct_data_points
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
+from etl.paths import DATA_DIR
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -292,7 +293,7 @@ def prepare_yearly_electricity_data(tb_meadow: Table) -> pd.DataFrame:
     return df
 
 
-def make_wide_table(df: pd.DataFrame, category: str) -> Table:
+def make_wide_table(df: pd.DataFrame, category: str, df_regions: pd.DataFrame, df_income: pd.DataFrame) -> Table:
     """Convert data from long to wide format for a specific category.
 
     This is a common processing for all categories in the data.
@@ -303,6 +304,10 @@ def make_wide_table(df: pd.DataFrame, category: str) -> Table:
         Data, after harmonizing country names.
     category : str
         Name of category (as defined above in CATEGORIES) to process.
+    df_regions : pd.DataFrame
+        Countries-regions data.
+    df_income : pd.DataFrame
+        Data on income group definitions.
 
     Returns
     -------
@@ -334,20 +339,26 @@ def make_wide_table(df: pd.DataFrame, category: str) -> Table:
     table = add_region_aggregates(
         data=table.reset_index(),
         index_columns=["country", "year"],
-        regions=REGIONS,
+        regions_to_add=REGIONS,
         aggregates=aggregates,
+        df_regions=df_regions,
+        df_income=df_income,
     )
 
     return table
 
 
-def make_table_electricity_generation(df: pd.DataFrame) -> Table:
+def make_table_electricity_generation(df: pd.DataFrame, df_regions: pd.DataFrame, df_income: pd.DataFrame) -> Table:
     """Create table with processed data of category "Electricity generation".
 
     Parameters
     ----------
     df : pd.DataFrame
         Data in long format for all categories, after harmonizing country names.
+    df_regions : pd.DataFrame
+        Countries-regions data.
+    df_income : pd.DataFrame
+        Data on income group definitions.
 
     Returns
     -------
@@ -356,7 +367,7 @@ def make_table_electricity_generation(df: pd.DataFrame) -> Table:
 
     """
     # Prepare wide table.
-    table = make_wide_table(df=df, category="Electricity generation")
+    table = make_wide_table(df=df, category="Electricity generation", df_regions=df_regions, df_income=df_income)
 
     # Recalculate the share of electricity generates for region aggregates.
     for column in table.columns:
@@ -372,13 +383,19 @@ def make_table_electricity_generation(df: pd.DataFrame) -> Table:
     return table
 
 
-def make_table_electricity_demand(df: pd.DataFrame, population: pd.DataFrame) -> Table:
+def make_table_electricity_demand(
+    df: pd.DataFrame, population: pd.DataFrame, df_regions: pd.DataFrame, df_income: pd.DataFrame
+) -> Table:
     """Create table with processed data of category "Electricity demand".
 
     Parameters
     ----------
     df : pd.DataFrame
         Data in long format for all categories, after harmonizing country names.
+    df_regions : pd.DataFrame
+        Countries-regions data.
+    df_income : pd.DataFrame
+        Data on income group definitions.
 
     Returns
     -------
@@ -387,7 +404,7 @@ def make_table_electricity_demand(df: pd.DataFrame, population: pd.DataFrame) ->
 
     """
     # Prepare wide table.
-    table = make_wide_table(df=df, category="Electricity demand")
+    table = make_wide_table(df=df, category="Electricity demand", df_regions=df_regions, df_income=df_income)
 
     # Add population to data
     table = add_population(df=table, population=population, warn_on_missing_countries=False)
@@ -405,13 +422,17 @@ def make_table_electricity_demand(df: pd.DataFrame, population: pd.DataFrame) ->
     return table
 
 
-def make_table_power_sector_emissions(df: pd.DataFrame) -> Table:
+def make_table_power_sector_emissions(df: pd.DataFrame, df_regions: pd.DataFrame, df_income: pd.DataFrame) -> Table:
     """Create table with processed data of category "Power sector emissions".
 
     Parameters
     ----------
     df : pd.DataFrame
         Data in long format for all categories, after harmonizing country names.
+    df_regions : pd.DataFrame
+        Countries-regions data.
+    df_income : pd.DataFrame
+        Data on income group definitions.
 
     Returns
     -------
@@ -420,13 +441,13 @@ def make_table_power_sector_emissions(df: pd.DataFrame) -> Table:
 
     """
     # Prepare wide table of emissions data.
-    table = make_wide_table(df=df, category="Power sector emissions")
+    table = make_wide_table(df=df, category="Power sector emissions", df_regions=df_regions, df_income=df_income)
 
     # Add carbon intensity.
     # In principle this only needs to be done for region aggregates, but we do it for all countries and check that
     # the results are consistent with the original data.
     # Prepare wide table also for electricity generation (required to calculate carbon intensity).
-    electricity = make_wide_table(df=df, category="Electricity generation")[
+    electricity = make_wide_table(df=df, category="Electricity generation", df_regions=df_regions, df_income=df_income)[
         ["country", "year", "Total Generation (TWh)"]
     ]
     # Add total electricity generation to emissions table.
@@ -468,6 +489,21 @@ def run(dest_dir: str) -> None:
     # Make a dataframe out of the data in the table, with the required columns.
     df_population = pd.DataFrame(tb_population)
 
+    # Load regions dataset.
+    # ds_regions: Dataset = paths.load_dependency("regions")
+    ds_regions = Dataset(DATA_DIR / "garden/reference")
+    # Load main table from dataset.
+    tb_regions = ds_regions["countries_regions"]
+    # Create a dataframe out of the table.
+    df_regions = pd.DataFrame(tb_regions)
+
+    # Load income groups dataset.
+    ds_income: Dataset = paths.load_dependency("wb_income")
+    # Get main table from dataset.
+    tb_income = ds_income["wb_income_group"]
+    # Create a dataframe out of the table.
+    df_income = pd.DataFrame(tb_income).reset_index()
+
     #
     # Process data.
     #
@@ -476,11 +512,15 @@ def run(dest_dir: str) -> None:
 
     # Split data into different tables, one per category, and process each one individually.
     tables = {
-        "Capacity": make_wide_table(df=df, category="Capacity"),
-        "Electricity demand": make_table_electricity_demand(df=df, population=df_population),
-        "Electricity generation": make_table_electricity_generation(df=df),
-        "Electricity imports": make_wide_table(df=df, category="Electricity imports"),
-        "Power sector emissions": make_table_power_sector_emissions(df=df),
+        "Capacity": make_wide_table(df=df, category="Capacity", df_regions=df_regions, df_income=df_income),
+        "Electricity demand": make_table_electricity_demand(
+            df=df, population=df_population, df_regions=df_regions, df_income=df_income
+        ),
+        "Electricity generation": make_table_electricity_generation(df=df, df_regions=df_regions, df_income=df_income),
+        "Electricity imports": make_wide_table(
+            df=df, category="Electricity imports", df_regions=df_regions, df_income=df_income
+        ),
+        "Power sector emissions": make_table_power_sector_emissions(df=df, df_regions=df_regions, df_income=df_income),
     }
 
     # Apply amendments, and set an appropriate index and short name to each table an sort conveniently.

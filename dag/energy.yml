@@ -77,6 +77,7 @@ steps:
   data://garden/ember/2023-02-20/yearly_electricity:
     - data://meadow/ember/2023-02-20/yearly_electricity
     - data://garden/demography/2022-12-08/population
+    - data://garden/wb/2021-07-01/wb_income
     - data://garden/reference
   #
   # Ember - European electricity review 2022.

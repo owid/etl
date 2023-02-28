@@ -152,7 +152,10 @@ ACCEPTED_OVERLAPS = {
 
 
 def get_countries_in_region(
-    region: str, region_modifications: Optional[Dict[str, Dict[str, List[str]]]] = None
+    region: str,
+    df_regions: pd.DataFrame,
+    df_income: pd.DataFrame,
+    region_modifications: Optional[Dict[str, Dict[str, List[str]]]] = None,
 ) -> List[str]:
     """Get countries in a region, both for known regions (e.g. "Africa") and custom ones (e.g. "Europe (excl. EU-27)").
 
@@ -160,6 +163,10 @@ def get_countries_in_region(
     ----------
     region : str
         Region name (e.g. "Africa", or "Europe (excl. EU-27)").
+    df_regions : pd.DataFrame
+        Countries-regions data.
+    df_income : pd.DataFrame
+        Data on income group definitions.
     region_modifications : dict or None
         If None (or an empty dictionary), the region should be in OWID's countries-regions dataset.
         If not None, it should be a dictionary with any (or all) of the following keys:
@@ -191,12 +198,24 @@ def get_countries_in_region(
 
     # List countries from the list of regions included.
     countries_set = set(
-        sum([geo.list_countries_in_region(region_included) for region_included in regions_included], [])
+        sum(
+            [
+                geo.list_countries_in_region(region_included, countries_regions=df_regions, income_groups=df_income)
+                for region_included in regions_included
+            ],
+            [],
+        )
     )
 
     # Remove all countries from the list of regions excluded.
     countries_set -= set(
-        sum([geo.list_countries_in_region(region_excluded) for region_excluded in regions_excluded], [])
+        sum(
+            [
+                geo.list_countries_in_region(region_excluded, countries_regions=df_regions, income_groups=df_income)
+                for region_excluded in regions_excluded
+            ],
+            [],
+        )
     )
 
     # Add the list of individual countries to be included.
@@ -382,8 +401,10 @@ def detect_overlapping_regions(
 
 def add_region_aggregates(
     data: pd.DataFrame,
-    regions: Dict[Any, Any],
+    regions_to_add: Dict[Any, Any],
     index_columns: List[str],
+    df_regions: pd.DataFrame,
+    df_income: pd.DataFrame,
     country_column: str = "country",
     aggregates: Optional[Dict[str, str]] = None,
 ) -> pd.DataFrame:
@@ -393,10 +414,14 @@ def add_region_aggregates(
     ----------
     data : pd.DataFrame
         Data.
-    regions: list
+    regions_to_add: list
         Regions to add.
     index_columns : list
         Name of index columns.
+    df_regions : pd.DataFrame
+        Countries-regions data.
+    df_income : pd.DataFrame
+        Data on income group definitions.
     country_column : str
         Name of country column.
     year_column : str
@@ -424,9 +449,11 @@ def add_region_aggregates(
         # If aggregations are not specified, assume all variables are to be aggregated, by summing.
         aggregates = {column: "sum" for column in data.columns if column not in index_columns}
 
-    for region in regions:
+    for region in regions_to_add:
         # List of countries in region.
-        countries_in_region = get_countries_in_region(region=region, region_modifications=regions[region])
+        countries_in_region = get_countries_in_region(
+            region=region, region_modifications=regions_to_add[region], df_regions=df_regions, df_income=df_income
+        )
         # Select rows of data for member countries.
         data_region = data[data[country_column].isin(countries_in_region)]
 
