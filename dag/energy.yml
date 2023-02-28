@@ -115,7 +115,7 @@ steps:
   # Energy - OWID Energy dataset (2023).
   #
   data://garden/energy/2023-02-20/owid_energy:
-    - data://garden/bp/2022-12-28/energy_mix
+    - data://garden/bp/2023-02-20/energy_mix
     - data://garden/energy/2023-02-20/fossil_fuel_production
     - data://garden/energy/2023-02-20/primary_energy_consumption
     - data://garden/energy/2023-02-20/electricity_mix
