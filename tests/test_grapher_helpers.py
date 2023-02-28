@@ -117,7 +117,7 @@ def test_ensure_source_per_variable_multiple_sources():
     new_table = gh._ensure_source_per_variable(table)
     assert len(new_table.deaths.metadata.sources) == 1
     source = new_table.deaths.metadata.sources[0]
-    assert source.name == "s1; s2"
+    assert source.name == "s1; s2."
     assert source.description == "s1 description\ns2 description"
 
     # no sources
@@ -125,7 +125,7 @@ def test_ensure_source_per_variable_multiple_sources():
     new_table = gh._ensure_source_per_variable(table)
     assert len(new_table.deaths.metadata.sources) == 1
     source = new_table.deaths.metadata.sources[0]
-    assert source.name == "s3"
+    assert source.name == "s3."
     assert source.description == "Dataset description\ns3 description"
 
     # sources have no description, but table has
@@ -143,7 +143,7 @@ def test_combine_metadata_sources():
         Source(name="s2", description="s2 description"),
     ]
     source = gh.combine_metadata_sources(sources)
-    assert source.name == "s1; s2"
+    assert source.name == "s1; s2."
     assert source.description == "s1 description\ns2 description"
 
     # make sure we haven't modified original sources
