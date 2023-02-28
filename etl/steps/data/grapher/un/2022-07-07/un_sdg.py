@@ -33,7 +33,8 @@ def run(dest_dir: str) -> None:
 
     # add tables to dataset
     clean_source_map = load_clean_source_mapping()
-    walden_ds = Catalog().find_one(namespace=NAMESPACE, short_name=FNAME, version=VERSION)
+    # NOTE: we renamed namespace from un_sdg to un, but we still use old walden
+    walden_ds = Catalog().find_one(namespace="un_sdg", short_name=FNAME, version=VERSION)
     ds_garden = Dataset((DATA_DIR / f"garden/{NAMESPACE}/{VERSION}/{FNAME}").as_posix())
     sdg_tables = ds_garden.table_names
     for var in sdg_tables:
