@@ -30,6 +30,7 @@ DIRECT_AND_EQUIVALENT_ENERGY = [
     "Renewables",
     "Solar",
     "Wind",
+    "Solar and wind",
 ]
 ALL_SOURCES = sorted(ONLY_DIRECT_ENERGY + DIRECT_AND_EQUIVALENT_ENERGY)
 
@@ -165,6 +166,10 @@ def calculate_direct_primary_energy(primary_energy: pd.DataFrame) -> pd.DataFram
     primary_energy["Low-carbon energy (TWh - direct)"] = primary_energy["Renewables (TWh - direct)"] + primary_energy[
         "Nuclear (TWh - direct)"
     ].fillna(0)
+    # Create column for direct primary energy from solar and wind in TWh.
+    primary_energy["Solar and wind (TWh - direct)"] = primary_energy["Solar (TWh - direct)"].fillna(0) + primary_energy[
+        "Wind (TWh - direct)"
+    ].fillna(0)
     # Create column for total direct primary energy.
     primary_energy["Primary energy (TWh - direct)"] = (
         primary_energy["Fossil fuels (TWh)"] + primary_energy["Low-carbon energy (TWh - direct)"]
@@ -202,6 +207,10 @@ def calculate_equivalent_primary_energy(primary_energy: pd.DataFrame) -> pd.Data
     primary_energy["Low-carbon energy (EJ - equivalent)"] = primary_energy[
         "Renewables (EJ - equivalent)"
     ] + primary_energy["Nuclear (EJ - equivalent)"].fillna(0)
+    # Create column for solar and wind.
+    primary_energy["Solar and wind (EJ - equivalent)"] = primary_energy["Solar (EJ - equivalent)"].fillna(
+        0
+    ) + primary_energy["Wind (EJ - equivalent)"].fillna(0)
     # Convert input-equivalent primary energy of non-fossil based electricity into TWh.
     # The result is primary energy using the "substitution method".
     for cat in DIRECT_AND_EQUIVALENT_ENERGY:
