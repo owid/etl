@@ -2,16 +2,140 @@
 
 """
 
+import numpy as np
 import pandas as pd
 from owid import catalog
 from owid.catalog import Dataset, Table
-from shared import add_population, add_region_aggregates
+from shared import add_population, add_region_aggregates, correct_data_points
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+
+# Corrections to the output tables.
+# They are all the same correction: Remove aggregates for 2022, given that only EU countries are informed.
+AMENDMENTS = {
+    "Capacity": [
+        (
+            {
+                "country": ["Europe", "Upper-middle-income countries", "High-income countries"],
+                "year": [2022],
+            },
+            {
+                "Clean (GW)": pd.NA,
+                "Fossil (GW)": pd.NA,
+                "Gas and Other Fossil (GW)": pd.NA,
+                "Hydro, Bioenergy and Other Renewables (GW)": pd.NA,
+                "Renewables (GW)": pd.NA,
+                "Wind and Solar (GW)": pd.NA,
+                "Bioenergy (GW)": pd.NA,
+                "Coal (GW)": pd.NA,
+                "Gas (GW)": pd.NA,
+                "Hydro (GW)": pd.NA,
+                "Nuclear (GW)": pd.NA,
+                "Other Fossil (GW)": pd.NA,
+                "Other Renewables (GW)": pd.NA,
+                "Solar (GW)": pd.NA,
+                "Wind (GW)": pd.NA,
+            },
+        )
+    ],
+    "Electricity demand": [
+        (
+            {
+                "country": ["Europe", "Upper-middle-income countries", "High-income countries"],
+                "year": [2022],
+            },
+            {
+                "Demand (TWh)": pd.NA,
+                "population": pd.NA,
+                "Demand per capita (kWh)": pd.NA,
+            },
+        )
+    ],
+    "Electricity generation": [
+        (
+            {
+                "country": ["Europe", "Upper-middle-income countries", "High-income countries"],
+                "year": [2022],
+            },
+            {
+                "Clean (%)": pd.NA,
+                "Fossil (%)": pd.NA,
+                "Gas and Other Fossil (%)": pd.NA,
+                "Hydro, Bioenergy and Other Renewables (%)": pd.NA,
+                "Renewables (%)": pd.NA,
+                "Wind and Solar (%)": pd.NA,
+                "Clean (TWh)": pd.NA,
+                "Fossil (TWh)": pd.NA,
+                "Gas and Other Fossil (TWh)": pd.NA,
+                "Hydro, Bioenergy and Other Renewables (TWh)": pd.NA,
+                "Renewables (TWh)": pd.NA,
+                "Wind and Solar (TWh)": pd.NA,
+                "Bioenergy (%)": pd.NA,
+                "Coal (%)": pd.NA,
+                "Gas (%)": pd.NA,
+                "Hydro (%)": pd.NA,
+                "Nuclear (%)": pd.NA,
+                "Other Fossil (%)": pd.NA,
+                "Other Renewables (%)": pd.NA,
+                "Solar (%)": pd.NA,
+                "Wind (%)": pd.NA,
+                "Bioenergy (TWh)": pd.NA,
+                "Coal (TWh)": pd.NA,
+                "Gas (TWh)": pd.NA,
+                "Hydro (TWh)": pd.NA,
+                "Nuclear (TWh)": pd.NA,
+                "Other Fossil (TWh)": pd.NA,
+                "Other Renewables (TWh)": pd.NA,
+                "Solar (TWh)": pd.NA,
+                "Wind (TWh)": pd.NA,
+                "Total Generation (TWh)": pd.NA,
+            },
+        ),
+    ],
+    "Electricity imports": [
+        (
+            {
+                "country": ["Europe", "Upper-middle-income countries", "High-income countries"],
+                "year": [2022],
+            },
+            {
+                "Net Imports (TWh)": np.nan,
+            },
+        ),
+    ],
+    "Power sector emissions": [
+        (
+            {
+                "country": ["Europe", "Upper-middle-income countries", "High-income countries"],
+                "year": [2022],
+            },
+            {
+                "Clean (mtCO2)": pd.NA,
+                "Fossil (mtCO2)": pd.NA,
+                "Gas and Other Fossil (mtCO2)": pd.NA,
+                "Hydro, Bioenergy and Other Renewables (mtCO2)": pd.NA,
+                "Renewables (mtCO2)": pd.NA,
+                "Wind and Solar (mtCO2)": pd.NA,
+                "Bioenergy (mtCO2)": pd.NA,
+                "Coal (mtCO2)": pd.NA,
+                "Gas (mtCO2)": pd.NA,
+                "Hydro (mtCO2)": pd.NA,
+                "Nuclear (mtCO2)": pd.NA,
+                "Other Fossil (mtCO2)": pd.NA,
+                "Other Renewables (mtCO2)": pd.NA,
+                "Solar (mtCO2)": pd.NA,
+                "Wind (mtCO2)": pd.NA,
+                "Total emissions (mtCO2)": pd.NA,
+                "Total Generation (TWh)": pd.NA,
+                "CO2 intensity (gCO2/kWh)": pd.NA,
+            },
+        ),
+    ],
+}
 
 # Aggregate regions to add, following OWID definitions.
 # Regions and income groups to create by aggregating contributions from member countries.
@@ -359,8 +483,9 @@ def run(dest_dir: str) -> None:
         "Power sector emissions": make_table_power_sector_emissions(df=df),
     }
 
-    # Set an appropriate index and short name to each table an sort conveniently.
+    # Apply amendments, and set an appropriate index and short name to each table an sort conveniently.
     for table_name in tables:
+        tables[table_name] = correct_data_points(df=tables[table_name], corrections=AMENDMENTS[table_name])
         tables[table_name] = tables[table_name].set_index(["country", "year"], verify_integrity=True).sort_index()
         tables[table_name].metadata.short_name = catalog.utils.underscore(table_name)
 
