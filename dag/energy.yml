@@ -25,14 +25,14 @@ steps:
   data://grapher/bp/2022-12-28/statistical_review:
     - data://garden/bp/2022-12-28/statistical_review
   #
-  # BP - Energy mix 2022.
+  # BP - Energy mix 2023.
   #
-  data://garden/bp/2022-12-28/energy_mix:
+  data://garden/bp/2023-02-20/energy_mix:
     - data://garden/bp/2022-12-28/statistical_review
-    - data://garden/owid/latest/key_indicators
+    - data://garden/demography/2022-12-08/population
     - data://garden/wb/2021-07-01/wb_income
-  data://grapher/bp/2022-12-28/energy_mix:
-    - data://garden/bp/2022-12-28/energy_mix
+  data://grapher/bp/2023-02-20/energy_mix:
+    - data://garden/bp/2023-02-20/energy_mix
   #
   # Shift - Fossil fuel production 2022.
   #
@@ -274,4 +274,11 @@ steps:
     - data://garden/bp/2022-12-28/statistical_review
   data://grapher/energy/2022-12-28/global_primary_energy:
     - data://garden/energy/2022-12-28/global_primary_energy
+  # BP - Energy mix 2022.
+  data://garden/bp/2022-12-28/energy_mix:
+    - data://garden/bp/2022-12-28/statistical_review
+    - data://garden/owid/latest/key_indicators
+    - data://garden/wb/2021-07-01/wb_income
+  data://grapher/bp/2022-12-28/energy_mix:
+    - data://garden/bp/2022-12-28/energy_mix
   ######################################################################################################################
