@@ -116,7 +116,8 @@ def combine_yearly_electricity_data(ds_global: Dataset) -> Table:
     # Sanity check.
     error = "Total generation column in emissions and generation tables are not identical."
     assert all(
-        combined_global["emissions__total_generation__twh"] == combined_global["generation__total_generation__twh"]
+        combined_global["emissions__total_generation__twh"].fillna(-1)
+        == combined_global["generation__total_generation__twh"].fillna(-1)
     ), error
 
     # Remove unnecessary columns and any possible rows with no data.
