@@ -2,7 +2,7 @@ all_sources:
   - source_xm_kk: &source-xm_kk
       name: Karlinsky and Kobak (2021)
       url: https://github.com/dkobak/excess-mortality
-      date_accessed: "2023-02-17"
+      date_accessed: "2023-02-28"
       publication_date: "2021-06-30"
       publication_year: 2021
       published_by:
