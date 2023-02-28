@@ -5,7 +5,7 @@
 import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
-from shared import CURRENT_DIR, add_population
+from shared import add_population
 
 from etl.helpers import PathFinder, create_dataset
 
