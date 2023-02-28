@@ -26,6 +26,7 @@ def run(dest_dir: str) -> None:
     tb_fluid = fluid_garden["fluid"]
 
     tb_flu = pd.merge(tb_fluid, tb_flunet, on=["country", "date"], how="outer")
+    # tb_flu.dropna(axis = 1, how="all")
     assert tb_flu[["country", "date"]].duplicated().sum() == 0
     tb_flu = Table(tb_flu, short_name="flu")
 

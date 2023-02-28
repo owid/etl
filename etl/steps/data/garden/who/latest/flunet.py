@@ -76,9 +76,10 @@ def combine_columns(df: pd.DataFrame) -> pd.DataFrame:
     Combine columns of:
     * Influenza A with no subtype
     * Influenza B Victoria substrains
+    Summing so that NaNs are skipped and not converted to 0
     """
-    df["a_no_subtype"] = df["anotsubtyped"] + df["anotsubtypable"] + df["aother_subtype"]
-    df["bvic"] = df["bvic_2del"] + df["bvic_3del"] + df["bvic_nodel"] + df["bvic_delunk"]
+    df["a_no_subtype"] = df[["anotsubtyped", "anotsubtypable", "aother_subtype"]].sum(axis=1, min_count=1)
+    df["bvic"] = df[["bvic_2del", "bvic_3del", "bvic_nodel", "bvic_delunk"]].sum(axis=1, min_count=1)
 
     return df
 
@@ -171,51 +172,71 @@ def create_zero_filled_strain_columns(df: pd.DataFrame) -> pd.DataFrame:
     For the stacked bar charts in the grapher to work I think I need to fill the NAs with zeros. I'll keep the original columns too as I think adding 0s into line charts would look weird and be misleading
     """
     strain_columns = [
-        "ah1n12009NONSENTINEL",
-        "ah1n12009NOTDEFINED",
-        "ah1n12009SENTINEL",
-        "ah1NONSENTINEL",
-        "ah1NOTDEFINED",
-        "ah1SENTINEL",
-        "ah3NONSENTINEL",
-        "ah3NOTDEFINED",
-        "ah3SENTINEL",
-        "ah5NONSENTINEL",
-        "ah5NOTDEFINED",
-        "ah5SENTINEL",
-        "ah7n9NONSENTINEL",
-        "ah7n9NOTDEFINED",
-        "ah7n9SENTINEL",
-        "a_no_subtypeNOTDEFINED",
-        "a_no_subtypeSENTINEL",
-        "inf_aNONSENTINEL",
-        "inf_aNOTDEFINED",
-        "inf_aSENTINEL",
-        "byamNONSENTINEL",
-        "byamNOTDEFINED",
-        "byamSENTINEL",
-        "bnotdeterminedNONSENTINEL",
-        "bnotdeterminedNOTDEFINED",
-        "bnotdeterminedSENTINEL",
-        "bvicNONSENTINEL",
-        "bvicNOTDEFINED",
-        "bvicSENTINEL",
-        "inf_bNONSENTINEL",
-        "inf_bNOTDEFINED",
-        "inf_bSENTINEL",
         "ah1n12009COMBINED",
         "ah1COMBINED",
         "ah3COMBINED",
         "ah5COMBINED",
         "ah7n9COMBINED",
         "a_no_subtypeCOMBINED",
-        "inf_aCOMBINED",
         "byamCOMBINED",
         "bnotdeterminedCOMBINED",
         "bvicCOMBINED",
+        "inf_aCOMBINED",
         "inf_bCOMBINED",
+    ]
+    # Add these columns if we need to, for now stick to the above for file size reasons
+    extended_columns = [
+        "ah1n12009SENTINEL",
+        "ah1SENTINEL",
+        "ah3SENTINEL",
+        "ah5SENTINEL",
+        "ah7n9SENTINEL",
+        "byamSENTINEL",
+        "bnotdeterminedSENTINEL",
+        "bvicSENTINEL",
+        "inf_aSENTINEL",
+        "inf_bSENTINEL",
+        "ah1n12009NONSENTINEL",
+        "ah1n12009NOTDEFINED",
+        "ah1NOTDEFINED",
+        "ah1NONSENTINEL",
+        "ah3NONSENTINEL",
+        "ah3NOTDEFINED",
+        "ah5NONSENTINEL",
+        "ah5NOTDEFINED",
+        "ah7n9NONSENTINEL",
+        "ah7n9NOTDEFINED",
+        "a_no_subtypeNOTDEFINED",
+        "a_no_subtypeSENTINEL",
+        "byamNONSENTINEL",
+        "byamNOTDEFINED",
+        "bnotdeterminedNONSENTINEL",
+        "bnotdeterminedNOTDEFINED",
+        "bvicNONSENTINEL",
+        "bvicNOTDEFINED",
     ]
 
     strain_columns_zfilled = [s + "_zfilled" for s in strain_columns]
     df[strain_columns_zfilled] = df[strain_columns].fillna(0)
     return df
+
+
+# def sanity_checks(df: pd.DataFrame) -> pd.DataFrame:
+#    """
+#    Some assertions to check that the variables are as expected e.g. all the of the influenza strains sum to the influenza all column.
+#    """
+##
+#
+#    assert all(
+#        df[
+#            [
+##                "ah1n12009NONSENTINEL",
+#                "ah1NONSENTINEL",
+#                "ah3NONSENTINEL",
+#                "ah5NONSENTINEL",
+#                "ah7n9NONSENTINEL",
+#                "a_no_subtypeNONSENTINEL",
+##            ]
+#        ].sum(axis=1, min_count=1)
+#        == df["inf_aNONSENTINEL"]
+#   )
