@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_4223_environmental_impacts_of_food__poore__and__nemecek__2018_values
   file_extension: feather
-  date_accessed: 2023-02-23 17:16:05.135727
+  date_accessed: 2023-02-28 18:29:12.075357
   name: Environmental impacts of food (Poore & Nemecek, 2018)
   description: ''
   source_name: Our World in Data catalog backport

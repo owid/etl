@@ -2,12 +2,12 @@
 steps:
   # Meadow
   data://meadow/excess_mortality/latest/hmd_stmf:
-    - snapshot://excess_mortality/2023-02-17/hmd_stmf.csv
+    - snapshot://excess_mortality/2023-02-28/hmd_stmf.csv
   data://meadow/excess_mortality/latest/wmd:
-    - snapshot://excess_mortality/2023-02-17/wmd.csv
+    - snapshot://excess_mortality/2023-02-28/wmd.csv
   data://meadow/excess_mortality/latest/xm_karlinsky_kobak:
-    - snapshot://excess_mortality/2023-02-17/xm_karlinsky_kobak.csv
-    - snapshot://excess_mortality/2023-02-17/xm_karlinsky_kobak.ages.csv
+    - snapshot://excess_mortality/2023-02-28/xm_karlinsky_kobak.csv
+    - snapshot://excess_mortality/2023-02-28/xm_karlinsky_kobak.ages.csv
   # Garden
   data://garden/excess_mortality/latest/hmd_stmf:
     - data://meadow/excess_mortality/latest/hmd_stmf

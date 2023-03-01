@@ -1,0 +1,125 @@
+dataset:
+  description: |-
+    FluID is a global platform for data sharing that links regional influenza epidemiological data into a single global database. The platform provides connections between existing databases and can also be used to directly enter data by the national focal points through a web-based interface. It complements the existing virological data collection tool FluNet.
+
+    The platform accommodates both qualitative and quantitative data which facilitates the tracking of global trends, spread, intensity, and impact of influenza. These data are made freely available to health policy makers in order to assist them in making informed decisions regarding the management of influenza.
+  licenses:
+  - {}
+  sources:
+  - {}
+tables:
+  fluid:
+    variables:
+      whoregion:
+        title: WHO Region
+        description: WHO regions (AFR, AMR, EMR, EUR, SEAR, WPR)
+      fluseason:
+        title: Flu season
+        description: Reporting season (NH=northern hemisphere, SH=southern hemisphere, YR=year-round reporting)
+      hemisphere:
+        title: Hemisphere
+        description: Hemisphere (NH=northern hemisphere, SH=southern hemisphere)
+      itz:
+        title: Influenza Transmission Zone
+        description: https://cdn.who.int/media/docs/default-source/influenza/influenza-transmission-zones20180914.pdf
+      country_code:
+        title: country_code
+        description: ISO3 country codes
+      country:
+        title: Country name
+        description: Country, area or territory name
+      iso_weekstartdate:
+        title: ISO week start date
+      iso_year:
+        title: Year
+      iso_week:
+        title: Week
+      mmwr_weekstartdate:
+        title: Morbidity and Mortality Weekly Report start date
+      mmwr_year:
+        title: Morbidity and Mortality Weekly Report year
+      mmwr_week:
+        title: Morbidity and Mortality Weekly Report week
+      origin_source:
+        title: Source
+        description: Surveillance site type (NONSENTINEL/SENTINEL/NOTDEFINED)
+      agegroup_code:
+        title: Age Group Code
+        description: Age group (xTOy; unknown; All)
+      case_info:
+        title: Type of case e.g. SARI, ILI, ARI
+      reported_cases:
+        title: Number of reported cases
+      outpatients:
+        title: Number of outpatients
+      inpatients:
+        title: Number of inpatients
+      pop_cov:
+        title: Population covered by surveillance sites
+      inf_tested:
+        title: Number of tests carried out for influenza
+      inf_pos:
+        title: Number of tests testing positive for influenza
+      inf_neg:
+        title: Number of tests testing negative for influenza
+      inf_a:
+        title: Number of influenza A detections (all subtypes)
+      inf_b:
+        title: Number of influenza B detections (all subtypes)
+      inf_mixed:
+        title: INF_MIXED
+      ah1:
+        title: Number of A(H1) detections (other than A(H1N1)pdm09)
+      ah1n12009:
+        title: Number of A(H1N1)2009 detections
+      ah3:
+        title: Number of A(H3) detections
+      ah5:
+        title: Number of A(H5) detections
+      ah7:
+        title: Number of A(H7) detections
+      anotsubtyped:
+        title: Number of not subtyped influenza A detections
+      aothertypes:
+        title: Number of other influenza A subtype detections
+      byamagata:
+        title: Number of B (Yamagata lineage) detections''
+      bvictoria:
+        title: Number of B (Victoria lineage) detections
+      bnotdetermined:
+        title: Number of influenza B detections (lineage not determined)''
+      other:
+        title: OTHER
+      rsv:
+        title: Number of Respiratory Syncytial Virus (RSV) detections
+      adeno:
+        title: Number of Adeno virus detections
+      parainfluenza:
+        title: Number of Parainfluenza virus detections
+      inf_risk:
+        title: INF_RISK
+      geospread:
+        title: Geographic Spread
+        description: Geographic spread (1=No activity; 2=Localized; 3=Regional; 4=Widespread; 0=No information available)
+      impact:
+        title: Impact
+        description: Impact (1=low; 2=moderate; 3=severe; 0=no information available)
+      intensity:
+        title: Intensity
+        description: Intensity (1=low or moderate; 2=high; 3=very high; 0=no information available)
+      trend:
+        title: Trend
+        description: Trend (1=decreasing; 2=unchanged; 3=increasing; 0=no information available)
+      nb_sites:
+        title: Number of surveillance sites
+      mortality_all:
+        title: MORTALITY_ALL
+      mortality_pni:
+        title: MORTALITY_PNI
+      iso2:
+        title: ISO2 country code
+      isoyw:
+        title: Year and week (ISO8601)
+      mmwryw:
+        title: Year and week (MMWR)
+
