@@ -1,0 +1,18 @@
+meta:
+  namespace: fasttrack
+  short_name: biosafety_level_4_facilities
+  file_extension: csv
+  date_accessed: 2023-03-01
+  name: DRAFT Biosafety level 4 facilities
+  description: ''
+  source_name: Local CSV
+  url: ''
+  source_published_by: Local CSV
+  source_data_url: gAAAAABj_xXoidWko-sw03skrCdO_qB6qpDQ-JfjIDpmcbo5ueW9rJdxYg8_SzGIzYgiC5P8UW7pEj5TEStcSCHxq_qlQQH3yQ==
+  is_public: false
+  version: latest
+wdir: ../../../data/snapshots/fasttrack/latest
+outs:
+- md5: 01bf4be498a35d1b9a50d8e9ba517e6f
+  size: 410
+  path: biosafety_level_4_facilities.csv
