@@ -302,6 +302,13 @@ tables:
         display:
           name: Solar electricity per capita
           numDecimalPlaces: 0
+      per_capita_solar_and_wind_generation__kwh:
+        title: Solar and wind electricity per capita (kWh)
+        short_unit: kWh
+        unit: kilowatt-hours
+        display:
+          name: Solar and wind electricity per capita
+          numDecimalPlaces: 0
       per_capita_total_generation__kwh:
         title: Per capita electricity (kWh)
         short_unit: kWh
@@ -347,12 +354,24 @@ tables:
         unit: terawatt-hours
         display:
           name: Solar
+      solar_and_wind_generation__twh:
+        title: Electricity from solar and wind (TWh)
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Solar and wind
       solar_share_of_electricity__pct:
         title: Solar (% electricity)
         short_unit: "%"
         unit: "%"
         display:
           name: Solar
+      solar_and_wind_share_of_electricity__pct:
+        title: Solar and wind (% electricity)
+        short_unit: "%"
+        unit: "%"
+        display:
+          name: Solar and wind
       total_demand__twh:
         title: Electricity demand (TWh)
         short_unit: TWh

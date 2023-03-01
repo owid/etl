@@ -68,6 +68,10 @@ def process_bp_data(table_bp: catalog.Table) -> pd.DataFrame:
             "renewable_generation__twh",
             "nuclear_generation__twh",
         ],
+        "solar_and_wind_generation__twh": [
+            "solar_generation__twh",
+            "wind_generation__twh",
+        ],
     }
 
     # Create a dataframe with a dummy index.
@@ -126,6 +130,9 @@ def process_ember_data(table_ember: catalog.Table) -> pd.DataFrame:
         df_ember["other_renewables_excluding_bioenergy_generation__twh"] + df_ember["bioenergy_generation__twh"]
     )
 
+    # Create a new variable for solar and wind generation.
+    df_ember["solar_and_wind_generation__twh"] = df_ember["solar_generation__twh"] + df_ember["wind_generation__twh"]
+
     return df_ember
 
 
@@ -166,6 +173,7 @@ def add_per_capita_variables(combined: pd.DataFrame, population: pd.DataFrame) -
         "solar_generation__twh",
         "total_generation__twh",
         "wind_generation__twh",
+        "solar_and_wind_generation__twh",
     ]
     # Add a column for population (only for harmonized countries).
     combined = add_population(df=combined, population=population, warn_on_missing_countries=False)
@@ -215,6 +223,7 @@ def add_share_variables(combined: pd.DataFrame) -> pd.DataFrame:
         "solar_generation__twh",
         "total_generation__twh",
         "wind_generation__twh",
+        "solar_and_wind_generation__twh",
     ]
     for variable in share_variables:
         new_column = variable.replace("_generation__twh", "_share_of_electricity__pct")
