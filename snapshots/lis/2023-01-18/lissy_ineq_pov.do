@@ -26,13 +26,14 @@ HOW TO EXECUTE:
 	- lis_abs_poverty_pc.csv (menu_option = 2, equivalized = 0)
 	- lis_distribution_equivalized.csv (menu_option = 3, equivalized = 1)
 	- lis_distribution_pc.csv (menu_option = 3, equivalized = 0)
+	- lis_additional_data.csv (menu_option = 4, any equivalized value)
 	
 9. Repeat the process for the different settings you want to extract.
 10. Once all the files have been created, copy them into the lis snapshot directory in the ETL, run concat_files.py and then update the snapshot, by using these comands one by one:
 	python snapshots/lis/2023-01-18/concat.py
 	python snapshots/lis/2023-01-18/lis_keyvars.py --path-to-file snapshots/lis/2023-01-18/lis_keyvars.csv
 	python snapshots/lis/2023-01-18/lis_abs_poverty.py --path-to-file snapshots/lis/2023-01-18/lis_abs_poverty.csv 
-	python snapshots/lis/2023-01-18/lis_distribution.py --path-to-file snapshots/lis/2023-01-18/distribution.csv 
+	python snapshots/lis/2023-01-18/lis_distribution.py --path-to-file snapshots/lis/2023-01-18/lis_distribution.csv 
 	
 	(Change the date for future updates)
 
@@ -45,6 +46,7 @@ Select data to extract:
 1. Population, mean, median, gini and relative poverty variables
 2. Absolute poverty variables
 3. Decile thresholds and shares
+4. Additional dataset information
 */
 
 global menu_option = 1
@@ -57,6 +59,9 @@ global dataset = "all"
 
 *Select the variables to extract
 global inc_cons_vars dhi dhci mi hcexp
+
+*Select if relative poverty lines should be obtained from the DHI median (1) or from each welfare variable (0)
+global relative_poverty_dhi = 0
 
 *Select if values should be converted to PPPs (1 = yes, 0 = no) and the PPP version (2017 or 2011)
 global ppp_values = 1
@@ -71,19 +76,29 @@ set linesize 255
 *-------------------------------------------------------------------------------------------------------------
 
 program define make_variables
+	* Identify observations with missing values and drop them
 	gen miss_comp = 0
 	quietly replace miss_comp=1 if dhi==. | dhci==. | hifactor==. | hiprivate==. | hi33==. | hcexp==.
 	quietly drop if miss_comp==1
+	
+	*Create market income variable
 	gen mi = hifactor + hiprivate + hi33
+	
+	*Get the grossnet variable from the dataset
+	quietly levelsof grossnet, local(uniq_gross) clean
+	
 	foreach var in $inc_cons_vars {
 	
+		*Get the maximum value of the distribution
 		quietly sum `var'
 		local max_`var' = r(max)
 		
-		if `max_`var'' > 0 {
+		*If the welfare variable has values >0, calculate top, bottom-coding and equivalization
+		if `max_`var'' > 0 {	
 			*Use raw income variable
 			gen e`var'_b = `var'
 			
+			*If PPPs are selected and only for countries with PPP data
 			if "$ppp_values" == "1" {
 				*Convert variable into int-$ at ppp_year prices
 				replace e`var'_b = e`var'_b / lisppp
@@ -125,13 +140,32 @@ program define make_variables
 		gen e`var'_b = .
 		
 		}
+		
+		*If gross income is not captured in the survey we don't want `mi'. Values correspond to taxes and contributions not captured (200) or partially captured (300, 310, 320). When this data is fully captured grossnet equals 100, 110 means this data is collected and 120 means this data is imputed
+		
+		if "`var'" == "mi" & ("`uniq_gross'" == "200" | "`uniq_gross'" == "300" | "`uniq_gross'" == "310" | "`uniq_gross'" == "320" | "`uniq_gross'" == ".") {
+			replace e`var'_b = .
+		}
+		
+		*If this option is selected, the relative poverty is estimated considering the median of each welfare variable
+		if "$relative_poverty_dhi" == "0" {
+		
+			quietly sum e`var'_b [w=hwgt*nhhmem], de
+			forvalues pct = 40(10)60 {
+				global povline_`pct'_`var' = r(p50)*`pct'/100
+			}
+		}
 	}
-	quietly sum edhi_b [w=hwgt*nhhmem], de
-	*Why edhi_b and not e`var'_b???
-	*LIS methodology always uses (equivalized) household disposable income for the relative poverty line
-	global povline_40 = r(p50)*0.4
-	global povline_50 = r(p50)*0.5
-	global povline_60 = r(p50)*0.6
+	
+	*If this option is selected, the relative poverty is estimated using the median DHI
+	if "$relative_poverty_dhi" == "1" {
+		quietly sum edhi_b [w=hwgt*nhhmem], de
+		*Why edhi_b and not e`var'_b???
+		*LIS methodology always uses (equivalized) disposable household income for the relative poverty line
+		forvalues pct = 40(10)60 {
+			global povline_`pct' = r(p50)*`pct'/100
+		}
+	}
 	
 	*Get total population
 	quietly sum nhhmem [w=hpopwgt]
@@ -142,30 +176,27 @@ end
 if "$ppp_values" == "1" {
 	use $myincl/ppp_$ppp_year.dta
 	
+	*Create yy variable, a year variable with two digits
+	gen yy = year
+	tostring yy, replace
+	replace yy = substr(yy,-2,.)
+
+	*Combine iso2 and yy to create ccyy, a country-year variable as the one identifying datasets
+	egen ccyy = concat(iso2 yy)
+
+	*Get distinct values of ccyy and call it countries_with_ppp
+	qui levelsof ccyy, local(countries_with_ppp) clean
+	
 	tempfile ppp
 	save "`ppp'"
 }
-
-*Define program to convert to PPP, to use in multiple instances and because some datasets do not have deflator (se76, tw)
-program define convert_ppp
-	if iso2 != "tw" | (iso2 != "se" & year == 1967)
-		quietly merge n:1 iso2 year using "`ppp'", keep(match) nogenerate keepusing(lisppp)
-		foreach var in $inc_cons_vars {
-			replace e`var'_b = e`var'_b / lisppp
-		}
-	}
-	else
-		foreach var in $inc_cons_vars {
-			replace e`var'_b = .
-		}
-end
 
 *Selects the entire dataset or a small one for testing
 if "$dataset" == "all" {
 	qui lissydata, lis
 }
 else if "$dataset" == "test" {
-qui lissydata, lis from(2015) to(2020) iso2(cl uk za)
+	qui lissydata, lis from(2015) to(2020) iso2(cl uk za)
 }
 
 * Gets countries and the first country in the group
@@ -178,14 +209,26 @@ local first_inc_cons : word 1 of $inc_cons_vars
 *Gets first absolute poverty line in abs_povlines
 local first_povline : word 1 of $abs_povlines
 
+*Define an empty countries_without_ppp global macro
+global countries_without_ppp
+
+*Check countries in the income datasets not in PPP dataset
+foreach c in `countries' {
+	if !strpos("`countries_with_ppp'", "`c'") {
+		global countries_without_ppp $countries_without_ppp `c'
+	}
+}
+
 * Gets the data
 
 foreach ccyy in `countries' {
 	quietly use dhi dhci hifactor hiprivate hi33 hcexp hwgt hpopwgt nhhmem grossnet iso2 year using $`ccyy'h, clear
-	*Merge with PPP data to get deflator
+	
+	*Merge with PPP data to get deflator (if PPPs are selected and only for countries with PPP data)
 	if "$ppp_values" == "1" {
 		quietly merge n:1 iso2 year using "`ppp'", keep(match) nogenerate keepusing(lisppp)
 	}
+	*Run make_variables function
 	quietly make_variables
 	
 	* Option 1 is to get population, mean, median, gini and relative poverty variables
@@ -199,8 +242,17 @@ foreach ccyy in `countries' {
 			
 				*For 40, 50, 60 (% of median)
 				forvalues pct = 40(10)60 {
+				
 					*Calculate poverty metrics
-					quietly povdeco e`var'_b [w=hwgt*nhhmem], pline(${povline_`pct'})
+					*If median DHI is selected
+					if "$relative_poverty_dhi" == "1" {
+						quietly povdeco e`var'_b [w=hwgt*nhhmem], pline(${povline_`pct'})
+					}
+					
+					*If relative poverty is measured from the median of each welfare variable
+					else if "$relative_poverty_dhi" == "0" {
+						quietly povdeco e`var'_b [w=hwgt*nhhmem], pline(${povline_`pct'_`var'})
+					}
 					
 					*fgt0 is headcount ratio
 					local fgt0_`var'_`pct': di %9.2f r(fgt0) *100
@@ -327,5 +379,21 @@ foreach ccyy in `countries' {
 			
 			}
 		}
+	}
+	* Option 4 is to get `grossnet' values, the variable that identifies if the dataset contains gross or net income and also the number of observations per dataset
+	else if "$menu_option" == "4" {
+		*Create unique values of grossnet (one per dataset)
+		qui levelsof grossnet, local(uniq_gross) clean
+		
+		foreach var in $inc_cons_vars {
+			
+			quietly sum e`var'_b
+			local n_`var' = r(N)
+			
+		}
+		
+		*Print dataset header
+		if "`ccyy'" == "`first_country'" di "dataset,grossnet,n_dhi,n_dhci,n_mi,n_hcexp"
+		di "`ccyy',`uniq_gross',`n_dhi',`n_dhci',`n_mi',`n_hcexp'"
 	}
 }

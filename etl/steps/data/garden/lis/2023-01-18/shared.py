@@ -126,6 +126,20 @@ var_dict = {
         "short_unit": "",
         "numDecimalPlaces": 2,
     },
+    "share_bottom50": {
+        "title": "Share of the bottom 50%",
+        "description": "This is the income or consumption of the poorest 50% as a share of total income or consumption.",
+        "unit": "%",
+        "short_unit": "%",
+        "numDecimalPlaces": 1,
+    },
+    "share_middle40": {
+        "title": "Share of the middle 40%",
+        "description": "This is the income or consumption of the middle 40% as a share of total income or consumption.",
+        "unit": "%",
+        "short_unit": "%",
+        "numDecimalPlaces": 1,
+    },
 }
 
 # Details for each consumption or income variable

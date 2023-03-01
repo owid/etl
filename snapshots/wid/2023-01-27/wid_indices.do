@@ -9,13 +9,13 @@ This program extracts inequality data from LIS for three types of income and one
 
 The inequality variables extracted from here include Gini coefficients, averages, thresholds and shares per decile, statistics for the top 1, 0.1, 0.01 and 0.001% percentile and share ratios.
 When needed, values are converted to PPP (2011 vintage) adjusted to prices of the most recent year available.
-	
+
 HOW TO EXECUTE:
 
 1. Open this do-file in a local installation of Stata (execution time: ~5-10 minutes)
 2. It generates one file, wid_indices_992j.csv, which needs to be imported as a snapshot in the ETL, as
 	python snapshots/wid/2023-01-27/world_inequality_database.py --path-to-file wid_indices_992j.csv
-	
+
 	(Change the date for future updates)
 
 */
@@ -29,7 +29,7 @@ qui sum year
 global max_year = r(max)
 
 *Get ppp data to convert to USD
-wid, indicators(xlcusp) year($max_year) clear 
+wid, indicators(xlcusp) year($max_year) clear
 rename value ppp
 tempfile ppp
 save "`ppp'"
@@ -62,7 +62,7 @@ drop variable percentile country year
 
 *Replace all occurrences of "." in the newly created `varp` (mainly in p99.9p100 and similar)
 *This is because names of variables with "." are not allowed
-replace varp = subinstr(varp, ".", "_", .) 
+replace varp = subinstr(varp, ".", "_", .)
 
 *Reshape dataset: couy is the main index and varp are what Stata calls subobservations, in this case metrics associated with percentiles
 reshape wide value, j(varp) i(couy) string
@@ -122,9 +122,9 @@ order country year *gini_pretax *gini*dis *gini*nat *gini_wealth *_ratio*pretax 
 sort country year
 
 *Export csv
-export delimited using "data\raw\wid_indices_992j.csv", replace
+export delimited using "wid_indices_992j.csv", replace
 
 ** In case of needing it in a Stata datafile
-*save "data\raw\wid_indices_992j.dta", replace
+*save "wid_indices_992j.dta", replace
 
 exit, clear
