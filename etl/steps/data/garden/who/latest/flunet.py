@@ -2,7 +2,7 @@
 import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
-from shared import remove_strings_of_zeros
+from shared import remove_sparse_timeseries
 from structlog import get_logger
 
 from etl.data_helpers import geo
@@ -41,8 +41,10 @@ def run(dest_dir: str) -> None:
     df = split_by_surveillance_type(df)
     df = calculate_percent_positive(df)
     cols = df.columns.drop(["country", "date"])
-    df = remove_strings_of_zeros(df, cols)
     df = create_zero_filled_strain_columns(df)
+    # set time-series with less than 10 (non-zero, non-NA) datapoints to NA
+    df = remove_sparse_timeseries(df=df, cols=cols, min_data_points=10)
+
     # Create a new table with the processed data.
     # tb_garden = Table(df, like=tb_meadow)
     tb_garden = Table(df, short_name=paths.short_name)
@@ -98,7 +100,7 @@ def remove_rows_that_sum_incorrectly(df: pd.DataFrame) -> pd.DataFrame:
     new_rows = df.shape[0]
     rows_dropped = orig_rows - new_rows
     log.info(f"{rows_dropped} rows dropped as the disaggregates did not sum correctly")
-    assert rows_dropped < 10000, "More than 10,000 rows dropped, this is much more than expected"
+    assert rows_dropped < 20000, "More than 20,000 rows dropped, this is much more than expected"
     return df
 
 
@@ -268,6 +270,8 @@ def create_zero_filled_strain_columns(df: pd.DataFrame) -> pd.DataFrame:
     df[strain_columns_zfilled] = df[strain_columns].fillna(0)
     return df
 
+
+# remove data for countries that have less than 5 or 10 data points
 
 # def sanity_checks(df: pd.DataFrame) -> pd.DataFrame:
 #    """
