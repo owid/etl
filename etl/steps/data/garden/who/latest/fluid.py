@@ -3,11 +3,7 @@
 import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
-<<<<<<< HEAD
 from shared import remove_sparse_timeseries
-=======
-from shared import remove_strings_of_zeros
->>>>>>> master
 from structlog import get_logger
 
 from etl.data_helpers import geo
