@@ -11,7 +11,6 @@ def remove_sparse_timeseries(df: pd.DataFrame, cols: list[str], min_data_points:
 
     for country in countries:
         for col in cols:
-            print(col)
             if df.loc[(df["country"] == country), col].fillna(0).astype(bool).sum() <= min_data_points:
                 df.loc[(df["country"] == country), col] = np.NaN
 
