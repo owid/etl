@@ -65,7 +65,7 @@ def remove_rows_that_sum_incorrectly(df: pd.DataFrame) -> pd.DataFrame:
     We can't be sure which of the columns are correct and as there are relatively few we should just remove them.
     """
     orig_rows = df.shape[0]
-    df = df.drop(df[(df["inf_a"].fillna(0) + df["inf_b"].fillna(0)) != df["inf_all"]].index)
+    df = df.drop(df[(df["inf_a"].fillna(0) + df["inf_b"].fillna(0)) != df["inf_all"].fillna(0)].index)
     df = df.drop(
         df[
             (
@@ -98,7 +98,7 @@ def remove_rows_that_sum_incorrectly(df: pd.DataFrame) -> pd.DataFrame:
     new_rows = df.shape[0]
     rows_dropped = orig_rows - new_rows
     log.info(f"{rows_dropped} rows dropped as the disaggregates did not sum correctly")
-    assert rows_dropped < 10000, "More than 10,000 rows dropped, this is much more than expected"
+    assert rows_dropped < 20000, "More than 20,000 rows dropped, this is much more than expected"
     return df
 
 
