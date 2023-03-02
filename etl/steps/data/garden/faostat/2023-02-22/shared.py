@@ -14,7 +14,6 @@ This module contains:
 import itertools
 import json
 import sys
-from copy import deepcopy
 from pathlib import Path
 from typing import Dict, List, Union, cast
 
@@ -27,7 +26,7 @@ from owid.datautils.io import load_json
 from tqdm.auto import tqdm
 
 from etl.data_helpers import geo
-from etl.helpers import PathFinder
+from etl.helpers import PathFinder, create_dataset
 from etl.paths import DATA_DIR, REFERENCE_DATASET
 
 # Initialise log.
@@ -1820,9 +1819,8 @@ def run(dest_dir: str) -> None:
     # Load dataset of FAOSTAT metadata.
     metadata: catalog.Dataset = paths.load_dependency(f"{NAMESPACE}_metadata")
 
-    # Load and prepare dataset, items, element-units, and countries metadata.
-    datasets_metadata = pd.DataFrame(metadata["datasets"]).reset_index()
-    datasets_metadata = datasets_metadata[datasets_metadata["dataset"] == dataset_short_name].reset_index(drop=True)
+    # Load dataset, items, element-units, and countries metadata.
+    dataset_metadata = pd.DataFrame(metadata["datasets"]).loc[dataset_short_name].to_dict()
     items_metadata = pd.DataFrame(metadata["items"]).reset_index()
     items_metadata = items_metadata[items_metadata["dataset"] == dataset_short_name].reset_index(drop=True)
     elements_metadata = pd.DataFrame(metadata["elements"]).reset_index()
@@ -1862,34 +1860,17 @@ def run(dest_dir: str) -> None:
     #
     # Save outputs.
     #
-    # Initialize new garden dataset.
-    dataset_garden = catalog.Dataset.create_empty(dest_dir)
-    # Prepare metadata for new garden dataset (starting with the metadata from the meadow version).
-    dataset_garden_metadata = deepcopy(ds_meadow.metadata)
-    dataset_garden_metadata.version = VERSION
-    dataset_garden_metadata.description = datasets_metadata["owid_dataset_description"].item()
-    dataset_garden_metadata.title = datasets_metadata["owid_dataset_title"].item()
-    # Add metadata to dataset.
-    dataset_garden.metadata = dataset_garden_metadata
-    # Create new dataset in garden.
-    dataset_garden.save()
-
-    # Prepare metadata for new garden long table (starting with the metadata from the meadow version).
-    data_table_long.metadata = deepcopy(tb_meadow.metadata)
-    data_table_long.metadata.title = dataset_garden_metadata.title
-    data_table_long.metadata.description = dataset_garden_metadata.description
-    data_table_long.metadata.primary_key = list(data_table_long.index.names)
-    data_table_long.metadata.dataset = dataset_garden_metadata
-    # Add long table to the dataset (no need to repack, since columns already have optimal dtypes).
-    dataset_garden.add(data_table_long, repack=False)
-
-    # Prepare metadata for new garden wide table (starting with the metadata from the long table).
-    # Add wide table to the dataset.
-    data_table_wide.metadata = deepcopy(data_table_long.metadata)
-
-    data_table_wide.metadata.title += ADDED_TITLE_TO_WIDE_TABLE
-    data_table_wide.metadata.short_name += "_flat"
-    data_table_wide.metadata.primary_key = list(data_table_wide.index.names)
-
-    # Add wide table to the dataset (no need to repack, since columns already have optimal dtypes).
-    dataset_garden.add(data_table_wide, repack=False)
+    # Update tables metadata.
+    data_table_long.metadata.short_name = dataset_short_name
+    data_table_long.metadata.title = dataset_metadata["owid_dataset_title"]
+    data_table_wide.metadata.short_name = f"{dataset_short_name}_flat"
+    data_table_wide.metadata.title = dataset_metadata["owid_dataset_title"] + ADDED_TITLE_TO_WIDE_TABLE
+    # Initialise new garden dataset.
+    ds_garden = create_dataset(
+        dest_dir=dest_dir, tables=[data_table_long, data_table_wide], default_metadata=ds_meadow.metadata
+    )
+    # Update dataset metadata.
+    ds_garden.metadata.description = dataset_metadata["owid_dataset_description"]
+    ds_garden.metadata.title = dataset_metadata["owid_dataset_title"]
+    # Create garden dataset.
+    ds_garden.save()
