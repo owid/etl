@@ -256,7 +256,7 @@ class PathFinder:
         elif channel in ["snapshot", "walden"]:
             step_name = f"{channel}://{namespace}/{version}/{short_name}"
         elif channel is None:
-            step_name = rf"(?:snapshot:/|walden:/|data://meadow|data://garden|data://grapher|data://explorers|backport://backport)/{namespace}/{version}/{short_name}"
+            step_name = rf"(?:snapshot:/|walden:/|data://meadow|data://garden|data://grapher|data://explorers|backport://backport)/{namespace}/{version}/{short_name}$"
         else:
             raise UnknownChannel
 
