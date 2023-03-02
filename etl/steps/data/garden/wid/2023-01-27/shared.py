@@ -21,6 +21,13 @@ var_dict = {
         "short_unit": "%",
         "numDecimalPlaces": 1,
     },
+    "p50p90_share": {
+        "title": "Middle 40% - Share",
+        "description": "This is the income or wealth of the middle 40% as a share of total income or wealth. The middle 40% is the share of the population whose income or consumption lies between the poorest 50% and the richest 10%.",
+        "unit": "%",
+        "short_unit": "%",
+        "numDecimalPlaces": 1,
+    },
     "thr": {
         "title": "Threshold",
         "description": "This is the level of income or wealth per year below which {str(pct_dict[pct]['thr_number'])}% of the population falls.",
@@ -176,7 +183,6 @@ pct_dict = {
         "decile10_extra": "Top 0.001%",
     },
     "p0p50": {"decile10": "Bottom 50%", "decile9": "Bottom 50%", "thr_number": "", "decile10_extra": "Bottom 50%"},
-    "p50p90": {"decile10": "Middle 40%", "decile9": "Middle 40%", "thr_number": "", "decile10_extra": "Middle 40%"},
 }
 
 
