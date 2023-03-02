@@ -2,6 +2,7 @@
 import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
+from shared import remove_strings_of_zeros
 from structlog import get_logger
 
 from etl.data_helpers import geo
@@ -39,6 +40,8 @@ def run(dest_dir: str) -> None:
     df = clean_and_format_data(df)
     df = split_by_surveillance_type(df)
     df = calculate_percent_positive(df)
+    cols = df.columns.drop(["country", "date"])
+    df = remove_strings_of_zeros(df, cols)
     df = create_zero_filled_strain_columns(df)
     # Create a new table with the processed data.
     # tb_garden = Table(df, like=tb_meadow)
@@ -52,6 +55,51 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
     log.info("flunet.end")
+
+
+def remove_rows_that_sum_incorrectly(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Let's remove rows that don't add up correctly e.g.
+    where influenza a + influenza b does not equal influenza all
+
+    We can't be sure which of the columns are correct and as there are relatively few we should just remove them.
+    """
+    orig_rows = df.shape[0]
+    df = df.drop(df[(df["inf_a"].fillna(0) + df["inf_b"].fillna(0)) != df["inf_all"]].index)
+    df = df.drop(
+        df[
+            (
+                df["ah1n12009"].fillna(0)
+                + df["ah1"].fillna(0)
+                + df["ah3"].fillna(0)
+                + df["ah5"].fillna(0)
+                + df["ah7n9"].fillna(0)
+                + df["anotsubtyped"].fillna(0)
+                + df["anotsubtypable"].fillna(0)
+                + df["aother_subtype"].fillna(0)
+            )
+            != df["inf_a"].fillna(0)
+        ].index
+    )
+
+    df = df.drop(
+        df[
+            (
+                df["bvic_2del"].fillna(0)
+                + df["bvic_3del"].fillna(0)
+                + df["bvic_nodel"].fillna(0)
+                + df["bvic_delunk"].fillna(0)
+                + df["byam"].fillna(0)
+                + df["bnotdetermined"].fillna(0)
+            )
+            != df["inf_b"].fillna(0)
+        ].index
+    )
+    new_rows = df.shape[0]
+    rows_dropped = orig_rows - new_rows
+    log.info(f"{rows_dropped} rows dropped as the disaggregates did not sum correctly")
+    assert rows_dropped < 10000, "More than 10,000 rows dropped, this is much more than expected"
+    return df
 
 
 def split_by_surveillance_type(df: pd.DataFrame) -> pd.DataFrame:
@@ -101,6 +149,7 @@ def clean_and_format_data(df: pd.DataFrame) -> pd.DataFrame:
     """
 
     df["date"] = create_date_from_iso_week(df["iso_weekstartdate"])
+    df = remove_rows_that_sum_incorrectly(df)
     df = combine_columns(df)
     sel_cols = [
         "country",
@@ -123,6 +172,7 @@ def clean_and_format_data(df: pd.DataFrame) -> pd.DataFrame:
         "spec_received_nb",
     ]
     df = df[sel_cols]
+
     return df
 
 
