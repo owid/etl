@@ -5,29 +5,16 @@ from owid.catalog.utils import underscore
 from owid.datautils import dataframes
 from structlog import get_logger
 
+from etl.helpers import PathFinder
 from etl.paths import DATA_DIR, REFERENCE_DATASET
 
 from .shared import CURRENT_DIR
 
 log = get_logger()
 
+paths = PathFinder(__file__)
+
 METADATA_PATH = CURRENT_DIR / "overview.meta.yml"
-# Details for datasets to import.
-# Population
-KI_DATASET_PATH = DATA_DIR / "garden/owid/latest/key_indicators"
-
-# Per capita CO2 emissions
-CO2_EMISSIONS_DATASET_PATH = DATA_DIR / "garden/gcp/2022-11-11/global_carbon_budget"
-
-# Energy consumption by source
-ENERGY_CON_DATASET_PATH = DATA_DIR / "garden/bp/2022-07-14/energy_mix"
-
-# Life expectancy dataset
-LIFE_EXPECTANCY_DATASET_PATH = DATA_DIR / "garden/demography/2022-11-30/life_expectancy"
-# Share of population using the internet
-# GDP per capita
-# Electricity access
-WDI_DATASET_PATH = DATA_DIR / "garden/worldbank_wdi/2022-05-26/wdi"
 
 ## Backports:
 # Electoral democracy
@@ -106,7 +93,7 @@ def get_population() -> pd.DataFrame:
     """
     Get the population variable from the key indicators dataset
     """
-    ds_ki = catalog.Dataset(KI_DATASET_PATH)
+    ds_ki: Dataset = paths.load_dependency("key_indicators")
     pop = ds_ki["population"].reset_index()
     pop = pop[["country", "year", "population"]]
     pop["population"] = pop["population"].astype("int64")
@@ -117,7 +104,7 @@ def get_emissions() -> pd.DataFrame:
     """
     Get the emissions per capita variable from the global carbon budget dataset
     """
-    ds_emissions = catalog.Dataset(CO2_EMISSIONS_DATASET_PATH)
+    ds_emissions: Dataset = paths.load_dependency("global_carbon_budget")
     df_emissions = ds_emissions["global_carbon_budget"].reset_index()
     df_emissions = df_emissions[["country", "year", "emissions_total_per_capita"]]
     df_emissions["year"] = df_emissions["year"].astype("int64")
@@ -128,7 +115,7 @@ def get_energy_mix() -> pd.DataFrame:
     """
     Get the energy consumption variables from the BP energy mix dataset
     """
-    ds_energy_mix = catalog.Dataset(ENERGY_CON_DATASET_PATH)
+    ds_energy_mix: Dataset = paths.load_dependency("energy_mix")
     df_energy_mix = ds_energy_mix["energy_mix"].reset_index()
     cols = [
         "country",
@@ -154,7 +141,7 @@ def get_wdi_variables() -> pd.DataFrame:
     Get the i) Share population using internet, ii) GDP per capita and iii) Share electricity access
     from the WDI dataset.
     """
-    ds_wdi = catalog.Dataset(WDI_DATASET_PATH)
+    ds_wdi: Dataset = paths.load_dependency("wdi")
     df_wdi = ds_wdi["wdi"].reset_index()
     cols = ["country", "year", "it_net_user_zs", "ny_gdp_pcap_kd", "eg_elc_accs_zs"]
     new_cols = ["country", "year", "share_pop_using_internet", "gdp_per_capita", "share_electricity_access"]
@@ -168,7 +155,7 @@ def get_life_expectancy() -> pd.DataFrame:
     """
     Get the long-run life-expectancy dataset - an OMM
     """
-    ds_life_expectancy = catalog.Dataset(LIFE_EXPECTANCY_DATASET_PATH)
+    ds_life_expectancy: Dataset = paths.load_dependency("life_expectancy")
     df_life_expectancy = ds_life_expectancy["life_expectancy"].reset_index()
     cols = ["country", "year", "life_expectancy_0"]
     new_cols = ["country", "year", "life_expectancy_at_birth"]
