@@ -1,0 +1,1040 @@
+dataset:
+  namespace: fasttrack
+  version: latest
+  short_name: vdem_row_final
+  title: DRAFT vdem_row_final
+  description: ''
+  sources:
+  - name: Unknown
+    published_by: Unknown
+    publication_year: 2023
+    date_accessed: 2023-03-02
+tables:
+  vdem_row_final:
+    variables:
+      regime_row_owid:
+        title: regime_row_owid
+        unit: ''
+      electdem_age_row_owid:
+        title: electdem_age_row_owid
+        unit: ''
+      electdem_age_group_row_owid:
+        title: electdem_age_group_row_owid
+        unit: ''
+      libdem_age_row_owid:
+        title: libdem_age_row_owid
+        unit: ''
+      libdem_age_group_row_owid:
+        title: libdem_age_group_row_owid
+        unit: ''
+      regime_amb_row_owid:
+        title: regime_amb_row_owid
+        unit: ''
+      electmulpar_row_owid:
+        title: electmulpar_row_owid
+        unit: ''
+      electmulpar_high_row_owid:
+        title: electmulpar_high_row_owid
+        unit: ''
+      electmulpar_low_row_owid:
+        title: electmulpar_low_row_owid
+        unit: ''
+      electmulpar_leg_row_owid:
+        title: electmulpar_leg_row_owid
+        unit: ''
+      electmulpar_leg_high_row_owid:
+        title: electmulpar_leg_high_row_owid
+        unit: ''
+      electmulpar_leg_low_row_owid:
+        title: electmulpar_leg_low_row_owid
+        unit: ''
+      electmulpar_hoe_row_owid:
+        title: electmulpar_hoe_row_owid
+        unit: ''
+      electmulpar_hoe_high_row_owid:
+        title: electmulpar_hoe_high_row_owid
+        unit: ''
+      electmulpar_hoe_low_row_owid:
+        title: electmulpar_hoe_low_row_owid
+        unit: ''
+      electfreefair_row_owid:
+        title: electfreefair_row_owid
+        unit: ''
+      electfreefair_high_row_owid:
+        title: electfreefair_high_row_owid
+        unit: ''
+      electfreefair_low_row_owid:
+        title: electfreefair_low_row_owid
+        unit: ''
+      electdem_dich_row_owid:
+        title: electdem_dich_row_owid
+        unit: ''
+      electdem_dich_high_row_owid:
+        title: electdem_dich_high_row_owid
+        unit: ''
+      electdem_dich_low_row_owid:
+        title: electdem_dich_low_row_owid
+        unit: ''
+      accessjust_m_row_owid:
+        title: accessjust_m_row_owid
+        unit: ''
+      accessjust_m_high_row_owid:
+        title: accessjust_m_high_row_owid
+        unit: ''
+      accessjust_m_low_row_owid:
+        title: accessjust_m_low_row_owid
+        unit: ''
+      accessjust_w_row_owid:
+        title: accessjust_w_row_owid
+        unit: ''
+      accessjust_w_high_row_owid:
+        title: accessjust_w_high_row_owid
+        unit: ''
+      accessjust_w_low_row_owid:
+        title: accessjust_w_low_row_owid
+        unit: ''
+      transplaws_row_owid:
+        title: transplaws_row_owid
+        unit: ''
+      transplaws_high_row_owid:
+        title: transplaws_high_row_owid
+        unit: ''
+      transplaws_low_row_owid:
+        title: transplaws_low_row_owid
+        unit: ''
+      lib_dich_row_owid:
+        title: lib_dich_row_owid
+        unit: ''
+      lib_dich_high_row_owid:
+        title: lib_dich_high_row_owid
+        unit: ''
+      lib_dich_low_row_owid:
+        title: lib_dich_low_row_owid
+        unit: ''
+      electdem_vdem_owid:
+        title: electdem_vdem_owid
+        unit: ''
+      electdem_vdem_low_owid:
+        title: electdem_vdem_low_owid
+        unit: ''
+      electdem_vdem_high_owid:
+        title: electdem_vdem_high_owid
+        unit: ''
+      libdem_vdem_owid:
+        title: libdem_vdem_owid
+        unit: ''
+      libdem_vdem_low_owid:
+        title: libdem_vdem_low_owid
+        unit: ''
+      libdem_vdem_high_owid:
+        title: libdem_vdem_high_owid
+        unit: ''
+      participdem_vdem_owid:
+        title: participdem_vdem_owid
+        unit: ''
+      participdem_vdem_low_owid:
+        title: participdem_vdem_low_owid
+        unit: ''
+      participdem_vdem_high_owid:
+        title: participdem_vdem_high_owid
+        unit: ''
+      delibdem_vdem_owid:
+        title: delibdem_vdem_owid
+        unit: ''
+      delibdem_vdem_low_owid:
+        title: delibdem_vdem_low_owid
+        unit: ''
+      delibdem_vdem_high_owid:
+        title: delibdem_vdem_high_owid
+        unit: ''
+      egaldem_vdem_owid:
+        title: egaldem_vdem_owid
+        unit: ''
+      egaldem_vdem_low_owid:
+        title: egaldem_vdem_low_owid
+        unit: ''
+      egaldem_vdem_high_owid:
+        title: egaldem_vdem_high_owid
+        unit: ''
+      freeexpr_vdem_owid:
+        title: freeexpr_vdem_owid
+        unit: ''
+      freeexpr_vdem_low_owid:
+        title: freeexpr_vdem_low_owid
+        unit: ''
+      freeexpr_vdem_high_owid:
+        title: freeexpr_vdem_high_owid
+        unit: ''
+      freeassoc_vdem_owid:
+        title: freeassoc_vdem_owid
+        unit: ''
+      freeassoc_vdem_low_owid:
+        title: freeassoc_vdem_low_owid
+        unit: ''
+      freeassoc_vdem_high_owid:
+        title: freeassoc_vdem_high_owid
+        unit: ''
+      suffr_vdem_owid:
+        title: suffr_vdem_owid
+        unit: ''
+      electfreefair_vdem_owid:
+        title: electfreefair_vdem_owid
+        unit: ''
+      electfreefair_vdem_low_owid:
+        title: electfreefair_vdem_low_owid
+        unit: ''
+      electfreefair_vdem_high_owid:
+        title: electfreefair_vdem_high_owid
+        unit: ''
+      electoff_vdem_owid:
+        title: electoff_vdem_owid
+        unit: ''
+      lib_vdem_owid:
+        title: lib_vdem_owid
+        unit: ''
+      lib_vdem_low_owid:
+        title: lib_vdem_low_owid
+        unit: ''
+      lib_vdem_high_owid:
+        title: lib_vdem_high_owid
+        unit: ''
+      indiv_libs_vdem_owid:
+        title: indiv_libs_vdem_owid
+        unit: ''
+      indiv_libs_vdem_low_owid:
+        title: indiv_libs_vdem_low_owid
+        unit: ''
+      indiv_libs_vdem_high_owid:
+        title: indiv_libs_vdem_high_owid
+        unit: ''
+      judicial_constr_vdem_owid:
+        title: judicial_constr_vdem_owid
+        unit: ''
+      judicial_constr_vdem_low_owid:
+        title: judicial_constr_vdem_low_owid
+        unit: ''
+      judicial_constr_vdem_high_owid:
+        title: judicial_constr_vdem_high_owid
+        unit: ''
+      legis_constr_vdem_owid:
+        title: legis_constr_vdem_owid
+        unit: ''
+      legis_constr_vdem_low_owid:
+        title: legis_constr_vdem_low_owid
+        unit: ''
+      legis_constr_vdem_high_owid:
+        title: legis_constr_vdem_high_owid
+        unit: ''
+      particip_vdem_owid:
+        title: particip_vdem_owid
+        unit: ''
+      particip_vdem_low_owid:
+        title: particip_vdem_low_owid
+        unit: ''
+      particip_vdem_high_owid:
+        title: particip_vdem_high_owid
+        unit: ''
+      civsoc_particip_vdem_owid:
+        title: civsoc_particip_vdem_owid
+        unit: ''
+      civsoc_particip_vdem_low_owid:
+        title: civsoc_particip_vdem_low_owid
+        unit: ''
+      civsoc_particip_vdem_high_owid:
+        title: civsoc_particip_vdem_high_owid
+        unit: ''
+      dirpop_vote_vdem_owid:
+        title: dirpop_vote_vdem_owid
+        unit: ''
+      locelect_vdem_owid:
+        title: locelect_vdem_owid
+        unit: ''
+      locelect_vdem_low_owid:
+        title: locelect_vdem_low_owid
+        unit: ''
+      locelect_vdem_high_owid:
+        title: locelect_vdem_high_owid
+        unit: ''
+      regelect_vdem_owid:
+        title: regelect_vdem_owid
+        unit: ''
+      regelect_vdem_low_owid:
+        title: regelect_vdem_low_owid
+        unit: ''
+      regelect_vdem_high_owid:
+        title: regelect_vdem_high_owid
+        unit: ''
+      delib_vdem_owid:
+        title: delib_vdem_owid
+        unit: ''
+      delib_vdem_low_owid:
+        title: delib_vdem_low_owid
+        unit: ''
+      delib_vdem_high_owid:
+        title: delib_vdem_high_owid
+        unit: ''
+      justified_polch_vdem_owid:
+        title: justified_polch_vdem_owid
+        unit: ''
+      justified_polch_vdem_low_owid:
+        title: justified_polch_vdem_low_owid
+        unit: ''
+      justified_polch_vdem_high_owid:
+        title: justified_polch_vdem_high_owid
+        unit: ''
+      justcomgd_polch_vdem_owid:
+        title: justcomgd_polch_vdem_owid
+        unit: ''
+      justcomgd_polch_vdem_low_owid:
+        title: justcomgd_polch_vdem_low_owid
+        unit: ''
+      justcomgd_polch_vdem_high_owid:
+        title: justcomgd_polch_vdem_high_owid
+        unit: ''
+      counterarg_polch_vdem_owid:
+        title: counterarg_polch_vdem_owid
+        unit: ''
+      counterarg_polch_vdem_low_owid:
+        title: counterarg_polch_vdem_low_owid
+        unit: ''
+      counterarg_polch_vdem_high_owid:
+        title: counterarg_polch_vdem_high_owid
+        unit: ''
+      elitecons_polch_vdem_owid:
+        title: elitecons_polch_vdem_owid
+        unit: ''
+      elitecons_polch_vdem_low_owid:
+        title: elitecons_polch_vdem_low_owid
+        unit: ''
+      elitecons_polch_vdem_high_owid:
+        title: elitecons_polch_vdem_high_owid
+        unit: ''
+      soccons_polch_vdem_owid:
+        title: soccons_polch_vdem_owid
+        unit: ''
+      soccons_polch_vdem_low_owid:
+        title: soccons_polch_vdem_low_owid
+        unit: ''
+      soccons_polch_vdem_high_owid:
+        title: soccons_polch_vdem_high_owid
+        unit: ''
+      turnout_vdem_owid:
+        title: turnout_vdem_owid
+        unit: ''
+      egal_vdem_owid:
+        title: egal_vdem_owid
+        unit: ''
+      egal_vdem_low_owid:
+        title: egal_vdem_low_owid
+        unit: ''
+      egal_vdem_high_owid:
+        title: egal_vdem_high_owid
+        unit: ''
+      equal_rights_vdem_owid:
+        title: equal_rights_vdem_owid
+        unit: ''
+      equal_rights_vdem_low_owid:
+        title: equal_rights_vdem_low_owid
+        unit: ''
+      equal_rights_vdem_high_owid:
+        title: equal_rights_vdem_high_owid
+        unit: ''
+      equal_access_vdem_owid:
+        title: equal_access_vdem_owid
+        unit: ''
+      equal_access_vdem_low_owid:
+        title: equal_access_vdem_low_owid
+        unit: ''
+      equal_access_vdem_high_owid:
+        title: equal_access_vdem_high_owid
+        unit: ''
+      equal_res_vdem_owid:
+        title: equal_res_vdem_owid
+        unit: ''
+      equal_res_vdem_low_owid:
+        title: equal_res_vdem_low_owid
+        unit: ''
+      equal_res_vdem_high_owid:
+        title: equal_res_vdem_high_owid
+        unit: ''
+      wom_hos_vdem_owid:
+        title: wom_hos_vdem_owid
+        unit: ''
+      wom_hog_vdem_owid:
+        title: wom_hog_vdem_owid
+        unit: ''
+      v2ex_hogw:
+        title: v2ex_hogw
+        unit: ''
+      corr_leg_vdem_owid:
+        title: corr_leg_vdem_owid
+        unit: ''
+      corr_leg_vdem_low_owid:
+        title: corr_leg_vdem_low_owid
+        unit: ''
+      corr_leg_vdem_high_owid:
+        title: corr_leg_vdem_high_owid
+        unit: ''
+      wom_parl_vdem_owid:
+        title: wom_parl_vdem_owid
+        unit: ''
+      corr_jud_vdem_owid:
+        title: corr_jud_vdem_owid
+        unit: ''
+      corr_jud_vdem_low_owid:
+        title: corr_jud_vdem_low_owid
+        unit: ''
+      corr_jud_vdem_high_owid:
+        title: corr_jud_vdem_high_owid
+        unit: ''
+      public_admin_vdem_owid:
+        title: public_admin_vdem_owid
+        unit: ''
+      public_admin_vdem_low_owid:
+        title: public_admin_vdem_low_owid
+        unit: ''
+      public_admin_vdem_high_owid:
+        title: public_admin_vdem_high_owid
+        unit: ''
+      socgr_civ_libs_vdem_owid:
+        title: socgr_civ_libs_vdem_owid
+        unit: ''
+      socgr_civ_libs_vdem_low_owid:
+        title: socgr_civ_libs_vdem_low_owid
+        unit: ''
+      socgr_civ_libs_vdem_high_owid:
+        title: socgr_civ_libs_vdem_high_owid
+        unit: ''
+      dom_auton_vdem_owid:
+        title: dom_auton_vdem_owid
+        unit: ''
+      dom_auton_vdem_low_owid:
+        title: dom_auton_vdem_low_owid
+        unit: ''
+      dom_auton_vdem_high_owid:
+        title: dom_auton_vdem_high_owid
+        unit: ''
+      int_auton_vdem_owid:
+        title: int_auton_vdem_owid
+        unit: ''
+      int_auton_vdem_low_owid:
+        title: int_auton_vdem_low_owid
+        unit: ''
+      int_auton_vdem_high_owid:
+        title: int_auton_vdem_high_owid
+        unit: ''
+      terr_contr_vdem_owid:
+        title: terr_contr_vdem_owid
+        unit: ''
+      terr_contr_vdem_low_owid:
+        title: terr_contr_vdem_low_owid
+        unit: ''
+      terr_contr_vdem_high_owid:
+        title: terr_contr_vdem_high_owid
+        unit: ''
+      socgr_pow_vdem_owid:
+        title: socgr_pow_vdem_owid
+        unit: ''
+      socgr_pow_vdem_low_owid:
+        title: socgr_pow_vdem_low_owid
+        unit: ''
+      socgr_pow_vdem_high_owid:
+        title: socgr_pow_vdem_high_owid
+        unit: ''
+      personalism_vdem_owid:
+        title: personalism_vdem_owid
+        unit: ''
+      personalism_vdem_low_owid:
+        title: personalism_vdem_low_owid
+        unit: ''
+      personalism_vdem_high_owid:
+        title: personalism_vdem_high_owid
+        unit: ''
+      civ_libs_vdem_owid:
+        title: civ_libs_vdem_owid
+        unit: ''
+      civ_libs_vdem_low_owid:
+        title: civ_libs_vdem_low_owid
+        unit: ''
+      civ_libs_vdem_high_owid:
+        title: civ_libs_vdem_high_owid
+        unit: ''
+      phys_integr_libs_vdem_owid:
+        title: phys_integr_libs_vdem_owid
+        unit: ''
+      phys_integr_libs_vdem_low_owid:
+        title: phys_integr_libs_vdem_low_owid
+        unit: ''
+      phys_integr_libs_vdem_high_owid:
+        title: phys_integr_libs_vdem_high_owid
+        unit: ''
+      pol_libs_vdem_owid:
+        title: pol_libs_vdem_owid
+        unit: ''
+      pol_libs_vdem_low_owid:
+        title: pol_libs_vdem_low_owid
+        unit: ''
+      pol_libs_vdem_high_owid:
+        title: pol_libs_vdem_high_owid
+        unit: ''
+      priv_libs_vdem_owid:
+        title: priv_libs_vdem_owid
+        unit: ''
+      priv_libs_vdem_low_owid:
+        title: priv_libs_vdem_low_owid
+        unit: ''
+      priv_libs_vdem_high_owid:
+        title: priv_libs_vdem_high_owid
+        unit: ''
+      corruption_vdem_owid:
+        title: corruption_vdem_owid
+        unit: ''
+      corruption_vdem_low_owid:
+        title: corruption_vdem_low_owid
+        unit: ''
+      corruption_vdem_high_owid:
+        title: corruption_vdem_high_owid
+        unit: ''
+      corr_exec_vdem_owid:
+        title: corr_exec_vdem_owid
+        unit: ''
+      corr_exec_vdem_low_owid:
+        title: corr_exec_vdem_low_owid
+        unit: ''
+      corr_exec_vdem_high_owid:
+        title: corr_exec_vdem_high_owid
+        unit: ''
+      corr_publsec_vdem_owid:
+        title: corr_publsec_vdem_owid
+        unit: ''
+      corr_publsec_vdem_low_owid:
+        title: corr_publsec_vdem_low_owid
+        unit: ''
+      corr_publsec_vdem_high_owid:
+        title: corr_publsec_vdem_high_owid
+        unit: ''
+      wom_emp_vdem_owid:
+        title: wom_emp_vdem_owid
+        unit: ''
+      wom_emp_vdem_low_owid:
+        title: wom_emp_vdem_low_owid
+        unit: ''
+      wom_emp_vdem_high_owid:
+        title: wom_emp_vdem_high_owid
+        unit: ''
+      wom_civ_libs_vdem_owid:
+        title: wom_civ_libs_vdem_owid
+        unit: ''
+      wom_civ_libs_vdem_low_owid:
+        title: wom_civ_libs_vdem_low_owid
+        unit: ''
+      wom_civ_libs_vdem_high_owid:
+        title: wom_civ_libs_vdem_high_owid
+        unit: ''
+      wom_civ_soc_vdem_owid:
+        title: wom_civ_soc_vdem_owid
+        unit: ''
+      wom_civ_soc_vdem_low_owid:
+        title: wom_civ_soc_vdem_low_owid
+        unit: ''
+      wom_civ_soc_vdem_high_owid:
+        title: wom_civ_soc_vdem_high_owid
+        unit: ''
+      wom_pol_par_vdem_owid:
+        title: wom_pol_par_vdem_owid
+        unit: ''
+      wom_pol_par_vdem_low_owid:
+        title: wom_pol_par_vdem_low_owid
+        unit: ''
+      wom_pol_par_vdem_high_owid:
+        title: wom_pol_par_vdem_high_owid
+        unit: ''
+      rule_of_law_vdem_owid:
+        title: rule_of_law_vdem_owid
+        unit: ''
+      rule_of_law_vdem_low_owid:
+        title: rule_of_law_vdem_low_owid
+        unit: ''
+      rule_of_law_vdem_high_owid:
+        title: rule_of_law_vdem_high_owid
+        unit: ''
+      civ_soc_str_vdem_owid:
+        title: civ_soc_str_vdem_owid
+        unit: ''
+      civ_soc_str_vdem_low_owid:
+        title: civ_soc_str_vdem_low_owid
+        unit: ''
+      civ_soc_str_vdem_high_owid:
+        title: civ_soc_str_vdem_high_owid
+        unit: ''
+      goveffective_vdem_wbgi_owid:
+        title: goveffective_vdem_wbgi_owid
+        unit: ''
+      corruption_cpi_owid:
+        title: corruption_cpi_owid
+        unit: ''
+      regime_redux_row_owid:
+        title: regime_redux_row_owid
+        unit: ''
+      wom_hoe_vdem_owid:
+        title: wom_hoe_vdem_owid
+        unit: ''
+      regime_imputed_vdem_owid:
+        title: regime_imputed_vdem_owid
+        unit: ''
+      regime_imputed_country_vdem_owid:
+        title: regime_imputed_country_vdem_owid
+        unit: ''
+      electdem_exp_row_owid:
+        title: electdem_exp_row_owid
+        unit: ''
+      libdem_exp_row_owid:
+        title: libdem_exp_row_owid
+        unit: ''
+      wom_parl_gr_vdem_owid:
+        title: wom_parl_gr_vdem_owid
+        unit: ''
+      number_closedaut_row_owid:
+        title: number_closedaut_row_owid
+        unit: ''
+      number_electaut_row_owid:
+        title: number_electaut_row_owid
+        unit: ''
+      number_electdem_row_owid:
+        title: number_electdem_row_owid
+        unit: ''
+      number_libdem_row_owid:
+        title: number_libdem_row_owid
+        unit: ''
+      number_closedaut_amb_row_owid:
+        title: number_closedaut_amb_row_owid
+        unit: ''
+      number_closedaut_h_amb_row_owid:
+        title: number_closedaut_h_amb_row_owid
+        unit: ''
+      number_electaut_l_amb_row_owid:
+        title: number_electaut_l_amb_row_owid
+        unit: ''
+      number_electaut_amb_row_owid:
+        title: number_electaut_amb_row_owid
+        unit: ''
+      number_electaut_h_amb_row_owid:
+        title: number_electaut_h_amb_row_owid
+        unit: ''
+      number_electdem_l_amb_row_owid:
+        title: number_electdem_l_amb_row_owid
+        unit: ''
+      number_electdem_amb_row_owid:
+        title: number_electdem_amb_row_owid
+        unit: ''
+      number_electdem_h_amb_row_owid:
+        title: number_electdem_h_amb_row_owid
+        unit: ''
+      number_libdem_l_amb_row_owid:
+        title: number_libdem_l_amb_row_owid
+        unit: ''
+      number_libdem_amb_row_owid:
+        title: number_libdem_amb_row_owid
+        unit: ''
+      number_electdem_18_row_owid:
+        title: number_electdem_18_row_owid
+        unit: ''
+      number_electdem_30_row_owid:
+        title: number_electdem_30_row_owid
+        unit: ''
+      number_electdem_60_row_owid:
+        title: number_electdem_60_row_owid
+        unit: ''
+      number_electdem_90_row_owid:
+        title: number_electdem_90_row_owid
+        unit: ''
+      number_electdem_91plus_row_owid:
+        title: number_electdem_91plus_row_owid
+        unit: ''
+      number_libdem_18_row_owid:
+        title: number_libdem_18_row_owid
+        unit: ''
+      number_libdem_30_row_owid:
+        title: number_libdem_30_row_owid
+        unit: ''
+      number_libdem_60_row_owid:
+        title: number_libdem_60_row_owid
+        unit: ''
+      number_libdem_90_row_owid:
+        title: number_libdem_90_row_owid
+        unit: ''
+      number_libdem_91plus_row_owid:
+        title: number_libdem_91plus_row_owid
+        unit: ''
+      number_nowomen_vdem_owid:
+        title: number_nowomen_vdem_owid
+        unit: ''
+      number_less10women_vdem_owid:
+        title: number_less10women_vdem_owid
+        unit: ''
+      number_less20women_vdem_owid:
+        title: number_less20women_vdem_owid
+        unit: ''
+      number_less30women_vdem_owid:
+        title: number_less30women_vdem_owid
+        unit: ''
+      number_less40women_vdem_owid:
+        title: number_less40women_vdem_owid
+        unit: ''
+      number_more40women_vdem_owid:
+        title: number_more40women_vdem_owid
+        unit: ''
+      pop_closedaut_row_owid:
+        title: pop_closedaut_row_owid
+        unit: ''
+      pop_electaut_row_owid:
+        title: pop_electaut_row_owid
+        unit: ''
+      pop_electdem_row_owid:
+        title: pop_electdem_row_owid
+        unit: ''
+      pop_libdem_row_owid:
+        title: pop_libdem_row_owid
+        unit: ''
+      pop_missreg_row_owid:
+        title: pop_missreg_row_owid
+        unit: ''
+      pop_closedaut_amb_row_owid:
+        title: pop_closedaut_amb_row_owid
+        unit: ''
+      pop_closedaut_h_amb_row_owid:
+        title: pop_closedaut_h_amb_row_owid
+        unit: ''
+      pop_electaut_l_amb_row_owid:
+        title: pop_electaut_l_amb_row_owid
+        unit: ''
+      pop_electaut_amb_row_owid:
+        title: pop_electaut_amb_row_owid
+        unit: ''
+      pop_electaut_h_amb_row_owid:
+        title: pop_electaut_h_amb_row_owid
+        unit: ''
+      pop_electdem_l_amb_row_owid:
+        title: pop_electdem_l_amb_row_owid
+        unit: ''
+      pop_electdem_amb_row_owid:
+        title: pop_electdem_amb_row_owid
+        unit: ''
+      pop_electdem_h_amb_row_owid:
+        title: pop_electdem_h_amb_row_owid
+        unit: ''
+      pop_libdem_l_amb_row_owid:
+        title: pop_libdem_l_amb_row_owid
+        unit: ''
+      pop_libdem_amb_row_owid:
+        title: pop_libdem_amb_row_owid
+        unit: ''
+      pop_electdem_18_row_owid:
+        title: pop_electdem_18_row_owid
+        unit: ''
+      pop_electdem_30_row_owid:
+        title: pop_electdem_30_row_owid
+        unit: ''
+      pop_electdem_60_row_owid:
+        title: pop_electdem_60_row_owid
+        unit: ''
+      pop_electdem_90_row_owid:
+        title: pop_electdem_90_row_owid
+        unit: ''
+      pop_electdem_91plus_row_owid:
+        title: pop_electdem_91plus_row_owid
+        unit: ''
+      pop_libdem_18_row_owid:
+        title: pop_libdem_18_row_owid
+        unit: ''
+      pop_libdem_30_row_owid:
+        title: pop_libdem_30_row_owid
+        unit: ''
+      pop_libdem_60_row_owid:
+        title: pop_libdem_60_row_owid
+        unit: ''
+      pop_libdem_90_row_owid:
+        title: pop_libdem_90_row_owid
+        unit: ''
+      pop_libdem_91plus_row_owid:
+        title: pop_libdem_91plus_row_owid
+        unit: ''
+      pop_nowomen_vdem_owid:
+        title: pop_nowomen_vdem_owid
+        unit: ''
+      pop_less10women_vdem_owid:
+        title: pop_less10women_vdem_owid
+        unit: ''
+      pop_less20women_vdem_owid:
+        title: pop_less20women_vdem_owid
+        unit: ''
+      pop_less30women_vdem_owid:
+        title: pop_less30women_vdem_owid
+        unit: ''
+      pop_less40women_vdem_owid:
+        title: pop_less40women_vdem_owid
+        unit: ''
+      pop_more40women_vdem_owid:
+        title: pop_more40women_vdem_owid
+        unit: ''
+      wom_parl_gr_vdem_owid7:
+        title: wom_parl_gr_vdem_owid7
+        unit: ''
+      popw_electdem_vdem_owid:
+        title: popw_electdem_vdem_owid
+        unit: ''
+      popw_electdem_l_vdem_owid:
+        title: popw_electdem_l_vdem_owid
+        unit: ''
+      popw_electdem_h_vdem_owid:
+        title: popw_electdem_h_vdem_owid
+        unit: ''
+      popw_libdem_vdem_owid:
+        title: popw_libdem_vdem_owid
+        unit: ''
+      popw_libdem_l_vdem_owid:
+        title: popw_libdem_l_vdem_owid
+        unit: ''
+      popw_libdem_h_vdem_owid:
+        title: popw_libdem_h_vdem_owid
+        unit: ''
+      popw_participdem_vdem_owid:
+        title: popw_participdem_vdem_owid
+        unit: ''
+      popw_participdem_l_vdem_owid:
+        title: popw_participdem_l_vdem_owid
+        unit: ''
+      popw_participdem_h_vdem_owid:
+        title: popw_participdem_h_vdem_owid
+        unit: ''
+      popw_delibdem_vdem_owid:
+        title: popw_delibdem_vdem_owid
+        unit: ''
+      popw_delibdem_l_vdem_owid:
+        title: popw_delibdem_l_vdem_owid
+        unit: ''
+      popw_delibdem_h_vdem_owid:
+        title: popw_delibdem_h_vdem_owid
+        unit: ''
+      popw_egaldem_vdem_owid:
+        title: popw_egaldem_vdem_owid
+        unit: ''
+      popw_egaldem_l_vdem_owid:
+        title: popw_egaldem_l_vdem_owid
+        unit: ''
+      popw_egaldem_h_vdem_owid:
+        title: popw_egaldem_h_vdem_owid
+        unit: ''
+      popw_civ_libs_vdem_owid:
+        title: popw_civ_libs_vdem_owid
+        unit: ''
+      popw_civ_libs_vdem_high_owid:
+        title: popw_civ_libs_vdem_high_owid
+        unit: ''
+      popw_civ_libs_vdem_low_owid:
+        title: popw_civ_libs_vdem_low_owid
+        unit: ''
+      popw_physinteg_libs_vdem_owid:
+        title: popw_physinteg_libs_vdem_owid
+        unit: ''
+      popw_physinteg_libs_vdem_h_owid:
+        title: popw_physinteg_libs_vdem_h_owid
+        unit: ''
+      popw_physinteg_libs_vdem_l_owid:
+        title: popw_physinteg_libs_vdem_l_owid
+        unit: ''
+      popw_pol_libs_vdem_owid:
+        title: popw_pol_libs_vdem_owid
+        unit: ''
+      popw_pol_libs_vdem_high_owid:
+        title: popw_pol_libs_vdem_high_owid
+        unit: ''
+      popw_pol_libs_vdem_low_owid:
+        title: popw_pol_libs_vdem_low_owid
+        unit: ''
+      popw_priv_libs_vdem_owid:
+        title: popw_priv_libs_vdem_owid
+        unit: ''
+      popw_priv_libs_vdem_high_owid:
+        title: popw_priv_libs_vdem_high_owid
+        unit: ''
+      popw_priv_libs_vdem_low_owid:
+        title: popw_priv_libs_vdem_low_owid
+        unit: ''
+      popw_wom_emp_vdem_owid:
+        title: popw_wom_emp_vdem_owid
+        unit: ''
+      popw_wom_emp_vdem_high_owid:
+        title: popw_wom_emp_vdem_high_owid
+        unit: ''
+      popw_wom_emp_vdem_low_owid:
+        title: popw_wom_emp_vdem_low_owid
+        unit: ''
+      popw_wom_civ_libs_vdem_owid:
+        title: popw_wom_civ_libs_vdem_owid
+        unit: ''
+      popw_wom_civ_libs_vdem_high_owid:
+        title: popw_wom_civ_libs_vdem_high_owid
+        unit: ''
+      popw_wom_civ_libs_vdem_low_owid:
+        title: popw_wom_civ_libs_vdem_low_owid
+        unit: ''
+      popw_wom_civ_soc_vdem_owid:
+        title: popw_wom_civ_soc_vdem_owid
+        unit: ''
+      popw_wom_civ_soc_vdem_high_owid:
+        title: popw_wom_civ_soc_vdem_high_owid
+        unit: ''
+      popw_wom_civ_soc_vdem_low_owid:
+        title: popw_wom_civ_soc_vdem_low_owid
+        unit: ''
+      popw_wom_pol_par_vdem_owid:
+        title: popw_wom_pol_par_vdem_owid
+        unit: ''
+      popw_wom_pol_par_vdem_high_owid:
+        title: popw_wom_pol_par_vdem_high_owid
+        unit: ''
+      popw_wom_pol_par_vdem_low_owid:
+        title: popw_wom_pol_par_vdem_low_owid
+        unit: ''
+      popw_wom_parl_vdem_owid:
+        title: popw_wom_parl_vdem_owid
+        unit: ''
+      popw_wom_hos_vdem_owid:
+        title: popw_wom_hos_vdem_owid
+        unit: ''
+      popw_wom_hog_vdem_owid:
+        title: popw_wom_hog_vdem_owid
+        unit: ''
+      popw_wom_hoe_vdem_owid:
+        title: popw_wom_hoe_vdem_owid
+        unit: ''
+      popw_socgr_civ_libs_vdem_owid:
+        title: popw_socgr_civ_libs_vdem_owid
+        unit: ''
+      popw_socgr_civ_libs_vdem_h_owid:
+        title: popw_socgr_civ_libs_vdem_h_owid
+        unit: ''
+      popw_socgr_civ_libs_vdem_l_owid:
+        title: popw_socgr_civ_libs_vdem_l_owid
+        unit: ''
+      popw_socgr_pow_vdem_owid:
+        title: popw_socgr_pow_vdem_owid
+        unit: ''
+      popw_socgr_pow_vdem_high_owid:
+        title: popw_socgr_pow_vdem_high_owid
+        unit: ''
+      popw_socgr_pow_vdem_low_owid:
+        title: popw_socgr_pow_vdem_low_owid
+        unit: ''
+      popw_terr_contr_vdem_owid:
+        title: popw_terr_contr_vdem_owid
+        unit: ''
+      popw_terr_contr_vdem_high_owid:
+        title: popw_terr_contr_vdem_high_owid
+        unit: ''
+      popw_terr_contr_vdem_low_owid:
+        title: popw_terr_contr_vdem_low_owid
+        unit: ''
+      popw_rule_of_law_vdem_owid:
+        title: popw_rule_of_law_vdem_owid
+        unit: ''
+      popw_rule_of_law_vdem_high_owid:
+        title: popw_rule_of_law_vdem_high_owid
+        unit: ''
+      popw_rule_of_law_vdem_low_owid:
+        title: popw_rule_of_law_vdem_low_owid
+        unit: ''
+      popw_public_admin_vdem_owid:
+        title: popw_public_admin_vdem_owid
+        unit: ''
+      popw_public_admin_vdem_high_owid:
+        title: popw_public_admin_vdem_high_owid
+        unit: ''
+      popw_public_admin_vdem_low_owid:
+        title: popw_public_admin_vdem_low_owid
+        unit: ''
+      popw_int_auton_vdem_owid:
+        title: popw_int_auton_vdem_owid
+        unit: ''
+      popw_int_auton_vdem_high_owid:
+        title: popw_int_auton_vdem_high_owid
+        unit: ''
+      popw_int_auton_vdem_low_owid:
+        title: popw_int_auton_vdem_low_owid
+        unit: ''
+      popw_dom_auton_vdem_owid:
+        title: popw_dom_auton_vdem_owid
+        unit: ''
+      popw_dom_auton_vdem_high_owid:
+        title: popw_dom_auton_vdem_high_owid
+        unit: ''
+      popw_dom_auton_vdem_low_owid:
+        title: popw_dom_auton_vdem_low_owid
+        unit: ''
+      popw_corruption_vdem_owid:
+        title: popw_corruption_vdem_owid
+        unit: ''
+      popw_corruption_vdem_high_owid:
+        title: popw_corruption_vdem_high_owid
+        unit: ''
+      popw_corruption_vdem_low_owid:
+        title: popw_corruption_vdem_low_owid
+        unit: ''
+      popw_corr_publsec_vdem_owid:
+        title: popw_corr_publsec_vdem_owid
+        unit: ''
+      popw_corr_publsec_vdem_high_owid:
+        title: popw_corr_publsec_vdem_high_owid
+        unit: ''
+      popw_corr_publsec_vdem_low_owid:
+        title: popw_corr_publsec_vdem_low_owid
+        unit: ''
+      popw_corr_exec_vdem_owid:
+        title: popw_corr_exec_vdem_owid
+        unit: ''
+      popw_corr_exec_vdem_high_owid:
+        title: popw_corr_exec_vdem_high_owid
+        unit: ''
+      popw_corr_exec_vdem_low_owid:
+        title: popw_corr_exec_vdem_low_owid
+        unit: ''
+      popw_corr_leg_vdem_owid:
+        title: popw_corr_leg_vdem_owid
+        unit: ''
+      popw_corr_leg_vdem_high_owid:
+        title: popw_corr_leg_vdem_high_owid
+        unit: ''
+      popw_corr_leg_vdem_low_owid:
+        title: popw_corr_leg_vdem_low_owid
+        unit: ''
+      popw_corr_jud_vdem_owid:
+        title: popw_corr_jud_vdem_owid
+        unit: ''
+      popw_corr_jud_vdem_high_owid:
+        title: popw_corr_jud_vdem_high_owid
+        unit: ''
+      popw_corr_jud_vdem_low_owid:
+        title: popw_corr_jud_vdem_low_owid
+        unit: ''
+      popw_personalism_vdem_owid:
+        title: popw_personalism_vdem_owid
+        unit: ''
+      popw_personalism_vdem_high_owid:
+        title: popw_personalism_vdem_high_owid
+        unit: ''
+      popw_personalism_vdem_low_owid:
+        title: popw_personalism_vdem_low_owid
+        unit: ''
+      popw_civ_soc_str_vdem_owid:
+        title: popw_civ_soc_str_vdem_owid
+        unit: ''
+      popw_civ_soc_str_vdem_high_owid:
+        title: popw_civ_soc_str_vdem_high_owid
+        unit: ''
+      popw_civ_soc_str_vdem_low_owid:
+        title: popw_civ_soc_str_vdem_low_owid
+        unit: ''
+      region:
+        title: region
+        unit: ''
