@@ -15,7 +15,6 @@ update.
 
 """
 
-from copy import deepcopy
 from pathlib import Path
 from typing import cast
 
