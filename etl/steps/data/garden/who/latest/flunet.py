@@ -40,10 +40,10 @@ def run(dest_dir: str) -> None:
     df = clean_and_format_data(df)
     df = split_by_surveillance_type(df)
     df = calculate_percent_positive(df)
-    cols = df.columns.drop(["country", "date"])
     df = create_zero_filled_strain_columns(df)
-    # set time-series with less than 10 (non-zero, non-NA) datapoints to NA
-    df = remove_sparse_timeseries(df=df, cols=cols, min_data_points=10)
+
+    # set time-series with less than 10 (non-zero, non-NA) datapoints to NA - apply to a
+    df = remove_sparse_timeseries(df=df, cols=df.columns.drop(["country", "date"]), min_data_points=10)
 
     # Create a new table with the processed data.
     # tb_garden = Table(df, like=tb_meadow)
@@ -291,4 +291,3 @@ def create_zero_filled_strain_columns(df: pd.DataFrame) -> pd.DataFrame:
 ##            ]
 #        ].sum(axis=1, min_count=1)
 #        == df["inf_aNONSENTINEL"]
-#   )
