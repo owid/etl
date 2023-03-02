@@ -60,7 +60,7 @@ def run(dest_dir: str) -> None:
     # Load `distribution` meadow dataset, rename variables
     df_distribution = load_distribution()
 
-    # Calculate income ratios and decile averages
+    # Calculate income ratios, decile averages and groups of shares
     df_distribution = create_distributional_variables(df_distribution)
 
     # Make table wide
@@ -277,6 +277,23 @@ def create_distributional_variables(df_distribution: pd.DataFrame) -> pd.DataFra
     df_distribution["p90_p10_ratio"] = df_distribution["thr_p90"] / df_distribution["thr_p10"]
     df_distribution["p90_p50_ratio"] = df_distribution["thr_p90"] / df_distribution["thr_p50"]
     df_distribution["p50_p10_ratio"] = df_distribution["thr_p50"] / df_distribution["thr_p10"]
+
+    # Calculate share of the botton 50%
+    df_distribution["share_bottom50"] = (
+        df_distribution["share_p10"]
+        + df_distribution["share_p20"]
+        + df_distribution["share_p30"]
+        + df_distribution["share_p40"]
+        + df_distribution["share_p50"]
+    )
+
+    # Calculate share of the middle 40%
+    df_distribution["share_middle40"] = (
+        df_distribution["share_p60"]
+        + df_distribution["share_p70"]
+        + df_distribution["share_p80"]
+        + df_distribution["share_p90"]
+    )
 
     # Create decile averages
     # Add mean data to dataframe

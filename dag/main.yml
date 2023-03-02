@@ -286,6 +286,11 @@ steps:
   data://explorers/wid/2023-01-27/world_inequality_database:
     - data://garden/wid/2023-01-27/world_inequality_database
 
+  # Poverty and inequality dataset for comparison explorers
+  data://explorers/poverty_inequality/2023-03-01/poverty_inequality:
+    - data://explorers/wid/2023-01-27/world_inequality_database
+    - data://explorers/lis/2023-01-18/luxembourg_income_study
+
   #
   # Regions - Regions (2023).
   #

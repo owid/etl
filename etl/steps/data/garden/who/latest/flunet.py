@@ -41,7 +41,6 @@ def run(dest_dir: str) -> None:
     df = split_by_surveillance_type(df)
     df = calculate_percent_positive(df)
     cols = df.columns.drop(["country", "date"])
-
     df = create_zero_filled_strain_columns(df)
     # set time-series with less than 10 (non-zero, non-NA) datapoints to NA
     df = remove_sparse_timeseries(df=df, cols=cols, min_data_points=10)
