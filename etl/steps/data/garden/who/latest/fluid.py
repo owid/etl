@@ -3,6 +3,7 @@
 import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
+from shared import remove_strings_of_zeros
 from structlog import get_logger
 
 from etl.data_helpers import geo
@@ -40,7 +41,8 @@ def run(dest_dir: str) -> None:
     # Subset the data
     df = subset_and_clean_data(df)
     df = pivot_fluid(df)
-    df = remove_strings_of_zeros(df)
+    cols = df.columns.drop(["country", "date"])
+    df = remove_strings_of_zeros(df, cols)
     df = calculate_patient_rates(df)
     df = df.reset_index(drop=True)
     # Create a new table with the processed data.
@@ -202,21 +204,5 @@ def calculate_patient_rates(df: pd.DataFrame) -> pd.DataFrame:
     df["ili_cases_per_thousand_outpatients"][df["ili_cases_per_thousand_outpatients"] > 1000] = np.NaN
     df["ari_cases_per_thousand_outpatients"][df["ari_cases_per_thousand_outpatients"] > 1000] = np.NaN
     df["sari_cases_per_hundred_inpatients"][df["sari_cases_per_hundred_inpatients"] > 100] = np.NaN
-
-    return df
-
-
-def remove_strings_of_zeros(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    For each country go through each column, if the sum = 0 then change all the values to NA. This is to
-    prevent long strings of 0s showing up in the grapher.
-    """
-    cols = df.columns.drop(["country", "date"])
-    countries = df["country"].drop_duplicates()
-
-    for country in countries:
-        for col in cols:
-            if df.loc[(df["country"] == country), col].sum() == 0:
-                df.loc[(df["country"] == country), col] = np.NaN
 
     return df
