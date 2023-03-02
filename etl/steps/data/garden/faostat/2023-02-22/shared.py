@@ -27,8 +27,8 @@ from owid.datautils.io import load_json
 from tqdm.auto import tqdm
 
 from etl.data_helpers import geo
-from etl.helpers import PathFinder, create_dataset
-from etl.paths import DATA_DIR, REFERENCE_DATASET, STEP_DIR
+from etl.helpers import PathFinder
+from etl.paths import DATA_DIR, REFERENCE_DATASET
 
 # Initialise log.
 log = structlog.get_logger()
@@ -295,7 +295,7 @@ FLAGS_RANKING = (
             ("Q", "Missing value; suppressed"),
             ("V", "Unvalidated value"),
             ("Fp", "Unknown flag"),
-            ],
+        ],
     )
     .reset_index()
     .rename(columns={"index": "ranking"})

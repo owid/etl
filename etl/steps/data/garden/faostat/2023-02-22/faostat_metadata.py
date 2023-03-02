@@ -52,7 +52,6 @@ from shared import (
     FAOSTAT_METADATA_SHORT_NAME,
     FLAGS_RANKING,
     NAMESPACE,
-    VERSION,
     harmonize_elements,
     harmonize_items,
     log,
@@ -60,43 +59,10 @@ from shared import (
 )
 from tqdm.auto import tqdm
 
-from etl.paths import DATA_DIR, STEP_DIR
 from etl.helpers import PathFinder
 
 # Minimum number of issues in the comparison of items and item codes from data and metadata to raise a warning.
 N_ISSUES_ON_ITEMS_FOR_WARNING = 10
-
-
-def load_latest_data_table_for_dataset(dataset_short_name: str) -> catalog.Table:
-    """Load data table (in long format) from the latest version of a dataset for a given domain.
-
-    Parameters
-    ----------
-    dataset_short_name : str
-        Dataset short name (e.g. 'faostat_qcl').
-
-    Returns
-    -------
-    table : catalog.Table
-        Latest version of table in long format for given domain.
-
-    """
-    # Path to folder with all versions of meadow datasets for FAOSTAT.
-    meadow_dir = DATA_DIR / "meadow" / NAMESPACE
-    # Load file of versions.
-    latest_versions = pd.read_csv(LATEST_VERSIONS_FILE).set_index(["channel", "dataset"])
-    # Find latest meadow version for given dataset.
-    dataset_version = latest_versions.loc["meadow", dataset_short_name].item()
-    # Path to latest dataset folder.
-    dataset_path = meadow_dir / dataset_version / dataset_short_name
-    assert dataset_path.is_dir(), f"Dataset {dataset_short_name} not found in meadow."
-    # Load dataset.
-    dataset = catalog.Dataset(dataset_path)
-    assert len(dataset.table_names) == 1
-    # Load table in long format from dataset.
-    table = dataset[dataset_short_name]
-
-    return table
 
 
 def create_dataset_descriptions_dataframe_for_domain(table: catalog.Table, dataset_short_name: str) -> pd.DataFrame:
@@ -339,8 +305,7 @@ def clean_global_items_dataframe(items_df: pd.DataFrame, custom_items: pd.DataFr
     ]
     if len(changed_descriptions) > 0:
         log.warning(
-            f"{len(changed_descriptions)} domains have changed descriptions. "
-            f"Consider updating custom_items.csv."
+            f"{len(changed_descriptions)} domains have changed descriptions. " f"Consider updating custom_items.csv."
         )
 
     items_df = items_df.drop(columns="fao_item_description_old").rename(
@@ -349,7 +314,10 @@ def clean_global_items_dataframe(items_df: pd.DataFrame, custom_items: pd.DataFr
 
     # Check that item names have not changed.
     # NOTE: This condition used to raise an error if not fulfilled. Consider making it an assertion.
-    if not (items_df[items_df["fao_item_check"].notnull()]["fao_item_check"] == items_df[items_df["fao_item_check"].notnull()]["fao_item"]).all():
+    if not (
+        items_df[items_df["fao_item_check"].notnull()]["fao_item_check"]
+        == items_df[items_df["fao_item_check"].notnull()]["fao_item"]
+    ).all():
         log.warning("Item names may have changed with respect to custom items file. Update custom items file.")
     items_df = items_df.drop(columns=["fao_item_check"])
 
@@ -816,7 +784,7 @@ def process_metadata(
     # Gather all variables from the latest version of each meadow dataset.
     for dataset_short_name in tqdm(dataset_short_names, file=sys.stdout):
         # Load latest meadow table for current dataset.
-        ds_latest : catalog.Dataset = paths.load_dependency(dataset_short_name)
+        ds_latest: catalog.Dataset = paths.load_dependency(dataset_short_name)
         table = ds_latest[dataset_short_name]
         df = pd.DataFrame(table.reset_index()).rename(
             columns={
@@ -972,5 +940,3 @@ def run(dest_dir: str) -> None:
     dataset_garden.add(items_table, repack=False)
     dataset_garden.add(elements_table, repack=False)
     dataset_garden.add(countries_table, repack=False)
-
-
