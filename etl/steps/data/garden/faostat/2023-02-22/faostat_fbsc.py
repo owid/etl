@@ -15,19 +15,19 @@ update.
 
 """
 
-import json
 from copy import deepcopy
+from pathlib import Path
 from typing import cast
 
 import pandas as pd
 from owid import catalog
-from owid.catalog.meta import DatasetMeta, TableMeta
 from owid.datautils import dataframes
+from owid.datautils.io import load_json
 from shared import (
     ADDED_TITLE_TO_WIDE_TABLE,
-    LATEST_VERSIONS_FILE,
+    CURRENT_DIR,
     NAMESPACE,
-    VERSION,
+    OUTLIERS_FILE_NAME,
     add_per_capita_variables,
     add_regions,
     clean_data,
@@ -39,10 +39,7 @@ from shared import (
     remove_outliers,
 )
 
-from etl.paths import DATA_DIR, STEP_DIR
-
-# Dataset name.
-DATASET_SHORT_NAME = f"{NAMESPACE}_fbsc"
+from etl.helpers import PathFinder, create_dataset
 
 # First year for which we have data in fbs dataset (it defines the first year when new methodology is used).
 FBS_FIRST_YEAR = 2010
@@ -119,54 +116,40 @@ def _assert_df_size(df: pd.DataFrame, size_mb: float) -> None:
 
 
 def run(dest_dir: str) -> None:
-    ####################################################################################################################
-    # Common definitions.
-    ####################################################################################################################
-
-    # Load file of versions.
-    latest_versions = pd.read_csv(LATEST_VERSIONS_FILE).set_index(["channel", "dataset"])
-
-    # Find path to latest versions of fbsh dataset.
-    fbsh_version = latest_versions.loc["meadow", "faostat_fbsh"].item()
-    fbsh_file = DATA_DIR / "meadow" / NAMESPACE / fbsh_version / "faostat_fbsh"
-    # Find path to latest versions of fbs dataset.
-    fbs_version = latest_versions.loc["meadow", "faostat_fbs"].item()
-    fbs_file = DATA_DIR / "meadow" / NAMESPACE / fbs_version / "faostat_fbs"
-    # Path to dataset of FAOSTAT metadata.
-    garden_metadata_dir = DATA_DIR / "garden" / NAMESPACE / VERSION / f"{NAMESPACE}_metadata"
-
-    # Path to outliers file.
-    outliers_file = STEP_DIR / "data" / "garden" / NAMESPACE / VERSION / "detected_outliers.json"
-
-    ####################################################################################################################
+    #
     # Load data.
-    ####################################################################################################################
+    #
+    # Fetch the dataset short name from dest_dir.
+    dataset_short_name = Path(dest_dir).name
+
+    # Define path to current step file.
+    current_step_file = (CURRENT_DIR / dataset_short_name).with_suffix(".py")
+
+    # Get paths and naming conventions for current data step.
+    paths = PathFinder(current_step_file.as_posix())
 
     # Load fbsh and fbs.
     log.info("faostat_fbsc.loading_datasets")
-    fbsh_dataset = catalog.Dataset(fbsh_file)
-    fbs_dataset = catalog.Dataset(fbs_file)
-
-    # Load dataset of FAOSTAT metadata.
-    metadata = catalog.Dataset(garden_metadata_dir)
-
-    # Load and prepare dataset, items and element-units metadata.
-    datasets_metadata = pd.DataFrame(metadata["datasets"]).reset_index()
-    datasets_metadata = datasets_metadata[datasets_metadata["dataset"] == DATASET_SHORT_NAME].reset_index(drop=True)
-    items_metadata = pd.DataFrame(metadata["items"]).reset_index()
-    items_metadata = items_metadata[items_metadata["dataset"] == DATASET_SHORT_NAME].reset_index(drop=True)
-    elements_metadata = pd.DataFrame(metadata["elements"]).reset_index()
-    elements_metadata = elements_metadata[elements_metadata["dataset"] == DATASET_SHORT_NAME].reset_index(drop=True)
-    countries_metadata = pd.DataFrame(metadata["countries"]).reset_index()
+    fbsh_dataset: catalog.Dataset = paths.load_dependency(f"{NAMESPACE}_fbsh")
+    fbs_dataset: catalog.Dataset = paths.load_dependency(f"{NAMESPACE}_fbs")
 
     # Load file of detected outliers.
-    with open(outliers_file, "r") as _json_file:
-        outliers = json.loads(_json_file.read())
+    outliers = load_json(paths.directory / OUTLIERS_FILE_NAME)
 
-    ####################################################################################################################
+    # Load dataset of FAOSTAT metadata.
+    metadata: catalog.Dataset = paths.load_dependency(f"{NAMESPACE}_metadata")
+
+    # Load dataset, items, element-units, and countries metadata.
+    dataset_metadata = pd.DataFrame(metadata["datasets"]).loc[dataset_short_name].to_dict()
+    items_metadata = pd.DataFrame(metadata["items"]).reset_index()
+    items_metadata = items_metadata[items_metadata["dataset"] == dataset_short_name].reset_index(drop=True)
+    elements_metadata = pd.DataFrame(metadata["elements"]).reset_index()
+    elements_metadata = elements_metadata[elements_metadata["dataset"] == dataset_short_name].reset_index(drop=True)
+    countries_metadata = pd.DataFrame(metadata["countries"]).reset_index()
+
+    #
     # Process data.
-    ####################################################################################################################
-
+    #
     # Combine fbsh and fbs datasets.
     log.info(
         "faostat_fbsc.combine_fbsh_and_fbs_datasets",
@@ -191,7 +174,7 @@ def run(dest_dir: str) -> None:
     # Add per-capita variables.
     data = add_per_capita_variables(data=data, elements_metadata=elements_metadata)
 
-    # Remove outliers from data.
+    # Remove outliers (this step needs to happen after creating regions and per capita variables).
     data = remove_outliers(data, outliers=outliers)
 
     # Avoid objects as they would explode memory, use categoricals instead.
@@ -210,49 +193,27 @@ def run(dest_dir: str) -> None:
     log.info("faostat_fbsc.prepare_wide_table", shape=data.shape)
     data_table_wide = prepare_wide_table(data=data)
 
-    ####################################################################################################################
-    # Prepare outputs.
-    ####################################################################################################################
+    #
+    # Save outputs.
+    #
+    # Update tables metadata.
+    data_table_long.metadata.short_name = dataset_short_name
+    data_table_long.metadata.title = dataset_metadata["owid_dataset_title"]
+    data_table_wide.metadata.short_name = f"{dataset_short_name}_flat"
+    data_table_wide.metadata.title = dataset_metadata["owid_dataset_title"] + ADDED_TITLE_TO_WIDE_TABLE
 
-    log.info("faostat_fbsc.prepare_outputs")
+    # Initialise new garden dataset.
+    ds_garden = create_dataset(
+        dest_dir=dest_dir, tables=[data_table_long, data_table_wide], default_metadata=fbs_dataset.metadata
+    )
 
-    # Initialize new garden dataset.
-    dataset_garden = catalog.Dataset.create_empty(dest_dir)
-    # Define metadata for new fbsc garden dataset (by default, take metadata from fbs dataset).
-    fbsc_sources = deepcopy(fbs_dataset.metadata.sources[0])
-    fbsc_sources.source_data_url = None
-    fbsc_sources.owid_data_url = None
     # Check that the title assigned here coincides with the one in custom_datasets.csv (for consistency).
     error = "Dataset title given to fbsc is different to the one in custom_datasets.csv. Update the latter file."
-    assert DATASET_TITLE == datasets_metadata["owid_dataset_title"].item(), error
-    dataset_garden_metadata = DatasetMeta(
-        namespace=NAMESPACE,
-        short_name=DATASET_SHORT_NAME,
-        title=DATASET_TITLE,
-        # Take description from any of the datasets (since they should be identical).
-        description=datasets_metadata["owid_dataset_description"].item(),
-        # For sources and licenses, assume those of fbs.
-        sources=[fbsc_sources],
-        licenses=fbs_dataset.metadata.licenses,
-        version=VERSION,
-    )
-    dataset_garden.metadata = dataset_garden_metadata
-    # Create new dataset in garden.
-    dataset_garden.save()
+    assert DATASET_TITLE == dataset_metadata["owid_dataset_title"], error
 
-    # Prepare metadata for new garden long table.
-    data_table_long.metadata = TableMeta(short_name=DATASET_SHORT_NAME)
-    data_table_long.metadata.title = dataset_garden_metadata.title
-    data_table_long.metadata.description = dataset_garden_metadata.description
-    data_table_long.metadata.primary_key = list(data_table_long.index.names)
-    data_table_long.metadata.dataset = dataset_garden_metadata
-    # Add long table to the dataset (no need to repack, since columns already have optimal dtypes).
-    dataset_garden.add(data_table_long, repack=False)
+    # Update dataset metadata.
+    ds_garden.metadata.description = dataset_metadata["owid_dataset_description"]
+    ds_garden.metadata.title = dataset_metadata["owid_dataset_title"]
 
-    # Prepare metadata for new garden wide table (starting with the metadata from the long table).
-    data_table_wide.metadata = deepcopy(data_table_long.metadata)
-    data_table_wide.metadata.title += ADDED_TITLE_TO_WIDE_TABLE
-    data_table_wide.metadata.short_name += "_flat"
-    data_table_wide.metadata.primary_key = list(data_table_wide.index.names)
-    # Add wide table to the dataset (no need to repack, since columns already have optimal dtypes).
-    dataset_garden.add(data_table_wide, repack=False)
+    # Create garden dataset.
+    ds_garden.save()
