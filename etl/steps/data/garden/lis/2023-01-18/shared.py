@@ -135,7 +135,7 @@ var_dict = {
     },
     "share_middle40": {
         "title": "Share of the middle 40%",
-        "description": "This is the income or consumption of the middle 40% as a share of total income or consumption.",
+        "description": "This is the income or consumption of the middle 40% as a share of total income or consumption. The middle 40% is the share of the population whose income or consumption lies between the poorest 50% and the richest 10%.",
         "unit": "%",
         "short_unit": "%",
         "numDecimalPlaces": 1,
