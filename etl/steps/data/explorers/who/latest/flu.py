@@ -9,7 +9,7 @@ from etl.helpers import PathFinder, create_dataset
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-MIN_DATA_POINTS = 10
+MIN_DATA_POINTS = 50
 
 
 def run(dest_dir: str) -> None:
