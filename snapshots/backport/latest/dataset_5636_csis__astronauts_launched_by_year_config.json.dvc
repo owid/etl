@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5636_csis__astronauts_launched_by_year_config
   file_extension: json
-  date_accessed: 2023-02-23 15:19:48.956142
+  date_accessed: 2023-03-03 10:57:47.321997
   name: Grapher metadata for dataset_5636_csis__astronauts_launched_by_year
   description: https://github.com/owid/notebooks/tree/main/EdouardMathieu/aerospace_csis_datasets
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 06c694301bb7d13df5a09ea5b9308cc6
-  size: 3825
+- md5: 86086b3f501b0757a2de8e8f2cd74a3d
+  size: 3824
   path: dataset_5636_csis__astronauts_launched_by_year_config.json
