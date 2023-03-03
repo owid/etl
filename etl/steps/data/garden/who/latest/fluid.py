@@ -40,9 +40,7 @@ def run(dest_dir: str) -> None:
     # Subset the data
     df = subset_and_clean_data(df)
     df = pivot_fluid(df)
-    cols = df.columns.drop(["country", "date"])
     # Remove timeseries where there are only zeros or NAs
-    # df = remove_sparse_timeseries(df=df, cols=cols, min_data_points=0)
     df = calculate_patient_rates(df)
     df = df.reset_index(drop=True)
     # Create a new table with the processed data.
