@@ -2,7 +2,6 @@
 import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
-from shared import remove_sparse_timeseries
 from structlog import get_logger
 
 from etl.data_helpers import geo
@@ -40,12 +39,12 @@ def run(dest_dir: str) -> None:
     df = clean_and_format_data(df)
     df = split_by_surveillance_type(df)
     df = calculate_percent_positive(df)
-    df = create_zero_filled_strain_columns(df)
+    # df = create_zero_filled_strain_columns(df)
 
     # We can't remove sparse data from the zero-filled columns because of how stacked bar charts behave
-    filter_col = [col for col in df if col.endswith("zfilled")]
+    # filter_col = [col for col in df if col.endswith("zfilled")]
     # set time-series with less than 10 (non-zero, non-NA) datapoints to NA - apply to a
-    df = remove_sparse_timeseries(df=df, cols=df.columns.drop(["country", "date", filter_col]), min_data_points=10)
+    # df = remove_sparse_timeseries(df=df, cols=df.columns.drop(["country", "date", filter_col]), min_data_points=10)
 
     # Create a new table with the processed data.
     # tb_garden = Table(df, like=tb_meadow)
@@ -218,58 +217,6 @@ def calculate_percent_positive(df: pd.DataFrame) -> pd.DataFrame:
         ] = np.nan
         df = df.dropna(axis=1, how="all")
 
-    return df
-
-
-def create_zero_filled_strain_columns(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    For the stacked bar charts in the grapher to work I think I need to fill the NAs with zeros. I'll keep the original columns too as I think adding 0s into line charts would look weird and be misleading
-    """
-    strain_columns = [
-        "ah1n12009COMBINED",
-        "ah1COMBINED",
-        "ah3COMBINED",
-        "ah5COMBINED",
-        "ah7n9COMBINED",
-        "a_no_subtypeCOMBINED",
-        "byamCOMBINED",
-        "bnotdeterminedCOMBINED",
-        "bvicCOMBINED",
-        "inf_aCOMBINED",
-        "inf_bCOMBINED",
-        "ah1n12009SENTINEL",
-        "ah1SENTINEL",
-        "ah3SENTINEL",
-        "ah5SENTINEL",
-        "ah7n9SENTINEL",
-        "byamSENTINEL",
-        "bnotdeterminedSENTINEL",
-        "bvicSENTINEL",
-        "inf_aSENTINEL",
-        "inf_bSENTINEL",
-        "ah1n12009NONSENTINEL",
-        "ah1n12009NOTDEFINED",
-        "ah1NOTDEFINED",
-        "ah1NONSENTINEL",
-        "ah3NONSENTINEL",
-        "ah3NOTDEFINED",
-        "ah5NONSENTINEL",
-        "ah5NOTDEFINED",
-        "ah7n9NONSENTINEL",
-        "ah7n9NOTDEFINED",
-        "a_no_subtypeNOTDEFINED",
-        "a_no_subtypeSENTINEL",
-        "byamNONSENTINEL",
-        "byamNOTDEFINED",
-        "bnotdeterminedNONSENTINEL",
-        "bnotdeterminedNOTDEFINED",
-        "bvicNONSENTINEL",
-        "bvicNOTDEFINED",
-    ]
-    # Add these columns if we need to, for now stick to the above for file size reasons
-
-    strain_columns_zfilled = [s + "_zfilled" for s in strain_columns]
-    df[strain_columns_zfilled] = df[strain_columns].fillna(0)
     return df
 
 

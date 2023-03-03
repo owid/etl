@@ -3,7 +3,6 @@
 import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
-from shared import remove_sparse_timeseries
 from structlog import get_logger
 
 from etl.data_helpers import geo
@@ -43,7 +42,7 @@ def run(dest_dir: str) -> None:
     df = pivot_fluid(df)
     cols = df.columns.drop(["country", "date"])
     # Remove timeseries where there are only zeros or NAs
-    df = remove_sparse_timeseries(df=df, cols=cols, min_data_points=0)
+    # df = remove_sparse_timeseries(df=df, cols=cols, min_data_points=0)
     df = calculate_patient_rates(df)
     df = df.reset_index(drop=True)
     # Create a new table with the processed data.
