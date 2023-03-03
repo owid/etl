@@ -28,7 +28,7 @@ def run(dest_dir: str) -> None:
 
     tb_flu = pd.DataFrame(pd.merge(tb_fluid, tb_flunet, on=["country", "date"], how="outer"))
     tb_flu = create_zero_filled_strain_columns(tb_flu)
-    tb_flu = remove_sparse_timeseries(df=tb_flu, cols=tb_flu.columns.drop(["country", "date"]), min_data_points=10)
+    tb_flu = remove_sparse_timeseries(df=tb_flu, min_data_points=10)
     # tb_flu.dropna(axis = 1, how="all")
     assert tb_flu[["country", "date"]].duplicated().sum() == 0
     tb_flu = Table(tb_flu, short_name="flu")
@@ -90,17 +90,29 @@ def create_zero_filled_strain_columns(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def remove_sparse_timeseries(df: pd.DataFrame, cols: list[str], min_data_points: int) -> pd.DataFrame:
+def remove_sparse_timeseries(df: pd.DataFrame, min_data_points: int) -> pd.DataFrame:
     """
-    For each country go through each column, if there are {min_data_points} or fewer values which are non-zero and non-NA then the whole time-series is set to NA.
-    For example if min_data_points = 5, then any country-column with fewer than 5 datapoints will be set to NA.
+    For each country identify if they have < {min_data_points} confirmed flu cases.
+
+    If they do then set all their values for flu cases to NA, we don't want to show super sparse countries
+
+
+
     """
     countries = df["country"].drop_duplicates()
-
+    cols = df.columns.drop(["country", "date"])
+    # all columns that have been zerofilled so they can be used in stacked bar charts
+    z_filled_cols = [col for col in cols if col.endswith("zfilled")]
+    # all columns that contain values on confirmed flu cases
+    all_flunet_cols = cols[(cols.str.contains("sentinel|notdefined|combined"))]
+    # all columns that will be used in line charts but not stacked bar charts
+    # line_cols = cols[(cols.str.contains("sentinel|notdefined|combined")) & (~cols.str.contains("zfilled"))]
     for country in countries:
-        for col in cols:
-            df[col] = df[col].astype(np.float32)
-            if df.loc[(df["country"] == country), col].fillna(0).astype(bool).sum() <= min_data_points:
-                df.loc[(df["country"] == country), col] = np.NaN
+        if all(df.loc[(df["country"] == country), z_filled_cols].fillna(0).astype(bool).sum() <= min_data_points):
+            df.loc[(df["country"] == country), all_flunet_cols] = np.NaN
+        # for col in line_cols:
+        #    df[col] = df[col].astype(np.float32)
+        #    if df.loc[(df["country"] == country), col].fillna(0).astype(bool).sum() <= min_data_points:
+        #        df.loc[(df["country"] == country), col] = np.NaN
 
     return df
