@@ -296,6 +296,14 @@ steps:
   #
   data://garden/regions/2023-01-01/regions:
 
+  # Democracy and Human rights - V-Dem index
+  data://meadow/owid/2023-03-02/vdem:
+  - snapshot://owid/2023-03-02/vdem.csv
+  data://garden/owid/2023-03-02/vdem:
+  - data://meadow/owid/2023-03-02/vdem
+  data://grapher/owid/2023-03-02/vdem:
+  - data://garden/owid/2023-03-02/vdem
+
 # Sub-dags to import
 include:
   - dag/open_numbers.yml

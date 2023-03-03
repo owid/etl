@@ -179,6 +179,9 @@
                       },
                       "conversionFactor": {
                         "type": "number"
+                      },
+                      "includeInTable": {
+                        "type": "boolean"
                       }
                     }
                   }
