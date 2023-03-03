@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_568_nih__dna_sequencing_costs_values
   file_extension: feather
-  date_accessed: 2023-02-23 19:11:31.376166
+  date_accessed: 2023-03-03 12:04:19.504359
   name: NIH - DNA Sequencing Costs
   description: https://github.com/owid/notebooks/tree/main/EdouardMathieu/nih_dna_sequencing_costs
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: cf1bb988b17527849ffbe8275a59f659
-  size: 6858
+- md5: fac9ca561563acd95b1c2c635ab07696
+  size: 6610
   path: dataset_568_nih__dna_sequencing_costs_values.feather
