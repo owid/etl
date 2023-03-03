@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5588_historical_cost_of_computer_memory_and_storage__john_c__mccallum_values
   file_extension: feather
-  date_accessed: 2023-02-23 17:50:42.956485
+  date_accessed: 2023-03-02 18:11:03.082133
   name: Historical cost of computer memory and storage - John C. McCallum
   description: https://github.com/owid/notebooks/tree/main/EdouardMathieu/computer_memory_prices
   source_name: Our World in Data catalog backport

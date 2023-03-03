@@ -239,3 +239,4 @@ def calculate_percent_positive(df: pd.DataFrame) -> pd.DataFrame:
 #                "a_no_subtypeNONSENTINEL",
 ##            ]
 #        ].sum(axis=1, min_count=1)
+#        == df["inf_aNONSENTINEL"]
