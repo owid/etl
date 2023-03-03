@@ -28,7 +28,7 @@ def run(dest_dir: str) -> None:
 
     tb_flu = pd.DataFrame(pd.merge(tb_fluid, tb_flunet, on=["country", "date"], how="outer"))
     tb_flu = create_zero_filled_strain_columns(tb_flu)
-    tb_flu = remove_sparse_timeseries(df=tb_flu, cols=tb_flu.columns.drop(["country", "date"]), min_data_points=10)
+    tb_flu = remove_sparse_timeseries(df=tb_flu, min_data_points=10)
     # tb_flu.dropna(axis = 1, how="all")
     assert tb_flu[["country", "date"]].duplicated().sum() == 0
     tb_flu = Table(tb_flu, short_name="flu")
@@ -90,7 +90,7 @@ def create_zero_filled_strain_columns(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def remove_sparse_timeseries(df: pd.DataFrame, cols: list[str], min_data_points: int) -> pd.DataFrame:
+def remove_sparse_timeseries(df: pd.DataFrame, min_data_points: int) -> pd.DataFrame:
     """
     For each country identify if they have < {min_data_points} confirmed flu cases.
 
@@ -100,6 +100,7 @@ def remove_sparse_timeseries(df: pd.DataFrame, cols: list[str], min_data_points:
 
     """
     countries = df["country"].drop_duplicates()
+    cols = df.columns.drop(["country", "date"])
     # all columns that have been zerofilled so they can be used in stacked bar charts
     z_filled_cols = [col for col in cols if col.endswith("zfilled")]
     # all columns that contain values on confirmed flu cases
