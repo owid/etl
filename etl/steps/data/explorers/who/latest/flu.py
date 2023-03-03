@@ -9,6 +9,8 @@ from etl.helpers import PathFinder, create_dataset
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+MIN_DATA_POINTS = 10
+
 
 def run(dest_dir: str) -> None:
     """
@@ -28,7 +30,7 @@ def run(dest_dir: str) -> None:
 
     tb_flu = pd.DataFrame(pd.merge(tb_fluid, tb_flunet, on=["country", "date"], how="outer"))
     tb_flu = create_zero_filled_strain_columns(tb_flu)
-    tb_flu = remove_sparse_timeseries(df=tb_flu, min_data_points=10)
+    tb_flu = remove_sparse_timeseries(df=tb_flu, min_data_points=MIN_DATA_POINTS)
     # tb_flu.dropna(axis = 1, how="all")
     assert tb_flu[["country", "date"]].duplicated().sum() == 0
     tb_flu = Table(tb_flu, short_name="flu")
@@ -96,7 +98,7 @@ def remove_sparse_timeseries(df: pd.DataFrame, min_data_points: int) -> pd.DataF
 
     If they do then set all their values for flu cases to NA, we don't want to show super sparse countries
 
-
+    For each of the ari/sari/ili columns we apply the same rule, if it has less than {min_data_points} then we set it to NA for that country
 
     """
     countries = df["country"].drop_duplicates()
@@ -106,13 +108,13 @@ def remove_sparse_timeseries(df: pd.DataFrame, min_data_points: int) -> pd.DataF
     # all columns that contain values on confirmed flu cases
     all_flunet_cols = cols[(cols.str.contains("sentinel|notdefined|combined"))]
     # all columns that will be used in line charts but not stacked bar charts
-    # line_cols = cols[(cols.str.contains("sentinel|notdefined|combined")) & (~cols.str.contains("zfilled"))]
+    fluid_cols = cols[(cols.str.contains("ili|ari"))]
     for country in countries:
         if all(df.loc[(df["country"] == country), z_filled_cols].fillna(0).astype(bool).sum() <= min_data_points):
             df.loc[(df["country"] == country), all_flunet_cols] = np.NaN
-        # for col in line_cols:
-        #    df[col] = df[col].astype(np.float32)
-        #    if df.loc[(df["country"] == country), col].fillna(0).astype(bool).sum() <= min_data_points:
-        #        df.loc[(df["country"] == country), col] = np.NaN
+        for col in fluid_cols:
+            df[col] = df[col].astype(np.float32)
+            if df.loc[(df["country"] == country), col].fillna(0).astype(bool).sum() <= min_data_points:
+                df.loc[(df["country"] == country), col] = np.NaN
 
     return df
