@@ -42,8 +42,10 @@ def run(dest_dir: str) -> None:
     df = calculate_percent_positive(df)
     df = create_zero_filled_strain_columns(df)
 
+    # We can't remove sparse data from the zero-filled columns because of how stacked bar charts behave
+    filter_col = [col for col in df if col.endswith("zfilled")]
     # set time-series with less than 10 (non-zero, non-NA) datapoints to NA - apply to a
-    df = remove_sparse_timeseries(df=df, cols=df.columns.drop(["country", "date"]), min_data_points=10)
+    df = remove_sparse_timeseries(df=df, cols=df.columns.drop(["country", "date", filter_col]), min_data_points=10)
 
     # Create a new table with the processed data.
     # tb_garden = Table(df, like=tb_meadow)
@@ -290,4 +292,3 @@ def create_zero_filled_strain_columns(df: pd.DataFrame) -> pd.DataFrame:
 #                "a_no_subtypeNONSENTINEL",
 ##            ]
 #        ].sum(axis=1, min_count=1)
-#        == df["inf_aNONSENTINEL"]
