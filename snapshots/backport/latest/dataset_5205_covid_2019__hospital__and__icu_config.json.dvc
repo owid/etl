@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5205_covid_2019__hospital__and__icu_config
   file_extension: json
-  date_accessed: 2023-03-04 12:05:36.019842
+  date_accessed: 2023-03-04 18:04:24.011568
   name: Grapher metadata for dataset_5205_covid_2019__hospital__and__icu
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 42309df971ba24acad90d6dc4cc83777
+- md5: f89b2ca94d2d8a96902c7e1b4d501d1d
   size: 8209
   path: dataset_5205_covid_2019__hospital__and__icu_config.json
