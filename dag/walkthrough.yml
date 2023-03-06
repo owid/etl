@@ -8,3 +8,5 @@ steps:
   - data://garden/dummy/2020-01-01/dummy
   data://explorers/dummy/2020-01-01/dummy:
   - data://garden/dummy/2020-01-01/dummy
+  data://meadow/technology/2023-03-06/mobile_money:
+  - snapshot://technology/2023-03-06/mobile_money.xlsx
