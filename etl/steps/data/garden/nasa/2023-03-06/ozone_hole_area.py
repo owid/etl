@@ -1,4 +1,7 @@
-"""Load a meadow dataset and create a garden dataset."""
+"""Load a meadow dataset and create a garden dataset.
+
+This step adds a new column: "country" with the value "World", since the data in this dataset
+is only for the world."""
 
 import pandas as pd
 from owid.catalog import Dataset, Table
@@ -26,6 +29,8 @@ def run(dest_dir: str) -> None:
 
     # Create a dataframe with data from the table.
     df = pd.DataFrame(tb_meadow)
+    # Add country column (only one entity: "World")
+    df["country"] = "World"
 
     # Create a new table with the processed data.
     tb_garden = Table(df, like=tb_meadow)
