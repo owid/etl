@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5883_covid_19_cases_and_deaths__who_config
   file_extension: json
-  date_accessed: 2023-03-05 06:05:57.087266
+  date_accessed: 2023-03-06 04:07:45.989165
   name: Grapher metadata for dataset_5883_covid_19_cases_and_deaths__who
   description: WORK IN PROGRESS
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: d17b5df2f2f85e95ac3f8a6702f4ff91
+- md5: cc52d84e2f9b3586c46293b7d8749f19
   size: 24742
   path: dataset_5883_covid_19_cases_and_deaths__who_config.json
