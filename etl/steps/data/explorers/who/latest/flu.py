@@ -5,6 +5,8 @@ import pandas as pd
 from owid.catalog import Dataset, Table
 
 from etl.helpers import PathFinder, create_dataset
+from etl.steps.data.garden.who.latest.fluid import calculate_patient_rates
+from etl.steps.data.garden.who.latest.flunet import calculate_percent_positive
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -32,8 +34,8 @@ def run(dest_dir: str) -> None:
     tb_flu = create_zero_filled_strain_columns(tb_flu)
     tb_flu = remove_sparse_timeseries(df=tb_flu, min_data_points=MIN_DATA_POINTS)
 
+    # Create monthly aggregates - sum variables that are counts and recalculate rates based on these monthly totals
     tb_flu_monthly = create_monthly_aggregates(df=tb_flu)
-    # tb_flu.dropna(axis = 1, how="all")
     assert tb_flu[["country", "date"]].duplicated().sum() == 0
     tb_flu = Table(tb_flu, short_name="flu")
     tb_flu_monthly = Table(tb_flu_monthly, short_name="flu_monthly")
@@ -156,9 +158,12 @@ def create_monthly_aggregates(df: pd.DataFrame) -> pd.DataFrame:
     count_cols = cols.drop(rate_cols)
 
     month_agg_df = df[count_cols].groupby(["country", "month_date"]).sum(min_count=1).reset_index()
-    month_agg_df = month_agg_df.rename(
-        columns={c: c + "_monthly" for c in df.columns if c not in ["country", "month_date"]}
+
+    month_agg_df = calculate_percent_positive(
+        df=month_agg_df, surveillance_cols=["sentinel", "nonsentinel", "notdefined", "combined"]
     )
+
+    month_agg_df = calculate_patient_rates(df=month_agg_df)
     # annual_agg_df = df[count_cols].groupby(["country", "year"]).sum(min_count=1)
 
     return month_agg_df

@@ -199,8 +199,9 @@ def calculate_patient_rates(df: pd.DataFrame) -> pd.DataFrame:
     log.info(f"{over_1000_ari} rows with ari_cases_per_thousand_outpatients over 1000. We'll set these to NA.")
     log.info(f"{over_100_sari} rows with sari_cases_per_hundred_inpatients over 100. We'll set these to NA.")
 
-    df["ili_cases_per_thousand_outpatients"][df["ili_cases_per_thousand_outpatients"] > 1000] = np.NaN
-    df["ari_cases_per_thousand_outpatients"][df["ari_cases_per_thousand_outpatients"] > 1000] = np.NaN
-    df["sari_cases_per_hundred_inpatients"][df["sari_cases_per_hundred_inpatients"] > 100] = np.NaN
+    df.loc[df["ili_cases_per_thousand_outpatients"] > 1000, "ili_cases_per_thousand_outpatients"] = np.NaN
+    df.loc[df["ari_cases_per_thousand_outpatients"] > 1000, "ari_cases_per_thousand_outpatients"] = np.NaN
+    df.loc[df["sari_cases_per_hundred_inpatients"] > 100, "sari_cases_per_hundred_inpatients"] = np.NaN
+    # df["sari_cases_per_hundred_inpatients"][df["sari_cases_per_hundred_inpatients"] > 100] = np.NaN
 
     return df
