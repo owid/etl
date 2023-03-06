@@ -10,7 +10,10 @@ all_sources:
 
 dataset:
   title: Ozone hole area and concentration (NASA, 2023)
-  # description: Dataset description.
+  description: |
+    Annual maximum and Antarctic stratospheric ozone hole area, resultant from the emission of ozone-depleting substances.
+
+    Minimum and mean Southern Hemisphere daily ozone concentrations, measured in Dobson Units (DU).
   licenses:
     - name: # TO BE FILLED. Example: Testing License Name
       url: # TO BE FILLED. Example: https://url_of_testing_source.com/license
