@@ -30,9 +30,10 @@ def run(dest_dir: str) -> None:
     tb_flunet = flunet_garden["flunet"]
     tb_fluid = fluid_garden["fluid"]
 
-    tb_flu = pd.DataFrame(pd.merge(tb_fluid, tb_flunet, on=["country", "date"], how="outer"))
+    tb_flu = pd.DataFrame(pd.merge(tb_fluid, tb_flunet, on=["country", "date", "hemisphere"], how="outer"))
     tb_flu = create_zero_filled_strain_columns(tb_flu)
     tb_flu = remove_sparse_timeseries(df=tb_flu, min_data_points=MIN_DATA_POINTS)
+    tb_flu = create_regional_aggregates(df=tb_flu)
 
     # Create monthly aggregates - sum variables that are counts and recalculate rates based on these monthly totals
     tb_flu_monthly = create_monthly_aggregates(df=tb_flu)
@@ -109,7 +110,7 @@ def remove_sparse_timeseries(df: pd.DataFrame, min_data_points: int) -> pd.DataF
     Also, remove flunet columns (not zero-filled) that are only NA or 0 as we don't want line charts for these.
     """
     countries = df["country"].drop_duplicates()
-    cols = df.columns.drop(["country", "date"])
+    cols = df.columns.drop(["country", "date", "hemisphere"])
     # all columns that have been zerofilled so they can be used in stacked bar charts
     z_filled_cols = [col for col in cols if col.endswith("zfilled")]
     # all columns that contain values on confirmed flu cases
@@ -164,6 +165,54 @@ def create_monthly_aggregates(df: pd.DataFrame) -> pd.DataFrame:
     )
 
     month_agg_df = calculate_patient_rates(df=month_agg_df)
-    # annual_agg_df = df[count_cols].groupby(["country", "year"]).sum(min_count=1)
 
     return month_agg_df
+
+
+def create_regional_aggregates(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Create global and hemispherical aggregates for the flu data.
+    Recalculate the rate columns at these aggregate levels
+    Combine the global and hemisphere aggregates with the original data and return it
+    """
+
+    cols = df.columns.drop(["country"])
+    # Columns that will need to be recalculated after aggregating
+    rate_cols = [
+        "ili_cases_per_thousand_outpatients",
+        "ari_cases_per_thousand_outpatients",
+        "sari_cases_per_hundred_inpatients",
+        "pcnt_possentinel",
+        "pcnt_posnonsentinel",
+        "pcnt_posnotdefined",
+        "pcnt_poscombined",
+    ]
+    # columns that we can aggregate by summing
+    count_cols = cols.drop(rate_cols)
+
+    global_aggregate = df[count_cols].groupby(["date"]).sum(min_count=1).reset_index()
+    global_aggregate["country"] = "World"
+    cols = global_aggregate.columns.to_list()
+    cols = cols[-1:] + cols[:-1]
+    global_aggregate = global_aggregate[cols]
+    global_aggregate = calculate_percent_positive(
+        df=global_aggregate, surveillance_cols=["sentinel", "nonsentinel", "notdefined", "combined"]
+    )
+    global_aggregate = calculate_patient_rates(df=global_aggregate)
+
+    hemisphere_aggregate = df[count_cols].groupby(["hemisphere", "date"]).sum(min_count=1).reset_index()
+
+    hemisphere_aggregate["hemisphere"] = hemisphere_aggregate["hemisphere"].replace(
+        {"NH": "Northern Hemisphere", "SH": "Southern Hemisphere"}
+    )
+    hemisphere_aggregate = hemisphere_aggregate.rename(columns={"hemisphere": "country"})
+
+    hemisphere_aggregate = calculate_percent_positive(
+        df=hemisphere_aggregate, surveillance_cols=["sentinel", "nonsentinel", "notdefined", "combined"]
+    )
+    hemisphere_aggregate = calculate_patient_rates(df=hemisphere_aggregate)
+
+    df = df.drop(columns=["hemisphere"])
+    df = pd.concat([df, global_aggregate, hemisphere_aggregate])
+
+    return df
