@@ -5,3 +5,5 @@ steps:
     - snapshot://nasa/2023-03-06/ozone_hole_area_p2.txt
   data://garden/nasa/2023-03-06/ozone_hole_area:
     - data://meadow/nasa/2023-03-06/ozone_hole_area
+  data://grapher/nasa/2023-03-06/ozone_hole_area:
+    - data://garden/nasa/2023-03-06/ozone_hole_area
