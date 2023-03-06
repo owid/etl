@@ -26,6 +26,6 @@ meta:
     You can download the code and complete dataset, including supplementary variables, from GitHub: https://github.com/owid/notebooks/tree/main/BastianHerre/democracy
 wdir: ../../../data/snapshots/owid/2023-03-02
 outs:
-- md5: 91e4a96bdf5e6c0dccc13d5bc273cd6c
-  size: 37388074
+- md5: ce55a1c8d19fcf12b0cd096e2e23bbac
+  size: 37359842
   path: vdem.csv

@@ -143,21 +143,25 @@ tables:
 
           The index reaches from 0 to 1 (most democratic).
       delibdem_vdem_owid:
-        title: Deliberative democracy
         description: |-
           The variable denotes the best estimate of the extent of suffrage, the freedom and fairness of elections, freedoms of association and expression, as well as the extent to which political elites justify their positions, justify them with the common good, acknowledge counterarguments, consult elites in policy changes, and society deliberates policy changes.
 
           It is based on the V-Dem variable v2x_delibdem, and we expand it to cover more years for some countries.
 
           The index reaches from 0 to 1 (most democratic).
+        display:
+          includeInTable: true
+          name: Deliberative democracy
       dirpop_vote_vdem_owid:
-        title: Direct popular voting
         description: |-
           The variable denotes the extent of how easy it is for citizens to vote on specific issues themselves in popular initiatives, referendums, and plebiscites.
 
           It is based on the V-Dem variable v2xdd_dd, and we expand it to cover more years for some countries.
 
           The index reaches from 0 to 1 (easiest).
+        display:
+          includeInTable: true
+          name: Direct popular voting
       egal_vdem_high_owid:
         description: |-
           The variable denotes the upper-bound estimate of the extent to which the protection of rights, access to power, and distribution of resources is equal.
@@ -194,13 +198,15 @@ tables:
 
           The index reaches from 0 to 1 (most democratic).
       egaldem_vdem_owid:
-        title: Egalitarian democracy
         description: |-
           The variable denotes the best estimate of the extent of suffrage, the freedom and fairness of elections, freedoms of association and expression, as well as the extent to which the protection of rights, access to power, and distribution of resources is equal.
 
           It is based on the V-Dem variable v2x_egaldem, and we expand it to cover more years for some countries.
 
           The index reaches from 0 to 1 (most democratic).
+        display:
+          includeInTable: true
+          name: Egalitarian democracy
       electdem_age_group_row_owid:
         description: |-
           The identification of electoral democracies is based on the Regimes of the World classification by Lührmann et al. (2018).
@@ -209,13 +215,15 @@ tables:
 
           The variable distinguishes between closed autocracies (score of 0), electoral autocracies (score of 1), electoral democracies aged 1-18 years (score of 2), 19-30 years (score of 3), 31-60 years (score of 4), 61-90 years (score of 5), and 91+ years (score of 6).
       electdem_age_row_owid:
-        title: Age of electoral democracy
         description: |-
           The identification of electoral democracies is based on the Regimes of the World classification by Lührmann et al. (2018).
 
           In electoral democracies, citizens have the right to participate in meaningful, free and fair, and multi-party elections.
-      # electdem_dich_high_row_owid:
-      # electdem_dich_low_row_owid:
+        display:
+          includeInTable: true
+          name: Age of electoral democracy
+      electdem_dich_high_row_owid: {}
+      electdem_dich_low_row_owid: {}
       electdem_dich_row_owid:
         description: The variable denotes the best estimate of whether the country is meaningfully
           an electoral democracy, based on the criteria of the classification by Lührmann
@@ -223,13 +231,15 @@ tables:
           to which political leaders are elected under comprehensive suffrage in free and
           fair elections, and freedoms of association and expression are guaranteed.
       electdem_exp_row_owid:
-        title: Experience with electoral democracy
         description: |-
           The variable identifies the number of years a country was an electoral democracy since 1789.
 
           The identification of electoral democracies is based on the Regimes of the World classification by Lührmann et al. (2018).
 
           In electoral democracies, citizens have the right to participate in meaningful, free and fair, and multi-party elections.
+        display:
+          includeInTable: true
+          name: Experience with electoral democracy
       electdem_vdem_high_owid:
         description: |-
           The variable denotes the upper-bound estimate of the extent to which political leaders are elected under comprehensive suffrage in free and fair elections, and freedoms of association and expression are guaranteed.
@@ -331,7 +341,6 @@ tables:
           elections were held or not, based on the criteria of the classification by Lührmann
           et al. (2018) and the assessment by V-Dem’s experts.
       electoff_vdem_owid:
-        title: Elected political leaders
         description: |-
           The variable measures the extent to which the legislature is chosen through broad elections, and the chief executive is elected directly or indirectly (appointed by a popularly elected legislature).
 
@@ -342,6 +351,9 @@ tables:
           The variable is based on the V-Dem variable v2x_elecoff, and we expand it to cover more years for some countries.
 
           The variables ranges from 0 to 1 (chief executive and legislature fully elected).
+        display:
+          includeInTable: true
+          name: Elected political leaders
       elitecons_polch_vdem_high_owid:
         description: |-
           The variable denotes the upper-bound estimate of the extent to which political elites consult other elites across the political spectrum and from relevant sectors of society and business when considering important policy changes.
@@ -626,15 +638,16 @@ tables:
 
           The variable distinguishes between closed autocracies (score of 0), electoral autocracies (score of 1), electoral democracies (score of 2), liberal democracies aged 1-18 years (score of 3), 19-30 years (score of 4), 31-60 years (score of 5), 61-90 years (score of 6), and 91+ years (score of 7).
       libdem_age_row_owid:
-        title: Age of liberal democracy
         description: |-
           The identification of liberal democracies is based on the Regimes of the World classification by Lührmann et al. (2018).
 
           In electoral democracies, citizens have the right to participate in meaningful, free and fair, and multi-party elections.
 
           In liberal democracies, citizens have further individual and minority rights, are equal before the law, and the actions of the executive are constrained by the legislative and the courts.
+        display:
+          includeInTable: true
+          name: Age of liberal democracy
       libdem_exp_row_owid:
-        title: Experience with liberal democracy
         description: |-
           The variable identifies the number of years a country was a liberal democracy since 1789.
 
@@ -643,6 +656,9 @@ tables:
           In electoral democracies, citizens have the right to participate in meaningful, free and fair, and multi-party elections.
 
           In liberal democracies, citizens have further individual and minority rights, are equal before the law, and the actions of the executive are constrained by the legislative and the courts.
+        display:
+          includeInTable: true
+          name: Experience with liberal democracy
       libdem_vdem_high_owid:
         description: |-
           The variable denotes the upper-bound estimate of the extent of suffrage, the freedom and fairness of elections, freedoms of association and expression, individual and minority rights, equality before the law, and executive constraints.
@@ -658,13 +674,15 @@ tables:
 
           The index reaches from 0 to 1 (most democratic).
       libdem_vdem_owid:
-        title: Liberal democracy
         description: |-
           The variable denotes the best estimate of the extent of suffrage, the freedom and fairness of elections, freedoms of association and expression, individual and minority rights, equality before the law, and executive constraints.
 
           It is based on the V-Dem variable v2x_libdem, and we expand it to cover more years for some countries.
 
           The index reaches from 0 to 1 (most democratic).
+        display:
+          includeInTable: true
+          name: Liberal democracy
       locelect_vdem_high_owid:
         description: |-
           The variable denotes the upper-bound estimate of the extent to which elected local governments exist and they operate without interference from local unelected bodies.
@@ -806,13 +824,15 @@ tables:
 
           The index reaches from 0 to 1 (most democratic).
       participdem_vdem_owid:
-        title: Participatory democracy
         description: |-
           The variable denotes the best estimate of the extent of suffrage, the freedom and fairness of elections, freedoms of association and expression, as well as the extent to which citizens can engage in regional and local government, civil society organizations, and direct democracy.
 
           It is based on the V-Dem variable v2x_partipdem, and we expand it to cover more years for some countries.
 
           The index reaches from 0 to 1 (most democratic).
+        display:
+          includeInTable: true
+          name: Participatory democracy
       phys_integr_libs_vdem_high_owid:
         description: |-
           The variable denotes the upper-bound estimate of the extent to which people are free from government torture and political killings.
@@ -977,11 +997,13 @@ tables:
 
           The index reaches from 0 to 1 (most democratic).
       popw_delibdem_vdem_owid:
-        title: Deliberative democracy weighted by population
         description: |-
           The variable denotes the best estimate of the extent of suffrage, the freedom and fairness of elections, freedoms of association and expression, as well as the extent to which political elites justify their positions, justify them with the common good, acknowledge counterarguments, consult elites in policy changes, and society deliberates policy changes, weighted by population.
 
           The index reaches from 0 to 1 (most democratic).
+        display:
+          includeInTable: true
+          name: Deliberative democracy weighted by population
       popw_egaldem_h_vdem_owid:
         description: |-
           The variable denotes the upper-bound estimate of the extent of suffrage, the freedom and fairness of elections, freedoms of association and expression, as well as the extent to which the protection of rights, access to power, and distribution of resources is equal, weighted by population.
@@ -993,11 +1015,13 @@ tables:
 
           The index reaches from 0 to 1 (most democratic).
       popw_egaldem_vdem_owid:
-        title: Egalitarian democracy weighted by population
         description: |-
           The variable denotes the best estimate of the extent of suffrage, the freedom and fairness of elections, freedoms of association and expression, as well as the extent to which the protection of rights, access to power, and distribution of resources is equal, weighted by population.
 
           The index reaches from 0 to 1 (most democratic).
+        display:
+          includeInTable: true
+          name: Egalitarian democracy weighted by population
       popw_electdem_h_vdem_owid:
         description: |-
           The variable denotes the upper-bound estimate of the extent to which political leaders are elected under comprehensive suffrage in free and fair elections, and freedoms of association and expression are guaranteed, weighted by population.
@@ -1009,11 +1033,13 @@ tables:
 
           The index reaches from 0 to 1 (most democratic).
       popw_electdem_vdem_owid:
-        title: Electoral democracy weighted by population
         description: |-
           The variable denotes the best estimate of the extent to which political leaders are elected under comprehensive suffrage in free and fair elections, and freedoms of association and expression are guaranteed, weighted by population.
 
           The index reaches from 0 to 1 (most democratic).
+        display:
+          includeInTable: true
+          name: Electoral democracy weighted by population
       popw_libdem_h_vdem_owid:
         description: |-
           The variable denotes the upper-bound estimate of the extent of suffrage, the freedom and fairness of elections, freedoms of association and expression, individual and minority rights, equality before the law, and executive constraints, weighted by population.
@@ -1025,11 +1051,13 @@ tables:
 
           The index reaches from 0 to 1 (most democratic).
       popw_libdem_vdem_owid:
-        title: Liberal democracy weighted by population
         description: |-
           The variable denotes the best estimate of the extent of suffrage, the freedom and fairness of elections, freedoms of association and expression, individual and minority rights, equality before the law, and executive constraints, weighted by population.
 
           The index reaches from 0 to 1 (most democratic).
+        display:
+          includeInTable: true
+          name: Liberal democracy weighted by population
       popw_participdem_h_vdem_owid:
         description: |-
           The variable denotes the upper-bound estimate of the extent of suffrage, the freedom and fairness of elections, freedoms of association and expression, as well as the extent to which citizens can engage in regional and local government, civil society organizations, and direct democracy, weighted by population.
@@ -1041,11 +1069,13 @@ tables:
 
           The index reaches from 0 to 1 (most democratic).
       popw_participdem_vdem_owid:
-        title: Participatory democracy weighted by population
         description: |-
           The variable denotes the best estimate of the extent of suffrage, the freedom and fairness of elections, freedoms of association and expression, as well as the extent to which citizens can engage in regional and local government, civil society organizations, and direct democracy, weighted by population.
 
           The index reaches from 0 to 1 (most democratic).
+        display:
+          includeInTable: true
+          name: Participatory democracy weighted by population
       popw_physinteg_libs_vdem_h_owid:
         description: |-
           The variable denotes the upper-bound estimate of the extent to which people are free from government torture and political killings, weighted by population.
@@ -1181,8 +1211,7 @@ tables:
         display:
           includeInTable: true
           name: Political regime
-      region:
-        title: region
+      region: {}
       soccons_polch_vdem_high_owid:
         description: |-
           The variable denotes the upper-bound estimate of the extent to which ordinary people independently discuss considered important policy changes among themselves, in the media, in associations or neighborhoods, or in the streets.
@@ -1205,7 +1234,6 @@ tables:
 
           Higher scores mean more discussion.
       suffr_vdem_owid:
-        title: Share of adult citizens who have the right to vote
         description: |-
           The variable denotes the share of adult citizens which have the legal right to vote in national elections.
 
@@ -1214,6 +1242,9 @@ tables:
           Universal suffrage is coded as 100%, and universal male suffrage as 50%.
 
           The variable captures legal restrictions, and not restrictions that may be in place in practice. It considers restrictions based on gender, property, tax payments, income, literacy, region, race, ethnicity, religion, and economic independence; it does not consider restrictions based on age, residence, conviction of a crime, or legal incompetence.
+        display:
+          includeInTable: true
+          name: Share of adult citizens who have the right to vote
       transplaws_high_row_owid:
         description: The variable denotes the upper-bound estimate of whether laws are transparent,
           coherent, and relatively stable, and their enforcement predictable, based on the
@@ -1230,8 +1261,11 @@ tables:
           criteria of the classification by Lührmann et al. (2018) and the assessment by
           V-Dem’s experts.
       turnout_vdem_owid:
-        title: Voter turnout
         description: |-
           The variable denotes the voter turnout as a share of all registered voters in the national election according to official results.
 
           It is based on the V-Dem variable v2eltrnout, and we expand it to cover more years for some countries.
+        display:
+          includeInTable: true
+          name: Voter turnout
+
