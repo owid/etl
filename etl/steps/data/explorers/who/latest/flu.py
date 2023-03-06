@@ -9,7 +9,7 @@ from etl.helpers import PathFinder, create_dataset
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-MIN_DATA_POINTS = 50
+MIN_DATA_POINTS = 20
 
 
 def run(dest_dir: str) -> None:
@@ -100,6 +100,7 @@ def remove_sparse_timeseries(df: pd.DataFrame, min_data_points: int) -> pd.DataF
 
     For each of the ari/sari/ili columns we apply the same rule, if it has less than {min_data_points} then we set it to NA for that country
 
+    Also, remove flunet columns (not zero-filled) that are only NA or 0 as we don't want line charts for these.
     """
     countries = df["country"].drop_duplicates()
     cols = df.columns.drop(["country", "date"])
@@ -108,13 +109,23 @@ def remove_sparse_timeseries(df: pd.DataFrame, min_data_points: int) -> pd.DataF
     # all columns that contain values on confirmed flu cases
     all_flunet_cols = cols[(cols.str.contains("sentinel|notdefined|combined"))]
     # all columns that will be used in line charts but not stacked bar charts
-    fluid_cols = cols[(cols.str.contains("ili|ari"))]
+    fluid_cols = cols[(cols.str.contains("ili|ari"))].to_list()
+
+    not_z_filled_flunet_cols = [col for col in all_flunet_cols if not col.endswith("zfilled")]
+    assert len(not_z_filled_flunet_cols) + len(z_filled_cols) + len(fluid_cols) == len(cols)
     for country in countries:
+        # Removing all flunet values for a country where
         if all(df.loc[(df["country"] == country), z_filled_cols].fillna(0).astype(bool).sum() <= min_data_points):
             df.loc[(df["country"] == country), all_flunet_cols] = np.NaN
-        for col in fluid_cols:
-            df[col] = df[col].astype(np.float32)
-            if df.loc[(df["country"] == country), col].fillna(0).astype(bool).sum() <= min_data_points:
-                df.loc[(df["country"] == country), col] = np.NaN
+        for fluid_col in fluid_cols:
+            # Removing rows from fluid columns where there are fewer than {min_data_points} for a country
+            df[fluid_col] = df[fluid_col].astype(np.float32)
+            if df.loc[(df["country"] == country), fluid_col].fillna(0).astype(bool).sum() <= min_data_points:
+                df.loc[(df["country"] == country), fluid_col] = np.NaN
+        for flunet_col in not_z_filled_flunet_cols:
+            # Removing rows from columns to be used in line charts where there are no non-NA or 0 values for a country (where it would show a flat 0 or NA line)
+            df[flunet_col] = df[flunet_col].astype(np.float32)
+            if df.loc[(df["country"] == country), flunet_col].fillna(0).astype(bool).sum() == 0:
+                df.loc[(df["country"] == country), flunet_col] = np.NaN
 
     return df
