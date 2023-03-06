@@ -31,12 +31,16 @@ def run(dest_dir: str) -> None:
     tb_flu = pd.DataFrame(pd.merge(tb_fluid, tb_flunet, on=["country", "date"], how="outer"))
     tb_flu = create_zero_filled_strain_columns(tb_flu)
     tb_flu = remove_sparse_timeseries(df=tb_flu, min_data_points=MIN_DATA_POINTS)
+
+    tb_flu_monthly = create_monthly_aggregates(df=tb_flu)
     # tb_flu.dropna(axis = 1, how="all")
     assert tb_flu[["country", "date"]].duplicated().sum() == 0
     tb_flu = Table(tb_flu, short_name="flu")
-
+    tb_flu_monthly = Table(tb_flu_monthly, short_name="flu_monthly")
     # Create explorer dataset, with garden table and metadata in csv format
-    ds_explorer = create_dataset(dest_dir, tables=[tb_flu], default_metadata=flunet_garden.metadata, formats=["csv"])
+    ds_explorer = create_dataset(
+        dest_dir, tables=[tb_flu, tb_flu_monthly], default_metadata=flunet_garden.metadata, formats=["csv"]
+    )
     ds_explorer.save()
 
 
@@ -129,3 +133,32 @@ def remove_sparse_timeseries(df: pd.DataFrame, min_data_points: int) -> pd.DataF
                 df.loc[(df["country"] == country), flunet_col] = np.NaN
 
     return df
+
+
+def create_monthly_aggregates(df: pd.DataFrame) -> pd.DataFrame:
+    df["month"] = pd.DatetimeIndex(df["date"]).month
+    df["year"] = pd.DatetimeIndex(df["date"]).year
+    df["month_date"] = pd.to_datetime(df[["year", "month"]].assign(DAY=1))
+    df = df.drop(columns=["month"])
+
+    cols = df.columns.drop(["date", "year"])
+    # Columns that will need to be recalculated after aggregating
+    rate_cols = [
+        "ili_cases_per_thousand_outpatients",
+        "ari_cases_per_thousand_outpatients",
+        "sari_cases_per_hundred_inpatients",
+        "pcnt_possentinel",
+        "pcnt_posnonsentinel",
+        "pcnt_posnotdefined",
+        "pcnt_poscombined",
+    ]
+    # columns that we can aggregate by summing
+    count_cols = cols.drop(rate_cols)
+
+    month_agg_df = df[count_cols].groupby(["country", "month_date"]).sum(min_count=1).reset_index()
+    month_agg_df = month_agg_df.rename(
+        columns={c: c + "_monthly" for c in df.columns if c not in ["country", "month_date"]}
+    )
+    # annual_agg_df = df[count_cols].groupby(["country", "year"]).sum(min_count=1)
+
+    return month_agg_df
