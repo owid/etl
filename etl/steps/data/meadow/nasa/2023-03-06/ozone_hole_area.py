@@ -51,6 +51,7 @@ def run(dest_dir: str) -> None:
 
 def build_df_p1(snap: Snapshot) -> pd.DataFrame:
     """Read raw data from source 1 and build a dataframe."""
+    log.info("ozone_hole_area: loading data from source 1")
     # Read data
     text = _read_txt_without_comments(snap.path)
     # Sanity checks
@@ -81,6 +82,7 @@ def build_df_p1(snap: Snapshot) -> pd.DataFrame:
 
 def build_df_p2(snap: Snapshot) -> pd.DataFrame:
     """Read raw data from source 2 and build a dataframe."""
+    log.info("ozone_hole_area: loading data from source 2")
     # Read data
     text = _read_txt_without_comments(snap.path)
     # Sanity checks
@@ -98,6 +100,7 @@ def build_df_p2(snap: Snapshot) -> pd.DataFrame:
 
 def build_df(snap_1: Snapshot, snap_2: Snapshot) -> pd.DataFrame:
     """Build a dataframe from the two sources."""
+    log.info("ozone_hole_area: merging dataframes")
     # Load two sources
     df1 = build_df_p1(snap_1)
     df2 = build_df_p2(snap_2)
