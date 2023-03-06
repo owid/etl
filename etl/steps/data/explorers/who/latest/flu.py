@@ -216,35 +216,3 @@ def create_regional_aggregates(df: pd.DataFrame) -> pd.DataFrame:
     df = pd.concat([df, global_aggregate, hemisphere_aggregate])
 
     return df
-
-
-def create_monthly_aggregates(df: pd.DataFrame) -> pd.DataFrame:
-    df["month"] = pd.DatetimeIndex(df["date"]).month
-    df["year"] = pd.DatetimeIndex(df["date"]).year
-    df["month_date"] = pd.to_datetime(df[["year", "month"]].assign(DAY=1))
-    df = df.drop(columns=["month"])
-
-    cols = df.columns.drop(["date", "year"])
-    # Columns that will need to be recalculated after aggregating
-    rate_cols = [
-        "ili_cases_per_thousand_outpatients",
-        "ari_cases_per_thousand_outpatients",
-        "sari_cases_per_hundred_inpatients",
-        "pcnt_possentinel",
-        "pcnt_posnonsentinel",
-        "pcnt_posnotdefined",
-        "pcnt_poscombined",
-    ]
-    # columns that we can aggregate by summing
-    count_cols = cols.drop(rate_cols)
-
-    month_agg_df = df[count_cols].groupby(["country", "month_date"]).sum(min_count=1).reset_index()
-
-    month_agg_df = calculate_percent_positive(
-        df=month_agg_df, surveillance_cols=["sentinel", "nonsentinel", "notdefined", "combined"]
-    )
-
-    month_agg_df = calculate_patient_rates(df=month_agg_df)
-    # annual_agg_df = df[count_cols].groupby(["country", "year"]).sum(min_count=1)
-
-    return month_agg_df
