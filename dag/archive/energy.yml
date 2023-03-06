@@ -83,3 +83,11 @@ steps:
     - data://meadow/irena/2022-10-20/renewable_power_generation_costs
   data://grapher/irena/2022-10-20/renewable_power_generation_costs:
     - data://garden/irena/2022-10-20/renewable_power_generation_costs
+  # Energy - OWID Energy dataset (2022).
+  data://garden/energy/2022-12-28/owid_energy:
+    - data://garden/bp/2022-12-28/energy_mix
+    - data://garden/energy/2022-12-28/fossil_fuel_production
+    - data://garden/energy/2022-12-28/primary_energy_consumption
+    - data://garden/energy/2022-12-28/electricity_mix
+    - data://garden/owid/latest/key_indicators
+    - data://garden/reference

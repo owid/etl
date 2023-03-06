@@ -1,0 +1,96 @@
+dataset:
+  namespace: energy
+  version: 2023-02-20
+  title: UK historical electricity (DUKES, 2023)
+  short_name: uk_historical_electricity
+  description: |
+    All data prior to 1985 (and prior to 1965 in the case of renewables), is sourced from <a href="https://www.gov.uk/government/statistics/electricity-chapter-5-digest-of-united-kingdom-energy-statistics-dukes">the Digest of UK Energy Statistics (DUKES), published by the UK's Department for Business, Energy & Industrial Strategy</a>.
+
+    All other data is sourced from the <a href="https://www.bp.com/en/global/corporate/energy-economics/statistical-review-of-world-energy.html">BP's Statistical Review of World Energy</a> and <a href="https://ember-climate.org/data-catalogue/yearly-electricity-data/">Ember's Yearly Electricity Data</a>. Where data from BP is available for a given year, we rely on it as the primary source. We then supplement this with data from Ember where data from BP is not available.
+  sources:
+    -
+      name: Digest of UK Energy Statistics
+      published_by: UK's Department for Business, Energy & Industrial Strategy
+      date_accessed: 2022-09-21
+      url: https://www.gov.uk/government/statistical-data-sets/historical-electricity-data
+    -
+      name: BP Statistical Review of World Energy
+      published_by: BP Statistical Review of World Energy
+      date_accessed: 2022-07-08
+      url: https://www.bp.com/en/global/corporate/energy-economics/statistical-review-of-world-energy.html
+    -
+      name: Ember's Yearly Electricity Data
+      published_by: Ember
+      publication_year: 2023
+      date_accessed: 2023-02-20
+      url: https://ember-climate.org/data-catalogue/yearly-electricity-data/
+    -
+      name: Ember's European Electricity Review
+      published_by: Ember
+      publication_year: 2022
+      date_accessed: 2022-08-01
+      url: https://ember-climate.org/insights/research/european-electricity-review-2022/
+
+tables:
+  uk_historical_electricity:
+    variables:
+      coal_generation:
+        title: Electricity generation from coal
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Coal
+      oil_generation:
+        title: Electricity generation from oil
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Oil
+      gas_generation:
+        title: Electricity generation from gas
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Natural gas
+      nuclear_generation:
+        title: Electricity generation from nuclear
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Nuclear
+      hydro_generation:
+        title: Electricity generation from hydropower
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Hydropower
+      solar_generation:
+        title: Electricity generation from solar
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Solar
+      wind_generation:
+        title: Electricity generation from wind
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Wind
+      other_renewables_generation:
+        title: Electricity generation from other renewables
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Other renewables
+      total_generation:
+        title: Total electricity generation
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Total electricity generation
+      net_imports:
+        title: Net electricity imports
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Net electricity imports
