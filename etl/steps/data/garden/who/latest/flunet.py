@@ -38,6 +38,7 @@ def run(dest_dir: str) -> None:
 
     df = clean_and_format_data(df)
     df = split_by_surveillance_type(df)
+
     df = calculate_percent_positive(df, surveillance_cols=["SENTINEL", "NONSENTINEL", "NOTDEFINED", "COMBINED"])
     # df = create_zero_filled_strain_columns(df)
 
