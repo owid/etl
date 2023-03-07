@@ -33,7 +33,7 @@ def run(dest_dir: str) -> None:
 
     # Select top-level regions
     df = df[
-        df.entity.isin(
+        df.region.isin(
             [
                 "East Asia and Pacific",
                 "Europe and Central Asia",
@@ -51,7 +51,7 @@ def run(dest_dir: str) -> None:
     # For each region, keep the latest data point in each year
     df = df.sort_values("year")
     df["year"] = df.year.dt.year
-    df = df.groupby(["entity", "year"], as_index=False).tail(1).reset_index(drop=True)
+    df = df.groupby(["region", "year"], as_index=False).tail(1).reset_index(drop=True)
 
     # Create a new table with the processed data.
     tb_garden = Table(df, like=tb_meadow)

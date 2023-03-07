@@ -28,7 +28,7 @@ def run(dest_dir: str) -> None:
 
     # Reshape to tidy format and rename cols
     df = df.melt(id_vars="Regions", var_name="year", value_name="active_accounts_90d").rename(
-        columns={"Regions": "entity"}
+        columns={"Regions": "region"}
     )
 
     # Create a new table and ensure all columns are snake-case.
