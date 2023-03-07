@@ -40,7 +40,7 @@ tables:
         description: |
           Measures the minimum of daily minimum ozone for each year.
       min_hole_concentration_date:
-        title: Date of minimum ozone hole area
+        title: Date of minimum ozone hole concentration
         short_unit: ""
         unit: ""
       mean_hole_area:
