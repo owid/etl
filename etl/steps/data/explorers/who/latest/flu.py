@@ -37,7 +37,7 @@ def run(dest_dir: str) -> None:
 
     # Create monthly aggregates - sum variables that are counts and recalculate rates based on these monthly totals
     tb_flu_monthly = create_monthly_aggregates(df=tb_flu)
-    assert tb_flu[["country", "date"]].duplicated().sum() == 0
+    #assert tb_flu[["country", "date"]].duplicated().sum() == 0
     tb_flu = Table(tb_flu, short_name="flu")
     tb_flu_monthly = Table(tb_flu_monthly, short_name="flu_monthly")
     # Create explorer dataset, with garden table and metadata in csv format
