@@ -158,7 +158,7 @@ def create_monthly_aggregates(df: pd.DataFrame) -> pd.DataFrame:
     # columns that we can aggregate by summing
     count_cols = cols.drop(rate_cols)
 
-    month_agg_df = df[count_cols].groupby(["country", "month_date"]).sum(min_count=1).reset_index()
+    month_agg_df = df[count_cols].groupby(["country", "month_date"]).sum(min_count=1, numeric_only=True).reset_index()
 
     month_agg_df = calculate_percent_positive(
         df=month_agg_df, surveillance_cols=["sentinel", "nonsentinel", "notdefined", "combined"]
@@ -175,7 +175,6 @@ def create_regional_aggregates(df: pd.DataFrame) -> pd.DataFrame:
     Recalculate the rate columns at these aggregate levels
     Combine the global and hemisphere aggregates with the original data and return it
     """
-
     cols = df.columns.drop(["country"])
     # Columns that will need to be recalculated after aggregating
     rate_cols = [
@@ -190,17 +189,45 @@ def create_regional_aggregates(df: pd.DataFrame) -> pd.DataFrame:
     # columns that we can aggregate by summing
     count_cols = cols.drop(rate_cols)
 
-    global_aggregate = df[count_cols].groupby(["date"]).sum(min_count=1).reset_index()
-    global_aggregate["country"] = "World"
-    cols = global_aggregate.columns.to_list()
-    cols = cols[-1:] + cols[:-1]
-    global_aggregate = global_aggregate[cols]
-    global_aggregate = calculate_percent_positive(
-        df=global_aggregate, surveillance_cols=["sentinel", "nonsentinel", "notdefined", "combined"]
-    )
-    global_aggregate = calculate_patient_rates(df=global_aggregate)
+    global_aggregate = create_global_aggregate(df, count_cols)
+    hemisphere_aggregate = create_hemisphere_aggregate(df, count_cols)
+    uk_aggregate = create_united_kingdom_aggregate(df, count_cols)
 
-    hemisphere_aggregate = df[count_cols].groupby(["hemisphere", "date"]).sum(min_count=1).reset_index()
+    df = df.drop(columns=["hemisphere"])
+
+    df = pd.concat([df, global_aggregate, hemisphere_aggregate, uk_aggregate])
+
+    return df
+
+
+def create_united_kingdom_aggregate(df: pd.DataFrame, count_cols) -> pd.DataFrame:
+    """
+    Summing the flunet data for England, Wales, Scotland and N.Ireland to create a United Kingdom entity
+    """
+    uk_df = df[df["country"].isin(["England", "Wales", "Scotland", "Northern Ireland"])]
+
+    # Check all nations are in the subset - in case of name changes
+    assert len(uk_df.country.drop_duplicates()) == 4
+
+    uk_agg = uk_df[count_cols].groupby(["date"]).sum(min_count=1, numeric_only=True).reset_index()
+
+    uk_agg["country"] = "United Kingdom"
+
+    cols = uk_agg.columns.to_list()
+    cols = cols[-1:] + cols[:-1]
+    uk_agg = uk_agg[cols]
+    uk_agg = calculate_percent_positive(
+        df=uk_agg, surveillance_cols=["sentinel", "nonsentinel", "notdefined", "combined"]
+    )
+    uk_agg = calculate_patient_rates(df=uk_agg)
+
+    return uk_agg
+
+
+def create_hemisphere_aggregate(df: pd.DataFrame, count_cols) -> pd.DataFrame:
+    hemisphere_aggregate = (
+        df[count_cols].groupby(["hemisphere", "date"]).sum(min_count=1, numeric_only=True).reset_index()
+    )
 
     hemisphere_aggregate["hemisphere"] = hemisphere_aggregate["hemisphere"].replace(
         {"NH": "Northern Hemisphere", "SH": "Southern Hemisphere"}
@@ -211,8 +238,17 @@ def create_regional_aggregates(df: pd.DataFrame) -> pd.DataFrame:
         df=hemisphere_aggregate, surveillance_cols=["sentinel", "nonsentinel", "notdefined", "combined"]
     )
     hemisphere_aggregate = calculate_patient_rates(df=hemisphere_aggregate)
+    return hemisphere_aggregate
 
-    df = df.drop(columns=["hemisphere"])
-    df = pd.concat([df, global_aggregate, hemisphere_aggregate])
 
-    return df
+def create_global_aggregate(df: pd.DataFrame, count_cols) -> pd.DataFrame:
+    global_aggregate = df[count_cols].groupby(["date"]).sum(min_count=1, numeric_only=True).reset_index()
+    global_aggregate["country"] = "World"
+    cols = global_aggregate.columns.to_list()
+    cols = cols[-1:] + cols[:-1]
+    global_aggregate = global_aggregate[cols]
+    global_aggregate = calculate_percent_positive(
+        df=global_aggregate, surveillance_cols=["sentinel", "nonsentinel", "notdefined", "combined"]
+    )
+    global_aggregate = calculate_patient_rates(df=global_aggregate)
+    return global_aggregate
