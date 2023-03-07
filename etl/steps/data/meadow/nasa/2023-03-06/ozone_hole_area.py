@@ -55,10 +55,12 @@ def build_df_p1(snap: Snapshot) -> pd.DataFrame:
     # Read data
     text = _read_txt_without_comments(snap.path)
     # Sanity checks
-    assert text[0] == "         Ozone Hole Area       Minimum Ozone\n", "Check data file header, might have changed!"
-    assert text[1] == "          Date     Value      Date     Value\n", "Check data file header, might have changed!"
-    assert text[2] == "Year    (YYMM) (mil km2)    (YYMM)      (DU)\n", "Check data file header, might have changed!"
-    assert text[3] == "----    ------ ---------    ------     -----\n", "Check data file header, might have changed!"
+    assert re.match(r"\s+Ozone Hole Area\s+Minimum Ozone\n", text[0]), "Data file header might have changed."
+    assert re.match(r"\s+Date\s+Value\s+Date\s+Value\n", text[1]), "Data file header might have changed."
+    assert re.match(
+        r"Year\s+\(YYMM\)\s+\(mil km2\)\s+\(YYMM\)\s+\(DU\)\n", text[2]
+    ), "Data file header might have changed."
+    assert re.match(r"\-{4}\s+\-{6}\s+\-{9}\s+\-{6}\s+\-{5}\n", text[3]), "Data file header might have changed."
     assert text[4].startswith("1979"), "First expected reported year should be 1979"
     # Get only data values
     text = text[4:]
@@ -70,13 +72,13 @@ def build_df_p1(snap: Snapshot) -> pd.DataFrame:
             "year",
             "max_hole_area_date",
             "max_hole_area",
-            "min_hole_concentration",
             "min_hole_concentration_date",
+            "min_hole_concentration",
         ],
     )
     # Get dates in date format
     df["max_hole_area_date"] = pd.to_datetime(df["year"] + df["max_hole_area_date"], format="%Y%m%d")
-    df["min_hole_concentration_date"] = pd.to_datetime(df["year"] + df["min_hole_concentration"], format="%Y%m%d")
+    df["min_hole_concentration_date"] = pd.to_datetime(df["year"] + df["min_hole_concentration_date"], format="%Y%m%d")
     return df
 
 
@@ -86,9 +88,9 @@ def build_df_p2(snap: Snapshot) -> pd.DataFrame:
     # Read data
     text = _read_txt_without_comments(snap.path)
     # Sanity checks
-    assert text[0] == "      O3 Hole Area Minimum Ozone\n", "Check data file header, might have changed!"
-    assert text[1] == "Year     (mil km2)          (DU)\n", "Check data file header, might have changed!"
-    assert text[2] == "----  ------------ -------------\n", "Check data file header, might have changed!"
+    assert re.match(r"\s+O3 Hole Area\s+Minimum Ozone\n", text[0]), "Data file header might have changed."
+    assert re.match(r"Year\s+\(mil km2\)\s+\(DU\)\n", text[1]), "Data file header might have changed."
+    assert re.match(r"\-{4}\s+\-{12}\s+\-{13}\n", text[2]), "Data file header might have changed."
     assert text[3].startswith("1979"), "First expected reported year should be 1979"
     # Get only data values
     text = text[3:]
@@ -129,8 +131,5 @@ def _read_txt_without_comments(path: Union[Path, str]) -> List[str]:
 
     A commented line is such that starts with a '#'."""
     with open(path, "r") as f:
-        text = []
-        for line in f:
-            if not line.startswith("#"):
-                text.append(line)
+        text = [line for line in f.readlines() if not line.startswith("#")]
     return text
