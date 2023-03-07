@@ -46,6 +46,10 @@ def variable_data_df_from_s3(engine: Engine, data_path: str) -> pd.DataFrame:
     if df.empty:
         return empty_df
 
+    return add_entity_code_and_name(engine, df)
+
+
+def add_entity_code_and_name(engine: Engine, df: pd.DataFrame) -> pd.DataFrame:
     # add entities from DB
     q = """
     SELECT
@@ -56,9 +60,7 @@ def variable_data_df_from_s3(engine: Engine, data_path: str) -> pd.DataFrame:
     WHERE id in %(entity_ids)s
     """
     entities = pd.read_sql(q, engine, params={"entity_ids": df["entityId"].tolist()})
-    df = df.merge(entities, on="entityId")
-
-    return df
+    return df.merge(entities, on="entityId")
 
 
 def variable_data(data_df: pd.DataFrame) -> Dict[str, Any]:

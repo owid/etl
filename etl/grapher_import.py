@@ -25,6 +25,12 @@ from sqlalchemy.engine.base import Engine
 from sqlmodel import Session, delete, select, update
 from tenacity import retry, stop
 
+from backport.datasync.data_metadata import (
+    add_entity_code_and_name,
+    variable_data,
+    variable_metadata,
+)
+from backport.datasync.datasync import upload_gzip_dict
 from etl import config
 from etl.db import open_db
 
@@ -250,26 +256,39 @@ def upsert_table(
 
         session.commit()
 
-        # delete its data to refresh it later
+        # delete its data if there is any
+        # TODO: once we stop upserting to data_values, prune all ETL datasets from data_values
+        # and remove these lines
         q = delete(gm.DataValues).where(gm.DataValues.variableId == variable_id)
         session.execute(q)
         session.commit()
 
         df = table.rename(columns={column_name: "value", "entity_id": "entityId"}).assign(variableId=variable_id)
 
+        # TODO: once we verify that uploading to S3 works, stop upserting to data_values and remove these
+        # lines together with function insert_to_data_values
         if table.metadata.dataset.short_name not in BLACKLIST_DATASETS_DATA_VALUES_UPSERTS:
             insert_to_data_values(engine, df)
-            log.info("upsert_table.upserted_data_values", size=len(table))
+            log.info("upsert_table.upserted_data_values", size=len(table), varible_id=variable_id)
 
-        # data_values changed, make dataPath and metadataPath null again
-        # NOTE: in the future we want to skip writing to data_values and fill dataPath and metadataPath from
-        # here. For that we need to make sure all updates to data_values are made by ETL, then we can deprecate
-        # datasync and write to S3 directly
+        # NOTE: we could prefetch all entities in advance, but it's not a bottleneck as it takes
+        # less than 10ms per variable
+        df = add_entity_code_and_name(engine, df)
+
+        var_data = variable_data(df)
+        var_metadata = variable_metadata(engine, variable_id, df)
+
+        # upload data and metadata to S3
+        data_path = upload_gzip_dict(var_data, variable.s3_data_path())
+        metadata_path = upload_gzip_dict(var_metadata, variable.s3_metadata_path())
+
         variable = gm.Variable.load_variable(session, variable_id)
-        variable.dataPath = None
-        variable.metadataPath = None
+        variable.dataPath = data_path
+        variable.metadataPath = metadata_path
         session.add(variable)
         session.commit()
+
+        log.info("upsert_table.uploaded_to_s3", size=len(table), variable_id=variable_id)
 
         return VariableUpsertResult(variable_id, source_id)  # type: ignore
 
