@@ -24,7 +24,7 @@ def run(dest_dir: str) -> None:
     snap: Snapshot = paths.load_dependency("microprocessor_trend.dat")
 
     # Load data from snapshot.
-    df = pd.read_table(snap.path, sep="\s+", header=None, names=["year", "transistors"], index_col=None, comment="#")
+    df = pd.read_table(snap.path, sep=r"\s+", header=None, names=["year", "transistors"], index_col=None, comment="#")
 
     #
     # Process data.
