@@ -33,6 +33,7 @@ from shared import (
     harmonize_elements,
     harmonize_items,
     log,
+    parse_amendments_table,
     prepare_long_table,
     prepare_wide_table,
     remove_outliers,
@@ -145,6 +146,7 @@ def run(dest_dir: str) -> None:
     elements_metadata = pd.DataFrame(metadata["elements"]).reset_index()
     elements_metadata = elements_metadata[elements_metadata["dataset"] == dataset_short_name].reset_index(drop=True)
     countries_metadata = pd.DataFrame(metadata["countries"]).reset_index()
+    amendments = parse_amendments_table(amendments=metadata["amendments"], dataset_short_name=dataset_short_name)
 
     #
     # Process data.
@@ -165,6 +167,7 @@ def run(dest_dir: str) -> None:
         items_metadata=items_metadata,
         elements_metadata=elements_metadata,
         countries_metadata=countries_metadata,
+        amendments=amendments,
     )
 
     # Add data for aggregate regions.

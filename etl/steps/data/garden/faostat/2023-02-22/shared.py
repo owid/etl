@@ -300,25 +300,6 @@ FLAGS_RANKING = (
     .rename(columns={"index": "ranking"})
 )
 
-
-# Amendments to apply to data values.
-# They will only be applied if "value" column is of type "category".
-VALUE_AMENDMENTS = {
-    # Replace values given as upper bounds (e.g. "<0.1") by the average between 0 and that value.
-    "<0.1": "0.05",
-    "<2.5": "1.25",
-    "<0.5": "0.25",
-    # Remove spurious comma values (this could be done simply by .str.replace(",", ""), however, given that it happens
-    # only in a few cases, it seems safer to explicitly correct them here).
-    "1,173.92": "1173.92",
-    "1,688.37": "1688.37",
-    "1,439.14": "1439.14",
-    "1,248.25": "1248.25",
-    "1,775.32": "1775.32",
-    # Replace missing values by nan.
-    "N": np.nan,
-}
-
 # Additional descriptions.
 
 # Additional explanation to append to element description for variables that were originally given per capita.
@@ -1434,11 +1415,8 @@ def add_per_capita_variables(data: pd.DataFrame, elements_metadata: pd.DataFrame
     return data
 
 
-def clean_data_values(values: pd.Series) -> pd.Series:
-    """Fix spurious data values (defined in VALUE_AMENDMENTS) and make values a float column.
-
-    Note: The mapping of VALUE_AMENDMENTS will only be applied if the input series of values is of type "category".
-    At the moment, this fixes issues only in faostat_sdgb dataset.
+def clean_data_values(values: pd.Series, amendments: Dict[str, str]) -> pd.Series:
+    """Fix spurious data values (defined in value_amendments.csv) and make values a float column.
 
     Parameters
     ----------
@@ -1452,18 +1430,18 @@ def clean_data_values(values: pd.Series) -> pd.Series:
 
     """
     values_clean = values.copy()
-    if values_clean.dtype == "category":
-        # Replace spurious values by either nan, or their correct numeric values (defined in VALUE_AMENDMENTS).
+    if len(amendments) > 0:
         values_clean = dataframes.map_series(
             series=values_clean,
-            mapping=VALUE_AMENDMENTS,
+            mapping=amendments,
             warn_on_missing_mappings=False,
-            warn_on_unused_mappings=False,
+            warn_on_unused_mappings=True,
+            show_full_warning=True,
         )
 
     # Convert all numbers into numeric.
     # Note: If this step fails with a ValueError, it may be because other spurious values have been introduced.
-    # If so, add them to the VALUE_AMENDMENTS.
+    # If so, add them to value_amendments.csv and re-run faostat_metadata.
     values_clean = values_clean.astype(float)
 
     return values_clean
@@ -1474,6 +1452,7 @@ def clean_data(
     items_metadata: pd.DataFrame,
     elements_metadata: pd.DataFrame,
     countries_metadata: pd.DataFrame,
+    amendments: Dict[str, str],
 ) -> pd.DataFrame:
     """Process data (with already harmonized item codes and element codes), before adding aggregate regions and
     per-capita variables.
@@ -1495,6 +1474,8 @@ def clean_data(
         Elements metadata (from the metadata dataset) after selecting elements for only the relevant domain.
     countries_metadata : pd.DataFrame
         Countries metadata (from the metadata dataset).
+    amendments : dict
+        Value amendments (if any).
 
     Returns
     -------
@@ -1504,8 +1485,8 @@ def clean_data(
     """
     data = data.copy()
 
-    # Fix spurious data values (applying mapping in VALUE_AMENDMENTS) and ensure column of values is float.
-    data["value"] = clean_data_values(data["value"])
+    # Fix spurious data values (applying mapping in value_amendments.csv) and ensure column of values is float.
+    data["value"] = clean_data_values(data["value"], amendments=amendments)
 
     # Convert nan flags into "official" (to avoid issues later on when dealing with flags).
     data["flag"] = pd.Series(
@@ -1794,6 +1775,21 @@ def _variable_name_map(data: pd.DataFrame, column: str) -> Dict[str, str]:
     return pivot.map(lambda x: list(x)[0]).to_dict()  # type: ignore
 
 
+def parse_amendments_table(amendments: catalog.Table, dataset_short_name: str):
+    amendments = pd.DataFrame(amendments).reset_index()
+    # Create a dictionary mapping spurious values to amended values.
+    amendments = (
+        amendments[amendments["dataset"] == dataset_short_name]
+        .drop(columns="dataset")
+        .set_index("spurious_value")
+        .to_dict()["new_value"]
+    )
+    # For some reason, empty values are loaded in the table as None. Change them to nan.
+    amendments = {old: new if new is not None else np.nan for old, new in amendments.items()}
+
+    return amendments
+
+
 def run(dest_dir: str) -> None:
     #
     # Load data.
@@ -1819,13 +1815,14 @@ def run(dest_dir: str) -> None:
     # Load dataset of FAOSTAT metadata.
     metadata: catalog.Dataset = paths.load_dependency(f"{NAMESPACE}_metadata")
 
-    # Load dataset, items, element-units, and countries metadata.
+    # Load dataset, items, element-units, countries metadata, and value amendments.
     dataset_metadata = pd.DataFrame(metadata["datasets"]).loc[dataset_short_name].to_dict()
     items_metadata = pd.DataFrame(metadata["items"]).reset_index()
     items_metadata = items_metadata[items_metadata["dataset"] == dataset_short_name].reset_index(drop=True)
     elements_metadata = pd.DataFrame(metadata["elements"]).reset_index()
     elements_metadata = elements_metadata[elements_metadata["dataset"] == dataset_short_name].reset_index(drop=True)
     countries_metadata = pd.DataFrame(metadata["countries"]).reset_index()
+    amendments = parse_amendments_table(amendments=metadata["amendments"], dataset_short_name=dataset_short_name)
 
     #
     # Process data.
@@ -1840,6 +1837,7 @@ def run(dest_dir: str) -> None:
         items_metadata=items_metadata,
         elements_metadata=elements_metadata,
         countries_metadata=countries_metadata,
+        amendments=amendments,
     )
 
     # Add data for aggregate regions.

@@ -998,8 +998,8 @@ def run(dest_dir: str) -> None:
     items_table = create_table(df=items_df, short_name="items", index_cols=["dataset", "item_code"])
     elements_table = create_table(df=elements_df, short_name="elements", index_cols=["dataset", "element_code"])
     countries_table = create_table(df=countries_df, short_name="countries", index_cols=["area_code"])
-    amendments_table = create_table(
-        df=value_amendments, short_name="amendments", index_cols=["dataset", "spurious_value"]
+    amendments_table = catalog.Table(value_amendments, short_name="amendments").set_index(
+        ["dataset", "spurious_value"], verify_integrity=True
     )
 
     # Add tables to dataset.
