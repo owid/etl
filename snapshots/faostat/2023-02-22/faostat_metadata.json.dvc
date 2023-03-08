@@ -15,3 +15,8 @@ meta:
   license_url: http://www.fao.org/contact-us/terms/db-terms-of-use/en
   license_name: CC BY-NC-SA 3.0 IGO
   is_public: true
+wdir: ../../../data/snapshots/faostat/2023-02-22
+outs:
+- md5: 8fc9d8298a064676a80601d3393a2548
+  size: 13973943
+  path: faostat_metadata.json
