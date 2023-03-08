@@ -1,3 +1,4 @@
+# (Inherited from meadow, remove if not different.)
 all_sources:
   - source_testing: &source-testing
       name: # TO BE FILLED. Example: Testing Short Citation
@@ -8,17 +9,19 @@ all_sources:
       publication_year: # TO BE FILLED (if publication_date is not given). Example: 2023
       # description: Source description.
 
+# (Inherited from meadow, remove if not different.)
 dataset:
-  title: # TO BE FILLED. Example: Testing Dataset Name (Institution, 2023)
+  title: # Example: Testing Dataset Name (Institution, 2023)
   # description: Dataset description.
   licenses:
-    - name: # TO BE FILLED. Example: Testing License Name
-      url: # TO BE FILLED. Example: https://url_of_testing_source.com/license
+    - name: # Example: Testing License Name
+      url: # Example: https://url_of_testing_source.com/license
   sources:
     - *source-testing
 
 tables:
   {{cookiecutter.short_name}}:
+    # (Inherited from meadow, remove if not different.)
     variables:
       # testing_variable:
       #   title: Testing variable title
