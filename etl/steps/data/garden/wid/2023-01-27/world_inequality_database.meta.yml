@@ -79,7 +79,7 @@ dataset:
   sources:
     - name: World Inequality Database (WID.world) (2022)
       url: https://wid.world/
-      date_accessed: "2023-02-13"
+      date_accessed: "2023-02-28"
       publication_date: "2022-11-23"
       publication_year: 2022
       published_by: World Inequality Database (WID), https://wid.world

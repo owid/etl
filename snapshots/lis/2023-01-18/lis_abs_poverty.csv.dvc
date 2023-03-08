@@ -21,6 +21,6 @@ meta:
     Harmonized into a common framework, LIS datasets contain household- and person-level data on labor income, capital income, pensions, public social benefits (excl. pensions) and private transfers, as well as taxes and contributions, demography, employment, and expenditures.
 wdir: ../../../data/snapshots/lis/2023-01-18
 outs:
-- md5: 9d0037162d30bd6e3ac9b67971d22891
-  size: 2528828
+- md5: 3e7227f7774f57038d2bee2a729d7992
+  size: 2403388
   path: lis_abs_poverty.csv

@@ -6,7 +6,6 @@ Current dataset assumes the following approximate mapping:
 Definitions according to the Notes in the data file:
 * "gdppc": Real GDP per capita in 2011$.
 * "pop": Population, mid-year (thousands).
-
 """
 
 import json

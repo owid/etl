@@ -195,8 +195,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
     print(tab.head())
     ```
 
-7. If you are an internal OWID member and want to push data to our Grapher DB, continue with `poetry run walkthrough grapher`. Alternatively, to create explorers
-dataset continue with `poetry run walkthrough explorers`.
+7. If you are an internal OWID member and want to push data to our Grapher DB, continue with `poetry run walkthrough grapher`. Alternatively, to create explorers dataset continue with `poetry run walkthrough explorers`.
 
 ## Generated files
 """

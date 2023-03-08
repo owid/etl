@@ -1,0 +1,18 @@
+meta:
+  namespace: fasttrack
+  short_name: germany_hypothetical_constant_nuclear
+  file_extension: csv
+  date_accessed: 2023-03-06
+  name: DRAFT Germany hypothetical constant nuclear
+  description: ''
+  source_name: Local CSV
+  url: ''
+  source_published_by: Local CSV
+  source_data_url: gAAAAABkBW2ixcvqdSXRkhPwzi_fZXrRzB3aYbtUS_TvtfeHN6hkDUdg_YhQRz7LP1oQx0k1VM-p_JntzPFkoBe3IbrRKaIqew==
+  is_public: false
+  version: latest
+wdir: ../../../data/snapshots/fasttrack/latest
+outs:
+- md5: 6be080d44a7dbb3f939c182729d1d322
+  size: 409
+  path: germany_hypothetical_constant_nuclear.csv

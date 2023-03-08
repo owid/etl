@@ -54,6 +54,9 @@ def _yield_wide_table(
         for col in table.columns:
             if table[col].isna().any():
                 raise ValueError(f"Column `{col}` contains missing values")
+    cols_with_none_units = [col for col in table.columns if table[col].metadata.unit is None]
+    if cols_with_none_units:
+        raise Exception("Columns with missing units: " + ", ".join(cols_with_none_units))
 
     dim_names = [k for k in table.primary_key if k not in ("year", "entity_id")]
     if dim_titles:

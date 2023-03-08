@@ -38,8 +38,15 @@ def run(dest_dir: str) -> None:
 
     df = clean_and_format_data(df)
     df = split_by_surveillance_type(df)
-    df = calculate_percent_positive(df)
-    df = create_zero_filled_strain_columns(df)
+
+    df = calculate_percent_positive(df, surveillance_cols=["SENTINEL", "NONSENTINEL", "NOTDEFINED", "COMBINED"])
+    # df = create_zero_filled_strain_columns(df)
+
+    # We can't remove sparse data from the zero-filled columns because of how stacked bar charts behave
+    # filter_col = [col for col in df if col.endswith("zfilled")]
+    # set time-series with less than 10 (non-zero, non-NA) datapoints to NA - apply to a
+    # df = remove_sparse_timeseries(df=df, cols=df.columns.drop(["country", "date", filter_col]), min_data_points=10)
+
     # Create a new table with the processed data.
     # tb_garden = Table(df, like=tb_meadow)
     tb_garden = Table(df, short_name=paths.short_name)
@@ -54,14 +61,59 @@ def run(dest_dir: str) -> None:
     log.info("flunet.end")
 
 
+def remove_rows_that_sum_incorrectly(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Let's remove rows that don't add up correctly e.g.
+    where influenza a + influenza b does not equal influenza all
+
+    We can't be sure which of the columns are correct and as there are relatively few we should just remove them.
+    """
+    orig_rows = df.shape[0]
+    df = df.drop(df[(df["inf_a"].fillna(0) + df["inf_b"].fillna(0)) != df["inf_all"].fillna(0)].index)
+    df = df.drop(
+        df[
+            (
+                df["ah1n12009"].fillna(0)
+                + df["ah1"].fillna(0)
+                + df["ah3"].fillna(0)
+                + df["ah5"].fillna(0)
+                + df["ah7n9"].fillna(0)
+                + df["anotsubtyped"].fillna(0)
+                + df["anotsubtypable"].fillna(0)
+                + df["aother_subtype"].fillna(0)
+            )
+            != df["inf_a"].fillna(0)
+        ].index
+    )
+
+    df = df.drop(
+        df[
+            (
+                df["bvic_2del"].fillna(0)
+                + df["bvic_3del"].fillna(0)
+                + df["bvic_nodel"].fillna(0)
+                + df["bvic_delunk"].fillna(0)
+                + df["byam"].fillna(0)
+                + df["bnotdetermined"].fillna(0)
+            )
+            != df["inf_b"].fillna(0)
+        ].index
+    )
+    new_rows = df.shape[0]
+    rows_dropped = orig_rows - new_rows
+    log.info(f"{rows_dropped} rows dropped as the disaggregates did not sum correctly")
+    assert rows_dropped < 20000, "More than 20,000 rows dropped, this is much more than expected"
+    return df
+
+
 def split_by_surveillance_type(df: pd.DataFrame) -> pd.DataFrame:
     """
     Pivoting the table so there is a column per variable and per surveillance type
 
     Summing each column and skipping NAs so there is a column of combined values
     """
-    flu_cols = df.columns.drop(["country", "date", "origin_source"])
-    df_piv = df.pivot(index=["country", "date"], columns="origin_source").reset_index()
+    flu_cols = df.columns.drop(["country", "date", "origin_source", "hemisphere"])
+    df_piv = df.pivot(index=["country", "hemisphere", "date"], columns="origin_source").reset_index()
 
     df_piv.columns = list(map("".join, df_piv.columns))
     sentinel_list = ["SENTINEL", "NONSENTINEL", "NOTDEFINED"]
@@ -101,9 +153,11 @@ def clean_and_format_data(df: pd.DataFrame) -> pd.DataFrame:
     """
 
     df["date"] = create_date_from_iso_week(df["iso_weekstartdate"])
+    df = remove_rows_that_sum_incorrectly(df)
     df = combine_columns(df)
     sel_cols = [
         "country",
+        "hemisphere",
         "date",
         "origin_source",
         "ah1n12009",
@@ -123,10 +177,11 @@ def clean_and_format_data(df: pd.DataFrame) -> pd.DataFrame:
         "spec_received_nb",
     ]
     df = df[sel_cols]
+
     return df
 
 
-def calculate_percent_positive(df: pd.DataFrame) -> pd.DataFrame:
+def calculate_percent_positive(df: pd.DataFrame, surveillance_cols: list[str]) -> pd.DataFrame:
     """
     Because the data is patchy in some places the WHO recommends three methods for calclating the share of influenza tests that are positive.
     In order of preference
@@ -137,8 +192,6 @@ def calculate_percent_positive(df: pd.DataFrame) -> pd.DataFrame:
     Remove rows where the percent is > 100
     Remove rows where the percent = 100 but all available denominators are 0.
     """
-    surveillance_cols = ["SENTINEL", "NONSENTINEL", "NOTDEFINED", "COMBINED"]
-
     for col in surveillance_cols:
         df["pcnt_pos_1" + col] = (df["inf_all" + col] / (df["inf_all" + col] + df["inf_negative" + col])) * 100
         df["pcnt_pos_2" + col] = (df["inf_all" + col] / df["spec_processed_nb" + col]) * 100
@@ -162,79 +215,6 @@ def calculate_percent_positive(df: pd.DataFrame) -> pd.DataFrame:
             & (df["spec_received_nb" + col] == 0),
             "pcnt_pos" + col,
         ] = np.nan
-        df = df.dropna(axis=1, how="all")
+        # df = df.dropna(axis=1, how="all")
 
     return df
-
-
-def create_zero_filled_strain_columns(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    For the stacked bar charts in the grapher to work I think I need to fill the NAs with zeros. I'll keep the original columns too as I think adding 0s into line charts would look weird and be misleading
-    """
-    strain_columns = [
-        "ah1n12009COMBINED",
-        "ah1COMBINED",
-        "ah3COMBINED",
-        "ah5COMBINED",
-        "ah7n9COMBINED",
-        "a_no_subtypeCOMBINED",
-        "byamCOMBINED",
-        "bnotdeterminedCOMBINED",
-        "bvicCOMBINED",
-        "inf_aCOMBINED",
-        "inf_bCOMBINED",
-        "ah1n12009SENTINEL",
-        "ah1SENTINEL",
-        "ah3SENTINEL",
-        "ah5SENTINEL",
-        "ah7n9SENTINEL",
-        "byamSENTINEL",
-        "bnotdeterminedSENTINEL",
-        "bvicSENTINEL",
-        "inf_aSENTINEL",
-        "inf_bSENTINEL",
-        "ah1n12009NONSENTINEL",
-        "ah1n12009NOTDEFINED",
-        "ah1NOTDEFINED",
-        "ah1NONSENTINEL",
-        "ah3NONSENTINEL",
-        "ah3NOTDEFINED",
-        "ah5NONSENTINEL",
-        "ah5NOTDEFINED",
-        "ah7n9NONSENTINEL",
-        "ah7n9NOTDEFINED",
-        "a_no_subtypeNOTDEFINED",
-        "a_no_subtypeSENTINEL",
-        "byamNONSENTINEL",
-        "byamNOTDEFINED",
-        "bnotdeterminedNONSENTINEL",
-        "bnotdeterminedNOTDEFINED",
-        "bvicNONSENTINEL",
-        "bvicNOTDEFINED",
-    ]
-    # Add these columns if we need to, for now stick to the above for file size reasons
-
-    strain_columns_zfilled = [s + "_zfilled" for s in strain_columns]
-    df[strain_columns_zfilled] = df[strain_columns].fillna(0)
-    return df
-
-
-# def sanity_checks(df: pd.DataFrame) -> pd.DataFrame:
-#    """
-#    Some assertions to check that the variables are as expected e.g. all the of the influenza strains sum to the influenza all column.
-#    """
-##
-#
-#    assert all(
-#        df[
-#            [
-##                "ah1n12009NONSENTINEL",
-#                "ah1NONSENTINEL",
-#                "ah3NONSENTINEL",
-#                "ah5NONSENTINEL",
-#                "ah7n9NONSENTINEL",
-#                "a_no_subtypeNONSENTINEL",
-##            ]
-#        ].sum(axis=1, min_count=1)
-#        == df["inf_aNONSENTINEL"]
-#   )

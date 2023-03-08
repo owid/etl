@@ -1,0 +1,272 @@
+dataset:
+  namespace: energy
+  version: 2023-02-20
+  title: Global Primary Energy (Smil & BP, 2023)
+  short_name: global_primary_energy
+  description: |
+    This dataset comprises of a combination of data from Appendix A of Vaclav Smil's Updated and Revised Edition of his book, 'Energy Transitions: Global and National Perspectives' (2017) and BP's Statistical Review of World Energy (2022).
+
+    All data prior to the year 1965 is sourced from Smil (2017). All data from 1965 onwards, with the exception of traditional biomass is sourced from BP Statistical Review. Smil's estimates of traditional biomass are only available until 2015. For the years 2016 onwards, we have assumed a similar level of traditional biomass consumption. This is approximately in line with recent trends in traditional biomass from Smil's data.
+
+    Our World in Data has normalized all BP fossil fuels data to terawatt-hours (TWh) using a conversion factor of 1,000,000 / 3,600 (~277.778) to convert from exajoules (EJ) to TWh.
+
+    This dataset includes primary energy data using two methodologies:
+    (1) 'direct' primary energy, which does not take account of the inefficiencies in fossil fuel production. Fossil fuel data is compared to electricity generation (not in input equivalents) of nuclear and renewables.
+    (2) 'substitution' primary energy, which does take account of inefficiencies in fossil fuel production. This converts non-fossil energy to their 'input equivalents': The amount of primary energy that would be needed if they had the same inefficiencies as fossil fuels. This is the methodology adopted by BP when all data is compared in exajoules.
+
+tables:
+  global_primary_energy:
+    variables:
+      biofuels__twh_direct_energy:
+        title: Biofuels (TWh, direct energy)
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Modern biofuels
+      biofuels__twh_substituted_energy:
+        title: Biofuels (TWh, substituted energy)
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Modern biofuels
+      coal__twh_direct_energy:
+        title: Coal (TWh, direct energy)
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Coal
+      coal__twh_substituted_energy:
+        title: Coal (TWh, substituted energy)
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Coal
+      # data_source
+      gas__twh_direct_energy:
+        title: Gas (TWh, direct energy)
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Natural gas
+      gas__twh_substituted_energy:
+        title: Gas (TWh, substituted energy)
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Natural gas
+      hydropower__twh_direct_energy:
+        title: Hydropower (TWh, direct energy)
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Hydropower
+      hydropower__twh_substituted_energy:
+        title: Hydropower (TWh, substituted energy)
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Hydropower
+      nuclear__twh_direct_energy:
+        title: Nuclear (TWh, direct energy)
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Nuclear
+      nuclear__twh_substituted_energy:
+        title: Nuclear (TWh, substituted energy)
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Nuclear
+      oil__twh_direct_energy:
+        title: Oil (TWh, direct energy)
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Oil
+      oil__twh_substituted_energy:
+        title: Oil (TWh, substituted energy)
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Oil
+      other_renewables__twh_direct_energy:
+        title: Other renewables (TWh, direct energy)
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Other renewables
+      other_renewables__twh_substituted_energy:
+        title: Other renewables (TWh, substituted energy)
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Other renewables
+      solar__twh_direct_energy:
+        title: Solar (TWh, direct energy)
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Solar
+      solar__twh_substituted_energy:
+        title: Solar (TWh, substituted energy)
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Solar
+      traditional_biomass__twh_direct_energy:
+        title: Traditional biomass (TWh, direct energy)
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Traditional biomass
+      traditional_biomass__twh_substituted_energy:
+        title: Traditional biomass (TWh, substituted energy)
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Traditional biomass
+      wind__twh_direct_energy:
+        title: Wind (TWh, direct energy)
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Wind
+      wind__twh_substituted_energy:
+        title: Wind (TWh, substituted energy)
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Wind
+      total_consumption__twh_direct_energy:
+        title: Total consumption (TWh, direct energy)
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Total consumption
+      total_consumption__twh_substituted_energy:
+        title: Total consumption (TWh, substituted energy)
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Total consumption
+      biofuels__pct_of_direct_energy:
+        title: Biofuels (%, direct energy)
+        short_unit: "%"
+        unit: "%"
+        display:
+          name: Modern biofuels
+      biofuels__pct_of_substituted_energy:
+        title: Biofuels (%, substituted energy)
+        short_unit: "%"
+        unit: "%"
+        display:
+          name: Modern biofuels
+      coal__pct_of_direct_energy:
+        title: Coal (%, direct energy)
+        short_unit: "%"
+        unit: "%"
+        display:
+          name: Coal
+      coal__pct_of_substituted_energy:
+        title: Coal (%, substituted energy)
+        short_unit: "%"
+        unit: "%"
+        display:
+          name: Coal
+      gas__pct_of_direct_energy:
+        title: Gas (%, direct energy)
+        short_unit: "%"
+        unit: "%"
+        display:
+          name: Natural gas
+      gas__pct_of_substituted_energy:
+        title: Gas (%, substituted energy)
+        short_unit: "%"
+        unit: "%"
+        display:
+          name: Natural gas
+      hydropower__pct_of_direct_energy:
+        title: Hydropower (%, direct energy)
+        short_unit: "%"
+        unit: "%"
+        display:
+          name: Hydropower
+      hydropower__pct_of_substituted_energy:
+        title: Hydropower (%, substituted energy)
+        short_unit: "%"
+        unit: "%"
+        display:
+          name: Hydropower
+      nuclear__pct_of_direct_energy:
+        title: Nuclear (%, direct energy)
+        short_unit: "%"
+        unit: "%"
+        display:
+          name: Nuclear
+      nuclear__pct_of_substituted_energy:
+        title: Nuclear (%, substituted energy)
+        short_unit: "%"
+        unit: "%"
+        display:
+          name: Nuclear
+      oil__pct_of_direct_energy:
+        title: Oil (%, direct energy)
+        short_unit: "%"
+        unit: "%"
+        display:
+          name: Oil
+      oil__pct_of_substituted_energy:
+        title: Oil (%, substituted energy)
+        short_unit: "%"
+        unit: "%"
+        display:
+          name: Oil
+      other_renewables__pct_of_direct_energy:
+        title: Other renewables (%, direct energy)
+        short_unit: "%"
+        unit: "%"
+        display:
+          name: Other renewables
+      other_renewables__pct_of_substituted_energy:
+        title: Other renewables (%, substituted energy)
+        short_unit: "%"
+        unit: "%"
+        display:
+          name: Other renewables
+      solar__pct_of_direct_energy:
+        title: Solar (%, direct energy)
+        short_unit: "%"
+        unit: "%"
+        display:
+          name: Solar
+      solar__pct_of_substituted_energy:
+        title: Solar (%, substituted energy)
+        short_unit: "%"
+        unit: "%"
+        display:
+          name: Solar
+      traditional_biomass__pct_of_direct_energy:
+        title: Traditional biomass (%, direct energy)
+        short_unit: "%"
+        unit: "%"
+        display:
+          name: Traditional biomass
+      traditional_biomass__pct_of_substituted_energy:
+        title: Traditional biomass (%, substituted energy)
+        short_unit: "%"
+        unit: "%"
+        display:
+          name: Traditional biomass
+      wind__pct_of_direct_energy:
+        title: Wind (%, direct energy)
+        short_unit: "%"
+        unit: "%"
+        display:
+          name: Wind
+      wind__pct_of_substituted_energy:
+        title: Wind (%, substituted energy)
+        short_unit: "%"
+        unit: "%"
+        display:
+          name: Wind

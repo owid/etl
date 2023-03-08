@@ -40,7 +40,7 @@ def run(dest_dir: str) -> None:
     # Subset the data
     df = subset_and_clean_data(df)
     df = pivot_fluid(df)
-    df = remove_strings_of_zeros(df)
+    # Remove timeseries where there are only zeros or NAs
     df = calculate_patient_rates(df)
     df = df.reset_index(drop=True)
     # Create a new table with the processed data.
@@ -89,7 +89,6 @@ def subset_and_clean_data(df: pd.DataFrame) -> pd.DataFrame:
         columns=[
             "whoregion",
             "fluseason",
-            "hemisphere",
             "itz",
             "country_code",
             "iso_weekstartdate",
@@ -146,7 +145,9 @@ def subset_and_clean_data(df: pd.DataFrame) -> pd.DataFrame:
 def pivot_fluid(df: pd.DataFrame) -> pd.DataFrame:
 
     df_piv = df.pivot(
-        index=["country", "date"], columns=["case_info"], values=["reported_cases", "outpatients", "inpatients"]
+        index=["country", "hemisphere", "date"],
+        columns=["case_info"],
+        values=["reported_cases", "outpatients", "inpatients"],
     ).reset_index()
 
     df_piv.columns = list(map("".join, df_piv.columns))
@@ -199,24 +200,9 @@ def calculate_patient_rates(df: pd.DataFrame) -> pd.DataFrame:
     log.info(f"{over_1000_ari} rows with ari_cases_per_thousand_outpatients over 1000. We'll set these to NA.")
     log.info(f"{over_100_sari} rows with sari_cases_per_hundred_inpatients over 100. We'll set these to NA.")
 
-    df["ili_cases_per_thousand_outpatients"][df["ili_cases_per_thousand_outpatients"] > 1000] = np.NaN
-    df["ari_cases_per_thousand_outpatients"][df["ari_cases_per_thousand_outpatients"] > 1000] = np.NaN
-    df["sari_cases_per_hundred_inpatients"][df["sari_cases_per_hundred_inpatients"] > 100] = np.NaN
-
-    return df
-
-
-def remove_strings_of_zeros(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    For each country go through each column, if the sum = 0 then change all the values to NA. This is to
-    prevent long strings of 0s showing up in the grapher.
-    """
-    cols = df.columns.drop(["country", "date"])
-    countries = df["country"].drop_duplicates()
-
-    for country in countries:
-        for col in cols:
-            if df.loc[(df["country"] == country), col].sum() == 0:
-                df.loc[(df["country"] == country), col] = np.NaN
+    df.loc[df["ili_cases_per_thousand_outpatients"] > 1000, "ili_cases_per_thousand_outpatients"] = np.NaN
+    df.loc[df["ari_cases_per_thousand_outpatients"] > 1000, "ari_cases_per_thousand_outpatients"] = np.NaN
+    df.loc[df["sari_cases_per_hundred_inpatients"] > 100, "sari_cases_per_hundred_inpatients"] = np.NaN
+    # df["sari_cases_per_hundred_inpatients"][df["sari_cases_per_hundred_inpatients"] > 100] = np.NaN
 
     return df
