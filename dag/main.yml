@@ -304,6 +304,13 @@ steps:
   data://grapher/democracy/2023-03-02/vdem:
   - data://garden/democracy/2023-03-02/vdem
 
+  # Microprocessor trend data
+  data://meadow/technology/2023-03-08/microprocessor_trend:
+  - snapshot://technology/2023-03-08/microprocessor_trend.dat
+  data://garden/technology/2023-03-08/microprocessor_trend:
+  - data://meadow/technology/2023-03-08/microprocessor_trend
+
+
 # Sub-dags to import
 include:
   - dag/open_numbers.yml
