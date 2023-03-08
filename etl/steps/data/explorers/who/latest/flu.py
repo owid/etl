@@ -31,13 +31,15 @@ def run(dest_dir: str) -> None:
     tb_fluid = fluid_garden["fluid"]
 
     tb_flu = pd.DataFrame(pd.merge(tb_fluid, tb_flunet, on=["country", "date", "hemisphere"], how="outer"))
+    assert tb_flu[["country", "date"]].duplicated().sum() == 0
     tb_flu = create_zero_filled_strain_columns(tb_flu)
     tb_flu = remove_sparse_timeseries(df=tb_flu, min_data_points=MIN_DATA_POINTS)
     tb_flu = create_regional_aggregates(df=tb_flu)
-
+    assert tb_flu[["country", "date"]].duplicated().sum() == 0
     # Create monthly aggregates - sum variables that are counts and recalculate rates based on these monthly totals
     tb_flu_monthly = create_monthly_aggregates(df=tb_flu)
-    # assert tb_flu[["country", "date"]].duplicated().sum() == 0
+
+    # Create Tables
     tb_flu = Table(tb_flu, short_name="flu")
     tb_flu_monthly = Table(tb_flu_monthly, short_name="flu_monthly")
     # Create explorer dataset, with garden table and metadata in csv format
@@ -175,6 +177,10 @@ def create_regional_aggregates(df: pd.DataFrame) -> pd.DataFrame:
     Recalculate the rate columns at these aggregate levels
     Combine the global and hemisphere aggregates with the original data and return it
     """
+    df_orig = df
+    # UK data is also counted in england, wales, scotland and n.ireland
+    df = df[df["country"] != "United Kingdom"]
+
     cols = df.columns.drop(["country"])
     # Columns that will need to be recalculated after aggregating
     rate_cols = [
@@ -191,37 +197,13 @@ def create_regional_aggregates(df: pd.DataFrame) -> pd.DataFrame:
 
     global_aggregate = create_global_aggregate(df, count_cols)
     hemisphere_aggregate = create_hemisphere_aggregate(df, count_cols)
-    uk_aggregate = create_united_kingdom_aggregate(df, count_cols)
+    # uk_aggregate = create_united_kingdom_aggregate(df, count_cols)
 
-    df = df.drop(columns=["hemisphere"])
+    df_orig = df_orig.drop(columns=["hemisphere"])
 
-    df = pd.concat([df, global_aggregate, hemisphere_aggregate, uk_aggregate])
+    df_out = pd.concat([df_orig, global_aggregate, hemisphere_aggregate])
 
-    return df
-
-
-def create_united_kingdom_aggregate(df: pd.DataFrame, count_cols) -> pd.DataFrame:
-    """
-    Summing the flunet data for England, Wales, Scotland and N.Ireland to create a United Kingdom entity
-    """
-    uk_df = df[df["country"].isin(["England", "Wales", "Scotland", "Northern Ireland"])]
-
-    # Check all nations are in the subset - in case of name changes
-    assert len(uk_df.country.drop_duplicates()) == 4
-
-    uk_agg = uk_df[count_cols].groupby(["date"]).sum(min_count=1, numeric_only=True).reset_index()
-
-    uk_agg["country"] = "United Kingdom"
-
-    cols = uk_agg.columns.to_list()
-    cols = cols[-1:] + cols[:-1]
-    uk_agg = uk_agg[cols]
-    uk_agg = calculate_percent_positive(
-        df=uk_agg, surveillance_cols=["sentinel", "nonsentinel", "notdefined", "combined"]
-    )
-    uk_agg = calculate_patient_rates(df=uk_agg)
-
-    return uk_agg
+    return df_out
 
 
 def create_hemisphere_aggregate(df: pd.DataFrame, count_cols) -> pd.DataFrame:
