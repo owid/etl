@@ -1,0 +1,19 @@
+meta:
+  namespace: fasttrack
+  short_name: table_5__threatened_species_in_each_major_group_by_country__show_all__1
+  file_extension: csv
+  date_accessed: 2023-03-08
+  name: DRAFT Table 5  Threatened species in each major group by country - show all
+    (1)
+  description: ''
+  source_name: Local CSV
+  url: ''
+  source_published_by: Local CSV
+  source_data_url: local_csv
+  is_public: true
+  version: latest
+wdir: ../../../data/snapshots/fasttrack/latest
+outs:
+- md5: a538769e631c489de6bde01f96e841f6
+  size: 11187
+  path: table_5__threatened_species_in_each_major_group_by_country__show_all__1.csv

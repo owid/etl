@@ -203,7 +203,7 @@ steps:
     - data://garden/demography/2023-02-03/life_expectancy
     - data://garden/owid/latest/key_indicators
     - data://garden/gcp/2022-11-11/global_carbon_budget
-    - data://garden/owid/2023-03-02/vdem
+    - data://garden/democracy/2023-03-02/vdem
     # The following step is not the latest version available.
     - data://garden/bp/2022-07-14/energy_mix
     - data://garden/worldbank_wdi/2022-05-26/wdi
@@ -297,12 +297,12 @@ steps:
   data://garden/regions/2023-01-01/regions:
 
   # Democracy and Human rights - V-Dem index
-  data://meadow/owid/2023-03-02/vdem:
-  - snapshot://owid/2023-03-02/vdem.csv
-  data://garden/owid/2023-03-02/vdem:
-  - data://meadow/owid/2023-03-02/vdem
-  data://grapher/owid/2023-03-02/vdem:
-  - data://garden/owid/2023-03-02/vdem
+  data://meadow/democracy/2023-03-02/vdem:
+  - snapshot://democracy/2023-03-02/vdem.csv
+  data://garden/democracy/2023-03-02/vdem:
+  - data://meadow/democracy/2023-03-02/vdem
+  data://grapher/democracy/2023-03-02/vdem:
+  - data://garden/democracy/2023-03-02/vdem
 
 # Sub-dags to import
 include:
@@ -319,3 +319,4 @@ include:
   - dag/biodiversity.yml
   - dag/health.yml
   - dag/excess_mortality.yml
+  - dag/environment.yml

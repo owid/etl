@@ -1,5 +1,5 @@
 meta:
-  namespace: owid
+  namespace: democracy
   short_name: vdem
   name: Democracy and Human rights - OWID based on Varieties of Democracy (v12) and
     Regimes of the World
@@ -24,8 +24,8 @@ meta:
     https://ourworldindata.org/vdem-human-rights-data
 
     You can download the code and complete dataset, including supplementary variables, from GitHub: https://github.com/owid/notebooks/tree/main/BastianHerre/democracy
-wdir: ../../../data/snapshots/owid/2023-03-02
+wdir: ../../../data/snapshots/democracy/2023-03-02
 outs:
-- md5: ce55a1c8d19fcf12b0cd096e2e23bbac
-  size: 37359842
+- md5: 6ba353754620878c95733423c000c6c4
+  size: 37368056
   path: vdem.csv
