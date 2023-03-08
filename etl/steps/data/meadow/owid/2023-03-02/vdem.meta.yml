@@ -1268,4 +1268,112 @@ tables:
         display:
           includeInTable: true
           name: Voter turnout
+      wom_civ_libs_vdem_high_owid:
+        description: |-
+          The variable denotes the upper-bound estimate of the extent to which women are free from forced labor, have property rights and access to the justice system, and enjoy freedom of movement.
+
+          It is based on the V-Dem variable v2x_gencl_codehigh, and we expand it to cover more years for some countries.
+
+          The variables ranges from 0 to 1 (most rights).
+      wom_civ_libs_vdem_low_owid:
+        description: |-
+          The variable denotes the lower-bound estimate of the extent to which women are free from forced labor, have property rights and access to the justice system, and enjoy freedom of movement.
+
+          It is based on the V-Dem variable v2x_gencl_codelow, and we expand it to cover more years for some countries.
+
+          The variables ranges from 0 to 1 (most rights).
+      wom_civ_libs_vdem_owid:
+        description: |-
+          The variable denotes the best estimate of the extent to which women are free from forced labor, have property rights and access to the justice system, and enjoy freedom of movement.
+
+          It is based on the V-Dem variable v2x_gencl, and we expand it to cover more years for some countries.
+
+          The variables ranges from 0 to 1 (most rights).
+      wom_civ_soc_vdem_high_owid:
+        description: |-
+          The variable denotes the upper-bound estimate of the extent to which women can discuss political issues, participate in civil society organizations, and are represented among journalists.
+
+          It is based on the V-Dem variable v2x_gencs_codehigh, and we expand it to cover more years for some countries.
+
+          The variables ranges from 0 to 1 (most participatory).
+      wom_civ_soc_vdem_low_owid:
+        description: |-
+          The variable denotes the lower-bound estimate of the extent to which women can discuss political issues, participate in civil society organizations, and are represented among journalists.
+
+          It is based on the V-Dem variable v2x_gencs_codelow, and we expand it to cover more years for some countries.
+
+          The variables ranges from 0 to 1 (most participatory).
+      wom_civ_soc_vdem_owid:
+        description: |-
+          The variable denotes the best estimate of the extent to which women can discuss political issues, participate in civil society organizations, and are represented among journalists.
+
+          It is based on the V-Dem variable v2x_gencs, and we expand it to cover more years for some countries.
+
+          The variables ranges from 0 to 1 (most participatory).
+      wom_emp_vdem_high_owid:
+        description: |-
+          The variable denotes the upper-bound estimate of the extent to which women enjoy civil rights, can participate in civil society, and are represented in politics.
+
+          It is based on the V-Dem variable v2x_gender_codehigh, and we expand it to cover more years for some countries.
+
+          The variables ranges from 0 to 1 (most empowered).
+      wom_emp_vdem_low_owid:
+        description: |-
+          The variable denotes the lower-bound estimate of the extent to which women enjoy civil rights, can participate in civil society, and are represented in politics.
+
+          It is based on the V-Dem variable v2x_gender_codelow, and we expand it to cover more years for some countries.
+
+          The variables ranges from 0 to 1 (most empowered).
+      wom_emp_vdem_owid:
+        description: |-
+          The variable denotes the best estimate of the extent to which women enjoy civil rights, can participate in civil society, and are represented in politics.
+
+          It is based on the V-Dem variable v2x_gender, and we expand it to cover more years for some countries.
+
+          The variables ranges from 0 to 1 (most empowered).
+      wom_hoe_vdem_owid:
+        description: |-
+          The variable denotes whether the chief executive of government in office on December 31 is a woman.
+
+          The chief executive is the head of government or head of state, whoever has more power.
+
+          It is based on the V-Dem variable v2exfemhos, v2exfemhog, v2ex_hosw, and v2ex_hogw. We expand the variables to cover more years for some countries.
+      wom_hog_vdem_owid:
+        description: |-
+          The variable denotes whether the head of government in office on December 31 is a woman.
+
+          It is based on the V-Dem variable v2exfemhog, and we expand it to cover more years for some countries.
+      wom_hos_vdem_owid:
+        description: |-
+          The variable denotes whether the head of state in office on December 31 is a woman.
+
+          It is based on the V-Dem variable v2exfemhos, and we expand it to cover more years for some countries.
+      wom_parl_vdem_owid:
+        description: |-
+          The variable denotes the percentage of women in the lower or single chamber of the legislature.
+
+          If the legislature has no chambers, the variable is set to missing.
+
+          It is based on the V-Dem variables v2lgfemleg, and we expand it to cover more years for some countries.
+      wom_pol_par_vdem_high_owid:
+        description: |-
+          The variable denotes the upper-bound estimate of the extent to which women are represented in the legislature and have an equal share of political power.
+
+          It is based on the V-Dem variable v2x_genpp_codehigh, and we expand it to cover more years for some countries.
+
+          The variables ranges from 0 to 1 (most equal).
+      wom_pol_par_vdem_low_owid:
+        description: |-
+          The variable denotes the lower-bound estimate of the extent to which women are represented in the legislature and have an equal share of political power.
+
+          It is based on the V-Dem variable v2x_genpp_codelow, and we expand it to cover more years for some countries.
+
+          The variables ranges from 0 to 1 (most equal).
+      wom_pol_par_vdem_owid:
+        description: |-
+          The variable denotes the best estimate of the extent to which women are represented in the legislature and have an equal share of political power.
+
+          It is based on the V-Dem variable v2x_genpp, and we expand it to cover more years for some countries.
+
+          The variables ranges from 0 to 1 (most equal).
 
