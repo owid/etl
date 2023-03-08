@@ -296,6 +296,8 @@ steps:
   - snapshot://technology/2023-03-06/mobile_money.xlsx
   data://garden/technology/2023-03-06/mobile_money:
   - data://meadow/technology/2023-03-06/mobile_money
+  data://grapher/technology/2023-03-06/mobile_money:
+  - data://garden/technology/2023-03-06/mobile_money
 
 
   #
