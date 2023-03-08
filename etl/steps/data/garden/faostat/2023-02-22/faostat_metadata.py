@@ -7,13 +7,16 @@ This step reads from:
 * Custom datasets file ('./custom_datasets.csv').
 * Custom elements and units file ('./custom_elements_and_units.csv').
 * Custom items file ('./custom_items.csv').
+* Value amendments file ('./value_amendments.csv').
 * Each of the individual meadow datasets. They are loaded to extract their countries, items, elements and units, and
   some sanity checks are performed.
 
 This step will:
-* Output a dataset (to be loaded by all garden datasets) with tables 'countries, 'datasets', 'elements' and 'items'.
+* Output a dataset (to be loaded by all garden datasets) with tables 'countries, 'datasets', 'elements', 'items'
+  and 'amendments'.
 * Apply sanity checks to countries, elements, items, and units.
 * Apply custom names and descriptions to datasets, elements, items and units.
+* Check that spurious values in value_amendments.csv are in the data, and whether there are new spurious values.
 * Harmonize country names.
 * Find countries that correspond to aggregates of other countries (e.g. 'Melanesia').
 * Ensure there are no degeneracies within a dataset (i.e. ensure each index is unique).
@@ -139,13 +142,13 @@ def clean_global_dataset_descriptions_dataframe(
     changed_descriptions = datasets_df[
         datasets_df["fao_dataset_description_old"] != datasets_df["fao_dataset_description_new"]
     ]
+
     if len(changed_titles) > 0:
         log.warning(f"{len(changed_titles)} domains have changed titles, consider updating custom_datasets.csv.")
     if len(changed_descriptions) > 0:
         log.warning(
             f"{len(changed_descriptions)} domains have changed descriptions. " f"Consider updating custom_datasets.csv."
         )
-
     datasets_df = datasets_df.drop(columns=["fao_dataset_title_old", "fao_dataset_description_old"]).rename(
         columns={
             "fao_dataset_title_new": "fao_dataset_title",
@@ -305,7 +308,8 @@ def clean_global_items_dataframe(items_df: pd.DataFrame, custom_items: pd.DataFr
     ]
     if len(changed_descriptions) > 0:
         log.warning(
-            f"{len(changed_descriptions)} domains have changed descriptions. " f"Consider updating custom_items.csv."
+            f"{len(changed_descriptions)} domains have changed item descriptions. "
+            f"Consider updating custom_items.csv."
         )
 
     items_df = items_df.drop(columns="fao_item_description_old").rename(
@@ -716,6 +720,53 @@ def check_that_all_flags_in_dataset_are_in_ranking(table: catalog.Table, metadat
         raise AssertionError("Flags in dataset not found in FLAGS_RANKING. Manually add those flags.")
 
 
+def check_definitions_in_value_amendments(
+    table: catalog.Table, dataset_short_name: str, value_amendments: pd.DataFrame
+) -> None:
+    """Check definitions in the value_amendments.csv file.
+
+    This function will assert that:
+    * All spurious values defined in the file are still found in the data.
+    * There are no unexpected spurious values in the data.
+
+    Spurious values are only searched for in "value" column if it has "category" dtype.
+    See regular expression below used to search for spurious values.
+
+    Parameters
+    ----------
+    table : catalog.Table
+        _description_
+    dataset_short_name : str
+        _description_
+    value_amendments : pd.DataFrame
+        _description_
+    """
+    # Regular expression used to search for spurious values in the "value" column.
+    regex_spurious_values = "<|,|N"
+
+    # Select value amendments for the specified dataset.
+    _value_amendments = value_amendments[value_amendments["dataset"] == dataset_short_name]
+    if not _value_amendments.empty:
+        # Check that spurious values defined in value_amendments.csv are indeed found in the data.
+        expected_spurious_values_not_found = set(_value_amendments["spurious_value"]) - set(table["value"])
+        error = (
+            f"Expected spurious values {expected_spurious_values_not_found} not found in {dataset_short_name}. "
+            f"Remove them from value_amendments.csv."
+        )
+        assert len(expected_spurious_values_not_found) == 0, error
+
+    # Search for additional spurious values (only if data values are of "category" type).
+    if table["value"].dtype == "category":
+        # Find any possible spurious values in the data.
+        spurious_values = (
+            table[table["value"].astype(str).str.contains(regex_spurious_values, regex=True)]["value"].unique().tolist()
+        )
+        # Find if any of those were not accounted for already in value_amendments.
+        new_spurious_values = set(spurious_values) - set(_value_amendments["spurious_value"])
+        error = f"Unexpected spurious values found in {dataset_short_name}. Add the following values to value_amendments.csv: {new_spurious_values}"
+        assert len(new_spurious_values) == 0, error
+
+
 def process_metadata(
     paths: PathFinder,
     metadata: catalog.Dataset,
@@ -723,6 +774,7 @@ def process_metadata(
     custom_elements: pd.DataFrame,
     custom_items: pd.DataFrame,
     countries_harmonization: Dict[str, str],
+    value_amendments: pd.DataFrame,
 ) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """Apply various sanity checks, gather data (about dataset, item, element and unit names and descriptions) from all
     domains, compare with data from its corresponding metadata file, and create clean dataframes of metadata about
@@ -740,6 +792,8 @@ def process_metadata(
         Data from custom_items.csv file.
     countries_harmonization : dict
         Data from faostat.countries.json file.
+    value_amendments : pd.DataFrame
+        Data from value_amendments.csv file.
 
     Returns
     -------
@@ -818,6 +872,12 @@ def process_metadata(
                 table=table, metadata_for_flags=metadata[f"{dataset_short_name}_flag"]
             )
 
+        # Check if spurious values defined in value_amendments.csv are still in the data,
+        # and whether there are new spurious values to be amended.
+        check_definitions_in_value_amendments(
+            table=table, dataset_short_name=dataset_short_name, value_amendments=value_amendments
+        )
+
         # Gather dataset descriptions, items, and element-units for current domain.
         datasets_from_data = create_dataset_descriptions_dataframe_for_domain(
             table, dataset_short_name=dataset_short_name
@@ -894,14 +954,17 @@ def run(dest_dir: str) -> None:
     custom_elements_and_units_file = paths.directory / "custom_elements_and_units.csv"
     # Path to file with mapping from FAO names to OWID harmonized country names.
     countries_file = paths.directory / f"{NAMESPACE}.countries.json"
+    # Path to file with spurious values and amendments.
+    value_amendments_file = paths.directory / "value_amendments.csv"
 
     # Load metadata from meadow.
     metadata: catalog.Dataset = paths.load_dependency(FAOSTAT_METADATA_SHORT_NAME)
 
-    # Load custom dataset names, items, and element-unit names.
+    # Load custom dataset names, items, element-unit names, and value amendments.
     custom_datasets = pd.read_csv(custom_datasets_file, dtype=str)
     custom_elements = pd.read_csv(custom_elements_and_units_file, dtype=str)
     custom_items = pd.read_csv(custom_items_file, dtype=str)
+    value_amendments = pd.read_csv(value_amendments_file, dtype=str)
 
     # Load countries file.
     countries_harmonization = io.load_json(countries_file)
@@ -916,6 +979,7 @@ def run(dest_dir: str) -> None:
         custom_elements=custom_elements,
         custom_items=custom_items,
         countries_harmonization=countries_harmonization,
+        value_amendments=value_amendments,
     )
 
     #
@@ -934,9 +998,13 @@ def run(dest_dir: str) -> None:
     items_table = create_table(df=items_df, short_name="items", index_cols=["dataset", "item_code"])
     elements_table = create_table(df=elements_df, short_name="elements", index_cols=["dataset", "element_code"])
     countries_table = create_table(df=countries_df, short_name="countries", index_cols=["area_code"])
+    amendments_table = create_table(
+        df=value_amendments, short_name="amendments", index_cols=["dataset", "spurious_value"]
+    )
 
-    # Add tables to dataset (no need to repack, since columns already have optimal dtypes).
+    # Add tables to dataset.
     dataset_garden.add(datasets_table, repack=False)
     dataset_garden.add(items_table, repack=False)
     dataset_garden.add(elements_table, repack=False)
     dataset_garden.add(countries_table, repack=False)
+    dataset_garden.add(amendments_table, repack=False)
