@@ -26,5 +26,9 @@ steps:
   - snapshot-private://fasttrack/latest/battery_costs_per_kwh__ziegler_et_al__and_bnef.csv
   data-private://grapher/fasttrack/latest/biosafety_level_4_facilities:
   - snapshot-private://fasttrack/latest/biosafety_level_4_facilities.csv
-  data-private://grapher/fasttrack/latest/vdem_row_final:
-  - snapshot-private://fasttrack/latest/vdem_row_final.csv
+  data-private://grapher/fasttrack/latest/germany_hypothetical_constant_nuclear:
+  - snapshot-private://fasttrack/latest/germany_hypothetical_constant_nuclear.csv
+  data-private://grapher/fasttrack/latest/oil_prices:
+  - snapshot-private://fasttrack/latest/oil_prices.csv
+  data://grapher/fasttrack/latest/table_5__threatened_species_in_each_major_group_by_country__show_all__1:
+  - snapshot://fasttrack/latest/table_5__threatened_species_in_each_major_group_by_country__show_all__1.csv

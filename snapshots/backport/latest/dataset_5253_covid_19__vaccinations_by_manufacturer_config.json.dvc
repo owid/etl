@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5253_covid_19__vaccinations_by_manufacturer_config
   file_extension: json
-  date_accessed: 2023-03-03 09:47:18.943389
+  date_accessed: 2023-03-08 09:53:09.625715
   name: Grapher metadata for dataset_5253_covid_19__vaccinations_by_manufacturer
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 5c14f11a87e19078f107ba8ac7edc1ae
+- md5: b513a8b8c0ee59191a2e2d56a361f346
   size: 10844
   path: dataset_5253_covid_19__vaccinations_by_manufacturer_config.json

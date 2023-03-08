@@ -9,7 +9,7 @@ P = PathFinder(__file__)
 
 def run(dest_dir: str) -> None:
     # load snapshot
-    data = pd.read_csv(Snapshot("fasttrack/latest/vdem_row_final.csv").path)
+    data = pd.read_csv(Snapshot("fasttrack/latest/oil_prices.csv").path)
 
     # create empty dataframe and table
     tb = catalog.Table(data, short_name=P.short_name)

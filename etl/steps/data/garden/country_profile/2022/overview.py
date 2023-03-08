@@ -17,8 +17,6 @@ paths = PathFinder(__file__)
 METADATA_PATH = CURRENT_DIR / "overview.meta.yml"
 
 ## Backports:
-# Electoral democracy
-# https://owid.cloud/admin/datasets/5600
 # Homicide rate
 # https://owid.cloud/admin/datasets/5599
 # Average years of schooling
@@ -47,10 +45,13 @@ def run(dest_dir: str) -> None:
     wdi = get_wdi_variables()
     # Life expectancy OMM
     life_exp = get_life_expectancy()
-    # Backport: Electoral democracy; Homicide rate; Average years of schooling; Life expectancy; Child mortality; Daily calories
+    # Electoral democracy
+    electoral_democracy = get_electoral_democracy()
+
+    # Backport: Homicide rate; Average years of schooling; Life expectancy; Child mortality; Daily calories
     backports = get_backports()
 
-    data_frames = [pop, emissions_pc, energy_mix, wdi, life_exp, backports]
+    data_frames = [pop, emissions_pc, energy_mix, wdi, life_exp, electoral_democracy, backports]
     df_merged = dataframes.multi_merge(data_frames, on=["country", "year"], how="outer")
     df_merged = df_merged.sort_values("year")
 
@@ -165,6 +166,23 @@ def get_life_expectancy() -> pd.DataFrame:
     return df_life_expectancy
 
 
+def get_electoral_democracy() -> pd.DataFrame:
+    """
+    Get the electoral democracy dataset
+    """
+    vdem: Dataset = paths.load_dependency("vdem")
+    df = vdem["vdem"]
+    return df[
+        [
+            "country",
+            "year",
+            "electdem_vdem_high_owid",
+            "electdem_vdem_low_owid",
+            "electdem_vdem_owid",
+        ]
+    ]
+
+
 def get_backports() -> pd.DataFrame:
     """
     Get the i) Child mortality rate, ii) Electoral democracy, iii) Homicide rate,
@@ -177,11 +195,6 @@ def get_backports() -> pd.DataFrame:
     backports = {
         "dataset_2710_child_mortality_rates__selected_gapminder__v10__2017": [
             "child_mortality__select_gapminder__v10__2017"
-        ],
-        "dataset_5600_democracy_and_human_rights__owid_based_on_varieties_of_democracy__v12__and_regimes_of_the_world": [
-            "electdem_vdem_high_owid",
-            "electdem_vdem_low_owid",
-            "electdem_vdem_owid",
         ],
         "dataset_5599_ihme__global_burden_of_disease__deaths_and_dalys__institute_for_health_metrics_and_evaluation__2022_04": [
             "deaths__interpersonal_violence__sex__both__age__all_ages__rate"
