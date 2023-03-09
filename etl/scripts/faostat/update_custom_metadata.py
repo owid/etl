@@ -6,7 +6,6 @@ This script will update all fao fields.
 
 import argparse
 
-import numpy as np
 import pandas as pd
 from owid.catalog import Dataset
 from shared import INCLUDED_DATASETS_CODES, VERSION
@@ -43,7 +42,7 @@ def update_custom_datasets_file(interactive=False, version=VERSION, read_only=Fa
 
     """
     if interactive:
-        print(f"\nChecking for changes in FAO dataset titles and descriptions.")
+        print("\nChecking for changes in FAO dataset titles and descriptions.")
 
     # Path to custom datasets file in garden.
     custom_datasets_file = STEP_DIR / "data/garden/faostat" / version / "custom_datasets.csv"
@@ -126,7 +125,7 @@ def update_custom_elements_and_units_file(interactive=False, version=VERSION, re
 
     """
     if interactive:
-        print(f"\nChecking for changes in FAO element names and descriptions, as well as units and short units.")
+        print("\nChecking for changes in FAO element names and descriptions, as well as units and short units.")
 
     # Path to custom elements and units file in garden.
     custom_elements_file = STEP_DIR / "data/garden/faostat" / version / "custom_elements_and_units.csv"

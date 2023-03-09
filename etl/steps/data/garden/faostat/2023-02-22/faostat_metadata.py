@@ -618,17 +618,6 @@ def clean_global_countries_dataframe(
     """
     countries_df = countries_in_data.copy()
 
-    # # Remove duplicates of area_code and fao_country, ensuring to keep m49_code when it is given.
-    # if "m49_code" in countries_df.columns:
-    #     print(f"m49_code found!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-    #     # Sort so that nans in m49_code are at the bottom, and then keep only the first duplicated row.
-    #     countries_df = countries_df.sort_values("m49_code")
-    # countries_df = (
-    #     countries_df.drop_duplicates(subset=["area_code", "fao_country"], keep="first")
-    #     .sort_values(["area_code"])
-    #     .reset_index(drop=True)
-    # )
-
     # Sanity checks.
     check_countries_to_exclude_or_harmonize(
         countries_in_data=countries_in_data,
@@ -948,8 +937,8 @@ def process_metadata(
 
     datasets_df = clean_global_dataset_descriptions_dataframe(datasets_df=datasets_df, custom_datasets=custom_datasets)
     items_df = clean_global_items_dataframe(items_df=items_df, custom_items=custom_items)
-    elements_df = clean_global_elements_dataframe(elements_df=elements_df, custom_elements=custom_elements)
 
+    elements_df = clean_global_elements_dataframe(elements_df=elements_df, custom_elements=custom_elements)
     countries_df = clean_global_countries_dataframe(
         countries_in_data=countries_in_data,
         country_groups=country_groups_in_data,
