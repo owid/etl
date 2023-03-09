@@ -1,0 +1,48 @@
+dataset:
+  namespace: fasttrack
+  version: latest
+  short_name: table_5__threatened_species_in_each_major_group_by_country__show_all__1
+  title: DRAFT Table 5  Threatened species in each major group by country - show all
+    (1)
+  description: ''
+  sources:
+  - name: Unknown
+    published_by: Unknown
+    publication_year: 2023
+    date_accessed: 2023-03-08
+tables:
+  table_5__threatened_species_in_each_major_group_by_country__show_all__1:
+    variables:
+      mammals:
+        title: Mammals
+        unit: ''
+      birds:
+        title: Birds
+        unit: ''
+      reptiles:
+        title: Reptiles*
+        unit: ''
+      amphibians:
+        title: Amphibians
+        unit: ''
+      fishes:
+        title: Fishes*
+        unit: ''
+      molluscs:
+        title: Molluscs*
+        unit: ''
+      other_inverts:
+        title: Other Inverts*
+        unit: ''
+      plants:
+        title: Plants*
+        unit: ''
+      fungi:
+        title: Fungi*
+        unit: ''
+      chromists:
+        title: Chromists*
+        unit: ''
+      total:
+        title: Total
+        unit: ''

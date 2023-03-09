@@ -194,24 +194,12 @@ def app(run_checks: bool, dummy_data: bool) -> None:
 
 1. Verify that generated files are correct and update them if necessary
 
-2. Test your ingest script with
+2. Run the snapshot step to upload files to S3
 ```bash
-python snapshots/{form.namespace}/{form.version}/{form.short_name}.py --skip-upload
+python snapshots/{form.namespace}/{form.version}/{form.short_name}.py
 ```
 
-3. Once you are happy with the ingest script, run it without the `--skip-upload` flag to upload files to S3. Running it again will overwrite the dataset.
-
-4. Exit the process and run next step with `poetry run walkthrough meadow`
-
-## Loading snapshots
-
-```python
-from etl.snapshot import Snapshot
-
-snap = Snapshot("{form.namespace}/{form.version}/{form.short_name}.{form.file_extension}")
-# call snap.pull() if you don't have it locally in snapshots/
-df = pd.read_excel(snap.path)
-```
+3. Exit the process and run next step with `poetry run walkthrough meadow`
 
 ## Generated files
 """

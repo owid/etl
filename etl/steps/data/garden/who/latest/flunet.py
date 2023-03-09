@@ -38,16 +38,10 @@ def run(dest_dir: str) -> None:
 
     df = clean_and_format_data(df)
     df = split_by_surveillance_type(df)
+
     df = calculate_percent_positive(df, surveillance_cols=["SENTINEL", "NONSENTINEL", "NOTDEFINED", "COMBINED"])
-    # df = create_zero_filled_strain_columns(df)
-
-    # We can't remove sparse data from the zero-filled columns because of how stacked bar charts behave
-    # filter_col = [col for col in df if col.endswith("zfilled")]
-    # set time-series with less than 10 (non-zero, non-NA) datapoints to NA - apply to a
-    # df = remove_sparse_timeseries(df=df, cols=df.columns.drop(["country", "date", filter_col]), min_data_points=10)
-
-    # Create a new table with the processed data.
-    # tb_garden = Table(df, like=tb_meadow)
+    df = create_united_kingdom_aggregate(df)
+    df = df.reset_index(drop=True)
     tb_garden = Table(df, short_name=paths.short_name)
     #
     # Save outputs.
@@ -111,8 +105,8 @@ def split_by_surveillance_type(df: pd.DataFrame) -> pd.DataFrame:
 
     Summing each column and skipping NAs so there is a column of combined values
     """
-    flu_cols = df.columns.drop(["country", "date", "origin_source"])
-    df_piv = df.pivot(index=["country", "date"], columns="origin_source").reset_index()
+    flu_cols = df.columns.drop(["country", "date", "origin_source", "hemisphere"])
+    df_piv = df.pivot(index=["country", "hemisphere", "date"], columns="origin_source").reset_index()
 
     df_piv.columns = list(map("".join, df_piv.columns))
     sentinel_list = ["SENTINEL", "NONSENTINEL", "NOTDEFINED"]
@@ -156,6 +150,7 @@ def clean_and_format_data(df: pd.DataFrame) -> pd.DataFrame:
     df = combine_columns(df)
     sel_cols = [
         "country",
+        "hemisphere",
         "date",
         "origin_source",
         "ah1n12009",
@@ -214,5 +209,41 @@ def calculate_percent_positive(df: pd.DataFrame, surveillance_cols: list[str]) -
             "pcnt_pos" + col,
         ] = np.nan
         # df = df.dropna(axis=1, how="all")
+
+    return df
+
+
+def create_united_kingdom_aggregate(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Summing the flunet data for England, Wales, Scotland and N.Ireland to create a United Kingdom entity
+    """
+    cols = df.columns.drop(["country"])
+    # Columns that will need to be recalculated after aggregating
+    rate_cols = [
+        "pcnt_posSENTINEL",
+        "pcnt_posNONSENTINEL",
+        "pcnt_posNOTDEFINED",
+        "pcnt_posCOMBINED",
+    ]
+    # columns that we can aggregate by summing
+    count_cols = cols.drop(rate_cols)
+    uk_df = df[df["country"].isin(["England", "Wales", "Scotland", "Northern Ireland"])]
+
+    # Check all nations are in the subset - in case of name changes
+    assert len(uk_df.country.drop_duplicates()) == 4
+
+    uk_agg = uk_df[count_cols].groupby(["date"]).sum(min_count=1, numeric_only=True).reset_index()
+
+    uk_agg["country"] = "United Kingdom"
+    uk_agg["hemisphere"] = "NH"
+
+    cols = uk_agg.columns.to_list()
+    cols = cols[-1:] + cols[:-1]
+    uk_agg = uk_agg[cols]
+    uk_agg = calculate_percent_positive(
+        df=uk_agg, surveillance_cols=["SENTINEL", "NONSENTINEL", "NOTDEFINED", "COMBINED"]
+    )
+
+    df = pd.concat([df, uk_agg])
 
     return df

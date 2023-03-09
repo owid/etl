@@ -761,6 +761,14 @@ tables:
       number_electdem_row_owid:
         description: The variable denotes the number of electoral democracies based on the
           Regimes of the World-classification by Lührmann et al. (2018).
+      number_less10women_vdem_owid:
+        description: The variables denotes the number of countries with less than 10% women in parliament.
+      number_less20women_vdem_owid:
+        description: The variables denotes the number of countries with 10-20% women in parliament.
+      number_less30women_vdem_owid:
+        description: The variables denotes the number of countries with 20-30% women in parliament.
+      number_less40women_vdem_owid:
+        description: The variables denotes the number of countries with 30-40% women in parliament.
       number_libdem_18_row_owid:
         description: The variable denotes the number of liberal democracies aged 1-18, as
           based on the Regimes of the World-classification by Lührmann et al. (2018).
@@ -788,6 +796,10 @@ tables:
       number_libdem_row_owid:
         description: The variable denotes the number of liberal democracies based on the
           Regimes of the World-classification by Lührmann et al. (2018).
+      number_more40women_vdem_owid:
+        description: The variables denotes the number of countries with more than 40% women in parliament.
+      number_nowomen_vdem_owid:
+        description: The variable denotes the number of countries with no woman in parliament.
       particip_vdem_high_owid:
         description: |-
           The variable denotes the upper-bound estimate of the extent to which citizens can engage in regional and local government, civil society organizations, and direct democracy.
@@ -936,6 +948,14 @@ tables:
       pop_electdem_row_owid:
         description: The variable denotes the number of people living in electoral democracies
           based on the Regimes of the World-classification by Lührmann et al. (2018).
+      pop_less10women_vdem_owid:
+        description: The variables denotes the number of people living in countries with less than 10% women in parliament.
+      pop_less20women_vdem_owid:
+        description: The variables denotes the number of people living in countries with 10-20% women in parliament.
+      pop_less30women_vdem_owid:
+        description: The variables denotes the number of people living in countries with 20-30% women in parliament.
+      pop_less40women_vdem_owid:
+        description: The variables denotes the number of people living in countries with 30-40% women in parliament.
       pop_libdem_18_row_owid:
         description: The variable denotes the number of people living in liberal democracies
           aged 1-18, as based on the Regimes of the World-classification by Lührmann et
@@ -971,6 +991,12 @@ tables:
         description: The variable denotes the number of people living in countries without
           regime data based on the Regimes of the World-classification by Lührmann et al.
           (2018).
+      pop_misswomen_vdem_owid:
+        description: The variables denotes the number of people living in countries without data on women's representation in parliament.
+      pop_more40women_vdem_owid:
+        description: The variables denotes the number of people living in countries with more than 40% women in parliament.
+      pop_nowomen_vdem_owid:
+        description: The variables denotes the number of people living in countries with no women in parliament.
       popw_civ_libs_vdem_high_owid:
         description: |-
           The variable denotes the upper-bound estimate of the extent to which people are free from government torture, political killings, and forced labor, they have property rights, and enjoy the freedoms of movement, religion, expression, and association, weighted by population.
@@ -1268,4 +1294,112 @@ tables:
         display:
           includeInTable: true
           name: Voter turnout
+      wom_civ_libs_vdem_high_owid:
+        description: |-
+          The variable denotes the upper-bound estimate of the extent to which women are free from forced labor, have property rights and access to the justice system, and enjoy freedom of movement.
+
+          It is based on the V-Dem variable v2x_gencl_codehigh, and we expand it to cover more years for some countries.
+
+          The variables ranges from 0 to 1 (most rights).
+      wom_civ_libs_vdem_low_owid:
+        description: |-
+          The variable denotes the lower-bound estimate of the extent to which women are free from forced labor, have property rights and access to the justice system, and enjoy freedom of movement.
+
+          It is based on the V-Dem variable v2x_gencl_codelow, and we expand it to cover more years for some countries.
+
+          The variables ranges from 0 to 1 (most rights).
+      wom_civ_libs_vdem_owid:
+        description: |-
+          The variable denotes the best estimate of the extent to which women are free from forced labor, have property rights and access to the justice system, and enjoy freedom of movement.
+
+          It is based on the V-Dem variable v2x_gencl, and we expand it to cover more years for some countries.
+
+          The variables ranges from 0 to 1 (most rights).
+      wom_civ_soc_vdem_high_owid:
+        description: |-
+          The variable denotes the upper-bound estimate of the extent to which women can discuss political issues, participate in civil society organizations, and are represented among journalists.
+
+          It is based on the V-Dem variable v2x_gencs_codehigh, and we expand it to cover more years for some countries.
+
+          The variables ranges from 0 to 1 (most participatory).
+      wom_civ_soc_vdem_low_owid:
+        description: |-
+          The variable denotes the lower-bound estimate of the extent to which women can discuss political issues, participate in civil society organizations, and are represented among journalists.
+
+          It is based on the V-Dem variable v2x_gencs_codelow, and we expand it to cover more years for some countries.
+
+          The variables ranges from 0 to 1 (most participatory).
+      wom_civ_soc_vdem_owid:
+        description: |-
+          The variable denotes the best estimate of the extent to which women can discuss political issues, participate in civil society organizations, and are represented among journalists.
+
+          It is based on the V-Dem variable v2x_gencs, and we expand it to cover more years for some countries.
+
+          The variables ranges from 0 to 1 (most participatory).
+      wom_emp_vdem_high_owid:
+        description: |-
+          The variable denotes the upper-bound estimate of the extent to which women enjoy civil rights, can participate in civil society, and are represented in politics.
+
+          It is based on the V-Dem variable v2x_gender_codehigh, and we expand it to cover more years for some countries.
+
+          The variables ranges from 0 to 1 (most empowered).
+      wom_emp_vdem_low_owid:
+        description: |-
+          The variable denotes the lower-bound estimate of the extent to which women enjoy civil rights, can participate in civil society, and are represented in politics.
+
+          It is based on the V-Dem variable v2x_gender_codelow, and we expand it to cover more years for some countries.
+
+          The variables ranges from 0 to 1 (most empowered).
+      wom_emp_vdem_owid:
+        description: |-
+          The variable denotes the best estimate of the extent to which women enjoy civil rights, can participate in civil society, and are represented in politics.
+
+          It is based on the V-Dem variable v2x_gender, and we expand it to cover more years for some countries.
+
+          The variables ranges from 0 to 1 (most empowered).
+      wom_hoe_vdem_owid:
+        description: |-
+          The variable denotes whether the chief executive of government in office on December 31 is a woman.
+
+          The chief executive is the head of government or head of state, whoever has more power.
+
+          It is based on the V-Dem variable v2exfemhos, v2exfemhog, v2ex_hosw, and v2ex_hogw. We expand the variables to cover more years for some countries.
+      wom_hog_vdem_owid:
+        description: |-
+          The variable denotes whether the head of government in office on December 31 is a woman.
+
+          It is based on the V-Dem variable v2exfemhog, and we expand it to cover more years for some countries.
+      wom_hos_vdem_owid:
+        description: |-
+          The variable denotes whether the head of state in office on December 31 is a woman.
+
+          It is based on the V-Dem variable v2exfemhos, and we expand it to cover more years for some countries.
+      wom_parl_vdem_owid:
+        description: |-
+          The variable denotes the percentage of women in the lower or single chamber of the legislature.
+
+          If the legislature has no chambers, the variable is set to missing.
+
+          It is based on the V-Dem variables v2lgfemleg, and we expand it to cover more years for some countries.
+      wom_pol_par_vdem_high_owid:
+        description: |-
+          The variable denotes the upper-bound estimate of the extent to which women are represented in the legislature and have an equal share of political power.
+
+          It is based on the V-Dem variable v2x_genpp_codehigh, and we expand it to cover more years for some countries.
+
+          The variables ranges from 0 to 1 (most equal).
+      wom_pol_par_vdem_low_owid:
+        description: |-
+          The variable denotes the lower-bound estimate of the extent to which women are represented in the legislature and have an equal share of political power.
+
+          It is based on the V-Dem variable v2x_genpp_codelow, and we expand it to cover more years for some countries.
+
+          The variables ranges from 0 to 1 (most equal).
+      wom_pol_par_vdem_owid:
+        description: |-
+          The variable denotes the best estimate of the extent to which women are represented in the legislature and have an equal share of political power.
+
+          It is based on the V-Dem variable v2x_genpp, and we expand it to cover more years for some countries.
+
+          The variables ranges from 0 to 1 (most equal).
 
