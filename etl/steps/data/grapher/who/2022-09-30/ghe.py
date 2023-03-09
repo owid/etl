@@ -1,12 +1,11 @@
 # To run with subset only: GHE_SUBSET_ONLY=1 etl grapher/who/2022-09-30/ghe --grapher
-import os
-
 import pandas as pd
 from owid import catalog
 
 from etl.helpers import PathFinder
 
 N = PathFinder(__file__)
+GHE_SUBSET_ONLY = True
 
 
 def run(dest_dir: str) -> None:
@@ -19,7 +18,8 @@ def run(dest_dir: str) -> None:
     expected_primary_keys = ["country", "year", "age_group", "sex", "cause"]
     if table.primary_key != expected_primary_keys:
         raise Exception(
-            f"GHE Table to transform to grapher contained unexpected primary key dimensions: {table.primary_key} instead of {expected_primary_keys}"
+            "GHE Table to transform to grapher contained unexpected primary key dimensions:"
+            f" {table.primary_key} instead of {expected_primary_keys}"
         )
 
     # We want to export all columns except causegroup and level (for now)
@@ -32,18 +32,19 @@ def run(dest_dir: str) -> None:
 
     if set(columns_to_export).difference(set(table.columns)):
         raise Exception(
-            f"GHE table to transform to grapher did not contain the expected columns but instead had: {list(table.columns)}"
+            "GHE table to transform to grapher did not contain the expected columns but instead had:"
+            f" {list(table.columns)}"
         )
 
     table.reset_index(inplace=True)
     table = table.drop(columns="flag_level")
-    # There are many diaggregations by age and sex we don't want all of them at the moment so we have this option to only load the subset
-    if "GHE_SUBSET_ONLY" in os.environ:
-        table = select_subset_causes(table)
-    else:
-        table = table
+
     # Calculating global totals of deaths and daly's for each disease
     table = add_global_totals(table)
+
+    # Use subset of the data for now
+    if GHE_SUBSET_ONLY:
+        table = select_subset_causes(table)
 
     table = table.set_index(["country", "year", "cause", "sex", "age_group"])
 
@@ -62,16 +63,28 @@ def run(dest_dir: str) -> None:
 
 
 def select_subset_causes(table: pd.DataFrame) -> pd.DataFrame:
+    """Selects a subset of all the data.
 
-    table = table[(table["sex"] == "Both sexes") & (table["age_group"] == "ALLAges")]
+    There are many diaggregations by age and sex we don't want all of them at the moment so we have this option to only load the subset.
 
+    Basically, we only keep "all ages" age-group and "both sexes" sex group. EXCEPT, when the cause is "Self-harm" where we keep all dimensions (https://github.com/owid/owid-issues/issues/759#issuecomment-1455220066)
+    """
+    causes_include_all = ["Self-harm"]
+    table = table[
+        ((table["sex"] == "Both sexes") & (table["age_group"] == "ALLAges")) | (table["cause"].isin(causes_include_all))
+    ]
     return table
 
 
 def add_global_totals(table: pd.DataFrame) -> pd.DataFrame:
-    glob_total = table.groupby(["year", "cause"])[["daly_count", "death_count"]].sum().reset_index()
+    # Get age_group=all and sex=all (avoid duplicates)
+    table_ = table[(table["sex"] == "Both sexes") & (table["age_group"] == "ALLAges")]
+    # Group by year and cause, sum
+    glob_total = table_.groupby(["year", "cause"])[["daly_count", "death_count"]].sum().reset_index()
+    # Fill other fields
     glob_total["country"] = "World"
     glob_total["age_group"] = "ALLAges"
     glob_total["sex"] = "Both sexes"
+    # Merge with complete table
     table = pd.concat([table, glob_total])
     return table
