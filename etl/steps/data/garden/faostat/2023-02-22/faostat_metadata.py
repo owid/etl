@@ -65,7 +65,7 @@ from tqdm.auto import tqdm
 from etl.helpers import PathFinder
 
 # Minimum number of issues in the comparison of items and item codes from data and metadata to raise a warning.
-N_ISSUES_ON_ITEMS_FOR_WARNING = 10
+N_ISSUES_ON_ITEMS_FOR_WARNING = 1
 
 
 def create_dataset_descriptions_dataframe_for_domain(table: catalog.Table, dataset_short_name: str) -> pd.DataFrame:
@@ -138,9 +138,11 @@ def clean_global_dataset_descriptions_dataframe(
         suffixes=("_new", "_old"),
     )
 
-    changed_titles = datasets_df[datasets_df["fao_dataset_title_old"] != datasets_df["fao_dataset_title_new"]]
+    changed_titles = datasets_df[
+        datasets_df["fao_dataset_title_old"].fillna("") != datasets_df["fao_dataset_title_new"].fillna("")
+    ]
     changed_descriptions = datasets_df[
-        datasets_df["fao_dataset_description_old"] != datasets_df["fao_dataset_description_new"]
+        datasets_df["fao_dataset_description_old"].fillna("") != datasets_df["fao_dataset_description_new"].fillna("")
     ]
 
     if len(changed_titles) > 0:
@@ -510,7 +512,8 @@ def clean_global_elements_dataframe(elements_df: pd.DataFrame, custom_elements: 
     ]
     if len(changed_descriptions) > 0:
         log.warning(
-            f"{len(changed_descriptions)} domains have changed descriptions. " f"Consider updating custom_elements.csv."
+            f"{len(changed_descriptions)} domains have changed element descriptions. "
+            f"Consider updating custom_elements.csv."
         )
 
     elements_df = elements_df.drop(columns=["fao_unit_old", "fao_element_description_old"]).rename(
@@ -566,10 +569,32 @@ def clean_global_elements_dataframe(elements_df: pd.DataFrame, custom_elements: 
     return elements_df
 
 
+def check_countries_to_exclude_or_harmonize(
+    countries_in_data: pd.DataFrame, excluded_countries: List[str], countries_harmonization: Dict[str, str]
+) -> None:
+    # Check that all excluded countries are in the data.
+    unknown_excluded_countries = set(excluded_countries) - set(countries_in_data["fao_country"])
+    error = (
+        f"Uknown excluded countries (to be removed from faostat.excluded_countries.json): {unknown_excluded_countries}"
+    )
+    assert len(unknown_excluded_countries) == 0, error
+
+    # Check that all countries to be harmonized are in the data.
+    unknown_countries_to_harmonize = set(countries_harmonization) - set(countries_in_data["fao_country"])
+    error = f"Unknown countries to be harmonized (to be removed or edited in faostat.countries.json): {unknown_countries_to_harmonize}"
+    assert len(unknown_countries_to_harmonize) == 0, error
+
+    # Check that all countries in the data are either to be excluded or to be harmonized.
+    unknown_countries = set(countries_in_data["fao_country"]) - set(excluded_countries) - set(countries_harmonization)
+    error = f"Unknown countries in the data (to be added either to faostat.excluded_countries.json or to faostat.countries.json): {unknown_countries}"
+    assert len(unknown_countries) == 0, error
+
+
 def clean_global_countries_dataframe(
     countries_in_data: pd.DataFrame,
     country_groups: Dict[str, List[str]],
     countries_harmonization: Dict[str, str],
+    excluded_countries: List[str],
 ) -> pd.DataFrame:
     """Clean dataframe of countries gathered from the data of the individual domains, harmonize country names (and
     country names of members of regions), and create a clean global countries dataframe.
@@ -582,6 +607,8 @@ def clean_global_countries_dataframe(
         Countries and their members, gathered from the data.
     countries_harmonization : dict
         Mapping of country names (from FAO names to OWID names).
+    excluded_countries : list
+        Country names to be ignored.
 
     Returns
     -------
@@ -591,22 +618,23 @@ def clean_global_countries_dataframe(
     """
     countries_df = countries_in_data.copy()
 
-    # Remove duplicates of area_code and fao_country, ensuring to keep m49_code when it is given.
-    if "m49_code" in countries_df.columns:
-        # Sort so that nans in m49_code are at the bottom, and then keep only the first duplicated row.
-        countries_df = countries_df.sort_values("m49_code")
-    countries_df = (
-        countries_df.drop_duplicates(subset=["area_code", "fao_country"], keep="first")
-        .sort_values(["area_code"])
-        .reset_index(drop=True)
-    )
+    # # Remove duplicates of area_code and fao_country, ensuring to keep m49_code when it is given.
+    # if "m49_code" in countries_df.columns:
+    #     print(f"m49_code found!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+    #     # Sort so that nans in m49_code are at the bottom, and then keep only the first duplicated row.
+    #     countries_df = countries_df.sort_values("m49_code")
+    # countries_df = (
+    #     countries_df.drop_duplicates(subset=["area_code", "fao_country"], keep="first")
+    #     .sort_values(["area_code"])
+    #     .reset_index(drop=True)
+    # )
 
-    countries_not_harmonized = sorted(set(countries_df["fao_country"]) - set(countries_harmonization))
-    if len(countries_not_harmonized) > 0:
-        log.info(
-            f"{len(countries_not_harmonized)} countries not included in countries file. "
-            f"They will not have data after countries are harmonized in a further step."
-        )
+    # Sanity checks.
+    check_countries_to_exclude_or_harmonize(
+        countries_in_data=countries_in_data,
+        excluded_countries=excluded_countries,
+        countries_harmonization=countries_harmonization,
+    )
 
     # Harmonize country groups and members.
     country_groups_harmonized = {
@@ -619,9 +647,10 @@ def clean_global_countries_dataframe(
     countries_df["country"] = dataframes.map_series(
         series=countries_df["fao_country"],
         mapping=countries_harmonization,
-        warn_on_unused_mappings=True,
+        warn_on_missing_mappings=False,
+        warn_on_unused_mappings=False,
         make_unmapped_values_nan=True,
-        show_full_warning=False,
+        show_full_warning=True,
     )
 
     # Add country members to countries dataframe.
@@ -664,6 +693,7 @@ def create_table(df: pd.DataFrame, short_name: str, index_cols: List[str]) -> ca
 
     # Set indexes and other necessary metadata.
     table = table.set_index(index_cols, verify_integrity=True)
+
     table.metadata.short_name = short_name
     table.metadata.primary_key = index_cols
 
@@ -774,6 +804,7 @@ def process_metadata(
     custom_elements: pd.DataFrame,
     custom_items: pd.DataFrame,
     countries_harmonization: Dict[str, str],
+    excluded_countries: List[str],
     value_amendments: pd.DataFrame,
 ) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """Apply various sanity checks, gather data (about dataset, item, element and unit names and descriptions) from all
@@ -792,6 +823,8 @@ def process_metadata(
         Data from custom_items.csv file.
     countries_harmonization : dict
         Data from faostat.countries.json file.
+    excluded_countries : list
+        Data from faostat.excluded_countries.json file.
     value_amendments : pd.DataFrame
         Data from value_amendments.csv file.
 
@@ -848,24 +881,16 @@ def process_metadata(
             }
         )[["area_code", "fao_country"]]
 
-        # Column 'area_code' in faostat_sdgb is float instead of integer, and it does not agree with the usual area
-        # codes. For example, Afghanistan has area code 4.0 in faostat_sdgb, whereas in other dataset it is 2.
-        # It seems to be the UN M49 code.
-        # So we add this code as a new column to the countries dataframe, to be able to map sdgb area codes later on.
-        if df["area_code"].dtype == "float64":
-            sdgb_codes_df = (
-                metadata["faostat_sdgb_area"]
-                .reset_index()[["country_code", "m49_code"]]
-                .rename(columns={"country_code": "area_code"})
-            )
-            df = pd.merge(
-                df.rename(columns={"area_code": "m49_code"}),
-                sdgb_codes_df,
-                on="m49_code",
-                how="left",
-            )
-
         df["area_code"] = df["area_code"].astype("Int64")
+
+        # Temporary patch.
+        if dataset_short_name == "faostat_wcad":
+            error = (
+                "Dataset faostat_wcad had 'French Guiana' for area code 69 (unlike other datasets, that had "
+                "'French Guyana'). But this may no longer the case, so this patch in the code can be removed."
+            )
+            assert "French Guiana" in df["fao_country"].unique(), error
+            df["fao_country"] = dataframes.map_series(df["fao_country"], mapping={"French Guiana": "French Guyana"})
 
         if f"{dataset_short_name}_flag" in metadata.table_names:
             check_that_all_flags_in_dataset_are_in_ranking(
@@ -924,10 +949,12 @@ def process_metadata(
     datasets_df = clean_global_dataset_descriptions_dataframe(datasets_df=datasets_df, custom_datasets=custom_datasets)
     items_df = clean_global_items_dataframe(items_df=items_df, custom_items=custom_items)
     elements_df = clean_global_elements_dataframe(elements_df=elements_df, custom_elements=custom_elements)
+
     countries_df = clean_global_countries_dataframe(
         countries_in_data=countries_in_data,
         country_groups=country_groups_in_data,
         countries_harmonization=countries_harmonization,
+        excluded_countries=excluded_countries,
     )
 
     return countries_df, datasets_df, elements_df, items_df
@@ -954,6 +981,8 @@ def run(dest_dir: str) -> None:
     custom_elements_and_units_file = paths.directory / "custom_elements_and_units.csv"
     # Path to file with mapping from FAO names to OWID harmonized country names.
     countries_file = paths.directory / f"{NAMESPACE}.countries.json"
+    # Path to file with list of excluded countries and regions.
+    excluded_countries_file = paths.directory / f"{NAMESPACE}.excluded_countries.json"
     # Path to file with spurious values and amendments.
     value_amendments_file = paths.directory / "value_amendments.csv"
 
@@ -966,8 +995,9 @@ def run(dest_dir: str) -> None:
     custom_items = pd.read_csv(custom_items_file, dtype=str)
     value_amendments = pd.read_csv(value_amendments_file, dtype=str)
 
-    # Load countries file.
+    # Load country mapping and excluded countries files.
     countries_harmonization = io.load_json(countries_file)
+    excluded_countries = io.load_json(excluded_countries_file)
 
     #
     # Process data.
@@ -979,6 +1009,7 @@ def run(dest_dir: str) -> None:
         custom_elements=custom_elements,
         custom_items=custom_items,
         countries_harmonization=countries_harmonization,
+        excluded_countries=excluded_countries,
         value_amendments=value_amendments,
     )
 
