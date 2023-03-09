@@ -266,6 +266,9 @@ class PathFinder:
     def _get_attributes_from_step_name(step_name: str) -> Dict[str, str]:
         """Get attributes (channel, namespace, version and short name) from the step name (as it appears in the dag)."""
         channel_type, path = step_name.split("://")
+
+        channel_type = channel_type.replace("-private", "")
+
         if channel_type in ["walden", "snapshot"]:
             channel = channel_type
             namespace, version, short_name = path.split("/")
@@ -280,9 +283,15 @@ class PathFinder:
 
     @property
     def step(self) -> str:
-        return self._create_step_name(
+        step_name = self._create_step_name(
             channel=self.channel, namespace=self.namespace, version=self.version, short_name=self.short_name
         )
+        # try private version if step is not in dag
+        if step_name not in self.dag:
+            step_name_private = re.sub(r"(data|walden|backport|snapshot)://", r"\1-private://", step_name)
+            if step_name_private in self.dag:
+                return step_name_private
+        return step_name
 
     @property
     def dependencies(self) -> List[str]:
@@ -301,7 +310,11 @@ class PathFinder:
     ) -> str:
         """Get dependency step name (as it appears in the dag) given its attributes (at least its short name)."""
         pattern = self._create_step_name(channel=channel, namespace=namespace, version=version, short_name=short_name)
-        matches = [dependency for dependency in self.dependencies if bool(re.match(pattern, dependency))]
+        matches = [
+            dependency
+            for dependency in self.dependencies
+            if bool(re.match(pattern, dependency.replace("-private", "")))
+        ]
 
         if len(matches) == 0:
             raise NoMatchingStepsAmongDependencies

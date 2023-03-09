@@ -101,6 +101,26 @@ def test_PathFinder_paths():
     assert pf.directory == paths.STEP_DIR / "data/meadow/papers/2022-11-03"
 
 
+def test_PathFinder_step_is_private():
+    pf = PathFinder(str(paths.STEP_DIR / "data/garden/namespace/2023/name/__init__.py"))
+
+    pf.dag = {
+        "data://garden/namespace/2023/name": {
+            "snapshot://namespace/2023/name",
+        }
+    }
+    assert pf.step == "data://garden/namespace/2023/name"
+    assert pf.get_dependency_step_name("name") == "snapshot://namespace/2023/name"
+
+    pf.dag = {
+        "data-private://garden/namespace/2023/name": {
+            "snapshot-private://namespace/2023/name",
+        }
+    }
+    assert pf.step == "data-private://garden/namespace/2023/name"
+    assert pf.get_dependency_step_name("name") == "snapshot-private://namespace/2023/name"
+
+
 def test_get_direct_dependencies_for_step_in_dag():
     for step in mock_dag["steps"]:
         dependencies = etl.helpers.get_direct_dependencies_for_step_in_dag(dag=mock_dag["steps"], step=step)
