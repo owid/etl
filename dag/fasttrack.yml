@@ -30,3 +30,5 @@ steps:
   - snapshot-private://fasttrack/latest/germany_hypothetical_constant_nuclear.csv
   data-private://grapher/fasttrack/latest/oil_prices:
   - snapshot-private://fasttrack/latest/oil_prices.csv
+  data://grapher/fasttrack/latest/table_5__threatened_species_in_each_major_group_by_country__show_all__1:
+  - snapshot://fasttrack/latest/table_5__threatened_species_in_each_major_group_by_country__show_all__1.csv
