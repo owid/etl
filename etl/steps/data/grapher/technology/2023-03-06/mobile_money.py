@@ -16,7 +16,7 @@ def run(dest_dir: str) -> None:
     ds_garden: Dataset = paths.load_dependency("mobile_money")
 
     # Read table from garden dataset.
-    tb_garden = ds_garden["mobile_money"]
+    tb_garden = ds_garden["mobile_money"].rename(columns={"region": "country"})
 
     #
     # Process data.
