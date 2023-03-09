@@ -1,4 +1,6 @@
-"""Load a meadow dataset and create a garden dataset."""
+"""Load a meadow dataset and create a garden dataset.
+
+Minor cleaning of GHO dataset (only age-standardized suicide rates metrics)"""
 
 import pandas as pd
 from owid.catalog import Dataset, Table
