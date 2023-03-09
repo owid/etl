@@ -1,4 +1,7 @@
-"""Script to create a snapshot of dataset 'Global Health Observatory: Suicide rates (WHO, 2022)'."""
+"""Script to create a snapshot of dataset 'Global Health Observatory: Age-standardised suicide rates (WHO, 2022)'.
+
+Complete list of indicators can be found at https://ghoapi.azureedge.net/api/Indicator.
+"""
 
 from pathlib import Path
 
