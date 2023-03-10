@@ -326,6 +326,8 @@ steps:
   - snapshot://bls/2023-03-09/us_consumer_prices.csv
   data://garden/bls/2023-03-10/us_consumer_prices:
   - data://meadow/bls/2023-03-10/us_consumer_prices
+  data://grapher/bls/2023-03-10/us_consumer_prices:
+  - data://garden/bls/2023-03-10/us_consumer_prices
 
 
 # Sub-dags to import
