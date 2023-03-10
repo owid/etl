@@ -46,7 +46,7 @@ def run(dest_dir: str) -> None:
     df = df[["series_id", "year", "value"]].groupby(["series_id", "year"], as_index=False).mean()
 
     # Pivot to wide format and add country
-    df.pivot(columns="series_id", values="value", index="year").assign(country="United States")
+    df = df.pivot(columns="series_id", values="value", index="year").assign(country="United States").reset_index()
 
     # Create a new table with the processed data.
     tb_garden = Table(df, short_name="us_consumer_prices")
