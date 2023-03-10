@@ -45,19 +45,20 @@ def add_slaughtered_animals_to_meat_total(data: pd.DataFrame) -> pd.DataFrame:
         Data after adding the new variable.
 
     """
-    # List of items to sum as part of "Meat, total" (avoiding double-counting items).
-    items_to_aggregate = [
-        "Meat, ass",
-        "Meat, beef and buffalo",
-        "Meat, camel",
-        "Meat, horse",
-        "Meat, lamb and mutton",
-        "Meat, mule",
-        "Meat, pig",
-        "Meat, poultry",
-        "Meat, rabbit",
-        "Meat, sheep and goat",
+    # List item codes to sum as part of "Meat, total" (avoiding double-counting items).
+    item_codes_to_aggregate = [
+        "00000977",  # 'Meat, lamb and mutton' (previously 'Meat, lamb and mutton')
+        "00001035",  # 'Meat of pig with the bone, fresh or chilled' (previously 'Meat, pig')
+        "00001097",  # 'Horse meat, fresh or chilled' (previously 'Meat, horse')
+        "00001108",  # 'Meat of asses, fresh or chilled' (previously 'Meat, ass')
+        "00001111",  # 'Meat of mules, fresh or chilled' (previously 'Meat, mule')
+        "00001127",  # 'Meat of camels, fresh or chilled' (previously 'Meat, camel')
+        "00001141",  # 'Meat of rabbits and hares, fresh or chilled' (previously 'Meat, rabbit')
+        "00001806",  # 'Meat, beef and buffalo' (previously 'Meat, beef and buffalo')
+        "00001807",  # 'Meat, sheep and goat' (previously 'Meat, sheep and goat')
+        "00001808",  # 'Meat, poultry' (previously 'Meat, poultry')
     ]
+
     # OWID item name for total meat.
     total_meat_item = "Meat, total"
     # OWID element name, unit name, and unit short name for number of slaughtered animals.
@@ -65,7 +66,7 @@ def add_slaughtered_animals_to_meat_total(data: pd.DataFrame) -> pd.DataFrame:
     slaughtered_animals_unit = "animals"
     slaughtered_animals_unit_short_name = "animals"
     error = f"Some items required to get the aggregate '{total_meat_item}' are missing in data."
-    assert set(items_to_aggregate) < set(data["item"]), error
+    assert set(item_codes_to_aggregate) < set(data["item_code"]), error
     assert slaughtered_animals_element in data["element"].unique()
     assert slaughtered_animals_unit in data["unit"].unique()
 
@@ -95,7 +96,7 @@ def add_slaughtered_animals_to_meat_total(data: pd.DataFrame) -> pd.DataFrame:
         data[
             (data["element"] == slaughtered_animals_element)
             & (data["unit"] == slaughtered_animals_unit)
-            & (data["item"].isin(items_to_aggregate))
+            & (data["item_code"].isin(item_codes_to_aggregate))
         ]
         .dropna(subset="value")
         .reset_index(drop=True)
@@ -270,11 +271,7 @@ def add_yield_to_aggregate_regions(data: pd.DataFrame) -> pd.DataFrame:
     # Replace all other fields from the corresponding fields in yield (tonnes per hectare) variable.
     for field in additional_fields.columns:
         combined[field] = additional_fields[field].item()
-
     assert set(data.columns) == set(combined.columns)
-
-    combined = combined
-
     combined_data = (
         pd.concat([data, combined], ignore_index=True)
         .reset_index(drop=True)
