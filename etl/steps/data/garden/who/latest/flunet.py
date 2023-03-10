@@ -176,6 +176,11 @@ def clean_and_format_data(df: pd.DataFrame) -> pd.DataFrame:
 
 def calculate_percent_positive(df: pd.DataFrame, surveillance_cols: list[str]) -> pd.DataFrame:
     """
+    Sometimes the 0s in the inf_negative* columns should in fact be zero. Here we convert rows where:
+    inf_negative* == 0 and the sum of the positive and negative tests does not equal the number of processed tests.
+
+    This should keep true 0s where the share of positive tests is actually 100%, typically when there is a small number of tests.
+
     Because the data is patchy in some places the WHO recommends three methods for calclating the share of influenza tests that are positive.
     In order of preference
     1. Postive tests divided by positive and negative tests summmed: inf_all/(inf_all + inf_neg)
@@ -186,6 +191,13 @@ def calculate_percent_positive(df: pd.DataFrame, surveillance_cols: list[str]) -
     Remove rows where the percent = 100 but all available denominators are 0.
     """
     for col in surveillance_cols:
+
+        df.loc[
+            (df["inf_negative" + col] == 0)
+            & (df["inf_negative" + col] + df["inf_all" + col] != df["spec_processed_nb" + col]),
+            "inf_negative" + col,
+        ] = np.nan
+
         df["pcnt_pos_1" + col] = (df["inf_all" + col] / (df["inf_all" + col] + df["inf_negative" + col])) * 100
         df["pcnt_pos_2" + col] = (df["inf_all" + col] / df["spec_processed_nb" + col]) * 100
         df["pcnt_pos_3" + col] = (df["inf_all" + col] / df["spec_received_nb" + col]) * 100
