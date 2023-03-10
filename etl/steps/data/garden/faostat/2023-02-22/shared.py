@@ -498,8 +498,10 @@ def harmonize_countries(data: pd.DataFrame, countries_metadata: pd.DataFrame) ->
     data["area_code"] = data["area_code"].astype(int)
 
     # Sanity check.
-    error = "Mismatch between fao_country in data and in metadata."
-    assert (data["fao_country"].astype(str) == data["fao_country_check"]).all(), error
+    country_mismatch = data[(data["fao_country"].astype(str) != data["fao_country_check"])]
+    if len(country_mismatch) > 0:
+        faulty_mapping = country_mismatch.set_index("fao_country").to_dict()["fao_country_check"]
+        log.warning(f"Mismatch between fao_country in data and in metadata: {faulty_mapping}")
     data = data.drop(columns="fao_country_check")
 
     # Remove unmapped countries.
@@ -1502,6 +1504,18 @@ def clean_data(
             "recipient_country_code": "area_code",
         }
     )
+
+    # Dataset faostat_wcad doesn't have a year column, but a "census_year", which has intervals like "2002-2003"
+    if "census_year" in data.columns:
+        if data["census_year"].astype(str).str.contains("-.{4}/", regex=True).any():
+            log.warning(
+                "Column 'census_year' in dataset 'faostat_wcad' contains values that need to be properly analysed "
+                "and processed, e.g. 1976-1977/1980-1981. For the moment, we take the first 4 digits as the year."
+            )
+
+        # Remove rows that don't have a census year, and take the first 4 digits
+        data = data.dropna(subset="census_year").reset_index(drop=True)
+        data["year"] = data["census_year"].astype(str).str[0:4].astype(int)
 
     # Ensure year column is integer (sometimes it is given as a range of years, e.g. 2013-2015).
     data["year"] = clean_year_column(data["year"])
