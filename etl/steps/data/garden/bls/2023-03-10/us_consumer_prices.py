@@ -21,7 +21,7 @@ VARIABLE_NAMES = {
     "CUUR0000SAH21": "household_energy",
     "CUUR0000SAH": "housing",
     "CUUR0000SAF": "food_beverages",
-    "CUUS0000SETG": "public_transport",
+    "CUUR0000SETG": "public_transport",
     "CUUS0000SS45011": "new_cars",
     "CUUR0000SAA": "clothing",
     "CUUR0000SEEE02": "software",

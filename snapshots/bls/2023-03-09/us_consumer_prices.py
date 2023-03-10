@@ -22,7 +22,7 @@ SERIES_IDS = [
     "CUUR0000SAH21",  # Household energy
     "CUUR0000SAH",  # Housing
     "CUUR0000SAF",  # Food & Beverages
-    "CUUS0000SETG",  # Public transport
+    "CUUR0000SETG",  # Public transport
     "CUUS0000SS45011",  # New cars
     "CUUR0000SAA",  # Clothing
     "CUUR0000SEEE02",  # Computer software and accessories
