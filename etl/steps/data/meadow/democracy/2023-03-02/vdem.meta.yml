@@ -150,7 +150,6 @@ tables:
 
           The index reaches from 0 to 1 (most democratic).
         display:
-          includeInTable: true
           name: Deliberative democracy
       dirpop_vote_vdem_owid:
         description: |-
@@ -160,7 +159,6 @@ tables:
 
           The index reaches from 0 to 1 (easiest).
         display:
-          includeInTable: true
           name: Direct popular voting
       egal_vdem_high_owid:
         description: |-
@@ -205,7 +203,6 @@ tables:
 
           The index reaches from 0 to 1 (most democratic).
         display:
-          includeInTable: true
           name: Egalitarian democracy
       electdem_age_group_row_owid:
         description: |-
@@ -220,7 +217,6 @@ tables:
 
           In electoral democracies, citizens have the right to participate in meaningful, free and fair, and multi-party elections.
         display:
-          includeInTable: true
           name: Age of electoral democracy
       electdem_dich_high_row_owid: {}
       electdem_dich_low_row_owid: {}
@@ -238,7 +234,6 @@ tables:
 
           In electoral democracies, citizens have the right to participate in meaningful, free and fair, and multi-party elections.
         display:
-          includeInTable: true
           name: Experience with electoral democracy
       electdem_vdem_high_owid:
         description: |-
@@ -262,7 +257,6 @@ tables:
 
           The index reaches from 0 to 1 (most democratic).
         display:
-          includeInTable: true
           name: Electoral democracy
       electfreefair_high_row_owid:
         description: |-
@@ -352,7 +346,6 @@ tables:
 
           The variable ranges from 0 to 1 (chief executive and legislature fully elected).
         display:
-          includeInTable: true
           name: Elected political leaders
       elitecons_polch_vdem_high_owid:
         description: |-
@@ -645,7 +638,6 @@ tables:
 
           In liberal democracies, citizens have further individual and minority rights, are equal before the law, and the actions of the executive are constrained by the legislative and the courts.
         display:
-          includeInTable: true
           name: Age of liberal democracy
       libdem_exp_row_owid:
         description: |-
@@ -657,7 +649,6 @@ tables:
 
           In liberal democracies, citizens have further individual and minority rights, are equal before the law, and the actions of the executive are constrained by the legislative and the courts.
         display:
-          includeInTable: true
           name: Experience with liberal democracy
       libdem_vdem_high_owid:
         description: |-
@@ -681,7 +672,6 @@ tables:
 
           The index reaches from 0 to 1 (most democratic).
         display:
-          includeInTable: true
           name: Liberal democracy
       locelect_vdem_high_owid:
         description: |-
@@ -855,7 +845,6 @@ tables:
 
           The index reaches from 0 to 1 (most democratic).
         display:
-          includeInTable: true
           name: Participatory democracy
       phys_integr_libs_vdem_high_owid:
         description: |-
@@ -1058,7 +1047,6 @@ tables:
 
           The index reaches from 0 to 1 (most democratic).
         display:
-          includeInTable: true
           name: Deliberative democracy weighted by population
       popw_egaldem_h_vdem_owid:
         description: |-
@@ -1076,7 +1064,6 @@ tables:
 
           The index reaches from 0 to 1 (most democratic).
         display:
-          includeInTable: true
           name: Egalitarian democracy weighted by population
       popw_electdem_h_vdem_owid:
         description: |-
@@ -1094,7 +1081,6 @@ tables:
 
           The index reaches from 0 to 1 (most democratic).
         display:
-          includeInTable: true
           name: Electoral democracy weighted by population
       popw_libdem_h_vdem_owid:
         description: |-
@@ -1112,7 +1098,6 @@ tables:
 
           The index reaches from 0 to 1 (most democratic).
         display:
-          includeInTable: true
           name: Liberal democracy weighted by population
       popw_participdem_h_vdem_owid:
         description: |-
@@ -1130,7 +1115,6 @@ tables:
 
           The index reaches from 0 to 1 (most democratic).
         display:
-          includeInTable: true
           name: Participatory democracy weighted by population
       popw_physinteg_libs_vdem_h_owid:
         description: |-
@@ -1367,7 +1351,6 @@ tables:
 
           It further includes intermediate categories for closed autocracies that may be electoral autocracies (score 1), electoral autocracies that may be closed autocracies (score 2), electoral autocracies that may be electoral democracies (score 4), electoral democracies that may be electoral autocracies (score 5), electoral democracies that may be liberal democracies (score 7) and liberal democracies that may be electoral democracies (score 8).
         display:
-          includeInTable: true
           name: Political regime
       regime_imputed_country_vdem_owid:
         description: The variable denotes the country from which we imputed regime information
@@ -1385,7 +1368,6 @@ tables:
 
           In electoral democracies, citizens have the right to participate in meaningful, free and fair, and multi-party elections.
         display:
-          includeInTable: true
           name: Electoral democracy
       regime_row_owid:
         description: |-
@@ -1399,7 +1381,6 @@ tables:
 
           In liberal democracies, citizens have further individual and minority rights, are equal before the law, and the actions of the executive are constrained by the legislative and the courts.
         display:
-          includeInTable: true
           name: Political regime
       region: {}
       soccons_polch_vdem_high_owid:
@@ -1475,7 +1456,6 @@ tables:
 
           The variable captures legal restrictions, and not restrictions that may be in place in practice. It considers restrictions based on gender, property, tax payments, income, literacy, region, race, ethnicity, religion, and economic independence; it does not consider restrictions based on age, residence, conviction of a crime, or legal incompetence.
         display:
-          includeInTable: true
           name: Share of adult citizens who have the right to vote
       transplaws_high_row_owid:
         description: The variable denotes the upper-bound estimate of whether laws are transparent,
@@ -1498,7 +1478,6 @@ tables:
 
           It is based on the V-Dem variable v2eltrnout, and we expand it to cover more years for some countries.
         display:
-          includeInTable: true
           name: Voter turnout
       wom_civ_libs_vdem_high_owid:
         description: |-
