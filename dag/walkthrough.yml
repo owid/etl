@@ -14,5 +14,5 @@ steps:
   - data://meadow/wvs/2023-03-08/wvs_trust
   data://grapher/wvs/2023-03-08/wvs_trust:
   - data://garden/wvs/2023-03-08/wvs_trust
-  data-private://meadow/wvs/2023-03-09/wvs_trust:
-  - snapshot-private://wvs/2023-03-09/wvs_trust.csv
+  data-private://meadow/wvs/2023-03-10/wvs_trust:
+  - snapshot-private://wvs/2023-03-10/wvs_trust.csv
