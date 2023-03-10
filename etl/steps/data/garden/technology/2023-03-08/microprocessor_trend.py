@@ -30,7 +30,15 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
+    # Transistors are counted in thousands
     df["transistors"] = df.transistors * 1000
+
+    # Sort rows by chronological order, and use cummax() to keep the highest-ever number of
+    # transistors for each date.
+    df = df.sort_values("year")
+    df["transistors"] = df.transistors.cummax()
+
+    # Trim dates to years, and keep the maximum number of transistors achieved each year
     df["year"] = df.year.astype(int)
     df = df.groupby(["year", "region"], as_index=False).max().reset_index(drop=True)
 
