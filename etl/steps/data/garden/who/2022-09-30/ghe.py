@@ -1,4 +1,3 @@
-import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
 from structlog import get_logger
@@ -43,22 +42,25 @@ def clean_data(df: pd.DataFrame) -> Table:
     )
     df["death_count"] = df["death_count"].round(0)
     df["death_count"] = df["death_count"].astype(int)
+
     # Add broader age groups
     df = build_custom_age_groups(df)
     # Set indices
     df = df.astype(
         {
             "country": "category",
-            "year": "uint64",
+            "year": "uint16",
             "cause": "category",
             "age_group": "category",
             "sex": "category",
             "daly_count": "float32",
+            "daly_rate100k": "float32",
             "death_count": "int32",
-            "flag_level": "float32",
+            "death_rate100k": "float32",
+            "flag_level": "uint8",
         }
     )
-    df = df.set_index(["country", "year", "cause", "sex", "age_group"])
+    df = df.set_index(["country", "year", "age_group", "sex", "cause"])
     df = Table(df, short_name="ghe")
     return df
 
@@ -140,7 +142,7 @@ def build_custom_age_groups(df: pd.DataFrame) -> pd.DataFrame:
     # Fix column values (rates + flag)
     df_sh["daly_rate100k"] = 100000 * df_sh["daly_count"] / df_sh["population"]
     df_sh["death_rate100k"] = 100000 * df_sh["death_count"] / df_sh["population"]
-    df_sh["flag_level"] = np.nan
+    df_sh["flag_level"] = 3
     df_sh = df_sh.drop(columns=["population"])
 
     log.info("ghe: concatenate dfs")

@@ -1,19 +1,35 @@
 # To run with subset only: GHE_SUBSET_ONLY=1 etl grapher/who/2022-09-30/ghe --grapher
 import pandas as pd
-from owid import catalog
+from owid.catalog import Dataset, Table
 
-from etl.helpers import PathFinder
+from etl.helpers import PathFinder, create_dataset
 
-N = PathFinder(__file__)
+# Get paths and naming conventions for current step.
+paths = PathFinder(__file__)
 GHE_SUBSET_ONLY = True
 
 
 def run(dest_dir: str) -> None:
-    dataset = catalog.Dataset.create_empty(dest_dir, N.garden_dataset.metadata)
-    dataset.save()
+    # Load garden dataset
+    ds_garden: Dataset = paths.load_dependency("ghe")
 
-    table = N.garden_dataset["ghe"]
+    # Read table from garden dataset.
+    tb_garden = ds_garden["ghe"]
 
+    # Process table
+    tb_garden = process(tb_garden)
+
+    #
+    # Save outputs.
+    #
+    # Create a new grapher dataset with the same metadata as the garden dataset.
+    ds_grapher = create_dataset(dest_dir, tables=[tb_garden], default_metadata=ds_garden.metadata)
+
+    # Save changes in the new grapher dataset.
+    ds_grapher.save()
+
+
+def process(table: Table) -> Table:
     # Since this script expects a certain structure make sure it is actually met
     expected_primary_keys = ["country", "year", "age_group", "sex", "cause"]
     if table.primary_key != expected_primary_keys:
@@ -21,7 +37,6 @@ def run(dest_dir: str) -> None:
             "GHE Table to transform to grapher contained unexpected primary key dimensions:"
             f" {table.primary_key} instead of {expected_primary_keys}"
         )
-
     # We want to export all columns except causegroup and level (for now)
     columns_to_export = [
         "death_count",
@@ -29,17 +44,16 @@ def run(dest_dir: str) -> None:
         "daly_count",
         "daly_rate100k",
     ]
-
     if set(columns_to_export).difference(set(table.columns)):
         raise Exception(
             "GHE table to transform to grapher did not contain the expected columns but instead had:"
             f" {list(table.columns)}"
         )
 
-    table.reset_index(inplace=True)
-    table = table.drop(columns="flag_level")
+    table = table.reset_index()
+    table = table.drop(columns=["flag_level"])
 
-    # Calculating global totals of deaths and daly's for each disease
+    # Add World totals (should probably be in Garden)
     table = add_global_totals(table)
 
     # Use subset of the data for now
@@ -48,18 +62,10 @@ def run(dest_dir: str) -> None:
 
     table = table.set_index(["country", "year", "cause", "sex", "age_group"])
 
-    table.update_metadata_from_yaml(N.metadata_path, "ghe")
-
-    for column in columns_to_export:
-        # use dataset source
-        table[column].metadata.sources = dataset.metadata.sources
-
-        # Use short names as titles
-        table[column].metadata.title = column
-
     table = table.loc[:, columns_to_export]
 
-    dataset.add(table)
+    table.metadata.short_name = paths.short_name
+    return table
 
 
 def select_subset_causes(table: pd.DataFrame) -> pd.DataFrame:
@@ -76,15 +82,18 @@ def select_subset_causes(table: pd.DataFrame) -> pd.DataFrame:
     return table
 
 
-def add_global_totals(table: pd.DataFrame) -> pd.DataFrame:
+def add_global_totals(df: pd.DataFrame) -> pd.DataFrame:
+    dtypes = df.dtypes.to_dict()
     # Get age_group=all and sex=all (avoid duplicates)
-    table_ = table[(table["sex"] == "Both sexes") & (table["age_group"] == "ALLAges")]
+    df_ = df[(df["sex"] == "Both sexes") & (df["age_group"] == "ALLAges")]
     # Group by year and cause, sum
-    glob_total = table_.groupby(["year", "cause"])[["daly_count", "death_count"]].sum().reset_index()
+    glob_total = df_.groupby(["year", "cause"], as_index=False, observed=True)[["daly_count", "death_count"]].sum()
     # Fill other fields
     glob_total["country"] = "World"
     glob_total["age_group"] = "ALLAges"
     glob_total["sex"] = "Both sexes"
     # Merge with complete table
-    table = pd.concat([table, glob_total])
-    return table
+    df = pd.concat([df, glob_total])
+    # Set dtypes as input
+    df = df.astype(dtypes)
+    return df
