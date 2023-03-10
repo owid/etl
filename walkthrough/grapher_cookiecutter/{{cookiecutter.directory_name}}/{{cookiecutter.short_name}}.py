@@ -23,6 +23,11 @@ def run(dest_dir: str) -> None:
     #
 
     #
+    # Checks.
+    #
+    assert {"year", "country"} <= set(tb_garden.reset_index().columns), "Table must have columns country and year."
+
+    #
     # Save outputs.
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.
