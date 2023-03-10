@@ -26,13 +26,16 @@ def run(dest_dir: str) -> None:
     tb_meadow = ds_meadow["wvs_trust"]
 
     # Create a dataframe with data from the table.
-    df = pd.DataFrame(tb_meadow)
+    df = pd.DataFrame(tb_meadow).reset_index()
 
     #
     # Process data.
     #
     log.info("wvs_trust.harmonize_countries")
     df = geo.harmonize_countries(df=df, countries_file=paths.country_mapping_path)
+
+    # Verify index and sort
+    df = df.set_index(["country", "year"], verify_integrity=True).sort_index()
 
     # Create a new table with the processed data.
     tb_garden = Table(df, like=tb_meadow)
