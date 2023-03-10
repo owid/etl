@@ -32,6 +32,8 @@ def run(dest_dir: str) -> None:
 
     tb_flu = pd.DataFrame(pd.merge(tb_fluid, tb_flunet, on=["country", "date", "hemisphere"], how="outer"))
     assert tb_flu[["country", "date"]].duplicated().sum() == 0
+
+    tb_flu = create_full_time_series(tb_flu)
     tb_flu = create_zero_filled_strain_columns(tb_flu)
     tb_flu = remove_sparse_timeseries(df=tb_flu, min_data_points=MIN_DATA_POINTS)
     tb_flu = create_regional_aggregates(df=tb_flu)
@@ -99,6 +101,29 @@ def create_zero_filled_strain_columns(df: pd.DataFrame) -> pd.DataFrame:
     strain_columns_zfilled = [s + "_zfilled" for s in strain_columns]
     df[strain_columns_zfilled] = df[strain_columns].fillna(0)
     return df
+
+
+def create_full_time_series(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    For each country ensure there is a value for each week between the start and the end date, especially important for the stacked bar charts
+
+    """
+    filled_df = pd.DataFrame()
+    for country in df.country.drop_duplicates():
+        country_df = df[df["country"] == country]
+        min_date = country_df.date.min()
+        max_date = country_df.date.max()
+        date_series = pd.Series(pd.date_range(min_date, max_date, freq="7D").format(), name="date")
+
+        if len(date_series[~date_series.isin(country_df["date"])]) > 0:
+            country_df = pd.merge(country_df, date_series, how="outer")
+            country_df[["country", "hemisphere"]] = country_df[["country", "hemisphere"]].fillna(method="ffill")
+            assert len(date_series) == country_df.shape[0]
+            assert country_df.country.isna().sum() == 0
+
+        filled_df = pd.concat([filled_df, country_df])
+
+    return filled_df
 
 
 def remove_sparse_timeseries(df: pd.DataFrame, min_data_points: int) -> pd.DataFrame:
