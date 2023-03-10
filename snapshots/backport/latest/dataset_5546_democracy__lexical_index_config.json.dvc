@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5546_democracy__lexical_index_config
   file_extension: json
-  date_accessed: 2023-03-09 16:28:41.259383
+  date_accessed: 2023-03-10 08:37:20.102457
   name: Grapher metadata for dataset_5546_democracy__lexical_index
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 6c1d3270a64d2dffa8dcfb9efe9a24c9
-  size: 53201
+- md5: 09c83240938a7f9d50ed348ec669a18a
+  size: 53248
   path: dataset_5546_democracy__lexical_index_config.json
