@@ -1177,14 +1177,14 @@ tables:
           The variable denotes the central estimate of  the extent to which people are free from forced labor, have property rights, and enjoy the freedoms of movement and religion, weighted by population.
 
           The variable ranges from 0 to 1 (most liberties).
-      popw_socgr_civ_libs_vdem_high_owid:
+      popw_socgr_civ_libs_vdem_h_owid:
         description: |-
           The variable denotes the upper-bound estimate of the extent to which social groups — defined by language, ethnicity, religion, race, region, and/or caste — are free from forced labor, have property rights and access to the justice system, and enjoy freedoms of movement, weighted by population.
 
           It is based on the V-Dem variable v2clsocgrp_codehigh, and we expand it to cover more years for some countries.
 
           Higher scores mean more equality.
-      popw_socgr_civ_libs_vdem_low_owid:
+      popw_socgr_civ_libs_vdem_l_owid:
         description: |-
           The variable denotes the lower-bound estimate of the extent to which social groups — defined by language, ethnicity, religion, race, region, and/or caste — are free from forced labor, have property rights and access to the justice system, and enjoy freedoms of movement, weighted by population.
 
