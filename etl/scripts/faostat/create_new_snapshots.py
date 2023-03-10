@@ -160,7 +160,9 @@ class FAODataset:
 
 
 def load_faostat_catalog() -> List[Dict[str, Any]]:
-    datasets = requests.get(FAO_CATALOG_URL).json()["Datasets"]["Dataset"]
+    # Some of the texts returned have special characters that seem to require CP-1252 decoding.
+    # datasets = requests.get(FAO_CATALOG_URL).json()["Datasets"]["Dataset"]
+    datasets = json.loads(requests.get(FAO_CATALOG_URL).content.decode("cp1252"))["Datasets"]["Dataset"]
     return datasets
 
 
