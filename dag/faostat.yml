@@ -397,13 +397,13 @@ steps:
   data://garden/faostat/2023-02-22/faostat_gn:
     - data://garden/wb/2021-07-01/wb_income
     - data://garden/owid/latest/key_indicators
+    - data://garden/faostat/2023-02-22/faostat_metadata
     - data://meadow/faostat/2023-02-22/faostat_gn
-    - data://meadow/faostat/2023-02-22/faostat_metadata
   data://garden/faostat/2023-02-22/faostat_ic:
     - data://garden/wb/2021-07-01/wb_income
     - data://garden/owid/latest/key_indicators
+    - data://garden/faostat/2023-02-22/faostat_metadata
     - data://meadow/faostat/2023-02-22/faostat_ic
-    - data://meadow/faostat/2023-02-22/faostat_metadata
   data://garden/faostat/2023-02-22/faostat_lc:
     - data://garden/wb/2021-07-01/wb_income
     - data://meadow/faostat/2023-02-22/faostat_lc
@@ -502,5 +502,5 @@ steps:
   data://garden/faostat/2023-02-22/faostat_wcad:
     - data://garden/wb/2021-07-01/wb_income
     - data://garden/owid/latest/key_indicators
+    - data://garden/faostat/2023-02-22/faostat_metadata
     - data://meadow/faostat/2023-02-22/faostat_wcad
-    - data://meadow/faostat/2023-02-22/faostat_metadata
