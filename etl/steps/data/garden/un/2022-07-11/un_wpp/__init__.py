@@ -111,7 +111,7 @@ def run(dest_dir: str) -> None:
     country_std = load_country_mapping()
     # pocess
     log.info("Processing population variables...")
-    df_population = process_population(ds["population"], country_std)
+    df_population_granular, df_population = process_population(ds["population"], country_std)
     log.info("Processing fertility variables...")
     df_fertility = process_fertility(ds["fertility"], country_std)
     log.info("Processing demographics variables...")
@@ -149,6 +149,17 @@ def run(dest_dir: str) -> None:
                 description=f"UN WPP dataset by OWID. Contains only metrics corresponding to sub-group {category}.",
             )
         )
+    # add dataset with single-year age group population
+    tables.append(
+        df_to_table(
+            df_population_granular,
+            short_name="population_granular",
+            description=(
+                "UN WPP dataset by OWID. Contains only metrics corresponding to population for all dimensions (age and"
+                " sex groups)."
+            ),
+        )
+    )
     tables += [table_long]
     # create dataset
     log.info("Loading dataset to Garden...")

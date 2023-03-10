@@ -1219,6 +1219,27 @@ tables:
           It is based on the V-Dem variable v2pepwrsoc, and we expand it to cover more years for some countries.
 
           Higher scores mean more equality.
+      popw_wom_civ_libs_vdem_high_owid:
+        description: |-
+          The variable denotes the upper-bound estimate of the extent to which women are free from forced labor, have property rights and access to the justice system, and enjoy freedom of movement, weighted by population.
+
+          It is based on the V-Dem variable v2x_gencl_codehigh, and we expand it to cover more years for some countries.
+
+          The variable ranges from 0 to 1 (most liberties).
+      popw_wom_civ_libs_vdem_low_owid:
+        description: |-
+          The variable denotes the lower-bound estimate of the extent to which women are free from forced labor, have property rights and access to the justice system, and enjoy freedom of movement, weighted by population.
+
+          It is based on the V-Dem variable v2x_gencl_codelow, and we expand it to cover more years for some countries.
+
+          The variable ranges from 0 to 1 (most liberties).
+      popw_wom_civ_libs_vdem_owid:
+        description: |-
+          The variable denotes the best estimate of the extent to which women are free from forced labor, have property rights and access to the justice system, and enjoy freedom of movement, weighted by population.
+
+          It is based on the V-Dem variable v2x_gencl, and we expand it to cover more years for some countries.
+
+          The variable ranges from 0 to 1 (most liberties).
       popw_wom_civ_soc_vdem_high_owid:
         description: |-
           The variable denotes the upper-bound estimate of the extent to which women can discuss political issues, participate in civil society organizations, and are represented among journalists, weighted by population.
@@ -1235,7 +1256,6 @@ tables:
           The variable ranges from 0 to 1 (most participatory).
       popw_wom_civ_soc_vdem_owid:
         description: |-
-
           The variable denotes the best estimate of the extent to which women can discuss political issues, participate in civil society organizations, and are represented among journalists, weighted by population.
 
           It is based on the V-Dem variable v2x_gencs, and we expand it to cover more years for some countries.
