@@ -1,15 +1,33 @@
 """Load a meadow dataset and create a garden dataset."""
 
-import pandas as pd
-from owid.catalog import Dataset, Table, TableMeta
-from structlog import get_logger
 import datetime
+
+import pandas as pd
+from owid.catalog import Dataset, Table
+from structlog import get_logger
+
 from etl.helpers import PathFinder, create_dataset
 
 log = get_logger()
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+
+VARIABLE_NAMES = {
+    "CUUR0000SEEB01": "college_tuition_fees",
+    "CUUR0000SAE1": "education",
+    "CUUR0000SEEB": "tuition_fees_childcare",
+    "CUUR0000SAM": "medical_care",
+    "CUUR0000SAH21": "household_energy",
+    "CUUR0000SAH": "housing",
+    "CUUR0000SAF": "food_beverages",
+    "CUUS0000SETG": "public_transport",
+    "CUUS0000SS45011": "new_cars",
+    "CUUR0000SAA": "clothing",
+    "CUUR0000SEEE02": "software",
+    "CUUR0000SERE01": "toys",
+    "CUUR0000SERA01": "televisions",
+}
 
 
 def run(dest_dir: str) -> None:
@@ -44,6 +62,9 @@ def run(dest_dir: str) -> None:
 
     # Calculate the average value per series_id & year
     df = df[["series_id", "year", "value"]].groupby(["series_id", "year"], as_index=False).mean()
+
+    # Translate variables to human-readable names
+    df.series_id = df.series_id.replace(VARIABLE_NAMES)
 
     # Pivot to wide format and add country
     df = df.pivot(columns="series_id", values="value", index="year").assign(country="United States").reset_index()

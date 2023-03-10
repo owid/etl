@@ -16,7 +16,7 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
 
 SERIES_IDS = [
     "CUUR0000SEEB01",  # College tuition fees
-    "CUUR0000SAE1",  # Education
+    "CUUR0000SAE1",  # Tuition, other school fees, and childcare
     "CUUR0000SEEB",  # Childcare
     "CUUR0000SAM",  # Medical care
     "CUUR0000SAH21",  # Household energy
@@ -25,7 +25,7 @@ SERIES_IDS = [
     "CUUS0000SETG",  # Public transport
     "CUUS0000SS45011",  # New cars
     "CUUR0000SAA",  # Clothing
-    "CUUR0000SEEE02",  # Software
+    "CUUR0000SEEE02",  # Computer software and accessories
     "CUUR0000SERE01",  # Toys
     "CUUR0000SERA01",  # TVs
 ]
