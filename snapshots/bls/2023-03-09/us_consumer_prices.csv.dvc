@@ -21,6 +21,6 @@ meta:
 
 wdir: ../../../data/snapshots/bls/2023-03-09
 outs:
-- md5: 5d70a684dbd41305fe8e6d3636e73f5a
-  size: 247610
+- md5: c69b93811fee923e34a9aa4e5287edda
+  size: 268365
   path: us_consumer_prices.csv

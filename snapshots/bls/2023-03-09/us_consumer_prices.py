@@ -26,7 +26,7 @@ SERIES_IDS = [
     "CUUS0000SS45011",  # New cars
     "CUUR0000SAA",  # Clothing
     "CUUR0000SEEE02",  # Software
-    "CUUS0000SERE01",  # Toys
+    "CUUR0000SERE01",  # Toys
     "CUUR0000SERA01",  # TVs
 ]
 
