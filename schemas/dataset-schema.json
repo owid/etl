@@ -164,6 +164,25 @@
                       }
                     ]
                   },
+                  "licenses": {
+                    "type": "array",
+                    "items": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "url"
+                        ]
+                      }
+                    ]
+                  },
                   "display": {
                     "type": "object",
                     "additionalProperties": false,
@@ -182,18 +201,24 @@
                       },
                       "includeInTable": {
                         "type": "boolean"
+                      },
+                      "unit": {
+                        "type": "string"
+                      },
+                      "yearIsDay": {
+                        "type": "boolean"
+                      },
+                      "zeroDay": {
+                        "type": "string",
+                        "format": "date"
                       }
                     }
                   }
                 }
               }
             }
-          },
-          "required": ["variables"]
+          }
         }
       }
-    },
-    "required": [
-      "dataset"
-    ]
+    }
   }
