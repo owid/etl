@@ -1,0 +1,32 @@
+meta:
+  namespace: technology
+  short_name: mobile_money
+  name: Global Mobile Money Dataset (GSMA, 2022)
+  version: 2023-03-06
+  publication_year: 2022
+  publication_date: 2022-03-01
+  source_name: GSMA (2022)
+  source_published_by: GSMA
+  url: https://www.gsma.com/mobilemoneymetrics/#global
+  source_data_url: https://www.gsma.com/mobilemoneymetrics/wp-content/uploads/2022/05/Global_Mobile_Money_Dataset_new.xlsx
+  file_extension: xlsx
+  license_url:
+  license_name:
+  date_accessed: 2023-03-06
+  is_public: true
+  description: |
+    The Global Mobile Money Dataset is a set of global metrics for the mobile money industry based on data collected and analyzed by the GSMA Mobile Money program.
+
+    The GSMA Mobile Money program considers services that meet the following definitions:
+
+    • The service must be available to the unbanked, e.g., people who do not have access to a formal account at a financial institution.
+    • The service must offer at least one of the following services: Storage of value; Domestic or international transfer; mobile payment, including bill payment, bulk disbursement, and merchant payment.
+    • The service must offer a network of physical transactional points outside bank branches and ATMs, making the service widely accessible to everyone.
+    • The service must offer an interface for initiating transactions for agents or customers that is available on mobile devices.
+    • Mobile banking services that offer the mobile phone as just another channel to access a traditional banking product are not included.
+    • Payment services linked to a traditional banking product or credit cards, such as Apple Pay and Google Wallet, are not included.
+wdir: ../../../data/snapshots/technology/2023-03-06
+outs:
+- md5: 242c9d84456f3f9721433ba8c106efaf
+  size: 963586
+  path: mobile_money.xlsx
