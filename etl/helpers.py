@@ -166,7 +166,7 @@ class PathFinder:
         ds_garden = paths.garden_dataset
     """
 
-    def __init__(self, __file__: str):
+    def __init__(self, __file__: str, is_private: Optional[bool] = None):
         self.f = Path(__file__)
 
         # Load dag.
@@ -180,9 +180,10 @@ class PathFinder:
         if len(self.f.relative_to(paths.STEP_DIR).parts) == 6:
             self.f = self.f.parent
 
-        # Start by assuming the current step is public.
+        # If is_private is not specified, start by assuming the current step is public.
         # Then, if the step is not found in the dag, but it's found as private, is_private will be set to True.
-        self.is_private = False
+        if is_private is None:
+            self.is_private = False
 
     @property
     def channel(self) -> str:
