@@ -291,6 +291,15 @@ steps:
     - data://explorers/wid/2023-01-27/world_inequality_database
     - data://explorers/lis/2023-01-18/luxembourg_income_study
 
+  # Global mobile money dataset (GSMA)
+  data://meadow/technology/2023-03-06/mobile_money:
+  - snapshot://technology/2023-03-06/mobile_money.xlsx
+  data://garden/technology/2023-03-06/mobile_money:
+  - data://meadow/technology/2023-03-06/mobile_money
+  data://grapher/technology/2023-03-06/mobile_money:
+  - data://garden/technology/2023-03-06/mobile_money
+
+
   #
   # Regions - Regions (2023).
   #
@@ -303,6 +312,15 @@ steps:
   - data://meadow/democracy/2023-03-02/vdem
   data://grapher/democracy/2023-03-02/vdem:
   - data://garden/democracy/2023-03-02/vdem
+
+  # Microprocessor trend data
+  data://meadow/technology/2023-03-08/microprocessor_trend:
+  - snapshot://technology/2023-03-08/microprocessor_trend.dat
+  data://garden/technology/2023-03-08/microprocessor_trend:
+  - data://meadow/technology/2023-03-08/microprocessor_trend
+  data://grapher/technology/2023-03-09/microprocessor_trend:
+  - data://garden/technology/2023-03-08/microprocessor_trend
+
 
 # Sub-dags to import
 include:

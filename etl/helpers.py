@@ -166,7 +166,7 @@ class PathFinder:
         ds_garden = paths.garden_dataset
     """
 
-    def __init__(self, __file__: str):
+    def __init__(self, __file__: str, is_private: Optional[bool] = None):
         self.f = Path(__file__)
 
         # Load dag.
@@ -179,6 +179,11 @@ class PathFinder:
         # It could be either called from a module with short_name.py or __init__.py inside short_name/ dir.
         if len(self.f.relative_to(paths.STEP_DIR).parts) == 6:
             self.f = self.f.parent
+
+        # If is_private is not specified, start by assuming the current step is public.
+        # Then, if the step is not found in the dag, but it's found as private, is_private will be set to True.
+        if is_private is None:
+            self.is_private = False
 
     @property
     def channel(self) -> str:
@@ -233,11 +238,12 @@ class PathFinder:
         return paths.SNAPSHOTS_DIR / self.namespace / self.version
 
     @staticmethod
-    def _create_step_name(
+    def create_step_name(
         short_name: str,
         channel: Optional[CHANNEL] = None,
         namespace: Optional[str] = None,
         version: Optional[Union[int, str]] = None,
+        is_private: Optional[bool] = False,
     ) -> str:
         """Create the step name (as it appears in the dag) given its attributes.
 
@@ -251,38 +257,70 @@ class PathFinder:
             # If version is not specified, catch any version, which could be either a date, a year, or "latest".
             version = r"(?:\d{4}\-\d{2}\-\d{2}|\d{4}|latest)"
 
+        # Suffix to add to, e.g. "data" if step is private.
+        is_private_suffix = "-private" if is_private else ""
+
         if channel in ["meadow", "garden", "grapher", "explorers"]:
-            step_name = f"data://{channel}/{namespace}/{version}/{short_name}"
+            step_name = f"data{is_private_suffix}://{channel}/{namespace}/{version}/{short_name}"
         elif channel in ["snapshot", "walden"]:
-            step_name = f"{channel}://{namespace}/{version}/{short_name}"
+            step_name = f"{channel}{is_private_suffix}://{namespace}/{version}/{short_name}"
         elif channel is None:
-            step_name = rf"(?:snapshot:/|walden:/|data://meadow|data://garden|data://grapher|data://explorers|backport://backport)/{namespace}/{version}/{short_name}"
+            step_name = rf"(?:snapshot{is_private_suffix}:/|walden{is_private_suffix}:/|data{is_private_suffix}://meadow|data{is_private_suffix}://garden|data://grapher|data://explorers|backport://backport)/{namespace}/{version}/{short_name}$"
         else:
             raise UnknownChannel
 
         return step_name
 
+    def _create_current_step_name(self):
+        return self.create_step_name(
+            short_name=self.short_name,
+            channel=self.channel,
+            namespace=self.namespace,
+            version=self.version,
+            is_private=self.is_private,
+        )
+
     @staticmethod
     def _get_attributes_from_step_name(step_name: str) -> Dict[str, str]:
-        """Get attributes (channel, namespace, version and short name) from the step name (as it appears in the dag)."""
+        """Get attributes (channel, namespace, version, short name and is_private) from the step name (as it appears in the dag)."""
         channel_type, path = step_name.split("://")
-        if channel_type in ["walden", "snapshot"]:
+        if channel_type.startswith(("walden", "snapshot")):
             channel = channel_type
             namespace, version, short_name = path.split("/")
-        elif channel_type in ["data", "backport"]:
+        elif channel_type.startswith(("data", "backport")):
             channel, namespace, version, short_name = path.split("/")
         else:
             raise WrongStepName
 
-        attributes = {"channel": channel, "namespace": namespace, "version": version, "short_name": short_name}
+        if channel_type.endswith("-private"):
+            is_private = True
+        else:
+            is_private = False
+
+        attributes = {
+            "channel": channel,
+            "namespace": namespace,
+            "version": version,
+            "short_name": short_name,
+            "is_private": is_private,
+        }
 
         return attributes
 
     @property
     def step(self) -> str:
-        return self._create_step_name(
-            channel=self.channel, namespace=self.namespace, version=self.version, short_name=self.short_name
-        )
+        # First assume current step is public.
+        _step = self._create_current_step_name()
+        if _step in self.dag:
+            return _step
+        else:
+            # If step is not found in the dag, check if it is private.
+            self.is_private = True
+            _step = self._create_current_step_name()
+            if _step not in self.dag:
+                raise CurrentStepMustBeInDag
+            else:
+                return _step
 
     @property
     def dependencies(self) -> List[str]:
@@ -298,10 +336,21 @@ class PathFinder:
         channel: Optional[str] = None,
         namespace: Optional[str] = None,
         version: Optional[Union[str, int]] = None,
+        is_private: Optional[bool] = None,
     ) -> str:
         """Get dependency step name (as it appears in the dag) given its attributes (at least its short name)."""
-        pattern = self._create_step_name(channel=channel, namespace=namespace, version=version, short_name=short_name)
+
+        pattern = self.create_step_name(
+            channel=channel, namespace=namespace, version=version, short_name=short_name, is_private=is_private
+        )
         matches = [dependency for dependency in self.dependencies if bool(re.match(pattern, dependency))]
+
+        # If no step was found and is_private was not specified, try again assuming step is private.
+        if (len(matches) == 0) and (is_private is None):
+            pattern = self.create_step_name(
+                channel=channel, namespace=namespace, version=version, short_name=short_name, is_private=True
+            )
+            matches = [dependency for dependency in self.dependencies if bool(re.match(pattern, dependency))]
 
         if len(matches) == 0:
             raise NoMatchingStepsAmongDependencies
@@ -318,10 +367,15 @@ class PathFinder:
         channel: Optional[str] = None,
         namespace: Optional[str] = None,
         version: Optional[Union[str, int]] = None,
+        is_private: Optional[bool] = None,
     ) -> Union[catalog.Dataset, Snapshot, WaldenCatalog]:
         """Load a dataset dependency, given its attributes (at least its short name)."""
         dependency_step_name = self.get_dependency_step_name(
-            short_name=short_name, channel=channel, namespace=namespace, version=version
+            short_name=short_name,
+            channel=channel,
+            namespace=namespace,
+            version=version,
+            is_private=is_private,
         )
         dependency = self._get_attributes_from_step_name(step_name=dependency_step_name)
         if dependency["channel"] == "walden":
