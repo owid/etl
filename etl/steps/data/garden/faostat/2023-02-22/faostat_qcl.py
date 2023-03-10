@@ -1,30 +1,31 @@
 """FAOSTAT garden step for faostat_qcl dataset."""
 
-import json
-from copy import deepcopy
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
 from owid import catalog
 from owid.datautils import dataframes
+from owid.datautils.io import load_json
 from shared import (
     ADDED_TITLE_TO_WIDE_TABLE,
+    CURRENT_DIR,
     FLAG_MULTIPLE_FLAGS,
-    LATEST_VERSIONS_FILE,
     NAMESPACE,
+    OUTLIERS_FILE_NAME,
     REGIONS_TO_ADD,
-    VERSION,
     add_per_capita_variables,
     add_regions,
     clean_data,
     harmonize_elements,
     harmonize_items,
+    parse_amendments_table,
     prepare_long_table,
     prepare_wide_table,
     remove_outliers,
 )
 
-from etl.paths import DATA_DIR, STEP_DIR
+from etl.helpers import PathFinder, create_dataset
 
 
 def add_slaughtered_animals_to_meat_total(data: pd.DataFrame) -> pd.DataFrame:
@@ -44,19 +45,20 @@ def add_slaughtered_animals_to_meat_total(data: pd.DataFrame) -> pd.DataFrame:
         Data after adding the new variable.
 
     """
-    # List of items to sum as part of "Meat, total" (avoiding double-counting items).
-    items_to_aggregate = [
-        "Meat, ass",
-        "Meat, beef and buffalo",
-        "Meat, camel",
-        "Meat, horse",
-        "Meat, lamb and mutton",
-        "Meat, mule",
-        "Meat, pig",
-        "Meat, poultry",
-        "Meat, rabbit",
-        "Meat, sheep and goat",
+    # List item codes to sum as part of "Meat, total" (avoiding double-counting items).
+    item_codes_to_aggregate = [
+        "00000977",  # 'Meat, lamb and mutton' (previously 'Meat, lamb and mutton')
+        "00001035",  # 'Meat of pig with the bone, fresh or chilled' (previously 'Meat, pig')
+        "00001097",  # 'Horse meat, fresh or chilled' (previously 'Meat, horse')
+        "00001108",  # 'Meat of asses, fresh or chilled' (previously 'Meat, ass')
+        "00001111",  # 'Meat of mules, fresh or chilled' (previously 'Meat, mule')
+        "00001127",  # 'Meat of camels, fresh or chilled' (previously 'Meat, camel')
+        "00001141",  # 'Meat of rabbits and hares, fresh or chilled' (previously 'Meat, rabbit')
+        "00001806",  # 'Meat, beef and buffalo' (previously 'Meat, beef and buffalo')
+        "00001807",  # 'Meat, sheep and goat' (previously 'Meat, sheep and goat')
+        "00001808",  # 'Meat, poultry' (previously 'Meat, poultry')
     ]
+
     # OWID item name for total meat.
     total_meat_item = "Meat, total"
     # OWID element name, unit name, and unit short name for number of slaughtered animals.
@@ -64,7 +66,7 @@ def add_slaughtered_animals_to_meat_total(data: pd.DataFrame) -> pd.DataFrame:
     slaughtered_animals_unit = "animals"
     slaughtered_animals_unit_short_name = "animals"
     error = f"Some items required to get the aggregate '{total_meat_item}' are missing in data."
-    assert set(items_to_aggregate) < set(data["item"]), error
+    assert set(item_codes_to_aggregate) < set(data["item_code"]), error
     assert slaughtered_animals_element in data["element"].unique()
     assert slaughtered_animals_unit in data["unit"].unique()
 
@@ -94,7 +96,7 @@ def add_slaughtered_animals_to_meat_total(data: pd.DataFrame) -> pd.DataFrame:
         data[
             (data["element"] == slaughtered_animals_element)
             & (data["unit"] == slaughtered_animals_unit)
-            & (data["item"].isin(items_to_aggregate))
+            & (data["item_code"].isin(item_codes_to_aggregate))
         ]
         .dropna(subset="value")
         .reset_index(drop=True)
@@ -269,11 +271,7 @@ def add_yield_to_aggregate_regions(data: pd.DataFrame) -> pd.DataFrame:
     # Replace all other fields from the corresponding fields in yield (tonnes per hectare) variable.
     for field in additional_fields.columns:
         combined[field] = additional_fields[field].item()
-
     assert set(data.columns) == set(combined.columns)
-
-    combined = combined
-
     combined_data = (
         pd.concat([data, combined], ignore_index=True)
         .reset_index(drop=True)
@@ -295,54 +293,42 @@ def add_yield_to_aggregate_regions(data: pd.DataFrame) -> pd.DataFrame:
 
 
 def run(dest_dir: str) -> None:
-    ####################################################################################################################
-    # Common definitions.
-    ####################################################################################################################
-
-    # Load file of versions.
-    latest_versions = pd.read_csv(LATEST_VERSIONS_FILE).set_index(["channel", "dataset"])
-
-    # Dataset short name.
-    dataset_short_name = f"{NAMESPACE}_qcl"
-    # Path to latest dataset in meadow for current FAOSTAT domain.
-    meadow_version = latest_versions.loc["meadow", dataset_short_name].item()
-    meadow_data_dir = DATA_DIR / "meadow" / NAMESPACE / meadow_version / dataset_short_name
-    # Path to dataset of FAOSTAT metadata.
-    garden_metadata_dir = DATA_DIR / "garden" / NAMESPACE / VERSION / f"{NAMESPACE}_metadata"
-
-    # Path to outliers file.
-    outliers_file = STEP_DIR / "data" / "garden" / NAMESPACE / VERSION / "detected_outliers.json"
-
-    ####################################################################################################################
+    #
     # Load data.
-    ####################################################################################################################
+    #
+    # Fetch the dataset short name from dest_dir.
+    dataset_short_name = Path(dest_dir).name
 
-    # Load meadow dataset and keep its metadata.
-    dataset_meadow = catalog.Dataset(meadow_data_dir)
+    # Define path to current step file.
+    current_step_file = (CURRENT_DIR / dataset_short_name).with_suffix(".py")
+
+    # Get paths and naming conventions for current data step.
+    paths = PathFinder(current_step_file.as_posix())
+
+    # Load latest meadow dataset and keep its metadata.
+    ds_meadow: catalog.Dataset = paths.load_dependency(dataset_short_name)
     # Load main table from dataset.
-    data_table_meadow = dataset_meadow[dataset_short_name]
-    data = pd.DataFrame(data_table_meadow).reset_index()
+    tb_meadow = ds_meadow[dataset_short_name]
+    data = pd.DataFrame(tb_meadow).reset_index()
+
+    # Load file of detected outliers.
+    outliers = load_json(paths.directory / OUTLIERS_FILE_NAME)
 
     # Load dataset of FAOSTAT metadata.
-    metadata = catalog.Dataset(garden_metadata_dir)
+    metadata: catalog.Dataset = paths.load_dependency(f"{NAMESPACE}_metadata")
 
-    # Load and prepare dataset, items, element-units, and countries metadata.
-    datasets_metadata = pd.DataFrame(metadata["datasets"]).reset_index()
-    datasets_metadata = datasets_metadata[datasets_metadata["dataset"] == dataset_short_name].reset_index(drop=True)
+    # Load dataset, items, element-units, and countries metadata.
+    dataset_metadata = pd.DataFrame(metadata["datasets"]).loc[dataset_short_name].to_dict()
     items_metadata = pd.DataFrame(metadata["items"]).reset_index()
     items_metadata = items_metadata[items_metadata["dataset"] == dataset_short_name].reset_index(drop=True)
     elements_metadata = pd.DataFrame(metadata["elements"]).reset_index()
     elements_metadata = elements_metadata[elements_metadata["dataset"] == dataset_short_name].reset_index(drop=True)
     countries_metadata = pd.DataFrame(metadata["countries"]).reset_index()
+    amendments = parse_amendments_table(amendments=metadata["amendments"], dataset_short_name=dataset_short_name)
 
-    # Load file of detected outliers.
-    with open(outliers_file, "r") as _json_file:
-        outliers = json.loads(_json_file.read())
-
-    ####################################################################################################################
+    #
     # Process data.
-    ####################################################################################################################
-
+    #
     # Harmonize items and elements, and clean data.
     data = harmonize_items(df=data, dataset_short_name=dataset_short_name)
     data = harmonize_elements(df=data)
@@ -353,6 +339,7 @@ def run(dest_dir: str) -> None:
         items_metadata=items_metadata,
         elements_metadata=elements_metadata,
         countries_metadata=countries_metadata,
+        amendments=amendments,
     )
 
     # Include number of slaughtered animals in total meat (which is missing).
@@ -367,7 +354,7 @@ def run(dest_dir: str) -> None:
     # Add yield (production per area) to aggregate regions.
     data = add_yield_to_aggregate_regions(data)
 
-    # Remove outliers from data.
+    # Remove outliers (this step needs to happen after creating regions and per capita variables).
     data = remove_outliers(data, outliers=outliers)
 
     # Create a long table (with item code and element code as part of the index).
@@ -376,38 +363,20 @@ def run(dest_dir: str) -> None:
     # Create a wide table (with only country and year as index).
     data_table_wide = prepare_wide_table(data=data)
 
-    ####################################################################################################################
+    #
     # Save outputs.
-    ####################################################################################################################
-
-    # Initialize new garden dataset.
-    dataset_garden = catalog.Dataset.create_empty(dest_dir)
-    # Prepare metadata for new garden dataset (starting with the metadata from the meadow version).
-    dataset_garden_metadata = deepcopy(dataset_meadow.metadata)
-    dataset_garden_metadata.version = VERSION
-    dataset_garden_metadata.description = datasets_metadata["owid_dataset_description"].item()
-    dataset_garden_metadata.title = datasets_metadata["owid_dataset_title"].item()
-    # Add metadata to dataset.
-    dataset_garden.metadata = dataset_garden_metadata
-    # Create new dataset in garden.
-    dataset_garden.save()
-
-    # Prepare metadata for new garden long table (starting with the metadata from the meadow version).
-    data_table_long.metadata = deepcopy(data_table_meadow.metadata)
-    data_table_long.metadata.title = dataset_garden_metadata.title
-    data_table_long.metadata.description = dataset_garden_metadata.description
-    data_table_long.metadata.primary_key = list(data_table_long.index.names)
-    data_table_long.metadata.dataset = dataset_garden_metadata
-    # Add long table to the dataset (no need to repack, since columns already have optimal dtypes).
-    dataset_garden.add(data_table_long, repack=False)
-
-    # Prepare metadata for new garden wide table (starting with the metadata from the long table).
-    # Add wide table to the dataset.
-    data_table_wide.metadata = deepcopy(data_table_long.metadata)
-
-    data_table_wide.metadata.title += ADDED_TITLE_TO_WIDE_TABLE
-    data_table_wide.metadata.short_name += "_flat"
-    data_table_wide.metadata.primary_key = list(data_table_wide.index.names)
-
-    # Add wide table to the dataset (no need to repack, since columns already have optimal dtypes).
-    dataset_garden.add(data_table_wide, repack=False)
+    #
+    # Update tables metadata.
+    data_table_long.metadata.short_name = dataset_short_name
+    data_table_long.metadata.title = dataset_metadata["owid_dataset_title"]
+    data_table_wide.metadata.short_name = f"{dataset_short_name}_flat"
+    data_table_wide.metadata.title = dataset_metadata["owid_dataset_title"] + ADDED_TITLE_TO_WIDE_TABLE
+    # Initialise new garden dataset.
+    ds_garden = create_dataset(
+        dest_dir=dest_dir, tables=[data_table_long, data_table_wide], default_metadata=ds_meadow.metadata
+    )
+    # Update dataset metadata.
+    ds_garden.metadata.description = dataset_metadata["owid_dataset_description"]
+    ds_garden.metadata.title = dataset_metadata["owid_dataset_title"]
+    # Create garden dataset.
+    ds_garden.save()

@@ -14,7 +14,6 @@ This module contains:
 import itertools
 import json
 import sys
-from copy import deepcopy
 from pathlib import Path
 from typing import Dict, List, Union, cast
 
@@ -23,20 +22,26 @@ import pandas as pd
 import structlog
 from owid import catalog, repack  # type: ignore
 from owid.datautils import dataframes
+from owid.datautils.io import load_json
 from tqdm.auto import tqdm
 
 from etl.data_helpers import geo
-from etl.paths import DATA_DIR, REFERENCE_DATASET, STEP_DIR
+from etl.helpers import PathFinder, create_dataset
+from etl.paths import DATA_DIR, REFERENCE_DATASET
 
 # Initialise log.
 log = structlog.get_logger()
 
-# Namespace and version that will be assumed in all garden steps.
-NAMESPACE = Path(__file__).parent.parent.name
-VERSION = Path(__file__).parent.name
+# Define path to current folder, namespace and version of all datasets in this folder.
+CURRENT_DIR = Path(__file__).parent
+NAMESPACE = CURRENT_DIR.parent.name
+VERSION = CURRENT_DIR.name
 
-# Path to file containing information of the latest versions of the relevant datasets.
-LATEST_VERSIONS_FILE = STEP_DIR / "data" / "garden" / NAMESPACE / VERSION / "versions.csv"
+# Name of FAOSTAT metadata dataset.
+FAOSTAT_METADATA_SHORT_NAME = f"{NAMESPACE}_metadata"
+
+# Name of file containing detected outliers (that should be in the same folder as the current file).
+OUTLIERS_FILE_NAME = "detected_outliers.json"
 
 # Elements and items.
 
@@ -272,85 +277,28 @@ FLAGS_RANKING = (
         data=[
             # FAO uses nan flag for official data; in our datasets we will replace nans by FLAG_OFFICIAL_DATA.
             (np.nan, "Official data"),
-            ("S", "Standardized data"),
-            ("X", "International reliable sources"),
-            (
-                "W",
-                "Data reported on country official publications or web sites (Official) or trade country files",
-            ),
-            ("Q", "Official data reported on FAO Questionnaires from countries"),
-            (
-                "Qm",
-                "Official data from questionnaires and/or national sources and/or COMTRADE (reporters)",
-            ),
-            ("E", "Expert sources from FAO (including other divisions)"),
-            (
-                "I",
-                "Country data reported by International Organizations where the country is a member (Semi-official) "
-                "- WTO, EU, UNSD, etc.",
-            ),
-            (
-                "A",
-                "Aggregate, may include official, semi-official, estimated or calculated data",
-            ),
-            ("_A", "Normal value"),
-            ("P", "Provisional official data"),
-            ("_P", "Provisional value"),
-            ("Fb", "Data obtained as a balance"),
-            ("Fk", "Calculated data on the basis of official figures"),
-            ("FC", "Calculated data"),
-            ("Fc", "Calculated data"),
-            ("Cv", "Calculated through value"),
-            ("F", "FAO estimate"),
-            ("_E", "Estimated value"),
-            ("R", "Estimated data using trading partners database"),
-            ("Fm", "Manual Estimation"),
-            ("*", "Unofficial figure"),
-            ("Im", "FAO data based on imputation methodology"),
-            ("_I", "Imputed value (CCSA definition)"),
-            (
-                "Z",
-                "When the Fertilizer Utilization Account (FUA) does not balance due to utilization from stockpiles, "
-                "apparent consumption has been set to zero",
-            ),
-            ("SD", "Statistical Discrepancy"),
-            ("Bk", "Break in series"),
-            ("NR", "Not reported"),
-            ("M", "Data not available"),
-            ("NV", "Data not available"),
-            ("_O", "Missing value"),
-            ("_V", "Unvalidated value"),
-            ("B", "Unknown flag"),
-            ("_L", "Unknown flag"),
-            ("_M", "Unknown flag"),
-            ("_U", "Unknown flag"),
-            ("w", "Unknown flag"),
-            # The definition of flag "_" exists, but it's empty.
-            ("_", ""),
+            ("A", "Official figure"),
+            ("X", "Figure from international organizations"),
+            ("C", "Aggregate, may include official, semi-official, estimated or calculated data"),
+            ("P", "Provisional value"),
+            ("I", "Imputed value"),
+            ("E", "Estimated value"),
+            ("F", "Forecast value"),
+            ("T", "Unofficial figure"),
+            ("B", "Time series break"),
+            ("N", "Not significant (negligible)"),
+            ("U", "Low reliability"),
+            ("L", "Missing value; data exist"),
+            ("O", "Missing value"),
+            ("M", "Missing value (data cannot exist, not applicable)"),
+            ("Q", "Missing value; suppressed"),
+            ("V", "Unvalidated value"),
+            ("Fp", "Unknown flag"),
         ],
     )
     .reset_index()
     .rename(columns={"index": "ranking"})
 )
-
-
-# Amendments to apply to data values.
-# They will only be applied if "value" column is of type "category".
-VALUE_AMENDMENTS = {
-    # Replace values given as upper bounds (e.g. "<0.1") by the average between 0 and that value.
-    "<0.1": "0.05",
-    "<2.5": "1.25",
-    "<0.5": "0.25",
-    # Remove spurious comma values (this could be done simply by .str.replace(",", ""), however, given that it happens
-    # only in a few cases, it seems safer to explicitly correct them here).
-    "1,173.92": "1173.92",
-    "1,688.37": "1688.37",
-    "1,439.14": "1439.14",
-    "1,248.25": "1248.25",
-    "1,775.32": "1775.32",
-    # Replace missing values by nan.
-    "N": np.nan,
-}
 
 # Additional descriptions.
 
@@ -550,8 +498,10 @@ def harmonize_countries(data: pd.DataFrame, countries_metadata: pd.DataFrame) ->
     data["area_code"] = data["area_code"].astype(int)
 
     # Sanity check.
-    error = "Mismatch between fao_country in data and in metadata."
-    assert (data["fao_country"].astype(str) == data["fao_country_check"]).all(), error
+    country_mismatch = data[(data["fao_country"].astype(str) != data["fao_country_check"])]
+    if len(country_mismatch) > 0:
+        faulty_mapping = country_mismatch.set_index("fao_country").to_dict()["fao_country_check"]
+        log.warning(f"Mismatch between fao_country in data and in metadata: {faulty_mapping}")
     data = data.drop(columns="fao_country_check")
 
     # Remove unmapped countries.
@@ -1467,11 +1417,8 @@ def add_per_capita_variables(data: pd.DataFrame, elements_metadata: pd.DataFrame
     return data
 
 
-def clean_data_values(values: pd.Series) -> pd.Series:
-    """Fix spurious data values (defined in VALUE_AMENDMENTS) and make values a float column.
-
-    Note: The mapping of VALUE_AMENDMENTS will only be applied if the input series of values is of type "category".
-    At the moment, this fixes issues only in faostat_sdgb dataset.
+def clean_data_values(values: pd.Series, amendments: Dict[str, str]) -> pd.Series:
+    """Fix spurious data values (defined in value_amendments.csv) and make values a float column.
 
     Parameters
     ----------
@@ -1485,18 +1432,18 @@ def clean_data_values(values: pd.Series) -> pd.Series:
 
     """
     values_clean = values.copy()
-    if values_clean.dtype == "category":
-        # Replace spurious values by either nan, or their correct numeric values (defined in VALUE_AMENDMENTS).
+    if len(amendments) > 0:
         values_clean = dataframes.map_series(
             series=values_clean,
-            mapping=VALUE_AMENDMENTS,
+            mapping=amendments,
             warn_on_missing_mappings=False,
-            warn_on_unused_mappings=False,
+            warn_on_unused_mappings=True,
+            show_full_warning=True,
         )
 
     # Convert all numbers into numeric.
     # Note: If this step fails with a ValueError, it may be because other spurious values have been introduced.
-    # If so, add them to the VALUE_AMENDMENTS.
+    # If so, add them to value_amendments.csv and re-run faostat_metadata.
     values_clean = values_clean.astype(float)
 
     return values_clean
@@ -1507,6 +1454,7 @@ def clean_data(
     items_metadata: pd.DataFrame,
     elements_metadata: pd.DataFrame,
     countries_metadata: pd.DataFrame,
+    amendments: Dict[str, str],
 ) -> pd.DataFrame:
     """Process data (with already harmonized item codes and element codes), before adding aggregate regions and
     per-capita variables.
@@ -1528,6 +1476,8 @@ def clean_data(
         Elements metadata (from the metadata dataset) after selecting elements for only the relevant domain.
     countries_metadata : pd.DataFrame
         Countries metadata (from the metadata dataset).
+    amendments : dict
+        Value amendments (if any).
 
     Returns
     -------
@@ -1537,8 +1487,8 @@ def clean_data(
     """
     data = data.copy()
 
-    # Fix spurious data values (applying mapping in VALUE_AMENDMENTS) and ensure column of values is float.
-    data["value"] = clean_data_values(data["value"])
+    # Fix spurious data values (applying mapping in value_amendments.csv) and ensure column of values is float.
+    data["value"] = clean_data_values(data["value"], amendments=amendments)
 
     # Convert nan flags into "official" (to avoid issues later on when dealing with flags).
     data["flag"] = pd.Series(
@@ -1554,6 +1504,18 @@ def clean_data(
             "recipient_country_code": "area_code",
         }
     )
+
+    # Dataset faostat_wcad doesn't have a year column, but a "census_year", which has intervals like "2002-2003"
+    if "census_year" in data.columns:
+        if data["census_year"].astype(str).str.contains("-.{4}/", regex=True).any():
+            log.warning(
+                "Column 'census_year' in dataset 'faostat_wcad' contains values that need to be properly analysed "
+                "and processed, e.g. 1976-1977/1980-1981. For the moment, we take the first 4 digits as the year."
+            )
+
+        # Remove rows that don't have a census year, and take the first 4 digits
+        data = data.dropna(subset="census_year").reset_index(drop=True)
+        data["year"] = data["census_year"].astype(str).str[0:4].astype(int)
 
     # Ensure year column is integer (sometimes it is given as a range of years, e.g. 2013-2015).
     data["year"] = clean_year_column(data["year"])
@@ -1827,55 +1789,58 @@ def _variable_name_map(data: pd.DataFrame, column: str) -> Dict[str, str]:
     return pivot.map(lambda x: list(x)[0]).to_dict()  # type: ignore
 
 
+def parse_amendments_table(amendments: catalog.Table, dataset_short_name: str):
+    amendments = pd.DataFrame(amendments).reset_index()
+    # Create a dictionary mapping spurious values to amended values.
+    amendments = (
+        amendments[amendments["dataset"] == dataset_short_name]
+        .drop(columns="dataset")
+        .set_index("spurious_value")
+        .to_dict()["new_value"]
+    )
+    # For some reason, empty values are loaded in the table as None. Change them to nan.
+    amendments = {old: new if new is not None else np.nan for old, new in amendments.items()}
+
+    return amendments
+
+
 def run(dest_dir: str) -> None:
-    ####################################################################################################################
-    # Common definitions.
-    ####################################################################################################################
-
-    # Assume dest_dir is a path to the step to be run, e.g. "faostat_qcl", and get the dataset short name from it.
-    dataset_short_name = Path(dest_dir).name
-    # Path to dataset of FAOSTAT metadata.
-    garden_metadata_dir = DATA_DIR / "garden" / NAMESPACE / VERSION / f"{NAMESPACE}_metadata"
-
-    # Path to outliers file.
-    outliers_file = STEP_DIR / "data" / "garden" / NAMESPACE / VERSION / "detected_outliers.json"
-
-    ####################################################################################################################
+    #
     # Load data.
-    ####################################################################################################################
+    #
+    # Fetch the dataset short name from dest_dir.
+    dataset_short_name = Path(dest_dir).name
 
-    # Load file of versions.
-    latest_versions = pd.read_csv(LATEST_VERSIONS_FILE).set_index(["channel", "dataset"])
+    # Define path to current step file.
+    current_step_file = (CURRENT_DIR / dataset_short_name).with_suffix(".py")
 
-    # Path to latest dataset in meadow for current FAOSTAT domain.
-    meadow_version = latest_versions.loc["meadow", dataset_short_name].item()
-    meadow_data_dir = DATA_DIR / "meadow" / NAMESPACE / meadow_version / dataset_short_name
+    # Get paths and naming conventions for current data step.
+    paths = PathFinder(current_step_file.as_posix())
+
     # Load latest meadow dataset and keep its metadata.
-    dataset_meadow = catalog.Dataset(meadow_data_dir)
+    ds_meadow: catalog.Dataset = paths.load_dependency(dataset_short_name)
     # Load main table from dataset.
-    data_table_meadow = dataset_meadow[dataset_short_name]
-    data = pd.DataFrame(data_table_meadow).reset_index()
+    tb_meadow = ds_meadow[dataset_short_name]
+    data = pd.DataFrame(tb_meadow).reset_index()
+
+    # Load file of detected outliers.
+    outliers = load_json(paths.directory / OUTLIERS_FILE_NAME)
 
     # Load dataset of FAOSTAT metadata.
-    metadata = catalog.Dataset(garden_metadata_dir)
+    metadata: catalog.Dataset = paths.load_dependency(f"{NAMESPACE}_metadata")
 
-    # Load and prepare dataset, items, element-units, and countries metadata.
-    datasets_metadata = pd.DataFrame(metadata["datasets"]).reset_index()
-    datasets_metadata = datasets_metadata[datasets_metadata["dataset"] == dataset_short_name].reset_index(drop=True)
+    # Load dataset, items, element-units, countries metadata, and value amendments.
+    dataset_metadata = pd.DataFrame(metadata["datasets"]).loc[dataset_short_name].to_dict()
     items_metadata = pd.DataFrame(metadata["items"]).reset_index()
     items_metadata = items_metadata[items_metadata["dataset"] == dataset_short_name].reset_index(drop=True)
     elements_metadata = pd.DataFrame(metadata["elements"]).reset_index()
     elements_metadata = elements_metadata[elements_metadata["dataset"] == dataset_short_name].reset_index(drop=True)
     countries_metadata = pd.DataFrame(metadata["countries"]).reset_index()
+    amendments = parse_amendments_table(amendments=metadata["amendments"], dataset_short_name=dataset_short_name)
 
-    # Load file of detected outliers.
-    with open(outliers_file, "r") as _json_file:
-        outliers = json.loads(_json_file.read())
-
-    ####################################################################################################################
+    #
     # Process data.
-    ####################################################################################################################
-
+    #
     # Harmonize items and elements, and clean data.
     data = harmonize_items(df=data, dataset_short_name=dataset_short_name)
     data = harmonize_elements(df=data)
@@ -1886,6 +1851,7 @@ def run(dest_dir: str) -> None:
         items_metadata=items_metadata,
         elements_metadata=elements_metadata,
         countries_metadata=countries_metadata,
+        amendments=amendments,
     )
 
     # Add data for aggregate regions.
@@ -1903,38 +1869,20 @@ def run(dest_dir: str) -> None:
     # Create a wide table (with only country and year as index).
     data_table_wide = prepare_wide_table(data=data)
 
-    ####################################################################################################################
+    #
     # Save outputs.
-    ####################################################################################################################
-
-    # Initialize new garden dataset.
-    dataset_garden = catalog.Dataset.create_empty(dest_dir)
-    # Prepare metadata for new garden dataset (starting with the metadata from the meadow version).
-    dataset_garden_metadata = deepcopy(dataset_meadow.metadata)
-    dataset_garden_metadata.version = VERSION
-    dataset_garden_metadata.description = datasets_metadata["owid_dataset_description"].item()
-    dataset_garden_metadata.title = datasets_metadata["owid_dataset_title"].item()
-    # Add metadata to dataset.
-    dataset_garden.metadata = dataset_garden_metadata
-    # Create new dataset in garden.
-    dataset_garden.save()
-
-    # Prepare metadata for new garden long table (starting with the metadata from the meadow version).
-    data_table_long.metadata = deepcopy(data_table_meadow.metadata)
-    data_table_long.metadata.title = dataset_garden_metadata.title
-    data_table_long.metadata.description = dataset_garden_metadata.description
-    data_table_long.metadata.primary_key = list(data_table_long.index.names)
-    data_table_long.metadata.dataset = dataset_garden_metadata
-    # Add long table to the dataset (no need to repack, since columns already have optimal dtypes).
-    dataset_garden.add(data_table_long, repack=False)
-
-    # Prepare metadata for new garden wide table (starting with the metadata from the long table).
-    # Add wide table to the dataset.
-    data_table_wide.metadata = deepcopy(data_table_long.metadata)
-
-    data_table_wide.metadata.title += ADDED_TITLE_TO_WIDE_TABLE
-    data_table_wide.metadata.short_name += "_flat"
-    data_table_wide.metadata.primary_key = list(data_table_wide.index.names)
-
-    # Add wide table to the dataset (no need to repack, since columns already have optimal dtypes).
-    dataset_garden.add(data_table_wide, repack=False)
+    #
+    # Update tables metadata.
+    data_table_long.metadata.short_name = dataset_short_name
+    data_table_long.metadata.title = dataset_metadata["owid_dataset_title"]
+    data_table_wide.metadata.short_name = f"{dataset_short_name}_flat"
+    data_table_wide.metadata.title = dataset_metadata["owid_dataset_title"] + ADDED_TITLE_TO_WIDE_TABLE
+    # Initialise new garden dataset.
+    ds_garden = create_dataset(
+        dest_dir=dest_dir, tables=[data_table_long, data_table_wide], default_metadata=ds_meadow.metadata
+    )
+    # Update dataset metadata.
+    ds_garden.metadata.description = dataset_metadata["owid_dataset_description"]
+    ds_garden.metadata.title = dataset_metadata["owid_dataset_title"]
+    # Create garden dataset.
+    ds_garden.save()

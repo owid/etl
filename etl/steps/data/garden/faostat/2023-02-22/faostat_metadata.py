@@ -7,13 +7,16 @@ This step reads from:
 * Custom datasets file ('./custom_datasets.csv').
 * Custom elements and units file ('./custom_elements_and_units.csv').
 * Custom items file ('./custom_items.csv').
+* Value amendments file ('./value_amendments.csv').
 * Each of the individual meadow datasets. They are loaded to extract their countries, items, elements and units, and
   some sanity checks are performed.
 
 This step will:
-* Output a dataset (to be loaded by all garden datasets) with tables 'countries, 'datasets', 'elements' and 'items'.
+* Output a dataset (to be loaded by all garden datasets) with tables 'countries, 'datasets', 'elements', 'items'
+  and 'amendments'.
 * Apply sanity checks to countries, elements, items, and units.
 * Apply custom names and descriptions to datasets, elements, items and units.
+* Check that spurious values in value_amendments.csv are in the data, and whether there are new spurious values.
 * Harmonize country names.
 * Find countries that correspond to aggregates of other countries (e.g. 'Melanesia').
 * Ensure there are no degeneracies within a dataset (i.e. ensure each index is unique).
@@ -41,16 +44,17 @@ above). For this reason, raise a warning only when there is a reasonable number 
 import json
 import sys
 from copy import deepcopy
+from pathlib import Path
 from typing import Dict, List, Tuple, cast
 
 import pandas as pd
 from owid import catalog
 from owid.datautils import dataframes, io
 from shared import (
+    CURRENT_DIR,
+    FAOSTAT_METADATA_SHORT_NAME,
     FLAGS_RANKING,
-    LATEST_VERSIONS_FILE,
     NAMESPACE,
-    VERSION,
     harmonize_elements,
     harmonize_items,
     log,
@@ -58,45 +62,10 @@ from shared import (
 )
 from tqdm.auto import tqdm
 
-from etl.paths import DATA_DIR, STEP_DIR
-
-# Define short name for output dataset.
-DATASET_SHORT_NAME = f"{NAMESPACE}_metadata"
+from etl.helpers import PathFinder
 
 # Minimum number of issues in the comparison of items and item codes from data and metadata to raise a warning.
-N_ISSUES_ON_ITEMS_FOR_WARNING = 10
-
-
-def load_latest_data_table_for_dataset(dataset_short_name: str) -> catalog.Table:
-    """Load data table (in long format) from the latest version of a dataset for a given domain.
-
-    Parameters
-    ----------
-    dataset_short_name : str
-        Dataset short name (e.g. 'faostat_qcl').
-
-    Returns
-    -------
-    table : catalog.Table
-        Latest version of table in long format for given domain.
-
-    """
-    # Path to folder with all versions of meadow datasets for FAOSTAT.
-    meadow_dir = DATA_DIR / "meadow" / NAMESPACE
-    # Load file of versions.
-    latest_versions = pd.read_csv(LATEST_VERSIONS_FILE).set_index(["channel", "dataset"])
-    # Find latest meadow version for given dataset.
-    dataset_version = latest_versions.loc["meadow", dataset_short_name].item()
-    # Path to latest dataset folder.
-    dataset_path = meadow_dir / dataset_version / dataset_short_name
-    assert dataset_path.is_dir(), f"Dataset {dataset_short_name} not found in meadow."
-    # Load dataset.
-    dataset = catalog.Dataset(dataset_path)
-    assert len(dataset.table_names) == 1
-    # Load table in long format from dataset.
-    table = dataset[dataset_short_name]
-
-    return table
+N_ISSUES_ON_ITEMS_FOR_WARNING = 1
 
 
 def create_dataset_descriptions_dataframe_for_domain(table: catalog.Table, dataset_short_name: str) -> pd.DataFrame:
@@ -169,17 +138,19 @@ def clean_global_dataset_descriptions_dataframe(
         suffixes=("_new", "_old"),
     )
 
-    changed_titles = datasets_df[datasets_df["fao_dataset_title_old"] != datasets_df["fao_dataset_title_new"]]
-    changed_descriptions = datasets_df[
-        datasets_df["fao_dataset_description_old"] != datasets_df["fao_dataset_description_new"]
+    changed_titles = datasets_df[
+        datasets_df["fao_dataset_title_old"].fillna("") != datasets_df["fao_dataset_title_new"].fillna("")
     ]
+    changed_descriptions = datasets_df[
+        datasets_df["fao_dataset_description_old"].fillna("") != datasets_df["fao_dataset_description_new"].fillna("")
+    ]
+
     if len(changed_titles) > 0:
         log.warning(f"{len(changed_titles)} domains have changed titles, consider updating custom_datasets.csv.")
     if len(changed_descriptions) > 0:
         log.warning(
             f"{len(changed_descriptions)} domains have changed descriptions. " f"Consider updating custom_datasets.csv."
         )
-
     datasets_df = datasets_df.drop(columns=["fao_dataset_title_old", "fao_dataset_description_old"]).rename(
         columns={
             "fao_dataset_title_new": "fao_dataset_title",
@@ -339,7 +310,7 @@ def clean_global_items_dataframe(items_df: pd.DataFrame, custom_items: pd.DataFr
     ]
     if len(changed_descriptions) > 0:
         log.warning(
-            f"WARNING: {len(changed_descriptions)} domains have changed descriptions. "
+            f"{len(changed_descriptions)} domains have changed item descriptions. "
             f"Consider updating custom_items.csv."
         )
 
@@ -347,11 +318,13 @@ def clean_global_items_dataframe(items_df: pd.DataFrame, custom_items: pd.DataFr
         columns={"fao_item_description_new": "fao_item_description"}
     )
 
-    error = "Item names may have changed with respect to custom items file. Update custom items file."
-    assert (
+    # Check that item names have not changed.
+    # NOTE: This condition used to raise an error if not fulfilled. Consider making it an assertion.
+    if not (
         items_df[items_df["fao_item_check"].notnull()]["fao_item_check"]
         == items_df[items_df["fao_item_check"].notnull()]["fao_item"]
-    ).all(), error
+    ).all():
+        log.warning("Item names may have changed with respect to custom items file. Update custom items file.")
     items_df = items_df.drop(columns=["fao_item_check"])
 
     # Assign original FAO name to all owid items that do not have a custom name.
@@ -539,7 +512,8 @@ def clean_global_elements_dataframe(elements_df: pd.DataFrame, custom_elements: 
     ]
     if len(changed_descriptions) > 0:
         log.warning(
-            f"{len(changed_descriptions)} domains have changed descriptions. " f"Consider updating custom_elements.csv."
+            f"{len(changed_descriptions)} domains have changed element descriptions. "
+            f"Consider updating custom_elements.csv."
         )
 
     elements_df = elements_df.drop(columns=["fao_unit_old", "fao_element_description_old"]).rename(
@@ -595,10 +569,32 @@ def clean_global_elements_dataframe(elements_df: pd.DataFrame, custom_elements: 
     return elements_df
 
 
+def check_countries_to_exclude_or_harmonize(
+    countries_in_data: pd.DataFrame, excluded_countries: List[str], countries_harmonization: Dict[str, str]
+) -> None:
+    # Check that all excluded countries are in the data.
+    unknown_excluded_countries = set(excluded_countries) - set(countries_in_data["fao_country"])
+    error = (
+        f"Uknown excluded countries (to be removed from faostat.excluded_countries.json): {unknown_excluded_countries}"
+    )
+    assert len(unknown_excluded_countries) == 0, error
+
+    # Check that all countries to be harmonized are in the data.
+    unknown_countries_to_harmonize = set(countries_harmonization) - set(countries_in_data["fao_country"])
+    error = f"Unknown countries to be harmonized (to be removed or edited in faostat.countries.json): {unknown_countries_to_harmonize}"
+    assert len(unknown_countries_to_harmonize) == 0, error
+
+    # Check that all countries in the data are either to be excluded or to be harmonized.
+    unknown_countries = set(countries_in_data["fao_country"]) - set(excluded_countries) - set(countries_harmonization)
+    error = f"Unknown countries in the data (to be added either to faostat.excluded_countries.json or to faostat.countries.json): {unknown_countries}"
+    assert len(unknown_countries) == 0, error
+
+
 def clean_global_countries_dataframe(
     countries_in_data: pd.DataFrame,
     country_groups: Dict[str, List[str]],
     countries_harmonization: Dict[str, str],
+    excluded_countries: List[str],
 ) -> pd.DataFrame:
     """Clean dataframe of countries gathered from the data of the individual domains, harmonize country names (and
     country names of members of regions), and create a clean global countries dataframe.
@@ -611,6 +607,8 @@ def clean_global_countries_dataframe(
         Countries and their members, gathered from the data.
     countries_harmonization : dict
         Mapping of country names (from FAO names to OWID names).
+    excluded_countries : list
+        Country names to be ignored.
 
     Returns
     -------
@@ -620,22 +618,12 @@ def clean_global_countries_dataframe(
     """
     countries_df = countries_in_data.copy()
 
-    # Remove duplicates of area_code and fao_country, ensuring to keep m49_code when it is given.
-    if "m49_code" in countries_df.columns:
-        # Sort so that nans in m49_code are at the bottom, and then keep only the first duplicated row.
-        countries_df = countries_df.sort_values("m49_code")
-    countries_df = (
-        countries_df.drop_duplicates(subset=["area_code", "fao_country"], keep="first")
-        .sort_values(["area_code"])
-        .reset_index(drop=True)
+    # Sanity checks.
+    check_countries_to_exclude_or_harmonize(
+        countries_in_data=countries_in_data,
+        excluded_countries=excluded_countries,
+        countries_harmonization=countries_harmonization,
     )
-
-    countries_not_harmonized = sorted(set(countries_df["fao_country"]) - set(countries_harmonization))
-    if len(countries_not_harmonized) > 0:
-        log.info(
-            f"{len(countries_not_harmonized)} countries not included in countries file. "
-            f"They will not have data after countries are harmonized in a further step."
-        )
 
     # Harmonize country groups and members.
     country_groups_harmonized = {
@@ -648,9 +636,10 @@ def clean_global_countries_dataframe(
     countries_df["country"] = dataframes.map_series(
         series=countries_df["fao_country"],
         mapping=countries_harmonization,
-        warn_on_unused_mappings=True,
+        warn_on_missing_mappings=False,
+        warn_on_unused_mappings=False,
         make_unmapped_values_nan=True,
-        show_full_warning=False,
+        show_full_warning=True,
     )
 
     # Add country members to countries dataframe.
@@ -693,6 +682,7 @@ def create_table(df: pd.DataFrame, short_name: str, index_cols: List[str]) -> ca
 
     # Set indexes and other necessary metadata.
     table = table.set_index(index_cols, verify_integrity=True)
+
     table.metadata.short_name = short_name
     table.metadata.primary_key = index_cols
 
@@ -749,12 +739,62 @@ def check_that_all_flags_in_dataset_are_in_ranking(table: catalog.Table, metadat
         raise AssertionError("Flags in dataset not found in FLAGS_RANKING. Manually add those flags.")
 
 
+def check_definitions_in_value_amendments(
+    table: catalog.Table, dataset_short_name: str, value_amendments: pd.DataFrame
+) -> None:
+    """Check definitions in the value_amendments.csv file.
+
+    This function will assert that:
+    * All spurious values defined in the file are still found in the data.
+    * There are no unexpected spurious values in the data.
+
+    Spurious values are only searched for in "value" column if it has "category" dtype.
+    See regular expression below used to search for spurious values.
+
+    Parameters
+    ----------
+    table : catalog.Table
+        _description_
+    dataset_short_name : str
+        _description_
+    value_amendments : pd.DataFrame
+        _description_
+    """
+    # Regular expression used to search for spurious values in the "value" column.
+    regex_spurious_values = "<|,|N"
+
+    # Select value amendments for the specified dataset.
+    _value_amendments = value_amendments[value_amendments["dataset"] == dataset_short_name]
+    if not _value_amendments.empty:
+        # Check that spurious values defined in value_amendments.csv are indeed found in the data.
+        expected_spurious_values_not_found = set(_value_amendments["spurious_value"]) - set(table["value"])
+        error = (
+            f"Expected spurious values {expected_spurious_values_not_found} not found in {dataset_short_name}. "
+            f"Remove them from value_amendments.csv."
+        )
+        assert len(expected_spurious_values_not_found) == 0, error
+
+    # Search for additional spurious values (only if data values are of "category" type).
+    if table["value"].dtype == "category":
+        # Find any possible spurious values in the data.
+        spurious_values = (
+            table[table["value"].astype(str).str.contains(regex_spurious_values, regex=True)]["value"].unique().tolist()
+        )
+        # Find if any of those were not accounted for already in value_amendments.
+        new_spurious_values = set(spurious_values) - set(_value_amendments["spurious_value"])
+        error = f"Unexpected spurious values found in {dataset_short_name}. Add the following values to value_amendments.csv: {new_spurious_values}"
+        assert len(new_spurious_values) == 0, error
+
+
 def process_metadata(
+    paths: PathFinder,
     metadata: catalog.Dataset,
     custom_datasets: pd.DataFrame,
     custom_elements: pd.DataFrame,
     custom_items: pd.DataFrame,
     countries_harmonization: Dict[str, str],
+    excluded_countries: List[str],
+    value_amendments: pd.DataFrame,
 ) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """Apply various sanity checks, gather data (about dataset, item, element and unit names and descriptions) from all
     domains, compare with data from its corresponding metadata file, and create clean dataframes of metadata about
@@ -772,6 +812,10 @@ def process_metadata(
         Data from custom_items.csv file.
     countries_harmonization : dict
         Data from faostat.countries.json file.
+    excluded_countries : list
+        Data from faostat.excluded_countries.json file.
+    value_amendments : pd.DataFrame
+        Data from value_amendments.csv file.
 
     Returns
     -------
@@ -812,10 +856,12 @@ def process_metadata(
     # Initialise list of all countries in all datasets, and all country groups.
     countries_in_data = pd.DataFrame({"area_code": [], "fao_country": []}).astype({"area_code": "Int64"})
     country_groups_in_data: Dict[str, List[str]] = {}
+
     # Gather all variables from the latest version of each meadow dataset.
     for dataset_short_name in tqdm(dataset_short_names, file=sys.stdout):
         # Load latest meadow table for current dataset.
-        table = load_latest_data_table_for_dataset(dataset_short_name=dataset_short_name)
+        ds_latest: catalog.Dataset = paths.load_dependency(dataset_short_name)
+        table = ds_latest[dataset_short_name]
         df = pd.DataFrame(table.reset_index()).rename(
             columns={
                 "area": "fao_country",
@@ -824,27 +870,26 @@ def process_metadata(
             }
         )[["area_code", "fao_country"]]
 
-        # Column 'area_code' in faostat_sdgb is float instead of integer, and it does not agree with the usual area
-        # codes. For example, Afghanistan has area code 4.0 in faostat_sdgb, whereas in other dataset it is 2.
-        # It seems to be the UN M49 code.
-        # So we add this code as a new column to the countries dataframe, to be able to map sdgb area codes later on.
-        if df["area_code"].dtype == "float64":
-            sdgb_codes_df = (
-                metadata["faostat_sdgb_area"]
-                .reset_index()[["country_code", "m49_code"]]
-                .rename(columns={"country_code": "area_code"})
-            )
-            df = pd.merge(
-                df.rename(columns={"area_code": "m49_code"}),
-                sdgb_codes_df,
-                on="m49_code",
-                how="left",
-            )
-
         df["area_code"] = df["area_code"].astype("Int64")
 
-        check_that_all_flags_in_dataset_are_in_ranking(
-            table=table, metadata_for_flags=metadata[f"{dataset_short_name}_flag"]
+        # Temporary patch.
+        if dataset_short_name == "faostat_wcad":
+            error = (
+                "Dataset faostat_wcad had 'French Guiana' for area code 69 (unlike other datasets, that had "
+                "'French Guyana'). But this may no longer the case, so this patch in the code can be removed."
+            )
+            assert "French Guiana" in df["fao_country"].unique(), error
+            df["fao_country"] = dataframes.map_series(df["fao_country"], mapping={"French Guiana": "French Guyana"})
+
+        if f"{dataset_short_name}_flag" in metadata.table_names:
+            check_that_all_flags_in_dataset_are_in_ranking(
+                table=table, metadata_for_flags=metadata[f"{dataset_short_name}_flag"]
+            )
+
+        # Check if spurious values defined in value_amendments.csv are still in the data,
+        # and whether there are new spurious values to be amended.
+        check_definitions_in_value_amendments(
+            table=table, dataset_short_name=dataset_short_name, value_amendments=value_amendments
         )
 
         # Gather dataset descriptions, items, and element-units for current domain.
@@ -892,72 +937,77 @@ def process_metadata(
 
     datasets_df = clean_global_dataset_descriptions_dataframe(datasets_df=datasets_df, custom_datasets=custom_datasets)
     items_df = clean_global_items_dataframe(items_df=items_df, custom_items=custom_items)
-    elements_df = clean_global_elements_dataframe(elements_df=elements_df, custom_elements=custom_elements)
 
+    elements_df = clean_global_elements_dataframe(elements_df=elements_df, custom_elements=custom_elements)
     countries_df = clean_global_countries_dataframe(
         countries_in_data=countries_in_data,
         country_groups=country_groups_in_data,
         countries_harmonization=countries_harmonization,
+        excluded_countries=excluded_countries,
     )
 
     return countries_df, datasets_df, elements_df, items_df
 
 
 def run(dest_dir: str) -> None:
-    ####################################################################################################################
-    # Common definitions.
-    ####################################################################################################################
+    #
+    # Load data.
+    #
+    # Fetch the dataset short name from dest_dir.
+    dataset_short_name = Path(dest_dir).name
 
-    # Path to latest garden version for FAOSTAT.
-    garden_code_dir = STEP_DIR / "data" / "garden" / NAMESPACE / VERSION
+    # Define path to current step file.
+    current_step_file = (CURRENT_DIR / dataset_short_name).with_suffix(".py")
+
+    # Get paths and naming conventions for current data step.
+    paths = PathFinder(current_step_file.as_posix())
+
     # Path to file with custom dataset titles and descriptions.
-    custom_datasets_file = garden_code_dir / "custom_datasets.csv"
+    custom_datasets_file = paths.directory / "custom_datasets.csv"
     # Path to file with custom item names and descriptions.
-    custom_items_file = garden_code_dir / "custom_items.csv"
+    custom_items_file = paths.directory / "custom_items.csv"
     # Path to file with custom element and unit names and descriptions.
-    custom_elements_and_units_file = garden_code_dir / "custom_elements_and_units.csv"
-
-    # Load file of versions.
-    latest_versions = pd.read_csv(LATEST_VERSIONS_FILE).set_index(["channel", "dataset"])
-
-    # Find latest meadow version of dataset of FAOSTAT metadata.
-    metadata_version = latest_versions.loc["meadow", DATASET_SHORT_NAME].item()
-    metadata_path = DATA_DIR / "meadow" / NAMESPACE / metadata_version / DATASET_SHORT_NAME
-
-    # Countries file, with mapping from FAO names to OWID harmonized country names.
-    countries_file = garden_code_dir / f"{NAMESPACE}.countries.json"
-
-    ####################################################################################################################
-    # Load and process data.
-    ####################################################################################################################
+    custom_elements_and_units_file = paths.directory / "custom_elements_and_units.csv"
+    # Path to file with mapping from FAO names to OWID harmonized country names.
+    countries_file = paths.directory / f"{NAMESPACE}.countries.json"
+    # Path to file with list of excluded countries and regions.
+    excluded_countries_file = paths.directory / f"{NAMESPACE}.excluded_countries.json"
+    # Path to file with spurious values and amendments.
+    value_amendments_file = paths.directory / "value_amendments.csv"
 
     # Load metadata from meadow.
-    assert metadata_path.is_dir()
-    metadata = catalog.Dataset(metadata_path)
+    metadata: catalog.Dataset = paths.load_dependency(FAOSTAT_METADATA_SHORT_NAME)
 
-    # Load custom dataset names, items, and element-unit names.
+    # Load custom dataset names, items, element-unit names, and value amendments.
     custom_datasets = pd.read_csv(custom_datasets_file, dtype=str)
     custom_elements = pd.read_csv(custom_elements_and_units_file, dtype=str)
     custom_items = pd.read_csv(custom_items_file, dtype=str)
+    value_amendments = pd.read_csv(value_amendments_file, dtype=str)
 
-    # Load countries file.
+    # Load country mapping and excluded countries files.
     countries_harmonization = io.load_json(countries_file)
+    excluded_countries = io.load_json(excluded_countries_file)
 
+    #
+    # Process data.
+    #
     countries_df, datasets_df, elements_df, items_df = process_metadata(
+        paths=paths,
         metadata=metadata,
         custom_datasets=custom_datasets,
         custom_elements=custom_elements,
         custom_items=custom_items,
         countries_harmonization=countries_harmonization,
+        excluded_countries=excluded_countries,
+        value_amendments=value_amendments,
     )
 
-    ####################################################################################################################
+    #
     # Save outputs.
-    ####################################################################################################################
-
+    #
     # Initialize new garden dataset.
     dataset_garden = catalog.Dataset.create_empty(dest_dir)
-    dataset_garden.short_name = DATASET_SHORT_NAME
+    dataset_garden.short_name = FAOSTAT_METADATA_SHORT_NAME
     # Keep original dataset's metadata from meadow.
     dataset_garden.metadata = deepcopy(metadata.metadata)
     # Create new dataset in garden.
@@ -967,11 +1017,14 @@ def run(dest_dir: str) -> None:
     datasets_table = create_table(df=datasets_df, short_name="datasets", index_cols=["dataset"])
     items_table = create_table(df=items_df, short_name="items", index_cols=["dataset", "item_code"])
     elements_table = create_table(df=elements_df, short_name="elements", index_cols=["dataset", "element_code"])
-
     countries_table = create_table(df=countries_df, short_name="countries", index_cols=["area_code"])
+    amendments_table = catalog.Table(value_amendments, short_name="amendments").set_index(
+        ["dataset", "spurious_value"], verify_integrity=True
+    )
 
-    # Add tables to dataset (no need to repack, since columns already have optimal dtypes).
+    # Add tables to dataset.
     dataset_garden.add(datasets_table, repack=False)
     dataset_garden.add(items_table, repack=False)
     dataset_garden.add(elements_table, repack=False)
     dataset_garden.add(countries_table, repack=False)
+    dataset_garden.add(amendments_table, repack=False)
