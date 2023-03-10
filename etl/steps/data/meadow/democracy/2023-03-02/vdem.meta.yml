@@ -1402,4 +1402,7 @@ tables:
           It is based on the V-Dem variable v2x_genpp, and we expand it to cover more years for some countries.
 
           The variables ranges from 0 to 1 (most equal).
+      socgr_civ_libs_vdem_owid:
+        description: |-
+          This is a brand new variable.
 
