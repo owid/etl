@@ -1,3 +1,5 @@
+"""Generate GHE garden dataset"""
+
 import pandas as pd
 from owid.catalog import Dataset, Table
 from structlog import get_logger
@@ -71,14 +73,13 @@ def build_custom_age_groups(df: pd.DataFrame) -> pd.DataFrame:
 
     # Get two dfs: one with cause=self-harm, the other with the rest
     log.info("ghe: separate self-harm from other causes")
-    msk = df["cause"].isin(["Self-harm"])
+    msk = (df["cause"].isin(["Self-harm"])) & (df["age_group"] != "ALLAges")
     df_sh = df[msk].reset_index(drop=True).copy()
     df = df[~msk].reset_index(drop=True).copy()
 
     # Add population values for each dimension
     log.info("ghe: add population values")
     AGE_GROUPS_RANGES = {
-        "ALLAges": None,
         "YEARS0-1": [0, 1],
         "YEARS1-4": [1, 4],
         "YEARS5-9": [5, 9],
@@ -113,25 +114,24 @@ def build_custom_age_groups(df: pd.DataFrame) -> pd.DataFrame:
     # Map age groups to broader age groups
     log.info("ghe: create broader age groups")
     AGE_GROUPS = {
-        "ALLAges": "ALLAges",
-        "YEARS0-1": "YEARS10-14",
-        "YEARS1-4": "YEARS10-14",
-        "YEARS5-9": "YEARS10-14",
-        "YEARS10-14": "YEARS10-14",
+        "YEARS0-1": "YEARS0-14",
+        "YEARS1-4": "YEARS0-14",
+        "YEARS5-9": "YEARS0-14",
+        "YEARS10-14": "YEARS0-14",
         "YEARS15-19": "YEARS15-24",
         "YEARS20-24": "YEARS15-24",
-        "YEARS25-29": "YEARS25-39",
-        "YEARS30-34": "YEARS25-39",
-        "YEARS35-39": "YEARS25-39",
-        "YEARS40-44": "YEARS40-64",
-        "YEARS45-49": "YEARS40-64",
-        "YEARS50-54": "YEARS40-64",
-        "YEARS55-59": "YEARS40-64",
-        "YEARS60-64": "YEARS40-64",
-        "YEARS65-69": "YEARS65PLUS",
-        "YEARS70-74": "YEARS65PLUS",
-        "YEARS75-79": "YEARS65PLUS",
-        "YEARS80-84": "YEARS65PLUS",
+        "YEARS25-29": "YEARS25-34",
+        "YEARS30-34": "YEARS25-34",
+        "YEARS35-39": "YEARS35-44",
+        "YEARS40-44": "YEARS35-44",
+        "YEARS45-49": "YEARS45-54",
+        "YEARS50-54": "YEARS45-54",
+        "YEARS55-59": "YEARS55-64",
+        "YEARS60-64": "YEARS55-64",
+        "YEARS65-69": "YEARS65-74",
+        "YEARS70-74": "YEARS65-74",
+        "YEARS75-79": "YEARS75-84",
+        "YEARS80-84": "YEARS75-84",
         "YEARS85PLUS": "YEARS65PLUS",
     }
     df_sh["age_group"] = df_sh["age_group"].map(AGE_GROUPS)
