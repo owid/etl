@@ -1,0 +1,44 @@
+dataset: {}
+
+tables:
+  us_consumer_prices:
+    variables:
+      college_tuition_fees:
+        title: College tuition & fees
+        description: College tuition and fees in U.S. city average, all urban consumers
+      education:
+        title: Education
+        description: Education in U.S. city average, all urban consumers
+      tuition_fees_childcare:
+        title: Tuition, school fees, childcare
+        description: Tuition, other school fees, and childcare in U.S. city average, all urban consumers
+      medical_care:
+        title: Medical care
+        description: Medical care in U.S. city average, all urban consumers
+      household_energy:
+        title: Household energy
+        description: Household energy in U.S. city average, all urban consumers
+      housing:
+        title: Housing
+        description: Housing in U.S. city average, all urban consumers
+      food_beverages:
+        title: Food & beverages
+        description: Food and beverages in U.S. city average, all urban consumers
+      public_transport:
+        title: Public transport
+        description: Public transportation in U.S. city average, all urban consumers
+      new_cars:
+        title: New cars
+        description: New cars in U.S. city average, all urban consumers
+      clothing:
+        title: Clothing
+        description: Apparel in U.S. city average, all urban consumers
+      software:
+        title: Computer software & accessories
+        description: Computer software and accessories in U.S. city average, all urban consumers
+      toys:
+        title: Toys
+        description: Toys in U.S. city average, all urban consumers
+      televisions:
+        title: Televisions
+        description: Televisions in U.S. city average, all urban consumers
