@@ -294,6 +294,7 @@ class PathFinder:
 
         if channel_type.endswith("-private"):
             is_private = True
+            channel = channel.replace("-private", "")
         else:
             is_private = False
 
