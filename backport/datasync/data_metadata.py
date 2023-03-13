@@ -40,6 +40,9 @@ def variable_data_df_from_s3(engine: Engine, data_path: str) -> pd.DataFrame:
     if df.empty:
         return empty_df
 
+    # we work with strings and convert to specific types later
+    df["value"] = df["value"].astype(str)
+
     return add_entity_code_and_name(engine, df)
 
 

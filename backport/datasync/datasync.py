@@ -271,7 +271,8 @@ def _load_datasets(engine: Engine, dataset_ids: tuple[int], dt_start: Optional[d
     if dataset_ids:
         where = "id in %(dataset_ids)s"
     elif dt_start:
-        where = "dataEditedAt > %(dt_start)s or metadataEditedAt > %(dt_start)s"
+        # datasets with sourceChecksum come from ETL and are already synced
+        where = "sourceChecksum is null and dataEditedAt > %(dt_start)s or metadataEditedAt > %(dt_start)s"
     else:
         raise ValueError("Either dataset_ids or dt_start must be specified")
 
@@ -284,8 +285,7 @@ def _load_datasets(engine: Engine, dataset_ids: tuple[int], dt_start: Optional[d
         false as isPrivate,
         sourceChecksum
     from datasets
-    -- datasets with sourceChecksum come from ETL and are already synced
-    where sourceChecksum is null and {where}
+    where {where}
     """
     df = pd.read_sql(
         q,
