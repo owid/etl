@@ -337,14 +337,6 @@ steps:
   data://grapher/bls/2023-03-10/us_consumer_prices:
   - data://garden/bls/2023-03-10/us_consumer_prices
 
-  # Trust questions in World Values Survey
-  data://meadow/wvs/2023-03-08/wvs_trust:
-  - snapshot://wvs/2023-03-08/wvs_trust.csv
-  data://garden/wvs/2023-03-08/wvs_trust:
-  - data://meadow/wvs/2023-03-08/wvs_trust
-  data://grapher/wvs/2023-03-08/wvs_trust:
-  - data://garden/wvs/2023-03-08/wvs_trust
-
 
 # Sub-dags to import
 include:
