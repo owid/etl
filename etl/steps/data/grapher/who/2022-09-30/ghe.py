@@ -17,19 +17,23 @@ def run(dest_dir: str) -> None:
     tb_garden = ds_garden["ghe"]
 
     # Process table
-    tb_garden = process(tb_garden)
-
+    tb_grapher = process(tb_garden)
+    # Add table metadata
+    tb_grapher.metadata = tb_garden.metadata
+    for col in tb_grapher.columns:
+        tb_grapher[col].metadata = tb_garden[col].metadata
     #
     # Save outputs.
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.
-    ds_grapher = create_dataset(dest_dir, tables=[tb_garden], default_metadata=ds_garden.metadata)
+    ds_grapher = create_dataset(dest_dir, tables=[tb_grapher], default_metadata=ds_garden.metadata)
 
     # Save changes in the new grapher dataset.
     ds_grapher.save()
 
 
 def process(table: Table) -> Table:
+    table = table.copy()
     # Since this script expects a certain structure make sure it is actually met
     expected_primary_keys = ["country", "year", "age_group", "sex", "cause"]
     if table.primary_key != expected_primary_keys:
@@ -83,7 +87,6 @@ def select_subset_causes(table: pd.DataFrame) -> pd.DataFrame:
 
 
 def add_global_totals(df: pd.DataFrame) -> pd.DataFrame:
-    dtypes = df.dtypes.to_dict()
     # Get age_group=all and sex=all (avoid duplicates)
     df_ = df[(df["sex"] == "Both sexes") & (df["age_group"] == "ALLAges")]
     # Group by year and cause, sum
@@ -94,6 +97,4 @@ def add_global_totals(df: pd.DataFrame) -> pd.DataFrame:
     glob_total["sex"] = "Both sexes"
     # Merge with complete table
     df = pd.concat([df, glob_total])
-    # Set dtypes as input
-    df = df.astype(dtypes)
     return df
