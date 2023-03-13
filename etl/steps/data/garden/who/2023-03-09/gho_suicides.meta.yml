@@ -1,7 +1,7 @@
 # (Inherited from meadow, remove if not different.)
 all_sources:
   - source_testing: &sources
-      name: WHO GHO (2022)
+      name: WHO, Global Health Observatory (2022)
       published_by: WHO, Global Health Observatory (2022)
       url: https://www.who.int/data/gho
       date_accessed: 2023-03-09
