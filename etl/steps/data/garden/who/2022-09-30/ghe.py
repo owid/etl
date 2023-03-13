@@ -132,7 +132,7 @@ def build_custom_age_groups(df: pd.DataFrame) -> pd.DataFrame:
         "YEARS70-74": "YEARS65-74",
         "YEARS75-79": "YEARS75-84",
         "YEARS80-84": "YEARS75-84",
-        "YEARS85PLUS": "YEARS65PLUS",
+        "YEARS85PLUS": "YEARS85PLUS",
     }
     df_sh["age_group"] = df_sh["age_group"].map(AGE_GROUPS)
 
