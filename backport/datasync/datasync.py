@@ -160,9 +160,8 @@ def _sync_variable_data_metadata(engine: Engine, variable_id: int, dry_run: bool
         # NOTE: if metadata changes, we still reupload even data to S3, this is quite inefficient, but
         #   this entire script is a temporary solution until everything is uploaded directly from ETL
         if variable_df.empty:
-            with Session(engine) as session:
-                assert variable.dataPath
-                variable_df = variable_data_df_from_s3(engine, variable.dataPath)
+            assert variable.dataPath
+            variable_df = variable_data_df_from_s3(engine, variable.dataPath)
 
         var_data = variable_data(variable_df)
         var_metadata = variable_metadata(engine, variable_id, variable_df)
@@ -272,7 +271,8 @@ def _load_datasets(engine: Engine, dataset_ids: tuple[int], dt_start: Optional[d
     if dataset_ids:
         where = "id in %(dataset_ids)s"
     elif dt_start:
-        where = "dataEditedAt > %(dt_start)s or metadataEditedAt > %(dt_start)s"
+        # datasets with sourceChecksum come from ETL and are already synced
+        where = "sourceChecksum is null and dataEditedAt > %(dt_start)s or metadataEditedAt > %(dt_start)s"
     else:
         raise ValueError("Either dataset_ids or dt_start must be specified")
 
@@ -285,8 +285,7 @@ def _load_datasets(engine: Engine, dataset_ids: tuple[int], dt_start: Optional[d
         false as isPrivate,
         sourceChecksum
     from datasets
-    -- datasets with sourceChecksum come from ETL and are already synced
-    where sourceChecksum is null and {where}
+    where {where}
     """
     df = pd.read_sql(
         q,

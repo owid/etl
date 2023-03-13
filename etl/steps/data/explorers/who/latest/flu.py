@@ -32,6 +32,8 @@ def run(dest_dir: str) -> None:
 
     tb_flu = pd.DataFrame(pd.merge(tb_fluid, tb_flunet, on=["country", "date", "hemisphere"], how="outer"))
     assert tb_flu[["country", "date"]].duplicated().sum() == 0
+
+    tb_flu = create_full_time_series(tb_flu)
     tb_flu = create_zero_filled_strain_columns(tb_flu)
     tb_flu = remove_sparse_timeseries(df=tb_flu, min_data_points=MIN_DATA_POINTS)
     tb_flu = create_regional_aggregates(df=tb_flu)
@@ -99,6 +101,29 @@ def create_zero_filled_strain_columns(df: pd.DataFrame) -> pd.DataFrame:
     strain_columns_zfilled = [s + "_zfilled" for s in strain_columns]
     df[strain_columns_zfilled] = df[strain_columns].fillna(0)
     return df
+
+
+def create_full_time_series(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    For each country ensure there is a value for each week between the start and the end date, especially important for the stacked bar charts
+
+    """
+    filled_df = pd.DataFrame()
+    for country in df.country.drop_duplicates():
+        country_df = df[df["country"] == country]
+        min_date = country_df.date.min()
+        max_date = country_df.date.max()
+        date_series = pd.Series(pd.date_range(min_date, max_date, freq="7D").format(), name="date")
+
+        if len(date_series[~date_series.isin(country_df["date"])]) > 0:
+            country_df = pd.merge(country_df, date_series, how="outer")
+            country_df[["country", "hemisphere"]] = country_df[["country", "hemisphere"]].fillna(method="ffill")
+            assert len(date_series) == country_df.shape[0]
+            assert country_df.country.isna().sum() == 0
+
+        filled_df = pd.concat([filled_df, country_df])
+
+    return filled_df
 
 
 def remove_sparse_timeseries(df: pd.DataFrame, min_data_points: int) -> pd.DataFrame:
@@ -195,7 +220,7 @@ def create_regional_aggregates(df: pd.DataFrame) -> pd.DataFrame:
     # columns that we can aggregate by summing
     count_cols = cols.drop(rate_cols)
 
-    global_aggregate = create_global_aggregate(df, count_cols)
+    global_aggregate = create_global_aggregate(df=df, count_cols=count_cols, min_countries=20, rate_cols=rate_cols)
     hemisphere_aggregate = create_hemisphere_aggregate(df, count_cols)
     # uk_aggregate = create_united_kingdom_aggregate(df, count_cols)
 
@@ -216,21 +241,75 @@ def create_hemisphere_aggregate(df: pd.DataFrame, count_cols) -> pd.DataFrame:
     )
     hemisphere_aggregate = hemisphere_aggregate.rename(columns={"hemisphere": "country"})
 
-    hemisphere_aggregate = calculate_percent_positive(
+    hemisphere_aggregate = calculate_percent_positive_aggregate(
         df=hemisphere_aggregate, surveillance_cols=["sentinel", "nonsentinel", "notdefined", "combined"]
     )
     hemisphere_aggregate = calculate_patient_rates(df=hemisphere_aggregate)
     return hemisphere_aggregate
 
 
-def create_global_aggregate(df: pd.DataFrame, count_cols) -> pd.DataFrame:
+def create_global_aggregate(df: pd.DataFrame, count_cols: list[str], min_countries: int, rate_cols) -> pd.DataFrame:
     global_aggregate = df[count_cols].groupby(["date"]).sum(min_count=1, numeric_only=True).reset_index()
+    # null_rate_dates = df[df['date'].isin(df['date'].value_counts()[df['date'].value_counts() < min_countries].index)].date.to_list()
     global_aggregate["country"] = "World"
     cols = global_aggregate.columns.to_list()
     cols = cols[-1:] + cols[:-1]
     global_aggregate = global_aggregate[cols]
-    global_aggregate = calculate_percent_positive(
+    global_aggregate = calculate_percent_positive_aggregate(
         df=global_aggregate, surveillance_cols=["sentinel", "nonsentinel", "notdefined", "combined"]
     )
     global_aggregate = calculate_patient_rates(df=global_aggregate)
+
     return global_aggregate
+
+
+def calculate_percent_positive_aggregate(df: pd.DataFrame, surveillance_cols: list[str]) -> pd.DataFrame:
+    """
+    Sometimes the 0s in the inf_negative* columns should in fact be zero. Here we convert rows where:
+    inf_negative* == 0 and the sum of the positive and negative tests does not equal the number of processed tests.
+
+    This should keep true 0s where the share of positive tests is actually 100%, typically when there is a small number of tests.
+
+    Because the data is patchy in some places the WHO recommends three methods for calclating the share of influenza tests that are positive.
+    In order of preference
+    1. Positive tests divided by specimens processed: inf_all/spec_processed_nb
+    2. Positive tests divided by specimens received: inf_all/spec_received_nb
+
+    We do no consider inf_negative at the regional level because in the earlier years it is often only available for single countries and over-inflates the share of positive tests.
+    This is not the case for specimens processed.
+
+    Remove rows where the percent is > 100
+    Remove rows where the percent = 100 but all available denominators are 0.
+    """
+    for col in surveillance_cols:
+
+        df.loc[
+            (df["inf_negative" + col] == 0)
+            & (df["inf_negative" + col] + df["inf_all" + col] != df["spec_processed_nb" + col]),
+            "inf_negative" + col,
+        ] = np.nan
+
+        # df["pcnt_pos_1" + col] = (df["inf_all" + col] / (df["inf_all" + col] + df["inf_negative" + col])) * 100
+        df["pcnt_pos_2" + col] = (df["inf_all" + col] / df["spec_processed_nb" + col]) * 100
+        df["pcnt_pos_3" + col] = (df["inf_all" + col] / df["spec_received_nb" + col]) * 100
+
+        # hierachically fill the 'pcnt_pos' column with values from the columns described above in order of preference: 1->2->3
+        df["pcnt_pos" + col] = df["pcnt_pos_2" + col]
+        df["pcnt_pos" + col] = df["pcnt_pos" + col].fillna(df["pcnt_pos_3" + col])
+
+        df = df.drop(columns=["pcnt_pos_2" + col, "pcnt_pos_3" + col])
+
+        # Drop rows where pcnt_pos is >100
+        df.loc[df["pcnt_pos" + col] > 100, "pcnt_pos" + col] = np.nan
+
+        # Rows where the percentage positive is 100 but all possible denominators are 0
+        df.loc[
+            (df["pcnt_pos" + col] == 100)
+            & (df["inf_negative" + col] == 0)
+            & (df["spec_processed_nb" + col] == 0)
+            & (df["spec_received_nb" + col] == 0),
+            "pcnt_pos" + col,
+        ] = np.nan
+        # df = df.dropna(axis=1, how="all")
+
+    return df
