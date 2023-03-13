@@ -1,4 +1,4 @@
-"""Load a snapshot and create a meadow dataset."""
+"""Load a snapshot and create the World Values Survey - Trust meadow dataset."""
 
 import pandas as pd
 from owid.catalog import Table

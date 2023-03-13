@@ -1,4 +1,4 @@
-"""Load a garden dataset and create a grapher dataset."""
+"""Load a garden dataset and create the World Values Survey - Trust grapher dataset."""
 
 from owid.catalog import Dataset
 
