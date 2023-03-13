@@ -1,12 +1,12 @@
 """Generate GHE garden dataset"""
 
 import pandas as pd
-from owid.catalog import Dataset, Table
+from owid.catalog import Table
 from structlog import get_logger
 
 from etl.data_helpers.population import add_population
 from etl.grapher_helpers import country_code_to_country
-from etl.helpers import PathFinder
+from etl.helpers import PathFinder, create_dataset
 
 log = get_logger()
 
@@ -19,24 +19,19 @@ def run(dest_dir: str) -> None:
 
     # read dataset from meadow
     ds_meadow = N.meadow_dataset
-    tb_meadow = ds_meadow["ghe"]
-
-    df = pd.DataFrame(tb_meadow)
+    df = pd.DataFrame(ds_meadow["ghe"])
 
     df["country"] = country_code_to_country(df["country"])
 
-    ds_garden = Dataset.create_empty(dest_dir, metadata=ds_meadow.metadata)
+    df = clean_data(df)
 
-    tb_garden = clean_data(df)
-
-    ds_garden.add(tb_garden)
-    ds_garden.update_metadata(N.metadata_path)
+    ds_garden = create_dataset(dest_dir, tables=[Table(df, short_name="ghe")], default_metadata=ds_meadow.metadata)
     ds_garden.save()
 
     log.info("ghe.end")
 
 
-def clean_data(df: pd.DataFrame) -> Table:
+def clean_data(df: pd.DataFrame) -> pd.DataFrame:
     log.info("ghe: basic cleaning")
     df["sex"] = df["sex"].map({"BTSX": "Both sexes", "MLE": "Male", "FMLE": "Female"})
     df[["daly_rate100k", "daly_count", "death_rate100k"]] = df[["daly_rate100k", "daly_count", "death_rate100k"]].round(
@@ -62,9 +57,7 @@ def clean_data(df: pd.DataFrame) -> Table:
             "flag_level": "uint8",
         }
     )
-    df = df.set_index(["country", "year", "age_group", "sex", "cause"])
-    df = Table(df, short_name="ghe")
-    return df
+    return df.set_index(["country", "year", "age_group", "sex", "cause"])
 
 
 def build_custom_age_groups(df: pd.DataFrame) -> pd.DataFrame:
