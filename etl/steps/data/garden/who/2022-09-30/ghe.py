@@ -73,7 +73,7 @@ def build_custom_age_groups(df: pd.DataFrame) -> pd.DataFrame:
 
     # Get two dfs: one with cause=self-harm, the other with the rest
     log.info("ghe: separate self-harm from other causes")
-    msk = (df["cause"].isin(["Self-harm"])) & (df["age_group"] != "ALLAges")
+    msk = (df["cause"].isin(["Self-harm"])) & (~df["age_group"].isin(["ALLAges", "YEARS85PLUS"]))
     df_sh = df[msk].reset_index(drop=True).copy()
     df = df[~msk].reset_index(drop=True).copy()
 
@@ -98,7 +98,7 @@ def build_custom_age_groups(df: pd.DataFrame) -> pd.DataFrame:
         "YEARS70-74": [70, 74],
         "YEARS75-79": [75, 79],
         "YEARS80-84": [80, 84],
-        "YEARS85PLUS": [85, None],
+        # "YEARS85PLUS": [85, None],
     }
     df_sh = add_population(
         df=df_sh,
@@ -132,7 +132,7 @@ def build_custom_age_groups(df: pd.DataFrame) -> pd.DataFrame:
         "YEARS70-74": "YEARS65-74",
         "YEARS75-79": "YEARS75-84",
         "YEARS80-84": "YEARS75-84",
-        "YEARS85PLUS": "YEARS85PLUS",
+        # "YEARS85PLUS": "YEARS85PLUS",
     }
     df_sh["age_group"] = df_sh["age_group"].map(AGE_GROUPS)
 
