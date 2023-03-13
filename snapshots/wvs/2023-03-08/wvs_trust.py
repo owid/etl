@@ -1,4 +1,7 @@
-"""Script to create a snapshot of dataset 'Trust questions in the World Values Survey Dataset (WVS, 2022)'."""
+"""
+Script to create a snapshot of dataset 'Trust questions in the World Values Survey Dataset (WVS, 2022)'.
+Data is uploaded locally. Check `wvs_trust.do` for more details on how to extract the data.
+"""
 
 from pathlib import Path
 

@@ -1,3 +1,21 @@
+/*
+COMMANDS TO EXTRACT TRUST QUESTIONS FROM THE WORLD VALUES SURVEY
+This code collapses microdata on trust from the World Values Survey (unweighted) and generates a csv file.
+A longitudinal data file is required: the most current version is 4.0 (2022).
+
+INSTRUCTIONS
+
+	1. Download the Stata dta file from https://www.worldvaluessurvey.org/WVSDocumentationWVL.jsp
+	2. Extract the dta file from the zip file.
+	3. Run this do-file in Stata.
+	4. Add snapshot. Currently the command is
+ 		python snapshots/wvs/2023-03-08/wvs_trust.py --path-to-file snapshots/wvs/2023-03-08/wvs_trust.csv
+	5. Delete csv file
+	6. Run etl wvs_trust
+
+*/
+
+
 use WVS_TimeSeries_4_0, clear
 
 * List of questions to work with
@@ -28,7 +46,7 @@ label list $questions
 A165 is the question "most people can be trusted"
 */
 
-* Keep only "most people can be trusted" (1), "Need to be very careful" (2), "Don't know" (-1)	
+* Keep only "most people can be trusted" (1), "Need to be very careful" (2), "Don't know" (-1)
 keep if A165 >= -1
 
 *Generate trust variable, with 1 if it's option 1
