@@ -1,8 +1,7 @@
 import json
-from typing import Any, Dict
+from typing import Any, Dict, List, Union
 from urllib.error import HTTPError
 
-import numpy as np
 import pandas as pd
 from sqlalchemy.engine import Engine
 
@@ -21,12 +20,7 @@ def variable_data_df_from_mysql(engine: Engine, variable_id: int) -> pd.DataFram
     ORDER BY
         year ASC
     """
-    df = pd.read_sql(q, engine, params={"variable_id": variable_id})
-
-    # convert from string to numerical type if possible
-    df["value"] = _convert_strings_to_numeric(df["value"])
-
-    return df
+    return pd.read_sql(q, engine, params={"variable_id": variable_id})
 
 
 def variable_data_df_from_s3(engine: Engine, data_path: str) -> pd.DataFrame:
@@ -71,7 +65,9 @@ def variable_data(data_df: pd.DataFrame) -> Dict[str, Any]:
             "year": "years",
         }
     )
-    return data_df[["values", "years", "entities"]].to_dict(orient="list")  # type: ignore
+    data = data_df[["values", "years", "entities"]].to_dict(orient="list")
+    data["values"] = _convert_strings_to_numeric(data["values"])
+    return data  # type: ignore
 
 
 def variable_metadata(engine: Engine, variable_id: int, variable_data: pd.DataFrame) -> Dict[str, Any]:
@@ -174,24 +170,17 @@ def _infer_variable_type(values: pd.Series) -> str:
             return "mixed"
 
 
-def _convert_strings_to_numeric(values: pd.Series) -> pd.Series:
-    assert values.map(lambda s: isinstance(s, str)).all(), "values must be strings"
-    assert values.notnull().all(), "values must not contain nulls"
-
-    values = values.replace("nan", np.nan)
-
-    # raises ValueError if any value is not numeric or float
-    try:
-        return values.map(int)
-    except ValueError:
-        pass
-    # perhaps they're all floats
-    try:
-        return values.map(float)
-    except ValueError:
-        pass
-    # otherwise return them as strings
-    return values
+def _convert_strings_to_numeric(lst: List[str]) -> List[Union[int, float, str]]:
+    result = []
+    for item in lst:
+        try:
+            num = float(item)
+            if num.is_integer():
+                num = int(num)
+        except ValueError:
+            num = item
+        result.append(num)
+    return result
 
 
 def _omit_nullable_values(d: dict) -> dict:

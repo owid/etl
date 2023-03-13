@@ -1,6 +1,7 @@
 from unittest import mock
 
 import pandas as pd
+import pytest
 
 from backport.datasync.data_metadata import (
     _convert_strings_to_numeric,
@@ -117,6 +118,9 @@ def test_infer_variable_type():
 
 
 def test_convert_strings_to_numeric():
-    assert _convert_strings_to_numeric(pd.Series(["1", "2.1", "UK"])).to_list() == ["1", "2.1", "UK"]
-    assert _convert_strings_to_numeric(pd.Series(["1", "2"])).to_list() == [1, 2]
-    assert _convert_strings_to_numeric(pd.Series(["1", "2.5"])).to_list() == [1, 2.5]
+    r = _convert_strings_to_numeric(["-2", "1", "2.1", "UK", "9.8e+09"])
+    assert r == [-2, 1, 2.1, "UK", 9800000000]
+    assert [type(x) for x in r] == [int, int, float, str, int]
+
+    with pytest.raises(TypeError):
+        r = _convert_strings_to_numeric([None, "UK"])  # type: ignore
