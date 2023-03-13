@@ -6,6 +6,7 @@ import pytest
 from backport.datasync.data_metadata import (
     _convert_strings_to_numeric,
     _infer_variable_type,
+    variable_data,
     variable_metadata,
 )
 from etl.db import get_engine
@@ -15,7 +16,7 @@ def test_variable_metadata():
     engine = get_engine()
     variable_df = pd.DataFrame(
         {
-            "value": [0.008, 0.038, 0.022, 0.031, 0.056],
+            "value": ["0.008", "0.038", "0.022", "0.031", "NA"],
             "year": [-10000, -10000, -10000, -10000, -10000],
             "entityId": [273, 275, 276, 277, 294],
             "entityName": ["Africa", "Asia", "Europe", "Oceania", "North America"],
@@ -72,7 +73,7 @@ def test_variable_metadata():
         "shortName": "population_density",
         "catalogPath": "grapher/owid/latest/key_indicators/population_density",
         "datasetName": "Key Indicators",
-        "type": "float",
+        "type": "mixed",
         "nonRedistributable": False,
         "display": {
             "name": "Population density",
@@ -102,6 +103,24 @@ def test_variable_metadata():
                 ]
             },
         },
+    }
+
+
+def test_variable_data():
+    data_df = pd.DataFrame(
+        {
+            "value": ["-2", "1", "2.1", "UK", "9.8e+09"],
+            "year": [-10000, -10000, -10000, -10000, -10000],
+            "entityId": [273, 275, 276, 277, 294],
+            "entityName": ["Africa", "Asia", "Europe", "Oceania", "North America"],
+            "entityCode": [None, None, None, None, None],
+        }
+    )
+
+    assert variable_data(data_df) == {
+        "entities": [273, 275, 276, 277, 294],
+        "values": [-2, 1, 2.1, "UK", 9800000000],
+        "years": [-10000, -10000, -10000, -10000, -10000],
     }
 
 

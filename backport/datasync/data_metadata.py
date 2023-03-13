@@ -164,10 +164,19 @@ def _infer_variable_type(values: pd.Series) -> str:
         else:
             raise NotImplementedError()
     except ValueError:
-        if values.map(lambda s: isinstance(s, str)).all():
-            return "string"
-        else:
+        if values.map(_is_float).any():
             return "mixed"
+        else:
+            return "string"
+
+
+def _is_float(x):
+    try:
+        float(x)
+    except ValueError:
+        return False
+    else:
+        return True
 
 
 def _convert_strings_to_numeric(lst: List[str]) -> List[Union[int, float, str]]:
