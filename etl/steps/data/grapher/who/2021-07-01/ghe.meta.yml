@@ -26,12 +26,12 @@ tables:
         title: Deaths per 100k
         description: Deaths per 100.000 people
         unit: deaths per 100,000 people
-        short_unit: 
+        short_unit:
       daly:
         title: Disability adjusted life years
         description: Disability adjusted life years
         unit: DALYs
-        short_unit: 
+        short_unit:
       daly_rate:
         title: Disability adjusted life years rate
         description: Disability adjusted life years per capita in one year
