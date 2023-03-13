@@ -20,7 +20,7 @@ meta:
   description: |
     The World Values Survey (WVS) is an international research program devoted to the scientific and academic study of social, political, economic, religious and cultural values of people in the world. The main research instrument of the project is a representative comparative social survey conducted globally every five years.
 
-    This dataset only includes a selection of questions related to trust:
+    In the Our World in Data dataset we calculate national totals for the following questions:
     <ul>
       <li>Generally speaking, would you say that most people can be trusted or that you need to be very careful in dealing with people?</li>
       <li>Could you tell me whether you trust people from you meet for the first time completely, somewhat, not very much or not at all?</li>

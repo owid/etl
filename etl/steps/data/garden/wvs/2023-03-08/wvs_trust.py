@@ -40,6 +40,16 @@ def run(dest_dir: str) -> None:
     # Create a new table with the processed data.
     tb_garden = Table(df, like=tb_meadow)
 
+    # Keep selected variables (the rest is kept in the snapshot/meadow for anaylisis)
+    vars_to_keep = [
+        "trust",
+        "trust_first_not_at_all",
+        "trust_personally_not_at_all",
+        "take_advantage",
+        "confidence_government",
+    ]
+    tb_garden = tb_garden[vars_to_keep]
+
     #
     # Save outputs.
     #
