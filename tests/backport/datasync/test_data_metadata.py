@@ -125,15 +125,14 @@ def test_variable_data():
 
 
 def test_infer_variable_type():
-    assert _infer_variable_type(pd.Series([1, 2])) == "int"
-    assert _infer_variable_type(pd.Series([1, 2.5])) == "float"
-    assert _infer_variable_type(pd.Series([1, 2.5, "c"])) == "mixed"
-    assert _infer_variable_type(pd.Series(["a", "b", "c"])) == "string"
-
     assert _infer_variable_type(pd.Series(["1", "2"])) == "int"
-    assert _infer_variable_type(pd.Series(["1", 2])) == "int"
-    assert _infer_variable_type(pd.Series(["1", 2, "3.5"])) == "float"
-    assert _infer_variable_type(pd.Series(["1", 2, "3.5", "a"])) == "mixed"
+    assert _infer_variable_type(pd.Series(["1", "2.1"])) == "float"
+    assert _infer_variable_type(pd.Series(["1", "2.0"])) == "float"
+    assert _infer_variable_type(pd.Series(["1", "2.0", "a"])) == "mixed"
+    assert _infer_variable_type(pd.Series(["1", "a"])) == "mixed"
+    assert _infer_variable_type(pd.Series(["1.1", "a"])) == "mixed"
+    assert _infer_variable_type(pd.Series(["a", "NA"])) == "string"
+    assert _infer_variable_type(pd.Series([], dtype=object)) == "mixed"
 
 
 def test_convert_strings_to_numeric():
