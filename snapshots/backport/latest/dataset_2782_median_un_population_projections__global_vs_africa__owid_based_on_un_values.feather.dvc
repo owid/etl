@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 15:57:18.152367
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Median UN Population Projections - Global vs Africa (OWID based on UN)
   namespace: backport
-  publication_date: latest
   short_name: dataset_2782_median_un_population_projections__global_vs_africa__owid_based_on_un_values
+  file_extension: feather
+  date_accessed: 2023-02-23 18:34:21.974016
+  name: Median UN Population Projections - Global vs Africa (OWID based on UN)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2782
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: f3788d20f61c54bfc64f0b3b9a11d6ce
-  size: 592418
+- md5: fbb941e38787bdbf5d260f5c6e73b37e
+  size: 592802
   path: dataset_2782_median_un_population_projections__global_vs_africa__owid_based_on_un_values.feather

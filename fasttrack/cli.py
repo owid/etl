@@ -5,6 +5,7 @@ import json
 import os
 import urllib.error
 from enum import Enum
+from io import StringIO
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 
@@ -38,7 +39,7 @@ from etl.paths import BASE_DIR, DAG_DIR, REFERENCE_DATASET, SNAPSHOTS_DIR, STEP_
 from etl.snapshot import Snapshot, SnapshotMeta
 from walkthrough import utils as walkthrough_utils
 
-from . import sheets
+from . import csv, sheets
 from .yaml_meta import YAMLDatasetMeta, YAMLMeta, YAMLSourceMeta, YAMLVariableMeta
 
 config.enable_bugsnag()
@@ -133,6 +134,8 @@ class FasttrackImport:
         # since sheets url is accessible with link, we have to encrypt it when storing in metadata
         sheets_url = _encrypt(self.sheets_url) if self.is_private else self.sheets_url
 
+        source_name = "Google Sheet" if self.sheets_url != "local_csv" else "Local CSV"
+
         snap_meta = SnapshotMeta(
             namespace=self.meta.dataset.namespace,
             short_name=self.meta.dataset.short_name,
@@ -141,8 +144,8 @@ class FasttrackImport:
             file_extension="csv",
             description=self.meta.dataset.description,
             url=self.partial_snapshot_meta.url,
-            source_name="Google Sheet",
-            source_published_by="Google Sheet",
+            source_name=source_name,
+            source_published_by=source_name,
             source_data_url=sheets_url,
             is_public=not self.is_private,
             date_accessed=dt.date.today(),
@@ -182,9 +185,15 @@ def app(dummy_data: bool, commit: bool) -> None:
 
     po.put_warning("This tool is still in beta. Please report any issues to @Mojmir")
 
-    with open(CURRENT_DIR / "instructions.md", "r") as f:
+    with open(CURRENT_DIR / "instructions_sheets.md", "r") as f:
         walkthrough_utils.put_widget(
-            title=po.put_html("<b>Instructions</b>"),
+            title=po.put_html("<b>Instructions for importing Google Sheet</b>"),
+            contents=[po.put_markdown(f.read())],
+        )
+
+    with open(CURRENT_DIR / "instructions_csv.md", "r") as f:
+        walkthrough_utils.put_widget(
+            title=po.put_html("<b>Instructions for importing Local CSV</b>"),
             contents=[po.put_markdown(f.read())],
         )
 
@@ -276,6 +285,7 @@ class FasttrackForm(BaseModel):
     existing_sheets_url: Optional[str]
     infer_metadata: bool
     is_private: bool
+    local_csv: Any
 
     def __init__(self, **data: Any) -> None:
         options = data.pop("options")
@@ -294,7 +304,7 @@ def _load_data_and_meta(
     sheets_url = None
     selected_sheet = "unselected"
 
-    # endless loop that breaks if everything passed validatin
+    # endless loop that breaks if everything passed validation
     while True:
         sheets_url = sheets_url or dummies.get("sheet_url", "")
 
@@ -330,6 +340,7 @@ def _load_data_and_meta(
                         help_text="Selected sheet will be used if you don't specify Google Sheets URL",
                         onchange=_onchange_existing_sheets_url,
                     ),
+                    pi.file_upload("OR Use local CSV file", name="local_csv", accept="text/csv"),
                     pi.checkbox(
                         "Additional Options",
                         options=[Options.INFER_METADATA.value, Options.IS_PRIVATE.value],  # type: ignore
@@ -345,53 +356,64 @@ def _load_data_and_meta(
         log.info("fasttrack.form", form=form_dict)
 
         # use selected sheet if URL is not available
-        if not form.new_sheets_url:
-            if form.existing_sheets_url == "unselected":
-                _bail([sheets.ValidationError("Please either set URL or pick from existing Google Sheets")])
-                continue
+        if not form.local_csv:
+            if not form.new_sheets_url:
+                if form.existing_sheets_url == "unselected":
+                    _bail([sheets.ValidationError("Please either set URL or pick from existing Google Sheets")])
+                    continue
+            else:
+                if form.existing_sheets_url != "unselected":
+                    _bail([sheets.ValidationError("You cannot set both URL and pick from existing Google Sheets")])
+                    continue
+
+        if form.local_csv:
+            csv_df = pd.read_csv(StringIO(form.local_csv["content"].decode()))
+
+            data = csv.parse_data_from_csv(csv_df)
+            meta, partial_snapshot_meta = csv.parse_metadata_from_csv(form.local_csv["filename"], csv_df.columns)
+
+            sheets_url = "local_csv"
+
+            po.put_success("Data imported from CSV")
         else:
-            if form.existing_sheets_url != "unselected":
-                _bail([sheets.ValidationError("You cannot set both URL and pick from existing Google Sheets")])
-                continue
+            selected_sheet = form.existing_sheets_url
+            sheets_url = form.new_sheets_url or selected_sheet
 
-        selected_sheet = form.existing_sheets_url
-        sheets_url = form.new_sheets_url or selected_sheet
+            assert sheets_url
 
-        assert sheets_url
+            po.put_markdown(
+                """
+            ## Importing data from Google Sheets...
 
-        po.put_markdown(
+            Note that Google Sheets refreshes its published version every 5 minutes, so you may need to wait a bit after you update your data.
             """
-        ## Importing data from Google Sheets...
+            )
 
-        Note that Google Sheets refreshes its published version every 5 minutes, so you may need to wait a bit after you update your data.
-        """
-        )
-
-        try:
-            google_sheets = sheets.import_google_sheets(sheets_url)
-            # TODO: it would make sense to repeat the import until we're sure that it has been updated
-            # we wouldn't risk importing data that is not up to date then
-            # the question is how much can we trust the timestamp in the published version
-            po.put_success(
-                f"Data imported (sheet refreshed {_last_updated_before_minutes(google_sheets['dataset_meta'])} minutes ago)"
-            )
-            meta, partial_snapshot_meta = sheets.parse_metadata_from_sheets(
-                google_sheets["dataset_meta"], google_sheets["variables_meta"], google_sheets["sources_meta"]
-            )
-            data = sheets.parse_data_from_sheets(google_sheets["data"])
-        except urllib.error.HTTPError:
-            _bail(
-                [
-                    sheets.ValidationError(
-                        "Sheet not found, have you copied the template? Creating new Google Sheets document or new "
-                        "sheets with the same name in the existing document does not work."
-                    )
-                ]
-            )
-            continue
-        except sheets.ValidationError as e:
-            _bail([e])
-            continue
+            try:
+                google_sheets = sheets.import_google_sheets(sheets_url)
+                # TODO: it would make sense to repeat the import until we're sure that it has been updated
+                # we wouldn't risk importing data that is not up to date then
+                # the question is how much can we trust the timestamp in the published version
+                po.put_success(
+                    f"Data imported (sheet refreshed {_last_updated_before_minutes(google_sheets['dataset_meta'])} minutes ago)"
+                )
+                meta, partial_snapshot_meta = sheets.parse_metadata_from_sheets(
+                    google_sheets["dataset_meta"], google_sheets["variables_meta"], google_sheets["sources_meta"]
+                )
+                data = sheets.parse_data_from_sheets(google_sheets["data"])
+            except urllib.error.HTTPError:
+                _bail(
+                    [
+                        sheets.ValidationError(
+                            "Sheet not found, have you copied the template? Creating new Google Sheets document or new "
+                            "sheets with the same name in the existing document does not work."
+                        )
+                    ]
+                )
+                continue
+            except sheets.ValidationError as e:
+                _bail([e])
+                continue
 
         # try to infer as much missing metadata as possible
         if form.infer_metadata:
@@ -468,6 +490,9 @@ def _load_existing_sheets_from_snapshots() -> List[Dict[str, str]]:
     # sort them by date accessed
     metas.sort(key=lambda meta: meta.date_accessed, reverse=True)
 
+    # exclude local CSVs
+    metas = [m for m in metas if m.source_name != "Local CSV"]
+
     # decrypt URLs if private
     for meta in metas:
         if not meta.is_public:
@@ -497,22 +522,6 @@ def _infer_metadata(
                 )
             )
             meta_variables[new_short_name] = meta_variables.pop(short_name)
-
-    # add missing variable metadata
-    # for col in data.columns:
-    #     # use underscored column name as variable short name and full name as title
-    #     try:
-    #         validate_underscore(col, "Variables")
-    #         short_name = col
-    #         title = col
-    #     except NameError:
-    #         short_name = underscore(col)
-    #         title = col
-
-    #     if short_name not in meta_variables:
-    #         meta_variables[short_name] = YAMLVariableMeta(title=title, short_unit="", unit="", description="")
-
-    #     data = data.rename(columns={col: short_name})
 
     return data, meta_variables
 

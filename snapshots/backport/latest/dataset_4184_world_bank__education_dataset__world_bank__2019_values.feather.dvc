@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 01:20:50.380109
-  description: ''
-  file_extension: feather
-  is_public: false
-  name: 'World Bank: Education Dataset - World Bank (2019)'
   namespace: backport
-  publication_date: latest
   short_name: dataset_4184_world_bank__education_dataset__world_bank__2019_values
+  file_extension: feather
+  date_accessed: 2023-02-23 19:47:41.232213
+  name: 'World Bank: Education Dataset - World Bank (2019)'
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/4184
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 8961f9c9970fb3f6dab620cd7c8d5219
-  size: 62618
+- md5: ef46b75d3ddbd6c478f3bc342ebae99b
+  size: 62994
   path: dataset_4184_world_bank__education_dataset__world_bank__2019_values.feather

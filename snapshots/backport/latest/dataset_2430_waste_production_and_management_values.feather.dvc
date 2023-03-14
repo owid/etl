@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:23:25.008721
-  description: This is a dataset imported by the automated fetcher
-  file_extension: feather
-  is_public: true
-  name: Waste Production and Management
   namespace: backport
-  publication_date: latest
   short_name: dataset_2430_waste_production_and_management_values
+  file_extension: feather
+  date_accessed: 2023-02-23 17:17:49.720380
+  name: Waste Production and Management
+  description: This is a dataset imported by the automated fetcher
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2430
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 9b20d4e01c47b5dfb0bc0996a53a683b
-  size: 33898
+- md5: 2f0e6bc523c598b9832457d76b1d54bd
+  size: 34274
   path: dataset_2430_waste_production_and_management_values.feather

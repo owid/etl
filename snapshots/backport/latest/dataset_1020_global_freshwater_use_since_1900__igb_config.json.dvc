@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:44:08.473139
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_1020_global_freshwater_use_since_1900__igb
   namespace: backport
-  publication_date: latest
   short_name: dataset_1020_global_freshwater_use_since_1900__igb_config
+  file_extension: json
+  date_accessed: 2023-02-23 18:43:46.109562
+  name: Grapher metadata for dataset_1020_global_freshwater_use_since_1900__igb
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/1020
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 18f871616f64c94d5fa114e427bf4049
-  size: 3106
+- md5: 5bb5698b75a95f2332a0dc28986b55ab
+  size: 3304
   path: dataset_1020_global_freshwater_use_since_1900__igb_config.json

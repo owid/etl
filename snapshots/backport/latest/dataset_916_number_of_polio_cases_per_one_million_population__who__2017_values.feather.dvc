@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:26:57.787532
-  description: The dataset is by country and ranges from 1980-2015.
-  file_extension: feather
-  is_public: true
-  name: Number of polio cases per one million population - WHO (2017)
   namespace: backport
-  publication_date: latest
   short_name: dataset_916_number_of_polio_cases_per_one_million_population__who__2017_values
+  file_extension: feather
+  date_accessed: 2023-02-23 17:34:39.484886
+  name: Number of polio cases per one million population - WHO (2017)
+  description: The dataset is by country and ranges from 1980-2015.
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/916
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: de01e68e14d4e4ba336871271baf5eee
-  size: 32178
+- md5: 2c22366d22c44071ff4234a3ef588b3c
+  size: 32554
   path: dataset_916_number_of_polio_cases_per_one_million_population__who__2017_values.feather

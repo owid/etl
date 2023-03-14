@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 00:23:13.014556
-  description: This is a dataset imported by the automated fetcher
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_1068_world_bank_global_findex__2011_variables
   namespace: backport
-  publication_date: latest
   short_name: dataset_1068_world_bank_global_findex__2011_variables_config
+  file_extension: json
+  date_accessed: 2023-02-23 17:52:33.789224
+  name: Grapher metadata for dataset_1068_world_bank_global_findex__2011_variables
+  description: This is a dataset imported by the automated fetcher
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/1068
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: e2326057d0a57c4cdb193ce6afb95c09
-  size: 416864
+- md5: 6679dc8f55a5b07548cdf19fec26e4c0
+  size: 479432
   path: dataset_1068_world_bank_global_findex__2011_variables_config.json

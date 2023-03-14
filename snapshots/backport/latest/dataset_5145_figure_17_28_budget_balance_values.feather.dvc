@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 01:01:58.324726
-  description: core-econ.org
-  file_extension: feather
-  is_public: false
-  name: Figure_17.28_budget_balance
   namespace: backport
-  publication_date: latest
   short_name: dataset_5145_figure_17_28_budget_balance_values
+  file_extension: feather
+  date_accessed: 2023-02-23 17:56:33.782198
+  name: Figure_17.28_budget_balance
+  description: core-econ.org
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5145
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 4cf0e99c74b2402ddf0db3974902b88b
-  size: 6954
+- md5: 1b6f043882f19abfd9f7fe64f2d2717e
+  size: 7330
   path: dataset_5145_figure_17_28_budget_balance_values.feather

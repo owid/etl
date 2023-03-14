@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-11-29 16:32:04.694495
-  description: This is a dataset imported by the automated fetcher
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_5599_ihme__global_burden_of_disease__deaths_and_dalys__institute_for_health_metrics_and_evaluation__2022_04
   namespace: backport
-  publication_date: latest
   short_name: dataset_5599_ihme__global_burden_of_disease__deaths_and_dalys__institute_for_health_metrics_and_evaluation__2022_04_config
+  file_extension: json
+  date_accessed: 2023-02-23 15:04:54.975270
+  name: Grapher metadata for dataset_5599_ihme__global_burden_of_disease__deaths_and_dalys__institute_for_health_metrics_and_evaluation__2022_04
+  description: This is a dataset imported by the automated fetcher
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5599
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 595766893107c142ca33daf10ad4af7f
-  size: 381287
+- md5: f14456819eb600592dcf3fac8195be2b
+  size: 540357
   path: dataset_5599_ihme__global_burden_of_disease__deaths_and_dalys__institute_for_health_metrics_and_evaluation__2022_04_config.json

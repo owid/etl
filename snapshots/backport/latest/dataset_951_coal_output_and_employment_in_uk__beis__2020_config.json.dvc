@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:05:52.984766
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_951_coal_output_and_employment_in_uk__beis__2020
   namespace: backport
-  publication_date: latest
   short_name: dataset_951_coal_output_and_employment_in_uk__beis__2020_config
+  file_extension: json
+  date_accessed: 2023-02-23 17:29:54.742760
+  name: Grapher metadata for dataset_951_coal_output_and_employment_in_uk__beis__2020
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/951
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 2bc86a02e3b3565afcd1b0523f6aee13
-  size: 10335
+- md5: 1bdb7d9098ae93b777894d2d70015ac2
+  size: 13321
   path: dataset_951_coal_output_and_employment_in_uk__beis__2020_config.json

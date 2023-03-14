@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:13:02.124847
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_1002_incidence_of_managerial_or_professional_jobs_and_collective_bargaining_by_gender__blau_and_kahn__2017
   namespace: backport
-  publication_date: latest
   short_name: dataset_1002_incidence_of_managerial_or_professional_jobs_and_collective_bargaining_by_gender__blau_and_kahn__2017_config
+  file_extension: json
+  date_accessed: 2023-02-23 19:18:18.621529
+  name: Grapher metadata for dataset_1002_incidence_of_managerial_or_professional_jobs_and_collective_bargaining_by_gender__blau_and_kahn__2017
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/1002
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 3b5e6c8f3f8b9518534a89e46962f42b
-  size: 4274
+- md5: 3bf8486feb4ac4edec62ad52e03cdf4d
+  size: 5066
   path: dataset_1002_incidence_of_managerial_or_professional_jobs_and_collective_bargaining_by_gender__blau_and_kahn__2017_config.json

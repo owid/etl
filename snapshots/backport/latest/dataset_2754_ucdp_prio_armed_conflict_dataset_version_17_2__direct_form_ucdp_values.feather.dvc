@@ -1,18 +1,19 @@
 meta:
-  date_accessed: 2022-12-07 16:57:07.862675
+  namespace: backport
+  short_name: dataset_2754_ucdp_prio_armed_conflict_dataset_version_17_2__direct_form_ucdp_values
+  file_extension: feather
+  date_accessed: 2023-02-23 17:20:58.874075
+  name: UCDP/PRIO Armed Conflict Dataset version 17.2 (direct form UCDP)
   description: This is downloaded directly from UCDP, rather than being merged with
     PRIO 3.1 (as we've done for battle deaths)
-  file_extension: feather
-  is_public: true
-  name: UCDP/PRIO Armed Conflict Dataset version 17.2 (direct form UCDP)
-  namespace: backport
-  publication_date: latest
-  short_name: dataset_2754_ucdp_prio_armed_conflict_dataset_version_17_2__direct_form_ucdp_values
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2754
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: df2c94b446990915ea13e9585f0aa4c7
-  size: 7298
+- md5: 216676ecf9f73ab505aa26e3e34708e0
+  size: 7674
   path: dataset_2754_ucdp_prio_armed_conflict_dataset_version_17_2__direct_form_ucdp_values.feather

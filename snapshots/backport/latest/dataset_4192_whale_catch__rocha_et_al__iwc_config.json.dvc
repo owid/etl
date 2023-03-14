@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 16:30:22.902271
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_4192_whale_catch__rocha_et_al__iwc
   namespace: backport
-  publication_date: latest
   short_name: dataset_4192_whale_catch__rocha_et_al__iwc_config
+  file_extension: json
+  date_accessed: 2023-02-23 17:10:26.069047
+  name: Grapher metadata for dataset_4192_whale_catch__rocha_et_al__iwc
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/4192
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: e1dfec7153d46c6c3d53ae53dab335da
-  size: 7983
+- md5: 32918cfc41a5af90d1ca940674a7d943
+  size: 10383
   path: dataset_4192_whale_catch__rocha_et_al__iwc_config.json

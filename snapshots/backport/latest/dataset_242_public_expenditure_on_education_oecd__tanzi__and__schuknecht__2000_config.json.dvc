@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 00:55:27.899230
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_242_public_expenditure_on_education_oecd__tanzi__and__schuknecht__2000
   namespace: backport
-  publication_date: latest
   short_name: dataset_242_public_expenditure_on_education_oecd__tanzi__and__schuknecht__2000_config
+  file_extension: json
+  date_accessed: 2023-02-23 15:02:15.863512
+  name: Grapher metadata for dataset_242_public_expenditure_on_education_oecd__tanzi__and__schuknecht__2000
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/242
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: af7b142a229b558fae33dc76373537ca
-  size: 2176
+- md5: 68629443dcb771dadf1f9da0763d5120
+  size: 2370
   path: dataset_242_public_expenditure_on_education_oecd__tanzi__and__schuknecht__2000_config.json

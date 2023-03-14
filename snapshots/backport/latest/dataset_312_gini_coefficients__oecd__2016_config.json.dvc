@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:44:46.259570
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_312_gini_coefficients__oecd__2016
   namespace: backport
-  publication_date: latest
   short_name: dataset_312_gini_coefficients__oecd__2016_config
+  file_extension: json
+  date_accessed: 2023-02-23 16:41:26.693627
+  name: Grapher metadata for dataset_312_gini_coefficients__oecd__2016
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/312
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 94df65f82f2014bc19fe18f132335b9b
-  size: 2707
+- md5: cc5dcb0713c10dd403992e4ed461eaab
+  size: 3099
   path: dataset_312_gini_coefficients__oecd__2016_config.json

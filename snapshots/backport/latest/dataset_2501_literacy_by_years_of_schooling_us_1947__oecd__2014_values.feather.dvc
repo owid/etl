@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:51:27.518398
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: 'Literacy by years of schooling US 1947 – OECD (2014) '
   namespace: backport
-  publication_date: latest
   short_name: dataset_2501_literacy_by_years_of_schooling_us_1947__oecd__2014_values
+  file_extension: feather
+  date_accessed: 2023-02-23 16:57:03.717497
+  name: Literacy by years of schooling US 1947 – OECD (2014)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2501
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 87a05d1db906d3012db595c44beaeaab
-  size: 5794
+- md5: 08718353729d208614f1f094e70f46ba
+  size: 6162
   path: dataset_2501_literacy_by_years_of_schooling_us_1947__oecd__2014_values.feather

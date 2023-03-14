@@ -1,0 +1,17 @@
+dataset:
+  namespace: fasttrack
+  version: latest
+  short_name: battery_costs_per_kwh__ziegler_et_al__and_bnef
+  title: DRAFT Battery costs per kWh (Ziegler et al. and BNEF)
+  description: ''
+  sources:
+  - name: Unknown
+    published_by: Unknown
+    publication_year: 2023
+    date_accessed: 2023-02-24
+tables:
+  battery_costs_per_kwh__ziegler_et_al__and_bnef:
+    variables:
+      battery_costs_per_kwh__ziegler_et_al__and_bnef:
+        title: Battery costs per kWh (Ziegler et al. and BNEF)
+        unit: ''

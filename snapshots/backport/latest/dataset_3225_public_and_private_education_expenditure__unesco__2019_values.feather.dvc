@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 16:00:54.378764
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Public and private education expenditure - UNESCO (2019)
   namespace: backport
-  publication_date: latest
   short_name: dataset_3225_public_and_private_education_expenditure__unesco__2019_values
+  file_extension: feather
+  date_accessed: 2023-02-23 17:49:43.333947
+  name: Public and private education expenditure - UNESCO (2019)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/3225
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 918fbbda4e08ccee69fc2f6717cf400e
-  size: 9194
+- md5: 2634210b8c2b7b248b7785fbacbf523c
+  size: 9562
   path: dataset_3225_public_and_private_education_expenditure__unesco__2019_values.feather

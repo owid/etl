@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:09:28.538691
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Working Hours Data - Huberman & Minns (2007)
   namespace: backport
-  publication_date: latest
   short_name: dataset_234_working_hours_data__huberman__and__minns__2007_values
+  file_extension: feather
+  date_accessed: 2023-02-23 19:49:26.562616
+  name: Working Hours Data - Huberman & Minns (2007)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/234
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 7709449cab428157204f04c97f6b8aeb
-  size: 9018
+- md5: df267520311b70b88e1781536f158b38
+  size: 9386
   path: dataset_234_working_hours_data__huberman__and__minns__2007_values.feather

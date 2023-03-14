@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:22:12.330455
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Share of marriages in England and Wales that ended in divorce (UK ONS, 2020)
   namespace: backport
-  publication_date: latest
   short_name: dataset_5124_share_of_marriages_in_england_and_wales_that_ended_in_divorce__uk_ons__2020_values
+  file_extension: feather
+  date_accessed: 2023-02-23 17:13:30.923598
+  name: Share of marriages in England and Wales that ended in divorce (UK ONS, 2020)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5124
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 362816d776ae0c58d1e5363ab8fa2b15
-  size: 6610
+- md5: 94d652fd53733ae00af2480a9ab17601
+  size: 6986
   path: dataset_5124_share_of_marriages_in_england_and_wales_that_ended_in_divorce__uk_ons__2020_values.feather

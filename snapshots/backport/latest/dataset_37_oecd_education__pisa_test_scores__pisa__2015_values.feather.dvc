@@ -1,20 +1,22 @@
 meta:
-  date_accessed: 2022-12-07 17:11:29.415814
-  description: "Score is the mean average across the 3 rated categories - mathematics,\
-    \ reading and science - except in 2003, where problem solving was an additional\
-    \ category and included in the mean average.\r\n\r\nFurther notes:\r\n1. China\
-    \ only includes Shanghai.\r\n"
-  file_extension: feather
-  is_public: true
-  name: 'OECD Education: PISA Test Scores - PISA (2015)'
   namespace: backport
-  publication_date: latest
   short_name: dataset_37_oecd_education__pisa_test_scores__pisa__2015_values
+  file_extension: feather
+  date_accessed: 2023-02-23 16:44:12.152239
+  name: 'OECD Education: PISA Test Scores - PISA (2015)'
+  description: |-
+    Score is the mean average across the 3 rated categories - mathematics, reading and science - except in 2003, where problem solving was an additional category and included in the mean average.
+
+    Further notes:
+    1. China only includes Shanghai.
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/37
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: f486b2bca9b4caaa91bd15ded5ef4b8a
-  size: 9234
+- md5: a1ffeca57e6bf48a51269d0ba816650a
+  size: 9602
   path: dataset_37_oecd_education__pisa_test_scores__pisa__2015_values.feather

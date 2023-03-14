@@ -1,17 +1,18 @@
 meta:
   namespace: backport
   short_name: dataset_5835_internet_use_in_the_us_by_age__pew_research_center_values
+  file_extension: feather
+  date_accessed: 2023-03-03 11:10:04.010500
   name: Internet use in the US by age (Pew Research Center)
   description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5835
-  file_extension: feather
-  date_accessed: 2022-12-20 18:02:07.305943
+  source_published_by: Our World in Data catalog backport
   is_public: true
   version: latest
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: ed81f7ad3cc7975f202ebf8d5c918c18
-  size: 6258
+- md5: 5368a08ec82d79f151a9d469c363e4e4
+  size: 6626
   path: dataset_5835_internet_use_in_the_us_by_age__pew_research_center_values.feather

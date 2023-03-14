@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 16:59:39.234359
-  description: ''
-  file_extension: json
-  is_public: false
-  name: Grapher metadata for dataset_3025_total_merchandise_trade_as_share_of_gdp__cow_v_4_0_national__2016__split
   namespace: backport
-  publication_date: latest
   short_name: dataset_3025_total_merchandise_trade_as_share_of_gdp__cow_v_4_0_national__2016__split_config
+  file_extension: json
+  date_accessed: 2023-02-23 19:46:15.884408
+  name: Grapher metadata for dataset_3025_total_merchandise_trade_as_share_of_gdp__cow_v_4_0_national__2016__split
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/3025
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 4cce1aa4fa9b9e559ae4a6d63ba94b7d
-  size: 2415
+- md5: 37306e41894cd79a4f87f32806e749d6
+  size: 2613
   path: dataset_3025_total_merchandise_trade_as_share_of_gdp__cow_v_4_0_national__2016__split_config.json

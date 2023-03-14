@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 01:09:15.093414
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Human rights protection – Fariss et al. (2020)
   namespace: backport
-  publication_date: latest
   short_name: dataset_241_human_rights_protection__fariss_et_al__2020_values
+  file_extension: feather
+  date_accessed: 2023-02-23 19:09:36.970947
+  name: Human rights protection – Fariss et al. (2020)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/241
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: beef8a5a0817442ed655199948b6b990
-  size: 104962
+- md5: 0953574e547b8fc047c6149c4ae51e83
+  size: 105338
   path: dataset_241_human_rights_protection__fariss_et_al__2020_values.feather

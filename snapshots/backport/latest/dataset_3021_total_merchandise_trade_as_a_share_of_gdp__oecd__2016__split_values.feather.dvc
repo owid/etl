@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:12:45.126822
-  description: ''
-  file_extension: feather
-  is_public: false
-  name: Total merchandise trade as a share of GDP (OECD (2016)) (split)
   namespace: backport
-  publication_date: latest
   short_name: dataset_3021_total_merchandise_trade_as_a_share_of_gdp__oecd__2016__split_values
+  file_extension: feather
+  date_accessed: 2023-02-23 15:07:07.864082
+  name: Total merchandise trade as a share of GDP (OECD (2016)) (split)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/3021
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 37f52e0c08f8815b0c70faea332d0dcd
-  size: 11906
+- md5: cac91fc89ea48454445a2d236f2c5ac8
+  size: 12274
   path: dataset_3021_total_merchandise_trade_as_a_share_of_gdp__oecd__2016__split_values.feather

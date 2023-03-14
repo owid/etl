@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:56:39.406010
-  description: Backported
-  file_extension: json
-  is_public: false
-  name: Grapher metadata for dataset_5817_world_income_distribution__van_zanden_et_al__eds__2_14__oecd
   namespace: backport
-  publication_date: latest
   short_name: dataset_5817_world_income_distribution__van_zanden_et_al__eds__2_14__oecd_config
+  file_extension: json
+  date_accessed: 2023-02-23 19:24:16.410814
+  name: Grapher metadata for dataset_5817_world_income_distribution__van_zanden_et_al__eds__2_14__oecd
+  description: Backported
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5817
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: fc433be3cc7844dc3d18766dfc1f70e5
-  size: 5425
+- md5: 9e2be5193fd071ebbfc69a6609cc7742
+  size: 6825
   path: dataset_5817_world_income_distribution__van_zanden_et_al__eds__2_14__oecd_config.json

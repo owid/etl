@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-11-29 16:49:02.027097
-  description: This is a dataset imported by the automated fetcher
-  file_extension: feather
-  is_public: true
-  name: Statistical Review of World Energy - BP (2021)
   namespace: backport
-  publication_date: latest
   short_name: dataset_5347_statistical_review_of_world_energy__bp__2021_values
+  file_extension: feather
+  date_accessed: 2023-02-23 17:38:26.105028
+  name: Statistical Review of World Energy - BP (2021)
+  description: This is a dataset imported by the automated fetcher
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5347
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 847c48a00a483f7be1fd5ba24a9fc1fb
-  size: 1613202
+- md5: 660c52544210ad468fd9859feb2b9486
+  size: 1613586
   path: dataset_5347_statistical_review_of_world_energy__bp__2021_values.feather

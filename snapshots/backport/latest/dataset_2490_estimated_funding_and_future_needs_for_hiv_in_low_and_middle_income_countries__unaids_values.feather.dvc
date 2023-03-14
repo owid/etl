@@ -1,18 +1,19 @@
 meta:
-  date_accessed: 2022-12-07 16:54:20.648792
-  description: ''
+  namespace: backport
+  short_name: dataset_2490_estimated_funding_and_future_needs_for_hiv_in_low_and_middle_income_countries__unaids_values
   file_extension: feather
-  is_public: true
+  date_accessed: 2023-02-23 18:19:28.460587
   name: Estimated funding and future needs for HIV in low and middle income countries
     - UNAIDS
-  namespace: backport
-  publication_date: latest
-  short_name: dataset_2490_estimated_funding_and_future_needs_for_hiv_in_low_and_middle_income_countries__unaids_values
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2490
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 14a5caf0ba1e13af961b3c533dcd2916
-  size: 7298
+- md5: 79f0e0ee62ef2856273e03b9bf283f41
+  size: 7674
   path: dataset_2490_estimated_funding_and_future_needs_for_hiv_in_low_and_middle_income_countries__unaids_values.feather

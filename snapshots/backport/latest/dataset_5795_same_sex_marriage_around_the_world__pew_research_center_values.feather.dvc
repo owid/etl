@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 15:56:57.372315
-  description: https://github.com/owid/notebooks/tree/main/EdouardMathieu/pew_gay_marriage
-  file_extension: feather
-  is_public: false
-  name: Same-sex marriage around the world - Pew Research Center
   namespace: backport
-  publication_date: latest
   short_name: dataset_5795_same_sex_marriage_around_the_world__pew_research_center_values
+  file_extension: feather
+  date_accessed: 2023-02-23 17:44:36.370000
+  name: Same-sex marriage around the world - Pew Research Center
+  description: https://github.com/owid/notebooks/tree/main/EdouardMathieu/pew_gay_marriage
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5795
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: cde036b9bf6eff8c1169d28776261961
-  size: 6402
+- md5: b7cefb22322aa3be33aec3ce1ecd2def
+  size: 6770
   path: dataset_5795_same_sex_marriage_around_the_world__pew_research_center_values.feather

@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:24:06.461609
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_5541_number_of_state_based_conflicts__by_conflict_type_and_region__ucdp_prio
   namespace: backport
-  publication_date: latest
   short_name: dataset_5541_number_of_state_based_conflicts__by_conflict_type_and_region__ucdp_prio_config
+  file_extension: json
+  date_accessed: 2023-02-23 18:26:05.834356
+  name: Grapher metadata for dataset_5541_number_of_state_based_conflicts__by_conflict_type_and_region__ucdp_prio
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5541
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 2adf7eb47568e8c4fdfb36847b242ed8
-  size: 4809
+- md5: 37a85b6dfcfbddc6ba3a8f56b3f04c63
+  size: 5809
   path: dataset_5541_number_of_state_based_conflicts__by_conflict_type_and_region__ucdp_prio_config.json

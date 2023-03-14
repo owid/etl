@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:06:46.575338
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Number of countries with minimum urban population threshold (UN;2018)
   namespace: backport
-  publication_date: latest
   short_name: dataset_2885_number_of_countries_with_minimum_urban_population_threshold__un__2018_values
+  file_extension: feather
+  date_accessed: 2023-02-23 17:57:13.085783
+  name: Number of countries with minimum urban population threshold (UN;2018)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2885
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: e6eb3daa9b2d1c5ac6d38956096a8440
-  size: 6042
+- md5: 1aaecbd94f4eb8ce990fcf1945ba1ab3
+  size: 6418
   path: dataset_2885_number_of_countries_with_minimum_urban_population_threshold__un__2018_values.feather

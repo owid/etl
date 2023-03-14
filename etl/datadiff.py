@@ -13,10 +13,13 @@ from owid.catalog import Dataset, DatasetMeta, LocalCatalog, RemoteCatalog, Tabl
 from owid.catalog.catalogs import CHANNEL, OWID_CATALOG_URI
 from rich.console import Console
 
+from etl import config
 from etl.files import yaml_dump
 from etl.tempcompare import df_equals
 
 log = structlog.get_logger()
+
+config.enable_bugsnag()
 
 
 class DatasetDiff:
@@ -251,7 +254,9 @@ def cli(
             any_diff = True
 
     console.print()
-    if any_diff:
+    if not path_to_ds_a and not path_to_ds_b:
+        console.print("[yellow]❓ No datasets found[/yellow]")
+    elif any_diff:
         console.print("[red]❌ Found differences[/red]")
     else:
         console.print("[green]✅ No differences found[/green]")

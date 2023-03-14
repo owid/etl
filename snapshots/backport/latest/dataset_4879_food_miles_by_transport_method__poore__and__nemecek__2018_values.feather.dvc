@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:02:01.703998
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Food miles by transport method (Poore & Nemecek, 2018)
   namespace: backport
-  publication_date: latest
   short_name: dataset_4879_food_miles_by_transport_method__poore__and__nemecek__2018_values
+  file_extension: feather
+  date_accessed: 2023-02-23 16:53:23.582460
+  name: Food miles by transport method (Poore & Nemecek, 2018)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/4879
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 67f385a286e1f3fcdd46f0c7eaa7e45f
-  size: 6074
+- md5: 538b74c6f323865c8a2d32eac862b443
+  size: 6442
   path: dataset_4879_food_miles_by_transport_method__poore__and__nemecek__2018_values.feather

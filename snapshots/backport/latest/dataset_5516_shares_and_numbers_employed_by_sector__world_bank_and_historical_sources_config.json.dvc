@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 16:53:55.290057
-  description: ''
-  file_extension: json
-  is_public: false
-  name: Grapher metadata for dataset_5516_shares_and_numbers_employed_by_sector__world_bank_and_historical_sources
   namespace: backport
-  publication_date: latest
   short_name: dataset_5516_shares_and_numbers_employed_by_sector__world_bank_and_historical_sources_config
+  file_extension: json
+  date_accessed: 2023-02-23 19:06:39.635315
+  name: Grapher metadata for dataset_5516_shares_and_numbers_employed_by_sector__world_bank_and_historical_sources
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5516
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: b033d1d99f9899ae127f6147630aa1d6
-  size: 4901
+- md5: 132c46fc30fd0a308b6da54df784122d
+  size: 6301
   path: dataset_5516_shares_and_numbers_employed_by_sector__world_bank_and_historical_sources_config.json

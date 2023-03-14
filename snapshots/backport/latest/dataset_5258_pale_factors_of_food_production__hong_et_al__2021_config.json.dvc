@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 01:47:26.648848
-  description: ''
-  file_extension: json
-  is_public: false
-  name: Grapher metadata for dataset_5258_pale_factors_of_food_production__hong_et_al__2021
   namespace: backport
-  publication_date: latest
   short_name: dataset_5258_pale_factors_of_food_production__hong_et_al__2021_config
+  file_extension: json
+  date_accessed: 2023-02-23 19:31:32.958145
+  name: Grapher metadata for dataset_5258_pale_factors_of_food_production__hong_et_al__2021
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5258
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 78ad1a01bba7603229f9a71cae8b88da
-  size: 7993
+- md5: 3e058dd11d23d9ea0ec7e8dcd03ad041
+  size: 9593
   path: dataset_5258_pale_factors_of_food_production__hong_et_al__2021_config.json

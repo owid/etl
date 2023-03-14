@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 00:44:12.427895
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Coefficient of Variation (CV) in caloric intake
   namespace: backport
-  publication_date: latest
   short_name: dataset_649_coefficient_of_variation__cv__in_caloric_intake_values
+  file_extension: feather
+  date_accessed: 2023-02-23 17:35:31.998124
+  name: Coefficient of Variation (CV) in caloric intake
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/649
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 087c25c4f0ceadc30a4417fc07495b42
-  size: 16282
+- md5: bc0e98c8d4474efcf48384eb19854b3c
+  size: 16658
   path: dataset_649_coefficient_of_variation__cv__in_caloric_intake_values.feather

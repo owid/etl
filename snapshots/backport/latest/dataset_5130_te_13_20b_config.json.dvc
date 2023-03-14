@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 15:38:30.263954
-  description: core-econ.org
-  file_extension: json
-  is_public: false
-  name: Grapher metadata for dataset_5130_te_13_20b
   namespace: backport
-  publication_date: latest
   short_name: dataset_5130_te_13_20b_config
+  file_extension: json
+  date_accessed: 2023-02-23 19:32:26.613997
+  name: Grapher metadata for dataset_5130_te_13_20b
+  description: core-econ.org
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5130
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: e261b070bbc4363e7c13926f63e235c2
-  size: 1317
+- md5: ce48308861d2a431df62d1acde5b1b7f
+  size: 1517
   path: dataset_5130_te_13_20b_config.json

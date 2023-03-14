@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-09 11:20:22.663989
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_4129_years_of_schooling__based_on_lee_lee__2016__barro_lee__2018__and_undp__2018
   namespace: backport
-  publication_date: latest
   short_name: dataset_4129_years_of_schooling__based_on_lee_lee__2016__barro_lee__2018__and_undp__2018_config
+  file_extension: json
+  date_accessed: 2023-02-23 17:09:46.808023
+  name: Grapher metadata for dataset_4129_years_of_schooling__based_on_lee_lee__2016__barro_lee__2018__and_undp__2018
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/4129
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: f148ab667b15d24f8a0efe0ac6dc769b
-  size: 2564
+- md5: 1648ae24cbbb85cbda5068285d59f0cd
+  size: 2764
   path: dataset_4129_years_of_schooling__based_on_lee_lee__2016__barro_lee__2018__and_undp__2018_config.json

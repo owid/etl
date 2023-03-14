@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:00:16.160962
-  description: ''
-  file_extension: feather
-  is_public: false
-  name: world-regions-according-to-the-united-nations
   namespace: backport
-  publication_date: latest
   short_name: dataset_5380_world_regions_according_to_the_united_nations_values
+  file_extension: feather
+  date_accessed: 2023-02-23 16:37:24.268601
+  name: world-regions-according-to-the-united-nations
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5380
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: ea44bc59ede4c4ffa17f664e240f3561
-  size: 14674
+- md5: 073c74a84c8f31b8102edaed84a3c0d7
+  size: 15050
   path: dataset_5380_world_regions_according_to_the_united_nations_values.feather

@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-11-29 16:24:49.764625
-  description: This is a dataset imported by the automated fetcher
-  file_extension: feather
-  is_public: true
-  name: Statistical Capacity Indicator (SCI) - World Bank Data on Statistical Capacity
   namespace: backport
-  publication_date: latest
   short_name: dataset_1070_statistical_capacity_indicator__sci__world_bank_data_on_statistical_capacity_values
+  file_extension: feather
+  date_accessed: 2023-02-23 17:24:49.802048
+  name: Statistical Capacity Indicator (SCI) - World Bank Data on Statistical Capacity
+  description: This is a dataset imported by the automated fetcher
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/1070
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: db1e72ba1d77b7ef9f83b25c082c319d
-  size: 48738
+- md5: da02c9c3abf4c2abcc29c4e11697d8ed
+  size: 49114
   path: dataset_1070_statistical_capacity_indicator__sci__world_bank_data_on_statistical_capacity_values.feather

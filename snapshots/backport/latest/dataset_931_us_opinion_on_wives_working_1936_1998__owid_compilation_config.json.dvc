@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 16:32:45.216605
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_931_us_opinion_on_wives_working_1936_1998__owid_compilation
   namespace: backport
-  publication_date: latest
   short_name: dataset_931_us_opinion_on_wives_working_1936_1998__owid_compilation_config
+  file_extension: json
+  date_accessed: 2023-02-23 18:55:41.030734
+  name: Grapher metadata for dataset_931_us_opinion_on_wives_working_1936_1998__owid_compilation
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/931
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 56ac086d79c012cb3a6db951d63c0295
-  size: 1893
+- md5: 6da951cabb406d76bf28f448ca661461
+  size: 2091
   path: dataset_931_us_opinion_on_wives_working_1936_1998__owid_compilation_config.json

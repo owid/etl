@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:47:15.715562
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_516_air_pollution_by_city__fouquet_and_dpcc__2011
   namespace: backport
-  publication_date: latest
   short_name: dataset_516_air_pollution_by_city__fouquet_and_dpcc__2011_config
+  file_extension: json
+  date_accessed: 2023-02-23 15:08:39.810567
+  name: Grapher metadata for dataset_516_air_pollution_by_city__fouquet_and_dpcc__2011
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/516
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: f348643d9f904831f6d5fe40cca44821
-  size: 2093
+- md5: f4286ae5209c95bce785daa6c1562a0b
+  size: 2289
   path: dataset_516_air_pollution_by_city__fouquet_and_dpcc__2011_config.json

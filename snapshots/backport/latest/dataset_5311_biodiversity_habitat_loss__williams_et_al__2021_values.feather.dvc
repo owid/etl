@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 00:56:43.903949
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Biodiversity habitat loss (Williams et al. 2021)
   namespace: backport
-  publication_date: latest
   short_name: dataset_5311_biodiversity_habitat_loss__williams_et_al__2021_values
+  file_extension: feather
+  date_accessed: 2023-02-23 18:23:41.326227
+  name: Biodiversity habitat loss (Williams et al. 2021)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5311
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 24e672ed6b70431aba36277484b3a333
-  size: 78962
+- md5: 55afc7da5d8282111643179e3011eed8
+  size: 79338
   path: dataset_5311_biodiversity_habitat_loss__williams_et_al__2021_values.feather

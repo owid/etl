@@ -10,9 +10,6 @@ all_sources:
 
 dataset:
   title: # TO BE FILLED. Example: Testing Dataset Name (Institution, 2023)
-  namespace: dummy
-  short_name: dummy
-  version: 2020-01-01
   # description: Dataset description.
   licenses:
     - name: # TO BE FILLED. Example: Testing License Name

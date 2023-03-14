@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 16:55:23.951381
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Cancer deaths grouped - OWID based on IHME
   namespace: backport
-  publication_date: latest
   short_name: dataset_1936_cancer_deaths_grouped__owid_based_on_ihme_values
+  file_extension: feather
+  date_accessed: 2023-02-23 16:58:34.823772
+  name: Cancer deaths grouped - OWID based on IHME
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/1936
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: bca930f18a3cfa4cf52f30692ac06c39
-  size: 346874
+- md5: 5050b133a6b03e71dc1a809bc1cd7169
+  size: 347250
   path: dataset_1936_cancer_deaths_grouped__owid_based_on_ihme_values.feather

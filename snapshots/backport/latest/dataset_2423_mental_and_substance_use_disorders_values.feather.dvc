@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:26:10.614431
-  description: This is a dataset imported by the automated fetcher
-  file_extension: feather
-  is_public: true
-  name: Mental and substance use disorders
   namespace: backport
-  publication_date: latest
   short_name: dataset_2423_mental_and_substance_use_disorders_values
+  file_extension: feather
+  date_accessed: 2023-02-23 19:09:59.052132
+  name: Mental and substance use disorders
+  description: This is a dataset imported by the automated fetcher
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2423
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 84423da61d0700612820c3f709706fbb
-  size: 5422338
+- md5: d005ffc9669c72961907685f5d7b1d89
+  size: 5422722
   path: dataset_2423_mental_and_substance_use_disorders_values.feather

@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 00:31:17.189215
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Recycled plastic exports - Brooks et al. (2018)
   namespace: backport
-  publication_date: latest
   short_name: dataset_2859_recycled_plastic_exports__brooks_et_al__2018_values
+  file_extension: feather
+  date_accessed: 2023-02-23 17:55:27.904549
+  name: Recycled plastic exports - Brooks et al. (2018)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2859
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 869d4817b266a756ce99abbeaacbaf9d
-  size: 6482
+- md5: caf8840784e77b4e82663f7eff4c383c
+  size: 6850
   path: dataset_2859_recycled_plastic_exports__brooks_et_al__2018_values.feather

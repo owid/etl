@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:33:23.813925
-  description: https://github.com/owid/notebooks/tree/main/EdouardMathieu/earth_impact_database
-  file_extension: json
-  is_public: false
-  name: Grapher metadata for dataset_5643_earth_impact_database__top_20_craters_by_diameter
   namespace: backport
-  publication_date: latest
   short_name: dataset_5643_earth_impact_database__top_20_craters_by_diameter_config
+  file_extension: json
+  date_accessed: 2023-02-23 17:59:40.552430
+  name: Grapher metadata for dataset_5643_earth_impact_database__top_20_craters_by_diameter
+  description: https://github.com/owid/notebooks/tree/main/EdouardMathieu/earth_impact_database
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5643
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: cd4417fe75e2187074361a88f3c12f76
-  size: 1990
+- md5: 9f2accb4a47d149d0bb65321686371fb
+  size: 2190
   path: dataset_5643_earth_impact_database__top_20_craters_by_diameter_config.json

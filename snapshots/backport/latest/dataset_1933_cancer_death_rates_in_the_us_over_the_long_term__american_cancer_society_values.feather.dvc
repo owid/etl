@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 00:57:26.624379
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Cancer death rates in the US over the long-term - American Cancer Society
   namespace: backport
-  publication_date: latest
   short_name: dataset_1933_cancer_death_rates_in_the_us_over_the_long_term__american_cancer_society_values
+  file_extension: feather
+  date_accessed: 2023-02-23 18:38:09.422130
+  name: Cancer death rates in the US over the long-term - American Cancer Society
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/1933
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: dc58baf0e0f402038588fcf1c314d21a
-  size: 10514
+- md5: 57c1d2a3c58525827b78e4f4fefb536f
+  size: 10890
   path: dataset_1933_cancer_death_rates_in_the_us_over_the_long_term__american_cancer_society_values.feather

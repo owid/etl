@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:24:24.358274
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Antibiotic use in livestock 2030 - Boeckel et al. (2017)
   namespace: backport
-  publication_date: latest
   short_name: dataset_1035_antibiotic_use_in_livestock_2030__boeckel_et_al__2017_values
+  file_extension: feather
+  date_accessed: 2023-02-23 19:03:26.410755
+  name: Antibiotic use in livestock 2030 - Boeckel et al. (2017)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/1035
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 4a0c2b4de878ad2fd8585bb2f861a4c3
-  size: 5946
+- md5: c0f5f4ae56181dadfffc609a353af0c4
+  size: 6314
   path: dataset_1035_antibiotic_use_in_livestock_2030__boeckel_et_al__2017_values.feather

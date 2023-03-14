@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 15:54:53.090891
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_426_weather_fatality_rates_in_the_us__owid_based_on_noaa_and_lopez_holle_and_population_data
   namespace: backport
-  publication_date: latest
   short_name: dataset_426_weather_fatality_rates_in_the_us__owid_based_on_noaa_and_lopez_holle_and_population_data_config
+  file_extension: json
+  date_accessed: 2023-02-23 16:45:31.981111
+  name: Grapher metadata for dataset_426_weather_fatality_rates_in_the_us__owid_based_on_noaa_and_lopez_holle_and_population_data
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/426
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: f93c6746a5727454804573b4a55bd1dd
-  size: 6203
+- md5: 2f3e2dd86c28b019b3562ecb0baac37e
+  size: 7967
   path: dataset_426_weather_fatality_rates_in_the_us__owid_based_on_noaa_and_lopez_holle_and_population_data_config.json

@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 01:39:04.360827
-  description: ''
-  file_extension: feather
-  is_public: false
-  name: Death rate from energy production - Markandya & Wilkinson (2007)
   namespace: backport
-  publication_date: latest
   short_name: dataset_455_death_rate_from_energy_production__markandya__and__wilkinson__2007_values
+  file_extension: feather
+  date_accessed: 2023-02-23 17:26:35.360060
+  name: Death rate from energy production - Markandya & Wilkinson (2007)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/455
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 539fbc9fdf3ce458ba6e591720ade368
-  size: 6090
+- md5: 1ddc76537972f5e1b464476994e4bc2d
+  size: 6458
   path: dataset_455_death_rate_from_energy_production__markandya__and__wilkinson__2007_values.feather

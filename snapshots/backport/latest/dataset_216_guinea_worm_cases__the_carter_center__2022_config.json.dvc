@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:19:15.940829
-  description: Manual update of spreadsheet
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_216_guinea_worm_cases__the_carter_center__2022
   namespace: backport
-  publication_date: latest
   short_name: dataset_216_guinea_worm_cases__the_carter_center__2022_config
+  file_extension: json
+  date_accessed: 2023-02-23 17:35:25.124616
+  name: Grapher metadata for dataset_216_guinea_worm_cases__the_carter_center__2022
+  description: Manual update of spreadsheet
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/216
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: ee50b35c1e3a15310f9d5d5cbe183c45
-  size: 2426
+- md5: c8862a463fb0481f694d68727497a18e
+  size: 2620
   path: dataset_216_guinea_worm_cases__the_carter_center__2022_config.json

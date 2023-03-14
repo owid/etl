@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:24:16.230434
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_1035_antibiotic_use_in_livestock_2030__boeckel_et_al__2017
   namespace: backport
-  publication_date: latest
   short_name: dataset_1035_antibiotic_use_in_livestock_2030__boeckel_et_al__2017_config
+  file_extension: json
+  date_accessed: 2023-02-23 19:02:58.989876
+  name: Grapher metadata for dataset_1035_antibiotic_use_in_livestock_2030__boeckel_et_al__2017
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/1035
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 26289a15732483b7e89ef5442c0115be
-  size: 2227
+- md5: 04727ab1319b97f42fad76c24c6a7aee
+  size: 2425
   path: dataset_1035_antibiotic_use_in_livestock_2030__boeckel_et_al__2017_config.json

@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 01:03:10.261811
-  description: ''
-  file_extension: feather
-  is_public: false
-  name: Rig Count (US Bureau of Labor Statistics (2017)) (split)
   namespace: backport
-  publication_date: latest
   short_name: dataset_3011_rig_count__us_bureau_of_labor_statistics__2017__split_values
+  file_extension: feather
+  date_accessed: 2023-02-23 16:49:49.869153
+  name: Rig Count (US Bureau of Labor Statistics (2017)) (split)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/3011
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 8078252fe1c2511f77ca1f30a85d0cda
-  size: 6242
+- md5: e18f18bd9959a3107b6939ea11ae4247
+  size: 6610
   path: dataset_3011_rig_count__us_bureau_of_labor_statistics__2017__split_values.feather

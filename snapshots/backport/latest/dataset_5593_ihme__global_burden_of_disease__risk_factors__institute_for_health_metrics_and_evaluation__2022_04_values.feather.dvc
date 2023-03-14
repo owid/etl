@@ -1,18 +1,19 @@
 meta:
-  date_accessed: 2022-11-29 16:24:36.352020
-  description: This is a dataset imported by the automated fetcher
+  namespace: backport
+  short_name: dataset_5593_ihme__global_burden_of_disease__risk_factors__institute_for_health_metrics_and_evaluation__2022_04_values
   file_extension: feather
-  is_public: true
+  date_accessed: 2023-02-23 17:14:53.291175
   name: IHME - Global Burden of Disease - Risk Factors - Institute for Health Metrics
     and Evaluation  (2022-04)
-  namespace: backport
-  publication_date: latest
-  short_name: dataset_5593_ihme__global_burden_of_disease__risk_factors__institute_for_health_metrics_and_evaluation__2022_04_values
+  description: This is a dataset imported by the automated fetcher
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5593
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: f2e3445f501922b3d9df6d2bf3695209
-  size: 6510266
+- md5: 0dd521a6591f50c7503c7a77e28f3d4c
+  size: 6510642
   path: dataset_5593_ihme__global_burden_of_disease__risk_factors__institute_for_health_metrics_and_evaluation__2022_04_values.feather

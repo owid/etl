@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5686_methane_emissions_by_sector__cait__2022_config
   file_extension: json
-  date_accessed: 2023-01-27 10:08:34.084236
+  date_accessed: 2023-02-23 17:33:39.253082
   name: Grapher metadata for dataset_5686_methane_emissions_by_sector__cait__2022
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: be24320685a2d494849aacd99b608634
-  size: 18999
+- md5: 04506688eedcf91b9727caf18ea821b7
+  size: 24599
   path: dataset_5686_methane_emissions_by_sector__cait__2022_config.json

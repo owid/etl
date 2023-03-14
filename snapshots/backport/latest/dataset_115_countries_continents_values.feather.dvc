@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-11-29 16:38:38.611121
-  description: Continents each country belongs to. Good one.
-  file_extension: feather
-  is_public: true
-  name: Countries Continents
   namespace: backport
-  publication_date: latest
   short_name: dataset_115_countries_continents_values
+  file_extension: feather
+  date_accessed: 2023-02-23 19:22:16.177960
+  name: Countries Continents
+  description: Continents each country belongs to. Good one.
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/115
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 14456789ef9a4b4dcebffbabfd644e62
-  size: 16162
+- md5: 1b2c513454b789b0dddba0959ec24f7e
+  size: 16538
   path: dataset_115_countries_continents_values.feather

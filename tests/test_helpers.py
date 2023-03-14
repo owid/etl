@@ -195,3 +195,30 @@ tables: {}""".strip()
     assert ds.metadata.short_name == "rose"
     assert ds.metadata.description == "Test description"
     assert ds.metadata.title == "Test title"
+
+
+def test_PathFinder_with_private_steps():
+    pf = PathFinder(str(paths.STEP_DIR / "data/garden/namespace/2023/name/__init__.py"))
+
+    pf.dag = {
+        "data://garden/namespace/2023/name": {
+            "snapshot://namespace/2023/snapshot_a",
+            "snapshot-private://namespace/2023/snapshot_b",
+            # There could be two steps with the same name, one public and one private (odd case).
+            "snapshot-private://namespace/2023/snapshot_a",
+        }
+    }
+    assert pf.step == "data://garden/namespace/2023/name"
+    assert pf.get_dependency_step_name("snapshot_a") == "snapshot://namespace/2023/snapshot_a"
+    assert pf.get_dependency_step_name("snapshot_b") == "snapshot-private://namespace/2023/snapshot_b"
+    # In the odd case that two dependencies have the same name, but one is public and the other is private,
+    # assume it's public, unless explicitly stated otherwise.
+    assert pf.get_dependency_step_name("snapshot_a", is_private=True) == "snapshot-private://namespace/2023/snapshot_a"
+
+    pf.dag = {
+        "data-private://garden/namespace/2023/name": {
+            "snapshot-private://namespace/2023/name",
+        }
+    }
+    assert pf.step == "data-private://garden/namespace/2023/name"
+    assert pf.get_dependency_step_name("name") == "snapshot-private://namespace/2023/name"

@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:23:54.128052
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_2854_decomposition_times_of_marine_debris
   namespace: backport
-  publication_date: latest
   short_name: dataset_2854_decomposition_times_of_marine_debris_config
+  file_extension: json
+  date_accessed: 2023-02-23 16:26:18.855840
+  name: Grapher metadata for dataset_2854_decomposition_times_of_marine_debris
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2854
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 2edfa85ff14bb29cbd2af4416cbc2764
-  size: 1531
+- md5: 9249b363a2d18348faaea4842880bdab
+  size: 1729
   path: dataset_2854_decomposition_times_of_marine_debris_config.json

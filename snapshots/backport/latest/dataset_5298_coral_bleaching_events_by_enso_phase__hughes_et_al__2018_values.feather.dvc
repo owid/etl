@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-19 12:01:03.518786
-  description: ''
-  file_extension: feather
-  is_public: false
-  name: Coral bleaching events by ENSO phase (Hughes et al. 2018)
   namespace: backport
-  publication_date: latest
   short_name: dataset_5298_coral_bleaching_events_by_enso_phase__hughes_et_al__2018_values
+  file_extension: feather
+  date_accessed: 2023-02-23 19:41:37.313508
+  name: Coral bleaching events by ENSO phase (Hughes et al. 2018)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5298
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 24917e303fbf2f892571fdd6c00bb0ec
-  size: 6586
+- md5: 038daf1e282502ab02e01ed414efe893
+  size: 6962
   path: dataset_5298_coral_bleaching_events_by_enso_phase__hughes_et_al__2018_values.feather

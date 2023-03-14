@@ -1,18 +1,19 @@
 meta:
-  date_accessed: 2022-12-08 01:44:22.033680
+  namespace: backport
+  short_name: dataset_707_output_of_key_services_sectors_in_england__using_bank_of_england__2017_values
+  file_extension: feather
+  date_accessed: 2023-02-23 18:00:00.164011
+  name: Output of key services sectors in England - using Bank of England (2017)
   description: This data consists the measures of output in key services sectors in
     England (1270-1870).
-  file_extension: feather
-  is_public: true
-  name: Output of key services sectors in England - using Bank of England (2017)
-  namespace: backport
-  publication_date: latest
-  short_name: dataset_707_output_of_key_services_sectors_in_england__using_bank_of_england__2017_values
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/707
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 1e73a4c17d30a8dbedfb919301f14c4b
-  size: 31482
+- md5: 481da97a06bbc401f7bd6c432b73c4e3
+  size: 31858
   path: dataset_707_output_of_key_services_sectors_in_england__using_bank_of_england__2017_values.feather

@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 16:53:43.710301
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Trade – Giovanni and Tena-Junguito (2016)
   namespace: backport
-  publication_date: latest
   short_name: dataset_292_trade__giovanni_and_tena_junguito__2016_values
+  file_extension: feather
+  date_accessed: 2023-02-23 15:13:30.626180
+  name: Trade – Giovanni and Tena-Junguito (2016)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/292
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: d1853f09f6581c0bd77b82a5b4b36aee
-  size: 8330
+- md5: 780d2d9ab2ccfcdf1eaa4523333852dc
+  size: 8706
   path: dataset_292_trade__giovanni_and_tena_junguito__2016_values.feather

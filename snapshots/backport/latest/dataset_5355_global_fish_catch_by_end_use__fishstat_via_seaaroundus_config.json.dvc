@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 15:56:03.308063
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_5355_global_fish_catch_by_end_use__fishstat_via_seaaroundus
   namespace: backport
-  publication_date: latest
   short_name: dataset_5355_global_fish_catch_by_end_use__fishstat_via_seaaroundus_config
+  file_extension: json
+  date_accessed: 2023-02-23 18:00:29.855863
+  name: Grapher metadata for dataset_5355_global_fish_catch_by_end_use__fishstat_via_seaaroundus
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5355
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: ec976be59bdb3ecde84ffbf7405efd53
-  size: 10239
+- md5: 85dc31945fd6e0ca19a70bd58821f5b4
+  size: 14239
   path: dataset_5355_global_fish_catch_by_end_use__fishstat_via_seaaroundus_config.json

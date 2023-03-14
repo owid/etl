@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 01:18:22.336841
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_1852_usa_patents_granted__us_patent__and__trademark_office
   namespace: backport
-  publication_date: latest
   short_name: dataset_1852_usa_patents_granted__us_patent__and__trademark_office_config
+  file_extension: json
+  date_accessed: 2023-02-23 15:14:41.641511
+  name: Grapher metadata for dataset_1852_usa_patents_granted__us_patent__and__trademark_office
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/1852
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: c8d42b84936be308e7a6151236c03be6
-  size: 4950
+- md5: 25913d1f2d0dfe0ed7e8352d9d86a841
+  size: 6336
   path: dataset_1852_usa_patents_granted__us_patent__and__trademark_office_config.json

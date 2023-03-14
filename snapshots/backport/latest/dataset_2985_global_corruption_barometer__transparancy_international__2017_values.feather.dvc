@@ -1,19 +1,20 @@
 meta:
-  date_accessed: 2022-12-08 01:25:37.900359
+  namespace: backport
+  short_name: dataset_2985_global_corruption_barometer__transparancy_international__2017_values
+  file_extension: feather
+  date_accessed: 2023-02-23 17:09:01.729921
+  name: Global Corruption Barometer - Transparancy International (2017)
   description: The surveys are spread across years, and the metrics are not constant
     over time, which makes this a tricky dataset. It's necessary to allow tolerance
     when using it to make graphs.
-  file_extension: feather
-  is_public: false
-  name: Global Corruption Barometer - Transparancy International (2017)
-  namespace: backport
-  publication_date: latest
-  short_name: dataset_2985_global_corruption_barometer__transparancy_international__2017_values
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2985
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 18bb61045f3a01f51e9d5b8ddb55f878
-  size: 18114
+- md5: 94c659065770454fdd1a7b96875be3a2
+  size: 18490
   path: dataset_2985_global_corruption_barometer__transparancy_international__2017_values.feather

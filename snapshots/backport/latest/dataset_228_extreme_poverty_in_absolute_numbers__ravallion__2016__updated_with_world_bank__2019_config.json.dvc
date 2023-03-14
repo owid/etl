@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 00:45:24.376993
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_228_extreme_poverty_in_absolute_numbers__ravallion__2016__updated_with_world_bank__2019
   namespace: backport
-  publication_date: latest
   short_name: dataset_228_extreme_poverty_in_absolute_numbers__ravallion__2016__updated_with_world_bank__2019_config
+  file_extension: json
+  date_accessed: 2023-02-23 18:54:39.326531
+  name: Grapher metadata for dataset_228_extreme_poverty_in_absolute_numbers__ravallion__2016__updated_with_world_bank__2019
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/228
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 0bdfc604ce746967bdf47f2bc654d63c
-  size: 3534
+- md5: d41cd608094ec969b08bd809ab6644a1
+  size: 3922
   path: dataset_228_extreme_poverty_in_absolute_numbers__ravallion__2016__updated_with_world_bank__2019_config.json

@@ -1,0 +1,32 @@
+meta:
+  namespace: excess_mortality
+  short_name: wmd
+  name: World Mortality Dataset
+  version: 2023-02-28
+  publication_year: 2021
+  publication_date: 2021-06-30
+  source_name: Karlinsky and Kobak (2021)
+  source_published_by: Karlinsky & Kobak 2021, Tracking excess mortality across countries
+    during the COVID-19 pandemic with the World Mortality Dataset, eLife https://doi.org/10.7554/eLife.69336
+  url: https://github.com/akarlinsky/world_mortality/
+  source_data_url: https://raw.githubusercontent.com/akarlinsky/world_mortality/main/world_mortality.csv
+  file_extension: csv
+  license_url: https://github.com/akarlinsky/world_mortality/blob/main/LICENSE
+  license_name: MIT License
+  date_accessed: 2023-02-28
+  is_public: true
+  description: |
+    World Mortality Dataset: international data on all-cause mortality.
+
+    This dataset contains country-level data on all-cause mortality in 2015–2022 collected from various sources. They are currently providing data for 122 countries and territories.
+
+    For a complete and up-to-date list of notes on the dataset, please refer to their GitHub page at https://github.com/akarlinsky/world_mortality/.
+
+    For the list of sources that they use, please go to https://github.com/akarlinsky/world_mortality/#sou rces.
+
+    Published paper available at https://elifesciences.org/articles/69336.
+wdir: ../../../data/snapshots/excess_mortality/2023-02-28
+outs:
+- md5: 9950c04728a5200795c0e4256e37b3d9
+  size: 897270
+  path: wmd.csv

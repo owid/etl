@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 15:51:40.952175
-  description: ''
-  file_extension: json
-  is_public: false
-  name: Grapher metadata for dataset_5297_global_bleaching_events__hughes_et_al__2018
   namespace: backport
-  publication_date: latest
   short_name: dataset_5297_global_bleaching_events__hughes_et_al__2018_config
+  file_extension: json
+  date_accessed: 2023-02-23 18:01:38.889097
+  name: Grapher metadata for dataset_5297_global_bleaching_events__hughes_et_al__2018
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5297
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 1891ad04f1c11e2a2fe193debc83c81f
-  size: 3173
+- md5: db8fa68095fbddc135ce0dd2d6f5b297
+  size: 3773
   path: dataset_5297_global_bleaching_events__hughes_et_al__2018_config.json

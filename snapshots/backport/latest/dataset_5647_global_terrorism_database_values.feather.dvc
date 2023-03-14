@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 01:49:41.057502
-  description: https://github.com/owid/notebooks/tree/main/EdouardMathieu/global_terrorism_database
-  file_extension: feather
-  is_public: false
-  name: Global Terrorism Database
   namespace: backport
-  publication_date: latest
   short_name: dataset_5647_global_terrorism_database_values
+  file_extension: feather
+  date_accessed: 2023-03-14 10:19:39.624953
+  name: Global Terrorism Database
+  description: https://github.com/owid/notebooks/tree/main/EdouardMathieu/global_terrorism_database
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5647
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 21dcecf154242ad0f9144aa249947de1
-  size: 66138
+- md5: e1de26d2b0a3d0fde0b854207640de12
+  size: 66514
   path: dataset_5647_global_terrorism_database_values.feather

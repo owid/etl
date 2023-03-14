@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:42:23.850516
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_651_hubberts_peak__cavallo__and__eia
   namespace: backport
-  publication_date: latest
   short_name: dataset_651_hubberts_peak__cavallo__and__eia_config
+  file_extension: json
+  date_accessed: 2023-02-23 16:35:52.652785
+  name: Grapher metadata for dataset_651_hubberts_peak__cavallo__and__eia
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/651
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: a0371a222adfe6df64e4262c0279a9ef
-  size: 2407
+- md5: 4198468600df3f4ca8c9c4f2e4719a11
+  size: 2799
   path: dataset_651_hubberts_peak__cavallo__and__eia_config.json

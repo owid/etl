@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:35:04.571711
-  description: https://github.com/owid/notebooks/tree/main/EdouardMathieu/2021_12_bsl4_facilities_world_map
-  file_extension: feather
-  is_public: false
-  name: Biosafety level 4 facilities
   namespace: backport
-  publication_date: latest
   short_name: dataset_5436_biosafety_level_4_facilities_values
+  file_extension: feather
+  date_accessed: 2023-03-01 12:05:52.818375
+  name: Biosafety level 4 facilities
+  description: https://github.com/owid/notebooks/tree/main/EdouardMathieu/2021_12_bsl4_facilities_world_map
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5436
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 313190f6fe060e7b127d64a25f12fe0d
-  size: 6466
+- md5: 918de44ac1d24d5608409366f8dbd26d
+  size: 6842
   path: dataset_5436_biosafety_level_4_facilities_values.feather

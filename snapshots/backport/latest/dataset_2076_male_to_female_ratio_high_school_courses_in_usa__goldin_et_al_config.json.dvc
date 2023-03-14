@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:02:43.860440
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_2076_male_to_female_ratio_high_school_courses_in_usa__goldin_et_al
   namespace: backport
-  publication_date: latest
   short_name: dataset_2076_male_to_female_ratio_high_school_courses_in_usa__goldin_et_al_config
+  file_extension: json
+  date_accessed: 2023-02-23 17:31:26.861421
+  name: Grapher metadata for dataset_2076_male_to_female_ratio_high_school_courses_in_usa__goldin_et_al
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2076
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: f96b0c7e2c7a832991e52440f34dbb2f
-  size: 2484
+- md5: 1e33cbd0137cbe06e05774950e299098
+  size: 3078
   path: dataset_2076_male_to_female_ratio_high_school_courses_in_usa__goldin_et_al_config.json

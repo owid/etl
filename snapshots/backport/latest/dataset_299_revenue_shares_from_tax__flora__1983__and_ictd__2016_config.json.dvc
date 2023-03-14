@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 15:38:38.686440
-  description: Europe
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_299_revenue_shares_from_tax__flora__1983__and_ictd__2016
   namespace: backport
-  publication_date: latest
   short_name: dataset_299_revenue_shares_from_tax__flora__1983__and_ictd__2016_config
+  file_extension: json
+  date_accessed: 2023-02-23 16:38:48.824862
+  name: Grapher metadata for dataset_299_revenue_shares_from_tax__flora__1983__and_ictd__2016
+  description: Europe
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/299
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 2749c7a021a1725337e2da3bf4188d85
-  size: 1855
+- md5: 431721c8692650728e5cc477b1a1fcf6
+  size: 2051
   path: dataset_299_revenue_shares_from_tax__flora__1983__and_ictd__2016_config.json

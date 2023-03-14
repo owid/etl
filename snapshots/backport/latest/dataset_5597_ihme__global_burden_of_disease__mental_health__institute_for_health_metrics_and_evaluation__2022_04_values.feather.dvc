@@ -1,18 +1,19 @@
 meta:
-  date_accessed: 2022-12-07 17:51:14.477643
-  description: This is a dataset imported by the automated fetcher
+  namespace: backport
+  short_name: dataset_5597_ihme__global_burden_of_disease__mental_health__institute_for_health_metrics_and_evaluation__2022_04_values
   file_extension: feather
-  is_public: true
+  date_accessed: 2023-02-23 16:58:27.110697
   name: IHME - Global Burden of Disease - Mental Health - Institute for Health Metrics
     and Evaluation  (2022-04)
-  namespace: backport
-  publication_date: latest
-  short_name: dataset_5597_ihme__global_burden_of_disease__mental_health__institute_for_health_metrics_and_evaluation__2022_04_values
+  description: This is a dataset imported by the automated fetcher
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5597
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 8692829bab76fbad16adc6210f712061
-  size: 3332642
+- md5: 0f32f3fc986caed611185c044fa07daf
+  size: 3333018
   path: dataset_5597_ihme__global_burden_of_disease__mental_health__institute_for_health_metrics_and_evaluation__2022_04_values.feather

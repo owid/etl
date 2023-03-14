@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_3096_biomass_and_taxa_abundance__bar_on_et_al__2018_config
   file_extension: json
-  date_accessed: 2023-01-25 12:12:13.776418
+  date_accessed: 2023-02-23 17:32:45.617070
   name: Grapher metadata for dataset_3096_biomass_and_taxa_abundance__bar_on_et_al__2018
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: e581de02d4ae5f311bc851735637e7fd
-  size: 2248
+- md5: faf9fde2bd3544349469b50dd93d2f10
+  size: 2644
   path: dataset_3096_biomass_and_taxa_abundance__bar_on_et_al__2018_config.json

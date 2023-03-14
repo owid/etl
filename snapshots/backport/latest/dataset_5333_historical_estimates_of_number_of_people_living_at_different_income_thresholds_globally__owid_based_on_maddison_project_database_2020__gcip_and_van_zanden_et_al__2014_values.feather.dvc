@@ -1,19 +1,20 @@
 meta:
-  date_accessed: 2022-12-07 18:42:14.263104
-  description: ''
+  namespace: backport
+  short_name: dataset_5333_historical_estimates_of_number_of_people_living_at_different_income_thresholds_globally__owid_based_on_maddison_project_database_2020__gcip_and_van_zanden_et_al__2014_values
   file_extension: feather
-  is_public: false
+  date_accessed: 2023-02-23 15:17:45.545411
   name: Historical estimates of number of people living at different income thresholds
     globally (OWID based on Maddison Project Database 2020, GCIP and van Zanden et
     al. (2014))
-  namespace: backport
-  publication_date: latest
-  short_name: dataset_5333_historical_estimates_of_number_of_people_living_at_different_income_thresholds_globally__owid_based_on_maddison_project_database_2020__gcip_and_van_zanden_et_al__2014_values
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5333
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 0abeaab849681fe3e9b3bb7687c6614e
-  size: 7026
+- md5: 8bac9dfa5d9a86c561b31801334130d9
+  size: 7402
   path: dataset_5333_historical_estimates_of_number_of_people_living_at_different_income_thresholds_globally__owid_based_on_maddison_project_database_2020__gcip_and_van_zanden_et_al__2014_values.feather

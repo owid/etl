@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-11-29 16:34:57.040056
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Democracy - Lexical Index
   namespace: backport
-  publication_date: latest
   short_name: dataset_5546_democracy__lexical_index_values
+  file_extension: feather
+  date_accessed: 2023-03-10 11:19:08.649589
+  name: Democracy - Lexical Index
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5546
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 0fdcb221309cb94302558a2d87087688
-  size: 2592730
+- md5: 0ebd842cd94e466d450dd77b28b7f47b
+  size: 2807682
   path: dataset_5546_democracy__lexical_index_values.feather

@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 15:38:41.749861
-  description: ''
-  file_extension: json
-  is_public: false
-  name: Grapher metadata for dataset_2987_firm_bribery_incidence__world_bank__enterprise_survey__split
   namespace: backport
-  publication_date: latest
   short_name: dataset_2987_firm_bribery_incidence__world_bank__enterprise_survey__split_config
+  file_extension: json
+  date_accessed: 2023-02-23 18:05:53.352194
+  name: Grapher metadata for dataset_2987_firm_bribery_incidence__world_bank__enterprise_survey__split
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2987
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 3eb58718197d2fd093d62e3d506f34d4
-  size: 1940
+- md5: 86d8e6f14cb3bcac14f0e5896f88386e
+  size: 2136
   path: dataset_2987_firm_bribery_incidence__world_bank__enterprise_survey__split_config.json

@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:27:03.676149
-  description: ''
-  file_extension: json
-  is_public: false
-  name: Grapher metadata for dataset_5391_free_range_eggs__defra_and_usda
   namespace: backport
-  publication_date: latest
   short_name: dataset_5391_free_range_eggs__defra_and_usda_config
+  file_extension: json
+  date_accessed: 2023-02-23 15:06:54.048826
+  name: Grapher metadata for dataset_5391_free_range_eggs__defra_and_usda
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5391
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: ce6d2b5bd840a7a48d7ee69812c9fe0f
-  size: 5410
+- md5: 17c0c0d2212752083b1b0b03cb04f3ed
+  size: 7410
   path: dataset_5391_free_range_eggs__defra_and_usda_config.json

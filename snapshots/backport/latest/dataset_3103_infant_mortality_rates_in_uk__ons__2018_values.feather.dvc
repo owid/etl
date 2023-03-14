@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 15:57:04.778774
-  description: ''
-  file_extension: feather
-  is_public: false
-  name: Infant Mortality Rates in UK (ONS, 2018)
   namespace: backport
-  publication_date: latest
   short_name: dataset_3103_infant_mortality_rates_in_uk__ons__2018_values
+  file_extension: feather
+  date_accessed: 2023-02-23 17:06:27.362657
+  name: Infant Mortality Rates in UK (ONS, 2018)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/3103
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: abb655d41baf69688bc6861c2bb2d6d3
-  size: 6362
+- md5: 0d311929f55b8b1b2c94ecd547a863cf
+  size: 6730
   path: dataset_3103_infant_mortality_rates_in_uk__ons__2018_values.feather

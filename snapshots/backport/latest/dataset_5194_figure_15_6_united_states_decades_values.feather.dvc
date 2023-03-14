@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:32:25.579960
-  description: ''
-  file_extension: feather
-  is_public: false
-  name: Figure_15.6_United_States_Decades
   namespace: backport
-  publication_date: latest
   short_name: dataset_5194_figure_15_6_united_states_decades_values
+  file_extension: feather
+  date_accessed: 2023-02-23 17:02:33.456621
+  name: Figure_15.6_United_States_Decades
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5194
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 0f600d5b66c7d73ecd5b8ffecc487e24
-  size: 6450
+- md5: e425b274f9b91aea6b86da86112902e1
+  size: 6818
   path: dataset_5194_figure_15_6_united_states_decades_values.feather

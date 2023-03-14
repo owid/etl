@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:11:19.350933
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Democracy - OWID based on Boix-Miller-Rosato
   namespace: backport
-  publication_date: latest
   short_name: dataset_5618_democracy__owid_based_on_boix_miller_rosato_values
+  file_extension: feather
+  date_accessed: 2023-02-23 16:52:24.154555
+  name: Democracy - OWID based on Boix-Miller-Rosato
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5618
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: bb5770ba8871cc425c6a4e71a7f20195
-  size: 1131378
+- md5: 57088120819eef1da61ac3774f4e2296
+  size: 1131762
   path: dataset_5618_democracy__owid_based_on_boix_miller_rosato_values.feather

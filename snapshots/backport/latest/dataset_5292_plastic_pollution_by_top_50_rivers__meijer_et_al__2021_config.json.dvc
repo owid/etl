@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:23:30.422069
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_5292_plastic_pollution_by_top_50_rivers__meijer_et_al__2021
   namespace: backport
-  publication_date: latest
   short_name: dataset_5292_plastic_pollution_by_top_50_rivers__meijer_et_al__2021_config
+  file_extension: json
+  date_accessed: 2023-02-23 16:40:28.212051
+  name: Grapher metadata for dataset_5292_plastic_pollution_by_top_50_rivers__meijer_et_al__2021
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5292
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: d719b913d275b41256ba682d25bf8db6
-  size: 2691
+- md5: 26f4806f0cf30e775d850734e98221cb
+  size: 3291
   path: dataset_5292_plastic_pollution_by_top_50_rivers__meijer_et_al__2021_config.json

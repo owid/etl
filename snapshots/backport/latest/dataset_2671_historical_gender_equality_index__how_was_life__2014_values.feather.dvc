@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 01:41:04.191211
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Historical gender equality index - How Was Life? (2014)
   namespace: backport
-  publication_date: latest
   short_name: dataset_2671_historical_gender_equality_index__how_was_life__2014_values
+  file_extension: feather
+  date_accessed: 2023-02-23 18:41:24.853353
+  name: Historical gender equality index - How Was Life? (2014)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2671
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: b2973c0220e28c5a130192cdc3a98113
-  size: 6202
+- md5: 960695b9559a33f0d099f78d89def2dd
+  size: 6570
   path: dataset_2671_historical_gender_equality_index__how_was_life__2014_values.feather

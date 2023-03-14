@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 01:20:39.930429
-  description: ''
-  file_extension: json
-  is_public: false
-  name: Grapher metadata for dataset_4184_world_bank__education_dataset__world_bank__2019
   namespace: backport
-  publication_date: latest
   short_name: dataset_4184_world_bank__education_dataset__world_bank__2019_config
+  file_extension: json
+  date_accessed: 2023-02-23 19:47:14.829093
+  name: Grapher metadata for dataset_4184_world_bank__education_dataset__world_bank__2019
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/4184
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 18253d0d01b257fd09d75ca4b530a588
-  size: 2538
+- md5: fe4d2091da0fe1efb0a0c5e115aa98bd
+  size: 2938
   path: dataset_4184_world_bank__education_dataset__world_bank__2019_config.json

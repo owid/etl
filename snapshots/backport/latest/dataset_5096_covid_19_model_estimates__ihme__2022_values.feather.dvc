@@ -1,12 +1,13 @@
 meta:
   namespace: backport
   short_name: dataset_5096_covid_19_model_estimates__ihme__2022_values
+  file_extension: feather
+  date_accessed: 2023-02-23 18:58:58.222411
   name: COVID-19 Model Estimates – IHME (2022)
   description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5096
-  file_extension: feather
-  date_accessed: 2022-12-23 17:26:04.504470
+  source_published_by: Our World in Data catalog backport
   is_public: false
   version: latest
   publication_date: latest

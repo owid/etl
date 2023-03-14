@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 15:50:04.451353
-  description: ''
-  file_extension: feather
-  is_public: false
-  name: EU Wild Bird Populations (Eurostat, 2022)
   namespace: backport
-  publication_date: latest
   short_name: dataset_5275_eu_wild_bird_populations__eurostat__2022_values
+  file_extension: feather
+  date_accessed: 2023-02-23 17:10:32.876891
+  name: EU Wild Bird Populations (Eurostat, 2022)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5275
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 4a4a129700ccc58ab771d6935e60e2ed
-  size: 8314
+- md5: 89b9fb4611313cdd90ca07d1b935beef
+  size: 8690
   path: dataset_5275_eu_wild_bird_populations__eurostat__2022_values.feather

@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:49:11.049706
-  description: ''
-  file_extension: json
-  is_public: false
-  name: Grapher metadata for dataset_5208_united_states_voter_turnout_demographics_in_presidential_elections__united_states_elections_project
   namespace: backport
-  publication_date: latest
   short_name: dataset_5208_united_states_voter_turnout_demographics_in_presidential_elections__united_states_elections_project_config
+  file_extension: json
+  date_accessed: 2023-02-23 18:20:34.317771
+  name: Grapher metadata for dataset_5208_united_states_voter_turnout_demographics_in_presidential_elections__united_states_elections_project
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5208
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: bfbcd735f3b7a771aa4b69c71878f8d1
-  size: 6968
+- md5: 0a527e4fc575cc28a5433fba97f70297
+  size: 9368
   path: dataset_5208_united_states_voter_turnout_demographics_in_presidential_elections__united_states_elections_project_config.json

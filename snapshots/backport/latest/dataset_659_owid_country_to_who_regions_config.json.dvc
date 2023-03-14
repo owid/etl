@@ -1,19 +1,20 @@
 meta:
-  date_accessed: 2022-12-07 15:50:35.166710
-  description: 'WHO groups countries in different regions, and provides information
-    on various variables according to this classification. This dataset changes country
-    names to OWID names and matches them to WHO regions. '
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_659_owid_country_to_who_regions
   namespace: backport
-  publication_date: latest
   short_name: dataset_659_owid_country_to_who_regions_config
+  file_extension: json
+  date_accessed: 2023-02-23 15:18:50.758098
+  name: Grapher metadata for dataset_659_owid_country_to_who_regions
+  description: WHO groups countries in different regions, and provides information
+    on various variables according to this classification. This dataset changes country
+    names to OWID names and matches them to WHO regions.
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/659
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 1668af048c8e953cb3789247cff0d27f
-  size: 1524
+- md5: aec692abf19f508c6d8363687b8dff2b
+  size: 1720
   path: dataset_659_owid_country_to_who_regions_config.json

@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:19:59.440271
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Endemic vertebrate species by country (IUCN, 2020)
   namespace: backport
-  publication_date: latest
   short_name: dataset_4098_endemic_vertebrate_species_by_country__iucn__2020_values
+  file_extension: feather
+  date_accessed: 2023-02-23 16:41:40.472820
+  name: Endemic vertebrate species by country (IUCN, 2020)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/4098
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: a6db1fd648d45655580579f3433f802f
-  size: 17946
+- md5: edb607c32248c5920f2cd64751af9894
+  size: 18322
   path: dataset_4098_endemic_vertebrate_species_by_country__iucn__2020_values.feather

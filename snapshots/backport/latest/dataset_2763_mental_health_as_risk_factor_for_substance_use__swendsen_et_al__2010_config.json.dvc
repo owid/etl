@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:38:51.379090
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_2763_mental_health_as_risk_factor_for_substance_use__swendsen_et_al__2010
   namespace: backport
-  publication_date: latest
   short_name: dataset_2763_mental_health_as_risk_factor_for_substance_use__swendsen_et_al__2010_config
+  file_extension: json
+  date_accessed: 2023-02-23 18:31:15.780809
+  name: Grapher metadata for dataset_2763_mental_health_as_risk_factor_for_substance_use__swendsen_et_al__2010
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2763
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: e42daa27d1ad4a15e1bcede265012d3d
-  size: 2852
+- md5: 819edf593dee9638aea9cb1fa50e45c5
+  size: 3446
   path: dataset_2763_mental_health_as_risk_factor_for_substance_use__swendsen_et_al__2010_config.json

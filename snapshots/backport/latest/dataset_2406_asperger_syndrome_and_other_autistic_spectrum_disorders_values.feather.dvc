@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:20:37.305003
-  description: This is a dataset imported by the automated fetcher
-  file_extension: feather
-  is_public: true
-  name: Asperger syndrome and other autistic spectrum disorders
   namespace: backport
-  publication_date: latest
   short_name: dataset_2406_asperger_syndrome_and_other_autistic_spectrum_disorders_values
+  file_extension: feather
+  date_accessed: 2023-02-23 18:52:37.361599
+  name: Asperger syndrome and other autistic spectrum disorders
+  description: This is a dataset imported by the automated fetcher
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2406
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: bded7dbb625564204947bd756a18ad85
-  size: 4792530
+- md5: a9af1062c57b931435394a64f433bbde
+  size: 4792914
   path: dataset_2406_asperger_syndrome_and_other_autistic_spectrum_disorders_values.feather

@@ -1,18 +1,19 @@
 meta:
-  date_accessed: 2022-12-08 00:46:14.831848
+  namespace: backport
+  short_name: dataset_380_absolute_deaths_from_ambient_pm2_5_air_pollution__state_of_global_air_values
+  file_extension: feather
+  date_accessed: 2023-02-23 16:39:02.678422
+  name: Absolute deaths from ambient PM2.5 air pollution- State of Global Air
   description: Absolute number of deaths per year from ambient particulate matter
     air pollution- State of Global Air
-  file_extension: feather
-  is_public: true
-  name: Absolute deaths from ambient PM2.5 air pollution- State of Global Air
-  namespace: backport
-  publication_date: latest
-  short_name: dataset_380_absolute_deaths_from_ambient_pm2_5_air_pollution__state_of_global_air_values
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/380
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: fcd00338f7aa3f6bf4fda4fbb4c50f1e
-  size: 15306
+- md5: 9de2059d4d1880aaa4efebbc86cc7fe1
+  size: 15682
   path: dataset_380_absolute_deaths_from_ambient_pm2_5_air_pollution__state_of_global_air_values.feather

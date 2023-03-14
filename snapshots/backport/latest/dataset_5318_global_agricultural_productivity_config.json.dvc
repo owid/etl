@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:02:54.024888
-  description: ''
-  file_extension: json
-  is_public: false
-  name: Grapher metadata for dataset_5318_global_agricultural_productivity
   namespace: backport
-  publication_date: latest
   short_name: dataset_5318_global_agricultural_productivity_config
+  file_extension: json
+  date_accessed: 2023-02-23 19:33:06.712202
+  name: Grapher metadata for dataset_5318_global_agricultural_productivity
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5318
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 3700f9cabef9c62b0f789dddf857e17b
-  size: 2717
+- md5: ba6fdb296d6ab17acc83958fadd886a3
+  size: 3717
   path: dataset_5318_global_agricultural_productivity_config.json

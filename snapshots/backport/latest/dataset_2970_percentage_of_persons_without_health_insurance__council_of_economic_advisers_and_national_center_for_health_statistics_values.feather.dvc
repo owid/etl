@@ -1,18 +1,19 @@
 meta:
-  date_accessed: 2022-12-08 00:04:41.797505
-  description: Split from https://owid.cloud/admin/datasets/204 - Jaiden
+  namespace: backport
+  short_name: dataset_2970_percentage_of_persons_without_health_insurance__council_of_economic_advisers_and_national_center_for_health_statistics_values
   file_extension: feather
-  is_public: true
+  date_accessed: 2023-02-23 18:02:26.472191
   name: Percentage of persons without health insurance - Council of Economic Advisers
     and National Center for Health Statistics
-  namespace: backport
-  publication_date: latest
-  short_name: dataset_2970_percentage_of_persons_without_health_insurance__council_of_economic_advisers_and_national_center_for_health_statistics_values
+  description: Split from https://owid.cloud/admin/datasets/204 - Jaiden
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2970
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: be08f5d0c15cc94fddb5ca3c540fae7d
-  size: 6194
+- md5: 6759b646bd0bbadb6bf3ca4cc4f7e79b
+  size: 6562
   path: dataset_2970_percentage_of_persons_without_health_insurance__council_of_economic_advisers_and_national_center_for_health_statistics_values.feather

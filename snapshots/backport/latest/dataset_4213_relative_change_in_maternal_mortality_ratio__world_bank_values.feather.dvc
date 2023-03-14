@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:52:58.595671
-  description: ''
-  file_extension: feather
-  is_public: false
-  name: Relative change in maternal mortality ratio (World Bank)
   namespace: backport
-  publication_date: latest
   short_name: dataset_4213_relative_change_in_maternal_mortality_ratio__world_bank_values
+  file_extension: feather
+  date_accessed: 2023-02-23 18:13:03.712674
+  name: Relative change in maternal mortality ratio (World Bank)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/4213
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 5ac525552e20ac42147ba84a15268e38
-  size: 15490
+- md5: 498c8e0be976830a48699df382e6f500
+  size: 15866
   path: dataset_4213_relative_change_in_maternal_mortality_ratio__world_bank_values.feather

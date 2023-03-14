@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 15:49:55.262648
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_5163_aviation_passenger_kilometres_and_co2_emissions__icct
   namespace: backport
-  publication_date: latest
   short_name: dataset_5163_aviation_passenger_kilometres_and_co2_emissions__icct_config
+  file_extension: json
+  date_accessed: 2023-02-23 18:39:09.644778
+  name: Grapher metadata for dataset_5163_aviation_passenger_kilometres_and_co2_emissions__icct
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5163
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: f511829e893b6914877f5ad2d72ebb3f
-  size: 13463
+- md5: 8de5d875bc028cfa30673588f5cea14c
+  size: 18063
   path: dataset_5163_aviation_passenger_kilometres_and_co2_emissions__icct_config.json

@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:13:39.396187
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Road deaths and injuries - OECD
   namespace: backport
-  publication_date: latest
   short_name: dataset_2509_road_deaths_and_injuries__oecd_values
+  file_extension: feather
+  date_accessed: 2023-02-23 19:32:33.513646
+  name: Road deaths and injuries - OECD
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2509
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 3c6f6a316b427a4dd06c09d13bdffe3d
-  size: 44202
+- md5: f8b16487c33ba81947d5abe08300d64e
+  size: 44578
   path: dataset_2509_road_deaths_and_injuries__oecd_values.feather

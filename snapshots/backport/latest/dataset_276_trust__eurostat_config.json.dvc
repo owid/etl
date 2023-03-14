@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:36:11.810669
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_276_trust__eurostat
   namespace: backport
-  publication_date: latest
   short_name: dataset_276_trust__eurostat_config
+  file_extension: json
+  date_accessed: 2023-02-23 19:22:48.684915
+  name: Grapher metadata for dataset_276_trust__eurostat
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/276
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 31afdc305e955565beced51223d0bcf9
-  size: 2229
+- md5: 7d7a92eeed716608ad45ef90ed43c47e
+  size: 2621
   path: dataset_276_trust__eurostat_config.json

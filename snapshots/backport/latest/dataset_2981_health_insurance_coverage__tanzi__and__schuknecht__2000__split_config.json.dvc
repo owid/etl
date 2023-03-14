@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 00:52:17.147494
-  description: ''
-  file_extension: json
-  is_public: false
-  name: Grapher metadata for dataset_2981_health_insurance_coverage__tanzi__and__schuknecht__2000__split
   namespace: backport
-  publication_date: latest
   short_name: dataset_2981_health_insurance_coverage__tanzi__and__schuknecht__2000__split_config
+  file_extension: json
+  date_accessed: 2023-02-23 17:14:44.563918
+  name: Grapher metadata for dataset_2981_health_insurance_coverage__tanzi__and__schuknecht__2000__split
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2981
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: fce65e77ab71694d9414e941172bfce0
-  size: 1699
+- md5: 34f1e6cc4d40cf2ef67db0f82feb5705
+  size: 1893
   path: dataset_2981_health_insurance_coverage__tanzi__and__schuknecht__2000__split_config.json

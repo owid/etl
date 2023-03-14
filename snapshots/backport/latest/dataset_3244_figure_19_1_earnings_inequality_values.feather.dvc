@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:30:02.518558
-  description: core-econ.org
-  file_extension: feather
-  is_public: false
-  name: Figure 19.1_Earnings_inequality
   namespace: backport
-  publication_date: latest
   short_name: dataset_3244_figure_19_1_earnings_inequality_values
+  file_extension: feather
+  date_accessed: 2023-02-23 19:44:22.714425
+  name: Figure 19.1_Earnings_inequality
+  description: core-econ.org
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/3244
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: bb48178b86982a4ada0af3255244d844
-  size: 5906
+- md5: d73461673752ec22b0576e50bb16ea01
+  size: 6274
   path: dataset_3244_figure_19_1_earnings_inequality_values.feather

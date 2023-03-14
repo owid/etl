@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 00:31:56.285141
-  description: ''
-  file_extension: feather
-  is_public: false
-  name: GPU Price-Performance Data – Epoch (2022)
   namespace: backport
-  publication_date: latest
   short_name: dataset_5654_gpu_price_performance_data__epoch__2022_values
+  file_extension: feather
+  date_accessed: 2023-03-01 09:09:43.695753
+  name: GPU Price-Performance Data – Epoch (2022)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5654
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 3b01feff26d7853ceb2bc67440c875a5
-  size: 43554
+- md5: 503d0a9437499e6ce9bea08ade16f47a
+  size: 43930
   path: dataset_5654_gpu_price_performance_data__epoch__2022_values.feather

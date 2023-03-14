@@ -10,3 +10,25 @@ steps:
   - snapshot-private://fasttrack/2022-11-01/lighting_efficiency_uk.csv
   data-private://grapher/fasttrack/2023-01-19/food_expenditures_by_country:
   - snapshot-private://fasttrack/2023-01-19/food_expenditures_by_country.csv
+  data-private://grapher/fasttrack/latest/metaculus__complementary_data:
+  - snapshot-private://fasttrack/latest/metaculus__complementary_data.csv
+  data-private://grapher/fasttrack/latest/global_extreme_poverty_future_scenario:
+  - snapshot-private://fasttrack/latest/global_extreme_poverty_future_scenario.csv
+  data-private://grapher/fasttrack/latest/child_mortality_future_projections:
+  - snapshot-private://fasttrack/latest/child_mortality_future_projections.csv
+  data-private://grapher/fasttrack/latest/literate_population:
+  - snapshot-private://fasttrack/latest/literate_population.csv
+  data-private://grapher/fasttrack/latest/test_co2_emissions:
+  - snapshot-private://fasttrack/latest/test_co2_emissions.csv
+  data-private://grapher/fasttrack/latest/test_electricity_projections:
+  - snapshot-private://fasttrack/latest/test_electricity_projections.csv
+  data-private://grapher/fasttrack/latest/battery_costs_per_kwh__ziegler_et_al__and_bnef:
+  - snapshot-private://fasttrack/latest/battery_costs_per_kwh__ziegler_et_al__and_bnef.csv
+  data-private://grapher/fasttrack/latest/biosafety_level_4_facilities:
+  - snapshot-private://fasttrack/latest/biosafety_level_4_facilities.csv
+  data-private://grapher/fasttrack/latest/germany_hypothetical_constant_nuclear:
+  - snapshot-private://fasttrack/latest/germany_hypothetical_constant_nuclear.csv
+  data-private://grapher/fasttrack/latest/oil_prices:
+  - snapshot-private://fasttrack/latest/oil_prices.csv
+  data://grapher/fasttrack/latest/table_5__threatened_species_in_each_major_group_by_country__show_all__1:
+  - snapshot://fasttrack/latest/table_5__threatened_species_in_each_major_group_by_country__show_all__1.csv

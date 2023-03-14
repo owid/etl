@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 15:49:39.174050
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_1903_mineral_production__bgs__2016
   namespace: backport
-  publication_date: latest
   short_name: dataset_1903_mineral_production__bgs__2016_config
+  file_extension: json
+  date_accessed: 2023-02-23 17:43:22.664934
+  name: Grapher metadata for dataset_1903_mineral_production__bgs__2016
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/1903
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 6fbd508c090bbfadcfc2cc0b5245ea6d
-  size: 5269
+- md5: 831984f4f84e04a34efc3d1fddc55528
+  size: 7051
   path: dataset_1903_mineral_production__bgs__2016_config.json

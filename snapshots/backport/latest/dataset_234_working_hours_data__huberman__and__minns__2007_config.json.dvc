@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:09:23.672624
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_234_working_hours_data__huberman__and__minns__2007
   namespace: backport
-  publication_date: latest
   short_name: dataset_234_working_hours_data__huberman__and__minns__2007_config
+  file_extension: json
+  date_accessed: 2023-02-23 19:49:00.453749
+  name: Grapher metadata for dataset_234_working_hours_data__huberman__and__minns__2007
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/234
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 53a94915e8e7e85d86f37e25cd7737ed
-  size: 4458
+- md5: d57ee539f2969814b6b7bd0cacc37300
+  size: 5252
   path: dataset_234_working_hours_data__huberman__and__minns__2007_config.json

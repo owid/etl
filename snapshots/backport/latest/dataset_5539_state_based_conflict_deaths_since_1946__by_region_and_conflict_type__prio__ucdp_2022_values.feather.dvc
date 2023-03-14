@@ -1,18 +1,19 @@
 meta:
-  date_accessed: 2022-12-07 15:55:01.898111
-  description: ''
+  namespace: backport
+  short_name: dataset_5539_state_based_conflict_deaths_since_1946__by_region_and_conflict_type__prio__ucdp_2022_values
   file_extension: feather
-  is_public: true
+  date_accessed: 2023-02-23 17:24:56.424636
   name: State-based conflict deaths since 1946, by region and conflict type (PRIO;
     UCDP 2022)
-  namespace: backport
-  publication_date: latest
-  short_name: dataset_5539_state_based_conflict_deaths_since_1946__by_region_and_conflict_type__prio__ucdp_2022_values
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5539
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: b7cd0f420459b2e5b6743efceca5881b
-  size: 34530
+- md5: d7e64e068dedb10e0a9e2ff594898eb6
+  size: 34906
   path: dataset_5539_state_based_conflict_deaths_since_1946__by_region_and_conflict_type__prio__ucdp_2022_values.feather

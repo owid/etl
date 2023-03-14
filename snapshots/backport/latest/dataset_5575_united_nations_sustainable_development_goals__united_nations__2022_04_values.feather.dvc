@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-11-29 16:26:44.221932
-  description: This is a dataset imported by the automated fetcher
-  file_extension: feather
-  is_public: true
-  name: United Nations Sustainable Development Goals - United Nations (2022-04)
   namespace: backport
-  publication_date: latest
   short_name: dataset_5575_united_nations_sustainable_development_goals__united_nations__2022_04_values
+  file_extension: feather
+  date_accessed: 2023-02-23 16:51:37.373088
+  name: United Nations Sustainable Development Goals - United Nations (2022-04)
+  description: This is a dataset imported by the automated fetcher
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5575
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: cb7cef5ed3c2ae7e5571da76b14f73de
-  size: 19472002
+- md5: 31ed991d50cb7e852e7301ceff2577c5
+  size: 19472386
   path: dataset_5575_united_nations_sustainable_development_goals__united_nations__2022_04_values.feather

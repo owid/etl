@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:32:49.959366
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_2873_relative_earnings_of_adults__by_educational_attainment__education_at_a_glance_2017__oecd_indicators__2017
   namespace: backport
-  publication_date: latest
   short_name: dataset_2873_relative_earnings_of_adults__by_educational_attainment__education_at_a_glance_2017__oecd_indicators__2017_config
+  file_extension: json
+  date_accessed: 2023-02-23 17:50:23.307047
+  name: Grapher metadata for dataset_2873_relative_earnings_of_adults__by_educational_attainment__education_at_a_glance_2017__oecd_indicators__2017
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2873
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: f384ec71293720293295549944fc1a76
-  size: 2425
+- md5: 332d78f01d429bd89f7bf10c90b32470
+  size: 2623
   path: dataset_2873_relative_earnings_of_adults__by_educational_attainment__education_at_a_glance_2017__oecd_indicators__2017_config.json

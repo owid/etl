@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 00:43:12.267187
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Ukraine-Russia contribution to global food
   namespace: backport
-  publication_date: latest
   short_name: dataset_5549_ukraine_russia_contribution_to_global_food_values
+  file_extension: feather
+  date_accessed: 2023-02-23 19:40:50.358969
+  name: Ukraine-Russia contribution to global food
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5549
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 08a33ddf5d77c3087ea31949f268e205
-  size: 6194
+- md5: 24b26ed23f95b128b58b11bcfdb37eea
+  size: 6562
   path: dataset_5549_ukraine_russia_contribution_to_global_food_values.feather

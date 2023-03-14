@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 00:51:56.109362
-  description: ''
-  file_extension: json
-  is_public: false
-  name: Grapher metadata for dataset_5097_covid_19_model_estimates__youyang_gu__2020
   namespace: backport
-  publication_date: latest
   short_name: dataset_5097_covid_19_model_estimates__youyang_gu__2020_config
+  file_extension: json
+  date_accessed: 2023-02-23 16:31:34.479697
+  name: Grapher metadata for dataset_5097_covid_19_model_estimates__youyang_gu__2020
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5097
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 31e0d0205cea5d8df199b9cc962a5c8b
-  size: 3085
+- md5: 793cb061fecbc00243431f553afe73c2
+  size: 3685
   path: dataset_5097_covid_19_model_estimates__youyang_gu__2020_config.json

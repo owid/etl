@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:16:35.123364
-  description: ''
-  file_extension: feather
-  is_public: false
-  name: Annual Working Hours – OWID (2020)
   namespace: backport
-  publication_date: latest
   short_name: dataset_5173_annual_working_hours__owid__2020_values
+  file_extension: feather
+  date_accessed: 2023-02-23 18:50:34.503656
+  name: Annual Working Hours – OWID (2020)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5173
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 3cc6b9101975d41b1a30429f9d353423
-  size: 29250
+- md5: 7ecf5d73dd2ba58dffbf54b280b3be74
+  size: 29626
   path: dataset_5173_annual_working_hours__owid__2020_values.feather

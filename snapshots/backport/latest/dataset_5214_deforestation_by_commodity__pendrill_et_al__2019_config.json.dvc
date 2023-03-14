@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 00:30:02.567005
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_5214_deforestation_by_commodity__pendrill_et_al__2019
   namespace: backport
-  publication_date: latest
   short_name: dataset_5214_deforestation_by_commodity__pendrill_et_al__2019_config
+  file_extension: json
+  date_accessed: 2023-02-23 17:08:54.738052
+  name: Grapher metadata for dataset_5214_deforestation_by_commodity__pendrill_et_al__2019
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5214
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 758054e618da50378ec0ec6262fbd419
-  size: 6228
+- md5: d1da1ebc177b97b4d5b310a016778b38
+  size: 7828
   path: dataset_5214_deforestation_by_commodity__pendrill_et_al__2019_config.json

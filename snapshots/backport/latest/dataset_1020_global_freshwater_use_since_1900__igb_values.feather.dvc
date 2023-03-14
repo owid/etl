@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:44:14.714287
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Global freshwater use since 1900 - IGB
   namespace: backport
-  publication_date: latest
   short_name: dataset_1020_global_freshwater_use_since_1900__igb_values
+  file_extension: feather
+  date_accessed: 2023-02-23 18:44:15.019826
+  name: Global freshwater use since 1900 - IGB
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/1020
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: f88cffa65f605c1ed4075823f044b773
-  size: 9826
+- md5: 1d0af7f9e8280db7b556cc571f3476a3
+  size: 10202
   path: dataset_1020_global_freshwater_use_since_1900__igb_values.feather

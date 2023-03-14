@@ -1,25 +1,32 @@
 meta:
-  date_accessed: 2022-12-08 00:11:05.351803
-  description: "Permalink: \n\nLocation: Global\nYear: Most recent\nContext: Risk\n\
-    Risk: All risk factors\nAge: All Ages\nMetric: Percent\nMeasure: Deaths\nSex:\
-    \ Both\nCause: Bladder cancer, Breast cancer, Cervical cancer, Colon and rectum\
-    \ cancer, Esophageal cancer, Gallbladder and biliary tract cancer, Kidney cancer,\
-    \ Larynx cancer, Leukemia, Lip and oral cavity cancer, Liver cancer, Mesothelioma,\
-    \ Multiple myeloma, Nasopharynx cancer, Non-Hodgkin lymphoma, Ovarian cancer,\
-    \ Pancreatic cancer, Prostate cancer, Stomach cancer, Thyroid cancer, Tracheal,\
-    \ bronchus and lung cancer, Uterine cancer. \n\n\nThere are four cancers that\
-    \ were previously on the chart (all with 0%) that no longer return any values"
-  file_extension: json
-  is_public: false
-  name: Grapher metadata for dataset_5511_share_of_cancer_deaths_attributed_to_risk_factors
   namespace: backport
-  publication_date: latest
   short_name: dataset_5511_share_of_cancer_deaths_attributed_to_risk_factors_config
+  file_extension: json
+  date_accessed: 2023-02-23 17:41:30.906566
+  name: Grapher metadata for dataset_5511_share_of_cancer_deaths_attributed_to_risk_factors
+  description: |-
+    Permalink:
+
+    Location: Global
+    Year: Most recent
+    Context: Risk
+    Risk: All risk factors
+    Age: All Ages
+    Metric: Percent
+    Measure: Deaths
+    Sex: Both
+    Cause: Bladder cancer, Breast cancer, Cervical cancer, Colon and rectum cancer, Esophageal cancer, Gallbladder and biliary tract cancer, Kidney cancer, Larynx cancer, Leukemia, Lip and oral cavity cancer, Liver cancer, Mesothelioma, Multiple myeloma, Nasopharynx cancer, Non-Hodgkin lymphoma, Ovarian cancer, Pancreatic cancer, Prostate cancer, Stomach cancer, Thyroid cancer, Tracheal, bronchus and lung cancer, Uterine cancer.
+
+
+    There are four cancers that were previously on the chart (all with 0%) that no longer return any values
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5511
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 2ae56b8d2a25675f126308a50fc4a123
-  size: 2485
+- md5: 2705bbfcf1cf1f1f5c3f0ea689640e9f
+  size: 2685
   path: dataset_5511_share_of_cancer_deaths_attributed_to_risk_factors_config.json

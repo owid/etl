@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 15:48:36.917801
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_2478_global_hunger_index_in_2017__listed_2017__global_hunger_index_2017
   namespace: backport
-  publication_date: latest
   short_name: dataset_2478_global_hunger_index_in_2017__listed_2017__global_hunger_index_2017_config
+  file_extension: json
+  date_accessed: 2023-02-23 19:35:52.632594
+  name: Grapher metadata for dataset_2478_global_hunger_index_in_2017__listed_2017__global_hunger_index_2017
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2478
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 1676bab4d1359e17369addc8f66e5e93
-  size: 1574
+- md5: 40d2ffa8cd4286a1382424d1dff398a1
+  size: 1772
   path: dataset_2478_global_hunger_index_in_2017__listed_2017__global_hunger_index_2017_config.json

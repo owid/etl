@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 00:09:12.796921
-  description: 'Code and data are available in this GitHub repo: https://github.com/owid/notebooks/tree/main/FionaSpooner/lung_cancer_deaths'
-  file_extension: feather
-  is_public: true
-  name: Lung cancer mortality rates (per 100,000) (2022)
   namespace: backport
-  publication_date: latest
   short_name: dataset_5628_lung_cancer_mortality_rates__per_100_000__2022_values
+  file_extension: feather
+  date_accessed: 2023-02-23 18:35:09.338358
+  name: Lung cancer mortality rates (per 100,000) (2022)
+  description: 'Code and data are available in this GitHub repo: https://github.com/owid/notebooks/tree/main/FionaSpooner/lung_cancer_deaths'
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5628
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: fef5f67dcc42d3018149715f0f9147b3
-  size: 133290
+- md5: e1e552e49a70225257e61fa117b1f169
+  size: 133674
   path: dataset_5628_lung_cancer_mortality_rates__per_100_000__2022_values.feather

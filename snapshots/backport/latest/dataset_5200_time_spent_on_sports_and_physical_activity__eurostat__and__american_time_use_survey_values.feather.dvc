@@ -1,18 +1,19 @@
 meta:
-  date_accessed: 2022-12-07 17:29:54.109935
-  description: ''
+  namespace: backport
+  short_name: dataset_5200_time_spent_on_sports_and_physical_activity__eurostat__and__american_time_use_survey_values
   file_extension: feather
-  is_public: false
+  date_accessed: 2023-02-23 16:33:34.212578
   name: Time spent on sports and physical activity - Eurostat & American Time Use
     Survey
-  namespace: backport
-  publication_date: latest
-  short_name: dataset_5200_time_spent_on_sports_and_physical_activity__eurostat__and__american_time_use_survey_values
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5200
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 4c96ca6daed666c36b02259baab9323c
-  size: 7402
+- md5: a7a0f390de53733f168813222d526ccf
+  size: 7770
   path: dataset_5200_time_spent_on_sports_and_physical_activity__eurostat__and__american_time_use_survey_values.feather

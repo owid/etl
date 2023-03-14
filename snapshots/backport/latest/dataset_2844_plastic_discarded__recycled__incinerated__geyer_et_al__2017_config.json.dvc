@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 15:58:57.041131
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_2844_plastic_discarded__recycled__incinerated__geyer_et_al__2017
   namespace: backport
-  publication_date: latest
   short_name: dataset_2844_plastic_discarded__recycled__incinerated__geyer_et_al__2017_config
+  file_extension: json
+  date_accessed: 2023-02-23 19:43:48.630421
+  name: Grapher metadata for dataset_2844_plastic_discarded__recycled__incinerated__geyer_et_al__2017
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2844
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: daedff99b61545d3823df317f1ba002a
-  size: 2431
+- md5: 9a4814759595a5e6451930c9a6f4719f
+  size: 2827
   path: dataset_2844_plastic_discarded__recycled__incinerated__geyer_et_al__2017_config.json

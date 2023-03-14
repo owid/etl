@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 16:52:19.791533
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_5291_plastic_ocean_pollution__meijer_et_al__2021
   namespace: backport
-  publication_date: latest
   short_name: dataset_5291_plastic_ocean_pollution__meijer_et_al__2021_config
+  file_extension: json
+  date_accessed: 2023-02-23 17:51:22.660689
+  name: Grapher metadata for dataset_5291_plastic_ocean_pollution__meijer_et_al__2021
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5291
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 4722f9e7dc442e5b10a7f94a070232d5
-  size: 5413
+- md5: 88b8c8593c9613e4d113600a425de6ad
+  size: 7013
   path: dataset_5291_plastic_ocean_pollution__meijer_et_al__2021_config.json

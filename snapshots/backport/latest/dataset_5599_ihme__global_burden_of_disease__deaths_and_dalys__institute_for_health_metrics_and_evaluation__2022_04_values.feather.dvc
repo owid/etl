@@ -1,18 +1,19 @@
 meta:
-  date_accessed: 2022-11-29 16:34:28.233227
-  description: This is a dataset imported by the automated fetcher
+  namespace: backport
+  short_name: dataset_5599_ihme__global_burden_of_disease__deaths_and_dalys__institute_for_health_metrics_and_evaluation__2022_04_values
   file_extension: feather
-  is_public: true
+  date_accessed: 2023-02-23 15:06:10.253807
   name: IHME - Global Burden of Disease - Deaths and DALYs - Institute for Health
     Metrics and Evaluation  (2022-04)
-  namespace: backport
-  publication_date: latest
-  short_name: dataset_5599_ihme__global_burden_of_disease__deaths_and_dalys__institute_for_health_metrics_and_evaluation__2022_04_values
+  description: This is a dataset imported by the automated fetcher
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5599
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: ad25a9862efc68af6daaf3ea44bdf194
-  size: 18850514
+- md5: 5abaebd1111c57c1f56c26c31558f276
+  size: 18850890
   path: dataset_5599_ihme__global_burden_of_disease__deaths_and_dalys__institute_for_health_metrics_and_evaluation__2022_04_values.feather

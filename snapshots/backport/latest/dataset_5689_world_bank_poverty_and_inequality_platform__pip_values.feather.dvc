@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:02:21.968979
-  description: Version 20220909_2017_01_02_PROD
-  file_extension: feather
-  is_public: true
-  name: World Bank Poverty and Inequality Platform (PIP)
   namespace: backport
-  publication_date: latest
   short_name: dataset_5689_world_bank_poverty_and_inequality_platform__pip_values
+  file_extension: feather
+  date_accessed: 2023-03-13 12:04:10.519293
+  name: World Bank Poverty and Inequality Platform (PIP)
+  description: Version 20220909_2017_01_02_PROD
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5689
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 79403f14296f53bcf9a2f1e4db01a298
-  size: 1555378
+- md5: c94c0490a1205556e5947c1502cbe958
+  size: 1555754
   path: dataset_5689_world_bank_poverty_and_inequality_platform__pip_values.feather

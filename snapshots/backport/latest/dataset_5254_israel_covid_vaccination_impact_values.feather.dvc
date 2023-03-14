@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 16:00:18.874912
-  description: ''
-  file_extension: feather
-  is_public: false
-  name: israel_covid_vaccination_impact
   namespace: backport
-  publication_date: latest
   short_name: dataset_5254_israel_covid_vaccination_impact_values
+  file_extension: feather
+  date_accessed: 2023-02-23 15:15:53.843486
+  name: israel_covid_vaccination_impact
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5254
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 4bd4c06b4aba49e5c09eddab70ef45c5
-  size: 15602
+- md5: 46d29de5bbb093647ee28c1f5fb8a7e9
+  size: 15978
   path: dataset_5254_israel_covid_vaccination_impact_values.feather

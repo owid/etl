@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 01:01:01.464171
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_988_global_deaths_by_cause_and_risk__global_burden_of_disease__2017
   namespace: backport
-  publication_date: latest
   short_name: dataset_988_global_deaths_by_cause_and_risk__global_burden_of_disease__2017_config
+  file_extension: json
+  date_accessed: 2023-02-23 15:00:41.049957
+  name: Grapher metadata for dataset_988_global_deaths_by_cause_and_risk__global_burden_of_disease__2017
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/988
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: f391e05b497b270a28108fe20dad0cc5
-  size: 11809
+- md5: fafed0fcd1cd49c29b8b0336a3fc2e8f
+  size: 15769
   path: dataset_988_global_deaths_by_cause_and_risk__global_burden_of_disease__2017_config.json

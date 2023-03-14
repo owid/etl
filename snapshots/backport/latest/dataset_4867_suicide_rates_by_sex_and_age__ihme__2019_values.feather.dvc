@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:53:11.509849
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Suicide rates by sex and age (IHME, 2019)
   namespace: backport
-  publication_date: latest
   short_name: dataset_4867_suicide_rates_by_sex_and_age__ihme__2019_values
+  file_extension: feather
+  date_accessed: 2023-02-23 15:16:47.099782
+  name: Suicide rates by sex and age (IHME, 2019)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/4867
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 6aaf23fe5468aa437e1b82ab6bfb522d
-  size: 816170
+- md5: 186e5462a064464980738cc5d09679ea
+  size: 816546
   path: dataset_4867_suicide_rates_by_sex_and_age__ihme__2019_values.feather

@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-11-29 16:27:17.746742
-  description: This is a dataset imported by the automated fetcher
-  file_extension: feather
-  is_public: true
-  name: Employment
   namespace: backport
-  publication_date: latest
   short_name: dataset_1857_employment_values
+  file_extension: feather
+  date_accessed: 2023-02-23 18:15:03.923940
+  name: Employment
+  description: This is a dataset imported by the automated fetcher
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/1857
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 795a1a1609024f8ac8b08fb78b671fda
-  size: 694274
+- md5: fa1c187afa6d0a6bdd154a3dfc7cb42a
+  size: 694650
   path: dataset_1857_employment_values.feather

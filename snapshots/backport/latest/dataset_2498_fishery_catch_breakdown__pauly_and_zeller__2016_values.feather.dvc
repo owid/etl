@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 01:50:31.415691
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Fishery catch breakdown - Pauly and Zeller (2016)
   namespace: backport
-  publication_date: latest
   short_name: dataset_2498_fishery_catch_breakdown__pauly_and_zeller__2016_values
+  file_extension: feather
+  date_accessed: 2023-02-23 18:28:18.043376
+  name: Fishery catch breakdown - Pauly and Zeller (2016)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2498
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: ed07dcfdc07ee3edcfbe0110829cc4ce
-  size: 8034
+- md5: 7de09bbe914f7458b0c6dfd56a0b431b
+  size: 8410
   path: dataset_2498_fishery_catch_breakdown__pauly_and_zeller__2016_values.feather

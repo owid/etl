@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:10:22.025693
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_591_prevalence_of_vitamin_a_deficiency_in_pregnant_women__who__2009
   namespace: backport
-  publication_date: latest
   short_name: dataset_591_prevalence_of_vitamin_a_deficiency_in_pregnant_women__who__2009_config
+  file_extension: json
+  date_accessed: 2023-02-23 19:21:43.172187
+  name: Grapher metadata for dataset_591_prevalence_of_vitamin_a_deficiency_in_pregnant_women__who__2009
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/591
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 4ba5401db97a195ea64a32e950a12b32
-  size: 4233
+- md5: d1d88f7623d684e58d29e4e9d9e5e319
+  size: 4625
   path: dataset_591_prevalence_of_vitamin_a_deficiency_in_pregnant_women__who__2009_config.json

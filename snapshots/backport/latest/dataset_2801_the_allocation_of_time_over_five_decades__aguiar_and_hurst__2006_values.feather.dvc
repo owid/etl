@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:03:09.073666
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: The allocation of time over five decades - Aguiar and Hurst (2006)
   namespace: backport
-  publication_date: latest
   short_name: dataset_2801_the_allocation_of_time_over_five_decades__aguiar_and_hurst__2006_values
+  file_extension: feather
+  date_accessed: 2023-02-23 17:55:21.023030
+  name: The allocation of time over five decades - Aguiar and Hurst (2006)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2801
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: f907c3bbfeeff5191bbf18b097e6cf59
-  size: 8298
+- md5: 93d8d3496ac8f5a97c73592defdad422
+  size: 8674
   path: dataset_2801_the_allocation_of_time_over_five_decades__aguiar_and_hurst__2006_values.feather

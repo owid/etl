@@ -1,19 +1,20 @@
 meta:
-  date_accessed: 2022-12-07 17:15:53.223826
-  description: 'WHO dataset on the number of cases for different diseases, and the
-    coverage of different vaccines against these disease. For TB, instead of the number
-    of cases, we have number of deaths. '
-  file_extension: feather
-  is_public: false
-  name: Cases of tetanus per million population (WHO and UNPD 2017) (split)
   namespace: backport
-  publication_date: latest
   short_name: dataset_3014_cases_of_tetanus_per_million_population__who_and_unpd_2017__split_values
+  file_extension: feather
+  date_accessed: 2023-02-23 16:39:09.764867
+  name: Cases of tetanus per million population (WHO and UNPD 2017) (split)
+  description: WHO dataset on the number of cases for different diseases, and the
+    coverage of different vaccines against these disease. For TB, instead of the number
+    of cases, we have number of deaths.
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/3014
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 442b0969b595f9ae919ae6d259529774
-  size: 198818
+- md5: 1c244e9d27cb0b31a05033ad148973da
+  size: 199194
   path: dataset_3014_cases_of_tetanus_per_million_population__who_and_unpd_2017__split_values.feather

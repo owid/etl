@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 16:54:58.931180
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: 'UK Defence Spending - ukpublicspending.com '
   namespace: backport
-  publication_date: latest
   short_name: dataset_126_uk_defence_spending__ukpublicspending_com_values
+  file_extension: feather
+  date_accessed: 2023-02-23 18:20:27.962994
+  name: UK Defence Spending - ukpublicspending.com
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/126
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 9d65e048db35a5da48df6b45de485bc3
-  size: 8554
+- md5: b32f4574ab5706953d95072ed90baa34
+  size: 8930
   path: dataset_126_uk_defence_spending__ukpublicspending_com_values.feather

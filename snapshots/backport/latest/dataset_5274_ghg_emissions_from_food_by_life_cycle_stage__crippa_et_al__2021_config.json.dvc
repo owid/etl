@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 16:56:52.914668
-  description: ''
-  file_extension: json
-  is_public: false
-  name: Grapher metadata for dataset_5274_ghg_emissions_from_food_by_life_cycle_stage__crippa_et_al__2021
   namespace: backport
-  publication_date: latest
   short_name: dataset_5274_ghg_emissions_from_food_by_life_cycle_stage__crippa_et_al__2021_config
+  file_extension: json
+  date_accessed: 2023-02-23 16:46:37.931146
+  name: Grapher metadata for dataset_5274_ghg_emissions_from_food_by_life_cycle_stage__crippa_et_al__2021
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5274
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 69dfe11705e2ce447cf65f2d6cd97b84
-  size: 9762
+- md5: 04a05c5a470a5ab3cc5e8e41f8f8602d
+  size: 12362
   path: dataset_5274_ghg_emissions_from_food_by_life_cycle_stage__crippa_et_al__2021_config.json

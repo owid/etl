@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:24:39.903194
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Environmental impacts of food (Poore & Nemecek, 2018)
   namespace: backport
-  publication_date: latest
   short_name: dataset_4223_environmental_impacts_of_food__poore__and__nemecek__2018_values
+  file_extension: feather
+  date_accessed: 2023-02-28 18:29:12.075357
+  name: Environmental impacts of food (Poore & Nemecek, 2018)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/4223
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: cc7681a7b3550f7fe8289cd8a1006356
-  size: 10730
+- md5: 0670a09d5dfccd7440807926d7c8db60
+  size: 11106
   path: dataset_4223_environmental_impacts_of_food__poore__and__nemecek__2018_values.feather

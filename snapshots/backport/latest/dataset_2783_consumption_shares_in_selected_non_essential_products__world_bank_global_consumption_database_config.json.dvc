@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:16:40.521554
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_2783_consumption_shares_in_selected_non_essential_products__world_bank_global_consumption_database
   namespace: backport
-  publication_date: latest
   short_name: dataset_2783_consumption_shares_in_selected_non_essential_products__world_bank_global_consumption_database_config
+  file_extension: json
+  date_accessed: 2023-02-23 17:36:51.869543
+  name: Grapher metadata for dataset_2783_consumption_shares_in_selected_non_essential_products__world_bank_global_consumption_database
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2783
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 084b0a4ca833914d466b097cd7145722
-  size: 9643
+- md5: cfb1efee74b074c9f9abc34bf7480aaa
+  size: 10435
   path: dataset_2783_consumption_shares_in_selected_non_essential_products__world_bank_global_consumption_database_config.json

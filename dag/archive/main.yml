@@ -8,6 +8,12 @@ steps:
     - snapshot://homicide/2023-01-04/unodc.xlsx
   data://garden/homicide/2023-01-04/unodc:
     - data://meadow/homicide/2023-01-04/unodc
+  data://meadow/un/2022-07-07/un_sdg:
+    - walden://un_sdg/2022-07-07/un_sdg
+  data://garden/un/2022-07-07/un_sdg:
+    - data://meadow/un/2022-07-07/un_sdg
+  data://grapher/un/2022-07-07/un_sdg:
+    - data://garden/un/2022-07-07/un_sdg
 # Include all active steps plus all archive steps.
 include:
   - dag/main.yml
@@ -18,7 +24,7 @@ include:
   # - dag/archive/examples.yml
   # - dag/archive/emissions.yml
   # - dag/archive/papers.yml
-  # - dag/archive/demography.yml
+  - dag/archive/demography.yml
   # - dag/archive/war.yml
   # - dag/archive/fasttrack.yml
   # - dag/archive/biodiversity.yml

@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 00:07:25.564152
-  description: ''
-  file_extension: feather
-  is_public: false
-  name: Long-term land use (Taylor and Rising)
   namespace: backport
-  publication_date: latest
   short_name: dataset_5441_long_term_land_use__taylor_and_rising_values
+  file_extension: feather
+  date_accessed: 2023-02-23 19:13:31.996770
+  name: Long-term land use (Taylor and Rising)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5441
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 40045361e63ef7175bef8e4c9130d3ec
-  size: 959146
+- md5: 7714f865a54eaa3bb1ee2061382d3b36
+  size: 959522
   path: dataset_5441_long_term_land_use__taylor_and_rising_values.feather

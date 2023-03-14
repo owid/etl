@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 00:52:06.550141
-  description: ''
-  file_extension: feather
-  is_public: false
-  name: COVID-19 Model Estimates – Youyang Gu (2020)
   namespace: backport
-  publication_date: latest
   short_name: dataset_5097_covid_19_model_estimates__youyang_gu__2020_values
+  file_extension: feather
+  date_accessed: 2023-02-23 16:32:00.855032
+  name: COVID-19 Model Estimates – Youyang Gu (2020)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5097
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 06f17630cc03372b28ea23ad1d979528
-  size: 201882
+- md5: 369f97bea2305cf46bf5a4b96a733273
+  size: 202258
   path: dataset_5097_covid_19_model_estimates__youyang_gu__2020_values.feather

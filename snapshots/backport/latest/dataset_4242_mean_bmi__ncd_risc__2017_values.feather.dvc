@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:51:13.356724
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Mean BMI - NCD RisC (2017)
   namespace: backport
-  publication_date: latest
   short_name: dataset_4242_mean_bmi__ncd_risc__2017_values
+  file_extension: feather
+  date_accessed: 2023-02-23 16:31:01.351844
+  name: Mean BMI - NCD RisC (2017)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/4242
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: a21e4dfb270836f327b85e8c7b6bc661
-  size: 156298
+- md5: ee0946d2d7acd0ea52a1ce7097d06e9b
+  size: 156674
   path: dataset_4242_mean_bmi__ncd_risc__2017_values.feather

@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 16:59:03.237015
-  description: ''
-  file_extension: json
-  is_public: false
-  name: Grapher metadata for dataset_4185_structure_of_general_government_expenditures_by_function__oecd__2017
   namespace: backport
-  publication_date: latest
   short_name: dataset_4185_structure_of_general_government_expenditures_by_function__oecd__2017_config
+  file_extension: json
+  date_accessed: 2023-02-23 18:25:59.570589
+  name: Grapher metadata for dataset_4185_structure_of_general_government_expenditures_by_function__oecd__2017
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/4185
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 2afc59d690b85d861f0e876f1163bde5
-  size: 9206
+- md5: f15845c900665765804dcd5dc766a8ec
+  size: 11206
   path: dataset_4185_structure_of_general_government_expenditures_by_function__oecd__2017_config.json

@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:11:44.110701
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Solar PV Systems Costs - Barbose & Darghouth (2016)
   namespace: backport
-  publication_date: latest
   short_name: dataset_546_solar_pv_systems_costs__barbose__and__darghouth__2016_values
+  file_extension: feather
+  date_accessed: 2023-02-23 19:37:05.506640
+  name: Solar PV Systems Costs - Barbose & Darghouth (2016)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/546
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 5b31c84130012e8ad5cb610389cbdfc4
-  size: 6402
+- md5: cd3aad6fda0852cba1ba868cb99163a9
+  size: 6770
   path: dataset_546_solar_pv_systems_costs__barbose__and__darghouth__2016_values.feather

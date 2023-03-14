@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:52:07.390331
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Plastic importers to China - Brooks et al. (2018)
   namespace: backport
-  publication_date: latest
   short_name: dataset_2850_plastic_importers_to_china__brooks_et_al__2018_values
+  file_extension: feather
+  date_accessed: 2023-02-23 17:19:14.371745
+  name: Plastic importers to China - Brooks et al. (2018)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2850
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: fbfe77c22affbe1b42735393645a6caa
-  size: 6362
+- md5: 6da57527a88358548bae1ad490b782a9
+  size: 6730
   path: dataset_2850_plastic_importers_to_china__brooks_et_al__2018_values.feather

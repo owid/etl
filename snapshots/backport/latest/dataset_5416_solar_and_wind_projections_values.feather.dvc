@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:34:15.721650
-  description: ''
-  file_extension: feather
-  is_public: false
-  name: Solar and wind projections
   namespace: backport
-  publication_date: latest
   short_name: dataset_5416_solar_and_wind_projections_values
+  file_extension: feather
+  date_accessed: 2023-02-23 19:45:55.571472
+  name: Solar and wind projections
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5416
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: d2c25f6c7630c1286fa944d9c8f88da1
-  size: 9954
+- md5: fca4a5285ab1f4e0cbcef50f5560f29f
+  size: 10330
   path: dataset_5416_solar_and_wind_projections_values.feather

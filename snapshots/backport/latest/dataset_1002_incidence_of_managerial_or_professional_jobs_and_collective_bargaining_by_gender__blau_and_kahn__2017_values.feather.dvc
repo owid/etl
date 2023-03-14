@@ -1,18 +1,19 @@
 meta:
-  date_accessed: 2022-12-07 18:13:09.939015
-  description: ''
+  namespace: backport
+  short_name: dataset_1002_incidence_of_managerial_or_professional_jobs_and_collective_bargaining_by_gender__blau_and_kahn__2017_values
   file_extension: feather
-  is_public: true
+  date_accessed: 2023-02-23 19:18:45.954378
   name: Incidence of managerial or professional jobs and collective-bargaining by
     gender - Blau and Kahn (2017)
-  namespace: backport
-  publication_date: latest
-  short_name: dataset_1002_incidence_of_managerial_or_professional_jobs_and_collective_bargaining_by_gender__blau_and_kahn__2017_values
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/1002
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: b140c0601885914ac61018874984b348
-  size: 6098
+- md5: af88dcc82f2f084d8e1a6f818e729e5f
+  size: 6466
   path: dataset_1002_incidence_of_managerial_or_professional_jobs_and_collective_bargaining_by_gender__blau_and_kahn__2017_values.feather

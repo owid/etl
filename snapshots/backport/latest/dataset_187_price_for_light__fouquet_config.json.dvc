@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:57:34.021271
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_187_price_for_light__fouquet
   namespace: backport
-  publication_date: latest
   short_name: dataset_187_price_for_light__fouquet_config
+  file_extension: json
+  date_accessed: 2023-02-23 17:58:34.504130
+  name: Grapher metadata for dataset_187_price_for_light__fouquet
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/187
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 2ed2b3906a12e29a365f3b3300d7de4a
-  size: 1739
+- md5: baee17fd6634c48d9d51c09de12bb54d
+  size: 1933
   path: dataset_187_price_for_light__fouquet_config.json

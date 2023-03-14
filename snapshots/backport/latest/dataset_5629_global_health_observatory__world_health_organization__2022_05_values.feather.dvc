@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:04:05.685934
-  description: This is a dataset imported by the automated fetcher
-  file_extension: feather
-  is_public: true
-  name: Global Health Observatory - World Health Organization (2022.05)
   namespace: backport
-  publication_date: latest
   short_name: dataset_5629_global_health_observatory__world_health_organization__2022_05_values
+  file_extension: feather
+  date_accessed: 2023-02-23 17:52:08.181358
+  name: Global Health Observatory - World Health Organization (2022.05)
+  description: This is a dataset imported by the automated fetcher
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5629
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: f41700c742ed8ad927c8bf737e10c810
-  size: 30728426
+- md5: 2f82254f5299dc59003bfe9429738649
+  size: 30728810
   path: dataset_5629_global_health_observatory__world_health_organization__2022_05_values.feather

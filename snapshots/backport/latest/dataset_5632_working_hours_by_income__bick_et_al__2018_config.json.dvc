@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 01:43:23.097346
-  description: ''
-  file_extension: json
-  is_public: false
-  name: Grapher metadata for dataset_5632_working_hours_by_income__bick_et_al__2018
   namespace: backport
-  publication_date: latest
   short_name: dataset_5632_working_hours_by_income__bick_et_al__2018_config
+  file_extension: json
+  date_accessed: 2023-02-23 17:06:13.474834
+  name: Grapher metadata for dataset_5632_working_hours_by_income__bick_et_al__2018
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5632
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: ad5c9ace4371670088da116fb6a6325f
-  size: 5210
+- md5: b074f9bd987ab862f6cf100f84abdb43
+  size: 6210
   path: dataset_5632_working_hours_by_income__bick_et_al__2018_config.json

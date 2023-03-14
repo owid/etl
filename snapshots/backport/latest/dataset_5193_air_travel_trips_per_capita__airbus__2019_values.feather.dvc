@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 16:30:32.825052
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Air travel trips per capita (Airbus, 2019)
   namespace: backport
-  publication_date: latest
   short_name: dataset_5193_air_travel_trips_per_capita__airbus__2019_values
+  file_extension: feather
+  date_accessed: 2023-02-23 19:37:19.564683
+  name: Air travel trips per capita (Airbus, 2019)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5193
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 16645f4e9f705d4f45eaa8f0df9b00b1
-  size: 14410
+- md5: b789f7a38871439f134c7fa55f9ef8cd
+  size: 14786
   path: dataset_5193_air_travel_trips_per_capita__airbus__2019_values.feather

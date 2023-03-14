@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:52:43.432243
-  description: This is a dataset imported by the automated fetcher
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_2404_autistic_spectrum_disorders
   namespace: backport
-  publication_date: latest
   short_name: dataset_2404_autistic_spectrum_disorders_config
+  file_extension: json
+  date_accessed: 2023-02-23 19:26:40.430939
+  name: Grapher metadata for dataset_2404_autistic_spectrum_disorders
+  description: This is a dataset imported by the automated fetcher
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2404
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: da310aab4a5a0ff483988d66f6fb7d04
-  size: 50714
+- md5: 14e3f1f02f8b55cd6fa6d98a972d1e4d
+  size: 71504
   path: dataset_2404_autistic_spectrum_disorders_config.json

@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 16:30:25.949348
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Whale catch (Rocha et al.; IWC)
   namespace: backport
-  publication_date: latest
   short_name: dataset_4192_whale_catch__rocha_et_al__iwc_values
+  file_extension: feather
+  date_accessed: 2023-02-23 17:10:53.123344
+  name: Whale catch (Rocha et al.; IWC)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/4192
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: dbd73ad68bf3bf045788c4b23fa87086
-  size: 16314
+- md5: 7fdafb46ec93d0776f701c50295113f7
+  size: 16690
   path: dataset_4192_whale_catch__rocha_et_al__iwc_values.feather

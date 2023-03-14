@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 01:10:10.871890
-  description: ''
-  file_extension: json
-  is_public: false
-  name: Grapher metadata for dataset_5386_north_atlantic_cod_catch__schijns_et_al__2021
   namespace: backport
-  publication_date: latest
   short_name: dataset_5386_north_atlantic_cod_catch__schijns_et_al__2021_config
+  file_extension: json
+  date_accessed: 2023-02-23 19:07:36.344737
+  name: Grapher metadata for dataset_5386_north_atlantic_cod_catch__schijns_et_al__2021
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5386
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 1a41bb126035909d7e9f35395ba16f80
-  size: 1912
+- md5: 2d0d09e3d75b85b9ec096f0176d67773
+  size: 2112
   path: dataset_5386_north_atlantic_cod_catch__schijns_et_al__2021_config.json

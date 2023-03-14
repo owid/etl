@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 16:30:39.817675
-  description: https://github.com/owid/notebooks/tree/main/FionaSpooner/oecd_flu_vaccination
-  file_extension: feather
-  is_public: false
-  name: Influenza vaccination rates in over 65s (OECD)
   namespace: backport
-  publication_date: latest
   short_name: dataset_5777_influenza_vaccination_rates_in_over_65s__oecd_values
+  file_extension: feather
+  date_accessed: 2023-02-23 19:47:48.281276
+  name: Influenza vaccination rates in over 65s (OECD)
+  description: https://github.com/owid/notebooks/tree/main/FionaSpooner/oecd_flu_vaccination
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5777
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: c48057b03a5e777224f733ac7ef07221
-  size: 9818
+- md5: 01096479307a9e1e6c9b741f97126435
+  size: 10186
   path: dataset_5777_influenza_vaccination_rates_in_over_65s__oecd_values.feather

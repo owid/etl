@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 01:34:40.687118
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_2769_alcohol_expenditure_in_the_usa_long_term__usda__2018
   namespace: backport
-  publication_date: latest
   short_name: dataset_2769_alcohol_expenditure_in_the_usa_long_term__usda__2018_config
+  file_extension: json
+  date_accessed: 2023-02-23 19:13:43.647720
+  name: Grapher metadata for dataset_2769_alcohol_expenditure_in_the_usa_long_term__usda__2018
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2769
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: b2d5c35d27727d918470e9536523f347
-  size: 6612
+- md5: 46ec2360e2139869c044db7e99c1cda4
+  size: 8394
   path: dataset_2769_alcohol_expenditure_in_the_usa_long_term__usda__2018_config.json

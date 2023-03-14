@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:22:51.682157
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_1930_trade_share_by_type_of_trade__owid_calculations_based_on_nber__united_nations_trade_data_1962_2000
   namespace: backport
-  publication_date: latest
   short_name: dataset_1930_trade_share_by_type_of_trade__owid_calculations_based_on_nber__united_nations_trade_data_1962_2000_config
+  file_extension: json
+  date_accessed: 2023-02-23 19:51:50.549400
+  name: Grapher metadata for dataset_1930_trade_share_by_type_of_trade__owid_calculations_based_on_nber__united_nations_trade_data_1962_2000
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/1930
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 3ea36b0e15ace03fa4c9c111e87a34b1
-  size: 5524
+- md5: 2dfe23111a1c75da11f4e7e0228fb473
+  size: 6316
   path: dataset_1930_trade_share_by_type_of_trade__owid_calculations_based_on_nber__united_nations_trade_data_1962_2000_config.json

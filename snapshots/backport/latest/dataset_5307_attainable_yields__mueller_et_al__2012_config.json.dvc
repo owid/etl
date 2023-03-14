@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 16:32:04.301566
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_5307_attainable_yields__mueller_et_al__2012
   namespace: backport
-  publication_date: latest
   short_name: dataset_5307_attainable_yields__mueller_et_al__2012_config
+  file_extension: json
+  date_accessed: 2023-02-23 19:31:20.526102
+  name: Grapher metadata for dataset_5307_attainable_yields__mueller_et_al__2012
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5307
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 510cdf045e462e9a0e706468c95d4851
-  size: 15191
+- md5: c9ce77a5abccaa67e9ff7da900bd2c09
+  size: 21991
   path: dataset_5307_attainable_yields__mueller_et_al__2012_config.json

@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 00:13:17.728236
-  description: ''
-  file_extension: feather
-  is_public: false
-  name: COVID testing time series data (Vietnam exemplar)
   namespace: backport
-  publication_date: latest
   short_name: dataset_5592_covid_testing_time_series_data__vietnam_exemplar_values
+  file_extension: feather
+  date_accessed: 2023-02-23 18:49:35.144945
+  name: COVID testing time series data (Vietnam exemplar)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5592
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 3302e529b50cedad4f7b033fd74174f8
-  size: 70338
+- md5: d90d6c03693f58990bdb422489d7e57b
+  size: 70714
   path: dataset_5592_covid_testing_time_series_data__vietnam_exemplar_values.feather

@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 00:18:59.445325
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Extreme precipitation in US (NOAA)
   namespace: backport
-  publication_date: latest
   short_name: dataset_2956_extreme_precipitation_in_us__noaa_values
+  file_extension: feather
+  date_accessed: 2023-02-23 18:25:47.097974
+  name: Extreme precipitation in US (NOAA)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2956
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 4fa59f21d0423d10382525164ca771c9
-  size: 9394
+- md5: ac0f810df25f3dfcb4577c24b36a6e90
+  size: 9770
   path: dataset_2956_extreme_precipitation_in_us__noaa_values.feather

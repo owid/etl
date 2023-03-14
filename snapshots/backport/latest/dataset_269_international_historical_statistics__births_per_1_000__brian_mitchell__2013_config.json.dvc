@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 00:37:26.941361
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_269_international_historical_statistics__births_per_1_000__brian_mitchell__2013
   namespace: backport
-  publication_date: latest
   short_name: dataset_269_international_historical_statistics__births_per_1_000__brian_mitchell__2013_config
+  file_extension: json
+  date_accessed: 2023-02-23 18:21:47.787645
+  name: Grapher metadata for dataset_269_international_historical_statistics__births_per_1_000__brian_mitchell__2013
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/269
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 5e3d632856f1d64951fc00630b72923d
-  size: 2132
+- md5: 579b774f70b3456225c70a65e0771c08
+  size: 2328
   path: dataset_269_international_historical_statistics__births_per_1_000__brian_mitchell__2013_config.json

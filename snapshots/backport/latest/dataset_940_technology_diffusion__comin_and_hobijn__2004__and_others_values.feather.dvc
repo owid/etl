@@ -1,18 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:09:57.334202
-  description: 'Describes the percentage of American households with access to, or
-    own, certain technologies. '
-  file_extension: feather
-  is_public: true
-  name: Technology Diffusion - Comin and Hobijn (2004) and others
   namespace: backport
-  publication_date: latest
   short_name: dataset_940_technology_diffusion__comin_and_hobijn__2004__and_others_values
+  file_extension: feather
+  date_accessed: 2023-03-13 13:43:07.256543
+  name: Technology Diffusion - Comin and Hobijn (2004) and others
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/940
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 1418c0712432d30ea8942ef655b8ca20
-  size: 12026
+- md5: e9c25a79eb944fa65e6c6c6b8573600a
+  size: 12402
   path: dataset_940_technology_diffusion__comin_and_hobijn__2004__and_others_values.feather

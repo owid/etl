@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:15:01.886691
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Measles London
   namespace: backport
-  publication_date: latest
   short_name: dataset_1875_measles_london_values
+  file_extension: feather
+  date_accessed: 2023-02-23 19:40:43.360158
+  name: Measles London
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/1875
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 5512e0d0b31fc6aee932d5317ff275f3
-  size: 7826
+- md5: 5e9e7781ac64ea7e23635e106ed8d127
+  size: 8202
   path: dataset_1875_measles_london_values.feather

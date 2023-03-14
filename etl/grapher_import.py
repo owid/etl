@@ -10,6 +10,7 @@ Usage:
 """
 
 import concurrent.futures
+import datetime
 import os
 from dataclasses import dataclass
 from threading import Lock
@@ -20,11 +21,18 @@ import structlog
 from owid import catalog
 from owid.catalog import utils
 from sqlalchemy import Integer, String
+from sqlalchemy.engine.base import Engine
 from sqlmodel import Session, delete, select, update
 from tenacity import retry, stop
 
+from backport.datasync.data_metadata import (
+    add_entity_code_and_name,
+    variable_data,
+    variable_metadata,
+)
+from backport.datasync.datasync import upload_gzip_dict
 from etl import config
-from etl.db import get_engine, open_db
+from etl.db import open_db
 
 from . import grapher_helpers as gh
 from . import grapher_model as gm
@@ -67,7 +75,9 @@ class VariableUpsertResult:
     source_id: int
 
 
-def upsert_dataset(dataset: catalog.Dataset, namespace: str, sources: List[catalog.meta.Source]) -> DatasetUpsertResult:
+def upsert_dataset(
+    engine: Engine, dataset: catalog.Dataset, namespace: str, sources: List[catalog.meta.Source]
+) -> DatasetUpsertResult:
     assert dataset.metadata.short_name, "Dataset must have a short_name"
     assert dataset.metadata.version, "Dataset must have a version"
     assert dataset.metadata.title, "Dataset must have a title"
@@ -80,8 +90,6 @@ def upsert_dataset(dataset: catalog.Dataset, namespace: str, sources: List[catal
             " `combine_metadata_sources` or `adapt_dataset_metadata_for_grapher` to"
             " join multiple sources"
         )
-
-    engine = gm.get_engine()
 
     short_name = dataset.metadata.short_name
 
@@ -158,6 +166,7 @@ def _update_variables_display(table: catalog.Table) -> None:
 
 
 def upsert_table(
+    engine: Engine,
     table: catalog.Table,
     dataset_upsert_result: DatasetUpsertResult,
     catalog_path: Optional[str] = None,
@@ -200,7 +209,7 @@ def upsert_table(
 
     _update_variables_display(table)
 
-    with Session(gm.get_engine()) as session:
+    with Session(engine) as session:
         log.info("upsert_table.upsert_variable", variable=table.columns[0])
 
         # For easy retrieveal of the value series we store the name
@@ -242,22 +251,46 @@ def upsert_table(
             catalog_path=catalog_path,
             dimensions=dimensions,
         ).upsert(session)
-        assert variable.id
+        variable_id = variable.id
+        assert variable_id
 
         session.commit()
 
-        # delete its data to refresh it later
-        q = delete(gm.DataValues).where(gm.DataValues.variableId == variable.id)
+        # delete its data if there is any
+        # TODO: once we stop upserting to data_values, prune all ETL datasets from data_values
+        # and remove these lines
+        q = delete(gm.DataValues).where(gm.DataValues.variableId == variable_id)
         session.execute(q)
         session.commit()
 
-        df = table.rename(columns={column_name: "value", "entity_id": "entityId"}).assign(variableId=variable.id)
+        df = table.rename(columns={column_name: "value", "entity_id": "entityId"}).assign(variableId=variable_id)
 
+        # TODO: once we verify that uploading to S3 works, stop upserting to data_values and remove these
+        # lines together with function insert_to_data_values
         if table.metadata.dataset.short_name not in BLACKLIST_DATASETS_DATA_VALUES_UPSERTS:
-            insert_to_data_values(df)
-            log.info("upsert_table.upserted_data_values", size=len(table))
+            insert_to_data_values(engine, df)
+            log.info("upsert_table.upserted_data_values", size=len(table), varible_id=variable_id)
 
-        return VariableUpsertResult(variable.id, source_id)
+        # NOTE: we could prefetch all entities in advance, but it's not a bottleneck as it takes
+        # less than 10ms per variable
+        df = add_entity_code_and_name(engine, df)
+
+        var_data = variable_data(df)
+        var_metadata = variable_metadata(engine, variable_id, df)
+
+        # upload data and metadata to S3
+        data_path = upload_gzip_dict(var_data, variable.s3_data_path())
+        metadata_path = upload_gzip_dict(var_metadata, variable.s3_metadata_path())
+
+        variable = gm.Variable.load_variable(session, variable_id)
+        variable.dataPath = data_path
+        variable.metadataPath = metadata_path
+        session.add(variable)
+        session.commit()
+
+        log.info("upsert_table.uploaded_to_s3", size=len(table), variable_id=variable_id)
+
+        return VariableUpsertResult(variable_id, source_id)  # type: ignore
 
 
 def fetch_db_checksum(dataset: catalog.Dataset) -> Optional[str]:
@@ -279,9 +312,17 @@ def fetch_db_checksum(dataset: catalog.Dataset) -> Optional[str]:
         return ds.sourceChecksum if ds is not None else None
 
 
-def set_dataset_checksum(dataset_id: int, checksum: str) -> None:
+def set_dataset_checksum_and_editedAt(dataset_id: int, checksum: str) -> None:
     with Session(gm.get_engine()) as session:
-        q = update(gm.Dataset).where(gm.Dataset.id == dataset_id).values(sourceChecksum=checksum)
+        q = (
+            update(gm.Dataset)
+            .where(gm.Dataset.id == dataset_id)
+            .values(
+                sourceChecksum=checksum,
+                dataEditedAt=datetime.datetime.utcnow(),
+                metadataEditedAt=datetime.datetime.utcnow(),
+            )
+        )
         session.execute(q)
         session.commit()
 
@@ -380,7 +421,7 @@ def cleanup_ghost_sources(dataset_id: int, upserted_source_ids: List[int]) -> No
 
 
 @retry(stop=stop.stop_after_attempt(3))
-def insert_to_data_values(df: pd.DataFrame) -> None:
+def insert_to_data_values(engine: Engine, df: pd.DataFrame) -> None:
     """Insert data into data_values table. Retry in case we get Deadlock error."""
     # value will be converted to string in MySQL, we need to do it beforehand otherwise
     # it's gonna assume it is float64 and mess up precision for smaller types
@@ -390,7 +431,7 @@ def insert_to_data_values(df: pd.DataFrame) -> None:
     # deadlocks
     df.to_sql(
         "data_values",
-        get_engine(),
+        engine,
         if_exists="append",
         index=False,
         dtype={

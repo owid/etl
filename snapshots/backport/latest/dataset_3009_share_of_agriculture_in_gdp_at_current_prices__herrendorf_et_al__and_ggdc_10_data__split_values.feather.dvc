@@ -1,18 +1,19 @@
 meta:
-  date_accessed: 2022-12-07 16:29:38.537406
-  description: ''
+  namespace: backport
+  short_name: dataset_3009_share_of_agriculture_in_gdp_at_current_prices__herrendorf_et_al__and_ggdc_10_data__split_values
   file_extension: feather
-  is_public: false
+  date_accessed: 2023-02-23 19:43:16.132539
   name: Share of agriculture in GDP at current prices (Herrendorf et al. and GGDC-10
     data) (split)
-  namespace: backport
-  publication_date: latest
-  short_name: dataset_3009_share_of_agriculture_in_gdp_at_current_prices__herrendorf_et_al__and_ggdc_10_data__split_values
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/3009
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: f9b1b6e3a39e8141fda28f46e09a3795
-  size: 65554
+- md5: be2b0428d8ba70330105f4a6199ef256
+  size: 65930
   path: dataset_3009_share_of_agriculture_in_gdp_at_current_prices__herrendorf_et_al__and_ggdc_10_data__split_values.feather

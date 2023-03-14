@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:51:58.077119
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_2850_plastic_importers_to_china__brooks_et_al__2018
   namespace: backport
-  publication_date: latest
   short_name: dataset_2850_plastic_importers_to_china__brooks_et_al__2018_config
+  file_extension: json
+  date_accessed: 2023-02-23 17:18:48.321413
+  name: Grapher metadata for dataset_2850_plastic_importers_to_china__brooks_et_al__2018
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2850
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: d2ee4dd94f568f9c01eb49955929120c
-  size: 2028
+- md5: 9bb1dbf7c088726a3627d6131fe3b7ff
+  size: 2424
   path: dataset_2850_plastic_importers_to_china__brooks_et_al__2018_config.json

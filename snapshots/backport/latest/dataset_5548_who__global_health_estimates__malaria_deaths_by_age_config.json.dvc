@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:07:36.140246
-  description: 'Code and data available in this repo: https://github.com/owid/notebooks/tree/main/FionaSpooner/who_malaria_deaths_by_age'
-  file_extension: json
-  is_public: false
-  name: Grapher metadata for dataset_5548_who__global_health_estimates__malaria_deaths_by_age
   namespace: backport
-  publication_date: latest
   short_name: dataset_5548_who__global_health_estimates__malaria_deaths_by_age_config
+  file_extension: json
+  date_accessed: 2023-02-23 19:04:39.509035
+  name: Grapher metadata for dataset_5548_who__global_health_estimates__malaria_deaths_by_age
+  description: 'Code and data available in this repo: https://github.com/owid/notebooks/tree/main/FionaSpooner/who_malaria_deaths_by_age'
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5548
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 6b451b9207781d95de72d77d52c054d6
-  size: 3504
+- md5: 192cbbd5afe8cbe9646bf58b83c4ff54
+  size: 4504
   path: dataset_5548_who__global_health_estimates__malaria_deaths_by_age_config.json

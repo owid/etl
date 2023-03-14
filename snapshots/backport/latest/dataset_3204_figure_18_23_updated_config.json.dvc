@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 16:32:37.630258
-  description: core-econ.org
-  file_extension: json
-  is_public: false
-  name: Grapher metadata for dataset_3204_figure_18_23_updated
   namespace: backport
-  publication_date: latest
   short_name: dataset_3204_figure_18_23_updated_config
+  file_extension: json
+  date_accessed: 2023-02-23 19:39:23.923623
+  name: Grapher metadata for dataset_3204_figure_18_23_updated
+  description: core-econ.org
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/3204
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 4d03eca0e445f7dfcc812683188bbc37
-  size: 1728
+- md5: 0a9a6a0907044b294307dd37eb3a5863
+  size: 1926
   path: dataset_3204_figure_18_23_updated_config.json

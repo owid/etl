@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 15:48:46.219030
-  description: core-econ.org
-  file_extension: feather
-  is_public: false
-  name: Figure 22.17_gini
   namespace: backport
-  publication_date: latest
   short_name: dataset_3256_figure_22_17_gini_values
+  file_extension: feather
+  date_accessed: 2023-02-23 17:49:03.464722
+  name: Figure 22.17_gini
+  description: core-econ.org
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/3256
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 7f752e3e09d908c316774195ae8a61a9
-  size: 6538
+- md5: 8016d90e6afe24a3e825fea1030dfcb4
+  size: 6906
   path: dataset_3256_figure_22_17_gini_values.feather

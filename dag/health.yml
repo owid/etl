@@ -30,6 +30,7 @@ steps:
     - data://garden/reference
   data://garden/who/2022-09-30/ghe:
     - data://meadow/who/2022-09-30/ghe
+    - data://garden/un/2022-07-11/un_wpp
     - data://garden/reference
   data://grapher/who/2022-09-30/ghe:
     - data://garden/who/2022-09-30/ghe
@@ -37,6 +38,14 @@ steps:
   #WHO - Global Health Observatory (Incomplete; waiting for WHO API update)
   data://meadow/who/2021-07-01/gho:
     - walden://who/2021-07-01/gho
+  # WHO - Global Health Observatory (only suicides variable)
+  data://meadow/who/2023-03-09/gho_suicides:
+    - snapshot://who/2023-03-09/gho_suicides.json
+  data://garden/who/2023-03-09/gho_suicides:
+    - data://meadow/who/2023-03-09/gho_suicides
+  data://grapher/who/2023-03-09/gho_suicides:
+    - data://garden/who/2023-03-09/gho_suicides
+
   # IHME Global Burden of Disease
   data://meadow/ihme_gbd/2020-12-19/child_mortality:
     - walden://ihme_gbd/2020-12-19/child_mortality
@@ -71,7 +80,6 @@ steps:
   data://grapher/ihme_gbd/2019/gbd_child_mortality:
     - data://garden/ihme_gbd/2019/gbd_child_mortality
 
-
   # Postnatal care coverage - World Bank (2022)
   data://meadow/postnatal_care/2022-09-19/postnatal_care:
     - walden://postnatal_care/2022-09-19/postnatal_care
@@ -79,3 +87,16 @@ steps:
     - data://meadow/postnatal_care/2022-09-19/postnatal_care
   data://grapher/postnatal_care/2022-09-19/postnatal_care:
     - data://garden/postnatal_care/2022-09-19/postnatal_care
+
+  # FluNet and FluID - WHO Flu Databases
+  data://meadow/who/latest/flunet:
+    - snapshot://who/latest/flunet.csv
+  data://garden/who/latest/flunet:
+    - data://meadow/who/latest/flunet
+  data://meadow/who/latest/fluid:
+    - snapshot://who/latest/fluid.csv
+  data://garden/who/latest/fluid:
+    - data://meadow/who/latest/fluid
+  data://explorers/who/latest/flu:
+    - data://garden/who/latest/fluid
+    - data://garden/who/latest/flunet

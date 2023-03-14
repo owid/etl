@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:28:22.892988
-  description: core-econ.org
-  file_extension: feather
-  is_public: false
-  name: TE-3.2_time
   namespace: backport
-  publication_date: latest
   short_name: dataset_3259_te_3_2_time_values
+  file_extension: feather
+  date_accessed: 2023-02-23 18:38:55.190581
+  name: TE-3.2_time
+  description: core-econ.org
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/3259
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 75f8197f5e8b2c0d84c2230ddc1eb932
-  size: 6826
+- md5: 87c01e6cce9503d84a6d686bbf117d69
+  size: 7194
   path: dataset_3259_te_3_2_time_values.feather

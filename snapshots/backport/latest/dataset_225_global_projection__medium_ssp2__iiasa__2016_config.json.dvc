@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 00:41:40.846945
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_225_global_projection__medium_ssp2__iiasa__2016
   namespace: backport
-  publication_date: latest
   short_name: dataset_225_global_projection__medium_ssp2__iiasa__2016_config
+  file_extension: json
+  date_accessed: 2023-02-23 19:39:11.186198
+  name: Grapher metadata for dataset_225_global_projection__medium_ssp2__iiasa__2016
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/225
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 5409a157e447507271a89dc41ff403ab
-  size: 4422
+- md5: b67d0efc2443d403696cc6df7d13bb1f
+  size: 5780
   path: dataset_225_global_projection__medium_ssp2__iiasa__2016_config.json

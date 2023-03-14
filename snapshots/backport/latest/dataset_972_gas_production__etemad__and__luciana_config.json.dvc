@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:42:25.123497
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_972_gas_production__etemad__and__luciana
   namespace: backport
-  publication_date: latest
   short_name: dataset_972_gas_production__etemad__and__luciana_config
+  file_extension: json
+  date_accessed: 2023-02-23 19:09:57.892200
+  name: Grapher metadata for dataset_972_gas_production__etemad__and__luciana
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/972
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 3a3489f13d2e3448f07dca35a823bf6e
-  size: 1580
+- md5: f7dbba680f43078c59c0988f9b0f44d7
+  size: 1778
   path: dataset_972_gas_production__etemad__and__luciana_config.json

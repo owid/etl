@@ -1,18 +1,19 @@
 meta:
-  date_accessed: 2022-12-07 18:06:32.406296
-  description: ''
+  namespace: backport
+  short_name: dataset_5540_violent_deaths_in_conflicts_and_one_sided_violence_since_1989__by_region_and_type_of_violence__ucdp_2022_values
   file_extension: feather
-  is_public: true
+  date_accessed: 2023-02-23 17:23:11.636731
   name: Violent deaths in conflicts and one-sided violence since 1989, by region and
     type of violence (UCDP 2022)
-  namespace: backport
-  publication_date: latest
-  short_name: dataset_5540_violent_deaths_in_conflicts_and_one_sided_violence_since_1989__by_region_and_type_of_violence__ucdp_2022_values
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5540
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: e78735ccd911449c7ca8d87856942fbb
-  size: 17282
+- md5: 465c8dcce1f6e68ca2590cdca759f2c6
+  size: 17658
   path: dataset_5540_violent_deaths_in_conflicts_and_one_sided_violence_since_1989__by_region_and_type_of_violence__ucdp_2022_values.feather

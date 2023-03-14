@@ -1,18 +1,19 @@
 meta:
-  date_accessed: 2022-12-08 01:33:14.770576
-  description: ''
+  namespace: backport
+  short_name: dataset_2476_change_in_global_hunger_index__1992_2017__listed_2017__global_hunger_index_2017_values
   file_extension: feather
-  is_public: true
+  date_accessed: 2023-02-23 17:48:16.953869
   name: Change in Global Hunger Index, 1992-2017 (listed 2017) (Global Hunger Index
     2017)
-  namespace: backport
-  publication_date: latest
-  short_name: dataset_2476_change_in_global_hunger_index__1992_2017__listed_2017__global_hunger_index_2017_values
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2476
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 384ae516a4a8ae18426159bbee6b06ca
-  size: 8674
+- md5: 96dabb08bde43853eeb25ca0bd1887f0
+  size: 9042
   path: dataset_2476_change_in_global_hunger_index__1992_2017__listed_2017__global_hunger_index_2017_values.feather

@@ -1,20 +1,21 @@
 meta:
-  date_accessed: 2022-12-08 00:26:15.336903
+  namespace: backport
+  short_name: dataset_5528_estimated_malaria_deaths_values
+  file_extension: feather
+  date_accessed: 2023-02-23 19:52:11.333063
+  name: Estimated Malaria Deaths
   description: There is some rounding of the figures for each of the regions, so that
     the sum doesn't quite add up to the values in the global estimates, which is also
     rounded. For example their estimate of global malaria deaths is 627000, but the
     regions sum to 626909.
-  file_extension: feather
-  is_public: false
-  name: Estimated Malaria Deaths
-  namespace: backport
-  publication_date: latest
-  short_name: dataset_5528_estimated_malaria_deaths_values
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5528
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: d8ad21426134d4b046c32c4aba12a9e4
-  size: 6474
+- md5: bd101bd666021b80b94d90acbc477ced
+  size: 6850
   path: dataset_5528_estimated_malaria_deaths_values.feather

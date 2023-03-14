@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-11-29 16:51:58.537835
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Child Mortality Rates (Selected Gapminder, v10) (2017)
   namespace: backport
-  publication_date: latest
   short_name: dataset_2710_child_mortality_rates__selected_gapminder__v10__2017_values
+  file_extension: feather
+  date_accessed: 2023-02-23 19:19:24.861784
+  name: Child Mortality Rates (Selected Gapminder, v10) (2017)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2710
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: ca47b13afa6121f987b2457cc867c68d
-  size: 70610
+- md5: 3cb041843bf9880e5a6ca5f17ad69aac
+  size: 70986
   path: dataset_2710_child_mortality_rates__selected_gapminder__v10__2017_values.feather

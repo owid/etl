@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 16:53:51.721113
-  description: ''
-  file_extension: feather
-  is_public: false
-  name: Prevalence of undernourishment since 2000 (FAOstats, 2018)
   namespace: backport
-  publication_date: latest
   short_name: dataset_2965_prevalence_of_undernourishment_since_2000__faostats__2018_values
+  file_extension: feather
+  date_accessed: 2023-02-23 15:09:00.560828
+  name: Prevalence of undernourishment since 2000 (FAOstats, 2018)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2965
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 5f441effb8fe4aaa428b42840e67bd9f
-  size: 25506
+- md5: 23d3d3c5936c4c03e481148f52c30ac8
+  size: 25882
   path: dataset_2965_prevalence_of_undernourishment_since_2000__faostats__2018_values.feather

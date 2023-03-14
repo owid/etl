@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:32:07.385928
-  description: ''
-  file_extension: json
-  is_public: false
-  name: Grapher metadata for dataset_5571_omm__public_expenditure_on_health__pctgdp
   namespace: backport
-  publication_date: latest
   short_name: dataset_5571_omm__public_expenditure_on_health__pctgdp_config
+  file_extension: json
+  date_accessed: 2023-02-23 17:07:49.551566
+  name: Grapher metadata for dataset_5571_omm__public_expenditure_on_health__pctgdp
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5571
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 68decc4d2a294cf57b267061f5bfef84
-  size: 2036
+- md5: c40bfd49689bc937b139eb3d5358573b
+  size: 2236
   path: dataset_5571_omm__public_expenditure_on_health__pctgdp_config.json

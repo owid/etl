@@ -4,6 +4,7 @@ from enum import Enum
 from pathlib import Path
 from typing import Any
 
+import ruamel.yaml
 from owid.catalog import Dataset
 from pydantic import BaseModel
 from pywebio import input as pi
@@ -136,6 +137,9 @@ def app(run_checks: bool, dummy_data: bool) -> None:
     if not form.include_metadata_yaml:
         os.remove(metadata_path)
 
+    if dummies:
+        _fill_dummy_metadata_yaml(metadata_path)
+
     po.put_markdown(
         f"""
 ## Next steps
@@ -180,9 +184,13 @@ def app(run_checks: bool, dummy_data: bool) -> None:
     poetry run etl data{private_suffix}://garden/{form.namespace}/{form.version}/{form.short_name} {"--private" if form.is_private else ""}
     ```
 
-5. Create a branch in [ETL](https://github.com/owid/etl), get it reviewed and merged.
+    Note that metadata is inherited from previous step (snapshot) and you don't have to repeat it.
 
-6. Once your changes are merged, your steps will be run automatically by our server and published to the OWID catalog. Once that is finished, it can be found by anyone using:
+5. (Optional) You can manually move steps from `dag/walkthrough.yml` to some other `dag/*.yml` if you feel like it belongs there. After you are happy with your code, run `make test` to find any issues.
+
+6. Create a pull request in [ETL](https://github.com/owid/etl), get it reviewed and merged.
+
+7. Once your changes are merged, your steps will be run automatically by our server and published to the OWID catalog. Then it can be loaded by anyone using:
 
     ```python
     from owid.catalog import find_one
@@ -191,7 +199,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
     print(tab.head())
     ```
 
-7. If you are an internal OWID member and want to push data to our Grapher DB, continue with `poetry run walkthrough grapher`
+8. If you are an internal OWID member and want to push data to our Grapher DB, continue with `poetry run walkthrough grapher`. Alternatively, to create explorers dataset continue with `poetry run walkthrough explorers`.
 
 ## Generated files
 """
@@ -222,3 +230,17 @@ def _check_dataset_in_meadow(form: GardenForm) -> None:
     except FileNotFoundError:
         # raise a warning, but continue
         po.put_warning(po.put_markdown(f"Dataset not found in Meadow, have you run ```\n{cmd}\n```?"))
+
+
+def _fill_dummy_metadata_yaml(metadata_path: Path) -> None:
+    """Fill dummy metadata yaml file with some dummy values. Only useful when
+    --dummy-data is used. We need this to avoid errors in `walkthrough grapher --dummy-data`."""
+    with open(metadata_path, "r") as f:
+        doc = ruamel.yaml.load(f, Loader=ruamel.yaml.RoundTripLoader)
+
+    doc["dataset"]["title"] = "Dummy dataset"
+    doc["tables"]["dummy"]["variables"] = {"dummy_variable": {"unit": "dummy unit"}}
+    doc["all_sources"][0]["source_testing"]["name"] = "Dummy source"
+
+    with open(metadata_path, "w") as f:
+        ruamel.yaml.dump(doc, f, Dumper=ruamel.yaml.RoundTripDumper)

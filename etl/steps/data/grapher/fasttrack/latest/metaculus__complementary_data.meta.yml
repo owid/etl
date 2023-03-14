@@ -1,0 +1,32 @@
+dataset:
+  namespace: fasttrack
+  version: latest
+  short_name: metaculus__complementary_data
+  title: DRAFT Metaculus - Complementary data
+  description: ''
+  sources:
+  - name: Unknown
+    published_by: Unknown
+    publication_year: 2023
+    date_accessed: 2023-02-21
+tables:
+  metaculus__complementary_data:
+    variables:
+      nuclear_weapons_stockpile:
+        title: nuclear_weapons_stockpile
+        unit: ''
+      life_expectancy:
+        title: Life expectancy
+        unit: ''
+      same_sex_marriage:
+        title: same_sex_marriage
+        unit: ''
+      trust:
+        title: trust
+        unit: ''
+      ai_flops:
+        title: ai_flops
+        unit: ''
+      supercomputer:
+        title: supercomputer
+        unit: ''

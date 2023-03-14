@@ -186,6 +186,8 @@ def app(run_checks: bool, dummy_data: bool) -> None:
     poetry run etl data{private_suffix}://meadow/{form.namespace}/{form.version}/{form.short_name} {"--private" if form.is_private else ""}
     ```
 
+    Note that metadata is inherited from previous step (snapshot) and you don't have to repeat it.
+
 5. Exit the process and run next step with `poetry run walkthrough garden`
 
 ## Generated files

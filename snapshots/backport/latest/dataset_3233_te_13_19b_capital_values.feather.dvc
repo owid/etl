@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 15:57:23.473606
-  description: core-econ.org
-  file_extension: feather
-  is_public: false
-  name: TE-13.19b_capital
   namespace: backport
-  publication_date: latest
   short_name: dataset_3233_te_13_19b_capital_values
+  file_extension: feather
+  date_accessed: 2023-02-23 18:07:14.169570
+  name: TE-13.19b_capital
+  description: core-econ.org
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/3233
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: e04bdc03dfb8c78d22affdcf5db24d0a
-  size: 6338
+- md5: 678476324bb2b2e449587278d413465e
+  size: 6706
   path: dataset_3233_te_13_19b_capital_values.feather

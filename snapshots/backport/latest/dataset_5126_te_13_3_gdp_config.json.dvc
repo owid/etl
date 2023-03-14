@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 15:59:55.006046
-  description: core-econ.org
-  file_extension: json
-  is_public: false
-  name: Grapher metadata for dataset_5126_te_13_3_gdp
   namespace: backport
-  publication_date: latest
   short_name: dataset_5126_te_13_3_gdp_config
+  file_extension: json
+  date_accessed: 2023-02-23 17:34:26.297723
+  name: Grapher metadata for dataset_5126_te_13_3_gdp
+  description: core-econ.org
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5126
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: ea1c7c460e55634e980dc70d21dd67ac
-  size: 2150
+- md5: 2ed29c628bfbfe057c7916682df4ecdc
+  size: 2550
   path: dataset_5126_te_13_3_gdp_config.json

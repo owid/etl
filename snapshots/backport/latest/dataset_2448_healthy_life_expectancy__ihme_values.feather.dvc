@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:30:33.906489
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Healthy Life Expectancy - IHME
   namespace: backport
-  publication_date: latest
   short_name: dataset_2448_healthy_life_expectancy__ihme_values
+  file_extension: feather
+  date_accessed: 2023-02-23 16:27:45.932280
+  name: Healthy Life Expectancy - IHME
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2448
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: dfbba5ad21aef6696045ea66831d9209
-  size: 88762
+- md5: ac59401b4e0c19024e15a3ef8c277ea0
+  size: 89138
   path: dataset_2448_healthy_life_expectancy__ihme_values.feather

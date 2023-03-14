@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:41:54.958267
-  description: ''
-  file_extension: feather
-  is_public: false
-  name: Fish discards (UN FAO)
   namespace: backport
-  publication_date: latest
   short_name: dataset_5356_fish_discards__un_fao_values
+  file_extension: feather
+  date_accessed: 2023-02-23 16:42:26.157926
+  name: Fish discards (UN FAO)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5356
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: c9a89103b48463f1109dc7d521bdee74
-  size: 6842
+- md5: 9e5aff6d31caeb956159cdb3a5f933b1
+  size: 7218
   path: dataset_5356_fish_discards__un_fao_values.feather

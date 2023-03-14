@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 16:54:11.022220
-  description: Generated with https://github.com/owid/notebooks/tree/main/EdouardMathieu/us_public_trust_government_pew_research_center
-  file_extension: feather
-  is_public: true
-  name: US - Public Trust in Government - Pew Research Center
   namespace: backport
-  publication_date: latest
   short_name: dataset_271_us__public_trust_in_government__pew_research_center_values
+  file_extension: feather
+  date_accessed: 2023-03-01 12:06:00.178168
+  name: US - Public Trust in Government - Pew Research Center
+  description: Generated with https://github.com/owid/notebooks/tree/main/EdouardMathieu/us_public_trust_government_pew_research_center
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/271
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 7caf1cf55ca994e5553927081929176c
-  size: 6234
+- md5: 9b97e6496585f8e004d716164bd03360
+  size: 6602
   path: dataset_271_us__public_trust_in_government__pew_research_center_values.feather

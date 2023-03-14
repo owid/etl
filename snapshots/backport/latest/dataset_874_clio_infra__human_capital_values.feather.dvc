@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 00:14:20.645096
-  description: This is a dataset imported by the automated fetcher
-  file_extension: feather
-  is_public: true
-  name: Clio-Infra - Human Capital
   namespace: backport
-  publication_date: latest
   short_name: dataset_874_clio_infra__human_capital_values
+  file_extension: feather
+  date_accessed: 2023-02-23 16:37:10.735308
+  name: Clio-Infra - Human Capital
+  description: This is a dataset imported by the automated fetcher
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/874
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: d4ce2e7fc0b830cadd97edb0781198cc
-  size: 243186
+- md5: 6610c73d6c7334d1422186964fc028bd
+  size: 243562
   path: dataset_874_clio_infra__human_capital_values.feather

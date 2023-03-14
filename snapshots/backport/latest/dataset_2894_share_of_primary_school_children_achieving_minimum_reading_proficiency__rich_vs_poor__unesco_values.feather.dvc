@@ -1,18 +1,19 @@
 meta:
-  date_accessed: 2022-12-07 16:57:41.373585
-  description: ''
+  namespace: backport
+  short_name: dataset_2894_share_of_primary_school_children_achieving_minimum_reading_proficiency__rich_vs_poor__unesco_values
   file_extension: feather
-  is_public: true
+  date_accessed: 2023-02-23 17:57:06.139394
   name: Share of primary-school children achieving minimum reading proficiency, rich
     vs poor - UNESCO
-  namespace: backport
-  publication_date: latest
-  short_name: dataset_2894_share_of_primary_school_children_achieving_minimum_reading_proficiency__rich_vs_poor__unesco_values
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2894
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 95f8eed6018a15ac58a1c3bfe98bd918
-  size: 6490
+- md5: db4b89e73061ea449f6485b8f82c3b0d
+  size: 6858
   path: dataset_2894_share_of_primary_school_children_achieving_minimum_reading_proficiency__rich_vs_poor__unesco_values.feather

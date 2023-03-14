@@ -1,18 +1,19 @@
 meta:
-  date_accessed: 2022-12-08 01:25:13.959346
-  description: ''
+  namespace: backport
+  short_name: dataset_2887_urbanization_in_the_long_run__owid_based_on_the_un_world_urbanization_prospects_2018_and_others_values
   file_extension: feather
-  is_public: true
+  date_accessed: 2023-02-23 18:36:56.763286
   name: Urbanization in the long run - OWID based on the UN World Urbanization Prospects
     2018 and others
-  namespace: backport
-  publication_date: latest
-  short_name: dataset_2887_urbanization_in_the_long_run__owid_based_on_the_un_world_urbanization_prospects_2018_and_others_values
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2887
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 60b3ea5f36cef61c34e7a9f65a0c5e45
-  size: 917274
+- md5: d17e0b27b94eb5b91ba5ff3210f3b740
+  size: 917658
   path: dataset_2887_urbanization_in_the_long_run__owid_based_on_the_un_world_urbanization_prospects_2018_and_others_values.feather

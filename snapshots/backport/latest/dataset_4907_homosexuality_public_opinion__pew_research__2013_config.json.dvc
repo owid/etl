@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 01:33:25.662807
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_4907_homosexuality_public_opinion__pew_research__2013
   namespace: backport
-  publication_date: latest
   short_name: dataset_4907_homosexuality_public_opinion__pew_research__2013_config
+  file_extension: json
+  date_accessed: 2023-02-23 19:33:53.176432
+  name: Grapher metadata for dataset_4907_homosexuality_public_opinion__pew_research__2013
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/4907
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 3cd94aacd57fd0b1d8ca5de1a8d1daaf
-  size: 1847
+- md5: 6aacd2ac1fabb1412d2ff26e962ec0b5
+  size: 2047
   path: dataset_4907_homosexuality_public_opinion__pew_research__2013_config.json

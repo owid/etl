@@ -1,6 +1,8 @@
 meta:
   namespace: backport
   short_name: dataset_5637_world_development_indicators__world_bank__2022_05_26_values
+  file_extension: feather
+  date_accessed: 2023-03-03 09:59:23.703300
   name: World Development Indicators - World Bank (2022.05.26)
   description: The World Development Indicators (WDI) is the primary World Bank collection
     of development indicators, compiled from officially-recognized international sources.
@@ -8,8 +10,7 @@ meta:
     includes national, regional and global estimates.
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5637
-  file_extension: feather
-  date_accessed: 2022-12-25 12:03:54.561504
+  source_published_by: Our World in Data catalog backport
   is_public: true
   version: latest
   publication_date: latest

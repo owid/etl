@@ -1,13 +1,4 @@
 steps:
-  data://meadow/papers/2022-11-03/zijdeman_et_al_2015:
-    - walden://papers/2022-11-01/zijdeman_et_al_2015
-  data://garden/papers/2022-11-03/zijdeman_et_al_2015:
-    - data://meadow/papers/2022-11-03/zijdeman_et_al_2015
-  data://meadow/papers/2022-11-04/riley_2005:
-    - walden://papers/2022-11-01/riley_2005
-  data://garden/papers/2022-11-04/riley_2005:
-    - data://meadow/papers/2022-11-04/riley_2005
-
   #
   # Farmer & Lafond (2016).
   #
@@ -22,6 +13,6 @@ steps:
   # Nemet (2009).
   #
   data://meadow/papers/2023-01-04/nemet_2009:
-   - snapshot://papers/2023-01-04/nemet_2009.csv
+    - snapshot://papers/2023-01-04/nemet_2009.csv
   data://garden/papers/2023-01-04/nemet_2009:
     - data://meadow/papers/2023-01-04/nemet_2009

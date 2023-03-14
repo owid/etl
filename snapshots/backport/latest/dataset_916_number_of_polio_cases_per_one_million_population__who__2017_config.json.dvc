@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:26:51.285507
-  description: The dataset is by country and ranges from 1980-2015.
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_916_number_of_polio_cases_per_one_million_population__who__2017
   namespace: backport
-  publication_date: latest
   short_name: dataset_916_number_of_polio_cases_per_one_million_population__who__2017_config
+  file_extension: json
+  date_accessed: 2023-02-23 17:34:13.988707
+  name: Grapher metadata for dataset_916_number_of_polio_cases_per_one_million_population__who__2017
+  description: The dataset is by country and ranges from 1980-2015.
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/916
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 235a10938c45addd5d62ccd44d6b5f06
-  size: 2255
+- md5: 7e1dadd0641112ed427ed910df5f5d53
+  size: 2453
   path: dataset_916_number_of_polio_cases_per_one_million_population__who__2017_config.json

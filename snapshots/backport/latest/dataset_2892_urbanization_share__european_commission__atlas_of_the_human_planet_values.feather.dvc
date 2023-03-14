@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:40:07.828630
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Urbanization share (European Commission, Atlas of the Human Planet)
   namespace: backport
-  publication_date: latest
   short_name: dataset_2892_urbanization_share__european_commission__atlas_of_the_human_planet_values
+  file_extension: feather
+  date_accessed: 2023-02-23 18:41:38.841987
+  name: Urbanization share (European Commission, Atlas of the Human Planet)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2892
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 9f1d0811fb7f216fecefa31c2ea9d416
-  size: 6010
+- md5: c8b521ae19daedb4cac1d702b7a9e542
+  size: 6378
   path: dataset_2892_urbanization_share__european_commission__atlas_of_the_human_planet_values.feather

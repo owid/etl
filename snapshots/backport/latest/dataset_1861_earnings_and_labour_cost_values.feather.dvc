@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-11-29 16:38:21.445766
-  description: This is a dataset imported by the automated fetcher
-  file_extension: feather
-  is_public: true
-  name: Earnings and labour cost
   namespace: backport
-  publication_date: latest
   short_name: dataset_1861_earnings_and_labour_cost_values
+  file_extension: feather
+  date_accessed: 2023-02-23 18:38:48.570270
+  name: Earnings and labour cost
+  description: This is a dataset imported by the automated fetcher
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/1861
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 2c39e44f40a2e087d7664110177ada6c
-  size: 123690
+- md5: 3d97d7a3a4b795c70a650c0902f63c13
+  size: 124066
   path: dataset_1861_earnings_and_labour_cost_values.feather

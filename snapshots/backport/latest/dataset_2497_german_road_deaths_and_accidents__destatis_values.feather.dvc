@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 01:27:52.818777
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: German road deaths and accidents - destatis
   namespace: backport
-  publication_date: latest
   short_name: dataset_2497_german_road_deaths_and_accidents__destatis_values
+  file_extension: feather
+  date_accessed: 2023-02-23 18:43:33.627473
+  name: German road deaths and accidents - destatis
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2497
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: ab2f63261645366dc7491c8d3a9f821b
-  size: 6834
+- md5: 0b02e1bb0d1dc24566695c655763cb6b
+  size: 7210
   path: dataset_2497_german_road_deaths_and_accidents__destatis_values.feather

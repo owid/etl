@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 16:27:45.879346
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_596_prevalence_of_zinc_deficiency__wessells_et_al__2012
   namespace: backport
-  publication_date: latest
   short_name: dataset_596_prevalence_of_zinc_deficiency__wessells_et_al__2012_config
+  file_extension: json
+  date_accessed: 2023-02-23 18:19:21.719831
+  name: Grapher metadata for dataset_596_prevalence_of_zinc_deficiency__wessells_et_al__2012
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/596
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 8f116a7392249c3d43076e8b827fb364
-  size: 2311
+- md5: 366592ea8a98c0ca9f3a8e459e7075ff
+  size: 2507
   path: dataset_596_prevalence_of_zinc_deficiency__wessells_et_al__2012_config.json

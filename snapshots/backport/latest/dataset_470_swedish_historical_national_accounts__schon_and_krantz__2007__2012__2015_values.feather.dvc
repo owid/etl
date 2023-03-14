@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:05:37.624113
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Swedish Historical National Accounts - Schön and Krantz (2007, 2012, 2015)
   namespace: backport
-  publication_date: latest
   short_name: dataset_470_swedish_historical_national_accounts__schon_and_krantz__2007__2012__2015_values
+  file_extension: feather
+  date_accessed: 2023-02-23 19:12:04.118044
+  name: Swedish Historical National Accounts - Schön and Krantz (2007, 2012, 2015)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/470
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 667ac11e488aee91eddd51f8020b6075
-  size: 18298
+- md5: 0b1b138e1423c9072bd8f10c0af8ccab
+  size: 18674
   path: dataset_470_swedish_historical_national_accounts__schon_and_krantz__2007__2012__2015_values.feather

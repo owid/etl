@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:26:24.098684
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Energy imports (% energy use) - World Bank (2014)
   namespace: backport
-  publication_date: latest
   short_name: dataset_486_energy_imports__pct_energy_use__world_bank__2014_values
+  file_extension: feather
+  date_accessed: 2023-02-23 19:35:34.091436
+  name: Energy imports (% energy use) - World Bank (2014)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/486
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 9ccf029623e7a589b2c99613b11f1dfa
-  size: 63698
+- md5: 230fd9d1ef4ff954be77143574b9e49f
+  size: 64074
   path: dataset_486_energy_imports__pct_energy_use__world_bank__2014_values.feather

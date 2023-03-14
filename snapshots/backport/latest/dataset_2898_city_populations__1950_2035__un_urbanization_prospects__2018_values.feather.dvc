@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:37:07.866984
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: City populations (1950-2035) - UN Urbanization Prospects (2018)
   namespace: backport
-  publication_date: latest
   short_name: dataset_2898_city_populations__1950_2035__un_urbanization_prospects__2018_values
+  file_extension: feather
+  date_accessed: 2023-02-23 19:25:41.442781
+  name: City populations (1950-2035) - UN Urbanization Prospects (2018)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2898
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 943bec296398b9949b03e709866c2dea
-  size: 11082
+- md5: 8dabcf681c4c7229df63d59bfbbeb1d3
+  size: 11458
   path: dataset_2898_city_populations__1950_2035__un_urbanization_prospects__2018_values.feather

@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 15:51:11.966603
-  description: core-econ.org
-  file_extension: feather
-  is_public: false
-  name: Figure_17.28_unemployment
   namespace: backport
-  publication_date: latest
   short_name: dataset_5146_figure_17_28_unemployment_values
+  file_extension: feather
+  date_accessed: 2023-02-23 18:43:12.280572
+  name: Figure_17.28_unemployment
+  description: core-econ.org
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5146
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 5aa723ce66d5d569eb0dcb5e1a925200
-  size: 6954
+- md5: 0960a4d11a147cb31a95ad7887eb1d8c
+  size: 7330
   path: dataset_5146_figure_17_28_unemployment_values.feather

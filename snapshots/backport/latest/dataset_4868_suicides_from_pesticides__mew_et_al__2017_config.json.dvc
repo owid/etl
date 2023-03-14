@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 01:48:40.785773
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_4868_suicides_from_pesticides__mew_et_al__2017
   namespace: backport
-  publication_date: latest
   short_name: dataset_4868_suicides_from_pesticides__mew_et_al__2017_config
+  file_extension: json
+  date_accessed: 2023-02-23 16:47:24.178253
+  name: Grapher metadata for dataset_4868_suicides_from_pesticides__mew_et_al__2017
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/4868
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 450cfdb949ec98efc50b611d1bd3c091
-  size: 2864
+- md5: c0265d6f4ab823f663e907e0029509d4
+  size: 3372
   path: dataset_4868_suicides_from_pesticides__mew_et_al__2017_config.json

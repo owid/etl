@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 01:35:55.744940
-  description: This is a dataset imported by the automated fetcher
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_2403_other_mental_and_substance_use_disorders
   namespace: backport
-  publication_date: latest
   short_name: dataset_2403_other_mental_and_substance_use_disorders_config
+  file_extension: json
+  date_accessed: 2023-02-23 18:47:33.792072
+  name: Grapher metadata for dataset_2403_other_mental_and_substance_use_disorders
+  description: This is a dataset imported by the automated fetcher
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2403
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: f4f68042b28e2e46c285f51e29b1f376
-  size: 52105
+- md5: 6a71caec2cfb2260d0482a9109dd2c8e
+  size: 72895
   path: dataset_2403_other_mental_and_substance_use_disorders_config.json

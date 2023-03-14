@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:28:06.712079
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Percentage of Americans living alone, by age - IPUMS
   namespace: backport
-  publication_date: latest
   short_name: dataset_2891_percentage_of_americans_living_alone__by_age__ipums_values
+  file_extension: feather
+  date_accessed: 2023-02-23 17:21:32.292302
+  name: Percentage of Americans living alone, by age - IPUMS
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2891
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 6f6eca9cb6686588d0a77d91efc4205b
-  size: 17986
+- md5: 7841f01ef77b38d5ff2c1d3d66ebe6a9
+  size: 18362
   path: dataset_2891_percentage_of_americans_living_alone__by_age__ipums_values.feather

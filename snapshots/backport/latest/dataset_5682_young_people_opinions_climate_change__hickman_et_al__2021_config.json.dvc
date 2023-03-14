@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:00:52.489973
-  description: ''
-  file_extension: json
-  is_public: false
-  name: Grapher metadata for dataset_5682_young_people_opinions_climate_change__hickman_et_al__2021
   namespace: backport
-  publication_date: latest
   short_name: dataset_5682_young_people_opinions_climate_change__hickman_et_al__2021_config
+  file_extension: json
+  date_accessed: 2023-02-23 15:18:04.806884
+  name: Grapher metadata for dataset_5682_young_people_opinions_climate_change__hickman_et_al__2021
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5682
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 99491cfa03bd9611d2c7c38ac9fa0de9
-  size: 5186
+- md5: 7d254f26f2e7a1ac8343b5267407db5b
+  size: 6386
   path: dataset_5682_young_people_opinions_climate_change__hickman_et_al__2021_config.json

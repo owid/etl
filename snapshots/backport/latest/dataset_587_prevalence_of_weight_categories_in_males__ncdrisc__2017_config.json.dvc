@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 15:56:36.758114
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_587_prevalence_of_weight_categories_in_males__ncdrisc__2017
   namespace: backport
-  publication_date: latest
   short_name: dataset_587_prevalence_of_weight_categories_in_males__ncdrisc__2017_config
+  file_extension: json
+  date_accessed: 2023-02-23 15:14:47.771665
+  name: Grapher metadata for dataset_587_prevalence_of_weight_categories_in_males__ncdrisc__2017
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/587
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 077e1c534e688943fbadbd097b30ebbe
-  size: 3943
+- md5: 108392e337aaa0cd308f00e06c3d4165
+  size: 4727
   path: dataset_587_prevalence_of_weight_categories_in_males__ncdrisc__2017_config.json

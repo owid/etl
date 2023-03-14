@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 01:37:02.995786
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Women's Economic Opportunity 2012 - Economist Intelligence Unit (2012)
   namespace: backport
-  publication_date: latest
   short_name: dataset_2674_womens_economic_opportunity_2012__economist_intelligence_unit__2012_values
+  file_extension: feather
+  date_accessed: 2023-02-23 17:00:42.936750
+  name: Women's Economic Opportunity 2012 - Economist Intelligence Unit (2012)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2674
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 4f531cdc105b15ed563c7bd1397bfbbd
-  size: 11362
+- md5: b6cd16171bb90e0b03326eacb50d8ebf
+  size: 11738
   path: dataset_2674_womens_economic_opportunity_2012__economist_intelligence_unit__2012_values.feather

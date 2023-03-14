@@ -1,0 +1,60 @@
+year,entity,life_expectancy
+1770,Europe,34.3
+1800,Europe,33.3
+1820,Europe,35.6
+1850,Europe,36.3
+1870,Europe,36.2
+1900,Europe,42.7
+1913,Europe,46.8
+1950,Europe,64.7
+1973,Europe,70.9
+1990,Europe,74.2
+2001,Europe,76.8
+1770,Asia,27.5
+1885,Asia,27.5
+1900,Asia,28
+1913,Asia,28.1
+1950,Asia,41.6
+1973,Asia,57.5
+1990,Asia,64.5
+2001,Asia,67.1
+1770,Africa,26.4
+1925,Africa,26.4
+1950,Africa,35.6
+1973,Africa,46.9
+1990,Africa,52.9
+2001,Africa,50.5
+1770,Americas,34.8
+1830,Americas,34.8
+1850,Americas,35.1
+1870,Americas,35.1
+1900,Americas,41
+1913,Americas,45.1
+1950,Americas,58.4
+1973,Americas,66
+1990,Americas,70.8
+2001,Americas,73.2
+1900,Soviet Union,29
+1913,Soviet Union,36.4
+1950,Soviet Union,56.1
+1973,Soviet Union,68.9
+1990,Soviet Union,69.1
+2001,Soviet Union,66.6
+1870,Oceania,34.7
+1900,Oceania,47.6
+1913,Oceania,51
+1950,Oceania,63.4
+1973,Oceania,68.2
+1990,Oceania,72.8
+2001,Oceania,74.6
+1770,World,28.5
+1800,World,28.5
+1820,World,29
+1850,World,29.3
+1870,World,29.7
+1900,World,32
+1913,World,34.1
+1950,World,48
+1973,World,60
+1990,World,65.2
+2001,World,66.6

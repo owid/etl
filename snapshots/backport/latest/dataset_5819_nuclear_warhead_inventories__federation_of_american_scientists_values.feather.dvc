@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 00:17:20.131150
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Nuclear warhead inventories – Federation of American Scientists
   namespace: backport
-  publication_date: latest
   short_name: dataset_5819_nuclear_warhead_inventories__federation_of_american_scientists_values
+  file_extension: feather
+  date_accessed: 2023-02-23 18:52:14.746292
+  name: Nuclear warhead inventories – Federation of American Scientists
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5819
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: a12c0abfd59dfabb0f68fd08c833228c
-  size: 6306
+- md5: 5f46c20d8a6b7e2bed11c17c45eda8c0
+  size: 6674
   path: dataset_5819_nuclear_warhead_inventories__federation_of_american_scientists_values.feather

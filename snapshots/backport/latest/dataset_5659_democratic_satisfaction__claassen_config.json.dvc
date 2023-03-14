@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 16:59:47.541694
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_5659_democratic_satisfaction__claassen
   namespace: backport
-  publication_date: latest
   short_name: dataset_5659_democratic_satisfaction__claassen_config
+  file_extension: json
+  date_accessed: 2023-02-23 17:38:38.390117
+  name: Grapher metadata for dataset_5659_democratic_satisfaction__claassen
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5659
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 49c1972799c9212b24bc05ce270ce17e
-  size: 5528
+- md5: b427bbf22be19c235bcd96adf54d0520
+  size: 6128
   path: dataset_5659_democratic_satisfaction__claassen_config.json

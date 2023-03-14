@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 15:54:24.460160
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: World Regions according to the World Bank
   namespace: backport
-  publication_date: latest
   short_name: dataset_960_world_regions_according_to_the_world_bank_values
+  file_extension: feather
+  date_accessed: 2023-02-23 16:43:19.582688
+  name: World Regions according to the World Bank
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/960
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 6c0b0395eb3f5ed17bff1df8cb6e0c0e
-  size: 13802
+- md5: 6469d1497f5e87efc8266efcd2574e4c
+  size: 14178
   path: dataset_960_world_regions_according_to_the_world_bank_values.feather

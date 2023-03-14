@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 17:48:39.069174
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Rotavirus deaths and cases in under-5s (IHME, 2018)
   namespace: backport
-  publication_date: latest
   short_name: dataset_4122_rotavirus_deaths_and_cases_in_under_5s__ihme__2018_values
+  file_extension: feather
+  date_accessed: 2023-02-23 19:03:12.129154
+  name: Rotavirus deaths and cases in under-5s (IHME, 2018)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/4122
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 0dd656c7ec80abd5d50d7edc5bcf2d22
-  size: 17442
+- md5: 5f0d8c80bb355d728d6d0751d59d3d09
+  size: 17818
   path: dataset_4122_rotavirus_deaths_and_cases_in_under_5s__ihme__2018_values.feather

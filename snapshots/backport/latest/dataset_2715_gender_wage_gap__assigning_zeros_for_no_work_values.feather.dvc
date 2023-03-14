@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 16:56:49.067029
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Gender wage gap (assigning zeros for no work)
   namespace: backport
-  publication_date: latest
   short_name: dataset_2715_gender_wage_gap__assigning_zeros_for_no_work_values
+  file_extension: feather
+  date_accessed: 2023-02-23 18:29:56.285591
+  name: Gender wage gap (assigning zeros for no work)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2715
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 61d08704c8d02c7bed92c275730d509f
-  size: 6178
+- md5: f8e9ca75c6cfb7e481061c0309ff5a67
+  size: 6546
   path: dataset_2715_gender_wage_gap__assigning_zeros_for_no_work_values.feather

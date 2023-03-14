@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 15:38:18.466101
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Air Pollutant Emissions - OECD
   namespace: backport
-  publication_date: latest
   short_name: dataset_2457_air_pollutant_emissions__oecd_values
+  file_extension: feather
+  date_accessed: 2023-02-23 19:28:30.205611
+  name: Air Pollutant Emissions - OECD
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2457
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 807dab439bcc75a13f5ee2980bb210ec
-  size: 22978
+- md5: 7811e7bd78a8f2b587fc8807677317fd
+  size: 23354
   path: dataset_2457_air_pollutant_emissions__oecd_values.feather

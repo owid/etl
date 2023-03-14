@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 15:53:18.949017
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Child Labor (World ILO) - ILO (2017)
   namespace: backport
-  publication_date: latest
   short_name: dataset_173_child_labor__world_ilo__ilo__2017_values
+  file_extension: feather
+  date_accessed: 2023-02-23 17:04:36.892066
+  name: Child Labor (World ILO) - ILO (2017)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/173
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 61e181ce0ff2beab8e3277d684c2f345
-  size: 6298
+- md5: fd512fa3d2242b6ec36503c5f866c139
+  size: 6666
   path: dataset_173_child_labor__world_ilo__ilo__2017_values.feather

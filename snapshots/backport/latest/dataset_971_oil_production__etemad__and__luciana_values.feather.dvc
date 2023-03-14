@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:54:49.715543
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Oil production - Etemad & Luciana
   namespace: backport
-  publication_date: latest
   short_name: dataset_971_oil_production__etemad__and__luciana_values
+  file_extension: feather
+  date_accessed: 2023-02-23 17:44:29.508476
+  name: Oil production - Etemad & Luciana
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/971
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 2d9cf1ca718a19ceb123267dfd5eeed0
-  size: 61994
+- md5: 3eb3b1d3124404297fae1de70f11ad03
+  size: 62370
   path: dataset_971_oil_production__etemad__and__luciana_values.feather

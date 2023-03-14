@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:33:31.846976
-  description: https://github.com/owid/notebooks/tree/main/EdouardMathieu/earth_impact_database
-  file_extension: feather
-  is_public: false
-  name: Earth Impact Database - Top 20 craters by diameter
   namespace: backport
-  publication_date: latest
   short_name: dataset_5643_earth_impact_database__top_20_craters_by_diameter_values
+  file_extension: feather
+  date_accessed: 2023-02-23 18:00:07.591822
+  name: Earth Impact Database - Top 20 craters by diameter
+  description: https://github.com/owid/notebooks/tree/main/EdouardMathieu/earth_impact_database
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5643
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 96cead7150b09597ca5d2dfb7879a78e
-  size: 6442
+- md5: 3af2b7f44e194f61a0ddc1d8ea46e91e
+  size: 6818
   path: dataset_5643_earth_impact_database__top_20_craters_by_diameter_values.feather

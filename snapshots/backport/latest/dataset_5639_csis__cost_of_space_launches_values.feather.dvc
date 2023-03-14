@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 00:35:14.418935
-  description: https://github.com/owid/notebooks/tree/main/EdouardMathieu/aerospace_csis_datasets
-  file_extension: feather
-  is_public: false
-  name: CSIS - Cost of space launches
   namespace: backport
-  publication_date: latest
   short_name: dataset_5639_csis__cost_of_space_launches_values
+  file_extension: feather
+  date_accessed: 2023-02-23 17:03:45.204344
+  name: CSIS - Cost of space launches
+  description: https://github.com/owid/notebooks/tree/main/EdouardMathieu/aerospace_csis_datasets
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5639
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 455aebd6461578a045caad54feffdc3a
-  size: 7874
+- md5: e1c768e1b07a6b4f1bceef46ed131a3b
+  size: 8250
   path: dataset_5639_csis__cost_of_space_launches_values.feather

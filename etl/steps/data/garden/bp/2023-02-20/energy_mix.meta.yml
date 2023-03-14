@@ -1,0 +1,57 @@
+dataset:
+  namespace: bp
+  title: Energy mix (BP, 2023)
+  short_name: energy_mix
+  sources:
+    -
+      name: Our World in Data based on BP Statistical Review of World Energy (2022)
+      published_by: BP Statistical Review of World Energy
+      date_accessed: 2022-07-08
+      url: https://www.bp.com/en/global/corporate/energy-economics/statistical-review-of-world-energy.html
+      description: |
+        BP's region definitions sometimes differ from Our World in Data's definitions. For example, BP's North America includes only Canada, Mexico and United States, whereas Our World in Data's North America includes countries in Central America (see a map with <a href="https://ourworldindata.org/world-region-map-definitions">our region definitions</a>). For this reason, we include in the dataset regions like "North America (BP)" to refer to BP's original data using their definition of the region, as well as "North America", which is data aggregated by Our World in Data using our definition. These aggregates are constructed by adding up (when possible) the contributions from the countries in the region.
+
+        <a href="https://www.bp.com/en/global/corporate/energy-economics/statistical-review-of-world-energy/using-the-review/definitions-and-explanatory-notes.html#accordion_Regional%20definitions">BP's region definitions</a>, denoted with "(BP)", are:
+        * "Asia Pacific (BP)": Brunei, Cambodia, China (Mainland), China Hong Kong SAR (Special Administrative Region), China Macau SAR (Special Administrative Region), Indonesia, Japan, Laos, Malaysia, Mongolia, North Korea, Philippines, Singapore, South Asia (Afghanistan, Bangladesh, India, Myanmar, Nepal, Pakistan and Sri Lanka), South Korea, Taiwan, Thailand, Vietnam, Australia, New Zealand, Papua New Guinea and Oceania.
+        * "Australasia (BP)": Australia, New Zealand.
+        * "CIS (BP)" - Commonwealth of Independent States: Armenia, Azerbaijan, Belarus, Kazakhstan, Kyrgyzstan, Moldova, Russian Federation, Tajikistan, Turkmenistan, Uzbekistan.
+        * "Caribbean (BP)": Atlantic islands between the US Gulf Coast and South America, including Puerto Rico, US Virgin Islands and Bermuda.
+        * "Central America (BP)": Belize, Costa Rica, El Salvador, Guatemala, Honduras, Nicaragua, Panama
+        * "Eastern Africa (BP)": Territories on the east coast of Africa from Sudan to Mozambique. Also Madagascar, Malawi, Uganda, Zambia, Zimbabwe.
+        * "Europe (BP)": European members of the OECD plus Albania, Bosnia-Herzegovina, Bulgaria, Croatia, Cyprus, Georgia, Gibraltar, Latvia, Lithuania, Malta, Montenegro, North Macedonia, Romania, Serbia and Ukraine.
+        * "Middle Africa (BP)": Angola, Cameroon, Central African Republic, Chad, Democratic Republic of Congo, Republic of Congo, Equatorial Guinea, Gabon, Sao Tome & Principe.
+        * "Middle East (BP)": Arabian Peninsula, Iran, Iraq, Israel, Jordan, Lebanon, Syria.
+        * "Non-OECD (BP)" - Organization for Economic Co-operation and Development: All countries that are not members of the OECD.
+        * "North America (BP)": US (excluding US territories), Canada, Mexico
+        * "Northern Africa (BP)": Territories on the north coast of Africa from Egypt to Western Sahara.
+        * "OECD (BP)" - Organization For Economic Co-operation and Development: Austria, Belgium, Czech Republic, Denmark, Estonia, Finland, France, Germany, Greece, Hungary, Iceland, Ireland, Italy, Latvia,  Lithuania, Luxembourg, Netherlands, Norway, Poland, Portugal, Slovakia, Slovenia, Spain, Sweden, Switzerland, Turkey, UK, Australia, Canada, Chile, Colombia, Israel, Japan, Mexico, New Zealand, South Korea, US.
+        * "OPEC (BP)" - Organization of the Petroleum Exporting Countries: Iran, Iraq, Kuwait, Saudi Arabia, United Arab Emirates, Algeria, Libya, Angola, Equatorial Guinea, Gabon, Nigeria, Republic of Congo, Venezuela.
+        * "South and Central America (BP)": Caribbean (including Puerto Rico and US Virgin Islands), Bermuda, Central and South America.
+        * "Southern Africa (BP)": Botswana, Lesotho, Namibia, South Africa, Swaziland.
+        * "Western Africa (BP)": Territories on the west coast of Africa from Mauritania to Nigeria, including Burkina Faso, Cape Verde, Mali and Niger.
+
+        Additionally, BP includes some regions that are not explicitly defined (e.g. "Other Europe", or "Other CIS"). We define our regions in the following way:
+        * "Africa" - All African countries + "Other Africa".
+        * "Asia" - All Asian countries + "Other Middle East" + "Other CIS" + "Other Asia Pacific".
+        * "Europe" - All European countries + "Other Europe".
+        * "North America" - All North American countries + "Other Caribbean" + "Other North America".
+        * "Oceania" - All Oceanian countries.
+        * "South America" - All South American countries + "Other South America".
+        Where the individual countries in each region are defined <a href="https://ourworldindata.org/world-region-map-definitions">in this map</a>. Additional BP regions are ignored, since they belong to other regions already included (e.g. the data for "Other Western Africa" is included in "Other Africa"). Finally, income groups are constructed following the definitions <a href="https://ourworldindata.org/grapher/world-banks-income-groups">in this map</a>.
+  description: |
+    Raw data on energy consumption is sourced from <a href="https://www.bp.com/en/global/corporate/energy-economics/statistical-review-of-world-energy.html">the BP Statistical Review of World Energy</a>.
+
+    Primary energy in exajoules (EJ) has been converted to TWh by Our World in Data based on a conversion factor of 1,000,000 / 3,600 (~277.778).
+
+    For non-fossil based electricity sources (nuclear, hydro, wind, solar, geothermal, biomass in power, and other renewable sources), BP's generation (in TWh) corresponds to gross generation and not accounting for cross-border electricity supply.
+    Also, for non-fossil based electricity, there are two ways to define primary energy:
+    * One is "direct primary energy", which corresponds to the electricity generation (in TWh).
+    * The other is "input-equivalent primary energy" (also called "primary energy using the substitution method").
+      This is the amount of fuel that would be required by thermal power stations to generate the reported electricity, as explained in <a href="https://www.bp.com/content/dam/bp/business-sites/en/global/corporate/pdfs/energy-economics/statistical-review/bp-stats-review-2022-methodology.pdf">BP's methodology document</a>. For example, if a country's nuclear power generated 100 TWh of electricity, and assuming that the efficiency of a standard thermal power plant is 38%, the input equivalent primary energy for this country would be 100 TWh / 0.38 = 263 TWh = 0.95 EJ. This input-equivalent primary energy takes account of the inefficiencies in fossil fuel production and provides a better approximation of each source's share of "final energy" consumption.
+
+    Additional metrics have been calculated by Our World in Data:
+    - Annual change in energy consumption by source: this is calculated as the difference from the previous year.
+    - % of total primary energy: calculated as each source's share of primary energy (direct energy and primary energy using the substitution method) from all sources.
+    - Per capita energy by source: calculated as primary energy consumption by source, divided by population.
+
+    Per capita figures have been calculated using a population dataset that is built and maintained by Our World in Data, based on <a href="https://ourworldindata.org/population-sources">different sources</a>.

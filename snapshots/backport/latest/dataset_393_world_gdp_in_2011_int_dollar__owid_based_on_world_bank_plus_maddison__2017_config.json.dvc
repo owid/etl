@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 00:17:47.644771
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_393_world_gdp_in_2011_int_dollar__owid_based_on_world_bank_plus_maddison__2017
   namespace: backport
-  publication_date: latest
   short_name: dataset_393_world_gdp_in_2011_int_dollar__owid_based_on_world_bank_plus_maddison__2017_config
+  file_extension: json
+  date_accessed: 2023-02-23 17:40:44.177584
+  name: Grapher metadata for dataset_393_world_gdp_in_2011_int_dollar__owid_based_on_world_bank_plus_maddison__2017
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/393
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 334f3cb82eef10f0ed4bee37c687ad6f
-  size: 1897
+- md5: fc3da4c04621149525fb71f4d4b42438
+  size: 2093
   path: dataset_393_world_gdp_in_2011_int_dollar__owid_based_on_world_bank_plus_maddison__2017_config.json

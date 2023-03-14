@@ -1,18 +1,19 @@
 meta:
-  date_accessed: 2022-12-08 00:12:16.068741
+  namespace: backport
+  short_name: dataset_387_ozone_concentration_stateofglobalair_values
+  file_extension: feather
+  date_accessed: 2023-02-23 19:18:31.894458
+  name: Ozone concentration-StateofGlobalAir
   description: Population-weighted ozone (O3) concentration by country (1990-2015)-
     via StateofGlobalAir
-  file_extension: feather
-  is_public: true
-  name: Ozone concentration-StateofGlobalAir
-  namespace: backport
-  publication_date: latest
-  short_name: dataset_387_ozone_concentration_stateofglobalair_values
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/387
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 7443d2010efaebf43980c8687d7fd1ae
-  size: 15362
+- md5: 39318b000e93a312c3cead7381b9a1f2
+  size: 15738
   path: dataset_387_ozone_concentration_stateofglobalair_values.feather

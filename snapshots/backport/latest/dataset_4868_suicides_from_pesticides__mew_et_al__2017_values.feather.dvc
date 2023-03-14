@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 01:48:51.991147
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Suicides from pesticides (Mew et al., 2017)
   namespace: backport
-  publication_date: latest
   short_name: dataset_4868_suicides_from_pesticides__mew_et_al__2017_values
+  file_extension: feather
+  date_accessed: 2023-02-23 16:47:50.046928
+  name: Suicides from pesticides (Mew et al., 2017)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/4868
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 6243d3c45aed454b3760b778041941c8
-  size: 6178
+- md5: 0f33a801de838e5e40d1ca719c937a21
+  size: 6546
   path: dataset_4868_suicides_from_pesticides__mew_et_al__2017_values.feather

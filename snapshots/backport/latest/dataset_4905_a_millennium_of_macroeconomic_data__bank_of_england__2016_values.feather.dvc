@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 15:54:14.848552
-  description: ''
-  file_extension: feather
-  is_public: false
-  name: A Millennium of Macroeconomic Data - Bank of England (2016)
   namespace: backport
-  publication_date: latest
   short_name: dataset_4905_a_millennium_of_macroeconomic_data__bank_of_england__2016_values
+  file_extension: feather
+  date_accessed: 2023-02-23 17:37:38.586155
+  name: A Millennium of Macroeconomic Data - Bank of England (2016)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/4905
+  source_published_by: Our World in Data catalog backport
+  is_public: false
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 009c8e81dda96f1befb0a58179aa23a4
-  size: 148394
+- md5: 727948cdb7b74e039b50bf3cae240f79
+  size: 148778
   path: dataset_4905_a_millennium_of_macroeconomic_data__bank_of_england__2016_values.feather

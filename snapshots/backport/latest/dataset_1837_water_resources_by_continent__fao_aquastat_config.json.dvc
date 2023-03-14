@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 01:29:12.321708
-  description: ''
-  file_extension: json
-  is_public: true
-  name: Grapher metadata for dataset_1837_water_resources_by_continent__fao_aquastat
   namespace: backport
-  publication_date: latest
   short_name: dataset_1837_water_resources_by_continent__fao_aquastat_config
+  file_extension: json
+  date_accessed: 2023-02-23 15:13:49.317327
+  name: Grapher metadata for dataset_1837_water_resources_by_continent__fao_aquastat
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/1837
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 7e2e07467e34c71bb50e73023169c334
-  size: 2601
+- md5: fb332e0991f4a7db8cd87abc8d64006e
+  size: 3195
   path: dataset_1837_water_resources_by_continent__fao_aquastat_config.json

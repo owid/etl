@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 01:46:02.519879
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Child Labor in US - Long (1958)
   namespace: backport
-  publication_date: latest
   short_name: dataset_655_child_labor_in_us__long__1958_values
+  file_extension: feather
+  date_accessed: 2023-02-23 16:26:06.313899
+  name: Child Labor in US - Long (1958)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/655
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 836f31fd3c52ea619f067f0fcf3eefc7
-  size: 6226
+- md5: 8fac3fcfe75282108a9c226c11732fa5
+  size: 6594
   path: dataset_655_child_labor_in_us__long__1958_values.feather

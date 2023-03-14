@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:08:19.075482
-  description: This is a dataset imported by the automated fetcher
-  file_extension: feather
-  is_public: true
-  name: Neoplasms
   namespace: backport
-  publication_date: latest
   short_name: dataset_2398_neoplasms_values
+  file_extension: feather
+  date_accessed: 2023-02-23 15:20:09.845259
+  name: Neoplasms
+  description: This is a dataset imported by the automated fetcher
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2398
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 5ca66899f66effcda71cf02d6ddabc6e
-  size: 2115330
+- md5: 2d15825c767a511f7cbc61812cacdae7
+  size: 2115706
   path: dataset_2398_neoplasms_values.feather

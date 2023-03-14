@@ -3,6 +3,7 @@ from owid.catalog import Dataset, Table
 from structlog import get_logger
 
 from etl.helpers import PathFinder
+from etl.snapshot import Snapshot
 from etl.steps.data.converters import convert_snapshot_metadata
 
 log = get_logger()
@@ -13,10 +14,9 @@ paths = PathFinder(__file__)
 
 def run(dest_dir: str) -> None:
     log.info("unodc.start")
-    paths
 
     # retrieve snapshot
-    snap = paths.load_dependency("unodc")
+    snap: Snapshot = paths.load_dependency("unodc.xlsx")
 
     # Snapshot("homicide/2023-01-04/unodc.xlsx")
     df = pd.read_excel(snap.path, skiprows=2)

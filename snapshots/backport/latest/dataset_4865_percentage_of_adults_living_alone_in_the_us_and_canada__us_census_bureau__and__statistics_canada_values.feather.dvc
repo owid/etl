@@ -1,18 +1,19 @@
 meta:
-  date_accessed: 2022-12-07 15:52:24.608755
-  description: ''
+  namespace: backport
+  short_name: dataset_4865_percentage_of_adults_living_alone_in_the_us_and_canada__us_census_bureau__and__statistics_canada_values
   file_extension: feather
-  is_public: true
+  date_accessed: 2023-02-23 17:56:20.544485
   name: Percentage of adults living alone in the US and Canada- US Census Bureau &
     Statistics Canada
-  namespace: backport
-  publication_date: latest
-  short_name: dataset_4865_percentage_of_adults_living_alone_in_the_us_and_canada__us_census_bureau__and__statistics_canada_values
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/4865
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 75e1c68d9cebe57253999578b5e9e6aa
-  size: 6354
+- md5: 0cacbb96a0b327bc42d29aa670effba8
+  size: 6722
   path: dataset_4865_percentage_of_adults_living_alone_in_the_us_and_canada__us_census_bureau__and__statistics_canada_values.feather

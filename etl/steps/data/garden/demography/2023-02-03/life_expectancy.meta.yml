@@ -1,0 +1,311 @@
+all_sources:
+  - un_wpp: &un_source
+      name: UN WPP (2022)
+      published_by: United Nations, Department of Economic and Social Affairs, Population Division (2022). World Population Prospects 2022, Online Edition
+      url: https://population.un.org/wpp/Download/
+      owid_data_url: https://walden.nyc3.digitaloceanspaces.com/un/2022-07-11/un_wpp.zip
+      date_accessed: "2022-09-09"
+      publication_date: "2022-07-11"
+      publication_year: 2022
+  - hmd: &hmd_source
+      name: Human Mortality Database
+      published_by: Human Mortality Database
+      url: https://www.mortality.org/Data/ZippedDataFiles
+      owid_data_url: https://walden.nyc3.digitaloceanspaces.com/hmd/2022-11-04/life_tables.zip
+      date_accessed: "2022-11-04"
+      publication_year: 2022
+  - zijdeman: &zijdeman_source
+      name: Zijdeman et al. (2015)
+      published_by: Zijdeman et al. (2015) (via clio-infra.eu)
+      url: https://clio-infra.eu/Indicators/LifeExpectancyatBirthTotal.html
+      source_data_url: https://clio-infra.eu/data/LifeExpectancyatBirth(Total)_Broad.xlsx
+      owid_data_url: https://walden.nyc3.digitaloceanspaces.com/papers/2022-11-01/zijdeman_et_al_2015.xlsx
+      date_accessed: "2022-11-01"
+      publication_year: 2015
+  - riley: &riley_source
+      name: Riley (2005)
+      published_by: Riley, J. C. (2005). Estimates of Regional and Global Life Expectancy, 1800-2001. Population and Development Review, 31(3), 537–543. http://www.jstor.org/stable/3401478
+      url: https://doi.org/10.1111/j.1728-4457.2005.00083.x
+      source_data_url: https://u.demog.berkeley.edu/~jrw/Biblio/Eprints/%20P-S/riley.2005_estimates.global.e0.pdf
+      owid_data_url: https://walden.nyc3.digitaloceanspaces.com/papers/2022-11-01/riley_2005.pdf
+      date_accessed: "2022-11-01"
+      publication_date: "2005-10-21"
+      publication_year: 2005
+
+all_licenses:
+  - un: &un_license
+      name: CC BY 3.0 IGO
+      url: http://creativecommons.org/licenses/by/3.0/igo/
+  - hmd: &hmd_license
+      name: CC BY 4.0
+      url: https://www.mortality.org/Data/UserAgreement
+  - zijdeman: &zijdeman_license
+      name: CC0 1.0 Universal (CC0 1.0) Public Domain Dedication License
+      url: https://datasets.iisg.amsterdam/dataset.xhtml?persistentId=hdl:10622/LKYT53
+  - riley: &riley_license
+      name: JSTOR
+      url: https://about.jstor.org/terms/
+
+dataset:
+  namespace: demography
+  short_name: life_expectancy
+  title: Life Expectancy (various sources)
+  description: |
+    This dataset has been created using multiple sources. We use UN WPP for data since 1950 (estimates and medium variant) and a combination of other sources before this year.
+
+    For continents, we use UN's definitions for values after 1950 and Riley (2005) definitions for values prior to 1950. Note that Riley reports "Americas", while the UN reports "Northern America" and "Latin America and the Caribbean" separately.
+
+    <b>SOURCES</b>
+
+    <b>World Population Prospects - UN (2022)</b>
+    World Population Prospects 2022 is the 27th edition of the official estimates and projections of the global population that have been published by the United Nations since 1951. The estimates are based on all available sources of data on population size and levels of fertility, mortality and international migration for 237 countries or areas. More details at https://population.un.org/wpp/Publications/.
+
+    <b>Life Tables - Human Mortality Database (2022-11-04)</b>
+    To facilitate rapid downloads, the database has been organized into zipped data files. Two series of files are intended for different purposes and for different users. For users who want to obtain all available data for an individual country or for all countries, the zipped data files labeled "By country" are recommended. The file organization follows internal practices and is not particularly user-friendly, but all publicly-available HMD data are included in this set.For users who only want information of a given kind for all countries, the files "By statistic" are recommended. In this case the file organization is simpler, but only certain parts of the database (i.e., items labeled "Complete Data Series" on country pages) are available in this format.
+
+    More details can be found at https://www.mortality.org/Data/ExplanatoryNotes.
+
+    <b>Life Expectancy at Birth (Total) - Zijdeman et al. (2015)</b>
+    This dataset provides Period Life Expectancy at birth per country and year. The overall aim of the dataset is to cover the entire world for the period 1500-2000.
+    The current version (version 2) was build as part of the OECD "How was life" project. The dataset has nearly global coverage for the post 1950 period, while pre
+    1950 the coverage decreases the more historic the time period. Depending on sources, the data are annual estimates, 5 yearly or decadel estimates
+
+    The sources used are:
+
+    - <a href=\"http://esa.un.org/wpp/\">UN World Population Project</a>.
+    - <a href=\"Human Mortality Database\">http://www.mortality.org</a>.
+    - <a href=\"Gapminder\">http://www.gapminder.org</a>.
+    - <a href=\"OECD\">http://stats.oecd.org</a>.
+    - <a href=\"http://www.lac.ox.ac.uk/moxlad-database\">Montevideo-Oxford Latin America Economic History Database</a>.
+    - <a href=\"ONS\">http://www.ons.gov.uk/ons/datasets-and-tables/index.html</a>.
+    - <a href=\"Australian Bureau of Statistics\">http://www.abs.gov.au/ausstats/abs@.nsf/web+pages/statistics?opendocument#from-banner=LN</a>.
+    - Kannisto, V., Nieminen, M. & Turpeinen, O. (1999). Finnish Life Tables since 1751, Demographic Research, 1(1), DOI: 10.4054/DemRes.1999.1.1
+
+    Link to paper can be found at https://clio-infra.eu/docs/Total_life_expectancy.docx.
+
+    <b>Estimates of Regional and Global Life Expectancy, 1800-2001 - Riley (2005)</b>
+    Historians and demographers have gone to considerable trouble to reconstruct life expectancy in the past in individual countries. This overview collects information from a large body of that work and links estimates for historical populations to those provided by the United Nations, the World Bank, and other sources for 1950-2001. The result is a picture of regional and global life expectancy at birth for selected years from 1800 to 2001. The bibliography of more than 700 sources is published separately on the web.
+  version: "2022-11-30"
+  licenses:
+    - *un_license
+    - *hmd_license
+    - *zijdeman_license
+    - *riley_license
+  sources:
+    - *un_source
+    - *hmd_source
+    - *zijdeman_source
+    - *riley_source
+tables:
+  historical:
+    title: Life Expectancy (various sources) - Historical
+    variables:
+      life_expectancy_0_hist:
+        title: Life expectancy at birth (historical)
+        description:
+          "The average number of years that a newborn could expect to live,
+          if he or she were to pass through life exposed to the sex- and age-specific
+          death rates prevailing at the time of his or her birth, for a specific year,
+          in a given country, territory, or geographic area.
+
+
+          Definition from the WHO.
+
+          "
+        unit: years
+        short_unit: years
+        sources:
+          - *un_source
+          - *zijdeman_source
+          - *riley_source
+      life_expectancy_15_hist:
+        title: Life expectancy at 15 (historical)
+        description:
+          "The average number of remaining years of life expected by a
+          hypothetical cohort of individuals who already reached age 15 and would
+          be subject during the remainder of their lives to the mortality rates of
+          a given period. It is expressed as years.
+
+
+          Definition from the UN.
+
+          "
+        unit: years
+        short_unit: years
+        sources:
+          - *un_source
+          - *hmd_source
+      life_expectancy_65_hist:
+        title: Life expectancy at 65 (historical)
+        description:
+          "The average number of remaining years of life expected by a
+          hypothetical cohort of individuals who already reached age 65 and would
+          be subject during the remainder of their lives to the mortality rates of
+          a given period. It is expressed as years.
+
+
+          Definition from the UN.
+
+          "
+        unit: years
+        short_unit: years
+        sources:
+          - *un_source
+          - *hmd_source
+      life_expectancy_80_hist:
+        title: Life expectancy at 80 (historical)
+        description:
+          "The average number of remaining years of life expected by a
+          hypothetical cohort of individuals who already reached age 80 and would
+          be subject during the remainder of their lives to the mortality rates of
+          a given period. It is expressed as years.
+
+
+          Definition from the UN.
+
+          "
+        unit: years
+        short_unit: years
+        sources:
+          - *un_source
+          - *hmd_source
+  life_expectancy:
+    title: Life Expectancy (various sources)
+    variables:
+      life_expectancy_0:
+        title: Life expectancy at birth
+        description:
+          "The average number of years that a newborn could expect to live,
+          if he or she were to pass through life exposed to the sex- and age-specific
+          death rates prevailing at the time of his or her birth, for a specific year,
+          in a given country, territory, or geographic area.
+
+
+          Definition from the WHO.
+
+          "
+        unit: years
+        short_unit: years
+        sources:
+          - *un_source
+          - *zijdeman_source
+          - *riley_source
+      life_expectancy_15:
+        title: Life expectancy at 15
+        description:
+          "The average number of remaining years of life expected by a
+          hypothetical cohort of individuals who already reached age 15 and would
+          be subject during the remainder of their lives to the mortality rates of
+          a given period. It is expressed as years.
+
+
+          Definition from the UN.
+
+          "
+        unit: years
+        short_unit: years
+        sources:
+          - *un_source
+          - *hmd_source
+      life_expectancy_65:
+        title: Life expectancy at 65
+        description:
+          "The average number of remaining years of life expected by a
+          hypothetical cohort of individuals who already reached age 65 and would
+          be subject during the remainder of their lives to the mortality rates of
+          a given period. It is expressed as years.
+
+
+          Definition from the UN.
+
+          "
+        unit: years
+        short_unit: years
+        sources:
+          - *un_source
+          - *hmd_source
+      life_expectancy_80:
+        title: Life expectancy at 80
+        description:
+          "The average number of remaining years of life expected by a
+          hypothetical cohort of individuals who already reached age 80 and would
+          be subject during the remainder of their lives to the mortality rates of
+          a given period. It is expressed as years.
+
+
+          Definition from the UN.
+
+          "
+        unit: years
+        short_unit: years
+        sources:
+          - *un_source
+          - *hmd_source
+  projection:
+    title: Life Expectancy (various sources) - Projection
+    variables:
+      life_expectancy_0_proj:
+        title: Life expectancy at birth (projection)
+        description:
+          "The average number of years that a newborn could expect to live,
+          if he or she were to pass through life exposed to the sex- and age-specific
+          death rates prevailing at the time of his or her birth, for a specific year,
+          in a given country, territory, or geographic area.
+
+
+          Definition from the WHO.
+
+          "
+        unit: years
+        short_unit: years
+        sources:
+          - *un_source
+      life_expectancy_15_proj:
+        title: Life expectancy at 15 (projection)
+        description:
+          "The average number of remaining years of life expected by a
+          hypothetical cohort of individuals who already reached age 15 and would
+          be subject during the remainder of their lives to the mortality rates of
+          a given period. It is expressed as years.
+
+
+          Definition from the UN.
+
+          "
+        unit: years
+        short_unit: years
+        sources:
+          - *un_source
+      life_expectancy_65_proj:
+        title: Life expectancy at 65 (projection)
+        description:
+          "The average number of remaining years of life expected by a
+          hypothetical cohort of individuals who already reached age 65 and would
+          be subject during the remainder of their lives to the mortality rates of
+          a given period. It is expressed as years.
+
+
+          Definition from the UN.
+
+          "
+        unit: years
+        short_unit: years
+        sources:
+          - *un_source
+          - *hmd_source
+      life_expectancy_80_proj:
+        title: Life expectancy at 80 (projection)
+        description:
+          "The average number of remaining years of life expected by a
+          hypothetical cohort of individuals who already reached age 80 and would
+          be subject during the remainder of their lives to the mortality rates of
+          a given period. It is expressed as years.
+
+
+          Definition from the UN.
+
+          "
+        unit: years
+        short_unit: years
+        sources:
+          - *un_source

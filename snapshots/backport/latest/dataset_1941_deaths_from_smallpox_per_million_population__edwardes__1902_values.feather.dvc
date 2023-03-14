@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-07 18:17:53.287847
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Deaths from smallpox per million population (Edwardes, 1902)
   namespace: backport
-  publication_date: latest
   short_name: dataset_1941_deaths_from_smallpox_per_million_population__edwardes__1902_values
+  file_extension: feather
+  date_accessed: 2023-02-23 17:42:04.791193
+  name: Deaths from smallpox per million population (Edwardes, 1902)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/1941
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 13e7955e052e5d71d0489639ce65a08c
-  size: 8474
+- md5: 64067f082105dfb2c6738c680e2d7229
+  size: 8850
   path: dataset_1941_deaths_from_smallpox_per_million_population__edwardes__1902_values.feather

@@ -1,17 +1,18 @@
 meta:
-  date_accessed: 2022-12-08 01:40:40.499903
-  description: ''
-  file_extension: feather
-  is_public: true
-  name: Global Hunger Index in 1992 (listed 2017) (Global Hunger Index 2017)
   namespace: backport
-  publication_date: latest
   short_name: dataset_2477_global_hunger_index_in_1992__listed_2017__global_hunger_index_2017_values
+  file_extension: feather
+  date_accessed: 2023-02-23 17:10:00.442937
+  name: Global Hunger Index in 1992 (listed 2017) (Global Hunger Index 2017)
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/2477
+  source_published_by: Our World in Data catalog backport
+  is_public: true
   version: latest
+  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 36248f68d63407d48eb9d96781cee973
-  size: 8658
+- md5: a4cabc73fc377aa49d4c5bc09ace09ed
+  size: 9026
   path: dataset_2477_global_hunger_index_in_1992__listed_2017__global_hunger_index_2017_values.feather
