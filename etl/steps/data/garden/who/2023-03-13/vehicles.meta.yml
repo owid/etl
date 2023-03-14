@@ -1,35 +1,27 @@
-# (Inherited from meadow, remove if not different.)
 all_sources:
-  - source_testing: &source-testing
-      name: # Example: Testing Short Citation
-      published_by: # (if different to short citation). Example: Testing Full Citation
-      url: # Example: https://url_of_testing_source.com/
-      date_accessed: # Example: 2023-01-01
-      publication_date: # Example: 2023-01-01
-      publication_year: # (if publication_date is not given). Example: 2023
-      # description: Source description.
+  - who_gho: &who-gho
+      name: WHO, Global Health Observatory (2022); United Nations - Population Division (2022)
+      published_by: WHO, Global Health Observatory (2022); United Nations - Population Division (2022)
+      url: https://ghoapi.azureedge.net/api/; https://population.un.org/wpp/Download/
+      date_accessed: 2022-08-03
+      publication_year: 2022
 
-# (Inherited from meadow, remove if not different.)
 dataset:
-  title: # Example: Testing Dataset Name (Institution, 2023)
-  # description: Dataset description.
-  licenses:
-    - name: # Example: Testing License Name
-      url: # Example: https://url_of_testing_source.com/license
+  title: Registered vehicles per 1,000 people (WHO, 2022)
+  namespace: who
+  short_name: vehicles
+  description: |-
+    The total number of registered vehicles (i.e. vehicles reported to a government agency and given some form of registration) in each county.
+    
+    Data were collected from a number of different sectors and stakeholders in each country and were submitted to the World Health Organization after consensus meetings, facilitated by   national data coordinators. All legislative documents were analysed by lawyers at WHO headquarters who extracted the relevant information. The legal analysis was then shared with   National Data Coordinators and a validation process resolved any data conflicts through discussion and submission of new legal documents.
   sources:
-    - *source-testing
+    - *who-gho
 
 tables:
   vehicles:
-    # (Inherited from meadow, remove if not different.)
     variables:
-      # testing_variable:
-      #   title: Testing variable title
-      #   unit: arbitrary units
-      #   short_unit: au
-      #   description: Full description of testing variable.
-      #   sources:
-      #     - *source-testing
-      #   display:
-      #     entityAnnotationsMap: Test annotation
-      #     numDecimalPlaces: 0
+      registered_vehicles_per_thousand:
+        title: Registered vehicles per 1,000 people
+        unit: vehicles per 1,000 people
+        display:
+          numDecimalPlaces: 1
