@@ -1,10 +1,9 @@
 """Load a meadow dataset and create a garden dataset."""
 
 import pandas as pd
-from owid.catalog import Dataset, Table
+from owid.catalog import Table
 from structlog import get_logger
 
-from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
 log = get_logger()
@@ -18,7 +17,7 @@ def run(dest_dir: str) -> None:
 
     # Load population.
     population_table: Table = paths.load_dependency("key_indicators")["population"]
-    pop = population_table["population"]
+    pop = population_table["population"] / 1000  # Divide by 1000 to get vehicles per 1000 people
 
     # Load registered vehicles.
     short_name = "dataset_5676_global_health_observatory__world_health_organization__2022_08"
@@ -32,7 +31,7 @@ def run(dest_dir: str) -> None:
         .set_index(["country", "year"])["indicator__number_of_registered_vehicles"]
     )
 
-    df = pd.DataFrame({"registered_vehicles_per_person": (registered_vehicles / pop).dropna()})
+    df = pd.DataFrame({"registered_vehicles_per_thousand": (registered_vehicles / pop)}).dropna()
 
     tb_garden = Table(df, short_name="vehicles")
 
