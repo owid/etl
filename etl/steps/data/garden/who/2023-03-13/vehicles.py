@@ -16,12 +16,14 @@ def run(dest_dir: str) -> None:
     log.info("vehicles.start")
 
     # Load population.
-    population_table: Table = paths.load_dependency("key_indicators")["population"]
+    population_dataset: Dataset = paths.load_dependency("key_indicators")
+    population_table: Table = population_dataset["population"]
     pop = population_table["population"] / 1000  # Divide by 1000 to get vehicles per 1000 people
 
     # Load registered vehicles.
     short_name = "dataset_5676_global_health_observatory__world_health_organization__2022_08"
-    who_gh: Table = paths.load_dependency(short_name)[short_name]
+    who_gh_dataset: Dataset = paths.load_dependency(short_name)
+    who_gh = who_gh_dataset[short_name]
 
     # Use the same index as popoulation
     registered_vehicles = who_gh["indicator__number_of_registered_vehicles"].dropna()
