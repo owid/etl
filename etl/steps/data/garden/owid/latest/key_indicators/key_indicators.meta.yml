@@ -7,7 +7,6 @@ tables:
       We combine this population dataset with the <a href="https://ourworldindata.org/grapher/land-area-km">land area estimates published by the World Bank</a>, to produce a long-run dataset of population density.
 
       In all sources that we rely on, population estimates and land area estimates are based on today's geographical borders.
-    short_name: population_density
     variables:
       population_density:
         title: Population density
@@ -23,7 +22,6 @@ tables:
     title: Land Area (FAO)
     description: |
       Country land area.
-    short_name: land_area
     variables:
       land_area:
         title: Land area (sq. km)
@@ -44,4 +42,4 @@ tables:
           - name: Food and Agriculture Organization of the United Nations
             published_by: World Bank
             url: http://data.worldbank.org/data-catalog/world-development-indicators
-            date_accessed: August 8, 2021
+            date_accessed: 2021-08-08
