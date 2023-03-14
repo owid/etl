@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5790_global_health_estimates__world_health_organization__2020_values
   file_extension: feather
-  date_accessed: 2023-03-14 11:59:09.415918
+  date_accessed: 2023-03-14 12:06:13.934091
   name: Global Health Estimates - World Health Organization (2020)
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 5374da3e83495517877910fa2ceab97f
-  size: 14477930
+- md5: 8bf86345c91709e07402355fc8b41113
+  size: 14578682
   path: dataset_5790_global_health_estimates__world_health_organization__2020_values.feather
