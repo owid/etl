@@ -100,7 +100,9 @@ steps:
     - data://garden/who/latest/fluid
     - data://garden/who/latest/flunet
 
-  #
+  # Registered vehicles per 1000 people
   data://garden/who/2023-03-13/vehicles:
     - data://garden/owid/latest/key_indicators
     - backport://backport/owid/latest/dataset_5676_global_health_observatory__world_health_organization__2022_08
+  data://grapher/who/2023-03-13/vehicles:
+  - data://garden/who/2023-03-13/vehicles
