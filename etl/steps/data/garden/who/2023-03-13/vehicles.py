@@ -1,7 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
 import pandas as pd
-from owid.catalog import Table
+from owid.catalog import Table, Dataset
 from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
