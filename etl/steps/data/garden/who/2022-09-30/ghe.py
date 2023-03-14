@@ -73,7 +73,17 @@ def build_custom_age_groups(df: pd.DataFrame) -> pd.DataFrame:
 
     # Get two dfs: one with cause=self-harm, the other with the rest
     log.info("ghe: separate self-harm from other causes")
-    msk = (df["cause"].isin(["Self-harm"])) & (~df["age_group"].isin(["ALLAges", "YEARS85PLUS"]))
+    msk = (df["cause"].isin(["Self-harm"])) & (
+        # The following age groups are passed as they are, without assigning them to broader age groups.
+        ~df["age_group"].isin(
+            [
+                "ALLAges",
+                "YEARS85PLUS",
+                "YEARS15-19",
+                "YEARS20-24",
+            ]
+        )
+    )
     df_sh = df[msk].reset_index(drop=True).copy()
     df = df[~msk].reset_index(drop=True).copy()
 
@@ -84,8 +94,8 @@ def build_custom_age_groups(df: pd.DataFrame) -> pd.DataFrame:
         "YEARS1-4": [1, 4],
         "YEARS5-9": [5, 9],
         "YEARS10-14": [10, 14],
-        "YEARS15-19": [15, 19],
-        "YEARS20-24": [20, 24],
+        # "YEARS15-19": [15, 19],
+        # "YEARS20-24": [20, 24],
         "YEARS25-29": [25, 29],
         "YEARS30-34": [30, 34],
         "YEARS35-39": [35, 39],
@@ -111,15 +121,15 @@ def build_custom_age_groups(df: pd.DataFrame) -> pd.DataFrame:
         age_col="age_group",
         age_group_mapping=AGE_GROUPS_RANGES,
     )
-    # Map age groups to broader age groups
+    # Map age groups to broader age groups. Missing age groups in the list are passed as they are (no need to assign to broad group)
     log.info("ghe: create broader age groups")
     AGE_GROUPS = {
         "YEARS0-1": "YEARS0-14",
         "YEARS1-4": "YEARS0-14",
         "YEARS5-9": "YEARS0-14",
         "YEARS10-14": "YEARS0-14",
-        "YEARS15-19": "YEARS15-24",
-        "YEARS20-24": "YEARS15-24",
+        # "YEARS15-19": "YEARS15-24",
+        # "YEARS20-24": "YEARS15-24",
         "YEARS25-29": "YEARS25-34",
         "YEARS30-34": "YEARS25-34",
         "YEARS35-39": "YEARS35-44",
