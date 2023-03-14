@@ -1,4 +1,17 @@
-"""Load a garden dataset and create an explorers dataset."""
+"""
+Load in both the FluNet and FluID datasets from garden and merge them.
+As we use stacked bar charts in the explorer we need to add a few special steps:
+
+* Ensure there is a row for each week between the start and end week for each country, this is done in create_full_time_series()
+* Ensure that for any country we want to show in a stacked bar chart there are 0s instead of NAs
+
+Further steps we take:
+
+* Remove data for country-variable combinations when there are fewer than 20 datapoints - set using MIN_DATA_POINTS
+* Calculate aggregates for both the global total and both hemispheres
+* For these aggregates we do not use inf_negative as a denominator, species processed is available many more countries and gives a better representation of the data. When using inf_negative many of the early datapoints are near 100%.
+* Create monthly aggregates where we sum the count variables and average the rate variables
+"""
 
 import numpy as np
 import pandas as pd
@@ -6,11 +19,11 @@ from owid.catalog import Dataset, Table
 
 from etl.helpers import PathFinder, create_dataset
 from etl.steps.data.garden.who.latest.fluid import calculate_patient_rates
-from etl.steps.data.garden.who.latest.flunet import calculate_percent_positive
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+# Remove data for countries which have fewer than this value
 MIN_DATA_POINTS = 20
 
 
@@ -105,7 +118,8 @@ def create_zero_filled_strain_columns(df: pd.DataFrame) -> pd.DataFrame:
 
 def create_full_time_series(df: pd.DataFrame) -> pd.DataFrame:
     """
-    For each country ensure there is a value for each week between the start and the end date, especially important for the stacked bar charts
+    For each country ensure there is a value for each week between the start and the end date,
+    especially important for the stacked bar charts which don't automatically fill missing dates with NAs
 
     """
     filled_df = pd.DataFrame()
@@ -166,6 +180,13 @@ def remove_sparse_timeseries(df: pd.DataFrame, min_data_points: int) -> pd.DataF
 
 
 def create_monthly_aggregates(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Aggregate weekly data into months. For simplicity, if the week commences in a certain month we include it in that month.
+
+    We sum counts and average rates to calculate the monthly values.
+
+    """
+
     df["month"] = pd.DatetimeIndex(df["date"]).month
     df["year"] = pd.DatetimeIndex(df["date"]).year
     df["month_date"] = pd.to_datetime(df[["year", "month"]].assign(DAY=1))
@@ -187,11 +208,11 @@ def create_monthly_aggregates(df: pd.DataFrame) -> pd.DataFrame:
 
     month_agg_df = df[count_cols].groupby(["country", "month_date"]).sum(min_count=1, numeric_only=True).reset_index()
 
-    month_agg_df = calculate_percent_positive(
-        df=month_agg_df, surveillance_cols=["sentinel", "nonsentinel", "notdefined", "combined"]
-    )
+    # columns that are aggregated by averaging (rates)
+    rate_agg_cols = ["country", "month_date"] + rate_cols
+    rate_agg_df = df[rate_agg_cols].groupby(["country", "month_date"]).mean(numeric_only=True).reset_index()
 
-    month_agg_df = calculate_patient_rates(df=month_agg_df)
+    month_agg_df = pd.merge(month_agg_df, rate_agg_df, on=["country", "month_date"], how="outer")
 
     return month_agg_df
 
@@ -222,7 +243,6 @@ def create_regional_aggregates(df: pd.DataFrame) -> pd.DataFrame:
 
     global_aggregate = create_global_aggregate(df=df, count_cols=count_cols, min_countries=20, rate_cols=rate_cols)
     hemisphere_aggregate = create_hemisphere_aggregate(df, count_cols)
-    # uk_aggregate = create_united_kingdom_aggregate(df, count_cols)
 
     df_orig = df_orig.drop(columns=["hemisphere"])
 
@@ -250,7 +270,6 @@ def create_hemisphere_aggregate(df: pd.DataFrame, count_cols) -> pd.DataFrame:
 
 def create_global_aggregate(df: pd.DataFrame, count_cols: list[str], min_countries: int, rate_cols) -> pd.DataFrame:
     global_aggregate = df[count_cols].groupby(["date"]).sum(min_count=1, numeric_only=True).reset_index()
-    # null_rate_dates = df[df['date'].isin(df['date'].value_counts()[df['date'].value_counts() < min_countries].index)].date.to_list()
     global_aggregate["country"] = "World"
     cols = global_aggregate.columns.to_list()
     cols = cols[-1:] + cols[:-1]
@@ -310,6 +329,5 @@ def calculate_percent_positive_aggregate(df: pd.DataFrame, surveillance_cols: li
             & (df["spec_received_nb" + col] == 0),
             "pcnt_pos" + col,
         ] = np.nan
-        # df = df.dropna(axis=1, how="all")
 
     return df
