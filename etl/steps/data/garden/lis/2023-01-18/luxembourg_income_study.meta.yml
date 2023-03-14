@@ -36,6 +36,3 @@ dataset:
         Luxembourg Income Study (LIS) Database, http://www.lisdatacenter.org
         (multiple countries; 1967-2021). Luxembourg, LIS.
       publisher_source: National income surveys
-tables:
-  luxembourg_income_study:
-    variables: {}

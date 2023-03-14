@@ -67,7 +67,7 @@ def clean_data(df: pd.DataFrame, column_rename: Optional[Dict[str, str]]) -> pd.
 def run_pipeline(dest_dir: str, paths: PathFinder, column_rename: Optional[Dict[str, str]] = None):
     log.info(f"{paths.short_name}.start")
     # read snapshot dataset
-    snap = paths.load_dependency(paths.short_name)
+    snap = paths.load_dependency(paths.short_name + ".csv")
     df = pd.read_csv(snap.path, header=4)
 
     # clean and transform data
