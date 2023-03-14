@@ -270,6 +270,7 @@ def create_hemisphere_aggregate(df: pd.DataFrame, count_cols) -> pd.DataFrame:
 
 def create_global_aggregate(df: pd.DataFrame, count_cols: list[str], min_countries: int, rate_cols) -> pd.DataFrame:
     global_aggregate = df[count_cols].groupby(["date"]).sum(min_count=1, numeric_only=True).reset_index()
+    # null_rate_dates = df[df['date'].isin(df['date'].value_counts()[df['date'].value_counts() < min_countries].index)].date.to_list()
     global_aggregate["country"] = "World"
     cols = global_aggregate.columns.to_list()
     cols = cols[-1:] + cols[:-1]
@@ -329,5 +330,6 @@ def calculate_percent_positive_aggregate(df: pd.DataFrame, surveillance_cols: li
             & (df["spec_received_nb" + col] == 0),
             "pcnt_pos" + col,
         ] = np.nan
+        # df = df.dropna(axis=1, how="all")
 
     return df
