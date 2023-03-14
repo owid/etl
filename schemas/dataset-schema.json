@@ -90,6 +90,9 @@
       },
       "tables": {
         "type": "object",
+        "propertyNames": {
+          "pattern": "^[a-z0-9_]*$"
+        },
         "additionalProperties": {
           "type": "object",
           "additionalProperties": false,
@@ -102,6 +105,9 @@
             },
             "variables": {
               "type": "object",
+              "propertyNames": {
+                "pattern": "^[a-z0-9_]*$"
+              },
               "additionalProperties": {
                 "type": "object",
                 "additionalProperties": false,

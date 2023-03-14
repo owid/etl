@@ -2,7 +2,7 @@
 
 from owid.catalog import Dataset
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder, create_dataset, grapher_checks
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -23,15 +23,15 @@ def run(dest_dir: str) -> None:
     #
 
     #
-    # Checks.
-    #
-    assert {"year", "country"} <= set(tb_garden.reset_index().columns), "Table must have columns country and year."
-
-    #
     # Save outputs.
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.
     ds_grapher = create_dataset(dest_dir, tables=[tb_garden], default_metadata=ds_garden.metadata)
+
+    #
+    # Checks.
+    #
+    grapher_checks(ds_garden)
 
     # Save changes in the new grapher dataset.
     ds_grapher.save()
