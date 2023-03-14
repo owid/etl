@@ -1,7 +1,7 @@
 all_sources:
   - source_testing: &source-testing
-      name: # TO BE FILLED. Example: Testing Short Citation
-      published_by: # TO BE FILLED (if different to short citation). Example: Testing Full Citation
+      name: Eckhardt (1991)
+      published_by: Eckhardt, William. 1991. Wars and War-Related Deaths, 1500-1990. In: Ruth Sivard: World Military and Social Expenditures. World Priorities.
       url: # TO BE FILLED. Example: https://url_of_testing_source.com/
       date_accessed: # TO BE FILLED. Example: 2023-01-01
       publication_date: # TO BE FILLED. Example: 2023-01-01
@@ -9,11 +9,12 @@ all_sources:
       # description: Source description.
 
 dataset:
-  title: # TO BE FILLED. Example: Testing Dataset Name (Institution, 2023)
+  title: Wars and deaths – Eckhardt
   namespace: war
   short_name: eckhardt_1991
   version: 2023-01-18
-  # description: Dataset description.
+  description: |
+    This dataset provides information on military and civilian deaths from wars, drawn from the chapter by Eckhardt (1991).
   licenses:
     - name: # TO BE FILLED. Example: Testing License Name
       url: # TO BE FILLED. Example: https://url_of_testing_source.com/license
