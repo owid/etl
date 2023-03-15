@@ -3,7 +3,7 @@
 dataset:
   namespace: lis
   short_name: luxembourg_income_study
-  title: Luxembourg Income Study (LIS, 2022)
+  title: Luxembourg Income Study (LIS, 2023)
   description: |-
     The Luxembourg Income Study Database (LIS) is the largest available income database of harmonized microdata collected from about 50 countries in Europe, North America, Latin America, Africa, Asia, and Australasia spanning five decades.
 
@@ -27,12 +27,12 @@ dataset:
     Person-level adjusted weights are used when generating income indicators for the total population. This means that survey data is adjusted to the population by multiplying the household weight by the number of household members (HWGT*NHHMEM).
   version: "2023-01-18"
   sources:
-    - name: Luxembourg Income Study (LIS) (2022)
+    - name: Luxembourg Income Study (LIS) (2023)
       url: https://www.lisdatacenter.org/our-data/lis-database/
-      date_accessed: "2023-02-27"
-      publication_date: "2022-12-15"
-      publication_year: 2022
+      date_accessed: "2023-03-14"
+      publication_date: "2023-03-14"
+      publication_year: 2023
       published_by:
         Luxembourg Income Study (LIS) Database, http://www.lisdatacenter.org
-        (multiple countries; 1967-2021). Luxembourg, LIS.
+        (multiple countries; 1967-2020). Luxembourg, LIS.
       publisher_source: National income surveys
