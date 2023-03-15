@@ -357,6 +357,7 @@ def read_sources_from_db(env_path: str, namespace: str, version: str, dataset: s
 def read_data_values_from_db(env_path: str, namespace: str, version: str, dataset: str) -> pd.DataFrame:
     engine = get_engine(dotenv_values(env_path))
 
+    # TODO: fix this!
     q = """
     SELECT
         dv.*,

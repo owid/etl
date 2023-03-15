@@ -53,6 +53,7 @@ class VariablesUpdate:
     def _get_metadata_from_db(self) -> List["VariableMetadata"]:
         """Get metadata for all variables in the update."""
         # build query
+        # TODO: fix me!!! use values from S3 instead
         query = """
             SELECT variableId, MIN(year) AS minYear, MAX(year) AS maxYear
             FROM data_values
