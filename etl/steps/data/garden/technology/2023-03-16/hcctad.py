@@ -52,7 +52,11 @@ def reshape_to_wide(df: pd.DataFrame) -> pd.DataFrame:
     # For this dataset, we want to be able to chart the UK and the US on completely separate charts,
     # and allow users to add/remove technologies. Therefore, countries should be variables and
     # technologies should be entities.
-    df = df.pivot(index=["variable", "year"], columns="country", values="value").reset_index()
+    df = (
+        df.pivot(index=["variable", "year"], columns="country", values="value")
+        .reset_index()
+        .rename(columns={"variable": "entity"})
+    )
     return df
 
 
