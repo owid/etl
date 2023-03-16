@@ -24,7 +24,15 @@ def run(dest_dir: str) -> None:
     snap: Snapshot = paths.load_dependency("hcctad.txt")
 
     # Load data from snapshot.
-    df = pd.read_csv(snap.path)
+    df = pd.read_csv(snap.path, na_values=".")
+
+    # Reshape to tidyformat.
+    df = (
+        df.rename(columns={"Variable": "variable", "Year": "year"})
+        .melt(["variable", "year"], var_name="country", value_name="value")
+        .dropna()
+        .reset_index(drop=True)
+    )
 
     #
     # Process data.
