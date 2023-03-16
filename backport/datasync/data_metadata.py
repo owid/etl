@@ -188,6 +188,7 @@ def _is_float(x):
 def _convert_strings_to_numeric(lst: List[str]) -> List[Union[int, float, str]]:
     result = []
     for item in lst:
+        assert isinstance(item, str)
         try:
             num = float(item)
             if num.is_integer():

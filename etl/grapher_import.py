@@ -241,9 +241,10 @@ def upsert_table(
         variable_id = variable.id
         assert variable_id
 
-        session.commit()
+        df = table.rename(columns={column_name: "value", "entity_id": "entityId"})
 
-        df = table.rename(columns={column_name: "value", "entity_id": "entityId"}).assign(variableId=variable_id)
+        # following functions assume that `value` is string
+        df["value"] = df["value"].astype(str)
 
         # NOTE: we could prefetch all entities in advance, but it's not a bottleneck as it takes
         # less than 10ms per variable
@@ -256,7 +257,6 @@ def upsert_table(
         data_path = upload_gzip_dict(var_data, variable.s3_data_path())
         metadata_path = upload_gzip_dict(var_metadata, variable.s3_metadata_path())
 
-        variable = gm.Variable.load_variable(session, variable_id)
         variable.dataPath = data_path
         variable.metadataPath = metadata_path
         session.add(variable)
