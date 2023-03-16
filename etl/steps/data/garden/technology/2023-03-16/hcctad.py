@@ -35,7 +35,8 @@ def convert_and_rename(df: pd.DataFrame, vars: pd.DataFrame) -> pd.DataFrame:
     df = df.drop(columns="multiply_by")
 
     # Improve column names
-    # Some variables are converted to the same names, so that they can be summed up later in aggregate_variables()
+    # Some variables are converted to the same names,
+    # so that they can be summed up later in aggregate_variables()
     df = df.drop(columns="variable").rename(columns={"new_name": "variable"})
 
     return df
