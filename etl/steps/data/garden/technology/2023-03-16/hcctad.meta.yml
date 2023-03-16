@@ -6,6 +6,10 @@ tables:
       united_kingdom:
         title: United Kingdom
         unit: ''
+        display:
+          numDecimalPlaces: 0
       united_states:
         title: United States
         unit: ''
+        display:
+          numDecimalPlaces: 0
