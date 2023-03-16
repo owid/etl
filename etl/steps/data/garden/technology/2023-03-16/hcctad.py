@@ -55,7 +55,7 @@ def reshape_to_wide(df: pd.DataFrame) -> pd.DataFrame:
     df = (
         df.pivot(index=["variable", "year"], columns="country", values="value")
         .reset_index()
-        .rename(columns={"variable": "entity"})
+        .rename(columns={"variable": "country"})
     )
     return df
 
