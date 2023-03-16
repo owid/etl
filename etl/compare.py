@@ -367,7 +367,6 @@ def read_values_from_s3(env_path: str, namespace: str, version: str, dataset: st
     FROM variables as v
     JOIN datasets as d ON v.datasetId = d.id
     WHERE d.version = %(version)s and d.namespace = %(namespace)s and d.shortName = %(dataset)s
-    limit 1
     """
     vf = pd.read_sql(
         q,

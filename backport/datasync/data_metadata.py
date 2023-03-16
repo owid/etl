@@ -43,7 +43,23 @@ def _fetch_data_df_from_s3(data_path: str):
         return pd.DataFrame(columns=["variableId", "entityId", "year", "value"])
 
 
-def variable_data_df_from_s3(engine: Engine, data_paths: List[str], workers: int = 1) -> pd.DataFrame:
+def variable_data_df_from_s3(
+    engine: Engine, data_paths: List[str] = [], variable_ids: List[int] = [], workers: int = 1
+) -> pd.DataFrame:
+    """Fetch data from S3 and add entity code and name from DB. You can use either data_paths or variable_ids."""
+    if not data_paths:
+        q = """
+        SELECT
+            dataPath
+        FROM variables as v
+        WHERE id in %(variable_ids)s
+        """
+        data_paths = pd.read_sql(
+            q,
+            engine,
+            params={"variable_ids": variable_ids},
+        )["dataPath"].tolist()
+
     with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as executor:
         results = list(executor.map(lambda data_path: _fetch_data_df_from_s3(data_path), data_paths))
 

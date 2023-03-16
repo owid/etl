@@ -1,8 +1,7 @@
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Union
 
-import pandas as pd
-
+from backport.datasync.data_metadata import variable_data_df_from_s3
 from etl.db import get_engine
 
 
@@ -52,19 +51,18 @@ class VariablesUpdate:
 
     def _get_metadata_from_db(self) -> List["VariableMetadata"]:
         """Get metadata for all variables in the update."""
-        # build query
-        # TODO: fix me!!! use values from S3 instead
-        query = """
-            SELECT variableId, MIN(year) AS minYear, MAX(year) AS maxYear
-            FROM data_values
-            WHERE variableId IN %(variable_ids)s
-            GROUP BY variableId
-        """
-        # get data
-        df_var_years = pd.read_sql(query, get_engine(), params={"variable_ids": self.ids_all})
+        # get data from S3
+        df_var_years = variable_data_df_from_s3(get_engine(), variable_ids=self.ids_all, workers=10)
+
+        # get min and max year for each variable
+        df_var_years = (
+            df_var_years.groupby("variableId", as_index=False)
+            .year.agg(["min", "max"])
+            .rename(columns={"min": "minYear", "max": "maxYear"})
+        )
 
         # build list of variable metadata
-        metadata_raw = df_var_years.set_index("variableId").to_dict("index")
+        metadata_raw = df_var_years.to_dict("index")
         metadata = []
         for k, v in metadata_raw.items():
             metadata.append(
