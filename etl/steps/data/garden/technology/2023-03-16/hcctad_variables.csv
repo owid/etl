@@ -8,8 +8,8 @@ Mobile Phones,Mobile phones,1000
 Telegraph,Telegrams,1000
 Mail,Mail (units handled),1000000
 Personal computers,Personal computers,1000
-Aviation - PKM,Air passenger traffic (freight ton-km),1000000
-Aviation-TKM,Air freight traffic (passenger-km),1000000
+Aviation - PKM,Air passenger traffic (passenger-km),1000000
+Aviation-TKM,Air freight traffic (freight ton-km),1000000
 Private Cars,Private cars,1000
 Commercial Cars,Commercial cars,1000
 Tonnage-All,Registered merchant ships (total tonnage),1
