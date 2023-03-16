@@ -271,8 +271,9 @@ def _load_datasets(engine: Engine, dataset_ids: tuple[int], dt_start: Optional[d
     if dataset_ids:
         where = "id in %(dataset_ids)s"
     elif dt_start:
-        # datasets with sourceChecksum come from ETL and are already synced
-        where = "sourceChecksum is null and dataEditedAt > %(dt_start)s or metadataEditedAt > %(dt_start)s"
+        # datasets with shortName come from ETL and are already synced
+        # we don't use sourceChecksum because that one is set only after the dataset is fully upserted
+        where = "shortName is null and dataEditedAt > %(dt_start)s or metadataEditedAt > %(dt_start)s"
     else:
         raise ValueError("Either dataset_ids or dt_start must be specified")
 
