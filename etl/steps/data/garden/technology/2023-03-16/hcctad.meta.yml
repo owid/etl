@@ -3,63 +3,9 @@ dataset: {}
 tables:
   hcctad:
     variables:
-      railway_lines:
-        title: Railway lines
-        unit: km
-        description: 'Length of railway line open, measured in km. Source: Mitchell (1998).'
-      railway_freight:
-        title: Railway freight traffic
-        unit: metric ton-km
-        description: 'Metric ton kilometers of freight transportation by railways. Source: Mitchell (1998) and World Bank (2001).'
-      railway_passenger:
-        title: Railway passenger traffic
-        unit: passenger-km
-        description: 'Passenger traffic on railways, in millions of passenger kilometers. Source: Mitchell (1998).'
-      electricity_output:
-        title: Electricity output
-        unit: MWhrs
-        description: 'MWhrs of electricity output. Source: Mitchell (1998) and World Bank (2001).'
-      landline_phones:
-        title: Landline phones
-        description: 'Mainland phones. Source: Mitchell (1998a,b,c) and World Bank (2001).'
-      mobile_phones:
-        title: Mobile phones
-        description: 'Mobile phones owned. Source: World Bank (2001).'
-      telegrams:
-        title: Telegrams
-        description: 'Number of telegrams. Source: Mitchell (1998).'
-      mail:
-        title: Mail
-        unit: units handled
-        description: 'Mail, units handled. Source: Mitchell (1998).'
-      personal_computers:
-        title: Personal computers
-        description: 'Personal computers. Source: World Bank (2001).'
-      air_passenger:
-        title: Air passenger traffic
-        unit: passenger-km
-        description: 'Commercial aviation, million passenger kilometers. Source: Mitchell (1998).'
-      air_freight:
-        title: Air freight traffic
-        unit: freight ton-km
-        description: 'Commercial aviation, million freight ton kilometers. Source: Mitchell (1998).'
-      private_cars:
-        title: Private cars
-        description: 'Privately owned vehicles. Source: Mitchell (1998) and World Bank (2001).'
-      commercial_cars:
-        title: Commercial cars
-        description: 'Commercial vehicles. Source: Mitchell (1998).'
-      ships:
-        title: Merchant ships
-        unit: total tonnage
-        description: 'Total tonnage of registered merchant ships. Source: Mitchell (1998).'
-      robots:
-        title: Industrial robots
-        description: 'Number of industrial robots used in manufacturing sectors. Source: IFR (various years).'
-      textile_spindles:
-        title: Textile spindles
-        description: 'Mule and ring spindles in operation. Source: Saxonhouse and Wright (2000) and IFMCSMA (various editions).'
-      steel:
-        title: Steel
-        unit: metric tons
-        description: 'Metric tons of crude steel produced (any method). Source: UNECE (various years) and IISI (various years).'
+      united_kingdom:
+        title: United Kingdom
+        unit: ''
+      united_states:
+        title: United States
+        unit: ''

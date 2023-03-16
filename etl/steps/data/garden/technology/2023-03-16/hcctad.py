@@ -17,6 +17,7 @@ paths = PathFinder(__file__)
 def filter_countries(df: pd.DataFrame) -> pd.DataFrame:
     # Only keep data from the United States and the United Kingdom. These time series are some of
     # the most complete in the dataset, and the most relevant to OWID readers.
+    df["country"] = df.country.astype(str)
     selected_countries = ["United States", "United Kingdom"]
     return df[df.country.isin(selected_countries)]
 
@@ -48,7 +49,10 @@ def aggregate_variables(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def reshape_to_wide(df: pd.DataFrame) -> pd.DataFrame:
-    df = df.pivot(index=["country", "year"], columns="variable", values="value").reset_index()
+    # For this dataset, we want to be able to chart the UK and the US on completely separate charts,
+    # and allow users to add/remove technologies. Therefore, countries should be variables and
+    # technologies should be entities.
+    df = df.pivot(index=["variable", "year"], columns="country", values="value").reset_index()
     return df
 
 
