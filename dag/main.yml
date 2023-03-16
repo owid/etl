@@ -340,6 +340,8 @@ steps:
   # Historical Cross Country Technology Adoption Dataset (Comin & Hobijn, 2004)
   data://meadow/technology/2023-03-16/hcctad:
   - snapshot://technology/2023-03-16/hcctad.txt
+  data://garden/technology/2023-03-16/hcctad:
+  - data://meadow/technology/2023-03-16/hcctad
 
 # Sub-dags to import
 include:

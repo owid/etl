@@ -1,0 +1,24 @@
+variable,new_name,multiply_by
+Length of Railway line open,railway_lines,1
+Freight traffic on railways-2,railway_freight,1000000
+Passenger traffic on railways-2,railway_passenger,1000000
+Energy output,electricity_output,10
+Phones,landline_phones,1000
+Mobile Phones,mobile_phones,1000
+Telegraph,telegrams,1000
+Mail,mail,1000000
+Personal computers,personal_computers,1000
+Aviation - PKM,air_freight,1000000
+Aviation-TKM,air_passenger,1000000
+Private Cars,private_cars,1000
+Commercial Cars,commercial_cars,1000
+Tonnage-All,ships,1
+industrial robots,robots,1
+Textiles - mule spindles,textile_spindles,1000
+Textiles - ring spindles,textile_spindles,1000
+steel - acid bessemer,steel,1000
+steel - basic bessemer,steel,1000
+steel - open hearth,steel,1000
+steel - blast oxygen,steel,1000
+steel - electric,steel,1000
+steel - other,steel,1000
