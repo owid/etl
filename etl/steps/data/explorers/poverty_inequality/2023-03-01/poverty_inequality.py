@@ -32,7 +32,7 @@ def add_pip_data(PIP_PATH: str):
     for var in drop_list:
         tb_pip = tb_pip[tb_pip.columns.drop(list(tb_pip.filter(like=var)))]
 
-    # Addittional variables to drop from PIP
+    # Additional variables to drop from PIP
     drop_list = [
         "survey_year",
         "survey_comparability",
@@ -61,6 +61,15 @@ def add_pip_data(PIP_PATH: str):
     }
 
     tb_pip["country"] = tb_pip["country"].replace(regions_dict)
+
+    # Calculate bottom 50% share
+    tb_pip["bottom50_share"] = (
+        tb_pip["decile1_share"]
+        + tb_pip["decile2_share"]
+        + tb_pip["decile3_share"]
+        + tb_pip["decile4_share"]
+        + tb_pip["decile5_share"]
+    )
 
     return tb_pip
 
