@@ -16,3 +16,8 @@ meta:
   is_public: true
   description: |
     Period: 1986-2022
+wdir: ../../../data/snapshots/unep/2023-03-17
+outs:
+- md5: baf2fb2afc2f7dc31fee79d69de0a9a7
+  size: 42274
+  path: consumption_controlled_substances.hydrofluorocarbons.xlsx

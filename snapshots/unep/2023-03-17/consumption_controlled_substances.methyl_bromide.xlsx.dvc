@@ -16,3 +16,8 @@ meta:
   is_public: true
   description: |
     Period: 1986-2022
+wdir: ../../../data/snapshots/unep/2023-03-17
+outs:
+- md5: cdcb0c7dd3481c7d8237939d52436d5e
+  size: 141099
+  path: consumption_controlled_substances.methyl_bromide.xlsx

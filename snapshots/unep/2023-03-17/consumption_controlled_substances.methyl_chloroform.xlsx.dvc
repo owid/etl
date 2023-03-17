@@ -16,3 +16,8 @@ meta:
   is_public: true
   description: |
     Period: 1986-2022
+wdir: ../../../data/snapshots/unep/2023-03-17
+outs:
+- md5: 7c1ae2679918a97f6a75ad889e34dbb7
+  size: 117419
+  path: consumption_controlled_substances.methyl_chloroform.xlsx
