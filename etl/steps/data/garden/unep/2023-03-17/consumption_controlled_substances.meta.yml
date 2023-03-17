@@ -1,0 +1,95 @@
+# (Inherited from meadow, remove if not different.)
+all_sources:
+  - source_testing: &source-testing
+      name: UNEP (2023)
+      published_by: # (if different to short citation). Example: Testing Full Citation
+      url: https://ozone.unep.org/countries/data-table
+      date_accessed: 2023-03-17
+      publication_date: 2023-03-16
+      publication_year: 2023
+      # description: Source description.
+
+# (Inherited from meadow, remove if not different.)
+dataset:
+  title: Consumption of controlled substances (UNEP, 2023)
+  description: TODO
+  licenses:
+    - name: # Example: Testing License Name
+      url: # Example: https://url_of_testing_source.com/license
+  sources:
+    - *source-testing
+
+tables:
+  consumption_controlled_substances:
+    # (Inherited from meadow, remove if not different.)
+    variables:
+      chlorofluorocarbons:
+        title: Consumption of controlled substance Chlorofluorocarbons (CFCs)
+        description:
+        short_unit: "ODP tonnes"
+        unit: "ODP tonnes"
+        display:
+          numDecimalPlaces: 1
+      bromochloromethane:
+        title: Consumption of controlled substance Bromochloromethane (BCM)
+        description:
+        short_unit: "ODP tonnes"
+        unit: "ODP tonnes"
+        display:
+          numDecimalPlaces: 1
+      carbon_tetrachloride:
+        title: Consumption of controlled substance Carbon Tetrachloride (CTC)
+        description:
+        short_unit: "ODP tonnes"
+        unit: "ODP tonnes"
+        display:
+          numDecimalPlaces: 1
+      halons:
+        title: Consumption of controlled substance Halons
+        description:
+        short_unit: "ODP tonnes"
+        unit: "ODP tonnes"
+        display:
+          numDecimalPlaces: 1
+      methyl_chloroform:
+        title: Consumption of controlled substance Methyl Chloroform (TCA)
+        description:
+        short_unit: "ODP tonnes"
+        unit: "ODP tonnes"
+        display:
+          numDecimalPlaces: 1
+      hydrofluorocarbons:
+        title: Consumption of controlled substance Hydrofluorocarbons (HFCs)
+        description:
+        short_unit: "ODP tonnes"
+        unit: "ODP tonnes"
+        display:
+          numDecimalPlaces: 1
+      other_fully_halogenated:
+        title: Consumption of controlled substance Other Fully Halogenated CFCs
+        description:
+        short_unit: "ODP tonnes"
+        unit: "ODP tonnes"
+        display:
+          numDecimalPlaces: 1
+      hydrobromofluorocarbons:
+        title: Consumption of controlled substance Hydrobromofluorocarbons (HBFCs)
+        description:
+        short_unit: "ODP tonnes"
+        unit: "ODP tonnes"
+        display:
+          numDecimalPlaces: 1
+      methyl_bromide:
+        title: Consumption of controlled substance Methyl Bromide (MB)
+        description:
+        short_unit: "ODP tonnes"
+        unit: "ODP tonnes"
+        display:
+          numDecimalPlaces: 1
+      hydrochlorofluorocarbons:
+        title: Consumption of controlled substance Hydrochlorofluorocarbons (HCFCs)
+        description:
+        short_unit: "ODP tonnes"
+        unit: "ODP tonnes"
+        display:
+          numDecimalPlaces: 1
