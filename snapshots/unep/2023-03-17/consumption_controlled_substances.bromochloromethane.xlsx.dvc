@@ -16,8 +16,3 @@ meta:
   is_public: true
   description: |
     Period: 1986-2022
-wdir: ../../../data/snapshots/unep/2023-03-17
-outs:
-- md5: 05aa062cc4a2daff0aac73b751fbb29b
-  size: 20314
-  path: consumption_controlled_substances.bromochloromethane.xlsx

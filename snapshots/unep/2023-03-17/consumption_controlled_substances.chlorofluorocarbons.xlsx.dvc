@@ -16,8 +16,3 @@ meta:
   is_public: true
   description: |
     Period: 1986-2022
-wdir: ../../../data/snapshots/unep/2023-03-17
-outs:
-- md5: a313469300309a8ee1ca095090e62217
-  size: 218230
-  path: consumption_controlled_substances.chlorofluorocarbons.xlsx

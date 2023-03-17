@@ -16,8 +16,3 @@ meta:
   is_public: true
   description: |
     Period: 1986-2022
-wdir: ../../../data/snapshots/unep/2023-03-17
-outs:
-- md5: 87c6df5654e6d35f3d70c04b4df9605a
-  size: 72535
-  path: consumption_controlled_substances.other-fully-halogenated.xlsx

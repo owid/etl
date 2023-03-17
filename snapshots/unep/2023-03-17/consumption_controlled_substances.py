@@ -4,7 +4,7 @@ The data for this Snapshot needs to be downloaded and imported from a local file
 
     1. Go to https://ozone.unep.org/countries/data-table?q=countries/data
     2. Download each of the available datasets. Each table has an "X" (Excel-like) sign, click it to download the corresponding XLSX file.
-    3. Name them with appropriate names (chemical name, using kebab-case). Accepted names are listed in variable `CHEMICAL_NAMES`, which should
+    3. Name them with appropriate names (chemical name, using snake-case). Accepted names are listed in variable `CHEMICAL_NAMES`, which should
        also match those stated in the DVC files ("consumption_controlled_substances.[checmical-name].xlsx.dvc").
     4. Place all XLSX files into one single folder.
     5. Run the script as: `python snapshots/unep/2023-03-17/consumption_controlled_substances.py --path-to-folder /path/to/folder/with/xlsx/files`
@@ -21,15 +21,15 @@ from etl.snapshot import Snapshot
 SNAPSHOT_VERSION = Path(__file__).parent.name
 CHEMICAL_NAMES = {
     "bromochloromethane",
-    "carbon-tetrachloride",
+    "carbon_tetrachloride",
     "chlorofluorocarbons",
     "halons",
     "hydrobromofluorocarbons",
     "hydrochlorofluorocarbons",
     "hydrofluorocarbons",
-    "methyl-bromide",
-    "methyl-chloroform",
-    "other-fully-halogenated",
+    "methyl_bromide",
+    "methyl_chloroform",
+    "other_fully_halogenated",
 }
 
 
@@ -48,8 +48,8 @@ def main(path_to_folder: Path | str, upload: bool) -> None:
     files = [f for f in path_to_folder.iterdir() if f.suffix == ".xlsx"]
     names = set(f.with_suffix("").name for f in files)
     assert names == CHEMICAL_NAMES, (
-        "There is a missmatch between expected chemical names and provided file names! Check them and try again. You"
-        " may find the guide at the top of this script useful for that."
+        "There is a missmatch between expected chemical names and provided file names! Check"
+        " them and try again. You may find the guide at the top of this script useful for that."
     )
     for name in names:
         # Create a new snapshot. Raise an error if DVC file for a given chemical is not found.

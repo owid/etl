@@ -16,8 +16,3 @@ meta:
   is_public: true
   description: |
     Period: 1986-2022
-wdir: ../../../data/snapshots/unep/2023-03-17
-outs:
-- md5: 0377c4a5f86c4eaba4674cf351e2b992
-  size: 165036
-  path: consumption_controlled_substances.halons.xlsx

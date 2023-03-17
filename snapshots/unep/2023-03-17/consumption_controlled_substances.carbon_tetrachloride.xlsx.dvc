@@ -16,8 +16,3 @@ meta:
   is_public: true
   description: |
     Period: 1986-2022
-wdir: ../../../data/snapshots/unep/2023-03-17
-outs:
-- md5: ecfccd28c87882149b5462e18cf28764
-  size: 137775
-  path: consumption_controlled_substances.carbon-tetrachloride.xlsx
