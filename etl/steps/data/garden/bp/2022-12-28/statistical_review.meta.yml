@@ -42,7 +42,4 @@ dataset:
 
 tables:
   statistical_review:
-    short_name: "statistical_review"
     title: "Statistical Review of World Energy"
-    variables:
-

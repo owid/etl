@@ -45,7 +45,7 @@ COLUMNS_ORDER: List[str] = [
 ]
 
 
-def process(df: pd.DataFrame, country_std: str) -> pd.DataFrame:
+def process_base(df: pd.DataFrame, country_std: str) -> pd.DataFrame:
     df = pd.DataFrame(df)
     df = df.reset_index()
     df = df.assign(location=df.location.map(country_std).astype("category"))
@@ -71,9 +71,15 @@ def process(df: pd.DataFrame, country_std: str) -> pd.DataFrame:
     )
     # Column order
     df = df[COLUMNS_ORDER]
-    # Add metrics
-    df = add_metrics(df)
     return df
+
+
+def process(df: pd.DataFrame, country_std: str) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    """Re-organizes age groups and complements some metrics."""
+    df_base = process_base(df, country_std)
+    # Add metrics
+    df = add_metrics(df_base.copy())
+    return df_base, df
 
 
 def add_metrics(df: pd.DataFrame) -> pd.DataFrame:

@@ -3,6 +3,7 @@
 from pathlib import Path
 
 import click
+import pandas as pd
 
 from etl.snapshot import Snapshot
 
@@ -23,6 +24,13 @@ def main(upload: bool) -> None:
 
     # Download data from source.
     snap.download_from_source()
+
+    # Try reading the csv, we sometimes get error invalid CSV with error
+    # if this fails, don't upload the file
+    pd.read_csv(snap.path)
+
+    # Snapshot should have at least 20mb, otherwise something went wrong
+    assert snap.path.stat().st_size > 20 * 2**20, "Snapshot file must have at least 20mb"
 
     # Add file to DVC and upload to S3.
     snap.dvc_add(upload=upload)

@@ -6,8 +6,8 @@ all_sources:
         Research (Germany), University of California, Berkeley (USA), and French Institute
         for Demographic Studies (France). Available at www.mortality.org.
       url: https://www.mortality.org/Data/STMF
-      date_accessed: "2023-02-28"
-      publication_date: "2023-02-27"
+      date_accessed: "2023-03-14"
+      publication_date: "2023-03-13"
       publication_year: 2023
       source_data_url: https://www.mortality.org/File/GetDocument/Public/STMF/Outputs/stmf.csv
 

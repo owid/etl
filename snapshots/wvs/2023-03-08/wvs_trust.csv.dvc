@@ -1,0 +1,37 @@
+meta:
+  namespace: wvs
+  short_name: trust_wvs
+  name: Trust questions in the World Values Survey Dataset (WVS, 2022)
+  version: 2023-03-08
+  publication_year: 2022
+  publication_date: 2022-12-14
+  source_name: World Values Survey (2022)
+  source_published_by: 'Inglehart, R., C. Haerpfer, A. Moreno, C. Welzel, K. Kizilova,
+    J. Diez-Medrano, M. Lagos, P. Norris, E. Ponarin & B. Puranen (eds.). 2022. World
+    Values Survey: All Rounds - Country-Pooled Datafile. Madrid, Spain & Vienna, Austria:
+    JD Systems Institute & WVSA Secretariat. Dataset Version 4.0. doi:10.14281/18241.17'
+  url: https://www.worldvaluessurvey.org/WVSDocumentationWVL.jsp
+  source_data_url:
+  file_extension: csv
+  license_url:
+  license_name:
+  date_accessed: 2023-03-08
+  is_public: true
+  description: |
+    The World Values Survey (WVS) is an international research program devoted to the scientific and academic study of social, political, economic, religious and cultural values of people in the world. The main research instrument of the project is a representative comparative social survey conducted globally every five years.
+
+    In the Our World in Data dataset we calculate national totals for the following questions:
+    <ul>
+      <li>Generally speaking, would you say that most people can be trusted or that you need to be very careful in dealing with people?</li>
+      <li>Could you tell me whether you trust people from you meet for the first time completely, somewhat, not very much or not at all?</li>
+      <li>Could you tell me whether you trust people you know personally completely, somewhat, not very much or not at all?</li>
+      <li>Could you tell me how much confidence you have in the government? Is it a great deal of confidence, quite a lot of confidence, not very much confidence or none at all?</li>
+      <li>Do you think most people try to take advantage of you?</li>
+    </ul>
+
+    The WVS runs a new survey wave every five years; the last update was done in 2022.  We will aim to update our data on Our World in Data soon after the WVS updates the source data with a new wave. You can access the source page at the link above and see the latest available data from the WVS.
+wdir: ../../../data/snapshots/wvs/2023-03-08
+outs:
+- md5: 8e04671f4f697d5eb4e3b3fcbc023d16
+  size: 20007
+  path: wvs_trust.csv

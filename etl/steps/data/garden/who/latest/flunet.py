@@ -40,15 +40,8 @@ def run(dest_dir: str) -> None:
     df = split_by_surveillance_type(df)
 
     df = calculate_percent_positive(df, surveillance_cols=["SENTINEL", "NONSENTINEL", "NOTDEFINED", "COMBINED"])
-    # df = create_zero_filled_strain_columns(df)
-
-    # We can't remove sparse data from the zero-filled columns because of how stacked bar charts behave
-    # filter_col = [col for col in df if col.endswith("zfilled")]
-    # set time-series with less than 10 (non-zero, non-NA) datapoints to NA - apply to a
-    # df = remove_sparse_timeseries(df=df, cols=df.columns.drop(["country", "date", filter_col]), min_data_points=10)
-
-    # Create a new table with the processed data.
-    # tb_garden = Table(df, like=tb_meadow)
+    df = create_united_kingdom_aggregate(df)
+    df = df.reset_index(drop=True)
     tb_garden = Table(df, short_name=paths.short_name)
     #
     # Save outputs.
@@ -183,6 +176,11 @@ def clean_and_format_data(df: pd.DataFrame) -> pd.DataFrame:
 
 def calculate_percent_positive(df: pd.DataFrame, surveillance_cols: list[str]) -> pd.DataFrame:
     """
+    Sometimes the 0s in the inf_negative* columns should in fact be zero. Here we convert rows where:
+    inf_negative* == 0 and the sum of the positive and negative tests does not equal the number of processed tests.
+
+    This should keep true 0s where the share of positive tests is actually 100%, typically when there is a small number of tests.
+
     Because the data is patchy in some places the WHO recommends three methods for calclating the share of influenza tests that are positive.
     In order of preference
     1. Postive tests divided by positive and negative tests summmed: inf_all/(inf_all + inf_neg)
@@ -193,6 +191,13 @@ def calculate_percent_positive(df: pd.DataFrame, surveillance_cols: list[str]) -
     Remove rows where the percent = 100 but all available denominators are 0.
     """
     for col in surveillance_cols:
+
+        df.loc[
+            (df["inf_negative" + col] == 0)
+            & (df["inf_negative" + col] + df["inf_all" + col] != df["spec_processed_nb" + col]),
+            "inf_negative" + col,
+        ] = np.nan
+
         df["pcnt_pos_1" + col] = (df["inf_all" + col] / (df["inf_all" + col] + df["inf_negative" + col])) * 100
         df["pcnt_pos_2" + col] = (df["inf_all" + col] / df["spec_processed_nb" + col]) * 100
         df["pcnt_pos_3" + col] = (df["inf_all" + col] / df["spec_received_nb" + col]) * 100
@@ -216,5 +221,41 @@ def calculate_percent_positive(df: pd.DataFrame, surveillance_cols: list[str]) -
             "pcnt_pos" + col,
         ] = np.nan
         # df = df.dropna(axis=1, how="all")
+
+    return df
+
+
+def create_united_kingdom_aggregate(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Summing the flunet data for England, Wales, Scotland and N.Ireland to create a United Kingdom entity
+    """
+    cols = df.columns.drop(["country"])
+    # Columns that will need to be recalculated after aggregating
+    rate_cols = [
+        "pcnt_posSENTINEL",
+        "pcnt_posNONSENTINEL",
+        "pcnt_posNOTDEFINED",
+        "pcnt_posCOMBINED",
+    ]
+    # columns that we can aggregate by summing
+    count_cols = cols.drop(rate_cols)
+    uk_df = df[df["country"].isin(["England", "Wales", "Scotland", "Northern Ireland"])]
+
+    # Check all nations are in the subset - in case of name changes
+    assert len(uk_df.country.drop_duplicates()) == 4
+
+    uk_agg = uk_df[count_cols].groupby(["date"]).sum(min_count=1, numeric_only=True).reset_index()
+
+    uk_agg["country"] = "United Kingdom"
+    uk_agg["hemisphere"] = "NH"
+
+    cols = uk_agg.columns.to_list()
+    cols = cols[-1:] + cols[:-1]
+    uk_agg = uk_agg[cols]
+    uk_agg = calculate_percent_positive(
+        df=uk_agg, surveillance_cols=["SENTINEL", "NONSENTINEL", "NOTDEFINED", "COMBINED"]
+    )
+
+    df = pd.concat([df, uk_agg])
 
     return df

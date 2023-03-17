@@ -1,0 +1,25 @@
+meta:
+  namespace: technology
+  short_name: microprocessor_trend
+  name: Karl Rupp, Microprocessor Trend Data (2022)
+  version: 2023-03-08
+  publication_year: 2022
+  publication_date: 2022-02-22
+  source_name: Karl Rupp, Microprocessor Trend Data (2022)
+  source_published_by: Karl Rupp, Microprocessor Trend Data (2022)
+  url: https://github.com/karlrupp/microprocessor-trend-data
+  source_data_url: https://raw.githubusercontent.com/karlrupp/microprocessor-trend-data/master/50yrs/transistors.dat
+  file_extension: dat
+  license_url: https://github.com/karlrupp/microprocessor-trend-data
+  license_name: Creative Commons Attribution 4.0 International Public License
+  date_accessed: 2023-03-08
+  is_public: true
+  description: |
+    This data comes from a repository of microprocessor trend data maintained by Karl Rupp on GitHub.
+
+    Where data for several microprocessors is given for a single year, we have shown the highest transistor count per chip of that year.
+wdir: ../../../data/snapshots/technology/2023-03-08
+outs:
+- md5: edda2909ace57a9dd887e42b51220936
+  size: 2571
+  path: microprocessor_trend.dat

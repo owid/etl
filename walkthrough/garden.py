@@ -184,9 +184,13 @@ def app(run_checks: bool, dummy_data: bool) -> None:
     poetry run etl data{private_suffix}://garden/{form.namespace}/{form.version}/{form.short_name} {"--private" if form.is_private else ""}
     ```
 
-5. Create a branch in [ETL](https://github.com/owid/etl), get it reviewed and merged.
+    Note that metadata is inherited from previous step (snapshot) and you don't have to repeat it.
 
-6. Once your changes are merged, your steps will be run automatically by our server and published to the OWID catalog. Once that is finished, it can be found by anyone using:
+5. (Optional) You can manually move steps from `dag/walkthrough.yml` to some other `dag/*.yml` if you feel like it belongs there. After you are happy with your code, run `make test` to find any issues.
+
+6. Create a pull request in [ETL](https://github.com/owid/etl), get it reviewed and merged.
+
+7. Once your changes are merged, your steps will be run automatically by our server and published to the OWID catalog. Then it can be loaded by anyone using:
 
     ```python
     from owid.catalog import find_one
@@ -195,7 +199,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
     print(tab.head())
     ```
 
-7. If you are an internal OWID member and want to push data to our Grapher DB, continue with `poetry run walkthrough grapher`. Alternatively, to create explorers dataset continue with `poetry run walkthrough explorers`.
+8. If you are an internal OWID member and want to push data to our Grapher DB, continue with `poetry run walkthrough grapher`. Alternatively, to create explorers dataset continue with `poetry run walkthrough explorers`.
 
 ## Generated files
 """

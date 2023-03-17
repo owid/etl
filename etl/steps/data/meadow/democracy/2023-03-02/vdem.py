@@ -41,10 +41,9 @@ def run(dest_dir: str) -> None:
     # Create a new table and ensure all columns are snake-case.
     tb = Table(df.reset_index(drop=True), short_name=paths.short_name, underscore=True)
 
-    # Default units and display for all columns
+    # Default units
     for col in tb.columns:
         tb[col].metadata.unit = ""
-        tb[col].metadata.display = {"includeInTable": True}
 
     #
     # Save outputs.

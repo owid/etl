@@ -2,10 +2,9 @@ meta:
   namespace: backport
   short_name: dataset_940_technology_diffusion__comin_and_hobijn__2004__and_others_values
   file_extension: feather
-  date_accessed: 2023-02-23 19:13:10.418136
+  date_accessed: 2023-03-13 13:43:07.256543
   name: Technology Diffusion - Comin and Hobijn (2004) and others
-  description: Describes the percentage of American households with access to, or
-    own, certain technologies.
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/940
   source_published_by: Our World in Data catalog backport
