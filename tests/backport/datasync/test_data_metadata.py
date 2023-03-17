@@ -162,5 +162,5 @@ def test_convert_strings_to_numeric():
     assert r == [-2, 1, 2.1, "UK", 9800000000]
     assert [type(x) for x in r] == [int, int, float, str, int]
 
-    with pytest.raises(TypeError):
+    with pytest.raises(AssertionError):
         r = _convert_strings_to_numeric([None, "UK"])  # type: ignore
