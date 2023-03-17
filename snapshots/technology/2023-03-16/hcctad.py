@@ -1,9 +1,8 @@
-"""Script to create a snapshot of dataset 'FluNet, World Health Organization (2023)'."""
+"""Script to create a snapshot of dataset 'Historical Cross Country Technology Adoption Dataset (Comin & Hobijn, 2004)'."""
 
 from pathlib import Path
 
 import click
-import pandas as pd
 
 from etl.snapshot import Snapshot
 
@@ -20,17 +19,10 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
 )
 def main(upload: bool) -> None:
     # Create a new snapshot.
-    snap = Snapshot(f"who/{SNAPSHOT_VERSION}/flunet.csv")
+    snap = Snapshot(f"technology/{SNAPSHOT_VERSION}/hcctad.txt")
 
     # Download data from source.
     snap.download_from_source()
-
-    # Try reading the csv, we sometimes get error invalid CSV with error
-    # if this fails, don't upload the file
-    pd.read_csv(snap.path)
-
-    # Snapshot should have at least 20mb, otherwise something went wrong
-    assert snap.path.stat().st_size > 20 * 2**20, "Snapshot file must have at least 20mb"
 
     # Add file to DVC and upload to S3.
     snap.dvc_add(upload=upload)
