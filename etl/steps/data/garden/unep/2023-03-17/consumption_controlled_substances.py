@@ -7,7 +7,7 @@ from owid.catalog import Dataset, Table
 from structlog import get_logger
 
 from etl.data_helpers import geo
-from etl.data_helpers.geo import list_countries_in_region
+from etl.data_helpers.geo import add_region_aggregates, list_countries_in_region
 from etl.helpers import PathFinder, create_dataset
 
 log = get_logger()
@@ -58,8 +58,8 @@ def df_to_table(df: pd.DataFrame) -> Table:
     log.info("consumption_controlled_substances: harmonizing countries")
     df = geo.harmonize_countries(df=df, countries_file=paths.country_mapping_path)
     # Add EU28
-    log.info("consumption_controlled_substances: add EU 28")
-    df = _add_eu28(df)
+    log.info("consumption_controlled_substances: add regions")
+    df = add_regions(df)
     # Estimate total consumption (summation over all chemicals)
     log.info("consumption_controlled_substances: estimating total")
     df_total = (
@@ -73,6 +73,23 @@ def df_to_table(df: pd.DataFrame) -> Table:
     # Create a new table with the processed data.
     tb_garden = Table(df, short_name=paths.short_name)
     return tb_garden
+
+
+def add_regions(df: pd.DataFrame) -> pd.DataFrame:
+    id_vars = ["country", "year"]
+    var_name = "chemical"
+    value_name = "consumption"
+    # Pivot
+    df_pivot = df.pivot(index=id_vars, columns=[var_name], values=value_name).reset_index()
+    # Add region data
+    regions = ["World", "Asia", "Africa", "North America", "South America", "Oceania"]
+    for region in regions:
+        df_pivot = add_region_aggregates(df_pivot, region=region)
+    # Unpivot back
+    df = df_pivot.melt(id_vars=id_vars, var_name=var_name, value_name=value_name).dropna(subset=[value_name])
+    # Add EU28 data
+    df = _add_eu28(df)
+    return df
 
 
 def _add_eu28(df: pd.DataFrame) -> pd.DataFrame:
