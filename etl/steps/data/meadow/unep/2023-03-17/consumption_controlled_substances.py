@@ -2,7 +2,6 @@
 
 import pandas as pd
 from owid.catalog import Table
-from owid.datautils.dataframes import multi_merge
 from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
@@ -14,16 +13,16 @@ log = get_logger()
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 CHEMICAL_NAMES = {
-    "bromochloromethane",
-    "carbon_tetrachloride",
-    "chlorofluorocarbons",
-    "halons",
-    "hydrobromofluorocarbons",
-    "hydrochlorofluorocarbons",
-    "hydrofluorocarbons",
-    "methyl_bromide",
-    "methyl_chloroform",
-    "other_fully_halogenated",
+    "bromochloromethane": "Bromochloromethane (BCM)",
+    "carbon_tetrachloride": "Carbon Tetrachloride (CTC)",
+    "chlorofluorocarbons": "Chlorofluorocarbons (CFCs)",
+    "halons": "Halons",
+    "hydrobromofluorocarbons": "Hydrobromofluorocarbons (HBFCs)",
+    "hydrochlorofluorocarbons": "Hydrochlorofluorocarbons (HCFCs)",
+    "hydrofluorocarbons": "Hydrofluorocarbons (HFCs)",
+    "methyl_bromide": "Methyl Bromide (MB)",
+    "methyl_chloroform": "Methyl Chloroform (TCA)",
+    "other_fully_halogenated": "Other Fully Halogenated CFCs",
 }
 
 
@@ -34,16 +33,16 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     dfs = []
-    for name in CHEMICAL_NAMES:
+    for name, name_pretty in CHEMICAL_NAMES.items():
         log.info(f"consumption_controlled_substances: loading snapshot `{name}`.")
         # Retrieve snapshot.
         snap: Snapshot = paths.load_dependency(f"consumption_controlled_substances.{name}.xlsx")
         # Load data from snapshot.
-        df = format_frame(pd.read_excel(snap.path, skiprows=1), name=name)
+        df = format_frame(pd.read_excel(snap.path, skiprows=1), name=name_pretty)
         # Append to list of dataframes
         dfs.append(df)
-    log.info("consumption_controlled_substances: merging dataframes.")
-    df = multi_merge(dfs, on=["Country", "year"], how="outer")
+    log.info("consumption_controlled_substances: concatenating dataframes.")
+    df = pd.concat(dfs, ignore_index=True)
     #
     # Process data.
     #
@@ -74,5 +73,9 @@ def format_frame(df: pd.DataFrame, name: str) -> pd.DataFrame:
     if "Baseline" in df.columns:
         df = df.drop(columns=["Baseline"])
     # Format df (unpivot)
-    df = df.melt(id_vars="Country", var_name="year", value_name=name).astype({"year": int})
+    df = (
+        df.melt(id_vars="Country", var_name="year", value_name="consumption")
+        .astype({"year": int})
+        .assign(chemical=name)
+    )
     return df
