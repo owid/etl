@@ -2,6 +2,7 @@
 
 import pandas as pd
 from owid.catalog import Table
+from owid.datautils.dataframes import multi_merge
 from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
@@ -41,7 +42,8 @@ def run(dest_dir: str) -> None:
         df = format_frame(pd.read_excel(snap.path, skiprows=1), name=name)
         # Append to list of dataframes
         dfs.append(df)
-    df = pd.concat(dfs, ignore_index=True)
+    log.info("consumption_controlled_substances: merging dataframes.")
+    df = multi_merge(dfs, on=["Country", "year"], how="outer")
     #
     # Process data.
     #
@@ -72,5 +74,5 @@ def format_frame(df: pd.DataFrame, name: str) -> pd.DataFrame:
     if "Baseline" in df.columns:
         df = df.drop(columns=["Baseline"])
     # Format df (unpivot)
-    df = df.melt(id_vars="Country", var_name="year", value_name=name)
+    df = df.melt(id_vars="Country", var_name="year", value_name=name).astype({"year": int})
     return df
