@@ -23,72 +23,10 @@ tables:
   consumption_controlled_substances:
     # (Inherited from meadow, remove if not different.)
     variables:
-      chlorofluorocarbons:
-        title: Consumption of controlled substance Chlorofluorocarbons (CFCs)
-        description:
-        short_unit: "ODP tonnes"
-        unit: "ODP tonnes"
-        display:
-          numDecimalPlaces: 1
-      bromochloromethane:
-        title: Consumption of controlled substance Bromochloromethane (BCM)
-        description:
-        short_unit: "ODP tonnes"
-        unit: "ODP tonnes"
-        display:
-          numDecimalPlaces: 1
-      carbon_tetrachloride:
-        title: Consumption of controlled substance Carbon Tetrachloride (CTC)
-        description:
-        short_unit: "ODP tonnes"
-        unit: "ODP tonnes"
-        display:
-          numDecimalPlaces: 1
-      halons:
-        title: Consumption of controlled substance Halons
-        description:
-        short_unit: "ODP tonnes"
-        unit: "ODP tonnes"
-        display:
-          numDecimalPlaces: 1
-      methyl_chloroform:
-        title: Consumption of controlled substance Methyl Chloroform (TCA)
-        description:
-        short_unit: "ODP tonnes"
-        unit: "ODP tonnes"
-        display:
-          numDecimalPlaces: 1
-      hydrofluorocarbons:
-        title: Consumption of controlled substance Hydrofluorocarbons (HFCs)
-        description:
-        short_unit: "ODP tonnes"
-        unit: "ODP tonnes"
-        display:
-          numDecimalPlaces: 1
-      other_fully_halogenated:
-        title: Consumption of controlled substance Other Fully Halogenated CFCs
-        description:
-        short_unit: "ODP tonnes"
-        unit: "ODP tonnes"
-        display:
-          numDecimalPlaces: 1
-      hydrobromofluorocarbons:
-        title: Consumption of controlled substance Hydrobromofluorocarbons (HBFCs)
-        description:
-        short_unit: "ODP tonnes"
-        unit: "ODP tonnes"
-        display:
-          numDecimalPlaces: 1
-      methyl_bromide:
-        title: Consumption of controlled substance Methyl Bromide (MB)
-        description:
-        short_unit: "ODP tonnes"
-        unit: "ODP tonnes"
-        display:
-          numDecimalPlaces: 1
-      hydrochlorofluorocarbons:
-        title: Consumption of controlled substance Hydrochlorofluorocarbons (HCFCs)
-        description:
+      consumption:
+        title: Consumption of controlled substance
+        description: |
+          Consumption of various controlled substances. These include Bromochloromethane (BCM), Carbon Tetrachloride (CTC), Chlorofluorocarbons (CFCs), Hydrobromofluorocarbons (HBFCs), Hydrochlorofluorocarbons (HCFCs), Hydrofluorocarbons (HFCs), Methyl Bromide (MB), Methyl Chloroform (TCA) and Other Fully Halogenated CFCs.
         short_unit: "ODP tonnes"
         unit: "ODP tonnes"
         display:
