@@ -1,5 +1,5 @@
 dataset:
-  title: World Happiness Report
+  title: World Happiness Report (2023)
   description: |-
     The World Happiness Report reflects a worldwide demand for more attention to happiness and well-being as criteria for government policy. It reviews the state of happiness in the world today and shows how the science of happiness explains personal and national variations in happiness.
 
@@ -12,12 +12,8 @@ dataset:
   - date_accessed: 2023-03-20
 tables:
   happiness:
-    title: World Happiness Report
+    title: World Happiness Report (2023)
     variables:
-      country:
-        title: Country name
-        short_unit: ''
-        unit: ''
       ladder_score:
         title: Cantril ladder score
         description: Average of survey responses to the 'Cantril Ladder' question in the Gallup World Poll. The survey question asks respondents to think of a ladder, with the best possible life for them being a 10, and the worst possible life being a 0.
