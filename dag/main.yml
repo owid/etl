@@ -348,8 +348,6 @@ steps:
 # Happiness report
   data://meadow/happiness/2023-03-20/happiness:
   - snapshot://happiness/2023-03-20/happiness.xls
-  data://garden/happines/2023-03-20/happiness:
-  - data://meadow/happines/2023-03-20/happiness
   data://garden/happiness/2023-03-20/happiness:
   - data://meadow/happiness/2023-03-20/happiness
   - backport://backport/owid/latest/dataset_235_world_happiness_report__2022
