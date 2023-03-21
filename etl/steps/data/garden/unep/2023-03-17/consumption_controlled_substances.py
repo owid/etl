@@ -60,16 +60,24 @@ def df_to_table(df: pd.DataFrame) -> Table:
     # Add EU28
     log.info("consumption_controlled_substances: add regions")
     df = add_regions(df)
-    # Estimate total consumption (summation over all chemicals)
+    # Estimate total consumption of ozone-depleting substances (summation over all chemicals except HFCs)
     log.info("consumption_controlled_substances: estimating total")
+    chemicals_ignore = [
+        "Hydrofluorocarbons (HFCs)",
+    ]
+    df_depleting = df[~df["chemical"].isin(chemicals_ignore)]
     df_total = (
-        df.groupby(["country", "year"], observed=True, as_index=False)[["consumption"]].sum().assign(chemical="All")
+        df_depleting.groupby(["country", "year"], observed=True, as_index=False)[["consumption"]]
+        .sum()
+        .assign(chemical="All (Ozone-depleting)")
     )
     df = pd.concat([df, df_total], ignore_index=True).sort_values(["country", "year", "chemical"])
+    # Add zero-filled column
+    df = add_consumption_zerofilled(df)
     # Set indices
     df = df.set_index(["country", "year", "chemical"])
     # Drop NaNs and set dtype
-    df = df.dropna(subset=["consumption"]).astype({"consumption": "float32"})
+    df = df.astype({"consumption": "float32", "consumption_zf": "float32"})
     # Create a new table with the processed data.
     tb_garden = Table(df, short_name=paths.short_name)
     return tb_garden
@@ -79,26 +87,31 @@ def add_regions(df: pd.DataFrame) -> pd.DataFrame:
     id_vars = ["country", "year"]
     var_name = "chemical"
     value_name = "consumption"
+    # Estimate data for the World
+    df_world = df.groupby(["year", "chemical"], as_index=False)[[value_name]].sum().assign(country="World")
+    df = pd.concat([df, df_world], ignore_index=True)
     # Pivot
     df_pivot = df.pivot(index=id_vars, columns=[var_name], values=value_name).reset_index()
-    # Add region data
-    regions = ["World", "Asia", "Africa", "North America", "South America", "Oceania"]
+    # Add continent data
+    regions = ["Asia", "Africa", "North America", "South America", "Oceania"]
     for region in regions:
         df_pivot = add_region_aggregates(df_pivot, region=region)
     # Unpivot back
     df = df_pivot.melt(id_vars=id_vars, var_name=var_name, value_name=value_name).dropna(subset=[value_name])
     # Add EU28 data
-    df = _add_eu28(df)
+    df = add_eu28(df)
     return df
 
 
-def _add_eu28(df: pd.DataFrame) -> pd.DataFrame:
+def add_eu28(df: pd.DataFrame) -> pd.DataFrame:
     """Add EU28 data to the dataframe.
 
     This dataset provides data for European Union as a changing entity (i.e. member states vary over time). This
     function estimates EU 28, as a fixed entity, by summing up the data for all EU 28 members over time.
 
     EU 27 cannot be estimated because there is no UK data in the dataset prior to Brexit (2021).
+
+    It removes the data for individual EU 28 member states.
     """
     # Get list of all EU28 members
     eu_members = list_countries_in_region("European Union (27)") + ["United Kingdom"]
@@ -120,3 +133,13 @@ def _check_country_mapping():
         "There are multiple countries with the same standardised name. Join step in Meadow might not be working"
         " properly."
     )
+
+
+def add_consumption_zerofilled(df: pd.DataFrame) -> pd.DataFrame:
+    id_vars = ["country", "year"]
+    var_name = "chemical"
+    value_name = "consumption"
+    df = df.pivot(index=id_vars, columns=[var_name], values=value_name).reset_index()
+    df = df.melt(id_vars=id_vars, var_name=var_name, value_name=value_name)
+    df["consumption_zf"] = df["consumption"].fillna(0)
+    return df
