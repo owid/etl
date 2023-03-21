@@ -102,7 +102,7 @@ def add_regions(df: pd.DataFrame) -> pd.DataFrame:
     # Add EU28 data
     df = add_eu28(df)
     # Add Europe data
-    # df = add_europe(df)
+    df = add_europe(df)
     return df
 
 
