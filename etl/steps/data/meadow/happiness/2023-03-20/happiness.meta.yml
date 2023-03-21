@@ -1,0 +1,41 @@
+dataset:
+  title: World Happiness Report (2023)
+  description: |-
+    The World Happiness Report reflects a worldwide demand for more attention to happiness and well-being as criteria for government policy. It reviews the state of happiness in the world today and shows how the science of happiness explains personal and national variations in happiness.
+
+    Life evaluations from the Gallup World Poll provide the basis for the annual happiness rankings. They are based on answers to the main life evaluation question. The Cantril ladder asks respondents to think of a ladder, with the best possible life for them being a 10 and the worst possible life being a 0. They are then asked to rate their own current lives on that 0 to 10 scale. The rankings are from nationally representative samples over three years.
+
+    2023 report data available at: https://happiness-report.s3.amazonaws.com/2023/DataForFigure2.1WHR2023.xls
+
+    2022 report data available at: https://happiness-report.s3.amazonaws.com/2022/Appendix_2_Data_for_Figure_2.1.xls
+
+    2021 report  data available at: https://happiness-report.s3.amazonaws.com/2021/DataForFigure2.1WHR2021C2.xls
+
+    Previous data available at: https://happiness-report.s3.amazonaws.com/2021/DataPanelWHR2021C2.xls
+  sources:
+  - name: World Happiness Report (2023)
+  - published_by: 'Helliwell, J. F., Layard, R., Sachs, J. D., De Neve, J.-E., Aknin, L. B., & Wang, S. (Eds.). (2023). World Happiness Report 2023. New York: Sustainable Development Solutions Network.'
+  - publisher_source: Data comes from the Gallup World Poll and the Gallup/Meta State of Social Connections study.
+  - url: https://worldhappiness.report
+  - date_accessed: 2023-03-20
+tables:
+  happiness:
+    title: World Happiness Report (2023)
+    variables:
+      ladder_score:
+        title: Cantril ladder score
+        description: Average of survey responses to the 'Cantril Ladder' question in the Gallup World Poll. The survey question asks respondents to think of a ladder, with the best possible life for them being a 10, and the worst possible life being a 0.
+        short_unit: ''
+        unit: ''
+      standard_error_of_ladder_score:
+        title: Standard error of Cantril ladder score
+        short_unit: ''
+        unit: ''
+      upperwhisker:
+        title: 97.5% confidence interval
+        short_unit: ''
+        unit: ''
+      lowerwhisker:
+        title: 2.5% confidence interval
+        short_unit: ''
+        unit: ''
