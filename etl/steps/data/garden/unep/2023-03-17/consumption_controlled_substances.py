@@ -1,6 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
 import json
+from typing import List
 
 import pandas as pd
 from owid.catalog import Dataset, Table
@@ -87,7 +88,7 @@ def add_regions(df: pd.DataFrame) -> pd.DataFrame:
     id_vars = ["country", "year"]
     var_name = "chemical"
     value_name = "consumption"
-    # Estimate data for the World
+    # Add data for the World
     df_world = df.groupby(["year", "chemical"], as_index=False)[[value_name]].sum().assign(country="World")
     df = pd.concat([df, df_world], ignore_index=True)
     # Pivot
@@ -100,6 +101,8 @@ def add_regions(df: pd.DataFrame) -> pd.DataFrame:
     df = df_pivot.melt(id_vars=id_vars, var_name=var_name, value_name=value_name).dropna(subset=[value_name])
     # Add EU28 data
     df = add_eu28(df)
+    # Add Europe data
+    # df = add_europe(df)
     return df
 
 
@@ -114,15 +117,43 @@ def add_eu28(df: pd.DataFrame) -> pd.DataFrame:
     It removes the data for individual EU 28 member states.
     """
     # Get list of all EU28 members
-    eu_members = list_countries_in_region("European Union (27)") + ["United Kingdom"]
-    # Get subset of data with EU28 data (including EU)
-    msk_eu28 = df["country"].isin(eu_members + ["European Union"])
-    df_eu28 = df[msk_eu28].copy()
-    # Build df with EU28 data
-    df_eu28["country"] = "European Union (28)"
-    df_eu28 = df_eu28.groupby(["country", "year", "chemical"], as_index=False)[["consumption"]].sum()
-    # Merge back
-    df = pd.concat([df[~msk_eu28], df_eu28], ignore_index=True)
+    eu28_members = list_countries_in_region("European Union (27)") + ["United Kingdom", "European Union"]
+    # Add EU28 data
+    df = _add_region(df, eu28_members, "European Union (28)")
+    return df
+
+
+def add_europe(df: pd.DataFrame) -> pd.DataFrame:
+    assert (
+        "European Union (28)" in df.country.unique()
+    ), "Check data! It looks like `European Union (28)` is not present."
+    # EU states
+    europe_members = list_countries_in_region("Europe") + ["European Union (28)"]
+    print(sorted(set(df.country).intersection(europe_members)))
+    print(len(set(df.country).intersection(europe_members)))
+    assert (
+        len(set(df.country).intersection(europe_members)) == 18
+    ), "Check data! It might be that individual EU 28 member states are still present."
+    # Add EU data
+    df = _add_region(df, europe_members, "European Union", remove_members=False)
+    return df
+
+
+def _add_region(df: pd.DataFrame, members: List[str], region: str, remove_members: bool = True) -> pd.DataFrame:
+    """Aggregate data for a region.
+
+    This function is useful when adding regions that are not currently considered by etl.data_helpers.geo.add_region_aggregates.
+    For instance "Europe Union (28)". Or when a region is built differently, e.g. Europe = EU 28 + ...
+    """
+    # Mask
+    msk_region = df["country"].isin(members)
+    df_region = df[msk_region].copy()
+    df_region["country"] = region
+    df_region = df_region.groupby(["country", "year", "chemical"], as_index=False)[["consumption"]].sum()
+    if remove_members:
+        df = pd.concat([df[~msk_region], df_region], ignore_index=True)
+    else:
+        df = pd.concat([df, df_region], ignore_index=True)
     return df
 
 
