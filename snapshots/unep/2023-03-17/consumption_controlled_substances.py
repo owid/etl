@@ -12,6 +12,7 @@ The data for this Snapshot needs to be downloaded and imported from a local file
 """
 
 from pathlib import Path
+from typing import Union
 
 import click
 
@@ -41,7 +42,7 @@ CHEMICAL_NAMES = {
     help="Upload dataset to Snapshot",
 )
 @click.option("--path-to-folder", prompt=True, type=str, help="Path to local folder containing all files.")
-def main(path_to_folder: Path | str, upload: bool) -> None:
+def main(path_to_folder: Union[Path, str], upload: bool) -> None:
     # Check correctness of files in local folder
     # There should be a file for each chemical name listed in `CHEMICAL_NAMES`.
     path_to_folder = Path(path_to_folder)
