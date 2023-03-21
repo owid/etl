@@ -12,7 +12,11 @@ all_sources:
 # (Inherited from meadow, remove if not different.)
 dataset:
   title: Consumption of controlled substances (UNEP, 2023)
-  description: TODO
+  description: |
+    Data on the consumption of controlled substances in ODP tonnes or in CO2-eq tonnes
+
+    Negative values for a given year imply that quantities destroyed or quantities exported for the year exceeded the sum of production and imports, implying that the destroyed or exported quantities came from stockpiles.
+
   licenses:
     - name: # Example: Testing License Name
       url: # Example: https://url_of_testing_source.com/license
