@@ -42,6 +42,14 @@ def convert_and_rename(df: pd.DataFrame, vars: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
+def fix_us_freight(df: pd.DataFrame) -> pd.DataFrame:
+    filter = (
+        (df.variable == "Railway freight traffic (metric ton-km)") & (df.country == "United States") & (df.year == 1959)
+    )
+    df.loc[filter, "value"] = df.loc[filter, "value"] / 10
+    return df
+
+
 def aggregate_variables(df: pd.DataFrame) -> pd.DataFrame:
     # Values are summed up across variable-country-year, to sum together the different types of
     # steel production and textile spindles.
@@ -80,7 +88,13 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     vars = load_variable_files()
-    df = df.pipe(filter_countries).pipe(convert_and_rename, vars).pipe(aggregate_variables).pipe(reshape_to_wide)
+    df = (
+        df.pipe(filter_countries)
+        .pipe(convert_and_rename, vars)
+        .pipe(aggregate_variables)
+        .pipe(fix_us_freight)
+        .pipe(reshape_to_wide)
+    )
 
     # Create a new table with the processed data.
     tb_garden = Table(df, short_name="hcctad")
