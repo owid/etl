@@ -49,8 +49,7 @@ def fix_us_freight(df: pd.DataFrame) -> pd.DataFrame:
     filter = (
         (df.variable == "Railway freight traffic (metric ton-km)") & (df.country == "United States") & (df.year == 1959)
     )
-    df.loc[filter, "value"] = df.loc[filter, "value"] / 10
-    return df
+    return df[-filter]
 
 
 def aggregate_variables(df: pd.DataFrame) -> pd.DataFrame:
