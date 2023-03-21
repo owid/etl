@@ -5,7 +5,7 @@ meta:
   version: 2023-03-17
   publication_year: 2023
   publication_date: 2023-03-16
-  source_name: UNEP (2023)
+  source_name: UN Environment Programme (2023)
   source_published_by: UN Environment Programme
   url: https://ozone.unep.org/countries/data-table
   source_data_url:
@@ -18,6 +18,6 @@ meta:
     Period: 1986-2022
 wdir: ../../../data/snapshots/unep/2023-03-17
 outs:
-- md5: 05aa062cc4a2daff0aac73b751fbb29b
-  size: 20314
-  path: consumption_controlled_substances.bromochloromethane.xlsx
+  - md5: 05aa062cc4a2daff0aac73b751fbb29b
+    size: 20314
+    path: consumption_controlled_substances.bromochloromethane.xlsx
