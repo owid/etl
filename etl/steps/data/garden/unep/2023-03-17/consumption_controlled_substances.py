@@ -129,13 +129,11 @@ def add_europe(df: pd.DataFrame) -> pd.DataFrame:
     ), "Check data! It looks like `European Union (28)` is not present."
     # EU states
     europe_members = list_countries_in_region("Europe") + ["European Union (28)"]
-    print(sorted(set(df.country).intersection(europe_members)))
-    print(len(set(df.country).intersection(europe_members)))
     assert (
         len(set(df.country).intersection(europe_members)) == 18
     ), "Check data! It might be that individual EU 28 member states are still present."
     # Add EU data
-    df = _add_region(df, europe_members, "European Union", remove_members=False)
+    df = _add_region(df, europe_members, "Europe", remove_members=False)
     return df
 
 
