@@ -2,6 +2,7 @@
 
 Minor cleaning of GHO dataset (only age-standardized suicide rates metrics)"""
 
+import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
 from structlog import get_logger
@@ -48,15 +49,17 @@ def run(dest_dir: str) -> None:
     #
     log.info("gho_suicides.harmonize_countries")
     df = process(df)
+    df_ratio = process_ratio(df)
 
     # Create a new table with the processed data.
     tb_garden = Table(df, short_name=ds_meadow.metadata.short_name)
+    tb_garden_ratio = Table(df_ratio, short_name=f"{ds_meadow.metadata.short_name}_ratio")
 
     #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb_garden], default_metadata=ds_meadow.metadata)
+    ds_garden = create_dataset(dest_dir, tables=[tb_garden, tb_garden_ratio], default_metadata=ds_meadow.metadata)
     ds_garden.update_metadata(paths.metadata_path)
     # Save changes in the new garden dataset.
     ds_garden.save()
@@ -85,3 +88,22 @@ def process(df: pd.DataFrame) -> pd.DataFrame:
     df = df.sort_values(columns_idx).set_index(columns_idx)
 
     return df
+
+
+def process_ratio(df: pd.DataFrame) -> pd.DataFrame:
+    df = df.reset_index().copy()
+    # Get only male and female data separately
+    df_male = df[df["sex"] == "male"].drop(columns=["sex"])
+    df_female = df[df["sex"] == "female"].drop(columns=["sex"])
+    # Merge data by year and country
+    df_ratio = df_male.merge(df_female, on=["country", "year"], suffixes=("_m", "_f"))
+    # Estimate ratio
+    df_ratio["suicide_rate_male_to_female"] = df_ratio["suicide_rate_m"] / df_ratio["suicide_rate_f"]
+    # Keep only relevant columns
+    df_ratio = df_ratio[["country", "year", "suicide_rate_male_to_female"]]
+    # Remove NaNs and infinities
+    df_ratio = df_ratio.dropna(subset=["suicide_rate_male_to_female"])
+    df_ratio = df_ratio[~df_ratio["suicide_rate_male_to_female"].isin([np.inf, -np.inf])]
+    # Set index
+    df_ratio = df_ratio.set_index(["country", "year"])
+    return df_ratio
