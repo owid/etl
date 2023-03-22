@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5917_global_health_observatory__age_standardized_suicide_rates__who__2022_config
   file_extension: json
-  date_accessed: 2023-03-22 06:46:13.845137
+  date_accessed: 2023-03-22 06:50:58.573034
   name: Grapher metadata for dataset_5917_global_health_observatory__age_standardized_suicide_rates__who__2022
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: f816a32c2a940bc8e9d35b544c8dcdff
+- md5: 2bb2f8208fb36f9b2c570b26b0bfaba2
   size: 7957
   path: dataset_5917_global_health_observatory__age_standardized_suicide_rates__who__2022_config.json
