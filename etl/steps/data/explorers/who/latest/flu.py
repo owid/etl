@@ -285,7 +285,7 @@ def create_global_aggregate(df: pd.DataFrame, count_cols: list[str], min_countri
 
 def calculate_percent_positive_aggregate(df: pd.DataFrame, surveillance_cols: list[str]) -> pd.DataFrame:
     """
-    Sometimes the 0s in the inf_negative* columns should in fact be zero. Here we convert rows where:
+    Sometimes the 0s in the inf_negative* columns should in fact be zero. Here we convert rows to NA where:
     inf_negative* == 0 and the sum of the positive and negative tests does not equal the number of processed tests.
 
     This should keep true 0s where the share of positive tests is actually 100%, typically when there is a small number of tests.
