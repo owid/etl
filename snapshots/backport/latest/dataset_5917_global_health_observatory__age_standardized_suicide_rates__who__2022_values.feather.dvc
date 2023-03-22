@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5917_global_health_observatory__age_standardized_suicide_rates__who__2022_values
   file_extension: feather
-  date_accessed: 2023-03-22 06:20:23.124349
+  date_accessed: 2023-03-22 06:25:25.210822
   name: 'Global Health Observatory: Age-standardized suicide rates (WHO, 2022)'
   description: ''
   source_name: Our World in Data catalog backport
