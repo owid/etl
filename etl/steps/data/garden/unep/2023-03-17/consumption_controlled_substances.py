@@ -77,6 +77,8 @@ def df_to_table(df: pd.DataFrame) -> Table:
     df = add_consumption_zerofilled(df)
     # Add consumption relative to 1986
     df = add_consumption_rel_1986(df)
+    # Remove data for regions in last year
+    df = remove_last_year_for_regions(df)
     # Set indices
     df = df.set_index(["country", "year", "chemical"])
     # Drop NaNs and set dtype
