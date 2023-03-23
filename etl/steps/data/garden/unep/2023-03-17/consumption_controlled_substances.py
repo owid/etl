@@ -177,7 +177,13 @@ def add_consumption_zerofilled(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def add_consumption_rel_1986(df: pd.DataFrame) -> pd.DataFrame:
-    df_1986 = df[df["year"] == 1986]
+    """Add column with ratio of consumption to 1986 consumption."""
+    # Initial columns and new column names
+    columns = list(df.columns)
+    new_col = "consumption_rel_1986"
+    # Get consumption in 1986, where it is not zero
+    df_1986 = df[(df["year"] == 1986) & (df["consumption"] > 0)]
+    # Merge and estimate ratio
     df = df.merge(df_1986, on=["country", "chemical"], suffixes=("", "_1986"), how="left")
-    df["consumption_rel_1986"] = (100 * df["consumption"] / df["consumption_1986"]).round(2)
-    return df
+    df[new_col] = (100 * df["consumption"] / df["consumption_1986"]).round(2)
+    return df[columns + [new_col]]
