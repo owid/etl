@@ -187,3 +187,23 @@ def add_consumption_rel_1986(df: pd.DataFrame) -> pd.DataFrame:
     df = df.merge(df_1986, on=["country", "chemical"], suffixes=("", "_1986"), how="left")
     df[new_col] = (100 * df["consumption"] / df["consumption_1986"]).round(2)
     return df[columns + [new_col]]
+
+
+def remove_last_year_for_regions(df: pd.DataFrame) -> pd.DataFrame:
+    """Remove datapoint for latest available year in regions.
+
+    Data for latest year for regions is usually an underestimate, because just a subset of countries have reported data."""
+    REGIONS = [
+        "Africa",
+        "Asia",
+        "Europe",
+        "European Union (27)",
+        "European Union (28)",
+        "North America",
+        "Oceania",
+        "South America",
+        "World",
+    ]
+    last_year = df["year"].max()
+    df = df[~((df["year"] == last_year) & (df["country"].isin(REGIONS)))]
+    return df
