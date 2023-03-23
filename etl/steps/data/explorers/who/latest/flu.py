@@ -13,6 +13,8 @@ Further steps we take:
 * Create monthly aggregates where we sum the count variables and average the rate variables
 """
 
+from datetime import datetime
+
 import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
@@ -25,6 +27,7 @@ paths = PathFinder(__file__)
 
 # Remove data for countries which have fewer than this value
 MIN_DATA_POINTS = 20
+MIN_DATA_POINTS_PER_YEAR = 10
 
 
 def run(dest_dir: str) -> None:
@@ -48,7 +51,10 @@ def run(dest_dir: str) -> None:
 
     tb_flu = create_full_time_series(tb_flu)
     tb_flu = create_zero_filled_strain_columns(tb_flu)
-    tb_flu = remove_sparse_timeseries(df=tb_flu, min_data_points=MIN_DATA_POINTS)
+
+    tb_flu = remove_sparse_years(tb_flu, min_datapoints_per_year=MIN_DATA_POINTS_PER_YEAR)
+
+    # tb_flu = remove_sparse_timeseries(df=tb_flu, min_data_points=MIN_DATA_POINTS)
     tb_flu = create_regional_aggregates(df=tb_flu)
     assert tb_flu[["country", "date"]].duplicated().sum() == 0
     # Create monthly aggregates - sum variables that are counts and recalculate rates based on these monthly totals
@@ -165,13 +171,34 @@ def remove_sparse_timeseries(df: pd.DataFrame, min_data_points: int) -> pd.DataF
         for fluid_col in fluid_cols:
             # Removing rows from fluid columns where there are fewer than {min_data_points} for a country
             df[fluid_col] = df[fluid_col].astype(np.float32)
-            if df.loc[(df["country"] == country), fluid_col].fillna(0).astype(bool).sum() <= min_data_points:
+            if df.loc[(df["country"] == country), fluid_col].sum() <= min_data_points:
                 df.loc[(df["country"] == country), fluid_col] = np.NaN
         for flunet_col in not_z_filled_flunet_cols:
             # Removing rows from columns to be used in line charts where there are no non-NA or 0 values for a country (where it would show a flat 0 or NA line)
             df[flunet_col] = df[flunet_col].astype(np.float32)
             if df.loc[(df["country"] == country), flunet_col].fillna(0).astype(bool).sum() == 0:
                 df.loc[(df["country"] == country), flunet_col] = np.NaN
+
+    return df
+
+
+def remove_sparse_years(df: pd.DataFrame, min_datapoints_per_year: int) -> pd.DataFrame:
+    """
+    If a year has fewer than {min_data_points_per_year} then we should remove all the data for that year -> set it to NA
+
+    """
+    df["year"] = pd.DatetimeIndex(df["date"]).year
+    constant_cols = ["country", "date", "hemisphere", "year"]
+    cols = df.columns.drop(constant_cols)
+    for col in cols:
+        df_col = df[["country", "year"] + [col]].copy(deep=True)
+        df_col[col] = pd.to_numeric(df_col[col])
+        df_col_bool = (
+            df_col.groupby(["country", "year"]).agg(weeks_gt_zero=(col, lambda x: x.gt(0).sum()))
+        ).reset_index()
+        df = pd.merge(df, df_col_bool, on=["country", "year"])
+        df[col][(df["weeks_gt_zero"] < min_datapoints_per_year) & (df["year"] < datetime.now().year)] = np.NaN  # type: ignore
+        df = df.drop(columns=["weeks_gt_zero"])
 
     return df
 
