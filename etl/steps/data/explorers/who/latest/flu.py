@@ -13,6 +13,8 @@ Further steps we take:
 * Create monthly aggregates where we sum the count variables and average the rate variables
 """
 
+from datetime import datetime
+
 import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
@@ -25,6 +27,7 @@ paths = PathFinder(__file__)
 
 # Remove data for countries which have fewer than this value
 MIN_DATA_POINTS = 20
+MIN_DATA_POINTS_PER_YEAR = 10
 
 
 def run(dest_dir: str) -> None:
@@ -48,7 +51,10 @@ def run(dest_dir: str) -> None:
 
     tb_flu = create_full_time_series(tb_flu)
     tb_flu = create_zero_filled_strain_columns(tb_flu)
-    tb_flu = remove_sparse_timeseries(df=tb_flu, min_data_points=MIN_DATA_POINTS)
+
+    tb_flu = remove_sparse_years(tb_flu, min_datapoints_per_year=MIN_DATA_POINTS_PER_YEAR)
+
+    # tb_flu = remove_sparse_timeseries(df=tb_flu, min_data_points=MIN_DATA_POINTS)
     tb_flu = create_regional_aggregates(df=tb_flu)
     assert tb_flu[["country", "date"]].duplicated().sum() == 0
     # Create monthly aggregates - sum variables that are counts and recalculate rates based on these monthly totals
@@ -70,42 +76,39 @@ def create_zero_filled_strain_columns(df: pd.DataFrame) -> pd.DataFrame:
     """
     strain_columns = [
         "ah1n12009combined",
-        "ah1combined",
-        "ah3combined",
-        "ah5combined",
-        "ah7n9combined",
-        "a_no_subtypecombined",
-        "byamcombined",
-        "bnotdeterminedcombined",
-        "bviccombined",
-        "inf_acombined",
-        "inf_bcombined",
         "ah1n12009sentinel",
-        "ah1sentinel",
-        "ah3sentinel",
-        "ah5sentinel",
-        "ah7n9sentinel",
-        "byamsentinel",
-        "bnotdeterminedsentinel",
-        "bvicsentinel",
-        "inf_asentinel",
-        "inf_bsentinel",
         "ah1n12009nonsentinel",
         "ah1n12009notdefined",
-        "ah1notdefined",
+        "ah1combined",
+        "ah1sentinel",
         "ah1nonsentinel",
+        "ah1notdefined",
+        "ah3combined",
+        "ah3sentinel",
         "ah3nonsentinel",
         "ah3notdefined",
+        "ah5combined",
+        "ah5sentinel",
         "ah5nonsentinel",
         "ah5notdefined",
+        "ah7n9combined",
+        "ah7n9sentinel",
         "ah7n9nonsentinel",
         "ah7n9notdefined",
-        "a_no_subtypenotdefined",
+        "a_no_subtypecombined",
         "a_no_subtypesentinel",
+        "a_no_subtypenonsentinel",
+        "a_no_subtypenotdefined",
+        "byamcombined",
+        "byamsentinel",
         "byamnonsentinel",
         "byamnotdefined",
+        "bnotdeterminedcombined",
+        "bnotdeterminedsentinel",
         "bnotdeterminednonsentinel",
         "bnotdeterminednotdefined",
+        "bviccombined",
+        "bvicsentinel",
         "bvicnonsentinel",
         "bvicnotdefined",
     ]
@@ -168,13 +171,34 @@ def remove_sparse_timeseries(df: pd.DataFrame, min_data_points: int) -> pd.DataF
         for fluid_col in fluid_cols:
             # Removing rows from fluid columns where there are fewer than {min_data_points} for a country
             df[fluid_col] = df[fluid_col].astype(np.float32)
-            if df.loc[(df["country"] == country), fluid_col].fillna(0).astype(bool).sum() <= min_data_points:
+            if df.loc[(df["country"] == country), fluid_col].sum() <= min_data_points:
                 df.loc[(df["country"] == country), fluid_col] = np.NaN
         for flunet_col in not_z_filled_flunet_cols:
             # Removing rows from columns to be used in line charts where there are no non-NA or 0 values for a country (where it would show a flat 0 or NA line)
             df[flunet_col] = df[flunet_col].astype(np.float32)
             if df.loc[(df["country"] == country), flunet_col].fillna(0).astype(bool).sum() == 0:
                 df.loc[(df["country"] == country), flunet_col] = np.NaN
+
+    return df
+
+
+def remove_sparse_years(df: pd.DataFrame, min_datapoints_per_year: int) -> pd.DataFrame:
+    """
+    If a year has fewer than {min_data_points_per_year} then we should remove all the data for that year -> set it to NA
+
+    """
+    df["year"] = pd.DatetimeIndex(df["date"]).year
+    constant_cols = ["country", "date", "hemisphere", "year"]
+    cols = df.columns.drop(constant_cols)
+    for col in cols:
+        df_col = df[["country", "year"] + [col]].copy(deep=True)
+        df_col[col] = pd.to_numeric(df_col[col])
+        df_col_bool = (
+            df_col.groupby(["country", "year"]).agg(weeks_gt_zero=(col, lambda x: x.gt(0).sum()))
+        ).reset_index()
+        df = pd.merge(df, df_col_bool, on=["country", "year"])
+        df[col][(df["weeks_gt_zero"] < min_datapoints_per_year) & (df["year"] < datetime.now().year)] = np.NaN  # type: ignore
+        df = df.drop(columns=["weeks_gt_zero"])
 
     return df
 
@@ -285,7 +309,7 @@ def create_global_aggregate(df: pd.DataFrame, count_cols: list[str], min_countri
 
 def calculate_percent_positive_aggregate(df: pd.DataFrame, surveillance_cols: list[str]) -> pd.DataFrame:
     """
-    Sometimes the 0s in the inf_negative* columns should in fact be zero. Here we convert rows where:
+    Sometimes the 0s in the inf_negative* columns should in fact be zero. Here we convert rows to NA where:
     inf_negative* == 0 and the sum of the positive and negative tests does not equal the number of processed tests.
 
     This should keep true 0s where the share of positive tests is actually 100%, typically when there is a small number of tests.
