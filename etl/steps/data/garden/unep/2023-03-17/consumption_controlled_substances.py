@@ -75,6 +75,8 @@ def df_to_table(df: pd.DataFrame) -> Table:
     df = pd.concat([df, df_total], ignore_index=True).sort_values(["country", "year", "chemical"])
     # Add zero-filled column
     df = add_consumption_zerofilled(df)
+    # Add consumption relative to 1986
+    df = add_consumption_rel_1986(df)
     # Set indices
     df = df.set_index(["country", "year", "chemical"])
     # Drop NaNs and set dtype
@@ -171,4 +173,11 @@ def add_consumption_zerofilled(df: pd.DataFrame) -> pd.DataFrame:
     df = df.pivot(index=id_vars, columns=[var_name], values=value_name).reset_index()
     df = df.melt(id_vars=id_vars, var_name=var_name, value_name=value_name)
     df["consumption_zf"] = df["consumption"].fillna(0)
+    return df
+
+
+def add_consumption_rel_1986(df: pd.DataFrame) -> pd.DataFrame:
+    df_1986 = df[df["year"] == 1986]
+    df = df.merge(df_1986, on=["country", "chemical"], suffixes=("", "_1986"), how="left")
+    df["consumption_rel_1986"] = (100 * df["consumption"] / df["consumption_1986"]).round(2)
     return df
