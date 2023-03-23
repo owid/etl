@@ -75,6 +75,8 @@ def df_to_table(df: pd.DataFrame) -> Table:
     df = pd.concat([df, df_total], ignore_index=True).sort_values(["country", "year", "chemical"])
     # Add zero-filled column
     df = add_consumption_zerofilled(df)
+    # Add consumption relative to 1986
+    df = add_consumption_rel_1986(df)
     # Set indices
     df = df.set_index(["country", "year", "chemical"])
     # Drop NaNs and set dtype
@@ -171,4 +173,37 @@ def add_consumption_zerofilled(df: pd.DataFrame) -> pd.DataFrame:
     df = df.pivot(index=id_vars, columns=[var_name], values=value_name).reset_index()
     df = df.melt(id_vars=id_vars, var_name=var_name, value_name=value_name)
     df["consumption_zf"] = df["consumption"].fillna(0)
+    return df
+
+
+def add_consumption_rel_1986(df: pd.DataFrame) -> pd.DataFrame:
+    """Add column with ratio of consumption to 1986 consumption."""
+    # Initial columns and new column names
+    columns = list(df.columns)
+    new_col = "consumption_rel_1986"
+    # Get consumption in 1986, where it is not zero
+    df_1986 = df[(df["year"] == 1986) & (df["consumption"] > 0)]
+    # Merge and estimate ratio
+    df = df.merge(df_1986, on=["country", "chemical"], suffixes=("", "_1986"), how="left")
+    df[new_col] = (100 * df["consumption"] / df["consumption_1986"]).round(2)
+    return df[columns + [new_col]]
+
+
+def remove_last_year_for_regions(df: pd.DataFrame) -> pd.DataFrame:
+    """Remove datapoint for latest available year in regions.
+
+    Data for latest year for regions is usually an underestimate, because just a subset of countries have reported data."""
+    REGIONS = [
+        "Africa",
+        "Asia",
+        "Europe",
+        "European Union (27)",
+        "European Union (28)",
+        "North America",
+        "Oceania",
+        "South America",
+        "World",
+    ]
+    last_year = df["year"].max()
+    df = df[~((df["year"] == last_year) & (df["country"].isin(REGIONS)))]
     return df
