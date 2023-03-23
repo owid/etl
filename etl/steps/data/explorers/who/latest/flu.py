@@ -52,6 +52,7 @@ def run(dest_dir: str) -> None:
     tb_flu = create_full_time_series(tb_flu)
     tb_flu = remove_sparse_years(tb_flu, min_datapoints_per_year=MIN_DATA_POINTS_PER_YEAR)
 
+    tb_flu = fill_missing_values_with_zero(tb_flu)
     tb_flu = create_zero_filled_strain_columns(tb_flu)
 
     tb_flu = remove_sparse_timeseries(df=tb_flu, min_data_points=MIN_DATA_POINTS)
@@ -68,6 +69,40 @@ def run(dest_dir: str) -> None:
         dest_dir, tables=[tb_flu, tb_flu_monthly], default_metadata=flunet_garden.metadata, formats=["csv"]
     )
     ds_explorer.save()
+
+
+def fill_missing_values_with_zero(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Fill missing values - between the first and last non-NA or 0 value, with 0s.
+    To prevent grapher automatically drawing a line connecting patches of data points.
+    Often countries don't provide data over their summer months, meaning grapher displayed a line joining the higher values of the winter peaks
+    """
+    countries = df["country"].drop_duplicates()
+    cols = df.columns.drop(["country", "date", "hemisphere", "year"])
+    # all columns that contain values on confirmed flu cases
+    all_flunet_cols = cols[(cols.str.contains("sentinel|notdefined|combined"))]
+    # all columns that will be used in line charts but not stacked bar charts
+    fluid_cols = cols[(cols.str.contains("ili|ari"))].to_list()
+
+    not_z_filled_flunet_cols = [col for col in all_flunet_cols if not col.endswith("zfilled")]
+    cols_to_fill = fluid_cols + not_z_filled_flunet_cols
+
+    df = df.sort_values(["country", "date"]).reset_index(drop=True)
+    for country in countries:
+        print(country)
+        for col in cols_to_fill:
+            # Removing rows from columns to be used in line charts where there are no non-NA or 0 values for a country (where it would show a flat 0 or NA line)
+            id_first = df.loc[(df["country"] == country), [col]].first_valid_index()
+            id_last = df.loc[(df["country"] == country), [col]].last_valid_index()
+            # first_valid_value = df[col].loc[id_first] if id_first is not None else None
+            # last_valid_value = df[col].loc[id_last] if id_last is not None else None
+            if id_first is not None:
+                dates_between = df["date"].loc[id_first:id_last]
+                # check the dates between the first and last values are actually between
+                assert all(pd.to_datetime(dates_between) >= pd.to_datetime(df["date"].loc[id_first]))
+                assert all(pd.to_datetime(dates_between) <= pd.to_datetime(df["date"].loc[id_last]))
+                df[col].loc[id_first:id_last] = df[col].loc[id_first:id_last].fillna(0)
+    return df
 
 
 def create_zero_filled_strain_columns(df: pd.DataFrame) -> pd.DataFrame:
