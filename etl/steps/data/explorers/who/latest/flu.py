@@ -197,9 +197,8 @@ def remove_sparse_years(df: pd.DataFrame, min_datapoints_per_year: int) -> pd.Da
             df_col.groupby(["country", "year"]).agg(weeks_gt_zero=(col, lambda x: x.gt(0).sum()))
         ).reset_index()
         df = pd.merge(df, df_col_bool, on=["country", "year"])
-        df[col][(df["weeks_gt_zero"] < min_datapoints_per_year) & (df["year"] < datetime.now().year)] = np.NaN
+        df[col][(df["weeks_gt_zero"] < min_datapoints_per_year) & (df["year"] < datetime.now().year)] = np.NaN  # type: ignore
         df = df.drop(columns=["weeks_gt_zero"])
-        print(df[col].count())
 
     return df
 

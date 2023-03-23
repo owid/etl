@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5241_covid_19__united_states_vaccinations_values
   file_extension: feather
-  date_accessed: 2023-03-21 18:09:36.410431
+  date_accessed: 2023-03-22 18:07:31.170702
   name: COVID-19 - United States vaccinations
   description: ''
   source_name: Our World in Data catalog backport
