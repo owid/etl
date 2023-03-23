@@ -50,9 +50,9 @@ def run(dest_dir: str) -> None:
     assert tb_flu[["country", "date"]].duplicated().sum() == 0
 
     tb_flu = create_full_time_series(tb_flu)
-    tb_flu = create_zero_filled_strain_columns(tb_flu)
-
     tb_flu = remove_sparse_years(tb_flu, min_datapoints_per_year=MIN_DATA_POINTS_PER_YEAR)
+
+    tb_flu = create_zero_filled_strain_columns(tb_flu)
 
     # tb_flu = remove_sparse_timeseries(df=tb_flu, min_data_points=MIN_DATA_POINTS)
     tb_flu = create_regional_aggregates(df=tb_flu)
@@ -185,7 +185,7 @@ def remove_sparse_timeseries(df: pd.DataFrame, min_data_points: int) -> pd.DataF
 def remove_sparse_years(df: pd.DataFrame, min_datapoints_per_year: int) -> pd.DataFrame:
     """
     If a year has fewer than {min_data_points_per_year} then we should remove all the data for that year -> set it to NA
-
+    Unless it is the current year, then we do not change it.
     """
     df["year"] = pd.DatetimeIndex(df["date"]).year
     constant_cols = ["country", "date", "hemisphere", "year"]
@@ -197,8 +197,9 @@ def remove_sparse_years(df: pd.DataFrame, min_datapoints_per_year: int) -> pd.Da
             df_col.groupby(["country", "year"]).agg(weeks_gt_zero=(col, lambda x: x.gt(0).sum()))
         ).reset_index()
         df = pd.merge(df, df_col_bool, on=["country", "year"])
-        df[col][(df["weeks_gt_zero"] < min_datapoints_per_year) & (df["year"] < datetime.now().year)] = np.NaN  # type: ignore
+        df[col][(df["weeks_gt_zero"] < min_datapoints_per_year) & (df["year"] < datetime.now().year)] = np.NaN
         df = df.drop(columns=["weeks_gt_zero"])
+        print(df[col].count())
 
     return df
 
