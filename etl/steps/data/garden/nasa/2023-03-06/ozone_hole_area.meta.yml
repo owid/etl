@@ -50,10 +50,10 @@ tables:
         short_unit: "km²"
         unit: "square kilometres"
         description: |
-          Ozone hole area mean (07 September -- 13 October) for each year.
+          Ozone hole area mean (07 September - 13 October) for each year.
       mean_hole_concentration:
         title: Mean daily concentration
         short_unit: "DU"
         unit: "Dobson Units (DU)"
         description: |
-          Minimum ozone (21 September -- 16 October) for each year.
+          Minimum ozone (21 September - 16 October) for each year.

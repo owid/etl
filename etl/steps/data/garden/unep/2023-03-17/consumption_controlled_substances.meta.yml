@@ -40,8 +40,8 @@ tables:
         description: |
           Consumption of various controlled substances. These include Bromochloromethane (BCM), Carbon Tetrachloride (CTC), Chlorofluorocarbons (CFCs), Hydrobromofluorocarbons (HBFCs), Hydrochlorofluorocarbons (HCFCs), Hydrofluorocarbons (HFCs), Methyl Bromide (MB), Methyl Chloroform (TCA) and Other Fully Halogenated CFCs.
 
-          We assign zero to missing values for a givent (year, country, chemical) triple.
-        short_unit: "ODP tonnes"
+          We assign zero to missing values for a given (year, country, chemical) triple. This is due to technical reasons, so that we are able to plot this variable using our Grapher stacked are charts.
+        short_unit: "tonnes"
         unit: "ODP tonnes"
         display:
           numDecimalPlaces: 1
