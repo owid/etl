@@ -89,13 +89,10 @@ def fill_missing_values_with_zero(df: pd.DataFrame) -> pd.DataFrame:
 
     df = df.sort_values(["country", "date"]).reset_index(drop=True)
     for country in countries:
-        print(country)
         for col in cols_to_fill:
-            # Removing rows from columns to be used in line charts where there are no non-NA or 0 values for a country (where it would show a flat 0 or NA line)
+            # Finding the first and last valid datapoints in each country-metric
             id_first = df.loc[(df["country"] == country), [col]].first_valid_index()
             id_last = df.loc[(df["country"] == country), [col]].last_valid_index()
-            # first_valid_value = df[col].loc[id_first] if id_first is not None else None
-            # last_valid_value = df[col].loc[id_last] if id_last is not None else None
             if id_first is not None:
                 dates_between = df["date"].loc[id_first:id_last]
                 # check the dates between the first and last values are actually between
