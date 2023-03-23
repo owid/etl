@@ -86,7 +86,7 @@ def fill_missing_values_with_zero(df: pd.DataFrame) -> pd.DataFrame:
 
     not_z_filled_flunet_cols = [col for col in all_flunet_cols if not col.endswith("zfilled")]
     cols_to_fill = fluid_cols + not_z_filled_flunet_cols
-
+    df = df.copy()
     df = df.sort_values(["country", "date"]).reset_index(drop=True)
     for country in countries:
         for col in cols_to_fill:
@@ -219,6 +219,8 @@ def remove_sparse_years(df: pd.DataFrame, min_datapoints_per_year: int) -> pd.Da
     If a year has fewer than {min_data_points_per_year} then we should remove all the data for that year -> set it to NA
     Unless it is the current year, then we do not change it.
     """
+
+    df = df.copy()
     df["year"] = pd.DatetimeIndex(df["date"]).year
     constant_cols = ["country", "date", "hemisphere", "year"]
     cols = df.columns.drop(constant_cols)
