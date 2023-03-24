@@ -51,7 +51,9 @@ def run(dest_dir: str) -> None:
 
     tb_flu = create_full_time_series(tb_flu)
     tb_flu = remove_sparse_years(tb_flu, min_datapoints_per_year=MIN_DATA_POINTS_PER_YEAR)
-
+    tb_flu = fill_flu_data_gaps_with_zero(tb_flu)
+    #
+    # tb_flu = fill_missing_values_with_zero(tb_flu)
     tb_flu = create_zero_filled_strain_columns(tb_flu)
 
     tb_flu = remove_sparse_timeseries(df=tb_flu, min_data_points=MIN_DATA_POINTS)
@@ -68,6 +70,35 @@ def run(dest_dir: str) -> None:
         dest_dir, tables=[tb_flu, tb_flu_monthly], default_metadata=flunet_garden.metadata, formats=["csv"]
     )
     ds_explorer.save()
+
+
+def fill_na_with_zero(group_df: pd.DataFrame, col: str) -> pd.DataFrame:
+    first_non_na = group_df[col].first_valid_index()
+    last_non_na = group_df[col].last_valid_index()
+    if first_non_na is not None:
+        group_df[col].loc[first_non_na + 1 : last_non_na] = group_df[col].loc[first_non_na + 1 : last_non_na].fillna(0)
+    return group_df
+
+
+def fill_flu_data_gaps_with_zero(df: pd.DataFrame) -> pd.DataFrame:
+    # put all the right columns in and make sure they aren't categories
+    cols = df.columns.drop(["country", "date", "hemisphere", "year"])
+    # all columns that contain values on confirmed flu cases
+    all_flunet_cols = cols[(cols.str.contains("sentinel|notdefined|combined"))]
+    # all columns that will be used in line charts but not stacked bar charts
+    fluid_cols = cols[(cols.str.contains("ili|ari"))].to_list()
+    not_z_filled_flunet_cols = [col for col in all_flunet_cols if not col.endswith("zfilled")]
+    flu_cols = fluid_cols + not_z_filled_flunet_cols
+    # cols_to_fill = ["country", "year", "date"] + fluid_cols + not_z_filled_flunet_cols
+    df[flu_cols] = df[flu_cols].apply(pd.to_numeric)
+    df_out = df.copy()
+    df_out = df_out.sort_values(["country", "date"]).reset_index(drop=True)
+    for col in flu_cols:
+        group_cols = ["country", "date", col]
+        df_filled = df_out[group_cols].groupby("country", group_keys=False).apply(fill_na_with_zero, col=col)
+        df_out[col] = df_filled[col]
+
+    return df_out
 
 
 def create_zero_filled_strain_columns(df: pd.DataFrame) -> pd.DataFrame:
@@ -187,17 +218,23 @@ def remove_sparse_years(df: pd.DataFrame, min_datapoints_per_year: int) -> pd.Da
     If a year has fewer than {min_data_points_per_year} then we should remove all the data for that year -> set it to NA
     Unless it is the current year, then we do not change it.
     """
-    df["year"] = pd.DatetimeIndex(df["date"]).year
+
+    df["year"] = pd.to_datetime(df["date"]).dt.year
     constant_cols = ["country", "date", "hemisphere", "year"]
     cols = df.columns.drop(constant_cols)
+    current_year = datetime.today().year
     for col in cols:
-        df_col = df[["country", "year"] + [col]].copy(deep=True)
+        df_col = df.loc[:, ["country", "year", col]]
         df_col[col] = pd.to_numeric(df_col[col])
         df_col_bool = (
-            df_col.groupby(["country", "year"]).agg(weeks_gt_zero=(col, lambda x: x.gt(0).sum()))
-        ).reset_index()
+            df_col.groupby(["country", "year"]).agg(weeks_gt_zero=(col, lambda x: x.gt(0).sum())).reset_index()
+        )
         df = pd.merge(df, df_col_bool, on=["country", "year"])
-        df[col][(df["weeks_gt_zero"] < min_datapoints_per_year) & (df["year"] < datetime.now().year)] = np.NaN  # type: ignore
+
+        df.loc[
+            (df["weeks_gt_zero"] < min_datapoints_per_year) & (df["year"] < current_year),
+            col,
+        ] = np.nan
         df = df.drop(columns=["weeks_gt_zero"])
 
     return df
@@ -355,5 +392,82 @@ def calculate_percent_positive_aggregate(df: pd.DataFrame, surveillance_cols: li
             "pcnt_pos" + col,
         ] = np.nan
         # df = df.dropna(axis=1, how="all")
+
+    return df
+
+
+def _fill_missing_values_with_zero(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Fill missing values - between the first and last non-NA or 0 value, with 0s.
+    To prevent grapher automatically drawing a line connecting patches of data points.
+    Often countries don't provide data over their summer months, meaning grapher displayed a line joining the higher values of the winter peaks
+    """
+    countries = df["country"].drop_duplicates()
+    cols = df.columns.drop(["country", "date", "hemisphere", "year"])
+    # all columns that contain values on confirmed flu cases
+    all_flunet_cols = cols[(cols.str.contains("sentinel|notdefined|combined"))]
+    # all columns that will be used in line charts but not stacked bar charts
+    fluid_cols = cols[(cols.str.contains("ili|ari"))].to_list()
+
+    not_z_filled_flunet_cols = [col for col in all_flunet_cols if not col.endswith("zfilled")]
+    cols_to_fill = fluid_cols + not_z_filled_flunet_cols
+    df = df.copy()
+    df = df.sort_values(["country", "date"]).reset_index(drop=True)
+    for country in countries:
+        for col in cols_to_fill:
+            # Finding the first and last valid datapoints in each country-metric
+            id_first = df.loc[(df["country"] == country), [col]].first_valid_index()
+            id_last = df.loc[(df["country"] == country), [col]].last_valid_index()
+            if id_first is not None:
+                dates_between = df["date"].loc[id_first:id_last]
+                # check the dates between the first and last values are actually between
+                assert all(pd.to_datetime(dates_between) >= pd.to_datetime(df["date"].loc[id_first])) & all(
+                    pd.to_datetime(dates_between) >= pd.to_datetime(df["date"].loc[id_first])
+                )
+                # assert all(pd.to_datetime(dates_between) <= pd.to_datetime(df["date"].loc[id_last]))
+                df[col].loc[id_first:id_last] = df[col].loc[id_first:id_last].fillna(0)
+    return df
+
+
+def _fill_na_with_zero(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Fill missing values - between the first and last non-NA or 0 value, with 0s.
+    To prevent grapher automatically drawing a line connecting patches of data points.
+    Often countries don't provide data over their summer months, meaning grapher displayed a line joining the higher values of the winter peaks
+    """
+    cols_to_fill = df.columns[df.columns.str.contains("ili|ari|sentinel|notdefined|combined")].difference(
+        ["country", "date", "hemisphere", "year"]
+    )
+    df[cols_to_fill] = df[cols_to_fill].apply(pd.to_numeric)
+    # iterate over each column
+    for col in cols_to_fill:
+        # find the indices of the first and last non-NaN values
+        first_non_na = df[col].first_valid_index()
+        last_non_na = df[col].last_valid_index()
+        # fill NaN values with 0, but only for values between first and last non-NaN values
+        df.loc[first_non_na + 1 : last_non_na, col] = df.loc[first_non_na + 1 : last_non_na, col].fillna(0)
+
+    return df
+
+
+def _remove_sparse_years(df: pd.DataFrame, min_datapoints_per_year: int) -> pd.DataFrame:
+    """
+    If a year has fewer than {min_data_points_per_year} then we should remove all the data for that year -> set it to NA
+    Unless it is the current year, then we do not change it.
+    """
+
+    df = df.copy()
+    df["year"] = pd.DatetimeIndex(df["date"]).year
+    constant_cols = ["country", "date", "hemisphere", "year"]
+    cols = df.columns.drop(constant_cols)
+    for col in cols:
+        df_col = df[["country", "year"] + [col]].copy(deep=True)
+        df_col[col] = pd.to_numeric(df_col[col])
+        df_col_bool = (
+            df_col.groupby(["country", "year"]).agg(weeks_gt_zero=(col, lambda x: x.gt(0).sum()))
+        ).reset_index()
+        df = pd.merge(df, df_col_bool, on=["country", "year"])
+        df[col][(df["weeks_gt_zero"] < min_datapoints_per_year) & (df["year"] < datetime.now().year)] = np.NaN  # type: ignore
+        df = df.drop(columns=["weeks_gt_zero"])
 
     return df
