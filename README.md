@@ -1,4 +1,4 @@
-![](https://img.shields.io/badge/python-3.9%20|%203.10%20|%203.11-blue.svg) 
+![](https://img.shields.io/badge/python-3.9%20|%203.10%20|%203.11-blue.svg)
 
 # etl
 
@@ -15,4 +15,3 @@ _The compute graph for Our World In Data's data processing._
 ## Documentation
 
 See: https://docs.owid.io/projects/etl/en/latest/
-
