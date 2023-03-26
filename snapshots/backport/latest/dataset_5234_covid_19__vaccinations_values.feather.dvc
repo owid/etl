@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5234_covid_19__vaccinations_values
   file_extension: feather
-  date_accessed: 2023-03-25 08:12:38.309626
+  date_accessed: 2023-03-26 12:08:00.039177
   name: COVID-19 - Vaccinations
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: d99aa48336bf943ff6fd6b403be5989b
-  size: 5590498
+- md5: c270a8d49c76a8ed62c529c336a290e4
+  size: 5588514
   path: dataset_5234_covid_19__vaccinations_values.feather
