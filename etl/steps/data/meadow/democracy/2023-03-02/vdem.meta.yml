@@ -1,13 +1,13 @@
 all_sources:
   - source_vdem: &source-vdem
-      name: OWID based on V-Dem (v12) and Lührmann et al. (2018)
+      name: OWID based on V-Dem (v13) and Lührmann et al. (2018)
       published_by: Our World in Data, Bastian Herre
-      publisher_source: Data comes from the Varieties of Democracy project (v12), sometimes using Lührmann et al's (2018) Regimes of the World classification, and own expansions and refinements.
+      publisher_source: Data comes from the Varieties of Democracy project (v13), sometimes using Lührmann et al's (2018) Regimes of the World classification, and own expansions and refinements.
       url: http://v-dem.net/vdemds.html
       date_accessed: 2023-03-02
 
 dataset:
-  title: Democracy and Human rights - OWID based on Varieties of Democracy (v12) and Regimes of the World
+  title: Democracy and Human rights - OWID based on Varieties of Democracy (v13) and Regimes of the World
   sources:
     - *source-vdem
 
@@ -50,21 +50,21 @@ tables:
 
           It is based on the V-Dem variable v2x_civlib_codehigh and we expand it to cover more years for some countries.
 
-          The variables ranges from 0 to 1 (most rights).
+          The variable ranges from 0 to 1 (most rights).
       civ_libs_vdem_low_owid:
         description: |-
           The variable denotes the lower-bound estimate of the extent to which people are free from government torture, political killings, and forced labor, they have property rights, and enjoy the freedoms of movement, religion, expression, and association.
 
           It is based on the V-Dem variable v2x_civlib_codelow and we expand it to cover more years for some countries.
 
-          The variables ranges from 0 to 1 (most rights).
+          The variable ranges from 0 to 1 (most rights).
       civ_libs_vdem_owid:
         description: |-
           The variable denotes the central estimate of the extent to which people are free from government torture, political killings, and forced labor, they have property rights, and enjoy the freedoms of movement, religion, expression, and association.
 
           It is based on the V-Dem variable v2x_civlib and we expand it to cover more years for some countries.
 
-          The variables ranges from 0 to 1 (most rights).
+          The variable ranges from 0 to 1 (most rights).
       civsoc_particip_vdem_high_owid:
         description: |-
           The variable denotes the upper-bound estimate of the extent to which major civil society organization are routinely consulted by policymakers, how many people are involved in them, women can participate, and candidate nomination for the legislature within parties is decentralized or made through primaries.
@@ -150,7 +150,6 @@ tables:
 
           The index reaches from 0 to 1 (most democratic).
         display:
-          includeInTable: true
           name: Deliberative democracy
       dirpop_vote_vdem_owid:
         description: |-
@@ -160,7 +159,6 @@ tables:
 
           The index reaches from 0 to 1 (easiest).
         display:
-          includeInTable: true
           name: Direct popular voting
       egal_vdem_high_owid:
         description: |-
@@ -205,7 +203,6 @@ tables:
 
           The index reaches from 0 to 1 (most democratic).
         display:
-          includeInTable: true
           name: Egalitarian democracy
       electdem_age_group_row_owid:
         description: |-
@@ -220,7 +217,6 @@ tables:
 
           In electoral democracies, citizens have the right to participate in meaningful, free and fair, and multi-party elections.
         display:
-          includeInTable: true
           name: Age of electoral democracy
       electdem_dich_high_row_owid: {}
       electdem_dich_low_row_owid: {}
@@ -238,7 +234,6 @@ tables:
 
           In electoral democracies, citizens have the right to participate in meaningful, free and fair, and multi-party elections.
         display:
-          includeInTable: true
           name: Experience with electoral democracy
       electdem_vdem_high_owid:
         description: |-
@@ -262,7 +257,6 @@ tables:
 
           The index reaches from 0 to 1 (most democratic).
         display:
-          includeInTable: true
           name: Electoral democracy
       electfreefair_high_row_owid:
         description: |-
@@ -285,21 +279,21 @@ tables:
 
           It is based on the V-Dem variable v2xel_frefair_codehigh, and we expand it to cover more years for some countries.
 
-          The variables ranges from 0 to 1 (most free and fair).
+          The variable ranges from 0 to 1 (most free and fair).
       electfreefair_vdem_low_owid:
         description: |-
           The variable denotes the lower-bound estimate of the extent to which registration fraud, systematic irregularities, government intimidation of the opposition, vote buying, and election violence are absent, and the election management body is autonomous and has enough staff and resources.
 
           It is based on the V-Dem variable v2xel_frefair_codelow, and we expand it to cover more years for some countries.
 
-          The variables ranges from 0 to 1 (most free and fair).
+          The variable ranges from 0 to 1 (most free and fair).
       electfreefair_vdem_owid:
         description: |-
           The variable denotes the best estimate of the extent to which registration fraud, systematic irregularities, government intimidation of the opposition, vote buying, and election violence are absent, and the election management body is autonomous and has enough staff and resources.
 
           It is based on the V-Dem variable v2xel_frefair, and we expand it to cover more years for some countries.
 
-          The variables ranges from 0 to 1 (most free and fair).
+          The variable ranges from 0 to 1 (most free and fair).
       electmulpar_high_row_owid:
         description: The variable denotes the upper-bound estimate of whether national multi-party
           elections were held or not, based on the criteria of the classification by Lührmann
@@ -350,9 +344,8 @@ tables:
 
           The variable is based on the V-Dem variable v2x_elecoff, and we expand it to cover more years for some countries.
 
-          The variables ranges from 0 to 1 (chief executive and legislature fully elected).
+          The variable ranges from 0 to 1 (chief executive and legislature fully elected).
         display:
-          includeInTable: true
           name: Elected political leaders
       elitecons_polch_vdem_high_owid:
         description: |-
@@ -444,69 +437,69 @@ tables:
 
           It is based on the V-Dem variable v2x_frassoc_thick_codehigh, and we expand it to cover more years for some countries.
 
-          The variables ranges from 0 to 1 (most free).
+          The variable ranges from 0 to 1 (most free).
       freeassoc_vdem_low_owid:
         description: |-
           The variable denotes the lower-bound estimate of the extent to which parties, including opposition parties, are allowed to form and participate in elections, and the extent to which civil society organizations are allowed to form and operate freely.
 
           It is based on the V-Dem variable v2x_frassoc_thick_codelow, and we expand it to cover more years for some countries.
 
-          The variables ranges from 0 to 1 (most free).
+          The variable ranges from 0 to 1 (most free).
       freeassoc_vdem_owid:
         description: |-
           The variable denotes the best estimate of the extent to which parties, including opposition parties, are allowed to form and participate in elections, and the extent to which civil society organizations are allowed to form and operate freely.
 
           It is based on the V-Dem variable v2x_frassoc_thick, and we expand it to cover more years for some countries.
 
-          The variables ranges from 0 to 1 (most free).
+          The variable ranges from 0 to 1 (most free).
       freeexpr_vdem_high_owid:
         description: |-
           The variable denotes the upper-bound estimate of the extent to which people can discuss political matters at home and in the public sphere, the press and media are free and present different political perspectives, and the freedom of academic and cultural expression.
 
           It is based on the V-Dem variable v2x_freexp_altinf_codehigh, and we expand it to cover more years for some countries.
 
-          The variables ranges from 0 to 1 (most free).
+          The variable ranges from 0 to 1 (most free).
       freeexpr_vdem_low_owid:
         description: |-
           The variable denotes the lower-bound estimate of the extent to which people can discuss political matters at home and in the public sphere, the press and media are free and present different political perspectives, and the freedom of academic and cultural expression.
 
           It is based on the V-Dem variable v2x_freexp_altinf_codelow, and we expand it to cover more years for some countries.
 
-          The variables ranges from 0 to 1 (most free).
+          The variable ranges from 0 to 1 (most free).
       freeexpr_vdem_owid:
         description: |-
           The variable denotes the best estimate of the extent to which people can discuss political matters at home and in the public sphere, the press and media are free and present different political perspectives, and the freedom of academic and cultural expression.
 
           It is based on the V-Dem variable v2x_freexp_altinf, and we expand it to cover more years for some countries.
 
-          The variables ranges from 0 to 1 (most free).
+          The variable ranges from 0 to 1 (most free).
       goveffective_vdem_wbgi_owid:
         description: |-
           The variable denotes perceptions of the quality of public services, the civil service, and policy formulation and implementation (positive values
           mean higher effectiveness) based on the data from the World Governance Indicators.
 
-          It comes from the variable e_wbgi_gee in the Varieties-of-Democracy dataset v12.
+          It comes from the variable e_wbgi_gee in the Varieties-of-Democracy dataset.
       indiv_libs_vdem_high_owid:
         description: |-
           The variable denotes the upper-bound estimate of the extent to which extent to which citizens enjoy physical integrity rights, freedoms of religion, of movement, and from forced labor, as well as access to justice, laws are transparent and public administration is impartial.
 
           It is based on the V-Dem variable v2xcl_rol_codehigh, and we expand it to cover more years for some countries.
 
-          The variables ranges from 0 to 1 (most rights).
+          The variable ranges from 0 to 1 (most rights).
       indiv_libs_vdem_low_owid:
         description: |-
           The variable denotes the lower-bound estimate of the extent to which extent to which citizens enjoy physical integrity rights, freedoms of religion, of movement, and from forced labor, as well as access to justice, laws are transparent and public administration is impartial.
 
           It is based on the V-Dem variable v2xcl_rol_codelow, and we expand it to cover more years for some countries.
 
-          The variables ranges from 0 to 1 (most rights).
+          The variable ranges from 0 to 1 (most rights).
       indiv_libs_vdem_owid:
         description: |-
           The variable denotes the best estimate of the extent to which extent to which citizens enjoy physical integrity rights, freedoms of religion, of movement, and from forced labor, as well as access to justice, laws are transparent and public administration is impartial.
 
           It is based on the V-Dem variable v2xcl_rol, and we expand it to cover more years for some countries.
 
-          The variables ranges from 0 to 1 (most rights).
+          The variable ranges from 0 to 1 (most rights).
       judicial_constr_vdem_high_owid:
         description: |-
           The variable denotes the upper-bound estimate of the extent to which the executive respects the constitution, complies with the judiciary and high courts, and higher and lower courts are independent.
@@ -645,7 +638,6 @@ tables:
 
           In liberal democracies, citizens have further individual and minority rights, are equal before the law, and the actions of the executive are constrained by the legislative and the courts.
         display:
-          includeInTable: true
           name: Age of liberal democracy
       libdem_exp_row_owid:
         description: |-
@@ -657,7 +649,6 @@ tables:
 
           In liberal democracies, citizens have further individual and minority rights, are equal before the law, and the actions of the executive are constrained by the legislative and the courts.
         display:
-          includeInTable: true
           name: Experience with liberal democracy
       libdem_vdem_high_owid:
         description: |-
@@ -681,7 +672,6 @@ tables:
 
           The index reaches from 0 to 1 (most democratic).
         display:
-          includeInTable: true
           name: Liberal democracy
       locelect_vdem_high_owid:
         description: |-
@@ -761,6 +751,18 @@ tables:
       number_electdem_row_owid:
         description: The variable denotes the number of electoral democracies based on the
           Regimes of the World-classification by Lührmann et al. (2018).
+      number_hoe_men_vdem_owid:
+        description: The variable denotes the number of countries in which the chief executive is a man.
+      number_hoe_women_vdem_owid:
+        description: The variable denotes the number of countries in which the chief executive is a woman.
+      number_hog_men_vdem_owid:
+        description: The variable denotes the number of countries in which the head of government is a man.
+      number_hog_women_vdem_owid:
+        description: The variable denotes the number of countries in which the head of government is a woman.
+      number_hos_men_vdem_owid:
+        description: The variable denotes the number of countries in which the head of state is a man.
+      number_hos_women_vdem_owid:
+        description: The variable denotes the number of countries in which the head of state is a woman.
       number_less10women_vdem_owid:
         description: The variables denotes the number of countries with less than 10% women in parliament.
       number_less20women_vdem_owid:
@@ -769,6 +771,8 @@ tables:
         description: The variables denotes the number of countries with 20-30% women in parliament.
       number_less40women_vdem_owid:
         description: The variables denotes the number of countries with 30-40% women in parliament.
+      number_less50women_vdem_owid:
+        description: The variables denotes the number of countries with 40-50% women in parliament.
       number_libdem_18_row_owid:
         description: The variable denotes the number of liberal democracies aged 1-18, as
           based on the Regimes of the World-classification by Lührmann et al. (2018).
@@ -796,8 +800,8 @@ tables:
       number_libdem_row_owid:
         description: The variable denotes the number of liberal democracies based on the
           Regimes of the World-classification by Lührmann et al. (2018).
-      number_more40women_vdem_owid:
-        description: The variables denotes the number of countries with more than 40% women in parliament.
+      number_more50women_vdem_owid:
+        description: The variables denotes the number of countries with more than 50% women in parliament.
       number_nowomen_vdem_owid:
         description: The variable denotes the number of countries with no woman in parliament.
       particip_vdem_high_owid:
@@ -843,7 +847,6 @@ tables:
 
           The index reaches from 0 to 1 (most democratic).
         display:
-          includeInTable: true
           name: Participatory democracy
       phys_integr_libs_vdem_high_owid:
         description: |-
@@ -851,42 +854,42 @@ tables:
 
           It is based on the V-Dem variable v2x_clph_codehigh and we expand it to cover more years for some countries.
 
-          The variables ranges from 0 to 1 (most rights).
+          The variable ranges from 0 to 1 (most rights).
       phys_integr_libs_vdem_low_owid:
         description: |-
           The variable denotes the lower-bound estimate of the extent to which people are free from government torture and political killings.
 
           It is based on the V-Dem variable v2x_clph_codelow and we expand it to cover more years for some countries.
 
-          The variables ranges from 0 to 1 (most rights).
+          The variable ranges from 0 to 1 (most rights).
       phys_integr_libs_vdem_owid:
         description: |-
           The variable denotes the central estimate of the extent to which people are free from government torture and political killings.
 
           It is based on the V-Dem variable v2x_clphy and we expand it to cover more years for some countries.
 
-          The variables ranges from 0 to 1 (most rights).
+          The variable ranges from 0 to 1 (most rights).
       pol_libs_vdem_high_owid:
         description: |-
           The variable denotes the upper-bound estimate of the extent to which people enjoy the freedoms of expression and association.
 
           It is based on the V-Dem variable v2x_clpol_codehigh and we expand it to cover more years for some countries.
 
-          The variables ranges from 0 to 1 (most liberties).
+          The variable ranges from 0 to 1 (most liberties).
       pol_libs_vdem_low_owid:
         description: |-
           The variable denotes the lower-bound estimate of the extent to which people enjoy the freedoms of expression and association.
 
           It is based on the V-Dem variable v2x_clpol_codelow and we expand it to cover more years for some countries.
 
-          The variables ranges from 0 to 1 (most liberties).
+          The variable ranges from 0 to 1 (most liberties).
       pol_libs_vdem_owid:
         description: |-
           The variable denotes the central estimate of the extent to which people enjoy the freedoms of expression and association.
 
           It is based on the V-Dem variable v2x_clpol and we expand it to cover more years for some countries.
 
-          The variables ranges from 0 to 1 (most liberties).
+          The variable ranges from 0 to 1 (most liberties).
       pop_closedaut_amb_row_owid:
         description: The variable denotes the number of people living in closed autocracies
           — accounting for ambiguous categories — based on the Regimes of the World-classification
@@ -948,14 +951,34 @@ tables:
       pop_electdem_row_owid:
         description: The variable denotes the number of people living in electoral democracies
           based on the Regimes of the World-classification by Lührmann et al. (2018).
+      pop_hoe_men_vdem_owid:
+        description: The variable denotes the number of people living in countries in which the chief executive is a man.
+      pop_hoe_missgen_vdem_owid:
+        description: The variable denotes the number of people living in countries without data on the chief executive’s gender.
+      pop_hoe_women_vdem_owid:
+        description: The variable denotes the number of people living in countries in which the chief executive is a woman.
+      pop_hog_men_vdem_owid:
+        description: The variable denotes the number of people living in countries in which the head of government is a man.
+      pop_hog_missgen_vdem_owid:
+        description: The variable denotes the number of people living in countries without data on the head of government’s gender.
+      pop_hog_women_vdem_owid:
+        description: The variable denotes the number of people living in countries in which the head of government is a woman.
+      pop_hos_men_vdem_owid:
+        description: The variable denotes the number of people living in countries in which the head of state is a man.
+      pop_hos_missgen_vdem_owid:
+        description: The variable denotes the number of people living in countries without data on the head of state’s gender.
+      pop_hos_women_vdem_owid:
+        description: The variable denotes the number of people living in countries in which the head of state is a woman.
       pop_less10women_vdem_owid:
-        description: The variables denotes the number of people living in countries with less than 10% women in parliament.
+        description: The variable denotes the number of people living in countries with less than 10% women in parliament.
       pop_less20women_vdem_owid:
-        description: The variables denotes the number of people living in countries with 10-20% women in parliament.
+        description: The variable denotes the number of people living in countries with 10-20% women in parliament.
       pop_less30women_vdem_owid:
-        description: The variables denotes the number of people living in countries with 20-30% women in parliament.
+        description: The variable denotes the number of people living in countries with 20-30% women in parliament.
       pop_less40women_vdem_owid:
-        description: The variables denotes the number of people living in countries with 30-40% women in parliament.
+        description: The variable denotes the number of people living in countries with 30-40% women in parliament.
+      pop_less50women_vdem_owid:
+        description: The variable denotes the number of people living in countries with 40-50% women in parliament.
       pop_libdem_18_row_owid:
         description: The variable denotes the number of people living in liberal democracies
           aged 1-18, as based on the Regimes of the World-classification by Lührmann et
@@ -992,26 +1015,26 @@ tables:
           regime data based on the Regimes of the World-classification by Lührmann et al.
           (2018).
       pop_misswomen_vdem_owid:
-        description: The variables denotes the number of people living in countries without data on women's representation in parliament.
-      pop_more40women_vdem_owid:
-        description: The variables denotes the number of people living in countries with more than 40% women in parliament.
+        description: The variable denotes the number of people living in countries without data on women's representation in parliament.
+      pop_more50women_vdem_owid:
+        description: The variable denotes the number of people living in countries with more than 50% women in parliament.
       pop_nowomen_vdem_owid:
-        description: The variables denotes the number of people living in countries with no women in parliament.
+        description: The variable denotes the number of people living in countries with no women in parliament.
       popw_civ_libs_vdem_high_owid:
         description: |-
           The variable denotes the upper-bound estimate of the extent to which people are free from government torture, political killings, and forced labor, they have property rights, and enjoy the freedoms of movement, religion, expression, and association, weighted by population.
 
-          The variables ranges from 0 to 1 (most rights).
+          The variable ranges from 0 to 1 (most rights).
       popw_civ_libs_vdem_low_owid:
         description: |-
           The variable denotes the lower-bound estimate of the extent to which people are free from government torture, political killings, and forced labor, they have property rights, and enjoy the freedoms of movement, religion, expression, and association, weighted by population.
 
-          The variables ranges from 0 to 1 (most rights).
+          The variable ranges from 0 to 1 (most rights).
       popw_civ_libs_vdem_owid:
         description: |-
           The variable denotes the central estimate of the extent to which people are free from government torture, political killings, and forced labor, they have property rights, and enjoy the freedoms of movement, religion, expression, and association, weighted by population.
 
-          The variables ranges from 0 to 1 (most rights).
+          The variable ranges from 0 to 1 (most rights).
       popw_delibdem_h_vdem_owid:
         description: |-
           The variable denotes the upper-bound estimate of the extent of suffrage, the freedom and fairness of elections, freedoms of association and expression, as well as the extent to which political elites justify their positions, justify them with the common good, acknowledge counterarguments, consult elites in policy changes, and society deliberates policy changes, weighted by population.
@@ -1028,7 +1051,6 @@ tables:
 
           The index reaches from 0 to 1 (most democratic).
         display:
-          includeInTable: true
           name: Deliberative democracy weighted by population
       popw_egaldem_h_vdem_owid:
         description: |-
@@ -1046,7 +1068,6 @@ tables:
 
           The index reaches from 0 to 1 (most democratic).
         display:
-          includeInTable: true
           name: Egalitarian democracy weighted by population
       popw_electdem_h_vdem_owid:
         description: |-
@@ -1064,7 +1085,6 @@ tables:
 
           The index reaches from 0 to 1 (most democratic).
         display:
-          includeInTable: true
           name: Electoral democracy weighted by population
       popw_libdem_h_vdem_owid:
         description: |-
@@ -1082,7 +1102,6 @@ tables:
 
           The index reaches from 0 to 1 (most democratic).
         display:
-          includeInTable: true
           name: Liberal democracy weighted by population
       popw_participdem_h_vdem_owid:
         description: |-
@@ -1100,74 +1119,207 @@ tables:
 
           The index reaches from 0 to 1 (most democratic).
         display:
-          includeInTable: true
           name: Participatory democracy weighted by population
       popw_physinteg_libs_vdem_h_owid:
         description: |-
           The variable denotes the upper-bound estimate of the extent to which people are free from government torture and political killings, weighted by population.
 
-          The variables ranges from 0 to 1 (most rights).
+          The variable ranges from 0 to 1 (most rights).
       popw_physinteg_libs_vdem_l_owid:
         description: |-
           The variable denotes the lower-bound estimate of the extent to which people are free from government torture and political killings, weighted by population.
 
-          The variables ranges from 0 to 1 (most rights).
+          The variable ranges from 0 to 1 (most rights).
       popw_physinteg_libs_vdem_owid:
         description: |-
           The variable denotes the central estimate of the extent to which people are free from government torture and political killings, weighted by population.
 
-          The variables ranges from 0 to 1 (most rights).
+          The variable ranges from 0 to 1 (most rights).
       popw_pol_libs_vdem_high_owid:
         description: |-
           The variable denotes the upper-bound estimate of the extent to which people enjoy the freedoms of expression and association, weighted by population.
 
-          The variables ranges from 0 to 1 (most liberties).
+          The variable ranges from 0 to 1 (most liberties).
       popw_pol_libs_vdem_low_owid:
         description: |-
           The variable denotes the lower-bound estimate of the extent to which people enjoy the freedoms of expression and association, weighted by population.
 
-          The variables ranges from 0 to 1 (most liberties).
+          The variable ranges from 0 to 1 (most liberties).
       popw_pol_libs_vdem_owid:
         description: |-
           The variable denotes the central estimate of the extent to which people enjoy the freedoms of expression and association, weighted by population.
 
-          The variables ranges from 0 to 1 (most liberties).
+          The variable ranges from 0 to 1 (most liberties).
       popw_priv_libs_vdem_high_owid:
         description: |-
           The variable denotes the upper-bound estimate of  the extent to which people are free from forced labor, have property rights, and enjoy the freedoms of movement and religion, weighted by population.
 
-          The variables ranges from 0 to 1 (most liberties).
+          The variable ranges from 0 to 1 (most liberties).
       popw_priv_libs_vdem_low_owid:
         description: |-
           The variable denotes the lower-bound estimate of  the extent to which people are free from forced labor, have property rights, and enjoy the freedoms of movement and religion, weighted by population.
 
-          The variables ranges from 0 to 1 (most liberties).
+          The variable ranges from 0 to 1 (most liberties).
       popw_priv_libs_vdem_owid:
         description: |-
           The variable denotes the central estimate of  the extent to which people are free from forced labor, have property rights, and enjoy the freedoms of movement and religion, weighted by population.
 
-          The variables ranges from 0 to 1 (most liberties).
+          The variable ranges from 0 to 1 (most liberties).
+      popw_socgr_civ_libs_vdem_h_owid:
+        description: |-
+          The variable denotes the upper-bound estimate of the extent to which social groups — defined by language, ethnicity, religion, race, region, and/or caste — are free from forced labor, have property rights and access to the justice system, and enjoy freedoms of movement, weighted by population.
+
+          It is based on the V-Dem variable v2clsocgrp_codehigh, and we expand it to cover more years for some countries.
+
+          Higher scores mean more equality.
+      popw_socgr_civ_libs_vdem_l_owid:
+        description: |-
+          The variable denotes the lower-bound estimate of the extent to which social groups — defined by language, ethnicity, religion, race, region, and/or caste — are free from forced labor, have property rights and access to the justice system, and enjoy freedoms of movement, weighted by population.
+
+          It is based on the V-Dem variable v2clsocgrp_codelow, and we expand it to cover more years for some countries.
+
+          Higher scores mean more equality.
+      popw_socgr_civ_libs_vdem_owid:
+        description: |-
+          The variable denotes the best estimate of the extent to which social groups — defined by language, ethnicity, religion, race, region, and/or caste — are free from forced labor, have property rights and access to the justice system, and enjoy freedoms of movement, weighted by population.
+
+          It is based on the V-Dem variable v2clsocgrp, and we expand it to cover more years for some countries.
+
+          Higher scores mean more equality.
+      popw_socgr_pow_vdem_high_owid:
+        description: |-
+          The variable denotes the upper-bound estimate of the extent to which social groups — defined by language, ethnicity, religion, race, region, and/or caste — are irrelevant to politics, or have similar political power, weighted by population.
+
+          It is based on the V-Dem variable v2pepwrsoc_codehigh, and we expand it to cover more years for some countries.
+
+          Higher scores mean more equality.
+      popw_socgr_pow_vdem_low_owid:
+        description: |-
+          The variable denotes the lower-bound estimate of the extent to which social groups — defined by language, ethnicity, religion, race, region, and/or caste — are irrelevant to politics, or have similar political power, weighted by population.
+
+          It is based on the V-Dem variable v2pepwrsoc_codelow, and we expand it to cover more years for some countries.
+
+          Higher scores mean more equality.
+      popw_socgr_pow_vdem_owid:
+        description: |-
+          The variable denotes the best estimate of the extent to which social groups — defined by language, ethnicity, religion, race, region, and/or caste — are irrelevant to politics, or have similar political power, weighted by population.
+
+          It is based on the V-Dem variable v2pepwrsoc, and we expand it to cover more years for some countries.
+
+          Higher scores mean more equality.
+      popw_wom_civ_libs_vdem_high_owid:
+        description: |-
+          The variable denotes the upper-bound estimate of the extent to which women are free from forced labor, have property rights and access to the justice system, and enjoy freedom of movement, weighted by population.
+
+          It is based on the V-Dem variable v2x_gencl_codehigh, and we expand it to cover more years for some countries.
+
+          The variable ranges from 0 to 1 (most liberties).
+      popw_wom_civ_libs_vdem_low_owid:
+        description: |-
+          The variable denotes the lower-bound estimate of the extent to which women are free from forced labor, have property rights and access to the justice system, and enjoy freedom of movement, weighted by population.
+
+          It is based on the V-Dem variable v2x_gencl_codelow, and we expand it to cover more years for some countries.
+
+          The variable ranges from 0 to 1 (most liberties).
+      popw_wom_civ_libs_vdem_owid:
+        description: |-
+          The variable denotes the best estimate of the extent to which women are free from forced labor, have property rights and access to the justice system, and enjoy freedom of movement, weighted by population.
+
+          It is based on the V-Dem variable v2x_gencl, and we expand it to cover more years for some countries.
+
+          The variable ranges from 0 to 1 (most liberties).
+      popw_wom_civ_soc_vdem_high_owid:
+        description: |-
+          The variable denotes the upper-bound estimate of the extent to which women can discuss political issues, participate in civil society organizations, and are represented among journalists, weighted by population.
+
+          It is based on the V-Dem variable v2x_gencs_codehigh, and we expand it to cover more years for some countries.
+
+          The variable ranges from 0 to 1 (most participatory).
+      popw_wom_civ_soc_vdem_low_owid:
+        description: |-
+          The variable denotes the lower-bound estimate of the extent to which women can discuss political issues, participate in civil society organizations, and are represented among journalists, weighted by population.
+
+          It is based on the V-Dem variable v2x_gencs_codelow, and we expand it to cover more years for some countries.
+
+          The variable ranges from 0 to 1 (most participatory).
+      popw_wom_civ_soc_vdem_owid:
+        description: |-
+          The variable denotes the best estimate of the extent to which women can discuss political issues, participate in civil society organizations, and are represented among journalists, weighted by population.
+
+          It is based on the V-Dem variable v2x_gencs, and we expand it to cover more years for some countries.
+
+          The variable ranges from 0 to 1 (most participatory).
+      popw_wom_emp_vdem_high_owid:
+        description: |-
+          The variable denotes the upper-bound estimate of the extent to which women enjoy civil liberties, can participate in civil society, and are represented in politics, weighted by population.
+
+          It is based on the V-Dem variable v2x_gender_codehigh, and we expand it to cover more years for some countries.
+
+          The variable ranges from 0 to 1 (most empowered).
+      popw_wom_emp_vdem_low_owid:
+       description: |-
+        The variable denotes the lower-bound estimate of the extent to which women enjoy civil liberties, can participate in civil society, and are represented in politics, weighted by population.
+
+        It is based on the V-Dem variable v2x_gender_codelow, and we expand it to cover more years for some countries.
+
+        The variable ranges from 0 to 1 (most empowered).
+      popw_wom_emp_vdem_owid:
+       description: |-
+
+        The variable denotes the best estimate of the extent to which women enjoy civil liberties, can participate in civil society, and are represented in politics, weighted by population.
+
+        It is based on the V-Dem variable v2x_gender, and we expand it to cover more years for some countries.
+
+        The variable ranges from 0 to 1 (most empowered).
+      popw_wom_parl_vdem_owid:
+        description: |-
+          The variable denotes the percentage of women in the lower or single chamber of the legislature, weighted by population.
+
+          If the legislature has no chambers, the variable is set to missing.
+
+          It is based on the V-Dem variables v2lgfemleg, and we expand it to cover more years for some countries.
+      popw_wom_pol_par_vdem_high_owid:
+        description: |-
+          The variable denotes the upper-bound estimate of the extent to which women are represented in the legislature and have an equal share of political power, weighted by population.
+
+          It is based on the V-Dem variable v2x_genpp_codehigh, and we expand it to cover more years for some countries.
+
+          The variable ranges from 0 to 1 (most equal).
+      popw_wom_pol_par_vdem_low_owid:
+        description: |-
+          The variable denotes the lower-bound estimate of the extent to which women are represented in the legislature and have an equal share of political power, weighted by population.
+
+          It is based on the V-Dem variable v2x_genpp_codelow, and we expand it to cover more years for some countries.
+
+          The variable ranges from 0 to 1 (most equal).
+      popw_wom_pol_par_vdem_owid:
+        description: |-
+          The variable denotes the best estimate of the extent to which women are represented in the legislature and have an equal share of political power, weighted by population.
+
+          It is based on the V-Dem variable v2x_genpp, and we expand it to cover more years for some countries.
+
+          The variable ranges from 0 to 1 (most equal).
       priv_libs_vdem_high_owid:
         description: |-
           The variable denotes the upper-bound estimate of  the extent to which people are free from forced labor, have property rights, and enjoy the freedoms of movement and religion.
 
           It is based on the V-Dem variable v2x_clpriv_codehigh and we expand it to cover more years for some countries.
 
-          The variables ranges from 0 to 1 (most liberties).
+          The variable ranges from 0 to 1 (most liberties).
       priv_libs_vdem_low_owid:
         description: |-
           The variable denotes the lower-bound estimate of  the extent to which people are free from forced labor, have property rights, and enjoy the freedoms of movement and religion.
 
           It is based on the V-Dem variable v2x_clpriv_codelow and we expand it to cover more years for some countries.
 
-          The variables ranges from 0 to 1 (most liberties).
+          The variable ranges from 0 to 1 (most liberties).
       priv_libs_vdem_owid:
         description: |-
           The variable denotes the central estimate of  the extent to which people are free from forced labor, have property rights, and enjoy the freedoms of movement and religion.
 
           It is based on the V-Dem variable v2x_clpriv and we expand it to cover more years for some countries.
 
-          The variables ranges from 0 to 1 (most liberties).
+          The variable ranges from 0 to 1 (most liberties).
       regelect_vdem_high_owid:
         description: |-
           The variable denotes the upper-bound estimate of the extent to which elected regional governments exist and they operate without interference from regional unelected bodies.
@@ -1203,7 +1355,6 @@ tables:
 
           It further includes intermediate categories for closed autocracies that may be electoral autocracies (score 1), electoral autocracies that may be closed autocracies (score 2), electoral autocracies that may be electoral democracies (score 4), electoral democracies that may be electoral autocracies (score 5), electoral democracies that may be liberal democracies (score 7) and liberal democracies that may be electoral democracies (score 8).
         display:
-          includeInTable: true
           name: Political regime
       regime_imputed_country_vdem_owid:
         description: The variable denotes the country from which we imputed regime information
@@ -1221,7 +1372,6 @@ tables:
 
           In electoral democracies, citizens have the right to participate in meaningful, free and fair, and multi-party elections.
         display:
-          includeInTable: true
           name: Electoral democracy
       regime_row_owid:
         description: |-
@@ -1235,7 +1385,6 @@ tables:
 
           In liberal democracies, citizens have further individual and minority rights, are equal before the law, and the actions of the executive are constrained by the legislative and the courts.
         display:
-          includeInTable: true
           name: Political regime
       region: {}
       soccons_polch_vdem_high_owid:
@@ -1259,6 +1408,48 @@ tables:
           It is based on the V-Dem variable v2dlengage, and we expand it to cover more years for some countries.
 
           Higher scores mean more discussion.
+      socgr_civ_libs_vdem_high_owid:
+        description: |-
+          The variable denotes the upper-bound estimate of the extent to which social groups — defined by language, ethnicity, religion, race, region, and/or caste — are free from forced labor, have property rights and access to the justice system, and enjoy freedoms of movement.
+
+          It is based on the V-Dem variable v2clsocgrp_codehigh, and we expand it to cover more years for some countries.
+
+          Higher scores mean more equality.
+      socgr_civ_libs_vdem_low_owid:
+        description: |-
+          The variable denotes the lower-bound estimate of the extent to which social groups — defined by language, ethnicity, religion, race, region, and/or caste — are free from forced labor, have property rights and access to the justice system, and enjoy freedoms of movement.
+
+          It is based on the V-Dem variable v2clsocgrp_codelow, and we expand it to cover more years for some countries.
+
+          Higher scores mean more equality.
+      socgr_civ_libs_vdem_owid:
+        description: |-
+          The variable denotes the best estimate of the extent to which social groups — defined by language, ethnicity, religion, race, region, and/or caste — are free from forced labor, have property rights and access to the justice system, and enjoy freedoms of movement.
+
+          It is based on the V-Dem variable v2clsocgrp, and we expand it to cover more years for some countries.
+
+          Higher scores mean more equality.
+      socgr_pow_vdem_high_owid:
+        description: |-
+          The variable denotes the upper-bound estimate of the extent to which social groups — defined by language, ethnicity, religion, race, region, and/or caste — are irrelevant to politics, or have similar political power.
+
+          It is based on the V-Dem variable v2pepwrsoc_codehigh, and we expand it to cover more years for some countries.
+
+          Higher scores mean more equality.
+      socgr_pow_vdem_low_owid:
+        description: |-
+          The variable denotes the lower-bound estimate of the extent to which social groups — defined by language, ethnicity, religion, race, region, and/or caste — are irrelevant to politics, or have similar political power.
+
+          It is based on the V-Dem variable v2pepwrsoc_codelow, and we expand it to cover more years for some countries.
+
+          Higher scores mean more equality.
+      socgr_pow_vdem_owid:
+        description: |-
+          The variable denotes the best estimate of the extent to which social groups — defined by language, ethnicity, religion, race, region, and/or caste — are irrelevant to politics, or have similar political power.
+
+          It is based on the V-Dem variable v2pepwrsoc, and we expand it to cover more years for some countries.
+
+          Higher scores mean more equality.
       suffr_vdem_owid:
         description: |-
           The variable denotes the share of adult citizens which have the legal right to vote in national elections.
@@ -1269,7 +1460,6 @@ tables:
 
           The variable captures legal restrictions, and not restrictions that may be in place in practice. It considers restrictions based on gender, property, tax payments, income, literacy, region, race, ethnicity, religion, and economic independence; it does not consider restrictions based on age, residence, conviction of a crime, or legal incompetence.
         display:
-          includeInTable: true
           name: Share of adult citizens who have the right to vote
       transplaws_high_row_owid:
         description: The variable denotes the upper-bound estimate of whether laws are transparent,
@@ -1292,7 +1482,6 @@ tables:
 
           It is based on the V-Dem variable v2eltrnout, and we expand it to cover more years for some countries.
         display:
-          includeInTable: true
           name: Voter turnout
       wom_civ_libs_vdem_high_owid:
         description: |-
@@ -1300,63 +1489,63 @@ tables:
 
           It is based on the V-Dem variable v2x_gencl_codehigh, and we expand it to cover more years for some countries.
 
-          The variables ranges from 0 to 1 (most rights).
+          The variable ranges from 0 to 1 (most liberties).
       wom_civ_libs_vdem_low_owid:
         description: |-
           The variable denotes the lower-bound estimate of the extent to which women are free from forced labor, have property rights and access to the justice system, and enjoy freedom of movement.
 
           It is based on the V-Dem variable v2x_gencl_codelow, and we expand it to cover more years for some countries.
 
-          The variables ranges from 0 to 1 (most rights).
+          The variable ranges from 0 to 1 (most liberties).
       wom_civ_libs_vdem_owid:
         description: |-
           The variable denotes the best estimate of the extent to which women are free from forced labor, have property rights and access to the justice system, and enjoy freedom of movement.
 
           It is based on the V-Dem variable v2x_gencl, and we expand it to cover more years for some countries.
 
-          The variables ranges from 0 to 1 (most rights).
+          The variable ranges from 0 to 1 (most liberties).
       wom_civ_soc_vdem_high_owid:
         description: |-
           The variable denotes the upper-bound estimate of the extent to which women can discuss political issues, participate in civil society organizations, and are represented among journalists.
 
           It is based on the V-Dem variable v2x_gencs_codehigh, and we expand it to cover more years for some countries.
 
-          The variables ranges from 0 to 1 (most participatory).
+          The variable ranges from 0 to 1 (most participatory).
       wom_civ_soc_vdem_low_owid:
         description: |-
           The variable denotes the lower-bound estimate of the extent to which women can discuss political issues, participate in civil society organizations, and are represented among journalists.
 
           It is based on the V-Dem variable v2x_gencs_codelow, and we expand it to cover more years for some countries.
 
-          The variables ranges from 0 to 1 (most participatory).
+          The variable ranges from 0 to 1 (most participatory).
       wom_civ_soc_vdem_owid:
         description: |-
           The variable denotes the best estimate of the extent to which women can discuss political issues, participate in civil society organizations, and are represented among journalists.
 
           It is based on the V-Dem variable v2x_gencs, and we expand it to cover more years for some countries.
 
-          The variables ranges from 0 to 1 (most participatory).
+          The variable ranges from 0 to 1 (most participatory).
       wom_emp_vdem_high_owid:
         description: |-
-          The variable denotes the upper-bound estimate of the extent to which women enjoy civil rights, can participate in civil society, and are represented in politics.
+          The variable denotes the upper-bound estimate of the extent to which women enjoy civil liberties, can participate in civil society, and are represented in politics.
 
           It is based on the V-Dem variable v2x_gender_codehigh, and we expand it to cover more years for some countries.
 
-          The variables ranges from 0 to 1 (most empowered).
+          The variable ranges from 0 to 1 (most empowered).
       wom_emp_vdem_low_owid:
         description: |-
-          The variable denotes the lower-bound estimate of the extent to which women enjoy civil rights, can participate in civil society, and are represented in politics.
+          The variable denotes the lower-bound estimate of the extent to which women enjoy civil liberties, can participate in civil society, and are represented in politics.
 
           It is based on the V-Dem variable v2x_gender_codelow, and we expand it to cover more years for some countries.
 
-          The variables ranges from 0 to 1 (most empowered).
+          The variable ranges from 0 to 1 (most empowered).
       wom_emp_vdem_owid:
         description: |-
-          The variable denotes the best estimate of the extent to which women enjoy civil rights, can participate in civil society, and are represented in politics.
+          The variable denotes the best estimate of the extent to which women enjoy civil liberties, can participate in civil society, and are represented in politics.
 
           It is based on the V-Dem variable v2x_gender, and we expand it to cover more years for some countries.
 
-          The variables ranges from 0 to 1 (most empowered).
+          The variable ranges from 0 to 1 (most empowered).
       wom_hoe_vdem_owid:
         description: |-
           The variable denotes whether the chief executive of government in office on December 31 is a woman.
@@ -1387,22 +1576,18 @@ tables:
 
           It is based on the V-Dem variable v2x_genpp_codehigh, and we expand it to cover more years for some countries.
 
-          The variables ranges from 0 to 1 (most equal).
+          The variable ranges from 0 to 1 (most equal).
       wom_pol_par_vdem_low_owid:
         description: |-
           The variable denotes the lower-bound estimate of the extent to which women are represented in the legislature and have an equal share of political power.
 
           It is based on the V-Dem variable v2x_genpp_codelow, and we expand it to cover more years for some countries.
 
-          The variables ranges from 0 to 1 (most equal).
+          The variable ranges from 0 to 1 (most equal).
       wom_pol_par_vdem_owid:
         description: |-
           The variable denotes the best estimate of the extent to which women are represented in the legislature and have an equal share of political power.
 
           It is based on the V-Dem variable v2x_genpp, and we expand it to cover more years for some countries.
 
-          The variables ranges from 0 to 1 (most equal).
-      socgr_civ_libs_vdem_owid:
-        description: |-
-          This is a brand new variable.
-
+          The variable ranges from 0 to 1 (most equal).

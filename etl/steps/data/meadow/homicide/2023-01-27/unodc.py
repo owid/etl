@@ -16,7 +16,7 @@ def run(dest_dir: str) -> None:
     log.info("unodc.start")
 
     # retrieve snapshot
-    snap: Snapshot = paths.load_dependency("unodc")
+    snap: Snapshot = paths.load_dependency("unodc.xlsx")
 
     # Snapshot("homicide/2023-01-04/unodc.xlsx")
     df = pd.read_excel(snap.path, skiprows=2)

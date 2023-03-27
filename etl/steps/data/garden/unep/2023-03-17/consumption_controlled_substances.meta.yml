@@ -1,0 +1,56 @@
+# (Inherited from meadow, remove if not different.)
+all_sources:
+  - source_testing: &source-testing
+      name: UN Environment Programme (2023)
+      published_by: UN Environment Programme # (if different to short citation). Example: Testing Full Citation
+      url: https://ozone.unep.org/countries/data-table
+      date_accessed: 2023-03-17
+      publication_date: 2023-03-16
+      publication_year: 2023
+      # description: Source description.
+
+# (Inherited from meadow, remove if not different.)
+dataset:
+  title: Consumption of controlled substances (UNEP, 2023)
+  description: |
+    Data on the consumption of controlled substances in ODP tonnes or in CO2-eq tonnes
+
+    Negative values for a given year imply that quantities destroyed or quantities exported for the year exceeded the sum of production and imports, implying that the destroyed or exported quantities came from stockpiles.
+
+  licenses:
+    - name: # Example: Testing License Name
+      url: # Example: https://url_of_testing_source.com/license
+  sources:
+    - *source-testing
+
+tables:
+  consumption_controlled_substances:
+    # (Inherited from meadow, remove if not different.)
+    variables:
+      consumption:
+        title: Consumption of controlled substance
+        description: |
+          Consumption of various controlled substances. These include Bromochloromethane (BCM), Carbon Tetrachloride (CTC), Chlorofluorocarbons (CFCs), Hydrobromofluorocarbons (HBFCs), Hydrochlorofluorocarbons (HCFCs), Hydrofluorocarbons (HFCs), Methyl Bromide (MB), Methyl Chloroform (TCA) and Other Fully Halogenated CFCs.
+        short_unit: "tonnes"
+        unit: "ODP tonnes"
+        display:
+          numDecimalPlaces: 1
+      consumption_zf:
+        title: Consumption of controlled substance (zero-filled)
+        description: |
+          Consumption of various controlled substances. These include Bromochloromethane (BCM), Carbon Tetrachloride (CTC), Chlorofluorocarbons (CFCs), Hydrobromofluorocarbons (HBFCs), Hydrochlorofluorocarbons (HCFCs), Hydrofluorocarbons (HFCs), Methyl Bromide (MB), Methyl Chloroform (TCA) and Other Fully Halogenated CFCs.
+
+          We assign zero to missing values for a given (year, country, chemical) triple. This is due to technical reasons, so that we are able to plot this variable using our Grapher stacked are charts.
+        short_unit: "tonnes"
+        unit: "ODP tonnes"
+        display:
+          numDecimalPlaces: 1
+      consumption_rel_1986:
+        title: Consumption of controlled substance (relative to 1986)
+        description: |
+          Consumption of various controlled substances. These include Bromochloromethane (BCM), Carbon Tetrachloride (CTC), Chlorofluorocarbons (CFCs), Hydrobromofluorocarbons (HBFCs), Hydrochlorofluorocarbons (HCFCs), Hydrofluorocarbons (HFCs), Methyl Bromide (MB), Methyl Chloroform (TCA) and Other Fully Halogenated CFCs.
+
+          This is measured as an index relative to emissions in the year 1986 (1986 = 100).
+        unit: ""
+        display:
+          numDecimalPlaces: 1

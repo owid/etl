@@ -1,0 +1,27 @@
+meta:
+  namespace: happiness
+  short_name: happiness
+  name: World Happiness Report (2023)
+  version: 2023-03-20
+  publication_year: 2023
+  publication_date: 2023-03-20
+  source_name: World Happiness Report (2023)
+  source_published_by: 'Helliwell, J. F., Layard, R., Sachs, J. D., De Neve, J.-E.,
+    Aknin, L. B., & Wang, S. (Eds.). (2023). World Happiness Report 2023. New York:
+    Sustainable Development Solutions Network.'
+  url: https://worldhappiness.report/
+  source_data_url: https://happiness-report.s3.amazonaws.com/2023/DataForFigure2.1WHR2023.xls
+  file_extension: xls
+  license_url: https://worldhappiness.report/faq/
+  license_name:
+  date_accessed: 2023-03-20
+  is_public: true
+  description: |
+    The World Happiness Report reflects a worldwide demand for more attention to happiness and well-being as criteria for government policy. It reviews the state of happiness in the world today and shows how the science of happiness explains personal and national variations in happiness.
+
+    Life evaluations from the Gallup World Poll provide the basis for the annual happiness rankings. They are based on answers to the main life evaluation question. The Cantril ladder asks respondents to think of a ladder, with the best possible life for them being a 10 and the worst possible life being a 0. They are then asked to rate their own current lives on that 0 to 10 scale. The rankings are from nationally representative samples over three years.
+wdir: ../../../data/snapshots/happiness/2023-03-20
+outs:
+- md5: 9df8e98202d1114c353833b6cf3d432a
+  size: 77824
+  path: happiness.xls
