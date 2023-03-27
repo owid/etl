@@ -849,6 +849,7 @@ t_country_latest_data = Table(
 )
 
 
+# data_values table is gonna be deprecated!
 class DataValues(SQLModel, table=True):
     __tablename__: str = "data_values"  # type: ignore
     __table_args__ = (

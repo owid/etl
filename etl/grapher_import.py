@@ -9,7 +9,6 @@ Usage:
     >>> import_dataset.main(dataset_dir, dataset_namespace)
 """
 
-import concurrent.futures
 import datetime
 import os
 from dataclasses import dataclass
@@ -20,10 +19,8 @@ import pandas as pd
 import structlog
 from owid import catalog
 from owid.catalog import utils
-from sqlalchemy import Integer, String
 from sqlalchemy.engine.base import Engine
-from sqlmodel import Session, delete, select, update
-from tenacity import retry, stop
+from sqlmodel import Session, select, update
 
 from backport.datasync.data_metadata import (
     add_entity_code_and_name,
@@ -51,16 +48,6 @@ INT_TYPES = (
     "uint64",
     "Int64",
 )
-
-# exclude the following datasets from upserting into data_values table as they
-# are too large
-# once we switch to catalogPath, no data will be upserted to data_values
-BLACKLIST_DATASETS_DATA_VALUES_UPSERTS = [
-    "gbd_cause",
-    "gbd_risk",
-    "gbd_prevalence",
-    "gbd_child_mortality",
-]
 
 
 @dataclass
@@ -254,22 +241,10 @@ def upsert_table(
         variable_id = variable.id
         assert variable_id
 
-        session.commit()
+        df = table.rename(columns={column_name: "value", "entity_id": "entityId"})
 
-        # delete its data if there is any
-        # TODO: once we stop upserting to data_values, prune all ETL datasets from data_values
-        # and remove these lines
-        q = delete(gm.DataValues).where(gm.DataValues.variableId == variable_id)
-        session.execute(q)
-        session.commit()
-
-        df = table.rename(columns={column_name: "value", "entity_id": "entityId"}).assign(variableId=variable_id)
-
-        # TODO: once we verify that uploading to S3 works, stop upserting to data_values and remove these
-        # lines together with function insert_to_data_values
-        if table.metadata.dataset.short_name not in BLACKLIST_DATASETS_DATA_VALUES_UPSERTS:
-            insert_to_data_values(engine, df)
-            log.info("upsert_table.upserted_data_values", size=len(table), varible_id=variable_id)
+        # following functions assume that `value` is string
+        df["value"] = df["value"].astype(str)
 
         # NOTE: we could prefetch all entities in advance, but it's not a bottleneck as it takes
         # less than 10ms per variable
@@ -282,7 +257,6 @@ def upsert_table(
         data_path = upload_gzip_dict(var_data, variable.s3_data_path())
         metadata_path = upload_gzip_dict(var_metadata, variable.s3_metadata_path())
 
-        variable = gm.Variable.load_variable(session, variable_id)
         variable.dataPath = data_path
         variable.metadataPath = metadata_path
         session.add(variable)
@@ -366,12 +340,6 @@ def cleanup_ghost_variables(dataset_id: int, upserted_variable_ids: List[int], w
             rows = pd.DataFrame(rows, columns=["chartId", "variableId"])
             raise ValueError(f"Variables used in charts will not be deleted automatically:\n{rows}")
 
-        # first delete data_values
-        # NOTE: deleting 100 variables takes ~30s with 10 workers with threading
-        # and about ~3mins when deleting them in batch
-        with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as executor:
-            list(executor.map(_delete_variable_from_data_values, variable_ids_to_delete))
-
         # then variables themselves with related data in other tables
         db.cursor.execute(
             """
@@ -393,16 +361,6 @@ def cleanup_ghost_variables(dataset_id: int, upserted_variable_ids: List[int], w
         )
 
 
-def _delete_variable_from_data_values(variable_id: int) -> None:
-    with open_db() as db:
-        db.cursor.execute(
-            """
-                    DELETE FROM data_values WHERE variableId = %(variable_id)s
-                """,
-            {"variable_id": variable_id},
-        )
-
-
 def cleanup_ghost_sources(dataset_id: int, upserted_source_ids: List[int]) -> None:
     """Remove all leftover sources that didn't get upserted into DB during grapher step.
     This could happen when you rename or delete sources.
@@ -418,26 +376,3 @@ def cleanup_ghost_sources(dataset_id: int, upserted_source_ids: List[int]) -> No
         )
         if db.cursor.rowcount > 0:
             log.warning(f"Deleted {db.cursor.rowcount} ghost sources")
-
-
-@retry(stop=stop.stop_after_attempt(3))
-def insert_to_data_values(engine: Engine, df: pd.DataFrame) -> None:
-    """Insert data into data_values table. Retry in case we get Deadlock error."""
-    # value will be converted to string in MySQL, we need to do it beforehand otherwise
-    # it's gonna assume it is float64 and mess up precision for smaller types
-    df.value = df.value.astype(str)
-
-    # insert data to data_values using pandas which is both faster and doesn't raise
-    # deadlocks
-    df.to_sql(
-        "data_values",
-        engine,
-        if_exists="append",
-        index=False,
-        dtype={
-            "value": String(255),
-            "year": Integer(),
-            "entityId": Integer(),
-            "variableId": Integer(),
-        },
-    )

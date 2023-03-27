@@ -394,6 +394,7 @@ class ChartRevisionSuggester:
         with open_db() as db:
             all_var_ids = list(self.old_var_id2new_var_id.keys()) + list(self.old_var_id2new_var_id.values())
             variable_ids_str = ",".join([str(_id) for _id in all_var_ids])
+            raise NotImplementedError("data_values was deprecated")
             rows = db.fetch_many(
                 f"""
                 SELECT variableId, MIN(year) AS minYear, MAX(year) AS maxYear
