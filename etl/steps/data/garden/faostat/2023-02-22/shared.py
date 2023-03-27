@@ -410,18 +410,28 @@ def harmonize_items(df: pd.DataFrame, dataset_short_name: str, item_col: str = "
     df = df.copy()
     # Note: Here list comprehension is faster than doing .astype(str).str.zfill(...).
     df["item_code"] = [str(item_code).zfill(N_CHARACTERS_ITEM_CODE) for item_code in df["item_code"]]
-    df[item_col] = df[item_col].astype(str)
+
+    # Convert both columns to category to reduce memory.
+    df = df.astype({"item_code": "category", item_col: "category"})
 
     # Fix those few cases where there is more than one item per item code within a given dataset.
     if dataset_short_name in ITEM_AMENDMENTS:
         for amendment in ITEM_AMENDMENTS[dataset_short_name]:
+            # Ensure new item code and item name are added as categories, to avoid errors.
+            if amendment["new_item_code"] not in df["item_code"].cat.categories:
+                df["item_code"] = df["item_code"].cat.add_categories(amendment["new_item_code"])
+            if amendment["new_fao_item"] not in df[item_col].cat.categories:
+                df[item_col] = df[item_col].cat.add_categories(amendment["new_fao_item"])
+
+            # Update item code and item name.
             df.loc[
                 (df["item_code"] == amendment["item_code"]) & (df[item_col] == amendment["fao_item"]),
                 ("item_code", item_col),
             ] = (amendment["new_item_code"], amendment["new_fao_item"])
 
-    # Convert both columns to category to reduce memory
-    df = df.astype({"item_code": "category", item_col: "category"})
+    # Remove unused categories.
+    df["item_code"] = df["item_code"].cat.remove_unused_categories()
+    df[item_col] = df[item_col].cat.remove_unused_categories()
 
     return df
 
