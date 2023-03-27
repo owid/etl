@@ -13,7 +13,6 @@ import re
 from pathlib import Path
 from typing import Dict, List, Optional, Set, Tuple, cast
 
-import pandas as pd
 from owid.walden import Catalog
 
 from etl.files import checksum_file
