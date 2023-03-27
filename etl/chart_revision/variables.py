@@ -56,7 +56,7 @@ class VariablesUpdate:
 
         # get min and max year for each variable
         df_var_years = (
-            df_var_years.groupby("variableId", as_index=False)
+            df_var_years.groupby("variableId")
             .year.agg(["min", "max"])
             .rename(columns={"min": "minYear", "max": "maxYear"})
         )
