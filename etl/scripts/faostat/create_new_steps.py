@@ -332,15 +332,8 @@ def generate_content_for_new_step_file(channel: str, step_name: str) -> str:
     """
     # Define common docstring to add to the header of the new step file.
     docstring = f'"""FAOSTAT {channel} step for {step_name} dataset."""\n'
-    if channel in ["meadow", "garden"]:
+    if channel in ["meadow", "garden", "grapher"]:
         file_content = docstring + f"from .{RUN_FILE_NAME} import run  # noqa:F401\n"
-    elif channel == "grapher":
-        file_content = docstring + (
-            f"from .{RUN_FILE_NAME} import catalog, get_grapher_dataset_from_file_name\n"
-            f"from .{RUN_FILE_NAME} import get_grapher_tables  # noqa:F401\n\n\n"
-            f"def get_grapher_dataset() -> catalog.Dataset:\n"
-            f"    return get_grapher_dataset_from_file_name(__file__)\n"
-        )
     else:
         raise ValueError("channel name not understood")
 
