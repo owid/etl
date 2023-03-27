@@ -250,11 +250,17 @@ def upsert_table(
         # less than 10ms per variable
         df = add_entity_code_and_name(engine, df)
 
+        # process and upload data to S3
         var_data = variable_data(df)
-        var_metadata = variable_metadata(engine, variable_id, df)
-
-        # upload data and metadata to S3
         data_path = upload_gzip_dict(var_data, variable.s3_data_path())
+
+        # we need to commit changes because we use SQL command in `variable_metadata`. We wouldn't
+        # have to if we used ORM instead
+        session.add(variable)
+        session.commit()
+
+        # process and upload metadata to S3
+        var_metadata = variable_metadata(engine, variable_id, df)
         metadata_path = upload_gzip_dict(var_metadata, variable.s3_metadata_path())
 
         variable.dataPath = data_path
