@@ -172,20 +172,18 @@ def create_full_time_series(df: pd.DataFrame) -> pd.DataFrame:
 
     """
     filled_df = pd.DataFrame()
-    # create set of dates for each country
-    date_sets = {country: set(df[df.country == country].date) for country in df.country.drop_duplicates()}
-    for country, country_df in df.groupby("country"):
+    for country in df.country.drop_duplicates():
+        country_df = df[df["country"] == country]
         min_date = country_df.date.min()
         max_date = country_df.date.max()
         date_series = pd.Series(pd.date_range(min_date, max_date, freq="7D").format(), name="date")
-        # check which dates are missing in the country
-        missing_dates = date_series[~date_series.isin(date_sets[country])]
-        if len(missing_dates) > 0:
-            missing_df = pd.DataFrame(
-                {"country": country, "date": missing_dates, "hemisphere": country_df.hemisphere.iloc[0]}
-            )
-            # merge missing dates into the country df
-            country_df = pd.concat([country_df, missing_df]).sort_values("date")
+
+        if len(date_series[~date_series.isin(country_df["date"])]) > 0:
+            country_df = pd.merge(country_df, date_series, how="outer")
+            country_df[["country", "hemisphere"]] = country_df[["country", "hemisphere"]].fillna(method="ffill")
+            assert len(date_series) == country_df.shape[0]
+            assert country_df.country.isna().sum() == 0
+
         filled_df = pd.concat([filled_df, country_df])
 
     return filled_df
