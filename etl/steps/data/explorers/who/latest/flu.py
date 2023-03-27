@@ -61,7 +61,7 @@ def run(dest_dir: str) -> None:
     tb_flu = create_regional_aggregates(df=tb_flu)
 
     # hold back the last 28 days of data as it takes some time for data to filter in from countries
-
+    tb_flu = hold_back_data(df=tb_flu, days_held_back=DAYS_HELD_BACK)
     assert tb_flu[["country", "date"]].duplicated().sum() == 0
     # Create monthly aggregates - sum variables that are counts and recalculate rates based on these monthly totals
     tb_flu_monthly = create_monthly_aggregates(df=tb_flu)
@@ -76,14 +76,15 @@ def run(dest_dir: str) -> None:
     ds_explorer.save()
 
 
-def hold_back_data(df=pd.DataFrame, days_held_back=DAYS_HELD_BACK) -> pd.DataFrame:
+def hold_back_data(df: pd.DataFrame, days_held_back: int) -> pd.DataFrame:
     """
     Removing the last {days_held_back} days from the data, these values are typically adjusted in the following weeks
     """
-    date_limit = datetime.now().date() - timedelta(days=days_held_back)
-    date_limit = date_limit.strftime(format="%Y-%m-%d")
-
+    todays_date = datetime.now().date()
+    date_limit = todays_date - timedelta(days=days_held_back)
+    date_limit = datetime.strftime(date_limit, format="%Y-%m-%d")  # type: ignore
     df = df[df["date"] <= date_limit]
+    assert all(df["date"] <= date_limit)
     return df
 
 
@@ -104,7 +105,6 @@ def fill_flu_data_gaps_with_zero(df: pd.DataFrame) -> pd.DataFrame:
     fluid_cols = cols[(cols.str.contains("ili|ari"))].to_list()
     not_z_filled_flunet_cols = [col for col in all_flunet_cols if not col.endswith("zfilled")]
     flu_cols = fluid_cols + not_z_filled_flunet_cols
-    # cols_to_fill = ["country", "year", "date"] + fluid_cols + not_z_filled_flunet_cols
     df[flu_cols] = df[flu_cols].apply(pd.to_numeric)
     df_out = df.copy()
     df_out = df_out.sort_values(["country", "date"]).reset_index(drop=True)
@@ -172,18 +172,20 @@ def create_full_time_series(df: pd.DataFrame) -> pd.DataFrame:
 
     """
     filled_df = pd.DataFrame()
-    for country in df.country.drop_duplicates():
-        country_df = df[df["country"] == country]
+    # create set of dates for each country
+    date_sets = {country: set(df[df.country == country].date) for country in df.country.drop_duplicates()}
+    for country, country_df in df.groupby("country"):
         min_date = country_df.date.min()
         max_date = country_df.date.max()
         date_series = pd.Series(pd.date_range(min_date, max_date, freq="7D").format(), name="date")
-
-        if len(date_series[~date_series.isin(country_df["date"])]) > 0:
-            country_df = pd.merge(country_df, date_series, how="outer")
-            country_df[["country", "hemisphere"]] = country_df[["country", "hemisphere"]].fillna(method="ffill")
-            assert len(date_series) == country_df.shape[0]
-            assert country_df.country.isna().sum() == 0
-
+        # check which dates are missing in the country
+        missing_dates = date_series[~date_series.isin(date_sets[country])]
+        if len(missing_dates) > 0:
+            missing_df = pd.DataFrame(
+                {"country": country, "date": missing_dates, "hemisphere": country_df.hemisphere.iloc[0]}
+            )
+            # merge missing dates into the country df
+            country_df = pd.concat([country_df, missing_df]).sort_values("date")
         filled_df = pd.concat([filled_df, country_df])
 
     return filled_df
