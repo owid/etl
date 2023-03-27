@@ -14,6 +14,3 @@ dataset:
     date_accessed: '2023-01-04'
     publication_date: '2009-03-01'
     publication_year: 2009
-tables:
-  nemet_2009:
-    variables: {}

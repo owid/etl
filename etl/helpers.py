@@ -63,6 +63,18 @@ def _get_github_branches(org: str, repo: str) -> List[Any]:
     return branches
 
 
+def grapher_checks(ds: catalog.Dataset) -> None:
+    """Check that the table is in the correct format for Grapher."""
+    for tab in ds:
+        assert {"year", "country"} <= set(tab.reset_index().columns), "Table must have columns country and year."
+        for col in tab:
+            if col in ("year", "country"):
+                continue
+            catalog.utils.validate_underscore(col)
+            assert tab[col].metadata.unit is not None, f"Column {col} must have a unit."
+            assert tab[col].metadata.title is not None, f"Column {col} must have a title."
+
+
 def create_dataset(
     dest_dir: Union[str, Path],
     tables: Iterable[catalog.Table],
@@ -294,6 +306,7 @@ class PathFinder:
 
         if channel_type.endswith("-private"):
             is_private = True
+            channel = channel.replace("-private", "")
         else:
             is_private = False
 

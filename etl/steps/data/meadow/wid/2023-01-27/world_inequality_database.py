@@ -47,7 +47,7 @@ iso2_missing = {
     "QW": "West Asia (WID)",
     "QX": "Western Europe (WID)",
     "QY": "European Union (WID)",
-    "WO": "World (WID)",
+    "WO": "World",
     "XA": "Asia (excluding Middle East) (WID)",
     "XB": "North America and Oceania (WID)",
     "XF": "Sub-Saharan Africa (WID)",

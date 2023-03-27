@@ -56,7 +56,3 @@ dataset:
     - Per capita energy by source: calculated as primary energy consumption by source, divided by population.
 
     Per capita figures have been calculated using a population dataset that is built and maintained by Our World in Data, based on <a href="https://ourworldindata.org/population-sources">different sources</a>.
-
-tables:
-  energy_mix:
-    variables:

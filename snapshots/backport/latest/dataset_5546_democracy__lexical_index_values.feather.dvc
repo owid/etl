@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5546_democracy__lexical_index_values
   file_extension: feather
-  date_accessed: 2023-03-10 08:37:35.455328
+  date_accessed: 2023-03-10 11:19:08.649589
   name: Democracy - Lexical Index
   description: ''
   source_name: Our World in Data catalog backport

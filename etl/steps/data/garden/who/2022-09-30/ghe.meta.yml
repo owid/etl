@@ -1,32 +1,88 @@
+# (Inherited from meadow, remove if not different.)
+all_sources:
+  - source_testing: &sources
+      name: WHO, Global Health Estimates (2020)
+      published_by: World Health Organization (2020)
+      url: https://www.who.int/data/global-health-estimates
+      date_accessed: 2022-09-30
+      publication_date: # Example: 2023-01-01
+      publication_year: # (if publication_date is not given). Example: 2023
+      # description: Source description.
+
 dataset:
   title: Global Health Estimates - World Health Organization (2020)
+  description: |
+    WHO's Global Health Estimates (GHE) provide the latest available data on death and disability globally, by region and country, and by age, sex and cause. The latest updates include global, regional and country trends from 2000 to 2019 inclusive. By providing key insights on mortality and morbidity trends, these estimates are a powerful tool to support informed decision-making on health policy and resource allocation.
+
+    <b>Methods:</b>
+    WHO's Global Health Estimates present comprehensive and comparable time-series data from 2000 onwards for health-related indicators, including life expectancy, healthy life expectancy, mortality and morbidity, as well as burden of diseases at global, regional and country levels, disaggregated by age, sex and cause.
+
+    They are produced using data from multiple consolidated sources, including national vital registration data, latest estimates from WHO technical programmes, United Nations partners and inter-agency groups, as well as the Global Burden of Disease and other scientific studies. A broad spectrum of robust and  well-established scientific methods were applied for the processing, synthesis and analysis of data. 
+  licenses:
+    - name: CC BY-NC-SA 3.0 IGO
+      url: https://www.who.int/about/policies/publishing/copyright
+  sources:
+    - *sources
+
 tables:
   ghe:
     variables:
       death_count:
-        title: Deaths
-        description: Deaths
+        description: |
+          Number of deaths for a given cause. All the different causes can be found in Annex Table A at https://cdn.who.int/media/docs/default-source/gho-documents/global-health-estimates/ghe2019_cod_methods.pdf?sfvrsn=37bcfacc_5.
         unit: deaths
+        short_unit: ""
         display:
+          name: Deaths
           numDecimalPlaces: 0
       death_rate100k:
-        title: Deaths per 100k
-        description: Deaths per 100.000 people
+        description: |
+          Death rate (per 100,000 people) for a given cause. All the different causes can be found in Annex Table A at https://cdn.who.int/media/docs/default-source/gho-documents/global-health-estimates/ghe2019_cod_methods.pdf?sfvrsn=37bcfacc_5.
         unit: deaths per 100,000 people
+        short_unit: ""
         display:
-          numDecimalPlaces: 2
+          name: Deaths per 100k
+          numDecimalPlaces: 1
       daly_count:
-        title: Disability adjusted life years
-        description: Disability adjusted life years
+        description: |
+          <b>Rationale:</b>
+          Mortality does not give a complete picture of the burden of disease borne by individuals in different populations. The overall burden of disease is assessed using the disability-adjusted life year (DALY), a time-based measure that combines years of life lost due to premature mortality (YLLs) and years of life lost due to time lived in states of less than full health, or years of healthy life lost due to disability (YLDs).
+          One DALY represents the loss of the equivalent of one year of full health. Using DALYs, the burden of diseases that cause premature death but little disability (such as drowning or measles) can be compared to that of diseases that do not cause death but do cause disability (such as cataract causing blindness).
+
+          <b>Definition:</b>
+          DALYs expressed per 100 000 population. DALYs for a disease or health condition are the sum of the years of life lost to due to premature mortality (YLLs) and the years lived with a disability (YLDs) due to prevalent cases of the disease or health condition in a population.
+
+          <b>Method of estimation:</b>
+          DALYs expressed per 100 000 population. DALYs for a specific cause are calculated as the sum of the years of life lost due to premature mortality (YLLs) from that cause and the years of years of healthy life lost due to disability (YLDs) for people living in states of less than good health resulting from the specific cause.
+          The YLLs for a cause are calculated as the number of cause-specific deaths multiplied by a loss function specifying the years lost for deaths as a function of the age at which death occurs. The loss function is based on the frontier national life expectancy projected for the year 2050 by the World Population Prospects 2012 (UN Population Division, 2013), with a life expectancy at birth of 92 years.
+          Prevalence YLDs are used here. Prevalence YLDs are calculated as the prevalence of each non-fatal condition multiplied by its disability weight.
+          More detailed method of estimation is available at: http://www.who.int/entity/healthinfo/statistics/GlobalDALYmethods_2000_2011.pdf?ua=1
+
         unit: DALYs
+        short_unit: ""
         display:
+          name: Disability adjusted life years
           numDecimalPlaces: 2
       daly_rate100k:
-        title: Disability adjusted life years per 100k
-        description: Disability adjusted life years per 100k capita in one year
+        description: |
+          <b>Rationale:</b>
+          Mortality does not give a complete picture of the burden of disease borne by individuals in different populations. The overall burden of disease is assessed using the disability-adjusted life year (DALY), a time-based measure that combines years of life lost due to premature mortality (YLLs) and years of life lost due to time lived in states of less than full health, or years of healthy life lost due to disability (YLDs).
+          One DALY represents the loss of the equivalent of one year of full health. Using DALYs, the burden of diseases that cause premature death but little disability (such as drowning or measles) can be compared to that of diseases that do not cause death but do cause disability (such as cataract causing blindness).
+
+          <b>Definition:</b>
+          DALYs expressed per 100 000 population. DALYs for a disease or health condition are the sum of the years of life lost to due to premature mortality (YLLs) and the years lived with a disability (YLDs) due to prevalent cases of the disease or health condition in a population.
+
+          <b>Method of estimation:</b>
+          DALYs expressed per 100 000 population. DALYs for a specific cause are calculated as the sum of the years of life lost due to premature mortality (YLLs) from that cause and the years of years of healthy life lost due to disability (YLDs) for people living in states of less than good health resulting from the specific cause.
+          The YLLs for a cause are calculated as the number of cause-specific deaths multiplied by a loss function specifying the years lost for deaths as a function of the age at which death occurs. The loss function is based on the frontier national life expectancy projected for the year 2050 by the World Population Prospects 2012 (UN Population Division, 2013), with a life expectancy at birth of 92 years.
+          Prevalence YLDs are used here. Prevalence YLDs are calculated as the prevalence of each non-fatal condition multiplied by its disability weight.
+          More detailed method of estimation is available at: http://www.who.int/entity/healthinfo/statistics/GlobalDALYmethods_2000_2011.pdf?ua=1
+
         unit: DALYs per 100,000 people
+        short_unit: ""
         display:
-          numDecimalPlaces: 2
+          name: Disability adjusted life years per 100k
+          numDecimalPlaces: 1
       flag_level:
         title: Level
         description: Hierachical level of disease/injury

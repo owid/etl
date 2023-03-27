@@ -1,0 +1,18 @@
+meta:
+  namespace: backport
+  short_name: dataset_2733_ozone_depletion_impacts_on_skin_cancer_incidence__slaper_et_al__1996_values
+  file_extension: feather
+  date_accessed: 2023-03-23 17:23:55.472304
+  name: Ozone depletion impacts on skin cancer incidence (Slaper et al., 1996)
+  description: ''
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/2733
+  source_published_by: Our World in Data catalog backport
+  is_public: true
+  version: latest
+  publication_date: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 29c92ff2f6768a43c391a2ec36ed85e2
+  size: 6618
+  path: dataset_2733_ozone_depletion_impacts_on_skin_cancer_incidence__slaper_et_al__1996_values.feather

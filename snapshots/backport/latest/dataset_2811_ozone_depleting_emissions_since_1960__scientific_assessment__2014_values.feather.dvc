@@ -1,0 +1,18 @@
+meta:
+  namespace: backport
+  short_name: dataset_2811_ozone_depleting_emissions_since_1960__scientific_assessment__2014_values
+  file_extension: feather
+  date_accessed: 2023-03-23 17:24:25.610600
+  name: Ozone depleting emissions since 1960 (Scientific Assessment, 2014)
+  description: ''
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/2811
+  source_published_by: Our World in Data catalog backport
+  is_public: true
+  version: latest
+  publication_date: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 67aedd3a8219b0bdc53e2273401b988a
+  size: 6714
+  path: dataset_2811_ozone_depleting_emissions_since_1960__scientific_assessment__2014_values.feather
