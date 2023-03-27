@@ -26,7 +26,7 @@ from etl.steps.data.garden.who.latest.fluid import calculate_patient_rates
 paths = PathFinder(__file__)
 
 # Remove data for countries which have fewer than this value
-MIN_DATA_POINTS = 20
+# MIN_DATA_POINTS = 20
 MIN_DATA_POINTS_PER_YEAR = 10
 # We hold back the most recent 28 days worth of data as these are often incomplete - it looks as if the data artificially drops if these days are included.
 DAYS_HELD_BACK = 28
@@ -57,7 +57,7 @@ def run(dest_dir: str) -> None:
     #
     tb_flu = create_zero_filled_strain_columns(tb_flu)
 
-    tb_flu = remove_sparse_timeseries(df=tb_flu, min_data_points=MIN_DATA_POINTS)
+    # tb_flu = remove_sparse_timeseries(df=tb_flu, min_data_points=MIN_DATA_POINTS)
     tb_flu = create_regional_aggregates(df=tb_flu)
 
     # hold back the last 28 days of data as it takes some time for data to filter in from countries
