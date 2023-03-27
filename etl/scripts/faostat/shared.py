@@ -103,7 +103,7 @@ GLOB_VERSION_PATTERN = "[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]"
 ADDITIONAL_DEPENDENCIES: Dict[str, List[Tuple[str, str, str]]] = {
     "meadow": [],
     "garden": [
-        (NAMESPACE, "meadow", f"{NAMESPACE}_metadata"),
+        (NAMESPACE, "garden", f"{NAMESPACE}_metadata"),
         ("owid", "garden", "key_indicators"),
         ("wb", "garden", "wb_income"),
     ],
@@ -118,6 +118,7 @@ ADDITIONAL_FILES_TO_COPY = [
     "custom_elements_and_units.csv",
     "custom_items.csv",
     "detected_outliers.json",
+    "value_amendments.csv",
 ]
 # Note: Further custom rules are applied to the list of steps to run.
 # These rules are defined in apply_custom_rules_to_list_of_steps_to_run.
