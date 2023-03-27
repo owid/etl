@@ -109,9 +109,9 @@ def create_dag_line_name(channel: str, step_name: str, namespace: str = NAMESPAC
         Name of the dag line.
 
     """
-    if channel in ["meadow", "garden"]:
+    if channel in ["meadow", "garden", "grapher"]:
         dag_line = f"data://{channel}/{namespace}/{version}/{step_name}"
-    elif channel in ["snapshot", "grapher"]:
+    elif channel in ["snapshot"]:
         dag_line = f"{channel}://{namespace}/{version}/{step_name}"
     else:
         raise ValueError("wrong channel name")

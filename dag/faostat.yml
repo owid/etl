@@ -555,9 +555,9 @@ steps:
     - data://garden/faostat/2023-02-22/faostat_tcl
   data://grapher/faostat/2023-02-22/faostat_ti:
     - data://garden/faostat/2023-02-22/faostat_ti
-  grapher://faostat/2023-02-22/faostat_gn:
-    - data://garden/faostat/2023-02-22/faostat_gn
-  grapher://faostat/2023-02-22/faostat_ic:
+  data://grapher/faostat/2023-02-22/faostat_gn:
+     - data://garden/faostat/2023-02-22/faostat_gn
+  data://grapher/faostat/2023-02-22/faostat_ic:
     - data://garden/faostat/2023-02-22/faostat_ic
-  grapher://faostat/2023-02-22/faostat_wcad:
+  data://grapher/faostat/2023-02-22/faostat_wcad:
     - data://garden/faostat/2023-02-22/faostat_wcad
