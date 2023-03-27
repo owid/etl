@@ -13,7 +13,7 @@ Further steps we take:
 * Create monthly aggregates where we sum the count variables and average the rate variables
 """
 
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import numpy as np
 import pandas as pd
@@ -28,6 +28,8 @@ paths = PathFinder(__file__)
 # Remove data for countries which have fewer than this value
 MIN_DATA_POINTS = 20
 MIN_DATA_POINTS_PER_YEAR = 10
+# We hold back the most recent 28 days worth of data as these are often incomplete - it looks as if the data artificially drops if these days are included.
+DAYS_HELD_BACK = 28
 
 
 def run(dest_dir: str) -> None:
@@ -53,11 +55,13 @@ def run(dest_dir: str) -> None:
     tb_flu = remove_sparse_years(tb_flu, min_datapoints_per_year=MIN_DATA_POINTS_PER_YEAR)
     tb_flu = fill_flu_data_gaps_with_zero(tb_flu)
     #
-    # tb_flu = fill_missing_values_with_zero(tb_flu)
     tb_flu = create_zero_filled_strain_columns(tb_flu)
 
     tb_flu = remove_sparse_timeseries(df=tb_flu, min_data_points=MIN_DATA_POINTS)
     tb_flu = create_regional_aggregates(df=tb_flu)
+
+    # hold back the last 28 days of data as it takes some time for data to filter in from countries
+
     assert tb_flu[["country", "date"]].duplicated().sum() == 0
     # Create monthly aggregates - sum variables that are counts and recalculate rates based on these monthly totals
     tb_flu_monthly = create_monthly_aggregates(df=tb_flu)
@@ -70,6 +74,17 @@ def run(dest_dir: str) -> None:
         dest_dir, tables=[tb_flu, tb_flu_monthly], default_metadata=flunet_garden.metadata, formats=["csv"]
     )
     ds_explorer.save()
+
+
+def hold_back_data(df=pd.DataFrame, days_held_back=DAYS_HELD_BACK) -> pd.DataFrame:
+    """
+    Removing the last {days_held_back} days from the data, these values are typically adjusted in the following weeks
+    """
+    date_limit = datetime.now().date() - timedelta(days=days_held_back)
+    date_limit = date_limit.strftime(format="%Y-%m-%d")
+
+    df = df[df["date"] <= date_limit]
+    return df
 
 
 def fill_na_with_zero(group_df: pd.DataFrame, col: str) -> pd.DataFrame:
