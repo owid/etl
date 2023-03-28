@@ -1,5 +1,9 @@
-"""Map old variables to new variables, and create chart revisions, to be able to visually confirm if the variables in an
-existing grapher chart can safely be replaced by the new ones.
+"""Map old grapher variables to new ones, and create chart revisions, to be able to visually confirm if the variables in
+an existing grapher chart can safely be replaced by the new ones.
+
+This script may raise errors, possibly because the chart revision tool fails when trying to create a revision for a
+chart that is already in revision (when another variable previously triggered a revision for the same chart).
+When this happens, simply go through the approval tool and run this script again until it produces no more revisions.
 
 """
 
@@ -9,6 +13,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
+from MySQLdb import IntegrityError
 from owid.catalog import Dataset
 from owid.datautils.dataframes import map_series
 from structlog import get_logger
@@ -86,8 +91,7 @@ def map_old_to_new_variable_names(variables_old: List[str], variables_new: List[
     if len(possible_new_variables) > 0:
         log.info(f"There are {len(possible_new_variables)} unknown new variables.")
     if len(unmatched_old_variables) > 0:
-        _unmatched_old_variables = "".join([f"\n    {variable}" for variable in unmatched_old_variables])
-        log.warning(f"Old variables not matched to any new variables: {_unmatched_old_variables}")
+        log.info(f"There are {len(unmatched_old_variables)} old variables not matched to any new variables.")
 
     # Map old variable names to new variable names.
     variables_name_mapping = variables_matched.dropna().set_index("variable_old").to_dict()["variable_new"]
@@ -121,6 +125,7 @@ def map_old_to_new_grapher_variable_ids(
     # Add the new variable titles to the old grapher variables dataframe.
     grapher_variables_mapping = grapher_variables_old.copy()
     grapher_variables_mapping["name_new"] = map_series(grapher_variables_mapping["name"], mapping=variables_mapping)
+
     # Merge with the new grapher variables ensuring that new titles are matched for all variables in the old dataframe.
     grapher_variables_mapping = pd.merge(
         grapher_variables_mapping,
@@ -244,10 +249,16 @@ def main(
             dataset_short_name=dataset_short_name, version_old=version_old, version_new=version_new
         )
 
-        if execute_revisions:
+        if execute_revisions and len(grapher_variable_ids_mapping) > 0:
             # Submit revisions to grapher db.
             log.info(f"Creating chart revisions to map {len(grapher_variable_ids_mapping)} old variables to new ones.")
-            create_and_submit_charts_revisions(mapping=grapher_variable_ids_mapping)
+            try:
+                create_and_submit_charts_revisions(mapping=grapher_variable_ids_mapping)
+            except IntegrityError:
+                log.error(
+                    "Execution failed because some of the charts are already awaiting revision. "
+                    "Go through the approval tool and re-run this script."
+                )
 
 
 if __name__ == "__main__":
@@ -279,7 +290,6 @@ if __name__ == "__main__":
         help="If given, execute chart revisions. Otherwise, simply print the log without starting any revisions.",
     )
     args = parser.parse_args()
-
     main(
         domains=args.domains,
         version_old=args.version_old,
