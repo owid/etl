@@ -1,0 +1,23 @@
+meta:
+  namespace: unep
+  short_name: consumption_controlled_substances
+  name: Consumption of controlled substances (UNEP, 2023)
+  version: 2023-03-17
+  publication_year: 2023
+  publication_date: 2023-03-16
+  source_name: UN Environment Programme (2023)
+  source_published_by: UN Environment Programme
+  url: https://ozone.unep.org/countries/data-table
+  source_data_url:
+  file_extension: xlsx
+  license_url:
+  license_name:
+  date_accessed: 2023-03-17
+  is_public: true
+  description: |
+    Period: 1986-2022
+wdir: ../../../data/snapshots/unep/2023-03-17
+outs:
+- md5: c37b5dce2d945f478830e1d891942ef5
+  size: 212762
+  path: consumption_controlled_substances.hydrochlorofluorocarbons.xlsx

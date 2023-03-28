@@ -727,7 +727,6 @@ class GrapherStep(Step):
 
             # insert data in parallel, this speeds it up considerably and is even faster than loading
             # data with LOAD DATA INFILE
-            # TODO: remove threads once we get rid of inserts into data_values
             if config.GRAPHER_INSERT_WORKERS > 1:
                 with concurrent.futures.ThreadPoolExecutor(max_workers=config.GRAPHER_INSERT_WORKERS) as executor:
                     results = executor.map(upsert, tables)

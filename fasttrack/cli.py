@@ -390,6 +390,11 @@ def _load_data_and_meta(
             )
 
             try:
+                if "?output=csv" not in sheets_url:
+                    raise sheets.ValidationError(
+                        "URL does not contain `?output=csv`. Have you published it as CSV and not as HTML by accident?"
+                    )
+
                 google_sheets = sheets.import_google_sheets(sheets_url)
                 # TODO: it would make sense to repeat the import until we're sure that it has been updated
                 # we wouldn't risk importing data that is not up to date then

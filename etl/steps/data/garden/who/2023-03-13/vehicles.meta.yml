@@ -1,0 +1,27 @@
+all_sources:
+  - who_gho: &who-gho
+      name: WHO, Global Health Observatory (2022); United Nations - Population Division (2022)
+      published_by: WHO, Global Health Observatory (2022); United Nations - Population Division (2022)
+      url: https://ghoapi.azureedge.net/api/; https://population.un.org/wpp/Download/
+      date_accessed: 2022-08-03
+      publication_year: 2022
+
+dataset:
+  title: Registered vehicles per 1,000 people (WHO, 2022)
+  namespace: who
+  short_name: vehicles
+  description: |-
+    The total number of registered vehicles (i.e. vehicles reported to a government agency and given some form of registration) in each county.
+    
+    Data were collected from a number of different sectors and stakeholders in each country and were submitted to the World Health Organization after consensus meetings, facilitated by   national data coordinators. All legislative documents were analysed by lawyers at WHO headquarters who extracted the relevant information. The legal analysis was then shared with   National Data Coordinators and a validation process resolved any data conflicts through discussion and submission of new legal documents.
+  sources:
+    - *who-gho
+
+tables:
+  vehicles:
+    variables:
+      registered_vehicles_per_thousand:
+        title: Registered vehicles per 1,000 people
+        unit: vehicles per 1,000 people
+        display:
+          numDecimalPlaces: 1

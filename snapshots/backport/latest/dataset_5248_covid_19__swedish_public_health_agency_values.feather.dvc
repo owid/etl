@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5248_covid_19__swedish_public_health_agency_values
   file_extension: feather
-  date_accessed: 2023-03-10 12:10:06.349254
+  date_accessed: 2023-03-24 11:47:31.111348
   name: COVID-19 - Swedish Public Health Agency
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 1cb9e7b20a625a61462c69b4510dbcf4
-  size: 14354
+- md5: ba492f8e17b2152b17725d55c8982e18
+  size: 14458
   path: dataset_5248_covid_19__swedish_public_health_agency_values.feather

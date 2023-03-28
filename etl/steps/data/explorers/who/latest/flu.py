@@ -13,6 +13,8 @@ Further steps we take:
 * Create monthly aggregates where we sum the count variables and average the rate variables
 """
 
+from datetime import datetime, timedelta
+
 import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
@@ -24,7 +26,10 @@ from etl.steps.data.garden.who.latest.fluid import calculate_patient_rates
 paths = PathFinder(__file__)
 
 # Remove data for countries which have fewer than this value
-MIN_DATA_POINTS = 20
+# MIN_DATA_POINTS = 20
+MIN_DATA_POINTS_PER_YEAR = 10
+# We hold back the most recent 28 days worth of data as these are often incomplete - it looks as if the data artificially drops if these days are included.
+DAYS_HELD_BACK = 28
 
 
 def run(dest_dir: str) -> None:
@@ -47,9 +52,16 @@ def run(dest_dir: str) -> None:
     assert tb_flu[["country", "date"]].duplicated().sum() == 0
 
     tb_flu = create_full_time_series(tb_flu)
+    tb_flu = remove_sparse_years(tb_flu, min_datapoints_per_year=MIN_DATA_POINTS_PER_YEAR)
+    tb_flu = fill_flu_data_gaps_with_zero(tb_flu)
+    #
     tb_flu = create_zero_filled_strain_columns(tb_flu)
-    tb_flu = remove_sparse_timeseries(df=tb_flu, min_data_points=MIN_DATA_POINTS)
+
+    # tb_flu = remove_sparse_timeseries(df=tb_flu, min_data_points=MIN_DATA_POINTS)
     tb_flu = create_regional_aggregates(df=tb_flu)
+
+    # hold back the last 28 days of data as it takes some time for data to filter in from countries
+    tb_flu = hold_back_data(df=tb_flu, days_held_back=DAYS_HELD_BACK)
     assert tb_flu[["country", "date"]].duplicated().sum() == 0
     # Create monthly aggregates - sum variables that are counts and recalculate rates based on these monthly totals
     tb_flu_monthly = create_monthly_aggregates(df=tb_flu)
@@ -64,48 +76,85 @@ def run(dest_dir: str) -> None:
     ds_explorer.save()
 
 
+def hold_back_data(df: pd.DataFrame, days_held_back: int) -> pd.DataFrame:
+    """
+    Removing the last {days_held_back} days from the data, these values are typically adjusted in the following weeks
+    """
+    todays_date = datetime.now().date()
+    date_limit = todays_date - timedelta(days=days_held_back)
+    date_limit = datetime.strftime(date_limit, format="%Y-%m-%d")  # type: ignore
+    df = df[df["date"] <= date_limit]
+    assert all(df["date"] <= date_limit)
+    return df
+
+
+def fill_na_with_zero(group_df: pd.DataFrame, col: str) -> pd.DataFrame:
+    first_non_na = group_df[col].first_valid_index()
+    last_non_na = group_df[col].last_valid_index()
+    if first_non_na is not None:
+        group_df[col].loc[first_non_na + 1 : last_non_na] = group_df[col].loc[first_non_na + 1 : last_non_na].fillna(0)
+    return group_df
+
+
+def fill_flu_data_gaps_with_zero(df: pd.DataFrame) -> pd.DataFrame:
+    # put all the right columns in and make sure they aren't categories
+    cols = df.columns.drop(["country", "date", "hemisphere", "year"])
+    # all columns that contain values on confirmed flu cases
+    all_flunet_cols = cols[(cols.str.contains("sentinel|notdefined|combined"))]
+    # all columns that will be used in line charts but not stacked bar charts
+    fluid_cols = cols[(cols.str.contains("ili|ari"))].to_list()
+    not_z_filled_flunet_cols = [col for col in all_flunet_cols if not col.endswith("zfilled")]
+    flu_cols = fluid_cols + not_z_filled_flunet_cols
+    df[flu_cols] = df[flu_cols].apply(pd.to_numeric)
+    df_out = df.copy()
+    df_out = df_out.sort_values(["country", "date"]).reset_index(drop=True)
+    for col in flu_cols:
+        group_cols = ["country", "date", col]
+        df_filled = df_out[group_cols].groupby("country", group_keys=False).apply(fill_na_with_zero, col=col)
+        df_out[col] = df_filled[col]
+
+    return df_out
+
+
 def create_zero_filled_strain_columns(df: pd.DataFrame) -> pd.DataFrame:
     """
     For the stacked bar charts in the grapher to work I think I need to fill the NAs with zeros. I'll keep the original columns too as I think adding 0s into line charts would look weird and be misleading
     """
     strain_columns = [
         "ah1n12009combined",
-        "ah1combined",
-        "ah3combined",
-        "ah5combined",
-        "ah7n9combined",
-        "a_no_subtypecombined",
-        "byamcombined",
-        "bnotdeterminedcombined",
-        "bviccombined",
-        "inf_acombined",
-        "inf_bcombined",
         "ah1n12009sentinel",
-        "ah1sentinel",
-        "ah3sentinel",
-        "ah5sentinel",
-        "ah7n9sentinel",
-        "byamsentinel",
-        "bnotdeterminedsentinel",
-        "bvicsentinel",
-        "inf_asentinel",
-        "inf_bsentinel",
         "ah1n12009nonsentinel",
         "ah1n12009notdefined",
-        "ah1notdefined",
+        "ah1combined",
+        "ah1sentinel",
         "ah1nonsentinel",
+        "ah1notdefined",
+        "ah3combined",
+        "ah3sentinel",
         "ah3nonsentinel",
         "ah3notdefined",
+        "ah5combined",
+        "ah5sentinel",
         "ah5nonsentinel",
         "ah5notdefined",
+        "ah7n9combined",
+        "ah7n9sentinel",
         "ah7n9nonsentinel",
         "ah7n9notdefined",
-        "a_no_subtypenotdefined",
+        "a_no_subtypecombined",
         "a_no_subtypesentinel",
+        "a_no_subtypenonsentinel",
+        "a_no_subtypenotdefined",
+        "byamcombined",
+        "byamsentinel",
         "byamnonsentinel",
         "byamnotdefined",
+        "bnotdeterminedcombined",
+        "bnotdeterminedsentinel",
         "bnotdeterminednonsentinel",
         "bnotdeterminednotdefined",
+        "bviccombined",
+        "bvicsentinel",
         "bvicnonsentinel",
         "bvicnotdefined",
     ]
@@ -151,7 +200,7 @@ def remove_sparse_timeseries(df: pd.DataFrame, min_data_points: int) -> pd.DataF
     Also, remove flunet columns (not zero-filled) that are only NA or 0 as we don't want line charts for these.
     """
     countries = df["country"].drop_duplicates()
-    cols = df.columns.drop(["country", "date", "hemisphere"])
+    cols = df.columns.drop(["country", "date", "hemisphere", "year"])
     # all columns that have been zerofilled so they can be used in stacked bar charts
     z_filled_cols = [col for col in cols if col.endswith("zfilled")]
     # all columns that contain values on confirmed flu cases
@@ -162,19 +211,46 @@ def remove_sparse_timeseries(df: pd.DataFrame, min_data_points: int) -> pd.DataF
     not_z_filled_flunet_cols = [col for col in all_flunet_cols if not col.endswith("zfilled")]
     assert len(not_z_filled_flunet_cols) + len(z_filled_cols) + len(fluid_cols) == len(cols)
     for country in countries:
-        # Removing all flunet values for a country where
+        # Removing all flunet values for a country where there are fewer than {min_data_points}
         if all(df.loc[(df["country"] == country), z_filled_cols].fillna(0).astype(bool).sum() <= min_data_points):
             df.loc[(df["country"] == country), all_flunet_cols] = np.NaN
         for fluid_col in fluid_cols:
             # Removing rows from fluid columns where there are fewer than {min_data_points} for a country
             df[fluid_col] = df[fluid_col].astype(np.float32)
-            if df.loc[(df["country"] == country), fluid_col].fillna(0).astype(bool).sum() <= min_data_points:
+            if df.loc[(df["country"] == country), fluid_col].sum() <= min_data_points:
                 df.loc[(df["country"] == country), fluid_col] = np.NaN
         for flunet_col in not_z_filled_flunet_cols:
             # Removing rows from columns to be used in line charts where there are no non-NA or 0 values for a country (where it would show a flat 0 or NA line)
             df[flunet_col] = df[flunet_col].astype(np.float32)
             if df.loc[(df["country"] == country), flunet_col].fillna(0).astype(bool).sum() == 0:
                 df.loc[(df["country"] == country), flunet_col] = np.NaN
+
+    return df
+
+
+def remove_sparse_years(df: pd.DataFrame, min_datapoints_per_year: int) -> pd.DataFrame:
+    """
+    If a year has fewer than {min_data_points_per_year} then we should remove all the data for that year -> set it to NA
+    Unless it is the current year, then we do not change it.
+    """
+
+    df["year"] = pd.to_datetime(df["date"]).dt.year
+    constant_cols = ["country", "date", "hemisphere", "year"]
+    cols = df.columns.drop(constant_cols)
+    current_year = datetime.today().year
+    for col in cols:
+        df_col = df.loc[:, ["country", "year", col]]
+        df_col[col] = pd.to_numeric(df_col[col])
+        df_col_bool = (
+            df_col.groupby(["country", "year"]).agg(weeks_gt_zero=(col, lambda x: x.gt(0).sum())).reset_index()
+        )
+        df = pd.merge(df, df_col_bool, on=["country", "year"])
+
+        df.loc[
+            (df["weeks_gt_zero"] < min_datapoints_per_year) & (df["year"] < current_year),
+            col,
+        ] = np.nan
+        df = df.drop(columns=["weeks_gt_zero"])
 
     return df
 
@@ -190,8 +266,11 @@ def create_monthly_aggregates(df: pd.DataFrame) -> pd.DataFrame:
     df["month"] = pd.DatetimeIndex(df["date"]).month
     df["year"] = pd.DatetimeIndex(df["date"]).year
     df["month_date"] = pd.to_datetime(df[["year", "month"]].assign(DAY=1))
-    df = df.drop(columns=["month"])
 
+    # Dropping any values for the current month - we shouldn't show data for months that aren't complete.
+    current_month = pd.to_datetime(datetime.now().date().strftime("%Y-%m-01"))
+    df = df.drop(columns=["month"])
+    df = df[df["month_date"] != current_month]
     cols = df.columns.drop(["date", "year"])
     # Columns that will need to be recalculated after aggregating
     rate_cols = [
@@ -285,7 +364,7 @@ def create_global_aggregate(df: pd.DataFrame, count_cols: list[str], min_countri
 
 def calculate_percent_positive_aggregate(df: pd.DataFrame, surveillance_cols: list[str]) -> pd.DataFrame:
     """
-    Sometimes the 0s in the inf_negative* columns should in fact be zero. Here we convert rows where:
+    Sometimes the 0s in the inf_negative* columns should in fact be zero. Here we convert rows to NA where:
     inf_negative* == 0 and the sum of the positive and negative tests does not equal the number of processed tests.
 
     This should keep true 0s where the share of positive tests is actually 100%, typically when there is a small number of tests.

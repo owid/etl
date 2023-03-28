@@ -162,7 +162,7 @@ def run(dest_dir: str) -> None:
     paths = PathFinder(current_step_file.as_posix())
 
     # Load snapshot.
-    snapshot = paths.load_dependency(short_name=dataset_short_name, channel="snapshot")
+    snapshot = paths.load_dependency(short_name=dataset_short_name + ".zip", channel="snapshot")
     df_snapshot = load_data(snapshot.path)
 
     #
