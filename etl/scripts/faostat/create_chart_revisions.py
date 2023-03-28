@@ -32,6 +32,12 @@ N_CHARACTERS_ITEM_CODE = 8
 # Maximum number of characters for element_code (integers will be prepended with zeros).
 N_CHARACTERS_ELEMENT_CODE = 6
 
+# This regex should extract item codes and element codes, which are made of numbers, sometimes "pc"
+# (for per capita variables), and "M" and "F" (for male and female, only for certain domains, like fs and sdgb).
+REGEX_TO_EXTRACT_ITEM_AND_ELEMENT = (
+    rf".*([0-9pcMF]{{{N_CHARACTERS_ITEM_CODE}}}).*([0-9pcMF]{{{N_CHARACTERS_ELEMENT_CODE}}})"
+)
+
 
 def extract_variables_from_dataset(dataset_short_name: str, version: str) -> List[str]:
     # Load wide table from dataset.
@@ -48,15 +54,10 @@ def extract_variables_from_dataset(dataset_short_name: str, version: str) -> Lis
 
 
 def extract_item_code_and_element_code_from_variable_name(variable: str) -> Dict[str, Any]:
-    regex = rf".*(\d{{{N_CHARACTERS_ITEM_CODE}}}).*(\d{{{N_CHARACTERS_ELEMENT_CODE}}})"
-    matches = re.findall(regex, variable)
-
-    if np.shape(matches) != (1, 2):
-        log.warning(f"Item code or element code could not be extracted for variable: {variable}")
-        item_code, element_code = None, None
-    else:
-        item_code, element_code = matches[0]
-
+    matches = re.findall(REGEX_TO_EXTRACT_ITEM_AND_ELEMENT, variable)
+    error = f"Item code or element code could not be extracted for variable: {variable}"
+    assert np.shape(matches) == (1, 2), error
+    item_code, element_code = matches[0]
     variable_codes = {"variable": variable, "item_code": item_code, "element_code": element_code}
 
     return variable_codes
@@ -85,7 +86,8 @@ def map_old_to_new_variable_names(variables_old: List[str], variables_new: List[
     if len(possible_new_variables) > 0:
         log.info(f"There are {len(possible_new_variables)} unknown new variables.")
     if len(unmatched_old_variables) > 0:
-        log.warning(f"Old variables not matched to any new variables: {unmatched_old_variables}")
+        _unmatched_old_variables = "".join([f"\n    {variable}" for variable in unmatched_old_variables])
+        log.warning(f"Old variables not matched to any new variables: {_unmatched_old_variables}")
 
     # Map old variable names to new variable names.
     variables_name_mapping = variables_matched.dropna().set_index("variable_old").to_dict()["variable_new"]
@@ -173,6 +175,7 @@ def _find_and_check_available_versions_for_dataset(
 def get_grapher_variable_id_mapping_for_two_dataset_versions(
     dataset_short_name: str, version_old: str, version_new: str
 ) -> Dict[int, int]:
+
     # Load old and new datasets.
     dataset_old = Dataset(DATA_DIR / "grapher" / NAMESPACE / version_old / dataset_short_name)
     dataset_new = Dataset(DATA_DIR / "grapher" / NAMESPACE / version_new / dataset_short_name)
@@ -184,15 +187,19 @@ def get_grapher_variable_id_mapping_for_two_dataset_versions(
     # Map old to new variable names.
     variables_mapping = map_old_to_new_variable_names(variables_old=variables_old, variables_new=variables_new)
 
+    # Get data for old and new variables from grapher db.
     grapher_variables_old, grapher_variables_new = get_grapher_data_for_old_and_new_variables(
         dataset_old=dataset_old, dataset_new=dataset_new
     )
 
     # Check that variable titles in ETL match those found in grapher DB.
     error = "Mismatch between expected old variable titles in ETL and grapher DB."
-    assert set(variables_old) == set(grapher_variables_old["name"]), error
+    # NOTE: grapher_variables_old includes only variables that have been used in charts, whereas variables_old
+    #  includes all variables. Therefore, we check that the former is fully contained in the latter.
+    assert set(grapher_variables_old["name"]) <= set(variables_old), error
     error = "Mismatch between expected new variable titles in ETL and grapher DB."
-    assert set(variables_new) == set(grapher_variables_new["name"]), error
+    # NOTE: Both grapher_variables_new and variables_new should contain all variables.
+    assert set(grapher_variables_new["name"]) == set(variables_new), error
 
     grapher_variable_ids_mapping = map_old_to_new_grapher_variable_ids(
         grapher_variables_old, grapher_variables_new, variables_mapping
