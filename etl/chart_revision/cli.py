@@ -14,10 +14,7 @@ from structlog import get_logger
 
 # TBD
 from etl.chart_revision.deprecated import ChartRevisionSuggester
-from etl.chart_revision.revision import (
-    get_charts_to_update,
-    submit_revisions_to_grapher,
-)
+from etl.chart_revision.revision import create_and_submit_charts_revisions
 from etl.config import DEBUG
 
 log = get_logger()
@@ -49,10 +46,4 @@ def main(mapping_file: str, revision_reason: Optional[str] = None):
     with open(mapping_file, "r") as f:
         variable_mapping = json.load(f)
         variable_mapping = {int(k): int(v) for k, v in variable_mapping.items()}
-    # Get revisions to be done
-    chart_revisions = get_charts_to_update(variable_mapping)
-    # Update chart configs
-    for chart_revision in chart_revisions:
-        _ = chart_revision.bake(revision_reason)
-    # Submit revisions to Grapher
-    submit_revisions_to_grapher(chart_revisions)
+    create_and_submit_charts_revisions(variable_mapping, revision_reason)
