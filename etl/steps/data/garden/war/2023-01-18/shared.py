@@ -184,7 +184,10 @@ def check_duplicates(df: pd.DataFrame, filename: str, logging: bool = False, for
             df_ = df.loc[
                 msk, ["bulk_id", "conflict_name", "conflict_participants", "start_year", "end_year", "total_deaths"]
             ].sort_values(["conflict_name", "conflict_participants", "start_year", "end_year"])
-            error_msg = f"There are some entries with the same {', '.join([f'`{col}`' for col in columns_subset])} ({n_duplicates}). Please review!\n{df_}"
+            error_msg = (
+                "There are some entries with the same"
+                f" {', '.join([f'`{col}`' for col in columns_subset])} ({n_duplicates}). Please review!\n{df_}"
+            )
             if force_error:
                 raise ValueError(error_msg)
             elif logging:
@@ -200,7 +203,7 @@ def check_duplicates(df: pd.DataFrame, filename: str, logging: bool = False, for
         ["conflict_name", "conflict_participants"],
         logging=logging,
         force_error=False,
-        to_csv=f"logging/{filename}-conflict-countries.csv",
+        # to_csv=f"logging/{filename}-conflict-countries.csv",
     )
     # check duplicates with same conflict_name and years
     _check_duplicates(
@@ -208,7 +211,7 @@ def check_duplicates(df: pd.DataFrame, filename: str, logging: bool = False, for
         ["conflict_name", "start_year", "end_year"],
         logging=logging,
         force_error=False,
-        to_csv=f"logging/{filename}-conflict-years.csv",
+        # to_csv=f"logging/{filename}-conflict-years.csv",
     )
     # check duplicates with same conflict_name and fatalities
     _check_duplicates(
@@ -216,11 +219,15 @@ def check_duplicates(df: pd.DataFrame, filename: str, logging: bool = False, for
         ["conflict_name", "total_deaths"],
         logging=logging,
         force_error=False,
-        to_csv=f"logging/{filename}-numdeaths.csv",
+        # to_csv=f"logging/{filename}-numdeaths.csv",
     )
     # check duplicates with same conflict_name
     _check_duplicates(
-        df, ["conflict_name"], logging=logging, force_error=False, to_csv=f"logging/{filename}-conflict.csv"
+        df,
+        ["conflict_name"],
+        logging=logging,
+        force_error=False,
+        # to_csv=f"logging/{filename}-conflict.csv",
     )
 
 
