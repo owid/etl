@@ -230,24 +230,24 @@ def clean_patient_rates(df: pd.DataFrame) -> pd.DataFrame:
 
     df["ili_cases_per_thousand_outpatients"] = df.groupby("country", group_keys=False)[
         "ili_cases_per_thousand_outpatients"
-    ].apply(check_group, min=0, max=1000)
+    ].apply(check_group, min=1, max=999)
 
     df["ari_cases_per_thousand_outpatients"] = df.groupby("country", group_keys=False)[
         "ari_cases_per_thousand_outpatients"
-    ].apply(check_group, min=0, max=1000)
+    ].apply(check_group, min=1, max=999)
 
     df["sari_cases_per_hundred_inpatients"] = df.groupby("country", group_keys=False)[
         "sari_cases_per_hundred_inpatients"
-    ].apply(check_group, min=0, max=100)
+    ].apply(check_group, min=1, max=99)
 
     return df
 
 
 def check_group(group: pd.Series, min: int, max: int) -> pd.Series:
     """
-    If all values in the group are equal to either {min} or {max} then replace all values for that group with NA.
+    If all values in the group are less than {min} or greater than {max}, or NA then replace all values for that group with NA.
     """
-    if all((x == min) | (x == max) | (np.isnan(x)) for x in group):
-        return pd.Series([np.NaN if x == min or x == max else x for x in group], index=group.index, dtype="float64")
+    if all((x <= min) | (x >= max) | (np.isnan(x)) for x in group):
+        return pd.Series([np.NaN if x <= min or x >= max else x for x in group], index=group.index, dtype="float64")
     else:
         return group
