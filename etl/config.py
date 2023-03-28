@@ -57,7 +57,6 @@ BAKED_VARIABLES_PATH = env.get("BAKED_VARIABLES_PATH", DEFAULT_BAKED_VARIABLES_P
 IPDB_ENABLED = False
 
 # number of workers for grapher inserts
-# NOTE: this will soon be deprecated after we get rid of data_values
 GRAPHER_INSERT_WORKERS = int(env.get("GRAPHER_WORKERS", 10))
 
 # forbid any individual step from consuming more than this much memory

@@ -163,7 +163,7 @@ def _sync_variable_data_metadata(engine: Engine, variable_id: int, dry_run: bool
         #   this entire script is a temporary solution until everything is uploaded directly from ETL
         if variable_df.empty:
             assert variable.dataPath
-            variable_df = variable_data_df_from_s3(engine, variable.dataPath)
+            variable_df = variable_data_df_from_s3(engine, [variable.dataPath])
 
         var_data = variable_data(variable_df)
         var_metadata = variable_metadata(engine, variable_id, variable_df)
