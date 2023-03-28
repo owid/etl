@@ -173,18 +173,15 @@ def calculate_patient_rates(df: pd.DataFrame) -> pd.DataFrame:
     """
     Calculating the rates of reported cases per outpatients/inpatients as also used by WHO
     """
-    # Fill NAs with numpy NAs so the divisions below don't fail
-    # df = df.fillna(np.nan)
 
     df[["reported_ili_cases", "reported_ari_cases", "reported_sari_cases"]] = df[
         ["reported_ili_cases", "reported_ari_cases", "reported_sari_cases"]
     ].astype(float)
 
-    df[["outpatients_ari", "outpatients_ili", "inpatients_sari", "inpatients_sari_icu"]] = (
-        df[["outpatients_ari", "outpatients_ili", "inpatients_sari", "inpatients_sari_icu"]]
-        .replace(pd.NA, np.NaN)
-        .replace(0, np.NaN)
-    )
+    # Replace 0s and NAs with NaNs
+    df.loc[:, ["outpatients_ari", "outpatients_ili", "inpatients_sari", "inpatients_sari_icu"]] = df.loc[
+        :, ["outpatients_ari", "outpatients_ili", "inpatients_sari", "inpatients_sari_icu"]
+    ].replace({0: np.nan, pd.NA: np.nan})
 
     df["ili_cases_per_thousand_outpatients"] = (df["reported_ili_cases"] / df["outpatients_ili"]) * 1000
     df["ari_cases_per_thousand_outpatients"] = (df["reported_ari_cases"] / df["outpatients_ari"]) * 1000
@@ -201,6 +198,23 @@ def clean_patient_rates(df: pd.DataFrame) -> pd.DataFrame:
     * Removing values over the top limit of the rate e.g. values over 100 for SARI cases per 100 inpatients
     * Removing time-series where there are only values of either 0 or the top limit of the variable.
     """
+    df[
+        [
+            "ili_cases_per_thousand_outpatients",
+            "ari_cases_per_thousand_outpatients",
+            "sari_cases_per_hundred_inpatients",
+        ]
+    ] = (
+        df[
+            [
+                "ili_cases_per_thousand_outpatients",
+                "ari_cases_per_thousand_outpatients",
+                "sari_cases_per_hundred_inpatients",
+            ]
+        ]
+        .astype(float)
+        .replace({pd.NA: np.nan})
+    )
 
     over_1000_ili = df[df["ili_cases_per_thousand_outpatients"] > 1000].shape[0]
     over_1000_ari = df[df["ari_cases_per_thousand_outpatients"] > 1000].shape[0]
@@ -233,7 +247,7 @@ def check_group(group: pd.Series, min: int, max: int) -> pd.Series:
     """
     If all values in the group are equal to either {min} or {max} then replace all values for that group with NA.
     """
-    if all(x == min or x == max for x in group):
+    if all((x == min) | (x == max) | (np.isnan(x)) for x in group):
         return pd.Series([np.NaN if x == min or x == max else x for x in group], index=group.index, dtype="float64")
     else:
-        return pd.Series(group)
+        return group
