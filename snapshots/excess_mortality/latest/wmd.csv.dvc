@@ -13,7 +13,7 @@ meta:
   file_extension: csv
   license_url: https://github.com/akarlinsky/world_mortality/blob/main/LICENSE
   license_name: MIT License
-  date_accessed: 2023-03-14
+  date_accessed: 2023-03-28
   is_public: true
   description: |
     World Mortality Dataset: international data on all-cause mortality.
@@ -27,6 +27,6 @@ meta:
     Published paper available at https://elifesciences.org/articles/69336.
 wdir: ../../../data/snapshots/excess_mortality/latest
 outs:
-- md5: 0caa9f47c872d72f5bf1bdd90c2ed988
-  size: 903666
+- md5: 2e977b3511a46279b6083ce123325b8c
+  size: 907167
   path: wmd.csv
