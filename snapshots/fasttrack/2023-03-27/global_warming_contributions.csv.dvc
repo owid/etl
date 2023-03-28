@@ -1,0 +1,19 @@
+meta:
+  namespace: fasttrack
+  short_name: global_warming_contributions
+  file_extension: csv
+  date_accessed: 2023-03-28
+  name: Global warming contributions
+  description: ''
+  source_name: Google Sheet
+  url: https://doi.org/10.5281/zenodo.7636699
+  source_published_by: Google Sheet
+  source_data_url: gAAAAABkIrQOIyQt5bEuJ3u__TyzmJatTogOATpOVWU2OahTzGoRCEv3TfId2cPsSTBBL1zq5066zmaCmVZaVJUjLrpPhlxVA7jdSJswKy6qs2GxJuGcu6AU1P0-ZflaaAJkE-ETZqaZu3v6FZhx-DbgZbPUKTOBQb0lDSfCi9s9UGGH1bErwnRWEAG-049HbagphiPILgQRvKh262_c43imp0xnpc3gBYJepl3W-BjMdz6bZpvtT45iLcv11LKUzmeaRMDwpxga
+  is_public: false
+  version: '2023-03-27'
+  publication_year: 2023
+wdir: ../../../data/snapshots/fasttrack/2023-03-27
+outs:
+- md5: 2a417b37d1e80588c3803ce0769f03ca
+  size: 19364534
+  path: global_warming_contributions.csv

@@ -1,0 +1,704 @@
+dataset:
+  namespace: fasttrack
+  version: '2023-03-27'
+  short_name: global_warming_contributions
+  title: Global warming contributions
+  description: ''
+  sources:
+  - name: Jones et al. (2023)
+    published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew, Robbie
+      M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard A., Friedlingstein,
+      Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023). National contributions
+      to climate change due to historical emissions of carbon dioxide, methane and
+      nitrous oxide [Data set]. In Scientific Data (2023.1).
+    publication_year: 2023
+    url: https://doi.org/10.5281/zenodo.7636699
+tables:
+  global_warming_contributions:
+    variables:
+      annual_fossil_co2:
+        title: Annual fossil CO2 emissions
+        short_unit: t
+        unit: tonnes
+        sources:
+        - name: Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      annual_land_co2:
+        title: annual_land_co2
+        short_unit: t
+        unit: tonnes
+        sources:
+        - name: Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      annual_co2:
+        title: annual_co2
+        short_unit: t
+        unit: tonnes
+        sources:
+        - name: Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      annual_fossil_ch4:
+        title: annual_fossil_ch4
+        short_unit: t
+        unit: tonnes
+        sources:
+        - name: Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      annual_land_ch4:
+        title: annual_land_ch4
+        short_unit: t
+        unit: tonnes
+        sources:
+        - name: Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      annual_fossil_n2o:
+        title: annual_fossil_n2o
+        short_unit: t
+        unit: tonnes
+        sources:
+        - name: Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      annual_ch4:
+        title: annual_ch4
+        short_unit: t
+        unit: tonnes
+        sources:
+        - name: Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      annual_land_n2o:
+        title: annual_land_n2o
+        short_unit: t
+        unit: tonnes
+        sources:
+        - name: Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      annual_n2o:
+        title: annual_n2o
+        short_unit: t
+        unit: tonnes
+        sources:
+        - name: Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      annual_fossil_ch4_co2eq:
+        title: annual_fossil_ch4_CO2eq
+        short_unit: t
+        unit: tonnes
+        sources:
+        - name: Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      annual_ch4_co2eq:
+        title: annual_ch4_CO2eq
+        short_unit: t
+        unit: tonnes
+        sources:
+        - name: Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      annual_land_ch4_co2eq:
+        title: annual_land_ch4_CO2eq
+        short_unit: t
+        unit: tonnes
+        sources:
+        - name: Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      annual_fossil_n2o_co2eq:
+        title: annual_fossil_n2o_CO2eq
+        short_unit: t
+        unit: tonnes
+        sources:
+        - name: Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      annual_land_n2o_co2eq:
+        title: annual_land_n2o_CO2eq
+        short_unit: t
+        unit: tonnes
+        sources:
+        - name: Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      annual_ghg_co2eq:
+        title: annual_ghg_CO2eq
+        short_unit: t
+        unit: tonnes
+        sources:
+        - name: Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      annual_fossil_co2eq:
+        title: annual_fossil_CO2eq
+        short_unit: t
+        unit: tonnes
+        sources:
+        - name: Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      annual_land_co2eq:
+        title: annual_land_CO2eq
+        short_unit: t
+        unit: tonnes
+        sources:
+        - name: Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      annual_n2o_co2eq:
+        title: annual_n2o_CO2eq
+        short_unit: t
+        unit: tonnes
+        sources:
+        - name: Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      share_global_n2o:
+        title: share_global_n2o
+        short_unit: '%'
+        unit: '%'
+        sources:
+        - name: Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      share_global_ch4:
+        title: share_global_ch4
+        short_unit: '%'
+        unit: '%'
+        sources:
+        - name: Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      share_global_ghg:
+        title: share_global_ghg
+        short_unit: '%'
+        unit: '%'
+        sources:
+        - name: Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      cumulative_fossil_co2:
+        title: cumulative_fossil_co2
+        short_unit: t
+        unit: tonnes
+        sources:
+        - name: Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      cumulative_land_co2:
+        title: cumulative_land_co2
+        short_unit: t
+        unit: tonnes
+        sources:
+        - name: Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      cumulative_co2:
+        title: cumulative_co2
+        short_unit: t
+        unit: tonnes
+        sources:
+        - name: Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      cumulative_land_ch4:
+        title: cumulative_land_ch4
+        short_unit: t
+        unit: tonnes
+        sources:
+        - name: Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      cumulative_fossil_ch4:
+        title: cumulative_fossil_ch4
+        short_unit: t
+        unit: tonnes
+        sources:
+        - name: Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      cumulative_ch4:
+        title: cumulative_ch4
+        short_unit: t
+        unit: tonnes
+        sources:
+        - name: Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      cumulative_land_n2o:
+        title: cumulative_land_n2o
+        short_unit: t
+        unit: tonnes
+        sources:
+        - name: Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      cumulative_fossil_n2o:
+        title: cumulative_fossil_n2o
+        short_unit: t
+        unit: tonnes
+        sources:
+        - name: Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      cumulative_n2o:
+        title: cumulative_n2o
+        short_unit: t
+        unit: tonnes
+        sources:
+        - name: Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      cumulative_fossil_ghg:
+        title: cumulative_fossil_ghg
+        short_unit: t
+        unit: tonnes
+        sources:
+        - name: Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      cumulative_land_ghg:
+        title: cumulative_land_ghg
+        short_unit: t
+        unit: tonnes
+        sources:
+        - name: Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      cumulative_ghg:
+        title: cumulative_ghg
+        short_unit: t
+        unit: tonnes
+        sources:
+        - name: Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      temp_fossil_co2:
+        title: temp_fossil_co2
+        short_unit: °C
+        unit: °C
+        sources:
+        - name: Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      temp_land_co2:
+        title: temp_land_co2
+        short_unit: °C
+        unit: °C
+        sources:
+        - name: Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      temp_co2:
+        title: temp_co2
+        short_unit: °C
+        unit: °C
+        sources:
+        - name: Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      temp_fossil_ch4:
+        title: temp_fossil_ch4
+        short_unit: °C
+        unit: °C
+        sources:
+        - name: Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      temp_land_ch4:
+        title: temp_land_ch4
+        short_unit: °C
+        unit: °C
+        sources:
+        - name: Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      temp_ch4:
+        title: temp_ch4
+        short_unit: °C
+        unit: °C
+        sources:
+        - name: Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      temp_fossil_n2o:
+        title: temp_fossil_n2o
+        short_unit: °C
+        unit: °C
+        sources:
+        - name: Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      temp_land_n2o:
+        title: temp_land_n2o
+        short_unit: °C
+        unit: °C
+        sources:
+        - name: Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      temp_n2o:
+        title: temp_n2o
+        short_unit: °C
+        unit: °C
+        sources:
+        - name: Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      temp_fossil_ghg:
+        title: temp_fossil_ghg
+        short_unit: °C
+        unit: °C
+        sources:
+        - name: Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      temp_land_ghg:
+        title: temp_land_ghg
+        short_unit: °C
+        unit: °C
+        sources:
+        - name: Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      temp_ghg:
+        title: temp_ghg
+        short_unit: °C
+        unit: °C
+        sources:
+        - name: Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      share_global_warming:
+        title: share_global_warming
+        short_unit: '%'
+        unit: '%'
+        sources:
+        - name: Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      annual_ch4_per_capita:
+        title: annual_ch4_per_capita
+        short_unit: t
+        unit: tonnes
+        sources:
+        - name: Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      annual_n2o_per_capita:
+        title: annual_n2o_per_capita
+        short_unit: t
+        unit: tonnes
+        sources:
+        - name: Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      annual_ghg_co2eq_per_capita:
+        title: annual_ghg_CO2eq_per_capita
+        short_unit: t
+        unit: tonnes
+        sources:
+        - name: Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
