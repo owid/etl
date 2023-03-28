@@ -4,7 +4,7 @@ meta:
   name: Short-Term Mortality Fluctuations (HMD, 2023)
   version: latest
   publication_year: 2023
-  publication_date: 2023-03-13
+  publication_date: 2023-03-24
   source_name: HMD
   source_published_by: HMD. Human Mortality Database. Max Planck Institute for Demographic
     Research (Germany), University of California, Berkeley (USA), and French Institute
@@ -14,7 +14,7 @@ meta:
   file_extension: csv
   license_url: https://www.mortality.org/Data/UserAgreement
   license_name: Creative Commons BY 4.0
-  date_accessed: 2023-03-14
+  date_accessed: 2023-03-28
   is_public: true
   description: |
     In response to the COVID-19 pandemic, the HMD team decided to establish a new data resource: Short-term Mortality Fluctuations (STMF) data series. Objective and internationally comparable data are crucial to determine the effectiveness of different strategies used to address epidemics. Weekly death counts provide the most objective and comparable way of assessing the scale of short-term mortality elevations across countries and time. More details about this data project can be found in the recently published paper (https://www.nature.com/articles/s41597-021-01019-1).
@@ -28,6 +28,6 @@ meta:
     HMD provides an online STMF visualization toolkit (https://mpidr.shinyapps.io/stmortality).
 wdir: ../../../data/snapshots/excess_mortality/latest
 outs:
-- md5: b8bb4cda6ef5a416f5e45a8387bee99c
-  size: 19652503
+- md5: 9ca22b671fafc17b6704ff4c4c907c96
+  size: 19676649
   path: hmd_stmf.csv
