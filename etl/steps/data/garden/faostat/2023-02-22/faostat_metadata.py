@@ -54,6 +54,8 @@ from shared import (
     CURRENT_DIR,
     FAOSTAT_METADATA_SHORT_NAME,
     FLAGS_RANKING,
+    N_CHARACTERS_ELEMENT_CODE,
+    N_CHARACTERS_ITEM_CODE,
     NAMESPACE,
     harmonize_elements,
     harmonize_items,
@@ -181,6 +183,20 @@ def clean_global_dataset_descriptions_dataframe(
     return datasets_df
 
 
+def check_that_item_and_element_harmonization_does_not_trim_codes(data: pd.DataFrame, category: str) -> None:
+    # Ensure that the number of digits of all item and element codes is smaller than the limits defined
+    # at the beginning of the garden shared module, by N_CHARACTERS_ITEM_CODE and N_CHARACTERS_ELEMENT_CODE,
+    # respectively.
+    n_characters = {"element": N_CHARACTERS_ELEMENT_CODE, "item": N_CHARACTERS_ITEM_CODE}
+    error = (
+        f"{category.capitalize()} codes found with more than N_CHARACTERS_{category.upper()}_CODE digits. "
+        f"This parameter is defined in garden shared module and may need to be increased. "
+        f"This would change how {category} codes are harmonized, increasing the length of variable names. "
+        f"It may have further unwanted consequences, so do it with caution."
+    )
+    assert all([len(str(code)) <= n_characters[category] for code in data[f"{category}_code"].unique()]), error
+
+
 def create_items_dataframe_for_domain(
     table: catalog.Table, metadata: catalog.Dataset, dataset_short_name: str
 ) -> pd.DataFrame:
@@ -208,6 +224,8 @@ def create_items_dataframe_for_domain(
     items_from_data = (
         df.rename(columns={"item": "fao_item"})[["item_code", "fao_item"]].drop_duplicates().reset_index(drop=True)
     )
+    # Sanity check.
+    check_that_item_and_element_harmonization_does_not_trim_codes(data=df, category="item")
     # Ensure items are well constructed and amend already known issues (defined in shared.ITEM_AMENDMENTS).
     items_from_data = harmonize_items(df=items_from_data, dataset_short_name=dataset_short_name, item_col="fao_item")
 
@@ -388,6 +406,8 @@ def create_elements_dataframe_for_domain(
         .drop_duplicates()
         .reset_index(drop=True)
     )
+    # Sanity check.
+    check_that_item_and_element_harmonization_does_not_trim_codes(data=df, category="element")
     # Ensure element_code is always a string of a fix number of characters.
     elements_from_data = harmonize_elements(df=elements_from_data, element_col="fao_element")
 
