@@ -4,11 +4,20 @@ meta:
   file_extension: csv
   date_accessed: 2023-03-28
   name: Global warming contributions
-  description: ''
+  description: |-
+    Jones et al. (2023) quantify national and regional contributions to the increase of global mean surface temperature over the last few centuries. As they detail: the "dataset describing the global warming response to national emissions CO2, CH4 and N2O from fossil and land use sources during 1851-2021.
+
+    National CO2 emissions data are collated from the Global Carbon Project (Andrew and Peters, 2022; Friedlingstein et al., 2022).
+
+    National CH4 and N2O emissions data are collated from PRIMAP-hist (HISTTP) (Gütschow et al., 2022).
+
+    We construct a time series of cumulative CO2-equivalent emissions for each country, gas, and emissions source (fossil or land use). Emissions of CH4 and N2O emissions are related to cumulative CO2-equivalent emissions using the Global Warming Potential (GWP*) approach, with best-estimates of the coefficients taken from the IPCC AR6 (Forster et al., 2021).
+
+    Warming in response to cumulative CO2-equivalent emissions is estimated using the transient climate response to cumulative carbon emissions (TCRE) approach, with best-estimate value of TCRE taken from the IPCC AR6 (Forster et al., 2021, Canadell et al., 2021). 'Warming' is specifically the change in global mean surface temperature (GMST)."
   source_name: Google Sheet
   url: https://doi.org/10.5281/zenodo.7636699
   source_published_by: Google Sheet
-  source_data_url: gAAAAABkIrQOIyQt5bEuJ3u__TyzmJatTogOATpOVWU2OahTzGoRCEv3TfId2cPsSTBBL1zq5066zmaCmVZaVJUjLrpPhlxVA7jdSJswKy6qs2GxJuGcu6AU1P0-ZflaaAJkE-ETZqaZu3v6FZhx-DbgZbPUKTOBQb0lDSfCi9s9UGGH1bErwnRWEAG-049HbagphiPILgQRvKh262_c43imp0xnpc3gBYJepl3W-BjMdz6bZpvtT45iLcv11LKUzmeaRMDwpxga
+  source_data_url: gAAAAABkIr3DiwMIeXlYkLHWK3otd9jOjb-ghAKldzHAZEH8PeFcT1x2qEO4jdxa4RQYaDZ87IGV_KijJggPTiKQRvrK3SW94s_jhkP9rCU-tkb5fcbTmLyVqA5yL1dQRCyhRbPEB-vBXQOoptpwhhedWpLFXfydnb-6VKAq4eTsIxo2ebE5YA7ltdYo74ttaL4YfUkruCLXHQGUqhL4QFH1wuVoGasfp-xh4MQXzhwaKKzbv8kw6RyE25hENWgNNKsGP5XQpsR4
   is_public: false
   version: '2023-03-27'
   publication_year: 2023
