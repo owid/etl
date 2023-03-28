@@ -7,6 +7,7 @@ from backport.datasync.data_metadata import (
     _convert_strings_to_numeric,
     _infer_variable_type,
     variable_data,
+    variable_data_df_from_s3,
     variable_metadata,
 )
 from etl.db import get_engine
@@ -124,6 +125,27 @@ def test_variable_data():
     }
 
 
+def test_variable_data_df_from_s3():
+    engine = mock.Mock()
+    entities = pd.DataFrame(
+        {
+            "entityId": [1],
+            "entityName": ["UK"],
+            "entityCode": ["GBR"],
+        }
+    )
+    s3_data = pd.DataFrame({"entities": [1, 1], "values": ["a", 2], "years": [2000, 2001]})
+
+    with mock.patch("pandas.read_sql", return_value=entities):
+        with mock.patch("pandas.read_json", return_value=s3_data):
+            df = variable_data_df_from_s3(engine, ["123.json"])
+
+    assert df.to_dict(orient="records") == [
+        {"entityId": 1, "value": "a", "year": 2000, "variableId": 123, "entityName": "UK", "entityCode": "GBR"},
+        {"entityId": 1, "value": "2", "year": 2001, "variableId": 123, "entityName": "UK", "entityCode": "GBR"},
+    ]
+
+
 def test_infer_variable_type():
     assert _infer_variable_type(pd.Series(["1", "2"])) == "int"
     assert _infer_variable_type(pd.Series(["1", "2.1"])) == "float"
@@ -140,5 +162,5 @@ def test_convert_strings_to_numeric():
     assert r == [-2, 1, 2.1, "UK", 9800000000]
     assert [type(x) for x in r] == [int, int, float, str, int]
 
-    with pytest.raises(TypeError):
+    with pytest.raises(AssertionError):
         r = _convert_strings_to_numeric([None, "UK"])  # type: ignore
