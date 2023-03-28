@@ -245,7 +245,7 @@ def clean_patient_rates(df: pd.DataFrame) -> pd.DataFrame:
 
 def check_group(group: pd.Series, min: int, max: int) -> pd.Series:
     """
-    If all values in the group are equal to either {min} or {max} then replace all values for that group with NA.
+    If all values in the group are less than {min} or greater than {max}, or NA then replace all values for that group with NA.
     """
     if all((x <= min) | (x >= max) | (np.isnan(x)) for x in group):
         return pd.Series([np.NaN if x <= min or x >= max else x for x in group], index=group.index, dtype="float64")
