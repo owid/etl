@@ -152,8 +152,6 @@ def pivot_fluid(df: pd.DataFrame) -> pd.DataFrame:
 
     df_piv.columns = list(map("".join, df_piv.columns))
 
-    # df_piv = df_piv.dropna(axis=1, how="all")
-
     df_piv = df_piv.rename(
         columns={
             "reported_casesSARI": "reported_sari_cases",
@@ -192,6 +190,18 @@ def calculate_patient_rates(df: pd.DataFrame) -> pd.DataFrame:
     df["ari_cases_per_thousand_outpatients"] = (df["reported_ari_cases"] / df["outpatients_ari"]) * 1000
     df["sari_cases_per_hundred_inpatients"] = (df["reported_sari_cases"] / df["inpatients_sari"]) * 100
 
+    df = clean_patient_rates(df)
+
+    return df
+
+
+def clean_patient_rates(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Cleaning the patient rates by:
+    * Removing values over the top limit of the rate e.g. values over 100 for SARI cases per 100 inpatients
+    * Removing time-series where there are only values of either 0 or the top limit of the variable.
+    """
+
     over_1000_ili = df[df["ili_cases_per_thousand_outpatients"] > 1000].shape[0]
     over_1000_ari = df[df["ari_cases_per_thousand_outpatients"] > 1000].shape[0]
     over_100_sari = df[df["sari_cases_per_hundred_inpatients"] > 100].shape[0]
@@ -203,6 +213,27 @@ def calculate_patient_rates(df: pd.DataFrame) -> pd.DataFrame:
     df.loc[df["ili_cases_per_thousand_outpatients"] > 1000, "ili_cases_per_thousand_outpatients"] = np.NaN
     df.loc[df["ari_cases_per_thousand_outpatients"] > 1000, "ari_cases_per_thousand_outpatients"] = np.NaN
     df.loc[df["sari_cases_per_hundred_inpatients"] > 100, "sari_cases_per_hundred_inpatients"] = np.NaN
-    # df["sari_cases_per_hundred_inpatients"][df["sari_cases_per_hundred_inpatients"] > 100] = np.NaN
+
+    df["ili_cases_per_thousand_outpatients"] = df.groupby("country", group_keys=False)[
+        "ili_cases_per_thousand_outpatients"
+    ].apply(check_group, min=0, max=1000)
+
+    df["ari_cases_per_thousand_outpatients"] = df.groupby("country", group_keys=False)[
+        "ari_cases_per_thousand_outpatients"
+    ].apply(check_group, min=0, max=1000)
+
+    df["sari_cases_per_hundred_inpatients"] = df.groupby("country", group_keys=False)[
+        "sari_cases_per_hundred_inpatients"
+    ].apply(check_group, min=0, max=100)
 
     return df
+
+
+def check_group(group: pd.Series, min: int, max: int) -> pd.Series:
+    """
+    If all values in the group are equal to either {min} or {max} then replace all values for that group with NA.
+    """
+    if all(x == min or x == max for x in group):
+        return pd.Series([np.NaN if x == min or x == max else x for x in group], index=group.index, dtype="float64")
+    else:
+        return pd.Series(group)
