@@ -1,7 +1,7 @@
 all_sources:
   - source_testing: &source-testing
       name: Clodfelter (2017)
-      published_by: Clodfelter, Micheal. 2017. Warfare and Armed Conflicts: A Statistical Encyclopedia of Casualty and other Figures, 1492-2015. Fourth edition. McFarland & Company.
+      published_by: "Clodfelter, Micheal. 2017. Warfare and Armed Conflicts: A Statistical Encyclopedia of Casualty and other Figures, 1492-2015. Fourth edition. McFarland & Company."
       url: # TO BE FILLED. Example: https://url_of_testing_source.com/
       date_accessed: # TO BE FILLED. Example: 2023-01-01
       publication_date: # TO BE FILLED. Example: 2023-01-01

@@ -1,7 +1,7 @@
 all_sources:
   - source_testing: &source-testing
       name: Bouthoul and Carrère (1978)
-      published_by: Bouthoul, Gaston, René Carrère, and Gernot Köhler. 1978. A list of the 366 Major Armed Conflicts of the Period 1740-1974. Peace Research 10(3): 83-108.
+      published_by: "Bouthoul, Gaston, René Carrère, and Gernot Köhler. 1978. A list of the 366 Major Armed Conflicts of the Period 1740-1974. Peace Research 10(3): 83-108."
       url: # TO BE FILLED. Example: https://url_of_testing_source.com/
       date_accessed: # TO BE FILLED. Example: 2023-01-01
       publication_date: # TO BE FILLED. Example: 2023-01-01

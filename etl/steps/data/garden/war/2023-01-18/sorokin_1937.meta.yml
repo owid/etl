@@ -1,7 +1,7 @@
 all_sources:
   - source_testing: &source-testing
       name: Sorokin (1937)
-      published_by: Sorokin, Pitirim. 1937. Social and cultural dynamics. Volume Three: Fluctuation of Social Relationships, Wars, and Revolution. American Book Company.
+      published_by: "Sorokin, Pitirim. 1937. Social and cultural dynamics. Volume Three: Fluctuation of Social Relationships, Wars, and Revolution. American Book Company."
       url: # TO BE FILLED. Example: https://url_of_testing_source.com/
       date_accessed: # TO BE FILLED. Example: 2023-01-01
       publication_date: # TO BE FILLED. Example: 2023-01-01

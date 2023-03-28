@@ -1,7 +1,7 @@
 all_sources:
   - source_testing: &source-testing
       name: Eckhardt (1991)
-      published_by: Eckhardt, William. 1991. Wars and War-Related Deaths, 1500-1990. In: Ruth Sivard: World Military and Social Expenditures. World Priorities.
+      published_by: "Eckhardt, William. 1991. Wars and War-Related Deaths, 1500-1990. In: Ruth Sivard: World Military and Social Expenditures. World Priorities."
       url: # TO BE FILLED. Example: https://url_of_testing_source.com/
       date_accessed: # TO BE FILLED. Example: 2023-01-01
       publication_date: # TO BE FILLED. Example: 2023-01-01

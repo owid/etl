@@ -1,7 +1,7 @@
 all_sources:
   - source_testing: &source-testing
       name: Kaye et al. (1985)
-      published_by: Kaye, G.D., D.A. Grant, and E.J. Emond. 1985. Major Armed Conflict: A Compendium of Interstate and Intrastate Conflict, 1720 to 1985. Operational Research and Analysis Establishment Report No. R 95, Department of National Defence Canada.
+      published_by: "Kaye, G.D., D.A. Grant, and E.J. Emond. 1985. Major Armed Conflict: A Compendium of Interstate and Intrastate Conflict, 1720 to 1985. Operational Research and Analysis Establishment Report No. R 95, Department of National Defence Canada."
       url: # TO BE FILLED. Example: https://url_of_testing_source.com/
       date_accessed: # TO BE FILLED. Example: 2023-01-01
       publication_date: # TO BE FILLED. Example: 2023-01-01
