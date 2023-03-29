@@ -14,7 +14,7 @@ dataset:
 
     Warming in response to cumulative CO2-equivalent emissions is estimated using the transient climate response to cumulative carbon emissions (TCRE) approach, with best-estimate value of TCRE taken from the IPCC AR6 (Forster et al., 2021, Canadell et al., 2021). 'Warming' is specifically the change in global mean surface temperature (GMST)."
   sources:
-  - name: Jones et al. (2023)
+  - name: Matthew Jones et al. (2023)
     published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew, Robbie
       M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard A., Friedlingstein,
       Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023). National contributions
@@ -30,7 +30,7 @@ tables:
         short_unit: t
         unit: tonnes
         sources:
-        - name: Jones et al. (2023)
+        - name: Matthew Jones et al. (2023)
           published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
             Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
             A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
@@ -44,7 +44,7 @@ tables:
         short_unit: t
         unit: tonnes
         sources:
-        - name: Jones et al. (2023)
+        - name: Matthew Jones et al. (2023)
           published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
             Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
             A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
@@ -58,7 +58,7 @@ tables:
         short_unit: t
         unit: tonnes
         sources:
-        - name: Jones et al. (2023)
+        - name: Matthew Jones et al. (2023)
           published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
             Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
             A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
@@ -72,7 +72,7 @@ tables:
         short_unit: t
         unit: tonnes
         sources:
-        - name: Jones et al. (2023)
+        - name: Matthew Jones et al. (2023)
           published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
             Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
             A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
@@ -86,7 +86,7 @@ tables:
         short_unit: t
         unit: tonnes
         sources:
-        - name: Jones et al. (2023)
+        - name: Matthew Jones et al. (2023)
           published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
             Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
             A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
@@ -100,7 +100,7 @@ tables:
         short_unit: t
         unit: tonnes
         sources:
-        - name: Jones et al. (2023)
+        - name: Matthew Jones et al. (2023)
           published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
             Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
             A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
@@ -114,7 +114,7 @@ tables:
         short_unit: t
         unit: tonnes
         sources:
-        - name: Jones et al. (2023)
+        - name: Matthew Jones et al. (2023)
           published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
             Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
             A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
@@ -128,7 +128,7 @@ tables:
         short_unit: t
         unit: tonnes
         sources:
-        - name: Jones et al. (2023)
+        - name: Matthew Jones et al. (2023)
           published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
             Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
             A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
@@ -142,7 +142,7 @@ tables:
         short_unit: t
         unit: tonnes
         sources:
-        - name: Jones et al. (2023)
+        - name: Matthew Jones et al. (2023)
           published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
             Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
             A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
@@ -162,7 +162,7 @@ tables:
           timescale using a conversion factor of 29.8 for fossil sources, and 27.2
           for agricultural and land use sources (as per the IPCC AR6 report).
         sources:
-        - name: Jones et al. (2023)
+        - name: Matthew Jones et al. (2023)
           published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
             Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
             A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
@@ -182,7 +182,7 @@ tables:
           timescale using a conversion factor of 29.8 for fossil sources, and 27.2
           for agricultural and land use sources (as per the IPCC AR6 report).
         sources:
-        - name: Jones et al. (2023)
+        - name: Matthew Jones et al. (2023)
           published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
             Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
             A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
@@ -202,7 +202,7 @@ tables:
           timescale using a conversion factor of 29.8 for fossil sources, and 27.2
           for agricultural and land use sources (as per the IPCC AR6 report).
         sources:
-        - name: Jones et al. (2023)
+        - name: Matthew Jones et al. (2023)
           published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
             Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
             A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
@@ -222,7 +222,7 @@ tables:
           over a 100-year timescale using a conversion factor of 273 (as per the IPCC
           AR6 report).
         sources:
-        - name: Jones et al. (2023)
+        - name: Matthew Jones et al. (2023)
           published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
             Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
             A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
@@ -242,7 +242,7 @@ tables:
           over a 100-year timescale using a conversion factor of 273 (as per the IPCC
           AR6 report).
         sources:
-        - name: Jones et al. (2023)
+        - name: Matthew Jones et al. (2023)
           published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
             Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
             A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
@@ -263,7 +263,7 @@ tables:
           nitrous oxide, 29.8 for methane from fossil sources, and 27.2 for methane
           from agricultural and land use sources (as per the IPCC AR6 report).
         sources:
-        - name: Jones et al. (2023)
+        - name: Matthew Jones et al. (2023)
           published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
             Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
             A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
@@ -284,7 +284,7 @@ tables:
           nitrous oxide, 29.8 for methane from fossil sources, and 27.2 for methane
           from agricultural and land use sources (as per the IPCC AR6 report).
         sources:
-        - name: Jones et al. (2023)
+        - name: Matthew Jones et al. (2023)
           published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
             Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
             A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
@@ -305,7 +305,7 @@ tables:
           nitrous oxide, 29.8 for methane from fossil sources, and 27.2 for methane
           from agricultural and land use sources (as per the IPCC AR6 report).
         sources:
-        - name: Jones et al. (2023)
+        - name: Matthew Jones et al. (2023)
           published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
             Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
             A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
@@ -325,7 +325,7 @@ tables:
           over a 100-year timescale using a conversion factor of 273 (as per the IPCC
           AR6 report).
         sources:
-        - name: Jones et al. (2023)
+        - name: Matthew Jones et al. (2023)
           published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
             Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
             A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
@@ -345,7 +345,7 @@ tables:
           over a 100-year timescale using a conversion factor of 273 (as per the IPCC
           AR6 report).
         sources:
-        - name: Jones et al. (2023)
+        - name: Matthew Jones et al. (2023)
           published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
             Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
             A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
@@ -365,7 +365,7 @@ tables:
           timescale using a conversion factor of 29.8 for fossil sources, and 27.2
           for agricultural and land use sources (as per the IPCC AR6 report).
         sources:
-        - name: Jones et al. (2023)
+        - name: Matthew Jones et al. (2023)
           published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
             Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
             A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
@@ -386,7 +386,7 @@ tables:
           nitrous oxide, 29.8 for methane from fossil sources, and 27.2 for methane
           from agricultural and land use sources (as per the IPCC AR6 report).
         sources:
-        - name: Jones et al. (2023)
+        - name: Matthew Jones et al. (2023)
           published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
             Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
             A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
@@ -400,7 +400,7 @@ tables:
         short_unit: t
         unit: tonnes
         sources:
-        - name: Jones et al. (2023)
+        - name: Matthew Jones et al. (2023)
           published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
             Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
             A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
@@ -414,7 +414,7 @@ tables:
         short_unit: t
         unit: tonnes
         sources:
-        - name: Jones et al. (2023)
+        - name: Matthew Jones et al. (2023)
           published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
             Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
             A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
@@ -428,7 +428,7 @@ tables:
         short_unit: t
         unit: tonnes
         sources:
-        - name: Jones et al. (2023)
+        - name: Matthew Jones et al. (2023)
           published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
             Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
             A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
@@ -442,7 +442,7 @@ tables:
         short_unit: t
         unit: tonnes
         sources:
-        - name: Jones et al. (2023)
+        - name: Matthew Jones et al. (2023)
           published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
             Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
             A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
@@ -456,7 +456,7 @@ tables:
         short_unit: t
         unit: tonnes
         sources:
-        - name: Jones et al. (2023)
+        - name: Matthew Jones et al. (2023)
           published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
             Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
             A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
@@ -470,7 +470,7 @@ tables:
         short_unit: t
         unit: tonnes
         sources:
-        - name: Jones et al. (2023)
+        - name: Matthew Jones et al. (2023)
           published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
             Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
             A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
@@ -484,7 +484,7 @@ tables:
         short_unit: t
         unit: tonnes
         sources:
-        - name: Jones et al. (2023)
+        - name: Matthew Jones et al. (2023)
           published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
             Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
             A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
@@ -498,7 +498,7 @@ tables:
         short_unit: t
         unit: tonnes
         sources:
-        - name: Jones et al. (2023)
+        - name: Matthew Jones et al. (2023)
           published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
             Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
             A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
@@ -512,7 +512,7 @@ tables:
         short_unit: t
         unit: tonnes
         sources:
-        - name: Jones et al. (2023)
+        - name: Matthew Jones et al. (2023)
           published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
             Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
             A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
@@ -526,7 +526,7 @@ tables:
         short_unit: t
         unit: tonnes
         sources:
-        - name: Jones et al. (2023)
+        - name: Matthew Jones et al. (2023)
           published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
             Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
             A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
@@ -540,7 +540,7 @@ tables:
         short_unit: t
         unit: tonnes
         sources:
-        - name: Jones et al. (2023)
+        - name: Matthew Jones et al. (2023)
           published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
             Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
             A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
@@ -561,7 +561,7 @@ tables:
           nitrous oxide, 29.8 for methane from fossil sources, and 27.2 for methane
           from agricultural and land use sources (as per the IPCC AR6 report).
         sources:
-        - name: Jones et al. (2023)
+        - name: Matthew Jones et al. (2023)
           published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
             Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
             A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
@@ -575,7 +575,7 @@ tables:
         short_unit: °C
         unit: °C
         sources:
-        - name: Jones et al. (2023)
+        - name: Matthew Jones et al. (2023)
           published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
             Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
             A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
@@ -589,7 +589,7 @@ tables:
         short_unit: °C
         unit: °C
         sources:
-        - name: Jones et al. (2023)
+        - name: Matthew Jones et al. (2023)
           published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
             Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
             A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
@@ -607,7 +607,7 @@ tables:
           The warming effects of each gas are calculated based on cumulative CO2-equivalent
           emissions using the Global Warming Potential (GWP*) approach.
         sources:
-        - name: Jones et al. (2023)
+        - name: Matthew Jones et al. (2023)
           published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
             Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
             A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
@@ -621,7 +621,7 @@ tables:
         short_unit: °C
         unit: °C
         sources:
-        - name: Jones et al. (2023)
+        - name: Matthew Jones et al. (2023)
           published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
             Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
             A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
@@ -635,7 +635,7 @@ tables:
         short_unit: °C
         unit: °C
         sources:
-        - name: Jones et al. (2023)
+        - name: Matthew Jones et al. (2023)
           published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
             Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
             A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
@@ -653,7 +653,7 @@ tables:
           effects of each gas are calculated based on cumulative CO2-equivalent emissions
           using the Global Warming Potential (GWP*) approach.
         sources:
-        - name: Jones et al. (2023)
+        - name: Matthew Jones et al. (2023)
           published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
             Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
             A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
@@ -667,7 +667,7 @@ tables:
         short_unit: °C
         unit: °C
         sources:
-        - name: Jones et al. (2023)
+        - name: Matthew Jones et al. (2023)
           published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
             Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
             A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
@@ -681,7 +681,7 @@ tables:
         short_unit: °C
         unit: °C
         sources:
-        - name: Jones et al. (2023)
+        - name: Matthew Jones et al. (2023)
           published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
             Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
             A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
@@ -699,7 +699,7 @@ tables:
           warming effects of each gas are calculated based on cumulative CO2-equivalent
           emissions using the Global Warming Potential (GWP*) approach.
         sources:
-        - name: Jones et al. (2023)
+        - name: Matthew Jones et al. (2023)
           published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
             Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
             A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
@@ -713,7 +713,7 @@ tables:
         short_unit: °C
         unit: °C
         sources:
-        - name: Jones et al. (2023)
+        - name: Matthew Jones et al. (2023)
           published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
             Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
             A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
@@ -727,7 +727,7 @@ tables:
         short_unit: °C
         unit: °C
         sources:
-        - name: Jones et al. (2023)
+        - name: Matthew Jones et al. (2023)
           published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
             Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
             A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
@@ -746,7 +746,7 @@ tables:
           based on cumulative CO2-equivalent emissions using the Global Warming Potential
           (GWP*) approach.
         sources:
-        - name: Jones et al. (2023)
+        - name: Matthew Jones et al. (2023)
           published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
             Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
             A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
@@ -765,7 +765,7 @@ tables:
           based on cumulative CO2-equivalent emissions using the Global Warming Potential
           (GWP*) approach.
         sources:
-        - name: Jones et al. (2023)
+        - name: Matthew Jones et al. (2023)
           published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
             Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
             A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
@@ -786,7 +786,7 @@ tables:
           factor of 29.8 for fossil sources, and 27.2 for agricultural and land use
           sources (as per the IPCC AR6 report).
         sources:
-        - name: Jones et al. (2023)
+        - name: Matthew Jones et al. (2023)
           published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
             Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
             A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
@@ -806,7 +806,7 @@ tables:
           converted these emissions to carbon-dioxide equivalents over a 100-year
           timescale using a conversion factor of 273 (as per the IPCC AR6 report).
         sources:
-        - name: Jones et al. (2023)
+        - name: Matthew Jones et al. (2023)
           published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
             Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
             A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
@@ -828,7 +828,7 @@ tables:
           from fossil sources, and 27.2 for methane from agricultural and land use
           sources (as per the IPCC AR6 report).
         sources:
-        - name: Jones et al. (2023)
+        - name: Matthew Jones et al. (2023)
           published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
             Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
             A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
