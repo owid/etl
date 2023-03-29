@@ -80,6 +80,14 @@ steps:
   data://grapher/ihme_gbd/2019/gbd_child_mortality:
     - data://garden/ihme_gbd/2019/gbd_child_mortality
 
+# Temporary additional to add Drug Disorders to grapher
+  data-private://meadow/ihme_gbd/2023-03-29/gbd_drug_disorders:
+  - snapshot-private://ihme_gbd/2023-03-29/gbd_drug_disorders.csv
+  data-private://garden/ihme_gbd/2023-03-29/gbd_drug_disorders:
+  - data-private://meadow/ihme_gbd/2023-03-29/gbd_drug_disorders
+  data-private://grapher/ihme_gbd/2023-03-29/gbd_drug_disorders:
+  - data-private://garden/ihme_gbd/2023-03-29/gbd_drug_disorders
+
   # Postnatal care coverage - World Bank (2022)
   data://meadow/postnatal_care/2022-09-19/postnatal_care:
     - walden://postnatal_care/2022-09-19/postnatal_care

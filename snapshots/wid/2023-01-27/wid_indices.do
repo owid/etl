@@ -102,7 +102,7 @@ drop p0p100_thr*
 *Define each income/wealth variable
 local var_names pretax posttax_nat posttax_dis wealth
 
-*Calculate ratios for each variable
+*Calculate ratios for each variable + create a duplicate variable for median
 foreach var in `var_names' {
 
 	gen palma_ratio_`var' = p90p100_share_`var' / (p0p50_share_`var' - p40p50_share_`var')
@@ -112,11 +112,13 @@ foreach var in `var_names' {
 	gen p90_p10_ratio_`var' = p90p100_thr_`var' / p10p20_thr_`var'
 	gen p90_p50_ratio_`var' = p90p100_thr_`var' / p50p60_thr_`var'
 	gen p50_p10_ratio_`var' = p50p60_thr_`var' / p10p20_thr_`var'
+	
+	gen median_`var' = p50p60_thr_`var'
 
 }
 
 *Order variables according to different variable groups
-order country year *gini_pretax *gini*dis *gini*nat *gini_wealth *_ratio*pretax *_ratio*dis *_ratio*nat *_ratio*wealth *share_pretax *share*dis *share*nat *share_wealth *avg_pretax *avg*dis *avg*nat *avg_wealth *thr_pretax *thr*dis *thr*nat *thr_wealth
+order country year *gini_pretax *gini*dis *gini*nat *gini_wealth *_ratio*pretax *_ratio*dis *_ratio*nat *_ratio*wealth *share_pretax *share*dis *share*nat *share_wealth *avg_pretax *avg*dis *avg*nat *avg_wealth *thr_pretax *thr*dis *thr*nat *thr_wealth median*
 
 *Sort country and year
 sort country year
