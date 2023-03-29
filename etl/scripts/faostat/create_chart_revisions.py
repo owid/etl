@@ -58,7 +58,7 @@ def extract_variables_from_dataset(dataset_short_name: str, version: str) -> Lis
     return variable_titles
 
 
-def extract_item_code_and_element_code_from_variable_name(variable: str) -> Dict[str, Any]:
+def extract_identifiers_from_variable_name(variable: str) -> Dict[str, Any]:
     matches = re.findall(REGEX_TO_EXTRACT_ITEM_AND_ELEMENT, variable)
     error = f"Item code or element code could not be extracted for variable: {variable}"
     assert np.shape(matches) == (1, 2), error
@@ -70,12 +70,8 @@ def extract_item_code_and_element_code_from_variable_name(variable: str) -> Dict
 
 def map_old_to_new_variable_names(variables_old: List[str], variables_new: List[str]) -> Dict[str, str]:
     # Extract item codes and element codes from variable names.
-    codes_old = pd.DataFrame(
-        [extract_item_code_and_element_code_from_variable_name(variable) for variable in variables_old]
-    )
-    codes_new = pd.DataFrame(
-        [extract_item_code_and_element_code_from_variable_name(variable) for variable in variables_new]
-    )
+    codes_old = pd.DataFrame([extract_identifiers_from_variable_name(variable) for variable in variables_old])
+    codes_new = pd.DataFrame([extract_identifiers_from_variable_name(variable) for variable in variables_new])
 
     variables_matched = pd.merge(
         codes_old, codes_new, how="outer", on=["item_code", "element_code"], suffixes=("_old", "_new")
@@ -145,7 +141,7 @@ def map_old_to_new_grapher_variable_ids(
     return grapher_variable_ids_mapping
 
 
-def _find_and_check_available_versions_for_dataset(
+def find_and_check_available_versions_for_dataset(
     dataset_short_name: str, version_old: Optional[str], version_new: Optional[str]
 ) -> Tuple[Optional[str], Optional[str]]:
     # Find available versions for current dataset.
@@ -238,7 +234,7 @@ def main(
         log.info(f"Checking available versions for dataset {dataset_short_name}.")
         # Ensure a dataset exist for each of the specified versions.
         # And if a version is not specified, assume the latest for the new dataset, or second latest for the old.
-        version_old, version_new = _find_and_check_available_versions_for_dataset(
+        version_old, version_new = find_and_check_available_versions_for_dataset(
             dataset_short_name=dataset_short_name, version_old=version_old, version_new=version_new
         )
         if (version_old is None) or (version_new is None):
