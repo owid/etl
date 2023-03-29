@@ -18,6 +18,7 @@ from rich_click.rich_group import RichGroup
 from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine
 
+from backport.datasync.data_metadata import variable_data_df_from_s3
 from etl import tempcompare
 
 
@@ -200,7 +201,7 @@ def etl_catalog(
     help="Path to .env file with remote database credentials.",
     default=".env",
 )
-@click.option("--data-values", is_flag=True, help="Compare data_values table.")
+@click.option("--values", is_flag=True, help="Compare values from S3.")
 @click.pass_context
 def grapher(
     ctx: click.core.Context,
@@ -209,18 +210,18 @@ def grapher(
     dataset: str,
     remote_env: str,
     local_env: str,
-    data_values: bool,
+    values: bool,
 ) -> None:
     """
     Compare a dataset in the local database with the remote database.
 
-    It compares dataset and variables metadata, and optionally the data_values table with --data-values flag
+    It compares dataset and variables metadata, and optionally the values from S3 with --values flag
     (which can be both CPU and memory heavy). It does the comparison in the same way as the etl-catalog command.
 
     The exit code is always 0 even if dataframes are different.
 
     Example usage:
-        compare  --show-values grapher ggdc 2020-10-01 ggdc_maddison__2020_10_01 --data-values
+        compare  --show-values grapher ggdc 2020-10-01 ggdc_maddison__2020_10_01 --values
     """
     remote_dataset_df = read_dataset_from_db(remote_env, namespace, version, dataset)
     local_dataset_df = read_dataset_from_db(local_env, namespace, version, dataset)
@@ -266,9 +267,9 @@ def grapher(
         **ctx.obj,
     )
 
-    if data_values:
-        remote_data_values_df = read_data_values_from_db(remote_env, namespace, version, dataset)
-        local_data_values_df = read_data_values_from_db(local_env, namespace, version, dataset)
+    if values:
+        remote_data_values_df = read_values_from_s3(remote_env, namespace, version, dataset)
+        local_data_values_df = read_values_from_s3(local_env, namespace, version, dataset)
 
         print("\n[magenta]=== Comparing data_values ===[/magenta]")
         diff_print(
@@ -354,24 +355,30 @@ def read_sources_from_db(env_path: str, namespace: str, version: str, dataset: s
     return cast(pd.DataFrame, df)
 
 
-def read_data_values_from_db(env_path: str, namespace: str, version: str, dataset: str) -> pd.DataFrame:
+def read_values_from_s3(env_path: str, namespace: str, version: str, dataset: str) -> pd.DataFrame:
     engine = get_engine(dotenv_values(env_path))
 
+    # get variables
     q = """
     SELECT
-        dv.*,
+        v.id as variableId,
+        v.dataPath,
         v.name as variable
-    FROM data_values as dv
-    JOIN variables as v ON dv.variableId = v.id
+    FROM variables as v
     JOIN datasets as d ON v.datasetId = d.id
     WHERE d.version = %(version)s and d.namespace = %(namespace)s and d.shortName = %(dataset)s
     """
-
-    df = pd.read_sql(
+    vf = pd.read_sql(
         q,
         engine,
         params={"version": version, "namespace": namespace, "dataset": dataset},
     )
+
+    # read them from S3
+    df = variable_data_df_from_s3(engine, vf.dataPath.tolist(), workers=10)
+
+    # add variable name
+    df = df.merge(vf[["variableId", "variable"]], on="variableId")
 
     # pivot table for easier comparison
     df = df.pivot(index=["year", "entityId"], columns="variable", values="value")

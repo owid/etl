@@ -2,7 +2,7 @@ meta:
   namespace: faostat
   short_name: faostat_el
   name: 'Land, Inputs and Sustainability: Land use indicators - FAO (2022)'
-  description: The Agri-environmental Indicators�Land Use domain provides information
+  description: The Agri-environmental Indicators—Land Use domain provides information
     on the distribution of agricultural and forest land, and their sub-components,
     including irrigated areas and areas under organic agriculture, at national, regional
     and global levels.Per capita values are included in this update.

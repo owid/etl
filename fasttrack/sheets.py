@@ -31,18 +31,19 @@ def import_google_sheets(url: str) -> Dict[str, Any]:
         "sources_meta": 1399503534,
     }
 
+    # read dataset first to check if we're using data_url instead of data sheet
+    dataset_meta = pd.read_csv(f"{url}&gid={SHEET_TO_GID['dataset_meta']}", header=None)
+    data_url = dataset_meta.set_index(0)[1].to_dict().get("data_url") or f"{url}&gid={SHEET_TO_GID['data']}"
+
     with concurrent.futures.ThreadPoolExecutor() as executor:
-        data_future = executor.submit(lambda x: pd.read_csv(x), f"{url}&gid={SHEET_TO_GID['data']}")
+        data_future = executor.submit(lambda x: pd.read_csv(x), data_url)
         variables_meta_future = executor.submit(lambda x: pd.read_csv(x), f"{url}&gid={SHEET_TO_GID['variables_meta']}")
-        dataset_meta_future = executor.submit(
-            lambda x: pd.read_csv(x, header=None), f"{url}&gid={SHEET_TO_GID['dataset_meta']}"
-        )
         sources_meta_future = executor.submit(lambda x: pd.read_csv(x), f"{url}&gid={SHEET_TO_GID['sources_meta']}")
 
     return {
         "data": data_future.result(),
         "variables_meta": variables_meta_future.result(),
-        "dataset_meta": dataset_meta_future.result(),
+        "dataset_meta": dataset_meta,
         "sources_meta": sources_meta_future.result(),
     }
 
@@ -78,6 +79,7 @@ def parse_metadata_from_sheets(
     dataset_dict = _prune_empty(dataset_meta_df.set_index(0)[1].to_dict())  # type: ignore
     dataset_dict["namespace"] = "fasttrack"  # or should it be owid? or institution specific?
     dataset_dict.pop("updated")
+    dataset_dict.pop("data_url")
     dataset_dict.setdefault("description", "")
 
     try:
