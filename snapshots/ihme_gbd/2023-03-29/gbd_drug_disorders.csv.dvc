@@ -1,5 +1,5 @@
 meta:
-  namespace: ihme
+  namespace: ihme_gbd
   short_name: gbd_drug_disorders
   name: Global Burden of Disease Study 2019 (GBD 2019)
   version: 2023-03-29
@@ -17,7 +17,7 @@ meta:
   is_public: false
   description: |
 
-wdir: ../../../data/snapshots/ihme/2023-03-29
+wdir: ../../../data/snapshots/ihme_gbd/2023-03-29
 outs:
 - md5: 01ca5dba357f1155695ed7905635b16a
   size: 930972
