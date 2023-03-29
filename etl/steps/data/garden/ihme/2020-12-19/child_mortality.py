@@ -20,7 +20,7 @@ def run(dest_dir: str) -> None:
     log.info("child_mortality.start")
 
     # read dataset from meadow
-    ds_meadow = Dataset(DATA_DIR / "meadow/ihme_gbd/2020-12-19/child_mortality")
+    ds_meadow = Dataset(DATA_DIR / "meadow/ihme/2020-12-19/child_mortality")
     tb_meadow = ds_meadow["child_mortality"]
 
     df = pd.DataFrame(tb_meadow)

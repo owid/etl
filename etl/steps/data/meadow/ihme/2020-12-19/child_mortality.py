@@ -17,7 +17,7 @@ def run(dest_dir: str) -> None:
     log.info("child_mortality.start")
 
     # retrieve raw data from walden
-    walden_ds = WaldenCatalog().find_one(namespace="ihme_gbd", short_name="child_mortality", version="2020-12-19")
+    walden_ds = WaldenCatalog().find_one(namespace="ihme", short_name="child_mortality", version="2020-12-19")
     local_file = walden_ds.ensure_downloaded()
 
     df = pd.read_feather(local_file)
