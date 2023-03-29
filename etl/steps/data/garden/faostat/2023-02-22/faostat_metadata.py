@@ -30,14 +30,10 @@ There are some non-trivial issues with the definitions of items at FAOSTAT:
     item code 221 corresponds to item "Almonds, with shell", which is the same item, but with a slightly different
     name. This happens with many items. On the website (https://www.fao.org/faostat/en/?#data/QV) they seem to be
     using the naming from the metadata. We can safely ignore this issue, and stick to the names in the data.
-  * In dataset sdgb, item codes have very unusual names, and they are not found in the metadata. We haven't figured
-    out the root of the issue yet.
 
 There are several cases in which one or a few item codes in the data are missing in the metadata. Also, there are
 several cases in which an item code in the data has an item name slightly different in the metadata. But these are not
 important issues (since we use item_code to merge different datasets, and we use metadata only to fetch descriptions).
-However, for some domains there are too many differences between items in the data and in the metadata (as explained
-above). For this reason, raise a warning only when there is a reasonable number of issues found.
 
 """
 
