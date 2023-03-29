@@ -12,7 +12,9 @@ from copy import deepcopy
 from owid import catalog
 from tqdm.auto import tqdm
 
-from etl.paths import DATA_DIR
+from etl.helpers import PathFinder
+
+paths = PathFinder(__file__)
 
 # Rename columns to be used by the food explorer.
 # Note: Include here all columns, even if the name is not changed.
@@ -48,9 +50,9 @@ EXPECTED_COLUMNS = {
 
 
 def run(dest_dir: str) -> None:
-    # Load the latest dataset for FAOSTAT food explorer from garden.
-    dataset_garden_latest_dir = sorted((DATA_DIR / "garden" / "faostat").glob("*/faostat_food_explorer"))[-1]
-    dataset_garden = catalog.Dataset(dataset_garden_latest_dir)
+    # Load the dataset for FAOSTAT food explorer from garden.
+    dataset_garden: catalog.Dataset = paths.load_dependency("faostat_food_explorer")
+
     # Get the table of all food products.
     table_garden = dataset_garden["all_products"]
 

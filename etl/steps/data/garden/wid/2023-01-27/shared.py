@@ -49,6 +49,13 @@ var_dict = {
         "short_unit": "$",
         "numDecimalPlaces": 1,
     },
+    "median": {
+        "title": "Median",
+        "description": "Median income or wealth.",
+        "unit": "international-$ in 2021 prices",
+        "short_unit": "$",
+        "numDecimalPlaces": 1,
+    },
     "palma_ratio": {
         "title": "Palma ratio",
         "description": "The Palma ratio is the share of total income or wealth of the top 10% divided by the share of the bottom 40%.",

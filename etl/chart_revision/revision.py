@@ -76,7 +76,9 @@ class ChartVariableUpdateRevision:
             return self.revision[item]
         else:
             raise ValueError(
-                "No revision available! This might be because the chart is not affected by the variable update."
+                "There is no revision available! This occurs because the chart new config was not built yet. This can"
+                " be done by calling the method `bake`. Another underlying issue might be because the chart is not"
+                " affected by the variable update."
             )
 
     def _get_relevant_variable_updates(self, variables_update: "VariablesUpdate") -> "VariablesUpdate":
@@ -464,3 +466,25 @@ def _get_chart_update_reason(variable_ids: List[int]) -> str:
         reason = reason[:SUGGESTED_REASON_MAX_LENGTH]
 
     return reason
+
+
+def create_and_submit_charts_revisions(mapping: Dict[int, int], revision_reason: Optional[str] = None):
+    """Review and suggest chart revisions based on the variable mapping.
+
+    Given a dictionary mapping old to new variable IDs, this function updated the configs from the affected charts
+    (those using the old variables) and suggests the chart revisions. This suggestions are pushed to the Grapher DB.
+
+    Parameters
+    ----------
+    mapping : Dict[int, int]
+        Dictionary with old to new variable IDs mapping.
+    revision_reason : Optional[str], optional
+        Text briefly summarising the reason for this update. If none is given, a default one will be generated based on variable and dataset descriptions.
+    """
+    # Get revisions to be done
+    chart_revisions = get_charts_to_update(mapping)
+    # Update chart configs
+    for chart_revision in chart_revisions:
+        _ = chart_revision.bake(revision_reason)
+    # Submit revisions to Grapher
+    submit_revisions_to_grapher(chart_revisions)

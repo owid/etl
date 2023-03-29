@@ -1,0 +1,28 @@
+meta:
+  namespace: fasttrack
+  short_name: global_warming_contributions
+  file_extension: csv
+  date_accessed: 2023-03-29
+  name: Global warming contributions
+  description: |-
+    Jones et al. (2023) quantify national and regional contributions to the increase of global mean surface temperature over the last few centuries. As they detail: the "dataset describing the global warming response to national emissions CO2, CH4 and N2O from fossil and land use sources during 1851-2021.
+
+    National CO2 emissions data are collated from the Global Carbon Project (Andrew and Peters, 2022; Friedlingstein et al., 2022).
+
+    National CH4 and N2O emissions data are collated from PRIMAP-hist (HISTTP) (Gütschow et al., 2022).
+
+    We construct a time series of cumulative CO2-equivalent emissions for each country, gas, and emissions source (fossil or land use). Emissions of CH4 and N2O emissions are related to cumulative CO2-equivalent emissions using the Global Warming Potential (GWP*) approach, with best-estimates of the coefficients taken from the IPCC AR6 (Forster et al., 2021).
+
+    Warming in response to cumulative CO2-equivalent emissions is estimated using the transient climate response to cumulative carbon emissions (TCRE) approach, with best-estimate value of TCRE taken from the IPCC AR6 (Forster et al., 2021, Canadell et al., 2021). 'Warming' is specifically the change in global mean surface temperature (GMST)."
+  source_name: Google Sheet
+  url: https://doi.org/10.5281/zenodo.7636699
+  source_published_by: Google Sheet
+  source_data_url: gAAAAABkJA7WvCo-f3u_JMGUF9cid_2fGu1DIt-m-5KWm8yczckrjMqCtatgoUgl0ndutC89gy_T0x7nP0SLoOLFwT9QPPBnHhk1q4NVdXRQmQGqtMUZ9fpI3ihqHUGi536Kh2baRyUgXWQFBG_3QPLq0gLEMs2o9zYNx_e0ZxsXrNrIsTCjtopQEeV4Wwc_h2dk_5l4i-MYFbNSbqs6hXMMmUAKRMIKmwxQG8pKnjgAoYSQZclY581EqJrFjRKnmFGSXbLnc6i4
+  is_public: false
+  version: '2023-03-27'
+  publication_year: 2023
+wdir: ../../../data/snapshots/fasttrack/2023-03-27
+outs:
+- md5: 48f8ff1455c82c193d7e5ec1cbc58fb7
+  size: 27352636
+  path: global_warming_contributions.csv

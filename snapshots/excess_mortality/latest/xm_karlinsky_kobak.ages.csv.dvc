@@ -14,7 +14,7 @@ meta:
   file_extension: csv
   license_url: https://github.com/dkobak/excess-mortality/blob/main/LICENSE
   license_name: GPL-3.0
-  date_accessed: 2023-03-14
+  date_accessed: 2023-03-28
   is_public: true
   description: |
     The data are sourced from the World Mortality Dataset (https://github.com/akarlinsky/world_mortality). Excess mortality is computed relative to the baseline obtained using linear extrapolation of the 2015–19 trend (different baselines for 2020, 2021, and 2022). In each subplot in the figure below, gray lines are 2015–19, black line is baseline for 2020, red line is 2020, blue line is 2021, orange line is 2022. Countries are sorted by the total excess mortality as % of the 2020 baseline.
