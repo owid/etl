@@ -5,6 +5,11 @@ from backport.datasync.data_metadata import variable_data_df_from_s3
 from etl.db import get_engine
 
 
+# Set to True when running experiments locally and want to avoid downloading data from S3.
+# Instead of getting the actual data, dummy data is generated.
+DEBUG_NO_S3 = False
+
+
 @dataclass
 class VariablesUpdate:
     """Contains the details on the variable updates."""
@@ -51,6 +56,15 @@ class VariablesUpdate:
 
     def _get_metadata_from_db(self) -> List["VariableMetadata"]:
         """Get metadata for all variables in the update."""
+        if DEBUG_NO_S3:
+            return [
+                VariableMetadata(
+                    id=i,
+                    min_year=1900,
+                    max_year=2020,
+                )
+                for i in self.ids_all
+            ]
         # get data from S3
         df_var_years = variable_data_df_from_s3(get_engine(), variable_ids=self.ids_all, workers=10)
 
