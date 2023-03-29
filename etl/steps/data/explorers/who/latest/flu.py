@@ -60,7 +60,7 @@ def run(dest_dir: str) -> None:
     #
     tb_flu = create_zero_filled_strain_columns(tb_flu)
 
-    # tb_flu = remove_sparse_timeseries(df=tb_flu, min_data_points=MIN_DATA_POINTS)
+    tb_flu = remove_sparse_timeseries(df=tb_flu)
     tb_flu = create_regional_aggregates(df=tb_flu)
 
     # hold back the last 28 days of data as it takes some time for data to filter in from countries
@@ -374,4 +374,24 @@ def calculate_percent_positive_aggregate(df: pd.DataFrame, surveillance_cols: li
         ] = np.nan
         # df = df.dropna(axis=1, how="all")
 
+    return df
+
+
+def remove_sparse_timeseries(df: pd.DataFrame) -> pd.DataFrame:
+    """Remove spare time series from zero filled columns - so we don't have time-series showing only zeros."""
+    countries = df["country"].drop_duplicates()
+    cols = df.columns.drop(["country", "date", "hemisphere", "year"])
+    # all columns that have been zerofilled so they can be used in stacked bar charts
+    z_filled_cols = [col for col in cols if col.endswith("zfilled")]
+    # all columns that contain values on confirmed flu cases
+    all_flunet_cols = cols[(cols.str.contains("sentinel|notdefined|combined"))]
+    # all columns that will be used in line charts but not stacked bar charts
+    fluid_cols = cols[(cols.str.contains("ili|ari"))].to_list()
+
+    not_z_filled_flunet_cols = [col for col in all_flunet_cols if not col.endswith("zfilled")]
+    assert len(not_z_filled_flunet_cols) + len(z_filled_cols) + len(fluid_cols) == len(cols)
+    for country in countries:
+        # Removing all flunet values for a country where there are fewer than {min_data_points}
+        if all(df.loc[(df["country"] == country), z_filled_cols].fillna(0).astype(bool).sum() == 0):
+            df.loc[(df["country"] == country), z_filled_cols] = np.NaN
     return df
