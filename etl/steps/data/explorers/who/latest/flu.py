@@ -51,6 +51,9 @@ def run(dest_dir: str) -> None:
     tb_flu = pd.DataFrame(pd.merge(tb_fluid, tb_flunet, on=["country", "date", "hemisphere"], how="outer"))
     assert tb_flu[["country", "date"]].duplicated().sum() == 0
 
+    # Remove data prior to 2009 as we don't show this on the explorer
+    tb_flu = tb_flu.loc[tb_flu["date"] > "2008-12-29"]
+
     tb_flu = create_full_time_series(tb_flu)
     tb_flu = remove_sparse_years(tb_flu, min_datapoints_per_year=MIN_DATA_POINTS_PER_YEAR)
     tb_flu = fill_flu_data_gaps_with_zero(tb_flu)
