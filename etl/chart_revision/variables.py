@@ -4,7 +4,6 @@ from typing import Dict, List, Optional, Union
 from backport.datasync.data_metadata import variable_data_df_from_s3
 from etl.db import get_engine
 
-
 # Set to True when running experiments locally and want to avoid downloading data from S3.
 # Instead of getting the actual data, dummy data is generated.
 DEBUG_NO_S3 = False
