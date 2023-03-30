@@ -1,0 +1,70 @@
+meta:
+  namespace: war
+  short_name: bouthoul_carrere_1978
+  name: A list of the 366 major armed conflicts of the period 1740 - 1974
+  source_name: Bouthoul and Carrere (1978)
+  publication_year: 1978
+  publication_date: 1978-07-01
+  url: https://www.jstor.org/stable/23609587
+  source_data_url: https://docs.google.com/spreadsheets/d/1JXkz05kb_gkGXuvdnI21B6lhHIVZJD5BaiEOZi8mqRk/edit?usp=sharing
+  file_extension: csv
+  license_url: https://about.jstor.org/terms/
+  license_name: JSTOR
+  date_accessed: 2023-01-09
+  is_public: true
+  description: >-
+    What years and countries are covered? 1740–1974, worldwide
+
+      - "List of all major armed conflicts – domestic and international – for the
+    period 1740 - 1974" (Bouthoul et al. 1978: 83)
+
+
+    Which conflicts are covered?
+
+      - Major armed conflicts, domestic and international.
+
+      - "Only those conflicts were included which satisfied at least one of the following
+    six quantitative criteria and could
+      therefore be considered as 'major armed conflicts', wars and revolutions being
+    the most representative ones." (Bouthoul et al. 1978: 83).
+
+      - 'Major': more than one state, affected a large area, lasted longer than one
+    year, killed more than 1,000, or had important results,
+      such as regime change or independence; "Those six criteria were: a. undertaken
+    by more than one state, b. Affected a space larger
+      than one province or a capital, c. lasted longer than one year, d. Was of great
+    intensity (more than 1,000 killed)[...], e. Had important
+      internal results (secession or regime change), f. Had important international
+    results (annexation or independence, emergence or
+      disappearance of a state" (Bouthoul et al. 1978: 83).
+
+      - "The list thus includes the following types of conflicts: foreign and civil
+    wars, occupations by force (e.g. Austria, 1938),
+      military penetrations, revolutions, uprisings and insurrections, massacres and
+    genocide, and other violent troubles with important
+      consequences." (Bouthoul et al. 1978: 83-84).
+
+      - "Conflicts preceded by an asterisk are classified as "inter-state" conflicts
+    in the authors' investigation." (Bouthoul et al. 1978: 84).
+
+
+    Which deaths and casualties are covered?
+
+      - Deaths; military and civilian combined; direct and indirect combined
+
+      - "Number of killed, military and civilian, on account of the conflict (operations,
+    massacres, epidemies and famines directly linked to the
+      conflict) (order of magnitude, e.g. 60,000). In view of the difficulty of obtaining
+    precise figures, the ones given indicate orders of magnitude"
+      (Bouthoul et al. 1978: 84).
+
+    How did we construct our source spreadsheet?
+
+      - We identified conflicts as well as deaths from the list in their article.
+
+      - We excluded conflicts without deaths.
+wdir: ../../../data/snapshots/war/2023-01-09
+outs:
+- md5: d0b1416eade865e82e5f935f1c641610
+  size: 46668
+  path: bouthoul_carrere_1978.csv

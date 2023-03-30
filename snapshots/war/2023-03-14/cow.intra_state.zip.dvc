@@ -1,0 +1,26 @@
+meta:
+  namespace: war
+  short_name: war_cow
+  name: Intra-State Wars v5.1 (COW War Data, 1816 – 2007)
+  version: 2023-03-14
+  publication_year: 2010
+  publication_date: 2010-01-27
+  source_name: Brecke
+  source_published_by: 'Sarkees, Meredith Reid and Frank Wayman (2010). Resort to
+    War: 1816 – 2007. Washington DC: CQ Press.'
+  url: hthttps://correlatesofwar.org/data-sets/cow-war/
+  source_data_url: https://correlatesofwar.org/wp-content/uploads/Intra-State-Wars-v5.1.zip
+  file_extension: zip
+  license_url:
+  license_name:
+  date_accessed: 2023-03-14
+  is_public: true
+  description: |
+    Version 5.1 of the Intra‐state war data represents an update of version 5.0 which was published as A GUIDE TO INTRA‐STATE WARS: An Examination of Civil, Regional, and Intercommunal Wars, 1816‐2014, by Jeffrey S. Dixon and Meredith Reid Sarkees. The primary attributes of Version 5.1 are that: it includes updated data on the intra-state wars from 1816-2014; and it includes wars that were omitted from the GUIDE due to publication errors. The dataset is composed of two files: Intra-state-Wars v.5.1.csv; and Intra‐state_state_participant_v5.1.csv. The first (Wars) provides summary information on each war, while the second file (state_participant) provides information on the war experience of each of the individual states involved.
+
+    You can find more notes at https://correlatesofwar.org/wp-content/uploads/Intra-StateWars_Codebook.pdf
+wdir: ../../../data/snapshots/war/2023-03-14
+outs:
+- md5: 8e2911728de2e040b8e5c712f7fca7e5
+  size: 887487
+  path: cow.intra_state.zip

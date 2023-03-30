@@ -1,0 +1,178 @@
+meta:
+  namespace: war
+  short_name: clodfelter_2017
+  name: 'Warfare and Armed Conflicts: A Statistical Encyclopedia of Casualty and Other
+    Figures, 1492-2015, 4th ed.'
+  source_name: Clodfelter (2017)
+  publication_year: 2017
+  publication_date: 2017-04-24
+  url: https://books.google.es/books/about/Warfare_and_Armed_Conflicts.html?id=kNzCDgAAQBAJ&redir_esc=y
+  source_data_url: https://docs.google.com/spreadsheets/d/1Evc5VP2Ra3Lb2_GoV8LjMaJcFoCzlUwslY-TFtC_fB4/edit?usp=sharing
+  file_extension: csv
+  license_url: https://mcfarlandbooks.com/product/warfare-and-armed-conflicts/
+  license_name: McFarland, 2017
+  date_accessed: 2023-01-09
+  is_public: true
+  description: >-
+    What years and countries are covered? 1492 – 2015
+
+
+    Which conflicts are covered? Wars, domestic and international
+
+      - 1492 chosen because data before even more flawed: "Because of the paucity
+    of even remotely reliable statistics before the Renaissance,
+      this volume employs as its starting point the epical year of 1492" (Clodfelter
+    2017: 1).
+
+      - "I have attempted to include every war, major or minor, for which there exist
+    statistics—international wars and civil wars,
+      internationalized civil wars, limited wars and unlimited wars, border wars and
+    miniwars—as well as those less organized and
+      less sustained, or wholly one-sided outbreaks of mass human violence—riots,
+    revolutions, massacres, bloodbaths, and pogroms,
+      (or those conflicts, such as the U.S. Civil Rights Movement, in which only one
+    side was armed and violent and the other
+      determinedly non-violent)" (Clodfelter 2017: 1-2).
+
+
+    Which deaths and casualties are covered?
+
+      - Deaths and casualties; military and civilian combined; direct and indirect
+    combined.
+
+      - Deaths and casualties from battle: "KIA for killed-in-action; DOW for died
+    of wounds; WIA for wounded-in-action; MIA for missing-in-action;
+      POW for prisoner of war. In many instances, because of a lack of accurate information
+    about the number who died of wounds subsequent to the
+      battle or who died from fratricide or other causes directly or indirectly attributable
+    to hostile fire, KIA is employed as a catch-all
+      designation for lack of more precise data. Where more appropriate, the term
+    "battle deaths" is used" (Clodfelter 2017: xix-xx).
+
+      - Deaths from disease included: "Of course, a very large proportion of the dead
+    shown in these sets of figures were not killed in battle but
+      died as a result of infections arising from wounds or disease. Until the great
+    medical advances of the late nineteenth century and of the
+      twentieth century, nearly as many men did after the guns had fallen silent as
+    had been killed in the heat and smoke of battle"
+      (Clodfelter 2017: 6).
+
+      - "Until the twentieth century a soldier marching off to war had a far greater
+    chance of dying for his cause or country because of disease than
+      through enemy fire. The proportion of disease deaths to combat deaths (including
+    those who died of wounds) was almost always at least 3:1, even
+      in the healthiest of climates" (Clodfelter 2017: 6).
+
+      - No deaths or casualties threshold: "It is, of course, beyond the scope of
+    a work such as this to include the losses of every single battle
+      for which someone has bothered to take and record a count of casualties. [...]
+    It is obvious that I must establish some kind of minimum
+      cut-off figure for the toll of the battles of, say, World War I's Western Front
+    or World War II's Russian Front, while setting a different
+      criterion when recording the losses suffered in the actions of a great many
+    lesser wars. If I were to arbitrarily conform to a figure of
+      50,000 or even 25,000 total casualties incurred, below which I would not bother
+    to include a battle in this survey, this work would
+      ignore a great many of the important battles of history" (Clodfelter 2017: 2).
+
+      - One-sided violence included: "I have attempted to include every war, major
+    or minor, for which there exist statistics [...] as well as those
+      less organized and less sustained, or wholly one-sided outbreaks of mass human
+    violence—riots, revolutions, massacres, bloodbaths, and pogroms,
+      (or those conflicts, such as the U.S. Civil Rights Movement, in which only one
+    side was armed and violent and the other determinedly
+      non-violent)" (Clodfelter 2017: 1-2).
+
+      - Numbers do not necessarily add up across categories: "Figures in tables organized
+    by year or unit do not always conform strictly to other
+      cumulative counts or estimates due to variables in the methodology and dating
+    of the counts" (Clodfelter 2017: xx).
+
+      - Data quality low because lives lost were not valued: "Body counts were not
+    important in earlier centuries, particularly the seventeenth and
+      eighteenth, the era of siege warfare. In those centuries the magnitude of victory
+    was often calculated as much on fortresses or cities
+      captured and war materiel seized as on casualties inflicted" (Clodfelter 2017:
+    4).
+
+      - "The ratio of killed to wounded also remained fairly constant up to World
+    War I. For every 10 men killed usually another 35 were wounded"
+      (Clodfelter 2017: 4).
+
+      - Sometimes several estimates are given: "Usually a single set of figures is
+    presented in this work, but in some cases, for the sake of
+      comparison, conflicting counts are given. The abbreviation "n.a." (not available)
+    is used when no reliable data were found." (Clodfelter 2017: xix).
+
+
+    How did he construct the data?
+
+      - Data quality as good as can be, but flawed: "I have employed official and
+    supposedly authoritative sources wherever available, have sought
+      statistics from both sides in each war to evaluate the inevitably conflicting
+    claims, and have tried to verify the numbers reported on
+      the battlefield with the records of the various medical corps and military surgeon-general
+    reports. But for all my efforts at cutting
+      through the exaggeration, propaganda, and outright mendacity with which the
+    statistics of warfare are weighted, it must still be admitted
+      that every quantity in this work may legitimately be questioned" (Clodfelter
+    2017: xix).
+
+      - Data quality lower for earlier years and for countries outside Europe: "Usually
+    the longer the battle and the larger the battlefield,
+      the more uncertain the numbers involved. Generally also, the reliability of
+    battlefield figures decreases the further back one goes in
+      history and the further one travels from the Western industrial world. Numerical
+    precision in warfare, even in the West, was rare prior
+      to the Age of the Enlightenment. Every battlefield statistic can be no more
+    than an educated guess" (Clodfelter 2017: xix).
+
+      - Data is still informative: "But there are precise numbers in the documentation
+    of warfare—tens of thousands of them. It is unnecessary
+      to reject them all because a few seem unlikely or even impossible, and round
+    off all battlefield numbers" (Clodfelter 2017: xix).
+
+      - Data quality for European countries is better (but a troubling way of expressing
+    that): "In some cases, exact numbers are stated for one
+      side in a conflict while estimated figures are given for the opposing side.
+    This is due to the progression in statistical accuracy of the
+      one side and lack of such for the other. This is particularly characteristic
+    of the colonial conflicts of the late eighteenth through the
+      early twentieth centuries, when the more technologically advanced Western armies
+    battled the forces of Africa and Asia whose cultures cared
+      little for statistical precision" (Clodfelter 2017: xix).
+
+      - Data quality is better if war was relatively small, brief, and clear geography
+    and timeline: "The dependability of statistical accuracy
+      rises with battles of relatively small scope, brief duration, and distinct boundaries
+    in geography and chronology" (Clodfelter 2017: xix).
+
+      - Worked to reconcile differing sources: "Where generally reliable, but conflicting,
+    sources exist for the same battle or war, the origin
+      of each source has been investigated to determine the more accurate of the two"
+    (Clodfelter 2017: xix).
+
+
+    How did we construct our source spreadsheet?
+
+      - We identified conflicts as well as deaths and casualties based on the conflict
+    narratives in his book.
+
+      - We seem to have almost exclusively coded conflicts until the early 19th century;
+    among the coded conflicts, the latest start date is 1831.
+
+      - We erred on the side of caution, such as by excluding estimates referring
+    to 'dead, wounded, or missing in action'.
+
+      - In some cases, we used overall estimates of deaths instead of adding up more
+    specific death types.
+
+      - We have two source spreadsheets: they include the same information, but whereas
+    one provides more information in the 'notes' column, the
+      other follows the structure common for the other datasets of one conflict per
+    row.
+wdir: ../../../data/snapshots/war/2023-01-09
+outs:
+- md5: 3d352b60ea0bf89d81061ffdb6db9322
+  size: 41745
+  path: clodfelter_2017.csv

@@ -1,0 +1,36 @@
+all_sources:
+  - source_testing: &source-testing
+      name: Dunnigan and Martel (1987)
+      published_by: Dunnigan, James, and William Martel. 1987. How to Stop a War. Doubleday.
+      url: https://books.google.es/books/about/How_to_Stop_a_War.html?id=lg7cAAAAMAAJ
+      date_accessed: 2023-01-09
+      publication_date: 1987-10-01
+      publication_year: 1987
+      # description: Source description.
+
+dataset:
+  title: Wars and deaths – Dunnigan and Martel
+  namespace: war
+  short_name: dunnigan_martel_1987
+  version: 2023-01-18
+  description: |
+    This dataset provides information on military and civilian deaths from wars, drawn from the book by Dunnigan and Martel (1987).
+  licenses:
+    - name: Doubleday (1987)
+      url: # TO BE FILLED. Example: https://url_of_testing_source.com/license
+  sources:
+    - *source-testing
+
+tables:
+  dunnigan_martel_1987:
+    variables:
+      # testing_variable:
+      #   title: Testing variable title
+      #   unit: arbitrary units
+      #   short_unit: au
+      #   description: Full description of testing variable.
+      #   sources:
+      #     - *source-testing
+      #   display:
+      #     entityAnnotationsMap: Test annotation
+      #     numDecimalPlaces: 0
