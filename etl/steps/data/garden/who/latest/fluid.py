@@ -227,30 +227,36 @@ def clean_patient_rates(df: pd.DataFrame) -> pd.DataFrame:
     over_1000_ari = df[df["ari_cases_per_thousand_outpatients"] > 1000].shape[0]
     over_100_sari = df[df["sari_cases_per_hundred_inpatients"] > 100].shape[0]
 
-    log.info(f"{over_1000_ili} rows with ili_cases_per_thousand_outpatients over 1000. We'll set these to NA.")
-    log.info(f"{over_1000_ari} rows with ari_cases_per_thousand_outpatients over 1000. We'll set these to NA.")
-    log.info(f"{over_100_sari} rows with sari_cases_per_hundred_inpatients over 100. We'll set these to NA.")
+    log.info(
+        f"{over_1000_ili} rows with ili_cases_per_thousand_outpatients greater than or equal to 1000. We'll set these to NA."
+    )
+    log.info(
+        f"{over_1000_ari} rows with ari_cases_per_thousand_outpatients greater than or equal to 1000. We'll set these to NA."
+    )
+    log.info(
+        f"{over_100_sari} rows with sari_cases_per_hundred_inpatients greater than or equal to 100. We'll set these to NA."
+    )
 
-    df.loc[df["ili_cases_per_thousand_outpatients"] > 1000, "ili_cases_per_thousand_outpatients"] = np.NaN
-    df.loc[df["ari_cases_per_thousand_outpatients"] > 1000, "ari_cases_per_thousand_outpatients"] = np.NaN
-    df.loc[df["sari_cases_per_hundred_inpatients"] > 100, "sari_cases_per_hundred_inpatients"] = np.NaN
+    df.loc[df["ili_cases_per_thousand_outpatients"] >= 1000, "ili_cases_per_thousand_outpatients"] = np.NaN
+    df.loc[df["ari_cases_per_thousand_outpatients"] >= 1000, "ari_cases_per_thousand_outpatients"] = np.NaN
+    df.loc[df["sari_cases_per_hundred_inpatients"] >= 100, "sari_cases_per_hundred_inpatients"] = np.NaN
 
     df["ili_cases_per_thousand_outpatients"] = df.groupby("country", group_keys=False)[
         "ili_cases_per_thousand_outpatients"
-    ].apply(check_group, min=1, max=999)
+    ].apply(remove_values_with_only_extremes, min=1, max=999)
 
     df["ari_cases_per_thousand_outpatients"] = df.groupby("country", group_keys=False)[
         "ari_cases_per_thousand_outpatients"
-    ].apply(check_group, min=1, max=999)
+    ].apply(remove_values_with_only_extremes, min=1, max=999)
 
     df["sari_cases_per_hundred_inpatients"] = df.groupby("country", group_keys=False)[
         "sari_cases_per_hundred_inpatients"
-    ].apply(check_group, min=1, max=99)
+    ].apply(remove_values_with_only_extremes, min=1, max=99)
 
     return df
 
 
-def check_group(group: pd.Series, min: int, max: int) -> pd.Series:
+def remove_values_with_only_extremes(group: pd.Series, min: int, max: int) -> pd.Series:
     """
     If all values in the group are less than {min} or greater than {max}, or NA then replace all values for that group with NA.
     """
