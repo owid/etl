@@ -1,7 +1,14 @@
 """Detected anomalies.
 
-This module contains a class for each data anomaly detected. The class checks that the anomaly exists, and removes it.
-Optionally, the anomaly can be visualized.
+This module contains a class for each data anomaly detected. The class has the following methods and properties:
+* description: A human-readable text that describes the anomaly.
+  NOTE: The description will be added to the dataset metadata description, and hence will be shown in grapher.
+* checks: A method that ensures the anomaly exists in the data.
+  This is useful to detect if an anomaly has been corrected after a data update.
+* fix: A method that removes the anomaly.
+* inspect: An optional method that plots (in the browser) a visualization that shows the anomaly.
+  It can be used before and after removing the anomalies.
+* handle_anomalies: A helper method that uses all the previous methods in the usual order.
 
 If after an update the anomaly is no longer in the original data, remove the corresponding class.
 
@@ -30,6 +37,7 @@ class DataAnomaly(abc.ABC):
     @property
     @abc.abstractmethod
     def description(self) -> str:
+        # Description of the anomaly, which will be added to the dataset description.
         pass
 
     @abc.abstractmethod
@@ -47,11 +55,14 @@ class DataAnomaly(abc.ABC):
         log.info(f"Handling anomaly: {self.description}")
         log.info("Checking that known data anomalies are present in the data")
         self.check(df=df)
+
         if inspect_anomalies:
             log.info("Inspect anomaly before fixing.")
             self.inspect(df=df)
+
         log.info("Fixing anomalies.")
         df_fixed = self.fix(df=df)
+
         if inspect_anomalies:
             log.info("Inspect anomaly after fixing.")
             self.inspect(df=df_fixed)
@@ -335,8 +346,10 @@ detected_anomalies = {
 
 def handle_anomalies(dataset_short_name: str, data: pd.DataFrame) -> Tuple[pd.DataFrame, str]:
     if dataset_short_name not in detected_anomalies:
+        # If there is no anomaly class for a given dataset, return the same data and an empty anomaly description.
         return data, ""
     else:
+        # If there are anomalies, fix them, and return the fixed data and a text describing all anomalies.
         data_fixed = data.copy()
         anomaly_descriptions = "\n\nDetected data anomalies:"
 
