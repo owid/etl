@@ -1,4 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
+from datetime import datetime
+
 import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
@@ -6,6 +8,10 @@ from structlog import get_logger
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
+from etl.steps.data.garden.who.latest.fluid import (
+    MIN_DATA_POINTS_PER_YEAR,
+    remove_sparse_years,
+)
 
 log = get_logger()
 
@@ -41,6 +47,7 @@ def run(dest_dir: str) -> None:
 
     df = calculate_percent_positive(df, surveillance_cols=["SENTINEL", "NONSENTINEL", "NOTDEFINED", "COMBINED"])
     df = create_united_kingdom_aggregate(df)
+    df = remove_sparse_years(df, min_datapoints_per_year=MIN_DATA_POINTS_PER_YEAR)
     df = df.reset_index(drop=True)
     tb_garden = Table(df, short_name=paths.short_name)
     #
