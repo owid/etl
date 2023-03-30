@@ -31,10 +31,7 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    tb_garden = tb_garden.reset_index()
-    for column in ["population", "world_pop_share"]:
-        tb_garden = add_projection_and_historical_metrics(tb_garden, YEAR_THRESHOLD, column)
-    tb_garden = tb_garden.set_index(["country", "year"])
+    tb_garden = process(tb_garden)
     #
     # Save outputs.
     #
@@ -49,6 +46,29 @@ def run(dest_dir: str) -> None:
     # Save changes in the new grapher dataset.
     ds_grapher.save()
 
+
+def process(table: Table) -> Table:
+    """Adapt table for Grapher.
+
+    - Add historical and projection versions of population and world_pop_share metrics (i.e. +4 columns).
+    - Drop `source` column.
+
+    Parameters
+    ----------
+    table : Table
+        Input table.
+
+    Returns
+    -------
+    Table
+        Modified table.
+    """
+    table = table.reset_index()
+    for column in ["population", "world_pop_share"]:
+        table = add_projection_and_historical_metrics(table, YEAR_THRESHOLD, column)
+    table = table.drop(columns=["source"])
+    table = table.set_index(["country", "year"], verify_integrity=True)
+    return table
 
 def add_projection_and_historical_metrics(table: Table, year_threshold: int, metric: str) -> Table:
     """Create projection and historical versions of a metric.
