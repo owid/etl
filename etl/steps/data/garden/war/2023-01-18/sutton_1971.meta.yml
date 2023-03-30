@@ -2,10 +2,10 @@ all_sources:
   - source_testing: &source-testing
       name: Sutton (1972)
       published_by: Sutton, Antony. 1972. Wars and Revolutions in the Nineteenth Century. Hoover Institution Archives.
-      url: # TO BE FILLED. Example: https://url_of_testing_source.com/
-      date_accessed: # TO BE FILLED. Example: 2023-01-01
+      url: https://searchworks.stanford.edu/view/3023823
+      date_accessed: 2023-01-09
       publication_date: # TO BE FILLED. Example: 2023-01-01
-      publication_year: # TO BE FILLED (if publication_date is not given). Example: 2023
+      publication_year: 1971
       # description: Source description.
 
 dataset:
@@ -16,7 +16,7 @@ dataset:
   description: |
     This dataset provides information on deaths from wars and revolutions, using data from Sutton (1972).
   licenses:
-    - name: # TO BE FILLED. Example: Testing License Name
+    - name: Unknown
       url: # TO BE FILLED. Example: https://url_of_testing_source.com/license
   sources:
     - *source-testing

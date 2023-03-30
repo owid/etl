@@ -2,10 +2,10 @@ all_sources:
   - source_testing: &source-testing
       name: Kaye et al. (1985)
       published_by: "Kaye, G.D., D.A. Grant, and E.J. Emond. 1985. Major Armed Conflict: A Compendium of Interstate and Intrastate Conflict, 1720 to 1985. Operational Research and Analysis Establishment Report No. R 95, Department of National Defence Canada."
-      url: # TO BE FILLED. Example: https://url_of_testing_source.com/
-      date_accessed: # TO BE FILLED. Example: 2023-01-01
-      publication_date: # TO BE FILLED. Example: 2023-01-01
-      publication_year: # TO BE FILLED (if publication_date is not given). Example: 2023
+      url: https://books.google.es/books/about/Major_Armed_Conflict.html?id=Xce_PwAACAAJ&redir_esc=y
+      date_accessed:2023-01-09
+      publication_date: 1985-11-01
+      publication_year: 1985
       # description: Source description.
 
 dataset:
@@ -16,7 +16,7 @@ dataset:
   description: |
     This dataset provides information on direct and indirect military and civilian deaths from major armed conflicts, drawn from the report by Kaye et al. (1985).
   licenses:
-    - name: # TO BE FILLED. Example: Testing License Name
+    - name: Department of National Defence, Canada, Operational Research and Analysis Establishment, 1985
       url: # TO BE FILLED. Example: https://url_of_testing_source.com/license
   sources:
     - *source-testing
