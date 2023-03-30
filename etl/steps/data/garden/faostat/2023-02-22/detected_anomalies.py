@@ -338,11 +338,11 @@ def handle_anomalies(dataset_short_name: str, data: pd.DataFrame) -> Tuple[pd.Da
         return data, ""
     else:
         data_fixed = data.copy()
-        anomaly_descriptions = ""
+        anomaly_descriptions = "\n\nDetected data anomalies:"
 
         for anomaly_class in detected_anomalies[dataset_short_name]:
             anomaly = anomaly_class()
-            anomaly_descriptions += anomaly.description + "\n"
+            anomaly_descriptions += "\n\n+" + anomaly.description
             data_fixed = anomaly.handle_anomalies(df=data_fixed)
 
         return data_fixed, anomaly_descriptions

@@ -6,23 +6,21 @@ import numpy as np
 import pandas as pd
 from owid import catalog
 from owid.datautils import dataframes
-from owid.datautils.io import load_json
 from shared import (
     ADDED_TITLE_TO_WIDE_TABLE,
     CURRENT_DIR,
     FLAG_MULTIPLE_FLAGS,
     NAMESPACE,
-    OUTLIERS_FILE_NAME,
     REGIONS_TO_ADD,
     add_per_capita_variables,
     add_regions,
     clean_data,
+    handle_anomalies,
     harmonize_elements,
     harmonize_items,
     parse_amendments_table,
     prepare_long_table,
     prepare_wide_table,
-    remove_outliers,
 )
 
 from etl.helpers import PathFinder, create_dataset
@@ -311,9 +309,6 @@ def run(dest_dir: str) -> None:
     tb_meadow = ds_meadow[dataset_short_name]
     data = pd.DataFrame(tb_meadow).reset_index()
 
-    # Load file of detected outliers.
-    outliers = load_json(paths.directory / OUTLIERS_FILE_NAME)
-
     # Load dataset of FAOSTAT metadata.
     metadata: catalog.Dataset = paths.load_dependency(f"{NAMESPACE}_metadata")
 
@@ -354,8 +349,8 @@ def run(dest_dir: str) -> None:
     # Add yield (production per area) to aggregate regions.
     data = add_yield_to_aggregate_regions(data)
 
-    # Remove outliers (this step needs to happen after creating regions and per capita variables).
-    data = remove_outliers(data, outliers=outliers)
+    # Handle detected anomalies in the data.
+    data, anomaly_descriptions = handle_anomalies(dataset_short_name=dataset_short_name, data=data)
 
     # Create a long table (with item code and element code as part of the index).
     data_table_long = prepare_long_table(data=data)
@@ -371,12 +366,15 @@ def run(dest_dir: str) -> None:
     data_table_long.metadata.title = dataset_metadata["owid_dataset_title"]
     data_table_wide.metadata.short_name = f"{dataset_short_name}_flat"
     data_table_wide.metadata.title = dataset_metadata["owid_dataset_title"] + ADDED_TITLE_TO_WIDE_TABLE
+
     # Initialise new garden dataset.
     ds_garden = create_dataset(
         dest_dir=dest_dir, tables=[data_table_long, data_table_wide], default_metadata=ds_meadow.metadata
     )
-    # Update dataset metadata.
-    ds_garden.metadata.description = dataset_metadata["owid_dataset_description"]
+
+    # Update dataset metadata and add description of anomalies (if any) to the dataset description.
+    ds_garden.metadata.description = dataset_metadata["owid_dataset_description"] + anomaly_descriptions
     ds_garden.metadata.title = dataset_metadata["owid_dataset_title"]
+
     # Create garden dataset.
     ds_garden.save()
