@@ -1,0 +1,36 @@
+all_sources:
+  - source_testing: &source-testing
+      name: Kaye et al. (1985)
+      published_by: "Kaye, G.D., D.A. Grant, and E.J. Emond. 1985. Major Armed Conflict: A Compendium of Interstate and Intrastate Conflict, 1720 to 1985. Operational Research and Analysis Establishment Report No. R 95, Department of National Defence Canada."
+      url: https://books.google.es/books/about/Major_Armed_Conflict.html?id=Xce_PwAACAAJ&redir_esc=y
+      date_accessed: 2023-01-09
+      publication_date: 1985-11-01
+      publication_year: 1985
+      # description: Source description.
+
+dataset:
+  title: Major armed conflicts and deaths – Kaye et al.
+  namespace: war
+  short_name: orae_1985
+  version: 2023-01-18
+  description: |
+    This dataset provides information on direct and indirect military and civilian deaths from major armed conflicts, drawn from the report by Kaye et al. (1985).
+  licenses:
+    - name: Department of National Defence, Canada, Operational Research and Analysis Establishment, 1985
+      url: # TO BE FILLED. Example: https://url_of_testing_source.com/license
+  sources:
+    - *source-testing
+
+tables:
+  orae_1985:
+    variables:
+      # testing_variable:
+      #   title: Testing variable title
+      #   unit: arbitrary units
+      #   short_unit: au
+      #   description: Full description of testing variable.
+      #   sources:
+      #     - *source-testing
+      #   display:
+      #     entityAnnotationsMap: Test annotation
+      #     numDecimalPlaces: 0

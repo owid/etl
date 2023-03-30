@@ -1,5 +1,8 @@
 """Load a meadow dataset and create a garden dataset."""
 
+
+from datetime import datetime
+
 import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
@@ -12,6 +15,7 @@ log = get_logger()
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+MIN_DATA_POINTS_PER_YEAR = 10
 
 
 def run(dest_dir: str) -> None:
@@ -40,8 +44,11 @@ def run(dest_dir: str) -> None:
     # Subset the data
     df = subset_and_clean_data(df)
     df = pivot_fluid(df)
-    # Remove timeseries where there are only zeros or NAs
+    # Remove years with fewer than 10 datapoints
+    df = remove_sparse_years(df, min_datapoints_per_year=MIN_DATA_POINTS_PER_YEAR)
+
     df = calculate_patient_rates(df)
+
     df = df.reset_index(drop=True)
     # Create a new table with the processed data.
     tb_garden = Table(df, short_name=paths.short_name)
@@ -220,30 +227,36 @@ def clean_patient_rates(df: pd.DataFrame) -> pd.DataFrame:
     over_1000_ari = df[df["ari_cases_per_thousand_outpatients"] > 1000].shape[0]
     over_100_sari = df[df["sari_cases_per_hundred_inpatients"] > 100].shape[0]
 
-    log.info(f"{over_1000_ili} rows with ili_cases_per_thousand_outpatients over 1000. We'll set these to NA.")
-    log.info(f"{over_1000_ari} rows with ari_cases_per_thousand_outpatients over 1000. We'll set these to NA.")
-    log.info(f"{over_100_sari} rows with sari_cases_per_hundred_inpatients over 100. We'll set these to NA.")
+    log.info(
+        f"{over_1000_ili} rows with ili_cases_per_thousand_outpatients greater than or equal to 1000. We'll set these to NA."
+    )
+    log.info(
+        f"{over_1000_ari} rows with ari_cases_per_thousand_outpatients greater than or equal to 1000. We'll set these to NA."
+    )
+    log.info(
+        f"{over_100_sari} rows with sari_cases_per_hundred_inpatients greater than or equal to 100. We'll set these to NA."
+    )
 
-    df.loc[df["ili_cases_per_thousand_outpatients"] > 1000, "ili_cases_per_thousand_outpatients"] = np.NaN
-    df.loc[df["ari_cases_per_thousand_outpatients"] > 1000, "ari_cases_per_thousand_outpatients"] = np.NaN
-    df.loc[df["sari_cases_per_hundred_inpatients"] > 100, "sari_cases_per_hundred_inpatients"] = np.NaN
+    df.loc[df["ili_cases_per_thousand_outpatients"] >= 1000, "ili_cases_per_thousand_outpatients"] = np.NaN
+    df.loc[df["ari_cases_per_thousand_outpatients"] >= 1000, "ari_cases_per_thousand_outpatients"] = np.NaN
+    df.loc[df["sari_cases_per_hundred_inpatients"] >= 100, "sari_cases_per_hundred_inpatients"] = np.NaN
 
     df["ili_cases_per_thousand_outpatients"] = df.groupby("country", group_keys=False)[
         "ili_cases_per_thousand_outpatients"
-    ].apply(check_group, min=1, max=999)
+    ].apply(remove_values_with_only_extremes, min=1, max=999)
 
     df["ari_cases_per_thousand_outpatients"] = df.groupby("country", group_keys=False)[
         "ari_cases_per_thousand_outpatients"
-    ].apply(check_group, min=1, max=999)
+    ].apply(remove_values_with_only_extremes, min=1, max=999)
 
     df["sari_cases_per_hundred_inpatients"] = df.groupby("country", group_keys=False)[
         "sari_cases_per_hundred_inpatients"
-    ].apply(check_group, min=1, max=99)
+    ].apply(remove_values_with_only_extremes, min=1, max=99)
 
     return df
 
 
-def check_group(group: pd.Series, min: int, max: int) -> pd.Series:
+def remove_values_with_only_extremes(group: pd.Series, min: int, max: int) -> pd.Series:
     """
     If all values in the group are less than {min} or greater than {max}, or NA then replace all values for that group with NA.
     """
@@ -251,3 +264,30 @@ def check_group(group: pd.Series, min: int, max: int) -> pd.Series:
         return pd.Series([np.NaN if x <= min or x >= max else x for x in group], index=group.index, dtype="float64")
     else:
         return group
+
+
+def remove_sparse_years(df: pd.DataFrame, min_datapoints_per_year: int) -> pd.DataFrame:
+    """
+    If a year has fewer than {min_data_points_per_year} then we should remove all the data for that year -> set it to NA
+    Unless it is the current year, then we do not change it.
+    """
+
+    df["year"] = pd.to_datetime(df["date"]).dt.year
+    constant_cols = ["country", "date", "hemisphere", "year"]
+    cols = df.columns.drop(constant_cols)
+    current_year = datetime.today().year
+    for col in cols:
+        df_col = df.loc[:, ["country", "year", col]]
+        df_col[col] = pd.to_numeric(df_col[col])
+        df_col_bool = (
+            df_col.groupby(["country", "year"]).agg(weeks_gt_zero=(col, lambda x: x.gt(0).sum())).reset_index()
+        )
+        df = pd.merge(df, df_col_bool, on=["country", "year"])
+
+        df.loc[
+            (df["weeks_gt_zero"] < min_datapoints_per_year) & (df["year"] < current_year),
+            col,
+        ] = np.nan
+        df = df.drop(columns=["weeks_gt_zero"])
+
+    return df

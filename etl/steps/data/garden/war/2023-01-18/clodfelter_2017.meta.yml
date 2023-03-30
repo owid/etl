@@ -1,0 +1,36 @@
+all_sources:
+  - source_testing: &source-testing
+      name: Clodfelter (2017)
+      published_by: "Clodfelter, Micheal. 2017. Warfare and Armed Conflicts: A Statistical Encyclopedia of Casualty and other Figures, 1492-2015. Fourth edition. McFarland & Company."
+      url: https://books.google.es/books/about/Warfare_and_Armed_Conflicts.html?id=kNzCDgAAQBAJ&redir_esc=y
+      date_accessed: 2023-01-09
+      publication_date: 2017-04-24
+      publication_year: 2017
+      # description: Source description.
+
+dataset:
+  title: Wars, deaths, and casualties – Clodfelter
+  namespace: war
+  short_name: clodfelter_2017
+  version: 2023-01-18
+  description: |
+    This dataset provides information on direct and indirect military and civilian deaths and casualties from wars, drawn from the book by Clodfelter (2017).
+  licenses:
+    - name: McFarland, 2017
+      url: https://mcfarlandbooks.com/product/warfare-and-armed-conflicts/
+  sources:
+    - *source-testing
+
+tables:
+  clodfelter_2017:
+    variables:
+      # testing_variable:
+      #   title: Testing variable title
+      #   unit: arbitrary units
+      #   short_unit: au
+      #   description: Full description of testing variable.
+      #   sources:
+      #     - *source-testing
+      #   display:
+      #     entityAnnotationsMap: Test annotation
+      #     numDecimalPlaces: 0

@@ -1,0 +1,36 @@
+all_sources:
+  - source_testing: &source-testing
+      name: Bouthoul and Carrère (1978)
+      published_by: "Bouthoul, Gaston, René Carrère, and Gernot Köhler. 1978. A list of the 366 Major Armed Conflicts of the Period 1740-1974. Peace Research 10(3): 83-108."
+      url: https://www.jstor.org/stable/23609587
+      date_accessed: 2023-01-09
+      publication_date: 1978-07-01
+      publication_year: 1978
+      # description: Source description.
+
+dataset:
+  title: Major armed conflicts and deaths – Bouthoul and Carrère
+  namespace: war
+  short_name: bouthoul_carrere_1978
+  version: 2023-01-18
+  description: |
+    This dataset provides information on direct and indirect military and civilian deaths from major armed conflicts, drawn from the article by Bouthoul and Carrère (1978).
+  licenses:
+    - name: JSTOR
+      url: https://about.jstor.org/terms/
+  sources:
+    - *source-testing
+
+tables:
+  bouthoul_carrere_1978:
+    variables:
+      # testing_variable:
+      #   title: Testing variable title
+      #   unit: arbitrary units
+      #   short_unit: au
+      #   description: Full description of testing variable.
+      #   sources:
+      #     - *source-testing
+      #   display:
+      #     entityAnnotationsMap: Test annotation
+      #     numDecimalPlaces: 0

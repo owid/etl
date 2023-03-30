@@ -1,0 +1,11 @@
+dataset:
+  title: Drug Use Disorders - Global Burden of Disease Study 2019 (GBD 2019)
+  description: ''
+  sources:
+  - name: IHME, Global Burden of Disease (2019)
+  - url: https://vizhub.healthdata.org/gbd-results/
+tables:
+  gbd_drug_disorders:
+      val:
+        title: The annual number of deaths from drug use disorders per 100,000 people aged 15- to 49-years.
+        unit: 'deaths per 100,000 population'

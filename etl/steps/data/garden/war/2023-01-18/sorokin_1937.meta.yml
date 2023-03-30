@@ -1,0 +1,36 @@
+all_sources:
+  - source_testing: &source-testing
+      name: Sorokin (1937)
+      published_by: "Sorokin, Pitirim. 1937. Social and cultural dynamics. Volume Three: Fluctuation of Social Relationships, Wars, and Revolution. American Book Company."
+      url: https://doi.org/10.2307/2143975
+      date_accessed: 2023-01-09
+      publication_date: 1937-12-01
+      publication_year: 1937
+      # description: Source description.
+
+dataset:
+  title: Wars and casualties – Sorokin
+  namespace: war
+  short_name: sorokin_1937
+  version: 2023-01-18
+  description: |
+    This dataset provides information on direct military casualties from wars, drawn from the book by Sorokin (1937).
+  licenses:
+    - name: JSTOR
+      url: https://about.jstor.org/terms/
+  sources:
+    - *source-testing
+
+tables:
+  sorokin_1937:
+    variables:
+      # testing_variable:
+      #   title: Testing variable title
+      #   unit: arbitrary units
+      #   short_unit: au
+      #   description: Full description of testing variable.
+      #   sources:
+      #     - *source-testing
+      #   display:
+      #     entityAnnotationsMap: Test annotation
+      #     numDecimalPlaces: 0

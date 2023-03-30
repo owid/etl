@@ -132,6 +132,7 @@ class ChartVariableUpdateRevision:
         chart = self._update_config_time(chart)
         chart = self._update_chart_dimensions(chart)
         chart = self._update_available_entities(chart)
+        chart = self._update_sort_fields(chart)
         self._check_fastt(chart)
         return chart
 
@@ -246,6 +247,23 @@ class ChartVariableUpdateRevision:
 
     def _update_available_entities(self, chart: "Chart") -> "Chart":
         # chart.config["data"]["availableEntities"] = ["Spain"]
+        return chart
+
+    def _update_sort_fields(self, chart: "Chart") -> "Chart":
+        """There are three fields that deal with the sorting of bars in bar charts and marimekko.
+
+        - sortBy: sorting criterium (column, total or entityName)
+        - sortColumnSlug: if sortBy is "column", this is the slug of the column to sort by.
+        - sortOrder: "asc" or "desc"
+
+        This fields should remain the same. However, when the sorting criterium is set to 'column', the column slug (i.e. variable ID)
+        may have changed due to dataset update.
+        """
+        if "sortBy" in chart.config:
+            if chart.config["sortBy"] == "column":
+                assert "sortColumnSlug" in chart.config, "sortBy is 'column' but sortColumnSlug is not defined!"
+                var_old_id = chart.config["sortColumnSlug"]
+                chart.config["sortColumnSlug"] = str(self.variables_update.mapping.get(int(var_old_id), var_old_id))
         return chart
 
     def _check_fastt(self, chart: "Chart") -> None:
