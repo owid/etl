@@ -47,8 +47,6 @@ def run(dest_dir: str) -> None:
     tb_flu = tb_flu.loc[tb_flu["date"] > "2008-12-29"]
 
     tb_flu = create_full_time_series(tb_flu)
-    # Remove years with fewer than 10 data points
-    # tb_flu = remove_sparse_years(tb_flu, min_datapoints_per_year=MIN_DATA_POINTS_PER_YEAR)
     # Create zerofilled columns for use in stacked bar charts
     tb_flu = create_zero_filled_strain_columns(tb_flu)
     # Create global and hemisphere aggregates
