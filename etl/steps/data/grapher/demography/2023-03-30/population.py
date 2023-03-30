@@ -70,6 +70,7 @@ def process(table: Table) -> Table:
     table = table.set_index(["country", "year"], verify_integrity=True)
     return table
 
+
 def add_projection_and_historical_metrics(table: Table, year_threshold: int, metric: str) -> Table:
     """Create projection and historical versions of a metric.
 
