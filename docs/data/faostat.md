@@ -228,6 +228,10 @@ python etl/scripts/faostat/create_new_steps.py -c garden
 ```bash
 etl garden/faostat/YYYY-MM-DD
 ```
+Optionally, set `INSPECT_ANOMALIES=True`, to visualize if anomalies that were detected in the previous version of the data are still present in the current version.
+```bash
+INSPECT_ANOMALIES=True etl garden/faostat/YYYY-MM-DD
+```
 6. Create new grapher steps.
 ```bash
 python etl/scripts/faostat/create_new_steps.py -c grapher
