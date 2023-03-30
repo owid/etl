@@ -38,6 +38,7 @@ config.enable_bugsnag()
 
 @click.command(help=__doc__)
 @click.option("--dataset-ids", "-d", type=int, multiple=True)
+@click.option("--variable-ids", "-v", type=int, multiple=True)
 @click.option(
     "--dt-start",
     type=click.DateTime(),
@@ -63,6 +64,7 @@ config.enable_bugsnag()
 )
 def cli(
     dataset_ids: tuple[int],
+    variable_ids: tuple[int],
     dt_start: dt.datetime,
     dry_run: bool,
     force: bool,
@@ -126,7 +128,7 @@ def cli(
 
         log.info("datasync.start", dataset_id=ds.id, progress=progress)
 
-        variable_ids = _load_variable_ids(engine, ds.id)
+        ds_variable_ids = variable_ids or _load_variable_ids(engine, ds.id)
 
         with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as executor:
             results = executor.map(
@@ -136,14 +138,14 @@ def cli(
                     dry_run=dry_run,
                     private=ds.isPrivate,
                 ),
-                variable_ids,
+                ds_variable_ids,
             )
 
             # raise errors from futures, otherwise they'd fail silently
             list(results)
 
-        # add file to S3
-        if not dry_run:
+        # add file to S3 if not dry run or not syncing specific variables
+        if not dry_run and not variable_ids:
             ds.save_to_s3(client)
 
         log.info("datasync.end", dataset_id=ds.id)
@@ -161,7 +163,7 @@ def _sync_variable_data_metadata(engine: Engine, variable_id: int, dry_run: bool
         #   this entire script is a temporary solution until everything is uploaded directly from ETL
         if variable_df.empty:
             assert variable.dataPath
-            variable_df = variable_data_df_from_s3(engine, variable.dataPath)
+            variable_df = variable_data_df_from_s3(engine, [variable.dataPath])
 
         var_data = variable_data(variable_df)
         var_metadata = variable_metadata(engine, variable_id, variable_df)
@@ -171,11 +173,12 @@ def _sync_variable_data_metadata(engine: Engine, variable_id: int, dry_run: bool
             data_path = upload_gzip_dict(var_data, variable.s3_data_path(), private)
             metadata_path = upload_gzip_dict(var_metadata, variable.s3_metadata_path(), private)
 
-            # update dataPath and metadataPath of a variable
-            variable.dataPath = data_path
-            variable.metadataPath = metadata_path
-            session.add(variable)
-            session.commit()
+            # update dataPath and metadataPath of a variable if different
+            if variable.dataPath != data_path or variable.metadataPath != metadata_path:
+                variable.dataPath = data_path
+                variable.metadataPath = metadata_path
+                session.add(variable)
+                session.commit()
 
     log.info("datasync.upload", t=f"{time.time() - t:.2f}s", variable_id=variable_id)
 
@@ -215,6 +218,7 @@ class DatasetSync:
     id: int
     dataEditedAt: dt.datetime
     metadataEditedAt: dt.datetime
+    variablesEditedAt: dt.datetime
     isPrivate: bool
     sourceChecksum: str
 
@@ -231,6 +235,10 @@ class DatasetSync:
         d = json.loads(a["Body"].read().decode())
         d["dataEditedAt"] = dt.datetime.utcfromtimestamp(d["dataEditedAt"] / 1000)
         d["metadataEditedAt"] = dt.datetime.utcfromtimestamp(d["metadataEditedAt"] / 1000)
+        if "variablesEditedAt" in d:
+            d["variablesEditedAt"] = dt.datetime.utcfromtimestamp(d["variablesEditedAt"] / 1000)
+        else:
+            d["variablesEditedAt"] = d["metadataEditedAt"]
         d.pop("name", None)
         return cls(**d)
 
@@ -248,7 +256,11 @@ class DatasetSync:
         # compare timestamps of the latest update (we don't have sourceChecksum for all datasets)
         # NOTE: we rebake both data and metadata even if only one has changed. This is a bit inefficient, but should
         # not matter much since dataset updates are rare.
-        if self.dataEditedAt == ds.dataEditedAt and self.metadataEditedAt == ds.metadataEditedAt:
+        if (
+            self.dataEditedAt == ds.dataEditedAt
+            and self.metadataEditedAt == ds.metadataEditedAt
+            and self.variablesEditedAt == ds.variablesEditedAt
+        ):
             # checksums should match if dataEditedAt match
             assert self.sourceChecksum is None or ds.sourceChecksum is None or self.sourceChecksum == ds.sourceChecksum
             return True
@@ -269,24 +281,32 @@ def _load_variable_ids(engine: Engine, dataset_id: int) -> List[int]:
 
 def _load_datasets(engine: Engine, dataset_ids: tuple[int], dt_start: Optional[dt.datetime]) -> List[DatasetSync]:
     if dataset_ids:
-        where = "id in %(dataset_ids)s"
+        where = "d.id in %(dataset_ids)s"
+        having = "1 = 1"
     elif dt_start:
         # datasets with shortName come from ETL and are already synced
         # we don't use sourceChecksum because that one is set only after the dataset is fully upserted
-        where = "shortName is null and dataEditedAt > %(dt_start)s or metadataEditedAt > %(dt_start)s"
+        where = "d.shortName is null and v.shortName is null"
+        having = "dataEditedAt > %(dt_start)s or metadataEditedAt > %(dt_start)s or variablesEditedAt > %(dt_start)s"
+
     else:
         raise ValueError("Either dataset_ids or dt_start must be specified")
 
     q = f"""
     select
-        id,
-        dataEditedAt,
-        metadataEditedAt,
+        MAX(d.id) as id,
+        MAX(d.dataEditedAt) as dataEditedAt,
+        MAX(d.metadataEditedAt) as metadataEditedAt,
         -- we save all variables as public for now to have them available in grapher
         false as isPrivate,
-        sourceChecksum
-    from datasets
+        MAX(d.sourceChecksum) as sourceChecksum,
+        -- latest updated variable
+        MAX(v.updatedAt) as variablesEditedAt
+    from datasets as d
+    join variables as v on v.datasetId = d.id
     where {where}
+    group by d.id
+    having {having}
     """
     df = pd.read_sql(
         q,
@@ -302,6 +322,7 @@ def _load_datasets(engine: Engine, dataset_ids: tuple[int], dt_start: Optional[d
     for ds in ds_dicts:
         ds["dataEditedAt"] = ds["dataEditedAt"].to_pydatetime()
         ds["metadataEditedAt"] = ds["metadataEditedAt"].to_pydatetime()
+        ds["variablesEditedAt"] = ds["variablesEditedAt"].to_pydatetime()
 
     return [DatasetSync(**d) for d in ds_dicts]
 

@@ -1,0 +1,15 @@
+dataset:
+  title: Drug Use Disorders - Global Burden of Disease Study 2019 (GBD 2019)
+  description: 'This aggregate cause incorporates death and disability resulting from opioid use disorder, amphetamine use disorder, cocaine use disorder, cannabis use disorder, and a residual category of other drug use disorders.'
+  licenses:
+  - name: Free-of-Charge Non-Commercial-User Agreement
+    url: https://www.healthdata.org/data-tools-practices/data-practices/ihme-free-charge-non-commercial-user-agreement
+  sources:
+  - name: IHME, Global Burden of Disease (2019)
+  - url: https://vizhub.healthdata.org/gbd-results/
+tables:
+  gbd_drug_disorders:
+    variables:
+      val:
+        title: The annual number of deaths from drug use disorders per 100,000 people aged 15- to 49-years for both sexes
+        unit: 'deaths per 100,000 population'

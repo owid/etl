@@ -345,6 +345,15 @@ steps:
   data://grapher/technology/2023-03-16/hcctad:
   - data://garden/technology/2023-03-16/hcctad
 
+# Happiness report
+  data://meadow/happiness/2023-03-20/happiness:
+  - snapshot://happiness/2023-03-20/happiness.xls
+  data://garden/happiness/2023-03-20/happiness:
+  - data://meadow/happiness/2023-03-20/happiness
+  - backport://backport/owid/latest/dataset_235_world_happiness_report__2022
+  data://grapher/happiness/2023-03-20/happiness:
+  - data://garden/happiness/2023-03-20/happiness
+
 # Sub-dags to import
 include:
   - dag/open_numbers.yml

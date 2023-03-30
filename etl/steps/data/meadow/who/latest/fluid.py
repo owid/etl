@@ -25,7 +25,6 @@ def run(dest_dir: str) -> None:
 
     # Load data from snapshot.
     df = pd.read_csv(snap.path)
-
     #
     # Process data.
     #

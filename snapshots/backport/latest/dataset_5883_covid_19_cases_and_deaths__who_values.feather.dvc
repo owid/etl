@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5883_covid_19_cases_and_deaths__who_values
   file_extension: feather
-  date_accessed: 2023-03-17 06:04:51.777217
+  date_accessed: 2023-03-30 06:06:27.211549
   name: COVID-19 Cases and deaths - WHO
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: f3288caec734169de151aad6de354833
-  size: 22337730
+- md5: 387770d2a5f179f0db930218054a425f
+  size: 22659914
   path: dataset_5883_covid_19_cases_and_deaths__who_values.feather

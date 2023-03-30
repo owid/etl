@@ -1,3 +1,4 @@
+import concurrent.futures
 import json
 from typing import Any, Dict, List, Union
 from urllib.error import HTTPError
@@ -23,22 +24,46 @@ def variable_data_df_from_mysql(engine: Engine, variable_id: int) -> pd.DataFram
     return pd.read_sql(q, engine, params={"variable_id": variable_id})
 
 
-def variable_data_df_from_s3(engine: Engine, data_path: str) -> pd.DataFrame:
-    empty_df = pd.DataFrame(columns=["entityId", "entityName", "entityCode", "year", "value"])
+def _fetch_data_df_from_s3(data_path: str):
     try:
-        df = pd.read_json(data_path).rename(
-            columns={
-                "entities": "entityId",
-                "values": "value",
-                "years": "year",
-            }
+        variable_id = int(data_path.split("/")[-1].replace(".json", ""))
+        return (
+            pd.read_json(data_path)
+            .rename(
+                columns={
+                    "entities": "entityId",
+                    "values": "value",
+                    "years": "year",
+                }
+            )
+            .assign(variableId=variable_id)
         )
     # no data on S3 in dataPath
     except HTTPError:
-        return empty_df
+        return pd.DataFrame(columns=["variableId", "entityId", "year", "value"])
 
-    if df.empty:
-        return empty_df
+
+def variable_data_df_from_s3(
+    engine: Engine, data_paths: List[str] = [], variable_ids: List[int] = [], workers: int = 1
+) -> pd.DataFrame:
+    """Fetch data from S3 and add entity code and name from DB. You can use either data_paths or variable_ids."""
+    if not data_paths:
+        q = """
+        SELECT
+            dataPath
+        FROM variables as v
+        WHERE id in %(variable_ids)s
+        """
+        data_paths = pd.read_sql(
+            q,
+            engine,
+            params={"variable_ids": variable_ids},
+        )["dataPath"].tolist()
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as executor:
+        results = list(executor.map(lambda data_path: _fetch_data_df_from_s3(data_path), data_paths))
+
+    df = pd.concat(results)
 
     # we work with strings and convert to specific types later
     df["value"] = df["value"].astype(str)
@@ -188,6 +213,7 @@ def _is_float(x):
 def _convert_strings_to_numeric(lst: List[str]) -> List[Union[int, float, str]]:
     result = []
     for item in lst:
+        assert isinstance(item, str)
         try:
             num = float(item)
             if num.is_integer():

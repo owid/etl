@@ -1,9 +1,12 @@
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Union
 
-import pandas as pd
-
+from backport.datasync.data_metadata import variable_data_df_from_s3
 from etl.db import get_engine
+
+# Set to True when running experiments locally and want to avoid downloading data from S3.
+# Instead of getting the actual data, dummy data is generated.
+DEBUG_NO_S3 = False
 
 
 @dataclass
@@ -52,18 +55,27 @@ class VariablesUpdate:
 
     def _get_metadata_from_db(self) -> List["VariableMetadata"]:
         """Get metadata for all variables in the update."""
-        # build query
-        query = """
-            SELECT variableId, MIN(year) AS minYear, MAX(year) AS maxYear
-            FROM data_values
-            WHERE variableId IN %(variable_ids)s
-            GROUP BY variableId
-        """
-        # get data
-        df_var_years = pd.read_sql(query, get_engine(), params={"variable_ids": self.ids_all})
+        if DEBUG_NO_S3:
+            return [
+                VariableMetadata(
+                    id=i,
+                    min_year=1900,
+                    max_year=2020,
+                )
+                for i in self.ids_all
+            ]
+        # get data from S3
+        df_var_years = variable_data_df_from_s3(get_engine(), variable_ids=self.ids_all, workers=10)
+
+        # get min and max year for each variable
+        df_var_years = (
+            df_var_years.groupby("variableId")
+            .year.agg(["min", "max"])
+            .rename(columns={"min": "minYear", "max": "maxYear"})
+        )
 
         # build list of variable metadata
-        metadata_raw = df_var_years.set_index("variableId").to_dict("index")
+        metadata_raw = df_var_years.to_dict("index")
         metadata = []
         for k, v in metadata_raw.items():
             metadata.append(
