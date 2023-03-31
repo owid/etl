@@ -23,7 +23,7 @@ dataset:
     - name: Creative Commons BY 4.0
       url: https://docs.google.com/document/d/1-RmthhS2EPMK_HIpnPctcXpB0n7ADSWnXa5Hb3PxNq4/edit?usp=sharing
   sources:
-    - *source-testing
+    - *gapminder_source
 tables:
   population:
     variables:
