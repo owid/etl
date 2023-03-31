@@ -41,7 +41,7 @@ def run(dest_dir: str) -> None:
     #
     # Checks.
     #
-    grapher_checks(ds_garden)
+    grapher_checks(ds_grapher)
 
     # Save changes in the new grapher dataset.
     ds_grapher.save()
@@ -120,7 +120,7 @@ def _modify_variable_description_historical(variable_description: str) -> str:
     for line in variable_description.split("\n"):
         match = re.search(r"([\d\-BCE,\s]*):.*", line)
         if match:
-            if match.group(1) != "2022-2100":
+            if match.group(1) != f"{YEAR_THRESHOLD}-2100":
                 new_description.append(line)
         else:
             new_description.append(line)
@@ -131,9 +131,9 @@ def _modify_variable_description_historical(variable_description: str) -> str:
 def _modify_variable_description_projection(variable_description: str) -> str:
     new_description = []
     for line in variable_description.split("\n"):
-        match = re.search(r"([\d\-BCE,\s]*):.*", line)
+        match = re.search(r"(\* [\d\-BCE,\s]*):.*", line)
         if match:
-            if match.group(1) == "2022-2100":
+            if match.group(1) == f"* {YEAR_THRESHOLD}-2100":
                 new_description.append(line)
         else:
             new_description.append(line)
