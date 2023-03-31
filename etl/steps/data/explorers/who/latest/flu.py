@@ -322,21 +322,17 @@ def create_zero_filled_strain_columns(df: pd.DataFrame) -> pd.DataFrame:
     strain_columns_zfilled = [s + "_zfilled" for s in strain_surv_columns]
     df[strain_columns_zfilled] = df[strain_surv_columns].fillna(0)
 
-    df = remove_sparse_timeseries(df, strain_columns, surveillance_types)
+    df = remove_sparse_timeseries(df, strain_columns_zfilled)
 
     return df
 
 
-def remove_sparse_timeseries(
-    df: pd.DataFrame, strain_columns: list[str], surveillance_types: list[str]
-) -> pd.DataFrame:
+def remove_sparse_timeseries(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
     """
     Remove sparse time series from zero filled columns, so we don't have time-series showing only zeros.
     """
     countries = df["country"].drop_duplicates()
-    for type in surveillance_types:
-        cols = [x + type + "_zfilled" for x in strain_columns]
-        for country in countries:
-            if all(df.loc[(df["country"] == country), cols].fillna(0).sum()) == 0:
-                df.loc[(df["country"] == country), cols] = np.NaN
+    for country in countries:
+        if all(df.loc[(df["country"] == country), cols].fillna(0).sum()) == 0:
+            df.loc[(df["country"] == country), cols] = np.NaN
     return df
