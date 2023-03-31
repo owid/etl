@@ -17,7 +17,6 @@ import abc
 import os
 from typing import Tuple
 
-import numpy as np
 import pandas as pd
 import plotly.express as px
 from structlog import get_logger
