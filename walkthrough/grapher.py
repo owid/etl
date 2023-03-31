@@ -78,6 +78,14 @@ def app(run_checks: bool, dummy_data: bool) -> None:
                 validate=utils.validate_short_name,
                 help_text="Underscored dataset short name. Example: natural_disasters",
             ),
+            pi.input(
+                "Garden dataset version",
+                name="garden_version",
+                placeholder=str(dt.date.today()),
+                required=True,
+                value=dummies.get("version", str(dt.date.today())),
+                help_text="Version of the garden dataset (by default, the current date, or exceptionally the publication date).",
+            ),
             pi.checkbox(
                 "Additional Options",
                 options=[
@@ -99,7 +107,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
         dag_content = utils.add_to_dag(
             {
                 f"data{private_suffix}://grapher/{form.namespace}/{form.version}/{form.short_name}": [
-                    f"data{private_suffix}://garden/{form.namespace}/{form.version}/{form.short_name}"
+                    f"data{private_suffix}://garden/{form.namespace}/{form.garden_version}/{form.short_name}"
                 ]
             }
         )
