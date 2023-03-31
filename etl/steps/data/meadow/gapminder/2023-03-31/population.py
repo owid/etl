@@ -34,6 +34,7 @@ def run(dest_dir: str) -> None:
         sheet_name="data-for-countries-etc-by-year",
         usecols=["name", "time", "Population"],
     ).rename(columns={"name": "country", "time": "year", "Population": "population"})
+    df = df.set_index(["country", "year"], verify_integrity=True)
     #
     # Process data.
     #
