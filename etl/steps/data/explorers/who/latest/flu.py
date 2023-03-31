@@ -110,58 +110,6 @@ def fill_flu_data_gaps_with_zero(df: pd.DataFrame) -> pd.DataFrame:
     return df_out
 
 
-def create_zero_filled_strain_columns(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    For the stacked bar charts in the grapher to work I think I need to fill the NAs with zeros.
-    """
-    strain_columns = [
-        "ah1n12009combined",
-        "ah1n12009sentinel",
-        "ah1n12009nonsentinel",
-        "ah1n12009notdefined",
-        "ah1combined",
-        "ah1sentinel",
-        "ah1nonsentinel",
-        "ah1notdefined",
-        "ah3combined",
-        "ah3sentinel",
-        "ah3nonsentinel",
-        "ah3notdefined",
-        "ah5combined",
-        "ah5sentinel",
-        "ah5nonsentinel",
-        "ah5notdefined",
-        "ah7n9combined",
-        "ah7n9sentinel",
-        "ah7n9nonsentinel",
-        "ah7n9notdefined",
-        "a_no_subtypecombined",
-        "a_no_subtypesentinel",
-        "a_no_subtypenonsentinel",
-        "a_no_subtypenotdefined",
-        "byamcombined",
-        "byamsentinel",
-        "byamnonsentinel",
-        "byamnotdefined",
-        "bnotdeterminedcombined",
-        "bnotdeterminedsentinel",
-        "bnotdeterminednonsentinel",
-        "bnotdeterminednotdefined",
-        "bviccombined",
-        "bvicsentinel",
-        "bvicnonsentinel",
-        "bvicnotdefined",
-    ]
-    # Add these columns if we need to, for now stick to the above for file size reasons
-
-    strain_columns_zfilled = [s + "_zfilled" for s in strain_columns]
-    df[strain_columns_zfilled] = df[strain_columns].fillna(0)
-
-    df = remove_sparse_timeseries(df, strain_columns_zfilled)
-
-    return df
-
-
 def create_full_time_series(df: pd.DataFrame) -> pd.DataFrame:
     """
     For each country ensure there is a value for each week between the start and the end date,
@@ -352,40 +300,43 @@ def calculate_percent_positive_aggregate(df: pd.DataFrame, surveillance_cols: li
     return df
 
 
-def remove_sparse_timeseries(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
+def create_zero_filled_strain_columns(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    For the stacked bar charts in the grapher to work I think I need to fill the NAs with zeros.
+    """
+    surveillance_types = ["combined", "sentinel", "nonsentinel", "notdefined"]
+
+    strain_columns = [
+        "ah1n12009",
+        "ah1",
+        "ah3",
+        "ah5",
+        "ah7n9",
+        "a_no_subtype",
+        "byam",
+        "bnotdetermined",
+        "bvic",
+    ]
+
+    strain_surv_columns = [x + y for y in surveillance_types for x in strain_columns]
+    strain_columns_zfilled = [s + "_zfilled" for s in strain_surv_columns]
+    df[strain_columns_zfilled] = df[strain_surv_columns].fillna(0)
+
+    df = remove_sparse_timeseries(df, strain_columns, surveillance_types)
+
+    return df
+
+
+def remove_sparse_timeseries(
+    df: pd.DataFrame, strain_columns: list[str], surveillance_types: list[str]
+) -> pd.DataFrame:
     """
     Remove sparse time series from zero filled columns, so we don't have time-series showing only zeros.
     """
     countries = df["country"].drop_duplicates()
-    for country in countries:
-        for col in cols:
-            if df.loc[(df["country"] == country), col].fillna(0).sum() == 0:
-                df.loc[(df["country"] == country), col] = np.NaN
-    return df
-
-
-def _remove_sparse_years(df: pd.DataFrame, min_datapoints_per_year: int) -> pd.DataFrame:
-    """
-    If a year has fewer than {min_data_points_per_year} then we should remove all the data for that year -> set it to NA
-    Unless it is the current year, then we do not change it.
-    """
-
-    df["year"] = pd.to_datetime(df["date"]).dt.year
-    constant_cols = ["country", "date", "hemisphere", "year"]
-    cols = df.columns.drop(constant_cols)
-    current_year = datetime.today().year
-    for col in cols:
-        df_col = df.loc[:, ["country", "year", col]]
-        df_col[col] = pd.to_numeric(df_col[col])
-        df_col_bool = (
-            df_col.groupby(["country", "year"]).agg(weeks_gt_zero=(col, lambda x: x.gt(0).sum())).reset_index()
-        )
-        df = pd.merge(df, df_col_bool, on=["country", "year"])
-
-        df.loc[
-            (df["weeks_gt_zero"] < min_datapoints_per_year) & (df["year"] < current_year),
-            col,
-        ] = np.nan
-        df = df.drop(columns=["weeks_gt_zero"])
-
+    for type in surveillance_types:
+        cols = [x + type + "_zfilled" for x in strain_columns]
+        for country in countries:
+            if all(df.loc[(df["country"] == country), cols].fillna(0).sum()) == 0:
+                df.loc[(df["country"] == country), cols] = np.NaN
     return df
