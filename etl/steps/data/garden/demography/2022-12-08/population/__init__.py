@@ -241,11 +241,14 @@ def add_historical_regions(df: pd.DataFrame) -> pd.DataFrame:
 def filter_rows(df: pd.DataFrame) -> pd.DataFrame:
     """Make sure that all rows make sense.
 
-    That is, e.g. remove rows with population = 0.
+    - Remove rows with population = 0.
+    - Remove datapoints for the Netherland Antilles after 2010 (it was dissolved then), as HYDE has data after that year.
     """
     log.info("population: filter rows...")
     # remove datapoints with population = 0
     df = cast(pd.DataFrame, df[df["population"] > 0].copy())
+    # remove datapoints for the Netherland Antilles after 2010 (it was dissolved then)
+    df = df[~((df["country"] == "Netherlands Antilles") & (df["year"] > 2010))]
     return df
 
 

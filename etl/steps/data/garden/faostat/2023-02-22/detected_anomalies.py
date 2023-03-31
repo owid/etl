@@ -1,16 +1,8 @@
-"""Detected anomalies.
+"""This module contains a class for each type of data anomaly detected.
 
-This module contains a class for each data anomaly detected. The class has the following methods and properties:
-* description: A human-readable text that describes the anomaly.
-  NOTE: The description will be added to the dataset metadata description, and hence will be shown in grapher.
-* checks: A method that ensures the anomaly exists in the data.
-  This is useful to detect if an anomaly has been corrected after a data update.
-* fix: A method that removes the anomaly.
-* inspect: An optional method that plots (in the browser) a visualization that shows the anomaly.
-  It can be used before and after removing the anomalies.
-* handle_anomalies: A helper method that uses all the previous methods in the usual order.
+If after a data update an anomaly is no longer in the data, remove the corresponding class from this module.
 
-If after an update the anomaly is no longer in the original data, remove the corresponding class.
+See documentation of class DataAnomaly below for more details on how anomaly classes are structured.
 
 """
 import abc
@@ -28,7 +20,7 @@ INSPECT_ANOMALIES = bool(os.getenv("INSPECT_ANOMALIES", False))
 
 
 class DataAnomaly(abc.ABC):
-    """Abstract class for data anomaly."""
+    """Abstract class for a certain type of data anomaly."""
 
     def __init__(self) -> None:
         pass
@@ -36,21 +28,68 @@ class DataAnomaly(abc.ABC):
     @property
     @abc.abstractmethod
     def description(self) -> str:
-        # Description of the anomaly, which will be added to the dataset description.
-        pass
+        """A human-readable text that describes the anomaly.
+
+        NOTE: The description will be added to the dataset metadata description, and hence will be shown in grapher.
+        """
+        raise NotImplementedError
 
     @abc.abstractmethod
     def check(self, df: pd.DataFrame) -> None:
-        pass
+        """A method that ensures the anomaly exists in the data.
+
+        This is useful to detect if an anomaly has been corrected after a data update.
+
+        Parameters
+        ----------
+        df : pd.DataFrame
+            Data containing anomalies.
+        """
+        raise NotImplementedError
 
     @abc.abstractmethod
     def fix(self, df: pd.DataFrame) -> pd.DataFrame:
-        pass
+        """A method that removes the anomaly.
+
+        Parameters
+        ----------
+        df : pd.DataFrame
+            Data that contains anomalies to be removed.
+
+        Returns
+        -------
+        df_fixed : pd.DataFrame
+            Data after removing anomalies.
+        """
+        raise NotImplementedError
 
     def inspect(self, df: pd.DataFrame) -> None:
-        pass
+        """An optional method that plots (in the browser) a visualization that shows the anomaly.
+
+        It can be used before and after removing the anomalies.
+
+        Parameters
+        ----------
+        df : pd.DataFrame
+            Data to be inspected (before or after having anomalies removed).
+        """
+        raise NotImplementedError
 
     def handle_anomalies(self, df: pd.DataFrame, inspect_anomalies: bool = INSPECT_ANOMALIES) -> pd.DataFrame:
+        """A helper method that uses all the previous methods in the usual order.
+
+        Parameters
+        ----------
+        df : pd.DataFrame
+            Data with anomalies.
+        inspect_anomalies : bool, optional
+            True to open charts in the browser to visualize the data before and after removing the anomalies.
+
+        Returns
+        -------
+        df_fixed : pd.DataFrame
+            Data after removing anomalies.
+        """
         log.info(f"Handling anomaly: {self.description}")
         log.info("Checking that known data anomalies are present in the data")
         self.check(df=df)
@@ -70,6 +109,7 @@ class DataAnomaly(abc.ABC):
 
 
 def _split_long_title(text: str) -> str:
+    """Split a given text to have at most 100 characters per line, where line breaks are noted by the HTML tag <br>."""
     # I couldn't find an easy way to show a figure below a long text, so I split the title into lines of a fixed width.
     line_length = 100
     html_text = "<br>".join([text[i : i + line_length] for i in range(0, len(text), line_length)])
@@ -210,7 +250,7 @@ class CocoaBeansFoodAvailable(DataAnomaly):
         log.info(
             "The anomaly causes: "
             "\n* Zeros from 2010 onwards. "
-            "\n* Often it's zero for all years, but for some countries there are single non-zero values (e.g. Afghanistan)."
+            "\n* I's usually zero all years, but some countries also have single non-zero values (e.g. Afghanistan)."
         )
         for element_code in self.affected_element_codes:
             selection = (df["item_code"].isin(self.affected_item_codes)) & (df["element_code"] == element_code)
