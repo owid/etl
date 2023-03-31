@@ -7,7 +7,7 @@ Four sources are used overall:
 - After 1950:
     - UN WPP (2022)
 - Before 1950:
-    - Gapminder (v6): This is prioritised over HYDE.
+    - Gapminder (v7): This is prioritised over HYDE.
     - HYDE (v3.2)
     - Gapminder (Systema Globalis):
         Provides data on former countries, and complements other sources with data on missing years for some countries.
