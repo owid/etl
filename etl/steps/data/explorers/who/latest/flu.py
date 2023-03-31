@@ -47,8 +47,6 @@ def run(dest_dir: str) -> None:
     tb_flu = tb_flu.loc[tb_flu["date"] > "2008-12-29"]
 
     tb_flu = create_full_time_series(tb_flu)
-    # Remove years with fewer than 10 data points
-    # tb_flu = remove_sparse_years(tb_flu, min_datapoints_per_year=MIN_DATA_POINTS_PER_YEAR)
     # Create zerofilled columns for use in stacked bar charts
     tb_flu = create_zero_filled_strain_columns(tb_flu)
     # Create global and hemisphere aggregates
@@ -356,13 +354,13 @@ def calculate_percent_positive_aggregate(df: pd.DataFrame, surveillance_cols: li
 
 def remove_sparse_timeseries(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
     """
-    Remove spare time series from zero filled columns, so we don't have time-series showing only zeros.
+    Remove sparse time series from zero filled columns, so we don't have time-series showing only zeros.
     """
     countries = df["country"].drop_duplicates()
     for country in countries:
-        # Removing all flunet values for a country where there are fewer than {min_data_points}
-        if all(df.loc[(df["country"] == country), cols].fillna(0).astype(bool).sum() == 0):
-            df.loc[(df["country"] == country), cols] = np.NaN
+        for col in cols:
+            if df.loc[(df["country"] == country), col].fillna(0).sum() == 0:
+                df.loc[(df["country"] == country), col] = np.NaN
     return df
 
 
