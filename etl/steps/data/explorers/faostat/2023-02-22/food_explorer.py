@@ -97,7 +97,7 @@ def run(dest_dir: str) -> None:
     ds_garden: Dataset = paths.load_dependency("faostat_food_explorer")
 
     # Get the table of all food products.
-    tb_garden = ds_garden["all_products"]
+    tb_garden = ds_garden["faostat_food_explorer"]
 
     #
     # Process data.
@@ -108,7 +108,9 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Initialize new explorers dataset.
-    ds_explorers = create_dataset(dest_dir=dest_dir, tables=tables, default_metadata=ds_garden, formats=["csv"])
+    ds_explorers = create_dataset(
+        dest_dir=dest_dir, tables=tables, default_metadata=ds_garden.metadata, formats=["csv"]
+    )
     ds_explorers.metadata.short_name = "food_explorer"
 
     # Create new explorers dataset.
