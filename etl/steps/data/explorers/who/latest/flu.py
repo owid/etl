@@ -354,13 +354,13 @@ def calculate_percent_positive_aggregate(df: pd.DataFrame, surveillance_cols: li
 
 def remove_sparse_timeseries(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
     """
-    Remove spare time series from zero filled columns, so we don't have time-series showing only zeros.
+    Remove sparse time series from zero filled columns, so we don't have time-series showing only zeros.
     """
     countries = df["country"].drop_duplicates()
     for country in countries:
-        # Removing all flunet values for a country where there are fewer than {min_data_points}
-        if all(df.loc[(df["country"] == country), cols].fillna(0).astype(bool).sum() == 0):
-            df.loc[(df["country"] == country), cols] = np.NaN
+        for col in cols:
+            if df.loc[(df["country"] == country), col].fillna(0).sum() == 0:
+                df.loc[(df["country"] == country), col] = np.NaN
     return df
 
 
