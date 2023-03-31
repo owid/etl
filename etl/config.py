@@ -14,7 +14,9 @@ from os import environ as env
 import bugsnag
 from dotenv import load_dotenv
 
-ENV_FILE = env.get("ENV", ".env")
+from etl.paths import BASE_DIR
+
+ENV_FILE = env.get("ENV", BASE_DIR / ".env")
 
 load_dotenv(ENV_FILE)
 

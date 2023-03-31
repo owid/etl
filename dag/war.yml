@@ -1,0 +1,37 @@
+# Steps for conflict data
+# https://github.com/owid/owid-issues/issues/449
+steps:
+  # Meadow
+  data://meadow/war/2023-01-10/bouthoul_carrere_1978:
+    - snapshot://war/2023-01-09/bouthoul_carrere_1978.csv
+  data://meadow/war/2023-01-10/clodfelter_2017:
+    - snapshot://war/2023-01-09/clodfelter_2017.csv
+  data://meadow/war/2023-01-10/dunnigan_martel_1987:
+    - snapshot://war/2023-01-09/dunnigan_martel_1987.csv
+  data://meadow/war/2023-01-10/eckhardt_1991:
+    - snapshot://war/2023-01-09/eckhardt_1991.csv
+  data://meadow/war/2023-01-10/orae_1985:
+    - snapshot://war/2023-01-09/orae_1985.csv
+  data://meadow/war/2023-01-10/sorokin_1937:
+    - snapshot://war/2023-01-09/sorokin_1937.csv
+  data://meadow/war/2023-01-10/sutton_1971:
+    - snapshot://war/2023-01-09/sutton_1971.csv
+  data://meadow/war/2023-02-03/war_brecke:
+    - snapshot://war/2023-02-03/war_brecke.xlsx
+  data://meadow/war/2023-02-03/prio_v31:
+    - snapshot://war/2023-02-02/prio_v31.xls
+  # Garden
+  data://garden/war/2023-01-18/bouthoul_carrere_1978:
+    - data://meadow/war/2023-01-10/bouthoul_carrere_1978
+  data://garden/war/2023-01-18/clodfelter_2017:
+    - data://meadow/war/2023-01-10/clodfelter_2017
+  data://garden/war/2023-01-18/dunnigan_martel_1987:
+    - data://meadow/war/2023-01-10/dunnigan_martel_1987
+  data://garden/war/2023-01-18/eckhardt_1991:
+    - data://meadow/war/2023-01-10/eckhardt_1991
+  data://garden/war/2023-01-18/orae_1985:
+    - data://meadow/war/2023-01-10/orae_1985
+  data://garden/war/2023-01-18/sorokin_1937:
+    - data://meadow/war/2023-01-10/sorokin_1937
+  data://garden/war/2023-01-18/sutton_1971:
+    - data://meadow/war/2023-01-10/sutton_1971

@@ -1,0 +1,120 @@
+meta:
+  namespace: war
+  short_name: dunnigan_martel_1987
+  name: How to stop a war (1987)
+  source_name: Dunnigan and Martel (1987)
+  publication_year: 1987
+  publication_date: 1987-10-01
+  url: https://books.google.es/books/about/How_to_Stop_a_War.html?id=lg7cAAAAMAAJ
+  source_data_url: https://docs.google.com/spreadsheets/d/13XJbTXryll5VqhtmbutMLCbb3pgjEtofk3o2dJG29Aw/edit?usp=sharing
+  file_extension: csv
+  license_url:
+  license_name: Doubleday (1987)
+  date_accessed: 2023-01-09
+  is_public: true
+  description: >-
+    What years and countries are covered?
+
+      - "Wars that occurred during the last two hundred years" (Dunnigan and Martel
+    1987: 6).
+
+      - 1786-1987  (Dunnigan and Martel 1987: 207, 250)
+
+
+    Which conflicts are covered?
+
+      - "War is organized violence caused by national governments" (Dunnigan and Martel
+    1987: 11).
+
+      - "Traditional Wars. [...] Two nations gather up their armed forces and go after
+    each other" (Dunnigan and Martel 1987: 11).
+
+      - "Colonial Wars. A broad category of conflicts best described as a major power
+    going to war with a significantly weaker power on the
+      defender's own territory. This does not always involve actual colonies, just
+    big guys beating up on little guys.
+      [The major distinguishing characteristic is the great disparity in military
+    power between the two combatants. [...] What is most important
+      about this type of war is that only one side, the major power, can escalate
+    the war to include nuclear weapons or other combat between
+      superpowers" (Dunnigan and Martel 1987: 11).
+
+      - "Civil Wars. A nation at war with itself, with both sides deploying armed
+    forces. This category includes insurrections, separatist movements,
+      persistent terrorism and rebellions in general" (Dunnigan and Martel 1987: 11-12).
+
+      - "Civil Terrors. A nation goes to war against its own people. Many of these
+    wars are very similar to civil wars, except that the "rebels" are
+      not organized well, if at all. [...] The most prominent examples are the Stalinist
+    Terror in Russia during the 1930s, the Communist Terror in
+      China during the 1950s [...]" (Dunnigan and Martel 1987: 12).
+
+      - "Began: Year in which the war began. Sometimes it differs from the official
+    starting date. We used the date at which hostilities or
+      large-scale unrest began" (Dunnigan and Martel 1987: 180).
+
+      - "We categorized wars into the following groups: C— Civil terror[;] R—Social
+    revolution[;] S—Secessionist movement[;] T—Territorial conflict"
+      (Dunnigan and Martel 1987: 184).
+
+
+    Which deaths and casualties are covered?
+
+      - Probably deaths; military and civilian combined; direct and indirect combined.
+
+      - "Losses: Military and civilian" (Dunnigan and Martel 1987: 185).
+
+      - "Keep in mind that it is often difficult to separate them. A further complication
+    is that civilian losses are often not noted in histories"
+      (Dunnigan and Martel 1987: 185).
+
+      - 'Losses' used, which probably means deaths: "nearly half the deaths in all
+    wars" made up by the Napoleonic Wars, the Taiping Rebellion, and
+      the World Wars — which is half of all the losses of the 163 million they list.
+
+
+    How did they construct the data?
+
+      - "our information was collected for each participant of the war" (Dunnigan
+    and Martel 1987: 6).
+
+      - "One source that was quite useful is The Encyclopedia of Military History
+    (New York: Harper & Row, 1977) by R. E. Dupuy and T. N. Dupuy.
+      The detailed accounts of wars provided a starting point for identifying wars"
+    (Dunnigan and Martel 1987: 275).
+
+      - "An important reference was The Wages of War, 1819-1965 (New York: John Wiley
+    & Sons, 1972) by J. David Singer and Melvin Small. [...] It
+      is also a good source of data on the size of the combat forces for each nation,
+    and estimates of the casualties. Singer and Small, however,
+      tend to generate statistics of dubious value, such as battle deaths per month
+    of the war" (Dunnigan and Martel 1987: 275).
+
+      - "There is considerable uncertainty about the number of people who are killed
+    in a given war, especially as one proceeds further into the past"
+      (Dunnigan and Martel 1987: 275).
+
+      - "Some other sources for data on combat casualties are Statistics of Deadly
+    Quarrels (Pittsburgh: Boxwood Press, 1960) by Lewis Frye Richardson;
+      Social and Cultural Dynamics (New York: American Book, 1937) by Pitirim A. Sorokin;
+    Losses of Life in Modern Wars (London: Oxford University,
+      1916) by Gaston Bodart; Losses of Life Caused by War (London: Oxford University,
+    1920) by Vedel and Petersen. Military Balance (Letchford,
+      England: The Garden City Press Ltd., 1985), which is published annually by the
+    International Institute for Strategic Studies, is a good source
+      for the size of armed forces in the contemporary period" (Dunnigan and Martel
+    1987: 276).
+
+    How did we construct it?
+
+      - We used to access the book here; the access since seems to have become restricted,
+    we have purchased a used copy; the quotes above are from
+      that copy.
+
+      - We extracted conflicts as well as deaths and casualties from the list in their
+    book, starting at page 207.
+wdir: ../../../data/snapshots/war/2023-01-09
+outs:
+- md5: 5ab165a63ccfdec62b72d3bddf114497
+  size: 150480
+  path: dunnigan_martel_1987.csv

@@ -6,7 +6,6 @@ This module contains:
 * Definitions related to countries and regions (e.g. aggregate regions to generate and definition of historic regions).
 * Definitions of flags (found in the original FAOSTAT data) and their ranking (i.e. the priority of data points when
   there are duplicates).
-* Identified outliers.
 * Other additional definitions (e.g. texts to include in the definitions of generated per-capita variables).
 
 """
@@ -53,20 +52,6 @@ N_CHARACTERS_ITEM_CODE = 8
 N_CHARACTERS_ELEMENT_CODE = 6
 # Manual fixes to item codes to avoid ambiguities.
 ITEM_AMENDMENTS = {
-    "faostat_sdgb": [
-        {
-            "item_code": "AG_PRD_FIESMSN_",
-            "fao_item": "2.1.2 Population in moderate or severe food insecurity (thousands of people) (female)",
-            "new_item_code": "AG_PRD_FIESMSN_FEMALE",
-            "new_fao_item": "2.1.2 Population in moderate or severe food insecurity (thousands of people) (female)",
-        },
-        {
-            "item_code": "AG_PRD_FIESMSN_",
-            "fao_item": "2.1.2 Population in moderate or severe food insecurity (thousands of people) (male)",
-            "new_item_code": "AG_PRD_FIESMSN_MALE",
-            "new_fao_item": "2.1.2 Population in moderate or severe food insecurity (thousands of people) (male)",
-        },
-    ],
     "faostat_fbsh": [
         # Mappings to harmonize item names of fbsh with those of fbs.
         {
@@ -481,28 +466,15 @@ def harmonize_countries(data: pd.DataFrame, countries_metadata: pd.DataFrame) ->
 
     """
     data = data.copy()
-    if data["area_code"].dtype == "float64":
-        # This happens at least for faostat_sdgb, where area code is totally different to the usual one.
-        # See further explanations in garden step for faostat_metadata.
-        # When this happens, merge using the old country name instead of the area code.
-        data = pd.merge(
-            data.rename(columns={"area_code": "m49_code"}),
-            countries_metadata[["area_code", "m49_code", "fao_country", "country"]].rename(
-                columns={"fao_country": "fao_country_check"}
-            ),
-            on="m49_code",
-            how="left",
-        ).drop(columns="m49_code")
-    else:
-        # Add harmonized country names (from countries metadata) to data.
-        data = pd.merge(
-            data,
-            countries_metadata[["area_code", "fao_country", "country"]].rename(
-                columns={"fao_country": "fao_country_check"}
-            ),
-            on="area_code",
-            how="left",
-        )
+    # Add harmonized country names (from countries metadata) to data.
+    data = pd.merge(
+        data,
+        countries_metadata[["area_code", "fao_country", "country"]].rename(
+            columns={"fao_country": "fao_country_check"}
+        ),
+        on="area_code",
+        how="left",
+    )
 
     # area_code should always be an int
     data["area_code"] = data["area_code"].astype(int)
