@@ -37,9 +37,9 @@ def run(dest_dir: str) -> None:
     #
     log.info("population.harmonize_countries")
     df = geo.harmonize_countries(
-        df=df, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
+        df=df.reset_index(), countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
     )
-
+    df = df.set_index(["country", "year"], verify_integrity=True)
     # Create a new table with the processed data.
     tb_garden = Table(df, like=tb_meadow)
 
