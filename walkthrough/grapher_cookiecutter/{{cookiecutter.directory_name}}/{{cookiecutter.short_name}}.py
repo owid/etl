@@ -31,7 +31,7 @@ def run(dest_dir: str) -> None:
     #
     # Checks.
     #
-    grapher_checks(ds_garden)
+    grapher_checks(ds_grapher)
 
     # Save changes in the new grapher dataset.
     ds_grapher.save()
