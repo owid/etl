@@ -141,16 +141,15 @@ class SpinachAreaHarvestedAnomaly(DataAnomaly):
             fig.show()
 
     def fix(self, df):
-        df_fixed = df.copy()
-        df_fixed.loc[
+        indexes_to_drop = df[
             (
                 (df["country"].isin(self.affected_countries))
                 & (df["item_code"].isin(self.affected_item_codes))
                 & (df["element_code"].isin(self.affected_element_codes))
                 & (df["year"].isin(self.affected_years))
-            ),
-            "value",
-        ] = np.nan
+            )
+        ].index
+        df_fixed = df.drop(indexes_to_drop).reset_index(drop=True)
 
         return df_fixed
 
@@ -223,16 +222,14 @@ class CocoaBeansFoodAvailable(DataAnomaly):
 
     def fix(self, df):
         # Remove all possibly spurious zeros from 2010 onwards in all countries.
-        df_fixed = df.copy()
-        df_fixed.loc[
+        indexes_to_drop = df[
             (
                 (df["year"] > 2010)
                 & (df["item_code"].isin(self.affected_item_codes))
                 & (df["element_code"].isin(self.affected_element_codes))
                 & (df["value"] == 0)
-            ),
-            "value",
-        ] = np.nan
+            )
+        ].index.tolist()
         # Additionally, remove all data for region aggregates from 2010 onwards.
         # List of possibly affected region aggregates, including all original FAO region aggregates.
         aggregates = [
@@ -249,7 +246,9 @@ class CocoaBeansFoodAvailable(DataAnomaly):
             "High-income countries",
             "World",
         ] + sorted(set(df[df["country"].str.contains("FAO")]["country"]))
-        df.loc[(df["country"].isin(aggregates)) & (df["year"] >= 2010), "value"] = np.nan
+        indexes_to_drop.extend(df[(df["country"].isin(aggregates)) & (df["year"] >= 2010)].index.tolist())
+
+        df_fixed = df.drop(indexes_to_drop).reset_index(drop=True)
 
         return df_fixed
 
@@ -319,16 +318,15 @@ class EggYieldNorthernEuropeAnomaly(DataAnomaly):
             fig.show()
 
     def fix(self, df):
-        df_fixed = df.copy()
-        df_fixed.loc[
+        indexes_to_drop = df[
             (
                 (df["country"].isin(self.affected_countries))
                 & (df["item_code"].isin(self.affected_item_codes))
                 & (df["element_code"].isin(self.affected_element_codes))
                 & (df["year"].isin(self.affected_years))
-            ),
-            "value",
-        ] = np.nan
+            )
+        ].index
+        df_fixed = df.drop(indexes_to_drop).reset_index(drop=True)
 
         return df_fixed
 
