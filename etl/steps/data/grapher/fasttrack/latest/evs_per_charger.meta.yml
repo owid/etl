@@ -1,0 +1,44 @@
+dataset:
+  namespace: fasttrack
+  version: latest
+  short_name: evs_per_charger
+  title: DRAFT EVs per charger
+  description: ''
+  sources:
+  - name: Unknown
+    published_by: Unknown
+    publication_year: 2023
+    date_accessed: 2023-03-31
+tables:
+  evs_per_charger:
+    variables:
+      battery_electric:
+        title: battery_electric
+        unit: ''
+      hybrid:
+        title: hybrid
+        unit: ''
+      all_evs:
+        title: all_evs
+        unit: ''
+      fast_chargers:
+        title: fast_chargers
+        unit: ''
+      slow_chargers:
+        title: slow_chargers
+        unit: ''
+      all_chargers:
+        title: all_chargers
+        unit: ''
+      evs_per_charger:
+        title: evs_per_charger
+        unit: ''
+      bevs_per_charger:
+        title: bevs_per_charger
+        unit: ''
+      evs_per_fast_charger:
+        title: evs_per_fast_charger
+        unit: ''
+      share_chargers_fast:
+        title: share_chargers_fast
+        unit: ''

@@ -34,3 +34,5 @@ steps:
   - snapshot://fasttrack/latest/table_5__threatened_species_in_each_major_group_by_country__show_all__1.csv
   data-private://grapher/fasttrack/2023-03-27/global_warming_contributions:
   - snapshot-private://fasttrack/2023-03-27/global_warming_contributions.csv
+  data-private://grapher/fasttrack/latest/evs_per_charger:
+  - snapshot-private://fasttrack/latest/evs_per_charger.csv
