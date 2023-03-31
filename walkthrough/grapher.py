@@ -27,6 +27,7 @@ class GrapherForm(BaseModel):
     short_name: str
     namespace: str
     version: str
+    garden_version: str
     add_to_dag: bool
     is_private: bool
 
