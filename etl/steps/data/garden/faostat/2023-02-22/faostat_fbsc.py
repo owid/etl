@@ -21,22 +21,20 @@ from typing import cast
 import pandas as pd
 from owid import catalog
 from owid.datautils import dataframes
-from owid.datautils.io import load_json
 from shared import (
     ADDED_TITLE_TO_WIDE_TABLE,
     CURRENT_DIR,
     NAMESPACE,
-    OUTLIERS_FILE_NAME,
     add_per_capita_variables,
     add_regions,
     clean_data,
+    handle_anomalies,
     harmonize_elements,
     harmonize_items,
     log,
     parse_amendments_table,
     prepare_long_table,
     prepare_wide_table,
-    remove_outliers,
 )
 
 from etl.helpers import PathFinder, create_dataset
@@ -133,9 +131,6 @@ def run(dest_dir: str) -> None:
     fbsh_dataset: catalog.Dataset = paths.load_dependency(f"{NAMESPACE}_fbsh")
     fbs_dataset: catalog.Dataset = paths.load_dependency(f"{NAMESPACE}_fbs")
 
-    # Load file of detected outliers.
-    outliers = load_json(paths.directory / OUTLIERS_FILE_NAME)
-
     # Load dataset of FAOSTAT metadata.
     metadata: catalog.Dataset = paths.load_dependency(f"{NAMESPACE}_metadata")
 
@@ -176,8 +171,8 @@ def run(dest_dir: str) -> None:
     # Add per-capita variables.
     data = add_per_capita_variables(data=data, elements_metadata=elements_metadata)
 
-    # Remove outliers (this step needs to happen after creating regions and per capita variables).
-    data = remove_outliers(data, outliers=outliers)
+    # Handle detected anomalies in the data.
+    data, anomaly_descriptions = handle_anomalies(dataset_short_name=dataset_short_name, data=data)
 
     # Avoid objects as they would explode memory, use categoricals instead.
     for col in data.columns:
@@ -213,8 +208,8 @@ def run(dest_dir: str) -> None:
     error = "Dataset title given to fbsc is different to the one in custom_datasets.csv. Update the latter file."
     assert DATASET_TITLE == dataset_metadata["owid_dataset_title"], error
 
-    # Update dataset metadata.
-    ds_garden.metadata.description = dataset_metadata["owid_dataset_description"]
+    # Update dataset metadata and add description of anomalies (if any) to the dataset description.
+    ds_garden.metadata.description = dataset_metadata["owid_dataset_description"] + anomaly_descriptions
     ds_garden.metadata.title = dataset_metadata["owid_dataset_title"]
 
     # Create garden dataset.
