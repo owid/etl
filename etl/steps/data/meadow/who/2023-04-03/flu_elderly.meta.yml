@@ -1,0 +1,11 @@
+tables:
+  flu_elderly:
+    variables:
+      doses:
+        title: DOSES
+        unit: ''
+        short_unit: ''
+      coverage:
+        title: COVERAGE
+        unit: ''
+        short_unit: ''

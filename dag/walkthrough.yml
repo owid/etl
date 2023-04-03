@@ -8,3 +8,5 @@ steps:
   - data://garden/dummy/2020-01-01/dummy
   data://explorers/dummy/2020-01-01/dummy:
   - data://garden/dummy/2020-01-01/dummy
+  data://meadow/who/2023-04-03/flu_elderly:
+  - snapshot://who/2023-04-03/flu_elderly.xlsx
