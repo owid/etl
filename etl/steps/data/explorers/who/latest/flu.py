@@ -20,7 +20,6 @@ import pandas as pd
 from owid.catalog import Dataset, Table
 
 from etl.helpers import PathFinder, create_dataset
-from etl.steps.data.garden.who.latest.fluid import calculate_patient_rates
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -226,7 +225,7 @@ def create_hemisphere_aggregate(df: pd.DataFrame, count_cols: list[str]) -> pd.D
     hemisphere_aggregate = calculate_percent_positive_aggregate(
         df=hemisphere_aggregate, surveillance_cols=["sentinel", "nonsentinel", "notdefined", "combined"]
     )
-    hemisphere_aggregate = calculate_patient_rates(df=hemisphere_aggregate)
+    # hemisphere_aggregate = calculate_patient_rates(df=hemisphere_aggregate)
     return hemisphere_aggregate
 
 
@@ -243,7 +242,7 @@ def create_global_aggregate(df: pd.DataFrame, count_cols: list[str]) -> pd.DataF
     global_aggregate = calculate_percent_positive_aggregate(
         df=global_aggregate, surveillance_cols=["sentinel", "nonsentinel", "notdefined", "combined"]
     )
-    global_aggregate = calculate_patient_rates(df=global_aggregate)
+    # global_aggregate = calculate_patient_rates(df=global_aggregate)
 
     return global_aggregate
 
@@ -306,7 +305,7 @@ def create_zero_filled_strain_columns(df: pd.DataFrame) -> pd.DataFrame:
     """
     surveillance_types = ["combined", "sentinel", "nonsentinel", "notdefined"]
 
-    strains = [
+    strain_columns = [
         "ah1n12009",
         "ah1",
         "ah3",
@@ -318,24 +317,25 @@ def create_zero_filled_strain_columns(df: pd.DataFrame) -> pd.DataFrame:
         "bvic",
     ]
 
-    strain_surv_columns = [x + y for y in surveillance_types for x in strains]
+    strain_surv_columns = [x + y for y in surveillance_types for x in strain_columns]
     strain_columns_zfilled = [s + "_zfilled" for s in strain_surv_columns]
     df[strain_columns_zfilled] = df[strain_surv_columns].fillna(0)
 
-    df = remove_sparse_timeseries(df, strains, surveillance_types)
+    df = remove_sparse_timeseries(df, strain_columns, surveillance_types)
 
     return df
 
 
-def remove_sparse_timeseries(df: pd.DataFrame, strains: list[str], surveillance_types: list[str]) -> pd.DataFrame:
+def remove_sparse_timeseries(
+    df: pd.DataFrame, strain_columns: list[str], surveillance_types: list[str]
+) -> pd.DataFrame:
     """
     Remove sparse time series from zero filled columns, so we don't have time-series showing only zeros.
     """
     countries = df["country"].drop_duplicates()
-
     for type in surveillance_types:
-        cols = [x + type + "_zfilled" for x in strains]
+        cols = [x + type + "_zfilled" for x in strain_columns]
         for country in countries:
-            if all(df.loc[(df["country"] == country), cols].sum() == 0):
+            if all(df.loc[(df["country"] == country), cols].fillna(0).sum() == 0):
                 df.loc[(df["country"] == country), cols] = np.NaN
     return df
