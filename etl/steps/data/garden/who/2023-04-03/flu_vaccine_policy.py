@@ -1,7 +1,4 @@
 """Load a meadow dataset and create a garden dataset."""
-
-import re
-
 import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
