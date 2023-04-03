@@ -336,6 +336,6 @@ def remove_sparse_timeseries(
     for type in surveillance_types:
         cols = [x + type + "_zfilled" for x in strain_columns]
         for country in countries:
-            if all(df.loc[(df["country"] == country), cols].fillna(0).sum()) == 0:
+            if all(df.loc[(df["country"] == country), cols].fillna(0).sum() == 0):
                 df.loc[(df["country"] == country), cols] = np.NaN
     return df
