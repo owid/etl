@@ -485,7 +485,7 @@ def clean_global_elements_dataframe(elements_df: pd.DataFrame, custom_elements: 
     elements_df : pd.DataFrame
         Elements and units dataframe gathered from all domains.
     custom_elements : pd.DataFrame
-        Data from custom_items.csv file.
+        Data from custom_element_and_units.csv file.
 
     Returns
     -------
