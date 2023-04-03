@@ -222,9 +222,9 @@ def create_hemisphere_aggregate(df: pd.DataFrame, count_cols: list[str]) -> pd.D
     )
     hemisphere_aggregate = hemisphere_aggregate.rename(columns={"hemisphere": "country"})
 
-    # hemisphere_aggregate = calculate_percent_positive_aggregate(
-    #    df=hemisphere_aggregate, surveillance_cols=["sentinel", "nonsentinel", "notdefined", "combined"]
-    # )
+    hemisphere_aggregate = calculate_percent_positive_aggregate(
+        df=hemisphere_aggregate, surveillance_cols=["sentinel", "nonsentinel", "notdefined", "combined"]
+    )
     # hemisphere_aggregate = calculate_patient_rates(df=hemisphere_aggregate)
     return hemisphere_aggregate
 
@@ -239,15 +239,15 @@ def create_global_aggregate(df: pd.DataFrame, count_cols: list[str]) -> pd.DataF
     cols = global_aggregate.columns.to_list()
     cols = cols[-1:] + cols[:-1]
     global_aggregate = global_aggregate[cols]
-    # global_aggregate = calculate_percent_positive_aggregate(
-    #    df=global_aggregate, surveillance_cols=["sentinel", "nonsentinel", "notdefined", "combined"]
-    # )
+    global_aggregate = calculate_percent_positive_aggregate(
+        df=global_aggregate, surveillance_cols=["sentinel", "nonsentinel", "notdefined", "combined"]
+    )
     # global_aggregate = calculate_patient_rates(df=global_aggregate)
 
     return global_aggregate
 
 
-def _calculate_percent_positive_aggregate(df: pd.DataFrame, surveillance_cols: list[str]) -> pd.DataFrame:
+def calculate_percent_positive_aggregate(df: pd.DataFrame, surveillance_cols: list[str]) -> pd.DataFrame:
     """
     Sometimes the 0s in the inf_negative* columns should in fact be zero. Here we convert rows to NA where:
     inf_negative* == 0 and the sum of the positive and negative tests does not equal the number of processed tests.
