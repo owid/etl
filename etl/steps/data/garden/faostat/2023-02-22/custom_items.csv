@@ -260,7 +260,7 @@ faostat_qcl,00000748,"Peppermint, spearmint",,"Mentha spp.: M. piperita	  Leaves
 faostat_qcl,00000587,Persimmons,,"This subclass includes persimmons (kakis), species of Diospyros kaki and Diospyros virginiana. (Unofficial definition)",
 faostat_qcl,00001043,"Pig fat, rendered",,"Pig fat, rendered This subclass includes: - fat and grease from pigs, rendered, such as: lard This subclass does not include: - fat from pigs, unrendered, cf. 21511 - lard stearin and lard oil, cf. 21529",
 faostat_qcl,00000197,"Pigeon peas, dry",Pigeon peas,"Pigeon peas, dry This subclass is defined through the following headings/subheadings of the HS 2007: 0713.60.",
-faostat_fbsc,00002733,Pigmeat,Pork,"Default composition: 1035 Meat, pig, 1038 Meat, pork, 1039 Bacon and ham, 1041 Meat, pig sausages, 1042 Meat, pig, preparations",
+faostat_fbsc,00002733,Pigmeat,"Meat, pig","Default composition: 1035 Meat, pig, 1038 Meat, pork, 1039 Bacon and ham, 1041 Meat, pig sausages, 1042 Meat, pig, preparations",
 faostat_fbsc,00002641,Pimento,Chillies and peppers,"Default composition: 689 Chillies and peppers, dry",
 faostat_qcl,00000574,Pineapples,,"Pineapples This subclass includes: -  pineapples, Ananas comosus",
 faostat_fbsc,00002618,Pineapples and products,Pineapples,"Default composition: 574 Pineapples, 575 Pineapples canned, 576 Juice, pineapple, 580 Juice, pineapple, concentrated",
