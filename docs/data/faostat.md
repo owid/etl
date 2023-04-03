@@ -232,15 +232,19 @@ Optionally, set `INSPECT_ANOMALIES=True`, to visualize if anomalies that were de
 ```bash
 INSPECT_ANOMALIES=True etl garden/faostat/YYYY-MM-DD
 ```
-6. Create new grapher steps.
+6. Inspect and update any possible changes of dataset/item/element/unit names and descriptions.
+```bash
+python etl/scripts/faostat/update_custom_metadata.py
+```
+7. Create new grapher steps.
 ```bash
 python etl/scripts/faostat/create_new_steps.py -c grapher
 ```
-7. Run the new etl grapher steps, to generate the grapher charts.
+8. Run the new etl grapher steps, to generate the grapher charts.
 ```bash
 etl faostat/YYYY-MM-DD --grapher
 ```
-8. Generate chart revisions (showing a chart using an old version of a variable and the same chart using the new
+9. Generate chart revisions (showing a chart using an old version of a variable and the same chart using the new
 version) for each dataset, to replace variables of a dataset from its second latest version to its latest version.
 ```bash
 python etl/scripts/faostat/create_chart_revisions.py -e
@@ -248,13 +252,18 @@ python etl/scripts/faostat/create_chart_revisions.py -e
 NOTE: This step may raise errors (because of limitations in our chart revision tool). If so, continue to the next step
 and come back to this one again. Keep repeating these two steps until there are no more errors (which may happen after
 two iterations).
-9. Use OWID's internal approval tool to visually inspect changes between the old and new versions of updated charts, and
+10. Use OWID's internal approval tool to visually inspect changes between the old and new versions of updated charts, and
 accept or reject changes.
-10. Create a new explorers step. For the moment, this has to be done manually:
+11. Create a new explorers step. For the moment, this has to be done manually:
 * Duplicate the latest step in `etl/etl/steps/data/explorers/faostat/` and use the current date as the new version.
 * Duplicate entry of explorers step in the dag, and replace versions (of the step itself and its dependencies) by the
 corresponding latest versions.
-11. Move old, unnecessary etl steps in the dag to the archive dag.
+12. Run the new etl explorers step, to generate the csv files for the global food explorer.
+```bash
+etl explorers/faostat/YYYY-MM-DD/food_explorer
+```
+Run internal sanity checks on the generated files.
+13. Move old, unnecessary etl steps in the dag to the archive dag.
 
 ## Workflow to make changes to a dataset
 
