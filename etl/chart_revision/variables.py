@@ -1,3 +1,4 @@
+import pandas as pd
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Union
 
@@ -17,9 +18,12 @@ class VariablesUpdate:
     # Variables metadata for each variable (by variable ID)
     metadata: List["VariableMetadata"]
     _metadata_dix: Optional[Dict[int, "VariableMetadata"]] = None
+    # Variable data
+    _var_data = None
 
     def __init__(self, mapping: Dict[int, int], metadata: Optional[List["VariableMetadata"]] = None):
         self.mapping = mapping
+        self._var_data = self._get_var_data_from_db()
         if metadata:
             self.metadata = metadata
         else:
@@ -53,6 +57,10 @@ class VariablesUpdate:
             raise ValueError(f"Variable ID {old_id} is not a variable to be updated!")
         return self.mapping[old_id]
 
+    def _get_var_data_from_db(self) -> pd.DataFrame:
+        df = variable_data_df_from_s3(get_engine(), variable_ids=self.ids_all, workers=10)
+        return df
+
     def _get_metadata_from_db(self) -> List["VariableMetadata"]:
         """Get metadata for all variables in the update."""
         if DEBUG_NO_S3:
@@ -64,12 +72,10 @@ class VariablesUpdate:
                 )
                 for i in self.ids_all
             ]
-        # get data from S3
-        df_var_years = variable_data_df_from_s3(get_engine(), variable_ids=self.ids_all, workers=10)
 
         # get min and max year for each variable
         df_var_years = (
-            df_var_years.groupby("variableId")
+            self._var_data.groupby("variableId")
             .year.agg(["min", "max"])
             .rename(columns={"min": "minYear", "max": "maxYear"})
         )
@@ -129,3 +135,7 @@ class VariableMetadata:
     id: int
     min_year: int
     max_year: int
+
+
+def get_entities_mapping(self):
+    pass
