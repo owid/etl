@@ -1,0 +1,25 @@
+all_sources:
+  - un_wpp: &gapminder_source
+      name: Gapminder (2022)
+      published_by: Gapminder, Population (v7) 2022
+      url: https://gapm.io/dl_popv7
+      date_accessed: "2023-03-31"
+      publication_date: "2022-10-19"
+      publication_year: 2022
+
+dataset:
+  title: Population (Gapminder, 2022)
+  licenses:
+    - name: Creative Commons BY 4.0
+      url: https://docs.google.com/document/d/1-RmthhS2EPMK_HIpnPctcXpB0n7ADSWnXa5Hb3PxNq4/edit?usp=sharing
+  sources:
+    - *gapminder_source
+tables:
+  population:
+    variables:
+      population:
+        title: Population
+        short_unit: ""
+        unit: ""
+        description: |-
+          Population by country and year.
