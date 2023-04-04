@@ -1,6 +1,7 @@
-import pandas as pd
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Union, Tuple
+from typing import Any, Dict, List, Optional, Tuple, Union
+
+import pandas as pd
 
 from backport.datasync.data_metadata import variable_data_df_from_s3
 from etl.db import get_engine
@@ -13,6 +14,7 @@ DEBUG_NO_S3 = False
 # It is given in percentage terms, i.e. 100 * (datapoint_new - datapoint_old) / datapoint_old.
 THRESHOLD_MAJOR_CHANGE = 5
 
+
 @dataclass
 class VariablesUpdate:
     """Contains the details on the variable updates."""
@@ -22,9 +24,14 @@ class VariablesUpdate:
     metadata: List["VariableMetadata"]
     _metadata_dix: Optional[Dict[int, "VariableMetadata"]] = None
     # Update summary
-    _update_summary: List[Tuple[str, str, str]] = field(default_factory=list)
+    _update_summary: List[Tuple[Any, Any, Any]] = field(default_factory=list)
 
-    def __init__(self, mapping: Dict[int, int], metadata: Optional[List["VariableMetadata"]] = None, update_summary: Optional[List[Tuple[str, str, str]]] = None):
+    def __init__(
+        self,
+        mapping: Dict[int, int],
+        metadata: Optional[List["VariableMetadata"]] = None,
+        update_summary: Optional[List[Tuple[Any, Any, Any]]] = None,
+    ):
         self.mapping = mapping
         var_data = None
         if metadata:
@@ -147,7 +154,7 @@ class VariablesUpdate:
                 year_max = max(year_max, var_meta.max_year)
             return [year_min, year_max]
 
-    def _build_variables_update_summary(self, var_data: Optional[pd.DataFrame] = None) -> List[Tuple[int, int, str]]:
+    def _build_variables_update_summary(self, var_data: Optional[pd.DataFrame] = None) -> List[Tuple[Any, Any, Any]]:
         """Find out differences between old and new variable.
 
         For each variable update, it checks:
@@ -218,8 +225,11 @@ class VariablesUpdate:
         for old_var, new_var, summary_var in self._update_summary:
             old_var_name = self.get_metadata(old_var)
             new_var_name = self.get_metadata(new_var)
-            summary += f"<h2>Variable {old_var_name} ({old_var}) -> {new_var_name} ({new_var})</h2><br>{summary_var}<br><br>"
+            summary += (
+                f"<h2>Variable {old_var_name} ({old_var}) -> {new_var_name} ({new_var})</h2><br>{summary_var}<br><br>"
+            )
         return summary
+
 
 def _summary_datapoint_changes(df_old: pd.DataFrame, df_new: pd.DataFrame, entities_mapping: Dict[int, str]) -> str:
     """Generate a summary with major differences between `df_old` and `df_new`.
@@ -227,10 +237,14 @@ def _summary_datapoint_changes(df_old: pd.DataFrame, df_new: pd.DataFrame, entit
     This includes: number of datapoints that changed and substantially changed, mean/max/min of relative difference.
     """
     # Estimate difference in new values
-    df_merged_inner = df_old.merge(df_new, how="inner", on=["entityId", "year"], suffixes=["_old", "_new"])
+    df_merged_inner = df_old.merge(df_new, how="inner", on=["entityId", "year"], suffixes=("_old", "_new"))
     df_merged_inner["value_diff"] = df_merged_inner["value_old"].astype(int) - df_merged_inner["value_new"].astype(int)
-    df_merged_inner["value_diff_rel"] = (100 * df_merged_inner["value_diff"] / df_merged_inner["value_old"].astype(int)).round(4)
-    df_merged_inner.loc[(df_merged_inner["value_old"] == "0") & (df_merged_inner["value_new"] == "0"), "value_diff_rel"] = 0
+    df_merged_inner["value_diff_rel"] = (
+        100 * df_merged_inner["value_diff"] / df_merged_inner["value_old"].astype(int)
+    ).round(4)
+    df_merged_inner.loc[
+        (df_merged_inner["value_old"] == "0") & (df_merged_inner["value_new"] == "0"), "value_diff_rel"
+    ] = 0
     df_merged_inner["value_diff_rel_abs"] = df_merged_inner["value_diff_rel"].abs()
 
     # Datapoints with different values
@@ -263,9 +277,11 @@ def _summary_datapoint_changes(df_old: pd.DataFrame, df_new: pd.DataFrame, entit
     return ""
 
 
-def _summary_datapoint_added_and_removed(df_old: pd.DataFrame, df_new: pd.DataFrame, entities_mapping: Dict[int, str]) -> str:
+def _summary_datapoint_added_and_removed(
+    df_old: pd.DataFrame, df_new: pd.DataFrame, entities_mapping: Dict[int, str]
+) -> str:
     # Find out Missing/new datapoints
-    df_merged_outer = df_old.merge(df_new, how="outer", on=["entityId", "year"], suffixes=["_old", "_new"])
+    df_merged_outer = df_old.merge(df_new, how="outer", on=["entityId", "year"], suffixes=("_old", "_new"))
 
     # number of datapoints added
     num_new_values = df_merged_outer["value_old"].isna().sum()
@@ -291,6 +307,7 @@ def _summary_datapoint_added_and_removed(df_old: pd.DataFrame, df_new: pd.DataFr
     # Missing datapoints (present in old variable but not in new variable)):
     # {df_lost_values.to_html(index=False)}
     # """
+
 
 def prettify_datavalues_df(df: pd.DataFrame, entities_mapping: Dict[int, str]) -> pd.DataFrame:
     df["entity"] = df["entityId"].map(entities_mapping)
