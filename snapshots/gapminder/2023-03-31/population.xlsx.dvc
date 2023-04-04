@@ -26,6 +26,6 @@ meta:
     Visit https://www.gapminder.org/data/documentation/gd003/ to learn more about the methodology used and the data from back to 10,000 BC.
 wdir: ../../../data/snapshots/gapminder/2023-03-31
 outs:
-- md5: 59a2fe3bd528fa8faf08c9facccabe5b
-  size: 3773553
+- md5: 2ff20af19edba61e69956c2e306e54f7
+  size: 3773746
   path: population.xlsx
