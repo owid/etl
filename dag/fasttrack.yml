@@ -36,3 +36,5 @@ steps:
   - snapshot-private://fasttrack/2023-03-27/global_warming_contributions.csv
   data-private://grapher/fasttrack/latest/evs_per_charger:
   - snapshot-private://fasttrack/latest/evs_per_charger.csv
+  data-private://grapher/fasttrack/latest/who_standard_pop:
+  - snapshot-private://fasttrack/latest/who_standard_pop.csv
