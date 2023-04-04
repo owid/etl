@@ -1,0 +1,31 @@
+meta:
+  namespace: gapminder
+  short_name: population
+  name: Population (Gapminder, 2022)
+  version: 2023-03-31
+  publication_year: 2022
+  publication_date: 2022-10-19
+  source_name: Gapminder (2022)
+  source_published_by: Gapminder, Population (v7) 2022
+  url: http://gapm.io/dpop
+  source_data_url: https://gapm.io/dl_popv7
+  file_extension: xlsx
+  license_url: https://docs.google.com/document/d/1-RmthhS2EPMK_HIpnPctcXpB0n7ADSWnXa5Hb3PxNq4/edit?usp=sharing
+  license_name: Creative Commons BY 4.0
+  date_accessed: 2023-03-31
+  is_public: true
+  description: |
+    Gapminder's population data is divided into two chunks: One long historical trend for the global population that goes back to 10,000 BC. And the second chunk is country estimates that only reaches back to 1800.
+
+    For the first chunk, several sources were used. You can learn more at https://docs.google.com/spreadsheets/d/1hkLbEilJbl630IG68q-aQJlUjuTFm9b_12nQMVd1sZM/edit#gid=0.
+
+    For the second chunk, Gapminder uses UN population data between 1950 to 2100 from the UN Population Division World Population Prospects 2019, and the forecast to the year 2100 uses their medium-fertility variant. For years before 1950, this version uses the data documented in greater detail by Mattias Lindgren in version 3. The main source was Angus Maddison’s data, which CLIO Infra Project maintained and improved.
+
+    Note that when combining version 3 with the new UN data, the trends for a few countries didn't match up in the overlapping year 1950. Minor adjustments were made to the years before and after to smooth out discrepancies between the two sources and avoid spurious jumps in Gapminder's visualisations.
+
+    Visit https://www.gapminder.org/data/documentation/gd003/ to learn more about the methodology used and the data from back to 10,000 BC.
+wdir: ../../../data/snapshots/gapminder/2023-03-31
+outs:
+- md5: 2ff20af19edba61e69956c2e306e54f7
+  size: 3773746
+  path: population.xlsx
