@@ -42,7 +42,7 @@ METADATA_PATH = os.path.join(N.directory, "meta.yml")
 # sources names
 # this dictionary maps source short names to complete source names
 SOURCES_NAMES = {
-    "unwpp": "United Nations - Population Division 2022 (https://population.un.org/wpp/Download/Standard/Population/)",
+    "unwpp": "United Nations, World Population Prospects 2022 (https://population.un.org/wpp/Download/Standard/Population/)",
     "gapminder_v6": "Gapminder v6 (https://www.gapminder.org/data/documentation/gd003/)",
     "gapminder_sg": "Gapminder - Systema Globalis (https://github.com/open-numbers/ddf--gapminder--systema_globalis)",
     "hyde": "HYDE v3.2 (https://dataportaal.pbl.nl/downloads/HYDE/)",
