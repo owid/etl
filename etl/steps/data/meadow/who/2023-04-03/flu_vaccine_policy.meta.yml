@@ -1,0 +1,111 @@
+tables:
+  flu_vaccine_policy:
+    variables:
+      are_adjuvanted_vaccine_type_used:
+        title: Are adjuvanted vaccine type used?
+        short_unit: ''
+        unit: ''
+      are_high_dose_vaccine_type_used:
+        title: Are high dose vaccine type used?
+        short_unit: ''
+        unit: ''
+      are_influenza_vaccines_licensed_by_the_countrys_national_regulatory_agency:
+        title: Are influenza vaccines licensed by the country's National Regulatory Agency?
+        short_unit: ''
+        unit: ''
+      are_live_attenuated_influenza_vaccines__laiv__used_in_the_country:
+        title: Are live attenuated influenza vaccines (LAIV) used in the country?
+        short_unit: ''
+        unit: ''
+      are_quadrivalent_inactivated_vaccine_type_used:
+        title: Are quadrivalent inactivated vaccine type used?
+        short_unit: ''
+        unit: ''
+      are_trivalent_inactivated_vaccine_type_used:
+        title: Are trivalent inactivated vaccine type used?
+        short_unit: ''
+        unit: ''
+      at_what_time_of_the_year_is_influenza_vaccine_generally_offered:
+        title: At what time of the year is influenza vaccine generally offered?
+        short_unit: ''
+        unit: ''
+      does_the_country_have_a_formal_national__governmental__influenza_vaccination_policy:
+        title: National vaccination policy
+        short_unit: ''
+        unit: ''
+      how_many_doses_of_influenza_vaccine_were_distributed:
+        title: Doses distributed
+        short_unit: ''
+        unit: 'doses'
+        display:
+          numDecimalPlaces: 0
+      is_influenza_vaccination_recommended_for_adults_with_certain_chronic_conditions:
+        title: Recommended for adults with certain chronic conditions
+        short_unit: ''
+        unit: ''
+      is_influenza_vaccination_recommended_for_children__age_group_1:
+        title: Recommended for children (age group 1)
+        short_unit: ''
+        unit: ''
+      is_influenza_vaccination_recommended_for_children_and_adults_with_certain_chronic_conditions:
+        title: Recommended for children and adults with certain chronic conditions
+        short_unit: ''
+        unit: ''
+      is_influenza_vaccination_recommended_for_children_in_another_age_group__age_group_2:
+        title: Recommended for children in another age group (age group 2)
+        short_unit: ''
+        unit: ''
+      is_influenza_vaccination_recommended_for_children_with_certain_chronic_conditions:
+        title: Recommended for children with certain chronic conditions
+        short_unit: ''
+        unit: ''
+      is_influenza_vaccination_recommended_for_children:
+        title: Recommended for children
+        short_unit: ''
+        unit: ''
+      is_influenza_vaccination_recommended_for_health_and_care_workers_workers:
+        title: Recommended for health and care workers workers
+        short_unit: ''
+        unit: ''
+      is_influenza_vaccination_recommended_for_older_persons:
+        title: Recommended for older persons
+        short_unit: ''
+        unit: ''
+      is_influenza_vaccination_recommended_for_other_groups:
+        title: Recommended for other groups
+        short_unit: ''
+        unit: ''
+      is_influenza_vaccination_recommended_for_pregnant_women:
+        title: Recommended for pregnant women
+        short_unit: ''
+        unit: ''
+      is_influenza_vaccination_recommended_for_residents_living_in_long_term_care_facilities:
+        title: Recommended for residents living in long-term care facilities
+        short_unit: ''
+        unit: ''
+      is_influenza_vaccination_recommended_for_travellers__i_e__hajj:
+        title: Recommended for travellers (i.e. Hajj)
+        short_unit: ''
+        unit: ''
+      is_influenza_vaccination_recommended_for_universal_recommendation__for_all_persons__gt__6_months:
+        title: Recommended for universal recommendation (for all persons >=6 months)
+        short_unit: ''
+        unit: ''
+      were_influenza_vaccines_available_in_the_country_this_season_year__either_in_the_private_sector_or_public_sector:
+        title: Were influenza vaccines available in the country this season/year (either
+          in the private sector or public sector)?
+        short_unit: ''
+        unit: ''
+      what_are_the_other_vaccine_types_used:
+        title: What are the other vaccine types used?
+        short_unit: ''
+        unit: ''
+      what_time_period_are_influenza_vaccination_policy_and_vaccine_availability_reported_on:
+        title: What time period are influenza vaccination policy and vaccine availability
+          reported on?
+        short_unit: ''
+        unit: ''
+      what_vaccine_formulation_is_used:
+        title: What vaccine formulation is used?
+        short_unit: ''
+        unit: ''

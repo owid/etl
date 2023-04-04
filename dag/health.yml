@@ -109,6 +109,14 @@ steps:
     - data://garden/who/latest/fluid
     - data://garden/who/latest/flunet
 
+  # Flu vaccine policy - https://immunizationdata.who.int/pages/indicators-by-category/influenza.html?YEAR=
+  data://meadow/who/2023-04-03/flu_vaccine_policy:
+  - snapshot://who/2023-04-03/flu_vaccine_policy.xlsx
+  data://garden/who/2023-04-03/flu_vaccine_policy:
+  - data://meadow/who/2023-04-03/flu_vaccine_policy
+  data://grapher/who/2023-04-03/flu_vaccine_policy:
+  - data://garden/who/2023-04-03/flu_vaccine_policy
+
   # Registered vehicles per 1000 people
   data://garden/who/2023-03-13/vehicles:
     - data://garden/owid/latest/key_indicators
