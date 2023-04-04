@@ -285,7 +285,14 @@ class CocoaBeansFoodAvailable(DataAnomaly):
             "High-income countries",
             "World",
         ] + sorted(set(df[df["country"].str.contains("FAO")]["country"]))
-        indexes_to_drop.extend(df[(df["country"].isin(aggregates)) & (df["year"] >= 2010)].index.tolist())
+        indexes_to_drop.extend(
+            df[
+                (df["country"].isin(aggregates))
+                & (df["year"] >= 2010)
+                & (df["item_code"].isin(self.affected_item_codes))
+                & (df["element_code"].isin(self.affected_element_codes))
+            ].index.tolist()
+        )
 
         df_fixed = df.drop(indexes_to_drop).reset_index(drop=True)
 
