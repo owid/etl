@@ -24,7 +24,6 @@ from etl.helpers import PathFinder, create_dataset
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-# MIN_DATA_POINTS_PER_YEAR = 10
 DAYS_HELD_BACK = 28
 
 
@@ -133,11 +132,13 @@ def create_full_time_series(df: pd.DataFrame) -> pd.DataFrame:
     return filled_df
 
 
-def create_monthly_aggregates(df: pd.DataFrame) -> pd.DataFrame:
+def create_monthly_aggregates(df: pd.DataFrame, days_held_back: int) -> pd.DataFrame:
     """
     Aggregate weekly data into months. For simplicity, if the week commences in a certain month we include it in that month.
 
     We sum counts and average rates to calculate the monthly values.
+
+    We hold back from showing the values for a month until it is at least {days_held_back} days into the month
 
     """
 
@@ -173,7 +174,7 @@ def create_monthly_aggregates(df: pd.DataFrame) -> pd.DataFrame:
     # drop previous month unless it is past 28th of current month - so we don't show data for a month until it has 4 weeks worth of data
     previous_month = current_month - timedelta(days=1)
     previous_month = previous_month.replace(day=1)
-    if datetime.now().day < DAYS_HELD_BACK:
+    if datetime.now().day < days_held_back:
         month_agg_df = month_agg_df[month_agg_df["month_date"] != previous_month]
 
     return month_agg_df
