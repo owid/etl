@@ -124,7 +124,7 @@ def fill_slaughtered_poultry_with_slaughtered_chicken(data: pd.DataFrame) -> pd.
     )
 
     log.info(
-        f"Filling {len(poultry_slaughtered_missing_data)} rows of missing data for slaughtered poultry with "\
+        f"Filling {len(poultry_slaughtered_missing_data)} rows of missing data for slaughtered poultry with "
         "slaughtered chicken."
     )
     # Add chicken data to the full dataframe.
@@ -282,7 +282,7 @@ def add_slaughtered_animals_to_meat_total(data: pd.DataFrame) -> pd.DataFrame:
     assert compared[compared["_merge"] == "right_only"].empty, "Expected 'left_only' or 'both', not 'right_only'."
 
     log.info(
-        f"Removed {len(compared[compared['_merge'] == 'left_only'])} rows for which we don't have the number of "\
+        f"Removed {len(compared[compared['_merge'] == 'left_only'])} rows for which we don't have the number of "
         "poultry slaughtered."
     )
 
