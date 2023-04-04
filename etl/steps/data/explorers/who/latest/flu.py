@@ -24,7 +24,6 @@ from etl.helpers import PathFinder, create_dataset
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-# MIN_DATA_POINTS_PER_YEAR = 10
 DAYS_HELD_BACK = 28
 
 
@@ -57,7 +56,7 @@ def run(dest_dir: str) -> None:
 
     assert tb_flu[["country", "date"]].duplicated().sum() == 0
     # Create monthly aggregates - sum variables that are counts and recalculate rates based on these monthly totals
-    tb_flu_monthly = create_monthly_aggregates(df=tb_flu)
+    tb_flu_monthly = create_monthly_aggregates(df=tb_flu, days_held_back=DAYS_HELD_BACK)
 
     # Create Tables
     tb_flu = Table(tb_flu, short_name="flu")
@@ -133,11 +132,13 @@ def create_full_time_series(df: pd.DataFrame) -> pd.DataFrame:
     return filled_df
 
 
-def create_monthly_aggregates(df: pd.DataFrame) -> pd.DataFrame:
+def create_monthly_aggregates(df: pd.DataFrame, days_held_back: int) -> pd.DataFrame:
     """
     Aggregate weekly data into months. For simplicity, if the week commences in a certain month we include it in that month.
 
     We sum counts and average rates to calculate the monthly values.
+
+    We hold back from showing the values for a month until it is at least {days_held_back} days into the month
 
     """
 
@@ -170,6 +171,11 @@ def create_monthly_aggregates(df: pd.DataFrame) -> pd.DataFrame:
     rate_agg_df = df[rate_agg_cols].groupby(["country", "month_date"]).mean(numeric_only=True).reset_index()
 
     month_agg_df = pd.merge(month_agg_df, rate_agg_df, on=["country", "month_date"], how="outer")
+    # drop previous month unless it is past 28th of current month - so we don't show data for a month until it has 4 weeks worth of data
+    previous_month = current_month - timedelta(days=1)
+    previous_month = previous_month.replace(day=1)
+    if datetime.now().day < days_held_back:
+        month_agg_df = month_agg_df[month_agg_df["month_date"] != previous_month]
 
     return month_agg_df
 
