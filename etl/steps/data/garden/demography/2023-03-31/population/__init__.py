@@ -23,7 +23,7 @@ from owid.catalog.utils import underscore_table
 from structlog import get_logger
 
 from etl.data_helpers import geo
-from etl.helpers import PathFinder
+from etl.helpers import PathFinder, create_dataset
 
 from .gapminder import load_gapminder
 from .gapminder_sg import (
@@ -42,10 +42,10 @@ METADATA_PATH = os.path.join(N.directory, "meta.yml")
 # sources names
 # this dictionary maps source short names to complete source names
 SOURCES_NAMES = {
-    "unwpp": "United Nations, World Population Prospects 2022 (https://population.un.org/wpp/Download/Standard/Population/)",
-    "gapminder_v6": "Gapminder v6 (https://www.gapminder.org/data/documentation/gd003/)",
-    "gapminder_sg": "Gapminder - Systema Globalis (https://github.com/open-numbers/ddf--gapminder--systema_globalis)",
-    "hyde": "HYDE v3.2 (https://dataportaal.pbl.nl/downloads/HYDE/)",
+    "unwpp": "United Nations, World Population Prospects (2022) (https://population.un.org/wpp/Download/Standard/Population/)",
+    "gapminder_v7": "Gapminder (v7) (https://www.gapminder.org/data/documentation/gd003/)",
+    "gapminder_sg": "Gapminder (Systema Globalis) (https://github.com/open-numbers/ddf--gapminder--systema_globalis)",
+    "hyde": "HYDE (v3.2) (https://dataportaal.pbl.nl/downloads/HYDE/)",
 }
 
 
@@ -57,11 +57,7 @@ def run(dest_dir: str) -> None:
 
     # create dataset
     log.info("population: create dataset")
-    ds = Dataset.create_empty(dest_dir)
-
-    # add table to dataset
-    log.info("population: add table to dataset")
-    ds.add(tb)
+    ds = create_dataset(dest_dir, tables=[tb])
 
     # manage metadata
     log.info("population: add metadata")
@@ -80,7 +76,7 @@ def make_table() -> Table:
         .pipe(add_regions)
         .pipe(add_world)
         .pipe(add_historical_regions)
-        .pipe(filter_rows)
+        .pipe(fix_anomalies)
         .pipe(set_dtypes)
         .pipe(add_world_population_share)
         .pipe(df_to_table)
@@ -106,7 +102,7 @@ def load_data() -> pd.DataFrame:
 def select_source(df: pd.DataFrame) -> pd.DataFrame:
     """Select adequate source for each country-year.
 
-    Rows are selected based on the following relevance scale: "unwpp" > "gapminder_v6" > "hyde"
+    Rows are selected based on the following relevance scale: "unwpp" > "gapminder_v7" > "hyde"
     """
     log.info("population: selecting source...")
     df = df.loc[df["population"] > 0]
@@ -116,13 +112,13 @@ def select_source(df: pd.DataFrame) -> pd.DataFrame:
     df = df.loc[~((df["country"].isin(has_un_data)) & (df["year"] >= 1950) & (df["source"] != "unwpp"))]
 
     # If a country has Gapminder data, then remove all non-Gapminder data between 1800 and 1949
-    has_gapminder_data = set(df.loc[df["source"] == "gapminder_v6", "country"])
+    has_gapminder_data = set(df.loc[df["source"] == "gapminder_v7", "country"])
     df = df.loc[
         ~(
             (df["country"].isin(has_gapminder_data))
             & (df["year"] >= 1800)
             & (df["year"] <= 1949)
-            & (df["source"] != "gapminder_v6")
+            & (df["source"] != "gapminder_v7")
         )
     ]
 
@@ -238,7 +234,7 @@ def add_historical_regions(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def filter_rows(df: pd.DataFrame) -> pd.DataFrame:
+def fix_anomalies(df: pd.DataFrame) -> pd.DataFrame:
     """Make sure that all rows make sense.
 
     - Remove rows with population = 0.
@@ -268,7 +264,7 @@ def add_world_population_share(df: pd.DataFrame) -> pd.DataFrame:
     # Add a metric "% of world population"
     world_pop = df.loc[df["country"] == "World", ["year", "population"]].rename(columns={"population": "world_pop"})
     df = df.merge(world_pop, on="year", how="left")
-    df["world_pop_share"] = (100 * df["population"].div(df.world_pop)).round(2)
+    df["world_pop_share"] = 100 * df["population"].div(df.world_pop)
     df = df.drop(columns="world_pop")
     return df
 
@@ -277,7 +273,7 @@ def df_to_table(df: pd.DataFrame) -> Table:
     """Create table from dataframe."""
     log.info("population: converting df to table...")
     # fine tune df (sort rows, columns, set index)
-    df = df.set_index(["country", "year"]).sort_index()[["population", "world_pop_share", "source"]]
+    df = df.set_index(["country", "year"], verify_integrity=True).sort_index()[["population", "world_pop_share", "source"]]
     # create table, sort rows
     tb = Table(df, short_name="population")
     # add metadata to columns

@@ -5,7 +5,7 @@ from etl.helpers import PathFinder
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-SOURCE_NAME = "gapminder_v6"
+SOURCE_NAME = "gapminder_v7"
 
 
 def load_gapminder():

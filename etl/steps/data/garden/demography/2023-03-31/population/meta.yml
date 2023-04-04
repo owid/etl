@@ -20,7 +20,7 @@ dataset:
       url: https://www.gapminder.org/data/documentation/gd003/
       date_accessed: 2023-03-31
     - name: UN (2022)
-      published_by: UN, World Population Prospects (2022)
+      published_by: United Nations, World Population Prospects (2022)
       url: https://population.un.org/wpp/Download/Standard/Population/
       date_accessed: 2022-09-10
     - name: HYDE (2017)
