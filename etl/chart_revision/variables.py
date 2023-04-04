@@ -223,10 +223,10 @@ class VariablesUpdate:
         summary = ""
         print(self._update_summary)
         for old_var, new_var, summary_var in self._update_summary:
-            old_var_name = self.get_metadata(old_var)
-            new_var_name = self.get_metadata(new_var)
+            old_var_name = self.get_metadata(old_var).name
+            new_var_name = self.get_metadata(new_var).name
             summary += (
-                f"<h2>Variable {old_var_name} ({old_var}) -> {new_var_name} ({new_var})</h2><br>{summary_var}<br><br>"
+                f"<h2>Variable {old_var_name} ({old_var}) → {new_var_name} ({new_var})</h2><br>{summary_var}<br><br>"
             )
         return summary
 
