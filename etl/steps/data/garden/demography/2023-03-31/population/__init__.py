@@ -18,7 +18,7 @@ from copy import deepcopy
 from typing import List, cast
 
 import pandas as pd
-from owid.catalog import Dataset, Table
+from owid.catalog import Table
 from owid.catalog.utils import underscore_table
 from structlog import get_logger
 
@@ -273,7 +273,9 @@ def df_to_table(df: pd.DataFrame) -> Table:
     """Create table from dataframe."""
     log.info("population: converting df to table...")
     # fine tune df (sort rows, columns, set index)
-    df = df.set_index(["country", "year"], verify_integrity=True).sort_index()[["population", "world_pop_share", "source"]]
+    df = df.set_index(["country", "year"], verify_integrity=True).sort_index()[
+        ["population", "world_pop_share", "source"]
+    ]
     # create table, sort rows
     tb = Table(df, short_name="population")
     # add metadata to columns
