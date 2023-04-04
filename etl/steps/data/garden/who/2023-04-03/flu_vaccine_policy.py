@@ -37,18 +37,17 @@ def run(dest_dir: str) -> None:
     )
     # Replacing value codes with either missing data or a more descriptive value
     df = df.replace({"ND": np.NaN, "NR": "Not relevant", "Unknown": np.NaN})
-    # Removing strings from some values e.g. commas in numbers
+    # Removing strings from some values e.g. commas in numbers but not full-stops
     df["how_many_doses_of_influenza_vaccine_were_distributed"] = df[
         "how_many_doses_of_influenza_vaccine_were_distributed"
-    ].str.replace(r"[^0-9]", "", regex=True)
+    ].str.replace(r"[^0-9\.]", "", regex=True)
 
     df = clean_binary_colums(df)
     df = clean_hemisphere_formulation(df)
-    # Removing erroneous value from is_influenza_vaccination_recommended_for_children
-    df["is_influenza_vaccination_recommended_for_children"].replace(0, np.NAN)
+    df = remove_erroneous_zeros(df)
 
     # Create a new table with the processed data.
-    df = df.set_index(["country", "year"])
+    df = df.set_index(["country", "year"], verify_integrity=True)
     tb_garden = Table(df, like=tb_meadow)
     #
     # Save outputs.
@@ -88,5 +87,15 @@ def clean_hemisphere_formulation(df: pd.DataFrame) -> pd.DataFrame:
             [np.NaN, "Not relevant", "Both", "Northern Hemisphere", "Southern Hemisphere"]
         )
     )
+
+    return df
+
+
+def remove_erroneous_zeros(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Remove the handful of zeros that are found in columns where it is not clear what they mean.
+    """
+    cols = df.columns.drop("how_many_doses_of_influenza_vaccine_were_distributed")
+    df[cols] = df[cols].replace(0, np.NaN)
 
     return df
