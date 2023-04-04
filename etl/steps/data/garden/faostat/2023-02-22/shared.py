@@ -10,18 +10,17 @@ This module contains:
 
 """
 
-import itertools
 import json
 import sys
 from pathlib import Path
-from typing import Dict, List, Union, cast
+from typing import Dict, List, cast
 
 import numpy as np
 import pandas as pd
 import structlog
+from detected_anomalies import handle_anomalies
 from owid import catalog, repack  # type: ignore
 from owid.datautils import dataframes
-from owid.datautils.io import load_json
 from tqdm.auto import tqdm
 
 from etl.data_helpers import geo
@@ -38,9 +37,6 @@ VERSION = CURRENT_DIR.name
 
 # Name of FAOSTAT metadata dataset.
 FAOSTAT_METADATA_SHORT_NAME = f"{NAMESPACE}_metadata"
-
-# Name of file containing detected outliers (that should be in the same folder as the current file).
-OUTLIERS_FILE_NAME = "detected_outliers.json"
 
 # Elements and items.
 
@@ -961,61 +957,6 @@ def remove_overlapping_data_between_historical_regions_and_successors(
     return data_region
 
 
-def remove_outliers(data: pd.DataFrame, outliers: List[Dict[str, List[Union[str, int]]]]) -> pd.DataFrame:
-    """Remove known outliers (defined in OUTLIERS_TO_REMOVE) from processed data.
-
-    The argument "outliers" is the list of outliers to remove: data points that are wrong and create artefacts in the
-    charts. For each dictionary in the list, all possible combinations of the field values will be considered outliers
-    (e.g. if two countries are given and three years, all three years will be removed for both countries).
-
-    Parameters
-    ----------
-    data : pd.DataFrame
-        Processed data (after harmonizing items, elements and countries, and adding regions and per-capita variables).
-    outliers : list
-
-
-    Returns
-    -------
-    data : pd.DataFrame
-        Data after removing known outliers.
-
-    """
-    data = data.copy()
-
-    # Make a dataframe with all rows that need to be removed from the data.
-    rows_to_drop = pd.DataFrame()
-    for outlier in outliers:
-        # Find all possible combinations of the field values in the outlier dictionary (and ignore "notes").
-        _outlier = {key: value for key, value in outlier.items() if key != "notes"}
-        _rows_to_drop = pd.DataFrame.from_records(
-            list(itertools.product(*_outlier.values())),
-            columns=list(_outlier),
-        )
-        rows_to_drop = pd.concat([rows_to_drop, _rows_to_drop], ignore_index=True).reset_index(drop=True)
-
-    # Quickly find out if there will be rows to drop in current dataset; if not, ignore.
-    if (len(set(rows_to_drop["item_code"]) & set(data["item_code"])) > 0) & (
-        len(set(rows_to_drop["element_code"]) & set(data["element_code"])) > 0
-    ):
-        log.info(f"Removing {len(rows_to_drop)} rows of known outliers.")
-
-        # Get indexes of data that correspond to the rows we want to drop.
-        indexes_to_drop = list(
-            pd.merge(
-                data.reset_index(),
-                rows_to_drop,
-                on=rows_to_drop.columns.tolist(),
-                how="inner",
-            )["index"].unique()
-        )
-
-        # Drop those rows in data.
-        data = data.drop(indexes_to_drop).reset_index(drop=True)
-
-    return data
-
-
 def add_regions(data: pd.DataFrame, elements_metadata: pd.DataFrame) -> pd.DataFrame:
     """Add region aggregates (i.e. aggregate data for continents and income groups).
 
@@ -1805,9 +1746,6 @@ def run(dest_dir: str) -> None:
     tb_meadow = ds_meadow[dataset_short_name]
     data = pd.DataFrame(tb_meadow).reset_index()
 
-    # Load file of detected outliers.
-    outliers = load_json(paths.directory / OUTLIERS_FILE_NAME)
-
     # Load dataset of FAOSTAT metadata.
     metadata: catalog.Dataset = paths.load_dependency(f"{NAMESPACE}_metadata")
 
@@ -1842,8 +1780,8 @@ def run(dest_dir: str) -> None:
     # Add per-capita variables.
     data = add_per_capita_variables(data=data, elements_metadata=elements_metadata)
 
-    # Remove outliers (this step needs to happen after creating regions and per capita variables).
-    data = remove_outliers(data, outliers=outliers)
+    # Handle detected anomalies in the data.
+    data, anomaly_descriptions = handle_anomalies(dataset_short_name=dataset_short_name, data=data)
 
     # Create a long table (with item code and element code as part of the index).
     data_table_long = prepare_long_table(data=data)
@@ -1859,12 +1797,14 @@ def run(dest_dir: str) -> None:
     data_table_long.metadata.title = dataset_metadata["owid_dataset_title"]
     data_table_wide.metadata.short_name = f"{dataset_short_name}_flat"
     data_table_wide.metadata.title = dataset_metadata["owid_dataset_title"] + ADDED_TITLE_TO_WIDE_TABLE
+
     # Initialise new garden dataset.
     ds_garden = create_dataset(
         dest_dir=dest_dir, tables=[data_table_long, data_table_wide], default_metadata=ds_meadow.metadata
     )
     # Update dataset metadata.
-    ds_garden.metadata.description = dataset_metadata["owid_dataset_description"]
+    # Add description of anomalies (if any) to the dataset description.
+    ds_garden.metadata.description = dataset_metadata["owid_dataset_description"] + anomaly_descriptions
     ds_garden.metadata.title = dataset_metadata["owid_dataset_title"]
     # Create garden dataset.
     ds_garden.save()

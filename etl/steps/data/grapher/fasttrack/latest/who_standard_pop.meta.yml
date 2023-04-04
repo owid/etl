@@ -1,0 +1,17 @@
+dataset:
+  namespace: fasttrack
+  version: latest
+  short_name: who_standard_pop
+  title: DRAFT who_standard_pop
+  description: ''
+  sources:
+  - name: Unknown
+    published_by: Unknown
+    publication_year: 2023
+    date_accessed: 2023-04-04
+tables:
+  who_standard_pop:
+    variables:
+      age_group_size:
+        title: age_group_size
+        unit: ''
