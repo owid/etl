@@ -173,7 +173,7 @@ def create_monthly_aggregates(df: pd.DataFrame, days_held_back: int) -> pd.DataF
     month_agg_df = pd.merge(month_agg_df, rate_agg_df, on=["country", "month_date"], how="outer")
     # drop previous month unless it is past 28th of current month - so we don't show data for a month until it has 4 weeks worth of data
     previous_month = current_month - timedelta(days=1)
-    previous_month = previous_month.replace(day=1)
+    previous_month = previous_month.replace(day=1).date().strftime("%Y-%m-01")
     if datetime.now().day < days_held_back:
         month_agg_df = month_agg_df[month_agg_df["month_date"] != previous_month]
 
