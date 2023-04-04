@@ -9,7 +9,7 @@ from etl.db import get_engine
 # Set to True when running experiments locally and want to avoid downloading data from S3.
 # Instead of getting the actual data, dummy data is generated.
 # This still triggers an error on the grapher side though.
-DEBUG_NO_S3 = False
+DEBUG_NO_S3 = True
 # Threshold among which we consider a change in a datapoint to be significant.
 # It is given in percentage terms, i.e. 100 * (datapoint_new - datapoint_old) / datapoint_old.
 THRESHOLD_MAJOR_CHANGE = 5
@@ -226,7 +226,7 @@ class VariablesUpdate:
             old_var_name = self.get_metadata(old_var).name
             new_var_name = self.get_metadata(new_var).name
             summary += (
-                f"<h3>Variable {old_var_name} ({old_var}) → {new_var_name} ({new_var})</h3><br>{summary_var}<br><br>"
+                f"<h4>{old_var_name} ({old_var}) → {new_var_name} ({new_var})</h4>{summary_var}<br>"
             )
         return summary
 
