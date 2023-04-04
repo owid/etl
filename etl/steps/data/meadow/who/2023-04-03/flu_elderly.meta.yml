@@ -2,10 +2,12 @@ tables:
   flu_elderly:
     variables:
       doses:
-        title: DOSES
-        unit: ''
+        title: Number of doses
+        unit: doses
         short_unit: ''
       coverage:
-        title: COVERAGE
-        unit: ''
-        short_unit: ''
+        title: Share of the target population vaccinated against influenza
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1

@@ -29,7 +29,7 @@ def run(dest_dir: str) -> None:
 
     df = df[["NAME", "YEAR", "DOSES", "COVERAGE"]].dropna(subset="COVERAGE")
 
-    df = df.rename(columns={"NAME": "country", "YEAR": "year"}).set_index(["country", "year"])
+    df = df.rename(columns={"NAME": "country", "YEAR": "year"}).set_index(["country", "year"], verify_integrity=True)
 
     # df = df.set_index(["country", "year"])
     # Process data.
