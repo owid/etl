@@ -1,0 +1,18 @@
+meta:
+  namespace: fasttrack
+  short_name: who_standard_pop
+  file_extension: csv
+  date_accessed: 2023-04-04
+  name: DRAFT who_standard_pop
+  description: ''
+  source_name: Local CSV
+  url: ''
+  source_published_by: Local CSV
+  source_data_url: gAAAAABkK_Ivu_Je_oySMG3rgLckjjugFOOG9jhgajTBIwUJ87fOQX3EcGZdjwRpsHoFeZBCGlbef41qF0k0cvf-8OSrcTED0w==
+  is_public: false
+  version: latest
+wdir: ../../../data/snapshots/fasttrack/latest
+outs:
+- md5: cc14c66a73f7db992f0b39fe1d0db45e
+  size: 611
+  path: who_standard_pop.csv
