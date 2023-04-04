@@ -114,6 +114,7 @@ ADDITIONAL_DEPENDENCIES: Dict[str, List[Tuple[str, str, str]]] = {
 ADDITIONAL_FILES_TO_COPY = [
     RUN_FILE_NAME + ".py",
     f"{NAMESPACE}.countries.json",
+    f"{NAMESPACE}.excluded_countries.json",
     "custom_datasets.csv",
     "custom_elements_and_units.csv",
     "custom_items.csv",
