@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5430_covid_19__deaths_by_vaccination_status__switzerland_and_liechtenstein_values
   file_extension: feather
-  date_accessed: 2023-02-23 17:29:15.520701
+  date_accessed: 2023-03-31 15:13:25.515448
   name: COVID-19 - Deaths by vaccination status - Switzerland and Liechtenstein
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: c96b87c63fde5932cfdf0383966ebb17
-  size: 14194
+- md5: a6c271a85f1222c5e8303335c66bb8ba
+  size: 13610
   path: dataset_5430_covid_19__deaths_by_vaccination_status__switzerland_and_liechtenstein_values.feather
