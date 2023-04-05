@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_235_world_happiness_report__2022_values
   file_extension: feather
-  date_accessed: 2023-02-23 17:54:35.342272
+  date_accessed: 2023-04-04 17:09:35.817618
   name: World Happiness Report (2022)
   description: |-
     Code and data available at: https://github.com/owid/notebooks/tree/main/FionaSpooner/world_happiness_report
