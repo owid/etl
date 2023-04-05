@@ -57,6 +57,13 @@ TOTAL_MEAT_ITEM = "Meat, total"
 SLAUGHTERED_ANIMALS_ELEMENT = "Producing or slaughtered animals"
 SLAUGHTERED_ANIMALS_UNIT = "animals"
 SLAUGHTERED_ANIMALS_UNIT_SHORT_NAME = "animals"
+# Text to be added to the dataset description (after the description of anomalies).
+SLAUGHTERED_ANIMALS_ADDITIONAL_DESCRIPTION = (
+    "\n\nFAO does not provide data for the total number of slaughtered animals "
+    "to produce meat. We calculate this metric by adding up the number of slaughtered animals of all meat groups. "
+    "However, when data for slaughtered poultry (which usually outnumbers other meat groups) is not provided, we do "
+    "not calculate the total (to avoid spurious dips in the data)."
+)
 
 
 def fill_slaughtered_poultry_with_slaughtered_chicken(data: pd.DataFrame) -> pd.DataFrame:
@@ -513,7 +520,9 @@ def run(dest_dir: str) -> None:
     )
 
     # Update dataset metadata and add description of anomalies (if any) to the dataset description.
-    ds_garden.metadata.description = dataset_metadata["owid_dataset_description"] + anomaly_descriptions
+    ds_garden.metadata.description = (
+        dataset_metadata["owid_dataset_description"] + anomaly_descriptions + SLAUGHTERED_ANIMALS_ADDITIONAL_DESCRIPTION
+    )
     ds_garden.metadata.title = dataset_metadata["owid_dataset_title"]
 
     # Create garden dataset.
