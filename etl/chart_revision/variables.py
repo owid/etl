@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Tuple, Union
+from urllib.error import URLError
 
 import pandas as pd
 
@@ -9,7 +10,7 @@ from etl.db import get_engine
 # Set to True when running experiments locally and want to avoid downloading data from S3.
 # Instead of getting the actual data, dummy data is generated.
 # This still triggers an error on the grapher side though.
-DEBUG_NO_S3 = True
+DEBUG_NO_S3 = False
 # Threshold among which we consider a change in a datapoint to be significant.
 # It is given in percentage terms, i.e. 100 * (datapoint_new - datapoint_old) / datapoint_old.
 THRESHOLD_MAJOR_CHANGE = 5
@@ -80,8 +81,13 @@ class VariablesUpdate:
             raise ValueError(f"Variable ID {old_id} is not a variable to be updated!")
         return self.mapping[old_id]
 
-    def _get_var_data_from_db(self) -> pd.DataFrame:
-        df = variable_data_df_from_s3(get_engine(), variable_ids=self.ids_all, workers=10)
+    def _get_var_data_from_db(self, recursion_counter: int = 0) -> pd.DataFrame:
+        if recursion_counter >= 2:
+            raise URLError("Failed to download data from S3")
+        try:
+            df = variable_data_df_from_s3(get_engine(), variable_ids=self.ids_all, workers=10)
+        except URLError:
+            df = self._get_var_data_from_db(recursion_counter + 1)
         return df
 
     def _get_metadata_from_db(self, var_data: Optional[pd.DataFrame] = None) -> List["VariableMetadata"]:
@@ -90,7 +96,7 @@ class VariablesUpdate:
         query = "SELECT id, name FROM variables v WHERE id IN %(ids)s"
         df_varnames = pd.read_sql(query, get_engine(), params={"ids": self.ids_all})
 
-        if var_data:
+        if var_data is not None:
             # get min and max year for each variable
             df_var_years = (
                 var_data.groupby("variableId")
@@ -261,13 +267,11 @@ def _summary_datapoint_changes(df_old: pd.DataFrame, df_new: pd.DataFrame, entit
     df_values_have_changed = prettify_datavalues_df(df_values_have_changed, entities_mapping)
 
     if num_different >= 0:
-        return f"""
-        Number datapoints that changed: {num_different}
-            Avg difference (abs): {diff_mean}%
-            Max difference (abs): {diff_max}%
-            Min difference (abs): {diff_min}%
-
-        Number datapoints that substantially changed (≥{THRESHOLD_MAJOR_CHANGE}%): {num_different_major}
+        return f"""<b>Number datapoints that changed:</b> {num_different}<br>
+            Avg difference (abs): {diff_mean}%<br>
+            Max difference (abs): {diff_max}%<br>
+            Min difference (abs): {diff_min}%<br>
+        <b>Number datapoints that substantially changed (≥{THRESHOLD_MAJOR_CHANGE}%):</b> {num_different_major}<br><br>
         """
         # Datapoints that changed:
         # {df_values_have_changed.to_html(index=False)}
@@ -295,9 +299,8 @@ def _summary_datapoint_added_and_removed(
     if (num_new_values == 0) and (num_missing_values == 0):
         return ""
 
-    return f"""
-    Number datapoints in old variable: {len(df_old)}
-    Number datapoints in new variable: {len(df_new)} (= {len(df_old)} - {num_missing_values} + {num_new_values})
+    return f"""<b>Number datapoints in old variable:</b> {len(df_old)}<br>
+    <b>Number datapoints in new variable:</b> {len(df_new)} (= {len(df_old)} - {num_missing_values} + {num_new_values})
     """
     # New datapoints (present in new variable but not in old variable)):
     # {df_new_values.to_html(index=False)}
