@@ -454,8 +454,6 @@ class TeaProductionAnomaly(DataAnomaly):
         # Check that all affected countries have official data on 1990, and estimated on 1991.
         for country in self.affected_countries:
             # Assert it for each individual country.
-            # assert (flagged_official[flagged_official["country"] == country]["flag"].isin(["A", "multiple_flags"])).all()
-            # assert (flagged_estimate[flagged_estimate["country"] == country]["flag"].isin(["E", "multiple_flags"])).all()
             # Check that tea production increases by at least a factor of 3.
             high_value = flagged_estimate[
                 (flagged_estimate["country"] == country) & (flagged_estimate["element_code"] == "005510")
