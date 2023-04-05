@@ -194,7 +194,7 @@ class SpinachAreaHarvestedAnomaly(DataAnomaly):
         return df_fixed
 
 
-class CocoaBeansFoodAvailable(DataAnomaly):
+class CocoaBeansFoodAvailableAnomaly(DataAnomaly):
     description = (  # type: ignore
         "Food available for consumption for cocoa beans from 2010 onwards presents many zeros for different countries. "
         "These zeros are likely to correspond to missing data. "
@@ -378,13 +378,123 @@ class EggYieldNorthernEuropeAnomaly(DataAnomaly):
         return df_fixed
 
 
+class TeaProductionAnomaly(DataAnomaly):
+    description = (  # type: ignore
+        "Tea production in FAO data increased dramatically from 1990 to 1991 for many different countries (including "
+        "some of the main producers, like China and India). However, data from 1991 was flagged as 'Estimated value' "
+        "(while data prior to 1991 is flagged as 'Official figure'). This potentially anomalous increase was not "
+        "present in the previous version of the data. Therefore, we removed tea production data (as well as "
+        "per-capita production and yield) from 1991 onwards."
+    )
+
+    affected_item_codes = [
+        "00000667",
+    ]
+    affected_element_codes = [
+        "005510",  # Production.
+        "5510pc",  # Per capita production.
+        "005419",  # Yield.
+    ]
+    # Countries affected by the anomaly.
+    # NOTE: All countries will be removed (since some of them are the main contributors to tea production), but these
+    # ones will be used to check for the anomaly.
+    affected_countries = [
+        "Africa",
+        "Africa (FAO)",
+        "Americas (FAO)",
+        "Argentina",
+        "Asia",
+        "Asia (FAO)",
+        "Bangladesh",
+        "China",
+        "China (FAO)",
+        "Eastern Africa (FAO)",
+        "Eastern Asia (FAO)",
+        "India",
+        "Indonesia",
+        "Iran",
+        "Kenya",
+        "Land Locked Developing Countries (FAO)",
+        "Least Developed Countries (FAO)",
+        "Low-income countries",
+        "Low Income Food Deficit Countries (FAO)",
+        "Lower-middle-income countries",
+        "Malawi",
+        "Net Food Importing Developing Countries (FAO)",
+        "Rwanda",
+        "South America",
+        "South America (FAO)",
+        "South-eastern Asia (FAO)",
+        "Southern Asia (FAO)",
+        "Sri Lanka",
+        "Tanzania",
+        "Turkey",
+        "Uganda",
+        "Upper-middle-income countries",
+        "Vietnam",
+        "Western Asia (FAO)",
+        "World",
+        "Zimbabwe",
+    ]
+
+    def check(self, df):
+        # Check that the data on 1990 has the flag "A" (Official figure) for each of the affected countries.
+        flagged_official = df[
+            (df["country"].isin(self.affected_countries))
+            & (df["item_code"].isin(self.affected_item_codes))
+            & (df["element_code"].isin(self.affected_element_codes))
+            & (df["year"] == 1990)
+        ]
+        flagged_estimate = df[
+            (df["country"].isin(self.affected_countries))
+            & (df["item_code"].isin(self.affected_item_codes))
+            & (df["element_code"].isin(self.affected_element_codes))
+            & (df["year"] > 1990)
+        ]
+        # Check that all affected countries have official data on 1990, and estimated on 1991.
+        for country in self.affected_countries:
+            # Assert it for each individual country.
+            # assert (flagged_official[flagged_official["country"] == country]["flag"].isin(["A", "multiple_flags"])).all()
+            # assert (flagged_estimate[flagged_estimate["country"] == country]["flag"].isin(["E", "multiple_flags"])).all()
+            # Check that tea production increases by at least a factor of 3.
+            high_value = flagged_estimate[
+                (flagged_estimate["country"] == country) & (flagged_estimate["element_code"] == "005510")
+            ]["value"].iloc[0]
+            low_value = flagged_official[
+                (flagged_official["country"] == country) & (flagged_official["element_code"] == "005510")
+            ]["value"].iloc[0]
+            assert high_value / low_value > 3
+
+    def inspect(self, df):
+        log.info("The anomaly causes: " "\n* The production of tea to increase dramatically from 1990 to 1991.")
+        for element_code in self.affected_element_codes:
+            selection = (df["item_code"].isin(self.affected_item_codes)) & (df["element_code"] == element_code)
+            df_affected = df[selection].astype({"country": str}).sort_values(["country", "year"])
+            title = _split_long_title(self.description + f"Element code {element_code}")
+            fig = px.line(df_affected, x="year", y="value", color="country", title=title)
+            fig.show()
+
+    def fix(self, df):
+        indexes_to_drop = df[
+            (
+                (df["item_code"].isin(self.affected_item_codes))
+                & (df["element_code"].isin(self.affected_element_codes))
+                & (df["year"] > 1990)
+            )
+        ].index
+        df_fixed = df.drop(indexes_to_drop).reset_index(drop=True)
+
+        return df_fixed
+
+
 detected_anomalies = {
     "faostat_qcl": [
         SpinachAreaHarvestedAnomaly,
         EggYieldNorthernEuropeAnomaly,
+        TeaProductionAnomaly,
     ],
     "faostat_fbsc": [
-        CocoaBeansFoodAvailable,
+        CocoaBeansFoodAvailableAnomaly,
     ],
 }
 
