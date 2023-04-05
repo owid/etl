@@ -143,6 +143,7 @@ class SpinachAreaHarvestedAnomaly(DataAnomaly):
         "Asia (FAO)",
         "Upper-middle-income countries",
         "Eastern Asia (FAO)",
+        "World",
     ]
 
     def check(self, df):
