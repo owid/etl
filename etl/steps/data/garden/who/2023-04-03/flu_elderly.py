@@ -2,6 +2,7 @@
 
 - Load meadow dataset
 - Harmonize countries
+- Cap vaccination coverage values at 100%
 - Sort values and set index
 - Create Table and Dataset
 """
@@ -39,6 +40,8 @@ def run(dest_dir: str) -> None:
     #
     log.info("flu_elderly.harmonize_countries")
     df = geo.harmonize_countries(df=df, countries_file=paths.country_mapping_path)
+    # Coverage values over 100% are capped at 100%
+    df.loc[df["coverage"] > 100, "coverage"] = 100
 
     df = df.sort_values(["country", "year"])
     df = df.set_index(["country", "year"], verify_integrity=True)
