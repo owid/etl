@@ -25,13 +25,16 @@ MSGTypes = Literal["error", "warning", "info", "success"]
 
 def get_charts_to_update(variable_mapping: Dict[int, int]) -> List["ChartVariableUpdateRevision"]:
     # variables update
+    log.info("Creating VariablesUpdate object...")
     variables_update = VariablesUpdate(variable_mapping)
     # get details on dimensions and chart IDs affected by the variable update
+    log.info("Getting info from chart_dimensions table...")
     chart_dimensions = _get_chart_dimensions_from_db(list(variable_mapping.keys()))
     chart_ids = list(set(c["chartId"] for c in chart_dimensions))
     # get details on charts affected by the variable update
     charts_raw = _get_charts_from_db(chart_ids)
     # build list with chart objects
+    log.info("Building list with ChartVariableUpdateRevision objects...")
     charts = []
     for chart_raw in charts_raw:
         # create chart instance

@@ -529,8 +529,10 @@ class Navigation:
                         )
         else:
             # Get revisions to be made
+            log.info("Get charts to update...")
             charts = get_charts_to_update(self.variable_mapping)
             # show charts to be updated (and therefore get revisions)
+            log.info("Showing submission details...")
             revisions = self.show_submission_details_exp(charts)
             if revisions:
                 # ask user to confirm submission

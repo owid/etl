@@ -1,0 +1,18 @@
+meta:
+  namespace: backport
+  short_name: dataset_5941_investment__credit_to_agriculture__fao__2023_02_22_values
+  file_extension: feather
+  date_accessed: 2023-04-06 16:05:52.466952
+  name: 'Investment: Credit to Agriculture (FAO, 2023-02-22)'
+  description: ''
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/5941
+  source_published_by: Our World in Data catalog backport
+  is_public: true
+  version: latest
+  publication_date: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 515c5f2ef9f7c1b093bc4f815ee240bd
+  size: 549050
+  path: dataset_5941_investment__credit_to_agriculture__fao__2023_02_22_values.feather
