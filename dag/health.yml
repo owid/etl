@@ -117,6 +117,15 @@ steps:
   data://grapher/who/2023-04-03/flu_vaccine_policy:
   - data://garden/who/2023-04-03/flu_vaccine_policy
 
+  # WHO flu vaccination of elderly - https://immunizationdata.who.int/pages/coverage/flu.html?ANTIGEN=FLU_ELDERLY&YEAR=
+  data://meadow/who/2023-04-03/flu_elderly:
+  - snapshot://who/2023-04-03/flu_elderly.xlsx
+  data://garden/who/2023-04-03/flu_elderly:
+  - data://meadow/who/2023-04-03/flu_elderly
+  data://grapher/who/2023-04-03/flu_elderly:
+  - data://garden/who/2023-04-03/flu_elderly
+
+
   # Registered vehicles per 1000 people
   data://garden/who/2023-03-13/vehicles:
     - data://garden/owid/latest/key_indicators

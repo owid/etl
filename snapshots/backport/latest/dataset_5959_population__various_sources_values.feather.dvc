@@ -1,0 +1,18 @@
+meta:
+  namespace: backport
+  short_name: dataset_5959_population__various_sources_values
+  file_extension: feather
+  date_accessed: 2023-04-06 11:25:52.244858
+  name: Population (various sources)
+  description: ''
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/5959
+  source_published_by: Our World in Data catalog backport
+  is_public: true
+  version: latest
+  publication_date: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 4ae82d25b0e9fb5370e024018f99eb46
+  size: 2316450
+  path: dataset_5959_population__various_sources_values.feather

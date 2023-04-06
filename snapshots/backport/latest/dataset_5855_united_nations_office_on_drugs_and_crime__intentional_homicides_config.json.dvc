@@ -1,0 +1,18 @@
+meta:
+  namespace: backport
+  short_name: dataset_5855_united_nations_office_on_drugs_and_crime__intentional_homicides_config
+  file_extension: json
+  date_accessed: 2023-04-06 10:06:35.373962
+  name: Grapher metadata for dataset_5855_united_nations_office_on_drugs_and_crime__intentional_homicides
+  description: ''
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/5855
+  source_published_by: Our World in Data catalog backport
+  is_public: true
+  version: latest
+  publication_date: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: b7f7bd027faeee1c12d19338cb30a685
+  size: 32151
+  path: dataset_5855_united_nations_office_on_drugs_and_crime__intentional_homicides_config.json

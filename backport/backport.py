@@ -7,6 +7,7 @@ import structlog
 from sqlalchemy.engine import Engine
 from sqlmodel import Session
 
+from backport.datasync.data_metadata import variable_data_df_from_s3
 from etl import config
 from etl import grapher_model as gm
 from etl.backport_helpers import GrapherConfig
@@ -212,6 +213,29 @@ def _load_values(engine: Engine, variable_ids: list[int]) -> pd.DataFrame:
     where d.variableId in %(variable_ids)s
     """
     df: pd.DataFrame = pd.read_sql(q, engine, params={"variable_ids": variable_ids})
+
+    # If df is empty, then data_values don't exist. This shouldn't be happening becase
+    # we don't backport ETL datasets (that don't have data_values), but there's an
+    # exception for SDG dataset that might backport ETL datasets.
+    if df.empty:
+        q = """
+        select
+            v.id as variable_id,
+            v.name as variable_name
+        from variables as v
+        where v.id in %(variable_ids)s
+        """
+        df = variable_data_df_from_s3(engine, variable_ids=variable_ids)
+        df = df.rename(
+            columns={
+                "entityId": "entity_id",
+                "variableId": "variable_id",
+                "entityName": "entity_name",
+                "entityCode": "entity_code",
+            }
+        )
+        vf: pd.DataFrame = pd.read_sql(q, engine, params={"variable_ids": variable_ids})
+        df = df.merge(vf, on="variable_id")
 
     # try converting values to float if possible, this can make the data 50% smaller
     # if successful

@@ -1,0 +1,15 @@
+tables:
+  flu_elderly:
+    variables:
+      doses:
+        title: Number of doses
+        unit: doses
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
+      coverage:
+        title: Share of the target elderly population vaccinated against influenza
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
