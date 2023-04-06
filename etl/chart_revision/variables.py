@@ -242,9 +242,9 @@ def _summary_datapoint_changes(df_old: pd.DataFrame, df_new: pd.DataFrame, entit
     """
     # Estimate difference in new values
     df_merged_inner = df_old.merge(df_new, how="inner", on=["entityId", "year"], suffixes=("_old", "_new"))
-    df_merged_inner["value_diff"] = df_merged_inner["value_old"].astype(int) - df_merged_inner["value_new"].astype(int)
+    df_merged_inner["value_diff"] = df_merged_inner["value_old"].astype(float) - df_merged_inner["value_new"].astype(float)
     df_merged_inner["value_diff_rel"] = (
-        100 * df_merged_inner["value_diff"] / df_merged_inner["value_old"].astype(int)
+        100 * df_merged_inner["value_diff"] / df_merged_inner["value_old"].astype(float)
     ).round(4)
     df_merged_inner.loc[
         (df_merged_inner["value_old"] == "0") & (df_merged_inner["value_new"] == "0"), "value_diff_rel"
