@@ -6,7 +6,7 @@ tables:
         unit: doses
         short_unit: ''
       coverage:
-        title: Share of the target population vaccinated against influenza
+        title: Share of the target elderly population vaccinated against influenza
         unit: '%'
         short_unit: '%'
         display:
