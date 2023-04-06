@@ -18,6 +18,7 @@ from shared import (
     handle_anomalies,
     harmonize_elements,
     harmonize_items,
+    log,
     parse_amendments_table,
     prepare_long_table,
     prepare_wide_table,
@@ -25,12 +26,128 @@ from shared import (
 
 from etl.helpers import PathFinder, create_dataset
 
+# Item and item code for 'Meat, poultry'.
+ITEM_POULTRY = "Meat, poultry"
+ITEM_CODE_MEAT_POULTRY = "00001808"
+# Item code for 'Meat, chicken'.
+ITEM_CODE_MEAT_CHICKEN = "00001058"
+# List item codes to sum as part of "Meat, total" (avoiding double-counting items).
+MEAT_TOTAL_ITEM_CODES = [
+    "00000977",  # 'Meat, lamb and mutton' (previously 'Meat, lamb and mutton')
+    "00001035",  # 'Meat of pig with the bone, fresh or chilled' (previously 'Meat, pig')
+    "00001097",  # 'Horse meat, fresh or chilled' (previously 'Meat, horse')
+    "00001108",  # 'Meat of asses, fresh or chilled' (previously 'Meat, ass')
+    "00001111",  # 'Meat of mules, fresh or chilled' (previously 'Meat, mule')
+    "00001127",  # 'Meat of camels, fresh or chilled' (previously 'Meat, camel')
+    "00001141",  # 'Meat of rabbits and hares, fresh or chilled' (previously 'Meat, rabbit')
+    "00001806",  # 'Meat, beef and buffalo' (previously 'Meat, beef and buffalo')
+    "00001807",  # 'Meat, sheep and goat' (previously 'Meat, sheep and goat')
+    ITEM_CODE_MEAT_POULTRY,  # 'Meat, poultry' (previously 'Meat, poultry')
+]
+
+# List of element codes for "Producing or slaughtered animals" (they have different items assigned).
+SLAUGHTERED_ANIMALS_ELEMENT_CODES = ["005320", "005321"]
+# For the resulting dataframe, we arbitrarily assign the first of those codes.
+SLAUGHTERED_ANIMALS_ELEMENT_CODE = SLAUGHTERED_ANIMALS_ELEMENT_CODES[0]
+# Item code for 'Meat, total'.
+TOTAL_MEAT_ITEM_CODE = "00001765"
+# OWID item name for total meat.
+TOTAL_MEAT_ITEM = "Meat, total"
+# OWID element name, unit name, and unit short name for number of slaughtered animals.
+SLAUGHTERED_ANIMALS_ELEMENT = "Producing or slaughtered animals"
+SLAUGHTERED_ANIMALS_UNIT = "animals"
+SLAUGHTERED_ANIMALS_UNIT_SHORT_NAME = "animals"
+# Text to be added to the dataset description (after the description of anomalies).
+SLAUGHTERED_ANIMALS_ADDITIONAL_DESCRIPTION = (
+    "\n\nFAO does not provide data for the total number of slaughtered animals "
+    "to produce meat. We calculate this metric by adding up the number of slaughtered animals of all meat groups. "
+    "However, when data for slaughtered poultry (which usually outnumbers other meat groups) is not provided, we do "
+    "not calculate the total (to avoid spurious dips in the data)."
+)
+
+
+def fill_slaughtered_poultry_with_slaughtered_chicken(data: pd.DataFrame) -> pd.DataFrame:
+    """Fill missing data on slaughtered poultry with slaughtered chicken.
+
+    Most of poultry meat comes from chicken. However, sometimes chicken is informed, but the rest of poultry isn't,
+    which causes poultry data to be empty (e.g. Spain in 2018).
+    Therefore, we fill missing data for poultry with chicken data.
+    """
+    data = data.copy()
+
+    # Prepare a slice of the data to extract additional data fields.
+    additional_fields = (
+        data[(data["item_code"] == ITEM_CODE_MEAT_POULTRY) & (data["unit"] == SLAUGHTERED_ANIMALS_UNIT)][
+            ["fao_item", "item_description", "fao_unit_short_name"]
+        ]
+        .drop_duplicates()
+        .iloc[0]
+    )
+
+    # Select data for the number of slaughtered chicken.
+    chickens_slaughtered = data[
+        (data["item_code"] == ITEM_CODE_MEAT_CHICKEN)
+        & (data["element"] == SLAUGHTERED_ANIMALS_ELEMENT)
+        & (data["unit"] == SLAUGHTERED_ANIMALS_UNIT)
+    ]
+
+    # Select data for the number of slaughtered poultry.
+    poultry_slaughtered = data[
+        (data["item_code"] == ITEM_CODE_MEAT_POULTRY)
+        & (data["element"] == SLAUGHTERED_ANIMALS_ELEMENT)
+        & (data["unit"] == SLAUGHTERED_ANIMALS_UNIT)
+    ][["country", "year", "value"]]
+
+    # Combine poultry and chicken data.
+    compared = pd.merge(
+        chickens_slaughtered,
+        poultry_slaughtered,
+        on=["country", "year"],
+        how="outer",
+        indicator=True,
+        suffixes=("_chicken", "_poultry"),
+    )
+
+    error = "There are cases where slaughtered poultry is informed, but slaughered chicken is not."
+    assert compared[compared["_merge"] == "right_only"].empty, error
+
+    error = "There are rows where there is more slaughtered poultry than slaughtered chicken."
+    assert compared[compared["value_poultry"] < compared["value_chicken"]].empty, error
+
+    # Prepare a replacement dataframe for missing data on slaughtered poultry.
+    poultry_slaughtered_missing_data = (
+        compared[compared["_merge"] == "left_only"]
+        .assign(
+            **{
+                "item_code": ITEM_CODE_MEAT_POULTRY,
+                "item": ITEM_POULTRY,
+                "fao_item": additional_fields["fao_item"],
+                "fao_unit_short_name": additional_fields["fao_unit_short_name"],
+                "item_description": additional_fields["item_description"],
+            }
+        )
+        .drop(columns=["_merge", "value_poultry"])
+        .rename(columns={"value_chicken": "value"})
+    )
+
+    log.info(
+        f"Filling {len(poultry_slaughtered_missing_data)} rows of missing data for slaughtered poultry with "
+        "slaughtered chicken."
+    )
+    # Add chicken data to the full dataframe.
+    data = pd.concat([data, poultry_slaughtered_missing_data], ignore_index=True)
+
+    return data
+
 
 def add_slaughtered_animals_to_meat_total(data: pd.DataFrame) -> pd.DataFrame:
     """Add number of slaughtered animals to meat total.
 
     There is no FAOSTAT data on slaughtered animals for total meat. We construct this data by aggregating that element
     for the items specified in items_to_aggregate (which corresponds to all meat items after removing redundancies).
+
+    If the number of slaughtered poultry is not informed, we remove the number of total animals slaughtered
+    (since poultry are by far the most commonly slaughtered animals).
 
     Parameters
     ----------
@@ -43,58 +160,51 @@ def add_slaughtered_animals_to_meat_total(data: pd.DataFrame) -> pd.DataFrame:
         Data after adding the new variable.
 
     """
-    # List item codes to sum as part of "Meat, total" (avoiding double-counting items).
-    item_codes_to_aggregate = [
-        "00000977",  # 'Meat, lamb and mutton' (previously 'Meat, lamb and mutton')
-        "00001035",  # 'Meat of pig with the bone, fresh or chilled' (previously 'Meat, pig')
-        "00001097",  # 'Horse meat, fresh or chilled' (previously 'Meat, horse')
-        "00001108",  # 'Meat of asses, fresh or chilled' (previously 'Meat, ass')
-        "00001111",  # 'Meat of mules, fresh or chilled' (previously 'Meat, mule')
-        "00001127",  # 'Meat of camels, fresh or chilled' (previously 'Meat, camel')
-        "00001141",  # 'Meat of rabbits and hares, fresh or chilled' (previously 'Meat, rabbit')
-        "00001806",  # 'Meat, beef and buffalo' (previously 'Meat, beef and buffalo')
-        "00001807",  # 'Meat, sheep and goat' (previously 'Meat, sheep and goat')
-        "00001808",  # 'Meat, poultry' (previously 'Meat, poultry')
-    ]
+    data = data.copy()
 
-    # OWID item name for total meat.
-    total_meat_item = "Meat, total"
-    # OWID element name, unit name, and unit short name for number of slaughtered animals.
-    slaughtered_animals_element = "Producing or slaughtered animals"
-    slaughtered_animals_unit = "animals"
-    slaughtered_animals_unit_short_name = "animals"
-    error = f"Some items required to get the aggregate '{total_meat_item}' are missing in data."
-    assert set(item_codes_to_aggregate) < set(data["item_code"]), error
-    assert slaughtered_animals_element in data["element"].unique()
-    assert slaughtered_animals_unit in data["unit"].unique()
+    error = f"Some items required to get the aggregate '{TOTAL_MEAT_ITEM}' are missing in data."
+    assert set(MEAT_TOTAL_ITEM_CODES) < set(data["item_code"]), error
+    assert SLAUGHTERED_ANIMALS_ELEMENT in data["element"].unique()
+    assert SLAUGHTERED_ANIMALS_UNIT in data["unit"].unique()
 
-    # For some reason, there are two element codes for the same element (they have different items assigned).
-    error = "Element codes for 'Producing or slaughtered animals' may have changed."
-    assert data[(data["element"] == slaughtered_animals_element) & ~(data["element_code"].str.contains("pc"))][
-        "element_code"
-    ].unique().tolist() == ["005320", "005321"], error
-
-    # Similarly, there are two items for meat total.
-    error = f"Item codes for '{total_meat_item}' may have changed."
-    assert list(data[data["item"] == total_meat_item]["item_code"].unique()) == ["00001765"], error
-
-    # We arbitrarily choose the first element code and the first item code.
-    slaughtered_animals_element_code = "005320"
-    total_meat_item_code = "00001765"
-
-    # Check that, indeed, this variable is not given in the original data.
+    # Check that, indeed, the number of slaughtered animals for total meat is not given in the original data.
     assert data[
-        (data["item"] == total_meat_item)
-        & (data["element"] == slaughtered_animals_element)
-        & (data["unit"] == slaughtered_animals_unit)
+        (data["item"] == TOTAL_MEAT_ITEM)
+        & (data["element"] == SLAUGHTERED_ANIMALS_ELEMENT)
+        & (data["unit"] == SLAUGHTERED_ANIMALS_UNIT)
     ].empty
+
+    # There are two element codes for the same element (they have different items assigned).
+    error = "Element codes for 'Producing or slaughtered animals' may have changed."
+    assert (
+        data[(data["element"] == SLAUGHTERED_ANIMALS_ELEMENT) & ~(data["element_code"].str.contains("pc"))][
+            "element_code"
+        ]
+        .unique()
+        .tolist()
+        == SLAUGHTERED_ANIMALS_ELEMENT_CODES
+    ), error
+
+    # Check that the items assigned to each the two element codes do not overlap.
+    error = "Element codes for 'Producing or slaughtered animals' have overlapping items."
+    items_for_different_elements = (
+        data[(data["element_code"].isin(SLAUGHTERED_ANIMALS_ELEMENT_CODES))]
+        .groupby("element_code", observed=True)
+        .agg({"item_code": lambda x: list(x.unique())})
+        .to_dict()["item_code"]
+    )
+    assert set.intersection(*[set(x) for x in items_for_different_elements.values()]) == set(), error
+
+    # Confirm the item code for total meat.
+    error = f"Item code for '{TOTAL_MEAT_ITEM}' may have changed."
+    assert list(data[data["item"] == TOTAL_MEAT_ITEM]["item_code"].unique()) == [TOTAL_MEAT_ITEM_CODE], error
 
     # Select the subset of data to aggregate.
     data_to_aggregate = (
         data[
-            (data["element"] == slaughtered_animals_element)
-            & (data["unit"] == slaughtered_animals_unit)
-            & (data["item_code"].isin(item_codes_to_aggregate))
+            (data["element"] == SLAUGHTERED_ANIMALS_ELEMENT)
+            & (data["unit"] == SLAUGHTERED_ANIMALS_UNIT)
+            & (data["item_code"].isin(MEAT_TOTAL_ITEM_CODES))
         ]
         .dropna(subset="value")
         .reset_index(drop=True)
@@ -117,46 +227,80 @@ def add_slaughtered_animals_to_meat_total(data: pd.DataFrame) -> pd.DataFrame:
         },
     ).reset_index()
 
-    # Get element description for selected element code.
-    _slaughtered_animals_element_description = data[data["element_code"] == slaughtered_animals_element_code][
+    # Get element description for selected element code (so far it's always been an empty string).
+    _slaughtered_animals_element_description = data[data["element_code"].isin(SLAUGHTERED_ANIMALS_ELEMENT_CODES)][
         "element_description"
     ].unique()
     assert len(_slaughtered_animals_element_description) == 1
     slaughtered_animals_element_description = _slaughtered_animals_element_description[0]
 
     # Get item description for selected item code.
-    _total_meat_item_description = data[data["item_code"] == total_meat_item_code]["item_description"].unique()
+    _total_meat_item_description = data[data["item_code"] == TOTAL_MEAT_ITEM_CODE]["item_description"].unique()
     assert len(_total_meat_item_description) == 1
     total_meat_item_description = _total_meat_item_description[0]
 
     # Get FAO item name for selected item code.
-    _total_meat_fao_item = data[data["item_code"] == total_meat_item_code]["fao_item"].unique()
+    _total_meat_fao_item = data[data["item_code"] == TOTAL_MEAT_ITEM_CODE]["fao_item"].unique()
     assert len(_total_meat_fao_item) == 1
     total_meat_fao_item = _total_meat_fao_item[0]
 
     # Get FAO unit for selected item code.
-    _total_meat_fao_unit = data[data["item_code"] == total_meat_item_code]["fao_unit_short_name"].unique()
+    _total_meat_fao_unit = data[data["item_code"] == TOTAL_MEAT_ITEM_CODE]["fao_unit_short_name"].unique()
     assert len(_total_meat_fao_unit) == 1
     total_meat_fao_unit = _total_meat_fao_unit[0]
 
     # Manually include the rest of columns.
-    animals["element"] = slaughtered_animals_element
+    animals["element"] = SLAUGHTERED_ANIMALS_ELEMENT
     animals["element_description"] = slaughtered_animals_element_description
-    animals["unit"] = slaughtered_animals_unit
-    animals["unit_short_name"] = slaughtered_animals_unit_short_name
-    animals["element_code"] = slaughtered_animals_element_code
-    animals["item_code"] = total_meat_item_code
-    animals["item"] = total_meat_item
+    animals["unit"] = SLAUGHTERED_ANIMALS_UNIT
+    animals["unit_short_name"] = SLAUGHTERED_ANIMALS_UNIT_SHORT_NAME
+    # We arbitrarily assign the first element code (out of the two available) to the resulting variables.
+    animals["element_code"] = SLAUGHTERED_ANIMALS_ELEMENT_CODE
+    animals["item_code"] = TOTAL_MEAT_ITEM_CODE
+    animals["item"] = TOTAL_MEAT_ITEM
     animals["item_description"] = total_meat_item_description
     animals["fao_item"] = total_meat_fao_item
     animals["fao_unit_short_name"] = total_meat_fao_unit
 
+    log.info(f"Adding {len(animals)} rows with the total number of slaughtered animals for meat.")
+
+    # For each year, we are adding up the number of animals slaughtered to compute the total, regardless of how many
+    # of those animals have data.
+    # However, some years do not have data for a particular animal; this is acceptable except if the animal is poultry,
+    # which is the most commonly slaughtered animal. Therefore, if data is missing for poultry, the total will show a
+    # significant (and spurious) decrease (this happens, e.g. in Estonia in 2019).
+    # Therefore, we remove data points for which poultry is not informed.
+
+    # Find country-years for which we have the number of poultry slaughtered.
+    country_years_with_poultry_data = (
+        data[
+            (data["item_code"] == ITEM_CODE_MEAT_POULTRY)
+            & (data["element"] == SLAUGHTERED_ANIMALS_ELEMENT)
+            & (data["unit"] == SLAUGHTERED_ANIMALS_UNIT)
+        ]
+        .dropna(subset="value")[["country", "year"]]
+        .drop_duplicates()
+        .reset_index(drop=True)
+    )
+
+    # Add a column to inform of all those rows for which we don't have poultry data.
+    compared = pd.merge(animals, country_years_with_poultry_data, how="outer", indicator=True)
+
+    assert compared[compared["_merge"] == "right_only"].empty, "Expected 'left_only' or 'both', not 'right_only'."
+
+    log.info(
+        f"Removed {len(compared[compared['_merge'] == 'left_only'])} rows for which we don't have the number of "
+        "poultry slaughtered."
+    )
+
+    animals_corrected = compared[compared["_merge"] == "both"].reset_index(drop=True).drop(columns=["_merge"])
+
     # Check that we are not missing any column.
-    assert set(data.columns) == set(animals.columns)
+    assert set(data.columns) == set(animals_corrected.columns)
 
     # Add animals data to the original dataframe.
     combined_data = (
-        pd.concat([data, animals], ignore_index=True)
+        pd.concat([data, animals_corrected], ignore_index=True)
         .reset_index(drop=True)
         .astype(
             {
@@ -337,6 +481,9 @@ def run(dest_dir: str) -> None:
         amendments=amendments,
     )
 
+    # Fill missing data for slaughtered poultry with slaughtered chicken.
+    data = fill_slaughtered_poultry_with_slaughtered_chicken(data=data)
+
     # Include number of slaughtered animals in total meat (which is missing).
     data = add_slaughtered_animals_to_meat_total(data=data)
 
@@ -373,7 +520,9 @@ def run(dest_dir: str) -> None:
     )
 
     # Update dataset metadata and add description of anomalies (if any) to the dataset description.
-    ds_garden.metadata.description = dataset_metadata["owid_dataset_description"] + anomaly_descriptions
+    ds_garden.metadata.description = (
+        dataset_metadata["owid_dataset_description"] + anomaly_descriptions + SLAUGHTERED_ANIMALS_ADDITIONAL_DESCRIPTION
+    )
     ds_garden.metadata.title = dataset_metadata["owid_dataset_title"]
 
     # Create garden dataset.

@@ -1270,7 +1270,7 @@ def add_per_capita_variables(data: pd.DataFrame, elements_metadata: pd.DataFrame
     NOTE:
     * Variables for which new per-capita rows will be created are those with 'make_per_capita' equal to 1 in the
       custom_elements_and_units.csv file.
-    * The new variables will have the same element codes as the original per-capita variables, with 'pc' prepended to
+    * The new variables will have the same element codes as the original per-capita variables, with 'pc' appended to
     the number.
 
     Parameters
