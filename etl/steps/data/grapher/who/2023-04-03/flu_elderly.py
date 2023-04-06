@@ -1,4 +1,8 @@
-"""Load a garden dataset and create a grapher dataset."""
+"""Load a garden dataset and create a grapher dataset.
+
+- Load from garden
+- Create Dataset and prepare for grapher
+"""
 
 from owid.catalog import Dataset
 
