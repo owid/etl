@@ -1,12 +1,12 @@
 dataset:
   namespace: ggdc
   version: 2022-11-28
-  title: Penn World Table 10.0
+  title: Penn World Table (GGDC, 2021)
   short_name: penn_world_table
-  description: Penn World Table version 10.0 is a database with information on GDP and its composition, employment, productivity and trade, covering 183 countries between 1950 and 2019.
+  description: Penn World Table is a database with information on GDP and its composition, employment, productivity and trade, covering 183 countries between 1950 and 2019.
   sources:
     -
-      name: Feenstra et al. (2015), Penn World Table 10.0
+      name: Feenstra et al. (2015), Penn World Table (2021)
       published_by: Feenstra, R. C., Inklaar, R. and Timmer, M.P. (2015), "The Next Generation of the Penn World Table". American Economic Review, 105(10), 3150-3182
       publication_year: 2021
       date_accessed: 2022-11-28
