@@ -2,9 +2,10 @@ meta:
   namespace: backport
   short_name: dataset_5774_key_indicators_values
   file_extension: feather
-  date_accessed: 2023-04-04 22:10:59.631305
+  date_accessed: 2023-04-06 14:12:53.816145
   name: Key Indicators
-  description: ''
+  description: If you want to use population metrics, please refer to dataset "Population
+    (various sources, YYYY.X)", where YYYY is the year and X version of the dataset.
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5774
   source_published_by: Our World in Data catalog backport

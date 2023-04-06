@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5941_investment__credit_to_agriculture__fao__2023_02_22_values
   file_extension: feather
-  date_accessed: 2023-04-06 11:23:29.786269
+  date_accessed: 2023-04-06 14:11:53.202540
   name: 'Investment: Credit to Agriculture (FAO, 2023-02-22)'
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: d039fefe5436decdf228532a971a627f
+- md5: 515c5f2ef9f7c1b093bc4f815ee240bd
   size: 549050
   path: dataset_5941_investment__credit_to_agriculture__fao__2023_02_22_values.feather
