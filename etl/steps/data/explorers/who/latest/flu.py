@@ -24,7 +24,9 @@ from etl.helpers import PathFinder, create_dataset
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-DAYS_HELD_BACK = 28
+# This means we don't show weekly data until it is more than x days old
+# and we don't show the previous months data until it is past the xth day of the current month
+DAYS_HELD_BACK = 21
 
 
 def run(dest_dir: str) -> None:

@@ -1,7 +1,12 @@
-"""After an update, when running the garden faostat_metadata step, it warns that domain titles or descriptions
-have changed, so we have to update the custom_datasets.csv file.
+"""Update FAO names and descriptions
 
-This script will update all fao fields.
+After an update, FAO may have changed dataset, item, element, or unit names and descriptions.
+This will cause the garden faostat_metadata step to raise warnings, and may cause further issues on charts and the food
+explorer.
+
+This script updates all fao fields in custom_datasets.csv, custom_elements_and_units.csv, and custom_items.csv files.
+NOTE: It's recommended to run this script in interactive mode (using the -i flag) to check if any name change implies a
+significant change in the data.
 """
 
 import argparse

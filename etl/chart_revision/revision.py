@@ -105,6 +105,7 @@ class ChartVariableUpdateRevision:
                     "chartId": self.id,
                     "originalConfig": self.chart_init.config_as_str,
                     "suggestedConfig": cast(Chart, self.chart).config_as_str,
+                    "changesInDataSummary": self.variables_update.bake_summary_of_changes(),
                     "suggested_reason": (
                         self._revision_reason
                         if self._revision_reason
@@ -368,6 +369,7 @@ def submit_revisions_to_grapher(revisions: List[ChartVariableUpdateRevision]):
                     revision["suggestedConfig"],
                     revision["originalConfig"],
                     revision["suggested_reason"],
+                    revision["changesInDataSummary"],
                     "pending",
                     GRAPHER_USER_ID,
                 )
@@ -378,9 +380,9 @@ def submit_revisions_to_grapher(revisions: List[ChartVariableUpdateRevision]):
 
             query = """
                 INSERT INTO suggested_chart_revisions
-                    (chartId, suggestedConfig, originalConfig, suggestedReason, status, createdBy, createdAt, updatedAt)
+                    (chartId, suggestedConfig, originalConfig, suggestedReason, changesInDataSummary, status, createdBy, createdAt, updatedAt)
                 VALUES
-                    (%s, %s, %s, %s, %s, %s, NOW(), NOW())
+                    (%s, %s, %s, %s, %s, %s, %s, NOW(), NOW())
             """
             db.upsert_many(query, tuples)
 
