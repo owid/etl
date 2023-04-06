@@ -32,9 +32,7 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     log.info("flu_elderly.harmonize_countries")
-    df = geo.harmonize_countries(
-        df=df, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
-    )
+    df = geo.harmonize_countries(df=df, countries_file=paths.country_mapping_path)
 
     df = df.sort_values(["country", "year"])
     df = df.set_index(["country", "year"], verify_integrity=True)

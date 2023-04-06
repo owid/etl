@@ -1,4 +1,11 @@
-"""Load a snapshot and create a meadow dataset."""
+"""Load a snapshot and create a meadow dataset.
+
+- Load snapshot
+- Drop the last line as it is a download relic
+- Select out the necessary columns and remove rows which are NA for the 'coverage' dataset as this is the main variable we are interested in
+- Rename in accordance with etl norms e.g. 'country' and 'year'
+- Create Table and Dataset
+"""
 
 import pandas as pd
 from owid.catalog import Table
@@ -25,13 +32,15 @@ def run(dest_dir: str) -> None:
 
     # Load data from snapshot.
     df = pd.read_excel(snap.path)
+    # Drop the last line as it is just NAs
     df = df[:-1]
 
+    # Subsetting to just the columns we want to use and also dropping rows where the coverage is NA as this is the main variable are interested in
     df = df[["NAME", "YEAR", "DOSES", "COVERAGE"]].dropna(subset="COVERAGE")
 
+    # Rename inline with etl norms
     df = df.rename(columns={"NAME": "country", "YEAR": "year"}).set_index(["country", "year"], verify_integrity=True)
 
-    # df = df.set_index(["country", "year"])
     # Process data.
     #
     # Create a new table and ensure all columns are snake-case.

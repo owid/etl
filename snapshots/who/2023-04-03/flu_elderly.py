@@ -1,4 +1,12 @@
-"""Script to create a snapshot of dataset 'Influenza Vaccination Coverage (WHO; UNICEF, 2023)'."""
+"""Script to create a snapshot of dataset 'Influenza Vaccination Coverage (WHO; UNICEF, 2023)'.
+
+To access the data visit this url: https://immunizationdata.who.int/pages/coverage/flu.html?ANTIGEN=FLU_ELDERLY&YEAR=
+
+Select 'All countries' and 'Influenza elderly' and widest range of years possible.
+
+Click 'Apply' and then 'Download' to get the xlsx file locally.
+
+"""
 
 from pathlib import Path
 
