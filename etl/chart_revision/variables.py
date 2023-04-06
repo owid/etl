@@ -227,7 +227,7 @@ class VariablesUpdate:
             raise ValueError("Update summary is not available. Please run `build_variables_update_summary` first!")
         # Iterate over all variable mapping tupples and build summary
         summary = ""
-        print(self._update_summary)
+        # print(self._update_summary)
         for old_var, new_var, summary_var in self._update_summary:
             old_var_name = self.get_metadata(old_var).name
             new_var_name = self.get_metadata(new_var).name
