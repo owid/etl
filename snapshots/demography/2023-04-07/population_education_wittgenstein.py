@@ -1,4 +1,4 @@
-"""Script to create a snapshot of dataset 'Population size by education (Wittgenstein Centre, 2018)'.
+"""Script to create a snapshot of dataset 'Population size by education level (Wittgenstein Centre, 2018)'.
 
 The file used in here is downloaded manually from Wittgenstein's site:
 

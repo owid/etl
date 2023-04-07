@@ -36,7 +36,7 @@ def run(dest_dir: str) -> None:
     df = geo.harmonize_countries(
         df=df, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
     )
-    df = df.set_index(["country", "year", "education"])
+    df = df.set_index(["country", "year", "education"], verify_integrity=True)
 
     # Create a new table with the processed data.
     tb_garden = Table(df, short_name=paths.short_name)

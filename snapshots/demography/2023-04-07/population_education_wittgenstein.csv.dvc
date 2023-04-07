@@ -1,7 +1,7 @@
 meta:
   namespace: demography
   short_name: population_education_wittgenstein
-  name: Population size by education (Wittgenstein Centre, 2018)
+  name: Population size by education level (Wittgenstein Centre, 2018)
   version: 2023-04-07
   publication_year: 1974
   source_name: Wittgenstein Centre (2018)
