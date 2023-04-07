@@ -25,7 +25,12 @@ def run(dest_dir: str) -> None:
 
     # Load data from snapshot.
     df = pd.read_csv(snap.path, skiprows=8)
-    assert set(df.columns) == {'Area', 'Education', 'Population', 'Year'}, "There was a change in the data format! Table headers sare not the ones expected."
+    assert set(df.columns) == {
+        "Area",
+        "Education",
+        "Population",
+        "Year",
+    }, "There was a change in the data format! Table headers sare not the ones expected."
 
     #
     # Process data.
