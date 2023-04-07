@@ -1,4 +1,13 @@
-"""Script to create a snapshot of dataset 'Population size by education (Wittgenstein Centre, 2018)'."""
+"""Script to create a snapshot of dataset 'Population size by education (Wittgenstein Centre, 2018)'.
+
+The file used in here is downloaded manually from Wittgenstein's site:
+
+- Visit http://dataexplorer.wittgensteincentre.org/wcde-v2/
+- In 2. Geography, select "World" as the Region, and then check the box "Include countries of selected regions".
+- In 4. Time Horizon, choose "Medium (SSP2)" as the Scenario, and then check the box "Include all times".
+- Click on "Download data".
+
+"""
 
 from pathlib import Path
 from typing import Union
