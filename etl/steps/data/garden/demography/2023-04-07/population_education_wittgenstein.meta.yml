@@ -1,3 +1,5 @@
+dataset: {}
+
 tables:
   population_education_wittgenstein:
     # (Inherited from meadow, remove if not different.)
@@ -18,3 +20,5 @@ tables:
           • Short Post Secondary: Highest level of education attained: Completed ISCED 4 or 5
           • Bachelor: Highest level of education attained: Completed ISCED 6 and incomplete ISCED 7
           • Master and higher: Highest level of education attained: Completed ISCED 7 or 8
+
+          ISCED: The International Standard Classification of Education is a framework to organize international education programmes by levels and fields.
