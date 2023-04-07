@@ -48,7 +48,3 @@ def run(dest_dir: str) -> None:
     ds_meadow.save()
 
     log.info("population_education_wittgenstein.end")
-
-
-def format_df(df: pd.DataFrame) -> pd.DataFrame:
-    pass
