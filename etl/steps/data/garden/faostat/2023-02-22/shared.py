@@ -495,6 +495,70 @@ def harmonize_countries(data: pd.DataFrame, countries_metadata: pd.DataFrame) ->
     return data
 
 
+def prepare_dataset_description(fao_description: str, owid_description: str) -> str:
+    """Prepare dataset description using the original FAO description and an (optional) OWID description.
+
+    Parameters
+    ----------
+    fao_description : str
+        Original FAOSTAT dataset description.
+    owid_description : str
+        Optional OWID dataset description
+
+    Returns
+    -------
+    description: str
+        Dataset description.
+    """
+
+    description = ""
+    if len(owid_description) > 0:
+        description += owid_description + "\n\n"
+
+    if len(fao_description) > 0:
+        description += f"Original dataset description by FAOSTAT:\n{fao_description}"
+
+    # Remove empty spaces at the beginning and end.
+    description = description.strip()
+
+    return description
+
+
+def prepare_variable_description(item: str, element: str, item_description: str, element_description: str) -> str:
+    """Prepare variable description by combining item and element names and descriptions.
+
+    This will be used in the variable metadata of the wide table, and shown in grapher SOURCES tab.
+
+    Parameters
+    ----------
+    item : str
+        Item name.
+    element : str
+        Element name.
+    item_description : str
+        Item description.
+    element_description : str
+        Element description.
+
+    Returns
+    -------
+    description : str
+        Variable description.
+    """
+    description = f"Item: {item}\n"
+    if len(item_description) > 0:
+        description += f"Description: {item_description}\n"
+
+    description += f"\nMetric: {element}\n"
+    if len(element_description) > 0:
+        description += f"Description: {element_description}"
+
+    # Remove empty spaces at the beginning and end.
+    description = description.strip()
+
+    return description
+
+
 def remove_rows_with_nan_value(data: pd.DataFrame, verbose: bool = False) -> pd.DataFrame:
     """Remove rows for which column "value" is nan.
 
@@ -1630,8 +1694,8 @@ def prepare_wide_table(data: pd.DataFrame) -> catalog.Table:
 
     # Construct a human-readable variable description (for the variable metadata).
     data["variable_description"] = dataframes.apply_on_categoricals(
-        [data.item_description, data.element_description],
-        lambda item_desc, element_desc: f"{item_desc}\n{element_desc}".lstrip().rstrip(),
+        [data.item, data.element, data.item_description, data.element_description],
+        prepare_variable_description,
     )
 
     # Pivot over long dataframe to generate a wide dataframe with country-year as index, and as many columns as
@@ -1806,5 +1870,9 @@ def run(dest_dir: str) -> None:
     # Add description of anomalies (if any) to the dataset description.
     ds_garden.metadata.description = dataset_metadata["owid_dataset_description"] + anomaly_descriptions
     ds_garden.metadata.title = dataset_metadata["owid_dataset_title"]
+
+    # Update the main source's metadata description (which will be shown in charts).
+    ds_garden.metadata.sources[0].description = ds_garden.metadata.description
+
     # Create garden dataset.
     ds_garden.save()

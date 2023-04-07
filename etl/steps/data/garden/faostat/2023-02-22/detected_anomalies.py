@@ -15,6 +15,9 @@ from structlog import get_logger
 
 log = get_logger()
 
+# Sentence to add before describing data anomalies (if there is any).
+ANOMALY_DESCRIPTION_INTRODUCTION = "\n\nProcessing of possible data anomalies by Our World in Data:"
+
 # If environment variable INSPECT_ANOMALIES is set to True, run the step in interactive mode.
 INSPECT_ANOMALIES = bool(os.getenv("INSPECT_ANOMALIES", False))
 
@@ -504,7 +507,7 @@ def handle_anomalies(dataset_short_name: str, data: pd.DataFrame) -> Tuple[pd.Da
     else:
         # If there are anomalies, fix them, and return the fixed data and a text describing all anomalies.
         data_fixed = data.copy()
-        anomaly_descriptions = "\n\nDetected data anomalies:"
+        anomaly_descriptions = ANOMALY_DESCRIPTION_INTRODUCTION
 
         for anomaly_class in detected_anomalies[dataset_short_name]:
             anomaly = anomaly_class()

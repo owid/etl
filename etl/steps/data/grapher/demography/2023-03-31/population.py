@@ -66,7 +66,7 @@ def process(table: Table) -> Table:
     table = table.reset_index()
     for column in ["population", "world_pop_share"]:
         table = add_projection_and_historical_metrics(table, YEAR_THRESHOLD, column)
-    table = table.drop(columns=["source"])
+    # table = table.drop(columns=["source"])
     table = table.set_index(["country", "year"], verify_integrity=True)
     return table
 
