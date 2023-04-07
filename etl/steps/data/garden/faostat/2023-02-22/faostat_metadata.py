@@ -57,6 +57,7 @@ from shared import (
     harmonize_items,
     log,
     optimize_table_dtypes,
+    prepare_dataset_description,
 )
 from tqdm.auto import tqdm
 
@@ -91,39 +92,6 @@ def create_dataset_descriptions_dataframe_for_domain(table: catalog.Table, datas
     )
 
     return dataset_descriptions_df
-
-
-def prepare_dataset_description(dataset_short_name: str, fao_description: str, owid_description: str) -> str:
-    """Prepare dataset description using the original FAO description and an (optional) OWID description.
-
-    Parameters
-    ----------
-    dataset_short_name : str
-        Dataset short name.
-    fao_description : str
-        Original FAOSTAT dataset description.
-    owid_description : str
-        Optional OWID dataset description
-
-    Returns
-    -------
-    description: str
-        Dataset description.
-    """
-    domain = dataset_short_name.split("_")[-1].upper()
-
-    description = ""
-    if len(owid_description) > 0:
-        description += owid_description + "\n\n"
-
-    if len(fao_description) > 0:
-        description += f"Original FAOSTAT description for the {domain} domain:" + "\n\n"
-        description += fao_description
-
-    # Remove empty spaces at the beginning and end.
-    description = description.strip()
-
-    return description
 
 
 def clean_global_dataset_descriptions_dataframe(
@@ -197,7 +165,6 @@ def clean_global_dataset_descriptions_dataframe(
     # (if there is any).
     datasets_df["owid_dataset_description"] = [
         prepare_dataset_description(
-            dataset_short_name=dataset["dataset"],
             fao_description=dataset["fao_dataset_description"],
             owid_description=dataset["owid_dataset_description"],
         )

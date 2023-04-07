@@ -209,8 +209,15 @@ def run(dest_dir: str) -> None:
     assert DATASET_TITLE == dataset_metadata["owid_dataset_title"], error
 
     # Update dataset metadata and add description of anomalies (if any) to the dataset description.
-    ds_garden.metadata.description = dataset_metadata["owid_dataset_description"] + anomaly_descriptions
+    # NOTE: For this specific dataset, we include the title as part of the description, given that the description
+    # (taken from one of the original datasets) does not mention that this dataset combines two methodologies.
+    ds_garden.metadata.description = (
+        DATASET_TITLE + "\n\n" + dataset_metadata["owid_dataset_description"] + anomaly_descriptions
+    )
     ds_garden.metadata.title = dataset_metadata["owid_dataset_title"]
+
+    # Update the main source's metadata description (which will be shown in charts).
+    ds_garden.metadata.sources[0].description = ds_garden.metadata.description
 
     # Create garden dataset.
     ds_garden.save()
