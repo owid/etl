@@ -1,17 +1,4 @@
-# (Inherited from meadow, remove if not different.)
-all_sources:
-  - sources: &sources
-      name: Wittgenstein Centre (2018)
-      published_by: Wittgenstein Centre for Demography and Global Human Capital (WIC) Wittgenstein Centre Data Explorer. Version 2.0 2018
-      url: http://dataexplorer.wittgensteincentre.org/wcde-v2/
-      date_accessed: 2023-04-07
-      publication_year: 2018
-      # description: Source description.
-
-# (Inherited from meadow, remove if not different.)
-dataset:
-  sources:
-    - *sources
+dataset: {}
 
 tables:
   population_education_wittgenstein:
@@ -33,5 +20,5 @@ tables:
           • Short Post Secondary: Highest level of education attained: Completed ISCED 4 or 5
           • Bachelor: Highest level of education attained: Completed ISCED 6 and incomplete ISCED 7
           • Master and higher: Highest level of education attained: Completed ISCED 7 or 8
-        sources:
-          - *sources
+
+          ISCED: The International Standard Classification of Education is a framework to organize international education programmes by levels and fields.
