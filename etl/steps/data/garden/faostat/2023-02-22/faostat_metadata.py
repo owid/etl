@@ -57,6 +57,7 @@ from shared import (
     harmonize_items,
     log,
     optimize_table_dtypes,
+    prepare_dataset_description,
 )
 from tqdm.auto import tqdm
 
@@ -160,10 +161,15 @@ def clean_global_dataset_descriptions_dataframe(
     error = "Custom titles for different datasets are equal. Edit custom_datasets.csv file."
     assert len(set(datasets_df["dataset"])) == len(set(datasets_df["owid_dataset_title"])), error
 
-    # Add custom descriptions.
-    datasets_df["owid_dataset_description"] = datasets_df["owid_dataset_description"].fillna(
-        datasets_df["fao_dataset_description"]
-    )
+    # The final description will be the owid description (if there is any) followed by the original FAO description
+    # (if there is any).
+    datasets_df["owid_dataset_description"] = [
+        prepare_dataset_description(
+            fao_description=dataset["fao_dataset_description"],
+            owid_description=dataset["owid_dataset_description"],
+        )
+        for _, dataset in datasets_df.fillna("").iterrows()
+    ]
 
     # Reorder columns.
     datasets_df = datasets_df[
