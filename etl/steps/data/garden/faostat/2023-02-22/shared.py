@@ -516,7 +516,7 @@ def prepare_dataset_description(fao_description: str, owid_description: str) -> 
         description += owid_description + "\n\n"
 
     if len(fao_description) > 0:
-        description += f"Original dataset description by FAOSTAT:\n\n{fao_description}"
+        description += f"Original dataset description by FAOSTAT:\n{fao_description}"
 
     # Remove empty spaces at the beginning and end.
     description = description.strip()
