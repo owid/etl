@@ -14,6 +14,14 @@ steps:
     - data://open_numbers/open_numbers/latest/gapminder__systema_globalis
   data://grapher/demography/2023-03-31/population:
     - data://garden/demography/2023-03-31/population
+  ## Population by education group (Wittgenstein centre)
+  data://meadow/demography/2023-04-07/population_education_wittgenstein:
+    - snapshot://demography/2023-04-07/population_education_wittgenstein.csv
+  data://garden/demography/2023-04-07/population_education_wittgenstein:
+    - data://meadow/demography/2023-04-07/population_education_wittgenstein
+  data://grapher/demography/2023-04-07/population_education_wittgenstein:
+    - data://garden/demography/2023-04-07/population_education_wittgenstein
+
   # Life expectancy
   ## Meadow
   data://meadow/papers/2022-11-03/zijdeman_et_al_2015:
