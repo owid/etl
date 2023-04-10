@@ -1,6 +1,8 @@
 """Archive unused grapher FAOSTAT datasets and etl steps.
 
 TODO: Most of the logic in this script could (and eventually should) be integrated with VersionTracker.
+  Also, for some reason, catalogPath is often missing in DB table variables, which makes this script partially useless.
+  We should have a catalog path in the DB datasets table.
 
 """
 
@@ -223,6 +225,13 @@ def get_etl_paths_for_db_dataset_ids(dataset_ids: List[int], db_conn: Connection
         cursor.execute(query)
         result = cursor.fetchall()
         catalog_paths = pd.DataFrame(result, columns=["dataset_id", "catalog_path"]).dropna().drop_duplicates()
+
+    ids_with_missing_paths = sorted(set(dataset_ids) - set(catalog_paths["dataset_id"]))
+    if len(ids_with_missing_paths) > 0:
+        log.error(
+            f"Catalog path not found for DB datasets {ids_with_missing_paths}. "
+            "Manually check if these ids are found in the name of any backported dataset in the active DAG."
+        )
 
     return catalog_paths
 
