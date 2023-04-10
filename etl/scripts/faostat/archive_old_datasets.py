@@ -199,14 +199,14 @@ def archive_db_datasets(
 
     # Archive (and make private) selected datasets.
     if execute and len(dataset_ids_to_archive) > 0:
-        query = """
+        query = f"""
         UPDATE datasets
         SET isPrivate=1, isArchived=1
-        WHERE id IN (%s)
+        WHERE id IN ({','.join([str(i) for i in dataset_ids_to_archive])})
         ;
         """
         with db_conn.cursor() as cursor:
-            cursor.execute(query, dataset_ids_to_archive)
+            cursor.execute(query)
         print(f"Archived {len(dataset_ids_to_archive)} datasets.")
 
 
