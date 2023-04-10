@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5941_investment__credit_to_agriculture__fao__2023_02_22_config
   file_extension: json
-  date_accessed: 2023-04-07 15:04:13.420696
+  date_accessed: 2023-04-10 14:06:57.568588
   name: Grapher metadata for dataset_5941_investment__credit_to_agriculture__fao__2023_02_22
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: af13ce944bbc64ccd18eb69fe412acac
-  size: 36114
+- md5: 55feb86a13aead54f8719a85f4810c95
+  size: 34183
   path: dataset_5941_investment__credit_to_agriculture__fao__2023_02_22_config.json
