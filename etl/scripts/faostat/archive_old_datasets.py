@@ -5,9 +5,10 @@ TODO: Most of the logic in this script could (and eventually should) be integrat
 """
 
 import argparse
-from typing import List, Optional
+from typing import List
 
 import pandas as pd
+from MySQLdb.connections import Connection
 from structlog import get_logger
 
 from etl import db
@@ -31,7 +32,7 @@ def add_step_attributes(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def list_active_db_datasets(only_from_etl: bool = False) -> pd.DataFrame:
+def list_active_db_datasets(db_conn: Connection, only_from_etl: bool = False) -> pd.DataFrame:
     query = """
     SELECT d.id, d.name, v.id, v.catalogPath
     FROM datasets d
@@ -45,10 +46,9 @@ def list_active_db_datasets(only_from_etl: bool = False) -> pd.DataFrame:
             AND v.catalogPath IS NOT NULL
         """
     query += ";"
-    with db.get_connection() as db_conn:
-        with db_conn.cursor() as cursor:
-            cursor.execute(query)
-            result = cursor.fetchall()
+    with db_conn.cursor() as cursor:
+        cursor.execute(query)
+        result = cursor.fetchall()
     df = pd.DataFrame(result, columns=["dataset_id", "dataset_title", "variable_id", "catalog_path"])
 
     # Keep only dataset information.
@@ -60,7 +60,9 @@ def list_active_db_datasets(only_from_etl: bool = False) -> pd.DataFrame:
     return df
 
 
-def list_archivable_db_datasets(namespace: str = NAMESPACE, tracker: Optional[VersionTracker] = None) -> pd.DataFrame:
+def list_archivable_db_datasets(
+    db_conn: Connection, tracker: VersionTracker, namespace: str = NAMESPACE
+) -> pd.DataFrame:
     # Get all DB datasets (and its variables, with their catalog path) that:
     # * Are not archived.
     # * Were produced by ETL (and therefore have a catalog path).
@@ -81,10 +83,9 @@ def list_archivable_db_datasets(namespace: str = NAMESPACE, tracker: Optional[Ve
         )
     ;
     """
-    with db.get_connection() as db_conn:
-        with db_conn.cursor() as cursor:
-            cursor.execute(query)
-            result = cursor.fetchall()
+    with db_conn.cursor() as cursor:
+        cursor.execute(query)
+        result = cursor.fetchall()
 
     df = pd.DataFrame(result, columns=["dataset_id", "dataset_title", "variable_id", "catalog_path"])
 
@@ -110,8 +111,6 @@ def list_archivable_db_datasets(namespace: str = NAMESPACE, tracker: Optional[Ve
     )
 
     # Get list of backported datasets ids from the dag.
-    if tracker is None:
-        tracker = VersionTracker()
     backported_dataset_ids = tracker.get_backported_db_dataset_ids()
     not_archivable_datasets = sorted(set(df["dataset_id"]) & set(backported_dataset_ids))
 
@@ -130,7 +129,7 @@ def list_archivable_db_datasets(namespace: str = NAMESPACE, tracker: Optional[Ve
     return datasets_to_archive
 
 
-# def list_archived_db_datasets(namespace: str = NAMESPACE) -> pd.DataFrame:
+# def list_archived_db_datasets(db_conn: Connection, namespace: str = NAMESPACE) -> pd.DataFrame:
 #     # Get all datasets (and its variables, with their catalog path) that:
 #     # * Are archived.
 #     # * Were produced by ETL (and therefore have a catalog path).
@@ -143,10 +142,9 @@ def list_archivable_db_datasets(namespace: str = NAMESPACE, tracker: Optional[Ve
 #     AND v.catalogPath IS NOT NULL
 #     ;
 #     """
-#     with db.get_connection() as db_conn:
-#         with db_conn.cursor() as cursor:
-#             cursor.execute(query)
-#             result = cursor.fetchall()
+#     with db_conn.cursor() as cursor:
+#         cursor.execute(query)
+#         result = cursor.fetchall()
 
 #     df = pd.DataFrame(result, columns=["dataset_id", "dataset_title", "variable_id", "catalog_path"])
 
@@ -163,11 +161,11 @@ def list_archivable_db_datasets(namespace: str = NAMESPACE, tracker: Optional[Ve
 #     return datasets_archived
 
 
-def check_db_dataset_is_archivable(dataset_id: int, tracker: VersionTracker) -> None:
+def check_db_dataset_is_archivable(dataset_id: int, tracker: VersionTracker, db_conn: Connection) -> None:
     # Check that a DB dataset:
     # * Has no variables used in charts.
     # * Is not backported by active ETL steps.
-    db_datasets_active_ids = sorted(set(list_active_db_datasets()["dataset_id"]))
+    db_datasets_active_ids = sorted(set(list_active_db_datasets(db_conn=db_conn)["dataset_id"]))
     error = f"DB dataset with id {dataset_id} cannot be archived because it has variables used in charts."
     assert dataset_id not in db_datasets_active_ids, error
 
@@ -176,10 +174,14 @@ def check_db_dataset_is_archivable(dataset_id: int, tracker: VersionTracker) -> 
 
 
 def archive_db_datasets(
-    datasets_to_archive: pd.DataFrame, tracker: VersionTracker, interactive: bool = True, execute: bool = False
+    datasets_to_archive: pd.DataFrame,
+    db_conn: Connection,
+    tracker: VersionTracker,
+    interactive: bool = True,
+    execute: bool = False,
 ) -> None:
     # Double check that each DB dataset can safely be archived.
-    [check_db_dataset_is_archivable(dataset_id, tracker=tracker) for dataset_id in datasets_to_archive]
+    [check_db_dataset_is_archivable(dataset_id, tracker=tracker, db_conn=db_conn) for dataset_id in datasets_to_archive]
 
     if interactive and len(datasets_to_archive) > 0:
         _list = "\n".join(
@@ -203,13 +205,12 @@ def archive_db_datasets(
         WHERE id IN (%s)
         ;
         """
-        with db.get_connection() as db_conn:
-            with db_conn.cursor() as cursor:
-                cursor.execute(query, dataset_ids_to_archive)
+        with db_conn.cursor() as cursor:
+            cursor.execute(query, dataset_ids_to_archive)
         print(f"Archived {len(dataset_ids_to_archive)} datasets.")
 
 
-def get_etl_paths_for_db_dataset_ids(dataset_ids: List[int]) -> pd.DataFrame:
+def get_etl_paths_for_db_dataset_ids(dataset_ids: List[int], db_conn: Connection) -> pd.DataFrame:
     query = f"""
         SELECT d.id, v.catalogPath
         FROM datasets d
@@ -218,18 +219,17 @@ def get_etl_paths_for_db_dataset_ids(dataset_ids: List[int]) -> pd.DataFrame:
         WHERE d.id IN ({','.join([str(i) for i in dataset_ids])})
         ;
     """
-    with db.get_connection() as db_conn:
-        with db_conn.cursor() as cursor:
-            cursor.execute(query)
-            result = cursor.fetchall()
-            catalog_paths = pd.DataFrame(result, columns=["dataset_id", "catalog_path"]).dropna().drop_duplicates()
+    with db_conn.cursor() as cursor:
+        cursor.execute(query)
+        result = cursor.fetchall()
+        catalog_paths = pd.DataFrame(result, columns=["dataset_id", "catalog_path"]).dropna().drop_duplicates()
 
     return catalog_paths
 
 
-def get_archivable_grapher_steps(tracker: VersionTracker) -> pd.DataFrame:
+def get_archivable_grapher_steps(db_conn: Connection, tracker: VersionTracker) -> pd.DataFrame:
     # Find all active DB datasets.
-    db_datasets_active = list_active_db_datasets()
+    db_datasets_active = list_active_db_datasets(db_conn=db_conn)
 
     # Find all active ETL grapher steps.
     # Only public steps will be considered. The archival of private steps has be done manually.
@@ -247,9 +247,9 @@ def get_archivable_grapher_steps(tracker: VersionTracker) -> pd.DataFrame:
 
     # Get ETL paths of grapher steps that have a DB dataset that is a backported dependency of an active ETL step.
     backported_db_dataset_ids = tracker.get_backported_db_dataset_ids()
-    etl_paths_of_backported_steps = get_etl_paths_for_db_dataset_ids(dataset_ids=backported_db_dataset_ids)[
-        "catalog_path"
-    ].tolist()
+    etl_paths_of_backported_steps = get_etl_paths_for_db_dataset_ids(
+        dataset_ids=backported_db_dataset_ids, db_conn=db_conn
+    )["catalog_path"].tolist()
     etl_paths_of_backported_steps = [
         "/".join(f"data://{step}".split("/")[:-1]) for step in etl_paths_of_backported_steps if step is not None
     ]
@@ -266,19 +266,22 @@ def get_archivable_grapher_steps(tracker: VersionTracker) -> pd.DataFrame:
     return etl_steps_to_archive
 
 
-def main(execute: bool = False, interactive: bool = INTERACTIVE) -> None:
+def main(execute: bool = False) -> None:
+    # Initialize connection to DB.
+    db_conn = db.get_connection()
+
     # Initialise version tracker.
     tracker = VersionTracker()
 
     # List DB datasets that can safely be archived.
-    db_datasets_to_archive = list_archivable_db_datasets(tracker=tracker)
+    db_datasets_to_archive = list_archivable_db_datasets(tracker=tracker, db_conn=db_conn)
 
     if len(db_datasets_to_archive) > 0:
         # Archive unused grapher datasets.
-        archive_db_datasets(db_datasets_to_archive, tracker=tracker, execute=execute)
+        archive_db_datasets(db_datasets_to_archive, db_conn=db_conn, tracker=tracker, execute=execute)
 
     # Find all ETL grapher steps in the dag that do not have a DB dataset.
-    etl_steps_to_archive = get_archivable_grapher_steps(tracker=tracker)
+    etl_steps_to_archive = get_archivable_grapher_steps(tracker=tracker, db_conn=db_conn)
 
     # TODO: Eventually it would be good if this happened automatically.
     #  Then, version tracker would also detect other steps to be safely archived.
