@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5322_covid_19__vaccinations_by_age_group_config
   file_extension: json
-  date_accessed: 2023-04-07 11:31:32.855409
+  date_accessed: 2023-04-10 08:08:38.943720
   name: Grapher metadata for dataset_5322_covid_19__vaccinations_by_age_group
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 1b8cc2d7b636f6a638508e2db7dd5767
+- md5: 58680468fd66cad1d7afc8cba7402096
   size: 121988
   path: dataset_5322_covid_19__vaccinations_by_age_group_config.json

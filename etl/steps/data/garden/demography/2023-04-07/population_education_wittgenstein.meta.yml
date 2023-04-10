@@ -1,0 +1,24 @@
+dataset: {}
+
+tables:
+  population_education_wittgenstein:
+    # (Inherited from meadow, remove if not different.)
+    variables:
+      population:
+        title: Population
+        unit: persons
+        description: |
+          Population projections by levels of educational attainment.
+
+          • Under 15: Population below 15 years old
+          • No Education: Highest level of education attained: No level and Grade 1 of ISCED 1 not completed.
+          • Incomplete Primary: Highest level of education attained: Incomplete ISCED 1
+          • Primary: Highest level of education attained: Completed ISCED 1 and incomplete ISCED 2
+          • Lower Secondary: Highest level of education attained: Completed ISCED 2 and incomplete ISCED 3
+          • Upper Secondary: Highest level of education attained: Completed ISCED 3 and incomplete ISCED 4 5 or 6
+          • Post Secondary: Highest level of education attained: Completed ISCED 4 5 6 7 or 8
+          • Short Post Secondary: Highest level of education attained: Completed ISCED 4 or 5
+          • Bachelor: Highest level of education attained: Completed ISCED 6 and incomplete ISCED 7
+          • Master and higher: Highest level of education attained: Completed ISCED 7 or 8
+
+          ISCED: The International Standard Classification of Education is a framework to organize international education programmes by levels and fields.
