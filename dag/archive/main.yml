@@ -18,7 +18,7 @@ steps:
 include:
   - dag/main.yml
   # - dag/archive/open_numbers.yml
-  # - dag/archive/faostat.yml
+  - dag/archive/faostat.yml
   - dag/archive/energy.yml
   # - dag/archive/walkthrough.yml
   # - dag/archive/examples.yml
