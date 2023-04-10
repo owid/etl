@@ -289,6 +289,11 @@ def main(execute: bool = False) -> None:
         # Archive unused grapher datasets.
         archive_db_datasets(db_datasets_to_archive, db_conn=db_conn, tracker=tracker, execute=execute)
 
+    log.warning(
+        "NOTE: Since catalogPath is not always informed in DB, the following output is not reliable and "
+        "should be manually checked!"
+    )
+
     # Find all ETL grapher steps in the dag that do not have a DB dataset.
     etl_steps_to_archive = get_archivable_grapher_steps(tracker=tracker, db_conn=db_conn)
 
