@@ -39,20 +39,8 @@ steps:
   data://grapher/andrew/2019-12-03/co2_mitigation_curves_2celsius:
     - data://garden/andrew/2019-12-03/co2_mitigation_curves
   #
-  # GCP - Global Carbon Budget - additional data (2021).
-  #
-  # This dataset is no longer used in grapher (since version 2022-11-11 contains an updated version of their variables).
-  data://meadow/gcp/2022-09-29/global_carbon_budget_additional:
-    - walden://gcp/2022-09-29/global_carbon_budget_global
-  data://garden/gcp/2022-09-29/global_carbon_budget_additional:
-    - data://meadow/gcp/2022-09-29/global_carbon_budget_additional
-    - data://garden/owid/latest/key_indicators
-  data://grapher/gcp/2022-09-29/global_carbon_budget_additional:
-    - data://garden/gcp/2022-09-29/global_carbon_budget_additional
-  #
   # GCP - Global Carbon Budget (2022-11-11).
   #
-  # Until the release date, ensure the data is private.
   data://meadow/gcp/2022-11-11/global_carbon_budget_fossil_co2_emissions:
     - walden://gcp/2022-11-11/global_carbon_budget_fossil_co2_emissions
   data://meadow/gcp/2022-11-11/global_carbon_budget_global_emissions:
@@ -75,29 +63,6 @@ steps:
     - data://garden/energy/2022-07-29/primary_energy_consumption
   data://grapher/gcp/2022-11-11/global_carbon_budget:
     - data://garden/gcp/2022-11-11/global_carbon_budget
-  #
-  # RFF - World Carbon Pricing (2022-09-14).
-  #
-  data://meadow/rff/2022-09-14/world_carbon_pricing:
-    - walden://rff/2022-09-14/world_carbon_pricing
-    - walden://rff/2022-09-14/ipcc_codes
-  data://meadow/rff/2022-09-14/world_carbon_pricing__subnational:
-    - walden://rff/2022-09-14/world_carbon_pricing__subnational
-    - walden://rff/2022-09-14/ipcc_codes
-  data://meadow/rff/2022-09-14/emissions_weighted_carbon_price__economy:
-    - walden://rff/2022-09-14/emissions_weighted_carbon_price__economy
-  data://meadow/rff/2022-09-14/emissions_weighted_carbon_price__coverage:
-    - walden://rff/2022-09-14/emissions_weighted_carbon_price__coverage
-  data://garden/rff/2022-09-14/world_carbon_pricing:
-    - data://meadow/rff/2022-09-14/world_carbon_pricing
-    - data://meadow/rff/2022-09-14/world_carbon_pricing__subnational
-  data://garden/rff/2022-09-14/emissions_weighted_carbon_price:
-    - data://meadow/rff/2022-09-14/emissions_weighted_carbon_price__economy
-    - data://meadow/rff/2022-09-14/emissions_weighted_carbon_price__coverage
-  data://grapher/rff/2022-09-14/world_carbon_pricing_any_sector:
-    - data://garden/rff/2022-09-14/world_carbon_pricing
-  data://grapher/rff/2022-09-14/emissions_weighted_carbon_price:
-    - data://garden/rff/2022-09-14/emissions_weighted_carbon_price
   #
   # RFF - World Carbon Pricing (2022-10-11).
   #
