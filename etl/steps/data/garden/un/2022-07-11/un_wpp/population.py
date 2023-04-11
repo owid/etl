@@ -1,5 +1,5 @@
 """Population table."""
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -157,6 +157,10 @@ def _add_metric_population(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame
     df_p_0_24 = _add_age_group(df_p, 0, 24)
     # 15 - 64
     df_p_15_64 = _add_age_group(df_p, 15, 64)
+    # 15+
+    df_p_15_plus = _add_age_group(df_p, 15, 200, "15+")
+    # 18+
+    df_p_18_plus = _add_age_group(df_p, 18, 200, "18+")
     # all
     df_p_all = (
         df_p.groupby(
@@ -178,6 +182,8 @@ def _add_metric_population(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame
             df_p_1,
             df_p_1_4,
             df_p_15_64,
+            df_p_15_plus,
+            df_p_18_plus,
             df_p_all,
         ],
         ignore_index=True,
@@ -193,18 +199,18 @@ def _add_metric_population(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame
     return df_p_granular, df_p_broad
 
 
-def _add_age_group(df: pd.DataFrame, age_min: int, age_max: int) -> pd.DataFrame:
+def _add_age_group(df: pd.DataFrame, age_min: int, age_max: int, age_group: Optional[str] = None) -> pd.DataFrame:
     ages_accepted = [str(i) for i in range(age_min, age_max + 1)]
     dfx: pd.DataFrame = df.loc[df.age.isin(ages_accepted)].drop(columns="age").copy()
-    dfx = (
-        dfx.groupby(
-            ["location", "year", "metric", "sex", "variant"],
-            as_index=False,
-            observed=True,
-        )
-        .sum()
-        .assign(age=f"{age_min}-{age_max}")
-    )
+    dfx = dfx.groupby(
+        ["location", "year", "metric", "sex", "variant"],
+        as_index=False,
+        observed=True,
+    ).sum()
+    if age_group:
+        dfx = dfx.assign(age=age_group)
+    else:
+        dfx = dfx.assign(age=f"{age_min}-{age_max}")
     dfx = optimize_dtypes(dfx, simple=True)
     return dfx
 
