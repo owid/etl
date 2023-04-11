@@ -1,8 +1,6 @@
 """Archive unused grapher FAOSTAT datasets and etl steps.
 
 TODO: Most of the logic in this script could (and eventually should) be integrated with VersionTracker.
-  Also, for some reason, catalogPath is often missing in DB table variables, which makes this script partially useless.
-  We should have a catalog path in the DB datasets table.
 
 """
 
@@ -23,41 +21,24 @@ log = get_logger()
 INTERACTIVE = True
 
 
-def add_step_attributes(df: pd.DataFrame) -> pd.DataFrame:
-    df = df.copy()
-
-    # Extract step names and versions from the catalog path.
-    df["namespace"] = df["catalog_path"].str.split("/").str[1]
-    df["version"] = df["catalog_path"].str.split("/").str[2]
-    df["name"] = df["catalog_path"].str.split("/").str[3]
-
-    return df
-
-
-def list_active_db_datasets(db_conn: Connection, only_from_etl: bool = False) -> pd.DataFrame:
+def list_active_db_datasets(db_conn: Connection) -> pd.DataFrame:
     query = """
-    SELECT d.id, d.name, v.id, v.catalogPath
+    SELECT d.id, d.name, d.namespace, d.version, d.shortName
     FROM datasets d
     JOIN variables v
     ON v.datasetId = d.id
     JOIN chart_dimensions cd
     ON v.id = cd.variableId
-    WHERE d.isArchived IS FALSE"""
-    if only_from_etl:
-        query += """
-            AND v.catalogPath IS NOT NULL
-        """
-    query += ";"
+    WHERE d.isArchived IS FALSE
+    ;
+    """
     with db_conn.cursor() as cursor:
         cursor.execute(query)
         result = cursor.fetchall()
-    df = pd.DataFrame(result, columns=["dataset_id", "dataset_title", "variable_id", "catalog_path"])
+    df = pd.DataFrame(result, columns=["dataset_id", "dataset_title", "namespace", "version", "short_name"])
 
     # Keep only dataset information.
-    df = df.drop_duplicates(subset=["dataset_id"]).drop(columns=["variable_id"]).reset_index(drop=True)
-
-    # Add step attributes.
-    df = add_step_attributes(df=df)
+    df = df.drop_duplicates(subset=["dataset_id"]).reset_index(drop=True)
 
     return df
 
@@ -65,18 +46,18 @@ def list_active_db_datasets(db_conn: Connection, only_from_etl: bool = False) ->
 def list_archivable_db_datasets(
     db_conn: Connection, tracker: VersionTracker, namespace: str = NAMESPACE
 ) -> pd.DataFrame:
-    # Get all DB datasets (and its variables, with their catalog path) that:
+    # Get all DB datasets that:
     # * Are not archived.
-    # * Were produced by ETL (and therefore have a catalog path).
+    # * Were produced by ETL (and therefore have a version).
     # * Do not have any variables in charts (and hence none of their variable ids appear in chart_dimensions).
     # * Belong to a specific namespace.
     query = """
-    SELECT d.id, d.name, v.id, v.catalogPath
+    SELECT d.id, d.name, d.namespace, d.version, d.shortName
     FROM datasets d
     JOIN variables v
     ON v.datasetId = d.id
     WHERE d.isArchived IS FALSE
-    AND v.catalogPath IS NOT NULL
+    AND d.version IS NOT NULL
     AND d.id NOT IN (
         SELECT DISTINCT(v.datasetId)
         FROM chart_dimensions cd
@@ -89,28 +70,18 @@ def list_archivable_db_datasets(
         cursor.execute(query)
         result = cursor.fetchall()
 
-    df = pd.DataFrame(result, columns=["dataset_id", "dataset_title", "variable_id", "catalog_path"])
+    df = pd.DataFrame(result, columns=["dataset_id", "dataset_title", "namespace", "version", "short_name"])
 
     # Select only datasets for the relevant namespace, and keep only unique dataset ids and catalog paths.
-    df = (
-        df[df["catalog_path"].str.startswith(f"grapher/{namespace}/")]
-        .drop_duplicates(subset=["dataset_id"])
-        .drop(columns=["variable_id"])
-        .reset_index(drop=True)
-    )
-
-    # Add step attributes.
-    df = add_step_attributes(df=df)
+    df = df[df["namespace"] == namespace].drop_duplicates(subset=["dataset_id"]).reset_index(drop=True)
 
     # Find the latest ETL version of each step.
     df["latest_version"] = [
-        find_latest_version_for_step(channel="grapher", step_name=step_name) for step_name in df["name"]
+        find_latest_version_for_step(channel="grapher", step_name=step_name) for step_name in df["short_name"]
     ]
 
     # Select all grapher datasets whose version is not the latest.
-    df = (
-        df[df["version"] < df["latest_version"]].drop(columns=["catalog_path", "latest_version"]).reset_index(drop=True)
-    )
+    df = df[df["version"] < df["latest_version"]].reset_index(drop=True)
 
     # Get list of backported datasets ids from the dag.
     backported_dataset_ids = tracker.get_backported_db_dataset_ids()
@@ -129,38 +100,6 @@ def list_archivable_db_datasets(
     datasets_to_archive = df.sort_values("dataset_id").reset_index(drop=True)
 
     return datasets_to_archive
-
-
-# def list_archived_db_datasets(db_conn: Connection, namespace: str = NAMESPACE) -> pd.DataFrame:
-#     # Get all datasets (and its variables, with their catalog path) that:
-#     # * Are archived.
-#     # * Were produced by ETL (and therefore have a catalog path).
-#     query = """
-#     SELECT d.id, d.name, v.id, v.catalogPath
-#     FROM datasets d
-#     JOIN variables v
-#     ON v.datasetId = d.id
-#     WHERE d.isArchived IS TRUE
-#     AND v.catalogPath IS NOT NULL
-#     ;
-#     """
-#     with db_conn.cursor() as cursor:
-#         cursor.execute(query)
-#         result = cursor.fetchall()
-
-#     df = pd.DataFrame(result, columns=["dataset_id", "dataset_title", "variable_id", "catalog_path"])
-
-#     # Select only datasets for the relevant namespace, and keep only unique dataset ids and catalog paths.
-#     df = df[df["catalog_path"].str.startswith(f"grapher/{namespace}/")].drop_duplicates(subset=["dataset_id"]).\
-#         drop(columns=["variable_id"]).reset_index(drop=True)
-
-#     # Add step attributes.
-#     df = add_step_attributes(df=df)
-
-#     # Sort conveniently.
-#     datasets_archived = df.sort_values("dataset_id").reset_index(drop=True)
-
-#     return datasets_archived
 
 
 def check_db_dataset_is_archivable(dataset_id: int, tracker: VersionTracker, db_conn: Connection) -> None:
@@ -188,7 +127,7 @@ def archive_db_datasets(
     if interactive and len(datasets_to_archive) > 0:
         _list = "\n".join(
             [
-                f"[{row['version']}/{row['name']}] {row['dataset_id']} - {row['dataset_title']}"
+                f"[{row['version']}/{row['short_name']}] {row['dataset_id']} - {row['dataset_title']}"
                 for _, row in datasets_to_archive.iterrows()
             ]
         )
@@ -214,26 +153,27 @@ def archive_db_datasets(
 
 def get_etl_paths_for_db_dataset_ids(dataset_ids: List[int], db_conn: Connection) -> pd.DataFrame:
     query = f"""
-        SELECT d.id, v.catalogPath
+        SELECT d.id, d.namespace, d.version, d.shortName
         FROM datasets d
-        JOIN variables v
-        ON d.id = v.datasetID
         WHERE d.id IN ({','.join([str(i) for i in dataset_ids])})
         ;
     """
     with db_conn.cursor() as cursor:
         cursor.execute(query)
         result = cursor.fetchall()
-        catalog_paths = pd.DataFrame(result, columns=["dataset_id", "catalog_path"]).dropna().drop_duplicates()
+        df = pd.DataFrame(result, columns=["dataset_id", "namespace", "version", "short_name"])
 
-    ids_with_missing_paths = sorted(set(dataset_ids) - set(catalog_paths["dataset_id"]))
+    ids_with_missing_paths = sorted(set(dataset_ids) - set(df["dataset_id"]))
     if len(ids_with_missing_paths) > 0:
         log.error(
             f"Catalog path not found for DB datasets {ids_with_missing_paths}. "
             "Manually check if these ids are found in the name of any backported dataset in the active DAG."
         )
 
-    return catalog_paths
+    # Generate catalog paths, assuming all datasets come from the ETL grapher channel.
+    df["catalog_path"] = "grapher/" + df["namespace"] + "/" + df["version"] + "/" + df["short_name"]
+
+    return df
 
 
 def get_archivable_grapher_steps(db_conn: Connection, tracker: VersionTracker) -> pd.DataFrame:
@@ -245,32 +185,37 @@ def get_archivable_grapher_steps(db_conn: Connection, tracker: VersionTracker) -
     steps_df = tracker.steps_df.copy()
     grapher_steps = steps_df[
         (steps_df["status"] == "active") & (steps_df["channel"] == "grapher") & (steps_df["kind"] == "public")
-    ]
+    ].rename(columns={"name": "short_name"})
 
     # Warn about grapher steps used as dependencies
     # (this should not happen often, but may happen for fasttracked datasets).
-    grapher_steps_used_as_dependencies = sorted(set(grapher_steps["step"]) & set(tracker.all_active_dependencies))
+    grapher_steps_used_as_dependencies = grapher_steps[
+        grapher_steps["step"].isin(tracker.all_active_dependencies)
+    ].reset_index(drop=True)
     if len(grapher_steps_used_as_dependencies) > 0:
-        _list = "\n".join(grapher_steps_used_as_dependencies)
+        _list = "\n".join(grapher_steps_used_as_dependencies["step"].tolist())
         log.warning(f"The following grapher steps are used as dependencies of other steps:\n{_list}")
+    grapher_steps_used_as_dependencies = grapher_steps_used_as_dependencies[["namespace", "version", "short_name"]]
 
     # Get ETL paths of grapher steps that have a DB dataset that is a backported dependency of an active ETL step.
     backported_db_dataset_ids = tracker.get_backported_db_dataset_ids()
-    etl_paths_of_backported_steps = get_etl_paths_for_db_dataset_ids(
-        dataset_ids=backported_db_dataset_ids, db_conn=db_conn
-    )["catalog_path"].tolist()
-    etl_paths_of_backported_steps = [
-        "/".join(f"data://{step}".split("/")[:-1]) for step in etl_paths_of_backported_steps if step is not None
-    ]
+    backported_steps = get_etl_paths_for_db_dataset_ids(dataset_ids=backported_db_dataset_ids, db_conn=db_conn).dropna(
+        subset="version"
+    )
+
+    # Combine active DB steps, grapher steps used as dependencies of active steps, and backported steps.
+    # to gather all not archivable steps.
+    not_archivable_steps = (
+        pd.concat([db_datasets_active, backported_steps, grapher_steps_used_as_dependencies], ignore_index=True)
+        .drop_duplicates(subset=["namespace", "version", "short_name"])
+        .reset_index(drop=True)
+    )
 
     # Of all ETL grapher steps, find those that do not have any active or backported DB dataset.
     etl_steps_to_archive = pd.merge(
-        grapher_steps, db_datasets_active, on=["namespace", "version", "name"], how="outer", indicator=True
+        grapher_steps, not_archivable_steps, on=["namespace", "version", "short_name"], how="outer", indicator=True
     )
-    etl_steps_to_archive = etl_steps_to_archive[
-        (etl_steps_to_archive["_merge"] == "left_only")
-        & ~(etl_steps_to_archive["step"].isin(etl_paths_of_backported_steps))
-    ].reset_index(drop=True)
+    etl_steps_to_archive = etl_steps_to_archive[etl_steps_to_archive["_merge"] == "left_only"].reset_index(drop=True)
 
     return etl_steps_to_archive
 
@@ -288,11 +233,6 @@ def main(execute: bool = False) -> None:
     if len(db_datasets_to_archive) > 0:
         # Archive unused grapher datasets.
         archive_db_datasets(db_datasets_to_archive, db_conn=db_conn, tracker=tracker, execute=execute)
-
-    log.warning(
-        "NOTE: Since catalogPath is not always informed in DB, the following output is not reliable and "
-        "should be manually checked!"
-    )
 
     # Find all ETL grapher steps in the dag that do not have a DB dataset.
     etl_steps_to_archive = get_archivable_grapher_steps(tracker=tracker, db_conn=db_conn)
