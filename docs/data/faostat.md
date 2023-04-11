@@ -267,7 +267,6 @@ Run internal sanity checks on the generated files.
 ```bash
 python etl/scripts/faostat/archive_old_datasets.py -e
 ```
-WARNING: Since `catalogPath` is often empty, the output of this script is unreliable. Use with caution.
 NOTE: This step may needs to be run several times, since archiving of steps currently needs to be done manually.
 
 ## Workflow to make changes to a dataset
