@@ -2,10 +2,9 @@ meta:
   namespace: backport
   short_name: dataset_5774_key_indicators_config
   file_extension: json
-  date_accessed: 2023-04-06 14:12:34.053774
+  date_accessed: 2023-04-11 20:54:10.651210
   name: Grapher metadata for dataset_5774_key_indicators
-  description: If you want to use population metrics, please refer to dataset "Population
-    (various sources, YYYY.X)", where YYYY is the year and X version of the dataset.
+  description: ''
   source_name: Our World in Data catalog backport
   url: https://owid.cloud/admin/datasets/5774
   source_published_by: Our World in Data catalog backport
@@ -14,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 38247a3e6aee844ac044baa39cd92d55
-  size: 15009
+- md5: 524c8e215b9af4f1c6391ca5b069d314
+  size: 14849
   path: dataset_5774_key_indicators_config.json
