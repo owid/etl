@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5237_uk_covid_data_values
   file_extension: feather
-  date_accessed: 2023-04-10 18:08:26.336354
+  date_accessed: 2023-04-11 18:01:46.710806
   name: uk_covid_data
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: e7148fe53277ca4d555209e999f700ab
-  size: 8871682
+- md5: c903d09cc4c25f2e702edfd8bb28644a
+  size: 8864642
   path: dataset_5237_uk_covid_data_values.feather
