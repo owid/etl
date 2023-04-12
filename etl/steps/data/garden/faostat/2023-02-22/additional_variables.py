@@ -166,8 +166,37 @@ def generate_area_used_for_production_per_crop_type(df_qcl: pd.DataFrame) -> Tab
     return tb_area_by_crop_type
 
 
-def run(dest_dir: str) -> None:
+def generate_percentage_of_sustainable_and_overexploited_fish(df_sdgb: pd.DataFrame) -> Table:
+    # "14.4.1 Proportion of fish stocks within biologically sustainable levels (not overexploited) (%)"
+    ITEM_CODE_SUSTAINABLE_FISH = "00024029"
 
+    # Select the necessary item.
+    df_sdgb = df_sdgb[df_sdgb["item_code"] == ITEM_CODE_SUSTAINABLE_FISH].reset_index(drop=True)
+    error = "Unit for fish data has changed."
+    assert list(df_sdgb["unit"].unique()) == ["percent"], error
+    error = "Element for fish data has changed."
+    assert list(df_sdgb["element"].unique()) == ["Value"], error
+
+    # Select necessary columns (item and element descriptions are empty in the current version).
+    df_sdgb = df_sdgb[["country", "year", "value"]].rename(columns={"value": "sustainable_fish"})
+
+    error = "Percentage of sustainable fish larger than 100%."
+    assert (df_sdgb["sustainable_fish"] <= 100).all(), error
+
+    # Add column of percentage of overexploited fish.
+    df_sdgb["overexploited_fish"] = 100 - df_sdgb["sustainable_fish"]
+
+    # Create a table with the necessary columns, set an appropriate index, and sort conveniently.
+    tb_fish = (
+        Table(df_sdgb, short_name="share_of_sustainable_and_overexploited_fish")
+        .set_index(["country", "year"], verify_integrity=True)
+        .sort_index()
+    )
+
+    return tb_fish
+
+
+def run(dest_dir: str) -> None:
     #
     # Load inputs.
     #
@@ -186,6 +215,11 @@ def run(dest_dir: str) -> None:
     tb_qcl = ds_qcl[f"{NAMESPACE}_qcl"]
     df_qcl = pd.DataFrame(tb_qcl).reset_index()
 
+    # Load dataset about SDG indicators, load its main (long-format) table, and create a convenient dataframe.
+    ds_sdgb: Dataset = paths.load_dependency(f"{NAMESPACE}_sdgb")
+    tb_sdgb = ds_sdgb[f"{NAMESPACE}_sdgb"]
+    df_sdgb = pd.DataFrame(tb_sdgb).reset_index()
+
     #
     # Process data.
     #
@@ -194,7 +228,9 @@ def run(dest_dir: str) -> None:
 
     # Create data for area used for production per crop type.
     tb_area_by_crop_type = generate_area_used_for_production_per_crop_type(df_qcl=df_qcl)
-    # Issues: Oilcrops start in 1991 instead of 1961 like in the old version.
+
+    # Create data for the share of sustainable and overexploited fish.
+    tb_sustainable_and_overexploited_fish = generate_percentage_of_sustainable_and_overexploited_fish(df_sdgb=df_sdgb)
 
     #
     # Save outputs.
@@ -202,5 +238,7 @@ def run(dest_dir: str) -> None:
     # Create a new garden dataset.
     # Take by default the metadata of one of the datasets, simply to get the FAOSTAT sources (the rest of the metadata
     # will be defined in the metadata yaml file).
-    ds_garden = create_dataset(dest_dir, tables=[tb_arable_land_per_crop_output, tb_area_by_crop_type])
+    ds_garden = create_dataset(
+        dest_dir, tables=[tb_arable_land_per_crop_output, tb_area_by_crop_type, tb_sustainable_and_overexploited_fish]
+    )
     ds_garden.save()
