@@ -57,3 +57,33 @@ tables:
         title : "Percentage of overexploited fish stocks"
         unit: "%"
         short_unit: "%"
+  land_spared_by_increased_crop_yields:
+    variables:
+      area:
+        title: "Actual cropland area today"
+        unit: "hectares"
+        short_unit: "ha"
+        description: |
+          Total cropland area on a given year, calculated by dividing the total production by the crop yield.
+      area_with_yield_of_1961:
+        title: "Cropland area needed if yields stagnated in 1961"
+        unit: "hectares"
+        short_unit: "ha"
+        description: |
+          Total cropland area that would be necessary if crop yields stagnated in 1961.
+          
+          This area is calculated by dividing the total production on a given year by the crop yield of 1961.
+      spared_land:
+        title: "Land spared due to crop yield increases"
+        unit: "hectares"
+        short_unit: "ha"
+        description: |
+          Land spared since 1961 due to the increase of crop yields.
+
+          This area is calculated as the cropland area that would be necessary if crop yields stagnated in 1961, minus the true cropland area on a given year.
+      spared_land__pct:
+        title: "Percentage reduction in area needed due to crop yield increases"
+        unit: "hectares"
+        short_unit: "ha"
+        description: |
+          Land spared since 1961 due to the increase of crop yields, as a percentage of the total land that would be necessary if crop yields had not increased since then.

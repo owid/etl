@@ -100,7 +100,6 @@ def generate_area_used_for_production_per_crop_type(df_qcl: pd.DataFrame) -> Tab
     ]
 
     # Item codes for croup groups from faostat_qcl.
-    # Additionally, coarse grains will be added to these groups.
     ITEM_CODES_OF_CROP_GROUPS = [
         "00001717",  # Cereals
         "00001804",  # Citrus Fruit
@@ -196,6 +195,91 @@ def generate_percentage_of_sustainable_and_overexploited_fish(df_sdgb: pd.DataFr
     return tb_fish
 
 
+def generate_spared_land_from_increased_yields(df_qcl: pd.DataFrame) -> Table:
+    # Reference year (to see how much land we spare from increased yields).
+    REFERENCE_YEAR = 1961
+    # Element code for "Yield" of faostat_qcl dataset.
+    ELEMENT_CODE_FOR_YIELD = "005419"
+    # Element code for "Production" of faostat_qcl dataset.
+    ELEMENT_CODE_FOR_PRODUCTION = "005510"
+
+    # Item codes for crop groups from faostat_qcl.
+    ITEM_CODES_OF_CROP_GROUPS = [
+        "00001717",  # Cereals
+        "00001738",  # Fruit
+        "00001726",  # Pulses
+        "00001720",  # Roots and tubers
+        "00001735",  # Vegetables
+        "00001723",  # Sugar Crops
+        "00001729",  # Treenuts
+        # Data for fibre crops has changed significantly since last version, and is also significantly smaller than
+        # other crop groups, so we omit it.
+        # "00000821",  # Fibre crops.
+    ]
+
+    # Select necessary items and elements.
+    spared_land = df_qcl[
+        (df_qcl["item_code"].isin(ITEM_CODES_OF_CROP_GROUPS))
+        & (df_qcl["element_code"].isin([ELEMENT_CODE_FOR_PRODUCTION, ELEMENT_CODE_FOR_YIELD]))
+    ].reset_index(drop=True)
+
+    # Sanity check.
+    error = "Units for production and yield have changed."
+    assert set(spared_land["unit"]) == set(["tonnes per hectare", "tonnes"]), error
+
+    # Transpose dataframe.
+    spared_land = spared_land.pivot(
+        index=["country", "year", "item"], columns=["element"], values="value"
+    ).reset_index()
+
+    # Fix column name after pivotting.
+    spared_land.columns = ["country", "year", "item", "Yield", "Production"]
+
+    # Add columns for production and yield for a given reference year.
+    reference_values = spared_land[spared_land["year"] == REFERENCE_YEAR].drop(columns=["year"])
+    spared_land = pd.merge(
+        spared_land, reference_values, on=["country", "item"], how="left", suffixes=("", f" in {REFERENCE_YEAR}")
+    )
+
+    # Drop countries for which we did not have data in the reference year.
+    spared_land = spared_land.dropna().reset_index(drop=True)
+
+    # Calculate area harvested that would be required given current production, but with the yield of the reference year.
+    spared_land[f"Area with yield of {REFERENCE_YEAR}"] = (
+        spared_land["Production"] / spared_land[f"Yield in {REFERENCE_YEAR}"]
+    )
+    # Calculate the real area harvested (given the current production and yield).
+    spared_land["Area"] = spared_land["Production"] / spared_land["Yield"]
+
+    # Keep only required columns
+    spared_land = spared_land[["country", "year", "item", "Area", f"Area with yield of {REFERENCE_YEAR}"]].reset_index(
+        drop=True
+    )
+
+    # Add total area for all crops.
+    all_crops = (
+        spared_land.groupby(["country", "year"], as_index=False, observed=True)
+        .agg({"Area": sum, f"Area with yield of {REFERENCE_YEAR}": sum})
+        .assign(**{"item": "All crops"})
+    )
+    spared_land = pd.concat([spared_land, all_crops], ignore_index=True)
+
+    # Calculate the spared land in absolute value, and as a percentage of the land we would have used with no yield increase.
+    spared_land["Spared land"] = spared_land[f"Area with yield of {REFERENCE_YEAR}"] - spared_land["Area"]
+    spared_land["Spared land (%)"] = (
+        100 * spared_land["Spared land"] / spared_land[f"Area with yield of {REFERENCE_YEAR}"]
+    )
+
+    # Create a table with the necessary columns, set an appropriate index, and sort conveniently.
+    tb_spared_land = Table(
+        spared_land.set_index(["country", "year", "item"], verify_integrity=True).sort_index(),
+        short_name="land_spared_by_increased_crop_yields",
+        underscore=True,
+    )
+
+    return tb_spared_land
+
+
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
@@ -223,14 +307,17 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    # Create data for arable land per crop output.
+    # Create table for arable land per crop output.
     tb_arable_land_per_crop_output = generate_arable_land_per_crop_output(df_rl=df_rl, df_qi=df_qi)
 
-    # Create data for area used for production per crop type.
+    # Create table for area used for production per crop type.
     tb_area_by_crop_type = generate_area_used_for_production_per_crop_type(df_qcl=df_qcl)
 
-    # Create data for the share of sustainable and overexploited fish.
+    # Create table for the share of sustainable and overexploited fish.
     tb_sustainable_and_overexploited_fish = generate_percentage_of_sustainable_and_overexploited_fish(df_sdgb=df_sdgb)
+
+    # Create table for spared land due to increased yields.
+    tb_spared_land_from_increased_yields = generate_spared_land_from_increased_yields(df_qcl=df_qcl)
 
     #
     # Save outputs.
@@ -239,6 +326,12 @@ def run(dest_dir: str) -> None:
     # Take by default the metadata of one of the datasets, simply to get the FAOSTAT sources (the rest of the metadata
     # will be defined in the metadata yaml file).
     ds_garden = create_dataset(
-        dest_dir, tables=[tb_arable_land_per_crop_output, tb_area_by_crop_type, tb_sustainable_and_overexploited_fish]
+        dest_dir,
+        tables=[
+            tb_arable_land_per_crop_output,
+            tb_area_by_crop_type,
+            tb_sustainable_and_overexploited_fish,
+            tb_spared_land_from_increased_yields,
+        ],
     )
     ds_garden.save()
