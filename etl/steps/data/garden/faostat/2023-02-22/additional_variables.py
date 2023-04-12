@@ -140,6 +140,7 @@ def generate_area_used_for_production_per_crop_type(df_qcl: pd.DataFrame) -> Tab
         drop=True
     )
 
+    # Prepare variable description.
     descriptions = "Definitions by FAOSTAT:"
     for item in sorted(set(area_by_crop_type["item"])):
         descriptions += f"\n\nItem: {item}"
@@ -160,7 +161,7 @@ def generate_area_used_for_production_per_crop_type(df_qcl: pd.DataFrame) -> Tab
     )
 
     # Add a table description.
-    tb_area_by_crop_type.metadata.description = descriptions
+    tb_area_by_crop_type["area_used_for_production"].metadata.description = descriptions
 
     return tb_area_by_crop_type
 

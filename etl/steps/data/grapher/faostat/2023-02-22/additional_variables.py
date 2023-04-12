@@ -15,8 +15,10 @@ def run(dest_dir: str) -> None:
     # Load garden dataset.
     ds_garden: Dataset = paths.load_dependency("additional_variables")
 
-    # Read table from garden dataset.
-    tb_garden = ds_garden["arable_land_per_crop_output"]
+    # Read tables from garden dataset.
+    tb_arable_land_per_crop_output = ds_garden["arable_land_per_crop_output"]
+    # To insert table into grapher DB, change "item" column to "country" (which will be changed back in the admin).
+    tb_area_used_per_crop_type = ds_garden["area_used_per_crop_type"].reset_index().rename(columns={"item": "country"})
 
     #
     # Process data.
@@ -26,7 +28,11 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.
-    ds_grapher = create_dataset(dest_dir, tables=[tb_garden], default_metadata=ds_garden.metadata)
+    ds_grapher = create_dataset(
+        dest_dir,
+        tables=[tb_arable_land_per_crop_output, tb_area_used_per_crop_type],
+        default_metadata=ds_garden.metadata,
+    )
 
     #
     # Checks.
