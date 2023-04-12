@@ -47,3 +47,13 @@ tables:
         short_unit: "ha"
         # Description will be fetched from the original FAOSTAT item and element descriptions.
         # description: |
+  share_of_sustainable_and_overexploited_fish:
+    variables:
+      sustainable_fish:
+        title: "Percentage of fish stocks within biologically sustainable levels"
+        unit: "%"
+        short_unit: "%"
+      overexploited_fish:
+        title : "Percentage of overexploited fish stocks"
+        unit: "%"
+        short_unit: "%"
