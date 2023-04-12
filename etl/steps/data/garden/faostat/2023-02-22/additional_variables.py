@@ -1,6 +1,7 @@
 """Dataset that combines different variables of other FAOSTAT datasets.
 
 """
+
 import pandas as pd
 from owid.catalog import Dataset, Table
 from shared import NAMESPACE
@@ -73,7 +74,99 @@ def generate_arable_land_per_crop_output(df_rl: pd.DataFrame, df_qi: pd.DataFram
     return tb_combined
 
 
+def generate_area_used_for_production_per_crop_type(df_qcl: pd.DataFrame) -> Table:
+    # Element code for "Area harvested" of faostat_qcl dataset.
+    ELEMENT_CODE_FOR_AREA_HARVESTED = "005312"
+
+    # List of items belonging to item group "Coarse Grain, Total", according to
+    # https://www.fao.org/faostat/en/#definitions
+    ITEM_CODES_COARSE_GRAINS = [
+        "00000044",  # Barley
+        "00000089",  # Buckwheat
+        "00000101",  # Canary seed
+        "00000108",  # Cereals n.e.c.
+        "00000108",  # Cereals nes
+        "00000094",  # Fonio
+        "00000103",  # Grain, mixed
+        "00000056",  # Maize
+        "00000056",  # Maize (corn)
+        "00000079",  # Millet
+        "00000103",  # Mixed grain
+        "00000075",  # Oats
+        "00000092",  # Quinoa
+        "00000071",  # Rye
+        "00000083",  # Sorghum
+        "00000097",  # Triticale
+    ]
+
+    # Item codes for croup groups from faostat_qcl.
+    # Additionally, coarse grains will be added to these groups.
+    ITEM_CODES_OF_CROP_GROUPS = [
+        "00001717",  # Cereals
+        "00001804",  # Citrus Fruit
+        "00001738",  # Fruit
+        "00000780",  # Jute
+        "00001732",  # Oilcrops, Oil Equivalent
+        "00001726",  # Pulses
+        "00001720",  # Roots and tubers
+        "00001729",  # Treenuts
+        "00001735",  # Vegetables
+        "00001814",  # Coarse Grain
+    ]
+
+    error = "Not all expected item codes were found in QCL."
+    assert set(ITEM_CODES_COARSE_GRAINS) < set(df_qcl["item_code"]), error
+
+    # Select the world and the element code for area harvested.
+    area_by_crop_type = df_qcl[
+        (df_qcl["country"] == "World") & (df_qcl["element_code"] == ELEMENT_CODE_FOR_AREA_HARVESTED)
+    ].reset_index(drop=True)
+    error = "Unit for element 'Area harvested' in faostat_qcl has changed."
+    assert list(area_by_crop_type["unit"].unique()) == ["hectares"], error
+
+    # Add items for item group "Coarse Grain, Total".
+    coarse_grains = (
+        area_by_crop_type[(area_by_crop_type["item_code"].isin(ITEM_CODES_COARSE_GRAINS))]
+        .groupby("year", as_index=False)
+        .agg({"value": "sum"})
+        .assign(**{"item": "Coarse Grain", "item_code": "00001814"})
+    )
+    area_by_crop_type = pd.concat(
+        [area_by_crop_type[~area_by_crop_type["item_code"].isin(ITEM_CODES_COARSE_GRAINS)], coarse_grains],
+        ignore_index=True,
+    )
+
+    area_by_crop_type = area_by_crop_type[area_by_crop_type["item_code"].isin(ITEM_CODES_OF_CROP_GROUPS)].reset_index(
+        drop=True
+    )
+
+    descriptions = "Definitions by FAOSTAT:"
+    for item in sorted(set(area_by_crop_type["item"])):
+        descriptions += f"\n\nItem: {item}"
+        item_description = area_by_crop_type[area_by_crop_type["item"] == item]["item_description"].fillna("").iloc[0]
+        if len(item_description) > 0:
+            descriptions += f"\nDescription: {item_description}"
+
+    descriptions += f"\n\nMetric: {area_by_crop_type['element'].iloc[0]}"
+    descriptions += f"\nDescription: {area_by_crop_type['element_description'].iloc[0]}"
+
+    # Create a table with the necessary columns, set an appropriate index, and sort conveniently.
+    tb_area_by_crop_type = Table(
+        area_by_crop_type[["item", "year", "value"]]
+        .rename(columns={"value": "area_used_for_production"})
+        .set_index(["item", "year"], verify_integrity=True)
+        .sort_index(),
+        short_name="area_used_per_crop_type",
+    )
+
+    # Add a table description.
+    tb_area_by_crop_type.metadata.description = descriptions
+
+    return tb_area_by_crop_type
+
+
 def run(dest_dir: str) -> None:
+
     #
     # Load inputs.
     #
@@ -87,11 +180,20 @@ def run(dest_dir: str) -> None:
     tb_qi = ds_qi[f"{NAMESPACE}_qi"]
     df_qi = pd.DataFrame(tb_qi).reset_index()
 
+    # Load dataset about crops and livestock, load its main (long-format) table, and create a convenient dataframe.
+    ds_qcl: Dataset = paths.load_dependency(f"{NAMESPACE}_qcl")
+    tb_qcl = ds_qcl[f"{NAMESPACE}_qcl"]
+    df_qcl = pd.DataFrame(tb_qcl).reset_index()
+
     #
     # Process data.
     #
     # Create data for arable land per crop output.
     tb_arable_land_per_crop_output = generate_arable_land_per_crop_output(df_rl=df_rl, df_qi=df_qi)
+
+    # Create data for area used for production per crop type.
+    tb_area_by_crop_type = generate_area_used_for_production_per_crop_type(df_qcl=df_qcl)
+    # Issues: Oilcrops start in 1991 instead of 1961 like in the old version.
 
     #
     # Save outputs.
@@ -99,5 +201,5 @@ def run(dest_dir: str) -> None:
     # Create a new garden dataset.
     # Take by default the metadata of one of the datasets, simply to get the FAOSTAT sources (the rest of the metadata
     # will be defined in the metadata yaml file).
-    ds_garden = create_dataset(dest_dir, tables=[tb_arable_land_per_crop_output])
+    ds_garden = create_dataset(dest_dir, tables=[tb_arable_land_per_crop_output, tb_area_by_crop_type])
     ds_garden.save()

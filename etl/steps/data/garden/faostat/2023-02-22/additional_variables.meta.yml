@@ -39,3 +39,11 @@ tables:
           This metric measures the index of arable land needed to produce a fixed quantity of crops (where values in 1961 are equal to 1.0).
 
           Arable land is the total of areas (extent of surface of land or water) under temporary crops, temporary meadows and pastures, and land with temporary fallow.  Arable land does not include land that is potentially cultivable but is not normally cultivated.
+  area_used_per_crop_type:
+    variables:
+      area_used_for_production:
+        title: "Area used for production"
+        unit: "hectares"
+        short_unit: "ha"
+        # Description will be fetched from the original FAOSTAT item and element descriptions.
+        # description: |
