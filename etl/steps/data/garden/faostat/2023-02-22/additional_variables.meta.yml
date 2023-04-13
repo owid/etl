@@ -53,10 +53,14 @@ tables:
         title: "Percentage of fish stocks within biologically sustainable levels"
         unit: "%"
         short_unit: "%"
+        description: |
+          Fish stock are subpopulations of a particular species of fish which have common parameters such as location, growth and mortality which define their population dynamics. Fish stocks are within biologically sustainable levels when fish catch does not exceed the maximum sustainable yield (MSY) - the rate at which fish populations can regenerate.
       overexploited_fish:
         title : "Percentage of overexploited fish stocks"
         unit: "%"
         short_unit: "%"
+        description: |
+          Fish stock are subpopulations of a particular species of fish which have common parameters such as location, growth and mortality which define their population dynamics. Fish stocks are overexploited when fish catch exceeds the maximum sustainable yield (MSY) - the rate at which fish populations can regenerate.
   land_spared_by_increased_crop_yields:
     variables:
       area:
@@ -80,7 +84,7 @@ tables:
         description: |
           Land spared since 1961 due to the increase of crop yields.
 
-          This area is calculated as the cropland area that would be necessary if crop yields stagnated in 1961, minus the true cropland area on a given year.
+          This area is calculated as the cropland area that would be necessary if crop yields stagnated in 1961 (the total production on a given year divided by the crop yield of 1961), minus the true cropland area on a given year.
       spared_land__pct:
         title: "Percentage reduction in area needed due to crop yield increases"
         unit: "hectares"

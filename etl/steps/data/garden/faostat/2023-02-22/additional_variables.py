@@ -504,7 +504,9 @@ def generate_food_available_for_consumption(df_fbsc: pd.DataFrame) -> Table:
             + "', '".join(item_names)
             + "'."
         )
-        tb_food_available_for_consumption[underscore(group)].metadata.title = group
+        tb_food_available_for_consumption[
+            underscore(group)
+        ].metadata.title = f"Daily caloric intake per person from {group.lower().replace('other', 'other commodities')}"
         tb_food_available_for_consumption[underscore(group)].metadata.unit = CONSUMPTION_UNIT
         tb_food_available_for_consumption[underscore(group)].metadata.short_unit = "kcal"
         tb_food_available_for_consumption[underscore(group)].metadata.description = description

@@ -29,6 +29,17 @@ def run(dest_dir: str) -> None:
     # To insert table into grapher DB, change "item" column to "country" (which will be changed back in the admin).
     tb_area_used_per_crop_type = tb_area_used_per_crop_type.reset_index().rename(columns={"item": "country"})
 
+    # For land spared by increased crop yields, for the moment we only need global data, by crop type.
+    # And again, change "item" to "country" to fit grapher DB needs.
+    tb_land_spared_by_increased_crop_yields = tb_land_spared_by_increased_crop_yields.reset_index()
+    tb_land_spared_by_increased_crop_yields = (
+        tb_land_spared_by_increased_crop_yields[tb_land_spared_by_increased_crop_yields["country"] == "World"]
+        .drop(columns=["country"])
+        .rename(columns={"item": "country"})
+        .set_index(["country", "year"], verify_integrity=True)
+        .sort_index()
+    )
+
     #
     # Save outputs.
     #
