@@ -532,19 +532,6 @@ def generate_macronutrient_compositions(df_fbsc: pd.DataFrame) -> Table:
     KCAL_PER_GRAM_OF_PROTEIN = 4
     KCAL_PER_GRAM_OF_CARBOHYDRATES = 4
 
-    # Common description for all variables.
-    DESCRIPTION = """The FAO provide annual figures from 1961 by country on daily caloric supply, fat supply (in grams),   and protein supply (in grams). To calculate the daily per capita supply of carbohydrates, we assume an energy density by macronutrient of 4 kcal per gram of both protein and carbohydrate and 9 kcal per gram of fat (based on established nutritional guidelines reported by the FAO). The daily supply of carbohydrates is therefore calculated as:
-
-    ((Daily supply of kcal)-(Daily supply of protein * 4 + Daily supply of fat * 9)) / 4
-
-    The quantity of calories from each macronutrient is then calculated based on the energy density figures given above (e.g. calories from protein is calculated by multiplting the daily supply of protein in grams by 4).
-
-    For an explanation of these conversion factors, see "Chapter 3: Calculation Of The Energy Content Of Foods - Energy Conversion Factors", available at: http://www.fao.org/docrep/006/Y5022E/y5022e04.htm
-
-    The share of calories derived from each macronutrient is then calculated by dividing the number of calories derived from a given macronutrient by the total daily caloric supply.
-
-    Protein of animal origin includes protein supplied in the form of all meat commodities, eggs and dairy products, and fish & seafood.
-    """
     # Select relevant items and elements.
     df = df_fbsc[
         (df_fbsc["item_code"].isin([ITEM_CODE_ALL_PRODUCTS, ITEM_CODE_ANIMAL_PRODUCTS, ITEM_CODE_VEGETAL_PRODUCTS]))
@@ -644,9 +631,6 @@ def generate_macronutrient_compositions(df_fbsc: pd.DataFrame) -> Table:
         short_name="macronutrient_compositions",
         underscore=True,
     )
-    # For simplicity, add the same variable description to all variables.
-    for column in tb_combined:
-        tb_combined[column].metadata.description = DESCRIPTION
 
     return tb_combined
 
