@@ -512,6 +512,93 @@ def generate_food_available_for_consumption(df_fbsc: pd.DataFrame) -> Table:
     return tb_food_available_for_consumption
 
 
+def generate_macronutrient_compositions(df_fbsc: pd.DataFrame) -> Table:
+    # Item code for "Total" of faostat_fbsc.
+    ITEM_CODE_ALL_PRODUCTS = "00002901"
+    # Item code for "Vegetal Products" of faostat_fbsc.
+    ITEM_CODE_VEGETAL_PRODUCTS = "00002903"
+    # Item code for "Animal Products" of faostat_fbsc.
+    ITEM_CODE_ANIMAL_PRODUCTS = "00002941"
+
+    # Element code for "Food available for consumption" of faostat_fbsc (in kilocalories per day per capita).
+    ELEMENT_CODE_FOR_ENERGY_PER_DAY = "0664pc"
+    # Element code for "Food available for consumption" of faostat_fbsc (in grams of protein per day per capita).
+    ELEMENT_CODE_FOR_PROTEIN_PER_DAY = "0674pc"
+    # Element code for "Food available for consumption" of faostat_fbsc (in grams of fat per day per capita).
+    ELEMENT_CODE_FOR_FAT_PER_DAY = "0684pc"
+
+    # Assumed energy density by macronutrient, in kilocalories per gram of fat, protein or carbohydrates.
+    KCAL_PER_GRAM_OF_FAT = 9
+    KCAL_PER_GRAM_OF_PROTEIN = 4
+    KCAL_PER_GRAM_OF_CARBOHYDRATES = 4
+
+    # Select relevant items and elements.
+    df = df_fbsc[(df_fbsc["item_code"].isin([ITEM_CODE_ALL_PRODUCTS, ITEM_CODE_ANIMAL_PRODUCTS, ITEM_CODE_VEGETAL_PRODUCTS])) &
+            (df_fbsc["element_code"].isin([ELEMENT_CODE_FOR_ENERGY_PER_DAY, ELEMENT_CODE_FOR_PROTEIN_PER_DAY, ELEMENT_CODE_FOR_FAT_PER_DAY]))].reset_index(drop=True)
+
+    # Sanity check.
+    error = "One or more of the units of food available for consumption has changed."
+    assert list(df["unit"].unique()) == ['kilocalories per day per capita', 'grams of protein per day per capita', 'grams of fat per day per capita'], error
+
+    # Food contents and element code for the metric of their consumption per day per capita.
+    food_contents = {
+        "energy": ELEMENT_CODE_FOR_ENERGY_PER_DAY,
+        "fat": ELEMENT_CODE_FOR_FAT_PER_DAY,
+        "protein": ELEMENT_CODE_FOR_PROTEIN_PER_DAY,
+    }
+
+    # Initialize a list of dataframes, one for each food content (energy, fat or protein).
+    dfs = []
+    for content in food_contents:
+        # Create a dataframe for each food content, and add it to the list.
+        df_content = df[df["element_code"]==food_contents[content]].pivot(index=["country", "year"], columns=["item"], values=["value"])#.reset_index()
+        df_content.columns = df_content.columns.droplevel(0)
+        df_content = df_content.reset_index().rename(columns={
+            "Total": f"Total {content}",
+            "Vegetal Products": f"{content.capitalize()} from vegetal products",
+            "Animal Products": f"{content.capitalize()} from animal products"})
+        dfs.append(df_content)
+
+        # Sanity check.
+        error = f"The sum of animal and vegetable {content} does not add up to the total."
+        assert (100 * abs(df_content[f"{content.capitalize()} from animal products"] + df_content[f"{content.capitalize()} from vegetal products"] -df_content[f"Total {content}"]) / df_content[f"Total {content}"] < 1).all(), error
+
+    # Combine all dataframes.
+    combined = multi_merge(dfs=dfs, on=["country", "year"], how="outer")
+
+    # Daily caloric intake from fat, per person.
+    combined["Total energy from fat"] = combined["Total fat"] * KCAL_PER_GRAM_OF_FAT
+    # Daily caloric intake from protein, per person.
+    combined["Total energy from protein"] = combined["Total protein"] * KCAL_PER_GRAM_OF_PROTEIN
+    # Daily caloric intake from carbohydrates (assumed to be the rest of the daily caloric intake), per person.
+    # This is calculated as the difference between the total caloric intake minus the caloric intake from protein and fat.
+    combined["Total energy from carbohydrates"] = combined["Total energy"] - combined["Total energy from fat"] - combined["Total energy from protein"]
+
+    # Daily intake of carbohydrates per person.
+    combined["Total carbohydrates"] = combined["Total energy from carbohydrates"] / KCAL_PER_GRAM_OF_CARBOHYDRATES
+
+    # Caloric intake from fat as a percentage of the total daily caloric intake.
+    combined["Share of energy from fat"] = 100 * combined["Total energy from fat"] / combined["Total energy"]
+    # Caloric intake from protein as a percentage of the total daily caloric intake.
+    combined["Share of energy from protein"] = 100 * combined["Total energy from protein"] / combined["Total energy"]
+    # Caloric intake from carbohydrates as a percentage of the total daily caloric intake.
+    combined["Share of energy from carbohydrates"] = 100 * combined["Total energy from carbohydrates"] / combined["Total energy"]
+
+    # Daily caloric intake from animal protein.
+    combined["Energy from animal protein"] = combined["Protein from animal products"] * KCAL_PER_GRAM_OF_PROTEIN
+    # Caloric intake from animal protein as a percentage of the total daily caloric intake.
+    combined["Share of energy from animal protein"] = 100 * combined["Energy from animal protein"] / combined["Total energy"]
+    # Daily caloric intake from vegetal protein.
+    combined["Energy from vegetal protein"] = combined["Protein from vegetal products"] * KCAL_PER_GRAM_OF_PROTEIN
+    # Caloric intake from vegetal protein as a percentage of the total daily caloric intake.
+    combined["Share of energy from vegetal protein"] = 100 * combined["Energy from vegetal protein"] / combined["Total energy"]
+
+    # Create a table, set an appropriate index, and sort conveniently.
+    tb_combined = Table(combined.set_index(["country", "year"], verify_integrity=True).sort_index(), short_name="macronutrient_compositions", underscore=True)
+
+    return tb_combined
+
+
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
@@ -558,6 +645,9 @@ def run(dest_dir: str) -> None:
 
     # Create table for dietary compositions by commodity group.
     tb_food_available_for_consumption = generate_food_available_for_consumption(df_fbsc=df_fbsc)
+    
+    # Create table for macronutrient compositions.
+    tb_macronutrient_compositions = generate_macronutrient_compositions(df_fbsc=df_fbsc)
 
     #
     # Save outputs.
@@ -573,6 +663,7 @@ def run(dest_dir: str) -> None:
             tb_sustainable_and_overexploited_fish,
             tb_spared_land_from_increased_yields,
             tb_food_available_for_consumption,
+            tb_macronutrient_compositions,
         ],
     )
     ds_garden.save()
