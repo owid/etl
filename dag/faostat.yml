@@ -305,6 +305,7 @@ steps:
     - data://garden/faostat/2023-02-22/faostat_qi
     - data://garden/faostat/2023-02-22/faostat_qcl
     - data://garden/faostat/2023-02-22/faostat_sdgb
+    - data://garden/faostat/2023-02-22/faostat_fbsc
   #
   # FAOSTAT grapher step for additional variables for version 2023-02-22
   #

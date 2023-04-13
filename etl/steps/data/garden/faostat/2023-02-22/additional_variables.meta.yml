@@ -87,3 +87,5 @@ tables:
         short_unit: "ha"
         description: |
           Land spared since 1961 due to the increase of crop yields, as a percentage of the total land that would be necessary if crop yields had not increased since then.
+  # All metadata for food_available_for_consumption is prepared via script.
+  # food_available_for_consumption:

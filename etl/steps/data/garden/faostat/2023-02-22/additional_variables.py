@@ -4,6 +4,8 @@
 
 import pandas as pd
 from owid.catalog import Dataset, Table
+from owid.catalog.utils import underscore
+from owid.datautils.dataframes import multi_merge
 from shared import NAMESPACE
 
 from etl.helpers import PathFinder, create_dataset
@@ -280,6 +282,236 @@ def generate_spared_land_from_increased_yields(df_qcl: pd.DataFrame) -> Table:
     return tb_spared_land
 
 
+def generate_food_available_for_consumption(df_fbsc: pd.DataFrame) -> Table:
+    # Element code for "Food available for consumption" of faostat_fbsc (in kilocalories per day per capita).
+    ELEMENT_CODE_FOR_PER_CAPITA_FOOD = "0664pc"
+    # Expected unit.
+    CONSUMPTION_UNIT = "kilocalories per day per capita"
+
+    # df_fbsc[df_fbsc["unit"].str.contains("kilocal")][["element_code", "element", "unit"]].drop_duplicates()
+
+    df_fbsc = df_fbsc[(df_fbsc["element_code"] == ELEMENT_CODE_FOR_PER_CAPITA_FOOD)].reset_index(drop=True)
+
+    # Sanity check.
+    error = "Units for food available for consumption have changed."
+    assert list(df_fbsc["unit"].unique()) == [CONSUMPTION_UNIT], error
+
+    # List of food groups created by OWID.
+    # Each food group contains one or more "item groups", defined by FAOSTAT.
+    # Each item group contains one or more "item", defined by FAOSTAT.
+    # The complete list of items coincides exactly with the complete list of items of FAOSTAT item group "Grand Total"
+    # (with item group code 2901).
+    # So all existing food items in FBSC are contained here, and there are no repetitions.
+    # Notes:
+    # * There are a few item groups that are not included here, namely "Vegetal Products" (item group code 2903),
+    #   and "Animal Products" (item group code 2941). But their items are contained in other item groups, so including them
+    #   would cause unnecessary repetition of items.
+    # * To check for the components of an individual item group:
+    # from etl.paths import DATA_DIR
+    # metadata = Dataset(DATA_DIR / "meadow/faostat/2023-02-22/faostat_metadata")
+    # item_groups = metadata["faostat_fbs_item_group"]
+    # set(item_groups.loc[2941]["item"])
+    FOOD_GROUPS = {
+        "Cereals and grains": [
+            "00002905",  # Cereals, Excluding Beer
+            # Item group contains:
+            # 'Barley and products',
+            # 'Cereals, Other',
+            # 'Maize and products',
+            # 'Millet and products',
+            # 'Oats',
+            # 'Rice and products',
+            # 'Rye and products',
+            # 'Sorghum and products',
+            # 'Wheat and products',
+        ],
+        "Pulses": [
+            "00002911",  # Pulses
+            # Item group contains:
+            # 'Beans',
+            # 'Peas',
+            # 'Pulses, Other and products',
+        ],
+        "Starchy roots": [
+            "00002907",  # Starchy Roots
+            # Item group contains:
+            # 'Cassava and products',
+            # 'Potatoes and products',
+            # 'Roots, Other',
+            # 'Sweet potatoes',
+            # 'Yams',
+        ],
+        "Fruits and vegetables": [
+            "00002919",  # Fruits - Excluding Wine
+            # Item group contains:
+            # 'Apples and products',
+            # 'Bananas',
+            # 'Citrus, Other',
+            # 'Dates',
+            # 'Fruits, other',
+            # 'Grapefruit and products',
+            # 'Grapes and products (excl wine)',
+            # 'Lemons, Limes and products',
+            # 'Oranges, Mandarines',
+            # 'Pineapples and products',
+            # 'Plantains',
+            "00002918",  # Vegetables
+            # Item group contains:
+            # 'Onions',
+            # 'Tomatoes and products',
+            # 'Vegetables, other',
+        ],
+        "Oils and fats": [
+            "00002914",  # Vegetable Oils
+            # Item group contains:
+            # 'Coconut Oil',
+            # 'Cottonseed Oil',
+            # 'Groundnut Oil',
+            # 'Maize Germ Oil',
+            # 'Oilcrops Oil, Other',
+            # 'Olive Oil',
+            # 'Palm Oil',
+            # 'Palmkernel Oil',
+            # 'Rape and Mustard Oil',
+            # 'Ricebran Oil',
+            # 'Sesameseed Oil',
+            # 'Soyabean Oil',
+            # 'Sunflowerseed Oil'
+            "00002946",  # Animal fats group
+            # Item group contains:
+            # 'Butter, Ghee',
+            # 'Cream',
+            # 'Fats, Animals, Raw',
+            # 'Fish, Body Oil',
+            # 'Fish, Liver Oil'
+            "00002913",  # Oilcrops
+            # Item group contains:
+            # 'Coconuts - Incl Copra',
+            # 'Cottonseed',
+            # 'Groundnuts',
+            # 'Oilcrops, Other',
+            # 'Olives (including preserved)',
+            # 'Palm kernels',
+            # 'Rape and Mustardseed',
+            # 'Sesame seed',
+            # 'Soyabeans',
+            # 'Sunflower seed'
+            "00002912",  # Treenuts
+            # Item group contains:
+            # 'Nuts and products',
+        ],
+        "Sugar": [
+            "00002909",  # Sugar & Sweeteners
+            # Item group contains:
+            # 'Honey',
+            # 'Sugar (Raw Equivalent)',
+            # 'Sugar non-centrifugal',
+            # 'Sweeteners, Other',
+            "00002908",  # Sugar crops
+            # Item group contains:
+            # 'Sugar beet',
+            # 'Sugar cane',
+        ],
+        "Meat": [
+            "00002960",  # Fish and seafood
+            # Item group contains:
+            # 'Aquatic Animals, Others',
+            # 'Cephalopods',
+            # 'Crustaceans',
+            # 'Demersal Fish',
+            # 'Freshwater Fish',
+            # 'Marine Fish, Other',
+            # 'Molluscs, Other',
+            # 'Pelagic Fish',
+            "00002943",  # Meat, total
+            # Item group contains:
+            # 'Bovine Meat',
+            # 'Meat, Other',
+            # 'Mutton & Goat Meat',
+            # 'Pigmeat',
+            # 'Poultry Meat',
+        ],
+        "Dairy and eggs": [
+            "00002948",  # Milk - Excluding Butter
+            # Item group contains:
+            # 'Milk - Excluding Butter',
+            "00002949",  # Eggs
+            # Item group contains:
+            # 'Eggs',
+        ],
+        "Alcoholic beverages": [
+            "00002924",  # Alcoholic Beverages
+            # Item group contains:
+            # 'Alcohol, Non-Food',
+            # 'Beer',
+            # 'Beverages, Alcoholic',
+            # 'Beverages, Fermented',
+            # 'Wine',
+        ],
+        "Other": [
+            "00002928",  # Miscellaneous
+            # Item group contains:
+            # 'Infant food',
+            # 'Miscellaneous',
+            "00002923",  # Spices
+            # Item group contains:
+            # 'Cloves',
+            # 'Pepper',
+            # 'Pimento',
+            # 'Spices, Other',
+            "00002922",  # Stimulants
+            # Item group contains:
+            # 'Cocoa Beans and products',
+            # 'Coffee and products',
+            # 'Tea (including mate)',
+            "00002945",  # Offals
+            # Item group contains:
+            # 'Offals, Edible',
+            "00002961",  # Aquatic Products, Other
+            # 'Aquatic Plants',
+            # 'Meat, Aquatic Mammals',
+        ],
+    }
+
+    # Sanity check.
+    error = "Not all expected item codes are found in the data."
+    assert set([item_code for group in FOOD_GROUPS.values() for item_code in group]) <= set(df_fbsc["item_code"]), error
+
+    # Create a list of dataframes, one for each food group.
+    dfs = [
+        df_fbsc[df_fbsc["item_code"].isin(FOOD_GROUPS[group])]
+        .groupby(["country", "year"], as_index=False, observed=True)
+        .agg({"value": "sum"})
+        .rename(columns={"value": group})
+        for group in FOOD_GROUPS
+    ]
+    combined = multi_merge(dfs=dfs, on=["country", "year"], how="outer")
+
+    # Create a table, set an appropriate index, and sort conveniently.
+    tb_food_available_for_consumption = Table(
+        combined.set_index(["country", "year"], verify_integrity=True).sort_index(),
+        short_name="food_available_for_consumption",
+        underscore=True,
+    )
+
+    # Prepare variable metadata.
+    common_description = "Data represents the average daily per capita supply of calories from the full range of commodities, grouped by food categories. Note that these figures do not correct for waste at the household/consumption level so may not directly reflect the quantity of food finally consumed by a given individual.\n\nSpecific food commodities have been grouped into higher-level categories."
+    for group in FOOD_GROUPS:
+        item_names = list(df_fbsc[df_fbsc["item_code"].isin(FOOD_GROUPS[group])]["item"].unique())
+        description = (
+            common_description
+            + f" Food group '{group}' includes the FAO item groups: '"
+            + "', '".join(item_names)
+            + "'."
+        )
+        tb_food_available_for_consumption[underscore(group)].metadata.title = group
+        tb_food_available_for_consumption[underscore(group)].metadata.unit = CONSUMPTION_UNIT
+        tb_food_available_for_consumption[underscore(group)].metadata.short_unit = "kcal"
+        tb_food_available_for_consumption[underscore(group)].metadata.description = description
+
+    return tb_food_available_for_consumption
+
+
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
@@ -304,6 +536,11 @@ def run(dest_dir: str) -> None:
     tb_sdgb = ds_sdgb[f"{NAMESPACE}_sdgb"]
     df_sdgb = pd.DataFrame(tb_sdgb).reset_index()
 
+    # Load dataset about food balances, load its main (long-format) table, and create a convenient dataframe.
+    ds_fbsc: Dataset = paths.load_dependency(f"{NAMESPACE}_fbsc")
+    tb_fbsc = ds_fbsc[f"{NAMESPACE}_fbsc"]
+    df_fbsc = pd.DataFrame(tb_fbsc).reset_index()
+
     #
     # Process data.
     #
@@ -319,6 +556,9 @@ def run(dest_dir: str) -> None:
     # Create table for spared land due to increased yields.
     tb_spared_land_from_increased_yields = generate_spared_land_from_increased_yields(df_qcl=df_qcl)
 
+    # Create table for dietary compositions by commodity group.
+    tb_food_available_for_consumption = generate_food_available_for_consumption(df_fbsc=df_fbsc)
+
     #
     # Save outputs.
     #
@@ -332,6 +572,7 @@ def run(dest_dir: str) -> None:
             tb_area_by_crop_type,
             tb_sustainable_and_overexploited_fish,
             tb_spared_land_from_increased_yields,
+            tb_food_available_for_consumption,
         ],
     )
     ds_garden.save()
