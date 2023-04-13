@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5433_covid_19__sequencing_values
   file_extension: feather
-  date_accessed: 2023-04-11 20:53:10.266358
+  date_accessed: 2023-04-13 00:06:35.038725
   name: COVID-19 - Sequencing
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 23e1412c11501610cf3c581037e336db
-  size: 317442
+- md5: 6de84262fc2961b9e5b01b94fbbb29f4
+  size: 319314
   path: dataset_5433_covid_19__sequencing_values.feather
