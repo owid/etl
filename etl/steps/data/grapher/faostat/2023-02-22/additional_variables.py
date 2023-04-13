@@ -21,6 +21,7 @@ def run(dest_dir: str) -> None:
     tb_sustainable_and_overexploited_fish = ds_garden["share_of_sustainable_and_overexploited_fish"]
     tb_land_spared_by_increased_crop_yields = ds_garden["land_spared_by_increased_crop_yields"]
     tb_food_available_for_consumption = ds_garden["food_available_for_consumption"]
+    tb_macronutrient_compositions = ds_garden["macronutrient_compositions"]
 
     #
     # Process data.
@@ -40,6 +41,7 @@ def run(dest_dir: str) -> None:
             tb_sustainable_and_overexploited_fish,
             tb_land_spared_by_increased_crop_yields,
             tb_food_available_for_consumption,
+            tb_macronutrient_compositions,
         ],
         default_metadata=ds_garden.metadata,
     )

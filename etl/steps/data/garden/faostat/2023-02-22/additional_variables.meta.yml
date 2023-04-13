@@ -89,3 +89,86 @@ tables:
           Land spared since 1961 due to the increase of crop yields, as a percentage of the total land that would be necessary if crop yields had not increased since then.
   # All metadata for food_available_for_consumption is prepared via script.
   # food_available_for_consumption:
+  macronutrient_compositions:
+    variables:
+      # The description for all variables is the same, and is created via script.
+      energy_from_animal_products:
+        title: "Daily caloric intake per person from animal products"
+        unit: "kilocalories per day per capita"
+        short_unit: "kcal"
+      energy_from_animal_protein:
+        title: "Daily caloric intake per person that comes from animal protein"
+        unit: "kilocalories per day per capita"
+        short_unit: "kcal"
+      energy_from_vegetal_products:
+        title: "Daily caloric intake per person from vegetal products"
+        unit: "kilocalories per day per capita"
+        short_unit: "kcal"
+      energy_from_vegetal_protein:
+        title: "Daily caloric intake per person that comes from vegetal protein"
+        unit: "kilocalories per day per capita"
+        short_unit: "kcal"
+      fat_from_animal_products:
+        title: "Daily fat intake per person from animal products"
+        unit: "grams per day per capita"
+        short_unit: "g"
+      fat_from_vegetal_products:
+        title: "Daily fat intake per person from vegetal products"
+        unit: "grams per day per capita"
+        short_unit: "g"
+      protein_from_animal_products:
+        title: "Daily protein intake from animal products"
+        unit: "grams per day per capita"
+        short_unit: "g"
+      protein_from_vegetal_products:
+        title: "Daily protein intake per person from vegetal products"
+        unit: "grams per day per capita"
+        short_unit: "g"
+      share_of_energy_from_animal_protein:
+        title: "Share of the daily caloric intake that comes from animal protein"
+        unit: "%"
+        short_unit: "%"
+      share_of_energy_from_carbohydrates:
+        title: "Share of the daily caloric intake that comes from carbohydrates"
+        unit: "%"
+        short_unit: "%"
+      share_of_energy_from_fat:
+        title: "Share of the daily caloric intake that comes from fat"
+        unit: "%"
+        short_unit: "%"
+      share_of_energy_from_protein:
+        title: "Share of the daily caloric intake that comes from protein"
+        unit: "%"
+        short_unit: "%"
+      share_of_energy_from_vegetal_protein:
+        title: "Share of the daily caloric intake that comes from vegetal protein"
+        unit: "%"
+        short_unit: "%"
+      total_carbohydrates:
+        title: "Daily carbohydrates intake per person"
+        unit: "grams per day per capita"
+        short_unit: "g"
+      total_energy:
+        title: "Daily caloric intake per person"
+        unit: "kilocalories per day per capita"
+        short_unit: "kcal"
+      total_energy_from_carbohydrates:
+        title: "Daily caloric intake per person from carbohydrates"
+        unit: "kilocalories per day per capita"
+        short_unit: "kcal"
+      total_energy_from_fat:
+        title: "Daily caloric intake per person from fat"
+        unit: "kilocalories per day per capita"
+        short_unit: "kcal"
+      total_energy_from_protein:
+        title: "Daily caloric intake per person from protein"
+        unit: "kilocalories per day per capita"
+        short_unit: "kcal"
+      total_fat:
+        title: "Daily fat intake per person"
+        unit: "grams per day per capita"
+        short_unit: "g"
+      total_protein:
+        title: "Daily protein intake per person"
+        unit: "grams per day per capita"
+        short_unit: "g"
