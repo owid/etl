@@ -17,6 +17,7 @@ CURRENT_DIR = Path(__file__).parent
 ETL_DIR = Path(etl.__file__).parent.parent
 DEFAULT_EXTENSION = "csv"
 
+
 class Options(Enum):
 
     ADD_TO_DAG = "Add steps into dag/walkthrough.yaml file"
@@ -40,7 +41,7 @@ class MeadowForm(BaseModel):
     def __init__(self, **data: Any) -> None:
         options = data.pop("options")
         print(1, data["snapshot_file_extension"])
-        if (ext := data.pop("snapshot_file_extension") != ""):
+        if ext := data.pop("snapshot_file_extension") != "":
             data["snapshot_file_extension"] = ext
         else:
             data["snapshot_file_extension"] = DEFAULT_EXTENSION

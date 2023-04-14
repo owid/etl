@@ -123,17 +123,13 @@ def app(run_checks: bool, dummy_data: bool) -> None:
     private_suffix = "-private" if form.is_private else ""
 
     if form.add_to_dag:
-        deps = [
-            f"data{private_suffix}://meadow/{form.namespace}/{form.meadow_version}/{form.short_name}"
-        ]
+        deps = [f"data{private_suffix}://meadow/{form.namespace}/{form.meadow_version}/{form.short_name}"]
         if form.load_population:
             deps.append(utils.DATASET_POPULATION_URI)
         if form.load_countries_regions:
             deps.append(utils.DATASET_REFERENCE_URI)
         dag_content = utils.add_to_dag(
-            {
-                f"data{private_suffix}://garden/{form.namespace}/{form.version}/{form.short_name}": deps
-            }
+            {f"data{private_suffix}://garden/{form.namespace}/{form.version}/{form.short_name}": deps}
         )
     else:
         dag_content = ""
