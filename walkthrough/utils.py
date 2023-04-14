@@ -18,6 +18,13 @@ from etl.steps import DAG
 DAG_WALKTHROUGH_PATH = DAG_DIR / "walkthrough.yml"
 WALDEN_INGEST_DIR = Path(walden.__file__).parent.parent.parent / "ingests"
 
+# Load latest population version
+POPULATION_LATEST_VERSION = (
+    sorted((STEP_DIR / "data/garden/demography").glob("*/population/"))[-1].as_posix().split("/")[-2]
+)
+DATASET_POPULATION_URI = f"data://garden/demography/{POPULATION_LATEST_VERSION}/population"
+DATASET_REFERENCE_URI = "data://garden/reference"
+
 DUMMY_DATA = {
     "namespace": "dummy",
     "short_name": "dummy",
