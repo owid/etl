@@ -22,8 +22,6 @@ class Options(Enum):
     ADD_TO_DAG = "Add steps into dag/walkthrough.yaml file"
     INCLUDE_METADATA_YAML = "Include *.meta.yaml file with metadata"
     GENERATE_NOTEBOOK = "Generate playground notebook"
-    LOAD_COUNTRIES_REGIONS = "Load countries regions in the script"
-    LOAD_POPULATION = "Load population in the script"
     IS_PRIVATE = "Make dataset private"
 
 
@@ -35,8 +33,6 @@ class MeadowForm(BaseModel):
     snapshot_version: str
     snapshot_file_extension: str
     add_to_dag: bool
-    load_countries_regions: bool
-    load_population: bool
     generate_notebook: bool
     include_metadata_yaml: bool
     is_private: bool
@@ -45,8 +41,6 @@ class MeadowForm(BaseModel):
         options = data.pop("options")
         data["add_to_dag"] = Options.ADD_TO_DAG.value in options
         data["include_metadata_yaml"] = Options.INCLUDE_METADATA_YAML.value in options
-        data["load_countries_regions"] = Options.LOAD_COUNTRIES_REGIONS.value in options
-        data["load_population"] = Options.LOAD_POPULATION.value in options
         data["generate_notebook"] = Options.GENERATE_NOTEBOOK.value in options
         data["is_private"] = Options.IS_PRIVATE.value in options
         super().__init__(**data)
@@ -107,14 +101,12 @@ def app(run_checks: bool, dummy_data: bool) -> None:
                     Options.ADD_TO_DAG.value,
                     Options.INCLUDE_METADATA_YAML.value,
                     Options.GENERATE_NOTEBOOK.value,
-                    Options.LOAD_COUNTRIES_REGIONS.value,
-                    Options.LOAD_POPULATION.value,
                     Options.IS_PRIVATE.value,
                 ],
                 name="options",
                 value=[
                     Options.ADD_TO_DAG.value,
-                    Options.INCLUDE_METADATA_YAML.value,
+                    # Options.INCLUDE_METADATA_YAML.value,
                     Options.GENERATE_NOTEBOOK.value,
                 ],
             ),
@@ -125,15 +117,12 @@ def app(run_checks: bool, dummy_data: bool) -> None:
     private_suffix = "-private" if form.is_private else ""
 
     if form.add_to_dag:
-        deps = [
-            f"snapshot{private_suffix}://{form.namespace}/{form.snapshot_version}/{form.short_name}.{form.snapshot_file_extension}"
-        ]
-        if form.load_population:
-            deps.append("data://garden/owid/latest/key_indicators")
-        if form.load_countries_regions:
-            deps.append("data://garden/reference")
         dag_content = utils.add_to_dag(
-            {f"data{private_suffix}://meadow/{form.namespace}/{form.version}/{form.short_name}": deps}
+            {
+                f"data{private_suffix}://meadow/{form.namespace}/{form.version}/{form.short_name}": [
+                    f"snapshot{private_suffix}://{form.namespace}/{form.snapshot_version}/{form.short_name}.{form.snapshot_file_extension}",
+                ]
+            }
         )
     else:
         dag_content = ""

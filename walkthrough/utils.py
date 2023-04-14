@@ -17,6 +17,8 @@ from etl.steps import DAG
 
 DAG_WALKTHROUGH_PATH = DAG_DIR / "walkthrough.yml"
 WALDEN_INGEST_DIR = Path(walden.__file__).parent.parent.parent / "ingests"
+DATASET_POPULATION_URI = "data://garden/demography/2023-03-31/population"
+DATASET_REFERENCE_URI = "data://garden/reference"
 
 DUMMY_DATA = {
     "namespace": "dummy",
