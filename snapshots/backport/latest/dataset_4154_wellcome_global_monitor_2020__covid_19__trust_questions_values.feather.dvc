@@ -1,0 +1,18 @@
+meta:
+  namespace: backport
+  short_name: dataset_4154_wellcome_global_monitor_2020__covid_19__trust_questions_values
+  file_extension: feather
+  date_accessed: 2023-04-11 18:01:27.427179
+  name: 'Wellcome Global Monitor 2020: Covid-19 - Trust questions'
+  description: https://github.com/owid/notebooks/tree/main/EdouardMathieu/wellcome_global_monitor
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/4154
+  source_published_by: Our World in Data catalog backport
+  is_public: true
+  version: latest
+  publication_date: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 0a968bea0fca89de80f91da014979d90
+  size: 14146
+  path: dataset_4154_wellcome_global_monitor_2020__covid_19__trust_questions_values.feather
