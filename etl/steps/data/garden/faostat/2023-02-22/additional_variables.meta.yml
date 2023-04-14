@@ -104,7 +104,7 @@ tables:
 
           ((Daily supply of kcal)-(Daily supply of protein * 4 + Daily supply of fat * 9)) / 4
 
-          The quantity of calories from each macronutrient is then calculated based on the energy density figures given above (e.g. calories from protein is calculated by multiplting the daily supply of protein in grams by 4).
+          The quantity of calories from each macronutrient is then calculated based on the energy density figures given above (e.g. calories from protein is calculated by multiplying the daily supply of protein in grams by 4).
 
           For an explanation of these conversion factors, see "Chapter 3: Calculation Of The Energy Content Of Foods - Energy Conversion Factors", available at: http://www.fao.org/docrep/006/Y5022E/y5022e04.htm
 

@@ -47,7 +47,7 @@ def generate_arable_land_per_crop_output(df_rl: pd.DataFrame, df_qi: pd.DataFram
     df_qi = df_qi[["country", "year", "value"]].rename(columns={"value": "index"})
 
     # Combine both dataframes.
-    combined = pd.merge(df_rl, df_qi, on=["country", "year"], how="inner")
+    combined = pd.merge(df_rl, df_qi, on=["country", "year"], how="inner", validate="one_to_one")
 
     # Create the new variable of arable land per crop output.
     combined["value"] = combined["area"] / combined["index"]
@@ -288,8 +288,7 @@ def generate_food_available_for_consumption(df_fbsc: pd.DataFrame) -> Table:
     # Expected unit.
     CONSUMPTION_UNIT = "kilocalories per day per capita"
 
-    # df_fbsc[df_fbsc["unit"].str.contains("kilocal")][["element_code", "element", "unit"]].drop_duplicates()
-
+    # Select relevant metric.
     df_fbsc = df_fbsc[(df_fbsc["element_code"] == ELEMENT_CODE_FOR_PER_CAPITA_FOOD)].reset_index(drop=True)
 
     # Sanity check.
