@@ -15,7 +15,7 @@ from . import utils
 CURRENT_DIR = Path(__file__).parent
 
 ETL_DIR = Path(etl.__file__).parent.parent
-
+DEFAULT_EXTENSION = "csv"
 
 class Options(Enum):
 
@@ -43,6 +43,12 @@ class MeadowForm(BaseModel):
 
     def __init__(self, **data: Any) -> None:
         options = data.pop("options")
+        print(1, data["snapshot_file_extension"])
+        if (ext := data.pop("snapshot_file_extension") != ""):
+            data["snapshot_file_extension"] = ext
+        else:
+            data["snapshot_file_extension"] = DEFAULT_EXTENSION
+        print(2, data["snapshot_file_extension"])
         data["add_to_dag"] = Options.ADD_TO_DAG.value in options
         data["include_metadata_yaml"] = Options.INCLUDE_METADATA_YAML.value in options
         data["load_countries_regions"] = Options.LOAD_COUNTRIES_REGIONS.value in options
@@ -97,7 +103,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
             pi.input(
                 "Snapshot file extension",
                 name="snapshot_file_extension",
-                placeholder="csv",
+                placeholder=DEFAULT_EXTENSION,
                 value=dummies.get("file_extension"),
                 help_text="File extension (without the '.') of the snapshot data file. Example: csv",
             ),
