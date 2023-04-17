@@ -1,5 +1,5 @@
 """Script to create a snapshot of dataset 'Short-Term Mortality Fluctuations (HMD, 2023)'."""
-
+from datetime import datetime
 from pathlib import Path
 
 import click
@@ -20,6 +20,10 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
 def main(upload: bool) -> None:
     # Create a new snapshot.
     snap = Snapshot(f"excess_mortality/{SNAPSHOT_VERSION}/hmd_stmf.csv")
+
+    # Add date_accessed
+    snap.metadata.date_accessed = datetime.today()
+    snap.metadata.save()
 
     # Download data from source.
     snap.download_from_source()

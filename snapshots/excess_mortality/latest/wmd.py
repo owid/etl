@@ -22,12 +22,12 @@ def main(upload: bool) -> None:
     # Create a new snapshot.
     snap = Snapshot(f"excess_mortality/{SNAPSHOT_VERSION}/wmd.csv")
 
+    # Add date_accessed
+    snap.metadata.date_accessed = datetime.today()
+    snap.metadata.save()
+
     # Download data from source.
     snap.download_from_source()
-
-    # Add date_accessed
-    snap.metadata.date_accessed = datetime.today().strftime("%Y-%m-%d")
-    snap.metadata.save()
 
     # Add file to DVC and upload to S3.
     snap.dvc_add(upload=upload)

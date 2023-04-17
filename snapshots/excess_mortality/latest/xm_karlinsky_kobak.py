@@ -28,7 +28,7 @@ def add_snapshot(uri: str, upload: bool):
     # Load snapshot
     snap = Snapshot(uri)
     # Add date_accessed
-    snap.metadata.date_accessed = datetime.today().strftime("%Y-%m-%d")
+    snap.metadata.date_accessed = datetime.today()
     snap.metadata.save()
     # Download file
     snap.download_from_source()
