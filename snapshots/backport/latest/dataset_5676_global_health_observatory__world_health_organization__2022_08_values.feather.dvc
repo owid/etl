@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5676_global_health_observatory__world_health_organization__2022_08_values
   file_extension: feather
-  date_accessed: 2023-04-10 14:01:47.312545
+  date_accessed: 2023-04-17 07:12:11.300483
   name: Global Health Observatory - World Health Organization (2022.08)
   description: This is a dataset imported by the automated fetcher
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 8760c0cb39a15d954ff2ef5dd351d71d
+- md5: e03402f551224d3915a1e8d85c4265d6
   size: 31581050
   path: dataset_5676_global_health_observatory__world_health_organization__2022_08_values.feather
