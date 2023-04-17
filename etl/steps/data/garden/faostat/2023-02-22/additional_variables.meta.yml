@@ -206,3 +206,50 @@ tables:
         unit: "grams per day per capita"
         short_unit: "g"
         description: *macronutrient_composition_variable_description
+  fertilizers:
+    variables:
+      nitrogen_per_cropland:
+        title: Nitrogen use per area of cropland
+        unit: kilograms per hectare
+        short_unit: kg/ha
+        description: 
+      phosphate_per_cropland:
+        title: Phosphate use per area of cropland
+        unit: kilograms per hectare
+        short_unit: kg/ha
+        description: 
+      potash_per_cropland:
+        title: Potash use per area of cropland
+        unit: kilograms per hectare
+        short_unit: kg/ha
+        description: 
+      all_fertilizers_per_cropland:
+        title: All fertilizers use per area of cropland
+        unit: kilograms per hectare
+        short_unit: kg/ha
+        description: 
+      cropland:
+        title: Area of cropland
+        unit: hectares
+        short_unit: ha
+        description: 
+      nitrogen_use:
+        title: Nitrogen use
+        unit: tonnes
+        short_unit: t
+        description: 
+      phosphate_use:
+        title: Phosphate use
+        unit: tonnes
+        short_unit: t
+        description: 
+      potash_use:
+        title: Potash use
+        unit: tonnes
+        short_unit: t
+        description: 
+      all_fertilizers_use:
+        title: All fertilizers use
+        unit: tonnes
+        short_unit: t
+        description: 
