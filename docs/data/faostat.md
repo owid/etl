@@ -263,7 +263,13 @@ corresponding latest versions.
 etl explorers/faostat/YYYY-MM-DD/food_explorer
 ```
 Run internal sanity checks on the generated files.
-13. Move old, unnecessary etl steps in the dag to the archive dag.
+13. Manually create a new garden dataset of additional variables `additional_variables` for the new version, and update its metadata. Then create a new grapher dataset too.
+NOTE: In the future this could be handled automatically by one of the existing scripts.
+14. Archive unnecessary DB datasets, and move old, unnecessary etl steps in the dag to the archive dag.
+```bash
+python etl/scripts/faostat/archive_old_datasets.py -e
+```
+NOTE: This step may needs to be run several times, since archiving of steps currently needs to be done manually.
 
 ## Workflow to make changes to a dataset
 

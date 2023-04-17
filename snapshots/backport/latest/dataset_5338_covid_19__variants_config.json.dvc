@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5338_covid_19__variants_config
   file_extension: json
-  date_accessed: 2023-04-14 00:09:41.576968
+  date_accessed: 2023-04-17 00:06:13.246839
   name: Grapher metadata for dataset_5338_covid_19__variants
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 879e6de67f64bcc7bd4460ce4e49ff2b
+- md5: 5735fa8f6196b433daaaeb6e8f5d0901
   size: 48475
   path: dataset_5338_covid_19__variants_config.json

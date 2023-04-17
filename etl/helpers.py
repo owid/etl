@@ -561,9 +561,6 @@ class VersionTracker:
     """Helper object that loads the dag, provides useful functions to check for versions and dataset dependencies, and
     checks for inconsistencies.
 
-    ####################################################################################################################
-    WARNING: This class may be refactored substantially, so it would be better to not use it for now in the code.
-    ####################################################################################################################
     """
 
     def __init__(self):
@@ -728,6 +725,21 @@ class VersionTracker:
 
         if len(unused_data_steps) > 0:
             log.warning(f"Some data steps can be safely archived: {unused_data_steps}")
+
+    def get_backported_db_dataset_ids(self) -> List[int]:
+        """Get list of ids of DB datasets that are used as backported datasets in active steps of ETL.
+
+        Returns
+        -------
+        backported_dataset_ids : List[int]
+            Grapher DB dataset ids that are used in ETL backported datasets.
+        """
+        backported_dataset_names = [step for step in self.all_active_dependencies if step.startswith("backport://")]
+        backported_dataset_ids = sorted(
+            set([int(step.split("dataset_")[1].split("_")[0]) for step in backported_dataset_names])
+        )
+
+        return backported_dataset_ids
 
     def apply_sanity_checks(self) -> None:
         self.check_that_archive_steps_are_not_dependencies_of_active_steps()

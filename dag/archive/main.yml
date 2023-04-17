@@ -14,11 +14,23 @@ steps:
     - data://meadow/un/2022-07-07/un_sdg
   data://grapher/un/2022-07-07/un_sdg:
     - data://garden/un/2022-07-07/un_sdg
+  #
+  # Met Office Hadley Centre - Near surface temperature anomaly (2023-01-02).
+  #
+  data://meadow/met_office_hadley_centre/2023-01-02/near_surface_temperature:
+    - snapshot://met_office_hadley_centre/2023-01-02/near_surface_temperature_global.csv
+    - snapshot://met_office_hadley_centre/2023-01-02/near_surface_temperature_northern_hemisphere.csv
+    - snapshot://met_office_hadley_centre/2023-01-02/near_surface_temperature_southern_hemisphere.csv
+  data://garden/met_office_hadley_centre/2023-01-02/near_surface_temperature:
+    - data://meadow/met_office_hadley_centre/2023-01-02/near_surface_temperature
+  data://grapher/met_office_hadley_centre/2023-01-02/near_surface_temperature:
+    - data://garden/met_office_hadley_centre/2023-01-02/near_surface_temperature
+
 # Include all active steps plus all archive steps.
 include:
   - dag/main.yml
   # - dag/archive/open_numbers.yml
-  # - dag/archive/faostat.yml
+  - dag/archive/faostat.yml
   - dag/archive/energy.yml
   # - dag/archive/walkthrough.yml
   # - dag/archive/examples.yml
