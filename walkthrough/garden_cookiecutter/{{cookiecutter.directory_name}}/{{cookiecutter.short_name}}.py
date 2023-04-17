@@ -25,7 +25,7 @@ def load_countries_regions() -> Table:
 
 
 def load_population() -> Table:
-    """Load population table from key_indicators dataset."""
+    """Load population table from population OMM dataset."""
     ds_indicators: Dataset = paths.load_dependency(channel="garden", namespace="demography", short_name="population")
     tb_population = ds_indicators["population"]
 
