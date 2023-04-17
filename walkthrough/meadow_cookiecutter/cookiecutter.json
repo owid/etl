@@ -5,8 +5,6 @@
     "version": "",
     "snapshot_version": "",
     "snapshot_file_extension": "",
-    "load_population": false,
-    "load_countries_regions": false,
     "include_metadata_yaml": false,
     "add_to_dag": false,
     "is_private": false
