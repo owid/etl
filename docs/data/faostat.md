@@ -263,7 +263,11 @@ corresponding latest versions.
 etl explorers/faostat/YYYY-MM-DD/food_explorer
 ```
 Run internal sanity checks on the generated files.
-13. Move old, unnecessary etl steps in the dag to the archive dag.
+13. Archive unnecessary DB datasets, and move old, unnecessary etl steps in the dag to the archive dag.
+```bash
+python etl/scripts/faostat/archive_old_datasets.py -e
+```
+NOTE: This step may needs to be run several times, since archiving of steps currently needs to be done manually.
 
 ## Workflow to make changes to a dataset
 

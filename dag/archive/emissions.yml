@@ -1,0 +1,34 @@
+steps:
+  #
+  # RFF - World Carbon Pricing (2022-09-14).
+  #
+  data://meadow/rff/2022-09-14/world_carbon_pricing:
+    - walden://rff/2022-09-14/world_carbon_pricing
+    - walden://rff/2022-09-14/ipcc_codes
+  data://meadow/rff/2022-09-14/world_carbon_pricing__subnational:
+    - walden://rff/2022-09-14/world_carbon_pricing__subnational
+    - walden://rff/2022-09-14/ipcc_codes
+  data://meadow/rff/2022-09-14/emissions_weighted_carbon_price__economy:
+    - walden://rff/2022-09-14/emissions_weighted_carbon_price__economy
+  data://meadow/rff/2022-09-14/emissions_weighted_carbon_price__coverage:
+    - walden://rff/2022-09-14/emissions_weighted_carbon_price__coverage
+  data://garden/rff/2022-09-14/world_carbon_pricing:
+    - data://meadow/rff/2022-09-14/world_carbon_pricing
+    - data://meadow/rff/2022-09-14/world_carbon_pricing__subnational
+  data://garden/rff/2022-09-14/emissions_weighted_carbon_price:
+    - data://meadow/rff/2022-09-14/emissions_weighted_carbon_price__economy
+    - data://meadow/rff/2022-09-14/emissions_weighted_carbon_price__coverage
+  data://grapher/rff/2022-09-14/world_carbon_pricing_any_sector:
+    - data://garden/rff/2022-09-14/world_carbon_pricing
+  data://grapher/rff/2022-09-14/emissions_weighted_carbon_price:
+    - data://garden/rff/2022-09-14/emissions_weighted_carbon_price
+  #
+  # GCP - Global Carbon Budget - additional data (2021).
+  #
+  data://meadow/gcp/2022-09-29/global_carbon_budget_additional:
+    - walden://gcp/2022-09-29/global_carbon_budget_global
+  data://garden/gcp/2022-09-29/global_carbon_budget_additional:
+    - data://meadow/gcp/2022-09-29/global_carbon_budget_additional
+    - data://garden/owid/latest/key_indicators
+  data://grapher/gcp/2022-09-29/global_carbon_budget_additional:
+    - data://garden/gcp/2022-09-29/global_carbon_budget_additional

@@ -1,0 +1,270 @@
+steps:
+  #
+  # FAOSTAT meadow steps for version 2022-05-17
+  #
+  data://meadow/faostat/2022-05-17/faostat_ef:
+    - walden://faostat/2022-05-17/faostat_ef
+  data://meadow/faostat/2022-05-17/faostat_ei:
+    - walden://faostat/2022-05-17/faostat_ei
+  data://meadow/faostat/2022-05-17/faostat_ek:
+    - walden://faostat/2022-05-17/faostat_ek
+  data://meadow/faostat/2022-05-17/faostat_el:
+    - walden://faostat/2022-05-17/faostat_el
+  data://meadow/faostat/2022-05-17/faostat_emn:
+    - walden://faostat/2022-05-17/faostat_emn
+  data://meadow/faostat/2022-05-17/faostat_ep:
+    - walden://faostat/2022-05-17/faostat_ep
+  data://meadow/faostat/2022-05-17/faostat_esb:
+    - walden://faostat/2022-05-17/faostat_esb
+  data://meadow/faostat/2022-05-17/faostat_fa:
+    - walden://faostat/2022-05-17/faostat_fa
+  data://meadow/faostat/2022-05-17/faostat_fbs:
+    - walden://faostat/2022-05-17/faostat_fbs
+  data://meadow/faostat/2022-05-17/faostat_fbsh:
+    - walden://faostat/2022-05-17/faostat_fbsh
+  data://meadow/faostat/2022-05-17/faostat_fo:
+    - walden://faostat/2022-05-17/faostat_fo
+  data://meadow/faostat/2022-05-17/faostat_fs:
+    - walden://faostat/2022-05-17/faostat_fs
+  data://meadow/faostat/2022-05-17/faostat_lc:
+    - walden://faostat/2022-05-17/faostat_lc
+  data://meadow/faostat/2022-05-17/faostat_metadata:
+    - walden://faostat/2022-05-17/faostat_metadata
+  data://meadow/faostat/2022-05-17/faostat_qcl:
+    - walden://faostat/2022-05-17/faostat_qcl
+  data://meadow/faostat/2022-05-17/faostat_qi:
+    - walden://faostat/2022-05-17/faostat_qi
+  data://meadow/faostat/2022-05-17/faostat_qv:
+    - walden://faostat/2022-05-17/faostat_qv
+  data://meadow/faostat/2022-05-17/faostat_rfb:
+    - walden://faostat/2022-05-17/faostat_rfb
+  data://meadow/faostat/2022-05-17/faostat_rfn:
+    - walden://faostat/2022-05-17/faostat_rfn
+  data://meadow/faostat/2022-05-17/faostat_rl:
+    - walden://faostat/2022-05-17/faostat_rl
+  data://meadow/faostat/2022-05-17/faostat_rp:
+    - walden://faostat/2022-05-17/faostat_rp
+  data://meadow/faostat/2022-05-17/faostat_rt:
+    - walden://faostat/2022-05-17/faostat_rt
+  data://meadow/faostat/2022-05-17/faostat_scl:
+    - data://meadow/faostat/2022-05-17/faostat_metadata
+    - walden://faostat/2022-05-17/faostat_scl
+  data://meadow/faostat/2022-05-17/faostat_sdgb:
+    - walden://faostat/2022-05-17/faostat_sdgb
+  data://meadow/faostat/2022-05-17/faostat_tcl:
+    - walden://faostat/2022-05-17/faostat_tcl
+  data://meadow/faostat/2022-05-17/faostat_ti:
+    - walden://faostat/2022-05-17/faostat_ti
+  #
+  # FAOSTAT garden steps for version 2022-05-17
+  #
+  data://garden/faostat/2022-05-17/faostat_metadata:
+    - data://meadow/faostat/2022-05-17/faostat_ef
+    - data://meadow/faostat/2022-05-17/faostat_ei
+    - data://meadow/faostat/2022-05-17/faostat_ek
+    - data://meadow/faostat/2022-05-17/faostat_el
+    - data://meadow/faostat/2022-05-17/faostat_emn
+    - data://meadow/faostat/2022-05-17/faostat_ep
+    - data://meadow/faostat/2022-05-17/faostat_esb
+    - data://meadow/faostat/2022-05-17/faostat_fa
+    - data://meadow/faostat/2022-05-17/faostat_fbs
+    - data://meadow/faostat/2022-05-17/faostat_fbsh
+    - data://meadow/faostat/2022-05-17/faostat_fo
+    - data://meadow/faostat/2022-05-17/faostat_fs
+    - data://meadow/faostat/2022-05-17/faostat_lc
+    - data://meadow/faostat/2022-05-17/faostat_metadata
+    - data://meadow/faostat/2022-05-17/faostat_qcl
+    - data://meadow/faostat/2022-05-17/faostat_qi
+    - data://meadow/faostat/2022-05-17/faostat_qv
+    - data://meadow/faostat/2022-05-17/faostat_rfb
+    - data://meadow/faostat/2022-05-17/faostat_rfn
+    - data://meadow/faostat/2022-05-17/faostat_rl
+    - data://meadow/faostat/2022-05-17/faostat_rp
+    - data://meadow/faostat/2022-05-17/faostat_rt
+    - data://meadow/faostat/2022-05-17/faostat_scl
+    - data://meadow/faostat/2022-05-17/faostat_sdgb
+    - data://meadow/faostat/2022-05-17/faostat_tcl
+    - data://meadow/faostat/2022-05-17/faostat_ti
+  data://garden/faostat/2022-05-17/faostat_ef:
+    - data://meadow/faostat/2022-05-17/faostat_ef
+    - data://garden/faostat/2022-05-17/faostat_metadata
+    - data://garden/owid/latest/key_indicators
+    - data://garden/wb/2021-07-01/wb_income
+  data://garden/faostat/2022-05-17/faostat_ei:
+    - data://meadow/faostat/2022-05-17/faostat_ei
+    - data://garden/faostat/2022-05-17/faostat_metadata
+    - data://garden/owid/latest/key_indicators
+    - data://garden/wb/2021-07-01/wb_income
+  data://garden/faostat/2022-05-17/faostat_ek:
+    - data://meadow/faostat/2022-05-17/faostat_ek
+    - data://garden/faostat/2022-05-17/faostat_metadata
+    - data://garden/owid/latest/key_indicators
+    - data://garden/wb/2021-07-01/wb_income
+  data://garden/faostat/2022-05-17/faostat_el:
+    - data://meadow/faostat/2022-05-17/faostat_el
+    - data://garden/faostat/2022-05-17/faostat_metadata
+    - data://garden/owid/latest/key_indicators
+    - data://garden/wb/2021-07-01/wb_income
+  data://garden/faostat/2022-05-17/faostat_emn:
+    - data://meadow/faostat/2022-05-17/faostat_emn
+    - data://garden/faostat/2022-05-17/faostat_metadata
+    - data://garden/owid/latest/key_indicators
+    - data://garden/wb/2021-07-01/wb_income
+  data://garden/faostat/2022-05-17/faostat_ep:
+    - data://meadow/faostat/2022-05-17/faostat_ep
+    - data://garden/faostat/2022-05-17/faostat_metadata
+    - data://garden/owid/latest/key_indicators
+    - data://garden/wb/2021-07-01/wb_income
+  data://garden/faostat/2022-05-17/faostat_esb:
+    - data://meadow/faostat/2022-05-17/faostat_esb
+    - data://garden/faostat/2022-05-17/faostat_metadata
+    - data://garden/owid/latest/key_indicators
+    - data://garden/wb/2021-07-01/wb_income
+  data://garden/faostat/2022-05-17/faostat_fa:
+    - data://meadow/faostat/2022-05-17/faostat_fa
+    - data://garden/faostat/2022-05-17/faostat_metadata
+    - data://garden/owid/latest/key_indicators
+    - data://garden/wb/2021-07-01/wb_income
+  data://garden/faostat/2022-05-17/faostat_fbsc:
+    - data://meadow/faostat/2022-05-17/faostat_fbs
+    - data://meadow/faostat/2022-05-17/faostat_fbsh
+    - data://garden/faostat/2022-05-17/faostat_metadata
+    - data://garden/owid/latest/key_indicators
+    - data://garden/wb/2021-07-01/wb_income
+  data://garden/faostat/2022-05-17/faostat_fo:
+    - data://meadow/faostat/2022-05-17/faostat_fo
+    - data://garden/faostat/2022-05-17/faostat_metadata
+    - data://garden/owid/latest/key_indicators
+    - data://garden/wb/2021-07-01/wb_income
+  data://garden/faostat/2022-05-17/faostat_food_explorer:
+    - data://garden/faostat/2022-05-17/faostat_fbsc
+    - data://garden/faostat/2022-05-17/faostat_metadata
+    - data://garden/faostat/2022-05-17/faostat_qcl
+    - data://garden/owid/latest/key_indicators
+    - data://garden/wb/2021-07-01/wb_income
+  data://garden/faostat/2022-05-17/faostat_fs:
+    - data://meadow/faostat/2022-05-17/faostat_fs
+    - data://garden/faostat/2022-05-17/faostat_metadata
+    - data://garden/owid/latest/key_indicators
+    - data://garden/wb/2021-07-01/wb_income
+  data://garden/faostat/2022-05-17/faostat_lc:
+    - data://meadow/faostat/2022-05-17/faostat_lc
+    - data://garden/faostat/2022-05-17/faostat_metadata
+    - data://garden/owid/latest/key_indicators
+    - data://garden/wb/2021-07-01/wb_income
+  data://garden/faostat/2022-05-17/faostat_qcl:
+    - data://garden/faostat/2022-05-17/faostat_metadata
+    - data://meadow/faostat/2022-05-17/faostat_qcl
+    - data://garden/owid/latest/key_indicators
+    - data://garden/wb/2021-07-01/wb_income
+  data://garden/faostat/2022-05-17/faostat_qi:
+    - data://garden/faostat/2022-05-17/faostat_metadata
+    - data://meadow/faostat/2022-05-17/faostat_qi
+    - data://garden/owid/latest/key_indicators
+    - data://garden/wb/2021-07-01/wb_income
+  data://garden/faostat/2022-05-17/faostat_qv:
+    - data://garden/faostat/2022-05-17/faostat_metadata
+    - data://meadow/faostat/2022-05-17/faostat_qv
+    - data://garden/owid/latest/key_indicators
+    - data://garden/wb/2021-07-01/wb_income
+  data://garden/faostat/2022-05-17/faostat_rfb:
+    - data://garden/faostat/2022-05-17/faostat_metadata
+    - data://meadow/faostat/2022-05-17/faostat_rfb
+    - data://garden/owid/latest/key_indicators
+    - data://garden/wb/2021-07-01/wb_income
+  data://garden/faostat/2022-05-17/faostat_rfn:
+    - data://garden/faostat/2022-05-17/faostat_metadata
+    - data://meadow/faostat/2022-05-17/faostat_rfn
+    - data://garden/owid/latest/key_indicators
+    - data://garden/wb/2021-07-01/wb_income
+  data://garden/faostat/2022-05-17/faostat_rl:
+    - data://garden/faostat/2022-05-17/faostat_metadata
+    - data://meadow/faostat/2022-05-17/faostat_rl
+    - data://garden/owid/latest/key_indicators
+    - data://garden/wb/2021-07-01/wb_income
+  data://garden/faostat/2022-05-17/faostat_rp:
+    - data://garden/faostat/2022-05-17/faostat_metadata
+    - data://meadow/faostat/2022-05-17/faostat_rp
+    - data://garden/owid/latest/key_indicators
+    - data://garden/wb/2021-07-01/wb_income
+  data://garden/faostat/2022-05-17/faostat_rt:
+    - data://garden/faostat/2022-05-17/faostat_metadata
+    - data://meadow/faostat/2022-05-17/faostat_rt
+    - data://garden/owid/latest/key_indicators
+    - data://garden/wb/2021-07-01/wb_income
+  data://garden/faostat/2022-05-17/faostat_scl:
+    - data://garden/faostat/2022-05-17/faostat_metadata
+    - data://meadow/faostat/2022-05-17/faostat_scl
+    - data://garden/owid/latest/key_indicators
+    - data://garden/wb/2021-07-01/wb_income
+  data://garden/faostat/2022-05-17/faostat_sdgb:
+    - data://garden/faostat/2022-05-17/faostat_metadata
+    - data://meadow/faostat/2022-05-17/faostat_sdgb
+    - data://garden/owid/latest/key_indicators
+    - data://garden/wb/2021-07-01/wb_income
+  data://garden/faostat/2022-05-17/faostat_tcl:
+    - data://garden/faostat/2022-05-17/faostat_metadata
+    - data://meadow/faostat/2022-05-17/faostat_tcl
+    - data://garden/owid/latest/key_indicators
+    - data://garden/wb/2021-07-01/wb_income
+  data://garden/faostat/2022-05-17/faostat_ti:
+    - data://garden/faostat/2022-05-17/faostat_metadata
+    - data://meadow/faostat/2022-05-17/faostat_ti
+    - data://garden/owid/latest/key_indicators
+    - data://garden/wb/2021-07-01/wb_income
+  #
+  # FAOSTAT grapher steps for version 2022-05-17
+  #
+  data://grapher/faostat/2022-05-17/faostat_ef:
+    - data://garden/faostat/2022-05-17/faostat_ef
+  data://grapher/faostat/2022-05-17/faostat_ei:
+    - data://garden/faostat/2022-05-17/faostat_ei
+  data://grapher/faostat/2022-05-17/faostat_ek:
+    - data://garden/faostat/2022-05-17/faostat_ek
+  data://grapher/faostat/2022-05-17/faostat_el:
+    - data://garden/faostat/2022-05-17/faostat_el
+  data://grapher/faostat/2022-05-17/faostat_emn:
+    - data://garden/faostat/2022-05-17/faostat_emn
+  data://grapher/faostat/2022-05-17/faostat_ep:
+    - data://garden/faostat/2022-05-17/faostat_ep
+  data://grapher/faostat/2022-05-17/faostat_esb:
+    - data://garden/faostat/2022-05-17/faostat_esb
+  data://grapher/faostat/2022-05-17/faostat_fa:
+    - data://garden/faostat/2022-05-17/faostat_fa
+  data://grapher/faostat/2022-05-17/faostat_fbsc:
+    - data://garden/faostat/2022-05-17/faostat_fbsc
+  data://grapher/faostat/2022-05-17/faostat_fo:
+    - data://garden/faostat/2022-05-17/faostat_fo
+  data://grapher/faostat/2022-05-17/faostat_fs:
+    - data://garden/faostat/2022-05-17/faostat_fs
+  data://grapher/faostat/2022-05-17/faostat_lc:
+    - data://garden/faostat/2022-05-17/faostat_lc
+  data://grapher/faostat/2022-05-17/faostat_qcl:
+    - data://garden/faostat/2022-05-17/faostat_qcl
+  data://grapher/faostat/2022-05-17/faostat_qi:
+    - data://garden/faostat/2022-05-17/faostat_qi
+  data://grapher/faostat/2022-05-17/faostat_qv:
+    - data://garden/faostat/2022-05-17/faostat_qv
+  data://grapher/faostat/2022-05-17/faostat_rfb:
+    - data://garden/faostat/2022-05-17/faostat_rfb
+  data://grapher/faostat/2022-05-17/faostat_rfn:
+    - data://garden/faostat/2022-05-17/faostat_rfn
+  data://grapher/faostat/2022-05-17/faostat_rl:
+    - data://garden/faostat/2022-05-17/faostat_rl
+  data://grapher/faostat/2022-05-17/faostat_rp:
+    - data://garden/faostat/2022-05-17/faostat_rp
+  data://grapher/faostat/2022-05-17/faostat_rt:
+    - data://garden/faostat/2022-05-17/faostat_rt
+  data://grapher/faostat/2022-05-17/faostat_scl:
+    - data://garden/faostat/2022-05-17/faostat_scl
+  data://grapher/faostat/2022-05-17/faostat_sdgb:
+    - data://garden/faostat/2022-05-17/faostat_sdgb
+  data://grapher/faostat/2022-05-17/faostat_tcl:
+    - data://garden/faostat/2022-05-17/faostat_tcl
+  data://grapher/faostat/2022-05-17/faostat_ti:
+    - data://garden/faostat/2022-05-17/faostat_ti
+  #
+  # Food explorer step
+  #
+  data://explorers/owid/latest/food_explorer:
+    - data://garden/faostat/2022-05-17/faostat_food_explorer
