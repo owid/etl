@@ -1,0 +1,26 @@
+steps:
+  # NASA Ozone Watch
+  data://meadow/nasa/2023-03-06/ozone_hole_area:
+    - snapshot://nasa/2023-03-06/ozone_hole_area_p1.txt
+    - snapshot://nasa/2023-03-06/ozone_hole_area_p2.txt
+  data://garden/nasa/2023-03-06/ozone_hole_area:
+    - data://meadow/nasa/2023-03-06/ozone_hole_area
+  data://grapher/nasa/2023-03-06/ozone_hole_area:
+    - data://garden/nasa/2023-03-06/ozone_hole_area
+  # UNEP Cumption of controlled substances
+  data://meadow/unep/2023-03-17/consumption_controlled_substances:
+    - snapshot://unep/2023-03-17/consumption_controlled_substances.bromochloromethane.xlsx
+    - snapshot://unep/2023-03-17/consumption_controlled_substances.carbon_tetrachloride.xlsx
+    - snapshot://unep/2023-03-17/consumption_controlled_substances.chlorofluorocarbons.xlsx
+    - snapshot://unep/2023-03-17/consumption_controlled_substances.halons.xlsx
+    - snapshot://unep/2023-03-17/consumption_controlled_substances.hydrobromofluorocarbons.xlsx
+    - snapshot://unep/2023-03-17/consumption_controlled_substances.hydrochlorofluorocarbons.xlsx
+    - snapshot://unep/2023-03-17/consumption_controlled_substances.hydrofluorocarbons.xlsx
+    - snapshot://unep/2023-03-17/consumption_controlled_substances.methyl_bromide.xlsx
+    - snapshot://unep/2023-03-17/consumption_controlled_substances.methyl_chloroform.xlsx
+    - snapshot://unep/2023-03-17/consumption_controlled_substances.other_fully_halogenated.xlsx
+  data://garden/unep/2023-03-17/consumption_controlled_substances:
+    - data://meadow/unep/2023-03-17/consumption_controlled_substances
+    - data://garden/owid/latest/key_indicators
+  data://grapher/unep/2023-03-17/consumption_controlled_substances:
+    - data://garden/unep/2023-03-17/consumption_controlled_substances

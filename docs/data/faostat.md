@@ -62,6 +62,8 @@ List of meadow datasets that are generated, and their titles:
 * `faostat_fbsh`: Food Balances: Food Balances (-2013, old methodology and population).
 * `faostat_fo`: Forestry: Forestry Production and Trade.
 * `faostat_fs`: Food Security and Nutrition: Suite of Food Security Indicators.
+* `faostat_gn`: Climate Change: Energy Use.
+* `faostat_ic`: Investment: Credit to Agriculture.
 * `faostat_lc`: Land, Inputs and Sustainability: Land Cover.
 * `faostat_qcl`: Production: Crops and livestock products.
 * `faostat_qi`: Production: Production Indices.
@@ -75,6 +77,7 @@ List of meadow datasets that are generated, and their titles:
 * `faostat_sdgb`: SDG Indicators: SDG Indicators.
 * `faostat_tcl`: Trade: Crops and livestock products.
 * `faostat_ti`: Trade: Trade Indices.
+* `faostat_wcad`: World Census of Agriculture: Structural data from agricultural censuses.
 
 Each dataset `faostat_*` contains only one table:
 * `faostat_*`: Raw data in long format.
@@ -91,9 +94,8 @@ Each dataset `faostat_*` contains only one table:
     * `value`: Data value.
     * `flag`: Flag for current data point.
 
-Exceptionally, one dataset has different column names:
-* `faostat_fa`, that contains `recipient_country_code` instead of `area_code` in the index, and column
-  `recipient_country` instead of `area`.
+Exceptionally, some datasets have different column names:
+* `faostat_fa` contains `recipient_country_code` instead of `area_code` in the index, and column `recipient_country` instead of `area`. Also, `faostat_wcad` has columns `wca_round` and `census_year` instead of `year`.
 
 There is an additional dataset:
 * `faostat_metadata`: FAOSTAT (additional) metadata dataset (originally ingested using the FAOSTAT API).
@@ -226,29 +228,56 @@ python etl/scripts/faostat/create_new_steps.py -c garden
 ```bash
 etl garden/faostat/YYYY-MM-DD
 ```
-6. Create new grapher steps.
+Optionally, set `INSPECT_ANOMALIES=True`, to visualize if anomalies that were detected in the previous version of the data are still present in the current version.
+```bash
+INSPECT_ANOMALIES=True etl garden/faostat/YYYY-MM-DD
+```
+6. Inspect and update any possible changes of dataset/item/element/unit names and descriptions.
+```bash
+python etl/scripts/faostat/update_custom_metadata.py
+```
+7. Create new grapher steps.
 ```bash
 python etl/scripts/faostat/create_new_steps.py -c grapher
 ```
-7. Run the new etl grapher steps, to generate the grapher charts.
+8. Run the new etl grapher steps, to generate the grapher charts.
 ```bash
 etl faostat/YYYY-MM-DD --grapher
 ```
-8. Use OWID's internal approval tool to visually inspect changes between the old and new versions of updated charts, and
+9. Generate chart revisions (showing a chart using an old version of a variable and the same chart using the new
+version) for each dataset, to replace variables of a dataset from its second latest version to its latest version.
+```bash
+python etl/scripts/faostat/create_chart_revisions.py -e
+```
+NOTE: This step may raise errors (because of limitations in our chart revision tool). If so, continue to the next step
+and come back to this one again. Keep repeating these two steps until there are no more errors (which may happen after
+two iterations).
+10. Use OWID's internal approval tool to visually inspect changes between the old and new versions of updated charts, and
 accept or reject changes.
-9. Create a new explorers step. For the moment, this has to be done manually:
+11. Create a new explorers step. For the moment, this has to be done manually:
 * Duplicate the latest step in `etl/etl/steps/data/explorers/faostat/` and use the current date as the new version.
 * Duplicate entry of explorers step in the dag, and replace versions (of the step itself and its dependencies) by the
 corresponding latest versions.
+12. Run the new etl explorers step, to generate the csv files for the global food explorer.
+```bash
+etl explorers/faostat/YYYY-MM-DD/food_explorer
+```
+Run internal sanity checks on the generated files.
+13. Manually create a new garden dataset of additional variables `additional_variables` for the new version, and update its metadata. Then create a new grapher dataset too.
+NOTE: In the future this could be handled automatically by one of the existing scripts.
+14. Archive unnecessary DB datasets, and move old, unnecessary etl steps in the dag to the archive dag.
+```bash
+python etl/scripts/faostat/archive_old_datasets.py -e
+```
+NOTE: This step may needs to be run several times, since archiving of steps currently needs to be done manually.
 
 ## Workflow to make changes to a dataset
 
 ### Removing outliers
 
-If a new outlier in a dataset is detected, it can be added to `OUTLIERS_TO_REMOVE` in the latest garden `shared.py`
-module.
-Since that module is not a data step itself, `etl` will not recognise that there has been a change.
-Therefore, the garden step of the dataset with the outlier has to be forced (using the `--force` flag).
+If a new outlier in a dataset is detected, it can be added to `detected_outliers.json` in the latest garden version
+folder.
+Then run again the corresponding etl step.
 
 ### Adding or removing a domain
 
@@ -397,14 +426,7 @@ NOTE:
 ### Harmonization of item code
 
 Most FAOSTAT datasets have items identified by a simple integer number (e.g. item code 15 corresponds to item `Wheat`).
-However, there are some exceptions:
-* Dataset `faostat_sdgb` has alphanumerical item codes (e.g. it has item codes like `240283`, `5.a.1(a)`, and
-  `AG_FLS_IDX`), which seem to have no connection to other item codes.
-* Dataset `faostat_scl` has item codes with decimals (e.g. '23120.01' for item `Flour, rice`). These items do not seem
-  to be related to the usual item codes. For example, item code "0115" in `faostat_scl` corresponds to item `Barley`,
-  whereas in `faostat_tcl`, item code 115 corresponds to item `Food preparations, flour, malt extract`.
 
-Ignoring these two exceptions, the rest of the datasets seem to be consistent in their item codes:
 Although for the same item code one can find slightly different item names in different datasets, they seem to always
 refer to the same product.
 For example, item code 27 has FAO item name `Rice, paddy` in datasets `faostat_ei`, `faostat_qcl`, `faostat_qi`, and
@@ -412,10 +434,11 @@ For example, item code 27 has FAO item name `Rice, paddy` in datasets `faostat_e
 
 To be able to accommodate the numerical item codes of `faostat_scl` and the default item code, we convert item codes of
 all datasets to a string of 8 characters (e.g. 15 becomes "00000015").
-As an exception, item codes from `faostat_sdgb` can have more than 8 characters.
+This number of characters is defined by `N_CHARACTERS_ITEM_CODE` in the `shared.py` module of the garden folder.
 
 ### Harmonization of element code
 
 We have not identified issues with element codes like those in item codes.
 However, for consistency (and just in case similar issues occur in the future), we also convert element codes into
 strings of 6 digits (e.g. 1234 -> '001234').
+This number of characters is defined by `N_CHARACTERS_ELEMENT_CODE` in the `shared.py` module of the garden folder.

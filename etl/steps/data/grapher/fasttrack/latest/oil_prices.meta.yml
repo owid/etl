@@ -1,0 +1,17 @@
+dataset:
+  namespace: fasttrack
+  version: latest
+  short_name: oil_prices
+  title: DRAFT Oil prices
+  description: ''
+  sources:
+  - name: Unknown
+    published_by: Unknown
+    publication_year: 2023
+    date_accessed: 2023-03-06
+tables:
+  oil_prices:
+    variables:
+      brent_oil_price:
+        title: Brent oil price
+        unit: ''

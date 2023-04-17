@@ -5,21 +5,25 @@ dataset:
   description: |
     This dataset has been created using multiple sources:
 
-      - We use UN WPP 2022 for data prior to 1950.
-      - Before that, we combine HYDE and Gapminder.
+    - UN WPP (2022): Covers the period 1950-2100. Future projections are based on the Medium variant.
+    - Gapminder (v6): Mostly covers the period 1800-1949. In addition, it complements the dataset with population data for the "Vatican" until 2100 (it is missing in UN WPP's estimates).
+    - HYDE (v3.2): Mostly covers the period 10,000 BCE - 1799. In addition, it complements the dataset with population for
+    some countries outside of this year period. E.g. it provides data for "Svalbard and Jan Mayen" (until 2017) and "Netherlands Antilles" (until 2010).
+    - Gapminder (Systema Globalis): Covers the period 1555-2008. It complements the dataset with former countries and other data points not present in the other sources.
 
-    This dataset includes all countries and some former countries.
+    For a more detailed description, please refer to the field "source" in table "population".
+
   version: "2022-12-08"
   sources: &population-sources
-    - name: Gapminder (v6)
+    - name: Gapminder (2019)
       published_by: Gapminder (v6)
-      url: https://www.gapminder.org/data/documentation/gd003/
+      url: https://docs.google.com/spreadsheets/d/14_suWY8fCPEXV0MH7ZQMZ-KndzMVsSsA5HdR-7WqAC0/edit#gid=501532268
       date_accessed: October 8, 2021
     - name: UN (2022)
-      published_by: United Nations - Population Division (2022)
+      published_by: UN, World Population Prospects (2022)
       url: https://population.un.org/wpp/Download/Standard/Population/
       date_accessed: September 10, 2022
-    - name: HYDE (v3.2)
+    - name: HYDE (2017)
       published_by: HYDE (v3.2)
       url: https://dataportaal.pbl.nl/downloads/HYDE/
       date_accessed: October 8, 2021
@@ -45,10 +49,10 @@ tables:
         description: |
           Population by country, available from 10,000 BCE to 2100 based on Gapminder data, HYDE, and UN Population Division (2022) estimates.
 
-          10,000 BCE - 1799: Historical estimates by HYDE (v3.2).
-          1800-1949: Historical estimates by Gapminder.
-          1950-2021: Population records by the United Nations - Population Division (2022).
-          2022-2100: Projections based on Medium variant by the United Nations - Population Division (2022).
+          * 10,000 BCE - 1799: Historical estimates by HYDE (v3.2). Includes some datapoints from Gapminder (Systema Globalis).
+          * 1800-1949: Historical estimates by Gapminder. Includes some datapoints from HYDE (v3.2) and Gapminder (Systema Globalis).
+          * 1950-2021: Population records by the United Nations - Population Division (2022). Includes some datapoints from HYDE (v3.2), Gapminder (Systema Globalis) and Gapminder (v6).
+          * 2022-2100: Projections based on Medium variant by the United Nations - Population Division (2022).
         unit: persons
         display:
           name: Population
@@ -59,13 +63,18 @@ tables:
         description: |
           Share of the world's population by country, available from 10,000 BCE to 2100 based on Gapminder data, HYDE, and UN Population Division (2022) estimates.
 
-          10,000 BCE - 1799: Historical estimates by HYDE (v3.2).
-          1800-1949: Historical estimates by Gapminder.
-          1950-2021: Population records by the United Nations - Population Division (2022).
-          2022-2100: Projections based on Medium variant by the United Nations - Population Division (2022).
+          * 10,000 BCE - 1799: Historical estimates by HYDE (v3.2). Includes some datapoints Gapminder (Systema Globalis).
+          * 1800-1949: Historical estimates by Gapminder. Includes some datapoints from HYDE (v3.2) and Gapminder (Systema Globalis).
+          * 1950-2021: Population records by the United Nations - Population Division (2022). Includes some datapoints from HYDE (v3.2), Gapminder (Systema Globalis) and Gapminder (v6).
+          * 2022-2100: Projections based on Medium variant by the United Nations - Population Division (2022).
         unit: "%"
         short_unit: "%"
         display:
           name: Share of world population
           includeInTable: true
         sources: *population-sources
+      source:
+        title: Source
+        description: |
+          Name of the source for a specific data point. The name includes a short name for the source and a link.
+        unit: ""

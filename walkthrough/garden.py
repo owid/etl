@@ -25,6 +25,8 @@ class Options(Enum):
     ADD_TO_DAG = "Add steps into dag.yml file"
     INCLUDE_METADATA_YAML = "Include *.meta.yaml file with metadata"
     GENERATE_NOTEBOOK = "Generate playground notebook"
+    LOAD_COUNTRIES_REGIONS = "Load countries regions in the script"
+    LOAD_POPULATION = "Load population in the script"
     IS_PRIVATE = "Make dataset private"
 
 
@@ -35,6 +37,8 @@ class GardenForm(BaseModel):
     version: str
     meadow_version: str
     add_to_dag: bool
+    load_countries_regions: bool
+    load_population: bool
     include_metadata_yaml: bool
     generate_notebook: bool
     is_private: bool
@@ -43,6 +47,8 @@ class GardenForm(BaseModel):
         options = data.pop("options")
         data["add_to_dag"] = Options.ADD_TO_DAG.value in options
         data["include_metadata_yaml"] = Options.INCLUDE_METADATA_YAML.value in options
+        data["load_countries_regions"] = Options.LOAD_COUNTRIES_REGIONS.value in options
+        data["load_population"] = Options.LOAD_POPULATION.value in options
         data["generate_notebook"] = Options.GENERATE_NOTEBOOK.value in options
         data["is_private"] = Options.IS_PRIVATE.value in options
         super().__init__(**data)
@@ -96,6 +102,8 @@ def app(run_checks: bool, dummy_data: bool) -> None:
                     Options.ADD_TO_DAG.value,
                     Options.INCLUDE_METADATA_YAML.value,
                     Options.GENERATE_NOTEBOOK.value,
+                    Options.LOAD_COUNTRIES_REGIONS.value,
+                    Options.LOAD_POPULATION.value,
                     Options.IS_PRIVATE.value,
                 ],
                 name="options",
@@ -115,12 +123,13 @@ def app(run_checks: bool, dummy_data: bool) -> None:
     private_suffix = "-private" if form.is_private else ""
 
     if form.add_to_dag:
+        deps = [f"data{private_suffix}://meadow/{form.namespace}/{form.meadow_version}/{form.short_name}"]
+        if form.load_population:
+            deps.append(utils.DATASET_POPULATION_URI)
+        if form.load_countries_regions:
+            deps.append(utils.DATASET_REFERENCE_URI)
         dag_content = utils.add_to_dag(
-            {
-                f"data{private_suffix}://garden/{form.namespace}/{form.version}/{form.short_name}": [
-                    f"data{private_suffix}://meadow/{form.namespace}/{form.meadow_version}/{form.short_name}"
-                ]
-            }
+            {f"data{private_suffix}://garden/{form.namespace}/{form.version}/{form.short_name}": deps}
         )
     else:
         dag_content = ""
@@ -184,9 +193,13 @@ def app(run_checks: bool, dummy_data: bool) -> None:
     poetry run etl data{private_suffix}://garden/{form.namespace}/{form.version}/{form.short_name} {"--private" if form.is_private else ""}
     ```
 
-5. Create a branch in [ETL](https://github.com/owid/etl), get it reviewed and merged.
+    Note that metadata is inherited from previous step (snapshot) and you don't have to repeat it.
 
-6. Once your changes are merged, your steps will be run automatically by our server and published to the OWID catalog. Once that is finished, it can be found by anyone using:
+5. (Optional) You can manually move steps from `dag/walkthrough.yml` to some other `dag/*.yml` if you feel like it belongs there. After you are happy with your code, run `make test` to find any issues.
+
+6. Create a pull request in [ETL](https://github.com/owid/etl), get it reviewed and merged.
+
+7. Once your changes are merged, your steps will be run automatically by our server and published to the OWID catalog. Then it can be loaded by anyone using:
 
     ```python
     from owid.catalog import find_one
@@ -195,8 +208,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
     print(tab.head())
     ```
 
-7. If you are an internal OWID member and want to push data to our Grapher DB, continue with `poetry run walkthrough grapher`. Alternatively, to create explorers
-dataset continue with `poetry run walkthrough explorers`.
+8. If you are an internal OWID member and want to push data to our Grapher DB, continue with `poetry run walkthrough grapher`. Alternatively, to create explorers dataset continue with `poetry run walkthrough explorers`.
 
 ## Generated files
 """

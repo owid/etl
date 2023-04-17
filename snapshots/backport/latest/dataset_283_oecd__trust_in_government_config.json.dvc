@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_283_oecd__trust_in_government_config
   file_extension: json
-  date_accessed: 2023-02-23 17:18:28.230767
+  date_accessed: 2023-03-01 12:05:08.154397
   name: Grapher metadata for dataset_283_oecd__trust_in_government
   description: https://github.com/owid/notebooks/tree/main/EdouardMathieu/oecd_trust_government
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 3fe7b2c55fc9a287dbf5ee5212962ee0
-  size: 2419
+- md5: e8a802797c3ddbad000eec8f863cfed8
+  size: 2410
   path: dataset_283_oecd__trust_in_government_config.json

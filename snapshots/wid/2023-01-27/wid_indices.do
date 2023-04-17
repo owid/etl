@@ -9,13 +9,13 @@ This program extracts inequality data from LIS for three types of income and one
 
 The inequality variables extracted from here include Gini coefficients, averages, thresholds and shares per decile, statistics for the top 1, 0.1, 0.01 and 0.001% percentile and share ratios.
 When needed, values are converted to PPP (2011 vintage) adjusted to prices of the most recent year available.
-	
+
 HOW TO EXECUTE:
 
 1. Open this do-file in a local installation of Stata (execution time: ~5-10 minutes)
 2. It generates one file, wid_indices_992j.csv, which needs to be imported as a snapshot in the ETL, as
 	python snapshots/wid/2023-01-27/world_inequality_database.py --path-to-file wid_indices_992j.csv
-	
+
 	(Change the date for future updates)
 
 */
@@ -29,7 +29,7 @@ qui sum year
 global max_year = r(max)
 
 *Get ppp data to convert to USD
-wid, indicators(xlcusp) year($max_year) clear 
+wid, indicators(xlcusp) year($max_year) clear
 rename value ppp
 tempfile ppp
 save "`ppp'"
@@ -62,7 +62,7 @@ drop variable percentile country year
 
 *Replace all occurrences of "." in the newly created `varp` (mainly in p99.9p100 and similar)
 *This is because names of variables with "." are not allowed
-replace varp = subinstr(varp, ".", "_", .) 
+replace varp = subinstr(varp, ".", "_", .)
 
 *Reshape dataset: couy is the main index and varp are what Stata calls subobservations, in this case metrics associated with percentiles
 reshape wide value, j(varp) i(couy) string
@@ -102,7 +102,7 @@ drop p0p100_thr*
 *Define each income/wealth variable
 local var_names pretax posttax_nat posttax_dis wealth
 
-*Calculate ratios for each variable
+*Calculate ratios for each variable + create a duplicate variable for median
 foreach var in `var_names' {
 
 	gen palma_ratio_`var' = p90p100_share_`var' / (p0p50_share_`var' - p40p50_share_`var')
@@ -112,19 +112,21 @@ foreach var in `var_names' {
 	gen p90_p10_ratio_`var' = p90p100_thr_`var' / p10p20_thr_`var'
 	gen p90_p50_ratio_`var' = p90p100_thr_`var' / p50p60_thr_`var'
 	gen p50_p10_ratio_`var' = p50p60_thr_`var' / p10p20_thr_`var'
+	
+	gen median_`var' = p50p60_thr_`var'
 
 }
 
 *Order variables according to different variable groups
-order country year *gini_pretax *gini*dis *gini*nat *gini_wealth *_ratio*pretax *_ratio*dis *_ratio*nat *_ratio*wealth *share_pretax *share*dis *share*nat *share_wealth *avg_pretax *avg*dis *avg*nat *avg_wealth *thr_pretax *thr*dis *thr*nat *thr_wealth
+order country year *gini_pretax *gini*dis *gini*nat *gini_wealth *_ratio*pretax *_ratio*dis *_ratio*nat *_ratio*wealth *share_pretax *share*dis *share*nat *share_wealth *avg_pretax *avg*dis *avg*nat *avg_wealth *thr_pretax *thr*dis *thr*nat *thr_wealth median*
 
 *Sort country and year
 sort country year
 
 *Export csv
-export delimited using "data\raw\wid_indices_992j.csv", replace
+export delimited using "wid_indices_992j.csv", replace
 
 ** In case of needing it in a Stata datafile
-*save "data\raw\wid_indices_992j.dta", replace
+*save "wid_indices_992j.dta", replace
 
 exit, clear

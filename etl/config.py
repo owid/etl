@@ -7,12 +7,16 @@ The environment variables and settings here are for publishing options, they're
 only important for OWID staff.
 """
 
+import os
+import pwd
 from os import environ as env
 
 import bugsnag
 from dotenv import load_dotenv
 
-ENV_FILE = env.get("ENV", ".env")
+from etl.paths import BASE_DIR
+
+ENV_FILE = env.get("ENV", BASE_DIR / ".env")
 
 load_dotenv(ENV_FILE)
 
@@ -34,11 +38,25 @@ DB_PORT = int(env.get("DB_PORT", "3306"))
 DB_USER = env.get("DB_USER", "root")
 DB_PASS = env.get("DB_PASS", "")
 
+
+def get_username():
+    return pwd.getpwuid(os.getuid())[0]
+
+
+# if running against live or staging, use s3://owid-catalog that has CDN
+# otherwise use s3://owid-test/baked-variables/<username> for local development
+# it might be better to save things locally instead of S3, but that would require
+# a lot of changes to the codebase (and even grapher one)
+if DB_NAME in ("live_grapher", "staging_grapher"):
+    DEFAULT_BAKED_VARIABLES_PATH = f"s3://owid-catalog/baked-variables/{DB_NAME}"
+else:
+    DEFAULT_BAKED_VARIABLES_PATH = f"s3://owid-test/baked-variables/{get_username()}"
+BAKED_VARIABLES_PATH = env.get("BAKED_VARIABLES_PATH", DEFAULT_BAKED_VARIABLES_PATH)
+
 # run ETL steps with debugger on exception
 IPDB_ENABLED = False
 
 # number of workers for grapher inserts
-# NOTE: this will soon be deprecated after we get rid of data_values
 GRAPHER_INSERT_WORKERS = int(env.get("GRAPHER_WORKERS", 10))
 
 # forbid any individual step from consuming more than this much memory

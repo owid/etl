@@ -1,0 +1,26 @@
+meta:
+  namespace: war
+  short_name: war_ucdp
+  name: One-sided Violence Dataset version 22.1 (UCDP, 1989 - 2021)
+  version: 2023-03-14
+  publication_year: 2022
+  publication_date: 2022-06-27
+  source_name: Brecke
+  source_published_by: Davies, Shawn, Therese Pettersson & Magnus Öberg (2022). Organized
+    violence 1989-2021 and drone warfare. Journal of Peace Research 59(4).
+  url: hhttps://ucdp.uu.se/downloads/index.html
+  source_data_url: https://ucdp.uu.se/downloads/nsos/ucdp-onesided-221-csv.zip
+  file_extension: zip
+  license_url:
+  license_name:
+  date_accessed: 2023-03-14
+  is_public: true
+  description: |
+    An actor-year dataset with information of intentional attacks on civilians by governments and formally organized armed groups.
+
+    You can find more notes at https://ucdp.uu.se/downloads/nsos/ucdp-onesided-221.pdf
+wdir: ../../../data/snapshots/war/2023-03-14
+outs:
+- md5: 8f5fc7920baba16e7001846d29396bbf
+  size: 24601
+  path: ucdp.one_sided.zip

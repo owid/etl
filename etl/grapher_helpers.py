@@ -54,6 +54,9 @@ def _yield_wide_table(
         for col in table.columns:
             if table[col].isna().any():
                 raise ValueError(f"Column `{col}` contains missing values")
+    cols_with_none_units = [col for col in table.columns if table[col].metadata.unit is None]
+    if cols_with_none_units:
+        raise Exception("Columns with missing units: " + ", ".join(cols_with_none_units))
 
     dim_names = [k for k in table.primary_key if k not in ("year", "entity_id")]
     if dim_titles:
@@ -412,8 +415,8 @@ def _adapt_table_for_grapher(
     if table.index.names != [None]:
         table = table.reset_index()
 
-    assert {"year", country_col} <= set(table.columns)
-    assert "entity_id" not in table.columns
+    assert {"year", country_col} <= set(table.columns), f"Table must have columns {country_col} and year."
+    assert "entity_id" not in table.columns, "Table must not have column entity_id."
 
     # Grapher needs a column entity id, that is constructed based on the unique entity names in the database.
     table["entity_id"] = country_to_entity_id(table[country_col], create_entities=True)

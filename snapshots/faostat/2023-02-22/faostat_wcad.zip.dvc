@@ -11,7 +11,7 @@ meta:
     agricultural production purposes. Member countries provided census data to FAO
     under the World Programme for the Census of Agriculture (WCA). National censuses
     are conducted at least once every ten years in an internationally comparable way.
-    The ��Structural data from agricultural censuses�� domain in FAOSTAT provides
+    The ‘’Structural data from agricultural censuses’’ domain in FAOSTAT provides
     structural data from the last four WCA rounds (WCA 2020, 2010, 2000 and 1990)
     for each participating country and territory, to the extent possible. For earlier
     rounds (WCA 1930, 1950, 1960, 1970 and 1980) data are provided only on the number
@@ -33,6 +33,6 @@ meta:
   is_public: true
 wdir: ../../../data/snapshots/faostat/2023-02-22
 outs:
-- md5: 08ad8f0b75f9b41acf382764edae52b3
-  size: 176513
+- md5: e217efd74ff08d23216c98ddad0e360e
+  size: 176497
   path: faostat_wcad.zip

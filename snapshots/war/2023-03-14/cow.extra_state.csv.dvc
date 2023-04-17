@@ -1,0 +1,26 @@
+meta:
+  namespace: war
+  short_name: war_cow
+  name: Extra-State Wars v4.0 (COW War Data, 1816 – 2007)
+  version: 2023-03-14
+  publication_year: 2010
+  publication_date: 2010-01-27
+  source_name: Brecke
+  source_published_by: 'Sarkees, Meredith Reid and Frank Wayman (2010). Resort to
+    War: 1816 – 2007. Washington DC: CQ Press.'
+  url: hthttps://correlatesofwar.org/data-sets/cow-war/
+  source_data_url: https://correlatesofwar.org/wp-content/uploads/Extra-StateWarData_v4.0.csv
+  file_extension: csv
+  license_url:
+  license_name:
+  date_accessed: 2023-03-14
+  is_public: true
+  description: |
+    The Correlates of War (COW) Project has utilized a classification of wars that is based upon the status of territorial entities, in particular focusing on those that are classified as members of the inter-state system (referred to as “states”). This dataset encompasses wars in the middle category – wars that take place between a state(s) and a nonstate entity outside the borders of the state, or extra-state wars.
+
+    You can find more notes at https://correlatesofwar.org/wp-content/uploads/Extra-StateWars_Codebook.pdf
+wdir: ../../../data/snapshots/war/2023-03-14
+outs:
+- md5: bc318746fd36b1cbe11a2584dff3d70d
+  size: 23068
+  path: cow.extra_state.csv

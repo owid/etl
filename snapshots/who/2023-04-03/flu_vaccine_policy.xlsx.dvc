@@ -1,0 +1,22 @@
+meta:
+  namespace: who
+  short_name: flu_vaccine_policy
+  name: WHO Influenza Vaccination Policy (2023)
+  version: 2023-04-03
+  publication_year: 2023
+  source_name: WHO; UNICEF (2023)
+  source_published_by: WHO/UNICEF Joint Reporting Form on Immunization (JRF)
+  url: https://immunizationdata.who.int/pages/indicators-by-category/influenza.html?YEAR=
+  source_data_url:
+  file_extension: xlsx
+  license_url: https://www.who.int/about/policies/publishing/copyright
+  license_name: CC BY-NC-SA 3.0 IGO
+  date_accessed: 2023-04-03
+  is_public: true
+  description: |
+
+wdir: ../../../data/snapshots/who/2023-04-03
+outs:
+- md5: 015716c6fa6ee43fcbb620377d2ab338
+  size: 1045879
+  path: flu_vaccine_policy.xlsx

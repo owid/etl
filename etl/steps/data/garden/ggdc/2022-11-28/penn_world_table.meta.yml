@@ -1,12 +1,12 @@
 dataset:
   namespace: ggdc
   version: 2022-11-28
-  title: Penn World Table 10.0 (GGDC, 2021)
+  title: Penn World Table (GGDC, 2021)
   short_name: penn_world_table
-  description: Penn World Table version 10.0 is a database with information on GDP and its composition, employment, productivity and trade, covering 183 countries between 1950 and 2019.
+  description: Penn World Table is a database with information on GDP and its composition, employment, productivity and trade, covering 183 countries between 1950 and 2019.
   sources:
     -
-      name: Feenstra et al. (2015), Penn World Table 10.0
+      name: Feenstra et al. (2015), Penn World Table (2021)
       published_by: Feenstra, R. C., Inklaar, R. and Timmer, M.P. (2015), "The Next Generation of the Penn World Table". American Economic Review, 105(10), 3150-3182
       publisher_source: National accounts, ICP PPP estimations, multiple other sources
       publication_year: 2021
@@ -116,11 +116,11 @@ tables:
       avh:
         title: Annual working hours per worker
         unit: Hours per worker
-        description: It is the average sum of hours worked by employess and self-employed people during each year in a country.
+        description: It is the average sum of hours worked by employees and self-employed people during each year in a country.
       hc:
         title: Human capital index, based on years of schooling and returns to education
         unit:
-        description: This is based on average years of schooling, linearly interpolated from Barro and Lee (2013), and an assumed rate of return for primary, secondary, and tertiary education, as in Caselli (2005).. The authours note it is an imperfect measure of human capital as differences in the returns to experience (Lagakos et al. 2014) and the quality of schooling (Hanushek and Woessman 2012) are not accounted for.
+        description: This is based on average years of schooling, linearly interpolated from Barro and Lee (2013), and an assumed rate of return for primary, secondary, and tertiary education, as in Caselli (2005).. The authors note it is an imperfect measure of human capital as differences in the returns to experience (Lagakos et al. 2014) and the quality of schooling (Hanushek and Woessman 2012) are not accounted for.
       ccon:
         title: Consumption of households and government (single price benchmark)
         unit: international-$ in 2017 prices
@@ -139,7 +139,7 @@ tables:
         title: Capital stock (single price benchmark)
         unit: international-$ in 2017 prices
         short_unit: $
-        description: It is estimated from investment by asset in each country, as structures, transport equipment, machinery and also computers, communication equipment and sofware on selected countries. Prices for these assets are constant across countries each year.
+        description: It is estimated from investment by asset in each country, as structures, transport equipment, machinery and also computers, communication equipment and software on selected countries. Prices for these assets are constant across countries each year.
         display:
            name: Capital stock
       ck:
@@ -148,7 +148,7 @@ tables:
       ctfp:
         title: TFP level at current PPPs (USA=1)
         unit:
-        description: Total factor productivity level, computed with GDP (output, single price benchmark), Capital stock (single price benchmark), labor input data and Share of labour compensation in GDP, the share of labor income of employees and self-employed workers in GDP. It is useful to compare productivity levels across countries in each year.
+        description: Total factor productivity level, computed with GDP (output, single price benchmark), Capital stock (single price benchmark), labor input data and Share of labor compensation in GDP, the share of labor income of employees and self-employed workers in GDP. It is useful to compare productivity levels across countries in each year.
       cwtfp:
         title: Welfare-relevant TFP levels at current PPPs (USA=1)
         unit:
@@ -180,7 +180,7 @@ tables:
       rtfpna:
         title: Total factor productivity index (using national accounts) (2017=1)
         unit: ""
-        description: Total factor productivity level, computed with GDP (using national accounts growth rates), Capital stock (using national accounts), labor input data and Share of labour compensation in GDP, the share of labor income of employees and self-employed workers in GDP. It is useful to compare the growth of productivity over time in each country.
+        description: Total factor productivity level, computed with GDP (using national accounts growth rates), Capital stock (using national accounts), labor input data and Share of labor compensation in GDP, the share of labor income of employees and self-employed workers in GDP. It is useful to compare the growth of productivity over time in each country.
         display:
            name: TFP index
       rwtfpna:
@@ -188,7 +188,7 @@ tables:
         unit:
         description: Computed from Total factor productivity index (using national accounts) and the Domestic absorption (consumption plus investment) (using national accounts), it is useful for comparing the growth of welfare-relevant productivity over time in each country.
       labsh:
-        title: Share of labour compensation in GDP
+        title: Share of labor compensation in GDP
         unit: "%"
         short_unit: "%"
         description: It is the share of labor income of employees and self-employed workers in GDP (output, single price benchmark) and it is used to compare total inputs across countries or over time.

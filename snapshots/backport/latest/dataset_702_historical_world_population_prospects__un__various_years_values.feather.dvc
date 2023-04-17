@@ -1,0 +1,18 @@
+meta:
+  namespace: backport
+  short_name: dataset_702_historical_world_population_prospects__un__various_years_values
+  file_extension: feather
+  date_accessed: 2023-04-14 17:09:52.325431
+  name: Historical World Population Prospects (UN, various years)
+  description: ''
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/702
+  source_published_by: Our World in Data catalog backport
+  is_public: true
+  version: latest
+  publication_date: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: df1e2cfd2d1cf1cffd59bd418fdd8980
+  size: 7250
+  path: dataset_702_historical_world_population_prospects__un__various_years_values.feather

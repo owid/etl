@@ -1,0 +1,31 @@
+meta:
+  namespace: democracy
+  short_name: vdem
+  name: Democracy and Human rights - OWID based on Varieties of Democracy (v12) and
+    Regimes of the World
+  version: 2023-03-02
+  source_name: OWID based on V-Dem (v12) and Lührmann et al. (2018)
+  source_published_by: Data comes from the Varieties of Democracy project (v12), sometimes
+    using Lührmann et al's (2018) Regimes of the World classification, and own expansions
+    and refinements.
+  url: http://v-dem.net/vdemds.html
+  source_data_url:
+  file_extension: csv
+  license_url:
+  license_name:
+  date_accessed: 2023-03-02
+  is_public: true
+  description: |
+    This dataset provides information on democracy and human rights, using data from the Varieties of Democracy project (v12), and the Regimes of the World classification by Lührmann et al. (2018).
+
+    We expand the countries and years covered, and refine the coding of the Regimes of the World classification. You can read a detailed description of the data in these posts:
+    https://ourworldindata.org/regimes-of-the-world-data
+    https://ourworldindata.org/vdem-electoral-democracy-data
+    https://ourworldindata.org/vdem-human-rights-data
+
+    You can download the code and complete dataset, including supplementary variables, from GitHub: https://github.com/owid/notebooks/tree/main/BastianHerre/democracy
+wdir: ../../../data/snapshots/democracy/2023-03-02
+outs:
+- md5: d2fc10d5334f31127298fd7b215c562d
+  size: 37905371
+  path: vdem.csv

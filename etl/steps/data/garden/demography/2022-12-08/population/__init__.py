@@ -43,7 +43,7 @@ METADATA_PATH = os.path.join(N.directory, "meta.yml")
 # this dictionary maps source short names to complete source names
 SOURCES_NAMES = {
     "unwpp": "United Nations - Population Division 2022 (https://population.un.org/wpp/Download/Standard/Population/)",
-    "gapminder_v6": "Gapminder v6 (https://www.gapminder.org/data/documentation/gd003/)",
+    "gapminder_v6": "Gapminder v6 (https://docs.google.com/spreadsheets/d/14_suWY8fCPEXV0MH7ZQMZ-KndzMVsSsA5HdR-7WqAC0/edit#gid=501532268)",
     "gapminder_sg": "Gapminder - Systema Globalis (https://github.com/open-numbers/ddf--gapminder--systema_globalis)",
     "hyde": "HYDE v3.2 (https://dataportaal.pbl.nl/downloads/HYDE/)",
 }
@@ -241,11 +241,14 @@ def add_historical_regions(df: pd.DataFrame) -> pd.DataFrame:
 def filter_rows(df: pd.DataFrame) -> pd.DataFrame:
     """Make sure that all rows make sense.
 
-    That is, e.g. remove rows with population = 0.
+    - Remove rows with population = 0.
+    - Remove datapoints for the Netherland Antilles after 2010 (it was dissolved then), as HYDE has data after that year.
     """
     log.info("population: filter rows...")
     # remove datapoints with population = 0
     df = cast(pd.DataFrame, df[df["population"] > 0].copy())
+    # remove datapoints for the Netherland Antilles after 2010 (it was dissolved then)
+    df = df[~((df["country"] == "Netherlands Antilles") & (df["year"] > 2010))]
     return df
 
 

@@ -1,0 +1,839 @@
+dataset:
+  namespace: fasttrack
+  version: '2023-03-27'
+  short_name: global_warming_contributions
+  title: Global warming contributions
+  description: |-
+    Jones et al. (2023) quantify national and regional contributions to the increase of global mean surface temperature over the last few centuries. As they detail: the "dataset describing the global warming response to national emissions CO2, CH4 and N2O from fossil and land use sources during 1851-2021.
+
+    National CO2 emissions data are collated from the Global Carbon Project (Andrew and Peters, 2022; Friedlingstein et al., 2022).
+
+    National CH4 and N2O emissions data are collated from PRIMAP-hist (HISTTP) (Gütschow et al., 2022).
+
+    We construct a time series of cumulative CO2-equivalent emissions for each country, gas, and emissions source (fossil or land use). Emissions of CH4 and N2O emissions are related to cumulative CO2-equivalent emissions using the Global Warming Potential (GWP*) approach, with best-estimates of the coefficients taken from the IPCC AR6 (Forster et al., 2021).
+
+    Warming in response to cumulative CO2-equivalent emissions is estimated using the transient climate response to cumulative carbon emissions (TCRE) approach, with best-estimate value of TCRE taken from the IPCC AR6 (Forster et al., 2021, Canadell et al., 2021). 'Warming' is specifically the change in global mean surface temperature (GMST)."
+  sources:
+  - name: Matthew Jones et al. (2023)
+    published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew, Robbie
+      M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard A., Friedlingstein,
+      Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023). National contributions
+      to climate change due to historical emissions of carbon dioxide, methane and
+      nitrous oxide [Data set]. In Scientific Data (2023.1).
+    publication_year: 2023
+    url: https://doi.org/10.5281/zenodo.7636699
+tables:
+  global_warming_contributions:
+    variables:
+      annual_fossil_co2:
+        title: Annual fossil CO2 emissions
+        short_unit: t
+        unit: tonnes
+        sources:
+        - name: Matthew Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      annual_land_co2:
+        title: Annual CO2 emissions from agriculture and land use
+        short_unit: t
+        unit: tonnes
+        sources:
+        - name: Matthew Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      annual_co2:
+        title: Annual CO2 emissions
+        short_unit: t
+        unit: tonnes
+        sources:
+        - name: Matthew Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      annual_fossil_ch4:
+        title: annual_fossil_ch4
+        short_unit: t
+        unit: tonnes
+        sources:
+        - name: Matthew Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      annual_land_ch4:
+        title: annual_land_ch4
+        short_unit: t
+        unit: tonnes
+        sources:
+        - name: Matthew Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      annual_fossil_n2o:
+        title: annual_fossil_n2o
+        short_unit: t
+        unit: tonnes
+        sources:
+        - name: Matthew Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      annual_ch4:
+        title: annual_ch4
+        short_unit: t
+        unit: tonnes
+        sources:
+        - name: Matthew Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      annual_land_n2o:
+        title: annual_land_n2o
+        short_unit: t
+        unit: tonnes
+        sources:
+        - name: Matthew Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      annual_n2o:
+        title: annual_n2o
+        short_unit: t
+        unit: tonnes
+        sources:
+        - name: Matthew Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      annual_fossil_ch4_co2eq:
+        title: Annual methane emissions from fossil fuels and industry
+        short_unit: t
+        unit: tonnes
+        description: Methane emissions are calculated by Our World in Data based on
+          emissions data from Jones et al. (2023) and IPCC conversion factors. Jones
+          et al. (2023) give methane emissions in standard metric tonnes per year.
+          We have converted these emissions to carbon-dioxide equivalents over a 100-year
+          timescale using a conversion factor of 29.8 for fossil sources, and 27.2
+          for agricultural and land use sources (as per the IPCC AR6 report).
+        sources:
+        - name: Matthew Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      annual_ch4_co2eq:
+        title: Annual methane emissions
+        short_unit: t
+        unit: tonnes
+        description: Methane emissions are calculated by Our World in Data based on
+          emissions data from Jones et al. (2023) and IPCC conversion factors. Jones
+          et al. (2023) give methane emissions in standard metric tonnes per year.
+          We have converted these emissions to carbon-dioxide equivalents over a 100-year
+          timescale using a conversion factor of 29.8 for fossil sources, and 27.2
+          for agricultural and land use sources (as per the IPCC AR6 report).
+        sources:
+        - name: Matthew Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      annual_land_ch4_co2eq:
+        title: Annual methane emissions from agriculture and land use
+        short_unit: t
+        unit: tonnes
+        description: Methane emissions are calculated by Our World in Data based on
+          emissions data from Jones et al. (2023) and IPCC conversion factors. Jones
+          et al. (2023) give methane emissions in standard metric tonnes per year.
+          We have converted these emissions to carbon-dioxide equivalents over a 100-year
+          timescale using a conversion factor of 29.8 for fossil sources, and 27.2
+          for agricultural and land use sources (as per the IPCC AR6 report).
+        sources:
+        - name: Matthew Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      annual_fossil_n2o_co2eq:
+        title: Annual nitrous oxide emissions from fossil fuels and industry
+        short_unit: t
+        unit: tonnes
+        description: Nitrous oxide emissions are calculated by Our World in Data based
+          on emissions data from Jones et al. (2023) and IPCC AR6 conversion factors.
+          Jones et al. (2023) give nitrous oxide emissions in standard metric tonnes
+          per year. We have converted these emissions to carbon-dioxide equivalents
+          over a 100-year timescale using a conversion factor of 273 (as per the IPCC
+          AR6 report).
+        sources:
+        - name: Matthew Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      annual_land_n2o_co2eq:
+        title: Annual nitrous oxide emissions from agriculture and land use
+        short_unit: t
+        unit: tonnes
+        description: Nitrous oxide emissions are calculated by Our World in Data based
+          on emissions data from Jones et al. (2023) and IPCC AR6 conversion factors.
+          Jones et al. (2023) give nitrous oxide emissions in standard metric tonnes
+          per year. We have converted these emissions to carbon-dioxide equivalents
+          over a 100-year timescale using a conversion factor of 273 (as per the IPCC
+          AR6 report).
+        sources:
+        - name: Matthew Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      annual_ghg_co2eq:
+        title: Annual greenhouse gas emissions
+        short_unit: t
+        unit: tonnes
+        description: Greenhouse gas emissions are calculated by Our World in Data
+          based on emissions data from Jones et al. (2023) and IPCC AR6 conversion
+          factors. Jones et al. (2023) give methane and nitrous oxide emissions in
+          standard metric tonnes per year. We have converted these emissions to carbon-dioxide
+          equivalents over a 100-year timescale using a conversion factor of 273 for
+          nitrous oxide, 29.8 for methane from fossil sources, and 27.2 for methane
+          from agricultural and land use sources (as per the IPCC AR6 report).
+        sources:
+        - name: Matthew Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      annual_fossil_co2eq:
+        title: Annual greenhouse gas emissions from fossil fuels and industry
+        short_unit: t
+        unit: tonnes
+        description: Greenhouse gas emissions are calculated by Our World in Data
+          based on emissions data from Jones et al. (2023) and IPCC AR6 conversion
+          factors. Jones et al. (2023) give methane and nitrous oxide emissions in
+          standard metric tonnes per year. We have converted these emissions to carbon-dioxide
+          equivalents over a 100-year timescale using a conversion factor of 273 for
+          nitrous oxide, 29.8 for methane from fossil sources, and 27.2 for methane
+          from agricultural and land use sources (as per the IPCC AR6 report).
+        sources:
+        - name: Matthew Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      annual_land_co2eq:
+        title: Annual greenhouse gas emissions from agriculture and land use
+        short_unit: t
+        unit: tonnes
+        description: Greenhouse gas emissions are calculated by Our World in Data
+          based on emissions data from Jones et al. (2023) and IPCC AR6 conversion
+          factors. Jones et al. (2023) give methane and nitrous oxide emissions in
+          standard metric tonnes per year. We have converted these emissions to carbon-dioxide
+          equivalents over a 100-year timescale using a conversion factor of 273 for
+          nitrous oxide, 29.8 for methane from fossil sources, and 27.2 for methane
+          from agricultural and land use sources (as per the IPCC AR6 report).
+        sources:
+        - name: Matthew Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      annual_n2o_co2eq:
+        title: Annual nitrous oxide emissions
+        short_unit: t
+        unit: tonnes
+        description: Nitrous oxide emissions are calculated by Our World in Data based
+          on emissions data from Jones et al. (2023) and IPCC AR6 conversion factors.
+          Jones et al. (2023) give nitrous oxide emissions in standard metric tonnes
+          per year. We have converted these emissions to carbon-dioxide equivalents
+          over a 100-year timescale using a conversion factor of 273 (as per the IPCC
+          AR6 report).
+        sources:
+        - name: Matthew Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      share_global_n2o:
+        title: Share of global nitrous oxide emissions
+        short_unit: '%'
+        unit: '%'
+        description: Nitrous oxide emissions are calculated by Our World in Data based
+          on emissions data from Jones et al. (2023) and IPCC AR6 conversion factors.
+          Jones et al. (2023) give nitrous oxide emissions in standard metric tonnes
+          per year. We have converted these emissions to carbon-dioxide equivalents
+          over a 100-year timescale using a conversion factor of 273 (as per the IPCC
+          AR6 report).
+        sources:
+        - name: Matthew Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      share_global_ch4:
+        title: Share of global methane emissions
+        short_unit: '%'
+        unit: '%'
+        description: Methane emissions are calculated by Our World in Data based on
+          emissions data from Jones et al. (2023) and IPCC conversion factors. Jones
+          et al. (2023) give methane emissions in standard metric tonnes per year.
+          We have converted these emissions to carbon-dioxide equivalents over a 100-year
+          timescale using a conversion factor of 29.8 for fossil sources, and 27.2
+          for agricultural and land use sources (as per the IPCC AR6 report).
+        sources:
+        - name: Matthew Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      share_global_ghg:
+        title: Share of global greenhouse gas emissions
+        short_unit: '%'
+        unit: '%'
+        description: Greenhouse gas emissions are calculated by Our World in Data
+          based on emissions data from Jones et al. (2023) and IPCC AR6 conversion
+          factors. Jones et al. (2023) give methane and nitrous oxide emissions in
+          standard metric tonnes per year. We have converted these emissions to carbon-dioxide
+          equivalents over a 100-year timescale using a conversion factor of 273 for
+          nitrous oxide, 29.8 for methane from fossil sources, and 27.2 for methane
+          from agricultural and land use sources (as per the IPCC AR6 report).
+        sources:
+        - name: Matthew Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      cumulative_fossil_co2:
+        title: cumulative_fossil_co2
+        short_unit: t
+        unit: tonnes
+        sources:
+        - name: Matthew Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      cumulative_land_co2:
+        title: cumulative_land_co2
+        short_unit: t
+        unit: tonnes
+        sources:
+        - name: Matthew Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      cumulative_co2:
+        title: cumulative_co2
+        short_unit: t
+        unit: tonnes
+        sources:
+        - name: Matthew Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      cumulative_land_ch4:
+        title: cumulative_land_ch4
+        short_unit: t
+        unit: tonnes
+        sources:
+        - name: Matthew Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      cumulative_fossil_ch4:
+        title: cumulative_fossil_ch4
+        short_unit: t
+        unit: tonnes
+        sources:
+        - name: Matthew Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      cumulative_ch4:
+        title: cumulative_ch4
+        short_unit: t
+        unit: tonnes
+        sources:
+        - name: Matthew Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      cumulative_land_n2o:
+        title: cumulative_land_n2o
+        short_unit: t
+        unit: tonnes
+        sources:
+        - name: Matthew Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      cumulative_fossil_n2o:
+        title: cumulative_fossil_n2o
+        short_unit: t
+        unit: tonnes
+        sources:
+        - name: Matthew Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      cumulative_n2o:
+        title: cumulative_n2o
+        short_unit: t
+        unit: tonnes
+        sources:
+        - name: Matthew Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      cumulative_fossil_ghg:
+        title: cumulative_fossil_ghg
+        short_unit: t
+        unit: tonnes
+        sources:
+        - name: Matthew Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      cumulative_land_ghg:
+        title: cumulative_land_ghg
+        short_unit: t
+        unit: tonnes
+        sources:
+        - name: Matthew Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      cumulative_ghg:
+        title: Cumulative greenhouse gas emissions
+        short_unit: t
+        unit: tonnes
+        description: Greenhouse gas emissions are calculated by Our World in Data
+          based on emissions data from Jones et al. (2023) and IPCC AR6 conversion
+          factors. Jones et al. (2023) give methane and nitrous oxide emissions in
+          standard metric tonnes per year. We have converted these emissions to carbon-dioxide
+          equivalents over a 100-year timescale using a conversion factor of 273 for
+          nitrous oxide, 29.8 for methane from fossil sources, and 27.2 for methane
+          from agricultural and land use sources (as per the IPCC AR6 report).
+        sources:
+        - name: Matthew Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      temp_fossil_co2:
+        title: temp_fossil_co2
+        short_unit: °C
+        unit: °C
+        sources:
+        - name: Matthew Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      temp_land_co2:
+        title: temp_land_co2
+        short_unit: °C
+        unit: °C
+        sources:
+        - name: Matthew Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      temp_co2:
+        title: Change in global mean surface temperature from CO2 emissions
+        short_unit: °C
+        unit: °C
+        description: This measures each country's contribution to global mean surface
+          temperature (GMST) rise from its cumulative emissions of carbon dioxide.
+          The warming effects of each gas are calculated based on cumulative CO2-equivalent
+          emissions using the Global Warming Potential (GWP*) approach.
+        sources:
+        - name: Matthew Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      temp_fossil_ch4:
+        title: temp_fossil_ch4
+        short_unit: °C
+        unit: °C
+        sources:
+        - name: Matthew Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      temp_land_ch4:
+        title: temp_land_ch4
+        short_unit: °C
+        unit: °C
+        sources:
+        - name: Matthew Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      temp_ch4:
+        title: Change in global mean surface temperature from methane emissions
+        short_unit: °C
+        unit: °C
+        description: This measures each country's contribution to global mean surface
+          temperature (GMST) rise from its cumulative emissions of methane. The warming
+          effects of each gas are calculated based on cumulative CO2-equivalent emissions
+          using the Global Warming Potential (GWP*) approach.
+        sources:
+        - name: Matthew Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      temp_fossil_n2o:
+        title: temp_fossil_n2o
+        short_unit: °C
+        unit: °C
+        sources:
+        - name: Matthew Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      temp_land_n2o:
+        title: temp_land_n2o
+        short_unit: °C
+        unit: °C
+        sources:
+        - name: Matthew Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      temp_n2o:
+        title: Change in global mean surface temperature from nitrous oxide emissions
+        short_unit: °C
+        unit: °C
+        description: This measures each country's contribution to global mean surface
+          temperature (GMST) rise from its cumulative nitrous oxide emissions. The
+          warming effects of each gas are calculated based on cumulative CO2-equivalent
+          emissions using the Global Warming Potential (GWP*) approach.
+        sources:
+        - name: Matthew Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      temp_fossil_ghg:
+        title: temp_fossil_ghg
+        short_unit: °C
+        unit: °C
+        sources:
+        - name: Matthew Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      temp_land_ghg:
+        title: temp_land_ghg
+        short_unit: °C
+        unit: °C
+        sources:
+        - name: Matthew Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      temp_ghg:
+        title: Change in global mean surface temperature from greenhouse gas emissions
+        short_unit: °C
+        unit: °C
+        description: This measures each country's contribution to global mean surface
+          temperature (GMST) rise from its cumulative emissions of carbon dioxide,
+          methane and nitrous oxide. The warming effects of each gas are calculated
+          based on cumulative CO2-equivalent emissions using the Global Warming Potential
+          (GWP*) approach.
+        sources:
+        - name: Matthew Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      share_global_warming:
+        title: Share of contribution to global warming
+        short_unit: '%'
+        unit: '%'
+        description: This measures each country's contribution to global mean surface
+          temperature (GMST) rise from its cumulative emissions of carbon dioxide,
+          methane and nitrous oxide. The warming effects of each gas are calculated
+          based on cumulative CO2-equivalent emissions using the Global Warming Potential
+          (GWP*) approach.
+        sources:
+        - name: Matthew Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      annual_ch4_per_capita:
+        title: Methane emissions per person
+        short_unit: t
+        unit: tonnes
+        description: Methane emissions per person are calculated by Our World in Data
+          based on emissions data from Jones et al. (2023) and population data from
+          HYDE and the UN World Population Prospects. Jones et al. (2023) give methane
+          emissions in standard metric tonnes per year. We have converted these emissions
+          to carbon-dioxide equivalents over a 100-year timescale using a conversion
+          factor of 29.8 for fossil sources, and 27.2 for agricultural and land use
+          sources (as per the IPCC AR6 report).
+        sources:
+        - name: Matthew Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      annual_n2o_per_capita:
+        title: Nitrous oxide emissions per person
+        short_unit: t
+        unit: tonnes
+        description: Nitrous oxide emissions per person are calculated by Our World
+          in Data based on emissions data from Jones et al. (2023) and population
+          data from HYDE and the UN World Population Prospects. Jones et al. (2023)
+          give nitrous oxide emissions in standard metric tonnes per year. We have
+          converted these emissions to carbon-dioxide equivalents over a 100-year
+          timescale using a conversion factor of 273 (as per the IPCC AR6 report).
+        sources:
+        - name: Matthew Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699
+      annual_ghg_co2eq_per_capita:
+        title: Greenhouse gas emissions per person
+        short_unit: t
+        unit: tonnes
+        description: Greenhouse gas emissions per person are calculated by Our World
+          in Data based on emissions data from Jones et al. (2023) and population
+          data from HYDE and the UN World Population Prospects. Jones et al. (2023)
+          give methane and nitrous oxide emissions in standard metric tonnes per year.
+          We have converted these emissions to carbon-dioxide equivalents over a 100-year
+          timescale using a conversion factor of 273 for nitrous oxide, 29.8 for methane
+          from fossil sources, and 27.2 for methane from agricultural and land use
+          sources (as per the IPCC AR6 report).
+        sources:
+        - name: Matthew Jones et al. (2023)
+          published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+            Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard
+            A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023).
+            National contributions to climate change due to historical emissions of
+            carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data
+            (2023.1).
+          publication_year: 2023
+          url: https://doi.org/10.5281/zenodo.7636699

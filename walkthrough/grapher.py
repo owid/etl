@@ -27,6 +27,7 @@ class GrapherForm(BaseModel):
     short_name: str
     namespace: str
     version: str
+    garden_version: str
     add_to_dag: bool
     is_private: bool
 
@@ -78,6 +79,14 @@ def app(run_checks: bool, dummy_data: bool) -> None:
                 validate=utils.validate_short_name,
                 help_text="Underscored dataset short name. Example: natural_disasters",
             ),
+            pi.input(
+                "Garden dataset version",
+                name="garden_version",
+                placeholder=str(dt.date.today()),
+                required=True,
+                value=dummies.get("version", str(dt.date.today())),
+                help_text="Version of the garden dataset (by default, the current date, or exceptionally the publication date).",
+            ),
             pi.checkbox(
                 "Additional Options",
                 options=[
@@ -99,7 +108,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
         dag_content = utils.add_to_dag(
             {
                 f"data{private_suffix}://grapher/{form.namespace}/{form.version}/{form.short_name}": [
-                    f"data{private_suffix}://garden/{form.namespace}/{form.version}/{form.short_name}"
+                    f"data{private_suffix}://garden/{form.namespace}/{form.garden_version}/{form.short_name}"
                 ]
             }
         )
@@ -117,13 +126,15 @@ def app(run_checks: bool, dummy_data: bool) -> None:
 1. Test your step against your local database. If you have your grapher DB configured locally, your `.env` file should look similar to this:
 
     ```bash
-    GRAPHER_USER_ID=59
+    GRAPHER_USER_ID=your_user_id
     DB_USER=root
     DB_NAME=owid
     DB_HOST=127.0.0.1
     DB_PORT=3306
     DB_PASS=
     ```
+
+    Get `your_user_id` by running SQL query `select id from users where email = 'your_name@ourworldindata.org'`.
 
     Then run the grapher step:
     ```
@@ -133,19 +144,15 @@ def app(run_checks: bool, dummy_data: bool) -> None:
 2. When you feel confident, use `.env.staging` for staging which looks something like this:
 
     ```
-    GRAPHER_USER_ID=59
+    GRAPHER_USER_ID=your_user_id
     DB_USER=staging_grapher
     DB_NAME=staging_grapher
     DB_PASS=***
-    DB_PORT=3307
-    DB_HOST=127.0.0.1
+    DB_PORT=3306
+    DB_HOST=owid-staging
     ```
 
-    Config above assumes you have opened SSH tunnel to staging DB on port 3307. If you have your `~/.ssh/config` set up correctly, then you can open the tunnel with
-
-    ```
-    ssh -f owid-staging -L 3307:localhost:3306 -N
-    ```
+    Make sure you have [Tailscale](https://tailscale.com/download) installed and running.
 
     After you run
 
@@ -155,7 +162,18 @@ def app(run_checks: bool, dummy_data: bool) -> None:
 
     you should see it [in staging admin](https://staging.owid.cloud/admin/datasets).
 
-3. Pushing to production grapher is **not yet automated**. After you get it reviewed and approved, you can use `.env.prod` file and run
+3. To get your dataset into production DB, you can merge your PR into master and it'll be deployed automatically. Alternatively, you can push it to production manually by using `.env.prod` file
+
+    ```
+    GRAPHER_USER_ID=your_user_id
+    DB_USER=live_grapher
+    DB_NAME=etl_grapher
+    DB_PASS=***
+    DB_PORT=3306
+    DB_HOST=owid-live-db
+    ```
+
+    and running
 
     ```
     ENV=.env.prod poetry run etl grapher/{form.namespace}/{form.version}/{form.short_name} --grapher {"--private" if form.is_private else ""}
@@ -164,6 +182,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
 4. Check your dataset in [admin](https://owid.cloud/admin/datasets).
 
 5. If you are an internal OWID member and, because of this dataset update, you want to update charts in our Grapher DB, continue with `poetry run walkthrough charts`
+
 ## Generated files
 """
     )

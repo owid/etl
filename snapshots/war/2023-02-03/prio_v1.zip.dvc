@@ -1,0 +1,24 @@
+meta:
+  namespace: war
+  short_name: prio_v1
+  name: Battledeaths Dataset (PRIO v1.0, 2005)
+  version: 2023-02-03
+  publication_year: 2005
+  source_name: PRIO
+  source_published_by: "Lacina, Bethany & Nils Petter Gleditsch, 2005. 'Monitoring\
+    \ Trends in Global Combat: A New Dataset of Battle Deaths', European Journal of\
+    \ Population 21(2–3): 145–166."
+  url: https://www.prio.org/data/1
+  source_data_url: https://www.prio.org/utility/DownloadFile.ashx?id=7&type=datasetfile
+  file_extension: zip
+  license_url:
+  license_name:
+  date_accessed: 2023-02-03
+  is_public: true
+  description: |
+    This dataset includes statistics for all battle deaths (soldiers and civilians killed in combat) in state-based armed conflicts. The dataset is compatible with the UCDP/PRIO Armed Conflict Dataset (Gleditsch et al., 2002) for the period 1946–2002; with the Correlates of War Dataset (Sarkees, 2000) for the period 1900–97; and the Fearon & Laitin  (2003) dataset on civil conflict in the period 1945–99.
+wdir: ../../../data/snapshots/war/2023-02-03
+outs:
+- md5: 473b4bc990bdedd93b4273d08e8852ab
+  size: 3189028
+  path: prio_v1.zip

@@ -15,6 +15,7 @@ from . import utils
 CURRENT_DIR = Path(__file__).parent
 
 ETL_DIR = Path(etl.__file__).parent.parent
+DEFAULT_EXTENSION = "csv"
 
 
 class Options(Enum):
@@ -22,8 +23,6 @@ class Options(Enum):
     ADD_TO_DAG = "Add steps into dag/walkthrough.yaml file"
     INCLUDE_METADATA_YAML = "Include *.meta.yaml file with metadata"
     GENERATE_NOTEBOOK = "Generate playground notebook"
-    LOAD_COUNTRIES_REGIONS = "Load countries regions in the script"
-    LOAD_POPULATION = "Load population in the script"
     IS_PRIVATE = "Make dataset private"
 
 
@@ -35,18 +34,20 @@ class MeadowForm(BaseModel):
     snapshot_version: str
     snapshot_file_extension: str
     add_to_dag: bool
-    load_countries_regions: bool
-    load_population: bool
     generate_notebook: bool
     include_metadata_yaml: bool
     is_private: bool
 
     def __init__(self, **data: Any) -> None:
         options = data.pop("options")
+        print(1, data["snapshot_file_extension"])
+        if ext := data.pop("snapshot_file_extension") != "":
+            data["snapshot_file_extension"] = ext
+        else:
+            data["snapshot_file_extension"] = DEFAULT_EXTENSION
+        print(2, data["snapshot_file_extension"])
         data["add_to_dag"] = Options.ADD_TO_DAG.value in options
         data["include_metadata_yaml"] = Options.INCLUDE_METADATA_YAML.value in options
-        data["load_countries_regions"] = Options.LOAD_COUNTRIES_REGIONS.value in options
-        data["load_population"] = Options.LOAD_POPULATION.value in options
         data["generate_notebook"] = Options.GENERATE_NOTEBOOK.value in options
         data["is_private"] = Options.IS_PRIVATE.value in options
         super().__init__(**data)
@@ -97,7 +98,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
             pi.input(
                 "Snapshot file extension",
                 name="snapshot_file_extension",
-                placeholder="csv",
+                placeholder=DEFAULT_EXTENSION,
                 value=dummies.get("file_extension"),
                 help_text="File extension (without the '.') of the snapshot data file. Example: csv",
             ),
@@ -107,14 +108,12 @@ def app(run_checks: bool, dummy_data: bool) -> None:
                     Options.ADD_TO_DAG.value,
                     Options.INCLUDE_METADATA_YAML.value,
                     Options.GENERATE_NOTEBOOK.value,
-                    Options.LOAD_COUNTRIES_REGIONS.value,
-                    Options.LOAD_POPULATION.value,
                     Options.IS_PRIVATE.value,
                 ],
                 name="options",
                 value=[
                     Options.ADD_TO_DAG.value,
-                    Options.INCLUDE_METADATA_YAML.value,
+                    # Options.INCLUDE_METADATA_YAML.value,
                     Options.GENERATE_NOTEBOOK.value,
                 ],
             ),
@@ -125,15 +124,12 @@ def app(run_checks: bool, dummy_data: bool) -> None:
     private_suffix = "-private" if form.is_private else ""
 
     if form.add_to_dag:
-        deps = [
-            f"snapshot{private_suffix}://{form.namespace}/{form.snapshot_version}/{form.short_name}.{form.snapshot_file_extension}"
-        ]
-        if form.load_population:
-            deps.append("data://garden/owid/latest/key_indicators")
-        if form.load_countries_regions:
-            deps.append("data://garden/reference")
         dag_content = utils.add_to_dag(
-            {f"data{private_suffix}://meadow/{form.namespace}/{form.version}/{form.short_name}": deps}
+            {
+                f"data{private_suffix}://meadow/{form.namespace}/{form.version}/{form.short_name}": [
+                    f"snapshot{private_suffix}://{form.namespace}/{form.snapshot_version}/{form.short_name}.{form.snapshot_file_extension}",
+                ]
+            }
         )
     else:
         dag_content = ""
@@ -185,6 +181,8 @@ def app(run_checks: bool, dummy_data: bool) -> None:
     ```
     poetry run etl data{private_suffix}://meadow/{form.namespace}/{form.version}/{form.short_name} {"--private" if form.is_private else ""}
     ```
+
+    Note that metadata is inherited from previous step (snapshot) and you don't have to repeat it.
 
 5. Exit the process and run next step with `poetry run walkthrough garden`
 

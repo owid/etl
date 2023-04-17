@@ -9,7 +9,7 @@ NAMESPACE = "un"
 VERSION = "2022-07-11"
 FNAME = "un_wpp"
 TNAME = "un_wpp"
-SOURCE_NAME_DISPLAY = "United Nations - Population Division (2022)"
+SOURCE_NAME_DISPLAY = "UN, World Population Prospects (2022)"
 
 
 log = structlog.get_logger()

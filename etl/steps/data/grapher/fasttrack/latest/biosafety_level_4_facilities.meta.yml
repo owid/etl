@@ -1,0 +1,17 @@
+dataset:
+  namespace: fasttrack
+  version: latest
+  short_name: biosafety_level_4_facilities
+  title: DRAFT Biosafety level 4 facilities
+  description: ''
+  sources:
+  - name: Unknown
+    published_by: Unknown
+    publication_year: 2023
+    date_accessed: 2023-03-01
+tables:
+  biosafety_level_4_facilities:
+    variables:
+      bsl4_facilities:
+        title: bsl4_facilities
+        unit: ''

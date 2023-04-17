@@ -1,0 +1,50 @@
+all_sources: {}
+dataset: {}
+  # sources:
+  #   - name: World Values Survey (2022)
+  #     published_by: 'Inglehart, R., C. Haerpfer, A. Moreno, C. Welzel, K. Kizilova, J. Diez-Medrano, M. Lagos, P. Norris, E. Ponarin & B. Puranen (eds.). 2022. World Values Survey: All Rounds - Country-Pooled Datafile. Madrid, Spain & Vienna, Austria: JD Systems Institute & WVSA Secretariat. Dataset Version 4.0. doi:10.14281/18241.17'
+  #     publisher_source: "Nationally representative household surveys"
+
+tables:
+  wvs_trust:
+    variables:
+      trust:
+        title: Agree "Most people can be trusted"
+        description: '% of respondents replying "Most people can be trusted" when asked "Generally speaking, would you say that most people can be trusted or that you need to be very careful in dealing with people?" Possible answers include "Most people can be trusted", "Do not know" and "Need to be very careful".'
+        unit: "%"
+        short_unit: "%"
+        display:
+          name: Agree "Most people can be trusted"
+          numDecimalPlaces: 1
+      trust_first_not_at_all:
+        title: Agree "Do not trust those I meet for the first time"
+        description: '% of respondents replying that they "do not trust at all" when asked "I‘d like to ask you how much you trust people from various groups. Could you tell me for each whether you trust people from this group completely, somewhat, not very much or not at all?" in the group "People you meet for the first time".'
+        unit: "%"
+        short_unit: "%"
+        display:
+          name: Agree "Do not trust those I meet for the first time"
+          numDecimalPlaces: 1
+      trust_personally_not_at_all:
+        title: Agree "Do not trust those I know personally"
+        description: '% of respondents replying that they "do not trust at all" when asked "I‘d like to ask you how much you trust people from various groups. Could you tell me for each whether you trust people from this group completely, somewhat, not very much or not at all?" in the group "People you know personally".'
+        unit: "%"
+        short_unit: "%"
+        display:
+          name: Agree "Do not trust those I know personally"
+          numDecimalPlaces: 1
+      take_advantage:
+        title: Agree "Most people would try to take advantage of you"
+        description: '% of respondents replying that people "would take advantage" when asked "Do you think most people try to take advantage of you". Possible answers include they "would try to be fair", "would take advantage" and "do not know".'
+        unit: "%"
+        short_unit: "%"
+        display:
+          name: Agree "Most people would try to take advantage of you"
+          numDecimalPlaces: 1
+      confidence_government:
+        title: "Trust: Confidence in government"
+        description: '% of respondents replying that they "trust completely" or "trust somewhat" when asked "I am going to name a number of organisations. For each one, could you tell me how much confidence you have in them: is it a great deal of confidence, quite a lot of confidence, not very much confidence or none at all?".'
+        unit: "%"
+        short_unit: "%"
+        display:
+          name: "Trust: Confidence in government"
+          numDecimalPlaces: 1

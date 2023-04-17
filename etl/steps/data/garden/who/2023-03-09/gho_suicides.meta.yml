@@ -1,0 +1,71 @@
+# (Inherited from meadow, remove if not different.)
+all_sources:
+  - source_testing: &sources
+      name: WHO, Global Health Observatory (2022)
+      published_by: WHO, Global Health Observatory (2022)
+      url: https://www.who.int/data/gho
+      date_accessed: 2023-03-09
+      publication_date: # Example: 2023-01-01
+      publication_year: # (if publication_date is not given). Example: 2023
+      # description: Source description.
+
+# (Inherited from meadow, remove if not different.)
+dataset:
+  title: "Global Health Observatory: Age-standardized suicide rates (WHO, 2022)"
+  description: |
+    The GHO issues analytical reports on the current situation and trends for priority health issues. A key output of the GHO is the annual publication World Health Statistics, which compiles statistics for key health indicators on an annual basis. The World Health Statistics also include a brief report on annual progress towards the health-related MDGs. In addition, the GHO provides analytical reports on cross-cutting topics such as the report on women and health and burden of disease. Lastly, the GHO provides the link to specific disease or programme reports with a strong analytical component.
+
+    This is a subset of the original GHO dataset, only including suicides-related metrics.
+  licenses:
+    - name: CC BY-NC-SA 3.0 IGO
+      url: https://www.who.int/about/policies/publishing/copyright
+  sources:
+    - *sources
+
+tables:
+  gho_suicides:
+    # (Inherited from meadow, remove if not different.)
+    variables:
+      suicide_rate:
+        title: Age-standardized suicide rate
+        unit: deaths per 100,000 people
+        description: |
+          These Global Health Estimates represent WHO's best estimates, based on the evidence available up until November 2020, rather than the official estimates of Member States, and have not necessarily been endorsed by Member States.
+
+
+          They have been computed using standard categories, definitions and methods to ensure cross-national comparability and may not be the same as official national estimates produced using alternative, potentially equally rigorous, methods.
+
+
+          Researchers typically define suicide deaths those which were given death codes in the International Classification for Diseases (ICD) for 'intentional self-harm' (X60–X84 and Y87.0). This includes people who had self-harmed but had not intended to die, and the country may not consider them to be suicide.
+
+
+          The process involved extraction of codes X60–X84 and Y87.0 for suicide from the WHO Mortality Database, redistribution of deaths of unknown sex/age and deaths assigned to ill-defined codes, interpolation/extrapolation of number of deaths for missing years, scaling of total deaths by age and sex to WHO all-cause envelopes for 2000–2019, and use of population estimates from the UN Population Division.
+        sources:
+          - *sources
+        display:
+          numDecimalPlaces: 1
+  gho_suicides_ratio:
+    # (Inherited from meadow, remove if not different.)
+    variables:
+      suicide_rate_male_to_female:
+        title: Male to female suicide death rate ratio
+        unit: ""
+        description: |
+          These Global Health Estimates represent WHO's best estimates, based on the evidence available up until November 2020, rather than the official estimates of Member States, and have not necessarily been endorsed by Member States.
+
+
+          They have been computed using standard categories, definitions and methods to ensure cross-national comparability and may not be the same as official national estimates produced using alternative, potentially equally rigorous, methods.
+
+
+          Researchers typically define suicide deaths those which were given death codes in the International Classification for Diseases (ICD) for 'intentional self-harm' (X60–X84 and Y87.0). This includes people who had self-harmed but had not intended to die, and the country may not consider them to be suicide.
+
+
+          The process involved extraction of codes X60–X84 and Y87.0 for suicide from the WHO Mortality Database, redistribution of deaths of unknown sex/age and deaths assigned to ill-defined codes, interpolation/extrapolation of number of deaths for missing years, scaling of total deaths by age and sex to WHO all-cause envelopes for 2000–2019, and use of population estimates from the UN Population Division.
+
+
+          The male-female suicide ratio is calculated by Our World in Data by dividing the male age-standardized suicide rate by the female age-standardized rate.
+
+        sources:
+          - *sources
+        display:
+          numDecimalPlaces: 1

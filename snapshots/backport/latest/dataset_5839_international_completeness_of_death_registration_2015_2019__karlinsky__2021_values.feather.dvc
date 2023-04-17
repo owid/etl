@@ -1,0 +1,18 @@
+meta:
+  namespace: backport
+  short_name: dataset_5839_international_completeness_of_death_registration_2015_2019__karlinsky__2021_values
+  file_extension: feather
+  date_accessed: 2023-04-11 20:54:58.200815
+  name: International Completeness of Death Registration 2015-2019 – Karlinsky (2021)
+  description: ''
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/5839
+  source_published_by: Our World in Data catalog backport
+  is_public: true
+  version: latest
+  publication_date: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 32fb5a505b001b1744d79747cd122b7c
+  size: 39914
+  path: dataset_5839_international_completeness_of_death_registration_2015_2019__karlinsky__2021_values.feather

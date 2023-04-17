@@ -84,7 +84,7 @@ def create_units(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def get_attributes_description() -> Dict:
-    units: Snapshot = paths.load_dependency(short_name="un_sdg_unit", namespace="un")
+    units: Snapshot = paths.load_dependency(short_name="un_sdg_unit.csv", namespace="un")
     df_units = pd.read_csv(units.path)
     dict_units = df_units.set_index("AttCode").to_dict()["AttValue"]
     # local_file = walden_ds.ensure_downloaded()
@@ -94,7 +94,7 @@ def get_attributes_description() -> Dict:
 
 
 def get_dimension_description() -> dict[str, str]:
-    dimensions: Snapshot = paths.load_dependency(short_name="un_sdg_dimension", namespace="un")
+    dimensions: Snapshot = paths.load_dependency(short_name="un_sdg_dimension.json", namespace="un")
     # walden_ds = Catalog().find_one(namespace=NAMESPACE, short_name="dimension", version=VERSION)
     # local_file = walden_ds.ensure_downloaded()
     with open(dimensions.path) as json_file:

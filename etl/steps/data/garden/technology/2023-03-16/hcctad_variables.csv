@@ -1,0 +1,24 @@
+variable,new_name,multiply_by
+Length of Railway line open,Railway lines (km),1
+Freight traffic on railways-2,Railway freight traffic (metric ton-km),1000000
+Passenger traffic on railways-2,Railway passenger traffic (passenger-km),1000000
+Energy output,Electricity output (MWhrs),10
+Phones,Landline phones,1000
+Mobile Phones,Mobile phones,1000
+Telegraph,Telegrams,1000000
+Mail,Mail (units handled),1000000
+Personal computers,Personal computers,1000
+Aviation - PKM,Air passenger traffic (passenger-km),1000000
+Aviation-TKM,Air freight traffic (freight ton-km),1000000
+Private Cars,Private cars,1000
+Commercial Cars,Commercial cars,1000
+Tonnage-All,Registered merchant ships (total tonnage),1
+industrial robots,Industrial robots,1
+Textiles - mule spindles,Textile spindles,1000
+Textiles - ring spindles,Textile spindles,1000
+steel - acid bessemer,Steel (metric tons),1000
+steel - basic bessemer,Steel (metric tons),1000
+steel - open hearth,Steel (metric tons),1000
+steel - blast oxygen,Steel (metric tons),1000
+steel - electric,Steel (metric tons),1000
+steel - other,Steel (metric tons),1000

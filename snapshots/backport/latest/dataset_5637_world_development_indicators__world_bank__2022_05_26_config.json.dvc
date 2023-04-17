@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5637_world_development_indicators__world_bank__2022_05_26_config
   file_extension: json
-  date_accessed: 2023-02-23 17:21:25.725683
+  date_accessed: 2023-03-03 09:58:10.639022
   name: Grapher metadata for dataset_5637_world_development_indicators__world_bank__2022_05_26
   description: The World Development Indicators (WDI) is the primary World Bank collection
     of development indicators, compiled from officially-recognized international sources.
@@ -16,6 +16,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 1f4d028c8d183719d7ef15eafdfdad87
-  size: 3568712
+- md5: 4d566a512c16aec083d6fd1c726422a4
+  size: 3568759
   path: dataset_5637_world_development_indicators__world_bank__2022_05_26_config.json

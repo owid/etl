@@ -1,0 +1,65 @@
+all_sources:
+  - source_testing: &source-testing
+      name: NASA
+      published_by: NASA Ozone Watch
+      url: http://ozonewatch.gsfc.nasa.gov/meteorology/annual_data.html
+      date_accessed: 2023-03-06
+      publication_date: 2023-02-14
+      publication_year: 2023
+      # description: Source description.
+
+dataset:
+  title: Ozone hole area and concentration (NASA, 2023)
+  description: |
+    Annual maximum and Antarctic stratospheric ozone hole area, resultant from the emission of ozone-depleting substances.
+
+    Minimum and mean Southern Hemisphere daily ozone concentrations, measured in Dobson Units (DU).
+
+    This dataset should be next updated by the source every year. We will update it on Our World in Data soon after the new version is published. At the link above you can directly access the source page and see the latest available data.
+  licenses:
+    - name: # TO BE FILLED. Example: Testing License Name
+      url: # TO BE FILLED. Example: https://url_of_testing_source.com/license
+  sources:
+    - *source-testing
+
+tables:
+  ozone_hole_area:
+    variables:
+      max_hole_area:
+        title: Maximum ozone hole area
+        short_unit: "km²"
+        unit: "square kilometres"
+        description: |
+          The ozone hole area is determined from total ozone satellite measurements. It is defined to be that region of ozone values below 220 Dobson Units (DU) located south of 40°S. Values below 220 DU represent anthropogenic ozone losses over Antarctica.
+
+          The maximum of daily ozone hole area for each year.
+      max_hole_area_date:
+        title: Date of maximum ozone hole area
+        short_unit: ""
+        unit: ""
+      min_hole_concentration:
+        title: Minimum daily concentration
+        short_unit: "DU"
+        unit: "Dobson Units (DU)"
+        description: |
+          The minimum of daily minimum ozone for each year.
+
+          The minimum ozone is found from total ozone satellite measurements south of 40°S. No interpolation of missing values is performed. This means that the actual minimum value on a day may be estimated too high, especially in the polar night region.
+      min_hole_concentration_date:
+        title: Date of minimum ozone hole concentration
+        short_unit: ""
+        unit: ""
+      mean_hole_area:
+        title: Mean ozone hole area
+        short_unit: "km²"
+        unit: "square kilometres"
+        description: |
+          The ozone hole area is determined from total ozone satellite measurements. It is defined to be that region of ozone values below 220 Dobson Units (DU) located south of 40°S. Values below 220 DU represent anthropogenic ozone losses over Antarctica.
+
+          Ozone hole area mean (07 September - 13 October) for each year.
+      mean_hole_concentration:
+        title: Mean daily concentration
+        short_unit: "DU"
+        unit: "Dobson Units (DU)"
+        description: |
+          Minimum ozone (21 September - 16 October) for each year.

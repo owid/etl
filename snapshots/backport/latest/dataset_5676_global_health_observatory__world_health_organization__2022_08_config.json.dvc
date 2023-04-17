@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5676_global_health_observatory__world_health_organization__2022_08_config
   file_extension: json
-  date_accessed: 2023-02-23 19:16:31.950248
+  date_accessed: 2023-04-17 07:10:30.594345
   name: Grapher metadata for dataset_5676_global_health_observatory__world_health_organization__2022_08
   description: This is a dataset imported by the automated fetcher
   source_name: Our World in Data catalog backport

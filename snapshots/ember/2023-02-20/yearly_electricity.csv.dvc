@@ -1,0 +1,25 @@
+meta:
+  namespace: ember
+  short_name: yearly_electricity
+  name: Yearly Electricity Data (Ember, 2023)
+  source_name: Ember
+  publication_year: 2023
+  publication_date: 2023-01-31
+  url: https://ember-climate.org/data-catalogue/yearly-electricity-data/
+  source_data_url: https://ember-climate.org/app/uploads/2022/07/yearly_full_release_long_format.csv
+  file_extension: csv
+  license_url: https://ember-climate.org/creative-commons/
+  license_name: Creative Commons ShareAlike Attribution Licence (CC BY-SA 4.0)
+  date_accessed: 2023-02-20
+  is_public: true
+  description: |
+    Ember's latest yearly electricity generation, capacity, emissions and demand data from over 200 geographies.
+
+    This dataset contains yearly electricity generation, capacity, emissions, import and demand data for over 200 geographies. Data is collected from multi-country datasets (EIA, Eurostat, BP, UN) as well as national sources (e.g China data from the National Bureau of Statistics).
+
+    You can find more about Ember's methodology in this document: https://ember-climate.org/app/uploads/2022/07/Ember-Electricity-Data-Methodology.pdf
+wdir: ../../../data/snapshots/ember/2023-02-20
+outs:
+- md5: 20e3b41fef0b1bf0f0965f1a4d10cba3
+  size: 38330254
+  path: yearly_electricity.csv
