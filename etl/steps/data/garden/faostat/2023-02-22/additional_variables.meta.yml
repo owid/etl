@@ -1,0 +1,208 @@
+all_sources:
+  - faostat: &faostat_source
+      name: Food and Agriculture Organization of the United Nations
+      published_by: Food and Agriculture Organization of the United Nations
+      url: http://www.fao.org/faostat/en/#data/
+      date_accessed: "2023-02-22"
+      publication_date: "2023-02-22"
+      publication_year: 2023
+
+dataset:
+  title: Additional variables (FAOSTAT, 2023)
+  description: |
+    Additional variables created using data from different FAOSTAT datasets.
+  sources:
+    - *faostat_source
+
+tables:
+  arable_land_per_crop_output:
+    variables:
+      area:
+        title: 'Arable land'
+        unit: 'hectares'
+        short_unit: 'ha'
+        description: |
+          Arable land is the total of areas (extent of surface of land or water) under temporary crops, temporary meadows and pastures, and land with temporary fallow.  Arable land does not include land that is potentially cultivable but is not normally cultivated.
+      index:
+        title: 'Gross Production Index Number'
+        unit: ''
+        short_unit: ''
+        description: |
+          Gross Production Index Number (2014-2016 = 100).
+      arable_land_per_crop_output:
+        title: Arable land needed to produce a fixed quantity of crops
+        unit: ''
+        short_unit: ''
+        description: |
+          Index of arable land needed to produce a fixed quantity of crops (where values in 1961 are equal to 1.0). This is calculated as arable land divided by the crop production index (PIN). The crop production index here is the sum of crop commodities produced (after deductions of quantities used as seed and feed). It is weighted by the commodity prices.
+
+          This metric measures the index of arable land needed to produce a fixed quantity of crops (where values in 1961 are equal to 1.0).
+
+          Arable land is the total of areas (extent of surface of land or water) under temporary crops, temporary meadows and pastures, and land with temporary fallow.  Arable land does not include land that is potentially cultivable but is not normally cultivated.
+  area_used_per_crop_type:
+    variables:
+      area_used_for_production:
+        title: "Area used for production"
+        unit: "hectares"
+        short_unit: "ha"
+        # Description will be fetched from the original FAOSTAT item and element descriptions.
+        # description: |
+  share_of_sustainable_and_overexploited_fish:
+    variables:
+      sustainable_fish:
+        title: "Percentage of fish stocks within biologically sustainable levels"
+        unit: "%"
+        short_unit: "%"
+        description: |
+          Fish stock are subpopulations of a particular species of fish which have common parameters such as location, growth and mortality which define their population dynamics. Fish stocks are within biologically sustainable levels when fish catch does not exceed the maximum sustainable yield (MSY) - the rate at which fish populations can regenerate.
+      overexploited_fish:
+        title : "Percentage of overexploited fish stocks"
+        unit: "%"
+        short_unit: "%"
+        description: |
+          Fish stock are subpopulations of a particular species of fish which have common parameters such as location, growth and mortality which define their population dynamics. Fish stocks are overexploited when fish catch exceeds the maximum sustainable yield (MSY) - the rate at which fish populations can regenerate.
+  land_spared_by_increased_crop_yields:
+    variables:
+      area:
+        title: "Actual cropland area today"
+        unit: "hectares"
+        short_unit: "ha"
+        description: |
+          Total cropland area on a given year, calculated by dividing the total production by the crop yield.
+      area_with_yield_of_1961:
+        title: "Cropland area needed if yields stagnated in 1961"
+        unit: "hectares"
+        short_unit: "ha"
+        description: |
+          Total cropland area that would be necessary if crop yields stagnated in 1961.
+          
+          This area is calculated by dividing the total production on a given year by the crop yield of 1961.
+      spared_land:
+        title: "Land spared due to crop yield increases"
+        unit: "hectares"
+        short_unit: "ha"
+        description: |
+          Land spared since 1961 due to the increase of crop yields.
+
+          This area is calculated as the cropland area that would be necessary if crop yields stagnated in 1961 (the total production on a given year divided by the crop yield of 1961), minus the true cropland area on a given year.
+      spared_land__pct:
+        title: "Percentage reduction in area needed due to crop yield increases"
+        unit: "hectares"
+        short_unit: "ha"
+        description: |
+          Land spared since 1961 due to the increase of crop yields, as a percentage of the total land that would be necessary if crop yields had not increased since then.
+  # All metadata for food_available_for_consumption is prepared via script.
+  # food_available_for_consumption:
+  macronutrient_compositions:
+    variables:
+      energy_from_animal_products:
+        title: "Daily caloric intake per person from animal products"
+        unit: "kilocalories per day per capita"
+        short_unit: "kcal"
+        description: &macronutrient_composition_variable_description |
+          The FAO provide annual figures from 1961 by country on daily caloric supply, fat supply (in grams),   and protein supply (in grams). To calculate the daily per capita supply of carbohydrates, we assume an energy density by macronutrient of 4 kcal per gram of both protein and carbohydrate and 9 kcal per gram of fat (based on established nutritional guidelines reported by the FAO). The daily supply of carbohydrates is therefore calculated as:
+
+          ((Daily supply of kcal)-(Daily supply of protein * 4 + Daily supply of fat * 9)) / 4
+
+          The quantity of calories from each macronutrient is then calculated based on the energy density figures given above (e.g. calories from protein is calculated by multiplying the daily supply of protein in grams by 4).
+
+          For an explanation of these conversion factors, see "Chapter 3: Calculation Of The Energy Content Of Foods - Energy Conversion Factors", available at: http://www.fao.org/docrep/006/Y5022E/y5022e04.htm
+
+          The share of calories derived from each macronutrient is then calculated by dividing the number of calories derived from a given macronutrient by the total daily caloric supply.
+
+          Protein of animal origin includes protein supplied in the form of all meat commodities, eggs and dairy products, and fish & seafood.
+      energy_from_animal_protein:
+        title: "Daily caloric intake per person that comes from animal protein"
+        unit: "kilocalories per day per capita"
+        short_unit: "kcal"
+        description: *macronutrient_composition_variable_description
+      energy_from_vegetal_products:
+        title: "Daily caloric intake per person from vegetal products"
+        unit: "kilocalories per day per capita"
+        short_unit: "kcal"
+        description: *macronutrient_composition_variable_description
+      energy_from_vegetal_protein:
+        title: "Daily caloric intake per person that comes from vegetal protein"
+        unit: "kilocalories per day per capita"
+        short_unit: "kcal"
+        description: *macronutrient_composition_variable_description
+      fat_from_animal_products:
+        title: "Daily fat intake per person from animal products"
+        unit: "grams per day per capita"
+        short_unit: "g"
+        description: *macronutrient_composition_variable_description
+      fat_from_vegetal_products:
+        title: "Daily fat intake per person from vegetal products"
+        unit: "grams per day per capita"
+        short_unit: "g"
+        description: *macronutrient_composition_variable_description
+      protein_from_animal_products:
+        title: "Daily protein intake from animal products"
+        unit: "grams per day per capita"
+        short_unit: "g"
+        description: *macronutrient_composition_variable_description
+      protein_from_vegetal_products:
+        title: "Daily protein intake per person from vegetal products"
+        unit: "grams per day per capita"
+        short_unit: "g"
+        description: *macronutrient_composition_variable_description
+      share_of_energy_from_animal_protein:
+        title: "Share of the daily caloric intake that comes from animal protein"
+        unit: "%"
+        short_unit: "%"
+        description: *macronutrient_composition_variable_description
+      share_of_energy_from_carbohydrates:
+        title: "Share of the daily caloric intake that comes from carbohydrates"
+        unit: "%"
+        short_unit: "%"
+        description: *macronutrient_composition_variable_description
+      share_of_energy_from_fat:
+        title: "Share of the daily caloric intake that comes from fat"
+        unit: "%"
+        short_unit: "%"
+        description: *macronutrient_composition_variable_description
+      share_of_energy_from_protein:
+        title: "Share of the daily caloric intake that comes from protein"
+        unit: "%"
+        short_unit: "%"
+        description: *macronutrient_composition_variable_description
+      share_of_energy_from_vegetal_protein:
+        title: "Share of the daily caloric intake that comes from vegetal protein"
+        unit: "%"
+        short_unit: "%"
+        description: *macronutrient_composition_variable_description
+      total_carbohydrates:
+        title: "Daily carbohydrates intake per person"
+        unit: "grams per day per capita"
+        short_unit: "g"
+        description: *macronutrient_composition_variable_description
+      total_energy:
+        title: "Daily caloric intake per person"
+        unit: "kilocalories per day per capita"
+        short_unit: "kcal"
+        description: *macronutrient_composition_variable_description
+      total_energy_from_carbohydrates:
+        title: "Daily caloric intake per person from carbohydrates"
+        unit: "kilocalories per day per capita"
+        short_unit: "kcal"
+        description: *macronutrient_composition_variable_description
+      total_energy_from_fat:
+        title: "Daily caloric intake per person from fat"
+        unit: "kilocalories per day per capita"
+        short_unit: "kcal"
+        description: *macronutrient_composition_variable_description
+      total_energy_from_protein:
+        title: "Daily caloric intake per person from protein"
+        unit: "kilocalories per day per capita"
+        short_unit: "kcal"
+        description: *macronutrient_composition_variable_description
+      total_fat:
+        title: "Daily fat intake per person"
+        unit: "grams per day per capita"
+        short_unit: "g"
+        description: *macronutrient_composition_variable_description
+      total_protein:
+        title: "Daily protein intake per person"
+        unit: "grams per day per capita"
+        short_unit: "g"
+        description: *macronutrient_composition_variable_description
