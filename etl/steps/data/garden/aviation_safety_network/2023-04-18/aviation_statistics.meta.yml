@@ -1,0 +1,68 @@
+dataset:
+  title: Fatal aviation accidents and fatalities (ASN, 2023-04-18)
+  description: |
+    Data on fatal accidents, hijacking incidents and numbers of fatalities are based on airliners of 14+ passengers, and do not include corporate jet and military transport accidents.
+
+    Air traffic figures are based on the number of airliner flight departures (not the number of passengers) per year.
+  sources:
+    -
+      name: Aviation Safety Network (2023)
+      published_by: The Flight Safety Foundation's Aviation Safety Network (ASN)
+      publisher_source: |
+        Information contained in the Aviation Safety Network database is based on information from official sources (authorities, safety boards).
+      publication_year: 2023
+      date_accessed: 2023-04-18
+      url: "https://aviation-safety.net/statistics/"
+    -
+      name: World Bank's World Development Indicators
+      published_by: World Bank's World Development Indicators
+      publication_year: 2022
+      date_accessed: 2022-05-26
+
+tables:
+  aviation_statistics:
+    variables:
+      accidents_per_million_flights:
+        title: Fatal accidents per million commercial flights
+        short_unit:
+        unit: accidents
+      accidents_with_passenger_and_cargo_flights_including_hijacking_etc:
+        title: Fatal accidents from commercial airliners
+        short_unit:
+        unit: accidents
+      departures_worldwide:
+        title: Number of flight departures
+        short_unit:
+        unit: departures
+      fatalities_per_million_flights:
+        title: Fatalities per million flights
+        short_unit:
+        unit: fatalities
+      fatalities_per_million_passengers:
+        title: Fatalities per million passengers
+        short_unit:
+        unit: fatalities
+      fatalities_with_passenger_and_cargo_flights_including_hijacking_etc:
+        title: Fatalities from commercial airliners
+        short_unit:
+        unit: fatalities
+      hijacking_fatalities:
+        title: Hijacking fatalities
+        short_unit:
+        unit: fatalities
+      hijacking_incidents:
+        title: Hijacking incidents
+        short_unit:
+        unit: incidents
+      million_flights_per_accident:
+        title: Million flights per fatal accident
+        short_unit:
+        unit: million flights
+      million_passengers_per_fatality:
+        title: Million passengers per fatality
+        short_unit:
+        unit: million passengers
+      passengers_carried:
+        title: Passengers per year
+        short_unit:
+        unit: passengers
