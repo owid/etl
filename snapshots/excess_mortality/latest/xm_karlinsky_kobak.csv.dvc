@@ -24,6 +24,6 @@ meta:
   publication_date: 2021-06-30
 wdir: ../../../data/snapshots/excess_mortality/latest
 outs:
-  - md5: fbb63baba797dd1b9ad13b50c6731404
-    size: 4528557
+  - md5: a2d8c40ae3cdfc97a15ae3ba0d0098f0
+    size: 374477
     path: xm_karlinsky_kobak.csv
