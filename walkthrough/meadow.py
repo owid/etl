@@ -40,12 +40,8 @@ class MeadowForm(BaseModel):
 
     def __init__(self, **data: Any) -> None:
         options = data.pop("options")
-        print(1, data["snapshot_file_extension"])
-        if ext := data.pop("snapshot_file_extension") != "":
-            data["snapshot_file_extension"] = ext
-        else:
+        if data["snapshot_file_extension"] == "":
             data["snapshot_file_extension"] = DEFAULT_EXTENSION
-        print(2, data["snapshot_file_extension"])
         data["add_to_dag"] = Options.ADD_TO_DAG.value in options
         data["include_metadata_yaml"] = Options.INCLUDE_METADATA_YAML.value in options
         data["generate_notebook"] = Options.GENERATE_NOTEBOOK.value in options
@@ -99,7 +95,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
                 "Snapshot file extension",
                 name="snapshot_file_extension",
                 placeholder=DEFAULT_EXTENSION,
-                value=dummies.get("file_extension"),
+                value=dummies.get("snapshot_file_extension"),
                 help_text="File extension (without the '.') of the snapshot data file. Example: csv",
             ),
             pi.checkbox(
