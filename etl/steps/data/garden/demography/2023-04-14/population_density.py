@@ -56,6 +56,7 @@ def make_table(tb_population: Table, tb_land_area: Table) -> Table:
     # Dataframe population
     df_population = pd.DataFrame(tb_population).reset_index()
     # Dataframe land area
+    # We use land area of countries as they are defined today (latest reported value)
     log.info("population_density: process land area datafame")
     column_area = "land_area__00006601__area__005110__hectares"
     df_land_area = (
@@ -73,7 +74,7 @@ def make_table(tb_population: Table, tb_land_area: Table) -> Table:
     # Drop NaN (no data for area)
     df = df.dropna(subset=["area"])
     # Estimate population density as population / land_area(in km2)
-    df["population_density"] = df["population"] / (0.01 * df["area"])  # 0.01 to convert from hectare to km2
+    df["population_density"] = df["population"] / (0.01 * df["area"])  # 0.01 to convert from hectares to km2
     # Rename column source -> source_population
     df = df.rename(columns={"source": "source_population"})
     # Select relevant columns, order them, set index
