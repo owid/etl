@@ -12,26 +12,6 @@ log = get_logger()
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
-{% if cookiecutter.load_countries_regions == "True" %}
-
-
-def load_countries_regions() -> Table:
-    # Load countries-regions table from reference dataset (e.g. to map from iso codes to country names).
-    ds_reference = paths.load_dependency("reference")
-    tb_countries_regions = ds_reference["countries_regions"]
-
-    return tb_countries_regions
-{% endif -%}
-{% if cookiecutter.load_population == "True" %}
-
-
-def load_population() -> Table:
-    # Load population table from key_indicators dataset.
-    ds_indicators = paths.load_dependency("key_indicators")
-    tb_population = ds_indicators["population"]
-
-    return tb_population
-{% endif -%}
 
 
 def run(dest_dir: str) -> None:
