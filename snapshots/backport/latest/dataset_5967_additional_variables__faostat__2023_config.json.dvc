@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5967_additional_variables__faostat__2023_config
   file_extension: json
-  date_accessed: 2023-04-18 12:05:53.166768
+  date_accessed: 2023-04-18 12:12:18.167915
   name: Grapher metadata for dataset_5967_additional_variables__faostat__2023
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: c7b4a788a902039632668ff63ebf53f1
+- md5: 69984002a780d151d0a7f78831e646ab
   size: 87147
   path: dataset_5967_additional_variables__faostat__2023_config.json
