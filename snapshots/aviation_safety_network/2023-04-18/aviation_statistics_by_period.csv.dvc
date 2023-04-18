@@ -1,0 +1,20 @@
+meta:
+  namespace: aviation_safety_network
+  short_name: aviation_statistics_by_period
+  name: Aviation statistics by period
+  source_name: Aviation Safety Network
+  publication_year: 2023
+  publication_date: 2023-04-18
+  url: https://aviation-safety.net/statistics/period/stats.php
+  source_data_url:
+  file_extension: csv
+  license_url: https://aviation-safety.net/about/usage33.php
+  license_name: Copyright Aviation Safety Network
+  date_accessed: 2023-04-18
+  description: |
+
+wdir: ../../../data/snapshots/aviation_safety_network/2023-04-18
+outs:
+- md5: e1db95af99b03e0c5c536aaa8fbed932
+  size: 1884
+  path: aviation_statistics_by_period.csv
