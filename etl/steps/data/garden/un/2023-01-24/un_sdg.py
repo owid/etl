@@ -47,7 +47,6 @@ def run(dest_dir: str) -> None:
     )
 
     # Create a new table with the processed data.
-    # tb_garden = Table(df, like=tb_meadow)
     all_tables = create_tables(df)
 
     # Creating OMMs
@@ -89,16 +88,11 @@ def get_attributes_description() -> Dict:
     units: Snapshot = paths.load_dependency(short_name="un_sdg_unit.csv", namespace="un")
     df_units = pd.read_csv(units.path)
     dict_units = df_units.set_index("AttCode").to_dict()["AttValue"]
-    # local_file = walden_ds.ensure_downloaded()
-    # with open(local_file) as json_file:
-    # units = json.load(json_file)
     return dict_units
 
 
 def get_dimension_description() -> dict[str, str]:
     dimensions: Snapshot = paths.load_dependency(short_name="un_sdg_dimension.json", namespace="un")
-    # walden_ds = Catalog().find_one(namespace=NAMESPACE, short_name="dimension", version=VERSION)
-    # local_file = walden_ds.ensure_downloaded()
     with open(dimensions.path) as json_file:
         dims: dict[str, str] = json.load(json_file)
     # underscore to match the df column names
