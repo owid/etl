@@ -6,7 +6,7 @@ dataset:
     Air traffic figures are based on the number of airliner flight departures (not the number of passengers) per year.
   sources:
     -
-      name: Aviation Safety Network
+      name: Aviation Safety Network (2023)
       published_by: The Flight Safety Foundation's Aviation Safety Network (ASN)
       publisher_source: |
         Information contained in the Aviation Safety Network database is based on information from official sources (authorities, safety boards).

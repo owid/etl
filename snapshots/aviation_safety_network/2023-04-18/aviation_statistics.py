@@ -1,9 +1,9 @@
 """Script to create a snapshot of dataset 'Aviation statistics'.
 
 In total, 3 snapshots will be created:
-* Data from their shared Google spreadsheet (from one specific sheet).
-* Data extracted directly from their page on aviation statistics by period.
-* Data extracted directly from their page on aviation statistics by nature.
+* Data downloaded from their public Google spreadsheet.
+* Data extracted from their HTML page on aviation statistics by period.
+* Data extracted from their HTML page on aviation statistics by nature.
 
 It would be better to extract all data from the spreadsheet, but some important variables are not included there.
 

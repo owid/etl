@@ -59,7 +59,7 @@ def run(dest_dir: str) -> None:
     df_by_period = df_by_period.rename(columns={"Year": "year"})
     df_by_nature = df_by_nature.rename(columns={"Year": "year"})
 
-    # Drop last column (which should be the only one without a year), which gives a grand total.
+    # Drop last row (which should be the only one without a year), which gives a grand total.
     df = df.dropna(subset="year").reset_index(drop=True).astype({"year": int})
 
     # Combine all dataframes.
