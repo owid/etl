@@ -636,6 +636,71 @@ def generate_macronutrient_compositions(df_fbsc: pd.DataFrame) -> Table:
     return tb_combined
 
 
+def generate_fertilizers(df_ef: pd.DataFrame, df_rl: pd.DataFrame) -> Table:
+    # Item code for "Cropland" (which includes arable land and permanent crops).
+    ITEM_CODE_FOR_CROPLAND = "00006620"
+
+    # Element code for element "Area" of faostat_rl dataset.
+    ELEMENT_CODE_FOR_AREA = "005110"
+
+    # Item codes for fertilizers in faostat_ef (namely nitrogen, phosphate and potash).
+    ITEM_CODES_FOR_FERTILIZERS = ["00003102", "00003103", "00003104"]
+
+    # Element code for use per area of cropland.
+    ELEMENT_CODE_FOR_USE_PER_AREA = "005159"
+
+    # Convert units from kilograms to tonnes.
+    KG_TO_TONNES = 1e-3
+
+    # Select necessary element (use per area).
+    fertilizers = df_ef[(df_ef["element_code"] == ELEMENT_CODE_FOR_USE_PER_AREA)].reset_index(drop=True)
+
+    # Sanity checks.
+    error = "Unit for use per area has changed."
+    assert list(fertilizers["unit"].unique()) == ["kilograms per hectare"], error
+
+    error = "Unexpected list of item codes for fertilizers (maybe another was added to faostat_ef)."
+    assert set(fertilizers["item_code"]) == set(ITEM_CODES_FOR_FERTILIZERS), error
+
+    # Transpose fertilizers data.
+    fertilizers = fertilizers.pivot(index=["country", "year"], columns=["item"], values=["value"]).reset_index()
+    fertilizers.columns = ["country", "year", "nitrogen_per_cropland", "phosphate_per_cropland", "potash_per_cropland"]
+
+    # Add column for total fertilizers per area cropland.
+    fertilizers["all_fertilizers_per_cropland"] = fertilizers[
+        ["nitrogen_per_cropland", "phosphate_per_cropland", "potash_per_cropland"]
+    ].sum(axis=1)
+
+    # To get total agricultural use of fertilizers, we need cropland area.
+    area = df_rl[
+        (df_rl["element_code"] == ELEMENT_CODE_FOR_AREA) & (df_rl["item_code"] == ITEM_CODE_FOR_CROPLAND)
+    ].reset_index(drop=True)
+
+    # Sanity check.
+    error = "Unit for area has changed."
+    assert list(area["unit"].unique()) == ["hectares"], error
+
+    # Transpose area data.
+    area = area.pivot(index=["country", "year"], columns=["item"], values=["value"]).reset_index()
+    area.columns = ["country", "year", "cropland"]
+
+    # Combine fertilizers and area.
+    combined = pd.merge(fertilizers, area, on=["country", "year"], how="outer", validate="one_to_one")
+
+    # Add variables for total fertilizer use.
+    for fertilizer in ["nitrogen", "phosphate", "potash", "all_fertilizers"]:
+        combined[f"{fertilizer}_use"] = combined[f"{fertilizer}_per_cropland"] * combined["cropland"] * KG_TO_TONNES
+
+    # Create a table, set an appropriate index, and sort conveniently.
+    tb_fertilizers = Table(
+        combined.set_index(["country", "year"], verify_integrity=True).sort_index(),
+        short_name="fertilizers",
+        underscore=True,
+    )
+
+    return tb_fertilizers
+
+
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
@@ -665,6 +730,11 @@ def run(dest_dir: str) -> None:
     tb_fbsc = ds_fbsc[f"{NAMESPACE}_fbsc"]
     df_fbsc = pd.DataFrame(tb_fbsc).reset_index()
 
+    # Load dataset about fertilizers, load its main (long-format) table, and create a convenient dataframe.
+    ds_ef: Dataset = paths.load_dependency(f"{NAMESPACE}_ef")
+    tb_ef = ds_ef[f"{NAMESPACE}_ef"]
+    df_ef = pd.DataFrame(tb_ef).reset_index()
+
     #
     # Process data.
     #
@@ -686,12 +756,13 @@ def run(dest_dir: str) -> None:
     # Create table for macronutrient compositions.
     tb_macronutrient_compositions = generate_macronutrient_compositions(df_fbsc=df_fbsc)
 
+    # Create table for fertilizers data.
+    tb_fertilizers = generate_fertilizers(df_ef=df_ef, df_rl=df_rl)
+
     #
     # Save outputs.
     #
     # Create a new garden dataset.
-    # Take by default the metadata of one of the datasets, simply to get the FAOSTAT sources (the rest of the metadata
-    # will be defined in the metadata yaml file).
     ds_garden = create_dataset(
         dest_dir,
         tables=[
@@ -701,6 +772,7 @@ def run(dest_dir: str) -> None:
             tb_spared_land_from_increased_yields,
             tb_food_available_for_consumption,
             tb_macronutrient_compositions,
+            tb_fertilizers,
         ],
     )
     ds_garden.save()
