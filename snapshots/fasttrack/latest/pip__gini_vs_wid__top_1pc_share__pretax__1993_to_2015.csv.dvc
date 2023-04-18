@@ -8,11 +8,11 @@ meta:
   source_name: Local CSV
   url: ''
   source_published_by: Local CSV
-  source_data_url: gAAAAABkPk0aujGlVNcZDQLu8JyBfqFgi8wD9dZVlvSNN4Fy1C75_A1mpLMYNpY-zs4NQgofmvNH4I4-TIC-i5mAxdbAlxzodA==
+  source_data_url: gAAAAABkPlOSr7r68fRmFhQUvAmGt3ic6GMZV6Xyub1XFwWU_Ct4RENLfR6J4yKaU9E4ZsN67q7XMGnN0k1PQgJPY2OLJ9aCcQ==
   is_public: false
   version: latest
 wdir: ../../../data/snapshots/fasttrack/latest
 outs:
-- md5: 855fd020355a3960442298b7254e549c
-  size: 16055
+- md5: 7681d711badc9b36d770f850a8cb2103
+  size: 14785
   path: pip__gini_vs_wid__top_1pc_share__pretax__1993_to_2015.csv
