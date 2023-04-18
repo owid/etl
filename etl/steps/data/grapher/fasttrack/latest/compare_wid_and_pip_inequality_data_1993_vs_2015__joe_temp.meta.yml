@@ -1,0 +1,29 @@
+dataset:
+  namespace: fasttrack
+  version: latest
+  short_name: compare_wid_and_pip_inequality_data_1993_vs_2015__joe_temp
+  title: DRAFT Compare WID and PIP inequality data 1993 vs 2015 (Joe temp)
+  description: ''
+  sources:
+  - name: Unknown
+    published_by: Unknown
+    publication_year: 2023
+    date_accessed: 2023-04-18
+tables:
+  compare_wid_and_pip_inequality_data_1993_vs_2015__joe_temp:
+    variables:
+      region:
+        title: region
+        unit: ''
+      pip__gini__all_observations:
+        title: 'PIP: Gini – all observations'
+        unit: ''
+      wid__top_1pc_share__pretax__all_observations:
+        title: 'WID: Top 1pc share – pretax – all observations'
+        unit: ''
+      pip__gini__only_matching_observations:
+        title: 'PIP: Gini – only matching observations'
+        unit: ''
+      wid__top_1pc_share__pretax__only_matching_observations:
+        title: 'WID: Top 1pc share – pretax – only matching observations'
+        unit: ''
