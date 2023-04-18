@@ -11,26 +11,33 @@ help-default:
 	@echo
 	@echo '  make test      Run all linting and unit tests'
 	@echo '  make watch     Run all tests, watching for changes'
+	@echo '  make check     Format & Lint & Typecheck changed files from master'
 	@echo
 
 # check formatting before lint, since an autoformat might fix linting issues
-test-default: check-formatting lint check-typing unittest version-tracker
+test-default: check-formatting lint check-typing unittest
 
 .venv-default:
 	@echo '==> Installing packages'
-	git submodule update --init
 	poetry install
-	touch $@
+	touch .venv
+
+check-default:
+	@echo '==> Format & Lint & Typecheck changed files'
+	@CHANGED_PY_FILES=$$(git diff --name-only master | grep '\.py'); \
+	if [ -n "$$CHANGED_PY_FILES" ]; then \
+		echo "$$CHANGED_PY_FILES" | xargs ruff format; \
+		echo "$$CHANGED_PY_FILES" | xargs ruff check --fix; \
+		echo "$$CHANGED_PY_FILES" | xargs pyright; \
+	fi
 
 lint-default: .venv
-	@echo '==> Linting'
-	@poetry run flake8 $(SRC)
+	@echo '==> Linting & Sorting imports'
+	@poetry run ruff check --fix $(SRC)
 
 check-formatting-default: .venv
 	@echo '==> Checking formatting'
-	@poetry run black --check $(SRC)
-	@echo '==> Checking import sorting'
-	@poetry run isort --check-only $(SRC)
+	@poetry run ruff format --check $(SRC)
 
 check-typing-default: .venv
 	@echo '==> Checking types'
@@ -42,9 +49,7 @@ unittest-default: .venv
 
 format-default: .venv
 	@echo '==> Reformatting files'
-	@poetry run black $(SRC)
-	@echo '==> Sorting imports'
-	@poetry run isort $(SRC)
+	@poetry run ruff format $(SRC)
 
 watch-default: .venv
 	poetry run watchmedo shell-command -c 'clear; make test' --recursive --drop .
