@@ -15,15 +15,27 @@ tables:
       region:
         title: region
         unit: ''
-      pip__gini__all_observations:
-        title: 'PIP: Gini – all observations'
+      pip__gini1993__all_observations:
+        title: 'PIP: Gini1993 – all observations'
         unit: ''
-      wid__top_1pc_share__pretax__all_observations:
-        title: 'WID: Top 1pc share – pretax – all observations'
+      pip__gini2015__all_observations:
+        title: 'PIP: Gini2015 – all observations'
         unit: ''
-      pip__gini__only_matching_observations:
-        title: 'PIP: Gini – only matching observations'
+      wid__top_1pc_share__pretax1993__all_observations:
+        title: 'WID: Top 1pc share – pretax1993 – all observations'
         unit: ''
-      wid__top_1pc_share__pretax__only_matching_observations:
-        title: 'WID: Top 1pc share – pretax – only matching observations'
+      wid__top_1pc_share__pretax2015__all_observations:
+        title: 'WID: Top 1pc share – pretax2015 – all observations'
+        unit: ''
+      pip__gini1993__only_matching_observations:
+        title: 'PIP: Gini1993 – only matching observations'
+        unit: ''
+      pip__gini2015__only_matching_observations:
+        title: 'PIP: Gini2015 – only matching observations'
+        unit: ''
+      wid__top_1pc_share__pretax1993__only_matching_observations:
+        title: 'WID: Top 1pc share – pretax1993 – only matching observations'
+        unit: ''
+      wid__top_1pc_share__pretax2015__only_matching_observations:
+        title: 'WID: Top 1pc share – pretax2015 – only matching observations'
         unit: ''
