@@ -352,9 +352,20 @@ def combine_paris_principles(all_tabs: List[pd.DataFrame]) -> List[pd.DataFrame]
             paris_principles_tables.append(table)
     paris_principles_table = pd.concat(paris_principles_tables)
     paris_principles_table = paris_principles_table.reset_index()
+    # Adding new variable name
     paris_principles_table["seriescode"] = "SG_NHR_OWID"
+    paris_principles_table["seriesdescription"] = "The level to which countries are compliant with the Paris Principles"
     paris_principles_table = paris_principles_table.set_index(
         ["country", "year", "goal", "target", "indicator", "seriescode"], verify_integrity=True
+    )
+    # Shortening the values to improve the source tab
+    paris_principles_table.value = paris_principles_table.value.replace(
+        {
+            "Countries with National Human Rights Institutions in compliance with the Paris Principles, A status (1 = YES; 0 = NO)": "National Human Rights Institutions in compliance with the Paris Principles",
+            "Countries with National Human Rights Institutions not fully compliant with the Paris Principles, B status (1 = YES; 0 = NO)": "National Human Rights Institutions not fully compliant with the Paris Principles",
+            "Countries with no application for accreditation with the Paris Principles, D status (1 = YES; 0 = NO)": "No application for accreditation with the Paris Principles",
+            "Countries with National Human Rights Institutions and no status with the Paris Principles, C status (1 = YES; 0 = NO)": "National Human Rights Institutions and no status with the Paris Principles",
+        }
     )
 
     all_tabs.append(paris_principles_table)
