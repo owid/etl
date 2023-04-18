@@ -63,36 +63,6 @@ steps:
     - data://garden/owid/latest/key_indicators
   data://meadow/oecd/2016-06-01/regional_wellbeing:
     - walden://oecd/2016-06-01/regional_wellbeing
-  data://garden/sdg/latest/sdg:
-    - backport://backport/owid/latest/dataset_1047_world_bank_gender_statistics__gender
-    - backport://backport/owid/latest/dataset_1070_statistical_capacity_indicator__sci__world_bank_data_on_statistical_capacity
-    - backport://backport/owid/latest/dataset_115_countries_continents
-    - backport://backport/owid/latest/dataset_1857_employment
-    - backport://backport/owid/latest/dataset_1861_earnings_and_labour_cost
-    - backport://backport/owid/latest/dataset_3093_economic_losses_from_disasters_as_a_share_of_gdp__pielke__2018
-    - backport://backport/owid/latest/dataset_5201_forest_land__deforestation_and_change__fao__2020
-    - backport://backport/owid/latest/dataset_5332_water_and_sanitation__who_wash__2021
-    - backport://backport/owid/latest/dataset_5362_world_bank_edstats_2020
-    - backport://backport/owid/latest/dataset_5520_united_nations_sustainable_development_goals__united_nations__2022_02
-    - backport://backport/owid/latest/dataset_5546_democracy__lexical_index
-    - backport://backport/owid/latest/dataset_5575_united_nations_sustainable_development_goals__united_nations__2022_04
-    - backport://backport/owid/latest/dataset_5593_ihme__global_burden_of_disease__risk_factors__institute_for_health_metrics_and_evaluation__2022_04
-    - backport://backport/owid/latest/dataset_5599_ihme__global_burden_of_disease__deaths_and_dalys__institute_for_health_metrics_and_evaluation__2022_04
-    - backport://backport/owid/latest/dataset_5637_world_development_indicators__world_bank__2022_05_26
-    - backport://backport/owid/latest/dataset_5676_global_health_observatory__world_health_organization__2022_08
-    - backport://backport/owid/latest/dataset_5782_who_immunization_data__2022
-    - backport://backport/owid/latest/dataset_5790_global_health_estimates__world_health_organization__2020
-    - backport://backport/owid/latest/dataset_5821_gender_statistics__world_bank__2022_10_29
-    - backport://backport/owid/latest/dataset_5839_international_completeness_of_death_registration_2015_2019__karlinsky__2021
-    - backport://backport/owid/latest/dataset_5855_united_nations_office_on_drugs_and_crime__intentional_homicides
-    - backport://backport/owid/latest/dataset_5895_united_nations_sustainable_development_goals__2023
-    - backport://backport/owid/latest/dataset_5939_food_security__suite_of_food_security_indicators__fao__2023_02_22
-    - backport://backport/owid/latest/dataset_5941_investment__credit_to_agriculture__fao__2023_02_22
-    - backport://backport/owid/latest/dataset_5942_sdg_indicators__sdg_indicators__fao__2023_02_22
-    - backport://backport/owid/latest/dataset_5963_population__various_sources__2023_1
-    - backport://backport/owid/latest/dataset_829_food_security__suite_of_food_security_indicators__fao__2017
-    - backport://backport/owid/latest/dataset_943_sexual_violence__unicef__2017
-    - data://garden/worldbank_wdi/2022-05-26/wdi
   data://grapher/malnutrition/2022-10-18/malnutrition:
     - data://garden/malnutrition/2022-10-18/malnutrition
   data://garden/malnutrition/2022-10-18/malnutrition:
@@ -157,13 +127,22 @@ steps:
   # Data extracted from the public spreadsheet.
   data://meadow/aviation_safety_network/2022-10-14/aviation_statistics:
     - snapshot://aviation_safety_network/2022-10-14/aviation_statistics.csv
+  data://meadow/aviation_safety_network/2023-04-18/aviation_statistics:
+    - snapshot://aviation_safety_network/2023-04-18/aviation_statistics.csv
+    - snapshot://aviation_safety_network/2023-04-18/aviation_statistics_by_nature.csv
+    - snapshot://aviation_safety_network/2023-04-18/aviation_statistics_by_period.csv
   # Here, worldbank_wdi is required to get some additional aviation statistics.
   data://garden/aviation_safety_network/2022-10-14/aviation_statistics:
     - data://meadow/aviation_safety_network/2022-10-12/aviation_statistics
     - data://meadow/aviation_safety_network/2022-10-14/aviation_statistics
     - data://garden/worldbank_wdi/2022-05-26/wdi
+  data://garden/aviation_safety_network/2023-04-18/aviation_statistics:
+    - data://meadow/aviation_safety_network/2023-04-18/aviation_statistics
+    - data://garden/worldbank_wdi/2022-05-26/wdi
   data://grapher/aviation_safety_network/2022-10-14/aviation_statistics:
     - data://garden/aviation_safety_network/2022-10-14/aviation_statistics
+  data://grapher/aviation_safety_network/2023-04-18/aviation_statistics:
+    - data://garden/aviation_safety_network/2023-04-18/aviation_statistics
 
   # HMD
   data://meadow/hmd/2022-11-04/life_tables:
