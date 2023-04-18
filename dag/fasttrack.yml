@@ -38,3 +38,5 @@ steps:
   - snapshot-private://fasttrack/latest/evs_per_charger.csv
   data-private://grapher/fasttrack/latest/who_standard_pop:
   - snapshot-private://fasttrack/latest/who_standard_pop.csv
+  data-private://grapher/fasttrack/latest/pip__gini_vs_wid__top_1pc_share__pretax__1993_to_2015:
+  - snapshot-private://fasttrack/latest/pip__gini_vs_wid__top_1pc_share__pretax__1993_to_2015.csv
