@@ -135,3 +135,9 @@ steps:
   # WGM
   data://meadow/health/2023-04-18/wgm_mental_health:
     - snapshot://health/2023-04-18/wgm_mental_health.zip
+  data://garden/health/2023-04-18/wgm_mental_health:
+    - data://meadow/health/2023-04-18/wgm_mental_health
+    - data://garden/demography/2023-03-31/population
+    - data://garden/reference
+  data://grapher/health/2023-04-19/wgm_mental_health:
+    - data://garden/health/2023-04-18/wgm_mental_health
