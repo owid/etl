@@ -357,7 +357,7 @@ def combine_paris_principles(all_tabs: List[pd.DataFrame]) -> List[pd.DataFrame]
         {
             "Countries with National Human Rights Institutions in compliance with the Paris Principles, A status (1 = YES; 0 = NO)": "National Human Rights Institutions in compliance with the Paris Principles",
             "Countries with National Human Rights Institutions not fully compliant with the Paris Principles, B status (1 = YES; 0 = NO)": "National Human Rights Institutions not fully compliant with the Paris Principles",
-            "Countries with no application for accreditation with the Paris Principles, D status (1 = YES; 0 = NO)": "No application for accreditation with the Paris Principles",
+            "Countries with no application for accreditation with the Paris Principles, D status  (1 = YES; 0 = NO)": "No application for accreditation with the Paris Principles",
             "Countries with National Human Rights Institutions and no status with the Paris Principles, C status (1 = YES; 0 = NO)": "National Human Rights Institutions and no status with the Paris Principles",
         }
     )
