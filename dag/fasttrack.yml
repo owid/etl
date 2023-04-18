@@ -40,3 +40,5 @@ steps:
   - snapshot-private://fasttrack/latest/who_standard_pop.csv
   data-private://grapher/fasttrack/latest/pip__gini_vs_wid__top_1pc_share__pretax__1993_to_2015:
   - snapshot-private://fasttrack/latest/pip__gini_vs_wid__top_1pc_share__pretax__1993_to_2015.csv
+  data-private://grapher/fasttrack/latest/compare_wid_and_pip_inequality_data_1980_vs_2018__joe_temp:
+  - snapshot-private://fasttrack/latest/compare_wid_and_pip_inequality_data_1980_vs_2018__joe_temp.csv
