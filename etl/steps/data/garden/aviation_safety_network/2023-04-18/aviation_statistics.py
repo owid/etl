@@ -88,6 +88,9 @@ def run(dest_dir: str) -> None:
     # Select only global data.
     df_wdi = df_wdi[df_wdi["country"] == "World"].reset_index(drop=True)
 
+    # To avoid issues when merging with ASN data (which has integer columns with nans) convert to new pandas dtypes.
+    df_wdi = df_wdi.astype({"departures_worldwide": "Float64", "passengers_carried": "Int64"})
+
     # Combine ASN with WDI data.
     df_combined = pd.merge(df, df_wdi, how="left", on=["country", "year"])
 
