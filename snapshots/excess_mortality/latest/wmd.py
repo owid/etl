@@ -1,6 +1,6 @@
 """Script to create a snapshot of dataset 'World Mortality Dataset'."""
 
-from datetime import datetime
+from datetime import date
 from pathlib import Path
 
 import click
@@ -23,7 +23,7 @@ def main(upload: bool) -> None:
     snap = Snapshot(f"excess_mortality/{SNAPSHOT_VERSION}/wmd.csv")
 
     # Add date_accessed
-    snap.metadata.date_accessed = datetime.today()
+    snap.metadata.date_accessed = date.today()
     snap.metadata.save()
 
     # Download data from source.
