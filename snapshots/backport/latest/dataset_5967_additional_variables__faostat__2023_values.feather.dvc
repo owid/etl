@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5967_additional_variables__faostat__2023_values
   file_extension: feather
-  date_accessed: 2023-04-18 12:12:41.062103
+  date_accessed: 2023-04-18 12:18:17.750444
   name: Additional variables (FAOSTAT, 2023)
   description: ''
   source_name: Our World in Data catalog backport
