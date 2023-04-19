@@ -59,7 +59,7 @@ def run(dest_dir: str) -> None:
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(dest_dir, tables=[tb_garden], default_metadata=ds_meadow.metadata)
-
+    ds_garden.update_metadata(paths.metadata_path)
     # Save changes in the new garden dataset.
     ds_garden.save()
 
@@ -71,7 +71,9 @@ def make_table(df: pd.DataFrame) -> Table:
     df = clean_df(df)
     df = make_df_with_share_answers(df)
     df = map_ids_to_labels(df)
-    return Table(df, short_name=paths.short_name, underscore=True)
+    df = final_formatting(df)
+    tb = Table(df, short_name=paths.short_name, underscore=True)
+    return tb
 
 
 def clean_df(df: pd.DataFrame) -> pd.DataFrame:
@@ -179,11 +181,6 @@ def map_ids_to_labels(df: pd.DataFrame) -> pd.DataFrame:
     df["gender"] = df["gender"].replace(gender_mapping)
     df["age_group"] = df["age_group"].replace(age_group_mapping)
 
-    # Format
-    log.info("wgm_mental_health: final formatting}")
-    df = df[["country", "year", "question", "answer", "gender", "age_group", "share", "count"]].set_index(
-        ["country", "year", "question", "answer", "gender", "age_group"], verify_integrity=True
-    )
     return df
 
 
@@ -228,3 +225,12 @@ def _sanity_check_age_ids(df: pd.DataFrame):
         raise ValueError(f"Unexpected age group ID {age_unexpected}")
     if age_missing:
         raise ValueError(f"Missing age group ID {age_missing}")
+
+
+def final_formatting(df: pd.DataFrame) -> pd.DataFrame:
+    # Format
+    log.info("wgm_mental_health: final formatting}")
+    df = df[["country", "year", "question", "answer", "gender", "age_group", "share", "count"]].set_index(
+        ["country", "year", "question", "answer", "gender", "age_group"], verify_integrity=True
+    )
+    return df
