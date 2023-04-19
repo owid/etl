@@ -1,41 +1,49 @@
 # Using the interactive walkthrough
 
-_This article is meant for OWID staff members._
+!!! note
 
-The walkthrough is an interactive web UI for setting up ETL steps.
+    This article is meant for OWID staff members.
+
+The walkthrough is an interactive web UI for setting up the different ETL steps. It creates the base files to help you
+create the recipe for a dataset. It currently supports the following stages:
+
+| Option      | Description                          |
+| ----------- | ------------------------------------ |
+| `walden`       | Create a Walden step: Insert upstream data to our catalog. |
+| `snapshot`       | Create a Walden step: Insert upstream data to our catalog. |
+| `meadow`       | Create a Meadow step: Format data. |
+| `garden`       | Create a Garden step: Harmonize and process data. |
+| `grapher`       | Create a Grapher step: Transform data to be Grapher-ready. |
+| `explorers`       | Create an Explorer step: Transform data to be Explorer-ready. |
+
+
+```bash
+$ walkthrough --help
+Usage: walkthrough [OPTIONS] {walden|snapshot|meadow|garden|grapher|explo
+                   rers|charts}
+
+Options:
+  --run-checks / --skip-checks  Environment checks
+  --dummy-data                  Prefill form with dummy data, useful for
+                                development
+  --auto-open / --no-auto-open  Auto open browser on port 8082
+  --port INTEGER                Application port
+  --help                        Show this message and exit.
+```
 
 ## Get set up
 
 Before you begin, make sure you've set up the ETL as described in [Getting Started](../getting-started/index.md).
 
-## Decide on names
-
-The ETL uses a naming convention to identify datasets. To add a dataset, you will need to choose a short name for the data provider (e.g. `un`, `who`), which will serve as the namespace to add it to.
-
-You will also need to choose a short name for the dataset itself (e.g. `population`), which will be used to identify the dataset in the ETL.
-
-??? tip "What's a short name?"
-
-    Short names must be unique within a namespace. They must be in lowercase and separated only with underscores. They must not contain any special characters, and should not be too long.
-
-    - ✓ `population`
-    - ✓ `electricity_demand`
-    - ✗ `Electricity Demand`
-    - ✗ `electricity-demand`
-    - ✗ `really_long_elaborate_description_of_the_variable_in_question`
-
 ## Start the walkthrough
 
-```bash
-source .venv/bin/activate
-```
+Walkthrough consists of a web app that will ask you for various metadata fields (such as `namespace`, `version`, `source_url`, etc.). Based on your input,
+it will generate the required files in the appropriate `snapshots/` or `etl/` directory. Walkthrough will point you to the commands that you need to run once you
+have implemented the step.
 
-Then, for each stage of data processing you need to do, run the walkthrough for that stage:
+A typical workflow would involve:
 
-```mermaid
-graph LR
-
-snapshot --> meadow --> garden --> grapher
-```
-
-Begin with `walkthrough snapshot`, and open your browser to the page that it prints out.
+1. Create a snapshot step: `poetry run walkthrough snapshot`.
+2. Create a meadow step based on the output from 1: `poetry run walkthrough meadow`.
+3. Create a garden step based on the output from 2: `poetry run walkthrough garden`.
+4. Create a grapher step based on the output from 3: `poetry run walktrhough grapher`.

@@ -11,6 +11,7 @@ Our format is inspired by [Frictionless DataPackage format](https://frictionless
 We have adapted this format to our needs as follows.
 
 ## Levels of data
+The following diagram presents an hypothetical dataset with two tables (`Table A` and `Table B`). Both tables have a primary keys and some variables.
 
 ```mermaid
 graph TB
@@ -41,9 +42,9 @@ The folder contains one or more Feather files, each of which represents a _table
 
 ### Tables ([`owid.catalog.Table`](https://github.com/owid/owid-catalog-py/blob/master/owid/catalog/tables.py))
 
-A table is a data file in Feather format (`<short_name>.feather`) with an accompanying JSON metadata file (`<short_name>.meta.json`).
+A table is a data file in Feather format (`<short_name>.feather`) or Parquet format (`<short_name>.parquet`) with an accompanying JSON metadata file (`<short_name>.meta.json`).
 
-Feather was chosen since it is fast, compact, and it preserves types, avoiding the need to describe the types in the table's metadata file.
+Feather/Parquet were chosen since they are fast, compact, and preserves types, avoiding the need to describe the types in the table's metadata file.
 
 In Python, the `Table` class is a Pandas `DataFrame` extended to support metadata.
 
@@ -82,3 +83,9 @@ and imported into Python with:
 ```python
 from owid import catalog
 ```
+
+
+!!! note
+
+    If you have [set your working environment](../getting-started/working-environment.md), you will have the `owid-catalog` from `vendor/owid-catalog-py`.
+    Make sure that you have the latest version by running  `cd vendor/owid-catalog-py && git pull`.

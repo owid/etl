@@ -20,15 +20,16 @@ There are two methods that we use, both of which are semi-automated and involve 
 
 ### Command-line harmonization
 
-The [etl](https://github.com/owid/etl) codebase contains an interactive `harmonize` command-line tool which can be used to harmonize a CSV file containing a column called `Country` or `Region`.
+The [etl](https://github.com/owid/etl) codebase contains an interactive `harmonize` command-line tool which can be used to harmonize a CSV file that contains a column with country names.
 
 ```
-$ harmonize --help
+$ poetry run harmonize --help
 Usage: harmonize [OPTIONS] DATA_FILE COLUMN OUTPUT_FILE [INSTITUTION]
 
-  Given a data file in feather or CSV format, and the name of the column
-  representing country or region names, interactively generate a JSON mapping
-  from the given names to OWID's canonical names.
+  Given a DATA_FILE in feather or CSV format, and the name of the COLUMN
+  representing country or region names, interactively generate the JSON
+  mapping OUTPUT_FILE from the given names to OWID's canonical names.
+  Optionally, can use INSTITUTION to append "(institution)" to countries.
 
   When a name is ambiguous, you can use:
 
@@ -38,14 +39,34 @@ Usage: harmonize [OPTIONS] DATA_FILE COLUMN OUTPUT_FILE [INSTITUTION]
 
   q: to quit and save the partially complete mapping
 
-  If a mapping file already exists, it will resume where the mapping file left
-  off.
+  If a mapping file already exists, it will resume where the mapping file
+  left off.
 
 Options:
   --help  Show this message and exit.
 ```
 
+As an example, start the harmonization interactive session for table `undp_hdr` from dataset `meadow/un/2022-11-29/undp_hdr`:
+
+
+```bash
+$ poetry run harmonize data/meadow/un/2022-11-29/undp_hdr/undp_hdr.feather country mapping.json
+206 countries/regions to harmonize
+  └ 189 automatically matched
+  └ 17 ambiguous countries/regions
+
+Beginning interactive harmonization...
+
+[1/17] Arab States
+(n) next, (s) suggest, (q) quit
+(Cmd)
+```
+
 ### Using the Grapher admin
+
+!!! warning
+
+    This method is not preferred. Ideally, you should use the `harmonize` command tool.
 
 The [owid-grapher](https://github.com/owid/owid-grapher) codebase contains a interactive country harmonization tool that can be accessed at [http://localhost:3030/admin/standardize](http://localhost:3030/admin/standardize) when running the dev server.
 

@@ -4,8 +4,8 @@ Welcome to the public data pipeline for [Our World In Data](https://ourworldinda
 
 Choose the material that most interests you:
 
-- [I want to learn more about the pipeline and how it operates](architecture/index.md)
-- [I want to build a public dataset on my local machine](getting-started/index.md)
-- [I want to access a public dataset using an API](api/index.ipynb)
-- [I am an OWID staff member, and want to add a dataset to the ETL](adding-data/index.md)
-- [I am a member of the public, and want to contribute](contributing.md)
+- I want to **learn more about the pipeline** and how it operates | [Read more :octicons-arrow-right-24:](architecture/index.md)
+- I want to **build a public dataset** on my local machine | [Read more :octicons-arrow-right-24:](getting-started/index.md)
+- I want to **access a public dataset** using an **API** | [Read more :octicons-arrow-right-24:](api/index.md)
+- I am an **OWID staff** member, and want to **add a dataset to the ETL** | [Read more :octicons-arrow-right-24:](adding-data/index.md)
+- I am a member of the public, and want to **contribute** | [Read more :octicons-arrow-right-24:](contributing.md)
