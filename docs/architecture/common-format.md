@@ -11,6 +11,7 @@ Our format is inspired by [Frictionless DataPackage format](https://frictionless
 We have adapted this format to our needs as follows.
 
 ## Levels of data
+The following diagram presents an hypothetical dataset with two tables (`Table A` and `Table B`). Both tables have a primary keys and some variables.
 
 ```mermaid
 graph TB
