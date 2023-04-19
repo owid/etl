@@ -44,3 +44,5 @@ steps:
   - snapshot-private://fasttrack/latest/compare_wid_and_pip_inequality_data_1980_vs_2018__joe_temp.csv
   data-private://grapher/fasttrack/latest/compare_wid_and_pip_inequality_data_1993_vs_2015__joe_temp:
   - snapshot-private://fasttrack/latest/compare_wid_and_pip_inequality_data_1993_vs_2015__joe_temp.csv
+  data-private://grapher/fasttrack/latest/compare_wid_and_pip_change_in_inequality_1993_vs_2015__joe_temp:
+  - snapshot-private://fasttrack/latest/compare_wid_and_pip_change_in_inequality_1993_vs_2015__joe_temp.csv
