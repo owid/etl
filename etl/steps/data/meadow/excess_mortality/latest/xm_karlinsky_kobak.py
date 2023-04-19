@@ -42,7 +42,7 @@ def run(dest_dir: str) -> None:
     #
     # Retrieve snapshots.
     snap_all: Snapshot = paths.load_dependency("xm_karlinsky_kobak.csv")
-    snap_ages: Snapshot = paths.load_dependency("xm_karlinsky_kobak.ages.csv")
+    snap_ages: Snapshot = paths.load_dependency("xm_karlinsky_kobak_ages.csv")
 
     # Load data from snapshot.
     df_all = load_dataframe(snap_all.path, column_names=COLUMN_NAMES)

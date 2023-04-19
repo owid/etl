@@ -1,6 +1,6 @@
 ---
 name: "walkthrough issue"
-about: For issues that involve `walktrhough` program.
+about: For issues that involve `walkthrough` program.
 title: "walkthrough: meaningful title for the issue"
 labels: walkthrough
 assignees: marigold,lucasrodes

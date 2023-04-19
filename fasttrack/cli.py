@@ -197,6 +197,12 @@ def app(dummy_data: bool, commit: bool) -> None:
             contents=[po.put_markdown(f.read())],
         )
 
+    with open(CURRENT_DIR / "instructions_large_csv.md", "r") as f:
+        walkthrough_utils.put_widget(
+            title=po.put_html("<b>Instructions for importing large CSV file</b>"),
+            contents=[po.put_markdown(f.read())],
+        )
+
     data, meta, sheets_url, form, snapshot_dict = _load_data_and_meta(dummies)
 
     fast_import = FasttrackImport(data, meta, sheets_url, form.is_private, snapshot_dict)
