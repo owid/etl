@@ -5,10 +5,7 @@ repo_url: https://github.com/owid/etl
 
 nav:
   - Home: "index.md"
-  - Getting started:
-    - Working environment: "getting-started/working-environment.md"
-    - Building datasets: "getting-started/building-datasets.md"
-    - Consuming datasets: "getting-started/consuming-datasets.md"
+  - Getting started: "getting-started/index.md"
   - Architecture:
       - Overview: "architecture/index.md"
       - Common format: "architecture/common-format.md"
@@ -18,30 +15,13 @@ nav:
       - Workflow: "architecture/workflow.md"
   - Adding data:
       - Guide: "adding-data/index.md"
+      - Fast track: "adding-data/fast-track.md"
       - Walkthrough: "adding-data/walkthrough.md"
       - Manually add: "adding-data/manual.md"
-      - Fast track: "adding-data/fast-track.md"
   - API: "api/index.ipynb"
   - Contributing: "contributing.md"
 
 theme:
-  # logo: assets/logo.png
-  favicon: assets/favicon.ico
-  palette:
-    # Palette toggle for light mode
-    - media: "(prefers-color-scheme: light)"
-      scheme: default
-      toggle:
-        icon: material/brightness-7
-        name: Switch to dark mode
-    # Palette toggle for dark mode
-    - media: "(prefers-color-scheme: dark)"
-      scheme: slate
-      toggle:
-        icon: material/brightness-4
-        name: Switch to light mode
-  font:
-    text: Lato
   name: material
   features:
     - navigation.instant
@@ -49,15 +29,10 @@ theme:
     - navigation.tabs
     - navigation.tabs.sticky
     - navigation.indexes
-    - content.tooltips
-
 
 markdown_extensions:
   - admonition
-  - abbr
-  - attr_list
   - pymdownx.details
-  - pymdownx.snippets
   - pymdownx.superfences:
       custom_fences:
         - name: mermaid
@@ -65,30 +40,10 @@ markdown_extensions:
           format: !!python/name:pymdownx.superfences.fence_code_format
   - pymdownx.tabbed:
       alternate_style: true
-  - pymdownx.emoji:
-      emoji_index: !!python/name:materialx.emoji.twemoji
-      emoji_generator: !!python/name:materialx.emoji.to_svg
 
 plugins:
   - mkdocs-jupyter:
       ignore_h1_titles: True
-  - search
 
 extra_css:
   - css/extra.css
-
-extra:
-  homepage: https://docs.owid.io/projects/etl
-  generator: false
-  social:
-    # icons available listed: https://github.com/squidfunk/mkdocs-material/tree/master/material/.icons/fontawesome
-    - icon: fontawesome/brands/github
-      link: https://github.com/ourworldindata
-    - icon: fontawesome/solid/globe
-      link: https://ourworldindata.org
-    - icon: fontawesome/brands/twitter
-      link: https://twitter.com/ourworldindata
-    - icon: fontawesome/brands/instagram
-      link: https://instagram.com/ourworldindata
-
-copyright: Copyright &copy; 2023 Our World in Data

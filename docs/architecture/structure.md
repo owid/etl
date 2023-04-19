@@ -2,11 +2,7 @@
 
 ## A compute graph
 
-The ETL is a compute graph, that uses a directed acyclic graph (DAG) to describe the dependencies between datasets. There are currently three types of nodes in the graph:
-
-- snapshots
-- datasets
-- grapher exports
+The ETL is a compute graph, that uses a directed acyclic graph (DAG) to describe the dependencies between datasets. There are currently three types of nodes in the graph: snapshots, datasets and grapher exports.
 
 ### Snapshots
 
@@ -14,10 +10,10 @@ Data snapshots represent a copy of an upstream datasource in its original format
 
 New-style snapshots are managed in the ETL using DVC and begin with the prefix `snapshot://`. Old-style snapshots are managed by the [walden](https://github.com/owid/walden) codebase and begin with the prefix `walden://`.
 
-Snapshot URIs use the convention:
+Snapshot URIs use the convention: 
 
 ```
-snapshot://<namespace>/<version>/<filename>
+snapshot://<provider>/<version>/<filename>
 ```
 
 Examples:
@@ -32,10 +28,10 @@ Datasets are nodes in the compute graph, the main units of work in the ETL. They
 Dataset URIs use the convention:
 
 ```
-data://<channel>/<namespace>/<version>/<dataset-short-name>
+data://<channel>/<namespace>/<version>/<dataset>
 ```
 
-The channel is used as the highest level of grouping, and represents a stage of data curation.
+The channel is used as the highest level of grouping, and typically represents a stage of data curation.
 
 Typically the namespace is a data provider, like `un`, but it in cases where there are many data providers, it can describe the topic area instead (e.g. `energy`).
 
@@ -57,14 +53,14 @@ The Grapher codebase can only except datasets that are in a particulare shape:
 
 However, datasets in the ETL are often in a different shape. For example, they may be broken down by gender, disease type, fish stock, or some other dimension.
 
-All data charted on our site is built from simplified grapher views, stored in MySQL.
+All data charted on our site is built from simplified grapher views, stored in MySQL. 
 
 Grapher steps are responsible for reshaping a dataset on disk into a grapher view. A single variable may fan out into a large number of grapher views.
 
 Grapher views use the following convention:
 
 ```
-data://grapher/<namespace>/<version>/<dataset-short-name>
+data://grapher/<provider>/<version>/<dataset>
 ```
 
 Grapher views are still normal datasets, but they adapt the data to the way it must look when being inserted to MySQL.
@@ -73,9 +69,9 @@ For each grapher view, there is a corresponding matching `grapher://` step autom
 
 The automatically generated step adapts the data for grapher, including:
 
-- Generating a grapher variable for every combination of values of dimensions (e.g. `Death rate (sex=male, age group=60-70)`).
-- Converting countries to `entity_id` values that match the `entities` table in MySQL.
-- If the dataset has multiple sources, merging them into a single combined source to fit Grapher's data model for sources.
+- Generating a grapher variable for every combination of values of dimensions (e.g. `Death rate (sex=male, age group=60-70)`)
+- Converting countries to `entity_id` values that match the `entities` table in MySQL
+- If the dataset has multiple sources, merging them into a single combined source to fit Grapher's data model for sources 
 
 ## Features and constraints
 
@@ -103,7 +99,7 @@ graph LR
 upstream --> snapshot --> etl --> catalog[on-disk catalog]
 ```
 
-We secondly keep record all data dependencies in a directed graph or DAG (see YAML files from [`dag`](https://github.com/owid/etl/blob/master/dag/main.yml)), and forbid steps from using any data as input that isn't explicitly declared as a dependency. This means that the result of any step is a pure function of its inputs.
+We secondly keep record all data dependencies in a directed graph or DAG (see: [`dag/main.yml`](https://github.com/owid/etl/blob/master/dag/main.yml)), and forbid steps from using any data as input that isn't explicitly declared as a dependency. This means that the result of any step is a pure function of its inputs.
 
 ### Checksums for safe caching
 
