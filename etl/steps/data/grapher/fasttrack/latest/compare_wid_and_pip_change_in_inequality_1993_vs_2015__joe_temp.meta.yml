@@ -1,0 +1,23 @@
+dataset:
+  namespace: fasttrack
+  version: latest
+  short_name: compare_wid_and_pip_change_in_inequality_1993_vs_2015__joe_temp
+  title: DRAFT Compare WID and PIP CHANGE in inequality 1993 vs 2015 (Joe temp)
+  description: ''
+  sources:
+  - name: Unknown
+    published_by: Unknown
+    publication_year: 2023
+    date_accessed: 2023-04-19
+tables:
+  compare_wid_and_pip_change_in_inequality_1993_vs_2015__joe_temp:
+    variables:
+      region:
+        title: region
+        unit: ''
+      change_pip:
+        title: change_PIP
+        unit: ''
+      change_wid:
+        title: change_WID
+        unit: ''
