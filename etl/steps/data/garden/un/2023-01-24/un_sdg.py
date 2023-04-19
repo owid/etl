@@ -47,11 +47,12 @@ def run(dest_dir: str) -> None:
     )
 
     # Create a new table with the processed data.
-    # tb_garden = Table(df, like=tb_meadow)
     all_tables = create_tables(df)
 
     # Creating OMMs
     all_tables = create_omms(all_tables)
+    # Combine Paris Principles variables
+    all_tables = combine_paris_principles(all_tables)
     log.info("Saving data tables...")
 
     ds_garden = Dataset.create_empty(dest_dir)
@@ -87,16 +88,11 @@ def get_attributes_description() -> Dict:
     units: Snapshot = paths.load_dependency(short_name="un_sdg_unit.csv", namespace="un")
     df_units = pd.read_csv(units.path)
     dict_units = df_units.set_index("AttCode").to_dict()["AttValue"]
-    # local_file = walden_ds.ensure_downloaded()
-    # with open(local_file) as json_file:
-    # units = json.load(json_file)
     return dict_units
 
 
 def get_dimension_description() -> dict[str, str]:
     dimensions: Snapshot = paths.load_dependency(short_name="un_sdg_dimension.json", namespace="un")
-    # walden_ds = Catalog().find_one(namespace=NAMESPACE, short_name="dimension", version=VERSION)
-    # local_file = walden_ds.ensure_downloaded()
     with open(dimensions.path) as json_file:
         dims: dict[str, str] = json.load(json_file)
     # underscore to match the df column names
@@ -322,7 +318,50 @@ def create_omms(all_tabs: List[pd.DataFrame]) -> List[pd.DataFrame]:
             table.reset_index(level=["level_status"], inplace=True)  # type: ignore
             table["value"] = table["level_status"]
             table.drop(columns=["level_status"], inplace=True)
-
         new_tabs.append(table)
 
     return new_tabs
+
+
+def combine_paris_principles(all_tabs: List[pd.DataFrame]) -> List[pd.DataFrame]:
+    """
+    Combine the four variables regarding country's accreditation with the Paris Principles (having independent Human Rights Institutions)
+
+    Currently there are four variables, one variable for each level of accreditation, shown by the value of 1. We should combine these and instead set the value as the series description.
+
+    This is in a similar vain to the create_omms() function but in this case the variables each have their own variable code.
+
+
+    """
+    paris_principles_vars = ["SG_NHR_IMPLN", "SG_NHR_INTEXSTN", "SG_NHR_NOSTUSN", "SG_NHR_NOAPPLN"]
+    paris_principles_tables = []
+    for table in all_tabs:
+        if table.index[0][5] in (paris_principles_vars):
+            table = table.copy(deep=False)
+            vc = table.groupby(["country", "year"]).value.sum().sort_values(ascending=False)
+            regions = set(vc[vc > 1].index.get_level_values(0))
+            table = table[~table.index.get_level_values("country").isin(regions)]
+            table["value"] = table["seriesdescription"]
+            table["long_unit"] = ""
+            paris_principles_tables.append(table)
+    paris_principles_table = pd.concat(paris_principles_tables)
+    paris_principles_table = paris_principles_table.reset_index()
+    # Adding new variable name
+    paris_principles_table["seriescode"] = "SG_NHR_OWID"
+    paris_principles_table["seriesdescription"] = "The level to which countries are compliant with the Paris Principles"
+    paris_principles_table = paris_principles_table.set_index(
+        ["country", "year", "goal", "target", "indicator", "seriescode"], verify_integrity=True
+    )
+    # Shortening the values to improve the source tab
+    paris_principles_table.value = paris_principles_table.value.replace(
+        {
+            "Countries with National Human Rights Institutions in compliance with the Paris Principles, A status (1 = YES; 0 = NO)": "Compliant with Paris Principles",
+            "Countries with National Human Rights Institutions not fully compliant with the Paris Principles, B status (1 = YES; 0 = NO)": "Observer Status",
+            "Countries with no application for accreditation with the Paris Principles, D status  (1 = YES; 0 = NO)": "Not compliant with the Paris Principles",
+            "Countries with National Human Rights Institutions and no status with the Paris Principles, C status (1 = YES; 0 = NO)": "No status with the Paris Principles",
+        }
+    )
+
+    all_tabs.append(paris_principles_table)
+
+    return all_tabs

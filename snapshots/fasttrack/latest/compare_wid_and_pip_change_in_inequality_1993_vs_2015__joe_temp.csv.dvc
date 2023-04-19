@@ -1,0 +1,18 @@
+meta:
+  namespace: fasttrack
+  short_name: compare_wid_and_pip_change_in_inequality_1993_vs_2015__joe_temp
+  file_extension: csv
+  date_accessed: 2023-04-19
+  name: DRAFT Compare WID and PIP CHANGE in inequality 1993 vs 2015 (Joe temp)
+  description: ''
+  source_name: Local CSV
+  url: ''
+  source_published_by: Local CSV
+  source_data_url: gAAAAABkQGjg8pZBg8WMNZUv2EasjfCdgUz5BsZx3qHgkWANzLpoAI75wEHzixo6ZJI28uSItJ4E3OYryQBFdXDUohCjH9yhTQ==
+  is_public: false
+  version: latest
+wdir: ../../../data/snapshots/fasttrack/latest
+outs:
+- md5: 82da9221c1216a5531ebc6f4b1957d55
+  size: 4112
+  path: compare_wid_and_pip_change_in_inequality_1993_vs_2015__joe_temp.csv

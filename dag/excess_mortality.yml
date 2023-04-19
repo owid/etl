@@ -7,7 +7,7 @@ steps:
     - snapshot://excess_mortality/latest/wmd.csv
   data://meadow/excess_mortality/latest/xm_karlinsky_kobak:
     - snapshot://excess_mortality/latest/xm_karlinsky_kobak.csv
-    - snapshot://excess_mortality/latest/xm_karlinsky_kobak.ages.csv
+    - snapshot://excess_mortality/latest/xm_karlinsky_kobak_ages.csv
   # Garden
   data://garden/excess_mortality/latest/hmd_stmf:
     - data://meadow/excess_mortality/latest/hmd_stmf

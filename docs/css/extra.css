@@ -17,3 +17,28 @@
     margin-top: 5px;
     margin-bottom: 5px;
 }
+
+.tabbed-content {
+    /* background-color: rgb(255, 252, 252); */
+    border: 1px solid #edecec;
+    border-radius: 1%;
+    padding: 0.5rem;
+}
+
+/* .md-typeset h1 {
+    font-size: 3em;
+}
+
+
+.md-typeset h2 {
+    font-size: 2em;
+}
+
+
+.md-typeset h3 {
+    font-size: 1.5em;
+} */
+
+/* .md-typeset p {
+    font-size: 1em;
+} */

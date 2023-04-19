@@ -11,8 +11,6 @@ dataset:
     some countries outside of this year period. E.g. it provides data for "Svalbard and Jan Mayen" (until 2017) and "Netherlands Antilles" (until 2010).
     • Gapminder (Systema Globalis): Covers the period 1555-2008. It complements the dataset with former countries and other data points not present in the other sources.
 
-    For a more detailed description, please refer to the field "source" in table "population".
-
   version: "2022-12-08"
   sources: &population-sources
     - name: Gapminder (2022)
@@ -36,6 +34,15 @@ dataset:
       published_by: Gapminder (Systema Globalis)
       url: https://github.com/open-numbers/ddf--gapminder--systema_globalis
       date_accessed: 2022-12-12
+  licenses:
+    - name: Creative Commons BY 4.0
+      url: https://docs.google.com/document/d/1-RmthhS2EPMK_HIpnPctcXpB0n7ADSWnXa5Hb3PxNq4/edit?usp=sharing
+    - name: CC BY 3.0 IGO
+      url: http://creativecommons.org/licenses/by/3.0/igo/
+    - name: CC BY 3.0
+      url: https://dataportaal.pbl.nl/downloads/HYDE/HYDE3.2/readme_release_HYDE3.2.1.txt
+    - name: Creative Commons BY 4.0
+      url: https://creativecommons.org/licenses/by/4.0/
 tables:
   population:
     title: Population (various sources)

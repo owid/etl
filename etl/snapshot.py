@@ -25,7 +25,6 @@ dvc_lock = Lock()
 
 @dataclass
 class Snapshot:
-
     uri: str
     metadata: "SnapshotMeta"
 
@@ -79,7 +78,6 @@ class Snapshot:
 @dataclass_json
 @dataclass
 class SnapshotMeta:
-
     # how we identify the dataset
     namespace: str  # a short source name (usually institution name)
     short_name: str  # a slug, ideally unique, snake_case, no spaces
@@ -136,7 +134,12 @@ class SnapshotMeta:
     def save(self) -> None:
         self.path.parent.mkdir(exist_ok=True, parents=True)
         with open(self.path, "w") as ostream:
-            yaml_dump({"meta": self.to_dict()}, ostream)
+            d = self.to_dict()
+
+            # exclude `outs` with md5, we reset it when saving new metadata
+            d.pop("outs", None)
+
+            yaml_dump({"meta": d}, ostream)
 
     @property
     def uri(self):
