@@ -1,0 +1,24 @@
+meta:
+  namespace: papers
+  short_name: bayliss_smith_wanmali_1984
+  name: Long-term wheat yields, Understading Green Revolutions, Bayliss-Smith & Wanmali
+    (1984)
+  version: 2023-04-20
+  publication_year: 1984
+  source_name: Bayliss-Smith & Wanmali (1984)
+  source_published_by: Understading Green Revolutions, Tim P. Bayliss-Smith and Sudhir
+    Wanmali (1984)
+  url: https://www.cambridge.org/core/books/understanding-green-revolutions/761959C5635C85DB4C36E6B44C19A5EF
+  source_data_url:
+  file_extension: csv
+  license_url:
+  license_name: Copyright Cambridge University Press 1984
+  date_accessed: 2023-04-20
+  is_public: true
+  description: |
+    Data from Table 1.2 Wheat yields in Europe, 1850 to 1977-79 (100 kg/hectare).
+wdir: ../../../data/snapshots/papers/2023-04-20
+outs:
+- md5: b34683141ffb8b9ef407d3a224faff6a
+  size: 526
+  path: bayliss_smith_wanmali_1984.csv

@@ -1,0 +1,11 @@
+dataset:
+  title: Long-term wheat yields (agriculture, 2023)
+  description: |
+    This dataset combines data from two key sources:
+    + Wheat yields from 1961 onwards are as reported by the Food and Agricultural Organization of the United Nations.
+    + Data for European countries from prior to 1961 is sourced from Table 1.2 of Understanding Green Revolutions, by Bayliss-Smith & Wanmali (1984).
+
+    All values of yield have been converted to tonnes per hectare.
+
+tables:
+  {}

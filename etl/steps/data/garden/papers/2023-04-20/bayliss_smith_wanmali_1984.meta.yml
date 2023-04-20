@@ -1,0 +1,12 @@
+# (Inherited from meadow, remove if not different.)
+dataset:
+  # title: # Example: Testing Dataset Name (Institution, 2023)
+  description: |
+    Data on long-term wheat yields extracted from the book "Understanding Green Revolutions" (Bayliss-Smith & Wanmali (1984)), specifically from Table 1.2 (Wheat yields in Europe, 1850 to 1977-79).
+tables:
+  long_term_wheat_yields:
+    variables:
+      wheat_yield:
+         title: Wheat yields
+         unit: tonnes per hectare
+         short_unit: t/ha
