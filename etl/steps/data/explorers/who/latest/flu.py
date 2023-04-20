@@ -95,8 +95,8 @@ def fill_flu_data_gaps_with_zero(df: pd.DataFrame) -> pd.DataFrame:
     cols = df.columns.drop(["country", "date", "year"])
     # all columns that contain values on confirmed flu cases
     all_flunet_cols = cols[(cols.str.contains("sentinel|notdefined|combined"))]
-    # drop percent positive columns from filling with 0
-    all_flunet_cols = all_flunet_cols[~(all_flunet_cols.str.contains("pcnt"))]
+    # drop columns associated with calculating percent positive from filling with 0
+    all_flunet_cols = all_flunet_cols[~(all_flunet_cols.str.contains("pcnt|spec|negative"))]
     # all columns that will be used in line charts but not stacked bar charts
     fluid_cols = cols[(cols.str.contains("ili|ari"))].to_list()
     not_z_filled_flunet_cols = [col for col in all_flunet_cols if not col.endswith("zfilled")]
