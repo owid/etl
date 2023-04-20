@@ -1,0 +1,13 @@
+dataset:
+  title: Long-term corn yields in United States (USDA/NASS, 2023)
+  description: |
+    This data is sourced from the USDA/NASS database, which reports survey data on corn yields in bushels per acre. To convert these values to tonnes per hectare, we have used a conversion factor of 0.06725.
+
+tables:
+  us_corn_yields:
+    variables:
+      corn_yield:
+        title: Corn yields
+        unit: tonnes per hectare
+        short_unit: tonnes/ha
+        description: Average corn (maize) yields measured in tonnes per hectare.
