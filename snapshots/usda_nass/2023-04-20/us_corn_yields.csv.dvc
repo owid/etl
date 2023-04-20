@@ -4,8 +4,7 @@ meta:
   name: Long-term corn yields in United States
   version: 2023-04-20
   publication_date: 2023-04-17
-  source_name: National Agricultural Statistics Service of the United States Department
-    of Agriculture (USDA/NASS)
+  source_name: USDA National Agricultural Statistics Service (NASS)
   source_published_by: National Agricultural Statistics Service of the United States
     Department of Agriculture (USDA/NASS)
   url: https://quickstats.nass.usda.gov/
