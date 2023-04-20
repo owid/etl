@@ -1,35 +1,12 @@
 # (Inherited from meadow, remove if not different.)
-all_sources:
-  - source_testing: &source-testing
-      name: # Example: Testing Short Citation
-      published_by: # (if different to short citation). Example: Testing Full Citation
-      url: # Example: https://url_of_testing_source.com/
-      date_accessed: # Example: 2023-01-01
-      publication_date: # Example: 2023-01-01
-      publication_year: # (if publication_date is not given). Example: 2023
-      # description: Source description.
-
-# (Inherited from meadow, remove if not different.)
 dataset:
-  title: # Example: Testing Dataset Name (Institution, 2023)
-  # description: Dataset description.
-  licenses:
-    - name: # Example: Testing License Name
-      url: # Example: https://url_of_testing_source.com/license
-  sources:
-    - *source-testing
-
+  # title: # Example: Testing Dataset Name (Institution, 2023)
+  description: |
+    Data on long-term wheat yields extracted from the book "Understanding Green Revolutions" (Bayliss-Smith & Wanmali (1984)), specifically from Table 1.2 (Wheat yields in Europe, 1850 to 1977-79).
 tables:
-  bayliss_smith_wanmali_1984:
-    # (Inherited from meadow, remove if not different.)
+  long_term_wheat_yields:
     variables:
-      # testing_variable:
-      #   title: Testing variable title
-      #   unit: arbitrary units
-      #   short_unit: au
-      #   description: Full description of testing variable.
-      #   sources:
-      #     - *source-testing
-      #   display:
-      #     entityAnnotationsMap: Test annotation
-      #     numDecimalPlaces: 0
+      wheat_yield:
+         title: Wheat yields
+         unit: kilograms per hectare
+         short_unit: kg/ha
