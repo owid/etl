@@ -8,5 +8,5 @@ tables:
     variables:
       wheat_yield:
          title: Wheat yields
-         unit: kilograms per hectare
-         short_unit: kg/ha
+         unit: tonnes per hectare
+         short_unit: t/ha

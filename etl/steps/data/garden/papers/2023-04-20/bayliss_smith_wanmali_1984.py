@@ -35,8 +35,8 @@ def run(dest_dir: str) -> None:
     # Years are given as strings of intervals, e.g. "1909-1913". Convert them into the average year.
     df["year"] = [np.array(interval.split("-")).astype(int).mean().astype(int) for interval in df["year"]]
 
-    # Convert from 100kg per hectare to kg per hectare.
-    df["wheat_yield"] *= 100
+    # Convert from 100kg per hectare to tonnes per hectare.
+    df["wheat_yield"] *= 0.1
 
     # Harmonize country names.
     df = geo.harmonize_countries(df=df, countries_file=paths.country_mapping_path)
