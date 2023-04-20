@@ -75,6 +75,7 @@ def run(dest_dir: str) -> None:
     tb_garden = Table(combined, short_name="long_term_wheat_yields")
 
     # Add variable metadata, using faostat unit and element description (there was no item description).
+    tb_garden["wheat_yield"].metadata.title = "Wheat yields"
     tb_garden["wheat_yield"].metadata.description = f"Long-term wheat yields.\n{element_description}"
     tb_garden["wheat_yield"].metadata.unit = "tonnes per hectare"
     tb_garden["wheat_yield"].metadata.short_unit = "t/ha"
