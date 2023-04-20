@@ -78,7 +78,7 @@ def run(dest_dir: str) -> None:
     tb_garden["wheat_yield"].metadata.title = "Wheat yields"
     tb_garden["wheat_yield"].metadata.description = f"Long-term wheat yields.\n{element_description}"
     tb_garden["wheat_yield"].metadata.unit = "tonnes per hectare"
-    tb_garden["wheat_yield"].metadata.short_unit = "t/ha"
+    tb_garden["wheat_yield"].metadata.short_unit = "tonnes/ha"
 
     #
     # Save outputs.
