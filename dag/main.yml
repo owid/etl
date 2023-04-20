@@ -353,3 +353,4 @@ include:
   - dag/health.yml
   - dag/excess_mortality.yml
   - dag/environment.yml
+  - dag/agriculture.yml
