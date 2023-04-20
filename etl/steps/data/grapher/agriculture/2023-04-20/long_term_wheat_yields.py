@@ -15,6 +15,10 @@ def run(dest_dir: str) -> None:
     # Load garden dataset.
     ds_garden: Dataset = paths.load_dependency("long_term_wheat_yields")
 
+    # For simplicity, remove sources descriptions (which are mostly irrelevant for the variable used here).
+    ds_garden.metadata.sources[0].description = ""
+    ds_garden.metadata.sources[1].description = ""
+
     # Read table from garden dataset.
     tb_garden = ds_garden["long_term_wheat_yields"]
 
