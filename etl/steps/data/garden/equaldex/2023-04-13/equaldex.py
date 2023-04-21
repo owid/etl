@@ -65,9 +65,10 @@ def run(dest_dir: str) -> None:
     df = geo.harmonize_countries(df=df, countries_file=paths.country_mapping_path)
 
     # Create a new table with the processed data.
-    tb_garden = Table(df)
-
-    tb_garden.metadata.short_name = "equaldex"
+    tb_garden = Table(
+        df,
+        short_name=paths.short_name,
+    )
 
     # Change id columns to number
     tb_garden["id_homosexuality"] = tb_garden["id_homosexuality"].astype("Int64")
