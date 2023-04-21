@@ -5,7 +5,7 @@ steps:
     - data://garden/faostat/2023-02-22/faostat_qcl
   data://grapher/agriculture/2023-04-20/long_term_wheat_yields:
     - data://garden/agriculture/2023-04-20/long_term_wheat_yields
-  # Long term corn yields in United States.
+  # Long-term corn yields in United States.
   data://meadow/usda_nass/2023-04-20/us_corn_yields:
     - snapshot://usda_nass/2023-04-20/us_corn_yields.csv
   data://garden/usda_nass/2023-04-20/us_corn_yields:
