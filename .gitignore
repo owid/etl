@@ -41,3 +41,6 @@ docs/.vscode
 site/
 
 .sanity-check
+
+# API key
+access_key.py

@@ -8,3 +8,7 @@ steps:
   - data://garden/dummy/2020-01-01/dummy
   data://explorers/dummy/2020-01-01/dummy:
   - data://garden/dummy/2020-01-01/dummy
+  data://meadow/equaldex/2023-04-13/equaldex:
+  - snapshot://equaldex/2023-04-13/equaldex.csv
+  - data://garden/owid/latest/key_indicators
+  - data://garden/reference

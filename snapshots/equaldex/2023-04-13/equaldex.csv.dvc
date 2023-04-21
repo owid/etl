@@ -1,0 +1,22 @@
+meta:
+  namespace: equaldex
+  short_name: equaldex
+  name: Equaldex dataset (Equaldex, 2023)
+  version: 2023-04-13
+  publication_year: 2023
+  source_name: Equaldex (2023)
+  source_published_by: LGBT Rights by Country & Travel Guide | Equaldex. (2023). https://www.equaldex.com/
+  url: https://www.equaldex.com/
+  source_data_url:
+  file_extension: csv
+  license_url: https://www.equaldex.com/terms
+  license_name:
+  date_accessed: 2023-04-13
+  is_public: true
+  description: |
+    Equaldex is a collaborative knowledge base for the LGBT (lesbian, gay, bisexual, transgender) movement. The site aims to crowdsource every law related to LGBT rights to provide a comprehensive and global view of the LGBT rights movement.
+wdir: ../../../data/snapshots/equaldex/2023-04-13
+outs:
+- md5: 86796900f524e66a3038b51d171ce17b
+  size: 9451362
+  path: equaldex.csv
