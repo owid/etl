@@ -1,5 +1,3 @@
-# Adding data to our site
-
 !!! warning "This section is meant for OWID staff members."
 
 We want to add data to our site so that we can

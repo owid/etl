@@ -6,27 +6,47 @@ repo_url: https://github.com/owid/etl
 nav:
   - Home: "index.md"
   - Getting started:
+    - Getting started: "getting-started/index.md"
     - Working environment: "getting-started/working-environment.md"
     - Building datasets: "getting-started/building-datasets.md"
     - Consuming datasets: "getting-started/consuming-datasets.md"
-  - Architecture:
-      - Overview: "architecture/index.md"
-      - Common format: "architecture/common-format.md"
-      - Harmonization: "architecture/harmonization.md"
-      - Internal structure: "architecture/structure.md"
+  - ETL Architecture:
+      - Architecture: architecture/index.md
+      - Our journey: "architecture/our-journey.md"
+      - Design principles: "architecture/etl-design.md"
+      - Workflow:
+        - Workflow: "architecture/workflow/index.md"
+        - Snapshot: "architecture/workflow/snapshot.md"
+        - Meadow: "architecture/workflow/common-format.md"
+        - Garden: "architecture/workflow/harmonization.md"
+        - Grapher: "architecture/workflow/grapher.md"
       - Metadata: "architecture/metadata.md"
-      - Workflow: "architecture/workflow.md"
-  - Adding data:
-      - Guide: "adding-data/index.md"
-      - Fast track: "adding-data/fast-track.md"
-      - Walkthrough: "adding-data/walkthrough.md"
-      - Manually add: "adding-data/manual.md"
+      - Special steps:
+        - Special steps: "architecture/other-steps/index.md"
+        - Backport: "architecture/other-steps/backport.md"
+        - Open Numbers: "architecture/other-steps/open-numbers.md"
+        - ETag: "architecture/other-steps/etag.md"
+        - GitHub: "architecture/other-steps/github.md"
+        - Private steps: "architecture/other-steps/private.md"
+  - Tutorials:
+    - Tutorials: "tutorials/index.md"
+    - Adding data:
+      - Adding data: "tutorials/adding-data/index.md"
+      - Walkthrough: "tutorials/adding-data/walkthrough.md"
+      - Manually add: "tutorials/adding-data/manual.md"
+      - Fast track: "tutorials/adding-data/fast-track.md"
+    - Updating charts: "tutorials/updating-charts.md"
+    - Harmonize country names: "tutorials/harmonize-countries.md"
   - API: "api/index.ipynb"
+  - Datasets:
+    - Datasets: "data/index.md"
+    - Faostat: "data/faostat.md"
+    - Regions: "data/regions.md"
   - Contributing: "contributing.md"
 
 theme:
   # logo: assets/logo.png
-  favicon: assets/favicon.ico
+  favicon: assets/images/favicon.png
   palette:
     # Palette toggle for light mode
     - media: "(prefers-color-scheme: light)"
@@ -50,7 +70,7 @@ theme:
     - navigation.tabs.sticky
     - navigation.indexes
     - content.tooltips
-
+    - navigation.expand
 
 markdown_extensions:
   - admonition

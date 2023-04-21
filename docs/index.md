@@ -13,8 +13,8 @@ Choose the material that most interests you:
 :material-download: I want to **access a public dataset** using an **API**<br>
 [Read more :octicons-arrow-right-24:](api/)
 
-:material-upload: I am an **OWID staff** member, and want to **add a dataset to the ETL**<br>
-[Read more :octicons-arrow-right-24:](adding-data/index.md)
+:material-upload: I am an **OWID staff** member, and want to **work with the ETL**<br>
+[Read more :octicons-arrow-right-24:](tutorials/index.md)
 
 :material-open-source-initiative: I am a member of the public, and want to **contribute**<br>
 [Read more :octicons-arrow-right-24:](contributing.md)
