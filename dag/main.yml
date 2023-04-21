@@ -287,6 +287,8 @@ steps:
   # Regions - Regions (2023).
   #
   data://garden/regions/2023-01-01/regions:
+  data://grapher/regions/2023-01-01/regions:
+  - data://garden/regions/2023-01-01/regions
 
   # Democracy and Human rights - V-Dem index
   data://meadow/democracy/2023-03-02/vdem:
