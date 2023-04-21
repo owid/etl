@@ -1,6 +1,8 @@
-!!! info "You will learn more about the structure and design of the ETL in the next [section](../../architecture/)"
+!!! info "You will learn more about the structure and design of the ETL in the next [section](../../architecture/)."
 
-Every step in the dag has a URI. For example, the Human Development Reports (by the UNDP):
+Every step in the dag has a URI. URIs allow us to uniquely identify any step (or node) throughout the whole ETL. This allows us to reference datasets (and use them) when building a new dataset.
+
+For example, the Human Development Reports (by the UNDP):
 
 *[URI]: Uniform Resource Identifier
 *[UNDP]: United Nations Development Programme
@@ -9,16 +11,9 @@ Every step in the dag has a URI. For example, the Human Development Reports (by 
 data://garden/un/2022-11-29/undp_hdr
 ```
 
-??? note "How are URIs built?"
+!!! info "See also"
 
-    How a URI of a dataset will make more sense in upcoming sections. But it mainly consists of four main parts:
-
-        <channel>://<channel>/<namespace>/<version>/<dataset>
-
-    * **channel**: Level of curation of the dataset. In this case, the channel is `garden`.
-    * **namespace**: A way to group similar datasets. Similarity might come from the topic (e.g. `health`) or from the source (as in this example, `un`).
-    * **version**: Version of the dataset. Typically a date. In this case, the version is `2022-11-29`.
-    * **dataset** short name: Short name to identify the dataset. In this case, the short name is `undp_hdr`.
+    [How are URIs built? :octicons-arrow-right-24:](../architecture/design/uri.md)
 
 ## Dry-runs
 

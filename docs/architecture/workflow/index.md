@@ -13,9 +13,9 @@ snapshot --> format --> harmonise --> import --> publish
 
 The design of the ETL involves steps that mirror the stages above, which help us to meet several design goals of the project:
 
-1. [Snapshot step](architecture/workflow/snapshot.md): Take a **snapshot** of the upstream data source.
-- [Meadow step](architecture/workflow/common-format.md): Bring the data into a **common format**.
-- [Garden step](architecture/workflow/harmonization.md): **Harmonise** the names of countries, genders and any other columns we may want to join on.
-- [Grapher step](architecture/workflow/grapher.md): **Import** the data to our internal MySQL database.
+1. [Snapshot step](snapshot.md): Take a **snapshot** of the upstream data source.
+- [Meadow step](meadow.md): Bring the data into a **common format**.
+- [Garden step](garden.md): **Harmonise** the names of countries, genders and any other columns we may want to join on.
+- [Grapher step](grapher.md): **Import** the data to our internal MySQL database.
 
 A data manager must implement all these steps to make something chartable on the Our World in Data site. Afterwards, the data is available for publication on our site. The [publication step](architecture/workflow/publish.md) can involve creating new charts or updating existing ones with the new data.

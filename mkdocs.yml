@@ -10,15 +10,23 @@ nav:
     - Working environment: "getting-started/working-environment.md"
     - Building datasets: "getting-started/building-datasets.md"
     - Consuming datasets: "getting-started/consuming-datasets.md"
-  - ETL Architecture:
+  - Architecture:
       - Architecture: architecture/index.md
       - Our journey: "architecture/our-journey.md"
-      - Design principles: "architecture/etl-design.md"
+      - Design principles:
+        - Design principles: "architecture/design/index.md"
+        - Computational graph:
+          - Computational graph: "architecture/design/compute-graph/index.md"
+        - ETL phases: "architecture/design/phases.md"
+        - Data model: "architecture/design/common-format.md"
+        - Features and constraints: "architecture/design/features-constraints.md"
+        - The DAG: "architecture/design/dag.md"
+        - The URI: "architecture/design/uri.md"
       - Workflow:
         - Workflow: "architecture/workflow/index.md"
         - Snapshot: "architecture/workflow/snapshot.md"
-        - Meadow: "architecture/workflow/common-format.md"
-        - Garden: "architecture/workflow/harmonization.md"
+        - Meadow: "architecture/workflow/meadow.md"
+        - Garden: "architecture/workflow/garden.md"
         - Grapher: "architecture/workflow/grapher.md"
       - Metadata: "architecture/metadata.md"
       - Special steps:
@@ -37,11 +45,13 @@ nav:
       - Fast track: "tutorials/adding-data/fast-track.md"
     - Updating charts: "tutorials/updating-charts.md"
     - Harmonize country names: "tutorials/harmonize-countries.md"
-  - API: "api/index.ipynb"
   - Datasets:
     - Datasets: "data/index.md"
     - Faostat: "data/faostat.md"
     - Regions: "data/regions.md"
+  - API:
+    - API: "api/index.md"
+    - Python: "api/python.ipynb"
   - Contributing: "contributing.md"
 
 theme:
