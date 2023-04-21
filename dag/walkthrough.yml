@@ -12,3 +12,7 @@ steps:
   - snapshot://equaldex/2023-04-13/equaldex.csv
   - data://garden/owid/latest/key_indicators
   - data://garden/reference
+  data://garden/equaldex/2023-04-13/equaldex:
+  - data://meadow/equaldex/2023-04-13/equaldex
+  - data://garden/demography/2023-03-31/population
+  - data://garden/reference
