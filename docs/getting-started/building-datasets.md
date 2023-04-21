@@ -1,16 +1,19 @@
-Every step in the dag has a URI. For example, the Human Development Reports (by the UNDP) dataset has the URI:
+!!! info "You will learn more about the structure and design of the ETL in the next [section](../../architecture/)"
 
+Every step in the dag has a URI. For example, the Human Development Reports (by the UNDP):
+
+*[URI]: Uniform Resource Identifier
 *[UNDP]: United Nations Development Programme
 
 ```
 data://garden/un/2022-11-29/undp_hdr
 ```
 
-!!! note
+??? note "How are URIs built?"
 
     How a URI of a dataset will make more sense in upcoming sections. But it mainly consists of four main parts:
 
-        data://[channel]/[namespace]/[version]/[dataset]
+        <channel>://<channel>/<namespace>/<version>/<dataset>
 
     * **channel**: Level of curation of the dataset. In this case, the channel is `garden`.
     * **namespace**: A way to group similar datasets. Similarity might come from the topic (e.g. `health`) or from the source (as in this example, `un`).
@@ -34,9 +37,9 @@ Running 4 steps:
 
 The first two listed steps are `snapshot://` steps, which when executed will download upstream snapshots of the dataset to the `data/snapshots/` folder. The last two steps are `data://` steps, which will generate local datasets in the `data/` folder.
 
-!!! note
+??? note "`meadow` and `garden` channels"
 
-    Here you can indetify different channels in the URIs: `meadow` and `garden`, followed by the same string `un/2022-11-29/undp_hdr`. These represent different levels
+    In the above example, you can indetify different channels in the URIs: `meadow` and `garden`, followed by the same string `un/2022-11-29/undp_hdr`. These represent different levels
     of curation of a dataset (in this example, the UNDP HDR version 2022-11-29 dataset).
 
     `garden` datasets are good to go, whereas `meadow` datasets have not been curated enough to be used in production environments. We will explore these nuances later on.

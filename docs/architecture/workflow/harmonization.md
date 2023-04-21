@@ -64,9 +64,7 @@ Beginning interactive harmonization...
 
 ### Using the Grapher admin
 
-!!! warning
-
-    This method is not preferred. Ideally, you should use the `harmonize` command tool.
+!!! warning "This method is not preferred. Instead, consider using the `harmonize` command tool."
 
 The [owid-grapher](https://github.com/owid/owid-grapher) codebase contains a interactive country harmonization tool that can be accessed at [http://localhost:3030/admin/standardize](http://localhost:3030/admin/standardize) when running the dev server.
 
