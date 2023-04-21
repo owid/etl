@@ -29,7 +29,7 @@ from backport.datasync.data_metadata import (
 from etl import config
 from etl import grapher_model as gm
 from etl.db import get_engine
-from etl.publish import connect_s3
+from etl.publish import connect_s3, connect_s3_cached
 
 log = structlog.get_logger()
 
@@ -189,7 +189,8 @@ def upload_gzip_dict(d: Dict[str, Any], s3_path: str, private: bool = False) -> 
 
     bucket, key = s3_utils.s3_bucket_key(s3_path)
 
-    client = connect_s3()
+    client = connect_s3_cached()
+
     for attempt in Retrying(
         wait=wait_exponential(min=5, max=100),
         stop=stop_after_attempt(7),
