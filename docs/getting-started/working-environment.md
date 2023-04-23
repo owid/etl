@@ -2,7 +2,7 @@ The ETL can be used by OWID staff or the general public to build a copy of our d
 
 !!! warning
 
-    This documentation is still under construction. Please [report any issue]((https://github.com/owid/etl/issues/new?assignees=&labels=&template=docs-issue---.md)) that you may find so we can keep improving our docs.
+    This documentation is still under construction. Please [report any issue](https://github.com/owid/etl/issues/new?assignees=&labels=&template=docs-issue---.md) that you may find so we can keep improving our docs.
 
 
 *[WSL]: Windows Subsystem for Linux
@@ -92,7 +92,7 @@ First of all, you need to have the [ETL project](https://github.com/owid/etl) in
 git clone https://github.com/owid/etl.git
 ```
 
-Along with various directories and files, the project also has two submodules in the `vendor/` folder: [owid-catalog-py](https://github.com/owid/owid-catalog-py) and [walden](https://github.com/owid/walden), both in-house developed libraries, which simplify the interaction with our datasets.
+Along with various directories and files, the project also has two submodules in the `vendor/` folder: [owid-catalog-py](https://github.com/owid/owid-catalog-py) and [walden](https://github.com/owid/walden) (deprecated), both in-house developed libraries, which simplify the interaction with our datasets.
 
 ## Check your environment
 

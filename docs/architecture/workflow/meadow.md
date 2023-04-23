@@ -1,91 +1,40 @@
-# Common format
+# Meadow
+The meadow step is the first Transform step of our ETL.
 
-To use data from a wide variety of sources, we need to bring it into a common format.
+In a meadow step, we load a `snapshot` and adapt it to be in a convenient format. A convenient format means creating an instance of a [`Dataset`](../../design/common-format/#datasets-owidcatalogdataset), with the appropriate data as a table (or tables).
 
-Our format is inspired by [Frictionless DataPackage format](https://frictionlessdata.io/), which features the following:
+In this step, you can add and define metadata, but we rarely do this. Instead, we propagate the metadata defined in the Snapshot step and leave it to the Garden step to enhance the metadata.
 
-- Tables as the fundamental unit of data
-- One CSV file per table
-- An accompanying YAML file for metadata
+Meadow steps should only have `snapshot` (or `walden`) dependencies and ー by definition ー should not depend on `garden` steps.
 
-We have adapted this format to our needs as follows.
-
-## Levels of data
-The following diagram presents an hypothetical dataset with two tables (`Table A` and `Table B`). Both tables have a primary keys and some variables.
+A typical flow up to the Meadow step could look like:
 
 ```mermaid
-graph TB
+flowchart LR
 
-catalog --> dataset
-dataset --> ta[table A]
-ta --> pka[primary key]
-ta --> va1[variable A1]
-ta --> va2[variable A2]
-dataset --> tb[table B]
-tb --> pkb[primary key]
-tb --> vb1[variable B1]
-tb --> vb2[variable B2]
-tb --> vb3[variable B3]
+    upstream1((____)):::node -.->|copy| snapshot1((____)):::node
+    snapshot1((____)):::node -->|format| meadow1((____)):::node
+
+    subgraph id0 [Upstream]
+    upstream1
+    end
+
+    subgraph id1 [Snapshot]
+    snapshot1
+    end
+
+    subgraph id2 [Meadow]
+    meadow1
+    end
+
+
+    subgraph id [ETL]
+    id1
+    id2
+    end
+
+    classDef node fill:#002147,color:#002147
+    classDef node_ss fill:#002147,color:#fff
 ```
 
-### Catalog ([`owid.catalog.CatalogMixin`](https://github.com/owid/owid-catalog-py/blob/master/owid/catalog/catalogs.py))
-
-A catalog is set of datasets, represented on disk as a folder of folders.
-
-### Datasets ([`owid.catalog.Dataset`](https://github.com/owid/owid-catalog-py/blob/master/owid/catalog/datasets.py))
-
-A dataset is a group tables, represented on disk as a folder. Inside the folder, an `index.json` file containing metadata about the dataset as a whole.
-
-The dataset folder is named after the dataset's _short name_, which is a unique identifier for the dataset. The short name is used in URLs, and to identify the dataset in the catalog.
-
-The folder contains one or more Feather files, each of which represents a _table_.
-
-### Tables ([`owid.catalog.Table`](https://github.com/owid/owid-catalog-py/blob/master/owid/catalog/tables.py))
-
-A table is a data file in Feather format (`<short_name>.feather`) or Parquet format (`<short_name>.parquet`) with an accompanying JSON metadata file (`<short_name>.meta.json`).
-
-Feather/Parquet were chosen since they are fast, compact, and preserves types, avoiding the need to describe the types in the table's metadata file.
-
-In Python, the `Table` class is a Pandas `DataFrame` extended to support metadata.
-
-The metadata file indicates the primary key of the table, for example:
-
-```yaml
-{ primary_key: ["country", "year"] }
-```
-
-All variables in the table share the same primary key. Any column of the table that is not in the primary key is considered to be a _variable_.
-
-### Variables ([`owid.catalog.Variable`](https://github.com/owid/owid-catalog-py/blob/master/owid/catalog/variables.py))
-
-Each variable represents a single indicator, and is equivalent to a Pandas `Series`, including its index.
-
-For example, a table with the columns (`country`, `year`, `population`) and primary key (`country`, `year`) would have one variables: `population`.
-
-## Ergonomics
-
-To make these data types easier to work with, datasets, tables and variables must all have a `short_name` property that uniquely identifies them.
-
-A short name is a lowercase string containing only alphanumeric characters and underscores. It must start with a letter.
-
-## Working with this format
-
-The `owid-catalog` package provides a Python API for working with this format.
-
-It can be installed with:
-
-```
-pip install owid-catalog
-```
-
-and imported into Python with:
-
-```python
-from owid import catalog
-```
-
-
-!!! note
-
-    If you have [set your working environment](../getting-started/working-environment.md), you will have the `owid-catalog` from `vendor/owid-catalog-py`.
-    Make sure that you have the latest version by running  `cd vendor/owid-catalog-py && git pull`.
+!!! bug "TODO: Add an example of code"

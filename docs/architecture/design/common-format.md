@@ -85,5 +85,5 @@ from owid import catalog
 
 !!! note
 
-    If you have [set your working environment](../getting-started/working-environment.md), you will have the `owid-catalog` from `vendor/owid-catalog-py`.
+    If you have [set your working environment](../../getting-started/working-environment.md), you will have the `owid-catalog` from `vendor/owid-catalog-py`.
     Make sure that you have the latest version by running  `cd vendor/owid-catalog-py && git pull`.

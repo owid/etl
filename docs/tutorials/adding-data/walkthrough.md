@@ -35,8 +35,8 @@ Before you begin, make sure you've set up the ETL as described in [Getting Start
 ## Start the walkthrough
 
 Walkthrough consists of a web app that will ask you for various metadata fields (such as `namespace`, `version`, `source_url`, etc.). Based on your input,
-it will generate the required files in the appropriate `snapshots/` or `etl/` directory. Walkthrough will point you to the commands that you need to run once you
-have implemented the step.
+it will generate the required files in the appropriate `snapshots/` or `etl/` directory. **Walkthrough will point you to the commands that you need to run once you
+have implemented the step.**
 
 A typical workflow would involve:
 

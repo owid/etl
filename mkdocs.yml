@@ -17,25 +17,25 @@ nav:
         - Design principles: "architecture/design/index.md"
         - Computational graph:
           - Computational graph: "architecture/design/compute-graph/index.md"
-        - ETL phases: "architecture/design/phases.md"
+        - ETL model: "architecture/design/phases.md"
         - Data model: "architecture/design/common-format.md"
         - Features and constraints: "architecture/design/features-constraints.md"
         - The DAG: "architecture/design/dag.md"
         - The URI: "architecture/design/uri.md"
-      - Workflow:
-        - Workflow: "architecture/workflow/index.md"
+      - ETL steps:
+        - ETL steps: "architecture/workflow/index.md"
         - Snapshot: "architecture/workflow/snapshot.md"
         - Meadow: "architecture/workflow/meadow.md"
         - Garden: "architecture/workflow/garden.md"
         - Grapher: "architecture/workflow/grapher.md"
-      - Metadata: "architecture/metadata.md"
-      - Special steps:
-        - Special steps: "architecture/other-steps/index.md"
-        - Backport: "architecture/other-steps/backport.md"
-        - Open Numbers: "architecture/other-steps/open-numbers.md"
-        - ETag: "architecture/other-steps/etag.md"
-        - GitHub: "architecture/other-steps/github.md"
-        - Private steps: "architecture/other-steps/private.md"
+        - Special steps:
+          - Special steps: "architecture/workflow/other-steps/index.md"
+          - Explorers: "architecture/workflow/other-steps/explorers.md"
+          - Backport: "architecture/workflow/other-steps/backport.md"
+          - Open Numbers: "architecture/workflow/other-steps/open-numbers.md"
+          - ETag: "architecture/workflow/other-steps/etag.md"
+          - GitHub: "architecture/workflow/other-steps/github.md"
+          - Private steps: "architecture/workflow/other-steps/private.md"
   - Tutorials:
     - Tutorials: "tutorials/index.md"
     - Adding data:
@@ -45,6 +45,8 @@ nav:
       - Fast track: "tutorials/adding-data/fast-track.md"
     - Updating charts: "tutorials/updating-charts.md"
     - Harmonize country names: "tutorials/harmonize-countries.md"
+    - Backporting Grapher datasets to ETL: "tutorials/backport.md"
+    - Importing a private dataset to ETL: "tutorials/private-import.md"
   - Datasets:
     - Datasets: "data/index.md"
     - Faostat: "data/faostat.md"
@@ -81,6 +83,9 @@ theme:
     - navigation.indexes
     - content.tooltips
     - navigation.expand
+    # - navigation.sections
+    # - toc.follow
+    - navigation.top
 
 markdown_extensions:
   - admonition

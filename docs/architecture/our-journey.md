@@ -46,7 +46,7 @@ We needed a better solution to build a large dataset catalog, which should be sc
 - It should be transparent. Anyone should be able to trace back how the data had been processed, from one of our charts all the way to the original data source.
 - Versioning of datasets. Git is great at keeping history of versions, but it is not suitable for large files. Data recipes (scripts) can live in Git, but data files should be in a dedicated disk.
 
-To this end, we developed the current project, the ETL, as the next stage in how we process data. The ETL generates an on-disk data catalog based on flat files. We import this catalog into MySQL for use on our site, but we also use it to power a [public API](../api/).
+To this end, we developed the current project, the ETL, as the next stage in how we process data. The ETL generates an on-disk data catalog based on flat files. We import this catalog into MySQL for use on our site, but we also use it to power a [public API](../../api/).
 
 ```mermaid
 graph LR
@@ -59,4 +59,4 @@ catalog --> API
 The main users of the ETL are data managers. The ETL is desinged to make their work fully repeatable and reviewable. The admin is still available for manual imports, and may be faster for datasets that have been transformed by hand.
 
 
-Read about our [data management workflow](workflow/index.md) to learn more about how we use the ETL.
+<!-- Read about our [data management workflow](workflow/index.md) to learn more about how we use the ETL. -->
