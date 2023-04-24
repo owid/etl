@@ -113,5 +113,13 @@ poetry run etl data://grapher/<namespace>/<version>/<dataset_short_name> --graph
 To test the step, you can run it on the grapher `staging` database, or using
 [a local grapher](https://github.com/owid/owid-grapher/blob/master/docs/docker-compose-mysql.md).
 
+!!! warning "The `grapher` step to import the dataset to Grpaher is now automatic"
+    We have automatic deploys to grapher database from ETL. This means that whenever we push to master, `etl --grapher` is automatically run and pushes your data to MySQL. This means:
+
+    - **You don't have to manually push to grapher**. Just merge and wait for CI status on master to turn green.
+    - You can still manually push new datasets (a new dataset doesn't have recipe in master yet). This is useful if you want to explore it in grapher, get feedback, iterate on a PR, etc. However, if you manually deploy an existing dataset, it'll be overwritten by the version in master
+
+    Automatic deploys will run on both production and staging. This process is not final, we are still iterating.
+
 #### Create a pull request to merge the new branch with the master branch in `etl`.
 At this point, some further editing of the step files may be required before merging the branch with master.
