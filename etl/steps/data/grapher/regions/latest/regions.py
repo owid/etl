@@ -274,7 +274,7 @@ def run(dest_dir: str) -> None:
     regions.metadata.short_name = "regions"
 
     # Drop unneeded columns
-    regions: Table = regions.drop(columns=["is_historical", "defined_by"])  # type: ignore
+    regions: Table = regions.drop(columns=["defined_by"])  # type: ignore
 
     # Create slugs for all countries and keep track of legacy slugs.
     is_country = regions["region_type"] == "country"
