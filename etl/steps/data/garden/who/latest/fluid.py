@@ -98,6 +98,7 @@ def subset_and_clean_data(df: pd.DataFrame) -> pd.DataFrame:
             "fluseason",
             "itz",
             "country_code",
+            "iso_week",
             "iso_weekstartdate",
             "iso_year",
             "mmwr_weekstartdate",
@@ -151,7 +152,7 @@ def subset_and_clean_data(df: pd.DataFrame) -> pd.DataFrame:
 def pivot_fluid(df: pd.DataFrame) -> pd.DataFrame:
 
     df_piv = df.pivot(
-        index=["country", "hemisphere", "date", "iso_week"],
+        index=["country", "hemisphere", "date"],
         columns=["case_info"],
         values=["reported_cases", "outpatients", "inpatients"],
     ).reset_index()
@@ -272,7 +273,7 @@ def remove_sparse_years(df: pd.DataFrame, min_datapoints_per_year: int) -> pd.Da
     """
 
     df["year"] = pd.to_datetime(df["date"]).dt.year
-    constant_cols = ["country", "date", "hemisphere", "year", "iso_week"]
+    constant_cols = ["country", "date", "hemisphere", "year"]
     cols = df.columns.drop(constant_cols)
     current_year = datetime.today().year
     for col in cols:
@@ -284,11 +285,9 @@ def remove_sparse_years(df: pd.DataFrame, min_datapoints_per_year: int) -> pd.Da
         df = pd.merge(df, df_col_bool, on=["country", "year"])
 
         df_current = df[df["year"] == current_year]
-        # Getting how many weeks worth of data there should have been so far this year
-        num_weeks = max(df_current["iso_week"])
         # Dropping rows if all the weeks data from this year are 0 or NA
         df_current.loc[
-            (df_current["weeks_gt_zero"] == num_weeks),
+            (df_current["weeks_gt_zero"] == 0),
             col,
         ] = np.nan
 
