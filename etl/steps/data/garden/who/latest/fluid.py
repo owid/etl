@@ -152,7 +152,7 @@ def subset_and_clean_data(df: pd.DataFrame) -> pd.DataFrame:
 def pivot_fluid(df: pd.DataFrame) -> pd.DataFrame:
 
     df_piv = df.pivot(
-        index=["country", "hemisphere", "date"],
+        index=["country", "hemisphere", "date", "iso_week"],
         columns=["case_info"],
         values=["reported_cases", "outpatients", "inpatients"],
     ).reset_index()
@@ -273,7 +273,7 @@ def remove_sparse_years(df: pd.DataFrame, min_datapoints_per_year: int) -> pd.Da
     """
 
     df["year"] = pd.to_datetime(df["date"]).dt.year
-    constant_cols = ["country", "date", "hemisphere", "year"]
+    constant_cols = ["country", "date", "hemisphere", "year", "iso_week"]
     cols = df.columns.drop(constant_cols)
     current_year = datetime.today().year
     for col in cols:
