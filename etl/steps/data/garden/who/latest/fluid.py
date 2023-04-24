@@ -273,7 +273,7 @@ def remove_sparse_years(df: pd.DataFrame, min_datapoints_per_year: int) -> pd.Da
     """
 
     df["year"] = pd.to_datetime(df["date"]).dt.year
-    constant_cols = ["country", "date", "hemisphere", "year", "iso_week"]
+    constant_cols = ["country", "date", "hemisphere", "year"]
     cols = df.columns.drop(constant_cols)
     current_year = datetime.today().year
     for col in cols:
