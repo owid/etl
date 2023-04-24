@@ -100,7 +100,6 @@ def subset_and_clean_data(df: pd.DataFrame) -> pd.DataFrame:
             "country_code",
             "iso_weekstartdate",
             "iso_year",
-            "iso_week",
             "mmwr_weekstartdate",
             "mmwr_year",
             "mmwr_week",
@@ -152,7 +151,7 @@ def subset_and_clean_data(df: pd.DataFrame) -> pd.DataFrame:
 def pivot_fluid(df: pd.DataFrame) -> pd.DataFrame:
 
     df_piv = df.pivot(
-        index=["country", "hemisphere", "date"],
+        index=["country", "hemisphere", "date", "iso_week"],
         columns=["case_info"],
         values=["reported_cases", "outpatients", "inpatients"],
     ).reset_index()
@@ -269,11 +268,11 @@ def remove_values_with_only_extremes(group: pd.Series, min: int, max: int) -> pd
 def remove_sparse_years(df: pd.DataFrame, min_datapoints_per_year: int) -> pd.DataFrame:
     """
     If a year has fewer than {min_data_points_per_year} then we should remove all the data for that year -> set it to NA
-    Unless it is the current year, then we do not change it.
+    For the current year then if all the values are 0 or NA then we remove all values for the year so far
     """
 
     df["year"] = pd.to_datetime(df["date"]).dt.year
-    constant_cols = ["country", "date", "hemisphere", "year"]
+    constant_cols = ["country", "date", "hemisphere", "year", "iso_week"]
     cols = df.columns.drop(constant_cols)
     current_year = datetime.today().year
     for col in cols:
@@ -284,10 +283,23 @@ def remove_sparse_years(df: pd.DataFrame, min_datapoints_per_year: int) -> pd.Da
         )
         df = pd.merge(df, df_col_bool, on=["country", "year"])
 
-        df.loc[
-            (df["weeks_gt_zero"] < min_datapoints_per_year) & (df["year"] < current_year),
+        df_current = df[df["year"] == current_year]
+        # Getting how many weeks worth of data there should have been so far this year
+        num_weeks = max(df_current["iso_week"])
+        # Dropping rows if all the weeks data from this year are 0 or NA
+        df_current.loc[
+            (df_current["weeks_gt_zero"] == num_weeks),
             col,
         ] = np.nan
+
+        df_hist = df[df["year"] < current_year]
+
+        df_hist.loc[
+            (df_hist["weeks_gt_zero"] < min_datapoints_per_year),
+            col,
+        ] = np.nan
+
+        df = pd.concat([df_current, df_hist])
         df = df.drop(columns=["weeks_gt_zero"])
 
     return df
