@@ -299,6 +299,7 @@ def remove_sparse_years(df: pd.DataFrame, min_datapoints_per_year: int) -> pd.Da
         ] = np.nan
 
         df = pd.concat([df_current, df_hist])
+        df[col] = pd.to_numeric(df[col])
         df = df.drop(columns=["weeks_gt_zero"])
 
     return df

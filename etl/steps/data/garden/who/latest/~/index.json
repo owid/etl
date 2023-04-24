@@ -1,0 +1,30 @@
+{
+  "channel": "meadow",
+  "namespace": "who",
+  "short_name": "flunet",
+  "title": "FluNet, World Health Organization (2023)",
+  "description": "FluNet is a global web-based tool for influenza virological surveillance first launched in 1997. The virological data entered into FluNet, e.g. number of influenza viruses detected by subtype, are critical for tracking the movement of viruses globally and interpreting the epidemiological data. The data at country level are publically available and updated weekly. The results are presented in various formats including tables, maps and graphs.\n\nThe data are provided remotely by National Influenza Centres (NICs) of the Global Influenza Surveillance and Response System (GISRS) and other national influenza reference laboratories collaborating actively with GISRS, or are uploaded from WHO regional databases.\n",
+  "sources": [
+    {
+      "name": "FluNet, World Health Organization (2023)",
+      "description": "FluNet is a global web-based tool for influenza virological surveillance first launched in 1997. The virological data entered into FluNet, e.g. number of influenza viruses detected by subtype, are critical for tracking the movement of viruses globally and interpreting the epidemiological data. The data at country level are publically available and updated weekly. The results are presented in various formats including tables, maps and graphs.\n\nThe data are provided remotely by National Influenza Centres (NICs) of the Global Influenza Surveillance and Response System (GISRS) and other national influenza reference laboratories collaborating actively with GISRS, or are uploaded from WHO regional databases.\n",
+      "url": "https://www.who.int/tools/flunet",
+      "source_data_url": "https://frontdoor-l4uikgap6gz3m.azurefd.net/FLUMART/VIW_FNT?&$format=csv",
+      "owid_data_url": null,
+      "date_accessed": "2023-02-16",
+      "publication_date": "2023-02-16",
+      "publication_year": 2023,
+      "published_by": "Global Influenza Surveillance and Response System, World Health Organization",
+      "publisher_source": null
+    }
+  ],
+  "licenses": [
+    {
+      "name": "CC BY-NC-SA 3.0 IGO",
+      "url": "https://www.who.int/about/policies/publishing/copyright"
+    }
+  ],
+  "is_public": true,
+  "version": "latest",
+  "source_checksum": "cc7bc8979302ad97c5f3d5890db586a6"
+}
