@@ -6,6 +6,10 @@ tables:
       share:
         title: "Share"
         unit: "%"
+        description: >-
+          Description
       count:
         title: "Count"
         unit: ""
+        description: >-
+          Description

@@ -3,8 +3,9 @@
 These are manually created, based on:
 
 - "Guide to using the data": https://cms.wellcome.org/sites/default/files/2021-10/wgmdata-mental-health-data-dictionary-user-guide.docx (provides mapping of answer IDs to answer labels, only for MH* fields)
-- "Full questionnaire": https://cms.wellcome.org/sites/default/files/2021-11/WGM_Full_Questionnaire.pdf (based on order of answers, we manually map answer IDs to answer labels. Ideally WGM would provide a dictionary)
-
+- "Full questionnaire":
+    - WGM mental health 2020: https://cms.wellcome.org/sites/default/files/2021-11/WGM_Full_Questionnaire.pdf (based on order of answers, we manually map answer IDs to answer labels. Ideally WGM would provide a dictionary)
+    - Need to complement with https://wellcome.org/reports/wellcome-global-monitor-covid-19/2020 (for the W* questions)
 
 """
 
@@ -361,7 +362,7 @@ question_mapping = {
             "1": "A lot",
             "2": "Some",
             "3": "Not much",
-            "4": "None at all",
+            "4": "Not at all",
             "99": "DK/Refused",
         },
     },
@@ -371,7 +372,7 @@ question_mapping = {
             "1": "A lot",
             "2": "Some",
             "3": "Not much",
-            "4": "None at all",
+            "4": "Not at all",
             "99": "DK/Refused",
         },
     },
@@ -381,7 +382,7 @@ question_mapping = {
             "1": "A lot",
             "2": "Some",
             "3": "Not much",
-            "4": "None at all",
+            "4": "Not at all",
             "99": "DK/Refused",
         },
     },
@@ -391,7 +392,7 @@ question_mapping = {
             "1": "A lot",
             "2": "Some",
             "3": "Not much",
-            "4": "None at all",
+            "4": "Not at all",
             "99": "DK/Refused",
         },
     },
@@ -401,7 +402,7 @@ question_mapping = {
             "1": "A lot",
             "2": "Some",
             "3": "Not much",
-            "4": "None at all",
+            "4": "Not at all",
             "99": "DK/Refused",
         },
     },
@@ -411,7 +412,7 @@ question_mapping = {
             "1": "A lot",
             "2": "Some",
             "3": "Not much",
-            "4": "None at all",
+            "4": "Not at all",
             "99": "DK/Refused",
         },
     },
@@ -421,7 +422,7 @@ question_mapping = {
             "1": "A lot",
             "2": "Some",
             "3": "Not much",
-            "4": "None at all",
+            "4": "Not at all",
             "99": "DK/Refused",
         },
     },
@@ -431,7 +432,7 @@ question_mapping = {
             "1": "A lot",
             "2": "Some",
             "3": "Not much",
-            "4": "None at all",
+            "4": "Not at all",
             "99": "DK/Refused",
         },
     },
@@ -441,7 +442,7 @@ question_mapping = {
             "1": "A lot",
             "2": "Some",
             "3": "Not much",
-            "4": "None at all",
+            "4": "Not at all",
             "99": "DK/Refused",
         },
     },
@@ -451,7 +452,7 @@ question_mapping = {
             "1": "A lot",
             "2": "Some",
             "3": "Not much",
-            "4": "None at all",
+            "4": "Not at all",
             "99": "DK/Refused",
         },
     },
@@ -474,11 +475,11 @@ question_mapping = {
         },
     },
     "w10": {
-        "title": "Science and technology will increase/decrease the number of jobs i nyour local area in the next 5 years",
+        "title": "Science and technology will increase/decrease the number of jobs in your local area in the next 5 years",
         "answers": {
             "1": "Increase",
             "2": "Decrease",
-            "3": "No effect",
+            "3": "Neither/No effect",
             "99": "DK/Refused",
         },
     },
