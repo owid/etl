@@ -1,4 +1,7 @@
 # To run with subset only: GHE_SUBSET_ONLY=1 etl grapher/who/2022-09-30/ghe --grapher
+# NOTE: This is a massive dataset with 50M rows and 50k variables (there are just 4 actual
+# columns, but 12500 dimension combinations). It takes ~1.5h to upload it to grapher with
+# 40 workers.
 import pandas as pd
 from owid.catalog import Dataset, Table
 
@@ -6,7 +9,7 @@ from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
-GHE_SUBSET_ONLY = True
+GHE_SUBSET_ONLY = False
 
 
 def run(dest_dir: str) -> None:

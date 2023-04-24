@@ -7,6 +7,7 @@ import concurrent.futures
 import re
 import sys
 from collections.abc import Iterable
+from functools import lru_cache
 from pathlib import Path
 from typing import Any, Dict, Iterator, Optional, cast
 from urllib.error import HTTPError
@@ -272,6 +273,13 @@ def connect_s3(s3_config: Optional[Config] = None) -> Any:
         aws_secret_access_key=config.S3_SECRET_KEY,
         config=s3_config,
     )
+
+
+@lru_cache(maxsize=None)
+def connect_s3_cached(s3_config: Optional[Config] = None) -> Any:
+    """Connect to S3, but cache the connection for subsequent calls. This is more efficient than
+    creating a new connection for every request."""
+    return connect_s3(s3_config)
 
 
 def _channel_path(channel: CHANNEL, format: FileFormat) -> Path:
