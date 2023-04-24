@@ -10,11 +10,11 @@ These are manually created, based on:
 """
 
 
-gender_mapping = {
+MAPPING_GENDER_VALUES = {
     1: "male",
     2: "female",
 }
-age_group_mapping = {
+MAPPING_AGE_VALUES = {
     1: "15-29",
     2: "30-49",
     3: "50-64",
@@ -22,7 +22,7 @@ age_group_mapping = {
     99: "DK/Refused",
 }
 # Rename fields
-column_rename = {
+MAPPING_COLUMN_NAMES = {
     "countrynew": "country",
     "wgt": "weight_intra_country",
     "projwt": "weight_inter_country",
@@ -33,7 +33,7 @@ column_rename = {
 # Extracted from
 # - https://cms.wellcome.org/sites/default/files/2021-11/WGM_Full_Questionnaire.pdf (full questionaire)
 # - https://cms.wellcome.org/sites/default/files/2021-10/wgm-mentalhealthmodule-crossnational-tabs.xlsx (data report, xlsx)
-question_mapping = {
+MAPPING_QUESTION_VALUES = {
     "mh1": {
         "title": "Importance of mental health for well-being",
         "answers": {

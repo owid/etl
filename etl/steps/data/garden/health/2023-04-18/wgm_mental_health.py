@@ -4,11 +4,17 @@ from typing import List
 
 import pandas as pd
 from owid.catalog import Dataset, Table
-from shared import age_group_mapping, column_rename, gender_mapping, question_mapping
 from structlog import get_logger
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
+
+from .shared import (
+    MAPPING_AGE_VALUES,
+    MAPPING_COLUMN_NAMES,
+    MAPPING_GENDER_VALUES,
+    MAPPING_QUESTION_VALUES,
+)
 
 log = get_logger()
 
@@ -83,15 +89,15 @@ def clean_df(df: pd.DataFrame) -> pd.DataFrame:
     """Keep relevant columns, unpivot dataframe, harmonise country names."""
     log.info("wgm_mental_health: cleaning dataframe")
     # Relevant columns
-    columns_rel = list(column_rename.keys()) + list(question_mapping.keys())
+    columns_rel = list(MAPPING_COLUMN_NAMES.keys()) + list(MAPPING_QUESTION_VALUES.keys())
     df = df[columns_rel]
     # Rename columns
-    df = df.rename(columns=column_rename)
+    df = df.rename(columns=MAPPING_COLUMN_NAMES)
     # Unpivot
     log.info("wgm_mental_health: unpivotting dataframe")
     df = df.melt(
-        id_vars=list(column_rename.values()),
-        value_vars=list(question_mapping.keys()),
+        id_vars=list(MAPPING_COLUMN_NAMES.values()),
+        value_vars=list(MAPPING_QUESTION_VALUES.keys()),
         var_name="question",
         value_name="answer",
     )
@@ -99,9 +105,7 @@ def clean_df(df: pd.DataFrame) -> pd.DataFrame:
     df = df.astype({"question": str, "answer": str})
     # Harmonise country names
     log.info("wgm_mental_health: harmonize_countries")
-    df = geo.harmonize_countries(
-        df=df, countries_file=paths.country_mapping_path
-    )
+    df = geo.harmonize_countries(df=df, countries_file=paths.country_mapping_path)
     return df
 
 
@@ -239,7 +243,7 @@ def map_ids_to_labels(df: pd.DataFrame) -> pd.DataFrame:
     # Create unique identifier for answer id. Note that answer ids mean different things depending on the question!
     # Therefore, we build a mapping `questionId__answerId -> answerLabel`
     question_answer_id_to_label = {}
-    for q_id, q_props in question_mapping.items():
+    for q_id, q_props in MAPPING_QUESTION_VALUES.items():
         for a_id, a_label in q_props["answers"].items():
             question_answer_id_to_label[f"{q_id}__{a_id}"] = a_label
     df["question__answer"] = df["question"] + "__" + df["answer"]
@@ -258,29 +262,29 @@ def map_ids_to_labels(df: pd.DataFrame) -> pd.DataFrame:
     _sanity_check_age_ids(df)
 
     # Question ID to Question label mapping
-    question_id_to_label = {k: v["title"] for k, v in question_mapping.items()}
+    question_id_to_label = {k: v["title"] for k, v in MAPPING_QUESTION_VALUES.items()}
 
     # Map IDs to Labels (Question, Answer, Gender, Age group)
     log.info("wgm_mental_health: mapping ids to labels}")
     df["question"] = df["question"].replace(question_id_to_label)
     df["answer"] = df["question__answer"].map(question_answer_id_to_label).fillna("Unknown")
-    df["gender"] = df["gender"].replace(gender_mapping)
-    df["age_group"] = df["age_group"].replace(age_group_mapping)
+    df["gender"] = df["gender"].replace(MAPPING_GENDER_VALUES)
+    df["age_group"] = df["age_group"].replace(MAPPING_AGE_VALUES)
 
     return df
 
 
 def _sanity_check_question(df: pd.DataFrame):
-    q_map = {k: v["title"] for k, v in question_mapping.items()}
+    q_map = {k: v["title"] for k, v in MAPPING_QUESTION_VALUES.items()}
     questions = set(df["question"])
-    questions_unexpected = questions.difference(set(question_mapping))
+    questions_unexpected = questions.difference(set(MAPPING_QUESTION_VALUES))
     assert not questions_unexpected, f"Unexpected question ID {questions_unexpected}"
     questions_missing = set(q_map).difference(questions)
     assert not questions_unexpected, f"Missing question ID {questions_missing}"
 
 
 def _sanity_check_answer(df: pd.DataFrame):
-    q_a_map = {k: set(v["answers"]) for k, v in question_mapping.items()}
+    q_a_map = {k: set(v["answers"]) for k, v in MAPPING_QUESTION_VALUES.items()}
     dfg = df.groupby("question")["answer"].apply(set).to_dict()
     for k, v in dfg.items():
         answers_unexpected = v.difference(q_a_map[k])
@@ -296,8 +300,8 @@ def _sanity_check_answer(df: pd.DataFrame):
 
 
 def _sanity_check_gender(df: pd.DataFrame):
-    gender_unexpected = set(df["gender"]).difference(set(gender_mapping) | {"all"})
-    gender_missing = set(set(gender_mapping) | {"all"}).difference(df["gender"])
+    gender_unexpected = set(df["gender"]).difference(set(MAPPING_GENDER_VALUES) | {"all"})
+    gender_missing = set(set(MAPPING_GENDER_VALUES) | {"all"}).difference(df["gender"])
     if gender_unexpected:
         raise ValueError(f"Unexpected gender ID {gender_unexpected}")
     if gender_missing:
@@ -305,8 +309,8 @@ def _sanity_check_gender(df: pd.DataFrame):
 
 
 def _sanity_check_age_ids(df: pd.DataFrame):
-    age_unexpected = set(df["age_group"]).difference(set(age_group_mapping) | {"all"})
-    age_missing = set(set(age_group_mapping) | {"all"}).difference(df["age_group"])
+    age_unexpected = set(df["age_group"]).difference(set(MAPPING_AGE_VALUES) | {"all"})
+    age_missing = set(set(MAPPING_AGE_VALUES) | {"all"}).difference(df["age_group"])
     if age_unexpected:
         raise ValueError(f"Unexpected age group ID {age_unexpected}")
     if age_missing:
