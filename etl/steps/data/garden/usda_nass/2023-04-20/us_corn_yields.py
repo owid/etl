@@ -11,8 +11,12 @@ log = get_logger()
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-# Unit conversion factor to change from bushels per acre to tonnes per hectare.
-BUSHELS_PER_ACRE_TO_TONNES_PER_HECTARE = 0.06725
+
+# Unit conversion factor to change from bushel of corn to metric tonnes.
+BUSHELS_OF_CORN_TO_TONNES = 0.0254
+
+# Unit conversion factor to change from acres to hectares.
+ACRES_TO_HECTARES = 0.4047
 
 
 def run(dest_dir: str) -> None:
@@ -34,7 +38,7 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     # Change units of corn yield.
-    df["corn_yield"] *= BUSHELS_PER_ACRE_TO_TONNES_PER_HECTARE
+    df["corn_yield"] *= BUSHELS_OF_CORN_TO_TONNES / ACRES_TO_HECTARES
 
     # Create a new table with the processed data.
     tb_garden = Table(df, like=tb_meadow)
