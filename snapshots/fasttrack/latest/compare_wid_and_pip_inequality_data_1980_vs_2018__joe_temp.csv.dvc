@@ -1,0 +1,18 @@
+meta:
+  namespace: fasttrack
+  short_name: compare_wid_and_pip_inequality_data_1980_vs_2018__joe_temp
+  file_extension: csv
+  date_accessed: 2023-04-18
+  name: DRAFT Compare WID and PIP inequality data 1980 vs 2018 (Joe temp)
+  description: ''
+  source_name: Local CSV
+  url: ''
+  source_published_by: Local CSV
+  source_data_url: gAAAAABkPnvjWjkvLdUrfVlCfL7LlME4D9o29z3V_9ugnqMLIGzV_z-9UedVSfUjHrVKypEPt7Lj4u8Y3KMqG1lAQBfhpkYbVg==
+  is_public: false
+  version: latest
+wdir: ../../../data/snapshots/fasttrack/latest
+outs:
+- md5: ff3a6e764ec49942e727fe73e207d705
+  size: 8238
+  path: compare_wid_and_pip_inequality_data_1980_vs_2018__joe_temp.csv

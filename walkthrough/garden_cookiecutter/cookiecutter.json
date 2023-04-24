@@ -3,6 +3,8 @@
     "short_name": "",
     "namespace": "",
     "version": "",
+    "include_metadata_yaml": false,
     "add_to_dag": false,
-    "include_metadata_yaml": false
+    "load_population": false,
+    "load_countries_regions": false
 }

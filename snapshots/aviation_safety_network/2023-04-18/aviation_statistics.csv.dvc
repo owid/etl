@@ -1,0 +1,22 @@
+meta:
+  namespace: aviation_safety_network
+  short_name: aviation_statistics
+  name: Aviation statistics
+  version: 2023-04-18
+  publication_date: 2023-04-18
+  source_name: Aviation Safety Network
+  source_published_by: The Flight Safety Foundation's Aviation Safety Network (ASN)
+  url: https://aviation-safety.net/statistics/
+  source_data_url: https://docs.google.com/spreadsheets/d/1SDp7p1y6m7N5xD5_fpOkYOrJvd68V7iy6etXy2cetb8/gviz/tq?tqx=out:csv&sheet=Accidents+and+fatalities+per+year
+  file_extension: csv
+  license_url: https://aviation-safety.net/about/usage33.php
+  license_name: Copyright Aviation Safety Network
+  date_accessed: 2023-04-18
+  is_public: true
+  description: |
+
+wdir: ../../../data/snapshots/aviation_safety_network/2023-04-18
+outs:
+- md5: aae2d0f3be835d999fecc33fe6c3dbf4
+  size: 12124
+  path: aviation_statistics.csv

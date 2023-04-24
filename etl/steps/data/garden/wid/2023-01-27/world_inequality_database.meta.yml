@@ -7,7 +7,7 @@ dataset:
 
     In recent years, the WIL has been leading efforts in creating “distributional national accounts” (DINA). The goal is to provide estimates of the distribution of income and wealth that are harmonized over time and across countries, that are consistent with the macroeconomic aggregates produced by national statistical institutes, and that can therefore be viewed as a distributional extension of the existing international System of National Accounts (SNA).
 
-    The WID provides extensive data on the distribution of pretax income, post-tax income and wealth, on top of a detailed decomposition of macroeconomic aggregates of income and wealth. This dataset uploaded to Our World in Data contains pretax income data only.
+    The WID provides extensive data on the distribution of pretax income, post-tax income and wealth, on top of a detailed decomposition of macroeconomic aggregates of income and wealth. This dataset uploaded to Our World in Data contains pretax and post-tax income, and wealth data.
 
     WID seeks to distribute the entirety of national income among resident households (including all income flowing to corporations, the government, and to and from the foreign sector). In this way it accounts for 100% of macroeconomic growth coming from GDP statistics. WID also presents results for numerous concepts across granular percentile groups reaching small fractiles at the very top of the distribution.
 
@@ -26,7 +26,7 @@ dataset:
 
     Purchasing power parities
 
-    Though a large number of indicators provided by the WID (such as the share of income received by various groups) are not sensitive to the overall price level, WID provides purchasing power parities (PPPs) to convert the local currency units provided by default in averages and thresholds. This dataset uses 2017 PPPs to account for inflation and for differences in the cost of living between countries. Regional aggregations provided by WID are by default using PPPs and also include market exchange rates conversions, but they are dropped for this dataset.
+    Though a large number of indicators provided by the WID (such as the share of income received by various groups) are not sensitive to the overall price level, WID provides purchasing power parities (PPPs) to convert the local currency units provided by default in averages and thresholds. This dataset uses international-$ in 2021 prices to account for inflation and for differences in the cost of living between countries. This is the result of using 2011 PPPs combined with an adjustment for inflation until 2021. Regional aggregations provided by WID are by default using PPPs and also include market exchange rates conversions, but they are dropped for this dataset.
 
     Measures of the distribution
 
@@ -47,16 +47,18 @@ dataset:
       <li><b>Pretax factor</b> corresponds to the distribution of income before any redistribution, be it through social insurance systems of social assistance.</li>
       <li><b>Pretax post-replacement income</b> (often referred to as “pretax income”) includes redistribution that occurs through social insurance schemes (pension and sometimes unemployment benefits), but not social assistance. The main difference with pretax factor income and is the treatment of pensions, which are counted on a contribution basis by pretax factor income and on a distribution basis by pretax national income. The key reason “pretax national income” series is preferred is that it is less sensitive than pretax factor income inequality to the age structure of the population.</li>
       <li><b>Post-tax disposable income</b> includes all cash redistribution through the tax and transfer system, but does not include in-kind benefits and therefore does not add up to national income.</li>
-      <li><b>inally, post-tax national income</b> redistributes all in-kind transfers (i.e., government consumption expenditures) to individuals.</li>
+      <li><b>Post-tax national income</b> redistributes all in-kind transfers (i.e., government consumption expenditures) to individuals.</li>
     </ul>
+
+    In Our World in Data, only pre-tax and post-tax national income is utilized for the sake of global coverage and comparability.
 
     Undistributed profits
 
     The undistributed profits of corporations are distributed to the shareholders of these corporations. Direct taxes and benefits are distributed to the people that pay the tax or receive the benefit. The corporate tax is paid by the shareholders. Sales taxes and VATs are distributed proportionally to factor income for pretax concepts, and are removed proportionally to consumption in post-tax concepts.
 
-    In-kind transfers
+    In-kind transfers and collective expenditures
 
-    For in-kind transfers, three variants are considered: allocation proportional to post-tax disposable income, lump-sum allocation, and proportional allocation except for health spending which we distribute lump sum. That last concept is used as WID’s benchmark for post-tax national income.
+    In-kind transfers and collective expenditures are the two components of government consumption. The former includes education and health spending, and the latter includes public goods such as national defense or street lighting. In order to create post-tax national income distributions, proportional allocation is used except for health spending which WID distributes lump sum. The post-tax disposable series excludes these components, but has a limited global coverage.
 
     INCOME DISTRIBUTION METHODS
     When there is exhaustive tax microdata
@@ -68,7 +70,7 @@ dataset:
     The method to incorporate tax information into surveys has three stages:
     <ul>
       <li>The choice of the merging point: the highest income where the ratio of the density functions of both survey and tax records coincides with the respective ratio of cumulative density functions.</li>
-      <li>he reweighting of survey observations above and below this point: below are uniformly reweighted (assuming relative probability of response constant over this part of the distribution).</li>
+      <li>The reweighting of survey observations above and below this point: below are uniformly reweighted (assuming relative probability of response constant over this part of the distribution).</li>
       <li>The expansion of the survey’s support by including the highest incomes from tax data: after the merging point the survey distribution is replaced by the tax distribution.</li>
     </ul>
 

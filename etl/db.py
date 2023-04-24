@@ -32,7 +32,9 @@ def get_connection() -> MySQLdb.Connection:
 
 def get_engine() -> Engine:
     return create_engine(
-        f"mysql://{config.DB_USER}:{quote(config.DB_PASS)}@{config.DB_HOST}:{config.DB_PORT}/{config.DB_NAME}"
+        f"mysql://{config.DB_USER}:{quote(config.DB_PASS)}@{config.DB_HOST}:{config.DB_PORT}/{config.DB_NAME}",
+        pool_size=30,  # Increase the pool size to allow higher GRAPHER_WORKERS
+        max_overflow=30,  # Increase the max overflow limit to allow higher GRAPHER_WORKERS
     )
 
 

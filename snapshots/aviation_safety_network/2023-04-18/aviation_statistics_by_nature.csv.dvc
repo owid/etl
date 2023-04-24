@@ -1,0 +1,20 @@
+meta:
+  namespace: aviation_safety_network
+  short_name: aviation_statistics_by_nature
+  name: Aviation statistics by nature
+  source_name: Aviation Safety Network
+  publication_year: 2023
+  publication_date: 2023-04-18
+  url: https://aviation-safety.net/statistics/nature/stats.php
+  source_data_url:
+  file_extension: csv
+  license_url: https://aviation-safety.net/about/usage33.php
+  license_name: Copyright Aviation Safety Network
+  date_accessed: 2023-04-18
+  description: |
+
+wdir: ../../../data/snapshots/aviation_safety_network/2023-04-18
+outs:
+- md5: 105673bcdcb4ff7dd2d1f11350f40e04
+  size: 1599
+  path: aviation_statistics_by_nature.csv

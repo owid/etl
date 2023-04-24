@@ -1,0 +1,11 @@
+# (Inherited from meadow, remove if not different.)
+tables:
+  wgm_mental_health:
+    # (Inherited from meadow, remove if not different.)
+    variables:
+      share:
+        title: "Share"
+        unit: "%"
+      count:
+        title: "Count"
+        unit: ""

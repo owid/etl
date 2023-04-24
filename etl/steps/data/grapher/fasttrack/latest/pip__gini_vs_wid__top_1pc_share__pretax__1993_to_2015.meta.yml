@@ -1,0 +1,29 @@
+dataset:
+  namespace: fasttrack
+  version: latest
+  short_name: pip__gini_vs_wid__top_1pc_share__pretax__1993_to_2015
+  title: 'DRAFT PIP: Gini vs WID: Top 1pc share – pretax – 1993 to 2015'
+  description: ''
+  sources:
+  - name: Unknown
+    published_by: Unknown
+    publication_year: 2023
+    date_accessed: 2023-04-18
+tables:
+  pip__gini_vs_wid__top_1pc_share__pretax__1993_to_2015:
+    variables:
+      region:
+        title: region
+        unit: ''
+      pip__gini__all_observations:
+        title: 'PIP: Gini – all observations'
+        unit: ''
+      wid__top_1pc_share__pretax__all_observations:
+        title: 'WID: Top 1pc share – pretax – all observations'
+        unit: ''
+      pip__gini__only_matching_observations:
+        title: 'PIP: Gini – only matching observations'
+        unit: ''
+      wid__top_1pc_share__pretax__only_matching_observations:
+        title: 'WID: Top 1pc share – pretax – only matching observations'
+        unit: ''

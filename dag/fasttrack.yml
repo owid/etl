@@ -38,3 +38,11 @@ steps:
   - snapshot-private://fasttrack/latest/evs_per_charger.csv
   data-private://grapher/fasttrack/latest/who_standard_pop:
   - snapshot-private://fasttrack/latest/who_standard_pop.csv
+  data-private://grapher/fasttrack/latest/pip__gini_vs_wid__top_1pc_share__pretax__1993_to_2015:
+  - snapshot-private://fasttrack/latest/pip__gini_vs_wid__top_1pc_share__pretax__1993_to_2015.csv
+  data-private://grapher/fasttrack/latest/compare_wid_and_pip_inequality_data_1980_vs_2018__joe_temp:
+  - snapshot-private://fasttrack/latest/compare_wid_and_pip_inequality_data_1980_vs_2018__joe_temp.csv
+  data-private://grapher/fasttrack/latest/compare_wid_and_pip_inequality_data_1993_vs_2015__joe_temp:
+  - snapshot-private://fasttrack/latest/compare_wid_and_pip_inequality_data_1993_vs_2015__joe_temp.csv
+  data-private://grapher/fasttrack/latest/compare_wid_and_pip_change_in_inequality_1993_vs_2015__joe_temp:
+  - snapshot-private://fasttrack/latest/compare_wid_and_pip_change_in_inequality_1993_vs_2015__joe_temp.csv

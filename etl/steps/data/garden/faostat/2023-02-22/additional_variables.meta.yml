@@ -206,3 +206,59 @@ tables:
         unit: "grams per day per capita"
         short_unit: "g"
         description: *macronutrient_composition_variable_description
+  fertilizers:
+    variables:
+      nitrogen_per_cropland:
+        title: Nitrogen use per area of cropland
+        unit: kilograms per hectare
+        short_unit: kg/ha
+        description: |
+          Nutrient nitrogen (N) from all fertilizer products per area of cropland, which corresponds to the sum of arable land and permanent crops.
+      phosphate_per_cropland:
+        title: Phosphate use per area of cropland
+        unit: kilograms per hectare
+        short_unit: kg/ha
+        description: |
+           Nutrient phosphate (P2O5) from all fertilizer products per area of cropland, which corresponds to the sum of arable land and permanent crops.
+      potash_per_cropland:
+        title: Potash use per area of cropland
+        unit: kilograms per hectare
+        short_unit: kg/ha
+        description: |
+          Nutrient potash (K2O) from all fertilizer products per area of cropland, which corresponds to the sum of arable land and permanent crops.
+      all_fertilizers_per_cropland:
+        title: All fertilizers use per area of cropland
+        unit: kilograms per hectare
+        short_unit: kg/ha
+        description: |
+          Agricultural use of all fertilizer products (including nitrogenous, potash, and phosphate fertilizers) per area of cropland, which corresponds to the sum of arable land and permanent crops.
+      cropland:
+        title: Area of cropland
+        unit: hectares
+        short_unit: ha
+        description: 
+          Surface area of cropland, which corresponds to the sum of arable land and permanent crops.
+      nitrogen_use:
+        title: Nitrogen use
+        unit: tonnes
+        short_unit: t
+        description: |
+          Agricultural use of nutrient nitrogen (N) from all fertilizer products.
+      phosphate_use:
+        title: Phosphate use
+        unit: tonnes
+        short_unit: t
+        description: |
+          Agricultural use of nutrient phosphate (P2O5) from all fertilizer products.
+      potash_use:
+        title: Potash use
+        unit: tonnes
+        short_unit: t
+        description: |
+          Agricultural use of nutrient potash (K2O) from all fertilizer products.
+      all_fertilizers_use:
+        title: All fertilizers use
+        unit: tonnes
+        short_unit: t
+        description: |
+          Agricultural use from all fertilizer products (including nitrogenous, potash, and phosphate fertilizers).

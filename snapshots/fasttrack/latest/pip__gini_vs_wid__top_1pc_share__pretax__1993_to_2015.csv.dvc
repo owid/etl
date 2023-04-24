@@ -1,0 +1,18 @@
+meta:
+  namespace: fasttrack
+  short_name: pip__gini_vs_wid__top_1pc_share__pretax__1993_to_2015
+  file_extension: csv
+  date_accessed: 2023-04-18
+  name: 'DRAFT PIP: Gini vs WID: Top 1pc share – pretax – 1993 to 2015'
+  description: ''
+  source_name: Local CSV
+  url: ''
+  source_published_by: Local CSV
+  source_data_url: gAAAAABkPlOSr7r68fRmFhQUvAmGt3ic6GMZV6Xyub1XFwWU_Ct4RENLfR6J4yKaU9E4ZsN67q7XMGnN0k1PQgJPY2OLJ9aCcQ==
+  is_public: false
+  version: latest
+wdir: ../../../data/snapshots/fasttrack/latest
+outs:
+- md5: 7681d711badc9b36d770f850a8cb2103
+  size: 14785
+  path: pip__gini_vs_wid__top_1pc_share__pretax__1993_to_2015.csv

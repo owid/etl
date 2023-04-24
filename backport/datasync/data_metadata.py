@@ -72,6 +72,11 @@ def variable_data_df_from_s3(
 
 
 def add_entity_code_and_name(engine: Engine, df: pd.DataFrame) -> pd.DataFrame:
+    if df.empty:
+        df["entityName"] = []
+        df["entityCode"] = []
+        return df
+
     # add entities from DB
     q = """
     SELECT

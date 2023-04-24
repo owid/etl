@@ -22,18 +22,20 @@ class PartialSnapshotMeta(BaseModel):
     license_name: Optional[str]
 
 
-def import_google_sheets(url: str) -> Dict[str, Any]:
-    # these IDs are taken from template sheet
-    SHEET_TO_GID = {
-        "data": 409110122,
-        "variables_meta": 777328216,
-        "dataset_meta": 1719161864,
-        "sources_meta": 1399503534,
-    }
+# these IDs are taken from template sheet, they will be different if someone
+# creates a new sheet from scratch and use those names
+SHEET_TO_GID = {
+    "data": 409110122,
+    "variables_meta": 777328216,
+    "dataset_meta": 1719161864,
+    "sources_meta": 1399503534,
+}
 
+
+def import_google_sheets(url: str) -> Dict[str, Any]:
     # read dataset first to check if we're using data_url instead of data sheet
     dataset_meta = pd.read_csv(f"{url}&gid={SHEET_TO_GID['dataset_meta']}", header=None)
-    data_url = dataset_meta.set_index(0)[1].to_dict().get("data_url") or f"{url}&gid={SHEET_TO_GID['data']}"
+    data_url = _get_data_url(dataset_meta, url)
 
     with concurrent.futures.ThreadPoolExecutor() as executor:
         data_future = executor.submit(lambda x: pd.read_csv(x), data_url)
@@ -158,3 +160,18 @@ def _move_keys_to_the_end(d: Dict[str, Any], keys: List[str]) -> None:
 
 def _prune_empty(d: Dict[str, Any]) -> Dict[str, Any]:
     return {k: v for k, v in d.items() if v and not pd.isnull(v)}
+
+
+def _get_data_url(dataset_meta: pd.DataFrame, url: str) -> str:
+    """Get data url from dataset_meta field or use data sheet if dataset_meta is empty."""
+    data_url = dataset_meta.set_index(0)[1].to_dict().get("data_url")
+
+    if data_url:
+        # files on Google Drive need modified link for downloading raw csv
+        if "drive.google.com" in data_url:
+            data_url = data_url.replace("file/d/", "uc?id=").replace("/view?usp=share_link", "&export=download")
+    else:
+        # use data sheet
+        data_url = f"{url}&gid={SHEET_TO_GID['data']}"
+
+    return data_url
