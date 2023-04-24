@@ -110,8 +110,8 @@ def split_by_surveillance_type(df: pd.DataFrame) -> pd.DataFrame:
 
     Summing each column and skipping NAs so there is a column of combined values
     """
-    flu_cols = df.columns.drop(["country", "date", "origin_source", "hemisphere", "iso_week"])
-    df_piv = df.pivot(index=["country", "hemisphere", "date", "iso_week"], columns="origin_source").reset_index()
+    flu_cols = df.columns.drop(["country", "date", "origin_source", "hemisphere"])
+    df_piv = df.pivot(index=["country", "hemisphere", "date"], columns="origin_source").reset_index()
 
     df_piv.columns = list(map("".join, df_piv.columns))
     sentinel_list = ["SENTINEL", "NONSENTINEL", "NOTDEFINED"]
@@ -157,7 +157,6 @@ def clean_and_format_data(df: pd.DataFrame) -> pd.DataFrame:
         "country",
         "hemisphere",
         "date",
-        "iso_week",
         "origin_source",
         "ah1n12009",
         "ah1",
