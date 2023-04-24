@@ -100,7 +100,7 @@ def clean_df(df: pd.DataFrame) -> pd.DataFrame:
     # Harmonise country names
     log.info("wgm_mental_health: harmonize_countries")
     df = geo.harmonize_countries(
-        df=df, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
+        df=df, countries_file=paths.country_mapping_path
     )
     return df
 
