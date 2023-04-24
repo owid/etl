@@ -3,16 +3,15 @@
 The walkthrough is an interactive web UI for setting up the different ETL steps. It creates the base files to help you
 create the recipe for a dataset. It currently supports the following stages:
 
-| Option      | Description                          |
-| ----------- | ------------------------------------ |
-| `snapshot`       | Create a Walden step: Insert upstream data to our catalog. |
-| `walden`       | (This step is deprecated. Use `snapshot` instead). Create a Walden step: Insert upstream data to our catalog. |
-| `meadow`       | Create a Meadow step: Format data. |
-| `garden`       | Create a Garden step: Harmonize and process data. |
-| `grapher`       | Create a Grapher step: Transform data to be Grapher-ready. |
-| `explorers`       | Create an Explorer step: Transform data to be Explorer-ready. |
-| `charts`       | Tool to update our charts. |
-
+| Option      | Description                                                                                                   |
+| ----------- | ------------------------------------------------------------------------------------------------------------- |
+| `snapshot`  | Create a Snapshot step: Insert upstream data to our catalog.                                                  |
+| `walden`    | (This step is deprecated. Use `snapshot` instead). Create a Walden step: Insert upstream data to our catalog. |
+| `meadow`    | Create a Meadow step: Format data.                                                                            |
+| `garden`    | Create a Garden step: Harmonize and process data.                                                             |
+| `grapher`   | Create a Grapher step: Transform data to be Grapher-ready.                                                    |
+| `explorers` | Create an Explorer step: Transform data to be Explorer-ready.                                                 |
+| `charts`    | Tool to update our charts.                                                                                    |
 
 ```bash
 $ walkthrough --help
