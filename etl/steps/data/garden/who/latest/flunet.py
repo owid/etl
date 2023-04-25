@@ -47,7 +47,9 @@ def run(dest_dir: str) -> None:
     df = create_united_kingdom_aggregate(df)
     df = remove_sparse_years(df, min_datapoints_per_year=MIN_DATA_POINTS_PER_YEAR)
     df = df.reset_index(drop=True)
-    tb_garden = Table(df, short_name=paths.short_name)
+    cols_check = df.columns.drop(["country", "hemisphere", "date", "year"])
+    df[cols_check] = df[cols_check].dropna(axis="rows", how="all")
+    tb_garden = Table(df, short_name=paths.short_name).reset_index(drop=True)
     #
     # Save outputs.
     #

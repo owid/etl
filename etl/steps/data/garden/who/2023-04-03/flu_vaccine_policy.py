@@ -67,7 +67,7 @@ def clean_binary_colums(df: pd.DataFrame) -> pd.DataFrame:
     """
     # Select out the columns that start with 'is', 'are', 'were' or 'does
     binary_cols = df.columns[df.columns.str.startswith(("is", "are", "were"))]
-    dict_map = {"Yes": "Yes", "No": "No", "Not relevant": "Not relevant"}
+    dict_map = {"Yes": "Yes", "No": "No"}
     df[binary_cols] = df[binary_cols].applymap(dict_map.get).fillna(np.NaN)
 
     return df

@@ -1,0 +1,1 @@
+So far you have learned about the standard steps. These should cover most of the cases. However, there are some other steps worth mentioning.
