@@ -147,3 +147,5 @@ steps:
   data://garden/health/2023-04-25/wgm_2018:
     - data://meadow/health/2023-04-25/wgm_2018
     - data://garden/reference
+  data://grapher/health/2023-04-26/wgm_2018:
+    - data://garden/health/2023-04-25/wgm_2018
