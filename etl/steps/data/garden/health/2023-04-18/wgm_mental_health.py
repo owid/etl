@@ -25,22 +25,6 @@ paths = PathFinder(__file__)
 THRESHOLD_ANSWERS = 100
 
 
-def load_countries_regions() -> Table:
-    """Load countries-regions table from reference dataset (e.g. to map from iso codes to country names)."""
-    ds_reference: Dataset = paths.load_dependency("reference")
-    tb_countries_regions = ds_reference["countries_regions"]
-
-    return tb_countries_regions
-
-
-def load_population() -> Table:
-    """Load population table from population OMM dataset."""
-    ds_indicators: Dataset = paths.load_dependency(channel="garden", namespace="demography", short_name="population")
-    tb_population = ds_indicators["population"]
-
-    return tb_population
-
-
 def run(dest_dir: str) -> None:
     log.info("wgm_mental_health: start")
 
@@ -68,6 +52,8 @@ def run(dest_dir: str) -> None:
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(dest_dir, tables=[tb_garden], default_metadata=ds_meadow.metadata)
     ds_garden.update_metadata(paths.metadata_path)
+    # Add explanation to dataset description
+    ds_garden.metadata.description += "\n\nNote: Data for answers that where the demographic group had less than 100 participants are filtered out."
     # Save changes in the new garden dataset.
     ds_garden.save()
 
@@ -193,7 +179,7 @@ def _make_df_with_share_answers(df: pd.DataFrame, weight_column: str = "weight_i
     # Sanity check
     x = df_combined.groupby(["country", "year", "question", "gender", "age_group"], observed=True)[["share"]].sum()
     assert x[
-        x.share - 100 > 0.1
+        abs(x.share - 100) > 0.1
     ].empty, "The share was not correctly estimated! Sum of shares does not sum up to 100% (we allow for 0.1% error)"
     return df_combined
 
@@ -292,11 +278,11 @@ def _sanity_check_answer(df: pd.DataFrame):
         if answers_unexpected:
             print(k, "unexpected", answers_unexpected)
             if answers_unexpected != {" "}:
-                raise ValueError("ERROR. Would expect nothing or whitespace, this is new!")
+                raise ValueError("Would expect nothing or whitespace, this is new!")
         if answers_missing:
             print(k, "missing", answers_missing)
             if answers_missing != {" "}:
-                raise ValueError("ERROR. Would expect nothing or whitespace, this is new!")
+                raise ValueError("Would expect nothing or whitespace, this is new!")
 
 
 def _sanity_check_gender(df: pd.DataFrame):
@@ -324,6 +310,8 @@ def filter_rows_with_low_participation(df: pd.DataFrame) -> pd.DataFrame:
     df_count = df.groupby(col_idx, observed=True, as_index=False)[["count"]].sum()
     df = df.merge(df_count, on=col_idx, suffixes=("", "_total"), how="left")
     df = df[df["count_total"] > THRESHOLD_ANSWERS]
+    # Alternative would be to just remove share values and keep absolute counts
+    # df.loc[df["count_total"] > THRESHOLD_ANSWERS, "Share"] = None
     # Log
     percentage_kept = round(100 * len(df[df["count"] > THRESHOLD_ANSWERS]) / len(df), 2)
     log.info(f"wgm_mental_health: Keeping {percentage_kept}% of all the rows.")
