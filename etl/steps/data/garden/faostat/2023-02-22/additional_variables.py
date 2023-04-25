@@ -669,8 +669,14 @@ def generate_fertilizers(df_ef: pd.DataFrame, df_rl: pd.DataFrame) -> Table:
     # Fix spurious index names after pivoting, and rename columns conveniently.
     fertilizers.columns = [column[1] for column in fertilizers.columns]
 
-    fertilizers = fertilizers.rename(columns={'Nutrient nitrogen N (total)': "nitrogen_per_cropland", 'Nutrient phosphate P2O5 (total)': "phosphate_per_cropland",
-           'Nutrient potash K2O (total)': "potash_per_cropland"}, errors="raise")
+    fertilizers = fertilizers.rename(
+        columns={
+            "Nutrient nitrogen N (total)": "nitrogen_per_cropland",
+            "Nutrient phosphate P2O5 (total)": "phosphate_per_cropland",
+            "Nutrient potash K2O (total)": "potash_per_cropland",
+        },
+        errors="raise",
+    )
 
     # Add column for total fertilizers per area cropland.
     fertilizers["all_fertilizers_per_cropland"] = fertilizers[
@@ -745,9 +751,9 @@ def generate_vegetable_oil_yields(df_qcl: pd.DataFrame, df_fbsc: pd.DataFrame) -
         # The item "Palm oil" doesn't have a description, but it probably refers to only the oil from the pulp of the
         # palm fruit (therefore it does not include the kernel).
         "palm": "00000257",  # Palm oil
-        # The item "Palm kernel oil" clearly refers to only the oil produced from the kernel of the palm fruit.
+        # The item "Palm kernel oil" clearly refers to only the oil produced from the kernel of the palm fruit.
         # Therefore, "Palm oil" and "Palm kernel oil" will need to be combined to account for all oils produced from
-        # the palm fruit (item "Palm fruit oil" for which we have the area harvested).
+        # the palm fruit (item "Palm fruit oil" for which we have the area harvested).
         "palm_kernel": "00000258",  # Palm kernel oil
         "sunflower": "00000268",  # Sunflower oil
         "rapeseed": "00000271",  # Rapeseed oil
@@ -765,47 +771,63 @@ def generate_vegetable_oil_yields(df_qcl: pd.DataFrame, df_fbsc: pd.DataFrame) -
     }
 
     # Extract the total production of vegetable oil. This is given in fbsc but not qcl.
-    total_production = df_fbsc[(df_fbsc["country"] == "World") &
-                               (df_fbsc["item_code"] == ITEM_CODE_FOR_VEGETABLE_OILS_TOTAL) &
-            (df_fbsc["element_code"] == ELEMENT_CODE_FOR_PRODUCTION_FBSC) &
-            (df_fbsc["unit"] == UNIT_FOR_PRODUCTION)].reset_index(drop=True)
+    total_production = df_fbsc[
+        (df_fbsc["country"] == "World")
+        & (df_fbsc["item_code"] == ITEM_CODE_FOR_VEGETABLE_OILS_TOTAL)
+        & (df_fbsc["element_code"] == ELEMENT_CODE_FOR_PRODUCTION_FBSC)
+        & (df_fbsc["unit"] == UNIT_FOR_PRODUCTION)
+    ].reset_index(drop=True)
 
     # Transpose data.
-    total_production = total_production.pivot(index=["country", "year"], columns=["item_code"], values=["value"]).\
-        rename(columns={ITEM_CODE_FOR_VEGETABLE_OILS_TOTAL: "vegetable_oils_production"})
+    total_production = total_production.pivot(
+        index=["country", "year"], columns=["item_code"], values=["value"]
+    ).rename(columns={ITEM_CODE_FOR_VEGETABLE_OILS_TOTAL: "vegetable_oils_production"})
 
     # Fix column names after pivoting.
     total_production.columns = [column[1] for column in total_production.columns]
     total_production = total_production.reset_index().drop(columns=["country"])
 
     # Select relevant items, elements and units for the production of crops.
-    production = df_qcl[(df_qcl["item_code"].isin(ITEM_CODE_FOR_EACH_CROP_PRODUCTION.values())) & (df_qcl["unit"] == UNIT_FOR_PRODUCTION) &
-           (df_qcl["element_code"] == ELEMENT_CODE_FOR_PRODUCTION_QCL)].reset_index(drop=True)
+    production = df_qcl[
+        (df_qcl["item_code"].isin(ITEM_CODE_FOR_EACH_CROP_PRODUCTION.values()))
+        & (df_qcl["unit"] == UNIT_FOR_PRODUCTION)
+        & (df_qcl["element_code"] == ELEMENT_CODE_FOR_PRODUCTION_QCL)
+    ].reset_index(drop=True)
 
     # Transpose data.
     production = production.pivot(index=["country", "year"], columns=["item_code"], values=["value"])
 
     # Fix column names after pivoting.
-    production.columns = np.array(production.columns.tolist())[:,1]
+    production.columns = np.array(production.columns.tolist())[:, 1]
 
     # Assign a convenient name to each crop.
-    CROP_NAME_FOR_ITEM_CODE = {ITEM_CODE_FOR_EACH_CROP_PRODUCTION[item_code]: item_code for item_code in ITEM_CODE_FOR_EACH_CROP_PRODUCTION}
-    production = production.rename(columns={item_code: CROP_NAME_FOR_ITEM_CODE[item_code] + "_production" for item_code in production.columns}).reset_index()
+    CROP_NAME_FOR_ITEM_CODE = {
+        ITEM_CODE_FOR_EACH_CROP_PRODUCTION[item_code]: item_code for item_code in ITEM_CODE_FOR_EACH_CROP_PRODUCTION
+    }
+    production = production.rename(
+        columns={item_code: CROP_NAME_FOR_ITEM_CODE[item_code] + "_production" for item_code in production.columns}
+    ).reset_index()
 
     # Select relevant items, elements and units for the area of crops.
-    area = df_qcl[(df_qcl["item_code"].isin(ITEM_CODE_FOR_EACH_CROP_AREA.values())) &
-                  (df_qcl["unit"] == UNIT_FOR_AREA) &
-           (df_qcl["element_code"] == ELEMENT_CODE_FOR_AREA)].reset_index(drop=True)
+    area = df_qcl[
+        (df_qcl["item_code"].isin(ITEM_CODE_FOR_EACH_CROP_AREA.values()))
+        & (df_qcl["unit"] == UNIT_FOR_AREA)
+        & (df_qcl["element_code"] == ELEMENT_CODE_FOR_AREA)
+    ].reset_index(drop=True)
 
     # Transpose data.
     area = area.pivot(index=["country", "year"], columns=["item_code"], values=["value"])
 
     # Fix column names after pivoting.
-    area.columns = np.array(area.columns.tolist())[:,1]
+    area.columns = np.array(area.columns.tolist())[:, 1]
 
     # Assign a convenient name to each crop.
-    CROP_NAME_FOR_ITEM_CODE = {ITEM_CODE_FOR_EACH_CROP_AREA[item_code]: item_code for item_code in ITEM_CODE_FOR_EACH_CROP_AREA}
-    area = area.rename(columns={item_code: CROP_NAME_FOR_ITEM_CODE[item_code] + "_area" for item_code in area.columns}).reset_index()
+    CROP_NAME_FOR_ITEM_CODE = {
+        ITEM_CODE_FOR_EACH_CROP_AREA[item_code]: item_code for item_code in ITEM_CODE_FOR_EACH_CROP_AREA
+    }
+    area = area.rename(
+        columns={item_code: CROP_NAME_FOR_ITEM_CODE[item_code] + "_area" for item_code in area.columns}
+    ).reset_index()
 
     # Combine production and area.
     combined = pd.merge(production, area, on=["country", "year"], how="outer")
@@ -825,7 +847,9 @@ def generate_vegetable_oil_yields(df_qcl: pd.DataFrame, df_fbsc: pd.DataFrame) -
         # Hectares of the original crop harvested per tonne of oil produced (inverse of the previous).
         combined[f"{crop}_hectares_per_tonne"] = combined[f"{crop}_area"] / combined[f"{crop}_production"]
         # Area required to produce the total demand of vegetable oils using only one specific crop.
-        combined[f"{crop}_area_to_meet_global_oil_demand"] = combined[f"{crop}_hectares_per_tonne"] * combined["vegetable_oils_production"]
+        combined[f"{crop}_area_to_meet_global_oil_demand"] = (
+            combined[f"{crop}_hectares_per_tonne"] * combined["vegetable_oils_production"]
+        )
 
     # Create a table, set an appropriate index, and sort conveniently.
     tb_vegetable_oil_yields = Table(
