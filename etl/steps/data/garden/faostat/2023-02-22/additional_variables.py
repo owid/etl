@@ -856,6 +856,9 @@ def generate_vegetable_oil_yields(df_qcl: pd.DataFrame, df_fbsc: pd.DataFrame) -
             combined[f"{crop}_hectares_per_tonne"] * combined["vegetable_oils_production"]
         )
 
+    # Replace infinite values (obtained when dividing by a null area) by nans.
+    combined = combined.replace(np.inf, np.nan)
+
     # Create a table, set an appropriate index, and sort conveniently.
     tb_vegetable_oil_yields = Table(
         combined.set_index(["country", "year"], verify_integrity=True).sort_index(),
@@ -903,8 +906,8 @@ def generate_vegetable_oil_yields(df_qcl: pd.DataFrame, df_fbsc: pd.DataFrame) -
             ].metadata.title = f"Area of {crop} crops harvested to produce a tonne of {crop} oil".replace(
                 "palm crops", "palm fruit crops"
             )
-            tb_vegetable_oil_yields[column].metadata.unit = "tonnes per hectare"
-            tb_vegetable_oil_yields[column].metadata.short_unit = "tonnes/ha"
+            tb_vegetable_oil_yields[column].metadata.unit = "hectares per tonne"
+            tb_vegetable_oil_yields[column].metadata.short_unit = "hectares/tonne"
             tb_vegetable_oil_yields[column].metadata.description = (
                 f"Area of {crop} crops harvested to produce a tonne of {crop} oil. This metric "
                 "is the inverse of oil yields, and represents the amount of land that would need to be devoted to "
