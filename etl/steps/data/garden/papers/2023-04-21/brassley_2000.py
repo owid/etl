@@ -1,5 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
 from structlog import get_logger
@@ -12,24 +13,17 @@ log = get_logger()
 paths = PathFinder(__file__)
 
 
-# Unit conversion factor to change from bushel of corn to metric tonnes.
-BUSHELS_OF_CORN_TO_TONNES = 0.0254
-
-# Unit conversion factor to change from acres to hectares.
-ACRES_TO_HECTARES = 0.4047
-
-
 def run(dest_dir: str) -> None:
-    log.info("us_corn_yields.start")
+    log.info("brassley_2000.start")
 
     #
     # Load inputs.
     #
     # Load meadow dataset.
-    ds_meadow: Dataset = paths.load_dependency("us_corn_yields")
+    ds_meadow: Dataset = paths.load_dependency("brassley_2000")
 
     # Read table from meadow dataset.
-    tb_meadow = ds_meadow["us_corn_yields"]
+    tb_meadow = ds_meadow["brassley_2000"]
 
     # Create a dataframe with data from the table.
     df = pd.DataFrame(tb_meadow)
@@ -37,11 +31,20 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    # Change units of corn yield.
-    df["corn_yield"] *= BUSHELS_OF_CORN_TO_TONNES / ACRES_TO_HECTARES
+    # Years are given in intervals; take the average year of each interval.
+    df["year"] = [np.array(year.split("-")).astype(int).mean().astype(int) for year in df["year"]]
+
+    # Add a country column.
+    df["country"] = "United Kingdom"
+
+    # Set an appropriate index and sort conveniently.
+    df = df.set_index(["country", "year"], verify_integrity=True).sort_index()
+
+    # Rename columns.
+    df = df.rename(columns={column: column + "_yield" for column in df.columns})
 
     # Create a new table with the processed data.
-    tb_garden = Table(df, like=tb_meadow)
+    tb_garden = Table(df, short_name=paths.short_name)
 
     #
     # Save outputs.
@@ -52,4 +55,4 @@ def run(dest_dir: str) -> None:
     # Save changes in the new garden dataset.
     ds_garden.save()
 
-    log.info("us_corn_yields.end")
+    log.info("brassley_2000.end")
