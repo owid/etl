@@ -78,7 +78,7 @@ def run(dest_dir: str) -> None:
     )
 
     # Rename columns.
-    df = df.rename(columns={column: column + "_yield" for column in df.columns})
+    df.columns = [f"{column}_yield" for column in df.columns]
 
     # Ensure all numeric columns are standard floats, and convert units (from bushels per acre to tonnes per hectare).
     for column in df.columns:
