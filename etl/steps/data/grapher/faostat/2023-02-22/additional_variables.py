@@ -23,6 +23,7 @@ def run(dest_dir: str) -> None:
     tb_food_available_for_consumption = ds_garden["food_available_for_consumption"]
     tb_macronutrient_compositions = ds_garden["macronutrient_compositions"]
     tb_fertilizers = ds_garden["fertilizers"]
+    tb_vegetable_oil_yields = ds_garden["vegetable_oil_yields"]
 
     #
     # Process data.
@@ -55,6 +56,7 @@ def run(dest_dir: str) -> None:
             tb_food_available_for_consumption,
             tb_macronutrient_compositions,
             tb_fertilizers,
+            tb_vegetable_oil_yields,
         ],
         default_metadata=ds_garden.metadata,
     )

@@ -2,6 +2,7 @@
 
 """
 
+import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
 from owid.catalog.utils import underscore
@@ -234,8 +235,8 @@ def generate_spared_land_from_increased_yields(df_qcl: pd.DataFrame) -> Table:
         index=["country", "year", "item"], columns=["element"], values="value"
     ).reset_index()
 
-    # Fix column name after pivotting.
-    spared_land.columns = ["country", "year", "item", "Yield", "Production"]
+    # Fix spurious index name after pivotting.
+    spared_land.columns = list(spared_land.columns)
 
     # Add columns for production and yield for a given reference year.
     reference_values = spared_land[spared_land["year"] == REFERENCE_YEAR].drop(columns=["year"])
@@ -246,7 +247,7 @@ def generate_spared_land_from_increased_yields(df_qcl: pd.DataFrame) -> Table:
     # Drop countries for which we did not have data in the reference year.
     spared_land = spared_land.dropna().reset_index(drop=True)
 
-    # Calculate area harvested that would be required given current production, but with the yield of the reference year.
+    # Calculate area harvested that would be required given current production, with the yield of the reference year.
     spared_land[f"Area with yield of {REFERENCE_YEAR}"] = (
         spared_land["Production"] / spared_land[f"Yield in {REFERENCE_YEAR}"]
     )
@@ -266,7 +267,7 @@ def generate_spared_land_from_increased_yields(df_qcl: pd.DataFrame) -> Table:
     )
     spared_land = pd.concat([spared_land, all_crops], ignore_index=True)
 
-    # Calculate the spared land in absolute value, and as a percentage of the land we would have used with no yield increase.
+    # Calculate the spared land in total value, and as a percentage of land we would have used with no yield increase.
     spared_land["Spared land"] = spared_land[f"Area with yield of {REFERENCE_YEAR}"] - spared_land["Area"]
     spared_land["Spared land (%)"] = (
         100 * spared_land["Spared land"] / spared_land[f"Area with yield of {REFERENCE_YEAR}"]
@@ -303,8 +304,8 @@ def generate_food_available_for_consumption(df_fbsc: pd.DataFrame) -> Table:
     # So all existing food items in FBSC are contained here, and there are no repetitions.
     # Notes:
     # * There are a few item groups that are not included here, namely "Vegetal Products" (item group code 2903),
-    #   and "Animal Products" (item group code 2941). But their items are contained in other item groups, so including them
-    #   would cause unnecessary repetition of items.
+    #   and "Animal Products" (item group code 2941). But their items are contained in other item groups, so including
+    #   them would cause unnecessary repetition of items.
     # * To check for the components of an individual item group:
     # from etl.paths import DATA_DIR
     # metadata = Dataset(DATA_DIR / "meadow/faostat/2023-02-22/faostat_metadata")
@@ -494,7 +495,12 @@ def generate_food_available_for_consumption(df_fbsc: pd.DataFrame) -> Table:
     )
 
     # Prepare variable metadata.
-    common_description = "Data represents the average daily per capita supply of calories from the full range of commodities, grouped by food categories. Note that these figures do not correct for waste at the household/consumption level so may not directly reflect the quantity of food finally consumed by a given individual.\n\nSpecific food commodities have been grouped into higher-level categories."
+    common_description = (
+        "Data represents the average daily per capita supply of calories from the full range of "
+        "commodities, grouped by food categories. Note that these figures do not correct for waste at the "
+        "household/consumption level so may not directly reflect the quantity of food finally consumed by a given "
+        "individual.\n\nSpecific food commodities have been grouped into higher-level categories."
+    )
     for group in FOOD_GROUPS:
         item_names = list(df_fbsc[df_fbsc["item_code"].isin(FOOD_GROUPS[group])]["item"].unique())
         description = (
@@ -596,7 +602,7 @@ def generate_macronutrient_compositions(df_fbsc: pd.DataFrame) -> Table:
     # Daily caloric intake from protein, per person.
     combined["Total energy from protein"] = combined["Total protein"] * KCAL_PER_GRAM_OF_PROTEIN
     # Daily caloric intake from carbohydrates (assumed to be the rest of the daily caloric intake), per person.
-    # This is calculated as the difference between the total caloric intake minus the caloric intake from protein and fat.
+    # This is the difference between the total caloric intake minus the caloric intake from protein and fat.
     combined["Total energy from carbohydrates"] = (
         combined["Total energy"] - combined["Total energy from fat"] - combined["Total energy from protein"]
     )
@@ -663,8 +669,19 @@ def generate_fertilizers(df_ef: pd.DataFrame, df_rl: pd.DataFrame) -> Table:
     assert set(fertilizers["item_code"]) == set(ITEM_CODES_FOR_FERTILIZERS), error
 
     # Transpose fertilizers data.
-    fertilizers = fertilizers.pivot(index=["country", "year"], columns=["item"], values=["value"]).reset_index()
-    fertilizers.columns = ["country", "year", "nitrogen_per_cropland", "phosphate_per_cropland", "potash_per_cropland"]
+    fertilizers = fertilizers.pivot(index=["country", "year"], columns=["item"], values=["value"])
+
+    # Fix spurious index names after pivoting, and rename columns conveniently.
+    fertilizers.columns = [column[1] for column in fertilizers.columns]
+
+    fertilizers = fertilizers.rename(
+        columns={
+            "Nutrient nitrogen N (total)": "nitrogen_per_cropland",
+            "Nutrient phosphate P2O5 (total)": "phosphate_per_cropland",
+            "Nutrient potash K2O (total)": "potash_per_cropland",
+        },
+        errors="raise",
+    )
 
     # Add column for total fertilizers per area cropland.
     fertilizers["all_fertilizers_per_cropland"] = fertilizers[
@@ -699,6 +716,157 @@ def generate_fertilizers(df_ef: pd.DataFrame, df_rl: pd.DataFrame) -> Table:
     )
 
     return tb_fertilizers
+
+
+def generate_vegetable_oil_yields(df_qcl: pd.DataFrame, df_fbsc: pd.DataFrame) -> Table:
+    # Element code for "Production" in faostat_qcl.
+    ELEMENT_CODE_FOR_PRODUCTION_QCL = "005510"
+    # Element code for "Production" in faostat_fbsc.
+    ELEMENT_CODE_FOR_PRODUCTION_FBSC = "005511"
+    # Unit for "Production".
+    UNIT_FOR_PRODUCTION = "tonnes"
+    # Element code for "Area harvested".
+    ELEMENT_CODE_FOR_AREA = "005312"
+    # Unit for "Area harvested".
+    UNIT_FOR_AREA = "hectares"
+    # Item code for "Vegetable Oils" (required to get the global production of vegetable oils on a given year).
+    ITEM_CODE_FOR_VEGETABLE_OILS_TOTAL = "00002914"
+    # Item codes in faostat_qcl for the area of the crops (we don't need the production of the crops).
+    ITEM_CODE_FOR_EACH_CROP_AREA = {
+        # The item "Palm fruit oil" refers to the fruit that contains both the pulp (that leads to palm oil)
+        # as well as the kernel (that leads to palm kernel oil).
+        "palm": "00000254",  # Palm fruit oil
+        "sunflower": "00000267",  # Sunflower seed
+        "rapeseed": "00000270",  # Rapeseed
+        "soybean": "00000236",  # Soybeans
+        "olive": "00000260",  # Olives
+        "coconut": "00000249",  # Coconuts
+        "groundnut": "00000242",  # Groundnuts
+        "cottonseed": "00000328",  # Seed cotton
+        "sesame": "00000289",  # Sesame seed
+        # Item "Maize" has the description "[...] This class includes: -  maize harvested for their dry grains only"
+        # So it's not clear whether it includes area used for maize oil, and therefore I won't consider it.
+        # "maize": "00000056",  # Maize
+        # Other vegetable oils not considered.
+        # "safflower": "00000280",  # Safflower seed
+        # "linseed": "00000333",  # Linseed
+    }
+    # Item codes in faostat_qcl for the production of the oils (there is no area harvested data for oils).
+    ITEM_CODE_FOR_EACH_CROP_PRODUCTION = {
+        # The item "Palm oil" doesn't have a description, but it probably refers to only the oil from the pulp of the
+        # palm fruit (therefore it does not include the kernel).
+        "palm": "00000257",  # Palm oil
+        # The item "Palm kernel oil" clearly refers to only the oil produced from the kernel of the palm fruit.
+        # Therefore, "Palm oil" and "Palm kernel oil" will need to be combined to account for all oils produced from
+        # the palm fruit (item "Palm fruit oil" for which we have the area harvested).
+        "palm_kernel": "00000258",  # Palm kernel oil
+        "sunflower": "00000268",  # Sunflower oil
+        "rapeseed": "00000271",  # Rapeseed oil
+        "soybean": "00000237",  # Soybean oil
+        "olive": "00000261",  # Olive oil
+        "coconut": "00000252",  # Coconut oil
+        "groundnut": "00000244",  # Groundnut oil
+        "cottonseed": "00000331",  # Cottonseed oil
+        "sesame": "00000290",  # Sesame oil
+        # Item "maize" is not included (see comment above).
+        # "maize": "00000060",  # Maize oil
+        # Other vegetable oils not considered.
+        # "safflower": "00000281",  # Safflower oil
+        # "linseed": "00000334",  # Linseed oil
+    }
+
+    # Extract the total production of vegetable oil. This is given in fbsc but not qcl.
+    total_production = df_fbsc[
+        (df_fbsc["country"] == "World")
+        & (df_fbsc["item_code"] == ITEM_CODE_FOR_VEGETABLE_OILS_TOTAL)
+        & (df_fbsc["element_code"] == ELEMENT_CODE_FOR_PRODUCTION_FBSC)
+        & (df_fbsc["unit"] == UNIT_FOR_PRODUCTION)
+    ].reset_index(drop=True)
+
+    # Transpose data.
+    total_production = total_production.pivot(
+        index=["country", "year"], columns=["item_code"], values=["value"]
+    ).rename(columns={ITEM_CODE_FOR_VEGETABLE_OILS_TOTAL: "vegetable_oils_production"})
+
+    # Fix column names after pivoting.
+    total_production.columns = [column[1] for column in total_production.columns]
+    total_production = total_production.reset_index().drop(columns=["country"])
+
+    # Select relevant items, elements and units for the production of crops.
+    production = df_qcl[
+        (df_qcl["item_code"].isin(ITEM_CODE_FOR_EACH_CROP_PRODUCTION.values()))
+        & (df_qcl["unit"] == UNIT_FOR_PRODUCTION)
+        & (df_qcl["element_code"] == ELEMENT_CODE_FOR_PRODUCTION_QCL)
+    ].reset_index(drop=True)
+
+    # Transpose data.
+    production = production.pivot(index=["country", "year"], columns=["item_code"], values=["value"])
+
+    # Fix column names after pivoting.
+    production.columns = np.array(production.columns.tolist())[:, 1]
+
+    # Assign a convenient name to each crop.
+    CROP_NAME_FOR_ITEM_CODE = {
+        ITEM_CODE_FOR_EACH_CROP_PRODUCTION[item_code]: item_code for item_code in ITEM_CODE_FOR_EACH_CROP_PRODUCTION
+    }
+    production = production.rename(
+        columns={item_code: CROP_NAME_FOR_ITEM_CODE[item_code] + "_production" for item_code in production.columns}
+    ).reset_index()
+
+    # Select relevant items, elements and units for the area of crops.
+    area = df_qcl[
+        (df_qcl["item_code"].isin(ITEM_CODE_FOR_EACH_CROP_AREA.values()))
+        & (df_qcl["unit"] == UNIT_FOR_AREA)
+        & (df_qcl["element_code"] == ELEMENT_CODE_FOR_AREA)
+    ].reset_index(drop=True)
+
+    # Transpose data.
+    area = area.pivot(index=["country", "year"], columns=["item_code"], values=["value"])
+
+    # Fix column names after pivoting.
+    area.columns = np.array(area.columns.tolist())[:, 1]
+
+    # Assign a convenient name to each crop.
+    CROP_NAME_FOR_ITEM_CODE = {
+        ITEM_CODE_FOR_EACH_CROP_AREA[item_code]: item_code for item_code in ITEM_CODE_FOR_EACH_CROP_AREA
+    }
+    area = area.rename(
+        columns={item_code: CROP_NAME_FOR_ITEM_CODE[item_code] + "_area" for item_code in area.columns}
+    ).reset_index()
+
+    # Combine production and area.
+    combined = pd.merge(production, area, on=["country", "year"], how="outer")
+
+    # Add column for global vegetable oil production.
+    combined = pd.merge(combined, total_production, on=["year"], how="left")
+
+    # Combine the production of palm oil and palm kernel oil, since we have the area harvested for the palm fruit
+    # (which leads to the production of both palm oil and palm kernel oil).
+    combined["palm_production"] += combined["palm_kernel_production"]
+    combined = combined.drop(columns=["palm_kernel_production"])
+
+    # For each crop, create three relevant metrics.
+    for crop in ITEM_CODE_FOR_EACH_CROP_AREA:
+        # Vegetable oil yield, which is the amount of oil produced per area harvested of the original crop.
+        combined[f"{crop}_tonnes_per_hectare"] = combined[f"{crop}_production"] / combined[f"{crop}_area"]
+        # Hectares of the original crop harvested per tonne of oil produced (inverse of the previous).
+        combined[f"{crop}_hectares_per_tonne"] = combined[f"{crop}_area"] / combined[f"{crop}_production"]
+        # Area required to produce the total demand of vegetable oils using only one specific crop.
+        combined[f"{crop}_area_to_meet_global_oil_demand"] = (
+            combined[f"{crop}_hectares_per_tonne"] * combined["vegetable_oils_production"]
+        )
+
+    # Replace infinite values (obtained when dividing by a null area) by nans.
+    combined = combined.replace(np.inf, np.nan)
+
+    # Create a table, set an appropriate index, and sort conveniently.
+    tb_vegetable_oil_yields = Table(
+        combined.set_index(["country", "year"], verify_integrity=True).sort_index(),
+        short_name="vegetable_oil_yields",
+        underscore=True,
+    )
+
+    return tb_vegetable_oil_yields
 
 
 def run(dest_dir: str) -> None:
@@ -759,6 +927,9 @@ def run(dest_dir: str) -> None:
     # Create table for fertilizers data.
     tb_fertilizers = generate_fertilizers(df_ef=df_ef, df_rl=df_rl)
 
+    # Create table for vegetable oil yields.
+    tb_vegetable_oil_yields = generate_vegetable_oil_yields(df_qcl=df_qcl, df_fbsc=df_fbsc)
+
     #
     # Save outputs.
     #
@@ -773,6 +944,7 @@ def run(dest_dir: str) -> None:
             tb_food_available_for_consumption,
             tb_macronutrient_compositions,
             tb_fertilizers,
+            tb_vegetable_oil_yields,
         ],
     )
     ds_garden.save()
