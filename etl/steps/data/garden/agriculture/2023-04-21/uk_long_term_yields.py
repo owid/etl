@@ -49,7 +49,7 @@ def run(dest_dir: str) -> None:
     # Create a convenient dataframe.
     df_broadberry = pd.DataFrame(tb_broadberry).reset_index()
 
-    # Load UK long-term yields data from Broadberry et al. (2015).
+    # Load UK long-term yields data from Brassley (2000).
     ds_brassley: Dataset = paths.load_dependency("brassley_2000")
 
     # Read main table from dataset.
