@@ -4099,14 +4099,14 @@ resolved_reference = "0bed883fbe5c0bd1a01d624d245da92deacaa75a"
 
 [[package]]
 name = "owid-repack"
-version = "0.1.1"
+version = "0.1.2"
 description = "Pack Pandas data frames into smaller, more memory-efficient data types."
 category = "main"
 optional = false
 python-versions = ">=3.8.1"
 files = [
-    {file = "owid_repack-0.1.1-py3-none-any.whl", hash = "sha256:837d8b1b029ec6d065c75c171598bfd363c8fdff2a01ccbe8b5c0fec91b831af"},
-    {file = "owid_repack-0.1.1.tar.gz", hash = "sha256:a062f2f775f92a50bc0d974c035846a3764778a3c6422642731dd7a005db646b"},
+    {file = "owid_repack-0.1.2-py3-none-any.whl", hash = "sha256:6c1a098aeb32b8fedee225990abf48141892a15ff1d492291483e4cca40d2860"},
+    {file = "owid_repack-0.1.2.tar.gz", hash = "sha256:e583e022b548e9e9e40d5dab6c3d8026c80a293bbd677df487908a00f1f01a7e"},
 ]
 
 [package.dependencies]
@@ -6973,4 +6973,4 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "b64b7d05e30cbf5aebf5d75c76c29059b5f318a48b1b991283f2e5759ffbab3f"
+content-hash = "e54f45a93768525ecbcb005c1619b48c63af04a3860391f102ffbafad1044b51"
