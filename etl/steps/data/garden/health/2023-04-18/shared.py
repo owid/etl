@@ -104,7 +104,7 @@ MAPPING_QUESTION_VALUES = {
         },
     },
     "mh4a": {
-        "title": "Important for national govt to fund research on cancer",
+        "title": "Important for national government to fund research on cancer",
         "answers": {
             "1": "Extremely important",
             "2": "Somewhat important",
@@ -114,7 +114,7 @@ MAPPING_QUESTION_VALUES = {
         },
     },
     "mh4b": {
-        "title": "Important for national govt to fund research on anxiety/depression",
+        "title": "Important for national government to fund research on anxiety/depression",
         "answers": {
             "1": "Extremely important",
             "2": "Somewhat important",
@@ -236,7 +236,7 @@ MAPPING_QUESTION_VALUES = {
         },
     },
     "mh9a": {
-        "title": "How helpful was talking to mental health professional when anxious/depressed",
+        "title": "How helpful was talking to mental health professional when anxious/depressed?",
         "answers": {
             "1": "Very helpful",
             "2": "Somewhat helpful",
@@ -245,7 +245,7 @@ MAPPING_QUESTION_VALUES = {
         },
     },
     "mh9b": {
-        "title": "How helpful was engaging in religious or spiritual activities when anxious/depressed",
+        "title": "How helpful was engaging in religious or spiritual activities when anxious/depressed?",
         "answers": {
             "1": "Very helpful",
             "2": "Somewhat helpful",
@@ -254,7 +254,7 @@ MAPPING_QUESTION_VALUES = {
         },
     },
     "mh9c": {
-        "title": "How helpful was talking to friends or family when anxious/depressed",
+        "title": "How helpful was talking to friends or family when anxious/depressed?",
         "answers": {
             "1": "Very helpful",
             "2": "Somewhat helpful",
@@ -263,7 +263,7 @@ MAPPING_QUESTION_VALUES = {
         },
     },
     "mh9d": {
-        "title": "How helpful was taking prescribed medication when anxious/depressed",
+        "title": "How helpful was taking prescribed medication when anxious/depressed?",
         "answers": {
             "1": "Very helpful",
             "2": "Somewhat helpful",
@@ -272,7 +272,7 @@ MAPPING_QUESTION_VALUES = {
         },
     },
     "mh9e": {
-        "title": "How helpful was improving healthy lifestyle behaviors when anxious/depressed",
+        "title": "How helpful was improving healthy lifestyle behaviors when anxious/depressed?",
         "answers": {
             "1": "Very helpful",
             "2": "Somewhat helpful",
@@ -281,7 +281,7 @@ MAPPING_QUESTION_VALUES = {
         },
     },
     "mh9f": {
-        "title": "How helpful was making a change to work situation when anxious/depressed",
+        "title": "How helpful was making a change to work situation when anxious/depressed?",
         "answers": {
             "1": "Very helpful",
             "2": "Somewhat helpful",
@@ -290,7 +290,7 @@ MAPPING_QUESTION_VALUES = {
         },
     },
     "mh9g": {
-        "title": "How helpful was making a change to personal relationships when anxious/depressed",
+        "title": "How helpful was making a change to personal relationships when anxious/depressed?",
         "answers": {
             "1": "Very helpful",
             "2": "Somewhat helpful",
@@ -299,7 +299,7 @@ MAPPING_QUESTION_VALUES = {
         },
     },
     "mh9h": {
-        "title": "How helpful was spending time in nature/the outdoors when anxious/depressed",
+        "title": "How helpful was spending time in nature/the outdoors when anxious/depressed?",
         "answers": {
             "1": "Very helpful",
             "2": "Somewhat helpful",
@@ -397,7 +397,7 @@ MAPPING_QUESTION_VALUES = {
         },
     },
     "w5f": {
-        "title": "Trust in people working for NGOs/charitable orgs in your country",
+        "title": "Trust in people working for NGOs/charitable organizations in your country",
         "answers": {
             "1": "A lot",
             "2": "Some",
@@ -447,7 +447,7 @@ MAPPING_QUESTION_VALUES = {
         },
     },
     "w7c": {
-        "title": "Trust leaders in the national government to value opinmions and expertise of scientists",
+        "title": "Trust leaders in the national government to value opinions and expertise of scientists",
         "answers": {
             "1": "A lot",
             "2": "Some",
@@ -457,7 +457,7 @@ MAPPING_QUESTION_VALUES = {
         },
     },
     "w8": {
-        "title": "Work from scientists in your country benefits most, some of very few people",
+        "title": "Work from scientists in your country benefits most, some, or very few people",
         "answers": {
             "1": "Most",
             "2": "Some",
@@ -532,7 +532,7 @@ MAPPING_QUESTION_VALUES = {
         },
     },
     "w15_1a": {
-        "title": "Based decisions about coronavirus on scientific advice: National government",
+        "title": "Based decisions about coronavirus on scientific advice from the National government",
         "answers": {
             "1": "A lot",
             "2": "Some",
@@ -542,7 +542,7 @@ MAPPING_QUESTION_VALUES = {
         },
     },
     "w15_1b": {
-        "title": "Based decisions about coronavirus on scientific advice: Friends and family",
+        "title": "Based decisions about coronavirus on scientific advice from friends and family",
         "answers": {
             "1": "A lot",
             "2": "Some",
@@ -552,7 +552,7 @@ MAPPING_QUESTION_VALUES = {
         },
     },
     "w15_1c": {
-        "title": "Based decisions about coronavirus on scientific advice: WHO",
+        "title": "Based decisions about coronavirus on scientific advice from the WHO",
         "answers": {
             "1": "A lot",
             "2": "Some",
@@ -562,7 +562,7 @@ MAPPING_QUESTION_VALUES = {
         },
     },
     "w15_1d": {
-        "title": "Based decisions about coronavirus on scientific advice: Doctors and nurses in your country",
+        "title": "Based decisions about coronavirus on scientific advice from doctors and nurses in your country",
         "answers": {
             "1": "A lot",
             "2": "Some",
@@ -572,7 +572,7 @@ MAPPING_QUESTION_VALUES = {
         },
     },
     "w15_1e": {
-        "title": "Based decisions about coronavirus on scientific advice: Religious leaders",
+        "title": "Based decisions about coronavirus on scientific advice from religious leaders",
         "answers": {
             "1": "A lot",
             "2": "Some",
@@ -592,7 +592,7 @@ MAPPING_QUESTION_VALUES = {
         },
     },
     "w15_2b": {
-        "title": "After the COVID crisis ends, your government should spend money on preventing and curing dieases ONLY if they pose a risk to poeple in your country",
+        "title": "After the COVID crisis ends, your government should spend money on preventing and curing diseases ONLY if they pose a risk to people in your country",
         "answers": {
             "1": "Strongly agree",
             "2": "Somewhat agree",
