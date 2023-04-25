@@ -262,3 +262,5 @@ tables:
         short_unit: t
         description: |
           Agricultural use from all fertilizer products (including nitrogenous, potash, and phosphate fertilizers).
+  # All metadata for vegetable_oil_yields is prepared via script.
+  # vegetable_oil_yields:

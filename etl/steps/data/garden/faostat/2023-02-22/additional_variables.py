@@ -247,7 +247,7 @@ def generate_spared_land_from_increased_yields(df_qcl: pd.DataFrame) -> Table:
     # Drop countries for which we did not have data in the reference year.
     spared_land = spared_land.dropna().reset_index(drop=True)
 
-    # Calculate area harvested that would be required given current production, but with the yield of the reference year.
+    # Calculate area harvested that would be required given current production, with the yield of the reference year.
     spared_land[f"Area with yield of {REFERENCE_YEAR}"] = (
         spared_land["Production"] / spared_land[f"Yield in {REFERENCE_YEAR}"]
     )
@@ -267,7 +267,7 @@ def generate_spared_land_from_increased_yields(df_qcl: pd.DataFrame) -> Table:
     )
     spared_land = pd.concat([spared_land, all_crops], ignore_index=True)
 
-    # Calculate the spared land in absolute value, and as a percentage of the land we would have used with no yield increase.
+    # Calculate the spared land in total value, and as a percentage of land we would have used with no yield increase.
     spared_land["Spared land"] = spared_land[f"Area with yield of {REFERENCE_YEAR}"] - spared_land["Area"]
     spared_land["Spared land (%)"] = (
         100 * spared_land["Spared land"] / spared_land[f"Area with yield of {REFERENCE_YEAR}"]
@@ -304,8 +304,8 @@ def generate_food_available_for_consumption(df_fbsc: pd.DataFrame) -> Table:
     # So all existing food items in FBSC are contained here, and there are no repetitions.
     # Notes:
     # * There are a few item groups that are not included here, namely "Vegetal Products" (item group code 2903),
-    #   and "Animal Products" (item group code 2941). But their items are contained in other item groups, so including them
-    #   would cause unnecessary repetition of items.
+    #   and "Animal Products" (item group code 2941). But their items are contained in other item groups, so including
+    #   them would cause unnecessary repetition of items.
     # * To check for the components of an individual item group:
     # from etl.paths import DATA_DIR
     # metadata = Dataset(DATA_DIR / "meadow/faostat/2023-02-22/faostat_metadata")
@@ -495,7 +495,12 @@ def generate_food_available_for_consumption(df_fbsc: pd.DataFrame) -> Table:
     )
 
     # Prepare variable metadata.
-    common_description = "Data represents the average daily per capita supply of calories from the full range of commodities, grouped by food categories. Note that these figures do not correct for waste at the household/consumption level so may not directly reflect the quantity of food finally consumed by a given individual.\n\nSpecific food commodities have been grouped into higher-level categories."
+    common_description = (
+        "Data represents the average daily per capita supply of calories from the full range of "
+        "commodities, grouped by food categories. Note that these figures do not correct for waste at the "
+        "household/consumption level so may not directly reflect the quantity of food finally consumed by a given "
+        "individual.\n\nSpecific food commodities have been grouped into higher-level categories."
+    )
     for group in FOOD_GROUPS:
         item_names = list(df_fbsc[df_fbsc["item_code"].isin(FOOD_GROUPS[group])]["item"].unique())
         description = (
@@ -597,7 +602,7 @@ def generate_macronutrient_compositions(df_fbsc: pd.DataFrame) -> Table:
     # Daily caloric intake from protein, per person.
     combined["Total energy from protein"] = combined["Total protein"] * KCAL_PER_GRAM_OF_PROTEIN
     # Daily caloric intake from carbohydrates (assumed to be the rest of the daily caloric intake), per person.
-    # This is calculated as the difference between the total caloric intake minus the caloric intake from protein and fat.
+    # This is the difference between the total caloric intake minus the caloric intake from protein and fat.
     combined["Total energy from carbohydrates"] = (
         combined["Total energy"] - combined["Total energy from fat"] - combined["Total energy from protein"]
     )
@@ -739,7 +744,7 @@ def generate_vegetable_oil_yields(df_qcl: pd.DataFrame, df_fbsc: pd.DataFrame) -
         "groundnut": "00000242",  # Groundnuts
         "cottonseed": "00000328",  # Seed cotton
         "sesame": "00000289",  # Sesame seed
-        # Item "Maize" has the description "Maize (corn) This class includes: -  maize harvested for their dry grains only"
+        # Item "Maize" has the description "[...] This class includes: -  maize harvested for their dry grains only"
         # So it's not clear whether it includes area used for maize oil, and therefore I won't consider it.
         # "maize": "00000056",  # Maize
         # Other vegetable oils not considered.
@@ -858,7 +863,64 @@ def generate_vegetable_oil_yields(df_qcl: pd.DataFrame, df_fbsc: pd.DataFrame) -
         underscore=True,
     )
 
-    # TODO: Add variable titles, units and descriptions.
+    # Add variable metadata.
+    for column in tb_vegetable_oil_yields.columns:
+        if column == "vegetable_oils_production":
+            tb_vegetable_oil_yields[column].metadata.title = "Global production of vegetable oils"
+            tb_vegetable_oil_yields[column].metadata.unit = "tonnes"
+            tb_vegetable_oil_yields[column].metadata.short_unit = "t"
+            tb_vegetable_oil_yields[column].metadata.description = "Amount of vegetable oils produced worldwide."
+        elif column.endswith("_production"):
+            crop = column.replace("_production", "")
+            tb_vegetable_oil_yields[column].metadata.title = f"Production of {crop} oil"
+            tb_vegetable_oil_yields[column].metadata.unit = "tonnes"
+            tb_vegetable_oil_yields[column].metadata.short_unit = "t"
+            tb_vegetable_oil_yields[column].metadata.description = f"Amount of {crop} oil produced."
+        elif column.endswith("_area"):
+            crop = column.replace("_area", "")
+            tb_vegetable_oil_yields[column].metadata.title = f"Area harvested for {crop} crops".replace(
+                "palm crops", "palm fruit crops"
+            )
+            tb_vegetable_oil_yields[column].metadata.unit = "hectares"
+            tb_vegetable_oil_yields[column].metadata.short_unit = "ha"
+            tb_vegetable_oil_yields[column].metadata.description = f"Land area used to harvest {crop} crops.".replace(
+                "palm crops", "palm fruit crops"
+            )
+        elif column.endswith("_tonnes_per_hectare"):
+            crop = column.replace("_tonnes_per_hectare", "")
+            tb_vegetable_oil_yields[column].metadata.title = f"{crop.capitalize()} oil yield per crop"
+            tb_vegetable_oil_yields[column].metadata.unit = "tonnes per hectare"
+            tb_vegetable_oil_yields[column].metadata.short_unit = "tonnes/ha"
+            tb_vegetable_oil_yields[column].metadata.description = (
+                f"Average amount of {crop} oil produced per hectare of {crop} crops harvested. "
+                "Note that this calculates the oil yield per hectare, which is different from the yield of the total "
+                "crop, because not all of the crop can be used for oil.".replace("palm crops", "palm fruit crops")
+            )
+        elif column.endswith("_hectares_per_tonne"):
+            crop = column.replace("_hectares_per_tonne", "")
+            tb_vegetable_oil_yields[
+                column
+            ].metadata.title = f"Area of {crop} crops harvested to produce a tonne of {crop} oil".replace(
+                "palm crops", "palm fruit crops"
+            )
+            tb_vegetable_oil_yields[column].metadata.unit = "tonnes per hectare"
+            tb_vegetable_oil_yields[column].metadata.short_unit = "tonnes/ha"
+            tb_vegetable_oil_yields[column].metadata.description = (
+                f"Area of {crop} crops harvested to produce a tonne of {crop} oil. This metric "
+                "is the inverse of oil yields, and represents the amount of land that would need to be devoted to "
+                "grow a given crop to produce one tonne of oil.".replace("palm crops", "palm fruit crops")
+            )
+        elif column.endswith("_area_to_meet_global_oil_demand"):
+            crop = column.replace("_area_to_meet_global_oil_demand", "")
+            tb_vegetable_oil_yields[
+                column
+            ].metadata.title = f"Area needed to meet the global vegetable oil demand with only {crop} oil"
+            tb_vegetable_oil_yields[column].metadata.unit = "hectares"
+            tb_vegetable_oil_yields[column].metadata.short_unit = "ha"
+            tb_vegetable_oil_yields[column].metadata.description = (
+                f"Amount of land that would need to be devoted to grow {crop} crops if it was to "
+                "meet global vegetable oil demand alone.".replace("palm crops", "palm fruit crops")
+            )
 
     return tb_vegetable_oil_yields
 
