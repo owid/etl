@@ -308,7 +308,7 @@ MAPPING_QUESTION_VALUES = {
         },
     },
     "w1": {
-        "title": "How much do you know about science",
+        "title": "How much do you know about science?",
         "answers": {
             "1": "A lot",
             "2": "Some",
@@ -437,7 +437,7 @@ MAPPING_QUESTION_VALUES = {
         },
     },
     "w7b": {
-        "title": "Trust scientist to do their work with the intention of benefiting the public",
+        "title": "Trust scientists to do their work with the intention of benefiting the public",
         "answers": {
             "1": "A lot",
             "2": "Some",
@@ -466,7 +466,7 @@ MAPPING_QUESTION_VALUES = {
         },
     },
     "w9": {
-        "title": "Work from scientists in your country has benefited you",
+        "title": "Work from scientists in your country has benefited people like you",
         "answers": {
             "1": "A lot",
             "2": "A little",

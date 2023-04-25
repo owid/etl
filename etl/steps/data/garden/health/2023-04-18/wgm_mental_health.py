@@ -164,15 +164,15 @@ def _build_df_with_incomes(df: pd.DataFrame) -> pd.DataFrame:
 
 def _make_df_with_share_answers(df: pd.DataFrame, weight_column: str = "weight_intra_country") -> pd.DataFrame:
     # 1. broken down by gender and age group
-    df_gender_age = make_individual_df_with_share_answers(
+    df_gender_age = _make_individual_df_with_share_answers(
         df, dimensions=["gender", "age_group"], weight_column=weight_column
     )
     # 2. broken down by gender
-    df_gender = make_individual_df_with_share_answers(df, dimensions=["gender"], weight_column=weight_column)
+    df_gender = _make_individual_df_with_share_answers(df, dimensions=["gender"], weight_column=weight_column)
     # 3. broken down by age_group
-    df_age = make_individual_df_with_share_answers(df, dimensions=["age_group"], weight_column=weight_column)
+    df_age = _make_individual_df_with_share_answers(df, dimensions=["age_group"], weight_column=weight_column)
     # 4. no breakdown
-    df_nb = make_individual_df_with_share_answers(df, weight_column=weight_column)
+    df_nb = _make_individual_df_with_share_answers(df, weight_column=weight_column)
     # Combine dataframes
     log.info("wgm_mental_health: combining dataframes into combined one")
     df_combined = pd.concat([df_nb, df_gender, df_age, df_gender_age], ignore_index=True)
@@ -184,7 +184,7 @@ def _make_df_with_share_answers(df: pd.DataFrame, weight_column: str = "weight_i
     return df_combined
 
 
-def make_individual_df_with_share_answers(
+def _make_individual_df_with_share_answers(
     df: pd.DataFrame, weight_column: str, dimensions: List[str] = []
 ) -> pd.DataFrame:
     """Obtain table with answer percentages and counts to each question for all demographic groups and countries.
