@@ -26,9 +26,7 @@ def run(dest_dir: str) -> None:
     # Load data from snapshot.
     df = pd.read_csv(snap.path, compression="zip")
     # Set dtype for all questions to str
-    columns = [col for col in df.columns if col not in ["WGT", "PROJWT"]]
-    df[columns] = df[columns].astype(str)
-
+    df = df.astype({column: str for column in df.columns if column not in ["WGT", "PROJWT"]})
     #
     # Process data.
     #
