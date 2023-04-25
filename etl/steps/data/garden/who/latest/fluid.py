@@ -98,9 +98,9 @@ def subset_and_clean_data(df: pd.DataFrame) -> pd.DataFrame:
             "fluseason",
             "itz",
             "country_code",
+            "iso_week",
             "iso_weekstartdate",
             "iso_year",
-            "iso_week",
             "mmwr_weekstartdate",
             "mmwr_year",
             "mmwr_week",
@@ -269,7 +269,7 @@ def remove_values_with_only_extremes(group: pd.Series, min: int, max: int) -> pd
 def remove_sparse_years(df: pd.DataFrame, min_datapoints_per_year: int) -> pd.DataFrame:
     """
     If a year has fewer than {min_data_points_per_year} then we should remove all the data for that year -> set it to NA
-    Unless it is the current year, then we do not change it.
+    For the current year then if all the values are 0 or NA then we remove all values for the year so far
     """
 
     df["year"] = pd.to_datetime(df["date"]).dt.year
@@ -284,10 +284,22 @@ def remove_sparse_years(df: pd.DataFrame, min_datapoints_per_year: int) -> pd.Da
         )
         df = pd.merge(df, df_col_bool, on=["country", "year"])
 
-        df.loc[
-            (df["weeks_gt_zero"] < min_datapoints_per_year) & (df["year"] < current_year),
+        df_current = df[df["year"] == current_year]
+        # Dropping rows if all the weeks data from this year are 0 or NA
+        df_current.loc[
+            (df_current["weeks_gt_zero"] == 0),
             col,
         ] = np.nan
+
+        df_hist = df[df["year"] < current_year]
+
+        df_hist.loc[
+            (df_hist["weeks_gt_zero"] < min_datapoints_per_year),
+            col,
+        ] = np.nan
+
+        df = pd.concat([df_current, df_hist])
+        df[col] = pd.to_numeric(df[col])
         df = df.drop(columns=["weeks_gt_zero"])
 
     return df
