@@ -925,6 +925,10 @@ def generate_vegetable_oil_yields(df_qcl: pd.DataFrame, df_fbsc: pd.DataFrame) -
                 "meet global vegetable oil demand alone.".replace("palm crops", "palm fruit crops")
             )
 
+        # Add a note to columns related to palm oil.
+        if "palm" in column:
+            tb_vegetable_oil_yields[column].metadata.description += " Palm oil includes palm kernel oil."
+
     return tb_vegetable_oil_yields
 
 
