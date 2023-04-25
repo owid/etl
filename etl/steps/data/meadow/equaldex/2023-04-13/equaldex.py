@@ -37,6 +37,8 @@ def run(dest_dir: str) -> None:
     df = df.set_index(["country", "year", "issue"], verify_integrity=False).sort_index()
 
     # Drop duplicates in the index
+    # Equaldex collaborators are cleaning this duplicates, that sometimes provide different values for the same year
+    # We are keeping the first value for each year
     df = df[~df.index.duplicated(keep="first")]
 
     # Create a new table and ensure all columns are snake-case.

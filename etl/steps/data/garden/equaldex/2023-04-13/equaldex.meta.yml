@@ -19,123 +19,90 @@ dataset:
 tables:
   equaldex:
     variables:
-      id_changing_gender:
-        title: id_changing_gender
-        unit: arbitrary units
-        short_unit: au
-        description: Full description of testing variable.
+      homosexuality:
+        title: Homosexual activity - Legislation status
+        unit: ""
+        short_unit: ""
+        description: |
+          Describes the legislation status of homosexual activity in each country and year.
+
+          Nine different status are possible:
+            1. Legal
+            2. Male illegal, female legal
+            3. Male illegal, female uncertain
+            4. Illegal (other penalty)
+            5. Ambiguous"
+            6. Varies by Region
+            7. Illegal (imprisonment as punishment)
+            8. Illegal (up to life in prison as punishment)
+            9. Illegal (death penalty as punishment)
         sources:
           - *source-equaldex
         display:
-          entityAnnotationsMap: Test annotation
-          numDecimalPlaces: 0
-      id_homosexuality:
-        title: id_homosexuality
-        unit: arbitrary units
-        short_unit: au
-        description: Full description of testing variable.
+          name: Homosexual activity
+      changing_gender:
+        title: Right to change legal gender - Legislation status
+        unit: ""
+        short_unit: ""
+        description: |
+          Describes the legislation status of the right to change legal gender in each country and year.
+
+          Five different status are possible:
+            1. Legal, surgery not required
+            2. Legal, but requires surgery
+            3. Ambiguous
+            4. Varies by Region
+            5. Illegal
         sources:
           - *source-equaldex
         display:
-          entityAnnotationsMap: Test annotation
-          numDecimalPlaces: 0
-      id_marriage:
-        title: id_marriage
-        unit: arbitrary units
-        short_unit: au
-        description: Full description of testing variable.
+          name: Right to change legal gender
+      marriage:
+        title: Same-sex marriage - Legislation status
+        unit: ""
+        short_unit: ""
+        description: |
+          Describes the legislation status of same-sex marriage in each country and year.
+
+          Ten different status are possible:
+            1. Legal
+            2. Civil unions
+            3. Other type of partnership
+            4. Foreign same-sex marriages recognized only
+            5. Unregistered cohabitation
+            6. Ambiguous
+            7. Varies by Region
+            8. Unrecognized
+            9. Unrecognized, same-sex marriage and civil unions banned
+            10. Not legal
         sources:
           - *source-equaldex
         display:
-          entityAnnotationsMap: Test annotation
-          numDecimalPlaces: 0
-      value_changing_gender:
-        title: value_changing_gender
-        unit: arbitrary units
-        short_unit: au
-        description: Full description of testing variable.
-        sources:
-          - *source-equaldex
-        display:
-          entityAnnotationsMap: Test annotation
-          numDecimalPlaces: 0
-      value_homosexuality:
-        title: value_homosexuality
-        unit: arbitrary units
-        short_unit: au
-        description: Full description of testing variable.
-        sources:
-          - *source-equaldex
-        display:
-          entityAnnotationsMap: Test annotation
-          numDecimalPlaces: 0
-      value_marriage:
-        title: value_marriage
-        unit: arbitrary units
-        short_unit: au
-        description: Full description of testing variable.
-        sources:
-          - *source-equaldex
-        display:
-          entityAnnotationsMap: Test annotation
-          numDecimalPlaces: 0
-      value_formatted_changing_gender:
-        title: value_formatted_changing_gender
-        unit: arbitrary units
-        short_unit: au
-        description: Full description of testing variable.
-        sources:
-          - *source-equaldex
-        display:
-          entityAnnotationsMap: Test annotation
-          numDecimalPlaces: 0
-      value_formatted_homosexuality:
-        title: value_formatted_homosexuality
-        unit: arbitrary units
-        short_unit: au
-        description: Full description of testing variable.
-        sources:
-          - *source-equaldex
-        display:
-          entityAnnotationsMap: Test annotation
-          numDecimalPlaces: 0
-      value_formatted_marriage:
-        title: value_formatted_marriage
-        unit: arbitrary units
-        short_unit: au
-        description: Full description of testing variable.
-        sources:
-          - *source-equaldex
-        display:
-          entityAnnotationsMap: Test annotation
-          numDecimalPlaces: 0
-      description_changing_gender:
-        title: description_changing_gender
-        unit: arbitrary units
-        short_unit: au
-        description: Full description of testing variable.
-        sources:
-          - *source-equaldex
-        display:
-          entityAnnotationsMap: Test annotation
-          numDecimalPlaces: 0
+          name: Same-sex marriage
       description_homosexuality:
-        title: description_homosexuality
-        unit: arbitrary units
-        short_unit: au
-        description: Full description of testing variable.
+        title: Homosexual activity - National context
+        unit: ""
+        short_unit: ""
+        description: Describes more details about the legislation status of homosexual activity in each country and year.
         sources:
           - *source-equaldex
         display:
-          entityAnnotationsMap: Test annotation
-          numDecimalPlaces: 0
+          name: Homosexual activity
+      description_changing_gender:
+        title: Right to change legal gender - National context
+        unit: ""
+        short_unit: ""
+        description: Describes more details about the legislation status of the right to change legal gender in each country and year.
+        sources:
+          - *source-equaldex
+        display:
+          name: Right to change legal gender
       description_marriage:
-        title: description_marriage
-        unit: arbitrary units
-        short_unit: au
-        description: Full description of testing variable.
+        title: Same-sex marriage - National context
+        unit: ""
+        short_unit: ""
+        description: Describes more details about the legislation status of same-sex marriage in each country and year.
         sources:
           - *source-equaldex
         display:
-          entityAnnotationsMap: Test annotation
-          numDecimalPlaces: 0
+          name: Same-sex marriage
