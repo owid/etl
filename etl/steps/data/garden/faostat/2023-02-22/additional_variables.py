@@ -866,69 +866,6 @@ def generate_vegetable_oil_yields(df_qcl: pd.DataFrame, df_fbsc: pd.DataFrame) -
         underscore=True,
     )
 
-    # Add variable metadata.
-    for column in tb_vegetable_oil_yields.columns:
-        if column == "vegetable_oils_production":
-            tb_vegetable_oil_yields[column].metadata.title = "Global production of vegetable oils"
-            tb_vegetable_oil_yields[column].metadata.unit = "tonnes"
-            tb_vegetable_oil_yields[column].metadata.short_unit = "t"
-            tb_vegetable_oil_yields[column].metadata.description = "Amount of vegetable oils produced worldwide."
-        elif column.endswith("_production"):
-            crop = column.replace("_production", "")
-            tb_vegetable_oil_yields[column].metadata.title = f"Production of {crop} oil"
-            tb_vegetable_oil_yields[column].metadata.unit = "tonnes"
-            tb_vegetable_oil_yields[column].metadata.short_unit = "t"
-            tb_vegetable_oil_yields[column].metadata.description = f"Amount of {crop} oil produced."
-        elif column.endswith("_area"):
-            crop = column.replace("_area", "")
-            tb_vegetable_oil_yields[column].metadata.title = f"Area harvested for {crop} crops".replace(
-                "palm crops", "palm fruit crops"
-            )
-            tb_vegetable_oil_yields[column].metadata.unit = "hectares"
-            tb_vegetable_oil_yields[column].metadata.short_unit = "ha"
-            tb_vegetable_oil_yields[column].metadata.description = f"Land area used to harvest {crop} crops.".replace(
-                "palm crops", "palm fruit crops"
-            )
-        elif column.endswith("_tonnes_per_hectare"):
-            crop = column.replace("_tonnes_per_hectare", "")
-            tb_vegetable_oil_yields[column].metadata.title = f"{crop.capitalize()} oil yield per crop"
-            tb_vegetable_oil_yields[column].metadata.unit = "tonnes per hectare"
-            tb_vegetable_oil_yields[column].metadata.short_unit = "tonnes/ha"
-            tb_vegetable_oil_yields[column].metadata.description = (
-                f"Average amount of {crop} oil produced per hectare of {crop} crops harvested. "
-                "Note that this calculates the oil yield per hectare, which is different from the yield of the total "
-                "crop, because not all of the crop can be used for oil.".replace("palm crops", "palm fruit crops")
-            )
-        elif column.endswith("_hectares_per_tonne"):
-            crop = column.replace("_hectares_per_tonne", "")
-            tb_vegetable_oil_yields[
-                column
-            ].metadata.title = f"Area of {crop} crops harvested to produce a tonne of {crop} oil".replace(
-                "palm crops", "palm fruit crops"
-            )
-            tb_vegetable_oil_yields[column].metadata.unit = "hectares per tonne"
-            tb_vegetable_oil_yields[column].metadata.short_unit = "hectares/tonne"
-            tb_vegetable_oil_yields[column].metadata.description = (
-                f"Area of {crop} crops harvested to produce a tonne of {crop} oil. This metric "
-                "is the inverse of oil yields, and represents the amount of land that would need to be devoted to "
-                "grow a given crop to produce one tonne of oil.".replace("palm crops", "palm fruit crops")
-            )
-        elif column.endswith("_area_to_meet_global_oil_demand"):
-            crop = column.replace("_area_to_meet_global_oil_demand", "")
-            tb_vegetable_oil_yields[
-                column
-            ].metadata.title = f"Area needed to meet the global vegetable oil demand with only {crop} oil"
-            tb_vegetable_oil_yields[column].metadata.unit = "hectares"
-            tb_vegetable_oil_yields[column].metadata.short_unit = "ha"
-            tb_vegetable_oil_yields[column].metadata.description = (
-                f"Amount of land that would need to be devoted to grow {crop} crops if it was to "
-                "meet global vegetable oil demand alone.".replace("palm crops", "palm fruit crops")
-            )
-
-        # Add a note to columns related to palm oil.
-        if "palm" in column:
-            tb_vegetable_oil_yields[column].metadata.description += " Palm oil includes palm kernel oil."
-
     return tb_vegetable_oil_yields
 
 
