@@ -4,17 +4,16 @@ from typing import List
 
 import pandas as pd
 from owid.catalog import Dataset, Table
-from structlog import get_logger
-
-from etl.data_helpers import geo
-from etl.helpers import PathFinder, create_dataset
-
-from .shared import (
+from shared import (
     MAPPING_AGE_VALUES,
     MAPPING_COLUMN_NAMES,
     MAPPING_GENDER_VALUES,
     MAPPING_QUESTION_VALUES,
 )
+from structlog import get_logger
+
+from etl.data_helpers import geo
+from etl.helpers import PathFinder, create_dataset
 
 log = get_logger()
 
@@ -43,8 +42,18 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    # Create a new table with the processed data.
-    tb_garden = make_table(df)
+    # Keep relevant columns, unpivot dataframe, harmonize country names.
+    df = clean_df(df)
+    # Build dataframe with shares of answers to each questions.
+    df = make_df_with_share_answers(df)
+    # Map IDs to labels (question, age and gender groups, answers)
+    df = map_ids_to_labels(df)
+    # Filter out questions with low participation
+    df = filter_rows_with_low_participation(df)
+    # Format dataframe with appropriate columns, indexes
+    df = final_formatting(df)
+    # Create a new table based on the dataframe `df`
+    tb_garden = Table(df, short_name=paths.short_name, underscore=True)
 
     #
     # Save outputs.
@@ -53,22 +62,13 @@ def run(dest_dir: str) -> None:
     ds_garden = create_dataset(dest_dir, tables=[tb_garden], default_metadata=ds_meadow.metadata)
     ds_garden.update_metadata(paths.metadata_path)
     # Add explanation to dataset description
-    ds_garden.metadata.description += "\n\nNote: Data for answers that where the demographic group had less than 100 participants are filtered out."
+    ds_garden.metadata.description += (
+        "\n\nNote: Data for answers that where the demographic group had less than 100 participants are filtered out."
+    )
     # Save changes in the new garden dataset.
     ds_garden.save()
 
     log.info("wgm_mental_health: end")
-
-
-def make_table(df: pd.DataFrame) -> Table:
-    """Create a new table from a dataframe."""
-    df = clean_df(df)
-    df = make_df_with_share_answers(df)
-    df = map_ids_to_labels(df)
-    df = filter_rows_with_low_participation(df)
-    df = final_formatting(df)
-    tb = Table(df, short_name=paths.short_name, underscore=True)
-    return tb
 
 
 def clean_df(df: pd.DataFrame) -> pd.DataFrame:

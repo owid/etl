@@ -11,7 +11,7 @@ meta:
   source_data_url: https://cms.wellcome.org/sites/default/files/2021-11/wgm_full_wave2_public_file.zip
   file_extension: zip
   license_url:
-  license_name:
+  license_name: Copyright Wellcome
   date_accessed: 2023-04-18
   is_public: true
   description: |
