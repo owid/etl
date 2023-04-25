@@ -15,18 +15,17 @@ paths = PathFinder(__file__)
 
 
 def run(dest_dir: str) -> None:
-    log.info("wgm_mental_health.start")
+    log.info("broadberry_et_al_2015.start")
 
     #
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap: Snapshot = paths.load_dependency("wgm_mental_health.zip")
+    snap: Snapshot = paths.load_dependency("broadberry_et_al_2015.csv")
 
     # Load data from snapshot.
-    df = pd.read_csv(snap.path, compression="zip")
-    # Set dtype for all questions to str
-    df = df.astype({column: str for column in df.columns if column not in ["WGT", "PROJWT"]})
+    df = pd.read_csv(snap.path)
+
     #
     # Process data.
     #
@@ -42,4 +41,4 @@ def run(dest_dir: str) -> None:
     # Save changes in the new garden dataset.
     ds_meadow.save()
 
-    log.info("wgm_mental_health.end")
+    log.info("broadberry_et_al_2015.end")

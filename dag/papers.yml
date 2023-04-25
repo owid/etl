@@ -22,3 +22,17 @@ steps:
     - snapshot://papers/2023-04-20/bayliss_smith_wanmali_1984.csv
   data://garden/papers/2023-04-20/bayliss_smith_wanmali_1984:
     - data://meadow/papers/2023-04-20/bayliss_smith_wanmali_1984
+  #
+  # Broadberry et al. (2015). Data on long-term yields in United Kingdom.
+  #
+  data://meadow/papers/2023-04-21/broadberry_et_al_2015:
+    - snapshot://papers/2023-04-21/broadberry_et_al_2015.csv
+  data://garden/papers/2023-04-21/broadberry_et_al_2015:
+    - data://meadow/papers/2023-04-21/broadberry_et_al_2015
+  #
+  # Brassley et al. (2000). Data on long-term yields in United Kingdom.
+  #
+  data://meadow/papers/2023-04-21/brassley_2000:
+    - snapshot://papers/2023-04-21/brassley_2000.csv
+  data://garden/papers/2023-04-21/brassley_2000:
+    - data://meadow/papers/2023-04-21/brassley_2000

@@ -262,3 +262,281 @@ tables:
         short_unit: t
         description: |
           Agricultural use from all fertilizer products (including nitrogenous, potash, and phosphate fertilizers).
+  vegetable_oil_yields:
+    variables:
+      sunflower_production:
+        title: Production of sunflower oil
+        unit: tonnes
+        short_unit: t
+        description: |
+          Amount of sunflower oil produced.
+      soybean_production:
+        title: Production of soybean oil
+        unit: tonnes
+        short_unit: t
+        description: |
+          Amount of soybean oil produced.
+      groundnut_production:
+        title: Production of groundnut oil
+        unit: tonnes
+        short_unit: t
+        description: |
+          Amount of groundnut oil produced.
+      coconut_production:
+        title: Production of coconut oil
+        unit: tonnes
+        short_unit: t
+        description: |
+          Amount of coconut oil produced.
+      olive_production:
+        title: Production of olive oil
+        unit: tonnes
+        short_unit: t
+        description: |
+          Amount of olive oil produced.
+      cottonseed_production:
+        title: Production of cottonseed oil
+        unit: tonnes
+        short_unit: t
+        description: |
+          Amount of cottonseed oil produced.
+      sesame_production:
+        title: Production of sesame oil
+        unit: tonnes
+        short_unit: t
+        description: |
+          Amount of sesame oil produced.
+      rapeseed_production:
+        title: Production of rapeseed oil
+        unit: tonnes
+        short_unit: t
+        description: |
+          Amount of rapeseed oil produced.
+      palm_production:
+        title: Production of palm oil
+        unit: tonnes
+        short_unit: t
+        description: |
+          Amount of palm oil produced. Palm oil includes palm kernel oil.
+      sunflower_area:
+        title: Area harvested for sunflower crops
+        unit: hectares
+        short_unit: ha
+        description: |
+          Land area used to harvest sunflower crops.
+      cottonseed_area:
+        title: Area harvested for cottonseed crops
+        unit: hectares
+        short_unit: ha
+        description: |
+          Land area used to harvest cottonseed crops.
+      soybean_area:
+        title: Area harvested for soybean crops
+        unit: hectares
+        short_unit: ha
+        description: |
+          Land area used to harvest soybean crops.
+      groundnut_area:
+        title: Area harvested for groundnut crops
+        unit: hectares
+        short_unit: ha
+        description: |
+          Land area used to harvest groundnut crops.
+      olive_area:
+        title: Area harvested for olive crops
+        unit: hectares
+        short_unit: ha
+        description: |
+          Land area used to harvest olive crops.
+      rapeseed_area:
+        title: Area harvested for rapeseed crops
+        unit: hectares
+        short_unit: ha
+        description: |
+          Land area used to harvest rapeseed crops.
+      coconut_area:
+        title: Area harvested for coconut crops
+        unit: hectares
+        short_unit: ha
+        description: |
+          Land area used to harvest coconut crops.
+      sesame_area:
+        title: Area harvested for sesame crops
+        unit: hectares
+        short_unit: ha
+        description: |
+          Land area used to harvest sesame crops.
+      palm_area:
+        title: Area harvested for palm fruit crops
+        unit: hectares
+        short_unit: ha
+        description: |
+          Land area used to harvest palm fruit crops. Palm oil includes palm kernel oil.
+      vegetable_oils_production:
+        title: Global production of vegetable oils
+        unit: tonnes
+        short_unit: t
+        description: |
+          Amount of vegetable oils produced worldwide.
+      palm_tonnes_per_hectare:
+        title: Palm oil yield per crop
+        unit: tonnes per hectare
+        short_unit: tonnes/ha
+        description: |
+          Average amount of palm oil produced per hectare of palm fruit crops harvested. Note that this calculates the oil yield per hectare, which is different from the yield of the total crop, because not all of the crop can be used for oil. Palm oil includes palm kernel oil.
+      palm_hectares_per_tonne:
+        title: Area of palm fruit crops harvested to produce a tonne of palm oil
+        unit: hectares per tonne
+        short_unit: hectares/tonne
+        description: |
+          Area of palm fruit crops harvested to produce a tonne of palm oil. This metric is the inverse of oil yields, and represents the amount of land that would need to be devoted to grow a given crop to produce one tonne of oil. Palm oil includes palm kernel oil.
+      palm_area_to_meet_global_oil_demand:
+        title: Area needed to meet the global vegetable oil demand with only palm oil
+        unit: hectares
+        short_unit: ha
+        description: |
+          Amount of land that would need to be devoted to grow palm fruit crops if it was to meet global vegetable oil demand alone. Palm oil includes palm kernel oil.
+      sunflower_tonnes_per_hectare:
+        title: Sunflower oil yield per crop
+        unit: tonnes per hectare
+        short_unit: tonnes/ha
+        description: |
+          Average amount of sunflower oil produced per hectare of sunflower crops harvested. Note that this calculates the oil yield per hectare, which is different from the yield of the total crop, because not all of the crop can be used for oil.
+      sunflower_hectares_per_tonne:
+        title: Area of sunflower crops harvested to produce a tonne of sunflower oil
+        unit: hectares per tonne
+        short_unit: hectares/tonne
+        description: |
+          Area of sunflower crops harvested to produce a tonne of sunflower oil. This metric is the inverse of oil yields, and represents the amount of land that would need to be devoted to grow a given crop to produce one tonne of oil.
+      sunflower_area_to_meet_global_oil_demand:
+        title: Area needed to meet the global vegetable oil demand with only sunflower oil
+        unit: hectares
+        short_unit: ha
+        description: |
+          Amount of land that would need to be devoted to grow sunflower crops if it was to meet global vegetable oil demand alone.
+      rapeseed_tonnes_per_hectare:
+        title: Rapeseed oil yield per crop
+        unit: tonnes per hectare
+        short_unit: tonnes/ha
+        description: |
+          Average amount of rapeseed oil produced per hectare of rapeseed crops harvested. Note that this calculates the oil yield per hectare, which is different from the yield of the total crop, because not all of the crop can be used for oil.
+      rapeseed_hectares_per_tonne:
+        title: Area of rapeseed crops harvested to produce a tonne of rapeseed oil
+        unit: hectares per tonne
+        short_unit: hectares/tonne
+        description: |
+          Area of rapeseed crops harvested to produce a tonne of rapeseed oil. This metric is the inverse of oil yields, and represents the amount of land that would need to be devoted to grow a given crop to produce one tonne of oil.
+      rapeseed_area_to_meet_global_oil_demand:
+        title: Area needed to meet the global vegetable oil demand with only rapeseed oil
+        unit: hectares
+        short_unit: ha
+        description: |
+          Amount of land that would need to be devoted to grow rapeseed crops if it was to meet global vegetable oil demand alone.
+      soybean_tonnes_per_hectare:
+        title: Soybean oil yield per crop
+        unit: tonnes per hectare
+        short_unit: tonnes/ha
+        description: |
+          Average amount of soybean oil produced per hectare of soybean crops harvested. Note that this calculates the oil yield per hectare, which is different from the yield of the total crop, because not all of the crop can be used for oil.
+      soybean_hectares_per_tonne:
+        title: Area of soybean crops harvested to produce a tonne of soybean oil
+        unit: hectares per tonne
+        short_unit: hectares/tonne
+        description: |
+          Area of soybean crops harvested to produce a tonne of soybean oil. This metric is the inverse of oil yields, and represents the amount of land that would need to be devoted to grow a given crop to produce one tonne of oil.
+      soybean_area_to_meet_global_oil_demand:
+        title: Area needed to meet the global vegetable oil demand with only soybean oil
+        unit: hectares
+        short_unit: ha
+        description: |
+          Amount of land that would need to be devoted to grow soybean crops if it was to meet global vegetable oil demand alone.
+      olive_tonnes_per_hectare:
+        title: Olive oil yield per crop
+        unit: tonnes per hectare
+        short_unit: tonnes/ha
+        description: |
+          Average amount of olive oil produced per hectare of olive crops harvested. Note that this calculates the oil yield per hectare, which is different from the yield of the total crop, because not all of the crop can be used for oil.
+      olive_hectares_per_tonne:
+        title: Area of olive crops harvested to produce a tonne of olive oil
+        unit: hectares per tonne
+        short_unit: hectares/tonne
+        description: |
+          Area of olive crops harvested to produce a tonne of olive oil. This metric is the inverse of oil yields, and represents the amount of land that would need to be devoted to grow a given crop to produce one tonne of oil.
+      olive_area_to_meet_global_oil_demand:
+        title: Area needed to meet the global vegetable oil demand with only olive oil
+        unit: hectares
+        short_unit: ha
+        description: |
+          Amount of land that would need to be devoted to grow olive crops if it was to meet global vegetable oil demand alone.
+      coconut_tonnes_per_hectare:
+        title: Coconut oil yield per crop
+        unit: tonnes per hectare
+        short_unit: tonnes/ha
+        description: |
+          Average amount of coconut oil produced per hectare of coconut crops harvested. Note that this calculates the oil yield per hectare, which is different from the yield of the total crop, because not all of the crop can be used for oil.
+      coconut_hectares_per_tonne:
+        title: Area of coconut crops harvested to produce a tonne of coconut oil
+        unit: hectares per tonne
+        short_unit: hectares/tonne
+        description: |
+          Area of coconut crops harvested to produce a tonne of coconut oil. This metric is the inverse of oil yields, and represents the amount of land that would need to be devoted to grow a given crop to produce one tonne of oil.
+      coconut_area_to_meet_global_oil_demand:
+        title: Area needed to meet the global vegetable oil demand with only coconut oil
+        unit: hectares
+        short_unit: ha
+        description: |
+          Amount of land that would need to be devoted to grow coconut crops if it was to meet global vegetable oil demand alone.
+      groundnut_tonnes_per_hectare:
+        title: Groundnut oil yield per crop
+        unit: tonnes per hectare
+        short_unit: tonnes/ha
+        description: |
+          Average amount of groundnut oil produced per hectare of groundnut crops harvested. Note that this calculates the oil yield per hectare, which is different from the yield of the total crop, because not all of the crop can be used for oil.
+      groundnut_hectares_per_tonne:
+        title: Area of groundnut crops harvested to produce a tonne of groundnut oil
+        unit: hectares per tonne
+        short_unit: hectares/tonne
+        description: |
+          Area of groundnut crops harvested to produce a tonne of groundnut oil. This metric is the inverse of oil yields, and represents the amount of land that would need to be devoted to grow a given crop to produce one tonne of oil.
+      groundnut_area_to_meet_global_oil_demand:
+        title: Area needed to meet the global vegetable oil demand with only groundnut oil
+        unit: hectares
+        short_unit: ha
+        description: |
+          Amount of land that would need to be devoted to grow groundnut crops if it was to meet global vegetable oil demand alone.
+      cottonseed_tonnes_per_hectare:
+        title: Cottonseed oil yield per crop
+        unit: tonnes per hectare
+        short_unit: tonnes/ha
+        description: |
+          Average amount of cottonseed oil produced per hectare of cottonseed crops harvested. Note that this calculates the oil yield per hectare, which is different from the yield of the total crop, because not all of the crop can be used for oil.
+      cottonseed_hectares_per_tonne:
+        title: Area of cottonseed crops harvested to produce a tonne of cottonseed oil
+        unit: hectares per tonne
+        short_unit: hectares/tonne
+        description: |
+          Area of cottonseed crops harvested to produce a tonne of cottonseed oil. This metric is the inverse of oil yields, and represents the amount of land that would need to be devoted to grow a given crop to produce one tonne of oil.
+      cottonseed_area_to_meet_global_oil_demand:
+        title: Area needed to meet the global vegetable oil demand with only cottonseed oil
+        unit: hectares
+        short_unit: ha
+        description: |
+          Amount of land that would need to be devoted to grow cottonseed crops if it was to meet global vegetable oil demand alone.
+      sesame_tonnes_per_hectare:
+        title: Sesame oil yield per crop
+        unit: tonnes per hectare
+        short_unit: tonnes/ha
+        description: |
+          Average amount of sesame oil produced per hectare of sesame crops harvested. Note that this calculates the oil yield per hectare, which is different from the yield of the total crop, because not all of the crop can be used for oil.
+      sesame_hectares_per_tonne:
+        title: Area of sesame crops harvested to produce a tonne of sesame oil
+        unit: hectares per tonne
+        short_unit: hectares/tonne
+        description: |
+          Area of sesame crops harvested to produce a tonne of sesame oil. This metric is the inverse of oil yields, and represents the amount of land that would need to be devoted to grow a given crop to produce one tonne of oil.
+      sesame_area_to_meet_global_oil_demand:
+        title: Area needed to meet the global vegetable oil demand with only sesame oil
+        unit: hectares
+        short_unit: ha
+        description: |
+          Amount of land that would need to be devoted to grow sesame crops if it was to meet global vegetable oil demand alone.

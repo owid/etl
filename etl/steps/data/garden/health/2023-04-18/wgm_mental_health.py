@@ -4,33 +4,24 @@ from typing import List
 
 import pandas as pd
 from owid.catalog import Dataset, Table
+from shared import (
+    MAPPING_AGE_VALUES,
+    MAPPING_COLUMN_NAMES,
+    MAPPING_GENDER_VALUES,
+    MAPPING_QUESTION_VALUES,
+)
 from structlog import get_logger
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
-from .shared import age_group_mapping, column_rename, gender_mapping, question_mapping
-
 log = get_logger()
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
-
-
-def load_countries_regions() -> Table:
-    """Load countries-regions table from reference dataset (e.g. to map from iso codes to country names)."""
-    ds_reference: Dataset = paths.load_dependency("reference")
-    tb_countries_regions = ds_reference["countries_regions"]
-
-    return tb_countries_regions
-
-
-def load_population() -> Table:
-    """Load population table from population OMM dataset."""
-    ds_indicators: Dataset = paths.load_dependency(channel="garden", namespace="demography", short_name="population")
-    tb_population = ds_indicators["population"]
-
-    return tb_population
+# Minimum number of participants answering a question. Questions for demographic groups with fewer answers are filtered out.
+# This mostly affects very granular breakdowns (e.g. by age and gender)
+THRESHOLD_ANSWERS = 100
 
 
 def run(dest_dir: str) -> None:
@@ -51,8 +42,18 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    # Create a new table with the processed data.
-    tb_garden = make_table(df)
+    # Keep relevant columns, unpivot dataframe, harmonize country names.
+    df = clean_df(df)
+    # Build dataframe with shares of answers to each questions.
+    df = make_df_with_share_answers(df)
+    # Map IDs to labels (question, age and gender groups, answers)
+    df = map_ids_to_labels(df)
+    # Filter out questions with low participation
+    df = filter_rows_with_low_participation(df)
+    # Format dataframe with appropriate columns, indexes
+    df = final_formatting(df)
+    # Create a new table based on the dataframe `df`
+    tb_garden = Table(df, short_name=paths.short_name, underscore=True)
 
     #
     # Save outputs.
@@ -60,34 +61,29 @@ def run(dest_dir: str) -> None:
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(dest_dir, tables=[tb_garden], default_metadata=ds_meadow.metadata)
     ds_garden.update_metadata(paths.metadata_path)
+    # Add explanation to dataset description
+    ds_garden.metadata.description += (
+        "\n\nNote: Data for answers that where the demographic group had less than 100 participants are filtered out."
+    )
     # Save changes in the new garden dataset.
     ds_garden.save()
 
     log.info("wgm_mental_health: end")
 
 
-def make_table(df: pd.DataFrame) -> Table:
-    """Create a new table from a dataframe."""
-    df = clean_df(df)
-    df = make_df_with_share_answers(df)
-    df = map_ids_to_labels(df)
-    df = final_formatting(df)
-    tb = Table(df, short_name=paths.short_name, underscore=True)
-    return tb
-
-
 def clean_df(df: pd.DataFrame) -> pd.DataFrame:
+    """Keep relevant columns, unpivot dataframe, harmonise country names."""
     log.info("wgm_mental_health: cleaning dataframe")
     # Relevant columns
-    columns_rel = list(column_rename.keys()) + list(question_mapping.keys())
+    columns_rel = list(MAPPING_COLUMN_NAMES.keys()) + list(MAPPING_QUESTION_VALUES.keys())
     df = df[columns_rel]
     # Rename columns
-    df = df.rename(columns=column_rename)
+    df = df.rename(columns=MAPPING_COLUMN_NAMES)
     # Unpivot
     log.info("wgm_mental_health: unpivotting dataframe")
     df = df.melt(
-        id_vars=list(column_rename.values()),
-        value_vars=list(question_mapping.keys()),
+        id_vars=list(MAPPING_COLUMN_NAMES.values()),
+        value_vars=list(MAPPING_QUESTION_VALUES.keys()),
         var_name="question",
         value_name="answer",
     )
@@ -95,40 +91,116 @@ def clean_df(df: pd.DataFrame) -> pd.DataFrame:
     df = df.astype({"question": str, "answer": str})
     # Harmonise country names
     log.info("wgm_mental_health: harmonize_countries")
-    df = geo.harmonize_countries(
-        df=df, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
-    )
+    df = geo.harmonize_countries(df=df, countries_file=paths.country_mapping_path)
     return df
 
 
 def make_df_with_share_answers(df: pd.DataFrame) -> pd.DataFrame:
+    """Build dataframe with shares of answers to each questions.
+
+    Obtains values for all countries, continents and income groups. Also for various demographic groups (age, gender)
+    """
+    # Obtain dataframe for countries
+    log.info("wgm_mental_health: building dataframe for countries")
+    df_countries = _make_df_with_share_answers(df)
+    # Obtain dataframe for World
+    log.info("wgm_mental_health: building dataframe for World")
+    df_world = df.assign(country="World")
+    df_world = _make_df_with_share_answers(df_world, "weight_inter_country")
+    # Obtain dataframe for continents
+    log.info("wgm_mental_health: building dataframe for continents")
+    df_continents = _build_df_with_continents(df)
+    df_continents = _make_df_with_share_answers(df_continents, "weight_inter_country")
+    # Obtain dataframe for income groups
+    log.info("wgm_mental_health: building dataframe for income groups")
+    df_incomes = _build_df_with_incomes(df)
+    df_incomes = _make_df_with_share_answers(df_incomes, "weight_inter_country")
+    # Merge
+    df = pd.concat([df_countries, df_world, df_continents, df_incomes], ignore_index=True)
+    return df
+
+
+def _build_df_with_continents(df: pd.DataFrame) -> pd.DataFrame:
+    # Obtain dataframe for continents
+    df_continents = df.copy()
+    continents = ["Africa", "Asia", "Europe", "North America", "Oceania", "South America"]
+    df_continents["country"] = df_continents["country"].cat.add_categories(continents)
+    for continent in continents:
+        countries = geo.list_countries_in_region(continent)
+        msk = df_continents["country"].isin(countries)
+        df_continents.loc[msk, "country"] = continent
+
+    # Sanity check
+    unc_countries = set(df_continents.country).difference(continents)
+    assert not unc_countries, f"Some countries do not belong to any continent: {unc_countries}!"
+    return df_continents
+
+
+def _build_df_with_incomes(df: pd.DataFrame) -> pd.DataFrame:
+    # Obtain dataframe for income groups
+    df_income = df.copy()
+    incomes = [
+        "High-income countries",
+        "Upper-middle-income countries",
+        "Lower-middle-income countries",
+        "Low-income countries",
+    ]
+    df_income["country"] = df_income["country"].cat.add_categories(incomes)
+    for income in incomes:
+        countries = geo.list_countries_in_region(income)
+        msk = df_income["country"].isin(countries)
+        df_income.loc[msk, "country"] = income
+
+    # Sanity check
+    unc_countries_expected = {"Venezuela"}  # WB unclassified Venezuela in 2021, bc of lacking data
+    unc_countries = set(df_income.country).difference(incomes)
+    assert (
+        unc_countries == unc_countries_expected
+    ), f"Only Venezuela is expected to be unclassified, but found {unc_countries} to be unclassified!"
+    # Remove Venezuela
+    df_income = df_income[~df_income["country"].isin(unc_countries_expected)]
+    return df_income
+
+
+def _make_df_with_share_answers(df: pd.DataFrame, weight_column: str = "weight_intra_country") -> pd.DataFrame:
     # 1. broken down by gender and age group
-    df_gender_age = make_individual_df_with_share_answers(df, ["gender", "age_group"])
+    df_gender_age = make_individual_df_with_share_answers(
+        df, dimensions=["gender", "age_group"], weight_column=weight_column
+    )
     # 2. broken down by gender
-    df_gender = make_individual_df_with_share_answers(df, ["gender"])
+    df_gender = make_individual_df_with_share_answers(df, dimensions=["gender"], weight_column=weight_column)
     # 3. broken down by age_group
-    df_age = make_individual_df_with_share_answers(df, ["age_group"])
+    df_age = make_individual_df_with_share_answers(df, dimensions=["age_group"], weight_column=weight_column)
     # 4. no breakdown
-    df_nb = make_individual_df_with_share_answers(df)
+    df_nb = make_individual_df_with_share_answers(df, weight_column=weight_column)
     # Combine dataframes
     log.info("wgm_mental_health: combining dataframes into combined one")
     df_combined = pd.concat([df_nb, df_gender, df_age, df_gender_age], ignore_index=True)
     # Sanity check
     x = df_combined.groupby(["country", "year", "question", "gender", "age_group"], observed=True)[["share"]].sum()
     assert x[
-        x.share - 100 > 0.1
+        abs(x.share - 100) > 0.1
     ].empty, "The share was not correctly estimated! Sum of shares does not sum up to 100% (we allow for 0.1% error)"
     return df_combined
 
 
-def make_individual_df_with_share_answers(df: pd.DataFrame, dimensions: List[str] = []) -> pd.DataFrame:
+def make_individual_df_with_share_answers(
+    df: pd.DataFrame, weight_column: str, dimensions: List[str] = []
+) -> pd.DataFrame:
+    """Obtain table with answer percentages and counts to each question for all demographic groups and countries.
+
+    For each question, obtain the number of each registered answer. Also, obtain the "weighted number", which is given
+    by weighting each answer according to the `weight_column` column. This is later used to obtain the share.
+
+    The `weight_column` has either the value of "weight_intra_country" (used to standardise different demographics within a country) or
+    "weight_inter_country" (to standardise a variable across different countries)
+    """
+
     log.info(f"wgm_mental_health: building dataframe with share of answers for dimensions {dimensions}")
-    # For each question, obtain the number of each registered answer. Also, obtain the "weighted number", which is given
-    # by weighting each answer according to the `weight_inter_country` variable (used to standardise different demographics)
     operations = ["sum", "count"]
     columns_index_base = ["country", "year", "question", "answer"]
     columns_index = columns_index_base + dimensions
-    df_ = df.groupby(columns_index, observed=True).agg({"weight_intra_country": operations})
+    df_ = df.groupby(columns_index, observed=True).agg({weight_column: operations})
     df_.columns = operations
     df_ = df_.reset_index()
     # For each question, now obtain the percentage of each of its answers (weighted).
@@ -149,11 +221,15 @@ def make_individual_df_with_share_answers(df: pd.DataFrame, dimensions: List[str
 
 
 def map_ids_to_labels(df: pd.DataFrame) -> pd.DataFrame:
+    """Instead of having IDs we use labels.
+
+    The source uses IDs for gender and age groups, answers and questions.
+    """
     # Answer ID to Answer label mapping
     # Create unique identifier for answer id. Note that answer ids mean different things depending on the question!
     # Therefore, we build a mapping `questionId__answerId -> answerLabel`
     question_answer_id_to_label = {}
-    for q_id, q_props in question_mapping.items():
+    for q_id, q_props in MAPPING_QUESTION_VALUES.items():
         for a_id, a_label in q_props["answers"].items():
             question_answer_id_to_label[f"{q_id}__{a_id}"] = a_label
     df["question__answer"] = df["question"] + "__" + df["answer"]
@@ -172,29 +248,29 @@ def map_ids_to_labels(df: pd.DataFrame) -> pd.DataFrame:
     _sanity_check_age_ids(df)
 
     # Question ID to Question label mapping
-    question_id_to_label = {k: v["title"] for k, v in question_mapping.items()}
+    question_id_to_label = {k: v["title"] for k, v in MAPPING_QUESTION_VALUES.items()}
 
     # Map IDs to Labels (Question, Answer, Gender, Age group)
     log.info("wgm_mental_health: mapping ids to labels}")
     df["question"] = df["question"].replace(question_id_to_label)
     df["answer"] = df["question__answer"].map(question_answer_id_to_label).fillna("Unknown")
-    df["gender"] = df["gender"].replace(gender_mapping)
-    df["age_group"] = df["age_group"].replace(age_group_mapping)
+    df["gender"] = df["gender"].replace(MAPPING_GENDER_VALUES)
+    df["age_group"] = df["age_group"].replace(MAPPING_AGE_VALUES)
 
     return df
 
 
 def _sanity_check_question(df: pd.DataFrame):
-    q_map = {k: v["title"] for k, v in question_mapping.items()}
+    q_map = {k: v["title"] for k, v in MAPPING_QUESTION_VALUES.items()}
     questions = set(df["question"])
-    questions_unexpected = questions.difference(set(question_mapping))
+    questions_unexpected = questions.difference(set(MAPPING_QUESTION_VALUES))
     assert not questions_unexpected, f"Unexpected question ID {questions_unexpected}"
     questions_missing = set(q_map).difference(questions)
     assert not questions_unexpected, f"Missing question ID {questions_missing}"
 
 
 def _sanity_check_answer(df: pd.DataFrame):
-    q_a_map = {k: set(v["answers"]) for k, v in question_mapping.items()}
+    q_a_map = {k: set(v["answers"]) for k, v in MAPPING_QUESTION_VALUES.items()}
     dfg = df.groupby("question")["answer"].apply(set).to_dict()
     for k, v in dfg.items():
         answers_unexpected = v.difference(q_a_map[k])
@@ -202,16 +278,16 @@ def _sanity_check_answer(df: pd.DataFrame):
         if answers_unexpected:
             print(k, "unexpected", answers_unexpected)
             if answers_unexpected != {" "}:
-                raise ValueError("ERROR. Would expect nothing or whitespace, this is new!")
+                raise ValueError("Would expect nothing or whitespace, this is new!")
         if answers_missing:
             print(k, "missing", answers_missing)
             if answers_missing != {" "}:
-                raise ValueError("ERROR. Would expect nothing or whitespace, this is new!")
+                raise ValueError("Would expect nothing or whitespace, this is new!")
 
 
 def _sanity_check_gender(df: pd.DataFrame):
-    gender_unexpected = set(df["gender"]).difference(set(gender_mapping) | {"all"})
-    gender_missing = set(set(gender_mapping) | {"all"}).difference(df["gender"])
+    gender_unexpected = set(df["gender"]).difference(set(MAPPING_GENDER_VALUES) | {"all"})
+    gender_missing = set(set(MAPPING_GENDER_VALUES) | {"all"}).difference(df["gender"])
     if gender_unexpected:
         raise ValueError(f"Unexpected gender ID {gender_unexpected}")
     if gender_missing:
@@ -219,16 +295,31 @@ def _sanity_check_gender(df: pd.DataFrame):
 
 
 def _sanity_check_age_ids(df: pd.DataFrame):
-    age_unexpected = set(df["age_group"]).difference(set(age_group_mapping) | {"all"})
-    age_missing = set(set(age_group_mapping) | {"all"}).difference(df["age_group"])
+    age_unexpected = set(df["age_group"]).difference(set(MAPPING_AGE_VALUES) | {"all"})
+    age_missing = set(set(MAPPING_AGE_VALUES) | {"all"}).difference(df["age_group"])
     if age_unexpected:
         raise ValueError(f"Unexpected age group ID {age_unexpected}")
     if age_missing:
         raise ValueError(f"Missing age group ID {age_missing}")
 
 
+def filter_rows_with_low_participation(df: pd.DataFrame) -> pd.DataFrame:
+    """Filter rows where the number of answers for a question from a demographic group was very low"""
+    log.info("wgm_mental_health: Filtering entries with few participants.")
+    col_idx = ["country", "year", "question", "gender", "age_group"]
+    df_count = df.groupby(col_idx, observed=True, as_index=False)[["count"]].sum()
+    df = df.merge(df_count, on=col_idx, suffixes=("", "_total"), how="left")
+    df = df[df["count_total"] > THRESHOLD_ANSWERS]
+    # Alternative would be to just remove share values and keep absolute counts
+    # df.loc[df["count_total"] > THRESHOLD_ANSWERS, "Share"] = None
+    # Log
+    percentage_kept = round(100 * len(df[df["count"] > THRESHOLD_ANSWERS]) / len(df), 2)
+    log.info(f"wgm_mental_health: Keeping {percentage_kept}% of all the rows.")
+    return df
+
+
 def final_formatting(df: pd.DataFrame) -> pd.DataFrame:
-    # Format
+    """Keep relevant rows and set index."""
     log.info("wgm_mental_health: final formatting}")
     df = df[["country", "year", "question", "answer", "gender", "age_group", "share", "count"]].set_index(
         ["country", "year", "question", "answer", "gender", "age_group"], verify_integrity=True
