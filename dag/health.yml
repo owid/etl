@@ -132,3 +132,7 @@ steps:
     - backport://backport/owid/latest/dataset_5676_global_health_observatory__world_health_organization__2022_08
   data://grapher/who/2023-03-13/vehicles:
   - data://garden/who/2023-03-13/vehicles
+
+  # WGM 2018
+  data://meadow/health/2023-04-25/wgm_2018:
+    - snapshot://health/2023-04-25/wgm_2018.xlsx
