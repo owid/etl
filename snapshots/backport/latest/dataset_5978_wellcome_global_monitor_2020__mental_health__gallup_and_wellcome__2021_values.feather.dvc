@@ -1,0 +1,18 @@
+meta:
+  namespace: backport
+  short_name: dataset_5978_wellcome_global_monitor_2020__mental_health__gallup_and_wellcome__2021_values
+  file_extension: feather
+  date_accessed: 2023-04-26 21:36:01.154295
+  name: Wellcome Global Monitor 2020 - Mental health (Gallup and Wellcome, 2021)
+  description: ''
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/5978
+  source_published_by: Our World in Data catalog backport
+  is_public: true
+  version: latest
+  publication_date: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: bf39a629f2937ba7832665ea39c5be98
+  size: 8306594
+  path: dataset_5978_wellcome_global_monitor_2020__mental_health__gallup_and_wellcome__2021_values.feather
