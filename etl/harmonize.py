@@ -5,6 +5,7 @@
 
 import cmd
 import json
+import re
 from collections import defaultdict
 from pathlib import Path
 from typing import DefaultDict, Dict, List, Optional, Set, cast
@@ -14,7 +15,10 @@ import pandas as pd
 from owid.catalog import Dataset
 from rapidfuzz import process
 
-from etl.paths import REFERENCE_DATASET
+from etl.paths import REFERENCE_DATASET, STEP_DIR
+
+# Path to latest regions definitions file. We update aliases from harmonize
+REGION_DEFINITIONS_FILE = sorted((STEP_DIR / "data/garden/regions/").glob("*/regions.yml"))[-1]
 
 
 @click.command()
@@ -114,7 +118,8 @@ def interactive_harmonize(
 
             if picker.save_alias:
                 # update the reference dataset to include this alias
-                save_alias(name, region)
+                save_alias_to_countries_regions(name, region)
+                save_alias_to_regions_yaml(name, region)
                 print(f'Saved alias: "{region}" -> "{name}"')
         else:
             n_skipped += 1
@@ -262,7 +267,7 @@ def input_bool(query: str, default: str = "y") -> bool:
     return (c.lower() or default) == "y"
 
 
-def save_alias(name: str, alias: str) -> None:
+def save_alias_to_countries_regions(name: str, alias: str) -> None:
     """
     Update the reference country/region dataset to include this alias.
     """
@@ -280,6 +285,43 @@ def save_alias(name: str, alias: str) -> None:
     # pack up and save
     rc.loc[rc.name == name, "aliases"] = json.dumps(sorted(aliases))
     ref.add(rc, formats=["csv"])
+
+
+def save_alias_to_regions_yaml(name: str, alias: str) -> None:
+    """
+    Save alias to regions.yml definitions. It doesn't modify original formatting of the file, but assumes
+    that `alias` is always the last element in the region block.
+    """
+    with open(REGION_DEFINITIONS_FILE, "r") as f:
+        yaml_content = f.read()
+
+    with open(REGION_DEFINITIONS_FILE, "w") as f:
+        f.write(_add_alias_to_regions(yaml_content, name, alias))
+
+
+def _add_alias_to_regions(yaml_content, target_name, new_alias):
+    # match block that contains target name
+    pattern = f'name: "{re.escape(target_name)}"(?:.(?!- code:))*'
+    match = re.search(pattern, yaml_content, re.DOTALL)
+
+    if match:
+        existing_aliases = re.search(r'(aliases:\s*\n(?:\s+- "[^"]+"\n)*)', match.group(0))
+        if existing_aliases:
+            # Add the new alias to the existing aliases
+            updated_aliases = existing_aliases.group(1) + f'    - "{new_alias}"\n'
+            yaml_content = (
+                yaml_content[: match.start()]
+                + match.group(0).replace(existing_aliases.group(1), updated_aliases)
+                + yaml_content[match.end() :]
+            )
+        else:
+            # Add the aliases key with the new alias
+            aliases = f'  aliases:\n    - "{new_alias}"\n'
+            yaml_content = yaml_content[: match.end()] + aliases + yaml_content[match.end() :]
+    else:
+        raise ValueError(f"Could not find region {target_name} in {REGION_DEFINITIONS_FILE}")
+
+    return yaml_content
 
 
 def print_mapping(region: str, name: str) -> None:
