@@ -284,11 +284,11 @@ def _sanity_check_answer(df: pd.DataFrame):
         answers_missing = q_a_map[k].difference(v)
         if answers_unexpected:
             print(f"Question {k}, unexpected answers:", answers_unexpected)
-            #if answers_unexpected != {" "}:
+            # if answers_unexpected != {" "}:
             raise ValueError("Would expect nothing or whitespace, this is new!")
         if answers_missing:
             print(f"Question {k}, missing answers:", answers_missing)
-            #if answers_missing != {" "}:
+            # if answers_missing != {" "}:
             raise ValueError("Would expect nothing or whitespace, this is new!")
 
 
