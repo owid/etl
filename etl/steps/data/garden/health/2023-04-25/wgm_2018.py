@@ -42,6 +42,8 @@ def run(dest_dir: str) -> None:
     df = add_age_group(df)
     # Keep relevant columns, unpivot dataframe, harmonize country names.
     df = clean_df(df)
+    # Remove empty answers
+    df = df[df["answer"] != " "]
     # Merge "Don't Know" and "Refused" categories, as done in WGM 2020
     df = merge_dk_and_refused_answers(df)
     # Build dataframe with shares of answers to each questions.
@@ -246,12 +248,12 @@ def _sanity_check_answer(df: pd.DataFrame):
         answers_missing = q_a_map[k].difference(v)
         if answers_unexpected:
             print(f"Question {k}, unexpected answers:", answers_unexpected)
-            if answers_unexpected != {" "}:
-                raise ValueError("Would expect nothing or whitespace, this is new!")
+            # if answers_unexpected != {" "}:
+            raise ValueError("Would expect nothing or whitespace, this is new!")
         if answers_missing:
             print(f"Question {k}, missing answers:", answers_missing)
-            if answers_missing != {" "}:
-                raise ValueError("Would expect nothing or whitespace, this is new!")
+            # if answers_missing != {" "}:
+            raise ValueError("Would expect nothing or whitespace, this is new!")
 
 
 def _sanity_check_gender(df: pd.DataFrame):
