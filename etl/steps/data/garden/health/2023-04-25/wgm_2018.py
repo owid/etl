@@ -37,7 +37,7 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    log.info("wgm_2018: harmonize_countries")
+    log.info("wgm_2018: process data")
     # Add age_group (based on age value)
     df = add_age_group(df)
     # Keep relevant columns, unpivot dataframe, harmonize country names.
@@ -63,7 +63,7 @@ def run(dest_dir: str) -> None:
     ds_garden.update_metadata(paths.metadata_path)
     # Add explanation to dataset description
     ds_garden.metadata.description += (
-        "\n\nNote: Data for answers that where the demographic group had less than 100 participants are filtered out."
+        "\n\nNote: Data for answers where the demographic group had less than 100 participants are filtered out."
     )
 
     # Save changes in the new garden dataset.
@@ -80,17 +80,27 @@ def add_age_group(df: pd.DataFrame) -> pd.DataFrame:
     - 30-49
     - 50-64
     - 65+
-    - DK/Refused
+    - Don't know/Refused
     """
     log.info("wgm_2018: add_age_group")
     df["age_group"] = df["age"].apply(_map_age_to_group)
     return df
 
 
-def _map_age_to_group(age_str: str):
+def _map_age_to_group(age_str: str) -> str:
+    # Answers with whitespace are mapped to "Don't know/Refused"
+    # This was checked with the source
     if age_str == " ":
-        return "DK/Refused"
-    age = int(age_str)
+        return "Don't know/Refused"
+    # Map the age to an integer
+    # If not possible, raise an error
+    try:
+        age = int(age_str)
+    except Exception:
+        raise ValueError(f"Invalid age value: {age_str}")
+    # Map age to age group
+    if age < 15:
+        raise ValueError(f"Invalid age value: {age}")
     if age < 30:
         return "15-29"
     if age < 50:
@@ -143,15 +153,15 @@ def make_df_with_share_answers(df: pd.DataFrame) -> pd.DataFrame:
     log.info("wgm_2018: building dataframe for countries")
     df_countries = _make_df_with_share_answers(df)
     # Obtain dataframe for World
-    log.info("wgm_mental_health: building dataframe for World")
+    log.info("wgm_2018: building dataframe for World")
     df_world = df.assign(country="World")
     df_world = _make_df_with_share_answers(df_world, "weight_inter_country")
     # # Obtain dataframe for continents
-    log.info("wgm_mental_health: building dataframe for continents")
+    log.info("wgm_2018: building dataframe for continents")
     df_continents = _build_df_with_continents(df)
     df_continents = _make_df_with_share_answers(df_continents, "weight_inter_country")
     # # Obtain dataframe for income groups
-    log.info("wgm_mental_health: building dataframe for income groups")
+    log.info("wgm_2018: building dataframe for income groups")
     df_incomes = _build_df_with_incomes(df)
     df_incomes = _make_df_with_share_answers(df_incomes, "weight_inter_country")
     # # Merge
@@ -196,16 +206,16 @@ def map_ids_to_labels(df: pd.DataFrame) -> pd.DataFrame:
 
 def filter_rows_with_low_participation(df: pd.DataFrame) -> pd.DataFrame:
     """Filter rows where the number of answers for a question from a demographic group was very low"""
-    log.info("wgm_mental_health: Filtering entries with few participants.")
+    log.info("wgm_2018: Filtering entries with few participants.")
+    num_samples_initially = len(df)
     col_idx = ["country", "year", "question", "gender", "age_group"]
-    df_count = df.groupby(col_idx, observed=True, as_index=False)[["count"]].sum()
-    df = df.merge(df_count, on=col_idx, suffixes=("", "_total"), how="left")
+    df["count_total"] = df.groupby(col_idx, observed=True)["count"].transform("sum")
     df = df[df["count_total"] > THRESHOLD_ANSWERS]
     # Alternative would be to just remove share values and keep absolute counts
     # df.loc[df["count_total"] > THRESHOLD_ANSWERS, "Share"] = None
     # Log
-    percentage_kept = round(100 * len(df[df["count"] > THRESHOLD_ANSWERS]) / len(df), 2)
-    log.info(f"wgm_mental_health: Keeping {percentage_kept}% of all the rows.")
+    percentage_kept = round(100 * len(df) / num_samples_initially, 2)
+    log.info(f"wgm_2018: Keeping {percentage_kept}% of all the rows.")
     return df.reset_index(drop=True)
 
 
@@ -296,8 +306,7 @@ def _make_individual_df_with_share_answers(
     df_ = df_.reset_index()
     # For each question, now obtain the percentage of each of its answers (weighted).
     columns_normalise = [col for col in columns_index if col not in ["answer"]]
-    df_weights_sum = df_.groupby(columns_normalise, as_index=False)[["sum"]].sum()
-    df_ = df_.merge(df_weights_sum, on=columns_normalise, suffixes=("", "_denominator"))
+    df_["sum_denominator"] = df_.groupby(columns_normalise, observed=True)["sum"].transform("sum")
     df_["share"] = 100 * df_["sum"] / df_["sum_denominator"]
     # Add missing dimensions
     dimensions_all = ["gender", "age_group"]
