@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5429_excess_mortality_estimates__the_economist__2023_config
   file_extension: json
-  date_accessed: 2023-04-11 12:05:56.606436
+  date_accessed: 2023-04-26 08:10:37.043053
   name: Grapher metadata for dataset_5429_excess_mortality_estimates__the_economist__2023
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 078d203f59565ceef998b0bd0c7105fa
+- md5: 81fb25b78b621bef9530a50b30dec82f
   size: 10940
   path: dataset_5429_excess_mortality_estimates__the_economist__2023_config.json
