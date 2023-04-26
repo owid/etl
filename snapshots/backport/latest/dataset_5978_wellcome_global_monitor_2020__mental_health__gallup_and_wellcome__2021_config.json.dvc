@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5978_wellcome_global_monitor_2020__mental_health__gallup_and_wellcome__2021_config
   file_extension: json
-  date_accessed: 2023-04-26 21:49:56.918674
+  date_accessed: 2023-04-26 22:58:48.584329
   name: Grapher metadata for dataset_5978_wellcome_global_monitor_2020__mental_health__gallup_and_wellcome__2021
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 7adf2fa432a455248aad30e282a32e85
+- md5: fd8e84deae925582403353f283b02ab7
   size: 23914428
   path: dataset_5978_wellcome_global_monitor_2020__mental_health__gallup_and_wellcome__2021_config.json
