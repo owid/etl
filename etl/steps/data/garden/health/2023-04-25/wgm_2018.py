@@ -52,6 +52,8 @@ def run(dest_dir: str) -> None:
     df = map_ids_to_labels(df)
     # Filter out questions with low participation
     df = filter_rows_with_low_participation(df)
+    # Create new categories: "Somewhat agree" and "Strongly agree" -> "Agree"
+    df = create_agree_and_disagree_categories(df)
     # Format dataframe with appropriate columns, indexes
     df = final_formatting(df)
     # Create a new table based on the dataframe `df`
@@ -219,6 +221,40 @@ def filter_rows_with_low_participation(df: pd.DataFrame) -> pd.DataFrame:
     percentage_kept = round(100 * len(df) / num_samples_initially, 2)
     log.info(f"wgm_2018: Keeping {percentage_kept}% of all the rows.")
     return df.reset_index(drop=True)
+
+
+def create_agree_and_disagree_categories(df: pd.DataFrame) -> pd.DataFrame:
+    questions_merge_agree_disagree = [
+        "q24",
+        "q25",
+        "q26",
+    ]
+    mapping = {
+        "Strongly agree": "Agree",
+        "Somewhat agree": "Agree",
+        "Strongly disagree": "Disagree",
+        "Somewhat disagree": "Disagree",
+    }
+    for q in questions_merge_agree_disagree:
+        # Keep only rows of affected questions
+        df_ = df[df["question"] == MAPPING_QUESTION_VALUES[q]["title"]].copy()
+        # Keep only affected answers
+        df_ = df_[df_["answer"].isin(list(mapping.keys()))]
+        # Map categories to new categories
+        df_["answer"] = df_["answer"].map(mapping).fillna(df_["answer"])
+        df_ = df_.groupby(["country", "year", "question", "answer", "gender", "age_group"], as_index=False).sum(
+            numeric_only=True
+        )
+        # Sanity check
+        set(df_.answer) == {
+            "Agree",
+            "Disagree",
+            "Don't know/Refused",
+            "Neither agree nor disagree",
+        }, "Unknown or unexpected answers!"
+        # Add to main dataframe
+        df = pd.concat([df, df_], ignore_index=True)
+    return df
 
 
 def final_formatting(df: pd.DataFrame) -> pd.DataFrame:
