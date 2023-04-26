@@ -1,7 +1,5 @@
-# (Inherited from meadow, remove if not different.)
 tables:
-  wgm_mental_health:
-    # (Inherited from meadow, remove if not different.)
+  wgm_2018:
     variables:
       share:
         title: "Share"
@@ -11,9 +9,10 @@ tables:
 
           The share is obtained weighting the answers based on the characteristics of the participant. Data weighting is
           used to minimise bias in survey estimates and is intended to be used to generate nationally representative estimates within a country.
-          The weighting procedure was fotrmulated based on the sample design and performed in multiple stages.
+          The weighting procedure was formulated based on the sample design and performed in multiple stages.
 
-          To learn more about this, you can read section "Data weighting" at https://cms.wellcome.org/sites/default/files/2021-10/wgm2020-methodology.pdf
+          To learn more about this, you can read section "Data weighting" in chapter "I: Survey Methodology"
+          at https://cms.wellcome.org/sites/default/files/wgm2018-methodology.pdf
         display:
           numDecimalPlaces: 1
       count:
