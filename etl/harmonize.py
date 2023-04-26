@@ -23,10 +23,9 @@ from etl.paths import REFERENCE_DATASET
 @click.argument("output_file")
 @click.argument("institution", required=False)
 def harmonize(data_file: str, column: str, output_file: str, institution: Optional[str] = None) -> None:
-    """
-    Given a data file in feather or CSV format, and the name of the column representing
-    country or region names, interactively generate a JSON mapping from the given names
-    to OWID's canonical names.
+    """Given a DATA_FILE in feather or CSV format, and the name of the COLUMN representing
+    country or region names, interactively generate the JSON mapping OUTPUT_FILE from the given names
+    to OWID's canonical names. Optionally, can use INSTITUTION to append "(institution)" to countries.
 
     When a name is ambiguous, you can use:
 
