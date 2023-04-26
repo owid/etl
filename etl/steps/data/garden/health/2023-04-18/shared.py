@@ -19,7 +19,7 @@ MAPPING_AGE_VALUES = {
     2: "30-49",
     3: "50-64",
     4: "65+",
-    99: "DK/Refused",
+    99: "Don't know/Refused",
 }
 # Rename fields
 MAPPING_COLUMN_NAMES = {
@@ -40,7 +40,7 @@ MAPPING_QUESTION_VALUES = {
             "1": "More important",
             "2": "As important",
             "3": "Less important",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "mh2a": {
@@ -50,7 +50,7 @@ MAPPING_QUESTION_VALUES = {
             "2": "Some",
             "3": "Not much",
             "4": "Not at all",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "mh2b": {
@@ -60,7 +60,7 @@ MAPPING_QUESTION_VALUES = {
             "2": "Some",
             "3": "Not much",
             "4": "Not at all",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "mh3a": {
@@ -70,7 +70,7 @@ MAPPING_QUESTION_VALUES = {
             "2": "Some",
             "3": "Not much",
             "4": "Not at all",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "mh3b": {
@@ -80,7 +80,7 @@ MAPPING_QUESTION_VALUES = {
             "2": "Some",
             "3": "Not much",
             "4": "Not at all",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "mh3c": {
@@ -90,7 +90,7 @@ MAPPING_QUESTION_VALUES = {
             "2": "Some",
             "3": "Not much",
             "4": "Not at all",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "mh3d": {
@@ -100,7 +100,7 @@ MAPPING_QUESTION_VALUES = {
             "2": "Some",
             "3": "Not much",
             "4": "Not at all",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "mh4a": {
@@ -110,7 +110,7 @@ MAPPING_QUESTION_VALUES = {
             "2": "Somewhat important",
             "3": "Not too important",
             "4": "Not important at all",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "mh4b": {
@@ -120,7 +120,7 @@ MAPPING_QUESTION_VALUES = {
             "2": "Somewhat important",
             "3": "Not too important",
             "4": "Not important at all",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "mh5": {
@@ -129,7 +129,7 @@ MAPPING_QUESTION_VALUES = {
             "1": "Very comfortable",
             "2": "Somewhat comfortable",
             "3": "Not at all comfortable",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "mh6": {
@@ -137,7 +137,7 @@ MAPPING_QUESTION_VALUES = {
         "answers": {
             "1": "Yes",
             "2": "No",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "mh7a": {
@@ -145,7 +145,7 @@ MAPPING_QUESTION_VALUES = {
         "answers": {
             "1": "Yes",
             "2": "No",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "mh7b": {
@@ -160,7 +160,7 @@ MAPPING_QUESTION_VALUES = {
             "3": "Ages 20-29",
             "4": "Ages 30-39",
             "5": "Ages ≥40",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "mh7c": {
@@ -168,7 +168,7 @@ MAPPING_QUESTION_VALUES = {
         "answers": {
             "1": "Yes",
             "2": "No",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "mh8a": {
@@ -176,7 +176,7 @@ MAPPING_QUESTION_VALUES = {
         "answers": {
             "1": "Yes",
             "2": "No",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "mh8b": {
@@ -184,7 +184,7 @@ MAPPING_QUESTION_VALUES = {
         "answers": {
             "1": "Yes",
             "2": "No",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "mh8c": {
@@ -192,7 +192,7 @@ MAPPING_QUESTION_VALUES = {
         "answers": {
             "1": "Yes",
             "2": "No",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "mh8d": {
@@ -200,7 +200,7 @@ MAPPING_QUESTION_VALUES = {
         "answers": {
             "1": "Yes",
             "2": "No",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "mh8e": {
@@ -208,7 +208,7 @@ MAPPING_QUESTION_VALUES = {
         "answers": {
             "1": "Yes",
             "2": "No",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "mh8f": {
@@ -216,7 +216,7 @@ MAPPING_QUESTION_VALUES = {
         "answers": {
             "1": "Yes",
             "2": "No",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "mh8g": {
@@ -224,7 +224,7 @@ MAPPING_QUESTION_VALUES = {
         "answers": {
             "1": "Yes",
             "2": "No",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "mh8h": {
@@ -232,7 +232,7 @@ MAPPING_QUESTION_VALUES = {
         "answers": {
             "1": "Yes",
             "2": "No",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "mh9a": {
@@ -241,7 +241,7 @@ MAPPING_QUESTION_VALUES = {
             "1": "Very helpful",
             "2": "Somewhat helpful",
             "3": "Not helpful",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "mh9b": {
@@ -250,7 +250,7 @@ MAPPING_QUESTION_VALUES = {
             "1": "Very helpful",
             "2": "Somewhat helpful",
             "3": "Not helpful",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "mh9c": {
@@ -259,7 +259,7 @@ MAPPING_QUESTION_VALUES = {
             "1": "Very helpful",
             "2": "Somewhat helpful",
             "3": "Not helpful",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "mh9d": {
@@ -268,7 +268,7 @@ MAPPING_QUESTION_VALUES = {
             "1": "Very helpful",
             "2": "Somewhat helpful",
             "3": "Not helpful",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "mh9e": {
@@ -277,7 +277,7 @@ MAPPING_QUESTION_VALUES = {
             "1": "Very helpful",
             "2": "Somewhat helpful",
             "3": "Not helpful",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "mh9f": {
@@ -286,7 +286,7 @@ MAPPING_QUESTION_VALUES = {
             "1": "Very helpful",
             "2": "Somewhat helpful",
             "3": "Not helpful",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "mh9g": {
@@ -295,7 +295,7 @@ MAPPING_QUESTION_VALUES = {
             "1": "Very helpful",
             "2": "Somewhat helpful",
             "3": "Not helpful",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "mh9h": {
@@ -304,7 +304,7 @@ MAPPING_QUESTION_VALUES = {
             "1": "Very helpful",
             "2": "Somewhat helpful",
             "3": "Not helpful",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "w1": {
@@ -314,7 +314,7 @@ MAPPING_QUESTION_VALUES = {
             "2": "Some",
             "3": "Not much",
             "4": "Nothing at all",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "w2": {
@@ -324,7 +324,7 @@ MAPPING_QUESTION_VALUES = {
             "2": "Some of it",
             "3": "Not much of it",
             "4": "None of it",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "w3": {
@@ -343,7 +343,7 @@ MAPPING_QUESTION_VALUES = {
             "2": "Some",
             "3": "Not much",
             "4": "None at all",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "w5a": {
@@ -353,7 +353,7 @@ MAPPING_QUESTION_VALUES = {
             "2": "Some",
             "3": "Not much",
             "4": "None at all",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "w5b": {
@@ -363,7 +363,7 @@ MAPPING_QUESTION_VALUES = {
             "2": "Some",
             "3": "Not much",
             "4": "Not at all",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "w5c": {
@@ -373,7 +373,7 @@ MAPPING_QUESTION_VALUES = {
             "2": "Some",
             "3": "Not much",
             "4": "Not at all",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "w5d": {
@@ -383,7 +383,7 @@ MAPPING_QUESTION_VALUES = {
             "2": "Some",
             "3": "Not much",
             "4": "Not at all",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "w5e": {
@@ -393,7 +393,7 @@ MAPPING_QUESTION_VALUES = {
             "2": "Some",
             "3": "Not much",
             "4": "Not at all",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "w5f": {
@@ -403,7 +403,7 @@ MAPPING_QUESTION_VALUES = {
             "2": "Some",
             "3": "Not much",
             "4": "Not at all",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "w5g": {
@@ -413,7 +413,7 @@ MAPPING_QUESTION_VALUES = {
             "2": "Some",
             "3": "Not much",
             "4": "Not at all",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "w6": {
@@ -423,7 +423,7 @@ MAPPING_QUESTION_VALUES = {
             "2": "Some",
             "3": "Not much",
             "4": "Not at all",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "w7a": {
@@ -433,7 +433,7 @@ MAPPING_QUESTION_VALUES = {
             "2": "Some",
             "3": "Not much",
             "4": "Not at all",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "w7b": {
@@ -443,7 +443,7 @@ MAPPING_QUESTION_VALUES = {
             "2": "Some",
             "3": "Not much",
             "4": "Not at all",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "w7c": {
@@ -453,7 +453,7 @@ MAPPING_QUESTION_VALUES = {
             "2": "Some",
             "3": "Not much",
             "4": "Not at all",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "w8": {
@@ -462,7 +462,7 @@ MAPPING_QUESTION_VALUES = {
             "1": "Most",
             "2": "Some",
             "3": "Very few",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "w9": {
@@ -471,7 +471,7 @@ MAPPING_QUESTION_VALUES = {
             "1": "A lot",
             "2": "A little",
             "3": "Not at all",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "w10": {
@@ -480,7 +480,7 @@ MAPPING_QUESTION_VALUES = {
             "1": "Increase",
             "2": "Decrease",
             "3": "Neither/No effect",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "w11a": {
@@ -490,7 +490,7 @@ MAPPING_QUESTION_VALUES = {
             "2": "Mostly negative impact",
             "3": "No impact at all",
             "4": "Both positive and negative impact",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "w11b": {
@@ -500,7 +500,7 @@ MAPPING_QUESTION_VALUES = {
             "2": "Mostly negative impact",
             "3": "No impact at all",
             "4": "Both positive and negative impact",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "w13": {
@@ -508,7 +508,7 @@ MAPPING_QUESTION_VALUES = {
         "answers": {
             "1": "Yes",
             "2": "No",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "w14": {
@@ -518,7 +518,7 @@ MAPPING_QUESTION_VALUES = {
             "2": "Fairly well",
             "3": "Not very well",
             "4": "Not at all",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "w15": {
@@ -528,7 +528,7 @@ MAPPING_QUESTION_VALUES = {
             "2": "Minor threat",
             "3": "Not a threat",
             "4": "Climate change / global warming is not happening",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "w15_1a": {
@@ -538,7 +538,7 @@ MAPPING_QUESTION_VALUES = {
             "2": "Some",
             "3": "Not much",
             "4": "Not at all",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "w15_1b": {
@@ -548,7 +548,7 @@ MAPPING_QUESTION_VALUES = {
             "2": "Some",
             "3": "Not much",
             "4": "Not at all",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "w15_1c": {
@@ -558,7 +558,7 @@ MAPPING_QUESTION_VALUES = {
             "2": "Some",
             "3": "Not much",
             "4": "Not at all",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "w15_1d": {
@@ -568,7 +568,7 @@ MAPPING_QUESTION_VALUES = {
             "2": "Some",
             "3": "Not much",
             "4": "Not at all",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "w15_1e": {
@@ -578,7 +578,7 @@ MAPPING_QUESTION_VALUES = {
             "2": "Some",
             "3": "Not much",
             "4": "Not at all",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "w15_2a": {
@@ -588,7 +588,7 @@ MAPPING_QUESTION_VALUES = {
             "2": "Somewhat agree",
             "3": "Somewhat disagree",
             "4": "Strongly disagree",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "w15_2b": {
@@ -598,7 +598,7 @@ MAPPING_QUESTION_VALUES = {
             "2": "Somewhat agree",
             "3": "Somewhat disagree",
             "4": "Strongly disagree",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "w27": {
@@ -606,7 +606,7 @@ MAPPING_QUESTION_VALUES = {
         "answers": {
             "1": "Yes",
             "2": "No",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "w28": {
@@ -618,7 +618,7 @@ MAPPING_QUESTION_VALUES = {
             "4": "Once a day",
             "5": "A few days a week",
             "6": "Less than few days a week",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "w29": {
@@ -628,7 +628,7 @@ MAPPING_QUESTION_VALUES = {
             "2": "Most of the time",
             "3": "Some of the time",
             "4": "Never",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     # "wp21757": {
@@ -638,7 +638,7 @@ MAPPING_QUESTION_VALUES = {
     #         "2": "Some",
     #         "3": "Not much",
     #         "4": "Not at all",
-    #         "99": "DK/Refused",
+    #         "99": "Don't know/Refused",
     #     },
     # },
     # "wp21758": {
@@ -647,7 +647,7 @@ MAPPING_QUESTION_VALUES = {
     #         "1": "Yes",
     #         "2": "No",
     #         "3": "Does not apply / no job",
-    #         "99": "DK/Refused",
+    #         "99": "Don't know/Refused",
     #     },
     # },
     # "wp21759": {
@@ -656,7 +656,7 @@ MAPPING_QUESTION_VALUES = {
     #         "1": "Yes",
     #         "2": "No",
     #         "3": "Does not apply / no job",
-    #         "99": "DK/Refused",
+    #         "99": "Don't know/Refused",
     #     },
     # },
     # "wp21760": {
@@ -665,7 +665,7 @@ MAPPING_QUESTION_VALUES = {
     #         "1": "Yes",
     #         "2": "No",
     #         "3": "Does not apply / no job",
-    #         "99": "DK/Refused",
+    #         "99": "Don't know/Refused",
     #     },
     # },
     # "wp21761": {
@@ -674,7 +674,7 @@ MAPPING_QUESTION_VALUES = {
     #         "1": "Yes",
     #         "2": "No",
     #         "3": "Does not apply / no job",
-    #         "99": "DK/Refused",
+    #         "99": "Don't know/Refused",
     #     },
     # },
     # "wp21768": {
@@ -682,7 +682,7 @@ MAPPING_QUESTION_VALUES = {
     #     "answers": {
     #         "1": "Yes, would agree",
     #         "2": "No, would not agree",
-    #         "99": "DK/Refused",
+    #         "99": "Don't know/Refused",
     #     },
     # },
 }
