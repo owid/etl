@@ -24,6 +24,7 @@ def run(dest_dir: str) -> None:
     tb_macronutrient_compositions = ds_garden["macronutrient_compositions"]
     tb_fertilizers = ds_garden["fertilizers"]
     tb_vegetable_oil_yields = ds_garden["vegetable_oil_yields"]
+    tb_agriculture_land_use_evolution = ds_garden["agriculture_land_use_evolution"]
 
     #
     # Process data.
@@ -57,6 +58,7 @@ def run(dest_dir: str) -> None:
             tb_macronutrient_compositions,
             tb_fertilizers,
             tb_vegetable_oil_yields,
+            tb_agriculture_land_use_evolution,
         ],
         default_metadata=ds_garden.metadata,
     )
