@@ -277,15 +277,13 @@ def run(dest_dir: str) -> None:
     regions: Table = regions.drop(columns=["defined_by"])  # type: ignore
 
     # Create slugs for all countries and keep track of legacy slugs.
-    is_country = regions["region_type"] == "country"
-    regions.loc[is_country, "slug"] = regions.loc[is_country, "name"].astype(str).map(slugify)
-    regions["slug"].update(LEGACY_SLUGS)
+    regions["slug"] = regions["name"].astype(str).map(slugify)
 
     # Countries that are mappable in Grapher.
     regions["is_mappable"] = regions.index.isin(MAPPABLE_COUNTRIES)
 
     # Countries that have a country page in Grapher.
-    regions["omit_country_page"] = regions.index.isin(NO_COUNTRY_PAGE)
+    regions["is_unlisted"] = regions.index.isin(NO_COUNTRY_PAGE)
 
     # Add ISO alpha 2 codes.
     regions["short_code"] = legacy_codes["iso_alpha2"]
