@@ -44,6 +44,8 @@ def run(dest_dir: str) -> None:
     #
     # Keep relevant columns, unpivot dataframe, harmonize country names.
     df = clean_df(df)
+    # Remove empty answers
+    df = df[df["answer"] != " "]
     # Build dataframe with shares of answers to each questions.
     df = make_df_with_share_answers(df)
     # Map IDs to labels (question, age and gender groups, answers)
@@ -276,12 +278,12 @@ def _sanity_check_answer(df: pd.DataFrame):
         answers_missing = q_a_map[k].difference(v)
         if answers_unexpected:
             print(k, "unexpected", answers_unexpected)
-            if answers_unexpected != {" "}:
-                raise ValueError("Would expect nothing or whitespace, this is new!")
+            # if answers_unexpected != {" "}:
+            raise ValueError("Would expect nothing or whitespace, this is new!")
         if answers_missing:
             print(k, "missing", answers_missing)
-            if answers_missing != {" "}:
-                raise ValueError("Would expect nothing or whitespace, this is new!")
+            # if answers_missing != {" "}:
+            raise ValueError("Would expect nothing or whitespace, this is new!")
 
 
 def _sanity_check_gender(df: pd.DataFrame):
