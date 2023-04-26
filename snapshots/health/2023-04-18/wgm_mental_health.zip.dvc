@@ -1,0 +1,35 @@
+meta:
+  namespace: health
+  short_name: wgm_mental_health
+  name: Wellcome Global Monitor 2020 - Mental health (Gallup and Wellcome, 2021)
+  version: 2023-04-18
+  publication_year: 2021
+  publication_date: 2021-10-21
+  source_name: Wellcome Global Monitor (2021)
+  source_published_by: "Wellcome, The Gallup Organization Ltd. (2021). Wellcome Global Monitor, 2020."
+  url: https://wellcome.org/reports/wellcome-global-monitor-mental-health/2020
+  source_data_url: https://cms.wellcome.org/sites/default/files/2021-11/wgm_full_wave2_public_file.zip
+  file_extension: zip
+  license_url:
+  license_name: Copyright Wellcome
+  date_accessed: 2023-04-18
+  is_public: true
+  description: |
+    Wellcome conducted the first Global Monitor – the largest-ever study of public attitudes to science and health – in 2018. The first wave covered topics such as whether people trust science, scientists and information about health, and attitudes towards the safety and efficacy of vaccines – a focus which has since proved incredibly forward-thinking.
+
+    In 2020, the Global Monitor's central focus was science's role in mental health.
+
+    The datasets and crosstabs cover the mental health sections of the WGM Survey 2020 conducted in 113 countries and territories worldwide on mental health views and experiences. The rest of the survey data will be published in subsequent data releases.
+
+
+    Relevant links:
+
+    • You can find the Wellcome Global Monitor 2020 full report at https://cms.wellcome.org/sites/default/files/2021-10/wellcome-global-monitor-mental-health.pdf
+    • Details on the methodology: https://cms.wellcome.org/sites/default/files/2021-10/wgm2020-methodology.pdf
+    • Details about the questionnaire: https://cms.wellcome.org/sites/default/files/2021-10/wgm2020-questionnaire.pdf
+    • Full questionnaire: https://cms.wellcome.org/sites/default/files/2021-11/WGM_Full_Questionnaire.pdf
+wdir: ../../../data/snapshots/health/2023-04-18
+outs:
+- md5: 386bae8712f9e9f2be45d7be2aae3942
+  size: 5850179
+  path: wgm_mental_health.zip
