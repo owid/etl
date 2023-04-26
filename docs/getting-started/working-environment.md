@@ -91,11 +91,26 @@ Even though it's not compulsory, it is **highly recommended** to install [pyenv]
 
 Follow the instructions in the [pyenv installation guide](https://github.com/pyenv/pyenv#installation) or follow the steps below.
 
-Install pyenv using Homebrew:
-```
-brew update
-brew install pyenv
-```
+=== "MacOS"
+
+    Install pyenv using Homebrew:
+    ```bash
+    brew update
+    brew install pyenv
+    ```
+
+=== "Ubuntu 22.04"
+
+    !!! note "For a more complete installation guide, [follow this guide](https://realpython.com/intro-to-pyenv/#installing-pyenv)."
+
+    Use the automatic installer:
+
+    ```bash
+    curl https://pyenv.run | bash
+    ```
+
+    For more details visit our other project: https://github.com/pyenv/pyenv-installer
+
 
 Add these lines to `~/.zshrc`, `~/.bash_profile` or `~/.bashrc`:
 
