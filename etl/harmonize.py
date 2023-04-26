@@ -18,7 +18,7 @@ from rapidfuzz import process
 from etl.paths import REFERENCE_DATASET, STEP_DIR
 
 # Path to latest regions definitions file. We update aliases from harmonize
-REGION_DEFINITIONS_FILE = STEP_DIR / "data/garden/regions/2023-01-01/regions.yml"
+REGION_DEFINITIONS_FILE = sorted((STEP_DIR / "data/garden/regions/").glob("*/regions.yml"))[-1]
 
 
 @click.command()
