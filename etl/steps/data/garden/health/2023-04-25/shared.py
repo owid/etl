@@ -26,7 +26,7 @@ MAPPING_QUESTION_VALUES = {
             "2": "Some",
             "3": "Not much",
             "4": "Nothing at all",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "q2": {
@@ -36,7 +36,7 @@ MAPPING_QUESTION_VALUES = {
             "2": "Some of it",
             "3": "Not much of it",
             "4": "Nothing at all",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "q3": {
@@ -44,7 +44,7 @@ MAPPING_QUESTION_VALUES = {
         "answers": {
             "1": "Yes",
             "2": "No",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "q4": {
@@ -52,7 +52,7 @@ MAPPING_QUESTION_VALUES = {
         "answers": {
             "1": "Yes",
             "2": "No",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "q5a": {
@@ -61,7 +61,7 @@ MAPPING_QUESTION_VALUES = {
             "1": "Yes",
             "2": "No",
             "97": "Never attended this type of school",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "q5b": {
@@ -70,7 +70,7 @@ MAPPING_QUESTION_VALUES = {
             "1": "Yes",
             "2": "No",
             "97": "Never attended this type of school",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "q5c": {
@@ -79,7 +79,7 @@ MAPPING_QUESTION_VALUES = {
             "1": "Yes",
             "2": "No",
             "97": "Never attended this type of school",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "q6": {
@@ -87,7 +87,7 @@ MAPPING_QUESTION_VALUES = {
         "answers": {
             "1": "Yes",
             "2": "No",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "q7": {
@@ -95,7 +95,7 @@ MAPPING_QUESTION_VALUES = {
         "answers": {
             "1": "Yes",
             "2": "No",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "q8": {
@@ -103,7 +103,7 @@ MAPPING_QUESTION_VALUES = {
         "answers": {
             "1": "Yes",
             "2": "No",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "q9": {
@@ -111,7 +111,7 @@ MAPPING_QUESTION_VALUES = {
         "answers": {
             "1": "Yes",
             "2": "No",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "q10a": {
@@ -119,7 +119,7 @@ MAPPING_QUESTION_VALUES = {
         "answers": {
             "1": "Yes",
             "2": "No",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "q10b": {
@@ -127,7 +127,7 @@ MAPPING_QUESTION_VALUES = {
         "answers": {
             "1": "Yes",
             "2": "No",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "q11a": {
@@ -137,7 +137,7 @@ MAPPING_QUESTION_VALUES = {
             "2": "Some",
             "3": "Not much",
             "4": "Not at all",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "q11b": {
@@ -147,7 +147,7 @@ MAPPING_QUESTION_VALUES = {
             "2": "Some",
             "3": "Not much",
             "4": "Not at all",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "q11c": {
@@ -157,7 +157,7 @@ MAPPING_QUESTION_VALUES = {
             "2": "Some",
             "3": "Not much",
             "4": "Not at all",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "q11d": {
@@ -167,7 +167,7 @@ MAPPING_QUESTION_VALUES = {
             "2": "Some",
             "3": "Not much",
             "4": "Not at all",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "q11e": {
@@ -177,7 +177,7 @@ MAPPING_QUESTION_VALUES = {
             "2": "Some",
             "3": "Not much",
             "4": "Not at all",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "q11f": {
@@ -187,7 +187,7 @@ MAPPING_QUESTION_VALUES = {
             "2": "Some",
             "3": "Not much",
             "4": "Not at all",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "q11g": {
@@ -197,7 +197,7 @@ MAPPING_QUESTION_VALUES = {
             "2": "Some",
             "3": "Not much",
             "4": "Not at all",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "q12": {
@@ -207,7 +207,7 @@ MAPPING_QUESTION_VALUES = {
             "2": "Some",
             "3": "Not much",
             "4": "Not at all",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "q13": {
@@ -217,7 +217,7 @@ MAPPING_QUESTION_VALUES = {
             "2": "Some",
             "3": "Not much",
             "4": "Not at all",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "q14a": {
@@ -227,7 +227,7 @@ MAPPING_QUESTION_VALUES = {
             "2": "Some",
             "3": "Not much",
             "4": "Not at all",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "q14b": {
@@ -237,7 +237,7 @@ MAPPING_QUESTION_VALUES = {
             "2": "Some",
             "3": "Not much",
             "4": "Not at all",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "q15a": {
@@ -247,7 +247,7 @@ MAPPING_QUESTION_VALUES = {
             "2": "Some",
             "3": "Not much",
             "4": "Not at all",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "q15b": {
@@ -257,7 +257,7 @@ MAPPING_QUESTION_VALUES = {
             "2": "Some",
             "3": "Not much",
             "4": "Not at all",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "q16": {
@@ -266,7 +266,7 @@ MAPPING_QUESTION_VALUES = {
             "1": "Most",
             "2": "Some",
             "3": "Very few",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "q17": {
@@ -274,7 +274,7 @@ MAPPING_QUESTION_VALUES = {
         "answers": {
             "1": "Yes",
             "2": "No",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "q18": {
@@ -282,7 +282,7 @@ MAPPING_QUESTION_VALUES = {
         "answers": {
             "1": "Yes",
             "2": "No",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "q19": {
@@ -291,7 +291,7 @@ MAPPING_QUESTION_VALUES = {
             "1": "Increase",
             "2": "Decrease",
             "3": "Neither/Have no effect",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "q20": {
@@ -303,7 +303,7 @@ MAPPING_QUESTION_VALUES = {
             "4": "A famous person",
             "5": "Traditional healer (or equivalent)",
             "97": "None of these/Someone else",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "q21": {
@@ -313,7 +313,7 @@ MAPPING_QUESTION_VALUES = {
             "2": "Some",
             "3": "Not much",
             "4": "Not at all",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "q22": {
@@ -323,7 +323,7 @@ MAPPING_QUESTION_VALUES = {
             "2": "Some",
             "3": "Not much",
             "4": "Not at all",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "q23": {
@@ -331,7 +331,7 @@ MAPPING_QUESTION_VALUES = {
         "answers": {
             "1": "Yes",
             "2": "No",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "q24": {
@@ -342,7 +342,7 @@ MAPPING_QUESTION_VALUES = {
             "3": "Neither agree nor disagree",
             "4": "Somewhat disagree",
             "5": "Strongly disagree",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "q25": {
@@ -353,7 +353,7 @@ MAPPING_QUESTION_VALUES = {
             "3": "Neither agree nor disagree",
             "4": "Somewhat disagree",
             "5": "Strongly disagree",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "q26": {
@@ -364,7 +364,7 @@ MAPPING_QUESTION_VALUES = {
             "3": "Neither agree nor disagree",
             "4": "Somewhat disagree",
             "5": "Strongly disagree",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "q27": {
@@ -373,7 +373,7 @@ MAPPING_QUESTION_VALUES = {
             "1": "Yes",
             "2": "No",
             "3": "Yes but no longer living",
-            "5": "DK/Refused",
+            "5": "Don't know/Refused",
         },
     },
     "q28": {
@@ -381,7 +381,7 @@ MAPPING_QUESTION_VALUES = {
         "answers": {
             "1": "Yes",
             "2": "No",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "d1": {
@@ -389,7 +389,7 @@ MAPPING_QUESTION_VALUES = {
         "answers": {
             "1": "Named a specific religion",
             "2": "Secular/Non-religious",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "q29": {
@@ -397,7 +397,7 @@ MAPPING_QUESTION_VALUES = {
         "answers": {
             "1": "Yes",
             "2": "No",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
     "q30": {
@@ -406,7 +406,7 @@ MAPPING_QUESTION_VALUES = {
             "1": "Science",
             "2": "The teachings of your religion",
             "97": "(It depends)",
-            "99": "DK/Refused",
+            "99": "Don't know/Refused",
         },
     },
 }
