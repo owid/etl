@@ -11,7 +11,9 @@ when are they most useful.
 
 :material-tools: I have something complex to do or am very comfortable with the ETL<br>[Manual addition :octicons-arrow-right-24:](manual.md)
 
-:material-run-fast: I have a very small dataset and I am not concerned about reproducibility<br>[Use Fast Track :octicons-arrow-right-24:](fast-track.md)
+:material-run-fast: I have a small dataset and I am not concerned about reproducibility<br>[Use Fast-Track :octicons-arrow-right-24:](fast-track.md)
+
+:material-flash: I just want to explore dataset in grapher<br>[Use Super Fast-Track :octicons-arrow-right-24:](fast-track.md#super-fast-track)
 
 :octicons-question-16: I have limited coding skills but I am concerned about reproducibility<br>[Report on #data-scientists slack channel :octicons-arrow-right-24:](https://app.slack.com/client/T3DR40MTQ/C025BDNS5AA/)
 

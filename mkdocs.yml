@@ -42,7 +42,7 @@ nav:
       - Adding data: "tutorials/adding-data/index.md"
       - Walkthrough: "tutorials/adding-data/walkthrough.md"
       - Manually add: "tutorials/adding-data/manual.md"
-      - Fast track: "tutorials/adding-data/fast-track.md"
+      - Fast-track: "tutorials/adding-data/fast-track.md"
     - Updating charts: "tutorials/updating-charts.md"
     - Harmonize country names: "tutorials/harmonize-countries.md"
     - Backporting Grapher datasets to ETL: "tutorials/backport.md"
