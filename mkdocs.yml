@@ -47,13 +47,16 @@ nav:
     - Harmonize country names: "tutorials/harmonize-countries.md"
     - Backporting Grapher datasets to ETL: "tutorials/backport.md"
     - Importing a private dataset to ETL: "tutorials/private-import.md"
-  - Datasets:
-    - Datasets: "data/index.md"
+  - Dataset catalog:
+    - Dataset catalog: "data/index.md"
     - Faostat: "data/faostat.md"
     - Regions: "data/regions.md"
   - API:
     - API: "api/index.md"
     - Python: "api/python.ipynb"
+  - Development:
+    - Development: "dev/index.md"
+    - Documentation: "dev/docs.md"
   - Contributing: "contributing.md"
 
 theme:
