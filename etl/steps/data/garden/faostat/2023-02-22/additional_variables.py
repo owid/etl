@@ -869,6 +869,73 @@ def generate_vegetable_oil_yields(df_qcl: pd.DataFrame, df_fbsc: pd.DataFrame) -
     return tb_vegetable_oil_yields
 
 
+def generate_agriculture_land_evolution(df_rl: pd.DataFrame) -> Table:
+    # Element code for "Area".
+    ELEMENT_CODE_FOR_AREA = "005110"
+    # Unit for element of area.
+    UNIT_FOR_AREA = "hectares"
+    # Item code for "Land under perm. meadows and pastures".
+    ITEM_CODE_FOR_PASTURES = "00006655"
+    # Item code for "Cropland".
+    ITEM_CODE_FOR_CROPLAND = "00006620"
+    # Item code for "Agricultural land".
+    ITEM_CODE_FOR_AGRICULTURAL_LAND = "00006610"
+
+    # Select the relevant items, elements and units.
+    land = df_rl[
+        (df_rl["unit"] == UNIT_FOR_AREA)
+        & (df_rl["element_code"] == ELEMENT_CODE_FOR_AREA)
+        & (df_rl["item_code"].isin([ITEM_CODE_FOR_AGRICULTURAL_LAND, ITEM_CODE_FOR_CROPLAND, ITEM_CODE_FOR_PASTURES]))
+    ].reset_index(drop=True)
+
+    # Transpose data and rename columns conveniently.
+    land = land.pivot(index=["country", "year"], columns=["item_code"], values="value").reset_index()
+    land.columns = list(land.columns)
+    land = land.rename(
+        columns={
+            ITEM_CODE_FOR_AGRICULTURAL_LAND: "agriculture_area",
+            ITEM_CODE_FOR_CROPLAND: "cropland_area",
+            ITEM_CODE_FOR_PASTURES: "pasture_area",
+        },
+        errors="raise",
+    )
+
+    # Add columns corresponding to the values of one decade before.
+    _land = land.copy()
+    _land["_year"] = _land["year"] + 10
+    combined = pd.merge(
+        land,
+        _land,
+        left_on=["country", "year"],
+        right_on=["country", "_year"],
+        how="inner",
+        suffixes=("", "_one_decade_back"),
+    ).drop(columns=["_year"])
+
+    # Add a column checking whether, for a given year, the country uses less, same, or more land than 10 years back.
+    # To do so, instead of simply comparing total numbers, impose a minimum threshold of fractional change.
+    # So that, if the land use on a given year is within, say, 1% of the value of 10 years back, consider it the same.
+    # TODO: Currently, assume changes within 0% (to replicate the previous results).
+    epsilon = 0.0
+    for item in ["agriculture_area", "cropland_area", "pasture_area"]:
+        combined[f"{item}_change"] = "Uses same land"
+        has_increased = combined[f"{item}"] > ((1 + epsilon) * combined[f"{item}_one_decade_back"])
+        combined.loc[has_increased, f"{item}_change"] = "Uses more land"
+        has_decreased = combined[f"{item}"] < ((1 - epsilon) * combined[f"{item}_one_decade_back"])
+        combined.loc[has_decreased, f"{item}_change"] = "Uses less land"
+
+        # TODO: Instead, we could simply have percentual changes and show map brackets. Decide which options is better.
+        # combined[f"{item}_change"] = 100 * (combined[f"{item}"] - combined[f"{item}_one_decade_back"]) / combined[f"{item}_one_decade_back"]
+
+    # Set an appropriate index and sort conveniently.
+    combined = combined.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
+
+    # Create a table.
+    tb_land_use_evolution = Table(combined, short_name="agriculture_land_use_evolution", underscore=True)
+
+    return tb_land_use_evolution
+
+
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
@@ -930,6 +997,9 @@ def run(dest_dir: str) -> None:
     # Create table for vegetable oil yields.
     tb_vegetable_oil_yields = generate_vegetable_oil_yields(df_qcl=df_qcl, df_fbsc=df_fbsc)
 
+    # Create table for peak agricultural land.
+    tb_agriculture_land_use_evolution = generate_agriculture_land_evolution(df_rl=df_rl)
+
     #
     # Save outputs.
     #
@@ -945,6 +1015,7 @@ def run(dest_dir: str) -> None:
             tb_macronutrient_compositions,
             tb_fertilizers,
             tb_vegetable_oil_yields,
+            tb_agriculture_land_use_evolution,
         ],
     )
     ds_garden.save()
