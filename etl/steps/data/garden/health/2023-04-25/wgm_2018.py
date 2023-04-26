@@ -67,7 +67,8 @@ def run(dest_dir: str) -> None:
     ds_garden.update_metadata(paths.metadata_path)
     # Add explanation to dataset description
     ds_garden.metadata.description += (
-        "\n\nNote: Data for answers where the demographic group had less than 100 participants are filtered out."
+        "\n\nNote 1: Data for answers where the demographic group had less than 100 participants are filtered out."
+        "\n\nNote 2: Empty answers have been filtered out. Empty answers may appear because the question was not applicable to the respondent or the respondent did not answer the question."
     )
 
     # Save changes in the new garden dataset.

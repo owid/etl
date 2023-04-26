@@ -30,11 +30,11 @@ meta:
     MAIN TOPICS
     The survey included the following variables:
 
-    • responses from Wellcome Global Monitor 2018 questionnaire
-    • gender and age
-    • educational level, employment status and per capita income quintiles
-    • country income level (World Bank)
-    • urban/rural location
+    • Responses from Wellcome Global Monitor 2018 questionnaire
+    • Gender and age
+    • Educational level, employment status and per capita income quintiles
+    • Country income level (World Bank)
+    • Urban/rural location
     • Wellcome Trust in Scientists Index
 wdir: ../../../data/snapshots/health/2023-04-25
 outs:
