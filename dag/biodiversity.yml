@@ -6,3 +6,9 @@
     - data://meadow/biodiversity/2023-01-11/cherry_blossom
     data://grapher/biodiversity/2023-01-11/cherry_blossom:
     - data://garden/biodiversity/2023-01-11/cherry_blossom
+    data://meadow/unodc/2023-04-26/wildlife_seizures:
+    - snapshot://unodc/2023-04-26/wildlife_seizures.xlsx
+    data://garden/unodc/2023-04-26/wildlife_seizures:
+    - data://meadow/unodc/2023-04-26/wildlife_seizures
+    data://grapher/unodc/2023-04-26/wildlife_seizures:
+    - data://garden/unodc/2023-04-26/wildlife_seizures

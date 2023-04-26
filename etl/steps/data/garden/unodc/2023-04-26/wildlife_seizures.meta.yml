@@ -1,0 +1,55 @@
+dataset:
+  title: Wildlife Seizure Trends, (United Nations Office on Drugs and Crime, 2022)
+  description: ''
+  licenses:
+  - name: UNODC Terms of Use
+    url: https://dataunodc.un.org/termsofuse
+  sources:
+  - name: UNODC (2022)
+    url: https://dataunodc.un.org/dp-wildlife-seizures
+    source_data_url: https://dataunodc.un.org/sites/dataunodc.un.org/files/data_wildlife_trafficking.xlsx
+    date_accessed: '2023-04-26'
+    publication_date: '2022-06-22'
+    publication_year: 2022
+    published_by: CITES Illegal Trade Database and UNODC World WISE Database
+tables:
+  wildlife_seizures:
+    variables:
+      elephant_tusks_number:
+        title: Elephant tusks (number)
+        short_unit: ''
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+      elephant_tusks_quantity_in_mt:
+        title: Elephant tusks in metric tons
+        short_unit: ''
+        unit: 'metric tons'
+      pangolins_number:
+        title: Pangolins (number)
+        short_unit: ''
+        unit: ''
+      pangolins_live_equivalent__in_thousands:
+        title: Pangolins live equivalent (in thousands)
+        short_unit: ''
+        unit: 'live equivalent (in thousands)'
+      tigers_live_equivalent:
+        title: Tigers live equivalent
+        short_unit: ''
+        unit: ' live equivalent'
+      rhino_horns_number:
+        title: Rhino horns (number)
+        short_unit: ''
+        unit: ''
+      rhino_horns_quantity_in_kg:
+        title: Rhino horns in kilograms
+        short_unit: ''
+        unit: 'kg'
+      european_eels_number:
+        title: European eels (number)
+        short_unit: ''
+        unit: ''
+      european_eels_quantity_in_kg:
+        title: European eels in kilograms
+        short_unit: ''
+        unit: 'kg'
