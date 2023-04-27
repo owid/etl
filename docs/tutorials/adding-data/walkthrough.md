@@ -1,7 +1,14 @@
 # Using the interactive walkthrough
 
 The walkthrough is an interactive web UI for setting up the different ETL steps. It creates the base files to help you
-create the recipe for a dataset. It currently supports the following stages:
+create the recipe for a dataset.
+
+## Get set up
+
+Before you begin, make sure you've set up the ETL as described in [Getting Started](../../getting-started/index.md).
+
+## Walkthrough options
+The walkthrough currently supports the following stages:
 
 | Option      | Description                                                                                                   |
 | ----------- | ------------------------------------------------------------------------------------------------------------- |
@@ -26,10 +33,6 @@ Options:
   --port INTEGER                Application port
   --help                        Show this message and exit.
 ```
-
-## Get set up
-
-Before you begin, make sure you've set up the ETL as described in [Getting Started](../getting-started/index.md).
 
 ## Start the walkthrough
 

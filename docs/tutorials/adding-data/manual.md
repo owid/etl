@@ -1,7 +1,7 @@
 # Manually add a dataset to the ETL
 ## Get set up
 
-Before you begin, make sure you've set up the ETL as described in [Getting Started](../getting-started/index.md).
+Before you begin, make sure you've set up the ETL as described in [Getting Started](../../getting-started/index.md).
 
 ## Adding steps to the ETL
 
