@@ -912,20 +912,11 @@ def generate_agriculture_land_evolution(df_rl: pd.DataFrame) -> Table:
         suffixes=("", "_one_decade_back"),
     ).drop(columns=["_year"])
 
-    # Add a column checking whether, for a given year, the country uses less, same, or more land than 10 years back.
-    # To do so, instead of simply comparing total numbers, impose a minimum threshold of fractional change.
-    # So that, if the land use on a given year is within, say, 1% of the value of 10 years back, consider it the same.
-    # TODO: Currently, assume changes within 0% (to replicate the previous results).
-    epsilon = 0.0
+    # For each item, add the percentage change of land use this year with respect to one decade back.
     for item in ["agriculture_area", "cropland_area", "pasture_area"]:
-        combined[f"{item}_change"] = "Uses same land"
-        has_increased = combined[f"{item}"] > ((1 + epsilon) * combined[f"{item}_one_decade_back"])
-        combined.loc[has_increased, f"{item}_change"] = "Uses more land"
-        has_decreased = combined[f"{item}"] < ((1 - epsilon) * combined[f"{item}_one_decade_back"])
-        combined.loc[has_decreased, f"{item}_change"] = "Uses less land"
-
-        # TODO: Instead, we could simply have percentual changes and show map brackets. Decide which options is better.
-        # combined[f"{item}_change"] = 100 * (combined[f"{item}"] - combined[f"{item}_one_decade_back"]) / combined[f"{item}_one_decade_back"]
+        combined[f"{item}_change"] = (
+            100 * (combined[f"{item}"] - combined[f"{item}_one_decade_back"]) / combined[f"{item}_one_decade_back"]
+        )
 
     # Set an appropriate index and sort conveniently.
     combined = combined.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
