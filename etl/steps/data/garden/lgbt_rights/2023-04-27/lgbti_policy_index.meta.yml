@@ -1,0 +1,106 @@
+dataset:
+  description: |-
+    From paper's abstract:
+
+    "Integration into the international community is typically used to explain liberal outcomes. However, is it possible that such integration can also explain rising illiberalism? Using the case of LGBT+ rights, I argue that backlash to liberal norms is increasingly organized transnationally, and that exposure to global norms via integration explains both liberal and illiberal outcomes. I test this argument through extensive original data collect and by using time-series cross-section, multinomial, and cross-lagged panel models. Robust findings reveal how exposure to global norms spurs policy backlashes – not just expansions – depending on how countries are situated within pro- and anti-LGBT+ transnational networks. This study contributes to our understanding of the changing international system by revealing how illiberal actors use mechanisms built by the liberal international community to transnationally organize, advance illiberal norms, and deinstitutionalize liberalism’s dominance."
+  sources:
+  - {}
+tables:
+  lgbti_policy_index:
+    variables:
+      equal_age:
+        title: equal_age
+        short_unit: ''
+        unit: ''
+      unequal_age:
+        title: unequal_age
+        short_unit: ''
+        unit: ''
+      constitution:
+        title: constitution
+        short_unit: ''
+        unit: ''
+      conversion_therapies:
+        title: conversion_therapies
+        short_unit: ''
+        unit: ''
+      death_penalty:
+        title: death_penalty
+        short_unit: ''
+        unit: ''
+      employment_discrim:
+        title: employment_discrim
+        short_unit: ''
+        unit: ''
+      gender_surgery:
+        title: gender_surgery
+        short_unit: ''
+        unit: ''
+      hate_crimes:
+        title: hate_crimes
+        short_unit: ''
+        unit: ''
+      incite_hate:
+        title: incite_hate
+        short_unit: ''
+        unit: ''
+      joint_adoption:
+        title: joint_adoption
+        short_unit: ''
+        unit: ''
+      lgb_military:
+        title: lgb_military
+        short_unit: ''
+        unit: ''
+      lgb_military_ban:
+        title: lgb_military_ban
+        short_unit: ''
+        unit: ''
+      marriage_equality:
+        title: marriage_equality
+        short_unit: ''
+        unit: ''
+      marriage_ban:
+        title: marriage_ban
+        short_unit: ''
+        unit: ''
+      samesex_legal:
+        title: samesex_legal
+        short_unit: ''
+        unit: ''
+      third_gender:
+        title: third_gender
+        short_unit: ''
+        unit: ''
+      trans_military:
+        title: trans_military
+        short_unit: ''
+        unit: ''
+      samesex_illegal:
+        title: samesex_illegal
+        short_unit: ''
+        unit: ''
+      civil_unions:
+        title: civil_unions
+        short_unit: ''
+        unit: ''
+      gendermarker:
+        title: gendermarker
+        short_unit: ''
+        unit: ''
+      propaganda:
+        title: propaganda
+        short_unit: ''
+        unit: ''
+      policy_index:
+        title: policy_index
+        short_unit: ''
+        unit: ''
+      numiso:
+        title: numiso
+        short_unit: ''
+        unit: ''
+      uncode:
+        title: uncode
+        short_unit: ''
+        unit: ''

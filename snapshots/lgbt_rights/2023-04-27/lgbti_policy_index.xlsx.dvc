@@ -1,0 +1,25 @@
+meta:
+  namespace: lgbt_rights
+  short_name: lgbti_policy_index
+  name: LGBTI Policy Index (Velasco, 2020)
+  version: '2023-04-27'
+  publication_date: '2020-07-24'
+  source_name: Kristopher Velasco (2020)
+  source_published_by: 'Velasco, K. (2020). Transnational Backlash and the Deinstitutionalization
+    of Liberal Norms: LGBT+ Rights in a Contested World. https://doi.org/10.31235/osf.io/3rtje'
+  url: https://osf.io/preprints/socarxiv/3rtje/
+  source_data_url:
+  file_extension: xlsx
+  license_url:
+  license_name: ''
+  date_accessed: 2023-04-27
+  is_public: true
+  description: |
+    From paper's abstract:
+
+    "Integration into the international community is typically used to explain liberal outcomes. However, is it possible that such integration can also explain rising illiberalism? Using the case of LGBT+ rights, I argue that backlash to liberal norms is increasingly organized transnationally, and that exposure to global norms via integration explains both liberal and illiberal outcomes. I test this argument through extensive original data collect and by using time-series cross-section, multinomial, and cross-lagged panel models. Robust findings reveal how exposure to global norms spurs policy backlashes – not just expansions – depending on how countries are situated within pro- and anti-LGBT+ transnational networks. This study contributes to our understanding of the changing international system by revealing how illiberal actors use mechanisms built by the liberal international community to transnationally organize, advance illiberal norms, and deinstitutionalize liberalism’s dominance."
+wdir: ../../../data/snapshots/lgbt_rights/2023-04-27
+outs:
+- md5: ef891cbe74677c191de6893fb0f0916b
+  size: 408425
+  path: lgbti_policy_index.xlsx

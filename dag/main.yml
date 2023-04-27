@@ -337,6 +337,16 @@ steps:
   data://grapher/happiness/2023-03-20/happiness:
   - data://garden/happiness/2023-03-20/happiness
 
+# LGBTI Policy Index (Velasco, 2020)
+  data://meadow/lgbt_rights/2023-04-27/lgbti_policy_index:
+  - snapshot://lgbt_rights/2023-04-27/lgbti_policy_index.xlsx
+  data://garden/lgbt_rights/2023-04-27/lgbti_policy_index:
+  - data://meadow/lgbt_rights/2023-04-27/lgbti_policy_index
+  - data://garden/demography/2023-03-31/population
+  - data://garden/reference
+  data://grapher/lgbt_rights/2023-04-27/lgbti_policy_index:
+  - data://garden/lgbt_rights/2023-04-27/lgbti_policy_index
+
 # Sub-dags to import
 include:
   - dag/open_numbers.yml
