@@ -26,6 +26,7 @@ def run(dest_dir: str) -> None:
     tb_vegetable_oil_yields = ds_garden["vegetable_oil_yields"]
     tb_agriculture_land_use_evolution = ds_garden["agriculture_land_use_evolution"]
     tb_hypothetical_meat_consumption = ds_garden["hypothetical_meat_consumption"]
+    tb_cereal_allocation = ds_garden["cereal_allocation"]
 
     #
     # Process data.
@@ -61,6 +62,7 @@ def run(dest_dir: str) -> None:
             tb_vegetable_oil_yields,
             tb_agriculture_land_use_evolution,
             tb_hypothetical_meat_consumption,
+            tb_cereal_allocation,
         ],
         default_metadata=ds_garden.metadata,
     )
