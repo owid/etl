@@ -540,3 +540,89 @@ tables:
         short_unit: ha
         description: |
           Amount of land that would need to be devoted to grow sesame crops if it was to meet global vegetable oil demand alone.
+  agriculture_land_use_evolution:
+    variables:
+      agriculture_area:
+        title: Area used for agriculture
+        unit: hectares
+        short_unit: ha
+        description: |
+          Surface area devoted to agriculture on a given year.
+      agriculture_area_one_decade_back:
+        title: Area used for agriculture one decade back
+        unit: hectares
+        short_unit: ha
+        description: |
+          Surface area devoted to agriculture one decade before a given year. For example, for year 2020, this variable gives the extent of agricultural land in 2010.
+      cropland_area:
+        title: Area used for croplands
+        unit: hectares
+        short_unit: ha
+        description: |
+          Surface area devoted to croplands on a given year.
+      cropland_area_one_decade_back:
+        title: Area used for croplands one decade back
+        unit: hectares
+        short_unit: ha
+        description: |
+          Surface area devoted to croplands one decade before a given year. For example, for year 2020, this variable gives the extent of croplands in 2010.
+      pasture_area:
+        title: Area used for pastures
+        unit: hectares
+        short_unit: ha
+        description: |
+          Surface area devoted to pastures on a given year.
+      pasture_area_one_decade_back:
+        title: Area used for pastures one decade back
+        unit: hectares
+        short_unit: ha
+        description: |
+          Surface area devoted to pastures one decade before a given year. For example, for year 2020, this variable gives the extent of pastures in 2010.
+      year_one_decade_back:
+        title: Year one decade back
+        unit: ""
+        short_unit: ""
+        description: |
+          Year one decade before a given year. For example, for year 2020, this variable would be 2010.
+      agriculture_area_change:
+        title: Change in agriculture area with respect to one decade back
+        unit: "%"
+        short_unit: "%"
+        description: |
+          Percentage change in surface area devoted to agriculture with respect to 10 years before. Negative values imply that surface area has decreased with respect to the previous decade.
+
+          This data is used to assess which countries may have already peaked in their agricultural land use. 
+
+          Assessing this by looking at annual land use data is difficult because there can be significant year-to-year variability. That land use for one or two years was lower than previous years would be insufficient to conclude that a country had peaked.
+
+          For this reason we look at decadal changes in agricultural land. We look at land use in the latest year relative to 10 years before.
+
+          If land use is lower in the latest year then we suggest that land use may have peaked. If land use it the same or higher than a decade back, we suggest that it hasn't, or this is uncertain.
+      cropland_area_change:
+        title: Change in cropland area with respect to one decade back
+        unit: "%"
+        short_unit: "%"
+        description: |
+          Percentage change in surface area devoted to croplands with respect to 10 years before. Negative values imply that surface area has decreased with respect to the previous decade.
+
+          This data is used to assess which countries may have already peaked in their agricultural land use. 
+
+          Assessing this by looking at annual land use data is difficult because there can be significant year-to-year variability. That land use for one or two years was lower than previous years would be insufficient to conclude that a country had peaked.
+
+          For this reason we look at decadal changes in agricultural land. We look at land use in the latest year relative to 10 years before.
+
+          If land use is lower in the latest year then we suggest that land use may have peaked. If land use it the same or higher than a decade back, we suggest that it hasn't, or this is uncertain.
+      pasture_area_change:
+        title: Change in pasture area with respect to one decade back
+        unit: "%"
+        short_unit: "%"
+        description: |
+          Percentage change in surface area devoted to pastures with respect to 10 years before. Negative values imply that surface area has decreased with respect to the previous decade.
+
+          This data is used to assess which countries may have already peaked in their agricultural land use. 
+
+          Assessing this by looking at annual land use data is difficult because there can be significant year-to-year variability. That land use for one or two years was lower than previous years would be insufficient to conclude that a country had peaked.
+
+          For this reason we look at decadal changes in agricultural land. We look at land use in the latest year relative to 10 years before.
+
+          If land use is lower in the latest year then we suggest that land use may have peaked. If land use it the same or higher than a decade back, we suggest that it hasn't, or this is uncertain.
