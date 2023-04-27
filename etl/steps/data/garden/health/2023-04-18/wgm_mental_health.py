@@ -44,6 +44,8 @@ def run(dest_dir: str) -> None:
     #
     # Keep relevant columns, unpivot dataframe, harmonize country names.
     df = clean_df(df)
+    # Remove empty answers
+    df = df[df["answer"] != " "]
     # Build dataframe with shares of answers to each questions.
     df = make_df_with_share_answers(df)
     # Map IDs to labels (question, age and gender groups, answers)
@@ -63,7 +65,8 @@ def run(dest_dir: str) -> None:
     ds_garden.update_metadata(paths.metadata_path)
     # Add explanation to dataset description
     ds_garden.metadata.description += (
-        "\n\nNote: Data for answers that where the demographic group had less than 100 participants are filtered out."
+        "\n\nNote 1: Data for answers where the demographic group had less than 100 participants are filtered out."
+        "\n\nNote 2: Empty answers have been filtered out. Empty answers may appear because the question was not applicable to the respondent or the respondent did not answer the question."
     )
     # Save changes in the new garden dataset.
     ds_garden.save()
@@ -164,15 +167,15 @@ def _build_df_with_incomes(df: pd.DataFrame) -> pd.DataFrame:
 
 def _make_df_with_share_answers(df: pd.DataFrame, weight_column: str = "weight_intra_country") -> pd.DataFrame:
     # 1. broken down by gender and age group
-    df_gender_age = make_individual_df_with_share_answers(
+    df_gender_age = _make_individual_df_with_share_answers(
         df, dimensions=["gender", "age_group"], weight_column=weight_column
     )
     # 2. broken down by gender
-    df_gender = make_individual_df_with_share_answers(df, dimensions=["gender"], weight_column=weight_column)
+    df_gender = _make_individual_df_with_share_answers(df, dimensions=["gender"], weight_column=weight_column)
     # 3. broken down by age_group
-    df_age = make_individual_df_with_share_answers(df, dimensions=["age_group"], weight_column=weight_column)
+    df_age = _make_individual_df_with_share_answers(df, dimensions=["age_group"], weight_column=weight_column)
     # 4. no breakdown
-    df_nb = make_individual_df_with_share_answers(df, weight_column=weight_column)
+    df_nb = _make_individual_df_with_share_answers(df, weight_column=weight_column)
     # Combine dataframes
     log.info("wgm_mental_health: combining dataframes into combined one")
     df_combined = pd.concat([df_nb, df_gender, df_age, df_gender_age], ignore_index=True)
@@ -184,7 +187,7 @@ def _make_df_with_share_answers(df: pd.DataFrame, weight_column: str = "weight_i
     return df_combined
 
 
-def make_individual_df_with_share_answers(
+def _make_individual_df_with_share_answers(
     df: pd.DataFrame, weight_column: str, dimensions: List[str] = []
 ) -> pd.DataFrame:
     """Obtain table with answer percentages and counts to each question for all demographic groups and countries.
@@ -205,8 +208,7 @@ def make_individual_df_with_share_answers(
     df_ = df_.reset_index()
     # For each question, now obtain the percentage of each of its answers (weighted).
     columns_normalise = [col for col in columns_index if col not in ["answer"]]
-    df_weights_sum = df_.groupby(columns_normalise, as_index=False)[["sum"]].sum()
-    df_ = df_.merge(df_weights_sum, on=columns_normalise, suffixes=("", "_denominator"))
+    df_["sum_denominator"] = df_.groupby(columns_normalise, observed=True)["sum"].transform("sum")
     df_["share"] = 100 * df_["sum"] / df_["sum_denominator"]
     # Add missing dimensions
     dimensions_all = ["gender", "age_group"]
@@ -277,12 +279,12 @@ def _sanity_check_answer(df: pd.DataFrame):
         answers_missing = q_a_map[k].difference(v)
         if answers_unexpected:
             print(k, "unexpected", answers_unexpected)
-            if answers_unexpected != {" "}:
-                raise ValueError("Would expect nothing or whitespace, this is new!")
+            # if answers_unexpected != {" "}:
+            raise ValueError("Would expect nothing or whitespace, this is new!")
         if answers_missing:
             print(k, "missing", answers_missing)
-            if answers_missing != {" "}:
-                raise ValueError("Would expect nothing or whitespace, this is new!")
+            # if answers_missing != {" "}:
+            raise ValueError("Would expect nothing or whitespace, this is new!")
 
 
 def _sanity_check_gender(df: pd.DataFrame):
@@ -306,14 +308,14 @@ def _sanity_check_age_ids(df: pd.DataFrame):
 def filter_rows_with_low_participation(df: pd.DataFrame) -> pd.DataFrame:
     """Filter rows where the number of answers for a question from a demographic group was very low"""
     log.info("wgm_mental_health: Filtering entries with few participants.")
+    num_samples_initially = len(df)
     col_idx = ["country", "year", "question", "gender", "age_group"]
-    df_count = df.groupby(col_idx, observed=True, as_index=False)[["count"]].sum()
-    df = df.merge(df_count, on=col_idx, suffixes=("", "_total"), how="left")
+    df["count_total"] = df.groupby(col_idx, observed=True)["count"].transform("sum")
     df = df[df["count_total"] > THRESHOLD_ANSWERS]
     # Alternative would be to just remove share values and keep absolute counts
     # df.loc[df["count_total"] > THRESHOLD_ANSWERS, "Share"] = None
     # Log
-    percentage_kept = round(100 * len(df[df["count"] > THRESHOLD_ANSWERS]) / len(df), 2)
+    percentage_kept = round(100 * len(df) / num_samples_initially, 2)
     log.info(f"wgm_mental_health: Keeping {percentage_kept}% of all the rows.")
     return df
 

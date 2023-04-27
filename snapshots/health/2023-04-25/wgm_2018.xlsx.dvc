@@ -1,0 +1,43 @@
+meta:
+  namespace: health
+  short_name: wgm_2018
+  name: Wellcome Global Monitor 2018 (Gallup and Wellcome, 2019)
+  version: 2023-04-25
+  publication_year: 2019
+  publication_date: 2019-06-18
+  source_name: Wellcome Global Monitor (2019)
+  source_published_by: 'Wellcome Trust, The Gallup Organization Ltd. (2019). Wellcome
+    Global Monitor, 2018. 2nd Edition. UK Data Service. SN: 8466, DOI: http://doi.org/10.5255/UKDA-SN-8466-2'
+  url: https://wellcome.org/reports/wellcome-global-monitor/2018
+  source_data_url: https://wellcome.org/sites/default/files/wgm2018-dataset-crosstabs-all-countries.xlsx
+  file_extension: xlsx
+  license_url:
+  license_name: Copyright Wellcome Trust
+  date_accessed: 2023-04-25
+  is_public: true
+  description: |
+    The Wellcome Global Monitor is the first global survey of how people worldwide think and feel about key science and health challenges - including such critical topics as public trust in scientists, attitudes towards vaccines and how inclusive or exclusive people believe the benefits of science to be.
+
+    The survey involved more than 140,000 people in 144 countries in 2018, and was run as part of the Gallup World Poll.  Typically, 1,000 individuals were surveyed in each country. In China, India and Russia the sample sizes were 2,000 or greater. In rare instances, the sample size fell between 500 and 1,000.
+
+    The survey will provide evidence on how public attitudes vary across different demographic groups and countries, and will help researchers and policy makers around the world to promote debate, and frame proposals for action to improve engagement and trust in science and healthcare.
+
+    Further information about the survey can be found on the Wellcome Global Monitor website (https://wellcome.org/reports/wellcome-global-monitor/2018).
+
+    For the second edition (July 2019), updated versions of the data and documentation are provided.
+
+
+    MAIN TOPICS
+    The survey included the following variables:
+
+    • Responses from Wellcome Global Monitor 2018 questionnaire
+    • Gender and age
+    • Educational level, employment status and per capita income quintiles
+    • Country income level (World Bank)
+    • Urban/rural location
+    • Wellcome Trust in Scientists Index
+wdir: ../../../data/snapshots/health/2023-04-25
+outs:
+- md5: 12fe9fa09f0de4dde0e63486f77fffb3
+  size: 52593312
+  path: wgm_2018.xlsx
