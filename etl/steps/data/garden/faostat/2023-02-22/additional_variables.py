@@ -927,6 +927,97 @@ def generate_agriculture_land_evolution(df_rl: pd.DataFrame) -> Table:
     return tb_land_use_evolution
 
 
+def generate_hypothetical_meat_consumption(df_qcl: pd.DataFrame) -> Table:
+    # Element code and unit for "Production".
+    ELEMENT_CODE_FOR_PRODUCTION = "005510"
+    UNIT_FOR_PRODUCTION = "tonnes"
+    # Element code and unit for per-capita "Production".
+    ELEMENT_CODE_FOR_PRODUCTION_PER_CAPITA = "5510pc"
+    UNIT_FOR_PRODUCTION_PER_CAPITA = "tonnes per capita"
+    # Element code and unit for "Producing or slaughtered animals".
+    ELEMENT_CODE_FOR_ANIMALS = "005320"
+    UNIT_FOR_ANIMALS = "animals"
+    # Element code and unit for per-capita "Producing or slaughtered animals".
+    ELEMENT_CODE_FOR_ANIMALS_PER_CAPITA = "5320pc"
+    UNIT_FOR_ANIMALS_PER_CAPITA = "animals per capita"
+    # Item code for "Meat, total".
+    ITEM_CODE_FOR_MEAT_TOTAL = "00001765"
+
+    # Select the required items/elements/units to get national data on per-capita production and slaughtered animals.
+    meat = df_qcl[
+        (df_qcl["item_code"] == ITEM_CODE_FOR_MEAT_TOTAL)
+        & (df_qcl["element_code"].isin([ELEMENT_CODE_FOR_PRODUCTION_PER_CAPITA, ELEMENT_CODE_FOR_ANIMALS_PER_CAPITA]))
+        & (df_qcl["unit"].isin([UNIT_FOR_PRODUCTION_PER_CAPITA, UNIT_FOR_ANIMALS_PER_CAPITA]))
+    ].reset_index(drop=True)
+    meat = meat.pivot(index=["country", "year"], columns="element_code", values="value").reset_index()
+    meat = meat.rename(
+        columns={
+            ELEMENT_CODE_FOR_ANIMALS_PER_CAPITA: "animals_per_capita",
+            ELEMENT_CODE_FOR_PRODUCTION_PER_CAPITA: "production_per_capita",
+        }
+    )
+
+    # Take data for global population from the "population_with_data" column for the production of total meat.
+    # This should coincide with the true world population.
+    # Note that "population_with_data" may differ with the total population for certain items/elements for region
+    # aggregates (e.g. "Africa"). For slaughtered animals, population with data may also differ, since it's
+    # built for all countries (in the garden faostat_qcl step) by aggregating.
+    # But this does not happen with total meat/production for the "World", since this data was extracted directly from FAOSTAT.
+    # TODO: Confirm this by checking qcl code, especially the one about animals slaughtered
+    global_population = (
+        df_qcl[
+            (df_qcl["country"] == "World")
+            & (df_qcl["element_code"] == ELEMENT_CODE_FOR_PRODUCTION)
+            & (df_qcl["unit"] == UNIT_FOR_PRODUCTION)
+            & (df_qcl["item_code"] == ITEM_CODE_FOR_MEAT_TOTAL)
+        ][["year", "population_with_data"]]
+        .reset_index(drop=True)
+        .rename(columns={"population_with_data": "global_population"})
+    ).astype({"global_population": int})
+
+    # Just for reference, extract global production and number of slaughtered animals.
+    global_production = (
+        df_qcl[
+            (df_qcl["country"] == "World")
+            & (df_qcl["element_code"] == ELEMENT_CODE_FOR_PRODUCTION)
+            & (df_qcl["unit"] == UNIT_FOR_PRODUCTION)
+            & (df_qcl["item_code"] == ITEM_CODE_FOR_MEAT_TOTAL)
+        ][["year", "value"]]
+        .reset_index(drop=True)
+        .rename(columns={"value": "production_global"})
+    )
+    global_animals = (
+        df_qcl[
+            (df_qcl["country"] == "World")
+            & (df_qcl["element_code"] == ELEMENT_CODE_FOR_ANIMALS)
+            & (df_qcl["unit"] == UNIT_FOR_ANIMALS)
+            & (df_qcl["item_code"] == ITEM_CODE_FOR_MEAT_TOTAL)
+        ][["year", "value"]]
+        .reset_index(drop=True)
+        .rename(columns={"value": "animals_global"})
+    )
+
+    # Combine national with global data.
+    combined = multi_merge(dfs=[meat, global_population, global_production, global_animals], on=["year"], how="left")
+
+    # Sanity check.
+    error = "Rows have changed after merging national data with global data."
+    assert len(combined) == len(meat), error
+
+    # Add columns for hypothetical global production and number of slaughtered animals.
+    # This is the production (or number of slaughtered animals) that would be needed worldwide to meet the demand of a given country.
+    combined["production_global_hypothetical"] = combined["production_per_capita"] * combined["global_population"]
+    combined["animals_global_hypothetical"] = combined["animals_per_capita"] * combined["global_population"]
+
+    # Set an appropriate index and sort conveniently.
+    combined = combined.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
+
+    # Create a table with the combined data.
+    tb_hypothetical_meat_consumption = Table(combined, short_name="hypothetical_meat_consumption", underscore=True)
+
+    return tb_hypothetical_meat_consumption
+
+
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
@@ -991,6 +1082,9 @@ def run(dest_dir: str) -> None:
     # Create table for peak agricultural land.
     tb_agriculture_land_use_evolution = generate_agriculture_land_evolution(df_rl=df_rl)
 
+    # Create table for hypothetical meat consumption
+    tb_hypothetical_meat_consumption = generate_hypothetical_meat_consumption(df_qcl=df_qcl)
+
     #
     # Save outputs.
     #
@@ -1007,6 +1101,7 @@ def run(dest_dir: str) -> None:
             tb_fertilizers,
             tb_vegetable_oil_yields,
             tb_agriculture_land_use_evolution,
+            tb_hypothetical_meat_consumption,
         ],
     )
     ds_garden.save()
