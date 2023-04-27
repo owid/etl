@@ -974,7 +974,7 @@ def generate_hypothetical_meat_consumption(df_qcl: pd.DataFrame) -> Table:
         ][["year", "population_with_data"]]
         .reset_index(drop=True)
         .rename(columns={"population_with_data": "global_population"})
-    )
+    ).astype({"global_population": int})
 
     # Just for reference, extract global production and number of slaughtered animals.
     global_production = (
