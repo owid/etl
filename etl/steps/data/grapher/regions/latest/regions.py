@@ -14,14 +14,6 @@ from etl.helpers import PathFinder, create_dataset
 paths = PathFinder(__file__)
 
 
-# Legacy slugs for countries that have changed their name.
-LEGACY_SLUGS = {
-    "CZE": "czech-republic",
-    "MKD": "macedonia",
-    "SWZ": "swaziland",
-    "TLS": "timor",
-}
-
 # Countries that are mappable in Grapher.
 MAPPABLE_COUNTRIES = [
     "AFG",
@@ -251,6 +243,8 @@ NO_COUNTRY_PAGE = [
     "SJM",
     "UMI",
     "WLF",
+    "PS_GZA",
+    "SXM",
 ]
 
 
@@ -278,7 +272,6 @@ def run(dest_dir: str) -> None:
 
     # Create slugs for all countries and keep track of legacy slugs.
     regions["slug"] = regions["name"].astype(str).map(slugify)
-    regions["slug"].update(LEGACY_SLUGS)
 
     # Countries that are mappable in Grapher.
     regions["is_mappable"] = regions.index.isin(MAPPABLE_COUNTRIES)
