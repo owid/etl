@@ -639,7 +639,7 @@ tables:
         description: |
           Hypothetical number of slaughtered animals worldwide if everyone in the world ate the same quantity as the average citizen of a given country.
 
-          This is a hypothetical variable derived by Our World in Data which answers the question: "how many animals would need to be slaughtered if everyone in the world was to consume the average per capita amount of a given country?". For example "how many animals would need to be slaughtered if everyone in the world consumed the same amount of meat as the average UK citizen?".
+          This is a hypothetical variable derived by Our World in Data which answers the question: "how many animals would need to be slaughtered if everyone in the world consumed the average per capita amount of a given country?". For example "how many animals would need to be slaughtered if everyone in the world consumed the same amount of meat as the average UK citizen?".
 
           This was derived by multiplying global population by the per capita number of slaughtered animals of a given country.
       animals_per_capita:
@@ -661,7 +661,7 @@ tables:
         description: |
           Hypothetical global meat demand if everyone in the world ate the same quantity as the average citizen of a given country.
 
-          This is a hypothetical variable derived by Our World in Data which answers the question: "what would global meat production have to be if everyone in the world was to consume the average per capita amount of a given country?". For example "how much meat would we need to produce if everyone in the world consumed the same amount of meat as the average UK citizen?".
+          This is a hypothetical variable derived by Our World in Data which answers the question: "what would global meat production have to be if everyone in the world consumed the average per capita amount of a given country?". For example "how much meat would we need to produce if everyone in the world consumed the same amount of meat as the average UK citizen?".
 
           This was derived by multiplying global population by per capita meat supply of a given country.
       production_per_capita:
