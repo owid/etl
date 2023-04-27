@@ -949,14 +949,13 @@ def generate_hypothetical_meat_consumption(df_qcl: pd.DataFrame) -> Table:
         & (df_qcl["element_code"].isin([ELEMENT_CODE_FOR_PRODUCTION_PER_CAPITA, ELEMENT_CODE_FOR_ANIMALS_PER_CAPITA]))
         & (df_qcl["unit"].isin([UNIT_FOR_PRODUCTION_PER_CAPITA, UNIT_FOR_ANIMALS_PER_CAPITA]))
     ].reset_index(drop=True)
-    meat = meat.pivot(index=["country", "year"], columns=["element_code"], values=["value"])
-    meat.columns = [column[1] for column in meat.columns]
+    meat = meat.pivot(index=["country", "year"], columns="element_code", values="value").reset_index()
     meat = meat.rename(
         columns={
             ELEMENT_CODE_FOR_ANIMALS_PER_CAPITA: "animals_per_capita",
             ELEMENT_CODE_FOR_PRODUCTION_PER_CAPITA: "production_per_capita",
         }
-    ).reset_index()
+    )
 
     # Take data for global population from the "population_with_data" column for the production of total meat.
     # This should coincide with the true world population.
