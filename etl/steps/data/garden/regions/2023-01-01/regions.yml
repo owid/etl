@@ -1653,6 +1653,7 @@
 
 - code: "OWID_ZAN"
   name: "Zanzibar"
+  region_type: "other"
 
 - code: "ZWE"
   name: "Zimbabwe"
