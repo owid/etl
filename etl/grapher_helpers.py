@@ -368,7 +368,11 @@ def _adapt_dataset_metadata_for_grapher(
     # Add the dataset description as if it was a source's description.
     if metadata.description is not None:
         if metadata.sources[0].description:
-            if metadata.sources[0].description != metadata.description:
+            # If descriptions are not subsets of each other (or equal), add them together
+            if (
+                metadata.sources[0].description not in metadata.description
+                and metadata.description not in metadata.sources[0].description
+            ):
                 metadata.sources[0].description = metadata.description + "\n" + metadata.sources[0].description
         else:
             metadata.sources[0].description = metadata.description
