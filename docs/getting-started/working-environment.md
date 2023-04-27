@@ -85,6 +85,71 @@ You will need Python 3.9+, basic build tools, and MySQL client libraries.
 
     Please ask someone in the `#data-architecture` Slack channel to help you get set up.
 
+## Install pyenv
+
+Even though it's not compulsory, it is **highly recommended** to install [pyenv](https://github.com/pyenv/pyenv#installation) to manage your Python versions. This will allow you to have multiple Python versions installed in your machine and switch between them easily. You will also avoid issues caused by updating system wide Python.
+
+Follow the instructions in the [pyenv installation guide](https://github.com/pyenv/pyenv#installation) or follow the steps below.
+
+=== "MacOS"
+
+    Install pyenv using Homebrew:
+    ```bash
+    brew update
+    brew install pyenv
+    ```
+
+=== "Ubuntu 22.04"
+
+    !!! note "For a more complete installation guide, [follow this guide](https://realpython.com/intro-to-pyenv/#installing-pyenv)."
+
+    Use the automatic installer:
+
+    ```bash
+    curl https://pyenv.run | bash
+    ```
+
+    For more details visit our other project: https://github.com/pyenv/pyenv-installer
+
+
+Add these lines to `~/.zshrc`, `~/.bash_profile` or `~/.bashrc`:
+
+```
+export PYENV_ROOT="$HOME/.pyenv"
+export PATH="$PYENV_ROOT/bin:$PATH"
+if command -v pyenv 1>/dev/null 2>&1; then
+  eval "$(pyenv init --path)"
+  eval "$(pyenv init -)"
+fi
+```
+
+Restart your shell to apply changes
+
+```
+exec "$SHELL"
+```
+
+Verify that pyenv is installed properly:
+
+```
+pyenv --version
+```
+
+Now, you can use pyenv to install and manage multiple Python versions on your Mac. For example, to install Python 3.11.3, run:
+
+```
+pyenv install 3.11.3
+```
+
+To set the newly installed Python version as the global default, run:
+
+```
+pyenv global 3.11.3
+```
+
+Now check that `which python3` prints path `.../.pyenv/shims/python3` and `python --version` prints `Python 3.11.3`.
+
+
 ## Clone the project
 First of all, you need to have the [ETL project](https://github.com/owid/etl) in your working environment. Run:
 

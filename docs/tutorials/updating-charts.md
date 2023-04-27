@@ -1,3 +1,5 @@
+!!! warning "This tutorial might be partial or incomplete. Please check with the team if you have questions."
+
 Once a dataset is available on the Grapher admin, you can create charts from its variables. In some cases, the dataset is a newer version from an already existing one. In such cases, we may need to update some charts that are relying on variables from the old dataset.
 
 To this end, we use `poetry run walkthrough charts`. This tool will guide you through the whole process of creating _chart revisions_.
