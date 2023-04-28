@@ -337,6 +337,13 @@ steps:
   data://grapher/happiness/2023-03-20/happiness:
   - data://garden/happiness/2023-03-20/happiness
 
+# Tourism
+  data://garden/tourism/2023-04-29/tourism_departures_per_thousand:
+    - data://garden/worldbank_wdi/2022-05-26/wdi
+    - data://garden/demography/2023-03-31/population
+  data://grapher/tourism/2023-04-29/tourism_departures_per_thousand:
+  - data://garden/tourism/2023-04-29/tourism_departures_per_thousand
+
 # Sub-dags to import
 include:
   - dag/open_numbers.yml
