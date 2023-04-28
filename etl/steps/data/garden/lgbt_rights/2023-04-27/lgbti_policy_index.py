@@ -56,13 +56,21 @@ def run(dest_dir: str) -> None:
     df = df.set_index(["country", "year"], verify_integrity=True).sort_index()
 
     # Create a new table with the processed data.
-    tb_garden = Table(df, like=tb_meadow)
+    tb_garden = Table(df)
+    tb_garden.metadata.short_name = "lgbti_policy_index"
 
     #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb_garden], default_metadata=ds_meadow.metadata)
+    ds_garden = create_dataset(dest_dir, tables=[tb_garden])
+
+    # For now the variable descriptions are stored as a list of strings, this transforms them into a single string
+    tb_garden = ds_garden["lgbti_policy_index"]
+    for col in tb_garden.columns:
+        if isinstance(tb_garden[col].metadata.description, list):
+            tb_garden[col].metadata.description = "\n".join(tb_garden[col].metadata.description)
+    ds_garden.add(tb_garden)
 
     # Save changes in the new garden dataset.
     ds_garden.save()

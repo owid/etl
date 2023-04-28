@@ -1,9 +1,47 @@
 dataset:
   title: LGBTI Policy Index (Velasco, 2020)
-  description: |-
-    From paper's abstract:
+  description: &index_description |-
+    Velasco measures a country’s LGBT+ policy landscape with an original LGBT+ policy index that he created; the LGBT+ Policy Index captures the implementation of 18 different LGBT+ policies. Policies included in the index are limited to those adopted across at least three countries or are explicitly advocated for by transnational activists.
 
-    "Integration into the international community is typically used to explain liberal outcomes. However, is it possible that such integration can also explain rising illiberalism? Using the case of LGBT+ rights, I argue that backlash to liberal norms is increasingly organized transnationally, and that exposure to global norms via integration explains both liberal and illiberal outcomes. I test this argument through extensive original data collect and by using time-series cross-section, multinomial, and cross-lagged panel models. Robust findings reveal how exposure to global norms spurs policy backlashes – not just expansions – depending on how countries are situated within pro- and anti-LGBT+ transnational networks. This study contributes to our understanding of the changing international system by revealing how illiberal actors use mechanisms built by the liberal international community to transnationally organize, advance illiberal norms, and deinstitutionalize liberalism’s dominance."
+    These policies are subdivided between:
+
+      Progressive policies:
+        1.	Same-Sex Sexual Acts Legal
+        2.	Equal Age of Consent
+        3.	Employment Discrimination
+        4.	Hate Crime Protections
+        5.	Incitement to Hatred
+        6.	Civil Unions
+        7.	Marriage Equality
+        8.	Joint Adoptions
+        9.	Gender Marker Change
+        10.	LGB Military
+        11.	Transgender Military
+        12.	Ban on Conversion Therapies
+        13.	Ban on Gender Assignment Surgeries on Children
+
+      Regressive policies
+        1.	Death Penalty for Same-Sex Sexual Acts
+        2.	Propaganda Laws
+        3.	Same-Sex Sexual Acts Illegal
+        4.	Unequal Age of Consent
+        5.	Ban on Marriage Equality
+
+    These policies are not measured in a binary (adopted/not-adopted) scheme; the author follows Frank and colleagues (2010, 2017) in considering that similar policies can meaningfully vary in scope, benefits, punishment, etc. So, he determines the robustness of each policy by reviewing five indicators (between parentheses are the scoring schemes):
+      1.	Proportion of Population Living Under Law: To acknowledge subnational variations (0-1)
+      2.	Scope of Genders Subject to Law: As they can be typically differentiated by gender (0: no law, 0.5: just men or women, 1: both)
+      3.	Maximum Level of Punishment: For regressive policies (0: no law, 0.2: <3 years, 0.4: >3 years and <15 years, 0.6: >15 years and < life, 0.8: live in prison, 1: death penality)
+      4.	Ease of Access: To benefits the law outlines (0: no law, 0.25: significant barriers, 0.5: moderate barriers, 0.75: little to few barriers, 1: no barriers)
+      5.	Evidence of Enforcement: Has been least one case the previous year where this was implemented? (0: no evidence, 1: evidence)
+
+    While all five indicators may not be relevant to each policy, each policy in question uses at least three different indicators and with them, each policy score ranges from 0 to 1. Therefore, a score of 1 corresponds to that policy's most robust scope and implementation. This also means that changes in any indicators will influence each policy’s overall score. For example, a country having national marriage equality (indicator 1), few (if any) formal restrictions to obtaining a marriage license (indicator 4), and full implementation (indicator 5) will receive a score of 1.
+
+    To create the index, the scores for each policy are summed together annually, with progressive policies receiving a positive score and regressive policies receiving a negative. This results in an index ranging from -5 to +13. No country reaches these extremes, demonstrating that countries can get better and worse in their policy environments.
+
+    The LGBT+ policy index represents the most robust and nuanced measure of LGBT+ policy adoption and implementation to date and is a novel contribution to the literature. By incorporating progressive and regressive LGBT+ policies and variation in implementation beyond a binary coding scheme, this measure captures even fine-grained changes to the LGBT+ policy landscape. It better assesses the extent to which countries are or are not influenced by transnational processes.
+
+    Multiple sources were consulted to find the necessary data to construct this index. The primary data source was the State Sponsored Homophobia Reports produced by ILGA. These reports, produced almost annually, outline the adoption of various policies and provide some information on implementation. For information on trans- and intersex-specific policies and military information, other sources were used, including the Trans Legal Mapping Report, also produced by ILGA, reports and documentation provided by Transgender Europe, Movement Advancement Project, The Hague Center for Strategic Studies LGBT+ Military Index, and academic studies such as Reynolds (2013). Furthermore, multiple sources were used to obtain data on the evidence of enforcement – particularly arrests – including an extensive newspaper search across each country using LexisNexis and Factiva and other external reports by Amnesty International, Human Rights Watch, and the U.S. State Department.
+
   sources:
   - name: Kristopher Velasco (2020)
     url: https://osf.io/preprints/socarxiv/3rtje/
@@ -16,23 +54,27 @@ tables:
     variables:
       equal_age:
         title: Equal age of consent
-        description: ""
+        description:
+          - Measures if the progressive policy of equal age of consent is adopted.<br>
+          - *index_description
         short_unit: ''
         unit: ''
         display:
           name: Equal age of consent
           numDecimalPlaces: 2
       unequal_age:
-        title: unequal_age
-        description: Unequal age of consent
-        short_unit: ''
+        title: Unequal age of consent
+        description:
+          - Measures if the regressive policy of unequal age of consent is adopted.<br>
+          - *index_description
+        short_unit: ""
         unit: ''
         display:
           name: Unequal age of consent
           numDecimalPlaces: 2
       constitution:
         title: constitution
-        description: ""
+        description: Variable not among the 18 policies of the index.
         short_unit: ''
         unit: ''
         display:
@@ -40,7 +82,9 @@ tables:
           numDecimalPlaces: 0
       conversion_therapies:
         title: Ban on conversion therapies
-        description: ""
+        description:
+          - Measures if the regressive policy of a ban on conversion therapies is adopted.<br>
+          - *index_description
         short_unit: ''
         unit: ''
         display:
@@ -48,7 +92,9 @@ tables:
           numDecimalPlaces: 2
       death_penalty:
         title: Death penalty for same-sex sexual acts
-        description: ""
+        description:
+          - Measures if the regressive policy of a death penalty for same-sex sexual acts is adopted.<br>
+          - *index_description
         short_unit: ''
         unit: ''
         display:
@@ -56,7 +102,9 @@ tables:
           numDecimalPlaces: 2
       employment_discrim:
         title: Employment discrimination laws
-        description: ""
+        description:
+          - Measures if the progressive policy of employment discrimination laws is adopted.<br>
+          - *index_description
         short_unit: ''
         unit: ''
         display:
@@ -64,7 +112,9 @@ tables:
           numDecimalPlaces: 2
       gender_surgery:
         title: Ban on gender assignment surgeries on children
-        description: ""
+        description:
+          - Measures if the progressive policy of a ban on gender assignment surgeries on children is adopted.<br>
+          - *index_description
         short_unit: ''
         unit: ''
         display:
@@ -72,7 +122,9 @@ tables:
           numDecimalPlaces: 0
       hate_crimes:
         title: Hate crime protections
-        description: ""
+        description:
+          - Measures if the progressive policy of hate crime protections is adopted.<br>
+          - *index_description
         short_unit: ''
         unit: ''
         display:
@@ -80,7 +132,9 @@ tables:
           numDecimalPlaces: 2
       incite_hate:
         title: Incitement to hatred
-        description: ""
+        description:
+          - Measures if the progressive policy of incitement to hatred is adopted.<br>
+          - *index_description
         short_unit: ''
         unit: ''
         display:
@@ -88,7 +142,9 @@ tables:
           numDecimalPlaces: 2
       joint_adoption:
         title: Joint adoptions
-        description: ""
+        description:
+          - Measures if the progressive policy of joint adoptions is adopted.<br>
+          - *index_description
         short_unit: ''
         unit: ''
         display:
@@ -96,7 +152,9 @@ tables:
           numDecimalPlaces: 2
       lgb_military:
         title: LGB military
-        description: ""
+        description:
+          - Measures if the progressive policy of LGB military is adopted.<br>
+          - *index_description
         short_unit: ''
         unit: ''
         display:
@@ -104,7 +162,9 @@ tables:
           numDecimalPlaces: 0
       lgb_military_ban:
         title: LGB military ban
-        description: ""
+        description:
+          - Measures if the regressive policy of a LGB military ban is adopted. Variable not among the 18 policies of the index.<br>
+          - *index_description
         short_unit: ''
         unit: ''
         display:
@@ -112,7 +172,9 @@ tables:
           numDecimalPlaces: 0
       marriage_equality:
         title: Marriage equality
-        description: ""
+        description:
+          - Measures if the progressive policy of marriage equality is adopted.<br>
+          - *index_description
         short_unit: ''
         unit: ''
         display:
@@ -120,7 +182,9 @@ tables:
           numDecimalPlaces: 2
       marriage_ban:
         title: Ban on marriage equality
-        description: ""
+        description:
+          - Measures if the regressive policy of a marriage ban is adopted.<br>
+          - *index_description
         short_unit: ''
         unit: ''
         display:
@@ -128,7 +192,9 @@ tables:
           numDecimalPlaces: 2
       samesex_legal:
         title: Same-sex sexual acts legal
-        description: ""
+        description:
+          - Measures if the progressive policy of making same-sex sexual acts legal is adopted.<br>
+          - *index_description
         short_unit: ''
         unit: ''
         display:
@@ -136,7 +202,9 @@ tables:
           numDecimalPlaces: 2
       third_gender:
         title: Third gender recognition
-        description: ""
+        description:
+          - Measures if the progressive policy of third gender recognition is adopted. Variable not among the 18 policies of the index.<br>
+          - *index_description
         short_unit: ''
         unit: ''
         display:
@@ -144,7 +212,9 @@ tables:
           numDecimalPlaces: 0
       trans_military:
         title: Trasgender military
-        description: ""
+        description:
+          - Measures if the progressive policy of admitting trasgender military is adopted.<br>
+          - *index_description
         short_unit: ''
         unit: ''
         display:
@@ -152,7 +222,9 @@ tables:
           numDecimalPlaces: 0
       samesex_illegal:
         title: Same-sex sexual acts illegal
-        description: ""
+        description:
+          - Measures if the regressive policy of making same-sex sexual acts illegal is adopted.<br>
+          - *index_description
         short_unit: ''
         unit: ''
         display:
@@ -160,7 +232,9 @@ tables:
           numDecimalPlaces: 2
       civil_unions:
         title: Civil unions
-        description: ""
+        description:
+          - Measures if the progressive policy of civil unions is adopted.<br>
+          - *index_description
         short_unit: ''
         unit: ''
         display:
@@ -168,7 +242,9 @@ tables:
           numDecimalPlaces: 2
       gendermarker:
         title: Gender marker change
-        description: ""
+        description:
+          - Measures if the progressive policy of gender marker change is adopted.<br>
+          - *index_description
         short_unit: ''
         unit: ''
         display:
@@ -176,7 +252,9 @@ tables:
           numDecimalPlaces: 2
       propaganda:
         title: Propaganda laws
-        description: ""
+        description:
+          - Measures if the regressive policy of propaganda laws is adopted.<br>
+          - *index_description
         short_unit: ''
         unit: ''
         display:
@@ -184,7 +262,7 @@ tables:
           numDecimalPlaces: 2
       policy_index:
         title: LGBT+ Policy Index
-        description: ""
+        description: *index_description
         short_unit: ''
         unit: ''
         display:
