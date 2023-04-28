@@ -47,14 +47,14 @@ def process_data(df: pd.DataFrame) -> pd.DataFrame:
     # Create a new list of id for each issue, ordered from more liberal to more restrictive (useful for grapher charts)
     id_homosexuality = {
         "Legal": "01. Legal",
-        "Male illegal, female legal": "02. Male illegal, female legal",
-        "Male illegal, female uncertain": "03. Male illegal, female uncertain",
-        "Illegal (other penalty)": "04. Illegal (other penalty)",
-        "Ambiguous": "05. Ambiguous",
-        "Varies by Region": "06. Varies by Region",
-        "Illegal (imprisonment as punishment)": "07. Illegal (imprisonment as punishment)",
-        "Illegal (up to life in prison as punishment)": "08. Illegal (up to life in prison as punishment)",
-        "Illegal (death penalty as punishment)": "09. Illegal (death penalty as punishment)",
+        "Ambiguous": "02. Ambiguous",
+        "Varies by Region": "03. Varies by Region",
+        "Male illegal, female legal": "04. Male illegal, female legal or uncertain",
+        "Male illegal, female uncertain": "04. Male illegal, female legal or uncertain",
+        "Illegal (other penalty)": "05. Illegal, prison or other penalty",
+        "Illegal (imprisonment as punishment)": "05. Illegal, prison or other penalty",
+        "Illegal (up to life in prison as punishment)": "05. Illegal, prison or other penalty",
+        "Illegal (death penalty as punishment)": "06. Illegal (death penalty as punishment)",
     }
     id_changing_gender = {
         "Legal, surgery not required": "01. Legal, surgery not required",
@@ -65,15 +65,15 @@ def process_data(df: pd.DataFrame) -> pd.DataFrame:
     }
     id_marriage = {
         "Legal": "01. Legal",
-        "Civil unions": "02. Civil unions",
-        "Other type of partnership": "03. Other type of partnership",
-        "Foreign same-sex marriages recognized only": "04. Foreign same-sex marriages recognized only",
-        "Unregistered cohabitation": "05. Unregistered cohabitation",
-        "Ambiguous": "06. Ambiguous",
-        "Varies by Region": "07. Varies by Region",
-        "Unrecognized": "08. Unrecognized",
-        "Unrecognized, same-sex marriage and civil unions banned": "09. Unrecognized, same-sex marriage and civil unions banned",
-        "Not legal": "10. Not legal",
+        "Civil unions": "02. Civil union or other partnership",
+        "Other type of partnership": "02. Civil union or other partnership",
+        "Foreign same-sex marriages recognized only": "03. Foreign same-sex marriages recognized only",
+        "Unregistered cohabitation": "04. Unregistered cohabitation",
+        "Ambiguous": "05. Ambiguous",
+        "Varies by Region": "06. Varies by Region",
+        "Unrecognized": "07. Unrecognized",
+        "Unrecognized, same-sex marriage and civil unions banned": "08. Unrecognized, same-sex marriage and civil unions banned",
+        "Not legal": "09. Not legal",
     }
 
     # Match id variables with the new ids in new columns

@@ -338,14 +338,14 @@ steps:
   - data://garden/happiness/2023-03-20/happiness
 
 # Equaldex dataset
-  data://meadow/equaldex/2023-04-13/equaldex:
-  - snapshot://equaldex/2023-04-13/equaldex.csv
-  data://garden/equaldex/2023-04-13/equaldex:
-  - data://meadow/equaldex/2023-04-13/equaldex
+  data://meadow/lgbt_rights/2023-04-13/equaldex:
+  - snapshot://lgbt_rights/2023-04-13/equaldex.csv
+  data://garden/lgbt_rights/2023-04-13/equaldex:
+  - data://meadow/lgbt_rights/2023-04-13/equaldex
   - data://garden/demography/2023-03-31/population
   - data://garden/reference
-  data://grapher/equaldex/2023-04-13/equaldex:
-  - data://garden/equaldex/2023-04-13/equaldex
+  data://grapher/lgbt_rights/2023-04-13/equaldex:
+  - data://garden/lgbt_rights/2023-04-13/equaldex
 
 # Sub-dags to import
 include:
