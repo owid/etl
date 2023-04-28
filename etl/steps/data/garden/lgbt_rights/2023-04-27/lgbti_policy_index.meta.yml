@@ -1,106 +1,208 @@
 dataset:
+  title: LGBTI Policy Index (Velasco, 2020)
   description: |-
     From paper's abstract:
 
     "Integration into the international community is typically used to explain liberal outcomes. However, is it possible that such integration can also explain rising illiberalism? Using the case of LGBT+ rights, I argue that backlash to liberal norms is increasingly organized transnationally, and that exposure to global norms via integration explains both liberal and illiberal outcomes. I test this argument through extensive original data collect and by using time-series cross-section, multinomial, and cross-lagged panel models. Robust findings reveal how exposure to global norms spurs policy backlashes – not just expansions – depending on how countries are situated within pro- and anti-LGBT+ transnational networks. This study contributes to our understanding of the changing international system by revealing how illiberal actors use mechanisms built by the liberal international community to transnationally organize, advance illiberal norms, and deinstitutionalize liberalism’s dominance."
   sources:
-  - {}
+  - name: Kristopher Velasco (2020)
+    url: https://osf.io/preprints/socarxiv/3rtje/
+    date_accessed: "2023-03-31"
+    publication_date: '2020-07-24'
+    published_by:
+      'Velasco, K. (2020). Transnational Backlash and the Deinstitutionalization of Liberal Norms: LGBT+ Rights in a Contested World. https://doi.org/10.31235/osf.io/3rtje'
 tables:
   lgbti_policy_index:
     variables:
       equal_age:
-        title: equal_age
+        title: Equal age of consent
+        description: ""
         short_unit: ''
         unit: ''
+        display:
+          name: Equal age of consent
+          numDecimalPlaces: 2
       unequal_age:
         title: unequal_age
+        description: Unequal age of consent
         short_unit: ''
         unit: ''
+        display:
+          name: Unequal age of consent
+          numDecimalPlaces: 2
       constitution:
         title: constitution
+        description: ""
         short_unit: ''
         unit: ''
+        display:
+          name: constitution
+          numDecimalPlaces: 0
       conversion_therapies:
-        title: conversion_therapies
+        title: Ban on conversion therapies
+        description: ""
         short_unit: ''
         unit: ''
+        display:
+          name: Ban on conversion therapies
+          numDecimalPlaces: 2
       death_penalty:
-        title: death_penalty
+        title: Death penalty for same-sex sexual acts
+        description: ""
         short_unit: ''
         unit: ''
+        display:
+          name: Death penalty for same-sex sexual acts
+          numDecimalPlaces: 2
       employment_discrim:
-        title: employment_discrim
+        title: Employment discrimination laws
+        description: ""
         short_unit: ''
         unit: ''
+        display:
+          name: Employment discrimination laws
+          numDecimalPlaces: 2
       gender_surgery:
-        title: gender_surgery
+        title: Ban on gender assignment surgeries on children
+        description: ""
         short_unit: ''
         unit: ''
+        display:
+          name: Ban on gender assignment surgeries on children
+          numDecimalPlaces: 0
       hate_crimes:
-        title: hate_crimes
+        title: Hate crime protections
+        description: ""
         short_unit: ''
         unit: ''
+        display:
+          name: Hate crime protections
+          numDecimalPlaces: 2
       incite_hate:
-        title: incite_hate
+        title: Incitement to hatred
+        description: ""
         short_unit: ''
         unit: ''
+        display:
+          name: Incitement to hatred
+          numDecimalPlaces: 2
       joint_adoption:
-        title: joint_adoption
+        title: Joint adoptions
+        description: ""
         short_unit: ''
         unit: ''
+        display:
+          name: Joint adoptions
+          numDecimalPlaces: 2
       lgb_military:
-        title: lgb_military
+        title: LGB military
+        description: ""
         short_unit: ''
         unit: ''
+        display:
+          name: LGB military
+          numDecimalPlaces: 0
       lgb_military_ban:
-        title: lgb_military_ban
+        title: LGB military ban
+        description: ""
         short_unit: ''
         unit: ''
+        display:
+          name: LGB military ban
+          numDecimalPlaces: 0
       marriage_equality:
-        title: marriage_equality
+        title: Marriage equality
+        description: ""
         short_unit: ''
         unit: ''
+        display:
+          name: Marriage equality
+          numDecimalPlaces: 2
       marriage_ban:
-        title: marriage_ban
+        title: Ban on marriage equality
+        description: ""
         short_unit: ''
         unit: ''
+        display:
+          name: Ban on marriage equality
+          numDecimalPlaces: 2
       samesex_legal:
-        title: samesex_legal
+        title: Same-sex sexual acts legal
+        description: ""
         short_unit: ''
         unit: ''
+        display:
+          name: Same-sex sexual acts legal
+          numDecimalPlaces: 2
       third_gender:
-        title: third_gender
+        title: Third gender recognition
+        description: ""
         short_unit: ''
         unit: ''
+        display:
+          name: Third gender recognition
+          numDecimalPlaces: 0
       trans_military:
-        title: trans_military
+        title: Trasgender military
+        description: ""
         short_unit: ''
         unit: ''
+        display:
+          name: Trasgender military
+          numDecimalPlaces: 0
       samesex_illegal:
-        title: samesex_illegal
+        title: Same-sex sexual acts illegal
+        description: ""
         short_unit: ''
         unit: ''
+        display:
+          name: Same-sex sexual acts illegal
+          numDecimalPlaces: 2
       civil_unions:
-        title: civil_unions
+        title: Civil unions
+        description: ""
         short_unit: ''
         unit: ''
+        display:
+          name: Civil unions
+          numDecimalPlaces: 2
       gendermarker:
-        title: gendermarker
+        title: Gender marker change
+        description: ""
         short_unit: ''
         unit: ''
+        display:
+          name: Gender marker change
+          numDecimalPlaces: 2
       propaganda:
-        title: propaganda
+        title: Propaganda laws
+        description: ""
         short_unit: ''
         unit: ''
+        display:
+          name: Propaganda laws
+          numDecimalPlaces: 2
       policy_index:
-        title: policy_index
+        title: LGBT+ Policy Index
+        description: ""
         short_unit: ''
         unit: ''
+        display:
+          name: LGBT+ Policy Index
+          numDecimalPlaces: 2
       numiso:
         title: numiso
+        description: ""
         short_unit: ''
         unit: ''
+        display:
+          name: numiso
+          numDecimalPlaces: 0
       uncode:
         title: uncode
+        description: ""
         short_unit: ''
         unit: ''
+        display:
+          name: uncode
+          numDecimalPlaces: 0

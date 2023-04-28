@@ -42,7 +42,7 @@ def run(dest_dir: str) -> None:
     tb_meadow = ds_meadow["lgbti_policy_index"]
 
     # Create a dataframe with data from the table.
-    df = pd.DataFrame(tb_meadow)
+    df = pd.DataFrame(tb_meadow).reset_index(drop=False)
 
     #
     # Process data.

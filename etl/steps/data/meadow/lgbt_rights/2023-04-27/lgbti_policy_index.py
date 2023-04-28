@@ -29,6 +29,9 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
+    # Verify index and sort
+    df = df.set_index(["country", "year"], verify_integrity=True).sort_index()
+
     # Create a new table and ensure all columns are snake-case.
     tb = Table(df, short_name=paths.short_name, underscore=True)
 
