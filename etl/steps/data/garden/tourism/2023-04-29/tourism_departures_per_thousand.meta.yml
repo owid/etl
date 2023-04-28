@@ -1,0 +1,22 @@
+tables:
+  tourism_departures_per_thousand:
+    variables:
+      tourism_departures_per_thousand:
+        title: Number of departures (per 1000 people)
+        unit: departures per 1000 people
+        short_unit: ""
+        description: >-
+          International outbound tourists are the number of departures that people make from their country of usual residence to
+          any other country for any purpose other than a remunerated activity in the country visited. The data on outbound
+          tourists refer to the number of departures, not to the number of people traveling. Thus a person who makes several
+          trips from a country during a given period is counted each time as a new departure. This figure is given per 1000 people.
+      # testing_variable:
+      #   title: Testing variable title
+      #   unit: arbitrary units
+      #   short_unit: au
+      #   description: Full description of testing variable.
+      #   sources:
+      #     - *source-testing
+      #   display:
+      #     entityAnnotationsMap: Test annotation
+      #     numDecimalPlaces: 0
