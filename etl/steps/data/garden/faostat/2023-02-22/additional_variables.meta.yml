@@ -706,5 +706,6 @@ tables:
         short_unit: "%"
         description: |
           This is calculated by dividing the amount of cereals allocated to other uses (predominantly industrial uses such as biofuel production) by the sum of all cereal uses considered (namely human food, animal feed, and other uses). This corresponds to cereals available domestically (after trade) excluding supply chain losses and seed resown from the crop.
-  # All metadata for maize_and_wheat is prepared via script.
+  # All metadata for maize_and_wheat and fertilizer_exports is prepared via script.
   # maize_and_wheat:
+  # fertilizer_exports:
