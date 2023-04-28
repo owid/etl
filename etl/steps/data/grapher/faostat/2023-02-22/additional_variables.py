@@ -91,6 +91,37 @@ def prepare_maize_and_wheat_in_the_context_of_the_ukraine_war(tb_maize_and_wheat
     return combined
 
 
+def prepare_fertilizer_exports_in_the_context_of_the_ukraine_war(tb_fertilizer_exports: Table) -> Table:
+    # Select the relevant countries for the chart.
+    fertilizer_exports = tb_fertilizer_exports.loc[["Ukraine", "Russia", "Belarus"]].reset_index()
+
+    # Transpose data.
+    fertilizer_exports = fertilizer_exports.pivot(
+        index=["item", "year"], columns="country", values=["exports", "share_of_exports"]
+    )
+
+    fertilizer_exports.columns = [column[0] + " " + column[1] for column in fertilizer_exports.columns]
+
+    # To be able to work in grapher, rename "item" column to "country".
+    fertilizer_exports.index.names = ["country", "year"]
+
+    # Adapt metadata.
+    fertilizer_exports.metadata.short_name = "fertilizer_exports_in_the_context_of_the_ukraine_war"
+    for column in fertilizer_exports.columns:
+        element, country = column.split(" ")
+        title = element.capitalize().replace("_", " ") + " from " + country
+        fertilizer_exports[column].metadata.title = title
+        if "share" in column:
+            fertilizer_exports[column].metadata.unit = "%"
+            fertilizer_exports[column].metadata.short_unit = "%"
+        else:
+            fertilizer_exports[column].metadata.unit = "tonnes"
+            fertilizer_exports[column].metadata.short_unit = "t"
+    fertilizer_exports = underscore_table(fertilizer_exports)
+
+    return fertilizer_exports
+
+
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
@@ -111,6 +142,7 @@ def run(dest_dir: str) -> None:
     tb_hypothetical_meat_consumption = ds_garden["hypothetical_meat_consumption"]
     tb_cereal_allocation = ds_garden["cereal_allocation"]
     tb_maize_and_wheat = ds_garden["maize_and_wheat"]
+    tb_fertilizer_exports = ds_garden["fertilizer_exports"]
 
     #
     # Process data.
@@ -134,6 +166,11 @@ def run(dest_dir: str) -> None:
         tb_maize_and_wheat=tb_maize_and_wheat
     )
 
+    # Prepare fertilizer exports data in the context of the Ukraine war.
+    tb_fertilizer_exports_in_the_context_of_the_ukraine_war = (
+        prepare_fertilizer_exports_in_the_context_of_the_ukraine_war(tb_fertilizer_exports=tb_fertilizer_exports)
+    )
+
     #
     # Save outputs.
     #
@@ -153,6 +190,7 @@ def run(dest_dir: str) -> None:
             tb_hypothetical_meat_consumption,
             tb_cereal_allocation,
             tb_maize_and_wheat_in_the_context_of_the_ukraine_war,
+            tb_fertilizer_exports_in_the_context_of_the_ukraine_war,
         ],
         default_metadata=ds_garden.metadata,
     )
