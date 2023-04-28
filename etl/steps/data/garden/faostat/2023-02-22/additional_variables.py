@@ -1018,6 +1018,63 @@ def generate_hypothetical_meat_consumption(df_qcl: pd.DataFrame) -> Table:
     return tb_hypothetical_meat_consumption
 
 
+def generate_cereal_allocation(df_fbsc: pd.DataFrame) -> Table:
+    # Item code for "Cereals - Excluding Beer".
+    ITEM_CODE_FOR_CEREALS = "00002905"
+    # Note: We disregard the contribution from "00002520" ("Cereals, Other"), which is usually negligible compared to the total.
+    # Element code and unit for "Food".
+    # Note: The element code for "Food available for consumption" is "000645"; this should be the same data, except that
+    #  it is given in kilograms (originally it was given per capita). Therefore, we use "Food", which is more convenient.
+    ELEMENT_CODE_FOR_FOOD = "005142"
+    UNIT_FOR_FOOD = "tonnes"
+    # Element code and unit for "Feed".
+    ELEMENT_CODE_FOR_FEED = "005521"
+    UNIT_FOR_FEED = "tonnes"
+    # Element code and unit for "Other uses".
+    ELEMENT_CODE_FOR_OTHER_USES = "005154"
+    UNIT_FOR_OTHER_USES = "tonnes"
+
+    # Select the relevant items/elements.
+    cereals = df_fbsc[
+        (df_fbsc["item_code"] == ITEM_CODE_FOR_CEREALS)
+        & (df_fbsc["element_code"].isin([ELEMENT_CODE_FOR_FOOD, ELEMENT_CODE_FOR_FEED, ELEMENT_CODE_FOR_OTHER_USES]))
+    ].reset_index(drop=True)
+
+    # Sanity check.
+    error = "Units have changed"
+    assert set(cereals["unit"]) == set([UNIT_FOR_FOOD, UNIT_FOR_FEED, UNIT_FOR_OTHER_USES]), error
+
+    # Transpose data and rename columns conveniently.
+    cereals = (
+        cereals.pivot(index=["country", "year"], columns="element_code", values="value")
+        .reset_index()
+        .rename(
+            columns={
+                ELEMENT_CODE_FOR_FOOD: "cereals_allocated_to_food",
+                ELEMENT_CODE_FOR_FEED: "cereals_allocated_to_animal_feed",
+                ELEMENT_CODE_FOR_OTHER_USES: "cereals_allocated_to_other_uses",
+            }
+        )
+    )
+
+    # Add variables for the share of cereals allocated to each use.
+    all_cereal_uses = ["food", "animal_feed", "other_uses"]
+    for item in all_cereal_uses:
+        cereals[f"share_of_cereals_allocated_to_{item}"] = (
+            100
+            * cereals[f"cereals_allocated_to_{item}"]
+            / cereals[[f"cereals_allocated_to_{use}" for use in all_cereal_uses]].sum(axis=1)
+        )
+
+    # Set an appropriate index and sort conveniently.
+    cereals = cereals.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
+
+    # Create a table with the generated data.
+    tb_cereal_allocation = Table(cereals, short_name="cereal_allocation", underscore=True)
+
+    return tb_cereal_allocation
+
+
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
@@ -1085,6 +1142,9 @@ def run(dest_dir: str) -> None:
     # Create table for hypothetical meat consumption
     tb_hypothetical_meat_consumption = generate_hypothetical_meat_consumption(df_qcl=df_qcl)
 
+    # Create table for cereal allocation.
+    tb_cereal_allocation = generate_cereal_allocation(df_fbsc=df_fbsc)
+
     #
     # Save outputs.
     #
@@ -1102,6 +1162,7 @@ def run(dest_dir: str) -> None:
             tb_vegetable_oil_yields,
             tb_agriculture_land_use_evolution,
             tb_hypothetical_meat_consumption,
+            tb_cereal_allocation,
         ],
     )
     ds_garden.save()

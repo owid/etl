@@ -668,3 +668,41 @@ tables:
         title: Per-capita production of meat in each country
         unit: "tonnes per person"
         short_unit: "t/person"
+  cereal_allocation:
+    variables:
+      cereals_allocated_to_animal_feed:
+        title: Cereals allocated to animal feed
+        unit: tonnes
+        short_unit: t
+        description: |
+          Quantity of cereal crops allocated to animal feed (and not human food or other uses, such as biofuel production).
+      cereals_allocated_to_food:
+        title: Cereals allocated to human food
+        unit: tonnes
+        short_unit: t
+        description: |
+          Quantity of cereal crops allocated to human food (and not animal feed or other uses, such as biofuel production).
+      cereals_allocated_to_other_uses:
+        title: Cereals allocated to other uses
+        unit: tonnes
+        short_unit: t
+        description: |
+          Quantity of cereal crops allocated to other uses (and not to human food or animal feed), predominantly industrial uses such as biofuel production.
+      share_of_cereals_allocated_to_animal_feed:
+        title: Share of cereals that are allocated to animal feed
+        unit: "%"
+        short_unit: "%"
+        description: |
+          This is calculated by dividing the amount of cereals allocated to animal feed by the sum of all cereal uses considered (namely human food, animal feed, and other uses such us biofuel production). This corresponds to cereals available domestically (after trade) excluding supply chain losses and seed resown from the crop.
+      share_of_cereals_allocated_to_food:
+        title: Share of cereals that are allocated to human food
+        unit: "%"
+        short_unit: "%"
+        description: |
+          This is calculated by dividing the amount of cereals allocated to human food by the sum of all cereal uses considered (namely human food, animal feed, and other uses such us biofuel production). This corresponds to cereals available domestically (after trade) excluding supply chain losses and seed resown from the crop.
+      share_of_cereals_allocated_to_other_uses:
+        title: Share of cereals that are allocated to other uses such as biofuel production
+        unit: "%"
+        short_unit: "%"
+        description: |
+          This is calculated by dividing the amount of cereals allocated to other uses (predominantly industrial uses such as biofuel production) by the sum of all cereal uses considered (namely human food, animal feed, and other uses). This corresponds to cereals available domestically (after trade) excluding supply chain losses and seed resown from the crop.
