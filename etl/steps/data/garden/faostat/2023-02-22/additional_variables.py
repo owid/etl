@@ -1131,6 +1131,65 @@ def generate_maize_and_wheat(df_fbsc: pd.DataFrame) -> Table:
     return tb_maize_and_wheat
 
 
+def generate_fertilizer_exports(df_rfn: pd.DataFrame) -> Table:
+    # Element code for "Export Quantity".
+    ELEMENT_CODE_FOR_EXPORTS = "005910"
+    # Item code for "Nutrient nitrogen N (total)".
+    ITEM_CODE_FOR_NITROGEN = "00003102"
+    # Item code for "Nutrient phosphate P2O5 (total)".
+    ITEM_CODE_FOR_PHOSPHATE = "00003103"
+    # Item code for "Nutrient potash K2O (total)".
+    ITEM_CODE_FOR_POTASH = "00003104"
+
+    # Select the relevant items and elements.
+    fertilizer_exports = df_rfn[
+        (df_rfn["element_code"] == ELEMENT_CODE_FOR_EXPORTS)
+        & (df_rfn["item_code"].isin([ITEM_CODE_FOR_NITROGEN, ITEM_CODE_FOR_PHOSPHATE, ITEM_CODE_FOR_POTASH]))
+    ].reset_index(drop=True)
+
+    # Sanity check.
+    error = "Units have changed."
+    assert list(fertilizer_exports["unit"].unique()) == ["tonnes"], error
+
+    # Rename columns and items conveniently.
+    fertilizer_exports = fertilizer_exports[["country", "year", "item_code", "value"]].rename(
+        columns={"item_code": "item", "value": "exports"}
+    )
+    fertilizer_exports["item"] = fertilizer_exports["item"].replace(
+        {ITEM_CODE_FOR_NITROGEN: "Nitrogen", ITEM_CODE_FOR_PHOSPHATE: "Phosphorous", ITEM_CODE_FOR_POTASH: "Potassium"}
+    )
+
+    # Add column of global exports.
+    global_exports = (
+        fertilizer_exports[fertilizer_exports["country"] == "World"].drop(columns=["country"]).reset_index(drop=True)
+    )
+    fertilizer_exports = pd.merge(
+        fertilizer_exports, global_exports, how="left", on=["year", "item"], suffixes=("", "_global")
+    )
+
+    # Create columns for the share of exports.
+    fertilizer_exports["share_of_exports"] = 100 * fertilizer_exports["exports"] / fertilizer_exports["exports_global"]
+
+    # Drop column of global exports.
+    fertilizer_exports = fertilizer_exports.drop(columns=["exports_global"])
+
+    # Set an appropriate index and sort conveniently.
+    fertilizer_exports = (
+        fertilizer_exports.set_index(["country", "year", "item"], verify_integrity=True).sort_index().sort_index(axis=1)
+    )
+
+    # Create a table with the generated data.
+    tb_fertilizer_exports = Table(fertilizer_exports, short_name="fertilizer_exports", underscore=True)
+
+    # Add minimal variable metadata (more metadata will be added at the grapher step).
+    tb_fertilizer_exports["share_of_exports"].metadata.unit = "%"
+    tb_fertilizer_exports["share_of_exports"].metadata.short_unit = "%"
+    tb_fertilizer_exports["exports"].metadata.unit = "tonnes"
+    tb_fertilizer_exports["exports"].metadata.short_unit = "t"
+
+    return tb_fertilizer_exports
+
+
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
@@ -1164,6 +1223,11 @@ def run(dest_dir: str) -> None:
     ds_ef: Dataset = paths.load_dependency(f"{NAMESPACE}_ef")
     tb_ef = ds_ef[f"{NAMESPACE}_ef"]
     df_ef = pd.DataFrame(tb_ef).reset_index()
+
+    # Load dataset about fertilizers by nutrient, load its main (long-format) table, and create a convenient dataframe.
+    ds_rfn: Dataset = paths.load_dependency(f"{NAMESPACE}_rfn")
+    tb_rfn = ds_rfn[f"{NAMESPACE}_rfn"]
+    df_rfn = pd.DataFrame(tb_rfn).reset_index()
 
     #
     # Process data.
@@ -1204,6 +1268,9 @@ def run(dest_dir: str) -> None:
     # Create table for maize and wheat data (used in the context of the Ukraine war).
     tb_maize_and_wheat = generate_maize_and_wheat(df_fbsc=df_fbsc)
 
+    # Create table for fertilizer exports (used in the context of the Ukraine war).
+    tb_fertilizer_exports = generate_fertilizer_exports(df_rfn=df_rfn)
+
     #
     # Save outputs.
     #
@@ -1223,6 +1290,7 @@ def run(dest_dir: str) -> None:
             tb_hypothetical_meat_consumption,
             tb_cereal_allocation,
             tb_maize_and_wheat,
+            tb_fertilizer_exports,
         ],
     )
     ds_garden.save()
