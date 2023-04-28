@@ -26,16 +26,13 @@ tables:
         description: |
           Describes the legislation status of homosexual activity in each country and year.
 
-          Nine different status are possible:
-            1. Legal
-            2. Male illegal, female legal
-            3. Male illegal, female uncertain
-            4. Illegal (other penalty)
-            5. Ambiguous"
-            6. Varies by Region
-            7. Illegal (imprisonment as punishment)
-            8. Illegal (up to life in prison as punishment)
-            9. Illegal (death penalty as punishment)
+          These statuses are possible:
+            <ol type = "1"><li>Legal</li>
+            <li>Ambiguous</li>
+            <li>Varies by Region</li>
+            <li>Male illegal, female legal or uncertain</li>
+            <li>Illegal, prison or other penalty</li>
+            <li>Illegal (death penalty as punishment)</li></ol>
         sources:
           - *source-equaldex
         display:
@@ -47,12 +44,12 @@ tables:
         description: |
           Describes the legislation status of the right to change legal gender in each country and year.
 
-          Five different status are possible:
-            1. Legal, surgery not required
-            2. Legal, but requires surgery
-            3. Ambiguous
-            4. Varies by Region
-            5. Illegal
+          These statuses are possible:
+            <ol type = "1"><li>Legal, surgery not required</li>
+            <li>Legal, but requires surgery</li>
+            <li>Ambiguous</li>
+            <li>Varies by Region</li>
+            <li>Illegal</li></ol>
         sources:
           - *source-equaldex
         display:
@@ -64,17 +61,16 @@ tables:
         description: |
           Describes the legislation status of same-sex marriage in each country and year.
 
-          Ten different status are possible:
-            1. Legal
-            2. Civil unions
-            3. Other type of partnership
-            4. Foreign same-sex marriages recognized only
-            5. Unregistered cohabitation
-            6. Ambiguous
-            7. Varies by Region
-            8. Unrecognized
-            9. Unrecognized, same-sex marriage and civil unions banned
-            10. Not legal
+          These statuses are possible:
+            <ol type = "1"><li>Legal</li>
+            <li>Civil union or other partnership</li>
+            <li>Foreign same-sex marriages recognized only</li>
+            <li>Unregistered cohabitation</li>
+            <li>Ambiguous</li>
+            <li>Varies by Region</li>
+            <li>Unrecognized</li>
+            <li>Unrecognized, same-sex marriage and civil unions banned</li>
+            <li>Not legal</li></ol>
         sources:
           - *source-equaldex
         display:
