@@ -64,6 +64,14 @@ steps:
   data://grapher/gcp/2022-11-11/global_carbon_budget:
     - data://garden/gcp/2022-11-11/global_carbon_budget
   #
+  # GCP - Global Carbon Budget (2023-04-28).
+  #
+  data://meadow/gcp/2023-04-28/global_carbon_budget:
+    - snapshot://gcp/2023-04-28/global_carbon_budget_fossil_co2_emissions.csv
+    - snapshot://gcp/2023-04-28/global_carbon_budget_global_emissions.xlsx
+    - snapshot://gcp/2023-04-28/global_carbon_budget_national_emissions.xlsx
+    - snapshot://gcp/2023-04-28/global_carbon_budget_land_use_change_emissions.xlsx
+  #
   # RFF - World Carbon Pricing (2022-10-11).
   #
   data://meadow/rff/2022-10-11/world_carbon_pricing:
