@@ -1,11 +1,94 @@
 """Load a garden dataset and create a grapher dataset."""
 
-from owid.catalog import Dataset
+import pandas as pd
+from owid.catalog import Dataset, Table
+from owid.catalog.utils import underscore_table
 
 from etl.helpers import PathFinder, create_dataset, grapher_checks
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+
+
+def prepare_maize_and_wheat_in_the_context_of_the_ukraine_war(tb_maize_and_wheat: Table) -> Table:
+    # Prepare groupings that will be shown in a stacked discrete bar chart.
+    # Ukraine and Russia exports of maize and wheat.
+    ukraine_and_russia_exports = (
+        pd.merge(
+            tb_maize_and_wheat[["maize_exports", "wheat_exports"]].loc["Ukraine"],
+            tb_maize_and_wheat[["maize_exports", "wheat_exports"]].loc["Russia"],
+            left_index=True,
+            right_index=True,
+            suffixes=(" Ukraine", " Russia"),
+        )
+        .assign(**{"country": "Ukraine and Russia exports"})
+        .reset_index()
+    )
+    # EU and UK maize and wheat used for animal feed.
+    eu_and_uk_feed = (
+        pd.merge(
+            tb_maize_and_wheat[["maize_animal_feed", "wheat_animal_feed"]].loc["European Union (27)"],
+            tb_maize_and_wheat[["maize_animal_feed", "wheat_animal_feed"]].loc["United Kingdom"],
+            left_index=True,
+            right_index=True,
+            suffixes=(" EU", " UK"),
+        )
+        .assign(**{"country": "EU and UK animal feed"})
+        .reset_index()
+    )
+    # EU and UK maize and wheat devoted to other uses (predominantly biofuels).
+    eu_and_uk_biofuels = (
+        pd.merge(
+            tb_maize_and_wheat[["maize_other_uses", "wheat_other_uses"]].loc["European Union (27)"],
+            tb_maize_and_wheat[["maize_other_uses", "wheat_other_uses"]].loc["United Kingdom"],
+            left_index=True,
+            right_index=True,
+            suffixes=(" EU", " UK"),
+        )
+        .assign(**{"country": "EU and UK biofuels"})
+        .reset_index()
+    )
+    # US maize and wheat used for animal feed.
+    us_feed = (
+        tb_maize_and_wheat[["maize_animal_feed", "wheat_animal_feed"]]
+        .loc["United States"]
+        .rename(columns={"maize_animal_feed": "maize_animal_feed US", "wheat_animal_feed": "wheat_animal_feed US"})
+        .assign(**{"country": "US animal feed"})
+        .reset_index()
+    )
+    # US maize and wheat devoted to other uses (predominantly biofuels).
+    us_biofuels = (
+        tb_maize_and_wheat[["maize_other_uses", "wheat_other_uses"]]
+        .loc["United States"]
+        .rename(columns={"maize_other_uses": "maize_other_uses US", "wheat_other_uses": "wheat_other_uses US"})
+        .assign(**{"country": "US biofuels"})
+        .reset_index()
+    )
+
+    # Combine all groupings.
+    combined = pd.concat(
+        [ukraine_and_russia_exports, eu_and_uk_feed, eu_and_uk_biofuels, us_feed, us_biofuels], ignore_index=True
+    )
+
+    # Set an appropriate index and sort conveniently.
+    combined = combined.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
+
+    # Adapt metadata.
+    combined.metadata.short_name = "maize_and_wheat_in_the_context_of_the_ukraine_war"
+    for column in combined.columns:
+        title = (
+            column.replace("maize_", "Maize ")
+            .replace("wheat_", "Wheat ")
+            .replace("animal_feed", "used for animal feed in")
+            .replace("exports", "exported by")
+            .replace("other_uses", "used for biofuels in")
+        )
+        combined[column].metadata.title = title
+        combined[column].metadata.unit = "tonnes"
+        combined[column].metadata.short_unit = "t"
+    combined = underscore_table(combined)
+
+    return combined
 
 
 def run(dest_dir: str) -> None:
@@ -27,6 +110,7 @@ def run(dest_dir: str) -> None:
     tb_agriculture_land_use_evolution = ds_garden["agriculture_land_use_evolution"]
     tb_hypothetical_meat_consumption = ds_garden["hypothetical_meat_consumption"]
     tb_cereal_allocation = ds_garden["cereal_allocation"]
+    tb_maize_and_wheat = ds_garden["maize_and_wheat"]
 
     #
     # Process data.
@@ -43,6 +127,11 @@ def run(dest_dir: str) -> None:
         .rename(columns={"item": "country"})
         .set_index(["country", "year"], verify_integrity=True)
         .sort_index()
+    )
+
+    # Prepare maize and what data in the context of the Ukraine war.
+    tb_maize_and_wheat_in_the_context_of_the_ukraine_war = prepare_maize_and_wheat_in_the_context_of_the_ukraine_war(
+        tb_maize_and_wheat=tb_maize_and_wheat
     )
 
     #
@@ -63,6 +152,7 @@ def run(dest_dir: str) -> None:
             tb_agriculture_land_use_evolution,
             tb_hypothetical_meat_consumption,
             tb_cereal_allocation,
+            tb_maize_and_wheat_in_the_context_of_the_ukraine_war,
         ],
         default_metadata=ds_garden.metadata,
     )
