@@ -62,13 +62,6 @@ def run(dest_dir: str) -> None:
     ds_garden = create_dataset(dest_dir, tables=[tb_garden])
     # Fill metadata fields dynamically based on two building datasets
     log.info("tourism_departures_per_thousand.add_metadata")
-    ds_garden.metadata.description = """
-    Number of tourist departures per 1000 was derived based on the number of departures per year, divided by population figures from the World Bank's World Development Indicators (WDI).
-
-    Number of tourist departures sourced from the World Bank's World Development Indicators (WDI). Available at: https://data.worldbank.org/indicator/ST.INT.DPRT.
-
-    Population data sourced from our core population dataset. More info at https://ourworldindata.org/population-sources.
-    """
     ds_garden.metadata.title = "Number of tourist departures per 1000 (various sources, 2023)"
     ds_garden.metadata.sources = ds_wdi.metadata.sources + ds_population.metadata.sources
     ds_garden.metadata.licenses = ds_wdi.metadata.licenses + ds_population.metadata.licenses

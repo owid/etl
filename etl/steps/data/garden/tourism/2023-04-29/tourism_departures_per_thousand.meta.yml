@@ -1,3 +1,14 @@
+dataset:
+  description: >-
+    Number of tourist departures per 1000 was derived based on the number of departures per year,
+    divided by population figures from the World Bank's World Development Indicators (WDI).
+
+
+    • Number of tourist departures sourced from the World Bank's World Development Indicators (WDI).
+    Available at: https://data.worldbank.org/indicator/ST.INT.DPRT.
+
+
+    • Population data sourced from our core population dataset. More info at https://ourworldindata.org/population-sources.
 tables:
   tourism_departures_per_thousand:
     variables:
