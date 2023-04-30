@@ -35,7 +35,11 @@ def run(dest_dir: str) -> None:
     # Load sheet with historical WB classifications
     df = dfs["Country Analytical History"]
     # Minor formatting (only keep cells with relevant data)
-    df = format_df(df)
+    df = extract_data_from_excel(df)
+    # Pivot to have years as rows
+    # We could leave this for Garden, but catalog.Table won't accept columns starting with a number. We could change these
+    # to be 2020 -> _2020, but it feels inefficient
+    df = df.melt(id_vars=["country_code", "country"], var_name="year", value_name="classification")
     # Create a new table and ensure all columns are snake-case.
     tb = Table(df, short_name=paths.short_name, underscore=True)
 
@@ -51,7 +55,7 @@ def run(dest_dir: str) -> None:
     log.info("wb_income: end")
 
 
-def format_df(df: pd.DataFrame) -> pd.DataFrame:
+def extract_data_from_excel(df: pd.DataFrame) -> pd.DataFrame:
     # Sanity shape check
     log.info("wb_income: sanity check on table dimensions")
     assert (shape := df.shape) == (
