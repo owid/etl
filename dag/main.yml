@@ -337,6 +337,10 @@ steps:
   data://grapher/happiness/2023-03-20/happiness:
   - data://garden/happiness/2023-03-20/happiness
 
+  # WB income groups
+  data://meadow/wb/2023-04-30/wb_income:
+    - snapshot://wb/2023-04-30/wb_income.xlsx
+
 # Sub-dags to import
 include:
   - dag/open_numbers.yml
