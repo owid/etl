@@ -1,0 +1,13 @@
+tables:
+  wb_income:
+    # (Inherited from meadow, remove if not different.)
+    variables:
+      classification:
+        title: Income group
+        unit:
+        description: Classification by the World Bank based on the country's income.
+      #   sources:
+      #     - *source-testing
+      #   display:
+      #     entityAnnotationsMap: Test annotation
+      #     numDecimalPlaces: 0
