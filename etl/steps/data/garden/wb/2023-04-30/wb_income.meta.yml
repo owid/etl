@@ -4,7 +4,7 @@ tables:
     variables:
       classification:
         title: Income group
-        unit:
+        unit: ""
         description: Classification by the World Bank based on the country's income.
       #   sources:
       #     - *source-testing
