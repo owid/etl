@@ -9,9 +9,6 @@ It harmonizes and further processes meadow data, and uses the following auxiliar
 
 """
 
-from typing import Dict, List, Optional
-
-# +
 import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
@@ -22,7 +19,6 @@ from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
 log = get_logger()
-# -
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -63,22 +59,22 @@ REGIONS = {
     "High-income countries": {},
     # Additional composite regions.
     "Asia (excl. China and India)": {
-        "regions_included": ["Asia"],
-        "countries_excluded": ["China", "India"],
+        "additional_regions": ["Asia"],
+        "excluded_members": ["China", "India"],
     },
-    "Europe (excl. EU-27)": {"regions_included": ["Europe"], "regions_excluded": ["European Union (27)"]},
+    "Europe (excl. EU-27)": {"additional_regions": ["Europe"], "excluded_regions": ["European Union (27)"]},
     "Europe (excl. EU-28)": {
-        "regions_included": ["Europe"],
-        "regions_excluded": ["European Union (27)"],
-        "countries_excluded": ["United Kingdom"],
+        "additional_regions": ["Europe"],
+        "excluded_regions": ["European Union (27)"],
+        "excluded_members": ["United Kingdom"],
     },
     "European Union (28)": {
-        "regions_included": ["European Union (27)"],
-        "countries_included": ["United Kingdom"],
+        "additional_regions": ["European Union (27)"],
+        "additional_members": ["United Kingdom"],
     },
     "North America (excl. USA)": {
-        "regions_included": ["North America"],
-        "countries_excluded": ["United States"],
+        "additional_regions": ["North America"],
+        "excluded_members": ["United States"],
     },
 }
 
@@ -157,66 +153,6 @@ COLUMNS_THAT_MUST_HAVE_DATA = [
     "emissions_from_land_use_change",
     # 'land_use_change_quality_flag',
 ]
-
-
-def get_countries_in_region(
-    region: str, region_modifications: Optional[Dict[str, Dict[str, List[str]]]] = None
-) -> List[str]:
-    """Get countries in a region, both for known regions (e.g. "Africa") and custom ones (e.g. "Europe (excl. EU-27)").
-
-    Parameters
-    ----------
-    region : str
-        Region name (e.g. "Africa", or "Europe (excl. EU-27)").
-    region_modifications : dict or None
-        If None (or an empty dictionary), the region should be in OWID's countries-regions dataset.
-        If not None, it should be a dictionary with any (or all) of the following keys:
-        - "regions_included": List of regions whose countries will be included.
-        - "regions_excluded": List of regions whose countries will be excluded.
-        - "countries_included": List of additional individual countries to be included.
-        - "countries_excluded": List of additional individual countries to be excluded.
-        NOTE: All regions and countries defined in this dictionary should be in OWID's countries-regions dataset.
-
-    Returns
-    -------
-    countries : list
-        List of countries in the specified region.
-
-    """
-    if region_modifications is None:
-        region_modifications = {}
-
-    # Check that the fields in the regions_modifications dictionary are well defined.
-    expected_fields = ["regions_included", "regions_excluded", "countries_included", "countries_excluded"]
-    assert all([field in expected_fields for field in region_modifications])
-
-    # Get lists of regions whose countries will be included and excluded.
-    regions_included = region_modifications.get("regions_included", [region])
-    regions_excluded = region_modifications.get("regions_excluded", [])
-    # Get lists of additional individual countries to include and exclude.
-    countries_included = region_modifications.get("countries_included", [])
-    countries_excluded = region_modifications.get("countries_excluded", [])
-
-    # List countries from the list of regions included.
-    countries_set = set(
-        sum([geo.list_countries_in_region(region_included) for region_included in regions_included], [])
-    )
-
-    # Remove all countries from the list of regions excluded.
-    countries_set -= set(
-        sum([geo.list_countries_in_region(region_excluded) for region_excluded in regions_excluded], [])
-    )
-
-    # Add the list of individual countries to be included.
-    countries_set |= set(countries_included)
-
-    # Remove the list of individual countries to be excluded.
-    countries_set -= set(countries_excluded)
-
-    # Convert set of countries into a sorted list.
-    countries = sorted(countries_set)
-
-    return countries
 
 
 def sanity_checks_on_input_data(
@@ -668,6 +604,9 @@ def combine_data_and_add_variables(
     df_land_use: pd.DataFrame,
     df_gdp: pd.DataFrame,
     df_energy: pd.DataFrame,
+    df_population: pd.DataFrame,
+    ds_regions: Dataset,
+    ds_income_groups: Dataset,
 ) -> Table:
     """Combine all relevant data into one dataframe, add region aggregates, and add custom variables (e.g. emissions per
     capita).
@@ -688,6 +627,12 @@ def combine_data_and_add_variables(
         GDP data.
     df_energy : pd.DataFrame
         Primary energy data.
+    df_population : pd.DataFrame
+        Population data.
+    ds_regions : Dataset
+        Regions dataset.
+    ds_income_groups : Dataset
+        Income groups dataset.
 
     Returns
     -------
@@ -714,8 +659,8 @@ def combine_data_and_add_variables(
     assert set(df_consumption["country"]) < set(df_co2["country"]), error
     df_co2 = pd.merge(df_co2, df_consumption, on=["country", "year"], how="outer")
 
-    # Add population to dataframe.
-    df_co2 = geo.add_population_to_dataframe(df=df_co2, warn_on_missing_countries=False)
+    # Add population to original dataframe.
+    df_co2 = pd.merge(df_co2, df_population[["country", "year", "population"]], on=["country", "year"], how="left")
 
     # Add GDP to main dataframe.
     df_co2 = pd.merge(df_co2, df_gdp, on=["country", "year"], how="left")
@@ -756,7 +701,15 @@ def combine_data_and_add_variables(
         column: "sum" for column in df_co2.columns if column not in ["country", "year", "land_use_change_quality_flag"]
     }
     for region in REGIONS:
-        countries_in_region = get_countries_in_region(region=region, region_modifications=REGIONS[region])
+        countries_in_region = geo.list_members_of_region(
+            region=region,
+            ds_regions=ds_regions,
+            ds_income_groups=ds_income_groups,
+            additional_regions=REGIONS[region].get("additional_regions", None),
+            excluded_regions=REGIONS[region].get("excluded_regions", None),
+            additional_members=REGIONS[region].get("additional_members", None),
+            excluded_members=REGIONS[region].get("excluded_members", None),
+        )
         df_co2 = geo.add_region_aggregates(
             df=df_co2,
             region=region,
@@ -907,7 +860,15 @@ def run(dest_dir: str) -> None:
     ds_gdp: Dataset = paths.load_dependency("ggdc_maddison")
     tb_gdp = ds_gdp["maddison_gdp"]
 
-    # TODO: Load regions, population and income groups.
+    # Load population dataset and read its main table.
+    ds_population: Dataset = paths.load_dependency("population")
+    tb_population = ds_population["population"]
+
+    # Load regions dataset and read its main tables (it will be used to create region aggregates).
+    ds_regions: Dataset = paths.load_dependency("regions")
+
+    # Load income groups dataset and read its main table (it will be used to create region aggregates).
+    ds_income_groups: Dataset = paths.load_dependency("wb_income")
 
     # Create a dataframe for each table.
     df_co2 = pd.DataFrame(tb_co2).reset_index()
@@ -917,6 +878,7 @@ def run(dest_dir: str) -> None:
     df_land_use = pd.DataFrame(tb_land_use).reset_index()
     df_energy = pd.DataFrame(tb_energy).reset_index()
     df_gdp = pd.DataFrame(tb_gdp).reset_index()
+    df_population = pd.DataFrame(tb_population).reset_index()
 
     #
     # Process data.
@@ -966,6 +928,9 @@ def run(dest_dir: str) -> None:
         df_land_use=df_land_use,
         df_gdp=df_gdp,
         df_energy=df_energy,
+        df_population=df_population,
+        ds_regions=ds_regions,
+        ds_income_groups=ds_income_groups,
     )
 
     # Run sanity checks on output data.

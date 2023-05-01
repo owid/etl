@@ -77,6 +77,11 @@ steps:
     - data://garden/energy/2023-02-20/primary_energy_consumption
     # Loaded to calculate emissions per GDP.
     - data://garden/ggdc/2020-10-01/ggdc_maddison
+    # Loaded to create per-capita variables.
+    - data://garden/demography/2022-12-08/population
+    # Loaded to create region aggregates (including income groups).
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2021-07-01/wb_income
   data://grapher/gcp/2023-04-28/global_carbon_budget:
     - data://garden/gcp/2023-04-28/global_carbon_budget
   #
