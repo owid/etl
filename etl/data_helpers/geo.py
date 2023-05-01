@@ -484,3 +484,112 @@ def add_population_to_dataframe(
     df_with_population = pd.merge(df, population, on=[country_col, year_col], how="left")
 
     return df_with_population
+
+
+def list_members_of_region(
+    region: str,
+    ds_regions: Dataset,
+    ds_income_groups: Dataset,
+    additional_regions: Optional[List[str]] = None,
+    excluded_regions: Optional[List[str]] = None,
+    additional_members: Optional[List[str]] = None,
+    excluded_members: Optional[List[str]] = None,
+) -> List[str]:
+    """Get countries in a region, both for known regions (e.g. "Africa") and custom ones (e.g. "Europe (excl. EU-27)").
+
+    NOTE: This function should replace list_countries_in_region once we have new functions to create region aggregates.
+
+    Parameters
+    ----------
+    region : str
+        Region name (e.g. "Africa", or "Europe (excl. EU-27)"). If the region is a known region in ds_regions, its
+        members will be listed.
+    ds_regions : Dataset
+        Regions dataset.
+    ds_income_groups : Dataset
+        Income groups dataset.
+    additional_regions: list or None
+        Additional regions whose members should be included in the list.
+    excluded_regions: list or None
+        Regions whose members should be excluded from the list.
+    additional_members : list or None
+        Additional individual members to include in the list.
+    excluded_members : list
+        Individual members to exclude from the list.
+
+    Returns
+    -------
+    countries : list
+        List of countries in the specified region.
+
+    """
+    if additional_regions is None:
+        additional_regions = []
+    if excluded_regions is None:
+        excluded_regions = []
+    if additional_members is None:
+        additional_members = []
+    if excluded_members is None:
+        excluded_members = []
+
+    # Get main tables from the regions dataset.
+    df_region_definitions = pd.DataFrame(ds_regions["definitions"]).reset_index()
+    df_region_members = pd.DataFrame(ds_regions["members"]).reset_index()
+
+    # Get a mapping from region code to name.
+    region_names = df_region_definitions.set_index("code").to_dict()["name"]
+
+    # Map each region code to its name, and each member code to its name.
+    df_countries_in_region = df_region_members.copy()
+    df_countries_in_region["region"] = map_series(
+        df_countries_in_region["code"], mapping=region_names, warn_on_missing_mappings=True
+    )
+    df_countries_in_region["member"] = map_series(
+        df_countries_in_region["member"], mapping=region_names, warn_on_missing_mappings=True
+    )
+
+    # Create a column with the list of members in each region
+    df_countries_in_region = (
+        df_countries_in_region.rename(columns={"member": "members"})
+        .groupby("region", as_index=True, observed=True)
+        .agg({"members": list})
+    )
+
+    # Get the main table from the income groups dataset.
+    df_income = pd.DataFrame(ds_income_groups["wb_income_group"]).reset_index()
+
+    # Create a dataframe of countries in each income group.
+    df_countries_in_income_group = (
+        df_income.rename(columns={"income_group": "region", "country": "members"})
+        .groupby("region", as_index=True, observed=True)
+        .agg({"members": list})
+    )
+
+    # Create a dataframe of members in regions, including income groups.
+    df_regions = pd.concat([df_countries_in_region, df_countries_in_income_group], ignore_index=False)
+
+    # Get list of default members for the given region, if it's known.
+    if region in df_regions.index.tolist():
+        countries_set = set(df_regions.loc[region]["members"])
+    else:
+        # Initialise an empty set of members.
+        countries_set = set()
+
+    # List countries from the list of regions included.
+    countries_set |= set(
+        sum([df_regions.loc[region_included]["members"] for region_included in additional_regions], [])
+    )
+
+    # Remove all countries from the list of regions excluded.
+    countries_set -= set(sum([df_regions.loc[region_excluded]["members"] for region_excluded in excluded_regions], []))
+
+    # Add the list of individual countries to be included.
+    countries_set |= set(additional_members)
+
+    # Remove the list of individual countries to be excluded.
+    countries_set -= set(excluded_members)
+
+    # Convert set of countries into a sorted list.
+    countries = sorted(countries_set)
+
+    return countries
