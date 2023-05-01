@@ -3,7 +3,7 @@ tables:
     # (Inherited from meadow, remove if not different.)
     variables:
       classification:
-        title: Income group
+        title: World Bank income classification
         unit: ""
         description: Classification by the World Bank based on the country's income.
       #   sources:
