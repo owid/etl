@@ -71,6 +71,14 @@ steps:
     - snapshot://gcp/2023-04-28/global_carbon_budget_global_emissions.xlsx
     - snapshot://gcp/2023-04-28/global_carbon_budget_national_emissions.xlsx
     - snapshot://gcp/2023-04-28/global_carbon_budget_land_use_change_emissions.xlsx
+  data://garden/gcp/2023-04-28/global_carbon_budget:
+    - data://meadow/gcp/2023-04-28/global_carbon_budget
+    # Loaded to calculate emissions per unit energy.
+    - data://garden/energy/2023-02-20/primary_energy_consumption
+    # Loaded to calculate emissions per GDP.
+    - data://garden/ggdc/2020-10-01/ggdc_maddison
+  data://grapher/gcp/2023-04-28/global_carbon_budget:
+    - data://garden/gcp/2023-04-28/global_carbon_budget
   #
   # RFF - World Carbon Pricing (2022-10-11).
   #
