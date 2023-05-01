@@ -352,6 +352,7 @@ def harmonize_countries(
     warn_on_missing_countries: bool = True,
     make_missing_countries_nan: bool = False,
     warn_on_unused_countries: bool = True,
+    warn_on_unknown_excluded_countries: bool = True,
     show_full_warning: bool = True,
 ) -> pd.DataFrame:
     """Harmonize country names in dataframe, following the mapping given in a file.
@@ -379,6 +380,9 @@ def harmonize_countries(
     warn_on_unused_countries : bool
         True to warn about countries that appear in countries file but are useless (since they do not appear in original
         dataframe).
+    warn_on_unknown_excluded_countries : bool
+        True to warn about countries that appear in the list of non-harmonized countries to ignore, but are not found in
+        the data.
     show_full_warning : bool
         True to display list of countries in warning messages.
 
@@ -399,7 +403,7 @@ def harmonize_countries(
 
         # Check that all countries to be excluded exist in the data.
         unknown_excluded_countries = set(excluded_countries) - set(df[country_col])
-        if len(unknown_excluded_countries) > 0:
+        if warn_on_unknown_excluded_countries and (len(unknown_excluded_countries) > 0):
             warn_on_list_of_entities(
                 list_of_entities=unknown_excluded_countries,
                 warning_message="Unknown country names in excluded countries file:",
