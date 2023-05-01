@@ -73,7 +73,7 @@ def harmonize_income_group_labels(df: pd.DataFrame) -> pd.DataFrame:
     MAPPING_CLASSIFICATION = {
         "..": np.nan,
         "L": "Low-income countries",
-        "H": "High-income countrires",
+        "H": "High-income countries",
         "UM": "Upper-middle-income countries",
         "LM": "Lower-middle-income countries",
         "LM*": "Lower-middle-income countries",
