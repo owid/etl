@@ -43,3 +43,5 @@ dataset:
 tables:
   statistical_review:
     title: "Statistical Review of World Energy"
+    variables:
+      {}
