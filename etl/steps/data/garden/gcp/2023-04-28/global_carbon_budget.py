@@ -567,6 +567,27 @@ def prepare_production_emissions(df_production: pd.DataFrame) -> pd.DataFrame:
     return df_production
 
 
+def prepare_land_use_emissions(df_land_use: pd.DataFrame) -> pd.DataFrame:
+    """Prepare land-use change emissions data (basic processing).
+
+    Parameters
+    ----------
+    df_land_use : pd.DataFrame
+        Land-use change emissions.
+
+    Returns
+    -------
+    df_land_use : pd.DataFrame
+        Data after basic processing.
+
+    """
+    # Convert units from megatonnes of carbon per year emissions to tonnes of CO2 per year.
+    for column in df_land_use.drop(columns=["country", "year"]).columns:
+        df_land_use[column] *= MILLION_TONNES_OF_CARBON_TO_TONNES_OF_CO2
+
+    return df_land_use
+
+
 def prepare_historical_emissions(df_historical: pd.DataFrame) -> pd.DataFrame:
     """Prepare historical emissions data.
 
@@ -937,7 +958,7 @@ def run(dest_dir: str) -> None:
     #
     # Load inputs.
     #
-    # Load meadow dataset and read all tables from dataset.
+    # Load meadow dataset and read all its tables.
     ds_meadow: Dataset = paths.load_dependency("global_carbon_budget")
     tb_co2 = ds_meadow["global_carbon_budget_fossil_co2_emissions"]
     tb_historical = ds_meadow["global_carbon_budget_historical_budget"]
@@ -975,6 +996,9 @@ def run(dest_dir: str) -> None:
 
     # Prepare production-based emission data.
     df_production = prepare_production_emissions(df_production=df_production)
+
+    # Prepare land-use emission data.
+    df_land_use = prepare_land_use_emissions(df_land_use=df_land_use)
 
     # Select and rename columns from primary energy data.
     df_energy = df_energy[list(PRIMARY_ENERGY_COLUMNS)].rename(columns=PRIMARY_ENERGY_COLUMNS, errors="raise")

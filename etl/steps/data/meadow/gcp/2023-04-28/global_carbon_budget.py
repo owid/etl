@@ -1,4 +1,14 @@
-"""Load a snapshot and create a meadow dataset."""
+"""Load a snapshot and create a meadow dataset.
+
+It combines the following snapshots:
+- GCP's Fossil CO2 emissions (long-format csv).
+- GCP's official GCB global emissions (excel file) containing global bunker fuel and land-use change emissions.
+- GCP's official GCB national emissions (excel file) containing consumption-based emissions for each country.
+  - Production-based emissions from this file are also used, but just to include total emissions of regions
+    according to GCP (e.g. "Africa (GCP)") and for sanity checks.
+- GCP's official GCB national land-use change emissions (excel file) with land-use change emissions for each country.
+
+"""
 
 import pandas as pd
 from owid.catalog import Table
@@ -49,10 +59,6 @@ def prepare_historical_budget(df_historical_budget: pd.DataFrame) -> Table:
         "land-use change emissions": "global_land_use_change_emissions",
     }
     df_historical_budget = df_historical_budget[list(columns)].rename(columns=columns)
-
-    # # Convert units from gigatonnes of carbon per year emissions to tonnes of CO2 per year.
-    # for column in df.drop(columns="year").columns:
-    #     df[column] *= BILLION_TONNES_OF_CARBON_TO_TONNES_OF_CO2
 
     # Add column for country (to be able to combine this with the national data).
     df_historical_budget["country"] = "World"
@@ -117,9 +123,6 @@ def prepare_land_use_emissions(df_land_use: pd.DataFrame) -> Table:
     # Add quality factor as an additional column.
     df_land_use = pd.merge(df_land_use, quality_flag, how="left", on="country")
 
-    # # Convert units from megatonnes of carbon per year emissions to tonnes of CO2 per year.
-    # df_land_use["emissions"] *= MILLION_TONNES_OF_CARBON_TO_TONNES_OF_CO2
-
     # Set an index and sort row and columns conveniently.
     df_land_use = df_land_use.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
 
@@ -129,13 +132,13 @@ def prepare_land_use_emissions(df_land_use: pd.DataFrame) -> Table:
     return tb_land_use
 
 
-def prepare_national_emissions(df_national: pd.DataFrame, column_name: str) -> Table:
+def prepare_national_emissions(df: pd.DataFrame, column_name: str) -> Table:
     """Select variables and prepare the territorial emissions (or the consumption emissions) sheet of GCB's raw national
     data file.
 
     Parameters
     ----------
-    df_national : pd.DataFrame
+    df : pd.DataFrame
         Territorial emissions (or consumption emissions) sheet of GCB's raw national data file.
     column_name : str
         Name to assign to emissions column to be generated.
@@ -146,10 +149,13 @@ def prepare_national_emissions(df_national: pd.DataFrame, column_name: str) -> T
         Processed territorial (or consumption) emissions sheet of GCB's raw national data file.
 
     """
-    df_national = df_national.copy()
+    df = df.copy()
+
+    error = f"Sheet in national data file for {column_name} has changed (consider changing 'skiprows')."
+    assert df.columns[1] == "Afghanistan", error
 
     # The zeroth column is expected to be year.
-    df_national = df_national.rename(columns={df_national.columns[0]: "year"})
+    df = df.rename(columns={df.columns[0]: "year"})
 
     # Each column represents a country; then the final columns are regions, "Bunkers", and "Statistical Difference".
     # Keep "Bunkers", but remove "Statistical Difference" (which is almost completely empty).
@@ -157,20 +163,16 @@ def prepare_national_emissions(df_national: pd.DataFrame, column_name: str) -> T
     # handled at the garden step.
 
     # Remove unnecessary column.
-    df_national = df_national.drop(columns=["Statistical Difference"])
+    df = df.drop(columns=["Statistical Difference"])
 
     # Convert from wide to long format dataframe.
-    df_national = df_national.melt(id_vars=["year"]).rename(columns={"variable": "country", "value": column_name})
-
-    # # Convert units from megatonnes of carbon per year emissions to tonnes of CO2 per year.
-    # for column in df_national.drop(columns=["country", "year"]).columns:
-    #     df_national[column] *= MILLION_TONNES_OF_CARBON_TO_TONNES_OF_CO2
+    df = df.melt(id_vars=["year"]).rename(columns={"variable": "country", "value": column_name})
 
     # Set an index and sort row and columns conveniently.
-    df_national = df_national.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
+    df = df.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
 
     # Create a table with the generated data.
-    tb_national = Table(df_national, short_name="global_carbon_budget_national", underscore=True)
+    tb_national = Table(df, short_name=f"global_carbon_budget_{column_name}", underscore=True)
 
     return tb_national
 
@@ -196,8 +198,11 @@ def run(dest_dir: str) -> None:
     # Load land-use emissions.
     df_land_use = pd.read_excel(snap_land_use.path, sheet_name="BLUE", skiprows=7)
 
-    # Load national emissions.
-    df_national = pd.read_excel(snap_national.path, sheet_name="Territorial Emissions", skiprows=11)
+    # Load production-based national emissions.
+    df_production = pd.read_excel(snap_national.path, sheet_name="Territorial Emissions", skiprows=11)
+
+    # Load consumption-based national emissions.
+    df_consumption = pd.read_excel(snap_national.path, sheet_name="Consumption Emissions", skiprows=8)
 
     # TODO: Transfer changes that were done in the old meadow step to garden.
     #  Consider converting units at the garden step, or not converting them.
@@ -215,10 +220,10 @@ def run(dest_dir: str) -> None:
     tb_land_use = prepare_land_use_emissions(df_land_use=df_land_use)
 
     # Prepare data for production-based emissions, from the file of national emissions.
-    tb_production = prepare_national_emissions(df_national=df_national, column_name="production_emissions")
+    tb_production = prepare_national_emissions(df=df_production, column_name="production_emissions")
 
     # Prepare data for consumption-based emissions, from the file of national emissions.
-    tb_consumption = prepare_national_emissions(df_national=df_national, column_name="consumption_emissions")
+    tb_consumption = prepare_national_emissions(df=df_consumption, column_name="consumption_emissions")
 
     #
     # Save outputs.
