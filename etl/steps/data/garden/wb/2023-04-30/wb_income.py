@@ -71,7 +71,7 @@ def harmonize_income_group_labels(df: pd.DataFrame) -> pd.DataFrame:
     assert lm_special == {"YEM1987", "YEM1988"}, f"Unexpected entries with classification 'LM*': {df[msk]}"
     # Rename labels
     MAPPING_CLASSIFICATION = {
-        "..": np.nan,
+        "..": np.nan,  # no available classification for country-year (maybe country didn't exist yet/anymore)
         "L": "Low-income countries",
         "H": "High-income countries",
         "UM": "Upper-middle-income countries",
