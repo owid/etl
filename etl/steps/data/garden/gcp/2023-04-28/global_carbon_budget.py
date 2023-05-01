@@ -413,21 +413,7 @@ def sanity_checks_on_output_data(combined_df: pd.DataFrame) -> None:
 
 
 def prepare_fossil_co2_emissions(df_co2: pd.DataFrame) -> pd.DataFrame:
-    """Prepare Fossil CO2 emissions data (basic processing).
-
-    Select and rename columns to be used, adapt units, and fix known issues.
-
-    Parameters
-    ----------
-    df_co2 : pd.DataFrame
-        Production-based emissions from GCP's Fossil CO2 emissions dataset (csv file).
-
-    Returns
-    -------
-    df_co2 : pd.DataFrame
-        Fossil CO2 emissions data after basic processing.
-
-    """
+    """Prepare Fossil CO2 emissions data (basic processing)."""
     # Select and rename columns from fossil CO2 data.
     df_co2 = df_co2[list(CO2_COLUMNS)].rename(columns=CO2_COLUMNS, errors="raise")
 
@@ -504,21 +490,7 @@ def prepare_fossil_co2_emissions(df_co2: pd.DataFrame) -> pd.DataFrame:
 
 
 def prepare_consumption_emissions(df_consumption: pd.DataFrame) -> pd.DataFrame:
-    """Prepare consumption-based emissions data (basic processing).
-
-    Select and rename columns to be used, adapt units, and fix known issues.
-
-    Parameters
-    ----------
-    df_consumption : pd.DataFrame
-        Consumption-based emissions from GCP's official national emissions dataset (excel file).
-
-    Returns
-    -------
-    df_consumption : pd.DataFrame
-        Consumption-based emissions after basic processing.
-
-    """
+    """Prepare consumption-based emissions data (basic processing)."""
     # Select and rename columns.
     df_consumption = df_consumption[list(CONSUMPTION_EMISSIONS_COLUMNS)].rename(
         columns=CONSUMPTION_EMISSIONS_COLUMNS, errors="raise"
@@ -547,19 +519,7 @@ def prepare_consumption_emissions(df_consumption: pd.DataFrame) -> pd.DataFrame:
 
 
 def prepare_production_emissions(df_production: pd.DataFrame) -> pd.DataFrame:
-    """Prepare production-based emissions data (basic processing).
-
-    Parameters
-    ----------
-    df_production : pd.DataFrame
-        Production-based emissions from GCP's official national emissions dataset (excel file).
-
-    Returns
-    -------
-    df_production : pd.DataFrame
-        Production-based emissions after basic processing.
-
-    """
+    """Prepare production-based emissions data (basic processing)."""
     # Convert units from megatonnes of carbon per year emissions to tonnes of CO2 per year.
     for column in df_production.drop(columns=["country", "year"]).columns:
         df_production[column] *= MILLION_TONNES_OF_CARBON_TO_TONNES_OF_CO2
@@ -568,42 +528,15 @@ def prepare_production_emissions(df_production: pd.DataFrame) -> pd.DataFrame:
 
 
 def prepare_land_use_emissions(df_land_use: pd.DataFrame) -> pd.DataFrame:
-    """Prepare land-use change emissions data (basic processing).
-
-    Parameters
-    ----------
-    df_land_use : pd.DataFrame
-        Land-use change emissions.
-
-    Returns
-    -------
-    df_land_use : pd.DataFrame
-        Data after basic processing.
-
-    """
+    """Prepare land-use change emissions data (basic processing)."""
     # Convert units from megatonnes of carbon per year emissions to tonnes of CO2 per year.
-    for column in df_land_use.drop(columns=["country", "year"]).columns:
-        df_land_use[column] *= MILLION_TONNES_OF_CARBON_TO_TONNES_OF_CO2
+    df_land_use["emissions"] *= MILLION_TONNES_OF_CARBON_TO_TONNES_OF_CO2
 
     return df_land_use
 
 
 def prepare_historical_emissions(df_historical: pd.DataFrame) -> pd.DataFrame:
-    """Prepare historical emissions data.
-
-    Select and rename columns to be used and adapt units.
-
-    Parameters
-    ----------
-    df_historical : pd.DataFrame
-        Historical emissions from GCP's official global emissions dataset (excel file).
-
-    Returns
-    -------
-    df_historical : pd.DataFrame
-        Historical emissions after basic processing.
-
-    """
+    """Prepare historical emissions data."""
     # Select and rename columns from historical emissions data.
     df_historical = df_historical[list(HISTORICAL_EMISSIONS_COLUMNS)].rename(
         columns=HISTORICAL_EMISSIONS_COLUMNS, errors="raise"
