@@ -23,7 +23,7 @@ MAPPING_MEASURE = {
         "title": "Sales: US$ (purchasing power parity per capita",
     },
     "Defined daily dosage per 1 000 inhabitants per day": {
-        "unit": "DDD per 1,000 inhabitants per day",
+        "unit": "daily dose per 1,000 inhabitants per day",
         "title": "Consumption: DDD per 1,000 inhabitants per day",
     },
     "Million US$ at exchange rate": {"unit": "million US$", "title": "Sales: Million US$ at exchange rate"},
