@@ -22,7 +22,7 @@ from shared import (
     add_region_aggregates,
 )
 
-from etl.helpers import PathFinder
+from etl.helpers import PathFinder, create_dataset
 from etl.paths import DATA_DIR
 
 P = PathFinder(__file__)
@@ -200,6 +200,10 @@ def prepare_output_table(df: pd.DataFrame, bp_table: catalog.Table) -> catalog.T
     # Get the table metadata from the original table.
     table.metadata = deepcopy(bp_table.metadata)
 
+    # Update table metadata.
+    table.metadata.title = "Statistical Review of World Energy"
+    table.metadata.short_name = "statistical_review"
+
     # Get the metadata of each variable from the original table.
     for column in table.drop(columns="country_code").columns:
         table[column].metadata = deepcopy(bp_table[column].metadata)
@@ -360,14 +364,7 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset.
-    ds_garden = catalog.Dataset.create_empty(dest_dir)
-
-    # Add table to dataset.
-    table.metadata.short_name = "statistical_review"
-    ds_garden.add(table)
-
-    # Update dataset and table metadata using yaml file.
-    ds_garden.update_metadata(METADATA_FILE_PATH)
+    ds_garden = create_dataset(dest_dir, tables=[table], default_metadata=bp_ds.metadata)
 
     # Save dataset.
     ds_garden.save()
