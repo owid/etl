@@ -204,9 +204,6 @@ def run(dest_dir: str) -> None:
     # Load consumption-based national emissions.
     df_consumption = pd.read_excel(snap_national.path, sheet_name="Consumption Emissions", skiprows=8)
 
-    # TODO: Transfer changes that were done in the old meadow step to garden.
-    #  Consider converting units at the garden step, or not converting them.
-
     #
     # Process data.
     #
