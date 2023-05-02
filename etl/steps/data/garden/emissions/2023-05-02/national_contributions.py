@@ -41,6 +41,7 @@ SHARE_VARIABLES = [
     "annual_emissions_ch4_total",
     "annual_emissions_co2_total",
     "annual_emissions_n2o_total",
+    "annual_emissions_ghg_total_co2eq",
     "temperature_response_ghg_total",
 ]
 
