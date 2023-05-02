@@ -46,12 +46,14 @@ def pick_variables(df: pd.DataFrame) -> pd.DataFrame:
     return df[df.variable.isin(VARIABLE_LIST)]
 
 
-def reshape(df: pd.DataFrame) -> pd.DataFrame:
-    return (
-        df.melt(id_vars=["Country", "variable"], var_name="year")
-        .pivot(index=["Country", "year"], columns="variable", values="value")
-        .reset_index()
-    )
+def reshape_and_clean(df: pd.DataFrame) -> pd.DataFrame:
+    df = df.melt(id_vars=["Country", "variable"], var_name="year")
+
+    # Coerce values to numeric, and drop NAs
+    df = df.assign(value=pd.to_numeric(df.value, errors="coerce")).dropna(subset=["value"])
+
+    df = df.pivot(index=["Country", "year"], columns="variable", values="value").reset_index()
+    return df
 
 
 def run(dest_dir: str) -> None:
@@ -64,14 +66,11 @@ def run(dest_dir: str) -> None:
     snap: Snapshot = paths.load_dependency("world_economic_outlook.xls")
 
     # Load data from snapshot, then process.
-    df = read(snap.path).pipe(make_variable_names).pipe(pick_variables).pipe(reshape)
+    df = read(snap.path).pipe(make_variable_names).pipe(pick_variables).pipe(reshape_and_clean)
 
     # Create a new table and ensure all columns are snake-case.
     tb = Table(df, short_name=paths.short_name, underscore=True)
 
-    #
-    # Save outputs.
-    #
     # Create a new meadow dataset with the same metadata as the snapshot.
     ds_meadow = create_dataset(dest_dir, tables=[tb], default_metadata=snap.metadata)
 
