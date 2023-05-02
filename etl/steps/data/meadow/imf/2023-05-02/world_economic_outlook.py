@@ -16,7 +16,7 @@ paths = PathFinder(__file__)
 VARIABLE_LIST = ["Gross domestic product, constant prices - Percent change"]
 
 
-def read(path: str) -> pd.DataFrame:
+def read(path) -> pd.DataFrame:
     df = (
         pd.read_csv(path, delimiter="\t", encoding="utf-16-le")
         .drop(
