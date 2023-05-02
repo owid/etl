@@ -1,0 +1,7 @@
+tables:
+  world_economic_outlook:
+    variables:
+      gross_domestic_product__constant_prices__percent_change:
+        title: Gross domestic product, constant prices - Percent change
+        short_unit: '%'
+        unit: '%'
