@@ -337,6 +337,16 @@ steps:
   data://grapher/happiness/2023-03-20/happiness:
   - data://garden/happiness/2023-03-20/happiness
 
+# International Monetary Fund, World Economic Outlook
+  data://meadow/imf/2023-05-02/world_economic_outlook:
+  - snapshot://imf/2023-05-02/world_economic_outlook.xls
+  data://garden/imf/2023-05-02/world_economic_outlook:
+  - data://meadow/imf/2023-05-02/world_economic_outlook
+  data://grapher/imf/2023-05-02/world_economic_outlook:
+  - data://garden/imf/2023-05-02/world_economic_outlook
+
+
+
 # Sub-dags to import
 include:
   - dag/open_numbers.yml

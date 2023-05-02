@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5413_covid_19__deaths_by_vaccination_status__united_states_values
   file_extension: feather
-  date_accessed: 2023-03-31 15:12:13.654158
+  date_accessed: 2023-05-02 13:03:34.434700
   name: COVID-19 - Deaths by vaccination status - United States
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: c8ac6e43f288080ec2af5fda0d3286c2
-  size: 14930
+- md5: cd0b53fd3a8b33920c411f697083ae19
+  size: 15922
   path: dataset_5413_covid_19__deaths_by_vaccination_status__united_states_values.feather

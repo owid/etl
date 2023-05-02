@@ -1,0 +1,18 @@
+meta:
+  namespace: backport
+  short_name: dataset_5988_gbd_countries_with_primary_data_on_mental_illnesses_values
+  file_extension: feather
+  date_accessed: 2023-05-02 13:00:25.235285
+  name: GBD countries with primary data on mental illnesses
+  description: ''
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/5988
+  source_published_by: Our World in Data catalog backport
+  is_public: false
+  version: latest
+  publication_date: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: c466b37d8e4f0d8327291f9fec40cc2c
+  size: 6570
+  path: dataset_5988_gbd_countries_with_primary_data_on_mental_illnesses_values.feather
