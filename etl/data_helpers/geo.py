@@ -489,7 +489,7 @@ def add_population_to_dataframe(
 def list_members_of_region(
     region: str,
     ds_regions: Dataset,
-    ds_income_groups: Dataset,
+    ds_income_groups: Optional[Dataset] = None,
     additional_regions: Optional[List[str]] = None,
     excluded_regions: Optional[List[str]] = None,
     additional_members: Optional[List[str]] = None,
@@ -506,8 +506,8 @@ def list_members_of_region(
         members will be listed.
     ds_regions : Dataset
         Regions dataset.
-    ds_income_groups : Dataset
-        Income groups dataset.
+    ds_income_groups : Dataset or None
+        Income groups dataset. It must be given if region is an income group.
     additional_regions: list or None
         Additional regions whose members should be included in the list.
     excluded_regions: list or None
@@ -555,33 +555,36 @@ def list_members_of_region(
         .agg({"members": list})
     )
 
-    # Get the main table from the income groups dataset.
-    df_income = pd.DataFrame(ds_income_groups["wb_income_group"]).reset_index()
+    if ds_income_groups is not None:
+        # Get the main table from the income groups dataset.
+        df_income = pd.DataFrame(ds_income_groups["wb_income_group"]).reset_index()
 
-    # Create a dataframe of countries in each income group.
-    df_countries_in_income_group = (
-        df_income.rename(columns={"income_group": "region", "country": "members"})
-        .groupby("region", as_index=True, observed=True)
-        .agg({"members": list})
-    )
+        # Create a dataframe of countries in each income group.
+        df_countries_in_income_group = (
+            df_income.rename(columns={"income_group": "region", "country": "members"})
+            .groupby("region", as_index=True, observed=True)
+            .agg({"members": list})
+        )
 
-    # Create a dataframe of members in regions, including income groups.
-    df_regions = pd.concat([df_countries_in_region, df_countries_in_income_group], ignore_index=False)
+        # Create a dataframe of members in regions, including income groups.
+        df_countries_in_region = pd.concat([df_countries_in_region, df_countries_in_income_group], ignore_index=False)
 
     # Get list of default members for the given region, if it's known.
-    if region in df_regions.index.tolist():
-        countries_set = set(df_regions.loc[region]["members"])
+    if region in df_countries_in_region.index.tolist():
+        countries_set = set(df_countries_in_region.loc[region]["members"])
     else:
         # Initialise an empty set of members.
         countries_set = set()
 
     # List countries from the list of regions included.
     countries_set |= set(
-        sum([df_regions.loc[region_included]["members"] for region_included in additional_regions], [])
+        sum([df_countries_in_region.loc[region_included]["members"] for region_included in additional_regions], [])
     )
 
     # Remove all countries from the list of regions excluded.
-    countries_set -= set(sum([df_regions.loc[region_excluded]["members"] for region_excluded in excluded_regions], []))
+    countries_set -= set(
+        sum([df_countries_in_region.loc[region_excluded]["members"] for region_excluded in excluded_regions], [])
+    )
 
     # Add the list of individual countries to be included.
     countries_set |= set(additional_members)
