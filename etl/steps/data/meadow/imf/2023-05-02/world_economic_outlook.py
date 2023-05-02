@@ -13,6 +13,9 @@ log = get_logger()
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+# This is a preliminary bulk importer for the IMF's WEO dataset.
+# As of October 2021, it only generates a grapher-compatible dataset with 1 variable (GDP growth).
+# But this first version could be extended to a traditional bulk import of the entire dataset later.
 VARIABLE_LIST = ["Gross domestic product, constant prices - Percent change"]
 
 
