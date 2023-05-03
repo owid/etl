@@ -15,7 +15,7 @@ tables:
     variables:
       qubits:
         title: Quantum bits per processor
-        short_unit: qubits
-        unit: qb
+        short_unit: qb
+        unit: qubits
         description: Highest number of quantum bits in a single circuit-based quantum
           processor over time

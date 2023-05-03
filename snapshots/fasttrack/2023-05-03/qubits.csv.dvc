@@ -16,6 +16,6 @@ meta:
   publication_year: 2023
 wdir: ../../../data/snapshots/fasttrack/2023-05-03
 outs:
-- md5: 98bc4786b97bbd9641e4193482760e42
-  size: 134
+- md5: 1fe20229745ae15ca1928af9fb9b1535
+  size: 119
   path: qubits.csv
