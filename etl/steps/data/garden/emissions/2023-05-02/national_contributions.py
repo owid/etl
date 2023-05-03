@@ -13,6 +13,13 @@ log = get_logger()
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+# Minimum year to consider.
+# There is data from 1830 for some variables and from 1850 for others.
+# However, when inspecting data between 1830 and 1850 (e.g. total CO2 emissions) it seems there is an abrupt jump
+# between 1849 and 1850, which happens for many countries.
+# This jump seems to be spurious, and therefore we start all time series from 1850.
+YEAR_MIN = 1850
+
 # Conversion factor to change from teragrams to tonnes.
 TERAGRAMS_TO_TONNES = 1e6
 # Conversion factor to change from petagrams to tonnes.
@@ -53,21 +60,41 @@ PER_CAPITA_VARIABLES = [
 ]
 
 # Regions to be added by aggregating data from their member countries.
-REGIONS = [
-    # Continents.
-    "Africa",
-    "Asia",
-    "Europe",
-    "European Union (27)",
-    "North America",
-    "Oceania",
-    "South America",
+REGIONS = {
+    # Default continents.
+    "Africa": {},
+    "Asia": {},
+    "Europe": {},
+    "North America": {},
+    "Oceania": {},
+    "South America": {},
     # Income groups.
-    "Low-income countries",
-    "Upper-middle-income countries",
-    "Lower-middle-income countries",
-    "High-income countries",
-]
+    "Low-income countries": {},
+    "Upper-middle-income countries": {},
+    "Lower-middle-income countries": {},
+    "High-income countries": {},
+    # Additional composite regions.
+    "Asia (excl. China and India)": {
+        "additional_regions": ["Asia"],
+        "excluded_members": ["China", "India"],
+    },
+    "Europe (excl. EU-27)": {"additional_regions": ["Europe"], "excluded_regions": ["European Union (27)"]},
+    "Europe (excl. EU-28)": {
+        "additional_regions": ["Europe"],
+        "excluded_regions": ["European Union (27)"],
+        "excluded_members": ["United Kingdom"],
+    },
+    "European Union (28)": {
+        "additional_regions": ["European Union (27)"],
+        "additional_members": ["United Kingdom"],
+    },
+    "North America (excl. USA)": {
+        "additional_regions": ["North America"],
+        "excluded_members": ["United States"],
+    },
+    # EU27 is already included in the original data.
+    # "European Union (27)": {},
+}
 
 
 def run_sanity_checks_on_inputs(df):
@@ -138,7 +165,15 @@ def add_emissions_in_co2_equivalents(df: pd.DataFrame) -> pd.DataFrame:
 def add_region_aggregates(df: pd.DataFrame, ds_regions: Dataset, ds_income_groups: Dataset) -> pd.DataFrame:
     for region in REGIONS:
         # List members in this region.
-        members = geo.list_members_of_region(region, ds_regions=ds_regions, ds_income_groups=ds_income_groups)
+        members = geo.list_members_of_region(
+            region=region,
+            ds_regions=ds_regions,
+            ds_income_groups=ds_income_groups,
+            additional_regions=REGIONS[region].get("additional_regions", None),
+            excluded_regions=REGIONS[region].get("excluded_regions", None),
+            additional_members=REGIONS[region].get("additional_members", None),
+            excluded_members=REGIONS[region].get("excluded_members", None),
+        )
         df = geo.add_region_aggregates(
             df=df,
             region=region,
@@ -188,6 +223,30 @@ def add_per_capita_variables(df: pd.DataFrame, ds_population: Dataset) -> pd.Dat
     df = df.drop(columns="population")
 
     return df
+
+
+def run_sanity_checks_on_outputs(df: pd.DataFrame) -> None:
+    error = "Share of global emissions cannot be larger than 101%"
+    assert (df[[column for column in df.columns if "share" in column]].max() < 101).all(), error
+    error = "Share of global emissions was not expected to be smaller than -1%"
+    # Some countries did contribute negatively to CO2 emissions, however overall the negative contribution is always
+    # smaller than 1% in absolute value.
+    assert (df[[column for column in df.columns if "share" in column]].min() > -1).all(), error
+
+    # Ensure that no country contributes to emissions more than the entire world.
+    columns_that_should_be_smaller_than_global = [
+        column for column in df.drop(columns=["country", "year"]).columns if "capita" not in column
+    ]
+    df_global = df[df["country"] == "World"].drop(columns="country")
+    check = pd.merge(
+        df[df["country"] != "World"].reset_index(drop=True), df_global, on="year", how="left", suffixes=("", "_global")
+    )
+    for column in columns_that_should_be_smaller_than_global:
+        # It is in principle possible that some region would emit more than the world, if the rest of regions
+        # were contributing with negative CO2 emissions (e.g. High-income countries in 1854).
+        # However, the difference should be very small.
+        error = f"Region contributed to {column} more than the entire world."
+        assert check[(check[column] - check[f"{column}_global"]) / check[f"{column}_global"] > 0.00001].empty, error
 
 
 def run(dest_dir: str) -> None:
@@ -260,6 +319,12 @@ def run(dest_dir: str) -> None:
 
     # Add per-capita variables.
     df = add_per_capita_variables(df=df, ds_population=ds_population)
+
+    # Ensure data starts from a certain fixed year (see notes above).
+    df = df[df["year"] >= YEAR_MIN].reset_index(drop=True)
+
+    # Sanity checks.
+    run_sanity_checks_on_outputs(df=df)
 
     # Create a new table with the processed data.
     tb_garden = Table(df, short_name=paths.short_name, underscore=True)
