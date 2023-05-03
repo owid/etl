@@ -86,7 +86,7 @@ def add_entity_code_and_name(engine: Engine, df: pd.DataFrame) -> pd.DataFrame:
     FROM entities
     WHERE id in %(entity_ids)s
     """
-    entities = pd.read_sql(q, engine, params={"entity_ids": df["entityId"].unique().tolist()})
+    entities = pd.read_sql(q, engine, params={"entity_ids": list(df["entityId"].unique())})
     return df.merge(entities, on="entityId")
 
 
