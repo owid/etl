@@ -50,3 +50,5 @@ steps:
   - snapshot-private://fasttrack/latest/quantum_processors_over_time.csv
   data-private://grapher/fasttrack/2023-05-02/tomitaka_2018:
   - snapshot-private://fasttrack/2023-05-02/tomitaka_2018.csv
+  data-private://grapher/fasttrack/2023-05-03/qubits:
+  - snapshot-private://fasttrack/2023-05-03/qubits.csv
