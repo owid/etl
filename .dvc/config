@@ -4,6 +4,8 @@
     url = s3://owid-catalog/snapshots
     endpointurl = https://nyc3.digitaloceanspaces.com
     acl = public-read
+    # Increase this if you are seeing requests timing out
+    connect_timeout = 600
 ['remote "public-read"']
     # Use Cloudflare CDN for pulling public data (also users won't need AWS config)
     url = https://catalog.ourworldindata.org/snapshots
