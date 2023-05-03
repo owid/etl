@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5986_population_coverage_of_mental_health_data__baxter_et_al__2013_config
   file_extension: json
-  date_accessed: 2023-04-29 08:07:56.955952
+  date_accessed: 2023-05-03 10:48:07.743650
   name: Grapher metadata for dataset_5986_population_coverage_of_mental_health_data__baxter_et_al__2013
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: aa7eb9d4a1a51de8861b768bed45272b
-  size: 6287
+- md5: 45ab04f90d13d963153f88217d10bb89
+  size: 5867
   path: dataset_5986_population_coverage_of_mental_health_data__baxter_et_al__2013_config.json
