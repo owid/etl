@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5515_ai_input_trends_data__sevilla_et_al__2023_values
   file_extension: feather
-  date_accessed: 2023-04-01 12:09:22.304258
+  date_accessed: 2023-05-03 10:51:35.207115
   name: AI Input Trends Data – Sevilla et al. (2023)
   description: ''
   source_name: Our World in Data catalog backport
@@ -13,6 +13,6 @@ meta:
   publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 09563e601ee5b56db4c76280acaa3c6a
-  size: 30434
+- md5: e074bc54f0da228655025db13cfd53da
+  size: 30058
   path: dataset_5515_ai_input_trends_data__sevilla_et_al__2023_values.feather
