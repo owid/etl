@@ -1,0 +1,33 @@
+dataset:
+  namespace: fasttrack
+  version: '2023-05-03'
+  short_name: apms_2014
+  title: Current depression in England by age and gender (APMS, 2014)
+  description: This is a dataset of the prevalence of current depression in the general
+    population in England, living in private households. Households were sampled randomly
+    and individuals were interviewed using the revised Clinical Interview Schedule
+    (CIS-R), which is a diagnostic structured interview format to determine whether
+    people had common mental disorders in the past week. In this dataset, presence
+    of a current episode of major depression was determined.
+  sources:
+  - name: Adult Psychiatric Morbidity Survey 2014, England (2016)
+    published_by: '"McManus S, Bebbington P, Jenkins R, Brugha T. (eds.) (2016) Mental
+      health and wellbeing in England: Adult Psychiatric Morbidity Survey 2014. Leeds:
+      NHS Digital"'
+    publisher_source: Surveys of individuals in randomly-selected private households
+      in England
+    publication_year: 2016
+    date_accessed: 2022-12-01
+    url: https://www.gov.uk/government/statistics/adult-psychiatric-morbidity-survey-mental-health-and-wellbeing-england-2014
+tables:
+  apms_2014:
+    variables:
+      current_prevalence_depression_men:
+        title: Current prevalence of depression, men
+        unit: '%'
+      current_prevalence_depression_women:
+        title: Current prevalence of depression, women
+        unit: '%'
+      current_prevalence_depression_all:
+        title: Current prevalence of depression, all
+        unit: '%'
