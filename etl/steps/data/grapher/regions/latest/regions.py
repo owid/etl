@@ -282,7 +282,7 @@ def run(dest_dir: str) -> None:
     regions["short_code"] = legacy_codes["iso_alpha2"]
 
     # Add members
-    regions["members"] = members_expanded.groupby("code").agg(list)
+    regions["members"] = members_expanded.groupby("code").agg(";".join)
 
     #
     # Save outputs.
