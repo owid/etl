@@ -428,6 +428,7 @@ def harmonize_countries(
 
 def add_population_to_dataframe(
     df: pd.DataFrame,
+    ds_population: Optional[Dataset] = None,
     country_col: str = "country",
     year_col: str = "year",
     population_col: str = "population",
@@ -440,6 +441,8 @@ def add_population_to_dataframe(
     ----------
     df : pd.DataFrame
         Original dataframe that contains a column of country names and years.
+    ds_population : Dataset or None
+        Population dataset.
     country_col : str
         Name of column in original dataframe with country names.
     year_col : str
@@ -458,7 +461,11 @@ def add_population_to_dataframe(
 
     """
     # Load population data.
-    population = _load_population().rename(
+    if ds_population is not None:
+        population = ds_population["population"].reset_index()
+    else:
+        population = _load_population()
+    population = population.rename(
         columns={
             "country": country_col,
             "year": year_col,

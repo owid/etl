@@ -251,7 +251,7 @@ def map_ids_to_labels(df: pd.DataFrame) -> pd.DataFrame:
     _sanity_check_age_ids(df)
 
     # Question ID to Question label mapping
-    question_id_to_label = {k: v["title"] for k, v in MAPPING_QUESTION_VALUES.items()}
+    question_id_to_label = {k: f"{k} - {v['title']}" for k, v in MAPPING_QUESTION_VALUES.items()}
 
     # Map IDs to Labels (Question, Answer, Gender, Age group)
     log.info("wgm_mental_health: mapping ids to labels}")
