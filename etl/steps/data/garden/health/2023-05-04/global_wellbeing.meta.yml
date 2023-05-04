@@ -3,16 +3,16 @@ tables:
     variables:
       count_on_to_help:
         title: Count On to Help
-        short_unit: ''
-        unit: ''
+        short_unit: '%'
+        unit: '%'
       health_problems:
         title: Health Problems
-        short_unit: ''
-        unit: ''
+        short_unit: '%'
+        unit: '%'
       experience_calmness_yesterday:
         title: Experience Calmness Yesterday
-        short_unit: ''
-        unit: ''
+        short_unit: '%'
+        unit: '%'
         description: >-
           The question asked was: "Did you experience the feeling of 'calmness' during A LOT OF THE DAY yesterday?"
 
@@ -20,8 +20,8 @@ tables:
           The accepted answers were: "Yes", "No", "Don't know", "Refused"
       enjoy_the_work_you_do_every_day:
         title: Enjoy the Work You Do Every Day
-        short_unit: ''
-        unit: ''
+        short_unit: '%'
+        unit: '%'
         description: >-
           The question asked was: "Do you enjoy the work you do in your job every day, or not?"
 
@@ -29,8 +29,8 @@ tables:
           The accepted answers were: "Yes", "No", "Don't know", "Refused"
       exciting_life_or_calm_life:
         title: Exciting Life or Calm Life
-        short_unit: ''
-        unit: ''
+        short_unit: '%'
+        unit: '%'
         description: >-
           The question asked was: "Would you rather live an exciting life or a calm life?"
 
@@ -38,8 +38,8 @@ tables:
           The accepted answers were: "An exciting life", "A calm life", "Both", "Neither"
       feel_at_peace_with_life:
         title: Feel at Peace With Life
-        short_unit: ''
-        unit: ''
+        short_unit: '%'
+        unit: '%'
         description: >-
           The question asked was: "In general, do you feel at peace with your life, or not?"
 
@@ -47,8 +47,8 @@ tables:
           The accepted answers were: "Yes", "No", "Don't know", "Refused"
       focus_on_taking_care_of_themselves_or_taking_care_of_others:
         title: Focus on Taking Care of Themselves or Taking Care of Others
-        short_unit: ''
-        unit: ''
+        short_unit: '%'
+        unit: '%'
         description: >-
           The question asked was: "Do you think people should focus more on taking care of themselves or on taking care of others?"
 
@@ -56,8 +56,8 @@ tables:
           The accepted answers were: "Taking care of others", "Taking care of themselves", "Both", Neither, "Don't know", "Refused"
       main_purpose_in_life:
         title: Main Purpose in Life
-        short_unit: ''
-        unit: ''
+        short_unit: '%'
+        unit: '%'
         description: >-
           The question asked was: "Which of the following is closest to your MAIN purpose in life?"
 
@@ -65,8 +65,8 @@ tables:
           The accepted answers were: "Yes", "No", "Don't know", "Refused"
       many_choices_in_type_of_work:
         title: Many Choices in Type of Work
-        short_unit: ''
-        unit: ''
+        short_unit: '%'
+        unit: '%'
         description: >-
           The question asked was: "Do you, personally, have many choices in regard to the type of work you can do in your life?"
 
@@ -75,8 +75,8 @@ tables:
           "Helping other people who need help", "I do not know my purpose in life", "None of these", "Don't know", "Refused"
       various_aspects_of_life_in_balance:
         title: Various Aspects of Life in Balance
-        short_unit: ''
-        unit: ''
+        short_unit: '%'
+        unit: '%'
         description: >-
           The question asked was: "In general, do you feel the various aspects of your life are in balance, or not?"
 
@@ -84,8 +84,8 @@ tables:
           The accepted answers were: "Yes", "No", "Don't know", "Refused"
       work_significantly_improves_the_lives_of_others_outside_of_household:
         title: Work Significantly Improves the Lives of Others Outside of Household
-        short_unit: ''
-        unit: ''
+        short_unit: '%'
+        unit: '%'
         description: >-
           The question asked was: "Do you think the work you do in your job significantly improves the lives of other people outside of your own household, or not?"
 
@@ -113,19 +113,19 @@ tables:
     variables:
       struggling_index:
         title: Struggling Index
-        short_unit: ''
-        unit: ''
+        short_unit: '%'
+        unit: '%'
         description: >-
           Gallup classifies those who rate their current life a 7 or higher and their anticipated life in five years an 8 or higher as thriving.
       suffering_index:
         title: Suffering Index
-        short_unit: ''
-        unit: ''
+        short_unit: '%'
+        unit: '%'
         description: >-
           Those who rate their current life and anticipated life in five years a 4 or lower are classified as suffering.
       thriving_index:
         title: Thriving Index
-        short_unit: ''
-        unit: ''
+        short_unit: '%'
+        unit: '%'
         description: >-
           Those who are neither suffering nor thriving are considered struggling.

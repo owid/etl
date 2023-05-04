@@ -15,20 +15,20 @@ paths = PathFinder(__file__)
 
 # Expected questions in the dataset.
 QUESTIONS_EXPECTED = {
-    'Count On to Help',
-    'Enjoy the Work You Do Every Day',
-    'Exciting Life or Calm Life',
-    'Experience Calmness Yesterday',
-    'Feel at Peace With Life',
-    'Focus on Taking Care of Themselves or Taking Care of Others',
-    'Health Problems',
-    'Main Purpose in Life',
-    'Many Choices in Type of Work',
-    'Struggling Index',
-    'Suffering Index',
-    'Thriving Index',
-    'Various Aspects of Life in Balance',
-    'Work Significantly Improves the Lives of Others Outside of Household',
+    "Count On to Help",
+    "Enjoy the Work You Do Every Day",
+    "Exciting Life or Calm Life",
+    "Experience Calmness Yesterday",
+    "Feel at Peace With Life",
+    "Focus on Taking Care of Themselves or Taking Care of Others",
+    "Health Problems",
+    "Main Purpose in Life",
+    "Many Choices in Type of Work",
+    "Struggling Index",
+    "Suffering Index",
+    "Thriving Index",
+    "Various Aspects of Life in Balance",
+    "Work Significantly Improves the Lives of Others Outside of Household",
 }
 
 
@@ -54,9 +54,7 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     log.info("global_wellbeing: harmonize_countries")
-    df = geo.harmonize_countries(
-        df=df, countries_file=paths.country_mapping_path
-    )
+    df = geo.harmonize_countries(df=df, countries_file=paths.country_mapping_path)
 
     # Add year
     df["year"] = 2020
@@ -64,7 +62,9 @@ def run(dest_dir: str) -> None:
     # Sanity check on questions
     log.info("global_wellbeing: check questions are as expected")
     questions = set(df["question"])
-    assert not (questions_unknown := questions.difference(QUESTIONS_EXPECTED)), f"Unknown questions! {questions_unknown}"
+    assert not (
+        questions_unknown := questions.difference(QUESTIONS_EXPECTED)
+    ), f"Unknown questions! {questions_unknown}"
 
     # Pivot to have questions as columnns
     log.info("global_wellbeing: harmonize_countries")
@@ -78,6 +78,8 @@ def run(dest_dir: str) -> None:
     # Get table with the survey questions
     log.info("global_wellbeing: build df with survey questions")
     df_questions = df[[col for col in df.columns if col not in df_index.columns]]
+    # Get percent from rates
+    df_questions = 100 * df_questions
 
     # Create a new table with the processed data.
     log.info("global_wellbeing: create tables")
