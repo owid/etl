@@ -1,0 +1,18 @@
+meta:
+  namespace: backport
+  short_name: dataset_5979_wellcome_global_monitor_2018__gallup_and_wellcome__2019_values
+  file_extension: feather
+  date_accessed: 2023-05-04 07:43:33.151572
+  name: Wellcome Global Monitor 2018 (Gallup and Wellcome, 2019)
+  description: ''
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/5979
+  source_published_by: Our World in Data catalog backport
+  is_public: true
+  version: latest
+  publication_date: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: a3b65099f7689051248b71335610f568
+  size: 12645874
+  path: dataset_5979_wellcome_global_monitor_2018__gallup_and_wellcome__2019_values.feather
