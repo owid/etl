@@ -1,0 +1,21 @@
+dataset:
+  namespace: fasttrack
+  version: '2023-05-03'
+  short_name: qubits
+  title: Quantum processors over time
+  description: ''
+  sources:
+  - name: Wikipedia, List of quantum processors (2023)
+    published_by: Wikipedia, List of quantum processors, Circuit-based quantum processors
+    publication_year: 2023
+    date_accessed: 2023-05-03
+    url: https://en.wikipedia.org/wiki/List_of_quantum_processors
+tables:
+  qubits:
+    variables:
+      qubits:
+        title: Quantum bits per processor
+        short_unit: qb
+        unit: qubits
+        description: Highest number of quantum bits in a single circuit-based quantum
+          processor over time

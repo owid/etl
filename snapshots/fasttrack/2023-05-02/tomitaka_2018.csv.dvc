@@ -1,0 +1,24 @@
+meta:
+  namespace: fasttrack
+  short_name: tomitaka_2018
+  file_extension: csv
+  date_accessed: 2023-05-03
+  name: Symptoms of depression (Tomitaka et al. 2018)
+  description: |-
+    Data reports the frequency of depressive symptoms from the 2013-2014 National Health and Nutrition Examination Survey in the United States (NHANES). Depressive symptoms were assessed using the Patient Health Questionnaire-9 (PHQ-9) in 5372 individuals across the general population.
+
+    The nine items of the PHQ-9 reflect the nine criteria on which DSM-5 diagnoses of depressive disorders are based. The PHQ-9 assesses the frequency of a variety of depressive symptoms within the past 2 weeks with 4-point response options: 0 = “not at all,” 1 = “several days,” 2 = “more than half the days,” and 3 = “nearly every day.”
+  source_name: Google Sheet
+  url: https://link.springer.com/article/10.1186/s12888-018-1696-9
+  source_published_by: Google Sheet
+  source_data_url: https://docs.google.com/spreadsheets/d/e/2PACX-1vQ0XtprK8CrjzrwpeZSPjPiuGmuCgwkHtwXs8jXKkHOuCN8UTmWQDgu11wkj9o5xtO5T5_woseQ8waJ/pub?output=csv
+  license_url: https://link.springer.com/article/10.1186/s12888-018-1696-9#rightslink
+  license_name: CC BY 4.0
+  is_public: false
+  version: '2023-05-02'
+  publication_year: 2018
+wdir: ../../../data/snapshots/fasttrack/2023-05-02
+outs:
+- md5: d3218f29cead3656b5dba747a28b7722
+  size: 486
+  path: tomitaka_2018.csv

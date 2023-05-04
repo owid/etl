@@ -64,6 +64,27 @@ steps:
   data://grapher/gcp/2022-11-11/global_carbon_budget:
     - data://garden/gcp/2022-11-11/global_carbon_budget
   #
+  # GCP - Global Carbon Budget (2023-04-28).
+  #
+  data://meadow/gcp/2023-04-28/global_carbon_budget:
+    - snapshot://gcp/2023-04-28/global_carbon_budget_fossil_co2_emissions.csv
+    - snapshot://gcp/2023-04-28/global_carbon_budget_global_emissions.xlsx
+    - snapshot://gcp/2023-04-28/global_carbon_budget_national_emissions.xlsx
+    - snapshot://gcp/2023-04-28/global_carbon_budget_land_use_change_emissions.xlsx
+  data://garden/gcp/2023-04-28/global_carbon_budget:
+    - data://meadow/gcp/2023-04-28/global_carbon_budget
+    # Loaded to calculate emissions per unit energy.
+    - data://garden/energy/2023-02-20/primary_energy_consumption
+    # Loaded to calculate emissions per GDP.
+    - data://garden/ggdc/2020-10-01/ggdc_maddison
+    # Loaded to create per-capita variables.
+    - data://garden/demography/2022-12-08/population
+    # Loaded to create region aggregates (including income groups).
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2021-07-01/wb_income
+  data://grapher/gcp/2023-04-28/global_carbon_budget:
+    - data://garden/gcp/2023-04-28/global_carbon_budget
+  #
   # RFF - World Carbon Pricing (2022-10-11).
   #
   data://meadow/rff/2022-10-11/world_carbon_pricing:
@@ -86,3 +107,17 @@ steps:
     - data://garden/rff/2022-10-11/world_carbon_pricing
   data://grapher/rff/2022-10-11/emissions_weighted_carbon_price:
     - data://garden/rff/2022-10-11/emissions_weighted_carbon_price
+  #
+  # Jones et al. (2023) - National contributions to climate change (2023-05-02)
+  #
+  data://meadow/emissions/2023-05-02/national_contributions:
+    - snapshot://emissions/2023-05-02/national_contributions_annual_emissions.csv
+    - snapshot://emissions/2023-05-02/national_contributions_cumulative_emissions.csv
+    - snapshot://emissions/2023-05-02/national_contributions_temperature_response.csv
+  data://garden/emissions/2023-05-02/national_contributions:
+    - data://meadow/emissions/2023-05-02/national_contributions
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2021-07-01/wb_income
+    - data://garden/demography/2022-12-08/population
+  data://grapher/emissions/2023-05-02/national_contributions:
+    - data://garden/emissions/2023-05-02/national_contributions

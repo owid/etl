@@ -46,3 +46,11 @@ steps:
   - snapshot-private://fasttrack/latest/compare_wid_and_pip_inequality_data_1993_vs_2015__joe_temp.csv
   data-private://grapher/fasttrack/latest/compare_wid_and_pip_change_in_inequality_1993_vs_2015__joe_temp:
   - snapshot-private://fasttrack/latest/compare_wid_and_pip_change_in_inequality_1993_vs_2015__joe_temp.csv
+  data-private://grapher/fasttrack/latest/quantum_processors_over_time:
+  - snapshot-private://fasttrack/latest/quantum_processors_over_time.csv
+  data-private://grapher/fasttrack/2023-05-02/tomitaka_2018:
+  - snapshot-private://fasttrack/2023-05-02/tomitaka_2018.csv
+  data-private://grapher/fasttrack/2023-05-03/qubits:
+  - snapshot-private://fasttrack/2023-05-03/qubits.csv
+  data-private://grapher/fasttrack/2023-05-03/apms_2014:
+  - snapshot-private://fasttrack/2023-05-03/apms_2014.csv

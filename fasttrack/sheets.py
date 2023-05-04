@@ -15,7 +15,6 @@ class ValidationError(Exception):
 
 
 class PartialSnapshotMeta(BaseModel):
-
     url: str
     publication_year: Optional[int]
     license_url: Optional[str]
@@ -81,7 +80,7 @@ def parse_metadata_from_sheets(
     dataset_dict = _prune_empty(dataset_meta_df.set_index(0)[1].to_dict())  # type: ignore
     dataset_dict["namespace"] = "fasttrack"  # or should it be owid? or institution specific?
     dataset_dict.pop("updated")
-    dataset_dict.pop("data_url")
+    dataset_dict.pop("data_url", None)
     dataset_dict.setdefault("description", "")
 
     try:
