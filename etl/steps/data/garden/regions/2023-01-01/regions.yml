@@ -114,6 +114,7 @@
 
 - code: "ATA"
   name: "Antarctica"
+  region_type: "other"
 
 - code: "ATG"
   name: "Antigua and Barbuda"
