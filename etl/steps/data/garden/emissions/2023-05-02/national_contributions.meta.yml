@@ -171,9 +171,7 @@ tables:
         unit: °C
         short_unit: °C
         description: |
-          Change in global mean surface temperature (in °C) caused by greenhouse gas emissions.
-
-          This measures each country's contribution to global mean surface temperature (GMST) rise from its cumulative emissions of carbon dioxide, methane and nitrous oxide. The warming effects of each gas are calculated based on cumulative CO2-equivalent emissions using the Global Warming Potential (GWP*) approach.
+          Change in global mean surface temperature (in °C) caused by greenhouse gas emissions. This measures each country's contribution to global mean surface temperature (GMST) rise from its cumulative emissions of carbon dioxide, methane and nitrous oxide. The warming effects of each gas are calculated based on cumulative CO2-equivalent emissions using the Global Warming Potential (GWP*) approach.
       temperature_response_ch4_fossil:
         title: Change in global mean surface temperature caused by methane emissions from fossil fuels and industry
         unit: °C
@@ -191,9 +189,7 @@ tables:
         unit: °C
         short_unit: °C
         description: |
-          Change in global mean surface temperature (in °C) caused by methane emissions.
-
-          This measures each country's contribution to global mean surface temperature (GMST) rise from its cumulative emissions of methane. The warming effects of each gas are calculated based on cumulative CO2-equivalent emissions using the Global Warming Potential (GWP*) approach.
+          Change in global mean surface temperature (in °C) caused by methane emissions. This measures each country's contribution to global mean surface temperature (GMST) rise from its cumulative emissions of methane. The warming effects of each gas are calculated based on cumulative CO2-equivalent emissions using the Global Warming Potential (GWP*) approach.
       temperature_response_co2_fossil:
         title: Change in global mean surface temperature caused by CO2 emissions from fossil fuels and industry
         unit: °C
@@ -211,9 +207,7 @@ tables:
         unit: °C
         short_unit: °C
         description: |
-          Change in global mean surface temperature (in °C) caused by CO2 emissions.
-
-          This measures each country's contribution to global mean surface temperature (GMST) rise from its cumulative emissions of carbon dioxide. The warming effects of each gas are calculated based on cumulative CO2-equivalent emissions using the Global Warming Potential (GWP*) approach.
+          Change in global mean surface temperature (in °C) caused by CO2 emissions. This measures each country's contribution to global mean surface temperature (GMST) rise from its cumulative emissions of carbon dioxide. The warming effects of each gas are calculated based on cumulative CO2-equivalent emissions using the Global Warming Potential (GWP*) approach.
       temperature_response_n2o_fossil:
         title: Change in global mean surface temperature caused by nitrous oxide emissions from fossil fuels and industry
         unit: °C
@@ -231,89 +225,67 @@ tables:
         unit: °C
         short_unit: °C
         description: |
-          Change in global mean surface temperature (in °C) caused by nitrous oxide emissions.
-
-          This measures each country's contribution to global mean surface temperature (GMST) rise from its cumulative nitrous oxide emissions. The warming effects of each gas are calculated based on cumulative CO2-equivalent emissions using the Global Warming Potential (GWP*) approach.
+          Change in global mean surface temperature (in °C) caused by nitrous oxide emissions. This measures each country's contribution to global mean surface temperature (GMST) rise from its cumulative nitrous oxide emissions. The warming effects of each gas are calculated based on cumulative CO2-equivalent emissions using the Global Warming Potential (GWP*) approach.
       annual_emissions_ch4_fossil_co2eq:
         title: Annual methane emissions from fossil fuels and industry in CO2 equivalents
         unit: tonnes
         short_unit: t
         description: |
-          Annual methane emissions from fossil fuels and industry in CO2 equivalents.
-
-          Methane emissions are calculated by Our World in Data based on emissions data from Jones et al. (2023) and IPCC conversion factors. Jones et al. (2023) give methane emissions in standard metric tonnes per year. We have converted these emissions to carbon-dioxide equivalents over a 100-year timescale using a conversion factor of 29.8 for fossil sources, and 27.2 for agricultural and land use sources (as per the IPCC AR6 report).
+          Annual methane emissions from fossil fuels and industry in CO2 equivalents. Methane emissions are calculated by Our World in Data based on emissions data from Jones et al. (2023) and IPCC conversion factors. Jones et al. (2023) give methane emissions in standard metric tonnes per year. We have converted these emissions to carbon-dioxide equivalents over a 100-year timescale using a conversion factor of 29.8 for fossil sources, and 27.2 for agricultural and land use sources (as per the IPCC AR6 report).
       annual_emissions_ch4_land_co2eq:
         title: Annual methane emissions from agriculture and land use in CO2 equivalents
         unit: tonnes
         short_unit: t
         description: |
-          Annual methane emissions from agriculture and land use in CO2 equivalents.
-
-          Methane emissions are calculated by Our World in Data based on emissions data from Jones et al. (2023) and IPCC conversion factors. Jones et al. (2023) give methane emissions in standard metric tonnes per year. We have converted these emissions to carbon-dioxide equivalents over a 100-year timescale using a conversion factor of 29.8 for fossil sources, and 27.2 for agricultural and land use sources (as per the IPCC AR6 report).
+          Annual methane emissions from agriculture and land use in CO2 equivalents. Methane emissions are calculated by Our World in Data based on emissions data from Jones et al. (2023) and IPCC conversion factors. Jones et al. (2023) give methane emissions in standard metric tonnes per year. We have converted these emissions to carbon-dioxide equivalents over a 100-year timescale using a conversion factor of 29.8 for fossil sources, and 27.2 for agricultural and land use sources (as per the IPCC AR6 report).
       annual_emissions_ch4_total_co2eq:
         title: Annual methane emissions in CO2 equivalents
         unit: tonnes
         short_unit: t
         description: |
-          Annual methane emissions in CO2 equivalents.
-
-          Methane emissions are calculated by Our World in Data based on emissions data from Jones et al. (2023) and IPCC conversion factors. Jones et al. (2023) give methane emissions in standard metric tonnes per year. We have converted these emissions to carbon-dioxide equivalents over a 100-year timescale using a conversion factor of 29.8 for fossil sources, and 27.2 for agricultural and land use sources (as per the IPCC AR6 report).
+          Annual methane emissions in CO2 equivalents. Methane emissions are calculated by Our World in Data based on emissions data from Jones et al. (2023) and IPCC conversion factors. Jones et al. (2023) give methane emissions in standard metric tonnes per year. We have converted these emissions to carbon-dioxide equivalents over a 100-year timescale using a conversion factor of 29.8 for fossil sources, and 27.2 for agricultural and land use sources (as per the IPCC AR6 report).
       annual_emissions_n2o_fossil_co2eq:
         title: Annual nitrous oxide emissions from fossil fuels and industry in CO2 equivalents
         unit: tonnes
         short_unit: t
         description: |
-          Annual nitrous oxide emissions from fossil fuels and industry in CO2 equivalents.
-
-          Nitrous oxide emissions are calculated by Our World in Data based on emissions data from Jones et al. (2023) and IPCC AR6 conversion factors. Jones et al. (2023) give nitrous oxide emissions in standard metric tonnes per year. We have converted these emissions to carbon-dioxide equivalents over a 100-year timescale using a conversion factor of 273 (as per the IPCC AR6 report).
+          Annual nitrous oxide emissions from fossil fuels and industry in CO2 equivalents. Nitrous oxide emissions are calculated by Our World in Data based on emissions data from Jones et al. (2023) and IPCC AR6 conversion factors. Jones et al. (2023) give nitrous oxide emissions in standard metric tonnes per year. We have converted these emissions to carbon-dioxide equivalents over a 100-year timescale using a conversion factor of 273 (as per the IPCC AR6 report).
       annual_emissions_n2o_land_co2eq:
         title: Annual nitrous oxide emissions from agriculture and land use in CO2 equivalents
         unit: tonnes
         short_unit: t
         description: |
-          Annual nitrous oxide emissions from agriculture and land use in CO2 equivalents.
-
-          Nitrous oxide emissions are calculated by Our World in Data based on emissions data from Jones et al. (2023) and IPCC AR6 conversion factors. Jones et al. (2023) give nitrous oxide emissions in standard metric tonnes per year. We have converted these emissions to carbon-dioxide equivalents over a 100-year timescale using a conversion factor of 273 (as per the IPCC AR6 report).
+          Annual nitrous oxide emissions from agriculture and land use in CO2 equivalents. Nitrous oxide emissions are calculated by Our World in Data based on emissions data from Jones et al. (2023) and IPCC AR6 conversion factors. Jones et al. (2023) give nitrous oxide emissions in standard metric tonnes per year. We have converted these emissions to carbon-dioxide equivalents over a 100-year timescale using a conversion factor of 273 (as per the IPCC AR6 report).
       annual_emissions_n2o_total_co2eq:
         title: Annual nitrous oxide emissions in CO2 equivalents
         unit: tonnes
         short_unit: t
         description: |
-          Annual nitrous oxide emissions in CO2 equivalents.
-
-          Nitrous oxide emissions are calculated by Our World in Data based on emissions data from Jones et al. (2023) and IPCC AR6 conversion factors. Jones et al. (2023) give nitrous oxide emissions in standard metric tonnes per year. We have converted these emissions to carbon-dioxide equivalents over a 100-year timescale using a conversion factor of 273 (as per the IPCC AR6 report).
+          Annual nitrous oxide emissions in CO2 equivalents. Nitrous oxide emissions are calculated by Our World in Data based on emissions data from Jones et al. (2023) and IPCC AR6 conversion factors. Jones et al. (2023) give nitrous oxide emissions in standard metric tonnes per year. We have converted these emissions to carbon-dioxide equivalents over a 100-year timescale using a conversion factor of 273 (as per the IPCC AR6 report).
       annual_emissions_ghg_fossil_co2eq:
         title: Annual greenhouse gas emissions from fossil fuels and industry in CO2 equivalents
         unit: tonnes
         short_unit: t
         description: |
-          Annual greenhouse gas emissions from fossil fuels and industry in CO2 equivalents.
-
-          Greenhouse gas emissions are calculated by Our World in Data based on emissions data from Jones et al. (2023) and IPCC AR6 conversion factors. Jones et al. (2023) give methane and nitrous oxide emissions in standard metric tonnes per year. We have converted these emissions to carbon-dioxide equivalents over a 100-year timescale using a conversion factor of 273 for nitrous oxide, 29.8 for methane from fossil sources, and 27.2 for methane from agricultural and land use sources (as per the IPCC AR6 report).
+          Annual greenhouse gas emissions from fossil fuels and industry in CO2 equivalents. Greenhouse gas emissions are calculated by Our World in Data based on emissions data from Jones et al. (2023) and IPCC AR6 conversion factors. Jones et al. (2023) give methane and nitrous oxide emissions in standard metric tonnes per year. We have converted these emissions to carbon-dioxide equivalents over a 100-year timescale using a conversion factor of 273 for nitrous oxide, 29.8 for methane from fossil sources, and 27.2 for methane from agricultural and land use sources (as per the IPCC AR6 report).
       annual_emissions_ghg_land_co2eq:
         title: Annual greenhouse gas emissions from agriculture and land use in CO2 equivalents
         unit: tonnes
         short_unit: t
         description: |
-          Annual greenhouse gas emissions from agriculture and land use in CO2 equivalents.
-
-          Greenhouse gas emissions are calculated by Our World in Data based on emissions data from Jones et al. (2023) and IPCC AR6 conversion factors. Jones et al. (2023) give methane and nitrous oxide emissions in standard metric tonnes per year. We have converted these emissions to carbon-dioxide equivalents over a 100-year timescale using a conversion factor of 273 for nitrous oxide, 29.8 for methane from fossil sources, and 27.2 for methane from agricultural and land use sources (as per the IPCC AR6 report).
+          Annual greenhouse gas emissions from agriculture and land use in CO2 equivalents. Greenhouse gas emissions are calculated by Our World in Data based on emissions data from Jones et al. (2023) and IPCC AR6 conversion factors. Jones et al. (2023) give methane and nitrous oxide emissions in standard metric tonnes per year. We have converted these emissions to carbon-dioxide equivalents over a 100-year timescale using a conversion factor of 273 for nitrous oxide, 29.8 for methane from fossil sources, and 27.2 for methane from agricultural and land use sources (as per the IPCC AR6 report).
       annual_emissions_ghg_total_co2eq:
         title: Annual greenhouse gas emissions in CO2 equivalents
         unit: tonnes
         short_unit: t
         description: |
-          Annual greenhouse gas emissions in CO2 equivalents.
-
-          Greenhouse gas emissions are calculated by Our World in Data based on emissions data from Jones et al. (2023) and IPCC AR6 conversion factors. Jones et al. (2023) give methane and nitrous oxide emissions in standard metric tonnes per year. We have converted these emissions to carbon-dioxide equivalents over a 100-year timescale using a conversion factor of 273 for nitrous oxide, 29.8 for methane from fossil sources, and 27.2 for methane from agricultural and land use sources (as per the IPCC AR6 report).
+          Annual greenhouse gas emissions in CO2 equivalents. Greenhouse gas emissions are calculated by Our World in Data based on emissions data from Jones et al. (2023) and IPCC AR6 conversion factors. Jones et al. (2023) give methane and nitrous oxide emissions in standard metric tonnes per year. We have converted these emissions to carbon-dioxide equivalents over a 100-year timescale using a conversion factor of 273 for nitrous oxide, 29.8 for methane from fossil sources, and 27.2 for methane from agricultural and land use sources (as per the IPCC AR6 report).
       share_of_annual_emissions_ch4_total:
         title: Share of global methane emissions
         unit: "%"
         short_unit: "%"
         description: |
-          Share of global methane emissions.
-
-          Methane emissions are calculated by Our World in Data based on emissions data from Jones et al. (2023) and IPCC conversion factors. Jones et al. (2023) give methane emissions in standard metric tonnes per year. We have converted these emissions to carbon-dioxide equivalents over a 100-year timescale using a conversion factor of 29.8 for fossil sources, and 27.2 for agricultural and land use sources (as per the IPCC AR6 report).
+          Share of global methane emissions. Methane emissions are calculated by Our World in Data based on emissions data from Jones et al. (2023) and IPCC conversion factors. Jones et al. (2023) give methane emissions in standard metric tonnes per year. We have converted these emissions to carbon-dioxide equivalents over a 100-year timescale using a conversion factor of 29.8 for fossil sources, and 27.2 for agricultural and land use sources (as per the IPCC AR6 report).
       share_of_annual_emissions_co2_total:
         title: Share of global CO2 emissions
         unit: "%"
@@ -325,46 +297,34 @@ tables:
         unit: "%"
         short_unit: "%"
         description: |
-          Share of global greenhouse gas emissions.
-
-          Greenhouse gas emissions are calculated by Our World in Data based on emissions data from Jones et al. (2023) and IPCC AR6 conversion factors. Jones et al. (2023) give methane and nitrous oxide emissions in standard metric tonnes per year. We have converted these emissions to carbon-dioxide equivalents over a 100-year timescale using a conversion factor of 273 for nitrous oxide, 29.8 for methane from fossil sources, and 27.2 for methane from agricultural and land use sources (as per the IPCC AR6 report).
+          Share of global greenhouse gas emissions. Greenhouse gas emissions are calculated by Our World in Data based on emissions data from Jones et al. (2023) and IPCC AR6 conversion factors. Jones et al. (2023) give methane and nitrous oxide emissions in standard metric tonnes per year. We have converted these emissions to carbon-dioxide equivalents over a 100-year timescale using a conversion factor of 273 for nitrous oxide, 29.8 for methane from fossil sources, and 27.2 for methane from agricultural and land use sources (as per the IPCC AR6 report).
       share_of_annual_emissions_n2o_total:
         title: Share of global nitrous oxide emissions
         unit: "%"
         short_unit: "%"
         description: |
-          Share of global nitrous oxide emissions.
-
-          Nitrous oxide emissions are calculated by Our World in Data based on emissions data from Jones et al. (2023) and IPCC AR6 conversion factors. Jones et al. (2023) give nitrous oxide emissions in standard metric tonnes per year. We have converted these emissions to carbon-dioxide equivalents over a 100-year timescale using a conversion factor of 273 (as per the IPCC AR6 report).
+          Share of global nitrous oxide emissions. Nitrous oxide emissions are calculated by Our World in Data based on emissions data from Jones et al. (2023) and IPCC AR6 conversion factors. Jones et al. (2023) give nitrous oxide emissions in standard metric tonnes per year. We have converted these emissions to carbon-dioxide equivalents over a 100-year timescale using a conversion factor of 273 (as per the IPCC AR6 report).
       share_of_temperature_response_ghg_total:
         title: Share of contribution to global warming
         unit: "%"
         short_unit: "%"
         description: |
-          Share of contribution to global warming (as a percentage).
-
-          This measures each country's contribution to global mean surface temperature (GMST) rise from its cumulative emissions of carbon dioxide, methane and nitrous oxide. The warming effects of each gas are calculated based on cumulative CO2-equivalent emissions using the Global Warming Potential (GWP*) approach.
+          Share of contribution to global warming (as a percentage). This measures each country's contribution to global mean surface temperature (GMST) rise from its cumulative emissions of carbon dioxide, methane and nitrous oxide. The warming effects of each gas are calculated based on cumulative CO2-equivalent emissions using the Global Warming Potential (GWP*) approach.
       annual_emissions_ch4_total_co2eq_per_capita:
         title: Per-capita methane emissions in CO2 equivalents
         unit: tonnes
         short_unit: t
         description: |
-          Per-capita methane emissions in CO2 equivalents.
-
-          Methane emissions per person are calculated by Our World in Data based on emissions data from Jones et al. (2023) and population data from HYDE and the UN World Population Prospects. Jones et al. (2023) give methane emissions in standard metric tonnes per year. We have converted these emissions to carbon-dioxide equivalents over a 100-year timescale using a conversion factor of 29.8 for fossil sources, and 27.2 for agricultural and land use sources (as per the IPCC AR6 report).
+          Per-capita methane emissions in CO2 equivalents. Methane emissions per person are calculated by Our World in Data based on emissions data from Jones et al. (2023) and population data from HYDE and the UN World Population Prospects. Jones et al. (2023) give methane emissions in standard metric tonnes per year. We have converted these emissions to carbon-dioxide equivalents over a 100-year timescale using a conversion factor of 29.8 for fossil sources, and 27.2 for agricultural and land use sources (as per the IPCC AR6 report).
       annual_emissions_n2o_total_co2eq_per_capita:
         title: Per-capita nitrous oxide emissions in CO2 equivalents
         unit: tonnes
         short_unit: t
         description: |
-          Per-capita nitrous oxide emissions in CO2 equivalents.
-
-          Nitrous oxide emissions are calculated by Our World in Data based on emissions data from Jones et al. (2023) and IPCC AR6 conversion factors. Jones et al. (2023) give nitrous oxide emissions in standard metric tonnes per year. We have converted these emissions to carbon-dioxide equivalents over a 100-year timescale using a conversion factor of 273 (as per the IPCC AR6 report).
+          Per-capita nitrous oxide emissions in CO2 equivalents. Nitrous oxide emissions are calculated by Our World in Data based on emissions data from Jones et al. (2023) and IPCC AR6 conversion factors. Jones et al. (2023) give nitrous oxide emissions in standard metric tonnes per year. We have converted these emissions to carbon-dioxide equivalents over a 100-year timescale using a conversion factor of 273 (as per the IPCC AR6 report).
       annual_emissions_ghg_total_co2eq_per_capita:
         title: Per-capita greenhouse gas emissions in CO2 equivalents
         unit: tonnes
         short_unit: t
         description: |
-          Per-capita greenhouse gas emissions in CO2 equivalents.
-
-          Greenhouse gas emissions are calculated by Our World in Data based on emissions data from Jones et al. (2023) and IPCC AR6 conversion factors. Jones et al. (2023) give methane and nitrous oxide emissions in standard metric tonnes per year. We have converted these emissions to carbon-dioxide equivalents over a 100-year timescale using a conversion factor of 273 for nitrous oxide, 29.8 for methane from fossil sources, and 27.2 for methane from agricultural and land use sources (as per the IPCC AR6 report).
+          Per-capita greenhouse gas emissions in CO2 equivalents. Greenhouse gas emissions are calculated by Our World in Data based on emissions data from Jones et al. (2023) and IPCC AR6 conversion factors. Jones et al. (2023) give methane and nitrous oxide emissions in standard metric tonnes per year. We have converted these emissions to carbon-dioxide equivalents over a 100-year timescale using a conversion factor of 273 for nitrous oxide, 29.8 for methane from fossil sources, and 27.2 for methane from agricultural and land use sources (as per the IPCC AR6 report).
