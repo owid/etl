@@ -37,7 +37,7 @@ FORMER_COUNTRIES = {
         "end": 1990,
     },
     "eri_a_eth": {
-        "name": "Eritrea and Ethiopia",
+        "name": "Ethiopia (former)",
         "end": 1993,
     },
     "scg": {
