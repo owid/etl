@@ -159,19 +159,19 @@ tables:
         unit: °C
         short_unit: °C
         description: |
-          Change in global mean surface temperature caused by greenhouse gas emissions from fossil fuels and industry.
+          Change in global mean surface temperature (in °C) caused by greenhouse gas emissions from fossil fuels and industry.
       temperature_response_ghg_land:
         title: Change in global mean surface temperature caused by greenhouse gas emissions from agriculture and land use
         unit: °C
         short_unit: °C
         description: |
-          Change in global mean surface temperature caused by greenhouse gas emissions from agriculture and land use.
+          Change in global mean surface temperature (in °C) caused by greenhouse gas emissions from agriculture and land use.
       temperature_response_ghg_total:
         title: Change in global mean surface temperature caused by greenhouse gas emissions
         unit: °C
         short_unit: °C
         description: |
-          Change in global mean surface temperature caused by greenhouse gas emissions.
+          Change in global mean surface temperature (in °C) caused by greenhouse gas emissions.
 
           This measures each country's contribution to global mean surface temperature (GMST) rise from its cumulative emissions of carbon dioxide, methane and nitrous oxide. The warming effects of each gas are calculated based on cumulative CO2-equivalent emissions using the Global Warming Potential (GWP*) approach.
       temperature_response_ch4_fossil:
@@ -179,19 +179,19 @@ tables:
         unit: °C
         short_unit: °C
         description: |
-          Change in global mean surface temperature caused by methane emissions from fossil fuels and industry.
+          Change in global mean surface temperature (in °C) caused by methane emissions from fossil fuels and industry.
       temperature_response_ch4_land:
         title: Change in global mean surface temperature caused by methane emissions from agriculture and land use
         unit: °C
         short_unit: °C
         description: |
-          Change in global mean surface temperature caused by methane emissions from agriculture and land use.
+          Change in global mean surface temperature (in °C) caused by methane emissions from agriculture and land use.
       temperature_response_ch4_total:
         title: Change in global mean surface temperature caused by methane emissions
         unit: °C
         short_unit: °C
         description: |
-          Change in global mean surface temperature caused by methane emissions.
+          Change in global mean surface temperature (in °C) caused by methane emissions.
 
           This measures each country's contribution to global mean surface temperature (GMST) rise from its cumulative emissions of methane. The warming effects of each gas are calculated based on cumulative CO2-equivalent emissions using the Global Warming Potential (GWP*) approach.
       temperature_response_co2_fossil:
@@ -199,19 +199,19 @@ tables:
         unit: °C
         short_unit: °C
         description: |
-          Change in global mean surface temperature caused by CO2 emissions from fossil fuels and industry.
+          Change in global mean surface temperature (in °C) caused by CO2 emissions from fossil fuels and industry.
       temperature_response_co2_land:
         title: Change in global mean surface temperature caused by CO2 emissions from agriculture and land use
         unit: °C
         short_unit: °C
         description: |
-          Change in global mean surface temperature caused by CO2 emissions from agriculture and land use.
+          Change in global mean surface temperature (in °C) caused by CO2 emissions from agriculture and land use.
       temperature_response_co2_total:
         title: Change in global mean surface temperature caused by CO2 emissions
         unit: °C
         short_unit: °C
         description: |
-          Change in global mean surface temperature caused by CO2 emissions.
+          Change in global mean surface temperature (in °C) caused by CO2 emissions.
 
           This measures each country's contribution to global mean surface temperature (GMST) rise from its cumulative emissions of carbon dioxide. The warming effects of each gas are calculated based on cumulative CO2-equivalent emissions using the Global Warming Potential (GWP*) approach.
       temperature_response_n2o_fossil:
@@ -219,19 +219,19 @@ tables:
         unit: °C
         short_unit: °C
         description: |
-          Change in global mean surface temperature caused by nitrous oxide emissions from fossil fuels and industry.
+          Change in global mean surface temperature (in °C) caused by nitrous oxide emissions from fossil fuels and industry.
       temperature_response_n2o_land:
         title: Change in global mean surface temperature caused by nitrous oxide emissions from agriculture and land use
         unit: °C
         short_unit: °C
         description: |
-          Change in global mean surface temperature caused by nitrous oxide emissions from agriculture and land use.
+          Change in global mean surface temperature (in °C) caused by nitrous oxide emissions from agriculture and land use.
       temperature_response_n2o_total:
         title: Change in global mean surface temperature caused by nitrous oxide emissions
         unit: °C
         short_unit: °C
         description: |
-          Change in global mean surface temperature caused by nitrous oxide emissions.
+          Change in global mean surface temperature (in °C) caused by nitrous oxide emissions.
 
           This measures each country's contribution to global mean surface temperature (GMST) rise from its cumulative nitrous oxide emissions. The warming effects of each gas are calculated based on cumulative CO2-equivalent emissions using the Global Warming Potential (GWP*) approach.
       annual_emissions_ch4_fossil_co2eq:
@@ -341,7 +341,7 @@ tables:
         unit: "%"
         short_unit: "%"
         description: |
-          Share of contribution to global warming.
+          Share of contribution to global warming (as a percentage).
 
           This measures each country's contribution to global mean surface temperature (GMST) rise from its cumulative emissions of carbon dioxide, methane and nitrous oxide. The warming effects of each gas are calculated based on cumulative CO2-equivalent emissions using the Global Warming Potential (GWP*) approach.
       annual_emissions_ch4_total_co2eq_per_capita:
