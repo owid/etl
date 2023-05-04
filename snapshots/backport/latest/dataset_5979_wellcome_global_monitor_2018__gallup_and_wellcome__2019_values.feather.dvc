@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5979_wellcome_global_monitor_2018__gallup_and_wellcome__2019_values
   file_extension: feather
-  date_accessed: 2023-05-04 08:26:21.838459
+  date_accessed: 2023-05-04 09:06:42.126026
   name: Wellcome Global Monitor 2018 (Gallup and Wellcome, 2019)
   description: ''
   source_name: Our World in Data catalog backport
