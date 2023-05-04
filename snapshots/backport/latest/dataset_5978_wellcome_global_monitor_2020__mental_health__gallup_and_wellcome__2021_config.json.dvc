@@ -1,0 +1,18 @@
+meta:
+  namespace: backport
+  short_name: dataset_5978_wellcome_global_monitor_2020__mental_health__gallup_and_wellcome__2021_config
+  file_extension: json
+  date_accessed: 2023-05-04 09:23:45.422459
+  name: Grapher metadata for dataset_5978_wellcome_global_monitor_2020__mental_health__gallup_and_wellcome__2021
+  description: ''
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/5978
+  source_published_by: Our World in Data catalog backport
+  is_public: true
+  version: latest
+  publication_date: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 2271a4e974cda69a332850c166692250
+  size: 31302614
+  path: dataset_5978_wellcome_global_monitor_2020__mental_health__gallup_and_wellcome__2021_config.json
