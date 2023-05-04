@@ -1,0 +1,9 @@
+
+tables:
+  health_pharma_market:
+    variables:
+      n06a_antidepressants__consumption__ddd_per_1_000_inhabitants_per_day:
+        description: >-
+          This estimates of the daily intake of antidepressants per 1000 people, calculated as the 'defined daily dose' – the expected doses of antidepressants taken per 1000 people per day,
+          according to the recommended dosages for each antidepressant. This enables us to compare overall levels of drug consumption, accounting for the fact that different antidepressants
+          have different recommended dosages.
