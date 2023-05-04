@@ -1,6 +1,6 @@
 
 tables:
-  oecd_pharma_market:
+  health_pharma_market:
     variables:
       n06a_antidepressants__consumption__ddd_per_1_000_inhabitants_per_day:
         description: >-

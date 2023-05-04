@@ -152,9 +152,9 @@ steps:
     - data://garden/health/2023-04-25/wgm_2018
 
   # OECD: Pharmaceutical Market
-  data://meadow/oecd/2023-05-01/oecd_pharma_market:
-    - snapshot://oecd/2023-05-01/oecd_pharma_market.csv
-  data://garden/oecd/2023-05-01/oecd_pharma_market:
-    - data://meadow/oecd/2023-05-01/oecd_pharma_market
-  data://grapher/oecd/2023-05-01/oecd_pharma_market:
-    - data://garden/oecd/2023-05-01/oecd_pharma_market
+  data://meadow/oecd/2023-05-01/health_pharma_market:
+    - snapshot://oecd/2023-05-01/health_pharma_market.csv
+  data://garden/oecd/2023-05-01/health_pharma_market:
+    - data://meadow/oecd/2023-05-01/health_pharma_market
+  data://grapher/oecd/2023-05-01/health_pharma_market:
+    - data://garden/oecd/2023-05-01/health_pharma_market

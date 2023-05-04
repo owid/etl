@@ -32,7 +32,7 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
 @click.option("--path-to-file", prompt=True, type=str, help="Path to local data file.")
 def main(path_to_file: str, upload: bool) -> None:
     # Create a new snapshot.
-    snap = Snapshot(f"oecd/{SNAPSHOT_VERSION}/oecd_pharma_market.csv")
+    snap = Snapshot(f"oecd/{SNAPSHOT_VERSION}/health_pharma_market.csv")
 
     # Ensure destination folder exists.
     snap.path.parent.mkdir(exist_ok=True, parents=True)

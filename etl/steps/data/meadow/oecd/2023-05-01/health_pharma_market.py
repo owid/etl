@@ -15,13 +15,13 @@ paths = PathFinder(__file__)
 
 
 def run(dest_dir: str) -> None:
-    log.info("oecd_pharma_market.start")
+    log.info("health_pharma_market.start")
 
     #
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap: Snapshot = paths.load_dependency("oecd_pharma_market.csv")
+    snap: Snapshot = paths.load_dependency("health_pharma_market.csv")
 
     # Load data from snapshot.
     df = pd.read_csv(snap.path)
@@ -41,4 +41,4 @@ def run(dest_dir: str) -> None:
     # Save changes in the new garden dataset.
     ds_meadow.save()
 
-    log.info("oecd_pharma_market.end")
+    log.info("health_pharma_market.end")

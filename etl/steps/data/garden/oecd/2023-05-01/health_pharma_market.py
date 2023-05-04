@@ -42,16 +42,16 @@ MAPPING_MEASURE = {
 
 
 def run(dest_dir: str) -> None:
-    log.info("oecd_pharma_market: start")
+    log.info("health_pharma_market: start")
 
     #
     # Load inputs.
     #
     # Load meadow dataset.
-    ds_meadow: Dataset = paths.load_dependency("oecd_pharma_market")
+    ds_meadow: Dataset = paths.load_dependency("health_pharma_market")
 
     # Read table from meadow dataset.
-    tb_meadow = ds_meadow["oecd_pharma_market"]
+    tb_meadow = ds_meadow["health_pharma_market"]
 
     # Create a dataframe with data from the table.
     df = pd.DataFrame(tb_meadow)
@@ -60,30 +60,30 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     # Harmonize country names
-    log.info("oecd_pharma_market: harmonize_countries")
+    log.info("health_pharma_market: harmonize_countries")
     df = geo.harmonize_countries(df=df, countries_file=paths.country_mapping_path)
 
     # Pivot (each variable has its own column)
     # This is done so that we can customize the metadata for each variable.
-    log.info("oecd_pharma_market: pivot data")
+    log.info("health_pharma_market: pivot data")
     df = df.pivot(index=["country", "year"], columns=["variable", "measure"], values="value")
 
     # Create a new table with the processed data.
     tb_garden = Table(df, short_name=paths.short_name)
     # Add metadata to the variables in the table
-    log.info("oecd_pharma_market: add variable metadata")
+    log.info("health_pharma_market: add variable metadata")
     tb_garden = add_variable_metadata(tb_garden)
 
     #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    log.info("oecd_pharma_market: create dataset")
+    log.info("health_pharma_market: create dataset")
     ds_garden = create_dataset(dest_dir, tables=[tb_garden], default_metadata=ds_meadow.metadata)
     ds_garden.update_metadata(paths.metadata_path)
     # Save changes in the new garden dataset.
     ds_garden.save()
-    log.info("oecd_pharma_market: end")
+    log.info("health_pharma_market: end")
 
 
 def add_variable_metadata(tb: Table) -> Table:

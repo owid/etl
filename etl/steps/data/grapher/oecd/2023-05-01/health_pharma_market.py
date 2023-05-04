@@ -13,10 +13,10 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load garden dataset.
-    ds_garden: Dataset = paths.load_dependency("oecd_pharma_market")
+    ds_garden: Dataset = paths.load_dependency("health_pharma_market")
 
     # Read table from garden dataset.
-    tb_garden = ds_garden["oecd_pharma_market"]
+    tb_garden = ds_garden["health_pharma_market"]
 
     #
     # Process data.
