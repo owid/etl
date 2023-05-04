@@ -338,12 +338,12 @@ steps:
   - data://garden/happiness/2023-03-20/happiness
 
   # WB income groups
-  data://meadow/wb/2023-04-30/wb_income:
-    - snapshot://wb/2023-04-30/wb_income.xlsx
-  data://garden/wb/2023-04-30/wb_income:
-    - data://meadow/wb/2023-04-30/wb_income
-  data://grapher/wb/2023-04-30/wb_income:
-    - data://garden/wb/2023-04-30/wb_income
+  data://meadow/wb/2023-04-30/income_groups:
+    - snapshot://wb/2023-04-30/income_groups.xlsx
+  data://garden/wb/2023-04-30/income_groups:
+    - data://meadow/wb/2023-04-30/income_groups
+  data://grapher/wb/2023-04-30/income_groups:
+    - data://garden/wb/2023-04-30/income_groups
 
 # International Monetary Fund, World Economic Outlook
   data://meadow/imf/2023-05-02/world_economic_outlook:

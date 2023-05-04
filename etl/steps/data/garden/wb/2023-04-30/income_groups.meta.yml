@@ -1,5 +1,5 @@
 tables:
-  wb_income:
+  income_groups:
     variables:
       classification:
         title: World Bank income classification

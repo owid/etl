@@ -247,7 +247,7 @@ def create_agree_and_disagree_categories(df: pd.DataFrame) -> pd.DataFrame:
             numeric_only=True
         )
         # Sanity check
-        set(df_.answer) == {
+        assert set(df_.answer) == {
             "Agree",
             "Disagree",
             "Don't know/Refused",

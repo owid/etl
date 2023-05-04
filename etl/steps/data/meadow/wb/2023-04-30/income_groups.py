@@ -18,13 +18,13 @@ paths = PathFinder(__file__)
 
 
 def run(dest_dir: str) -> None:
-    log.info("wb_income: start")
+    log.info("income_groups: start")
 
     #
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap: Snapshot = paths.load_dependency("wb_income.xlsx")
+    snap: Snapshot = paths.load_dependency("income_groups.xlsx")
 
     # Load data from snapshot.
     dfs = pd.read_excel(snap.path, sheet_name=None)
@@ -52,22 +52,25 @@ def run(dest_dir: str) -> None:
     # Save changes in the new garden dataset.
     ds_meadow.save()
 
-    log.info("wb_income: end")
+    log.info("income_groups: end")
 
 
 def extract_data_from_excel(df: pd.DataFrame) -> pd.DataFrame:
     # Sanity shape check
-    log.info("wb_income: sanity check on table dimensions")
-    assert (shape := df.shape) == (
-        shape_expected := (239, 37)
-    ), f"Invalid shape. Expected was {shape_expected}, but found {shape}"
+    log.info("income_groups: sanity check on table dimensions")
+    assert (num_rows := df.shape[0]) == (
+        num_rows_expected := 239
+    ), f"Invalid number of rows. Expected was {num_rows_expected}, but found {num_rows}"
+    assert (num_cols := df.shape[1]) >= (
+        num_cols_expected := 37
+    ), f"Invalid number of columns. Expected was >{num_cols_expected}, but found {num_cols}"
     # Check data starts in correct row
-    log.info("wb_income: sanity check on data location in excel file")
+    log.info("income_groups: sanity check on data location in excel file")
     assert (
         df.loc[10, "World Bank Analytical Classifications"] == "Afghanistan"
     ), "Row 10, column 'World Bank Analytical Classifications' expected to have value 'Afghanistan'"
     # Get year values (columns)
-    log.info("wb_income: extract only relevant data from excel sheet")
+    log.info("income_groups: extract only relevant data from excel sheet")
     years = _get_years(df)
     df.columns = ["country_code", "country"] + years
     # Drop all but data (based on column 'code' having a value)

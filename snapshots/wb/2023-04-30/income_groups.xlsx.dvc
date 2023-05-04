@@ -1,6 +1,6 @@
 meta:
   namespace: wb
-  short_name: wb_income
+  short_name: income_groups
   name: Income classifications (World Bank, 2022)
   version: '2023-04-30'
   publication_year: 2022
@@ -27,11 +27,15 @@ meta:
     https://datacatalogfiles.worldbank.org/ddh-published/0037712/DR0090754/OGHIST.xlsx
 
 
-    Note 1: Income classifications are set each year on July 1 for all World Bank member economies,
+    Note 1: Income classifications are set each year on July 1 for all World Bank
+    member economies,
     and all other economies with populations of more than 30,000. These official analytical
-    classifications are fixed during the World Bank's fiscal year (ending on June 30), thus
-    economies remain in the categories in which they are classified irrespective of any revisions to
-    their per capita income data. The historical classifications shown are as published on July 1 of
+    classifications are fixed during the World Bank's fiscal year (ending on June
+    30), thus
+    economies remain in the categories in which they are classified irrespective of
+    any revisions to
+    their per capita income data. The historical classifications shown are as published
+    on July 1 of
     each fiscal year.
 
 
@@ -49,4 +53,4 @@ wdir: ../../../data/snapshots/wb/2023-04-30
 outs:
 - md5: bfdf219c089ae93abf8d160915b273ab
   size: 103024
-  path: wb_income.xlsx
+  path: income_groups.xlsx
