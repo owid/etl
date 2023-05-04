@@ -1,6 +1,6 @@
 meta:
   namespace: health
-  short_name: gallup
+  short_name: global_wellbeing
   name: Global Wellbeing Initiative (Gallup, 2020)
   version: '2023-05-04'
   publication_year: 2020"
@@ -34,4 +34,4 @@ wdir: ../../../data/snapshots/health/2023-05-04
 outs:
 - md5: 09700be364f90936b1f91cbec3388cc5
   size: 899303
-  path: gallup.
+  path: global_wellbeing.xlsx
