@@ -52,3 +52,5 @@ steps:
   - snapshot-private://fasttrack/2023-05-02/tomitaka_2018.csv
   data-private://grapher/fasttrack/2023-05-03/qubits:
   - snapshot-private://fasttrack/2023-05-03/qubits.csv
+  data-private://grapher/fasttrack/2023-05-03/apms_2014:
+  - snapshot-private://fasttrack/2023-05-03/apms_2014.csv
