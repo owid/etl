@@ -2,12 +2,15 @@
 
 Datasets combined:
 * Global Carbon Budget (Global Carbon Project, 2022).
+* National contributions to climate change (Jones et al. (2023), 2023).
 * Greenhouse gas emissions by sector (CAIT, 2022).
 * Primary energy consumption (BP & EIA, 2022)
 
-Additionally, OWID's population dataset and Maddison Project Database (Bolt and van Zanden, 2020) on GDP are included.
+Additionally, OWID's regions dataset, population dataset and Maddison Project Database (Bolt and van Zanden, 2020) on
+GDP are included.
 
 """
+
 from typing import List
 
 import numpy as np
@@ -90,6 +93,15 @@ GCP_COLUMNS = {
     "emissions_total_including_land_use_change_per_unit_energy": "co2_including_luc_per_unit_energy",
     "growth_emissions_total_including_land_use_change": "co2_including_luc_growth_abs",
     "pct_growth_emissions_total_including_land_use_change": "co2_including_luc_growth_prct",
+}
+JONES_COLUMNS = {
+    "country": "country",
+    "year": "year",
+    "temperature_response_co2_total": "temperature_change_from_co2",
+    "temperature_response_ghg_total": "temperature_change_from_ghg",
+    "temperature_response_ch4_total": "temperature_change_from_ch4",
+    "temperature_response_n2o_total": "temperature_change_from_n2o",
+    "share_of_temperature_response_ghg_total": "share_of_temperature_change_from_ghg",
 }
 CAIT_GHG_COLUMNS = {
     "country": "country",
@@ -199,6 +211,7 @@ def convert_units(table: catalog.Table) -> catalog.Table:
 
 def combine_tables(
     tb_gcp: catalog.Table,
+    tb_jones: catalog.Table,
     tb_cait_ghg: catalog.Table,
     tb_cait_ch4: catalog.Table,
     tb_cait_n2o: catalog.Table,
@@ -213,6 +226,8 @@ def combine_tables(
     ----------
     tb_gcp : catalog.Table
         Global Carbon Budget table (from Global Carbon Project).
+    tb_jones : catalog.Table
+        National contributions to climate change (from Jones et al. (2023)).
     tb_cait_ghg : catalog.Table
         Greenhouse gas emissions table (from CAIT).
     tb_cait_ch4 : catalog.Table
@@ -235,7 +250,7 @@ def combine_tables(
 
     """
     # Gather all variables' metadata from all tables.
-    tables = [tb_gcp, tb_cait_ghg, tb_cait_ch4, tb_cait_n2o, tb_energy, tb_gdp, tb_population, tb_regions]
+    tables = [tb_gcp, tb_jones, tb_cait_ghg, tb_cait_ch4, tb_cait_n2o, tb_energy, tb_gdp, tb_population, tb_regions]
     variables_metadata = {}
     for table in tables:
         for variable in table.columns:
@@ -248,7 +263,7 @@ def combine_tables(
             variables_metadata[variable] = table[variable].metadata
 
     # Combine main tables (with an outer join, to gather all entities from all tables).
-    tables = [tb_gcp, tb_cait_ghg, tb_cait_ch4, tb_cait_n2o]
+    tables = [tb_gcp, tb_jones, tb_cait_ghg, tb_cait_ch4, tb_cait_n2o]
     combined = dataframes.multi_merge(dfs=tables, on=["country", "year"], how="outer")
 
     # Add secondary tables (with a left join, to keep only entities for which we have emissions data).
@@ -319,9 +334,11 @@ def run(dest_dir: str) -> None:
     #
     # Load data.
     #
-    # Read all required datasets.
     # Load the global carbon budget dataset from the Global Carbon Project (GCP).
     ds_gcp: catalog.Dataset = paths.load_dependency("global_carbon_budget")
+
+    # Load the Jones et al. (2023) dataset on national contributions to climate change.
+    ds_jones: catalog.Dataset = paths.load_dependency("national_contributions")
 
     # Load the greenhouse gas emissions by sector dataset by CAIT.
     ds_cait: catalog.Dataset = paths.load_dependency("ghg_emissions_by_sector")
@@ -340,6 +357,7 @@ def run(dest_dir: str) -> None:
 
     # Gather all required tables from all datasets.
     tb_gcp = ds_gcp["global_carbon_budget"]
+    tb_jones = ds_jones["national_contributions"]
     tb_cait_ghg = ds_cait["greenhouse_gas_emissions_by_sector"]
     tb_cait_ch4 = ds_cait["methane_emissions_by_sector"]
     tb_cait_n2o = ds_cait["nitrous_oxide_emissions_by_sector"]
@@ -354,6 +372,7 @@ def run(dest_dir: str) -> None:
     #
     # Choose required columns and rename them.
     tb_gcp = tb_gcp.reset_index()[list(GCP_COLUMNS)].rename(columns=GCP_COLUMNS)
+    tb_jones = tb_jones.reset_index()[list(JONES_COLUMNS)].rename(columns=JONES_COLUMNS)
     tb_cait_ghg = tb_cait_ghg.reset_index()[list(CAIT_GHG_COLUMNS)].rename(columns=CAIT_GHG_COLUMNS)
     tb_cait_ch4 = tb_cait_ch4.reset_index()[list(CAIT_CH4_COLUMNS)].rename(columns=CAIT_CH4_COLUMNS)
     tb_cait_n2o = tb_cait_n2o.reset_index()[list(CAIT_N2O_COLUMNS)].rename(columns=CAIT_N2O_COLUMNS)
@@ -369,6 +388,7 @@ def run(dest_dir: str) -> None:
     # Combine tables.
     combined = combine_tables(
         tb_gcp=tb_gcp,
+        tb_jones=tb_jones,
         tb_cait_ghg=tb_cait_ghg,
         tb_cait_ch4=tb_cait_ch4,
         tb_cait_n2o=tb_cait_n2o,
@@ -387,7 +407,7 @@ def run(dest_dir: str) -> None:
     ds_garden = create_dataset(dest_dir, tables=[combined])
 
     # Gather metadata sources from all tables' original dataset sources.
-    tables = [tb_gcp, tb_cait_ghg, tb_cait_ch4, tb_cait_n2o, tb_energy, tb_gdp, tb_population]
+    tables = [tb_gcp, tb_jones, tb_cait_ghg, tb_cait_ch4, tb_cait_n2o, tb_energy, tb_gdp, tb_population]
     ds_garden.metadata.sources = gather_sources_from_tables(tables=tables)
 
     # Create dataset.

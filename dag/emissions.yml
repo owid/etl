@@ -20,6 +20,7 @@ steps:
   # Emissions - CO2 dataset (2022).
   #
   data://garden/emissions/2023-05-03/owid_co2:
+    - data://garden/emissions/2023-05-02/national_contributions
     - data://garden/gcp/2023-04-28/global_carbon_budget
     - data://garden/cait/2022-08-10/ghg_emissions_by_sector
     - data://garden/energy/2023-02-20/primary_energy_consumption
