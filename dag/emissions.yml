@@ -19,13 +19,14 @@ steps:
   #
   # Emissions - CO2 dataset (2022).
   #
-  data://garden/emissions/2022-11-11/owid_co2:
-    - data://garden/gcp/2022-11-11/global_carbon_budget
+  data://garden/emissions/2023-05-03/owid_co2:
+    - data://garden/emissions/2023-05-02/national_contributions
+    - data://garden/gcp/2023-04-28/global_carbon_budget
     - data://garden/cait/2022-08-10/ghg_emissions_by_sector
-    # The following step is not the latest version available.
-    - data://garden/energy/2022-07-29/primary_energy_consumption
-    - data://garden/owid/latest/key_indicators
+    - data://garden/energy/2023-02-20/primary_energy_consumption
+    - data://garden/demography/2022-12-08/population
     - data://garden/ggdc/2020-10-01/ggdc_maddison
+    - data://garden/regions/2023-01-01/regions
   #
   # Andrew - CO2 mitigation curves (2019).
   #
