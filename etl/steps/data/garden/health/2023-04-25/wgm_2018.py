@@ -248,12 +248,12 @@ def create_agree_and_disagree_categories(df: pd.DataFrame) -> pd.DataFrame:
             numeric_only=True
         )
         # Sanity check
-        set(df_.answer) == {
+        answers = set(df_["answer"])
+        answers_expected = {
             "Agree",
             "Disagree",
-            "Don't know/Refused",
-            "Neither agree nor disagree",
-        }, "Unknown or unexpected answers!"
+        }
+        assert answers == answers_expected, f"Unknown or unexpected answers! {answers.difference(answers_expected)}"
         # Add to main dataframe
         df = pd.concat([df, df_], ignore_index=True)
     return df
