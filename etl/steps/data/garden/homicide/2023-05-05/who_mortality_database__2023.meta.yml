@@ -1,0 +1,27 @@
+tables:
+  who_mortality_database__2023:
+    variables:
+        number_of_homicides:
+          title: Number of homicides
+          short_unit: ''
+          unit: 'homicides'
+          display:
+            numDecimalPlaces: 0
+        percentage_of_homicides_out_of_total_deaths:
+          title: Percentage of homicides out of total deaths
+          short_unit: '%'
+          unit: '% of total deaths'
+          display:
+            numDecimalPlaces: 2
+        age_standardized_homicide_rate_per_100_000_standard_population:
+          title: Age-standardized homicide rate per 100,000 standard population
+          short_unit: ''
+          unit: 'homicides per 100,000 people'
+          display:
+            numDecimalPlaces: 2
+        homicide_rate_per_100_000_population:
+          title: Homicide rate per 100,000 population
+          short_unit: ''
+          unit: 'homicides per 100,000 people'
+          display:
+            numDecimalPlaces: 2

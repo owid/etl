@@ -8,3 +8,9 @@ steps:
   - data://garden/dummy/2020-01-01/dummy
   data://explorers/dummy/2020-01-01/dummy:
   - data://garden/dummy/2020-01-01/dummy
+  data://meadow/homicide/2023-05-05/who_mortality_database__2023:
+  - snapshot://homicide/2023-05-05/who_mortality_database__2023.csv
+  data://garden/homicide/2023-05-05/who_mortality_database__2023:
+  - data://meadow/homicide/2023-05-05/who_mortality_database__2023
+  data://grapher/homicide/2023-05-05/who_mortality_database__2023:
+  - data://garden/homicide/2023-05-05/who_mortality_database__2023

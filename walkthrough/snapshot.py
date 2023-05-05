@@ -196,7 +196,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
 
 2. Run the snapshot step to upload files to S3
 ```bash
-python snapshots/{form.namespace}/{form.version}/{form.short_name}.py
+poetry run python snapshots/{form.namespace}/{form.version}/{form.short_name}.py
 ```
 
 3. Exit the process and run next step with `poetry run walkthrough meadow`
