@@ -2,7 +2,7 @@ from owid import catalog
 
 from etl.paths import DATA_DIR
 
-DATASET_GARDEN = DATA_DIR / "garden/technology/2022/internet"
+DATASET_GARDEN = DATA_DIR / "garden/research_development/2023-05-05/patents_articles"
 
 
 def run(dest_dir: str) -> None:
@@ -10,7 +10,7 @@ def run(dest_dir: str) -> None:
     dataset = catalog.Dataset.create_empty(dest_dir, garden_dataset.metadata)
 
     # Add population table to dataset
-    dataset.add(garden_dataset["users"])
+    dataset.add(garden_dataset["patents_articles"])
 
     # Save dataset
     dataset.save()
