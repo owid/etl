@@ -1,10 +1,7 @@
-from copy import deepcopy
 from pathlib import Path
-from typing import List
 
-from owid.catalog import Dataset, Source, Table, Variable
+from owid.catalog import Dataset, Table, Variable
 
-from etl.data_helpers import geo
 from etl.paths import DATA_DIR
 
 CURRENT_DIR = Path(__file__).parent
