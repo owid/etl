@@ -40,31 +40,6 @@ steps:
   data://grapher/andrew/2019-12-03/co2_mitigation_curves_2celsius:
     - data://garden/andrew/2019-12-03/co2_mitigation_curves
   #
-  # GCP - Global Carbon Budget (2022-11-11).
-  #
-  data://meadow/gcp/2022-11-11/global_carbon_budget_fossil_co2_emissions:
-    - walden://gcp/2022-11-11/global_carbon_budget_fossil_co2_emissions
-  data://meadow/gcp/2022-11-11/global_carbon_budget_global_emissions:
-    - walden://gcp/2022-11-11/global_carbon_budget_global_emissions
-  data://meadow/gcp/2022-11-11/global_carbon_budget_national_emissions:
-    - walden://gcp/2022-11-11/global_carbon_budget_national_emissions
-  data://meadow/gcp/2022-11-11/global_carbon_budget_land_use_change_emissions:
-    - walden://gcp/2022-11-11/global_carbon_budget_land_use_change_emissions
-  data://garden/gcp/2022-11-11/global_carbon_budget:
-    - data://meadow/gcp/2022-11-11/global_carbon_budget_fossil_co2_emissions
-    - data://meadow/gcp/2022-11-11/global_carbon_budget_global_emissions
-    - data://meadow/gcp/2022-11-11/global_carbon_budget_national_emissions
-    - data://meadow/gcp/2022-11-11/global_carbon_budget_land_use_change_emissions
-    # Additionally, regions, population, income groups, GDP, and primary energy datasets are used.
-    - data://garden/reference
-    - data://garden/owid/latest/key_indicators
-    - data://garden/wb/2021-07-01/wb_income
-    - data://garden/ggdc/2020-10-01/ggdc_maddison
-    # The following step is not the latest version available.
-    - data://garden/energy/2022-07-29/primary_energy_consumption
-  data://grapher/gcp/2022-11-11/global_carbon_budget:
-    - data://garden/gcp/2022-11-11/global_carbon_budget
-  #
   # GCP - Global Carbon Budget (2023-04-28).
   #
   data://meadow/gcp/2023-04-28/global_carbon_budget:
