@@ -38,7 +38,7 @@ def load_wdi() -> Table:
 
 
 def load_key_indicators() -> Table:
-    d = Dataset(DATA_DIR / "garden/owid/latest/key_indicators")
+    d = Dataset(DATA_DIR / "garden/demography/2023-03-31/population")
     return d["population"]
 
 
