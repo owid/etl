@@ -74,7 +74,8 @@ def run(dest_dir: str) -> None:
     # We define an additional table since these columns don't have the dimension "answer"
     log.info("global_wellbeing: build df with gallup indices")
     df_index = df.filter(regex=r".* Index")
-    df_index = df_index.droplevel(2).dropna(how="all")
+    df_index = df_index.droplevel(3).dropna(how="all")
+    df_index = 100 * df_index
     # Get table with the survey questions
     log.info("global_wellbeing: build df with survey questions")
     df_questions = df[[col for col in df.columns if col not in df_index.columns]]
