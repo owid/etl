@@ -47,8 +47,8 @@ def make_combined(table_wdi: Table, table_population: Table) -> Table:
     table = table_population.merge(table_wdi, left_index=True, right_index=True)
 
     # Calculate new variables
-    patents_per_million = 1000000 * table.ip_pat_resd / table.population
-    articles_per_million = 1000000 * table.ip_jrn_artc_sc / table.population
+    patents_per_million = table.ip_pat_resd.mul(1000000).div(table.population)
+    articles_per_million = table.ip_jrn_artc_sc.mul(1000000).div(table.population)
 
     # Add to table
     table = table.assign(
