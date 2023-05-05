@@ -355,6 +355,12 @@ steps:
   data://grapher/imf/2023-05-02/world_economic_outlook:
   - data://garden/imf/2023-05-02/world_economic_outlook
 
+  # Patents & journal articles (World Bank, United Nations)
+  data://garden/research_development/2023-05-05/patents_articles:
+    - data://garden/worldbank_wdi/2022-05-26/wdi
+    - data://garden/owid/latest/key_indicators
+  data://grapher/research_development/2023-05-05/patents_articles:
+    - data://garden/research_development/2023-05-05/patents_articles
 
 # Sub-dags to import
 include:
