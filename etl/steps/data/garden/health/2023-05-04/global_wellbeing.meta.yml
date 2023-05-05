@@ -116,16 +116,73 @@ tables:
         short_unit: '%'
         unit: '%'
         description: >-
+          For its Life Evaluation Index, Gallup asks people to imagine a ladder, with the lowest rung representing the worst possible
+          life and the highest rung representing the best possible life. Those rungs are numbered zero to 10, based on the Cantril
+          Self-Anchoring Striving Scale (https://news.gallup.com/poll/122453/Understanding-Gallup-Uses-Cantril-Scale.aspx).
+          People rate where they stand today and where they expect to stand in five years.
+
+
           Gallup classifies those who rate their current life a 7 or higher and their anticipated life in five years an 8 or higher as thriving.
+
+
+          Globally, Gallup has tracked life evaluations in at least 100 countries and areas each year since 2005, recording
+          the highs and lows of how people have viewed their lives through major upheavals and changes -- including such events
+          as Brexit, the Arab uprisings and the Euromaidan revolution. Since Gallup began tracking this in 2005, the percentage
+          of the global population rating their lives highly enough to be considered thriving has ranged from a low of 21% in
+          2009 to a high of 29% in 2020.
+
+
+          In the U.S., Gallup has tracked the Life Evaluation Index as part of domestic polling since 2008, recording the
+          highs and lows of Americans' perceptions of their lives through the Great Recession and the COVID-19 pandemic,
+          among other major events. Throughout that time, the percentage of Americans who are thriving has ranged from a
+          low of 46% in November 2008 and April 2020 to a high of 59% in June 2021.
       suffering_index:
         title: Suffering Index
         short_unit: '%'
         unit: '%'
         description: >-
-          Those who rate their current life and anticipated life in five years a 4 or lower are classified as suffering.
+          For its Life Evaluation Index, Gallup asks people to imagine a ladder, with the lowest rung representing the worst possible
+          life and the highest rung representing the best possible life. Those rungs are numbered zero to 10, based on the Cantril
+          Self-Anchoring Striving Scale (https://news.gallup.com/poll/122453/Understanding-Gallup-Uses-Cantril-Scale.aspx).
+          People rate where they stand today and where they expect to stand in five years.
+
+
+          Gallup classifies those who rate their current life and anticipated life in five years a 4 or lower are classified as suffering.
+
+
+          Globally, Gallup has tracked life evaluations in at least 100 countries and areas each year since 2005, recording
+          the highs and lows of how people have viewed their lives through major upheavals and changes -- including such events
+          as Brexit, the Arab uprisings and the Euromaidan revolution. Since Gallup began tracking this in 2005, the percentage
+          of the global population rating their lives highly enough to be considered thriving has ranged from a low of 21% in
+          2009 to a high of 29% in 2020.
+
+
+          In the U.S., Gallup has tracked the Life Evaluation Index as part of domestic polling since 2008, recording the
+          highs and lows of Americans' perceptions of their lives through the Great Recession and the COVID-19 pandemic,
+          among other major events. Throughout that time, the percentage of Americans who are thriving has ranged from a
+          low of 46% in November 2008 and April 2020 to a high of 59% in June 2021.
       thriving_index:
         title: Thriving Index
         short_unit: '%'
         unit: '%'
         description: >-
-          Those who are neither suffering nor thriving are considered struggling.
+          For its Life Evaluation Index, Gallup asks people to imagine a ladder, with the lowest rung representing the worst possible
+          life and the highest rung representing the best possible life. Those rungs are numbered zero to 10, based on the Cantril
+          Self-Anchoring Striving Scale (https://news.gallup.com/poll/122453/Understanding-Gallup-Uses-Cantril-Scale.aspx).
+          People rate where they stand today and where they expect to stand in five years.
+
+
+          Gallup classifies those who are neither suffering nor thriving are considered struggling (between a 4 and a 7).
+
+
+          Globally, Gallup has tracked life evaluations in at least 100 countries and areas each year since 2005, recording
+          the highs and lows of how people have viewed their lives through major upheavals and changes -- including such events
+          as Brexit, the Arab uprisings and the Euromaidan revolution. Since Gallup began tracking this in 2005, the percentage
+          of the global population rating their lives highly enough to be considered thriving has ranged from a low of 21% in
+          2009 to a high of 29% in 2020.
+
+
+          In the U.S., Gallup has tracked the Life Evaluation Index as part of domestic polling since 2008, recording the
+          highs and lows of Americans' perceptions of their lives through the Great Recession and the COVID-19 pandemic,
+          among other major events. Throughout that time, the percentage of Americans who are thriving has ranged from a
+          low of 46% in November 2008 and April 2020 to a high of 59% in June 2021.
