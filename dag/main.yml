@@ -358,7 +358,7 @@ steps:
   # Patents & journal articles (World Bank, United Nations)
   data://garden/research_development/2023-05-05/patents_articles:
     - data://garden/worldbank_wdi/2022-05-26/wdi
-    - data://garden/owid/latest/key_indicators
+    - data://garden/demography/2023-03-31/population
   data://grapher/research_development/2023-05-05/patents_articles:
     - data://garden/research_development/2023-05-05/patents_articles
 
