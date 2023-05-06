@@ -2,7 +2,7 @@ meta:
   namespace: backport
   short_name: dataset_5338_covid_19__variants_values
   file_extension: feather
-  date_accessed: 2023-05-05 06:53:59.240745
+  date_accessed: 2023-05-06 08:08:24.767740
   name: COVID-19 - Variants
   description: ''
   source_name: Our World in Data catalog backport
