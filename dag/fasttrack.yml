@@ -62,3 +62,5 @@ steps:
   - snapshot-private://fasttrack/latest/owid_upload_top1_percent_compare_1993.csv
   data-private://grapher/fasttrack/latest/owid_upload_gini_compare_1980:
   - snapshot-private://fasttrack/latest/owid_upload_gini_compare_1980.csv
+  data-private://grapher/fasttrack/latest/owid_upload_top1_percent_compare_1980:
+  - snapshot-private://fasttrack/latest/owid_upload_top1_percent_compare_1980.csv
