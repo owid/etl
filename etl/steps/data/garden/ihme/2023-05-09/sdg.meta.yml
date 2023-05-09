@@ -13,10 +13,6 @@ dataset:
     url: https://www.healthdata.org/data-tools-practices/data-practices/terms-and-conditions
   sources:
   - name: Institute of Health Metrics and Evaluation (2022)
-    description: |
-      IHME produced estimates and forecasts for 13 of the SDG indicators included in the Goalkeepers Report.
-
-      The full description of the methods used to produce the data can be found here: https://www.gatesfoundation.org/goalkeepers/report/2022-report/data-sources/#ExploretheIndicatorPages
     url: https://api.healthdata.org/sdg/v1/docs & https://api.healthdata.org/sdg/v1/docs
     date_accessed: '2023-05-05'
     publication_date: '2022-09-12'
