@@ -63,6 +63,9 @@ tables:
       relative_rise_wid__gini__pretax:
         title: 'relative_rise_WID: Gini – pretax'
         unit: ''
+      proportional_change_wid__gini__pretax:
+        title: 'proportional_change_WID: Gini – pretax'
+        unit: ''
       pip_welfare_pip__gini:
         title: 'pip_welfare_PIP: Gini'
         unit: ''
@@ -110,4 +113,7 @@ tables:
         unit: ''
       relative_rise_pip__gini:
         title: 'relative_rise_PIP: Gini'
+        unit: ''
+      proportional_change_pip__gini:
+        title: 'proportional_change_PIP: Gini'
         unit: ''

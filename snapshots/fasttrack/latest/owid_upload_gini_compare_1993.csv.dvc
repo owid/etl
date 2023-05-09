@@ -8,11 +8,11 @@ meta:
   source_name: Local CSV
   url: ''
   source_published_by: Local CSV
-  source_data_url: gAAAAABkWq03tfVrHkdGIaSQAeP6niAEkNUFwoAKLKRiBEXrHp3MkufnyDFh5Xw0vg2-YLYTjR0E-tj9dKiL_mR21D0Gi-vN-Q==
+  source_data_url: gAAAAABkWrEYse8SRzl9C_CF8Md7IleZMleUQHpKweR-R0FLnBMXB73R_TR8R4apbld3SFjOWcMEZc5MWqmGpmusI8HQLRa-5A==
   is_public: false
   version: latest
 wdir: ../../../data/snapshots/fasttrack/latest
 outs:
-- md5: 73b5b03ed2865e7992ec50b1a9a8afb0
-  size: 30335
+- md5: 2bdd8abe9ce6b079b2f234537f64279f
+  size: 34053
   path: owid_upload_gini_compare_1993.csv
