@@ -1,0 +1,28 @@
+dataset:
+  namespace: fasttrack
+  version: latest
+  short_name: gbd_2019_mental_health_country_coverage
+  title: Countries with mental health data in GBD 2019
+  description: |-
+    Dataset showing the number of countries with primary data on the prevalence of mental illnesses. These were found after a systematic review, grey literature search and expert consultation, to identify studies with data on the prevalence of each mental illness.
+
+    'The GBD inclusion criteria stipulated that: (1) the diagnostic criteria must be from 1980 onward; (2) “caseness” must be based on clinical threshold as established by the DSM, ICD, Chinese Classification of Mental Disorders (CCMD), or diagnosed by a clinician using established tools; (3) sufficient information must be provided on study method and sample characteristics to assess the quality of the study; and (4) study samples must be representative of the general population (i.e., case studies, veterans, or refugee samples were excluded). No limitation was set on the language of publication.'
+  sources:
+  - name: IHME GBD (2019)
+    published_by: 'Vos, T., Lim, S. S., Abbafati, C., Abbas, K. M., Abbasi, M., Abbasifard,
+      M., Abbasi-Kangevari, M., Abbastabar, H., Abd-Allah, F., Abdelalim, A., Abdollahi,
+      M., Abdollahpour, I., Abolhassani, H., Aboyans, V., Abrams, E. M., Abreu, L.
+      G., Abrigo, M. R. M., Abu-Raddad, L. J., Abushouk, A. I., … Murray, C. J. L.
+      (2020). Global burden of 369 diseases and injuries in 204 countries and territories,
+      1990–2019: A systematic analysis for the Global Burden of Disease Study 2019.
+      The Lancet, 396(10258), 1204–1222.'
+    publisher_source: Country-level prevalence data
+    publication_year: 2020
+    date_accessed: 2023-05-05
+    url: https://www.thelancet.com/journals/lancet/article/PIIS0140-6736(20)30925-9/fulltext
+tables:
+  gbd_2019_mental_health_country_coverage:
+    variables:
+      number_of_countries:
+        title: Number of countries with primary data on prevalence of mental disorders
+        unit: ''
