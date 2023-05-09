@@ -1,0 +1,39 @@
+dataset:
+  namespace: research_development
+  version: 2023-05-05
+  title: Patent applications and journal articles per million (World Bank, UN)
+  short_name: patents_wdi_unwpp
+  sources:
+    - name: World Bank (2022); United Nations (2022)
+      url: "https://datacatalog.worldbank.org/search/dataset/0037712/World-Development-Indicators; https://population.un.org/wpp/Download/"
+      date_accessed: "2023-05-05"
+      publication_year: 2022
+      published_by: "World Development Indicators, The World Bank; United Nations, Department of Economic and Social Affairs, Population Division (2022). World Population Prospects 2022, Online Edition"
+
+tables:
+  patents_articles:
+    variables:
+      patents_per_million:
+        title: Patent applications per million people
+        description: "Rates were calculated by Our World in Data based on a combination of World Bank, World Development Indicators (WDI) and United Nations World Population Prospects estimates.
+
+This data only includes resident patent applications. Resident patent applications are those for which the first-named applicant or assignee is a resident of the State or region concerned.
+        
+Patent applications are worldwide patent applications filed through the Patent Cooperation Treaty procedure or with a national patent office for exclusive rights for an invention--a product or process that provides a new way of doing something or offers a new technical solution to a problem. A patent provides protection for the invention to the owner of the patent for a limited period, generally 20 years."
+        short_unit: 
+        unit: applications per million people
+        display:
+          numDecimalPlaces: 0
+      articles_per_million:
+        title: Scientific and technical journal articles per million people
+        description: "Rates were calculated by Our World in Data based on a combination of World Bank, World Development Indicators (WDI) and United Nations World Population Prospects estimates.
+        
+The number of scientific and engineering articles published in the following fields: physics, biology, chemistry, mathematics, clinical medicine, biomedical research, engineering and technology, and earth and space sciences. The NSF considers article counts from a set of journals covered by Science Citation Index (SCI) and Social Sciences Citation Index (SSCI).
+
+A scientific journal is a periodical publication intended to further the progress of science, usually by reporting new research. Most journals are highly specialized, although some of the oldest journals such as Nature publish articles and scientific papers across a wide range of scientific fields. Scientific journals contain articles that have been peer reviewed. When a scientific journal describes experiments or calculations, they must supply enough details that an independent researcher could repeat the experiment or calculation to verify the results. Each such journal article becomes part of the permanent scientific record. Some journals, such as Nature, Science, Proceedings of the National Academy of Sciences of the United States of America (PNAS), and Physical Review Letters, have a reputation of publishing articles that mark a fundamental breakthrough in their respective fields.
+
+Scientific and technical article counts are from journals classified by the Institute for Scientific Information's Science Citation Index (SCI) and Social Sciences Citation Index (SSCI). Counts are based on fractional assignments; articles with authors from different countries are allocated proportionately to each country. The SCI and SSCI databases cover the core set of scientific journals but may exclude some of local importance and may reflect some bias toward English-language journals. Articles are classified by year of publication and assigned to region/country/economy on basis of institutional address(es) listed on the article. Articles are counted on a fractional-count basis that is, for articles with collaborating institutions from multiple countries/economies, each country/economy receives fractional credit on basis of proportion of its participating institutions. Details may not add to total because of rounding."
+        short_unit: 
+        unit: articles per million people
+        display:
+          numDecimalPlaces: 0
