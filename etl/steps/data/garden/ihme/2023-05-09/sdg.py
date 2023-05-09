@@ -81,9 +81,8 @@ def label_projections(df: pd.DataFrame) -> pd.DataFrame:
         "Worse": "Worse Projection",
         "Better": "Better Projection",
     }
-
-    df_estimate.loc[:, "scenario_label"] = df_estimate.loc[:, "scenario_label"].replace(label_map_est)
-    df_projection.loc[:, "scenario_label"] = df_projection.loc[:, "scenario_label"].replace(label_map_proj)
+    df_estimate = df_estimate.replace({"scenario_label": label_map_est})
+    df_projection = df_projection.replace({"scenario_label": label_map_proj})
 
     # Concatenate the DataFrames and check the shape
     df_replaced = pd.DataFrame(pd.concat([df_estimate, df_projection]))

@@ -32,8 +32,6 @@ tables:
           Prevalence of stunting among children under 5 years.
 
           IHME measures stunting prevalence as height-for-age more than two standard deviations below the reference median on the height-age growth curve, based on WHO 2006 growth standards for children of age 0–59 months.
-
-          Projections to 2030 were modeled using an ensemble approach to forecast the prevalence of stunting, using SDI as a key driver in order to capture the effects of the COVID-19 pandemic on income per capita and education. Estimates in Global Burden of Disease (GBD) 2020 leveraged several methodological advances including ensemble model predictions for severity-specific stunting prevalence and mean height-for-age z-scores (HAZ), further disaggregation of <5 age groups, and an improved distribution fitting model that focuses on HAZ scores of < -2 (i.e., under the range for stunting) rather than across the full range of HAZ scores. This led to improved estimates in a number of countries, notably including South Africa, the Democratic Republic of the Congo, India, and Pakistan. In addition, new data has improved estimates in a number of countries as well, including Pakistan.
         short_unit: '%'
         unit: '%'
       mean_estimate_prevalence_of_child_stunting_under_5_females_reference_estimate:
@@ -42,8 +40,6 @@ tables:
           Prevalence of stunting among female children under 5 years.
 
           IHME measures stunting prevalence as height-for-age more than two standard deviations below the reference median on the height-age growth curve, based on WHO 2006 growth standards for children of age 0–59 months.
-
-          Projections to 2030 were modeled using an ensemble approach to forecast the prevalence of stunting, using SDI as a key driver in order to capture the effects of the COVID-19 pandemic on income per capita and education. Estimates in Global Burden of Disease (GBD) 2020 leveraged several methodological advances including ensemble model predictions for severity-specific stunting prevalence and mean height-for-age z-scores (HAZ), further disaggregation of <5 age groups, and an improved distribution fitting model that focuses on HAZ scores of < -2 (i.e., under the range for stunting) rather than across the full range of HAZ scores. This led to improved estimates in a number of countries, notably including South Africa, the Democratic Republic of the Congo, India, and Pakistan. In addition, new data has improved estimates in a number of countries as well, including Pakistan.
         short_unit: '%'
         unit: '%'
       mean_estimate_prevalence_of_child_stunting_under_5_males_reference_estimate:
@@ -52,8 +48,6 @@ tables:
           Prevalence of stunting among male children under 5 years.
 
           IHME measures stunting prevalence as height-for-age more than two standard deviations below the reference median on the height-age growth curve, based on WHO 2006 growth standards for children of age 0–59 months.
-
-          Projections to 2030 were modeled using an ensemble approach to forecast the prevalence of stunting, using SDI as a key driver in order to capture the effects of the COVID-19 pandemic on income per capita and education. Estimates in Global Burden of Disease (GBD) 2020 leveraged several methodological advances including ensemble model predictions for severity-specific stunting prevalence and mean height-for-age z-scores (HAZ), further disaggregation of <5 age groups, and an improved distribution fitting model that focuses on HAZ scores of < -2 (i.e., under the range for stunting) rather than across the full range of HAZ scores. This led to improved estimates in a number of countries, notably including South Africa, the Democratic Republic of the Congo, India, and Pakistan. In addition, new data has improved estimates in a number of countries as well, including Pakistan.
         short_unit: '%'
         unit: '%'
       mean_estimate_maternal_mortality_ratio__who__15_49_years_females_reference_estimate:
@@ -62,8 +56,6 @@ tables:
           Maternal mortality ratio (maternal deaths among women aged 15-49 years per 100,000 live births) without late cause deaths.
 
           It depicts the risk of maternal death relative to the number of live births and essentially captures the risk of death in a single pregnancy or a single live birth.
-
-          Projections to 2030 were modeled using an ensemble approach to forecast MMR, using SDI as a key driver in order to capture the effects of the COVID-19 pandemic on income per capita and education. Our analysis of direct and indirect maternal mortality in selected countries showed no significant relationship between direct mortality and indicators of the COVID-19 pandemic (i.e., COVID-19 infection incidence rate, COVID-19 mortality rate, changes in mobility). However, there was a significant effect of the COVID-19 pandemic on indirect maternal mortality. This effect on indirect maternal mortality was modeled using COVID-19 mortality rate as a covariate. This year, our estimates of excess indirect maternal mortality also include a correction for the proportion of deaths that are considered incidental, or unrelated to pregnancy status. Currently available data does not suggest a consistent relationship between the pandemic and indicators of maternal care (antenatal care, skilled birth attendance), and IHME has not incorporated an effect of the pandemic on these indicators.
         unit: 'per 100,000 live births'
       mean_estimate_under_5_mortality_rate_under_5_both_sexes_reference_estimate:
         title: Under-5 mortality rate - Both Sexes - Estimate
@@ -72,7 +64,6 @@ tables:
 
           IHME defines the under-5 mortality rate (U5MR) as the probability of death between birth and age 5. It is expressed as number of deaths per 1,000 live births.
 
-          Projections were based on a combination of key drivers, including GBD risk factors, selected interventions (e.g., vaccines), and SDI. Additional short-term disruptions (2020–2021) from the COVID-19 pandemic incorporated the reductions seen in child deaths from infectious diseases (flu, respiratory syncytial virus, measles, pertussis) observed during the pandemic, driven primarily by social distancing and mask use, as well as increases in child deaths due directly to COVID-19. Most of the changes in U5MR estimates in the current Goalkeepers Report results came from new and additional input mortality data that IHME has incorporated since the GBD 2019 study, including estimates of excess mortality observed during the COVID-19 pandemic.
         unit: 'per 1,000 live births'
       mean_estimate_under_5_mortality_rate_under_5_females_reference_estimate:
         title:  Under-5 mortality rate - Female - Estimate
@@ -81,7 +72,6 @@ tables:
 
           IHME defines the under-5 mortality rate (U5MR) as the probability of death between birth and age 5. It is expressed as number of deaths per 1,000 live births.
 
-          Projections were based on a combination of key drivers, including GBD risk factors, selected interventions (e.g., vaccines), and SDI. Additional short-term disruptions (2020–2021) from the COVID-19 pandemic incorporated the reductions seen in child deaths from infectious diseases (flu, respiratory syncytial virus, measles, pertussis) observed during the pandemic, driven primarily by social distancing and mask use, as well as increases in child deaths due directly to COVID-19. Most of the changes in U5MR estimates in the current Goalkeepers Report results came from new and additional input mortality data that IHME has incorporated since the GBD 2019 study, including estimates of excess mortality observed during the COVID-19 pandemic.
         unit: 'per 1,000 live births'
       mean_estimate_under_5_mortality_rate_under_5_males_reference_estimate:
         title: Under-5 mortality rate - Male - Estimate
@@ -90,7 +80,6 @@ tables:
 
           IHME defines the under-5 mortality rate (U5MR) as the probability of death between birth and age 5. It is expressed as number of deaths per 1,000 live births.
 
-          Projections were based on a combination of key drivers, including GBD risk factors, selected interventions (e.g., vaccines), and SDI. Additional short-term disruptions (2020–2021) from the COVID-19 pandemic incorporated the reductions seen in child deaths from infectious diseases (flu, respiratory syncytial virus, measles, pertussis) observed during the pandemic, driven primarily by social distancing and mask use, as well as increases in child deaths due directly to COVID-19. Most of the changes in U5MR estimates in the current Goalkeepers Report results came from new and additional input mortality data that IHME has incorporated since the GBD 2019 study, including estimates of excess mortality observed during the COVID-19 pandemic.
         unit: 'per 1,000 live births'
       mean_estimate_neonatal_mortality_rate_neonatal_both_sexes_reference_estimate:
         title: Neonatal mortality rate - Both Sexes - Estimate
@@ -98,8 +87,6 @@ tables:
           Neonatal mortality rate (probability of dying during the first 28 days of life per 1,000 live births).
 
           IHME defines the neonatal mortality rate as the probability of death in the first 28 completed days of life. It is expressed as the number of deaths per 1,000 live births.
-
-          Projections were based on a combination of key drivers, including GBD risk factors, selected interventions (e.g., vaccines), and SDI. Most of the changes in neonatal mortality estimates in this year’s Goalkeepers Report are the result of new data, including estimates of excess mortality observed during the COVID-19 pandemic.
         unit: 'per 1,000 live births'
       mean_estimate_neonatal_mortality_rate_neonatal_females_reference_estimate:
         title: Neonatal mortality rate - Female - Estimate
@@ -107,8 +94,6 @@ tables:
           Neonatal mortality rate (probability of dying during the first 28 days of life per 1,000 live births).
 
           IHME defines the neonatal mortality rate as the probability of death in the first 28 completed days of life. It is expressed as the number of deaths per 1,000 live births.
-
-          Projections were based on a combination of key drivers, including GBD risk factors, selected interventions (e.g., vaccines), and SDI. Most of the changes in neonatal mortality estimates in this year’s Goalkeepers Report are the result of new data, including estimates of excess mortality observed during the COVID-19 pandemic.
         unit: 'per 1,000 live births'
       mean_estimate_neonatal_mortality_rate_neonatal_males_reference_estimate:
         title: Neonatal mortality rate - Male - Estimate
@@ -117,7 +102,6 @@ tables:
 
           IHME defines the neonatal mortality rate as the probability of death in the first 28 completed days of life. It is expressed as the number of deaths per 1,000 live births.
 
-          Projections were based on a combination of key drivers, including GBD risk factors, selected interventions (e.g., vaccines), and SDI. Most of the changes in neonatal mortality estimates in this year’s Goalkeepers Report are the result of new data, including estimates of excess mortality observed during the COVID-19 pandemic.
         unit: 'per 1,000 live births'
       mean_estimate_hiv_incidence_rate_all_ages_both_sexes_reference_estimate:
         title: HIV incidence rate - Both Sexes - Estimate
@@ -125,10 +109,6 @@ tables:
           Age-standardized rate of new HIV infections (per 1,000).
 
           IHME estimates the HIV rate as new HIV infections per 1,000 population.
-
-          Forecasts of HIV incidence were based on forecasted ART, prevention of maternal-to-child transmission (PMTCT) coverage, and incidence as inputs into a modified version of Avenir Health’s Spectrum software. Adult ART is forecasted using the expected spending on HIV curative care—which in turn was forecasted based on income per capita, including the effect of the COVID-19 pandemic—and ART prices.
-
-          GBD estimates incorporated methodological changes to cause of death data for HIV as well as the adjustment of incidence estimates, to be consistent with vital registration data.
         unit: 'per 1,000 people'
       mean_estimate_hiv_incidence_rate_all_ages_females_reference_estimate:
         title: HIV incidence rate - Female - Estimate
@@ -136,10 +116,6 @@ tables:
           Age-standardized rate of new HIV infections (per 1,000).
 
           IHME estimates the HIV rate as new HIV infections per 1,000 population.
-
-          Forecasts of HIV incidence were based on forecasted ART, prevention of maternal-to-child transmission (PMTCT) coverage, and incidence as inputs into a modified version of Avenir Health’s Spectrum software. Adult ART is forecasted using the expected spending on HIV curative care—which in turn was forecasted based on income per capita, including the effect of the COVID-19 pandemic—and ART prices.
-
-          GBD estimates incorporated methodological changes to cause of death data for HIV as well as the adjustment of incidence estimates, to be consistent with vital registration data.
         unit: 'per 1,000 people'
       mean_estimate_hiv_incidence_rate_all_ages_males_reference_estimate:
         title: HIV incidence rate - Male - Estimate
@@ -147,106 +123,76 @@ tables:
           Age-standardized rate of new HIV infections (per 1,000).
 
           IHME estimates the HIV rate as new HIV infections per 1,000 population.
-
-          Forecasts of HIV incidence were based on forecasted ART, prevention of maternal-to-child transmission (PMTCT) coverage, and incidence as inputs into a modified version of Avenir Health’s Spectrum software. Adult ART is forecasted using the expected spending on HIV curative care—which in turn was forecasted based on income per capita, including the effect of the COVID-19 pandemic—and ART prices.
-
-          GBD estimates incorporated methodological changes to cause of death data for HIV as well as the adjustment of incidence estimates, to be consistent with vital registration data.
         unit: 'per 1,000 people'
       mean_estimate_tuberculosis_incidence_rate_all_ages_both_sexes_reference_estimate:
         title: Tuberculosis incidence rate - Both Sexes - Estimate
         description: |
           Age-standardized rate of tuberculosis cases (per 100,000).
 
-          IHME estimates new and relapse tuberculosis (TB) cases diagnosed within a given calendar year (incidence) using data from prevalence surveys, case notifications, and cause-specific mortality estimates as inputs to a statistical model that enforces internal consistency among the estimates. GBD estimates in this round incorporate methodological improvements in using case notification data.
-
-          IHME evaluated the literature on COVID-19 disruptions to TB incidence and identified three types of studies: studies reporting raw data on diagnosis and treatment in 2020, studies reporting on service disruption from new surveys, and studies reporting on models of TB impacts using notification data or theoretical COVID scenarios. Due to the lack of counterfactual data in pre-pandemic time periods and modeling assumptions used in the current studies, IHME could not estimate an additional disruption in TB incidence due to COVID-19. IHME will continue to evaluate and analyze as more data is released. In addition to historical trends, projections to 2030 were modeled using an ensemble approach to forecast the incidence of TB, using SDI as a key driver in order to capture the effects of the COVID-19 pandemic on income per capita and education
+          IHME estimates new and relapse tuberculosis (TB) cases diagnosed within a given calendar year (incidence) using data from prevalence surveys, case notifications, and cause-specific mortality estimates as inputs to a statistical model that enforces internal consistency among the estimates.
         unit: 'new cases per 100,000 people'
       mean_estimate_tuberculosis_incidence_rate_all_ages_females_reference_estimate:
         title: Tuberculosis incidence rate - Female - Estimate
         description: |
           Age-standardized rate of tuberculosis cases (per 100,000).
 
-          IHME estimates new and relapse tuberculosis (TB) cases diagnosed within a given calendar year (incidence) using data from prevalence surveys, case notifications, and cause-specific mortality estimates as inputs to a statistical model that enforces internal consistency among the estimates. GBD estimates in this round incorporate methodological improvements in using case notification data.
-
-          IHME evaluated the literature on COVID-19 disruptions to TB incidence and identified three types of studies: studies reporting raw data on diagnosis and treatment in 2020, studies reporting on service disruption from new surveys, and studies reporting on models of TB impacts using notification data or theoretical COVID scenarios. Due to the lack of counterfactual data in pre-pandemic time periods and modeling assumptions used in the current studies, IHME could not estimate an additional disruption in TB incidence due to COVID-19. IHME will continue to evaluate and analyze as more data is released. In addition to historical trends, projections to 2030 were modeled using an ensemble approach to forecast the incidence of TB, using SDI as a key driver in order to capture the effects of the COVID-19 pandemic on income per capita and education
+          IHME estimates new and relapse tuberculosis (TB) cases diagnosed within a given calendar year (incidence) using data from prevalence surveys, case notifications, and cause-specific mortality estimates as inputs to a statistical model that enforces internal consistency among the estimates.
         unit: 'new cases per 100,000 people'
       mean_estimate_tuberculosis_incidence_rate_all_ages_males_reference_estimate:
         title: Tuberculosis incidence rate - Male - Estimate
         description: |
           Age-standardized rate of tuberculosis cases (per 100,000).
 
-          IHME estimates new and relapse tuberculosis (TB) cases diagnosed within a given calendar year (incidence) using data from prevalence surveys, case notifications, and cause-specific mortality estimates as inputs to a statistical model that enforces internal consistency among the estimates. GBD estimates in this round incorporate methodological improvements in using case notification data.
-
-          IHME evaluated the literature on COVID-19 disruptions to TB incidence and identified three types of studies: studies reporting raw data on diagnosis and treatment in 2020, studies reporting on service disruption from new surveys, and studies reporting on models of TB impacts using notification data or theoretical COVID scenarios. Due to the lack of counterfactual data in pre-pandemic time periods and modeling assumptions used in the current studies, IHME could not estimate an additional disruption in TB incidence due to COVID-19. IHME will continue to evaluate and analyze as more data is released. In addition to historical trends, projections to 2030 were modeled using an ensemble approach to forecast the incidence of TB, using SDI as a key driver in order to capture the effects of the COVID-19 pandemic on income per capita and education
+          IHME estimates new and relapse tuberculosis (TB) cases diagnosed within a given calendar year (incidence) using data from prevalence surveys, case notifications, and cause-specific mortality estimates as inputs to a statistical model that enforces internal consistency among the estimates.
         unit: 'new cases per 100,000 people'
       mean_estimate_malaria_incidence_rate_all_ages_both_sexes_reference_estimate:
         title: Malaria incidence rate - Both Sexes - Estimate
         description: |
           Age-standardized rate of malaria cases (per 1,000).
 
-          IHME estimates the malaria rate as the number of new cases per 1,000 population. To estimate malaria incidence in 2020 and 2021, IHME takes into account updated reports regarding pandemic-related disruptions to malaria interventions and effective treatment with an antimalarial drug (which includes ITN, indoor residual spraying, antimalarial treatment, and drug effectiveness). These reports were used to apply an adjustment to estimates of antimalarial treatment coverage, which were then used to produce estimates of malaria incidence. Projections to 2030 were derived using an ensemble model. First, coverage of ACT and ITNs is forecast as a function of the SDI, which is predicted in turn by projections of income per capita and education. For countries where there exists available data on intervention coverage, malaria incidence is forecasted through 2030 using an ensemble approach, incorporating past trends and forecasts of ACT and ITN coverage to produce the projections. For countries where there is no available data on ACT or ITN coverage, an ensemble approach is used based on past trends in incidence as well as projections of SDI, which incorporates the effects of the COVID-19 pandemic through income per capita and education.
-
-          Due to reporting lags, there is still relatively little data to inform pandemic-related impacts on malaria incidence. The WHO global pulse surveys, which were used to adjust 2020 and 2021 incidence results, were applied only to countries in sub-Saharan Africa due to a lack of comparable method for applying the adjustment to other regions arising from the difference in incidence estimation. Furthermore, although those pulse surveys currently allow us to begin trying to capture malaria pandemic-related impacts, the surveys were completed by national-level health officials and capture only their individual assessment of how the pandemic has affected care seeking.
+          IHME estimates the malaria rate as the number of new cases per 1,000 population.
         unit: 'new cases per 1,000 people'
       mean_estimate_malaria_incidence_rate_all_ages_females_reference_estimate:
         title: Malaria incidence rate - Female - Estimate
         description: |
           Age-standardized rate of malaria cases (per 1,000).
 
-          IHME estimates the malaria rate as the number of new cases per 1,000 population. To estimate malaria incidence in 2020 and 2021, IHME takes into account updated reports regarding pandemic-related disruptions to malaria interventions and effective treatment with an antimalarial drug (which includes ITN, indoor residual spraying, antimalarial treatment, and drug effectiveness). These reports were used to apply an adjustment to estimates of antimalarial treatment coverage, which were then used to produce estimates of malaria incidence. Projections to 2030 were derived using an ensemble model. First, coverage of ACT and ITNs is forecast as a function of the SDI, which is predicted in turn by projections of income per capita and education. For countries where there exists available data on intervention coverage, malaria incidence is forecasted through 2030 using an ensemble approach, incorporating past trends and forecasts of ACT and ITN coverage to produce the projections. For countries where there is no available data on ACT or ITN coverage, an ensemble approach is used based on past trends in incidence as well as projections of SDI, which incorporates the effects of the COVID-19 pandemic through income per capita and education.
-
-          Due to reporting lags, there is still relatively little data to inform pandemic-related impacts on malaria incidence. The WHO global pulse surveys, which were used to adjust 2020 and 2021 incidence results, were applied only to countries in sub-Saharan Africa due to a lack of comparable method for applying the adjustment to other regions arising from the difference in incidence estimation. Furthermore, although those pulse surveys currently allow us to begin trying to capture malaria pandemic-related impacts, the surveys were completed by national-level health officials and capture only their individual assessment of how the pandemic has affected care seeking.
+          IHME estimates the malaria rate as the number of new cases per 1,000 population.
         unit: 'new cases per 1,000 people'
       mean_estimate_malaria_incidence_rate_all_ages_males_reference_estimate:
         title: Malaria incidence rate - Male - Estimate
         description: |
           Age-standardized rate of malaria cases (per 1,000).
 
-          IHME estimates the malaria rate as the number of new cases per 1,000 population. To estimate malaria incidence in 2020 and 2021, IHME takes into account updated reports regarding pandemic-related disruptions to malaria interventions and effective treatment with an antimalarial drug (which includes ITN, indoor residual spraying, antimalarial treatment, and drug effectiveness). These reports were used to apply an adjustment to estimates of antimalarial treatment coverage, which were then used to produce estimates of malaria incidence. Projections to 2030 were derived using an ensemble model. First, coverage of ACT and ITNs is forecast as a function of the SDI, which is predicted in turn by projections of income per capita and education. For countries where there exists available data on intervention coverage, malaria incidence is forecasted through 2030 using an ensemble approach, incorporating past trends and forecasts of ACT and ITN coverage to produce the projections. For countries where there is no available data on ACT or ITN coverage, an ensemble approach is used based on past trends in incidence as well as projections of SDI, which incorporates the effects of the COVID-19 pandemic through income per capita and education.
-
-          Due to reporting lags, there is still relatively little data to inform pandemic-related impacts on malaria incidence. The WHO global pulse surveys, which were used to adjust 2020 and 2021 incidence results, were applied only to countries in sub-Saharan Africa due to a lack of comparable method for applying the adjustment to other regions arising from the difference in incidence estimation. Furthermore, although those pulse surveys currently allow us to begin trying to capture malaria pandemic-related impacts, the surveys were completed by national-level health officials and capture only their individual assessment of how the pandemic has affected care seeking.
+          IHME estimates the malaria rate as the number of new cases per 1,000 population.
         unit: 'new cases per 1,000 people'
       mean_estimate_prevalence_of_15_neglected_tropical_diseases_all_ages_both_sexes_reference_estimate:
         title: Prevalence of 15 neglected tropical diseases - Both Sexes - Estimate
         description: |
           Age-standardized prevalence of 15 neglected tropical diseases (NTDs). Prevalence estimates reported here may exceed 100% as they reflect the sum of prevalent cases of 15 NTDs.
 
-          IHME measures the sum of the prevalence of 15 NTDs per 100,000 that are currently measured in the annual Global Burden of Disease study: human African trypanosomiasis, Chagas disease, cystic echinococcosis, cysticercosis, dengue, food-borne trematodiases, Guinea worm, soil-transmitted helminths (STH, comprising hookworm, trichuriasis, and ascariasis), leishmaniasis, leprosy, lymphatic filariasis, onchocerciasis, rabies, schistosomiasis, and trachoma. Since the 2020 Goalkeepers Report, changes in historical trends in this indicator reflect updates to the estimated prevalence of each NTD made for the GBD 2020 study. Specifically, changes in the summary NTD prevalence indicator between the 2020 Goalkeepers Report and these estimates largely reflect the addition of new data to STH models, especially in Latin America and South Asia.
-
-          In the 2021 Goalkeepers Report, IHME did not estimate a COVID-19 effect on this indicator, due to limited surveillance and control program data availability. Modeling studies and available data suggest that the COVID pandemic likely resulted in disruptions to NTD epidemiology, though these disruptions are likely to vary by disease and location and may be variably amenable to mitigation through increased control efforts. Although modeling studies can characterize potential disruptions under various scenarios, reliable data to quantify the true magnitude of pandemic effects on NTD epidemiology are sparse.
-
-          For this year’s report, IHME searched for published and gray literature quantifying the impact of the COVID-19 pandemic on NTD prevalence. Due to data gaps, lags in availability, and challenges in accounting for the likely disruptions to NTD surveillance during the pandemic, IHME found evidence to support adjustment for COVID-19 disruptions only for dengue. IHME adjusted dengue estimates in 2020 and 2021 using country-specific estimates of COVID disruptions from Chen et al. (2022), including updated estimates for 2021 graciously provided by the study authors via personal communication. For 2020, IHME adjusted only the proportion of cases occurring in April through December, reflecting the timing of the start of the pandemic; for 2021, IHME adjusted the full year. IHME excluded Brazil from the country-specific analysis due to data inconsistencies. For countries not estimated directly by this analysis, IHME applied regional or global disruption ratios. Projections to 2030 used an ensemble model, driven both by trends in the past as well as projections of SDI, which incorporated disruptions from the COVID-19 pandemic on income per capita and education.
+          IHME measures the sum of the prevalence of 15 NTDs per 100,000 that are currently measured in the annual Global Burden of Disease study: human African trypanosomiasis, Chagas disease, cystic echinococcosis, cysticercosis, dengue, food-borne trematodiases, Guinea worm, soil-transmitted helminths (STH, comprising hookworm, trichuriasis, and ascariasis), leishmaniasis, leprosy, lymphatic filariasis, onchocerciasis, rabies, schistosomiasis, and trachoma.
         unit: 'cases of 15 NTDs per 100,000 people'
       mean_estimate_prevalence_of_15_neglected_tropical_diseases_all_ages_females_reference_estimate:
         title: Prevalence of 15 neglected tropical diseases - Female - Estimate
         description: |
           Age-standardized prevalence of 15 neglected tropical diseases (NTDs). Prevalence estimates reported here may exceed 100% as they reflect the sum of prevalent cases of 15 NTDs.
 
-          IHME measures the sum of the prevalence of 15 NTDs per 100,000 that are currently measured in the annual Global Burden of Disease study: human African trypanosomiasis, Chagas disease, cystic echinococcosis, cysticercosis, dengue, food-borne trematodiases, Guinea worm, soil-transmitted helminths (STH, comprising hookworm, trichuriasis, and ascariasis), leishmaniasis, leprosy, lymphatic filariasis, onchocerciasis, rabies, schistosomiasis, and trachoma. Since the 2020 Goalkeepers Report, changes in historical trends in this indicator reflect updates to the estimated prevalence of each NTD made for the GBD 2020 study. Specifically, changes in the summary NTD prevalence indicator between the 2020 Goalkeepers Report and these estimates largely reflect the addition of new data to STH models, especially in Latin America and South Asia.
-
-          In the 2021 Goalkeepers Report, IHME did not estimate a COVID-19 effect on this indicator, due to limited surveillance and control program data availability. Modeling studies and available data suggest that the COVID pandemic likely resulted in disruptions to NTD epidemiology, though these disruptions are likely to vary by disease and location and may be variably amenable to mitigation through increased control efforts. Although modeling studies can characterize potential disruptions under various scenarios, reliable data to quantify the true magnitude of pandemic effects on NTD epidemiology are sparse.
-
-          For this year’s report, IHME searched for published and gray literature quantifying the impact of the COVID-19 pandemic on NTD prevalence. Due to data gaps, lags in availability, and challenges in accounting for the likely disruptions to NTD surveillance during the pandemic, IHME found evidence to support adjustment for COVID-19 disruptions only for dengue. IHME adjusted dengue estimates in 2020 and 2021 using country-specific estimates of COVID disruptions from Chen et al. (2022), including updated estimates for 2021 graciously provided by the study authors via personal communication. For 2020, IHME adjusted only the proportion of cases occurring in April through December, reflecting the timing of the start of the pandemic; for 2021, IHME adjusted the full year. IHME excluded Brazil from the country-specific analysis due to data inconsistencies. For countries not estimated directly by this analysis, IHME applied regional or global disruption ratios. Projections to 2030 used an ensemble model, driven both by trends in the past as well as projections of SDI, which incorporated disruptions from the COVID-19 pandemic on income per capita and education.
+          IHME measures the sum of the prevalence of 15 NTDs per 100,000 that are currently measured in the annual Global Burden of Disease study: human African trypanosomiasis, Chagas disease, cystic echinococcosis, cysticercosis, dengue, food-borne trematodiases, Guinea worm, soil-transmitted helminths (STH, comprising hookworm, trichuriasis, and ascariasis), leishmaniasis, leprosy, lymphatic filariasis, onchocerciasis, rabies, schistosomiasis, and trachoma.
         unit: 'cases of 15 NTDs per 100,000 people'
       mean_estimate_prevalence_of_15_neglected_tropical_diseases_all_ages_males_reference_estimate:
         title: Prevalence of 15 neglected tropical diseases - Male - Estimate
         description: |
           Age-standardized prevalence of 15 neglected tropical diseases (NTDs). Prevalence estimates reported here may exceed 100% as they reflect the sum of prevalent cases of 15 NTDs.
 
-          IHME measures the sum of the prevalence of 15 NTDs per 100,000 that are currently measured in the annual Global Burden of Disease study: human African trypanosomiasis, Chagas disease, cystic echinococcosis, cysticercosis, dengue, food-borne trematodiases, Guinea worm, soil-transmitted helminths (STH, comprising hookworm, trichuriasis, and ascariasis), leishmaniasis, leprosy, lymphatic filariasis, onchocerciasis, rabies, schistosomiasis, and trachoma. Since the 2020 Goalkeepers Report, changes in historical trends in this indicator reflect updates to the estimated prevalence of each NTD made for the GBD 2020 study. Specifically, changes in the summary NTD prevalence indicator between the 2020 Goalkeepers Report and these estimates largely reflect the addition of new data to STH models, especially in Latin America and South Asia.
-
-          In the 2021 Goalkeepers Report, IHME did not estimate a COVID-19 effect on this indicator, due to limited surveillance and control program data availability. Modeling studies and available data suggest that the COVID pandemic likely resulted in disruptions to NTD epidemiology, though these disruptions are likely to vary by disease and location and may be variably amenable to mitigation through increased control efforts. Although modeling studies can characterize potential disruptions under various scenarios, reliable data to quantify the true magnitude of pandemic effects on NTD epidemiology are sparse.
-
-          For this year’s report, IHME searched for published and gray literature quantifying the impact of the COVID-19 pandemic on NTD prevalence. Due to data gaps, lags in availability, and challenges in accounting for the likely disruptions to NTD surveillance during the pandemic, IHME found evidence to support adjustment for COVID-19 disruptions only for dengue. IHME adjusted dengue estimates in 2020 and 2021 using country-specific estimates of COVID disruptions from Chen et al. (2022), including updated estimates for 2021 graciously provided by the study authors via personal communication. For 2020, IHME adjusted only the proportion of cases occurring in April through December, reflecting the timing of the start of the pandemic; for 2021, IHME adjusted the full year. IHME excluded Brazil from the country-specific analysis due to data inconsistencies. For countries not estimated directly by this analysis, IHME applied regional or global disruption ratios. Projections to 2030 used an ensemble model, driven both by trends in the past as well as projections of SDI, which incorporated disruptions from the COVID-19 pandemic on income per capita and education.
+          IHME measures the sum of the prevalence of 15 NTDs per 100,000 that are currently measured in the annual Global Burden of Disease study: human African trypanosomiasis, Chagas disease, cystic echinococcosis, cysticercosis, dengue, food-borne trematodiases, Guinea worm, soil-transmitted helminths (STH, comprising hookworm, trichuriasis, and ascariasis), leishmaniasis, leprosy, lymphatic filariasis, onchocerciasis, rabies, schistosomiasis, and trachoma.
         unit: 'cases of 15 NTDs per 100,000 people'
       mean_estimate_met_need_for_family_planning_with_modern_contraception_methods_15_49_years_females_reference_estimate:
         title: Met need for family planning with modern contraception methods, 15-49 years females - Estimate
         description: |
           Proportion of women of reproductive age (15 to 49 years) who have their need for family planning met with modern contraception methods.
 
-          IHME estimates the proportion of women of reproductive age (15–49 years) who have their need for family planning satisfied with modern contraceptive methods. Modern contraceptive methods include the current use of male and female sterilization, male and female condoms, diaphragms, cervical caps, sponges, spermicidal agents, oral hormonal pills, patches, rings, implants, injections, intrauterine devices (IUDs), and emergency contraceptives. Projections to 2030 used an ensemble model, based both on past trends and using SDI as a key driver, which incorporates projections of income per capita and education and the effects of the COVID-19 pandemic.
-
-          Our analysis of PMA surveys and the smartphone-based follow-up survey referenced above does not show a consistent, significant reduction in contraception use due to the pandemic. As a result, IHME did not incorporate a short-term effect on the family planning indicator. Changes to the historical estimates can be attributed to methodological updates and the addition of new data sources, including the Generations and Gender Programme surveys. They switched from modeling the demand that is satisfied with modern methods directly for all women to modeling the three underlying components of the indicator separately for partnered and unpartnered women: any contraceptive use, proportion of use that is modern, and proportion of non-use that is unmet need. This modeling approach better aligns with data restrictions such as only surveying partnered (married or in-union) women and allows us to construct the full range of family planning indicators.
+          IHME estimates the proportion of women of reproductive age (15–49 years) who have their need for family planning satisfied with modern contraceptive methods. Modern contraceptive methods include the current use of male and female sterilization, male and female condoms, diaphragms, cervical caps, sponges, spermicidal agents, oral hormonal pills, patches, rings, implants, injections, intrauterine devices (IUDs), and emergency contraceptives.
         short_unit: '%'
         unit: '%'
       mean_estimate_coverage_of_essential_health_services__as_defined_by_the_uhc_service_coverage_index_all_ages_both_sexes_reference_estimate:
@@ -261,8 +207,6 @@ tables:
           IHME measures the age-standardized prevalence of any current use of smoked tobacco among those age 15 and older.
 
           IHME collates information from available representative surveys that include questions about self-reported current use of tobacco and information on the type of tobacco product smoked (including cigarettes, cigars, pipes, hookahs, and local products).
-
-          IHME converts all data to its standard definition of any current smoking within the last 30 days, so that meaningful comparisons can be made across locations and over time. Estimates this year are higher than last year to reflect the update in the indicator from daily smoking to any smoking within the last 30 days, to better align with the SDG definition. Projections to 2030 used SDI as a key driver, which incorporates projections of income per capita, education, and the effect of the COVID-19 pandemic.
         short_unit: '%'
         unit: '%'
       mean_estimate_prevalence_of_daily_smoking_age_standardized_females_reference_estimate:
@@ -273,8 +217,6 @@ tables:
           IHME measures the age-standardized prevalence of any current use of smoked tobacco among those age 15 and older.
 
           IHME collates information from available representative surveys that include questions about self-reported current use of tobacco and information on the type of tobacco product smoked (including cigarettes, cigars, pipes, hookahs, and local products).
-
-          IHME converts all data to its standard definition of any current smoking within the last 30 days, so that meaningful comparisons can be made across locations and over time. Estimates this year are higher than last year to reflect the update in the indicator from daily smoking to any smoking within the last 30 days, to better align with the SDG definition. Projections to 2030 used SDI as a key driver, which incorporates projections of income per capita, education, and the effect of the COVID-19 pandemic.
         short_unit: '%'
         unit: '%'
       mean_estimate_prevalence_of_daily_smoking_age_standardized_males_reference_estimate:
@@ -285,8 +227,6 @@ tables:
           IHME measures the age-standardized prevalence of any current use of smoked tobacco among those age 15 and older.
 
           IHME collates information from available representative surveys that include questions about self-reported current use of tobacco and information on the type of tobacco product smoked (including cigarettes, cigars, pipes, hookahs, and local products).
-
-          IHME converts all data to its standard definition of any current smoking within the last 30 days, so that meaningful comparisons can be made across locations and over time. Estimates this year are higher than last year to reflect the update in the indicator from daily smoking to any smoking within the last 30 days, to better align with the SDG definition. Projections to 2030 used SDI as a key driver, which incorporates projections of income per capita, education, and the effect of the COVID-19 pandemic.
         short_unit: '%'
         unit: '%'
       mean_estimate_coverage_of_dpt3_all_ages_both_sexes_reference_estimate:
@@ -319,8 +259,6 @@ tables:
           Prevalence of stunting among children under 5 years.
 
           IHME measures stunting prevalence as height-for-age more than two standard deviations below the reference median on the height-age growth curve, based on WHO 2006 growth standards for children of age 0–59 months.
-
-          Projections to 2030 were modeled using an ensemble approach to forecast the prevalence of stunting, using SDI as a key driver in order to capture the effects of the COVID-19 pandemic on income per capita and education. Estimates in Global Burden of Disease (GBD) 2020 leveraged several methodological advances including ensemble model predictions for severity-specific stunting prevalence and mean height-for-age z-scores (HAZ), further disaggregation of <5 age groups, and an improved distribution fitting model that focuses on HAZ scores of < -2 (i.e., under the range for stunting) rather than across the full range of HAZ scores. This led to improved estimates in a number of countries, notably including South Africa, the Democratic Republic of the Congo, India, and Pakistan. In addition, new data has improved estimates in a number of countries as well, including Pakistan.
         short_unit: '%'
         unit: '%'
       mean_estimate_prevalence_of_child_stunting_under_5_both_sexes_reference_projection:
@@ -329,8 +267,6 @@ tables:
           Prevalence of stunting among children under 5 years.
 
           IHME measures stunting prevalence as height-for-age more than two standard deviations below the reference median on the height-age growth curve, based on WHO 2006 growth standards for children of age 0–59 months.
-
-          Projections to 2030 were modeled using an ensemble approach to forecast the prevalence of stunting, using SDI as a key driver in order to capture the effects of the COVID-19 pandemic on income per capita and education. Estimates in Global Burden of Disease (GBD) 2020 leveraged several methodological advances including ensemble model predictions for severity-specific stunting prevalence and mean height-for-age z-scores (HAZ), further disaggregation of <5 age groups, and an improved distribution fitting model that focuses on HAZ scores of < -2 (i.e., under the range for stunting) rather than across the full range of HAZ scores. This led to improved estimates in a number of countries, notably including South Africa, the Democratic Republic of the Congo, India, and Pakistan. In addition, new data has improved estimates in a number of countries as well, including Pakistan.
         short_unit: '%'
         unit: '%'
       mean_estimate_prevalence_of_child_stunting_under_5_both_sexes_better_projection:
@@ -339,8 +275,6 @@ tables:
           Prevalence of stunting among children under 5 years.
 
           IHME measures stunting prevalence as height-for-age more than two standard deviations below the reference median on the height-age growth curve, based on WHO 2006 growth standards for children of age 0–59 months.
-
-          Projections to 2030 were modeled using an ensemble approach to forecast the prevalence of stunting, using SDI as a key driver in order to capture the effects of the COVID-19 pandemic on income per capita and education. Estimates in Global Burden of Disease (GBD) 2020 leveraged several methodological advances including ensemble model predictions for severity-specific stunting prevalence and mean height-for-age z-scores (HAZ), further disaggregation of <5 age groups, and an improved distribution fitting model that focuses on HAZ scores of < -2 (i.e., under the range for stunting) rather than across the full range of HAZ scores. This led to improved estimates in a number of countries, notably including South Africa, the Democratic Republic of the Congo, India, and Pakistan. In addition, new data has improved estimates in a number of countries as well, including Pakistan.
         short_unit: '%'
         unit: '%'
       mean_estimate_prevalence_of_child_stunting_under_5_females_worse_projection:
@@ -349,8 +283,6 @@ tables:
           Prevalence of stunting among children under 5 years.
 
           IHME measures stunting prevalence as height-for-age more than two standard deviations below the reference median on the height-age growth curve, based on WHO 2006 growth standards for children of age 0–59 months.
-
-          Projections to 2030 were modeled using an ensemble approach to forecast the prevalence of stunting, using SDI as a key driver in order to capture the effects of the COVID-19 pandemic on income per capita and education. Estimates in Global Burden of Disease (GBD) 2020 leveraged several methodological advances including ensemble model predictions for severity-specific stunting prevalence and mean height-for-age z-scores (HAZ), further disaggregation of <5 age groups, and an improved distribution fitting model that focuses on HAZ scores of < -2 (i.e., under the range for stunting) rather than across the full range of HAZ scores. This led to improved estimates in a number of countries, notably including South Africa, the Democratic Republic of the Congo, India, and Pakistan. In addition, new data has improved estimates in a number of countries as well, including Pakistan.
         short_unit: '%'
         unit: '%'
       mean_estimate_prevalence_of_child_stunting_under_5_females_reference_projection:
@@ -359,8 +291,6 @@ tables:
           Prevalence of stunting among children under 5 years.
 
           IHME measures stunting prevalence as height-for-age more than two standard deviations below the reference median on the height-age growth curve, based on WHO 2006 growth standards for children of age 0–59 months.
-
-          Projections to 2030 were modeled using an ensemble approach to forecast the prevalence of stunting, using SDI as a key driver in order to capture the effects of the COVID-19 pandemic on income per capita and education. Estimates in Global Burden of Disease (GBD) 2020 leveraged several methodological advances including ensemble model predictions for severity-specific stunting prevalence and mean height-for-age z-scores (HAZ), further disaggregation of <5 age groups, and an improved distribution fitting model that focuses on HAZ scores of < -2 (i.e., under the range for stunting) rather than across the full range of HAZ scores. This led to improved estimates in a number of countries, notably including South Africa, the Democratic Republic of the Congo, India, and Pakistan. In addition, new data has improved estimates in a number of countries as well, including Pakistan.
         short_unit: '%'
         unit: '%'
       mean_estimate_prevalence_of_child_stunting_under_5_females_better_projection:
@@ -369,8 +299,6 @@ tables:
           Prevalence of stunting among children under 5 years.
 
           IHME measures stunting prevalence as height-for-age more than two standard deviations below the reference median on the height-age growth curve, based on WHO 2006 growth standards for children of age 0–59 months.
-
-          Projections to 2030 were modeled using an ensemble approach to forecast the prevalence of stunting, using SDI as a key driver in order to capture the effects of the COVID-19 pandemic on income per capita and education. Estimates in Global Burden of Disease (GBD) 2020 leveraged several methodological advances including ensemble model predictions for severity-specific stunting prevalence and mean height-for-age z-scores (HAZ), further disaggregation of <5 age groups, and an improved distribution fitting model that focuses on HAZ scores of < -2 (i.e., under the range for stunting) rather than across the full range of HAZ scores. This led to improved estimates in a number of countries, notably including South Africa, the Democratic Republic of the Congo, India, and Pakistan. In addition, new data has improved estimates in a number of countries as well, including Pakistan.
         short_unit: '%'
         unit: '%'
       mean_estimate_prevalence_of_child_stunting_under_5_males_worse_projection:
@@ -379,8 +307,6 @@ tables:
           Prevalence of stunting among children under 5 years.
 
           IHME measures stunting prevalence as height-for-age more than two standard deviations below the reference median on the height-age growth curve, based on WHO 2006 growth standards for children of age 0–59 months.
-
-          Projections to 2030 were modeled using an ensemble approach to forecast the prevalence of stunting, using SDI as a key driver in order to capture the effects of the COVID-19 pandemic on income per capita and education. Estimates in Global Burden of Disease (GBD) 2020 leveraged several methodological advances including ensemble model predictions for severity-specific stunting prevalence and mean height-for-age z-scores (HAZ), further disaggregation of <5 age groups, and an improved distribution fitting model that focuses on HAZ scores of < -2 (i.e., under the range for stunting) rather than across the full range of HAZ scores. This led to improved estimates in a number of countries, notably including South Africa, the Democratic Republic of the Congo, India, and Pakistan. In addition, new data has improved estimates in a number of countries as well, including Pakistan.
         short_unit: '%'
         unit: '%'
       mean_estimate_prevalence_of_child_stunting_under_5_males_reference_projection:
@@ -389,8 +315,6 @@ tables:
           Prevalence of stunting among children under 5 years.
 
           IHME measures stunting prevalence as height-for-age more than two standard deviations below the reference median on the height-age growth curve, based on WHO 2006 growth standards for children of age 0–59 months.
-
-          Projections to 2030 were modeled using an ensemble approach to forecast the prevalence of stunting, using SDI as a key driver in order to capture the effects of the COVID-19 pandemic on income per capita and education. Estimates in Global Burden of Disease (GBD) 2020 leveraged several methodological advances including ensemble model predictions for severity-specific stunting prevalence and mean height-for-age z-scores (HAZ), further disaggregation of <5 age groups, and an improved distribution fitting model that focuses on HAZ scores of < -2 (i.e., under the range for stunting) rather than across the full range of HAZ scores. This led to improved estimates in a number of countries, notably including South Africa, the Democratic Republic of the Congo, India, and Pakistan. In addition, new data has improved estimates in a number of countries as well, including Pakistan.
         short_unit: '%'
         unit: '%'
       mean_estimate_prevalence_of_child_stunting_under_5_males_better_projection:
@@ -399,8 +323,6 @@ tables:
           Prevalence of stunting among children under 5 years.
 
           IHME measures stunting prevalence as height-for-age more than two standard deviations below the reference median on the height-age growth curve, based on WHO 2006 growth standards for children of age 0–59 months.
-
-          Projections to 2030 were modeled using an ensemble approach to forecast the prevalence of stunting, using SDI as a key driver in order to capture the effects of the COVID-19 pandemic on income per capita and education. Estimates in Global Burden of Disease (GBD) 2020 leveraged several methodological advances including ensemble model predictions for severity-specific stunting prevalence and mean height-for-age z-scores (HAZ), further disaggregation of <5 age groups, and an improved distribution fitting model that focuses on HAZ scores of < -2 (i.e., under the range for stunting) rather than across the full range of HAZ scores. This led to improved estimates in a number of countries, notably including South Africa, the Democratic Republic of the Congo, India, and Pakistan. In addition, new data has improved estimates in a number of countries as well, including Pakistan.
         short_unit: '%'
         unit: '%'
       mean_estimate_maternal_mortality_ratio__who__15_49_years_females_worse_projection:
@@ -409,8 +331,6 @@ tables:
           Maternal mortality ratio (maternal deaths among women aged 15-49 years per 100,000 live births) without late cause deaths.
 
           It depicts the risk of maternal death relative to the number of live births and essentially captures the risk of death in a single pregnancy or a single live birth.
-
-          Projections to 2030 were modeled using an ensemble approach to forecast MMR, using SDI as a key driver in order to capture the effects of the COVID-19 pandemic on income per capita and education. Our analysis of direct and indirect maternal mortality in selected countries showed no significant relationship between direct mortality and indicators of the COVID-19 pandemic (i.e., COVID-19 infection incidence rate, COVID-19 mortality rate, changes in mobility). However, there was a significant effect of the COVID-19 pandemic on indirect maternal mortality. This effect on indirect maternal mortality was modeled using COVID-19 mortality rate as a covariate. This year, our estimates of excess indirect maternal mortality also include a correction for the proportion of deaths that are considered incidental, or unrelated to pregnancy status. Currently available data does not suggest a consistent relationship between the pandemic and indicators of maternal care (antenatal care, skilled birth attendance), and IHME has not incorporated an effect of the pandemic on these indicators.
         unit: 'per 100,000 live births'
       mean_estimate_maternal_mortality_ratio__who__15_49_years_females_reference_projection:
         title: Maternal mortality ratio - Reference Projection
@@ -418,8 +338,6 @@ tables:
           Maternal mortality ratio (maternal deaths among women aged 15-49 years per 100,000 live births) without late cause deaths.
 
           It depicts the risk of maternal death relative to the number of live births and essentially captures the risk of death in a single pregnancy or a single live birth.
-
-          Projections to 2030 were modeled using an ensemble approach to forecast MMR, using SDI as a key driver in order to capture the effects of the COVID-19 pandemic on income per capita and education. Our analysis of direct and indirect maternal mortality in selected countries showed no significant relationship between direct mortality and indicators of the COVID-19 pandemic (i.e., COVID-19 infection incidence rate, COVID-19 mortality rate, changes in mobility). However, there was a significant effect of the COVID-19 pandemic on indirect maternal mortality. This effect on indirect maternal mortality was modeled using COVID-19 mortality rate as a covariate. This year, our estimates of excess indirect maternal mortality also include a correction for the proportion of deaths that are considered incidental, or unrelated to pregnancy status. Currently available data does not suggest a consistent relationship between the pandemic and indicators of maternal care (antenatal care, skilled birth attendance), and IHME has not incorporated an effect of the pandemic on these indicators.
         unit: 'per 100,000 live births'
       mean_estimate_maternal_mortality_ratio__who__15_49_years_females_better_projection:
         title: Maternal mortality ratio - Better Projection
@@ -427,8 +345,6 @@ tables:
           Maternal mortality ratio (maternal deaths among women aged 15-49 years per 100,000 live births) without late cause deaths.
 
           It depicts the risk of maternal death relative to the number of live births and essentially captures the risk of death in a single pregnancy or a single live birth.
-
-          Projections to 2030 were modeled using an ensemble approach to forecast MMR, using SDI as a key driver in order to capture the effects of the COVID-19 pandemic on income per capita and education. Our analysis of direct and indirect maternal mortality in selected countries showed no significant relationship between direct mortality and indicators of the COVID-19 pandemic (i.e., COVID-19 infection incidence rate, COVID-19 mortality rate, changes in mobility). However, there was a significant effect of the COVID-19 pandemic on indirect maternal mortality. This effect on indirect maternal mortality was modeled using COVID-19 mortality rate as a covariate. This year, our estimates of excess indirect maternal mortality also include a correction for the proportion of deaths that are considered incidental, or unrelated to pregnancy status. Currently available data does not suggest a consistent relationship between the pandemic and indicators of maternal care (antenatal care, skilled birth attendance), and IHME has not incorporated an effect of the pandemic on these indicators.
         unit: 'per 100,000 live births'
       mean_estimate_under_5_mortality_rate_under_5_both_sexes_worse_projection:
         title: Under-5 mortality rate - Both Sexes - Worse Projection
@@ -436,8 +352,6 @@ tables:
           Under-5 mortality rate (probability of dying before the age of 5 years per 1,000 live births).
 
           IHME defines the under-5 mortality rate (U5MR) as the probability of death between birth and age 5. It is expressed as number of deaths per 1,000 live births.
-
-          Projections were based on a combination of key drivers, including GBD risk factors, selected interventions (e.g., vaccines), and SDI. Additional short-term disruptions (2020–2021) from the COVID-19 pandemic incorporated the reductions seen in child deaths from infectious diseases (flu, respiratory syncytial virus, measles, pertussis) observed during the pandemic, driven primarily by social distancing and mask use, as well as increases in child deaths due directly to COVID-19. Most of the changes in U5MR estimates in the current Goalkeepers Report results came from new and additional input mortality data that IHME has incorporated since the GBD 2019 study, including estimates of excess mortality observed during the COVID-19 pandemic.
         unit: 'per 1,000 live births'
       mean_estimate_under_5_mortality_rate_under_5_both_sexes_reference_projection:
         title: Under-5 mortality rate - Both Sexes - Reference Projection
@@ -445,8 +359,6 @@ tables:
           Under-5 mortality rate (probability of dying before the age of 5 years per 1,000 live births).
 
           IHME defines the under-5 mortality rate (U5MR) as the probability of death between birth and age 5. It is expressed as number of deaths per 1,000 live births.
-
-          Projections were based on a combination of key drivers, including GBD risk factors, selected interventions (e.g., vaccines), and SDI. Additional short-term disruptions (2020–2021) from the COVID-19 pandemic incorporated the reductions seen in child deaths from infectious diseases (flu, respiratory syncytial virus, measles, pertussis) observed during the pandemic, driven primarily by social distancing and mask use, as well as increases in child deaths due directly to COVID-19. Most of the changes in U5MR estimates in the current Goalkeepers Report results came from new and additional input mortality data that IHME has incorporated since the GBD 2019 study, including estimates of excess mortality observed during the COVID-19 pandemic.
         unit: 'per 1,000 live births'
       mean_estimate_under_5_mortality_rate_under_5_both_sexes_better_projection:
         title: Under-5 mortality rate - Both Sexes - Better Projection
@@ -454,8 +366,6 @@ tables:
           Under-5 mortality rate (probability of dying before the age of 5 years per 1,000 live births).
 
           IHME defines the under-5 mortality rate (U5MR) as the probability of death between birth and age 5. It is expressed as number of deaths per 1,000 live births.
-
-          Projections were based on a combination of key drivers, including GBD risk factors, selected interventions (e.g., vaccines), and SDI. Additional short-term disruptions (2020–2021) from the COVID-19 pandemic incorporated the reductions seen in child deaths from infectious diseases (flu, respiratory syncytial virus, measles, pertussis) observed during the pandemic, driven primarily by social distancing and mask use, as well as increases in child deaths due directly to COVID-19. Most of the changes in U5MR estimates in the current Goalkeepers Report results came from new and additional input mortality data that IHME has incorporated since the GBD 2019 study, including estimates of excess mortality observed during the COVID-19 pandemic.
         unit: 'per 1,000 live births'
       mean_estimate_under_5_mortality_rate_under_5_females_worse_projection:
         title: Under-5 mortality rate - Female - Worse Projection
@@ -463,8 +373,6 @@ tables:
           Under-5 mortality rate (probability of dying before the age of 5 years per 1,000 live births).
 
           IHME defines the under-5 mortality rate (U5MR) as the probability of death between birth and age 5. It is expressed as number of deaths per 1,000 live births.
-
-          Projections were based on a combination of key drivers, including GBD risk factors, selected interventions (e.g., vaccines), and SDI. Additional short-term disruptions (2020–2021) from the COVID-19 pandemic incorporated the reductions seen in child deaths from infectious diseases (flu, respiratory syncytial virus, measles, pertussis) observed during the pandemic, driven primarily by social distancing and mask use, as well as increases in child deaths due directly to COVID-19. Most of the changes in U5MR estimates in the current Goalkeepers Report results came from new and additional input mortality data that IHME has incorporated since the GBD 2019 study, including estimates of excess mortality observed during the COVID-19 pandemic.
         unit: 'per 1,000 live births'
       mean_estimate_under_5_mortality_rate_under_5_females_reference_projection:
         title: Under-5 mortality rate - Female - Reference Projection
@@ -472,8 +380,6 @@ tables:
           Under-5 mortality rate (probability of dying before the age of 5 years per 1,000 live births).
 
           IHME defines the under-5 mortality rate (U5MR) as the probability of death between birth and age 5. It is expressed as number of deaths per 1,000 live births.
-
-          Projections were based on a combination of key drivers, including GBD risk factors, selected interventions (e.g., vaccines), and SDI. Additional short-term disruptions (2020–2021) from the COVID-19 pandemic incorporated the reductions seen in child deaths from infectious diseases (flu, respiratory syncytial virus, measles, pertussis) observed during the pandemic, driven primarily by social distancing and mask use, as well as increases in child deaths due directly to COVID-19. Most of the changes in U5MR estimates in the current Goalkeepers Report results came from new and additional input mortality data that IHME has incorporated since the GBD 2019 study, including estimates of excess mortality observed during the COVID-19 pandemic.
         unit: 'per 1,000 live births'
       mean_estimate_under_5_mortality_rate_under_5_females_better_projection:
         title: Under-5 mortality rate - Female - Better Projection
@@ -481,8 +387,6 @@ tables:
           Under-5 mortality rate (probability of dying before the age of 5 years per 1,000 live births).
 
           IHME defines the under-5 mortality rate (U5MR) as the probability of death between birth and age 5. It is expressed as number of deaths per 1,000 live births.
-
-          Projections were based on a combination of key drivers, including GBD risk factors, selected interventions (e.g., vaccines), and SDI. Additional short-term disruptions (2020–2021) from the COVID-19 pandemic incorporated the reductions seen in child deaths from infectious diseases (flu, respiratory syncytial virus, measles, pertussis) observed during the pandemic, driven primarily by social distancing and mask use, as well as increases in child deaths due directly to COVID-19. Most of the changes in U5MR estimates in the current Goalkeepers Report results came from new and additional input mortality data that IHME has incorporated since the GBD 2019 study, including estimates of excess mortality observed during the COVID-19 pandemic.
         unit: 'per 1,000 live births'
       mean_estimate_under_5_mortality_rate_under_5_males_worse_projection:
         title: Under-5 mortality rate - Male - Worse Projection
@@ -490,8 +394,6 @@ tables:
           Under-5 mortality rate (probability of dying before the age of 5 years per 1,000 live births).
 
           IHME defines the under-5 mortality rate (U5MR) as the probability of death between birth and age 5. It is expressed as number of deaths per 1,000 live births.
-
-          Projections were based on a combination of key drivers, including GBD risk factors, selected interventions (e.g., vaccines), and SDI. Additional short-term disruptions (2020–2021) from the COVID-19 pandemic incorporated the reductions seen in child deaths from infectious diseases (flu, respiratory syncytial virus, measles, pertussis) observed during the pandemic, driven primarily by social distancing and mask use, as well as increases in child deaths due directly to COVID-19. Most of the changes in U5MR estimates in the current Goalkeepers Report results came from new and additional input mortality data that IHME has incorporated since the GBD 2019 study, including estimates of excess mortality observed during the COVID-19 pandemic.
         unit: 'per 1,000 live births'
       mean_estimate_under_5_mortality_rate_under_5_males_reference_projection:
         title: Under-5 mortality rate - Male - Reference Projection
@@ -499,8 +401,6 @@ tables:
           Under-5 mortality rate (probability of dying before the age of 5 years per 1,000 live births).
 
           IHME defines the under-5 mortality rate (U5MR) as the probability of death between birth and age 5. It is expressed as number of deaths per 1,000 live births.
-
-          Projections were based on a combination of key drivers, including GBD risk factors, selected interventions (e.g., vaccines), and SDI. Additional short-term disruptions (2020–2021) from the COVID-19 pandemic incorporated the reductions seen in child deaths from infectious diseases (flu, respiratory syncytial virus, measles, pertussis) observed during the pandemic, driven primarily by social distancing and mask use, as well as increases in child deaths due directly to COVID-19. Most of the changes in U5MR estimates in the current Goalkeepers Report results came from new and additional input mortality data that IHME has incorporated since the GBD 2019 study, including estimates of excess mortality observed during the COVID-19 pandemic.
         unit: 'per 1,000 live births'
       mean_estimate_under_5_mortality_rate_under_5_males_better_projection:
         title: Under-5 mortality rate - Male - Better Projection
@@ -508,8 +408,6 @@ tables:
           Under-5 mortality rate (probability of dying before the age of 5 years per 1,000 live births).
 
           IHME defines the under-5 mortality rate (U5MR) as the probability of death between birth and age 5. It is expressed as number of deaths per 1,000 live births.
-
-          Projections were based on a combination of key drivers, including GBD risk factors, selected interventions (e.g., vaccines), and SDI. Additional short-term disruptions (2020–2021) from the COVID-19 pandemic incorporated the reductions seen in child deaths from infectious diseases (flu, respiratory syncytial virus, measles, pertussis) observed during the pandemic, driven primarily by social distancing and mask use, as well as increases in child deaths due directly to COVID-19. Most of the changes in U5MR estimates in the current Goalkeepers Report results came from new and additional input mortality data that IHME has incorporated since the GBD 2019 study, including estimates of excess mortality observed during the COVID-19 pandemic.
         unit: 'per 1,000 live births'
       mean_estimate_neonatal_mortality_rate_neonatal_both_sexes_worse_projection:
         title: Neonatal mortality rate - Both Sexes - Worse Projection
@@ -517,8 +415,6 @@ tables:
           Neonatal mortality rate (probability of dying during the first 28 days of life per 1,000 live births).
 
           IHME defines the neonatal mortality rate as the probability of death in the first 28 completed days of life. It is expressed as the number of deaths per 1,000 live births.
-
-          Projections were based on a combination of key drivers, including GBD risk factors, selected interventions (e.g., vaccines), and SDI. Most of the changes in neonatal mortality estimates in this year’s Goalkeepers Report are the result of new data, including estimates of excess mortality observed during the COVID-19 pandemic.
         unit: 'per 1,000 live births'
       mean_estimate_neonatal_mortality_rate_neonatal_both_sexes_reference_projection:
         title: Neonatal mortality rate - Both Sexes - Reference Projection
@@ -526,8 +422,6 @@ tables:
           Neonatal mortality rate (probability of dying during the first 28 days of life per 1,000 live births).
 
           IHME defines the neonatal mortality rate as the probability of death in the first 28 completed days of life. It is expressed as the number of deaths per 1,000 live births.
-
-          Projections were based on a combination of key drivers, including GBD risk factors, selected interventions (e.g., vaccines), and SDI. Most of the changes in neonatal mortality estimates in this year’s Goalkeepers Report are the result of new data, including estimates of excess mortality observed during the COVID-19 pandemic.
         unit: 'per 1,000 live births'
       mean_estimate_neonatal_mortality_rate_neonatal_both_sexes_better_projection:
         title: Neonatal mortality rate - Both Sexes - Better Projection
@@ -535,8 +429,6 @@ tables:
           Neonatal mortality rate (probability of dying during the first 28 days of life per 1,000 live births).
 
           IHME defines the neonatal mortality rate as the probability of death in the first 28 completed days of life. It is expressed as the number of deaths per 1,000 live births.
-
-          Projections were based on a combination of key drivers, including GBD risk factors, selected interventions (e.g., vaccines), and SDI. Most of the changes in neonatal mortality estimates in this year’s Goalkeepers Report are the result of new data, including estimates of excess mortality observed during the COVID-19 pandemic.
         unit: 'per 1,000 live births'
       mean_estimate_neonatal_mortality_rate_neonatal_females_worse_projection:
         title: Neonatal mortality rate - Female - Worse Projection
@@ -544,8 +436,6 @@ tables:
           Neonatal mortality rate (probability of dying during the first 28 days of life per 1,000 live births).
 
           IHME defines the neonatal mortality rate as the probability of death in the first 28 completed days of life. It is expressed as the number of deaths per 1,000 live births.
-
-          Projections were based on a combination of key drivers, including GBD risk factors, selected interventions (e.g., vaccines), and SDI. Most of the changes in neonatal mortality estimates in this year’s Goalkeepers Report are the result of new data, including estimates of excess mortality observed during the COVID-19 pandemic.
         unit: 'per 1,000 live births'
       mean_estimate_neonatal_mortality_rate_neonatal_females_reference_projection:
         title: Neonatal mortality rate - Female - Reference Projection
@@ -553,8 +443,6 @@ tables:
           Neonatal mortality rate (probability of dying during the first 28 days of life per 1,000 live births).
 
           IHME defines the neonatal mortality rate as the probability of death in the first 28 completed days of life. It is expressed as the number of deaths per 1,000 live births.
-
-          Projections were based on a combination of key drivers, including GBD risk factors, selected interventions (e.g., vaccines), and SDI. Most of the changes in neonatal mortality estimates in this year’s Goalkeepers Report are the result of new data, including estimates of excess mortality observed during the COVID-19 pandemic.
         unit: 'per 1,000 live births'
       mean_estimate_neonatal_mortality_rate_neonatal_females_better_projection:
         title: Neonatal mortality rate - Female - Better Projection
@@ -562,8 +450,6 @@ tables:
           Neonatal mortality rate (probability of dying during the first 28 days of life per 1,000 live births).
 
           IHME defines the neonatal mortality rate as the probability of death in the first 28 completed days of life. It is expressed as the number of deaths per 1,000 live births.
-
-          Projections were based on a combination of key drivers, including GBD risk factors, selected interventions (e.g., vaccines), and SDI. Most of the changes in neonatal mortality estimates in this year’s Goalkeepers Report are the result of new data, including estimates of excess mortality observed during the COVID-19 pandemic.
         unit: 'per 1,000 live births'
       mean_estimate_neonatal_mortality_rate_neonatal_males_worse_projection:
         title: Neonatal mortality rate - Male - Worse Projection
@@ -571,8 +457,6 @@ tables:
           Neonatal mortality rate (probability of dying during the first 28 days of life per 1,000 live births).
 
           IHME defines the neonatal mortality rate as the probability of death in the first 28 completed days of life. It is expressed as the number of deaths per 1,000 live births.
-
-          Projections were based on a combination of key drivers, including GBD risk factors, selected interventions (e.g., vaccines), and SDI. Most of the changes in neonatal mortality estimates in this year’s Goalkeepers Report are the result of new data, including estimates of excess mortality observed during the COVID-19 pandemic.
         unit: 'per 1,000 live births'
       mean_estimate_neonatal_mortality_rate_neonatal_males_reference_projection:
         title: Neonatal mortality rate - Male - Reference Projection
@@ -580,8 +464,6 @@ tables:
           Neonatal mortality rate (probability of dying during the first 28 days of life per 1,000 live births).
 
           IHME defines the neonatal mortality rate as the probability of death in the first 28 completed days of life. It is expressed as the number of deaths per 1,000 live births.
-
-          Projections were based on a combination of key drivers, including GBD risk factors, selected interventions (e.g., vaccines), and SDI. Most of the changes in neonatal mortality estimates in this year’s Goalkeepers Report are the result of new data, including estimates of excess mortality observed during the COVID-19 pandemic.
         unit: 'per 1,000 live births'
       mean_estimate_neonatal_mortality_rate_neonatal_males_better_projection:
         title: Neonatal mortality rate - Male - Better Projection
@@ -589,8 +471,6 @@ tables:
           Neonatal mortality rate (probability of dying during the first 28 days of life per 1,000 live births).
 
           IHME defines the neonatal mortality rate as the probability of death in the first 28 completed days of life. It is expressed as the number of deaths per 1,000 live births.
-
-          Projections were based on a combination of key drivers, including GBD risk factors, selected interventions (e.g., vaccines), and SDI. Most of the changes in neonatal mortality estimates in this year’s Goalkeepers Report are the result of new data, including estimates of excess mortality observed during the COVID-19 pandemic.
         unit: 'per 1,000 live births'
       mean_estimate_hiv_incidence_rate_all_ages_both_sexes_worse_projection:
         title: HIV incidence rate - Both Sexes - Worse Projection
@@ -598,10 +478,6 @@ tables:
           Age-standardized rate of new HIV infections (per 1,000).
 
           IHME estimates the HIV rate as new HIV infections per 1,000 population.
-
-          Forecasts of HIV incidence were based on forecasted ART, prevention of maternal-to-child transmission (PMTCT) coverage, and incidence as inputs into a modified version of Avenir Health’s Spectrum software. Adult ART is forecasted using the expected spending on HIV curative care—which in turn was forecasted based on income per capita, including the effect of the COVID-19 pandemic—and ART prices.
-
-          GBD estimates incorporated methodological changes to cause of death data for HIV as well as the adjustment of incidence estimates, to be consistent with vital registration data.
         unit: 'per 1,000 people'
       mean_estimate_hiv_incidence_rate_all_ages_both_sexes_reference_projection:
         title: HIV incidence rate - Both Sexes - Reference Projection
@@ -609,10 +485,6 @@ tables:
           Age-standardized rate of new HIV infections (per 1,000).
 
           IHME estimates the HIV rate as new HIV infections per 1,000 population.
-
-          Forecasts of HIV incidence were based on forecasted ART, prevention of maternal-to-child transmission (PMTCT) coverage, and incidence as inputs into a modified version of Avenir Health’s Spectrum software. Adult ART is forecasted using the expected spending on HIV curative care—which in turn was forecasted based on income per capita, including the effect of the COVID-19 pandemic—and ART prices.
-
-          GBD estimates incorporated methodological changes to cause of death data for HIV as well as the adjustment of incidence estimates, to be consistent with vital registration data.
         unit: 'per 1,000 people'
       mean_estimate_hiv_incidence_rate_all_ages_both_sexes_better_projection:
         title: HIV incidence rate - Both Sexes - Better Projection
@@ -620,10 +492,6 @@ tables:
           Age-standardized rate of new HIV infections (per 1,000).
 
           IHME estimates the HIV rate as new HIV infections per 1,000 population.
-
-          Forecasts of HIV incidence were based on forecasted ART, prevention of maternal-to-child transmission (PMTCT) coverage, and incidence as inputs into a modified version of Avenir Health’s Spectrum software. Adult ART is forecasted using the expected spending on HIV curative care—which in turn was forecasted based on income per capita, including the effect of the COVID-19 pandemic—and ART prices.
-
-          GBD estimates incorporated methodological changes to cause of death data for HIV as well as the adjustment of incidence estimates, to be consistent with vital registration data.
         unit: 'per 1,000 people'
       mean_estimate_hiv_incidence_rate_all_ages_females_worse_projection:
         title: HIV incidence rate - Female - Worse Projection
@@ -631,10 +499,6 @@ tables:
           Age-standardized rate of new HIV infections (per 1,000).
 
           IHME estimates the HIV rate as new HIV infections per 1,000 population.
-
-          Forecasts of HIV incidence were based on forecasted ART, prevention of maternal-to-child transmission (PMTCT) coverage, and incidence as inputs into a modified version of Avenir Health’s Spectrum software. Adult ART is forecasted using the expected spending on HIV curative care—which in turn was forecasted based on income per capita, including the effect of the COVID-19 pandemic—and ART prices.
-
-          GBD estimates incorporated methodological changes to cause of death data for HIV as well as the adjustment of incidence estimates, to be consistent with vital registration data.
         unit: 'per 1,000 people'
       mean_estimate_hiv_incidence_rate_all_ages_females_reference_projection:
         title: HIV incidence rate - Female - Reference Projection
@@ -642,10 +506,6 @@ tables:
           Age-standardized rate of new HIV infections (per 1,000).
 
           IHME estimates the HIV rate as new HIV infections per 1,000 population.
-
-          Forecasts of HIV incidence were based on forecasted ART, prevention of maternal-to-child transmission (PMTCT) coverage, and incidence as inputs into a modified version of Avenir Health’s Spectrum software. Adult ART is forecasted using the expected spending on HIV curative care—which in turn was forecasted based on income per capita, including the effect of the COVID-19 pandemic—and ART prices.
-
-          GBD estimates incorporated methodological changes to cause of death data for HIV as well as the adjustment of incidence estimates, to be consistent with vital registration data.
         unit: 'per 1,000 people'
       mean_estimate_hiv_incidence_rate_all_ages_females_better_projection:
         title: HIV incidence rate - Female - Better Projection
@@ -653,10 +513,6 @@ tables:
           Age-standardized rate of new HIV infections (per 1,000).
 
           IHME estimates the HIV rate as new HIV infections per 1,000 population.
-
-          Forecasts of HIV incidence were based on forecasted ART, prevention of maternal-to-child transmission (PMTCT) coverage, and incidence as inputs into a modified version of Avenir Health’s Spectrum software. Adult ART is forecasted using the expected spending on HIV curative care—which in turn was forecasted based on income per capita, including the effect of the COVID-19 pandemic—and ART prices.
-
-          GBD estimates incorporated methodological changes to cause of death data for HIV as well as the adjustment of incidence estimates, to be consistent with vital registration data.
         unit: 'per 1,000 people'
       mean_estimate_hiv_incidence_rate_all_ages_males_worse_projection:
         title: HIV incidence rate - Male - Worse Projection
@@ -664,10 +520,6 @@ tables:
           Age-standardized rate of new HIV infections (per 1,000).
 
           IHME estimates the HIV rate as new HIV infections per 1,000 population.
-
-          Forecasts of HIV incidence were based on forecasted ART, prevention of maternal-to-child transmission (PMTCT) coverage, and incidence as inputs into a modified version of Avenir Health’s Spectrum software. Adult ART is forecasted using the expected spending on HIV curative care—which in turn was forecasted based on income per capita, including the effect of the COVID-19 pandemic—and ART prices.
-
-          GBD estimates incorporated methodological changes to cause of death data for HIV as well as the adjustment of incidence estimates, to be consistent with vital registration data.
         unit: 'per 1,000 people'
       mean_estimate_hiv_incidence_rate_all_ages_males_reference_projection:
         title: HIV incidence rate - Male - Reference Projection
@@ -675,10 +527,6 @@ tables:
           Age-standardized rate of new HIV infections (per 1,000).
 
           IHME estimates the HIV rate as new HIV infections per 1,000 population.
-
-          Forecasts of HIV incidence were based on forecasted ART, prevention of maternal-to-child transmission (PMTCT) coverage, and incidence as inputs into a modified version of Avenir Health’s Spectrum software. Adult ART is forecasted using the expected spending on HIV curative care—which in turn was forecasted based on income per capita, including the effect of the COVID-19 pandemic—and ART prices.
-
-          GBD estimates incorporated methodological changes to cause of death data for HIV as well as the adjustment of incidence estimates, to be consistent with vital registration data.
         unit: 'per 1,000 people'
       mean_estimate_hiv_incidence_rate_all_ages_males_better_projection:
         title: HIV incidence rate - Male - Better Projection
@@ -686,145 +534,111 @@ tables:
           Age-standardized rate of new HIV infections (per 1,000).
 
           IHME estimates the HIV rate as new HIV infections per 1,000 population.
-
-          Forecasts of HIV incidence were based on forecasted ART, prevention of maternal-to-child transmission (PMTCT) coverage, and incidence as inputs into a modified version of Avenir Health’s Spectrum software. Adult ART is forecasted using the expected spending on HIV curative care—which in turn was forecasted based on income per capita, including the effect of the COVID-19 pandemic—and ART prices.
-
-          GBD estimates incorporated methodological changes to cause of death data for HIV as well as the adjustment of incidence estimates, to be consistent with vital registration data.
         unit: 'per 1,000 people'
       mean_estimate_tuberculosis_incidence_rate_all_ages_both_sexes_worse_projection:
         title: Tuberculosis incidence rate - Both Sexes - Worse Projection
         description: |
           Age-standardized rate of tuberculosis cases (per 100,000).
 
-          IHME estimates new and relapse tuberculosis (TB) cases diagnosed within a given calendar year (incidence) using data from prevalence surveys, case notifications, and cause-specific mortality estimates as inputs to a statistical model that enforces internal consistency among the estimates. GBD estimates in this round incorporate methodological improvements in using case notification data.
-
-          IHME evaluated the literature on COVID-19 disruptions to TB incidence and identified three types of studies: studies reporting raw data on diagnosis and treatment in 2020, studies reporting on service disruption from new surveys, and studies reporting on models of TB impacts using notification data or theoretical COVID scenarios. Due to the lack of counterfactual data in pre-pandemic time periods and modeling assumptions used in the current studies, IHME could not estimate an additional disruption in TB incidence due to COVID-19. IHME will continue to evaluate and analyze as more data is released. In addition to historical trends, projections to 2030 were modeled using an ensemble approach to forecast the incidence of TB, using SDI as a key driver in order to capture the effects of the COVID-19 pandemic on income per capita and education
+          IHME estimates new and relapse tuberculosis (TB) cases diagnosed within a given calendar year (incidence) using data from prevalence surveys, case notifications, and cause-specific mortality estimates as inputs to a statistical model that enforces internal consistency among the estimates.
         unit: 'new cases per 100,000 people'
       mean_estimate_tuberculosis_incidence_rate_all_ages_both_sexes_reference_projection:
         title: Tuberculosis incidence rate - Both Sexes - Reference Projection
         description: |
           Age-standardized rate of tuberculosis cases (per 100,000).
 
-          IHME estimates new and relapse tuberculosis (TB) cases diagnosed within a given calendar year (incidence) using data from prevalence surveys, case notifications, and cause-specific mortality estimates as inputs to a statistical model that enforces internal consistency among the estimates. GBD estimates in this round incorporate methodological improvements in using case notification data.
-
-          IHME evaluated the literature on COVID-19 disruptions to TB incidence and identified three types of studies: studies reporting raw data on diagnosis and treatment in 2020, studies reporting on service disruption from new surveys, and studies reporting on models of TB impacts using notification data or theoretical COVID scenarios. Due to the lack of counterfactual data in pre-pandemic time periods and modeling assumptions used in the current studies, IHME could not estimate an additional disruption in TB incidence due to COVID-19. IHME will continue to evaluate and analyze as more data is released. In addition to historical trends, projections to 2030 were modeled using an ensemble approach to forecast the incidence of TB, using SDI as a key driver in order to capture the effects of the COVID-19 pandemic on income per capita and education
+          IHME estimates new and relapse tuberculosis (TB) cases diagnosed within a given calendar year (incidence) using data from prevalence surveys, case notifications, and cause-specific mortality estimates as inputs to a statistical model that enforces internal consistency among the estimates.
         unit: 'new cases per 100,000 people'
       mean_estimate_tuberculosis_incidence_rate_all_ages_both_sexes_better_projection:
         title: Tuberculosis incidence rate - Both Sexes - Better Projection
         description: |
           Age-standardized rate of tuberculosis cases (per 100,000).
 
-          IHME estimates new and relapse tuberculosis (TB) cases diagnosed within a given calendar year (incidence) using data from prevalence surveys, case notifications, and cause-specific mortality estimates as inputs to a statistical model that enforces internal consistency among the estimates. GBD estimates in this round incorporate methodological improvements in using case notification data.
-
-          IHME evaluated the literature on COVID-19 disruptions to TB incidence and identified three types of studies: studies reporting raw data on diagnosis and treatment in 2020, studies reporting on service disruption from new surveys, and studies reporting on models of TB impacts using notification data or theoretical COVID scenarios. Due to the lack of counterfactual data in pre-pandemic time periods and modeling assumptions used in the current studies, IHME could not estimate an additional disruption in TB incidence due to COVID-19. IHME will continue to evaluate and analyze as more data is released. In addition to historical trends, projections to 2030 were modeled using an ensemble approach to forecast the incidence of TB, using SDI as a key driver in order to capture the effects of the COVID-19 pandemic on income per capita and education
+          IHME estimates new and relapse tuberculosis (TB) cases diagnosed within a given calendar year (incidence) using data from prevalence surveys, case notifications, and cause-specific mortality estimates as inputs to a statistical model that enforces internal consistency among the estimates.
         unit: 'new cases per 100,000 people'
       mean_estimate_tuberculosis_incidence_rate_all_ages_females_worse_projection:
         title: Tuberculosis incidence rate - Female - Worse Projection
         description: |
           Age-standardized rate of tuberculosis cases (per 100,000).
 
-          IHME estimates new and relapse tuberculosis (TB) cases diagnosed within a given calendar year (incidence) using data from prevalence surveys, case notifications, and cause-specific mortality estimates as inputs to a statistical model that enforces internal consistency among the estimates. GBD estimates in this round incorporate methodological improvements in using case notification data.
-
-          IHME evaluated the literature on COVID-19 disruptions to TB incidence and identified three types of studies: studies reporting raw data on diagnosis and treatment in 2020, studies reporting on service disruption from new surveys, and studies reporting on models of TB impacts using notification data or theoretical COVID scenarios. Due to the lack of counterfactual data in pre-pandemic time periods and modeling assumptions used in the current studies, IHME could not estimate an additional disruption in TB incidence due to COVID-19. IHME will continue to evaluate and analyze as more data is released. In addition to historical trends, projections to 2030 were modeled using an ensemble approach to forecast the incidence of TB, using SDI as a key driver in order to capture the effects of the COVID-19 pandemic on income per capita and education
+          IHME estimates new and relapse tuberculosis (TB) cases diagnosed within a given calendar year (incidence) using data from prevalence surveys, case notifications, and cause-specific mortality estimates as inputs to a statistical model that enforces internal consistency among the estimates.
         unit: 'new cases per 100,000 people'
       mean_estimate_tuberculosis_incidence_rate_all_ages_females_reference_projection:
         title: Tuberculosis incidence rate - Female - Reference Projection
         description: |
           Age-standardized rate of tuberculosis cases (per 100,000).
 
-          IHME estimates new and relapse tuberculosis (TB) cases diagnosed within a given calendar year (incidence) using data from prevalence surveys, case notifications, and cause-specific mortality estimates as inputs to a statistical model that enforces internal consistency among the estimates. GBD estimates in this round incorporate methodological improvements in using case notification data.
-
-          IHME evaluated the literature on COVID-19 disruptions to TB incidence and identified three types of studies: studies reporting raw data on diagnosis and treatment in 2020, studies reporting on service disruption from new surveys, and studies reporting on models of TB impacts using notification data or theoretical COVID scenarios. Due to the lack of counterfactual data in pre-pandemic time periods and modeling assumptions used in the current studies, IHME could not estimate an additional disruption in TB incidence due to COVID-19. IHME will continue to evaluate and analyze as more data is released. In addition to historical trends, projections to 2030 were modeled using an ensemble approach to forecast the incidence of TB, using SDI as a key driver in order to capture the effects of the COVID-19 pandemic on income per capita and education
+          IHME estimates new and relapse tuberculosis (TB) cases diagnosed within a given calendar year (incidence) using data from prevalence surveys, case notifications, and cause-specific mortality estimates as inputs to a statistical model that enforces internal consistency among the estimates.
         unit: 'new cases per 100,000 people'
       mean_estimate_tuberculosis_incidence_rate_all_ages_females_better_projection:
         title: Tuberculosis incidence rate - Female - Better Projection
         description: |
           Age-standardized rate of tuberculosis cases (per 100,000).
 
-          IHME estimates new and relapse tuberculosis (TB) cases diagnosed within a given calendar year (incidence) using data from prevalence surveys, case notifications, and cause-specific mortality estimates as inputs to a statistical model that enforces internal consistency among the estimates. GBD estimates in this round incorporate methodological improvements in using case notification data.
-
-          IHME evaluated the literature on COVID-19 disruptions to TB incidence and identified three types of studies: studies reporting raw data on diagnosis and treatment in 2020, studies reporting on service disruption from new surveys, and studies reporting on models of TB impacts using notification data or theoretical COVID scenarios. Due to the lack of counterfactual data in pre-pandemic time periods and modeling assumptions used in the current studies, IHME could not estimate an additional disruption in TB incidence due to COVID-19. IHME will continue to evaluate and analyze as more data is released. In addition to historical trends, projections to 2030 were modeled using an ensemble approach to forecast the incidence of TB, using SDI as a key driver in order to capture the effects of the COVID-19 pandemic on income per capita and education
+          IHME estimates new and relapse tuberculosis (TB) cases diagnosed within a given calendar year (incidence) using data from prevalence surveys, case notifications, and cause-specific mortality estimates as inputs to a statistical model that enforces internal consistency among the estimates.
         unit: 'new cases per 100,000 people'
       mean_estimate_tuberculosis_incidence_rate_all_ages_males_worse_projection:
         title: Tuberculosis incidence rate - Male - Worse Projection
         description: |
           Age-standardized rate of tuberculosis cases (per 100,000).
 
-          IHME estimates new and relapse tuberculosis (TB) cases diagnosed within a given calendar year (incidence) using data from prevalence surveys, case notifications, and cause-specific mortality estimates as inputs to a statistical model that enforces internal consistency among the estimates. GBD estimates in this round incorporate methodological improvements in using case notification data.
-
-          IHME evaluated the literature on COVID-19 disruptions to TB incidence and identified three types of studies: studies reporting raw data on diagnosis and treatment in 2020, studies reporting on service disruption from new surveys, and studies reporting on models of TB impacts using notification data or theoretical COVID scenarios. Due to the lack of counterfactual data in pre-pandemic time periods and modeling assumptions used in the current studies, IHME could not estimate an additional disruption in TB incidence due to COVID-19. IHME will continue to evaluate and analyze as more data is released. In addition to historical trends, projections to 2030 were modeled using an ensemble approach to forecast the incidence of TB, using SDI as a key driver in order to capture the effects of the COVID-19 pandemic on income per capita and education
+          IHME estimates new and relapse tuberculosis (TB) cases diagnosed within a given calendar year (incidence) using data from prevalence surveys, case notifications, and cause-specific mortality estimates as inputs to a statistical model that enforces internal consistency among the estimates.
         unit: 'new cases per 100,000 people'
       mean_estimate_tuberculosis_incidence_rate_all_ages_males_reference_projection:
         title: Tuberculosis incidence rate - Male - Reference Projection
         description: |
           Age-standardized rate of tuberculosis cases (per 100,000).
 
-          IHME estimates new and relapse tuberculosis (TB) cases diagnosed within a given calendar year (incidence) using data from prevalence surveys, case notifications, and cause-specific mortality estimates as inputs to a statistical model that enforces internal consistency among the estimates. GBD estimates in this round incorporate methodological improvements in using case notification data.
-
-          IHME evaluated the literature on COVID-19 disruptions to TB incidence and identified three types of studies: studies reporting raw data on diagnosis and treatment in 2020, studies reporting on service disruption from new surveys, and studies reporting on models of TB impacts using notification data or theoretical COVID scenarios. Due to the lack of counterfactual data in pre-pandemic time periods and modeling assumptions used in the current studies, IHME could not estimate an additional disruption in TB incidence due to COVID-19. IHME will continue to evaluate and analyze as more data is released. In addition to historical trends, projections to 2030 were modeled using an ensemble approach to forecast the incidence of TB, using SDI as a key driver in order to capture the effects of the COVID-19 pandemic on income per capita and education
+          IHME estimates new and relapse tuberculosis (TB) cases diagnosed within a given calendar year (incidence) using data from prevalence surveys, case notifications, and cause-specific mortality estimates as inputs to a statistical model that enforces internal consistency among the estimates.
         unit: 'new cases per 100,000 people'
       mean_estimate_tuberculosis_incidence_rate_all_ages_males_better_projection:
         title: Tuberculosis incidence rate - Male - Better Projection
         description: |
           Age-standardized rate of tuberculosis cases (per 100,000).
 
-          IHME estimates new and relapse tuberculosis (TB) cases diagnosed within a given calendar year (incidence) using data from prevalence surveys, case notifications, and cause-specific mortality estimates as inputs to a statistical model that enforces internal consistency among the estimates. GBD estimates in this round incorporate methodological improvements in using case notification data.
-
-          IHME evaluated the literature on COVID-19 disruptions to TB incidence and identified three types of studies: studies reporting raw data on diagnosis and treatment in 2020, studies reporting on service disruption from new surveys, and studies reporting on models of TB impacts using notification data or theoretical COVID scenarios. Due to the lack of counterfactual data in pre-pandemic time periods and modeling assumptions used in the current studies, IHME could not estimate an additional disruption in TB incidence due to COVID-19. IHME will continue to evaluate and analyze as more data is released. In addition to historical trends, projections to 2030 were modeled using an ensemble approach to forecast the incidence of TB, using SDI as a key driver in order to capture the effects of the COVID-19 pandemic on income per capita and education
+          IHME estimates new and relapse tuberculosis (TB) cases diagnosed within a given calendar year (incidence) using data from prevalence surveys, case notifications, and cause-specific mortality estimates as inputs to a statistical model that enforces internal consistency among the estimates.
         unit: 'new cases per 100,000 people'
       mean_estimate_malaria_incidence_rate_all_ages_both_sexes_worse_projection:
         title: Malaria incidence rate - Both Sexes - Worse Projection
         description: |
           Age-standardized rate of malaria cases (per 1,000).
 
-          IHME estimates the malaria rate as the number of new cases per 1,000 population. To estimate malaria incidence in 2020 and 2021, IHME takes into account updated reports regarding pandemic-related disruptions to malaria interventions and effective treatment with an antimalarial drug (which includes ITN, indoor residual spraying, antimalarial treatment, and drug effectiveness). These reports were used to apply an adjustment to estimates of antimalarial treatment coverage, which were then used to produce estimates of malaria incidence. Projections to 2030 were derived using an ensemble model. First, coverage of ACT and ITNs is forecast as a function of the SDI, which is predicted in turn by projections of income per capita and education. For countries where there exists available data on intervention coverage, malaria incidence is forecasted through 2030 using an ensemble approach, incorporating past trends and forecasts of ACT and ITN coverage to produce the projections. For countries where there is no available data on ACT or ITN coverage, an ensemble approach is used based on past trends in incidence as well as projections of SDI, which incorporates the effects of the COVID-19 pandemic through income per capita and education.
-
-          Due to reporting lags, there is still relatively little data to inform pandemic-related impacts on malaria incidence. The WHO global pulse surveys, which were used to adjust 2020 and 2021 incidence results, were applied only to countries in sub-Saharan Africa due to a lack of comparable method for applying the adjustment to other regions arising from the difference in incidence estimation. Furthermore, although those pulse surveys currently allow us to begin trying to capture malaria pandemic-related impacts, the surveys were completed by national-level health officials and capture only their individual assessment of how the pandemic has affected care seeking.
+          IHME estimates the malaria rate as the number of new cases per 1,000 population.
         unit: 'new cases per 1,000 people'
       mean_estimate_malaria_incidence_rate_all_ages_both_sexes_reference_projection:
         title: Malaria incidence rate - Both Sexes - Reference Projection
         description: |
           Age-standardized rate of malaria cases (per 1,000).
 
-          IHME estimates the malaria rate as the number of new cases per 1,000 population. To estimate malaria incidence in 2020 and 2021, IHME takes into account updated reports regarding pandemic-related disruptions to malaria interventions and effective treatment with an antimalarial drug (which includes ITN, indoor residual spraying, antimalarial treatment, and drug effectiveness). These reports were used to apply an adjustment to estimates of antimalarial treatment coverage, which were then used to produce estimates of malaria incidence. Projections to 2030 were derived using an ensemble model. First, coverage of ACT and ITNs is forecast as a function of the SDI, which is predicted in turn by projections of income per capita and education. For countries where there exists available data on intervention coverage, malaria incidence is forecasted through 2030 using an ensemble approach, incorporating past trends and forecasts of ACT and ITN coverage to produce the projections. For countries where there is no available data on ACT or ITN coverage, an ensemble approach is used based on past trends in incidence as well as projections of SDI, which incorporates the effects of the COVID-19 pandemic through income per capita and education.
-
-          Due to reporting lags, there is still relatively little data to inform pandemic-related impacts on malaria incidence. The WHO global pulse surveys, which were used to adjust 2020 and 2021 incidence results, were applied only to countries in sub-Saharan Africa due to a lack of comparable method for applying the adjustment to other regions arising from the difference in incidence estimation. Furthermore, although those pulse surveys currently allow us to begin trying to capture malaria pandemic-related impacts, the surveys were completed by national-level health officials and capture only their individual assessment of how the pandemic has affected care seeking.
+          IHME estimates the malaria rate as the number of new cases per 1,000 population.
         unit: 'new cases per 1,000 people'
       mean_estimate_malaria_incidence_rate_all_ages_both_sexes_better_projection:
         title: Malaria incidence rate - Both Sexes - Better Projection
         description: |
           Age-standardized rate of malaria cases (per 1,000).
 
-          IHME estimates the malaria rate as the number of new cases per 1,000 population. To estimate malaria incidence in 2020 and 2021, IHME takes into account updated reports regarding pandemic-related disruptions to malaria interventions and effective treatment with an antimalarial drug (which includes ITN, indoor residual spraying, antimalarial treatment, and drug effectiveness). These reports were used to apply an adjustment to estimates of antimalarial treatment coverage, which were then used to produce estimates of malaria incidence. Projections to 2030 were derived using an ensemble model. First, coverage of ACT and ITNs is forecast as a function of the SDI, which is predicted in turn by projections of income per capita and education. For countries where there exists available data on intervention coverage, malaria incidence is forecasted through 2030 using an ensemble approach, incorporating past trends and forecasts of ACT and ITN coverage to produce the projections. For countries where there is no available data on ACT or ITN coverage, an ensemble approach is used based on past trends in incidence as well as projections of SDI, which incorporates the effects of the COVID-19 pandemic through income per capita and education.
-
-          Due to reporting lags, there is still relatively little data to inform pandemic-related impacts on malaria incidence. The WHO global pulse surveys, which were used to adjust 2020 and 2021 incidence results, were applied only to countries in sub-Saharan Africa due to a lack of comparable method for applying the adjustment to other regions arising from the difference in incidence estimation. Furthermore, although those pulse surveys currently allow us to begin trying to capture malaria pandemic-related impacts, the surveys were completed by national-level health officials and capture only their individual assessment of how the pandemic has affected care seeking.
+          IHME estimates the malaria rate as the number of new cases per 1,000 population.
         unit: 'new cases per 1,000 people'
       mean_estimate_malaria_incidence_rate_all_ages_females_worse_projection:
         title: Malaria incidence rate - Female - Worse Projection
         description: |
           Age-standardized rate of malaria cases (per 1,000).
 
-          IHME estimates the malaria rate as the number of new cases per 1,000 population. To estimate malaria incidence in 2020 and 2021, IHME takes into account updated reports regarding pandemic-related disruptions to malaria interventions and effective treatment with an antimalarial drug (which includes ITN, indoor residual spraying, antimalarial treatment, and drug effectiveness). These reports were used to apply an adjustment to estimates of antimalarial treatment coverage, which were then used to produce estimates of malaria incidence. Projections to 2030 were derived using an ensemble model. First, coverage of ACT and ITNs is forecast as a function of the SDI, which is predicted in turn by projections of income per capita and education. For countries where there exists available data on intervention coverage, malaria incidence is forecasted through 2030 using an ensemble approach, incorporating past trends and forecasts of ACT and ITN coverage to produce the projections. For countries where there is no available data on ACT or ITN coverage, an ensemble approach is used based on past trends in incidence as well as projections of SDI, which incorporates the effects of the COVID-19 pandemic through income per capita and education.
-
-          Due to reporting lags, there is still relatively little data to inform pandemic-related impacts on malaria incidence. The WHO global pulse surveys, which were used to adjust 2020 and 2021 incidence results, were applied only to countries in sub-Saharan Africa due to a lack of comparable method for applying the adjustment to other regions arising from the difference in incidence estimation. Furthermore, although those pulse surveys currently allow us to begin trying to capture malaria pandemic-related impacts, the surveys were completed by national-level health officials and capture only their individual assessment of how the pandemic has affected care seeking.
+          IHME estimates the malaria rate as the number of new cases per 1,000 population.
         unit: 'new cases per 1,000 people'
       mean_estimate_malaria_incidence_rate_all_ages_females_reference_projection:
         title: Malaria incidence rate - Female - Reference Projection
         description: |
           Age-standardized rate of malaria cases (per 1,000).
 
-          IHME estimates the malaria rate as the number of new cases per 1,000 population. To estimate malaria incidence in 2020 and 2021, IHME takes into account updated reports regarding pandemic-related disruptions to malaria interventions and effective treatment with an antimalarial drug (which includes ITN, indoor residual spraying, antimalarial treatment, and drug effectiveness). These reports were used to apply an adjustment to estimates of antimalarial treatment coverage, which were then used to produce estimates of malaria incidence. Projections to 2030 were derived using an ensemble model. First, coverage of ACT and ITNs is forecast as a function of the SDI, which is predicted in turn by projections of income per capita and education. For countries where there exists available data on intervention coverage, malaria incidence is forecasted through 2030 using an ensemble approach, incorporating past trends and forecasts of ACT and ITN coverage to produce the projections. For countries where there is no available data on ACT or ITN coverage, an ensemble approach is used based on past trends in incidence as well as projections of SDI, which incorporates the effects of the COVID-19 pandemic through income per capita and education.
-
-          Due to reporting lags, there is still relatively little data to inform pandemic-related impacts on malaria incidence. The WHO global pulse surveys, which were used to adjust 2020 and 2021 incidence results, were applied only to countries in sub-Saharan Africa due to a lack of comparable method for applying the adjustment to other regions arising from the difference in incidence estimation. Furthermore, although those pulse surveys currently allow us to begin trying to capture malaria pandemic-related impacts, the surveys were completed by national-level health officials and capture only their individual assessment of how the pandemic has affected care seeking.
+          IHME estimates the malaria rate as the number of new cases per 1,000 population.
         unit: 'new cases per 1,000 people'
       mean_estimate_malaria_incidence_rate_all_ages_females_better_projection:
         title: Malaria incidence rate - Female - Better Projection
         description: |
           Age-standardized rate of malaria cases (per 1,000).
 
-          IHME estimates the malaria rate as the number of new cases per 1,000 population. To estimate malaria incidence in 2020 and 2021, IHME takes into account updated reports regarding pandemic-related disruptions to malaria interventions and effective treatment with an antimalarial drug (which includes ITN, indoor residual spraying, antimalarial treatment, and drug effectiveness). These reports were used to apply an adjustment to estimates of antimalarial treatment coverage, which were then used to produce estimates of malaria incidence. Projections to 2030 were derived using an ensemble model. First, coverage of ACT and ITNs is forecast as a function of the SDI, which is predicted in turn by projections of income per capita and education. For countries where there exists available data on intervention coverage, malaria incidence is forecasted through 2030 using an ensemble approach, incorporating past trends and forecasts of ACT and ITN coverage to produce the projections. For countries where there is no available data on ACT or ITN coverage, an ensemble approach is used based on past trends in incidence as well as projections of SDI, which incorporates the effects of the COVID-19 pandemic through income per capita and education.
-
-          Due to reporting lags, there is still relatively little data to inform pandemic-related impacts on malaria incidence. The WHO global pulse surveys, which were used to adjust 2020 and 2021 incidence results, were applied only to countries in sub-Saharan Africa due to a lack of comparable method for applying the adjustment to other regions arising from the difference in incidence estimation. Furthermore, although those pulse surveys currently allow us to begin trying to capture malaria pandemic-related impacts, the surveys were completed by national-level health officials and capture only their individual assessment of how the pandemic has affected care seeking.
+          IHME estimates the malaria rate as the number of new cases per 1,000 population.
         unit: 'new cases per 1,000 people'
       mean_estimate_coverage_of_dpt3_all_ages_both_sexes_worse_projection:
         title: Coverage of DTP3 - Both Sexes - Worse Projection
@@ -903,155 +717,107 @@ tables:
         description: |
           Age-standardized rate of malaria cases (per 1,000).
 
-          IHME estimates the malaria rate as the number of new cases per 1,000 population. To estimate malaria incidence in 2020 and 2021, IHME takes into account updated reports regarding pandemic-related disruptions to malaria interventions and effective treatment with an antimalarial drug (which includes ITN, indoor residual spraying, antimalarial treatment, and drug effectiveness). These reports were used to apply an adjustment to estimates of antimalarial treatment coverage, which were then used to produce estimates of malaria incidence. Projections to 2030 were derived using an ensemble model. First, coverage of ACT and ITNs is forecast as a function of the SDI, which is predicted in turn by projections of income per capita and education. For countries where there exists available data on intervention coverage, malaria incidence is forecasted through 2030 using an ensemble approach, incorporating past trends and forecasts of ACT and ITN coverage to produce the projections. For countries where there is no available data on ACT or ITN coverage, an ensemble approach is used based on past trends in incidence as well as projections of SDI, which incorporates the effects of the COVID-19 pandemic through income per capita and education.
-
-          Due to reporting lags, there is still relatively little data to inform pandemic-related impacts on malaria incidence. The WHO global pulse surveys, which were used to adjust 2020 and 2021 incidence results, were applied only to countries in sub-Saharan Africa due to a lack of comparable method for applying the adjustment to other regions arising from the difference in incidence estimation. Furthermore, although those pulse surveys currently allow us to begin trying to capture malaria pandemic-related impacts, the surveys were completed by national-level health officials and capture only their individual assessment of how the pandemic has affected care seeking.
+          IHME estimates the malaria rate as the number of new cases per 1,000 population.
         unit: 'new cases per 1,000 people'
       mean_estimate_malaria_incidence_rate_all_ages_males_reference_projection:
         title: Malaria incidence rate - Male - Reference Projection
         description: |
           Age-standardized rate of malaria cases (per 1,000).
 
-          IHME estimates the malaria rate as the number of new cases per 1,000 population. To estimate malaria incidence in 2020 and 2021, IHME takes into account updated reports regarding pandemic-related disruptions to malaria interventions and effective treatment with an antimalarial drug (which includes ITN, indoor residual spraying, antimalarial treatment, and drug effectiveness). These reports were used to apply an adjustment to estimates of antimalarial treatment coverage, which were then used to produce estimates of malaria incidence. Projections to 2030 were derived using an ensemble model. First, coverage of ACT and ITNs is forecast as a function of the SDI, which is predicted in turn by projections of income per capita and education. For countries where there exists available data on intervention coverage, malaria incidence is forecasted through 2030 using an ensemble approach, incorporating past trends and forecasts of ACT and ITN coverage to produce the projections. For countries where there is no available data on ACT or ITN coverage, an ensemble approach is used based on past trends in incidence as well as projections of SDI, which incorporates the effects of the COVID-19 pandemic through income per capita and education.
-
-          Due to reporting lags, there is still relatively little data to inform pandemic-related impacts on malaria incidence. The WHO global pulse surveys, which were used to adjust 2020 and 2021 incidence results, were applied only to countries in sub-Saharan Africa due to a lack of comparable method for applying the adjustment to other regions arising from the difference in incidence estimation. Furthermore, although those pulse surveys currently allow us to begin trying to capture malaria pandemic-related impacts, the surveys were completed by national-level health officials and capture only their individual assessment of how the pandemic has affected care seeking.
+          IHME estimates the malaria rate as the number of new cases per 1,000 population.
         unit: 'new cases per 1,000 people'
       mean_estimate_malaria_incidence_rate_all_ages_males_better_projection:
         title: Malaria incidence rate - Male - Better Projection
         description: |
           Age-standardized rate of malaria cases (per 1,000).
 
-          IHME estimates the malaria rate as the number of new cases per 1,000 population. To estimate malaria incidence in 2020 and 2021, IHME takes into account updated reports regarding pandemic-related disruptions to malaria interventions and effective treatment with an antimalarial drug (which includes ITN, indoor residual spraying, antimalarial treatment, and drug effectiveness). These reports were used to apply an adjustment to estimates of antimalarial treatment coverage, which were then used to produce estimates of malaria incidence. Projections to 2030 were derived using an ensemble model. First, coverage of ACT and ITNs is forecast as a function of the SDI, which is predicted in turn by projections of income per capita and education. For countries where there exists available data on intervention coverage, malaria incidence is forecasted through 2030 using an ensemble approach, incorporating past trends and forecasts of ACT and ITN coverage to produce the projections. For countries where there is no available data on ACT or ITN coverage, an ensemble approach is used based on past trends in incidence as well as projections of SDI, which incorporates the effects of the COVID-19 pandemic through income per capita and education.
-
-          Due to reporting lags, there is still relatively little data to inform pandemic-related impacts on malaria incidence. The WHO global pulse surveys, which were used to adjust 2020 and 2021 incidence results, were applied only to countries in sub-Saharan Africa due to a lack of comparable method for applying the adjustment to other regions arising from the difference in incidence estimation. Furthermore, although those pulse surveys currently allow us to begin trying to capture malaria pandemic-related impacts, the surveys were completed by national-level health officials and capture only their individual assessment of how the pandemic has affected care seeking.
+          IHME estimates the malaria rate as the number of new cases per 1,000 population.
         unit: 'new cases per 1,000 people'
       mean_estimate_prevalence_of_15_neglected_tropical_diseases_all_ages_both_sexes_worse_projection:
         title: Prevalence of 15 neglected tropical diseases - Both Sexes - Worse Projection
         description: |
           Age-standardized prevalence of 15 neglected tropical diseases (NTDs). Prevalence estimates reported here may exceed 100% as they reflect the sum of prevalent cases of 15 NTDs.
 
-          IHME measures the sum of the prevalence of 15 NTDs per 100,000 that are currently measured in the annual Global Burden of Disease study: human African trypanosomiasis, Chagas disease, cystic echinococcosis, cysticercosis, dengue, food-borne trematodiases, Guinea worm, soil-transmitted helminths (STH, comprising hookworm, trichuriasis, and ascariasis), leishmaniasis, leprosy, lymphatic filariasis, onchocerciasis, rabies, schistosomiasis, and trachoma. Since the 2020 Goalkeepers Report, changes in historical trends in this indicator reflect updates to the estimated prevalence of each NTD made for the GBD 2020 study. Specifically, changes in the summary NTD prevalence indicator between the 2020 Goalkeepers Report and these estimates largely reflect the addition of new data to STH models, especially in Latin America and South Asia.
-
-          In the 2021 Goalkeepers Report, IHME did not estimate a COVID-19 effect on this indicator, due to limited surveillance and control program data availability. Modeling studies and available data suggest that the COVID pandemic likely resulted in disruptions to NTD epidemiology, though these disruptions are likely to vary by disease and location and may be variably amenable to mitigation through increased control efforts. Although modeling studies can characterize potential disruptions under various scenarios, reliable data to quantify the true magnitude of pandemic effects on NTD epidemiology are sparse.
-
-          For this year’s report, IHME searched for published and gray literature quantifying the impact of the COVID-19 pandemic on NTD prevalence. Due to data gaps, lags in availability, and challenges in accounting for the likely disruptions to NTD surveillance during the pandemic, IHME found evidence to support adjustment for COVID-19 disruptions only for dengue. IHME adjusted dengue estimates in 2020 and 2021 using country-specific estimates of COVID disruptions from Chen et al. (2022), including updated estimates for 2021 graciously provided by the study authors via personal communication. For 2020, IHME adjusted only the proportion of cases occurring in April through December, reflecting the timing of the start of the pandemic; for 2021, IHME adjusted the full year. IHME excluded Brazil from the country-specific analysis due to data inconsistencies. For countries not estimated directly by this analysis, IHME applied regional or global disruption ratios. Projections to 2030 used an ensemble model, driven both by trends in the past as well as projections of SDI, which incorporated disruptions from the COVID-19 pandemic on income per capita and education.
+          IHME measures the sum of the prevalence of 15 NTDs per 100,000 that are currently measured in the annual Global Burden of Disease study: human African trypanosomiasis, Chagas disease, cystic echinococcosis, cysticercosis, dengue, food-borne trematodiases, Guinea worm, soil-transmitted helminths (STH, comprising hookworm, trichuriasis, and ascariasis), leishmaniasis, leprosy, lymphatic filariasis, onchocerciasis, rabies, schistosomiasis, and trachoma.
         unit: 'cases of 15 NTDs per 100,000 people'
       mean_estimate_prevalence_of_15_neglected_tropical_diseases_all_ages_both_sexes_reference_projection:
         title: Prevalence of 15 neglected tropical diseases - Both Sexes - Reference Projection
         description: |
           Age-standardized prevalence of 15 neglected tropical diseases (NTDs). Prevalence estimates reported here may exceed 100% as they reflect the sum of prevalent cases of 15 NTDs.
 
-          IHME measures the sum of the prevalence of 15 NTDs per 100,000 that are currently measured in the annual Global Burden of Disease study: human African trypanosomiasis, Chagas disease, cystic echinococcosis, cysticercosis, dengue, food-borne trematodiases, Guinea worm, soil-transmitted helminths (STH, comprising hookworm, trichuriasis, and ascariasis), leishmaniasis, leprosy, lymphatic filariasis, onchocerciasis, rabies, schistosomiasis, and trachoma. Since the 2020 Goalkeepers Report, changes in historical trends in this indicator reflect updates to the estimated prevalence of each NTD made for the GBD 2020 study. Specifically, changes in the summary NTD prevalence indicator between the 2020 Goalkeepers Report and these estimates largely reflect the addition of new data to STH models, especially in Latin America and South Asia.
-
-          In the 2021 Goalkeepers Report, IHME did not estimate a COVID-19 effect on this indicator, due to limited surveillance and control program data availability. Modeling studies and available data suggest that the COVID pandemic likely resulted in disruptions to NTD epidemiology, though these disruptions are likely to vary by disease and location and may be variably amenable to mitigation through increased control efforts. Although modeling studies can characterize potential disruptions under various scenarios, reliable data to quantify the true magnitude of pandemic effects on NTD epidemiology are sparse.
-
-          For this year’s report, IHME searched for published and gray literature quantifying the impact of the COVID-19 pandemic on NTD prevalence. Due to data gaps, lags in availability, and challenges in accounting for the likely disruptions to NTD surveillance during the pandemic, IHME found evidence to support adjustment for COVID-19 disruptions only for dengue. IHME adjusted dengue estimates in 2020 and 2021 using country-specific estimates of COVID disruptions from Chen et al. (2022), including updated estimates for 2021 graciously provided by the study authors via personal communication. For 2020, IHME adjusted only the proportion of cases occurring in April through December, reflecting the timing of the start of the pandemic; for 2021, IHME adjusted the full year. IHME excluded Brazil from the country-specific analysis due to data inconsistencies. For countries not estimated directly by this analysis, IHME applied regional or global disruption ratios. Projections to 2030 used an ensemble model, driven both by trends in the past as well as projections of SDI, which incorporated disruptions from the COVID-19 pandemic on income per capita and education.
+          IHME measures the sum of the prevalence of 15 NTDs per 100,000 that are currently measured in the annual Global Burden of Disease study: human African trypanosomiasis, Chagas disease, cystic echinococcosis, cysticercosis, dengue, food-borne trematodiases, Guinea worm, soil-transmitted helminths (STH, comprising hookworm, trichuriasis, and ascariasis), leishmaniasis, leprosy, lymphatic filariasis, onchocerciasis, rabies, schistosomiasis, and trachoma.
         unit: 'cases of 15 NTDs per 100,000 people'
       mean_estimate_prevalence_of_15_neglected_tropical_diseases_all_ages_both_sexes_better_projection:
         title: Prevalence of 15 neglected tropical diseases - Both Sexes - Better Projection
         description: |
           Age-standardized prevalence of 15 neglected tropical diseases (NTDs). Prevalence estimates reported here may exceed 100% as they reflect the sum of prevalent cases of 15 NTDs.
 
-          IHME measures the sum of the prevalence of 15 NTDs per 100,000 that are currently measured in the annual Global Burden of Disease study: human African trypanosomiasis, Chagas disease, cystic echinococcosis, cysticercosis, dengue, food-borne trematodiases, Guinea worm, soil-transmitted helminths (STH, comprising hookworm, trichuriasis, and ascariasis), leishmaniasis, leprosy, lymphatic filariasis, onchocerciasis, rabies, schistosomiasis, and trachoma. Since the 2020 Goalkeepers Report, changes in historical trends in this indicator reflect updates to the estimated prevalence of each NTD made for the GBD 2020 study. Specifically, changes in the summary NTD prevalence indicator between the 2020 Goalkeepers Report and these estimates largely reflect the addition of new data to STH models, especially in Latin America and South Asia.
-
-          In the 2021 Goalkeepers Report, IHME did not estimate a COVID-19 effect on this indicator, due to limited surveillance and control program data availability. Modeling studies and available data suggest that the COVID pandemic likely resulted in disruptions to NTD epidemiology, though these disruptions are likely to vary by disease and location and may be variably amenable to mitigation through increased control efforts. Although modeling studies can characterize potential disruptions under various scenarios, reliable data to quantify the true magnitude of pandemic effects on NTD epidemiology are sparse.
-
-          For this year’s report, IHME searched for published and gray literature quantifying the impact of the COVID-19 pandemic on NTD prevalence. Due to data gaps, lags in availability, and challenges in accounting for the likely disruptions to NTD surveillance during the pandemic, IHME found evidence to support adjustment for COVID-19 disruptions only for dengue. IHME adjusted dengue estimates in 2020 and 2021 using country-specific estimates of COVID disruptions from Chen et al. (2022), including updated estimates for 2021 graciously provided by the study authors via personal communication. For 2020, IHME adjusted only the proportion of cases occurring in April through December, reflecting the timing of the start of the pandemic; for 2021, IHME adjusted the full year. IHME excluded Brazil from the country-specific analysis due to data inconsistencies. For countries not estimated directly by this analysis, IHME applied regional or global disruption ratios. Projections to 2030 used an ensemble model, driven both by trends in the past as well as projections of SDI, which incorporated disruptions from the COVID-19 pandemic on income per capita and education.
+          IHME measures the sum of the prevalence of 15 NTDs per 100,000 that are currently measured in the annual Global Burden of Disease study: human African trypanosomiasis, Chagas disease, cystic echinococcosis, cysticercosis, dengue, food-borne trematodiases, Guinea worm, soil-transmitted helminths (STH, comprising hookworm, trichuriasis, and ascariasis), leishmaniasis, leprosy, lymphatic filariasis, onchocerciasis, rabies, schistosomiasis, and trachoma.
         unit: 'cases of 15 NTDs per 100,000 people'
       mean_estimate_prevalence_of_15_neglected_tropical_diseases_all_ages_females_worse_projection:
         title: Prevalence of 15 neglected tropical diseases - Female - Worse Projection
         description: |
           Age-standardized prevalence of 15 neglected tropical diseases (NTDs). Prevalence estimates reported here may exceed 100% as they reflect the sum of prevalent cases of 15 NTDs.
 
-          IHME measures the sum of the prevalence of 15 NTDs per 100,000 that are currently measured in the annual Global Burden of Disease study: human African trypanosomiasis, Chagas disease, cystic echinococcosis, cysticercosis, dengue, food-borne trematodiases, Guinea worm, soil-transmitted helminths (STH, comprising hookworm, trichuriasis, and ascariasis), leishmaniasis, leprosy, lymphatic filariasis, onchocerciasis, rabies, schistosomiasis, and trachoma. Since the 2020 Goalkeepers Report, changes in historical trends in this indicator reflect updates to the estimated prevalence of each NTD made for the GBD 2020 study. Specifically, changes in the summary NTD prevalence indicator between the 2020 Goalkeepers Report and these estimates largely reflect the addition of new data to STH models, especially in Latin America and South Asia.
-
-          In the 2021 Goalkeepers Report, IHME did not estimate a COVID-19 effect on this indicator, due to limited surveillance and control program data availability. Modeling studies and available data suggest that the COVID pandemic likely resulted in disruptions to NTD epidemiology, though these disruptions are likely to vary by disease and location and may be variably amenable to mitigation through increased control efforts. Although modeling studies can characterize potential disruptions under various scenarios, reliable data to quantify the true magnitude of pandemic effects on NTD epidemiology are sparse.
-
-          For this year’s report, IHME searched for published and gray literature quantifying the impact of the COVID-19 pandemic on NTD prevalence. Due to data gaps, lags in availability, and challenges in accounting for the likely disruptions to NTD surveillance during the pandemic, IHME found evidence to support adjustment for COVID-19 disruptions only for dengue. IHME adjusted dengue estimates in 2020 and 2021 using country-specific estimates of COVID disruptions from Chen et al. (2022), including updated estimates for 2021 graciously provided by the study authors via personal communication. For 2020, IHME adjusted only the proportion of cases occurring in April through December, reflecting the timing of the start of the pandemic; for 2021, IHME adjusted the full year. IHME excluded Brazil from the country-specific analysis due to data inconsistencies. For countries not estimated directly by this analysis, IHME applied regional or global disruption ratios. Projections to 2030 used an ensemble model, driven both by trends in the past as well as projections of SDI, which incorporated disruptions from the COVID-19 pandemic on income per capita and education.
+          IHME measures the sum of the prevalence of 15 NTDs per 100,000 that are currently measured in the annual Global Burden of Disease study: human African trypanosomiasis, Chagas disease, cystic echinococcosis, cysticercosis, dengue, food-borne trematodiases, Guinea worm, soil-transmitted helminths (STH, comprising hookworm, trichuriasis, and ascariasis), leishmaniasis, leprosy, lymphatic filariasis, onchocerciasis, rabies, schistosomiasis, and trachoma.
         unit: 'cases of 15 NTDs per 100,000 people'
       mean_estimate_prevalence_of_15_neglected_tropical_diseases_all_ages_females_reference_projection:
         title: Prevalence of 15 neglected tropical diseases - Female - Reference Projection
         description: |
           Age-standardized prevalence of 15 neglected tropical diseases (NTDs). Prevalence estimates reported here may exceed 100% as they reflect the sum of prevalent cases of 15 NTDs.
 
-          IHME measures the sum of the prevalence of 15 NTDs per 100,000 that are currently measured in the annual Global Burden of Disease study: human African trypanosomiasis, Chagas disease, cystic echinococcosis, cysticercosis, dengue, food-borne trematodiases, Guinea worm, soil-transmitted helminths (STH, comprising hookworm, trichuriasis, and ascariasis), leishmaniasis, leprosy, lymphatic filariasis, onchocerciasis, rabies, schistosomiasis, and trachoma. Since the 2020 Goalkeepers Report, changes in historical trends in this indicator reflect updates to the estimated prevalence of each NTD made for the GBD 2020 study. Specifically, changes in the summary NTD prevalence indicator between the 2020 Goalkeepers Report and these estimates largely reflect the addition of new data to STH models, especially in Latin America and South Asia.
-
-          In the 2021 Goalkeepers Report, IHME did not estimate a COVID-19 effect on this indicator, due to limited surveillance and control program data availability. Modeling studies and available data suggest that the COVID pandemic likely resulted in disruptions to NTD epidemiology, though these disruptions are likely to vary by disease and location and may be variably amenable to mitigation through increased control efforts. Although modeling studies can characterize potential disruptions under various scenarios, reliable data to quantify the true magnitude of pandemic effects on NTD epidemiology are sparse.
-
-          For this year’s report, IHME searched for published and gray literature quantifying the impact of the COVID-19 pandemic on NTD prevalence. Due to data gaps, lags in availability, and challenges in accounting for the likely disruptions to NTD surveillance during the pandemic, IHME found evidence to support adjustment for COVID-19 disruptions only for dengue. IHME adjusted dengue estimates in 2020 and 2021 using country-specific estimates of COVID disruptions from Chen et al. (2022), including updated estimates for 2021 graciously provided by the study authors via personal communication. For 2020, IHME adjusted only the proportion of cases occurring in April through December, reflecting the timing of the start of the pandemic; for 2021, IHME adjusted the full year. IHME excluded Brazil from the country-specific analysis due to data inconsistencies. For countries not estimated directly by this analysis, IHME applied regional or global disruption ratios. Projections to 2030 used an ensemble model, driven both by trends in the past as well as projections of SDI, which incorporated disruptions from the COVID-19 pandemic on income per capita and education.
+          IHME measures the sum of the prevalence of 15 NTDs per 100,000 that are currently measured in the annual Global Burden of Disease study: human African trypanosomiasis, Chagas disease, cystic echinococcosis, cysticercosis, dengue, food-borne trematodiases, Guinea worm, soil-transmitted helminths (STH, comprising hookworm, trichuriasis, and ascariasis), leishmaniasis, leprosy, lymphatic filariasis, onchocerciasis, rabies, schistosomiasis, and trachoma.
         unit: 'cases of 15 NTDs per 100,000 people'
       mean_estimate_prevalence_of_15_neglected_tropical_diseases_all_ages_females_better_projection:
         title: Prevalence of 15 neglected tropical diseases - Female - Better Projection
         description: |
           Age-standardized prevalence of 15 neglected tropical diseases (NTDs). Prevalence estimates reported here may exceed 100% as they reflect the sum of prevalent cases of 15 NTDs.
 
-          IHME measures the sum of the prevalence of 15 NTDs per 100,000 that are currently measured in the annual Global Burden of Disease study: human African trypanosomiasis, Chagas disease, cystic echinococcosis, cysticercosis, dengue, food-borne trematodiases, Guinea worm, soil-transmitted helminths (STH, comprising hookworm, trichuriasis, and ascariasis), leishmaniasis, leprosy, lymphatic filariasis, onchocerciasis, rabies, schistosomiasis, and trachoma. Since the 2020 Goalkeepers Report, changes in historical trends in this indicator reflect updates to the estimated prevalence of each NTD made for the GBD 2020 study. Specifically, changes in the summary NTD prevalence indicator between the 2020 Goalkeepers Report and these estimates largely reflect the addition of new data to STH models, especially in Latin America and South Asia.
-
-          In the 2021 Goalkeepers Report, IHME did not estimate a COVID-19 effect on this indicator, due to limited surveillance and control program data availability. Modeling studies and available data suggest that the COVID pandemic likely resulted in disruptions to NTD epidemiology, though these disruptions are likely to vary by disease and location and may be variably amenable to mitigation through increased control efforts. Although modeling studies can characterize potential disruptions under various scenarios, reliable data to quantify the true magnitude of pandemic effects on NTD epidemiology are sparse.
-
-          For this year’s report, IHME searched for published and gray literature quantifying the impact of the COVID-19 pandemic on NTD prevalence. Due to data gaps, lags in availability, and challenges in accounting for the likely disruptions to NTD surveillance during the pandemic, IHME found evidence to support adjustment for COVID-19 disruptions only for dengue. IHME adjusted dengue estimates in 2020 and 2021 using country-specific estimates of COVID disruptions from Chen et al. (2022), including updated estimates for 2021 graciously provided by the study authors via personal communication. For 2020, IHME adjusted only the proportion of cases occurring in April through December, reflecting the timing of the start of the pandemic; for 2021, IHME adjusted the full year. IHME excluded Brazil from the country-specific analysis due to data inconsistencies. For countries not estimated directly by this analysis, IHME applied regional or global disruption ratios. Projections to 2030 used an ensemble model, driven both by trends in the past as well as projections of SDI, which incorporated disruptions from the COVID-19 pandemic on income per capita and education.
+          IHME measures the sum of the prevalence of 15 NTDs per 100,000 that are currently measured in the annual Global Burden of Disease study: human African trypanosomiasis, Chagas disease, cystic echinococcosis, cysticercosis, dengue, food-borne trematodiases, Guinea worm, soil-transmitted helminths (STH, comprising hookworm, trichuriasis, and ascariasis), leishmaniasis, leprosy, lymphatic filariasis, onchocerciasis, rabies, schistosomiasis, and trachoma.
         unit: 'cases of 15 NTDs per 100,000 people'
       mean_estimate_prevalence_of_15_neglected_tropical_diseases_all_ages_males_worse_projection:
         title: Prevalence of 15 neglected tropical diseases - Male - Worse Projection
         description: |
           Age-standardized prevalence of 15 neglected tropical diseases (NTDs). Prevalence estimates reported here may exceed 100% as they reflect the sum of prevalent cases of 15 NTDs.
 
-          IHME measures the sum of the prevalence of 15 NTDs per 100,000 that are currently measured in the annual Global Burden of Disease study: human African trypanosomiasis, Chagas disease, cystic echinococcosis, cysticercosis, dengue, food-borne trematodiases, Guinea worm, soil-transmitted helminths (STH, comprising hookworm, trichuriasis, and ascariasis), leishmaniasis, leprosy, lymphatic filariasis, onchocerciasis, rabies, schistosomiasis, and trachoma. Since the 2020 Goalkeepers Report, changes in historical trends in this indicator reflect updates to the estimated prevalence of each NTD made for the GBD 2020 study. Specifically, changes in the summary NTD prevalence indicator between the 2020 Goalkeepers Report and these estimates largely reflect the addition of new data to STH models, especially in Latin America and South Asia.
-
-          In the 2021 Goalkeepers Report, IHME did not estimate a COVID-19 effect on this indicator, due to limited surveillance and control program data availability. Modeling studies and available data suggest that the COVID pandemic likely resulted in disruptions to NTD epidemiology, though these disruptions are likely to vary by disease and location and may be variably amenable to mitigation through increased control efforts. Although modeling studies can characterize potential disruptions under various scenarios, reliable data to quantify the true magnitude of pandemic effects on NTD epidemiology are sparse.
-
-          For this year’s report, IHME searched for published and gray literature quantifying the impact of the COVID-19 pandemic on NTD prevalence. Due to data gaps, lags in availability, and challenges in accounting for the likely disruptions to NTD surveillance during the pandemic, IHME found evidence to support adjustment for COVID-19 disruptions only for dengue. IHME adjusted dengue estimates in 2020 and 2021 using country-specific estimates of COVID disruptions from Chen et al. (2022), including updated estimates for 2021 graciously provided by the study authors via personal communication. For 2020, IHME adjusted only the proportion of cases occurring in April through December, reflecting the timing of the start of the pandemic; for 2021, IHME adjusted the full year. IHME excluded Brazil from the country-specific analysis due to data inconsistencies. For countries not estimated directly by this analysis, IHME applied regional or global disruption ratios. Projections to 2030 used an ensemble model, driven both by trends in the past as well as projections of SDI, which incorporated disruptions from the COVID-19 pandemic on income per capita and education.
+          IHME measures the sum of the prevalence of 15 NTDs per 100,000 that are currently measured in the annual Global Burden of Disease study: human African trypanosomiasis, Chagas disease, cystic echinococcosis, cysticercosis, dengue, food-borne trematodiases, Guinea worm, soil-transmitted helminths (STH, comprising hookworm, trichuriasis, and ascariasis), leishmaniasis, leprosy, lymphatic filariasis, onchocerciasis, rabies, schistosomiasis, and trachoma.
         unit: 'cases of 15 NTDs per 100,000 people'
       mean_estimate_prevalence_of_15_neglected_tropical_diseases_all_ages_males_reference_projection:
         title: Prevalence of 15 neglected tropical diseases - Male - Reference Projection
         description: |
           Age-standardized prevalence of 15 neglected tropical diseases (NTDs). Prevalence estimates reported here may exceed 100% as they reflect the sum of prevalent cases of 15 NTDs.
 
-          IHME measures the sum of the prevalence of 15 NTDs per 100,000 that are currently measured in the annual Global Burden of Disease study: human African trypanosomiasis, Chagas disease, cystic echinococcosis, cysticercosis, dengue, food-borne trematodiases, Guinea worm, soil-transmitted helminths (STH, comprising hookworm, trichuriasis, and ascariasis), leishmaniasis, leprosy, lymphatic filariasis, onchocerciasis, rabies, schistosomiasis, and trachoma. Since the 2020 Goalkeepers Report, changes in historical trends in this indicator reflect updates to the estimated prevalence of each NTD made for the GBD 2020 study. Specifically, changes in the summary NTD prevalence indicator between the 2020 Goalkeepers Report and these estimates largely reflect the addition of new data to STH models, especially in Latin America and South Asia.
-
-          In the 2021 Goalkeepers Report, IHME did not estimate a COVID-19 effect on this indicator, due to limited surveillance and control program data availability. Modeling studies and available data suggest that the COVID pandemic likely resulted in disruptions to NTD epidemiology, though these disruptions are likely to vary by disease and location and may be variably amenable to mitigation through increased control efforts. Although modeling studies can characterize potential disruptions under various scenarios, reliable data to quantify the true magnitude of pandemic effects on NTD epidemiology are sparse.
-
-          For this year’s report, IHME searched for published and gray literature quantifying the impact of the COVID-19 pandemic on NTD prevalence. Due to data gaps, lags in availability, and challenges in accounting for the likely disruptions to NTD surveillance during the pandemic, IHME found evidence to support adjustment for COVID-19 disruptions only for dengue. IHME adjusted dengue estimates in 2020 and 2021 using country-specific estimates of COVID disruptions from Chen et al. (2022), including updated estimates for 2021 graciously provided by the study authors via personal communication. For 2020, IHME adjusted only the proportion of cases occurring in April through December, reflecting the timing of the start of the pandemic; for 2021, IHME adjusted the full year. IHME excluded Brazil from the country-specific analysis due to data inconsistencies. For countries not estimated directly by this analysis, IHME applied regional or global disruption ratios. Projections to 2030 used an ensemble model, driven both by trends in the past as well as projections of SDI, which incorporated disruptions from the COVID-19 pandemic on income per capita and education.
+          IHME measures the sum of the prevalence of 15 NTDs per 100,000 that are currently measured in the annual Global Burden of Disease study: human African trypanosomiasis, Chagas disease, cystic echinococcosis, cysticercosis, dengue, food-borne trematodiases, Guinea worm, soil-transmitted helminths (STH, comprising hookworm, trichuriasis, and ascariasis), leishmaniasis, leprosy, lymphatic filariasis, onchocerciasis, rabies, schistosomiasis, and trachoma.
         unit: 'cases of 15 NTDs per 100,000 people'
       mean_estimate_prevalence_of_15_neglected_tropical_diseases_all_ages_males_better_projection:
         title: Prevalence of 15 neglected tropical diseases - Male - Better Projection
         description: |
           Age-standardized prevalence of 15 neglected tropical diseases (NTDs). Prevalence estimates reported here may exceed 100% as they reflect the sum of prevalent cases of 15 NTDs.
 
-          IHME measures the sum of the prevalence of 15 NTDs per 100,000 that are currently measured in the annual Global Burden of Disease study: human African trypanosomiasis, Chagas disease, cystic echinococcosis, cysticercosis, dengue, food-borne trematodiases, Guinea worm, soil-transmitted helminths (STH, comprising hookworm, trichuriasis, and ascariasis), leishmaniasis, leprosy, lymphatic filariasis, onchocerciasis, rabies, schistosomiasis, and trachoma. Since the 2020 Goalkeepers Report, changes in historical trends in this indicator reflect updates to the estimated prevalence of each NTD made for the GBD 2020 study. Specifically, changes in the summary NTD prevalence indicator between the 2020 Goalkeepers Report and these estimates largely reflect the addition of new data to STH models, especially in Latin America and South Asia.
-
-          In the 2021 Goalkeepers Report, IHME did not estimate a COVID-19 effect on this indicator, due to limited surveillance and control program data availability. Modeling studies and available data suggest that the COVID pandemic likely resulted in disruptions to NTD epidemiology, though these disruptions are likely to vary by disease and location and may be variably amenable to mitigation through increased control efforts. Although modeling studies can characterize potential disruptions under various scenarios, reliable data to quantify the true magnitude of pandemic effects on NTD epidemiology are sparse.
-
-          For this year’s report, IHME searched for published and gray literature quantifying the impact of the COVID-19 pandemic on NTD prevalence. Due to data gaps, lags in availability, and challenges in accounting for the likely disruptions to NTD surveillance during the pandemic, IHME found evidence to support adjustment for COVID-19 disruptions only for dengue. IHME adjusted dengue estimates in 2020 and 2021 using country-specific estimates of COVID disruptions from Chen et al. (2022), including updated estimates for 2021 graciously provided by the study authors via personal communication. For 2020, IHME adjusted only the proportion of cases occurring in April through December, reflecting the timing of the start of the pandemic; for 2021, IHME adjusted the full year. IHME excluded Brazil from the country-specific analysis due to data inconsistencies. For countries not estimated directly by this analysis, IHME applied regional or global disruption ratios. Projections to 2030 used an ensemble model, driven both by trends in the past as well as projections of SDI, which incorporated disruptions from the COVID-19 pandemic on income per capita and education.
+          IHME measures the sum of the prevalence of 15 NTDs per 100,000 that are currently measured in the annual Global Burden of Disease study: human African trypanosomiasis, Chagas disease, cystic echinococcosis, cysticercosis, dengue, food-borne trematodiases, Guinea worm, soil-transmitted helminths (STH, comprising hookworm, trichuriasis, and ascariasis), leishmaniasis, leprosy, lymphatic filariasis, onchocerciasis, rabies, schistosomiasis, and trachoma.
         unit: 'cases of 15 NTDs per 100,000 people'
       mean_estimate_met_need_for_family_planning_with_modern_contraception_methods_15_49_years_females_worse_projection:
         title: Met need for family planning with modern contraception methods, 15-49 years females - Worse Projection
         description: |
           Proportion of women of reproductive age (15 to 49 years) who have their need for family planning met with modern contraception methods.
 
-          IHME estimates the proportion of women of reproductive age (15–49 years) who have their need for family planning satisfied with modern contraceptive methods. Modern contraceptive methods include the current use of male and female sterilization, male and female condoms, diaphragms, cervical caps, sponges, spermicidal agents, oral hormonal pills, patches, rings, implants, injections, intrauterine devices (IUDs), and emergency contraceptives. Projections to 2030 used an ensemble model, based both on past trends and using SDI as a key driver, which incorporates projections of income per capita and education and the effects of the COVID-19 pandemic.
-
-          Our analysis of PMA surveys and the smartphone-based follow-up survey referenced above does not show a consistent, significant reduction in contraception use due to the pandemic. As a result, IHME did not incorporate a short-term effect on the family planning indicator. Changes to the historical estimates can be attributed to methodological updates and the addition of new data sources, including the Generations and Gender Programme surveys. They switched from modeling the demand that is satisfied with modern methods directly for all women to modeling the three underlying components of the indicator separately for partnered and unpartnered women: any contraceptive use, proportion of use that is modern, and proportion of non-use that is unmet need. This modeling approach better aligns with data restrictions such as only surveying partnered (married or in-union) women and allows us to construct the full range of family planning indicators.
+          IHME estimates the proportion of women of reproductive age (15–49 years) who have their need for family planning satisfied with modern contraceptive methods. Modern contraceptive methods include the current use of male and female sterilization, male and female condoms, diaphragms, cervical caps, sponges, spermicidal agents, oral hormonal pills, patches, rings, implants, injections, intrauterine devices (IUDs), and emergency contraceptives.
         short_unit: '%'
         unit: '%'
       mean_estimate_met_need_for_family_planning_with_modern_contraception_methods_15_49_years_females_reference_projection:
-        itle: Met need for family planning with modern contraception methods, 15-49 years females - Reference Projection
+        title: Met need for family planning with modern contraception methods, 15-49 years females - Reference Projection
         description: |
           Proportion of women of reproductive age (15 to 49 years) who have their need for family planning met with modern contraception methods.
 
-          IHME estimates the proportion of women of reproductive age (15–49 years) who have their need for family planning satisfied with modern contraceptive methods. Modern contraceptive methods include the current use of male and female sterilization, male and female condoms, diaphragms, cervical caps, sponges, spermicidal agents, oral hormonal pills, patches, rings, implants, injections, intrauterine devices (IUDs), and emergency contraceptives. Projections to 2030 used an ensemble model, based both on past trends and using SDI as a key driver, which incorporates projections of income per capita and education and the effects of the COVID-19 pandemic.
-
-          Our analysis of PMA surveys and the smartphone-based follow-up survey referenced above does not show a consistent, significant reduction in contraception use due to the pandemic. As a result, IHME did not incorporate a short-term effect on the family planning indicator. Changes to the historical estimates can be attributed to methodological updates and the addition of new data sources, including the Generations and Gender Programme surveys. They switched from modeling the demand that is satisfied with modern methods directly for all women to modeling the three underlying components of the indicator separately for partnered and unpartnered women: any contraceptive use, proportion of use that is modern, and proportion of non-use that is unmet need. This modeling approach better aligns with data restrictions such as only surveying partnered (married or in-union) women and allows us to construct the full range of family planning indicators.
+          IHME estimates the proportion of women of reproductive age (15–49 years) who have their need for family planning satisfied with modern contraceptive methods. Modern contraceptive methods include the current use of male and female sterilization, male and female condoms, diaphragms, cervical caps, sponges, spermicidal agents, oral hormonal pills, patches, rings, implants, injections, intrauterine devices (IUDs), and emergency contraceptives.
         short_unit: '%'
         unit: '%'
       mean_estimate_met_need_for_family_planning_with_modern_contraception_methods_15_49_years_females_better_projection:
-        itle: Met need for family planning with modern contraception methods, 15-49 years females - Better Projection
+        title: Met need for family planning with modern contraception methods, 15-49 years females - Better Projection
         description: |
           Proportion of women of reproductive age (15 to 49 years) who have their need for family planning met with modern contraception methods.
 
-          IHME estimates the proportion of women of reproductive age (15–49 years) who have their need for family planning satisfied with modern contraceptive methods. Modern contraceptive methods include the current use of male and female sterilization, male and female condoms, diaphragms, cervical caps, sponges, spermicidal agents, oral hormonal pills, patches, rings, implants, injections, intrauterine devices (IUDs), and emergency contraceptives. Projections to 2030 used an ensemble model, based both on past trends and using SDI as a key driver, which incorporates projections of income per capita and education and the effects of the COVID-19 pandemic.
-
-          Our analysis of PMA surveys and the smartphone-based follow-up survey referenced above does not show a consistent, significant reduction in contraception use due to the pandemic. As a result, IHME did not incorporate a short-term effect on the family planning indicator. Changes to the historical estimates can be attributed to methodological updates and the addition of new data sources, including the Generations and Gender Programme surveys. They switched from modeling the demand that is satisfied with modern methods directly for all women to modeling the three underlying components of the indicator separately for partnered and unpartnered women: any contraceptive use, proportion of use that is modern, and proportion of non-use that is unmet need. This modeling approach better aligns with data restrictions such as only surveying partnered (married or in-union) women and allows us to construct the full range of family planning indicators.
+          IHME estimates the proportion of women of reproductive age (15–49 years) who have their need for family planning satisfied with modern contraceptive methods. Modern contraceptive methods include the current use of male and female sterilization, male and female condoms, diaphragms, cervical caps, sponges, spermicidal agents, oral hormonal pills, patches, rings, implants, injections, intrauterine devices (IUDs), and emergency contraceptives.
         short_unit: '%'
         unit: '%'
       mean_estimate_coverage_of_essential_health_services__as_defined_by_the_uhc_service_coverage_index_all_ages_both_sexes_worse_projection:
@@ -1074,8 +840,6 @@ tables:
           IHME measures the age-standardized prevalence of any current use of smoked tobacco among those age 15 and older.
 
           IHME collates information from available representative surveys that include questions about self-reported current use of tobacco and information on the type of tobacco product smoked (including cigarettes, cigars, pipes, hookahs, and local products).
-
-          IHME converts all data to its standard definition of any current smoking within the last 30 days, so that meaningful comparisons can be made across locations and over time. Estimates this year are higher than last year to reflect the update in the indicator from daily smoking to any smoking within the last 30 days, to better align with the SDG definition. Projections to 2030 used SDI as a key driver, which incorporates projections of income per capita, education, and the effect of the COVID-19 pandemic.
         short_unit: '%'
         unit: '%'
       mean_estimate_prevalence_of_daily_smoking_age_standardized_both_sexes_reference_projection:
@@ -1086,8 +850,6 @@ tables:
           IHME measures the age-standardized prevalence of any current use of smoked tobacco among those age 15 and older.
 
           IHME collates information from available representative surveys that include questions about self-reported current use of tobacco and information on the type of tobacco product smoked (including cigarettes, cigars, pipes, hookahs, and local products).
-
-          IHME converts all data to its standard definition of any current smoking within the last 30 days, so that meaningful comparisons can be made across locations and over time. Estimates this year are higher than last year to reflect the update in the indicator from daily smoking to any smoking within the last 30 days, to better align with the SDG definition. Projections to 2030 used SDI as a key driver, which incorporates projections of income per capita, education, and the effect of the COVID-19 pandemic.
         short_unit: '%'
         unit: '%'
       mean_estimate_prevalence_of_daily_smoking_age_standardized_both_sexes_better_projection:
@@ -1098,8 +860,6 @@ tables:
           IHME measures the age-standardized prevalence of any current use of smoked tobacco among those age 15 and older.
 
           IHME collates information from available representative surveys that include questions about self-reported current use of tobacco and information on the type of tobacco product smoked (including cigarettes, cigars, pipes, hookahs, and local products).
-
-          IHME converts all data to its standard definition of any current smoking within the last 30 days, so that meaningful comparisons can be made across locations and over time. Estimates this year are higher than last year to reflect the update in the indicator from daily smoking to any smoking within the last 30 days, to better align with the SDG definition. Projections to 2030 used SDI as a key driver, which incorporates projections of income per capita, education, and the effect of the COVID-19 pandemic.
         short_unit: '%'
         unit: '%'
       mean_estimate_prevalence_of_daily_smoking_age_standardized_females_worse_projection:
@@ -1110,8 +870,6 @@ tables:
           IHME measures the age-standardized prevalence of any current use of smoked tobacco among those age 15 and older.
 
           IHME collates information from available representative surveys that include questions about self-reported current use of tobacco and information on the type of tobacco product smoked (including cigarettes, cigars, pipes, hookahs, and local products).
-
-          IHME converts all data to its standard definition of any current smoking within the last 30 days, so that meaningful comparisons can be made across locations and over time. Estimates this year are higher than last year to reflect the update in the indicator from daily smoking to any smoking within the last 30 days, to better align with the SDG definition. Projections to 2030 used SDI as a key driver, which incorporates projections of income per capita, education, and the effect of the COVID-19 pandemic.
         short_unit: '%'
         unit: '%'
       mean_estimate_prevalence_of_daily_smoking_age_standardized_females_reference_projection:
@@ -1122,8 +880,6 @@ tables:
           IHME measures the age-standardized prevalence of any current use of smoked tobacco among those age 15 and older.
 
           IHME collates information from available representative surveys that include questions about self-reported current use of tobacco and information on the type of tobacco product smoked (including cigarettes, cigars, pipes, hookahs, and local products).
-
-          IHME converts all data to its standard definition of any current smoking within the last 30 days, so that meaningful comparisons can be made across locations and over time. Estimates this year are higher than last year to reflect the update in the indicator from daily smoking to any smoking within the last 30 days, to better align with the SDG definition. Projections to 2030 used SDI as a key driver, which incorporates projections of income per capita, education, and the effect of the COVID-19 pandemic.
         short_unit: '%'
         unit: '%'
       mean_estimate_prevalence_of_daily_smoking_age_standardized_females_better_projection:
@@ -1134,8 +890,6 @@ tables:
           IHME measures the age-standardized prevalence of any current use of smoked tobacco among those age 15 and older.
 
           IHME collates information from available representative surveys that include questions about self-reported current use of tobacco and information on the type of tobacco product smoked (including cigarettes, cigars, pipes, hookahs, and local products).
-
-          IHME converts all data to its standard definition of any current smoking within the last 30 days, so that meaningful comparisons can be made across locations and over time. Estimates this year are higher than last year to reflect the update in the indicator from daily smoking to any smoking within the last 30 days, to better align with the SDG definition. Projections to 2030 used SDI as a key driver, which incorporates projections of income per capita, education, and the effect of the COVID-19 pandemic.
         short_unit: '%'
         unit: '%'
       mean_estimate_prevalence_of_daily_smoking_age_standardized_males_worse_projection:
@@ -1146,8 +900,6 @@ tables:
           IHME measures the age-standardized prevalence of any current use of smoked tobacco among those age 15 and older.
 
           IHME collates information from available representative surveys that include questions about self-reported current use of tobacco and information on the type of tobacco product smoked (including cigarettes, cigars, pipes, hookahs, and local products).
-
-          IHME converts all data to its standard definition of any current smoking within the last 30 days, so that meaningful comparisons can be made across locations and over time. Estimates this year are higher than last year to reflect the update in the indicator from daily smoking to any smoking within the last 30 days, to better align with the SDG definition. Projections to 2030 used SDI as a key driver, which incorporates projections of income per capita, education, and the effect of the COVID-19 pandemic.
         short_unit: '%'
         unit: '%'
       mean_estimate_prevalence_of_daily_smoking_age_standardized_males_reference_projection:
@@ -1158,8 +910,6 @@ tables:
           IHME measures the age-standardized prevalence of any current use of smoked tobacco among those age 15 and older.
 
           IHME collates information from available representative surveys that include questions about self-reported current use of tobacco and information on the type of tobacco product smoked (including cigarettes, cigars, pipes, hookahs, and local products).
-
-          IHME converts all data to its standard definition of any current smoking within the last 30 days, so that meaningful comparisons can be made across locations and over time. Estimates this year are higher than last year to reflect the update in the indicator from daily smoking to any smoking within the last 30 days, to better align with the SDG definition. Projections to 2030 used SDI as a key driver, which incorporates projections of income per capita, education, and the effect of the COVID-19 pandemic.
         short_unit: '%'
         unit: '%'
       mean_estimate_prevalence_of_daily_smoking_age_standardized_males_better_projection:
@@ -1170,8 +920,6 @@ tables:
           IHME measures the age-standardized prevalence of any current use of smoked tobacco among those age 15 and older.
 
           IHME collates information from available representative surveys that include questions about self-reported current use of tobacco and information on the type of tobacco product smoked (including cigarettes, cigars, pipes, hookahs, and local products).
-
-          IHME converts all data to its standard definition of any current smoking within the last 30 days, so that meaningful comparisons can be made across locations and over time. Estimates this year are higher than last year to reflect the update in the indicator from daily smoking to any smoking within the last 30 days, to better align with the SDG definition. Projections to 2030 used SDI as a key driver, which incorporates projections of income per capita, education, and the effect of the COVID-19 pandemic.
         short_unit: '%'
         unit: '%'
 
