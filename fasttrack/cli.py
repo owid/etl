@@ -280,13 +280,11 @@ def app(dummy_data: bool, commit: bool) -> None:
 
 
 class Options(Enum):
-
     INFER_METADATA = "Infer missing metadata (instead of raising an error)"
     IS_PRIVATE = "Make dataset private (your metadata will be still public!)"
 
 
 class FasttrackForm(BaseModel):
-
     new_sheets_url: str
     existing_sheets_url: Optional[str]
     infer_metadata: bool
