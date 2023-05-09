@@ -57,7 +57,7 @@ tables:
         short_unit: '%'
         unit: '%'
       mean_estimate_maternal_mortality_ratio__who__15_49_years_females_reference_estimate:
-        title: Maternal mortality ratio, estimate
+        title: Maternal mortality ratio - Estimate
         description: |
           Maternal mortality ratio (maternal deaths among women aged 15-49 years per 100,000 live births) without late cause deaths.
 
@@ -240,7 +240,7 @@ tables:
           For this year’s report, IHME searched for published and gray literature quantifying the impact of the COVID-19 pandemic on NTD prevalence. Due to data gaps, lags in availability, and challenges in accounting for the likely disruptions to NTD surveillance during the pandemic, IHME found evidence to support adjustment for COVID-19 disruptions only for dengue. IHME adjusted dengue estimates in 2020 and 2021 using country-specific estimates of COVID disruptions from Chen et al. (2022), including updated estimates for 2021 graciously provided by the study authors via personal communication. For 2020, IHME adjusted only the proportion of cases occurring in April through December, reflecting the timing of the start of the pandemic; for 2021, IHME adjusted the full year. IHME excluded Brazil from the country-specific analysis due to data inconsistencies. For countries not estimated directly by this analysis, IHME applied regional or global disruption ratios. Projections to 2030 used an ensemble model, driven both by trends in the past as well as projections of SDI, which incorporated disruptions from the COVID-19 pandemic on income per capita and education.
         unit: 'cases of 15 NTDs per 100,000 people'
       mean_estimate_met_need_for_family_planning_with_modern_contraception_methods_15_49_years_females_reference_estimate:
-        title: Met need for family planning with modern contraception methods, 15-49 years females, estimate
+        title: Met need for family planning with modern contraception methods, 15-49 years females - Estimate
         description: |
           Proportion of women of reproductive age (15 to 49 years) who have their need for family planning met with modern contraception methods.
 
@@ -404,7 +404,7 @@ tables:
         short_unit: '%'
         unit: '%'
       mean_estimate_maternal_mortality_ratio__who__15_49_years_females_worse_projection:
-        title: Maternal mortality ratio, worse projection
+        title: Maternal mortality ratio - Worse Projection
         description: |
           Maternal mortality ratio (maternal deaths among women aged 15-49 years per 100,000 live births) without late cause deaths.
 
@@ -413,7 +413,7 @@ tables:
           Projections to 2030 were modeled using an ensemble approach to forecast MMR, using SDI as a key driver in order to capture the effects of the COVID-19 pandemic on income per capita and education. Our analysis of direct and indirect maternal mortality in selected countries showed no significant relationship between direct mortality and indicators of the COVID-19 pandemic (i.e., COVID-19 infection incidence rate, COVID-19 mortality rate, changes in mobility). However, there was a significant effect of the COVID-19 pandemic on indirect maternal mortality. This effect on indirect maternal mortality was modeled using COVID-19 mortality rate as a covariate. This year, our estimates of excess indirect maternal mortality also include a correction for the proportion of deaths that are considered incidental, or unrelated to pregnancy status. Currently available data does not suggest a consistent relationship between the pandemic and indicators of maternal care (antenatal care, skilled birth attendance), and IHME has not incorporated an effect of the pandemic on these indicators.
         unit: 'per 100,000 live births'
       mean_estimate_maternal_mortality_ratio__who__15_49_years_females_reference_projection:
-        title: Maternal mortality ratio, reference projection
+        title: Maternal mortality ratio - Reference Projection
         description: |
           Maternal mortality ratio (maternal deaths among women aged 15-49 years per 100,000 live births) without late cause deaths.
 
@@ -422,7 +422,7 @@ tables:
           Projections to 2030 were modeled using an ensemble approach to forecast MMR, using SDI as a key driver in order to capture the effects of the COVID-19 pandemic on income per capita and education. Our analysis of direct and indirect maternal mortality in selected countries showed no significant relationship between direct mortality and indicators of the COVID-19 pandemic (i.e., COVID-19 infection incidence rate, COVID-19 mortality rate, changes in mobility). However, there was a significant effect of the COVID-19 pandemic on indirect maternal mortality. This effect on indirect maternal mortality was modeled using COVID-19 mortality rate as a covariate. This year, our estimates of excess indirect maternal mortality also include a correction for the proportion of deaths that are considered incidental, or unrelated to pregnancy status. Currently available data does not suggest a consistent relationship between the pandemic and indicators of maternal care (antenatal care, skilled birth attendance), and IHME has not incorporated an effect of the pandemic on these indicators.
         unit: 'per 100,000 live births'
       mean_estimate_maternal_mortality_ratio__who__15_49_years_females_better_projection:
-        title: Maternal mortality ratio, better projection
+        title: Maternal mortality ratio - Better Projection
         description: |
           Maternal mortality ratio (maternal deaths among women aged 15-49 years per 100,000 live births) without late cause deaths.
 
@@ -1025,7 +1025,7 @@ tables:
           For this year’s report, IHME searched for published and gray literature quantifying the impact of the COVID-19 pandemic on NTD prevalence. Due to data gaps, lags in availability, and challenges in accounting for the likely disruptions to NTD surveillance during the pandemic, IHME found evidence to support adjustment for COVID-19 disruptions only for dengue. IHME adjusted dengue estimates in 2020 and 2021 using country-specific estimates of COVID disruptions from Chen et al. (2022), including updated estimates for 2021 graciously provided by the study authors via personal communication. For 2020, IHME adjusted only the proportion of cases occurring in April through December, reflecting the timing of the start of the pandemic; for 2021, IHME adjusted the full year. IHME excluded Brazil from the country-specific analysis due to data inconsistencies. For countries not estimated directly by this analysis, IHME applied regional or global disruption ratios. Projections to 2030 used an ensemble model, driven both by trends in the past as well as projections of SDI, which incorporated disruptions from the COVID-19 pandemic on income per capita and education.
         unit: 'cases of 15 NTDs per 100,000 people'
       mean_estimate_met_need_for_family_planning_with_modern_contraception_methods_15_49_years_females_worse_projection:
-        title: Met need for family planning with modern contraception methods, 15-49 years females, worse projection
+        title: Met need for family planning with modern contraception methods, 15-49 years females - Worse Projection
         description: |
           Proportion of women of reproductive age (15 to 49 years) who have their need for family planning met with modern contraception methods.
 
@@ -1035,7 +1035,7 @@ tables:
         short_unit: '%'
         unit: '%'
       mean_estimate_met_need_for_family_planning_with_modern_contraception_methods_15_49_years_females_reference_projection:
-        itle: Met need for family planning with modern contraception methods, 15-49 years females, reference projection
+        itle: Met need for family planning with modern contraception methods, 15-49 years females - Reference Projection
         description: |
           Proportion of women of reproductive age (15 to 49 years) who have their need for family planning met with modern contraception methods.
 
@@ -1045,7 +1045,7 @@ tables:
         short_unit: '%'
         unit: '%'
       mean_estimate_met_need_for_family_planning_with_modern_contraception_methods_15_49_years_females_better_projection:
-        itle: Met need for family planning with modern contraception methods, 15-49 years females, better projection
+        itle: Met need for family planning with modern contraception methods, 15-49 years females - Better Projection
         description: |
           Proportion of women of reproductive age (15 to 49 years) who have their need for family planning met with modern contraception methods.
 
