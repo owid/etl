@@ -16,7 +16,9 @@ meta:
   date_accessed: 2023-05-05
   is_public: false
   description: |
-    IHME produced estimates and forecasts for 13 of the SDG indicators included in the Goalkeepers Report. To estimate the effects of the COVID-19 pandemic on the SDG indicators and their accompanying projections to 2030, IHME implemented an approach as shown in Figure 1 for capturing both the short-term effects of the COVID-19 pandemic as well as the long-term effects that reflect its impact on economic production, educational attainment, and development, and the consequences of these on the SDG indicators.
+    IHME produced estimates and forecasts for 13 of the SDG indicators included in the Goalkeepers Report.
+
+    The full description of the methods used to produce the data can be found here: https://www.gatesfoundation.org/goalkeepers/report/2022-report/data-sources/#ExploretheIndicatorPages
 wdir: ../../../data/snapshots/ihme/2023-05-05
 outs:
 - md5: 8117e96debed567fc203e2aa9388d6f9
