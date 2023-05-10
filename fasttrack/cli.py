@@ -280,13 +280,11 @@ def app(dummy_data: bool, commit: bool) -> None:
 
 
 class Options(Enum):
-
     INFER_METADATA = "Infer missing metadata (instead of raising an error)"
     IS_PRIVATE = "Make dataset private (your metadata will be still public!)"
 
 
 class FasttrackForm(BaseModel):
-
     new_sheets_url: str
     existing_sheets_url: Optional[str]
     infer_metadata: bool
@@ -740,7 +738,12 @@ def _encrypt(s: str) -> str:
 
 def _decrypt(s: str) -> str:
     fernet = _get_secret_key()
-    return fernet.decrypt(s.encode()).decode() if fernet else s
+    # content is not encrypted, this is to keep it backward compatible with old datasets
+    # that weren't using encryption
+    if "docs.google.com" in s:
+        return s
+    else:
+        return fernet.decrypt(s.encode()).decode() if fernet else s
 
 
 if __name__ == "__main__":

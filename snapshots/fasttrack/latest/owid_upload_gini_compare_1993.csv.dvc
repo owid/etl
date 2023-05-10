@@ -1,0 +1,18 @@
+meta:
+  namespace: fasttrack
+  short_name: owid_upload_gini_compare_1993
+  file_extension: csv
+  date_accessed: 2023-05-09
+  name: DRAFT owid_upload_gini_compare_1993
+  description: ''
+  source_name: Local CSV
+  url: ''
+  source_published_by: Local CSV
+  source_data_url: gAAAAABkWrEYse8SRzl9C_CF8Md7IleZMleUQHpKweR-R0FLnBMXB73R_TR8R4apbld3SFjOWcMEZc5MWqmGpmusI8HQLRa-5A==
+  is_public: false
+  version: latest
+wdir: ../../../data/snapshots/fasttrack/latest
+outs:
+- md5: 2bdd8abe9ce6b079b2f234537f64279f
+  size: 34053
+  path: owid_upload_gini_compare_1993.csv
