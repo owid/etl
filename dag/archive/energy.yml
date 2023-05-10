@@ -161,3 +161,11 @@ steps:
     - data://garden/wb/2021-07-01/wb_income
   data://grapher/bp/2022-12-28/energy_mix:
     - data://garden/bp/2022-12-28/energy_mix
+  #
+  # Energy - Primary energy consumption 2022b.
+  #
+  data://garden/energy/2022-07-29/primary_energy_consumption:
+    - data://garden/bp/2022-07-14/statistical_review
+    - data://garden/eia/2022-07-27/energy_consumption
+    - data://garden/ggdc/2020-10-01/ggdc_maddison
+    - data://garden/owid/latest/key_indicators
