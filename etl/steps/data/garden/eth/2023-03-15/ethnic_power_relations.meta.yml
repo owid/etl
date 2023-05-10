@@ -322,7 +322,7 @@ tables:
       cntr_relevance:
         title: Relevance
         description:
-          - '"R" indicates countries where ethnicity is coded as being relevant at least once in the sample period; "P" indicates countries where only a placeholder group is coded.'<br>
+          - '"R" indicates countries where ethnicity is coded as being relevant at least once in the sample period; "P" indicates countries where only a placeholder group is coded.<br>'
           - *description_ethnic_group
           - *description_group_relevance
         unit: ""
