@@ -47,6 +47,10 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
+    # Drop numiso and uncode columns (auxiliary columns from the author's original dataset).
+    df = df.drop(columns=["numiso", "uncode"])
+
+    # Harmonize country names.
     log.info("lgbti_policy_index.harmonize_countries")
     df = geo.harmonize_countries(
         df=df, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
