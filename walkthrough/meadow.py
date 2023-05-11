@@ -7,6 +7,7 @@ from typing import Any
 from pydantic import BaseModel
 from pywebio import input as pi
 from pywebio import output as po
+from pywebio.session import go_app
 
 import etl
 
@@ -19,7 +20,6 @@ DEFAULT_EXTENSION = "csv"
 
 
 class Options(Enum):
-
     ADD_TO_DAG = "Add steps into dag/walkthrough.yaml file"
     INCLUDE_METADATA_YAML = "Include *.meta.yaml file with metadata"
     GENERATE_NOTEBOOK = "Generate playground notebook"
@@ -27,7 +27,6 @@ class Options(Enum):
 
 
 class MeadowForm(BaseModel):
-
     short_name: str
     namespace: str
     version: str
@@ -49,8 +48,8 @@ class MeadowForm(BaseModel):
         super().__init__(**data)
 
 
-def app(run_checks: bool, dummy_data: bool) -> None:
-    dummies = utils.DUMMY_DATA if dummy_data else {}
+def app(run_checks: bool) -> None:
+    state = utils.APP_STATE
 
     with open(CURRENT_DIR / "meadow.md", "r") as f:
         po.put_markdown(f.read())
@@ -63,7 +62,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
                 name="namespace",
                 placeholder="institution",
                 required=True,
-                value=dummies.get("namespace"),
+                value=state.get("namespace"),
                 help_text="Institution name. Example: emdat",
             ),
             pi.input(
@@ -71,7 +70,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
                 name="version",
                 placeholder=str(dt.date.today()),
                 required=True,
-                value=dummies.get("version", str(dt.date.today())),
+                value=state.get("version", str(dt.date.today())),
                 help_text="Version of the meadow dataset (by default, the current date, or exceptionally the publication date).",
             ),
             pi.input(
@@ -79,7 +78,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
                 name="short_name",
                 placeholder="testing_dataset_name",
                 required=True,
-                value=dummies.get("short_name"),
+                value=state.get("short_name"),
                 validate=utils.validate_short_name,
                 help_text="Underscored dataset short name. Example: natural_disasters",
             ),
@@ -88,14 +87,14 @@ def app(run_checks: bool, dummy_data: bool) -> None:
                 name="snapshot_version",
                 placeholder=str(dt.date.today()),
                 required=True,
-                value=dummies.get("version", str(dt.date.today())),
+                value=state.get("version", str(dt.date.today())),
                 help_text="Snapshot version (usually the same as the meadow version).",
             ),
             pi.input(
                 "Snapshot file extension",
                 name="snapshot_file_extension",
                 placeholder=DEFAULT_EXTENSION,
-                value=dummies.get("snapshot_file_extension"),
+                value=state.get("snapshot_file_extension"),
                 help_text="File extension (without the '.') of the snapshot data file. Example: csv",
             ),
             pi.checkbox(
@@ -116,6 +115,9 @@ def app(run_checks: bool, dummy_data: bool) -> None:
         ],
     )
     form = MeadowForm(**data)
+
+    # save form data to global state for next steps
+    state.update(form.dict())
 
     private_suffix = "-private" if form.is_private else ""
 
@@ -180,7 +182,12 @@ def app(run_checks: bool, dummy_data: bool) -> None:
 
     Note that metadata is inherited from previous step (snapshot) and you don't have to repeat it.
 
-5. Exit the process and run next step with `poetry run walkthrough garden`
+5. Continue to the garden step
+"""
+    )
+    po.put_buttons(["Go to garden"], [lambda: go_app("garden", new_window=False)])
+    po.put_markdown(
+        """
 
 ## Generated files
 """
