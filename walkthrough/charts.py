@@ -16,8 +16,8 @@ from MySQLdb import OperationalError
 from pywebio import input as pi
 from pywebio import output as po
 
-from etl.chart_revision.deprecated import ChartRevisionSuggester
-from etl.chart_revision.revision import (
+from etl.chart_revision.v1.deprecated import ChartRevisionSuggester
+from etl.chart_revision.v1.revision import (
     ChartVariableUpdateRevision,
     get_charts_to_update,
     submit_revisions_to_grapher,

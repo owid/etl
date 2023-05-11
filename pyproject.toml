@@ -22,7 +22,7 @@ generate_graph = 'etl.to_graphviz:to_graphviz'
 version_tracker = 'etl.helpers:run_version_tracker_checks'
 etl-match-variables = 'etl.match_variables:main_cli'
 etl-translate-varmap = 'etl.variable_mapping_translate:main_cli'
-etl-chart-suggester = 'etl.chart_revision.cli:main_cli'
+etl-chart-suggester = 'etl.chart_revision.v1.cli:main_cli'
 etl-metadata-export = 'etl.metadata_export:cli'
 etl-datadiff = 'etl.datadiff:cli'
 
