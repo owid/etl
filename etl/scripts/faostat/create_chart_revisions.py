@@ -19,7 +19,7 @@ from owid.datautils.dataframes import map_series
 from structlog import get_logger
 
 from etl import db
-from etl.chart_revision.revision import create_and_submit_charts_revisions
+from etl.chart_revision.v1.revision import create_and_submit_charts_revisions
 from etl.paths import DATA_DIR
 from etl.scripts.faostat.shared import NAMESPACE
 

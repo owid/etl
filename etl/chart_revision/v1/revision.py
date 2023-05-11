@@ -12,8 +12,8 @@ import simplejson as json
 from MySQLdb import IntegrityError
 from structlog import get_logger
 
-from etl.chart_revision.chart import Chart
-from etl.chart_revision.variables import VariablesUpdate
+from etl.chart_revision.v1.chart import Chart
+from etl.chart_revision.v1.variables import VariablesUpdate
 from etl.config import GRAPHER_USER_ID
 from etl.db import get_engine, open_db
 
