@@ -869,6 +869,327 @@ def generate_vegetable_oil_yields(df_qcl: pd.DataFrame, df_fbsc: pd.DataFrame) -
     return tb_vegetable_oil_yields
 
 
+def generate_agriculture_land_evolution(df_rl: pd.DataFrame) -> Table:
+    # Element code for "Area".
+    ELEMENT_CODE_FOR_AREA = "005110"
+    # Unit for element of area.
+    UNIT_FOR_AREA = "hectares"
+    # Item code for "Land under perm. meadows and pastures".
+    ITEM_CODE_FOR_PASTURES = "00006655"
+    # Item code for "Cropland".
+    ITEM_CODE_FOR_CROPLAND = "00006620"
+    # Item code for "Agricultural land".
+    ITEM_CODE_FOR_AGRICULTURAL_LAND = "00006610"
+
+    # Select the relevant items, elements and units.
+    land = df_rl[
+        (df_rl["unit"] == UNIT_FOR_AREA)
+        & (df_rl["element_code"] == ELEMENT_CODE_FOR_AREA)
+        & (df_rl["item_code"].isin([ITEM_CODE_FOR_AGRICULTURAL_LAND, ITEM_CODE_FOR_CROPLAND, ITEM_CODE_FOR_PASTURES]))
+    ].reset_index(drop=True)
+
+    # Transpose data and rename columns conveniently.
+    land = land.pivot(index=["country", "year"], columns=["item_code"], values="value").reset_index()
+    land.columns = list(land.columns)
+    land = land.rename(
+        columns={
+            ITEM_CODE_FOR_AGRICULTURAL_LAND: "agriculture_area",
+            ITEM_CODE_FOR_CROPLAND: "cropland_area",
+            ITEM_CODE_FOR_PASTURES: "pasture_area",
+        },
+        errors="raise",
+    )
+
+    # Add columns corresponding to the values of one decade before.
+    _land = land.copy()
+    _land["_year"] = _land["year"] + 10
+    combined = pd.merge(
+        land,
+        _land,
+        left_on=["country", "year"],
+        right_on=["country", "_year"],
+        how="inner",
+        suffixes=("", "_one_decade_back"),
+    ).drop(columns=["_year"])
+
+    # For each item, add the percentage change of land use this year with respect to one decade back.
+    for item in ["agriculture_area", "cropland_area", "pasture_area"]:
+        combined[f"{item}_change"] = (
+            100 * (combined[f"{item}"] - combined[f"{item}_one_decade_back"]) / combined[f"{item}_one_decade_back"]
+        )
+
+    # Set an appropriate index and sort conveniently.
+    combined = combined.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
+
+    # Create a table.
+    tb_land_use_evolution = Table(combined, short_name="agriculture_land_use_evolution", underscore=True)
+
+    return tb_land_use_evolution
+
+
+def generate_hypothetical_meat_consumption(df_qcl: pd.DataFrame) -> Table:
+    # Element code and unit for "Production".
+    ELEMENT_CODE_FOR_PRODUCTION = "005510"
+    UNIT_FOR_PRODUCTION = "tonnes"
+    # Element code and unit for per-capita "Production".
+    ELEMENT_CODE_FOR_PRODUCTION_PER_CAPITA = "5510pc"
+    UNIT_FOR_PRODUCTION_PER_CAPITA = "tonnes per capita"
+    # Element code and unit for "Producing or slaughtered animals".
+    ELEMENT_CODE_FOR_ANIMALS = "005320"
+    UNIT_FOR_ANIMALS = "animals"
+    # Element code and unit for per-capita "Producing or slaughtered animals".
+    ELEMENT_CODE_FOR_ANIMALS_PER_CAPITA = "5320pc"
+    UNIT_FOR_ANIMALS_PER_CAPITA = "animals per capita"
+    # Item code for "Meat, total".
+    ITEM_CODE_FOR_MEAT_TOTAL = "00001765"
+
+    # Select the required items/elements/units to get national data on per-capita production and slaughtered animals.
+    meat = df_qcl[
+        (df_qcl["item_code"] == ITEM_CODE_FOR_MEAT_TOTAL)
+        & (df_qcl["element_code"].isin([ELEMENT_CODE_FOR_PRODUCTION_PER_CAPITA, ELEMENT_CODE_FOR_ANIMALS_PER_CAPITA]))
+        & (df_qcl["unit"].isin([UNIT_FOR_PRODUCTION_PER_CAPITA, UNIT_FOR_ANIMALS_PER_CAPITA]))
+    ].reset_index(drop=True)
+    meat = meat.pivot(index=["country", "year"], columns="element_code", values="value").reset_index()
+    meat = meat.rename(
+        columns={
+            ELEMENT_CODE_FOR_ANIMALS_PER_CAPITA: "animals_per_capita",
+            ELEMENT_CODE_FOR_PRODUCTION_PER_CAPITA: "production_per_capita",
+        }
+    )
+
+    # Take data for global population from the "population_with_data" column for the production of total meat.
+    # This should coincide with the true world population.
+    # Note that "population_with_data" may differ with the total population for certain items/elements for region
+    # aggregates (e.g. "Africa"). For slaughtered animals, population with data may also differ, since it's
+    # built for all countries (in the garden faostat_qcl step) by aggregating.
+    # But this does not happen with total meat/production for the "World", since this data was extracted directly from FAOSTAT.
+    # TODO: Confirm this by checking qcl code, especially the one about animals slaughtered
+    global_population = (
+        df_qcl[
+            (df_qcl["country"] == "World")
+            & (df_qcl["element_code"] == ELEMENT_CODE_FOR_PRODUCTION)
+            & (df_qcl["unit"] == UNIT_FOR_PRODUCTION)
+            & (df_qcl["item_code"] == ITEM_CODE_FOR_MEAT_TOTAL)
+        ][["year", "population_with_data"]]
+        .reset_index(drop=True)
+        .rename(columns={"population_with_data": "global_population"})
+    ).astype({"global_population": int})
+
+    # Just for reference, extract global production and number of slaughtered animals.
+    global_production = (
+        df_qcl[
+            (df_qcl["country"] == "World")
+            & (df_qcl["element_code"] == ELEMENT_CODE_FOR_PRODUCTION)
+            & (df_qcl["unit"] == UNIT_FOR_PRODUCTION)
+            & (df_qcl["item_code"] == ITEM_CODE_FOR_MEAT_TOTAL)
+        ][["year", "value"]]
+        .reset_index(drop=True)
+        .rename(columns={"value": "production_global"})
+    )
+    global_animals = (
+        df_qcl[
+            (df_qcl["country"] == "World")
+            & (df_qcl["element_code"] == ELEMENT_CODE_FOR_ANIMALS)
+            & (df_qcl["unit"] == UNIT_FOR_ANIMALS)
+            & (df_qcl["item_code"] == ITEM_CODE_FOR_MEAT_TOTAL)
+        ][["year", "value"]]
+        .reset_index(drop=True)
+        .rename(columns={"value": "animals_global"})
+    )
+
+    # Combine national with global data.
+    combined = multi_merge(dfs=[meat, global_population, global_production, global_animals], on=["year"], how="left")
+
+    # Sanity check.
+    error = "Rows have changed after merging national data with global data."
+    assert len(combined) == len(meat), error
+
+    # Add columns for hypothetical global production and number of slaughtered animals.
+    # This is the production (or number of slaughtered animals) that would be needed worldwide to meet the demand of a given country.
+    combined["production_global_hypothetical"] = combined["production_per_capita"] * combined["global_population"]
+    combined["animals_global_hypothetical"] = combined["animals_per_capita"] * combined["global_population"]
+
+    # Set an appropriate index and sort conveniently.
+    combined = combined.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
+
+    # Create a table with the combined data.
+    tb_hypothetical_meat_consumption = Table(combined, short_name="hypothetical_meat_consumption", underscore=True)
+
+    return tb_hypothetical_meat_consumption
+
+
+def generate_cereal_allocation(df_fbsc: pd.DataFrame) -> Table:
+    # Item code for "Cereals - Excluding Beer".
+    ITEM_CODE_FOR_CEREALS = "00002905"
+    # Note: We disregard the contribution from "00002520" ("Cereals, Other"), which is usually negligible compared to the total.
+    # Element code and unit for "Food".
+    # Note: The element code for "Food available for consumption" is "000645"; this should be the same data, except that
+    #  it is given in kilograms (originally it was given per capita). Therefore, we use "Food", which is more convenient.
+    ELEMENT_CODE_FOR_FOOD = "005142"
+    UNIT_FOR_FOOD = "tonnes"
+    # Element code and unit for "Feed".
+    ELEMENT_CODE_FOR_FEED = "005521"
+    UNIT_FOR_FEED = "tonnes"
+    # Element code and unit for "Other uses".
+    ELEMENT_CODE_FOR_OTHER_USES = "005154"
+    UNIT_FOR_OTHER_USES = "tonnes"
+
+    # Select the relevant items/elements.
+    cereals = df_fbsc[
+        (df_fbsc["item_code"] == ITEM_CODE_FOR_CEREALS)
+        & (df_fbsc["element_code"].isin([ELEMENT_CODE_FOR_FOOD, ELEMENT_CODE_FOR_FEED, ELEMENT_CODE_FOR_OTHER_USES]))
+    ].reset_index(drop=True)
+
+    # Sanity check.
+    error = "Units have changed"
+    assert set(cereals["unit"]) == set([UNIT_FOR_FOOD, UNIT_FOR_FEED, UNIT_FOR_OTHER_USES]), error
+
+    # Transpose data and rename columns conveniently.
+    cereals = (
+        cereals.pivot(index=["country", "year"], columns="element_code", values="value")
+        .reset_index()
+        .rename(
+            columns={
+                ELEMENT_CODE_FOR_FOOD: "cereals_allocated_to_food",
+                ELEMENT_CODE_FOR_FEED: "cereals_allocated_to_animal_feed",
+                ELEMENT_CODE_FOR_OTHER_USES: "cereals_allocated_to_other_uses",
+            }
+        )
+    )
+
+    # Add variables for the share of cereals allocated to each use.
+    all_cereal_uses = ["food", "animal_feed", "other_uses"]
+    for item in all_cereal_uses:
+        cereals[f"share_of_cereals_allocated_to_{item}"] = (
+            100
+            * cereals[f"cereals_allocated_to_{item}"]
+            / cereals[[f"cereals_allocated_to_{use}" for use in all_cereal_uses]].sum(axis=1)
+        )
+
+    # Set an appropriate index and sort conveniently.
+    cereals = cereals.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
+
+    # Create a table with the generated data.
+    tb_cereal_allocation = Table(cereals, short_name="cereal_allocation", underscore=True)
+
+    return tb_cereal_allocation
+
+
+def generate_maize_and_wheat(df_fbsc: pd.DataFrame) -> Table:
+    # Item code for "Wheat".
+    ITEM_CODE_FOR_WHEAT = "00002511"
+    # Item code for "Maize".
+    ITEM_CODE_FOR_MAIZE = "00002514"
+    # Element code for "Exports".
+    ELEMENT_CODE_FOR_EXPORTS = "005911"
+    # Element code for "Feed".
+    ELEMENT_CODE_FOR_FEED = "005521"
+    # Element code for "Other uses".
+    ELEMENT_CODE_FOR_OTHER_USES = "005154"
+
+    # Select the relevant items/elements.
+    maize_and_wheat = df_fbsc[
+        (df_fbsc["item_code"].isin([ITEM_CODE_FOR_MAIZE, ITEM_CODE_FOR_WHEAT]))
+        & (df_fbsc["element_code"].isin([ELEMENT_CODE_FOR_EXPORTS, ELEMENT_CODE_FOR_FEED, ELEMENT_CODE_FOR_OTHER_USES]))
+    ]
+
+    # Sanity check.
+    error = "Units have changed."
+    assert list(maize_and_wheat["unit"].unique()) == ["tonnes"], error
+
+    # Transpose data and rename columns conveniently.
+    maize_and_wheat = maize_and_wheat.pivot(
+        index=["country", "year"], columns=["item_code", "element_code"], values="value"
+    )
+    maize_and_wheat = maize_and_wheat.rename(
+        columns={ITEM_CODE_FOR_MAIZE: "maize", ITEM_CODE_FOR_WHEAT: "wheat"}, level=0
+    ).rename(
+        columns={
+            ELEMENT_CODE_FOR_EXPORTS: "exports",
+            ELEMENT_CODE_FOR_FEED: "animal_feed",
+            ELEMENT_CODE_FOR_OTHER_USES: "other_uses",
+        }
+    )
+    maize_and_wheat.columns = [column[0] + "_" + column[1] for column in maize_and_wheat.columns]
+
+    # Set an appropriate index and sort conveniently.
+    maize_and_wheat = (
+        maize_and_wheat.reset_index()
+        .set_index(["country", "year"], verify_integrity=True)
+        .sort_index()
+        .sort_index(axis=1)
+    )
+
+    # Create a table with the generated data.
+    tb_maize_and_wheat = Table(maize_and_wheat, short_name="maize_and_wheat", underscore=True)
+
+    # Add minimal variable metadata (more metadata will be added at the grapher step).
+    for column in tb_maize_and_wheat.columns:
+        tb_maize_and_wheat[column].metadata.unit = "tonnes"
+        tb_maize_and_wheat[column].metadata.short_unit = "t"
+
+    return tb_maize_and_wheat
+
+
+def generate_fertilizer_exports(df_rfn: pd.DataFrame) -> Table:
+    # Element code for "Export Quantity".
+    ELEMENT_CODE_FOR_EXPORTS = "005910"
+    # Item code for "Nutrient nitrogen N (total)".
+    ITEM_CODE_FOR_NITROGEN = "00003102"
+    # Item code for "Nutrient phosphate P2O5 (total)".
+    ITEM_CODE_FOR_PHOSPHATE = "00003103"
+    # Item code for "Nutrient potash K2O (total)".
+    ITEM_CODE_FOR_POTASH = "00003104"
+
+    # Select the relevant items and elements.
+    fertilizer_exports = df_rfn[
+        (df_rfn["element_code"] == ELEMENT_CODE_FOR_EXPORTS)
+        & (df_rfn["item_code"].isin([ITEM_CODE_FOR_NITROGEN, ITEM_CODE_FOR_PHOSPHATE, ITEM_CODE_FOR_POTASH]))
+    ].reset_index(drop=True)
+
+    # Sanity check.
+    error = "Units have changed."
+    assert list(fertilizer_exports["unit"].unique()) == ["tonnes"], error
+
+    # Rename columns and items conveniently.
+    fertilizer_exports = fertilizer_exports[["country", "year", "item_code", "value"]].rename(
+        columns={"item_code": "item", "value": "exports"}
+    )
+    fertilizer_exports["item"] = fertilizer_exports["item"].replace(
+        {ITEM_CODE_FOR_NITROGEN: "Nitrogen", ITEM_CODE_FOR_PHOSPHATE: "Phosphorous", ITEM_CODE_FOR_POTASH: "Potassium"}
+    )
+
+    # Add column of global exports.
+    global_exports = (
+        fertilizer_exports[fertilizer_exports["country"] == "World"].drop(columns=["country"]).reset_index(drop=True)
+    )
+    fertilizer_exports = pd.merge(
+        fertilizer_exports, global_exports, how="left", on=["year", "item"], suffixes=("", "_global")
+    )
+
+    # Create columns for the share of exports.
+    fertilizer_exports["share_of_exports"] = 100 * fertilizer_exports["exports"] / fertilizer_exports["exports_global"]
+
+    # Drop column of global exports.
+    fertilizer_exports = fertilizer_exports.drop(columns=["exports_global"])
+
+    # Set an appropriate index and sort conveniently.
+    fertilizer_exports = (
+        fertilizer_exports.set_index(["country", "year", "item"], verify_integrity=True).sort_index().sort_index(axis=1)
+    )
+
+    # Create a table with the generated data.
+    tb_fertilizer_exports = Table(fertilizer_exports, short_name="fertilizer_exports", underscore=True)
+
+    # Add minimal variable metadata (more metadata will be added at the grapher step).
+    tb_fertilizer_exports["share_of_exports"].metadata.unit = "%"
+    tb_fertilizer_exports["share_of_exports"].metadata.short_unit = "%"
+    tb_fertilizer_exports["exports"].metadata.unit = "tonnes"
+    tb_fertilizer_exports["exports"].metadata.short_unit = "t"
+
+    return tb_fertilizer_exports
+
+
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
@@ -903,6 +1224,11 @@ def run(dest_dir: str) -> None:
     tb_ef = ds_ef[f"{NAMESPACE}_ef"]
     df_ef = pd.DataFrame(tb_ef).reset_index()
 
+    # Load dataset about fertilizers by nutrient, load its main (long-format) table, and create a convenient dataframe.
+    ds_rfn: Dataset = paths.load_dependency(f"{NAMESPACE}_rfn")
+    tb_rfn = ds_rfn[f"{NAMESPACE}_rfn"]
+    df_rfn = pd.DataFrame(tb_rfn).reset_index()
+
     #
     # Process data.
     #
@@ -930,6 +1256,21 @@ def run(dest_dir: str) -> None:
     # Create table for vegetable oil yields.
     tb_vegetable_oil_yields = generate_vegetable_oil_yields(df_qcl=df_qcl, df_fbsc=df_fbsc)
 
+    # Create table for peak agricultural land.
+    tb_agriculture_land_use_evolution = generate_agriculture_land_evolution(df_rl=df_rl)
+
+    # Create table for hypothetical meat consumption
+    tb_hypothetical_meat_consumption = generate_hypothetical_meat_consumption(df_qcl=df_qcl)
+
+    # Create table for cereal allocation.
+    tb_cereal_allocation = generate_cereal_allocation(df_fbsc=df_fbsc)
+
+    # Create table for maize and wheat data (used in the context of the Ukraine war).
+    tb_maize_and_wheat = generate_maize_and_wheat(df_fbsc=df_fbsc)
+
+    # Create table for fertilizer exports (used in the context of the Ukraine war).
+    tb_fertilizer_exports = generate_fertilizer_exports(df_rfn=df_rfn)
+
     #
     # Save outputs.
     #
@@ -945,6 +1286,11 @@ def run(dest_dir: str) -> None:
             tb_macronutrient_compositions,
             tb_fertilizers,
             tb_vegetable_oil_yields,
+            tb_agriculture_land_use_evolution,
+            tb_hypothetical_meat_consumption,
+            tb_cereal_allocation,
+            tb_maize_and_wheat,
+            tb_fertilizer_exports,
         ],
     )
     ds_garden.save()

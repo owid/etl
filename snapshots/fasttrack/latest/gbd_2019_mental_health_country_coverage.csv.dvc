@@ -1,0 +1,23 @@
+meta:
+  namespace: fasttrack
+  short_name: gbd_2019_mental_health_country_coverage
+  file_extension: csv
+  date_accessed: 2023-05-09
+  name: Countries with mental health data in GBD 2019
+  description: |-
+    Dataset showing the number of countries with primary data on the prevalence of mental illnesses. These were found after a systematic review, grey literature search and expert consultation, to identify studies with data on the prevalence of each mental illness.
+
+    'The GBD inclusion criteria stipulated that: (1) the diagnostic criteria must be from 1980 onward; (2) “caseness” must be based on clinical threshold as established by the DSM, ICD, Chinese Classification of Mental Disorders (CCMD), or diagnosed by a clinician using established tools; (3) sufficient information must be provided on study method and sample characteristics to assess the quality of the study; and (4) study samples must be representative of the general population (i.e., case studies, veterans, or refugee samples were excluded). No limitation was set on the language of publication.'
+  source_name: Google Sheet
+  url: https://www.thelancet.com/journals/lancet/article/PIIS0140-6736(20)30925-9/fulltext
+  source_published_by: Google Sheet
+  source_data_url: gAAAAABkWm0zWq0RoWXfM5NcV5v5HEvy3acOrAO43ah32iootMCxIVQ9n64M403JFdlQWElBh6eCUn4E9ve7Xs0kqXM3nJo75VjPVf7mpyEJiPl4YN4znukGEqS0MIZ0RrkItC2GuCU8jxt686r-6QJpiqXZ5Qc9E-k8xjgyeRYpT-BGxWZi5VknsEUR90jbySK0G_uIC4EUnCbMDnlXxlncI5U4QbxPeUMIy0z_Uzp49zdGRmG1awBi_AK_lx0Wi_ivQMJFpMiu
+  license_url: https://www.thelancet.com/journals/lancet/article/PIIS0140-6736(20)30925-9/fulltext
+  is_public: false
+  version: latest
+  publication_year: 2020
+wdir: ../../../data/snapshots/fasttrack/latest
+outs:
+- md5: b3d4c8fce19f2ee06faaaefec028a6a7
+  size: 534
+  path: gbd_2019_mental_health_country_coverage.csv

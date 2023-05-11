@@ -207,3 +207,7 @@ This will list all the folders and directories in the project. Find a brief expl
 | `Makefile`, `default.mk`    | `make`-related files. |
 
 *[DVC]: Data Version Control
+
+## Grapher
+
+To test import datasets to the Grapher locally, you need to set your Grapher working environment first. For this, follow this [guide](https://github.com/owid/owid-grapher/blob/master/docs/docker-compose-mysql.md).

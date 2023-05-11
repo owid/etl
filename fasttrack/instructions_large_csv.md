@@ -6,7 +6,7 @@ If your dataset is too big to fit into Google Sheets (your CSV has >20mb), you c
 
 2. Upload your CSV to a public URL. This could be Google Drive to [OWID Fast-track -> datasets](https://drive.google.com/drive/folders/1OeK3wsNnaHFCOTQlxHjqgZuFS9gvPhaI?usp=share_link) folder or it could be S3.
 
-3. Instead of having data in Google Sheets, you will have a link to your CSV in `dataset_meta` sheet in `data_url` field.
+3. Instead of having data in Google Sheets, you will have a link to your CSV in `dataset_meta` sheet in `external_csv` field.
 
 4. Get the URL of your CSV. For example, if you uploaded it to Google Drive, you can get the URL by right-clicking on the file and selecting `Get shareable link`. The URL should look something like this: `https://drive.google.com/file/d/1--xdZuBFD1ZgM_8e4frydCheab6KBgnU/view?usp=sharing`. Paste this URL into that `data_url` field.
 

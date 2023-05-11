@@ -1,7 +1,7 @@
 # Manually add a dataset to the ETL
 ## Get set up
 
-Before you begin, make sure you've set up the ETL as described in [Getting Started](../getting-started/index.md).
+Before you begin, make sure you've set up the ETL as described in [Getting Started](../../getting-started/index.md).
 
 ## Adding steps to the ETL
 
@@ -113,7 +113,7 @@ poetry run etl data://grapher/<namespace>/<version>/<dataset_short_name> --graph
 To test the step, you can run it on the grapher `staging` database, or using
 [a local grapher](https://github.com/owid/owid-grapher/blob/master/docs/docker-compose-mysql.md).
 
-!!! warning "The `grapher` step to import the dataset to Grpaher is now automatic"
+!!! warning "The `grapher` step to import the dataset to Grapher is now automatic"
     We have automatic deploys to grapher database from ETL. This means that whenever we push to master, `etl --grapher` is automatically run and pushes your data to MySQL. This means:
 
     - **You don't have to manually push to grapher**. Just merge and wait for CI status on master to turn green.

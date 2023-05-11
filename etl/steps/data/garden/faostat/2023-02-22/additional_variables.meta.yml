@@ -540,3 +540,172 @@ tables:
         short_unit: ha
         description: |
           Amount of land that would need to be devoted to grow sesame crops if it was to meet global vegetable oil demand alone.
+  agriculture_land_use_evolution:
+    variables:
+      agriculture_area:
+        title: Area used for agriculture
+        unit: hectares
+        short_unit: ha
+        description: |
+          Surface area devoted to agriculture on a given year.
+      agriculture_area_one_decade_back:
+        title: Area used for agriculture one decade back
+        unit: hectares
+        short_unit: ha
+        description: |
+          Surface area devoted to agriculture one decade before a given year. For example, for year 2020, this variable gives the extent of agricultural land in 2010.
+      cropland_area:
+        title: Area used for croplands
+        unit: hectares
+        short_unit: ha
+        description: |
+          Surface area devoted to croplands on a given year.
+      cropland_area_one_decade_back:
+        title: Area used for croplands one decade back
+        unit: hectares
+        short_unit: ha
+        description: |
+          Surface area devoted to croplands one decade before a given year. For example, for year 2020, this variable gives the extent of croplands in 2010.
+      pasture_area:
+        title: Area used for pastures
+        unit: hectares
+        short_unit: ha
+        description: |
+          Surface area devoted to pastures on a given year.
+      pasture_area_one_decade_back:
+        title: Area used for pastures one decade back
+        unit: hectares
+        short_unit: ha
+        description: |
+          Surface area devoted to pastures one decade before a given year. For example, for year 2020, this variable gives the extent of pastures in 2010.
+      year_one_decade_back:
+        title: Year one decade back
+        unit: ""
+        short_unit: ""
+        description: |
+          Year one decade before a given year. For example, for year 2020, this variable would be 2010.
+      agriculture_area_change:
+        title: Change in agriculture area with respect to one decade back
+        unit: "%"
+        short_unit: "%"
+        description: |
+          Percentage change in surface area devoted to agriculture with respect to 10 years before. Negative values imply that surface area has decreased with respect to the previous decade.
+
+          This data is used to assess which countries may have already peaked in their agricultural land use. 
+
+          Assessing this by looking at annual land use data is difficult because there can be significant year-to-year variability. That land use for one or two years was lower than previous years would be insufficient to conclude that a country had peaked.
+
+          For this reason we look at decadal changes in agricultural land. We look at land use in the latest year relative to 10 years before.
+
+          If land use is lower in the latest year then we suggest that land use may have peaked. If land use it the same or higher than a decade back, we suggest that it hasn't, or this is uncertain.
+      cropland_area_change:
+        title: Change in cropland area with respect to one decade back
+        unit: "%"
+        short_unit: "%"
+        description: |
+          Percentage change in surface area devoted to croplands with respect to 10 years before. Negative values imply that surface area has decreased with respect to the previous decade.
+
+          This data is used to assess which countries may have already peaked in their agricultural land use. 
+
+          Assessing this by looking at annual land use data is difficult because there can be significant year-to-year variability. That land use for one or two years was lower than previous years would be insufficient to conclude that a country had peaked.
+
+          For this reason we look at decadal changes in agricultural land. We look at land use in the latest year relative to 10 years before.
+
+          If land use is lower in the latest year then we suggest that land use may have peaked. If land use it the same or higher than a decade back, we suggest that it hasn't, or this is uncertain.
+      pasture_area_change:
+        title: Change in pasture area with respect to one decade back
+        unit: "%"
+        short_unit: "%"
+        description: |
+          Percentage change in surface area devoted to pastures with respect to 10 years before. Negative values imply that surface area has decreased with respect to the previous decade.
+
+          This data is used to assess which countries may have already peaked in their agricultural land use. 
+
+          Assessing this by looking at annual land use data is difficult because there can be significant year-to-year variability. That land use for one or two years was lower than previous years would be insufficient to conclude that a country had peaked.
+
+          For this reason we look at decadal changes in agricultural land. We look at land use in the latest year relative to 10 years before.
+
+          If land use is lower in the latest year then we suggest that land use may have peaked. If land use it the same or higher than a decade back, we suggest that it hasn't, or this is uncertain.
+  hypothetical_meat_consumption:
+    variables:
+      animals_global:
+        title: Number of slaughtered animals to produce meat worldwide
+        unit: "animals"
+        short_unit: ""
+      animals_global_hypothetical:
+        title: Hypothetical number of slaughtered animals if everyone ate like the average citizen of a given country
+        unit: "animals"
+        short_unit: ""
+        description: |
+          Hypothetical number of slaughtered animals worldwide if everyone in the world ate the same quantity as the average citizen of a given country.
+
+          This is a hypothetical variable derived by Our World in Data which answers the question: "How many animals would need to be slaughtered if everyone in the world consumed the average per capita amount of a given country?". For example: "How many animals would need to be slaughtered if everyone in the world consumed the same amount of meat as the average UK citizen?".
+
+          This was derived by multiplying global population by the per capita number of slaughtered animals of a given country.
+      animals_per_capita:
+        title: Number of slaughtered animals per person in each country
+        unit: "animals per person"
+        short_unit: ""
+      global_population:
+        title: World population
+        unit: "people"
+        short_unit: ""
+      production_global:
+        title: Total amount of meat produced worldwide
+        unit: "tonnes"
+        short_unit: "t"
+      production_global_hypothetical:
+        title: Hypothetical global meat demand if everyone ate like the average citizen of a given country
+        unit: "tonnes"
+        short_unit: "t"
+        description: |
+          Hypothetical global meat demand if everyone in the world ate the same quantity as the average citizen of a given country.
+
+          This is a hypothetical variable derived by Our World in Data which answers the question: "What would global meat production have to be if everyone in the world consumed the average per capita amount of a given country?". For example: "How much meat would we need to produce if everyone in the world consumed the same amount of meat as the average UK citizen?".
+
+          This was derived by multiplying global population by per capita meat supply of a given country.
+      production_per_capita:
+        title: Per-capita production of meat in each country
+        unit: "tonnes per person"
+        short_unit: "t/person"
+  cereal_allocation:
+    variables:
+      cereals_allocated_to_animal_feed:
+        title: Cereals allocated to animal feed
+        unit: tonnes
+        short_unit: t
+        description: |
+          Quantity of cereal crops allocated to animal feed (and not human food or other uses, such as biofuel production).
+      cereals_allocated_to_food:
+        title: Cereals allocated to human food
+        unit: tonnes
+        short_unit: t
+        description: |
+          Quantity of cereal crops allocated to human food (and not animal feed or other uses, such as biofuel production).
+      cereals_allocated_to_other_uses:
+        title: Cereals allocated to other uses
+        unit: tonnes
+        short_unit: t
+        description: |
+          Quantity of cereal crops allocated to other uses (and not to human food or animal feed), predominantly industrial uses such as biofuel production.
+      share_of_cereals_allocated_to_animal_feed:
+        title: Share of cereals that are allocated to animal feed
+        unit: "%"
+        short_unit: "%"
+        description: |
+          This is calculated by dividing the amount of cereals allocated to animal feed by the sum of all cereal uses considered (namely human food, animal feed, and other uses such us biofuel production). This corresponds to cereals available domestically (after trade) excluding supply chain losses and seed resown from the crop.
+      share_of_cereals_allocated_to_food:
+        title: Share of cereals that are allocated to human food
+        unit: "%"
+        short_unit: "%"
+        description: |
+          This is calculated by dividing the amount of cereals allocated to human food by the sum of all cereal uses considered (namely human food, animal feed, and other uses such us biofuel production). This corresponds to cereals available domestically (after trade) excluding supply chain losses and seed resown from the crop.
+      share_of_cereals_allocated_to_other_uses:
+        title: Share of cereals that are allocated to other uses such as biofuel production
+        unit: "%"
+        short_unit: "%"
+        description: |
+          This is calculated by dividing the amount of cereals allocated to other uses (predominantly industrial uses such as biofuel production) by the sum of all cereal uses considered (namely human food, animal feed, and other uses). This corresponds to cereals available domestically (after trade) excluding supply chain losses and seed resown from the crop.
+  # All metadata for maize_and_wheat and fertilizer_exports is prepared via script.
+  # maize_and_wheat:
+  # fertilizer_exports:
