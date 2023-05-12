@@ -449,6 +449,7 @@
   name: "Denmark"
   related:
     - "FRO"
+    - "GRL"
 
 - code: "DJI"
   name: "Djibouti"
@@ -983,6 +984,8 @@
   name: "New Zealand"
   related:
     - "TKL"
+    - "NIU"
+    - "COK"
 
 - code: "NIC"
   name: "Nicaragua"

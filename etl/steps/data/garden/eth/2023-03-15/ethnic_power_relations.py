@@ -13,6 +13,26 @@ log = get_logger()
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+# EPR classifies some countries as both their historical and current name. This is not ideal for some cases where their borders changed completely
+def separate_historical_countries(df: pd.DataFrame) -> pd.DataFrame:
+
+    df["country"] = df["country"].astype(str)
+    # RUSSIA / SOVIET UNION
+    # Change the country name for the Soviet Union to Russia for years less or equal to 1991
+    df.loc[(df["country"] == "Russia (Soviet Union)") & (df["year"] <= 1991), "country"] = "USSR"
+    df.loc[(df["country"] == "Russia (Soviet Union)") & (df["year"] > 1991), "country"] = "Russia"
+
+    # YEMEN
+    # Rename "Yemen (Arab Republic of Yemen)" to "Yemen" for years greater than 1990
+    df.loc[(df["country"] == "Yemen (Arab Republic of Yemen)") & (df["year"] > 1990), "country"] = "Yemen"
+
+    # GERMANY
+    # Rename "German Federal Republic" to "Germany" for years greater than 1990
+    df.loc[(df["country"] == "German Federal Republic") & (df["year"] > 1990), "country"] = "Germany"
+
+    return df
+
+
 # Data processing function for the Ethnic Power-Relations Dataset
 def process_ethnic_power_relations(df: pd.DataFrame) -> pd.DataFrame:
     # Select only the variables related to the Ethnic Power-Relations Dataset
@@ -180,30 +200,6 @@ def add_regional_aggregations(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-# EPR classifies some countries as both their historical and current name. This is not ideal for some cases where their borders changed completely
-def separate_historical_countries(df: pd.DataFrame) -> pd.DataFrame:
-
-    df["country"] = df["country"].astype(str)
-    # RUSSIA / SOVIET UNION
-    # Change the country name for the Soviet Union to Russia for years less or equal to 1991
-    df.loc[(df["country"] == "Russia (Soviet Union)") & (df["year"] <= 1991), "country"] = "USSR"
-    df.loc[(df["country"] == "Russia (Soviet Union)") & (df["year"] > 1991), "country"] = "Russia"
-
-    # VIETNAM
-    # Rename "Vietnam, Democratic Republic of" to "Vietnam" for years greater than 1976
-    df.loc[(df["country"] == "Vietnam, Democratic Republic of") & (df["year"] > 1975), "country"] = "Vietnam"
-
-    # YEMEN
-    # Rename "Yemen (Arab Republic of Yemen)" to "Yemen" for years greater than 1990
-    df.loc[(df["country"] == "Yemen (Arab Republic of Yemen)") & (df["year"] > 1990), "country"] = "Yemen"
-
-    # GERMANY
-    # Rename "German Federal Republic" to "Germany" for years greater than 1990
-    df.loc[(df["country"] == "German Federal Republic") & (df["year"] > 1990), "country"] = "Germany"
-
-    return df
-
-
 def run(dest_dir: str) -> None:
     log.info("ethnic_power_relations.start")
 
@@ -223,7 +219,7 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
 
-    # Separate historical countries (Soviet Union, Vietnam, Yemen)
+    # Separate historical countries (Soviet Union, Yemen)
     df = separate_historical_countries(df)
 
     log.info("ethnic_power_relations.harmonize_countries")
