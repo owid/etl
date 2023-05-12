@@ -18,73 +18,103 @@ tables:
         description:
         short_unit: ''
         unit: ''
+        display:
+          numDecimalPlaces: 0
       exceptions_legal_age_of_marriage:
         title: Are there any exceptions to the legal age of marriage? (1=yes; 0=no)
         description:
         short_unit: ''
         unit: ''
+        display:
+          numDecimalPlaces: 0
       marriage_under_legal_age_void_or_explicitly_prohibited:
         title: Is marriage under the legal age void or explicitly prohibited? (1=yes; 0=no)
         description:
         short_unit: ''
         unit: ''
+        display:
+          numDecimalPlaces: 0
       penalties_for_authorizing_or_entering_into_early_marriage:
         title: Are there penalties for authorizing or entering into child or early marriage? (1=yes; 0=no)
         description:
         short_unit: ''
         unit: ''
+        display:
+          numDecimalPlaces: 0
       criminal_penalties_for_domestic_violence:
         title: Does the legislation establish clear criminal penalties for domestic violence? (1=yes; 0=no)
         description:
         short_unit: ''
         unit: ''
+        display:
+          numDecimalPlaces: 0
       specialized_court_for_domestic_violence:
         title: Is there a specialized court or procedure for cases of domestic violence? (1=yes; 0=no)
         description:
         short_unit: ''
         unit: ''
+        display:
+          numDecimalPlaces: 0
       national_identity_card:
         title: Can a woman obtain a national identity card in the same way as a married man? (1=yes; 0=no)
         description:
         short_unit: ''
         unit: ''
+        display:
+          numDecimalPlaces: 0
       customary_law_valid_source_of_law:
         title: Is customary law a valid source of law under the constitution? (1=yes; 0=no)
         description:
         short_unit: ''
         unit: ''
+        display:
+          numDecimalPlaces: 0
       customary_law_invalid_if_violates_constitutional_provisions:
         title: If customary law is a valid source of law under the constitution, is it considered invalid if it violates constitutional provisions on nondiscrimination or equality? (1=yes; 0=no)
         description:
         short_unit: ''
         unit: ''
+        display:
+          numDecimalPlaces: 0
       legislation_addresses_sexual_harassment:
         title: Is there legislation that specifically addresses sexual harassment? (1=yes; 0=no)
         description:
         short_unit: ''
         unit: ''
+        display:
+          numDecimalPlaces: 0
       confer_citizenship_to_children_married:
         title: Can a married woman legally confer citizenship to her children in the same way as a married man? (1=yes; 0=no)
         description:
         short_unit: ''
         unit: ''
+        display:
+          numDecimalPlaces: 0
       confer_citizenship_to_children_unmarried:
         title: Can an unmarried woman legally confer citizenship to her children in the same way as a married man? (1=yes; 0=no)
         description:
         short_unit: ''
         unit: ''
+        display:
+          numDecimalPlaces: 0
       confer_citizenship_to_non_national_spouse_married:
         title: Can a married woman legally confer her citizenship to a non-national spouse in the same way as a married man? (1=yes; 0=no)
         description:
         short_unit: ''
         unit: ''
+        display:
+          numDecimalPlaces: 0
       joint_legal_responsibility_family_expenses:
         title: Do married couples jointly share legal responsibility for financially maintaining the family’s expenses? (1=yes; 0=no)
         description:
         short_unit: ''
         unit: ''
+        display:
+          numDecimalPlaces: 0
       womans_testimony_carry_same_evidentiary_weight:
         title: Does a woman’s testimony carry the same evidentiary weight in court as a man's in all types of cases? (1=yes; 0=no)
         description:
         short_unit: ''
         unit: ''
+        display:
+          numDecimalPlaces: 0
