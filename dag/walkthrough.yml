@@ -8,9 +8,3 @@ steps:
   - data://garden/dummy/2020-01-01/dummy
   data://explorers/dummy/2020-01-01/dummy:
   - data://garden/dummy/2020-01-01/dummy
-  data://meadow/wb/2023-05-12/women_business_law_additional:
-  - snapshot://wb/2023-05-12/women_business_law_additional.xlsx
-  data://garden/wb/2023-05-12/women_business_law_additional:
-  - data://meadow/wb/2023-05-12/women_business_law_additional
-  - data://garden/demography/2023-03-31/population
-  - data://garden/reference

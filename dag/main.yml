@@ -381,6 +381,15 @@ steps:
   data://grapher/research_development/2023-05-05/patents_articles:
     - data://garden/research_development/2023-05-05/patents_articles
 
+  # World Bank's Women, Business and the Law additional data
+  data://meadow/wb/2023-05-12/women_business_law_additional:
+  - snapshot://wb/2023-05-12/women_business_law_additional.xlsx
+  data://garden/wb/2023-05-12/women_business_law_additional:
+  - data://meadow/wb/2023-05-12/women_business_law_additional
+  - data://garden/demography/2023-03-31/population
+  - data://garden/reference
+  - data://garden/wb/2021-07-01/wb_income
+
 # Sub-dags to import
 include:
   - dag/open_numbers.yml
