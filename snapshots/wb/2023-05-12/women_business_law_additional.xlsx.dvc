@@ -15,7 +15,7 @@ meta:
   date_accessed: 2023-05-12
   is_public: true
   description: |
-    Women, Business and the Law data is available for the period from 1971 to 2023 (calendar years 1970 to 2022). By developing a time series and further researching the interaction between inequality of opportunity for women and labor market dynamics, Women, Business and the Law strengthens insights into how women’s employment and entrepreneurship are affected by legal gender discrimination, and in turn how this affects economic outcomes.
+    By developing a time series and further researching the interaction between inequality of opportunity for women and labor market dynamics, Women, Business and the Law strengthens insights into how women’s employment and entrepreneurship are affected by legal gender discrimination, and in turn how this affects economic outcomes.
 
     This specific dataset is an additional file provided by the World Bank, which contains a set of 14 non-scored questions (years 2017, 2019, and 2020), including data on child marriage, customary law, citizenship, sexual harassment, and access to ID cards.
 wdir: ../../../data/snapshots/wb/2023-05-12
