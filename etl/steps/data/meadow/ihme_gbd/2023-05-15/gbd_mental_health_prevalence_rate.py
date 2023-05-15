@@ -3,6 +3,7 @@
 import os
 import tempfile
 import zipfile
+from typing import cast
 
 import pandas as pd
 from owid.catalog import Table
@@ -66,5 +67,5 @@ def read_df_from_snapshot_zips(snap: Snapshot) -> pd.DataFrame:
             if f.endswith(".csv"):
                 df_ = pd.read_csv(os.path.join(temp_dir, f))
                 dfs.append(df_)
-    df = pd.concat(dfs, ignore_index=True)
+    df = cast(pd.DataFrame, pd.concat(dfs, ignore_index=True))
     return df
