@@ -21,7 +21,7 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap: Snapshot = paths.load_dependency("{{cookiecutter.short_name}}.{{cookiecutter.snapshot_file_extension}}")
+    snap: Snapshot = paths.load_dependency("{{cookiecutter.short_name}}.{{cookiecutter.file_extension}}")
 
     # Load data from snapshot.
     df = pd.read_csv(snap.path)
