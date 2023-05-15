@@ -23,6 +23,6 @@ meta:
     This dataset only contains Prevalence rate metrics for mental health-related causes.
 wdir: ../../../data/snapshots/ihme_gbd/2023-05-15
 outs:
-- md5: 78e930eb5481b8baa5c10bed27e3c6b5
-  size: 35213045
+- md5: 33a22568e923c7a449654582461fdd1d
+  size: 37331688
   path: gbd_mental_health_prevalence_rate.zip
