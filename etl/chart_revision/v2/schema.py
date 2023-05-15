@@ -1,3 +1,4 @@
+import copy
 from typing import Any, Dict, List
 
 import requests
@@ -74,7 +75,7 @@ def validate_chart_config_and_set_defaults(config: Dict[str, Any]) -> Dict[str, 
     # Get schema
     schema = get_schema_chart_config()
     # Validate and update config with defaults
-    config_new = config.copy()
+    config_new = copy.deepcopy(config)
     DefaultSetterValidatingValidator(schema).validate(config_new)
     return config_new
 
@@ -120,7 +121,7 @@ def validate_chart_config_and_remove_defaults(config: Dict[str, Any]) -> Dict[st
     # Get schema
     schema = get_schema_chart_config()
     # Validate and update config with defaults
-    config_new = config.copy()
+    config_new = copy.deepcopy(config)
     DefaultDeleteValidatingValidator(schema).validate(config_new)
     return config_new
 

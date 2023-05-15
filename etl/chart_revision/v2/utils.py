@@ -9,7 +9,7 @@ from etl.db import get_engine
 
 
 def bake_chart_comparison_from_configs(
-    chart_id: int, config_1: Dict[str, Any], config_2: Dict[str, Any]
+    config_1: Dict[str, Any], config_2: Dict[str, Any]
 ) -> gm.SuggestedChartRevisions:
     """Create a SuggestedChartRevisions object from a two configurations of the same chart.
 
@@ -18,14 +18,12 @@ def bake_chart_comparison_from_configs(
 
     IMPORTANT: Configurations must be from the same chart.
 
-    TODO: In the future, it would be nice if we could bake a comparison of two different charts. For this to happen, we need to add a new table
-    in our database (chart_comparison), which should be a generalisation of our current table `suggested_chart_revisions`.
+    TODO: In the future, this should support comparisons of two *different* charts. For this to happen, we need to add a new table
+    in our database (chart_comparison), which would be a generalisation of our current table `suggested_chart_revisions`.
 
     Parameters
     ----------
-    chart_id : int
-        ID of the chart.
-    config_1 : gm.Chart
+    config_1 : Dict[str, Any]
         Configuration 1 of the chart. Typically, the original chart configuration.
     config_2 : Dict[str, Any]
         Configuration 2 of the chart. Typically, the new chart configuration.
@@ -35,6 +33,9 @@ def bake_chart_comparison_from_configs(
     gm.SuggestedChartRevisions
         Sugested revision.
     """
+    if config_1["id"] != config_2["id"]:
+        raise ValueError("Configurations must be from the same chart.")
+    chart_id = config_1["id"]
     return gm.SuggestedChartRevisions(
         chartId=chart_id,
         createdBy=GRAPHER_USER_ID,
