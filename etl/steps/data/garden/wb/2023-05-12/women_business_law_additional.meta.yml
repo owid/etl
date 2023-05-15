@@ -1,0 +1,120 @@
+dataset:
+  title: Women, Business and the Law - Additional Data (World Bank, 2021)
+  description: |
+    By developing a time series and further researching the interaction between inequality of opportunity for women and labor market dynamics, Women, Business and the Law strengthens insights into how women’s employment and entrepreneurship are affected by legal gender discrimination, and in turn how this affects economic outcomes.
+
+    This specific dataset is an additional file provided by the World Bank, which contains a set of 14 non-scored questions (years 2017, 2019, and 2020), including data on child marriage, customary law, citizenship, sexual harassment, and access to ID cards.
+  sources:
+  - name: World Bank (2021)
+    url: https://wbl.worldbank.org/en/wbl-data
+    date_accessed: 2023-05-12
+    publication_date: 2021-05-14
+    published_by: 'World Bank. 2023. Women, Business and the Law 2023. Washington, DC: World Bank.'
+tables:
+  women_business_law_additional:
+    variables:
+      legal_age_of_marriage:
+        title: What is the legal age of marriage for girls?
+        description: Measured in years, is the are of marriage for girls defined by the legislation.
+        short_unit: ''
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+      exceptions_legal_age_of_marriage:
+        title: Are there any exceptions to the legal age of marriage? (1=yes; 0=no)
+        description: Measures whether there are any exceptions to the legal age of marriage.
+        short_unit: ''
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+      marriage_under_legal_age_void_or_explicitly_prohibited:
+        title: Is marriage under the legal age void or explicitly prohibited? (1=yes; 0=no)
+        description: Measures whether marriage under the legal age is void or explicitly prohibited.
+        short_unit: ''
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+      penalties_for_authorizing_or_entering_into_early_marriage:
+        title: Are there penalties for authorizing or entering into child or early marriage? (1=yes; 0=no)
+        description: Measures whether there are penalties for authorizing or entering into child or early marriage.
+        short_unit: ''
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+      criminal_penalties_for_domestic_violence:
+        title: Does the legislation establish clear criminal penalties for domestic violence? (1=yes; 0=no)
+        description: Measures whether the legislation establishes clear criminal penalties for domestic violence.
+        short_unit: ''
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+      specialized_court_for_domestic_violence:
+        title: Is there a specialized court or procedure for cases of domestic violence? (1=yes; 0=no)
+        description: Measures whether there is a specialized court or procedure for cases of domestic violence.
+        short_unit: ''
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+      national_identity_card:
+        title: Can a woman obtain a national identity card in the same way as a married man? (1=yes; 0=no)
+        description: Measures whether a woman can obtain a national identity card in the same way as a married man.
+        short_unit: ''
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+      customary_law_valid_source_of_law:
+        title: Is customary law a valid source of law under the constitution? (1=yes; 0=no)
+        description: Measures whether customary law is a valid source of law under the constitution.
+        short_unit: ''
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+      customary_law_invalid_if_violates_constitutional_provisions:
+        title: If customary law is a valid source of law under the constitution, is it considered invalid if it violates constitutional provisions on nondiscrimination or equality? (1=yes; 0=no)
+        description: Measures whether customary law is considered invalid if it violates constitutional provisions on nondiscrimination or equality.
+        short_unit: ''
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+      legislation_addresses_sexual_harassment:
+        title: Is there legislation that specifically addresses sexual harassment? (1=yes; 0=no)
+        description: Measures whether there is legislation that specifically addresses sexual harassment.
+        short_unit: ''
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+      confer_citizenship_to_children_married:
+        title: Can a married woman legally confer citizenship to her children in the same way as a married man? (1=yes; 0=no)
+        description: Measures whether a married woman can legally confer citizenship to her children in the same way as a married man.
+        short_unit: ''
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+      confer_citizenship_to_children_unmarried:
+        title: Can an unmarried woman legally confer citizenship to her children in the same way as a married man? (1=yes; 0=no)
+        description: Measures whether a unmarried woman can legally confer citizenship to her children in the same way as a married man.
+        short_unit: ''
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+      confer_citizenship_to_non_national_spouse_married:
+        title: Can a married woman legally confer her citizenship to a non-national spouse in the same way as a married man? (1=yes; 0=no)
+        description: Measures wheter a married woman can legally confer her citizenship to a non-national spouse in the same way as a married man.
+        short_unit: ''
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+      joint_legal_responsibility_family_expenses:
+        title: Do married couples jointly share legal responsibility for financially maintaining the family’s expenses? (1=yes; 0=no)
+        description: Measures whether married couples jointly share legal responsibility for financially maintaining the family’s expenses.
+        short_unit: ''
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+      womans_testimony_carry_same_evidentiary_weight:
+        title: Does a woman’s testimony carry the same evidentiary weight in court as a man's in all types of cases? (1=yes; 0=no)
+        description: Measures whether a woman's testimony carries the same weight as evidence in court as a man's in all types of cases.
+        short_unit: ''
+        unit: ''
+        display:
+          numDecimalPlaces: 0
