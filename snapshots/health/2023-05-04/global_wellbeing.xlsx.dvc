@@ -1,0 +1,37 @@
+meta:
+  namespace: health
+  short_name: global_wellbeing
+  name: Global Wellbeing Initiative (Gallup, 2020)
+  version: '2023-05-04'
+  publication_year: 2020"
+  source_name: Global Wellbeing Initiative (2020)
+  source_published_by: Gallup World Poll, Global Wellbeing Initiative dataset, 2020
+  url: https://www.gallup.com/analytics/468179/global-wellbeing-initiative-dataset.aspx
+  source_data_url:
+  file_extension: xlsx
+  license_url:
+  license_name: ''
+  date_accessed: 2023-05-04
+  is_public: true
+  description: |
+    Gallup and the Wellbeing for Planet Earth Foundation joined forces in 2019 for a groundbreaking partnership known as the Global Wellbeing Initiative (GWI, https://www.globalwellbeinginitiative.org/) to develop a more nuanced and globally inclusive measurement and understanding of wellbeing.
+
+    The GWI has worked to develop new items for the World Poll that will lay the foundation for future research projects and transform our perception of wellbeing.
+
+
+    SURVEY METHODS:
+
+    The survey involved more than 122,000 people in 116 countries in 2020 and was run as part of the Gallup World Poll. Typically, 1,000 individuals were surveyed in each country. In China, India and Russia, the sample sizes were 2,000 or greater. In rare instances, the sample size fell between 500 and 1,000.
+
+    The dataset includes the following variables:
+
+    • Responses to the Global Wellbeing Initiative questionnaire
+    • Gender and age
+    • Educational level, employment status and per capita income quintiles
+    • Country income level (World Bank)
+    • Urban/Rural location
+wdir: ../../../data/snapshots/health/2023-05-04
+outs:
+- md5: 09700be364f90936b1f91cbec3388cc5
+  size: 899303
+  path: global_wellbeing.xlsx

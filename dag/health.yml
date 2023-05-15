@@ -158,3 +158,11 @@ steps:
     - data://meadow/oecd/2023-05-01/health_pharma_market
   data://grapher/oecd/2023-05-01/health_pharma_market:
     - data://garden/oecd/2023-05-01/health_pharma_market
+
+  # Global Wellbeing Initiative (2020)
+  data://meadow/health/2023-05-04/global_wellbeing:
+    - snapshot://health/2023-05-04/global_wellbeing.xlsx
+  data://garden/health/2023-05-04/global_wellbeing:
+    - data://meadow/health/2023-05-04/global_wellbeing
+  data://grapher/health/2023-05-04/global_wellbeing:
+    - data://garden/health/2023-05-04/global_wellbeing
