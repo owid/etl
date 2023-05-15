@@ -8,7 +8,7 @@ meta:
   source_name: Institute of Health Metrics and Evaluation (2022)
   source_published_by: 'Institute for Health Metrics and Evaluation (IHME). Health-related
     SDGs. Seattle, WA: IHME, University of Washington, 2022. Available from https://api.healthdata.org/sdg/v1/docs'
-  url: https://api.healthdata.org/sdg/v1/docs & https://api.healthdata.org/sdg/v1/docs
+  url: https://api.healthdata.org/sdg/v1/docs
   source_data_url:
   file_extension: csv
   license_url: https://www.healthdata.org/data-tools-practices/data-practices/terms-and-conditions
