@@ -5072,13 +5072,13 @@ files = [
 
 [[package]]
 name = "pywebio"
-version = "1.7.1"
+version = "1.8.2"
 description = "Write interactive web app in script way."
 category = "dev"
 optional = false
 python-versions = ">=3.5.2"
 files = [
-    {file = "pywebio-1.7.1.tar.gz", hash = "sha256:853d103f0a46af8d8170d35fd7a1ea042fe125c7ec56cf5180e8fde212e5eed9"},
+    {file = "pywebio-1.8.2.tar.gz", hash = "sha256:6177b20b17de821ea580515438ca9dbcdc436a6e1eb17f9c5e357531fb87a855"},
 ]
 
 [package.dependencies]
@@ -6973,4 +6973,4 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "e54f45a93768525ecbcb005c1619b48c63af04a3860391f102ffbafad1044b51"
+content-hash = "4a3278cde5775a12e638d9c97dd530a199cd7a10ab0a88563999606cc05d7cc2"
