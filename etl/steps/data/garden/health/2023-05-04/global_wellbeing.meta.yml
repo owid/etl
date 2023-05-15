@@ -1,0 +1,188 @@
+tables:
+  global_wellbeing:
+    variables:
+      count_on_to_help:
+        title: Count On to Help
+        short_unit: '%'
+        unit: '%'
+      health_problems:
+        title: Health Problems
+        short_unit: '%'
+        unit: '%'
+      experience_calmness_yesterday:
+        title: Experience Calmness Yesterday
+        short_unit: '%'
+        unit: '%'
+        description: >-
+          The question asked was: "Did you experience the feeling of 'calmness' during A LOT OF THE DAY yesterday?"
+
+
+          The accepted answers were: "Yes", "No", "Don't know", "Refused"
+      enjoy_the_work_you_do_every_day:
+        title: Enjoy the Work You Do Every Day
+        short_unit: '%'
+        unit: '%'
+        description: >-
+          The question asked was: "Do you enjoy the work you do in your job every day, or not?"
+
+
+          The accepted answers were: "Yes", "No", "Don't know", "Refused"
+      exciting_life_or_calm_life:
+        title: Exciting Life or Calm Life
+        short_unit: '%'
+        unit: '%'
+        description: >-
+          The question asked was: "Would you rather live an exciting life or a calm life?"
+
+
+          The accepted answers were: "An exciting life", "A calm life", "Both", "Neither"
+      feel_at_peace_with_life:
+        title: Feel at Peace With Life
+        short_unit: '%'
+        unit: '%'
+        description: >-
+          The question asked was: "In general, do you feel at peace with your life, or not?"
+
+
+          The accepted answers were: "Yes", "No", "Don't know", "Refused"
+      focus_on_taking_care_of_themselves_or_taking_care_of_others:
+        title: Focus on Taking Care of Themselves or Taking Care of Others
+        short_unit: '%'
+        unit: '%'
+        description: >-
+          The question asked was: "Do you think people should focus more on taking care of themselves or on taking care of others?"
+
+
+          The accepted answers were: "Taking care of others", "Taking care of themselves", "Both", Neither, "Don't know", "Refused"
+      main_purpose_in_life:
+        title: Main Purpose in Life
+        short_unit: '%'
+        unit: '%'
+        description: >-
+          The question asked was: "Which of the following is closest to your MAIN purpose in life?"
+
+
+          The accepted answers were: "Yes", "No", "Don't know", "Refused"
+      many_choices_in_type_of_work:
+        title: Many Choices in Type of Work
+        short_unit: '%'
+        unit: '%'
+        description: >-
+          The question asked was: "Do you, personally, have many choices in regard to the type of work you can do in your life?"
+
+
+          The accepted answers were: "Being good at what you do in your daily life", "Caring for family and close friends",
+          "Helping other people who need help", "I do not know my purpose in life", "None of these", "Don't know", "Refused"
+      various_aspects_of_life_in_balance:
+        title: Various Aspects of Life in Balance
+        short_unit: '%'
+        unit: '%'
+        description: >-
+          The question asked was: "In general, do you feel the various aspects of your life are in balance, or not?"
+
+
+          The accepted answers were: "Yes", "No", "Don't know", "Refused"
+      work_significantly_improves_the_lives_of_others_outside_of_household:
+        title: Work Significantly Improves the Lives of Others Outside of Household
+        short_unit: '%'
+        unit: '%'
+        description: >-
+          The question asked was: "Do you think the work you do in your job significantly improves the lives of other people outside of your own household, or not?"
+
+
+          The accepted answers were: "Yes", "No", "Don't know", "Refused"
+  global_wellbeing_index:
+    description: >-
+      For its Life Evaluation Index, Gallup asks people to imagine a ladder, with the lowest rung representing the worst possible
+      life and the highest rung representing the best possible life. Those rungs are numbered zero to 10, based on the Cantril
+      Self-Anchoring Striving Scale (https://news.gallup.com/poll/122453/Understanding-Gallup-Uses-Cantril-Scale.aspx).
+      People rate where they stand today and where they expect to stand in five years.
+
+
+      Globally, Gallup has tracked life evaluations in at least 100 countries and areas each year since 2005, recording
+      the highs and lows of how people have viewed their lives through major upheavals and changes -- including such events
+      as Brexit, the Arab uprisings and the Euromaidan revolution. Since Gallup began tracking this in 2005, the percentage
+      of the global population rating their lives highly enough to be considered thriving has ranged from a low of 21% in
+      2009 to a high of 29% in 2020.
+
+
+      In the U.S., Gallup has tracked the Life Evaluation Index as part of domestic polling since 2008, recording the
+      highs and lows of Americans' perceptions of their lives through the Great Recession and the COVID-19 pandemic,
+      among other major events. Throughout that time, the percentage of Americans who are thriving has ranged from a
+      low of 46% in November 2008 and April 2020 to a high of 59% in June 2021.
+    variables:
+      struggling_index:
+        title: Struggling Index
+        short_unit: '%'
+        unit: '%'
+        description: >-
+          For its Life Evaluation Index, Gallup asks people to imagine a ladder, with the lowest rung representing the worst possible
+          life and the highest rung representing the best possible life. Those rungs are numbered zero to 10, based on the Cantril
+          Self-Anchoring Striving Scale (https://news.gallup.com/poll/122453/Understanding-Gallup-Uses-Cantril-Scale.aspx).
+          People rate where they stand today and where they expect to stand in five years.
+
+
+          Gallup classifies those who rate their current life a 7 or higher and their anticipated life in five years an 8 or higher as thriving.
+
+
+          Globally, Gallup has tracked life evaluations in at least 100 countries and areas each year since 2005, recording
+          the highs and lows of how people have viewed their lives through major upheavals and changes -- including such events
+          as Brexit, the Arab uprisings and the Euromaidan revolution. Since Gallup began tracking this in 2005, the percentage
+          of the global population rating their lives highly enough to be considered thriving has ranged from a low of 21% in
+          2009 to a high of 29% in 2020.
+
+
+          In the U.S., Gallup has tracked the Life Evaluation Index as part of domestic polling since 2008, recording the
+          highs and lows of Americans' perceptions of their lives through the Great Recession and the COVID-19 pandemic,
+          among other major events. Throughout that time, the percentage of Americans who are thriving has ranged from a
+          low of 46% in November 2008 and April 2020 to a high of 59% in June 2021.
+      suffering_index:
+        title: Suffering Index
+        short_unit: '%'
+        unit: '%'
+        description: >-
+          For its Life Evaluation Index, Gallup asks people to imagine a ladder, with the lowest rung representing the worst possible
+          life and the highest rung representing the best possible life. Those rungs are numbered zero to 10, based on the Cantril
+          Self-Anchoring Striving Scale (https://news.gallup.com/poll/122453/Understanding-Gallup-Uses-Cantril-Scale.aspx).
+          People rate where they stand today and where they expect to stand in five years.
+
+
+          Gallup classifies those who rate their current life and anticipated life in five years a 4 or lower are classified as suffering.
+
+
+          Globally, Gallup has tracked life evaluations in at least 100 countries and areas each year since 2005, recording
+          the highs and lows of how people have viewed their lives through major upheavals and changes -- including such events
+          as Brexit, the Arab uprisings and the Euromaidan revolution. Since Gallup began tracking this in 2005, the percentage
+          of the global population rating their lives highly enough to be considered thriving has ranged from a low of 21% in
+          2009 to a high of 29% in 2020.
+
+
+          In the U.S., Gallup has tracked the Life Evaluation Index as part of domestic polling since 2008, recording the
+          highs and lows of Americans' perceptions of their lives through the Great Recession and the COVID-19 pandemic,
+          among other major events. Throughout that time, the percentage of Americans who are thriving has ranged from a
+          low of 46% in November 2008 and April 2020 to a high of 59% in June 2021.
+      thriving_index:
+        title: Thriving Index
+        short_unit: '%'
+        unit: '%'
+        description: >-
+          For its Life Evaluation Index, Gallup asks people to imagine a ladder, with the lowest rung representing the worst possible
+          life and the highest rung representing the best possible life. Those rungs are numbered zero to 10, based on the Cantril
+          Self-Anchoring Striving Scale (https://news.gallup.com/poll/122453/Understanding-Gallup-Uses-Cantril-Scale.aspx).
+          People rate where they stand today and where they expect to stand in five years.
+
+
+          Gallup classifies those who are neither suffering nor thriving are considered struggling (between a 4 and a 7).
+
+
+          Globally, Gallup has tracked life evaluations in at least 100 countries and areas each year since 2005, recording
+          the highs and lows of how people have viewed their lives through major upheavals and changes -- including such events
+          as Brexit, the Arab uprisings and the Euromaidan revolution. Since Gallup began tracking this in 2005, the percentage
+          of the global population rating their lives highly enough to be considered thriving has ranged from a low of 21% in
+          2009 to a high of 29% in 2020.
+
+
+          In the U.S., Gallup has tracked the Life Evaluation Index as part of domestic polling since 2008, recording the
+          highs and lows of Americans' perceptions of their lives through the Great Recession and the COVID-19 pandemic,
+          among other major events. Throughout that time, the percentage of Americans who are thriving has ranged from a
+          low of 46% in November 2008 and April 2020 to a high of 59% in June 2021.
