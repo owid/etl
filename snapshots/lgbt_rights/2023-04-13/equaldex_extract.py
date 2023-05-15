@@ -10,8 +10,9 @@ To run this script, you need to create a file called access_key.py with the foll
 API_KEY = "your_api_key"
 You can obtain your API key by registering at https://www.equaldex.com/ and then copying it from your account settings: https://www.equaldex.com/settings
 
-After running this script, add the long.csv file to snapshots:
+After running this script, add the long.csv and the current.csv file to snapshots:
     python snapshots/lgbt_rights/2023-04-13/equaldex.py --path-to-file snapshots/lgbt_rights/2023-04-13/long.csv
+    python snapshots/lgbt_rights/2023-04-13/equaldex_current.py --path-to-file snapshots/lgbt_rights/2023-04-13/current.csv
 
 """
 
@@ -128,6 +129,12 @@ def extract_from_api(country_list: list) -> pd.DataFrame:
     cols_to_move = ["country", "issue"]
     df_current = df_current[cols_to_move + [col for col in df_current.columns if col not in cols_to_move]]
     df_historical = df_historical[cols_to_move + [col for col in df_historical.columns if col not in cols_to_move]]
+
+    # Obtain current year
+    current_year = datetime.datetime.now().year
+
+    # Add year_extraction column to the dataframe
+    df_current["year_extraction"] = current_year
 
     # Export files
     df_current.to_csv(PARENT_DIR / "current.csv", index=False)

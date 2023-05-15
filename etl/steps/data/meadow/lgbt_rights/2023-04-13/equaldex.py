@@ -19,19 +19,32 @@ def run(dest_dir: str) -> None:
 
     #
     # Load inputs.
+
+    # CURRENT DATASET
+    # Retrieve snapshot.
+    snap: Snapshot = paths.load_dependency("equaldex_current.csv")
+
+    # Load data from snapshot.
+    df_current = pd.read_csv(snap.path)
+
     #
+    # Process data.
+
+    # Rename year_extraction to year
+    df_current = df_current.rename(columns={"year_extraction": "year"})
+
+    # Set index as country, year and issue and verify that there are no duplicates
+    df_current = df_current.set_index(["country", "year", "issue"], verify_integrity=False).sort_index()
+
+    # Create a new table and ensure all columns are snake-case.
+    tb_current = Table(df_current, short_name="equaldex_current", underscore=True)
+
+    # COMPLETE DATASET
     # Retrieve snapshot.
     snap: Snapshot = paths.load_dependency("equaldex.csv")
 
     # Load data from snapshot.
     df = pd.read_csv(snap.path)
-
-    #
-    # Process data.
-
-    # Select only the homosexuality, marriage and changing-gender values in issue column.
-    issues_to_keep = ["homosexuality", "marriage", "changing-gender"]
-    df = df[df["issue"].isin(issues_to_keep)].reset_index(drop=True)
 
     # Set index as country, year and issue and verify that there are no duplicates
     df = df.set_index(["country", "year", "issue"], verify_integrity=False).sort_index()
@@ -42,13 +55,13 @@ def run(dest_dir: str) -> None:
     df = df[~df.index.duplicated(keep="first")]
 
     # Create a new table and ensure all columns are snake-case.
-    tb = Table(df, short_name=paths.short_name, underscore=True)
+    tb = Table(df, short_name="equaldex", underscore=True)
 
     #
     # Save outputs.
     #
     # Create a new meadow dataset with the same metadata as the snapshot.
-    ds_meadow = create_dataset(dest_dir, tables=[tb], default_metadata=snap.metadata)
+    ds_meadow = create_dataset(dest_dir, tables=[tb, tb_current], default_metadata=snap.metadata)
 
     # Save changes in the new garden dataset.
     ds_meadow.save()
