@@ -189,7 +189,7 @@ def app(run_checks: bool) -> None:
 
 5. Create a pull request in [ETL](https://github.com/owid/etl), get it reviewed and merged.
 
-6. Once your changes are merged, your steps will be run automatically by our server and published to the OWID catalog. Then it can be loaded by anyone using:
+6. (Optional) Once your changes are merged, your steps will be run automatically by our server and published to the OWID catalog. Then it can be loaded by anyone using:
 
     ```python
     from owid.catalog import find_one
