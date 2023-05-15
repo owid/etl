@@ -43,8 +43,7 @@ with open(CURRENT_DIR / "charts.styles.css", "r") as f:
     pywebio.config(css_style=f.read())
 
 
-def app(run_checks: bool, dummy_data: bool) -> None:
-
+def app(run_checks: bool) -> None:
     nav = Navigation()
     # show live banner alert
     nav.show_live_banner()

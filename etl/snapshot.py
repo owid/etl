@@ -9,10 +9,14 @@ from typing import Any, Dict, List, Literal, Optional, Union
 import pandas as pd
 import yaml
 from dataclasses_json import dataclass_json
+from dvc.exceptions import UploadError
 from dvc.repo import Repo
 from owid.catalog.meta import pruned_json
 from owid.datautils import dataframes
 from owid.walden import files
+from tenacity import Retrying
+from tenacity.retry import retry_if_exception_type
+from tenacity.stop import stop_after_attempt
 
 from etl import paths
 from etl.files import yaml_dump
@@ -71,7 +75,13 @@ class Snapshot:
         with dvc_lock:
             dvc.add(str(self.path), fname=str(self.metadata_path))
             if upload:
-                dvc.push(str(self.path), remote="public" if self.metadata.is_public else "private")
+                # DVC sometimes returns UploadError, retry a few times
+                for attempt in Retrying(
+                    stop=stop_after_attempt(3),
+                    retry=retry_if_exception_type(UploadError),
+                ):
+                    with attempt:
+                        dvc.push(str(self.path), remote="public" if self.metadata.is_public else "private")
 
 
 @pruned_json

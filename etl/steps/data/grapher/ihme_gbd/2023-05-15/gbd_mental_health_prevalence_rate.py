@@ -1,7 +1,5 @@
 """Load a garden dataset and create a grapher dataset."""
 
-from typing import cast
-
 from owid.catalog import Dataset
 
 from etl.helpers import PathFinder, create_dataset, grapher_checks
@@ -15,10 +13,10 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load garden dataset.
-    ds_garden = cast(Dataset, paths.load_dependency("{{cookiecutter.short_name}}"))
+    ds_garden: Dataset = paths.load_dependency("gbd_mental_health_prevalence_rate")
 
     # Read table from garden dataset.
-    tb = ds_garden["{{cookiecutter.short_name}}"]
+    tb_garden = ds_garden["gbd_mental_health_prevalence_rate"]
 
     #
     # Process data.
@@ -28,7 +26,7 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.
-    ds_grapher = create_dataset(dest_dir, tables=[tb], default_metadata=ds_garden.metadata)
+    ds_grapher = create_dataset(dest_dir, tables=[tb_garden], default_metadata=ds_garden.metadata)
 
     #
     # Checks.
