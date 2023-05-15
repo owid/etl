@@ -31,7 +31,7 @@ class MeadowForm(BaseModel):
     namespace: str
     version: str
     snapshot_version: str
-    snapshot_file_extension: str
+    file_extension: str
     add_to_dag: bool
     generate_notebook: bool
     include_metadata_yaml: bool
@@ -39,8 +39,8 @@ class MeadowForm(BaseModel):
 
     def __init__(self, **data: Any) -> None:
         options = data.pop("options")
-        if data["snapshot_file_extension"] == "":
-            data["snapshot_file_extension"] = DEFAULT_EXTENSION
+        if data["file_extension"] == "":
+            data["file_extension"] = DEFAULT_EXTENSION
         data["add_to_dag"] = Options.ADD_TO_DAG.value in options
         data["include_metadata_yaml"] = Options.INCLUDE_METADATA_YAML.value in options
         data["generate_notebook"] = Options.GENERATE_NOTEBOOK.value in options
@@ -92,9 +92,9 @@ def app(run_checks: bool) -> None:
             ),
             pi.input(
                 "Snapshot file extension",
-                name="snapshot_file_extension",
+                name="file_extension",
                 placeholder=DEFAULT_EXTENSION,
-                value=state.get("snapshot_file_extension"),
+                value=state.get("file_extension"),
                 help_text="File extension (without the '.') of the snapshot data file. Example: csv",
             ),
             pi.checkbox(
@@ -125,7 +125,7 @@ def app(run_checks: bool) -> None:
         dag_content = utils.add_to_dag(
             {
                 f"data{private_suffix}://meadow/{form.namespace}/{form.version}/{form.short_name}": [
-                    f"snapshot{private_suffix}://{form.namespace}/{form.snapshot_version}/{form.short_name}.{form.snapshot_file_extension}",
+                    f"snapshot{private_suffix}://{form.namespace}/{form.snapshot_version}/{form.short_name}.{form.file_extension}",
                 ]
             }
         )
@@ -156,19 +156,7 @@ def app(run_checks: bool) -> None:
 
 2. (Optional) Generated notebook `{notebook_path.relative_to(ETL_DIR)}` can be used to examine the dataset output interactively.
 
-3. (Optional) Loading the dataset is also possible with this snippet:
-
-    ```python
-    from owid.catalog import Dataset
-    from etl.paths import DATA_DIR
-
-    ds = Dataset(DATA_DIR / "meadow" / "{form.namespace}" / "{form.version}" / "{form.short_name}")
-    print(ds.table_names)
-
-    df = ds["{form.short_name}"]
-    ```
-
-4. (Optional) Generate metadata file `{form.short_name}.meta.yml` from your dataset with
+3. (Optional) Generate metadata file `{form.short_name}.meta.yml` from your dataset with
 
     ```
     poetry run etl-metadata-export data/meadow/{form.namespace}/{form.version}/{form.short_name} -o etl/steps/data/meadow/{form.namespace}/{form.version}/{form.short_name}.meta.yml
@@ -182,7 +170,7 @@ def app(run_checks: bool) -> None:
 
     Note that metadata is inherited from previous step (snapshot) and you don't have to repeat it.
 
-5. Continue to the garden step
+4. Continue to the garden step
 """
     )
     po.put_buttons(["Go to garden"], [lambda: go_app("garden", new_window=False)])

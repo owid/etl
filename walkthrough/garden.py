@@ -67,7 +67,7 @@ def app(run_checks: bool) -> None:
                 name="namespace",
                 placeholder="institution",
                 required=True,
-                value=state.get("namespace"),
+                value=state.get("namespace") or "",
                 help_text="Institution name. Example: emdat",
             ),
             pi.input(
@@ -83,7 +83,7 @@ def app(run_checks: bool) -> None:
                 name="short_name",
                 placeholder="testing_dataset_name",
                 required=True,
-                value=state.get("short_name"),
+                value=state.get("short_name") or "",
                 validate=utils.validate_short_name,
                 help_text="Underscored dataset short name. Example: natural_disasters",
             ),
@@ -171,19 +171,7 @@ def app(run_checks: bool) -> None:
 
 2. (Optional) Generated notebook `{notebook_path.relative_to(ETL_DIR)}` can be used to examine the dataset output interactively.
 
-3. (Optional) Loading the dataset is also possible with this snippet:
-
-    ```python
-    from owid.catalog import Dataset
-    from etl.paths import DATA_DIR
-
-    ds = Dataset(DATA_DIR / "garden" / "{form.namespace}" / "{form.version}" / "{form.short_name}")
-    print(ds.table_names)
-
-    df = ds["{form.short_name}"]
-    ```
-
-4. (Optional) Generate metadata file `{form.short_name}.meta.yml` from your dataset with
+3. (Optional) Generate metadata file `{form.short_name}.meta.yml` from your dataset with
 
     ```
     poetry run etl-metadata-export data/garden/{form.namespace}/{form.version}/{form.short_name} -o etl/steps/data/garden/{form.namespace}/{form.version}/{form.short_name}.meta.yml
@@ -197,11 +185,11 @@ def app(run_checks: bool) -> None:
 
     Note that metadata is inherited from previous step (snapshot) and you don't have to repeat it.
 
-5. (Optional) You can manually move steps from `dag/walkthrough.yml` to some other `dag/*.yml` if you feel like it belongs there. After you are happy with your code, run `make test` to find any issues.
+4. (Optional) You can manually move steps from `dag/walkthrough.yml` to some other `dag/*.yml` if you feel like it belongs there. After you are happy with your code, run `make test` to find any issues.
 
-6. Create a pull request in [ETL](https://github.com/owid/etl), get it reviewed and merged.
+5. Create a pull request in [ETL](https://github.com/owid/etl), get it reviewed and merged.
 
-7. Once your changes are merged, your steps will be run automatically by our server and published to the OWID catalog. Then it can be loaded by anyone using:
+6. Once your changes are merged, your steps will be run automatically by our server and published to the OWID catalog. Then it can be loaded by anyone using:
 
     ```python
     from owid.catalog import find_one
@@ -210,7 +198,7 @@ def app(run_checks: bool) -> None:
     print(tab.head())
     ```
 
-8. If you are an internal OWID member and want to push data to our Grapher DB, continue to the grapher step or to explorers step.
+7. If you are an internal OWID member and want to push data to our Grapher DB, continue to the grapher step or to explorers step.
 """
     )
     po.put_buttons(
