@@ -8,7 +8,7 @@ Follow the steps below to obtain the file for this step:
     - GBD Estimate: "Cause of death or injury"
     - Measure: "Prevalence"
     - Metric: "Rate"
-    - Location: "select all countries and territories"
+    - Location: "select all countries and territories", then also add "Global", different "World Bank" income groups, entities in "Four World regions".
     - Age: 15-19, 20-24, 25-29, 30-34, 35-39, 40-44, 45-49, 50-54, 55-59, 60-64, 65-69, 70+
     - Sex: Both, Female, Male
     - Year: all
