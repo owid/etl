@@ -3,7 +3,6 @@
 import os
 import tempfile
 import zipfile
-from typing import List
 
 import pandas as pd
 from owid.catalog import Table
@@ -57,7 +56,7 @@ def run(dest_dir: str) -> None:
     log.info("gbd_mental_health_prevalence_rate.end")
 
 
-def read_df_from_snapshot_zips(snap: Snapshot) -> List[pd.DataFrame]:
+def read_df_from_snapshot_zips(snap: Snapshot) -> pd.DataFrame:
     """Build dataframe from zipped csvs in snapshot."""
     dfs = []
     with tempfile.TemporaryDirectory() as temp_dir:
