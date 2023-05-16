@@ -24,7 +24,7 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
         },
         errors="ignore",
     ).drop(
-        columns=["measure_id", "location_id", "sex_id", "age_id", "cause_id", "metric_id"],
+        columns=["measure_id", "location_id", "sex_id", "age_id", "cause_id", "metric_id", "upper", "lower"],
         errors="ignore",
     )
 

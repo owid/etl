@@ -51,15 +51,9 @@ def tidy_countries(country_mapping_path: Path, excluded_countries_path: Path, df
     return df
 
 
-def clean_values(df: pd.DataFrame) -> pd.DataFrame:
-    df = df.drop(columns=["upper", "lower"])
-    return df
-
-
 def prepare_garden(df: pd.DataFrame) -> Table:
     log.info("prepare_garden")
     tb_garden = underscore_table(Table(df))
-    tb_garden = clean_values(tb_garden)
     return tb_garden
 
 
