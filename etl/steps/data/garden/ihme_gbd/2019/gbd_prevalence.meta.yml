@@ -11,16 +11,6 @@ tables:
         unit: total cases
         display:
           numDecimalPlaces: 0
-      incidence__percent:
-        title: Proportion of total incidence
-        unit: "%"
-        display:
-          numDecimalPlaces: 2
-      prevalence__percent:
-        title: Proportion of total prevalence
-        unit: "%"
-        display:
-          numDecimalPlaces: 2
       incidence__rate:
         title: Number of new cases per year per 100,000 people
         unit: new cases per 100,000 people
