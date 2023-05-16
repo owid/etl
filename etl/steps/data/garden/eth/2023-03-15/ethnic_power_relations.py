@@ -101,6 +101,9 @@ def process_ethnic_power_relations(df: pd.DataFrame) -> pd.DataFrame:
 
     df[share_vars] *= 100
 
+    # Calculate share variable for population not in EGIP or MEG
+    df["restpop"] = 100 - df["egippop"] - df["exclpop"]
+
     return df
 
 
@@ -124,7 +127,17 @@ def add_regional_aggregations(df: pd.DataFrame) -> pd.DataFrame:
 
     # Define variables which their aggregation is weighted by population
     # Do not aggregate: legippop, lexclpop, ldiscrimpop, lmaxexclpop
-    pop_vars = ["lpop", "egippop", "exclpop", "discrimpop", "maxexclpop", "regautpop", "regautexclpop", "regautegippop"]
+    pop_vars = [
+        "lpop",
+        "egippop",
+        "exclpop",
+        "restpop",
+        "discrimpop",
+        "maxexclpop",
+        "regautpop",
+        "regautexclpop",
+        "regautegippop",
+    ]
 
     # Multiply variables by population
     pop_vars_headcount = []
@@ -160,6 +173,7 @@ def add_regional_aggregations(df: pd.DataFrame) -> pd.DataFrame:
         "lpop_headcount": "sum",
         "egippop_headcount": "sum",
         "exclpop_headcount": "sum",
+        "restpop_headcount": "sum",
         "discrimpop_headcount": "sum",
         "maxexclpop_headcount": "sum",
         "regautpop_headcount": "sum",
