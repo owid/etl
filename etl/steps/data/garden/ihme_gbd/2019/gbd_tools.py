@@ -59,21 +59,18 @@ def prepare_garden(df: pd.DataFrame) -> Table:
 
 def _pivot_number(df: pd.DataFrame, dims: List[str]) -> Any:
     df_number = df[df.metric == "Number"].pivot(index=["country", "year"] + dims, columns="measure", values="value")
-    df_number = df_number.round(0).astype("Int64")
     df_number = df_number.rename(columns=lambda c: c + " - Number")
     return df_number
 
 
 def _pivot_percent(df: pd.DataFrame, dims: List[str]) -> Any:
     df_percent = df[df.metric == "Percent"].pivot(index=["country", "year"] + dims, columns="measure", values="value")
-    df_percent = df_percent.round(2)
     df_percent = df_percent.rename(columns=lambda c: c + " - Percent")
     return df_percent
 
 
 def _pivot_rate(df: pd.DataFrame, dims: List[str]) -> Any:
     df_rate = df[df.metric == "Rate"].pivot(index=["country", "year"] + dims, columns="measure", values="value")
-    df_rate = df_rate.round(2)
     df_rate = df_rate.rename(columns=lambda c: c + " - Rate")
     return df_rate
 
@@ -82,7 +79,6 @@ def _pivot_share(df: pd.DataFrame, dims: List[str]) -> Any:
     df_share = df[df.metric == "Share of the population"].pivot(
         index=["country", "year"] + dims, columns="measure", values="value"
     )
-    df_share = df_share.round(2)
     df_share = df_share.rename(columns=lambda c: c + " - Share of the population")
     return df_share
 
@@ -152,8 +148,8 @@ def add_share_of_population(df: pd.DataFrame) -> pd.DataFrame:
     df_percent["metric"] = "Share of the population"
     df_percent.loc[:, "value"] = df_percent.loc[:, "value"] / 1000
 
-    df = pd.concat([df, df_percent])
-    df = df.reset_index()
+    df = pd.concat([df, df_percent], axis=0).reset_index(drop=True)
+    # df = df.reset_index()
     return df
 
 
