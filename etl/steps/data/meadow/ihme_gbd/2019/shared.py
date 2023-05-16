@@ -11,25 +11,21 @@ from etl.steps.data.converters import convert_walden_metadata
 
 
 def clean_data(df: pd.DataFrame) -> pd.DataFrame:
-    return (
-        df.rename(
-            columns={
-                "location_name": "country",
-                "location": "country",
-                "val": "value",
-                "measure_name": "measure",
-                "sex_name": "sex",
-                "age_name": "age",
-                "cause_name": "cause",
-                "metric_name": "metric",
-            },
-            errors="ignore",
-        )
-        .drop(
-            columns=["measure_id", "location_id", "sex_id", "age_id", "cause_id", "metric_id"],
-            errors="ignore",
-        )
-        .drop_duplicates(subset=["measure", "sex", "age", "cause", "metric", "year"])
+    return df.rename(
+        columns={
+            "location_name": "country",
+            "location": "country",
+            "val": "value",
+            "measure_name": "measure",
+            "sex_name": "sex",
+            "age_name": "age",
+            "cause_name": "cause",
+            "metric_name": "metric",
+        },
+        errors="ignore",
+    ).drop(
+        columns=["measure_id", "location_id", "sex_id", "age_id", "cause_id", "metric_id"],
+        errors="ignore",
     )
 
 

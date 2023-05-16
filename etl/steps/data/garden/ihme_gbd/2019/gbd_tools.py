@@ -84,14 +84,24 @@ def _pivot_rate(df: pd.DataFrame, dims: List[str]) -> Any:
     return df_rate
 
 
+def _pivot_share(df: pd.DataFrame, dims: List[str]) -> Any:
+    df_share = df[df.metric == "Share of the population"].pivot(
+        index=["country", "year"] + dims, columns="measure", values="value"
+    )
+    df_share = df_share.round(2)
+    df_share = df_share.rename(columns=lambda c: c + " - Share of the population")
+    return df_share
+
+
 def pivot(df: pd.DataFrame, dims: List[str]) -> Table:
     # NOTE: processing them separately simplifies the code and is faster (and less memory heavy) than
     # doing it all in one pivot operation
     df_number = _pivot_number(df, dims)
     df_percent = _pivot_percent(df, dims)
     df_rate = _pivot_rate(df, dims)
+    df_share = _pivot_share(df, dims)
 
-    tb_garden = Table(pd.concat([df_number, df_percent, df_rate], axis=1))
+    tb_garden = Table(pd.concat([df_number, df_percent, df_rate, df_share], axis=1))
     tb_garden = underscore_table(tb_garden)
 
     return tb_garden
@@ -142,6 +152,17 @@ def omm_metrics(df: pd.DataFrame) -> Any:
     return pd.concat(omms, axis=0)
 
 
+def add_share_of_population(df: pd.DataFrame) -> pd.DataFrame:
+    df_rate = df.loc[df["metric"] == "Rate"]
+    df_percent = df_rate.copy()
+    df_percent["metric"] = "Share of the population"
+    df_percent.loc[:, "value"] = df_percent.loc[:, "value"] / 1000
+
+    df = pd.concat([df, df_percent])
+    df = df.reset_index()
+    return df
+
+
 def run_wrapper(
     dataset: str,
     country_mapping_path: Path,
@@ -153,7 +174,7 @@ def run_wrapper(
     # read dataset from meadow
     ds_meadow = Dataset(DATA_DIR / f"meadow/ihme_gbd/2019/{dataset}")
 
-    tb_meadow = ds_meadow[f"{dataset}"]
+    tb_meadow = ds_meadow[dataset]
     tb_meadow = tb_meadow.drop(["index"], axis=1, errors="ignore")
     df_garden = pd.DataFrame(tb_meadow)
     df_garden = tidy_countries(country_mapping_path, excluded_countries_path, df_garden)
@@ -161,7 +182,7 @@ def run_wrapper(
 
     omm = omm_metrics(df_garden)
     df_garden = cast(pd.DataFrame, pd.concat([df_garden, omm], axis=0))
-
+    df_garden = add_share_of_population(df_garden)
     tb_garden = pivot(df_garden, dims)
 
     # free up memory
