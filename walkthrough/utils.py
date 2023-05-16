@@ -41,6 +41,9 @@ DUMMY_DATA = {
     "url": "https://www.url-dummy.com/",
 }
 
+# state shared between steps
+APP_STATE = {}
+
 
 def validate_short_name(short_name: str) -> Optional[str]:
     try:

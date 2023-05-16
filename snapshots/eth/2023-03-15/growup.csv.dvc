@@ -1,0 +1,25 @@
+meta:
+  namespace: eth
+  short_name: growup
+  name: Geographical Research On War, Unified Platform - GROW<sup>up</sup> (ETH, 2021)
+  version: 2023-03-15
+  publication_date: 2021-06-08
+  source_name: Geographical Research On War, Unified Platform - GROW<sup>up</sup>
+    (2021)
+  source_published_by: Luc Girardin, Philipp Hunziker, Lars-Erik Cederman, Nils-Christian
+    Bormann, Seraina Rüegger, and Manuel Vogt. 2015. GROW<sup>up</sup> - Geographical
+    Research On War, Unified Platform. ETH Zurich. http://growup.ethz.ch/
+  url: https://growup.ethz.ch/
+  source_data_url:
+  file_extension: csv
+  license_url:
+  license_name:
+  date_accessed: 2023-03-15
+  is_public: true
+  description: |
+    The GROW<sup>up</sup> platform offers a visualization of settlement patterns of politically active ethnic groups around the world from 1946-2020. Additionally, it provides information about ethnic groups' access to executive government power, their involvement in civil war, federal administrative units, physical elevation, nightlight data, as well as population and GDP data by area.
+wdir: ../../../data/snapshots/eth/2023-03-15
+outs:
+- md5: ba8380d1bc3539411ca12c8e13068fdf
+  size: 4052435
+  path: growup.csv

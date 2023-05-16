@@ -1,5 +1,7 @@
 """Load a snapshot and create a meadow dataset."""
 
+from typing import cast
+
 import pandas as pd
 from owid.catalog import Table
 from structlog import get_logger
@@ -21,7 +23,7 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap: Snapshot = paths.load_dependency("dummy.csv")
+    snap = cast(Snapshot, paths.load_dependency("dummy.csv"))
 
     # Load data from snapshot.
     df = pd.read_csv(snap.path)

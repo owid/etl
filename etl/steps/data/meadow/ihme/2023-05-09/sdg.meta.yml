@@ -1,0 +1,50 @@
+dataset:
+  title: Sustainable Development Goals (IHME, 2022)
+  description: IHME produced estimates and forecasts for 13 of the SDG indicators
+    included in the Goalkeepers Report. To estimate the effects of the COVID-19 pandemic
+    on the SDG indicators and their accompanying projections to 2030, IHME implemented
+    an approach as shown in Figure 1 for capturing both the short-term effects of
+    the COVID-19 pandemic as well as the long-term effects that reflect its impact
+    on economic production, educational attainment, and development, and the consequences
+    of these on the SDG indicators.
+  licenses:
+  - name: IHME Free-of-charge non-commercial user agreement
+    url: https://www.healthdata.org/data-tools-practices/data-practices/terms-and-conditions
+  sources:
+  - name: Institute of Health Metrics and Evaluation (2022)
+    description: IHME produced estimates and forecasts for 13 of the SDG indicators
+      included in the Goalkeepers Report. To estimate the effects of the COVID-19
+      pandemic on the SDG indicators and their accompanying projections to 2030, IHME
+      implemented an approach as shown in Figure 1 for capturing both the short-term
+      effects of the COVID-19 pandemic as well as the long-term effects that reflect
+      its impact on economic production, educational attainment, and development,
+      and the consequences of these on the SDG indicators.
+    url: https://api.healthdata.org/sdg/v1/docs & https://api.healthdata.org/sdg/v1/docs
+    date_accessed: '2023-05-05'
+    publication_date: '2022-09-12'
+    publication_year: 2022
+    published_by: 'Institute for Health Metrics and Evaluation (IHME). Health-related
+      SDGs. Seattle, WA: IHME, University of Washington, 2022. Available from https://api.healthdata.org/sdg/v1/docs'
+tables:
+  sdg:
+    variables:
+      indicator_name:
+        title: indicator_name
+        unit: ''
+        short_unit: ''
+      age_group_name:
+        title: age_group_name
+        unit: ''
+        short_unit: ''
+      sex_label:
+        title: sex_label
+        unit: ''
+        short_unit: ''
+      scenario_label:
+        title: scenario_label
+        unit: ''
+        short_unit: ''
+      mean_estimate:
+        title: mean_estimate
+        unit: ''
+        short_unit: ''

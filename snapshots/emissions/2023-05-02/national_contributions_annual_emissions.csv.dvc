@@ -1,0 +1,40 @@
+meta:
+  namespace: emissions
+  short_name: national_contributions_annual_emissions
+  name: National contributions to climate change - Annual emissions (Jones et al.
+    (2023), 2023)
+  version: '2023-05-02'
+  publication_date: '2023-02-13'
+  source_name: Jones et al. (2023)
+  source_published_by: Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew,
+    Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard A., Friedlingstein,
+    Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023). National contributions to
+    climate change due to historical emissions of carbon dioxide, methane and nitrous
+    oxide [Data set]. In Scientific Data (2023.1). Zenodo.
+  url: https://zenodo.org/record/7636699#.ZFCy4exBweZ
+  source_data_url: https://zenodo.org/record/7636699/files/EMISSIONS_ANNUAL_1830-2021.csv
+  file_extension: csv
+  license_url: https://zenodo.org/record/7636699#.ZFCy4exBweZ
+  license_name: Creative Commons Attribution 4.0 International
+  date_accessed: 2023-05-02
+  is_public: true
+  description: |
+    Annual emissions data (1830-2021).
+
+    Dataset description by Jones et al. (2023):
+    A dataset describing the global warming response to national emissions CO2, CH4 and N2O from fossil and land use sources during 1851-2021.
+
+    National CO2 emissions data are collated from the Global Carbon Project (Andrew and Peters, 2022; Friedlingstein et al., 2022). 
+
+    National CH4 and N2O emissions data are collated from PRIMAP-hist (HISTTP) (Gütschow et al., 2022).
+
+    We construct a time series of cumulative CO2-equivalent emissions for each country, gas, and emissions source (fossil or land use). Emissions of CH4 and N2O emissions are related to cumulative CO2-equivalent emissions using the Global Warming Potential (GWP*) approach, with best-estimates of the coefficients taken from the IPCC AR6 (Forster et al., 2021).
+
+    Warming in response to cumulative CO2-equivalent emissions is estimated using the transient climate response to cumulative carbon emissions (TCRE) approach, with best-estimate value of TCRE taken from the IPCC AR6 (Forster et al., 2021, Canadell et al., 2021). 'Warming' is specifically the change in global mean surface temperature (GMST).
+
+    The data files provide emissions, cumulative emissions and the GMST response by country, gas (CO2, CH4, N2O or 3-GHG total) and source (fossil emissions, land use emissions or the total).
+wdir: ../../../data/snapshots/emissions/2023-05-02
+outs:
+- md5: dce07a206256931a5a23589ef76bcd3e
+  size: 26320900
+  path: national_contributions_annual_emissions.csv

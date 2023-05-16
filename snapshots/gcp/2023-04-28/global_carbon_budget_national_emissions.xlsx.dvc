@@ -1,0 +1,40 @@
+meta:
+  namespace: gcp
+  short_name: global_carbon_budget_national_emissions
+  name: Global Carbon Budget - National emissions
+  version: '2023-04-28'
+  publication_date: '2022-11-11'
+  source_name: Global Carbon Project
+  source_published_by: "Friedlingstein, P., O'Sullivan, M., Jones, M. W., Andrew,\
+    \ R. M., Gregor, L., Hauck, J., Le Quéré, C., Luijkx, I. T., Olsen, A., Peters,\
+    \ G. P., Peters, W., Pongratz, J., Schwingshackl, C., Sitch, S., Canadell, J.\
+    \ G., Ciais, P., Jackson, R. B., Alin, S. R., Alkama, R., Arneth, A., Arora, V.\
+    \ K., Bates, N. R., Becker, M., Bellouin, N., Bittig, H. C., Bopp, L., Chevallier,\
+    \ F., Chini, L. P., Cronin, M., Evans, W., Falk, S., Feely, R. A., Gasser, T.,\
+    \ Gehlen, M., Gkritzalis, T., Gloege, L., Grassi, G., Gruber, N., Gürses, Ö.,\
+    \ Harris, I., Hefner, M., Houghton, R. A., Hurtt, G. C., Iida, Y., Ilyina, T.,\
+    \ Jain, A. K., Jersild, A., Kadono, K., Kato, E., Kennedy, D., Klein Goldewijk,\
+    \ K., Knauer, J., Korsbakken, J. I., Landschützer, P., Lefèvre, N., Lindsay, K.,\
+    \ Liu, J., Liu, Z., Marland, G., Mayot, N., McGrath, M. J., Metzl, N., Monacci,\
+    \ N. M., Munro, D. R., Nakaoka, S.-I., Niwa, Y., O'Brien, K., Ono, T., Palmer,\
+    \ P. I., Pan, N., Pierrot, D., Pocock, K., Poulter, B., Resplandy, L., Robertson,\
+    \ E., Rödenbeck, C., Rodriguez, C., Rosan, T. M., Schwinger, J., Séférian, R.,\
+    \ Shutler, J. D., Skjelvan, I., Steinhoff, T., Sun, Q., Sutton, A. J., Sweeney,\
+    \ C., Takao, S., Tanhua, T., Tans, P. P., Tian, X., Tian, H., Tilbrook, B., Tsujino,\
+    \ H., Tubiello, F., van der Werf, G. R., Walker, A. P., Wanninkhof, R., Whitehead,\
+    \ C., Willstrand Wranne, A., Wright, R., Yuan, W., Yue, C., Yue, X., Zaehle, S.,\
+    \ Zeng, J., and Zheng, B.: Global Carbon Budget 2022, Earth Syst. Sci. Data, 14,\
+    \ 4811-4900, https://doi.org/10.5194/essd-14-4811-2022, 2022."
+  url: https://globalcarbonbudget.org/
+  source_data_url: https://globalcarbonbudget.org/wp-content/uploads/National_Fossil_Carbon_Emissions_2022v1.0.xlsx
+  file_extension: xlsx
+  license_url: https://zenodo.org/record/7215364
+  license_name: Creative Commons Attribution 4.0 International
+  date_accessed: 2023-04-28
+  is_public: true
+  description: |
+wdir: ../../../data/snapshots/gcp/2023-04-28
+outs:
+- md5: a60b3be798bd0e58ce6966b302496c3f
+  size: 558517
+  path: global_carbon_budget_national_emissions.xlsx

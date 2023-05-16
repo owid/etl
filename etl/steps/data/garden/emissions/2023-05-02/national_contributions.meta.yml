@@ -1,0 +1,330 @@
+all_sources:
+  - source_jones: &source-jones
+      name: Our World in Data based on Jones et al. (2023)
+      published_by: |
+        Our World in Data based on Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew, Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023). National contributions to climate change due to historical emissions of carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data (2023.1). Zenodo.
+      url: https://zenodo.org/record/7636699#.ZFCy4exBweZ
+      date_accessed: "2023-05-02"
+      publication_date: "2023-02-13"
+
+dataset:
+  title: National contributions to climate change (Jones et al. (2023), 2023)
+  description: |
+    Jones et al. (2023) quantify national and regional contributions to the increase of global mean surface temperature over the last few centuries.
+    
+    Original dataset description by Jones et al. (2023):
+    A dataset describing the global warming response to national emissions CO2, CH4 and N2O from fossil and land use sources during 1851-2021.
+    
+    National CO2 emissions data are collated from the Global Carbon Project (Andrew and Peters, 2022; Friedlingstein et al., 2022). 
+    
+    National CH4 and N2O emissions data are collated from PRIMAP-hist (HISTTP) (Gütschow et al., 2022).
+    
+    We construct a time series of cumulative CO2-equivalent emissions for each country, gas, and emissions source (fossil or land use). Emissions of CH4 and N2O emissions are related to cumulative CO2-equivalent emissions using the Global Warming Potential (GWP*) approach, with best-estimates of the coefficients taken from the IPCC AR6 (Forster et al., 2021).
+    
+    Warming in response to cumulative CO2-equivalent emissions is estimated using the transient climate response to cumulative carbon emissions (TCRE) approach, with best-estimate value of TCRE taken from the IPCC AR6 (Forster et al., 2021, Canadell et al., 2021). 'Warming' is specifically the change in global mean surface temperature (GMST).
+  sources:
+    - *source-jones
+
+tables:
+  national_contributions:
+    variables:
+      annual_emissions_ch4_fossil:
+        title: Annual methane emissions from fossil fuels and industry
+        unit: tonnes
+        short_unit: t
+        description: |
+          Annual methane emissions from fossil fuels and industry.
+      annual_emissions_ch4_land:
+        title: Annual methane emissions from agriculture and land use
+        unit: tonnes
+        short_unit: t
+        description: |
+          Annual methane emissions from agriculture and land use.
+      annual_emissions_ch4_total:
+        title: Annual methane emissions
+        unit: tonnes
+        short_unit: t
+        description: |
+          Annual methane emissions.
+      annual_emissions_co2_fossil:
+        title: Annual CO2 emissions from fossil fuels and industry
+        unit: tonnes
+        short_unit: t
+        description: |
+          Annual CO2 emissions from fossil fuels and industry.
+      annual_emissions_co2_total:
+        title: Annual CO2 emissions
+        unit: tonnes
+        short_unit: t
+        description: |
+          Annual CO2 emissions.
+      annual_emissions_n2o_fossil:
+        title: Annual nitrous oxide emissions from fossil fuels and industry
+        unit: tonnes
+        short_unit: t
+        description: |
+          Annual nitrous oxide emissions from fossil fuels and industry.
+      annual_emissions_n2o_land:
+        title: Annual nitrous oxide emissions from agriculture and land use
+        unit: tonnes
+        short_unit: t
+        description: |
+          Annual nitrous oxide emissions from agriculture and land use.
+      annual_emissions_n2o_total:
+        title: Annual nitrous oxide emissions
+        unit: tonnes
+        short_unit: t
+        description: |
+          Annual nitrous oxide emissions.
+      annual_emissions_co2_land:
+        title: Annual CO2 emissions from agriculture and land use
+        unit: tonnes
+        short_unit: t
+        description: |
+          Annual CO2 emissions from agriculture and land use.
+      cumulative_emissions_ghg_fossil:
+        title: Cumulative greenhouse gas emissions from fossil fuels and industry
+        unit: tonnes
+        short_unit: t
+        description: |
+          Cumulative greenhouse gas emissions from fossil fuels and industry.
+      cumulative_emissions_ghg_land:
+        title: Cumulative greenhouse gas emissions from agriculture and land use
+        unit: tonnes
+        short_unit: t
+        description: |
+          Cumulative greenhouse gas emissions from agriculture and land use.
+      cumulative_emissions_ghg_total:
+        title: Cumulative greenhouse gas emissions
+        unit: tonnes
+        short_unit: t
+        description: |
+          Cumulative greenhouse gas emissions.
+      cumulative_emissions_ch4_fossil:
+        title: Cumulative methane emissions from fossil fuels and industry
+        unit: tonnes
+        short_unit: t
+        description: |
+          Cumulative methane emissions from fossil fuels and industry.
+      cumulative_emissions_ch4_land:
+        title: Cumulative methane emissions from agriculture and land use
+        unit: tonnes
+        short_unit: t
+        description: |
+          Cumulative methane emissions from agriculture and land use.
+      cumulative_emissions_ch4_total:
+        title: Cumulative methane emissions
+        unit: tonnes
+        short_unit: t
+        description: |
+          Cumulative methane emissions.
+      cumulative_emissions_co2_fossil:
+        title: Cumulative CO2 emissions from fossil fuels and industry
+        unit: tonnes
+        short_unit: t
+        description: |
+          Cumulative CO2 emissions from fossil fuels and industry.
+      cumulative_emissions_co2_land:
+        title: Cumulative CO2 emissions from agriculture and land use
+        unit: tonnes
+        short_unit: t
+        description: |
+          Cumulative CO2 emissions from agriculture and land use.
+      cumulative_emissions_co2_total:
+        title: Cumulative CO2 emissions
+        unit: tonnes
+        short_unit: t
+        description: |
+          Cumulative CO2 emissions.
+      cumulative_emissions_n2o_fossil:
+        title: Cumulative nitrous oxide emissions from fossil fuels and industry
+        unit: tonnes
+        short_unit: t
+        description: |
+          Cumulative nitrous oxide emissions from fossil fuels and industry.
+      cumulative_emissions_n2o_land:
+        title: Cumulative nitrous oxide emissions from agriculture and land use
+        unit: tonnes
+        short_unit: t
+        description: |
+          Cumulative nitrous oxide emissions from agriculture and land use.
+      cumulative_emissions_n2o_total:
+        title: Cumulative nitrous oxide emissions
+        unit: tonnes
+        short_unit: t
+        description: |
+          Cumulative nitrous oxide emissions.
+      temperature_response_ghg_fossil:
+        title: Change in global mean surface temperature caused by greenhouse gas emissions from fossil fuels and industry
+        unit: °C
+        short_unit: °C
+        description: |
+          Change in global mean surface temperature (in °C) caused by greenhouse gas emissions from fossil fuels and industry.
+      temperature_response_ghg_land:
+        title: Change in global mean surface temperature caused by greenhouse gas emissions from agriculture and land use
+        unit: °C
+        short_unit: °C
+        description: |
+          Change in global mean surface temperature (in °C) caused by greenhouse gas emissions from agriculture and land use.
+      temperature_response_ghg_total:
+        title: Change in global mean surface temperature caused by greenhouse gas emissions
+        unit: °C
+        short_unit: °C
+        description: |
+          Change in global mean surface temperature (in °C) caused by greenhouse gas emissions. This measures each country's contribution to global mean surface temperature (GMST) rise from its cumulative emissions of carbon dioxide, methane and nitrous oxide. The warming effects of each gas are calculated based on cumulative CO2-equivalent emissions using the Global Warming Potential (GWP*) approach.
+      temperature_response_ch4_fossil:
+        title: Change in global mean surface temperature caused by methane emissions from fossil fuels and industry
+        unit: °C
+        short_unit: °C
+        description: |
+          Change in global mean surface temperature (in °C) caused by methane emissions from fossil fuels and industry.
+      temperature_response_ch4_land:
+        title: Change in global mean surface temperature caused by methane emissions from agriculture and land use
+        unit: °C
+        short_unit: °C
+        description: |
+          Change in global mean surface temperature (in °C) caused by methane emissions from agriculture and land use.
+      temperature_response_ch4_total:
+        title: Change in global mean surface temperature caused by methane emissions
+        unit: °C
+        short_unit: °C
+        description: |
+          Change in global mean surface temperature (in °C) caused by methane emissions. This measures each country's contribution to global mean surface temperature (GMST) rise from its cumulative emissions of methane. The warming effects of each gas are calculated based on cumulative CO2-equivalent emissions using the Global Warming Potential (GWP*) approach.
+      temperature_response_co2_fossil:
+        title: Change in global mean surface temperature caused by CO2 emissions from fossil fuels and industry
+        unit: °C
+        short_unit: °C
+        description: |
+          Change in global mean surface temperature (in °C) caused by CO2 emissions from fossil fuels and industry.
+      temperature_response_co2_land:
+        title: Change in global mean surface temperature caused by CO2 emissions from agriculture and land use
+        unit: °C
+        short_unit: °C
+        description: |
+          Change in global mean surface temperature (in °C) caused by CO2 emissions from agriculture and land use.
+      temperature_response_co2_total:
+        title: Change in global mean surface temperature caused by CO2 emissions
+        unit: °C
+        short_unit: °C
+        description: |
+          Change in global mean surface temperature (in °C) caused by CO2 emissions. This measures each country's contribution to global mean surface temperature (GMST) rise from its cumulative emissions of carbon dioxide. The warming effects of each gas are calculated based on cumulative CO2-equivalent emissions using the Global Warming Potential (GWP*) approach.
+      temperature_response_n2o_fossil:
+        title: Change in global mean surface temperature caused by nitrous oxide emissions from fossil fuels and industry
+        unit: °C
+        short_unit: °C
+        description: |
+          Change in global mean surface temperature (in °C) caused by nitrous oxide emissions from fossil fuels and industry.
+      temperature_response_n2o_land:
+        title: Change in global mean surface temperature caused by nitrous oxide emissions from agriculture and land use
+        unit: °C
+        short_unit: °C
+        description: |
+          Change in global mean surface temperature (in °C) caused by nitrous oxide emissions from agriculture and land use.
+      temperature_response_n2o_total:
+        title: Change in global mean surface temperature caused by nitrous oxide emissions
+        unit: °C
+        short_unit: °C
+        description: |
+          Change in global mean surface temperature (in °C) caused by nitrous oxide emissions. This measures each country's contribution to global mean surface temperature (GMST) rise from its cumulative nitrous oxide emissions. The warming effects of each gas are calculated based on cumulative CO2-equivalent emissions using the Global Warming Potential (GWP*) approach.
+      annual_emissions_ch4_fossil_co2eq:
+        title: Annual methane emissions from fossil fuels and industry in CO2 equivalents
+        unit: tonnes
+        short_unit: t
+        description: |
+          Annual methane emissions from fossil fuels and industry in CO2 equivalents. Methane emissions are calculated by Our World in Data based on emissions data from Jones et al. (2023) and IPCC conversion factors. Jones et al. (2023) give methane emissions in standard metric tonnes per year. We have converted these emissions to carbon-dioxide equivalents over a 100-year timescale using a conversion factor of 29.8 for fossil sources, and 27.2 for agricultural and land use sources (as per the IPCC AR6 report).
+      annual_emissions_ch4_land_co2eq:
+        title: Annual methane emissions from agriculture and land use in CO2 equivalents
+        unit: tonnes
+        short_unit: t
+        description: |
+          Annual methane emissions from agriculture and land use in CO2 equivalents. Methane emissions are calculated by Our World in Data based on emissions data from Jones et al. (2023) and IPCC conversion factors. Jones et al. (2023) give methane emissions in standard metric tonnes per year. We have converted these emissions to carbon-dioxide equivalents over a 100-year timescale using a conversion factor of 29.8 for fossil sources, and 27.2 for agricultural and land use sources (as per the IPCC AR6 report).
+      annual_emissions_ch4_total_co2eq:
+        title: Annual methane emissions in CO2 equivalents
+        unit: tonnes
+        short_unit: t
+        description: |
+          Annual methane emissions in CO2 equivalents. Methane emissions are calculated by Our World in Data based on emissions data from Jones et al. (2023) and IPCC conversion factors. Jones et al. (2023) give methane emissions in standard metric tonnes per year. We have converted these emissions to carbon-dioxide equivalents over a 100-year timescale using a conversion factor of 29.8 for fossil sources, and 27.2 for agricultural and land use sources (as per the IPCC AR6 report).
+      annual_emissions_n2o_fossil_co2eq:
+        title: Annual nitrous oxide emissions from fossil fuels and industry in CO2 equivalents
+        unit: tonnes
+        short_unit: t
+        description: |
+          Annual nitrous oxide emissions from fossil fuels and industry in CO2 equivalents. Nitrous oxide emissions are calculated by Our World in Data based on emissions data from Jones et al. (2023) and IPCC AR6 conversion factors. Jones et al. (2023) give nitrous oxide emissions in standard metric tonnes per year. We have converted these emissions to carbon-dioxide equivalents over a 100-year timescale using a conversion factor of 273 (as per the IPCC AR6 report).
+      annual_emissions_n2o_land_co2eq:
+        title: Annual nitrous oxide emissions from agriculture and land use in CO2 equivalents
+        unit: tonnes
+        short_unit: t
+        description: |
+          Annual nitrous oxide emissions from agriculture and land use in CO2 equivalents. Nitrous oxide emissions are calculated by Our World in Data based on emissions data from Jones et al. (2023) and IPCC AR6 conversion factors. Jones et al. (2023) give nitrous oxide emissions in standard metric tonnes per year. We have converted these emissions to carbon-dioxide equivalents over a 100-year timescale using a conversion factor of 273 (as per the IPCC AR6 report).
+      annual_emissions_n2o_total_co2eq:
+        title: Annual nitrous oxide emissions in CO2 equivalents
+        unit: tonnes
+        short_unit: t
+        description: |
+          Annual nitrous oxide emissions in CO2 equivalents. Nitrous oxide emissions are calculated by Our World in Data based on emissions data from Jones et al. (2023) and IPCC AR6 conversion factors. Jones et al. (2023) give nitrous oxide emissions in standard metric tonnes per year. We have converted these emissions to carbon-dioxide equivalents over a 100-year timescale using a conversion factor of 273 (as per the IPCC AR6 report).
+      annual_emissions_ghg_fossil_co2eq:
+        title: Annual greenhouse gas emissions from fossil fuels and industry in CO2 equivalents
+        unit: tonnes
+        short_unit: t
+        description: |
+          Annual greenhouse gas emissions from fossil fuels and industry in CO2 equivalents. Greenhouse gas emissions are calculated by Our World in Data based on emissions data from Jones et al. (2023) and IPCC AR6 conversion factors. Jones et al. (2023) give methane and nitrous oxide emissions in standard metric tonnes per year. We have converted these emissions to carbon-dioxide equivalents over a 100-year timescale using a conversion factor of 273 for nitrous oxide, 29.8 for methane from fossil sources, and 27.2 for methane from agricultural and land use sources (as per the IPCC AR6 report).
+      annual_emissions_ghg_land_co2eq:
+        title: Annual greenhouse gas emissions from agriculture and land use in CO2 equivalents
+        unit: tonnes
+        short_unit: t
+        description: |
+          Annual greenhouse gas emissions from agriculture and land use in CO2 equivalents. Greenhouse gas emissions are calculated by Our World in Data based on emissions data from Jones et al. (2023) and IPCC AR6 conversion factors. Jones et al. (2023) give methane and nitrous oxide emissions in standard metric tonnes per year. We have converted these emissions to carbon-dioxide equivalents over a 100-year timescale using a conversion factor of 273 for nitrous oxide, 29.8 for methane from fossil sources, and 27.2 for methane from agricultural and land use sources (as per the IPCC AR6 report).
+      annual_emissions_ghg_total_co2eq:
+        title: Annual greenhouse gas emissions in CO2 equivalents
+        unit: tonnes
+        short_unit: t
+        description: |
+          Annual greenhouse gas emissions in CO2 equivalents. Greenhouse gas emissions are calculated by Our World in Data based on emissions data from Jones et al. (2023) and IPCC AR6 conversion factors. Jones et al. (2023) give methane and nitrous oxide emissions in standard metric tonnes per year. We have converted these emissions to carbon-dioxide equivalents over a 100-year timescale using a conversion factor of 273 for nitrous oxide, 29.8 for methane from fossil sources, and 27.2 for methane from agricultural and land use sources (as per the IPCC AR6 report).
+      share_of_annual_emissions_ch4_total:
+        title: Share of global methane emissions
+        unit: "%"
+        short_unit: "%"
+        description: |
+          Share of global methane emissions. Methane emissions are calculated by Our World in Data based on emissions data from Jones et al. (2023) and IPCC conversion factors. Jones et al. (2023) give methane emissions in standard metric tonnes per year. We have converted these emissions to carbon-dioxide equivalents over a 100-year timescale using a conversion factor of 29.8 for fossil sources, and 27.2 for agricultural and land use sources (as per the IPCC AR6 report).
+      share_of_annual_emissions_co2_total:
+        title: Share of global CO2 emissions
+        unit: "%"
+        short_unit: "%"
+        description: |
+          Share of global CO2 emissions.
+      share_of_annual_emissions_ghg_total_co2eq:
+        title: Share of global greenhouse gas emissions
+        unit: "%"
+        short_unit: "%"
+        description: |
+          Share of global greenhouse gas emissions. Greenhouse gas emissions are calculated by Our World in Data based on emissions data from Jones et al. (2023) and IPCC AR6 conversion factors. Jones et al. (2023) give methane and nitrous oxide emissions in standard metric tonnes per year. We have converted these emissions to carbon-dioxide equivalents over a 100-year timescale using a conversion factor of 273 for nitrous oxide, 29.8 for methane from fossil sources, and 27.2 for methane from agricultural and land use sources (as per the IPCC AR6 report).
+      share_of_annual_emissions_n2o_total:
+        title: Share of global nitrous oxide emissions
+        unit: "%"
+        short_unit: "%"
+        description: |
+          Share of global nitrous oxide emissions. Nitrous oxide emissions are calculated by Our World in Data based on emissions data from Jones et al. (2023) and IPCC AR6 conversion factors. Jones et al. (2023) give nitrous oxide emissions in standard metric tonnes per year. We have converted these emissions to carbon-dioxide equivalents over a 100-year timescale using a conversion factor of 273 (as per the IPCC AR6 report).
+      share_of_temperature_response_ghg_total:
+        title: Share of contribution to global warming
+        unit: "%"
+        short_unit: "%"
+        description: |
+          Share of contribution to global warming (as a percentage). This measures each country's contribution to global mean surface temperature (GMST) rise from its cumulative emissions of carbon dioxide, methane and nitrous oxide. The warming effects of each gas are calculated based on cumulative CO2-equivalent emissions using the Global Warming Potential (GWP*) approach.
+      annual_emissions_ch4_total_co2eq_per_capita:
+        title: Per-capita methane emissions in CO2 equivalents
+        unit: tonnes
+        short_unit: t
+        description: |
+          Per-capita methane emissions in CO2 equivalents. Methane emissions per person are calculated by Our World in Data based on emissions data from Jones et al. (2023) and population data from HYDE and the UN World Population Prospects. Jones et al. (2023) give methane emissions in standard metric tonnes per year. We have converted these emissions to carbon-dioxide equivalents over a 100-year timescale using a conversion factor of 29.8 for fossil sources, and 27.2 for agricultural and land use sources (as per the IPCC AR6 report).
+      annual_emissions_n2o_total_co2eq_per_capita:
+        title: Per-capita nitrous oxide emissions in CO2 equivalents
+        unit: tonnes
+        short_unit: t
+        description: |
+          Per-capita nitrous oxide emissions in CO2 equivalents. Nitrous oxide emissions are calculated by Our World in Data based on emissions data from Jones et al. (2023) and IPCC AR6 conversion factors. Jones et al. (2023) give nitrous oxide emissions in standard metric tonnes per year. We have converted these emissions to carbon-dioxide equivalents over a 100-year timescale using a conversion factor of 273 (as per the IPCC AR6 report).
+      annual_emissions_ghg_total_co2eq_per_capita:
+        title: Per-capita greenhouse gas emissions in CO2 equivalents
+        unit: tonnes
+        short_unit: t
+        description: |
+          Per-capita greenhouse gas emissions in CO2 equivalents. Greenhouse gas emissions are calculated by Our World in Data based on emissions data from Jones et al. (2023) and IPCC AR6 conversion factors. Jones et al. (2023) give methane and nitrous oxide emissions in standard metric tonnes per year. We have converted these emissions to carbon-dioxide equivalents over a 100-year timescale using a conversion factor of 273 for nitrous oxide, 29.8 for methane from fossil sources, and 27.2 for methane from agricultural and land use sources (as per the IPCC AR6 report).

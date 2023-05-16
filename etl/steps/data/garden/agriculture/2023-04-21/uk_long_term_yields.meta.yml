@@ -1,0 +1,15 @@
+dataset:
+  title: Long-term yields in the United Kingdom (various sources, 2023)
+  description: |
+    This dataset on agricultural yields in the United Kingdom was constructed from yield data from three key sources:
+
+    • Data from 1270 to 1870 is taken from Table 3.06 of Broadberry et al. (2015). The data in this table is based on the Medieval Accounts Database, the Early Modern Probate Inventories Database and the Modern Farm Accounts Database. Seed sown per acre from the Medieval and Modern Databases. Pulses for the modern period and all seeds sown for the early modern period are taken from Overton and Campbell (1996), Allen (2005).
+    This comprises crop yield estimates only for England. For this dataset, we have assumed that yields in England are also representative of average UK yields. The data was given as decadal averages, and we have assumed, for each value, the middle year in each decade.
+    All values of yield in bushels per acre have been converted to tonnes per hectare, using the conversion factors given by <a href="https://www.ers.usda.gov/webdocs/publications/41880/33132_ah697_002.pdf">the USDA</a> for the different commodities.
+
+    • Data from 1870 to 1960 is taken from Table 4 of Brassley (2000). The data in this table is based on the book "A hundred Years of British food and farming: a statistical survey", by H. F. Marks (ed. D. K. Britton, 1989). The data is provided over 5-year periods. We have assumed, for each value, the middle year in each 5-year set.
+
+    • Data from 1961 onwards is sourced from the Food and Agriculture Organization of the United Nations.
+
+tables:
+  {}

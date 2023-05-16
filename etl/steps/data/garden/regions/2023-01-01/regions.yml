@@ -114,6 +114,7 @@
 
 - code: "ATA"
   name: "Antarctica"
+  region_type: "other"
 
 - code: "ATG"
   name: "Antigua and Barbuda"
@@ -448,6 +449,7 @@
   name: "Denmark"
   related:
     - "FRO"
+    - "GRL"
 
 - code: "DJI"
   name: "Djibouti"
@@ -471,7 +473,7 @@
     - "DEU"
 
 - code: "TLS"
-  name: "East Timor"
+  name: "Timor"
   aliases:
     - "East Timor"
     - "Timor-Leste"
@@ -982,6 +984,8 @@
   name: "New Zealand"
   related:
     - "TKL"
+    - "NIU"
+    - "COK"
 
 - code: "NIC"
   name: "Nicaragua"
@@ -1653,6 +1657,7 @@
 
 - code: "OWID_ZAN"
   name: "Zanzibar"
+  region_type: "other"
 
 - code: "ZWE"
   name: "Zimbabwe"

@@ -5,23 +5,78 @@ repo_url: https://github.com/owid/etl
 
 nav:
   - Home: "index.md"
-  - Getting started: "getting-started/index.md"
+  - Getting started:
+    - Getting started: "getting-started/index.md"
+    - Working environment: "getting-started/working-environment.md"
+    - Building datasets: "getting-started/building-datasets.md"
+    - Consuming datasets: "getting-started/consuming-datasets.md"
   - Architecture:
-      - Overview: "architecture/index.md"
-      - Common format: "architecture/common-format.md"
-      - Harmonization: "architecture/harmonization.md"
-      - Internal structure: "architecture/structure.md"
-      - Metadata: "architecture/metadata.md"
-      - Workflow: "architecture/workflow.md"
-  - Adding data:
-      - Guide: "adding-data/index.md"
-      - Fast track: "adding-data/fast-track.md"
-      - Walkthrough: "adding-data/walkthrough.md"
-      - Manually add: "adding-data/manual.md"
-  - API: "api/index.ipynb"
+      - Architecture: architecture/index.md
+      - Our journey: "architecture/our-journey.md"
+      - Design principles:
+        - Design principles: "architecture/design/index.md"
+        - Computational graph:
+          - Computational graph: "architecture/design/compute-graph/index.md"
+        - ETL model: "architecture/design/phases.md"
+        - Data model: "architecture/design/common-format.md"
+        - Features and constraints: "architecture/design/features-constraints.md"
+        - The DAG: "architecture/design/dag.md"
+        - The URI: "architecture/design/uri.md"
+      - ETL steps:
+        - ETL steps: "architecture/workflow/index.md"
+        - Snapshot: "architecture/workflow/snapshot.md"
+        - Meadow: "architecture/workflow/meadow.md"
+        - Garden: "architecture/workflow/garden.md"
+        - Grapher: "architecture/workflow/grapher.md"
+        - Special steps:
+          - Special steps: "architecture/workflow/other-steps/index.md"
+          - Explorers: "architecture/workflow/other-steps/explorers.md"
+          - Backport: "architecture/workflow/other-steps/backport.md"
+          - Open Numbers: "architecture/workflow/other-steps/open-numbers.md"
+          - ETag: "architecture/workflow/other-steps/etag.md"
+          - GitHub: "architecture/workflow/other-steps/github.md"
+          - Private steps: "architecture/workflow/other-steps/private.md"
+  - Tutorials:
+    - Tutorials: "tutorials/index.md"
+    - Adding data:
+      - Adding data: "tutorials/adding-data/index.md"
+      - Walkthrough: "tutorials/adding-data/walkthrough.md"
+      - Manually add: "tutorials/adding-data/manual.md"
+      - Fast-track: "tutorials/adding-data/fast-track.md"
+    - Updating charts: "tutorials/updating-charts.md"
+    - Harmonize country names: "tutorials/harmonize-countries.md"
+    - Backporting Grapher datasets to ETL: "tutorials/backport.md"
+    - Importing a private dataset to ETL: "tutorials/private-import.md"
+  - Dataset catalog:
+    - Dataset catalog: "data/index.md"
+    - Faostat: "data/faostat.md"
+    - Regions: "data/regions.md"
+  - API:
+    - API: "api/index.md"
+    - Python: "api/python.ipynb"
+  - Development:
+    - Development: "dev/index.md"
+    - Documentation: "dev/docs.md"
   - Contributing: "contributing.md"
 
 theme:
+  # logo: assets/logo.png
+  favicon: assets/images/favicon.png
+  palette:
+    # Palette toggle for light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    # Palette toggle for dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  font:
+    text: Lato
   name: material
   features:
     - navigation.instant
@@ -29,10 +84,18 @@ theme:
     - navigation.tabs
     - navigation.tabs.sticky
     - navigation.indexes
+    - content.tooltips
+    - navigation.expand
+    # - navigation.sections
+    # - toc.follow
+    - navigation.top
 
 markdown_extensions:
   - admonition
+  - abbr
+  - attr_list
   - pymdownx.details
+  - pymdownx.snippets
   - pymdownx.superfences:
       custom_fences:
         - name: mermaid
@@ -40,10 +103,30 @@ markdown_extensions:
           format: !!python/name:pymdownx.superfences.fence_code_format
   - pymdownx.tabbed:
       alternate_style: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
 
 plugins:
   - mkdocs-jupyter:
       ignore_h1_titles: True
+  - search
 
 extra_css:
   - css/extra.css
+
+extra:
+  homepage: https://docs.owid.io/projects/etl
+  generator: false
+  social:
+    # icons available listed: https://github.com/squidfunk/mkdocs-material/tree/master/material/.icons/fontawesome
+    - icon: fontawesome/brands/github
+      link: https://github.com/ourworldindata
+    - icon: fontawesome/solid/globe
+      link: https://ourworldindata.org
+    - icon: fontawesome/brands/twitter
+      link: https://twitter.com/ourworldindata
+    - icon: fontawesome/brands/instagram
+      link: https://instagram.com/ourworldindata
+
+copyright: Copyright &copy; 2023 Our World in Data

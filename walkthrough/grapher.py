@@ -6,6 +6,7 @@ from typing import Any
 from pydantic import BaseModel
 from pywebio import input as pi
 from pywebio import output as po
+from pywebio.session import go_app
 
 import etl
 
@@ -17,13 +18,11 @@ ETL_DIR = Path(etl.__file__).parent.parent
 
 
 class Options(Enum):
-
     ADD_TO_DAG = "Add steps into dag.yml file"
     IS_PRIVATE = "Make dataset private"
 
 
 class GrapherForm(BaseModel):
-
     short_name: str
     namespace: str
     version: str
@@ -38,8 +37,8 @@ class GrapherForm(BaseModel):
         super().__init__(**data)
 
 
-def app(run_checks: bool, dummy_data: bool) -> None:
-    dummies = utils.DUMMY_DATA if dummy_data else {}
+def app(run_checks: bool) -> None:
+    state = utils.APP_STATE
 
     with open(CURRENT_DIR / "grapher.md", "r") as f:
         po.put_markdown(f.read())
@@ -59,7 +58,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
                 name="namespace",
                 placeholder="institution",
                 required=True,
-                value=dummies.get("namespace"),
+                value=state.get("namespace"),
                 help_text="Institution name. Example: emdat",
             ),
             pi.input(
@@ -67,7 +66,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
                 name="version",
                 placeholder=str(dt.date.today()),
                 required=True,
-                value=dummies.get("version", str(dt.date.today())),
+                value=state.get("version", str(dt.date.today())),
                 help_text="Version of the grapher dataset (by default, the current date, or exceptionally the publication date).",
             ),
             pi.input(
@@ -75,7 +74,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
                 name="short_name",
                 placeholder="testing_dataset_name",
                 required=True,
-                value=dummies.get("short_name"),
+                value=state.get("short_name"),
                 validate=utils.validate_short_name,
                 help_text="Underscored dataset short name. Example: natural_disasters",
             ),
@@ -84,7 +83,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
                 name="garden_version",
                 placeholder=str(dt.date.today()),
                 required=True,
-                value=dummies.get("version", str(dt.date.today())),
+                value=state.get("version", str(dt.date.today())),
                 help_text="Version of the garden dataset (by default, the current date, or exceptionally the publication date).",
             ),
             pi.checkbox(
@@ -101,6 +100,9 @@ def app(run_checks: bool, dummy_data: bool) -> None:
         ],
     )
     form = GrapherForm(**data)
+
+    # save form data to global state for next steps
+    state.update(form.dict())
 
     private_suffix = "-private" if form.is_private else ""
 
@@ -140,6 +142,7 @@ def app(run_checks: bool, dummy_data: bool) -> None:
     ```
     poetry run etl grapher/{form.namespace}/{form.version}/{form.short_name} --grapher {"--private" if form.is_private else ""}
     ```
+    Your new dataset should then appear in your local set-up: http://localhost:3030/admin/datasets. Follow the instructions [here](https://github.com/owid/owid-grapher/blob/master/docs/docker-compose-mysql.md) to create your local Grapher development set-up.
 
 2. When you feel confident, use `.env.staging` for staging which looks something like this:
 
@@ -181,8 +184,15 @@ def app(run_checks: bool, dummy_data: bool) -> None:
 
 4. Check your dataset in [admin](https://owid.cloud/admin/datasets).
 
-5. If you are an internal OWID member and, because of this dataset update, you want to update charts in our Grapher DB, continue with `poetry run walkthrough charts`
-
+5. If you are an internal OWID member and, because of this dataset update, you want to update charts in our Grapher DB, continue with charts
+"""
+    )
+    po.put_buttons(
+        ["Go to charts"],
+        [lambda: go_app("charts", new_window=False)],
+    )
+    po.put_markdown(
+        """
 ## Generated files
 """
     )

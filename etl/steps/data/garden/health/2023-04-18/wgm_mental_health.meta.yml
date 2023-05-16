@@ -1,0 +1,23 @@
+# (Inherited from meadow, remove if not different.)
+tables:
+  wgm_mental_health:
+    # (Inherited from meadow, remove if not different.)
+    variables:
+      share:
+        title: "Share"
+        unit: "%"
+        description: >-
+          Share of the participants in the demographic group (country, age and gender) that marked a particular answer to the question.
+
+          The share is obtained weighting the answers based on the characteristics of the participant. Data weighting is
+          used to minimise bias in survey estimates and is intended to be used to generate nationally representative estimates within a country.
+          The weighting procedure was fotrmulated based on the sample design and performed in multiple stages.
+
+          To learn more about this, you can read section "Data weighting" at https://cms.wellcome.org/sites/default/files/2021-10/wgm2020-methodology.pdf
+        display:
+          numDecimalPlaces: 1
+      count:
+        title: "Count"
+        unit: ""
+        description: >-
+          Number of the participants in the demographic group (country, age and gender) that marked a particular answer to the question.

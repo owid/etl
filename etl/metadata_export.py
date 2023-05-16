@@ -45,7 +45,7 @@ def metadata_export(
     ds_meta = ds.metadata.to_dict()
 
     # transform dataset metadata
-    for source in ds_meta["sources"]:
+    for source in ds_meta.get("sources", []):
         _prune_empty(source)
 
     for license in ds_meta.get("licenses", []):
@@ -60,7 +60,7 @@ def metadata_export(
     ds_meta.pop("is_public")
     ds_meta.pop("source_checksum")
     # move sources at the end
-    ds_meta["sources"] = ds_meta.pop("sources")
+    ds_meta["sources"] = ds_meta.pop("sources", [])
 
     # transform tables metadata
     tb_meta = {}

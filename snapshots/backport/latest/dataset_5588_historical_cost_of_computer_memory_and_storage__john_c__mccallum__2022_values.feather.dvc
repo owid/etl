@@ -1,0 +1,18 @@
+meta:
+  namespace: backport
+  short_name: dataset_5588_historical_cost_of_computer_memory_and_storage__john_c__mccallum__2022_values
+  file_extension: feather
+  date_accessed: 2023-04-23 08:12:13.428322
+  name: Historical cost of computer memory and storage (John C. McCallum, 2022)
+  description: https://github.com/owid/notebooks/tree/main/EdouardMathieu/computer_memory_prices
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/5588
+  source_published_by: Our World in Data catalog backport
+  is_public: true
+  version: latest
+  publication_date: latest
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 1b661721069fe70dc47ce50398859e83
+  size: 7138
+  path: dataset_5588_historical_cost_of_computer_memory_and_storage__john_c__mccallum__2022_values.feather

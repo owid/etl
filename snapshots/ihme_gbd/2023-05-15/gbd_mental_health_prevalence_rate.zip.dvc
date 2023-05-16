@@ -1,0 +1,28 @@
+meta:
+  namespace: ihme_gbd
+  short_name: gbd_mental_health_prevalence_rate
+  name: 'Global Burden of Disease: Mental disorders, prevalence rates (IHME, 2020)'
+  version: '2023-05-15'
+  publication_year: '2020'
+  source_name: IHME, Global Burden of Disease (2020)
+  source_published_by: 'Global Burden of Disease Collaborative Network. Global Burden
+    of Disease Study 2019 (GBD 2019) Results. Seattle, United States: Institute for
+    Health Metrics and Evaluation (IHME), 2020. Available from https://vizhub.healthdata.org/gbd-results/'
+  url: https://vizhub.healthdata.org/gbd-results/
+  source_data_url:
+  file_extension: zip
+  license_url: https://www.healthdata.org/data-tools-practices/data-practices/ihme-free-charge-non-commercial-user-agreement
+  license_name: IHME Free-of-Charge Non-Commercial-User Agreement
+  date_accessed: 2023-05-15
+  is_public: true
+  description: |
+    The Global Burden of Disease (GBD) provides a comprehensive picture of mortality and disability across countries, time, age, and sex. It quantifies health loss from hundreds of diseases, injuries, and risk factors, so that health systems can be improved and disparities eliminated.
+
+    GBD research incorporates both the prevalence of a given disease or risk factor and the relative harm it causes. With these tools, decision-makers can compare different health issues and their effects.
+
+    This dataset only contains Prevalence rate metrics for mental health-related causes.
+wdir: ../../../data/snapshots/ihme_gbd/2023-05-15
+outs:
+- md5: 33a22568e923c7a449654582461fdd1d
+  size: 37331688
+  path: gbd_mental_health_prevalence_rate.zip

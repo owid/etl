@@ -1,0 +1,56 @@
+# (Inherited from meadow, remove if not different.)
+tables:
+  gbd_mental_health_prevalence_rate:
+    # (Inherited from meadow, remove if not different.)
+    variables:
+      prevalence_rate_anxiety_disorders:
+        title: Anxiety disorders (prevalence rate)
+        description: >-
+          Prevalence rate of anxiety disorders. This is estimated as the total number of cases with anxiety disorders per 100,000 population.
+        unit: "per 100,000 people"
+      prevalence_rate_bipolar_disorders:
+        title: Bipolar disorders (prevalence rate)
+        description: >-
+          Prevalence rate of bipolar disorders. This is estimated as the total number of cases with bipolar disorders per 100,000 population.
+        unit: "per 100,000 people"
+      prevalence_rate_depressive_disorders:
+        title: Depressive disorders (prevalence rate)
+        description: >-
+          Prevalence rate of depressive disorders. This is estimated as the total number of cases with depressive disorders per 100,000 population.
+        unit: "per 100,000 people"
+      prevalence_rate_eating_disorders:
+        title: Eating disorders (prevalence rate)
+        description: >-
+          Prevalence rate of eating disorders. This is estimated as the total number of cases with eating disorders per 100,000 population.
+        unit: "per 100,000 people"
+      prevalence_rate_schizophrenia_disorders:
+        title: Schizophrenia disorders (prevalence rate)
+        description: >-
+          Prevalence rate of schizophrenia disorders. This is estimated as the total number of cases with schizophrenia disorders per 100,000 population.
+        unit: "per 100,000 people"
+
+      share_anxiety_disorders:
+        title: Anxiety disorders (share of population)
+        description: >-
+          Share of population with of anxiety disorders. This is estimated as the total share of cases with anxiety disorders relative to the population of a country.
+        unit: "%"
+      share_bipolar_disorders:
+        title: Bipolar disorders (share of population)
+        description: >-
+          Share of population with of bipolar disorders. This is estimated as the total number of cases with bipolar disorders relative to the population of a country.
+        unit: "%"
+      share_depressive_disorders:
+        title: Depressive disorders (share of population)
+        description: >-
+          Share of population with of depressive disorders. This is estimated as the total number of cases with depresive disorders relative to the population of a country.
+        unit: "%"
+      share_eating_disorders:
+        title: Eating disorders (share of population)
+        description: >-
+          Share of population with of eating disorders. This is estimated as the total number of cases with anxiety eating relative to the population of a country.
+        unit: "%"
+      share_schizophrenia_disorders:
+        title: Schizophrenia disorders (share of population)
+        description: >-
+          Share of population with of schizophrenia disorders. This is estimated as the total number of cases with schizophrenia disorders relative to the population of a country.
+        unit: "%"

@@ -108,6 +108,13 @@ steps:
   data://grapher/un/2023-01-24/un_sdg:
     - data://garden/un/2023-01-24/un_sdg
 
+# IHME SDG
+  data-private://meadow/ihme/2023-05-09/sdg:
+  - snapshot-private://ihme/2023-05-05/sdg.csv
+  data-private://garden/ihme/2023-05-09/sdg:
+  - data-private://meadow/ihme/2023-05-09/sdg
+  data-private://grapher/ihme/2023-05-09/sdg:
+  - data-private://garden/ihme/2023-05-09/sdg
 
   # Internet
   data://garden/technology/2022/internet:
@@ -193,7 +200,7 @@ steps:
     - backport://backport/owid/latest/dataset_581_daily_supply_of_calories_per_person__owid_based_on_un_fao__and__historical_sources
     - data://garden/demography/2023-02-03/life_expectancy
     - data://garden/owid/latest/key_indicators
-    - data://garden/gcp/2022-11-11/global_carbon_budget
+    - data://garden/gcp/2023-04-28/global_carbon_budget
     - data://garden/democracy/2023-03-02/vdem
     # The following step is not the latest version available.
     - data://garden/bp/2022-07-14/energy_mix
@@ -287,6 +294,8 @@ steps:
   # Regions - Regions (2023).
   #
   data://garden/regions/2023-01-01/regions:
+  data://grapher/regions/latest/regions:
+  - data://garden/regions/2023-01-01/regions
 
   # Democracy and Human rights - V-Dem index
   data://meadow/democracy/2023-03-02/vdem:
@@ -337,6 +346,7 @@ steps:
   data://grapher/happiness/2023-03-20/happiness:
   - data://garden/happiness/2023-03-20/happiness
 
+
 # Equaldex dataset
   data://meadow/lgbt_rights/2023-04-13/equaldex:
   - snapshot://lgbt_rights/2023-04-13/equaldex.csv
@@ -347,6 +357,49 @@ steps:
   - data://garden/reference
   data://grapher/lgbt_rights/2023-04-13/equaldex:
   - data://garden/lgbt_rights/2023-04-13/equaldex
+  
+  # Ethnic Power Relations Dataset
+  data://meadow/eth/2023-03-15/growup:
+  - snapshot://eth/2023-03-15/growup.csv
+  data://garden/eth/2023-03-15/ethnic_power_relations:
+  - data://meadow/eth/2023-03-15/growup
+  - data://garden/demography/2023-03-31/population
+  - data://garden/wb/2021-07-01/wb_income
+  - data://garden/reference
+  data://grapher/eth/2023-03-15/ethnic_power_relations:
+  - data://garden/eth/2023-03-15/ethnic_power_relations
+
+
+  # WB income groups
+  data://meadow/wb/2023-04-30/income_groups:
+    - snapshot://wb/2023-04-30/income_groups.xlsx
+  data://garden/wb/2023-04-30/income_groups:
+    - data://meadow/wb/2023-04-30/income_groups
+  data://grapher/wb/2023-04-30/income_groups:
+    - data://garden/wb/2023-04-30/income_groups
+
+# International Monetary Fund, World Economic Outlook
+  data://meadow/imf/2023-05-02/world_economic_outlook:
+  - snapshot://imf/2023-05-02/world_economic_outlook.xls
+  data://garden/imf/2023-05-02/world_economic_outlook:
+  - data://meadow/imf/2023-05-02/world_economic_outlook
+  data://grapher/imf/2023-05-02/world_economic_outlook:
+  - data://garden/imf/2023-05-02/world_economic_outlook
+
+  # Patents & journal articles (World Bank, United Nations)
+  data://garden/research_development/2023-05-05/patents_articles:
+    - data://garden/worldbank_wdi/2022-05-26/wdi
+    - data://garden/demography/2023-03-31/population
+  data://grapher/research_development/2023-05-05/patents_articles:
+    - data://garden/research_development/2023-05-05/patents_articles
+
+  # World Bank's Women, Business and the Law additional data
+  data://meadow/wb/2023-05-12/women_business_law_additional:
+  - snapshot://wb/2023-05-12/women_business_law_additional.xlsx
+  data://garden/wb/2023-05-12/women_business_law_additional:
+  - data://meadow/wb/2023-05-12/women_business_law_additional
+  data://grapher/wb/2023-05-12/women_business_law_additional:
+  - data://garden/wb/2023-05-12/women_business_law_additional
 
 # Sub-dags to import
 include:

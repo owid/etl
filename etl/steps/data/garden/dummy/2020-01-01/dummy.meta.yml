@@ -1,3 +1,4 @@
+# (Inherited from meadow, remove if not different.)
 all_sources:
 - source_testing: &source-testing
     name: Dummy source
@@ -16,6 +17,7 @@ dataset:
 
 tables:
   dummy:
+    # (Inherited from meadow, remove if not different.)
     variables:
       dummy_variable:
         unit: dummy unit

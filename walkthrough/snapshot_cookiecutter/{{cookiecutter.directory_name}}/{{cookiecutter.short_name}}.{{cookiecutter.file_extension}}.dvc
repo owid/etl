@@ -1,17 +1,21 @@
 meta:
-  namespace: {{cookiecutter.namespace}}
-  short_name: {{cookiecutter.short_name}}
-  name: {{cookiecutter.name}}
-  version: {{cookiecutter.snapshot_version}}{% if cookiecutter.publication_year %}
-  publication_year: {{cookiecutter.publication_year}}{% endif %}{% if cookiecutter.publication_date %}
-  publication_date: {{cookiecutter.publication_date}}{% endif %}
-  source_name: {{cookiecutter.source_name}}
-  source_published_by: {{cookiecutter.source_published_by}}
+  namespace: "{{cookiecutter.namespace}}"
+  short_name: "{{cookiecutter.short_name}}"
+  name: "{{cookiecutter.name}}"
+  version: "{{cookiecutter.snapshot_version}}"
+  {%- if cookiecutter.publication_year %}
+  publication_year: {{cookiecutter.publication_year}}
+  {% endif -%}
+  {%- if cookiecutter.publication_date %}
+  publication_date: "{{cookiecutter.publication_date}}"
+  {% endif -%}
+  source_name: "{{cookiecutter.source_name}}"
+  source_published_by: "{{cookiecutter.source_published_by}}"
   url: {{cookiecutter.url}}
   source_data_url: {{cookiecutter.source_data_url}}
   file_extension: {{cookiecutter.file_extension}}
   license_url: {{cookiecutter.license_url}}
-  license_name: {{cookiecutter.license_name}}
+  license_name: "{{cookiecutter.license_name}}"
   date_accessed: {% now 'local', '%Y-%m-%d' %}
   is_public: {% if cookiecutter.is_private == "True" %}false{% else %}true{% endif %}
   description: |

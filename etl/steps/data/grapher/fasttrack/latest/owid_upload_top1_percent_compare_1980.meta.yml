@@ -1,0 +1,119 @@
+dataset:
+  namespace: fasttrack
+  version: latest
+  short_name: owid_upload_top1_percent_compare_1980
+  title: DRAFT owid_upload_top1_percent_compare_1980
+  description: ''
+  sources:
+  - name: Unknown
+    published_by: Unknown
+    publication_year: 2023
+    date_accessed: 2023-05-09
+tables:
+  owid_upload_top1_percent_compare_1980:
+    variables:
+      pip_welfare_wid__top_1pc_share__pretax:
+        title: 'pip_welfare_WID: Top 1pc share – pretax'
+        unit: ''
+      year1980_wid__top_1pc_share__pretax:
+        title: 'year1980_WID: Top 1pc share – pretax'
+        unit: ''
+      value1980_wid__top_1pc_share__pretax:
+        title: 'value1980_WID: Top 1pc share – pretax'
+        unit: ''
+      year2018_wid__top_1pc_share__pretax:
+        title: 'year2018_WID: Top 1pc share – pretax'
+        unit: ''
+      value2018_wid__top_1pc_share__pretax:
+        title: 'value2018_WID: Top 1pc share – pretax'
+        unit: ''
+      region:
+        title: region
+        unit: ''
+      pop1980_wid__top_1pc_share__pretax:
+        title: 'pop1980_WID: Top 1pc share – pretax'
+        unit: ''
+      pop2018_wid__top_1pc_share__pretax:
+        title: 'pop2018_WID: Top 1pc share – pretax'
+        unit: ''
+      change_wid__top_1pc_share__pretax:
+        title: 'change_WID: Top 1pc share – pretax'
+        unit: ''
+      absolute_tolerance_wid__top_1pc_share__pretax:
+        title: 'absolute_tolerance_WID: Top 1pc share – pretax'
+        unit: ''
+      relative_tolerance_wid__top_1pc_share__pretax:
+        title: 'relative_tolerance_WID: Top 1pc share – pretax'
+        unit: ''
+      absolute_fall_wid__top_1pc_share__pretax:
+        title: 'absolute_fall_WID: Top 1pc share – pretax'
+        unit: ''
+      absolute_stable_wid__top_1pc_share__pretax:
+        title: 'absolute_stable_WID: Top 1pc share – pretax'
+        unit: ''
+      absolute_rise_wid__top_1pc_share__pretax:
+        title: 'absolute_rise_WID: Top 1pc share – pretax'
+        unit: ''
+      relative_fall_wid__top_1pc_share__pretax:
+        title: 'relative_fall_WID: Top 1pc share – pretax'
+        unit: ''
+      relative_stable_wid__top_1pc_share__pretax:
+        title: 'relative_stable_WID: Top 1pc share – pretax'
+        unit: ''
+      relative_rise_wid__top_1pc_share__pretax:
+        title: 'relative_rise_WID: Top 1pc share – pretax'
+        unit: ''
+      proportional_change_wid__top_1pc_share__pretax:
+        title: 'proportional_change_WID: Top 1pc share – pretax'
+        unit: ''
+      pip_welfare_pip__top_1pc_share:
+        title: 'pip_welfare_PIP: Top 1pc share'
+        unit: ''
+      year1980_pip__top_1pc_share:
+        title: 'year1980_PIP: Top 1pc share'
+        unit: ''
+      value1980_pip__top_1pc_share:
+        title: 'value1980_PIP: Top 1pc share'
+        unit: ''
+      year2018_pip__top_1pc_share:
+        title: 'year2018_PIP: Top 1pc share'
+        unit: ''
+      value2018_pip__top_1pc_share:
+        title: 'value2018_PIP: Top 1pc share'
+        unit: ''
+      pop1980_pip__top_1pc_share:
+        title: 'pop1980_PIP: Top 1pc share'
+        unit: ''
+      pop2018_pip__top_1pc_share:
+        title: 'pop2018_PIP: Top 1pc share'
+        unit: ''
+      change_pip__top_1pc_share:
+        title: 'change_PIP: Top 1pc share'
+        unit: ''
+      absolute_tolerance_pip__top_1pc_share:
+        title: 'absolute_tolerance_PIP: Top 1pc share'
+        unit: ''
+      relative_tolerance_pip__top_1pc_share:
+        title: 'relative_tolerance_PIP: Top 1pc share'
+        unit: ''
+      absolute_fall_pip__top_1pc_share:
+        title: 'absolute_fall_PIP: Top 1pc share'
+        unit: ''
+      absolute_stable_pip__top_1pc_share:
+        title: 'absolute_stable_PIP: Top 1pc share'
+        unit: ''
+      absolute_rise_pip__top_1pc_share:
+        title: 'absolute_rise_PIP: Top 1pc share'
+        unit: ''
+      relative_fall_pip__top_1pc_share:
+        title: 'relative_fall_PIP: Top 1pc share'
+        unit: ''
+      relative_stable_pip__top_1pc_share:
+        title: 'relative_stable_PIP: Top 1pc share'
+        unit: ''
+      relative_rise_pip__top_1pc_share:
+        title: 'relative_rise_PIP: Top 1pc share'
+        unit: ''
+      proportional_change_pip__top_1pc_share:
+        title: 'proportional_change_PIP: Top 1pc share'
+        unit: ''

@@ -1,0 +1,119 @@
+dataset:
+  namespace: fasttrack
+  version: latest
+  short_name: owid_upload_gini_compare_1980
+  title: DRAFT owid_upload_gini_compare_1980
+  description: ''
+  sources:
+  - name: Unknown
+    published_by: Unknown
+    publication_year: 2023
+    date_accessed: 2023-05-09
+tables:
+  owid_upload_gini_compare_1980:
+    variables:
+      pip_welfare_wid__gini__pretax:
+        title: 'pip_welfare_WID: Gini – pretax'
+        unit: ''
+      year1980_wid__gini__pretax:
+        title: 'year1980_WID: Gini – pretax'
+        unit: ''
+      value1980_wid__gini__pretax:
+        title: 'value1980_WID: Gini – pretax'
+        unit: ''
+      year2018_wid__gini__pretax:
+        title: 'year2018_WID: Gini – pretax'
+        unit: ''
+      value2018_wid__gini__pretax:
+        title: 'value2018_WID: Gini – pretax'
+        unit: ''
+      region:
+        title: region
+        unit: ''
+      pop1980_wid__gini__pretax:
+        title: 'pop1980_WID: Gini – pretax'
+        unit: ''
+      pop2018_wid__gini__pretax:
+        title: 'pop2018_WID: Gini – pretax'
+        unit: ''
+      change_wid__gini__pretax:
+        title: 'change_WID: Gini – pretax'
+        unit: ''
+      absolute_tolerance_wid__gini__pretax:
+        title: 'absolute_tolerance_WID: Gini – pretax'
+        unit: ''
+      relative_tolerance_wid__gini__pretax:
+        title: 'relative_tolerance_WID: Gini – pretax'
+        unit: ''
+      absolute_fall_wid__gini__pretax:
+        title: 'absolute_fall_WID: Gini – pretax'
+        unit: ''
+      absolute_stable_wid__gini__pretax:
+        title: 'absolute_stable_WID: Gini – pretax'
+        unit: ''
+      absolute_rise_wid__gini__pretax:
+        title: 'absolute_rise_WID: Gini – pretax'
+        unit: ''
+      relative_fall_wid__gini__pretax:
+        title: 'relative_fall_WID: Gini – pretax'
+        unit: ''
+      relative_stable_wid__gini__pretax:
+        title: 'relative_stable_WID: Gini – pretax'
+        unit: ''
+      relative_rise_wid__gini__pretax:
+        title: 'relative_rise_WID: Gini – pretax'
+        unit: ''
+      proportional_change_wid__gini__pretax:
+        title: 'proportional_change_WID: Gini – pretax'
+        unit: ''
+      pip_welfare_pip__gini:
+        title: 'pip_welfare_PIP: Gini'
+        unit: ''
+      year1980_pip__gini:
+        title: 'year1980_PIP: Gini'
+        unit: ''
+      value1980_pip__gini:
+        title: 'value1980_PIP: Gini'
+        unit: ''
+      year2018_pip__gini:
+        title: 'year2018_PIP: Gini'
+        unit: ''
+      value2018_pip__gini:
+        title: 'value2018_PIP: Gini'
+        unit: ''
+      pop1980_pip__gini:
+        title: 'pop1980_PIP: Gini'
+        unit: ''
+      pop2018_pip__gini:
+        title: 'pop2018_PIP: Gini'
+        unit: ''
+      change_pip__gini:
+        title: 'change_PIP: Gini'
+        unit: ''
+      absolute_tolerance_pip__gini:
+        title: 'absolute_tolerance_PIP: Gini'
+        unit: ''
+      relative_tolerance_pip__gini:
+        title: 'relative_tolerance_PIP: Gini'
+        unit: ''
+      absolute_fall_pip__gini:
+        title: 'absolute_fall_PIP: Gini'
+        unit: ''
+      absolute_stable_pip__gini:
+        title: 'absolute_stable_PIP: Gini'
+        unit: ''
+      absolute_rise_pip__gini:
+        title: 'absolute_rise_PIP: Gini'
+        unit: ''
+      relative_fall_pip__gini:
+        title: 'relative_fall_PIP: Gini'
+        unit: ''
+      relative_stable_pip__gini:
+        title: 'relative_stable_PIP: Gini'
+        unit: ''
+      relative_rise_pip__gini:
+        title: 'relative_rise_PIP: Gini'
+        unit: ''
+      proportional_change_pip__gini:
+        title: 'proportional_change_PIP: Gini'
+        unit: ''

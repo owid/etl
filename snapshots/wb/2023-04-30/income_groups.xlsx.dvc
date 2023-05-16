@@ -1,0 +1,56 @@
+meta:
+  namespace: wb
+  short_name: income_groups
+  name: Income classifications (World Bank, 2022)
+  version: '2023-04-30'
+  publication_year: 2022
+  publication_date: '2022-07-01'
+  source_name: World Bank (2022)
+  source_published_by: World Bank, Income classifications (2022)
+  url: https://datahelpdesk.worldbank.org/knowledgebase/articles/906519-world-bank-country-and-lending-groups
+  source_data_url: https://datacatalogfiles.worldbank.org/ddh-published/0037712/DR0090754/OGHIST.xlsx
+  file_extension: xlsx
+  license_url: https://www.worldbank.org/en/about/legal/terms-of-use-for-datasets
+  license_name: Creative Commons BY 4.0
+  date_accessed: 2023-04-30
+  is_public: true
+  description: >-
+    For the current 2023 fiscal year, low-income economies are defined as those with
+    a GNI per capita, calculated using the
+    World Bank Atlas method (https://datahelpdesk.worldbank.org/knowledgebase/articles/378832-what-is-the-world-bank-atlas-method),
+    of $1,085 or less in 2021; lower middle-income economies are those with a GNI
+    per capita between
+    $1,086 and $4,255; upper middle-income economies are those with a GNI per capita
+    between $4,256 and $13,205; high-income
+    economies are those with a GNI per capita of $13,205 or more. For details on past
+    years, please refer to file:
+    https://datacatalogfiles.worldbank.org/ddh-published/0037712/DR0090754/OGHIST.xlsx
+
+
+    Note 1: Income classifications are set each year on July 1 for all World Bank
+    member economies,
+    and all other economies with populations of more than 30,000. These official analytical
+    classifications are fixed during the World Bank's fiscal year (ending on June
+    30), thus
+    economies remain in the categories in which they are classified irrespective of
+    any revisions to
+    their per capita income data. The historical classifications shown are as published
+    on July 1 of
+    each fiscal year.
+
+
+    Note 2: Regions in this table include economies at all income levels. The
+    term country, used interchangeably with economy,
+    does not imply political independence but refers to any territory for which authorities
+    report separate social or economic statistics.
+    For more information about how the World Bank classifies countries please read
+    https://datahelpdesk.worldbank.org/knowledgebase/articles/378834-how-does-the-world-bank-classify-countries
+
+
+    Find more details in World Development Indicators website
+    (https://datatopics.worldbank.org/world-development-indicators/the-world-by-income-and-region.html).
+wdir: ../../../data/snapshots/wb/2023-04-30
+outs:
+- md5: bfdf219c089ae93abf8d160915b273ab
+  size: 103024
+  path: income_groups.xlsx

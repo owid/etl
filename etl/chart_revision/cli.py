@@ -13,8 +13,8 @@ from rich_click.rich_command import RichCommand
 from structlog import get_logger
 
 # TBD
-from etl.chart_revision.deprecated import ChartRevisionSuggester
-from etl.chart_revision.revision import create_and_submit_charts_revisions
+from etl.chart_revision.v1.deprecated import ChartRevisionSuggester
+from etl.chart_revision.v1.revision import create_and_submit_charts_revisions
 from etl.config import DEBUG
 
 log = get_logger()
