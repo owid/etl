@@ -124,28 +124,3 @@ def validate_chart_config_and_remove_defaults(config: Dict[str, Any]) -> Dict[st
     config_new = copy.deepcopy(config)
     DefaultDeleteValidatingValidator(schema).validate(config_new)
     return config_new
-
-
-def find_charts_from_variable_ids(variable_ids: List[int]) -> List[gm.Chart]:
-    """Retrieve charts that use the given variables from their IDs.
-
-    Parameters
-    ----------
-    variable_ids : List[int]
-        List with variable IDs.
-
-    Returns
-    -------
-    List[gm.Chart]
-        List of charts using the specified variables.
-    """
-    # Find IDs of charts that use the given variable IDs
-    with Session(get_engine()) as session:
-        chart_ids = (
-            session.exec(select(gm.ChartDimensions.chartId).where(gm.ChartDimensions.variableId.in_(variable_ids)))
-            .unique()
-            .all()
-        )
-    # Retrieve charts from a given list of chart IDs
-    with Session(get_engine()) as session:
-        return session.exec(select(gm.Chart).where(gm.Chart.id.in_(chart_ids))).all()
