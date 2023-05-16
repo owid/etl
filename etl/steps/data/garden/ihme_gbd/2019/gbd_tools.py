@@ -149,7 +149,6 @@ def add_share_of_population(df: pd.DataFrame) -> pd.DataFrame:
     df_percent.loc[:, "value"] = df_percent.loc[:, "value"] / 1000
 
     df = cast(pd.DataFrame, pd.concat([df, df_percent], axis=0))
-    # df = df.reset_index()
     return df
 
 
