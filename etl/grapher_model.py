@@ -579,7 +579,7 @@ class Source(SQLModel, table=True):
 
 
 class SuggestedChartRevisions(SQLModel, table=True):
-    __tablename__ = "suggested_chart_revisions"
+    __tablename__: str = "suggested_chart_revisions"
     __table_args__ = (
         ForeignKeyConstraint(["chartId"], ["charts.id"], name="suggested_chart_revisions_ibfk_1"),
         ForeignKeyConstraint(["createdBy"], ["users.id"], name="suggested_chart_revisions_ibfk_2"),
@@ -818,7 +818,7 @@ class Variable(SQLModel, table=True):
 
 
 class ChartDimensions(SQLModel, table=True):
-    __tablename__ = "chart_dimensions"
+    __tablename__: str = "chart_dimensions"
     __table_args__ = (
         ForeignKeyConstraint(["chartId"], ["charts.id"], name="chart_dimensions_chartId_78d6a092_fk_charts_id"),
         ForeignKeyConstraint(

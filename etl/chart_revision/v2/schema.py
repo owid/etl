@@ -1,15 +1,14 @@
 import copy
-from typing import Any, Dict, List
+from typing import Any, Dict, Optional
 
 import requests
 from jsonschema import Draft202012Validator, validate, validators
-from sqlmodel import Session, select
-
-import etl.grapher_model as gm
-from etl.db import get_engine
+from structlog import get_logger
 
 # Version of the schema
 SCHEMA_VERSION = "003"
+# Logger
+log = get_logger()
 
 
 def get_schema_chart_config() -> Dict[str, Any]:
@@ -35,19 +34,24 @@ def validate_chart_config(config: Dict[str, Any]) -> None:
     validate(config, schema)
 
 
-def validate_chart_config_and_set_defaults(config: Dict[str, Any]) -> Dict[str, Any]:
+def validate_chart_config_and_set_defaults(
+    config: Dict[str, Any], schema: Optional[Dict[str, Any]] = None
+) -> Dict[str, Any]:
     """Add properties with default values to a config file, if they are not present.
 
     Parameters
     ----------
     config : Dict[str, Any]
         JSON-like object. Typically the chart configuration field.
+    schema: Dict[str, Any]
+        JSON-like object. Schema of the chart configuration. If none is provided, the latest schema is downloaded.
 
     Returns
     -------
     Dict[str, Any]
         Updated object, with defaults set.
     """
+    log.info("schema: validating schema and adding defaults")
 
     def _extend_with_set_default(validator_class):  # type: ignore
         validate_properties = validator_class.VALIDATORS["properties"]
@@ -73,26 +77,32 @@ def validate_chart_config_and_set_defaults(config: Dict[str, Any]) -> Dict[str, 
     # Create custom validation object
     DefaultSetterValidatingValidator = _extend_with_set_default(Draft202012Validator)
     # Get schema
-    schema = get_schema_chart_config()
+    if schema is None:
+        schema = get_schema_chart_config()
     # Validate and update config with defaults
     config_new = copy.deepcopy(config)
     DefaultSetterValidatingValidator(schema).validate(config_new)
     return config_new
 
 
-def validate_chart_config_and_remove_defaults(config: Dict[str, Any]) -> Dict[str, Any]:
+def validate_chart_config_and_remove_defaults(
+    config: Dict[str, Any], schema: Optional[Dict[str, Any]] = None
+) -> Dict[str, Any]:
     """Remove properties with values equal to their defaults from schema.
 
     Parameters
     ----------
     config : Dict[str, Any]
         JSON-like object. Typically the chart configuration field.
+    schema: Dict[str, Any]
+        JSON-like object. Schema of the chart configuration. If none is provided, the latest schema is downloaded.
 
     Returns
     -------
     Dict[str, Any]
         Updated object, with defaults set.
     """
+    log.info("schema: validating schema and removing defaults")
 
     def _extend_with_remove_default(validator_class):  # type: ignore
         validate_properties = validator_class.VALIDATORS["properties"]
@@ -119,7 +129,8 @@ def validate_chart_config_and_remove_defaults(config: Dict[str, Any]) -> Dict[st
     # Create custom validation object
     DefaultDeleteValidatingValidator = _extend_with_remove_default(Draft202012Validator)
     # Get schema
-    schema = get_schema_chart_config()
+    if schema is None:
+        schema = get_schema_chart_config()
     # Validate and update config with defaults
     config_new = copy.deepcopy(config)
     DefaultDeleteValidatingValidator(schema).validate(config_new)

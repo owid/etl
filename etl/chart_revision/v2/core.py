@@ -1,6 +1,6 @@
 from copy import deepcopy
 from datetime import datetime
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 from sqlmodel import Session
 
@@ -15,7 +15,9 @@ from etl.db import get_engine
 
 
 def create_and_submit_charts_revisions(
-    variable_mapping: Dict[int, int] = None, charts: List[gm.Chart] = None, chatgpt_reviews: bool = False
+    variable_mapping: Optional[Dict[int, int]] = None,
+    charts: Optional[List[gm.Chart]] = None,
+    chatgpt_reviews: bool = False,
 ):
     """Create and submit chart revisions.
 
@@ -45,7 +47,9 @@ def create_and_submit_charts_revisions(
 
 
 def create_chart_comparisons(
-    variable_mapping: Dict[int, int] = None, charts: List[gm.Chart] = None, chatgpt_reviews: bool = False
+    variable_mapping: Optional[Dict[int, int]] = None,
+    charts: Optional[List[gm.Chart]] = None,
+    chatgpt_reviews: bool = False,
 ) -> List[gm.SuggestedChartRevisions]:
     """Create chart comparisons.
 
@@ -72,10 +76,8 @@ def create_chart_comparisons(
         Sugested chart comparions.
     """
     updaters = []
-    print(1)
     # If variable mapping is given, get list of charts to be updated
     if variable_mapping is not None:
-        print(11)
         updater_from_variables = ChartVariableUpdater(variable_mapping)
         # Get list of charts affected
         charts = updater_from_variables.find_charts_to_be_updated()
@@ -83,18 +85,18 @@ def create_chart_comparisons(
         updaters.append(updater_from_variables)
     # Else if charts is given, check if chatgpt_reviews is True. Otherwise no chart revision is done.
     elif charts is not None:
-        print(12)
         if not chatgpt_reviews:
             raise ValueError(
                 "If `charts` is given, `chatgpt_reviews` must be True. Otherwise, no chart revision is done!"
             )
+    else:
+        raise ValueError("You must provide either `variable_mapping` or `charts`!")
+
     # Add GPT updated if set by user
-    print(2)
     if chatgpt_reviews:
         updaters.append(ChartUpdaterGPTSuggestions())
 
     # Initiate list with comparisons
-    print(3)
     comparisons = []
     for chart in charts:
         # Update chart config
@@ -105,6 +107,7 @@ def create_chart_comparisons(
         comparison = create_chart_comparison(chart.config, config_new)
         comparisons.append(comparison)
     return comparisons
+
 
 def update_chart_config(config: Dict[str, Any], updaters: List[ChartUpdater]) -> Dict[str, Any]:
     """Update chart configuration using the `updaters`.
@@ -158,7 +161,7 @@ def create_chart_comparison(config_1: Dict[str, Any], config_2: Dict[str, Any]) 
     chart_id = config_1["id"]
     return gm.SuggestedChartRevisions(
         chartId=chart_id,
-        createdBy=GRAPHER_USER_ID,
+        createdBy=int(GRAPHER_USER_ID),  # type: ignore
         originalConfig=config_1,
         suggestedConfig=config_2,
         status="pending",
