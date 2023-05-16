@@ -148,7 +148,7 @@ def add_share_of_population(df: pd.DataFrame) -> pd.DataFrame:
     df_percent["metric"] = "Share of the population"
     df_percent.loc[:, "value"] = df_percent.loc[:, "value"] / 1000
 
-    df = pd.concat([df, df_percent], axis=0).reset_index(drop=True)
+    df = cast(pd.DataFrame, pd.concat([df, df_percent], axis=0))
     # df = df.reset_index()
     return df
 
