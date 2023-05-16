@@ -1,6 +1,6 @@
 from typing import List
 
-import dask as dd
+import dask.dataframe as dd
 import pandas as pd
 import pyarrow.compute as pc
 from owid.catalog import Dataset, Table, TableMeta
