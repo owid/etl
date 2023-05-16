@@ -72,8 +72,8 @@ def run_wrapper(dataset: str, metadata_path: str, namespace: str, version: str, 
     walden_ds = WaldenCatalog().find_one(namespace=namespace, short_name=dataset, version=version)
     local_file = walden_ds.ensure_downloaded()
 
-    df = read_and_clean_data(local_file)
-    df = df.drop_duplicates()
+    tb = read_and_clean_data(local_file)
+    tb = tb.drop_duplicates()
     # create new dataset and reuse walden metadata
     ds = Dataset.create_empty(dest_dir)
     ds.metadata = convert_walden_metadata(walden_ds)
