@@ -11,7 +11,8 @@ from etl.steps.data.converters import convert_walden_metadata
 
 
 def clean_data(df: pd.DataFrame) -> pd.DataFrame:
-    return df.rename(
+
+    df = df.rename(
         columns={
             "location_name": "country",
             "location": "country",
@@ -23,10 +24,26 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
             "metric_name": "metric",
         },
         errors="ignore",
-    ).drop(
+    )
+    df = df.drop(
         columns=["measure_id", "location_id", "sex_id", "age_id", "cause_id", "metric_id", "upper", "lower"],
         errors="ignore",
     )
+    df = df.astype(
+        {
+            "measure": "category",
+            "country": "category",
+            "sex": "category",
+            "age": "category",
+            "cause": "category",
+            "metric": "category",
+            "year": "category",
+            "value": "float32",
+        }
+    )
+    df = df = df.drop(df[(df.measure.isin(["Prevalence", "Incidence"])) & (df.metric == "Percent")].index)
+    # df = df.groupby(["measure", "sex", "cause", "metric"])
+    return df
 
 
 def read_and_clean_data(local_file: str) -> pd.DataFrame:
@@ -76,7 +93,7 @@ def run_wrapper(dataset: str, metadata_path: str, namespace: str, version: str, 
 
     ds.metadata.update_from_yaml(metadata_path, if_source_exists="replace")
     tb.update_metadata_from_yaml(metadata_path, f"{dataset}")
-    tb = tb.reset_index()
+    tb = tb.reset_index(drop=True)
     # add table to a dataset
     ds.add(tb)
 
