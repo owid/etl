@@ -51,36 +51,37 @@ def tidy_countries(country_mapping_path: Path, excluded_countries_path: Path, df
     return df
 
 
+def clean_values(df: pd.DataFrame) -> pd.DataFrame:
+    df = df.drop(columns=["upper", "lower"])
+    return df
+
+
 def prepare_garden(df: pd.DataFrame) -> Table:
     log.info("prepare_garden")
     tb_garden = underscore_table(Table(df))
+    tb_garden = clean_values(tb_garden)
     return tb_garden
 
 
 def _pivot_number(df: pd.DataFrame, dims: List[str]) -> Any:
     df_number = df[df.metric == "Number"].pivot(index=["country", "year"] + dims, columns="measure", values="value")
+    df_number = df_number.round(0).astype("Int64")
     df_number = df_number.rename(columns=lambda c: c + " - Number")
     return df_number
 
 
 def _pivot_percent(df: pd.DataFrame, dims: List[str]) -> Any:
     df_percent = df[df.metric == "Percent"].pivot(index=["country", "year"] + dims, columns="measure", values="value")
+    df_percent = df_percent.round(2)
     df_percent = df_percent.rename(columns=lambda c: c + " - Percent")
     return df_percent
 
 
 def _pivot_rate(df: pd.DataFrame, dims: List[str]) -> Any:
     df_rate = df[df.metric == "Rate"].pivot(index=["country", "year"] + dims, columns="measure", values="value")
+    df_rate = df_rate.round(2)
     df_rate = df_rate.rename(columns=lambda c: c + " - Rate")
     return df_rate
-
-
-def _pivot_share(df: pd.DataFrame, dims: List[str]) -> Any:
-    df_share = df[df.metric == "Share of the population"].pivot(
-        index=["country", "year"] + dims, columns="measure", values="value"
-    )
-    df_share = df_share.rename(columns=lambda c: c + " - Share of the population")
-    return df_share
 
 
 def pivot(df: pd.DataFrame, dims: List[str]) -> Table:
@@ -89,9 +90,8 @@ def pivot(df: pd.DataFrame, dims: List[str]) -> Table:
     df_number = _pivot_number(df, dims)
     df_percent = _pivot_percent(df, dims)
     df_rate = _pivot_rate(df, dims)
-    df_share = _pivot_share(df, dims)
 
-    tb_garden = Table(pd.concat([df_number, df_percent, df_rate, df_share], axis=1))
+    tb_garden = Table(pd.concat([df_number, df_percent, df_rate], axis=1))
     tb_garden = underscore_table(tb_garden)
 
     return tb_garden
@@ -142,16 +142,6 @@ def omm_metrics(df: pd.DataFrame) -> Any:
     return pd.concat(omms, axis=0)
 
 
-def add_share_of_population(df: pd.DataFrame) -> pd.DataFrame:
-    df_rate = df.loc[df["metric"] == "Rate"]
-    df_percent = df_rate.copy()
-    df_percent["metric"] = "Share of the population"
-    df_percent.loc[:, "value"] = df_percent.loc[:, "value"] / 1000
-
-    df = cast(pd.DataFrame, pd.concat([df, df_percent], axis=0))
-    return df
-
-
 def run_wrapper(
     dataset: str,
     country_mapping_path: Path,
@@ -163,7 +153,7 @@ def run_wrapper(
     # read dataset from meadow
     ds_meadow = Dataset(DATA_DIR / f"meadow/ihme_gbd/2019/{dataset}")
 
-    tb_meadow = ds_meadow[dataset]
+    tb_meadow = ds_meadow[f"{dataset}"]
     tb_meadow = tb_meadow.drop(["index"], axis=1, errors="ignore")
     df_garden = pd.DataFrame(tb_meadow)
     df_garden = tidy_countries(country_mapping_path, excluded_countries_path, df_garden)
@@ -171,7 +161,7 @@ def run_wrapper(
 
     omm = omm_metrics(df_garden)
     df_garden = cast(pd.DataFrame, pd.concat([df_garden, omm], axis=0))
-    df_garden = add_share_of_population(df_garden)
+
     tb_garden = pivot(df_garden, dims)
 
     # free up memory

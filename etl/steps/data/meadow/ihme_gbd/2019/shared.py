@@ -11,39 +11,26 @@ from etl.steps.data.converters import convert_walden_metadata
 
 
 def clean_data(df: pd.DataFrame) -> pd.DataFrame:
-
-    df = df.rename(
-        columns={
-            "location_name": "country",
-            "location": "country",
-            "val": "value",
-            "measure_name": "measure",
-            "sex_name": "sex",
-            "age_name": "age",
-            "cause_name": "cause",
-            "metric_name": "metric",
-        },
-        errors="ignore",
+    return (
+        df.rename(
+            columns={
+                "location_name": "country",
+                "location": "country",
+                "val": "value",
+                "measure_name": "measure",
+                "sex_name": "sex",
+                "age_name": "age",
+                "cause_name": "cause",
+                "metric_name": "metric",
+            },
+            errors="ignore",
+        )
+        .drop(
+            columns=["measure_id", "location_id", "sex_id", "age_id", "cause_id", "metric_id"],
+            errors="ignore",
+        )
+        .drop_duplicates(subset=["measure", "sex", "age", "cause", "metric", "year"])
     )
-    df = df.drop(
-        columns=["measure_id", "location_id", "sex_id", "age_id", "cause_id", "metric_id", "upper", "lower"],
-        errors="ignore",
-    )
-    df = df.astype(
-        {
-            "measure": "category",
-            "country": "category",
-            "sex": "category",
-            "age": "category",
-            "cause": "category",
-            "metric": "category",
-            "year": "category",
-            "value": "float32",
-        }
-    )
-    df = df = df.drop(df[(df.measure.isin(["Prevalence", "Incidence"])) & (df.metric == "Percent")].index)
-    # df = df.groupby(["measure", "sex", "cause", "metric"])
-    return df
 
 
 def read_and_clean_data(local_file: str) -> pd.DataFrame:
@@ -72,8 +59,8 @@ def run_wrapper(dataset: str, metadata_path: str, namespace: str, version: str, 
     walden_ds = WaldenCatalog().find_one(namespace=namespace, short_name=dataset, version=version)
     local_file = walden_ds.ensure_downloaded()
 
-    tb = read_and_clean_data(local_file)
-    tb = tb.drop_duplicates()
+    df = read_and_clean_data(local_file)
+
     # create new dataset and reuse walden metadata
     ds = Dataset.create_empty(dest_dir)
     ds.metadata = convert_walden_metadata(walden_ds)
@@ -86,14 +73,14 @@ def run_wrapper(dataset: str, metadata_path: str, namespace: str, version: str, 
         title=ds.metadata.title,
         description=walden_ds.description,
     )
-    tb = Table(tb, metadata=table_metadata)
+    tb = Table(df, metadata=table_metadata)
 
     # underscore all table columns
     tb = underscore_table(tb)
 
     ds.metadata.update_from_yaml(metadata_path, if_source_exists="replace")
     tb.update_metadata_from_yaml(metadata_path, f"{dataset}")
-    tb.reset_index(drop=True, inplace=True)
+    tb = tb.reset_index()
     # add table to a dataset
     ds.add(tb)
 

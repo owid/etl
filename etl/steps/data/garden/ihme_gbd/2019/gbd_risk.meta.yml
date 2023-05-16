@@ -17,9 +17,6 @@ tables:
       dalys__disability_adjusted_life_years__percent:
         title: DALYs attributed to risk (percent)
         unit: "%"
-      dalys__share_of_the_population:
-        title: DALYs attributed to risk (share of the population)
-        unit: "%"
       deaths__number:
         title: Deaths attributed to risk (number)
         unit: deaths
@@ -28,7 +25,4 @@ tables:
         unit: deaths per 100,000 people
       deaths__percent:
         title: Deaths attributed to risk (percent)
-        unit: "%"
-      deaths__rate:
-        title: Deaths attributed to risk (share of the populaton)
         unit: "%"

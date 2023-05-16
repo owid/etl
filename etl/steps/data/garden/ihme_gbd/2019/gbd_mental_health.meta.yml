@@ -13,6 +13,6 @@ tables:
       prevalence__rate:
         title: Prevalence (rate)
         unit: cases per 100,000 people
-      prevalence__share_of_the_population:
-        title: Current number of cases in the population per 100 people
+      prevalence__percent:
+        title: Prevalence (percent)
         unit: "%"

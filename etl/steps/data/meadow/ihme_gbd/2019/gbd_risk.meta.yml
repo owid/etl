@@ -1,8 +1,4 @@
 dataset:
-  description: |
-    The Global Burden of Disease (GBD) provides a comprehensive picture of mortality and disability across countries, time, age, and sex. It quantifies health loss from hundreds of diseases, injuries, and risk factors, so that health systems can be improved and disparities eliminated.
-
-    GBD research incorporates both the prevalence of a given disease or risk factor and the relative harm it causes. With these tools, decision-makers can compare different health issues and their effects.
   sources:
     -
       name: Global Burden of Disease Study (2019) - Risk factors

@@ -1,13 +1,7 @@
 dataset:
-  description: |
-    The Global Burden of Disease (GBD) provides a comprehensive picture of mortality and disability across countries, time, age, and sex. It quantifies health loss from hundreds of diseases, injuries, and risk factors, so that health systems can be improved and disparities eliminated.
-
-    GBD research incorporates both the prevalence of a given disease or risk factor and the relative harm it causes. With these tools, decision-makers can compare different health issues and their effects.
-
-    This dataset contains metrics on the prevalence and incidence of diseases and injuries.
   sources:
     -
-      name: Global Burden of Disease Study (2019) - Prevalence and Incidence
+      name: Global Burden of Disease Study (2019) - Prevalence and incidence  
       published_by: Institute of Health Metrics and Evaluation
 
 tables:
@@ -15,7 +9,7 @@ tables:
     variables:
       measure:
         title: Measure name
-        description: Prevalence or incidence of conditions within a population. Prevalence is total population with a condition, incidence is the number of new cases each year.
+        description: Prevalence or incidence of conditions within a population. Prevalence is total population with a condition, incidence is the number of new cases each year. 
       cause:
         title: Type of condition
         description: A condition that impacts an individuals health or well-being.
