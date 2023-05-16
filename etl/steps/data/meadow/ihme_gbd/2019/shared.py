@@ -72,7 +72,7 @@ def run_wrapper(dataset: str, metadata_path: str, namespace: str, version: str, 
     walden_ds = WaldenCatalog().find_one(namespace=namespace, short_name=dataset, version=version)
     local_file = walden_ds.ensure_downloaded()
 
-    df = read_and_clean_data(local_file)
+    tb = read_and_clean_data(local_file)
 
     # create new dataset and reuse walden metadata
     ds = Dataset.create_empty(dest_dir)
@@ -86,14 +86,14 @@ def run_wrapper(dataset: str, metadata_path: str, namespace: str, version: str, 
         title=ds.metadata.title,
         description=walden_ds.description,
     )
-    tb = Table(df, metadata=table_metadata)
+    tb = Table(tb, metadata=table_metadata)
 
     # underscore all table columns
     tb = underscore_table(tb)
 
     ds.metadata.update_from_yaml(metadata_path, if_source_exists="replace")
     tb.update_metadata_from_yaml(metadata_path, f"{dataset}")
-    tb = tb.reset_index(drop=True)
+    tb.reset_index(drop=True, inplace=True)
     # add table to a dataset
     ds.add(tb)
 
