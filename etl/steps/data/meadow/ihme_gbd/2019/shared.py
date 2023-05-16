@@ -1,5 +1,6 @@
 from typing import List
 
+import dask.dataframe as dd
 import pandas as pd
 import pyarrow.compute as pc
 from owid.catalog import Dataset, Table, TableMeta
@@ -73,7 +74,9 @@ def run_wrapper(dataset: str, metadata_path: str, namespace: str, version: str, 
     local_file = walden_ds.ensure_downloaded()
 
     tb = read_and_clean_data(local_file)
+    tb = dd.from_pandas(tb, npartitions=100)
     tb = tb.drop_duplicates()
+    tb = tb.compute()
     # create new dataset and reuse walden metadata
     ds = Dataset.create_empty(dest_dir)
     ds.metadata = convert_walden_metadata(walden_ds)
