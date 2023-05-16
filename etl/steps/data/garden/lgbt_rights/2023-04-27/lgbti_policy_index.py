@@ -133,11 +133,6 @@ def add_regional_aggregations(df: pd.DataFrame) -> pd.DataFrame:
     for var in pop_vars:
         df_regions[var] = df_regions[f"{var}_weighted"] / df_regions["population"]
 
-    # Calculate population share variables for regions
-    for var in binary_vars:
-        df_regions[f"{var}_yes_share"] = df_regions[f"{var}_yes_pop"] / df_regions["population"] * 100
-        df_regions[f"{var}_no_share"] = df_regions[f"{var}_no_pop"] / df_regions["population"] * 100
-
     # Concatenate df with df_regions
     df = pd.concat([df, df_regions], ignore_index=True)
 
@@ -173,9 +168,7 @@ def run(dest_dir: str) -> None:
 
     # Harmonize country names.
     log.info("lgbti_policy_index.harmonize_countries")
-    df = geo.harmonize_countries(
-        df=df, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
-    )
+    df = geo.harmonize_countries(df=df, countries_file=paths.country_mapping_path)
 
     # Add regional aggregations
     df = add_regional_aggregations(df)
