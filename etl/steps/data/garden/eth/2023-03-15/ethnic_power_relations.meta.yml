@@ -214,6 +214,20 @@ tables:
           numDecimalPlaces: 1
         sources:
           - *source-epr
+      restpop:
+        title: Share of the population not belonging to an ethnically relevant group
+        description:
+          - Share of the population that is not part of an ethnic group in power (EGIP) or a marginalized ethnic group (MEG).<br>
+          - *description_ethnic_group
+          - *description_egip
+          - *description_meg
+        unit: "%"
+        short_unit: "%"
+        display:
+          name: Share of the population not belonging to an ethnically relevant group
+          numDecimalPlaces: 1
+        sources:
+          - *source-epr
       lexclpop:
         title: Share of ethnically relevant population in marginalized ethnic groups (MEG)
         description:
