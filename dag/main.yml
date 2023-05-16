@@ -353,11 +353,9 @@ steps:
   - snapshot://lgbt_rights/2023-04-13/equaldex_current.csv
   data://garden/lgbt_rights/2023-04-13/equaldex:
   - data://meadow/lgbt_rights/2023-04-13/equaldex
-  - data://garden/demography/2023-03-31/population
-  - data://garden/reference
   data://grapher/lgbt_rights/2023-04-13/equaldex:
   - data://garden/lgbt_rights/2023-04-13/equaldex
-  
+
   # Ethnic Power Relations Dataset
   data://meadow/eth/2023-03-15/growup:
   - snapshot://eth/2023-03-15/growup.csv
