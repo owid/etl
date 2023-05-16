@@ -174,8 +174,7 @@ def run(dest_dir: str) -> None:
     df = add_regional_aggregations(df)
 
     # Create a new table with the processed data.
-    tb_garden = Table(df)
-    tb_garden.metadata.short_name = "lgbti_policy_index"
+    tb_garden = Table(df, short_name="lgbti_policy_index")
 
     #
     # Save outputs.
