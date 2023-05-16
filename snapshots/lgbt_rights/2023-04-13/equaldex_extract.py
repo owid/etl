@@ -10,7 +10,7 @@ To run this script, you need to create a file called access_key.py with the foll
 API_KEY = "your_api_key"
 You can obtain your API key by registering at https://www.equaldex.com/ and then copying it from your account settings: https://www.equaldex.com/settings
 
-After running this script, add the long.csv and the current.csv file to snapshots:
+After running this script, add the long.csv and the current.csv file to snapshots (change the date in the path for future updates):
     python snapshots/lgbt_rights/2023-04-13/equaldex.py --path-to-file snapshots/lgbt_rights/2023-04-13/long.csv
     python snapshots/lgbt_rights/2023-04-13/equaldex_current.py --path-to-file snapshots/lgbt_rights/2023-04-13/current.csv
 
