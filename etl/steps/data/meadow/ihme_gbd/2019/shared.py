@@ -1,8 +1,8 @@
 from typing import List
 
-import dask.dataframe as dd
 import pandas as pd
 import pyarrow.compute as pc
+from dask.dataframe import from_pandas
 from owid.catalog import Dataset, Table, TableMeta
 from owid.catalog.utils import underscore_table
 from owid.walden import Catalog as WaldenCatalog
@@ -74,7 +74,7 @@ def run_wrapper(dataset: str, metadata_path: str, namespace: str, version: str, 
     local_file = walden_ds.ensure_downloaded()
 
     tb = read_and_clean_data(local_file)
-    tb = dd.from_pandas(tb, npartitions=100)
+    tb = from_pandas(tb, npartitions=100)
     tb = tb.drop_duplicates()
     tb = tb.compute()
     # create new dataset and reuse walden metadata
