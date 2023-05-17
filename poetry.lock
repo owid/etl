@@ -5063,14 +5063,14 @@ image = ["Pillow"]
 
 [[package]]
 name = "pyright"
-version = "1.1.308"
+version = "1.1.288"
 description = "Command line wrapper for pyright"
 category = "dev"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "pyright-1.1.308-py3-none-any.whl", hash = "sha256:40a541d21000d256bbd076f4337fc93d4265a92c63f06e5bedf893d77afb234d"},
-    {file = "pyright-1.1.308.tar.gz", hash = "sha256:7858a32d08555f8894931e2dc9571126cdc417e78e096f5be13e9418d8aed1e9"},
+    {file = "pyright-1.1.288-py3-none-any.whl", hash = "sha256:ab5da004e2de3b0567c685aa8d38bba68d872b1b4a20f1013400ace571a7efc7"},
+    {file = "pyright-1.1.288.tar.gz", hash = "sha256:c45594c5833b01d5125bc291d2498d4ed0f2c2e3dd4fd8236fbdaf597099f617"},
 ]
 
 [package.dependencies]
@@ -7294,4 +7294,4 @@ testing = ["big-O", "flake8 (<5)", "jaraco.functools", "jaraco.itertools", "more
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "9ac7b686bbc3a0387f0db1d119c5eacb851aabb34b1f327351fea0c43f16f5f2"
+content-hash = "b7f90cd8c6e32767944a70a86aa4980dd4b871774a92af27036d6946d0d5c1d4"

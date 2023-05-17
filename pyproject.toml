@@ -81,7 +81,7 @@ jupyter_nbextensions_configurator = ">=0.4.1"
 plotly = ">=5.7.0"
 cookiecutter = ">=2.1.1"
 isort = ">=5.10.1"
-pyright = ">=1.1.277"
+pyright = "1.1.288"
 types-PyYAML = ">=6.0.12"
 
 [tool.poetry.group.dev.dependencies]
