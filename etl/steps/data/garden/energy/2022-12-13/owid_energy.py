@@ -15,6 +15,7 @@ import pandas as pd
 from owid import catalog
 from owid.datautils import dataframes
 
+from etl.data_helpers.geo import load_regions
 from etl.paths import DATA_DIR
 
 from .shared import (
@@ -38,7 +39,6 @@ PRIMARY_ENERGY_CONSUMPTION_DATASET_PATH = DATA_DIR / "garden/energy/2022-07-29/p
 PRIMARY_ENERGY_CONSUMPTION_TABLE_NAME = "primary_energy_consumption"
 ELECTRICITY_MIX_DATASET_PATH = DATA_DIR / "garden/energy/2022-12-13/electricity_mix"
 ELECTRICITY_MIX_TABLE_NAME = "electricity_mix"
-COUNTRIES_REGIONS_DATASET_PATH = DATA_DIR / "garden/reference/"
 # Population and GDP are only used to add the population and gdp columns (and no other derived variables).
 POPULATION_DATASET_PATH = DATA_DIR / "garden/owid/latest/key_indicators/"
 GDP_DATASET_PATH = DATA_DIR / "garden/ggdc/2020-10-01/ggdc_maddison"
@@ -159,9 +159,7 @@ def run(dest_dir: str) -> None:
     tb_electricity_mix = ds_electricity_mix[ELECTRICITY_MIX_TABLE_NAME].reset_index()
 
     # Load countries-regions dataset (required to get ISO codes).
-    countries_regions = catalog.Dataset(COUNTRIES_REGIONS_DATASET_PATH)["countries_regions"].reset_index()[
-        ["name", "iso_alpha3"]
-    ]
+    countries_regions = load_regions(("name", "iso_alpha3"))
 
     # Population data will also be loaded (used only to add a population column, and not to create any other derived
     # variables). Historical regions will be added to the population.

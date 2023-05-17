@@ -479,7 +479,7 @@ class TestListCountriesInRegionsThatMustHaveData(unittest.TestCase):
         ) == ["Country 3"]
 
 
-@patch.object(geo, "_load_countries_regions", lambda: mock_countries_regions)
+@patch.object(geo, "load_regions", lambda cols: mock_countries_regions)
 @patch.object(geo, "_load_income_groups", lambda: mock_income_groups)
 class TestAddRegionAggregates:
     df_in = pd.DataFrame(

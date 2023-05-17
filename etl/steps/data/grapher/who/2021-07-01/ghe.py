@@ -55,6 +55,7 @@ def run(dest_dir: str) -> None:
         .round({"deaths": 0, "deaths_rate": 2, "deaths_100k": 2, "daly": 2, "daly_rate": 2, "daly_100k": 2})
     )
     table["deaths"] = table["deaths"].astype(int)
+    # convert codes to country names
     table["country"] = gh.country_code_to_country(table["country_code"])
     table = table.drop(["country_code"], axis=1)
     table = table.set_index(["country", "year", "ghe_cause_title", "sex_code", "agegroup_code"])
@@ -74,7 +75,6 @@ def run(dest_dir: str) -> None:
 
 
 def select_subset_causes(table: pd.DataFrame) -> pd.DataFrame:
-
     table = table[(table["sex_code"] == "both") & (table["agegroup_code"] == "ALLAges")]
 
     return table

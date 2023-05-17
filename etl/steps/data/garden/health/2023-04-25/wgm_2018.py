@@ -367,6 +367,9 @@ def _build_df_with_continents(df: pd.DataFrame) -> pd.DataFrame:
     df_continents["country"] = df_continents["country"].cat.add_categories(continents)
     for continent in continents:
         countries = geo.list_countries_in_region(continent)
+        # HOTFIX: be consistent with deprecated countries_regions.csv
+        if continent == "Asia":
+            countries.append("Northern Cyprus")
         msk = df_continents["country"].isin(countries)
         df_continents.loc[msk, "country"] = continent
 

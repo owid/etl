@@ -8,8 +8,8 @@ import pandas as pd
 from owid.catalog import Dataset, Table
 from structlog import get_logger
 
+from etl.data_helpers.geo import load_regions
 from etl.helpers import PathFinder
-from etl.paths import REFERENCE_DATASET
 from etl.snapshot import Snapshot
 from etl.steps.data.converters import convert_snapshot_metadata
 
@@ -33,8 +33,7 @@ def run(dest_dir: str) -> None:
     #
     # Load inputs.
     # Load reference file with country names in OWID standard
-    ds_reference = Dataset(REFERENCE_DATASET)
-    df_countries_regions = pd.DataFrame(ds_reference["countries_regions"]).reset_index()
+    df_countries_regions = load_regions(("name", "iso_alpha2"))
 
     # Create a new meadow dataset with the same metadata as the snapshot.
     snap = paths.load_dependency("lis_keyvars.csv")
@@ -66,9 +65,7 @@ def run(dest_dir: str) -> None:
         df["year"] = np.where(df["year"] > 50, df["year"] + 1900, df["year"] + 2000)
 
         # Merge dataset and country dictionary to get the name of the country (and rename it as "country")
-        df = pd.merge(
-            df, df_countries_regions[["name", "iso_alpha2"]], left_on="country", right_on="iso_alpha2", how="left"
-        )
+        df = pd.merge(df, df_countries_regions, left_on="country", right_on="iso_alpha2", how="left")
         df = df.drop(columns=["country", "iso_alpha2"])
         df = df.rename(columns={"name": "country"})
 

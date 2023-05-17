@@ -8,14 +8,13 @@ from owid.datautils import dataframes
 from shared import CURRENT_DIR
 
 from etl.data_helpers import geo
+from etl.data_helpers.geo import load_regions
 from etl.paths import DATA_DIR
 
 # Details for dataset to export.
 DATASET_SHORT_NAME = "european_electricity_review"
 # Details for dataset to import.
 MEADOW_DATASET_PATH = DATA_DIR / f"meadow/ember/2022-08-01/{DATASET_SHORT_NAME}"
-# Path to countries-regions dataset.
-COUNTRIES_REGIONS_DATASET_PATH = DATA_DIR / "garden/reference"
 
 COUNTRY_MAPPING_PATH = CURRENT_DIR / f"{DATASET_SHORT_NAME}.countries.json"
 METADATA_PATH = CURRENT_DIR / f"{DATASET_SHORT_NAME}.meta.yml"
@@ -206,7 +205,7 @@ def run(dest_dir: str) -> None:
     ds_meadow = catalog.Dataset(MEADOW_DATASET_PATH)
 
     # Load countries-regions table (required to convert country codes to country names in net flows table).
-    countries_regions = catalog.Dataset(COUNTRIES_REGIONS_DATASET_PATH)["countries_regions"]
+    countries_regions = load_regions(("name",))
 
     #
     # Process data.

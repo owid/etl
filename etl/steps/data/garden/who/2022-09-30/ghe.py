@@ -21,6 +21,7 @@ def run(dest_dir: str) -> None:
     ds_meadow = N.meadow_dataset
     df = pd.DataFrame(ds_meadow["ghe"])
 
+    # convert codes to country names
     df["country"] = country_code_to_country(df["country"])
 
     df = clean_data(df)

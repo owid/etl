@@ -4,7 +4,7 @@ import functools
 import json
 import warnings
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union, cast
+from typing import Any, Dict, List, Literal, Optional, Tuple, Union, cast
 
 import numpy as np
 import pandas as pd
@@ -13,7 +13,7 @@ from owid.datautils.common import ExceptionFromDocstring, warn_on_list_of_entiti
 from owid.datautils.dataframes import groupby_agg, map_series
 from owid.datautils.io.json import load_json
 
-from etl.paths import DATA_DIR, REFERENCE_DATASET
+from etl.paths import DATA_DIR, REGIONS_DATASET_PATH
 
 # When creating region aggregates for a certain variable in a certain year, some mandatory countries must be
 # informed, otherwise the aggregate will be nan (since we consider that there is not enough information).
@@ -37,8 +37,6 @@ TNAME_KEY_INDICATORS = "population"
 # Path to Key Indicators dataset
 DATASET_WB_INCOME = DATA_DIR / "garden" / "wb" / "2021-07-01" / "wb_income"
 TNAME_WB_INCOME = "wb_income_group"
-# Path to Key Indicators dataset
-TNAME_REFERENCE = "countries_regions"
 
 
 @functools.lru_cache
@@ -48,10 +46,30 @@ def _load_population() -> pd.DataFrame:
     return cast(pd.DataFrame, population)
 
 
+# NOTE: feel free to add more if needed
+RegionColumns = Literal[
+    "name", "code", "legacy_entity_id", "region_type", "is_historical", "iso_alpha2", "iso_alpha3", "members"
+]
+
+
 @functools.lru_cache
-def _load_countries_regions() -> pd.DataFrame:
-    countries_regions = Dataset(REFERENCE_DATASET)[TNAME_REFERENCE]
-    return cast(pd.DataFrame, countries_regions)
+def load_regions(columns: Tuple[RegionColumns] = ("name",)) -> pd.DataFrame:
+    """Load selected columns from regions dataset. Not all columns are implemented, but they
+    can be easily added on the fly."""
+    ds_regions = Dataset(REGIONS_DATASET_PATH)
+    regions = ds_regions["definitions"]
+
+    # add members as JSON
+    if "members" in columns:
+        regions["members"] = ds_regions["members"].groupby("code").agg(lambda x: json.dumps(list(x)))
+
+    if {"legacy_entity_id", "iso_alpha2", "iso_alpha3"} & set(columns):
+        regions = regions.join(ds_regions["legacy_codes"], how="left")
+
+    if "code" in columns:
+        regions["code"] = regions.index
+
+    return regions[list(columns)]
 
 
 @functools.lru_cache
@@ -87,7 +105,7 @@ def list_countries_in_region(
 
     """
     if countries_regions is None:
-        countries_regions = _load_countries_regions()
+        countries_regions = load_regions(("name", "members"))
 
     # TODO: Remove lines related to income_groups once they are included in countries-regions dataset.
     if income_groups is None:
@@ -160,7 +178,7 @@ def list_countries_in_region_that_must_have_data(
 
     """
     if countries_regions is None:
-        countries_regions = _load_countries_regions()
+        countries_regions = load_regions(("name", "members"))
 
     if population is None:
         population = _load_population()
