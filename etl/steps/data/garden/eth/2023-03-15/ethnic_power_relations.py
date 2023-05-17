@@ -138,7 +138,7 @@ def add_regional_aggregations(df: pd.DataFrame) -> pd.DataFrame:
         "regautexclpop",
         "regautegippop",
     ]
-   
+
     # Define binary variables to create binary aggregations
     binary_vars = [
         "incidence_eth_flag",
