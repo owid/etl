@@ -23,7 +23,7 @@ import pandas as pd
 import requests
 import structlog
 import yaml
-from dvc.dvcfile import Dvcfile
+from dvc.dvcfile import load_file
 from dvc.repo import Repo
 
 from etl.db import get_engine
@@ -626,7 +626,7 @@ class SnapshotStep(Step):
                 raise Exception(f"File {self._dvc_path} has not been added to DVC. Run snapshot script to add it.")
 
         with dvc_lock:
-            dvc_file = Dvcfile(DVC_REPO, self._dvc_path)
+            dvc_file = load_file(DVC_REPO, self._dvc_path)
             with DVC_REPO.lock:
                 # DVC returns empty dictionary if file is up to date
                 return dvc_file.stage.status() != {}
