@@ -11,7 +11,6 @@ from etl.steps.data.converters import convert_walden_metadata
 
 
 def clean_data(df: pd.DataFrame) -> pd.DataFrame:
-
     df = df.rename(
         columns={
             "location_name": "country",
@@ -37,7 +36,7 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
             "age": "category",
             "cause": "category",
             "metric": "category",
-            "year": "category",
+            "year": "int",
             "value": "float32",
         }
     )

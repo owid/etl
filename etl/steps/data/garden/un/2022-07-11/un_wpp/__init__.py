@@ -123,9 +123,6 @@ def run(dest_dir: str) -> None:
     # merge main df
     log.info("Merging tables...")
     df = merge_dfs([df_population, df_fertility, df_demographics, df_depratio, df_deaths])
-    # Remove Sint Maarten
-    log.info("Removing country due to inconsistencies...")
-    df = df.loc[~df.index.get_level_values("location").isin(["SXM"])]
     # create tables
     log.info("Transforming DataFrame into Table...")
     table_long = df_to_table(
