@@ -52,7 +52,7 @@ You will need Python 3.9+, basic build tools, and MySQL client libraries.
     You can install most things you need with `apt`:
 
     ```bash
-    sudo apt install python3-dev python3-virtualenv python3-setuptools mysql-client
+    sudo apt install python3-dev python3-virtualenv python3-setuptools mysql-client libmysqlclient-dev
     ```
 
     However, the version of Poetry that ships with Ubuntu is too old, so we need to install a more recent version.

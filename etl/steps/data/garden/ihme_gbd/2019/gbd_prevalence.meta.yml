@@ -1,27 +1,33 @@
-dataset:
-  sources:
-    -
-      name: Global Burden of Disease Study (2019) - Prevalence and incidence  
-      published_by: Institute of Health Metrics and Evaluation
-
 tables:
   gbd_prevalence:
     variables:
       incidence__number:
         title: Number of new cases per year
         unit: new cases per year
+        display:
+          numDecimalPlaces: 0
       prevalence__number:
         title: Current number of cases in the population
         unit: total cases
-      incidence__percent:
-        title: Proportion of total incidence
-        unit: "%"
-      prevalence__percent:
-        title: Proportion of total prevalence
-        unit: "%"
+        display:
+          numDecimalPlaces: 0
       incidence__rate:
         title: Number of new cases per year per 100,000 people
         unit: new cases per 100,000 people
+        display:
+          numDecimalPlaces: 2
       prevalence__rate:
         title: Current number of cases in the population per 100,000 people
         unit: cases per 100,000 people
+        display:
+          numDecimalPlaces: 2
+      incidence__share_of_the_population:
+        title: Number of new cases per year per 100 people
+        unit: '%'
+        display:
+          numDecimalPlaces: 2
+      prevalence__share_of_the_population:
+        title: Current number of cases in the population per 100 people
+        unit: '%'
+        display:
+          numDecimalPlaces: 2

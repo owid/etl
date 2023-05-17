@@ -1,0 +1,62 @@
+meta:
+  namespace: lgbt_rights
+  short_name: lgbti_policy_index
+  name: LGBT+ policies (Velasco, 2020)
+  version: '2023-04-27'
+  publication_date: '2020-07-24'
+  source_name: Kristopher Velasco (2020)
+  source_published_by: 'Velasco, K. (2020). Transnational Backlash and the Deinstitutionalization
+    of Liberal Norms: LGBT+ Rights in a Contested World. https://doi.org/10.31235/osf.io/3rtje'
+  url: https://osf.io/preprints/socarxiv/3rtje/
+  source_data_url:
+  file_extension: xlsx
+  license_url:
+  license_name: ''
+  date_accessed: 2023-03-31
+  is_public: true
+  description: |
+    Velasco measures a country’s LGBT+ policy landscape with an original LGBT+ policy index that he created; the LGBT+ Policy Index captures the implementation of 18 different LGBT+ policies. Policies included in the index are limited to those adopted across at least three countries or are explicitly advocated for by transnational activists.
+
+    These policies are subdivided between:
+
+      Progressive policies:
+        1.	Same-Sex Sexual Acts Legal
+        2.	Equal Age of Consent
+        3.	Employment Discrimination
+        4.	Hate Crime Protections
+        5.	Incitement to Hatred
+        6.	Civil Unions
+        7.	Marriage Equality
+        8.	Joint Adoptions
+        9.	Gender Marker Change
+        10.	LGB Military
+        11.	Transgender Military
+        12.	Ban on Conversion Therapies
+        13.	Ban on Gender Assignment Surgeries on Children
+
+      Regressive policies
+        1.	Death Penalty for Same-Sex Sexual Acts
+        2.	Propaganda Laws
+        3.	Same-Sex Sexual Acts Ilegal
+        4.	Unequal Age of Consent
+        5.	Ban on Marriage Equality
+
+    These policies are not measured in a binary (adopted/not-adopted) scheme; the author follows Frank and colleagues (2010, 2017) in considering that similar policies can meaningfully vary in scope, benefits, punishment, etc. So, he determines the robustness of each policy by reviewing five indicators (between parentheses are the scoring schemes):
+      1.	Proportion of Population Living Under Law: To acknowledge subnational variations (0-1)
+      2.	Scope of Genders Subject to Law: As they can be typically differentiated by gender (0: no law, 0.5: just men or women, 1: both)
+      3.	Maximum Level of Punishment: For regressive policies (0: no law, 0.2: <3 years, 0.4: >3 years and <15 years, 0.6: >15 years and < life, 0.8: live in prison, 1: death penality)
+      4.	Ease of Access: To benefits the law outlines (0: no law, 0.25: significant barriers, 0.5: moderate barriers, 0.75: little to few barriers, 1: no barriers)
+      5.	Evidence of Enforcement: Has been least one case the previous year where this was implemented? (0: no evidence, 1: evidence)
+
+    While all five indicators may not be relevant to each policy, each policy in question uses at least three different indicators and with them, each policy score ranges from 0 to 1. Therefore, a score of 1 corresponds to that policy's most robust scope and implementation. This also means that changes in any indicators will influence each policy’s overall score. For example, a country having national marriage equality (indicator 1), few (if any) formal restrictions to obtaining a marriage license (indicator 4), and full implementation (indicator 5) will receive a score of 1.
+
+    To create the index, the scores for each policy are summed together annually, with progressive policies receiving a positive score and regressive policies receiving a negative. This results in an index ranging from -5 to +13. No country reaches these extremes, demonstrating that countries can get better and worse in their policy environments.
+
+    The LGBT+ policy index represents the most robust and nuanced measure of LGBT+ policy adoption and implementation to date and is a novel contribution to the literature. By incorporating progressive and regressive LGBT+ policies and variation in implementation beyond a binary coding scheme, this measure captures even fine-grained changes to the LGBT+ policy landscape. It better assesses the extent to which countries are or are not influenced by transnational processes.
+
+    Multiple sources were consulted to find the necessary data to construct this index. The primary data source was the State Sponsored Homophobia Reports produced by ILGA. These reports, produced almost annually, outline the adoption of various policies and provide some information on implementation. For information on trans- and intersex-specific policies and military information, other sources were used, including the Trans Legal Mapping Report, also produced by ILGA, reports and documentation provided by Transgender Europe, Movement Advancement Project, The Hague Center for Strategic Studies LGBT+ Military Index, and academic studies such as Reynolds (2013). Furthermore, multiple sources were used to obtain data on the evidence of enforcement – particularly arrests – including an extensive newspaper search across each country using LexisNexis and Factiva and other external reports by Amnesty International, Human Rights Watch, and the U.S. State Department.
+wdir: ../../../data/snapshots/lgbt_rights/2023-04-27
+outs:
+- md5: ef891cbe74677c191de6893fb0f0916b
+  size: 408425
+  path: lgbti_policy_index.xlsx
