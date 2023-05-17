@@ -1,6 +1,6 @@
 from copy import deepcopy
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
 
 from sqlmodel import Session
 
@@ -15,7 +15,7 @@ from etl.db import get_engine
 
 
 def create_and_submit_charts_revisions(
-    variable_mapping: Optional[Dict[int, int]] = None,
+    variable_mapping: Optional[Dict[Union[str, int], Union[str, int]]] = None,
     charts: Optional[List[gm.Chart]] = None,
     chatgpt_reviews: bool = False,
 ):
@@ -47,7 +47,7 @@ def create_and_submit_charts_revisions(
 
 
 def create_chart_comparisons(
-    variable_mapping: Optional[Dict[int, int]] = None,
+    variable_mapping: Optional[Dict[Union[str, int], Union[str, int]]] = None,
     charts: Optional[List[gm.Chart]] = None,
     chatgpt_reviews: bool = False,
 ) -> List[gm.SuggestedChartRevisions]:
@@ -63,7 +63,7 @@ def create_chart_comparisons(
 
     Parameters
     ----------
-    variable_mapping : Dict[int, int], optional
+    variable_mapping : Dict[Union[str, int], Union[str, int]], optional
         Mapping between old and new variable IDs. Is given priority over `charts` to get the list of charts to be updated.
     charts : List[gm.Chart], optional
         List of charts to be reviewed. Only used if `variable_mapping` is not given.
