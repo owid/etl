@@ -36,7 +36,7 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
             "age": "category",
             "cause": "category",
             "metric": "category",
-            "year": "category",
+            "year": "int",
             "value": "float32",
         }
     )
