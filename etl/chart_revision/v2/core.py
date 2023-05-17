@@ -8,6 +8,7 @@ from structlog import get_logger
 import etl.grapher_model as gm
 from etl.chart_revision.v2.base import ChartUpdater
 from etl.chart_revision.v2.updaters import (
+    ChartUpdaterFASTTReduce,
     ChartUpdaterGPTSuggestions,
     ChartVariableUpdater,
 )
@@ -21,6 +22,7 @@ def create_and_submit_charts_revisions(
     variable_mapping: Optional[Dict[int, int]] = None,
     charts: Optional[List[gm.Chart]] = None,
     chatgpt_reviews: bool = False,
+    fastt_reduce: bool = True,
 ):
     """Create and submit chart revisions.
 
@@ -42,9 +44,11 @@ def create_and_submit_charts_revisions(
         List of charts to be reviewed. Only used if `variable_mapping` is not given.
     chatgpt_reviews : bool, optional
         Set to True if you want to use ChatGPT to suggest revisions for the charts (e.g. subtitle revisions, etc.). Defaults to False.
+    fastt_reduce : bool, optional
+        Set to True if you want to simplify the FASTT. At the moment it just removes the field "data". Defaults to True.
     """
     # Create comparions
-    comparisons = create_chart_comparisons(variable_mapping, charts, chatgpt_reviews)
+    comparisons = create_chart_comparisons(variable_mapping, charts, chatgpt_reviews, fastt_reduce)
     # Submit chart comparisons
     submit_chart_comparisons(comparisons)
 
@@ -53,6 +57,7 @@ def create_chart_comparisons(
     variable_mapping: Optional[Dict[int, int]] = None,
     charts: Optional[List[gm.Chart]] = None,
     chatgpt_reviews: bool = False,
+    fastt_reduce: bool = True,
 ) -> List[gm.SuggestedChartRevisions]:
     """Create chart comparisons.
 
@@ -72,6 +77,8 @@ def create_chart_comparisons(
         List of charts to be reviewed. Only used if `variable_mapping` is not given.
     chatgpt_reviews : bool, optional
         Set to True if you want to use ChatGPT to suggest revisions for the charts (e.g. subtitle revisions, etc.). Defaults to False.
+    fastt_reduce : bool, optional
+        Set to True if you want to simplify the FASTT. At the moment it just removes the field "data". Defaults to True.
 
     Returns
     -------
@@ -98,6 +105,9 @@ def create_chart_comparisons(
     # Add GPT updated if set by user
     if chatgpt_reviews:
         updaters.append(ChartUpdaterGPTSuggestions())
+    # Add FASTT reduce updater
+    if fastt_reduce:
+        updaters.append(ChartUpdaterFASTTReduce())
 
     # Initiate list with comparisons
     comparisons = []

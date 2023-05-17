@@ -10,9 +10,10 @@ import click
 from rich_click.rich_command import RichCommand
 from structlog import get_logger
 
+from etl.chart_revision.v1.cli import main as main_v1
+
 # TBD
 from etl.chart_revision.v1.deprecated import ChartRevisionSuggester
-from etl.chart_revision.v1.cli import main as main_v1
 from etl.chart_revision.v2.cli import main as main_v2
 from etl.config import DEBUG
 
@@ -21,13 +22,20 @@ log = get_logger()
 VERSIONS = ["0", "1", "2"]
 VERSION_DEFAULT = max(VERSIONS)
 
+
 @click.command(cls=RichCommand, help=__doc__)
 @click.argument(
     "mapping-file",
     type=str,
 )
 @click.option("--revision-reason", default=None, help="Assign a reason for the suggested chart revision.")
-@click.option("-u", "--use-version", type=click.Choice(VERSIONS), default=VERSION_DEFAULT, help="Choose chart_revision backend version to use. By default uses latest version.")
+@click.option(
+    "-u",
+    "--use-version",
+    type=click.Choice(VERSIONS),
+    default=VERSION_DEFAULT,
+    help="Choose chart_revision backend version to use. By default uses latest version.",
+)
 def main_cli(mapping_file: str, revision_reason: str, use_version: int) -> None:
     """Chart revision backend client."""
     try:
