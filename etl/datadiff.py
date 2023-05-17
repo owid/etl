@@ -15,7 +15,7 @@ from rich.console import Console
 
 from etl import config
 from etl.files import yaml_dump
-from etl.tempcompare import df_equals
+from etl.tempcompare import series_equals
 
 log = structlog.get_logger()
 
@@ -76,11 +76,19 @@ class DatasetDiff:
 
             # only sort index if different to avoid unnecessary sorting for huge datasets such as ghe
             if not _index_equals(table_a, table_b):
+                index_diff = True
                 table_a = _sort_index(table_a)
                 table_b = _sort_index(table_b)
 
-            table_a = table_a.reset_index()
-            table_b = table_b.reset_index()
+                # align tables by index
+                table_a, table_b = table_a.align(table_b, join="outer")
+            else:
+                index_diff = False
+
+            # resetting index will make comparison easier
+            dims = table_a.index.names
+            table_a: Table = table_a.reset_index()
+            table_b: Table = table_b.reset_index()
 
             # compare table metadata
             diff = _dict_diff(_table_metadata_dict(table_a), _table_metadata_dict(table_b), tabs=3)
@@ -94,15 +102,6 @@ class DatasetDiff:
 
             # compare columns
             all_cols = sorted(set(table_a.columns) | set(table_b.columns))
-            shared_cols = sorted(set(table_a.columns) & set(table_b.columns))
-
-            if table_a[shared_cols].shape == table_b[shared_cols].shape:
-                # align dataframes by their primary key and compare
-                eq = df_equals(table_a[shared_cols], table_b[shared_cols])
-                data_differs = (~eq).any().to_dict()
-            else:
-                data_differs = {col: False for col in shared_cols}
-
             for col in all_cols:
                 if col not in table_a.columns:
                     self.p(f"\t\t[green]+ Column [b]{col}[/b]")
@@ -111,8 +110,9 @@ class DatasetDiff:
                 else:
                     col_a = table_a[col]
                     col_b = table_b[col]
-                    shape_diff = col_a.shape != col_b.shape
-                    data_diff = data_differs.get(col)
+
+                    eq = series_equals(table_a[col], table_b[col])
+                    data_diff = (~eq).any()
 
                     col_a_meta = col_a.metadata.to_dict()
                     col_b_meta = col_b.metadata.to_dict()
@@ -122,13 +122,18 @@ class DatasetDiff:
                     changed = (
                         (["data"] if data_diff else [])
                         + (["metadata"] if meta_diff else [])
-                        + (["shape"] if shape_diff else [])
+                        + (["index"] if index_diff else [])
                     )
 
                     if changed:
                         self.p(f"\t\t[yellow]~ Column [b]{col}[/b] (changed [u]{' & '.join(changed)}[/u])")
                         if self.verbose and meta_diff:
                             self.p(_dict_diff(col_a_meta, col_b_meta, tabs=4))
+                        if self.verbose:
+                            if data_diff or index_diff:
+                                out = _data_diff(table_a, table_b, eq, col, dims, tabs=4)
+                                if out:
+                                    self.p(out)
                     else:
                         # do not print identical columns
                         pass
@@ -303,6 +308,44 @@ def _dict_diff(dict_a: Dict[str, Any], dict_b: Dict[str, Any], tabs) -> str:
     else:
         # add tabs
         return "\t" * tabs + "".join(lines).replace("\n", "\n" + "\t" * tabs).rstrip()
+
+
+def _data_diff(table_a: Table, table_b: Table, eq: pd.Series, col: str, dims: list[str], tabs: int) -> str:
+    """Return summary of data differences."""
+    lines = [
+        f"- Changed values: {(~eq).sum()} / {len(eq)} ({(~eq).sum() / len(eq) * 100:.2f}%)",
+    ]
+
+    # changes in index
+    for dim in dims:
+        diff_elements = sorted(list(set(table_a.loc[~eq, dim])))
+        detail = f"{len(diff_elements)} affected" if len(diff_elements) > 5 else ", ".join(diff_elements)
+        lines.append(f"- {dim}: {detail}")
+
+    # changes in values
+    if table_a[col].dtype == "category":
+        vals_a = set(table_a.loc[~eq, col].dropna())
+        vals_b = set(table_b.loc[~eq, col].dropna())
+        if vals_a - vals_b:
+            lines.append(f"- Removed values: {', '.join(vals_a - vals_b)}")
+        if vals_b - vals_a:
+            lines.append(f"- New values: {', '.join(vals_b - vals_a)}")
+    else:
+        mean_a = table_a.loc[~eq, col].mean()
+        mean_b = table_b.loc[~eq, col].mean()
+        abs_diff = mean_b - mean_a
+        rel_diff = abs_diff / 0.5 / (mean_a + mean_b)
+
+        lines.append(f"- Avg. change: {abs_diff:.2f} ({rel_diff:.0%})")
+
+    # add color
+    lines = ["[violet]" + line for line in lines]
+
+    if not lines:
+        return ""
+    else:
+        # add tabs
+        return "\t" * tabs + "\n".join(lines).replace("\n", "\n" + "\t" * tabs).rstrip()
 
 
 def _sort_index(df: Table) -> Table:
