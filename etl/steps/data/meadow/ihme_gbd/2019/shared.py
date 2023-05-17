@@ -2,7 +2,7 @@ from typing import List
 
 import pandas as pd
 import pyarrow.compute as pc
-from dask.dataframe import from_pandas
+from dask.dataframe.io.io import from_pandas
 from owid.catalog import Dataset, Table, TableMeta
 from owid.catalog.utils import underscore_table
 from owid.walden import Catalog as WaldenCatalog
