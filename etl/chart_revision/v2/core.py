@@ -1,8 +1,9 @@
 from copy import deepcopy
 from datetime import datetime
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional
 
 from sqlmodel import Session
+from structlog import get_logger
 
 import etl.grapher_model as gm
 from etl.chart_revision.v2.base import ChartUpdater
@@ -13,9 +14,11 @@ from etl.chart_revision.v2.updaters import (
 from etl.config import GRAPHER_USER_ID
 from etl.db import get_engine
 
+log = get_logger()
+
 
 def create_and_submit_charts_revisions(
-    variable_mapping: Optional[Dict[Union[str, int], Union[str, int]]] = None,
+    variable_mapping: Optional[Dict[int, int]] = None,
     charts: Optional[List[gm.Chart]] = None,
     chatgpt_reviews: bool = False,
 ):
@@ -47,7 +50,7 @@ def create_and_submit_charts_revisions(
 
 
 def create_chart_comparisons(
-    variable_mapping: Optional[Dict[Union[str, int], Union[str, int]]] = None,
+    variable_mapping: Optional[Dict[int, int]] = None,
     charts: Optional[List[gm.Chart]] = None,
     chatgpt_reviews: bool = False,
 ) -> List[gm.SuggestedChartRevisions]:
@@ -99,11 +102,10 @@ def create_chart_comparisons(
     # Initiate list with comparisons
     comparisons = []
     for chart in charts:
+        log.info(f"chart_revision: creating comparison for chart {chart.id}")
         # Update chart config
-        print(4)
         config_new = update_chart_config(chart.config, updaters)
         # Create chart comparison and add to list
-        print(5)
         comparison = create_chart_comparison(chart.config, config_new)
         comparisons.append(comparison)
     return comparisons

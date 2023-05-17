@@ -5,7 +5,7 @@ These functions are used when there are updates on variables. They are used in t
 
 
 from collections import Counter
-from typing import Any, Dict, List, Literal, Optional, Set, Tuple, Union, cast
+from typing import Any, Dict, List, Literal, Optional, Set, Tuple, cast
 
 from sqlmodel import Session, select
 from structlog import get_logger
@@ -14,9 +14,9 @@ import etl.grapher_model as gm
 from backport.datasync.data_metadata import variable_data_df_from_s3
 from etl.chart_revision.v2.base import ChartUpdater
 from etl.chart_revision.v2.schema import (
+    get_schema_chart_config,
     validate_chart_config_and_remove_defaults,
     validate_chart_config_and_set_defaults,
-    get_schema_chart_config,
 )
 from etl.db import get_engine
 
@@ -26,7 +26,7 @@ log = get_logger()
 class ChartVariableUpdater(ChartUpdater):
     """Handle chart updates when there are updates on variables."""
 
-    def __init__(self, variable_mapping: Dict[Union[str, int], Union[str, int]], schema: Optional[Dict[str, Any]] = None) -> None:
+    def __init__(self, variable_mapping: Dict[int, int], schema: Optional[Dict[str, Any]] = None) -> None:
         """Constructor.
 
         Parameters
@@ -35,7 +35,7 @@ class ChartVariableUpdater(ChartUpdater):
             Mapping between old and new variable IDs.
         """
         # Variable mapping dictionary: Old variable ID -> New variable ID
-        self.variable_mapping: Dict[str, str] = {str(k): str(v) for k, v in variable_mapping.items()}
+        self.variable_mapping = variable_mapping
         # Lists with variable IDs (old, new and all)
         self.variable_ids_old = set(variable_mapping.keys())
         self.variable_ids_new = set(variable_mapping.values())
@@ -49,7 +49,7 @@ class ChartVariableUpdater(ChartUpdater):
             self.schema = get_schema_chart_config()
 
     @property
-    def variable_meta(self) -> Dict[str, Any]:
+    def variable_meta(self) -> Dict[int, Any]:
         """Variable metadata."""
         if self.__variable_meta is None:
             raise ValueError(
@@ -68,12 +68,12 @@ class ChartVariableUpdater(ChartUpdater):
             List of charts that use the variables that are being updated.
         """
         # Get charts to be updated
-        charts = find_charts_from_variable_ids(cast(Set[str], self.variable_ids_old))
+        charts = find_charts_from_variable_ids(self.variable_ids_old)
         # Get metadata for variables in use in the charts
         self.__variable_meta = self._get_variable_metadata(charts)
         return charts
 
-    def _get_variable_metadata(self, charts: List[gm.Chart]) -> Dict[str, Any]:
+    def _get_variable_metadata(self, charts: List[gm.Chart]) -> Dict[int, Any]:
         """Get variable metadata.
 
         We need to get metadata for variables being updated (old and new), but also for variables that are not being updated, but are used in the charts.
@@ -96,7 +96,6 @@ class ChartVariableUpdater(ChartUpdater):
             df.groupby("variableId").year.agg(["min", "max"]).rename(columns={"min": "minYear", "max": "maxYear"})
         )
         variable_meta = variable_meta.to_dict(orient="index")
-        variable_meta = {str(k): v for k, v in variable_meta.items()}
         return variable_meta
 
     def run(self, config: Dict[str, Any]) -> Dict[str, Any]:
@@ -122,7 +121,7 @@ class ChartVariableUpdater(ChartUpdater):
         return config_new
 
 
-def find_charts_from_variable_ids(variable_ids: Set[str]) -> List[gm.Chart]:
+def find_charts_from_variable_ids(variable_ids: Set[int]) -> List[gm.Chart]:
     """Retrieve charts that use the given variables from their IDs.
 
     TODO: Currently we make two calls to the database. Can probably be reduced to one.
@@ -151,8 +150,8 @@ def find_charts_from_variable_ids(variable_ids: Set[str]) -> List[gm.Chart]:
 
 def update_config_map(
     config: Dict[str, Any],
-    variable_mapping: Dict[str, str],
-    variable_meta: Dict[str, Any],
+    variable_mapping: Dict[int, int],
+    variable_meta: Dict[int, Any],
     variable_id_default_for_map: int,
 ) -> Dict[str, Any]:
     """Update map config.
@@ -163,9 +162,9 @@ def update_config_map(
     ----------
     config : Dict[str, Any]
         Configuration of the chart. It is assumed that no changed has occured under the property `map`.
-    variable_mapping : Dict[str, str]
+    variable_mapping : Dict[int, int]
         Mapping from old to new variable IDs.
-    variable_meta : Dict[str, Any]
+    variable_meta : Dict[int, int]
         Variable metadata. Includes min and max years.
     variable_id_default_for_map : int
         ID of the first variable in the old chart. Usually found at config["dimensions"][0]["variableId"]
@@ -180,13 +179,13 @@ def update_config_map(
     if config["hasMapTab"]:
         log.info("variable_update: chart uses map")
         # Get map_variable_id
-        map_var_id = str(config["map"].get(
+        map_var_id = config["map"].get(
             "variableId", variable_id_default_for_map
-        ))  # chart.config["dimensions"][0]["variableId"]
+        )  # chart.config["dimensions"][0]["variableId"]
         # Proceed only if variable ID used for map is in variable_mapping (i.e. needs update)
         if map_var_id in variable_mapping:
             # Get and set new map variable ID in the chart config
-            map_var_id_new = str(variable_mapping[map_var_id])
+            map_var_id_new = variable_mapping[map_var_id]
             config["map"]["variableId"] = map_var_id_new
             # Get year ranges from old and new variables
             year_range_new_min = variable_meta[map_var_id_new]["minYear"]
@@ -210,8 +209,8 @@ def update_config_map(
 
 def update_config_time(
     config: Dict[str, Any],
-    variable_mapping: Dict[str, str],
-    variable_meta: Dict[str, Any],
+    variable_mapping: Dict[int, int],
+    variable_meta: Dict[int, Any],
 ) -> Dict[str, Any]:
     """Update time config.
 
@@ -221,13 +220,13 @@ def update_config_time(
         Configuration of the chart. It is assumed that no changed has occured under the property `map`.
     variable_mapping : Dict[int, int]
         Mapping from old to new variable IDs.
-    variable_meta : Dict[str, Any]
+    variable_meta : Dict[int, Any]
         Variable metadata. Includes min and max years.
 
     Returns
     -------
     Dict[str, Any]
-        _description_
+        Updated chart configuration.
     """
     log.info("variable_update: updating time config")
     chart_type = config["type"]
@@ -317,7 +316,7 @@ def update_config_time(
     return config
 
 
-def update_config_dimensions(config: Dict[str, Any], variable_mapping: Dict[str, str]) -> Dict[str, Any]:
+def update_config_dimensions(config: Dict[str, Any], variable_mapping: Dict[int, int]) -> Dict[str, Any]:
     """Update dimensions in the chart config.
 
     Parameters
@@ -335,17 +334,17 @@ def update_config_dimensions(config: Dict[str, Any], variable_mapping: Dict[str,
     log.info("variable_update: updating dimensions")
     # Update dimensions field
     for dimension in config["dimensions"]:
-        if str(dimension["variableId"]) in variable_mapping:
+        if dimension["variableId"] in variable_mapping:
             dimension["variableId"] = variable_mapping[dimension["variableId"]]
     return config
 
 
-def update_config_sort(config: Dict[str, Any], variable_mapping: Dict[str, str]) -> Dict[str, Any]:
+def update_config_sort(config: Dict[str, Any], variable_mapping: Dict[int, int]) -> Dict[str, Any]:
     """Update sort in the chart config.
 
     There are three fields that deal with the sorting of bars in bar charts and marimekko.
 
-        - sortBy: sorting criterium (column, total or entityName)
+        - sortBy: sorting criterium ('column', 'total' or 'entityName')
         - sortColumnSlug: if sortBy is "column", this is the slug of the column to sort by.
         - sortOrder: "asc" or "desc"
 
@@ -356,7 +355,7 @@ def update_config_sort(config: Dict[str, Any], variable_mapping: Dict[str, str])
     ----------
     config : Dict[str, Any]
         Configuration of the chart. It is assumed that no changed has occured under the property `sort`.
-    variable_mapping : Dict[str, str]
+    variable_mapping : Dict[int, int]
         Mapping from old to new variable IDs.
 
     Returns
@@ -375,8 +374,8 @@ def update_config_sort(config: Dict[str, Any], variable_mapping: Dict[str, str])
 
 def _update_config_time_specific_chart(
     config: Dict[str, Any],
-    variable_mapping: Dict[str, str],
-    variable_meta: Dict[str, Any],
+    variable_mapping: Dict[int, int],
+    variable_meta: Dict[int, Any],
     range_mode: Literal["intersect", "union", "single"],
     properties: List[str],
 ) -> Dict[str, Any]:
@@ -405,16 +404,19 @@ def _update_config_time_specific_chart(
 
     # Only update if minTime/maxTime is not set to latest/earliest and falls out of range
     if (config["minTime"] not in ["latest", "earliest"]) & (config["maxTime"] not in ["latest", "earliest"]):
-        print(config["minTime"], config["maxTime"], range_new_min, range_new_max)
+        log.info(f"variable_update: updating time range of chart. Old: {config['minTime']} -> {config['maxTime']}.")
         config["minTime"] = min(max(config["minTime"], range_new_min), range_new_max)
         config["maxTime"] = min(max(config["maxTime"], range_new_min), range_new_max)
         if config["minTime"] > config["maxTime"]:
             config["minTime"] = config["maxTime"]
+        log.info(f"variable_update: updating time range of chart. New: {config['minTime']} -> {config['maxTime']}.")
+    else:
+        log.info(f"variable_update: keeping time range of chart. {config['minTime']} -> {config['maxTime']}.")
     return config
 
 
 def _get_time_ranges(
-    config: Dict[str, Any], variable_mapping: Dict[str, str], variable_meta: Dict[str, Any], properties: List[str]
+    config: Dict[str, Any], variable_mapping: Dict[int, int], variable_meta: Dict[int, Any], properties: List[str]
 ) -> Tuple[List[Tuple[int, int]], List[Tuple[int, int]]]:
     """Get time ranges of variables used in the chart configuration.
 
@@ -422,20 +424,18 @@ def _get_time_ranges(
     """
     ranges_old = []
     ranges_new = []
-    print(properties)
     # Iterate over all dimensions used in the chart, obtain their year ranges, and add to range list.
     # Also check if variable will be updated, so that the new range is added to ranges_new.
     for dim in config["dimensions"]:
         if dim["property"] in properties:
-            variable_id = str(dim["variableId"])
+            variable_id = dim["variableId"]
             ranges_old.append([variable_meta[variable_id]["minYear"], variable_meta[variable_id]["maxYear"]])
             if variable_id in variable_mapping:
                 variable_id_new = variable_mapping[variable_id]
-                print(variable_meta)
                 ranges_new.append(
                     (
-                        variable_meta[str(variable_id_new)]["minYear"],
-                        variable_meta[str(variable_id_new)]["maxYear"],
+                        variable_meta[variable_id_new]["minYear"],
+                        variable_meta[variable_id_new]["maxYear"],
                     )
                 )
     return (ranges_old, ranges_new)
@@ -448,7 +448,6 @@ def intersect_range(ranges: List[Tuple[int, int]]) -> Tuple[int, int]:
     """
     range_min = None
     range_max = None
-    print(ranges)
     for range_ in ranges:
         if range_min is None or range_[0] > range_min:
             range_min = range_[0]
