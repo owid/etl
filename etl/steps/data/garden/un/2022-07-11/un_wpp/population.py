@@ -110,7 +110,13 @@ def remove_outliers(df: pd.DataFrame) -> pd.DataFrame:
     So far, detected ones are:
         - Sex ratio for Sint Maarten
     """
-    df = df.loc[~((df["location"] == "Sint Maarten (Dutch part)") & (df["metric"] == "sex_ratio") & (df["age"].isin(["5", "10", "30", "40"])))]
+    df = df.loc[
+        ~(
+            (df["location"] == "Sint Maarten (Dutch part)")
+            & (df["metric"] == "sex_ratio")
+            & (df["age"].isin(["5", "10", "30", "40"]))
+        )
+    ]
     return df
 
 
