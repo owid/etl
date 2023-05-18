@@ -649,6 +649,10 @@ class SuggestedChartRevisions(SQLModel, table=True):
             Computed("(if((`status` in (_utf8mb4'pending',_utf8mb4'flagged')),true,NULL))", persisted=False),
         ),
     )
+    changesInDataSummary: Optional[str] = Field(
+        default=None, sa_column=Column("suggestedConfig", String(512, "utf8mb4_0900_as_cs"))
+    )
+    experimental: Optional[Dict[Any, Any]] = Field(sa_column=Column("suggestedConfig", JSON, nullable=False))
 
     charts: Optional["Chart"] = Relationship(back_populates="suggested_chart_revisions")
     users: Optional["User"] = Relationship(back_populates="suggested_chart_revisions")
