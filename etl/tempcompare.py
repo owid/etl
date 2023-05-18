@@ -1,5 +1,4 @@
 import random
-import warnings
 from typing import Any, Callable, Generator, Iterable, List, Optional, cast
 
 import numpy as np
@@ -86,54 +85,59 @@ def sample_from_dataframe(df: pd.DataFrame, **kwargs: Any) -> pd.DataFrame:
     return cast(pd.DataFrame, df.sample(**kwargs).sort_index())
 
 
-def df_equals(
-    df1,
-    df2,
+def series_equals(
+    s1: pd.Series,
+    s2: pd.Series,
     absolute_tolerance: float = 1e-08,
     relative_tolerance: float = 1e-05,
-) -> pd.DataFrame:
+) -> pd.Series:
+    """Compare two series and return a boolean series with True
+    if values are the same or within tolerance."""
+    assert all(s1.index == s2.index), "Indices must be the same"
+
+    # Union categories of categorical columns to enable comparison
+    if s1.dtype == "category":
+        uc = union_categoricals([s1, s2])
+        s1 = pd.Series(pd.Categorical(s1.values, categories=uc.categories), index=s1.index)
+        s2 = pd.Series(pd.Categorical(s2.values, categories=uc.categories), index=s2.index)
+
+    # Eq above does not take tolerance into account so compare again with tolerance
+    # for columns that are numeric. this could probably be sped up with a check on any on
+    # the column first but would have to be benchmarked
+    if is_numeric_dtype(s1) and is_numeric_dtype(s2):
+        # For numeric data, consider them equal within certain absolute and relative tolerances.
+        return pd.Series(
+            np.isclose(
+                s1.astype(float),
+                s2.astype(float),
+                atol=absolute_tolerance,
+                rtol=relative_tolerance,
+                equal_nan=True,
+            ),
+            index=s1.index,
+        )
+    elif (s1.dtype in (object, "category", "string")) or (s2.dtype in (object, "category", "string")):
+        # Apply a direct comparison for strings or categories
+        pass
+    elif is_datetime64_any_dtype(s1):
+        # Apply a direct comparison for datetimes
+        pass
+    else:
+        raise ValueError(f"Unsupported dtype {s1.dtype} for column {s1.name}")
+
+    return s1.eq(s2) | (s1.isnull() & s2.isnull())
+
+
+def df_equals(df1: pd.DataFrame, df2: pd.DataFrame, **kwargs) -> pd.DataFrame:
     """Compare two dataframes and return a boolean dataframe with True
     if values are the same or within tolerance."""
     assert all(df1.columns == df2.columns), "Columns must be the same"
     assert all(df1.index == df2.index), "Indices must be the same"
 
-    df1, df2 = df1.copy(deep=False), df2.copy(deep=False)
-
-    # Union categories of categorical columns to enable comparison
+    equals = pd.DataFrame(False, index=df1.index, columns=df1.columns)
     for col in df1.columns:
-        if df1[col].dtype == "category":
-            uc = union_categoricals([df1[col], df2[col]])
-            for df in [df1, df2]:
-                df[col] = pd.Categorical(df[col].values, categories=uc.categories)
-
-    # We don't use the compare function here from above because it builds a new
-    # dataframe and we want to leave indices intact so we can know which rows and columns
-    # were different once we drop the ones with no differences
-    diffs = df1.eq(df2) | (df1.isnull() & df2.isnull())
-
-    # Eq above does not take tolerance into account so compare again with tolerance
-    # for columns that are numeric. this could probably be sped up with a check on any on
-    # the column first but would have to be benchmarked
-    for col in diffs.columns:
-        if is_numeric_dtype(df1[col]):
-            # For numeric data, consider them equal within certain absolute and relative tolerances.
-            diffs[col] = np.isclose(
-                df1[col].astype(float).values,
-                df2[col].astype(float).values,
-                atol=absolute_tolerance,
-                rtol=relative_tolerance,
-                equal_nan=True,
-            )
-        elif (df1[col].dtype in (object, "category", "string")) or (df2[col].dtype in (object, "category", "string")):
-            # Apply a direct comparison for strings or categories
-            pass
-        elif is_datetime64_any_dtype(df1[col]):
-            # Apply a direct comparison for datetimes
-            pass
-        else:
-            warnings.warn(f"Unsupported dtype {df1[col].dtype}")
-
-    return diffs
+        equals[col] = series_equals(df1[col], df2[col], **kwargs)
+    return equals
 
 
 class HighLevelDiff:
