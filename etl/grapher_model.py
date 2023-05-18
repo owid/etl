@@ -257,6 +257,23 @@ class Chart(SQLModel, table=True):
     suggested_chart_revisions: List["SuggestedChartRevisions"] = Relationship(back_populates="charts")
     chart_dimensions: List["ChartDimensions"] = Relationship(back_populates="charts")
 
+    @classmethod
+    def load_chart(cls, session: Session, chart_id: int) -> "Chart":
+        """Load chart with id `chart_id`."""
+        return session.exec(select(Chart).where(Chart.id == chart_id)).one()
+
+    @classmethod
+    def load_charts_using_variables(cls, session: Session, variable_ids: List[int]) -> List["Chart"]:
+        """Load charts that use any of the given variables in `variable_ids`."""
+        # Find IDs of charts
+        chart_ids = (
+            session.exec(select(ChartDimensions.chartId).where(ChartDimensions.variableId.in_(variable_ids)))  # type: ignore
+            .unique()
+            .all()
+        )
+        # Find charts
+        return session.exec(select(Chart).where(Chart.id.in_(chart_ids))).all()  # type: ignore
+
 
 class Dataset(SQLModel, table=True):
     """Example
