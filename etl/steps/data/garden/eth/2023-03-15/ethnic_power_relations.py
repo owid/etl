@@ -139,6 +139,16 @@ def add_regional_aggregations(df: pd.DataFrame) -> pd.DataFrame:
         "regautegippop",
     ]
 
+    # Define binary variables to create binary aggregations
+    binary_vars = [
+        "incidence_eth_flag",
+        "incidence_noneth_flag",
+        "incidence_terr_eth_flag",
+        "incidence_gov_eth_flag",
+        "incidence_terr_noneth_flag",
+        "incidence_gov_noneth_flag",
+    ]
+
     # Multiply variables by population
     pop_vars_headcount = []
     for var in pop_vars:
@@ -179,6 +189,12 @@ def add_regional_aggregations(df: pd.DataFrame) -> pd.DataFrame:
         "regautpop_headcount": "sum",
         "regautexclpop_headcount": "sum",
         "regautegippop_headcount": "sum",
+        "incidence_eth_flag": "sum",
+        "incidence_noneth_flag": "sum",
+        "incidence_terr_eth_flag": "sum",
+        "incidence_gov_eth_flag": "sum",
+        "incidence_terr_noneth_flag": "sum",
+        "incidence_gov_noneth_flag": "sum",
         "population": "sum",
     }
 
@@ -201,6 +217,12 @@ def add_regional_aggregations(df: pd.DataFrame) -> pd.DataFrame:
     df_regions["lexclpop"] = df_regions["exclpop"] / df_regions["lpop"]
     df_regions["ldiscrimpop"] = df_regions["discrimpop"] / df_regions["lpop"]
     df_regions["lmaxexclpop"] = df_regions["maxexclpop"] / df_regions["lpop"]
+
+    # Calculate binary variables for regions
+    # For each variable in binary_vars, replace values greater than 1 with 1
+    for var in binary_vars:
+        df_regions[var] = df_regions[var] > 0
+        df_regions[var] = df_regions[var].astype(int)
 
     # Concatenate df with df_regions
     df = pd.concat([df, df_regions], ignore_index=True)

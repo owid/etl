@@ -98,7 +98,14 @@ def run(dest_dir: str) -> None:
         df = pd.DataFrame.from_dict(yaml.safe_load(_file))
 
     # Load file of region codes.
-    df_codes = pd.read_csv(REGION_CODES_FILE)
+    # NOTE: Namibia has iso_code "NA" which would be interpreted as NaN without extra arguments.
+    df_codes = pd.read_csv(
+        REGION_CODES_FILE,
+        keep_default_na=False,
+        na_values=[
+            "",
+        ],
+    )
 
     #
     # Process data.
