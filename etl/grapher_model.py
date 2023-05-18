@@ -260,7 +260,7 @@ class Chart(SQLModel, table=True):
     @classmethod
     def load_chart(cls, session: Session, chart_id: int) -> "Chart":
         """Load chart with id `chart_id`."""
-        return session.exec(select(Chart).where(Chart.id == chart_id)).one()
+        return session.exec(select(cls).where(cls.id == chart_id)).one()
 
     @classmethod
     def load_charts_using_variables(cls, session: Session, variable_ids: List[int]) -> List["Chart"]:
