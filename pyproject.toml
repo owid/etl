@@ -64,6 +64,8 @@ mkdocs-jupyter = "^0.22.0"
 gitpython = "^3.1.30"
 rapidfuzz = "^2.13.7"
 streamlit = "^1.22.0"
+# pinned because of frictionless, remove this pin when frictionless is updated
+fsspec = "2022.11.0"
 
 [tool.poetry.dev-dependencies]
 pytest = ">=7.1.2"
