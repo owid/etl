@@ -36,7 +36,7 @@ GET_DATA_FROM_API = True
 
 
 # Function to extract data from the EqualDex API
-def extract_from_api(country_list: list) -> pd.DataFrame:
+def extract_from_api(country_list: list) -> tuple[pd.DataFrame, pd.DataFrame]:
     # Initialize logger.
     log = get_logger()
 
@@ -71,7 +71,7 @@ def extract_from_api(country_list: list) -> pd.DataFrame:
                 log.error(f"{country}: Status {status}")
 
         # Create a dictionary with the output
-        response_dict = json.loads(content)
+        response_dict = json.loads(content)  # type: ignore
 
         # Get the country name from the response
         try:
@@ -218,7 +218,7 @@ def create_long_dataset(df_current, df_historical):
     df_long = df_long.set_index(["country", "year", "issue"], verify_integrity=False).sort_index()
 
     # Show rows with duplicated index
-    df_duplicated = df_long[df_long.index.duplicated(keep=False)]
+    df_duplicated = df_long[df_long.index.duplicated(keep=False)]  # type: ignore
 
     df_duplicated.to_csv(PARENT_DIR / "duplicated.csv", index=True)
 
