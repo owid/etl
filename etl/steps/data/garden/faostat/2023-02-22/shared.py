@@ -822,6 +822,7 @@ def remove_regions_from_countries_regions_members(
 
     """
     countries_regions = countries_regions.copy()
+    countries_regions['members'] = countries_regions['members'].dropna().astype(str)
 
     # Get the owid code for each region that needs to be ignored when creating region aggregates.
     regions_to_ignore_codes = []
