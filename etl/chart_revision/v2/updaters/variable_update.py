@@ -85,7 +85,7 @@ class ChartVariableUpdater(ChartUpdater):
         for chart in charts:
             variable_ids |= set(c["variableId"] for c in chart.config["dimensions"] if c["property"] in {"x", "y"})
         log.info(
-            f"variable_update: getting variable metadataa of {len(variable_ids)} variables from {len(charts)} charts"
+            f"variable_update: getting variable metadata of {len(variable_ids)} variables from {len(charts)} charts"
         )
         # Combine with new variables (not yet used in charts)
         variable_ids = list(variable_ids | set(self.variable_ids_new))
