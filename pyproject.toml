@@ -88,6 +88,7 @@ types-PyYAML = ">=6.0.12"
 hydra-core = ">=1.3.0"
 mkdocs-material = "<9.0.0"
 pywebio = ">=1.8.2"
+black = {version = "22.3.0", extras = ["jupyter"]}
 
 [tool.black]
 exclude = ".ipynb_checkpoints|walkthrough/.*_cookiecutter|.*playground.*.ipynb"
