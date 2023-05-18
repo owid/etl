@@ -1,6 +1,6 @@
 from copy import deepcopy
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 from sqlmodel import Session
 from structlog import get_logger
@@ -48,12 +48,12 @@ def create_and_submit_charts_revisions(
         Set to True if you want to simplify the FASTT. At the moment it just removes the field "data". Defaults to True.
     """
     # Create comparions
-    comparisons = create_chart_comparisons(variable_mapping, charts, chatgpt_reviews, fastt_reduce)
+    comparisons = update_and_create_chart_comparisons(variable_mapping, charts, chatgpt_reviews, fastt_reduce)
     # Submit chart comparisons
     submit_chart_comparisons(comparisons)
 
 
-def create_chart_comparisons(
+def update_and_create_chart_comparisons(
     variable_mapping: Optional[Dict[int, int]] = None,
     charts: Optional[List[gm.Chart]] = None,
     chatgpt_reviews: bool = False,
@@ -85,6 +85,55 @@ def create_chart_comparisons(
     List[gm.SuggestedChartRevisions]
         Sugested chart comparions.
     """
+    # Build updaters (and get charts based on `variable_mapping`)
+    updaters, charts = build_updaters_and_get_charts(variable_mapping, charts, chatgpt_reviews, fastt_reduce)
+
+    # Initiate list with comparisons
+    comparisons = []
+    for chart in charts:
+        log.info(f"chart_revision: creating comparison for chart {chart.id}")
+        # Update chart config
+        config_new = update_chart_config(chart.config, updaters)
+        # Create chart comparison and add to list
+        comparison = create_chart_comparison(chart.config, config_new)
+        comparisons.append(comparison)
+    return comparisons
+
+
+def build_updaters_and_get_charts(
+    variable_mapping: Optional[Dict[int, int]] = None,
+    charts: Optional[List[gm.Chart]] = None,
+    chatgpt_reviews: bool = False,
+    fastt_reduce: bool = True,
+) -> Tuple[List[ChartUpdater], List[gm.Chart]]:
+    """Build the list of updaters to process charts.
+
+    You can feed a list of charts to be updated or, alternatively, a variable mapping dictionary. The variable mapping dictionary maps old to new variable IDs.
+    A variable mapping is used when we are updating variables and want charts to reflect these.
+
+    The logic is as follows:
+        - if `variable_mapping` is given, we get the list of charts to be updated from `variable_mapping` and proceed from there.
+        - else if `charts` is given, we use these charts to proceed. In this scenario, `ChartVariableUpdater` is not used.
+        - else an error is raised.
+
+    Parameters
+    ----------
+    variable_mapping : Dict[Union[str, int], Union[str, int]], optional
+        Mapping between old and new variable IDs. Is given priority over `charts` to get the list of charts to be updated.
+    charts : List[gm.Chart], optional
+        List of charts to be reviewed. Only used if `variable_mapping` is not given.
+    chatgpt_reviews : bool, optional
+        Set to True if you want to use ChatGPT to suggest revisions for the charts (e.g. subtitle revisions, etc.). Defaults to False.
+    fastt_reduce : bool, optional
+        Set to True if you want to simplify the FASTT. At the moment it just removes the field "data". Defaults to True.
+
+    Returns
+    -------
+    List[ChartUpdater]
+        List with updaters. Find more details on available updaters at `etl.chart_revision.v2.updaters`.
+    List[gm.Chart]
+        List of charts to be updated.
+    """
     updaters = []
     # If variable mapping is given, get list of charts to be updated
     if variable_mapping is not None:
@@ -108,17 +157,7 @@ def create_chart_comparisons(
     # Add FASTT reduce updater
     if fastt_reduce:
         updaters.append(ChartUpdaterFASTTReduce())
-
-    # Initiate list with comparisons
-    comparisons = []
-    for chart in charts:
-        log.info(f"chart_revision: creating comparison for chart {chart.id}")
-        # Update chart config
-        config_new = update_chart_config(chart.config, updaters)
-        # Create chart comparison and add to list
-        comparison = create_chart_comparison(chart.config, config_new)
-        comparisons.append(comparison)
-    return comparisons
+    return updaters, charts
 
 
 def update_chart_config(config: Dict[str, Any], updaters: List[ChartUpdater]) -> Dict[str, Any]:
