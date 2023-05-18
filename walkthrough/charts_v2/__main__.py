@@ -1,3 +1,5 @@
+from urllib.error import URLError
+
 import pandas as pd
 import streamlit as st
 from MySQLdb import OperationalError
@@ -377,30 +379,37 @@ if st.session_state.submitted_variables:
     # Get updaters and charts to update
     with st.spinner("Retrieving charts to be updated. This can take up to 1 minute..."):
         log.info("chart_revision: building updaters and getting charts!!!!")
-        updaters, charts = build_updaters_and_get_charts_cached(variable_mapping=variable_mapping)
+        try:
+            updaters, charts = build_updaters_and_get_charts_cached(variable_mapping=variable_mapping)
+        except URLError as e:
+            st.error(e)
+            error_submitting_variables = True
+        else:
+            error_submitting_variables = False
         # st.session_state.charts_obtained = True
-    # Display details
-    num_charts = len(charts)
-    with st.container():
-        st.info(f"""Number of charts to be updated: {num_charts}""")
-    with st.expander("👷  Show variable id mapping"):
-        st.write(variable_mapping)
-    with st.expander("📊  Show affected charts (before update)"):
-        for chart in charts:
-            slug = chart.config["slug"]
-            st.markdown(
-                f"""<iframe src="https://ourworldindata.org/grapher/{slug}" loading="lazy" style="width: 100%; height: 600px; border: 0px none;"></iframe>""",
-                unsafe_allow_html=True,
-            )
+    if not error_submitting_variables:
+        # Display details
+        num_charts = len(charts)
+        with st.container():
+            st.info(f"""Number of charts to be updated: {num_charts}""")
+        with st.expander("👷  Show variable id mapping"):
+            st.write(variable_mapping)
+        with st.expander("📊  Show affected charts (before update)"):
+            for chart in charts:
+                slug = chart.config["slug"]
+                st.markdown(
+                    f"""<iframe src="https://ourworldindata.org/grapher/{slug}" loading="lazy" style="width: 100%; height: 600px; border: 0px none;"></iframe>""",
+                    unsafe_allow_html=True,
+                )
 
-    # Button to finally submit the revisions
-    submitted_revisions = st.button(label="🚀 CREATE AND SUBMIT CHART REVISIONS", use_container_width=True)
-    if submitted_revisions:
-        st.session_state.submitted_revisions = True
-        log.info(
-            f"{st.session_state.submitted_datasets}, {st.session_state.submitted_variables}, {st.session_state.submitted_revisions}"
-        )
-    st.divider()
+        # Button to finally submit the revisions
+        submitted_revisions = st.button(label="🚀 CREATE AND SUBMIT CHART REVISIONS", use_container_width=True)
+        if submitted_revisions:
+            st.session_state.submitted_revisions = True
+            log.info(
+                f"{st.session_state.submitted_datasets}, {st.session_state.submitted_variables}, {st.session_state.submitted_revisions}"
+            )
+        st.divider()
 
 ##########################################################################################
 # 4 CHART REVISIONS SUBMISSION
