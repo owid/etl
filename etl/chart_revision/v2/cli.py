@@ -11,4 +11,4 @@ def main(mapping_file: str, revision_reason: Optional[str] = None) -> None:
     with open(mapping_file, "r") as f:
         variable_mapping = json.load(f)
         variable_mapping = {int(k): int(v) for k, v in variable_mapping.items()}
-    create_and_submit_charts_revisions(variable_mapping, revision_reason)
+    create_and_submit_charts_revisions(variable_mapping)

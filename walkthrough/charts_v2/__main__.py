@@ -66,7 +66,6 @@ def _show_environment():
 
 @st.cache_resource
 def _check_env_and_environment():
-    print(1111)
     ok = _check_env()
     if ok:
         # check that you can connect to DB
@@ -88,7 +87,12 @@ def _check_env_and_environment():
             _show_environment()
 
 
-st.set_page_config(page_title="Chart revisions baker", layout="wide")
+@st.cache_data
+def build_updaters_and_get_charts_cached(variable_mapping):
+    return build_updaters_and_get_charts(variable_mapping=variable_mapping)
+
+
+st.set_page_config(page_title="Chart revisions baker", layout="wide", page_icon="🧑‍🍳")
 st.title("🧑‍🍳 Chart revisions baker")
 # get dataset
 DATASETS = get_datasets()
@@ -104,7 +108,16 @@ if "submitted_variables" not in st.session_state:
     st.session_state.submitted_variables = False
 if "submitted_revisions" not in st.session_state:
     st.session_state.submitted_revisions = False
-
+if "charts_obtained" not in st.session_state:
+    st.session_state.charts_obtained = False
+# Others
+old_var_selectbox = []
+new_var_selectbox = []
+ignore_selectbox = []
+variable_display_to_id = {}
+charts = []
+updaters = []
+num_charts = 0
 
 # CONFIGURATION SIDEBAR
 with st.sidebar:
@@ -160,6 +173,9 @@ with st.form("form-datasets"):
         st.session_state.submitted_datasets = True
         st.session_state.submitted_variables = False
         st.session_state.submitted_revisions = False
+        log.info(
+            f"{st.session_state.submitted_datasets}, {st.session_state.submitted_variables}, {st.session_state.submitted_revisions}"
+        )
 
     # Get IDs of datasets
     dataset_old_id = display_name_to_id_mapping[dataset_old]
@@ -188,7 +204,7 @@ if st.session_state.submitted_datasets:
     else:
         variable_mapping_auto = {}
     # Get remaining mapping suggestions
-    suggestions = find_mapping_suggestions(missing_old, missing_new, similarity_name)
+    suggestions = find_mapping_suggestions(missing_old, missing_new, similarity_name)  # type: ignore
 
     with st.expander("👷  Mapping details (debugging purposes only)"):
         st.subheader("Auto mapping")
@@ -210,69 +226,135 @@ if st.session_state.submitted_datasets:
     else:
         with st.form("form-variables"):
             col1, col2 = st.columns(2)
+            col_1_widths = [5, 1]
             # Left column (old variables)
             with col1:
                 st.subheader("Old dataset")
-                st.caption(f"[Explore dataset]({env.admin_url}/datasets/{dataset_old_id}/)")
-                old_var_selectbox = []  # This will contain references to selectbox elements of old variables
-                ignore_selectbox = []  # This will contain references to checkbox elements of old variables
-                # Automatically mapped variables (non-editable)
-                for i, variable in enumerate(variable_mapping_auto.keys()):
-                    col11, col12 = st.columns([5, 1])
-                    with col11:
-                        element = st.selectbox(
-                            label=f"auto-{i}-1",
-                            options=[variable_id_to_display[variable]],
-                            disabled=True,
-                            label_visibility="collapsed",
-                        )
-                        old_var_selectbox.append(element)
-                    with col12:
-                        element = st.checkbox("Ignore", key=f"auto-ignore-{i}")
-                        ignore_selectbox.append(element)
-                # Remaining variables
-                for i, suggestion in enumerate(suggestions):
-                    # with st.empty():
-                    variable = suggestion["old"]["id_old"]
-                    col11, col12 = st.columns([5, 1])
-                    with col11:
-                        element = st.selectbox(
-                            label=f"manual-{i}-1",
-                            options=[variable_id_to_display[variable]],
-                            disabled=True,
-                            label_visibility="collapsed",
-                        )
-                        old_var_selectbox.append(element)
-                    with col12:
-                        element = st.checkbox("Ignore", key=f"manual-ignore-{i}")
-                        ignore_selectbox.append(element)
-            # Right column (new variables)
+                col11, col21 = st.columns(col_1_widths)
+                with col11:
+                    st.caption(f"[Explore dataset]({env.admin_url}/datasets/{dataset_old_id}/)")
+                with col21:
+                    st.caption("Ignore")
             with col2:
                 st.subheader("New dataset")
                 st.caption(f"[Explore dataset]({env.admin_url}/datasets/{dataset_new_id}/)")
-                new_var_selectbox = []  # This will contain references to selectbox elements of new variables
-                # Automatically mapped variables (non-editable)
-                for i, variable in enumerate(variable_mapping_auto.values()):
+
+            old_var_selectbox = []
+            ignore_selectbox = []
+            new_var_selectbox = []
+
+            # Automatically mapped variables (non-editable)
+            for i, (variable_old, variable_new) in enumerate(variable_mapping_auto.items()):
+                col_auto_1, col_auto_2 = st.columns(2)
+                with col_auto_1:
+                    col_auto_11, col_auto_12 = st.columns(col_1_widths)
+                    with col_auto_11:
+                        element = st.selectbox(
+                            label=f"auto-{i}-left",
+                            options=[variable_id_to_display[variable_old]],
+                            disabled=True,
+                            label_visibility="collapsed",
+                        )
+                        old_var_selectbox.append(element)
+                    with col_auto_12:
+                        element = st.checkbox("", key=f"auto-ignore-{i}")
+                        ignore_selectbox.append(element)
+                with col_auto_2:
                     element = st.selectbox(
-                        label=f"auto-{i}-2",
-                        options=[variable_id_to_display[variable]],
+                        label=f"auto-{i}-right",
+                        options=[variable_id_to_display[variable_new]],
                         disabled=True,
                         label_visibility="collapsed",
                     )
                     new_var_selectbox.append(element)
-                # Remaining variables
-                for i, suggestion in enumerate(suggestions):
-                    options = [variable_id_to_display[op] for op in suggestion["new"]["id_new"]]
+
+            # Remaining variables (editable)
+            for i, suggestion in enumerate(suggestions):
+                variable_old = suggestion["old"]["id_old"]
+                options = [variable_id_to_display[op] for op in suggestion["new"]["id_new"]]
+                col_manual_1, col_manual_2 = st.columns(2)
+                with col_manual_1:
+                    col_manual_11, col_manual_12 = st.columns(col_1_widths)
+                    with col_manual_11:
+                        element = st.selectbox(
+                            label=f"manual-{i}-left",
+                            options=[variable_id_to_display[variable_old]],
+                            disabled=True,
+                            label_visibility="collapsed",
+                        )
+                        old_var_selectbox.append(element)
+                    with col_manual_12:
+                        element = st.checkbox("", key=f"manual-ignore-{i}")
+                        ignore_selectbox.append(element)
+                with col_manual_2:
                     element = st.selectbox(
-                        label=f"manual-{i}-2", options=options, disabled=False, label_visibility="collapsed"
+                        label=f"manual-{i}-right", options=options, disabled=False, label_visibility="collapsed"
                     )
                     new_var_selectbox.append(element)
+
+            # with col1:
+            #     st.subheader("Old dataset")
+            #     st.caption(f"[Explore dataset]({env.admin_url}/datasets/{dataset_old_id}/)")
+            #     old_var_selectbox = []  # This will contain references to selectbox elements of old variables
+            #     ignore_selectbox = []  # This will contain references to checkbox elements of old variables
+            #     # Automatically mapped variables (non-editable)
+            #     for i, variable in enumerate(variable_mapping_auto.keys()):
+            #         col11, col12 = st.columns([5, 1])
+            #         with col11:
+            #             element = st.selectbox(
+            #                 label=f"auto-{i}-1",
+            #                 options=[variable_id_to_display[variable]],
+            #                 disabled=True,
+            #                 label_visibility="collapsed",
+            #             )
+            #             old_var_selectbox.append(element)
+            #         with col12:
+            #             element = st.checkbox("Ignore", key=f"auto-ignore-{i}")
+            #             ignore_selectbox.append(element)
+            #     # Remaining variables
+            #     for i, suggestion in enumerate(suggestions):
+            #         # with st.empty():
+            #         variable = suggestion["old"]["id_old"]
+            #         col11, col12 = st.columns([5, 1])
+            #         with col11:
+            #             element = st.selectbox(
+            #                 label=f"manual-{i}-1",
+            #                 options=[variable_id_to_display[variable]],
+            #                 disabled=True,
+            #                 label_visibility="collapsed",
+            #             )
+            #             old_var_selectbox.append(element)
+            #         with col12:
+            #             element = st.checkbox("Ignore", key=f"manual-ignore-{i}")
+            #             ignore_selectbox.append(element)
+            # # Right column (new variables)
+            # with col2:
+            #     st.subheader("New dataset")
+            #     st.caption(f"[Explore dataset]({env.admin_url}/datasets/{dataset_new_id}/)")
+            #     new_var_selectbox = []  # This will contain references to selectbox elements of new variables
+            #     # Automatically mapped variables (non-editable)
+            #     for i, variable in enumerate(variable_mapping_auto.values()):
+            #         element = st.selectbox(
+            #             label=f"auto-{i}-2",
+            #             options=[variable_id_to_display[variable]],
+            #             disabled=True,
+            #             label_visibility="collapsed",
+            #         )
+            #         new_var_selectbox.append(element)
+            #     # Remaining variables
+            #     for i, suggestion in enumerate(suggestions):
+            #         options = [variable_id_to_display[op] for op in suggestion["new"]["id_new"]]
+            #         element = st.selectbox(
+            #             label=f"manual-{i}-2", options=options, disabled=False, label_visibility="collapsed"
+            #         )
+            #         new_var_selectbox.append(element)
             submitted_variables = st.form_submit_button("Submit")
-            print(0, submitted_variables)
             if submitted_variables:
-                print(1)
                 st.session_state.submitted_variables = True
                 st.session_state.submitted_revisions = False
+                log.info(
+                    f"{st.session_state.submitted_datasets}, {st.session_state.submitted_variables}, {st.session_state.submitted_revisions}"
+                )
 
 ##########################################################################################
 # 3 CHART REVISIONS BAKING
@@ -294,16 +376,16 @@ if st.session_state.submitted_variables:
 
     # Get updaters and charts to update
     with st.spinner("Retrieving charts to be updated. This can take up to 1 minute..."):
-        updaters, charts = build_updaters_and_get_charts(variable_mapping=variable_mapping)
+        log.info("chart_revision: building updaters and getting charts!!!!")
+        updaters, charts = build_updaters_and_get_charts_cached(variable_mapping=variable_mapping)
+        # st.session_state.charts_obtained = True
     # Display details
-    tab1, tab2 = st.tabs(["Overview details", "Charts affected (before update)"])
-    with tab1:
-        num_charts = len(charts)
-        with st.expander("👷  Show variable id mapping"):
-            st.write(variable_mapping)
-        with st.container():
-            st.info(f"""Number of charts to be updated: {num_charts}""")
-    with tab2:
+    num_charts = len(charts)
+    with st.container():
+        st.info(f"""Number of charts to be updated: {num_charts}""")
+    with st.expander("👷  Show variable id mapping"):
+        st.write(variable_mapping)
+    with st.expander("📊  Show affected charts (before update)"):
         for chart in charts:
             slug = chart.config["slug"]
             st.markdown(
@@ -315,6 +397,9 @@ if st.session_state.submitted_variables:
     submitted_revisions = st.button(label="🚀 CREATE AND SUBMIT CHART REVISIONS", use_container_width=True)
     if submitted_revisions:
         st.session_state.submitted_revisions = True
+        log.info(
+            f"{st.session_state.submitted_datasets}, {st.session_state.submitted_variables}, {st.session_state.submitted_revisions}"
+        )
     st.divider()
 
 ##########################################################################################
@@ -337,22 +422,12 @@ if st.session_state.submitted_revisions:
         bar.progress(percent_complete, text=f"{progress_text} {percent_complete}%")
 
     # Submit chart comparisons
-    print("submitting revisions")
     try:
-        print("try")
         submit_chart_comparisons(comparisons)
     except Exception as e:
-        print("except")
         st.error(f"Something went wrong! {e}")
     else:
-        print("finally")
         st.balloons()
         st.success(
             f"Chart revisions submitted successfully! Now review these at the [approval tool]({env.chart_approval_tool_url})!"
         )
-
-print("---")
-print("dataset", st.session_state.submitted_datasets)
-print("variables", st.session_state.submitted_variables)
-print("revisions", st.session_state.submitted_revisions)
-print("***********")
