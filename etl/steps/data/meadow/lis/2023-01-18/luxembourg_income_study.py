@@ -3,12 +3,13 @@ Load the three LIS snapshots and creates three tables in the luxembourg_income_s
 Country names are converted from iso-2 codes in this step and years are reformated from "YY" to "YYYY"
 """
 
+from typing import cast
+
 import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
 from structlog import get_logger
 
-from etl.data_helpers.geo import load_regions
 from etl.helpers import PathFinder
 from etl.snapshot import Snapshot
 from etl.steps.data.converters import convert_snapshot_metadata
@@ -33,7 +34,7 @@ def run(dest_dir: str) -> None:
     #
     # Load inputs.
     # Load reference file with country names in OWID standard
-    df_countries_regions = load_regions(("name", "iso_alpha2"))
+    df_countries_regions = cast(Dataset, paths.load_dependency("regions"))["regions"]
 
     # Create a new meadow dataset with the same metadata as the snapshot.
     snap = paths.load_dependency("lis_keyvars.csv")

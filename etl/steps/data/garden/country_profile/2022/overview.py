@@ -1,3 +1,5 @@
+from typing import cast
+
 import pandas as pd
 from owid import catalog
 from owid.catalog import Dataset
@@ -5,7 +7,6 @@ from owid.catalog.utils import underscore
 from owid.datautils import dataframes
 from structlog import get_logger
 
-from etl.data_helpers.geo import load_regions
 from etl.helpers import PathFinder
 from etl.paths import DATA_DIR
 
@@ -27,7 +28,7 @@ METADATA_PATH = CURRENT_DIR / "overview.meta.yml"
 # Daily supply of calories per person
 # https://owid.cloud/admin/datasets/581
 
-countries = load_regions(("name", "region_type", "is_historical"))
+countries = cast(Dataset, paths.load_dependency("regions"))["regions"]
 # Get only countries - we don't want regions just yet
 countries = countries[(countries.region_type == "country") & (~countries.is_historical)]
 countries_list = countries["name"].to_list()

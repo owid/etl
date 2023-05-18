@@ -1,10 +1,11 @@
+from typing import cast
+
 import pandas as pd
 from owid.catalog import Dataset, Table, TableMeta
 from owid.catalog.utils import underscore_table
 from owid.walden import Catalog as WaldenCatalog
 from structlog import get_logger
 
-from etl.data_helpers.geo import load_regions
 from etl.helpers import PathFinder
 from etl.steps.data.converters import convert_walden_metadata
 
@@ -29,7 +30,7 @@ def run(dest_dir: str) -> None:
     # df = clean_data(df)
 
     # Read reference dataset for countries and regions
-    df_countries_regions = load_regions(("name", "iso_alpha3"))
+    df_countries_regions = cast(Dataset, N.load_dependency("regions"))["regions"]
 
     # Merge dataset and country dictionary to get the name of the country (and rename it as "country")
     df = pd.merge(

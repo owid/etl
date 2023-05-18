@@ -12,14 +12,18 @@ Additionally, OWID's population dataset and Maddison Project Database (Bolt and 
 
 """
 
+from typing import cast
+
 import numpy as np
 import pandas as pd
 from owid import catalog
 from owid.datautils import dataframes
 from shared import CURRENT_DIR, gather_sources_from_tables
 
-from etl.data_helpers.geo import load_regions
+from etl.helpers import PathFinder
 from etl.paths import DATA_DIR
+
+paths = PathFinder(__file__)
 
 # Details for dataset to export.
 DATASET_SHORT_NAME = "owid_co2"
@@ -299,7 +303,8 @@ def run(dest_dir: str) -> None:
     tb_energy = ds_energy["primary_energy_consumption"]
     tb_gdp = ds_gdp["maddison_gdp"]
     tb_population = ds_population["population"]
-    tb_countries_regions = load_regions(("name", "code"))
+    tb_countries_regions = cast(catalog.Dataset, paths.load_dependency("regions"))["regions"]
+    tb_countries_regions["code"] = tb_countries_regions.index
 
     #
     # Process data.

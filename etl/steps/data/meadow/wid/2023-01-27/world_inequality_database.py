@@ -1,11 +1,12 @@
 """Load a snapshot and create the World Inequality Dataset meadow dataset."""
 
+from typing import cast
+
 import numpy as np
 import pandas as pd
-from owid.catalog import Table
+from owid.catalog import Dataset, Table
 from structlog import get_logger
 
-from etl.data_helpers.geo import load_regions
 from etl.helpers import PathFinder, create_dataset
 from etl.snapshot import Snapshot
 
@@ -102,7 +103,7 @@ iso2_missing = {
 # Country harmonization function, using both the reference country/regional OWID dataset and WID's `iso2_missing` list
 def harmonize_countries(df: pd.DataFrame, iso2_missing: dict) -> pd.DataFrame:
     # Load reference file with country names in OWID standard
-    df_countries_regions = load_regions(("name", "iso_alpha2"))
+    df_countries_regions = cast(Dataset, paths.load_dependency("regions"))["regions"](("name", "iso_alpha2"))
 
     # Merge dataset and country dictionary to get the name of the country
     df = pd.merge(

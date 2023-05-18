@@ -1,9 +1,10 @@
 import click
 import pandas as pd
 import structlog
+from owid.catalog import Dataset
 
-from etl.data_helpers.geo import load_regions
 from etl.db import get_engine
+from etl.paths import DATA_DIR
 
 log = structlog.get_logger()
 
@@ -12,7 +13,9 @@ log = structlog.get_logger()
 def audit_entities_cli() -> None:
     """Compare countries_regions.csv against database and find any mismatch in entity ids."""
     # region -> entity from countries regions
-    csv_df = load_regions(("name", "legacy_entity_id")).rename(columns={"legacy_entity_id": "entity_id"})
+    csv_df = Dataset(DATA_DIR / "garden/regions/2023-01-01/regions")["regions"].rename(
+        columns={"legacy_entity_id": "entity_id"}
+    )
 
     assert csv_df.name.value_counts().max() == 1
     csv_map = csv_df.set_index("name").entity_id.dropna().astype(int).to_dict()

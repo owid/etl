@@ -10,9 +10,7 @@ import pandas as pd
 import structlog
 from owid import catalog
 from owid.catalog.utils import underscore
-from owid.datautils import dataframes
 
-from etl.data_helpers.geo import load_regions
 from etl.db import get_connection, get_engine
 from etl.db_utils import DBUtils
 
@@ -215,12 +213,6 @@ def _get_and_create_entities_in_db(countries: Set[str]) -> Dict[str, int]:
     db = DBUtils(cursor)
     log.info("Creating entities in DB", countries=countries)
     return {name: db.get_or_create_entity(name) for name in countries}
-
-
-def country_code_to_country(country_code: pd.Series) -> pd.Series:
-    """Convert country code to country name."""
-    code_to_country = load_regions()["name"].to_dict()
-    return cast(pd.Series, dataframes.map_series(country_code, code_to_country, warn_on_missing_mappings=True))
 
 
 def country_to_entity_id(

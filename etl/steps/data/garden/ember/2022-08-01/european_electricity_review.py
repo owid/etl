@@ -2,14 +2,18 @@
 
 """
 
+from typing import cast
+
 import pandas as pd
 from owid import catalog
 from owid.datautils import dataframes
 from shared import CURRENT_DIR
 
 from etl.data_helpers import geo
-from etl.data_helpers.geo import load_regions
+from etl.helpers import PathFinder
 from etl.paths import DATA_DIR
+
+paths = PathFinder(__file__)
 
 # Details for dataset to export.
 DATASET_SHORT_NAME = "european_electricity_review"
@@ -205,7 +209,7 @@ def run(dest_dir: str) -> None:
     ds_meadow = catalog.Dataset(MEADOW_DATASET_PATH)
 
     # Load countries-regions table (required to convert country codes to country names in net flows table).
-    countries_regions = load_regions(("name",))
+    countries_regions = cast(catalog.Dataset, paths.load_dependency("regions"))["regions"]
 
     #
     # Process data.

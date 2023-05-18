@@ -4,7 +4,6 @@ from pathlib import Path
 import pandas as pd
 from owid.catalog import Dataset, Table
 
-from etl.data_helpers.geo import load_regions
 from etl.paths import DATA_DIR
 from etl.steps.data.garden.owid.latest.key_indicators.utils import add_regions
 
@@ -18,7 +17,7 @@ def load_land_area() -> Table:
     table = table.reset_index()
 
     # convert iso codes to country names
-    countries_regions = load_regions(("name",))
+    countries_regions = Dataset(DATA_DIR / "garden/regions/2023-01-01/regions")["regions"]
 
     table = (
         table.rename(

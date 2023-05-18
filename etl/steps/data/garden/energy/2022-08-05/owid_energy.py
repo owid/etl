@@ -16,8 +16,10 @@ from owid import catalog
 from owid.datautils import dataframes
 from shared import CURRENT_DIR, add_population, gather_sources_from_tables
 
-from etl.data_helpers.geo import load_regions
+from etl.helpers import PathFinder
 from etl.paths import DATA_DIR
+
+paths = PathFinder(__file__)
 
 # Details for dataset to export.
 DATASET_SHORT_NAME = "owid_energy"
@@ -145,7 +147,7 @@ def run(dest_dir: str) -> None:
     tb_electricity_mix = ds_electricity_mix[ds_electricity_mix.table_names[0]].reset_index()
 
     # Load countries-regions dataset (required to get ISO codes).
-    countries_regions = load_regions(("name", "iso_alpha3"))
+    countries_regions = cast(catalog.Dataset, paths.load_dependency("regions"))["regions"]
 
     # Load population (used only to add a population column, and not to create any other derived variables).
     # Historical regions will be added to the population.
