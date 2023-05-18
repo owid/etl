@@ -6,8 +6,9 @@ This script extracts data from the EqualDex API and creates two datasets:
 The script also creates a long dataset that merges and expands the two previous datasets for each year.
 This long dataset is saved as long.csv and it is indexed by country, year and issue.
 
-To run this script, you need to create a file called access_key.py with the following content:
-API_KEY = "your_api_key"
+To run this script, you need to add your API key to the .env file in this repository, as:
+# Equaldex access key
+EQUALDEX_KEY="your_api_key"
 You can obtain your API key by registering at https://www.equaldex.com/ and then copying it from your account settings: https://www.equaldex.com/settings
 
 After running this script, add the long.csv and the current.csv file to snapshots (change the date in the path for future updates):
