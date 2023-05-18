@@ -18,15 +18,18 @@ After running this script, add the long.csv and the current.csv file to snapshot
 
 import datetime
 import json
+import os
 from pathlib import Path
 
 import pandas as pd
 import requests
-from access_key import API_KEY
 from structlog import get_logger
 
 # Set directory path
 PARENT_DIR = Path(__file__).parent.absolute()
+
+# Import API key (it is stored in .env file)
+API_KEY = os.getenv("EQUALDEX_KEY")
 
 # Set parameter to extract data from the API or not (this is useful to avoid running the API query every time)
 GET_DATA_FROM_API = True
@@ -216,6 +219,7 @@ def create_long_dataset(df_current, df_historical):
 
     # Show rows with duplicated index
     df_duplicated = df_long[df_long.index.duplicated(keep=False)]
+
     df_duplicated.to_csv(PARENT_DIR / "duplicated.csv", index=True)
 
 
