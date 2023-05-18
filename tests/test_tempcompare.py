@@ -7,8 +7,8 @@ from etl.tempcompare import df_equals
 
 def test_df_equals():
     # Test with two identical dataframes
-    df1 = pd.DataFrame({"col1": [1, 2, 3], "col2": ["a", "b", "c"]})
-    df2 = pd.DataFrame({"col1": [1, 2, 3], "col2": ["a", "b", "c"]})
+    df1 = pd.DataFrame({"col1": [1, 2, 3, np.nan], "col2": ["a", "b", "c", np.nan]})
+    df2 = pd.DataFrame({"col1": [1, 2, 3, np.nan], "col2": ["a", "b", "c", np.nan]})
     assert df_equals(df1, df2).all().all()
 
     # Test with two different dataframes
