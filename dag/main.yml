@@ -259,6 +259,7 @@ steps:
     - snapshot://lis/2023-01-18/lis_keyvars.csv
     - snapshot://lis/2023-01-18/lis_abs_poverty.csv
     - snapshot://lis/2023-01-18/lis_distribution.csv
+    - data://garden/regions/2023-01-01/regions
   data://garden/lis/2023-01-18/luxembourg_income_study:
     - data://meadow/lis/2023-01-18/luxembourg_income_study
   data://grapher/lis/2023-01-18/luxembourg_income_study:
