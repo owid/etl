@@ -17,8 +17,8 @@ paths = PathFinder(__file__)
 
 def load_countries_regions() -> Table:
     """Load countries-regions table from reference dataset (e.g. to map from iso codes to country names)."""
-    ds_reference = cast(Dataset, paths.load_dependency("reference"))
-    tb_countries_regions = ds_reference["countries_regions"]
+    ds_reference = cast(Dataset, paths.load_dependency("regions"))
+    tb_countries_regions = ds_reference["regions"]
 
     return tb_countries_regions
 {% endif -%}

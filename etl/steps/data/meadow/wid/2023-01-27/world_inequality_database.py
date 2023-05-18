@@ -103,7 +103,7 @@ iso2_missing = {
 # Country harmonization function, using both the reference country/regional OWID dataset and WID's `iso2_missing` list
 def harmonize_countries(df: pd.DataFrame, iso2_missing: dict) -> pd.DataFrame:
     # Load reference file with country names in OWID standard
-    df_countries_regions = cast(Dataset, paths.load_dependency("regions"))["regions"](("name", "iso_alpha2"))
+    df_countries_regions = cast(Dataset, paths.load_dependency("regions"))["regions"]
 
     # Merge dataset and country dictionary to get the name of the country
     df = pd.merge(

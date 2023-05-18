@@ -229,7 +229,7 @@ class GeoPickerCmd(cmd.Cmd):
                 self.save_alias = input_bool("Save this alias")
             else:
                 # it's a manual entry that does not correspond to any known country
-                print(f"Using custom entry '{choice}' that does not match a country/region from the reference set")
+                print(f"Using custom entry '{choice}' that does not match a country/region from the regions set")
                 self.match = choice
 
         return True

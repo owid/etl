@@ -13,14 +13,6 @@ log = get_logger()
 paths = PathFinder(__file__)
 
 
-def load_countries_regions() -> Table:
-    """Load countries-regions table from reference dataset (e.g. to map from iso codes to country names)."""
-    ds_reference: Dataset = paths.load_dependency("reference")
-    tb_countries_regions = ds_reference["countries_regions"]
-
-    return tb_countries_regions
-
-
 def load_population() -> Table:
     """Load population table from population OMM dataset."""
     ds_indicators: Dataset = paths.load_dependency(channel="garden", namespace="demography", short_name="population")

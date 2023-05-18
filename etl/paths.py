@@ -8,7 +8,6 @@ DAG_ARCHIVE_FILE = DAG_DIR / "archive" / "main.yml"
 DATA_DIR = BASE_DIR / "data"
 SNAPSHOTS_DIR = BASE_DIR / "snapshots"
 STEP_DIR = BASE_DIR / "etl" / "steps"
-REFERENCE_DATASET = DATA_DIR / "garden" / "reference"
 
 # Regions paths
 REGIONS_DATASET_PATH = DATA_DIR / "garden" / "regions" / "2023-01-01" / "regions"

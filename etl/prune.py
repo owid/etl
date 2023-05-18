@@ -80,8 +80,7 @@ def dag_datasets_dirs(dag_path: Path) -> Set[str]:
             path = parts.netloc + parts.path
             dataset_dirs.append(path)
 
-    # NOTE: garden/reference is a special dataset with tables commited to git
-    return set(dataset_dirs) | {"garden/reference"}
+    return set(dataset_dirs)
 
 
 def local_datasets_dirs(data_dir: Path) -> Set[str]:
