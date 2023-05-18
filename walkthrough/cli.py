@@ -3,7 +3,6 @@ from collections.abc import Iterable
 from typing import Literal
 
 import click
-import streamlit.web.bootstrap
 from pywebio import start_server
 from pywebio.session import go_app
 from rich import print
