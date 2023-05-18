@@ -107,8 +107,8 @@ grapher: .venv
 
 dot: dependencies.pdf
 
-dependencies.pdf: .venv dag.yml etl/to_graphviz.py
-	poetry run python etl/to_graphviz.py dependencies.dot
+dependencies.pdf: .venv dag/main.yml etl/to_graphviz.py
+	poetry run generate_graph dependencies.dot
 	dot -Tpdf dependencies.dot >$@.tmp
 	mv -f $@.tmp $@
 
