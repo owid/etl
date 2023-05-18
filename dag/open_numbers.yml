@@ -149,8 +149,6 @@ steps:
     - github://open-numbers/ddf--oxford--covid_government_response
   data://open_numbers/open_numbers/latest/pwt__penn_world_table:
     - github://open-numbers/ddf--pwt--penn_world_table
-  data://open_numbers/open_numbers/latest/semio__dag_test:
-    - github://open-numbers/ddf--semio--dag_test
   data://open_numbers/open_numbers/latest/sodertorn__stockholm_lan_basomrade:
     - github://open-numbers/ddf--sodertorn--stockholm_lan_basomrade
   data://open_numbers/open_numbers/latest/sodertornsmodellen:

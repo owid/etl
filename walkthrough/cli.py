@@ -1,3 +1,4 @@
+import os
 from collections.abc import Iterable
 from typing import Literal
 
@@ -8,7 +9,7 @@ from rich import print
 
 from . import charts, explorers, garden, grapher, meadow, snapshot, utils
 
-PHASES = Literal["all", "snapshot", "meadow", "garden", "grapher", "explorers", "charts"]
+PHASES = Literal["all", "snapshot", "meadow", "garden", "grapher", "explorers", "charts", "charts-old"]
 
 
 @click.command()
@@ -41,34 +42,43 @@ PHASES = Literal["all", "snapshot", "meadow", "garden", "grapher", "explorers", 
 )
 def cli(phase: Iterable[PHASES], run_checks: bool, dummy_data: bool, auto_open: bool, port: int) -> None:
     print(f"Walkthrough has been opened at http://localhost:{port}/")
-    apps = {
-        "snapshot": snapshot.app,
-        "meadow": meadow.app,
-        "garden": garden.app,
-        "grapher": grapher.app,
-        "explorers": explorers.app,
-        "charts": charts.app,
-    }
+    if phase == "charts":
+        import sys
 
-    # prefill state with dummy data
-    if dummy_data:
-        utils.APP_STATE = utils.DUMMY_DATA
+        from streamlit.web import cli as stcli
 
-    apps_to_start = {app_name: lambda app=app: app(run_checks=run_checks) for app_name, app in apps.items()}
+        script_path = os.path.join(os.path.dirname(__file__), "charts_v2/__main__.py")
+        sys.argv = ["streamlit", "run", script_path, "--server.port", str(port)]
+        sys.exit(stcli.main())
+    else:
+        apps = {
+            "snapshot": snapshot.app,
+            "meadow": meadow.app,
+            "garden": garden.app,
+            "grapher": grapher.app,
+            "explorers": explorers.app,
+            "charts-old": charts.app,
+        }
 
-    def index():
-        go_app(phase, new_window=False)
+        # prefill state with dummy data
+        if dummy_data:
+            utils.APP_STATE = utils.DUMMY_DATA
 
-    # start only one app if given phase, otherwise show default index page
-    if phase != "all":
-        apps_to_start["index"] = index  # type: ignore
+        apps_to_start = {app_name: lambda app=app: app(run_checks=run_checks) for app_name, app in apps.items()}
 
-    start_server(
-        apps_to_start,
-        port=port,
-        debug=True,
-        auto_open_webbrowser=True,
-    )
+        def index():
+            go_app(phase, new_window=False)
+
+        # start only one app if given phase, otherwise show default index page
+        if phase != "all":
+            apps_to_start["index"] = index  # type: ignore
+
+        start_server(
+            apps_to_start,
+            port=port,
+            debug=True,
+            auto_open_webbrowser=True,
+        )
 
 
 if __name__ == "__main__":

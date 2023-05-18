@@ -21,12 +21,12 @@ generate_graph = 'etl.to_graphviz:to_graphviz'
 version_tracker = 'etl.helpers:run_version_tracker_checks'
 etl-match-variables = 'etl.match_variables:main_cli'
 etl-translate-varmap = 'etl.variable_mapping_translate:main_cli'
-etl-chart-suggester = 'etl.chart_revision.v1.cli:main_cli'
+etl-chart-suggester = 'etl.chart_revision.cli:main_cli'
 etl-metadata-export = 'etl.metadata_export:cli'
 etl-datadiff = 'etl.datadiff:cli'
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.10"
 owid-catalog = {path = "vendor/owid-catalog-py", develop = true}
 walden = {path = "vendor/walden", develop = true}
 click = ">=8.0.1"
@@ -63,6 +63,7 @@ owid-repack = "^0.1.2"
 mkdocs-jupyter = "^0.22.0"
 gitpython = "^3.1.30"
 rapidfuzz = "^2.13.7"
+streamlit = "^1.22.0"
 
 [tool.poetry.dev-dependencies]
 pytest = ">=7.1.2"
@@ -80,13 +81,16 @@ jupyter_nbextensions_configurator = ">=0.4.1"
 plotly = ">=5.7.0"
 cookiecutter = ">=2.1.1"
 isort = ">=5.10.1"
-pyright = ">=1.1.277"
+pyright = "1.1.288"
 types-PyYAML = ">=6.0.12"
 
 [tool.poetry.group.dev.dependencies]
 hydra-core = ">=1.3.0"
 mkdocs-material = "<9.0.0"
 pywebio = ">=1.8.2"
+black = {version = "22.3.0", extras = ["jupyter"]}
+# unpinning pandas-stubs would introduce tons of type errors
+pandas-stubs = "1.2.0.62"
 
 [tool.black]
 exclude = ".ipynb_checkpoints|walkthrough/.*_cookiecutter|.*playground.*.ipynb"

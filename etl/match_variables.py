@@ -27,12 +27,12 @@ N_MAX_SUGGESTIONS = 10
 SIMILARITY_NAME = "partial_ratio"
 # Similarity methods currently considered.
 SIMILARITY_NAMES = {
-    "ratio": fuzz.ratio,
+    "token_set_ratio": fuzz.token_set_ratio,
+    "token_sort_ratio": fuzz.token_sort_ratio,
     "partial_ratio": fuzz.partial_ratio,
     "partial_token_set_ratio": fuzz.partial_token_set_ratio,
     "partial_token_sort_ratio": fuzz.partial_token_sort_ratio,
-    "token_set_ratio": fuzz.token_set_ratio,
-    "token_sort_ratio": fuzz.token_sort_ratio,
+    "ratio": fuzz.ratio,
 }
 
 
