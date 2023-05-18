@@ -9,7 +9,6 @@ import etl.grapher_model as gm
 from etl.chart_revision.v2.base import ChartUpdater
 from etl.chart_revision.v2.updaters import (
     ChartUpdaterFASTTReduce,
-    ChartUpdaterGPTSuggestions,
     ChartVariableUpdater,
 )
 from etl.config import GRAPHER_USER_ID
@@ -123,7 +122,7 @@ def build_updaters_and_get_charts(
     charts : List[gm.Chart], optional
         List of charts to be reviewed. Only used if `variable_mapping` is not given.
     chatgpt_reviews : bool, optional
-        Set to True if you want to use ChatGPT to suggest revisions for the charts (e.g. subtitle revisions, etc.). Defaults to False.
+        [NOT IMPLEMENTED] Set to True if you want to use ChatGPT to suggest revisions for the charts (e.g. subtitle revisions, etc.). Defaults to False.
     fastt_reduce : bool, optional
         Set to True if you want to simplify the FASTT. At the moment it just removes the field "data". Defaults to True.
 
@@ -153,7 +152,7 @@ def build_updaters_and_get_charts(
 
     # Add GPT updated if set by user
     if chatgpt_reviews:
-        updaters.append(ChartUpdaterGPTSuggestions())
+        pass
     # Add FASTT reduce updater
     if fastt_reduce:
         updaters.append(ChartUpdaterFASTTReduce())
