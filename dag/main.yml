@@ -74,6 +74,7 @@ steps:
     - snapshot://homicide/2023-01-03/who_mort_db.csv
   data://garden/homicide/2023-01-03/who_mort_db:
     - data://meadow/homicide/2023-01-03/who_mort_db
+    - data://garden/un/2022-07-11/un_wpp
   data://grapher/homicide/2023-01-03/who_mort_db:
     - data://garden/homicide/2023-01-03/who_mort_db
 
@@ -356,7 +357,7 @@ steps:
   - data://garden/wb/2021-07-01/wb_income
   data://grapher/lgbt_rights/2023-04-27/lgbti_policy_index:
   - data://garden/lgbt_rights/2023-04-27/lgbti_policy_index
-  
+
   # Ethnic Power Relations Dataset
   data://meadow/eth/2023-03-15/growup:
   - snapshot://eth/2023-03-15/growup.csv
