@@ -124,7 +124,6 @@ if "charts_obtained" not in st.session_state:
 old_var_selectbox = []
 new_var_selectbox = []
 ignore_selectbox = []
-variable_display_to_id = {}
 charts = []
 updaters = []
 num_charts = 0
@@ -178,7 +177,7 @@ with st.form("form-datasets"):
                 options=SIMILARITY_NAMES,
                 help="Select the prefered function for matching variables. Find more details at https://www.analyticsvidhya.com/blog/2021/07/fuzzy-string-matching-a-hands-on-guide/",
             )
-    submitted_datasets = st.form_submit_button("Submit")
+    submitted_datasets = st.form_submit_button("Submit", type="primary")
     if submitted_datasets:
         st.session_state.submitted_datasets = True
         st.session_state.submitted_variables = False
@@ -205,7 +204,6 @@ if st.session_state.submitted_datasets:
     df = pd.concat([old_variables, new_variables], ignore_index=True)
     df["display_name"] = "[" + df["id"].astype(str) + "] " + df["name"]
     variable_id_to_display = df.set_index("id")["display_name"].to_dict()
-    variable_display_to_id = df.set_index("display_name")["id"].to_dict()
 
     # Get auto variable mapping (if mapping by identical name is enabled)
     mapping, missing_old, missing_new = preliminary_mapping(old_variables, new_variables, map_identical)
@@ -215,8 +213,10 @@ if st.session_state.submitted_datasets:
         variable_mapping_auto = {}
     # Get remaining mapping suggestions
     suggestions = find_mapping_suggestions(missing_old, missing_new, similarity_name)  # type: ignore
+    # Sort by max similarity: First suggestion is that one that has the highest similarity score with any of its suggested new vars
+    suggestions = sorted(suggestions, key=lambda x: x["new"]["similarity"].max(), reverse=True)
 
-    with st.expander("👷  Mapping details (debugging purposes only)"):
+    with st.expander("👷  Mapping details (debugging)"):
         st.subheader("Auto mapping")
         st.write(variable_mapping_auto)
         st.subheader("Suggestions (needs manual mapping)")
@@ -224,7 +224,7 @@ if st.session_state.submitted_datasets:
             st.write(suggestion["old"])
             st.write(suggestion["new"])
 
-    # 2.2 DISPLAY
+    # 2.2 DISPLAY MAPPING SECTION
     st.header(
         "Map variables",
         help="Map variables from the old to the new dataset. The idea is that the variables in the new dataset will replace those from the old dataset in our charts. You can choose to ignore some variables if you want to.",
@@ -237,128 +237,98 @@ if st.session_state.submitted_datasets:
         with st.form("form-variables"):
             col1, col2 = st.columns(2)
             col_1_widths = [5, 1]
+            col_2_widths = [5, 1]
             # Left column (old variables)
             with col1:
                 st.subheader("Old dataset")
-                col11, col21 = st.columns(col_1_widths)
+                col11, col12 = st.columns(col_1_widths)
                 with col11:
                     st.caption(f"[Explore dataset]({env.admin_url}/datasets/{dataset_old_id}/)")
-                with col21:
-                    st.caption("Ignore")
+                with col12:
+                    st.caption("Ignore", help="Check to ignore this variable in the mapping.")
             with col2:
                 st.subheader("New dataset")
-                st.caption(f"[Explore dataset]({env.admin_url}/datasets/{dataset_new_id}/)")
-
+                col21, col22 = st.columns(col_2_widths)
+                with col21:
+                    st.caption(f"[Explore dataset]({env.admin_url}/datasets/{dataset_new_id}/)")
+                with col22:
+                    st.caption(
+                        "Score",
+                        help="Similarity score between the old variable and the 'closest' new variable (from 0 to 100%). Variables with low scores are likely not to have a good match.",
+                    )
             old_var_selectbox = []
             ignore_selectbox = []
             new_var_selectbox = []
 
             # Automatically mapped variables (non-editable)
             for i, (variable_old, variable_new) in enumerate(variable_mapping_auto.items()):
-                col_auto_1, col_auto_2 = st.columns(2)
-                with col_auto_1:
-                    col_auto_11, col_auto_12 = st.columns(col_1_widths)
-                    with col_auto_11:
+                with st.container():
+                    col_auto_1, col_auto_2 = st.columns(2)
+                    with col_auto_1:
+                        col_auto_11, col_auto_12 = st.columns(col_1_widths)
+                        with col_auto_11:
+                            element = st.selectbox(
+                                label=f"auto-{i}-left",
+                                options=[variable_id_to_display[variable_old]],
+                                disabled=True,
+                                label_visibility="collapsed",
+                            )
+                            old_var_selectbox.append(element)
+                        with col_auto_12:
+                            element = st.checkbox("Ignore", key=f"auto-ignore-{i}", label_visibility="collapsed")
+                            ignore_selectbox.append(element)
+                    with col_auto_2:
                         element = st.selectbox(
-                            label=f"auto-{i}-left",
-                            options=[variable_id_to_display[variable_old]],
+                            label=f"auto-{i}-right",
+                            options=[variable_id_to_display[variable_new]],
                             disabled=True,
                             label_visibility="collapsed",
                         )
-                        old_var_selectbox.append(element)
-                    with col_auto_12:
-                        element = st.checkbox("", key=f"auto-ignore-{i}")
-                        ignore_selectbox.append(element)
-                with col_auto_2:
-                    element = st.selectbox(
-                        label=f"auto-{i}-right",
-                        options=[variable_id_to_display[variable_new]],
-                        disabled=True,
-                        label_visibility="collapsed",
-                    )
-                    new_var_selectbox.append(element)
+                        new_var_selectbox.append(element)
 
             # Remaining variables (editable)
             for i, suggestion in enumerate(suggestions):
-                variable_old = suggestion["old"]["id_old"]
-                options = [variable_id_to_display[op] for op in suggestion["new"]["id_new"]]
-                col_manual_1, col_manual_2 = st.columns(2)
-                with col_manual_1:
-                    col_manual_11, col_manual_12 = st.columns(col_1_widths)
-                    with col_manual_11:
-                        element = st.selectbox(
-                            label=f"manual-{i}-left",
-                            options=[variable_id_to_display[variable_old]],
-                            disabled=True,
-                            label_visibility="collapsed",
-                        )
-                        old_var_selectbox.append(element)
-                    with col_manual_12:
-                        element = st.checkbox("", key=f"manual-ignore-{i}")
-                        ignore_selectbox.append(element)
-                with col_manual_2:
-                    element = st.selectbox(
-                        label=f"manual-{i}-right", options=options, disabled=False, label_visibility="collapsed"
-                    )
-                    new_var_selectbox.append(element)
+                with st.container():
+                    variable_old = suggestion["old"]["id_old"]
+                    similarity_max = int(suggestion["new"]["similarity"].max().round(0))
+                    col_manual_1, col_manual_2 = st.columns(2)
+                    with col_manual_1:
+                        col_manual_11, col_manual_12 = st.columns(col_1_widths)
+                        with col_manual_11:
+                            element = st.selectbox(
+                                label=f"manual-{i}-left",
+                                options=[variable_old],
+                                disabled=True,
+                                label_visibility="collapsed",
+                                format_func=variable_id_to_display.get,
+                            )
+                            old_var_selectbox.append(element)
+                        with col_manual_12:
+                            element = st.checkbox("Ignore", key=f"manual-ignore-{i}", label_visibility="collapsed")
+                            ignore_selectbox.append(element)
+                    with col_manual_2:
+                        col_manual_21, col_manual_22 = st.columns(col_2_widths)
+                        with col_manual_21:
+                            element = st.selectbox(
+                                label=f"manual-{i}-right",
+                                options=suggestion["new"]["id_new"],
+                                disabled=False,
+                                label_visibility="collapsed",
+                                format_func=variable_id_to_display.get,
+                            )
+                            new_var_selectbox.append(element)
+                        with col_manual_22:
+                            if similarity_max > 80:
+                                color = "blue"
+                            elif similarity_max > 60:
+                                color = "green"
+                            elif similarity_max > 40:
+                                color = "orange"
+                            else:
+                                color = "red"
+                            st.markdown(f":{color}[**{similarity_max}%**]")
 
-            # with col1:
-            #     st.subheader("Old dataset")
-            #     st.caption(f"[Explore dataset]({env.admin_url}/datasets/{dataset_old_id}/)")
-            #     old_var_selectbox = []  # This will contain references to selectbox elements of old variables
-            #     ignore_selectbox = []  # This will contain references to checkbox elements of old variables
-            #     # Automatically mapped variables (non-editable)
-            #     for i, variable in enumerate(variable_mapping_auto.keys()):
-            #         col11, col12 = st.columns([5, 1])
-            #         with col11:
-            #             element = st.selectbox(
-            #                 label=f"auto-{i}-1",
-            #                 options=[variable_id_to_display[variable]],
-            #                 disabled=True,
-            #                 label_visibility="collapsed",
-            #             )
-            #             old_var_selectbox.append(element)
-            #         with col12:
-            #             element = st.checkbox("Ignore", key=f"auto-ignore-{i}")
-            #             ignore_selectbox.append(element)
-            #     # Remaining variables
-            #     for i, suggestion in enumerate(suggestions):
-            #         # with st.empty():
-            #         variable = suggestion["old"]["id_old"]
-            #         col11, col12 = st.columns([5, 1])
-            #         with col11:
-            #             element = st.selectbox(
-            #                 label=f"manual-{i}-1",
-            #                 options=[variable_id_to_display[variable]],
-            #                 disabled=True,
-            #                 label_visibility="collapsed",
-            #             )
-            #             old_var_selectbox.append(element)
-            #         with col12:
-            #             element = st.checkbox("Ignore", key=f"manual-ignore-{i}")
-            #             ignore_selectbox.append(element)
-            # # Right column (new variables)
-            # with col2:
-            #     st.subheader("New dataset")
-            #     st.caption(f"[Explore dataset]({env.admin_url}/datasets/{dataset_new_id}/)")
-            #     new_var_selectbox = []  # This will contain references to selectbox elements of new variables
-            #     # Automatically mapped variables (non-editable)
-            #     for i, variable in enumerate(variable_mapping_auto.values()):
-            #         element = st.selectbox(
-            #             label=f"auto-{i}-2",
-            #             options=[variable_id_to_display[variable]],
-            #             disabled=True,
-            #             label_visibility="collapsed",
-            #         )
-            #         new_var_selectbox.append(element)
-            #     # Remaining variables
-            #     for i, suggestion in enumerate(suggestions):
-            #         options = [variable_id_to_display[op] for op in suggestion["new"]["id_new"]]
-            #         element = st.selectbox(
-            #             label=f"manual-{i}-2", options=options, disabled=False, label_visibility="collapsed"
-            #         )
-            #         new_var_selectbox.append(element)
-            submitted_variables = st.form_submit_button("Submit")
+            submitted_variables = st.form_submit_button("Submit", type="primary")
             if submitted_variables:
                 st.session_state.submitted_variables = True
                 st.session_state.submitted_revisions = False
@@ -379,7 +349,7 @@ if st.session_state.submitted_variables:
     if len(new_var_selectbox) != len(ignore_selectbox):
         raise ValueError("Something went wrong! The number of new variables and ignore checkboxes is different.")
     variable_mapping = {
-        variable_display_to_id[old]: variable_display_to_id[new]
+        int(old): int(new)
         for old, new, ignore in zip(old_var_selectbox, new_var_selectbox, ignore_selectbox)
         if not ignore
     }
@@ -400,7 +370,7 @@ if st.session_state.submitted_variables:
         num_charts = len(charts)
         with st.container():
             st.info(f"""Number of charts to be updated: {num_charts}""")
-        with st.expander("👷  Show variable id mapping"):
+        with st.expander("🔎  Show variable id mapping"):
             st.write(variable_mapping)
         with st.expander("📊  Show affected charts (before update)"):
             for chart in charts:
@@ -411,7 +381,9 @@ if st.session_state.submitted_variables:
                 )
 
         # Button to finally submit the revisions
-        submitted_revisions = st.button(label="🚀 CREATE AND SUBMIT CHART REVISIONS", use_container_width=True)
+        submitted_revisions = st.button(
+            label="🚀 CREATE AND SUBMIT CHART REVISIONS", use_container_width=True, type="primary"
+        )
         if submitted_revisions:
             st.session_state.submitted_revisions = True
             log.info(
