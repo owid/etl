@@ -27,8 +27,14 @@ log = get_logger()
 # Functions
 @st.cache_data
 def get_datasets():
-    datasets = get_all_datasets(archived=False)
-    return datasets.sort_values("name")
+    """Load datasets."""
+    with st.spinner("Retrieving datasets..."):
+        try:
+            datasets = get_all_datasets(archived=False)
+        except OperationalError as e:
+            raise OperationalError(f"Could not retrieve datasets. Try reloading the page. If the error persists, please report an issue. Error: {e}")
+        else:
+            return datasets.sort_values("name")
 
 
 def get_variables_from_datasets(dataset_id_1: int, dataset_id_2: int):
