@@ -316,7 +316,15 @@ if st.session_state.submitted_datasets:
                             )
                             new_var_selectbox.append(element)
                         with col_manual_22:
-                            st.text(f"{similarity_max}%")
+                            if similarity_max > 80:
+                                color = "blue"
+                            elif similarity_max > 60:
+                                color = "green"
+                            elif similarity_max > 40:
+                                color = "orange"
+                            else:
+                                color = "red"
+                            st.markdown(f":{color}[**{similarity_max}%**]")
 
             submitted_variables = st.form_submit_button("Submit")
             if submitted_variables:
