@@ -254,7 +254,7 @@ if st.session_state.submitted_datasets:
                 with col22:
                     st.caption(
                         "Score",
-                        help="Similarity score between the old variable and the 'closest' new variable (from 0 to 100%)",
+                        help="Similarity score between the old variable and the 'closest' new variable (from 0 to 100%). Variables with low scores are likely not to have a good match.",
                     )
             old_var_selectbox = []
             ignore_selectbox = []
