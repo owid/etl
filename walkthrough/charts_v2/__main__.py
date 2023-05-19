@@ -32,7 +32,9 @@ def get_datasets():
         try:
             datasets = get_all_datasets(archived=False)
         except OperationalError as e:
-            raise OperationalError(f"Could not retrieve datasets. Try reloading the page. If the error persists, please report an issue. Error: {e}")
+            raise OperationalError(
+                f"Could not retrieve datasets. Try reloading the page. If the error persists, please report an issue. Error: {e}"
+            )
         else:
             return datasets.sort_values("name")
 
