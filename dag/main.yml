@@ -199,7 +199,7 @@ steps:
     - backport://backport/owid/latest/dataset_2710_child_mortality_rates__selected_gapminder__v10__2017
     - backport://backport/owid/latest/dataset_581_daily_supply_of_calories_per_person__owid_based_on_un_fao__and__historical_sources
     - data://garden/demography/2023-02-03/life_expectancy
-    - data://garden/owid/latest/key_indicators
+    - data://garden/regions/2023-01-01/regions
     - data://garden/gcp/2023-04-28/global_carbon_budget
     - data://garden/democracy/2023-03-02/vdem
     # The following step is not the latest version available.
