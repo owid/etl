@@ -360,7 +360,7 @@ tables:
       exclpop_headcount:
         title: Population in marginalized ethnic groups (MEG)
         description:
-          - Population of all MEG groups in this country<br>
+          - Population of all MEG groups in this country.<br>
           - *description_ethnic_group
           - *description_meg
         unit: ""
