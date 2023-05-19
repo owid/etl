@@ -213,6 +213,8 @@ if st.session_state.submitted_datasets:
         variable_mapping_auto = {}
     # Get remaining mapping suggestions
     suggestions = find_mapping_suggestions(missing_old, missing_new, similarity_name)  # type: ignore
+    # Sort by max similarity: First suggestion is that one that has the highest similarity score with any of its suggested new vars
+    suggestions = sorted(suggestions, key=lambda x: x["new"]["similarity"].max(), reverse=True)
 
     with st.expander("👷  Mapping details (debugging)"):
         st.subheader("Auto mapping")
