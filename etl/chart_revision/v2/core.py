@@ -7,10 +7,7 @@ from structlog import get_logger
 
 import etl.grapher_model as gm
 from etl.chart_revision.v2.base import ChartUpdater
-from etl.chart_revision.v2.updaters import (
-    ChartUpdaterFASTTReduce,
-    ChartVariableUpdater,
-)
+from etl.chart_revision.v2.updaters import ChartUpdaterFASTTReduce, ChartVariableUpdater
 from etl.config import GRAPHER_USER_ID
 from etl.db import get_engine
 

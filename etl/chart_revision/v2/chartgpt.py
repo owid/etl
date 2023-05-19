@@ -1,13 +1,13 @@
 import json
+from typing import Any, Dict
+
 import openai
 from sqlmodel import Session
 from structlog import get_logger
-from typing import Any, Dict
 
+import etl.grapher_model as gm
 from etl.chart_revision.v2.base import ChartUpdater
 from etl.db import get_engine
-import etl.grapher_model as gm
-
 
 # ChatGPT model name
 # details: https://platform.openai.com/docs/models
@@ -74,15 +74,21 @@ def suggest_new_config_fields(config: Dict[str, Any], num_suggestions: int) -> D
         try:
             response = json.loads(response)
         except ValueError:
-            log.error(f"Could not parse new configuration #{i}! Returned response is not a JSON with fields `title` and `subtitle`: {response}.")
+            log.error(
+                f"Could not parse new configuration #{i}! Returned response is not a JSON with fields `title` and `subtitle`: {response}."
+            )
         else:
             if "title" not in response or "subtitle" not in response:
-                log.error(f"Could not parse new configuration #{i}! Returned response is not a JSON with fields `title` and `subtitle`: {response}.")
+                log.error(
+                    f"Could not parse new configuration #{i}! Returned response is not a JSON with fields `title` and `subtitle`: {response}."
+                )
             else:
-                configs.append({
-                    "title": response["title"],
-                    "subtitle": response["subtitle"],
-                })
+                configs.append(
+                    {
+                        "title": response["title"],
+                        "subtitle": response["subtitle"],
+                    }
+                )
     return configs
 
 
