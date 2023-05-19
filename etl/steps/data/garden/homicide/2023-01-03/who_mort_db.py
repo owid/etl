@@ -7,6 +7,7 @@ from owid.catalog.utils import underscore
 from structlog import get_logger
 
 from etl.data_helpers import geo
+from etl.data_helpers.population import add_population
 from etl.helpers import PathFinder
 from etl.paths import DATA_DIR
 
@@ -33,7 +34,8 @@ def run(dest_dir: str) -> None:
     df["sex"] = df["sex"].str.lower()
     log.info("who_mort_df.calculate_youth_homicides")
     df = calculate_youth_homicide_rate(df)
-    df = clean_up_dimensions(df)
+    # df = clean_up_dimensions(df)
+    # We are not interested in the other age
 
     df_piv = df.pivot_table(
         index=["country", "year"],
@@ -55,6 +57,7 @@ def run(dest_dir: str) -> None:
 
     for col in tb_garden.columns:
         tb_garden[col].metadata = build_metadata(col)
+    tb_garden.columns = [underscore(col) for col in tb_garden.columns.values]
 
     ds_garden.add(tb_garden)
 
@@ -64,6 +67,82 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
     log.info("who_mort_db.end")
+
+
+def build_custom_age_groups(df: pd.DataFrame) -> pd.DataFrame:
+    """Estimate all the metrics for a broader age group."""
+
+    # Add population values for each dimension
+    log.info("who: add population values")
+    AGE_GROUPS_RANGES = {
+        "Age00": [0, 0],
+        "Age01_04": [1, 4],
+        "Age05_09": [5, 9],
+        "Age10_14": [10, 14],
+        "Age15_19": [15, 19],
+        "Age20_24": [20, 24],
+        "Age25_29": [25, 29],
+        "Age30_34": [30, 34],
+        "Age35_39": [35, 39],
+        "Age40_44": [40, 44],
+        "Age45_49": [45, 49],
+        "Age50_54": [50, 54],
+        "Age55_59": [55, 59],
+        "Age60_64": [60, 64],
+        "Age65_69": [65, 69],
+        "Age70_74": [70, 74],
+        "Age75_79": [75, 79],
+        "Age80_84": [80, 84],
+        "Age85_over": [85, None],
+        "Age_all": [0, None],
+    }
+    df = add_population(
+        df=df,
+        country_col="country",
+        year_col="year",
+        sex_col="sex",
+        sex_group_all="all",
+        sex_group_female="female",
+        sex_group_male="male",
+        age_col="age_group_code",
+        age_group_mapping=AGE_GROUPS_RANGES,
+    )
+    # Map age groups to broader age groups. Missing age groups in the list are passed as they are (no need to assign to broad group)
+    log.info("ghe: create broader age groups")
+    AGE_GROUPS = {
+        "Age00": "Age0_14",
+        "Age1_4": "Age0_14",
+        "Age5_9": "Age0_14",
+        "Age10_14": "Age0_14",
+        "Age15_19": "Age15_24",
+        "Age20_24": "Age15_24",
+        "Age25_29": "Age25_49",
+        "Age30_34": "Age25_49",
+        "Age35_39": "Age25_49",
+        "Age40_44": "Age25_49",
+        "Age45_49": "Age25_49",
+        "Age50_54": "Age50_69",
+        "Age55_59": "Age50_69",
+        "Age60_64": "Age50_69",
+        "Age65_69": "Age50_69",
+        "Age70_74": "Age70_over",
+        "Age75_79": "Age70_over",
+        "Age80-84": "Age70_over",
+        "Age85_over": "Age70_over",
+    }
+    df_sh["age_group"] = df_sh["age_group"].map(AGE_GROUPS)
+
+    # Sum
+    df_sh = df_sh.groupby(["country", "year", "age_group", "sex", "cause"], as_index=False, observed=True).sum()
+    # Fix column values (rates + flag)
+    df_sh["daly_rate100k"] = 100000 * df_sh["daly_count"] / df_sh["population"]
+    df_sh["death_rate100k"] = 100000 * df_sh["death_count"] / df_sh["population"]
+    df_sh["flag_level"] = 3
+    df_sh = df_sh.drop(columns=["population"])
+
+    log.info("ghe: concatenate dfs")
+    df = pd.concat([df, df_sh], axis=0, ignore_index=True, sort=False)
+    return df
 
 
 def clean_up_dimensions(df: pd.DataFrame) -> pd.DataFrame:
