@@ -105,8 +105,11 @@ def add_population(
             # Define min and max age range in group
             age_min = age_ranges[0] if age_ranges[0] is not None else -1
             age_max = age_ranges[1] if age_ranges[1] is not None else 1000
-            # Keep ages in group
-            pop_g = pop[(pop["age"] >= age_min) & (pop["age"] < age_max)].copy()
+            # Keep ages in group - allows for selection of single years in group
+            if age_min == age_max:
+                pop_g = pop[(pop["age"] >= age_min) & (pop["age"] <= age_max)].copy()
+            else:
+                pop_g = pop[(pop["age"] >= age_min) & (pop["age"] < age_max)].copy()
             # Group by dimensions, replace age group name
             pop_g = (
                 pop_g.drop(columns=["age"])
