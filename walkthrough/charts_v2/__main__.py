@@ -177,7 +177,7 @@ with st.form("form-datasets"):
                 options=SIMILARITY_NAMES,
                 help="Select the prefered function for matching variables. Find more details at https://www.analyticsvidhya.com/blog/2021/07/fuzzy-string-matching-a-hands-on-guide/",
             )
-    submitted_datasets = st.form_submit_button("Submit")
+    submitted_datasets = st.form_submit_button("Submit", type="primary")
     if submitted_datasets:
         st.session_state.submitted_datasets = True
         st.session_state.submitted_variables = False
@@ -236,8 +236,8 @@ if st.session_state.submitted_datasets:
     else:
         with st.form("form-variables"):
             col1, col2 = st.columns(2)
-            col_1_widths = [6, 1]
-            col_2_widths = [6, 1]
+            col_1_widths = [5, 1]
+            col_2_widths = [5, 1]
             # Left column (old variables)
             with col1:
                 st.subheader("Old dataset")
@@ -245,7 +245,7 @@ if st.session_state.submitted_datasets:
                 with col11:
                     st.caption(f"[Explore dataset]({env.admin_url}/datasets/{dataset_old_id}/)")
                 with col12:
-                    st.caption("", help="Check to ignore this variable in the mapping.")
+                    st.caption("Ignore", help="Check to ignore this variable in the mapping.")
             with col2:
                 st.subheader("New dataset")
                 col21, col22 = st.columns(col_2_widths)
@@ -253,7 +253,7 @@ if st.session_state.submitted_datasets:
                     st.caption(f"[Explore dataset]({env.admin_url}/datasets/{dataset_new_id}/)")
                 with col22:
                     st.caption(
-                        "",
+                        "Score",
                         help="Similarity score between the old variable and the 'closest' new variable (from 0 to 100%)",
                     )
             old_var_selectbox = []
@@ -328,7 +328,7 @@ if st.session_state.submitted_datasets:
                                 color = "red"
                             st.markdown(f":{color}[**{similarity_max}%**]")
 
-            submitted_variables = st.form_submit_button("Submit")
+            submitted_variables = st.form_submit_button("Submit", type="primary")
             if submitted_variables:
                 st.session_state.submitted_variables = True
                 st.session_state.submitted_revisions = False
@@ -381,7 +381,9 @@ if st.session_state.submitted_variables:
                 )
 
         # Button to finally submit the revisions
-        submitted_revisions = st.button(label="🚀 CREATE AND SUBMIT CHART REVISIONS", use_container_width=True)
+        submitted_revisions = st.button(
+            label="🚀 CREATE AND SUBMIT CHART REVISIONS", use_container_width=True, type="primary"
+        )
         if submitted_revisions:
             st.session_state.submitted_revisions = True
             log.info(
