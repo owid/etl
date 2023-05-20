@@ -372,8 +372,8 @@ if st.session_state.submitted_datasets:
                                 element_check = st.checkbox(
                                     "Explore", key=f"auto-explore-{i}", label_visibility="collapsed"
                                 )
-                    if enable_explore and element_check:
-                        plot_comparison_two_variables(df_data, variable_old, variable_new, variable_id_to_display)
+                    if enable_explore and element_check:  # type: ignore
+                        plot_comparison_two_variables(df_data, variable_old, variable_new, variable_id_to_display)  # type: ignore
 
             # Remaining variables (editable)
             for i, suggestion in enumerate(suggestions):

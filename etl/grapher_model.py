@@ -847,7 +847,7 @@ class Variable(SQLModel, table=True):
 
     @classmethod
     def load_variables(cls, session: Session, variables_id: List[int]) -> List["Variable"]:
-        return session.exec(select(cls).where(cls.id.in_(variables_id))).all()
+        return session.exec(select(cls).where(cls.id.in_(variables_id))).all()  # type: ignore
 
     def s3_data_path(self) -> str:
         """Path to S3 with data in JSON format for Grapher. Typically
