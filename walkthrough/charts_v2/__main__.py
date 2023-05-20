@@ -2,113 +2,37 @@ from urllib.error import URLError
 
 import pandas as pd
 import streamlit as st
-from MySQLdb import OperationalError
 from structlog import get_logger
 
-from etl import config
 from etl.chart_revision.v2.core import (
-    build_updaters_and_get_charts,
     create_chart_comparison,
     submit_chart_comparisons,
     update_chart_config,
 )
-from etl.db import get_all_datasets, get_connection, get_variables_in_dataset
 from etl.match_variables import (
     SIMILARITY_NAMES,
     find_mapping_suggestions,
     preliminary_mapping,
 )
 from walkthrough.utils import OWIDEnv
+from walkthrough.charts_v2.utils import (
+    get_datasets,
+    get_variables_from_datasets,
+    build_updaters_and_get_charts_cached,
+    _check_env_and_environment,
+)
+from walkthrough.charts_v2.dataset_mapping import build_dataset_form
+
 
 # logger
 log = get_logger()
 
 
-# Functions
-@st.cache_data
-def get_datasets():
-    """Load datasets."""
-    with st.spinner("Retrieving datasets..."):
-        try:
-            datasets = get_all_datasets(archived=False)
-        except OperationalError as e:
-            raise OperationalError(
-                f"Could not retrieve datasets. Try reloading the page. If the error persists, please report an issue. Error: {e}"
-            )
-        else:
-            return datasets.sort_values("name")
-
-
-def get_variables_from_datasets(dataset_id_1: int, dataset_id_2: int):
-    """Get variables from two datasets."""
-    with get_connection() as db_conn:
-        # Get variables from old dataset that have been used in at least one chart.
-        old_variables = get_variables_in_dataset(db_conn=db_conn, dataset_id=dataset_id_1, only_used_in_charts=True)
-        # Get all variables from new dataset.
-        new_variables = get_variables_in_dataset(db_conn=db_conn, dataset_id=dataset_id_2, only_used_in_charts=False)
-    return old_variables, new_variables
-
-
-def _check_env() -> bool:
-    """Check if environment variables are set correctly."""
-    ok = True
-    for env_name in ("GRAPHER_USER_ID", "DB_USER", "DB_NAME", "DB_HOST"):
-        if getattr(config, env_name) is None:
-            ok = False
-            st.warning(st.markdown(f"Environment variable `{env_name}` not found, do you have it in your `.env` file?"))
-
-    if ok:
-        st.success("`.env` configured correctly")
-    return ok
-
-
-def _show_environment():
-    # show variables (from .env)
-    st.info(
-        f"""
-    * **GRAPHER_USER_ID**: `{config.GRAPHER_USER_ID}`
-    * **DB_USER**: `{config.DB_USER}`
-    * **DB_NAME**: `{config.DB_NAME}`
-    * **DB_HOST**: `{config.DB_HOST}`
-    """
-    )
-
-
-@st.cache_resource
-def _check_env_and_environment():
-    ok = _check_env()
-    if ok:
-        # check that you can connect to DB
-        try:
-            with st.spinner():
-                _ = get_connection()
-        except OperationalError as e:
-            st.error(
-                "We could not connect to the database. If connecting to a remote database, remember to"
-                f" ssh-tunel into it using the appropriate ports and then try again.\n\nError:\n{e}"
-            )
-            ok = False
-        except Exception as e:
-            raise e
-        else:
-            msg = "Connection to the Grapher database was successfull!"
-            st.success(msg)
-            st.subheader("Environment")
-            _show_environment()
-
-
-@st.cache_data
-def build_updaters_and_get_charts_cached(variable_mapping):
-    return build_updaters_and_get_charts(variable_mapping=variable_mapping)
-
-
+# Page config
 st.set_page_config(page_title="Chart revisions baker", layout="wide", page_icon="🧑‍🍳")
 st.title("🧑‍🍳 Chart revisions baker")
-# get dataset
+# Get datasets
 DATASETS = get_datasets()
-# build dataset display name
-DATASETS["display_name"] = "[" + DATASETS["id"].astype(str) + "] " + DATASETS["name"]
-display_name_to_id_mapping = DATASETS.set_index("display_name")["id"].to_dict()
 # OWID Env
 env = OWIDEnv()
 # Session states
@@ -151,44 +75,7 @@ Note that this step is equivalent to running `etl-match-variables` and `etl-char
 # 1 DATASET MAPPING
 ##########################################################################################
 with st.form("form-datasets"):
-    st.header(
-        "Dataset update",
-        help="Variable mapping will be done from the old to the new dataset. The idea is that the variables in the new dataset will replace those from the old dataset in our charts.",
-    )
-    col1, col2 = st.columns(2)
-    with col1:
-        dataset_old = st.selectbox(
-            label="Old dataset",
-            options=DATASETS["display_name"],
-            help="Dataset containing variables to be replaced in our charts.",
-        )
-    with col2:
-        dataset_new = st.selectbox(
-            label="New dataset",
-            options=DATASETS["display_name"],
-            help="Dataset contianinng the new variables. These will replace the old variables in our charts.",
-        )
-    col0, _, _ = st.columns(3)
-    with col0:
-        with st.expander("Other parameters"):
-            map_identical = st.checkbox("Map identically named variables", value=True)
-            similarity_name = st.selectbox(
-                label="Similarity matching function",
-                options=SIMILARITY_NAMES,
-                help="Select the prefered function for matching variables. Find more details at https://www.analyticsvidhya.com/blog/2021/07/fuzzy-string-matching-a-hands-on-guide/",
-            )
-    submitted_datasets = st.form_submit_button("Submit", type="primary")
-    if submitted_datasets:
-        st.session_state.submitted_datasets = True
-        st.session_state.submitted_variables = False
-        st.session_state.submitted_revisions = False
-        log.info(
-            f"{st.session_state.submitted_datasets}, {st.session_state.submitted_variables}, {st.session_state.submitted_revisions}"
-        )
-
-    # Get IDs of datasets
-    dataset_old_id = display_name_to_id_mapping[dataset_old]
-    dataset_new_id = display_name_to_id_mapping[dataset_new]
+    dataset_old_id, dataset_new_id, map_identical, similarity_name = build_dataset_form(DATASETS, SIMILARITY_NAMES)
 
 
 ##########################################################################################
@@ -269,9 +156,10 @@ if st.session_state.submitted_datasets:
                         with col_auto_11:
                             element = st.selectbox(
                                 label=f"auto-{i}-left",
-                                options=[variable_id_to_display[variable_old]],
+                                options=[variable_old],
                                 disabled=True,
                                 label_visibility="collapsed",
+                                format_func=variable_id_to_display.get,
                             )
                             old_var_selectbox.append(element)
                         with col_auto_12:
@@ -280,9 +168,10 @@ if st.session_state.submitted_datasets:
                     with col_auto_2:
                         element = st.selectbox(
                             label=f"auto-{i}-right",
-                            options=[variable_id_to_display[variable_new]],
+                            options=[variable_new],
                             disabled=True,
                             label_visibility="collapsed",
+                            format_func=variable_id_to_display.get,
                         )
                         new_var_selectbox.append(element)
 
