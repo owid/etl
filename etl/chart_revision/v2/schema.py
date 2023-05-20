@@ -24,7 +24,7 @@ def get_schema_chart_config() -> Dict[str, Any]:
     """
     return requests.get(
         f"https://files.ourworldindata.org/schemas/grapher-schema.{SCHEMA_VERSION}.json",
-        timeout=10,
+        timeout=20,
     ).json()
 
 
