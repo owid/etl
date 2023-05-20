@@ -1,5 +1,5 @@
 import json
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 import openai
 from sqlmodel import Session
@@ -35,7 +35,7 @@ Return the title and subtitle in JSON format. For example, if the title is "This
 log = get_logger()
 
 
-def ask_gpt(question: str, system_prompt: str = "", model: str = "gpt-4", num_responses: int = 1) -> str:
+def ask_gpt(question: str, system_prompt: str = "", model: str = "gpt-4", num_responses: int = 1) -> List[str]:
     """Ask chatGPT a question, with a system prompt.
 
     More on its API can be found at https://platform.openai.com/docs/api-reference.
@@ -51,10 +51,10 @@ def ask_gpt(question: str, system_prompt: str = "", model: str = "gpt-4", num_re
         frequency_penalty=1,
         n=num_responses,
     )
-    return [c["message"]["content"] for c in response["choices"]]
+    return [c["message"]["content"] for c in response["choices"]]  # type: ignore
 
 
-def suggest_new_config_fields(config: Dict[str, Any], num_suggestions: int) -> Dict[str, Any]:
+def suggest_new_config_fields(config: Dict[str, Any], num_suggestions: int) -> List[Dict[str, Any]]:
     """Obtain `num_suggestions` new configurations for a given chart configuration.
 
     Note that the new configurations only contain the affected fields (e.g. title and subtitle).
