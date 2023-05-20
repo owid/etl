@@ -318,7 +318,7 @@ def _data_diff(table_a: Table, table_b: Table, eq: pd.Series, col: str, dims: li
 
     # changes in index
     for dim in dims:
-        diff_elements = sorted(list(set(table_a.loc[~eq, dim])))
+        diff_elements = table_a.loc[~eq, dim].dropna().unique().astype(str).sort_values().tolist()
         detail = f"{len(diff_elements)} affected" if len(diff_elements) > 5 else ", ".join(diff_elements)
         lines.append(f"- {dim}: {detail}")
 
