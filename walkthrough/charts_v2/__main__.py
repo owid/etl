@@ -1,3 +1,5 @@
+from http.client import RemoteDisconnected
+from typing import List
 from urllib.error import URLError
 
 import pandas as pd
@@ -5,6 +7,7 @@ import streamlit as st
 from MySQLdb import OperationalError
 from structlog import get_logger
 
+from backport.datasync.data_metadata import variable_data_df_from_s3
 from etl import config
 from etl.chart_revision.v2.core import (
     build_updaters_and_get_charts,
@@ -12,7 +15,12 @@ from etl.chart_revision.v2.core import (
     submit_chart_comparisons,
     update_chart_config,
 )
-from etl.db import get_all_datasets, get_connection, get_variables_in_dataset
+from etl.db import (
+    get_all_datasets,
+    get_connection,
+    get_engine,
+    get_variables_in_dataset,
+)
 from etl.match_variables import (
     SIMILARITY_NAMES,
     find_mapping_suggestions,
@@ -97,12 +105,63 @@ def _check_env_and_environment():
             _show_environment()
 
 
-@st.cache_data
+@st.cache_data(show_spinner=False)
 def build_updaters_and_get_charts_cached(variable_mapping):
+    st.write(variable_mapping)
     return build_updaters_and_get_charts(variable_mapping=variable_mapping)
 
 
-st.set_page_config(page_title="Chart revisions baker", layout="wide", page_icon="🧑‍🍳")
+@st.cache_data(show_spinner=False)
+def get_variable_data_cached(variables_ids: List[int]):
+    df = variable_data_df_from_s3(get_engine(), variable_ids=[int(v) for v in variables_ids], workers=10)
+    return df
+
+
+@st.cache_data(show_spinner=False)
+def build_df_comparison_two_variables_cached(df, variable_old, variable_new, var_id_to_display):
+    df_variables = df[df["variableId"].isin([variable_old, variable_new])]
+    df_variables.loc[:, "value"] = df_variables.value.astype(float)
+    df_variables = df_variables.pivot(index=["entityName", "year"], columns="variableId", values="value").reset_index()
+    df_variables["Relative difference"] = (
+        (df_variables[variable_old] - df_variables[variable_new]) / df_variables[variable_old]
+    ).abs()
+    df_variables = df_variables.rename(columns=var_id_to_display).sort_values("Relative difference", ascending=False)
+    return df_variables
+
+
+def plot_comparison_two_variables(df, variable_old, variable_new, var_id_to_display):
+    df_variables = build_df_comparison_two_variables_cached(df, variable_old, variable_new, var_id_to_display)
+    st.dataframe(df_variables)
+    # years = sorted(set(df_variables["year"]))
+    # year = st.select_slider('Year', years)
+    # df_variables_year = df_variables[df_variables["year"] == year]
+    # chart = alt.Chart(df_variables_year).mark_bar().encode(
+    #     x="diff",
+    #     y="entityName",
+    #     tooltip='entityName',
+    # ).interactive()
+    # st.altair_chart(chart, theme="streamlit", use_container_width=True)
+
+
+st.set_page_config(
+    page_title="Chart revisions baker",
+    layout="wide",
+    page_icon="🧑‍🍳",
+    initial_sidebar_state="collapsed",
+    menu_items={
+        "Report a bug": "https://github.com/owid/etl/issues/new?assignees=marigold%2Clucasrodes&labels=walkthrough&projects=&template=walkthrough-issue---.md&title=walkthrough%3A+meaningful+title+for+the+issue",
+        "About": """
+After the new dataset has been correctly upserted into the database, we need to update the affected charts. This step helps with that. These are the steps (this is all automated):
+
+- The user is asked to choose the _old dataset_ and the _new dataset_.
+- The user has to establish a mapping between variables in the _old dataset_ and in the _new dataset_. This mapping tells Grapher how to "replace" old variables with new ones.
+- The tool creates chart revisions for all the public charts using variables in the _old dataset_ that have been mapped to variables in the _new dataset_.
+- Once the chart revisions are created, you can review these and submit them to the database so that they become available on the _Approval tool_.
+
+Note that this step is equivalent to running `etl-match-variables` and `etl-chart-suggester` commands in terminal. Call them in terminal with option `--help` for more details.
+""",
+    },
+)
 st.title("🧑‍🍳 Chart revisions baker")
 # get dataset
 DATASETS = get_datasets()
@@ -118,8 +177,10 @@ if "submitted_variables" not in st.session_state:
     st.session_state.submitted_variables = False
 if "submitted_revisions" not in st.session_state:
     st.session_state.submitted_revisions = False
-if "charts_obtained" not in st.session_state:
-    st.session_state.charts_obtained = False
+if "show_submission_details" not in st.session_state:
+    st.session_state.show_submission_details = False
+if "variable_mapping" not in st.session_state:
+    st.session_state.variable_mapping = {}
 # Others
 old_var_selectbox = []
 new_var_selectbox = []
@@ -131,21 +192,8 @@ num_charts = 0
 # CONFIGURATION SIDEBAR
 with st.sidebar:
     t1, t2 = st.tabs(["Environment", "About this tool"])
-    with t1:
-        _check_env_and_environment()
-    with t2:
-        st.markdown(
-            """
-After the new dataset has been correctly upserted into the database, we need to update the affected charts. This step helps with that. These are the steps (this is all automated):
+    _check_env_and_environment()
 
-- The user is asked to choose the _old dataset_ and the _new dataset_.
-- The user has to establish a mapping between variables in the _old dataset_ and in the _new dataset_. This mapping tells Grapher how to "replace" old variables with new ones.
-- The tool creates chart revisions for all the public charts using variables in the _old dataset_ that have been mapped to variables in the _new dataset_.
-- Once the chart revisions are created, you can review these and submit them to the database so that they become available on the _Approval tool_.
-
-Note that this step is equivalent to running `etl-match-variables` and `etl-chart-suggester` commands in terminal. Call them in terminal with option `--help` for more details.
-"""
-        )
 
 ##########################################################################################
 # 1 DATASET MAPPING
@@ -170,16 +218,22 @@ with st.form("form-datasets"):
         )
     col0, _, _ = st.columns(3)
     with col0:
-        with st.expander("Other parameters"):
+        with st.expander("Parameters"):
             map_identical = st.checkbox("Map identically named variables", value=True)
+            enable_explore = st.checkbox(
+                "Explore variable mappings with charts (Experimental)",
+                help="Compare the variable mappings with some charts. This might take some time initially, as we need to download data values from S3",
+                value=False,
+            )
             similarity_name = st.selectbox(
                 label="Similarity matching function",
                 options=SIMILARITY_NAMES,
                 help="Select the prefered function for matching variables. Find more details at https://www.analyticsvidhya.com/blog/2021/07/fuzzy-string-matching-a-hands-on-guide/",
             )
-    submitted_datasets = st.form_submit_button("Submit", type="primary")
+    submitted_datasets = st.form_submit_button("Next", type="primary")
     if submitted_datasets:
         st.session_state.submitted_datasets = True
+        st.session_state.show_submission_details = False
         st.session_state.submitted_variables = False
         st.session_state.submitted_revisions = False
         log.info(
@@ -216,13 +270,28 @@ if st.session_state.submitted_datasets:
     # Sort by max similarity: First suggestion is that one that has the highest similarity score with any of its suggested new vars
     suggestions = sorted(suggestions, key=lambda x: x["new"]["similarity"].max(), reverse=True)
 
+    # Get data points
+    if enable_explore:
+        with st.spinner(
+            "Retrieving data values from S3. This might take some time... If you don't need this, disable the 'Explore' option from the 'parameters' section."
+        ):
+            df_data = get_variable_data_cached(list(set(old_variables["id"]) | set(new_variables["id"])))
+
     with st.expander("👷  Mapping details (debugging)"):
-        st.subheader("Auto mapping")
+        st.subheader("Variable mapping")
+        st.markdown("##### Automatically mapped variables")
         st.write(variable_mapping_auto)
-        st.subheader("Suggestions (needs manual mapping)")
+        st.markdown("##### Variables that need manual mapping from the user.")
         for suggestion in suggestions:
+            st.markdown(f"##### Variable #{suggestion['old']['id_old']}")
             st.write(suggestion["old"])
             st.write(suggestion["new"])
+    # Get all variable IDs used in this section
+
+    # Sample dataset ALTAIR
+    # 179981
+    # df_ = df_data[df_data["variableId"] == list(old_variables["id"])[0]]
+    # alt.Chart(df_).mark_line().encode(x="year", y="value", color="entityName").interactive()
 
     # 2.2 DISPLAY MAPPING SECTION
     st.header(
@@ -234,11 +303,12 @@ if st.session_state.submitted_datasets:
             f"It looks as the dataset [{dataset_old_id}](https://owid.cloud) has no variable in use in any chart! Therefore, no mapping is needed."
         )
     else:
-        with st.form("form-variables"):
+        with st.container():
             col1, col2 = st.columns(2)
-            col_1_widths = [5, 1]
-            col_2_widths = [5, 1]
-            # Left column (old variables)
+            col_1_widths = [6, 1]
+            col_2_widths = [7, 1, 1] if enable_explore else [6, 1]
+
+            # Titles
             with col1:
                 st.subheader("Old dataset")
                 col11, col12 = st.columns(col_1_widths)
@@ -248,14 +318,20 @@ if st.session_state.submitted_datasets:
                     st.caption("Ignore", help="Check to ignore this variable in the mapping.")
             with col2:
                 st.subheader("New dataset")
-                col21, col22 = st.columns(col_2_widths)
-                with col21:
+                cols2 = st.columns(col_2_widths)
+                with cols2[0]:
                     st.caption(f"[Explore dataset]({env.admin_url}/datasets/{dataset_new_id}/)")
-                with col22:
+                with cols2[1]:
                     st.caption(
                         "Score",
                         help="Similarity score between the old variable and the 'closest' new variable (from 0 to 100%). Variables with low scores are likely not to have a good match.",
                     )
+                if enable_explore:
+                    with cols2[2]:
+                        st.caption(
+                            "Explore",
+                            help="Explore the distribution of the currently compared variables.",
+                        )
             old_var_selectbox = []
             ignore_selectbox = []
             new_var_selectbox = []
@@ -265,26 +341,39 @@ if st.session_state.submitted_datasets:
                 with st.container():
                     col_auto_1, col_auto_2 = st.columns(2)
                     with col_auto_1:
-                        col_auto_11, col_auto_12 = st.columns(col_1_widths)
-                        with col_auto_11:
+                        cols_auto = st.columns(col_1_widths)
+                        with cols_auto[0]:
                             element = st.selectbox(
                                 label=f"auto-{i}-left",
-                                options=[variable_id_to_display[variable_old]],
+                                options=[variable_old],
                                 disabled=True,
                                 label_visibility="collapsed",
+                                format_func=variable_id_to_display.get,
                             )
                             old_var_selectbox.append(element)
-                        with col_auto_12:
+                        with cols_auto[1]:
                             element = st.checkbox("Ignore", key=f"auto-ignore-{i}", label_visibility="collapsed")
                             ignore_selectbox.append(element)
                     with col_auto_2:
-                        element = st.selectbox(
-                            label=f"auto-{i}-right",
-                            options=[variable_id_to_display[variable_new]],
-                            disabled=True,
-                            label_visibility="collapsed",
-                        )
-                        new_var_selectbox.append(element)
+                        cols_auto_2 = st.columns(col_2_widths)
+                        with cols_auto_2[0]:
+                            element = st.selectbox(
+                                label=f"auto-{i}-right",
+                                options=[variable_new],
+                                disabled=True,
+                                label_visibility="collapsed",
+                                format_func=variable_id_to_display.get,
+                            )
+                            new_var_selectbox.append(element)
+                        with cols_auto_2[1]:
+                            st.markdown(":violet[**100%**]")
+                        if enable_explore:
+                            with cols_auto_2[2]:
+                                element_check = st.checkbox(
+                                    "Explore", key=f"auto-explore-{i}", label_visibility="collapsed"
+                                )
+                    if enable_explore and element_check:
+                        plot_comparison_two_variables(df_data, variable_old, variable_new, variable_id_to_display)
 
             # Remaining variables (editable)
             for i, suggestion in enumerate(suggestions):
@@ -307,8 +396,8 @@ if st.session_state.submitted_datasets:
                             element = st.checkbox("Ignore", key=f"manual-ignore-{i}", label_visibility="collapsed")
                             ignore_selectbox.append(element)
                     with col_manual_2:
-                        col_manual_21, col_manual_22 = st.columns(col_2_widths)
-                        with col_manual_21:
+                        cols_manual_2 = st.columns(col_2_widths)
+                        with cols_manual_2[0]:
                             element = st.selectbox(
                                 label=f"manual-{i}-right",
                                 options=suggestion["new"]["id_new"],
@@ -317,7 +406,7 @@ if st.session_state.submitted_datasets:
                                 format_func=variable_id_to_display.get,
                             )
                             new_var_selectbox.append(element)
-                        with col_manual_22:
+                        with cols_manual_2[1]:
                             if similarity_max > 80:
                                 color = "blue"
                             elif similarity_max > 60:
@@ -327,10 +416,16 @@ if st.session_state.submitted_datasets:
                             else:
                                 color = "red"
                             st.markdown(f":{color}[**{similarity_max}%**]")
+                        if enable_explore:
+                            with cols_manual_2[2]:
+                                element = st.checkbox(
+                                    "Explore", key=f"manual-explore-{i}", label_visibility="collapsed"
+                                )
 
-            submitted_variables = st.form_submit_button("Submit", type="primary")
+            submitted_variables = st.button("Next", type="primary")
             if submitted_variables:
                 st.session_state.submitted_variables = True
+                st.session_state.show_submission_details = True
                 st.session_state.submitted_revisions = False
                 log.info(
                     f"{st.session_state.submitted_datasets}, {st.session_state.submitted_variables}, {st.session_state.submitted_revisions}"
@@ -339,7 +434,7 @@ if st.session_state.submitted_datasets:
 ##########################################################################################
 # 3 CHART REVISIONS BAKING
 ##########################################################################################
-if st.session_state.submitted_variables:
+if st.session_state.submitted_datasets and st.session_state.show_submission_details:
     st.header("Submission details")
     # BUILD MAPPING
     if len(old_var_selectbox) != len(new_var_selectbox):
@@ -355,12 +450,22 @@ if st.session_state.submitted_variables:
     }
 
     # Get updaters and charts to update
-    with st.spinner("Retrieving charts to be updated. This can take up to 1 minute..."):
-        log.info("chart_revision: building updaters and getting charts!!!!")
+    if st.session_state.submitted_variables:
+        with st.spinner("Retrieving charts to be updated. This can take up to 1 minute..."):
+            log.info("chart_revision: building updaters and getting charts!!!!")
+            try:
+                st.session_state.variable_mapping = variable_mapping
+                updaters, charts = build_updaters_and_get_charts_cached(variable_mapping=variable_mapping)
+            except (URLError, RemoteDisconnected) as e:
+                st.error(e.__traceback__)
+                error_submitting_variables = True
+            else:
+                error_submitting_variables = False
+    else:
         try:
-            updaters, charts = build_updaters_and_get_charts_cached(variable_mapping=variable_mapping)
-        except URLError as e:
-            st.error(e)
+            updaters, charts = build_updaters_and_get_charts_cached(variable_mapping=st.session_state.variable_mapping)
+        except (URLError, RemoteDisconnected) as e:
+            st.error(e.__traceback__)
             error_submitting_variables = True
         else:
             error_submitting_variables = False
@@ -373,6 +478,7 @@ if st.session_state.submitted_variables:
         with st.expander("🔎  Show variable id mapping"):
             st.write(variable_mapping)
         with st.expander("📊  Show affected charts (before update)"):
+            st.warning("Charts that are not public at ourworldindata.org will not be rendered correctly.")
             for chart in charts:
                 slug = chart.config["slug"]
                 st.markdown(
@@ -389,8 +495,10 @@ if st.session_state.submitted_variables:
             log.info(
                 f"{st.session_state.submitted_datasets}, {st.session_state.submitted_variables}, {st.session_state.submitted_revisions}"
             )
+        else:
+            st.session_state.submitted_revisions = False
         st.divider()
-
+        st.session_state.submitted_variables = False
 ##########################################################################################
 # 4 CHART REVISIONS SUBMISSION
 ##########################################################################################
