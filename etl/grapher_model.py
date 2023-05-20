@@ -828,6 +828,10 @@ class Variable(SQLModel, table=True):
     def load_variable(cls, session: Session, variable_id: int) -> "Variable":
         return session.exec(select(cls).where(cls.id == variable_id)).one()
 
+    @classmethod
+    def load_variables(cls, session: Session, variables_id: List[int]) -> List["Variable"]:
+        return session.exec(select(cls).where(cls.id.in_(variables_id))).all()
+
     def s3_data_path(self) -> str:
         """Path to S3 with data in JSON format for Grapher. Typically
         s3://owid-catalog/baked-variables/live_grapher/data/123.json."""
