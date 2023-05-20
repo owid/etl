@@ -6,7 +6,6 @@ from sqlmodel import Session
 from structlog import get_logger
 
 import etl.grapher_model as gm
-from etl.chart_revision.v2.base import ChartUpdater
 from etl.db import get_engine
 
 # ChatGPT model name
@@ -20,7 +19,7 @@ You are a researcher and science communicator that publishes charts on various t
 To improve these fields, focus on the following:
 
 - Make sure the title and subtitle are short and concise.
-- Don't make the title longer.
+- Don't make the title or subtitle longer.
 - Ideally, the title length should be less than 80 characters
 - Ideally, the subtitle length should be less than 250 characters.
 - Do not use title case for the title.
