@@ -35,7 +35,12 @@ LIMIT_VARIABLES_SLIDER_CHECK = 50
 class ChartVariableUpdater(ChartUpdater):
     """Handle chart updates when there are updates on variables."""
 
-    def __init__(self, variable_mapping: Dict[int, int], schema: Optional[Dict[str, Any]] = None) -> None:
+    def __init__(
+        self,
+        variable_mapping: Dict[int, int],
+        schema: Optional[Dict[str, Any]] = None,
+        skip_slider_check_limit: Optional[int] = None,
+    ) -> None:
         """Constructor.
 
         Parameters
@@ -44,6 +49,9 @@ class ChartVariableUpdater(ChartUpdater):
             Mapping between old and new variable IDs.
         schema : Optional[Dict[str, Any]]
             Schema of the chart configuration. Defaults to None.
+        skip_slider_check_limit : int
+            If the number of variables to be updated is greater than this value, the slider range check is disabled. That is, no changes to the slider are performed.
+            This is to avoid errors when updating charts with many variables. Defaults to None.
         """
         # Variable mapping dictionary: Old variable ID -> New variable ID
         self.variable_mapping = variable_mapping
@@ -59,7 +67,12 @@ class ChartVariableUpdater(ChartUpdater):
         else:
             self.schema = get_schema_chart_config()
         # Check range for slider
-        self.slider_range_check = True
+        self.__slider_range_check = None
+        if skip_slider_check_limit is None:
+            self.num_variables_to_skip_slider_check = LIMIT_VARIABLES_SLIDER_CHECK
+        else:
+            self.num_variables_to_skip_slider_check = skip_slider_check_limit
+        log.info(f"HEHE: {self.num_variables_to_skip_slider_check}")
 
     @property
     def variable_meta(self) -> Dict[int, Any]:
@@ -69,6 +82,15 @@ class ChartVariableUpdater(ChartUpdater):
                 "Variable metadata is not set. `variable_metadata` is set when `find_charts_to_be_updated` is called."
             )
         return self.__variable_meta
+
+    @property
+    def slider_range_check(self) -> bool:
+        """Check if slider range check is enabled."""
+        if self.__slider_range_check is None:
+            raise ValueError(
+                "Slider range check is not set. `slider_range_check` is set when `find_charts_to_be_updated` is called."
+            )
+        return self.__slider_range_check
 
     def find_charts_to_be_updated(self) -> List[gm.Chart]:
         """Find charts that use the variables that are being updated.
@@ -84,14 +106,15 @@ class ChartVariableUpdater(ChartUpdater):
         charts = find_charts_from_variable_ids(self.variable_ids_old)
         # Get variables
         variable_ids = self._get_all_variables_from_charts(charts)
-        log.info(self.variable_ids_old)
-        log.info(
-            f"variable_update: getting variable metadata of {len(variable_ids)} variables from {len(charts)} charts"
-        )
-        if len(variable_ids) > LIMIT_VARIABLES_SLIDER_CHECK:
-            self.slider_range_check = False
+        if len(variable_ids) > self.num_variables_to_skip_slider_check:
+            self.__slider_range_check = False
+        else:
+            self.__slider_range_check = True
         # Get metadata for variables in use in the charts
         if (self.__variable_meta is None) and self.slider_range_check:
+            log.info(
+                f"variable_update: getting variable metadata of {len(variable_ids)} variables from {len(charts)} charts"
+            )
             self.__variable_meta = self._get_variable_metadata(variable_ids)
         return charts
 
