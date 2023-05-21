@@ -666,10 +666,18 @@ class SuggestedChartRevisions(SQLModel, table=True):
             Computed("(if((`status` in (_utf8mb4'pending',_utf8mb4'flagged')),true,NULL))", persisted=False),
         ),
     )
+    changesInDataSummary: Optional[str] = Field(
+        default=None, sa_column=Column("changesInDataSummary", String(512, "utf8mb4_0900_as_cs"))
+    )
+    experimental: Optional[Dict[Any, Any]] = Field(sa_column=Column("experimental", JSON, nullable=False))
 
     charts: Optional["Chart"] = Relationship(back_populates="suggested_chart_revisions")
     users: Optional["User"] = Relationship(back_populates="suggested_chart_revisions")
     users_: Optional["User"] = Relationship(back_populates="suggested_chart_revisions_")
+
+    @classmethod
+    def load_pending(cls, session: Session):
+        return session.exec(select(SuggestedChartRevisions).where(SuggestedChartRevisions.status == "pending")).all()
 
 
 class DimensionFilter(TypedDict):
