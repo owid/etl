@@ -38,6 +38,7 @@ updaters = []
 num_charts = 0
 variable_mapping = {}
 variable_config = None
+submission_config = None
 
 ##########################################################################################
 # 1 DATASET MAPPING
@@ -67,8 +68,10 @@ if st.session_state.submitted_datasets:
 if st.session_state.submitted_datasets and st.session_state.show_submission_details:
     st.header("Submission details")
     if variable_config is not None:
-        submission_config = create_submission(variable_config, SCHEMA_CHART_CONFIG)
-
+        if variable_config.is_valid:
+            submission_config = create_submission(variable_config, SCHEMA_CHART_CONFIG)
+        else:
+            st.error("Something went wrong with the submission. Please try again. Report the error #003001")
 
 ##########################################################################################
 # 4 CHART REVISIONS SUBMISSION
@@ -76,5 +79,8 @@ if st.session_state.submitted_datasets and st.session_state.show_submission_deta
 # TODO: add description
 ##########################################################################################
 if st.session_state.submitted_datasets and st.session_state.submitted_revisions:
-    if submission_config is not None and submission_config.is_valid:
-        push_submission(submission_config, owid_env)
+    if submission_config is not None:
+        if submission_config.is_valid:
+            push_submission(submission_config, owid_env)
+        else:
+            st.error("Something went wrong with the submission. Please try again. Report the error #004001")

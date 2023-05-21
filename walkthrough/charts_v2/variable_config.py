@@ -225,11 +225,14 @@ def ask_and_get_variable_mapping(search_form, owid_env: OWIDEnv) -> "VariableCon
 
 
 class VariableConfig(BaseModel):
+    is_valid: bool = False
     variable_mapping: Dict[int, int] = {}
     skip_slider_check: Literal[0, 1, 2] = 0
 
     def __init__(self, **data: Any) -> None:
         """Constructor."""
+        if "variable_mapping" in data and "skip_slider_check" in data:
+            data["is_valid"] = True
         super().__init__(**data)
 
     @property
