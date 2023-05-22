@@ -34,7 +34,7 @@ def run(dest_dir: str) -> None:
     #
     # Load inputs.
     # Load reference file with country names in OWID standard
-    df_countries_regions = cast(Dataset, paths.load_dependency("regions"))["regions"]
+    df_countries_regions = cast(Dataset, paths.load_dependency("regions"))["regions"][["name", "iso_alpha2"]]
 
     # Create a new meadow dataset with the same metadata as the snapshot.
     snap = paths.load_dependency("lis_keyvars.csv")
