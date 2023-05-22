@@ -1,6 +1,7 @@
 """Utils for key_indicators module."""
 import pandas as pd
-from owid.datautils import geo
+
+from etl.data_helpers import geo
 
 
 def add_regions(df: pd.DataFrame) -> pd.DataFrame:
