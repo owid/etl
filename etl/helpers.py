@@ -161,7 +161,7 @@ class MultipleMatchingStepsAmongDependencies(ExceptionFromDocstring):
 
 
 class UnknownChannel(ExceptionFromDocstring):
-    """Unknown channel name. Valid channels are 'walden', 'snapshot', 'meadow', 'garden', or 'grapher'."""
+    """Unknown channel name. Valid channels are 'examples', 'walden', 'snapshot', 'meadow', 'garden', or 'grapher'."""
 
 
 class WrongStepName(ExceptionFromDocstring):
@@ -272,7 +272,7 @@ class PathFinder:
         # Suffix to add to, e.g. "data" if step is private.
         is_private_suffix = "-private" if is_private else ""
 
-        if channel in ["meadow", "garden", "grapher", "explorers"]:
+        if channel in ["meadow", "garden", "grapher", "explorers", "examples"]:
             step_name = f"data{is_private_suffix}://{channel}/{namespace}/{version}/{short_name}"
         elif channel in ["snapshot", "walden"]:
             step_name = f"{channel}{is_private_suffix}://{namespace}/{version}/{short_name}"
