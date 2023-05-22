@@ -1,7 +1,7 @@
 import concurrent.futures
 import json
 from http.client import RemoteDisconnected
-from typing import Any, Dict, List, Union
+from typing import cast, Any, Dict, List, Union
 from urllib.error import HTTPError, URLError
 
 import pandas as pd
@@ -76,7 +76,10 @@ def variable_data_df_from_s3(
     with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as executor:
         results = list(executor.map(lambda data_path: _fetch_data_df_from_s3(data_path), data_paths))
 
-    df = pd.concat(results)
+    if isinstance(results, list) and all(isinstance(df, pd.DataFrame) for df in results):
+        df = pd.concat(cast(List[pd.DataFrame], results))
+    else:
+        raise TypeError(f"results must be a list of pd.DataFrame, got {type(results)}")
 
     # we work with strings and convert to specific types later
     df["value"] = df["value"].astype(str)
