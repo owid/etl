@@ -72,7 +72,6 @@ class ChartVariableUpdater(ChartUpdater):
             self.num_variables_to_skip_slider_check = LIMIT_VARIABLES_SLIDER_CHECK
         else:
             self.num_variables_to_skip_slider_check = skip_slider_check_limit
-        log.info(f"HEHE: {self.num_variables_to_skip_slider_check}")
 
     @property
     def variable_meta(self) -> Dict[int, Any]:
