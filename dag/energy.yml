@@ -7,7 +7,7 @@ steps:
     - backport://backport/owid/latest/dataset_5347_statistical_review_of_world_energy__bp__2021
     - data://garden/owid/latest/key_indicators
     - data://garden/wb/2021-07-01/wb_income
-    - data://garden/reference
+    - data://garden/regions/2023-01-01/regions
   #
   # BP - Statistical review 2022.
   #
@@ -21,7 +21,7 @@ steps:
     - data://garden/bp/2022-07-11/statistical_review
     - data://garden/owid/latest/key_indicators
     - data://garden/wb/2021-07-01/wb_income
-    - data://garden/reference
+    - data://garden/regions/2023-01-01/regions
   data://grapher/bp/2022-12-28/statistical_review:
     - data://garden/bp/2022-12-28/statistical_review
   #
@@ -40,7 +40,7 @@ steps:
     - walden://shift/2022-07-18/fossil_fuel_production
   data://garden/shift/2022-07-18/fossil_fuel_production:
     - data://meadow/shift/2022-07-18/fossil_fuel_production
-    - data://garden/reference
+    - data://garden/regions/2023-01-01/regions
   #
   # Energy - Fossil Fuel Production 2023.
   #
@@ -58,7 +58,7 @@ steps:
   data://garden/eia/2022-07-27/energy_consumption:
     - data://meadow/eia/2022-07-27/energy_consumption
     - data://garden/owid/latest/key_indicators
-    - data://garden/reference
+    - data://garden/regions/2023-01-01/regions
   #
   # Energy - Primary energy consumption 2023.
   #
@@ -78,7 +78,7 @@ steps:
     - data://meadow/ember/2023-02-20/yearly_electricity
     - data://garden/demography/2022-12-08/population
     - data://garden/wb/2021-07-01/wb_income
-    - data://garden/reference
+    - data://garden/regions/2023-01-01/regions
   #
   # Ember - European electricity review 2022.
   #
@@ -87,7 +87,7 @@ steps:
     - walden://ember/2022-02-01/european_electricity_review
   data://garden/ember/2022-08-01/european_electricity_review:
       - data://meadow/ember/2022-08-01/european_electricity_review
-      - data://garden/reference
+      - data://garden/regions/2023-01-01/regions
   #
   # Ember - European electricity review 2023.
   #
@@ -121,7 +121,7 @@ steps:
     - data://garden/energy/2023-02-20/electricity_mix
     - data://garden/demography/2022-12-08/population
     - data://garden/ggdc/2020-10-01/ggdc_maddison
-    - data://garden/reference
+    - data://garden/regions/2023-01-01/regions
   #
   # Smil - Global primary energy (2017).
   #
@@ -188,7 +188,7 @@ steps:
   data://garden/irena/2022-10-25/renewable_energy_patents:
     - data://meadow/irena/2022-10-25/renewable_energy_patents
     - data://garden/wb/2021-07-01/wb_income
-    - data://garden/reference
+    - data://garden/regions/2023-01-01/regions
   # The grapher dataset uses only the wide table from the garden dataset.
   data://grapher/irena/2022-10-25/renewable_energy_patents:
     - data://garden/irena/2022-10-25/renewable_energy_patents
@@ -219,7 +219,7 @@ steps:
     - data://garden/bp/2022-07-11/statistical_review
     - data://garden/owid/latest/key_indicators
     - data://garden/wb/2021-07-01/wb_income
-    - data://garden/reference
+    - data://garden/regions/2023-01-01/regions
   data://garden/bp/2022-07-14/energy_mix:
     - data://garden/bp/2022-07-14/statistical_review
     - data://garden/owid/latest/key_indicators

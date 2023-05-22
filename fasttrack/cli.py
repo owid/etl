@@ -1,7 +1,6 @@
 import datetime as dt
 import difflib
 import functools
-import json
 import os
 import urllib.error
 from enum import Enum
@@ -35,7 +34,13 @@ from etl.command import main as etl_main
 from etl.compare import diff_print
 from etl.db import get_engine
 from etl.files import apply_black_formatter_to_files
-from etl.paths import BASE_DIR, DAG_DIR, REFERENCE_DATASET, SNAPSHOTS_DIR, STEP_DIR
+from etl.paths import (
+    BASE_DIR,
+    DAG_DIR,
+    LATEST_REGIONS_DATASET_PATH,
+    SNAPSHOTS_DIR,
+    STEP_DIR,
+)
 from etl.snapshot import Snapshot, SnapshotMeta
 from walkthrough import utils as walkthrough_utils
 
@@ -576,12 +581,8 @@ def _harmonize_countries(df: pd.DataFrame) -> Tuple[pd.DataFrame, List[str]]:
     """Check if all countries are harmonized."""
     po.put_markdown("""## Harmonizing countries...""")
 
-    alias_to_country = (
-        Dataset(REFERENCE_DATASET)["countries_regions"][["name", "aliases"]]
-        .assign(aliases=lambda df: df.aliases.map(lambda s: json.loads(s) if isinstance(s, str) else None))
-        .explode("aliases")
-        .set_index("aliases")["name"]
-    )
+    ds_regions = Dataset(LATEST_REGIONS_DATASET_PATH)
+    alias_to_country = ds_regions["definitions"].join(ds_regions["aliases"], how="left").set_index("alias")["name"]
 
     df = df.reset_index()
 

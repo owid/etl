@@ -50,6 +50,9 @@ def add_population(
             ...
         }
 
+        Population within the range [min_age, max_age] will be assigned to the age group `age_group_name_in_input_dataframe`.
+        To get single-year values, use max_age = min_age + 1.
+
     Returns
     -------
     pd.DataFrame
@@ -105,9 +108,10 @@ def add_population(
             # Define min and max age range in group
             age_min = age_ranges[0] if age_ranges[0] is not None else -1
             age_max = age_ranges[1] if age_ranges[1] is not None else 1000
-            # Keep ages in group
-            pop_g = pop[(pop["age"] >= age_min) & (pop["age"] < age_max)].copy()
-            # Group by dimensions, replace age group name
+            # Keep ages in group - allows for selection of single years in group
+            pop_g = pop[
+                (pop["age"] >= age_min) & (pop["age"] <= age_max)
+            ].copy()  # Group by dimensions, replace age group name
             pop_g = (
                 pop_g.drop(columns=["age"])
                 .groupby(["location", "year", "sex"], as_index=False, observed=True)

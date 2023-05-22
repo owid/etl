@@ -6,48 +6,48 @@ dataset:
 tables:
   definitions:
     variables:
-      name:
+      name: &ref_name
         title: "Region name"
         description: |
           Region name.
-      short_name:
+      short_name: &ref_short_name
         title: "Region short name"
         description: |
           Region short name, to be used in certain visualizations that are short of space.
-      region_type:
+      region_type: &ref_region_type
         title: "Region type"
         description: |
           Type of region (e.g. country or continent). These types are not accurate, given that many regions have a complicated political status, and it is out of the scope of this dataset to adopt precise definitions.
-      is_historical:
+      is_historical: &ref_is_historical
         title: "Is historical"
         description: |
           True if the region does not currently exist, but existed in the past.
-      defined_by:
+      defined_by: &ref_defined_by
         title: "Defined by"
         description: |
           Institution that introduced a certain definition. For example, if a certain region was found in a dataset of a certain institution, this variable will contain the name of the institution (in a short, snake_case form, e.g. "owid").
 
   aliases:
     variables:
-      alias:
+      alias: &ref_alias
         title: "Alias"
         description: |
           Alternative name for a region. For example, "U.S" is a common alias of region "United States".
 
   members:
     variables:
-      member:
+      member: &ref_member
         title: "Member"
         description: |
           Member of a region.
 
   related:
     variables:
-      member:
+      member: &ref_related
         title: "Possible member"
         description: |
           Possible member of a region. Here, membership is defined rather vaguely: A member can be a sub-region of a country, an overseas territory, a country inside a continent, etc.
-          
+
           The status of many regions is unclear or contested, and by defining these dependencies we are not making any political statement. We simply define possible overlaps between geographical regions that can be found in datasets, to ensure we never double-count the contribution from those regions when creating aggregate data.
 
   transitions:
@@ -62,3 +62,14 @@ tables:
           Successor of a historical region.
 
           A successor is defined as a region that starts existing after a certain historical region stops existing, occupying (partially or totally) the same geographic area.
+
+  regions:
+    variables:
+      name: *ref_name
+      short_name: *ref_short_name
+      region_type: *ref_region_type
+      is_historical: *ref_is_historical
+      defined_by: *ref_defined_by
+      members: *ref_member
+      aliases: *ref_alias
+      related: *ref_related

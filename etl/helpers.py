@@ -161,7 +161,7 @@ class MultipleMatchingStepsAmongDependencies(ExceptionFromDocstring):
 
 
 class UnknownChannel(ExceptionFromDocstring):
-    """Unknown channel name. Valid channels are 'walden', 'snapshot', 'meadow', 'garden', or 'grapher'."""
+    """Unknown channel name. Valid channels are 'examples', 'walden', 'snapshot', 'meadow', 'garden', or 'grapher'."""
 
 
 class WrongStepName(ExceptionFromDocstring):
@@ -272,7 +272,7 @@ class PathFinder:
         # Suffix to add to, e.g. "data" if step is private.
         is_private_suffix = "-private" if is_private else ""
 
-        if channel in ["meadow", "garden", "grapher", "explorers"]:
+        if channel in ["meadow", "garden", "grapher", "explorers", "examples"]:
             step_name = f"data{is_private_suffix}://{channel}/{namespace}/{version}/{short_name}"
         elif channel in ["snapshot", "walden"]:
             step_name = f"{channel}{is_private_suffix}://{namespace}/{version}/{short_name}"
@@ -702,8 +702,7 @@ class VersionTracker:
                 & (self.step_attributes_df["channel"].isin(["meadow", "garden"]))
             ]["step"]
         )
-        # The only main data step that is not explicitly in the DAG is the reference dataset (which should be removed soon).
-        missing_steps = latest_data_steps - set(list(self.dag_active) + ["data://garden/reference"])
+        missing_steps = latest_data_steps - set(list(self.dag_active))
         if len(missing_steps) > 0:
             for missing_step in missing_steps:
                 print(f"Step {missing_step} is the latest version of a step and hence should be in the dag.")

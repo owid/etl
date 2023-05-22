@@ -1,7 +1,7 @@
 import pandas as pd
 from owid.catalog import Dataset, DatasetMeta, Table
 
-from etl.datadiff import DatasetDiff
+from etl.datadiff import DatasetDiff, _data_diff
 
 
 def test_DatasetDiff_summary(tmp_path):
@@ -35,3 +35,18 @@ def test_DatasetDiff_summary(tmp_path):
         "\t\t[yellow]~ Column [b]a[/b] (changed [u]data & metadata[/u])",
         "\t\t[green]+ Column [b]b[/b]",
     ]
+
+
+def test_data_diff():
+    table_a = Table({"country": ["UK", "US"], "a": [1, 2]})
+    table_b = Table({"country": ["UK", "US"], "a": [1, 3]})
+    out = _data_diff(table_a, table_b, col="a", dims=["country"], tabs=0)
+    print(out)
+    assert (
+        out
+        == """
+[violet]- Changed values: 1 / 2 (50.00%)
+[violet]- country: US
+[violet]- Avg. change: 1.00 (40%)
+    """.strip()
+    )

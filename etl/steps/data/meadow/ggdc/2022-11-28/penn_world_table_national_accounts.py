@@ -1,3 +1,5 @@
+from typing import cast
+
 import pandas as pd
 from owid.catalog import Dataset, Table, TableMeta
 from owid.catalog.utils import underscore_table
@@ -5,7 +7,6 @@ from owid.walden import Catalog as WaldenCatalog
 from structlog import get_logger
 
 from etl.helpers import PathFinder
-from etl.paths import REFERENCE_DATASET
 from etl.steps.data.converters import convert_walden_metadata
 
 log = get_logger()
@@ -29,9 +30,7 @@ def run(dest_dir: str) -> None:
     # df = clean_data(df)
 
     # Read reference dataset for countries and regions
-
-    ds_reference = Dataset(REFERENCE_DATASET)
-    df_countries_regions = pd.DataFrame(ds_reference["countries_regions"]).reset_index()
+    df_countries_regions = cast(Dataset, N.load_dependency("regions"))["regions"]
 
     # Merge dataset and country dictionary to get the name of the country (and rename it as "country")
     df = pd.merge(
@@ -39,6 +38,7 @@ def run(dest_dir: str) -> None:
     )
     df = df.rename(columns={"name": "country"})
     df = df.drop(columns=["iso_alpha3"])
+    df = df.astype({"countrycode": str, "country": str})
 
     # Add country names for some specific 3-letter codes
     df.loc[df["countrycode"] == "CH2", ["country"]] = "China (alternative inflation series)"

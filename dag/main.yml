@@ -16,7 +16,7 @@ steps:
     - data://garden/demography/2022-12-08/population
     - data://open_numbers/open_numbers/latest/open_numbers__world_development_indicators
     - data://garden/wb/2021-07-01/wb_income
-    - data://garden/reference
+    - data://garden/regions/2023-01-01/regions
   # UN WPP (2022)
   data://meadow/un/2022-07-11/un_wpp:
     - snapshot://un/2022-07-11/un_wpp.zip
@@ -35,6 +35,7 @@ steps:
   # Others
   data://grapher/who/2021-07-01/ghe:
     - data://garden/who/2021-07-01/ghe
+    - data://garden/regions/2023-01-01/regions
   data://meadow/living_planet/2020-09-10/lpd:
     - walden://living_planet/2020-09-10/lpd
   data://garden/living_planet/2020-09-10/lpd:
@@ -120,7 +121,7 @@ steps:
   data://garden/technology/2022/internet:
     - data://garden/worldbank_wdi/2022-05-26/wdi
     - data://garden/owid/latest/key_indicators
-    - data://garden/reference
+    - data://garden/regions/2023-01-01/regions
   data://grapher/technology/2022/internet:
     - data://garden/technology/2022/internet
 
@@ -180,7 +181,7 @@ steps:
     - data://meadow/emdat/2022-11-24/natural_disasters
     - data://garden/owid/latest/key_indicators
     - data://garden/wb/2021-07-01/wb_income
-    - data://garden/reference
+    - data://garden/regions/2023-01-01/regions
     - data://garden/worldbank_wdi/2022-05-26/wdi
   # The following dataset has all (yearly and decadal) variables together.
   data://grapher/emdat/2022-11-24/natural_disasters:
@@ -200,6 +201,7 @@ steps:
     - backport://backport/owid/latest/dataset_581_daily_supply_of_calories_per_person__owid_based_on_un_fao__and__historical_sources
     - data://garden/demography/2023-02-03/life_expectancy
     - data://garden/owid/latest/key_indicators
+    - data://garden/regions/2023-01-01/regions
     - data://garden/gcp/2023-04-28/global_carbon_budget
     - data://garden/democracy/2023-03-02/vdem
     # The following step is not the latest version available.
@@ -231,7 +233,7 @@ steps:
     - walden://ggdc/2021-06-18/penn_world_table
   data://meadow/ggdc/2022-11-28/penn_world_table_national_accounts:
     - walden://ggdc/2021-06-18/penn_world_table_national_accounts
-    - data://garden/reference
+    - data://garden/regions/2023-01-01/regions
   data://garden/ggdc/2022-11-28/penn_world_table:
     - data://meadow/ggdc/2022-11-28/penn_world_table
     - data://meadow/ggdc/2022-11-28/penn_world_table_national_accounts
@@ -259,6 +261,7 @@ steps:
     - snapshot://lis/2023-01-18/lis_keyvars.csv
     - snapshot://lis/2023-01-18/lis_abs_poverty.csv
     - snapshot://lis/2023-01-18/lis_distribution.csv
+    - data://garden/regions/2023-01-01/regions
   data://garden/lis/2023-01-18/luxembourg_income_study:
     - data://meadow/lis/2023-01-18/luxembourg_income_study
   data://grapher/lis/2023-01-18/luxembourg_income_study:
@@ -268,6 +271,7 @@ steps:
 
   # World Inequality Database
   data://meadow/wid/2023-01-27/world_inequality_database:
+    - data://garden/regions/2023-01-01/regions
     - snapshot://wid/2023-01-27/world_inequality_database.csv
   data://garden/wid/2023-01-27/world_inequality_database:
     - data://meadow/wid/2023-01-27/world_inequality_database
@@ -352,11 +356,10 @@ steps:
   data://garden/lgbt_rights/2023-04-27/lgbti_policy_index:
   - data://meadow/lgbt_rights/2023-04-27/lgbti_policy_index
   - data://garden/demography/2023-03-31/population
-  - data://garden/reference
   - data://garden/wb/2021-07-01/wb_income
   data://grapher/lgbt_rights/2023-04-27/lgbti_policy_index:
   - data://garden/lgbt_rights/2023-04-27/lgbti_policy_index
-  
+
   # Ethnic Power Relations Dataset
   data://meadow/eth/2023-03-15/growup:
   - snapshot://eth/2023-03-15/growup.csv
@@ -364,7 +367,7 @@ steps:
   - data://meadow/eth/2023-03-15/growup
   - data://garden/demography/2023-03-31/population
   - data://garden/wb/2021-07-01/wb_income
-  - data://garden/reference
+  - data://garden/regions/2023-01-01/regions
   data://grapher/eth/2023-03-15/ethnic_power_relations:
   - data://garden/eth/2023-03-15/ethnic_power_relations
 

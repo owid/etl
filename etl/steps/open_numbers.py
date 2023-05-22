@@ -25,7 +25,7 @@ from owid.catalog.meta import Source
 from owid.repack import repack_series
 
 from etl.git import GithubRepo
-from etl.paths import REFERENCE_DATASET
+from etl.paths import DATA_DIR
 
 log = structlog.get_logger()
 
@@ -225,8 +225,7 @@ GM_TO_OWID_ISO_CODES = {
 
 def iso_gm2owid(ds: Variable) -> Variable:
     # Load reference OWID country file
-    reference_dataset = Dataset(REFERENCE_DATASET)
-    countries_regions = reference_dataset["countries_regions"]
+    countries_regions = Dataset(DATA_DIR / "garden/regions/2023-01-01/regions")["regions"]
     # Standardize
     return ds.str.upper().map(GM_TO_OWID_ISO_CODES).map(countries_regions["name"])
 

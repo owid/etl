@@ -2,6 +2,8 @@
 
 """
 
+from typing import cast
+
 import numpy as np
 import pandas as pd
 from owid import catalog
@@ -10,7 +12,6 @@ from shared import add_population, add_region_aggregates, correct_data_points
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
-from etl.paths import DATA_DIR
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -490,11 +491,7 @@ def run(dest_dir: str) -> None:
     df_population = pd.DataFrame(tb_population)
 
     # Load regions dataset.
-    # ds_regions: Dataset = paths.load_dependency("regions")
-    ds_regions = Dataset(DATA_DIR / "garden/reference")
-    # Load main table from dataset.
-    tb_regions = ds_regions["countries_regions"]
-    # Create a dataframe out of the table.
+    tb_regions = cast(Dataset, paths.load_dependency("regions"))["regions"]
     df_regions = pd.DataFrame(tb_regions)
 
     # Load income groups dataset.

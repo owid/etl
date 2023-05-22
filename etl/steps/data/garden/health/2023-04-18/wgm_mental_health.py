@@ -1,6 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from typing import List
+from typing import List, cast
 
 import pandas as pd
 from owid.catalog import Dataset, Table
@@ -31,7 +31,7 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load meadow dataset.
-    ds_meadow: Dataset = paths.load_dependency("wgm_mental_health")
+    ds_meadow = cast(Dataset, paths.load_dependency("wgm_mental_health"))
 
     # Read table from meadow dataset.
     tb_meadow = ds_meadow["wgm_mental_health"]
