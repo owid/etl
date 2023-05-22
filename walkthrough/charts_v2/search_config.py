@@ -36,8 +36,8 @@ def build_dataset_form(df: pd.DataFrame, similarity_names: Dict[str, Any]) -> "S
         with st.expander("Parameters"):
             map_identical = st.checkbox("Map identically named variables", value=True)
             enable_explore = st.checkbox(
-                "Explore variable mappings with charts (Experimental)",
-                help="Compare the variable mappings with some charts. This might take some time initially, as we need to download data values from S3",
+                "Explore variable mappings (Experimental)",
+                help="Compare the variable mappings with tables and charts. This might take some time initially, as we need to download data values from S3",
                 value=False,
             )
             similarity_name = st.selectbox(
