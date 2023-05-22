@@ -676,8 +676,17 @@ class SuggestedChartRevisions(SQLModel, table=True):
     users_: Optional["User"] = Relationship(back_populates="suggested_chart_revisions_")
 
     @classmethod
-    def load_pending(cls, session: Session):
-        return session.exec(select(SuggestedChartRevisions).where(SuggestedChartRevisions.status == "pending")).all()
+    def load_pending(cls, session: Session, user_id: int = None):
+        if user_id is None:
+            return session.exec(
+                select(SuggestedChartRevisions).where((SuggestedChartRevisions.status == "pending"))
+            ).all()
+        else:
+            return session.exec(
+                select(SuggestedChartRevisions)
+                .where(SuggestedChartRevisions.status == "pending")
+                .where(SuggestedChartRevisions.createdBy == user_id)
+            ).all()
 
 
 class DimensionFilter(TypedDict):
