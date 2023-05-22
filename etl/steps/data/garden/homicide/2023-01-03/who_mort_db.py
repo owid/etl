@@ -116,7 +116,7 @@ def add_age_groups(df: pd.DataFrame) -> pd.DataFrame:
         "Age65_69": "Age 50-69",
         "Age70_74": "Age 70+",
         "Age75_79": "Age 70+",
-        "Age80-84": "Age 70+",
+        "Age80_84": "Age 70+",
         "Age85_over": "Age 70+",
         "All ages": "All ages",
         "Unknown age": "Unknown age",
@@ -140,7 +140,7 @@ def add_age_groups(df: pd.DataFrame) -> pd.DataFrame:
         "Age65_69": "Age 65-74",
         "Age70_74": "Age 65-74",
         "Age75_79": "Age 75+",
-        "Age80-84": "Age 75+",
+        "Age80_84": "Age 75+",
         "Age85_over": "Age 75+",
         "All ages": "All ages",
         "Unknown age": "Unknown age",
@@ -182,6 +182,7 @@ def build_custom_age_groups(df: pd.DataFrame, age_groups: dict) -> pd.DataFrame:
 
     df_age["age_group_code"] = df_age["age_group_code"].map(age_groups)
 
+    assert df_age["age_group_code"].isna().sum() == 0, "Age-group missing from the age-group dict"
     # Sum
     df_age = df_age.drop(
         [
