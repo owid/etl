@@ -1,7 +1,7 @@
 import concurrent.futures
 import json
 from http.client import RemoteDisconnected
-from typing import cast, Any, Dict, List, Union
+from typing import Any, Dict, List, Union, cast
 from urllib.error import HTTPError, URLError
 
 import pandas as pd
