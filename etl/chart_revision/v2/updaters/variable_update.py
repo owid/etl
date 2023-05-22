@@ -5,9 +5,7 @@ These functions are used when there are updates on variables. They are used in t
 
 
 from collections import Counter
-from http.client import RemoteDisconnected
 from typing import Any, Dict, List, Literal, Optional, Set, Tuple, cast
-from urllib.error import URLError
 
 from sqlmodel import Session, select
 from structlog import get_logger
@@ -134,12 +132,8 @@ class ChartVariableUpdater(ChartUpdater):
         This is because we need to know the min and max years for all variables used in the charts to update the chart time configuration.
         """
         # Get metadata of variables from S3 (try twice)
-        try:
-            log.info(f"_get_variable_metadata: trying to get variable metadata from S3. Variables IDs: {variable_ids}")
-            df = variable_data_df_from_s3(get_engine(), variable_ids=[int(v) for v in variable_ids], workers=10)
-        except (URLError, RemoteDisconnected):
-            log.info("_get_variable_metadata: trying to get variable metadata from S3 (second try)")
-            df = variable_data_df_from_s3(get_engine(), variable_ids=[int(v) for v in variable_ids], workers=10)
+        log.info(f"_get_variable_metadata: trying to get variable metadata from S3. Variables IDs: {variable_ids}")
+        df = variable_data_df_from_s3(get_engine(), variable_ids=[int(v) for v in variable_ids], workers=10)
 
         # Reshape metadata, we want a dictionary!
         variable_meta = (
