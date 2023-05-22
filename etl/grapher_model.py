@@ -676,7 +676,7 @@ class SuggestedChartRevisions(SQLModel, table=True):
     users_: Optional["User"] = Relationship(back_populates="suggested_chart_revisions_")
 
     @classmethod
-    def load_pending(cls, session: Session, user_id: int = None):
+    def load_pending(cls, session: Session, user_id: Optional[int] = None):
         if user_id is None:
             return session.exec(
                 select(SuggestedChartRevisions).where((SuggestedChartRevisions.status == "pending"))

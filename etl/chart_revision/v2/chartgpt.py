@@ -133,7 +133,11 @@ def cli(userid: int, only_mine: bool, sample_size: int, model_name: str) -> None
         # Get pending revisions
         log.info(f"Using {model_name}, sampling {sample_size} suggestions...")
         if only_mine:
-            userid = GRAPHER_USER_ID
+            if GRAPHER_USER_ID is None:
+                raise ValueError(
+                    "Environment variable `GRAPHER_USER_ID` is not set. Please set it to your user ID, or use the `--userid` option."
+                )
+            userid = int(GRAPHER_USER_ID)
         if userid is not None:
             log.info(f"Only getting revisions from user with ID {userid}...")
         revisions = gm.SuggestedChartRevisions.load_pending(session, userid)
