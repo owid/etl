@@ -55,7 +55,6 @@ def run(dest_dir: str) -> None:
 
     log.info("who_mort_db.harmonize_countries")
     df = harmonize_countries(df)
-    df["sex"] = df["sex"].str.lower()
     df = clean_up_dimensions(df)
     df = add_age_groups(df)
     df_piv = df.pivot_table(
@@ -91,7 +90,7 @@ def run(dest_dir: str) -> None:
 
 
 def clean_up_dimensions(df: pd.DataFrame) -> pd.DataFrame:
-    sex_dict = {"all": "Both Sexes", "male": "Males", "female": "Females", "unknown": "Unknown sex"}
+    sex_dict = {"All": "Both Sexes", "Male": "Males", "Female": "Females", "unknown": "Unknown sex"}
     age_dict = {"Age_all": "All ages", "Age_unknown": "Unknown age"}
     df = df.replace({"sex": sex_dict, "age_group_code": age_dict})
 
@@ -102,8 +101,8 @@ def add_age_groups(df: pd.DataFrame) -> pd.DataFrame:
 
     age_groups_ihme = {
         "Age00": "Age 0-4",
-        "Age1_4": "Age 0-4",
-        "Age5_9": "Age 5-14",
+        "Age01_04": "Age 0-4",
+        "Age05_09": "Age 5-14",
         "Age10_14": "Age 5-14",
         "Age15_19": "Age 15-49",
         "Age20_24": "Age 15-49",
@@ -126,8 +125,8 @@ def add_age_groups(df: pd.DataFrame) -> pd.DataFrame:
 
     age_groups_decadal = {
         "Age00": "Age 0-4",
-        "Age1_4": "Age 0-4",
-        "Age5_9": "Age 5-14",
+        "Age01_04": "Age 0-4",
+        "Age05_09": "Age 5-14",
         "Age10_14": "Age 5-14",
         "Age15_19": "Age 15-24",
         "Age20_24": "Age 15-24",
@@ -193,11 +192,11 @@ def build_custom_age_groups(df: pd.DataFrame, age_groups: dict) -> pd.DataFrame:
         ],
         axis=1,
     )
-    df_age = df_age.groupby(["country", "year", "sex", "age_group_code"], as_index=False, observed=True).sum()
+    df_age = df_age.groupby(["country", "year", "sex", "age_group_code"]).sum()
     df_age["death_rate_per_100_000_population"] = (
         df_age["number_of_deaths"].div(df_age["population"]).replace(np.inf, np.nan)
     ) * 100000
-    df_age = df_age.drop(columns=["population"])
+    # df_age = df_age.drop(columns=["population"])
 
     return df_age
 
