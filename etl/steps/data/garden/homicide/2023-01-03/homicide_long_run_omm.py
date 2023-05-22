@@ -60,8 +60,8 @@ def get_who_mortality_db() -> pd.DataFrame:
 
     ds_who_db: catalog.Dataset = paths.load_dependency("who_mort_db")
     df_who = ds_who_db["who_mort_db"].reset_index()
-    df_who = pd.DataFrame(df_who[["country", "year", "death_rate_per_100_000_standard_population_both_sexes_all_ages"]])
-    df_who = df_who.dropna(subset="death_rate_per_100_000_standard_population_both_sexes_all_ages")
+    df_who = pd.DataFrame(df_who[["country", "year", "death_rate_per_100_000_population_both_sexes_all_ages"]])
+    df_who = df_who.dropna(subset="death_rate_per_100_000_population_both_sexes_all_ages")
     df_who["source"] = "WHO"
     return df_who
 
