@@ -236,6 +236,7 @@ def submit_chart_comparisons(revisions: List[gm.SuggestedChartRevisions]) -> Non
     revisions : List[gm.SuggestedChartRevisions]
         Chart revisions.
     """
+    log.info("chart_revision: submitting revisions to the database...")
     with Session(get_engine()) as session:
         session.bulk_save_objects(revisions)
         session.commit()
