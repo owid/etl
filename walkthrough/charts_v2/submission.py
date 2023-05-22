@@ -94,7 +94,7 @@ def create_submission(variable_config: VariableConfig, schema_chart_config: Dict
 def push_submission(submission_config: "SubmissionConfig", owid_env: OWIDEnv) -> None:
     """Push submissions to the database."""
     # Create chart comparisons
-    progress_text = "Creating chart revisions..."
+    progress_text = "Submitting chart revisions..."
     bar = st.progress(0, progress_text)
     comparisons = []
     for i, chart in enumerate(submission_config.charts):
