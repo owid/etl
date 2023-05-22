@@ -98,6 +98,11 @@ def clean_up_dimensions(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def add_age_groups(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Create custom age-group aggregations, there are a range of different ones that might be useful for this dataset.
+    For example, we may want to compare to other causes of death imported via the IHME dataset, so we should include age-groups that match our chosen IHME groups.
+
+    """
     age_groups_ihme = {
         "Age00": "Age 0-4",
         "Age01_04": "Age 0-4",
@@ -139,9 +144,9 @@ def add_age_groups(df: pd.DataFrame) -> pd.DataFrame:
         "Age60_64": "Age 55-64",
         "Age65_69": "Age 65-74",
         "Age70_74": "Age 65-74",
-        "Age75_79": "Age 75+",
-        "Age80_84": "Age 75+",
-        "Age85_over": "Age 75+",
+        "Age75_79": "Age 75-84",
+        "Age80_84": "Age 75-84",
+        "Age85_over": "Age 85+",
         "All ages": "All ages",
         "Unknown age": "Unknown age",
     }
@@ -155,12 +160,8 @@ def add_age_groups(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def build_custom_age_groups(df: pd.DataFrame, age_groups: dict) -> pd.DataFrame:
-    """Estimate metrics for broader age groups - in line with the age-groups we use for IHME:
-    * 0-4
-    * 5-14
-    * 15-49
-    * 50-69
-    * 70+
+    """
+    Estimate metrics for broader age groups. In line with the age-groups we define in the age_groups dict:
     """
     df_age = df.copy()
     # Add population values for each dimension
@@ -202,6 +203,9 @@ def build_custom_age_groups(df: pd.DataFrame, age_groups: dict) -> pd.DataFrame:
 
 
 def remove_granular_age_groups(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Remove the small five-year age-groups that are in the original dataset
+    """
     age_groups_to_keep = ["All ages", "Unknown age"]
     df = df[df["age_group_code"].isin(age_groups_to_keep)]
     assert len(df["age_group_code"].drop_duplicates()) == len(age_groups_to_keep)
