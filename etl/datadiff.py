@@ -75,7 +75,7 @@ class DatasetDiff:
             table_b = ds_b[table_name]
 
             # only sort index if different to avoid unnecessary sorting for huge datasets such as ghe
-            if not _index_equals(table_a, table_b):
+            if len(table_a) != len(table_b) or not _index_equals(table_a, table_b):
                 index_diff = True
                 table_a = _sort_index(table_a)
                 table_b = _sort_index(table_b)
