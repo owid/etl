@@ -209,7 +209,7 @@ def ask_and_get_variable_mapping(search_form, owid_env: OWIDEnv) -> "VariableCon
             )
             # Submission button
             submitted_variables = st.button("Next", type="primary")
-            if submitted_variables:
+            if submitted_variables or st.session_state.show_submission_details:
                 st.session_state.submitted_variables = True
                 st.session_state.show_submission_details = True
                 st.session_state.submitted_revisions = False
@@ -231,6 +231,7 @@ class VariableConfig(BaseModel):
 
     def __init__(self, **data: Any) -> None:
         """Constructor."""
+        print(data)
         if "variable_mapping" in data and "skip_slider_check" in data:
             data["is_valid"] = True
         super().__init__(**data)

@@ -58,15 +58,20 @@ with st.form("form-datasets"):
 # TODO: add description
 ##########################################################################################
 if st.session_state.submitted_datasets:
+    log.info(f"SEARCH FORM: {search_form}")
     variable_config = ask_and_get_variable_mapping(search_form, owid_env)
-
+    log.info(f"VARIABLE CONFIG (2): {variable_config}")
 ##########################################################################################
 # 3 CHART REVISIONS BAKING
 #
 # TODO: add description
 ##########################################################################################
-if st.session_state.submitted_datasets and st.session_state.show_submission_details:
-    st.header("Submission details")
+if (
+    st.session_state.submitted_datasets
+    and st.session_state.submitted_variables
+    and st.session_state.show_submission_details
+):
+    log.info(f"VARIABLE CONFIG (3): {variable_config}")
     if variable_config is not None:
         if variable_config.is_valid:
             submission_config = create_submission(variable_config, SCHEMA_CHART_CONFIG)

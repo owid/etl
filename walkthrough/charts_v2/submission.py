@@ -32,8 +32,8 @@ def create_submission(variable_config: VariableConfig, schema_chart_config: Dict
     submission = SubmissionConfig()
     if st.session_state.submitted_variables:
         with st.spinner("Retrieving charts to be updated. This can take up to 1 minute..."):
-            log.info("chart_revision: building updaters and getting charts!!!!")
             try:
+                log.info("chart_revision: building updaters and getting charts!")
                 st.session_state.variable_mapping = variable_config.variable_mapping
                 updaters, charts = build_updaters_and_get_charts_cached(
                     variable_mapping=variable_config.variable_mapping,
@@ -47,6 +47,7 @@ def create_submission(variable_config: VariableConfig, schema_chart_config: Dict
     # Otherwise, get cached values
     else:
         try:
+            log.info("chart_revision: building updaters and getting charts CACHED!")
             updaters, charts = build_updaters_and_get_charts_cached(
                 variable_mapping=st.session_state.variable_mapping,
                 schema_chart_config=schema_chart_config,
@@ -60,6 +61,7 @@ def create_submission(variable_config: VariableConfig, schema_chart_config: Dict
 
     # If we managed to get the charts and updaters, show results.
     if submission.is_valid:
+        log.info(f"chart_revision: Submission is valid: {submission}")
         # Display details
         num_charts = len(charts)  # type: ignore
         with st.container():
