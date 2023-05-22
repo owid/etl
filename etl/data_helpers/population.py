@@ -50,7 +50,7 @@ def add_population(
             ...
         }
 
-        Population within the range [min_age, max_age) will be assigned to the age group `age_group_name_in_input_dataframe`.
+        Population within the range [min_age, max_age] will be assigned to the age group `age_group_name_in_input_dataframe`.
         To get single-year values, use max_age = min_age + 1.
 
     Returns
