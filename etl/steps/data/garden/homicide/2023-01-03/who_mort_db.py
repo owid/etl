@@ -152,6 +152,7 @@ def add_age_groups(df: pd.DataFrame) -> pd.DataFrame:
     df_age_group_decadal = build_custom_age_groups(df, age_groups=age_groups_decadal)
     df_orig = remove_granular_age_groups(df)
     df_combined = pd.concat([df_orig, df_age_group_ihme, df_age_group_decadal], axis=0)
+    df_combined = df_combined.loc[:, ~df_combined.columns.duplicated()]
     return df_combined
 
 
