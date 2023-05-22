@@ -131,7 +131,7 @@ class DatasetDiff:
                             self.p(_dict_diff(col_a_meta, col_b_meta, tabs=4))
                         if self.verbose:
                             if data_diff or index_diff:
-                                out = _data_diff(table_a, table_b, eq, col, dims, tabs=4)
+                                out = _data_diff(table_a, table_b, col, dims, tabs=4, eq=eq)
                                 if out:
                                     self.p(out)
                     else:
@@ -310,15 +310,20 @@ def _dict_diff(dict_a: Dict[str, Any], dict_b: Dict[str, Any], tabs) -> str:
         return "\t" * tabs + "".join(lines).replace("\n", "\n" + "\t" * tabs).rstrip()
 
 
-def _data_diff(table_a: Table, table_b: Table, eq: pd.Series, col: str, dims: list[str], tabs: int) -> str:
+def _data_diff(
+    table_a: Table, table_b: Table, col: str, dims: list[str], tabs: int, eq: Optional[pd.Series] = None
+) -> str:
     """Return summary of data differences."""
+    if eq is None:
+        eq = series_equals(table_a[col], table_b[col])
+
     lines = [
         f"- Changed values: {(~eq).sum()} / {len(eq)} ({(~eq).sum() / len(eq) * 100:.2f}%)",
     ]
 
     # changes in index
     for dim in dims:
-        diff_elements = table_a.loc[~eq, dim].dropna().unique().astype(str).sort_values().tolist()
+        diff_elements = table_a.loc[~eq, dim].dropna().astype(str).sort_values().unique().tolist()
         detail = f"{len(diff_elements)} affected" if len(diff_elements) > 5 else ", ".join(diff_elements)
         lines.append(f"- {dim}: {detail}")
 
