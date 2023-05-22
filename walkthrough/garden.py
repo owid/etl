@@ -129,7 +129,7 @@ def app(run_checks: bool) -> None:
         if form.load_population:
             deps.append(utils.DATASET_POPULATION_URI)
         if form.load_countries_regions:
-            deps.append(utils.DATASET_REFERENCE_URI)
+            deps.append(utils.DATASET_REGIONS_URI)
         dag_content = utils.add_to_dag(
             {f"data{private_suffix}://garden/{form.namespace}/{form.version}/{form.short_name}": deps}
         )

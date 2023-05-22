@@ -41,7 +41,7 @@ steps:
     - data://garden/energy/2022-07-29/primary_energy_consumption
     - data://garden/energy/2022-12-13/electricity_mix
     - data://garden/owid/latest/key_indicators
-    - data://garden/reference
+    - data://garden/regions/2023-01-01/regions
   #
   # Energy - Global primary energy (2022).
   #
@@ -92,7 +92,7 @@ steps:
     - data://garden/energy/2022-12-28/primary_energy_consumption
     - data://garden/energy/2022-12-28/electricity_mix
     - data://garden/owid/latest/key_indicators
-    - data://garden/reference
+    - data://garden/regions/2023-01-01/regions
   #
   # Ember yearly electricity 2022.
   #
@@ -101,7 +101,7 @@ steps:
   data://garden/ember/2022-12-13/yearly_electricity:
     - data://meadow/ember/2022-12-13/yearly_electricity
     - data://garden/owid/latest/key_indicators
-    - data://garden/reference
+    - data://garden/regions/2023-01-01/regions
   #
   # Ember combined electricity 2022.
   #

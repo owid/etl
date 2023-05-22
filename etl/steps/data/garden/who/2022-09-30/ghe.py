@@ -1,11 +1,13 @@
 """Generate GHE garden dataset"""
 
+from typing import cast
+
 import pandas as pd
-from owid.catalog import Table
+from owid.catalog import Dataset, Table
+from owid.datautils import dataframes
 from structlog import get_logger
 
 from etl.data_helpers.population import add_population
-from etl.grapher_helpers import country_code_to_country
 from etl.helpers import PathFinder, create_dataset
 
 log = get_logger()
@@ -21,7 +23,9 @@ def run(dest_dir: str) -> None:
     ds_meadow = N.meadow_dataset
     df = pd.DataFrame(ds_meadow["ghe"])
 
-    df["country"] = country_code_to_country(df["country"])
+    # convert codes to country names
+    code_to_country = cast(Dataset, N.load_dependency("regions"))["regions"]["name"].to_dict()
+    df["country"] = dataframes.map_series(df["country"], code_to_country, warn_on_missing_mappings=True)
 
     df = clean_data(df)
 

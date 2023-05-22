@@ -1,10 +1,11 @@
 # To run with subset only: GHE_SUBSET_ONLY=1 etl grapher/who/2021-07-01/ghe --grapher
 import os
+from typing import cast
 
 import pandas as pd
 from owid import catalog
+from owid.datautils import dataframes
 
-from etl import grapher_helpers as gh
 from etl.helpers import PathFinder
 
 N = PathFinder(__file__)
@@ -55,7 +56,10 @@ def run(dest_dir: str) -> None:
         .round({"deaths": 0, "deaths_rate": 2, "deaths_100k": 2, "daly": 2, "daly_rate": 2, "daly_100k": 2})
     )
     table["deaths"] = table["deaths"].astype(int)
-    table["country"] = gh.country_code_to_country(table["country_code"])
+    # convert codes to country names
+    code_to_country = cast(catalog.Dataset, N.load_dependency("regions"))["regions"]["name"].to_dict()
+    table["country"] = dataframes.map_series(table["country_code"], code_to_country, warn_on_missing_mappings=True)
+
     table = table.drop(["country_code"], axis=1)
     table = table.set_index(["country", "year", "ghe_cause_title", "sex_code", "agegroup_code"])
 
@@ -74,7 +78,6 @@ def run(dest_dir: str) -> None:
 
 
 def select_subset_causes(table: pd.DataFrame) -> pd.DataFrame:
-
     table = table[(table["sex_code"] == "both") & (table["agegroup_code"] == "ALLAges")]
 
     return table
