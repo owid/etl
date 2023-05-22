@@ -98,7 +98,6 @@ def clean_up_dimensions(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def add_age_groups(df: pd.DataFrame) -> pd.DataFrame:
-
     age_groups_ihme = {
         "Age00": "Age 0-4",
         "Age01_04": "Age 0-4",
@@ -196,16 +195,15 @@ def build_custom_age_groups(df: pd.DataFrame, age_groups: dict) -> pd.DataFrame:
     df_age["death_rate_per_100_000_population"] = (
         df_age["number_of_deaths"].div(df_age["population"]).replace(np.inf, np.nan)
     ) * 100000
-    # df_age = df_age.drop(columns=["population"])
+    df_age = df_age.drop(columns=["population"]).reset_index()
 
     return df_age
 
 
 def remove_granular_age_groups(df: pd.DataFrame) -> pd.DataFrame:
-
-    age_groups_to_keep = ["Age_all", "Age_unknown"]
-
+    age_groups_to_keep = ["All ages", "Unknown age"]
     df = df[df["age_group_code"].isin(age_groups_to_keep)]
+    assert len(df["age_group_code"].drop_duplicates()) == len(age_groups_to_keep)
     return df
 
 
