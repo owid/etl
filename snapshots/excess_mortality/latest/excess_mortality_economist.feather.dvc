@@ -1,0 +1,18 @@
+meta:
+  namespace: excess_mortality
+  short_name: excess_mortality_economist
+  file_extension: feather
+  date_accessed: 2023-05-22 17:07:21.116626
+  name: Excess Mortality Estimates – The Economist (2023)
+  description: ''
+  source_name: Our World in Data catalog backport
+  url: https://owid.cloud/admin/datasets/5429
+  source_published_by: Our World in Data catalog backport
+  is_public: false
+  version: latest
+  publication_date: latest
+wdir: ../../../data/snapshots/excess_mortality/latest
+outs:
+- md5: 63d075fbda5347dc98cea98f93a95529
+  size: 8633322
+  path: excess_mortality_economist.feather
