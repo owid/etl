@@ -1,6 +1,7 @@
 import json
 from typing import List, cast
 
+import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table, VariableMeta
 from owid.catalog.utils import underscore
@@ -15,6 +16,29 @@ log = get_logger()
 
 # naming conventions
 N = PathFinder(__file__)
+
+AGE_GROUPS_RANGES = {
+    "Age00": [0, 1],
+    "Age01_04": [1, 5],
+    "Age05_09": [5, 10],
+    "Age10_14": [10, 15],
+    "Age15_19": [15, 20],
+    "Age20_24": [20, 25],
+    "Age25_29": [25, 30],
+    "Age30_34": [30, 35],
+    "Age35_39": [35, 40],
+    "Age40_44": [40, 45],
+    "Age45_49": [45, 50],
+    "Age50_54": [50, 55],
+    "Age55_59": [55, 60],
+    "Age60_64": [60, 65],
+    "Age65_69": [65, 70],
+    "Age70_74": [70, 75],
+    "Age75_79": [75, 80],
+    "Age80_84": [80, 85],
+    "Age85_over": [85, None],
+    "All ages": [0, None],
+}
 
 
 def run(dest_dir: str) -> None:
@@ -32,11 +56,8 @@ def run(dest_dir: str) -> None:
     log.info("who_mort_db.harmonize_countries")
     df = harmonize_countries(df)
     df["sex"] = df["sex"].str.lower()
-    log.info("who_mort_df.calculate_youth_homicides")
-    df = calculate_youth_homicide_rate(df)
-    # df = clean_up_dimensions(df)
-    # We are not interested in the other age
-
+    df = clean_up_dimensions(df)
+    df = add_age_groups(df)
     df_piv = df.pivot_table(
         index=["country", "year"],
         columns=["sex", "age_group_code"],
@@ -47,19 +68,19 @@ def run(dest_dir: str) -> None:
             "death_rate_per_100_000_population",
         ],
     )
-
-    # df = df.set_index(["country", "year", "age_group_code", "sex"], verify_integrity=True)
     # create new dataset with the same metadata as meadow
     ds_garden = Dataset.create_empty(dest_dir, metadata=ds_meadow.metadata)
 
     # create new table with the same metadata as meadow and add it to dataset
-    tb_garden = Table(df_piv)
-
+    tb_garden = Table(df_piv, short_name="who_mort_db")
+    new_tb_garden = Table(short_name="who_mort_db")
     for col in tb_garden.columns:
-        tb_garden[col].metadata = build_metadata(col)
-    tb_garden.columns = [underscore(col) for col in tb_garden.columns.values]
+        col_metadata = build_metadata(col)
+        new_col = underscore(" ".join(col).strip())
+        new_tb_garden[new_col] = tb_garden[col]
+        new_tb_garden[new_col].metadata = col_metadata
 
-    ds_garden.add(tb_garden)
+    ds_garden.add(new_tb_garden)
 
     # update metadata from yaml file
     ds_garden.update_metadata(N.metadata_path)
@@ -69,110 +90,122 @@ def run(dest_dir: str) -> None:
     log.info("who_mort_db.end")
 
 
-def build_custom_age_groups(df: pd.DataFrame) -> pd.DataFrame:
-    """Estimate all the metrics for a broader age group."""
+def clean_up_dimensions(df: pd.DataFrame) -> pd.DataFrame:
+    sex_dict = {"all": "Both Sexes", "male": "Males", "female": "Females", "unknown": "Unknown sex"}
+    age_dict = {"Age_all": "All ages", "Age_unknown": "Unknown age"}
+    df = df.replace({"sex": sex_dict, "age_group_code": age_dict})
 
-    # Add population values for each dimension
-    log.info("who: add population values")
-    AGE_GROUPS_RANGES = {
-        "Age00": [0, 0],
-        "Age01_04": [1, 4],
-        "Age05_09": [5, 9],
-        "Age10_14": [10, 14],
-        "Age15_19": [15, 19],
-        "Age20_24": [20, 24],
-        "Age25_29": [25, 29],
-        "Age30_34": [30, 34],
-        "Age35_39": [35, 39],
-        "Age40_44": [40, 44],
-        "Age45_49": [45, 49],
-        "Age50_54": [50, 54],
-        "Age55_59": [55, 59],
-        "Age60_64": [60, 64],
-        "Age65_69": [65, 69],
-        "Age70_74": [70, 74],
-        "Age75_79": [75, 79],
-        "Age80_84": [80, 84],
-        "Age85_over": [85, None],
-        "Age_all": [0, None],
+    return df
+
+
+def add_age_groups(df: pd.DataFrame) -> pd.DataFrame:
+
+    age_groups_ihme = {
+        "Age00": "Age 0-4",
+        "Age1_4": "Age 0-4",
+        "Age5_9": "Age 5-14",
+        "Age10_14": "Age 5-14",
+        "Age15_19": "Age 15-49",
+        "Age20_24": "Age 15-49",
+        "Age25_29": "Age 15-49",
+        "Age30_34": "Age 15-49",
+        "Age35_39": "Age 15-49",
+        "Age40_44": "Age 15-49",
+        "Age45_49": "Age 15-49",
+        "Age50_54": "Age 50-69",
+        "Age55_59": "Age 50-69",
+        "Age60_64": "Age 50-69",
+        "Age65_69": "Age 50-69",
+        "Age70_74": "Age 70+",
+        "Age75_79": "Age 70+",
+        "Age80-84": "Age 70+",
+        "Age85_over": "Age 70+",
+        "All ages": "All ages",
+        "Unknown age": "Unknown age",
     }
-    df = add_population(
-        df=df,
+
+    age_groups_decadal = {
+        "Age00": "Age 0-4",
+        "Age1_4": "Age 0-4",
+        "Age5_9": "Age 5-14",
+        "Age10_14": "Age 5-14",
+        "Age15_19": "Age 15-24",
+        "Age20_24": "Age 15-24",
+        "Age25_29": "Age 25-34",
+        "Age30_34": "Age 25-34",
+        "Age35_39": "Age 35-44",
+        "Age40_44": "Age 35-44",
+        "Age45_49": "Age 45-54",
+        "Age50_54": "Age 45-54",
+        "Age55_59": "Age 55-64",
+        "Age60_64": "Age 55-64",
+        "Age65_69": "Age 65-74",
+        "Age70_74": "Age 65-74",
+        "Age75_79": "Age 75+",
+        "Age80-84": "Age 75+",
+        "Age85_over": "Age 75+",
+        "All ages": "All ages",
+        "Unknown age": "Unknown age",
+    }
+
+    df_age_group_ihme = build_custom_age_groups(df, age_groups=age_groups_ihme)
+    df_age_group_decadal = build_custom_age_groups(df, age_groups=age_groups_decadal)
+    df_orig = remove_granular_age_groups(df)
+    df_combined = pd.concat([df_orig, df_age_group_ihme, df_age_group_decadal], axis=0)
+    return df_combined
+
+
+def build_custom_age_groups(df: pd.DataFrame, age_groups: dict) -> pd.DataFrame:
+    """Estimate metrics for broader age groups - in line with the age-groups we use for IHME:
+    * 0-4
+    * 5-14
+    * 15-49
+    * 50-69
+    * 70+
+    """
+    df_age = df.copy()
+    # Add population values for each dimension
+    log.info("who_mort_db.add_population_values")
+
+    df_age = add_population(
+        df=df_age,
         country_col="country",
         year_col="year",
         sex_col="sex",
-        sex_group_all="all",
-        sex_group_female="female",
-        sex_group_male="male",
+        sex_group_all="Both Sexes",
+        sex_group_female="Females",
+        sex_group_male="Males",
         age_col="age_group_code",
         age_group_mapping=AGE_GROUPS_RANGES,
     )
     # Map age groups to broader age groups. Missing age groups in the list are passed as they are (no need to assign to broad group)
-    log.info("ghe: create broader age groups")
-    AGE_GROUPS = {
-        "Age00": "Age0_14",
-        "Age1_4": "Age0_14",
-        "Age5_9": "Age0_14",
-        "Age10_14": "Age0_14",
-        "Age15_19": "Age15_24",
-        "Age20_24": "Age15_24",
-        "Age25_29": "Age25_49",
-        "Age30_34": "Age25_49",
-        "Age35_39": "Age25_49",
-        "Age40_44": "Age25_49",
-        "Age45_49": "Age25_49",
-        "Age50_54": "Age50_69",
-        "Age55_59": "Age50_69",
-        "Age60_64": "Age50_69",
-        "Age65_69": "Age50_69",
-        "Age70_74": "Age70_over",
-        "Age75_79": "Age70_over",
-        "Age80-84": "Age70_over",
-        "Age85_over": "Age70_over",
-    }
-    df_sh["age_group"] = df_sh["age_group"].map(AGE_GROUPS)
+    log.info("who_mort_db.create_broader_age_groups")
+
+    df_age["age_group_code"] = df_age["age_group_code"].map(age_groups)
 
     # Sum
-    df_sh = df_sh.groupby(["country", "year", "age_group", "sex", "cause"], as_index=False, observed=True).sum()
-    # Fix column values (rates + flag)
-    df_sh["daly_rate100k"] = 100000 * df_sh["daly_count"] / df_sh["population"]
-    df_sh["death_rate100k"] = 100000 * df_sh["death_count"] / df_sh["population"]
-    df_sh["flag_level"] = 3
-    df_sh = df_sh.drop(columns=["population"])
+    df_age = df_age.drop(
+        [
+            "percentage_of_cause_specific_deaths_out_of_total_deaths",
+            "age_standardized_death_rate_per_100_000_standard_population",
+            "death_rate_per_100_000_population",
+        ],
+        axis=1,
+    )
+    df_age = df_age.groupby(["country", "year", "sex", "age_group_code"], as_index=False, observed=True).sum()
+    df_age["death_rate_per_100_000_population"] = (
+        df_age["number_of_deaths"].div(df_age["population"]).replace(np.inf, np.nan)
+    ) * 100000
+    df_age = df_age.drop(columns=["population"])
 
-    log.info("ghe: concatenate dfs")
-    df = pd.concat([df, df_sh], axis=0, ignore_index=True, sort=False)
-    return df
+    return df_age
 
 
-def clean_up_dimensions(df: pd.DataFrame) -> pd.DataFrame:
-    sex_dict = {"all": "Both Sexes", "male": "Males", "female": "Females", "unknown": "Unknown sex"}
-    age_dict = {
-        "Age_all": "All ages",
-        "Age00": "Under 1",
-        "Age01_04": "Age 1-4",
-        "Age05_09": "Age 5-9",
-        "Age10_14": "Age 10-14",
-        "Age15_19": "Age 15-19",
-        "Age20_24": "Age 20-24",
-        "Age25_29": "Age 25-29",
-        "Age30_34": "Age 30-34",
-        "Age35_39": "Age 35-39",
-        "Age40_44": "Age 40-44",
-        "Age45_49": "Age 45-49",
-        "Age50_54": "Age 50-54",
-        "Age55_59": "Age 55-59",
-        "Age60_64": "Age 60-64",
-        "Age65_69": "Age 65-69",
-        "Age70_74": "Age 70-74",
-        "Age75_79": "Age 75-79",
-        "Age80_84": "Age 80-84",
-        "Age_unknown": "Unknown age",
-        "Age00_14": "Under 15",
-    }
+def remove_granular_age_groups(df: pd.DataFrame) -> pd.DataFrame:
 
-    df = df.replace({"age_group_code": age_dict, "sex": sex_dict})
+    age_groups_to_keep = ["Age_all", "Age_unknown"]
 
+    df = df[df["age_group_code"].isin(age_groups_to_keep)]
     return df
 
 
@@ -199,11 +232,16 @@ def build_metadata(col: tuple) -> pd.DataFrame:
             "short_unit": "%",
             "numDecimalPlaces": 2,
         },
-        "number_of_deaths": {"title": "Number of deaths", "unit": "homicides", "short_unit": "", "numDecimalPlaces": 2},
+        "number_of_deaths": {
+            "title": "Number of homicides",
+            "unit": "homicides",
+            "short_unit": "",
+            "numDecimalPlaces": 0,
+        },
     }
     meta = VariableMeta(
         title=f"{metric_dict[col[0]]['title']} - {col[1]} - {col[2]}",
-        description=f"The {metric_dict[col[0]]['title'].lower()} for {col[1].lower()}, {col[2].lower()} years",
+        description=f"The {metric_dict[col[0]]['title'].lower()} for {col[1].lower()}, {col[2].lower()}.",
         unit=f"{metric_dict[col[0]]['unit']}",
         short_unit=f"{metric_dict[col[0]]['short_unit']}",
     )
@@ -239,81 +277,3 @@ def harmonize_countries(df: pd.DataFrame) -> pd.DataFrame:
         )
 
     return df
-
-
-def load_youth_population(min_year: int, max_year: int) -> Table:
-    """Load population table from population UNWPP dataset."""
-    ds_indicators: Dataset = N.load_dependency(channel="garden", namespace="un", short_name="un_wpp")
-    tb_population = ds_indicators["population"].reset_index(drop=False)
-    tb_population = tb_population[
-        (tb_population["age"] == "0-14")
-        & (tb_population["year"] >= min_year)
-        & (tb_population["year"] <= max_year)
-        & (tb_population["metric"] == "population")
-    ]
-
-    return tb_population
-
-
-def calculate_youth_homicides(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Sum the number of homicides for the following age-groups:
-    * 0 years
-    * 1-4 years
-    * 5-9 years
-    * 10-14 years
-
-    To get the total homicides for those under age 15.
-    """
-
-    age_group_codes = ["Age00", "Age01_04", "Age05_09", "Age10_14"]
-
-    df_youth = df[df["age_group_code"].isin(age_group_codes)]
-
-    cols = ["country", "year", "sex", "age_group_code", "number_of_deaths"]
-    df_youth = df_youth[cols].groupby(by=["country", "year", "sex"])["number_of_deaths"].sum().reset_index()
-    df_youth.loc[:, "age_group_code"] = "Age00_14"
-
-    # df_merge = pd.merge(df, df_youth, how="outer", on=["country", "year", "sex", "number_of_deaths", "age_group_code"])
-
-    return df_youth
-
-
-def calculate_youth_homicide_rate(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Calculate the youth homicide rate:
-
-    Total homicides where the victim was under 15/ total under 15 population
-    """
-    youth_homicides = calculate_youth_homicides(df)
-
-    min_year = df["year"].min()
-    max_year = df["year"].max()
-
-    youth_pop = load_youth_population(min_year=min_year, max_year=max_year)
-
-    youth_pop = youth_pop.rename(columns={"value": "population", "location": "country"}).drop(
-        columns=["metric", "variant", "age"]
-    )
-
-    youth_homicides_df = pd.merge(
-        youth_homicides,
-        youth_pop,
-        how="left",
-        on=["country", "year", "sex"],
-    ).dropna(subset="population")
-
-    youth_homicides_df["death_rate_per_100_000_population"] = (
-        youth_homicides_df["number_of_deaths"] / youth_homicides_df["population"]
-    ) * 100000
-
-    df_merge = pd.merge(
-        df,
-        youth_homicides_df,
-        how="outer",
-        on=["country", "year", "sex", "number_of_deaths", "death_rate_per_100_000_population", "age_group_code"],
-    )
-
-    df_merge = df_merge.drop(columns="population")
-
-    return df_merge
