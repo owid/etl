@@ -7,7 +7,8 @@ meta:
   publication_date: 2023-02-16
   source_name: FluID, World Health Oragnization (2023)
   source_published_by: FluID, World Health Oragnization (2023)
-  url: https://www.who.int/teams/global-influenza-programme/surveillance-and-monitoring/fluid
+  url: 
+    https://www.who.int/teams/global-influenza-programme/surveillance-and-monitoring/fluid
   source_data_url: https://frontdoor-l4uikgap6gz3m.azurefd.net/FLUMART/VIW_FID?&$format=csv
   file_extension: csv
   license_url: https://www.who.int/about/policies/publishing/copyright
@@ -20,6 +21,6 @@ meta:
     The platform accommodates both qualitative and quantitative data which facilitates the tracking of global trends, spread, intensity, and impact of influenza. These data are made freely available to health policy makers in order to assist them in making informed decisions regarding the management of influenza.
 wdir: ../../../data/snapshots/who/latest
 outs:
-- md5: c8147cda29f2058467791a6ebe99b994
-  size: 109051904
+- md5: 5b8d983e7f04982033fc4f2ef00e4ac1
+  size: 135135962
   path: fluid.csv

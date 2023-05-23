@@ -12,6 +12,7 @@ log = get_logger()
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+
 # Data processing function (cleaning and small transformations)
 def data_processing(df: pd.DataFrame) -> pd.DataFrame:
     # Multiply shares by 100

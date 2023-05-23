@@ -25,7 +25,7 @@ from tqdm.auto import tqdm
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
-from etl.paths import DATA_DIR, REFERENCE_DATASET
+from etl.paths import DATA_DIR
 
 # Initialise log.
 log = structlog.get_logger()
@@ -822,13 +822,14 @@ def remove_regions_from_countries_regions_members(
 
     """
     countries_regions = countries_regions.copy()
+    countries_regions["members"] = countries_regions["members"].dropna().astype(str)
 
     # Get the owid code for each region that needs to be ignored when creating region aggregates.
     regions_to_ignore_codes = []
     for region in set(regions_to_remove):
         selected_region = countries_regions[countries_regions["name"] == region]
         assert len(selected_region) == 1, f"Region {region} ambiguous or not found in countries_regions dataset."
-        regions_to_ignore_codes.append(selected_region.index.values.item())
+        regions_to_ignore_codes.append(selected_region.index[0])
 
     # Remove those regions to ignore from lists of members of each region.
     regions_mask = countries_regions["members"].notnull()
@@ -887,7 +888,7 @@ def load_countries_regions() -> pd.DataFrame:
 
     """
     # Load dataset of countries and regions.
-    countries_regions = catalog.Dataset(REFERENCE_DATASET)["countries_regions"]
+    countries_regions = catalog.Dataset(DATA_DIR / "garden/regions/2023-01-01/regions")["regions"]
 
     countries_regions = remove_regions_from_countries_regions_members(
         countries_regions, regions_to_remove=REGIONS_TO_IGNORE_IN_AGGREGATES

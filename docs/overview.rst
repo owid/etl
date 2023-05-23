@@ -114,11 +114,11 @@ This usually involves some data cleaning, adding more metadata like unit informa
 ④ Split the data into Grapher's simpler data model
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Our visualization tool Grapher is optimized for time series display of country level statistics. As such it uses a restricted data model that makes this use case easier, but makes other use cases harder. 
+Our visualization tool Grapher is optimized for time series display of country level statistics. As such it uses a restricted data model that makes this use case easier, but makes other use cases harder.
 
 .. admonition:: Key point
 
-    All data visualised on the Our World In Data site is represented internally as a four-tuple: 
+    All data visualised on the Our World In Data site is represented internally as a four-tuple:
 
     ``(time, entity, variable, value)``
 
@@ -128,7 +128,7 @@ For example, a variable representing GDP in international $ will have a value fo
 
 In general data analysis, a variable could have extra dimensions. For example, deaths over time could be broken down by country, cause, gender and age group. Since grapher's data model cannot contain these dimensions, we expand them into many variables.
 
-.. mermaid:: 
+.. mermaid::
 
     graph LR
 
@@ -154,7 +154,7 @@ In general data analysis, the line between what should be interpreted as ``varia
 Harmonization tables
 --------------------
 
-For important and common index columns, notably countries/regions, there exists a dataframe that enumerates the set of commonly understood entities - for the most important countries/regions file this is the `countries_regions.csv <../data/garden/reference/countries_regions.csv>`_. In this dataframe all countries and geographic regions are listed with their *unique code* used at Our World In Data, as well as additional information like contained smaller units, additional third party identifiers, etc.
+For important and common index columns, notably countries/regions, there exists a regions dataset that enumerates the set of commonly understood entities. In this dataframe all countries and geographic regions are listed with their *unique code* used at Our World In Data, as well as additional information like contained smaller units, additional third party identifiers, etc.
 
 
 .. admonition:: Unique code used at Our World In Data

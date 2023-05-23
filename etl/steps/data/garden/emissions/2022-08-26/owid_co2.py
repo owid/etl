@@ -12,13 +12,18 @@ Additionally, OWID's population dataset and Maddison Project Database (Bolt and 
 
 """
 
+from typing import cast
+
 import numpy as np
 import pandas as pd
 from owid import catalog
 from owid.datautils import dataframes
 from shared import CURRENT_DIR, gather_sources_from_tables
 
+from etl.helpers import PathFinder
 from etl.paths import DATA_DIR
+
+paths = PathFinder(__file__)
 
 # Details for dataset to export.
 DATASET_SHORT_NAME = "owid_co2"
@@ -28,8 +33,6 @@ METADATA_PATH = CURRENT_DIR / f"{DATASET_SHORT_NAME}.meta.yml"
 GCP_PATH = DATA_DIR / "backport/owid/latest/dataset_5582_global_carbon_budget__global_carbon_project__v2021/"
 CAIT_PATH = DATA_DIR / "garden/cait/2022-08-10/ghg_emissions_by_sector"
 PRIMARY_ENERGY_PATH = DATA_DIR / "garden/energy/2022-07-29/primary_energy_consumption"
-# Countries-regions dataset is only used to add ISO country codes.
-COUNTRIES_REGIONS_PATH = DATA_DIR / "garden/reference/"
 # Population is only used to add the population column (and no other derived variables).
 POPULATION_PATH = DATA_DIR / "garden/owid/latest/key_indicators/"
 # GDP is only used to add the gdp column (and no other derived variables).
@@ -115,7 +118,7 @@ PRIMARY_ENERGY_COLUMNS = {
 }
 COUNTRIES_REGIONS_COLUMNS = {
     "name": "country",
-    "iso_alpha3": "iso_code",
+    "code": "iso_code",
 }
 POPULATION_COLUMNS = {
     "country": "country",
@@ -291,8 +294,6 @@ def run(dest_dir: str) -> None:
     ds_energy = catalog.Dataset(PRIMARY_ENERGY_PATH)
     # Load population dataset.
     ds_population = catalog.Dataset(POPULATION_PATH)
-    # Load countries-regions dataset (required to get ISO codes).
-    ds_countries_regions = catalog.Dataset(COUNTRIES_REGIONS_PATH)
 
     # Gather all required tables from all datasets.
     tb_gcp = ds_gcp[ds_gcp.table_names[0]]
@@ -302,7 +303,8 @@ def run(dest_dir: str) -> None:
     tb_energy = ds_energy["primary_energy_consumption"]
     tb_gdp = ds_gdp["maddison_gdp"]
     tb_population = ds_population["population"]
-    tb_countries_regions = ds_countries_regions["countries_regions"]
+    tb_countries_regions = cast(catalog.Dataset, paths.load_dependency("regions"))["regions"]
+    tb_countries_regions["code"] = tb_countries_regions.index
 
     #
     # Process data.

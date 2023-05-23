@@ -4,7 +4,6 @@ This dataset was downloaded and processed by a previous version of
 https://github.com/owid/importers/tree/master/bp_statreview
 
 However, in this additional step we add region aggregates following OWID definitions of regions.
-
 """
 
 from copy import deepcopy

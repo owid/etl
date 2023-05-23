@@ -26,7 +26,7 @@ from owid.datautils import dataframes
 from tqdm.auto import tqdm
 
 from etl.data_helpers import geo
-from etl.paths import DATA_DIR, REFERENCE_DATASET, STEP_DIR
+from etl.paths import DATA_DIR, STEP_DIR
 
 # Initialise log.
 log = structlog.get_logger()
@@ -895,7 +895,7 @@ def load_countries_regions() -> pd.DataFrame:
 
     """
     # Load dataset of countries and regions.
-    countries_regions = catalog.Dataset(REFERENCE_DATASET)["countries_regions"]
+    countries_regions = catalog.Dataset(DATA_DIR / "garden/regions/2023-01-01/regions")["regions"]
 
     countries_regions = remove_regions_from_countries_regions_members(
         countries_regions, regions_to_remove=REGIONS_TO_IGNORE_IN_AGGREGATES

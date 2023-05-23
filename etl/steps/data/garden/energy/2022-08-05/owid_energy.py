@@ -16,7 +16,10 @@ from owid import catalog
 from owid.datautils import dataframes
 from shared import CURRENT_DIR, add_population, gather_sources_from_tables
 
+from etl.helpers import PathFinder
 from etl.paths import DATA_DIR
+
+paths = PathFinder(__file__)
 
 # Details for dataset to export.
 DATASET_SHORT_NAME = "owid_energy"
@@ -27,7 +30,6 @@ ENERGY_MIX_DATASET_PATH = DATA_DIR / "garden/bp/2022-07-14/energy_mix"
 FOSSIL_FUEL_PRODUCTION_DATASET_PATH = DATA_DIR / "garden/energy/2022-07-20/fossil_fuel_production"
 PRIMARY_ENERGY_CONSUMPTION_DATASET_PATH = DATA_DIR / "garden/energy/2022-07-29/primary_energy_consumption"
 ELECTRICITY_MIX_DATASET_PATH = DATA_DIR / "garden/energy/2022-08-03/electricity_mix"
-COUNTRIES_REGIONS_DATASET_PATH = DATA_DIR / "garden/reference/"
 # Population and GDP are only used to add the population and gdp columns (and no other derived variables).
 POPULATION_DATASET_PATH = DATA_DIR / "garden/owid/latest/key_indicators/"
 GDP_DATASET_PATH = DATA_DIR / "garden/ggdc/2020-10-01/ggdc_maddison"
@@ -145,9 +147,7 @@ def run(dest_dir: str) -> None:
     tb_electricity_mix = ds_electricity_mix[ds_electricity_mix.table_names[0]].reset_index()
 
     # Load countries-regions dataset (required to get ISO codes).
-    countries_regions = catalog.Dataset(COUNTRIES_REGIONS_DATASET_PATH)["countries_regions"].reset_index()[
-        ["name", "iso_alpha3"]
-    ]
+    countries_regions = cast(catalog.Dataset, paths.load_dependency("regions"))["regions"]
 
     # Load population (used only to add a population column, and not to create any other derived variables).
     # Historical regions will be added to the population.

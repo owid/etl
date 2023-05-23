@@ -2,10 +2,9 @@ from copy import deepcopy
 from pathlib import Path
 
 import pandas as pd
-from owid import catalog
 from owid.catalog import Dataset, Table
 
-from etl.paths import DATA_DIR, REFERENCE_DATASET
+from etl.paths import DATA_DIR
 from etl.steps.data.garden.owid.latest.key_indicators.utils import add_regions
 
 DIR_PATH = Path(__file__).parent
@@ -18,8 +17,7 @@ def load_land_area() -> Table:
     table = table.reset_index()
 
     # convert iso codes to country names
-    reference_dataset = catalog.Dataset(REFERENCE_DATASET)
-    countries_regions = reference_dataset["countries_regions"]
+    countries_regions = Dataset(DATA_DIR / "garden/regions/2023-01-01/regions")["regions"]
 
     table = (
         table.rename(

@@ -257,6 +257,23 @@ class Chart(SQLModel, table=True):
     suggested_chart_revisions: List["SuggestedChartRevisions"] = Relationship(back_populates="charts")
     chart_dimensions: List["ChartDimensions"] = Relationship(back_populates="charts")
 
+    @classmethod
+    def load_chart(cls, session: Session, chart_id: int) -> "Chart":
+        """Load chart with id `chart_id`."""
+        return session.exec(select(cls).where(cls.id == chart_id)).one()
+
+    @classmethod
+    def load_charts_using_variables(cls, session: Session, variable_ids: List[int]) -> List["Chart"]:
+        """Load charts that use any of the given variables in `variable_ids`."""
+        # Find IDs of charts
+        chart_ids = (
+            session.exec(select(ChartDimensions.chartId).where(ChartDimensions.variableId.in_(variable_ids)))  # type: ignore
+            .unique()
+            .all()
+        )
+        # Find charts
+        return session.exec(select(Chart).where(Chart.id.in_(chart_ids))).all()  # type: ignore
+
 
 class Dataset(SQLModel, table=True):
     """Example
@@ -649,10 +666,18 @@ class SuggestedChartRevisions(SQLModel, table=True):
             Computed("(if((`status` in (_utf8mb4'pending',_utf8mb4'flagged')),true,NULL))", persisted=False),
         ),
     )
+    changesInDataSummary: Optional[str] = Field(
+        default=None, sa_column=Column("changesInDataSummary", String(512, "utf8mb4_0900_as_cs"))
+    )
+    experimental: Optional[Dict[Any, Any]] = Field(sa_column=Column("experimental", JSON, nullable=False))
 
     charts: Optional["Chart"] = Relationship(back_populates="suggested_chart_revisions")
     users: Optional["User"] = Relationship(back_populates="suggested_chart_revisions")
     users_: Optional["User"] = Relationship(back_populates="suggested_chart_revisions_")
+
+    @classmethod
+    def load_pending(cls, session: Session):
+        return session.exec(select(SuggestedChartRevisions).where(SuggestedChartRevisions.status == "pending")).all()
 
 
 class DimensionFilter(TypedDict):

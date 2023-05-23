@@ -6,6 +6,7 @@ These functions are used when there are updates on variables. They are used in t
 
 from collections import Counter
 from typing import Any, Dict, List, Literal, Optional, Set, Tuple, cast
+from urllib.error import URLError
 
 from sqlmodel import Session, select
 from structlog import get_logger
@@ -89,13 +90,27 @@ class ChartVariableUpdater(ChartUpdater):
         # Combine with new variables (not yet used in charts)
         variable_ids = list(variable_ids | set(self.variable_ids_new))
 
-        # Get metadata of variables from S3k
-        df = variable_data_df_from_s3(get_engine(), variable_ids=[int(v) for v in variable_ids], workers=10)
+        # Get metadata of variables from S3 (try twice)
+        log.info("0")
+        try:
+            log.info(1)
+            df = variable_data_df_from_s3(get_engine(), variable_ids=[int(v) for v in variable_ids], workers=10)
+        except URLError:
+            try:
+                log.info(12)
+                df = variable_data_df_from_s3(get_engine(), variable_ids=[int(v) for v in variable_ids], workers=10)
+            except URLError:
+                log.info(2)
+                raise URLError(
+                    "Could not connect to S3. If this persists, please report in #tech-issues channel on slack."
+                )
+
         # Reshape metadata, we want a dictionary!
         variable_meta = (
             df.groupby("variableId").year.agg(["min", "max"]).rename(columns={"min": "minYear", "max": "maxYear"})
         )
         variable_meta = variable_meta.to_dict(orient="index")
+        # raise URLError("Could not connect to S3. If this persists, please report in #tech-issues channel on slack.")
         return variable_meta
 
     def run(self, config: Dict[str, Any]) -> Dict[str, Any]:

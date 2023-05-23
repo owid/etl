@@ -1,3 +1,5 @@
+from typing import cast
+
 import pandas as pd
 from owid import catalog
 from owid.catalog import Dataset
@@ -6,7 +8,7 @@ from owid.datautils import dataframes
 from structlog import get_logger
 
 from etl.helpers import PathFinder
-from etl.paths import DATA_DIR, REFERENCE_DATASET
+from etl.paths import DATA_DIR
 
 from .shared import CURRENT_DIR
 
@@ -26,9 +28,10 @@ METADATA_PATH = CURRENT_DIR / "overview.meta.yml"
 # Daily supply of calories per person
 # https://owid.cloud/admin/datasets/581
 
-countries = Dataset(REFERENCE_DATASET)["countries_regions"]
-# Get only countries which have an ISO2 code - we don't want regions just yet
-countries_list = countries[["name", "iso_alpha2"]].dropna()["name"].to_list()
+countries = cast(Dataset, paths.load_dependency("regions"))["regions"]
+# Get only countries - we don't want regions just yet
+countries = countries[(countries.region_type == "country") & (~countries.is_historical)]
+countries_list = countries["name"].to_list()
 
 
 def run(dest_dir: str) -> None:
@@ -62,7 +65,6 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
     for country in countries_list:
-
         # making snake case version of country name
         country_snake_case = underscore(country)
         df_country = df_merged[df_merged["country"] == country]

@@ -209,10 +209,7 @@ def parse_step(step_name: str, dag: Dict[str, Any]) -> "Step":
 
     step: Step
     if step_type == "data":
-        if path == "garden/reference":
-            step = ReferenceStep(path)
-        else:
-            step = DataStep(path, dependencies)
+        step = DataStep(path, dependencies)
 
     elif step_type == "walden":
         step = WaldenStep(path)
@@ -301,16 +298,6 @@ def extract_step_attributes(step: str) -> Dict[str, str]:
 
         # Extract attributes from root of the step.
         namespace, version, name = root.split("/")
-
-        # Define an identifier for this step, that is identical for all versions.
-        identifier = f"{channel}/{namespace}/{name}"
-    elif root == "garden/reference":
-        # This is a special step that does not have a namespace or a version.
-        # We should probably get rid of this special step soon. But for now, define its properties manually.
-        channel = "garden"
-        namespace = "owid"
-        version = "latest"
-        name = "reference"
 
         # Define an identifier for this step, that is identical for all versions.
         identifier = f"{channel}/{namespace}/{name}"
@@ -526,27 +513,6 @@ class DataStep(Step):
                     stderr_file=ostream,
                     cwd=notebook_path.parent.as_posix(),
                 )
-
-
-@dataclass
-class ReferenceStep(DataStep):
-    """
-    A step that marks a dependency on a local dataset. It never runs, but it will checksum
-    the local dataset and trigger rebuilds if the local dataset changes.
-    """
-
-    def __init__(self, path: str) -> None:
-        self.path = path
-        self.dependencies = []
-
-    def is_dirty(self) -> bool:
-        return False
-
-    def can_execute(self) -> bool:
-        return True
-
-    def run(self) -> None:
-        return
 
 
 @dataclass
