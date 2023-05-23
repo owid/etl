@@ -190,9 +190,11 @@ def ask_and_get_variable_mapping(search_form, owid_env: OWIDEnv) -> "VariableCon
                             st.markdown(f":{color}[**{similarity_max}%**]")
                         if search_form.enable_explore_mode:
                             with cols_manual_2[2]:
-                                element = st.checkbox(
+                                element_check = st.checkbox(
                                     "Explore", key=f"manual-explore-{i}", label_visibility="collapsed"
                                 )
+                    if search_form.enable_explore_mode and element_check:  # type: ignore
+                        plot_comparison_two_variables(df_data, variable_old, element, variable_id_to_display)  # type: ignore
 
             # Options
             skip_slider_check = st.radio(
@@ -288,6 +290,7 @@ def build_df_comparison_two_variables_cached(df, variable_old, variable_new, var
 
 
 def plot_comparison_two_variables(df, variable_old, variable_new, var_id_to_display):
+    print("TABLE")
     df_variables = build_df_comparison_two_variables_cached(df, variable_old, variable_new, var_id_to_display)
     st.dataframe(df_variables)
     # years = sorted(set(df_variables["year"]))
