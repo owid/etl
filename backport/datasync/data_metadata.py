@@ -1,10 +1,15 @@
 import concurrent.futures
 import json
-from typing import Any, Dict, List, Union
-from urllib.error import HTTPError
+from http.client import RemoteDisconnected
+from typing import Any, Dict, List, Union, cast
+from urllib.error import HTTPError, URLError
 
 import pandas as pd
 from sqlalchemy.engine import Engine
+from tenacity import Retrying
+from tenacity.retry import retry_if_exception_type
+from tenacity.stop import stop_after_attempt
+from tenacity.wait import wait_fixed
 
 
 def variable_data_df_from_mysql(engine: Engine, variable_id: int) -> pd.DataFrame:
@@ -27,17 +32,25 @@ def variable_data_df_from_mysql(engine: Engine, variable_id: int) -> pd.DataFram
 def _fetch_data_df_from_s3(data_path: str):
     try:
         variable_id = int(data_path.split("/")[-1].replace(".json", ""))
-        return (
-            pd.read_json(data_path)
-            .rename(
-                columns={
-                    "entities": "entityId",
-                    "values": "value",
-                    "years": "year",
-                }
-            )
-            .assign(variableId=variable_id)
-        )
+        # Cloudflare limits us to 600 requests per minute, retry in case we hit the limit
+        # NOTE: increase wait time or attempts if we hit the limit too often
+        for attempt in Retrying(
+            wait=wait_fixed(2),
+            stop=stop_after_attempt(3),
+            retry=retry_if_exception_type((URLError, RemoteDisconnected)),
+        ):
+            with attempt:
+                return (
+                    pd.read_json(data_path)
+                    .rename(
+                        columns={
+                            "entities": "entityId",
+                            "values": "value",
+                            "years": "year",
+                        }
+                    )
+                    .assign(variableId=variable_id)
+                )
     # no data on S3 in dataPath
     except HTTPError:
         return pd.DataFrame(columns=["variableId", "entityId", "year", "value"])
@@ -63,7 +76,10 @@ def variable_data_df_from_s3(
     with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as executor:
         results = list(executor.map(lambda data_path: _fetch_data_df_from_s3(data_path), data_paths))
 
-    df = pd.concat(results)
+    if isinstance(results, list) and all(isinstance(df, pd.DataFrame) for df in results):
+        df = pd.concat(cast(List[pd.DataFrame], results))
+    else:
+        raise TypeError(f"results must be a list of pd.DataFrame, got {type(results)}")
 
     # we work with strings and convert to specific types later
     df["value"] = df["value"].astype(str)

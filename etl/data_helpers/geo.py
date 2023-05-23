@@ -31,8 +31,9 @@ NUM_ALLOWED_NANS_PER_YEAR = None
 
 # Paths to datasets used in this module. Feel free to update the versions or paths whenever there is a
 # new version of the datasets.
-# Path to Key Indicators dataset
-DATASET_KEY_INDICATORS = DATA_DIR / "garden" / "owid" / "latest" / "key_indicators"
+# Path to Key Indicators dataset (TODO: should change it)
+# DATASET_POPULATION = DATA_DIR / "garden" / "demography" / "2023-03-31" / "population"
+DATASET_POPULATION = DATA_DIR / "garden" / "owid" / "latest" / "key_indicators"
 TNAME_KEY_INDICATORS = "population"
 # Path to Key Indicators dataset
 # TODO: we should update it to latest garden/wb/*/income_groups dataset
@@ -42,7 +43,7 @@ TNAME_WB_INCOME = "wb_income_group"
 
 @functools.lru_cache
 def _load_population() -> pd.DataFrame:
-    population = Dataset(DATASET_KEY_INDICATORS)[TNAME_KEY_INDICATORS]
+    population = Dataset(DATASET_POPULATION)[TNAME_KEY_INDICATORS]
     population = population.reset_index()
     return cast(pd.DataFrame, population)
 
