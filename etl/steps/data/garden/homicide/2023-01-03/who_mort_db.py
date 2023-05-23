@@ -18,9 +18,9 @@ log = get_logger()
 N = PathFinder(__file__)
 
 AGE_GROUPS_RANGES = {
-    "Age00": [0, 1],
-    "Age01_04": [1, 5],
-    "Age05_09": [5, 10],
+    "Age00": [0, 0],
+    "Age01_04": [1, 4],
+    "Age05_09": [5, 9],
     "Age10_14": [10, 14],
     "Age15_19": [15, 19],
     "Age20_24": [20, 24],
@@ -198,6 +198,8 @@ def build_custom_age_groups(df: pd.DataFrame, age_groups: dict) -> pd.DataFrame:
         df_age["number_of_deaths"].div(df_age["population"]).replace(np.inf, np.nan)
     ) * 100000
     df_age = df_age.drop(columns=["population"]).reset_index()
+
+    assert df["number_of_deaths"].sum() == df_age["number_of_deaths"].sum()
 
     return df_age
 
