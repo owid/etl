@@ -22,7 +22,7 @@ WALDEN_INGEST_DIR = Path(walden.__file__).parent.parent.parent / "ingests"
 POPULATION_LATEST_VERSION = (
     sorted((STEP_DIR / "data/garden/demography").glob("*/population/"))[-1].as_posix().split("/")[-2]
 )
-REGIONS_LATEST_VERSION = sorted((STEP_DIR / "data/garden/regions").glob("*/regions/"))[-1].as_posix().split("/")[-2]
+REGIONS_LATEST_VERSION = sorted((STEP_DIR / "data/garden/regions").glob("*"))[-1].as_posix().split("/")[-2]
 DATASET_POPULATION_URI = f"data://garden/demography/{POPULATION_LATEST_VERSION}/population"
 DATASET_REGIONS_URI = f"data://garden/regions/{REGIONS_LATEST_VERSION}/regions"
 
