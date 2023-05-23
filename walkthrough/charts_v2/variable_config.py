@@ -206,14 +206,15 @@ def ask_and_get_variable_mapping(search_form, owid_env: OWIDEnv) -> "VariableCon
 
             # Options
             skip_slider_check = st.radio(
-                label="Review and update the time slider in charts",
+                label="Review the time slider in charts",
                 options=RADIO_OPTIONS.keys(),
                 index=1,
                 help=(
-                    "To review the time slider of charts, we need to get the data values for *all* the variables involved (i.e. not only the variables"
+                    "Review that the new selected timeline range is consistent with the new timeline range.\n\n"
+                    "To do this, we need to get the data values for *all* the variables involved (i.e. not only the variables"
                     "being updated). This is a costly operation, and hence we recommend skipping whenever there are more than 50 variables involved.\n\n"
-                    "Ideally, the time slider should almost never be updated. If set to a specific year (or range of years) we should"
-                    "assume that there is a good reason for that. If set to 'earliest' or 'latest, the chart will be rendered with the new time range, so no need"
+                    "Note, also, that the time slider should almost never be updated. If set to a specific year (or range of years) we should"
+                    "assume that there is a good editorial reason for that. If set to 'earliest' or 'latest', the chart will be rendered with the new time range, so no need"
                     "to update the time slider config field value."
                 ),
                 format_func=RADIO_OPTIONS.get,
