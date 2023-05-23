@@ -35,6 +35,7 @@ NUM_ALLOWED_NANS_PER_YEAR = None
 DATASET_KEY_INDICATORS = DATA_DIR / "garden" / "owid" / "latest" / "key_indicators"
 TNAME_KEY_INDICATORS = "population"
 # Path to Key Indicators dataset
+# TODO: we should update it to latest garden/wb/*/income_groups dataset
 DATASET_WB_INCOME = DATA_DIR / "garden" / "wb" / "2021-07-01" / "wb_income"
 TNAME_WB_INCOME = "wb_income_group"
 
@@ -157,12 +158,15 @@ def list_countries_in_region_that_must_have_data(
         Countries that are expected to have the largest contribution.
 
     """
+    # TODO: we should be passing countries_regions explicitly and get rid of `_load_countries_regions`
     if countries_regions is None:
         countries_regions = _load_countries_regions()
 
+    # TODO: we should be passing population explicitly and get rid of `_load_population`
     if population is None:
         population = _load_population()
 
+    # TODO: we should be passing income groups explicitly and get rid of `_load_income_groups`
     if income_groups is None:
         income_groups = _load_income_groups().reset_index()
 
