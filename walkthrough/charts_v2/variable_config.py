@@ -151,8 +151,10 @@ def ask_and_get_variable_mapping(search_form, owid_env: OWIDEnv) -> "VariableCon
                                     "Explore", key=f"auto-explore-{i}", label_visibility="collapsed"
                                 )
                     if search_form.enable_explore_mode and element_check:  # type: ignore
-                        plot_comparison_two_variables(df_data, variable_old, variable_new, variable_id_to_display)  # type: ignore
-
+                        try:
+                            plot_comparison_two_variables(df_data, variable_old, variable_new, variable_id_to_display)  # type: ignore
+                        except:
+                            st.error("Something went wrong! This can be due to several reasons: One (or both) of the variables are not numeric, `data_values` for one of the variables does not have the columns `entityName` and `year`. Please check the error message below. Report the error #002001")
             # Remaining variables (editable)
             for i, suggestion in enumerate(suggestions):
                 with st.container():
@@ -288,20 +290,28 @@ def get_variable_data_cached(variables_ids: List[int]):
 
 @st.cache_data(show_spinner=False)
 def build_df_comparison_two_variables_cached(df, variable_old, variable_new, var_id_to_display):
+    # Get df with only the two variables, cast to appropriate type
     df_variables = df[df["variableId"].isin([variable_old, variable_new])]
     df_variables.loc[:, "value"] = df_variables.value.astype(float)
+    # Reshape dataframe
     df_variables = df_variables.pivot(index=["entityName", "year"], columns="variableId", values="value").reset_index()
-    df_variables["Relative difference"] = (
-        (df_variables[variable_old] - df_variables[variable_new]) / df_variables[variable_old]
+    df_variables["Relative difference (%)"] = (
+        100 * (df_variables[variable_old] - df_variables[variable_new]) / df_variables[variable_old]
     ).abs()
-    df_variables = df_variables.rename(columns=var_id_to_display).sort_values("Relative difference", ascending=False)
+    df_variables = df_variables.rename(columns=var_id_to_display).sort_values("Relative difference (%)", ascending=False)
+    # df_variables = df_variables.style.bar(subset=['Relative difference (%)'], color='#d65f5f')
     return df_variables
 
 
 def plot_comparison_two_variables(df, variable_old, variable_new, var_id_to_display):
     log.info("table: comparison of two variables")
     df_variables = build_df_comparison_two_variables_cached(df, variable_old, variable_new, var_id_to_display)
-    st.dataframe(df_variables)
+    # Show country filters
+    countries = st.multiselect("Select locations", df_variables["entityName"])
+    if countries:
+        df_variables = df_variables[df_variables["entityName"].isin(countries)]
+    # Display table
+    st.dataframe(df_variables.style.background_gradient(cmap="OrRd", subset=["Relative difference (%)"], vmin=0, vmax=20))
     # years = sorted(set(df_variables["year"]))
     # year = st.select_slider('Year', years)
     # df_variables_year = df_variables[df_variables["year"] == year]
