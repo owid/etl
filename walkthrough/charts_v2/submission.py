@@ -120,7 +120,8 @@ def push_submission(submission_config: "SubmissionConfig", owid_env: OWIDEnv) ->
             staging_link = "https://staging.owid.cloud/admin/suggested-chart-revisions/review"
             local_link = "http://localhost:3030/admin/suggested-chart-revisions/review"
 
-            st.success(f"""
+            st.success(
+                f"""
             Chart revisions submitted successfully!
 
             Now review these at the approval tool:
@@ -128,7 +129,8 @@ def push_submission(submission_config: "SubmissionConfig", owid_env: OWIDEnv) ->
             - [Live]({live_link})
             - [Staging]({staging_link})
             - [Local]({local_link})
-            """)
+            """
+            )
         else:
             st.success(
                 f"Chart revisions submitted successfully! Now review these at the [approval tool]({owid_env.chart_approval_tool_url})!"

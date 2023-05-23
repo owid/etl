@@ -22,6 +22,7 @@ RADIO_OPTIONS = {
 }
 ignore_all = False
 
+
 def ask_and_get_variable_mapping(search_form, owid_env: OWIDEnv) -> "VariableConfig":
     variable_config = VariableConfig()
 
@@ -87,7 +88,10 @@ def ask_and_get_variable_mapping(search_form, owid_env: OWIDEnv) -> "VariableCon
                     st.caption(f"[Explore dataset]({owid_env.admin_url}/datasets/{search_form.dataset_old_id}/)")
                 with col12:
                     st.caption("Ignore", help="Check to ignore this variable in the mapping.")
-                    ignore_all = st.checkbox("All", help="Check to ignore all mappings.",)
+                    ignore_all = st.checkbox(
+                        "All",
+                        help="Check to ignore all mappings.",
+                    )
             with col2:
                 st.subheader("New dataset")
                 cols2 = st.columns(col_2_widths)
@@ -124,7 +128,9 @@ def ask_and_get_variable_mapping(search_form, owid_env: OWIDEnv) -> "VariableCon
                             )
                             old_var_selectbox.append(element)
                         with cols_auto[1]:
-                            element = st.checkbox("Ignore", key=f"auto-ignore-{i}", label_visibility="collapsed", value=ignore_all)
+                            element = st.checkbox(
+                                "Ignore", key=f"auto-ignore-{i}", label_visibility="collapsed", value=ignore_all
+                            )
                             ignore_selectbox.append(element)
                     with col_auto_2:
                         cols_auto_2 = st.columns(col_2_widths)
@@ -165,7 +171,9 @@ def ask_and_get_variable_mapping(search_form, owid_env: OWIDEnv) -> "VariableCon
                             )
                             old_var_selectbox.append(element)
                         with col_manual_12:
-                            element = st.checkbox("Ignore", key=f"manual-ignore-{i}", label_visibility="collapsed", value=ignore_all)
+                            element = st.checkbox(
+                                "Ignore", key=f"manual-ignore-{i}", label_visibility="collapsed", value=ignore_all
+                            )
                             ignore_selectbox.append(element)
                     with col_manual_2:
                         cols_manual_2 = st.columns(col_2_widths)
@@ -290,7 +298,7 @@ def build_df_comparison_two_variables_cached(df, variable_old, variable_new, var
 
 
 def plot_comparison_two_variables(df, variable_old, variable_new, var_id_to_display):
-    print("TABLE")
+    log.info("table: comparison of two variables")
     df_variables = build_df_comparison_two_variables_cached(df, variable_old, variable_new, var_id_to_display)
     st.dataframe(df_variables)
     # years = sorted(set(df_variables["year"]))
