@@ -297,11 +297,11 @@ def build_df_comparison_two_variables_cached(df, variable_old, variable_new, var
     df_variables.loc[:, "value"] = df_variables.value.astype(float)
     # Reshape dataframe
     df_variables = df_variables.pivot(index=["entityName", "year"], columns="variableId", values="value").reset_index()
-    df_variables["Relative difference (%)"] = (
+    df_variables["Relative difference (abs, %)"] = (
         (100 * (df_variables[variable_old] - df_variables[variable_new]) / df_variables[variable_old]).round(2)
     ).abs()
     df_variables = df_variables.rename(columns=var_id_to_display).sort_values(
-        "Relative difference (%)", ascending=False
+        "Relative difference (abs, %)", ascending=False
     )
     # df_variables = df_variables.style.bar(subset=['Relative difference (%)'], color='#d65f5f')
     return df_variables
@@ -312,12 +312,12 @@ def plot_comparison_two_variables(df, variable_old, variable_new, var_id_to_disp
     df_variables = build_df_comparison_two_variables_cached(df, variable_old, variable_new, var_id_to_display)
     # Show country filters
     countries = st.multiselect("Select locations", sorted(set(df_variables["entityName"])))
-    st.write(countries)
+    # st.write(countries)
     if countries:
         df_variables = df_variables[df_variables["entityName"].isin(countries)]
     # Display table
     st.dataframe(
-        df_variables.style.background_gradient(cmap="OrRd", subset=["Relative difference (%)"], vmin=0, vmax=20)
+        df_variables.style.background_gradient(cmap="OrRd", subset=["Relative difference (abs, %)"], vmin=0, vmax=20)
     )
     # years = sorted(set(df_variables["year"]))
     # year = st.select_slider('Year', years)
