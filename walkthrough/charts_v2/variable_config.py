@@ -1,6 +1,6 @@
 """Concerns the second stage of walkthrough charts, when the variable mapping is constructed."""
-from typing import Any, Dict, List, Literal
 import uuid
+from typing import Any, Dict, List, Literal
 
 import pandas as pd
 import streamlit as st
@@ -313,7 +313,11 @@ def plot_comparison_two_variables(df, variable_old, variable_new, var_id_to_disp
     log.info("table: comparison of two variables")
     df_variables = build_df_comparison_two_variables_cached(df, variable_old, variable_new, var_id_to_display)
     # Show country filters
-    countries = st.multiselect("Select locations", sorted(set(df_variables["entityName"])), key=f"multi-{variable_old}-{variable_new}-{uuid.uuid4().hex[:10]}")
+    countries = st.multiselect(
+        "Select locations",
+        sorted(set(df_variables["entityName"])),
+        key=f"multi-{variable_old}-{variable_new}-{uuid.uuid4().hex[:10]}",
+    )
     # st.write(countries)
     if countries:
         df_variables = df_variables[df_variables["entityName"].isin(countries)]
