@@ -18,6 +18,9 @@ LATEST_REGIONS_DATASET_PATH = BASE_DIR / "data/garden/regions" / LATEST_REGIONS_
 LATEST_INCOME_VERSION = sorted((STEP_DIR / "data/garden/wb/").glob("*/income_groups.py"))[-1].parts[-2]
 LATEST_INCOME_DATASET_PATH = BASE_DIR / "data/garden/wb" / LATEST_INCOME_VERSION / "income_groups"
 
+# Population
+LATEST_POPULATION_VERSION = sorted((STEP_DIR / "data/garden/demography/").glob("*/population"))[-1].parts[-2]
+
 # NOTE: this is useful when your steps are defined in a different package
 BASE_PACKAGE = os.environ.get("BASE_PACKAGE", "etl")
 
