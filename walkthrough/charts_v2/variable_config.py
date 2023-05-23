@@ -298,7 +298,7 @@ def build_df_comparison_two_variables_cached(df, variable_old, variable_new, var
     # Reshape dataframe
     df_variables = df_variables.pivot(index=["entityName", "year"], columns="variableId", values="value").reset_index()
     df_variables["Relative difference (%)"] = (
-        100 * (df_variables[variable_old] - df_variables[variable_new]) / df_variables[variable_old]
+        (100 * (df_variables[variable_old] - df_variables[variable_new]) / df_variables[variable_old]).round(2)
     ).abs()
     df_variables = df_variables.rename(columns=var_id_to_display).sort_values(
         "Relative difference (%)", ascending=False
