@@ -10,7 +10,7 @@ from etl.steps.data.garden.owid.latest.key_indicators.utils import add_regions
 DIR_PATH = Path(__file__).parent
 
 
-def load_land_area() -> Table:
+def load_land_area(ds: Dataset) -> Table:
     d = Dataset(DATA_DIR / "open_numbers/open_numbers/latest/open_numbers__world_development_indicators")
     table = d["ag_lnd_totl_k2"]
 
@@ -29,7 +29,7 @@ def load_land_area() -> Table:
         .assign(country=table.geo.str.upper().map(countries_regions["name"]))
         .dropna(subset=["country"])
         .drop(["geo"], axis=1)
-        .pipe(add_regions)
+        .pipe(add_regions, population=ds["population"].reset_index())
         .pipe(add_world)
     )
 
@@ -61,8 +61,8 @@ def add_world(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def make_table() -> Table:
-    t = load_land_area()
+def make_table(ds: Dataset) -> Table:
+    t = load_land_area(ds)
     t.update_metadata_from_yaml(DIR_PATH / "key_indicators.meta.yml", "land_area")
 
     # variable ID 147839 in grapher

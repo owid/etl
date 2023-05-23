@@ -15,7 +15,7 @@ import pandas as pd
 from owid.catalog import Dataset
 from rapidfuzz import process
 
-from etl.paths import LATEST_REGIONS_DATASET_PATH, LATEST_REGIONS_REGIONS_YML
+from etl.paths import LATEST_REGIONS_DATASET_PATH, LATEST_REGIONS_YML
 
 
 @click.command()
@@ -270,10 +270,10 @@ def save_alias_to_regions_yaml(name: str, alias: str) -> None:
     Save alias to regions.yml definitions. It doesn't modify original formatting of the file, but assumes
     that `alias` is always the last element in the region block.
     """
-    with open(LATEST_REGIONS_REGIONS_YML, "r") as f:
+    with open(LATEST_REGIONS_YML, "r") as f:
         yaml_content = f.read()
 
-    with open(LATEST_REGIONS_REGIONS_YML, "w") as f:
+    with open(LATEST_REGIONS_YML, "w") as f:
         f.write(_add_alias_to_regions(yaml_content, name, alias))
 
 
@@ -297,7 +297,7 @@ def _add_alias_to_regions(yaml_content, target_name, new_alias):
             aliases = f'  aliases:\n    - "{new_alias}"\n'
             yaml_content = yaml_content[: match.end()] + aliases + yaml_content[match.end() :]
     else:
-        raise ValueError(f"Could not find region {target_name} in {LATEST_REGIONS_REGIONS_YML}")
+        raise ValueError(f"Could not find region {target_name} in {LATEST_REGIONS_YML}")
 
     return yaml_content
 
