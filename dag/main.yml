@@ -415,6 +415,7 @@ include:
   - dag/demography.yml
   - dag/war.yml
   - dag/fasttrack.yml
+  - dag/migrated.yml
   - dag/biodiversity.yml
   - dag/health.yml
   - dag/excess_mortality.yml

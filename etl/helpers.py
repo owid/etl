@@ -274,7 +274,10 @@ class PathFinder:
 
         if channel in ["meadow", "garden", "grapher", "explorers", "examples"]:
             step_name = f"data{is_private_suffix}://{channel}/{namespace}/{version}/{short_name}"
-        elif channel in ["snapshot", "walden"]:
+        elif channel == "snapshot":
+            # match also on snapshot short_names without extension
+            step_name = f"{channel}{is_private_suffix}://{namespace}/{version}/{short_name}(.\\w+)?"
+        elif channel == "walden":
             step_name = f"{channel}{is_private_suffix}://{namespace}/{version}/{short_name}"
         elif channel is None:
             step_name = rf"(?:snapshot{is_private_suffix}:/|walden{is_private_suffix}:/|data{is_private_suffix}://meadow|data{is_private_suffix}://garden|data://grapher|data://explorers|backport://backport)/{namespace}/{version}/{short_name}$"
@@ -404,6 +407,18 @@ class PathFinder:
             )
             dataset = catalog.Dataset(dataset_path)
 
+        return dataset
+
+    def load_snapshot_dependency(self) -> Snapshot:
+        """Load snapshot dependency with the same name."""
+        snap = self.load_dependency(channel="snapshot", short_name=self.short_name)
+        assert isinstance(snap, Snapshot)
+        return snap
+
+    def load_dataset_dependency(self) -> catalog.Dataset:
+        """Load dataset dependency with the same name."""
+        dataset = self.load_dependency(short_name=self.short_name)
+        assert isinstance(dataset, catalog.Dataset)
         return dataset
 
 
