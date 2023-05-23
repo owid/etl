@@ -311,7 +311,8 @@ def plot_comparison_two_variables(df, variable_old, variable_new, var_id_to_disp
     log.info("table: comparison of two variables")
     df_variables = build_df_comparison_two_variables_cached(df, variable_old, variable_new, var_id_to_display)
     # Show country filters
-    countries = st.multiselect("Select locations", df_variables["entityName"])
+    countries = st.multiselect("Select locations", sorted(set(df_variables["entityName"])))
+    st.write(countries)
     if countries:
         df_variables = df_variables[df_variables["entityName"].isin(countries)]
     # Display table
