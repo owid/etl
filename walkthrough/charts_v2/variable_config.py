@@ -1,5 +1,6 @@
 """Concerns the second stage of walkthrough charts, when the variable mapping is constructed."""
 from typing import Any, Dict, List, Literal
+import uuid
 
 import pandas as pd
 import streamlit as st
@@ -30,7 +31,7 @@ def ask_and_get_variable_mapping(search_form, owid_env: OWIDEnv) -> "VariableCon
     # Get variables from old and new datasets
     old_variables, new_variables = get_variables_from_datasets(search_form.dataset_old_id, search_form.dataset_new_id)
 
-    # Build display mappings: id -> display_name, display_name -> id
+    # Build display mappings: id -> display_name
     df = pd.concat([old_variables, new_variables], ignore_index=True)
     df["display_name"] = "[" + df["id"].astype(str) + "] " + df["name"]
     variable_id_to_display = df.set_index("id")["display_name"].to_dict()
@@ -55,15 +56,15 @@ def ask_and_get_variable_mapping(search_form, owid_env: OWIDEnv) -> "VariableCon
         ):
             df_data = get_variable_data_cached(list(set(old_variables["id"]) | set(new_variables["id"])))
 
-    with st.expander("👷  Mapping details (debugging)"):
-        st.subheader("Variable mapping")
-        st.markdown("##### Automatically mapped variables")
-        st.write(variable_mapping_auto)
-        st.markdown("##### Variables that need manual mapping from the user.")
-        for suggestion in suggestions:
-            st.markdown(f"##### Variable #{suggestion['old']['id_old']}")
-            st.write(suggestion["old"])
-            st.write(suggestion["new"])
+    # with st.expander("👷  Mapping details (debugging)"):
+    #     st.subheader("Variable mapping")
+    #     st.markdown("##### Automatically mapped variables")
+    #     st.write(variable_mapping_auto)
+    #     st.markdown("##### Variables that need manual mapping from the user.")
+    #     for suggestion in suggestions:
+    #         st.markdown(f"##### Variable #{suggestion['old']['id_old']}")
+    #         st.write(suggestion["old"])
+    #         st.write(suggestion["new"].head(5).to_dict())
 
     # 2.2 DISPLAY MAPPING SECTION
     st.header(
@@ -307,11 +308,12 @@ def build_df_comparison_two_variables_cached(df, variable_old, variable_new, var
     return df_variables
 
 
+# @st.cache_data(show_spinner=False)
 def plot_comparison_two_variables(df, variable_old, variable_new, var_id_to_display):
     log.info("table: comparison of two variables")
     df_variables = build_df_comparison_two_variables_cached(df, variable_old, variable_new, var_id_to_display)
     # Show country filters
-    countries = st.multiselect("Select locations", sorted(set(df_variables["entityName"])))
+    countries = st.multiselect("Select locations", sorted(set(df_variables["entityName"])), key=f"multi-{variable_old}-{variable_new}-{uuid.uuid4().hex[:10]}")
     # st.write(countries)
     if countries:
         df_variables = df_variables[df_variables["entityName"].isin(countries)]
