@@ -122,6 +122,7 @@ def push_submission(submission_config: "SubmissionConfig", owid_env: OWIDEnv) ->
 
 @st.cache_data(show_spinner=False)
 def build_updaters_and_get_charts_cached(variable_mapping, schema_chart_config, skip_slider_check_limit):
+    # st.write(variable_mapping)
     return build_updaters_and_get_charts(
         variable_mapping=variable_mapping,
         schema_chart_config=schema_chart_config,

@@ -20,7 +20,7 @@ RADIO_OPTIONS = {
     1: "Only if it is a small dataset update (Recommended)",
     2: "Yes",
 }
-
+ignore_all = False
 
 def ask_and_get_variable_mapping(search_form, owid_env: OWIDEnv) -> "VariableConfig":
     variable_config = VariableConfig()
@@ -87,6 +87,7 @@ def ask_and_get_variable_mapping(search_form, owid_env: OWIDEnv) -> "VariableCon
                     st.caption(f"[Explore dataset]({owid_env.admin_url}/datasets/{search_form.dataset_old_id}/)")
                 with col12:
                     st.caption("Ignore", help="Check to ignore this variable in the mapping.")
+                    ignore_all = st.checkbox("All", help="Check to ignore all mappings.",)
             with col2:
                 st.subheader("New dataset")
                 cols2 = st.columns(col_2_widths)
@@ -123,7 +124,7 @@ def ask_and_get_variable_mapping(search_form, owid_env: OWIDEnv) -> "VariableCon
                             )
                             old_var_selectbox.append(element)
                         with cols_auto[1]:
-                            element = st.checkbox("Ignore", key=f"auto-ignore-{i}", label_visibility="collapsed")
+                            element = st.checkbox("Ignore", key=f"auto-ignore-{i}", label_visibility="collapsed", value=ignore_all)
                             ignore_selectbox.append(element)
                     with col_auto_2:
                         cols_auto_2 = st.columns(col_2_widths)
@@ -164,7 +165,7 @@ def ask_and_get_variable_mapping(search_form, owid_env: OWIDEnv) -> "VariableCon
                             )
                             old_var_selectbox.append(element)
                         with col_manual_12:
-                            element = st.checkbox("Ignore", key=f"manual-ignore-{i}", label_visibility="collapsed")
+                            element = st.checkbox("Ignore", key=f"manual-ignore-{i}", label_visibility="collapsed", value=ignore_all)
                             ignore_selectbox.append(element)
                     with col_manual_2:
                         cols_manual_2 = st.columns(col_2_widths)
