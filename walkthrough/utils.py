@@ -201,7 +201,7 @@ class OWIDEnv:
 
     def detect_env_type(self) -> OWIDEnvType:
         # live
-        if config.DB_NAME == "live_grapher" and config.DB_USER == "etl_grapher":
+        if config.DB_NAME == "live_grapher":
             return "live"
         # staging
         elif config.DB_NAME == "staging_grapher" and config.DB_USER == "staging_grapher":

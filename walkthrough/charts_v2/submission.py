@@ -115,9 +115,24 @@ def push_submission(submission_config: "SubmissionConfig", owid_env: OWIDEnv) ->
         st.error(f"Something went wrong! {e}")
     else:
         st.balloons()
-        st.success(
-            f"Chart revisions submitted successfully! Now review these at the [approval tool]({owid_env.chart_approval_tool_url})!"
-        )
+        if owid_env.env_type_id == "unknown":
+            live_link = "https://owid.cloud/admin/suggested-chart-revisions/review"
+            staging_link = "https://staging.owid.cloud/admin/suggested-chart-revisions/review"
+            local_link = "http://localhost:3030/admin/suggested-chart-revisions/review"
+
+            st.success(f"""
+            Chart revisions submitted successfully!
+
+            Now review these at the approval tool:
+
+            - [Live]({live_link})
+            - [Staging]({staging_link})
+            - [Local]({local_link})
+            """)
+        else:
+            st.success(
+                f"Chart revisions submitted successfully! Now review these at the [approval tool]({owid_env.chart_approval_tool_url})!"
+            )
 
 
 @st.cache_data(show_spinner=False)
