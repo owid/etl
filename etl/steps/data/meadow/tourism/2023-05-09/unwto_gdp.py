@@ -25,7 +25,7 @@ def run(dest_dir: str) -> None:
     snap: Snapshot = paths.load_dependency("unwto_gdp.xlsx")
 
     # Load the data from the Excel object into memory
-    excel_object = shrd.load_data(snap)
+    excel_object = shrd.load_data(snap, sheet_name_to_load)
 
     # Load the desired sheet from the Excel file into a pandas DataFrame
     df = pd.read_excel(excel_object, sheet_name=sheet_name_to_load)

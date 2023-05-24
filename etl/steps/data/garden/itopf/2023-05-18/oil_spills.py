@@ -55,9 +55,6 @@ def run(dest_dir: str) -> None:
     # using 'year' as the key and keeping all records from both DataFrames ('outer' join).
     df_decadal = pd.merge(df, decadal_averages_df, on="year", how="outer", validate="many_to_one")
 
-    # Reset the DataFrame's index to default.
-    df_decadal.reset_index(inplace=True)
-
     # Replace any '__' in column names with a space (done because of double _ in some variable names)
     newnames = [name.replace("__", " ") for name in df_decadal.columns]
     df_decadal.columns = newnames
