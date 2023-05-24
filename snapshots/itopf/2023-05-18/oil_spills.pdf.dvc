@@ -1,0 +1,26 @@
+meta:
+  namespace: itopf
+  short_name: oil_spills
+  name: Oil tanker spill statistics (ITOPF, 2023)
+  version: 2023-05-18
+  publication_year: 2023
+  publication_date: January 2023
+  source_name: ITOPF
+  source_published_by: ITOPF (2023). Oil tanker spill statistics 2022. ITOPF Ltd,
+    London, UK
+  url: https://www.itopf.org/knowledge-resources/data-statistics/statistics/
+  source_data_url: https://www.itopf.org/fileadmin/uploads/itopf/data/Photos/Statistics/Oil_Spill_Stats_brochure_2022.pdf
+  file_extension: pdf
+  license_url: https://www.itopf.org/terms-conditions/
+  license_name: ITOPF Limited, 2019
+  date_accessed: 2023-05-18
+  is_public: true
+  description: |
+    ITOPF maintains a database of oil spills from tank vessels, including combined carriers, FPSOs and barges. This contains information on accidental spillages of persistent and non-persistent hydrocarbon oil since 1970, except those resulting from acts of war. For historical reasons, spills are generally categorised by size, <7 tonnes, 7-700 tonnes and >700 tonnes, although the actual amount spilt is also recorded. Information is now held on over 10,000 incidents, the vast majority of which fall into the smallest category i.e. <7 tonnes.
+
+    Information is gathered from published sources, such as the shipping press and other specialist publications, as well as from vessel owners, their insurers and from ITOPF's own experience at incidents. Historically, information from published sources mostly related to large spills, often resulting from collisions, groundings, structural damage, fires or explosions. In recent decades, however, reporting of smaller spills has improved.
+wdir: ../../../data/snapshots/itopf/2023-05-18
+outs:
+- md5: 2909693666a74789122bffe4ecfb8d9e
+  size: 1442988
+  path: oil_spills.pdf

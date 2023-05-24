@@ -341,7 +341,7 @@ steps:
   data://grapher/technology/2023-03-16/hcctad:
   - data://garden/technology/2023-03-16/hcctad
 
-# Happiness report
+  # Happiness report
   data://meadow/happiness/2023-03-20/happiness:
   - snapshot://happiness/2023-03-20/happiness.xls
   data://garden/happiness/2023-03-20/happiness:
@@ -370,6 +370,14 @@ steps:
   - data://garden/regions/2023-01-01/regions
   data://grapher/eth/2023-03-15/ethnic_power_relations:
   - data://garden/eth/2023-03-15/ethnic_power_relations
+
+# Oil Spills
+  data://meadow/itopf/2023-05-18/oil_spills:
+  - snapshot://itopf/2023-05-18/oil_spills.pdf
+  data://garden/itopf/2023-05-18/oil_spills:
+  - data://meadow/itopf/2023-05-18/oil_spills
+  data://grapher/itopf/2023-05-18/oil_spills:
+  - data://garden/itopf/2023-05-18/oil_spills
 
 
   # WB income groups

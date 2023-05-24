@@ -1,0 +1,330 @@
+dataset:
+  title: UNWTO Tourism Statistics Database
+  description: |-
+    The United Nations World Tourism Organization (UNWTO) collects data from countries through
+    annual questionnaires that follow the International Recommendations for Tourism Statistics (IRTS 2008)
+    standard, a framework approved by the United Nations. The data covers various aspects of tourism,
+    such as Inbound Tourism (including Arrivals by region, main purpose, and mode of transport, as well as
+    Accommodation and Tourism expenditure in the country), Domestic Tourism (including Trips and Accommodation),
+    Outbound Tourism (including Departures and Tourism expenditure in other countries),
+    Tourism Industries (such as Accommodation in hotels and similar establishments),
+    and Employment (including the number of employees in tourism industries).
+  licenses:
+  - name: Creative Commons BY 4.0
+    url: https://www.unwto.org/copyright
+  sources:
+  - name: UNWTO
+    description: |-
+      The United Nations World Tourism Organization (UNWTO) collects data from countries through
+      annual questionnaires that follow the International Recommendations for Tourism Statistics (IRTS 2008)
+      standard, a framework approved by the United Nations. The data covers various aspects of tourism,
+      such as Inbound Tourism (including Arrivals by region, main purpose, and mode of transport, as well as
+      Accommodation and Tourism expenditure in the country), Domestic Tourism (including Trips and Accommodation),
+      Outbound Tourism (including Departures and Tourism expenditure in other countries),
+      Tourism Industries (such as Accommodation in hotels and similar establishments),
+      and Employment (including the number of employees in tourism industries).
+    url: https://www.unwto.org/tourism-statistics/key-tourism-statistics
+    source_data_url: https://webunwto.s3.eu-west-1.amazonaws.com/s3fs-public/2023-03/unwto-all-data-download_032023.xlsx
+    date_accessed: '2023-05-04'
+    publication_date: '2023-01-25'
+    publication_year: 2023
+    published_by: World Tourism Organization, 2023
+tables:
+  unwto:
+    variables:
+      in_to_ar_ov_vi_to:
+        title: Inbound arrivals (tourists)
+        unit: ''
+        short_unit: ''
+      in_to_ar_sa_da_vi_ex:
+        title: Inbound arrivals (same day)
+        unit: ''
+        short_unit: ''
+      in_to_ar_to_ar:
+        title: Inbound arrivals (total)
+        unit: ''
+        short_unit: ''
+      in_to_ar_of_wh_cr_pa:
+        title: Inbound arrivals (same day of which cruise)
+        unit: ''
+        short_unit: ''
+      do_to_ac_ho_an_si_es_gu:
+        title: Domestic guests in tourism-accommodation (hotels and similar establishments)
+        unit: guests
+        short_unit: ''
+      do_to_ac_ho_an_si_es_ov:
+        title: Nights in tourism-accommodation by domestic visitors (hotels and similar
+          establishments)
+        unit: nights
+        short_unit: ''
+      do_to_ac_to_gu:
+        title: Domestic guests in tourism-accommodation (total)
+        unit: guests
+        short_unit: ''
+      do_to_ac_to_ov:
+        title: Nights in tourism-accommodation by domestic visitors(total)
+        unit: nights
+        short_unit: ''
+      do_to_tr_ov_vi_to:
+        title: Domestic trips (tourists)
+        unit: ''
+        short_unit: ''
+      do_to_tr_sa_da_vi_ex:
+        title: Domestic trips (same day)
+        unit: ''
+        short_unit: ''
+      do_to_tr_to_tr:
+        title: Domestic trips (total)
+        unit: ''
+        short_unit: ''
+      em_ac_se_fo_vi_ho_an_si_es:
+        title: Employment (accommodation services for visitors - ie hotels and similar
+          establishments)
+        unit: ''
+        short_unit: ''
+      em_fo_an_be_se_ac:
+        title: Employment (food and beverage serving activities)
+        unit: ''
+        short_unit: ''
+      em_ot_ac_se:
+        title: Employment (other accommodation services)
+        unit: ''
+        short_unit: ''
+      em_ot_to_in:
+        title: Employment (other tourism industries)
+        unit: ''
+        short_unit: ''
+      em_pa_tr:
+        title: Employment (passenger transportation)
+        unit: ''
+        short_unit: ''
+      em_to:
+        title: Employment (total)
+        unit: ''
+        short_unit: ''
+      em_tr_ag_an_ot_re_se_ac:
+        title: Employment (travel agencies and other reservation services activities)
+        unit: ''
+        short_unit: ''
+      in_to_ac_ho_an_si_es_gu:
+        title: Foreign guests in tourism-accommodation (hotels and similar establishments)
+        unit: ''
+        short_unit: ''
+      in_to_ac_ho_an_si_es_ov:
+        title: Nights in tourism-accommodation by foreigners (hotels and similar establishments)
+        unit: ''
+        short_unit: ''
+      in_to_ac_to_gu:
+        title: Foreign guests in tourism-accommodations (total)
+        unit: ''
+        short_unit: ''
+      in_to_ac_to_ov:
+        title: Nights in tourism-accommodation by foreigners (total)
+        unit: ''
+        short_unit: ''
+      in_to_ex_pa_tr:
+        title: Inbound tourism-expenditure (passenger transport)
+        unit: ''
+        short_unit: ''
+      in_to_ex_tr:
+        title: Inbound tourism-expenditure (travel)
+        unit: ''
+        short_unit: ''
+      in_to_pu_bu_an_pr:
+        title: Inbound tourism purpose (business and professional)
+        unit: ''
+        short_unit: ''
+      in_to_pu_pe:
+        title: Inbound tourism purpose (personal)
+        unit: ''
+        short_unit: ''
+      in_to_pu_to:
+        title: Inbound tourism purpose (total)
+        unit: ''
+        short_unit: ''
+      in_to_re_af:
+        title: Inbound tourism Africa
+        unit: ''
+        short_unit: ''
+      in_to_re_am:
+        title: Inbound tourism America
+        unit: ''
+        short_unit: ''
+      in_to_re_ea_as_an_th_pa:
+        title: Inbound tourism East Asia and the Pacific
+        unit: ''
+        short_unit: ''
+      in_to_re_eu:
+        title: Inbound tourism Europe
+        unit: ''
+        short_unit: ''
+      in_to_re_mi_ea:
+        title: Inbound tourism Middle East
+        unit: ''
+        short_unit: ''
+      in_to_re_ot_no_cl:
+        title: Inbound tourism Not Classified
+        unit: ''
+        short_unit: ''
+      in_to_re_so_as:
+        title: Inbound tourism South Asia
+        unit: ''
+        short_unit: ''
+      in_to_re_to:
+        title: Inbound tourism Total
+        unit: ''
+        short_unit: ''
+      in_to_re_of_wh_na_re_ab:
+        title: Inbound tourism Not Classified (of which, nationals residing abroad)
+        unit: ''
+        short_unit: ''
+      in_to_tr_ai:
+        title: Inbound transport (Air)
+        unit: arrivals
+        short_unit: ''
+      in_to_tr_la:
+        title: Inbound transport (Land)
+        unit: arrivals
+        short_unit: ''
+      in_to_tr_to:
+        title: Inbound transport (Total)
+        unit: arrivals
+        short_unit: ''
+      in_to_tr_wa:
+        title: Inbound transport (Water)
+        unit: arrivals
+        short_unit: ''
+      ou_to_de_ov_vi_to:
+        title: Outbound departures (tourists)
+        unit: departures
+        short_unit: ''
+      ou_to_de_sa_da_vi_ex:
+        title: Outbound departures (same day)
+        unit: departures
+        short_unit: ''
+      ou_to_de_to_de:
+        title: Outbound departures (total)
+        unit: departures
+        short_unit: ''
+      ou_to_ex_pa_tr:
+        title: Outbound tourism-expenditure (passenger transport)
+        unit: ''
+        short_unit: ''
+      ou_to_ex_tr:
+        title: Outbound tourism-expenditure (travel)
+        unit: US million $
+        short_unit: ''
+      to_in_av_ca_be_pl_pe_10_in:
+        title: Available capacity (bed-places per 1000 inhabitants)
+        unit: ''
+        short_unit: ''
+      to_in_av_le_of_st:
+        title: Average length of stay
+        unit: nights
+        short_unit: ''
+      to_in_nu_of_be_pl:
+        title: Number of bed-places
+        unit: ''
+        short_unit: ''
+      to_in_nu_of_es:
+        title: Number of establishments
+        unit: ''
+        short_unit: ''
+      to_in_nu_of_ro:
+        title: Number of rooms
+        unit: ''
+        short_unit: ''
+      to_in_oc_ra_be_pl:
+        title: Occupancy rate of bed-places
+        unit: ''
+        short_unit: ''
+      to_in_oc_ra_ro:
+        title: Occupancy rate of rooms
+        unit: ''
+        short_unit: ''
+      inb_tour_region:
+        title: International tourist arrivals by region
+        unit: ''
+        short_unit: ''
+      population:
+        title: Population
+        unit: ''
+        short_unit: ''
+      ou_to_de_to_de_per_1000:
+        title: Outbound departures (total) per 1000
+        unit: ''
+        short_unit: ''
+      ou_to_de_ov_vi_to_per_1000:
+        title: Outbound departures (tourists) per 1000
+        unit: ''
+        short_unit: ''
+      ou_to_de_sa_da_vi_ex_per_1000:
+        title: Outbound departures (same day) per 1000
+        unit: ''
+        short_unit: ''
+      do_to_tr_to_tr_per_1000:
+        title: Domestic trips (total) per 1000 people
+        unit: ''
+        short_unit: ''
+      do_to_tr_ov_vi_to_per_1000:
+        title: Domestic trips (tourists) per 1000 people
+        unit: ''
+        short_unit: ''
+      do_to_tr_sa_da_vi_ex_per_1000:
+        title: Domestic trips (same day) per 1000 people
+        unit: ''
+        short_unit: ''
+      in_to_ar_to_ar_per_1000:
+        title: Inbound arrivals (total) per 1000 people
+        unit: ''
+        short_unit: ''
+      in_to_ar_ov_vi_to_per_1000:
+        title: Inbound arrivals (same night) per 1000 people
+        unit: ''
+        short_unit: ''
+      in_to_ar_sa_da_vi_ex_per_1000:
+        title: Inbound arrivals (tourists) per 1000 people
+        unit: ''
+        short_unit: ''
+      em_ac_se_fo_vi_ho_an_si_es_per_1000:
+        title: Employment (accommodation services for visitors - ie hotels and similar
+          establishments) per 1000 people
+        unit: ''
+        short_unit: ''
+      em_fo_an_be_se_ac_per_1000:
+        title: Employment (food and beverage serving activities) per 1000 people
+        unit: ''
+        short_unit: ''
+      em_ot_ac_se_per_1000:
+        title: Employment (other accommodation services) per 1000 people
+        unit: ''
+        short_unit: ''
+      em_ot_to_in_per_1000:
+        title: Employment (other tourism industries) per 1000 people
+        unit: ''
+        short_unit: ''
+      em_pa_tr_per_1000:
+        title: Employment (passenger transportation) per 1000 people
+        unit: ''
+        short_unit: ''
+      em_to_per_1000:
+        title: Employment (total) per 1000 people
+        unit: ''
+        short_unit: ''
+      em_tr_ag_an_ot_re_se_ac_per_1000:
+        title: Employment (travel agencies and other reservation services activities)
+          per 1000 people
+        unit: ''
+        short_unit: ''
+      bus_pers:
+        title: Business/Personal Ratio of Purpose of Travel
+        unit: ''
+        short_unit: ''
+      inb_outb_tour:
+        title: Inbound/Outbound (tourists)
+        short_unit: 'ratio'
+        unit: ''
+      inb_outb_tot:
+        title:  Inbound/Outbound (total)
+        short_unit: 'ratio'
+        unit: ''
