@@ -213,9 +213,8 @@ def upsert_table(
     utils.validate_underscore(table.columns[0], "Variable's name")
 
     # make sure we have unique (year, entity_id) pairs
-    vc = table.index.value_counts()
-    if (vc > 1).any():
-        raise AssertionError(f"Duplicate (year, entity_id) pairs:\n {vc[vc > 1].index.tolist()}")
+    if not table.index.is_unique:
+        raise AssertionError("Duplicate (year, entity_id) pairs")
 
     if len(table.iloc[:, 0].metadata.sources) > 1:
         raise NotImplementedError(

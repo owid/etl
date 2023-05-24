@@ -28,7 +28,7 @@ from owid import catalog
 from owid.walden import CATALOG as WALDEN_CATALOG
 from owid.walden import Dataset as WaldenDataset
 
-from etl import config, files, git
+from etl import config, files, git_helpers
 from etl import grapher_helpers as gh
 from etl import paths
 from etl.db import get_engine
@@ -810,7 +810,7 @@ class GithubStep(Step):
     """
 
     path: str
-    gh_repo: git.GithubRepo = field(repr=False)
+    gh_repo: git_helpers.GithubRepo = field(repr=False)
     version: str = "latest"
 
     def __init__(self, path: str) -> None:
@@ -820,7 +820,7 @@ class GithubStep(Step):
         except ValueError:
             raise Exception("github step is not in the form github://<org>/<repo>")
 
-        self.gh_repo = git.GithubRepo(org, repo)
+        self.gh_repo = git_helpers.GithubRepo(org, repo)
 
     def __str__(self) -> str:
         return f"github://{self.path}"
