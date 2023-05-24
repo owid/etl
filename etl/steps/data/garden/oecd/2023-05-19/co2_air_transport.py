@@ -49,9 +49,7 @@ def run(dest_dir: str) -> None:
     #
     log.info("co2_air_transport.harmonize_countries")
 
-    df = geo.harmonize_countries(
-        df=df, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
-    )
+    df = geo.harmonize_countries(df=df, countries_file=paths.country_mapping_path)
     # Only use passenger flights and total international/domestic emissions
     df = df[df["flight_type"] == "P"]
     df.drop("flight_type", axis=1, inplace=True)

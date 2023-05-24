@@ -1,5 +1,4 @@
 """Load a snapshot and create a meadow dataset."""
-
 import pandas as pd
 import shared as shrd
 from owid.catalog import Table
@@ -24,17 +23,7 @@ def run(dest_dir: str) -> None:
     # Load the input data from Excel file
     snap: Snapshot = paths.load_dependency("unwto_environment.xlsx")
 
-    # Load data from the Excel object
-    excel_object = shrd.load_data(snap)
-
-    # If no Excel object is present, exit the function
-    if excel_object is None:
-        return
-
-    # Check if the required sheet is present in the Excel file
-    if "Data" not in excel_object.sheet_names:
-        log.warning("Sheet 'Data' not found in the Excel file.")
-        return
+    excel_object = shrd.load_data(snap, sheet_name_to_load)
 
     # Read the required sheet from the Excel file
     df = pd.read_excel(excel_object, sheet_name=sheet_name_to_load)

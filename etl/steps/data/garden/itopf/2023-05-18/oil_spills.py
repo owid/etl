@@ -32,9 +32,7 @@ def run(dest_dir: str) -> None:
     # Log that the process of harmonizing countries has started.
     log.info("oil_spills.harmonize_countries")
     # Call a function to harmonize country names in the DataFrame.
-    df = geo.harmonize_countries(
-        df=df, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
-    )
+    df = geo.harmonize_countries(df=df, countries_file=paths.country_mapping_path)
 
     # Create an empty DataFrame to store the average values per decade.
     decadal_averages_df = pd.DataFrame()
@@ -55,16 +53,12 @@ def run(dest_dir: str) -> None:
 
     # Merge the original DataFrame with the DataFrame containing the decadal averages,
     # using 'year' as the key and keeping all records from both DataFrames ('outer' join).
-    df_decadal = pd.merge(df, decadal_averages_df, on="year", how="outer")
-
-    # Set the DataFrame index to be a combination of 'country' and 'year' and check if the index is unique.
-    df_decadal.set_index(["country", "year"], inplace=True)
-    assert df_decadal.index.is_unique, "Index is not unique."
+    df_decadal = pd.merge(df, decadal_averages_df, on="year", how="outer", validate="many_to_one")
 
     # Reset the DataFrame's index to default.
     df_decadal.reset_index(inplace=True)
 
-    # Replace any '__' in column names with a space.
+    # Replace any '__' in column names with a space (done because of double _ in some variable names)
     newnames = [name.replace("__", " ") for name in df_decadal.columns]
     df_decadal.columns = newnames
 

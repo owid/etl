@@ -7,7 +7,7 @@ from etl.snapshot import Snapshot
 log = get_logger()
 
 
-def load_data(snap: Snapshot):
+def load_data(snap: Snapshot, sheet_name_to_load: str):
     """
     Load the Excel file from the given snapshot.
 
@@ -26,7 +26,11 @@ def load_data(snap: Snapshot):
     except IsADirectoryError:
         raise IsADirectoryError(f"Provided path is a directory, not an Excel file: {snap.path}")
     except Exception as e:
-        raise Exception(f"Unknown error occurred: {e}")
+        raise Exception(f"An error occurred while loading the Excel file: {e}")
+
+    if sheet_name_to_load not in excel_object.sheet_names:
+        # Raise an exception if the desired sheet is not found
+        raise Exception("Sheet not found in the Excel file.")
 
     # Return the loaded Excel file as a pandas ExcelFile object.
     return excel_object

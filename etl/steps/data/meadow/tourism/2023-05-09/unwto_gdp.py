@@ -27,16 +27,6 @@ def run(dest_dir: str) -> None:
     # Load the data from the Excel object into memory
     excel_object = shrd.load_data(snap)
 
-    # If the Excel object is empty, stop the execution and return from function
-    if excel_object is None:
-        return
-
-    # Check if the desired sheet ('Data') is present in the Excel file
-    if "Data" not in excel_object.sheet_names:
-        # Log a warning message if the desired sheet is not found
-        log.warning("Sheet 'Data' not found in the Excel file.")
-        return
-
     # Load the desired sheet from the Excel file into a pandas DataFrame
     df = pd.read_excel(excel_object, sheet_name=sheet_name_to_load)
 

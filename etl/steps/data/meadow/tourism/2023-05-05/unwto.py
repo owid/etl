@@ -36,7 +36,7 @@ def load_data(snap: Snapshot):
     except IsADirectoryError:
         raise IsADirectoryError(f"Provided path is a directory, not an Excel file: {snap.path}")
     except Exception as e:
-        raise Exception(f"Unknown error occurred: {e}")
+        raise Exception(f"An error occurred while loading the Excel file: {e}")
 
     # Return the loaded Excel file as a pandas ExcelFile object.
     return excel_object
@@ -195,15 +195,9 @@ def run(dest_dir: str) -> None:
         if best_ratio >= 0.6:  # You can adjust this threshold based on your requirements
             matched_sheet_names.append(best_match)
 
-    # Check that all required sheets were matched
-    # NOTE from mojmir: commented this out because it is blocking buildkite CI
-    # print("Matched sheet names:")
-    # for name in matched_sheet_names:
-    #     print(f"- {name}")
-    #     confirm = input("Are the matched sheet names correct? (y/n)").lower()
-    #     if confirm != "y":
-    #         # If the matched sheet names are not correct, raise an error
-    #         raise ValueError("Matched sheet names are incorrect.")
+    # Print matched sheets
+    for name in matched_sheet_names:
+        print(f"- {name}")
 
     # Process data.
     df_concat = process_data(excel_object, year_range, matched_sheet_names)

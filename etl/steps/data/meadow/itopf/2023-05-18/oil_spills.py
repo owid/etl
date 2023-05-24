@@ -52,83 +52,21 @@ def run(dest_dir: str) -> None:
     nsp_quant = pd.merge(df_nspills, df_oil_spilled, on="year", how="outer")
     nsp_quant["country"] = "World"  # add World
 
-    # Extract causes of oil spills
-    # Copy specific columns from two different DataFrames
-    df_above_7000_cause_totals = df_above_7000[["Cause", df_above_7000.columns[-1]]].copy()
-    df_below_7000_cause_totals = df_7_7000[["Cause", df_7_7000.columns[-1]]].copy()
-
-    # Assign a constant year value to the 'year' column for both DataFrames
-    df_below_7000_cause_totals["year"] = 2023
-    df_above_7000_cause_totals["year"] = 2023
-
-    # Pivot both DataFrames to reshape them, setting 'year' as the index, 'Cause' as the columns, and 'Total' as the values
-    df_below_7000_cause_totals_pv = df_below_7000_cause_totals.pivot(index="year", columns="Cause", values="Total")
-    df_above_7000_cause_totals_pv = df_above_7000_cause_totals.pivot(index="year", columns="Cause", values="Total")
-
-    # Remove column name for the index for both pivoted DataFrames
-    df_below_7000_cause_totals_pv = df_below_7000_cause_totals_pv.rename_axis(None, axis="columns")
-    df_above_7000_cause_totals_pv = df_above_7000_cause_totals_pv.rename_axis(None, axis="columns")
-
-    # Reset index for both pivoted DataFrames
-    df_below_7000_cause_totals_pv.reset_index(inplace=True)
-    df_above_7000_cause_totals_pv.reset_index(inplace=True)
-
-    # Assign a constant country value to the 'country' column for both pivoted DataFrames
-    df_below_7000_cause_totals_pv["country"] = "Small (7-700t)"
-    df_above_7000_cause_totals_pv["country"] = "Large (>700t)"
-
-    # Concatenate the two pivoted DataFrames along the row axis
-    merged_causes = pd.concat([df_above_7000_cause_totals_pv, df_below_7000_cause_totals_pv], axis=0)
-
-    # For every column in the merged DataFrame that is not 'year' or 'country', rename the column by appending '_causes' to the existing column name
-    for column in merged_causes.columns:
-        if column not in ["year", "country"]:
-            merged_causes.rename(columns={column: column + "_causes"}, inplace=True)
-
-    # Extract operations during which spills occurred
-    # Convert columns from the second one onwards in df_above_7000 to integers
-    df_above_7000[df_above_7000.columns[1:]] = df_above_7000[df_above_7000.columns[1:]].astype(int)
-
-    # Create a new row 'Operations Total' in df_above_7000 that is the sum of all rows
-    df_above_7000.loc["Operations Total"] = df_above_7000.sum(axis=0)
-
-    # Extract the last row from df_above_7000
-    operations_ab_7000 = df_above_7000.iloc[[-1]]
-
-    # Convert columns from the second one onwards in df_7_7000 to integers
-    df_7_7000[df_7_7000.columns[1:]] = df_7_7000[df_7_7000.columns[1:]].astype(int)
-
-    # Create a new row 'Operations Total' in df_7_7000 that is the sum of all rows
-    df_7_7000.loc["Operations Total"] = df_7_7000.sum(axis=0)
-
-    # Extract the last row from df_7_7000
-    operations_bel_7000 = df_7_7000.iloc[[-1]]
-
-    # Concatenate the last rows from df_above_7000 and df_7_7000 into a new dataframe
-    operations_total = pd.merge(operations_bel_7000, operations_ab_7000, how="outer")
-    # Rename the Cause column to country of operations_total to 'Small (7-700t)' and 'Large (>700t)'
-    operations_total.at[0, "country"] = "Small (7-700t)"
-    operations_total.at[1, "country"] = "Large (>700t)"
-    del operations_total["Cause"]
-
-    # Add a new column 'year' to operations_total with a constant value 2023
-    operations_total["year"] = 2023
-
-    # Append '_ops' to each column name that is not 'year' or 'country' in operations_total
-    for column in operations_total.columns:
-        if column not in ["year", "country"]:
-            operations_total.rename(columns={column: column + "_ops"}, inplace=True)
+    causes_df = extract_causes_of_oil_spills(df_above_7000, df_7_7000)  # Extract causes of oil spills
+    ops_df = extract_operations(df_above_7000, df_7_7000)  # Extract operationd during which oil spills
 
     # Merge operations_total with merged_causes on 'year' and 'country'
-    merge_cause_op = pd.merge(merged_causes, operations_total, on=["year", "country"])
+    merge_cause_op = pd.merge(
+        causes_df, ops_df, on=["year", "country"]
+    )  # country actually just means "Large (>700t)" or "Small (7-700t)" oil spills
 
-    # Merge nsp_quant with merge_cause_op on 'year' and 'country' into a new dataframe 'combined_df'
+    # Merge nsp_quant (oil spilled and number of spills) with merge_cause_op (causes and operation type of indcidents) on 'year' and 'country'
     combined_df = pd.merge(nsp_quant, merge_cause_op, on=["year", "country"], how="outer")
 
-    # Drop the 'Total_ops' column from combined_df
+    # Drop the 'Total_ops' column from combined_df (as we aren't going to use it (total number of spills for all causes)
     combined_df.drop("Total_ops", axis=1, inplace=True)
 
-    # Merge combined_df with df_biggest_spills on 'year' and 'country'
+    # Merge combined_df with df_biggest_spills (biggest spills between 1970-2022) on 'year' and 'country'
     merge_biggest_spills = pd.merge(combined_df, df_biggest_spills, on=["year", "country"], how="outer")
 
     # Create a new table and ensure all columns are snake-case.
@@ -141,6 +79,183 @@ def run(dest_dir: str) -> None:
     ds_meadow.save()
 
     log.info("oil_spills.end")
+
+
+def prepare_ops_dataframe(df, country):
+    """
+    Prepares a dataframe of oil spill operations by summarizing and extracting relevant information.
+
+    This function performs several tasks:
+        1. Converts columns (from the second onwards) to integers.
+        2. Creates a new row, 'Operations Total', which is the sum of all rows in the dataframe.
+        3. Extracts the last row from the dataframe.
+        4. Adds 'country' and 'year' columns to the dataframe, assigning constant values.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        A pandas dataframe containing oil spill operation data.
+        Expected to have at least one row and multiple columns where the second column onwards represent numeric data.
+
+    country : str
+        A string representing the category of oil spills (e.g., 'Large (>700t)' or 'Small (7-700t)').
+
+    Returns
+    -------
+    operations : pd.DataFrame
+        A single-row dataframe containing the total operations, the assigned country, and the year.
+        The dataframe maintains the same columns as the input dataframe, with the addition of 'country' and 'year'.
+
+    Note
+    ----
+    The 'country' label is used here to categorize large and small oil spills, a naming trick used for visualization.
+    The function assigns a constant year (2023) for all operations.
+    """
+    # Convert columns from the second one onwards to integers
+    df[df.columns[1:]] = df[df.columns[1:]].astype(int)
+
+    # Create a new row 'Operations Total' in df that is the sum of all rows
+    df.loc["Operations Total"] = df.sum(axis=0)
+
+    # Extract the last row from df
+    operations = df.iloc[[-1]].copy()
+
+    # Assign constant values to 'country' and 'year'
+    operations["country"] = country
+    operations["year"] = 2023
+
+    return operations
+
+
+def extract_operations(df_above_7000, df_7_7000):
+    """
+    Extracts oil spill operations from two dataframes and returns a combined dataframe.
+
+    The function uses the `prepare_ops_dataframe` function to summarize and extract the operations data
+    from two different dataframes: one for oil spills above 7000 tons and one for oil spills between 7 and 7000 tons.
+    After preparing the data (calls prepare_ops_dataframe function), it concatenates the resulting dataframes into a single dataframe and appends
+    the suffix '_ops' to the column names (except for 'year' and 'country'). Finally, it removes the column "Cause_ops".
+
+    Parameters
+    ----------
+    df_above_7000 : pd.DataFrame
+        A pandas dataframe containing data about oil spill operations above 7000 tons.
+
+    df_7_7000 : pd.DataFrame
+        A pandas dataframe containing data about oil spill operations between 7 and 7000 tons.
+
+    Returns
+    -------
+    operations_total : pd.DataFrame
+        A pandas dataframe containing the total operations from both input dataframes, with renamed columns and
+        unnecessary columns removed.
+    Note
+    ----
+    The 'country' label is used here to categorize large and small oil spills, a naming trick used for visualization.
+    """
+    operations_ab_7000 = prepare_ops_dataframe(df_above_7000, "Large (>700t)")
+    operations_bel_7000 = prepare_ops_dataframe(df_7_7000, "Small (7-700t)")
+    # Concatenate the last rows from both dataframes into a new dataframe
+    operations_total = pd.concat([operations_bel_7000, operations_ab_7000])
+    operations_total = append_suffix_to_non_year_country_columns(operations_total, "_ops")
+    del operations_total["Cause_ops"]
+
+    return operations_total
+
+
+def extract_causes_of_oil_spills(df_above_7000, df_below_7000):
+    """
+    Extracts the causes of oil spills from two dataframes and returns a combined dataframe.
+
+    This function calls the `extract_cause_totals` function to extract the causes of oil spills from
+    two different dataframes: one for oil spills above 7000 tons and one for oil spills below 7000 tons.
+    After preparing the data, it concatenates the resulting dataframes into a single dataframe and appends
+    the suffix '_causes' to the column names (except for 'year' and 'country').
+
+    Parameters
+    ----------
+    df_above_7000 : pd.DataFrame
+        A pandas dataframe containing data about causes of oil spills above 7000 tons.
+
+    df_below_7000 : pd.DataFrame
+        A pandas dataframe containing data about causes of oil spills below 7000 tons.
+
+    Returns
+    -------
+    merged_causes : pd.DataFrame
+        A pandas dataframe containing the total causes from both input dataframes, with columns renamed to append '_causes'.
+    """
+    df_above_7000_cause_totals_pv = extract_cause_totals(df_above_7000, 2023, "Large (>700t)")
+    df_below_7000_cause_totals_pv = extract_cause_totals(df_below_7000, 2023, "Small (7-700t)")
+    # Concatenate the two pivoted DataFrames along the row axis
+    merged_causes = pd.concat([df_above_7000_cause_totals_pv, df_below_7000_cause_totals_pv], axis=0)
+    # Append suffix '_causes' to non 'year' and 'country' columns
+    merged_causes = append_suffix_to_non_year_country_columns(merged_causes, "_causes")
+    return merged_causes
+
+
+def extract_cause_totals(df, year, country):
+    """
+    Extracts total cause data from a given DataFrame, reformats it, and returns the processed DataFrame.
+
+    This function takes a DataFrame, copies relevant columns, assigns a constant 'year' and 'country'
+    to the data, reshapes it by pivoting on the 'year', sets 'Cause' as columns, and 'Total' as values.
+    It then resets the DataFrame index to flatten it and assigns a constant country value.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        The input pandas DataFrame to process.
+
+    year : int
+        The year to assign to the 'year' column.
+
+    country : str
+        The country to assign to the 'country' column.
+
+    Returns
+    -------
+    df_cause_totals_pv : pd.DataFrame
+        The processed DataFrame, which includes the total causes data, now reshaped and assigned with
+        a 'year' and 'country'.
+    """
+    # Copy specific columns from DataFrame
+    df_cause_totals = df[["Cause", df.columns[-1]]].copy()
+    # Assign a constant year value to the 'year' column for DataFrame
+    df_cause_totals["year"] = year
+    # Pivot DataFrame to reshape it, setting 'year' as the index, 'Cause' as the columns, and 'Total' as the values
+    df_cause_totals_pv = df_cause_totals.pivot(index="year", columns="Cause", values="Total")
+    # Reset index
+    df_cause_totals_pv.reset_index(inplace=True)
+    # Assign a constant country value to the 'country' column for pivoted DataFrame
+    df_cause_totals_pv["country"] = country
+    return df_cause_totals_pv
+
+
+def append_suffix_to_non_year_country_columns(df, suffix):
+    """
+    Appends a provided suffix to the names of all columns in a DataFrame that are not 'year' or 'country'.
+
+    This function iterates over all column names in the input DataFrame. If the column name is not
+    'year' or 'country', it appends the provided suffix to the column name.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        The input DataFrame whose columns names need to be processed.
+
+    suffix : str
+        The suffix to be appended to each column name that is not 'year' or 'country'.
+
+    Returns
+    -------
+    df : pd.DataFrame
+        The DataFrame with processed column names.
+    """
+    for column in df.columns:
+        if column not in ["year", "country"]:
+            df.rename(columns={column: column + suffix}, inplace=True)
+    return df
 
 
 def extract_text_from_page(pdf, page_number):

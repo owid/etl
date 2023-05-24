@@ -26,7 +26,14 @@ def run(dest_dir: str) -> None:
 
     # Specify columns to use and their new names
     cos_to_use = ["Country", "FLIGHT", "Frequency", "SOURCE", "TIME", "Value"]
-    cos_to_name = ["country", "flight_type", "frequency", "emission_source", "year", "value"]
+    cos_to_name = [
+        "country",
+        "flight_type",
+        "frequency",
+        "emission_source",
+        "year",
+        "value",
+    ]  # clarify what this columns mean
 
     # Slice the DataFrame to keep only the columns of interest
     df = df[cos_to_use]
