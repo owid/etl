@@ -24,7 +24,7 @@ from owid.catalog import Dataset, Table, Variable, utils
 from owid.catalog.meta import Source
 from owid.repack import repack_series
 
-from etl.git import GithubRepo
+from etl.git_helpers import GithubRepo
 from etl.paths import DATA_DIR
 
 log = structlog.get_logger()

@@ -2,6 +2,7 @@ import concurrent.futures
 import datetime as dt
 import gzip
 import json
+import re
 import time
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
@@ -10,7 +11,7 @@ import pandas as pd
 import rich_click as click
 import structlog
 from botocore.config import Config
-from botocore.exceptions import EndpointConnectionError
+from botocore.exceptions import ClientError, EndpointConnectionError
 from dataclasses_json import dataclass_json
 from owid.catalog import s3_utils
 from sqlalchemy.engine import Engine
@@ -26,7 +27,7 @@ from backport.datasync.data_metadata import (
     variable_data_df_from_s3,
     variable_metadata,
 )
-from etl import config
+from etl import config, files
 from etl import grapher_model as gm
 from etl.db import get_engine
 from etl.publish import connect_s3, connect_s3_cached
@@ -185,26 +186,39 @@ def _sync_variable_data_metadata(engine: Engine, variable_id: int, dry_run: bool
 
 def upload_gzip_dict(d: Dict[str, Any], s3_path: str, private: bool = False) -> str:
     """Upload compressed dictionary to S3 and return its URL."""
-    body_gzip = gzip.compress(json.dumps(d, default=str).encode())  # type: ignore
-
+    client = connect_s3_cached()
     bucket, key = s3_utils.s3_bucket_key(s3_path)
 
-    client = connect_s3_cached()
+    s = json.dumps(d, default=str, sort_keys=True)
 
-    for attempt in Retrying(
-        wait=wait_exponential(min=5, max=100),
-        stop=stop_after_attempt(7),
-        retry=retry_if_exception_type(EndpointConnectionError),
-    ):
-        with attempt:
-            client.put_object(
-                Bucket=bucket,
-                Body=body_gzip,
-                Key=key,
-                ContentEncoding="gzip",
-                ContentType="application/json",
-                ACL="private" if private else "public-read",
-            )
+    # compare md5 of the file with the one in S3, if different, upload
+    # NOTE: updatedAt is removed because it changes every time we upload
+    # NOTE: uploading to S3 is actually not a bottleneck when using threads
+    md5 = files.checksum_str("1" + re.sub(r'"updatedAt":\s*"[^"]*"', '"updatedAt": ""', s))
+    try:
+        response = client.head_object(Bucket=bucket, Key=key)
+        s3_md5 = response["Metadata"].get("original-hash", None)
+    except ClientError:
+        s3_md5 = None
+
+    if md5 != s3_md5:
+        body_gzip = gzip.compress(s.encode())  # type: ignore
+
+        for attempt in Retrying(
+            wait=wait_exponential(min=5, max=100),
+            stop=stop_after_attempt(7),
+            retry=retry_if_exception_type(EndpointConnectionError),
+        ):
+            with attempt:
+                client.put_object(
+                    Bucket=bucket,
+                    Body=body_gzip,
+                    Key=key,
+                    ContentEncoding="gzip",
+                    ContentType="application/json",
+                    ACL="private" if private else "public-read",
+                    Metadata={"original-hash": md5},
+                )
 
     # bucket owid-catalog is behind Cloudflare
     if bucket == "owid-catalog":
