@@ -9,14 +9,13 @@
     "schemas/dataset-schema.json": "**/*.meta.yml"
   },
   "[python]": {
-    "editor.defaultFormatter": "ms-python.python",
     "editor.formatOnSave": true,
     "editor.codeActionsOnSave": {
       "source.organizeImports": true
     },
-    "editor.formatOnType": true
+    "editor.formatOnType": true,
+    "editor.defaultFormatter": "ms-python.black-formatter"
   },
-  "python.formatting.provider": "black",
   "isort.args": ["--profile", "black"],
   "python.linting.flake8Enabled": true,
   "python.linting.enabled": true,
