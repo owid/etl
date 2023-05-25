@@ -65,6 +65,8 @@ def _get_github_branches(org: str, repo: str) -> List[Any]:
 
 def grapher_checks(ds: catalog.Dataset) -> None:
     """Check that the table is in the correct format for Grapher."""
+    assert ds.metadata.title, "Dataset must have a title."
+
     for tab in ds:
         assert {"year", "country"} <= set(tab.reset_index().columns), "Table must have columns country and year."
         for col in tab:
