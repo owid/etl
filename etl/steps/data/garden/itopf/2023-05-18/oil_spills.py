@@ -16,7 +16,6 @@ paths = PathFinder(__file__)
 
 def run(dest_dir: str) -> None:
     log.info("oil_spills.start")
-    print("hi")
 
     #
     # Load inputs.
