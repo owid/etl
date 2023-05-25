@@ -5,7 +5,6 @@ from typing import cast
 from owid.catalog import Dataset
 from structlog import get_logger
 
-from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
 log = get_logger()
