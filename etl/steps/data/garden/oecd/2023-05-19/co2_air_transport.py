@@ -66,9 +66,9 @@ def run(dest_dir: str) -> None:
 
     emissions_columns = [col for col in pivot_table_ye.columns if col not in ("country", "year", "population")]
 
-    # Generate per capital co2 emissions data and add it do the dataframe
+    # Generate per capital co2 emissions data and add it do the dataframe and convert to pounds
     for col in emissions_columns:
-        pivot_table_ye[f"per_capita_{col}"] = pivot_table_ye[col] / pivot_table_ye["population"]
+        pivot_table_ye[f"per_capita_{col}"] = (pivot_table_ye[col] * 2204.62) / pivot_table_ye["population"]
 
     # Add Inbound/Outbound tourism to the dataframe (multiply international aviation emissions by international arrivals/departures)
     pivot_outb = add_inbound_outbound_tour(pivot_table_ye, df_tr)
@@ -114,7 +114,7 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb_garden], default_metadata=None)
+    ds_garden = create_dataset(dest_dir, tables=[tb_garden], default_metadata=ds_meadow.metadata)
 
     # Save changes in the new garden dataset.
     ds_garden.save()
@@ -259,7 +259,7 @@ def add_inbound_outbound_tour(df, df_tr):
     df = pd.merge(df, just_inb_ratio, on=["year", "country"])
 
     # Calculate the interaction between TER_INT_a and inb_outb_tour
-    df["int_inb_out"] = df["TER_INT_a"] * df["inb_outb_tour"]
+    df["int_inb_out"] = df["per_capita_TER_INT_a"] * df["inb_outb_tour"]
 
     # Drop the 'inb_outb_tour' column
     df = df.drop(["inb_outb_tour"], axis=1)

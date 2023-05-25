@@ -165,7 +165,50 @@ def run(dest_dir: str) -> None:
         merged_df_concat_transf["in_to_ar_sa_da_vi_ex"] / merged_df_concat_transf["in_to_ar_ov_vi_to"]
     )
 
+    merged_df_concat_transf["outbound_exp_per_tourist"] = (
+        merged_df_concat_transf["ou_to_ex_tr"] * 1e6
+    ) / merged_df_concat_transf["ou_to_de_ov_vi_to"]
+
+    merged_df_concat_transf["inb_exp_per_tourist"] = (
+        merged_df_concat_transf["in_to_ex_tr"] * 1e6
+    ) / merged_df_concat_transf["in_to_ar_ov_vi_to"]
+
+    merged_df_concat_transf["ou_to_ex_tr_per_capita"] = (
+        merged_df_concat_transf["ou_to_ex_tr"] * 1e6
+    ) / merged_df_concat_transf["population"]
+
     merged_df_concat_transf.reset_index(inplace=True)  # reset index
+
+    # drop variables that are unlikely to be used
+    columns_to_exclude = [
+        "in_to_ar_of_wh_cr_pa",
+        "do_to_ac_to_gu",
+        "do_to_ac_to_ov",
+        "em_ot_ac_se",
+        "em_ot_to_in",
+        "em_pa_tr",
+        "em_tr_ag_an_ot_re_se_ac",
+        "in_to_ac_to_gu",
+        "in_to_ac_to_ov",
+        "in_to_ex_pa_tr",
+        "in_to_re_af",
+        "in_to_re_am",
+        "in_to_re_ea_as_an_th_pa",
+        "in_to_re_eu",
+        "in_to_re_mi_ea",
+        "in_to_re_ot_no_cl",
+        "in_to_re_so_as",
+        "in_to_re_to",
+        "in_to_re_of_wh_na_re_ab",
+        "in_to_tr_to",
+        "ou_to_ex_pa_tr",
+        "to_in_nu_of_be_pl",
+        "to_in_nu_of_es",
+        "to_in_nu_of_ro",
+        "to_in_oc_ra_be_pl",
+        "in_to_pu_to",
+    ]
+    merged_df_concat_transf = merged_df_concat_transf.drop(columns_to_exclude, axis=1)
 
     # Create a new table with the processed data.
     tb_garden = Table(merged_df_concat_transf, short_name="unwto")

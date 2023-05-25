@@ -38,10 +38,6 @@ tables:
         short_unit: ''
         display:
           numDecimalPlaces: 0
-      in_to_ar_of_wh_cr_pa:
-        title: Inbound arrivals (same day of which cruise)
-        unit: ''
-        short_unit: ''
       do_to_ac_ho_an_si_es_gu:
         title: Domestic guests in tourism-accommodation (hotels and similar establishments)
         unit: guests
@@ -51,18 +47,6 @@ tables:
       do_to_ac_ho_an_si_es_ov:
         title: Nights in tourism-accommodation by domestic visitors (hotels and similar
           establishments)
-        unit: nights
-        short_unit: ''
-        display:
-          numDecimalPlaces: 0
-      do_to_ac_to_gu:
-        title: Domestic guests in tourism-accommodation (total)
-        unit: guests
-        short_unit: ''
-        display:
-          numDecimalPlaces: 0
-      do_to_ac_to_ov:
-        title: Nights in tourism-accommodation by domestic visitors(total)
         unit: nights
         short_unit: ''
         display:
@@ -98,32 +82,8 @@ tables:
         short_unit: ''
         display:
           numDecimalPlaces: 0
-      em_ot_ac_se:
-        title: Employment (other accommodation services)
-        unit: ''
-        short_unit: ''
-        display:
-          numDecimalPlaces: 0
-      em_ot_to_in:
-        title: Employment (other tourism industries)
-        unit: ''
-        short_unit: ''
-        display:
-          numDecimalPlaces: 0
-      em_pa_tr:
-        title: Employment (passenger transportation)
-        unit: ''
-        short_unit: ''
-        display:
-          numDecimalPlaces: 0
       em_to:
         title: Employment (total)
-        unit: ''
-        short_unit: ''
-        display:
-          numDecimalPlaces: 0
-      em_tr_ag_an_ot_re_se_ac:
-        title: Employment (travel agencies and other reservation services activities)
         unit: ''
         short_unit: ''
         display:
@@ -136,24 +96,6 @@ tables:
           numDecimalPlaces: 0
       in_to_ac_ho_an_si_es_ov:
         title: Nights in tourism-accommodation by foreigners (hotels and similar establishments)
-        unit: ''
-        short_unit: ''
-        display:
-          numDecimalPlaces: 0
-      in_to_ac_to_gu:
-        title: Foreign guests in tourism-accommodations (total)
-        unit: ''
-        short_unit: ''
-        display:
-          numDecimalPlaces: 0
-      in_to_ac_to_ov:
-        title: Nights in tourism-accommodation by foreigners (total)
-        unit: ''
-        short_unit: ''
-        display:
-          numDecimalPlaces: 0
-      in_to_ex_pa_tr:
-        title: Inbound tourism-expenditure (passenger transport)
         unit: ''
         short_unit: ''
         display:
@@ -176,66 +118,6 @@ tables:
         short_unit: ''
         display:
           numDecimalPlaces: 0
-      in_to_pu_to:
-        title: Inbound tourism purpose (total)
-        unit: ''
-        short_unit: ''
-        display:
-          numDecimalPlaces: 0
-      in_to_re_af:
-        title: Africa
-        unit: ''
-        short_unit: ''
-        display:
-          numDecimalPlaces: 0
-      in_to_re_am:
-        title: America
-        unit: ''
-        short_unit: ''
-        display:
-          numDecimalPlaces: 0
-      in_to_re_ea_as_an_th_pa:
-        title: East Asia and the Pacific
-        unit: ''
-        short_unit: ''
-        display:
-          numDecimalPlaces: 0
-      in_to_re_eu:
-        title: Europe
-        unit: ''
-        short_unit: ''
-        display:
-          numDecimalPlaces: 0
-      in_to_re_mi_ea:
-        title: Middle East
-        unit: ''
-        short_unit: ''
-        display:
-          numDecimalPlaces: 0
-      in_to_re_ot_no_cl:
-        title: Not Classified
-        unit: ''
-        short_unit: ''
-        display:
-          numDecimalPlaces: 0
-      in_to_re_so_as:
-        title: South Asia
-        unit: ''
-        short_unit: ''
-        display:
-          numDecimalPlaces: 0
-      in_to_re_to:
-        title: Inbound tourism Total
-        unit: ''
-        short_unit: ''
-        display:
-          numDecimalPlaces: 0
-      in_to_re_of_wh_na_re_ab:
-        title: Not Classified (of which, nationals residing abroad)
-        unit: ''
-        short_unit: ''
-        display:
-          numDecimalPlaces: 0
       in_to_tr_ai:
         title: Inbound transport (Air)
         unit: arrivals
@@ -244,12 +126,6 @@ tables:
           numDecimalPlaces: 0
       in_to_tr_la:
         title: Inbound transport (Land)
-        unit: arrivals
-        short_unit: ''
-        display:
-          numDecimalPlaces: 0
-      in_to_tr_to:
-        title: Inbound transport (Total)
         unit: arrivals
         short_unit: ''
         display:
@@ -278,12 +154,6 @@ tables:
         short_unit: ''
         display:
           numDecimalPlaces: 0
-      ou_to_ex_pa_tr:
-        title: Outbound tourism-expenditure (passenger transport)
-        unit: ''
-        short_unit: ''
-        display:
-          numDecimalPlaces: 0
       ou_to_ex_tr:
         title: Outbound tourism-expenditure (travel)
         unit: US million $
@@ -299,30 +169,6 @@ tables:
       to_in_av_le_of_st:
         title: Average length of stay
         unit: nights
-        short_unit: ''
-        display:
-          numDecimalPlaces: 2
-      to_in_nu_of_be_pl:
-        title: Number of bed-places
-        unit: ''
-        short_unit: ''
-        display:
-          numDecimalPlaces: 0
-      to_in_nu_of_es:
-        title: Number of establishments
-        unit: ''
-        short_unit: ''
-        display:
-          numDecimalPlaces: 0
-      to_in_nu_of_ro:
-        title: Number of rooms
-        unit: ''
-        short_unit: ''
-        display:
-          numDecimalPlaces: 0
-      to_in_oc_ra_be_pl:
-        title: Occupancy rate of bed-places
-        unit: ''
         short_unit: ''
         display:
           numDecimalPlaces: 2
@@ -449,18 +295,34 @@ tables:
       inb_outb_tour:
         title: Inbound/Outbound (tourists)
         unit: ''
-        short_unit: ratio
+        short_unit: ''
         display:
           numDecimalPlaces: 2
       inb_outb_tot:
         title: Inbound/Outbound (total)
         unit: ''
-        short_unit: ratio
+        short_unit: ''
         display:
           numDecimalPlaces: 2
       same_tourist_ratio:
-        title: 'Same Day/Overnight visitors'
-        short_unit: ''
+        title: Same Day/Overnight visitors
         unit: ''
+        short_unit: ''
         display:
           numDecimalPlaces: 2
+      outbound_exp_per_tourist:
+        title: Expenditure for each tourist on outbound tourism
+        unit: US dollars
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
+      inb_exp_per_tourist:
+        title: Expenditure for each tourist on inbound tourism
+        unit: US dollars
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
+      ou_to_ex_tr_per_capita:
+        title: Outbound tourism expenditure per capita
+        unit: ''
+        short_unit: ''
