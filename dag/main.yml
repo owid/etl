@@ -403,6 +403,14 @@ steps:
   data://grapher/wb/2023-05-12/women_business_law_additional:
   - data://garden/wb/2023-05-12/women_business_law_additional
 
+  # U.S. patent activity since 1790 (USPTO)
+  data://meadow/research_development/2023-05-24/us_patents:
+  - snapshot://research_development/2023-05-24/us_patents.htm
+  data://garden/research_development/2023-05-25/us_patents:
+  - data://meadow/research_development/2023-05-24/us_patents
+  data://grapher/research_development/2023-05-25/us_patents:
+  - data://garden/research_development/2023-05-25/us_patents
+
 # Sub-dags to import
 include:
   - dag/open_numbers.yml
