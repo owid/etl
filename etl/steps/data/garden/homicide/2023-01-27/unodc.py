@@ -1,13 +1,14 @@
 import json
 from typing import List, cast
 
+import numpy as np
 import pandas as pd
-from owid.catalog import Dataset, Table, VariableMeta
+from owid.catalog import Table, VariableMeta
 from owid.catalog.utils import underscore
 from structlog import get_logger
 
 from etl.data_helpers import geo
-from etl.helpers import PathFinder
+from etl.helpers import PathFinder, create_dataset
 
 log = get_logger()
 
@@ -34,10 +35,8 @@ def run(dest_dir: str) -> None:
     tb_garden_list = clean_data(df)
 
     # create new dataset with the same metadata as meadow
-    ds_garden = Dataset.create_empty(dest_dir, metadata=ds_meadow.metadata)
-    for tb in tb_garden_list:
-        ds_garden.add(tb)
-        ds_garden.save()
+    ds_garden = create_dataset(dest_dir, tables=tb_garden_list, default_metadata=ds_meadow.metadata)
+    ds_garden.save()
 
     log.info("unodc.end")
 
@@ -88,7 +87,7 @@ def clean_data(df: pd.DataFrame) -> list[Table]:
 
     tb_share = calculate_share_of_homicides(tb_tot, tb_perp)
     tb_share.update_metadata_from_yaml(paths.metadata_path, "share")
-    tb_garden_list = [tb_mech, tb_tot, tb_perp, tb_situ]
+    tb_garden_list = [tb_mech, tb_tot, tb_perp, tb_situ, tb_share]
 
     return tb_garden_list
 
@@ -220,13 +219,15 @@ def clean_up_categories(df: pd.DataFrame) -> pd.DataFrame:
         "Unspecified means": "unspecified means",
         "Without a weapon/ other Mechanism": " without a weapon or by another mechanism",
         "Firearms or explosives": "firearms or explosives",
-        "Another weapon": "an unspecified weapon",
+        "Another weapon": "sharp or blunt object, including motor vehicles",
         "Intimate partner or family member": "Perpertrator is an intimate partner or family member",
         "Intimate partner or family member: Intimate partner": "Perpertrator is an intimate partner",
         "Intimate partner or family member: Family member": "Perpertrator is a family member",
         "Other Perpetrator known to the victim": "Another known perpetrator",
         "Perpetrator unknown": "Perpertrator is unknown",
         "Relationship to perpetrator is not known": "Perpertrator where the relationship to the victim is not known",
+        "Socio-political homicide - terrorist offences": "Terrorist offences",
+        "Unknown types of homicide": "Unknown situational context",
     }
     df = df.replace({"category": category_dict})
 
@@ -257,5 +258,6 @@ def calculate_share_of_homicides(total_table: Table, perp_table: Table) -> Table
             perp_select = f"counts_{perp}_{sex}_all_ages"
             new_col = underscore(f"Share of homicides of {sex} where the {perp}")
             share_df[new_col] = (merge_table[perp_select] / merge_table[sex_select]) * 100
+            share_df[new_col] = share_df[new_col].replace(np.inf, np.nan)
     share_table = Table(share_df, short_name="share")
     return share_table
