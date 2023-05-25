@@ -70,7 +70,7 @@ def grapher_checks(ds: catalog.Dataset) -> None:
 
     for tab in ds:
         assert {"year", "country"} <= set(tab.reset_index().columns), "Table must have columns country and year."
-        assert tab["year"].dtype in gh.INT_TYPES, f"year must be of an integer type but was: {tab['country'].dtype}"
+        assert tab.reset_index()["year"].dtype in gh.INT_TYPES, f"year must be of an integer type but was: {tab['country'].dtype}"
         for col in tab:
             if col in ("year", "country"):
                 continue
