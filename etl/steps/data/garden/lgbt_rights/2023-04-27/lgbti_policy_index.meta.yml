@@ -331,17 +331,17 @@ tables:
         short_unit: ''
         unit: ''
         display:
-          name: "Yes"
+          name: "Equal age of consent for same-sex partners"
           numDecimalPlaces: 0
       unequal_age_yes:
-        title: Unequal age of consent ("yes", number of countries)
+        title: Unequal age of consent ("yes"/"partially", number of countries)
         description:
           - Measures the presence of a law outlawing different ages of consent between same-sex and different-sex partners, which serves as a tool to inhibit same-sex acts between consenting adults.<br>
           - *count_yes_description
         short_unit: ""
         unit: ''
         display:
-          name: "Yes"
+          name: "Yes/Partially"
           numDecimalPlaces: 0
       constitution_yes:
         title: Constitutional protections against discrimination ("yes", number of countries)
@@ -364,14 +364,14 @@ tables:
           name: Ban on conversion therapies
           numDecimalPlaces: 0
       death_penalty_yes:
-        title: Death penalty for same-sex sexual acts ("yes", number of countries)
+        title: Death penalty for same-sex sexual acts ("yes"/"partially", number of countries)
         description:
           - Measures the adoption of policies that allow for individuals caught engaging in same-sex acts to be punished by death.<br>
           - *count_yes_description
         short_unit: ''
         unit: ''
         display:
-          name: "Yes"
+          name: "Death penalty for same-sex sexual acts or partial implementation"
           numDecimalPlaces: 0
       employment_discrim_yes:
         title: Employment discrimination bans ("yes", number of countries)
@@ -421,7 +421,7 @@ tables:
         short_unit: ''
         unit: ''
         display:
-          name: "Yes"
+          name: "Joint adoptions by same-sex partners are legal"
           numDecimalPlaces: 0
       lgb_military_yes:
         title: LGB military ("yes", number of countries)
@@ -451,7 +451,7 @@ tables:
         short_unit: ''
         unit: ''
         display:
-          name: "Yes"
+          name: "Marriage for same-sex partners legal"
           numDecimalPlaces: 0
       marriage_ban_yes:
         title: Ban on marriage equality ("yes", number of countries)
@@ -471,7 +471,7 @@ tables:
         short_unit: ''
         unit: ''
         display:
-          name: "Yes"
+          name: "Same-sex sexual acts legal"
           numDecimalPlaces: 0
       third_gender_yes:
         title: Third gender recognition ("yes", number of countries)
@@ -481,7 +481,7 @@ tables:
         short_unit: ''
         unit: ''
         display:
-          name: "Yes"
+          name: "Third gender is recognized"
           numDecimalPlaces: 0
       trans_military_yes:
         title: Trasgender military ("yes", number of countries)
@@ -514,14 +514,14 @@ tables:
           name: "Yes"
           numDecimalPlaces: 0
       propaganda_yes:
-        title: Anti-propaganda laws ("yes", number of countries)
+        title: Anti-propaganda laws ("yes"/"partially", number of countries)
         description:
           - Measures the adoption of policies banning “propaganda for non-traditional sexual relations”. Vaguely written, these laws are utilized to discriminate against LGBT individuals in the name of protecting “public morality, particularly pertaining to children”.<br>
           - *count_yes_description
         short_unit: ''
         unit: ''
         display:
-          name: "Yes"
+          name: "Yes/Partially"
           numDecimalPlaces: 0
       equal_age_no:
         title: Equal age of consent ("no"/"partially", number of countries)
@@ -531,17 +531,17 @@ tables:
         short_unit: ''
         unit: ''
         display:
-          name: "No/Partially"
+          name: "Unequal age of consent for same-sex partners or partially implemented"
           numDecimalPlaces: 0
       unequal_age_no:
-        title: Unequal age of consent ("no"/"partially", number of countries)
+        title: Unequal age of consent ("no", number of countries)
         description:
           - Measures the presence of a law outlawing different ages of consent between same-sex and different-sex partners, which serves as a tool to inhibit same-sex acts between consenting adults.<br>
           - *count_no_description
         short_unit: ""
         unit: ''
         display:
-          name: "No/Partially"
+          name: "No"
           numDecimalPlaces: 0
       constitution_no:
         title: Constitutional protections against discrimination ("no"/"partially", number of countries)
@@ -564,14 +564,14 @@ tables:
           name: "No/Partially"
           numDecimalPlaces: 0
       death_penalty_no:
-        title: Death penalty for same-sex sexual acts ("no"/"partially", number of countries)
+        title: Death penalty for same-sex sexual acts ("no", number of countries)
         description:
           - Measures the adoption of policies that allow for individuals caught engaging in same-sex acts to be punished by death.<br>
           - *count_no_description
         short_unit: ''
         unit: ''
         display:
-          name: "No/Partially"
+          name: "No death penalty"
           numDecimalPlaces: 0
       employment_discrim_no:
         title: Employment discrimination bans ("no"/"partially", number of countries)
@@ -621,7 +621,7 @@ tables:
         short_unit: ''
         unit: ''
         display:
-          name: "No/Partially"
+          name: "Joint adoptions by same-sex partners are illegal or partially implemented"
           numDecimalPlaces: 0
       lgb_military_no:
         title: LGB military ("no"/"partially", number of countries)
@@ -651,7 +651,7 @@ tables:
         short_unit: ''
         unit: ''
         display:
-          name: "No/Partially"
+          name: "Marriage for same-sex partners illegal or partially implemented"
           numDecimalPlaces: 0
       marriage_ban_no:
         title: Ban on marriage equality ("no"/"partially", number of countries)
@@ -671,7 +671,7 @@ tables:
         short_unit: ''
         unit: ''
         display:
-          name: "No/Partially"
+          name: "Same-sex sexual acts illegal or partial implementation of the law"
           numDecimalPlaces: 0
       third_gender_no:
         title: Third gender recognition ("no"/"partially", number of countries)
@@ -681,7 +681,7 @@ tables:
         short_unit: ''
         unit: ''
         display:
-          name: "No/Partially"
+          name: "Third gender is not recognized"
           numDecimalPlaces: 0
       trans_military_no:
         title: Trasgender military ("no"/"partially", number of countries)
@@ -714,14 +714,14 @@ tables:
           name: "No/Partially"
           numDecimalPlaces: 0
       propaganda_no:
-        title: Anti-propaganda laws ("no"/"partially", number of countries)
+        title: Anti-propaganda laws ("no", number of countries)
         description:
           - Measures the adoption of policies banning “propaganda for non-traditional sexual relations”. Vaguely written, these laws are utilized to discriminate against LGBT individuals in the name of protecting “public morality, particularly pertaining to children”.<br>
           - *count_no_description
         short_unit: ''
         unit: ''
         display:
-          name: "No/Partially"
+          name: "No"
           numDecimalPlaces: 0
       equal_age_yes_pop:
         title: Equal age of consent ("yes", total population)
@@ -731,17 +731,17 @@ tables:
         short_unit: ''
         unit: ''
         display:
-          name: "Yes"
+          name: "Equal age of consent for same-sex partners"
           numDecimalPlaces: 0
       unequal_age_yes_pop:
-        title: Unequal age of consent ("yes", total population)
+        title: Unequal age of consent ("yes"/"partially", total population)
         description:
           - Measures the presence of a law outlawing different ages of consent between same-sex and different-sex partners, which serves as a tool to inhibit same-sex acts between consenting adults.<br>
           - *pop_yes_description
         short_unit: ""
         unit: ''
         display:
-          name: "Yes"
+          name: "Yes/Partially"
           numDecimalPlaces: 0
       constitution_yes_pop:
         title: Constitutional protections against discrimination ("yes", total population)
@@ -764,14 +764,14 @@ tables:
           name: "Yes"
           numDecimalPlaces: 0
       death_penalty_yes_pop:
-        title: Death penalty for same-sex sexual acts ("yes", total population)
+        title: Death penalty for same-sex sexual acts ("yes"/"partially", total population)
         description:
           - Measures the adoption of policies that allow for individuals caught engaging in same-sex acts to be punished by death.<br>
           - *pop_yes_description
         short_unit: ''
         unit: ''
         display:
-          name: "Yes"
+          name: "Death penalty for same-sex sexual acts or partial implementation"
           numDecimalPlaces: 0
       employment_discrim_yes_pop:
         title: Employment discrimination bans ("yes", total population)
@@ -821,7 +821,7 @@ tables:
         short_unit: ''
         unit: ''
         display:
-          name: "Yes"
+          name: "Joint adoptions by same-sex partners are legal"
           numDecimalPlaces: 0
       lgb_military_yes_pop:
         title: LGB military ("yes", total population)
@@ -851,7 +851,7 @@ tables:
         short_unit: ''
         unit: ''
         display:
-          name: "Yes"
+          name: "Marriage for same-sex partners legal"
           numDecimalPlaces: 0
       marriage_ban_yes_pop:
         title: Ban on marriage equality ("yes", total population)
@@ -871,7 +871,7 @@ tables:
         short_unit: ''
         unit: ''
         display:
-          name: "Yes"
+          name: "Same-sex sexual acts legal"
           numDecimalPlaces: 0
       third_gender_yes_pop:
         title: Third gender recognition ("yes", total population)
@@ -881,7 +881,7 @@ tables:
         short_unit: ''
         unit: ''
         display:
-          name: "Yes"
+          name: "Third gender is recognized"
           numDecimalPlaces: 0
       trans_military_yes_pop:
         title: Trasgender military ("yes", total population)
@@ -914,14 +914,14 @@ tables:
           name: "Yes"
           numDecimalPlaces: 0
       propaganda_yes_pop:
-        title: Anti-propaganda laws ("yes", total population)
+        title: Anti-propaganda laws ("yes"/"partially", total population)
         description:
           - Measures the adoption of policies banning “propaganda for non-traditional sexual relations”. Vaguely written, these laws are utilized to discriminate against LGBT individuals in the name of protecting “public morality, particularly pertaining to children”.<br>
           - *pop_yes_description
         short_unit: ''
         unit: ''
         display:
-          name: "Yes"
+          name: "Yes/Partially"
           numDecimalPlaces: 0
       equal_age_no_pop:
         title: Equal age of consent ("no"/"partially", total population)
@@ -931,17 +931,17 @@ tables:
         short_unit: ''
         unit: ''
         display:
-          name: "No/Partially"
+          name: "Unequal age of consent for same-sex partners or partial implementation"
           numDecimalPlaces: 0
       unequal_age_no_pop:
-        title: Unequal age of consent ("no"/"partially", total population)
+        title: Unequal age of consent ("no", total population)
         description:
           - Measures the presence of a law outlawing different ages of consent between same-sex and different-sex partners, which serves as a tool to inhibit same-sex acts between consenting adults.<br>
           - *pop_no_description
         short_unit: ""
         unit: ''
         display:
-          name: "No/Partially"
+          name: "No"
           numDecimalPlaces: 0
       constitution_no_pop:
         title: Constitutional protections against discrimination ("no"/"partially", total population)
@@ -964,14 +964,14 @@ tables:
           name: "No/Partially"
           numDecimalPlaces: 0
       death_penalty_no_pop:
-        title: Death penalty for same-sex sexual acts ("no"/"partially", total population)
+        title: Death penalty for same-sex sexual acts ("no", total population)
         description:
           - Measures the adoption of policies that allow for individuals caught engaging in same-sex acts to be punished by death.<br>
           - *pop_no_description
         short_unit: ''
         unit: ''
         display:
-          name: "No/Partially"
+          name: "No death penalty"
           numDecimalPlaces: 0
       employment_discrim_no_pop:
         title: Employment discrimination bans ("no"/"partially", total population)
@@ -1021,7 +1021,7 @@ tables:
         short_unit: ''
         unit: ''
         display:
-          name: "No/Partially"
+          name: "Joint adoptions by same-sex partners are illegal or partially implemented"
           numDecimalPlaces: 0
       lgb_military_no_pop:
         title: LGB military ("no"/"partially", total population)
@@ -1051,7 +1051,7 @@ tables:
         short_unit: ''
         unit: ''
         display:
-          name: "No/Partially"
+          name: "Marriage for same-sex partners illegal or partially implemented"
           numDecimalPlaces: 0
       marriage_ban_no_pop:
         title: Ban on marriage equality ("no"/"partially", total population)
@@ -1071,7 +1071,7 @@ tables:
         short_unit: ''
         unit: ''
         display:
-          name: "No/Partially"
+          name: "Same-sex sexual acts illegal or partial implementation of the law"
           numDecimalPlaces: 0
       third_gender_no_pop:
         title: Third gender recognition ("no"/"partially", total population)
@@ -1081,7 +1081,7 @@ tables:
         short_unit: ''
         unit: ''
         display:
-          name: "No/Partially"
+          name: "Third gender is not recognized"
           numDecimalPlaces: 0
       trans_military_no_pop:
         title: Trasgender military ("no"/"partially", total population)
@@ -1114,12 +1114,12 @@ tables:
           name: Gender marker change
           numDecimalPlaces: 0
       propaganda_no_pop:
-        title: Anti-propaganda laws ("no"/"partially", total population)
+        title: Anti-propaganda laws ("no", total population)
         description:
           - Measures the adoption of policies banning “propaganda for non-traditional sexual relations”. Vaguely written, these laws are utilized to discriminate against LGBT individuals in the name of protecting “public morality, particularly pertaining to children”.<br>
           - *pop_no_description
         short_unit: ''
         unit: ''
         display:
-          name: "No/Partially"
+          name: "No"
           numDecimalPlaces: 0
