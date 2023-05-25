@@ -38,8 +38,6 @@ def run(dest_dir: str) -> None:
     for tb in tb_garden_list:
         ds_garden.add(tb)
         ds_garden.save()
-    # ds_garden = create_dataset(dest_dir, tables=[df_mech, df_tot])
-    # ds_garden.save()
 
     log.info("unodc.end")
 
