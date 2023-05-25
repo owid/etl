@@ -230,8 +230,8 @@ def add_regional_aggregations(df: pd.DataFrame) -> pd.DataFrame:
     # Drop population column
     df = df.drop(columns=["population"])
 
-    # Verify index and sort
-    df = df.set_index(["country", "year"], verify_integrity=True).sort_index()
+    # # Verify index and sort
+    # df = df.set_index(["country", "year"], verify_integrity=True).sort_index()
 
     return df
 
