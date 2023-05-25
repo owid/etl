@@ -80,36 +80,40 @@ def clean_data(df: pd.DataFrame) -> list[Table]:
     * by relationship to perpatrator
     * by situational context
     """
-    df_mech = create_mechanism_table(df, table_name="by mechanisms")
-    df_tot = create_total_table(df)
+    df["age"] = df["age"].map({"Total": "All ages"}, na_action="ignore").fillna(df["age"])
+    df["sex"] = df["sex"].map({"Total": "Both sexes"}, na_action="ignore").fillna(df["sex"])
 
-    # tb_garden = pd.merge(df_mech, df_tot, how="outer", on=["country", "year"])
+    tb_mech = create_table(df, table_name="by mechanisms")
+    tb_perp = create_table(df, table_name="by relationship to perpetrator")
+    tb_tot = create_total_table(df)
 
-    tb_garden_list = [df_mech, df_tot]
+    tb_share = calculate_share_of_homicides(tb_tot, tb_perp)
+    tb_share.update_metadata_from_yaml(paths.metadata_path, "share")
+    tb_garden_list = [tb_mech, tb_tot, tb_perp]
 
     return tb_garden_list
 
 
-def create_mechanism_table(df: pd.DataFrame, table_name: str) -> Table:
+def create_table(df: pd.DataFrame, table_name: str) -> Table:
     """
     Create the homicides by mechanism dataframe where we will have  homicides/homicide rate
     disaggregated by mechanism (e.g. weapon)
 
     """
     assert any(df["dimension"] == table_name), "table_name must be a dimension in df"
-    df_mech = df[df["dimension"] == table_name]
+    df_filter = df[df["dimension"] == table_name]
 
     # Make the table wider so we have a column for each mechanism
-    df_mech = pivot_and_format_table(
-        df_mech,
-        drop_columns=["region", "subregion", "indicator", "dimension", "source", "sex", "age"],
+    tb_filter = pivot_and_format_table(
+        df_filter,
+        drop_columns=["region", "subregion", "indicator", "dimension", "source"],
         pivot_index=["country", "year"],
         pivot_values=["value"],
-        pivot_columns=["unit_of_measurement", "category"],
+        pivot_columns=["unit_of_measurement", "category", "sex", "age"],
         table_name=table_name,
     )
 
-    return df_mech
+    return tb_filter
 
 
 def create_total_table(df: pd.DataFrame) -> Table:
@@ -125,9 +129,6 @@ def create_total_table(df: pd.DataFrame) -> Table:
 
     # Make it more obvious what total age and total sex means
 
-    df_tot["age"] = df_tot["age"].map({"Total": "All ages"}, na_action="ignore").fillna(df_tot["age"])
-    df_tot["sex"] = df_tot["sex"].map({"Total": "Both sexes"}, na_action="ignore").fillna(df_tot["sex"])
-
     df_tot = pivot_and_format_table(
         df_tot,
         drop_columns=["region", "subregion", "indicator", "dimension", "category", "source"],
@@ -141,21 +142,21 @@ def create_total_table(df: pd.DataFrame) -> Table:
     return df_tot
 
 
-def pivot_and_format_table(df, drop_columns, pivot_index, pivot_values, pivot_columns, table_name) -> Table:
+def pivot_and_format_table(df_piv, drop_columns, pivot_index, pivot_values, pivot_columns, table_name) -> Table:
     """
     - Dropping a selection of columns
     - Pivoting by the desired disaggregations e.g. category, unit of measurement
     - Tidying the column names
     """
-    df = df.drop(columns=drop_columns)
-    df = df.pivot(index=pivot_index, columns=pivot_columns, values=pivot_values)
+    df_piv = df_piv.drop(columns=drop_columns)
+    df_piv = df_piv.pivot(index=pivot_index, columns=pivot_columns, values=pivot_values)
 
-    df.columns = df.columns.droplevel(0)
+    df_piv.columns = df_piv.columns.droplevel(0)
     tb_garden = Table(short_name=underscore(table_name))
-    for col in df.columns:
+    for col in df_piv.columns:
         col_metadata = build_metadata(col, table_name=table_name)
         new_col = underscore(" ".join(col).strip())
-        tb_garden[new_col] = df[col]
+        tb_garden[new_col] = df_piv[col]
         tb_garden[new_col].metadata = col_metadata
 
     return tb_garden
@@ -187,7 +188,10 @@ def build_metadata(col: tuple, table_name: str) -> VariableMeta:
         )
     elif table_name == "Total":
         title = f"{metric_dict[col[0]]['title']} - {col[1]} - {col[2]}"
-        description = f"The {metric_dict[col[0]]['title'].lower()} for {col[1].lower()}, {col[2].lower()}"
+        description = f"The {metric_dict[col[0]]['title'].lower()} recorded in a year."
+    elif table_name == "by relationship to perpetrator":
+        title = f"{metric_dict[col[0]]['title']} - {col[1]} - {col[2]} - {col[3]}"
+        description = f"The {metric_dict[col[0]]['title'].lower()} shown by the victims relationship to the perpatrator. The age and sex characteristics relate to that of the victim, rather than the perpatrator"
     else:
         title = ""
         description = ""
@@ -204,6 +208,10 @@ def build_metadata(col: tuple, table_name: str) -> VariableMeta:
 
 
 def clean_up_categories(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Make the categories used in the dataset a bit more readable.
+
+    """
     category_dict = {
         "Firearms or explosives - firearms": "firearms",
         "Another weapon - sharp object": "a sharp object",
@@ -211,8 +219,41 @@ def clean_up_categories(df: pd.DataFrame) -> pd.DataFrame:
         "Without a weapon/ other Mechanism": " without a weapon or by another mechanism",
         "Firearms or explosives": "firearms or explosives",
         "Another weapon": "an unspecified weapon",
+        "Intimate partner or family member": "perpertrator is an intimate partner or family member",
+        "Intimate partner or family member: Intimate partner": "perpertrator is an intimate partner",
+        "Intimate partner or family member: Family member": "perpertrator is a family member",
+        "Other Perpetrator known to the victim": "an other known perpetrator",
+        "Perpetrator unknown": "perpertrator is unknown",
+        "Relationship to perpetrator is not known": "a perpertrator where the relationship to the victim is not known",
     }
     df = df.replace({"category": category_dict})
 
     assert df["category"].isna().sum() == 0
     return df
+
+
+def calculate_share_of_homicides(total_table: Table, perp_table: Table) -> Table:
+    """
+    Calculate the share of total homicides where:
+
+    * The perpertrator is an intimate partner
+    * The perpertrator is a family member
+    * The perpertrator is unknown
+    """
+    merge_table = pd.merge(total_table, perp_table, on=["country", "year"])
+
+    sexes = ["both_sexes", "female", "male"]
+    perpertrators = [
+        "perpertrator_is_an_intimate_partner",
+        "perpertrator_is_a_family_member",
+        "perpertrator_is_unknown",
+    ]
+    share_df = pd.DataFrame()
+    for sex in sexes:
+        sex_select = f"counts_{sex}_all_ages"
+        for perp in perpertrators:
+            perp_select = f"counts_{perp}_{sex}_all_ages"
+            new_col = underscore(f"Share of homicides of {sex} where the {perp}")
+            share_df[new_col] = (merge_table[perp_select] / merge_table[sex_select]) * 100
+    share_table = Table(share_df, short_name="share")
+    return share_table
