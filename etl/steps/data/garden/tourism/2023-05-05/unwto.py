@@ -160,6 +160,11 @@ def run(dest_dir: str) -> None:
     merged_df_concat_transf["inb_outb_tot"] = (
         merged_df_concat_transf["in_to_ar_to_ar"] / merged_df_concat_transf["ou_to_de_to_de"]
     )
+    # Calculate same-day by tourist trips ratio
+    merged_df_concat_transf["same_tourist_ratio"] = (
+        merged_df_concat_transf["in_to_ar_sa_da_vi_ex"] / merged_df_concat_transf["in_to_ar_ov_vi_to"]
+    )
+
     merged_df_concat_transf.reset_index(inplace=True)  # reset index
 
     # Create a new table with the processed data.
@@ -214,13 +219,13 @@ def calculate_sum_by_year(df):
     ]
     df_sum = df[regional_columns].reset_index().groupby("year").sum(numeric_only=True)
     df_sum.columns = [
-        "Africa (UNWTO)",
-        "Americas (UNWTO)",
-        "East Asia and the Pacific (UNWTO)",
-        "Europe (UNWTO)",
-        "Middle East (UNWTO)",
-        "Not classified (UNWTO)",
-        "South Asia (UNWTO)",
+        "Africa",
+        "Americas",
+        "East Asia and the Pacific",
+        "Europe",
+        "Middle East",
+        "Not classified",
+        "South Asia",
     ]
     return df_sum
 

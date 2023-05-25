@@ -52,6 +52,9 @@ def run(dest_dir: str) -> None:
         + ", "
         + df.loc[df["country"] == "La Coruna, Spain", "year"].astype(str)
     )
+    for col in df.columns:
+        if col not in ["country", "year"]:
+            df[col] = df[col].round(0)
 
     # Create a new table with the processed data.
     tb_garden = Table(df, short_name="oil_spills")

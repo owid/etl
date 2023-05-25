@@ -122,7 +122,7 @@ def prepare_ops_dataframe(df, country):
 
     # Assign constant values to 'country' and 'year'
     operations["country"] = country
-    operations["year"] = 2023
+    operations["year"] = 2022
 
     return operations
 
@@ -185,8 +185,8 @@ def extract_causes_of_oil_spills(df_above_7000, df_below_7000):
     merged_causes : pd.DataFrame
         A pandas dataframe containing the total causes from both input dataframes, with columns renamed to append '_causes'.
     """
-    df_above_7000_cause_totals_pv = extract_cause_totals(df_above_7000, 2023, "Large (>700t)")
-    df_below_7000_cause_totals_pv = extract_cause_totals(df_below_7000, 2023, "Small (7-700t)")
+    df_above_7000_cause_totals_pv = extract_cause_totals(df_above_7000, 2022, "Large (>700t)")
+    df_below_7000_cause_totals_pv = extract_cause_totals(df_below_7000, 2022, "Small (7-700t)")
     # Concatenate the two pivoted DataFrames along the row axis
     merged_causes = pd.concat([df_above_7000_cause_totals_pv, df_below_7000_cause_totals_pv], axis=0)
     # Append suffix '_causes' to non 'year' and 'country' columns
