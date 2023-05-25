@@ -34,43 +34,28 @@ def run(dest_dir: str) -> None:
     # Call a function to harmonize country names in the DataFrame.
     df = geo.harmonize_countries(df=df, countries_file=paths.country_mapping_path)
 
-    # Create an empty DataFrame to store the average values per decade.
-    decadal_averages_df = pd.DataFrame()
-
-    # Iterate over the columns of the original DataFrame.
-    for column in df.columns:
-        # Select specific columns of interest.
-        if column in ["bel_700t", "ab_700t", "oil_spilled"]:
-            # Group the data by decade (dividing the year by 10, rounding down and multiplying by 10 again),
-            # and calculate the mean for the specified column. Drop NaN results.
-            decadal_averages = df.groupby(df["year"] // 10 * 10)[column].mean().dropna()
-
-            # Construct new column names for the decadal averages.
-            decadal_column = "decadal_" + str(column)
-
-            # Add the calculated decadal averages to the new DataFrame, rounding and converting to integers.
-            decadal_averages_df[decadal_column] = np.round(decadal_averages).astype(int)
-
-    # Merge the original DataFrame with the DataFrame containing the decadal averages,
-    # using 'year' as the key and keeping all records from both DataFrames ('outer' join).
-    df_decadal = pd.merge(df, decadal_averages_df, on="year", how="outer", validate="many_to_one")
+    # Group the data by decade
+    for column in ["bel_700t", "ab_700t", "oil_spilled"]:
+        df["decadal_" + str(column)] = df[column].groupby(df["year"] // 10 * 10).transform("mean")
+        # set NaN everywhere except start of a decade
+        df["decadal_" + str(column)] = df["decadal_" + str(column)].where(df["year"] % 10 == 0, np.nan)
 
     # Replace any '__' in column names with a space (done because of double _ in some variable names)
-    newnames = [name.replace("__", " ") for name in df_decadal.columns]
-    df_decadal.columns = newnames
+    newnames = [name.replace("__", " ") for name in df.columns]
+    df.columns = newnames
 
     # Convert the 'country' column to a string type.
-    df_decadal["country"] = df_decadal["country"].astype(str)
+    df["country"] = df["country"].astype(str)
 
     # Append the 'year' to the 'country' column's entries where 'country' equals 'La Coruna, Spain'.
-    df_decadal.loc[df_decadal["country"] == "La Coruna, Spain", "country"] = (
-        df_decadal.loc[df_decadal["country"] == "La Coruna, Spain", "country"]
+    df.loc[df["country"] == "La Coruna, Spain", "country"] = (
+        df.loc[df["country"] == "La Coruna, Spain", "country"]
         + ", "
-        + df_decadal.loc[df_decadal["country"] == "La Coruna, Spain", "year"].astype(str)
+        + df.loc[df["country"] == "La Coruna, Spain", "year"].astype(str)
     )
 
     # Create a new table with the processed data.
-    tb_garden = Table(df_decadal, short_name="oil_spills")
+    tb_garden = Table(df, short_name="oil_spills")
 
     # Save outputs.
     #

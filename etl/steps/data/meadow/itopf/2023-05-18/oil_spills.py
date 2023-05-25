@@ -64,7 +64,7 @@ def run(dest_dir: str) -> None:
     combined_df = pd.merge(nsp_quant, merge_cause_op, on=["year", "country"], how="outer")
 
     # Drop the 'Total_ops' column from combined_df (as we aren't going to use it (total number of spills for all causes)
-    combined_df.drop("Total_ops", axis=1, inplace=True)
+    combined_df.drop("Total ops", axis=1, inplace=True)
 
     # Merge combined_df with df_biggest_spills (biggest spills between 1970-2022) on 'year' and 'country'
     merge_biggest_spills = pd.merge(combined_df, df_biggest_spills, on=["year", "country"], how="outer")
@@ -157,8 +157,8 @@ def extract_operations(df_above_7000, df_7_7000):
     operations_bel_7000 = prepare_ops_dataframe(df_7_7000, "Small (7-700t)")
     # Concatenate the last rows from both dataframes into a new dataframe
     operations_total = pd.concat([operations_bel_7000, operations_ab_7000])
-    operations_total = append_suffix_to_non_year_country_columns(operations_total, "_ops")
-    del operations_total["Cause_ops"]
+    operations_total = append_suffix_to_non_year_country_columns(operations_total, " ops")
+    del operations_total["Cause ops"]
 
     return operations_total
 
@@ -190,7 +190,7 @@ def extract_causes_of_oil_spills(df_above_7000, df_below_7000):
     # Concatenate the two pivoted DataFrames along the row axis
     merged_causes = pd.concat([df_above_7000_cause_totals_pv, df_below_7000_cause_totals_pv], axis=0)
     # Append suffix '_causes' to non 'year' and 'country' columns
-    merged_causes = append_suffix_to_non_year_country_columns(merged_causes, "_causes")
+    merged_causes = append_suffix_to_non_year_country_columns(merged_causes, " causes")
     return merged_causes
 
 

@@ -64,7 +64,7 @@ def run(dest_dir: str) -> None:
         pivot_table_ye, country_col="country", year_col="year", population_col="population"
     )
 
-    emissions_columns = pivot_table_ye.columns[2:-1]
+    emissions_columns = [col for col in pivot_table_ye.columns if col not in ("country", "year", "population")]
 
     # Generate per capital co2 emissions data and add it do the dataframe
     for col in emissions_columns:
@@ -93,10 +93,8 @@ def run(dest_dir: str) -> None:
     merge_df = merge_df[merge_df["year"] != 2023]
 
     # Apply the function to each row using apply()
-    merge_df = merge_df.apply(update_values, axis=1)
-    merge_df.reset_index(inplace=True)
-
-    del merge_df["index"]
+    merge_df.loc[~merge_df.country.isin(regions_[:-1]), month_names] = np.nan
+    merge_df.reset_index(inplace=True, drop=True)
 
     # Melt the DataFrame to have months as rows
     df_melted = merge_df.melt(id_vars=["country", "year"], value_vars=month_names, var_name="month", value_name="value")
@@ -173,45 +171,7 @@ def ukraine_fill_war_for_reg_agg(df):
         combined_mask, "ter_int_m_filled_ukraine"
     ].fillna(0)
 
-    merged_df[["year", "ter_int_m_filled_ukraine"]][country_mask]
-
     return merged_df
-
-
-def update_values(row):
-    """
-    Update values in the row based on the country.
-
-    Args:
-        row (pd.Series): A row of a DataFrame.
-
-    Returns:
-        pd.Series: Updated row.
-
-    """
-    regions_ = ["North America", "South America", "Europe", "Africa", "Asia", "Oceania"]
-    month_names = [
-        "January",
-        "February",
-        "March",
-        "April",
-        "May",
-        "June",
-        "July",
-        "August",
-        "September",
-        "October",
-        "November",
-        "December",
-    ]
-
-    country = row["country"]
-
-    if country in regions_:
-        return row
-    else:
-        row[month_names] = float("nan")  # Set values to NaN for month columns if it's not in the region list
-        return row
 
 
 def process_annual_data(df):

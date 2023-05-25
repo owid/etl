@@ -1,28 +1,14 @@
 dataset:
   title: UNWTO Tourism Statistics Database
-  description: |-
+  description: >
     The United Nations World Tourism Organization (UNWTO) collects data from countries through
     annual questionnaires that follow the International Recommendations for Tourism Statistics (IRTS 2008)
-    standard, a framework approved by the United Nations. The data covers various aspects of tourism,
-    such as Inbound Tourism (including Arrivals by region, main purpose, and mode of transport, as well as
-    Accommodation and Tourism expenditure in the country), Domestic Tourism (including Trips and Accommodation),
-    Outbound Tourism (including Departures and Tourism expenditure in other countries),
-    Tourism Industries (such as Accommodation in hotels and similar establishments),
-    and Employment (including the number of employees in tourism industries).
+    standard, a framework approved by the United Nations.
   licenses:
   - name: Creative Commons BY 4.0
     url: https://www.unwto.org/copyright
   sources:
-  - name: UNWTO
-    description: |-
-      The United Nations World Tourism Organization (UNWTO) collects data from countries through
-      annual questionnaires that follow the International Recommendations for Tourism Statistics (IRTS 2008)
-      standard, a framework approved by the United Nations. The data covers various aspects of tourism,
-      such as Inbound Tourism (including Arrivals by region, main purpose, and mode of transport, as well as
-      Accommodation and Tourism expenditure in the country), Domestic Tourism (including Trips and Accommodation),
-      Outbound Tourism (including Departures and Tourism expenditure in other countries),
-      Tourism Industries (such as Accommodation in hotels and similar establishments),
-      and Employment (including the number of employees in tourism industries).
+  - name: United Nations World Tourism Organization (UNWTO)
     url: https://www.unwto.org/tourism-statistics/key-tourism-statistics
     source_data_url: https://webunwto.s3.eu-west-1.amazonaws.com/s3fs-public/2023-03/unwto-all-data-download_032023.xlsx
     date_accessed: '2023-05-04'
@@ -143,31 +129,31 @@ tables:
         unit: ''
         short_unit: ''
       in_to_re_af:
-        title: Inbound tourism Africa
+        title: Africa
         unit: ''
         short_unit: ''
       in_to_re_am:
-        title: Inbound tourism America
+        title: America
         unit: ''
         short_unit: ''
       in_to_re_ea_as_an_th_pa:
-        title: Inbound tourism East Asia and the Pacific
+        title: East Asia and the Pacific
         unit: ''
         short_unit: ''
       in_to_re_eu:
-        title: Inbound tourism Europe
+        title: Europe
         unit: ''
         short_unit: ''
       in_to_re_mi_ea:
-        title: Inbound tourism Middle East
+        title: Middle East
         unit: ''
         short_unit: ''
       in_to_re_ot_no_cl:
-        title: Inbound tourism Not Classified
+        title: Not Classified
         unit: ''
         short_unit: ''
       in_to_re_so_as:
-        title: Inbound tourism South Asia
+        title: South Asia
         unit: ''
         short_unit: ''
       in_to_re_to:
@@ -175,7 +161,7 @@ tables:
         unit: ''
         short_unit: ''
       in_to_re_of_wh_na_re_ab:
-        title: Inbound tourism Not Classified (of which, nationals residing abroad)
+        title: Not Classified (of which, nationals residing abroad)
         unit: ''
         short_unit: ''
       in_to_tr_ai:

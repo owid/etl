@@ -1,6 +1,5 @@
 [core]
     remote = public
-    autostage = true
 ['remote "public"']
     url = s3://owid-catalog/snapshots
     endpointurl = https://nyc3.digitaloceanspaces.com

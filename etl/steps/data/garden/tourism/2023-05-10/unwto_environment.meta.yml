@@ -1,6 +1,7 @@
 dataset:
   title: UNWTO Environmental and Economic Aspects of Tourism
-  description: Implementation of standards accounting tools to monitor the economic
+  description: >
+    Implementation of standards accounting tools to monitor the economic
     and environmental aspects of tourism sustainability (indicator 12.b.1). Indicator
     12.b.1 shows the preparedness of countries to “develop and implement tools to
     monitor sustainable development impacts for sustainable tourism” called for in

@@ -1,18 +1,14 @@
 dataset:
   title: Oil Spills
-  description: |-
-    ITOPF maintains a database of oil spills from tank vessels, including combined carriers, FPSOs and barges. This contains information on
-    accidental spillages of persistent and non-persistent hydrocarbon oil since 1970, except those resulting from acts of war.
-    For historical reasons, spills are generally categorised by size, <7 tonnes, 7-700 tonnes and >700 tonnes, although the actual amount
-    spilt is also recorded.
-    Information is now held on over 10,000 incidents, the vast majority of which fall into the smallest category i.e. <7 tonnes.
-    Information is gathered from published sources, such as the shipping press and other specialist publications, as well as from
-    vessel owners, their insurers and from ITOPF's own experience at incidents. Historically, information from published sources mostly related to large spills, often resulting from collisions, groundings, structural damage, fires or explosions. In recent decades, however, reporting of smaller spills has improved.
+  description: >
+    ITOPF maintains a database of oil spills from tank vessels, including combined carriers, FPSOs and barges. This
+    contains information on accidental spillages of persistent and non-persistent hydrocarbon oil since 1970, except
+    those resulting from acts of war.
   licenses:
   - name: ITOPF Limited, 2019
     url: https://www.itopf.org/terms-conditions/
   sources:
-  - name: ITOPF
+  - name: International Tanker Owners Pollution Federation (ITOPF)
     url: https://www.itopf.org/knowledge-resources/data-statistics/statistics/
     date_accessed: '2023-05-18'
     publication_date: January 2023
@@ -21,90 +17,90 @@ tables:
   oil_spills:
     variables:
       bel_700t:
-        title: Small Oil Spills (7-700 tonnes)
+        title: Small oil spills (7-700 tonnes)
         unit: spills
         short_unit: ''
       ab_700t:
-        title: Large Oil Spills (>700 tonnes)
+        title: Large oil spills (>700 tonnes)
         unit: spills
         short_unit: ''
       oil_spilled:
-        title: Quantity of Oil Spilled
+        title: Quantity of oil spilled
         unit: tonnes
         short_unit: t
       allision_collision_causes:
-        title: Allision/Collision Causes
+        title: Allision/collision causes
         unit: causes
         short_unit: ''
       equipment_failure_causes:
-        title: Equipment Failure Causes
+        title: Equipment failure causes
         unit: causes
         short_unit: ''
       fire_explosion_causes:
-        title: Fire/Explosion Causes
+        title: Fire/explosion causes
         unit: causes
         short_unit: ''
       grounding_causes:
-        title: Grounding Causes
+        title: Grounding causes
         unit: causes
         short_unit: ''
       hull_failure_causes:
-        title: Hull Failure Causes
+        title: Hull failure causes
         unit: causes
         short_unit: ''
       other_causes:
-        title: Other Causes
+        title: Other causes
         unit: causes
         short_unit: ''
       unknown_causes:
-        title: Unknown Causes
+        title: Unknown causes
         unit: causes
         short_unit: ''
       loading_discharing_ops:
-        title: Loading/Discharging Operations
+        title: Loading/discharging operations
         unit: operations
         short_unit: ''
       bunkering_ops:
-        title: Bunkering Operations
+        title: Bunkering operations
         unit: operations
         short_unit: ''
       other_operations_ops:
-        title: Other Operations
+        title: Other operations
         unit: operations
         short_unit: ''
       uknown_ops:
-        title: Unknown Operations
+        title: Unknown operations
         unit: operations
         short_unit: ''
       at_anchor_inland_ops:
-        title: At Anchor (Inland) Operations
+        title: At anchor (inland) operations
         unit: operations
         short_unit: ''
       at_anchor_open_water_ops:
-        title: At Anchor (Open Water) Operations
+        title: At anchor (open water) operations
         unit: operations
         short_unit: ''
       underway_inland_ops:
-        title: Underway (Inland) Operations
+        title: Underway (inland) operations
         unit: operations
         short_unit: ''
       underway_open_water_ops:
-        title: Underway (Open Water) Operations
+        title: Underway (open water) operations
         unit: operations
         short_unit: ''
       biggest_spills_size:
-        title: Spill Size
+        title: Spill size
         short_unit: 't'
         unit: 'tonnes'
       decadal_bel_700t:
-        title: Decadal Small Oil Spills (7-700 tonnes)
+        title: Decadal small oil spills (7-700 tonnes)
         unit: spills
         short_unit: ''
       decadal_ab_700t:
-        title: Decadal Large Oil Spills (>700 tonnes)
+        title: Decadal large oil spills (>700 tonnes)
         unit: spills
         short_unit: ''
       decadal_oil_spilled:
-        title: Decadal Quantity of Oil Spilled
+        title: Decadal quantity of oil spilled
         unit: tonnes
         short_unit: t
