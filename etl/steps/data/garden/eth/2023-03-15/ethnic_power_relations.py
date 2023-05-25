@@ -227,8 +227,8 @@ def add_regional_aggregations(df: pd.DataFrame) -> pd.DataFrame:
     # Concatenate df with df_regions
     df = pd.concat([df, df_regions], ignore_index=True)
 
-    # Drop headcount and population columns
-    df = df.drop(columns=["population"] + pop_vars_headcount)
+    # Drop population column
+    df = df.drop(columns=["population"])
 
     # Verify index and sort
     df = df.set_index(["country", "year"], verify_integrity=True).sort_index()
