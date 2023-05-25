@@ -33,7 +33,7 @@ tables:
         display:
           numDecimalPlaces: 0
       north_america:
-        title: North America
+        title: North america
         unit: tonnes
         short_unit: t
         display:
@@ -45,7 +45,7 @@ tables:
         display:
           numDecimalPlaces: 0
       south_america:
-        title: South America
+        title: South america
         unit: tonnes
         short_unit: t
         display:
