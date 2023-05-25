@@ -139,7 +139,16 @@ def add_regional_aggregations(df: pd.DataFrame) -> pd.DataFrame:
     df = df[~df["country"].isin(regions)].reset_index(drop=True)
 
     # Also drop binary vars in df (they are only useful for regions)
-    df = df.drop(columns=binary_vars_yes + binary_vars_no + binary_vars_yes_pop + binary_vars_no_pop + regressive_vars_yes + regressive_vars_no + regressive_vars_yes_pop + regressive_vars_no_pop)
+    df = df.drop(
+        columns=binary_vars_yes
+        + binary_vars_no
+        + binary_vars_yes_pop
+        + binary_vars_no_pop
+        + regressive_vars_yes
+        + regressive_vars_no
+        + regressive_vars_yes_pop
+        + regressive_vars_no_pop
+    )
 
     # Calculate average variables for regions
     for var in pop_vars:
