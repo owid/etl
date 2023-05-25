@@ -1,0 +1,31 @@
+tables:
+  us_patents:
+    variables:
+      utility__patent__applications__e__inventions:
+        title: Utility/inventions patent applications
+        short_unit: ''
+        unit: 'applications'
+      design__patent_applications:
+        title: Design patent applications
+        short_unit: ''
+        unit: 'applications'
+      plant_patent__applications:
+        title: Plant patent applications
+        short_unit: ''
+        unit: 'applications'
+      utility_patents__e__inventions:
+        title: Utility/inventions patents
+        short_unit: ''
+        unit: 'patents'
+      design_patents:
+        title: Design patents
+        short_unit: ''
+        unit: 'patents'
+      plant_patents:
+        title: Plant patents
+        short_unit: ''
+        unit: 'patents'
+      patent_grants__to_foreign_residents__a:
+        title: Patent grants to foreign residents
+        short_unit: ''
+        unit: 'patents'
