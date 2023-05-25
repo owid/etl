@@ -120,7 +120,7 @@ def _move_sources_to_dataset(ds_meta: Dict[str, Any], tb_meta: Dict[str, Any]) -
     vars_sources = [var_meta.pop("sources", None) for var_meta in tb["variables"].values()]
 
     # every one must have a single source
-    if not all([len(sources) == 1 for sources in vars_sources]):
+    if not all([sources is not None and len(sources) == 1 for sources in vars_sources]):
         return ds_meta_orig, tb_meta_orig
 
     vars_sources = [sources[0] for sources in vars_sources]
