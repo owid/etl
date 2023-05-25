@@ -24,22 +24,15 @@ def run(dest_dir: str) -> None:
     # Load data from the snapshot into a pandas DataFrame
     df = pd.read_csv(snap.path, low_memory=False)
 
-    # Specify columns to use and their new names
-    cos_to_use = ["Country", "FLIGHT", "Frequency", "SOURCE", "TIME", "Value"]
-    cos_to_name = [
-        "country",
-        "flight_type",
-        "frequency",
-        "emission_source",
-        "year",
-        "value",
-    ]  # clarify what this columns mean
-
-    # Slice the DataFrame to keep only the columns of interest
-    df = df[cos_to_use]
-
-    # Rename the columns in the DataFrame
-    df = df.rename(columns=dict(zip(df.columns, cos_to_name)))
+    rename_cols = {
+        "Country": "country",
+        "FLIGHT": "flight_type",
+        "Frequency": "frequency",
+        "SOURCE": "emission_source",
+        "TIME": "year",
+        "Value": "value",
+    }
+    df = df.rename(columns=rename_cols)[rename_cols.values()]
 
     # Convert the 'year' column to datetime
     df["year"] = pd.to_datetime(df["year"])

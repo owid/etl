@@ -84,7 +84,7 @@ def run(dest_dir: str) -> None:
 
     merge_df = merge_df.rename(columns={"ter_int_m_filled_ukraine": "TER_INT_m"})
 
-    regions_ = ["North America", "South America", "Europe", "Africa", "Asia", "Oceania", "European Union (27)"]
+    regions_ = ["North America", "South America", "Europe", "Africa", "Asia", "Oceania"]
 
     for region in regions_:
         merge_df = geo.add_region_aggregates(df=merge_df, country_col="country", year_col="year", region=region)
@@ -93,7 +93,7 @@ def run(dest_dir: str) -> None:
     merge_df = merge_df[merge_df["year"] != 2023]
 
     # Apply the function to each row using apply()
-    merge_df.loc[~merge_df.country.isin(regions_[:-1]), month_names] = np.nan
+    merge_df.loc[~merge_df.country.isin(regions_), month_names] = np.nan
     merge_df.reset_index(inplace=True, drop=True)
 
     # Melt the DataFrame to have months as rows

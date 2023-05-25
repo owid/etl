@@ -58,16 +58,13 @@ def run(dest_dir: str) -> None:
 
     # Drop rows in 'merged_df' that correspond to the countries 'Saba', 'Sint Eustatius',
     # and 'Bonaire', and store the resulting DataFrame in 'merged_df_drop_'.
-    merged_df_drop_ = merged_df.drop(merged_df[merged_df["country"].isin(["Saba", "Sint Eustatius", "Bonaire"])].index)
-
+    merged_df_drop_ = merged_df.loc[~merged_df.country.isin(["Saba", "Sint Eustatius", "Bonaire"])]
     # Concatenate 'merged_df_drop_' and 'sum_bon_sint_saba' into a single DataFrame 'merged_df_concat'.
     # The rows of 'sum_bon_sint_saba' will be appended to 'merged_df_drop_'.
     merged_df_concat = merged_df_drop_.append(sum_bon_sint_saba, ignore_index=True)
 
     # Set index, check that it's unique and reset index
-    merged_df_concat = merged_df_concat.set_index(["country", "year"])
-    assert len(merged_df_concat.index.levels) == 2 and merged_df_concat.index.is_unique, "Index is not well constructed"
-    merged_df_concat = merged_df_concat.reset_index()
+    assert not merged_df_concat[["country", "year"]].duplicated().any(), "Index is not well constructed"
 
     # Aggregate data by region
     # Africa, Oceania, and income level categories
@@ -163,12 +160,10 @@ def run(dest_dir: str) -> None:
     merged_df_concat_transf["inb_outb_tot"] = (
         merged_df_concat_transf["in_to_ar_to_ar"] / merged_df_concat_transf["ou_to_de_to_de"]
     )
-
     merged_df_concat_transf.reset_index(inplace=True)  # reset index
 
     # Create a new table with the processed data.
     tb_garden = Table(merged_df_concat_transf, short_name="unwto")
-
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
@@ -183,12 +178,17 @@ def run(dest_dir: str) -> None:
 def shorten_name(name):
     # remove underscores and convert to title case
     name = name.replace("_", " ").title()
-
     # extract first letter of each word
     words = name.split()
     initials = "_".join([word[:2].lower() for word in words])
 
     return initials
+
+
+def shorten_column_names(df):
+    newnames = [shorten_name(name) for name in df.columns]
+    df.columns = newnames
+    return df
 
 
 def per_1000(df, column):
@@ -199,12 +199,6 @@ def convert_columns_to_float32(df):
     for col in df.columns:
         if df[col].dtype != "float32":
             df[col] = df[col].astype(str).replace(["", "<NA>"], np.nan).astype("float32")
-    return df
-
-
-def shorten_column_names(df):
-    newnames = [shorten_name(name) for name in df.columns]
-    df.columns = newnames
     return df
 
 

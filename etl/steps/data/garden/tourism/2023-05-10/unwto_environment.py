@@ -42,10 +42,7 @@ def run(dest_dir: str) -> None:
         columns={df.columns[2]: "seea_tables", df.columns[3]: "tsa_tables", df.columns[4]: "total_tables"}, inplace=True
     )
     # Create a new table with the processed data.
-    df.reset_index(inplace=True)
-    df.drop("index", axis=1, inplace=True)
-
-    tb_garden = Table(df, short_name="unwto_environment")
+    tb_garden = Table(df.reset_index(drop=True), short_name="unwto_environment")
 
     #
     # Save outputs.

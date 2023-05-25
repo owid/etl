@@ -16,7 +16,6 @@ paths = PathFinder(__file__)
 
 def run(dest_dir: str) -> None:
     log.info("oil_spills.start")
-    print("hi")
 
     #
     # Load inputs.
@@ -41,7 +40,7 @@ def run(dest_dir: str) -> None:
         df["decadal_" + str(column)] = df["decadal_" + str(column)].where(df["year"] % 10 == 0, np.nan)
 
     # Replace any '__' in column names with a space (done because of double _ in some variable names)
-    newnames = [name.replace("__", " ") for name in df.columns]
+    newnames = [name.replace("__", "_") for name in df.columns]
     df.columns = newnames
 
     # Convert the 'country' column to a string type.
