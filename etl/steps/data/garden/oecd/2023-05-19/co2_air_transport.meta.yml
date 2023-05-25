@@ -1,8 +1,7 @@
 dataset:
   title: Air Transport CO2 Emissions
   description: >
-    This database includes annual, quarterly, and monthly information on CO2 emissions related to commercial passenger, freight,
-    and general aviation flights, on both a territory and a residence basis, for 186 countries. These CO2 emissions are estimated by the OECD, based on a consistent methodology across countries.
+    This database includes annual, quarterly, and monthly information on CO2 emissions related to commercial passenger, freight, and general aviation flights, on both a territory and a residence basis, for 186 countries. These CO2 emissions are estimated by the OECD, based on a consistent methodology across countries.
   licenses:
   - name: Creative Commons BY 4.0
     url: https://www.oecd.org/termsandconditions/#:~:text=You%20must%20give%20appropriate%20credit,(accessed%20on%20(date)).
@@ -34,7 +33,7 @@ tables:
         display:
           numDecimalPlaces: 0
       north_america:
-        title: North america
+        title: North America
         unit: tonnes
         short_unit: t
         display:
@@ -46,7 +45,7 @@ tables:
         display:
           numDecimalPlaces: 0
       south_america:
-        title: South america
+        title: South America
         unit: tonnes
         short_unit: t
         display:

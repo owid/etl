@@ -108,6 +108,7 @@ def run(dest_dir: str) -> None:
     )
 
     merged_df = pd.merge(df_pivoted, merge_df, on=["country", "year"], how="outer")
+
     # Create a new table with the processed data.
     tb_garden = Table(merged_df, short_name="co2_air_transport")
     #
