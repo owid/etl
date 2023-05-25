@@ -34,6 +34,7 @@ def run(dest_dir: str) -> None:
     #
     # Create a new table and ensure all columns are snake-case.
     tb = Table(df, short_name=paths.short_name, underscore=True)
+    tb = tb.rename(columns={"calendar__year": "year"}).assign(country="United States").drop(columns="notes")
 
     #
     # Save outputs.
