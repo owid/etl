@@ -408,6 +408,8 @@ steps:
   - snapshot://research_development/2023-05-24/us_patents.htm
   data://garden/research_development/2023-05-25/us_patents:
   - data://meadow/research_development/2023-05-24/us_patents
+  data://grapher/research_development/2023-05-25/us_patents:
+  - data://garden/research_development/2023-05-25/us_patents
 
 # Sub-dags to import
 include:
