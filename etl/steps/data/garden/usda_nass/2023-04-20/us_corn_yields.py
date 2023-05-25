@@ -1,7 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
-import pandas as pd
-from owid.catalog import Dataset, Table
+from owid.catalog import Dataset
 from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
@@ -29,25 +28,19 @@ def run(dest_dir: str) -> None:
     ds_meadow: Dataset = paths.load_dependency("us_corn_yields")
 
     # Read table from meadow dataset.
-    tb_meadow = ds_meadow["us_corn_yields"]
-
-    # Create a dataframe with data from the table.
-    df = pd.DataFrame(tb_meadow)
+    tb = ds_meadow["us_corn_yields"]
 
     #
     # Process data.
     #
     # Change units of corn yield.
-    df["corn_yield"] *= BUSHELS_OF_CORN_TO_TONNES / ACRES_TO_HECTARES
-
-    # Create a new table with the processed data.
-    tb_garden = Table(df, like=tb_meadow)
+    tb["corn_yield"] *= BUSHELS_OF_CORN_TO_TONNES / ACRES_TO_HECTARES
 
     #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb_garden], default_metadata=ds_meadow.metadata)
+    ds_garden = create_dataset(dest_dir, tables=[tb], default_metadata=ds_meadow.metadata)
 
     # Save changes in the new garden dataset.
     ds_garden.save()

@@ -1,7 +1,6 @@
 """Load a snapshot and create a meadow dataset."""
 
-import pandas as pd
-from owid.catalog import Table
+from owid.catalog import processing as pr
 from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
@@ -30,14 +29,14 @@ def run(dest_dir: str) -> None:
     snap: Snapshot = paths.load_dependency("us_corn_yields.csv")
 
     # Load data from snapshot.
-    df = pd.read_csv(snap.path)
+    tb = pr.read_csv(snap.path, metadata=snap.to_table_metadata())
 
     #
     # Process data.
     #
     # Sanity check.
     error = "Data does not have the expected characteristics."
-    assert df[
+    assert tb[
         ["Program", "Period", "Geo Level", "State", "Commodity", "Data Item", "Domain", "Domain Category"]
     ].drop_duplicates().values.tolist() == [
         [
@@ -53,19 +52,16 @@ def run(dest_dir: str) -> None:
     ], error
 
     # Select and rename required columns, and add a country column.
-    df = df[list(COLUMNS)].rename(columns=COLUMNS, errors="raise").assign(**{"country": "United States"})
+    tb = tb[list(COLUMNS)].rename(columns=COLUMNS, errors="raise").assign(**{"country": "United States"}).underscore()
 
     # Set an appropriate index and sort conveniently.
-    df = df.set_index(["country", "year"], verify_integrity=True).sort_index()
-
-    # Create a new table and ensure all columns are snake-case.
-    tb = Table(df, short_name=paths.short_name, underscore=True)
+    tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index()
 
     #
     # Save outputs.
     #
     # Create a new meadow dataset with the same metadata as the snapshot.
-    ds_meadow = create_dataset(dest_dir, tables=[tb], default_metadata=snap.metadata)
+    ds_meadow = create_dataset(dest_dir, tables=[tb], default_metadata=tb.metadata.dataset)
 
     # Save changes in the new garden dataset.
     ds_meadow.save()
