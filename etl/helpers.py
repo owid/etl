@@ -19,6 +19,7 @@ from owid.datautils.common import ExceptionFromDocstring
 from owid.walden import Catalog as WaldenCatalog
 from owid.walden import Dataset as WaldenDataset
 
+from etl import grapher_helpers as gh
 from etl import paths
 from etl.snapshot import Snapshot, SnapshotMeta
 from etl.steps import extract_step_attributes, load_dag, reverse_graph
@@ -69,6 +70,7 @@ def grapher_checks(ds: catalog.Dataset) -> None:
 
     for tab in ds:
         assert {"year", "country"} <= set(tab.reset_index().columns), "Table must have columns country and year."
+        assert tab["year"].dtype in gh.INT_TYPES, f"year must be of an integer type but was: {tab['country'].dtype}"
         for col in tab:
             if col in ("year", "country"):
                 continue

@@ -36,6 +36,9 @@ def run(dest_dir: str) -> None:
     tb = Table(df, short_name=paths.short_name, underscore=True)
     tb = tb.rename(columns={"calendar__year": "year"}).assign(country="United States").drop(columns="notes")
 
+    # Clean year column `1836 (c) -> 1836`.
+    tb["year"] = tb["year"].str.replace("(c)", "", regex=False).astype(int)
+
     #
     # Save outputs.
     #
